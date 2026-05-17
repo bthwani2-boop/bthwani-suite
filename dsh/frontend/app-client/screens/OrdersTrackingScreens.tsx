@@ -1149,8 +1149,25 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const [ratingsSubmitted, setRatingsSubmitted] = React.useState(false);
   const [draftMessage, setDraftMessage] = React.useState('');
   const [draftAttachments, setDraftAttachments] = React.useState<OrderChatAttachmentKind[]>([]);
+  const [isSupportExpanded, setIsSupportExpanded] = React.useState(false);
+  const [selectedIssue, setSelectedIssue] = React.useState<string | null>(null);
+  const [supportDetailsText, setSupportDetailsText] = React.useState('');
+  const [isSupportSubmitted, setIsSupportSubmitted] = React.useState(false);
   const [actionBarHeight, setActionBarHeight] = React.useState(0);
   const [isChatExpanded, setIsChatExpanded] = React.useState(false);
+  const [hasAlertedCaptain, setHasAlertedCaptain] = React.useState(false);
+  const [supportAttachment, setSupportAttachment] = React.useState<string | null>(null);
+
+  const issueTypes = [
+    { id: 'not_received', label: 'لم أستلم الطلب' },
+    { id: 'captain_not_arrived', label: 'الكابتن لم يصل' },
+    { id: 'missing_items', label: 'الطلب ناقص' },
+    { id: 'damaged_product', label: 'المنتج تالف' },
+    { id: 'huge_delay', label: 'تأخر كبير' },
+    { id: 'payment_issue', label: 'مشكلة دفع' },
+    { id: 'other', label: 'أخرى' },
+  ];
+
   const effectiveClientState = normalizeClientFacingOrderState(clientState);
 
   React.useEffect(() => {
@@ -1228,26 +1245,21 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const canSendMessage = phase !== 'received' && (draftMessage.trim().length > 0 || draftAttachments.length > 0);
   const chatSendLabel = draftMessage.trim().length > 0 ? 'إرسال الرسالة' : draftAttachments.length > 0 ? 'إرسال المرفقات' : 'أضف نصًا أو مرفقًا';
 
-  const quickActions = (['voice', 'camera', 'video', 'attachment'] as OrderChatAttachmentKind[]).map((kind) => {
-    const option = orderChatAttachmentOptions[kind];
-    const selected = draftAttachments.includes(kind);
-
+  const quickActions = (['camera', 'video', 'voice'] as OrderChatAttachmentKind[]).map((kind) => {
+    const opt = orderChatAttachmentOptions[kind];
+    const isSelected = draftAttachments.includes(kind);
     return {
-      id: option.kind,
-      label: option.label,
-      selected,
+      id: kind,
+      label: opt.label,
+      selected: isSelected,
       disabled: phase === 'received',
-      icon: <Icon name={option.iconName as any} size={16} color={selected ? theme.brandContrast : theme.text} />,
+      icon: <Icon name={opt.iconName} size={18} color={isSelected ? theme.brandContrast : theme.brand} />,
       onPress: () => {
-        if (phase === 'received') {
-          return;
+        if (isSelected) {
+          setDraftAttachments(draftAttachments.filter((k) => k !== kind));
+        } else {
+          setDraftAttachments([...draftAttachments, kind]);
         }
-
-        setDraftAttachments((current) => (
-          current.includes(kind)
-            ? current.filter((item) => item !== kind)
-            : [...current, kind]
-        ));
       },
     };
   });
@@ -1340,23 +1352,13 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       ? 'تم إنشاء الطلب. هذه الشاشة مختصرة للتأكيد قبل النجاح ثم التتبع.'
       : 'تم تأكيد الطلب. الإجراء الرئيسي ينقلك إلى التتبع مباشرة.';
   } else if (phase === 'route') {
-    primaryAction = {
-      label: 'التواصل مع الكابتن',
-      onPress: () => setIsChatExpanded(true),
-    };
-    secondaryAction = onSupport ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' } : undefined;
-    stickyNote = 'جاري متابعة الطلب وتوصيله من قبل الكابتن.';
+    primaryAction = undefined;
+    secondaryAction = undefined;
+    stickyNote = '';
   } else if (phase === 'arrived') {
-    primaryAction = onSupport ? {
-      label: 'الدعم أو الإبلاغ عن مشكلة',
-      onPress: onSupport,
-    } : undefined;
-    secondaryAction = {
-      label: 'رسالة الكابتن',
-      onPress: () => setIsChatExpanded(true),
-      tone: 'secondary',
-    };
-    stickyNote = 'وصل الكابتن إلى موقع التسليم بانتظار إتمام التسليم.';
+    primaryAction = undefined;
+    secondaryAction = undefined;
+    stickyNote = '';
   } else if (phase === 'received') {
     if (ratingsSubmitted) {
       primaryAction = {
@@ -1378,9 +1380,11 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
     secondaryAction = onReorder
       ? { label: 'إعادة الطلب', onPress: onReorder, tone: 'secondary' }
-      : onSupport
-        ? { label: 'الدعم', onPress: onSupport, tone: 'secondary' }
-        : undefined;
+      : {
+          label: isSupportExpanded ? 'إغلاق الدعم' : 'الدعم أو الإبلاغ عن مشكلة',
+          onPress: () => setIsSupportExpanded(!isSupportExpanded),
+          tone: 'secondary',
+        };
 
     stickyNote = ratingsSubmitted
       ? 'تم حفظ التقييم بنجاح. شكراً لك!'
@@ -1389,9 +1393,10 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
   const reviewStateLabel = phase === 'received' ? (ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن') : 'مؤجل حتى الاستلام';
   const runtimeBottomInset = Platform.OS === 'android'
-    ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
+    ? safeArea.compact
     : safeArea.comfortable;
-  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + runtimeBottomInset + safeArea.comfortable;
+  const hasStickyBar = !!(primaryAction || secondaryAction || stickyNote);
+  const contentBottomPadding = (hasStickyBar && actionBarHeight > 0 ? actionBarHeight : (hasStickyBar ? spacing[16] : spacing[4])) + runtimeBottomInset + safeArea.comfortable;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
@@ -1452,33 +1457,45 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         {/* 3. Quick Actions Card */}
         <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
           <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>التواصل والمساعدة</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يمكنك الاتصال بالكابتن مباشرة أو مراسلته عبر المحادثة الفورية، أو طلب الدعم الفني.</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            يمكنك مراسلة الكابتن مباشرة داخل الطلب، أو تنبيهه، أو طلب الدعم والمساعدة عند وجود مشكلة.
+          </Text>
 
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', flexDirection: 'row-reverse' }}>
             <Button
-              label="اتصال بالكابتن"
-              tone="secondary"
-              leadingAccessory={<Icon name="call-outline" size={18} color={theme.text} />}
-              onPress={() => {}}
-              style={{ flex: 1, minWidth: 120 }}
-            />
-            <Button
-              label={isChatExpanded ? "إغلاق المحادثة" : "مراسلة الكابتن"}
-              tone={isChatExpanded ? "primary" : "secondary"}
-              leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.text} />}
+              label={isChatExpanded ? "إغلاق المراسلة" : "مراسلة الكابتن"}
+              tone={isChatExpanded ? "brand" : "secondary"}
+              leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
               onPress={() => setIsChatExpanded(!isChatExpanded)}
               style={{ flex: 1, minWidth: 120 }}
             />
-            {onSupport && (
+            {!hasClientReceived && (
               <Button
-                label="الدعم الفني"
-                tone="secondary"
-                leadingAccessory={<Icon name="help-circle-outline" size={18} color={theme.text} />}
-                onPress={onSupport}
+                label={hasAlertedCaptain ? "تم تنبيه الكابتن" : "تنبيه الكابتن"}
+                tone={hasAlertedCaptain ? "ghost" : "secondary"}
+                disabled={hasAlertedCaptain}
+                leadingAccessory={<Icon name="notifications-outline" size={18} color={hasAlertedCaptain ? theme.textSoft : theme.brand} />}
+                onPress={() => setHasAlertedCaptain(true)}
                 style={{ flex: 1, minWidth: 120 }}
               />
             )}
+            <Button
+              label={isSupportExpanded ? "إغلاق الدعم" : "الدعم أو الإبلاغ عن مشكلة"}
+              tone={isSupportExpanded ? "brand" : "secondary"}
+              leadingAccessory={<Icon name="help-circle-outline" size={18} color={isSupportExpanded ? theme.brandContrast : theme.brand} />}
+              onPress={() => setIsSupportExpanded(!isSupportExpanded)}
+              style={{ flex: 1, minWidth: 120 }}
+            />
           </Box>
+
+          {hasAlertedCaptain && !hasClientReceived && (
+            <Box layoutDirection="row-reverse" align="center" gap={2} style={{ marginTop: 4 }}>
+              <Icon name="checkmark-circle-outline" size={16} color={theme.success} />
+              <Text role="bodySm" style={{ color: theme.success, textAlign: 'right' }}>
+                أرسلنا تنبيهًا للكابتن داخل هذا الطلب.
+              </Text>
+            </Box>
+          )}
         </Surface>
 
         {/* Inline Chat toggled by Message Button */}
@@ -1505,6 +1522,144 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
             sendDisabled={!canSendMessage}
             disabledReason={phase === 'received' ? 'الدردشة أغلقت بعد استلام العميل للطلب.' : !canSendMessage ? 'أضف نصًا أو اختر مرفقًا واحدًا على الأقل.' : undefined}
           />
+        )}
+
+        {/* Inline Support toggled by Support Button */}
+        {isSupportExpanded && (
+          <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+            {isSupportSubmitted ? (
+              <Box gap={3} align="center" style={{ paddingVertical: 10 }}>
+                <Box
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    backgroundColor: theme.brandSurface,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 8,
+                  }}
+                >
+                  <Icon name="checkmark-circle" size={40} color={theme.brand} />
+                </Box>
+                <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>تم إرسال بلاغك بنجاح</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'center', paddingHorizontal: 16 }}>
+                  تلقينا تفاصيل مشكلتك وسيقوم فريق الدعم والمساعدة بمراجعة طلبك والتواصل معك في أقرب وقت ممكن.
+                </Text>
+                <KeyValueList
+                  dense
+                  items={[
+                    { label: 'نوع المشكلة', value: issueTypes.find(i => i.id === selectedIssue)?.label ?? '' },
+                    { label: 'تفاصيل إضافية', value: supportDetailsText.trim() || 'لا يوجد تفاصيل إضافية' },
+                    ...(supportAttachment ? [{ label: 'الملف المرفق', value: supportAttachment }] : []),
+                  ]}
+                />
+                <Button
+                  label="موافق"
+                  onPress={() => {
+                    setIsSupportExpanded(false);
+                    setIsSupportSubmitted(false);
+                    setSelectedIssue(null);
+                    setSupportDetailsText('');
+                    setSupportAttachment(null);
+                  }}
+                  style={{ width: '100%', marginTop: 8 }}
+                />
+              </Box>
+            ) : (
+              <Box gap={3}>
+                <Box gap={1} style={{ alignItems: 'flex-end' }}>
+                  <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>الدعم والمساعدة</Text>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                    اختر نوع المشكلة في طلبك لمتابعتها مع الدعم الفني فوراً.
+                  </Text>
+                </Box>
+
+                <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', flexDirection: 'row-reverse' }}>
+                  {issueTypes.map((issue) => {
+                    const isSelected = selectedIssue === issue.id;
+                    return (
+                      <Chip
+                        key={issue.id}
+                        label={issue.label}
+                        tone={isSelected ? 'brand' : 'default'}
+                        onPress={() => setSelectedIssue(selectedIssue === issue.id ? null : issue.id)}
+                      />
+                    );
+                  })}
+                </Box>
+
+                <TextField
+                  label="تفاصيل إضافية"
+                  value={supportDetailsText}
+                  placeholder="اكتب ملاحظة قصيرة تساعد فريق الدعم"
+                  onChangeText={setSupportDetailsText}
+                  style={{ textAlign: 'right' }}
+                />
+
+                {supportAttachment === null ? (
+                  <Pressable
+                    onPress={() => setSupportAttachment('dsh_support_proof.jpg')}
+                    style={({ pressed }) => ({
+                      flexDirection: 'row-reverse',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      gap: spacing[2],
+                      padding: spacing[3],
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderStyle: 'dashed',
+                      borderColor: theme.brand,
+                      backgroundColor: pressed ? theme.brandSurface : theme.surface,
+                      marginTop: spacing[2],
+                    })}
+                  >
+                    <Icon name="camera-outline" size={20} color={theme.brand} />
+                    <Text role="bodySm" style={{ color: theme.brand, fontWeight: '500' }}>
+                      إرفاق صورة أو مستند داعم (اختياري)
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <Surface
+                    tone="success"
+                    padding={3}
+                    radiusToken="lg"
+                    style={{
+                      flexDirection: 'row-reverse',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginTop: spacing[2],
+                      borderWidth: 1,
+                      borderColor: theme.success,
+                    }}
+                  >
+                    <Box layoutDirection="row-reverse" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                      <Icon name="checkmark-circle-outline" size={20} color={theme.success} />
+                      <Text role="bodySm" style={{ color: theme.success, fontWeight: '600' }}>
+                        تم إرفاق صورة الإثبات بنجاح ({supportAttachment})
+                      </Text>
+                    </Box>
+                    <Pressable
+                      onPress={() => setSupportAttachment(null)}
+                      style={({ pressed }) => ({
+                        padding: spacing[1],
+                        opacity: pressed ? 0.7 : 1,
+                      })}
+                    >
+                      <Icon name="trash-outline" size={18} color={theme.brand} />
+                    </Pressable>
+                  </Surface>
+                )}
+
+                <Button
+                  label={selectedIssue ? 'إرسال البلاغ' : 'اختر نوع المشكلة أولاً'}
+                  disabled={!selectedIssue}
+                  onPress={() => setIsSupportSubmitted(true)}
+                  style={{ marginTop: 8 }}
+                />
+              </Box>
+            )}
+          </Surface>
         )}
 
         {/* 4. Post-Delivery Section Only */}
@@ -1544,7 +1699,11 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
             <Box gap={2}>
               {onReorder && <Button label="إعادة الطلب" onPress={onReorder} />}
-              {onSupport && <Button label="الدعم أو الإبلاغ عن مشكلة" tone="secondary" onPress={onSupport} />}
+              <Button
+                label={isSupportExpanded ? "إغلاق الدعم" : "الدعم أو الإبلاغ عن مشكلة"}
+                tone="secondary"
+                onPress={() => setIsSupportExpanded(!isSupportExpanded)}
+              />
             </Box>
           </Surface>
         )}
@@ -1570,12 +1729,14 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         <View style={{ height: spacing[1] }} />
       </MobileScrollView>
 
-      <StickyActionBar
-        primaryAction={primaryAction}
-        secondaryAction={secondaryAction}
-        note={stickyNote}
-        onHeightChange={setActionBarHeight}
-      />
+      {hasStickyBar ? (
+        <StickyActionBar
+          primaryAction={primaryAction}
+          secondaryAction={secondaryAction}
+          note={stickyNote}
+          onHeightChange={setActionBarHeight}
+        />
+      ) : null}
     </View>
   );
 }
@@ -1669,66 +1830,6 @@ function renderTracking(
   );
 }
 
-      {(clientState === 'payment_failed' || clientState === 'area_unserviceable' || clientState === 'item_unavailable') ? (
-        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-          <SectionHeader title="سبب توقف الإكمال" subtitle="توضيح صريح لحالة التسعير والعنوان وتوفر العناصر." />
-          <KeyValueList
-            items={[
-              { label: 'داخل التغطية', value: serviceabilityQuote.inside_coverage ? 'نعم' : 'لا' },
-              { label: 'توفر العناصر', value: serviceabilityQuote.items_available ? 'متوفرة' : 'غير متوفرة' },
-              { label: 'حالة المتجر', value: serviceabilityQuote.store_open ? 'مفتوح' : 'مغلق' },
-              { label: 'نمط التنفيذ', value: formatFulfillmentMode(fulfillmentModeSnapshot.mode) },
-              { label: 'السعة الحالية', value: formatCapacityState(fulfillmentModeSnapshot.capacity_state) },
-            ]}
-          />
-        </Surface>
-      ) : null}
-
-      {walletVisibilityCopy ? (
-        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            {walletVisibilityCopy.description}
-          </Text>
-        </Surface>
-      ) : null}
-
-      {walletImpactVisibility ? (
-        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-          <SectionHeader title="الأثر المالي الظاهر" subtitle="ملخص مالي توضيحي فقط دون أي تنفيذ wallet/runtime." />
-          <KeyValueList
-            items={[
-              { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
-              { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
-              { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
-              { label: 'تعويض ظاهر', value: `${walletImpactVisibility.compensation} ر.ي` },
-              { label: 'استرداد معلق', value: `${walletImpactVisibility.refund_pending} ر.ي` },
-              { label: 'استرداد مكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
-            ]}
-          />
-          {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
-        </Surface>
-      ) : null}
-
-      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right' }}>{supportTitle}</Text>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          {supportDescription}
-        </Text>
-        {trackingStateMeta.isException && !onSupport ? (
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            لا يوجد مسار دعم موصول حاليًا داخل هذا العرض.
-          </Text>
-        ) : null}
-        <Box gap={2}>
-          {clientState === 'delivered' && onReorder ? <Button label="إعادة الطلب" onPress={onReorder} /> : null}
-          {onNextAction ? <Button label="العودة إلى الطلبات" onPress={onNextAction} /> : null}
-          {onSupport ? <Button label={supportButtonLabel} tone="secondary" onPress={onSupport} /> : null}
-        </Box>
-      </Surface>
-    </MobileScrollView>
-  );
-}
 
 export function DshOrdersListScreen({ items = fallbackOrderListItems, query = '', onQueryChange, onOpenOrder, onBack, onRetry, onNextAction }: DshOrdersListScreenProps) {
   const { theme } = useTheme();
@@ -1808,7 +1909,7 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
     : clientState === 'tracking_active'
-      ? deliveryJourneySteps.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }))
+      ? FULL_JOURNEY_STEPS.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }))
       : [{ id: clientState, title: trackingStateMeta.title, detail: trackingStateMeta.description, done: false }];
 
   if (clientState === 'delivered') {

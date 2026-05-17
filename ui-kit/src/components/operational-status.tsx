@@ -358,7 +358,7 @@ export function OrderLinkedChat({
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          editable={!sendDisabled || hasValue}
+          editable={!disabledReason}
           placeholder={inputPlaceholder}
           placeholderTextColor={theme.textSoft}
           multiline
@@ -519,7 +519,7 @@ export type StickyActionBarProps = {
 
 function resolveBottomInset() {
   if (Platform.OS === 'android') {
-    return Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height);
+    return safeArea.compact;
   }
 
   return safeArea.comfortable;
