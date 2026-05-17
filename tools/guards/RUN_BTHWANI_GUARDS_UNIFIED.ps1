@@ -10,8 +10,8 @@ param(
 
   [switch]$Strict,
   [switch]$SkipExisting,
-  [switch]$SkipV3
-)
+  [switch]$SkipV3,
+  [switch]$CreateZip)
 
 Set-Location -LiteralPath "C:\bthwani-suite"
 $ErrorActionPreference = 'Stop'
@@ -69,16 +69,16 @@ $ZipPath = Join-Path $EvidenceRoot "$SessionId.zip"
   "- phase: $Phase",
   "- mode: $Mode",
   "- evidence_root: $EvidenceRoot",
-  "- zip: $ZipPath",
+  "- zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })",
   "- failures: $Failures",
   "",
   "This runner is additive: it preserves the existing tools/guards/RUN_GOVERNANCE_GUARDS.ps1 path and then runs the root-level V3 complementary guards."
 ) | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'SUMMARY.md') -Encoding UTF8
-[ordered]@{ status=$FinalStatus; session_id=$SessionId; profile=$Profile; phase=$Phase; mode=$Mode; evidence_root=$EvidenceRoot; zip=$ZipPath; failures=$Failures; additive=$true } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'evidence.json') -Encoding UTF8
+[ordered]@{ status=$FinalStatus; session_id=$SessionId; profile=$Profile; phase=$Phase; mode=$Mode; evidence_root=$EvidenceRoot; zip=$(if ($CreateZip) { $ZipPath } else { $null }); failures=$Failures; additive=$true } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'evidence.json') -Encoding UTF8
 Compress-Archive -Path (Join-Path $EvidenceRoot '*') -DestinationPath $ZipPath -Force
 Write-Host ""
 Write-Host "status: $FinalStatus"
 Write-Host "evidence_root: $EvidenceRoot"
-Write-Host "zip: $ZipPath"
+Write-Host "zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })"
 if ($FinalStatus -eq 'FAIL') { exit 1 }
 exit 0

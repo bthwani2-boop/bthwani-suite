@@ -5,8 +5,8 @@ param(
   [ValidateSet('Governance', 'Agent')]
   [string]$Profile = 'Governance',
 
-  [switch]$FailOnWarning
-)
+  [switch]$FailOnWarning,
+  [switch]$CreateZip)
 
 $ErrorActionPreference = 'Stop'
 
@@ -191,7 +191,7 @@ $SummaryMd = @(
   "- session_id: $SessionId",
   "- mode: $Mode",
   "- evidence_root: $EvidenceRoot",
-  "- zip: $ZipPath",
+  "- zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })",
   "- guards_total: $($Entries.Count)",
   "- guards_fail: $FailCount",
   "- guards_warn: $WarnCount",
@@ -212,7 +212,7 @@ $Evidence = [ordered]@{
   repo = $RepoRoot
   mode = $Mode
   evidence_root = $EvidenceRoot
-  zip = (Join-Path $EvidenceRoot "$SessionId.zip")
+  zip = $(if ($CreateZip) { Join-Path $EvidenceRoot "$SessionId.zip" } else { $null })
   guards_total = $Entries.Count
   guards_fail = $FailCount
   guards_warn = $WarnCount
@@ -227,7 +227,7 @@ Write-Host ""
 Write-Host "status: $FinalStatus"
 Write-Host "profile: $Profile"
 Write-Host "evidence_root: $EvidenceRoot"
-Write-Host "zip: $ZipPath"
+Write-Host "zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })"
 Write-Host "guards_fail: $FailCount"
 Write-Host "guards_warn: $WarnCount"
 

@@ -839,27 +839,27 @@ function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTra
 function buildDefaultProofOfDelivery(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientProofOfDeliveryVisibility {
   if (clientState === 'delivered' || phase === 'received') {
     return {
-      proof_type: 'otp',
-      is_required: true,
+      proof_type: 'none',
+      is_required: false,
       captured_by: 'captain',
       captured_at: '2026-05-01T20:30:00+03:00',
       proof_asset_url: null,
       verification_result: 'verified',
       failure_reason: null,
-      customer_visible: true,
+      customer_visible: false,
     };
   }
 
   if (clientState === 'tracking_active' && phase === 'arrived') {
     return {
-      proof_type: 'otp',
-      is_required: true,
+      proof_type: 'none',
+      is_required: false,
       captured_by: null,
       captured_at: null,
       proof_asset_url: null,
-      verification_result: 'pending',
+      verification_result: 'not_required',
       failure_reason: null,
-      customer_visible: true,
+      customer_visible: false,
     };
   }
 
@@ -879,7 +879,7 @@ function buildDefaultHandoffVerification(): DshClientHandoffVerification {
   return {
     pickup_reference: 'PK-DSH-2201',
     pickup_code_or_barcode: 'PICK-2201',
-    dropoff_otp: '4821',
+    dropoff_otp: null,
     contactless_allowed: true,
     customer_instructions: 'سلّم الطلب عند الباب واتصل قبل الوصول.',
     partner_instructions: 'ثبّت المطابقة قبل تسليم الكيس النهائي.',
@@ -1150,10 +1150,15 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const [draftMessage, setDraftMessage] = React.useState('');
   const [draftAttachments, setDraftAttachments] = React.useState<OrderChatAttachmentKind[]>([]);
   const [actionBarHeight, setActionBarHeight] = React.useState(0);
-  const [isTimelineExpanded, setIsTimelineExpanded] = React.useState(false);
-  const [isOperationalExpanded, setIsOperationalExpanded] = React.useState(false);
-  const [isEventsExpanded, setIsEventsExpanded] = React.useState(false);
+  const [isChatExpanded, setIsChatExpanded] = React.useState(false);
   const effectiveClientState = normalizeClientFacingOrderState(clientState);
+
+  React.useEffect(() => {
+    if (effectiveClientState === 'delivered') {
+      setPhase('received');
+    }
+  }, [effectiveClientState]);
+
   const smartTracking = useSmartTrackingHeartbeat(phase);
   const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
     id: 'chat-captain-1',
@@ -1164,51 +1169,33 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     align: 'start',
     attachments: ['camera', 'video', 'voice'],
   });
+
   const clientStateMeta = getDshClientStateMeta(effectiveClientState);
-  const paymentPendingMeta = getDshClientStateMeta('payment_pending');
   const orderCreatedMeta = getDshClientStateMeta('order_created');
   const orderConfirmedMeta = getDshClientStateMeta('order_confirmed');
   const isDeliveredState = effectiveClientState === 'delivered';
   const isTrackingJourneyState = effectiveClientState === 'tracking_active' || isDeliveredState;
   const isOrderCreationState = effectiveClientState === 'order_created' || effectiveClientState === 'order_confirmed';
-  const isCheckoutSequenceState = !isTrackingJourneyState && !isOrderCreationState;
   const note = normalizeText(values.note).length ? values.note : 'لا توجد ملاحظات';
-  const deliveryStatusLabel = isTrackingJourneyState
-    ? phase === 'route'
-      ? currentStatusLabel ?? clientStateMeta.label
-      : phase === 'arrived'
-        ? 'وصل للعميل'
-        : isDeliveredState
-          ? 'تم التسليم'
-          : 'استلم العميل الطلب'
-    : currentStatusLabel ?? clientStateMeta.label;
-  const journeyTopBarTitle = isTrackingJourneyState
-    ? phase === 'route'
-      ? 'الطلب في الطريق إلى العميل'
-      : phase === 'arrived'
-        ? 'وصل الطلب للعميل'
-        : isDeliveredState
-          ? 'تم التسليم'
-          : 'استلم العميل الطلب'
-    : clientStateMeta.title;
+
+  const journeyTopBarTitle = isTrackingJourneyState ? 'متابعة الطلب' : clientStateMeta.title;
+
   const heroTitle = isTrackingJourneyState
     ? phase === 'route'
-      ? 'في الطريق'
+      ? 'الكابتن في الطريق إليك'
       : phase === 'arrived'
-        ? 'وصل للعميل'
-        : isDeliveredState
-          ? 'تم التسليم'
-          : 'تم الاستلام'
+        ? 'الكابتن وصل إلى موقع التسليم'
+        : 'تم تسليم الطلب'
     : clientStateMeta.title;
+
   const heroSummary = isTrackingJourneyState
     ? phase === 'route'
-      ? clientStateMeta.description
+      ? 'طلبك في الطريق مع الكابتن. يمكنك متابعة الوقت التقريبي للوصول بالأسفل.'
       : phase === 'arrived'
-        ? 'الطلب وصل إلى العميل وهو الآن بانتظار تثبيت الاستلام.'
-        : isDeliveredState
-          ? 'اكتمل التسليم ويمكنك تقييم المنتج والكابتن أو طلب الدعم من نفس الشاشة.'
-          : 'اكتمل الاستلام ويمكنك تقييم التجربة من نفس الصفحة.'
+        ? 'الكابتن وصل إلى موقع التسليم وهو بانتظارك لتسليم الطلب.'
+        : 'تم تسليم الطلب بنجاح. شكراً لك! يمكنك تقييم الخدمة أو طلب الدعم إذا واجهت أي مشكلة.'
     : clientStateMeta.description;
+
   const lifecycleStatusForSteps = buildDefaultLifecycleStatus(effectiveClientState, phase);
   const activeStepId = lifecycleToStepId(lifecycleStatusForSteps);
   const activeStepIndex = Math.max(0, FULL_JOURNEY_STEPS.findIndex((s) => s.id === activeStepId));
@@ -1222,41 +1209,25 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         { id: 'order-created', title: orderCreatedMeta.label, state: effectiveClientState === 'order_created' ? 'current' as const : 'done' as const },
         { id: 'order-confirmed', title: orderConfirmedMeta.label, state: effectiveClientState === 'order_confirmed' ? 'current' as const : 'next' as const },
       ];
+
   const nextStepValue = isTrackingJourneyState
     ? phase === 'route'
-      ? 'ثبّت الوصول عند مقابلة العميل.'
+      ? 'انتظر وصول الكابتن لموقعك'
       : phase === 'arrived'
-        ? 'ثبّت الاستلام لتفعيل التقييمات.'
-        : ratingsSubmitted
-          ? 'تم حفظ التقييمين داخل نفس الصفحة.'
-          : onSupport || onNextAction
-            ? 'اختر التقييمين ثم أرسل، أو استخدم الدعم والإجراء التالي المتاح.'
-            : 'اختر التقييمين ثم أرسل.'
-    : isOrderCreationState
-      ? effectiveClientState === 'order_created'
-        ? orderConfirmedMeta.label
-        : 'افتح صفحة التتبع لمتابعة التنفيذ.'
+        ? 'استلم طلبك من الكابتن'
+        : 'طلبك مكتمل بنجاح'
     : clientStateMeta.description;
-  const hasClientReceived = phase === 'received';
-  const canSubmitRatings = hasClientReceived && productRating > 0 && captainRating > 0;
+
+  const hasClientReceived = phase === 'received' || effectiveClientState === 'delivered';
+  const canSubmitRatings = hasClientReceived && (productRating > 0 || captainRating > 0);
   const productRatingLabel = productRating > 0 ? `${productRating}/5` : 'غير محدد';
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
-  const compactSteps = journeySteps as Array<{ id: string; title: string; state: 'done' | 'current' | 'next' }>;
-  const lifecycleStatus = React.useMemo(() => buildDefaultLifecycleStatus(effectiveClientState, phase), [effectiveClientState, phase]);
-  const eventTimeline = React.useMemo(() => buildDefaultEventTimeline(effectiveClientState, timeline, phase), [effectiveClientState, timeline, phase]);
   const proofVisibility = React.useMemo(() => buildDefaultProofOfDelivery(effectiveClientState, phase), [effectiveClientState, phase]);
-  const handoffVerification = React.useMemo(() => buildDefaultHandoffVerification(), []);
   const walletImpactVisibility = React.useMemo(() => buildDefaultWalletImpact(effectiveClientState), [effectiveClientState]);
-  const exceptionReason = React.useMemo(() => getDefaultExceptionReason(effectiveClientState), [effectiveClientState]);
-  const orderDetailsItems = [
-    { label: 'عنوان الاستلام', value: values.pickupAddress || 'غير محدد', tone: 'brand' as const },
-    { label: 'عنوان التسليم', value: values.dropoffAddress || 'غير محدد' },
-    { label: 'جهة الاتصال', value: values.contactName || 'غير محدد' },
-    { label: 'رقم الجوال', value: values.contactPhone || 'غير محدد' },
-    { label: 'الملاحظات', value: note },
-  ];
+
   const canSendMessage = phase !== 'received' && (draftMessage.trim().length > 0 || draftAttachments.length > 0);
   const chatSendLabel = draftMessage.trim().length > 0 ? 'إرسال الرسالة' : draftAttachments.length > 0 ? 'إرسال المرفقات' : 'أضف نصًا أو مرفقًا';
+
   const quickActions = (['voice', 'camera', 'video', 'attachment'] as OrderChatAttachmentKind[]).map((kind) => {
     const option = orderChatAttachmentOptions[kind];
     const selected = draftAttachments.includes(kind);
@@ -1281,60 +1252,21 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     };
   });
 
-  const primaryActionLabel = isOrderCreationState
-      ? effectiveClientState === 'order_created'
-        ? 'عرض نجاح الطلب'
-        : 'فتح التتبع'
-    : phase === 'route'
-      ? 'وصل الطلب للعميل'
-      : phase === 'arrived'
-        ? 'استلم العميل الطلب'
-        : ratingsSubmitted
-          ? 'تم إرسال التقييمين'
-          : 'إرسال التقييمين';
-  const primaryActionDisabled = isOrderCreationState ? false : phase === 'received' && (!canSubmitRatings || ratingsSubmitted);
   const productHelperText = phase === 'route'
     ? 'سيظهر تقييم المنتج بعد الاستلام.'
     : phase === 'arrived'
       ? 'سيفتح التقييم بعد تثبيت استلام العميل للطلب.'
     : ratingsSubmitted
       ? 'تم إرسال التقييمين. أي تعديل جديد سيعيد فتح الإرسال.'
-      : 'اختر تقييم المنتج من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
+      : 'اختر تقييم المنتج من 1 إلى 5 ثم أرسل التقييم بالأسفل.';
+
   const captainHelperText = phase === 'route'
     ? 'سيظهر تقييم الكابتن بعد الاستلام.'
     : phase === 'arrived'
       ? 'سيبقى تقييم الكابتن مؤجلًا حتى تثبيت الاستلام.'
     : ratingsSubmitted
       ? 'تم إرسال التقييمين. يمكنك تعديل الكابتن ثم إعادة الإرسال.'
-      : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييمين بالأسفل.';
-  const stickyNote = isOrderCreationState
-      ? effectiveClientState === 'order_created'
-        ? 'تم إنشاء الطلب. هذه الشاشة مختصرة للتأكيد قبل النجاح ثم التتبع.'
-        : 'تم تأكيد الطلب. الإجراء الرئيسي ينقلك إلى التتبع مباشرة.'
-    : phase === 'route'
-      ? 'يمكنك تثبيت الوصول من الزر الرئيسي عند وصول الطلب.'
-      : phase === 'arrived'
-        ? 'ثبّت الاستلام لتظهر التقييمات داخل نفس الصفحة.'
-        : ratingsSubmitted
-          ? 'تم حفظ التقييمين ولا توجد خطوة إضافية مطلوبة.'
-          : 'لن يتفعّل الإرسال حتى تختار تقييم المنتج والكابتن.';
-  const arrivalBellSummary = isTrackingJourneyState && phase !== 'received'
-    ? phase === 'route'
-      ? 'أيقونة الجرس تبقى داخل الطلب نفسه أثناء الطريق، وتغطي رنة الاقتراب ثم رنة الوصول من دون فتح صفحة مستقلة.'
-      : 'جرس الوصول مثبت داخل نفس شاشة الطلب، والمرحلة الحالية تشير إلى أن الكابتن وصل وبقي فقط تثبيت الاستلام.'
-    : null;
-  const bellStatusItems = isTrackingJourneyState && phase !== 'received'
-    ? [
-        { label: 'حالة الجرس', value: phase === 'route' ? 'اقتراب' : 'وصول', tone: phase === 'route' ? 'warning' as const : 'brand' as const },
-        { label: 'الرنات الفعالة', value: phase === 'route' ? 'اقتراب + وصول' : 'وصول مثبت' },
-        { label: 'الخطوة التالية', value: phase === 'route' ? 'انتظار وصول الكابتن' : 'تثبيت الاستلام ثم التقييم', tone: 'success' as const },
-      ]
-    : [];
-  const runtimeBottomInset = Platform.OS === 'android'
-    ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
-    : safeArea.comfortable;
-  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + runtimeBottomInset + safeArea.comfortable;
-  const reviewStateLabel = phase === 'received' ? (ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن') : 'مؤجل حتى الاستلام';
+      : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييم بالأسفل.';
 
   const handleProductRatingChange = (nextValue: number) => {
     setProductRating(nextValue);
@@ -1356,21 +1288,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       return;
     }
 
-    if (phase === 'route') {
-      setPhase('arrived');
+    if (hasClientReceived) {
+      if (ratingsSubmitted) {
+        return;
+      }
+      if (productRating > 0 || captainRating > 0) {
+        setRatingsSubmitted(true);
+      } else {
+        if (onNextAction) onNextAction();
+        else if (onBack) onBack();
+      }
       return;
     }
-
-    if (phase === 'arrived') {
-      setPhase('received');
-      return;
-    }
-
-    if (!canSubmitRatings || ratingsSubmitted) {
-      return;
-    }
-
-    setRatingsSubmitted(true);
   };
 
   const handleSendMessage = () => {
@@ -1395,15 +1324,74 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     setDraftAttachments([]);
   };
 
-  const secondaryAction = isOrderCreationState
-    ? onBack
-      ? { label: 'العودة إلى السلة', onPress: onBack, tone: 'secondary' as const }
-      : undefined
-    : phase === 'received' && onSupport
-        ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' as const }
-        : onBack
-          ? { label: phase === 'route' ? 'طلب تعديل عبر العمليات' : 'العودة', onPress: onBack, tone: 'secondary' as const }
-          : undefined;
+  let primaryAction: { label: string; onPress: () => void; disabled?: boolean } | undefined = undefined;
+  let secondaryAction: { label: string; onPress: () => void; tone?: 'secondary' | 'ghost' | 'primary' } | undefined = undefined;
+  let stickyNote = '';
+
+  if (isOrderCreationState) {
+    primaryAction = {
+      label: effectiveClientState === 'order_created' ? 'عرض نجاح الطلب' : 'فتح التتبع',
+      onPress: () => {
+        onPrimaryAction?.();
+      },
+    };
+    secondaryAction = onBack ? { label: 'العودة إلى السلة', onPress: onBack, tone: 'secondary' } : undefined;
+    stickyNote = effectiveClientState === 'order_created'
+      ? 'تم إنشاء الطلب. هذه الشاشة مختصرة للتأكيد قبل النجاح ثم التتبع.'
+      : 'تم تأكيد الطلب. الإجراء الرئيسي ينقلك إلى التتبع مباشرة.';
+  } else if (phase === 'route') {
+    primaryAction = {
+      label: 'التواصل مع الكابتن',
+      onPress: () => setIsChatExpanded(true),
+    };
+    secondaryAction = onSupport ? { label: 'الدعم أو الإبلاغ عن مشكلة', onPress: onSupport, tone: 'secondary' } : undefined;
+    stickyNote = 'جاري متابعة الطلب وتوصيله من قبل الكابتن.';
+  } else if (phase === 'arrived') {
+    primaryAction = onSupport ? {
+      label: 'الدعم أو الإبلاغ عن مشكلة',
+      onPress: onSupport,
+    } : undefined;
+    secondaryAction = {
+      label: 'رسالة الكابتن',
+      onPress: () => setIsChatExpanded(true),
+      tone: 'secondary',
+    };
+    stickyNote = 'وصل الكابتن إلى موقع التسليم بانتظار إتمام التسليم.';
+  } else if (phase === 'received') {
+    if (ratingsSubmitted) {
+      primaryAction = {
+        label: 'تم إرسال التقييم',
+        onPress: () => {},
+        disabled: true,
+      };
+    } else if (productRating > 0 || captainRating > 0) {
+      primaryAction = {
+        label: 'إرسال التقييم',
+        onPress: handlePrimaryAction,
+      };
+    } else {
+      primaryAction = {
+        label: 'تقييم لاحقًا',
+        onPress: handlePrimaryAction,
+      };
+    }
+
+    secondaryAction = onReorder
+      ? { label: 'إعادة الطلب', onPress: onReorder, tone: 'secondary' }
+      : onSupport
+        ? { label: 'الدعم', onPress: onSupport, tone: 'secondary' }
+        : undefined;
+
+    stickyNote = ratingsSubmitted
+      ? 'تم حفظ التقييم بنجاح. شكراً لك!'
+      : 'يمكنك تقييم المنتج والكابتن أو التخطي بالضغط على تقييم لاحقاً.';
+  }
+
+  const reviewStateLabel = phase === 'received' ? (ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن') : 'مؤجل حتى الاستلام';
+  const runtimeBottomInset = Platform.OS === 'android'
+    ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
+    : safeArea.comfortable;
+  const contentBottomPadding = (actionBarHeight > 0 ? actionBarHeight : spacing[16]) + runtimeBottomInset + safeArea.comfortable;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
@@ -1413,266 +1401,169 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       />
 
       <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
-        <Surface tone="brand" padding={3} radiusToken="xl" gap={2}>
-          <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-            <Icon name="flash-outline" size={18} tone="inverse" />
-            <Text role="bodyStrong" tone="inverse" style={{ textAlign: 'right', flex: 1 }}>
-              {phase === 'route' ? 'أسرع طريق عبر الملك فهد متاح الآن' : 'تم تثبيت الوصول في المنطقة التشغيلية'}
-            </Text>
+
+        {/* 1. Single Main Status Card */}
+        <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+            <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
+              <Text role="titleLg" style={{ textAlign: 'right', fontWeight: '700', color: theme.brand }}>
+                {heroTitle}
+              </Text>
+              <Text role="bodyMd" style={{ textAlign: 'right', color: theme.textSoft }}>
+                {heroSummary}
+              </Text>
+            </Box>
           </Box>
+
+          {isTrackingJourneyState && phase !== 'received' && (
+            <Box layoutDirection="row" justify="flex-end" gap={2} style={{ flexDirection: 'row-reverse' }}>
+              {smartTracking.proximityState === 'near_customer' && (
+                <Chip label="الكابتن قريب" tone="warning" />
+              )}
+              {(smartTracking.proximityState === 'at_door' || smartTracking.proximityState === 'bell_rang' || phase === 'arrived') && (
+                <Chip label="الكابتن وصل" tone="success" />
+              )}
+            </Box>
+          )}
+
+          <View style={{ height: 1, backgroundColor: theme.line }} />
+
+          <KeyValueList
+            items={[
+              { label: 'المسار', value: `${values.pickupAddress || 'غير محدد'} ← ${values.dropoffAddress || 'غير محدد'}` },
+              ...(isTrackingJourneyState && phase !== 'received' && smartTracking.etaMinutes !== null
+                ? [{ label: 'الوقت التقريبي للوصول', value: smartTracking.etaMinutes > 0 ? `تقريباً ${smartTracking.etaMinutes} دقيقة` : 'وصل الآن', tone: 'success' as const }]
+                : []
+              ),
+              ...(isTrackingJourneyState && phase !== 'received'
+                ? [{ label: 'آخر تحديث', value: smartTracking.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${smartTracking.lastUpdateMinutesAgo} دقيقة` }]
+                : []
+              ),
+              { label: 'الإجراء التالي', value: nextStepValue, tone: 'brand' as const },
+            ]}
+          />
         </Surface>
 
-        <Surface tone="raised" padding={3} radiusToken="xl">
+        {/* 2. 4-Stage Progress Bar */}
+        <Surface tone="raised" padding={3} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
           <HorizontalMilestones activeStepId={activeStepId} />
         </Surface>
 
-        <SmartTrackingCard phase={phase} smartTracking={smartTracking} />
+        {/* 3. Quick Actions Card */}
+        <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>التواصل والمساعدة</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يمكنك الاتصال بالكابتن مباشرة أو مراسلته عبر المحادثة الفورية، أو طلب الدعم الفني.</Text>
 
-        <OperationalStatusHero
-          statusLabel={deliveryStatusLabel}
-          statusTone={phase === 'received' ? 'success' : phase === 'arrived' ? 'brand' : 'warning'}
-          title={heroTitle}
-          summary={heroSummary}
-          routeLabel="المسار"
-          routeValue={`${values.pickupAddress || 'غير محدد'} → ${values.dropoffAddress || 'غير محدد'}`}
-          nextStepLabel="الإجراء التالي"
-          nextStepValue={nextStepValue}
-        />
-
-        <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-          <Pressable onPress={() => setIsTimelineExpanded(!isTimelineExpanded)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-            <Box layoutDirection="row" align="center" justify="space-between" style={{ flexDirection: 'row-reverse' }}>
-              <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-                <Text role="titleMd" style={{ color: theme.brand, fontWeight: '700' }}>مراحل الطلب التفصيلية</Text>
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  {isTimelineExpanded ? 'انقر لإخفاء التفاصيل' : 'انقر لعرض 13 خطوة لتتبع الطلب بدقة'}
-                </Text>
-              </Box>
-              <Icon
-                name={isTimelineExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
-                size={20}
-                color={theme.brand}
+          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', flexDirection: 'row-reverse' }}>
+            <Button
+              label="اتصال بالكابتن"
+              tone="secondary"
+              leadingAccessory={<Icon name="call-outline" size={18} color={theme.text} />}
+              onPress={() => {}}
+              style={{ flex: 1, minWidth: 120 }}
+            />
+            <Button
+              label={isChatExpanded ? "إغلاق المحادثة" : "مراسلة الكابتن"}
+              tone={isChatExpanded ? "primary" : "secondary"}
+              leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.text} />}
+              onPress={() => setIsChatExpanded(!isChatExpanded)}
+              style={{ flex: 1, minWidth: 120 }}
+            />
+            {onSupport && (
+              <Button
+                label="الدعم الفني"
+                tone="secondary"
+                leadingAccessory={<Icon name="help-circle-outline" size={18} color={theme.text} />}
+                onPress={onSupport}
+                style={{ flex: 1, minWidth: 120 }}
               />
-            </Box>
-          </Pressable>
-          {isTimelineExpanded && (
-            <Box gap={4} style={{ marginTop: 10 }}>
-              <StageRail activeStepId={activeStepId} steps={FULL_JOURNEY_STEPS} />
-            </Box>
-          )}
+            )}
+          </Box>
         </Surface>
 
-        <KeyValueDetails
-          title="تفاصيل الطلب"
-          subtitle="المعلومات المهمة فقط، بشكل مضغوط وقابل للقراءة."
-          items={orderDetailsItems}
-        />
-
-        {arrivalBellSummary ? (
-          <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-            <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: phase === 'route' ? theme.warningSurface : theme.brandSurface }}>
-                <Icon name="notifications-outline" size={20} color={phase === 'route' ? theme.warning : theme.brand} />
-              </View>
-              <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-                <Badge label="جرس الوصول" tone={phase === 'route' ? 'warning' : 'brand'} />
-                <Text role="bodyStrong" style={{ textAlign: 'right' }}>الجرس جزء من الطلب نفسه</Text>
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  {arrivalBellSummary}
-                </Text>
-              </Box>
-            </Box>
-            <KeyValueList items={bellStatusItems} />
-          </Surface>
-        ) : null}
-
-        {isOrderCreationState ? (
-          <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-            <SectionHeader title="تأكيد الطلب" subtitle="هذه شاشة إنشاء/تأكيد مختصرة فقط، من دون إعادة عرض التسعير أو فحص التغطية أو الدفع." />
-            <KeyValueList
-              items={[
-                { label: 'الحالة الحالية', value: clientStateMeta.label, tone: 'brand' },
-                { label: 'الخطوة التالية', value: effectiveClientState === 'order_created' ? 'عرض نجاح الطلب' : 'فتح التتبع' },
-                { label: 'مرجع التنفيذ', value: `${values.pickupAddress || 'غير محدد'} → ${values.dropoffAddress || 'غير محدد'}` },
-                { label: 'الدعم', value: onSupport ? 'متاح عند الحاجة' : 'غير موصول' },
-              ]}
-            />
-          </Surface>
-        ) : (
-          <>
-            <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-              <Pressable onPress={() => setIsOperationalExpanded(!isOperationalExpanded)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-                <Box layoutDirection="row" align="center" justify="space-between" style={{ flexDirection: 'row-reverse' }}>
-                  <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-                    <Text role="titleMd" style={{ color: theme.brand, fontWeight: '700' }}>التفاصيل التشغيلية والتحقق</Text>
-                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                      {isOperationalExpanded ? 'انقر لإخفاء التفاصيل' : 'انقر لعرض أكواد التحقق، إثبات التسليم والتعليمات'}
-                    </Text>
-                  </Box>
-                  <Icon
-                    name={isOperationalExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
-                    size={20}
-                    color={theme.brand}
-                  />
-                </Box>
-              </Pressable>
-              {isOperationalExpanded && (
-                <Box gap={4} style={{ marginTop: 12 }}>
-                  <Box gap={2}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>حالة دورة التنفيذ</Text>
-                    <KeyValueList
-                      items={[
-                        { label: 'الحالة التشغيلية', value: formatDeliveryLifecycleStatus(lifecycleStatus), tone: 'brand' },
-                        { label: 'نوع الإثبات', value: formatProofType(proofVisibility.proof_type) },
-                        { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
-                        { label: 'إظهار الإثبات للعميل', value: proofVisibility.customer_visible ? 'نعم' : 'لا' },
-                        { label: 'مرجع الاستلام', value: handoffVerification.pickup_reference ?? 'غير متوفر' },
-                        { label: 'OTP التسليم', value: handoffVerification.dropoff_otp ?? 'غير متوفر' },
-                      ]}
-                    />
-                    {exceptionReason ? (
-                      <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>
-                        سبب الحالة الحالية: {formatExceptionReason(exceptionReason)}
-                      </Text>
-                    ) : null}
-                  </Box>
-
-                  <View style={{ height: 1, backgroundColor: theme.line }} />
-
-                  <Box gap={2}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>معلومات الاستلام والتسليم</Text>
-                    <KeyValueList
-                      items={[
-                        { label: 'التقاط الإثبات', value: proofVisibility.captured_at ?? 'لم يُلتقط بعد' },
-                        { label: 'التقطه', value: proofVisibility.captured_by ?? 'غير محدد' },
-                        { label: 'تعليمات العميل', value: handoffVerification.customer_instructions ?? 'لا توجد' },
-                        { label: 'تعليمات الشريك', value: handoffVerification.partner_instructions ?? 'لا توجد' },
-                        { label: 'تسليم بدون تلامس', value: handoffVerification.contactless_allowed ? 'مسموح' : 'غير مسموح' },
-                        { label: 'ملاحظات الكابتن', value: handoffVerification.captain_handoff_notes ?? 'لا توجد' },
-                      ]}
-                    />
-                  </Box>
-                </Box>
-              )}
-            </Surface>
-
-            <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-              <Pressable onPress={() => setIsEventsExpanded(!isEventsExpanded)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-                <Box layoutDirection="row" align="center" justify="space-between" style={{ flexDirection: 'row-reverse' }}>
-                  <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-                    <Text role="titleMd" style={{ color: theme.brand, fontWeight: '700' }}>سجل الأحداث والتحولات</Text>
-                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                      {isEventsExpanded ? 'انقر لإخفاء السجل' : 'انقر لعرض سجل الحركات الزمنية التاريخية للطلب'}
-                    </Text>
-                  </Box>
-                  <Icon
-                    name={isEventsExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
-                    size={20}
-                    color={theme.brand}
-                  />
-                </Box>
-              </Pressable>
-              {isEventsExpanded && (
-                <Box gap={2} style={{ marginTop: 12 }}>
-                  {eventTimeline.map((eventItem) => (
-                    <ListItem
-                      key={eventItem.event_id}
-                      title={formatDeliveryLifecycleStatus(eventItem.to_status)}
-                      subtitle={eventItem.notes ?? 'لا توجد ملاحظات إضافية'}
-                      meta={eventItem.timestamp}
-                      badgeLabel={eventItem.reason_code ? formatExceptionReason(eventItem.reason_code) : eventItem.actor_role}
-                    />
-                  ))}
-                </Box>
-              )}
-            </Surface>
-
-            {walletImpactVisibility ? (
-              <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-                <SectionHeader title="الأثر المالي الظاهر" subtitle="يعرض الرصيد/الاسترداد/التعويض فقط من دون أي تنفيذ مالي." />
-                <KeyValueList
-                  items={[
-                    { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
-                    { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
-                    { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
-                    { label: 'رصيد المحفظة', value: `${walletImpactVisibility.wallet_credit} ر.ي` },
-                    { label: 'المسترد المكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
-                    { label: 'الاسترداد المعلق', value: `${walletImpactVisibility.refund_pending} ر.ي`, tone: walletImpactVisibility.refund_pending > 0 ? 'warning' : 'default' },
-                  ]}
-                />
-                {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
-              </Surface>
-            ) : null}
-          </>
+        {/* Inline Chat toggled by Message Button */}
+        {isChatExpanded && (
+          <OrderLinkedChat
+            title="الدردشة مع الكابتن"
+            subtitle={phase === 'received' ? 'السجل ظاهر للمراجعة فقط بعد الاستلام.' : 'آخر رسالة ومرفقات سريعة داخل نفس الصندوق.'}
+            statusLabel={phase === 'received' ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'}
+            statusTone={phase === 'received' ? 'warning' : 'brand'}
+            helperText={phase === 'received' ? 'لا يمكن إرسال رسائل جديدة بعد الاستلام.' : 'اكتب رسالة واحدة واضحة أو أرسل مرفقًا سريعًا دون فتح واجهات إضافية.'}
+            message={{
+              senderLabel: lastChatMessage.senderLabel,
+              body: lastChatMessage.body,
+              meta: lastChatMessage.time,
+              tone: lastChatMessage.tone,
+            }}
+            quickActions={quickActions}
+            inputLabel="رسالة إلى الكابتن"
+            inputPlaceholder="اكتب رسالتك هنا"
+            value={draftMessage}
+            onChangeText={setDraftMessage}
+            sendLabel={chatSendLabel}
+            onSend={handleSendMessage}
+            sendDisabled={!canSendMessage}
+            disabledReason={phase === 'received' ? 'الدردشة أغلقت بعد استلام العميل للطلب.' : !canSendMessage ? 'أضف نصًا أو اختر مرفقًا واحدًا على الأقل.' : undefined}
+          />
         )}
 
-        <OrderLinkedChat
-          title="الدردشة مع الكابتن"
-          subtitle={phase === 'received' ? 'السجل ظاهر للمراجعة فقط بعد الاستلام.' : 'آخر رسالة ومرفقات سريعة داخل نفس الصندوق.'}
-          statusLabel={phase === 'received' ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'}
-          statusTone={phase === 'received' ? 'warning' : 'brand'}
-          helperText={phase === 'received' ? 'لا يمكن إرسال رسائل جديدة بعد الاستلام.' : 'اكتب رسالة واحدة واضحة أو أرسل مرفقًا سريعًا دون فتح واجهات إضافية.'}
-          message={{
-            senderLabel: lastChatMessage.senderLabel,
-            body: lastChatMessage.body,
-            meta: lastChatMessage.time,
-            tone: lastChatMessage.tone,
-          }}
-          quickActions={quickActions}
-          inputLabel="رسالة إلى الكابتن"
-          inputPlaceholder="اكتب رسالتك هنا"
-          value={draftMessage}
-          onChangeText={setDraftMessage}
-          sendLabel={chatSendLabel}
-          onSend={handleSendMessage}
-          sendDisabled={!canSendMessage}
-          disabledReason={phase === 'received' ? 'الدردشة أغلقت بعد استلام العميل للطلب.' : !canSendMessage ? 'أضف نصًا أو اختر مرفقًا واحدًا على الأقل.' : undefined}
-        />
+        {/* 4. Post-Delivery Section Only */}
+        {hasClientReceived && (
+          <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+            <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700', color: theme.success }}>تقييم الخدمة وما بعد التسليم</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يسعدنا معرفة رأيك في جودة المنتج وتجربتك مع الكابتن.</Text>
 
-        <DeferredReviewBlock
-          title="تقييم المنتج"
-          subtitle="يظهر بعد استلام العميل للطلب، ويبقى مضغوطًا قبل ذلك."
-          enabled={hasClientReceived}
-          placeholderText="سيظهر تقييم المنتج بعد الاستلام."
-          currentValueLabel={productRatingLabel}
-          stateLabel={reviewStateLabel}
-          helperText={productHelperText}
-          value={productRating}
-          onChange={handleProductRatingChange}
-          submitted={ratingsSubmitted}
-        />
+            <DeferredReviewBlock
+              title="تقييم المنتج"
+              subtitle="ما هو رأيك في جودة ومطابقة المنتجات المستلمة؟"
+              enabled={true}
+              placeholderText="يرجى تقييم المنتج"
+              currentValueLabel={productRatingLabel}
+              stateLabel={reviewStateLabel}
+              helperText={productHelperText}
+              value={productRating}
+              onChange={handleProductRatingChange}
+              submitted={ratingsSubmitted}
+            />
 
-        <DeferredReviewBlock
-          title="تقييم الكابتن"
-          subtitle="يبقى مؤجلًا حتى يكتمل الاستلام من العميل."
-          enabled={hasClientReceived}
-          placeholderText="سيظهر تقييم الكابتن بعد الاستلام."
-          currentValueLabel={captainRatingLabel}
-          stateLabel={reviewStateLabel}
-          helperText={captainHelperText}
-          value={captainRating}
-          onChange={handleCaptainRatingChange}
-          submitted={ratingsSubmitted}
-          placeholderTone="brand"
-        />
+            <DeferredReviewBlock
+              title="تقييم الكابتن"
+              subtitle="كيف كانت تجربة التواصل وسرعة التوصيل مع الكابتن؟"
+              enabled={true}
+              placeholderText="يرجى تقييم الكابتن"
+              currentValueLabel={captainRatingLabel}
+              stateLabel={reviewStateLabel}
+              helperText={captainHelperText}
+              value={captainRating}
+              onChange={handleCaptainRatingChange}
+              submitted={ratingsSubmitted}
+              placeholderTone="brand"
+            />
 
-        {hasClientReceived && (onSupport || onNextAction || onReorder || proofVisibility.customer_visible) ? (
+            <View style={{ height: 1, backgroundColor: theme.line }} />
+
+            <Box gap={2}>
+              {onReorder && <Button label="إعادة الطلب" onPress={onReorder} />}
+              {onSupport && <Button label="الدعم أو الإبلاغ عن مشكلة" tone="secondary" onPress={onSupport} />}
+            </Box>
+          </Surface>
+        )}
+
+        {/* Wallet impact visibility (shown simplified if applicable, e.g. for completed refund impact info) */}
+        {walletImpactVisibility ? (
           <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-            <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما بعد التسليم</Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              بعد اكتمال التسليم يمكنك الإبلاغ عن مشكلة أو الانتقال إلى الإجراء التالي المتاح من دون مغادرة هذا المسار.
-            </Text>
+            <SectionHeader title="الأثر المالي" subtitle="يعرض الرصيد/الاسترداد/التعويض لشفافية الحساب." />
             <KeyValueList
               items={[
-                { label: 'نوع الإثبات الظاهر', value: formatProofType(proofVisibility.proof_type), tone: proofVisibility.customer_visible ? 'success' : 'default' },
-                { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
+                { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
+                { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
+                { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
+                { label: 'رصيد المحفظة', value: `${walletImpactVisibility.wallet_credit} ر.ي` },
+                { label: 'المسترد المكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
+                { label: 'الاسترداد المعلق', value: `${walletImpactVisibility.refund_pending} ر.ي`, tone: walletImpactVisibility.refund_pending > 0 ? 'warning' : 'default' },
               ]}
             />
-            <Box gap={2}>
-              {onReorder ? <Button label="إعادة الطلب" onPress={onReorder} /> : null}
-              {onSupport ? <Button label="الدعم أو الإبلاغ عن مشكلة" tone="secondary" onPress={onSupport} /> : null}
-              {onNextAction ? <Button label="الانتقال إلى الطلبات" onPress={onNextAction} /> : null}
-            </Box>
+            {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
           </Surface>
         ) : null}
 
@@ -1680,11 +1571,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       </MobileScrollView>
 
       <StickyActionBar
-        primaryAction={{
-          label: primaryActionLabel,
-          onPress: handlePrimaryAction,
-          disabled: primaryActionDisabled,
-        }}
+        primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         note={stickyNote}
         onHeightChange={setActionBarHeight}
@@ -1706,14 +1593,7 @@ function renderTracking(
   const activeTimelineIndex = Math.max(0, timeline.findIndex((item) => !item.done));
   const activeItem = timeline[activeTimelineIndex] ?? timeline[timeline.length - 1];
   const walletVisibilityCopy = getClientWalletVisibilityCopy(trackingStateMeta);
-  const lifecycleStatus = buildDefaultLifecycleStatus(clientState);
-  const eventTimeline = buildDefaultEventTimeline(clientState, timeline);
-  const proofVisibility = buildDefaultProofOfDelivery(clientState);
-  const handoffVerification = buildDefaultHandoffVerification();
   const walletImpactVisibility = buildDefaultWalletImpact(clientState);
-  const exceptionReason = getDefaultExceptionReason(clientState);
-  const serviceabilityQuote = buildDefaultServiceabilityQuote(clientState);
-  const fulfillmentModeSnapshot = buildDefaultFulfillmentModeSnapshot(clientState);
   const supportTitle = trackingStateMeta.isException ? 'الدعم مطلوب الآن' : 'الدعم والرجوع';
   const supportDescription = trackingStateMeta.isException
     ? 'هذه الحالة تحتاج متابعة دعم واضحة قبل أي خطوة لاحقة. استخدم زر الدعم الآن لشرح المشكلة ومتابعة الحل.'
@@ -1743,75 +1623,51 @@ function renderTracking(
         />
       </Surface>
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="مراحل الطلب" subtitle="يظهر كل انتقال بوضوح دون خريطة حية أو GPS." />
-        <Box gap={2}>
-          {timeline.map((step, index) => {
-            const isActive = !step.done && index === activeTimelineIndex;
-            const isDone = step.done;
-            const backgroundColor = isActive ? theme.brandSurface : isDone ? theme.successSurface : theme.surfaceRaised;
-            const borderColor = isActive ? theme.brand : theme.line;
-            const iconName: string = isDone ? 'checkmark' : isActive ? 'ellipse' : 'ellipse-outline';
-
-            return (
-              <Surface
-                key={step.id}
-                tone={isActive ? 'brand' : 'raised'}
-                gap={0}
-                padding={2}
-                style={{ borderRadius: 18, borderWidth: 1, borderColor, backgroundColor }}
-              >
-                <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-                  <View style={{ width: 28, alignItems: 'center' }}>
-                    <Icon name={iconName as any} size={18} color={isActive ? theme.brand : isDone ? theme.success : theme.textSoft} />
-                  </View>
-
-                  <Box gap={0} style={{ flex: 1 }}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>{step.title}</Text>
-                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{step.detail}</Text>
-                  </Box>
-
-                  <Chip label={isDone ? 'تم' : isActive ? 'الآن' : 'قادم'} tone={isActive ? 'brand' : isDone ? 'success' : 'default'} />
-                </Box>
-              </Surface>
-            );
-          })}
-        </Box>
-      </Surface>
-
-      <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="التحقق والحالة التشغيلية" subtitle="سبب الاستثناء، إثبات التسليم، وتعليمات التسليم تبقى ضمن نفس شاشة التتبع." />
-        <KeyValueList
-          items={[
-            { label: 'الحالة التشغيلية', value: formatDeliveryLifecycleStatus(lifecycleStatus), tone: 'brand' },
-            { label: 'نوع الإثبات', value: formatProofType(proofVisibility.proof_type) },
-            { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
-            { label: 'مرجع الاستلام', value: handoffVerification.pickup_reference ?? 'غير متوفر' },
-            { label: 'OTP التسليم', value: handoffVerification.dropoff_otp ?? 'غير متوفر' },
-            { label: 'ملاحظات الكابتن', value: handoffVerification.captain_handoff_notes ?? 'لا توجد' },
-          ]}
-        />
-        {exceptionReason ? (
+      {walletVisibilityCopy ? (
+        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            سبب الحالة الحالية: {formatExceptionReason(exceptionReason)}
+            {walletVisibilityCopy.description}
+          </Text>
+        </Surface>
+      ) : null}
+
+      {walletImpactVisibility ? (
+        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+          <SectionHeader title="الأثر المالي الظاهر" subtitle="ملخص مالي توضيحي فقط دون أي تنفيذ wallet/runtime." />
+          <KeyValueList
+            items={[
+              { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
+              { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
+              { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
+              { label: 'تعويض ظاهر', value: `${walletImpactVisibility.compensation} ر.ي` },
+              { label: 'استرداد معلق', value: `${walletImpactVisibility.refund_pending} ر.ي` },
+              { label: 'استرداد مكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
+            ]}
+          />
+          {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
+        </Surface>
+      ) : null}
+
+      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>{supportTitle}</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          {supportDescription}
+        </Text>
+        {trackingStateMeta.isException && !onSupport ? (
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            لا يوجد مسار دعم موصول حاليًا داخل هذا العرض.
           </Text>
         ) : null}
-      </Surface>
-
-      <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader title="سجل الأحداث" subtitle="يربط كل محطة بالفاعل والوقت وسبب الاستثناء إن وجد." />
         <Box gap={2}>
-          {eventTimeline.map((eventItem) => (
-            <ListItem
-              key={eventItem.event_id}
-              title={formatDeliveryLifecycleStatus(eventItem.to_status)}
-              subtitle={eventItem.notes ?? 'لا توجد ملاحظات إضافية'}
-              meta={eventItem.timestamp}
-              badgeLabel={eventItem.reason_code ? formatExceptionReason(eventItem.reason_code) : eventItem.actor_role}
-            />
-          ))}
+          {clientState === 'delivered' && onReorder ? <Button label="إعادة الطلب" onPress={onReorder} /> : null}
+          {onNextAction ? <Button label="العودة إلى الطلبات" onPress={onNextAction} /> : null}
+          {onSupport ? <Button label={supportButtonLabel} tone="secondary" onPress={onSupport} /> : null}
         </Box>
       </Surface>
+    </MobileScrollView>
+  );
+}
 
       {(clientState === 'payment_failed' || clientState === 'area_unserviceable' || clientState === 'item_unavailable') ? (
         <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>

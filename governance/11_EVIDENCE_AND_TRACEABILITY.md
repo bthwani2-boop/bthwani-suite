@@ -15,46 +15,62 @@ tools/registry/runs/{SESSION_ID}/
 
 ## Evidence pack standard
 
-### Always required after code/doc changes
+### Smart evidence selection by task risk
 
-```text
-SUMMARY.md
-evidence.json
-commands.log
-git-status.txt
-git-diff-stat.txt
-git-diff-name-status.txt
-git-diff-check.txt
-untracked-files.txt
-{SESSION_ID}.zip
-```
+Evidence remains required, but its shape must match task risk. Do not create a registry run folder or ZIP for every small task.
+
+| Task class | Minimum evidence | ZIP required? |
+|---|---|---|
+| LOW: terminal-only, decision-only, prompt-only, port check, git status, commit/push command preparation | terminal output or direct answer; git status / git diff --check when relevant | No |
+| MEDIUM: small code/docs/UI edit | git status, git diff --check, changed-file list, and pnpm -w exec tsc --noEmit when TypeScript/UI/runtime can be affected | No by default |
+| UI visible change | code evidence plus screenshot/RTL/overflow/spacing evidence when visual behavior changed | No by default |
+| HIGH: multi-file implementation, ui-kit/export/import/governance/script changes | targeted evidence folder under tools/registry/runs/{SESSION_ID}/, changed-file list, diff check, verification output, rollback note | Optional |
+| GOVERNANCE/GUARD evidence run or multi-file handoff | evidence folder under tools/registry/runs/{SESSION_ID}/ | Only when one upload artifact is needed or user explicitly requests it |
+
+### Minimum evidence after code/doc changes
+
+- git-status.txt or terminal git status output
+- git-diff-check.txt or terminal git diff --check output
+- changed-files list or git diff --name-status output
+- verification output when applicable
+
+### Optional registry evidence folder
+
+Use tools/registry/runs/{SESSION_ID}/ when the task is high-risk, scripted, multi-file, or needs reviewable local evidence.
+
+Recommended files when a registry folder is justified:
+
+- SUMMARY.md
+- evidence.json
+- commands.log
+- git-status.txt
+- git-diff-stat.txt
+- git-diff-name-status.txt
+- git-diff-check.txt
+- untracked-files.txt
+
+{SESSION_ID}.zip is optional and must not be created by default. Create it only when the user explicitly requests a ZIP, when many evidence files must be uploaded as one artifact, or when a major governance/guard evidence run requires a single handoff artifact.
 
 ### Required when TypeScript/runtime can be affected
 
-```text
-tsc-noemit.txt
-lint.txt or lint-not-run-reason.txt
-test.txt or test-not-run-reason.txt
-build.txt or build-not-run-reason.txt
-```
+- tsc-noemit.txt
+- lint.txt or lint-not-run-reason.txt
+- test.txt or test-not-run-reason.txt
+- build.txt or build-not-run-reason.txt
 
 ### Required when UI is affected
 
-```text
-screenshots/before
-screenshots/after
-visual-review.md
-rtl-check.md
-```
+- screenshots/before when available
+- screenshots/after
+- visual-review.md or clear visual notes
+- rtl-check.md or clear RTL notes
 
 ### Required when branch/checkpoint is affected
 
-```text
-branch-reality.txt
-commit-sha.txt
-ahead-behind.txt
-merge-base.txt
-```
+- branch-reality.txt
+- commit-sha.txt
+- ahead-behind.txt
+- merge-base.txt when relevant
 
 ## evidence.json minimum
 
@@ -128,6 +144,8 @@ Governance work may be called closed only when all applicable gates are proven:
 - active governance guards pass when the task changed a guard-owned rule or verification path,
 - no active implementation path depends on retired governance roots,
 - evidence pack exists under `tools/registry/runs/{SESSION_ID}/`,
+- ZIP is optional and created only when explicitly requested or when one upload artifact is needed,
+- ZIP is optional and created only when explicitly requested or when one upload artifact is needed,
 - decision vocabulary is one of the canonical values in this file,
 - local-only work, branch work, or push state is stated explicitly rather than implied.
 

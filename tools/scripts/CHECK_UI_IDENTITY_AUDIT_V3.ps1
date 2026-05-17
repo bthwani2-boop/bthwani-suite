@@ -1,4 +1,5 @@
 Set-Location -LiteralPath "C:\bthwani-suite"
+$CreateZip = $args -contains "-CreateZip"
 $ErrorActionPreference = "Stop"
 
 $session = "UI_IDENTITY_AUDIT_V3-" + (Get-Date -Format "yyyyMMdd-HHmmss")
@@ -151,13 +152,17 @@ Next: upload this ZIP for review before APPLY.
 "@ | Out-File -Encoding UTF8 (Join-Path $root "SUMMARY.md")
 
 $zip = Join-Path (Resolve-Path -LiteralPath $root).Path "$session.zip"
-Get-ChildItem -LiteralPath $root -File |
-  Where-Object { $_.Name -ne "$session.zip" } |
-  Compress-Archive -DestinationPath $zip -Force
+if ($CreateZip) {
+  Get-ChildItem -LiteralPath $root -File |
+    Where-Object { $_.Name -ne "$session.zip" } |
+    Compress-Archive -DestinationPath $zip -Force
+} else {
+  Write-Host "EVIDENCE_ZIP=not-created-by-default"
+}
 
 Write-Host "SESSION_ID=$session"
 Write-Host "EVIDENCE_ROOT=$root"
-Write-Host "EVIDENCE_ZIP=$zip"
+Write-Host "EVIDENCE_ZIP=$(if ($CreateZip) { $zip } else { 'not-created-by-default' })"
 Write-Host "SCANNED_FILES=$(@($files).Count)"
 Write-Host "MATCHES=$(@($matches).Count)"
 Write-Host "DIRECT_TAMAGUI_OUTSIDE_UIKIT=$(@($directTamaguiOutsideUiKit).Count)"

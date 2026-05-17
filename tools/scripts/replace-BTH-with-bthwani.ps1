@@ -1,4 +1,5 @@
 Set-Location -LiteralPath "C:\bthwani-suite"
+$CreateZip = $args -contains "-CreateZip"
 <#
 Safe BTH token cleanup utility.
 
@@ -142,4 +143,4 @@ Write-Host "Mode: $Mode"
 Write-Host "Matched files: $($matches.Count)"
 Write-Host "Changed files: $($changed.Count)"
 Write-Host "Evidence: $RunRoot"
-if ($Apply) { Write-Host "EVIDENCE ZIP: $(Join-Path $RunRoot "$SessionId.zip")" }
+if ($Apply) { Write-Host ("EVIDENCE ZIP: " + $(if ($CreateZip) { Join-Path $RunRoot "$SessionId.zip" } else { "not-created-by-default" })) }

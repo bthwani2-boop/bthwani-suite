@@ -1,6 +1,6 @@
 ---
 name: bthwani-local-evidence-pack
-description: Build BThwani local registry evidence packs and root review artifacts with the correct {SESSION_ID}.zip naming rule. Use after any write-capable execution.
+description: Build BThwani local evidence only when task risk justifies it. ZIP handoff is optional and used only when explicitly needed.
 version: 2026.05.17-v1
 ---
 
@@ -8,26 +8,41 @@ version: 2026.05.17-v1
 
 ## Purpose
 
-Create auditable local evidence.
+Create auditable local evidence without forcing ZIP creation for every task.
+
+## Smart use rule
+
+Do not use this skill for low-risk terminal-only, decision-only, or prompt-only work.
+
+Use it when one of these is true:
+
+1. The change is high-risk, scripted, or multi-file.
+2. The user needs to upload several evidence files as one artifact.
+3. The task changes governance, guards, scripts, UI-kit boundaries, imports/exports, or other sensitive ownership paths.
+4. The user explicitly requests an evidence bundle or ZIP.
 
 ## Steps
 
-1. Create `tools/registry/runs/{SESSION_ID}/`.
-2. Capture branch, commit, status, untracked files, diff-stat, name-status, diff-check.
-3. Capture verification outputs.
-4. Write `SUMMARY.md` and `evidence.json`.
-5. Create `{SESSION_ID}.zip` inside the same folder.
-6. Export root review artifacts when needed.
+1. Classify task risk first.
+2. Create tools/registry/runs/{SESSION_ID}/ only when justified.
+3. Capture branch, commit, status, untracked files, diff-stat, name-status, and diff-check when relevant.
+4. Capture verification outputs required by the task type.
+5. Write SUMMARY.md and evidence.json when a registry folder is created.
+6. Create {SESSION_ID}.zip only when -CreateZip / explicit ZIP handoff is requested or one upload artifact is actually needed.
+7. Export root review artifacts only when patch review is needed.
 
-## Required files
+## Required files when registry evidence is justified
 
-- `git-status.txt`
-- `git-diff-stat.txt`
-- `git-diff-name-status.txt`
-- `git-diff-check.txt`
-- `git-untracked.txt`
-- `evidence.json`
-- `{SESSION_ID}.zip`
+- git-status.txt
+- git-diff-stat.txt
+- git-diff-name-status.txt
+- git-diff-check.txt
+- git-untracked.txt
+- evidence.json
+
+## Optional handoff artifact
+
+- {SESSION_ID}.zip only when explicitly requested or practically needed.
 
 ## Universal BThwani constraints
 

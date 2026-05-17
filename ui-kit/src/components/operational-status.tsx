@@ -510,7 +510,7 @@ export type StickyActionBarAction = {
 };
 
 export type StickyActionBarProps = {
-  primaryAction: StickyActionBarAction;
+  primaryAction?: StickyActionBarAction;
   secondaryAction?: StickyActionBarAction;
   note?: string;
   onHeightChange?: (height: number) => void;
@@ -568,27 +568,31 @@ export function StickyActionBar({ primaryAction, secondaryAction, note, onHeight
         </Text>
       ) : null}
 
-      <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2] }}>
-        <Button
-          label={primaryAction.label}
-          tone={primaryAction.tone ?? 'primary'}
-          loading={primaryAction.loading}
-          disabled={primaryAction.disabled}
-          onPress={primaryAction.onPress}
-          style={{ flex: 1, minHeight: 48 }}
-        />
+      {primaryAction || secondaryAction ? (
+        <View style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2] }}>
+          {primaryAction ? (
+            <Button
+              label={primaryAction.label}
+              tone={primaryAction.tone ?? 'primary'}
+              loading={primaryAction.loading}
+              disabled={primaryAction.disabled}
+              onPress={primaryAction.onPress}
+              style={{ flex: 1, minHeight: 48 }}
+            />
+          ) : null}
 
-        {secondaryAction ? (
-          <Button
-            label={secondaryAction.label}
-            tone={secondaryAction.tone ?? 'secondary'}
-            loading={secondaryAction.loading}
-            disabled={secondaryAction.disabled}
-            onPress={secondaryAction.onPress}
-            style={{ flex: 1, minHeight: 48 }}
-          />
-        ) : null}
-      </View>
+          {secondaryAction ? (
+            <Button
+              label={secondaryAction.label}
+              tone={secondaryAction.tone ?? 'secondary'}
+              loading={secondaryAction.loading}
+              disabled={secondaryAction.disabled}
+              onPress={secondaryAction.onPress}
+              style={{ flex: 1, minHeight: 48 }}
+            />
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }

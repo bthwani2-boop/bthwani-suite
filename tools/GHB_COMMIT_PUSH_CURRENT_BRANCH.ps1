@@ -1,4 +1,6 @@
-[CmdletBinding()]
+[CmdletBinding(
+  [switch]$CreateZip
+)]
 param(
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
@@ -272,7 +274,7 @@ try {
     Invoke-Git -Name "log-oneline-after" -GitArgs @("--no-pager", "log", "--oneline", "-n", "5") | Out-Null
 
     $Status = if ($Committed) { "PASS_PUSHED_WITH_COMMIT" } else { "PASS_PUSHED_NO_NEW_COMMIT" }
-    $Recommendation = "PUSH_DONE_REVIEW_HANDOFF_ZIP"
+    $Recommendation = "PUSH_DONE_REVIEW_EVIDENCE_FOLDER"
     $ExitCode = 0
   }
 } catch {
@@ -306,7 +308,7 @@ skip_typecheck: $SkipTypecheck
 started_at: $($StartedAt.ToString("s"))
 completed_at: $($CompletedAt.ToString("s"))
 evidence_root: $FinalRoot
-handoff_zip: $HandoffZip
+handoff_zip: $(if ($CreateZip) { $HandoffZip } else { 'not-created-by-default' })
 
 warnings:
 $($Warnings | ForEach-Object { "- $_" } | Out-String)
@@ -316,7 +318,7 @@ $($Errors | ForEach-Object { "- $_" } | Out-String)
 
 next_action:
 - If status is DRY_RUN: review evidence, then run without -DryRun or use gp when ready.
-- If status is PASS_PUSHED_WITH_COMMIT or PASS_PUSHED_NO_NEW_COMMIT: upload _HANDOFF.zip if you want ChatGPT review.
+- If status is PASS_PUSHED_WITH_COMMIT or PASS_PUSHED_NO_NEW_COMMIT: review the evidence folder; use -CreateZip only if one upload artifact is needed.
 - If status is BLOCKED: fix the listed error, then rerun.
 "@
 
@@ -344,7 +346,7 @@ next_action:
     started_at = $StartedAt.ToString("o")
     completed_at = $CompletedAt.ToString("o")
     evidence_root = $FinalRoot
-    handoff_zip = $HandoffZip
+    handoff_zip = $(if ($CreateZip) { $HandoffZip } else { $null })
     checks = $Checks
     warnings = $Warnings
     errors = $Errors
@@ -377,7 +379,7 @@ next_action:
   Write-Host "committed: $Committed"
   Write-Host "pushed: $Pushed"
   Write-Host "evidence_root: $FinalRoot"
-  Write-Host "handoff_zip: $HandoffZip"
+  Write-Host "handoff_zip: $(if ($CreateZip) { $HandoffZip } else { 'not-created-by-default' })"
   Write-Host ""
 
   if ($Warnings.Count -gt 0) {
