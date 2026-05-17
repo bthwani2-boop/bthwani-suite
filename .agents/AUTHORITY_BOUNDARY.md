@@ -28,6 +28,12 @@
 - Skills must be general and executable across BThwani.
 - Service/application specialization belongs in `governance/`, not inside `.agents` skills.
 
+## Execution budget
+
+- `Use relevant skills` means select the narrowest 1-2 relevant skills, not the whole catalog.
+- Do not default to full lint, workspace `tsc`, all guards, registry evidence, or ZIP for LOW or MEDIUM tasks.
+- Do not emit repetitive wait-loop status chatter; one timed wait notice is the maximum when a real blocking operation is running.
+
 ## Acceptance rule
 
 No `PASS`, `CLOSED`, `FINAL`, `READY`, or `100%` without Git diff, verification, and evidence.

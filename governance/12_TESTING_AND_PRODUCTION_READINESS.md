@@ -7,8 +7,8 @@
 
 | Category | Required when | Evidence |
 |---|---|---|
-| TypeScript | any TS/TSX/config impact | `pnpm -w exec tsc --noEmit` |
-| Lint | code style/static checks exist | lint output or not-run reason |
+| TypeScript | TS/TSX/config/export impact | targeted typecheck for the affected project/path; workspace `tsc` only for high-risk, release, broad architecture, or explicit human request |
+| Lint | a direct lint question exists or an affected-project lint target is available | targeted lint output or NOT_RUN_REASON; workspace lint only on explicit PR/release/human request |
 | Unit | pure logic changed | test output |
 | Integration | API/client/service binding changed | integration output |
 | Contract | OpenAPI/schema/client changed | contract test output |
@@ -23,8 +23,16 @@
 Set-Location -LiteralPath "C:\bthwani-suite"
 git --no-pager status --short
 git --no-pager diff --check
-pnpm -w exec tsc --noEmit
+# Then choose the minimum targeted gate justified by the Smart Execution Budget.
 ```
+
+## Smart Execution Budget
+
+- LOW: terminal-only, docs tiny, prompt-only, text-only, port checks, or git-status work. Gates: `git status` and `git diff --check` only when writes occurred. No default full lint, workspace `tsc`, guards, registry evidence, or ZIP.
+- MEDIUM: one file or a few targeted files. Gates: `git status`, `git diff --check`, and targeted syntax/type/lint only when directly justified. No workspace lint by default.
+- UI_VISIBLE: visible UI changes. Gates: `git diff --check`, targeted TS/type verification when needed, and screenshot/RTL notes.
+- HIGH: governance, agents, guards, scripts, ui-kit exports, architecture, or other multi-file sensitive work. Gates: `git status`, `git diff --check`, targeted guards, PowerShell syntax validation for modified `.ps1`, and registry evidence only when the risk justifies it. ZIP is opt-in only.
+- COMMIT/PUSH: before commit, run `git status` and staged `git diff --check` only. Let hooks run. If a hook fails, fix only the specific failure.
 
 ## Production readiness dimensions
 

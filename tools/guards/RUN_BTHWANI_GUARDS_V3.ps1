@@ -54,17 +54,20 @@ foreach ($Guard in $Guards) {
 $FailCount = @($Results | Where-Object { $_.status -eq 'FAIL' }).Count
 $WarnCount = @($Results | Where-Object { $_.status -eq 'WARN' }).Count
 $FinalStatus = if ($FailCount -gt 0) { 'FAIL' } elseif ($WarnCount -gt 0) { 'WARN' } else { 'PASS' }
+$Blocking = ($FailCount -gt 0) -or ($Strict -and $WarnCount -gt 0)
 $ZipPath = Join-Path $EvidenceRoot "$SessionId.zip"
-$Summary = @("# BThwani Root Guards V3 Run", "", "- status: $FinalStatus", "- session_id: $SessionId", "- profile: $Profile", "- phase: $Phase", "- mode: $Mode", "- evidence_root: $EvidenceRoot", "- zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })", "- fail_count: $FailCount", "- warn_count: $WarnCount", "", "| Guard | Status | Fail | Warn | Info |", "|---|---|---:|---:|---:|")
+$Summary = @("# BThwani Root Guards V3 Run", "", "- status: $FinalStatus", "- session_id: $SessionId", "- profile: $Profile", "- phase: $Phase", "- mode: $Mode", "- evidence_root: $EvidenceRoot", "- zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })", "- fail_count: $FailCount", "- warn_count: $WarnCount", "- blocking: $Blocking", "", "| Guard | Status | Fail | Warn | Info |", "|---|---|---:|---:|---:|")
 foreach ($R in $Results) { $Summary += "| $($R.guardId) | $($R.status) | $($R.failCount) | $($R.warnCount) | $($R.infoCount) |" }
 $Summary | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'SUMMARY.md') -Encoding UTF8
-[ordered]@{ status=$FinalStatus; session_id=$SessionId; profile=$Profile; phase=$Phase; mode=$Mode; evidence_root=$EvidenceRoot; zip=$(if ($CreateZip) { $ZipPath } else { $null }); results=$Results } | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'evidence.json') -Encoding UTF8
-Compress-Archive -Path (Join-Path $EvidenceRoot '*') -DestinationPath $ZipPath -Force
+[ordered]@{ status=$FinalStatus; session_id=$SessionId; profile=$Profile; phase=$Phase; mode=$Mode; evidence_root=$EvidenceRoot; zip=$(if ($CreateZip) { $ZipPath } else { $null }); fail_count=$FailCount; warn_count=$WarnCount; blocking=$Blocking; results=$Results } | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'evidence.json') -Encoding UTF8
+if ($CreateZip) {
+  Compress-Archive -Path (Join-Path $EvidenceRoot '*') -DestinationPath $ZipPath -Force
+}
 Write-Host ""
 Write-Host "status: $FinalStatus"
 Write-Host "evidence_root: $EvidenceRoot"
 Write-Host "zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })"
 Write-Host "guards_fail: $FailCount"
 Write-Host "guards_warn: $WarnCount"
-if ($FinalStatus -eq 'FAIL') { exit 1 }
+if ($Blocking) { exit 1 }
 exit 0

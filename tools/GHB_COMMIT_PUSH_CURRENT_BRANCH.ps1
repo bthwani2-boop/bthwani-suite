@@ -1,6 +1,4 @@
-[CmdletBinding(
-  [switch]$CreateZip
-)]
+[CmdletBinding()]
 param(
   [Parameter(Mandatory = $true)]
   [ValidateNotNullOrEmpty()]
@@ -15,7 +13,8 @@ param(
   [switch]$SkipTypecheck,
   [switch]$AllowProtectedBranch,
   [switch]$AllowDifferentRemote,
-  [switch]$DryRun
+  [switch]$DryRun,
+  [switch]$CreateZip
 )
 
 Set-Location -LiteralPath "C:\bthwani-suite"
@@ -27,7 +26,7 @@ $StartedAt = Get-Date
 $SessionId = "GHB_COMMIT_PUSH-" + $StartedAt.ToString("yyyyMMdd-HHmmss")
 $TempRoot = Join-Path $env:TEMP ("BTHWANI-" + $SessionId)
 $FinalRoot = Join-Path $RepoRoot ("tools\registry\runs\" + $SessionId)
-$HandoffZip = Join-Path $FinalRoot "_HANDOFF.zip"
+$ZipPath = Join-Path $FinalRoot "$SessionId.zip"
 $CommandLog = Join-Path $TempRoot "commands.log"
 $StepNo = 0
 $Status = "BLOCKED"
@@ -46,6 +45,8 @@ $HadLocalChanges = $false
 $RemoteBranchExists = $false
 $Ahead = 0
 $Behind = 0
+$TypecheckRan = $false
+$TypecheckDecision = "NOT_RUN_REASON: not evaluated yet."
 
 New-Item -ItemType Directory -Force -Path $TempRoot | Out-Null
 
@@ -144,6 +145,100 @@ function Block-Run {
   throw $Reason
 }
 
+function Get-ChangedPathList {
+  param([switch]$StagedOnly)
+
+  $paths = New-Object System.Collections.Generic.List[string]
+  $seen = @{}
+  $commands = @()
+
+  if ($StagedOnly) {
+    $commands += @{ Name = "changed-paths-staged"; Args = @("--no-pager", "diff", "--cached", "--name-only", "--diff-filter=ACMRTUXB") }
+  } else {
+    $commands += @{ Name = "changed-paths-working-tree"; Args = @("--no-pager", "diff", "--name-only", "--diff-filter=ACMRTUXB") }
+    $commands += @{ Name = "changed-paths-staged"; Args = @("--no-pager", "diff", "--cached", "--name-only", "--diff-filter=ACMRTUXB") }
+  }
+
+  foreach ($command in $commands) {
+    $output = (Invoke-Git -Name $command.Name -GitArgs $command.Args -AllowFail:$true).Output
+    foreach ($line in ($output -split "(`r`n|`n|`r)")) {
+      $path = $line.Trim()
+      if ([string]::IsNullOrWhiteSpace($path)) {
+        continue
+      }
+      if (-not $seen.ContainsKey($path)) {
+        $seen[$path] = $true
+        $paths.Add($path) | Out-Null
+      }
+    }
+  }
+
+  return @($paths)
+}
+
+function Get-TypecheckDecision {
+  param(
+    [string[]]$Paths,
+    [switch]$SkipRequested
+  )
+
+  if ($SkipRequested) {
+    return [pscustomobject]@{
+      ShouldRun = $false
+      Reason = "NOT_RUN_REASON: skipped by explicit -SkipTypecheck."
+    }
+  }
+
+  if ($null -eq $Paths -or $Paths.Count -eq 0) {
+    return [pscustomobject]@{
+      ShouldRun = $false
+      Reason = "NOT_RUN_REASON: no changed files were detected for typecheck."
+    }
+  }
+
+  $highRiskPatterns = @(
+    '^(AGENTS|CLAUDE|GEMINI)\.md$',
+    '^\.agents/',
+    '^governance/',
+    '^package\.json$',
+    '^\.husky/pre-commit$',
+    '^tools/guards/',
+    '^tools/scripts/',
+    '^tools/GHB_COMMIT_PUSH_CURRENT_BRANCH\.ps1$',
+    '(^|/)tsconfig(\..+)?\.json$',
+    '^pnpm-workspace\.yaml$',
+    '^nx\.json$',
+    '(^|/)package\.json$'
+  )
+
+  $isHighRisk = ($Paths.Count -gt 8)
+  if (-not $isHighRisk) {
+    foreach ($path in $Paths) {
+      foreach ($pattern in $highRiskPatterns) {
+        if ($path -match $pattern) {
+          $isHighRisk = $true
+          break
+        }
+      }
+      if ($isHighRisk) {
+        break
+      }
+    }
+  }
+
+  if ($isHighRisk) {
+    return [pscustomobject]@{
+      ShouldRun = $true
+      Reason = "High-risk change set triggered workspace typecheck."
+    }
+  }
+
+  return [pscustomobject]@{
+    ShouldRun = $false
+    Reason = "NOT_RUN_REASON: default publish flow skips workspace typecheck for small or non-high-risk changes."
+  }
+}
+
 try {
   Add-Log "SESSION $SessionId"
   Add-Log "RepoRoot=$RepoRoot"
@@ -215,10 +310,15 @@ try {
     Invoke-Git -Name "dryrun-diff-stat" -GitArgs @("--no-pager", "diff", "--stat") -AllowFail:$true | Out-Null
     Invoke-Git -Name "dryrun-staged-name-status" -GitArgs @("--no-pager", "diff", "--cached", "--name-status") -AllowFail:$true | Out-Null
 
-    if (-not $SkipTypecheck) {
+    $dryRunPaths = Get-ChangedPathList
+    $dryRunTypecheck = Get-TypecheckDecision -Paths $dryRunPaths -SkipRequested:$SkipTypecheck
+    $TypecheckDecision = $dryRunTypecheck.Reason
+
+    if ($dryRunTypecheck.ShouldRun) {
       Invoke-External -Name "pnpm-workspace-tsc-noemit" -Exe "pnpm" -Args @("-w", "exec", "tsc", "--noEmit") | Out-Null
+      $TypecheckRan = $true
     } else {
-      $Warnings.Add("TypeScript check skipped by -SkipTypecheck.") | Out-Null
+      $Warnings.Add($TypecheckDecision) | Out-Null
     }
 
     $CommitShaAfter = (Invoke-Git -Name "rev-parse-head-after-dryrun" -GitArgs @("rev-parse", "HEAD")).Output.Trim()
@@ -247,16 +347,22 @@ try {
 
       Invoke-Git -Name "diff-cached-check" -GitArgs @("--no-pager", "diff", "--cached", "--check") | Out-Null
 
-      if (-not $SkipTypecheck) {
+      $stagedPaths = Get-ChangedPathList -StagedOnly
+      $commitTypecheck = Get-TypecheckDecision -Paths $stagedPaths -SkipRequested:$SkipTypecheck
+      $TypecheckDecision = $commitTypecheck.Reason
+
+      if ($commitTypecheck.ShouldRun) {
         Invoke-External -Name "pnpm-workspace-tsc-noemit" -Exe "pnpm" -Args @("-w", "exec", "tsc", "--noEmit") | Out-Null
+        $TypecheckRan = $true
       } else {
-        $Warnings.Add("TypeScript check skipped by -SkipTypecheck.") | Out-Null
+        $Warnings.Add($TypecheckDecision) | Out-Null
       }
 
       Invoke-Git -Name "commit" -GitArgs @("commit", "-m", $CommitMessage) | Out-Null
       $Committed = $true
     } else {
       $Warnings.Add("No local working-tree changes detected. Script will only push existing local commits if any.") | Out-Null
+      $TypecheckDecision = "NOT_RUN_REASON: no local changes were committed in this run."
     }
 
     $CommitShaAfter = (Invoke-Git -Name "rev-parse-head-after" -GitArgs @("rev-parse", "HEAD")).Output.Trim()
@@ -305,10 +411,12 @@ pushed: $Pushed
 stage_mode: $StageMode
 dry_run: $DryRun
 skip_typecheck: $SkipTypecheck
+typecheck_ran: $TypecheckRan
+typecheck_decision: $TypecheckDecision
 started_at: $($StartedAt.ToString("s"))
 completed_at: $($CompletedAt.ToString("s"))
 evidence_root: $FinalRoot
-handoff_zip: $(if ($CreateZip) { $HandoffZip } else { 'not-created-by-default' })
+zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })
 
 warnings:
 $($Warnings | ForEach-Object { "- $_" } | Out-String)
@@ -343,10 +451,12 @@ next_action:
     stage_mode = $StageMode
     dry_run = [bool]$DryRun
     skip_typecheck = [bool]$SkipTypecheck
+    typecheck_ran = $TypecheckRan
+    typecheck_decision = $TypecheckDecision
     started_at = $StartedAt.ToString("o")
     completed_at = $CompletedAt.ToString("o")
     evidence_root = $FinalRoot
-    handoff_zip = $(if ($CreateZip) { $HandoffZip } else { $null })
+    zip = $(if ($CreateZip) { $ZipPath } else { $null })
     checks = $Checks
     warnings = $Warnings
     errors = $Errors
@@ -358,12 +468,13 @@ next_action:
   Get-ChildItem -LiteralPath $TempRoot -Force |
     Copy-Item -Destination $FinalRoot -Recurse -Force
 
-  if (Test-Path -LiteralPath $HandoffZip) {
-    Remove-Item -LiteralPath $HandoffZip -Force
+  if ($CreateZip) {
+    if (Test-Path -LiteralPath $ZipPath) {
+      Remove-Item -LiteralPath $ZipPath -Force
+    }
+    $zipItems = Get-ChildItem -LiteralPath $FinalRoot -Force | Where-Object { $_.Name -ne (Split-Path -Leaf $ZipPath) }
+    Compress-Archive -Path $zipItems.FullName -DestinationPath $ZipPath -Force
   }
-
-  $zipItems = Get-ChildItem -LiteralPath $FinalRoot -Force | Where-Object { $_.Name -ne "_HANDOFF.zip" }
-  Compress-Archive -Path $zipItems.FullName -DestinationPath $HandoffZip -Force
 
   Write-Host ""
   Write-Host $Status
@@ -379,7 +490,7 @@ next_action:
   Write-Host "committed: $Committed"
   Write-Host "pushed: $Pushed"
   Write-Host "evidence_root: $FinalRoot"
-  Write-Host "handoff_zip: $(if ($CreateZip) { $HandoffZip } else { 'not-created-by-default' })"
+  Write-Host "zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' })"
   Write-Host ""
 
   if ($Warnings.Count -gt 0) {

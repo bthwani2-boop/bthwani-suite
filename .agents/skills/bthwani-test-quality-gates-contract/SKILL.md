@@ -15,7 +15,7 @@ Make verification proportional and complete.
 1. Classify change type: docs, agent, governance, UI, runtime, API, backend, config, dependency, data, release.
 2. Select minimum gates.
 3. Require `git diff --check` always after writes.
-4. Require `pnpm -w exec tsc --noEmit` for code-affecting changes unless blocked with reason.
+4. Prefer targeted typecheck for affected project/path when available; workspace tsc only for high-risk, release, broad architecture, or explicit human request. Otherwise record NOT_RUN_REASON.
 5. Require screenshots for visible UI changes.
 6. Require runtime smoke for behavior/runtime changes.
 7. Return `NEEDS_EVIDENCE` when gates are missing.

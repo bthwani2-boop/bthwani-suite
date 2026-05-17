@@ -1,5 +1,13 @@
+[CmdletBinding()]
+param(
+    [switch]$Apply,
+    [string]$Root = "ui-kit/docs",
+    [string]$Pattern = "\bBTH\b",
+    [string]$Replacement = "bthwani",
+    [switch]$CreateZip
+)
+
 Set-Location -LiteralPath "C:\bthwani-suite"
-$CreateZip = $args -contains "-CreateZip"
 <#
 Safe BTH token cleanup utility.
 
@@ -14,39 +22,10 @@ Rules:
 - Does not modify bthwani, BThwani, @bthwani/*, bthwani-suite.
 - Does not create .bak files inside source paths.
 - In Apply mode, backups and evidence are written under tools/registry/runs/{SESSION_ID}/.
-- In Apply mode, a ZIP named exactly after SESSION_ID is produced for review.
+- ZIP is optional and created only when -CreateZip is passed.
 #>
 
 $ErrorActionPreference = "Stop"
-
-$Apply = $false
-$Root = "ui-kit/docs"
-$Pattern = "\bBTH\b"
-$Replacement = "bthwani"
-
-for ($i = 0; $i -lt $args.Count; $i++) {
-    switch ($args[$i]) {
-        "-Apply" { $Apply = $true }
-        "-Root" {
-            if ($i + 1 -ge $args.Count) { throw "-Root requires a value." }
-            $i++
-            $Root = $args[$i]
-        }
-        "-Pattern" {
-            if ($i + 1 -ge $args.Count) { throw "-Pattern requires a value." }
-            $i++
-            $Pattern = $args[$i]
-        }
-        "-Replacement" {
-            if ($i + 1 -ge $args.Count) { throw "-Replacement requires a value." }
-            $i++
-            $Replacement = $args[$i]
-        }
-        default {
-            throw "Unknown argument: $($args[$i]). Allowed: -Apply, -Root <path>, -Pattern <regex>, -Replacement <text>."
-        }
-    }
-}
 
 $RepoRoot = (Get-Location).Path
 $SessionId = "REPLACE_BTH_TOKEN-" + (Get-Date -Format "yyyyMMdd-HHmmss")
@@ -109,7 +88,7 @@ replacement: $Replacement
 matched_files: $($matches.Count)
 changed_files: $($changed.Count)
 evidence_root: $RunRoot
-evidence_zip: $(Join-Path $RunRoot "$SessionId.zip")
+evidence_zip: $(if ($CreateZip -and $Apply) { Join-Path $RunRoot "$SessionId.zip" } else { 'not-created-by-default' })
 "@
 $summary | Set-Content -LiteralPath (Join-Path $RunRoot "summary.txt") -Encoding UTF8
 
@@ -134,9 +113,11 @@ if ($Apply) {
     git --no-pager diff -- . > (Join-Path $RunRoot "LOCAL_CHANGE_REVIEW.patch")
     git ls-files --others --exclude-standard > (Join-Path $RunRoot "untracked-files.txt")
 
-    $zipPath = Join-Path $RunRoot "$SessionId.zip"
-    if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
-    Compress-Archive -Path (Join-Path $RunRoot "*") -DestinationPath $zipPath -Force
+    if ($CreateZip) {
+        $zipPath = Join-Path $RunRoot "$SessionId.zip"
+        if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
+        Compress-Archive -Path (Join-Path $RunRoot "*") -DestinationPath $zipPath -Force
+    }
 }
 
 Write-Host "Mode: $Mode"

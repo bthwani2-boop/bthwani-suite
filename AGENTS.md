@@ -49,7 +49,7 @@ Core laws:
 - Use PowerShell for local execution.
 - Do not use unsafe or unjustified launchers for local tool execution; prefer `pnpm`, `pnpm exec`, `pnpm dlx`, or `pnpm nx`.
 - Evidence root is `tools/registry/runs/{SESSION_ID}`.
-- New registry ZIPs must be named `{SESSION_ID}.zip`.
+- When a registry ZIP is explicitly requested, name it `{SESSION_ID}.zip`.
 - If a task touches `.github/`, GitHub automation, CI, workflows, prompts, or CODEOWNERS, read `.github/copilot-instructions.md` and the relevant `.github/*` files before acting.
 - Backend target is Go unless current repo evidence explicitly says otherwise.
 - UI architecture: Screen / Surface / App -> `@bthwani/ui-kit` public exports -> Tamagui internally inside ui-kit only.
@@ -60,6 +60,19 @@ Core laws:
 - No new UI-kit files unless the need is non-negotiable, proven by evidence, and human-approved.
 - Service/application/domain specialization belongs in `governance/`; `.agents` skills remain general.
 - Do not claim `PASS`, `CLOSED`, `FINAL`, `READY`, or `100%` without Git diff, verification, and evidence.
+
+Smart Execution Budget:
+
+- LOW: terminal-only, docs tiny, prompt-only, text-only, port checks, or git-status work. Gates: `git status` and `git diff --check` only when writes occurred. Do not run full lint, workspace `tsc`, full guards, registry evidence, ZIP, or bulk skill reads.
+- MEDIUM: one file or a few targeted files. Gates: `git status`, `git diff --check`, and targeted syntax/type/lint only when directly justified. Do not run workspace lint by default.
+- UI_VISIBLE: visible UI changes. Gates: `git diff --check`, targeted TS/type verification when needed, and screenshot/RTL/overflow notes. Do not claim closure without visual evidence.
+- HIGH: governance, agents, guards, scripts, ui-kit exports, architecture, or other multi-file sensitive work. Gates: `git status`, `git diff --check`, targeted guards, PowerShell syntax validation for modified `.ps1`, and registry evidence only when the risk justifies it. ZIP is opt-in only.
+- COMMIT/PUSH: before commit, run `git status` and staged `git diff --check` only. Do not rerun hooks manually; let hooks run. If a hook fails, fix only the specific failure.
+
+Skill and wait budget:
+
+- `Use relevant skills` means choose the narrowest 1-2 project-owned skills for the task. Do not open the full skill catalog or unrelated skills unless direct evidence shows they are needed.
+- Do not emit repetitive wait-loop updates such as repeated "wait 60 seconds" or "continue to wait" messages. One timed wait notice is the maximum when a real blocking operation is running.
 
 Use these project-owned skills when relevant:
 

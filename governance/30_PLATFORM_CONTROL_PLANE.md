@@ -99,5 +99,5 @@ No service can be disabled without an impact assessment, and no provider activat
 No change is considered DONE without:
 - A diff showing the actual change
 - Guard passing (`node tools/plan/PLATFORM_CONTROL_PLANE_UIUX_PACKAGE/08_GUARDS/platform-control-plane-uiux.guard.mjs`)
-- TypeScript compilation clean (`pnpm -w exec tsc --noEmit`)
+- Targeted typecheck for the affected control-plane project/path when justified; workspace `tsc` only for high-risk, release, broad architecture, or explicit human request
 - No PASS / CLOSED / 100% claims without supporting evidence

@@ -7,6 +7,9 @@ Read first:
 - `.agents/adapters/gemini.md`
 
 Use the relevant `.agents/skills/*` file for execution details.
+Read only 1-2 directly relevant skills; do not open the full catalog unless task selection is unclear.
+Follow the Smart Execution Budget in `AGENTS.md` and `governance/15_AGENT_AND_AI_EXECUTION.md`; do not default to full lint, workspace `tsc`, full guards, registry evidence, or ZIP.
+Do not emit repetitive wait-loop status messages.
 Do not recreate `.github/skills`, `.github/agents`, or mirror folders.
 No `PASS`, `CLOSED`, `FINAL`, or `100%` without diff, verification, and evidence.
 

@@ -21,11 +21,11 @@ Evidence remains required, but its shape must match task risk. Do not create a r
 
 | Task class | Minimum evidence | ZIP required? |
 |---|---|---|
-| LOW: terminal-only, decision-only, prompt-only, port check, git status, commit/push command preparation | terminal output or direct answer; git status / git diff --check when relevant | No |
-| MEDIUM: small code/docs/UI edit | git status, git diff --check, changed-file list, and pnpm -w exec tsc --noEmit when TypeScript/UI/runtime can be affected | No by default |
-| UI visible change | code evidence plus screenshot/RTL/overflow/spacing evidence when visual behavior changed | No by default |
-| HIGH: multi-file implementation, ui-kit/export/import/governance/script changes | targeted evidence folder under tools/registry/runs/{SESSION_ID}/, changed-file list, diff check, verification output, rollback note | Optional |
-| GOVERNANCE/GUARD evidence run or multi-file handoff | evidence folder under tools/registry/runs/{SESSION_ID}/ | Only when one upload artifact is needed or user explicitly requests it |
+| LOW: terminal-only, docs tiny, prompt-only, text-only, port checks, git status | direct answer or terminal output; `git status` and `git diff --check` only when writes occurred | No |
+| MEDIUM: one file or a few targeted files | `git status`, `git diff --check`, changed-file list, and targeted syntax/type/lint only when directly justified | No by default |
+| UI_VISIBLE: visible UI change | `git diff --check`, targeted TS/type verification when needed, and screenshot/RTL/overflow/spacing notes | No by default |
+| HIGH: governance, agents, guards, scripts, ui-kit exports, architecture, or other multi-file sensitive work | `git status`, `git diff --check`, targeted guards, PowerShell syntax validation for modified `.ps1`, and registry evidence only when the risk justifies it | Optional and opt-in only |
+| COMMIT/PUSH: publishing step | before commit, run `git status` and staged `git diff --check`; let hooks run; if a hook fails, fix only the specific failure | No by default |
 
 ### Minimum evidence after code/doc changes
 
@@ -49,11 +49,11 @@ Recommended files when a registry folder is justified:
 - git-diff-check.txt
 - untracked-files.txt
 
-{SESSION_ID}.zip is optional and must not be created by default. Create it only when the user explicitly requests a ZIP, when many evidence files must be uploaded as one artifact, or when a major governance/guard evidence run requires a single handoff artifact.
+{SESSION_ID}.zip is optional and must not be created by default. Create it only when the user explicitly requests a ZIP, when many evidence files must be uploaded as one artifact, or when a major governance/guard evidence run truly requires a single handoff artifact.
 
-### Required when TypeScript/runtime can be affected
+### Required when targeted type/runtime verification is justified
 
-- tsc-noemit.txt
+- typecheck.txt or typecheck-not-run-reason.txt
 - lint.txt or lint-not-run-reason.txt
 - test.txt or test-not-run-reason.txt
 - build.txt or build-not-run-reason.txt
@@ -132,7 +132,7 @@ A task cannot pass if:
 - untracked files are unexplained,
 - staged changes are unreviewed,
 - UI screenshots are missing for UI work,
-- evidence pack lacks `{SESSION_ID}.zip` when a task writes under registry runs.
+- required registry evidence for the chosen task class is missing.
 
 ## Final governance closure gates
 
@@ -140,11 +140,10 @@ Governance work may be called closed only when all applicable gates are proven:
 
 - git status is understood,
 - `git --no-pager diff --check` passes,
-- `pnpm -w exec tsc --noEmit` passes when TypeScript or config changed,
-- active governance guards pass when the task changed a guard-owned rule or verification path,
+- targeted typecheck passes when TypeScript or config risk justifies it, or a NOT_RUN_REASON is recorded; workspace `tsc` is reserved for high-risk, release, broad architecture, or explicit human request,
+- targeted governance guards pass when the task changed a guard-owned rule or verification path,
 - no active implementation path depends on retired governance roots,
-- evidence pack exists under `tools/registry/runs/{SESSION_ID}/`,
-- ZIP is optional and created only when explicitly requested or when one upload artifact is needed,
+- registry evidence exists under `tools/registry/runs/{SESSION_ID}/` only when the task class justifies it,
 - ZIP is optional and created only when explicitly requested or when one upload artifact is needed,
 - decision vocabulary is one of the canonical values in this file,
 - local-only work, branch work, or push state is stated explicitly rather than implied.

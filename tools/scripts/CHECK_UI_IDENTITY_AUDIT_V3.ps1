@@ -1,5 +1,9 @@
+[CmdletBinding()]
+param(
+  [switch]$CreateZip
+)
+
 Set-Location -LiteralPath "C:\bthwani-suite"
-$CreateZip = $args -contains "-CreateZip"
 $ErrorActionPreference = "Stop"
 
 $session = "UI_IDENTITY_AUDIT_V3-" + (Get-Date -Format "yyyyMMdd-HHmmss")
@@ -127,7 +131,8 @@ $topFiles | Export-Csv -NoTypeInformation -Encoding UTF8 -Path (Join-Path $root 
 $checks = @()
 $checks += Run-Cmd "git-status.txt" "git --no-pager status --short"
 $checks += Run-Cmd "diff-check.txt" "git --no-pager diff --check"
-$checks += Run-Cmd "tsc-noemit.txt" "pnpm -w exec tsc --noEmit"
+Write-Text "typecheck-not-run-reason.txt" "NOT_RUN_REASON: UI identity audit V3 is read-only and does not run workspace tsc by default. Use a targeted project typecheck only when a later APPLY batch changes code."
+$checks += [pscustomobject]@{ name = "typecheck-not-run-reason.txt"; exitCode = 0 }
 
 $evidence = [pscustomobject]@{
   decision = "NEEDS_REVIEW"
@@ -137,7 +142,7 @@ $evidence = [pscustomobject]@{
   matchCount = @($matches).Count
   directTamaguiOutsideUiKitCount = @($directTamaguiOutsideUiKit).Count
   checks = $checks
-  next = "Review ui-identity-summary.csv, top-matched-files.csv, and direct Tamagui imports before first APPLY batch."
+  next = "Review ui-identity-summary.csv, top-matched-files.csv, and direct Tamagui imports before any APPLY batch."
 }
 
 $evidence | ConvertTo-Json -Depth 5 | Out-File -Encoding UTF8 (Join-Path $root "evidence.json")
@@ -149,6 +154,7 @@ Scanned files: $(@($files).Count)
 Matches: $(@($matches).Count)
 Direct Tamagui imports outside ui-kit: $(@($directTamaguiOutsideUiKit).Count)
 Next: upload this ZIP for review before APPLY.
+Next: review the evidence folder; create a ZIP only when explicitly requested.
 "@ | Out-File -Encoding UTF8 (Join-Path $root "SUMMARY.md")
 
 $zip = Join-Path (Resolve-Path -LiteralPath $root).Path "$session.zip"

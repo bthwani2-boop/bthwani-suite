@@ -179,9 +179,7 @@ foreach ($entry in $Entries) {
 $FailCount = @($Results | Where-Object { $_.status -eq 'FAIL' }).Count
 $WarnCount = @($Results | Where-Object { $_.status -eq 'WARN' }).Count
 $FinalStatus = if ($FailCount -gt 0) { 'FAIL' } elseif ($WarnCount -gt 0) { 'WARN' } else { 'PASS' }
-if ($FailOnWarning -and $WarnCount -gt 0 -and $FailCount -eq 0) {
-  $FinalStatus = 'FAIL'
-}
+$Blocking = ($FailCount -gt 0) -or ($FailOnWarning -and $WarnCount -gt 0)
 
 $ZipPath = Join-Path $EvidenceRoot "$SessionId.zip"
 $SummaryMd = @(
@@ -195,6 +193,7 @@ $SummaryMd = @(
   "- guards_total: $($Entries.Count)",
   "- guards_fail: $FailCount",
   "- guards_warn: $WarnCount",
+  "- blocking: $Blocking",
   "",
   "| Guard ID | Status | File | Owner policy |",
   "|---|---|---|---|"
@@ -216,12 +215,15 @@ $Evidence = [ordered]@{
   guards_total = $Entries.Count
   guards_fail = $FailCount
   guards_warn = $WarnCount
+  blocking = $Blocking
   results = $Results
 }
 $Evidence | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $EvidenceRoot 'evidence.json') -Encoding UTF8
 
-if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
-Compress-Archive -Path (Join-Path $EvidenceRoot '*') -DestinationPath $ZipPath -Force
+if ($CreateZip) {
+  if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
+  Compress-Archive -Path (Join-Path $EvidenceRoot '*') -DestinationPath $ZipPath -Force
+}
 
 Write-Host ""
 Write-Host "status: $FinalStatus"
@@ -231,6 +233,5 @@ Write-Host "zip: $(if ($CreateZip) { $ZipPath } else { 'not-created-by-default' 
 Write-Host "guards_fail: $FailCount"
 Write-Host "guards_warn: $WarnCount"
 
-if ($FinalStatus -eq 'FAIL') { exit 1 }
-if ($FailOnWarning -and $WarnCount -gt 0) { exit 1 }
+if ($Blocking) { exit 1 }
 exit 0

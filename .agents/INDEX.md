@@ -3,12 +3,17 @@
 ## Reading order
 
 1. `AGENTS.md`
-2. `.agents/README.md`
-3. `.agents/AUTHORITY_BOUNDARY.md`
-4. `.agents/SKILL_CATALOG.md`
-5. Relevant skill under `.agents/skills/`
-6. Relevant adapter under `.agents/adapters/`
-7. Relevant governance source under `governance/`
+2. `.agents/AUTHORITY_BOUNDARY.md`
+3. Relevant adapter under `.agents/adapters/`
+4. Relevant governance source under `governance/`
+5. One or two relevant skills under `.agents/skills/`
+6. Open `.agents/README.md` or `.agents/SKILL_CATALOG.md` only if skill selection is unclear or direct evidence requires more context
+
+## Execution budget
+
+- `Use relevant skills` means read only the narrowest 1-2 skills that materially help the task.
+- Do not default to full lint, workspace `tsc`, all guards, registry evidence, or ZIP for LOW or MEDIUM work.
+- Do not emit repetitive wait-loop chatter; one timed wait message is the maximum when a blocking operation is actually in progress.
 
 ## General BThwani skills
 

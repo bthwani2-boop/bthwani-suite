@@ -66,8 +66,9 @@ typed adapter
 Minimum package boundary change evidence:
 
 ```powershell
-pnpm -w exec tsc --noEmit
 git --no-pager diff --check
+# Prefer targeted typecheck for the affected package/export surface.
+# Workspace `tsc` is reserved for broad export churn, architecture changes, or explicit human request.
 rg "from ['\"]tamagui['\"]" app-client app-partner app-captain app-field control-panel webapp website dsh wlt knz arb amn esf mrf snd kwd
 rg "export \*" ui-kit/src dsh/frontend
 ```
