@@ -82,6 +82,45 @@ const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
 
 type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshOrderLifecycleStatus }>;
 
+const mockTicketsForOrder: Record<string, {
+  ticketId: string;
+  status: string;
+  statusTone: 'warning' | 'success' | 'danger';
+  type: string;
+  description: string;
+  attachedImage: string;
+  chatHistory: Array<{ sender: 'العميل' | 'الكابتن' | 'النظام'; text: string; time: string }>;
+}> = {
+  'PA-0081': {
+    ticketId: 'TK-4022',
+    status: 'نشط / قيد المراجعة',
+    statusTone: 'warning',
+    type: 'تأخير في الاستلام من المتجر',
+    description: 'الكابتن يفيد بازدحام شديد عند بوابة التحضير في بيك إن بريستو.',
+    attachedImage: 'صورة_مزدحمة_التحضير.jpg',
+    chatHistory: [
+      { sender: 'العميل', text: 'مرحباً كابتن، هل استلمت الطلب؟ مكتوب في التطبيق قيد التحضير.', time: '10:11' },
+      { sender: 'الكابتن', text: 'أهلاً بك يا غالي. نعم أنا متواجد بالمتجر الآن، لكن هناك ازدحام كبير جداً عند كاونتر الاستلام.', time: '10:12' },
+      { sender: 'النظام', text: '🔔 تم قرع جرس تنبيه الكابتن من قبل العميل للاستفسار عن الحالة.', time: '10:13' },
+      { sender: 'الكابتن', text: 'قمت برفع بلاغ دعم لتنبيه العمليات بتأخر المتجر في تسليم الأصناف.', time: '10:14' },
+      { sender: 'العميل', text: 'شكراً جزيلاً لك على التوضيح والمتابعة، بانتظارك.', time: '10:15' },
+    ],
+  },
+  'PA-0082': {
+    ticketId: 'TK-4025',
+    status: 'مفتوح / بانتظار العمليات',
+    statusTone: 'danger',
+    type: 'تعديل موقع التسليم',
+    description: 'العميل يطلب تغيير وجهة التوصيل لتكون للمدخل الخلفي بدل الرئيسي.',
+    attachedImage: 'العنوان_الجديد_المعدل.jpg',
+    chatHistory: [
+      { sender: 'العميل', text: 'كابتن، يرجى تسليم الطلب للمدخل الخلفي للمجمع السكني وليس الرئيسي.', time: '10:16' },
+      { sender: 'الكابتن', text: 'أبشر، تم استلام الملاحظة وسأتوجه مباشرة للمدخل الخلفي عند الوصول.', time: '10:17' },
+      { sender: 'النظام', text: '🔔 تم إرسال رنة تنبيه تلقائية للكابتن لتأكيد تحديث العنوان.', time: '10:18' },
+    ],
+  },
+};
+
 function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrder; onDecision: (id: string, decision: OpsDecision, note: string) => void }) {
   const { theme } = useTheme();
   const [note, setNote] = React.useState('');
@@ -103,6 +142,16 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
     background: decision === 'approve' ? theme.success : decision === 'reject' ? theme.danger : theme.warning,
     color: theme.textInverse,
   });
+
+  const ticketData = mockTicketsForOrder[order.id] || {
+    ticketId: 'TK-0000',
+    status: 'لا يوجد بلاغات نشطة',
+    statusTone: 'success',
+    type: 'عام',
+    description: 'لا توجد بلاغات دعم مرتبطة بهذا الطلب.',
+    attachedImage: '',
+    chatHistory: [],
+  };
 
   return (
     <div style={{ border: `1px solid ${theme.line}`, borderRadius: '14px', padding: '20px', background: theme.surfaceRaised, display: 'flex', flexDirection: 'column', gap: '16px', direction: 'rtl', textAlign: 'right' }}>
@@ -159,6 +208,76 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
         </div>
       </div>
 
+      {/* قسم بلاغات الدعم لطلب DSH */}
+      <div style={{ borderTop: `1px solid ${theme.line}`, paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 800, color: theme.text }}>🚨 بلاغات الدعم والشكاوى (DSH)</div>
+        <div style={{ background: theme.surfaceInset, borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: theme.text }}>بلاغ رقم: {ticketData.ticketId}</span>
+            <span style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '99px',
+              fontWeight: 700,
+              background: ticketData.statusTone === 'warning' ? theme.warningSurface : ticketData.statusTone === 'danger' ? theme.dangerSurface : theme.successSurface,
+              color: ticketData.statusTone === 'warning' ? theme.warning : ticketData.statusTone === 'danger' ? theme.danger : theme.success
+            }}>{ticketData.status}</span>
+          </div>
+          <div style={{ fontSize: '12px', color: theme.text, fontWeight: 600 }}>نوع البلاغ: <span style={{ color: theme.brand }}>{ticketData.type}</span></div>
+          <div style={{ fontSize: '12px', color: theme.textMuted }}>{ticketData.description}</div>
+
+          {ticketData.attachedImage && (
+            <div style={{ marginTop: '8px' }}>
+              <div style={{ fontSize: '10px', color: theme.textMuted, marginBottom: '4px' }}>🖼️ المرفقات وصورة الإثبات:</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: theme.surfaceRaised, border: `1px dashed ${theme.line}`, padding: '8px', borderRadius: '8px' }}>
+                <span style={{ fontSize: '20px' }}>📸</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: theme.brand }}>{ticketData.attachedImage}</div>
+                  <div style={{ fontSize: '10px', color: theme.success }}>محملة ومؤمنة بنجاح عبر نظام DSH</div>
+                </div>
+                <button style={{ padding: '4px 10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '6px', fontSize: '11px', cursor: 'pointer', color: theme.text }}>معاينة</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* سجل دردشة العميل والكابتن المباشرة */}
+      <div style={{ borderTop: `1px solid ${theme.line}`, paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 800, color: theme.text }}>💬 سجل دردشة العميل والكابتن المباشرة</div>
+        {ticketData.chatHistory.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', background: theme.surfaceInset, borderRadius: '10px', padding: '12px' }}>
+            {ticketData.chatHistory.map((chat, idx) => {
+              const isSystem = chat.sender === 'النظام';
+              const isCustomer = chat.sender === 'العميل';
+              return (
+                <div key={idx} style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignSelf: isSystem ? 'center' : isCustomer ? 'flex-start' : 'flex-end',
+                  maxWidth: '85%',
+                  background: isSystem ? theme.surfaceRaised : isCustomer ? theme.infoSurface : theme.surfaceRaised,
+                  border: isSystem ? `1px solid ${theme.line}` : 'none',
+                  borderRadius: '10px',
+                  padding: '8px 12px',
+                  gap: '2px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', fontSize: '10px', fontWeight: 700, color: isSystem ? theme.danger : isCustomer ? theme.info : theme.brand }}>
+                    <span>{chat.sender}</span>
+                    <span style={{ color: theme.textMuted, fontWeight: 'normal' }}>{chat.time}</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: theme.text, marginTop: '2px', textAlign: 'right' }}>{chat.text}</div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{ background: theme.surfaceInset, borderRadius: '10px', padding: '12px', textAlign: 'center', fontSize: '12px', color: theme.textMuted }}>
+            لا توجد محادثات جارية للطلب.
+          </div>
+        )}
+      </div>
+
       <div>
         <label style={{ fontSize: '12px', fontWeight: 700, color: theme.text, display: 'block', marginBottom: '6px' }}>ملاحظة القرار (اختياري)</label>
         <textarea
@@ -185,7 +304,7 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
   );
 }
 
-export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrdersScreenProps) {
+export function LiveOrdersScreen({ state = 'ready', subGroup: _subGroup, onRetry }: LiveOrdersScreenProps) {
   const { theme } = useTheme();
   const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
   const [expandedApprovalId, setExpandedApprovalId] = React.useState<string | null>(null);

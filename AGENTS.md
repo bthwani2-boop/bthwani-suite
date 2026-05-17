@@ -50,6 +50,7 @@ Core laws:
 - Do not use unsafe or unjustified launchers for local tool execution; prefer `pnpm`, `pnpm exec`, `pnpm dlx`, or `pnpm nx`.
 - Evidence root is `tools/registry/runs/{SESSION_ID}`.
 - New registry ZIPs must be named `{SESSION_ID}.zip`.
+- If a task touches `.github/`, GitHub automation, CI, workflows, prompts, or CODEOWNERS, read `.github/copilot-instructions.md` and the relevant `.github/*` files before acting.
 - Backend target is Go unless current repo evidence explicitly says otherwise.
 - UI architecture: Screen / Surface / App -> `@bthwani/ui-kit` public exports -> Tamagui internally inside ui-kit only.
 - Arabic/RTL UI must be directionally correct: icon+text cluster on the right, action/chevron opposite, right-aligned text, safe spacing, no clipping.

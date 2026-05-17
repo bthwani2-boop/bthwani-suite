@@ -1,18 +1,26 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, Box, Button, Icon, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { Box, Button, Divider, MobileScrollView, Text, TopBar } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { dshNotificationsFixtures } from '../data/notifications.preview-data';
 
-export type DshNotificationActionTarget = 'benefits' | 'tracking' | 'orders-list' | 'search';
+export type DshNotificationActionTarget = 'benefits' | 'tracking' | 'orders-list' | 'search' | 'none';
+
+export type DshNotificationCategory = 'order' | 'bell' | 'support' | 'offer' | 'subscription' | 'wallet' | 'system';
 
 export type DshNotificationItem = {
   id: string;
   title: string;
   subtitle: string;
-  meta: string;
+  meta: string; // ISO or preview timestamp (display as relative)
   badgeLabel: string;
+  category: DshNotificationCategory;
+  readState?: 'unread' | 'read';
+  priority?: 'normal' | 'important' | 'urgent';
   actionTarget: DshNotificationActionTarget;
+  relativeTime?: string;
+  timeGroup?: 'now' | 'today' | 'yesterday' | 'earlier';
+  retentionPolicy?: { days?: number; hours?: number; note?: string };
   onPress?: () => void;
 };
 
@@ -27,25 +35,16 @@ export type DshNotificationsScreenProps = {
   onRetry?: () => void;
 };
 
-function resolveBadgeTone(badgeLabel: string) {
-  if (/اشتراك/i.test(badgeLabel)) {
-    return 'brand' as const;
-  }
-
-  if (/مباشر|Live/i.test(badgeLabel)) {
-    return 'warning' as const;
-  }
-
-  if (/طلب|Order/i.test(badgeLabel)) {
-    return 'brand' as const;
-  }
-
-  if (/عرض|Offer/i.test(badgeLabel)) {
-    return 'info' as const;
-  }
-
-  return 'default' as const;
-}
+// Internal retention policy preview-only mapping
+const RETENTION_POLICY_MAP: Record<DshNotificationCategory, string> = {
+  order: 'حتى انتهاء الطلب + 24 ساعة',
+  bell: 'حتى تغير حالة الطلب أو 6 ساعات',
+  support: 'حتى إغلاق البلاغ + 72 ساعة',
+  offer: 'حتى انتهاء العرض أو 7 أيام',
+  subscription: '30 يومًا',
+  wallet: '30 يومًا',
+  system: '7 أيام',
+};
 
 function resolveNotificationPress(
   actionTarget: DshNotificationActionTarget,
@@ -68,117 +67,124 @@ function resolveNotificationPress(
     return callbacks.onOpenOrders ?? callbacks.onOpenTracking;
   }
 
-  return callbacks.onOpenSearch ?? callbacks.onOpenBenefits;
-}
-
-function NotificationGlyph() {
-  return (
-    <Box
-      background="warningSurface"
-      border
-      borderTone="brand"
-      radiusToken="pill"
-      align="center"
-      justify="center"
-      style={{ width: 48, height: 48, flexShrink: 0 }}
-    >
-      <Box background="brand" radiusToken="pill" style={{ width: 12, height: 12 }} />
-    </Box>
-  );
-}
-
-function DshNotificationCard({
-  item,
-  onPress,
-}: {
-  item: DshNotificationItem;
-  onPress?: () => void;
-}) {
-  const card = (
-    <Surface tone="raised" padding={4} gap={3} radiusToken="xl" elevationToken="raised" style={{ width: '100%' }}>
-      <Box layoutDirection="row" justify="space-between" align="flex-start" gap={3}>
-        <NotificationGlyph />
-        <Box gap={2} style={{ flex: 1 }}>
-          <Text role="bodyStrong" align="start" numberOfLines={2}>
-            {item.title}
-          </Text>
-          <Text role="bodySm" tone="muted" align="start" numberOfLines={3}>
-            {item.subtitle}
-          </Text>
-        </Box>
-      </Box>
-      <Box layoutDirection="row" justify="space-between" align="center" gap={3}>
-        <Badge label={item.badgeLabel} tone={resolveBadgeTone(item.badgeLabel)} />
-        <Text role="caption" tone="soft" align="end">
-          {item.meta}
-        </Text>
-      </Box>
-    </Surface>
-  );
-
-  if (!onPress) {
-    return card;
+  if (actionTarget === 'search') {
+    return callbacks.onOpenSearch ?? callbacks.onOpenBenefits;
   }
+
+  return undefined;
+}
+
+function relativeTimeFrom(meta: string) {
+  try {
+    const t = Date.parse(meta);
+    if (Number.isNaN(t)) return meta;
+    const diff = Date.now() - t;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'الآن';
+    if (mins < 60) return `منذ ${mins} دقيقة`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `منذ ${hours} ساعة`;
+    const days = Math.floor(hours / 24);
+    return `منذ ${days} يوم`;
+  } catch {
+    return meta;
+  }
+}
+
+function DshNotificationRow({ item, onPress }: { item: DshNotificationItem; onPress?: () => void }) {
+  const timeText = item.relativeTime ?? relativeTimeFrom(item.meta);
+  const retentionNote = RETENTION_POLICY_MAP[item.category] || '';
+  const metaText = `${timeText} · ${item.badgeLabel}${retentionNote ? ` (صلاحية: ${retentionNote})` : ''}`;
+
+  const isUnread = item.readState === 'unread';
+  const isUrgent = item.priority === 'urgent' && isUnread;
+  const isImportant = item.priority === 'important' && isUnread;
 
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : 'text'}
       onPress={onPress}
+      disabled={!onPress}
       style={({ pressed }) => [
         {
-          width: '100%',
-          opacity: pressed ? 0.94 : 1,
+          backgroundColor: 'transparent',
+          opacity: onPress && pressed ? 0.75 : 1,
         },
       ]}
     >
-      {card}
-    </Pressable>
-  );
-}
+      <View
+        style={{
+          flexDirection: 'row-reverse',
+          alignItems: 'flex-start',
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+          minHeight: 58,
+        }}
+      >
+        {/* Right side: Orange unread dot or minimal space (in row-reverse first child is rightmost) */}
+        <View style={{ width: 14, alignItems: 'center', justifyContent: 'flex-start', marginTop: 6 }}>
+          {isUnread && (
+            <Box
+              background="brand"
+              radiusToken="pill"
+              style={{ width: 6, height: 6 }}
+            />
+          )}
+        </View>
 
-function DshNotificationsSectionHeader({ count }: { count: number }) {
-  return (
-    <Box gap={2}>
-      <Box layoutDirection="row" justify="space-between" align="center" gap={3}>
-        <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-          <Text role="titleSm">آخر التنبيهات</Text>
-        </Box>
-        <Box
-          background="brandSurface"
-          border
-          borderTone="brand"
-          radiusToken="pill"
-          align="center"
-          justify="center"
-          style={{ width: 42, height: 42, flexShrink: 0 }}
-        >
-          <Text role="bodyStrong" tone="brand" align="center">
-            {count}
+        {/* Text Area (Align right, RTL style) */}
+        <View style={{ flex: 1, alignItems: 'flex-end', paddingHorizontal: 4 }}>
+          <Text
+            role="bodyStrong"
+            align="end"
+            numberOfLines={1}
+            style={{ textAlign: 'right', writingDirection: 'rtl' }}
+          >
+            {item.title}
           </Text>
-        </Box>
-      </Box>
-    </Box>
-  );
-}
+          <Text
+            role="bodySm"
+            tone="muted"
+            align="end"
+            numberOfLines={1}
+            style={{ textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}
+          >
+            {item.subtitle}
+          </Text>
+          <Text
+            role="caption"
+            tone="soft"
+            align="end"
+            numberOfLines={1}
+            style={{ textAlign: 'right', writingDirection: 'rtl', marginTop: 3 }}
+          >
+            {metaText}
+          </Text>
+        </View>
 
-function DshNotificationsEmptyState({
-  onOpenSearch,
-  onBack,
-}: {
-  onOpenSearch?: () => void;
-  onBack?: () => void;
-}) {
-  return (
-    <Surface tone="inset" padding={5} gap={3}>
-      <Text role="titleSm">لا توجد إشعارات حالياً</Text>
-      <Text role="bodySm" tone="muted">
-        عندما يصل تنبيه جديد سيظهر هنا بنفس البنية الواضحة والبسيطة.
-      </Text>
-      <Box layoutDirection="row" gap={2}>
-        {onOpenSearch ? <Button label="بحث DSH" tone="secondary" fullWidth={false} onPress={onOpenSearch} /> : null}
-        {onBack ? <Button label="رجوع" tone="ghost" fullWidth={false} onPress={onBack} /> : null}
-      </Box>
-    </Surface>
+        {/* Left side: Accent badge if urgent or important (placed leftmost in row-reverse since it's the last child) */}
+        {(isUrgent || isImportant) && (
+          <Box
+            background={isUrgent ? 'dangerSurface' : 'brandSurface'}
+            radiusToken="xs"
+            style={{
+              paddingHorizontal: 6,
+              paddingVertical: 2,
+              marginLeft: 8,
+              alignSelf: 'flex-start',
+            }}
+          >
+            <Text
+              role="caption"
+              tone={isUrgent ? 'danger' : 'brand'}
+              style={{ textAlign: 'right', fontWeight: 'bold' }}
+            >
+              {isUrgent ? 'عاجل' : 'هام'}
+            </Text>
+          </Box>
+        )}
+      </View>
+    </Pressable>
   );
 }
 
@@ -188,41 +194,132 @@ function renderContent(
   onOpenTracking?: () => void,
   onOpenOrders?: () => void,
   onOpenSearch?: () => void,
-  onBack?: () => void,
+  _onBack?: () => void,
 ) {
-  const resolvedItems = items.slice(0, 2).map((item) => ({
-    ...item,
-    onPress: item.onPress ?? resolveNotificationPress(item.actionTarget, { onOpenBenefits, onOpenTracking, onOpenOrders, onOpenSearch }),
-  }));
+  // Smart sorting: unread first, priority, category order, newest first
+  const resolvedItems = items
+    .map((item) => ({
+      ...item,
+      onPress: item.onPress ?? resolveNotificationPress(item.actionTarget, { onOpenBenefits, onOpenTracking, onOpenOrders, onOpenSearch }),
+    }))
+    .sort((a, b) => {
+      // 1. readState: unread first
+      const ra = a.readState === 'unread' ? 1 : 0;
+      const rb = b.readState === 'unread' ? 1 : 0;
+      if (ra !== rb) return rb - ra;
+
+      // 2. priority: urgent (3) > important (2) > normal (1)
+      const priorityScore = (p?: string) => (p === 'urgent' ? 3 : p === 'important' ? 2 : 1);
+      const pa = priorityScore(a.priority);
+      const pb = priorityScore(b.priority);
+      if (pa !== pb) return pb - pa;
+
+      // 3. category order: order/bell/support before offer/subscription/wallet/system
+      const categoryOrder: Record<DshNotificationCategory, number> = {
+        order: 0,
+        bell: 1,
+        support: 2,
+        offer: 3,
+        subscription: 4,
+        wallet: 5,
+        system: 6,
+      };
+      const ca = categoryOrder[a.category] ?? 99;
+      const cb = categoryOrder[b.category] ?? 99;
+      if (ca !== cb) return ca - cb;
+
+      // 4. time: newest first
+      const ta = Date.parse(a.meta) || 0;
+      const tb = Date.parse(b.meta) || 0;
+      return tb - ta;
+    });
+
+  // Find single urgent/important unread to show as top attention row
+  const topAttention = resolvedItems.find((it) => it.readState === 'unread' && (it.priority === 'urgent' || it.priority === 'important'));
+  const otherItems = resolvedItems.filter((it) => !topAttention || it.id !== topAttention.id);
+
+  const todayAll = otherItems.filter((item) => item.timeGroup === 'now' || item.timeGroup === 'today');
+  const earlierAll = otherItems.filter((item) => item.timeGroup === 'yesterday' || item.timeGroup === 'earlier');
+
+  const todayItems = todayAll.slice(0, 3);
+  const earlierItems = earlierAll.slice(0, 2);
+
+  const hasMoreItems = todayAll.length > 3 || earlierAll.length > 2;
 
   return (
     <View style={{ flex: 1 }}>
       <TopBar
         variant="surface"
         title="الإشعارات"
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
       />
 
-      <MobileScrollView fill padding={4} gap={4}>
-        <DshNotificationsSectionHeader count={resolvedItems.length} />
+      <MobileScrollView fill padding={3} gap={3}>
+        {topAttention ? (
+          <View style={{ gap: 2 }}>
+            <Text role="titleXs" align="end" style={{ textAlign: 'right', paddingHorizontal: 12, marginTop: 4 }}>
+              يحتاج انتباهك الآن
+            </Text>
+            <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
+              <DshNotificationRow item={topAttention} onPress={topAttention.onPress} />
+            </Box>
+          </View>
+        ) : null}
 
-        <Box gap={3}>
-          {resolvedItems.length ? (
-            resolvedItems.map((item) => <DshNotificationCard key={item.id} item={item} onPress={item.onPress} />)
-          ) : (
-            <DshNotificationsEmptyState onOpenSearch={onOpenSearch} onBack={onBack} />
-          )}
-        </Box>
+        <View style={{ gap: 2 }}>
+          <Text role="titleXs" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
+            اليوم
+          </Text>
+          <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
+            {todayItems.length ? (
+              todayItems.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  {index > 0 && <Divider style={{ opacity: 0.15 }} />}
+                  <DshNotificationRow item={item} onPress={item.onPress} />
+                </React.Fragment>
+              ))
+            ) : (
+              <View style={{ padding: 16 }}>
+                <Text role="bodySm" tone="soft" align="end" style={{ textAlign: 'right' }}>
+                  لا توجد تنبيهات اليوم
+                </Text>
+              </View>
+            )}
+          </Box>
+        </View>
+
+        <View style={{ gap: 2 }}>
+          <Text role="titleXs" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
+            سابقًا
+          </Text>
+          <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
+            {earlierItems.length ? (
+              earlierItems.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  {index > 0 && <Divider style={{ opacity: 0.15 }} />}
+                  <DshNotificationRow item={item} onPress={item.onPress} />
+                </React.Fragment>
+              ))
+            ) : (
+              <View style={{ padding: 16 }}>
+                <Text role="bodySm" tone="soft" align="end" style={{ textAlign: 'right' }}>
+                  لا توجد تنبيهات سابقة
+                </Text>
+              </View>
+            )}
+          </Box>
+        </View>
+
+        {hasMoreItems && onOpenSearch ? (
+          <View style={{ alignItems: 'flex-end', marginTop: 12, paddingHorizontal: 12 }}>
+            <Button
+              label="عرض الأقدم"
+              tone="secondary"
+              fullWidth={false}
+              onPress={onOpenSearch}
+              size="sm"
+            />
+          </View>
+        ) : null}
       </MobileScrollView>
     </View>
   );

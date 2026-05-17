@@ -76,28 +76,28 @@ const demoBellItems: DshCaptainOrderBellItem[] = [
 	{
 		id: 'captain-order-9021',
 		serviceType: 'standard',
-		title: 'طلب جديد #9021',
+		title: 'طلب جديد رقم 9021',
 		subtitle: 'Burger Lab بانتظار كابتن يقبل المسار.',
 		meta: 'التالي: مراجعة ثم قبول',
 	},
 	{
 		id: 'captain-order-9024',
 		serviceType: 'standard',
-		title: 'طلب جديد #9024',
+		title: 'طلب جديد رقم 9024',
 		subtitle: 'Green Bowl تحتاج مراجعة فورية قبل أن يكبر الصف.',
 		meta: 'التالي: فتح تفاصيل الطلب',
 	},
 	{
 		id: 'captain-order-awn-3104',
 		serviceType: 'awnak',
-		title: 'طلب نقل محلي #3104',
+		title: 'طلب نقل محلي رقم 3104',
 		subtitle: 'نقل طعام — من شارع حدة إلى باب اليمن. مجدول الآن.',
 		meta: 'التالي: استلام العنصر من المُرسِل وتوصيله مباشرة',
 	},
 	{
 		id: 'captain-order-spx-2078',
 		serviceType: 'shein-final-mile',
-		title: 'تسليم نهائي SHEIN #2078',
+		title: 'تسليم نهائي SHEIN رقم 2078',
 		subtitle: 'استلام من نقطة الفرز بثواني وتوصيل إلى العميل لمى ناصر.',
 		meta: 'التالي: استلام الطرد من نقطة الفرز فقط — لا شراء ولا استيراد',
 	},
@@ -292,6 +292,11 @@ function OrderDetailSection({
 	onBackToInbox?: () => void;
 	onRetry?: () => void;
 }) {
+	const { theme } = useTheme();
+	const [bellRung, setBellRung] = React.useState(false);
+	const [localMessages, setLocalMessages] = React.useState<DshCaptainOrderMessage[]>(demoMessages);
+	const [draftText, setDraftText] = React.useState('');
+
 	const primaryActionLabel = onConfirmPickup ? 'تأكيد الاستلام' : onConfirmDelivery ? 'تأكيد التسليم' : undefined;
 	const primaryAction = onConfirmPickup ?? onConfirmDelivery;
 	const secondaryActionLabel = onOpenNextOrder ? 'فتح الطلب التالي' : onRetry ? 'إعادة المحاولة' : undefined;
@@ -300,9 +305,10 @@ function OrderDetailSection({
 	return (
 		<DshOperationScreen
 			title="تفاصيل الطلب"
-			subtitle="مهمة نشطة واحدة مع قرار تشغيلي واضح في أسفل الشاشة مثل أسلوب العميل."
+			subtitle="مهمة نشطة مع تواصل متكامل وجرس تنبيه ذكي مباشر داخل نفس شاشة الطلب."
 			content={
 				<Box gap={3}>
+					{/* بطاقة تفاصيل الطلب الرئيسية */}
 					<Surface tone="brand" gap={3}>
 						<Box gap={1} style={{ alignItems: 'flex-end' }}>
 							<Badge label="طلب الكابتن" tone="warning" />
@@ -322,11 +328,120 @@ function OrderDetailSection({
 						/>
 					</Surface>
 
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title="إجراءات الطلب" subtitle="استخدم شريط الإجراءات السفلي لتنفيذ القرار والرجوع بدل تكرار الأزرار داخل المحتوى." />
-						<Text role="bodySm" tone="muted">
-							يبقى هذا القسم للقراءة السريعة فقط، بينما تظل أزرار التنفيذ والانتقال في نفس موضعها الثابت مثل تطبيق العميل.
+					{/* جرس تنبيه الكابتن المدمج والمباشر */}
+					<Surface tone={bellRung ? 'success' : 'raised'} gap={2} style={{ padding: 14, borderLeftWidth: 4, borderLeftColor: bellRung ? theme.success : theme.warning }}>
+						<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+							<Badge label={bellRung ? 'تم إرسال التنبيه' : 'جرس تنبيه الكابتن'} tone={bellRung ? 'success' : 'warning'} />
+							<Icon name="notifications-outline" size={20} tone={bellRung ? 'success' : 'warning'} />
+						</Box>
+						<Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>
+							{bellRung
+								? 'تم إرسال رنة جرس تنبيه للكابتن داخل الطلب لتحديث حالة الوصول الفوري بنجاح.'
+								: 'يرجى قرع الجرس لإرسال رنة تنبيه فوري للكابتن وتنبيهه للوصول دون الحاجة للاتصال الخارجي.'}
 						</Text>
+						{!bellRung && (
+							<Button
+								label="قرع جرس تنبيه الكابتن"
+								tone="warning"
+								size="sm"
+								fullWidth={false}
+								onPress={() => {
+									setBellRung(true);
+									const systemMsg: DshCaptainOrderMessage = {
+										id: `bell-ring-${Date.now()}`,
+										sender: 'النظام',
+										text: '🔔 تم قرع جرس تنبيه الكابتن فوريًا وتحديث الحالة بنجاح.',
+										time: 'الآن',
+										side: 'start'
+									};
+									setLocalMessages(current => [...current, systemMsg]);
+								}}
+							/>
+						)}
+					</Surface>
+
+					{/* قسم المحادثة والمراسلة المتكامل */}
+					<Surface tone="raised" gap={3} style={{ padding: 14 }}>
+						<SectionHeader
+							title="مراسلة وتواصل الطلب"
+							subtitle="دردشة مباشرة ثنائية بين الكابتن والعميل في سياق الطلب."
+						/>
+
+						<ScrollView
+							style={{ maxHeight: 180, minHeight: 110, paddingVertical: 8 }}
+							contentContainerStyle={{ gap: 8 }}
+							showsVerticalScrollIndicator={false}
+						>
+							{localMessages.map((msg) => {
+								const isSystem = msg.sender === 'النظام';
+								const isOutbound = msg.side === 'end';
+								return (
+									<Box
+										key={msg.id}
+										style={{
+											alignSelf: isSystem ? 'center' : isOutbound ? 'flex-end' : 'flex-start',
+											maxWidth: '85%',
+											width: 'auto'
+										}}
+									>
+										<Surface
+											tone={isSystem ? 'inset' : isOutbound ? 'brand' : 'default'}
+											style={{
+												padding: 10,
+												borderRadius: 12,
+												borderTopRightRadius: isOutbound && !isSystem ? 2 : 12,
+												borderTopLeftRadius: !isOutbound && !isSystem ? 2 : 12,
+												direction: 'rtl'
+											}}
+										>
+											<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 12 }}>
+												<Text role="caption" style={{ fontWeight: '700', color: isOutbound ? theme.textInverse : theme.brand }}>
+													{msg.sender}
+												</Text>
+												<Text role="caption" tone="muted" style={{ fontSize: 9 }}>
+													{msg.time}
+												</Text>
+											</Box>
+											<Text role="bodySm" style={{ textAlign: 'right', color: isOutbound ? theme.textInverse : theme.text }}>
+												{msg.text}
+											</Text>
+										</Surface>
+									</Box>
+								);
+							})}
+						</ScrollView>
+
+						<Box gap={2} style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 10 }}>
+							<TextField
+								value={draftText}
+								onChangeText={setDraftText}
+								placeholder="اكتب رسالة للكابتن هنا..."
+								style={{ minHeight: 44 }}
+							/>
+							<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+								<Button
+									size="sm"
+									fullWidth={false}
+									label="إرسال الرسالة"
+									disabled={!draftText.trim()}
+									onPress={() => {
+										if (!draftText.trim()) return;
+										const userMsg: DshCaptainOrderMessage = {
+											id: `msg-${Date.now()}`,
+											sender: 'الكابتن',
+											text: draftText.trim(),
+											time: 'الآن',
+											side: 'end'
+										};
+										setLocalMessages(current => [...current, userMsg]);
+										setDraftText('');
+									}}
+								/>
+								<Text role="caption" tone="muted">
+									التواصل مشفر ومغلق داخل الطلب.
+								</Text>
+							</Box>
+						</Box>
 					</Surface>
 				</Box>
 			}
@@ -463,7 +578,7 @@ function OrderChatSection({
 
 		Promise.resolve()
 			.then(async () => {
-				await new Promise((resolve) => setTimeout(resolve, 220));
+				await new Promise((resolve) => globalThis.setTimeout(resolve, 220));
 				setMessages((current) => [
 					...current,
 					{
@@ -1021,7 +1136,7 @@ export function DshCaptainOrderChatScreen({
 
 export function DshCaptainBellScreen({
 	state,
-	summary,
+	summary: _summary,
 	items,
 	onOpenInbox,
 	onOpenNextOrder,
@@ -1164,7 +1279,7 @@ export function DshCaptainOrderGetScreen(props: { onBack?: () => void; onSeconda
 			primaryLabel="تحديث لقطة المسار"
 			secondaryLabel="العودة إلى دليل الدعم"
 			keyValues={[
-				{ label: 'الطلب', value: '#9021' },
+				{ label: 'الطلب', value: 'رقم 9021' },
 				{ label: 'الوقت المتوقع الحالي', value: '8 دقائق' },
 				{ label: 'أثر الازدحام', value: 'متوسط', tone: 'warning' },
 			]}
@@ -1204,8 +1319,8 @@ export function DshCaptainOrdersListScreen(props: { onBack?: () => void; onSecon
 			primaryLabel="تحديث قائمة الطلبات"
 			secondaryLabel="العودة إلى دليل الدعم"
 			listItems={[
-				{ title: 'الطلب #9021', subtitle: 'Burger Lab إلى العليا', meta: 'الاستلام خلال 8 دقائق', badgeLabel: 'التالي' },
-				{ title: 'الطلب #9024', subtitle: 'Green Bowl إلى طريق الملك فهد', meta: 'الاستلام خلال 15 دقيقة', badgeLabel: 'في الصف' },
+				{ title: 'الطلب رقم 9021', subtitle: 'Burger Lab إلى العليا', meta: 'الاستلام خلال 8 دقائق', badgeLabel: 'التالي' },
+				{ title: 'الطلب رقم 9024', subtitle: 'Green Bowl إلى طريق الملك فهد', meta: 'الاستلام خلال 15 دقيقة', badgeLabel: 'في الصف' },
 			]}
 			onBack={props.onBack}
 			onSecondaryAction={props.onSecondaryAction}
@@ -1223,8 +1338,8 @@ export function DshCaptainOrdersOffersListScreen(props: { onBack?: () => void; o
 			primaryLabel="تحديث العروض"
 			secondaryLabel="العودة إلى دليل الدعم"
 			listItems={[
-				{ title: 'عرض #440', subtitle: 'Bean House إلى الوسط', meta: 'الدفع المتوقع 22 ر.ي', badgeLabel: 'مفتوح' },
-				{ title: 'عرض #441', subtitle: 'Green Bowl إلى الدائري', meta: 'الدفع المتوقع 19 ر.ي', badgeLabel: 'مفتوح' },
+				{ title: 'عرض رقم 440', subtitle: 'Bean House إلى الوسط', meta: 'الدفع المتوقع 22 ر.ي', badgeLabel: 'مفتوح' },
+				{ title: 'عرض رقم 441', subtitle: 'Green Bowl إلى الدائري', meta: 'الدفع المتوقع 19 ر.ي', badgeLabel: 'مفتوح' },
 			]}
 			onBack={props.onBack}
 			onSecondaryAction={props.onSecondaryAction}

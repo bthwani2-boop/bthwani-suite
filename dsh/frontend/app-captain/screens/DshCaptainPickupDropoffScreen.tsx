@@ -6,7 +6,6 @@ import {
   Button,
   Icon,
   KeyValueList,
-  ListItem,
   SectionHeader,
   Surface,
   Text,
@@ -179,17 +178,6 @@ export function DshCaptainPickupDropoffScreen({
 
           {mode === 'arrival' && (
             <>
-              <Surface tone="inset" padding={3} radiusToken="lg">
-                <Box layoutDirection="row" align="center" gap={3}>
-                  <Icon name="call-outline" size={20} tone="brand" />
-                  <View style={{ flex: 1 }}>
-                    <Text role="bodyStrong">اتصال بالعميل</Text>
-                    <Text role="caption" tone="muted">يمكنك الاتصال بالعميل لتنسيق الاستلام.</Text>
-                  </View>
-                  <Button label="اتصل" size="sm" tone="primary" />
-                </Box>
-              </Surface>
-
               <Surface tone={bellRung ? 'success' : 'brand'} gap={2} padding={3} radiusToken="lg" style={{ borderWidth: 1, borderColor: bellRung ? theme.success : theme.brand }}>
                 <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
                   <Badge label={bellRung ? 'تم قرع الجرس' : 'جرس الوصول'} tone={bellRung ? 'success' : 'warning'} />
