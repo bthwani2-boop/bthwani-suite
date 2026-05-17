@@ -21,9 +21,17 @@ export type DshCartDetailsProps = {
 	onCheckout?: () => void;
 };
 
+function toEnglishDigits(str: string): string {
+	return str
+		.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+		.replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776));
+}
+
 function formatAmount(value: number, currency: string) {
 	try {
-		return new Intl.NumberFormat('ar-YE', { style: 'currency', currency }).format(value);
+		const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
+		const displayCurrency = currency === 'YER' ? 'ر.ي.' : currency;
+		return `${formatted} ${displayCurrency}`;
 	} catch {
 		return `${value} ${currency}`;
 	}

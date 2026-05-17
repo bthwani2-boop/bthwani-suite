@@ -187,11 +187,18 @@ const PREVIEW_FALLBACK_ITEMS: CartItem[] = [
   { id: 'p4', title: 'فتة بالقشطة والعسل', priceValue: 1500, qty: 1 },
 ];
 
+function toEnglishDigits(str: string): string {
+  return str
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776));
+}
+
 function formatAmount(value: number) {
   try {
-    return new Intl.NumberFormat('ar-YE', { style: 'currency', currency: 'YER' }).format(value);
+    const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
+    return `${formatted} ر.ي.`;
   } catch {
-    return `${value} ر.ي`;
+    return `${value} ر.ي.`;
   }
 }
 
@@ -230,9 +237,9 @@ function padSchedulePart(value: number) {
 }
 
 function createExecutionScheduleOptions(referenceDate = new Date()): ExecutionScheduleOptions {
-  const dateChipFormatter = new Intl.DateTimeFormat('ar-YE', { weekday: 'short', day: 'numeric' });
-  const dateSummaryFormatter = new Intl.DateTimeFormat('ar-YE', { weekday: 'long', day: 'numeric', month: 'long' });
-  const timeFormatter = new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit' });
+  const dateChipFormatter = new Intl.DateTimeFormat('ar-YE', { weekday: 'short', day: 'numeric', numberingSystem: 'latn' });
+  const dateSummaryFormatter = new Intl.DateTimeFormat('ar-YE', { weekday: 'long', day: 'numeric', month: 'long', numberingSystem: 'latn' });
+  const timeFormatter = new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit', numberingSystem: 'latn' });
 
   const dateOptions = Array.from({ length: 4 }, (_, index) => {
     const date = new Date(referenceDate);
@@ -241,8 +248,8 @@ function createExecutionScheduleOptions(referenceDate = new Date()): ExecutionSc
 
     return {
       value: `${date.getFullYear()}-${padSchedulePart(date.getMonth() + 1)}-${padSchedulePart(date.getDate())}`,
-      label: index === 0 ? 'غدًا' : index === 1 ? 'بعد غد' : dateChipFormatter.format(date).replace('،', '').trim(),
-      fullLabel: dateSummaryFormatter.format(date),
+      label: index === 0 ? 'غدًا' : index === 1 ? 'بعد غد' : toEnglishDigits(dateChipFormatter.format(date)).replace('،', '').trim(),
+      fullLabel: toEnglishDigits(dateSummaryFormatter.format(date)),
     };
   });
 
@@ -252,8 +259,8 @@ function createExecutionScheduleOptions(referenceDate = new Date()): ExecutionSc
 
     return {
       value: `${padSchedulePart(time.getHours())}:${padSchedulePart(time.getMinutes())}`,
-      label: timeFormatter.format(time),
-      fullLabel: timeFormatter.format(time),
+      label: toEnglishDigits(timeFormatter.format(time)),
+      fullLabel: toEnglishDigits(timeFormatter.format(time)),
     };
   });
 
@@ -274,10 +281,10 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
 
   // Format display labels
   const dateObj = new Date(selectedDate);
-  const dateLabel = new Intl.DateTimeFormat('ar-YE', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
+  const dateLabel = toEnglishDigits(new Intl.DateTimeFormat('ar-YE', { weekday: 'long', day: 'numeric', month: 'long', numberingSystem: 'latn' }).format(dateObj));
 
   const [h, m] = selectedTime.split(':');
-  const timeLabel = new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit' }).format(new Date(2026, 0, 1, parseInt(h), parseInt(m)));
+  const timeLabel = toEnglishDigits(new Intl.DateTimeFormat('ar-YE', { hour: 'numeric', minute: '2-digit', numberingSystem: 'latn' }).format(new Date(2026, 0, 1, parseInt(h), parseInt(m))));
 
   return (
     <>
