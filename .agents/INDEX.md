@@ -39,6 +39,7 @@
 | `bthwani-observability-performance-contract` | See `.agents/skills/bthwani-observability-performance-contract/SKILL.md`. |
 | `bthwani-agent-skill-authoring-contract` | See `.agents/skills/bthwani-agent-skill-authoring-contract/SKILL.md`. |
 | `bthwani-agent-registry-validator` | See `.agents/skills/bthwani-agent-registry-validator/SKILL.md`. |
+| `bthwani-frontend-design-excellence-contract` | See `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`. |
 
 ## Preserved external/generated skills
 
@@ -66,4 +67,3 @@
 ## Rule
 
 Service/application specificity belongs in `governance/`; `.agents` stays general.
-| thwani-frontend-design-excellence-contract | See .agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md. |

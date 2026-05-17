@@ -27,6 +27,6 @@
 | `bthwani-observability-performance-contract` | Review logs, metrics, traces, performance and failure visibility. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-skill-authoring-contract` | Create/update skills with evals, trigger clarity, and minimal context burden. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-registry-validator` | Validate skill registry coverage, frontmatter, duplication, and risk terms. | `governance/` according to task domain | structured decision + evidence requirements |
+| `bthwani-frontend-design-excellence-contract` | Guard premium frontend design quality, visual hierarchy, responsive web/mobile UX, interaction states, accessibility, and visual evidence requirement. | `governance/` according to task domain | frontend design decision + visual evidence requirement |
 
 All skills require evidence before acceptance. External skills may be preserved, but BThwani rules override generic examples.
-| thwani-frontend-design-excellence-contract | Guard premium frontend design quality, visual hierarchy, responsive web/mobile UX, interaction states, accessibility, and visual evidence. | governance/ according to task domain | frontend design decision + visual evidence requirement |

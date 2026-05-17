@@ -69,6 +69,7 @@ Use these project-owned skills when relevant:
 - `.agents/skills/bthwani-agent-restoration-forensics/SKILL.md`
 - `.agents/skills/bthwani-domain-governance-reader/SKILL.md`
 - `.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md`
+- `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`
 - `.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md`
 - `.agents/skills/bthwani-platform-vars-control-contract/SKILL.md`
 - `.agents/skills/bthwani-runtime-provider-config-contract/SKILL.md`
