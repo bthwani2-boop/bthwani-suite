@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, I18nManager, Image, Platform, Pressable, ScrollView, View } from 'react-native';
+import { Dimensions, Image, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
 import {
   Button,
   Box,
@@ -20,6 +20,7 @@ import {
   TextField,
   Toast,
   TopBar,
+  useDirection,
   type PaymentDecisionOption,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
@@ -73,6 +74,7 @@ type RecommendationProduct = {
   priceLabel: string;
   priceValue: number;
   imageUri?: string;
+  description?: string;
 };
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
@@ -143,10 +145,10 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
     icon: 'pricetag-outline',
   },
   address: {
-    title: 'تحديث عنوان التوصيل',
-    placeholder: 'اكتب عنوان التوصيل بالتفصيل',
-    helper: 'العنوان المحلي سيظهر مباشرة في ملخص الطلب الحالي.',
-    saveLabel: 'حفظ العنوان',
+    title: 'موقع التوصيل',
+    placeholder: 'اكتب العنوان أو حدده من الخريطة لاحقًا',
+    helper: 'سيتم لاحقًا دعم تحديد الموقع بدبوس عبر Google Maps.',
+    saveLabel: 'حفظ الموقع',
     multiline: true,
     icon: 'location-outline',
   },
@@ -220,6 +222,19 @@ function resolveCartItemPriceValue(item: CartItem): number {
   }
 
   return 0;
+}
+
+function normalizeRecommendationMatchKey(value: string) {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function findCartItemForProduct(items: CartItem[], product: RecommendationProduct) {
+  const normalizedProductTitle = normalizeRecommendationMatchKey(product.title);
+
+  return items.find((item) => (
+    item.id === product.id
+    || normalizeRecommendationMatchKey(item.title) === normalizedProductTitle
+  ));
 }
 
 type ExecutionScheduleOption = {
@@ -311,16 +326,17 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
 }
 
 function PromoBanner({ onPress }: { onPress: () => void }) {
-  const isRTL = I18nManager.isRTL;
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
 
   return (
     <Surface
       tone="default"
       padding={2}
       style={{
-        backgroundColor: SURFACE_WARM,
+        backgroundColor: colorPalette.warningSoft,
         borderWidth: 1,
-        borderColor: SURFACE_WARM_BORDER,
+        borderColor: colorPalette.warning,
         borderRadius: 16,
         paddingHorizontal: spacing[2],
         paddingVertical: spacing[1],
@@ -334,7 +350,7 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
             size="sm"
             fullWidth={false}
             onPress={onPress}
-            style={{ minWidth: 92, minHeight: 36, backgroundColor: ACCENT_BLUE, borderColor: ACCENT_BLUE, borderRadius: 18 }}
+            style={{ minWidth: 92, minHeight: 36, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE, borderRadius: 18 }}
           />
         </View>
 
@@ -355,113 +371,115 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
 type RecommendationCardProps = {
   product: RecommendationProduct;
   cartQty: number;
-  onPress: () => void;
+  onOpenProductPreview: () => void;
 };
 
-function RecommendationCard({ product, cartQty, onPress }: RecommendationCardProps) {
+function RecommendationCard({ product, cartQty, onOpenProductPreview }: RecommendationCardProps) {
   const imageSource = resolveDshImageSource(product.imageUri);
 
   return (
-    <Surface
-      tone="default"
-      style={{
-        width: 140,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: BORDER_SOFT,
-        backgroundColor: colorPalette.surfacePrimary,
-        padding: spacing[2],
-        gap: spacing[1.5],
-        position: 'relative',
-        justifyContent: 'space-between',
-      }}
-    >
-      {/* Local Qty Badge */}
-      {cartQty > 0 && (
-        <View style={{
-          position: 'absolute',
-          top: 6,
-          right: 6,
-          backgroundColor: ACCENT_ORANGE,
-          borderRadius: 8,
-          paddingHorizontal: 6,
-          paddingVertical: 2,
-          zIndex: 2,
-        }}>
-          <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
-            {`مضاف (${cartQty})`}
-          </Text>
-        </View>
-      )}
-
-      {/* Image & Price */}
-      <View style={{ height: 80, backgroundColor: SURFACE_SOFT, borderRadius: 12, justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-        {imageSource ? (
-          <Image source={imageSource} style={{ width: 64, height: 64, borderRadius: 32 }} resizeMode="cover" />
-        ) : (
-          <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colorPalette.brandSoft }} />
+    <Pressable onPress={onOpenProductPreview} style={({ pressed }) => ({ opacity: pressed ? 0.94 : 1 })}>
+      <Surface
+        tone="default"
+        style={{
+          width: 140,
+          borderRadius: 16,
+          borderWidth: 1,
+          borderColor: BORDER_SOFT,
+          backgroundColor: colorPalette.surfacePrimary,
+          padding: spacing[2],
+          gap: spacing[1.5],
+          position: 'relative',
+          justifyContent: 'space-between',
+        }}
+      >
+        {cartQty > 0 && (
+          <View style={{
+            position: 'absolute',
+            top: 6,
+            right: 6,
+            backgroundColor: ACCENT_ORANGE,
+            borderRadius: 8,
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+            zIndex: 2,
+          }}>
+            <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
+              {`مضاف (${cartQty})`}
+            </Text>
+          </View>
         )}
-        <View style={{ position: 'absolute', bottom: 4, left: 4, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.75)', paddingHorizontal: 6, paddingVertical: 2 }}>
-          <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
-            {product.priceLabel}
+
+        <View style={{ height: 80, backgroundColor: SURFACE_SOFT, borderRadius: 12, justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
+          {imageSource ? (
+            <Image source={imageSource} style={{ width: 64, height: 64, borderRadius: 32 }} resizeMode="cover" />
+          ) : (
+            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colorPalette.brandSoft }} />
+          )}
+          <View style={{ position: 'absolute', bottom: 4, left: 4, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.75)', paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
+              {product.priceLabel}
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ gap: 2 }}>
+          <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center', fontSize: 13 }} numberOfLines={1}>
+            {product.title}
           </Text>
         </View>
-      </View>
 
-      {/* Title */}
-      <View style={{ gap: 2 }}>
-        <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center', fontSize: 13 }} numberOfLines={1}>
-          {product.title}
-        </Text>
-      </View>
-
-      {/* Add Button */}
-      <Button
-        label={cartQty > 0 ? "إضافة +" : "إضافة"}
-        tone="brand"
-        size="sm"
-        fullWidth
-        onPress={onPress}
-        style={{ minHeight: 32, borderRadius: 10 }}
-      />
-    </Surface>
+        <Button
+          label="عرض المنتج"
+          tone="secondary"
+          size="sm"
+          fullWidth
+          onPress={onOpenProductPreview}
+          style={{ minHeight: 32, borderRadius: 10 }}
+        />
+      </Surface>
+    </Pressable>
   );
 }
 
 type RecommendedSectionProps = {
   items: CartItem[];
-  showExtraProducts: boolean;
-  onToggleExpand: () => void;
-  onAddProduct: (product: RecommendationProduct) => void;
+  onOpenProductPreview: (product: RecommendationProduct) => void;
+  onOpenStore?: () => void;
 };
 
 function RecommendedSection({
   items,
-  showExtraProducts,
-  onToggleExpand,
-  onAddProduct,
+  onOpenProductPreview,
+  onOpenStore,
 }: RecommendedSectionProps) {
-  const isRTL = I18nManager.isRTL;
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
 
   // Display a subset of products in horizontal view
   const horizontalProducts = RECOMMENDED_PRODUCTS.slice(0, 4);
 
   return (
     <View style={{ gap: spacing[1.5] }}>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[1] }}>
-        <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
-          قد تعجبك هذه المنتجات أيضاً
-        </Text>
-        <Button
-          tone="ghost"
-          size="sm"
-          fullWidth={false}
-          onPress={onToggleExpand}
-        >
-          <Text style={{ color: ACCENT_ORANGE, fontWeight: '700' }}>
-            {showExtraProducts ? 'إغلاق المنتجات الإضافية' : 'إضافة منتجات أخرى'}
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[1], gap: spacing[1] }}>
+        <View style={{ flex: 1, gap: 2, alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
+          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+            قد تعجبك هذه المنتجات أيضاً
           </Text>
-        </Button>
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
+            المعاينة هنا فقط، والإضافة من داخل البطاقة المفتوحة.
+          </Text>
+        </View>
+        {onOpenStore && (
+          <Button
+            label="إضافة منتجات أخرى"
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            onPress={onOpenStore}
+            style={{ borderRadius: 10, minHeight: 32, paddingHorizontal: spacing[2] }}
+          />
+        )}
       </View>
 
       <ScrollView
@@ -482,67 +500,229 @@ function RecommendedSection({
               key={product.id}
               product={product}
               cartQty={cartQty}
-              onPress={() => onAddProduct(product)}
+              onOpenProductPreview={() => onOpenProductPreview(product)}
             />
           );
         })}
       </ScrollView>
+    </View>
+  );
+}
 
-      {showExtraProducts && (
+type PreviewFeedback = {
+  message: string;
+  tone: 'info' | 'success';
+};
+
+type ProductPreviewModalProps = {
+  visible: boolean;
+  product: RecommendationProduct | null;
+  cartQty: number;
+  feedback: PreviewFeedback | null;
+  bottomInset: number;
+  onClose: () => void;
+  onPrimaryAction: () => void;
+};
+
+function ProductPreviewModal({
+  visible,
+  product,
+  cartQty,
+  feedback,
+  bottomInset,
+  onClose,
+  onPrimaryAction,
+}: ProductPreviewModalProps) {
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
+  const imageSource = product ? resolveDshImageSource(product.imageUri) : undefined;
+  const priceLabel = product ? formatAmount(product.priceValue) : '';
+  const hasCartQty = cartQty > 0;
+  const actionLabel = hasCartQty ? 'زيادة الكمية' : 'إضافة للسلة';
+  const sheetBottomInset = Math.max(bottomInset, safeArea.comfortable) + spacing[2];
+  const sheetTopInset = safeArea.comfortable + spacing[2];
+
+  if (!visible || !product) {
+    return null;
+  }
+
+  return (
+    <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'flex-end',
+          paddingHorizontal: spacing[2],
+          paddingTop: sheetTopInset,
+          paddingBottom: sheetBottomInset,
+          backgroundColor: 'rgba(10, 47, 92, 0.48)',
+        }}
+      >
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="إغلاق معاينة المنتج"
+          onPress={onClose}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(10, 47, 92, 0.36)',
+          }}
+        />
+
         <Surface
           tone="default"
-          padding={3}
           style={{
-            backgroundColor: SURFACE_SOFT,
-            borderColor: BORDER_SOFT,
+            zIndex: 1,
+            borderRadius: 24,
             borderWidth: 1,
-            borderRadius: 16,
-            marginTop: spacing[1],
-            gap: spacing[2],
+            borderColor: BORDER_SOFT,
+            backgroundColor: colorPalette.surfacePrimary,
+            overflow: 'hidden',
+            maxHeight: '90%',
+            shadowColor: colorPalette.black,
+            shadowOpacity: 0.16,
+            shadowRadius: 24,
+            shadowOffset: { width: 0, height: 10 },
+            elevation: 16,
           }}
         >
-          <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
-            جميع المقترحات المتاحة
-          </Text>
-          <View style={{
-            flexDirection: 'row-reverse',
-            flexWrap: 'wrap',
-            gap: spacing[2],
-            justifyContent: 'flex-start',
-          }}>
-            {RECOMMENDED_PRODUCTS.map((product) => {
-              const cartItem = items.find((it) => it.title === product.title);
-              const cartQty = cartItem ? (cartItem.qty ?? 0) : 0;
-              return (
-                <RecommendationCard
-                  key={product.id}
-                  product={product}
-                  cartQty={cartQty}
-                  onPress={() => onAddProduct(product)}
-                />
-              );
-            })}
-          </View>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              padding: spacing[3],
+              gap: spacing[3],
+              paddingBottom: spacing[4],
+            }}
+          >
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[2] }}>
+              <View style={{ flex: 1, gap: spacing[0.5] }}>
+                <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
+                  معاينة المنتج
+                </Text>
+                <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
+                  الفتح هنا فقط، والإضافة من زر داخل البطاقة
+                </Text>
+              </View>
+
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="إغلاق المعاينة"
+                onPress={onClose}
+                style={({ pressed }) => ({
+                  width: 36,
+                  height: 36,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: BORDER_SOFT,
+                  backgroundColor: colorPalette.surfaceSecondary,
+                  opacity: pressed ? 0.8 : 1,
+                })}
+              >
+                <Icon name="close" size={18} color={TEXT_PRIMARY} />
+              </Pressable>
+            </View>
+
+            <View style={{ backgroundColor: SURFACE_SOFT, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: BORDER_SOFT }}>
+              <View style={{ height: 240, position: 'relative', backgroundColor: colorPalette.surfaceSecondary }}>
+                {imageSource ? (
+                  <Image source={imageSource} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                ) : (
+                  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colorPalette.brandSoft }}>
+                    <Icon name="cart-outline" size={44} color={ACCENT_BLUE} />
+                  </View>
+                )}
+
+                <View style={{ position: 'absolute', top: spacing[2], right: spacing[2], flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 999, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: colorPalette.white, paddingHorizontal: spacing[2], paddingVertical: spacing[1] }}>
+                  <Icon name="cart-outline" size={14} color={ACCENT_ORANGE} />
+                  <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+                    {hasCartQty ? `موجود في السلة · ${cartQty}` : 'غير موجود في السلة'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ gap: spacing[2], padding: spacing[3] }}>
+                <View style={{ gap: spacing[0.5] }}>
+                  <Text role="titleSm" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }} numberOfLines={2}>
+                    {product.title}
+                  </Text>
+                  <Text role="titleMd" style={{ color: ACCENT_BLUE, textAlign: isRTL ? 'right' : 'left' }}>
+                    {priceLabel}
+                  </Text>
+                </View>
+
+                {product.description ? (
+                  <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left', lineHeight: 20 }}>
+                    {product.description}
+                  </Text>
+                ) : null}
+
+                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2], borderRadius: 14, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: hasCartQty ? colorPalette.successSoft : colorPalette.surfaceSecondary, paddingHorizontal: spacing[2], paddingVertical: spacing[1.5] }}>
+                  <Text role="bodySm" style={{ flex: 1, color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                    {hasCartQty ? 'موجود في السلة' : 'غير موجود في السلة'}
+                  </Text>
+                  <Text role="bodySm" style={{ color: hasCartQty ? colorPalette.success : TEXT_SECONDARY, fontWeight: '700' }}>
+                    {hasCartQty ? `× ${cartQty}` : '0'}
+                  </Text>
+                </View>
+
+                {feedback ? (
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 14, borderWidth: 1, borderColor: feedback.tone === 'success' ? colorPalette.success : BORDER_SOFT, backgroundColor: feedback.tone === 'success' ? colorPalette.successSoft : colorPalette.brandSoft, paddingHorizontal: spacing[2], paddingVertical: spacing[1.5] }}>
+                    <Icon name={feedback.tone === 'success' ? 'checkmark-circle-outline' : 'information-circle-outline'} size={14} color={feedback.tone === 'success' ? colorPalette.success : ACCENT_BLUE} />
+                    <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                      {feedback.message}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[2] }}>
+                  <Button
+                    label={actionLabel}
+                    tone="brand"
+                    fullWidth={false}
+                    onPress={onPrimaryAction}
+                    style={{ flex: 1, minHeight: 48, borderRadius: 16, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
+                  />
+                  <Button
+                    label="إغلاق"
+                    tone="secondary"
+                    fullWidth={false}
+                    onPress={onClose}
+                    style={{ flex: 1, minHeight: 48, borderRadius: 16 }}
+                  />
+                </View>
+              </View>
+            </View>
+          </ScrollView>
         </Surface>
-      )}
-    </View>
+      </View>
+    </Modal>
   );
 }
 
 type CartItemRowProps = {
   item: CartItem;
+  index?: number;
   onChangeQty?: (id: string, qty: number) => void;
   onRemove?: (id: string) => void;
 };
 
-function CartItemRow({ item, onChangeQty, onRemove }: CartItemRowProps) {
+function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
   const price = resolveCartItemPriceValue(item);
   const subtotal = price * (item.qty ?? 1);
+
+  const displayIndex = index !== undefined ? `${index + 1}- ` : '';
 
   return (
     <View
       style={{
-        flexDirection: 'row-reverse',
+        flexDirection: isRTL ? 'row-reverse' : 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: colorPalette.surfacePrimary,
@@ -553,21 +733,21 @@ function CartItemRow({ item, onChangeQty, onRemove }: CartItemRowProps) {
         gap: spacing[2],
       }}
     >
-      {/* Right side: Product Name & Unit Price (RTL right-aligned) */}
-      <View style={{ flex: 1, alignItems: 'flex-start', gap: 4, paddingLeft: spacing[1] }}>
-        <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'right' }} numberOfLines={2}>
-          {item.title}
+      {/* Product Name & Unit Price */}
+      <View style={{ flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', gap: 4, paddingLeft: isRTL ? 0 : spacing[1], paddingRight: isRTL ? spacing[1] : 0 }}>
+        <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }} numberOfLines={2}>
+          {displayIndex}{item.title}
         </Text>
-        <Text role="caption" style={{ color: TEXT_SECONDARY }}>
+        <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
           سعر الوحدة: {formatAmount(price)}
         </Text>
       </View>
 
-      {/* Left side: Controls and Subtotal */}
-      <Box layoutDirection="row" align="center" gap={3}>
+      {/* Controls and Subtotal */}
+      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[3] }}>
         {/* Quantity controls: - / Qty / + */}
         <View style={{
-          flexDirection: 'row-reverse',
+          flexDirection: isRTL ? 'row-reverse' : 'row',
           alignItems: 'center',
           backgroundColor: SURFACE_SOFT,
           borderRadius: 12,
@@ -606,7 +786,7 @@ function CartItemRow({ item, onChangeQty, onRemove }: CartItemRowProps) {
         </View>
 
         {/* Subtotal */}
-        <Text role="bodyStrong" style={{ color: ACCENT_BLUE, minWidth: 64, textAlign: 'left' }}>
+        <Text role="bodyStrong" style={{ color: ACCENT_BLUE, minWidth: 64, textAlign: isRTL ? 'left' : 'right' }}>
           {formatAmount(subtotal)}
         </Text>
 
@@ -628,7 +808,7 @@ function CartItemRow({ item, onChangeQty, onRemove }: CartItemRowProps) {
             <Icon name="trash-outline" size={16} color={DANGER} />
           </Pressable>
         )}
-      </Box>
+      </View>
     </View>
   );
 }
@@ -639,9 +819,28 @@ type CartItemEditorProps = {
   onRemove?: (id: string) => void;
   onClearCart?: () => void;
   onScrollToRecommendations?: () => void;
+  subtotal: number;
+  deliveryFee: number;
+  discount: number;
+  grandTotal: number;
+  couponCode?: string;
 };
 
-function CartItemEditor({ items, onChangeQty, onRemove, onClearCart, onScrollToRecommendations }: CartItemEditorProps) {
+function CartItemEditor({
+  items,
+  onChangeQty,
+  onRemove,
+  onClearCart,
+  onScrollToRecommendations,
+  subtotal,
+  deliveryFee,
+  discount,
+  grandTotal,
+  couponCode,
+}: CartItemEditorProps) {
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
+
   return (
     <Card padding={3} gap={2}>
       {/* Header Row */}
@@ -694,7 +893,7 @@ function CartItemEditor({ items, onChangeQty, onRemove, onClearCart, onScrollToR
           </Text>
           {onScrollToRecommendations && (
             <Button
-              label="تصفح المقترحات"
+              label="إضافة منتجات"
               tone="brand"
               size="sm"
               fullWidth={false}
@@ -704,16 +903,50 @@ function CartItemEditor({ items, onChangeQty, onRemove, onClearCart, onScrollToR
           )}
         </Surface>
       ) : (
-        <View style={{ gap: spacing[2] }}>
-          {items.map((item) => (
-            <CartItemRow
-              key={item.id}
-              item={item}
-              onChangeQty={onChangeQty}
-              onRemove={onRemove}
-            />
-          ))}
-        </View>
+        <>
+          <View style={{ gap: spacing[2] }}>
+            {items.map((item, index) => (
+              <CartItemRow
+                key={item.id}
+                item={item}
+                index={index}
+                onChangeQty={onChangeQty}
+                onRemove={onRemove}
+              />
+            ))}
+          </View>
+
+          {/* Divider */}
+          <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[1] }} />
+
+          {/* Integrated Live Pricing Summary */}
+          <View style={{ gap: spacing[1.5], paddingHorizontal: spacing[1] }}>
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>إجمالي المنتجات</Text>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(subtotal)}</Text>
+            </View>
+
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>سعر التوصيل</Text>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(deliveryFee)}</Text>
+            </View>
+
+            {discount > 0 && (
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text role="bodySm" style={{ color: colorPalette.success, textAlign: isRTL ? 'right' : 'left' }}>الخصم (قسيمة: {couponCode})</Text>
+                <Text role="bodyStrong" style={{ color: colorPalette.success }}>-{formatAmount(discount)}</Text>
+              </View>
+            )}
+
+            {/* Grand Total Divider */}
+            <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[0.5] }} />
+
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 15, textAlign: isRTL ? 'right' : 'left' }}>الإجمالي النهائي</Text>
+              <Text role="titleMd" style={{ color: ACCENT_BLUE, fontWeight: '900' }}>{formatAmount(grandTotal)}</Text>
+            </View>
+          </View>
+        </>
       )}
     </Card>
   );
@@ -795,6 +1028,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodKey>('cod');
   const [couponCode, setCouponCode] = useState('');
+  const [deliveryAmount] = useState(950);
   const [pickupAddr, setPickupAddr] = useState('جوار الجبل الجديد');
   const [note, setNote] = useState('لا يوجد ملاحظة');
   const [extraRequest, setExtraRequest] = useState('');
@@ -804,11 +1038,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const [scheduledTime, setScheduledTime] = useState(() => executionScheduleOptions.timeOptions[0]?.value ?? '');
   const [quickActionKey, setQuickActionKey] = useState<QuickActionKey | null>(null);
   const [quickActionDraft, setQuickActionDraft] = useState('');
+  const [locationEditorVisible, setLocationEditorVisible] = useState(false);
+  const [locationDraft, setLocationDraft] = useState('');
+  const [locationFeedback, setLocationFeedback] = useState<string | null>(null);
   const [notice, setNotice] = useState<ScreenNotice | null>(null);
+  const [previewProduct, setPreviewProduct] = useState<RecommendationProduct | null>(null);
+  const [previewFeedback, setPreviewFeedback] = useState<PreviewFeedback | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [cartDetailsVisible, setCartDetailsVisible] = useState(false);
   const [footerHeight, setFooterHeight] = useState(0);
-  const [showExtraProducts, setShowExtraProducts] = useState(false);
   const {
     linked: walletLinked,
     balance: walletBalanceRaw,
@@ -821,12 +1059,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   } = useWltDshWalletPreview();
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
-  const isRTL = I18nManager.isRTL;
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
   const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
+  const totalItemsCount = useMemo(
+    () => items.reduce((acc, item) => acc + (item.qty ?? 1), 0),
+    [items],
+  );
   const clientState = useMemo<DshClientState>(
-    () => props.clientState ?? (items.length > 0 ? 'cart_ready' : 'cart_empty'),
-    [items.length, props.clientState],
+    () => props.clientState ?? (totalItemsCount > 0 ? 'cart_ready' : 'cart_empty'),
+    [props.clientState, totalItemsCount],
   );
   const isOrderSubmitted = clientState === 'order_created' || clientState === 'order_confirmed';
   const canEditOrder = !isOrderSubmitted && Boolean(props.onOpenStore ?? props.onOpenOrder ?? props.onContinue);
@@ -839,7 +1082,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     [items],
   );
   const subtotalAmount = subtotalMinorUnits / 100;
-  const deliveryAmount = 950;
   const couponDiscount = couponCode ? 500 : 0;
   const grandTotalAmount = Math.max(subtotalAmount + deliveryAmount - couponDiscount, 0);
   const grandTotalMinorUnits = Math.max(subtotalMinorUnits + Math.round(deliveryAmount * 100) - Math.round(couponDiscount * 100), 0);
@@ -853,13 +1095,19 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const formattedGrandTotal = formatAmount(grandTotalAmount);
   const formattedWalletBalance = formatAmount(walletBalance / 100);
   const formattedWalletShortfall = formatMinorUnitsAmount(walletShortfallMinorUnits);
-  const canCheckout = items.length > 0;
+  const canCheckout = totalItemsCount > 0;
+  const deliveryNotice = 'قد تتغير رسوم التوصيل بعد اعتماد الموقع.';
   const androidSystemBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
     : safeArea.comfortable;
   const footerSafePadding = androidSystemBottomInset + spacing[2];
   const resolvedFooterHeight = footerHeight > 0 ? footerHeight : sizes.controlMd + footerSafePadding + spacing[4];
   const actionBarBottomPadding = resolvedFooterHeight + spacing[2];
+  const activePreviewCartItem = useMemo(
+    () => (previewProduct ? findCartItemForProduct(items, previewProduct) : undefined),
+    [items, previewProduct],
+  );
+  const previewCartQty = activePreviewCartItem?.qty ?? 0;
 
   const updateItemQty = (id: string, qty: number) => {
     const targetItem = items.find((item) => item.id === id);
@@ -1207,7 +1455,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           ? undefined
           : {
               label: walletLinked ? 'شحن الرصيد' : 'ربط المحفظة',
-              tone: 'primary',
+              tone: 'warning',
               onPress: walletLinked
                 ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallMinorUnits))
                 : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline()),
@@ -1246,7 +1494,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           ? undefined
           : {
               label: !walletLinked ? 'فتح WLT' : 'شحن الرصيد',
-              tone: 'secondary',
+              tone: 'warning',
               onPress: !walletLinked
                 ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline())
                 : (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallMinorUnits)),
@@ -1448,25 +1696,88 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     setQuickActionDraft('');
   };
 
-  const handleAddRecommendedProduct = (product: RecommendationProduct) => {
-    setItems((previousItems) => {
-      const matchedItem = previousItems.find((item) => item.title === product.title);
-      if (matchedItem) {
-        return previousItems.map((item) => (item.title === product.title ? { ...item, qty: (item.qty ?? 1) + 1 } : item));
-      }
-
-      return [...previousItems, { id: `recommended-${product.id}`, title: product.title, priceValue: product.priceValue, qty: 1 }];
-    });
-
-    // Bypassing bottom toast alert for inline recommendation additions as requested
+  const openLocationEditor = () => {
+    setQuickActionKey(null);
+    setQuickActionDraft('');
+    setLocationDraft(pickupAddr === 'العنوان غير محدد بعد' ? '' : pickupAddr);
+    setLocationFeedback(null);
+    setLocationEditorVisible(true);
   };
 
-  const handleShowAllRecommendations = () => {
-    setShowExtraProducts((prev) => !prev);
+  const closeLocationEditor = () => {
+    setLocationDraft(pickupAddr === 'العنوان غير محدد بعد' ? '' : pickupAddr);
+    setLocationEditorVisible(false);
+  };
+
+  const applyLocationDraft = () => {
+    const trimmedValue = locationDraft.trim();
+    const nextLocation = trimmedValue || 'العنوان غير محدد بعد';
+
+    setPickupAddr(nextLocation);
+    setLocationFeedback(
+      trimmedValue
+        ? 'تم تحديث موقع التوصيل محليًا.'
+        : 'تم حفظ الموقع كحالة غير محددة حتى يتم إدخاله لاحقًا.',
+    );
+    setLocationEditorVisible(false);
+  };
+
+  const openProductPreview = (product: RecommendationProduct) => {
+    setPreviewProduct(product);
+    setPreviewFeedback(null);
+  };
+
+  const closeProductPreview = () => {
+    setPreviewProduct(null);
+    setPreviewFeedback(null);
+  };
+
+  const handlePreviewPrimaryAction = () => {
+    if (!previewProduct) {
+      return;
+    }
+
+    const matchingCartItem = findCartItemForProduct(items, previewProduct);
+    if (matchingCartItem) {
+      setItems((prev) => prev.map((item) => (
+        item.id === matchingCartItem.id
+          ? { ...item, qty: (item.qty ?? 1) + 1 }
+          : item
+      )));
+      setPreviewFeedback({ message: 'زادت الكمية', tone: 'success' });
+      return;
+    }
+
+    setItems((prev) => [
+      ...prev,
+      {
+        id: previewProduct.id,
+        title: previewProduct.title,
+        priceLabel: previewProduct.priceLabel,
+        priceValue: previewProduct.priceValue,
+        qty: 1,
+      },
+    ]);
+    setPreviewFeedback({ message: 'تمت الإضافة', tone: 'success' });
+  };
+
+  const handleOpenFirstRecommendationPreview = () => {
+    const firstProduct = RECOMMENDED_PRODUCTS[0];
+    if (firstProduct) {
+      openProductPreview(firstProduct);
+    }
   };
 
   const handleSubscribePress = () => {
     showNotice('الاشتراك جاهز UI فقط', 'زر الاشتراك واضح وفعال، لكن تفعيل الميزة يحتاج ربطًا لاحقًا خارج هذا النطاق.', 'info');
+  };
+
+  const handleOpenStore = () => {
+    if (props.onOpenStore) {
+      props.onOpenStore();
+    } else {
+      showNotice('واجهة المتجر غير موصولة', 'زر إضافة منتجات أخرى جاهز، ولكن لم يتم تمرير مسار واجهة المتجر في هذا العرض التجريبي.', 'info');
+    }
   };
 
   return (
@@ -1488,7 +1799,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: spacing[3], paddingVertical: spacing[2], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
             <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right', flex: 1 }}>الخيارات السريعة</Text>
-            <Text role="caption" style={{ color: TEXT_SECONDARY }}>القسيمة والعنوان والملاحظات</Text>
+            <Text role="caption" style={{ color: TEXT_SECONDARY }}>القسيمة والموقع والملاحظات</Text>
           </View>
           <OptionRow
             title="هل لديك قسيمة تخفيض؟"
@@ -1510,23 +1821,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             </View>
           )}
           <OptionRow
-            title="عنوان التوصيل"
+            title="موقع التوصيل"
             subtitle={pickupAddr}
             actionLabel="تغيير"
-            onAction={() => openQuickAction('address')}
+            onAction={openLocationEditor}
             style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
           />
-          {quickActionKey === 'address' && quickActionMeta && (
-            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
-              <InlineActionEditor
-                meta={quickActionMeta}
-                value={quickActionDraft}
-                onChangeValue={setQuickActionDraft}
-                onSubmit={applyQuickAction}
-                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
-              />
-            </View>
-          )}
           <OptionRow
             title="ملاحظات الطلب"
             subtitle={note}
@@ -1615,26 +1915,59 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         <RecommendedSection
           items={items}
-          showExtraProducts={showExtraProducts}
-          onToggleExpand={() => setShowExtraProducts(!showExtraProducts)}
-          onAddProduct={handleAddRecommendedProduct}
+          onOpenProductPreview={openProductPreview}
+          onOpenStore={handleOpenStore}
         />
 
-        <SummaryCard
+        <Surface
+          tone="default"
           padding={3}
-          gap={1.5}
-          title="ملخص الدفع"
-          items={[
-            { label: 'المجموع الفرعي', value: formattedSubtotal },
-            { label: 'رسوم التوصيل', value: formattedDelivery },
-            ...(couponCode ? [{ label: 'خصم القسيمة', value: formattedDiscount ?? '0 ر.ي.', tone: 'success' as const }] : []),
-          ]}
-          totalLabel="الإجمالي الكلي"
-          totalValue={formattedGrandTotal}
-        />
-        <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-          {clientStateMeta.description}
-        </Text>
+          gap={2}
+          style={{
+            backgroundColor: colorPalette.surfacePrimary,
+            borderWidth: 1,
+            borderColor: BORDER_SOFT,
+            borderRadius: 16,
+          }}
+        >
+          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[2] }}>
+            <View style={{ flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', gap: spacing[0.5] }}>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
+                موقع التوصيل
+              </Text>
+              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
+                {pickupAddr}
+              </Text>
+            </View>
+            <Button
+              label="تغيير الموقع"
+              tone="secondary"
+              size="sm"
+              fullWidth={false}
+              onPress={openLocationEditor}
+            />
+          </View>
+
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
+            {deliveryNotice}
+          </Text>
+
+          {locationFeedback ? (
+            <Text role="caption" style={{ color: ACCENT_BLUE, textAlign: isRTL ? 'right' : 'left' }}>
+              {locationFeedback}
+            </Text>
+          ) : null}
+
+          {locationEditorVisible ? (
+            <InlineActionEditor
+              meta={QUICK_ACTION_META.address}
+              value={locationDraft}
+              onChangeValue={setLocationDraft}
+              onSubmit={applyLocationDraft}
+              onClose={closeLocationEditor}
+            />
+          ) : null}
+        </Surface>
 
         <CartItemEditor
           items={items}
@@ -1642,9 +1975,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           onRemove={removeItem}
           onClearCart={() => {
             setItems([]);
-            showNotice('تم تفريغ السلة', 'يمكنك الرجوع للمتجر أو إضافة عنصر من المقترحات أدناه.', 'success');
+            showNotice('تم تفريغ السلة', 'يمكنك فتح أول منتج مقترح أو اختيار أي بطاقة من المقترحات أدناه.', 'success');
           }}
-          onScrollToRecommendations={() => setShowExtraProducts(true)}
+          onScrollToRecommendations={handleOpenFirstRecommendationPreview}
+          subtotal={subtotalAmount}
+          deliveryFee={deliveryAmount}
+          discount={couponDiscount}
+          grandTotal={grandTotalAmount}
+          couponCode={couponCode}
         />
         <View style={{ height: actionBarBottomPadding }} />
       </MobileScrollView>
@@ -1677,7 +2015,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         ) : null}
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[2] }}>
           <Button
-            label={isOrderSubmitted ? 'الطلب قيد التنفيذ' : 'تنفيذ الطلب'}
+            label={isOrderSubmitted ? 'الطلب قيد التنفيذ' : canCheckout ? 'تنفيذ الطلب' : 'أضف عناصر أولاً'}
             tone="brand"
             size="md"
             fullWidth={false}
@@ -1709,6 +2047,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           notice?.onActionPress?.();
           dismissNotice();
         }}
+      />
+
+      <ProductPreviewModal
+        visible={Boolean(previewProduct)}
+        product={previewProduct}
+        cartQty={previewCartQty}
+        feedback={previewFeedback}
+        bottomInset={androidSystemBottomInset}
+        onClose={closeProductPreview}
+        onPrimaryAction={handlePreviewPrimaryAction}
       />
 
       <DshCartDetails
