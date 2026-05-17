@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, I18nManager, Platform, Pressable, View } from 'react-native';
+import { Dimensions, I18nManager, Image, Platform, Pressable, ScrollView, View, type ImageSourcePropType } from 'react-native';
 import {
   Button,
   Box,
@@ -33,6 +33,7 @@ import {
   useWltDshWalletPreview,
   type WltDshFinanceEventKind,
 } from '../../../../wlt/frontend/app-client/dsh';
+import { resolveDshImageSource } from '../shared/resolve-image-source';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -70,6 +71,7 @@ type RecommendationProduct = {
   title: string;
   priceLabel: string;
   priceValue: number;
+  imageUri?: string;
 };
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
@@ -166,9 +168,16 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
 };
 
 const RECOMMENDED_PRODUCTS: RecommendationProduct[] = [
-  { id: 'r1', title: 'كيس خبز', priceLabel: '100', priceValue: 100 },
-  { id: 'r2', title: 'دجاج بروست', priceLabel: '1,500', priceValue: 1500 },
-  { id: 'r3', title: 'بطاطس', priceLabel: '250', priceValue: 250 },
+  { id: 'r1', title: 'تفاح طازج', priceLabel: '500', priceValue: 500, imageUri: 'dsh.product.apple.v1' },
+  { id: 'r2', title: 'كيس خبز', priceLabel: '100', priceValue: 100, imageUri: 'dsh.product.bread.v1' },
+  { id: 'r3', title: 'دجاج بروست', priceLabel: '1,500', priceValue: 1500, imageUri: 'dsh.product.chicken.v1' },
+  { id: 'r4', title: 'شوكولاتة فاخرة', priceLabel: '400', priceValue: 400, imageUri: 'dsh.product.choco.v1' },
+  { id: 'r5', title: 'كرواسون فرنسي', priceLabel: '300', priceValue: 300, imageUri: 'dsh.product.croissant.v1' },
+  { id: 'r6', title: 'حليب طازج', priceLabel: '600', priceValue: 600, imageUri: 'dsh.product.milk.v1' },
+  { id: 'r7', title: 'معكرونة إيطالية', priceLabel: '350', priceValue: 350, imageUri: 'dsh.product.pasta.v1' },
+  { id: 'r8', title: 'بطاطس رول', priceLabel: '250', priceValue: 250, imageUri: 'dsh.product.roll.v1' },
+  { id: 'r9', title: 'سلطة خضراء', priceLabel: '450', priceValue: 450, imageUri: 'dsh.product.salad.v1' },
+  { id: 'r10', title: 'زبادي طازج', priceLabel: '150', priceValue: 150, imageUri: 'dsh.product.yogurt.v1' },
 ];
 
 const PREVIEW_FALLBACK_ITEMS: CartItem[] = [
@@ -346,31 +355,37 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
 type RecommendationCardProps = {
   title: string;
   price: string;
+  imageUri?: string;
   onPress: () => void;
 };
 
-function RecommendationCard({ title, price, onPress }: RecommendationCardProps) {
+function RecommendationCard({ title, price, imageUri, onPress }: RecommendationCardProps) {
+  const imageSource = resolveDshImageSource(imageUri);
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`أضف ${title} إلى السلة`}
       onPress={onPress}
-      style={({ pressed }) => [{ width: 132, borderRadius: 18, overflow: 'hidden', backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, opacity: pressed ? 0.92 : 1 }]}
+      style={({ pressed }) => [{ width: 180, borderRadius: 20, overflow: 'hidden', backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, opacity: pressed ? 0.92 : 1 }]}
     >
-      <View style={{ height: 96, backgroundColor: SURFACE_SOFT, position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colorPalette.white, shadowColor: colorPalette.black, shadowOpacity: 0.06, shadowRadius: 8, elevation: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colorPalette.brandSoft }} />
+      <View style={{ height: 144, backgroundColor: SURFACE_SOFT, position: 'relative', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ width: 120, height: 120, borderRadius: 60, backgroundColor: colorPalette.white, shadowColor: colorPalette.black, shadowOpacity: 0.06, shadowRadius: 8, elevation: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          {imageSource ? (
+            <Image source={imageSource} style={{ width: 120, height: 120, borderRadius: 60 }} resizeMode="cover" />
+          ) : (
+            <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: colorPalette.brandSoft }} />
+          )}
         </View>
 
-        <View style={{ position: 'absolute', bottom: 6, left: 6, borderRadius: 8, backgroundColor: ACCENT_ORANGE, paddingHorizontal: 8, paddingVertical: 3 }}>
+        <View style={{ position: 'absolute', bottom: 8, left: 8, borderRadius: 10, backgroundColor: ACCENT_ORANGE, paddingHorizontal: 10, paddingVertical: 4 }}>
           <Text role="bodySm" style={{ color: colorPalette.white, fontWeight: '700' }}>
             {price}
           </Text>
         </View>
       </View>
 
-      <View style={{ paddingHorizontal: spacing[2], paddingTop: spacing[1], paddingBottom: spacing[1], gap: spacing[0] }}>
-        <Text role="bodySm" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
+      <View style={{ paddingHorizontal: spacing[2], paddingTop: spacing[2], paddingBottom: spacing[2], gap: spacing[0.5] }}>
+        <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
           {title}
         </Text>
         <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center' }}>
@@ -393,11 +408,19 @@ function RecommendedSection({ onShowAll, onAddProduct }: { onShowAll: () => void
         </Text>
       </View>
 
-      <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[1], overflow: 'hidden', paddingHorizontal: spacing[1] }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          flexDirection: isRTL ? 'row-reverse' : 'row',
+          gap: spacing[1],
+          paddingHorizontal: spacing[1],
+        }}
+      >
         {RECOMMENDED_PRODUCTS.map((product) => (
-          <RecommendationCard key={product.id} title={product.title} price={product.priceLabel} onPress={() => onAddProduct(product)} />
+          <RecommendationCard key={product.id} title={product.title} price={product.priceLabel} imageUri={product.imageUri} onPress={() => onAddProduct(product)} />
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 }

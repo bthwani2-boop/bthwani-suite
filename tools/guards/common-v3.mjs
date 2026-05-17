@@ -20,12 +20,14 @@ export function parseArgs(argv = process.argv.slice(2)) {
 export function normalizePath(p) { return p.replace(/\\/g, '/'); }
 
 export function walk(root, opts = {}) {
-  const excludes = new Set(opts.excludes || ['.git','node_modules','.next','dist','build','.expo','coverage','.turbo','.nx','.tamagui','tools/registry/runs','tools/plan']);
+  const excludes = new Set(opts.excludes || ['.git','node_modules','.next','dist','build','.expo','coverage','.turbo','.nx','.tamagui','tools/registry/runs','tools/plan','app-client/runtime','app-partner/runtime','app-captain/runtime','app-field/runtime']);
   const out = [];
   function rec(dir) {
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, ent.name);
       const rel = normalizePath(path.relative(root, full));
+      const segments = rel.split('/');
+      if (segments.some(seg => seg === '.git' || seg === 'node_modules' || seg === '.next' || seg === 'dist' || seg === 'build' || seg === '.expo' || seg === 'coverage' || seg === '.turbo' || seg === '.nx' || seg === '.tamagui')) continue;
       if ([...excludes].some(x => rel === x || rel.startsWith(x + '/'))) continue;
       if (ent.isDirectory()) rec(full); else out.push(full);
     }
