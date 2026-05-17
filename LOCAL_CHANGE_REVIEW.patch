@@ -178,3 +178,4 @@ index 4a1a3f41..d7664280 100644
 +
  if (strict && r.findings.some(f => f.severity === 'WARN')) for (const f of r.findings) if (f.severity === 'WARN') f.severity = 'FAIL';
  writeOutputs(r,args);
+
