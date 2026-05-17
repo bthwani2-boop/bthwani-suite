@@ -53,4 +53,4 @@ tools/registry/runs/*
 .claude/settings.local.json
 
 # Local media fixtures (seeds) - keep local only
-dsh/media-fixtures/assets/seed/dsh/
+/dsh/media-fixtures/assets/seed/dsh/
