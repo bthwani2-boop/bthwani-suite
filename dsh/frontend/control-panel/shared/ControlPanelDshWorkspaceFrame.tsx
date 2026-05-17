@@ -85,7 +85,7 @@ export function ControlPanelDshWorkspaceFrame({
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>{title}</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                <Text role="caption" className={styles.surfaceHeaderBadgeText}>{badges[0] ?? 'DSH'}</Text>
+                <Text role="caption" style={{ color: theme.brand, fontSize: 9, fontWeight: '800' }}>{badges[0] ?? 'DSH'}</Text>
               </Box>
             </div>
             <p className={styles.surfaceHeaderSubtitle}>{description}</p>

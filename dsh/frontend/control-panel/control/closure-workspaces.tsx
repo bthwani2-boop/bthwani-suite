@@ -75,7 +75,7 @@ export function ControlPanelDshControlHubScreen() {
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>حوكمة DSH</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                <Text role="caption" className={styles.surfaceHeaderBadgeText}>مستوى الأمان: عالٍ</Text>
+                <Text role="caption" style={{ color: theme.brand, fontSize: 9, fontWeight: '800' }}>مستوى الأمان: عالٍ</Text>
               </Box>
             </div>
             <p className={styles.surfaceHeaderSubtitle}>إدارة معايير الحماية، الحوكمة، وسجلات التدقيق المركزية</p>
