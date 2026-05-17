@@ -1,12 +1,28 @@
 name: bthwani-agent-os-2026-v3-guard
+
 on:
   pull_request:
   workflow_dispatch:
+
 jobs:
-  agent-os-v3-guard:
-    runs-on: windows-latest
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Verify BThwani Agent OS V3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Run current governance guard manifest
         shell: pwsh
-        run: .\tools\scripts\BTHWANI_AGENT_OS_2026_V3_FULL_GATE.ps1
+        run: |
+          ./tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode CI -Profile Governance
+          ./tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode CI -Profile Agent

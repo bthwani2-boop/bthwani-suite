@@ -1,82 +1,106 @@
 param(
-    [string]$RepoRoot = ".",
-    [string[]]$AllowedRelative = @("tools/scripts", "tools/guards"),
-    [string]$ChangedFilesPath = ""
+  [string]$ChangedFilesPath
 )
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = "Stop"
 
-$repoRootFull = (Resolve-Path $RepoRoot).Path
-
-function Normalize-RepoPath([string]$PathValue) {
-    return ($PathValue -replace '\\','/').TrimStart('/')
+function Normalize-RepoPath([string]$Path) {
+  if ($null -eq $Path) { return "" }
+  return (($Path -replace "\\","/").Trim().TrimStart("./"))
 }
 
-$allowedRoots = @($AllowedRelative | ForEach-Object { Normalize-RepoPath $_ })
+$repoRoot = (& git rev-parse --show-toplevel 2>$null).Trim()
+if ([string]::IsNullOrWhiteSpace($repoRoot)) {
+  $repoRoot = (Get-Location).Path
+}
+$repoRootFull = [System.IO.Path]::GetFullPath($repoRoot)
+Set-Location -LiteralPath $repoRootFull
 
-$legacyAllowedPatterns = @(
-    '^tools/(generate-dsh-fixture-images)\.ps1$',
-    '^kdt/merge-run/.*/proposed/[^/]+\.ps1$'
+$allowedRoots = @(
+  "tools/scripts",
+  "tools/guards"
 )
+
+# Legacy exact wrappers/tools that pre-existed before this policy.
+# Do not add broad roots here.
+$legacyAllowedExact = @(
+  "analyze_uikit.ps1",
+  "tools/generate-dsh-fixture-images.ps1",
+  "tools/GHB_COMMIT_PUSH_CURRENT_BRANCH.ps1",
+  "tools/ghb.ps1"
+)
+
+function Test-ExistsInIndexOrWorktree([string]$RelativePath) {
+  $p = Normalize-RepoPath $RelativePath
+  if ([string]::IsNullOrWhiteSpace($p)) { return $false }
+
+  git cat-file -e ":$p" 2>$null
+  if ($LASTEXITCODE -eq 0) { return $true }
+
+  if (Test-Path -LiteralPath $p) { return $true }
+
+  return $false
+}
 
 function Test-IsAllowedPs1([string]$RelativePath) {
-    $normalized = Normalize-RepoPath $RelativePath
+  $normalized = Normalize-RepoPath $RelativePath
 
-    foreach ($root in $allowedRoots) {
-        if ($normalized -eq $root -or $normalized -like "$root/*") {
-            return $true
-        }
+  foreach ($root in $allowedRoots) {
+    if ($normalized -eq $root -or $normalized -like "$root/*") {
+      return $true
     }
+  }
 
-    foreach ($pattern in $legacyAllowedPatterns) {
-        if ($normalized -match $pattern) {
-            return $true
-        }
+  foreach ($exact in $legacyAllowedExact) {
+    if ($normalized -eq $exact) {
+      return $true
     }
+  }
 
-    return $false
+  return $false
 }
 
-$violations = @()
+$violations = New-Object System.Collections.Generic.List[string]
 
-if ($ChangedFilesPath -and (Test-Path $ChangedFilesPath)) {
-    $changed = Get-Content -Path $ChangedFilesPath -ErrorAction Stop |
-        ForEach-Object { $_.Trim() } |
-        Where-Object { $_ -ne "" }
+if ($ChangedFilesPath -and (Test-Path -LiteralPath $ChangedFilesPath)) {
+  $changed = Get-Content -LiteralPath $ChangedFilesPath -ErrorAction Stop |
+    ForEach-Object { Normalize-RepoPath $_ } |
+    Where-Object { $_ -ne "" }
 
-    foreach ($f in $changed) {
-        $fNormalized = Normalize-RepoPath $f
-        if ($fNormalized -match '\.ps1$' -and -not (Test-IsAllowedPs1 $fNormalized)) {
-            $violations += (Join-Path $repoRootFull $f)
-        }
+  foreach ($f in $changed) {
+    if ($f -notmatch '\.ps1$') { continue }
+
+    # Important: name-only diffs include deleted/renamed old paths.
+    # Those are not final-index executable scripts and must not be false positives.
+    if (-not (Test-ExistsInIndexOrWorktree $f)) {
+      continue
     }
+
+    if (-not (Test-IsAllowedPs1 $f)) {
+      $violations.Add((Join-Path $repoRootFull $f)) | Out-Null
+    }
+  }
 } else {
-    $toolsDir = Join-Path $repoRootFull "tools"
-    if (-not (Test-Path $toolsDir)) {
-        Write-Host "No tools directory found at $toolsDir. Nothing to check."
-        exit 0
+  $tracked = git ls-files "*.ps1"
+  foreach ($f in $tracked) {
+    $fNorm = Normalize-RepoPath $f
+    if (-not (Test-ExistsInIndexOrWorktree $fNorm)) { continue }
+    if (-not (Test-IsAllowedPs1 $fNorm)) {
+      $violations.Add((Join-Path $repoRootFull $fNorm)) | Out-Null
     }
-
-    $all = Get-ChildItem -Path $toolsDir -Recurse -File -Include *.ps1 -ErrorAction SilentlyContinue
-    foreach ($it in $all) {
-        $rel = $it.FullName.Substring($repoRootFull.Length).TrimStart('\','/')
-        $relNorm = Normalize-RepoPath $rel
-        if (-not (Test-IsAllowedPs1 $relNorm)) {
-            $violations += $it.FullName
-        }
-    }
+  }
 }
 
 if ($violations.Count -gt 0) {
-    Write-Host "ERROR: Found PowerShell scripts outside allowed roots:"
-    $violations | ForEach-Object { Write-Host " - $_" }
-    Write-Host ""
-    Write-Host "Allowed roots:"
-    $allowedRoots | ForEach-Object { Write-Host " - $_" }
-    Write-Host ""
-    Write-Host "To fix: move new scripts into tools/scripts or tools/guards, or update tools/SCRIPTS_LOCATION_POLICY.md and this guard intentionally."
-    exit 1
+  Write-Host "ERROR: Found PowerShell scripts outside allowed roots:"
+  $violations | ForEach-Object { Write-Host " - $_" }
+  Write-Host ""
+  Write-Host "Allowed roots:"
+  $allowedRoots | ForEach-Object { Write-Host " - $_" }
+  Write-Host ""
+  Write-Host "Legacy exact allowlist:"
+  $legacyAllowedExact | ForEach-Object { Write-Host " - $_" }
+  exit 1
 }
 
 Write-Host "OK: no disallowed PS1 files found in checked set."

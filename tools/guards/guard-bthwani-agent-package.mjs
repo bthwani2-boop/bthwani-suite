@@ -3,9 +3,20 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const repo = process.cwd();
+const args = process.argv.slice(2);
+function argValue(name, fallback = "") {
+  const i = args.indexOf(name);
+  if (i >= 0 && i + 1 < args.length) return args[i + 1];
+  return fallback;
+}
+
+const repo = path.resolve(argValue("--root", process.cwd()));
+const jsonOut = argValue("--json-out", "");
+const mdOut = argValue("--md-out", "");
+
 const errors = [];
 const warnings = [];
+const info = [];
 
 const toPosix = (p) => p.split(path.sep).join("/");
 const abs = (p) => path.join(repo, p);
@@ -16,7 +27,7 @@ function walk(dir) {
   if (!exists(dir)) return [];
   const out = [];
   for (const ent of fs.readdirSync(abs(dir), { withFileTypes: true })) {
-    const p = path.join(dir, ent.name);
+    const p = path.posix.join(dir, ent.name);
     if (ent.isDirectory()) out.push(...walk(p));
     else out.push(toPosix(p));
   }
@@ -39,7 +50,9 @@ const requiredFiles = [
   ".agents/UPDATE_POLICY.md"
 ];
 
-for (const f of requiredFiles) if (!exists(f)) errors.push(`MISSING_REQUIRED_FILE:${f}`);
+for (const f of requiredFiles) {
+  if (!exists(f)) errors.push(`MISSING_REQUIRED_FILE:${f}`);
+}
 
 const requiredSkills = [
   "bthwani-current-workspace-authority",
@@ -124,9 +137,6 @@ const dangerousPatterns = [
   { name: "_HANDOFF", re: /_HANDOFF/i }
 ];
 
-// npx is intentionally NOT a risk term. It is allowed when documented/safest and evidenced.
-// Risk scanning is limited to BThwani-owned active instructions and root entries.
-// Imported Nx/community reference skills are not authoritative and are not scanned as policy.
 const scanFiles = [
   ...walk(".agents/skills").filter((p) => /^\.agents\/skills\/bthwani-[^/]+\/SKILL\.md$/i.test(p)),
   ".agents/README.md",
@@ -145,13 +155,17 @@ for (const f of scanFiles) {
   const lines = read(f).split(/\r?\n/);
   lines.forEach((line, idx) => {
     for (const pat of dangerousPatterns) {
-      if (pat.re.test(line) && !isSafePolicyContext(line)) warnings.push(`RISK_TERM:${pat.name}:${f}:${idx + 1}`);
+      if (pat.re.test(line) && !isSafePolicyContext(line)) {
+        warnings.push(`RISK_TERM:${pat.name}:${f}:${idx + 1}`);
+      }
     }
   });
 }
 
 for (const f of scanFiles) {
-  if (read(f).includes("_HANDOFF.zip")) errors.push(`LEGACY_HANDOFF_ZIP_REFERENCE:${f}`);
+  if (read(f).includes("_HANDOFF.zip")) {
+    errors.push(`LEGACY_HANDOFF_ZIP_REFERENCE:${f}`);
+  }
 }
 
 const uiSkill = ".agents/skills/bthwani-ui-kit-surface-contract/SKILL.md";
@@ -171,12 +185,42 @@ if (exists(authority)) {
 }
 
 const status = errors.length ? "FAIL" : warnings.length ? "PASS_WITH_WARNINGS" : "PASS";
-console.log(JSON.stringify({
+const result = {
   guard: "guard-bthwani-agent-package",
   repo,
   checked_at: new Date().toISOString(),
+  status,
+  failCount: errors.length,
+  warnCount: warnings.length,
+  infoCount: info.length,
   errors,
   warnings,
-  status
-}, null, 2));
+  info
+};
+
+if (jsonOut) {
+  fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
+  fs.writeFileSync(jsonOut, JSON.stringify(result, null, 2) + "\n");
+}
+
+if (mdOut) {
+  fs.mkdirSync(path.dirname(mdOut), { recursive: true });
+  const md = [
+    `# ${result.guard}`,
+    "",
+    `Status: ${result.status}`,
+    `Fail count: ${result.failCount}`,
+    `Warn count: ${result.warnCount}`,
+    "",
+    "## Errors",
+    ...(errors.length ? errors.map((x) => `- ${x}`) : ["- none"]),
+    "",
+    "## Warnings",
+    ...(warnings.length ? warnings.map((x) => `- ${x}`) : ["- none"]),
+    ""
+  ].join("\n");
+  fs.writeFileSync(mdOut, md);
+}
+
+console.log(JSON.stringify(result, null, 2));
 process.exit(errors.length ? 1 : 0);

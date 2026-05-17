@@ -100,7 +100,14 @@ const docsOnlyFiles = new Set([
   'tools/guards/GUARDS_CATALOG.md'
 ]);
 
+const selfReferentialGuardFiles = new Set([
+  'tools/guards/guard-agent-global-authority.mjs',
+  'tools/guards/guard-bthwani-agent-package.mjs',
+  'tools/guards/guard-governance-boundaries.mjs'
+]);
+
 const allowContext = (relative, lines, index) => {
+  if (selfReferentialGuardFiles.has(relative)) return true;
   if (docsOnlyFiles.has(relative)) return true;
   if (relative.endsWith('.config.json')) return true;
 

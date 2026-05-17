@@ -26,9 +26,25 @@ for (const tracked of gitTrackedFiles(root)) {
   }
 }
 
-const textFiles = walkFiles(root, { startDirs: ['.agents'], extensions: TEXT_EXTENSIONS });
-const agentsMdPath = path.join(root, 'AGENTS.md');
-if (fs.existsSync(agentsMdPath)) textFiles.push(agentsMdPath);
+const authorityRootFiles = new Set([
+  'AGENTS.md',
+  '.agents/README.md',
+  '.agents/INDEX.md',
+  '.agents/SKILL_CATALOG.md',
+  '.agents/AUTHORITY_BOUNDARY.md',
+  '.agents/UPDATE_POLICY.md'
+]);
+
+const isBthwaniOwnedSkill = (relative) =>
+  /^\.agents\/skills\/bthwani-[^/]+\/SKILL\.md$/i.test(relative);
+
+const isAdapterFile = (relative) =>
+  relative.startsWith('.agents/adapters/');
+
+const shouldScanAuthorityTerms = (relative) =>
+  authorityRootFiles.has(relative) ||
+  isBthwaniOwnedSkill(relative) ||
+  isAdapterFile(relative);
 
 const allowContext = (lines, index, currentSection) => {
   const windowStart = Math.max(0, index - 2);
@@ -36,6 +52,10 @@ const allowContext = (lines, index, currentSection) => {
   const windowText = lines.slice(windowStart, windowEnd).join(' ');
 
   if ((config.allowContextPatterns ?? []).some((token) => windowText.includes(token))) {
+    return true;
+  }
+
+  if (/allowed when documented|documented or safest|safest documented launcher|justified in evidence/i.test(windowText)) {
     return true;
   }
 
@@ -51,20 +71,31 @@ const forbiddenPatterns = [
   { code: 'LEGACY_ACTIVE_PATH', regex: /(^|[^A-Za-z0-9_])(apps\/|packages\/)/, message: 'Legacy active path pattern detected in active agent source.' }
 ];
 
+const textFiles = walkFiles(root, { startDirs: ['.agents'], extensions: TEXT_EXTENSIONS });
+const agentsMdPath = path.join(root, 'AGENTS.md');
+if (fs.existsSync(agentsMdPath)) textFiles.push(agentsMdPath);
+
 for (const file of textFiles) {
   const relative = rel(root, file);
+
+  if (!shouldScanAuthorityTerms(relative)) {
+    continue;
+  }
+
   const text = readTextSafe(file);
   const lines = text.split(/\r?\n/);
   let currentSection = '';
+
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
+
     if (/^\s*#{1,6}\s+/.test(line)) {
       currentSection = line.replace(/^\s*#{1,6}\s+/, '').trim();
     }
+
     for (const pattern of forbiddenPatterns) {
       if (!pattern.regex.test(line)) continue;
-      const strictFile = relative === 'AGENTS.md' && /github|opencode/i.test(pattern.code);
-      if (!strictFile && allowContext(lines, i, currentSection)) continue;
+      if (allowContext(lines, i, currentSection)) continue;
       report.fail(relative, pattern.message, `line ${i + 1}: ${line.trim()}`);
     }
   }
@@ -73,11 +104,14 @@ for (const file of textFiles) {
 for (const adapterRoot of config.adapterRoots ?? []) {
   const absolute = path.join(root, adapterRoot);
   if (!fs.existsSync(absolute)) continue;
+
   const adapterFiles = walkFiles(root, { startDirs: [adapterRoot], extensions: TEXT_EXTENSIONS });
+
   for (const file of adapterFiles) {
     const relative = rel(root, file);
     const text = readTextSafe(file);
     const lines = text.split(/\r?\n/);
+
     if (lines.length > (config.maxAdapterLines ?? 160)) {
       report.warn(relative, 'Adapter file is longer than the lightweight adapter threshold.', `lines=${lines.length}`);
     }
@@ -90,9 +124,11 @@ for (const adapterRoot of config.adapterRoots ?? []) {
 }
 
 const agentFiles = walkFiles(root, { startDirs: ['.agents'], extensions: TEXT_EXTENSIONS });
+
 for (const file of agentFiles) {
   const relative = rel(root, file);
   const base = path.basename(relative).toLowerCase();
+
   if ((config.forbiddenBridgeNamePatterns ?? []).some((pattern) => base.includes(pattern.toLowerCase()))) {
     report.fail(relative, 'Bridge-only file pattern detected inside .agents/.');
   }

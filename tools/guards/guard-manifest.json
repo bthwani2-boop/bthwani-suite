@@ -156,6 +156,29 @@
         "json",
         "md"
       ]
+    },
+    {
+      "id": "GUARD_BTHWANI_AGENT_PACKAGE",
+      "file": "tools/guards/guard-bthwani-agent-package.mjs",
+      "ownerPolicy": [
+        "AGENTS.md",
+        ".agents/README.md",
+        ".agents/INDEX.md",
+        ".agents/SKILL_CATALOG.md",
+        ".agents/AUTHORITY_BOUNDARY.md",
+        ".agents/UPDATE_POLICY.md",
+        "governance/15_AGENT_AND_AI_EXECUTION.md"
+      ],
+      "purpose": "validate BThwani-owned active agent package files, adapter hygiene, required skills, and unsafe active mirror roots",
+      "runners": [
+        "agent",
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ]
     }
   ]
 }

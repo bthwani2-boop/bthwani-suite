@@ -118,9 +118,9 @@ if ($Help) {
     Write-Host 'Safe checkpoint + branch + verify + recommendation.'
     Write-Host ''
     Write-Host 'Usage:'
-    Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\GHB_CHECKPOINT_VERIFY.ps1"'
-    Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\GHB_CHECKPOINT_VERIFY.ps1" -VerifyLevel Quick'
-    Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\GHB_CHECKPOINT_VERIFY.ps1" -Message "chore: checkpoint packages surfaces"'
+    Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\scripts\GHB_CHECKPOINT_VERIFY.ps1"'
+    Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\scripts\GHB_CHECKPOINT_VERIFY.ps1" -VerifyLevel Quick'
+    Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\scripts\GHB_CHECKPOINT_VERIFY.ps1" -Message "chore: checkpoint packages surfaces"'
     Write-Host ''
     Write-Host 'Safety:'
     Write-Host '  This script does not merge, promote, open PRs, force push, delete branches, or modify main/stable.'
@@ -556,7 +556,7 @@ Set-StrictMode -Version Latest
 
 $Script:ToolName = 'DIAGNOSE_GHB_CHECKPOINT_VERIFY'
 $Script:StartedAt = Get-Date
-$Script:TargetScriptPath = Join-Path $RepoRoot 'tools\GHB_CHECKPOINT_VERIFY.ps1'
+$Script:TargetScriptPath = Join-Path $RepoRoot 'tools\scripts\GHB_CHECKPOINT_VERIFY.ps1'
 $Script:SessionId = "$($Script:ToolName)-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 $Script:EvidenceRoot = Join-Path $RepoRoot "tools\registry\runs\$($Script:SessionId)"
 New-Item -ItemType Directory -Force -Path $Script:EvidenceRoot | Out-Null
@@ -715,7 +715,7 @@ exit 0
 $WrapperScript = @'
 #Requires -Version 5.1
 Set-Location -LiteralPath "C:\bthwani-suite"
-& powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\GHB_CHECKPOINT_VERIFY.ps1" @args
+& powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\scripts\GHB_CHECKPOINT_VERIFY.ps1" @args
 exit $LASTEXITCODE
 '@
 
@@ -724,13 +724,13 @@ try {
     if (-not (Test-Path -LiteralPath $RepoRoot -PathType Container)) { throw "Repo root not found: $RepoRoot" }
     Set-Location -LiteralPath $RepoRoot
 
-    Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\GHB_CHECKPOINT_VERIFY.ps1') -Content $GhbScript
+    Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\scripts\GHB_CHECKPOINT_VERIFY.ps1') -Content $GhbScript
     Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\DIAGNOSE_GHB_CHECKPOINT_VERIFY.ps1') -Content $DiagnoseScript
     Write-TextFileClean -Path (Join-Path $RepoRoot 'tools\ghb.ps1') -Content $WrapperScript
 
     $parserTokens = $null
     $parserErrors = $null
-    [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tools\GHB_CHECKPOINT_VERIFY.ps1'), [ref]$parserTokens, [ref]$parserErrors)
+    [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tools\scripts\GHB_CHECKPOINT_VERIFY.ps1'), [ref]$parserTokens, [ref]$parserErrors)
     if ($parserErrors -and $parserErrors.Count -gt 0) {
         $lines = @($parserErrors | ForEach-Object { "Line $($_.Extent.StartLineNumber): $($_.Message)" })
         Set-Content -LiteralPath (Join-Path $EvidenceRoot 'ghb-parser-errors.txt') -Value $lines -Encoding UTF8
@@ -746,7 +746,7 @@ try {
         Add-Blocker "Diagnose parser errors: $($diagErrors.Count)"
     }
 
-    $help = Invoke-External -FilePath 'powershell' -Arguments @('-NoProfile','-ExecutionPolicy','Bypass','-File',(Join-Path $RepoRoot 'tools\GHB_CHECKPOINT_VERIFY.ps1'),'-Help') -AllowFailure
+    $help = Invoke-External -FilePath 'powershell' -Arguments @('-NoProfile','-ExecutionPolicy','Bypass','-File',(Join-Path $RepoRoot 'tools\scripts\GHB_CHECKPOINT_VERIFY.ps1'),'-Help') -AllowFailure
     Set-Content -LiteralPath (Join-Path $EvidenceRoot 'ghb-help-output.txt') -Value $help['output'] -Encoding UTF8
     if ($help['exit_code'] -ne 0) { Add-Blocker "GHB -Help failed with exit code $($help['exit_code'])" }
 
