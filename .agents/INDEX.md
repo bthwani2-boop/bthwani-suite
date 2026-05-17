@@ -66,3 +66,4 @@
 ## Rule
 
 Service/application specificity belongs in `governance/`; `.agents` stays general.
+| thwani-frontend-design-excellence-contract | See .agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md. |

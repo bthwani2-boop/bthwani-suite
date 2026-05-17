@@ -1,0 +1,186 @@
+{
+  "version": "3.0.0-proposed",
+  "owner": "tools/guards",
+  "policy_source_rule": "governance/ owns policy text; tools/guards executes verification only",
+  "style_rule": "Many logical guards + fewer stronger executable guards; no noisy one-script-per-policy sprawl.",
+  "profiles": [
+    "fast",
+    "prepush",
+    "governance",
+    "architecture",
+    "ui",
+    "dsh",
+    "finance",
+    "agent",
+    "release"
+  ],
+  "phases": [
+    "GOVERNANCE",
+    "ARCHITECTURE",
+    "UI_UX_FLOW",
+    "API_BINDING",
+    "RUNTIME",
+    "PRODUCTION",
+    "PR_MERGE"
+  ],
+  "guards": [
+    {
+      "id": "GUARD_STEWARD_V3",
+      "file": "tools/guards/guard-steward-v3.mjs",
+      "logicalGuardIds": [
+        "GUARD_01_GOVERNANCE_ROOT",
+        "GUARD_13_EVIDENCE_PACK",
+        "GUARD_17_CI_GATES",
+        "GUARD_18_AGENT_EXECUTION",
+        "GUARD_23_WARNING_CLASSIFICATION",
+        "GUARD_24_TRACEABILITY_ROADMAP"
+      ],
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/13_CI_AND_GATES.md"
+      ],
+      "runners": [
+        "governance",
+        "prepush",
+        "release"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "phasePolicy": {
+        "UI_UX_FLOW": "BLOCKING",
+        "API_BINDING": "BLOCKING",
+        "RUNTIME": "BLOCKING",
+        "PRODUCTION": "BLOCKING"
+      }
+    },
+    {
+      "id": "GUARD_PHASE_SCOPE_V3",
+      "file": "tools/guards/guard-phase-scope-v3.mjs",
+      "logicalGuardIds": [
+        "GUARD_09_API_CONTRACT",
+        "GUARD_10_API_BINDING_RUNTIME",
+        "GUARD_14_BRANCH_CHECKPOINT",
+        "GUARD_18_AGENT_EXECUTION",
+        "GUARD_24_TRACEABILITY_ROADMAP"
+      ],
+      "ownerPolicy": [
+        "governance/09_API_BINDING_RUNTIME.md",
+        "governance/24_TRACEABILITY_AND_ROADMAP.md"
+      ],
+      "runners": [
+        "governance",
+        "ui",
+        "dsh",
+        "prepush",
+        "release"
+      ],
+      "mode": "phase-aware",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "phasePolicy": {
+        "UI_UX_FLOW": "REPORT_UNLESS_FALSE_CLAIM_OR_HARDCODING",
+        "API_BINDING": "BLOCKING",
+        "RUNTIME": "BLOCKING",
+        "PRODUCTION": "BLOCKING"
+      }
+    },
+    {
+      "id": "GUARD_UIUX_RATCHET_V3",
+      "file": "tools/guards/guard-uiux-ratchet-v3.mjs",
+      "logicalGuardIds": [
+        "GUARD_03_PACKAGE_BOUNDARY",
+        "GUARD_06_UI_KIT_AUTHORITY",
+        "GUARD_07_RTL_BRAND_VISUAL",
+        "GUARD_08_SCREEN_STATE_MODEL",
+        "GUARD_20_CONTROL_PANEL"
+      ],
+      "ownerPolicy": [
+        "governance/08_UI_KIT_AND_BRAND.md",
+        "governance/19_CONTROL_PANEL_AND_OPERATING_MODEL.md"
+      ],
+      "runners": [
+        "ui",
+        "dsh",
+        "prepush",
+        "release"
+      ],
+      "mode": "ratchet",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "phasePolicy": {
+        "UI_UX_FLOW": "RATCHET",
+        "API_BINDING": "RATCHET",
+        "RUNTIME": "RATCHET",
+        "PRODUCTION": "BLOCKING"
+      }
+    },
+    {
+      "id": "GUARD_DSH_PLATFORM_VARS_V3",
+      "file": "tools/guards/guard-dsh-platform-vars-v3.mjs",
+      "logicalGuardIds": [
+        "GUARD_11_WLT_FINANCIAL_OWNER",
+        "GUARD_12_VAR_POLICY",
+        "GUARD_20_CONTROL_PANEL",
+        "GUARD_22_DSH_GOLDEN_SLICE"
+      ],
+      "ownerPolicy": [
+        "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "runners": [
+        "dsh",
+        "finance",
+        "release"
+      ],
+      "mode": "phase-aware",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "phasePolicy": {
+        "UI_UX_FLOW": "REPORT_UNLESS_FINANCE_OR_RUNTIME_MUTATION",
+        "API_BINDING": "BLOCKING",
+        "RUNTIME": "BLOCKING",
+        "PRODUCTION": "BLOCKING"
+      }
+    },
+    {
+      "id": "GUARD_RELEASE_READINESS_V3",
+      "file": "tools/guards/guard-release-readiness-v3.mjs",
+      "logicalGuardIds": [
+        "GUARD_13_EVIDENCE_PACK",
+        "GUARD_15_SECURITY_SECRETS",
+        "GUARD_16_TESTING_READINESS",
+        "GUARD_17_CI_GATES",
+        "GUARD_19_CLEANUP_DEPRECATION",
+        "GUARD_21_OBSERVABILITY",
+        "GUARD_23_WARNING_CLASSIFICATION"
+      ],
+      "ownerPolicy": [
+        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+        "governance/16_SECURITY_AND_SECRETS.md",
+        "governance/12_TESTING_AND_PRODUCTION_READINESS.md"
+      ],
+      "runners": [
+        "prepush",
+        "release"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "phasePolicy": {
+        "PR_MERGE": "BLOCKING",
+        "PRODUCTION": "BLOCKING"
+      }
+    }
+  ]
+}

@@ -62,6 +62,7 @@ const requiredSkills = [
   "bthwani-agent-restoration-forensics",
   "bthwani-domain-governance-reader",
   "bthwani-ui-kit-surface-contract",
+  "bthwani-frontend-design-excellence-contract",
   "bthwani-screen-flow-binding-contract",
   "bthwani-platform-vars-control-contract",
   "bthwani-runtime-provider-config-contract",
@@ -177,6 +178,34 @@ if (exists(uiSkill)) {
   if (!s.includes("Tamagui internally inside ui-kit only")) errors.push("UI_SKILL_MISSING_TAMAGUI_BOUNDARY");
 }
 
+
+const frontendDesignSkill = ".agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md";
+if (exists(frontendDesignSkill)) {
+  const s = read(frontendDesignSkill);
+  const requiredFrontendPhrases = [
+    "premium",
+    "modern",
+    "mobile-first",
+    "web-ready",
+    "visual hierarchy",
+    "interaction states",
+    "empty",
+    "loading",
+    "error",
+    "success",
+    "accessibility",
+    "NEEDS_VISUAL_EVIDENCE",
+    "توجب الالتزام بنظام الألوان المركزي",
+    "تجب إزالة ومعالجة وتصحيح الضجيج والتكرار والكود الميت والتسرب والتشظي والتبعثر",
+    "@bthwani/ui-kit",
+    "governance/"
+  ];
+  for (const phrase of requiredFrontendPhrases) {
+    if (!s.includes(phrase)) {
+      errors.push(`FRONTEND_DESIGN_SKILL_MISSING_PHRASE:${phrase}`);
+    }
+  }
+}
 const authority = ".agents/AUTHORITY_BOUNDARY.md";
 if (exists(authority)) {
   const s = read(authority);

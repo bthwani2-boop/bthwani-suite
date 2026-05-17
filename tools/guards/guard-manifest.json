@@ -179,6 +179,91 @@
         "json",
         "md"
       ]
+    },
+    {
+      "id": "GUARD_STEWARD_V3",
+      "file": "tools/guards/guard-steward-v3.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/13_CI_AND_GATES.md"
+      ],
+      "purpose": "validate additive V3 guard system health without replacing existing guards",
+      "runners": [
+        "v3"
+      ],
+      "mode": "advisory",
+      "outputs": [
+        "json",
+        "md"
+      ]
+    },
+    {
+      "id": "GUARD_PHASE_SCOPE_V3",
+      "file": "tools/guards/guard-phase-scope-v3.mjs",
+      "ownerPolicy": [
+        "governance/09_API_BINDING_RUNTIME.md",
+        "governance/24_TRACEABILITY_AND_ROADMAP.md"
+      ],
+      "purpose": "phase-aware scope guard for UI/UX, API, runtime, and production stages",
+      "runners": [
+        "v3"
+      ],
+      "mode": "phase-aware",
+      "outputs": [
+        "json",
+        "md"
+      ]
+    },
+    {
+      "id": "GUARD_UIUX_RATCHET_V3",
+      "file": "tools/guards/guard-uiux-ratchet-v3.mjs",
+      "ownerPolicy": [
+        "governance/08_UI_KIT_AND_BRAND.md",
+        "governance/24_TRACEABILITY_AND_ROADMAP.md"
+      ],
+      "purpose": "UI/UX ratchet guard for central colors, RTL, ui-kit ownership, local design drift, and touched-scope discipline",
+      "runners": [
+        "v3"
+      ],
+      "mode": "audit",
+      "outputs": [
+        "json",
+        "md"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_PLATFORM_VARS_V3",
+      "file": "tools/guards/guard-dsh-platform-vars-v3.mjs",
+      "ownerPolicy": [
+        "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "DSH Platform/Vars control guard for mutable operational policy, provider control, and UI-only phase discipline",
+      "runners": [
+        "v3"
+      ],
+      "mode": "audit",
+      "outputs": [
+        "json",
+        "md"
+      ]
+    },
+    {
+      "id": "GUARD_RELEASE_READINESS_V3",
+      "file": "tools/guards/guard-release-readiness-v3.mjs",
+      "ownerPolicy": [
+        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+        "governance/13_CI_AND_GATES.md"
+      ],
+      "purpose": "release readiness evidence, diff, warning, rollback, and guard-result aggregation",
+      "runners": [
+        "v3"
+      ],
+      "mode": "advisory",
+      "outputs": [
+        "json",
+        "md"
+      ]
     }
   ]
 }

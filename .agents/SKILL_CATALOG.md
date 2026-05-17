@@ -29,3 +29,4 @@
 | `bthwani-agent-registry-validator` | Validate skill registry coverage, frontmatter, duplication, and risk terms. | `governance/` according to task domain | structured decision + evidence requirements |
 
 All skills require evidence before acceptance. External skills may be preserved, but BThwani rules override generic examples.
+| thwani-frontend-design-excellence-contract | Guard premium frontend design quality, visual hierarchy, responsive web/mobile UX, interaction states, accessibility, and visual evidence. | governance/ according to task domain | frontend design decision + visual evidence requirement |

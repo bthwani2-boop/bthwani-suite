@@ -1,0 +1,20 @@
+{
+  "wave_id": "DSH_PLATFORM_VARS_UI_FLOW",
+  "phase": "UI_UX_FLOW",
+  "scope": [
+    "control-panel/runtime/app/platform/page.tsx",
+    "dsh/frontend/control-panel/platform/**",
+    "dsh/frontend/control-panel/platform/Vars/**"
+  ],
+  "forbidden_phases": [
+    "API_BINDING",
+    "RUNTIME",
+    "PRODUCTION"
+  ],
+  "evidence_required": [
+    "visual_flow_matrix",
+    "screenshots_when_ui_changed",
+    "git-diff-check",
+    "guard-evidence-zip"
+  ]
+}
