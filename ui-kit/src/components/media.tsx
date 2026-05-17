@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image as RNImage, View, type ImageSourcePropType, type ImageStyle, type StyleProp } from 'react-native';
-import { radius, spacing } from '../foundation';
+import { colorPalette, radius, spacing, withAlpha } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Text } from '../primitives';
 
@@ -57,7 +57,7 @@ export function Image({ source, alt, width = 160, height = 160, style }: ImagePr
   const resolvedSource = typeof source === 'string' ? { uri: source } : source ?? undefined;
 
   if (!resolvedSource) {
-    return <View style={[{ width, height, borderRadius: radius.md, backgroundColor: 'rgba(0,0,0,0.06)', alignItems: 'center', justifyContent: 'center' }, style]}><Text role="caption" tone="soft">{alt ?? 'No image'}</Text></View>;
+    return <View style={[{ width, height, borderRadius: radius.md, backgroundColor: withAlpha(colorPalette.black, 0.06), alignItems: 'center', justifyContent: 'center' }, style]}><Text role="caption" tone="soft">{alt ?? 'No image'}</Text></View>;
   }
 
   return <RNImage source={resolvedSource} accessibilityLabel={alt} style={[{ width, height, borderRadius: radius.md }, style]} />;

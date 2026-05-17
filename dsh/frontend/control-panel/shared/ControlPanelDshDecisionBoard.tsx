@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { WebSectionCard, WebSignalCard, WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
+import { type DshUnifiedRecommendation, getDshRecommendationSeverityLabel } from './recommendation.preview-data';
 
 export type ControlPanelDshDecisionBoardProps = {
   title: string;
@@ -12,6 +13,7 @@ export type ControlPanelDshDecisionBoardProps = {
   evidenceHint: string;
   routeHint: string;
   decisionTone?: React.ComponentProps<typeof WebSignalCard>['tone'];
+  recommendation?: DshUnifiedRecommendation;
 };
 
 export function ControlPanelDshDecisionBoard({
@@ -24,33 +26,62 @@ export function ControlPanelDshDecisionBoard({
   evidenceHint,
   routeHint,
   decisionTone = 'brand',
+  recommendation,
 }: ControlPanelDshDecisionBoardProps) {
+  const unifiedRecommendation = recommendation ?? {
+    id: `${ownerSurface}-${title}`,
+    surface: ownerSurface,
+    severity: decisionTone === 'danger' ? 'high' : decisionTone === 'warning' ? 'medium' : 'low',
+    confidence: 'high',
+    affectedEntity: ownerSurface,
+    reason: blockers,
+    evidence: evidenceHint,
+    nextAction,
+    owner: ownerSurface,
+    expectedImpact: purpose,
+    primaryActionLabel: 'تنفيذ الآن',
+    secondaryActionLabel: 'فتح الأدلة',
+  };
+
   return (
     <WebSectionCard title={title} description={purpose}>
       <Box gap={2}>
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Box style={{ flexGrow: 1, flexBasis: 220 }}>
-            <WebSignalCard title="Primary decision" value={primaryDecision} description="What this screen should decide now." tone={decisionTone} />
+            <WebSignalCard title="القرار الأساسي" value={primaryDecision} description="ما الذي يجب أن يحسمه هذا السطح الآن." tone={decisionTone} />
           </Box>
           <Box style={{ flexGrow: 1, flexBasis: 220 }}>
-            <WebSignalCard title="Next action" value={nextAction} description="The next operational move." tone="warning" />
+            <WebSignalCard title="الإجراء التالي" value={nextAction} description="ما يجب تنفيذه الآن." tone="warning" />
           </Box>
           <Box style={{ flexGrow: 1, flexBasis: 220 }}>
-            <WebSignalCard title="Blockers" value={blockers} description="What still blocks closure or execution." tone="danger" />
+            <WebSignalCard title="العوائق" value={blockers} description="ما الذي ما زال يمنع الإغلاق أو التنفيذ." tone="danger" />
           </Box>
           <Box style={{ flexGrow: 1, flexBasis: 220 }}>
-            <WebSignalCard title="Owner surface" value={ownerSurface} description="The owning DSH surface for the decision." tone="best" />
+            <WebSignalCard title="السطح المالك" value={ownerSurface} description="السطح المسؤول عن القرار." tone="best" />
           </Box>
         </Box>
 
+        <WebControlPanelRecommendation
+          title="توصية النظام الموحدة"
+          reason={`لماذا؟ ${unifiedRecommendation.reason} · ما الدليل؟ ${unifiedRecommendation.evidence} · ما الأثر المتوقع؟ ${unifiedRecommendation.expectedImpact}`}
+          confidence={unifiedRecommendation.confidence}
+          auditTag={getDshRecommendationSeverityLabel(unifiedRecommendation.severity)}
+          primaryAction={{ id: `${unifiedRecommendation.id}-primary`, label: unifiedRecommendation.primaryActionLabel }}
+          secondaryAction={{ id: `${unifiedRecommendation.id}-secondary`, label: unifiedRecommendation.secondaryActionLabel }}
+        />
+
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" style={{ flexGrow: 1, flexBasis: 220 }}>
-            <Text role="caption" tone="muted">Evidence hint</Text>
+            <Text role="caption" tone="muted">ما الدليل؟</Text>
             <Text role="bodySm">{evidenceHint}</Text>
           </Box>
           <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" style={{ flexGrow: 1, flexBasis: 220 }}>
-            <Text role="caption" tone="muted">Route hint</Text>
+            <Text role="caption" tone="muted">مسار الواجهة</Text>
             <Text role="bodySm">{routeHint}</Text>
+          </Box>
+          <Box padding={3} gap={1} border radiusToken="xl" background="surfaceRaised" style={{ flexGrow: 1, flexBasis: 220 }}>
+            <Text role="caption" tone="muted">من المالك؟</Text>
+            <Text role="bodySm">{unifiedRecommendation.owner}</Text>
           </Box>
         </Box>
       </Box>

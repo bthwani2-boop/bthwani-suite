@@ -1,9 +1,9 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo } from 'react'; // Re-built
 import { Image, Pressable, ScrollView, StyleSheet, View, type GestureResponderEvent, type ImageSourcePropType, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { radius, resolveRowDirection, resolveTextAlign, spacing, type SpacingToken } from '../foundation';
-import { useDirection, useTheme } from '../providers';
+import { colorPalette, radius, resolveRowDirection, resolveTextAlign, spacing, withAlpha, type SpacingToken } from '../foundation';
+import { useBThwaniAppearance, useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
+import { Icon } from './icons';
 import { Surface, Text, type SurfaceTone } from '../primitives';
 import { StateView } from './state';
 
@@ -123,7 +123,7 @@ function resolveImageSource(source?: ImageSourcePropType | string | null): Image
 
 function formatCurrencyAmount(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('ar-SA', { style: 'currency', currency }).format(amount);
+    return new Intl.NumberFormat('ar-YE', { style: 'currency', currency }).format(amount);
   } catch {
     return `${amount} ${currency}`;
   }
@@ -163,32 +163,34 @@ function formatPriceLabel(price?: ProductCardPrice) {
     return undefined;
   }
 
-  return formatCurrencyAmount(price.value, price.currency ?? 'SAR');
+  return formatCurrencyAmount(price.value, price.currency ?? 'YER');
 }
 
 type ProductCardStyles = ReturnType<typeof createProductCardStyles>;
 
-function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection: 'row' | 'row-reverse', textAlign: 'left' | 'right' | 'center') {
+function createProductCardStyles(
+  theme: ReturnType<typeof useTheme>['theme'],
+  productColors: ReturnType<typeof useBThwaniAppearance>['tokens']['components']['commerce']['productCard'],
+  rowDirection: 'row' | 'row-reverse',
+  textAlign: 'left' | 'right' | 'center',
+) {
   const alignItemsDirection = textAlign === 'right' ? 'flex-end' : 'flex-start';
 
   return StyleSheet.create({
     card: {
       width: '100%',
-      backgroundColor: theme.surface,
+      backgroundColor: productColors.backgroundColor,
       borderRadius: 18,
       paddingVertical: 0,
       paddingHorizontal: 0,
       borderWidth: 1,
-      borderColor: theme.line,
+      borderColor: productColors.rimLightColor,
       flexDirection: rowDirection,
       alignItems: 'stretch',
       height: 126,
       overflow: 'hidden',
-      shadowColor: '#000',
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 1,
+      marginBottom: 12,
+      ...productColors.shadowSoft,
     },
     cardPressed: {
       opacity: 0.98,
@@ -205,7 +207,7 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
       borderBottomRightRadius: 18,
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
-      backgroundColor: theme.surfaceInset,
+      backgroundColor: productColors.imageBackground,
       borderWidth: 0,
       overflow: 'hidden',
       justifyContent: 'center',
@@ -221,19 +223,29 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
     imagePlaceholder: {
       width: '100%',
       height: '100%',
-      backgroundColor: theme.surfaceInset,
+      backgroundColor: productColors.imageBackground,
     },
     partnerTile: {
       position: 'absolute',
-      top: 10,
-      left: 10,
-      width: 44,
-      height: 36,
-      backgroundColor: 'rgba(255,255,255,0.96)',
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: '#e5e7eb',
+      bottom: -10,
+      right: -10,
+      width: 66,
+      height: 66,
+      backgroundColor: colorPalette.brand,
+      borderRadius: 33,
+      borderWidth: 2,
+      borderColor: colorPalette.white,
       zIndex: 6,
+      overflow: 'hidden',
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...productColors.partnerTileShadow,
+    },
+    partnerTileImageContainer: {
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+      backgroundColor: colorPalette.white,
       overflow: 'hidden',
       justifyContent: 'center',
       alignItems: 'center',
@@ -262,23 +274,29 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
     },
     favoriteButton: {
       position: 'absolute',
-      bottom: 8,
-      end: 8,
-      width: 34,
-      height: 34,
-      borderRadius: 17,
+      top: 0,
+      right: 0,
+      width: 36,
+      height: 36,
       backgroundColor: theme.surface,
+      borderBottomLeftRadius: 24,
+      borderTopRightRadius: 18,
       justifyContent: 'center',
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: '#fed7aa',
+      borderWidth: 0,
+      borderColor: 'transparent',
       zIndex: 3,
+      shadowColor: colorPalette.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      elevation: 2,
     },
     body: {
       flex: 1,
       minWidth: 0,
       justifyContent: 'flex-start',
-      gap: 4,
+      gap: 6,
       alignItems: alignItemsDirection,
       marginEnd: 0,
       paddingVertical: 8,
@@ -288,42 +306,42 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
       width: '100%',
       minHeight: 0,
       justifyContent: 'flex-start',
-      gap: 0,
+      gap: 2,
       alignItems: alignItemsDirection,
       flexShrink: 1,
     },
     title: {
-      color: theme.text,
+      color: productColors.titleColor,
       fontSize: 16,
       fontWeight: '900',
       lineHeight: 20,
       textAlign,
     },
     subtitle: {
-      color: theme.textMuted,
+      color: productColors.subtitleColor,
       fontSize: 11.5,
       marginTop: 1,
       lineHeight: 15,
       textAlign,
     },
     timingRow: {
-      marginTop: 2,
+      marginTop: 0,
       flexDirection: rowDirection,
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-start',
       alignSelf: 'flex-end',
       gap: 4,
       flexWrap: 'wrap',
     },
     prep: {
-      color: theme.textMuted,
+      color: productColors.subtitleColor,
       fontSize: 10.5,
       fontWeight: '600',
     },
     commerceZone: {
       width: '100%',
       justifyContent: 'flex-start',
-      gap: 2,
+      gap: 4,
       alignItems: alignItemsDirection,
       marginTop: 'auto',
       flexShrink: 1,
@@ -332,43 +350,37 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
       marginTop: 0,
       flexDirection: rowDirection,
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-start',
       alignSelf: 'flex-end',
-      gap: 4,
+      gap: 6,
       flexWrap: 'wrap',
       maxWidth: '100%',
     },
     price: {
-      color: theme.text,
+      color: productColors.priceColor,
       fontSize: 14,
       fontWeight: '900',
     },
     oldPrice: {
-      color: theme.textMuted,
+      color: productColors.oldPriceColor,
       fontSize: 10.5,
       fontWeight: '700',
       textDecorationLine: 'line-through',
     },
-    discountRow: {
-      marginTop: 1,
-      width: '100%',
-      flexDirection: rowDirection,
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-    },
+
     discountChip: {
-      backgroundColor: '#fef2f2',
+      backgroundColor: productColors.discountSurface,
       borderRadius: 999,
       paddingHorizontal: 8,
       paddingVertical: 2,
     },
     discountText: {
-      color: '#dc2626',
+      color: productColors.discountText,
       fontSize: 10,
       fontWeight: '900',
     },
     chipRow: {
-      marginTop: 2,
+      marginTop: 0,
       width: '100%',
       flexDirection: rowDirection,
       flexWrap: 'wrap',
@@ -377,57 +389,61 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
       alignSelf: 'stretch',
     },
     smallChipPrimary: {
-      backgroundColor: theme.brandSurface,
+      backgroundColor: productColors.statusDefaultSurface,
       borderRadius: 999,
       paddingHorizontal: 10,
       paddingVertical: 4,
     },
     smallChipPrimaryText: {
-      color: theme.brand,
+      color: productColors.statusDefaultText,
       fontSize: 11,
       fontWeight: '800',
     },
     smallChipSuccess: {
-      backgroundColor: theme.successSurface,
+      backgroundColor: productColors.statusSuccessSurface,
     },
     smallChipSuccessText: {
-      color: theme.successText,
+      color: productColors.statusSuccessText,
     },
     smallChipDanger: {
-      backgroundColor: theme.dangerSurface,
+      backgroundColor: productColors.statusDangerSurface,
     },
     smallChipDangerText: {
-      color: theme.dangerText,
+      color: productColors.statusDangerText,
     },
     smallChipLight: {
-      backgroundColor: theme.surfaceInset,
+      backgroundColor: productColors.categorySurface,
       borderRadius: 999,
       paddingHorizontal: 10,
       paddingVertical: 4,
     },
     smallChipLightText: {
-      color: theme.textMuted,
+      color: productColors.categoryText,
       fontSize: 11,
       fontWeight: '700',
     },
     actionRail: {
-      width: 44,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingTop: 6,
-      paddingLeft: 8,
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      zIndex: 10,
     },
     actionRailRTL: {
-      alignItems: 'center',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      zIndex: 10,
     },
     actionBadge: {
-      width: 36,
+      width: 44,
       height: 36,
-      borderRadius: 18,
-      backgroundColor: theme.brand,
+      borderTopRightRadius: 24,
+      borderBottomLeftRadius: 18,
+      backgroundColor: colorPalette.brand,
       justifyContent: 'center',
       alignItems: 'center',
       position: 'relative',
+      ...productColors.shadowPremium,
     },
     actionPlusBadge: {
       position: 'absolute',
@@ -436,9 +452,9 @@ function createProductCardStyles(theme: ReturnType<typeof useTheme>['theme'], ro
       width: 15,
       height: 15,
       borderRadius: 7.5,
-      backgroundColor: theme.surface,
+      backgroundColor: productColors.actionPlusSurface,
       borderWidth: 1,
-      borderColor: '#fed7aa',
+      borderColor: productColors.actionPlusBorder,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -474,11 +490,16 @@ export const ProductCard = memo(function ProductCard({
 }: ProductCardProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
   const rowDirection = resolveRowDirection(direction);
   const textAlign = resolveTextAlign(direction);
   const logicalAlign = textAlign === 'left' ? 'start' : textAlign === 'right' ? 'end' : 'center';
   const isRTL = direction === 'rtl';
-  const styles = useMemo(() => createProductCardStyles(theme, rowDirection, textAlign), [theme, rowDirection, textAlign]);
+  const productColors = appearanceTokens.components.commerce.productCard;
+  const styles = useMemo(
+    () => createProductCardStyles(theme, productColors, rowDirection, textAlign),
+    [theme, productColors, rowDirection, textAlign],
+  );
   const resolvedImageSource = resolveImageSource(imageSource ?? imageUri);
   const resolvedPartnerSource = resolveImageSource(partnerImageSource ?? partnerImageUri);
   const resolvedStatusTone = resolveStatusTone(statusLabel, statusTone);
@@ -500,21 +521,12 @@ export const ProductCard = memo(function ProductCard({
             <View style={styles.imagePlaceholder} />
           )}
 
-          {resolvedPartnerSource ? (
-            <View style={styles.partnerTile}>
-              <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="cover" />
-            </View>
-          ) : null}
-
-          {emoji ? <Text role="titleLg" style={styles.emoji}>{emoji}</Text> : null}
-
           {onImagePress ? (
             <Pressable
-              accessibilityRole="imagebutton"
-              accessibilityLabel={`${title} · معاينة الصورة`}
-              hitSlop={8}
-              onPress={onImagePress}
               style={styles.imagePressable}
+              onPress={onImagePress}
+              accessibilityRole="button"
+              accessibilityLabel={title}
             />
           ) : null}
 
@@ -524,12 +536,20 @@ export const ProductCard = memo(function ProductCard({
               onPress={onFavorite}
               style={styles.favoriteButton}
             >
-              <Ionicons
+              <Icon
                 name={isFavorited ? 'heart' : 'heart-outline'}
                 size={18}
-                color={isFavorited ? theme.danger : theme.textMuted}
+                color={colorPalette.brand}
               />
             </Pressable>
+          ) : null}
+
+          {resolvedPartnerSource ? (
+            <View style={styles.partnerTile}>
+              <View style={styles.partnerTileImageContainer}>
+                <Image source={resolvedPartnerSource} style={styles.partnerTileImage} resizeMode="contain" />
+              </View>
+            </View>
           ) : null}
         </View>
       </View>
@@ -547,7 +567,7 @@ export const ProductCard = memo(function ProductCard({
 
           {preparationTime ? (
             <View style={styles.timingRow}>
-              <Ionicons name="time-outline" size={14} color={theme.textMuted} />
+              <Icon name="time-outline" size={14} color={theme.textMuted} />
               <Text role="bodySm" style={styles.prep} numberOfLines={1}>
                 {preparationTime}
               </Text>
@@ -567,17 +587,14 @@ export const ProductCard = memo(function ProductCard({
                 {oldPriceLabel}
               </Text>
             ) : null}
-          </View>
-
-          {discountLabel ? (
-            <View style={styles.discountRow}>
+            {discountLabel ? (
               <View style={styles.discountChip}>
                 <Text role="label" style={styles.discountText} numberOfLines={1}>
                   {discountLabel}
                 </Text>
               </View>
-            </View>
-          ) : null}
+            ) : null}
+          </View>
 
           <View style={styles.chipRow}>
             {statusLabel ? (
@@ -620,9 +637,11 @@ export const ProductCard = memo(function ProductCard({
             onPress={(event: GestureResponderEvent) => onAdd({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })}
             style={styles.actionBadge}
           >
-            <Ionicons name="cart-outline" size={18} color={theme.textInverse} />
-            <View style={styles.actionPlusBadge}>
-              <Ionicons name="add" size={8} color={theme.text} />
+            <View style={{ position: 'relative' }}>
+              <Icon name="cart-outline" size={19} color={colorPalette.white} />
+              <View style={{ position: 'absolute', top: -3, left: -5, backgroundColor: colorPalette.white, borderRadius: 5, width: 10, height: 10, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="add" size={8} color={colorPalette.brand} />
+              </View>
             </View>
           </Pressable>
         ) : null}

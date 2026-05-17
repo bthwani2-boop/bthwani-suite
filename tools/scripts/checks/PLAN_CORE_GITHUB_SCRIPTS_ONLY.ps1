@@ -83,13 +83,10 @@ $CoreReason = @{}
 # Core docs and package.json referenced guards
 Add-Core "tools/scripts/README.md" "documentation for tools/scripts"
 Add-Core "tools/scripts/guard-central-i18n-direction.mjs" "used by package.json guard:i18n-direction"
-Add-Core "tools/scripts/validate-agent-governance.mjs" "used by package.json guard:agent-governance"
 
 # Governance / script governance
 Add-Core "tools/scripts/checks/CHECK_SCRIPT_GOVERNANCE.ps1" "current script inventory/governance diagnostic"
 Add-Core "tools/scripts/checks/PLAN_CORE_GITHUB_SCRIPTS_ONLY.ps1" "core script selection diagnostic"
-Add-Core "tools/scripts/CHECK_AGENT_GOVERNANCE_KIT_INTAKE.ps1" "agent governance intake diagnostic"
-Add-Core "tools/scripts/CHECK_ANALYZE_AI_AGENT_GITIGNORE_DRIFT.ps1" "AI agent gitignore drift diagnostic"
 Add-Core "tools/scripts/CHECK_ANALYZE_GOVERNANCE_AUTOMATION_BASELINE.ps1" "governance automation baseline"
 Add-Core "tools/scripts/CHECK_ANALYZE_GOVERNANCE_CONTROL_PLANE_DEEP.ps1" "governance control-plane deep diagnostic"
 

@@ -13,7 +13,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
+import { colorPalette, radius, resolveRowDirection, spacing, withAlpha } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge } from './button';
 import { EmptyState } from './state';
@@ -149,7 +149,7 @@ export function HighlightsRail({ items, maxItems = 5, variant = 'default', style
           </View>
           {imageSource ? <Image source={imageSource} style={{ position: 'absolute', inset: 0 }} /> : null}
           <View style={{ position: 'absolute', inset: 0, backgroundColor: colorPalette.overlaySoft }} />
-          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: spacing[3], backgroundColor: 'rgba(255,255,255,0.12)' }}>
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: spacing[3], backgroundColor: withAlpha(colorPalette.white, 0.12) }}>
             <Text role="label" tone="inverse" numberOfLines={2} align="center">
               {item.title}
             </Text>
@@ -308,11 +308,12 @@ export function KeyValueList({ items, dense = false, dividers = true }: KeyValue
 export type ListItemProps = React.ComponentProps<typeof Pressable> & {
   title: string;
   subtitle?: string;
-  meta?: string;
+  meta?: React.ReactNode;
   badgeLabel?: string;
+  badgeTone?: 'default' | 'success' | 'warning' | 'danger' | 'brand' | 'info';
 };
 
-export function ListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: ListItemProps) {
+export function ListItem({ title, subtitle, meta, badgeLabel, badgeTone, style, ...rest }: ListItemProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
@@ -337,9 +338,9 @@ export function ListItem({ title, subtitle, meta, badgeLabel, style, ...rest }: 
           <Text role="bodyStrong">{title}</Text>
           {subtitle ? <Text role="bodySm" tone="muted">{subtitle}</Text> : null}
         </View>
-        {badgeLabel ? <Badge label={badgeLabel} tone="brand" /> : null}
+        {badgeLabel ? <Badge label={badgeLabel} tone={badgeTone ?? 'brand'} /> : null}
       </View>
-      {meta ? <Text role="caption" tone="soft">{meta}</Text> : null}
+      {meta ? (typeof meta === 'string' ? <Text role="caption" tone="soft">{meta}</Text> : meta) : null}
     </Pressable>
   );
 }

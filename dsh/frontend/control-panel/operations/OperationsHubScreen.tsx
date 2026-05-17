@@ -2,27 +2,33 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { StateView } from '@bthwani/ui-kit';
+import { Box, StateView, Text } from '@bthwani/ui-kit';
+import {
+  WebControlPanelWorkbench,
+  WebControlPanelDenseHeader,
+  WebControlPanelLaneTabs,
+  WebControlPanelSubTabs,
+} from '@bthwani/ui-kit/web';
 import {
   buildOperationsHref,
   getOperationsGroupMeta,
-  NON_OPERATIONS_SECTION_SHORTCUTS,
   OPERATIONS_CANONICAL_GROUPS,
   resolveOperationsStateCopy,
 } from './operations.registry';
 import { OPERATIONS_PULSE_METRICS } from './operations.preview-data';
 import type { CanonicalOperationsGroupId, OperationsPanelId, OperationsViewState } from './operations.types';
-import { CommandCenterScreen } from './command-center/CommandCenterScreen';
-import { LiveOrdersScreen } from './live-orders/LiveOrdersScreen';
-import { DispatchAssignmentScreen } from './dispatch-assignment/DispatchAssignmentScreen';
-import { ControlPanelDshSheinProxyScreen } from './sheinproxy/ControlPanelDshSheinProxyScreen';
-import { AwnakScreen } from './awnak/AwnakScreen';
-import { CaptainOperationsScreen } from './captain-operations/CaptainOperationsScreen';
-import { PartnerStoresScreen } from './partner-stores/PartnerStoresScreen';
-import { AreaCapacityScreen } from './area-capacity/AreaCapacityScreen';
-import { ExceptionsEscalationsScreen } from './exceptions-escalations/ExceptionsEscalationsScreen';
-import { AuditSupportSlaScreen } from './audit-support-sla/AuditSupportSlaScreen';
-import styles from './dsh-surface.module.css';
+import { CommandCenterScreen } from './CommandCenterScreen';
+import { LiveOrdersScreen } from './LiveOrdersScreen';
+import { DispatchAssignmentScreen } from './DispatchAssignmentScreen';
+import { GeoHeatmapScreen } from './GeoHeatmapScreen';
+import { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';
+import { AwnakScreen } from './AwnakScreen';
+import { CaptainOperationsScreen } from './CaptainOperationsScreen';
+import { PartnerStoresScreen } from './PartnerStoresScreen';
+import { AreaCapacityScreen } from './AreaCapacityScreen';
+import { ExceptionsEscalationsScreen } from './ExceptionsEscalationsScreen';
+import { AuditSupportSlaScreen } from './AuditSupportSlaScreen';
+import styles from '../shared/control-panel-surface.module.css';
 
 export type ControlPanelDshOperationsScreenProps = {
   group?: CanonicalOperationsGroupId;
@@ -32,26 +38,18 @@ export type ControlPanelDshOperationsScreenProps = {
   fallbackHref?: string;
 };
 
-const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{ hubHref: string }>> = {
+const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   'command-center': CommandCenterScreen,
   'live-orders': LiveOrdersScreen,
   'dispatch-assignment': DispatchAssignmentScreen,
+  'geo-heatmap': GeoHeatmapScreen,
   sheinproxy: ControlPanelDshSheinProxyScreen,
-  'proxy-shein-awnak': AwnakScreen,
+  'awnak-operations': AwnakScreen,
   'captain-operations': CaptainOperationsScreen,
   'partner-stores': PartnerStoresScreen,
   'area-capacity': AreaCapacityScreen,
   'exceptions-escalations': ExceptionsEscalationsScreen,
   'audit-support-sla': AuditSupportSlaScreen,
-};
-
-const METRIC_ARABIC: Record<string, string> = {
-  'Open orders': 'الطلبات المفتوحة',
-  'Dispatch risk': 'خطر الإسناد',
-  'Captain cover': 'تغطية الكباتن',
-  'Escalations': 'الاستثناءات',
-  'Area capacity': 'ضغط المناطق',
-  'SLA risk': 'SLA risk',
 };
 
 export function ControlPanelDshOperationsScreen({
@@ -63,6 +61,7 @@ export function ControlPanelDshOperationsScreen({
 }: ControlPanelDshOperationsScreenProps) {
   const router = useRouter();
   const [activeGroup, setActiveGroup] = React.useState<CanonicalOperationsGroupId>(group);
+  const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
     setActiveGroup(group);
@@ -74,58 +73,86 @@ export function ControlPanelDshOperationsScreen({
 
   if (state !== 'ready') {
     return (
-      <div style={{ padding: 24 }} dir="rtl">
+      <div className={styles.surfaceStatePadding}>
         <StateView {...resolveOperationsStateCopy(state)} onActionPress={() => router.push(fallbackHref)} />
       </div>
     );
   }
 
+  const kpiItems = OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
+    label: metric.title,
+    value: String(metric.value),
+  }));
+
+  const tabItems = OPERATIONS_CANONICAL_GROUPS.map((item) => ({
+    id: item.id,
+    label: item.label,
+    active: item.id === activeGroup,
+  }));
+
+  const subTabItems = activeGroupMeta.subGroups?.map((sub) => ({
+    id: sub.id,
+    label: sub.label,
+    active: (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id,
+  }));
+
   return (
-    <div className={styles.operationsCockpit} dir="rtl">
-      {/* 1. Header Area */}
-      <header className={styles.operationsTopBar}>
-        <div className={styles.operationsTitleBlock}>
-          <h1>عمليات DSH</h1>
-          <p>مراقبة وتنفيذ الطلبات الحية</p>
+    <div className={styles.surfaceCockpit}>
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div className={styles.surfaceHeaderGlyph}>
+              <div className={styles.surfaceHeaderGlyphMinus} />
+            </div>
+          </div>
+          <Box gap={0}>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>عمليات DSH</h1>
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
+                <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
+              </Box>
+            </div>
+            <p className={styles.surfaceHeaderSubtitle}>مراقبة وتنفيذ الطلبات الحية</p>
+          </Box>
         </div>
 
-        <div className={styles.operationsHeaderActions}>
-          <div className={styles.operationsPulseCompact}>
-            {OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => (
-              <div key={metric.id} className={styles.operationsPulseItem}>
-                <span>{METRIC_ARABIC[metric.title] || metric.title}</span>
-                <span>{metric.value}</span>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
+            {kpiItems.map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={styles.commandKpiValue}>{m.value}</span>
               </div>
             ))}
           </div>
-
-
         </div>
       </header>
 
-      {/* 2. Operations Tabs */}
-      <nav className={styles.operationsTabs}>
-        {OPERATIONS_CANONICAL_GROUPS.map((item) => {
-          const isSelected = item.id === activeGroup;
-          return (
-            <button
-              key={item.id}
-              className={`${styles.operationsTab} ${isSelected ? styles.operationsTabActive : ''}`}
-              onClick={() => {
-                setActiveGroup(item.id);
-                router.push(buildOperationsHref(item.id, { orderId, panel }));
-              }}
-            >
-              {item.label}
-            </button>
-          );
-        })}
+      <nav className={styles.navigationDock}>
+        <WebControlPanelLaneTabs
+          items={tabItems}
+          onSelect={(id) => {
+            const groupId = id as CanonicalOperationsGroupId;
+            setActiveGroup(groupId);
+            setActiveSubGroup(undefined);
+            router.push(buildOperationsHref(groupId, { orderId, panel }));
+          }}
+        />
       </nav>
 
-      {/* 3. Main Active Area (No side rail) */}
-      <main className={styles.operationsMainPanel}>
-        <div className={styles.operationsInnerScroll}>
-          <ActiveScreen hubHref={hubHref} />
+      <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
+        {subTabItems && subTabItems.length > 0 && (
+          <WebControlPanelSubTabs
+            items={subTabItems}
+            ariaLabel="تصفية فرعية"
+            onSelect={(id) => setActiveSubGroup(id)}
+          />
+        )}
+      </div>
+
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
+          <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
         </div>
       </main>
     </div>
@@ -137,4 +164,3 @@ export function DshOperationsHubSurface(props: ControlPanelDshOperationsScreenPr
 }
 
 export default ControlPanelDshOperationsScreen;
-

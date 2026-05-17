@@ -1,6 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 import { Animated, FlatList, Pressable, StyleSheet, View, useWindowDimensions, type ImageSourcePropType, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, resolveRowDirection, spacing } from '../foundation';
+import { colorPalette, neutralPalette, radius, resolveRowDirection, spacing, withAlpha } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Text } from '../primitives';
 
@@ -27,7 +27,9 @@ export type BannerCarouselProps = {
   itemWidth?: number;
   itemGap?: number;
   autoPlayInterval?: number;
+  autoPlayDirection?: 'forward' | 'backward';
   resumeAfterMs?: number;
+  onIndexChange?: (index: number) => void;
   onBannerPress?: (item: BannerCarouselItem) => void;
   style?: StyleProp<ViewStyle>;
 };
@@ -41,19 +43,23 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function BannerCarousel({
-  banners,
-  variant = 'main',
-  width: widthProp,
-  height = 172,
-  fullBleed = false,
-  itemWidth,
-  itemGap,
-  autoPlayInterval = DEFAULT_AUTO_PLAY_INTERVAL_MS,
-  resumeAfterMs = DEFAULT_RESUME_AFTER_MS,
-  onBannerPress,
-  style,
-}: BannerCarouselProps) {
+export function BannerCarousel(props: BannerCarouselProps) {
+  const {
+    banners,
+    variant = 'main',
+    width: widthProp,
+    height = 172,
+    fullBleed = false,
+    itemWidth,
+    itemGap,
+    autoPlayInterval,
+    autoPlayDirection = 'forward',
+    resumeAfterMs,
+    onIndexChange,
+    onBannerPress,
+    style,
+  } = props;
+
   const { direction } = useDirection();
   const { theme } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
@@ -62,35 +68,83 @@ export function BannerCarousel({
   const isCompactSecondary = isSecondary && height <= 104;
   const isPeekSecondary = isSecondary && !fullBleed;
 
-  const resolvedWidth = widthProp ?? measuredWidth ?? windowWidth;
-  const isRtl = direction === 'rtl';
-  const count = banners.length;
-  const loopedBanners = React.useMemo(
-    () => (count > 1 ? [banners[count - 1], ...banners, banners[0]] : banners),
-    [banners, count],
-  );
-  const loopedCount = loopedBanners.length;
-
-  const listRef = React.useRef<FlatList<BannerCarouselItem>>(null);
   const scrollX = React.useRef(new Animated.Value(0)).current;
+  const flatListRef = React.useRef<FlatList>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const activeIndexRef = React.useRef(count > 1 ? 1 : 0);
-  const autoplayTimerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isInteracting, setIsInteracting] = React.useState(false);
+  const interactionTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const resolvedWidth = widthProp ?? measuredWidth ?? windowWidth;
+  const count = banners?.length ?? 0;
 
   const defaultSecondaryInset = isPeekSecondary ? CARD_INSET : 0;
   const defaultSecondaryGap = isPeekSecondary ? ITEM_GAP : 0;
-  const resolvedItemWidth = itemWidth ?? Math.max(0, resolvedWidth - defaultSecondaryInset);
-  const resolvedItemGap = itemGap ?? defaultSecondaryGap;
-  const snapInterval = resolvedItemWidth + resolvedItemGap;
+
+  // Explicitly resolve layout tokens
+  const finalItemGap = (typeof itemGap === 'number') ? itemGap : defaultSecondaryGap;
+  const finalItemWidth = (typeof itemWidth === 'number') ? itemWidth : Math.max(0, resolvedWidth - defaultSecondaryInset);
+  const snapInterval = finalItemWidth + finalItemGap;
+
   const horizontalPadding = isSecondary ? Math.max(0, resolvedWidth / 2 - snapInterval / 2) : 0;
   const decelerationRate = isSecondary ? 'normal' : 'fast';
   const snapAlignment = isSecondary ? 'center' : 'start';
   const styles = React.useMemo(() => createStyles(theme, isCompactSecondary), [theme, isCompactSecondary]);
-  const snapOffsets = React.useMemo(
-    () => Array.from({ length: loopedCount }, (_, index) => index * snapInterval),
-    [loopedCount, snapInterval],
-  );
+
+  // Programmatic scroll: use scrollToOffset (not scrollToIndex) to avoid
+  // dispatchCommand on an uncommitted Fabric native node ("property is not writable").
+  // requestAnimationFrame defers until after the render commit, making it safe.
+  React.useEffect(() => {
+    if (count <= 1 || isInteracting) {
+      return undefined;
+    }
+
+    const rafId = requestAnimationFrame(() => {
+      const list = flatListRef.current;
+      if (!list) return;
+      try {
+        list.scrollToOffset({
+          offset: activeIndex * snapInterval,
+          animated: true,
+        });
+      } catch (_err) {
+        // Ignore — component may have unmounted between raf and execution
+      }
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [activeIndex, isInteracting, count, snapInterval]);
+
+  // --- Autoplay Timer ---
+  React.useEffect(() => {
+    if (count <= 1 || !autoPlayInterval || isInteracting) {
+      return undefined;
+    }
+
+    const intervalId = setInterval(() => {
+      const step = autoPlayDirection === 'backward' ? -1 : 1;
+      const nextIndex = (activeIndex + step + count) % count;
+      setActiveIndex(nextIndex);
+      if (onIndexChange) onIndexChange(nextIndex);
+    }, autoPlayInterval);
+
+    return () => clearInterval(intervalId);
+  }, [count, autoPlayInterval, isInteracting, activeIndex, onIndexChange]);
+
+  const onScrollBeginDrag = React.useCallback(() => {
+    setIsInteracting(true);
+    if (interactionTimerRef.current) {
+      clearTimeout(interactionTimerRef.current);
+    }
+  }, []);
+
+  const onScrollEndDrag = React.useCallback(() => {
+    if (interactionTimerRef.current) {
+      clearTimeout(interactionTimerRef.current);
+    }
+    interactionTimerRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, resumeAfterMs ?? DEFAULT_RESUME_AFTER_MS);
+  }, [resumeAfterMs]);
 
   const toRealIndex = React.useCallback(
     (loopedIndex: number) => {
@@ -98,143 +152,30 @@ export function BannerCarousel({
         return 0;
       }
 
-      if (loopedIndex <= 0) {
-        return count - 1;
-      }
-
-      if (loopedIndex >= loopedCount - 1) {
-        return 0;
-      }
-
-      return loopedIndex - 1;
+      return clamp(loopedIndex, 0, count - 1);
     },
-    [count, loopedCount],
+    [count],
   );
-
-  const jumpToLoopedIndex = React.useCallback(
-    (nextLoopedIndex: number) => {
-      const offset = nextLoopedIndex * snapInterval;
-      activeIndexRef.current = nextLoopedIndex;
-      listRef.current?.scrollToOffset({ offset, animated: false });
-    },
-    [snapInterval],
-  );
-
-  const clearResumeTimer = React.useCallback(() => {
-    if (resumeTimerRef.current) {
-      clearTimeout(resumeTimerRef.current);
-      resumeTimerRef.current = null;
-    }
-  }, []);
-
-  const stopAutoplay = React.useCallback(() => {
-    if (autoplayTimerRef.current) {
-      clearInterval(autoplayTimerRef.current);
-      autoplayTimerRef.current = null;
-    }
-  }, []);
-
-  const startAutoplay = React.useCallback(() => {
-    stopAutoplay();
-
-    if (count <= 1 || autoPlayInterval <= 0) {
-      return;
-    }
-
-    autoplayTimerRef.current = setInterval(() => {
-      const current = activeIndexRef.current;
-      const next = isRtl
-        ? (current - 1 + loopedCount) % loopedCount
-        : (current + 1) % loopedCount;
-
-      activeIndexRef.current = next;
-      setActiveIndex(toRealIndex(next));
-
-      const offset = snapOffsets[next] ?? next * snapInterval;
-      listRef.current?.scrollToOffset({ offset, animated: true });
-    }, autoPlayInterval);
-  }, [autoPlayInterval, count, isRtl, loopedCount, snapInterval, snapOffsets, stopAutoplay, toRealIndex]);
-
-  React.useEffect(() => {
-    startAutoplay();
-
-    return () => {
-      stopAutoplay();
-      clearResumeTimer();
-    };
-  }, [clearResumeTimer, startAutoplay, stopAutoplay]);
-
-  React.useEffect(() => {
-    if (resolvedWidth <= 0) {
-      return;
-    }
-
-    const current = activeIndexRef.current;
-    const offset = snapOffsets[current] ?? current * snapInterval;
-    listRef.current?.scrollToOffset({ offset, animated: false });
-  }, [resolvedWidth, snapOffsets, snapInterval]);
-
-  const pauseAutoplay = React.useCallback(() => {
-    stopAutoplay();
-    clearResumeTimer();
-
-    if (count <= 1 || autoPlayInterval <= 0) {
-      return;
-    }
-
-    resumeTimerRef.current = setTimeout(() => {
-      startAutoplay();
-    }, resumeAfterMs);
-  }, [autoPlayInterval, clearResumeTimer, count, resumeAfterMs, startAutoplay, stopAutoplay]);
 
   const computeIndex = React.useCallback(
-    (offsetX: number) => clamp(Math.round(offsetX / snapInterval), 0, Math.max(0, loopedCount - 1)),
-    [loopedCount, snapInterval],
+    (offsetX: number) => clamp(Math.round(offsetX / snapInterval), 0, Math.max(0, count - 1)),
+    [count, snapInterval],
   );
 
   const onMomentumScrollEnd = React.useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const next = computeIndex(event.nativeEvent.contentOffset.x);
-
-      if (count > 1) {
-        if (next <= 0) {
-          jumpToLoopedIndex(loopedCount - 2);
-          setActiveIndex(count - 1);
-          clearResumeTimer();
-
-          if (autoPlayInterval > 0) {
-            startAutoplay();
-          }
-
-          return;
-        }
-
-        if (next >= loopedCount - 1) {
-          jumpToLoopedIndex(1);
-          setActiveIndex(0);
-          clearResumeTimer();
-
-          if (autoPlayInterval > 0) {
-            startAutoplay();
-          }
-
-          return;
-        }
-      }
-
-      activeIndexRef.current = next;
-      setActiveIndex(toRealIndex(next));
-      clearResumeTimer();
-
-      if (count > 1 && autoPlayInterval > 0) {
-        startAutoplay();
-      }
+      const realIndex = toRealIndex(next);
+      setActiveIndex(realIndex);
+      onIndexChange?.(realIndex);
     },
-    [autoPlayInterval, clearResumeTimer, computeIndex, count, jumpToLoopedIndex, loopedCount, startAutoplay, toRealIndex],
+    [computeIndex, toRealIndex],
   );
 
-  const onScroll = React.useMemo(
-    () => Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true }),
+  const onScroll = React.useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      scrollX.setValue(event.nativeEvent.contentOffset.x);
+    },
     [scrollX],
   );
 
@@ -311,19 +252,18 @@ export function BannerCarousel({
       return (
         <View style={[styles.itemWrap, { width: snapInterval, height }]}>
           <Pressable
-            style={{ width: resolvedItemWidth, height }}
+            style={{ width: finalItemWidth, height }}
             onPress={() => {
               item.onPress?.();
               onBannerPress?.(item);
             }}
-            onTouchStart={pauseAutoplay}
           >
             <Animated.View
               style={[
                 styles.card,
                 isSecondary ? styles.cardSecondary : styles.cardMain,
                 {
-                  width: resolvedItemWidth,
+                  width: finalItemWidth,
                   height,
                   backgroundColor: cardBackground,
                 },
@@ -420,7 +360,7 @@ export function BannerCarousel({
         </View>
       );
     },
-    [height, onBannerPress, pauseAutoplay, resolvedItemWidth, scrollX, snapInterval, styles, theme],
+    [height, onBannerPress, finalItemWidth, scrollX, snapInterval, styles, theme],
   );
 
   const handleLayout = React.useCallback(
@@ -441,10 +381,10 @@ export function BannerCarousel({
 
   return (
     <View onLayout={handleLayout} style={[styles.root, { width: widthProp ?? '100%', height: height + (isSecondary ? (isCompactSecondary ? spacing[2] : spacing[4]) : 0) }, style]}>
-      <Animated.FlatList
-        ref={listRef}
+      <FlatList
+        ref={flatListRef}
         horizontal
-        data={loopedBanners}
+        data={banners}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         showsHorizontalScrollIndicator={false}
@@ -458,7 +398,7 @@ export function BannerCarousel({
           paddingVertical: isSecondary ? (isCompactSecondary ? spacing[0] : spacing[1]) : 0,
           flexDirection: 'row',
         }}
-        initialScrollIndex={count > 1 ? 1 : 0}
+        initialScrollIndex={0}
         getItemLayout={(_: unknown, index: number) => ({
           length: snapInterval,
           offset: index * snapInterval,
@@ -467,9 +407,8 @@ export function BannerCarousel({
         onScroll={onScroll}
         scrollEventThrottle={16}
         onMomentumScrollEnd={onMomentumScrollEnd}
-        onScrollBeginDrag={pauseAutoplay}
-        onTouchStart={pauseAutoplay}
-        onTouchEnd={pauseAutoplay}
+        onScrollBeginDrag={onScrollBeginDrag}
+        onScrollEndDrag={onScrollEndDrag}
       />
 
       {count > 1 ? (
@@ -523,7 +462,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       borderRadius: 28,
       overflow: 'hidden',
       backgroundColor: theme.surface,
-      shadowColor: '#000000',
+      shadowColor: colorPalette.black,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.1,
       shadowRadius: 24,
@@ -571,17 +510,17 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       padding: secondaryOverlayPadding,
       justifyContent: 'space-between',
       alignItems: 'stretch',
-      backgroundColor: 'rgba(2,6,23,0.22)',
+      backgroundColor: withAlpha(colorPalette.black, 0.22),
     },
     fallbackTitle: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 18 : 25,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 22 : 30,
       textAlign: 'center',
     },
     fallbackSubtitle: {
-      color: 'rgba(255,255,255,0.96)',
+      color: withAlpha(colorPalette.white, 0.96),
       fontSize: isCompactSecondary ? 11 : 15,
       fontWeight: '600',
       lineHeight: isCompactSecondary ? 14 : 19,
@@ -591,7 +530,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'center',
       padding: isCompactSecondary ? 14 : 22,
-      backgroundColor: 'rgba(2,6,23,0.22)',
+      backgroundColor: withAlpha(colorPalette.black, 0.22),
       gap: isCompactSecondary ? 4 : 6,
       alignItems: 'center',
     },
@@ -599,7 +538,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'space-between',
       padding: secondaryOverlayPadding,
-      backgroundColor: 'rgba(2,6,23,0.26)',
+      backgroundColor: withAlpha(colorPalette.black, 0.26),
       gap: secondaryOverlayGap,
     },
     secondaryTopRow: {
@@ -614,28 +553,28 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       paddingHorizontal: 4,
     },
     overlayTitle: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 18 : 23,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 22 : 28,
       textAlign: 'center',
     },
     overlaySubtitle: {
-      color: 'rgba(255,255,255,0.96)',
+      color: withAlpha(colorPalette.white, 0.96),
       fontSize: isCompactSecondary ? 11 : 14,
       fontWeight: '600',
       lineHeight: isCompactSecondary ? 14 : 18,
       textAlign: 'center',
     },
     secondaryOverlayTitle: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 15 : 20,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 18 : 24,
       textAlign: 'center',
     },
     secondaryOverlaySubtitle: {
-      color: 'rgba(255,255,255,0.92)',
+      color: withAlpha(colorPalette.white, 0.92),
       fontSize: isCompactSecondary ? 11 : 13,
       fontWeight: '600',
       lineHeight: isCompactSecondary ? 14 : 17,
@@ -643,15 +582,15 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
     },
     secondaryBadgePill: {
       alignSelf: 'flex-start',
-      backgroundColor: 'rgba(255,255,255,0.92)',
+      backgroundColor: withAlpha(colorPalette.white, 0.92),
       borderRadius: radius.pill,
       paddingHorizontal: secondaryBadgePaddingHorizontal,
       paddingVertical: secondaryBadgePaddingVertical,
       borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.24)',
+      borderColor: withAlpha(colorPalette.white, 0.24),
     },
     secondaryBadgeText: {
-      color: '#0f172a',
+      color: neutralPalette[900],
       fontSize: isCompactSecondary ? 10 : 11,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 12 : 14,
@@ -663,7 +602,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSeco
       paddingVertical: secondaryCtaPaddingVertical,
     },
     secondaryCtaText: {
-      color: '#ffffff',
+      color: colorPalette.white,
       fontSize: isCompactSecondary ? 10 : 11,
       fontWeight: '800',
       lineHeight: isCompactSecondary ? 12 : 14,

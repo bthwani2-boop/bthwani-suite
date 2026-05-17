@@ -1,26 +1,55 @@
 # BThwani Executable Guards
 
-`tools/guards/` يحتوي حراس تنفيذية فقط.
+`tools/guards/` يحتوي تحققًا تنفيذيًا فقط.
 
-المرجع النصي السيادي للسياسات يبقى داخل:
+## authority split
 
-```text
-governance/
-```
+- `governance/` هو owner policy.
+- `.agents/` هو owner تشغيل الوكلاء والتعليمات التشغيلية.
+- `tools/guards/` يتحقق فقط. لا يكتب policy جديدًا.
+- `guard-manifest.json` هو الفهرس التنفيذي الرسمي لكل guard فعّال.
 
-كل حارس هنا يجب أن يصرّح بملف governance الذي يستند إليه داخل `guard-manifest.json`.
+## active runners
 
-## تشغيل كل الحراس
+تشغيل حراس governance:
 
 ```powershell
 Set-Location -LiteralPath "C:\bthwani-suite"
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\guards\RUN_GOVERNANCE_GUARDS.ps1"
 ```
 
-## القرارات
+تشغيل حراس agent authority:
 
-- `PASS`: لا توجد مخالفات مؤكدة.
-- `WARN`: توجد مخاطر أو نواقص تحتاج مراجعة.
-- `FAIL`: توجد مخالفة مؤكدة يجب إصلاحها.
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\guards\RUN_AGENT_GUARDS.ps1"
+```
 
-كل تشغيل يكتب evidence داخل `tools/registry/runs/...` وينتج `_HANDOFF.zip`.
+## active index
+
+- `guard-manifest.json` يسجل guard file وowner policy وrunner scope ودرجة الحظر.
+- `GUARDS_CATALOG.md` دليل قراءة فقط مشتق من الحراس الفعلية.
+- `RUN_GOVERNANCE_GUARDS.ps1` و`RUN_AGENT_GUARDS.ps1` لا يستنتجان guard جديدة خارج الـ manifest.
+
+## guard rules
+
+- لا `npx`.
+- لا `_HANDOFF.zip`.
+- لا مسارات active قديمة مثل `apps/` أو `packages/` داخل الحراس الفعالة.
+- لا references فعالة إلى `.github/skills` أو `.github/agents` أو `.opencode/skills`.
+- لا guard بلا manifest entry.
+- لا config orphan إذا كان guard يحتاج config.
+
+## outputs
+
+كل runner يكتب evidence تحت:
+
+```text
+tools/registry/runs/{SESSION_ID}/
+```
+
+وينتج ZIP باسم:
+
+```text
+{SESSION_ID}.zip
+```

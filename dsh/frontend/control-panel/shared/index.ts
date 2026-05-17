@@ -1,4 +1,23 @@
-export * from './dshCrossSurfaceClosureMap';
-export * from './ControlPanelDshDecisionBoard';
-export * from './ControlPanelDshActionQueue';
-export * from './ControlPanelDshWorkspaceFrame';
+export {
+	DSH_CROSS_SURFACE_CLOSURE_MAP,
+	getDshClosureItemsByStatus,
+	getDshClosureItemsBySurface,
+	resolveDshSurfaceId,
+	translateDshRuntimeBindingStatus,
+	type DshActor,
+	type DshClosureArea,
+	type DshClosureStatus,
+	type DshCounterpartLink,
+	type DshCrossSurfaceClosureItem,
+	type DshCrossSurfaceSignal,
+	type DshLegacySurfaceId,
+	type DshLifecycleStep,
+	type DshRuntimeBindingStatus,
+	type DshSurfaceId,
+	type DshSurfaceLookupId,
+} from '../../shared/dshCrossSurfaceClosureMap';
+export { ControlPanelDshDecisionBoard, type ControlPanelDshDecisionBoardProps } from './ControlPanelDshDecisionBoard';
+export { ControlPanelDshActionQueue, type ControlPanelDshActionQueueItem, type ControlPanelDshActionQueueProps } from './ControlPanelDshActionQueue';
+export { ControlPanelDshWorkspaceFrame, type ControlPanelDshWorkspaceFrameProps } from './ControlPanelDshWorkspaceFrame';
+export { getDshRecommendationConfidenceLabel, getDshRecommendationSeverityLabel, type DshRecommendationConfidence, type DshRecommendationSeverity, type DshUnifiedRecommendation } from './recommendation.preview-data';
+export { DSH_CROSS_SURFACE_JOURNEYS } from './journeyFixtures';

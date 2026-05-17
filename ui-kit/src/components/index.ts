@@ -1,7 +1,7 @@
 export { Badge, Button, Chip } from './button';
 export type { BadgeProps, ButtonProps, ButtonTone, ChipProps } from './button';
-export { CartSummary } from './display/CartSummary';
-export type { CartSummaryProps } from './display/CartSummary';
+export { AppearanceOptionCard, GlassActionButton, GlassCard, GlassChip, GlassHeroOverlay } from './appearance';
+export type { AppearanceOptionCardProps, GlassActionButtonProps, GlassCardProps, GlassChipProps, GlassHeroOverlayProps } from './appearance';
 export { AttachmentPicker, Card, DashboardShell, DetailScreenShell, ProductCard, ServiceHubShell, ServiceTileCard, StatCard } from './card';
 export type { AttachmentPickerItem, AttachmentPickerProps, AttachmentPickerTone, CardProps, DashboardShellProps, DetailScreenShellProps, ProductCardPrice, ProductCardProps, ServiceHubSection, ServiceHubShellProps, ServiceTileCardProps, StatCardProps } from './card';
 export { StoreCardPremium } from './store-card';
@@ -30,3 +30,10 @@ export { MobileWorkspaceHeader, NewsTickerBar, ScreenHeader, SearchTopBar, Secti
 export type { MobileWorkspaceHeaderProps, NewsTickerBarProps, ScreenHeaderProps, SearchTopBarProps, SectionHeaderProps, TabItem, TabsProps, TopBarAction, TopBarProps, TopBarVariant } from './header';
 export { IconButton } from './icon-button';
 export type { IconButtonProps } from './icon-button';
+export { ModernPremiumHeader, BottomNavBar } from './navigation';
+export type { ModernPremiumHeaderProps, NavItem, BottomNavBarProps } from './navigation';
+export { DateTimePicker } from './date-time-picker';
+export type { DateTimePickerProps } from './date-time-picker';
+
+export { CartConfirmationBlock } from './cart-confirmation-block';
+export type { CartConfirmationBlockProps } from './cart-confirmation-block';

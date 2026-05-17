@@ -1,36 +1,172 @@
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
-import { WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, getDshClosureItemsByStatus } from '../shared';
+import { Box, Text, useTheme } from '@bthwani/ui-kit';
+import { WebControlPanelSubTabs, WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame, getDshClosureItemsByStatus } from '../shared';
+import styles from '../shared/control-panel-surface.module.css';
 
 type GuardFilter = 'pass' | 'warn' | 'blocked';
+
+export function ControlPanelDshControlHubScreen() {
+  const { theme } = useTheme();
+  const [activeTab, setActiveTab] = React.useState<string>('governance');
+  const [activeSubTab, setActiveSubTab] = React.useState<string>('all');
+
+  const PRIMARY_TABS = [
+    { id: 'governance', label: 'تدقيق الحوكمة' },
+    { id: 'guards', label: 'حالة الحماية' },
+    { id: 'audit', label: 'سجل العمليات' },
+    { id: 'security', label: 'الأمن والوصول' },
+  ];
+
+  const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+    governance: [
+      { id: 'all', label: 'الكل' },
+      { id: 'pending', label: 'بانتظار التدقيق' },
+      { id: 'approved', label: 'معتمد' },
+    ],
+    guards: [
+      { id: 'pass', label: 'مكتمل' },
+      { id: 'warn', label: 'تنبيه' },
+      { id: 'blocked', label: 'محجوب' },
+    ],
+  };
+
+  React.useEffect(() => {
+    if (SECONDARY_TABS[activeTab]?.length > 0) {
+      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
+    } else {
+      setActiveSubTab('');
+    }
+  }, [activeTab]);
+
+  const renderContent = () => {
+    if (activeTab === 'governance') {
+      return <ControlPanelDshGovernanceEvidenceScreen />;
+    }
+    if (activeTab === 'guards') {
+      return <ControlPanelDshGuardStatusScreen />;
+    }
+    return (
+      <Box gap={2}>
+        <WebControlPanelRecommendation
+          title="لوحة الحماية"
+          reason={`التبويب الحالي: ${activeTab} · التصفية: ${activeSubTab} · افتح الأدلة أو الحواجز للمتابعة.`}
+          confidence="medium"
+          auditTag="حماية DSH"
+          primaryAction={{ id: 'open-evidence', label: 'فتح الدليل', onAction: () => setActiveTab('evidence') }}
+          secondaryAction={{ id: 'open-guards', label: 'حالة الحواجز', onAction: () => setActiveTab('guards') }}
+        />
+        <Text role="bodySm" tone="muted">يعرض هذا التبويب مسار الحماية الحالي بشكل تنفيذي وليس كلوحة قراءة فقط.</Text>
+      </Box>
+    );
+  };
+
+  return (
+    <div className={styles.surfaceCockpit}>
+      {/* 1. Header Area - Control Command Deck */}
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div className={styles.surfaceHeaderGlyph}>
+              <span className={styles.surfaceHeaderGlyphLabel}>ح</span>
+            </div>
+          </div>
+          <Box gap={0}>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>حوكمة DSH</h1>
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
+                <Text role="caption" className={styles.surfaceHeaderBadgeText}>مستوى الأمان: عالٍ</Text>
+              </Box>
+            </div>
+            <p className={styles.surfaceHeaderSubtitle}>إدارة معايير الحماية، الحوكمة، وسجلات التدقيق المركزية</p>
+          </Box>
+        </div>
+
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
+            {[
+              { label: 'حواجز مفعلة', value: '١٢' },
+              { label: 'تنبيهات أمنية', value: '٠', tone: 'success' },
+              { label: 'سجلات اليوم', value: '١,٤٠٠' }
+            ].map((m) => (
+              <div key={m.label} className={styles.commandKpi}>
+                <span className={styles.commandKpiLabel}>{m.label}</span>
+                <span className={m.tone === 'success' ? `${styles.commandKpiValue} ${styles.commandKpiValueSuccess}` : styles.commandKpiValue}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* 2. Primary Tabs */}
+      <nav className={styles.navigationDock}>
+        {PRIMARY_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={`${styles.surfaceTab} ${tab.id === activeTab ? styles.surfaceTabActive : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* 3. Secondary Tabs */}
+      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
+        <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
+          {SECONDARY_TABS[activeTab].map((sub) => (
+            <button
+              key={sub.id}
+              onClick={() => setActiveSubTab(sub.id)}
+              className={styles.surfaceTab}
+              style={{
+                backgroundColor: sub.id === activeSubTab ? theme.brandSurface : 'transparent',
+                color: sub.id === activeSubTab ? theme.brand : theme.textMuted,
+                borderColor: sub.id === activeSubTab ? theme.lineStrong : 'transparent',
+              }}
+            >
+              {sub.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 4. Main Panel */}
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
+          {renderContent()}
+        </div>
+      </main>
+    </div>
+  );
+}
 
 export function ControlPanelDshGovernanceEvidenceScreen() {
   return (
     <ControlPanelDshWorkspaceFrame
-      eyebrow="Governance evidence"
-      title="DSH evidence matrix"
-      description="A compact evidence matrix for closure state, surface coverage, and guard results."
+      eyebrow="أدلة الحوكمة"
+      title="مصفوفة أدلة DSH"
+      description="مصفوفة مضغوطة لحالة الإغلاق، تغطية الأسطح، ونتائج الحواجز."
       badges={['governance', 'evidence']}
-      metaItems={['closure state', 'surface coverage', 'guard results']}
+      metaItems={['حالة الإغلاق', 'تغطية الأسطح', 'نتائج الحواجز']}
       decisionBoard={{
-        title: 'Evidence closure board',
-        purpose: 'Keep proof gaps visible before a surface is called closed.',
-        primaryDecision: 'Close the evidence gap or leave the surface blocked.',
-        nextAction: 'Open guard status and capture the missing proof.',
-        blockers: 'Missing evidence and UI-flow cleanup still remain.',
+        title: 'لوحة قرار الأدلة',
+        purpose: 'إبقاء فجوات الأدلة مرئية قبل اعتبار السطح مغلقاً.',
+        primaryDecision: 'أغلق فجوة الأدلة أو ابقِ السطح محجوباً.',
+        nextAction: 'افتح حالة الحواجز واستكمل الدليل الناقص.',
+        blockers: 'الأدلة الناقصة ومسارات واجهة المستخدم لا تزال قائمة.',
         ownerSurface: 'control',
-        evidenceHint: 'closure items, guard results, and route proof',
+        evidenceHint: 'عناصر الإغلاق، نتائج الحواجز، وأدلة المسار',
         routeHint: '/operations?workspace=guard-status',
         decisionTone: 'danger',
       }}
-      primaryAction={{ label: 'Open guard status', href: '/operations?workspace=guard-status' }}
-      secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
+      primaryAction={{ label: 'فتح حالة الحواجز', href: '/operations?workspace=guard-status' }}
+      secondaryAction={{ label: 'فتح لوحة المراقبة', href: '/operations?workspace=dashboard' }}
       signals={[
-        { id: 'closed', title: 'Closed', value: String(getDshClosureItemsByStatus('closed').length), description: 'Closed items are already proven.', tone: 'best' },
-        { id: 'needs-evidence', title: 'Needs evidence', value: String(getDshClosureItemsByStatus('needs-evidence').length), description: 'Items waiting for evidence proof.', tone: 'warning' },
-        { id: 'needs-ui-flow', title: 'Needs UI flow', value: String(getDshClosureItemsByStatus('needs-ui-flow').length), description: 'Items needing flow cleanup.', tone: 'warning' },
-        { id: 'blocked', title: 'Blocked', value: String(getDshClosureItemsByStatus('blocked').length), description: 'Items blocked outside closure scope.', tone: 'danger' },
+        { id: 'closed', title: 'مغلق', value: String(getDshClosureItemsByStatus('closed').length), description: 'العناصر المغلقة موثقة بالكامل.', tone: 'best' },
+        { id: 'needs-evidence', title: 'يحتاج دليل', value: String(getDshClosureItemsByStatus('needs-evidence').length), description: 'عناصر بانتظار إثبات الدليل.', tone: 'warning' },
+        { id: 'needs-ui-flow', title: 'يحتاج مسار واجهة', value: String(getDshClosureItemsByStatus('needs-ui-flow').length), description: 'عناصر تحتاج إصلاح مسار الواجهة.', tone: 'warning' },
+        { id: 'blocked', title: 'محجوب', value: String(getDshClosureItemsByStatus('blocked').length), description: 'عناصر محجوبة خارج نطاق الإغلاق الحالي.', tone: 'danger' },
       ]}
     />
   );
@@ -61,14 +197,14 @@ export function ControlPanelDshGuardStatusScreen() {
     return {
       id,
       title: `${item.surfaceId} / ${item.title}`,
-      status: item.status.toUpperCase(),
+      status: item.status === 'closed' ? 'مغلق' : item.status === 'blocked' ? 'محجوب' : item.status === 'needs-evidence' ? 'يحتاج دليل' : 'يحتاج مسار',
       ownerSurface: 'control',
       blocker: item.description,
-      evidence: reviewedIds.has(id) ? 'Reviewed locally' : 'Open evidence required',
-      primaryActionLabel: 'Mark reviewed locally',
-      secondaryActionLabel: 'Open blocker',
-      evidenceActionLabel: 'Open evidence',
-      tone: item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : 'warning',
+      evidence: reviewedIds.has(id) ? 'تمت المراجعة محلياً' : 'مطلوب دليل مفتوح',
+      primaryActionLabel: 'تأكيد المراجعة',
+      secondaryActionLabel: 'فتح العائق',
+      evidenceActionLabel: 'فتح الدليل',
+      tone: item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : item.status === 'needs-evidence' ? 'warning' : 'warning',
     } as const;
   });
 
@@ -77,44 +213,44 @@ export function ControlPanelDshGuardStatusScreen() {
   return (
     <Box gap={4}>
       <ControlPanelDshWorkspaceFrame
-        eyebrow="Guard status"
-        title="DSH guard status"
-        description="DSH-related guards only, with PASS/WARN/BLOCKED style summaries."
+        eyebrow="حالة الحواجز"
+        title="حالة حواجز DSH"
+        description="الحواجز المتعلقة بـ DSH فقط، مع ملخصات مكتمل / تنبيه / محجوب."
         badges={['guards']}
-        metaItems={['PASS', 'WARN', 'BLOCKED']}
+        metaItems={['مكتمل', 'تنبيه', 'محجوب']}
         decisionBoard={{
-          title: 'Guard decision board',
-          purpose: 'Expose guard verdicts with the reason and the next step.',
-          primaryDecision: 'Pass the surface, warn on review, or block it.',
-          nextAction: activeFilter === 'blocked' ? 'Open blocker and evidence' : 'Mark reviewed locally and reopen evidence if needed.',
-          blockers: 'Blocked items and proof gaps remain visible here.',
+          title: 'لوحة قرار الحواجز',
+          purpose: 'كشف قرارات الحواجز مع السبب والخطوة التالية.',
+          primaryDecision: 'اقبل السطح، أو حذّر عند المراجعة، أو احجبه.',
+          nextAction: activeFilter === 'blocked' ? 'افتح العائق والدليل' : 'أكد المراجعة محلياً وأعد فتح الدليل إذا لزم.',
+          blockers: 'العناصر المحجوبة وفجوات الإثبات لا تزال مرئية هنا.',
           ownerSurface: 'control',
-          evidenceHint: selectedQueueItem ? selectedQueueItem.evidence : 'guard verdicts and closure-map rows',
+          evidenceHint: selectedQueueItem ? selectedQueueItem.evidence : 'قرارات الحواجز وصفوف خريطة الإغلاق',
           routeHint: '/operations?workspace=evidence',
           decisionTone: activeFilter === 'blocked' ? 'danger' : activeFilter === 'pass' ? 'best' : 'warning',
         }}
-        primaryAction={{ label: 'Open evidence', href: '/operations?workspace=evidence' }}
-        secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
+        primaryAction={{ label: 'فتح الدليل', href: '/operations?workspace=evidence' }}
+        secondaryAction={{ label: 'فتح لوحة المراقبة', href: '/operations?workspace=dashboard' }}
         signals={[
-          { id: 'pass', title: 'PASS', value: String(grouped.closed.length), description: 'Closed items that already pass closure.', tone: 'best' },
-          { id: 'warn', title: 'WARN', value: String(grouped.needsEvidence.length + grouped.needsUiFlow.length), description: 'Items needing proof or UI cleanup.', tone: 'warning' },
-          { id: 'blocked', title: 'BLOCKED', value: String(grouped.blocked.length), description: 'Items blocked outside the current scope.', tone: 'danger' },
+          { id: 'pass', title: 'مكتمل', value: String(grouped.closed.length), description: 'العناصر المغلقة التي تجتاز الإغلاق.', tone: 'best' },
+          { id: 'warn', title: 'تنبيه', value: String(grouped.needsEvidence.length + grouped.needsUiFlow.length), description: 'عناصر تحتاج إثباتاً أو إصلاح واجهة.', tone: 'warning' },
+          { id: 'blocked', title: 'محجوب', value: String(grouped.blocked.length), description: 'عناصر محجوبة خارج النطاق الحالي.', tone: 'danger' },
         ]}
       />
 
-      <WebSectionCard title="Guard filters" description="Filter the closure map by verdict, then mark a row reviewed locally.">
-        <WebSegmentedTabs
-          ariaLabel="Guard filters"
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <WebControlPanelSubTabs
           items={[
-            { id: 'pass', label: 'PASS', metaLabel: String(grouped.closed.length), active: activeFilter === 'pass' },
-            { id: 'warn', label: 'WARN', metaLabel: String(grouped.needsEvidence.length + grouped.needsUiFlow.length), active: activeFilter === 'warn' },
-            { id: 'blocked', label: 'BLOCKED', metaLabel: String(grouped.blocked.length), active: activeFilter === 'blocked' },
+            { id: 'pass', label: `مكتمل (${grouped.closed.length})`, active: activeFilter === 'pass' },
+            { id: 'warn', label: `تنبيه (${grouped.needsEvidence.length + grouped.needsUiFlow.length})`, active: activeFilter === 'warn' },
+            { id: 'blocked', label: `محجوب (${grouped.blocked.length})`, active: activeFilter === 'blocked' },
           ]}
           onSelect={(itemId) => setActiveFilter(itemId as GuardFilter)}
+          ariaLabel="فلاتر الحواجز"
         />
         <ControlPanelDshActionQueue
-          title="Guard rows"
-          purpose="Review the selected verdict row, open the blocker, or open evidence."
+          title="صفوف الحواجز"
+          purpose="راجع صف القرار المحدد، افتح العائق، أو افتح الدليل."
           items={queueItems}
           selectedId={selectedItemId}
           onSelect={setSelectedItemId}
@@ -122,23 +258,9 @@ export function ControlPanelDshGuardStatusScreen() {
           secondaryAction={() => setActiveFilter('blocked')}
           evidenceAction={() => setActiveFilter('warn')}
         />
-        <Box gap={2}>
-          {DSH_CROSS_SURFACE_CLOSURE_MAP.slice(0, 3).map((item) => (
-            <WebSignalCard
-              key={`${item.surfaceId}-${item.area}`}
-              title={`${item.surfaceId} / ${item.title}`}
-              value={item.status.toUpperCase()}
-              description={item.description}
-              tone={item.status === 'closed' ? 'best' : item.status === 'blocked' ? 'danger' : 'warning'}
-            />
-          ))}
-        </Box>
-        <Text role="bodySm" tone="muted">
-          Guard summaries remain UI-only and do not touch backend state.
-        </Text>
-      </WebSectionCard>
+      </div>
     </Box>
   );
 }
 
-export default ControlPanelDshGovernanceEvidenceScreen;
+export default ControlPanelDshControlHubScreen;

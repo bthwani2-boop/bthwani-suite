@@ -2,35 +2,43 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Governance Control Plane`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** GOVERNANCE_CANONICAL, GOVERNANCE_CONTROL_PLANE_STANDARD, GOVERNANCE_CLOSURE_STANDARD
 
-## Non-negotiable reading law
+## Final split
 
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
+- `governance/` decides policy, scope, acceptance, and decision vocabulary.
+- `.agents/` owns operational agent instructions, skills, and adapters.
+- `tools/guards/` verifies governance programmatically and must not invent policy.
+- `tools/registry/runs/{SESSION_ID}/` stores evidence and historical review artifacts.
 
 ## Purpose
 
-This folder is the canonical governance control plane for BThwani. It defines how the monorepo, services, surfaces, applications, packages, UI system, API contracts, runtime verification, evidence, branches, checkpoints, agents, and cleanup must behave.
+This folder is the canonical governance control plane for BThwani. It defines what the repo is allowed to do and how acceptance is decided. It does not replace `.agents/` or `tools/guards/`.
 
 ## Canonical roots
 
 ```text
 C:\bthwani-suite
 governance/
+.agents/
+tools/guards/
 tools/registry/runs/{SESSION_ID}/
-packages/ui-kit
-packages/surfaces
-packages/app-shells
-api-types
-api-clients
-services/
-contracts/master/
-apps/mobile/*
-apps/web/*
+app-client/runtime
+app-partner/runtime
+app-captain/runtime
+app-field/runtime
+control-panel/runtime
+webapp/runtime
+website/runtime
+ui-kit/
+dsh/
+wlt/
+knz/
+arb/
+amn/
+esf/
+mrf/
+snd/
+kwd/
 ```
 
 ## Authority order
@@ -38,17 +46,14 @@ apps/web/*
 1. Safety and explicit user instruction.
 2. Repository evidence from the active branch.
 3. This governance folder.
-4. Project resources/SOPs.
-5. Legacy files as source material only.
-6. AI/Copilot summaries.
-
-Legacy files are **not** active policy after this package is applied. Legacy is evidence for extraction only and is accounted for in `99_LEGACY_MERGE_LEDGER.md`.
+4. `.agents/` operational guidance when execution behavior matters.
+5. Historical accounting in `99_LEGACY_MERGE_LEDGER.md` and evidence packs.
 
 ## BThwani fixed facts
 
 - Active local repo: `C:\bthwani-suite`.
 - Canonical remote: `bthwani2-boop/bthwani-suite`.
-- Canonical stack: Node.js, TypeScript, pnpm, Nx, React, React Native, Expo Dev Client, Next.js, NestJS.
+- Current frontend/tooling stack: Node.js, TypeScript, pnpm, Nx, React, React Native, Expo Dev Client, Next.js. Target backend stack: Go per `TECH_STACK_LOCK.md`; do not assume NestJS unless current repo evidence explicitly requires it.
 - Canonical architecture ladder: Screen / Surface / App → `@bthwani/ui-kit` public exports → Tamagui internally inside ui-kit only.
 - Canonical visual identity: `#0A2F5C` deepBlue, `#FF500D` orange, `#FFFFFF` white.
 - Canonical language contract: Arabic/RTL correctness is mandatory where Arabic UI exists.
@@ -71,12 +76,13 @@ Legacy files are **not** active policy after this package is applied. Legacy is 
 | Testing and production readiness | `12_TESTING_AND_PRODUCTION_READINESS.md` |
 | CI and gates | `13_CI_AND_GATES.md` |
 | Guards | `14_GUARDS_CATALOG.md` |
-| AI / agent execution | `15_AGENT_AND_AI_EXECUTION.md` |
+| Agent and AI execution boundaries | `15_AGENT_AND_AI_EXECUTION.md` |
 | Security and secrets | `16_SECURITY_AND_SECRETS.md` |
 | Cleanup and deprecation | `17_CLEANUP_AND_DEPRECATION.md` |
 | Branches and checkpoints | `18_BRANCH_AND_CHECKPOINTS.md` |
 | Control panel | `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
 | Mutable policy and providers | `20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md` |
+| Target tech stack lock | `TECH_STACK_LOCK.md` |
 | Runtime observability and production proof | `09_API_BINDING_RUNTIME.md` |
 | DSH golden slice | `22_DSH_GOLDEN_SLICE.md` |
 | Warnings and false positives | `23_WARNINGS_AND_FALSE_POSITIVES.md` |
@@ -87,12 +93,12 @@ Legacy files are **not** active policy after this package is applied. Legacy is 
 ## Root file types
 
 - Canonical authority files are `00`, `01`, `02`, `03`, `04`, `05`, `06`, `07`, `08`, `09`, `10`, `11`, `12`, `13`, `14`, `15`, `16`, `17`, `18`, `19`, `20`, `22`, `23`, `24`, and `99`.
-- `AGENT_CHANGE_LEDGER.md` and `AGENT_UPDATE_VALIDATION_CHECKLIST.md` are support files owned by `15_AGENT_AND_AI_EXECUTION.md`.
+- `TECH_STACK_LOCK.md` is an active governance decision file, not an implementation plan.
 - No separate authority file should recreate runtime observability or service blueprint law outside `09_API_BINDING_RUNTIME.md` and `10_SERVICE_CLOSURE.md`.
 
 ## Anti-drift law
 
-Do not create a parallel governance root in `docs/governance`, `kdt/volatile`, app folders, package folders, or `.github` documents. Implementation roots may contain generated evidence or guard source, but they must point back here.
+Do not create a parallel governance root in `docs/governance`, app folders, package folders, or tool-adapter docs. Implementation roots may contain generated evidence or guard source, but they must point back here.
 
 ## Change protocol
 
@@ -100,13 +106,13 @@ Do not create a parallel governance root in `docs/governance`, `kdt/volatile`, a
 2. FORENSICS: prove the exact problem or missing rule.
 3. APPLY: change the smallest owner file only.
 4. VERIFY: run diff check and governance verification.
-5. LEDGER: update `99_LEGACY_MERGE_LEDGER.md` if legacy coverage changed.
+5. LEDGER: update `99_LEGACY_MERGE_LEDGER.md` if historical accounting or owner coverage changed.
 6. EVIDENCE: save evidence pack under `tools/registry/runs/{SESSION_ID}/`.
 
 ## Closure checklist for this file
 
 - [ ] Every rule above has exactly one owner file.
-- [ ] Any derived script/guard points back to this file and not to legacy.
+- [ ] Any derived script/guard points back to this file or its owner file.
 - [ ] Evidence exists for any claim of compliance.
 - [ ] No local app/surface/package silently overrides this file.
 - [ ] Any exception is documented with owner, expiry, risk, and rollback.

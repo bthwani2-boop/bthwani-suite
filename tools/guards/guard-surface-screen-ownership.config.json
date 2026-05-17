@@ -1,8 +1,0 @@
-{
-  "guard": "GUARD-18_SURFACE_SCREEN_OWNERSHIP",
-  "version": "1.0.0",
-  "mode": "CHECK_ONLY",
-  "policy": {
-    "defaultSeverity": "warning"
-  }
-}

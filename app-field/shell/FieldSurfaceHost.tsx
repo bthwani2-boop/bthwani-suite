@@ -1,1 +1,1 @@
-export { FieldSurfaceHost, default } from '../../dsh/frontend/app-field/FieldSurfaceHost';
+export { default, DshFieldSurface, DshFieldSurface as FieldSurfaceHost } from '../../dsh/frontend/app-field/DshFieldSurface';

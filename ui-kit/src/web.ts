@@ -1,15 +1,11 @@
+// ─── Website Lane ──────────────────────────────────────────────────────────────
+// Use for: landing pages, marketing, public-facing pages.
 export {
-	WebControlActionButton,
-	WebControlActionCard,
-	WebCommandCenterFrame,
-	WebCommandStrip,
-	WebControlDisclosureItem,
-	WebControlSurfaceHeader,
-	WebRailServiceList,
-	WebSegmentedTabs,
-	WebCompactSurfaceHeader,
-	WebSystemSuggestion,
-} from './web/index';
+	WebMissionHeroCard,
+	WebPageFrame,
+	WebSectionCard,
+	WebSignalCard,
+} from './web/page-frame';
 export {
 	WebDocumentShell,
 	WebRootBody,
@@ -17,12 +13,79 @@ export {
 	WebThemeStyle,
 	buildWebRootMetadata,
 } from './web/root-layout';
+
+// ─── Control Panel Lane ────────────────────────────────────────────────────────
+// Use for: staff operations, admin dashboards, control rooms only.
 export {
-	WebMissionHeroCard,
-	WebPageFrame,
-	WebSectionCard,
-	WebSignalCard,
-} from './web/page-frame';
+	WebCommandCenterFrame,
+	WebCommandStrip,
+	WebRailServiceList,
+	WebSegmentedTabs,
+	// ControlPanel primitives
+	WebControlPanelFrame,
+	WebControlPanelKpiStrip,
+	WebControlPanelWorkspaceTabs,
+	WebControlPanelSubTabs,
+	WebControlPanelViewport,
+	WebControlPanelWorkbench,
+	WebControlPanelDenseHeader,
+	WebControlPanelSplitPane,
+	WebControlPanelMapCanvas,
+	WebControlPanelMiniMapZone,
+	WebControlPanelMapPin,
+	WebControlPanelRouteLine,
+	WebControlPanelLaneTabs,
+	WebControlPanelTertiaryFilters,
+	WebControlPanelQueue,
+	WebControlPanelCompactPager,
+	WebControlPanelDecisionRow,
+	WebControlPanelRecommendation,
+	WebControlPanelActionCluster,
+	WebControlPanelInspectorShell,
+	WebControlPanelStatusTag,
+} from './web/index';
+export type {
+	WebControlPanelFrameProps,
+	WebControlPanelKpiItem,
+	WebControlPanelKpiStripProps,
+	WebControlPanelKpiTone,
+	WebControlPanelWorkspaceTabItem,
+	WebControlPanelWorkspaceTabsProps,
+	WebControlPanelSubTabItem,
+	WebControlPanelSubTabsProps,
+	WebControlPanelDenseHeaderMetric,
+	WebControlPanelViewportProps,
+	WebControlPanelWorkbenchProps,
+	WebControlPanelDenseHeaderProps,
+	WebControlPanelSplitPaneWidth,
+	WebControlPanelSplitPaneProps,
+	WebControlPanelMapCanvasProps,
+	WebControlPanelMiniMapZoneProps,
+	WebControlPanelMapPinProps,
+	WebControlPanelRouteLineProps,
+	WebControlPanelLaneTabItem,
+	WebControlPanelLaneTabsProps,
+	WebControlPanelTertiaryFilterItem,
+	WebControlPanelTertiaryFiltersProps,
+	WebControlPanelQueueProps,
+	WebControlPanelCompactPagerProps,
+	WebControlPanelDecisionRowProps,
+	WebControlPanelDecisionRowRisk,
+	WebControlPanelRecommendationProps,
+	WebControlPanelActionItem,
+	WebControlPanelActionClusterProps,
+	WebControlPanelInspectorShellProps,
+	WebControlPanelStatusTone,
+	WebControlPanelStatusTagProps,
+} from './web/index';
 
-
-
+// ─── Shared WebApp Components ─────────────────────────────────────────────────
+// Use for: general app surfaces, forms, cards usable in both webapp and control panel.
+export {
+	WebControlActionButton,
+	WebControlActionCard,
+	WebControlDisclosureItem,
+	WebControlSurfaceHeader,
+	WebCompactSurfaceHeader,
+	WebSystemSuggestion,
+} from './web/index';

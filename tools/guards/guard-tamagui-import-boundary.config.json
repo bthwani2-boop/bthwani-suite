@@ -1,5 +1,0 @@
-{
-  "version": "1.0.0",
-  "roots": ["apps", "packages"],
-  "extensions": [".ts", ".tsx", ".js", ".jsx"]
-}

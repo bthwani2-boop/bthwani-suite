@@ -32,7 +32,11 @@ wlt/wlt.openapi.yaml
 | OpenAPI Contract | `wlt/wlt.openapi.yaml` |
 | Public Export Path | `wlt/index.ts` |
 | Current Decision | `NOT CLOSED` |
-| Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
+| Current Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F1 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F2 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F3 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
+| Phase F4 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
@@ -106,7 +110,7 @@ closure_decision: NOT CLOSED
 | `app-partner` | Partner: أرباح، دفعات، تسويات، دفتر، محفظة حسب الصلاحيات. | runtime / shell / composition only | TBD | N/A |
 | `app-captain` | Captain: أرباح، رصيد، استلام دفعات، تسويات، سداد/محفظة حسب الصلاحيات. | runtime / shell / composition only | TBD | N/A |
 | `app-field` | Field Agent: رصيد، دفعات، سداد، محفظة أو مستحقات حسب الصلاحيات. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | WLT finance preview bound to /finance route (F4) — preview/fixture only | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` | N/A |
 
 ### Owned Capabilities
 
@@ -143,7 +147,7 @@ closure_decision: NOT CLOSED
 | `app-partner` | app owns shell/composition only | Partner: أرباح، دفعات، تسويات، دفتر، محفظة حسب الصلاحيات. | TBD | N/A |
 | `app-captain` | app owns shell/composition only | Captain: أرباح، رصيد، استلام دفعات، تسويات، سداد/محفظة حسب الصلاحيات. | TBD | N/A |
 | `app-field` | app owns shell/composition only | Field Agent: رصيد، دفعات، سداد، محفظة أو مستحقات حسب الصلاحيات. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` | N/A |
 
 ### App/Shell Rule
 
@@ -382,6 +386,10 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | Evidence ID | Scope | Result | Path | Notes |
 |---|---|---|---|---|
 | TBD | TBD | TBD | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
+| WLT-EVD-F2-CP | Client payment preview binding (F2) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | preview/fixture only |
+| WLT-EVD-F3-CAPTAIN | Captain finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | preview/fixture only |
+| WLT-EVD-F3-FIELD | Field finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | preview/fixture only |
+| WLT-EVD-F4-CP | Control-panel finance preview enhanced + bound to /finance (F4) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | preview/fixture only; WltDshFinanceControlPanelContent bound in ControlPanelSurfaceHost |
 
 ### Current Decision
 
@@ -395,6 +403,147 @@ NOT CLOSED
 - API contract may be scaffold/TBD.
 - Binding, Integration, Runtime, Backend, Security, Observability, Testing, Performance, Accessibility, and Production Readiness remain `TBD` unless evidence says otherwise.
 - No financial behavior may bypass WLT.
+
+### Phase F1 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| WLT-owned DSH finance preview model created | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| Deep cross-package import removed from PartnerDshWalletBridgeView | `wlt/frontend/app-partner/dsh/PartnerDshWalletBridgeView.tsx` | `BOUNDARY_FIXED` |
+| Arabic label for selected state | `wlt/frontend/app-client/dsh/WltDshPaymentOptionsRow.tsx` | `FIXED` |
+| Control-panel finance preview component added | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| TSC result | pnpm -w exec tsc --noEmit | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| All amounts | integer minor units (amountMinorUnits), no float — currency: YER / ريال يمني | `ENFORCED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F2 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| WLT payment options preview component created | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT model extended: WltDshPaymentMethod, WltDshPaymentPreviewState, payment option helpers | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| DSH checkout uses WLT-owned finance event kind resolver | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx` | `BOUNDARY_FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F3 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| WLT captain finance preview component created | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT field finance preview component created | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT model extended: WltCaptainFinanceSnapshot, WltPartnerFinanceSnapshot, WltFieldFinanceSnapshot | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| DSH captain finance screen uses WLT-owned preview | `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx` | `BOUNDARY_FIXED` |
+| DSH field finance screen uses WLT-owned preview | `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | `BOUNDARY_FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F4 Evidence Record (2026-05-09)
+
+| Item | File | Status |
+| --- | --- | --- |
+| Control-panel finance preview enhanced: client wallet/COD breakdown, captain COD/earnings, field commission/payout | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WltDshFinanceControlPanelContent exported and bound to /finance route | `control-panel/shell/ControlPanelSurfaceHost.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Finance route confirmed: /finance → section="finance" → WltDshFinanceControlPanelContent | `control-panel/runtime/app/finance/page.tsx` | `ROUTE_CONFIRMED_PREVIEW_ONLY` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| Real finance blocked until | contract / backend / security / audit / idempotency / ledger | `BLOCKED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+### Phase F5 Evidence Record (2026-05-16)
+
+| Item | File | Status |
+| --- | --- | --- |
+| Currency: ALL `halalas`/`SAR`/`ar-SA`/`ر.س` removed from WLT/DSH finance scope | All files in scope | `CURRENCY_CLEAN` |
+| Renamed `amountHalalas` → `amountMinorUnits` throughout (halalas = Saudi subunit, not YER) | `wlt-dsh-client.adapter`, `useWltDshWalletPreview`, `dshFinancePreview.ts` | `FIXED` |
+| Central `formatYer(minorUnits)` with `ar-YE` locale + safe fallback replacing Saudi formatter | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `FIXED` |
+| `formatWltYer` alias exported for UI use | `wlt/frontend/shared/finance/index.ts` | `FIXED` |
+| Captain eligibility balance section: current balance, minimum, shortfall, recharge CTA | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| COD reframed as ذمة مستحقة (liability) not balance | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `FIXED` |
+| Captain finance sections: eligibility / cod-liability / earnings / settlement | `wlt/frontend/app-captain/dsh/wlt-dsh-captain.adapter.ts` | `FIXED` |
+| Partner finance: gross sales / platform commission / deductions / net settlement / cycle | `wlt/frontend/app-partner/dsh/wlt-dsh-partner.parts.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Field commissions: approved / pending / rejected with holdReason and payout records | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Client payment preview: COD / wallet / mixed / official-wallets with balance states | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| DSH finance model converted to LEGACY_BRIDGE (re-exports WLT types only, no financial logic) | `dsh/frontend/shared/dshFinancePreviewModel.ts` | `BOUNDARY_FIXED` |
+| DSH control panel: captain-eligibility group added to finance registry and hub | `dsh/frontend/control-panel/finance/finance.registry.ts` | `UI_PREVIEW_FOUNDATION` |
+| DSH control panel: `FINANCE_ACTIVE_GROUPS` excludes tax-compliance (no Yemen policy) | `dsh/frontend/control-panel/finance/finance.registry.ts` | `FIXED` |
+| DSH control panel KPIs: live YER values from `getWltControlPanelFinancePreview()` | `dsh/frontend/control-panel/finance/FinanceHubScreen.tsx` | `FIXED` |
+| WLT control panel: CSS module replacing inline styles (no hardcoded colors) | `wlt/frontend/control-panel/finance/wlt-finance-control-panel.module.css` | `FIXED` |
+| WltCaptainFinanceSnapshot expanded: eligibility balance, minimum, shortfall, block reason | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WltPartnerFinanceSnapshot expanded: full settlement cycle breakdown | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WltFieldFinanceSnapshot expanded: pending/rejected records, payout date | `wlt/frontend/shared/finance/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| SERVICE_BLUEPRINT halalas → amountMinorUnits / YER fix | `wlt/SERVICE_BLUEPRINT.md` | `FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS — EXIT 0` |
+| Currency scan | All WLT/DSH finance files | `CLEAN — 0 SAR/ر.س/ar-SA/halalas` |
+| Evidence session | `tools/registry/runs/DSH_WLT_YEMEN_FINANCE_CLOSURE-20260516-155044/` | `COMPLETE` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+
+Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
+
+---
+
+## Phase F6 — Yemen Context + Contract Scaffold + Boundary Lock
+
+**Session:** DSH_WLT_FINANCE_REMAINING_CLOSURE-20260516-234559
+**Date:** 2026-05-16
+**Scope:** DSH/WLT/UI-kit visible context cleanup, WLT OpenAPI scaffold, WLT-only boundary
+
+### Phase F6 Summary
+
+This phase closes the remaining gaps left after Phase F5 preview closure:
+
+1. Saudi currency/context tokens removed from all DSH frontend files (previously missed by F5 scope)
+2. Minor-unit naming violations renamed in dsh-client-binding contracts and CartScreen
+3. WLT OpenAPI scaffold built with paths, schemas, and idempotency documentation
+4. WLT-only financial ownership boundary locked in contract
+5. ui-kit card.tsx default currency/locale corrected to Yemen context
+
+**NOT CLOSED in this phase:**
+
+- Runtime backend/ledger: NOT IMPLEMENTED
+- Idempotency enforcement: NOT IMPLEMENTED
+- Security/auth: NOT IMPLEMENTED
+- Reconciliation engine: NOT IMPLEMENTED
+- Production financial closure: NOT CLOSED
+
+### Phase F6 Classification
+
+| Item | Status |
+| --- | --- |
+| Saudi currency/context tokens in DSH frontend | CLOSED — scan zero |
+| Minor-unit naming cleanup (contracts + CartScreen) | CLOSED — scan zero |
+| WLT OpenAPI scaffold (paths + schemas) | CLOSED — scaffold present |
+| WLT-only financial ownership boundary | CLOSED — contract + blueprint locked |
+| ui-kit card default currency/locale | CLOSED — ar-YE / YER |
+| Runtime/backend ledger | NOT IMPLEMENTED |
+| Idempotency enforcement | NOT IMPLEMENTED |
+| Security/auth layer | NOT IMPLEMENTED |
+| Reconciliation engine | NOT IMPLEMENTED |
+| Production financial closure | NOT CLOSED |
+
+### Phase F6 Evidence Record
+
+| Item | File | Status |
+| --- | --- | --- |
+| Saudi currency/context tokens removed from 9 DSH frontend files | dsh/frontend/** | `CLEAN` |
+| Saudi locale (ar-SA) replaced with ar-YE in DSH partner/field/client files | dsh/frontend/** | `FIXED` |
+| Minor-unit naming renamed in dsh-client-binding.contracts.ts (17 fields) | dsh/frontend/app-client/contracts/ | `FIXED` |
+| Minor-unit naming renamed in CartScreen.tsx (types + local vars + function) | dsh/frontend/app-client/screens/ | `FIXED` |
+| topUpWalletInline marked PREVIEW_ONLY explicitly | dsh/frontend/app-client/screens/CartScreen.tsx | `FIXED` |
+| ui-kit card.tsx: ar-SA → ar-YE, SAR default → YER default | ui-kit/src/components/card.tsx | `FIXED` |
+| CartDetails.tsx: ar-SA → ar-YE | dsh/frontend/app-client/parts/CartDetails.tsx | `FIXED` |
+| WLT OpenAPI scaffold: 14 paths + 13 schemas + idempotency param | wlt/wlt.openapi.yaml | `SCAFFOLD` |
+| WLT contract state: CONTRACT_SCAFFOLD_PREVIEW_ONLY | wlt/wlt.openapi.yaml | `FIXED` |
+| WLT currency default: YER | wlt/wlt.openapi.yaml | `FIXED` |
+| WLT ownership declaration in OpenAPI | wlt/wlt.openapi.yaml | `FIXED` |
+| Evidence session | tools/registry/runs/DSH_WLT_FINANCE_REMAINING_CLOSURE-20260516-234559/ | `COMPLETE` |
 
 ### Single Next Action
 

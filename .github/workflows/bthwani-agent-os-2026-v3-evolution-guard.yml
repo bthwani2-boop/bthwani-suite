@@ -1,15 +1,28 @@
 name: bthwani-agent-os-2026-v3-evolution-guard
 
-# NOTE (example-only): Workflow `name` and step identifiers reference governance tokens; these are documentation identifiers, not secrets.
 on:
   pull_request:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   guard:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Run BThwani Agent Evolution Full Gate
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Run current governance guard manifest
         shell: pwsh
-        run: .\tools\scripts\BTHWANI_AGENT_OS_2026_V3_EVOLUTION_FULL_GATE.ps1
+        run: |
+          ./tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode CI -Profile Governance
+          ./tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode CI -Profile Agent

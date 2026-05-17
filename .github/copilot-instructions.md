@@ -1,33 +1,25 @@
-When the user sends exactly "ghb", run only:
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\GHB_CHECKPOINT_VERIFY.ps1"
+Read first:
 
-Do not manually recreate the workflow.
-Do not merge, promote, open PRs, delete branches, force push, or modify main/stable unless explicitly requested after the script recommendation.
+- `.agents/INDEX.md`
+- `.agents/AUTHORITY_BOUNDARY.md`
+- `.agents/adapters/copilot.md`
 
-<!-- BTHWANI_GP_SHORTCUT_START -->
+When the user sends exactly `ghb`, run only:
 
-## BThwani shortcut: gp
-
-When the user types exactly `gp` in the VS Code agent chat, treat it as:
-
-```text
-gp = GitHub commit + push for the current branch
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\bthwani-suite\tools\scripts\GHB_CHECKPOINT_VERIFY.ps1"
 ```
 
-Run only this command inside `C:\bthwani-suite`:
+Do not manually recreate the workflow.
+Do not merge, promote, open PRs, delete branches, force push, or modify main/stable unless the user explicitly asks for that after the script recommendation.
+
+## Shortcut: gp
+
+When the user types exactly `gp`, treat it as Git commit plus push for the current branch and run only:
 
 ```powershell
 Set-Location -LiteralPath "C:\bthwani-suite"
 powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\GHB_COMMIT_PUSH_CURRENT_BRANCH.ps1" -CommitMessage "checkpoint: current branch update"
 ```
 
-Rules:
-
-- Do not ask to continue.
-- Do not switch branches.
-- Do not modify files before running the script.
-- Do not run unrelated commands.
-- Do not push protected branches unless explicitly approved through the script options.
-- Return only the script status, recommendation, branch, commit SHA, push result, evidence root, `_HANDOFF.zip`, errors, and warnings.
-
-<!-- BTHWANI_GP_SHORTCUT_END -->
+Keep Copilot guidance thin. Use `.agents/skills/*` for workflow rules. No `PASS`, `CLOSED`, `FINAL`, or `100%` without diff, verification, and evidence.

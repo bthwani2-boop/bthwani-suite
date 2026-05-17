@@ -4,5 +4,5 @@ export { default } from './web-entry';
 export {
   ControlPanelDshMarketingScreen,
   DshControlPanelSurfaceHost,
-  ControlPanelDshSheinProxyRequestScreen,
+  ControlPanelDshSheinProxyScreen,
 } from '../composition';

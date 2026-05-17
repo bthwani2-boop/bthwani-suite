@@ -1,3 +1,2 @@
 export { FieldSurfaceHost } from './FieldSurfaceHost';
-export { default } from './mobile-entry';
-export * from './mobile-entry';
+export { default, DshFieldSurface } from './mobile-entry';

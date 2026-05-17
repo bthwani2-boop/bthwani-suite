@@ -2,19 +2,33 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Legacy Accounting Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** GOVERNANCE_REORGANIZATION_LEDGER, GOVERNANCE_DEEP_DEDUP_ANALYSIS_MATRIX, all legacy files
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Ledger purpose
 
 This file proves that legacy governance input was inventoried and mapped to canonical owner files. It does not mean every legacy sentence was copied verbatim. It means each source file has an owner decision, and the canonical package carries forward the enforceable rules, matrices, and protocols without keeping legacy as active authority.
+
+## 2026-05-13 blueprint merge correction
+
+A later user-directed review found that the earlier cleanup classification for `PLATFORM_BLUEPRINT.md` and `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` was too aggressive.
+
+The corrected active-state decision is:
+
+| File | Corrected decision | Active owner after correction |
+|---|---|---|
+| `PLATFORM_BLUEPRINT.md` | retained as an active governance support blueprint and rewritten as the single merged execution sequence file | `PLATFORM_BLUEPRINT.md` plus `02`, `03`, `10`, `11`, `12`, `14`, `15`, `22`, `24`, and `TECH_STACK_LOCK.md` |
+| `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` | merged into `PLATFORM_BLUEPRINT.md` and removed as a duplicate support source | `PLATFORM_BLUEPRINT.md`, `22_DSH_GOLDEN_SLICE.md`, `12_TESTING_AND_PRODUCTION_READINESS.md`, `14_GUARDS_CATALOG.md` |
+
+## 2026-05-13 governance cleanup v1
+
+This cleanup initially classified duplicated baseline/prompt-style governance files for removal or redistribution. The `PLATFORM_BLUEPRINT.md` and `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` rows below are superseded by the blueprint merge correction above.
+
+| File | Decision | Active owner after cleanup |
+|---|---|---|
+| `PLATFORM_BLUEPRINT.md` | removed from active governance | `02_PLATFORM_SSOT.md`, `03_REPO_BOUNDARIES.md`, `07_SURFACES_AND_SERVICES.md`, `10_SERVICE_CLOSURE.md`, `11_EVIDENCE_AND_TRACEABILITY.md`, `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
+| `BTHWANI_FINAL_MERGED_ENGINEERING_BASELINE_V1.md` | removed from active governance | numbered owner files plus `TECH_STACK_LOCK.md` |
+| `BTHWANI_DSH_BASELINE_READINESS_GUARDS_ADDENDUM.md` | removed from active governance | `22_DSH_GOLDEN_SLICE.md`, `12_TESTING_AND_PRODUCTION_READINESS.md`, `14_GUARDS_CATALOG.md` |
+| `TAMAGUI_INTEGRATION_LAW.md` | merged into active owner and removed | `08_UI_KIT_AND_BRAND.md` |
+| `15_AGENT_AND_AI_EXECUTION.md` | added as missing canonical owner for agent-execution boundaries | `15_AGENT_AND_AI_EXECUTION.md` |
 
 ## Source inventory summary
 
@@ -42,7 +56,6 @@ active_legacy_policy_after_apply: no
 | 12_TESTING_AND_PRODUCTION_READINESS.md | 1 |
 | 13_CI_AND_GATES.md | 10 |
 | 14_GUARDS_CATALOG.md | 18 |
-| 15_AGENT_AND_AI_EXECUTION.md | 6 |
 | 16_SECURITY_AND_SECRETS.md | 2 |
 | 17_CLEANUP_AND_DEPRECATION.md | 7 |
 | 18_BRANCH_AND_CHECKPOINTS.md | 1 |
@@ -77,14 +90,14 @@ active_legacy_policy_after_apply: no
 | 11_DSH_GOLDEN_SLICE_PROTOCOL.md | 65 | 218 | 22_DSH_GOLDEN_SLICE.md | 5c852d451d21 | PROMOTED_OR_ACCOUNTED |
 | 12_API_BINDING_RUNTIME_PROTOCOL.md | 103 | 379 | 09_API_BINDING_RUNTIME.md | 6677f8c4b6c7 | PROMOTED_OR_ACCOUNTED |
 | 13_CI_GATES_CONTRACT.md | 115 | 510 | 13_CI_AND_GATES.md | 11a5815a91b1 | PROMOTED_OR_ACCOUNTED |
-| 14_AGENT_EXECUTION_RULES.md | 357 | 1299 | 15_AGENT_AND_AI_EXECUTION.md | f91e137fc9c8 | PROMOTED_OR_ACCOUNTED |
+| 14_AGENT_EXECUTION_RULES.md | 357 | 1299 | 24_TRACEABILITY_AND_ROADMAP.md | f91e137fc9c8 | PROMOTED_OR_ACCOUNTED |
 | 16_SECURITY_AND_SECRETS_POLICY.md | 84 | 330 | 16_SECURITY_AND_SECRETS.md | e7e3bc31b887 | PROMOTED_OR_ACCOUNTED |
 | 17_TESTING_AND_PRODUCTION_READINESS.md | 146 | 496 | 12_TESTING_AND_PRODUCTION_READINESS.md | 5f3358a3b3b1 | PROMOTED_OR_ACCOUNTED |
 | 18_EVIDENCE_PACK_STANDARD.md | 154 | 465 | 11_EVIDENCE_AND_TRACEABILITY.md | 7edcb30b2e2e | PROMOTED_OR_ACCOUNTED |
-| 19_PATCH_REVIEW_PROTOCOL.md | 38 | 115 | 15_AGENT_AND_AI_EXECUTION.md | 0c53a9b26e78 | PROMOTED_OR_ACCOUNTED |
+| 19_PATCH_REVIEW_PROTOCOL.md | 38 | 115 | 13_CI_AND_GATES.md | 0c53a9b26e78 | PROMOTED_OR_ACCOUNTED |
 | AGENT_CHANGE_LEDGER_POLICY.md | 111 | 359 | 11_EVIDENCE_AND_TRACEABILITY.md | 255a1ede01b2 | PROMOTED_OR_ACCOUNTED |
-| AGENT_GOVERNANCE_POLICY.md | 39 | 126 | 15_AGENT_AND_AI_EXECUTION.md | 44a830c79b03 | PROMOTED_OR_ACCOUNTED |
-| AGENT_UPDATE_VALIDATION_CHECKLIST.md | 69 | 379 | 15_AGENT_AND_AI_EXECUTION.md | b316af9a43f5 | PROMOTED_OR_ACCOUNTED |
+| AGENT_GOVERNANCE_POLICY.md | 39 | 126 | 13_CI_AND_GATES.md | 44a830c79b03 | PROMOTED_OR_ACCOUNTED |
+| AGENT_UPDATE_VALIDATION_CHECKLIST.md | 69 | 379 | 11_EVIDENCE_AND_TRACEABILITY.md | b316af9a43f5 | PROMOTED_OR_ACCOUNTED |
 | AI_EXECUTION_GOVERNANCE.md | 107 | 274 | 13_CI_AND_GATES.md | 208a8ec06328 | PROMOTED_OR_ACCOUNTED |
 | API_CONTRACT_POLICY.md | 123 | 324 | 09_API_BINDING_RUNTIME.md | eb2e4d4b330c | PROMOTED_OR_ACCOUNTED |
 | APPROVED_SURFACE_NAMING.md | 40 | 135 | 13_CI_AND_GATES.md | 2c0ba2341796 | PROMOTED_OR_ACCOUNTED |
@@ -92,7 +105,7 @@ active_legacy_policy_after_apply: no
 | ARCHITECTURE_LOCK.md | 177 | 970 | 07_SURFACES_AND_SERVICES.md | 62e2e2284536 | PROMOTED_OR_ACCOUNTED |
 | BRANCH_AND_CHECKPOINT_POLICY.md | 97 | 222 | 18_BRANCH_AND_CHECKPOINTS.md | d3f6c27b6e9a | PROMOTED_OR_ACCOUNTED |
 | BTHWANI_GUIDE__Unified_Execution_OS__V4_Phases_Waves_Todolists.md | 2306 | 7413 | 24_TRACEABILITY_AND_ROADMAP.md | c8b96ac10b84 | PROMOTED_OR_ACCOUNTED |
-| BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md | 1140 | 3790 | 15_AGENT_AND_AI_EXECUTION.md | 5a0d073e90a3 | PROMOTED_OR_ACCOUNTED |
+| BTHWANI_MASTER_EXECUTION_PLAYBOOK__SINGLE_FILE.md | 1140 | 3790 | 24_TRACEABILITY_AND_ROADMAP.md | 5a0d073e90a3 | PROMOTED_OR_ACCOUNTED |
 | BTHWANI_PLATFORM_DSH_FULL_END_TO_END_ROADMAP_V2.md | 2622 | 8394 | 22_DSH_GOLDEN_SLICE.md | 7e1c2e63fb65 | PROMOTED_OR_ACCOUNTED |
 | CHANGE_ENTRY_RULE.md | 64 | 314 | 24_TRACEABILITY_AND_ROADMAP.md | 623b3c5274ea | PROMOTED_OR_ACCOUNTED |
 | CI_GRADUAL_GATE_POLICY.md | 70 | 251 | 13_CI_AND_GATES.md | 7cc3f8750c3e | PROMOTED_OR_ACCOUNTED |
@@ -101,7 +114,7 @@ active_legacy_policy_after_apply: no
 | DIRECTION_I18N_OWNERSHIP.md | 71 | 342 | 08_UI_KIT_AND_BRAND.md | aa01dec0c976 | PROMOTED_OR_ACCOUNTED |
 | DOCS_GOVERNANCE_ACTIVE_REFERENCE_REMEDIATION_PLAN.md | 34 | 102 | 17_CLEANUP_AND_DEPRECATION.md | bd06846e7e0b | PROMOTED_OR_ACCOUNTED |
 | DOCS_GOVERNANCE_DELETION_GATE_DECISION.md | 32 | 112 | 03_REPO_BOUNDARIES.md | 78648805e74d | PROMOTED_OR_ACCOUNTED |
-| DOCS_GOVERNANCE_DELETION_READINESS_AUDIT.md | 42 | 180 | 15_AGENT_AND_AI_EXECUTION.md | a11da81cf250 | PROMOTED_OR_ACCOUNTED |
+| DOCS_GOVERNANCE_DELETION_READINESS_AUDIT.md | 42 | 180 | 17_CLEANUP_AND_DEPRECATION.md | a11da81cf250 | PROMOTED_OR_ACCOUNTED |
 | DOCS_GOVERNANCE_DELETION_READINESS_POLICY.md | 63 | 227 | 03_REPO_BOUNDARIES.md | 6722e6ee1bbe | PROMOTED_OR_ACCOUNTED |
 | EVIDENCE_AND_CLOSURE_GATES.md | 148 | 271 | 11_EVIDENCE_AND_TRACEABILITY.md | 9cb0d1e211e8 | PROMOTED_OR_ACCOUNTED |
 | EVIDENCE_PACK_TEMPLATE.md | 57 | 220 | 11_EVIDENCE_AND_TRACEABILITY.md | b5608ee3cc09 | PROMOTED_OR_ACCOUNTED |
@@ -191,7 +204,7 @@ active_legacy_policy_after_apply: no
 
 | Legacy family | Canonical owner |
 |---|---|
-| Unified execution OS / playbooks | `15_AGENT_AND_AI_EXECUTION.md`, `24_TRACEABILITY_AND_ROADMAP.md` |
+| Unified execution OS / playbooks | `24_TRACEABILITY_AND_ROADMAP.md` |
 | Platform blueprint / operating model | `02_PLATFORM_SSOT.md`, `19_CONTROL_PANEL_AND_OPERATING_MODEL.md` |
 | DSH roadmap and golden slice | `22_DSH_GOLDEN_SLICE.md`, `10_SERVICE_CLOSURE.md` |
 | Service closure protocol | `10_SERVICE_CLOSURE.md` |
@@ -207,7 +220,6 @@ active_legacy_policy_after_apply: no
 
 - Runtime observability authority is absorbed into `09_API_BINDING_RUNTIME.md`.
 - Service blueprint and operation-catalog authority is absorbed into `10_SERVICE_CLOSURE.md`.
-- `AGENT_CHANGE_LEDGER.md` and `AGENT_UPDATE_VALIDATION_CHECKLIST.md` remain support-only files under `15_AGENT_AND_AI_EXECUTION.md`.
 
 ## Active authority statement
 

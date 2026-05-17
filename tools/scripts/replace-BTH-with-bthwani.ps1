@@ -6,20 +6,20 @@ Default mode is DryRun.
 Apply requires explicit -Apply.
 
 Allowed default scope:
-  packages/ui-kit/docs
+  ui-kit/docs
 
 Rules:
 - Replaces only exact uppercase word BTH using whole-token regex \bBTH\b.
 - Does not modify bthwani, BThwani, @bthwani/*, bthwani-suite.
 - Does not create .bak files inside source paths.
 - In Apply mode, backups and evidence are written under tools/registry/runs/{SESSION_ID}/.
-- In Apply mode, _HANDOFF.zip is produced for review.
+- In Apply mode, a ZIP named exactly after SESSION_ID is produced for review.
 #>
 
 $ErrorActionPreference = "Stop"
 
 $Apply = $false
-$Root = "packages/ui-kit/docs"
+$Root = "ui-kit/docs"
 $Pattern = "\bBTH\b"
 $Replacement = "bthwani"
 
@@ -108,7 +108,7 @@ replacement: $Replacement
 matched_files: $($matches.Count)
 changed_files: $($changed.Count)
 evidence_root: $RunRoot
-handoff_zip: $(Join-Path $RunRoot "_HANDOFF.zip")
+evidence_zip: $(Join-Path $RunRoot "$SessionId.zip")
 "@
 $summary | Set-Content -LiteralPath (Join-Path $RunRoot "summary.txt") -Encoding UTF8
 
@@ -133,7 +133,7 @@ if ($Apply) {
     git --no-pager diff -- . > (Join-Path $RunRoot "LOCAL_CHANGE_REVIEW.patch")
     git ls-files --others --exclude-standard > (Join-Path $RunRoot "untracked-files.txt")
 
-    $zipPath = Join-Path $RunRoot "_HANDOFF.zip"
+    $zipPath = Join-Path $RunRoot "$SessionId.zip"
     if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
     Compress-Archive -Path (Join-Path $RunRoot "*") -DestinationPath $zipPath -Force
 }
@@ -142,4 +142,4 @@ Write-Host "Mode: $Mode"
 Write-Host "Matched files: $($matches.Count)"
 Write-Host "Changed files: $($changed.Count)"
 Write-Host "Evidence: $RunRoot"
-if ($Apply) { Write-Host "HANDOFF ZIP: $(Join-Path $RunRoot "_HANDOFF.zip")" }
+if ($Apply) { Write-Host "EVIDENCE ZIP: $(Join-Path $RunRoot "$SessionId.zip")" }

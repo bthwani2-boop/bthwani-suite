@@ -5,6 +5,7 @@ import {
   View as TamaguiView,
   } from 'tamagui';
 import {
+	StyleSheet,
   type ScrollViewProps,
   type StyleProp,
   type TextProps as RNTextNativeProps,
@@ -12,7 +13,7 @@ import {
   type ViewProps,
   type ViewStyle,
 } from 'react-native';
-import { useDirection, useTheme } from './providers';
+import { useBThwaniAppearance, useDirection, useTheme } from './providers';
 import {
 	borders,
 	fontWeights,
@@ -115,7 +116,7 @@ export function Box({
 
 	return (
 		<HostView
-			style={[
+			style={StyleSheet.flatten([
 				{
 					paddingTop: spacing[resolvedPaddingY],
 					paddingBottom: spacing[resolvedPaddingY],
@@ -131,7 +132,7 @@ export function Box({
 				},
 				shadowLaw[elevationToken],
 				style
-			]}
+			])}
 		>
 			{children}
 		</HostView>
@@ -145,14 +146,16 @@ export type DividerProps = {
 
 export function Divider({ color, style }: DividerProps) {
 	const { theme } = useTheme();
-	return <HostView style={[{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style]} />;
+	return <HostView style={StyleSheet.flatten([{ height: 1, backgroundColor: color ?? theme.line, width: '100%' }, style])} />;
 }
 
 declare const process: { env: { NODE_ENV?: string } };
 
-type SurfaceVariant = 'default' | 'raised' | 'inset' | 'brandHeader' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+type BaseSurfaceVariant = 'default' | 'raised' | 'inset' | 'brandHeader' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+type GlassSurfaceVariant = 'glass' | 'glassStrong';
+type SurfaceVariant = BaseSurfaceVariant | GlassSurfaceVariant;
 
-const surfaceToneLaw: Record<SurfaceVariant, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
+const surfaceToneLaw: Record<BaseSurfaceVariant, { background: BoxBackground; borderTone: BoxBorderTone; elevationToken: ElevationToken }> = {
 	default: { background: 'surface', borderTone: 'line', elevationToken: 'flat' },
 	raised: { background: 'surfaceRaised', borderTone: 'lineStrong', elevationToken: 'raised' },
 	inset: { background: 'surfaceInset', borderTone: 'line', elevationToken: 'flat' },
@@ -169,6 +172,8 @@ export type SurfaceTone = SurfaceVariant;
 export type SurfaceProps = {
 	children?: React.ReactNode;
 	padding?: SpacingToken;
+	paddingX?: SpacingToken;
+	paddingY?: SpacingToken;
 	gap?: SpacingToken;
 	radiusToken?: RadiusToken;
 	elevationToken?: ElevationToken;
@@ -176,12 +181,16 @@ export type SurfaceProps = {
 	border?: boolean;
 	borderToken?: BorderToken;
 	borderTone?: 'line' | 'lineStrong' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+	align?: ViewStyle['alignItems'];
+	layoutDirection?: 'column' | 'row';
 	style?: StyleProp<ViewStyle>;
 };
 
 export function Surface({
 	children,
 	padding = 5,
+	paddingX,
+	paddingY,
 	gap = 3,
 	radiusToken = 'xl',
 	elevationToken,
@@ -189,8 +198,47 @@ export function Surface({
 	border = true,
 	borderToken = 'hairline',
 	borderTone,
+	align,
+	layoutDirection,
 	style
 }: SurfaceProps) {
+	const { tokens: appearanceTokens } = useBThwaniAppearance();
+
+	if (tone === 'glass' || tone === 'glassStrong') {
+		const glassStyle = tone === 'glassStrong'
+			? {
+					backgroundColor: appearanceTokens.glassSurfaceStrong,
+					...appearanceTokens.shadowPremium,
+				}
+			: {
+					backgroundColor: appearanceTokens.glassSurface,
+					...appearanceTokens.shadowSoft,
+				};
+
+		return (
+			<Box
+				padding={padding}
+				paddingX={paddingX}
+				paddingY={paddingY}
+				gap={gap}
+				radiusToken={radiusToken}
+				border={false}
+				align={align}
+				layoutDirection={layoutDirection}
+				style={StyleSheet.flatten([
+					{
+						borderWidth: border ? borders[borderToken] : 0,
+						borderColor: appearanceTokens.glassBorder,
+					},
+					glassStyle,
+					style,
+				])}
+			>
+				{children}
+			</Box>
+		);
+	}
+
 	const toneConfig = surfaceToneLaw[tone];
 	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in surfaceToneLaw)) {
 		// eslint-disable-next-line no-console
@@ -200,6 +248,8 @@ export function Surface({
 	return (
 		<Box
 			padding={padding}
+			paddingX={paddingX}
+			paddingY={paddingY}
 			gap={gap}
 			radiusToken={radiusToken}
 			elevationToken={elevationToken ?? toneConfig.elevationToken}
@@ -207,6 +257,8 @@ export function Surface({
 			border={border}
 			borderToken={borderToken}
 			borderTone={borderTone ?? toneConfig.borderTone}
+			align={align}
+			layoutDirection={layoutDirection}
 			style={style}
 		>
 			{children}
@@ -257,7 +309,7 @@ export function Text({
 		<HostText
 			allowFontScaling={allowFontScaling}
 			numberOfLines={numberOfLines}
-			style={[
+			style={StyleSheet.flatten([
 				{
 					...roleStyle,
 					fontWeight: weight ? fontWeights[weight] : roleStyle?.fontWeight,
@@ -267,7 +319,7 @@ export function Text({
 					fontFamily: resolveFontFamily(direction, resolvedFamily)
 				},
 				style
-			]}
+			])}
 		>
 			{children}
 		</HostText>
@@ -295,12 +347,12 @@ export function MobileScrollView({
 	return (
 		<HostScrollView
 			{...scrollProps}
-			style={[fill ? { flex: 1 } : undefined, style]}
-			contentContainerStyle={[
+			style={StyleSheet.flatten([fill ? { flex: 1 } : undefined, style])}
+			contentContainerStyle={StyleSheet.flatten([
 				fill ? { flexGrow: 1 } : undefined,
 				{ padding: spacing[padding], gap: spacing[gap] },
 				contentContainerStyle,
-			]}
+			])}
 		>
 			{children}
 		</HostScrollView>

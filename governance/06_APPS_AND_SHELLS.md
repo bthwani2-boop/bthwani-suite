@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `App Shell Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 04_APPS_SHELL_ONLY_CONTRACT, APPROVED_SURFACE_NAMING, platform app roots
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## App shell principle
 
@@ -20,23 +11,20 @@ Apps are runtime shells. They should mount navigation, providers, platform runti
 
 | App root | Surface | Allowed ownership | Forbidden ownership |
 | --- | --- | --- | --- |
-| app-client | app-client | mobile bootstrap, navigation, permissions, surface mount | service logic, local UI system |
-| app-partner | app-partner | partner shell, navigation, runtime glue | DSH/WLT ownership, local brand components |
-| app-captain | app-captain | captain shell, device permissions, route mount | order state machine outside surfaces |
-| app-field | app-field | field shell and route mount | partner/field business logic duplication |
-| control-panel | control-panel | Next shell, admin layout mount, auth shell | domain service ownership |
-| webapp | webapp | web runtime shell | control-panel operations |
-| website | website | marketing shell | live service operations |
+| `app-client/runtime` | app-client | mobile bootstrap, navigation, permissions, surface mount | service logic, local UI system |
+| `app-partner/runtime` | app-partner | partner shell, navigation, runtime glue | DSH/WLT ownership, local brand components |
+| `app-captain/runtime` | app-captain | captain shell, device permissions, route mount | order state machine outside surfaces |
+| `app-field/runtime` | app-field | field shell and route mount | partner/field business logic duplication |
+| `control-panel/runtime` | control-panel | Next shell, admin layout mount, auth shell | domain service ownership |
+| `webapp/runtime` | webapp | web runtime shell | control-panel operations |
+| `website/runtime` | website | marketing shell | live service operations |
 
-## Legacy bridge roots
+The top-level app folders are containers. The active workspace roots are the `*/runtime` directories listed above.
 
-- `apps/mobile/app-client`
-- `apps/mobile/app-partner`
-- `apps/mobile/app-captain`
-- `apps/mobile/app-field`
-- `apps/web/control-panel`
-- `apps/web/webapp`
-- `apps/web/website`
+## Retired path patterns
+
+- nested mobile app roots from earlier layouts
+- nested web app roots from earlier layouts
 
 ## Shell-only allowed work
 

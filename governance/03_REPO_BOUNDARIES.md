@@ -2,57 +2,38 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Repository Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** DOCS_GOVERNANCE_* policies, GOVERNANCE_CONTROL_PLANE_STANDARD, ARCHITECTURE_LOCK
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Canonical active roots
 
 | Root | Role | May contain policy? |
 |---|---|---|
 | `governance/` | Canonical policy/control plane | Yes |
-| `app-client` | Client mobile app shell | No, implementation only |
-| `app-partner` | Partner mobile app shell | No |
-| `app-captain` | Captain mobile app shell | No |
-| `app-field` | Field mobile app shell | No |
-| `control-panel` | Control panel app shell | No |
-| `webapp` | Web app shell | No |
-| `website` | Marketing site shell | No |
-| `packages/ui-kit` | Design/component authority | Technical source, not governance policy |
-| `packages/surfaces` | Surface/service-owned UI flows | Technical source, not governance policy |
-| `packages/app-shells` | App shell composition | Technical source, not governance policy |
-| `api-types` | Generated/shared API types | Derived from contracts |
-| `api-clients` | API clients | Derived from contracts/runtime binding |
-| `services/*` | Backend/service implementations | Technical source |
-| `contracts/master` | Contract source for public APIs | Contract truth |
-| `tools/guards` | Guard implementation | Derived from governance |
-| `tools/registry/runs` | Evidence output | Evidence only |
+| `.agents/` | Agent execution, skills, adapters | No, operational guidance only |
+| `app-client/runtime` | Client mobile runtime shell | No, implementation only |
+| `app-partner/runtime` | Partner mobile runtime shell | No |
+| `app-captain/runtime` | Captain mobile runtime shell | No |
+| `app-field/runtime` | Field mobile runtime shell | No |
+| `control-panel/runtime` | Control panel runtime shell | No |
+| `webapp/runtime` | Web app runtime shell | No |
+| `website/runtime` | Marketing site runtime shell | No |
+| `ui-kit` | Design/component authority | Technical source, not governance policy |
+| `dsh/`, `wlt/`, `knz/`, `arb/`, `amn/`, `esf/`, `mrf/`, `snd/`, `kwd/` | Service roots | Technical source, not governance policy |
+| `tools/guards/` | Guard implementation | Derived verification only |
+| `tools/registry/runs/` | Evidence output and historical review runs | Evidence only |
 | `.github/workflows` | CI implementation | Derived from governance |
-| `.github/agents`, `.github/skills` | Agent/skill definitions | Derived from governance |
 
-## Transitional roots
+## Retired locations
 
 | Root | Status | Rule |
 |---|---|---|
-| `docs/governance` | Legacy/transitional | Must not be active authority. Migrate or remove references. |
-| `kdt/volatile/registry/runs` | Legacy evidence root | Do not create new evidence there. |
-| `governance/governance-legacy` | Retired donor root | Removed after extraction; any reintroduction is archive-only and non-authoritative. |
+| `docs/governance` | Retired policy location | Must not be active authority. |
+| `kdt/volatile/registry/runs` | Retired evidence location | Do not create new evidence there. |
 
-## Legacy bridge roots
+## Retired path patterns
 
-- `apps/mobile/app-client`
-- `apps/mobile/app-partner`
-- `apps/mobile/app-captain`
-- `apps/mobile/app-field`
-- `apps/web/control-panel`
-- `apps/web/webapp`
-- `apps/web/website`
+- nested mobile app roots from earlier layouts
+- nested web app roots from earlier layouts
+- packages-based UI/surface/app-shell roots from earlier layouts
 
 ## Forbidden root behavior
 
@@ -61,6 +42,7 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 - No surface-local API contract that competes with `contracts/master`.
 - No generated evidence treated as policy.
 - No `.github` workflow introducing governance rules not defined here.
+- No retired GitHub-side agent roots as active agent sources.
 - No old repo/path named standalone `bth` as active target.
 
 ## Boundary proof
@@ -78,9 +60,9 @@ git ls-files --others --exclude-standard
 Plus targeted scans:
 
 ```powershell
-rg "from ['\"]tamagui['\"]" apps packages/surfaces
-rg "docs/governance|kdt/volatile|governance-legacy" .
-rg "export \*" packages/ui-kit/src packages/surfaces/src
+rg "from ['\"]tamagui['\"]" app-client app-partner app-captain app-field control-panel webapp website dsh wlt knz arb amn esf mrf snd kwd
+rg "docs/governance|kdt/volatile|\\.github/" .
+rg "export \*" ui-kit/src dsh/frontend
 ```
 
 ## Deletion and movement rule

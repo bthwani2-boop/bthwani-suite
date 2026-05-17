@@ -1,559 +1,515 @@
-import React, { memo, useMemo } from 'react';
-import { Image, Pressable, Platform, StyleSheet, Text, View, type ImageSourcePropType, type ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { radius, resolveRowDirection, resolveTextAlign, spacing } from '../foundation';
-import { useDirection, useTheme } from '../providers';
+import React from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Pressable,
+  Dimensions,
+} from 'react-native';
+import { Icon } from './icons';
+import { colorPalette, withAlpha } from '../foundation';
+import { useBThwaniAppearance, useTheme } from '../providers';
 
-export type ServiceToken = {
+/**
+ * STORE_CARD_PREMIUM_2026: MASTERPIECE EDITION
+ * A high-fidelity, compact horizontal store card optimized for RTL.
+ * Features: Fixed square image, circular logo overlay, image-overlaid metrics.
+ */
+
+// --- Constants ---
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const IMAGE_SIZE = 114; // Slightly increased to prevent text clipping
+const LOGO_SIZE = 54;
+const CARD_RADIUS = 16;
+const GOLD = '#FFD700';
+
+export interface ServiceToken {
   label: string;
-};
+}
 
-export type StoreCardPremiumItem = {
+export interface StoreCardPremiumItem {
   id: string;
   name: string;
-  subtitle: string;
-  image?: ImageSourcePropType | null;
+  subtitle?: string;
+  image: any;
+  logoImage?: any;
   rating?: number | null;
   distanceKm?: number | null;
   isOpen: boolean;
-  supportsPickup: boolean;
-  supportsPartnerDelivery: boolean;
-  serviceTokens?: ServiceToken[];
+  supportsPickup?: boolean;
+  supportsPartnerDelivery?: boolean;
   isFavorite: boolean;
-  isFollowing: boolean;
-  followersCount: number;
+  followersCount?: number;
   hasBthwaniPro?: boolean;
-  subscriptionPackageChips?: string[];
-  hasNewProducts?: boolean;
   hasOffer?: boolean;
   offerText?: string;
   pointsMultiplier?: number;
   hasCouponAvailable?: boolean;
-};
+  locationLabel?: string;
+  deliveryTimeLabel?: string;
+  isPopular?: boolean;
+}
 
-export type StoreCardPremiumProps = {
+export interface StoreCardPremiumProps {
   item: StoreCardPremiumItem;
-  onPress?: (id: string) => void;
-  onPressSubscriptionChip?: (storeId: string) => void;
-  onToggleFavorite?: (id: string) => void;
-  onToggleFollow?: (id: string) => void;
-  style?: ViewStyle;
-  testID?: string;
-};
-
-const CARD_HEIGHT = 98;
-const CARD_RADIUS = 14;
-const IMAGE_SIZE = 72;
-const METRICS_BAR_HEIGHT = 24;
-const SERVICE_LANE_MIN_HEIGHT = 18;
-const SUBSCRIPTION_LANE_HEIGHT = 20;
-const LEFT_COL_WIDTH = 54;
-
-function formatFollowerCount(value?: number | null) {
-  const count = Number(value ?? 0);
-
-  if (!Number.isFinite(count) || count <= 0) {
-    return '0';
-  }
-
-  if (count >= 1_000_000) {
-    return `${Math.round(count / 1_000_000)} مليون`;
-  }
-
-  if (count >= 1_000) {
-    const compactValue = count / 1_000;
-    return Number.isInteger(compactValue)
-      ? `${compactValue} ألف`
-      : `${compactValue.toFixed(1).replace(/\.0$/, '')} ألف`;
-  }
-
-  return `${count}`;
+  onPress?: () => void;
+  onFavoritePress?: () => void;
 }
 
-function formatFollowersLabel(value?: number | null, suffix = 'متابع') {
-  const countLabel = formatFollowerCount(value);
-  return suffix ? `${countLabel} ${suffix}` : countLabel;
-}
-
-function formatDistance(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) {
-    return '—';
-  }
-
-  return `${value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)} كم`;
-}
-
-function buildServiceTokens(supportsPickup: boolean, supportsPartnerDelivery: boolean): ServiceToken[] {
-  const tokens: ServiceToken[] = [];
-
-  if (supportsPickup) {
-    tokens.push({ label: 'استلام بنفسك' });
-  }
-
-  if (supportsPartnerDelivery) {
-    tokens.push({ label: 'توصيل المتجر' });
-  }
-
-  return tokens;
-}
-
-function createStyles(theme: ReturnType<typeof useTheme>['theme'], rowDirection: 'row' | 'row-reverse', textAlign: 'left' | 'right' | 'center') {
-  const alignItemsDirection = textAlign === 'right' ? 'flex-end' : 'flex-start';
-
-  return StyleSheet.create({
-    card: {
-      width: '100%',
-      height: CARD_HEIGHT,
-      borderRadius: CARD_RADIUS,
-      backgroundColor: theme.surface,
-      borderWidth: 1,
-      borderColor: theme.line,
-      paddingVertical: 0,
-      paddingHorizontal: 0,
-      flexDirection: rowDirection,
-      alignItems: 'stretch',
-      overflow: 'hidden',
-      shadowColor: '#000',
-      shadowOpacity: 0.04,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 1,
-    },
-    cardPressed: { opacity: 0.98 },
-    detailsBlock: {
-      flex: 1,
-      flexDirection: rowDirection,
-      minWidth: 0,
-      alignItems: 'stretch',
-    },
-    mediaCol: {
-      width: IMAGE_SIZE + 20,
-      alignItems: 'stretch',
-      justifyContent: 'space-between',
-      paddingVertical: 0,
-      paddingHorizontal: 0,
-    },
-    leftCol: {
-      width: LEFT_COL_WIDTH,
-      marginStart: 0,
-      alignItems: 'flex-start',
-      justifyContent: 'flex-end',
-      paddingBottom: 8,
-      paddingTop: 0,
-    },
-    statusPill: {
-      position: 'absolute',
-      top: -4,
-      left: -4,
-      minWidth: 50,
-      height: 26,
-      paddingHorizontal: 8,
-      borderRadius: 13,
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 4,
-      zIndex: 2,
-      borderTopLeftRadius: CARD_RADIUS + 1,
-    },
-    statusPillOpen: {
-      backgroundColor: theme.successSurface,
-      borderWidth: 1,
-      borderColor: theme.success,
-    },
-    statusPillClosed: {
-      backgroundColor: theme.danger,
-    },
-    statusDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-    },
-    statusDotOpen: { backgroundColor: theme.success },
-    statusDotClosed: { backgroundColor: theme.textInverse },
-    statusText: {
-      fontSize: 11,
-      lineHeight: 12,
-      fontWeight: '800',
-    },
-    statusTextOpen: { color: theme.successText },
-    statusTextClosed: { color: theme.textInverse },
-    favoriteBtn: {
-      width: 32,
-      height: 32,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 'auto',
-    },
-    imageWrap: {
-      width: '100%',
-      height: IMAGE_SIZE,
-      borderTopStartRadius: 0,
-      borderTopEndRadius: CARD_RADIUS,
-      borderBottomStartRadius: 10,
-      borderBottomEndRadius: 10,
-      overflow: 'hidden',
-      backgroundColor: theme.surfaceRaised,
-      borderWidth: 1,
-      borderColor: theme.line,
-      position: 'relative',
-    },
-    image: { width: '100%', height: '100%' },
-    imagePlaceholder: {
-      width: '100%',
-      height: '100%',
-      backgroundColor: theme.surfaceRaised,
-    },
-    imageRibbon: {
-      position: 'absolute',
-      bottom: 0,
-      start: 0,
-      end: 0,
-      flexDirection: rowDirection,
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: 2,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      paddingVertical: 2,
-      borderBottomStartRadius: 8,
-      borderBottomEndRadius: 8,
-    },
-    ribbonBadgeNew: {
-      backgroundColor: theme.brand,
-      paddingHorizontal: 4,
-      paddingVertical: 1,
-      borderRadius: 3,
-    },
-    ribbonBadgeOffer: {
-      backgroundColor: theme.danger,
-      paddingHorizontal: 4,
-      paddingVertical: 1,
-      borderRadius: 3,
-    },
-    ribbonText: {
-      fontSize: 7,
-      lineHeight: 9,
-      fontWeight: '700',
-      color: theme.textInverse,
-    },
-    metricsBar: {
-      height: METRICS_BAR_HEIGHT,
-      width: '100%',
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      gap: 6,
-      backgroundColor: 'transparent',
-      paddingHorizontal: 0,
-      transform: [{ translateX: -4 }],
-    },
-    ratingSection: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: 3,
-    },
-    starRatingWrap: {
-      width: 16,
-      height: 16,
-      position: 'relative',
-    },
-    starOutline: { position: 'absolute', top: 0, start: 0 },
-    starFillMask: {
-      position: 'absolute',
-      top: 0,
-      start: 0,
-      height: 16,
-      overflow: 'hidden',
-    },
-    pointsMultiplierInline: {
-      backgroundColor: theme.warning,
-      paddingHorizontal: 4,
-      paddingVertical: 1,
-      borderRadius: 4,
-    },
-    pointsMultiplierInlineText: {
-      fontSize: 8,
-      lineHeight: 10,
-      fontWeight: '800',
-      color: theme.text,
-    },
-    followersWrap: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: 2,
-      flexShrink: 0,
-    },
-    followersText: {
-      fontSize: 10,
-      lineHeight: 12,
-      fontWeight: '600',
-      color: theme.text,
-    },
-    followIconWrap: { position: 'relative' },
-    followPlusBadge: {
-      position: 'absolute',
-      bottom: -2,
-      start: -2,
-      width: 12,
-      height: 12,
-      borderRadius: 6,
-      backgroundColor: theme.brand,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    contentCol: {
-      flex: 1,
-      minWidth: 0,
-      justifyContent: 'space-between',
-      alignItems: alignItemsDirection,
-      marginEnd: 0,
-      paddingVertical: 8,
-      paddingHorizontal: 10,
-    },
-    name: {
-      fontSize: 15,
-      lineHeight: 18,
-      fontWeight: '700',
-      color: theme.text,
-      textAlign,
-    },
-    subtitle: {
-      marginTop: 0,
-      fontSize: 11,
-      lineHeight: 14,
-      fontWeight: '400',
-      color: theme.textMuted,
-      textAlign,
-    },
-    serviceRow: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      flexWrap: 'wrap',
-    },
-    serviceRowText: {
-      fontSize: 11,
-      lineHeight: 14,
-      fontWeight: '500',
-      color: theme.textMuted,
-    },
-    serviceRowDot: {
-      fontSize: 11,
-      color: theme.textSoft,
-    },
-    subscriptionRow: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      gap: 4,
-      flexWrap: 'nowrap',
-    },
-    proBadge: {
-      height: 20,
-      paddingHorizontal: 8,
-      borderRadius: 10,
-      backgroundColor: theme.infoSurface,
-      borderWidth: 1,
-      borderColor: theme.info,
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: 3,
-    },
-    proBadgePressed: {
-      opacity: 0.9,
-      backgroundColor: theme.infoSurface,
-    },
-    proBadgeText: {
-      fontSize: 10,
-      lineHeight: 12,
-      fontWeight: '800',
-      color: theme.infoText,
-    },
-    packageChip: {
-      height: 18,
-      paddingHorizontal: 6,
-      borderRadius: 9,
-      backgroundColor: theme.surfaceRaised,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    packageChipText: {
-      fontSize: 9,
-      lineHeight: 11,
-      fontWeight: '700',
-      color: theme.textMuted,
-    },
-    couponChip: {
-      width: 18,
-      height: 18,
-      borderRadius: 9,
-      backgroundColor: theme.infoSurface,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    couponChipStandalone: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: 4,
-      backgroundColor: theme.infoSurface,
-      paddingHorizontal: 6,
-      paddingVertical: 3,
-      borderRadius: 10,
-    },
-    couponChipText: {
-      fontSize: 9,
-      lineHeight: 11,
-      fontWeight: '600',
-      color: theme.infoText,
-    },
-  });
-}
-
-export const StoreCardPremium = memo(function StoreCardPremium({
+export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
   item,
   onPress,
-  onPressSubscriptionChip,
-  onToggleFavorite,
-  onToggleFollow,
-  style,
-  testID,
-}: StoreCardPremiumProps) {
-  const { direction } = useDirection();
+  onFavoritePress,
+}) => {
   const { theme } = useTheme();
-  const rowDirection = resolveRowDirection(direction);
-  const styles = useMemo(() => createStyles(theme, rowDirection, resolveTextAlign(direction)), [direction, theme]);
-  const serviceTokens = item.serviceTokens ?? buildServiceTokens(item.supportsPickup, item.supportsPartnerDelivery);
-  const followersLabel = formatFollowersLabel(item.followersCount);
-  const ratingValue = item.rating == null || Number.isNaN(item.rating) ? 0 : item.rating;
-  const hasImage = Boolean(item.image);
+  const { tokens, mode } = useBThwaniAppearance();
+  const pc = tokens.components.commerce.productCard;
+  const bdg = tokens.components.badges;
+  const isDark = mode === 'darkGlass';
 
   return (
     <Pressable
-      testID={testID}
-      onPress={() => onPress?.(item.id)}
-      style={({ pressed }) => [styles.card, style, pressed && styles.cardPressed]}
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, { backgroundColor: pc.backgroundColor, borderWidth: 1, borderColor: pc.rimLightColor, opacity: pressed ? 0.92 : 1 }]}
     >
-      <View style={[styles.statusPill, item.isOpen ? styles.statusPillOpen : styles.statusPillClosed]}>
-        <View style={[styles.statusDot, item.isOpen ? styles.statusDotOpen : styles.statusDotClosed]} />
-        <Text style={[styles.statusText, item.isOpen ? styles.statusTextOpen : styles.statusTextClosed]}>
-          {item.isOpen ? 'مفتوح' : 'مغلق'}
-        </Text>
+      {/* Top-Left Status Icon (Absolute Leaf Premium) */}
+      <View style={styles.absoluteStatusBadge}>
+        <View style={{ width: 24, height: 24, justifyContent: 'center', alignItems: 'center' }}>
+          <Icon
+            name={item.isOpen ? 'lock-open' : 'lock-closed'}
+            size={16}
+            color={item.isOpen ? theme.success : theme.danger}
+          />
+          <View style={{
+            position: 'absolute',
+            bottom: -3,
+            right: -3,
+            backgroundColor: item.isOpen ? theme.success : theme.danger,
+            borderRadius: 4.5,
+            width: 9,
+            height: 9,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderWidth: 1,
+            borderColor: theme.surface,
+          }}>
+            <Icon name={item.isOpen ? 'checkmark' : 'remove'} size={5} color={colorPalette.white} />
+          </View>
+        </View>
       </View>
 
-      <View style={styles.detailsBlock}>
-        <View style={styles.mediaCol}>
-          <View style={styles.imageWrap}>
-            {hasImage ? (
-              <Image source={item.image ?? undefined} style={styles.image} resizeMode="cover" />
-            ) : (
-              <View style={styles.imagePlaceholder} />
-            )}
+      {/* Bottom-Left Favorite Button (Absolute Leaf Premium) */}
+      <Pressable
+        onPress={onFavoritePress}
+        hitSlop={8}
+        style={styles.absoluteFavoriteButton}
+      >
+        <Icon
+          name={item.isFavorite ? 'heart' : 'heart-outline'}
+          size={16}
+          color={colorPalette.brand}
+        />
+      </Pressable>
 
-            {(item.hasNewProducts || item.hasOffer) ? (
-              <View style={styles.imageRibbon}>
-                {item.hasNewProducts ? (
-                  <View style={styles.ribbonBadgeNew}>
-                    <Text style={styles.ribbonText}>جديد</Text>
-                  </View>
-                ) : null}
-                {item.hasOffer && item.offerText ? (
-                  <View style={styles.ribbonBadgeOffer}>
-                    <Text style={styles.ribbonText} numberOfLines={1}>{item.offerText}</Text>
-                  </View>
-                ) : null}
-              </View>
-            ) : null}
+      {/* Image Area (Right side in RTL) */}
+      <View style={styles.imageContainer}>
+        <Image source={item.image} style={styles.mainImage} />
+
+        {/* Metrics Overlay (Bottom-Left of Image) */}
+        <View style={styles.imageMetricsOverlay}>
+          <View style={styles.imageMetricItem}>
+            <Icon name="star" size={10} color="#FFD700" />
+            <Text style={styles.imageMetricText}>{item.rating?.toFixed(1) || '4.5'}</Text>
+          </View>
+          <View style={styles.imageMetricDivider} />
+          <View style={styles.imageMetricItem}>
+            <Icon name="people" size={10} color={colorPalette.white} />
+            <Text style={styles.imageMetricText}>
+              {item.followersCount ? `${(item.followersCount / 1000).toFixed(0)}k` : '11k'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Orange Logo Template (Bottom-right Overlay) */}
+        <View style={styles.logoTemplateContainer}>
+          <View style={[styles.logoOverlay, { borderColor: theme.surface }]}>
+            <Image source={item.logoImage || item.image} style={styles.logoImage} />
+          </View>
+        </View>
+      </View>
+
+      {/* Content Area (Left side in RTL) */}
+      <View style={styles.contentContainer}>
+        {/* Row 1 & 2: Name + Location/Badges */}
+        <View style={styles.textContent}>
+          <View style={styles.headerRow}>
+            <Text style={[styles.storeName, { color: pc.titleColor }]} numberOfLines={1}>
+              {item.name}
+            </Text>
           </View>
 
-          <View style={styles.metricsBar}>
-            <Pressable onPress={() => onToggleFollow?.(item.id)} style={styles.followersWrap}>
-              <Text style={styles.followersText} numberOfLines={1}>{followersLabel}</Text>
-              <View style={styles.followIconWrap}>
-                <Ionicons name="people-outline" size={18} color={theme.text} style={{ transform: [{ scaleX: -1 }] }} />
-                <View style={styles.followPlusBadge}>
-                  <Ionicons name="add" size={8} color={theme.textInverse} />
-                </View>
-              </View>
-            </Pressable>
+          <View style={styles.locationBadgeRow}>
+            <View style={styles.locationCluster}>
+              <Icon name="location-sharp" size={11} color={colorPalette.brand} />
+              <Text style={[styles.addressText, { color: tokens.textSecondary }]} numberOfLines={1}>
+                {item.locationLabel || item.subtitle || 'الرياض'}
+              </Text>
+            </View>
 
-            <View style={styles.ratingSection}>
-              <View style={styles.starRatingWrap}>
-                <View style={styles.starOutline}>
-                  <Ionicons name="star-outline" size={16} color={theme.warning} />
+            <View style={styles.badgeCluster}>
+              {item.isPopular && (
+                <View style={[styles.statusBadge, { backgroundColor: bdg.brand.backgroundColor, borderWidth: 1, borderColor: bdg.brand.borderColor }]}>
+                  <Icon name="flame" size={10} color={bdg.brand.iconColor} />
+                  <Text style={[styles.statusText, { color: bdg.brand.textColor }]}>رائج</Text>
                 </View>
-                <View style={[styles.starFillMask, { width: `${Math.min(100, (ratingValue / 5) * 100)}%` }]}>
-                  <Ionicons name="star" size={16} color={theme.warning} />
-                </View>
-              </View>
-
-              {item.pointsMultiplier != null && item.pointsMultiplier > 1 ? (
-                <View style={styles.pointsMultiplierInline}>
-                  <Text style={styles.pointsMultiplierInlineText}>x{item.pointsMultiplier}</Text>
-                </View>
-              ) : null}
+              )}
             </View>
           </View>
         </View>
 
-        <View style={styles.contentCol}>
-          <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
-          <Text numberOfLines={1} style={styles.subtitle}>{item.subtitle}</Text>
-
-          <View style={[styles.serviceRow, { minHeight: SERVICE_LANE_MIN_HEIGHT }]}>
-            <Text numberOfLines={1} style={styles.serviceRowText}>{formatDistance(item.distanceKm)}</Text>
-            {serviceTokens.map((token, index) => (
-              <React.Fragment key={`${item.id}-${index}`}>
-                <Text style={styles.serviceRowDot}> • </Text>
-                <Text numberOfLines={1} style={styles.serviceRowText}>{token.label}</Text>
-              </React.Fragment>
-            ))}
+        {/* Row 3: Metrics Ribbon (Clean, No Background) */}
+        <View style={styles.metricsRibbon}>
+          <View style={styles.metricItem}>
+            <Icon name="navigate-outline" size={10} color={theme.textMuted} />
+            <Text style={[styles.metaText, { color: tokens.textMuted }]}>{item.distanceKm?.toFixed(1) || '2.1'} كم</Text>
           </View>
-
-          <View style={[styles.subscriptionRow, { minHeight: SUBSCRIPTION_LANE_HEIGHT }]}>
-            {item.hasBthwaniPro ? (
-              <>
-                <Pressable
-                  onPress={() => onPressSubscriptionChip?.(item.id)}
-                  style={({ pressed }) => [styles.proBadge, pressed && styles.proBadgePressed]}
-                  hitSlop={8}
-                >
-                  <Ionicons name="flash" size={10} color={theme.textInverse} />
-                  <Text style={styles.proBadgeText}>ثواني برو</Text>
-                </Pressable>
-
-                {item.subscriptionPackageChips?.length ? item.subscriptionPackageChips.map((chip) => (
-                  <View key={chip} style={styles.packageChip}>
-                    <Text style={styles.packageChipText} numberOfLines={1}>{chip}</Text>
-                  </View>
-                )) : null}
-
-                {item.hasCouponAvailable ? (
-                  <View style={styles.couponChip}>
-                    <Ionicons name="ticket-outline" size={10} color={theme.info} />
-                  </View>
-                ) : null}
-              </>
-            ) : item.hasCouponAvailable ? (
-              <View style={styles.couponChipStandalone}>
-                <Ionicons name="ticket-outline" size={12} color={theme.info} />
-                <Text style={styles.couponChipText}>قسيمة متاحة</Text>
-              </View>
-            ) : null}
+          <View style={styles.metricDivider} />
+          <View style={styles.metricItem}>
+            <Icon name="time-outline" size={10} color={theme.textMuted} />
+            <Text style={[styles.metaText, { color: tokens.textMuted }]}>{item.deliveryTimeLabel || '25-35 د'}</Text>
           </View>
         </View>
-      </View>
 
-      <View style={styles.leftCol}>
-        <Pressable hitSlop={10} onPress={() => onToggleFavorite?.(item.id)} style={styles.favoriteBtn}>
-          <Ionicons
-            name={item.isFavorite ? 'heart' : 'heart-outline'}
-            size={24}
-            color={item.isFavorite ? theme.danger : theme.textSoft}
-          />
-        </Pressable>
+        {/* Row 4: Service Icons */}
+        <View style={styles.servicesRow}>
+          {item.supportsPartnerDelivery && (
+            <View style={styles.serviceIconWrap}>
+              <Icon name="bicycle-outline" size={14} color={tokens.textSecondary} />
+              <Text style={[styles.serviceMiniText, { color: tokens.textSecondary }]}>توصيل</Text>
+            </View>
+          )}
+          {item.supportsPickup && (
+            <View style={styles.serviceIconWrap}>
+              <Icon name="walk-outline" size={14} color={tokens.textSecondary} />
+              <Text style={[styles.serviceMiniText, { color: tokens.textSecondary }]}>استلم</Text>
+            </View>
+          )}
+          <View style={styles.serviceIconWrap}>
+            <Icon name="flash-outline" size={14} color={colorPalette.brand} />
+            <Text style={[styles.serviceMiniText, { color: colorPalette.brand }]}>ثواني</Text>
+          </View>
+        </View>
+
+        {/* Row 5: Promo Chips */}
+        <View style={styles.promoRow}>
+          {item.hasBthwaniPro && (
+            <View style={[styles.promoChip, { backgroundColor: isDark ? tokens.glassSurfaceStrong : colorPalette.brandStrong, borderWidth: isDark ? 1 : 0, borderColor: isDark ? tokens.glassBorder : 'transparent' }]}>
+              <Text style={[styles.promoChipTextPro, { color: isDark ? tokens.textPrimary : colorPalette.white }]}>برو</Text>
+            </View>
+          )}
+          {item.hasOffer && (
+            <View style={[styles.promoChip, { backgroundColor: bdg.success.backgroundColor, borderWidth: 1, borderColor: bdg.success.borderColor }]}>
+              <Text style={[styles.promoChipText, { color: bdg.success.textColor }]}>مجاني</Text>
+            </View>
+          )}
+          {item.pointsMultiplier && item.pointsMultiplier > 1 && (
+            <View style={[styles.promoChip, { backgroundColor: bdg.info.backgroundColor, borderWidth: 1, borderColor: bdg.info.borderColor }]}>
+              <Text style={[styles.promoChipText, { color: bdg.info.textColor }]}>{item.pointsMultiplier}x نقاط</Text>
+            </View>
+          )}
+          {item.hasCouponAvailable && (
+            <View style={[styles.promoChip, { backgroundColor: bdg.promo.backgroundColor, borderWidth: 1, borderColor: bdg.promo.borderColor }]}>
+              <Text style={[styles.promoChipText, { color: bdg.promo.textColor }]}>كوبون</Text>
+            </View>
+          )}
+        </View>
       </View>
     </Pressable>
   );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    width: SCREEN_WIDTH - 32,
+    height: IMAGE_SIZE,
+    borderRadius: CARD_RADIUS,
+    flexDirection: 'row-reverse',
+    overflow: 'hidden',
+    alignSelf: 'center',
+    shadowColor: colorPalette.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    marginHorizontal: 16,
+    marginBottom: 10,
+  },
+  imageContainer: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    position: 'relative',
+  },
+  mainImage: {
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: CARD_RADIUS,
+  },
+  imageMetricsOverlay: {
+    position: 'absolute',
+    bottom: 8,
+    left: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: withAlpha(colorPalette.brandStrong, 0.85),
+    borderRadius: 6,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: withAlpha(colorPalette.white, 0.2),
+    gap: 4,
+    maxWidth: 66, // Prevents overlap with the logo circle on the right while staying clear of the left corner curve
+  },
+  imageMetricItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  imageMetricText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: colorPalette.white,
+    fontFamily: 'Outfit-Bold',
+  },
+  imageMetricDivider: {
+    width: 1,
+    height: 8,
+    backgroundColor: withAlpha(colorPalette.white, 0.3),
+  },
+  logoTemplateContainer: {
+    position: 'absolute',
+    bottom: -10,
+    right: -10,
+    width: LOGO_SIZE + 12,
+    height: LOGO_SIZE + 12,
+    borderRadius: (LOGO_SIZE + 12) / 2,
+    backgroundColor: colorPalette.brand,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
+    shadowColor: colorPalette.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: colorPalette.white,
+  },
+  absoluteStatusBadge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 30,
+    width: 36,
+    height: 36,
+    backgroundColor: colorPalette.white,
+    borderBottomRightRadius: 24,
+    borderTopLeftRadius: CARD_RADIUS,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0.8,
+    borderColor: withAlpha(colorPalette.black, 0.05),
+    shadowColor: colorPalette.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  absoluteFavoriteButton: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    zIndex: 30,
+    width: 36,
+    height: 36,
+    backgroundColor: colorPalette.white,
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: CARD_RADIUS,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0,
+    borderColor: 'transparent',
+    shadowColor: colorPalette.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  textContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  logoOverlay: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+    borderRadius: LOGO_SIZE / 2,
+    borderWidth: 1, // Slimmer internal border
+    overflow: 'hidden',
+    backgroundColor: colorPalette.white,
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  contentContainer: {
+    flex: 1,
+    paddingRight: 12,
+    paddingLeft: 45, // Leave space for absolute Status and Favorite actions
+    paddingVertical: 8,
+    justifyContent: 'space-between',
+  },
+  headerRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  storeName: {
+    fontSize: 19, // Primary: Prominent & Dominant
+    fontWeight: '800',
+    color: colorPalette.brandStrong,
+    textAlign: 'right',
+    fontFamily: 'Outfit-Bold',
+    marginBottom: 0,
+  },
+  addressText: {
+    fontSize: 11, // Even smaller and quieter
+    color: '#718096',
+    textAlign: 'right',
+    fontFamily: 'Outfit-Regular',
+    marginTop: -1,
+  },
+  locationBadgeRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  locationCluster: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    flex: 1,
+  },
+  badgeCluster: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusText: {
+    fontSize: 9, // Smaller for clean hierarchy
+    fontWeight: '700',
+    fontFamily: 'Outfit-Bold',
+    marginRight: 2,
+  },
+  statusOrb: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 2,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 4,
+  },
+  metaText: {
+    fontSize: 9, // Tertiary: Smallest possible for high-density elegance
+    color: '#718096',
+    fontFamily: 'Outfit-Medium',
+  },
+  deliveryBadgeText: {
+    fontSize: 13,
+    color: colorPalette.brand,
+    fontWeight: '700',
+    fontFamily: 'Outfit-Bold',
+  },
+  badgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  metricsRibbon: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    justifyContent: 'flex-start',
+    gap: 12,
+  },
+  metricItem: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 3,
+  },
+  metricText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colorPalette.brandStrong,
+  },
+  metricDivider: {
+    width: 1,
+    height: 10,
+    backgroundColor: withAlpha(colorPalette.black, 0.05),
+  },
+  servicesRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 16, // More space between services
+  },
+  serviceIconWrap: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+  },
+  serviceMiniText: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: colorPalette.brandStrong,
+  },
+  promoRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 8, // Increased gap for better separation
+    marginTop: 4,
+  },
+  promoChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  promoChipPro: {
+    backgroundColor: colorPalette.brandStrong,
+  },
+  promoChipTextPro: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colorPalette.white,
+  },
+  promoChipText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
 });
 
 export default StoreCardPremium;

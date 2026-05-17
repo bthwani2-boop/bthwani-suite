@@ -1,11 +1,48 @@
-export * from './surface-meta';
-export * from './surface-catalog';
-export * as entry from './entry';
-export * as orders from './orders';
-export * as finance from './finance';
-export * as profile from './profile';
-export * as operations from './operations';
-export * as dshAppCaptainFlow from './dsh-app-captain-flow';
-export * as shared from './shared';
+/**
+ * DSH Captain App Public API
+ *
+ * This file defines the clean, intentional public API for the DSH captain surface.
+ * Only components and types required by app-captain composition/shell are exported here.
+ */
 
+// Core Surface & Host
+export { DshCaptainSurface } from './DshCaptainSurface';
 
+/**
+ * Compatibility alias for DshCaptainSurface.
+ * @deprecated Use DshCaptainSurface instead.
+ */
+export { DshCaptainSurface as DshSurfaceHost } from './DshCaptainSurface';
+
+// Public Types required by Composition/Shell
+export type {
+	DshCaptainCommandTarget,
+	DshCaptainNavigationCommand,
+	DshCaptainRoute,
+	DshCaptainSurfaceProps,
+	DshSurfaceHostProps,
+	DshCaptainState,
+	DshCaptainStateGroup,
+	DshCaptainStateMeta,
+	DshCaptainFinanceSnapshot,
+	DshCaptainOperationsSnapshot,
+	DshCaptainOrderActionPayload,
+	DshCaptainOrderSnapshot,
+	DshCaptainProfileSnapshot,
+	DshCaptainProofPayload,
+} from './dsh-captain.types';
+
+// Routing & Registry
+export { dshCaptainRoutes } from './dsh-captain.routes';
+export type {
+	DshCaptainLegacyRoute,
+	DshCaptainRouteId,
+	DshCaptainRouteRecord,
+} from './dsh-captain.routes';
+
+export { dshCaptainScreenRegistry } from './dsh-captain.screen-registry';
+export type { DshCaptainScreenRegistryItem } from './dsh-captain.screen-registry';
+
+// --- End of Public API ---
+// Internal screens, parts, and data are hidden from the public index
+// to enforce strict architectural boundaries.

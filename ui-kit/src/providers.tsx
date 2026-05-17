@@ -14,6 +14,14 @@ import { Platform } from 'react-native';
 import { TamaguiProvider } from 'tamagui';
 import tamaguiConfig from './tamagui-config';
 import {
+	defaultBThwaniAppearanceMode,
+	getBThwaniAppearanceThemeMode,
+	getBThwaniAppearanceTokens,
+	resolveBThwaniAppearanceMode,
+	type BThwaniAppearanceMode,
+	type BThwaniAppearanceTokens,
+} from './appearance';
+import {
 	directionConfig,
 	getUiText,
 	lightTheme,
@@ -60,6 +68,13 @@ const ThemeContext = createContext<ThemeContextValue>({
 	mode: 'light',
 	theme: lightTheme,
 });
+
+type BThwaniAppearanceContextValue = {
+	mode: BThwaniAppearanceMode;
+	tokens: BThwaniAppearanceTokens;
+};
+
+const AppearanceContext = createContext<BThwaniAppearanceContextValue | null>(null);
 
 type PortalFactory = (children: ReactNode, container: Element) => ReactNode;
 
@@ -144,6 +159,48 @@ export function useThemeContext() {
 
 export function useTheme() {
 	return useThemeContext();
+}
+
+export type BThwaniAppearanceProviderProps = {
+	mode?: BThwaniAppearanceMode;
+	children: ReactNode;
+	syncThemeMode?: boolean;
+};
+
+export function BThwaniAppearanceProvider({
+	mode = defaultBThwaniAppearanceMode,
+	children,
+	syncThemeMode = true,
+}: BThwaniAppearanceProviderProps) {
+	const value = useMemo<BThwaniAppearanceContextValue>(() => ({
+		mode,
+		tokens: getBThwaniAppearanceTokens(mode),
+	}), [mode]);
+
+	const content = <AppearanceContext.Provider value={value}>{children}</AppearanceContext.Provider>;
+
+	if (!syncThemeMode) {
+		return content;
+	}
+
+	return <ThemeProvider mode={getBThwaniAppearanceThemeMode(mode)}>{content}</ThemeProvider>;
+}
+
+export function useBThwaniAppearanceContext() {
+	return useContext(AppearanceContext);
+}
+
+export function useBThwaniAppearance() {
+	const appearanceContext = useContext(AppearanceContext);
+	const { mode } = useTheme();
+	const resolvedMode = appearanceContext?.mode ?? resolveBThwaniAppearanceMode(mode);
+
+	return useMemo<BThwaniAppearanceContextValue>(() => (
+		appearanceContext ?? {
+			mode: resolvedMode,
+			tokens: getBThwaniAppearanceTokens(resolvedMode),
+		}
+	), [appearanceContext, resolvedMode]);
 }
 
 export type DirectionProviderProps = {
@@ -351,5 +408,4 @@ export function RootProviders({ children, language, themeMode }: RootProvidersPr
 }
 
 export type { Language, Direction, SemanticTheme, ThemeMode } from './foundation';
-
-
+export type { BThwaniAppearanceMode, BThwaniAppearanceTokens } from './appearance';

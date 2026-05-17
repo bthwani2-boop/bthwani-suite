@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme } from '../providers';
 import { Icon, type IconName } from './icons';
-import { sizes, spacing, radius } from '../foundation';
+import { colorPalette, sizes, spacing, radius, withAlpha } from '../foundation';
 
 export type IconButtonProps = PressableProps & {
   name: IconName;
@@ -27,7 +27,7 @@ export function IconButton({ name, size = sizes.iconMd, tone = 'default', style,
           borderRadius: radius.xl,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: pressed && backgroundColor === 'transparent' ? 'rgba(0,0,0,0.04)' : backgroundColor,
+          backgroundColor: pressed && backgroundColor === 'transparent' ? withAlpha(colorPalette.black, 0.04) : backgroundColor,
         },
         style as StyleProp<ViewStyle>,
       ]}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { borders, radius, resolveRowDirection, sizes, spacing } from '../foundation';
-import { useDirection, useTheme } from '../providers';
+import { useBThwaniAppearance, useDirection } from '../providers';
 import { Text } from '../primitives';
 
 type PressableStyle = StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>);
@@ -10,10 +10,13 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
   return typeof style === 'function' ? style(state) : style;
 }
 
-export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'brand' | 'warning' | 'info' | 'default' | 'glass' | 'glassStrong';
 
-export type ButtonProps = PressableProps & {
-  label: string;
+export type ButtonProps = Omit<PressableProps, 'children'> & {
+  label?: string;
+  children?: React.ReactNode;
+  variant?: ButtonTone;
+  onClick?: PressableProps['onPress'];
   tone?: ButtonTone;
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
@@ -26,7 +29,10 @@ export type ButtonProps = PressableProps & {
 
 export function Button({
   label,
-  tone = 'primary',
+  children,
+  tone,
+  variant,
+  onClick,
   size = 'md',
   loading = false,
   disabled,
@@ -36,21 +42,27 @@ export function Button({
   icon,
   iconPosition = 'leading',
   style,
+  onPress,
   ...rest
 }: ButtonProps) {
   const { direction } = useDirection();
-  const { theme } = useTheme();
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
   const resolvedDisabled = disabled || loading;
   const resolvedLeadingAccessory = leadingAccessory ?? (icon && iconPosition === 'leading' ? icon : null);
   const resolvedTrailingAccessory = trailingAccessory ?? (icon && iconPosition === 'trailing' ? icon : null);
-
   const toneConfig = {
-    primary: { backgroundColor: theme.brand, borderColor: theme.brand, labelColor: theme.brandContrast },
-    secondary: { backgroundColor: theme.surface, borderColor: theme.lineStrong, labelColor: theme.text },
-    ghost: { backgroundColor: 'transparent', borderColor: 'transparent', labelColor: theme.brand },
-    danger: { backgroundColor: theme.danger, borderColor: theme.danger, labelColor: '#FFFFFF' },
-    success: { backgroundColor: theme.success, borderColor: theme.success, labelColor: '#FFFFFF' },
-  }[tone];
+    primary: appearanceTokens.components.buttons.primary,
+    brand: appearanceTokens.components.buttons.brand,
+    secondary: appearanceTokens.components.buttons.secondary,
+    ghost: appearanceTokens.components.buttons.ghost,
+    danger: appearanceTokens.components.buttons.danger,
+    success: appearanceTokens.components.buttons.success,
+    warning: appearanceTokens.components.buttons.warning,
+    info: appearanceTokens.components.buttons.info,
+    default: appearanceTokens.components.buttons.default,
+    glass: appearanceTokens.components.buttons.glass,
+    glassStrong: appearanceTokens.components.buttons.glassStrong,
+  }[tone ?? variant ?? 'primary'];
 
   const sizeConfig = {
     sm: { minHeight: sizes.controlSm, paddingHorizontal: spacing[3], textRole: 'label' as const },
@@ -62,30 +74,53 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       disabled={resolvedDisabled}
-      style={({ pressed }) => [
-        {
-          width: fullWidth ? '100%' : undefined,
-          minHeight: sizeConfig.minHeight,
-          paddingHorizontal: sizeConfig.paddingHorizontal,
-          borderRadius: size === 'lg' ? radius.xl : radius.lg,
-          borderWidth: tone === 'ghost' ? 0 : borders.hairline,
-          borderColor: toneConfig.borderColor,
-          backgroundColor: toneConfig.backgroundColor,
-          opacity: resolvedDisabled ? 0.56 : pressed ? 0.9 : 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: resolveRowDirection(direction),
-          gap: spacing[2],
-        },
-        resolvePressableStyle(style, { pressed } as PressableStateCallbackType),
-      ]}
+      onPress={onPress ?? onClick}
+      style={({ pressed }) => {
+        const palette = resolvedDisabled ? toneConfig.disabled : pressed ? toneConfig.pressed : toneConfig.default;
+
+        return [
+          {
+            width: fullWidth ? '100%' : undefined,
+            minHeight: sizeConfig.minHeight,
+            paddingHorizontal: sizeConfig.paddingHorizontal,
+            borderRadius: size === 'lg' ? radius.xl : radius.lg,
+            borderWidth: tone === 'ghost' ? 0 : borders.hairline,
+            borderColor: palette.borderColor,
+            backgroundColor: palette.backgroundColor,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: resolveRowDirection(direction),
+            gap: spacing[2],
+          },
+          palette.shadow,
+          resolvePressableStyle(style, { pressed } as PressableStateCallbackType),
+        ];
+      }}
       {...rest}
     >
-      {loading ? <ActivityIndicator color={toneConfig.labelColor} /> : null}
+      {loading ? <ActivityIndicator color={(resolvedDisabled ? toneConfig.disabled : toneConfig.default).iconColor} /> : null}
       {resolvedLeadingAccessory}
-      <Text role={sizeConfig.textRole} style={{ color: toneConfig.labelColor }}>
-        {label}
-      </Text>
+      {label ? (
+        <Text
+          role={sizeConfig.textRole}
+          style={{
+            color: (resolvedDisabled ? toneConfig.disabled : toneConfig.default).textColor,
+          }}
+        >
+          {label}
+        </Text>
+      ) : typeof children === 'string' || typeof children === 'number' ? (
+        <Text
+          role={sizeConfig.textRole}
+          style={{
+            color: (resolvedDisabled ? toneConfig.disabled : toneConfig.default).textColor,
+          }}
+        >
+          {children}
+        </Text>
+      ) : (
+        children
+      )}
       {resolvedTrailingAccessory}
     </Pressable>
   );
@@ -98,15 +133,15 @@ export type BadgeProps = {
 };
 
 export function Badge({ label, tone = 'default', style }: BadgeProps) {
-  const { theme } = useTheme();
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
   const palette = {
-    default: { backgroundColor: theme.surfaceInset, textColor: theme.textMuted, borderColor: theme.line },
-    brand: { backgroundColor: theme.brandSurface, textColor: theme.brand, borderColor: theme.brandSurface },
-    success: { backgroundColor: theme.successSurface, textColor: theme.successText, borderColor: theme.successSurface },
-    warning: { backgroundColor: theme.warningSurface, textColor: theme.warningText, borderColor: theme.warningSurface },
-    danger: { backgroundColor: theme.dangerSurface, textColor: theme.dangerText, borderColor: theme.dangerSurface },
-    info: { backgroundColor: theme.infoSurface, textColor: theme.infoText, borderColor: theme.infoSurface },
-  }[tone];
+    default: appearanceTokens.components.badges.neutral,
+    brand: appearanceTokens.components.badges.brand,
+    success: appearanceTokens.components.badges.success,
+    warning: appearanceTokens.components.badges.warning,
+    danger: appearanceTokens.components.badges.danger,
+    info: appearanceTokens.components.badges.info,
+  }[tone ?? variant ?? 'primary'];
 
   return (
     <Pressable
@@ -135,43 +170,55 @@ export function Badge({ label, tone = 'default', style }: BadgeProps) {
 export type ChipProps = {
   label: string;
   selected?: boolean;
-  tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
+  tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' | 'glass' | 'glassStrong';
   onPress?: () => void;
 };
 
 export function Chip({ label, selected = false, tone = 'default', onPress }: ChipProps) {
-  const { theme } = useTheme();
-  const toneScheme = {
-    default: { accent: theme.lineStrong, surface: theme.surface, label: theme.text, selectedSurface: theme.surfaceInset, selectedLabel: theme.text },
-    brand: { accent: theme.brand, surface: theme.surface, label: theme.brand, selectedSurface: theme.brand, selectedLabel: theme.brandContrast },
-    success: { accent: theme.success, surface: theme.surface, label: theme.success, selectedSurface: theme.successSurface, selectedLabel: theme.success },
-    warning: { accent: theme.warning, surface: theme.surface, label: theme.warning, selectedSurface: theme.warningSurface, selectedLabel: theme.warning },
-    danger: { accent: theme.danger, surface: theme.surface, label: theme.danger, selectedSurface: theme.dangerSurface, selectedLabel: theme.danger },
-    info: { accent: theme.info, surface: theme.surface, label: theme.info, selectedSurface: theme.infoSurface, selectedLabel: theme.info },
-  }[tone];
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
+  const basePalette = {
+    default: appearanceTokens.components.chips.default,
+    brand: appearanceTokens.components.badges.brand,
+    success: appearanceTokens.components.badges.success,
+    warning: appearanceTokens.components.badges.warning,
+    danger: appearanceTokens.components.badges.danger,
+    info: appearanceTokens.components.badges.info,
+    glass: appearanceTokens.components.chips.glass,
+    glassStrong: appearanceTokens.components.chips.glassSelected,
+  }[tone ?? variant ?? 'primary'];
+  const selectedPalette = tone === 'glass' || tone === 'glassStrong'
+    ? appearanceTokens.components.chips.glassSelected
+    : appearanceTokens.components.chips.selected;
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      style={({ pressed }) => [
-        {
-          alignSelf: 'flex-start',
-          paddingHorizontal: spacing[3],
-          paddingVertical: spacing[2],
-          borderRadius: radius.pill,
-          borderWidth: 1,
-          borderColor: selected ? toneScheme.accent : theme.line,
-          backgroundColor: selected ? toneScheme.selectedSurface : toneScheme.surface,
-          opacity: pressed ? 0.9 : 1,
-        },
-      ]}
+      style={({ pressed }) => {
+        const palette = selected ? selectedPalette : basePalette;
+        const pressedPalette = selected
+          ? selectedPalette
+          : tone === 'glass' || tone === 'glassStrong'
+            ? appearanceTokens.components.chips.glassSelected
+            : appearanceTokens.components.chips.selected;
+
+        return [
+          {
+            alignSelf: 'flex-start',
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[2],
+            borderRadius: radius.pill,
+            borderWidth: 1,
+            borderColor: (pressed ? pressedPalette : palette).borderColor,
+            backgroundColor: (pressed ? pressedPalette : palette).backgroundColor,
+          },
+        ];
+      }}
     >
-      <Text role="label" style={{ color: selected ? toneScheme.selectedLabel : toneScheme.label }}>
+      <Text role="label" style={{ color: (selected ? selectedPalette : basePalette).textColor }}>
         {label}
       </Text>
     </Pressable>
   );
 }
-

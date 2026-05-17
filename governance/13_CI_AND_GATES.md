@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `CI Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 13_CI_GATES_CONTRACT, CI_GRADUAL_GATE_POLICY, CI_REPORT_ONLY_READINESS_PLAN
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Gate types
 
@@ -21,7 +12,7 @@ This file is not a slogan file. It is a control-plane rule file for BThwani. Any
 | TypeScript | blocking for code | typecheck fails |
 | Security/secrets | blocking | secret risk detected |
 | Boundary guard | blocking for boundary changes | forbidden imports/exports found |
-| Governance references | blocking for governance changes | legacy active references remain |
+| Governance references | blocking for governance changes | retired or invalid active references remain |
 | UI evidence | blocking for UI closure | screenshots missing |
 | Runtime evidence | blocking for runtime closure | logs/tests missing |
 | Warning classification | report/block depending severity | warnings unclassified |

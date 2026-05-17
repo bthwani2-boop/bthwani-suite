@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { WebPageFrame, WebSectionCard } from '@bthwani/ui-kit/web';
 import styles from './shared-web-shell.module.css';
 
@@ -29,6 +30,17 @@ export function WebsiteSurfaceHost(_props: WebsiteSurfaceHostProps) {
               {item}
             </p>
           ))}
+        </div>
+      </WebSectionCard>
+      <WebSectionCard
+        title="إعدادات المظهر"
+        description="رابط هادئ إلى إعداد المظهر بدل وضع زر صاخب داخل الواجهة العامة."
+      >
+        <div className={styles.linkGrid}>
+          <Link href="/settings" className={styles.navLink}>
+            <span className={styles.navLabel}>المظهر</span>
+            <span className={styles.navDescription}>تبديل آمن بين Light Premium و Dark Glass مع حفظ محلي.</span>
+          </Link>
         </div>
       </WebSectionCard>
     </WebPageFrame>

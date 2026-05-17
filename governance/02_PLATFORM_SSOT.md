@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Platform Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** PLATFORM_BLUEPRINT, PLATFORM_OPERATING_MODEL, ARCHITECTURE_LOCK, BTHWANI_MASTER_EXECUTION_PLAYBOOK
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Platform definition
 
@@ -101,7 +92,7 @@ VAR_ZONE_SURGE_MULTIPLIER
 3. Contracts under `contracts/master/`.
 4. Package public APIs and tests.
 5. Runtime logs and evidence packs.
-6. Legacy files only as extraction evidence.
+6. Historical accounting and superseded source notes only through `99_LEGACY_MERGE_LEDGER.md`.
 
 ## Platform closure conditions
 
@@ -115,5 +106,5 @@ The platform is not “closed” because files exist. Closure requires:
 - Evidence pack standard enforced.
 - Guards catalog defined.
 - Branch/checkpoint process defined.
-- Legacy source accounted for.
+- Historical source accounting updated when owner mapping changes.
 - Verification run generated and reviewed.

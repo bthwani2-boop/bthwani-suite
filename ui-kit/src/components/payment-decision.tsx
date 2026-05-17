@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
-import { borders, radius, resolveRowDirection, spacing } from '../foundation';
+import { borders, colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button, type BadgeProps, type ButtonTone } from './button';
 import { Text } from '../primitives';
@@ -105,7 +105,7 @@ export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
           paddingVertical: spacing[3],
           gap: spacing[2],
           opacity: item.disabled && !item.selected ? 0.68 : pressed && canSelect ? 0.96 : 1,
-          shadowColor: item.selected ? '#0A2F5C' : undefined,
+          shadowColor: item.selected ? colorPalette.brandStrong : undefined,
           shadowOpacity: item.selected ? 0.06 : 0,
           shadowRadius: item.selected ? 10 : 0,
           shadowOffset: item.selected ? { width: 0, height: 4 } : undefined,

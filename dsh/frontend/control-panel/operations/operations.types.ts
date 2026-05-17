@@ -4,8 +4,10 @@ export type CanonicalOperationsGroupId =
   | 'command-center'
   | 'live-orders'
   | 'dispatch-assignment'
+  | 'geo-heatmap'
   | 'sheinproxy'
-  | 'proxy-shein-awnak'
+  // 'proxy-shein-awnak' is a LEGACY alias — canonical is 'awnak-operations'
+  | 'awnak-operations'
   | 'captain-operations'
   | 'partner-stores'
   | 'area-capacity'
@@ -20,7 +22,7 @@ export type LegacyOperationsWorkspaceId =
   | 'tracking-handoff'
   | 'exceptions-sla'
   | 'partner-readiness'
-  | 'proxy-shein-awnak'
+  | 'proxy-shein-awnak' // legacy alias → awnak-operations
   | 'audit-evidence'
   | 'captain-ops'
   | 'field-ops'
@@ -53,14 +55,8 @@ export type LegacyOperationsWorkspaceId =
   | 'bell'
   | 'arrival-bell'
   | 'zone-set'
-  | 'live-tracking'
-  | 'handoff'
-  | 'proof-review'
-  | 'capacity'
-  | 'dispatch'
-  | 'exceptions'
-  | 'sla'
-  | 'audit';
+  | 'live-map-capacity'
+  | 'geo-heatmap';
 
 export type LegacySectionRedirectId =
   | 'finance'
@@ -80,11 +76,20 @@ export type AnyOperationsWorkspaceId = CanonicalOperationsGroupId | LegacyOperat
 
 export type NonOperationsSectionRootId = 'finance' | 'catalogs' | 'marketing' | 'partners';
 
+export type OperationsSubGroupMeta = {
+  id: string;
+  label: string;
+};
+
+export type OperationsTertiaryFilterId = 'الآن' | '١٥ دقيقة' | '٣٠ دقيقة' | 'خطر عالٍ' | 'نقص كباتن' | 'ضغط متاجر';
+
 export type OperationsGroupMeta = {
   id: CanonicalOperationsGroupId;
   label: string;
   description: string;
   badge: string;
+  subGroups?: readonly OperationsSubGroupMeta[];
+  tertiaryFilters?: readonly OperationsTertiaryFilterId[];
 };
 
 export type OperationsNormalizationResult =

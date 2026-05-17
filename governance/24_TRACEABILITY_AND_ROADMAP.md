@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Roadmap Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** PLATFORM_BLUEPRINT_EXECUTION_ROADMAP, BTHWANI_GUIDE phases/waves/todolists, VERIFICATION_MATRIX
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Traceability purpose
 
@@ -46,7 +37,7 @@ A wave must have:
 - decision,
 - next wave.
 
-Do not bundle many unrelated tasks into one broad AI prompt.
+Do not bundle many unrelated tasks into one broad task request.
 
 ## Roadmap closure
 

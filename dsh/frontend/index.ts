@@ -1,5 +1,13 @@
-export * as dshAppClient from './app-client';
-export * as dshAppPartner from './app-partner';
-export * as dshAppCaptain from './app-captain';
-export * as dshAppField from './app-field';
-export * as dshControlPanel from './control-panel';
+import * as dshAppClient from './app-client';
+import * as dshAppPartner from './app-partner';
+import * as dshAppCaptain from './app-captain';
+import * as dshAppField from './app-field';
+import * as dshControlPanel from './control-panel';
+
+export {
+	dshAppCaptain,
+	dshAppClient,
+	dshAppField,
+	dshAppPartner,
+	dshControlPanel,
+};

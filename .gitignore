@@ -25,8 +25,6 @@ yarn-error.log*
 # OS/editor noise
 .DS_Store
 Thumbs.db
-.claude/worktrees
-.claude/settings.local.json
 # Local-only donor/service intelligence outputs
 docs/services/surfaces-legacy-trash/
 # Local registry run artifacts
@@ -35,14 +33,7 @@ tools/registry/runs/
 tools/analysis/
 # Local-only scripts
 # tools/scripts/ # ENABLED_FOR_GOVERNANCE_SCRIPT_TRACKING
-# Local-only media fixture assets
-packages/media-fixtures/assets/
-!packages/media-fixtures/assets/
-packages/media-fixtures/assets/*
-!packages/media-fixtures/assets/seed/
-packages/media-fixtures/assets/seed/*
-!packages/media-fixtures/assets/seed/dsh/
-!packages/media-fixtures/assets/seed/dsh/**
+
 # Local Python virtual environments
 .venv/
 .tamagui/
@@ -57,3 +48,9 @@ tools/registry/runs/*
 !tools/registry/runs/README.md
 !tools/registry/runs/_published/
 !tools/registry/runs/_published/**
+
+.claude/worktrees
+.claude/settings.local.json
+
+# Local media fixtures (seeds) - keep local only
+dsh/media-fixtures/assets/seed/dsh/

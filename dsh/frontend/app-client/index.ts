@@ -1,26 +1,44 @@
-export * from './surface-meta';
-export * from './surface-catalog';
-export * from './awnak/screens';
-export * from './cart/screens';
-export * from './discovery/screens';
-export * from './entry/screens';
-export * from './favorites/screens';
-export * from './gas/screens';
-export * from './bell';
-export * from './home/screens';
-export * from './my_space/screens';
-export * from './notifications/screens';
-export * from './loyalty/screens';
-export * from './checkout/screens';
-// orders folder consolidated into checkout/screens to avoid duplication
-export * from './shein/screens';
-export * from './stores/screens';
-export * from './operations/screens';
-export * from './shared/dshClientStateModel';
-export * from './shared/dshClientBinding.contracts';
-// 'tracking' and 'checkout' families were consolidated; explicit exports removed.
-export { DshHomeApprovedVideoReelsViewer } from './home/components/DshHomeApprovedVideoReelsViewer';
-export type { DshHomeApprovedVideoReelsViewerProps } from './home/components/DshHomeApprovedVideoReelsViewer';
-export { DshSurfaceHost } from './DshSurfaceHost';
-export type { DshCommandTarget, DshRoute } from './DshSurfaceHost';
+/**
+ * DSH Client App Public API
+ *
+ * This file defines the clean, intentional public API for the DSH client surface.
+ * Only components and types required by app-client composition/shell or WLT bridges
+ * are exported here.
+ */
 
+// Core Surface & Host
+export { DshClientSurface } from './DshClientSurface';
+
+/**
+ * Compatibility alias for DshClientSurface.
+ * @deprecated Use DshClientSurface instead.
+ */
+export { DshClientSurface as DshSurfaceHost } from './DshClientSurface';
+
+// Public Types required by Composition/Shell
+export type {
+	DshClientSurfaceProps,
+	DshCommandTarget,
+	DshNavigationCommand,
+	DshRoute,
+	DshSurfaceHostProps,
+} from './dsh-client.types';
+
+// Routing & Registry
+export { dshClientRoutes } from './dsh-client.routes';
+export type {
+	DshClientLegacyRoute,
+	DshClientRouteId,
+	DshClientRouteRecord,
+} from './dsh-client.routes';
+
+export { dshClientScreenRegistry } from './dsh-client.screen-registry';
+export type { DshClientScreenRegistryItem } from './dsh-client.screen-registry';
+
+// Cross-App Integration Components
+export { DshHomeApprovedVideoReelsViewer } from './parts/ApprovedVideoReelsViewer';
+export type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
+
+// --- End of Public API ---
+// Internal screens, parts, and data are now hidden from the public index
+// to enforce strict architectural boundaries.

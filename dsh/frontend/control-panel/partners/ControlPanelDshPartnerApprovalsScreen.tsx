@@ -1,270 +1,198 @@
-'use client';
-
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Box, Button, Text } from '@bthwani/ui-kit';
-import { WebMissionHeroCard, WebSectionCard, WebSegmentedTabs, WebSignalCard } from '@bthwani/ui-kit/web';
-import { ControlPanelDshDecisionBoard } from '../shared';
-import { dshPartnerApprovalLanes, dshPartnerIntakeItems, dshPartnerIntakeMetrics, type DshPartnerIntakeItem, type DshPartnerIntakeQueue } from './workflow';
-import styles from '../operations/dsh-surface.module.css';
+import { Box, Text } from '@bthwani/ui-kit';
+import {
+  WebControlPanelDenseHeader,
+  WebControlPanelLaneTabs,
+  WebControlPanelSubTabs,
+  WebControlPanelDecisionRow,
+} from '@bthwani/ui-kit/web';
+import { getPartnerIntakeItems } from '../../shared/workflow';
+import {
+  ApprovalRecord,
+  moveApprovalRecordToStage,
+  translateStage,
+  translateEntityType,
+} from '../../shared/workflow';
+import styles from '../shared/control-panel-surface.module.css';
 
-export type ControlPanelDshPartnerApprovalsScreenProps = {
-  hubHref?: string;
-  operationsHref?: string;
-  catalogHref?: string;
-  marketingHref?: string;
-};
+// ML-001: approval action extended to include final ops activation step for marketing-approved records
+function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
+  const tone = (item.stage === 'marketing-review' || item.stage === 'marketing-approved') ? 'success' :
+               (item.stage === 'needs-fix') ? 'danger' :
+               (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'neutral';
 
-function resolveQueueLabel(queue: DshPartnerIntakeQueue) {
-  if (queue === 'offer-approval') return 'اعتماد العرض';
-  if (queue === 'partner-review') return 'Partner Review';
-  return 'جاهز للتسويق';
-}
+  const isAwaitingActivation = item.stage === 'marketing-approved';
+  const isAwaitingReview = ['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage);
 
-function resolveQueueTone(queue: DshPartnerIntakeQueue): 'warning' | 'info' | 'success' {
-  if (queue === 'offer-approval') return 'warning';
-  if (queue === 'partner-review') return 'info';
-  return 'success';
-}
-
-function resolveSourceLabel(source: DshPartnerIntakeItem['source']) {
-  return source === 'app-field' ? 'app-field' : 'app-partner';
-}
-
-function resolvePrimaryActionLabel(queue: DshPartnerIntakeQueue) {
-  if (queue === 'offer-approval') return 'العودة للعمليات';
-  if (queue === 'partner-review') return 'افتح الكتالوج';
-  return 'فتح التسويق';
-}
-
-function resolveSecondaryActionLabel(queue: DshPartnerIntakeQueue) {
-  if (queue === 'offer-approval') return 'افتح الكتالوج';
-  if (queue === 'partner-review') return 'افتح التسويق';
-  return 'العودة للعمليات';
-}
-
-function QueueCard({
-  item,
-  active,
-  onSelect,
-}: {
-  item: DshPartnerIntakeItem;
-  active: boolean;
-  onSelect: () => void;
-}) {
   return (
-    <Box padding={3} gap={2} border radiusToken="xl" background="surfaceRaised" style={{ borderColor: active ? 'rgba(255, 80, 13, 0.35)' : undefined }}>
-      <Box layoutDirection="row" justify="space-between" align="center">
-        <Text role="bodyStrong">{item.storeName}</Text>
-        <Text role="caption" tone={resolveQueueTone(item.queue)}>
-          {item.fieldStatusLabel}
-        </Text>
-      </Box>
-
-      <Text role="bodySm" tone="muted">
-        {item.categoryLabel} · {item.ownerLabel} · {item.submittedAt} · {resolveSourceLabel(item.source)}
-      </Text>
-
-      <Text role="bodySm" tone="muted">
-        {item.note}
-      </Text>
-
-      <Text role="bodySm">{item.nextStep}</Text>
-
-      <Box>
-        <Button label={active ? 'التفاصيل مفتوحة' : 'فتح التفاصيل'} tone={active ? 'secondary' : 'ghost'} fullWidth={false} onPress={onSelect} />
-      </Box>
-    </Box>
+    <WebControlPanelDecisionRow
+      entityId={item.id}
+      entityLabel={item.title}
+      status={translateStage(item.stage)}
+      statusTone={tone === 'danger' ? 'danger' : tone === 'success' ? 'success' : tone === 'warning' ? 'warning' : 'neutral'}
+      risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
+      recommendation={isAwaitingActivation ? 'جاهز للتفعيل النهائي' : 'مراجعة المستندات'}
+      reason={isAwaitingActivation
+        ? 'اجتاز الشريك مراحل التسجيل والمراجعة التسويقية. القرار النهائي بيد الأوبريشن.'
+        : 'البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني.'}
+      sla={translateEntityType(item.entityType)}
+      primaryAction={isAwaitingActivation ? {
+        id: 'activate',
+        label: 'تفعيل الشريك',
+        onAction: () => onAction(item.id, 'activate')
+      } : isAwaitingReview ? {
+        id: 'approve',
+        label: 'قبول للمراجعة',
+        onAction: () => onAction(item.id, 'approve')
+      } : undefined}
+      secondaryAction={isAwaitingReview ? {
+        id: 'fix',
+        label: 'طلب تعديل',
+        onAction: () => onAction(item.id, 'fix')
+      } : {
+        id: 'reject',
+        label: 'رفض',
+        onAction: () => onAction(item.id, 'reject')
+      }}
+    />
   );
 }
 
-export function ControlPanelDshPartnerApprovalsScreen({
-  hubHref = '/operations',
-  operationsHref = '/operations',
-  catalogHref = '/catalogs',
-  marketingHref = '/marketing',
-}: ControlPanelDshPartnerApprovalsScreenProps) {
-  const router = useRouter();
-  const queueItems = React.useMemo(() => ({
-    'offer-approval': dshPartnerIntakeItems.filter((item) => item.queue === 'offer-approval'),
-    'partner-review': dshPartnerIntakeItems.filter((item) => item.queue === 'partner-review'),
-    'marketing-review': dshPartnerIntakeItems.filter((item) => item.queue === 'marketing-review'),
-  }), []);
-  const [activeQueue, setActiveQueue] = React.useState<DshPartnerIntakeQueue>('offer-approval');
-  const [selectedItemId, setSelectedItemId] = React.useState<string>(queueItems['offer-approval'][0]?.id ?? '');
+export function ControlPanelDshPartnerHubScreen() {
+  const [activeTab, setActiveTab] = React.useState<string>('inbox');
+  const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
+  const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
-  const activeItems = queueItems[activeQueue];
-  const selectedItem = activeItems.find((item) => item.id === selectedItemId) ?? activeItems[0] ?? queueItems['offer-approval'][0];
-  const decisionState = selectedItem ?? activeItems[0];
+  const refresh = () => setItems(getPartnerIntakeItems());
 
   React.useEffect(() => {
-    if (!activeItems.some((item) => item.id === selectedItemId)) {
-      setSelectedItemId(activeItems[0]?.id ?? '');
-    }
-  }, [activeItems, selectedItemId]);
+    refresh();
+  }, []);
 
-  const queueTabs = [
-    { id: 'offer-approval', label: 'اعتماد العرض', metaLabel: String(queueItems['offer-approval'].length), active: activeQueue === 'offer-approval' },
-    { id: 'partner-review', label: 'مراجعة الشريك', metaLabel: String(queueItems['partner-review'].length), active: activeQueue === 'partner-review' },
-    { id: 'marketing-review', label: 'جاهز للتسويق', metaLabel: String(queueItems['marketing-review'].length), active: activeQueue === 'marketing-review' },
-  ] as const;
-
-  const handlePrimaryAction = () => {
-    if (!selectedItem) {
-      return;
+  const handleAction = (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => {
+    if (action === 'approve') {
+      moveApprovalRecordToStage(id, 'marketing-review', 'control-panel-partners', 'قبول للمراجعة التسويقية');
+    } else if (action === 'activate') {
+      // ML-001: final ops activation — transitions marketing-approved partner to catalog-adopted (store goes live)
+      moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-partners', 'تفعيل الشريك');
+    } else if (action === 'reject') {
+      moveApprovalRecordToStage(id, 'rejected', 'control-panel-partners', 'رفض');
+    } else if (action === 'fix') {
+      moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-partners', 'طلب تعديل');
     }
-
-    if (selectedItem.queue === 'offer-approval') {
-      router.push(operationsHref);
-      return;
-    }
-
-    if (selectedItem.queue === 'partner-review') {
-      router.push(catalogHref);
-      return;
-    }
-
-    if (selectedItem.queue === 'marketing-review') {
-      router.push(marketingHref);
-    }
+    refresh();
   };
 
-  const handleSecondaryAction = () => {
-    if (!selectedItem) {
-      return;
-    }
+  const PRIMARY_TABS = [
+    { id: 'inbox', label: 'الوارد الجديد', active: activeTab === 'inbox' },
+    { id: 'eligibility', label: 'أهلية الترويج', active: activeTab === 'eligibility' },
+    { id: 'topology', label: 'مسارات الخدمة', active: activeTab === 'topology' },
+    { id: 'contracts', label: 'إدارة العقود والامتثال', active: activeTab === 'contracts' },
+  ];
 
-    if (selectedItem.queue === 'offer-approval') {
-      router.push(catalogHref);
-      return;
-    }
-
-    if (selectedItem.queue === 'partner-review') {
-      router.push(marketingHref);
-      return;
-    }
-
-    if (selectedItem.queue === 'marketing-review') {
-      router.push(operationsHref);
-    }
+  const SECONDARY_TABS: Record<string, { id: string; label: string; active?: boolean }[]> = {
+    inbox: [
+      { id: 'registration', label: 'طلبات التسجيل', active: activeSubTab === 'registration' },
+      { id: 'modifications', label: 'تعديل البيانات', active: activeSubTab === 'modifications' },
+      { id: 'complaints', label: 'شكاوى الشركاء', active: activeSubTab === 'complaints' },
+    ],
+    eligibility: [
+      { id: 'promotions', label: 'العروض الترويجية', active: activeSubTab === 'promotions' },
+      { id: 'loyalty', label: 'برامج الولاء', active: activeSubTab === 'loyalty' },
+    ],
   };
+
+  React.useEffect(() => {
+    if (SECONDARY_TABS[activeTab]?.length > 0) {
+      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
+    } else {
+      setActiveSubTab('');
+    }
+  }, [activeTab]);
 
   return (
-    <Box gap={4}>
-      <ControlPanelDshDecisionBoard
-        title="Partner approval board"
-        purpose="Keep partner intake, document readiness, and handoff routes in one place."
-        primaryDecision={decisionState ? resolvePrimaryActionLabel(decisionState.queue) : 'Review partner intake'}
-        nextAction={decisionState ? resolveSecondaryActionLabel(decisionState.queue) : 'Open the active queue'}
-        blockers={decisionState ? decisionState.note : 'No active partner item selected.'}
-        ownerSurface="partners"
-        evidenceHint="partner intake record, queue state, and handoff proof"
-        routeHint={decisionState ? (decisionState.queue === 'offer-approval' ? operationsHref : decisionState.queue === 'partner-review' ? catalogHref : marketingHref) : operationsHref}
-        decisionTone={decisionState?.queue === 'offer-approval' ? 'warning' : decisionState?.queue === 'marketing-review' ? 'best' : 'brand'}
-      />
-
-      <WebMissionHeroCard
-        badges={['DSH', 'Partners', 'Field Intake']}
-        eyebrow="بوابة الشركاء"
-        title="طلبات الميدان التي تحتاج قرار الشركاء"
-        description="غرفة قرار واحدة لطلبات الشركاء: اختر queue، راجع العنصر، ثم نفّذ الإجراء الأساسي من نفس الصفحة بدون التنقل بين أقسام طويلة."
-        metaItems={dshPartnerIntakeMetrics.map((metric) => `${metric.label}: ${metric.value}`)}
-        primaryAction={{ label: 'افتح التسويق', href: marketingHref }}
-        secondaryAction={{ label: 'افتح الكتالوج', href: catalogHref }}
-      />
-
-      <Box gap={2}>
-        {dshPartnerIntakeMetrics.map((metric, index) => (
-          <WebSignalCard
-            key={metric.id}
-            title={metric.label}
-            value={String(metric.value)}
-            description={metric.description}
-            tone={index === 0 ? 'best' : undefined}
-          />
-        ))}
-      </Box>
-
-      <WebSectionCard title="قائمة القرار" description="اختر queue واحدة فقط، ثم افتح العنصر المطلوب من نفس السياق دون تمرير طويل.">
-        <Box gap={3}>
-          <WebSegmentedTabs
-            ariaLabel="قوائم قرارات الشركاء"
-            items={queueTabs}
-            onSelect={(queueId) => {
-              const nextQueue = queueId as DshPartnerIntakeQueue;
-              setActiveQueue(nextQueue);
-              setSelectedItemId(queueItems[nextQueue][0]?.id ?? '');
-            }}
-          />
-
-          <div className={styles.partnersDecisionGrid}>
-            <div className={styles.partnersQueueList}>
-              {activeItems.map((item) => (
-                <QueueCard
-                  key={item.id}
-                  item={item}
-                  active={item.id === selectedItem?.id}
-                  onSelect={() => setSelectedItemId(item.id)}
-                />
-              ))}
-            </div>
-
-            <div className={styles.partnersDecisionPanel}>
-              <Box padding={3} gap={3} border radiusToken="xl" background="surfaceRaised">
-                {selectedItem ? (
-                  <>
-                    <Box gap={1}>
-                      <Text role="bodyStrong">{selectedItem.storeName}</Text>
-                      <Text role="bodySm" tone="muted">
-                        {resolveQueueLabel(selectedItem.queue)} · {selectedItem.categoryLabel} · {selectedItem.ownerLabel}
-                      </Text>
-                    </Box>
-
-                    <Box gap={1}>
-                      <Text role="bodySm">{selectedItem.note}</Text>
-                      <Text role="bodySm" tone="muted">{selectedItem.nextStep}</Text>
-                      <Text role="caption" tone="soft">{selectedItem.submittedAt} · {resolveSourceLabel(selectedItem.source)}</Text>
-                    </Box>
-
-                    <Box gap={2}>
-                      <Button label={resolvePrimaryActionLabel(selectedItem.queue)} tone="primary" onPress={handlePrimaryAction} />
-                      <Button label={resolveSecondaryActionLabel(selectedItem.queue)} tone="secondary" onPress={handleSecondaryAction} />
-                      <Button label="فتح التسويق" tone="ghost" onPress={() => router.push(marketingHref)} />
-                    </Box>
-                  </>
-                ) : (
-                  <Text role="bodySm" tone="muted">لا توجد عناصر في هذه queue حاليًا.</Text>
-                )}
-              </Box>
+    <div className={styles.surfaceCockpit}>
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div className={styles.surfaceHeaderGlyph}>
+              <div className={styles.surfaceHeaderGlyphMinus} />
             </div>
           </div>
-        </Box>
-      </WebSectionCard>
+          <Box gap={0}>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>شركاء DSH</h1>
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
+                <span className={styles.surfaceHeaderBadgeText}>مراجعة الشريك</span>
+              </Box>
+            </div>
+            <p className={styles.surfaceHeaderSubtitle}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
+          </Box>
+        </div>
 
-      <WebSectionCard title="سلسلة الموافقة" description="المسار الحاكم يبقى ظاهرًا كمرجع مختصر بدل توزيعه على عدة sections طويلة.">
-        <Box gap={2}>
-          {dshPartnerApprovalLanes.map((lane) => (
-            <Box key={lane.id} padding={3} gap={1} border radiusToken="xl" background="surfaceRaised">
-              <Text role="bodyStrong">{lane.title}</Text>
-              <Text role="bodySm" tone="muted">
-                {lane.description}
-              </Text>
-            </Box>
-          ))}
-        </Box>
-      </WebSectionCard>
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>شركاء نشطون</span>
+              <span className={styles.commandKpiValue}>١,٢٥٤</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>طلبات معلقة</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>٢٨</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>تغطية المناطق</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>٨٤٪</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-      <WebSectionCard title="المسارات الحية" description="إبقاء العمليات والكتالوج والتسويق في نقرة واحدة دون تكرار CTA داخل كل بطاقة.">
-        <Box gap={2}>
-          <Button label="الرجوع إلى العمليات" tone="secondary" onPress={() => router.push(operationsHref)} />
-          <Button label="افتح التسويق" tone="secondary" onPress={() => router.push(marketingHref)} />
-          <Button label="افتح الكتالوج" tone="ghost" onPress={() => router.push(catalogHref)} />
-        </Box>
-      </WebSectionCard>
+      <nav className={styles.navigationDock}>
+        <WebControlPanelLaneTabs items={PRIMARY_TABS} onSelect={(id) => setActiveTab(id)} />
+      </nav>
 
-      <Button label="العودة إلى hub" tone="ghost" onPress={() => router.push(hubHref)} />
-    </Box>
+      <div className={styles.filterDock}>
+        {SECONDARY_TABS[activeTab] && (
+          <WebControlPanelSubTabs
+            items={SECONDARY_TABS[activeTab]}
+            onSelect={(id) => setActiveSubTab(id)}
+          />
+        )}
+      </div>
+
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
+          <Box padding={4} gap={4}>
+            {activeTab === 'inbox' && activeSubTab === 'registration' ? (
+              <Box gap={3}>
+                {items.length === 0 ? (
+                  <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
+                    <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
+                  </Box>
+                ) : (
+                  items.map((item) => (
+                    <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
+                  ))
+                )}
+              </Box>
+            ) : (
+              <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+                <Box align="center" gap={1}>
+                  <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
+                  <Text tone="muted">يمكن التبديل بين التبويبات الفرعية لفرز الطلبات حسب السطح والمراجعة والإسناد.</Text>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </div>
+      </main>
+    </div>
   );
+}
+
+export function ControlPanelDshPartnerApprovalsScreen() {
+  return <ControlPanelDshPartnerHubScreen />;
 }
 
 export default ControlPanelDshPartnerApprovalsScreen;

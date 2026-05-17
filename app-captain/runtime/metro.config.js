@@ -12,5 +12,12 @@ config.resolver.nodeModulesPaths = [
 	path.resolve(workspaceRoot, 'node_modules'),
 ];
 config.resolver.unstable_enableSymlinks = true;
+config.resolver.blockList = [
+	/.*\.next\/.*/,
+	/.*\.turbo\/.*/,
+	/.*\/tools\/registry\/runs\/.*/,
+	/.*\/build\/cache\/.*/,
+];
+
 
 module.exports = config;

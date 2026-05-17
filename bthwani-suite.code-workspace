@@ -23,6 +23,7 @@
 				}
 			},
 			"inputs": []
-		}
+		},
+		"claudeCode.useTerminal": true
 	}
 }

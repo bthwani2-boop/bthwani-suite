@@ -56,6 +56,53 @@ export const rawColorPalettes = {
 	}
 } as const;
 
+export const appearanceModeRawPalettes = {
+	lightPremium: {
+		deepBlue: '#0A2F5C',
+		deepBlueElevated: '#183D6B',
+		orange: '#FF500D',
+		orangeSoft: '#F48C54',
+		orangePeach: '#FFF0E7',
+		white: '#FFFFFF',
+		offWhite: '#F7F5F1',
+		warmWhite: '#FFFCF8',
+		warmSurface: '#F4EFE8',
+		warmSurfaceElevated: '#FBF7F2',
+		navyNight: '#0A2F5C',
+		navyNightElevated: '#183D6B',
+		navySurface: '#24476F',
+		navySurfaceRaised: '#33567C',
+		inkMuted: '#667A95',
+		inkSoft: '#91A0B3',
+		success: '#1F8B4C',
+		warning: '#B96A06',
+		danger: '#C43B35',
+		info: '#295FAA',
+	},
+	darkGlass: {
+		deepBlue: '#0A2F5C',
+		deepBlueElevated: '#264A76',
+		orange: '#FF500D',
+		orangeSoft: '#FF7A45',
+		orangePeach: '#402218',
+		white: '#FFFFFF',
+		offWhite: '#F4F7FB',
+		warmWhite: '#FBFCFE',
+		warmSurface: '#13233B',
+		warmSurfaceElevated: '#182B46',
+		navyNight: '#08111E',
+		navyNightElevated: '#0E1A2A',
+		navySurface: '#13233B',
+		navySurfaceRaised: '#182B46',
+		inkMuted: '#A4B4C8',
+		inkSoft: '#7E90A7',
+		success: '#4ADE80',
+		warning: '#F5C04E',
+		danger: '#F2877A',
+		info: '#8BB4E8',
+	},
+} as const;
+
 export const brandColorRoles = {
 	brand: rawColorPalettes.brand[500],
 	brandStrong: rawColorPalettes.brand[600],
@@ -89,42 +136,49 @@ export const semanticColorRoles = {
 	brandStrong: brandColorRoles.brandStrong,
 	brandSoft: brandColorRoles.brandSoft,
 	brandSurface: brandColorRoles.brandSurface,
-	pageBackground: rawColorPalettes.neutral[0],
+	pageBackground: '#F7F5F1',
 	surfacePrimary: rawColorPalettes.neutral[0],
-	surfaceSecondary: brandColorRoles.brandSoft,
-	borderSubtle: withAlpha(rawColorPalettes.brand[500], 0.16),
-	textPrimary: rawColorPalettes.neutral[900],
-	textSecondary: rawColorPalettes.neutral[600],
+	surfaceSecondary: '#FBF7F2',
+	borderSubtle: withAlpha(rawColorPalettes.brand[600], 0.1),
+	borderStrong: withAlpha(rawColorPalettes.brand[600], 0.18),
+	textPrimary: rawColorPalettes.brand[600],
+	textSecondary: '#24476F',
+	textMuted: '#667A95',
 	accentBlue: brandColorRoles.brandStrong,
 	accentOrange: brandColorRoles.brand,
 	ctaPrimary: brandColorRoles.brandStrong,
 	ctaSecondary: rawColorPalettes.neutral[0],
-	ink: rawColorPalettes.neutral[900],
-	inkMuted: rawColorPalettes.neutral[600],
-	inkSoft: rawColorPalettes.neutral[500],
+	ink: rawColorPalettes.brand[600],
+	inkMuted: '#667A95',
+	inkSoft: '#91A0B3',
 	line: rawColorPalettes.neutral[200],
-	lineStrong: rawColorPalettes.neutral[300],
+	lineStrong: withAlpha(rawColorPalettes.brand[600], 0.18),
 	surface: rawColorPalettes.neutral[0],
-	surfaceAlt: rawColorPalettes.neutral[50],
-	surfaceInset: rawColorPalettes.neutral[100],
-	surfaceRaised: rawColorPalettes.neutral[0],
-	success: rawColorPalettes.success[600],
-	successStrong: rawColorPalettes.success[700],
-	successSoft: rawColorPalettes.success[50],
-	warning: rawColorPalettes.warning[600],
-	warningStrong: rawColorPalettes.warning[700],
-	warningSoft: rawColorPalettes.warning[50],
-	danger: rawColorPalettes.danger[600],
-	dangerStrong: rawColorPalettes.danger[700],
-	dangerSoft: rawColorPalettes.danger[50],
-	info: rawColorPalettes.info[600],
-	infoStrong: rawColorPalettes.info[700],
-	infoSoft: rawColorPalettes.info[50],
-	overlay: withAlpha(rawColorPalettes.neutral[950], 0.48),
-	overlaySoft: withAlpha(rawColorPalettes.neutral[950], 0.24),
-	focusRing: withAlpha(rawColorPalettes.brand[500], 0.32),
-	disabledSurface: rawColorPalettes.neutral[100],
-	disabledInk: rawColorPalettes.neutral[400],
+	surfaceAlt: '#FFFCF8',
+	surfaceInset: '#F4EFE8',
+	surfaceRaised: '#FFFCF8',
+	success: '#1F8B4C',
+	successStrong: '#16653A',
+	successSoft: withAlpha('#1F8B4C', 0.1),
+	warning: '#B96A06',
+	warningStrong: '#8E5204',
+	warningSoft: withAlpha('#B96A06', 0.1),
+	danger: '#C43B35',
+	dangerStrong: '#9B2F2B',
+	dangerSoft: withAlpha('#C43B35', 0.1),
+	info: '#295FAA',
+	infoStrong: '#214D89',
+	infoSoft: withAlpha('#295FAA', 0.1),
+	overlay: withAlpha(rawColorPalettes.brand[600], 0.22),
+	overlaySoft: withAlpha(rawColorPalettes.brand[600], 0.1),
+	focusRing: withAlpha(rawColorPalettes.brand[500], 0.3),
+	disabledSurface: '#E7ECF2',
+	disabledInk: '#9AA7B7',
+	glassSurface: withAlpha(rawColorPalettes.neutral[0], 0.72),
+	glassSurfaceStrong: withAlpha(rawColorPalettes.neutral[0], 0.86),
+	glassBorder: withAlpha(rawColorPalettes.brand[600], 0.12),
+	rimLightSubtle: withAlpha(rawColorPalettes.brand[600], 0.08),
+	rimLightStrong: withAlpha(rawColorPalettes.brand[600], 0.16),
 	black: rawColorPalettes.neutral[950],
 	white: rawColorPalettes.neutral[0]
 } as const;
@@ -450,18 +504,39 @@ function appendVariables(target: CssVariableMap, entries: Record<string, string>
 	}
 }
 
+function createPrefixedAliasVariables(
+	variables: CssVariableMap,
+	canonicalPrefix: string,
+	aliasPrefix: string,
+) {
+	const aliases: CssVariableMap = {};
+
+	for (const name of Object.keys(variables)) {
+		if (!name.startsWith(canonicalPrefix)) {
+			continue;
+		}
+
+		aliases[name.replace(canonicalPrefix, aliasPrefix)] = `var(${name})`;
+	}
+
+	return aliases;
+}
+
 function createPaletteCssVariables() {
 	const variables: CssVariableMap = {};
 
 	for (const [paletteName, paletteValues] of Object.entries(rawColorPalettes)) {
 		for (const [tokenName, tokenValue] of Object.entries(paletteValues)) {
-			variables[`--bth-palette-${toKebabCase(paletteName)}-${tokenName}`] = tokenValue;
+			variables[`--bthwani-palette-${toKebabCase(paletteName)}-${tokenName}`] = tokenValue;
 		}
 	}
 
 	for (const [semanticRole, tokenValue] of Object.entries(semanticColorRoles)) {
-		variables[`--bth-color-${toKebabCase(semanticRole)}`] = tokenValue;
+		variables[`--bthwani-color-${toKebabCase(semanticRole)}`] = tokenValue;
 	}
+
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--bth-'));
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--ui-'));
 
 	return variables;
 }
@@ -577,6 +652,7 @@ export type SemanticTheme = {
 	surface: string;
 	surfaceRaised: string;
 	surfaceInset: string;
+	surfaceSecondary: string;
 	line: string;
 	lineStrong: string;
 	text: string;
@@ -616,25 +692,26 @@ export type SemanticTheme = {
 
 export const lightTheme: SemanticTheme = {
 	mode: 'light',
-	background: surfaceContainerRoles.background,
-	backgroundAlt: surfaceContainerRoles.backgroundAlt,
-	surface: surfaceContainerRoles.surface,
-	surfaceRaised: surfaceContainerRoles.surfaceRaised,
-	surfaceInset: surfaceContainerRoles.surfaceInset,
-	line: surfaceContainerRoles.line,
-	lineStrong: surfaceContainerRoles.lineStrong,
-	text: colorPalette.ink,
-	textMuted: colorPalette.inkMuted,
+	background: colorPalette.pageBackground,
+	backgroundAlt: colorPalette.surface,
+	surface: colorPalette.surface,
+	surfaceRaised: colorPalette.surfaceRaised,
+	surfaceInset: colorPalette.surfaceInset,
+	surfaceSecondary: colorPalette.surfaceSecondary,
+	line: colorPalette.borderSubtle,
+	lineStrong: colorPalette.borderStrong,
+	text: colorPalette.textPrimary,
+	textMuted: colorPalette.textMuted,
 	textSoft: colorPalette.inkSoft,
 	textInverse: colorPalette.white,
-	brand: brandColorRoles.brand,
+	brand: colorPalette.accentOrange,
 	brandContrast: colorPalette.white,
 	brandSurface: brandColorRoles.brandSurface,
-	brandHeaderBackground: brandColorRoles.brand,
+	brandHeaderBackground: colorPalette.accentBlue,
 	brandHeaderSurface: withAlpha(colorPalette.white, 0.08),
 	brandHeaderSurfaceStrong: withAlpha(colorPalette.white, 0.14),
 	brandHeaderStroke: withAlpha(colorPalette.white, 0.16),
-	brandHeaderStatusBar: brandColorRoles.brand,
+	brandHeaderStatusBar: colorPalette.accentBlue,
 	success: colorPalette.success,
 	successSurface: colorPalette.successSoft,
 	successText: colorPalette.successStrong,
@@ -650,56 +727,57 @@ export const lightTheme: SemanticTheme = {
 	focusRing: colorPalette.focusRing,
 	overlay: colorPalette.overlay,
 	overlaySoft: colorPalette.overlaySoft,
-	disabledSurface: surfaceContainerRoles.disabledSurface,
+	disabledSurface: colorPalette.disabledSurface,
 	disabledText: colorPalette.disabledInk,
-	fieldBackground: surfaceContainerRoles.surface,
-	fieldBorder: surfaceContainerRoles.line,
-	fieldBorderActive: brandColorRoles.brand,
+	fieldBackground: colorPalette.surface,
+	fieldBorder: colorPalette.borderSubtle,
+	fieldBorderActive: colorPalette.accentOrange,
 	fieldPlaceholder: colorPalette.inkSoft
 };
 
 export const darkTheme: SemanticTheme = {
 	mode: 'dark',
-	background: '#020617',
-	backgroundAlt: '#0F172A',
-	surface: '#111827',
-	surfaceRaised: '#182232',
-	surfaceInset: '#0B1324',
-	line: '#22304A',
-	lineStrong: '#334155',
-	text: '#F8FAFC',
-	textMuted: '#CBD5E1',
-	textSoft: '#94A3B8',
+	background: '#08111E',
+	backgroundAlt: '#0E1A2A',
+	surface: '#101B2C',
+	surfaceRaised: '#182B46',
+	surfaceInset: '#0D1828',
+	surfaceSecondary: '#13233B',
+	line: withAlpha('#FFFFFF', 0.1),
+	lineStrong: withAlpha('#FFFFFF', 0.2),
+	text: '#F4F7FB',
+	textMuted: withAlpha('#F4F7FB', 0.62),
+	textSoft: '#7E90A7',
 	textInverse: colorPalette.ink,
 	brand: '#FF500D',
 	brandContrast: '#FFFFFF',
-	brandSurface: withAlpha('#FF500D', 0.16),
-	brandHeaderBackground: '#FF500D',
+	brandSurface: withAlpha('#FF500D', 0.18),
+	brandHeaderBackground: '#0A2F5C',
 	brandHeaderSurface: withAlpha('#FFFFFF', 0.08),
 	brandHeaderSurfaceStrong: withAlpha('#FFFFFF', 0.14),
 	brandHeaderStroke: withAlpha('#FFFFFF', 0.18),
-	brandHeaderStatusBar: '#FF500D',
+	brandHeaderStatusBar: '#0A2F5C',
 	success: '#4ADE80',
 	successSurface: withAlpha('#4ADE80', 0.16),
 	successText: '#BBF7D0',
-	warning: '#FBBF24',
-	warningSurface: withAlpha('#FBBF24', 0.16),
-	warningText: '#FDE68A',
-	danger: '#F87171',
-	dangerSurface: withAlpha('#F87171', 0.16),
-	dangerText: '#FECACA',
-	info: '#60A5FA',
-	infoSurface: withAlpha('#60A5FA', 0.16),
-	infoText: '#BFDBFE',
-	focusRing: withAlpha('#FF500D', 0.4),
-	overlay: withAlpha('#020617', 0.72),
-	overlaySoft: withAlpha('#020617', 0.36),
-	disabledSurface: '#1E293B',
-	disabledText: '#64748B',
-	fieldBackground: '#0F172A',
-	fieldBorder: '#334155',
+	warning: '#F5C04E',
+	warningSurface: withAlpha('#F5C04E', 0.16),
+	warningText: '#F9D88B',
+	danger: '#F2877A',
+	dangerSurface: withAlpha('#F2877A', 0.16),
+	dangerText: '#FBD0C9',
+	info: '#8BB4E8',
+	infoSurface: withAlpha('#8BB4E8', 0.16),
+	infoText: '#D5E6F8',
+	focusRing: withAlpha('#FF500D', 0.36),
+	overlay: withAlpha('#08111E', 0.68),
+	overlaySoft: withAlpha('#08111E', 0.42),
+	disabledSurface: withAlpha('#FFFFFF', 0.08),
+	disabledText: withAlpha('#F4F7FB', 0.36),
+	fieldBackground: '#0D1828',
+	fieldBorder: withAlpha('#FFFFFF', 0.1),
 	fieldBorderActive: '#FF500D',
-	fieldPlaceholder: '#64748B'
+	fieldPlaceholder: '#7E90A7'
 };
 
 export const highContrastTheme: SemanticTheme = {
@@ -709,6 +787,7 @@ export const highContrastTheme: SemanticTheme = {
 	surface: '#000000',
 	surfaceRaised: '#0A0A0A',
 	surfaceInset: '#000000',
+	surfaceSecondary: withAlpha('#FFD60A', 0.18),
 	line: '#FFFFFF',
 	lineStrong: '#FFFFFF',
 	text: '#FFFFFF',
@@ -771,6 +850,54 @@ function resolveColorScheme(mode: ThemeMode) {
 	return mode === 'dark' || mode === 'high-contrast' ? 'dark' : 'light';
 }
 
+const platformThemeAliasMap = {
+	'app-background': 'background',
+	'app-surface': 'surface',
+	'app-surface-raised': 'surfaceRaised',
+	'app-surface-inset': 'surfaceInset',
+	'app-border': 'line',
+	'app-border-strong': 'lineStrong',
+	'app-text': 'text',
+	'app-text-muted': 'textMuted',
+	'app-text-soft': 'textSoft',
+	'app-brand': 'brand',
+	'app-brand-surface': 'brandSurface',
+	'app-field': 'fieldBackground',
+	'app-field-border': 'fieldBorder',
+	'app-focus-ring': 'focusRing',
+} as const satisfies Record<string, keyof Omit<SemanticTheme, 'mode'>>;
+
+const controlPanelThemeAliasMap = {
+	'control-panel-background': 'background',
+	'control-panel-stage': 'surfaceSecondary',
+	'control-panel-surface': 'surface',
+	'control-panel-surface-raised': 'surfaceRaised',
+	'control-panel-surface-inset': 'surfaceInset',
+	'control-panel-border': 'line',
+	'control-panel-border-strong': 'lineStrong',
+	'control-panel-text': 'text',
+	'control-panel-text-muted': 'textMuted',
+	'control-panel-text-soft': 'textSoft',
+	'control-panel-brand': 'brandHeaderBackground',
+	'control-panel-brand-surface': 'brandHeaderSurface',
+	'control-panel-field': 'fieldBackground',
+	'control-panel-field-border': 'fieldBorder',
+	'control-panel-focus-ring': 'focusRing',
+} as const satisfies Record<string, keyof Omit<SemanticTheme, 'mode'>>;
+
+function createDerivedThemeAliasVariables(
+	canonicalPrefix: string,
+	aliasMap: Record<string, keyof Omit<SemanticTheme, 'mode'>>,
+) {
+	const variables: ThemeCssVariableMap = {};
+
+	for (const [aliasName, sourceThemeKey] of Object.entries(aliasMap)) {
+		variables[`${canonicalPrefix}${aliasName}`] = `var(${canonicalPrefix}${toThemeKebabCase(sourceThemeKey)})`;
+	}
+
+	return variables;
+}
+
 export function createThemeCssVariables(theme: SemanticTheme) {
 	const variables: ThemeCssVariableMap = {};
 
@@ -779,17 +906,16 @@ export function createThemeCssVariables(theme: SemanticTheme) {
 			continue;
 		}
 
-		variables[`--bth-${toThemeKebabCase(themeKey)}`] = themeValue;
+		variables[`--bthwani-${toThemeKebabCase(themeKey)}`] = themeValue;
 	}
 
-	variables['--bth-color-scheme'] = resolveColorScheme(theme.mode);
+	appendVariables(variables, createDerivedThemeAliasVariables('--bthwani-', platformThemeAliasMap));
+	appendVariables(variables, createDerivedThemeAliasVariables('--bthwani-', controlPanelThemeAliasMap));
 
-	// Add UI-prefixed aliases for theme variables to ease staged migration.
-	for (const [name, value] of Object.entries(variables)) {
-		if (name.startsWith('--bth-')) {
-			variables[name.replace('--bth-', '--ui-')] = `var(${name})` as string;
-		}
-	}
+	variables['--bthwani-color-scheme'] = resolveColorScheme(theme.mode);
+
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--bth-'));
+	appendVariables(variables, createPrefixedAliasVariables(variables, '--bthwani-', '--ui-'));
 
 	return variables;
 }
@@ -933,4 +1059,3 @@ export function amountToArabicText(n: number, t: (key: string) => string): strin
 
 	return inner(n);
 }
-

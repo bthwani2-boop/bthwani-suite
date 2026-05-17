@@ -1,7 +1,7 @@
 {
   "name": "website",
-  "root": "website/runtime",
-  "sourceRoot": "website/runtime",
+  "root": "website",
+  "sourceRoot": "website",
   "projectType": "application",
   "targets": {
     "serve": {

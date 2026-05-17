@@ -1,2 +1,4 @@
-export { CaptainSurfaceHost as default } from './CaptainSurfaceHost';
-export * from './CaptainSurfaceHost';
+import { CaptainSurfaceHost } from './CaptainSurfaceHost';
+
+export { CaptainSurfaceHost, CaptainSurfaceHost as CaptainMobileEntry };
+export default CaptainSurfaceHost;

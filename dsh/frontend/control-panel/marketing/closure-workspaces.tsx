@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Button, Text } from '@bthwani/ui-kit';
-import { WebSectionCard } from '@bthwani/ui-kit/web';
+import { Box } from '@bthwani/ui-kit';
+import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
 
 type MarketingReviewKind = 'approval' | 'video';
@@ -21,14 +21,14 @@ type MarketingReviewRow = {
 function buildMarketingRows(kind: MarketingReviewKind) {
   const baseRows = kind === 'approval'
     ? [
-        { id: 'campaign-approval', title: 'Campaign approval', status: 'Ready', blocker: 'Release gating still needs a final local pass.', evidence: 'Campaign proof and release gate', tone: 'brand' as const },
-        { id: 'offer-review', title: 'Offer review', status: 'Queued', blocker: 'Offer copy needs clarity before release.', evidence: 'Offer copy and policy proof', tone: 'warning' as const },
-        { id: 'handoff-review', title: 'Handoff review', status: 'Tracked', blocker: 'Cross-surface handoff still needs confirmation.', evidence: 'Handoff chain and owner proof', tone: 'best' as const },
+        { id: 'campaign-approval', title: 'اعتماد الحملة', status: 'جاهز', blocker: 'بوابة الإصدار تحتاج مراجعة محلية نهائية.', evidence: 'دليل الحملة وبوابة الإصدار', tone: 'brand' as const },
+        { id: 'offer-review', title: 'مراجعة العرض', status: 'في الانتظار', blocker: 'نسخة العرض تحتاج وضوحاً قبل الإصدار.', evidence: 'نسخة العرض ودليل السياسة', tone: 'warning' as const },
+        { id: 'handoff-review', title: 'مراجعة التسليم', status: 'متابَع', blocker: 'تسليم الأسطح لا يزال يحتاج تأكيداً.', evidence: 'سلسلة التسليم ودليل المالك', tone: 'best' as const },
       ]
     : [
-        { id: 'video-review', title: 'Video submission review', status: 'Ready', blocker: 'Submission needs a final approval or edit.', evidence: 'Video proof and release gate', tone: 'brand' as const },
-        { id: 'banner-review', title: 'Banner review', status: 'Queued', blocker: 'Visual copy still needs a local decision.', evidence: 'Banner proof and route handoff', tone: 'warning' as const },
-        { id: 'growth-review', title: 'Growth review', status: 'Tracked', blocker: 'Growth lane proof remains visible.', evidence: 'Growth proof and owner handoff', tone: 'best' as const },
+        { id: 'video-review', title: 'مراجعة الفيديو', status: 'جاهز', blocker: 'التقديم يحتاج اعتماداً نهائياً أو تعديلاً.', evidence: 'دليل الفيديو وبوابة الإصدار', tone: 'brand' as const },
+        { id: 'banner-review', title: 'مراجعة البنر', status: 'في الانتظار', blocker: 'النسخة المرئية لا تزال تحتاج قراراً محلياً.', evidence: 'دليل البنر وتسليم المسار', tone: 'warning' as const },
+        { id: 'growth-review', title: 'مراجعة النمو', status: 'متابَع', blocker: 'دليل مسار النمو لا يزال ظاهراً.', evidence: 'دليل النمو وتسليم المالك', tone: 'best' as const },
       ];
 
   return baseRows.map((row) => ({
@@ -38,9 +38,9 @@ function buildMarketingRows(kind: MarketingReviewKind) {
     ownerSurface: 'marketing',
     blocker: row.blocker,
     evidence: row.evidence,
-    primaryActionLabel: 'Approve',
-    secondaryActionLabel: 'Request edit',
-    evidenceActionLabel: kind === 'approval' ? 'Open handoff' : 'Open evidence',
+    primaryActionLabel: 'اعتماد',
+    secondaryActionLabel: 'طلب تعديل',
+    evidenceActionLabel: kind === 'approval' ? 'فتح التسليم' : 'فتح الدليل',
     tone: row.tone,
   })) satisfies readonly MarketingReviewRow[];
 }
@@ -56,77 +56,71 @@ function MarketingReviewBoard({
 }) {
   const items = React.useMemo(() => buildMarketingRows(kind), [kind]);
   const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
-  const [lastAction, setLastAction] = React.useState('Ready for marketing review');
+  const [lastAction, setLastAction] = React.useState('جاهز للمراجعة التسويقية');
   const selectedItem = items.find((item) => item.id === selectedId) ?? items[0];
 
   return (
     <Box gap={4}>
       <ControlPanelDshWorkspaceFrame
-        eyebrow={kind === 'approval' ? 'Marketing approval' : 'Video review'}
+        eyebrow={kind === 'approval' ? 'اعتماد التسويق' : 'مراجعة الفيديو'}
         title={title}
-        description="A local marketing review lane with selected item state, approval actions, and explicit evidence handoff."
+        description="مسار مراجعة تسويقية محلي مع حالة العنصر المحدد وإجراءات الاعتماد وتسليم الدليل الصريح."
         badges={['marketing', kind]}
-        metaItems={[selectedItem?.status ?? 'Ready', lastAction]}
+        metaItems={[selectedItem?.status ?? 'جاهز', lastAction]}
         decisionBoard={{
-          title: `${title} board`,
+          title: `لوحة ${title}`,
           purpose,
-          primaryDecision: selectedItem?.status ?? 'Ready',
+          primaryDecision: selectedItem?.status ?? 'جاهز',
           nextAction: lastAction,
-          blockers: selectedItem?.blocker ?? 'Select a marketing row.',
+          blockers: selectedItem?.blocker ?? 'اختر صف تسويق.',
           ownerSurface: 'marketing',
-          evidenceHint: selectedItem?.evidence ?? 'marketing evidence',
+          evidenceHint: selectedItem?.evidence ?? 'دليل التسويق',
           routeHint: '/marketing',
           decisionTone: selectedItem?.tone,
         }}
-        primaryAction={{ label: 'Open marketing approval', href: '/marketing' }}
-        secondaryAction={{ label: 'Open dashboard', href: '/operations?workspace=dashboard' }}
+        primaryAction={{ label: 'فتح اعتماد التسويق', href: '/marketing' }}
+        secondaryAction={{ label: 'فتح لوحة المراقبة', href: '/operations?workspace=dashboard' }}
         signals={[
-          { id: `${kind}-ready`, title: 'Ready', value: 'Visible', description: 'Ready items stay selectable.', tone: 'best' },
-          { id: `${kind}-queued`, title: 'Queued', value: 'Visible', description: 'Queued items still need review.', tone: 'warning' },
-          { id: `${kind}-handoff`, title: 'Handoff', value: 'Tracked', description: 'Handoff evidence is explicit.', tone: 'brand' },
+          { id: `${kind}-ready`, title: 'جاهز', value: 'مرئي', description: 'العناصر الجاهزة قابلة للتحديد.', tone: 'best' },
+          { id: `${kind}-queued`, title: 'في الانتظار', value: 'مرئي', description: 'العناصر في الانتظار لا تزال تحتاج مراجعة.', tone: 'warning' },
+          { id: `${kind}-handoff`, title: 'تسليم', value: 'متابَع', description: 'دليل التسليم صريح.', tone: 'brand' },
         ]}
       />
 
       <ControlPanelDshActionQueue
-        title={kind === 'approval' ? 'Approval queue' : 'Video queue'}
-        purpose="Choose a row, approve or request edits, then open evidence or handoff locally."
+        title={kind === 'approval' ? 'صف الاعتماد' : 'صف الفيديو'}
+        purpose="اختر صفاً، اعتمد أو اطلب تعديلاً، ثم افتح الدليل أو التسليم محلياً."
         items={items}
         selectedId={selectedId}
         onSelect={setSelectedId}
         primaryAction={(item) => {
           setSelectedId(item.id);
-          setLastAction(`Approve: ${item.title}`);
+          setLastAction(`اعتماد: ${item.title}`);
         }}
         secondaryAction={(item) => {
           setSelectedId(item.id);
-          setLastAction(`Request edit: ${item.title}`);
+          setLastAction(`طلب تعديل: ${item.title}`);
         }}
         evidenceAction={(item) => {
           setSelectedId(item.id);
-          setLastAction(kind === 'approval' ? `Open handoff: ${item.title}` : `Open evidence: ${item.title}`);
+          setLastAction(kind === 'approval' ? `فتح التسليم: ${item.title}` : `فتح الدليل: ${item.title}`);
         }}
       />
 
-      <WebSectionCard
-        title={kind === 'approval' ? 'Marketing handoff' : 'Video evidence'}
-        description="The selected item stays visible while the local handoff or evidence step is triggered."
-      >
-        <Box gap={2}>
-          <Text role="bodySm" tone="muted">
-            {selectedItem ? `${selectedItem.title} · ${selectedItem.evidence}` : 'Select a row to continue.'}
-          </Text>
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button label="Approve" tone="primary" fullWidth={false} onPress={() => selectedItem && setLastAction(`Approve: ${selectedItem.title}`)} />
-            <Button label="Request edit" tone="secondary" fullWidth={false} onPress={() => selectedItem && setLastAction(`Request edit: ${selectedItem.title}`)} />
-            <Button
-              label={kind === 'approval' ? 'Open handoff' : 'Open evidence'}
-              tone="ghost"
-              fullWidth={false}
-              onPress={() => selectedItem && setLastAction(`${kind === 'approval' ? 'Open handoff' : 'Open evidence'}: ${selectedItem.title}`)}
-            />
-          </Box>
-        </Box>
-      </WebSectionCard>
+      <WebControlPanelRecommendation
+        title={kind === 'approval' ? 'تسليم التسويق' : 'دليل الفيديو'}
+        reason={selectedItem ? `${selectedItem.title} · ${selectedItem.evidence}` : 'اختر صفاً للمتابعة.'}
+        primaryAction={selectedItem ? {
+          id: 'approve',
+          label: 'اعتماد',
+          onAction: () => selectedItem && setLastAction(`اعتماد: ${selectedItem.title}`),
+        } : undefined}
+        secondaryAction={selectedItem ? {
+          id: 'edit',
+          label: 'طلب تعديل',
+          onAction: () => selectedItem && setLastAction(`طلب تعديل: ${selectedItem.title}`),
+        } : undefined}
+      />
     </Box>
   );
 }
@@ -135,8 +129,8 @@ export function ControlPanelDshMarketingApprovalScreen() {
   return (
     <MarketingReviewBoard
       kind="approval"
-      title="Campaign and offer approval"
-      purpose="Keep approval, video review, and release gating visible without a long page."
+      title="اعتماد الحملات والعروض"
+      purpose="إبقاء الاعتماد ومراجعة الفيديو وبوابة الإصدار مرئية في مساحة مضغوطة."
     />
   );
 }
@@ -145,8 +139,8 @@ export function ControlPanelDshVideoSubmissionsReviewScreen() {
   return (
     <MarketingReviewBoard
       kind="video"
-      title="Partner video submissions review"
-      purpose="Keep video review tied to the release decision instead of a generic summary."
+      title="مراجعة تقديمات فيديو الشركاء"
+      purpose="إبقاء مراجعة الفيديو مرتبطة بقرار الإصدار بدلاً من ملخص عام."
     />
   );
 }

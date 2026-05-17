@@ -1,7 +1,710 @@
 openapi: 3.1.0
 info:
-  title: WLT API
-  version: 0.1.0
-  description: Root WLT contract placeholder. Endpoints remain TBD until evidence is added.
-x-bthwani-contract-state: CONTRACT_TBD
-paths: {}
+  title: WLT DSH Finance API
+  version: 0.2.0-scaffold
+  description: >
+    WLT contract scaffold for DSH finance surfaces.
+    CONTRACT_SCAFFOLD_PREVIEW_ONLY — no backend implemented.
+    All financial ownership belongs to WLT.
+    DSH surfaces are consumers only; no direct ledger write from DSH.
+x-bthwani-contract-state: CONTRACT_SCAFFOLD_PREVIEW_ONLY
+x-bthwani-currency-default: YER
+x-bthwani-ownership: WLT owns all wallet, balance, payment, ledger, reconciliation, settlement, payout, COD liability, and captain eligibility operations. DSH surfaces are read-only consumers.
+x-bthwani-runtime-status: NOT_IMPLEMENTED — backend/ledger/idempotency/security/reconciliation not built
+
+paths:
+  /wlt/dsh/client/wallet/summary:
+    get:
+      operationId: getClientWalletSummary
+      summary: Get client wallet summary
+      description: >
+        WLT-owned. Returns wallet balance and linked state for the authenticated client.
+        Execution is WLT-owned — DSH client surface is a read-only consumer.
+      tags: [client-wallet]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Wallet summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/client/payment-intents:
+    post:
+      operationId: createClientPaymentIntent
+      summary: Create a payment intent for a client order
+      description: >
+        WLT-owned. Creates a payment intent authorizing wallet deduction for an order.
+        Idempotency-Key header is required to prevent duplicate charges.
+        Execution is WLT-owned — DSH client surface is a read-only consumer.
+      tags: [client-payment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentIntent'
+      responses:
+        '201':
+          description: Payment intent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+        '409':
+          description: Duplicate idempotency key
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/client/top-up-intents:
+    post:
+      operationId: createClientTopUpIntent
+      summary: Create a top-up intent for client wallet
+      description: >
+        WLT-owned. Initiates a wallet top-up flow for the client.
+        Idempotency-Key header is required to prevent duplicate top-ups.
+        Execution is WLT-owned — DSH client surface is a read-only consumer.
+      tags: [client-wallet]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopUpIntent'
+      responses:
+        '201':
+          description: Top-up intent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopUpIntent'
+        '409':
+          description: Duplicate idempotency key
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/captain/eligibility:
+    get:
+      operationId: getCaptainEligibility
+      summary: Get captain eligibility balance
+      description: >
+        WLT-owned. Returns captain wallet eligibility state for order acceptance.
+        Execution is WLT-owned — DSH captain surface is a read-only consumer.
+      tags: [captain-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Captain eligibility balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptainEligibilityBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/captain/top-up-intents:
+    post:
+      operationId: createCaptainTopUpIntent
+      summary: Create a top-up intent for captain wallet
+      description: >
+        WLT-owned. Initiates a wallet top-up flow for the captain.
+        Idempotency-Key header is required to prevent duplicate top-ups.
+        Execution is WLT-owned — DSH captain surface is a read-only consumer.
+      tags: [captain-finance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopUpIntent'
+      responses:
+        '201':
+          description: Top-up intent created
+        '409':
+          description: Duplicate idempotency key
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/captain/cod-liabilities:
+    get:
+      operationId: getCaptainCodLiabilities
+      summary: Get captain COD liability summary
+      description: >
+        WLT-owned. Returns outstanding COD liability for the captain.
+        Execution is WLT-owned — DSH captain surface is a read-only consumer.
+      tags: [captain-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: COD liability list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CodLiability'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/captain/earnings:
+    get:
+      operationId: getCaptainEarnings
+      summary: Get captain earnings ledger
+      description: >
+        WLT-owned. Returns captain earnings ledger entries.
+        Execution is WLT-owned — DSH captain surface is a read-only consumer.
+      tags: [captain-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Earnings ledger entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LedgerEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/partner/settlement-cycles:
+    get:
+      operationId: getPartnerSettlementCycles
+      summary: Get partner settlement cycles
+      description: >
+        WLT-owned. Returns partner settlement cycle history and pending amounts.
+        Execution is WLT-owned — DSH partner surface is a read-only consumer.
+      tags: [partner-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settlement cycles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PartnerSettlementCycle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/field/commissions:
+    get:
+      operationId: getFieldCommissions
+      summary: Get field agent commission ledger
+      description: >
+        WLT-owned. Returns field agent commission entries.
+        Execution is WLT-owned — DSH field surface is a read-only consumer.
+      tags: [field-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Commission entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FieldCommission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/finance/overview:
+    get:
+      operationId: getControlPanelFinanceOverview
+      summary: Get finance overview for control panel
+      description: >
+        WLT-owned. Returns aggregate finance metrics for control panel display.
+        Control panel may view and approve; no direct ledger write.
+        Execution is WLT-owned.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Finance overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoneyAmount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/reconciliation-runs:
+    get:
+      operationId: listReconciliationRuns
+      summary: List reconciliation runs
+      description: >
+        WLT-owned. Lists reconciliation run history for control panel review.
+        Execution is WLT-owned.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reconciliation runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReconciliationRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: triggerReconciliationRun
+      summary: Trigger a new reconciliation run
+      description: >
+        WLT-owned. Triggers a new reconciliation run.
+        Idempotency-Key header is required.
+        Execution is WLT-owned — control panel initiates only.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconciliationRun'
+      responses:
+        '201':
+          description: Reconciliation run triggered
+        '409':
+          description: Duplicate idempotency key
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/payout-decisions:
+    post:
+      operationId: createPayoutDecision
+      summary: Create a payout decision
+      description: >
+        WLT-owned. Records a control panel payout approval or rejection.
+        Idempotency-Key header is required.
+        Execution is WLT-owned — control panel approves/rejects only.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutDecision'
+      responses:
+        '201':
+          description: Payout decision recorded
+        '409':
+          description: Duplicate idempotency key
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/audit-events:
+    get:
+      operationId: listAuditEvents
+      summary: List finance audit events
+      description: >
+        WLT-owned. Returns audit event log for finance operations.
+        Execution is WLT-owned — control panel is read-only.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Audit events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >
+        Client-generated unique key (UUID v4 recommended) to prevent duplicate
+        mutations. Required on all POST endpoints that mutate financial state.
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    MoneyAmount:
+      type: object
+      description: >
+        Monetary amount in minor units (fils for YER).
+        Currency defaults to YER per x-bthwani-currency-default.
+      required: [amountMinorUnits, currency]
+      properties:
+        amountMinorUnits:
+          type: integer
+          description: Amount in minor currency units (e.g., fils for YER)
+        currency:
+          type: string
+          default: YER
+          description: ISO 4217 currency code. Default is YER (Yemeni Rial).
+        displayLabel:
+          type: string
+          description: Pre-formatted display string for UI use only
+
+    LedgerEntry:
+      type: object
+      description: WLT-owned ledger entry. Immutable after creation.
+      required: [id, type, amount, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [credit, debit, hold, release, refund, commission, settlement]
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        referenceId:
+          type: string
+          description: Order or transaction reference
+        note:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    WalletBalance:
+      type: object
+      description: WLT-owned wallet balance snapshot.
+      required: [balanceMinorUnits, currency, linked, updatedAt]
+      properties:
+        balanceMinorUnits:
+          type: integer
+          description: Current wallet balance in minor units
+        currency:
+          type: string
+          default: YER
+        linked:
+          type: boolean
+          description: Whether the wallet is linked to an active account
+        frozenMinorUnits:
+          type: integer
+          description: Amount currently on hold
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentIntent:
+      type: object
+      description: >
+        WLT-owned payment intent. Authorizes a wallet deduction for an order.
+        Requires Idempotency-Key on creation.
+      required: [orderId, amountMinorUnits, currency]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+        amountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        status:
+          type: string
+          enum: [pending, authorized, captured, failed, cancelled]
+
+    TopUpIntent:
+      type: object
+      description: >
+        WLT-owned top-up intent. Initiates a wallet funding flow.
+        Requires Idempotency-Key on creation.
+      required: [amountMinorUnits, currency]
+      properties:
+        id:
+          type: string
+          format: uuid
+        amountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        redirectUrl:
+          type: string
+          format: uri
+
+    CaptainEligibilityBalance:
+      type: object
+      description: WLT-owned captain eligibility balance for order acceptance.
+      required: [eligible, balanceMinorUnits, currency]
+      properties:
+        eligible:
+          type: boolean
+        balanceMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        minimumRequiredMinorUnits:
+          type: integer
+        note:
+          type: string
+
+    CodLiability:
+      type: object
+      description: WLT-owned COD liability record for a captain.
+      required: [id, amountMinorUnits, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+        amountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        status:
+          type: string
+          enum: [outstanding, settled, disputed]
+        dueAt:
+          type: string
+          format: date-time
+
+    PartnerSettlementCycle:
+      type: object
+      description: WLT-owned partner settlement cycle record.
+      required: [id, periodStart, periodEnd, netAmountMinorUnits, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        netAmountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        status:
+          type: string
+          enum: [pending, processing, paid, disputed]
+
+    FieldCommission:
+      type: object
+      description: WLT-owned field agent commission entry.
+      required: [id, amountMinorUnits, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+        amountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        status:
+          type: string
+          enum: [pending, approved, paid]
+        earnedAt:
+          type: string
+          format: date-time
+
+    RefundCase:
+      type: object
+      description: WLT-owned refund case.
+      required: [id, orderId, amountMinorUnits, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+        amountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        status:
+          type: string
+          enum: [pending, approved, processed, rejected]
+        reason:
+          type: string
+
+    ReconciliationRun:
+      type: object
+      description: >
+        WLT-owned reconciliation run record.
+        Requires Idempotency-Key when triggering.
+      required: [id, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        discrepancyCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+
+    PayoutDecision:
+      type: object
+      description: >
+        WLT-owned payout decision created by control panel.
+        Requires Idempotency-Key on creation.
+      required: [id, recipientId, recipientType, amountMinorUnits, currency, decision]
+      properties:
+        id:
+          type: string
+          format: uuid
+        recipientId:
+          type: string
+        recipientType:
+          type: string
+          enum: [captain, partner, field]
+        amountMinorUnits:
+          type: integer
+        currency:
+          type: string
+          default: YER
+        decision:
+          type: string
+          enum: [approved, rejected, held]
+        note:
+          type: string
+
+    AuditEvent:
+      type: object
+      description: WLT-owned immutable audit event.
+      required: [id, eventType, actorId, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+        actorId:
+          type: string
+        actorRole:
+          type: string
+          enum: [system, control-panel, wlt-service]
+        referenceId:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        retryable:
+          type: boolean
+        field:
+          type: string

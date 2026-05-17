@@ -1,8 +1,0 @@
-{
-  "guard": "GUARD-10_EVIDENCE_REGISTRY_HYGIENE",
-  "version": "1.0.0",
-  "mode": "CHECK_ONLY",
-  "policy": {
-    "evidenceHygieneSeverity": "warning"
-  }
-}

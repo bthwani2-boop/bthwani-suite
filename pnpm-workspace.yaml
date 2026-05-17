@@ -1,6 +1,4 @@
 packages:
-  - webapp
-  - website
   - webapp/runtime
   - website/runtime
   - app-client/runtime

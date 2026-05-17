@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Guard Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** GOVERNANCE_GUARD_CATALOG, GUARDRAILS_INDEX, GUARD_* files, WARNING_CLASSIFICATION_POLICY
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Guard record schema
 
@@ -24,7 +15,7 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 
 | ID | Domain | Purpose | Default severity | Acceptance evidence | Owner |
 | --- | --- | --- | --- | --- | --- |
-| GUARD_01_GOVERNANCE_ROOT | governance | active governance roots and legacy quarantine | BLOCKING | No parallel policy roots; legacy archive only | 00,03,99 |
+| GUARD_01_GOVERNANCE_ROOT | governance | active governance roots and retired-policy quarantine | BLOCKING | No parallel policy roots; historical material isolated | 00,03,99 |
 | GUARD_02_SHARED_FOLDER_OWNERSHIP | architecture | shared folder ownership | BLOCKING | No ambiguous shared implementation buckets | 04 |
 | GUARD_03_PACKAGE_BOUNDARY | packages | package import/export boundaries | BLOCKING | No deep imports, no direct Tamagui outside ui-kit | 05,08 |
 | GUARD_04_APPS_SHELL_ONLY | apps | apps remain shells | BLOCKING | No service logic/design system in apps | 06 |
@@ -36,12 +27,12 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 | GUARD_10_API_BINDING_RUNTIME | runtime | contract→client→surface→runtime chain | BLOCKING for runtime closure | Binding matrix and runtime evidence | 09,10 |
 | GUARD_11_WLT_FINANCIAL_OWNER | finance | WLT-only money truth | BLOCKING | No money mutation outside WLT | 02,07,20 |
 | GUARD_12_VAR_POLICY | runtime policy | mutable VAR/provider control | BLOCKING for mutable policy | No hardcoded mutable operational policy | 20 |
-| GUARD_13_EVIDENCE_PACK | evidence | evidence pack shape | BLOCKING | Required evidence files and _HANDOFF.zip | 11 |
+| GUARD_13_EVIDENCE_PACK | evidence | evidence pack shape | BLOCKING | Required evidence files and `{SESSION_ID}.zip` | 11 |
 | GUARD_14_BRANCH_CHECKPOINT | git | branch/checkpoint readiness | BLOCKING | branch reality captured | 18 |
 | GUARD_15_SECURITY_SECRETS | security | secrets/PII/auth/security | BLOCKING | No secrets; security evidence | 16 |
 | GUARD_16_TESTING_READINESS | quality | testing and readiness | BLOCKING when applicable | Type/test/build/runtime evidence | 12 |
 | GUARD_17_CI_GATES | ci | CI blocking/report-only correctness | BLOCKING | No unclassified failing gates | 13,23 |
-| GUARD_18_AGENT_EXECUTION | ai | AI/Copilot/script scope | BLOCKING for AI changes | Narrow scope and evidence | 15 |
+| GUARD_18_AGENT_EXECUTION | agents | agent/script scope | BLOCKING for agent-driven changes | Scope, ownership, and evidence stay inside the approved boundary | 15 |
 | GUARD_19_CLEANUP_DEPRECATION | cleanup | delete/archive/deprecation safety | BLOCKING | Inventory/reference/rollback | 17 |
 | GUARD_20_CONTROL_PANEL | control-panel | web-first control room model | REPORT/BLOCK | No route/page sprawl; ops tied to services | 19 |
 | GUARD_21_OBSERVABILITY | runtime | logs/metrics/errors/health | BLOCKING for prod readiness | Observable runtime evidence | 09 |
@@ -75,8 +66,8 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 
 ## ID collision rule
 
-Guard IDs must never be reused for a different meaning. If a legacy file used a conflicting ID, the new catalog wins and the legacy conflict is recorded in `99_LEGACY_MERGE_LEDGER.md`.
+Guard IDs must never be reused for a different meaning. If a historical file used a conflicting ID, the new catalog wins and the conflict is recorded in `99_LEGACY_MERGE_LEDGER.md`.
 
 ## Guard implementation rule
 
-Guard scripts live under `tools/guards` or equivalent implementation roots. They are derived from this catalog. Changing a guard behavior requires updating this file or the owner file first.
+Guard scripts live under `tools/guards` or equivalent implementation roots. They verify this catalog; they do not invent policy. Changing a guard behavior requires updating this file or the owner file first.

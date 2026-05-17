@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "requiredPaths": [
+    ".agents/INDEX.md",
+    ".agents/AUTHORITY_BOUNDARY.md",
+    ".agents/UPDATE_POLICY.md",
+    "AGENTS.md"
+  ],
+  "forbiddenRoots": [
+    ".github/skills",
+    ".github/agents",
+    ".opencode/skills"
+  ],
+  "forbiddenBridgeNamePatterns": [
+    "bridge-only"
+  ],
+  "adapterRoots": [
+    ".agents/adapters"
+  ],
+  "maxAdapterLines": 160,
+  "maxGovernanceMentionsPerAdapter": 6,
+  "allowContextPatterns": [
+    "legacy",
+    "Legacy",
+    "retired",
+    "Retired",
+    "historical",
+    "Historical",
+    "forbidden",
+    "Forbidden",
+    "do not",
+    "Do not",
+    "deleted",
+    "Deleted",
+    "remove",
+    "Remove",
+    "not active",
+    "inactive",
+    "migrated",
+    "migration",
+    "mirror",
+    "canonical .agents",
+    "retired root",
+    "retired roots",
+    "المتقاعدة",
+    "متقاعد",
+    "محذوف",
+    "محذوفة",
+    "غير نشط",
+    "غير نشطة",
+    "allowed when",
+    "allowed when documented",
+    "documented or safest",
+    "safest documented launcher",
+    "justified in evidence"
+  ],
+  "allowSectionPatterns": [
+    "Forbidden actions",
+    "What not to create",
+    "What was rejected",
+    "Why there was no direct restore"
+  ]
+}

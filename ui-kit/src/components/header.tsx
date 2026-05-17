@@ -2,7 +2,7 @@ import React from 'react';
 import { SearchField } from './field';
 import { Icon } from './icons';
 import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, StatusBar, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, resolveRowDirection, spacing } from '../foundation';
+import { colorPalette, radius, resolveRowDirection, spacing } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Badge, Button } from './button';
 import { Surface, Text } from '../primitives';
@@ -36,7 +36,7 @@ export function SearchTopBar({ value, onChangeText, onClose, placeholder, hint, 
         overflow: 'hidden',
         paddingTop: spacing[0],
         paddingBottom: spacing[0],
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.14,
         shadowRadius: 14,
         shadowOffset: { width: 0, height: 8 },
@@ -48,7 +48,7 @@ export function SearchTopBar({ value, onChangeText, onClose, placeholder, hint, 
         overflow: 'hidden',
         paddingTop: spacing[1],
         paddingBottom: spacing[1],
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.06,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 3 },
@@ -151,7 +151,7 @@ export function MobileWorkspaceHeader({
             backgroundColor: action.id === 'back' ? theme.brandSurface : theme.surface,
             borderWidth: 1,
             borderColor: action.id === 'back' ? theme.brand : theme.line,
-            shadowColor: '#020617',
+            shadowColor: colorPalette.black,
             shadowOpacity: 0.08,
             shadowRadius: 10,
             shadowOffset: { width: 0, height: 2 },
@@ -188,7 +188,7 @@ export function MobileWorkspaceHeader({
       style={[
         {
           borderRadius: radius.xl,
-          shadowColor: '#020617',
+          shadowColor: colorPalette.black,
           shadowOpacity: 0.06,
           shadowRadius: 10,
           shadowOffset: { width: 0, height: 3 },
@@ -291,13 +291,15 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   const messageLines = isBrand ? 1 : 2;
   const verticalPadding = isBrand ? spacing[0] : spacing[2];
   const horizontalPadding = isBrand ? spacing[1] : spacing[4];
-  const actionButtonSize = isBrand ? 56 : 38;
-  const trailingActionInset = -spacing[3];
-  const tickerPaddingEnd = trailingAction ? Math.max(spacing[1], Math.ceil(actionButtonSize * 0.25)) : horizontalPadding;
+  const actionButtonSize = isBrand ? 48 : 38;
+  const trailingActionInset = spacing[1];
+  const tickerPaddingEnd = trailingAction
+    ? horizontalPadding + Math.max(spacing[2], actionButtonSize + trailingActionInset)
+    : horizontalPadding;
   const badgeStyle = isBrand
     ? {
         backgroundColor: theme.brandHeaderSurfaceStrong,
-        borderColor: theme.brandHeaderSurfaceStrong,
+        borderColor: theme.brandHeaderStroke,
         paddingHorizontal: spacing[1],
         paddingVertical: spacing[0],
       }
@@ -306,8 +308,13 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
   const [viewportWidth, setViewportWidth] = React.useState(0);
   const [copyWidth, setCopyWidth] = React.useState(0);
   const marqueeGap = isBrand ? spacing[2] : spacing[4];
-  const marqueeDistance = copyWidth > 0 ? copyWidth + marqueeGap : 0;
-  const shouldMarquee = marquee && !reducedMotionEnabled && viewportWidth > 0 && copyWidth > 0;
+  const estimatedCopyWidth = React.useMemo(
+    () => Math.max(viewportWidth + spacing[6], Math.round(message.trim().length * (isBrand ? 10.5 : 9))),
+    [isBrand, message, viewportWidth],
+  );
+  const effectiveCopyWidth = copyWidth > 0 ? copyWidth : estimatedCopyWidth;
+  const marqueeDistance = effectiveCopyWidth > 0 ? effectiveCopyWidth + marqueeGap : 0;
+  const shouldMarquee = marquee && !reducedMotionEnabled && viewportWidth > 0 && marqueeDistance > 0 && (effectiveCopyWidth > viewportWidth || message.length > 18);
   const marqueeCopyCount = shouldMarquee ? Math.max(2, Math.ceil((viewportWidth + marqueeDistance) / marqueeDistance)) : 1;
   const marqueeStartOffset = direction === 'rtl' ? -marqueeDistance : 0;
   const marqueeEndOffset = direction === 'rtl' ? 0 : -marqueeDistance;
@@ -317,7 +324,7 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
     marqueeTranslateX.setValue(0);
     setViewportWidth(0);
     setCopyWidth(0);
-  }, [message, marquee, marqueeTranslateX]);
+  }, [direction, marquee, marqueeTranslateX, message]);
 
   React.useEffect(() => {
     if (!shouldMarquee) {
@@ -333,7 +340,8 @@ export function NewsTickerBar({ statusLabel, message, onPress, variant = 'defaul
         toValue: marqueeEndOffset,
         duration: marqueeDurationMs,
         easing: Easing.linear,
-        useNativeDriver: true,
+        useNativeDriver: false,
+        isInteraction: false,
       }),
       { resetBeforeIteration: true },
     );
@@ -539,7 +547,7 @@ export type TopBarProps = {
   ticker?: NewsTickerBarProps;
   tabs?: TabsProps<string>;
   variant?: TopBarVariant;
-  layoutMode?: 'default' | 'balanced-secondary' | 'relaxed-main';
+  layoutMode?: 'default' | 'balanced-secondary' | 'relaxed-main' | 'luxury-command';
   contentOffsetY?: number;
   actionsOffsetY?: number;
   style?: StyleProp<ViewStyle>;
@@ -551,19 +559,20 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
   const isMain = isMainHeaderVariant(variant);
   const useBalancedSecondary = !isMain && layoutMode === 'balanced-secondary';
   const useRelaxedMain = isMain && layoutMode === 'relaxed-main';
-  const resolvedContentOffsetY = contentOffsetY || (isMain ? (useRelaxedMain ? spacing[1] : spacing[0]) : spacing[1]);
+  const isLuxury = isMain && layoutMode === 'luxury-command';
+  const resolvedContentOffsetY = contentOffsetY || (isMain ? (isLuxury ? spacing[0] : (useRelaxedMain ? spacing[1] : spacing[0])) : spacing[1]);
   const titleTone = isMain ? 'inverse' : 'default';
   const titleAlign = direction === 'rtl' ? 'end' : 'start';
 
   function resolveActionBoxSize(action: TopBarAction, isBackAction = action.id === 'back') {
     const actionSize = action.size ?? (isBackAction && !isMain ? 'lg' : 'md');
     if (actionSize === 'lg') {
-      return isMain ? 36 : 42;
+      return isMain ? (isLuxury ? 44 : 32) : 42;
     }
     if (actionSize === 'sm') {
-      return isMain ? 32 : 36;
+      return isMain ? 28 : 36;
     }
-    return isMain ? 34 : 40;
+    return isMain ? 30 : 40;
   }
 
   const leadingClusterWidth = actions.length
@@ -585,7 +594,7 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
 
     return (
       <Pressable key={action.id} accessibilityRole="button" accessibilityLabel={action.accessibilityLabel} disabled={action.disabled} hitSlop={8} onPress={action.onPress} style={({ pressed }) => [{ padding: 0, opacity: action.disabled ? 0.56 : pressed ? 0.92 : 1 }]}>
-        <View style={{ position: 'relative', width: actionBoxSize, height: actionBoxSize, alignItems: 'center', justifyContent: 'center', borderRadius: actionBoxSize / 2, backgroundColor: actionBackgroundColor, borderWidth: 1, borderColor: actionBorderColor, shadowColor: '#020617', shadowOpacity: isMain ? 0 : 0.08, shadowRadius: isMain ? 0 : 10, shadowOffset: { width: 0, height: isMain ? 0 : 2 }, elevation: isMain ? 0 : 2 }}>
+        <View style={{ position: 'relative', width: actionBoxSize, height: actionBoxSize, alignItems: 'center', justifyContent: 'center', borderRadius: actionBoxSize / 2, backgroundColor: actionBackgroundColor, borderWidth: 1, borderColor: actionBorderColor, shadowColor: colorPalette.black, shadowOpacity: isMain ? 0 : 0.08, shadowRadius: isMain ? 0 : 10, shadowOffset: { width: 0, height: isMain ? 0 : 2 }, elevation: isMain ? 0 : 2 }}>
           {showBadge ? (
             <View style={[{ position: 'absolute', top: -spacing[1], zIndex: 1 }, badgeAnchorStyle]}>
               <Badge label={String(action.badgeCount)} tone={isMain ? 'info' : 'danger'} />
@@ -601,10 +610,10 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
     ? {
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        overflow: 'hidden',
-        paddingTop: useRelaxedMain ? spacing[1] : spacing[0],
-        paddingBottom: useRelaxedMain ? spacing[1] : spacing[0],
-        shadowColor: '#020617',
+        overflow: 'visible',
+        paddingTop: isLuxury ? spacing[10] : (useRelaxedMain ? spacing[10] : spacing[8]),
+        paddingBottom: isLuxury ? spacing[2] : (useRelaxedMain ? spacing[2] : spacing[1]),
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.14,
         shadowRadius: 14,
         shadowOffset: { width: 0, height: 8 },
@@ -616,7 +625,7 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
         overflow: 'hidden',
         paddingTop: spacing[1],
         paddingBottom: spacing[1],
-        shadowColor: '#020617',
+        shadowColor: colorPalette.black,
         shadowOpacity: 0.08,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 4 },
@@ -718,31 +727,72 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
   return (
     <Surface tone="brandHeader" border={false} padding={1} gap={0} style={[surfaceStyle, style]}>
       <StatusBar animated barStyle="light-content" backgroundColor={theme.brandHeaderStatusBar} />
-      <View style={contentRowStyle}>
-        <View style={{ flex: 1, gap: useRelaxedMain ? spacing[1] : spacing[0], alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-          <Pressable
-            accessibilityRole={onTitlePress ? 'button' : 'text'}
-            accessibilityLabel={titleAccessibilityLabel ?? title}
-            disabled={!onTitlePress}
-            hitSlop={8}
-            onPress={onTitlePress}
-            style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.98 : 1 }]}
-          >
-            {mainTitleInline}
-          </Pressable>
-          {locationLabel ? (
-            <View style={[{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }, isMain ? { alignSelf: direction === 'rtl' ? 'flex-end' : 'flex-start', paddingHorizontal: spacing[2], paddingVertical: spacing[0], borderRadius: radius.pill, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke } : null]}>
-              {locationIcon}
-              <Text role="bodySm" tone="inverse" numberOfLines={1} align={titleAlign} style={isMain ? { opacity: 0.96 } : undefined}>{locationLabel}</Text>
+      <View style={isLuxury ? { flexDirection: 'column', gap: spacing[3], paddingHorizontal: spacing[4] } : contentRowStyle}>
+        {isLuxury ? (
+          <>
+            {/* Row 1: Profile | Logo | Notifications + Cart */}
+            <View style={{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: 'center', minHeight: 32 }}>
+              <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+                {actions.filter(a => a.id === 'my-space').map(renderAction)}
+              </View>
+
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Pressable
+                  accessibilityRole={onTitlePress ? 'button' : 'text'}
+                  accessibilityLabel={titleAccessibilityLabel ?? title}
+                  disabled={!onTitlePress}
+                  onPress={onTitlePress}
+                  style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.8 : 1 }]}
+                >
+                  <Text role="titleMd" tone="inverse" numberOfLines={1} align="center">{title}</Text>
+                </Pressable>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+                {actions.filter(a => a.id === 'notifications' || a.id === 'cart').map(renderAction)}
+              </View>
             </View>
-          ) : null}
-        </View>
-        <View style={{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }}>
-          <View style={[{ flexDirection: 'row', gap: spacing[2], alignItems: 'center' }, isMain && actionsOffsetY ? { transform: [{ translateY: actionsOffsetY }] } : null]}>
-            {actions.map(renderAction)}
-          </View>
-          {trailingAction ? renderAction(trailingAction) : null}
-        </View>
+
+            {/* Row 2: Search Bar + Services Button */}
+            <View style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2], minHeight: 44 }}>
+              <Pressable
+                onPress={actions.find(a => a.id === 'search')?.onPress}
+                style={({ pressed }) => [{ flex: 1, height: 40, borderRadius: 20, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke, flexDirection: resolveRowDirection(direction), alignItems: 'center', paddingHorizontal: spacing[3], gap: spacing[2], opacity: pressed ? 0.9 : 1 }]}
+              >
+                <Icon name="search-outline" size={18} color={theme.textInverse} style={{ opacity: 0.7 }} />
+                <Text role="bodySm" tone="inverse" style={{ opacity: 0.7, flex: 1 }}>{subtitle || 'ابحث هنا...'}</Text>
+              </Pressable>
+              {trailingAction ? renderAction({ ...trailingAction, size: 'lg' }) : null}
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={{ flex: 1, gap: useRelaxedMain ? spacing[1] : spacing[0], alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+              <Pressable
+                accessibilityRole={onTitlePress ? 'button' : 'text'}
+                accessibilityLabel={titleAccessibilityLabel ?? title}
+                disabled={!onTitlePress}
+                hitSlop={8}
+                onPress={onTitlePress}
+                style={({ pressed }) => [{ opacity: pressed && onTitlePress ? 0.98 : 1 }]}
+              >
+                {mainTitleInline}
+              </Pressable>
+              {locationLabel ? (
+                <View style={[{ flexDirection: resolveRowDirection(direction), gap: spacing[1], alignItems: 'center' }, isMain ? { alignSelf: direction === 'rtl' ? 'flex-end' : 'flex-start', paddingHorizontal: spacing[2], paddingVertical: spacing[0], borderRadius: radius.pill, backgroundColor: theme.brandHeaderSurfaceStrong, borderWidth: 1, borderColor: theme.brandHeaderStroke } : null]}>
+                  {locationIcon}
+                  <Text role="bodySm" tone="inverse" numberOfLines={1} align={titleAlign} style={isMain ? { opacity: 0.96 } : undefined}>{locationLabel}</Text>
+                </View>
+              ) : null}
+            </View>
+            <View style={{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }}>
+              <View style={[{ flexDirection: 'row', gap: spacing[1], alignItems: 'center' }, isMain && actionsOffsetY ? { transform: [{ translateY: actionsOffsetY }] } : null]}>
+                {actions.map(renderAction)}
+              </View>
+              {trailingAction ? renderAction(trailingAction) : null}
+            </View>
+          </>
+        )}
       </View>
       {isMain && ticker ? (
         <View style={{ marginTop: -spacing[1], overflow: 'visible' }}>

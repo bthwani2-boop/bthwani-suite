@@ -2,15 +2,6 @@
 
 **Status:** Canonical Governance Payload v2
 **Owner:** `Service Closure Governance`
-**Canonical repo:** `C:\bthwani-suite`
-**Requested branch context:** `ghb/0107-20260430-225857-governance-packages`
-**Source basis:** extracted and consolidated from `governance/` + `governance/governance-legacy/`
-**Legacy families promoted here:** 10_SERVICE_CLOSURE_PROTOCOL, GOVERNANCE_CLOSURE_STANDARD, GOVERNANCE_CLOSEOUT_ROADMAP, SERVICE_BLUEPRINT patterns, PLATFORM_BLUEPRINT, operation catalog standards
-
-## Non-negotiable reading law
-
-This file is not a slogan file. It is a control-plane rule file for BThwani. Any implementation, prompt, script, PR, branch, guard, or audit that touches this domain must follow this file and must produce evidence. No `PASS`, `READY`, `CLOSED`, `FINAL`, or `100%` claim is valid without evidence under `tools/registry/runs/{SESSION_ID}/`.
-
 
 ## Purpose
 
@@ -78,10 +69,10 @@ Every canonical service should have a living blueprint before closure. The bluep
 ### Blueprint location
 
 ```text
-packages/surfaces/src/service-owned/<service>/SERVICE_BLUEPRINT.md
+<service>/SERVICE_BLUEPRINT.md
 ```
 
-or another approved service-owned canonical path if the repo structure evolves with evidence.
+or another approved root-service canonical path if the repo structure evolves with evidence.
 
 ### Required blueprint sections
 
@@ -184,5 +175,5 @@ This file owns closure protocol and the blueprint/catalog shape used to prove cl
 - “UI is done” without screenshots.
 - “API works” without contract/runtime evidence.
 - “Ready” with untracked files.
-- “Closed” with legacy unaccounted.
+- “Closed” without historical accounting updated when owner mapping changed.
 - “100%” with failing diff/typecheck/test/guard.

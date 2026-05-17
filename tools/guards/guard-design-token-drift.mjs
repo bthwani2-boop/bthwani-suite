@@ -5,15 +5,14 @@ import { parseArgs, createReport, finalize, walkFiles, readText, rel, TEXT_EXTEN
 const args = parseArgs();
 const report = createReport('DESIGN-TOKEN-DRIFT', 'governance/08_UI_KIT_AND_BRAND.md');
 const root = args.root;
-const files = walkFiles(root, { startDirs: ['apps', 'packages', 'services'], extensions: TEXT_EXTENSIONS });
+const files = walkFiles(root, {
+  startDirs: ['app-client/runtime', 'app-partner/runtime', 'app-captain/runtime', 'app-field/runtime', 'control-panel/runtime', 'webapp/runtime', 'website/runtime', 'ui-kit', 'dsh', 'wlt', 'knz', 'arb', 'amn', 'esf', 'mrf', 'snd', 'kwd'],
+  extensions: TEXT_EXTENSIONS,
+});
 
-const foundationCandidates = [
-  path.join(root, 'ui-kit/src/foundation.ts'),
-  path.join(root, 'packages/ui-kit/src/foundation.ts')
-];
-const foundationPath = foundationCandidates.find((candidate) => fs.existsSync(candidate));
-if (!foundationPath) {
-  report.fail('ui-kit/src/foundation.ts', 'Missing canonical ui-kit foundation token file.', 'checked ui-kit/src/foundation.ts and packages/ui-kit/src/foundation.ts');
+const foundationPath = path.join(root, 'ui-kit/src/foundation.ts');
+if (!fs.existsSync(foundationPath)) {
+  report.fail('ui-kit/src/foundation.ts', 'Missing canonical ui-kit foundation token file.', 'checked ui-kit/src/foundation.ts');
   finalize(report, args);
   process.exit(1);
 }
@@ -42,7 +41,7 @@ const hexRegex = /(?<![A-Za-z0-9_])#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})(?![A-Za-z0
 
 for (const file of files) {
   const relative = rel(root, file);
-  if (relative.startsWith('packages/ui-kit/') || isProbablyGeneratedPath(relative)) continue;
+  if (relative.startsWith('ui-kit/') || isProbablyGeneratedPath(relative)) continue;
   const text = readText(file);
   let match;
   while ((match = hexRegex.exec(text)) !== null) {

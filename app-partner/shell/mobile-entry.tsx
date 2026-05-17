@@ -1,2 +1,3 @@
-export { PartnerSurfaceHost as default } from './PartnerSurfaceHost';
-export * from './PartnerSurfaceHost';
+import { PartnerSurfaceHost } from './PartnerSurfaceHost';
+
+export { PartnerSurfaceHost as PartnerMobileEntry, PartnerSurfaceHost as default };

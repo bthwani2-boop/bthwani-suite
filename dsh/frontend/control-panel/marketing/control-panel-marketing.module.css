@@ -1,0 +1,438 @@
+.marketingStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 32px;
+}
+
+.surfaceCard {
+  background-color: var(--bthwani-control-panel-surface);
+  border-radius: 12px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  padding: 16px;
+}
+
+.surfaceCardTitle {
+  margin: 0 0 12px 0;
+  color: var(--bthwani-control-panel-brand);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.surfaceCardTitleCompact {
+  margin: 0 0 8px 0;
+  color: var(--bthwani-control-panel-brand);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--bthwani-control-panel-border-strong);
+  background-color: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-brand);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.actionButtonPrimary {
+  background-color: var(--bthwani-brand);
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-brand-contrast);
+}
+
+.actionButtonDanger {
+  background-color: var(--bthwani-danger-surface);
+  border-color: var(--bthwani-danger);
+  color: var(--bthwani-danger-text);
+}
+
+.actionButtonSuccess {
+  background-color: var(--bthwani-success-surface);
+  border-color: var(--bthwani-success);
+  color: var(--bthwani-success-text);
+}
+
+.actionButtonDisabled {
+  background-color: var(--bthwani-disabled-surface);
+  border-color: var(--bthwani-control-panel-border);
+  color: var(--bthwani-disabled-text);
+  cursor: not-allowed;
+}
+
+.statusNote {
+  padding: 4px 12px;
+  border-radius: 6px;
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.activeTickerCard {
+  padding: 12px;
+  background-color: var(--bthwani-control-panel-surface-inset);
+  border-radius: 8px;
+  border: 1px solid var(--bthwani-control-panel-border);
+}
+
+.cardMetaRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.liveBadge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--bthwani-success-surface);
+  color: var(--bthwani-success-text);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.messageText {
+  margin: 0 0 8px 0;
+  color: var(--bthwani-control-panel-brand);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.metaWrap {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 11px;
+}
+
+.planNote {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bthwani-control-panel-border);
+  color: var(--bthwani-control-panel-brand);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  background-color: var(--bthwani-control-panel-surface-inset);
+  border-radius: 8px;
+  border: 1px dashed var(--bthwani-control-panel-border-strong);
+}
+
+.emptyStateText {
+  margin: 0;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.previewBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--bthwani-brand);
+}
+
+.previewStatus {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-brand);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.previewContent {
+  flex: 1;
+  overflow: hidden;
+}
+
+.previewMessage {
+  margin: 0;
+  color: var(--bthwani-brand-contrast);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.previewTarget {
+  color: var(--bthwani-brand-contrast);
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.previewPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background-color: var(--bthwani-control-panel-surface-inset);
+}
+
+.previewPlaceholderText {
+  margin: 0;
+  color: var(--bthwani-disabled-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.editorGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.editorGridWithSidebar {
+  grid-template-columns: minmax(0, 1fr) 350px;
+}
+
+.listStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tickerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface-inset);
+}
+
+.tickerRowActive {
+  border-color: var(--bthwani-brand);
+}
+
+.tickerRowBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.tickerMetaLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.statusChip {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.statusChipSuccess {
+  background-color: var(--bthwani-success-surface);
+  color: var(--bthwani-success-text);
+}
+
+.statusChipNeutral {
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.metaChipRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.metaSeparator {
+  opacity: 0.4;
+}
+
+.suppressedChip {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--bthwani-danger-surface);
+  color: var(--bthwani-danger-text);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.tickerActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.editorCardAccent {
+  border-color: var(--bthwani-brand);
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.editorTitle {
+  margin: 0;
+  color: var(--bthwani-control-panel-brand);
+  font-weight: 800;
+}
+
+.closeButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.formStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fieldLabel {
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.fieldLabelLarge {
+  font-size: 11px;
+}
+
+.fieldControl {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-brand);
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.fieldControlCompact {
+  padding: 6px;
+  font-size: 11px;
+}
+
+.fieldTextarea {
+  min-height: 50px;
+  resize: vertical;
+}
+
+.fieldError {
+  color: var(--bthwani-danger-text);
+  font-size: 10px;
+}
+
+.fieldErrorSmall {
+  font-size: 9px;
+}
+
+.chipRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ruleChip {
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
+  font-size: 11px;
+}
+
+.ruleChipDanger {
+  border-color: var(--bthwani-danger);
+  background-color: var(--bthwani-danger-surface);
+  color: var(--bthwani-danger-text);
+}
+
+.mappingChip {
+  border-radius: 4px;
+}
+
+.headerLetter {
+  color: var(--bthwani-brand-contrast);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.subTabDock {
+  min-height: 36px;
+  padding: 4px 14px;
+}
+
+.subTabButton {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.selectedSubTab {
+  background-color: var(--bthwani-brand-surface);
+  color: var(--bthwani-brand);
+  border-color: var(--bthwani-brand);
+}
+
+.metricToneSuccess {
+  color: var(--bthwani-success-text);
+}
+
+.metricToneWarning {
+  color: var(--bthwani-warning-text);
+}
+
+@media (max-width: 960px) {
+  .editorGridWithSidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

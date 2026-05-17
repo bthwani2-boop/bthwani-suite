@@ -195,17 +195,15 @@ export function finishGuard({ evidenceRoot, decision, summary, evidence, issues,
   fs.writeFileSync(path.join(evidenceRoot, 'status.txt'), `${decision}\n`, 'utf8');
   fs.writeFileSync(path.join(evidenceRoot, 'evidence.json'), JSON.stringify(evidence, null, 2), 'utf8');
 
-  const handoffZip = path.join(evidenceRoot, '_HANDOFF.zip');
-  const namedZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}_HANDOFF.zip`);
-  for (const target of [handoffZip, namedZip]) if (fs.existsSync(target)) fs.rmSync(target, { force: true });
+  const evidenceZip = path.join(evidenceRoot, `${path.basename(evidenceRoot)}.zip`);
+  if (fs.existsSync(evidenceZip)) fs.rmSync(evidenceZip, { force: true });
 
   const files = fs.readdirSync(evidenceRoot)
-    .filter((name) => !name.endsWith('_HANDOFF.zip') && name !== '_HANDOFF.zip')
+    .filter((name) => name !== path.basename(evidenceZip))
     .map((name) => path.join(evidenceRoot, name));
 
-  makeZip(handoffZip, files);
-  fs.copyFileSync(handoffZip, namedZip);
-  return { handoffZip, namedZip };
+  makeZip(evidenceZip, files);
+  return { evidenceZip, handoffZip: evidenceZip, namedZip: evidenceZip };
 }
 
 export function runGuard({ guardId, guardName, prefix, configPath, collect }) {
