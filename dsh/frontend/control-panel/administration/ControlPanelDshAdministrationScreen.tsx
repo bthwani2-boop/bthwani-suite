@@ -175,7 +175,7 @@ function UserCard({ user }: { user: MockAdminUser }) {
             <Text role="titleMd">{user.name}</Text>
             <Text role="caption" tone="muted">{user.email}</Text>
             {role && (
-              <Surface tone={role.tone} padding={1} radiusToken="pill" border={false} style={{ display: 'inline-flex', width: 'fit-content' }}>
+              <Surface tone={role.tone} padding={1} radiusToken="pill" border={false} style={{ alignSelf: 'flex-start' }}>
                 <Text role="caption" tone={role.tone === 'default' ? 'muted' : 'inverse'}>{role.arabicName}</Text>
               </Surface>
             )}
