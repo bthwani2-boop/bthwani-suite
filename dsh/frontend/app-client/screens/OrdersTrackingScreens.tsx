@@ -843,7 +843,7 @@ function buildDefaultProofOfDelivery(clientState: DshClientState, phase: Journey
       is_required: true,
       captured_by: 'captain',
       captured_at: '2026-05-01T20:30:00+03:00',
-      proof_asset_url: 'https://example.invalid/dsh/proof/delivered',
+      proof_asset_url: null,
       verification_result: 'verified',
       failure_reason: null,
       customer_visible: true,
@@ -1033,6 +1033,101 @@ function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smar
   );
 }
 
+function getMilestoneIndex(stepId: string): number {
+  switch (stepId) {
+    case 'order_submitted':
+    case 'operations_review':
+    case 'operations_approved':
+      return 0; // تم الطلب
+    case 'order_received':
+    case 'preparing':
+    case 'ready_for_pickup':
+      return 1; // التجهيز
+    case 'captain_assigned':
+    case 'picked_up':
+    case 'enroute_to_customer':
+      return 2; // في الطريق
+    case 'near_customer':
+    case 'at_door':
+    case 'bell_rang':
+    case 'delivered':
+      return 3; // التسليم
+    default:
+      return 0;
+  }
+}
+
+function HorizontalMilestones({ activeStepId }: { activeStepId: string }) {
+  const { theme } = useTheme();
+  const currentMilestone = getMilestoneIndex(activeStepId);
+
+  const milestones = [
+    { label: 'تم الطلب', index: 0 },
+    { label: 'التجهيز', index: 1 },
+    { label: 'في الطريق', index: 2 },
+    { label: 'التسليم', index: 3 },
+  ];
+
+  return (
+    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, width: '100%', position: 'relative' }}>
+      {/* Background line */}
+      <View style={{ position: 'absolute', top: 22, left: '10%', right: '10%', height: 3, backgroundColor: theme.line, zIndex: 1 }} />
+      {/* Progress fill line */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 22,
+          right: '10%',
+          left: `${10 + (3 - currentMilestone) * 26.6}%`,
+          height: 3,
+          backgroundColor: theme.brand,
+          zIndex: 1,
+        }}
+      />
+
+      {milestones.map((milestone) => {
+        const isDone = milestone.index < currentMilestone;
+        const isActive = milestone.index === currentMilestone;
+        const isPassedOrActive = milestone.index <= currentMilestone;
+        const color = isActive ? theme.brand : isDone ? theme.success : theme.textSoft;
+        const bulletColor = isActive ? theme.brand : isDone ? theme.success : theme.line;
+
+        return (
+          <Box key={milestone.index} align="center" style={{ flex: 1, zIndex: 2 }}>
+            <View
+              style={{
+                width: isActive ? 20 : 14,
+                height: isActive ? 20 : 14,
+                borderRadius: isActive ? 10 : 7,
+                backgroundColor: bulletColor,
+                borderWidth: isActive ? 3 : 0,
+                borderColor: theme.brandSurface,
+                shadowColor: color,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: isActive ? 0.4 : 0,
+                shadowRadius: 4,
+                elevation: isActive ? 3 : 0,
+              }}
+            />
+            <Text
+              role="bodySm"
+              style={{
+                textAlign: 'center',
+                marginTop: 8,
+                color: isActive ? theme.brand : isPassedOrActive ? theme.text : theme.textSoft,
+                fontWeight: isActive ? '700' : '400',
+                fontSize: 12,
+              }}
+            >
+              {milestone.label}
+            </Text>
+          </Box>
+        );
+      })}
+    </View>
+  );
+}
+
 type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
@@ -1055,6 +1150,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const [draftMessage, setDraftMessage] = React.useState('');
   const [draftAttachments, setDraftAttachments] = React.useState<OrderChatAttachmentKind[]>([]);
   const [actionBarHeight, setActionBarHeight] = React.useState(0);
+  const [isTimelineExpanded, setIsTimelineExpanded] = React.useState(false);
+  const [isOperationalExpanded, setIsOperationalExpanded] = React.useState(false);
+  const [isEventsExpanded, setIsEventsExpanded] = React.useState(false);
   const effectiveClientState = normalizeClientFacingOrderState(clientState);
   const smartTracking = useSmartTrackingHeartbeat(phase);
   const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
@@ -1312,7 +1410,6 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       <TopBar
         variant="surface"
         title={journeyTopBarTitle}
-        trailingAction={onBack ? { id: 'back', icon: <Icon name="arrow-back" size={24} color={theme.brand} />, mirrorInRtl: true, accessibilityLabel: 'رجوع', onPress: onBack } : undefined}
       />
 
       <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
@@ -1323,6 +1420,10 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
               {phase === 'route' ? 'أسرع طريق عبر الملك فهد متاح الآن' : 'تم تثبيت الوصول في المنطقة التشغيلية'}
             </Text>
           </Box>
+        </Surface>
+
+        <Surface tone="raised" padding={3} radiusToken="xl">
+          <HorizontalMilestones activeStepId={activeStepId} />
         </Surface>
 
         <SmartTrackingCard phase={phase} smartTracking={smartTracking} />
@@ -1338,12 +1439,27 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           nextStepValue={nextStepValue}
         />
 
-        <Surface tone="raised" padding={4} radiusToken="xl" gap={4}>
-          <SectionHeader
-            title="مراحل الطلب"
-            subtitle="المراحل الرئيسية من الاستلام حتى التسليم، تتحدث بشكل ذكي كل 3 دقائق."
-          />
-          <StageRail activeStepId={activeStepId} steps={FULL_JOURNEY_STEPS} />
+        <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
+          <Pressable onPress={() => setIsTimelineExpanded(!isTimelineExpanded)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+            <Box layoutDirection="row" align="center" justify="space-between" style={{ flexDirection: 'row-reverse' }}>
+              <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+                <Text role="titleMd" style={{ color: theme.brand, fontWeight: '700' }}>مراحل الطلب التفصيلية</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  {isTimelineExpanded ? 'انقر لإخفاء التفاصيل' : 'انقر لعرض 13 خطوة لتتبع الطلب بدقة'}
+                </Text>
+              </Box>
+              <Icon
+                name={isTimelineExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
+                size={20}
+                color={theme.brand}
+              />
+            </Box>
+          </Pressable>
+          {isTimelineExpanded && (
+            <Box gap={4} style={{ marginTop: 10 }}>
+              <StageRail activeStepId={activeStepId} steps={FULL_JOURNEY_STEPS} />
+            </Box>
+          )}
         </Surface>
 
         <KeyValueDetails
@@ -1384,52 +1500,91 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           </Surface>
         ) : (
           <>
-            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-              <SectionHeader title="دورة التنفيذ" subtitle="الحالة التشغيلية، سبب الاستثناء، وإثبات التسليم الظاهر في هذا المسار." />
-              <KeyValueList
-                items={[
-                  { label: 'الحالة التشغيلية', value: formatDeliveryLifecycleStatus(lifecycleStatus), tone: 'brand' },
-                  { label: 'نوع الإثبات', value: formatProofType(proofVisibility.proof_type) },
-                  { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
-                  { label: 'إظهار الإثبات للعميل', value: proofVisibility.customer_visible ? 'نعم' : 'لا' },
-                  { label: 'مرجع الاستلام', value: handoffVerification.pickup_reference ?? 'غير متوفر' },
-                  { label: 'OTP التسليم', value: handoffVerification.dropoff_otp ?? 'غير متوفر' },
-                ]}
-              />
-              {exceptionReason ? (
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  سبب الحالة الحالية: {formatExceptionReason(exceptionReason)}
-                </Text>
-              ) : null}
-            </Surface>
-
-            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-              <SectionHeader title="سجل الأحداث" subtitle="آخر التحولات الزمنية المرتبطة بالطلب الحالي، بدون شاشة إضافية." />
-              <Box gap={2}>
-                {eventTimeline.map((eventItem) => (
-                  <ListItem
-                    key={eventItem.event_id}
-                    title={formatDeliveryLifecycleStatus(eventItem.to_status)}
-                    subtitle={eventItem.notes ?? 'لا توجد ملاحظات إضافية'}
-                    meta={eventItem.timestamp}
-                    badgeLabel={eventItem.reason_code ? formatExceptionReason(eventItem.reason_code) : eventItem.actor_role}
+            <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
+              <Pressable onPress={() => setIsOperationalExpanded(!isOperationalExpanded)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+                <Box layoutDirection="row" align="center" justify="space-between" style={{ flexDirection: 'row-reverse' }}>
+                  <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+                    <Text role="titleMd" style={{ color: theme.brand, fontWeight: '700' }}>التفاصيل التشغيلية والتحقق</Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                      {isOperationalExpanded ? 'انقر لإخفاء التفاصيل' : 'انقر لعرض أكواد التحقق، إثبات التسليم والتعليمات'}
+                    </Text>
+                  </Box>
+                  <Icon
+                    name={isOperationalExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
+                    size={20}
+                    color={theme.brand}
                   />
-                ))}
-              </Box>
+                </Box>
+              </Pressable>
+              {isOperationalExpanded && (
+                <Box gap={4} style={{ marginTop: 12 }}>
+                  <Box gap={2}>
+                    <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>حالة دورة التنفيذ</Text>
+                    <KeyValueList
+                      items={[
+                        { label: 'الحالة التشغيلية', value: formatDeliveryLifecycleStatus(lifecycleStatus), tone: 'brand' },
+                        { label: 'نوع الإثبات', value: formatProofType(proofVisibility.proof_type) },
+                        { label: 'نتيجة التحقق', value: formatVerificationResult(proofVisibility.verification_result) },
+                        { label: 'إظهار الإثبات للعميل', value: proofVisibility.customer_visible ? 'نعم' : 'لا' },
+                        { label: 'مرجع الاستلام', value: handoffVerification.pickup_reference ?? 'غير متوفر' },
+                        { label: 'OTP التسليم', value: handoffVerification.dropoff_otp ?? 'غير متوفر' },
+                      ]}
+                    />
+                    {exceptionReason ? (
+                      <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>
+                        سبب الحالة الحالية: {formatExceptionReason(exceptionReason)}
+                      </Text>
+                    ) : null}
+                  </Box>
+
+                  <View style={{ height: 1, backgroundColor: theme.line }} />
+
+                  <Box gap={2}>
+                    <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>معلومات الاستلام والتسليم</Text>
+                    <KeyValueList
+                      items={[
+                        { label: 'التقاط الإثبات', value: proofVisibility.captured_at ?? 'لم يُلتقط بعد' },
+                        { label: 'التقطه', value: proofVisibility.captured_by ?? 'غير محدد' },
+                        { label: 'تعليمات العميل', value: handoffVerification.customer_instructions ?? 'لا توجد' },
+                        { label: 'تعليمات الشريك', value: handoffVerification.partner_instructions ?? 'لا توجد' },
+                        { label: 'تسليم بدون تلامس', value: handoffVerification.contactless_allowed ? 'مسموح' : 'غير مسموح' },
+                        { label: 'ملاحظات الكابتن', value: handoffVerification.captain_handoff_notes ?? 'لا توجد' },
+                      ]}
+                    />
+                  </Box>
+                </Box>
+              )}
             </Surface>
 
-            <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-              <SectionHeader title="التحقق والتسليم" subtitle="مرجع الاستلام، كود التحقق، وتعليمات التسليم/الاستلام تبقى في نفس العرض." />
-              <KeyValueList
-                items={[
-                  { label: 'التقاط الإثبات', value: proofVisibility.captured_at ?? 'لم يُلتقط بعد' },
-                  { label: 'التقطه', value: proofVisibility.captured_by ?? 'غير محدد' },
-                  { label: 'تعليمات العميل', value: handoffVerification.customer_instructions ?? 'لا توجد' },
-                  { label: 'تعليمات الشريك', value: handoffVerification.partner_instructions ?? 'لا توجد' },
-                  { label: 'تسليم بدون تلامس', value: handoffVerification.contactless_allowed ? 'مسموح' : 'غير مسموح' },
-                  { label: 'ملاحظات الكابتن', value: handoffVerification.captain_handoff_notes ?? 'لا توجد' },
-                ]}
-              />
+            <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
+              <Pressable onPress={() => setIsEventsExpanded(!isEventsExpanded)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+                <Box layoutDirection="row" align="center" justify="space-between" style={{ flexDirection: 'row-reverse' }}>
+                  <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+                    <Text role="titleMd" style={{ color: theme.brand, fontWeight: '700' }}>سجل الأحداث والتحولات</Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                      {isEventsExpanded ? 'انقر لإخفاء السجل' : 'انقر لعرض سجل الحركات الزمنية التاريخية للطلب'}
+                    </Text>
+                  </Box>
+                  <Icon
+                    name={isEventsExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
+                    size={20}
+                    color={theme.brand}
+                  />
+                </Box>
+              </Pressable>
+              {isEventsExpanded && (
+                <Box gap={2} style={{ marginTop: 12 }}>
+                  {eventTimeline.map((eventItem) => (
+                    <ListItem
+                      key={eventItem.event_id}
+                      title={formatDeliveryLifecycleStatus(eventItem.to_status)}
+                      subtitle={eventItem.notes ?? 'لا توجد ملاحظات إضافية'}
+                      meta={eventItem.timestamp}
+                      badgeLabel={eventItem.reason_code ? formatExceptionReason(eventItem.reason_code) : eventItem.actor_role}
+                    />
+                  ))}
+                </Box>
+              )}
             </Surface>
 
             {walletImpactVisibility ? (
