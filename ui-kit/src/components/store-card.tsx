@@ -22,7 +22,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IMAGE_SIZE = 114; // Slightly increased to prevent text clipping
 const LOGO_SIZE = 54;
 const CARD_RADIUS = 16;
-const GOLD = '#FFD700';
+// Use semantic tokens instead of hardcoded gold
 
 export interface ServiceToken {
   label: string;
@@ -57,7 +57,7 @@ export interface StoreCardPremiumProps {
   onFavoritePress?: () => void;
 }
 
-export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
+const StoreCardPremiumComponent: React.FC<StoreCardPremiumProps> = ({
   item,
   onPress,
   onFavoritePress,
@@ -119,7 +119,7 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
         {/* Metrics Overlay (Bottom-Left of Image) */}
         <View style={styles.imageMetricsOverlay}>
           <View style={styles.imageMetricItem}>
-            <Icon name="star" size={10} color="#FFD700" />
+            <Icon name="star" size={10} color={colorPalette.warning} />
             <Text style={styles.imageMetricText}>{item.rating?.toFixed(1) || '4.5'}</Text>
           </View>
           <View style={styles.imageMetricDivider} />
@@ -228,6 +228,37 @@ export const StoreCardPremium: React.FC<StoreCardPremiumProps> = ({
     </Pressable>
   );
 };
+
+export const StoreCardPremium = React.memo(
+  StoreCardPremiumComponent,
+  (prevProps, nextProps) => {
+    const prevItem = prevProps.item;
+    const nextItem = nextProps.item;
+    return (
+      prevItem.id === nextItem.id &&
+      prevItem.name === nextItem.name &&
+      prevItem.subtitle === nextItem.subtitle &&
+      prevItem.image === nextItem.image &&
+      prevItem.logoImage === nextItem.logoImage &&
+      prevItem.rating === nextItem.rating &&
+      prevItem.distanceKm === nextItem.distanceKm &&
+      prevItem.isOpen === nextItem.isOpen &&
+      prevItem.supportsPickup === nextItem.supportsPickup &&
+      prevItem.supportsPartnerDelivery === nextItem.supportsPartnerDelivery &&
+      prevItem.isFavorite === nextItem.isFavorite &&
+      prevItem.isFollowing === nextItem.isFollowing &&
+      prevItem.followersCount === nextItem.followersCount &&
+      prevItem.hasBthwaniPro === nextItem.hasBthwaniPro &&
+      prevItem.hasOffer === nextItem.hasOffer &&
+      prevItem.offerText === nextItem.offerText &&
+      prevItem.pointsMultiplier === nextItem.pointsMultiplier &&
+      prevItem.hasCouponAvailable === nextItem.hasCouponAvailable &&
+      prevItem.locationLabel === nextItem.locationLabel &&
+      prevItem.deliveryTimeLabel === nextItem.deliveryTimeLabel &&
+      prevItem.isPopular === nextItem.isPopular
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   card: {
@@ -384,7 +415,7 @@ const styles = StyleSheet.create({
   },
   addressText: {
     fontSize: 11, // Even smaller and quieter
-    color: '#718096',
+    color: colorPalette.inkMuted,
     textAlign: 'right',
     fontFamily: 'Outfit-Regular',
     marginTop: -1,
@@ -435,7 +466,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 9, // Tertiary: Smallest possible for high-density elegance
-    color: '#718096',
+    color: colorPalette.inkMuted,
     fontFamily: 'Outfit-Medium',
   },
   deliveryBadgeText: {

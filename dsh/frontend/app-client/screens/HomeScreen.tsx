@@ -440,9 +440,9 @@ function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) 
 // Internal resolveTickerBanner removed. Using buildMarketingTickerPlan from store.
 
 /**
- * Internal helper for Category selection items
+ * Internal helper for Category selection items (memoized)
  */
-function CategorySelectorItem({
+const CategorySelectorItem = React.memo(({
   label,
   icon,
   onPress,
@@ -460,7 +460,7 @@ function CategorySelectorItem({
   isVideo?: boolean;
   styles: DshHomeGetStyles;
   theme: DshHomeTheme;
-}) {
+}) => {
   return (
     <Pressable style={styles.categorySelectorCard} onPress={onPress}>
       <View
@@ -480,12 +480,12 @@ function CategorySelectorItem({
       </View>
     </Pressable>
   );
-}
+});
 
 /**
- * Internal helper for Filter Chips
+ * Internal helper for Filter Chips (memoized)
  */
-function FilterChipItem({
+const FilterChipItem = React.memo(({
   label,
   icon,
   onPress,
@@ -499,7 +499,7 @@ function FilterChipItem({
   isActive: boolean;
   styles: DshHomeGetStyles;
   theme: DshHomeTheme;
-}) {
+}) => {
   return (
     <Pressable
       style={[
@@ -523,7 +523,7 @@ function FilterChipItem({
       </View>
     </Pressable>
   );
-}
+});
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   const titles = {
@@ -1357,7 +1357,7 @@ return (
                           resizeMode="contain"
                         />
                       ) : (
-                        <Icon name="ribbon-outline" size={32} color="#D4AF37" />
+                        <Icon name="ribbon-outline" size={32} color={colorPalette.warning} />
                       )}
                     </View>
                     <View style={styles.heroPromoTextWrap}>
@@ -1910,9 +1910,9 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flex: 1.6,
       height: 74, // Matches the height of CategorySelectorItem (56 icon + 4 gap + 14 text)
       borderRadius: 18,
-      backgroundColor: '#FDFCFB',
+      backgroundColor: colorPalette.surfaceAlt,
       borderWidth: 1,
-      borderColor: '#F0E9E0',
+      borderColor: colorPalette.surfaceInset,
       paddingHorizontal: 12,
       justifyContent: 'center',
       overflow: 'hidden',
@@ -1960,7 +1960,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       textAlign: 'right',
     },
     heroPromoSubtitle: {
-      color: '#717171',
+      color: colorPalette.inkMuted,
       fontSize: 9,
       fontWeight: '700',
       marginTop: 0,

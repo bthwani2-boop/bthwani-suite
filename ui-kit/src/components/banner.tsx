@@ -43,7 +43,7 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function BannerCarousel(props: BannerCarouselProps) {
+export function BannerCarouselComponent(props: BannerCarouselProps) {
   const {
     banners,
     variant = 'main',
@@ -69,7 +69,7 @@ export function BannerCarousel(props: BannerCarouselProps) {
   const isPeekSecondary = isSecondary && !fullBleed;
 
   const scrollX = React.useRef(new Animated.Value(0)).current;
-  const flatListRef = React.useRef<FlatList>(null);
+  const flatListRef = React.useRef<any>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [isInteracting, setIsInteracting] = React.useState(false);
   const interactionTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -172,11 +172,13 @@ export function BannerCarousel(props: BannerCarouselProps) {
     [computeIndex, toRealIndex],
   );
 
-  const onScroll = React.useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      scrollX.setValue(event.nativeEvent.contentOffset.x);
-    },
-    [scrollX],
+  const onScroll = React.useMemo(
+    () =>
+      Animated.event(
+        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+        { useNativeDriver: true }
+      ),
+    [scrollX]
   );
 
   const keyExtractor = React.useCallback(
@@ -215,12 +217,6 @@ export function BannerCarousel(props: BannerCarouselProps) {
         extrapolate: 'clamp',
       });
 
-      const shadowOpacity = scrollX.interpolate({
-        inputRange,
-        outputRange: isSecondary ? [0.06, 0.1, 0.16, 0.1, 0.06] : [0.08, 0.13, 0.2, 0.13, 0.08],
-        extrapolate: 'clamp',
-      });
-
       const mediaShift = scrollX.interpolate({
         inputRange,
         outputRange: isSecondary ? [-3, -1, 0, 1, 3] : [-6, -3, 0, 3, 6],
@@ -230,12 +226,10 @@ export function BannerCarousel(props: BannerCarouselProps) {
       const cardAnimatedStyle = isSecondary
         ? {
             opacity,
-            shadowOpacity,
             transform: [{ translateX }, { scale }],
           }
         : {
             opacity: 1,
-            shadowOpacity: 0,
             transform: [{ translateX: 0 }, { scale: 1 }],
           };
 
@@ -381,7 +375,7 @@ export function BannerCarousel(props: BannerCarouselProps) {
 
   return (
     <View onLayout={handleLayout} style={[styles.root, { width: widthProp ?? '100%', height: height + (isSecondary ? (isCompactSecondary ? spacing[2] : spacing[4]) : 0) }, style]}>
-      <FlatList
+      <Animated.FlatList
         ref={flatListRef}
         horizontal
         data={banners}
@@ -434,6 +428,29 @@ export function BannerCarousel(props: BannerCarouselProps) {
     </View>
   );
 }
+
+export const BannerCarousel = React.memo(
+  BannerCarouselComponent,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.variant === nextProps.variant &&
+      prevProps.width === nextProps.width &&
+      prevProps.height === nextProps.height &&
+      prevProps.fullBleed === nextProps.fullBleed &&
+      prevProps.itemWidth === nextProps.itemWidth &&
+      prevProps.itemGap === nextProps.itemGap &&
+      prevProps.autoPlayInterval === nextProps.autoPlayInterval &&
+      prevProps.autoPlayDirection === nextProps.autoPlayDirection &&
+      prevProps.resumeAfterMs === nextProps.resumeAfterMs &&
+      prevProps.banners?.length === nextProps.banners?.length &&
+      prevProps.banners?.every((b, i) =>
+        b.id === nextProps.banners?.[i]?.id &&
+        b.title === nextProps.banners?.[i]?.title &&
+        b.subtitle === nextProps.banners?.[i]?.subtitle
+      )
+    );
+  }
+);
 
 function createStyles(theme: ReturnType<typeof useTheme>['theme'], isCompactSecondary: boolean) {
   const secondaryCardRadius = isCompactSecondary ? 22 : 30;
