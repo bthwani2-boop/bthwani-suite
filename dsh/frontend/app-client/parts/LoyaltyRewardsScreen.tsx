@@ -2,11 +2,9 @@ import React from 'react';
 import { Box, Card, KeyValueList, SectionHeader, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { loyaltyRewardsFixture } from '../data/loyalty-commercial.preview-data';
 
-export type DshLoyaltyRewardsScreenProps = {
-  compact?: boolean;
-};
+export type DshLoyaltyRewardsScreenProps = {};
 
-export function DshLoyaltyRewardsScreen({ compact = false }: DshLoyaltyRewardsScreenProps) {
+export function DshLoyaltyRewardsScreen({}: DshLoyaltyRewardsScreenProps = {}) {
   const { theme } = useTheme();
   const { metrics, sections } = loyaltyRewardsFixture;
 
@@ -52,11 +50,11 @@ export function DshLoyaltyRewardsScreen({ compact = false }: DshLoyaltyRewardsSc
   }
 
   return (
-    <Box gap={compact ? 2 : 3}>
+    <Box gap={3}>
       <Surface
         tone="raised"
         gap={2}
-        padding={compact ? 2 : 3}
+        padding={3}
         style={{
           borderWidth: 1,
           borderColor: theme.brand,

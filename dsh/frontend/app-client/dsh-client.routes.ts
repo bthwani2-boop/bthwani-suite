@@ -20,7 +20,16 @@ export type DshClientRouteId =
   | 'dsh-orders'
   | 'dsh-tracking'
   | 'dsh-order-rating'
-  | 'dsh-checkout-intent';
+  | 'dsh-checkout-intent'
+  | 'dsh-wallet'
+  | 'dsh-loyalty'
+  | 'dsh-subscriptions'
+  | 'dsh-addresses'
+  | 'dsh-location'
+  | 'dsh-identity'
+  | 'dsh-commercial'
+  | 'dsh-appearance'
+  | 'dsh-preferences';
 
 export type DshClientLegacyRoute =
   | 'home'
@@ -44,7 +53,16 @@ export type DshClientLegacyRoute =
   | 'orders-list'
   | 'tracking'
   | 'order-rating'
-  | 'checkout-intent';
+  | 'checkout-intent'
+  | 'wallet'
+  | 'loyalty'
+  | 'subscriptions'
+  | 'addresses'
+  | 'location'
+  | 'identity'
+  | 'commercial'
+  | 'appearance'
+  | 'preferences';
 
 export type DshClientRouteRecord = {
   readonly routeId: DshClientRouteId;
@@ -76,4 +94,13 @@ export const dshClientRoutes = [
   { routeId: 'dsh-tracking', legacyRoute: 'tracking', screenId: 'client.dsh.order.smart-followup', ownerPath: 'dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx' },
   { routeId: 'dsh-order-rating', legacyRoute: 'order-rating', screenId: 'client.dsh.order.rating', ownerPath: 'dsh/frontend/app-client/screens/DshRatingScreen.tsx' },
   { routeId: 'dsh-checkout-intent', legacyRoute: 'checkout-intent', screenId: 'client.dsh.checkout.intent', ownerPath: 'dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx' },
+  { routeId: 'dsh-wallet', legacyRoute: 'wallet', screenId: 'client.dsh.wallet.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-loyalty', legacyRoute: 'loyalty', screenId: 'client.dsh.loyalty.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-subscriptions', legacyRoute: 'subscriptions', screenId: 'client.dsh.subscriptions.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-addresses', legacyRoute: 'addresses', screenId: 'client.dsh.addresses.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-location', legacyRoute: 'location', screenId: 'client.dsh.location.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-identity', legacyRoute: 'identity', screenId: 'client.dsh.identity.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-commercial', legacyRoute: 'commercial', screenId: 'client.dsh.commercial.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-appearance', legacyRoute: 'appearance', screenId: 'client.dsh.appearance.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-preferences', legacyRoute: 'preferences', screenId: 'client.dsh.preferences.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
 ] as const satisfies readonly DshClientRouteRecord[];

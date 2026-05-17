@@ -15,9 +15,7 @@ import {
 } from '@bthwani/ui-kit';
 import { subscriptionHeroCopy, subscriptionPlanCards, type SubscriptionPlanCard } from '../data/subscriptions-commercial.preview-data';
 
-export type DshSubscriptionsScreenProps = {
-  compact?: boolean;
-};
+export type DshSubscriptionsScreenProps = {};
 
 function SubscriptionPlanTile({
   plan,
@@ -66,7 +64,7 @@ function SubscriptionPlanTile({
   );
 }
 
-export function DshSubscriptionsScreen({ compact = false }: DshSubscriptionsScreenProps) {
+export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
   const { theme } = useTheme();
   const initialCurrentPlanId = subscriptionPlanCards.find((plan) => plan.current)?.id ?? 'weekly';
   const [currentPlanId, setCurrentPlanId] = React.useState(initialCurrentPlanId);
@@ -105,8 +103,8 @@ export function DshSubscriptionsScreen({ compact = false }: DshSubscriptionsScre
   };
 
   return (
-    <Box gap={compact ? 2 : 3}>
-      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+    <Box gap={3}>
+      <Surface tone="raised" gap={2} padding={3} style={{ borderWidth: 1, borderColor: theme.line }}>
         <SectionHeader
           title={subscriptionHeroCopy.title}
           subtitle={subscriptionHeroCopy.subtitle}
@@ -116,7 +114,7 @@ export function DshSubscriptionsScreen({ compact = false }: DshSubscriptionsScre
 
       <Surface
         gap={3}
-        padding={compact ? 2 : 3}
+        padding={3}
         style={{
           borderWidth: 0,
           borderRadius: 28,
@@ -145,7 +143,7 @@ export function DshSubscriptionsScreen({ compact = false }: DshSubscriptionsScre
         </Box>
       </Surface>
 
-      <Surface tone="raised" gap={2} padding={compact ? 2 : 3} style={{ borderWidth: 1, borderColor: theme.line }}>
+      <Surface tone="raised" gap={2} padding={3} style={{ borderWidth: 1, borderColor: theme.line }}>
         <Box gap={0} style={{ alignItems: 'flex-end' }}>
           <Text role="titleSm">طريقة الدفع</Text>
           <Text role="bodySm" tone="muted">الدفع عند أول طلب.</Text>

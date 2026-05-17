@@ -16,7 +16,7 @@ import {
   MobileScrollView,
   OperationalStatusHero,
   OrderLinkedChat,
-  SearchField,
+  SearchTopBar,
   SectionHeader,
   StatCard,
   StickyActionBar,
@@ -24,6 +24,7 @@ import {
   Surface,
   Text,
   TopBar,
+  radius,
   safeArea,
   spacing,
   useTheme,
@@ -53,10 +54,16 @@ type CreateOrderValues = {
 
 type DshOrderListItem = {
   id: string;
+  orderNumber: string;
   title: string;
-  subtitle: string;
   statusLabel: string;
-  meta: string;
+  timestamp: string;
+  total?: string;
+  isActive?: boolean;
+  fulfillmentType?: 'delivery' | 'pickup';
+  rawStatus?: DshClientState;
+  deliveryProvider?: 'bthwani' | 'store';
+  summary?: string;
 };
 
 type DshTrackingTimelineItem = {
@@ -100,6 +107,7 @@ export type DshOrdersListScreenProps = {
   query?: string;
   onQueryChange?: (query: string) => void;
   onOpenOrder?: (orderId: string) => void;
+  onReorder?: (orderId: string) => void;
   onBack?: () => void;
   onRetry?: () => void;
   onNextAction?: () => void;
@@ -211,9 +219,70 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
 };
 
 const fallbackOrderListItems: DshOrderListItem[] = [
-  { id: 'order-review', title: 'طلب قيد المراجعة', subtitle: 'العنوان والتواصل تحت التدقيق قبل التحريك', statusLabel: 'قيد المراجعة', meta: 'جاهز للتتبع' },
-  { id: 'order-route', title: 'طلب في الطريق', subtitle: 'تم التعيين والمتابعة الذكية نشطة الآن', statusLabel: 'في الطريق', meta: 'متابعة ذكية' },
-  { id: 'order-done', title: 'طلب مكتمل', subtitle: 'تم التسليم ويمكن الرجوع إليه لاحقًا', statusLabel: 'تم التسليم', meta: 'أرشيف' },
+  {
+    id: 'order-route',
+    orderNumber: '3770204',
+    title: 'شاورما هليل',
+    statusLabel: 'في الطريق',
+    timestamp: '2026-05-17T22:14:43+03:00',
+    isActive: true,
+    fulfillmentType: 'delivery',
+    rawStatus: 'tracking_active',
+    total: '45.00 ر.ي',
+    deliveryProvider: 'bthwani',
+    summary: '٢ وجبة شاورما هليل كلاسيك، ١ بطاطس عائلي، ١ عصير برتقال',
+  },
+  {
+    id: 'order-review',
+    orderNumber: '3770198',
+    title: 'مطعم القلعة',
+    statusLabel: 'قيد المراجعة',
+    timestamp: '2026-05-17T21:46:43+03:00',
+    isActive: true,
+    fulfillmentType: 'delivery',
+    rawStatus: 'order_created',
+    total: '120.00 ر.ي',
+    deliveryProvider: 'store',
+    summary: '١ كبسة لحم حاشي، ٢ كولا، ١ سلطة حارة',
+  },
+  {
+    id: 'order-done',
+    orderNumber: '3768910',
+    title: 'شاورمر',
+    statusLabel: 'تم التسليم',
+    timestamp: '2026-05-16T19:30:00+03:00',
+    isActive: false,
+    fulfillmentType: 'delivery',
+    rawStatus: 'delivered',
+    total: '84.00 ر.ي',
+    deliveryProvider: 'bthwani',
+    summary: '٣ وجبة شاورما عربي، ١ بطاطس تويستر كبير',
+  },
+  {
+    id: 'order-pickup-ready',
+    orderNumber: '3768800',
+    title: 'دانكن دونتس',
+    statusLabel: 'جاهز للاستلام',
+    timestamp: '2026-05-16T11:00:00+03:00',
+    isActive: false,
+    fulfillmentType: 'pickup',
+    rawStatus: 'delivered',
+    total: '35.00 ر.ي',
+    summary: '٦ حبات دونات مشكل، ١ قهوة باردة كبيرة',
+  },
+  {
+    id: 'order-failed',
+    orderNumber: '3765100',
+    title: 'بارنز كافيه',
+    statusLabel: 'فشل الدفع',
+    timestamp: '2026-05-15T09:15:00+03:00',
+    isActive: false,
+    fulfillmentType: 'delivery',
+    rawStatus: 'failed',
+    total: '28.00 ر.ي',
+    deliveryProvider: 'bthwani',
+    summary: '١ قهوة تركية، ١ دونات زعتر',
+  },
 ];
 
 function normalizeText(value: string) {
@@ -336,31 +405,197 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
   );
 }
 
-function OrdersListStatCard({ label, value, helperText }: { label: string; value: string; helperText: string }) {
-  const { theme } = useTheme();
-
-  return (
-    <Card
-      title={label}
-      subtitle={helperText}
-      style={{ flexBasis: '48%', flexGrow: 1, borderRadius: 18, borderWidth: 1, borderColor: theme.line }}
-    >
-      <Text role="hero" style={{ color: theme.brand }}>{value}</Text>
-    </Card>
-  );
+function formatOrderTime(isoString: string) {
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return isoString;
+    return d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return isoString;
+  }
 }
 
-function OrderRow({ item, onOpenOrder }: { item: DshOrderListItem; onOpenOrder?: (orderId: string) => void }) {
+function formatRelativeTime(isoString: string): string {
+  try {
+    const now = new Date('2026-05-17T22:26:43+03:00');
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return isoString;
+
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'الآن';
+    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+    if (diffHours < 24) {
+      if (diffHours === 1) return 'منذ ساعة';
+      if (diffHours === 2) return 'منذ ساعتين';
+      return `منذ ${diffHours} ساعات`;
+    }
+    if (diffDays === 1) return 'أمس';
+    if (diffDays === 2) return 'قبل يومين';
+    return d.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
+  } catch {
+    return isoString;
+  }
+}
+
+function OrderRow({
+  item,
+  onOpenOrder,
+  onReorder,
+}: {
+  item: DshOrderListItem;
+  onOpenOrder?: (orderId: string) => void;
+  onReorder?: (orderId: string) => void;
+}) {
   const { theme } = useTheme();
 
+  let deliveryText = '';
+  if (item.fulfillmentType === 'pickup') {
+    deliveryText = 'استلام بنفسي';
+  } else {
+    if (item.deliveryProvider === 'bthwani') {
+      deliveryText = 'توصيل بثواني';
+    } else if (item.deliveryProvider === 'store') {
+      deliveryText = 'توصيل المتجر';
+    } else {
+      deliveryText = 'توصيل';
+    }
+  }
+
   return (
-    <ListItem
-      title={item.title}
-      subtitle={item.subtitle}
-      meta={item.meta}
-      badgeLabel={item.statusLabel}
-      onPress={() => onOpenOrder?.(item.id)}
-    />
+    <View style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => onOpenOrder?.(item.id)}
+        style={({ pressed }) => ({
+          paddingVertical: spacing[3],
+          paddingHorizontal: spacing[4],
+          backgroundColor: pressed ? theme.line : theme.surface,
+          flexDirection: 'row-reverse',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: 88,
+        })}
+      >
+        <Box style={{ flex: 1 }} gap={1.5}>
+          <Box layoutDirection="row-reverse" align="center" justify="space-between" style={{ flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text, fontSize: 15, fontWeight: '700' }}>
+              {item.title}
+            </Text>
+            {item.total ? (
+              <Text role="bodyStrong" style={{ color: theme.brand, fontWeight: '700', fontSize: 14 }}>
+                {item.total}
+              </Text>
+            ) : null}
+          </Box>
+          {item.summary ? (
+            <Text role="bodySm" style={{ textAlign: 'right', color: theme.textSoft, fontSize: 13, lineHeight: 18 }}>
+              {item.summary}
+            </Text>
+          ) : null}
+          <Box layoutDirection="row-reverse" align="center" gap={2} style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: spacing[1] }}>
+            <Badge label={item.statusLabel} tone={item.isActive ? 'brand' : 'default'} size="sm" />
+            <Box
+              layoutDirection="row-reverse"
+              align="center"
+              style={{
+                flexDirection: 'row-reverse',
+                alignItems: 'center',
+                backgroundColor: item.fulfillmentType === 'pickup'
+                  ? theme.surfaceRaised
+                  : item.deliveryProvider === 'bthwani'
+                  ? theme.brandSurface
+                  : theme.surfaceRaised,
+                borderColor: item.fulfillmentType === 'pickup'
+                  ? theme.line
+                  : item.deliveryProvider === 'bthwani'
+                  ? theme.brand
+                  : theme.line,
+                borderWidth: 1,
+                borderRadius: 4,
+                paddingHorizontal: spacing[1.5],
+                paddingVertical: spacing[0.5],
+                gap: spacing[1],
+              }}
+            >
+              <Icon
+                name={
+                  item.fulfillmentType === 'pickup'
+                    ? 'walk-outline'
+                    : item.deliveryProvider === 'bthwani'
+                    ? 'flash-outline'
+                    : 'storefront-outline'
+                }
+                size={11}
+                color={
+                  item.fulfillmentType === 'pickup'
+                    ? theme.textSoft
+                    : item.deliveryProvider === 'bthwani'
+                    ? theme.brand
+                    : theme.textSoft
+                }
+              />
+              <Text
+                role="bodySm"
+                style={{
+                  fontSize: 11,
+                  fontWeight: '700',
+                  color: item.fulfillmentType === 'pickup'
+                    ? theme.textSoft
+                    : item.deliveryProvider === 'bthwani'
+                    ? theme.brand
+                    : theme.textSoft,
+                }}
+              >
+                {deliveryText}
+              </Text>
+            </Box>
+            <Text role="bodySm" tone="muted" style={{ fontSize: 12 }}>
+              {item.orderNumber} · {formatRelativeTime(item.timestamp)}
+            </Text>
+          </Box>
+        </Box>
+        <Icon name="chevron-back" size={18} color={theme.textSoft} style={{ marginLeft: spacing[2] }} />
+      </Pressable>
+
+      {!item.isActive && onReorder && (
+        <Box
+          layoutDirection="row-reverse"
+          justify="flex-start"
+          style={{
+            flexDirection: 'row-reverse',
+            paddingHorizontal: spacing[4],
+            paddingBottom: spacing[3],
+            backgroundColor: theme.surface,
+          }}
+        >
+          <Button
+            tone="ghost"
+            size="sm"
+            style={{
+              borderWidth: 1,
+              borderColor: theme.brand,
+              backgroundColor: theme.brandSurface,
+              borderRadius: radius.pill,
+              minHeight: 32,
+              paddingVertical: spacing[1],
+              paddingHorizontal: spacing[4],
+              width: undefined,
+              alignSelf: 'flex-start',
+            }}
+            onPress={() => onReorder?.(item.id)}
+          >
+            <Icon name="refresh-outline" size={14} color={theme.brand} />
+            <Text role="label" style={{ color: theme.brand, fontSize: 13, fontWeight: '700', lineHeight: 18 }}>
+              تكرار الطلب
+            </Text>
+          </Button>
+        </Box>
+      )}
+    </View>
   );
 }
 
@@ -458,7 +693,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
   };
 
   return (
-    <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+    <Surface tone="raised" gap={3} padding={2}>
       <SectionHeader
         title="الدردشة مع الكابتن"
         subtitle={isClosed ? 'الدردشة مقفلة بعد التسليم، والسجل فقط ما يزال ظاهرًا.' : 'صوت، كاميرا، وفيديو داخل نفس الصندوق دون ضوضاء إضافية.'}
@@ -532,7 +767,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
       </Box>
 
       {!isClosed ? (
-        <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="raised" gap={2} padding={2}>
           <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {([
               { kind: 'voice', label: 'صوت', iconName: 'mic-outline' as const },
@@ -569,7 +804,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
           <Button label={canSend ? sendButtonLabel : 'أضف نصًا أو مرفقًا'} onPress={handleSendMessage} disabled={!canSend} />
         </Surface>
       ) : (
-        <Surface tone="inset" gap={1} padding={2} style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="inset" gap={1} padding={2}>
           <Badge label="الدردشة مقفلة" tone="warning" />
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             لا يمكن إرسال رسائل جديدة بعد التسليم. يبقى السجل هنا للمراجعة فقط.
@@ -998,7 +1233,7 @@ function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smar
         : null;
 
   return (
-    <Surface tone="raised" radiusToken="xl" gap={3} padding={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+    <Surface tone="raised" radiusToken="xl" gap={3} padding={3}>
       <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
         <Box gap={0.5} style={{ alignItems: 'flex-end', flex: 1 }}>
           <Badge label="متابعة ذكية" tone="brand" />
@@ -1012,7 +1247,7 @@ function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smar
       </Box>
 
       {proximityAlert ? (
-        <Surface tone={proximityAlert.tone as any} gap={2} padding={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone={proximityAlert.tone as any} gap={2} padding={2}>
           <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
             <Icon name={proximityAlert.icon} size={20} color={theme.brand} />
             <Text role="bodyStrong" style={{ textAlign: 'right', flex: 1 }}>
@@ -1408,7 +1643,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
 
         {/* 1. Single Main Status Card */}
-        <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
           <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
             <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
               <Text role="titleLg" style={{ textAlign: 'right', fontWeight: '700', color: theme.brand }}>
@@ -1450,12 +1685,12 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         </Surface>
 
         {/* 2. 4-Stage Progress Bar */}
-        <Surface tone="raised" padding={3} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="raised" padding={3} radiusToken="xl">
           <HorizontalMilestones activeStepId={activeStepId} />
         </Surface>
 
         {/* 3. Quick Actions Card */}
-        <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
           <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>التواصل والمساعدة</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             يمكنك مراسلة الكابتن مباشرة داخل الطلب، أو تنبيهه، أو طلب الدعم والمساعدة عند وجود مشكلة.
@@ -1526,7 +1761,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
         {/* Inline Support toggled by Support Button */}
         {isSupportExpanded && (
-          <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
             {isSupportSubmitted ? (
               <Box gap={3} align="center" style={{ paddingVertical: 10 }}>
                 <Box
@@ -1664,7 +1899,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
         {/* 4. Post-Delivery Section Only */}
         {hasClientReceived && (
-          <Surface tone="raised" padding={4} radiusToken="xl" gap={3} style={{ borderWidth: 1, borderColor: theme.line }}>
+          <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
             <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700', color: theme.success }}>تقييم الخدمة وما بعد التسليم</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يسعدنا معرفة رأيك في جودة المنتج وتجربتك مع الكابتن.</Text>
 
@@ -1710,7 +1945,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
         {/* Wallet impact visibility (shown simplified if applicable, e.g. for completed refund impact info) */}
         {walletImpactVisibility ? (
-          <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+          <Surface tone="inset" gap={2} padding={2}>
             <SectionHeader title="الأثر المالي" subtitle="يعرض الرصيد/الاسترداد/التعويض لشفافية الحساب." />
             <KeyValueList
               items={[
@@ -1763,7 +1998,7 @@ function renderTracking(
 
   return (
     <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <Surface tone="brand" gap={2} padding={3} style={{ borderRadius: 24, borderWidth: 1, borderColor: theme.brand }}>
+      <Surface tone="brand" gap={2} padding={3}>
         <Box gap={1} style={{ alignItems: 'flex-end' }}>
           <Badge label={currentStatusLabel} tone="info" />
           <Text role="titleLg" style={{ textAlign: 'right' }}>{trackingStateMeta.title}</Text>
@@ -1773,7 +2008,7 @@ function renderTracking(
         </Box>
       </Surface>
 
-      <Surface tone="raised" gap={3} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+      <Surface tone="raised" gap={3} padding={2}>
         <SectionHeader title="الحالة الحالية" subtitle="آخر محطة مرئية الآن في مسار التنفيذ." />
         <KeyValueList
           items={[
@@ -1785,7 +2020,7 @@ function renderTracking(
       </Surface>
 
       {walletVisibilityCopy ? (
-        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="inset" gap={2} padding={2}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {walletVisibilityCopy.description}
@@ -1794,7 +2029,7 @@ function renderTracking(
       ) : null}
 
       {walletImpactVisibility ? (
-        <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="inset" gap={2} padding={2}>
           <SectionHeader title="الأثر المالي الظاهر" subtitle="ملخص مالي توضيحي فقط دون أي تنفيذ wallet/runtime." />
           <KeyValueList
             items={[
@@ -1810,7 +2045,7 @@ function renderTracking(
         </Surface>
       ) : null}
 
-      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
+      <Surface tone="inset" gap={2} padding={2}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>{supportTitle}</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           {supportDescription}
@@ -1831,55 +2066,80 @@ function renderTracking(
 }
 
 
-export function DshOrdersListScreen({ items = fallbackOrderListItems, query = '', onQueryChange, onOpenOrder, onBack, onRetry, onNextAction }: DshOrdersListScreenProps) {
+export function DshOrdersListScreen({ items = fallbackOrderListItems, query = '', onQueryChange, onOpenOrder, onReorder, onBack, onRetry, onNextAction }: DshOrdersListScreenProps) {
   const { theme } = useTheme();
+  const [isSearchVisible, setIsSearchVisible] = React.useState(false);
   const normalizedQuery = normalizeText(query);
   const visibleItems = normalizedQuery
-    ? items.filter((item) => normalizeText(`${item.title} ${item.subtitle} ${item.statusLabel} ${item.meta}`).includes(normalizedQuery))
+    ? items.filter((item) => normalizeText(`${item.title} ${item.orderNumber} ${item.statusLabel} ${item.summary || ''}`).includes(normalizedQuery))
     : items;
 
+  const sortedItems = [...visibleItems].sort((a, b) => {
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  });
+
   return (
-    <MobileScrollView padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[4] }}>
-      <Box gap={1}>
-        <Text role="titleLg">الطلبات</Text>
-        <Text role="bodySm" tone="muted">قائمة مختصرة للطلبات الحديثة مع حالة واضحة في كل صف.</Text>
-      </Box>
-
-      <Surface tone="brand" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.brand }}>
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <OrdersListStatCard label="الكل" value={String(items.length)} helperText="كل الطلبات المرئية" />
-          <OrdersListStatCard label="المطابق للبحث" value={String(visibleItems.length)} helperText="النتائج الحالية" />
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
+      {isSearchVisible && onQueryChange ? (
+        <SearchTopBar
+          variant="surface"
+          value={query}
+          onChangeText={onQueryChange}
+          onClose={() => {
+            setIsSearchVisible(false);
+            onQueryChange('');
+          }}
+          placeholder="ابحث برقم الطلب أو المتجر..."
+          autoFocus
+        />
+      ) : (
+        <TopBar
+          variant="surface"
+          title="طلباتي"
+          layoutMode="balanced-secondary"
+          actions={
+            onQueryChange
+              ? [
+                  {
+                    id: 'search',
+                    icon: <Icon name="search-outline" size={20} color={theme.text} />,
+                    onPress: () => setIsSearchVisible(true),
+                    accessibilityLabel: 'البحث',
+                  },
+                ]
+              : []
+          }
+          trailingAction={
+            onBack
+              ? {
+                  id: 'back',
+                  icon: <Icon name="arrow-forward" size={22} color={theme.text} />,
+                  onPress: onBack,
+                  accessibilityLabel: 'العودة',
+                }
+              : undefined
+          }
+        />
+      )}
+      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[8] }}>
+        <Box layoutDirection="row-reverse" justify="space-between" align="center" style={{ flexDirection: 'row-reverse' }}>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>آخر طلباتك من الأحدث إلى الأقدم.</Text>
         </Box>
-      </Surface>
 
-      <Surface tone="raised" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <SearchField label="بحث في الطلبات" value={query} onChangeText={onQueryChange} hint="جرّب عنوانًا أو حالة أو ملاحظة." />
-        <SectionHeader title="الصفوف الحالية" subtitle="اضغط على أي طلب لفتح تتبعه مباشرة." count={visibleItems.length} />
-
-        <Box gap={2}>
-          {visibleItems.length ? visibleItems.map((item) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} />) : (
-            <Card title="لا توجد نتائج" subtitle="جرّب كلمة مختلفة أو أعد عرض الكل.">
-              <Box gap={2}>
-                {onQueryChange ? <Button label="إظهار الكل" onPress={() => onQueryChange('')} /> : null}
-                {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} /> : null}
-                {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
-              </Box>
-            </Card>
-          )}
-        </Box>
-      </Surface>
-
-      <Surface tone="inset" gap={2} padding={2} style={{ borderRadius: 22, borderWidth: 1, borderColor: theme.line }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right' }}>الخطوة التالية</Text>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          اذهب إلى التتبع لعرض الحالة الحية أو استخدم العودة للخروج من هذا المسار.
-        </Text>
-        <Box gap={2}>
-          {onNextAction ? <Button label="التتبع" onPress={onNextAction} /> : null}
-          {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} /> : null}
-        </Box>
-      </Surface>
-    </MobileScrollView>
+        {sortedItems.length > 0 ? (
+          <Box style={{ backgroundColor: theme.surface, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: theme.line }}>
+            {sortedItems.map((item) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} onReorder={onReorder} />)}
+          </Box>
+        ) : (
+          <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>
+            <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>لا توجد طلبات</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>لم نعثر على أي طلب يطابق بحثك.</Text>
+            {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} style={{ marginTop: spacing[2] }} /> : null}
+            {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+          </Surface>
+        )}
+      </MobileScrollView>
+    </View>
   );
 }
 

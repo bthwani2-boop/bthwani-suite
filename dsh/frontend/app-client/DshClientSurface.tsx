@@ -224,7 +224,7 @@ const hostClientStates = {
 const initialOrders: HostOrderSummary[] = [
   {
     id: 'dsh-10021',
-    title: 'طلب #10021',
+    title: 'طلب رقم 10021',
     subtitle: 'من حدة إلى باب اليمن',
     statusLabel: getDshClientStateMeta(hostClientStates.trackingActive).label,
     meta: 'الوصول المتوقع خلال 18 دقيقة',
@@ -232,7 +232,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10019',
-    title: 'طلب #10019',
+    title: 'طلب رقم 10019',
     subtitle: 'من السبعين إلى التحرير',
     statusLabel: getDshClientStateMeta(hostClientStates.delivered).label,
     meta: 'اليوم 03:10 م',
@@ -240,7 +240,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10017',
-    title: 'طلب #10017',
+    title: 'طلب رقم 10017',
     subtitle: 'من شميلة إلى التحرير',
     statusLabel: getDshClientStateMeta(hostClientStates.cancelled).label,
     meta: 'تم الإلغاء مع توضيح سبب الحالة',
@@ -248,7 +248,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10016',
-    title: 'طلب #10016',
+    title: 'طلب رقم 10016',
     subtitle: 'من مذبح إلى باب السلام',
     statusLabel: getDshClientStateMeta(hostClientStates.failed).label,
     meta: 'توجد حاجة إلى مسار تعافٍ أو دعم واضح',
@@ -256,7 +256,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10015',
-    title: 'طلب #10015',
+    title: 'طلب رقم 10015',
     subtitle: 'من السنينة إلى سعوان',
     statusLabel: getDshClientStateMeta(hostClientStates.refundPending).label,
     meta: 'الاسترداد ما يزال قيد المعالجة',
@@ -264,7 +264,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10014',
-    title: 'طلب #10014',
+    title: 'طلب رقم 10014',
     subtitle: 'من التحرير إلى الجامعة',
     statusLabel: getDshClientStateMeta(hostClientStates.refunded).label,
     meta: 'تم تثبيت الأثر المالي النهائي للطلب',
@@ -272,7 +272,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10013',
-    title: 'طلب #10013',
+    title: 'طلب رقم 10013',
     subtitle: 'من الحصبة إلى بيت بوس',
     statusLabel: getDshClientStateMeta(hostClientStates.supportRequired).label,
     meta: 'هذه الحالة تحتاج متابعة دعم واضحة',
@@ -280,7 +280,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10012',
-    title: 'طلب #10012',
+    title: 'طلب رقم 10012',
     subtitle: 'من فج عطان إلى السبعين',
     statusLabel: getDshClientStateMeta(hostClientStates.walletCreditVisible).label,
     meta: 'يوجد رصيد ظاهر للعميل داخل المحفظة',
@@ -288,7 +288,7 @@ const initialOrders: HostOrderSummary[] = [
   },
   {
     id: 'dsh-10011',
-    title: 'طلب #10011',
+    title: 'طلب رقم 10011',
     subtitle: 'من باب اليمن إلى حدة',
     statusLabel: getDshClientStateMeta(hostClientStates.walletRefundVisible).label,
     meta: 'تظهر معلومة الاسترداد المالي ضمن المسار',
@@ -361,6 +361,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         routeTransitionFromBackRef.current = false;
       } else {
         routeHistoryRef.current.push(route);
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+          window.history.pushState({ route }, '');
+        }
       }
     }
   }, [route]);
@@ -395,6 +398,53 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
     return () => subscription.remove();
   }, [onExit, sheinInlineOpen, awnakInlineOpen]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      // Priority 1: dismiss transient modal overlays inside HomeScreen.
+      if (homeBackResolverRef.current?.()) {
+        window.history.pushState({ route }, '');
+        return;
+      }
+
+      // Priority 2: close inline order forms.
+      if (sheinInlineOpen) {
+        setSheinInlineOpen(false);
+        window.history.pushState({ route }, '');
+        return;
+      }
+      if (awnakInlineOpen) {
+        setAwnakInlineOpen(false);
+        window.history.pushState({ route }, '');
+        return;
+      }
+
+      // Priority 3: navigate back through route history.
+      if (routeHistoryRef.current.length > 1) {
+        routeTransitionFromBackRef.current = true;
+        routeHistoryRef.current.pop();
+        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
+        setRoute(previousRoute);
+      } else if (onExit) {
+        onExit();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Initialize/sync history state if empty
+    if (!window.history.state || window.history.state.route !== route) {
+      window.history.replaceState({ route }, '');
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [route, onExit, sheinInlineOpen, awnakInlineOpen]);
 
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();
