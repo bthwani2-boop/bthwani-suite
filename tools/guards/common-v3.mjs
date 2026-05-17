@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 export function parseArgs(argv = process.argv.slice(2)) {
   const args = { _: [] };
@@ -19,7 +20,7 @@ export function parseArgs(argv = process.argv.slice(2)) {
 export function normalizePath(p) { return p.replace(/\\/g, '/'); }
 
 export function walk(root, opts = {}) {
-  const excludes = new Set(opts.excludes || ['.git','node_modules','.next','dist','build','.expo','coverage','.turbo','.nx','tools/registry/runs','tools/plan']);
+  const excludes = new Set(opts.excludes || ['.git','node_modules','.next','dist','build','.expo','coverage','.turbo','.nx','.tamagui','tools/registry/runs','tools/plan']);
   const out = [];
   function rec(dir) {
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -30,6 +31,19 @@ export function walk(root, opts = {}) {
     }
   }
   rec(root); return out;
+}
+
+export function loadBaseline(root) {
+  const p = path.join(root, 'tools/guards/guard-v3-baseline.json');
+  if (!fs.existsSync(p)) return null;
+  try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
+}
+
+export function getGitTouchedFiles(root) {
+  try {
+    const out = execSync('git diff --name-only HEAD', { cwd: root, encoding: 'utf8', timeout: 10000, stdio: ['pipe','pipe','pipe'] });
+    return new Set(out.split(/\r?\n/).filter(Boolean).map(f => normalizePath(f)));
+  } catch { return new Set(); }
 }
 
 export function isTextFile(file) {
