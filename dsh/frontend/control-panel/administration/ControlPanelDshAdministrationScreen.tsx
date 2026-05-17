@@ -103,7 +103,7 @@ function PermissionMatrix() {
               <Text role="caption" tone="muted" weight="bold">الصلاحية</Text>
             </Box>
             {ADMIN_ROLES.map((role) => (
-              <Box key={role.id} style={{ flexGrow: 1, minWidth: 72, textAlign: 'center' }}>
+              <Box key={role.id} style={{ flexGrow: 1, minWidth: 72, alignItems: 'center' }}>
                 <Surface tone={role.tone} padding={1} radiusToken="pill" border={false}>
                   <Text role="caption" tone={role.tone === 'default' ? 'muted' : 'inverse'} weight="bold">
                     {role.arabicName}
@@ -124,7 +124,7 @@ function PermissionMatrix() {
               {ADMIN_ROLES.map((role) => {
                 const granted = hasPermission(role, perm.id);
                 return (
-                  <Box key={role.id} style={{ flexGrow: 1, minWidth: 72, textAlign: 'center' }}>
+                  <Box key={role.id} style={{ flexGrow: 1, minWidth: 72, alignItems: 'center' }}>
                     <Text role="bodyLg" tone={granted ? 'success' : 'danger'} weight="bold">
                       {granted ? '✓' : '✗'}
                     </Text>

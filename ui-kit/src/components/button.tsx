@@ -12,8 +12,11 @@ function resolvePressableStyle(style: PressableStyle | undefined, state: Pressab
 
 export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'brand' | 'warning' | 'info' | 'default' | 'glass' | 'glassStrong';
 
-export type ButtonProps = PressableProps & {
-  label: string;
+export type ButtonProps = Omit<PressableProps, 'children'> & {
+  label?: string;
+  children?: React.ReactNode;
+  variant?: ButtonTone;
+  onClick?: PressableProps['onPress'];
   tone?: ButtonTone;
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
@@ -26,7 +29,10 @@ export type ButtonProps = PressableProps & {
 
 export function Button({
   label,
-  tone = 'primary',
+  children,
+  tone,
+  variant,
+  onClick,
   size = 'md',
   loading = false,
   disabled,
@@ -36,6 +42,7 @@ export function Button({
   icon,
   iconPosition = 'leading',
   style,
+  onPress,
   ...rest
 }: ButtonProps) {
   const { direction } = useDirection();
@@ -55,7 +62,7 @@ export function Button({
     default: appearanceTokens.components.buttons.default,
     glass: appearanceTokens.components.buttons.glass,
     glassStrong: appearanceTokens.components.buttons.glassStrong,
-  }[tone];
+  }[tone ?? variant ?? 'primary'];
 
   const sizeConfig = {
     sm: { minHeight: sizes.controlSm, paddingHorizontal: spacing[3], textRole: 'label' as const },
@@ -67,6 +74,7 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       disabled={resolvedDisabled}
+      onPress={onPress ?? onClick}
       style={({ pressed }) => {
         const palette = resolvedDisabled ? toneConfig.disabled : pressed ? toneConfig.pressed : toneConfig.default;
 
@@ -92,14 +100,27 @@ export function Button({
     >
       {loading ? <ActivityIndicator color={(resolvedDisabled ? toneConfig.disabled : toneConfig.default).iconColor} /> : null}
       {resolvedLeadingAccessory}
-      <Text
-        role={sizeConfig.textRole}
-        style={{
-          color: (resolvedDisabled ? toneConfig.disabled : toneConfig.default).textColor,
-        }}
-      >
-        {label}
-      </Text>
+      {label ? (
+        <Text
+          role={sizeConfig.textRole}
+          style={{
+            color: (resolvedDisabled ? toneConfig.disabled : toneConfig.default).textColor,
+          }}
+        >
+          {label}
+        </Text>
+      ) : typeof children === 'string' || typeof children === 'number' ? (
+        <Text
+          role={sizeConfig.textRole}
+          style={{
+            color: (resolvedDisabled ? toneConfig.disabled : toneConfig.default).textColor,
+          }}
+        >
+          {children}
+        </Text>
+      ) : (
+        children
+      )}
       {resolvedTrailingAccessory}
     </Pressable>
   );
@@ -120,7 +141,7 @@ export function Badge({ label, tone = 'default', style }: BadgeProps) {
     warning: appearanceTokens.components.badges.warning,
     danger: appearanceTokens.components.badges.danger,
     info: appearanceTokens.components.badges.info,
-  }[tone];
+  }[tone ?? variant ?? 'primary'];
 
   return (
     <Pressable
@@ -164,7 +185,7 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
     info: appearanceTokens.components.badges.info,
     glass: appearanceTokens.components.chips.glass,
     glassStrong: appearanceTokens.components.chips.glassSelected,
-  }[tone];
+  }[tone ?? variant ?? 'primary'];
   const selectedPalette = tone === 'glass' || tone === 'glassStrong'
     ? appearanceTokens.components.chips.glassSelected
     : appearanceTokens.components.chips.selected;
