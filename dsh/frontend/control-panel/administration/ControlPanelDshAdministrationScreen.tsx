@@ -50,9 +50,12 @@ function RoleCard({ role }: { role: AdminRole }) {
             </Box>
             <Text role="bodySm">{role.description}</Text>
           </Box>
-          <Button variant="secondary" onClick={() => setExpanded(!expanded)}>
-            {expanded ? 'إخفاء الصلاحيات' : 'عرض الصلاحيات (تجريبي)'}
-          </Button>
+          <Button
+            tone="secondary"
+            fullWidth={false}
+            label={expanded ? 'إخفاء الصلاحيات' : 'عرض الصلاحيات (تجريبي)'}
+            onPress={() => setExpanded(!expanded)}
+          />
         </Box>
 
         {expanded && (
