@@ -103,6 +103,71 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
   },
 ];
 
+// UI_PREVIEW_ONLY — commission and settlement figures are WLT-owned, not authoritative here
+export type DshPartnerFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+
+export type DshPartnerModeAgreement = {
+  mode: DshPartnerFulfillmentMode;
+  modeLabel: string;
+  enabled: boolean;
+  /** UI_PREVIEW_ONLY — actual rate lives in WLT commission engine */
+  commissionRatePreview: string;
+  settlementBasis: string;
+  operationalReadiness: 'ready' | 'pending' | 'unavailable';
+  validityLabel: string;
+  negotiationNote?: string;
+};
+
+export type DshPartnerFulfillmentAgreement = {
+  partnerId: string;
+  storeName: string;
+  categoryLabel: string;
+  modes: readonly DshPartnerModeAgreement[];
+};
+
+export const PARTNER_FULFILLMENT_AGREEMENTS: readonly DshPartnerFulfillmentAgreement[] = [
+  {
+    partnerId: 'partner-saha',
+    storeName: 'محمصة الساحة',
+    categoryLabel: 'مقاهٍ ومحمصات',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'الاتفاق الافتراضي' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+    ],
+  },
+  {
+    partnerId: 'partner-shorouq',
+    storeName: 'بوفيه الشروق',
+    categoryLabel: 'بوفيهات',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'pending', validityLabel: 'قيد التفعيل', negotiationNote: 'يحتاج تأكيد جاهزية موصل المتجر' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+    ],
+  },
+  {
+    partnerId: 'partner-zawya',
+    storeName: 'مخبز الزاوية',
+    categoryLabel: 'مخابز',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'موصل المتجر جاهز' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'الاتفاق الكامل للأوضاع الثلاثة' },
+    ],
+  },
+  {
+    partnerId: 'partner-nokhba',
+    storeName: 'تمور النخبة',
+    categoryLabel: 'مواد غذائية',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+    ],
+  },
+] as const;
+
 export const dshPartnerApprovalLanes = [
   {
     id: 'lane-offer-pending',

@@ -8,7 +8,7 @@ export const dshPartnerOrderConversationPreviewDataContract = {
   moneySemantics: 'not_applicable',
 } as const;
 
-export type DshPartnerOrderConversationMode = 'pickup' | 'store_delivery' | 'platform_delivery';
+export type DshPartnerOrderConversationMode = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
 
 export type DshPartnerOrderConversationMessage = {
   id: string;
@@ -23,5 +23,6 @@ export type DshPartnerOrderConversationVisibility = 'enabled' | 'disabled-for-mo
 export function shouldShowDshPartnerOrderConversation(
   mode: DshPartnerOrderConversationMode
 ): DshPartnerOrderConversationVisibility {
-  return mode === 'platform_delivery' ? 'disabled-for-mode' : 'enabled';
+  // bthwani_delivery: the platform manages tracking; partner-to-captain chat is out of scope here
+  return mode === 'bthwani_delivery' ? 'disabled-for-mode' : 'enabled';
 }

@@ -24,7 +24,7 @@ type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'prep
 type PartnerOrderPriority = 'high' | 'normal' | 'low';
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
 type SmartFilterId = 'all' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'issues' | 'completed';
-type QuickFilterId = 'urgent' | 'sla_risk' | 'pickup' | 'store_delivery' | 'platform_delivery' | 'unread';
+type QuickFilterId = 'urgent' | 'sla_risk' | 'pickup' | 'partner_delivery' | 'bthwani_delivery' | 'unread';
 type SortMode = 'newest' | 'priority' | 'sla';
 
 export type PartnerOrdersHomeScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'partial';
@@ -71,7 +71,7 @@ const smartFilters: ReadonlyArray<{ id: SmartFilterId; label: string; tone: 'def
   { id: 'needs_accept', label: 'تحتاج قبول', tone: 'warning' },
   { id: 'preparing', label: 'قيد التحضير', tone: 'info' },
   { id: 'ready', label: 'جاهزة', tone: 'success' },
-  { id: 'handoff', label: 'تسليم للكابتن', tone: 'brand' },
+  { id: 'handoff', label: 'تسليم للمندوب', tone: 'brand' },
   { id: 'delivering', label: 'في الطريق', tone: 'info' },
   { id: 'issues', label: 'مشاكل', tone: 'danger' },
   { id: 'completed', label: 'مكتملة', tone: 'success' },
@@ -81,8 +81,8 @@ const quickFilters: ReadonlyArray<{ id: QuickFilterId; label: string }> = [
   { id: 'urgent', label: 'عاجلة' },
   { id: 'sla_risk', label: 'SLA قريب' },
   { id: 'pickup', label: 'استلم بنفسك' },
-  { id: 'store_delivery', label: 'توصيل المتجر' },
-  { id: 'platform_delivery', label: 'توصيل بثواني' },
+  { id: 'partner_delivery', label: 'توصيل المتجر' },
+  { id: 'bthwani_delivery', label: 'توصيل بثواني' },
   { id: 'unread', label: 'غير مقروء' },
 ];
 
@@ -95,13 +95,13 @@ const sortModes: ReadonlyArray<{ id: SortMode; label: string }> = [
 const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4401',
-    orderCode: '#4401',
+    orderCode: 'ORD-4401',
     customerName: 'نوف العتيبي',
     branchLabel: 'فرع الياسمين',
     status: 'needs_accept',
     priority: 'high',
     orderTypeLabel: 'توصيل المتجر',
-    orderMode: 'store_delivery',
+    orderMode: 'partner_delivery',
     itemsCountLabel: '3 عناصر',
     amountLabel: '92 ر.ي',
     createdAtLabel: '10:42 ص',
@@ -113,7 +113,7 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
   {
     id: 'ord-4398',
-    orderCode: '#4398',
+    orderCode: 'ORD-4398',
     customerName: 'خالد الزهراني',
     branchLabel: 'فرع الياسمين',
     status: 'preparing',
@@ -129,13 +129,13 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
   {
     id: 'ord-4391',
-    orderCode: '#4391',
+    orderCode: 'ORD-4391',
     customerName: 'ريم الشهراني',
     branchLabel: 'فرع الياسمين',
     status: 'ready',
     priority: 'high',
     orderTypeLabel: 'توصيل المتجر',
-    orderMode: 'store_delivery',
+    orderMode: 'partner_delivery',
     itemsCountLabel: '2 عنصر',
     amountLabel: '76 ر.ي',
     createdAtLabel: '10:21 ص',
@@ -145,28 +145,28 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
   {
     id: 'ord-4385',
-    orderCode: '#4385',
+    orderCode: 'ORD-4385',
     customerName: 'محمد السالم',
     branchLabel: 'فرع الياسمين',
     status: 'handoff',
     priority: 'normal',
     orderTypeLabel: 'توصيل المتجر',
-    orderMode: 'store_delivery',
+    orderMode: 'partner_delivery',
     itemsCountLabel: '4 عناصر',
     amountLabel: '118 ر.ي',
     createdAtLabel: '10:10 ص',
     elapsedLabel: 'منذ 31 دقيقة',
-    nextActionLabel: 'تسليم للكابتن',
+    nextActionLabel: 'تسليم لموصل الشريك',
   },
   {
     id: 'ord-4372',
-    orderCode: '#4372',
+    orderCode: 'ORD-4372',
     customerName: 'سارة القحطاني',
     branchLabel: 'فرع الياسمين',
     status: 'delivering',
     priority: 'normal',
     orderTypeLabel: 'توصيل بثواني',
-    orderMode: 'platform_delivery',
+    orderMode: 'bthwani_delivery',
     itemsCountLabel: '1 عنصر',
     amountLabel: '41 ر.ي',
     createdAtLabel: '09:54 ص',
@@ -176,7 +176,7 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
   {
     id: 'ord-4368',
-    orderCode: '#4368',
+    orderCode: 'ORD-4368',
     customerName: 'عبدالله المطيري',
     branchLabel: 'فرع الياسمين',
     status: 'completed',
@@ -191,13 +191,13 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
   {
     id: 'ord-4359',
-    orderCode: '#4359',
+    orderCode: 'ORD-4359',
     customerName: 'أحمد الدوسري',
     branchLabel: 'فرع الياسمين',
     status: 'cancelled',
     priority: 'low',
     orderTypeLabel: 'توصيل المتجر',
-    orderMode: 'store_delivery',
+    orderMode: 'partner_delivery',
     itemsCountLabel: '3 عناصر',
     amountLabel: '87 ر.ي',
     createdAtLabel: '09:28 ص',
@@ -214,9 +214,9 @@ function resolveStatusLabel(status: PartnerOrderStatus) {
   if (status === 'preparation_started') return 'بدأ التحضير';
   if (status === 'preparing') return 'قيد التحضير';
   if (status === 'ready') return 'جاهزة';
-  if (status === 'handoff') return 'تسليم للكابتن';
-  if (status === 'captain_assigned') return 'تم تعيين كابتن';
-  if (status === 'captain_arriving') return 'الكابتن في الطريق';
+  if (status === 'handoff') return 'تسليم للمندوب';
+  if (status === 'captain_assigned') return 'تم تعيين المندوب';
+  if (status === 'captain_arriving') return 'المندوب في الطريق';
   if (status === 'delivering') return 'في الطريق';
   if (status === 'completed') return 'مكتملة';
   return 'مشكلة';
@@ -337,10 +337,10 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
               ? Boolean(item.slaRisk)
               : quickFilter === 'pickup'
                 ? item.orderMode === 'pickup'
-                : quickFilter === 'store_delivery'
-                  ? item.orderMode === 'store_delivery'
-                  : quickFilter === 'platform_delivery'
-                    ? item.orderMode === 'platform_delivery'
+                : quickFilter === 'partner_delivery'
+                  ? item.orderMode === 'partner_delivery'
+                  : quickFilter === 'bthwani_delivery'
+                    ? item.orderMode === 'bthwani_delivery'
                     : Boolean(item.unread);
 
       const textMatch =
@@ -663,7 +663,7 @@ export function PartnerOrderDetailScreen({ state = 'ready', summary, onConfirmRe
         status: 'ready',
         priority: 'normal',
         orderTypeLabel: 'توصيل المتجر',
-        orderMode: 'store_delivery',
+        orderMode: 'partner_delivery',
         itemsCountLabel: '1 عنصر',
         amountLabel: '—',
         createdAtLabel: summary.serviceWindowLabel,

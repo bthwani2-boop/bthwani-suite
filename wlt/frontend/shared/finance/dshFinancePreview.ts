@@ -779,3 +779,88 @@ export function resolveWltDshPaymentPreviewState(
 
 // ─── Public label helper (for use in UI components) ───────────────
 export { formatYer as formatWltYer };
+
+// ─── Phase 7: Per-mode commission model ──────────────────────────
+// UI_PREVIEW_ONLY — WLT owns all real commission/settlement values.
+// This model encodes STRUCTURE (which line items apply per mode), not rates.
+
+export type WltDshFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+
+export type WltDshOrderLineItemApplicability =
+  | { applies: true; label: string }
+  | { applies: false; reason: string };
+
+export type WltDshOrderCommissionBreakdown = {
+  fulfillmentMode: WltDshFulfillmentMode;
+  fulfillmentModeLabel: string;
+  /** deliveryFee: present for bthwani_delivery and partner_delivery; absent for pickup unless policy overrides */
+  deliveryFee: WltDshOrderLineItemApplicability;
+  platformCommission: WltDshOrderLineItemApplicability;
+  /** captainPayout: ONLY for bthwani_delivery — never for partner_delivery or pickup */
+  captainPayout: WltDshOrderLineItemApplicability;
+  /** partnerCourierCost: ONLY for partner_delivery — preview only */
+  partnerCourierCost: WltDshOrderLineItemApplicability;
+  partnerNet: WltDshOrderLineItemApplicability;
+  /** UI_PREVIEW_ONLY — real commission is per-partner + per-mode, owned by WLT */
+  commissionRatePreview: 'UI_PREVIEW_ONLY';
+  isPreview: true;
+};
+
+export function getWltDshOrderCommissionBreakdown(mode: WltDshFulfillmentMode): WltDshOrderCommissionBreakdown {
+  const base = {
+    fulfillmentMode: mode,
+    commissionRatePreview: 'UI_PREVIEW_ONLY' as const,
+    isPreview: true as const,
+  };
+
+  if (mode === 'bthwani_delivery') {
+    return {
+      ...base,
+      fulfillmentModeLabel: 'توصيل بثواني',
+      deliveryFee: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+      platformCommission: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+      captainPayout: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+      partnerCourierCost: { applies: false, reason: 'لا ينطبق — كابتن بثواني هو المسؤول عن التوصيل' },
+      partnerNet: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+    };
+  }
+
+  if (mode === 'partner_delivery') {
+    return {
+      ...base,
+      fulfillmentModeLabel: 'توصيل المتجر',
+      deliveryFee: { applies: true, label: 'UI_PREVIEW_ONLY — حسب سياسة المتجر' },
+      platformCommission: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+      captainPayout: { applies: false, reason: 'لا ينطبق — لا يوجد كابتن بثواني في توصيل المتجر' },
+      partnerCourierCost: { applies: true, label: 'UI_PREVIEW_ONLY — حسب اتفاق المتجر' },
+      partnerNet: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+    };
+  }
+
+  // pickup
+  return {
+    ...base,
+    fulfillmentModeLabel: 'استلام بنفسي',
+    deliveryFee: { applies: false, reason: 'لا رسوم توصيل — العميل يستلم بنفسه (ما لم تنص السياسة على خلاف ذلك)' },
+    platformCommission: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+    captainPayout: { applies: false, reason: 'لا ينطبق — لا يوجد كابتن في الاستلام الذاتي' },
+    partnerCourierCost: { applies: false, reason: 'لا ينطبق — لا موصل في الاستلام الذاتي' },
+    partnerNet: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' },
+  };
+}
+
+// Per-partner, per-mode commission rate table — structure only; no hardcoded global rates.
+// Real rates: per partner + per mode + optional category/product override — all in WLT engine.
+export type WltDshPartnerModeRatePreview = {
+  partnerId: string;
+  storeLabel: string;
+  rates: Readonly<Record<WltDshFulfillmentMode, 'UI_PREVIEW_ONLY'>>;
+  isPreview: true;
+};
+
+export const WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW: readonly WltDshPartnerModeRatePreview[] = [
+  { partnerId: 'partner-saha', storeLabel: 'محمصة الساحة', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
+  { partnerId: 'partner-shorouq', storeLabel: 'بوفيه الشروق', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
+  { partnerId: 'partner-zawya', storeLabel: 'مخبز الزاوية', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
+  { partnerId: 'partner-nokhba', storeLabel: 'تمور النخبة', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
+] as const;

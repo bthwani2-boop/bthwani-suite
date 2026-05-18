@@ -48,6 +48,10 @@ import { getDshClientStateMeta } from '../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import { mapMenuItemToProductCard } from '../shared/map-menu-item-to-product-card';
 import { canRenderInClientSurface } from '../../shared/workflow';
+import {
+  type DshFulfillmentDeliveryMode,
+  getDshFulfillmentDeliveryModeMeta,
+} from '../contracts/dsh-client-binding.contracts';
 
 // Menu item view-model is shared locally to keep the screen fixture-free.
 
@@ -73,7 +77,7 @@ export type DshStoreGetScreenProps = {
     commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
-    deliveryModes?: Array<{ id: 'delivery' | 'pickup'; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
+    deliveryModes?: Array<{ id: DshFulfillmentDeliveryMode; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
     // PREMIUM 2026 ENHANCEMENTS (Synced from DshHomeGetStore)
     rating?: number;
     distanceLabel?: string;
@@ -90,7 +94,7 @@ export type DshStoreGetScreenProps = {
   menuItems?: DshStoreGetMenuItem[];
   onOpenItems?: () => void;
   onOpenSearch?: () => void;
-  onOpenCart?: () => void;
+  onOpenCart?: (mode?: DshFulfillmentDeliveryMode) => void;
   onAddItemToCart?: (
     item: DshStoreGetMenuItem,
     payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }
@@ -101,18 +105,13 @@ export type DshStoreGetScreenProps = {
   onSupport?: () => void;
 };
 
-type DeliveryMode = 'delivery' | 'pickup' | 'store_delivery';
-
-function getDeliveryModes(storeText: ReturnType<typeof useUiText>['storeScreen']): Array<{
-  id: DeliveryMode;
-  label: string;
-  icon: string;
-}> {
-  return [
-    { id: 'store_delivery', label: storeText.get.storeDelivery, icon: 'storefront-outline' },
-    { id: 'pickup', label: storeText.get.pickup, icon: 'bag-handle-outline' },
-    { id: 'delivery', label: storeText.get.platformDelivery, icon: 'bicycle-outline' },
-  ];
+function getAllDeliveryModes(): Array<{ id: DshFulfillmentDeliveryMode; label: string; icon: string }> {
+  return (
+    ['bthwani_delivery', 'partner_delivery', 'pickup'] as const
+  ).map((id) => {
+    const meta = getDshFulfillmentDeliveryModeMeta(id);
+    return { id, label: meta.label, icon: meta.icon };
+  });
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -307,7 +306,7 @@ function FilterChipItem({
             {
               color: isActive
                 ? (isDarkGlass ? colorPalette.brand : colorPalette.white)
-                : (isDarkGlass ? 'rgba(255, 255, 255, 0.8)' : '#717171'),
+                : (isDarkGlass ? 'rgba(255, 255, 255, 0.8)' : stylesTokens.muted),
             }
           ]}
           numberOfLines={1}
@@ -497,7 +496,7 @@ function DshStoreGetScreenContent({
   const isDarkGlass = appearanceMode === 'darkGlass' || themeMode === 'dark';
   const isRTL = direction === 'rtl';
   const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window');
-  const [selectedMode, setSelectedMode] = React.useState<DeliveryMode>('store_delivery');
+  const [selectedMode, setSelectedMode] = React.useState<DshFulfillmentDeliveryMode>('bthwani_delivery');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
   const [pickerItem, setPickerItem] = React.useState<DshStoreGetMenuItem | null>(null);
   const [selectedMeasureOption, setSelectedMeasureOption] = React.useState<string | null>(null);
@@ -549,7 +548,17 @@ function DshStoreGetScreenContent({
 
   const closeImagePreview = React.useCallback(() => setPreviewItem(null), []);
 
-  const deliveryModes = React.useMemo(() => getDeliveryModes(storeText), [storeText]);
+  const deliveryModes = React.useMemo(() => {
+    if (store?.deliveryModes?.length) {
+      return store.deliveryModes
+        .filter((m) => m.isAvailable)
+        .map((m) => {
+          const meta = getDshFulfillmentDeliveryModeMeta(m.id);
+          return { id: m.id, label: meta.label, icon: meta.icon };
+        });
+    }
+    return getAllDeliveryModes();
+  }, [store?.deliveryModes]);
 
   const storeCoverImageSource = React.useMemo(() => {
     if (!store) return undefined;
@@ -846,7 +855,7 @@ function DshStoreGetScreenContent({
             onPress={() => handleToggleFavorite(item.id)}
           >
             <View style={styles.previewFavoriteCircle}>
-              <Icon name={favoriteIds.has(item.id) ? 'heart' : 'heart-outline'} size={20} color="#FF500D" />
+              <Icon name={favoriteIds.has(item.id) ? 'heart' : 'heart-outline'} size={20} color={stylesTokens.orange} />
             </View>
           </TouchableOpacity>
 
@@ -892,16 +901,16 @@ function DshStoreGetScreenContent({
             </View>
 
             <TouchableOpacity
-              style={[styles.previewActionButton, { backgroundColor: '#FF500D', padding: 10, borderRadius: 16 }]}
+              style={[styles.previewActionButton, { backgroundColor: stylesTokens.orange, padding: 10, borderRadius: 16 }]}
               onPress={() => {
                 openMeasurementPicker(item, { x: viewportWidth / 2, y: viewportHeight / 2 });
                 closeImagePreview();
               }}
             >
               <View style={{ position: 'relative' }}>
-                <Icon name="cart-outline" size={20} color="#FFFFFF" />
-                <View style={[styles.previewActionPlusBadge, { backgroundColor: '#FFFFFF', borderColor: '#FF500D' }]}>
-                  <Icon name="add" size={8} color="#FF500D" />
+                <Icon name="cart-outline" size={20} color={stylesTokens.white} />
+                <View style={[styles.previewActionPlusBadge, { backgroundColor: stylesTokens.white, borderColor: stylesTokens.orange }]}>
+                  <Icon name="add" size={8} color={stylesTokens.orange} />
                 </View>
               </View>
             </TouchableOpacity>
@@ -993,8 +1002,8 @@ function DshStoreGetScreenContent({
   const handleGoToCart = React.useCallback(() => {
     setIsAddedToCart(false);
     closeMeasurementPicker();
-    onOpenCart?.();
-  }, [onOpenCart, closeMeasurementPicker]);
+    onOpenCart?.(selectedMode);
+  }, [closeMeasurementPicker, onOpenCart, selectedMode]);
 
   const handleContinueShopping = React.useCallback(() => {
     setIsAddedToCart(false);
@@ -1092,13 +1101,13 @@ function DshStoreGetScreenContent({
       return;
     }
 
-    if (normalized.includes('متجر') || normalized.includes('store delivery')) {
-      setSelectedMode('store_delivery');
+    if (normalized.includes('متجر') || normalized.includes('store delivery') || normalized.includes('partner')) {
+      setSelectedMode('partner_delivery');
       return;
     }
 
-    if (normalized.includes('توصيل')) {
-      setSelectedMode('delivery');
+    if (normalized.includes('توصيل') || normalized.includes('بثواني')) {
+      setSelectedMode('bthwani_delivery');
       return;
     }
 
@@ -1280,15 +1289,21 @@ function DshStoreGetScreenContent({
                             onPress={openInlineSearch}
                             hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                           >
-                            <Icon name="search-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
+                            <Icon name="search-outline" size={22} color={isDarkGlass ? stylesTokens.white : appearanceChrome.primaryText} />
                           </TouchableOpacity>
                           <TouchableOpacity
                             style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
                             activeOpacity={0.7}
-                            onPress={onOpenCart ?? onOpenItems}
+                            onPress={() => {
+                              if (onOpenCart) {
+                                onOpenCart(selectedMode);
+                                return;
+                              }
+                              onOpenItems?.();
+                            }}
                             hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                           >
-                            <Icon name="cart-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
+                            <Icon name="cart-outline" size={22} color={isDarkGlass ? stylesTokens.white : appearanceChrome.primaryText} />
                           </TouchableOpacity>
                         </View>
 
@@ -1298,7 +1313,7 @@ function DshStoreGetScreenContent({
                           onPress={handleStoreShare}
                           hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
                         >
-                          <Icon name="share-outline" size={22} color={isDarkGlass ? '#FFF' : '#2D3748'} />
+                          <Icon name="share-outline" size={22} color={isDarkGlass ? stylesTokens.white : appearanceChrome.primaryText} />
                         </TouchableOpacity>
                       </View>
 
@@ -1340,7 +1355,7 @@ function DshStoreGetScreenContent({
                         <Icon
                           name={operationalState === 'area_unserviceable' ? 'alert-circle' : 'warning'}
                           size={24}
-                          color={operationalState === 'area_unserviceable' ? '#FF3B30' : '#FF9500'}
+                          color={operationalState === 'area_unserviceable' ? stylesTokens.red : stylesTokens.warning}
                         />
                       </View>
                       <View style={styles.storeStateNoticeCopy}>
@@ -1369,9 +1384,9 @@ function DshStoreGetScreenContent({
                             <Icon name="location-sharp" size={14} color={ORANGE} />
                             <Text style={[styles.heroLocationText, { color: appearanceChrome.secondaryText }]} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
                           </View>
-                          <View style={[styles.heroStatusBadge, { backgroundColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(255, 59, 48, 0.12)', borderColor: operationalState === 'store_open' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(255, 59, 48, 0.25)' }]}>
-                            <View style={[styles.heroStatusDot, { backgroundColor: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]} />
-                            <Text style={[styles.heroStatusText, { color: operationalState === 'store_open' ? '#00C853' : '#FF3B30' }]}>
+                          <View style={[styles.heroStatusBadge, { backgroundColor: operationalState === 'store_open' ? hexToRgba(stylesTokens.green, 0.12) : hexToRgba(stylesTokens.red, 0.12), borderColor: operationalState === 'store_open' ? hexToRgba(stylesTokens.green, 0.25) : hexToRgba(stylesTokens.red, 0.25) }]}>
+                            <View style={[styles.heroStatusDot, { backgroundColor: operationalState === 'store_open' ? stylesTokens.green : stylesTokens.red }]} />
+                            <Text style={[styles.heroStatusText, { color: operationalState === 'store_open' ? stylesTokens.green : stylesTokens.red }]}>
                               {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
                             </Text>
                           </View>
@@ -1416,14 +1431,10 @@ function DshStoreGetScreenContent({
                       <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)' }]}>
                         {deliveryModes.map((mode) => {
                           const active = selectedMode === mode.id;
-                          let title = mode.label;
-                          if (mode.id === 'store_delivery') title = 'توصيل المتجر';
-                          else if (mode.id === 'pickup') title = 'استلم بنفسك';
-                          else if (mode.id === 'delivery') title = 'توصيل بثواني';
                           return (
                             <TouchableOpacity key={mode.id} style={[styles.heroLuxuryDeliveryChip, active && { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.15)' : stylesTokens.white }]} onPress={() => setSelectedMode(mode.id)} activeOpacity={0.8}>
                               <View style={styles.heroLuxuryDeliveryContent}>
-                                <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>{title}</Text>
+                                <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>{mode.label}</Text>
                                 <Icon name={mode.icon} size={14} color={active ? ORANGE : appearanceChrome.secondaryText} />
                               </View>
                             </TouchableOpacity>
@@ -1493,7 +1504,7 @@ function DshStoreGetScreenContent({
                                       'grid-outline'
                                     }
                                     size={16}
-                                    color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : '#717171')}
+                                    color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : appearanceChrome.secondaryText)}
                                   />
                                 )
                               }
@@ -1617,7 +1628,7 @@ function DshStoreGetScreenContent({
                                   'grid-outline'
                                 }
                                 size={16}
-                                color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : '#717171')}
+                                color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : appearanceChrome.secondaryText)}
                               />
                             )
                           }
@@ -1814,9 +1825,9 @@ const stylesTokens = {
   whiteOverlay: hexToRgba(colorPalette.white, 0.96),
 };
 
-const DARK_BLUE = '#0A2F5C';
-const ORANGE = '#FF500D';
-const GOLD = '#FFD700';
+const DARK_BLUE = stylesTokens.blue;
+const ORANGE = stylesTokens.orange;
+const GOLD = stylesTokens.warning;
 
 const styles = StyleSheet.create({
   screen: {
@@ -1878,7 +1889,7 @@ const styles = StyleSheet.create({
   heroCoverPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#333',
+    backgroundColor: stylesTokens.dark,
   },
   heroCoverOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -1997,7 +2008,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: stylesTokens.black,
         shadowOpacity: 0.15,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
@@ -2067,7 +2078,7 @@ const styles = StyleSheet.create({
   heroFeatureValue: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#FFF',
+    color: stylesTokens.white,
     fontFamily: 'Outfit-Bold',
   },
   heroBadgePro: {
@@ -2077,7 +2088,7 @@ const styles = StyleSheet.create({
   heroBadgeText: {
     fontSize: 11,
     fontWeight: '900',
-    color: '#FFF',
+    color: stylesTokens.white,
     fontFamily: 'Outfit-Bold',
   },
   sectionHeader: {
@@ -2233,7 +2244,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: 1.5,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: stylesTokens.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 12,
@@ -2295,7 +2306,7 @@ const styles = StyleSheet.create({
     backgroundColor: stylesTokens.white,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: stylesTokens.black,
         shadowOffset: { width: 0, height: 12 },
         shadowOpacity: 0.2,
         shadowRadius: 16,
@@ -2309,7 +2320,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: '#F7F7F7',
+    backgroundColor: stylesTokens.light,
   },
   previewSwipeLayer: {
     ...StyleSheet.absoluteFillObject,
@@ -2329,15 +2340,15 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FF500D',
+    backgroundColor: stylesTokens.orange,
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: stylesTokens.white,
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: stylesTokens.black,
         shadowOpacity: 0.2,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 3 },
@@ -2351,7 +2362,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: stylesTokens.white,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
@@ -2372,7 +2383,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: stylesTokens.black,
         shadowOpacity: 0.12,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
@@ -2428,7 +2439,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#FF500D',
+    borderColor: stylesTokens.orange,
   },
   previewDetailsFavoriteButton: {
     zIndex: 12,
@@ -2440,7 +2451,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 18,
     borderTopRightRadius: 4,
     borderBottomLeftRadius: 4,
-    backgroundColor: '#FF500D',
+    backgroundColor: stylesTokens.orange,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 3,
@@ -2449,7 +2460,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -3,
     left: -5,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: stylesTokens.white,
     borderRadius: 5,
     width: 10,
     height: 10,

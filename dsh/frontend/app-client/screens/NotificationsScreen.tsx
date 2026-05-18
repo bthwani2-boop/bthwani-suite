@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Box, Button, Divider, MobileScrollView, Text, TopBar } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
+import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import { dshNotificationsFixtures } from '../data/notifications.preview-data';
 
 export type DshNotificationActionTarget = 'benefits' | 'tracking' | 'orders-list' | 'search' | 'none';
@@ -21,6 +22,7 @@ export type DshNotificationItem = {
   relativeTime?: string;
   timeGroup?: 'now' | 'today' | 'yesterday' | 'earlier';
   retentionPolicy?: { days?: number; hours?: number; note?: string };
+  fulfillmentMode?: DshFulfillmentDeliveryMode;
   onPress?: () => void;
 };
 
@@ -91,10 +93,23 @@ function relativeTimeFrom(meta: string) {
   }
 }
 
+function resolveFulfillmentModeLabel(mode?: DshFulfillmentDeliveryMode) {
+  if (mode === 'bthwani_delivery') return 'توصيل بثواني';
+  if (mode === 'partner_delivery') return 'توصيل المتجر';
+  if (mode === 'pickup') return 'استلام بنفسي';
+  return null;
+}
+
 function DshNotificationRow({ item, onPress }: { item: DshNotificationItem; onPress?: () => void }) {
   const timeText = item.relativeTime ?? relativeTimeFrom(item.meta);
   const retentionNote = RETENTION_POLICY_MAP[item.category] || '';
-  const metaText = `${timeText} · ${item.badgeLabel}${retentionNote ? ` (صلاحية: ${retentionNote})` : ''}`;
+  const fulfillmentModeLabel = resolveFulfillmentModeLabel(item.fulfillmentMode);
+  const metaSegments = [
+    timeText,
+    item.badgeLabel,
+    fulfillmentModeLabel,
+  ].filter(Boolean);
+  const metaText = `${metaSegments.join(' · ')}${retentionNote ? ` (صلاحية: ${retentionNote})` : ''}`;
 
   const isUnread = item.readState === 'unread';
   const isUrgent = item.priority === 'urgent' && isUnread;

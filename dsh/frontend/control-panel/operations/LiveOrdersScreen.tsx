@@ -5,7 +5,9 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from './operations.preview-data';
+import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
+import type { DshFulfillmentOperationalMode } from './operations.types';
 import { Box, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshOperationsDecisionKind, DshOrderLifecycleStatus, DshOperationsOrderDetail } from '../../shared/dsh-order-journey.model';
@@ -120,6 +122,53 @@ const mockTicketsForOrder: Record<string, {
     ],
   },
 };
+
+const FULFILLMENT_MODE_IDS: readonly DshFulfillmentOperationalMode[] = ['bthwani_delivery', 'partner_delivery', 'pickup'];
+
+function FulfillmentModeQueueSection({ mode }: { mode: DshFulfillmentOperationalMode }) {
+  const { theme } = useTheme();
+  const modeMeta = DSH_FULFILLMENT_OPERATIONAL_MODE_META[mode];
+  const rows = FULFILLMENT_MODE_ORDER_QUEUES[mode];
+
+  return (
+    <div style={{ marginTop: '16px', direction: 'rtl', textAlign: 'right' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', borderBottom: `1px solid ${theme.line}`, paddingBottom: '8px', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '14px', fontWeight: 800, color: theme.text }}>{modeMeta.label}</span>
+        <span style={{ fontSize: '11px', color: theme.textMuted, background: theme.surfaceInset, padding: '2px 8px', borderRadius: '6px' }}>
+          {modeMeta.operationalOwner}
+        </span>
+        {modeMeta.requiresCaptain && (
+          <span style={{ fontSize: '11px', color: theme.brand, background: theme.brandSurface, padding: '2px 8px', borderRadius: '6px' }}>يتطلب كابتن</span>
+        )}
+        {modeMeta.requiresPartnerCourier && (
+          <span style={{ fontSize: '11px', color: theme.warning, background: theme.warningSurface, padding: '2px 8px', borderRadius: '6px' }}>يتطلب موصل شريك</span>
+        )}
+        {modeMeta.requiresCustomerPickup && (
+          <span style={{ fontSize: '11px', color: theme.success, background: theme.successSurface, padding: '2px 8px', borderRadius: '6px' }}>استلام ذاتي</span>
+        )}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {rows.map((row) => (
+          <div key={row.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', border: `1px solid ${theme.line}`, borderRadius: '10px', background: theme.surfaceRaised, gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: '140px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: theme.text }}>#{row.id} — {row.storeName}</span>
+              <span style={{ fontSize: '12px', color: theme.textMuted }}>{row.customerName} | {row.slaLabel}</span>
+            </div>
+            <span style={{
+              fontSize: '11px', padding: '3px 10px', borderRadius: '99px', fontWeight: 700,
+              background: row.statusTone === 'danger' ? theme.dangerSurface : row.statusTone === 'warning' ? theme.warningSurface : row.statusTone === 'success' ? theme.successSurface : theme.surfaceInset,
+              color: row.statusTone === 'danger' ? theme.danger : row.statusTone === 'warning' ? theme.warning : row.statusTone === 'success' ? theme.success : theme.textMuted,
+            }}>{row.statusLabel}</span>
+            {/* nextAction label is mode-derived — no captain dispatch for partner_delivery or pickup */}
+            <button type="button" style={{ padding: '6px 14px', background: theme.brand, color: theme.textInverse, border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '12px', whiteSpace: 'nowrap' }}>
+              {row.nextAction}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrder; onDecision: (id: string, decision: OpsDecision, note: string) => void }) {
   const { theme } = useTheme();
@@ -304,9 +353,10 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
   );
 }
 
-export function LiveOrdersScreen({ state = 'ready', subGroup: _subGroup, onRetry }: LiveOrdersScreenProps) {
+export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrdersScreenProps) {
   const { theme } = useTheme();
   const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
+  const activeMode = FULFILLMENT_MODE_IDS.find((m) => m === subGroup) ?? null;
   const [expandedApprovalId, setExpandedApprovalId] = React.useState<string | null>(null);
   const [decisions, setDecisions] = React.useState<DecisionState>({});
 
@@ -417,6 +467,8 @@ export function LiveOrdersScreen({ state = 'ready', subGroup: _subGroup, onRetry
           />
         ))}
       </Box>
+
+      {activeMode && <FulfillmentModeQueueSection mode={activeMode} />}
     </div>
   );
 }

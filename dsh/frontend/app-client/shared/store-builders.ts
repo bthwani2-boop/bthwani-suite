@@ -1,3 +1,4 @@
+import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import { DshDiscoveryStore, DshStoreFixtureItem } from '../../shared/dshStoreProductCardModel';
 
 /**
@@ -25,17 +26,32 @@ export function buildStoreCategories(items: DshStoreFixtureItem[]) {
   }));
 }
 
-export function buildStoreDeliveryModes(meta: string) {
+export type StoreDeliveryModeEntry = {
+  id: DshFulfillmentDeliveryMode;
+  name: string;
+  isAvailable: boolean;
+  estimatedTime?: string;
+  fee?: number;
+};
+
+export function buildStoreDeliveryModes(meta: string): StoreDeliveryModeEntry[] {
   return [
     {
-      id: 'delivery' as const,
+      id: 'bthwani_delivery',
       name: 'توصيل بثواني',
       isAvailable: true,
       estimatedTime: meta,
       fee: 12,
     },
     {
-      id: 'pickup' as const,
+      id: 'partner_delivery',
+      name: 'توصيل المتجر',
+      isAvailable: true,
+      estimatedTime: meta,
+      fee: 0,
+    },
+    {
+      id: 'pickup',
       name: 'استلم بنفسك',
       isAvailable: true,
       estimatedTime: '15 دقيقة',

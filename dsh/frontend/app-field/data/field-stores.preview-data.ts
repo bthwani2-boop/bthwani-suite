@@ -4,6 +4,18 @@ import {
   type DshCanonicalStoreCard,
 } from '../../shared/dshStoreProductCardModel';
 
+export type FieldFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+
+export type FieldFulfillmentModeAgreement = {
+  mode: FieldFulfillmentMode;
+  modeLabel: string;
+  enabled: boolean;
+  /** UI_PREVIEW_ONLY — actual rate is WLT-owned */
+  commissionRatePreview: string;
+  settlementBasis: string;
+  operationalReadiness: 'ready' | 'pending' | 'unavailable';
+};
+
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
 export type FieldLeadSource = 'candidate' | 'manual';
@@ -85,6 +97,8 @@ export type FieldStoreFile = {
   financeLabel: string;
   reviewFeedback?: string;
   draft: FieldOnboardingDraft;
+  /** UI_PREVIEW_ONLY — agreed fulfillment modes for this store; authoritative in WLT/backend */
+  fulfillmentAgreements?: readonly FieldFulfillmentModeAgreement[];
 };
 
 export type FieldSectionSummary = {
@@ -692,6 +706,11 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       location: 'النرجس',
       nextVisitLabel: 'غدًا 10:30 ص',
       financeLabel: 'جاهز للإرسال',
+      fulfillmentAgreements: [
+        { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+      ],
       draft: createEmptyDraft({
         activeSectionId: 'review',
         basics: {
@@ -799,6 +818,11 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       nextVisitLabel: 'مكتمل',
       financeLabel: '420 ر.ي',
       lockedStatus: 'offer-approved',
+      fulfillmentAgreements: [
+        { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' },
+        { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+      ],
       stageLabelOverride: 'منتهٍ للميداني',
       lifecycleNote: 'اعتمد الملف داخل الشركاء وينتظر المراجعة التسويقية النهائية قبل الظهور للعملاء.',
       draft: createEmptyDraft({

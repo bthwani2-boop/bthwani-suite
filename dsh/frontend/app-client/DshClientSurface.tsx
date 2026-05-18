@@ -49,6 +49,7 @@ import {
 import { getDshClientStateMeta, type DshClientState } from './data/client-state.preview-data';
 import { getPublishedHomePromos } from '../shared/promo.preview-store';
 import { dshCategoryFixtures, dshCategoryListFixtures } from './data/categories.preview-data';
+import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
@@ -68,6 +69,7 @@ type HostOrderSummary = {
   statusLabel: string;
   meta: string;
   clientState: DshClientState;
+  fulfillmentMode: DshFulfillmentDeliveryMode;
 };
 
 type HostCartItem = {
@@ -229,6 +231,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.trackingActive).label,
     meta: 'الوصول المتوقع خلال 18 دقيقة',
     clientState: hostClientStates.trackingActive,
+    fulfillmentMode: 'bthwani_delivery',
   },
   {
     id: 'dsh-10019',
@@ -237,6 +240,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.delivered).label,
     meta: 'اليوم 03:10 م',
     clientState: hostClientStates.delivered,
+    fulfillmentMode: 'partner_delivery',
   },
   {
     id: 'dsh-10017',
@@ -245,6 +249,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.cancelled).label,
     meta: 'تم الإلغاء مع توضيح سبب الحالة',
     clientState: hostClientStates.cancelled,
+    fulfillmentMode: 'pickup',
   },
   {
     id: 'dsh-10016',
@@ -253,6 +258,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.failed).label,
     meta: 'توجد حاجة إلى مسار تعافٍ أو دعم واضح',
     clientState: hostClientStates.failed,
+    fulfillmentMode: 'bthwani_delivery',
   },
   {
     id: 'dsh-10015',
@@ -261,6 +267,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.refundPending).label,
     meta: 'الاسترداد ما يزال قيد المعالجة',
     clientState: hostClientStates.refundPending,
+    fulfillmentMode: 'partner_delivery',
   },
   {
     id: 'dsh-10014',
@@ -269,6 +276,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.refunded).label,
     meta: 'تم تثبيت الأثر المالي النهائي للطلب',
     clientState: hostClientStates.refunded,
+    fulfillmentMode: 'pickup',
   },
   {
     id: 'dsh-10013',
@@ -277,6 +285,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.supportRequired).label,
     meta: 'هذه الحالة تحتاج متابعة دعم واضحة',
     clientState: hostClientStates.supportRequired,
+    fulfillmentMode: 'partner_delivery',
   },
   {
     id: 'dsh-10012',
@@ -285,6 +294,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.walletCreditVisible).label,
     meta: 'يوجد رصيد ظاهر للعميل داخل المحفظة',
     clientState: hostClientStates.walletCreditVisible,
+    fulfillmentMode: 'bthwani_delivery',
   },
   {
     id: 'dsh-10011',
@@ -293,6 +303,7 @@ const initialOrders: HostOrderSummary[] = [
     statusLabel: getDshClientStateMeta(hostClientStates.walletRefundVisible).label,
     meta: 'تظهر معلومة الاسترداد المالي ضمن المسار',
     clientState: hostClientStates.walletRefundVisible,
+    fulfillmentMode: 'pickup',
   },
 ];
 
@@ -320,11 +331,13 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
 export function DshClientSurface({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
   const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
+  const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
   const [route, setRoute] = React.useState<DshRoute>('home');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
   const [createOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
+  const [selectedFulfillmentMode, setSelectedFulfillmentMode] = React.useState<DshFulfillmentDeliveryMode>(defaultFulfillmentMode);
   const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
   const [ordersQuery, setOrdersQuery] = React.useState('');
   const [storesQuery, setStoresQuery] = React.useState('');
@@ -488,13 +501,17 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     setRoute('cart-get');
   }, []);
 
-  const openTrackedOrder = React.useCallback((orderId?: string) => {
+  const openTrackedOrder = React.useCallback((orderId?: string, fallbackMode?: DshFulfillmentDeliveryMode) => {
     const nextOrder = initialOrders.find((order) => order.id === orderId) ?? initialOrders[0];
+    const nextFulfillmentMode = orderId
+      ? nextOrder.fulfillmentMode
+      : fallbackMode ?? selectedFulfillmentMode ?? nextOrder.fulfillmentMode ?? defaultFulfillmentMode;
 
     setSelectedOrderId(nextOrder.id);
     setTrackingClientState(hostClientStates.trackingActive);
+    setSelectedFulfillmentMode(nextFulfillmentMode);
     setRoute('tracking');
-  }, []);
+  }, [defaultFulfillmentMode, selectedFulfillmentMode]);
 
   const openSupportFlow = React.useCallback(() => {
     setSelectedOperationScreen('order-issue-flag');
@@ -510,8 +527,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   }, []);
 
   const handleConfirmedOrderExecution = React.useCallback(() => {
-    openTrackedOrder();
-  }, [openTrackedOrder]);
+    openTrackedOrder(undefined, selectedFulfillmentMode);
+  }, [openTrackedOrder, selectedFulfillmentMode]);
 
   const activeStore = React.useMemo(
     () => dshDiscoveryStores.find((store) => store.id === activeStoreId) ?? dshDiscoveryStores[0],
@@ -540,9 +557,13 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       sourceRecordId: item.sourceRecordId ?? activeStore.sourceRecordId,
       publishStage: item.publishStage ?? activeStore.publishStage,
     };
+    const nextFulfillmentMode = _payload?.deliveryMode === 'pickup' || _payload?.deliveryMode === 'partner_delivery' || _payload?.deliveryMode === 'bthwani_delivery'
+      ? _payload.deliveryMode
+      : defaultFulfillmentMode;
 
     setActiveCanonicalStoreId(canonicalMetadata.canonicalStoreId);
     setActiveCanonicalProductId(canonicalMetadata.canonicalProductId);
+    setSelectedFulfillmentMode(nextFulfillmentMode);
 
     setCartItems((current) => {
       const existingIndex = current.findIndex((entry) => entry.id === item.id && entry.storeId === activeStore.id);
@@ -577,7 +598,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           : entry
       ));
     });
-  }, [activeCanonicalProductId, activeCanonicalStoreId, activeStore]);
+  }, [activeCanonicalProductId, activeCanonicalStoreId, activeStore, defaultFulfillmentMode]);
 
   const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
   const liveMarketingShorts = liveMarketingPrograms
@@ -700,7 +721,12 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           setStoreItemsEntryOrigin('store-get');
           setRoute('store-items');
         }}
-        onOpenCart={() => setRoute('cart-get')}
+        onOpenCart={(mode) => {
+          if (mode) {
+            setSelectedFulfillmentMode(mode);
+          }
+          setRoute('cart-get');
+        }}
         onOpenBenefits={() => {
           setSelectedOperationScreen('entitlements-get');
           setRoute('benefits');
@@ -739,6 +765,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return (
       <DshCartGetScreen
         clientState={cartClientState}
+        fulfillmentMode={selectedFulfillmentMode}
         store={{
           id: activeStore.id,
           name: activeStore.name,
@@ -919,6 +946,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         values={createOrderValues}
         clientState={trackingClientState}
         currentStatusLabel={activeTrackedOrder?.statusLabel}
+        fulfillmentMode={activeTrackedOrder?.fulfillmentMode ?? selectedFulfillmentMode}
         timeline={trackingTimeline}
         onSupport={openSupportFlow}
         onRetry={() => openTrackedOrder(activeTrackedOrder?.id)}

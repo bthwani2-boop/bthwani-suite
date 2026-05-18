@@ -1,4 +1,6 @@
 export type {
+	FieldFulfillmentMode,
+	FieldFulfillmentModeAgreement,
 	FieldLeadFilter,
 	FieldLeadSource,
 	FieldLeadStatus,

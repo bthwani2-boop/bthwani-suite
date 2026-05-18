@@ -1,3 +1,5 @@
+import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from './operations.types';
+
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
  */
@@ -516,6 +518,22 @@ export const EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW = {
     },
   ] as const,
 } as const;
+
+export const FULFILLMENT_MODE_ORDER_QUEUES: Record<import('./operations.types').DshFulfillmentOperationalMode, import('./operations.types').DshOperationsOrderRow[]> = {
+  bthwani_delivery: [
+    { id: 'BD-0101', storeName: 'شاورما هليل', customerName: 'نوف العتيبي', statusLabel: 'في انتظار كابتن', statusTone: 'warning', fulfillmentMode: 'bthwani_delivery', nextAction: 'تعيين كابتن', slaLabel: 'SLA: 8 دقائق' },
+    { id: 'BD-0102', storeName: 'برغر لاب', customerName: 'خالد الزهراني', statusLabel: 'الكابتن في الطريق', statusTone: 'neutral', fulfillmentMode: 'bthwani_delivery', nextAction: 'متابعة التسليم', slaLabel: 'SLA: 12 دقيقة' },
+    { id: 'BD-0103', storeName: 'مطعم القلعة', customerName: 'ريم الشهراني', statusLabel: 'تأخير', statusTone: 'danger', fulfillmentMode: 'bthwani_delivery', nextAction: 'تصعيد', slaLabel: 'SLA: خرق وشيك' },
+  ],
+  partner_delivery: [
+    { id: 'PD-0201', storeName: 'دانكن دونتس', customerName: 'محمد السالم', statusLabel: 'في انتظار موصل الشريك', statusTone: 'warning', fulfillmentMode: 'partner_delivery', nextAction: 'تنبيه الشريك', slaLabel: 'SLA: 15 دقيقة' },
+    { id: 'PD-0202', storeName: 'بارنز كافيه', customerName: 'سارة القحطاني', statusLabel: 'موصل الشريك في الطريق', statusTone: 'neutral', fulfillmentMode: 'partner_delivery', nextAction: 'متابعة الشريك', slaLabel: 'SLA: 20 دقيقة' },
+  ],
+  pickup: [
+    { id: 'PK-0301', storeName: 'كافيه آرت', customerName: 'أحمد الدوسري', statusLabel: 'الطلب جاهز', statusTone: 'success', fulfillmentMode: 'pickup', nextAction: 'إشعار العميل', slaLabel: 'SLA: 10 دقائق' },
+    { id: 'PK-0302', storeName: 'شيك هاوس', customerName: 'عبدالله المطيري', statusLabel: 'بانتظار التحضير', statusTone: 'warning', fulfillmentMode: 'pickup', nextAction: 'متابعة الجاهزية', slaLabel: 'SLA: 8 دقائق' },
+  ],
+};
 
 export const AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW = {
   summary: {

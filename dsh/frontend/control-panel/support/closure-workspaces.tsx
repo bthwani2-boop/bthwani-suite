@@ -14,6 +14,7 @@ import styles from '../shared/control-panel-surface.module.css';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
+type SupportFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
 
 type SupportRow = {
   id: string;
@@ -23,6 +24,9 @@ type SupportRow = {
   severity: 'danger' | 'warning' | 'success';
   slaAge: string;
   owner: string;
+  fulfillmentMode: SupportFulfillmentMode;
+  fulfillmentLabel: string;
+  responsibleActor: string;
   blocker: string;
   evidence: string;
   nextAction: string;
@@ -30,6 +34,12 @@ type SupportRow = {
   primaryActionLabel: string;
   secondaryActionLabel: string;
 };
+
+function resolveSupportModeBadge(mode: SupportFulfillmentMode) {
+  if (mode === 'bthwani_delivery') return 'توصيل بثواني';
+  if (mode === 'partner_delivery') return 'توصيل المتجر';
+  return 'استلام بنفسي';
+}
 
 function resolveCommitmentLabel() {
   return 'خطر الالتزام';
@@ -66,7 +76,10 @@ const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
     severity: 'warning',
     slaAge: '15 دقيقة',
     owner: 'تشغيل الطلبات',
-    blocker: 'انتظار إثبات الاستلام',
+    fulfillmentMode: 'bthwani_delivery',
+    fulfillmentLabel: 'توصيل بثواني',
+    responsibleActor: 'الكابتن',
+    blocker: 'بانتظار إثبات الاستلام من الكابتن',
     evidence: 'سجل رنين + صورة الاستلام',
     nextAction: 'أعد فتح الطلب واطلب الإثبات',
     recommendation: 'ابدأ من إثبات الاستلام ثم أعد الإسناد إذا استمر التأخير',
@@ -81,10 +94,13 @@ const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
     severity: 'warning',
     slaAge: '32 دقيقة',
     owner: 'دعم الشركاء',
-    blocker: 'فاتورة غير مطابقة',
-    evidence: 'نسخة الفاتورة + سجل التحصيل',
-    nextAction: 'طابق الفاتورة مع سجل التحصيل',
-    recommendation: 'أغلق النزاع فقط بعد مراجعة الفاتورة والسجل',
+    fulfillmentMode: 'partner_delivery',
+    fulfillmentLabel: 'توصيل المتجر',
+    responsibleActor: 'موصل الشريك / المتجر',
+    blocker: 'فاتورة غير مطابقة مع مسار توصيل المتجر',
+    evidence: 'نسخة الفاتورة + سجل التحصيل + محضر تسليم موصل الشريك',
+    nextAction: 'طابق الفاتورة مع سجل التحصيل وتسليم موصل الشريك',
+    recommendation: 'أغلق النزاع فقط بعد مراجعة الفاتورة والسجل ومسؤولية موصل الشريك',
     primaryActionLabel: 'مراجعة الشريك',
     secondaryActionLabel: 'فتح الأدلة',
   },
@@ -96,6 +112,9 @@ const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
     severity: 'danger',
     slaAge: '5 دقائق',
     owner: 'دعم الكباتن',
+    fulfillmentMode: 'bthwani_delivery',
+    fulfillmentLabel: 'توصيل بثواني',
+    responsibleActor: 'الكابتن',
     blocker: 'تعطل في الإشارة والاتصال',
     evidence: 'مراسلات الدعم + سجل الجهاز',
     nextAction: 'اعرض كابتن بديل وفعّل التصعيد',
@@ -111,10 +130,13 @@ const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
     severity: 'success',
     slaAge: '47 دقيقة',
     owner: 'الميدان',
-    blocker: 'بانتظار تأكيد الزيارة',
-    evidence: 'إثبات الموعد + سجل الحضور',
-    nextAction: 'ثبّت الموعد أو أغلقها مع دليل',
-    recommendation: 'أغلق الحالة فقط بعد تأكيد الحضور أو تغيير الموعد',
+    fulfillmentMode: 'pickup',
+    fulfillmentLabel: 'استلام بنفسي',
+    responsibleActor: 'العميل / المتجر',
+    blocker: 'بانتظار تأكيد جاهزية المتجر للاستلام',
+    evidence: 'إثبات الموعد + سجل الحضور + تأكيد الجاهزية',
+    nextAction: 'ثبّت الجاهزية أو أغلقها مع دليل',
+    recommendation: 'أغلق الحالة فقط بعد تأكيد جاهزية المتجر أو تغيير الموعد',
     primaryActionLabel: 'تثبيت الموعد',
     secondaryActionLabel: 'فتح الأدلة',
   },
@@ -232,7 +254,7 @@ export function ControlPanelDshSupportHubScreen() {
                       risk={row.severity === 'danger' ? 'danger' : row.severity === 'warning' ? 'warning' : 'neutral'}
                       recommendation={row.recommendation}
                       reason={row.blocker}
-                      sla={`زمن الالتزام ${row.slaAge} · المالك ${row.owner}`}
+                      sla={`زمن الالتزام ${row.slaAge} · المالك ${row.owner} · ${resolveSupportModeBadge(row.fulfillmentMode)} · المسؤول ${row.responsibleActor}`}
                       primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
                       secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
                       onInspect={() => setSelectedId(row.id)}
@@ -247,6 +269,8 @@ export function ControlPanelDshSupportHubScreen() {
                   <div className={styles.surfaceInspectorMeta}>
                     <Text role="caption" tone="muted">السطح: {selectedRow?.surface}</Text>
                     <Text role="caption" tone="muted">المالك: {selectedRow?.owner}</Text>
+                    <Text role="caption" tone="muted">وضع التنفيذ: {selectedRow?.fulfillmentLabel}</Text>
+                    <Text role="caption" tone="muted">المسؤول الحالي: {selectedRow?.responsibleActor}</Text>
                     <Text role="caption" tone="muted">العائق: {selectedRow?.blocker}</Text>
                     <Text role="caption" tone="muted">الدليل: {selectedRow?.evidence}</Text>
                     <Text role="caption" tone="muted">الإجراء التالي: {selectedRow?.nextAction}</Text>

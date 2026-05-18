@@ -34,6 +34,10 @@ import {
   type WltDshFinanceEventKind,
 } from '../../../../wlt/frontend/app-client/dsh';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
+import {
+  type DshFulfillmentDeliveryMode,
+  getDshFulfillmentDeliveryModeMeta,
+} from '../contracts/dsh-client-binding.contracts';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -112,6 +116,7 @@ type CheckoutActionPayload = {
 export type DshCartUnifiedScreenProps = {
   items?: CartItem[];
   clientState?: DshClientState;
+  fulfillmentMode?: DshFulfillmentDeliveryMode;
   store?: {
     id: string;
     name: string;
@@ -1028,7 +1033,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodKey>('cod');
   const [couponCode, setCouponCode] = useState('');
-  const [deliveryAmount] = useState(950);
+  const resolvedFulfillmentMode: DshFulfillmentDeliveryMode = props.fulfillmentMode ?? 'bthwani_delivery';
+  const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(resolvedFulfillmentMode);
+  // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY — real fee from WLT).
+  const deliveryAmount = resolvedFulfillmentMode === 'pickup' ? 0 : 950;
   const [pickupAddr, setPickupAddr] = useState('جوار الجبل الجديد');
   const [note, setNote] = useState('لا يوجد ملاحظة');
   const [extraRequest, setExtraRequest] = useState('');
@@ -1798,8 +1806,13 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: spacing[3], paddingVertical: spacing[2], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
-            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right', flex: 1 }}>الخيارات السريعة</Text>
-            <Text role="caption" style={{ color: TEXT_SECONDARY }}>القسيمة والموقع والملاحظات</Text>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5], flex: 1 }}>
+              <Icon name={fulfillmentModeMeta.icon} size={15} color={TEXT_PRIMARY} />
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                {fulfillmentModeMeta.label}
+              </Text>
+            </View>
+            <Text role="caption" style={{ color: TEXT_SECONDARY }}>وضع التنفيذ</Text>
           </View>
           <OptionRow
             title="هل لديك قسيمة تخفيض؟"
@@ -1845,13 +1858,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               />
             </View>
           )}
-          <OptionRow
-            title="طلب إضافي على الطريق"
-            subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
-            actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
-            onAction={() => openQuickAction('extra')}
-            style={{ paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
-          />
+          {resolvedFulfillmentMode === 'bthwani_delivery' && (
+            <OptionRow
+              title="طلب إضافي على الطريق"
+              subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
+              actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
+              onAction={() => openQuickAction('extra')}
+              style={{ paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+            />
+          )}
           {quickActionKey === 'extra' && quickActionMeta && (
             <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
               <InlineActionEditor

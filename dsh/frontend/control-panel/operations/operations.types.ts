@@ -1,5 +1,48 @@
 export type OperationsPanelId = 'detail' | 'chat';
 
+export type DshFulfillmentOperationalMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+
+export const DSH_FULFILLMENT_OPERATIONAL_MODE_META: Readonly<Record<DshFulfillmentOperationalMode, {
+  readonly label: string;
+  readonly operationalOwner: string;
+  readonly requiresCaptain: boolean;
+  readonly requiresPartnerCourier: boolean;
+  readonly requiresCustomerPickup: boolean;
+}>> = {
+  bthwani_delivery: {
+    label: 'توصيل بثواني',
+    operationalOwner: 'DSH Operations + Captain',
+    requiresCaptain: true,
+    requiresPartnerCourier: false,
+    requiresCustomerPickup: false,
+  },
+  partner_delivery: {
+    label: 'توصيل المتجر',
+    operationalOwner: 'Partner / Store Courier',
+    requiresCaptain: false,
+    requiresPartnerCourier: true,
+    requiresCustomerPickup: false,
+  },
+  pickup: {
+    label: 'استلام بنفسي',
+    operationalOwner: 'Client + Store',
+    requiresCaptain: false,
+    requiresPartnerCourier: false,
+    requiresCustomerPickup: true,
+  },
+} as const;
+
+export type DshOperationsOrderRow = {
+  id: string;
+  storeName: string;
+  customerName: string;
+  statusLabel: string;
+  statusTone: 'warning' | 'danger' | 'success' | 'neutral';
+  fulfillmentMode: DshFulfillmentOperationalMode;
+  nextAction: string;
+  slaLabel: string;
+};
+
 export type CanonicalOperationsGroupId =
   | 'command-center'
   | 'live-orders'

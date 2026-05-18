@@ -11,6 +11,7 @@ export type DshNotificationFixture = {
   relativeTime?: string; // human readable preview
   timeGroup?: 'now' | 'today' | 'yesterday' | 'earlier';
   retentionPolicy?: { days?: number; hours?: number; note?: string };
+  fulfillmentMode?: 'bthwani_delivery' | 'partner_delivery' | 'pickup'; // mode that generated this notification
 };
 
 /**
@@ -51,11 +52,12 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
     priority: 'important',
     actionTarget: 'tracking',
     retentionPolicy: { hours: 48, note: 'حتى انتهاء الطلب + 24 ساعة' },
+    fulfillmentMode: 'bthwani_delivery',
   },
   {
     id: 'notif-3',
     title: 'تنبيه داخل الطلب',
-    subtitle: 'تم تحديث حالة الدفع داخل الطلب رقم 3770204.',
+    subtitle: 'تم تحديث حالة الطلب رقم 3770204 ضمن مسار توصيل المتجر.',
     meta: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
     relativeTime: 'منذ 90 دقيقة',
     timeGroup: 'today',
@@ -65,11 +67,12 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
     priority: 'normal',
     actionTarget: 'tracking',
     retentionPolicy: { hours: 6, note: 'جرس: حتى 6 ساعات' },
+    fulfillmentMode: 'partner_delivery',
   },
   {
     id: 'notif-4',
     title: 'بلاغ دعم جديد',
-    subtitle: 'تم إنشاء بلاغ دعم لحالة تأخير الطلب. اضغط للاطلاع.',
+    subtitle: 'تم إنشاء بلاغ دعم لأن موصل المتجر تأخر في التسليم. اضغط للاطلاع.',
     meta: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     relativeTime: 'منذ يوم',
     timeGroup: 'yesterday',
@@ -79,6 +82,7 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
     priority: 'urgent',
     actionTarget: 'tracking',
     retentionPolicy: { days: 3, note: 'دعم: حتى 72 ساعة' },
+    fulfillmentMode: 'partner_delivery',
   },
   {
     id: 'notif-5',
@@ -110,8 +114,8 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
   },
   {
     id: 'notif-7',
-    title: 'الكابتن وصل',
-    subtitle: 'الكابتن وصل لموقعك. يرجى الاستلام.',
+    title: 'موصل المتجر وصل',
+    subtitle: 'موصل المتجر وصل لموقعك. يرجى الاستلام.',
     meta: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
     relativeTime: 'منذ 5 دقائق',
     timeGroup: 'now',
@@ -121,6 +125,7 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
     priority: 'important',
     actionTarget: 'tracking',
     retentionPolicy: { hours: 24 + 24, note: 'حتى انتهاء الطلب + 24 ساعة' },
+    fulfillmentMode: 'partner_delivery',
   },
   {
     id: 'notif-8',
@@ -139,7 +144,7 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
   {
     id: 'notif-9',
     title: 'تنبيه جرس داخل الطلب',
-    subtitle: 'جرس تنبيه: تم تغيير حالة الطلب.',
+    subtitle: 'جرس تنبيه: الطلب أصبح جاهزًا للاستلام من المتجر.',
     meta: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
     relativeTime: 'منذ 6 ساعات',
     timeGroup: 'today',
@@ -149,6 +154,7 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
     priority: 'normal',
     actionTarget: 'tracking',
     retentionPolicy: { hours: 6, note: 'جرس: حتى 6 ساعات' },
+    fulfillmentMode: 'pickup',
   },
   {
     id: 'notif-10',
@@ -167,7 +173,7 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
   {
     id: 'notif-11',
     title: 'بلاغ دعم تم استلامه',
-    subtitle: 'فريق الدعم يتعامل مع البلاغ الخاص بك.',
+    subtitle: 'فريق الدعم يتابع بلاغ جاهزية الطلب للاستلام من المتجر.',
     meta: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     relativeTime: 'منذ ساعتين',
     timeGroup: 'today',
@@ -177,5 +183,6 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
     priority: 'urgent',
     actionTarget: 'tracking',
     retentionPolicy: { days: 3, note: 'دعم: حتى 72 ساعة' },
+    fulfillmentMode: 'pickup',
   },
 ];

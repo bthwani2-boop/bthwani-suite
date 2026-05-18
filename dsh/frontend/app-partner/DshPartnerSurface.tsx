@@ -55,21 +55,21 @@ const defaultStoreHours: readonly PartnerStoreHoursDay[] = [
 
 const defaultServiceModes = [
   {
-    id: 'delivery',
-    label: 'Delivery',
-    description: 'Accept delivery demand and keep captain handoff open.',
+    id: 'partner_delivery',
+    label: 'توصيل المتجر',
+    description: 'تفعيل توصيل المتجر عبر موصل الشريك عند الجاهزية التشغيلية.',
     enabled: true,
   },
   {
     id: 'pickup',
-    label: 'Pickup',
-    description: 'Expose pickup-only capacity without slowing the delivery branch flow.',
+    label: 'استلام بنفسي',
+    description: 'إظهار الاستلام الذاتي عندما يكون المتجر جاهزًا لتسليم العميل مباشرة.',
     enabled: true,
   },
   {
-    id: 'scheduled',
-    label: 'Scheduled orders',
-    description: 'Allow future slots when the branch team can commit to preparation timing.',
+    id: 'bthwani_delivery',
+    label: 'توصيل بثواني',
+    description: 'فتح توصيل بثواني فقط عند توفر تغطية الكباتن والإسناد.',
     enabled: false,
   },
 ] as const;
@@ -209,7 +209,7 @@ export function DshPartnerSurface({
       merchantName: 'برغر لاب',
       customerName: 'عمر',
       serviceWindowLabel: 'يتبقى 12 دقيقة قبل حد الخدمة',
-      nextActionLabel: 'تأكيد الجاهزية وإرسال الطلب للكابتن',
+      nextActionLabel: 'تأكيد الجاهزية وتسليم الطلب لجهة التوصيل',
       readinessNote: 'التغليف مكتمل ومسار التسليم متاح.',
     };
   }, [activeOrderId]);
@@ -239,7 +239,7 @@ export function DshPartnerSurface({
   const deliveryOpsSummary = React.useMemo(
     () => ({
       outForDelivery: 8,
-      handoffReady: defaultServiceModes.find((mode) => mode.id === 'delivery')?.enabled ? 5 : 1,
+      handoffReady: defaultServiceModes.some((mode) => mode.id === 'partner_delivery' || mode.id === 'bthwani_delivery') ? 5 : 1,
       deliveredToday: 24,
       delayedRisk: 2,
     }),

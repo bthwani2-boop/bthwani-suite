@@ -179,7 +179,7 @@ function HumanVarCard({
                     width: '100%',
                     padding: '8px 12px',
                     borderRadius: 8,
-                    border: '1px solid var(--color-border, #ccc)',
+                    border: '1px solid var(--color-border, var(--color-border-subtle, currentColor))',
                     fontFamily: 'inherit',
                     fontSize: 14,
                     resize: 'vertical',
@@ -222,6 +222,7 @@ export function DshPlatformVarsWorkspace() {
     { id: 'regions', label: 'المناطق والمدن', badge: '', active: activeCategory === 'regions' },
     { id: 'captain', label: 'أهلية الكابتن', badge: '', active: activeCategory === 'captain' },
     { id: 'dispatch', label: 'الإسناد', badge: '', active: activeCategory === 'dispatch' },
+    { id: 'fulfillment', label: 'أوضاع التنفيذ', badge: '', active: activeCategory === 'fulfillment' },
     { id: 'capabilities', label: 'القدرات والأنماط', badge: '', active: activeCategory === 'capabilities' },
     { id: 'settlements', label: 'التسويات', badge: '', active: activeCategory === 'settlements' },
     { id: 'refunds', label: 'الاستردادات', badge: '', active: activeCategory === 'refunds' },
@@ -291,6 +292,91 @@ export function DshPlatformVarsWorkspace() {
               />
             )}
 
+            {activeCategory === 'fulfillment' && activeDomain === 'dsh' && (
+              <>
+                <Surface tone="default" border padding={3} radiusToken="md">
+                  <Box gap={1}>
+                    <Text role="caption" tone="muted">
+                      UI_PREVIEW_ONLY — سياسات أوضاع التنفيذ هنا للوضوح والتحكم المستقبلي فقط. لا يوجد Mutation، ولا Provider switching، ولا Backend.
+                    </Text>
+                    <Text role="caption" tone="muted">
+                      أولوية التطبيق لاحقًا: Global default → Region → Partner → Store → Product/Category override.
+                    </Text>
+                  </Box>
+                </Surface>
+                <HumanVarCard
+                  humanName="الأوضاع الافتراضية المتاحة"
+                  technicalKey="defaultAvailableFulfillmentModes"
+                  currentValue="[bthwani_delivery, pickup]"
+                  proposedValue="[bthwani_delivery, partner_delivery, pickup]"
+                  scope="Global default"
+                  impact="يوضح أي أوضاع تظهر افتراضيًا قبل أي override خاص بالمنطقة أو الشريك أو المتجر."
+                  risk="مخاطرة تشغيلية منخفضة"
+                  tone="brand"
+                />
+                <HumanVarCard
+                  humanName="السماح بتوصيل المتجر"
+                  technicalKey="allowPartnerDelivery"
+                  currentValue="Partner/Store override only"
+                  proposedValue="Enabled by region and partner readiness"
+                  scope="Region → Partner → Store"
+                  impact="يفعّل partner_delivery فقط عندما توجد جاهزية تشغيلية وموصل شريك مثبت."
+                  risk="مخاطرة تشغيلية متوسطة"
+                  tone="warning"
+                />
+                <HumanVarCard
+                  humanName="السماح بتوصيل بثواني"
+                  technicalKey="allowBthwaniDelivery"
+                  currentValue="Enabled"
+                  proposedValue="Enabled with captain coverage gate"
+                  scope="Global → Region"
+                  impact="يبقي bthwani_delivery مشروطًا بتغطية الكباتن بدل السماح المطلق."
+                  risk="مخاطرة تشغيلية متوسطة"
+                  tone="brand"
+                />
+                <HumanVarCard
+                  humanName="السماح بالاستلام الذاتي"
+                  technicalKey="allowPickup"
+                  currentValue="Store opt-in"
+                  proposedValue="Store opt-in with readiness confirmation"
+                  scope="Partner → Store"
+                  impact="يمنع pickup من الظهور إلا للمتاجر الجاهزة فعليًا لتسليم العميل."
+                  risk="مخاطرة منخفضة"
+                  tone="success"
+                />
+                <HumanVarCard
+                  humanName="معاينة سياسة العمولات"
+                  technicalKey="commissionPolicyPreview"
+                  currentValue="Per partner + per mode (WLT owner)"
+                  proposedValue="Per partner + per mode + category/product override"
+                  scope="WLT policy preview"
+                  impact="يوضح أن العمولة ليست رقمًا عامًا، وأن WLT هو المالك الوحيد للمنطق المالي."
+                  risk="مخاطرة مالية عالية"
+                  tone="danger"
+                />
+                <HumanVarCard
+                  humanName="معاينة سياسة رسوم التوصيل"
+                  technicalKey="deliveryFeePolicyPreview"
+                  currentValue="pickup = no deliveryFee unless policy; partner/bthwani = policy-based"
+                  proposedValue="Explicit per mode + per region preview"
+                  scope="Region → Partner → Store"
+                  impact="يمنع احتساب deliveryFee في pickup بلا سياسة مثبتة، ويفصل partner عن bthwani."
+                  risk="مخاطرة مالية متوسطة"
+                  tone="warning"
+                />
+                <HumanVarCard
+                  humanName="إلزامية الإسناد بكابتن حسب الوضع"
+                  technicalKey="captainDispatchRequiredByMode"
+                  currentValue="{ bthwani_delivery: true, partner_delivery: false, pickup: false }"
+                  proposedValue="{ bthwani_delivery: true, partner_delivery: false, pickup: false }"
+                  scope="Operational policy"
+                  impact="يثبت أن dispatch/captain assignment مطلوب فقط في bthwani_delivery."
+                  risk="مخاطرة تشغيلية منخفضة"
+                  tone="brand"
+                />
+              </>
+            )}
+
             {/* DSH sub-capabilities — these are NOT top-level services; they are modes/capabilities inside DSH */}
             {activeCategory === 'capabilities' && activeDomain === 'dsh' && (
               <>
@@ -355,7 +441,7 @@ export function DshPlatformVarsWorkspace() {
             )}
 
             {/* Fallback for empty states */}
-            {!(['captain', 'dispatch', 'capabilities'].includes(activeCategory) && activeDomain === 'dsh') &&
+            {!(['captain', 'dispatch', 'fulfillment', 'capabilities'].includes(activeCategory) && activeDomain === 'dsh') &&
              !(activeCategory === 'settlements' && activeDomain === 'wlt') && (
               <Surface tone="default" border padding={4} radiusToken="xl">
                 <Text role="bodySm" tone="muted" align="center">لا توجد متغيرات معرّفة في هذا التصنيف والمجال حاليًا.</Text>

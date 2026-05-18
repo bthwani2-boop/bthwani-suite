@@ -36,10 +36,10 @@ type PartnerSupportDirectoryItem = {
 const orderExecutionItems: readonly PartnerSupportDirectoryItem[] = [
   { id: 'order-accept', title: 'قبول الطلب', subtitle: 'بدء دورة التنفيذ من نقطة القبول الرسمية.', badgeLabel: 'تنفيذ' },
   { id: 'order-get', title: 'استلام الطلب', subtitle: 'تأكيد استلام الطلب داخل الفرع.', badgeLabel: 'تنفيذ' },
-  { id: 'order-handoff', title: 'تسليم الطلب للكابتن', subtitle: 'ربط التسليم بخطوة handoff الرسمية.', badgeLabel: 'تنفيذ' },
-  { id: 'order-out-for-delivery', title: 'قيد التوصيل', subtitle: 'متابعة الطلب بعد مغادرته للعميل.', badgeLabel: 'توصيل' },
+  { id: 'order-handoff', title: 'تسليم الطلب لجهة التوصيل', subtitle: 'ربط التسليم بخطوة handoff الرسمية حسب وضع التنفيذ.', badgeLabel: 'تنفيذ' },
+  { id: 'order-out-for-delivery', title: 'قيد التوصيل', subtitle: 'متابعة الطلب بعد مغادرته الفرع ضمن وضع التنفيذ الحالي.', badgeLabel: 'توصيل' },
   { id: 'order-prepare', title: 'تحضير الطلب', subtitle: 'إدارة مرحلة التحضير قبل الجاهزية.', badgeLabel: 'تنفيذ' },
-  { id: 'order-ready', title: 'الطلب جاهز', subtitle: 'تأكيد الجاهزية قبل handoff أو التسليم.', badgeLabel: 'تنفيذ' },
+  { id: 'order-ready', title: 'الطلب جاهز', subtitle: 'تأكيد الجاهزية قبل handoff أو الاستلام أو التسليم.', badgeLabel: 'تنفيذ' },
   { id: 'order-store-delivered', title: 'تم التسليم من الفرع', subtitle: 'إغلاق حالة التسليم من جهة الفرع.', badgeLabel: 'إغلاق' },
 ] as const;
 

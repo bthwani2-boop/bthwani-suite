@@ -2,6 +2,7 @@ import React from 'react';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+import { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
 
 type PartnerReviewKind = 'activation' | 'documents';
 
@@ -114,11 +115,14 @@ function PartnerReviewBoard({
 
 export function ControlPanelDshPartnerActivationScreen() {
   return (
-    <PartnerReviewBoard
-      kind="activation"
-      title="استقبال تفعيل الشريك"
-      purpose="إبقاء الاستقبال والتفعيل ومراجعة الوثائق في غرفة تحكم مضغوطة."
-    />
+    <Box gap={4}>
+      <PartnerReviewBoard
+        kind="activation"
+        title="استقبال تفعيل الشريك"
+        purpose="إبقاء الاستقبال والتفعيل ومراجعة الوثائق في غرفة تحكم مضغوطة."
+      />
+      <PartnerFulfillmentLane />
+    </Box>
   );
 }
 

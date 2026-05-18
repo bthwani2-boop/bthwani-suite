@@ -37,7 +37,7 @@ function resolveServiceTypeBadge(serviceType: DshCaptainOrderServiceType): Servi
 	if (serviceType === 'shein-final-mile') {
 		return { badgeLabel: 'SHEIN - تسليم نهائي', badgeTone: 'brand' };
 	}
-	return { badgeLabel: 'توصيل', badgeTone: 'warning' };
+	return { badgeLabel: 'توصيل بثواني', badgeTone: 'warning' };
 }
 
 export type DshCaptainOrderDetailSummary = {
@@ -76,6 +76,7 @@ const demoBellItems: DshCaptainOrderBellItem[] = [
 	{
 		id: 'captain-order-9021',
 		serviceType: 'standard',
+		fulfillmentMode: 'bthwani_delivery',
 		title: 'طلب جديد رقم 9021',
 		subtitle: 'Burger Lab بانتظار كابتن يقبل المسار.',
 		meta: 'التالي: مراجعة ثم قبول',
@@ -83,6 +84,7 @@ const demoBellItems: DshCaptainOrderBellItem[] = [
 	{
 		id: 'captain-order-9024',
 		serviceType: 'standard',
+		fulfillmentMode: 'bthwani_delivery',
 		title: 'طلب جديد رقم 9024',
 		subtitle: 'Green Bowl تحتاج مراجعة فورية قبل أن يكبر الصف.',
 		meta: 'التالي: فتح تفاصيل الطلب',
@@ -90,6 +92,7 @@ const demoBellItems: DshCaptainOrderBellItem[] = [
 	{
 		id: 'captain-order-awn-3104',
 		serviceType: 'awnak',
+		fulfillmentMode: 'bthwani_delivery',
 		title: 'طلب نقل محلي رقم 3104',
 		subtitle: 'نقل طعام — من شارع حدة إلى باب اليمن. مجدول الآن.',
 		meta: 'التالي: استلام العنصر من المُرسِل وتوصيله مباشرة',
@@ -97,6 +100,7 @@ const demoBellItems: DshCaptainOrderBellItem[] = [
 	{
 		id: 'captain-order-spx-2078',
 		serviceType: 'shein-final-mile',
+		fulfillmentMode: 'bthwani_delivery',
 		title: 'تسليم نهائي SHEIN رقم 2078',
 		subtitle: 'استلام من نقطة الفرز بثواني وتوصيل إلى العميل لمى ناصر.',
 		meta: 'التالي: استلام الطرد من نقطة الفرز فقط — لا شراء ولا استيراد',
@@ -231,7 +235,7 @@ function OrderInboxSection({
 	return (
 		<DshOperationScreen
 			title="صندوق طلبات الكابتن"
-			subtitle="مسار الصندوق أولًا يبقي الطلب الفوري واضحًا ويزيل ضجيج اللوحة."
+			subtitle="هذا الصندوق يعرض طلبات توصيل بثواني فقط — لا تظهر هنا طلبات توصيل المتجر أو الاستلام الذاتي."
 			content={
 				<Box gap={3}>
 					<Surface tone="brand" gap={3}>

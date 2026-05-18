@@ -2,6 +2,23 @@ import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 import type { DshPartnerPreparationStage } from '../../shared/dsh-order-journey.model';
 
+type PartnerFulfillmentMode = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
+
+const FULFILLMENT_MODE_INSTRUCTIONS: Record<PartnerFulfillmentMode, { title: string; instruction: string }> = {
+  pickup: {
+    title: 'استلام بنفسي',
+    instruction: 'جهّز الطلب لاستلام العميل — لا كابتن ولا موصل.',
+  },
+  partner_delivery: {
+    title: 'توصيل المتجر',
+    instruction: 'جهّز الطلب وعيّن موصل الشريك — لا كابتن بثواني.',
+  },
+  bthwani_delivery: {
+    title: 'توصيل بثواني',
+    instruction: 'جهّز الطلب لتسليمه لكابتن بثواني — انتظر تعيين الكابتن.',
+  },
+};
+
 export type PartnerOrderActionFlowId =
   | 'order-accept'
   | 'order-get'
@@ -23,16 +40,52 @@ const ORDER_ACTION_ITEMS: Array<DshPartnerPreparationStage & { id: PartnerOrderA
 
 export type DshPartnerOrderActionPanelProps = {
   activeFlowId?: PartnerOrderActionFlowId;
+  fulfillmentMode?: PartnerFulfillmentMode;
   onSelectFlow?: (flowId: PartnerOrderActionFlowId) => void;
 };
 
-export function DshPartnerOrderActionPanel({ activeFlowId, onSelectFlow }: DshPartnerOrderActionPanelProps) {
+export function DshPartnerOrderActionPanel({ activeFlowId, fulfillmentMode, onSelectFlow }: DshPartnerOrderActionPanelProps) {
+  const resolvedMode: PartnerFulfillmentMode = fulfillmentMode ?? 'bthwani_delivery';
+  const modeInfo = FULFILLMENT_MODE_INSTRUCTIONS[resolvedMode];
+
   return (
     <Surface tone="raised" gap={3}>
       <SectionHeader
         title="مسارات تنفيذ الطلب"
         subtitle="إجراءات الطلب تبقى قصيرة وواضحة من القبول حتى الإغلاق دون أي منطق خلفي."
       />
+
+      <Surface tone="default" gap={2}>
+        <Text role="label">{modeInfo.title}</Text>
+        <Text role="bodySm" tone="muted">{modeInfo.instruction}</Text>
+      </Surface>
+
+      {resolvedMode === 'partner_delivery' ? (
+        <Surface tone="raised" gap={2}>
+          <SectionHeader
+            title="موصل الشريك"
+            subtitle="UI_PREVIEW_ONLY — تعيين الموصل يتم عبر إعدادات الفريق لاحقًا."
+          />
+          <ListItem
+            title="اسم الموصل"
+            subtitle="لم يُعيَّن بعد — أضف موصل الشريك من إعدادات الفريق."
+            badgeLabel="معلّق"
+          />
+          <ListItem
+            title="حالة التعيين"
+            subtitle="في انتظار التعيين من مشرف الفرع."
+            badgeLabel="لم يُعيَّن"
+          />
+          <Box gap={2}>
+            <Button label="جاهز للخروج" size="sm" tone="secondary" fullWidth={false} />
+            <Button label="تم التسليم من طرف الشريك" size="sm" fullWidth={false} />
+          </Box>
+          <Text role="bodySm" tone="muted">
+            موصل الشريك مسؤول عن التوصيل — لا كابتن بثواني في هذا الطلب.
+          </Text>
+        </Surface>
+      ) : null}
+
       <Box gap={2}>
         {ORDER_ACTION_ITEMS.map((item) => (
           <ListItem

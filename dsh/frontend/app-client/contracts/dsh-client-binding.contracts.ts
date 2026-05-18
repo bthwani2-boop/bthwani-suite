@@ -50,7 +50,63 @@ export type DshClientExceptionReason =
   | 'return_required'
   | 'redispatch_required';
 
+// Timing modes (when) — separate concern from delivery modes (how).
+// 'instant' and 'scheduled' describe when the order is fulfilled, not who delivers it.
 export type DshClientFulfillmentMode = 'instant' | 'scheduled' | 'pickup' | 'partner_delivery' | 'bthwani_delivery';
+
+// Canonical delivery modes — the three authoritative values for how an order is physically fulfilled.
+// `partner_delivery` is the canonical code for what users/operators may also call
+// "store delivery" / "partner delivery", but the displayed Arabic label remains "توصيل المتجر".
+// Use this type anywhere the delivery channel (not timing) is the decision variable.
+export type DshFulfillmentDeliveryMode = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
+
+export type DshFulfillmentDeliveryModeMeta = {
+  readonly mode: DshFulfillmentDeliveryMode;
+  readonly label: string;
+  readonly icon: string;
+  readonly operationalOwner: string;
+  readonly financialOwner: 'WLT';
+  readonly requiresCaptain: boolean;
+  readonly requiresPartnerCourier: boolean;
+  readonly requiresCustomerPickup: boolean;
+};
+
+export const DSH_FULFILLMENT_DELIVERY_MODE_META: Readonly<Record<DshFulfillmentDeliveryMode, DshFulfillmentDeliveryModeMeta>> = {
+  bthwani_delivery: {
+    mode: 'bthwani_delivery',
+    label: 'توصيل بثواني',
+    icon: 'bicycle-outline',
+    operationalOwner: 'DSH Operations + Captain',
+    financialOwner: 'WLT',
+    requiresCaptain: true,
+    requiresPartnerCourier: false,
+    requiresCustomerPickup: false,
+  },
+  partner_delivery: {
+    mode: 'partner_delivery',
+    label: 'توصيل المتجر',
+    icon: 'storefront-outline',
+    operationalOwner: 'Partner / Store Courier',
+    financialOwner: 'WLT',
+    requiresCaptain: false,
+    requiresPartnerCourier: true,
+    requiresCustomerPickup: false,
+  },
+  pickup: {
+    mode: 'pickup',
+    label: 'استلم بنفسك',
+    icon: 'bag-handle-outline',
+    operationalOwner: 'Client + Store',
+    financialOwner: 'WLT',
+    requiresCaptain: false,
+    requiresPartnerCourier: false,
+    requiresCustomerPickup: true,
+  },
+} as const;
+
+export function getDshFulfillmentDeliveryModeMeta(mode: DshFulfillmentDeliveryMode): DshFulfillmentDeliveryModeMeta {
+  return DSH_FULFILLMENT_DELIVERY_MODE_META[mode];
+}
 
 export type DshClientEventActorRole = 'client' | 'store' | 'partner' | 'captain' | 'support' | 'system';
 

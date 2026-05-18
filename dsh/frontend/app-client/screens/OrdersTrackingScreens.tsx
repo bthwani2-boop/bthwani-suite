@@ -41,7 +41,9 @@ import type {
   DshClientProofOfDeliveryVisibility,
   DshClientServiceabilityQuote,
   DshClientWalletImpactVisibility,
+  DshFulfillmentDeliveryMode,
 } from '../contracts/dsh-client-binding.contracts';
+import { getDshFulfillmentDeliveryModeMeta } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
 
 type CreateOrderValues = {
@@ -60,9 +62,8 @@ type DshOrderListItem = {
   timestamp: string;
   total?: string;
   isActive?: boolean;
-  fulfillmentType?: 'delivery' | 'pickup';
+  fulfillmentMode?: DshFulfillmentDeliveryMode;
   rawStatus?: DshClientState;
-  deliveryProvider?: 'bthwani' | 'store';
   summary?: string;
 };
 
@@ -117,6 +118,7 @@ export type DshTrackingScreenProps = {
   values?: CreateOrderValues;
   clientState?: DshClientState;
   currentStatusLabel?: string;
+  fulfillmentMode?: DshFulfillmentDeliveryMode;
   timeline?: DshTrackingTimelineItem[];
   onSupport?: () => void;
   onRetry?: () => void;
@@ -149,15 +151,55 @@ const FULL_JOURNEY_STEPS: JourneyStep[] = [
   { id: 'operations_approved', title: 'اعتماد العمليات', detail: 'تمت الموافقة على الطلب.' },
   { id: 'order_received', title: 'استلم المتجر', detail: 'استلم المتجر الطلب وبدأ التجهيز.' },
   { id: 'preparing', title: 'قيد التجهيز', detail: 'يجهّز المتجر الطلب.' },
-  { id: 'ready_for_pickup', title: 'جاهز للاستلام', detail: 'الطلب جاهز، الكابتن في الطريق.' },
+  { id: 'ready_for_pickup', title: 'جاهز للاستلام', detail: 'الطلب جاهز في المتجر.' },
   { id: 'captain_assigned', title: 'تم تعيين الكابتن', detail: 'كابتن مكلّف وهو في طريقه للاستلام.' },
   { id: 'picked_up', title: 'استلم الكابتن الطلب', detail: 'الطلب مع الكابتن متجهًا نحوك.' },
   { id: 'enroute_to_customer', title: 'في الطريق إليك', detail: 'الطلب في الطريق. تحديث كل 3 دقائق بدون خريطة حية.' },
-  { id: 'near_customer', title: 'الطلب قريب منك', detail: 'الكابتن على مقربة من موقعك.' },
-  { id: 'at_door', title: 'الكابتن عند بابك', detail: 'وصل الكابتن إلى موقع التسليم.' },
+  { id: 'near_customer', title: 'الطلب قريب منك', detail: 'على مقربة من موقعك.' },
+  { id: 'at_door', title: 'وصل إلى موقع التسليم', detail: 'وصل إلى موقع التسليم.' },
   { id: 'bell_rang', title: 'تم قرع الجرس', detail: 'أُرسل إشعار الوصول. استعد لاستلام طلبك.' },
   { id: 'delivered', title: 'تم التسليم', detail: 'استلمت طلبك. شكرًا لاستخدام بثواني.' },
 ];
+
+function getStepModeOverride(stepId: string, mode: DshFulfillmentDeliveryMode): { title: string; detail: string } | null {
+  if (mode === 'bthwani_delivery') {
+    const overrides: Partial<Record<string, { title: string; detail: string }>> = {
+      ready_for_pickup: { title: 'جاهز للاستلام', detail: 'الطلب جاهز، الكابتن في الطريق.' },
+      captain_assigned: { title: 'تم تعيين الكابتن', detail: 'كابتن مكلّف وهو في طريقه للاستلام.' },
+      picked_up: { title: 'استلم الكابتن الطلب', detail: 'الطلب مع الكابتن متجهًا نحوك.' },
+      enroute_to_customer: { title: 'في الطريق إليك', detail: 'الطلب في الطريق مع الكابتن. تحديث كل 3 دقائق.' },
+      near_customer: { title: 'الطلب قريب منك', detail: 'الكابتن على مقربة من موقعك.' },
+      at_door: { title: 'الكابتن عند بابك', detail: 'وصل الكابتن إلى موقع التسليم.' },
+      bell_rang: { title: 'تم قرع الجرس', detail: 'الكابتن أرسل إشعار وصوله. استعد لاستلام طلبك.' },
+    };
+    return overrides[stepId] ?? null;
+  }
+  if (mode === 'partner_delivery') {
+    const overrides: Partial<Record<string, { title: string; detail: string }>> = {
+      ready_for_pickup: { title: 'جاهز للاستلام', detail: 'الطلب جاهز، بانتظار موصل المتجر.' },
+      captain_assigned: { title: 'تم تعيين موصل المتجر', detail: 'موصل المتجر مكلّف وهو في طريقه.' },
+      picked_up: { title: 'استلم موصل المتجر الطلب', detail: 'الطلب مع موصل المتجر متجهًا نحوك.' },
+      enroute_to_customer: { title: 'في الطريق إليك', detail: 'موصل المتجر في الطريق. تحديث كل 3 دقائق.' },
+      near_customer: { title: 'الطلب قريب منك', detail: 'موصل المتجر على مقربة من موقعك.' },
+      at_door: { title: 'موصل المتجر عند بابك', detail: 'وصل موصل المتجر إلى موقع التسليم.' },
+      bell_rang: { title: 'تم قرع الجرس', detail: 'أُرسل إشعار الوصول. استعد لاستلام طلبك.' },
+    };
+    return overrides[stepId] ?? null;
+  }
+  if (mode === 'pickup') {
+    const overrides: Partial<Record<string, { title: string; detail: string }>> = {
+      ready_for_pickup: { title: 'الطلب جاهز للاستلام', detail: 'توجه إلى المتجر لاستلام طلبك.' },
+      captain_assigned: { title: 'بانتظار استلامك', detail: 'الطلب محفوظ بانتظار وصولك للمتجر.' },
+      picked_up: { title: 'تأكيد من المتجر', detail: 'المتجر جاهز لتسليمك الطلب.' },
+      enroute_to_customer: { title: 'في الطريق إلى المتجر', detail: 'يرجى التوجه إلى المتجر مباشرة.' },
+      near_customer: { title: 'على وشك الوصول', detail: 'يبدو أنك قريب من المتجر.' },
+      at_door: { title: 'استلم طلبك', detail: 'أنت عند المتجر. أبرز رقم طلبك للاستلام.' },
+      bell_rang: { title: 'تأكيد الاستلام', detail: 'انتظر تأكيد المتجر لاستلامك للطلب.' },
+    };
+    return overrides[stepId] ?? null;
+  }
+  return null;
+}
 
 function lifecycleToStepId(status: DshClientDeliveryLifecycleStatus): string {
   switch (status) {
@@ -226,10 +268,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     statusLabel: 'في الطريق',
     timestamp: '2026-05-17T22:14:43+03:00',
     isActive: true,
-    fulfillmentType: 'delivery',
+    fulfillmentMode: 'bthwani_delivery',
     rawStatus: 'tracking_active',
     total: '45.00 ر.ي',
-    deliveryProvider: 'bthwani',
     summary: '٢ وجبة شاورما هليل كلاسيك، ١ بطاطس عائلي، ١ عصير برتقال',
   },
   {
@@ -239,10 +280,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     statusLabel: 'قيد المراجعة',
     timestamp: '2026-05-17T21:46:43+03:00',
     isActive: true,
-    fulfillmentType: 'delivery',
+    fulfillmentMode: 'partner_delivery',
     rawStatus: 'order_created',
     total: '120.00 ر.ي',
-    deliveryProvider: 'store',
     summary: '١ كبسة لحم حاشي، ٢ كولا، ١ سلطة حارة',
   },
   {
@@ -252,10 +292,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     statusLabel: 'تم التسليم',
     timestamp: '2026-05-16T19:30:00+03:00',
     isActive: false,
-    fulfillmentType: 'delivery',
+    fulfillmentMode: 'bthwani_delivery',
     rawStatus: 'delivered',
     total: '84.00 ر.ي',
-    deliveryProvider: 'bthwani',
     summary: '٣ وجبة شاورما عربي، ١ بطاطس تويستر كبير',
   },
   {
@@ -265,7 +304,7 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     statusLabel: 'جاهز للاستلام',
     timestamp: '2026-05-16T11:00:00+03:00',
     isActive: false,
-    fulfillmentType: 'pickup',
+    fulfillmentMode: 'pickup',
     rawStatus: 'delivered',
     total: '35.00 ر.ي',
     summary: '٦ حبات دونات مشكل، ١ قهوة باردة كبيرة',
@@ -277,10 +316,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     statusLabel: 'فشل الدفع',
     timestamp: '2026-05-15T09:15:00+03:00',
     isActive: false,
-    fulfillmentType: 'delivery',
+    fulfillmentMode: 'bthwani_delivery',
     rawStatus: 'failed',
     total: '28.00 ر.ي',
-    deliveryProvider: 'bthwani',
     summary: '١ قهوة تركية، ١ دونات زعتر',
   },
 ];
@@ -452,18 +490,9 @@ function OrderRow({
 }) {
   const { theme } = useTheme();
 
-  let deliveryText = '';
-  if (item.fulfillmentType === 'pickup') {
-    deliveryText = 'استلام بنفسي';
-  } else {
-    if (item.deliveryProvider === 'bthwani') {
-      deliveryText = 'توصيل بثواني';
-    } else if (item.deliveryProvider === 'store') {
-      deliveryText = 'توصيل المتجر';
-    } else {
-      deliveryText = 'توصيل';
-    }
-  }
+  const resolvedMode: DshFulfillmentDeliveryMode = item.fulfillmentMode ?? 'bthwani_delivery';
+  const modeMeta = getDshFulfillmentDeliveryModeMeta(resolvedMode);
+  const isBrand = resolvedMode === 'bthwani_delivery';
 
   return (
     <View style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
@@ -504,16 +533,8 @@ function OrderRow({
               style={{
                 flexDirection: 'row-reverse',
                 alignItems: 'center',
-                backgroundColor: item.fulfillmentType === 'pickup'
-                  ? theme.surfaceRaised
-                  : item.deliveryProvider === 'bthwani'
-                  ? theme.brandSurface
-                  : theme.surfaceRaised,
-                borderColor: item.fulfillmentType === 'pickup'
-                  ? theme.line
-                  : item.deliveryProvider === 'bthwani'
-                  ? theme.brand
-                  : theme.line,
+                backgroundColor: isBrand ? theme.brandSurface : theme.surfaceRaised,
+                borderColor: isBrand ? theme.brand : theme.line,
                 borderWidth: 1,
                 borderRadius: 4,
                 paddingHorizontal: spacing[1.5],
@@ -522,35 +543,19 @@ function OrderRow({
               }}
             >
               <Icon
-                name={
-                  item.fulfillmentType === 'pickup'
-                    ? 'walk-outline'
-                    : item.deliveryProvider === 'bthwani'
-                    ? 'flash-outline'
-                    : 'storefront-outline'
-                }
+                name={modeMeta.icon}
                 size={11}
-                color={
-                  item.fulfillmentType === 'pickup'
-                    ? theme.textSoft
-                    : item.deliveryProvider === 'bthwani'
-                    ? theme.brand
-                    : theme.textSoft
-                }
+                color={isBrand ? theme.brand : theme.textSoft}
               />
               <Text
                 role="bodySm"
                 style={{
                   fontSize: 11,
                   fontWeight: '700',
-                  color: item.fulfillmentType === 'pickup'
-                    ? theme.textSoft
-                    : item.deliveryProvider === 'bthwani'
-                    ? theme.brand
-                    : theme.textSoft,
+                  color: isBrand ? theme.brand : theme.textSoft,
                 }}
               >
-                {deliveryText}
+                {modeMeta.label}
               </Text>
             </Box>
             <Text role="bodySm" tone="muted" style={{ fontSize: 12 }}>
@@ -916,7 +921,7 @@ function formatFulfillmentMode(mode: DshClientFulfillmentModeSnapshot['mode']): 
     instant: 'فوري',
     scheduled: 'مجدول',
     pickup: 'استلام من المتجر',
-    partner_delivery: 'توصيل الشريك',
+    partner_delivery: 'توصيل المتجر',
     bthwani_delivery: 'توصيل بثواني',
   };
 
@@ -1217,7 +1222,7 @@ function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smar
   const { theme } = useTheme();
 
   const proximityAlert = smartTracking.proximityState === 'bell_rang'
-    ? { label: 'الكابتن ضغط زر الجرس', tone: 'brand' as const, icon: 'notifications' as const }
+    ? { label: 'تم قرع الجرس — استعد للاستلام', tone: 'brand' as const, icon: 'notifications' as const }
     : smartTracking.proximityState === 'at_door'
       ? { label: 'الطلب عند بابك', tone: 'success' as const, icon: 'home-outline' as const }
       : smartTracking.proximityState === 'near_customer'
@@ -1367,6 +1372,7 @@ type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
   clientState?: DshClientState;
+  fulfillmentMode?: DshFulfillmentDeliveryMode;
   onPrimaryAction?: () => void;
   onBack?: () => void;
   onSupport?: () => void;
@@ -1376,9 +1382,14 @@ type CreateOrderJourneyScreenProps = {
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', onPrimaryAction, onBack, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
+  const resolvedMode: DshFulfillmentDeliveryMode = fulfillmentMode ?? 'bthwani_delivery';
+  const isBthwaniDelivery = resolvedMode === 'bthwani_delivery';
+  const isPartnerDelivery = resolvedMode === 'partner_delivery';
+  const isPickup = resolvedMode === 'pickup';
+  const deliveryActorLabel = isBthwaniDelivery ? 'الكابتن' : isPartnerDelivery ? 'موصل المتجر' : '';
   const [productRating, setProductRating] = React.useState(0);
   const [captainRating, setCaptainRating] = React.useState(0);
   const [ratingsSubmitted, setRatingsSubmitted] = React.useState(false);
@@ -1395,7 +1406,11 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
   const issueTypes = [
     { id: 'not_received', label: 'لم أستلم الطلب' },
-    { id: 'captain_not_arrived', label: 'الكابتن لم يصل' },
+    ...(isBthwaniDelivery
+      ? [{ id: 'captain_not_arrived', label: 'الكابتن لم يصل' }]
+      : isPartnerDelivery
+        ? [{ id: 'courier_not_arrived', label: 'موصل المتجر لم يصل' }]
+        : [{ id: 'store_not_ready', label: 'الطلب غير جاهز في المتجر' }]),
     { id: 'missing_items', label: 'الطلب ناقص' },
     { id: 'damaged_product', label: 'المنتج تالف' },
     { id: 'huge_delay', label: 'تأخر كبير' },
@@ -1413,8 +1428,8 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
   const smartTracking = useSmartTrackingHeartbeat(phase);
   const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
-    id: 'chat-captain-1',
-    senderLabel: 'الكابتن المكلّف',
+    id: 'chat-actor-1',
+    senderLabel: isBthwaniDelivery ? 'الكابتن المكلّف' : isPartnerDelivery ? 'موصل المتجر' : 'دعم الطلب',
     body: 'إذا احتجت صورة أو فيديو أو رسالة صوتية للمنتج فأرسلها هنا ضمن نفس الطلب.',
     time: 'قبل قليل',
     tone: 'info',
@@ -1434,17 +1449,33 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
   const heroTitle = isTrackingJourneyState
     ? phase === 'route'
-      ? 'الكابتن في الطريق إليك'
+      ? isBthwaniDelivery
+        ? 'الكابتن في الطريق إليك'
+        : isPartnerDelivery
+          ? 'الطلب في الطريق مع موصل المتجر'
+          : 'طلبك جاهز في المتجر'
       : phase === 'arrived'
-        ? 'الكابتن وصل إلى موقع التسليم'
+        ? isBthwaniDelivery
+          ? 'الكابتن وصل إلى موقع التسليم'
+          : isPartnerDelivery
+            ? 'موصل المتجر وصل إلى موقعك'
+            : 'طلبك جاهز للاستلام الآن'
         : 'تم تسليم الطلب'
     : clientStateMeta.title;
 
   const heroSummary = isTrackingJourneyState
     ? phase === 'route'
-      ? 'طلبك في الطريق مع الكابتن. يمكنك متابعة الوقت التقريبي للوصول بالأسفل.'
+      ? isBthwaniDelivery
+        ? 'طلبك في الطريق مع الكابتن. يمكنك متابعة الوقت التقريبي للوصول بالأسفل.'
+        : isPartnerDelivery
+          ? 'الطلب في الطريق مع موصل المتجر. يمكنك متابعة الوقت التقريبي بالأسفل.'
+          : 'توجه إلى المتجر لاستلام طلبك مباشرة.'
       : phase === 'arrived'
-        ? 'الكابتن وصل إلى موقع التسليم وهو بانتظارك لتسليم الطلب.'
+        ? isBthwaniDelivery
+          ? 'الكابتن وصل إلى موقع التسليم وهو بانتظارك لتسليم الطلب.'
+          : isPartnerDelivery
+            ? 'موصل المتجر وصل. استعد لاستلام طلبك.'
+            : 'أنت على وشك الاستلام. أبرز رقم طلبك للمتجر.'
         : 'تم تسليم الطلب بنجاح. شكراً لك! يمكنك تقييم الخدمة أو طلب الدعم إذا واجهت أي مشكلة.'
     : clientStateMeta.description;
 
@@ -1464,9 +1495,17 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
   const nextStepValue = isTrackingJourneyState
     ? phase === 'route'
-      ? 'انتظر وصول الكابتن لموقعك'
+      ? isBthwaniDelivery
+        ? 'انتظر وصول الكابتن لموقعك'
+        : isPartnerDelivery
+          ? 'انتظر وصول موصل المتجر'
+          : 'توجه إلى المتجر لاستلام طلبك'
       : phase === 'arrived'
-        ? 'استلم طلبك من الكابتن'
+        ? isBthwaniDelivery
+          ? 'استلم طلبك من الكابتن'
+          : isPartnerDelivery
+            ? 'استلم طلبك من موصل المتجر'
+            : 'استلم طلبك من المتجر'
         : 'طلبك مكتمل بنجاح'
     : clientStateMeta.description;
 
@@ -1507,13 +1546,14 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       ? 'تم إرسال التقييمين. أي تعديل جديد سيعيد فتح الإرسال.'
       : 'اختر تقييم المنتج من 1 إلى 5 ثم أرسل التقييم بالأسفل.';
 
+  const deliveryActorRatingLabel = isBthwaniDelivery ? 'الكابتن' : isPartnerDelivery ? 'موصل المتجر' : 'الخدمة';
   const captainHelperText = phase === 'route'
-    ? 'سيظهر تقييم الكابتن بعد الاستلام.'
+    ? `سيظهر تقييم ${deliveryActorRatingLabel} بعد الاستلام.`
     : phase === 'arrived'
-      ? 'سيبقى تقييم الكابتن مؤجلًا حتى تثبيت الاستلام.'
+      ? `سيبقى تقييم ${deliveryActorRatingLabel} مؤجلًا حتى تثبيت الاستلام.`
     : ratingsSubmitted
-      ? 'تم إرسال التقييمين. يمكنك تعديل الكابتن ثم إعادة الإرسال.'
-      : 'اختر تقييم الكابتن من 1 إلى 5 ثم أرسل التقييم بالأسفل.';
+      ? `تم إرسال التقييمين. يمكنك تعديل ${deliveryActorRatingLabel} ثم إعادة الإرسال.`
+      : `اختر تقييم ${deliveryActorRatingLabel} من 1 إلى 5 ثم أرسل التقييم بالأسفل.`;
 
   const handleProductRatingChange = (nextValue: number) => {
     setProductRating(nextValue);
@@ -1623,7 +1663,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
     stickyNote = ratingsSubmitted
       ? 'تم حفظ التقييم بنجاح. شكراً لك!'
-      : 'يمكنك تقييم المنتج والكابتن أو التخطي بالضغط على تقييم لاحقاً.';
+      : `يمكنك تقييم المنتج و${deliveryActorRatingLabel} أو التخطي بالضغط على تقييم لاحقاً.`;
   }
 
   const reviewStateLabel = phase === 'received' ? (ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن') : 'مؤجل حتى الاستلام';
@@ -1655,13 +1695,13 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
             </Box>
           </Box>
 
-          {isTrackingJourneyState && phase !== 'received' && (
+          {isTrackingJourneyState && phase !== 'received' && !isPickup && (
             <Box layoutDirection="row" justify="flex-end" gap={2} style={{ flexDirection: 'row-reverse' }}>
               {smartTracking.proximityState === 'near_customer' && (
-                <Chip label="الكابتن قريب" tone="warning" />
+                <Chip label={`${deliveryActorLabel} قريب`} tone="warning" />
               )}
               {(smartTracking.proximityState === 'at_door' || smartTracking.proximityState === 'bell_rang' || phase === 'arrived') && (
-                <Chip label="الكابتن وصل" tone="success" />
+                <Chip label={`${deliveryActorLabel} وصل`} tone="success" />
               )}
             </Box>
           )}
@@ -1693,21 +1733,27 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
           <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>التواصل والمساعدة</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            يمكنك مراسلة الكابتن مباشرة داخل الطلب، أو تنبيهه، أو طلب الدعم والمساعدة عند وجود مشكلة.
+            {isBthwaniDelivery
+              ? 'يمكنك مراسلة الكابتن مباشرة داخل الطلب، أو تنبيهه، أو طلب الدعم والمساعدة عند وجود مشكلة.'
+              : isPartnerDelivery
+                ? 'يمكنك متابعة حالة التوصيل أو التواصل مع دعم الطلب عند وجود مشكلة.'
+                : 'تواصل مع المتجر أو طلب الدعم عند الحاجة.'}
           </Text>
 
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', flexDirection: 'row-reverse' }}>
-            <Button
-              label={isChatExpanded ? "إغلاق المراسلة" : "مراسلة الكابتن"}
-              tone={isChatExpanded ? "brand" : "secondary"}
-              leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
-              onPress={() => setIsChatExpanded(!isChatExpanded)}
-              style={{ flex: 1, minWidth: 120 }}
-            />
-            {!hasClientReceived && (
+            {!isPickup && (
               <Button
-                label={hasAlertedCaptain ? "تم تنبيه الكابتن" : "تنبيه الكابتن"}
-                tone={hasAlertedCaptain ? "ghost" : "secondary"}
+                label={isChatExpanded ? 'إغلاق المراسلة' : isBthwaniDelivery ? 'مراسلة الكابتن' : 'مراسلة دعم الطلب'}
+                tone={isChatExpanded ? 'brand' : 'secondary'}
+                leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
+                onPress={() => setIsChatExpanded(!isChatExpanded)}
+                style={{ flex: 1, minWidth: 120 }}
+              />
+            )}
+            {isBthwaniDelivery && !hasClientReceived && (
+              <Button
+                label={hasAlertedCaptain ? 'تم تنبيه الكابتن' : 'تنبيه الكابتن'}
+                tone={hasAlertedCaptain ? 'ghost' : 'secondary'}
                 disabled={hasAlertedCaptain}
                 leadingAccessory={<Icon name="notifications-outline" size={18} color={hasAlertedCaptain ? theme.textSoft : theme.brand} />}
                 onPress={() => setHasAlertedCaptain(true)}
@@ -1715,15 +1761,15 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
               />
             )}
             <Button
-              label={isSupportExpanded ? "إغلاق الدعم" : "الدعم أو الإبلاغ عن مشكلة"}
-              tone={isSupportExpanded ? "brand" : "secondary"}
+              label={isSupportExpanded ? 'إغلاق الدعم' : 'الدعم أو الإبلاغ عن مشكلة'}
+              tone={isSupportExpanded ? 'brand' : 'secondary'}
               leadingAccessory={<Icon name="help-circle-outline" size={18} color={isSupportExpanded ? theme.brandContrast : theme.brand} />}
               onPress={() => setIsSupportExpanded(!isSupportExpanded)}
               style={{ flex: 1, minWidth: 120 }}
             />
           </Box>
 
-          {hasAlertedCaptain && !hasClientReceived && (
+          {isBthwaniDelivery && hasAlertedCaptain && !hasClientReceived && (
             <Box layoutDirection="row-reverse" align="center" gap={2} style={{ marginTop: 4 }}>
               <Icon name="checkmark-circle-outline" size={16} color={theme.success} />
               <Text role="bodySm" style={{ color: theme.success, textAlign: 'right' }}>
@@ -1734,9 +1780,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         </Surface>
 
         {/* Inline Chat toggled by Message Button */}
-        {isChatExpanded && (
+        {isChatExpanded && !isPickup && (
           <OrderLinkedChat
-            title="الدردشة مع الكابتن"
+            title={isBthwaniDelivery ? 'الدردشة مع الكابتن' : 'التواصل مع دعم الطلب'}
             subtitle={phase === 'received' ? 'السجل ظاهر للمراجعة فقط بعد الاستلام.' : 'آخر رسالة ومرفقات سريعة داخل نفس الصندوق.'}
             statusLabel={phase === 'received' ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'}
             statusTone={phase === 'received' ? 'warning' : 'brand'}
@@ -1748,7 +1794,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
               tone: lastChatMessage.tone,
             }}
             quickActions={quickActions}
-            inputLabel="رسالة إلى الكابتن"
+            inputLabel={isBthwaniDelivery ? 'رسالة إلى الكابتن' : 'رسالة إلى دعم الطلب'}
             inputPlaceholder="اكتب رسالتك هنا"
             value={draftMessage}
             onChangeText={setDraftMessage}
@@ -1901,7 +1947,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         {hasClientReceived && (
           <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
             <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700', color: theme.success }}>تقييم الخدمة وما بعد التسليم</Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يسعدنا معرفة رأيك في جودة المنتج وتجربتك مع الكابتن.</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              {`يسعدنا معرفة رأيك في جودة المنتج وتجربتك مع ${deliveryActorRatingLabel}.`}
+            </Text>
 
             <DeferredReviewBlock
               title="تقييم المنتج"
@@ -1917,10 +1965,10 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
             />
 
             <DeferredReviewBlock
-              title="تقييم الكابتن"
-              subtitle="كيف كانت تجربة التواصل وسرعة التوصيل مع الكابتن؟"
+              title={`تقييم ${deliveryActorRatingLabel}`}
+              subtitle={`كيف كانت تجربة ${isBthwaniDelivery ? 'التواصل وسرعة التوصيل مع الكابتن' : isPartnerDelivery ? 'التوصيل مع موصل المتجر' : 'الاستلام والخدمة'}؟`}
               enabled={true}
-              placeholderText="يرجى تقييم الكابتن"
+              placeholderText={`يرجى تقييم ${deliveryActorRatingLabel}`}
               currentValueLabel={captainRatingLabel}
               stateLabel={reviewStateLabel}
               helperText={captainHelperText}
@@ -2164,7 +2212,7 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
   );
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, timeline = [], onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, fulfillmentMode, timeline = [], onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
@@ -2178,6 +2226,7 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
         values={values}
         timeline={fallbackTimeline}
         clientState={clientState}
+        fulfillmentMode={fulfillmentMode}
         initialPhase="received"
         currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
         onSupport={onSupport}
@@ -2197,6 +2246,7 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
       values={values}
       timeline={fallbackTimeline}
       clientState={clientState}
+      fulfillmentMode={fulfillmentMode}
       initialPhase="route"
       currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
       onSupport={onSupport}

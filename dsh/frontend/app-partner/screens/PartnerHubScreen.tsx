@@ -36,7 +36,7 @@ import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
 
 type PartnerOperationalMode = {
-  id: 'pickup' | 'delivery' | 'scheduled';
+  id: 'pickup' | 'partner_delivery' | 'bthwani_delivery';
   title: string;
   subtitle: string;
   commission: string;
@@ -88,8 +88,8 @@ type NotificationPreferenceState = Record<NotificationPreferenceId, boolean>;
 
 const defaultOperationalModes: readonly PartnerOperationalMode[] = [
   { id: 'pickup', title: 'استلم بنفسك', subtitle: 'استلام من الفرع مباشرة.', commission: getWltDshPartnerOperationalModeCommission('pickup'), enabled: true },
-  { id: 'delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية.', commission: getWltDshPartnerOperationalModeCommission('delivery'), enabled: true },
-  { id: 'scheduled', title: 'توصيل بثواني', subtitle: 'جدولة سريعة عند الحاجة.', commission: getWltDshPartnerOperationalModeCommission('scheduled'), enabled: false },
+  { id: 'partner_delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية بموصل الشريك.', commission: getWltDshPartnerOperationalModeCommission('partner_delivery'), enabled: true },
+  { id: 'bthwani_delivery', title: 'توصيل بثواني', subtitle: 'توصيل عبر كابتن بثواني.', commission: getWltDshPartnerOperationalModeCommission('bthwani_delivery'), enabled: false },
 ] as const;
 
 const defaultTeamMembers: readonly PartnerTeamMember[] = [
@@ -562,8 +562,17 @@ function HubSectionShell({
 function resolveServiceModeEnabled(serviceModes: readonly { id: string; enabled: boolean }[] | undefined, modeId: PartnerOperationalMode['id'], fallback: boolean) {
   const matched = serviceModes?.find((mode) => {
     if (modeId === 'pickup') return mode.id === 'pickup';
-    if (modeId === 'delivery') return mode.id === 'delivery' || mode.id === 'store-delivery';
-    return mode.id === 'scheduled' || mode.id === 'seconds';
+    // transitional aliases: legacy `delivery` plus textual `store delivery` / `partner delivery`
+    // all map to canonical `partner_delivery` which is displayed as "توصيل المتجر".
+    if (modeId === 'partner_delivery') {
+      return mode.id === 'partner_delivery'
+        || mode.id === 'partner delivery'
+        || mode.id === 'delivery'
+        || mode.id === 'store-delivery'
+        || mode.id === 'store delivery';
+    }
+    // transitional aliases: legacy 'scheduled' / 'seconds' map to bthwani_delivery
+    return mode.id === 'bthwani_delivery' || mode.id === 'scheduled' || mode.id === 'seconds';
   });
 
   return matched?.enabled ?? fallback;
@@ -625,7 +634,7 @@ function OperationsModeRow({
               flexShrink: 0,
             }}
           >
-            <Icon name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'delivery' ? 'car-outline' : 'time-outline'} size={16} tone={selected ? 'brand' : 'default'} />
+            <Icon name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'partner_delivery' ? 'car-outline' : 'bicycle-outline'} size={16} tone={selected ? 'brand' : 'default'} />
           </View>
 
           <View style={{ flexShrink: 1, minWidth: 0, gap: 2 }}>

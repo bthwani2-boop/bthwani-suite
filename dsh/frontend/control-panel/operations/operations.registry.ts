@@ -26,10 +26,13 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   {
     id: 'live-orders',
     label: 'الطلبات الحية',
-    description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ.',
+    description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ — مصنّفة حسب وضع التنفيذ.',
     badge: 'أساس',
     subGroups: [
       { id: 'all', label: 'الكل' },
+      { id: 'bthwani_delivery', label: 'توصيل بثواني' },
+      { id: 'partner_delivery', label: 'توصيل المتجر' },
+      { id: 'pickup', label: 'استلام بنفسي' },
       { id: 'unassigned', label: 'غير مسندة' },
       { id: 'delayed', label: 'متأخرة' },
       { id: 'pickup-proof', label: 'إثبات الاستلام' },

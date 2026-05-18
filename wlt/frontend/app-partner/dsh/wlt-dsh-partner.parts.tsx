@@ -16,6 +16,7 @@ import {
 } from '@bthwani/ui-kit';
 import type { WltDshPartnerWalletTransaction } from './wlt-dsh-partner.adapter';
 import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
+import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommission } from './wlt-dsh-partner.ui-copy';
 
 type PartnerDshWalletViewState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';
@@ -131,12 +132,20 @@ function resolveLinkedScopeLabel(activeZoneLabel?: string, branchLabel?: string)
   return primaryZone ? `${primaryZone} / ${branchShortLabel}` : branchShortLabel;
 }
 
-function resolveServiceModeEnabled(serviceModes: readonly ServiceModeInput[] | undefined, modeId: 'pickup' | 'delivery' | 'scheduled', fallback: boolean) {
+function resolveServiceModeEnabled(serviceModes: readonly ServiceModeInput[] | undefined, modeId: 'pickup' | 'partner_delivery' | 'bthwani_delivery', fallback: boolean) {
   const matched = serviceModes?.find((mode) => {
     if (modeId === 'pickup') return mode.id === 'pickup';
-    if (modeId === 'delivery') return mode.id === 'delivery' || mode.id === 'store-delivery';
-
-    return mode.id === 'scheduled' || mode.id === 'seconds';
+    // transitional aliases: legacy `delivery` plus textual `store delivery` / `partner delivery`
+    // all map to canonical `partner_delivery` which is displayed as "توصيل المتجر".
+    if (modeId === 'partner_delivery') {
+      return mode.id === 'partner_delivery'
+        || mode.id === 'partner delivery'
+        || mode.id === 'delivery'
+        || mode.id === 'store-delivery'
+        || mode.id === 'store delivery';
+    }
+    // transitional aliases: legacy 'scheduled' / 'seconds' map to bthwani_delivery
+    return mode.id === 'bthwani_delivery' || mode.id === 'scheduled' || mode.id === 'seconds';
   });
 
   return matched?.enabled ?? fallback;
@@ -386,23 +395,23 @@ export function PartnerDshWalletBridgeView({
     {
       id: 'pickup' as const,
       title: 'استلم بنفسك',
-      percentage: '0%',
+      percentage: getWltDshPartnerCommissionLabel(getWltDshPartnerOperationalModeCommission('pickup')),
       icon: 'hand-left-outline' as const,
       enabled: resolveServiceModeEnabled(serviceModes, 'pickup', true),
     },
     {
-      id: 'delivery' as const,
+      id: 'partner_delivery' as const,
       title: 'توصيل المتجر',
-      percentage: '8%',
-      icon: 'car-outline' as const,
-      enabled: resolveServiceModeEnabled(serviceModes, 'delivery', true),
+      percentage: getWltDshPartnerCommissionLabel(getWltDshPartnerOperationalModeCommission('partner_delivery')),
+      icon: 'storefront-outline' as const,
+      enabled: resolveServiceModeEnabled(serviceModes, 'partner_delivery', true),
     },
     {
-      id: 'scheduled' as const,
+      id: 'bthwani_delivery' as const,
       title: 'توصيل بثواني',
-      percentage: '15%',
-      icon: 'flash-outline' as const,
-      enabled: resolveServiceModeEnabled(serviceModes, 'scheduled', false),
+      percentage: getWltDshPartnerCommissionLabel(getWltDshPartnerOperationalModeCommission('bthwani_delivery')),
+      icon: 'bicycle-outline' as const,
+      enabled: resolveServiceModeEnabled(serviceModes, 'bthwani_delivery', false),
     },
   ];
 

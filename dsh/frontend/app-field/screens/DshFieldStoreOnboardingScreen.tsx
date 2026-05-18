@@ -231,6 +231,32 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           <TextField label="ساعات العمل" value={draft.offer.operatingHours} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'operatingHours', value)} />
           <TextField label="الجاهزية / التوصيل" value={draft.offer.deliveryReadiness} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'deliveryReadiness', value)} />
           <TextField label="ملاحظة مالية" value={draft.offer.financeNote} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'financeNote', value)} />
+
+          {store.fulfillmentAgreements && store.fulfillmentAgreements.length > 0 && (
+            <Card
+              title="أوضاع التنفيذ المتفق عليها"
+              subtitle="UI_PREVIEW_ONLY — أرقام العمولة والتسوية مملوكة لـ WLT وليست مصدر حقيقي هنا."
+            >
+              <Box gap={2}>
+                {store.fulfillmentAgreements.map((agreement) => (
+                  <Box key={agreement.mode} layoutDirection="row" justify="space-between" align="center" gap={2}>
+                    <Box gap={0} style={{ flex: 1 }}>
+                      <Text role="bodyStrong" style={{ textAlign: 'right' }}>{agreement.modeLabel}</Text>
+                      <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{agreement.settlementBasis}</Text>
+                    </Box>
+                    <Badge
+                      label={agreement.operationalReadiness === 'ready' ? 'جاهز' : agreement.operationalReadiness === 'pending' ? 'قيد التفعيل' : 'غير مفعّل'}
+                      tone={agreement.operationalReadiness === 'ready' ? 'success' : agreement.operationalReadiness === 'pending' ? 'warning' : 'neutral'}
+                    />
+                    <Badge
+                      label={agreement.enabled ? 'مفعّل' : 'معطّل'}
+                      tone={agreement.enabled ? 'success' : 'neutral'}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            </Card>
+          )}
         </Surface>
       );
     }
