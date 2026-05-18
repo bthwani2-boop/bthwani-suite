@@ -1,4 +1,4 @@
----
+﻿---
 name: bthwani-commercial-growth-contract
 description: Review marketing, loyalty, offers, subscriptions, campaigns, audiences, eligibility, budget, expiry, redemption, and wallet impact.
 version: 2026.05.17-v1
@@ -43,3 +43,29 @@ risks:
 decision: PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 next_action:
 ```
+
+<!-- BTHWANI_EXTERNAL_MARKETINGSKILLS_ADAPTATION_START -->
+## External adaptation: marketing skills
+
+Source: https://github.com/coreyhaines31/marketingskills
+Mode: adapted-not-mirrored.
+
+Use this adaptation inside the existing commercial-growth owner. Do not create a duplicate marketing skill.
+
+Additional commercial-growth duties:
+
+- Start with product, audience, positioning, and value proposition before copy or campaign work.
+- Review CRO, onboarding, paywall, checkout, activation, retention, referrals, churn, lifecycle messages, loyalty, subscriptions, offers, coupons, campaigns, and experiments when relevant.
+- Review SEO, ASO, content strategy, landing pages, app-store listing text, ad creative, and campaign copy when relevant.
+- Review analytics, attribution, event names, metrics, experiment hypothesis, holdout/rollback, expiry, eligibility, and measurement plan.
+- Check finance impact for any discount, coupon, subscription, wallet, ledger, settlement, refund, fee, budget, or redemption behavior.
+- Route configurable campaign or offer behavior to Platform/Vars or the approved control-panel owner.
+- Prevent duplicated commercial behavior across app-client, app-partner, control-panel, WLT/finance, DSH/operations, website, and webapp.
+
+Forbidden:
+
+- no hardcoded money-affecting marketing logic inside local screens
+- no duplicate campaign/offer/subscription logic across surfaces
+- no runtime/API/backend/database change unless explicitly requested
+- no claim of conversion, SEO, ASO, retention, or revenue improvement without measurement evidence
+<!-- BTHWANI_EXTERNAL_MARKETINGSKILLS_ADAPTATION_END -->

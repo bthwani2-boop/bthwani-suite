@@ -1,10 +1,9 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Badge,
   Box,
   Button,
-  Icon,
   MobileScrollView,
   Surface,
   Text,
@@ -46,58 +45,6 @@ type BenefitRow = {
   targetSection?: DshBenefitsSection;
 };
 
-type SectionPickerItem = {
-  value: DshBenefitsSection;
-  label: string;
-  summary: string;
-  badgeLabel: string;
-  badgeTone: 'default' | 'success' | 'warning' | 'danger' | 'brand' | 'info';
-  iconName: React.ComponentProps<typeof Icon>['name'];
-};
-
-const sectionRows: SectionPickerItem[] = [
-  {
-    value: 'now',
-    label: 'الأولوية الآن',
-    summary: 'أقصر طريق لما يفيد الطلب القادم مباشرة.',
-    badgeLabel: 'ذكي',
-    badgeTone: 'brand',
-    iconName: 'flash-outline',
-  },
-  {
-    value: 'loyalty',
-    label: 'النقاط والمكافآت',
-    summary: 'الرصيد، المستوى، وأقرب ثلاث مكافآت.',
-    badgeLabel: 'نقاط',
-    badgeTone: 'info',
-    iconName: 'star-outline',
-  },
-  {
-    value: 'subscription',
-    label: 'الاشتراك',
-    summary: 'الخطة الحالية والتبديل عند الحاجة فقط.',
-    badgeLabel: 'خطة',
-    badgeTone: 'default',
-    iconName: 'card-outline',
-  },
-  {
-    value: 'offers',
-    label: 'العروض والكوبونات',
-    summary: 'ثلاث فرص قابلة للاستخدام بدل قائمة طويلة.',
-    badgeLabel: 'متاح',
-    badgeTone: 'success',
-    iconName: 'pricetag-outline',
-  },
-  {
-    value: 'history',
-    label: 'السجل المختصر',
-    summary: 'آخر ثلاث إشعارات يمكن الرجوع منها للمسار المناسب.',
-    badgeLabel: 'حديث',
-    badgeTone: 'warning',
-    iconName: 'time-outline',
-  },
-];
-
 const sectionLabels: Record<DshBenefitsSection, string> = {
   now: 'الأولوية الآن',
   loyalty: 'النقاط والمكافآت',
@@ -106,12 +53,12 @@ const sectionLabels: Record<DshBenefitsSection, string> = {
   history: 'السجل المختصر',
 };
 
-const sectionDescriptions: Record<DshBenefitsSection, string> = {
-  now: 'ثلاثة صفوف فقط لما يمكن استخدامه أو مراجعته الآن.',
-  loyalty: 'الرصيد، المستوى، والمكافآت الأقرب بدون شاشة منفصلة.',
-  subscription: 'الخطة الحالية مع خيار تبديل واضح عند الحاجة.',
-  offers: 'العرض الجاهز، ما يحتاج نقاط، وما يخص المشتركين.',
-  history: 'آخر الأحداث مع فتح سريع للمسار المرتبط بها.',
+const sectionHints: Record<DshBenefitsSection, string> = {
+  now: 'أهم ما يمكنك الاستفادة منه قبل طلبك القادم',
+  loyalty: 'رصيدك الحالي ومكافآتك المتاحة للاستبدال',
+  subscription: 'خطتك الحالية وخيار التعديل متى احتجت',
+  offers: 'العروض والكوبونات المتاحة لاستخدامها الآن',
+  history: 'آخر التنبيهات المرتبطة بمزاياك',
 };
 
 function normalizeBenefitsSection(
@@ -158,25 +105,45 @@ function normalizeBenefitsSection(
 }
 
 function resolveStateSubtitle(section: DshBenefitsSection) {
-  if (section === 'loyalty') {
-    return 'نعرض النقاط والمكافآت من نفس المسار بدل فتح شاشة منفصلة.';
-  }
-  if (section === 'subscription') {
-    return 'نعرض الاشتراك الحالي وخيارات الباقة من نفس المسار.';
-  }
-  if (section === 'offers') {
-    return 'نعرض العروض والكوبونات المتاحة من نفس الصفحة.';
-  }
-  if (section === 'history') {
-    return 'نعرض آخر السجل والتنبيهات المرتبطة بالمزايا.';
-  }
-  return 'نجهّز ملخص المزايا الحالية داخل صفحة قصيرة وموحّدة.';
+  if (section === 'loyalty') return 'رصيدك الحالي ومكافآتك المتاحة';
+  if (section === 'subscription') return 'خطتك الحالية وخيار التعديل';
+  if (section === 'offers') return 'العروض المتاحة لاستخدامها الآن';
+  if (section === 'history') return 'آخر التنبيهات المرتبطة بمزاياك';
+  return 'أهم ما يمكنك الاستفادة منه الآن';
 }
 
-function BenefitsHeader({
-  onBack,
+function ScreenHeader({ title }: { title: string }) {
+  const { theme } = useTheme();
+
+  return (
+    <Surface
+      tone="raised"
+      padding={3}
+      gap={0}
+      style={{
+        borderRadius: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.line,
+        paddingTop: safeArea.comfortable + spacing[2],
+        minHeight: 44 + safeArea.comfortable + spacing[2],
+        justifyContent: 'flex-end',
+      }}
+    >
+      <Text role="titleMd" style={{ textAlign: 'right' }}>
+        {title}
+      </Text>
+    </Surface>
+  );
+}
+
+function ContentCard({
+  hint,
+  children,
+  feedback,
 }: {
-  onBack?: () => void;
+  hint: string;
+  children: React.ReactNode;
+  feedback?: string;
 }) {
   const { theme } = useTheme();
 
@@ -184,177 +151,28 @@ function BenefitsHeader({
     <Surface
       tone="raised"
       padding={3}
-      gap={2}
+      gap={3}
       style={{
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
         borderWidth: 1,
         borderColor: theme.line,
-        paddingTop: safeArea.comfortable + spacing[2],
+        borderRadius: 22,
       }}
     >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: spacing[3],
-          minHeight: 46,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="العودة"
-          disabled={!onBack}
-          hitSlop={8}
-          onPress={onBack}
-          style={({ pressed }) => ({
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            borderWidth: 1,
-            borderColor: theme.line,
-            backgroundColor: theme.surface,
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: onBack ? (pressed ? 0.9 : 1) : 0,
-          })}
-        >
-          <Icon name="chevron-back-outline" size={18} color={theme.text} />
-        </Pressable>
-
-        <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
-          <Text role="titleMd" style={{ textAlign: 'right' }}>
-            مزاياي
-          </Text>
-          <Text role="bodySm" tone="muted" numberOfLines={1} style={{ textAlign: 'right' }}>
-            النقاط، الاشتراك، العروض والكوبونات
-          </Text>
-        </View>
-      </View>
+      <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+        {hint}
+      </Text>
+      <View style={{ height: 1, backgroundColor: theme.line }} />
+      {children}
+      {feedback ? (
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {feedback}
+        </Text>
+      ) : null}
     </Surface>
   );
 }
 
-function HeroMetricRow({
-  label,
-  value,
-  helperText,
-}: {
-  label: string;
-  value: string;
-  helperText: string;
-}) {
-  const { theme } = useTheme();
-
-  return (
-    <View
-      style={{
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: spacing[3],
-        paddingVertical: spacing[2],
-      }}
-    >
-      <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
-        <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
-          {label}
-        </Text>
-        <Text role="caption" tone="soft" numberOfLines={1} style={{ textAlign: 'right' }}>
-          {helperText}
-        </Text>
-      </View>
-      <Text role="bodyStrong" style={{ textAlign: 'left', color: theme.text }}>
-        {value}
-      </Text>
-    </View>
-  );
-}
-
-function BenefitFocusRow({
-  item,
-  active,
-  onPress,
-}: {
-  item: SectionPickerItem;
-  active: boolean;
-  onPress: () => void;
-}) {
-  const { theme } = useTheme();
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => ({
-        borderRadius: 18,
-        backgroundColor: active ? theme.brandSurface : pressed ? theme.surfaceInset : 'transparent',
-        paddingHorizontal: spacing[3],
-        paddingVertical: spacing[3],
-      })}
-    >
-      <View
-        style={{
-          flexDirection: 'row-reverse',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: spacing[3],
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row-reverse',
-            alignItems: 'center',
-            gap: spacing[3],
-            flex: 1,
-          }}
-        >
-          <View
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: 14,
-              borderWidth: 1,
-              borderColor: active ? theme.brand : theme.line,
-              backgroundColor: active ? theme.surface : theme.surfaceInset,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Icon name={item.iconName} size={18} color={active ? theme.brand : theme.textSoft} />
-          </View>
-
-          <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
-            <View
-              style={{
-                flexDirection: 'row-reverse',
-                alignItems: 'center',
-                gap: spacing[2],
-                flexWrap: 'wrap',
-                width: '100%',
-              }}
-            >
-              <Badge label={item.badgeLabel} tone={item.badgeTone} />
-              <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
-                {item.label}
-              </Text>
-            </View>
-            <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
-              {item.summary}
-            </Text>
-          </View>
-        </View>
-
-        <Icon name="chevron-back-outline" size={18} color={active ? theme.brand : theme.textSoft} />
-      </View>
-    </Pressable>
-  );
-}
-
-function CompactBenefitRow({
+function BenefitListRow({
   row,
   showDivider = false,
   onActionPress,
@@ -387,7 +205,6 @@ function CompactBenefitRow({
             style={{
               flexDirection: 'row-reverse',
               alignItems: 'center',
-              justifyContent: 'flex-start',
               gap: spacing[2],
               flexWrap: 'wrap',
               width: '100%',
@@ -422,47 +239,8 @@ function CompactBenefitRow({
   );
 }
 
-function SectionPanel({
-  title,
-  subtitle,
-  children,
-  footer,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-}) {
-  const { theme } = useTheme();
-
-  return (
-    <Surface
-      tone="raised"
-      padding={3}
-      gap={3}
-      style={{
-        borderWidth: 1,
-        borderColor: theme.line,
-        borderRadius: 22,
-      }}
-    >
-      <Box gap={1} style={{ alignItems: 'flex-end' }}>
-        <Text role="titleSm" style={{ textAlign: 'right' }}>
-          {title}
-        </Text>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          {subtitle}
-        </Text>
-      </Box>
-      {children}
-      {footer}
-    </Surface>
-  );
-}
-
 export function DshBenefitsHubScreen({
   initialSection,
-  onBack,
   onPrimaryAction,
   onRetry,
   onSecondaryAction,
@@ -472,21 +250,21 @@ export function DshBenefitsHubScreen({
   const { theme } = useTheme();
   const resolvedInitialSection = normalizeBenefitsSection(screenId, initialSection);
   const [focusedSection, setFocusedSection] = React.useState<DshBenefitsSection>(resolvedInitialSection);
-  const [selectionMessage, setSelectionMessage] = React.useState('');
+  const [feedback, setFeedback] = React.useState('');
 
   React.useEffect(() => {
     setFocusedSection(resolvedInitialSection);
   }, [resolvedInitialSection]);
 
   React.useEffect(() => {
-    setSelectionMessage('');
+    setFeedback('');
   }, [focusedSection]);
 
   if (state !== 'ready') {
     return (
       <DshOperationScreen
         state={state}
-        title="مزاياي"
+        title={sectionLabels[resolvedInitialSection] ?? 'مزاياي'}
         subtitle={resolveStateSubtitle(resolvedInitialSection)}
         onPrimaryAction={onPrimaryAction}
         onRetry={onRetry}
@@ -516,34 +294,34 @@ export function DshBenefitsHubScreen({
   const nowRows: BenefitRow[] = [
     {
       id: 'now-offer',
-      title: liveOffers[0]?.title ?? 'لا يوجد عرض مباشر الآن',
+      title: liveOffers[0]?.title ?? 'لا يوجد عرض متاح الآن',
       subtitle: liveOffers[0]
         ? `${liveOffers[0].displayBadge} • ${liveOffers[0].eligibility}`
-        : 'أول فرصة قابلة للاستخدام ستظهر هنا فور توفرها.',
+        : 'سيظهر أول عرض متاح لك هنا فور توفره.',
       badgeLabel: liveOffers[0] ? 'جاهز' : 'قريبًا',
       badgeTone: liveOffers[0] ? 'success' : 'default',
-      actionLabel: liveOffers[0] ? 'استخدمه' : 'راجع',
+      actionLabel: liveOffers[0] ? 'استخدمه' : undefined,
       helperText: liveOffers[0]?.storeLabel || liveOffers[0]?.partnerName,
       targetSection: 'offers',
     },
     {
       id: 'now-loyalty',
-      title: `رصيدك ${activeTier?.minimumPoints ?? 0} نقطة`,
-      subtitle: `مستوى ${activeTier?.name ?? 'فضي'} مع ${activeRewards.length} مكافآت قابلة للمراجعة الآن.`,
+      title: `${activeTier?.minimumPoints ?? 0} نقطة`,
+      subtitle: `مستوى ${activeTier?.name ?? 'فضي'} — ${activeRewards.length} مكافأة متاحة للاستبدال الآن`,
       badgeLabel: 'نقاط',
       badgeTone: 'brand',
-      actionLabel: 'افتح',
-      helperText: `${activeEntitlements.length} مزايا مرتبطة بالمستوى الحالي`,
+      actionLabel: 'استبدل',
+      helperText: activeEntitlements.length > 0 ? `${activeEntitlements.length} ميزة مرتبطة بمستواك` : undefined,
       targetSection: 'loyalty',
     },
     {
       id: 'now-subscription',
-      title: currentPlan?.title ?? 'بدون اشتراك محدد',
-      subtitle: `${currentPlan?.price ?? '—'} • ${currentPlan?.cadence ?? 'لا توجد دورة واضحة'}`,
+      title: currentPlan?.title ?? 'بدون اشتراك',
+      subtitle: `${currentPlan?.price ?? '—'} • ${currentPlan?.cadence ?? ''}`,
       badgeLabel: 'اشتراك',
       badgeTone: 'info',
-      actionLabel: 'بدّل',
-      helperText: 'الخطة الحالية وخيار تبديل الباقة من نفس الصفحة.',
+      actionLabel: 'إدارة',
+      helperText: currentPlan?.highlight,
       targetSection: 'subscription',
     },
   ];
@@ -555,18 +333,17 @@ export function DshBenefitsHubScreen({
       subtitle: `${offer.displayBadge} • ${offer.eligibility}`,
       badgeLabel: 'متاح',
       badgeTone: 'success' as const,
-      actionLabel: 'جهّزه',
+      actionLabel: 'استخدم',
       helperText: offer.storeLabel || offer.partnerName,
     })),
     ...(couponReward
       ? [{
           id: couponReward.id,
           title: couponReward.title,
-          subtitle: couponReward.description ?? 'استبدال مباشر على طلبك القادم.',
-          badgeLabel: 'يحتاج نقاط',
+          subtitle: couponReward.description ?? 'يُطبَّق مباشرة على طلبك القادم.',
+          badgeLabel: `${couponReward.pointsCost} نقطة`,
           badgeTone: 'warning' as const,
           actionLabel: 'استبدل',
-          helperText: `${couponReward.pointsCost} نقطة`,
         }]
       : []),
     ...(currentPlan?.current
@@ -576,7 +353,7 @@ export function DshBenefitsHubScreen({
           subtitle: currentPlan.highlight,
           badgeLabel: 'للمشتركين',
           badgeTone: 'info' as const,
-          actionLabel: 'افتح',
+          actionLabel: 'تفعيل',
           helperText: currentPlan.note,
         }]
       : []),
@@ -584,9 +361,9 @@ export function DshBenefitsHubScreen({
       id: campaign.id,
       title: campaign.title,
       subtitle: campaign.subtitle,
-      badgeLabel: 'متاح',
+      badgeLabel: 'حملة',
       badgeTone: 'brand' as const,
-      actionLabel: 'راجع',
+      actionLabel: 'شارك',
       helperText: campaign.goal,
     })),
   ].slice(0, 3);
@@ -597,123 +374,101 @@ export function DshBenefitsHubScreen({
     subtitle: item.subtitle,
     badgeLabel: item.category === 'subscription' ? 'اشتراك' : 'عرض',
     badgeTone: item.category === 'subscription' ? 'info' : 'warning',
-    actionLabel: item.category === 'subscription' ? 'افتح الاشتراك' : 'افتح العرض',
+    actionLabel: item.category === 'subscription' ? 'الاشتراك' : 'العرض',
     helperText: item.relativeTime ?? item.meta,
     targetSection: item.category === 'subscription' ? 'subscription' : 'offers',
   }));
 
-  const handleCrossSectionAction = (row: BenefitRow, fallbackMessage: string) => {
+  const handleRowAction = (row: BenefitRow, feedbackMsg: string) => {
     if (row.targetSection) {
       setFocusedSection(row.targetSection);
-      setSelectionMessage(fallbackMessage);
       return;
     }
-
-    setSelectionMessage(fallbackMessage);
+    setFeedback(feedbackMsg);
   };
 
-  const renderSectionContent = () => {
+  const renderContent = () => {
     if (focusedSection === 'now') {
       return (
-        <SectionPanel
-          title={sectionLabels.now}
-          subtitle={sectionDescriptions.now}
-          footer={selectionMessage ? <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{selectionMessage}</Text> : undefined}
-        >
-          <View>
+        <ContentCard hint={sectionHints.now} feedback={feedback}>
+          <Box gap={0}>
             {nowRows.map((row, index) => (
-              <CompactBenefitRow
+              <BenefitListRow
                 key={row.id}
                 row={row}
                 showDivider={index > 0}
-                onActionPress={(selectedRow) => handleCrossSectionAction(selectedRow, `فتحنا مسار ${sectionLabels[selectedRow.targetSection ?? 'now']} مباشرة.`)}
+                onActionPress={(r: BenefitRow) => handleRowAction(r, `انتقلنا إلى ${sectionLabels[(r.targetSection ?? 'now') as DshBenefitsSection]}.`)}
               />
             ))}
-          </View>
-        </SectionPanel>
+          </Box>
+        </ContentCard>
       );
     }
 
     if (focusedSection === 'loyalty') {
       return (
-        <SectionPanel
-          title={sectionLabels.loyalty}
-          subtitle={sectionDescriptions.loyalty}
-          footer={selectionMessage ? <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{selectionMessage}</Text> : undefined}
-        >
-          <DshLoyaltyRewardsScreen compact onStatusChange={setSelectionMessage} />
-        </SectionPanel>
+        <ContentCard hint={sectionHints.loyalty} feedback={feedback}>
+          <DshLoyaltyRewardsScreen compact onStatusChange={setFeedback} />
+        </ContentCard>
       );
     }
 
     if (focusedSection === 'subscription') {
       return (
-        <SectionPanel
-          title={sectionLabels.subscription}
-          subtitle={sectionDescriptions.subscription}
-          footer={selectionMessage ? <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{selectionMessage}</Text> : undefined}
-        >
-          <DshSubscriptionsScreen compact onStatusChange={setSelectionMessage} />
-        </SectionPanel>
+        <ContentCard hint={sectionHints.subscription} feedback={feedback}>
+          <DshSubscriptionsScreen compact onStatusChange={setFeedback} />
+        </ContentCard>
       );
     }
 
     if (focusedSection === 'offers') {
       return (
-        <SectionPanel
-          title={sectionLabels.offers}
-          subtitle={sectionDescriptions.offers}
-          footer={selectionMessage ? <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{selectionMessage}</Text> : undefined}
-        >
-          <View>
-            {offersRows.length > 0 ? (
-              offersRows.map((row, index) => (
-                <CompactBenefitRow
+        <ContentCard hint={sectionHints.offers} feedback={feedback}>
+          {offersRows.length > 0 ? (
+            <Box gap={0}>
+              {offersRows.map((row, index) => (
+                <BenefitListRow
                   key={row.id}
                   row={row}
                   showDivider={index > 0}
-                  onActionPress={(selectedRow) => setSelectionMessage(`تم تجهيز ${selectedRow.title} للاستخدام في الطلب القادم.`)}
+                  onActionPress={(r: BenefitRow) => setFeedback(`تم تجهيز "${r.title}" للاستخدام في طلبك القادم.`)}
                 />
-              ))
-            ) : (
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                لا توجد عروض أو كوبونات مرئية الآن ضمن البيانات الحالية.
-              </Text>
-            )}
-          </View>
-        </SectionPanel>
+              ))}
+            </Box>
+          ) : (
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              لا توجد عروض أو كوبونات متاحة الآن.
+            </Text>
+          )}
+        </ContentCard>
       );
     }
 
     return (
-      <SectionPanel
-        title={sectionLabels.history}
-        subtitle={sectionDescriptions.history}
-        footer={selectionMessage ? <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{selectionMessage}</Text> : undefined}
-      >
-        <View>
-          {historyRows.length > 0 ? (
-            historyRows.map((row, index) => (
-              <CompactBenefitRow
+      <ContentCard hint={sectionHints.history} feedback={feedback}>
+        {historyRows.length > 0 ? (
+          <Box gap={0}>
+            {historyRows.map((row, index) => (
+              <BenefitListRow
                 key={row.id}
                 row={row}
                 showDivider={index > 0}
-                onActionPress={(selectedRow) => handleCrossSectionAction(selectedRow, `رجعناك إلى مسار ${sectionLabels[selectedRow.targetSection ?? 'history']} من السجل.`)}
+                onActionPress={(r: BenefitRow) => handleRowAction(r, `انتقلنا إلى ${sectionLabels[(r.targetSection ?? 'history') as DshBenefitsSection]}.`)}
               />
-            ))
-          ) : (
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              لا يوجد سجل مختصر حاليًا.
-            </Text>
-          )}
-        </View>
-      </SectionPanel>
+            ))}
+          </Box>
+        ) : (
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            لا يوجد سجل حاليًا.
+          </Text>
+        )}
+      </ContentCard>
     );
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
-      <BenefitsHeader onBack={onBack ?? onSecondaryAction ?? onPrimaryAction} />
+      <ScreenHeader title={sectionLabels[focusedSection] ?? 'مزاياي'} />
 
       <MobileScrollView
         fill
@@ -721,81 +476,10 @@ export function DshBenefitsHubScreen({
         gap={3}
         contentContainerStyle={{
           paddingBottom: safeArea.comfortable + spacing[12],
-          paddingTop: spacing[1],
+          paddingTop: spacing[2],
         }}
       >
-        <Surface
-          tone="brand"
-          padding={3}
-          gap={2}
-          style={{
-            borderWidth: 1,
-            borderColor: theme.line,
-            borderRadius: 24,
-          }}
-        >
-          <Box gap={1} style={{ alignItems: 'flex-end' }}>
-            <Text role="titleSm" style={{ textAlign: 'right' }}>
-              مزاياك جاهزة
-            </Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              صفحة قصيرة تقترح الخطوة الأنسب ثم تفتح لك المسار النشط فقط.
-            </Text>
-          </Box>
-
-          <HeroMetricRow
-            label="النقاط"
-            value={`${activeTier?.minimumPoints ?? 0} نقطة`}
-            helperText={`المستوى الحالي: ${activeTier?.name ?? 'فضي'}`}
-          />
-          <HeroMetricRow
-            label="المكافآت"
-            value={String(activeRewards.length)}
-            helperText="جاهزة أو قريبة للاستخدام"
-          />
-          <HeroMetricRow
-            label="الاشتراك"
-            value={currentPlan?.price ?? '—'}
-            helperText={currentPlan?.title ?? 'بدون اشتراك'}
-          />
-
-          <Button
-            label="استخدم في الطلب القادم"
-            tone="brand"
-            size="sm"
-            fullWidth={false}
-            onPress={() => setFocusedSection('offers')}
-          />
-        </Surface>
-
-        <Surface
-          tone="raised"
-          padding={1}
-          gap={0}
-          style={{
-            borderWidth: 1,
-            borderColor: theme.line,
-            borderRadius: 22,
-          }}
-        >
-          {sectionRows.map((item, index) => (
-            <View
-              key={item.value}
-              style={{
-                borderTopWidth: index > 0 ? 1 : 0,
-                borderTopColor: theme.line,
-              }}
-            >
-              <BenefitFocusRow
-                item={item}
-                active={focusedSection === item.value}
-                onPress={() => setFocusedSection(item.value)}
-              />
-            </View>
-          ))}
-        </Surface>
-
-        {renderSectionContent()}
+        {renderContent()}
       </MobileScrollView>
     </View>
   );

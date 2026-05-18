@@ -1,4 +1,4 @@
----
+﻿---
 name: bthwani-ui-kit-surface-contract
 description: Enforce BThwani UI-kit ownership, central color system, RTL correctness, reusable design centralization, and no visual drift. Use for any UI, UX, screen, surface, app, dashboard, mobile, web, or ui-kit task.
 version: 2026.05.17-v1
@@ -54,3 +54,30 @@ risks:
 decision: PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE / NEEDS_VISUAL_EVIDENCE
 next_action:
 ```
+
+<!-- BTHWANI_EXTERNAL_UI_UX_PRO_MAX_ADAPTATION_START -->
+## External adaptation: UI/UX design intelligence
+
+Source: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+Mode: adapted-not-mirrored.
+
+Use this adaptation only as visual reasoning support. It must not override BThwani design authority.
+
+Additional UI/UX reasoning duties:
+
+- Perform deep visual dissection before UI implementation.
+- Identify screen purpose, hierarchy, primary CTA, interaction cost, tab pressure, sheet/modal behavior, scroll boundaries, and visual density.
+- Check RTL at the concrete row level: icon and text in one right-side cluster, right-aligned Arabic copy, action or chevron on the opposite side, safe spacing, and no clipping.
+- Check whether repeated UI belongs in existing `@bthwani/ui-kit` exports before local implementation.
+- Check cross-surface impact when the same logic appears in app-client, app-partner, app-captain, app-field, control-panel, WLT/finance, DSH/operations, website, or webapp.
+- Preserve the BThwani visual identity: premium, cohesive, low-noise, modern 2026, practical, fast, and clear.
+
+Forbidden:
+
+- no donor palette import
+- no generic design-system copy
+- no local design system
+- no new UI-kit file unless the need is proven, non-negotiable, and explicitly human-approved
+- no Tamagui import outside the approved UI-kit boundary unless repo evidence proves the exact layer allows it
+- no visual PASS without screenshot evidence when visible UI changed
+<!-- BTHWANI_EXTERNAL_UI_UX_PRO_MAX_ADAPTATION_END -->

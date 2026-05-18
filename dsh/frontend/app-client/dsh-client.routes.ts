@@ -24,8 +24,7 @@ export type DshClientRouteId =
   | 'dsh-wallet'
   | 'dsh-loyalty'
   | 'dsh-subscriptions'
-  | 'dsh-addresses'
-  | 'dsh-location'
+  | 'dsh-addresses-location'
   | 'dsh-identity'
   | 'dsh-commercial'
   | 'dsh-appearance'
@@ -57,8 +56,7 @@ export type DshClientLegacyRoute =
   | 'wallet'
   | 'loyalty'
   | 'subscriptions'
-  | 'addresses'
-  | 'location'
+  | 'addresses-location'
   | 'identity'
   | 'commercial'
   | 'appearance'
@@ -97,8 +95,7 @@ export const dshClientRoutes = [
   { routeId: 'dsh-wallet', legacyRoute: 'wallet', screenId: 'client.dsh.wallet.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
   { routeId: 'dsh-loyalty', legacyRoute: 'loyalty', screenId: 'client.dsh.loyalty.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
   { routeId: 'dsh-subscriptions', legacyRoute: 'subscriptions', screenId: 'client.dsh.subscriptions.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
-  { routeId: 'dsh-addresses', legacyRoute: 'addresses', screenId: 'client.dsh.addresses.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
-  { routeId: 'dsh-location', legacyRoute: 'location', screenId: 'client.dsh.location.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
+  { routeId: 'dsh-addresses-location', legacyRoute: 'addresses-location', screenId: 'client.dsh.addresses-location.hub', ownerPath: 'dsh/frontend/app-client/screens/AddressLocationScreen.tsx' },
   { routeId: 'dsh-identity', legacyRoute: 'identity', screenId: 'client.dsh.identity.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
   { routeId: 'dsh-commercial', legacyRoute: 'commercial', screenId: 'client.dsh.commercial.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
   { routeId: 'dsh-appearance', legacyRoute: 'appearance', screenId: 'client.dsh.appearance.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },

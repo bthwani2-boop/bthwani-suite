@@ -1,4 +1,4 @@
-# BThwani Skill Catalog
+﻿# BThwani Skill Catalog
 
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
@@ -28,5 +28,6 @@
 | `bthwani-agent-skill-authoring-contract` | Create/update skills with evals, trigger clarity, and minimal context burden. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-registry-validator` | Validate skill registry coverage, frontmatter, duplication, and risk terms. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-frontend-design-excellence-contract` | Guard premium frontend design quality, visual hierarchy, responsive web/mobile UX, interaction states, accessibility, and visual evidence requirement. | `governance/` according to task domain | frontend design decision + visual evidence requirement |
+| `bthwani-stop-slop-prose-contract` | Remove AI-sounding prose, filler, vague claims, noisy writing, and weak Arabic/English copy from prompts, reports, UI copy, governance text, and marketing text. | `governance/` according to task domain | prose cleanup + remaining TBD + final text |
 
 All skills require evidence before acceptance. External skills may be preserved, but BThwani rules override generic examples.

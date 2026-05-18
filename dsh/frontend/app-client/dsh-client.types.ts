@@ -22,6 +22,7 @@ export type DshRoute =
   | 'service-settings'
   | 'zone-set'
   | 'orders-list'
+  | 'addresses-location'
   | 'tracking';
 
 export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'bell' | 'create-order' | 'cart-get';

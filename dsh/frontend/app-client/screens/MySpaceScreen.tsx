@@ -40,8 +40,7 @@ export type DshMySpaceScreenProps = {
   onOpenWallet?: () => void;
   onOpenLoyalty?: () => void;
   onOpenSubscriptions?: () => void;
-  onOpenAddresses?: () => void;
-  onOpenLocation?: () => void;
+  onOpenAddressesLocation?: () => void;
   onOpenIdentity?: () => void;
   onOpenCommercial?: () => void;
   onOpenAppearance?: () => void;
@@ -58,8 +57,7 @@ type MySpacePrimaryTab =
   | 'loyalty'
   | 'subscription'
   | 'offers'
-  | 'addresses'
-  | 'location'
+  | 'addresses-location'
   | 'identity'
   | 'appearance'
   | 'preferences';
@@ -77,8 +75,7 @@ const primaryTabs: PrimaryTabConfig[] = [
   { id: 'loyalty', label: 'النقاط والمكافآت', summary: 'الرصيد، المستوى، وأقرب ثلاث مكافآت', iconName: 'star-outline' },
   { id: 'subscription', label: 'الاشتراك', summary: 'الخطة الحالية والتبديل عند الحاجة فقط', iconName: 'card-outline' },
   { id: 'offers', label: 'العروض والكوبونات', summary: 'ثلاث فرص قابلة للاستخدام بدل قائمة طويلة', iconName: 'pricetag-outline' },
-  { id: 'addresses', label: 'العناوين المحفوظة', summary: 'إدارة مواقع التوصيل والاستلام', iconName: 'location-outline' },
-  { id: 'location', label: 'الموقع الحالي', summary: 'تحديد وتحديث موقعك الميداني', iconName: 'map-outline' },
+  { id: 'addresses-location', label: 'العناوين والموقع', summary: 'إدارة العناوين وموقع التوصيل', iconName: 'location-outline' },
   { id: 'identity', label: 'الملف الشخصي', summary: 'البيانات الشخصية والأمان', iconName: 'person-outline' },
   { id: 'appearance', label: 'المظهر', summary: 'فاتح أبيض أو داكن زجاجي', iconName: 'color-palette-outline' },
   { id: 'preferences', label: 'تفضيلات التوصيل', summary: 'إعدادات خاصة بالتسليم والاستبدال', iconName: 'options-outline' },
@@ -168,8 +165,7 @@ export function DshMySpaceScreen({
   onOpenWallet,
   onOpenLoyalty,
   onOpenSubscriptions,
-  onOpenAddresses,
-  onOpenLocation,
+  onOpenAddressesLocation,
   onOpenIdentity,
   onOpenCommercial,
   onOpenAppearance,
@@ -206,10 +202,8 @@ export function DshMySpaceScreen({
           : onOpenBenefits
             ? onOpenBenefits()
             : console.warn('Missing onOpenCommercial callback');
-      case 'addresses':
-        return onOpenAddresses ? onOpenAddresses() : console.warn('Missing onOpenAddresses callback');
-      case 'location':
-        return onOpenLocation ? onOpenLocation() : console.warn('Missing onOpenLocation callback');
+      case 'addresses-location':
+        return onOpenAddressesLocation ? onOpenAddressesLocation() : console.warn('Missing onOpenAddressesLocation callback');
       case 'identity':
         return onOpenIdentity ? onOpenIdentity() : console.warn('Missing onOpenIdentity callback');
       case 'appearance':

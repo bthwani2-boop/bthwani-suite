@@ -23,6 +23,7 @@ import {
   DshZoneSetScreen,
   DshListingStatusUpdateScreen,
 } from './screens/OperationScreens';
+import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
 import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
@@ -817,6 +818,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     ['DshServiceSettingsHubScreen', DshServiceSettingsHubScreen as unknown],
     ['DshZoneSetScreen', DshZoneSetScreen as unknown],
     ['DshListingStatusUpdateScreen', DshListingStatusUpdateScreen as unknown],
+    ['DshAddressLocationScreen', DshAddressLocationScreen as unknown],
   ];
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
@@ -861,8 +863,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onOpenWallet={() => setRoute('wlt-home')}
         onOpenLoyalty={() => { setSelectedOperationScreen('loyalty-points-client-balance'); setRoute('benefits'); }}
         onOpenSubscriptions={() => { setSelectedOperationScreen('subscription-sync'); setRoute('benefits'); }}
-        onOpenAddresses={() => { setSelectedOperationScreen('entitlements-get'); setRoute('service-settings'); }}
-        onOpenLocation={() => setRoute('zone-set')}
+        onOpenAddressesLocation={() => setRoute('addresses-location')}
         onOpenIdentity={() => { setSelectedOperationScreen('entitlements-get'); setRoute('service-settings'); }}
         onOpenCommercial={() => { setSelectedOperationScreen('promo-apply'); setRoute('benefits'); }}
         onOpenAppearance={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
@@ -1113,6 +1114,14 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onPrimaryAction={returnHome}
         onSecondaryAction={returnHome}
         onRetry={() => setRoute('listing-status-update')}
+      />
+    );
+  }
+
+  if (route === 'addresses-location') {
+    return (
+      <DshAddressLocationScreen
+        onBack={() => setRoute('my-space')}
       />
     );
   }
