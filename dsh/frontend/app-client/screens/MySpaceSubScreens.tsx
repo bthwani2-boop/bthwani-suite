@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import {
   Box,
   Icon,
@@ -13,6 +13,8 @@ import {
   useTheme,
   TextField,
   Button,
+  Switch,
+  SegmentedControl,
 } from '@bthwani/ui-kit';
 import {
   DshBenefitsHubScreen,
@@ -355,14 +357,329 @@ export function DshAppearanceHubScreen({ state = 'ready', onRetry, onBack }: Dsh
 }
 
 export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
+  const { theme } = useTheme();
+
+  // Active Tab state
+  const [activeTab, setActiveTab] = React.useState<'delivery' | 'notifications' | 'privacy'>('delivery');
+
+  // Tab 1: Delivery preferences state
+  const [deliveryInstructions, setDeliveryInstructions] = React.useState('اتصل قبل الوصول بدقيقتين واترك الطلب عند الباب عند عدم الرد.');
+  const [substitutionPref, setSubstitutionPref] = React.useState('chat_first');
+  const [contactPref, setContactPref] = React.useState('in_app');
+
+  // Tab 2: Notifications preferences state
+  const [orderProgressAlerts, setOrderProgressAlerts] = React.useState(true);
+  const [smartArrivalBell, setSmartArrivalBell] = React.useState(true);
+  const [promotionalAlerts, setPromotionalAlerts] = React.useState(true);
+  const [systemAlerts, setSystemAlerts] = React.useState(false);
+
+  // Tab 3: Experience & Privacy preferences state
+  const [quickOrder, setQuickOrder] = React.useState(true);
+  const [autoSaveAddresses, setAutoSaveAddresses] = React.useState(true);
+  const [highPrivacy, setHighPrivacy] = React.useState(false);
+  const [accessibilityMode, setAccessibilityMode] = React.useState(false);
+
+  // Status message state
+  const [statusMsg, setStatusMsg] = React.useState('');
+  const [statusTone, setStatusTone] = React.useState<'success' | 'danger'>('success');
+
+  const handleSave = () => {
+    setStatusMsg('تم حفظ جميع التفضيلات والتعديلات بنجاح وآمن!');
+    setStatusTone('success');
+    setTimeout(() => {
+      setStatusMsg('');
+    }, 3000);
+  };
+
+  const handleReset = () => {
+    setDeliveryInstructions('اتصل قبل الوصول بدقيقتين واترك الطلب عند الباب عند عدم الرد.');
+    setSubstitutionPref('chat_first');
+    setContactPref('in_app');
+    setOrderProgressAlerts(true);
+    setSmartArrivalBell(true);
+    setPromotionalAlerts(true);
+    setSystemAlerts(false);
+    setQuickOrder(true);
+    setAutoSaveAddresses(true);
+    setHighPrivacy(false);
+    setAccessibilityMode(false);
+    setStatusMsg('تم إعادة التفضيلات إلى القيم الافتراضية بنجاح.');
+    setStatusTone('success');
+    setTimeout(() => {
+      setStatusMsg('');
+    }, 3000);
+  };
+
+  if (state !== 'ready') {
+    return (
+      <DshOperationScreen
+        state={state}
+        title="تفضيلات التوصيل"
+        subtitle="إعدادات خاصة بالتسليم والاستبدال"
+        onRetry={onRetry}
+      />
+    );
+  }
+
+  const quickSuggestions = [
+    'اترك الطلب عند الباب دون طرق.',
+    'اتصل قبل الوصول بخمس دقائق.',
+    'سلم الطلب يدوياً للمستلم فقط.',
+  ];
+
   return (
-    <DshOperationScreen
-      state={state}
-      title="تفضيلات التوصيل"
-      subtitle="إعدادات خاصة بالتسليم والاستبدال"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
-      onRetry={onRetry}
-    />
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
+      <TopBar
+        variant="surface"
+        title="تفضيلات التوصيل"
+      />
+
+      {/* Segmented Control Tab Switcher */}
+      <Box padding={4} style={{ borderBottomWidth: 1, borderColor: theme.line }}>
+        <SegmentedControl
+          size="md"
+          fullWidth
+          options={[
+            { value: 'delivery', label: 'التوصيل' },
+            { value: 'notifications', label: 'التنبيهات' },
+            { value: 'privacy', label: 'الخصوصية والتجربة' },
+          ]}
+          value={activeTab}
+          onValueChange={(nextVal) => setActiveTab(nextVal as 'delivery' | 'notifications' | 'privacy')}
+        />
+      </Box>
+
+      <MobileScrollView
+        fill
+        padding={4}
+        gap={4}
+        contentContainerStyle={{ paddingBottom: safeArea.comfortable + spacing[12] }}
+      >
+        {statusMsg ? (
+          <Surface
+            tone="raised"
+            padding={3}
+            style={{
+              backgroundColor: statusTone === 'success' ? colorPalette.green50 : colorPalette.red50,
+              borderColor: statusTone === 'success' ? colorPalette.green200 : colorPalette.red200,
+              borderWidth: 1,
+              borderRadius: 12,
+            }}
+          >
+            <Box flexDirection="row-reverse" alignItems="center" gap={2}>
+              <Icon
+                name={statusTone === 'success' ? 'checkmark-circle' : 'alert-circle'}
+                size={20}
+                color={statusTone === 'success' ? colorPalette.green600 : colorPalette.red600}
+              />
+              <Text
+                role="bodySm"
+                style={{
+                  color: statusTone === 'success' ? colorPalette.green700 : colorPalette.red700,
+                  fontWeight: 'bold',
+                  flex: 1,
+                  textAlign: 'right',
+                }}
+              >
+                {statusMsg}
+              </Text>
+            </Box>
+          </Surface>
+        ) : null}
+
+        {activeTab === 'delivery' && (
+          <Box gap={4}>
+            {/* Delivery Instructions */}
+            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16 }}>
+              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
+                <Text role="bodyStrong" style={{ color: theme.text }}>تعليمات الكابتن والتسليم</Text>
+                <Icon name="car" size={20} tone="brand" />
+              </Box>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                ملاحظات أو توجيهات تظهر للكابتن لمساعدته في العثور على موقعك وتوصيل الطلب بسهولة وسرعة.
+              </Text>
+              <TextField
+                value={deliveryInstructions}
+                onChangeText={setDeliveryInstructions}
+                placeholder="أدخل تعليمات التوصيل هنا..."
+                multiline
+                numberOfLines={3}
+                style={{ textAlign: 'right', color: theme.text, minHeight: 80 }}
+              />
+
+              {/* Quick Suggestion Chips */}
+              <Box flexDirection="row-reverse" flexWrap="wrap" gap={2} style={{ marginTop: spacing[1] }}>
+                {quickSuggestions.map((suggestion) => (
+                  <TouchableOpacity
+                    key={suggestion}
+                    onPress={() => setDeliveryInstructions(suggestion)}
+                    style={{
+                      paddingVertical: spacing[1.5],
+                      paddingHorizontal: spacing[3],
+                      backgroundColor: theme.fieldBackground,
+                      borderRadius: 20,
+                      borderWidth: 1,
+                      borderColor: theme.line,
+                    }}
+                  >
+                    <Text role="bodySm" style={{ color: theme.text }}>{suggestion}</Text>
+                  </TouchableOpacity>
+                ))}
+              </Box>
+            </Surface>
+
+            {/* Substitution Preferences */}
+            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16 }}>
+              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
+                <Text role="bodyStrong" style={{ color: theme.text }}>تفضيلات استبدال السلع</Text>
+                <Icon name="swap-horizontal" size={20} tone="brand" />
+              </Box>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                كيف يتصرف المتجر أو الكابتن في حال عدم توفر أحد الأصناف المطلوبة في سلتك.
+              </Text>
+              <SegmentedControl
+                size="sm"
+                fullWidth
+                options={[
+                  { value: 'chat_first', label: 'المحادثة أولاً' },
+                  { value: 'auto_similar', label: 'بديل تلقائي' },
+                  { value: 'refund', label: 'استرداد المبلغ' },
+                ]}
+                value={substitutionPref}
+                onValueChange={setSubstitutionPref}
+              />
+            </Surface>
+
+            {/* Contact Preferences */}
+            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16 }}>
+              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
+                <Text role="bodyStrong" style={{ color: theme.text }}>طريقة التواصل المفضلة</Text>
+                <Icon name="chatbubbles" size={20} tone="brand" />
+              </Box>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                تحديد الوسيلة المفضلة للكابتن للتواصل معك أثناء تجهيز أو توصيل الطلب.
+              </Text>
+              <SegmentedControl
+                size="sm"
+                fullWidth
+                options={[
+                  { value: 'in_app', label: 'محادثة التطبيق' },
+                  { value: 'phone_call', label: 'مكالمة هاتفية' },
+                ]}
+                value={contactPref}
+                onValueChange={setContactPref}
+              />
+            </Surface>
+          </Box>
+        )}
+
+        {activeTab === 'notifications' && (
+          <Box gap={4}>
+            <Surface tone="raised" padding={4} gap={4} style={{ borderRadius: 16 }}>
+              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center" style={{ borderBottomWidth: 1, borderColor: theme.line, paddingBottom: spacing[2] }}>
+                <Text role="bodyStrong" style={{ color: theme.text }}>إعدادات التنبيهات</Text>
+                <Icon name="notifications" size={20} tone="brand" />
+              </Box>
+
+              <Switch
+                label="إشعارات حالة الطلب المباشرة"
+                description="تلقي تحديثات فورية عند قبول الطلب، خروج الكابتن، والوصول."
+                value={orderProgressAlerts}
+                onValueChange={setOrderProgressAlerts}
+              />
+
+              <Divider />
+
+              <Switch
+                label="تفعيل جرس الوصول الذكي"
+                description="إرسال تنبيه بصوت رنين مرتفع ونغمة مميزة عند اقتراب الكابتن."
+                value={smartArrivalBell}
+                onValueChange={setSmartArrivalBell}
+              />
+
+              <Divider />
+
+              <Switch
+                label="العروض والتخفيضات الحصرية"
+                description="تنبيهات مخصصة لأقوى التخفيضات، الهدايا، وكوبونات التوصيل المجاني."
+                value={promotionalAlerts}
+                onValueChange={setPromotionalAlerts}
+              />
+
+              <Divider />
+
+              <Switch
+                label="تنبيهات النظام الأساسية"
+                description="إشعارات الأمان والخصوصية والتحديثات الهامة للبنية التحتية للتطبيق."
+                value={systemAlerts}
+                onValueChange={setSystemAlerts}
+              />
+            </Surface>
+          </Box>
+        )}
+
+        {activeTab === 'privacy' && (
+          <Box gap={4}>
+            <Surface tone="raised" padding={4} gap={4} style={{ borderRadius: 16 }}>
+              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center" style={{ borderBottomWidth: 1, borderColor: theme.line, paddingBottom: spacing[2] }}>
+                <Text role="bodyStrong" style={{ color: theme.text }}>الخصوصية وتسهيلات التجربة</Text>
+                <Icon name="lock-closed" size={20} tone="brand" />
+              </Box>
+
+              <Switch
+                label="الطلب السريع بلمسة واحدة"
+                description="إتمام الطلب مباشرة باستخدام عنوانك وطريقة الدفع الافتراضية."
+                value={quickOrder}
+                onValueChange={setQuickOrder}
+              />
+
+              <Divider />
+
+              <Switch
+                label="حفظ المواقع والعناوين تلقائياً"
+                description="حفظ العناوين الجديدة تلقائياً لتسهيل الاستخدام مستقبلاً."
+                value={autoSaveAddresses}
+                onValueChange={setAutoSaveAddresses}
+              />
+
+              <Divider />
+
+              <Switch
+                label="تفعيل وضع الخصوصية العالي"
+                description="حظر الكباتن والمناديب من رؤية اسمك الكامل أو رقمك الفعلي."
+                value={highPrivacy}
+                onValueChange={setHighPrivacy}
+              />
+
+              <Divider />
+
+              <Switch
+                label="تسهيلات الوصول وقراءة الشاشة"
+                description="تكبير الخطوط وزيادة التباين البصري وتوافق قارئ الشاشة."
+                value={accessibilityMode}
+                onValueChange={setAccessibilityMode}
+              />
+            </Surface>
+          </Box>
+        )}
+
+        {/* Global Save & Reset Actions */}
+        <Box gap={2} style={{ marginTop: spacing[4] }}>
+          <Button
+            label="حفظ كل التفضيلات والتغييرات"
+            tone="brand"
+            onPress={handleSave}
+            style={{ width: '100%' }}
+          />
+
+          <Button
+            label="إعادة تعيين إلى الافتراضي"
+            tone="ghost"
+            onPress={handleReset}
+            style={{ width: '100%' }}
+          />
+        </Box>
+      </MobileScrollView>
+    </View>
   );
 }

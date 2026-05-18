@@ -24,7 +24,7 @@ import {
   DshListingStatusUpdateScreen,
 } from './screens/OperationScreens';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
-import { DshIdentityHubScreen } from './screens/MySpaceSubScreens';
+import { DshIdentityHubScreen, DshPreferencesHubScreen } from './screens/MySpaceSubScreens';
 import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
@@ -831,6 +831,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     ['DshListingStatusUpdateScreen', DshListingStatusUpdateScreen as unknown],
     ['DshAddressLocationScreen', DshAddressLocationScreen as unknown],
     ['DshIdentityHubScreen', DshIdentityHubScreen as unknown],
+    ['DshPreferencesHubScreen', DshPreferencesHubScreen as unknown],
   ];
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
@@ -879,7 +880,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onOpenIdentity={() => setRoute('identity')}
         onOpenCommercial={() => { setSelectedOperationScreen('promo-apply'); setRoute('benefits'); }}
         onOpenAppearance={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
-        onOpenPreferences={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
+        onOpenPreferences={() => setRoute('preferences')}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
         onBack={() => setRoute('home')}
@@ -1142,6 +1143,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return (
       <DshIdentityHubScreen
         onBack={() => setRoute('my-space')}
+      />
+    );
+  }
+
+  if (route === 'preferences') {
+    return (
+      <DshPreferencesHubScreen
+        onBack={() => setRoute('my-space')}
+        onRetry={() => setRoute('preferences')}
       />
     );
   }
