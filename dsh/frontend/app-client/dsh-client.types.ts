@@ -4,6 +4,7 @@ export type DshRoute =
   | 'home'
   | 'entry'
   | 'my-space'
+  | 'wlt-home'
   | 'preferences'
   | 'notifications'
   | 'store-items'

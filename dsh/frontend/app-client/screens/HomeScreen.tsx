@@ -99,6 +99,7 @@ export type DshHomeGetScreenProps = {
   onOpenMySpace?: () => void;
   onOpenNotifications?: () => void;
   onOpenCart?: () => void;
+  onOpenWallet?: () => void;
   onOpenService?: (serviceId: DshServiceId) => void;
   onOpenList?: () => void;
   onOpenCategory?: (categoryId: string) => void;
@@ -591,6 +592,7 @@ export function DshHomeGetScreen({
   onOpenCart,
   onOpenOrders,
   onOpenTracking,
+  onOpenWallet,
   onOpenMySpace,
   onOpenNotifications,
   onOpenService,
@@ -1617,6 +1619,11 @@ return (
             return;
           }
 
+          if (item.key === 'wlt') {
+            onOpenWallet?.();
+            return;
+          }
+
           onOpenService?.(item.key as DshServiceId);
         }}
       />
@@ -1626,7 +1633,7 @@ return (
         onSelect={(id) => {
           if (id === 'favorites') onOpenFavorites?.();
           if (id === 'orders') onOpenTracking?.();
-          if (id === 'wallet') onOpenEntry?.();
+          if (id === 'wallet') onOpenWallet?.();
           if (id === 'profile') onOpenMySpace?.();
         }}
         onLauncherPress={openServiceDial}

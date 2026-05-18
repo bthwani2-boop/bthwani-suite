@@ -1,9 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
+import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
 import { financeProviders } from '../../../../shared/finance/providers';
 
-export const WltHomeGetScreen: React.FC = () => {
+export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { t } = useI18n();
   const { tokens } = useBThwaniAppearance();
 
@@ -55,6 +55,8 @@ export const WltHomeGetScreen: React.FC = () => {
   const formattedBalance = new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(balance);
 
   return (
+    <View style={{ flex: 1 }}>
+      <TopBar title={tr('wlt.home.title', 'المحفظة')} onBack={onBack} />
     <ScreenWrapper state={state} loadingMessage={tr('surfaces.loading', 'جارٍ التحميل')} successMessage={tr('wlt.topup.success', 'تم الشحن')} onSuccessAction={() => setState('content')}>
       <ScrollView ref={scrollRef} style={{ flex: 1 }}>
         {/* Prominent balance hero */}
@@ -96,6 +98,7 @@ export const WltHomeGetScreen: React.FC = () => {
         )}
       </ScrollView>
     </ScreenWrapper>
+    </View>
   );
 };
 

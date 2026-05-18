@@ -57,6 +57,7 @@ import {
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
+import { WltHomeGetScreen } from '../../../wlt/frontend/app-client';
 
 type CreateOrderValues = Pick<
   DshClientCreateOrderRequest,
@@ -828,6 +829,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     );
   }
 
+  if (route === 'wlt-home') {
+    return <WltHomeGetScreen onBack={() => setRoute('home')} />;
+  }
+
   if (route === 'entry') {
     return (
       <DshEntryScreen
@@ -853,7 +858,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         }))}
         onAppearanceModeChange={setAppearanceMode}
         onOpenOrders={() => setRoute('orders-list')}
-        onOpenWallet={() => { setSelectedOperationScreen('entitlements-get'); setRoute('benefits'); }}
+        onOpenWallet={() => setRoute('wlt-home')}
         onOpenLoyalty={() => { setSelectedOperationScreen('loyalty-points-client-balance'); setRoute('benefits'); }}
         onOpenSubscriptions={() => { setSelectedOperationScreen('subscription-sync'); setRoute('benefits'); }}
         onOpenAddresses={() => { setSelectedOperationScreen('entitlements-get'); setRoute('service-settings'); }}
@@ -1198,6 +1203,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         },
       ]}
       onBack={onExit}
+      onOpenWallet={() => setRoute('wlt-home')}
       onOpenEntry={() => setRoute('entry')}
       onOpenMySpace={() => setRoute('my-space')}
       onOpenNotifications={() => setRoute('notifications')}
