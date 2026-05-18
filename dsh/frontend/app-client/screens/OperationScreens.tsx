@@ -673,13 +673,22 @@ type ConversationScreenId = 'chat-read-ack' | 'chat-send';
 
 type DshConversationHubScreenProps = {
   screenId: ConversationScreenId;
+  // ML-011: distinguishes captain-thread vs support-thread for label clarity;
+  // does not change visual design — affects secondaryActionLabel only.
+  threadType?: 'captain-thread' | 'support-thread';
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
   onRetry?: () => void;
 };
 
-export function DshConversationHubScreen({ screenId, state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshConversationHubScreenProps) {
+export function DshConversationHubScreen({ screenId, threadType, state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshConversationHubScreenProps) {
+  const threadLabel = threadType === 'captain-thread'
+    ? 'محادثة الكابتن'
+    : threadType === 'support-thread'
+    ? 'محادثة الدعم'
+    : 'المحادثة';
+
   return (
     <OperationScreenView
       screenId={screenId}
@@ -687,7 +696,7 @@ export function DshConversationHubScreen({ screenId, state = 'ready', onPrimaryA
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-      primaryActionLabel={screenId === 'chat-send' ? 'إرسال رسالة' : 'تأكيد المحادثة'}
+      primaryActionLabel={screenId === 'chat-send' ? `إرسال رسالة · ${threadLabel}` : `تأكيد ${threadLabel}`}
       secondaryActionLabel="العودة إلى الطلبات"
     />
   );

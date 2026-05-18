@@ -19,13 +19,14 @@ import {
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
 import {
   ControlPanelDshFinanceScreen,
-  ControlPanelDshSettlementScreen,
-  ControlPanelDshCodReconciliationScreen,
-  ControlPanelDshRefundQueueScreen,
-  ControlPanelDshCaptainEligibilityScreen,
   ControlPanelDshPayoutsScreen,
-  ControlPanelDshRiskAuditScreen,
 } from './FinanceHubScreens';
+import { PartnerSettlementWorkspace } from './PartnerSettlementWorkspace';
+import { CaptainPayoutWorkspace } from './CaptainPayoutWorkspace';
+import { RefundQueueWorkspace } from './RefundQueueWorkspace';
+import { CommissionBreakdownWorkspace } from './CommissionBreakdownWorkspace';
+import { PlatformFeeAuditWorkspace } from './PlatformFeeAuditWorkspace';
+import { FieldCommissionWorkspace } from './FieldCommissionWorkspace';
 import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
 
 import styles from '../shared/control-panel-surface.module.css';
@@ -38,16 +39,36 @@ export type ControlPanelDshFinanceScreenProps = {
   fallbackHref?: string;
 };
 
+// ML-040..045: WLT bridge adapters — read-only, no financial calculations inside DSH
+function PartnerSettlementBridgePanel(_: { hubHref: string; subGroup?: string }) {
+  return <PartnerSettlementWorkspace />;
+}
+function CaptainPayoutBridgePanel(_: { hubHref: string; subGroup?: string }) {
+  return <CaptainPayoutWorkspace />;
+}
+function RefundQueueBridgePanel(_: { hubHref: string; subGroup?: string }) {
+  return <RefundQueueWorkspace />;
+}
+function CommissionBreakdownBridgePanel(_: { hubHref: string; subGroup?: string }) {
+  return <CommissionBreakdownWorkspace />;
+}
+function PlatformFeeAuditBridgePanel(_: { hubHref: string; subGroup?: string }) {
+  return <PlatformFeeAuditWorkspace />;
+}
+function FieldCommissionBridgePanel(_: { hubHref: string; subGroup?: string }) {
+  return <FieldCommissionWorkspace />;
+}
+
 const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   overview: ControlPanelDshFinanceScreen,
-  settlements: ControlPanelDshSettlementScreen,
-  'cod-reconciliation': ControlPanelDshCodReconciliationScreen,
-  'captain-eligibility': ControlPanelDshCaptainEligibilityScreen,
-  refunds: ControlPanelDshRefundQueueScreen,
-  ledger: ControlPanelDshFinanceScreen,
+  settlements: PartnerSettlementBridgePanel,         // ML-040: partner settlement WLT bridge
+  'cod-reconciliation': CommissionBreakdownBridgePanel, // ML-043: per-order commission breakdown
+  'captain-eligibility': CaptainPayoutBridgePanel,  // ML-041: captain payout WLT bridge
+  refunds: RefundQueueBridgePanel,                   // ML-042: refund queue WLT bridge
+  ledger: FieldCommissionBridgePanel,                // ML-045: field agent commission ledger
   payouts: ControlPanelDshPayoutsScreen,
   'tax-compliance': ControlPanelDshFinanceScreen,
-  'risk-audit': ControlPanelDshRiskAuditScreen,
+  'risk-audit': PlatformFeeAuditBridgePanel,         // ML-044: platform fee audit WLT bridge
 };
 
 export function ControlPanelDshFinanceHubScreen({

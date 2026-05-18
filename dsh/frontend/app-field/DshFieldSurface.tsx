@@ -5,6 +5,7 @@ import { Box } from '@bthwani/ui-kit';
 import { DshFieldFinanceScreen } from './screens/DshFieldFinanceScreen';
 import { DshFieldProfileHomeScreen } from './screens/DshFieldProfileHomeScreen';
 import { DshFieldProfileScreen } from './screens/DshFieldProfileScreen';
+import { DshFieldReadinessEscalationScreen } from './screens/DshFieldReadinessEscalationScreen';
 import { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboardingScreen';
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
@@ -184,6 +185,7 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
           updateStore(activeStore.id, submitFieldStoreForReview);
           pushRoute({ kind: 'visit', storeId: activeStore.id });
         }}
+        onEscalate={() => pushRoute({ kind: 'readiness-escalation', storeId: activeStore.id })}
       />
     );
   }
@@ -249,6 +251,24 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
 
   if (route.kind === 'finance') {
     content = <DshFieldFinanceScreen stores={stores} onBack={popRoute} />;
+  }
+
+  if (route.kind === 'readiness-escalation' && activeStore) {
+    content = (
+      <DshFieldReadinessEscalationScreen
+        storeName={activeStore.name}
+        missingRequirements={[]}
+        escalationTargets={[
+          { id: 'partner-management', label: 'قسم الشركاء (Partner Management)', isSelected: true },
+          { id: 'control-panel', label: 'لوحة التحكم المركزية (Control Panel)', isSelected: false },
+          { id: 'marketing', label: 'فريق التسويق (Marketing)', isSelected: false },
+        ]}
+        onSelectTarget={() => undefined}
+        onSubmit={() => resetToStores()}
+        onBack={popRoute}
+        onRetry={() => pushRoute({ kind: 'readiness-escalation', storeId: activeStore.id })}
+      />
+    );
   }
 
   return (

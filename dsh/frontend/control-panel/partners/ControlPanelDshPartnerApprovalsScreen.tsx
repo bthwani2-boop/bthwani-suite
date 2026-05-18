@@ -14,6 +14,7 @@ import {
   translateEntityType,
 } from '../../shared/workflow';
 import styles from '../shared/control-panel-surface.module.css';
+import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 
 // ML-001: approval action extended to include final ops activation step for marketing-approved records
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
@@ -88,6 +89,7 @@ export function ControlPanelDshPartnerHubScreen() {
     { id: 'eligibility', label: 'أهلية الترويج', active: activeTab === 'eligibility' },
     { id: 'topology', label: 'مسارات الخدمة', active: activeTab === 'topology' },
     { id: 'contracts', label: 'إدارة العقود والامتثال', active: activeTab === 'contracts' },
+    { id: 'deactivation', label: 'إلغاء التفعيل', active: activeTab === 'deactivation' },
   ];
 
   const SECONDARY_TABS: Record<string, { id: string; label: string; active?: boolean }[]> = {
@@ -164,7 +166,9 @@ export function ControlPanelDshPartnerHubScreen() {
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
-            {activeTab === 'inbox' && activeSubTab === 'registration' ? (
+            {activeTab === 'deactivation' ? (
+              <PartnerDeactivationWorkspace />
+            ) : activeTab === 'inbox' && activeSubTab === 'registration' ? (
               <Box gap={3}>
                 {items.length === 0 ? (
                   <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">

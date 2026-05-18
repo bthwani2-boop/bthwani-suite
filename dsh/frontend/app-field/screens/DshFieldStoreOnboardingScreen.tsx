@@ -44,6 +44,7 @@ type DshFieldStoreOnboardingScreenProps = {
   onSaveDraft: () => void;
   onSubmitReview: () => void;
   onActivationComplete?: () => void;
+  onEscalate?: () => void;
 };
 
 function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOnboardingDraft, key: T, value: FieldOnboardingDraft[T]) {
@@ -53,7 +54,7 @@ function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOn
   };
 }
 
-export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding', onBack, onStoreChange, onSaveDraft, onSubmitReview, onActivationComplete }: DshFieldStoreOnboardingScreenProps) {
+export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding', onBack, onStoreChange, onSaveDraft, onSubmitReview, onActivationComplete, onEscalate }: DshFieldStoreOnboardingScreenProps) {
   if (screenState === 'activated') {
     return (
       <Surface style={{ flex: 1 }}>
@@ -61,7 +62,7 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
         <StateView
           stateId="success"
           title="تم تفعيل المتجر بنجاح"
-          description="اكتمل تسجيل المتجر وتمت الموافقة من قِبل الأوبريشن. يمكن المتابعة للمتجر التالي."
+          description="اكتمل تسجيل المتجر وتمت الموافقة من قِبل قسم الشركاء (Partner Management). يمكن المتابعة للمتجر التالي."
           actionLabel="إنهاء"
           onActionPress={onActivationComplete ?? onBack}
         />
@@ -358,6 +359,11 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           disabled: isLastSection ? !canSubmit : false,
           onPress: goToNextSection,
         }}
+        secondaryAction={onEscalate && missingItems.length > 0 && !readOnly ? {
+          label: 'تصعيد عائق',
+          tone: 'secondary' as const,
+          onPress: onEscalate,
+        } : undefined}
       />
     </Box>
   );

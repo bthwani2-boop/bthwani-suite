@@ -12,8 +12,14 @@ import {
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
+import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
+import { SupportTicketDetailWorkspace } from './SupportTicketDetailWorkspace';
+import { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
+import { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
+import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
 
-type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk';
+type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
@@ -52,9 +58,10 @@ const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
   { id: 'feedback', label: 'الآراء' },
   { id: 'escalation', label: 'التصعيد' },
   { id: 'sla-risk', label: resolveCommitmentLabel() },
+  { id: 'messaging', label: 'الرسائل' },
 ];
 
-const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: SupportLane | 'الكل'; label: string }>> = {
+const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: string }>> = {
   queue: [
     { id: 'الكل', label: 'الكل' },
     { id: 'الطلبات', label: 'الطلبات' },
@@ -66,6 +73,11 @@ const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: SupportLane | 'ال
   feedback: [{ id: 'الكل', label: 'الكل' }],
   escalation: [{ id: 'الكل', label: 'الكل' }],
   'sla-risk': [{ id: 'الكل', label: 'الكل' }],
+  messaging: [
+    { id: 'client', label: 'العملاء' },
+    { id: 'partner', label: 'الشركاء' },
+    { id: 'captain', label: 'الكباتن' },
+  ],
 };
 
 const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
@@ -144,6 +156,10 @@ const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
 ];
 
 function filterRows(tab: SupportTab, lane: string) {
+  if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging') {
+    return [];
+  }
+
   return SUPPORT_ROWS.filter((row) => {
     if (tab === 'queue') {
       return lane === 'الكل' || row.surface === lane;
@@ -157,11 +173,7 @@ function filterRows(tab: SupportTab, lane: string) {
       return row.surface === 'الطلبات' || row.surface === 'الشركاء';
     }
 
-    if (tab === 'escalation') {
-      return row.severity === 'danger';
-    }
-
-    return row.slaAge.includes('دقيقة') || row.slaAge.includes('47');
+    return false;
   });
 }
 
@@ -240,11 +252,35 @@ export function ControlPanelDshSupportHubScreen() {
       </div>
 
       <main className={styles.surfaceMainPanel}>
-        <div className={styles.surfaceInnerScroll}>
-          <div className={styles.surfaceSplitGrid}>
-            <div className={styles.surfaceListColumn}>
-              <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : activeTab === 'feedback' ? 'الآراء' : activeTab === 'escalation' ? 'التصعيد' : resolveCommitmentLabel()}</Text>
-              <Box gap={2}>
+        {activeTab === 'sla-risk' ? (
+          <SupportSlaDashboardScreen />
+        ) : activeTab === 'escalation' ? (
+          <div className={styles.surfaceInnerScroll}>
+            <div className={styles.surfaceSplitGrid}>
+              <div className={styles.surfaceListColumn}>
+                <SupportEscalationQueueScreen onOpenTicket={(id) => setSelectedId(id)} />
+              </div>
+              <div className={styles.surfaceInspectorPanel}>
+                <SupportTicketDetailWorkspace ticketId={selectedId || undefined} />
+              </div>
+            </div>
+          </div>
+        ) : activeTab === 'messaging' ? (
+          <div className={styles.surfaceInnerScroll}>
+            {activeSubTab === 'partner' ? (
+              <OpsPartnerMessagingWorkspace />
+            ) : activeSubTab === 'captain' ? (
+              <OpsCaptainMessagingWorkspace />
+            ) : (
+              <OpsClientMessagingWorkspace />
+            )}
+          </div>
+        ) : (
+          <div className={styles.surfaceInnerScroll}>
+            <div className={styles.surfaceSplitGrid}>
+              <div className={styles.surfaceListColumn}>
+                <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : 'الآراء'}</Text>
+                <Box gap={2}>
                   {rows.map((row) => (
                     <WebControlPanelDecisionRow
                       key={row.id}
@@ -291,7 +327,8 @@ export function ControlPanelDshSupportHubScreen() {
                 </Box>
               </div>
             </div>
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );
