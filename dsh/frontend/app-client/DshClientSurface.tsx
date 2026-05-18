@@ -526,8 +526,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     setRoute('orders-list');
   }, []);
 
-  const handleConfirmedOrderExecution = React.useCallback(() => {
-    openTrackedOrder(undefined, selectedFulfillmentMode);
+  const handleConfirmedOrderExecution = React.useCallback((payload?: { fulfillmentMode?: DshFulfillmentDeliveryMode }) => {
+    openTrackedOrder(undefined, payload?.fulfillmentMode ?? selectedFulfillmentMode);
   }, [openTrackedOrder, selectedFulfillmentMode]);
 
   const activeStore = React.useMemo(

@@ -12,6 +12,7 @@ import {
   PaymentDecisionList,
   safeArea,
   SegmentedControl,
+  SheetFrame,
   sizes,
   spacing,
   SummaryCard,
@@ -111,6 +112,7 @@ type CheckoutActionPayload = {
   orderTotalMinorUnits: number;
   summary: string;
   financeEventKind: WltDshFinanceEventKind;
+  fulfillmentMode: DshFulfillmentDeliveryMode;
 };
 
 export type DshCartUnifiedScreenProps = {
@@ -166,14 +168,40 @@ const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
     icon: 'document-text-outline',
   },
   extra: {
-    title: 'طلب إضافي على الطريق',
-    placeholder: 'مثال: ماء أو بسبس من أي ماركت على الطريق',
-    helper: 'سيظهر الطلب الإضافي داخل نفس الشاشة كإضافة جاهزة للمراجعة.',
-    saveLabel: 'حفظ الطلب',
+    title: 'على طريقي',
+    placeholder: 'مثال: ماء، بسبس، مناديل...',
+    helper: 'أضف شيئًا بسيطًا من طريق الكابتن.',
+    saveLabel: 'حفظ',
     multiline: true,
     icon: 'add-circle-outline',
   },
 };
+
+const FULFILLMENT_MODE_ORDER = ['bthwani_delivery', 'partner_delivery', 'pickup'] as const;
+
+function getDeliveryModeSelectionSummary(mode: DshFulfillmentDeliveryMode) {
+  switch (mode) {
+    case 'partner_delivery':
+      return 'تم اختيار توصيل المتجر';
+    case 'pickup':
+      return 'تم اختيار الاستلام من المتجر';
+    case 'bthwani_delivery':
+    default:
+      return 'تم اختيار توصيل بثواني';
+  }
+}
+
+function getDeliveryModePickerDescription(mode: DshFulfillmentDeliveryMode) {
+  switch (mode) {
+    case 'partner_delivery':
+      return 'التوصيل يتم عبر موصل المتجر إلى موقع العميل.';
+    case 'pickup':
+      return 'تستلم الطلب من المتجر بنفسك بدون رسوم توصيل.';
+    case 'bthwani_delivery':
+    default:
+      return 'التوصيل يتم عبر كابتن بثواني إلى موقع العميل.';
+  }
+}
 
 const RECOMMENDED_PRODUCTS: RecommendationProduct[] = [
   { id: 'r1', title: 'تفاح طازج', priceLabel: '500', priceValue: 500, imageUri: 'dsh.product.apple.v1' },
@@ -1033,10 +1061,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodKey>('cod');
   const [couponCode, setCouponCode] = useState('');
-  const resolvedFulfillmentMode: DshFulfillmentDeliveryMode = props.fulfillmentMode ?? 'bthwani_delivery';
-  const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(resolvedFulfillmentMode);
+  const [selectedFulfillmentMode, setSelectedFulfillmentMode] = useState<DshFulfillmentDeliveryMode>(
+    () => props.fulfillmentMode ?? 'bthwani_delivery',
+  );
+  const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(selectedFulfillmentMode);
   // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY — real fee from WLT).
-  const deliveryAmount = resolvedFulfillmentMode === 'pickup' ? 0 : 950;
+  const deliveryAmount = selectedFulfillmentMode === 'pickup' ? 0 : 950;
   const [pickupAddr, setPickupAddr] = useState('جوار الجبل الجديد');
   const [note, setNote] = useState('لا يوجد ملاحظة');
   const [extraRequest, setExtraRequest] = useState('');
@@ -1044,15 +1074,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const executionScheduleOptions = useMemo(() => createExecutionScheduleOptions(), []);
   const [scheduledDate, setScheduledDate] = useState(() => executionScheduleOptions.dateOptions[0]?.value ?? '');
   const [scheduledTime, setScheduledTime] = useState(() => executionScheduleOptions.timeOptions[0]?.value ?? '');
+  const [deliveryModePickerOpen, setDeliveryModePickerOpen] = useState(false);
   const [quickActionKey, setQuickActionKey] = useState<QuickActionKey | null>(null);
   const [quickActionDraft, setQuickActionDraft] = useState('');
-  const [locationEditorVisible, setLocationEditorVisible] = useState(false);
-  const [locationDraft, setLocationDraft] = useState('');
-  const [locationFeedback, setLocationFeedback] = useState<string | null>(null);
   const [notice, setNotice] = useState<ScreenNotice | null>(null);
   const [previewProduct, setPreviewProduct] = useState<RecommendationProduct | null>(null);
   const [previewFeedback, setPreviewFeedback] = useState<PreviewFeedback | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutReviewVisible, setCheckoutReviewVisible] = useState(false);
   const [cartDetailsVisible, setCartDetailsVisible] = useState(false);
   const [footerHeight, setFooterHeight] = useState(0);
   const {
@@ -1069,7 +1098,53 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const { direction } = useDirection();
   const isRTL = direction === 'rtl';
-  const quickActionMeta = quickActionKey ? QUICK_ACTION_META[quickActionKey] : null;
+  const isPickupMode = selectedFulfillmentMode === 'pickup';
+  const storePickupLocationLabel = useMemo(() => {
+    const storeSubtitle = props.store?.subtitle?.trim();
+    if (storeSubtitle) {
+      return storeSubtitle;
+    }
+
+    const storeName = props.store?.name?.trim();
+    if (storeName) {
+      return storeName;
+    }
+
+    return 'موقع المتجر غير محدد';
+  }, [props.store?.name, props.store?.subtitle]);
+  const hasStorePickupLocation = storePickupLocationLabel !== 'موقع المتجر غير محدد';
+  const locationTitle = isPickupMode ? 'موقع الاستلام' : 'موقع التوصيل';
+  const locationSubtitle = isPickupMode ? storePickupLocationLabel : pickupAddr;
+  const deliveryModeSelectionSummary = getDeliveryModeSelectionSummary(selectedFulfillmentMode);
+  const deliveryNotice = selectedFulfillmentMode === 'pickup'
+    ? 'لا توجد رسوم توصيل عند الاستلام بنفسك.'
+    : selectedFulfillmentMode === 'partner_delivery'
+      ? 'قد يحدد المتجر رسوم التوصيل النهائية بعد اعتماد الطلب.'
+      : 'قد تتغير رسوم التوصيل بعد اعتماد الموقع.';
+  const quickActionMeta = useMemo(() => {
+    if (!quickActionKey) {
+      return null;
+    }
+
+    if (quickActionKey !== 'address') {
+      return QUICK_ACTION_META[quickActionKey];
+    }
+
+    return {
+      ...QUICK_ACTION_META.address,
+      title: locationTitle,
+    };
+  }, [locationTitle, quickActionKey]);
+  const fulfillmentModeOptions = useMemo(
+    () => FULFILLMENT_MODE_ORDER.map((mode) => ({
+      value: mode,
+      label: getDshFulfillmentDeliveryModeMeta(mode).label,
+      icon: getDshFulfillmentDeliveryModeMeta(mode).icon,
+      summary: getDeliveryModeSelectionSummary(mode),
+      description: getDeliveryModePickerDescription(mode),
+    })),
+    [],
+  );
   const hasWltServiceRoute = typeof props.onOpenService === 'function';
   const totalItemsCount = useMemo(
     () => items.reduce((acc, item) => acc + (item.qty ?? 1), 0),
@@ -1104,7 +1179,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const formattedWalletBalance = formatAmount(walletBalance / 100);
   const formattedWalletShortfall = formatMinorUnitsAmount(walletShortfallMinorUnits);
   const canCheckout = totalItemsCount > 0;
-  const deliveryNotice = 'قد تتغير رسوم التوصيل بعد اعتماد الموقع.';
   const androidSystemBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
     : safeArea.comfortable;
@@ -1116,6 +1190,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     [items, previewProduct],
   );
   const previewCartQty = activePreviewCartItem?.qty ?? 0;
+
+  useEffect(() => {
+    const nextMode = props.fulfillmentMode ?? 'bthwani_delivery';
+    setSelectedFulfillmentMode((currentMode) => (currentMode === nextMode ? currentMode : nextMode));
+  }, [props.fulfillmentMode]);
 
   const updateItemQty = (id: string, qty: number) => {
     const targetItem = items.find((item) => item.id === id);
@@ -1178,6 +1257,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const dismissNotice = () => {
     setNotice(null);
+  };
+
+  const closeQuickAction = () => {
+    setQuickActionKey(null);
+    setQuickActionDraft('');
   };
 
   const openWltService = (mode: 'wallet-topup' | 'official-wallets') => {
@@ -1408,6 +1492,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
   }, [canUseMixedPayment, canUseWalletFull, paymentMethod]);
 
+  useEffect(() => {
+    if (quickActionKey === 'extra' && selectedFulfillmentMode !== 'bthwani_delivery') {
+      closeQuickAction();
+      return;
+    }
+
+    if (quickActionKey === 'address' && selectedFulfillmentMode === 'pickup') {
+      closeQuickAction();
+    }
+  }, [quickActionKey, selectedFulfillmentMode]);
+
   const paymentDecisionOptions = useMemo<PaymentDecisionOption[]>(() => {
     const walletPending = !walletHydrated || walletRefreshing;
 
@@ -1536,38 +1631,114 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     ];
   }, [canUseMixedPayment, canUseWalletFull, formattedGrandTotal, formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, topUpWalletInline, walletBalance, walletHydrated, walletLinked, walletRefreshing, walletShortfallMinorUnits]);
 
-  const handleCheckoutPress = async () => {
+  const executionTimingSummary = useMemo(() => {
+    if (scheduling === 'now') {
+      return 'الآن';
+    }
+
+    const selectedDateOption = executionScheduleOptions.dateOptions.find((option) => option.value === scheduledDate);
+    const selectedTimeOption = executionScheduleOptions.timeOptions.find((option) => option.value === scheduledTime);
+
+    return [selectedDateOption?.fullLabel ?? scheduledDate, selectedTimeOption?.fullLabel ?? scheduledTime]
+      .filter(Boolean)
+      .join(' - ');
+  }, [executionScheduleOptions, scheduledDate, scheduledTime, scheduling]);
+
+  const paymentMethodLabel = useMemo(
+    () => paymentDecisionOptions.find((option) => option.id === paymentMethod)?.title ?? paymentSelection.method,
+    [paymentDecisionOptions, paymentMethod, paymentSelection.method],
+  );
+
+  const checkoutReviewItems = useMemo(() => {
+    const items = [
+      { label: 'عدد العناصر', value: `${totalItemsCount} عناصر` },
+      { label: 'إجمالي المنتجات', value: formattedSubtotal },
+      { label: 'رسوم التوصيل', value: formattedDelivery },
+      { label: 'طريقة الدفع', value: paymentMethodLabel, helper: paymentSelection.summary },
+      { label: 'من المحفظة', value: formatMinorUnitsAmount(paymentSelection.walletAmountMinorUnits) },
+      { label: 'عند الاستلام', value: formatMinorUnitsAmount(paymentSelection.amountDueOnDeliveryMinorUnits) },
+      { label: 'خيار التوصيل', value: fulfillmentModeMeta.label },
+      { label: locationTitle, value: locationSubtitle },
+      { label: 'وقت التنفيذ', value: executionTimingSummary },
+    ];
+
+    if (formattedDiscount) {
+      items.splice(3, 0, { label: 'الخصم', value: formattedDiscount });
+    }
+
+    if (couponCode) {
+      items.push({ label: 'القسيمة', value: couponCode });
+    }
+
+    if (note !== 'لا يوجد ملاحظة') {
+      items.push({ label: 'ملاحظات الطلب', value: note });
+    }
+
+    if (selectedFulfillmentMode === 'bthwani_delivery' && extraRequest) {
+      items.push({ label: 'على طريقي', value: extraRequest });
+    }
+
+    return items;
+  }, [
+    couponCode,
+    executionTimingSummary,
+    extraRequest,
+    formattedDelivery,
+    formattedDiscount,
+    formattedSubtotal,
+    fulfillmentModeMeta.label,
+    locationSubtitle,
+    locationTitle,
+    note,
+    paymentMethodLabel,
+    paymentSelection.amountDueOnDeliveryMinorUnits,
+    paymentSelection.summary,
+    paymentSelection.walletAmountMinorUnits,
+    selectedFulfillmentMode,
+    totalItemsCount,
+  ]);
+
+  const buildCheckoutPayload = (): CheckoutActionPayload => ({
+    paymentMethod: paymentSelection.method,
+    walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
+    amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
+    orderTotalMinorUnits: grandTotalMinorUnits,
+    summary: paymentSelection.summary,
+    financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
+    fulfillmentMode: selectedFulfillmentMode,
+  });
+
+  const runCheckoutPreflight = () => {
     if (isOrderSubmitted) {
       showNotice('الطلب قيد التنفيذ', 'تم إرسال الطلب بالفعل. التعديل يتم عبر فريق العمليات فقط.', 'info');
-      return;
+      return false;
     }
 
     if (!canCheckout) {
       showNotice(clientStateMeta.label, clientStateMeta.description, 'info');
-      return;
+      return false;
     }
 
     if (!checkoutAction) {
       showNotice('تنفيذ الطلب محجوب', 'زر التنفيذ جاهز UI لكن المسار التالي غير موصول في هذا العرض.', 'info');
-      return;
+      return false;
     }
 
     if (!paymentSelection.valid) {
       const blockedStateMeta = paymentSelection.method === 'official-wallets' ? walletCreditMeta : paymentPendingMeta;
       showNotice(blockedStateMeta.label, paymentSelection.blockingReason ?? blockedStateMeta.description, paymentSelection.feedbackTone);
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  const submitCheckoutAfterReview = async () => {
+    const checkoutPayload = buildCheckoutPayload();
 
     if (paymentSelection.isExperimental) {
       showNotice('تم تسجيل الدفع التجريبي', paymentSelection.summary, 'success');
-      await Promise.resolve(checkoutAction({
-        paymentMethod: paymentSelection.method,
-        walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
-        amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
-        orderTotalMinorUnits: grandTotalMinorUnits,
-        summary: paymentSelection.summary,
-        financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
-      }));
+      await Promise.resolve(checkoutAction?.(checkoutPayload));
       return;
     }
 
@@ -1581,28 +1752,27 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           return;
         }
 
-        await Promise.resolve(checkoutAction({
-          paymentMethod: paymentSelection.method,
-          walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
-          amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
-          orderTotalMinorUnits: grandTotalMinorUnits,
-          summary: paymentSelection.summary,
-          financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
-        }));
+        await Promise.resolve(checkoutAction?.(checkoutPayload));
         return;
       } finally {
         setCheckoutLoading(false);
       }
     }
 
-    await Promise.resolve(checkoutAction({
-      paymentMethod: paymentSelection.method,
-      walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
-      amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
-      orderTotalMinorUnits: grandTotalMinorUnits,
-      summary: paymentSelection.summary,
-      financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
-    }));
+    await Promise.resolve(checkoutAction?.(checkoutPayload));
+  };
+
+  const handleCheckoutPress = () => {
+    if (!runCheckoutPreflight()) {
+      return;
+    }
+
+    setCheckoutReviewVisible(true);
+  };
+
+  const confirmCheckoutReview = async () => {
+    setCheckoutReviewVisible(false);
+    await submitCheckoutAfterReview();
   };
 
   const handleEditPress = () => {
@@ -1616,14 +1786,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       return;
     }
 
-    const editPayload: CheckoutActionPayload = {
-      paymentMethod: paymentSelection.method,
-      walletAmountMinorUnits: paymentSelection.walletAmountMinorUnits,
-      amountDueOnDeliveryMinorUnits: paymentSelection.amountDueOnDeliveryMinorUnits,
-      orderTotalMinorUnits: grandTotalMinorUnits,
-      summary: paymentSelection.summary,
-      financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
-    };
+    const editPayload = buildCheckoutPayload();
 
     if (props.onOpenOrder) {
       props.onOpenOrder(editPayload);
@@ -1633,16 +1796,48 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     props.onContinue?.(editPayload);
   };
 
+  const toggleDeliveryModePicker = () => {
+    if (!deliveryModePickerOpen) {
+      closeQuickAction();
+    }
+    setDeliveryModePickerOpen((current) => !current);
+  };
+
+  const handleDeliveryModeSelection = (mode: DshFulfillmentDeliveryMode) => {
+    setSelectedFulfillmentMode(mode);
+    setDeliveryModePickerOpen(false);
+    showNotice('تم تحديث خيار التوصيل', getDeliveryModeSelectionSummary(mode), 'success');
+  };
+
+  const handlePickupLocationPreview = () => {
+    if (!hasStorePickupLocation) {
+      showNotice('موقع المتجر غير محدد', 'لم يرسل المتجر موقع الاستلام بعد.', 'info');
+      return;
+    }
+
+    showNotice(locationTitle, storePickupLocationLabel, 'info');
+  };
+
   const openQuickAction = (actionKey: QuickActionKey) => {
+    setDeliveryModePickerOpen(false);
+
+    if (actionKey === 'address' && isPickupMode) {
+      handlePickupLocationPreview();
+      return;
+    }
+
+    if (actionKey === 'extra' && selectedFulfillmentMode !== 'bthwani_delivery') {
+      return;
+    }
+
     if (quickActionKey === actionKey) {
-      setQuickActionKey(null);
-      setQuickActionDraft('');
+      closeQuickAction();
       return;
     }
 
     const initialValue = {
       coupon: couponCode,
-      address: pickupAddr,
+      address: pickupAddr === 'العنوان غير محدد بعد' ? '' : pickupAddr,
       note: note === 'لا يوجد ملاحظة' ? '' : note,
       extra: extraRequest,
     }[actionKey];
@@ -1681,8 +1876,13 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
 
     if (quickActionKey === 'address') {
-      setPickupAddr(trimmedValue || 'العنوان غير محدد بعد');
-      showNotice('تم تحديث العنوان', trimmedValue || 'تم حفظ العنوان كحالة غير محددة حتى يتم إدخاله لاحقًا.', 'success');
+      const nextLocation = trimmedValue || 'العنوان غير محدد بعد';
+      setPickupAddr(nextLocation);
+      showNotice(
+        `تم تحديث ${locationTitle}`,
+        trimmedValue || 'تم حفظ الموقع كحالة غير محددة حتى يتم إدخاله لاحقًا.',
+        'success',
+      );
     }
 
     if (quickActionKey === 'note') {
@@ -1700,34 +1900,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       );
     }
 
-    setQuickActionKey(null);
-    setQuickActionDraft('');
-  };
-
-  const openLocationEditor = () => {
-    setQuickActionKey(null);
-    setQuickActionDraft('');
-    setLocationDraft(pickupAddr === 'العنوان غير محدد بعد' ? '' : pickupAddr);
-    setLocationFeedback(null);
-    setLocationEditorVisible(true);
-  };
-
-  const closeLocationEditor = () => {
-    setLocationDraft(pickupAddr === 'العنوان غير محدد بعد' ? '' : pickupAddr);
-    setLocationEditorVisible(false);
-  };
-
-  const applyLocationDraft = () => {
-    const trimmedValue = locationDraft.trim();
-    const nextLocation = trimmedValue || 'العنوان غير محدد بعد';
-
-    setPickupAddr(nextLocation);
-    setLocationFeedback(
-      trimmedValue
-        ? 'تم تحديث موقع التوصيل محليًا.'
-        : 'تم حفظ الموقع كحالة غير محددة حتى يتم إدخاله لاحقًا.',
-    );
-    setLocationEditorVisible(false);
+    closeQuickAction();
   };
 
   const openProductPreview = (product: RecommendationProduct) => {
@@ -1805,14 +1978,74 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         <PromoBanner onPress={handleSubscribePress} />
 
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: spacing[3], paddingVertical: spacing[2], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
-            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5], flex: 1 }}>
-              <Icon name={fulfillmentModeMeta.icon} size={15} color={TEXT_PRIMARY} />
-              <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
-                {fulfillmentModeMeta.label}
-              </Text>
-            </View>
-            <Text role="caption" style={{ color: TEXT_SECONDARY }}>وضع التنفيذ</Text>
+          <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[2], gap: spacing[1.5], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+            <Surface tone="inset" padding={2} gap={1} style={{ borderRadius: 16 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[1.5], flex: 1 }}>
+                  <Icon name={fulfillmentModeMeta.icon} size={18} color={TEXT_PRIMARY} />
+                  <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                    <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                      خيار التوصيل
+                    </Text>
+                    <Text role="caption" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
+                      {deliveryModeSelectionSummary}
+                    </Text>
+                    <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                      إذا أردت تغييره اضغط هنا
+                    </Text>
+                  </View>
+                </View>
+                <Button
+                  label="تغيير"
+                  tone="secondary"
+                  size="sm"
+                  fullWidth={false}
+                  onPress={toggleDeliveryModePicker}
+                />
+              </View>
+            </Surface>
+            {deliveryModePickerOpen && (
+              <View style={{ gap: spacing[1] }}>
+                {fulfillmentModeOptions.map((option) => {
+                  const isSelected = option.value === selectedFulfillmentMode;
+
+                  return (
+                    <Pressable
+                      key={option.value}
+                      accessibilityRole="button"
+                      onPress={() => handleDeliveryModeSelection(option.value)}
+                      style={{
+                        borderWidth: 1,
+                        borderColor: isSelected ? SURFACE_WARM_BORDER : BORDER_SOFT,
+                        backgroundColor: isSelected ? SURFACE_WARM : colorPalette.surfacePrimary,
+                        borderRadius: 16,
+                        paddingHorizontal: spacing[2],
+                        paddingVertical: spacing[1.5],
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5] }}>
+                        <Icon name={option.icon} size={18} color={isSelected ? ACCENT_ORANGE : TEXT_PRIMARY} />
+                        <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
+                            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                              {option.label}
+                            </Text>
+                            {isSelected && (
+                              <Text role="caption" style={{ color: ACCENT_ORANGE, textAlign: 'right' }}>
+                                محدد
+                              </Text>
+                            )}
+                          </View>
+                          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                            {option.description}
+                          </Text>
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
           </View>
           <OptionRow
             title="هل لديك قسيمة تخفيض؟"
@@ -1829,17 +2062,48 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 submitDisabled={quickActionDraft.trim().length === 0}
                 onChangeValue={setQuickActionDraft}
                 onSubmit={applyQuickAction}
-                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+                onClose={closeQuickAction}
               />
             </View>
           )}
-          <OptionRow
-            title="موقع التوصيل"
-            subtitle={pickupAddr}
-            actionLabel="تغيير"
-            onAction={openLocationEditor}
-            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
-          />
+          <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[1], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+            <Surface tone="inset" padding={2} gap={1} style={{ borderRadius: 16 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                  <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                    {locationTitle}
+                  </Text>
+                  <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                    {locationSubtitle}
+                  </Text>
+                </View>
+                <Button
+                  label={isPickupMode ? 'عرض الموقع' : 'تغيير'}
+                  tone="secondary"
+                  size="sm"
+                  fullWidth={false}
+                  disabled={isPickupMode && !hasStorePickupLocation}
+                  onPress={isPickupMode ? handlePickupLocationPreview : () => openQuickAction('address')}
+                />
+              </View>
+            </Surface>
+          </View>
+          {quickActionKey === 'address' && quickActionMeta && (
+            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
+              <InlineActionEditor
+                meta={quickActionMeta}
+                value={quickActionDraft}
+                onChangeValue={setQuickActionDraft}
+                onSubmit={applyQuickAction}
+                onClose={closeQuickAction}
+              />
+            </View>
+          )}
+          <View style={{ paddingHorizontal: spacing[3], paddingBottom: spacing[2] }}>
+            <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+              {deliveryNotice}
+            </Text>
+          </View>
           <OptionRow
             title="ملاحظات الطلب"
             subtitle={note}
@@ -1854,14 +2118,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 value={quickActionDraft}
                 onChangeValue={setQuickActionDraft}
                 onSubmit={applyQuickAction}
-                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+                onClose={closeQuickAction}
               />
             </View>
           )}
-          {resolvedFulfillmentMode === 'bthwani_delivery' && (
+          {selectedFulfillmentMode === 'bthwani_delivery' && (
             <OptionRow
-              title="طلب إضافي على الطريق"
-              subtitle={extraRequest || 'مثال: بسبس أو ماء من أي ماركت على طريق الكابتن'}
+              title="على طريقي"
+              subtitle={extraRequest || 'أضف شيئًا بسيطًا من طريق الكابتن'}
               actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
               onAction={() => openQuickAction('extra')}
               style={{ paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
@@ -1874,7 +2138,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 value={quickActionDraft}
                 onChangeValue={setQuickActionDraft}
                 onSubmit={applyQuickAction}
-                onClose={() => { setQuickActionKey(null); setQuickActionDraft(''); }}
+                onClose={closeQuickAction}
               />
             </View>
           )}
@@ -1933,56 +2197,6 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           onOpenProductPreview={openProductPreview}
           onOpenStore={handleOpenStore}
         />
-
-        <Surface
-          tone="default"
-          padding={3}
-          gap={2}
-          style={{
-            backgroundColor: colorPalette.surfacePrimary,
-            borderWidth: 1,
-            borderColor: BORDER_SOFT,
-            borderRadius: 16,
-          }}
-        >
-          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[2] }}>
-            <View style={{ flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', gap: spacing[0.5] }}>
-              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
-                موقع التوصيل
-              </Text>
-              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
-                {pickupAddr}
-              </Text>
-            </View>
-            <Button
-              label="تغيير الموقع"
-              tone="secondary"
-              size="sm"
-              fullWidth={false}
-              onPress={openLocationEditor}
-            />
-          </View>
-
-          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
-            {deliveryNotice}
-          </Text>
-
-          {locationFeedback ? (
-            <Text role="caption" style={{ color: ACCENT_BLUE, textAlign: isRTL ? 'right' : 'left' }}>
-              {locationFeedback}
-            </Text>
-          ) : null}
-
-          {locationEditorVisible ? (
-            <InlineActionEditor
-              meta={QUICK_ACTION_META.address}
-              value={locationDraft}
-              onChangeValue={setLocationDraft}
-              onSubmit={applyLocationDraft}
-              onClose={closeLocationEditor}
-            />
-          ) : null}
-        </Surface>
 
         <CartItemEditor
           items={items}
@@ -2050,6 +2264,43 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           />
         </View>
       </View>
+
+      <SheetFrame visible={checkoutReviewVisible} title="مراجعة الطلب" onClose={() => setCheckoutReviewVisible(false)}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ gap: spacing[3], paddingBottom: Math.max(androidSystemBottomInset, safeArea.comfortable) }}
+        >
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+            راجع كل تفاصيل الطلب قبل تأكيد التنفيذ النهائي.
+          </Text>
+          <SummaryCard
+            items={checkoutReviewItems}
+            totalLabel="الإجمالي النهائي"
+            totalValue={formattedGrandTotal}
+            padding={2}
+            gap={2}
+          />
+          <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
+            <Button
+              label="تأكيد التنفيذ"
+              tone="brand"
+              fullWidth={false}
+              disabled={checkoutLoading}
+              loading={checkoutLoading}
+              onPress={confirmCheckoutReview}
+              style={{ flex: 1, minHeight: 50, borderRadius: 16, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
+            />
+            <Button
+              label="رجوع للتعديل"
+              tone="secondary"
+              fullWidth={false}
+              disabled={checkoutLoading}
+              onPress={() => setCheckoutReviewVisible(false)}
+              style={{ flex: 1, minHeight: 50, borderRadius: 16 }}
+            />
+          </View>
+        </ScrollView>
+      </SheetFrame>
 
       <Toast
         visible={Boolean(notice)}

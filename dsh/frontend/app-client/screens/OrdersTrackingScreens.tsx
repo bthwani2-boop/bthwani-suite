@@ -1390,6 +1390,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const isPartnerDelivery = resolvedMode === 'partner_delivery';
   const isPickup = resolvedMode === 'pickup';
   const deliveryActorLabel = isBthwaniDelivery ? 'الكابتن' : isPartnerDelivery ? 'موصل المتجر' : '';
+  const pickupLocationValue = normalizeText(values.pickupAddress).length ? values.pickupAddress : 'موقع المتجر غير محدد';
+  const dropoffLocationValue = normalizeText(values.dropoffAddress).length ? values.dropoffAddress : 'غير محدد';
+  const journeyRouteValue = `${pickupLocationValue} ← ${dropoffLocationValue}`;
   const [productRating, setProductRating] = React.useState(0);
   const [captainRating, setCaptainRating] = React.useState(0);
   const [ratingsSubmitted, setRatingsSubmitted] = React.useState(false);
@@ -1429,7 +1432,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const smartTracking = useSmartTrackingHeartbeat(phase);
   const [lastChatMessage, setLastChatMessage] = React.useState<OrderChatMessage>({
     id: 'chat-actor-1',
-    senderLabel: isBthwaniDelivery ? 'الكابتن المكلّف' : isPartnerDelivery ? 'موصل المتجر' : 'دعم الطلب',
+    senderLabel: isBthwaniDelivery ? 'الكابتن المكلّف' : isPartnerDelivery ? 'موصل المتجر' : 'المتجر',
     body: 'إذا احتجت صورة أو فيديو أو رسالة صوتية للمنتج فأرسلها هنا ضمن نفس الطلب.',
     time: 'قبل قليل',
     tone: 'info',
@@ -1460,7 +1463,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           : isPartnerDelivery
             ? 'موصل المتجر وصل إلى موقعك'
             : 'طلبك جاهز للاستلام الآن'
-        : 'تم تسليم الطلب'
+        : isPickup
+          ? 'تم استلام الطلب'
+          : 'تم تسليم الطلب'
     : clientStateMeta.title;
 
   const heroSummary = isTrackingJourneyState
@@ -1476,7 +1481,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           : isPartnerDelivery
             ? 'موصل المتجر وصل. استعد لاستلام طلبك.'
             : 'أنت على وشك الاستلام. أبرز رقم طلبك للمتجر.'
-        : 'تم تسليم الطلب بنجاح. شكراً لك! يمكنك تقييم الخدمة أو طلب الدعم إذا واجهت أي مشكلة.'
+        : isPickup
+          ? 'تم استلام طلبك من المتجر بنجاح. يمكنك تقييم التجربة أو طلب الدعم إذا واجهت أي مشكلة.'
+          : 'تم تسليم الطلب بنجاح. شكراً لك! يمكنك تقييم الخدمة أو طلب الدعم إذا واجهت أي مشكلة.'
     : clientStateMeta.description;
 
   const lifecycleStatusForSteps = buildDefaultLifecycleStatus(effectiveClientState, phase);
@@ -1506,7 +1513,9 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           : isPartnerDelivery
             ? 'استلم طلبك من موصل المتجر'
             : 'استلم طلبك من المتجر'
-        : 'طلبك مكتمل بنجاح'
+        : isPickup
+          ? 'تم استلام طلبك من المتجر'
+          : 'طلبك مكتمل بنجاح'
     : clientStateMeta.description;
 
   const hasClientReceived = phase === 'received' || effectiveClientState === 'delivered';
@@ -1546,7 +1555,29 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       ? 'تم إرسال التقييمين. أي تعديل جديد سيعيد فتح الإرسال.'
       : 'اختر تقييم المنتج من 1 إلى 5 ثم أرسل التقييم بالأسفل.';
 
-  const deliveryActorRatingLabel = isBthwaniDelivery ? 'الكابتن' : isPartnerDelivery ? 'موصل المتجر' : 'الخدمة';
+  const deliveryActorRatingLabel = isBthwaniDelivery ? 'الكابتن' : isPartnerDelivery ? 'موصل المتجر' : 'المتجر';
+  const communicationSummary = isBthwaniDelivery
+    ? 'يمكنك مراسلة الكابتن مباشرة داخل الطلب، أو تنبيهه، أو طلب الدعم والمساعدة عند وجود مشكلة.'
+    : isPartnerDelivery
+      ? 'يمكنك متابعة حالة التوصيل أو مراسلة موصل المتجر أو طلب الدعم عند وجود مشكلة.'
+      : 'توجه إلى المتجر لاستلام طلبك، ويمكنك طلب الدعم أو الإبلاغ عن مشكلة عند الحاجة.';
+  const chatActionLabel = isBthwaniDelivery ? 'مراسلة الكابتن' : 'مراسلة موصل المتجر';
+  const chatTitle = isBthwaniDelivery ? 'الدردشة مع الكابتن' : 'الدردشة مع موصل المتجر';
+  const chatInputLabel = isBthwaniDelivery ? 'رسالة إلى الكابتن' : 'رسالة إلى موصل المتجر';
+  const heroDetailItems = [
+    ...(isPickup
+      ? [{ label: 'موقع الاستلام', value: pickupLocationValue }]
+      : [{ label: 'المسار', value: journeyRouteValue }]),
+    ...(isTrackingJourneyState && phase !== 'received' && !isPickup && smartTracking.etaMinutes !== null
+      ? [{ label: 'الوقت التقريبي للوصول', value: smartTracking.etaMinutes > 0 ? `تقريباً ${smartTracking.etaMinutes} دقيقة` : 'وصل الآن', tone: 'success' as const }]
+      : []
+    ),
+    ...(isTrackingJourneyState && phase !== 'received'
+      ? [{ label: 'آخر تحديث', value: smartTracking.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${smartTracking.lastUpdateMinutesAgo} دقيقة` }]
+      : []
+    ),
+    { label: 'الإجراء التالي', value: nextStepValue, tone: 'brand' as const },
+  ];
   const captainHelperText = phase === 'route'
     ? `سيظهر تقييم ${deliveryActorRatingLabel} بعد الاستلام.`
     : phase === 'arrived'
@@ -1709,18 +1740,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           <View style={{ height: 1, backgroundColor: theme.line }} />
 
           <KeyValueList
-            items={[
-              { label: 'المسار', value: `${values.pickupAddress || 'غير محدد'} ← ${values.dropoffAddress || 'غير محدد'}` },
-              ...(isTrackingJourneyState && phase !== 'received' && smartTracking.etaMinutes !== null
-                ? [{ label: 'الوقت التقريبي للوصول', value: smartTracking.etaMinutes > 0 ? `تقريباً ${smartTracking.etaMinutes} دقيقة` : 'وصل الآن', tone: 'success' as const }]
-                : []
-              ),
-              ...(isTrackingJourneyState && phase !== 'received'
-                ? [{ label: 'آخر تحديث', value: smartTracking.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${smartTracking.lastUpdateMinutesAgo} دقيقة` }]
-                : []
-              ),
-              { label: 'الإجراء التالي', value: nextStepValue, tone: 'brand' as const },
-            ]}
+            items={heroDetailItems}
           />
         </Surface>
 
@@ -1733,17 +1753,13 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
           <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>التواصل والمساعدة</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            {isBthwaniDelivery
-              ? 'يمكنك مراسلة الكابتن مباشرة داخل الطلب، أو تنبيهه، أو طلب الدعم والمساعدة عند وجود مشكلة.'
-              : isPartnerDelivery
-                ? 'يمكنك متابعة حالة التوصيل أو التواصل مع دعم الطلب عند وجود مشكلة.'
-                : 'تواصل مع المتجر أو طلب الدعم عند الحاجة.'}
+            {communicationSummary}
           </Text>
 
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', flexDirection: 'row-reverse' }}>
             {!isPickup && (
               <Button
-                label={isChatExpanded ? 'إغلاق المراسلة' : isBthwaniDelivery ? 'مراسلة الكابتن' : 'مراسلة دعم الطلب'}
+                label={isChatExpanded ? 'إغلاق المراسلة' : chatActionLabel}
                 tone={isChatExpanded ? 'brand' : 'secondary'}
                 leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
                 onPress={() => setIsChatExpanded(!isChatExpanded)}
@@ -1782,7 +1798,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         {/* Inline Chat toggled by Message Button */}
         {isChatExpanded && !isPickup && (
           <OrderLinkedChat
-            title={isBthwaniDelivery ? 'الدردشة مع الكابتن' : 'التواصل مع دعم الطلب'}
+            title={chatTitle}
             subtitle={phase === 'received' ? 'السجل ظاهر للمراجعة فقط بعد الاستلام.' : 'آخر رسالة ومرفقات سريعة داخل نفس الصندوق.'}
             statusLabel={phase === 'received' ? 'الدردشة مقفلة' : 'مرتبطة بهذا الطلب'}
             statusTone={phase === 'received' ? 'warning' : 'brand'}
@@ -1794,7 +1810,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
               tone: lastChatMessage.tone,
             }}
             quickActions={quickActions}
-            inputLabel={isBthwaniDelivery ? 'رسالة إلى الكابتن' : 'رسالة إلى دعم الطلب'}
+            inputLabel={chatInputLabel}
             inputPlaceholder="اكتب رسالتك هنا"
             value={draftMessage}
             onChangeText={setDraftMessage}
@@ -1946,9 +1962,11 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         {/* 4. Post-Delivery Section Only */}
         {hasClientReceived && (
           <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-            <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700', color: theme.success }}>تقييم الخدمة وما بعد التسليم</Text>
+            <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700', color: theme.success }}>
+              {isPickup ? 'تقييم التجربة بعد الاستلام' : 'تقييم الخدمة وما بعد التسليم'}
+            </Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              {`يسعدنا معرفة رأيك في جودة المنتج وتجربتك مع ${deliveryActorRatingLabel}.`}
+              {isPickup ? 'يسعدنا معرفة رأيك في جودة المنتج وتجربة الاستلام من المتجر.' : `يسعدنا معرفة رأيك في جودة المنتج وتجربتك مع ${deliveryActorRatingLabel}.`}
             </Text>
 
             <DeferredReviewBlock
@@ -1966,7 +1984,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
 
             <DeferredReviewBlock
               title={`تقييم ${deliveryActorRatingLabel}`}
-              subtitle={`كيف كانت تجربة ${isBthwaniDelivery ? 'التواصل وسرعة التوصيل مع الكابتن' : isPartnerDelivery ? 'التوصيل مع موصل المتجر' : 'الاستلام والخدمة'}؟`}
+              subtitle={`كيف كانت تجربة ${isBthwaniDelivery ? 'التواصل وسرعة التوصيل مع الكابتن' : isPartnerDelivery ? 'التوصيل مع موصل المتجر' : 'الاستلام من المتجر'}؟`}
               enabled={true}
               placeholderText={`يرجى تقييم ${deliveryActorRatingLabel}`}
               currentValueLabel={captainRatingLabel}
