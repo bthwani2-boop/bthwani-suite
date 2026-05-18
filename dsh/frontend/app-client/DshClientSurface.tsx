@@ -853,6 +853,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         }))}
         onAppearanceModeChange={setAppearanceMode}
         onOpenOrders={() => setRoute('orders-list')}
+        onOpenWallet={() => { setSelectedOperationScreen('entitlements-get'); setRoute('benefits'); }}
+        onOpenLoyalty={() => { setSelectedOperationScreen('loyalty-points-client-balance'); setRoute('benefits'); }}
+        onOpenSubscriptions={() => { setSelectedOperationScreen('subscription-sync'); setRoute('benefits'); }}
+        onOpenAddresses={() => { setSelectedOperationScreen('entitlements-get'); setRoute('service-settings'); }}
+        onOpenLocation={() => setRoute('zone-set')}
+        onOpenIdentity={() => { setSelectedOperationScreen('entitlements-get'); setRoute('service-settings'); }}
+        onOpenCommercial={() => { setSelectedOperationScreen('promo-apply'); setRoute('benefits'); }}
+        onOpenAppearance={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
+        onOpenPreferences={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
         onBack={() => setRoute('home')}
