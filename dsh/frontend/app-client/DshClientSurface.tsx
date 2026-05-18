@@ -49,18 +49,19 @@ import {
 import { getDshClientStateMeta, type DshClientState } from './data/client-state.preview-data';
 import { getPublishedHomePromos } from '../shared/promo.preview-store';
 import { dshCategoryFixtures, dshCategoryListFixtures } from './data/categories.preview-data';
-import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
+import {
+  isDshFulfillmentDeliveryMode,
+  type DshClientCreateOrderRequest,
+  type DshFulfillmentDeliveryMode,
+} from './contracts/dsh-client-binding.contracts';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 
-type CreateOrderValues = {
-  pickupAddress: string;
-  dropoffAddress: string;
-  contactName: string;
-  contactPhone: string;
-  note: string;
-};
+type CreateOrderValues = Pick<
+  DshClientCreateOrderRequest,
+  'fulfillmentMode' | 'pickupAddress' | 'dropoffAddress' | 'contactName' | 'contactPhone' | 'note'
+>;
 
 type HostOrderSummary = {
   id: string;
@@ -70,6 +71,9 @@ type HostOrderSummary = {
   meta: string;
   clientState: DshClientState;
   fulfillmentMode: DshFulfillmentDeliveryMode;
+  pickupAddress: string;
+  dropoffAddress: string;
+  note?: string;
 };
 
 type HostCartItem = {
@@ -192,7 +196,22 @@ function getProductCanonicalMetadata(storeId: string, productId: string): HostCa
   };
 }
 
+function resolveStorePickupAddress(store: { subtitle?: string; name?: string }) {
+  const subtitle = store.subtitle?.trim();
+  if (subtitle) {
+    return subtitle;
+  }
+
+  const name = store.name?.trim();
+  if (name) {
+    return name;
+  }
+
+  return 'موقع المتجر غير محدد';
+}
+
 const initialCreateOrderValues: CreateOrderValues = {
+  fulfillmentMode: 'bthwani_delivery',
   pickupAddress: 'رياض بارك، البوابة 2',
   dropoffAddress: 'العليا، طريق الملك فهد',
   contactName: 'أحمد',
@@ -232,6 +251,9 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'الوصول المتوقع خلال 18 دقيقة',
     clientState: hostClientStates.trackingActive,
     fulfillmentMode: 'bthwani_delivery',
+    pickupAddress: 'مطعم حدة المركزي',
+    dropoffAddress: 'حدة، شارع الستين',
+    note: 'اتصل قبل الوصول.',
   },
   {
     id: 'dsh-10019',
@@ -241,6 +263,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'اليوم 03:10 م',
     clientState: hostClientStates.delivered,
     fulfillmentMode: 'partner_delivery',
+    pickupAddress: 'مخبز السبعين',
+    dropoffAddress: 'التحرير، شارع الزبيري',
   },
   {
     id: 'dsh-10017',
@@ -250,6 +274,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'تم الإلغاء مع توضيح سبب الحالة',
     clientState: hostClientStates.cancelled,
     fulfillmentMode: 'pickup',
+    pickupAddress: 'متجر شميلة',
+    dropoffAddress: '',
   },
   {
     id: 'dsh-10016',
@@ -259,6 +285,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'توجد حاجة إلى مسار تعافٍ أو دعم واضح',
     clientState: hostClientStates.failed,
     fulfillmentMode: 'bthwani_delivery',
+    pickupAddress: 'مطبخ مذبح السريع',
+    dropoffAddress: 'باب السلام، شارع 14',
   },
   {
     id: 'dsh-10015',
@@ -268,6 +296,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'الاسترداد ما يزال قيد المعالجة',
     clientState: hostClientStates.refundPending,
     fulfillmentMode: 'partner_delivery',
+    pickupAddress: 'كافيه السنينة',
+    dropoffAddress: 'سعوان، الشارع العام',
   },
   {
     id: 'dsh-10014',
@@ -277,6 +307,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'تم تثبيت الأثر المالي النهائي للطلب',
     clientState: hostClientStates.refunded,
     fulfillmentMode: 'pickup',
+    pickupAddress: 'متجر التحرير',
+    dropoffAddress: '',
   },
   {
     id: 'dsh-10013',
@@ -286,6 +318,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'هذه الحالة تحتاج متابعة دعم واضحة',
     clientState: hostClientStates.supportRequired,
     fulfillmentMode: 'partner_delivery',
+    pickupAddress: 'فرع الحصبة',
+    dropoffAddress: 'بيت بوس، شارع الخمسين',
   },
   {
     id: 'dsh-10012',
@@ -295,6 +329,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'يوجد رصيد ظاهر للعميل داخل المحفظة',
     clientState: hostClientStates.walletCreditVisible,
     fulfillmentMode: 'bthwani_delivery',
+    pickupAddress: 'فرع فج عطان',
+    dropoffAddress: 'السبعين، شارع الجزائر',
   },
   {
     id: 'dsh-10011',
@@ -304,6 +340,8 @@ const initialOrders: HostOrderSummary[] = [
     meta: 'تظهر معلومة الاسترداد المالي ضمن المسار',
     clientState: hostClientStates.walletRefundVisible,
     fulfillmentMode: 'pickup',
+    pickupAddress: 'متجر باب اليمن',
+    dropoffAddress: '',
   },
 ];
 
@@ -336,7 +374,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
-  const [createOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
+  const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
+  const [trackingOrderOverride, setTrackingOrderOverride] = React.useState<Partial<CreateOrderValues> | null>(null);
   const [selectedFulfillmentMode, setSelectedFulfillmentMode] = React.useState<DshFulfillmentDeliveryMode>(defaultFulfillmentMode);
   const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
   const [ordersQuery, setOrdersQuery] = React.useState('');
@@ -501,17 +540,37 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     setRoute('cart-get');
   }, []);
 
-  const openTrackedOrder = React.useCallback((orderId?: string, fallbackMode?: DshFulfillmentDeliveryMode) => {
+  const openTrackedOrder = React.useCallback((
+    orderId?: string,
+    launchOverrides?: {
+      fulfillmentMode?: DshFulfillmentDeliveryMode;
+      orderDraft?: Partial<CreateOrderValues>;
+    },
+  ) => {
     const nextOrder = initialOrders.find((order) => order.id === orderId) ?? initialOrders[0];
     const nextFulfillmentMode = orderId
       ? nextOrder.fulfillmentMode
-      : fallbackMode ?? selectedFulfillmentMode ?? nextOrder.fulfillmentMode ?? defaultFulfillmentMode;
+      : launchOverrides?.fulfillmentMode ?? selectedFulfillmentMode ?? nextOrder.fulfillmentMode ?? defaultFulfillmentMode;
+    const nextOrderDraft = orderId
+      ? {
+          fulfillmentMode: nextOrder.fulfillmentMode,
+          pickupAddress: nextOrder.pickupAddress,
+          dropoffAddress: nextOrder.dropoffAddress,
+          note: nextOrder.note ?? createOrderValues.note,
+        }
+      : launchOverrides?.orderDraft;
 
     setSelectedOrderId(nextOrder.id);
     setTrackingClientState(hostClientStates.trackingActive);
     setSelectedFulfillmentMode(nextFulfillmentMode);
+    setTrackingOrderOverride(orderId ? null : nextOrderDraft ?? null);
+    setCreateOrderValues((currentValues) => ({
+      ...currentValues,
+      ...nextOrderDraft,
+      fulfillmentMode: nextFulfillmentMode,
+    }));
     setRoute('tracking');
-  }, [defaultFulfillmentMode, selectedFulfillmentMode]);
+  }, [createOrderValues.note, defaultFulfillmentMode, selectedFulfillmentMode]);
 
   const openSupportFlow = React.useCallback(() => {
     setSelectedOperationScreen('order-issue-flag');
@@ -526,8 +585,14 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     setRoute('orders-list');
   }, []);
 
-  const handleConfirmedOrderExecution = React.useCallback((payload?: { fulfillmentMode?: DshFulfillmentDeliveryMode }) => {
-    openTrackedOrder(undefined, payload?.fulfillmentMode ?? selectedFulfillmentMode);
+  const handleConfirmedOrderExecution = React.useCallback((payload?: {
+    fulfillmentMode?: DshFulfillmentDeliveryMode;
+    orderDraft?: Partial<CreateOrderValues>;
+  }) => {
+    openTrackedOrder(undefined, {
+      fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
+      orderDraft: payload?.orderDraft,
+    });
   }, [openTrackedOrder, selectedFulfillmentMode]);
 
   const activeStore = React.useMemo(
@@ -537,8 +602,27 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
-  const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore.meta), [activeStore.meta]);
+  const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
   const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
+  const trackingOrderValues = React.useMemo<CreateOrderValues>(() => ({
+    fulfillmentMode: trackingOrderOverride?.fulfillmentMode ?? activeTrackedOrder?.fulfillmentMode ?? createOrderValues.fulfillmentMode ?? selectedFulfillmentMode,
+    pickupAddress: trackingOrderOverride?.pickupAddress ?? activeTrackedOrder?.pickupAddress ?? createOrderValues.pickupAddress,
+    dropoffAddress: trackingOrderOverride?.dropoffAddress ?? activeTrackedOrder?.dropoffAddress ?? createOrderValues.dropoffAddress,
+    contactName: createOrderValues.contactName,
+    contactPhone: createOrderValues.contactPhone,
+    note: trackingOrderOverride?.note ?? activeTrackedOrder?.note ?? createOrderValues.note,
+  }), [activeTrackedOrder, createOrderValues, selectedFulfillmentMode, trackingOrderOverride]);
+  const reopenTracking = React.useCallback(() => {
+    openTrackedOrder(
+      trackingOrderOverride ? undefined : activeTrackedOrder?.id,
+      trackingOrderOverride
+        ? {
+            fulfillmentMode: trackingOrderValues.fulfillmentMode,
+            orderDraft: trackingOrderOverride,
+          }
+        : undefined,
+    );
+  }, [activeTrackedOrder?.id, openTrackedOrder, trackingOrderOverride, trackingOrderValues.fulfillmentMode]);
 
   const selectedItem = React.useMemo(
     () => activeStoreItems.find((item) => item.id === selectedItemId) ?? activeStoreItems[0],
@@ -557,13 +641,20 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       sourceRecordId: item.sourceRecordId ?? activeStore.sourceRecordId,
       publishStage: item.publishStage ?? activeStore.publishStage,
     };
-    const nextFulfillmentMode = _payload?.deliveryMode === 'pickup' || _payload?.deliveryMode === 'partner_delivery' || _payload?.deliveryMode === 'bthwani_delivery'
+    const nextFulfillmentMode = isDshFulfillmentDeliveryMode(_payload?.deliveryMode)
       ? _payload.deliveryMode
       : defaultFulfillmentMode;
+    const storePickupAddress = resolveStorePickupAddress(activeStore);
 
     setActiveCanonicalStoreId(canonicalMetadata.canonicalStoreId);
     setActiveCanonicalProductId(canonicalMetadata.canonicalProductId);
     setSelectedFulfillmentMode(nextFulfillmentMode);
+    setCreateOrderValues((currentValues) => ({
+      ...currentValues,
+      fulfillmentMode: nextFulfillmentMode,
+      pickupAddress: storePickupAddress,
+      dropoffAddress: nextFulfillmentMode === 'pickup' ? '' : currentValues.dropoffAddress,
+    }));
 
     setCartItems((current) => {
       const existingIndex = current.findIndex((entry) => entry.id === item.id && entry.storeId === activeStore.id);
@@ -722,9 +813,14 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           setRoute('store-items');
         }}
         onOpenCart={(mode) => {
-          if (mode) {
-            setSelectedFulfillmentMode(mode);
-          }
+          const nextFulfillmentMode = mode ?? selectedFulfillmentMode;
+          setSelectedFulfillmentMode(nextFulfillmentMode);
+          setCreateOrderValues((currentValues) => ({
+            ...currentValues,
+            fulfillmentMode: nextFulfillmentMode,
+            pickupAddress: resolveStorePickupAddress(activeStore),
+            dropoffAddress: nextFulfillmentMode === 'pickup' ? '' : currentValues.dropoffAddress,
+          }));
           setRoute('cart-get');
         }}
         onOpenBenefits={() => {
@@ -943,13 +1039,13 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'tracking') {
     return (
       <DshTrackingScreen
-        values={createOrderValues}
+        values={trackingOrderValues}
         clientState={trackingClientState}
         currentStatusLabel={activeTrackedOrder?.statusLabel}
-        fulfillmentMode={activeTrackedOrder?.fulfillmentMode ?? selectedFulfillmentMode}
+        fulfillmentMode={trackingOrderValues.fulfillmentMode}
         timeline={trackingTimeline}
         onSupport={openSupportFlow}
-        onRetry={() => openTrackedOrder(activeTrackedOrder?.id)}
+        onRetry={reopenTracking}
         onNextAction={() => setRoute('orders-list')}
         onReorder={openCreateOrderJourney}
       />
@@ -959,9 +1055,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'bell') {
     return (
       <DshClientBellScreen
-        onOpenTracking={() => openTrackedOrder(activeTrackedOrder?.id)}
+        onOpenTracking={reopenTracking}
         onOpenOrders={() => setRoute('orders-list')}
-        onBack={() => openTrackedOrder(activeTrackedOrder?.id)}
+        onBack={reopenTracking}
         onRetry={() => setRoute('bell')}
       />
     );

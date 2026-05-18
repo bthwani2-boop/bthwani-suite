@@ -1,8 +1,9 @@
 import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 import type { DshPartnerPreparationStage } from '../../shared/dsh-order-journey.model';
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 
-type PartnerFulfillmentMode = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
+type PartnerFulfillmentMode = DshFulfillmentDeliveryMode;
 
 const FULFILLMENT_MODE_INSTRUCTIONS: Record<PartnerFulfillmentMode, { title: string; instruction: string }> = {
   pickup: {

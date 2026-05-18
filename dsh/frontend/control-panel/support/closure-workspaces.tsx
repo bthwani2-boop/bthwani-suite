@@ -11,10 +11,11 @@ import {
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
-type SupportFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
 type SupportRow = {
   id: string;

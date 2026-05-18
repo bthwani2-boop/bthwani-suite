@@ -29,6 +29,7 @@ export const LIVE_ORDERS_OPERATIONAL_PREVIEW = {
   rows: [
     {
       id: 'LO-1024',
+      fulfillmentMode: 'bthwani_delivery',
       status: 'قيد الإسناد',
       statusTone: 'warning',
       eta: '12 دقيقة',
@@ -50,6 +51,7 @@ export const LIVE_ORDERS_OPERATIONAL_PREVIEW = {
     },
     {
       id: 'LO-1077',
+      fulfillmentMode: 'bthwani_delivery',
       status: 'بانتظار إثبات',
       statusTone: 'danger',
       eta: '18 دقيقة',
@@ -71,6 +73,7 @@ export const LIVE_ORDERS_OPERATIONAL_PREVIEW = {
     },
     {
       id: 'LO-1099',
+      fulfillmentMode: 'bthwani_delivery',
       status: 'في الطريق',
       statusTone: 'best',
       eta: '7 دقائق',

@@ -1,4 +1,5 @@
 import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/dshStoreProductCardModel';
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
 export type DshPartnerIntakeQueue = 'offer-approval' | 'partner-review' | 'marketing-review';
@@ -104,7 +105,7 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
 ];
 
 // UI_PREVIEW_ONLY — commission and settlement figures are WLT-owned, not authoritative here
-export type DshPartnerFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+export type DshPartnerFulfillmentMode = DshFulfillmentDeliveryMode;
 
 export type DshPartnerModeAgreement = {
   mode: DshPartnerFulfillmentMode;

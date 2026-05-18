@@ -33,6 +33,7 @@ import { DshOperationScreen, type DshOperationScreenState } from '../parts/Opera
 import { getDshClientStateMeta, type DshClientState } from '../data/client-state.preview-data';
 import type {
   DshClientAddressSnapshot,
+  DshClientCreateOrderRequest,
   DshClientDeliveryLifecycleStatus,
   DshClientEventTimelineItem,
   DshClientExceptionReason,
@@ -46,13 +47,10 @@ import type {
 import { getDshFulfillmentDeliveryModeMeta } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
 
-type CreateOrderValues = {
-  pickupAddress: string;
-  dropoffAddress: string;
-  contactName: string;
-  contactPhone: string;
-  note: string;
-};
+type CreateOrderValues = Pick<
+  DshClientCreateOrderRequest,
+  'fulfillmentMode' | 'pickupAddress' | 'dropoffAddress' | 'contactName' | 'contactPhone' | 'note'
+>;
 
 type DshOrderListItem = {
   id: string;
@@ -138,6 +136,7 @@ export type DshIntakeHubScreenProps = DshFlowHubScreenProps;
 
 
 const defaultCreateOrderValues: CreateOrderValues = {
+  fulfillmentMode: 'bthwani_delivery',
   pickupAddress: 'رياض بارك، البوابة 2',
   dropoffAddress: 'العليا، طريق الملك فهد',
   contactName: 'أحمد',
@@ -1385,7 +1384,7 @@ type CreateOrderJourneyScreenProps = {
 function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
-  const resolvedMode: DshFulfillmentDeliveryMode = fulfillmentMode ?? 'bthwani_delivery';
+  const resolvedMode: DshFulfillmentDeliveryMode = fulfillmentMode ?? values.fulfillmentMode ?? 'bthwani_delivery';
   const isBthwaniDelivery = resolvedMode === 'bthwani_delivery';
   const isPartnerDelivery = resolvedMode === 'partner_delivery';
   const isPickup = resolvedMode === 'pickup';

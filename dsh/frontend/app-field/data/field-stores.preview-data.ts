@@ -3,8 +3,9 @@ import {
   type DshCanonicalPublishStage,
   type DshCanonicalStoreCard,
 } from '../../shared/dshStoreProductCardModel';
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 
-export type FieldFulfillmentMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+export type FieldFulfillmentMode = DshFulfillmentDeliveryMode;
 
 export type FieldFulfillmentModeAgreement = {
   mode: FieldFulfillmentMode;

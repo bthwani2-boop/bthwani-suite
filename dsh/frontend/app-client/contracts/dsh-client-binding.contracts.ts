@@ -60,6 +60,10 @@ export type DshClientFulfillmentMode = 'instant' | 'scheduled' | 'pickup' | 'par
 // Use this type anywhere the delivery channel (not timing) is the decision variable.
 export type DshFulfillmentDeliveryMode = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
 
+export function isDshFulfillmentDeliveryMode(value: string | null | undefined): value is DshFulfillmentDeliveryMode {
+  return value === 'pickup' || value === 'partner_delivery' || value === 'bthwani_delivery';
+}
+
 export type DshFulfillmentDeliveryModeMeta = {
   readonly mode: DshFulfillmentDeliveryMode;
   readonly label: string;
@@ -277,6 +281,7 @@ export type DshClientServiceabilitySnapshot = {
 };
 
 export type DshClientCreateOrderRequest = {
+  fulfillmentMode: DshFulfillmentDeliveryMode;
   pickupAddress: string;
   dropoffAddress: string;
   contactName: string;
@@ -417,6 +422,7 @@ export type DshClientOperationsDecisionPayload = {
 
 export type DshClientOperationsOrderDetail = {
   orderId: DshClientId;
+  fulfillmentMode: DshFulfillmentDeliveryMode;
   customerName: string;
   customerPhone: string;
   dropoffAddress: string;

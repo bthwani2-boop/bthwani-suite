@@ -29,11 +29,14 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
 
 type OpsDecision = DshOperationsDecisionKind;
 
-type PendingApprovalOrder = DshOperationsOrderDetail;
+type PendingApprovalOrder = DshOperationsOrderDetail & {
+  fulfillmentMode: DshFulfillmentOperationalMode;
+};
 
 const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
   {
     id: 'PA-0081',
+    fulfillmentMode: 'bthwani_delivery',
     customerName: 'أحمد محمد',
     customerPhone: '770000000',
     dropoffAddress: 'العليا، طريق الملك فهد',
@@ -58,9 +61,10 @@ const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
   },
   {
     id: 'PA-0082',
+    fulfillmentMode: 'pickup',
     customerName: 'سارة خالد',
     customerPhone: '771111111',
-    dropoffAddress: 'حي النزهة، شارع 15',
+    dropoffAddress: '',
     pickupAddress: 'الواحة مول، المدخل الرئيسي',
     storeName: 'برغر لاب',
     paymentMethod: 'محفظة WLT',
@@ -70,10 +74,10 @@ const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
       { title: 'بطاطس كبير', qty: 1, priceLabel: '800 ر.ي' },
     ],
     subtotalLabel: '5,800 ر.ي',
-    deliveryLabel: '950 ر.ي',
-    totalLabel: '6,750 ر.ي',
-    customerNote: '',
-    customerInstructions: 'سلّم للحارس في المدخل.',
+    deliveryLabel: '0 ر.ي',
+    totalLabel: '5,800 ر.ي',
+    customerNote: 'سأصل خلال 15 دقيقة.',
+    customerInstructions: 'أبرز رقم الطلب للمتجر عند الاستلام.',
     couponCode: 'DSH10',
     eventLog: [
       { status: 'تم إنشاء الطلب', actor: 'العميل', timestamp: '2026-05-16T10:15:00+03:00' },
@@ -91,7 +95,7 @@ const mockTicketsForOrder: Record<string, {
   type: string;
   description: string;
   attachedImage: string;
-  chatHistory: Array<{ sender: 'العميل' | 'الكابتن' | 'النظام'; text: string; time: string }>;
+  chatHistory: Array<{ sender: 'العميل' | 'الكابتن' | 'موصل المتجر' | 'المتجر' | 'النظام'; text: string; time: string }>;
 }> = {
   'PA-0081': {
     ticketId: 'TK-4022',
@@ -110,20 +114,32 @@ const mockTicketsForOrder: Record<string, {
   },
   'PA-0082': {
     ticketId: 'TK-4025',
-    status: 'مفتوح / بانتظار العمليات',
-    statusTone: 'danger',
-    type: 'تعديل موقع التسليم',
-    description: 'العميل يطلب تغيير وجهة التوصيل لتكون للمدخل الخلفي بدل الرئيسي.',
-    attachedImage: 'العنوان_الجديد_المعدل.jpg',
+    status: 'نشط / متابعة جاهزية الاستلام',
+    statusTone: 'warning',
+    type: 'الطلب غير جاهز في المتجر',
+    description: 'العميل يسأل عن جاهزية الطلب قبل التوجه إلى المتجر.',
+    attachedImage: '',
     chatHistory: [
-      { sender: 'العميل', text: 'كابتن، يرجى تسليم الطلب للمدخل الخلفي للمجمع السكني وليس الرئيسي.', time: '10:16' },
-      { sender: 'الكابتن', text: 'أبشر، تم استلام الملاحظة وسأتوجه مباشرة للمدخل الخلفي عند الوصول.', time: '10:17' },
-      { sender: 'النظام', text: '🔔 تم إرسال رنة تنبيه تلقائية للكابتن لتأكيد تحديث العنوان.', time: '10:18' },
+      { sender: 'العميل', text: 'هل أصبح الطلب جاهزًا للاستلام من المتجر؟', time: '10:16' },
+      { sender: 'المتجر', text: 'يتبقى بضع دقائق على الجاهزية. سنؤكد لك فور الانتهاء.', time: '10:17' },
+      { sender: 'النظام', text: '🔔 تم تنبيه العمليات بوجود طلب استلام ذاتي بانتظار تأكيد الجاهزية.', time: '10:18' },
     ],
   },
 };
 
 const FULFILLMENT_MODE_IDS: readonly DshFulfillmentOperationalMode[] = ['bthwani_delivery', 'partner_delivery', 'pickup'];
+
+function getOperationsActorLabel(mode: DshFulfillmentOperationalMode) {
+  if (mode === 'partner_delivery') {
+    return 'موصل المتجر';
+  }
+
+  if (mode === 'pickup') {
+    return 'المتجر';
+  }
+
+  return 'الكابتن';
+}
 
 function FulfillmentModeQueueSection({ mode }: { mode: DshFulfillmentOperationalMode }) {
   const { theme } = useTheme();
@@ -174,6 +190,18 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
   const { theme } = useTheme();
   const [note, setNote] = React.useState('');
   const [pending, setPending] = React.useState<OpsDecision | null>(null);
+  const modeMeta = DSH_FULFILLMENT_OPERATIONAL_MODE_META[order.fulfillmentMode];
+  const deliveryActorLabel = getOperationsActorLabel(order.fulfillmentMode);
+  const isPickupMode = order.fulfillmentMode === 'pickup';
+  const locationRows = isPickupMode
+    ? [{ label: 'موقع الاستلام', value: order.pickupAddress }]
+    : [
+        { label: 'عنوان الاستلام', value: order.pickupAddress },
+        { label: 'عنوان التسليم', value: order.dropoffAddress },
+      ];
+  const supportConversationTitle = isPickupMode
+    ? '💬 سجل تواصل العميل والمتجر'
+    : `💬 سجل دردشة العميل و${deliveryActorLabel}`;
 
   const handleDecision = (decision: OpsDecision) => {
     setPending(decision);
@@ -206,21 +234,26 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
     <div style={{ border: `1px solid ${theme.line}`, borderRadius: '14px', padding: '20px', background: theme.surfaceRaised, display: 'flex', flexDirection: 'column', gap: '16px', direction: 'rtl', textAlign: 'right' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
         <span style={{ fontSize: '13px', fontWeight: 800, color: theme.brand }}>#{order.id}</span>
-        <span style={{ fontSize: '11px', background: theme.warningSurface, color: theme.warning, padding: '3px 10px', borderRadius: '99px', fontWeight: 700 }}>قيد مراجعة العمليات</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '11px', background: theme.surfaceInset, color: theme.textMuted, padding: '3px 10px', borderRadius: '99px', fontWeight: 700 }}>
+            {modeMeta.label}
+          </span>
+          <span style={{ fontSize: '11px', background: theme.warningSurface, color: theme.warning, padding: '3px 10px', borderRadius: '99px', fontWeight: 700 }}>قيد مراجعة العمليات</span>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         {[
           { label: 'العميل', value: order.customerName },
           { label: 'الجوال', value: order.customerPhone },
-          { label: 'عنوان الاستلام', value: order.pickupAddress },
-          { label: 'عنوان التسليم', value: order.dropoffAddress },
+          ...locationRows,
           { label: 'المتجر/الشريك', value: order.storeName },
+          { label: 'المالك التشغيلي', value: modeMeta.operationalOwner },
           { label: 'طريقة الدفع', value: order.paymentMethod },
           { label: 'حالة الدفع', value: order.paymentStatus },
           ...(order.couponCode ? [{ label: 'القسيمة', value: order.couponCode }] : []),
           ...(order.customerNote ? [{ label: 'ملاحظة العميل', value: order.customerNote }] : []),
-          ...(order.customerInstructions ? [{ label: 'تعليمات التسليم', value: order.customerInstructions }] : []),
+          ...(order.customerInstructions ? [{ label: isPickupMode ? 'تعليمات الاستلام' : 'تعليمات التسليم', value: order.customerInstructions }] : []),
         ].map(({ label, value }) => (
           <div key={label} style={{ background: theme.surfaceInset, borderRadius: '8px', padding: '8px 12px' }}>
             <div style={{ fontSize: '10px', color: theme.textMuted, marginBottom: '2px' }}>{label}</div>
@@ -293,7 +326,7 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
 
       {/* سجل دردشة العميل والكابتن المباشرة */}
       <div style={{ borderTop: `1px solid ${theme.line}`, paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 800, color: theme.text }}>💬 سجل دردشة العميل والكابتن المباشرة</div>
+        <div style={{ fontSize: '13px', fontWeight: 800, color: theme.text }}>{supportConversationTitle}</div>
         {ticketData.chatHistory.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', background: theme.surfaceInset, borderRadius: '10px', padding: '12px' }}>
             {ticketData.chatHistory.map((chat, idx) => {
@@ -455,7 +488,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
           <WebControlPanelDecisionRow
             key={order.id}
             entityId={order.id}
-            entityLabel={`${order.destination} — الكابتن: ${order.captain}`}
+            entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
             status={order.status}
             statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
             risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}

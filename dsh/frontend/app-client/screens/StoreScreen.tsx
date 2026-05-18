@@ -560,6 +560,18 @@ function DshStoreGetScreenContent({
     return getAllDeliveryModes();
   }, [store?.deliveryModes]);
 
+  React.useEffect(() => {
+    if (deliveryModes.length === 0) {
+      return;
+    }
+
+    if (deliveryModes.some((mode) => mode.id === selectedMode)) {
+      return;
+    }
+
+    setSelectedMode(deliveryModes[0].id);
+  }, [deliveryModes, selectedMode]);
+
   const storeCoverImageSource = React.useMemo(() => {
     if (!store) return undefined;
     // Global Rule: Square frame always uses store cover image

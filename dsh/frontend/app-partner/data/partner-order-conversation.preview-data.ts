@@ -1,3 +1,5 @@
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+
 // UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
 export const dshPartnerOrderConversationPreviewDataContract = {
   dataKind: 'UI_PREVIEW_ONLY',
@@ -8,7 +10,7 @@ export const dshPartnerOrderConversationPreviewDataContract = {
   moneySemantics: 'not_applicable',
 } as const;
 
-export type DshPartnerOrderConversationMode = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
+export type DshPartnerOrderConversationMode = DshFulfillmentDeliveryMode;
 
 export type DshPartnerOrderConversationMessage = {
   id: string;

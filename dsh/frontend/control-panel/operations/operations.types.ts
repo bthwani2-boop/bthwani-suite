@@ -1,6 +1,8 @@
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+
 export type OperationsPanelId = 'detail' | 'chat';
 
-export type DshFulfillmentOperationalMode = 'bthwani_delivery' | 'partner_delivery' | 'pickup';
+export type DshFulfillmentOperationalMode = DshFulfillmentDeliveryMode;
 
 export const DSH_FULFILLMENT_OPERATIONAL_MODE_META: Readonly<Record<DshFulfillmentOperationalMode, {
   readonly label: string;

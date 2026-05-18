@@ -34,26 +34,26 @@ export type StoreDeliveryModeEntry = {
   fee?: number;
 };
 
-export function buildStoreDeliveryModes(meta: string): StoreDeliveryModeEntry[] {
+export function buildStoreDeliveryModes(store: Pick<DshDiscoveryStore, 'meta' | 'supportsPickup' | 'supportsPartnerDelivery'>): StoreDeliveryModeEntry[] {
   return [
     {
       id: 'bthwani_delivery',
       name: 'توصيل بثواني',
       isAvailable: true,
-      estimatedTime: meta,
+      estimatedTime: store.meta,
       fee: 12,
     },
     {
       id: 'partner_delivery',
       name: 'توصيل المتجر',
-      isAvailable: true,
-      estimatedTime: meta,
+      isAvailable: store.supportsPartnerDelivery,
+      estimatedTime: store.meta,
       fee: 0,
     },
     {
       id: 'pickup',
       name: 'استلم بنفسك',
-      isAvailable: true,
+      isAvailable: store.supportsPickup,
       estimatedTime: '15 دقيقة',
       fee: 0,
     },

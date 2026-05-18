@@ -30,13 +30,14 @@ import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearanc
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../shared/dshStoreProductCardModel';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
+import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
 
 type PartnerOperationalMode = {
-  id: 'pickup' | 'partner_delivery' | 'bthwani_delivery';
+  id: DshFulfillmentDeliveryMode;
   title: string;
   subtitle: string;
   commission: string;

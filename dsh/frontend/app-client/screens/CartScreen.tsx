@@ -36,6 +36,7 @@ import {
 } from '../../../../wlt/frontend/app-client/dsh';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import {
+  type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
   getDshFulfillmentDeliveryModeMeta,
 } from '../contracts/dsh-client-binding.contracts';
@@ -105,6 +106,11 @@ type CartItem = {
   storeName?: string;
 };
 
+type CheckoutOrderDraft = Pick<
+  DshClientCreateOrderRequest,
+  'fulfillmentMode' | 'pickupAddress' | 'dropoffAddress' | 'note'
+>;
+
 type CheckoutActionPayload = {
   paymentMethod: PaymentMethodKey;
   walletAmountMinorUnits: number;
@@ -113,6 +119,7 @@ type CheckoutActionPayload = {
   summary: string;
   financeEventKind: WltDshFinanceEventKind;
   fulfillmentMode: DshFulfillmentDeliveryMode;
+  orderDraft: CheckoutOrderDraft;
 };
 
 export type DshCartUnifiedScreenProps = {
@@ -1067,7 +1074,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(selectedFulfillmentMode);
   // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY — real fee from WLT).
   const deliveryAmount = selectedFulfillmentMode === 'pickup' ? 0 : 950;
-  const [pickupAddr, setPickupAddr] = useState('جوار الجبل الجديد');
+  const [clientAddress, setClientAddress] = useState('جوار الجبل الجديد');
   const [note, setNote] = useState('لا يوجد ملاحظة');
   const [extraRequest, setExtraRequest] = useState('');
   const [scheduling, setScheduling] = useState<'now' | 'later'>('now');
@@ -1114,7 +1121,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   }, [props.store?.name, props.store?.subtitle]);
   const hasStorePickupLocation = storePickupLocationLabel !== 'موقع المتجر غير محدد';
   const locationTitle = isPickupMode ? 'موقع الاستلام' : 'موقع التوصيل';
-  const locationSubtitle = isPickupMode ? storePickupLocationLabel : pickupAddr;
+  const locationSubtitle = isPickupMode ? storePickupLocationLabel : clientAddress;
   const deliveryModeSelectionSummary = getDeliveryModeSelectionSummary(selectedFulfillmentMode);
   const deliveryNotice = selectedFulfillmentMode === 'pickup'
     ? 'لا توجد رسوم توصيل عند الاستلام بنفسك.'
@@ -1706,6 +1713,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     summary: paymentSelection.summary,
     financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(paymentSelection.method),
     fulfillmentMode: selectedFulfillmentMode,
+    orderDraft: {
+      fulfillmentMode: selectedFulfillmentMode,
+      pickupAddress: storePickupLocationLabel,
+      dropoffAddress: selectedFulfillmentMode === 'pickup' ? '' : clientAddress,
+      note,
+    },
   });
 
   const runCheckoutPreflight = () => {
@@ -1837,7 +1850,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     const initialValue = {
       coupon: couponCode,
-      address: pickupAddr === 'العنوان غير محدد بعد' ? '' : pickupAddr,
+      address: clientAddress === 'العنوان غير محدد بعد' ? '' : clientAddress,
       note: note === 'لا يوجد ملاحظة' ? '' : note,
       extra: extraRequest,
     }[actionKey];
@@ -1877,7 +1890,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     if (quickActionKey === 'address') {
       const nextLocation = trimmedValue || 'العنوان غير محدد بعد';
-      setPickupAddr(nextLocation);
+      setClientAddress(nextLocation);
       showNotice(
         `تم تحديث ${locationTitle}`,
         trimmedValue || 'تم حفظ الموقع كحالة غير محددة حتى يتم إدخاله لاحقًا.',
