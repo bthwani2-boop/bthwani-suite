@@ -1632,7 +1632,7 @@ return (
         activeId="home"
         onSelect={(id) => {
           if (id === 'favorites') onOpenFavorites?.();
-          if (id === 'orders') onOpenTracking?.();
+          if (id === 'orders') onOpenOrders?.();
           if (id === 'wallet') onOpenWallet?.();
           if (id === 'profile') onOpenMySpace?.();
         }}

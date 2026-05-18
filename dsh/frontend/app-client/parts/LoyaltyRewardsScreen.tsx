@@ -4,10 +4,12 @@ import {
   Badge,
   Box,
   Button,
+  Divider,
   Surface,
   Text,
   spacing,
   useTheme,
+  ActionStrip,
 } from '@bthwani/ui-kit';
 import { loyaltyRewardsFixture } from '../data/loyalty-commercial.preview-data';
 
@@ -23,7 +25,6 @@ type RewardRow = {
   helperText?: string;
 };
 
-import { ActionStrip } from '@bthwani/ui-kit';
 export function DshLoyaltyRewardsScreen({
   title = 'النقاط والولاء',
   compact = false,
@@ -58,7 +59,8 @@ export function DshLoyaltyRewardsScreen({
         </Box>
       ) : null}
 
-      <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: theme.line, backgroundColor: theme.surface }}>
+      <View style={{ paddingTop: spacing[2] }}>
+        <Divider />
         <ActionStrip
           icon="wallet-outline"
           title="الرصيد الحالي"
@@ -108,7 +110,7 @@ export function DshLoyaltyRewardsScreen({
               subtitle={
                 <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
                   <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                    {reward.helperText ?? 'مكافأة قابلة للاستبدال.'}
+                    {reward.helperText ?? 'مكافأة قابله للاستبدال.'}
                   </Text>
                   <Badge label={reward.value} tone="warning" />
                 </View>

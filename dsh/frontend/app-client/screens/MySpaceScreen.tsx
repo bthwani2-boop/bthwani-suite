@@ -18,6 +18,9 @@ import {
   safeArea,
   spacing,
   useTheme,
+  SegmentedControl,
+  useDirection,
+  type Language,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 
@@ -60,6 +63,7 @@ type MySpacePrimaryTab =
   | 'addresses-location'
   | 'identity'
   | 'appearance'
+  | 'language'
   | 'preferences';
 
 type PrimaryTabConfig = {
@@ -78,6 +82,7 @@ const primaryTabs: PrimaryTabConfig[] = [
   { id: 'addresses-location', label: 'العناوين والموقع', summary: 'إدارة العناوين وموقع التوصيل', iconName: 'location-outline' },
   { id: 'identity', label: 'الملف الشخصي', summary: 'البيانات الشخصية والأمان', iconName: 'person-outline' },
   { id: 'appearance', label: 'المظهر', summary: 'فاتح أبيض أو داكن زجاجي', iconName: 'color-palette-outline' },
+  { id: 'language', label: 'اللغة', summary: 'العربية أو الإنجليزية', iconName: 'globe-outline' },
   { id: 'preferences', label: 'تفضيلات التوصيل', summary: 'إعدادات خاصة بالتسليم والاستبدال', iconName: 'options-outline' },
 ];
 
@@ -85,7 +90,9 @@ interface MySpacePrimaryRowProps {
   title: string;
   subtitle: string;
   iconName: any;
-  onPress: () => void;
+  onPress?: () => void;
+  isExpanded?: boolean;
+  actionElement?: React.ReactNode;
 }
 
 function MySpacePrimaryRow({
@@ -93,8 +100,55 @@ function MySpacePrimaryRow({
   subtitle,
   iconName,
   onPress,
+  isExpanded = false,
+  actionElement,
 }: MySpacePrimaryRowProps) {
   const { theme } = useTheme();
+
+  const content = (
+    <View
+      style={{
+        width: '100%',
+        paddingHorizontal: spacing[3],
+        paddingVertical: spacing[3],
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        gap: spacing[3],
+      }}
+    >
+      <View
+        style={{
+          width: 44,
+          height: 44,
+          borderRadius: 15,
+          borderWidth: 1,
+          borderColor: theme.line,
+          backgroundColor: theme.brandSurface,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon name={iconName} size={21} color={theme.brand} />
+      </View>
+
+      <View style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}>
+        <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>{title}</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 2 }}>
+          {subtitle}
+        </Text>
+      </View>
+
+      {actionElement ? (
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          {actionElement}
+        </View>
+      ) : (
+        <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={theme.textSoft} />
+        </View>
+      )}
+    </View>
+  );
 
   return (
     <Surface
@@ -115,51 +169,29 @@ function MySpacePrimaryRow({
         overflow: 'hidden',
       }}
     >
-      <Pressable
-        accessibilityRole="button"
-        onPress={onPress}
-        style={({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => ({
-          width: '100%',
-          paddingHorizontal: spacing[3],
-          paddingVertical: spacing[3],
-          backgroundColor: pressed ? theme.line : 'transparent',
-          flexDirection: 'row-reverse',
-          alignItems: 'center',
-          gap: spacing[3],
-        })}
-      >
-        <View
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 15,
-            borderWidth: 1,
-            borderColor: theme.line,
-            backgroundColor: theme.brandSurface,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+      {actionElement ? (
+        content
+      ) : (
+        <Pressable
+          accessibilityRole="button"
+          onPress={onPress}
+          style={({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => ({
+            width: '100%',
+            backgroundColor: pressed ? theme.line : 'transparent',
+          })}
         >
-          <Icon name={iconName} size={21} color={theme.brand} />
-        </View>
-
-        <View style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>{title}</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 2 }}>
-            {subtitle}
-          </Text>
-        </View>
-
-        <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="chevron-back" size={20} color={theme.textSoft} />
-        </View>
-      </Pressable>
+          {content}
+        </Pressable>
+      )}
     </Surface>
   );
 }
 
 export function DshMySpaceScreen({
   state = 'ready',
+  appearanceHydrated,
+  appearanceMode = 'light',
+  onAppearanceModeChange,
   onOpenBenefits,
   onOpenOrders,
   onOpenWallet,
@@ -173,12 +205,22 @@ export function DshMySpaceScreen({
   onRetry,
 }: DshMySpaceScreenProps) {
   const { theme } = useTheme();
+  const { language, setLanguage } = useDirection();
 
   if (state !== 'ready') {
     return <DshOperationScreen state={state} title="مساحتي" subtitle="الهوية الشخصية داخل DSH" onRetry={onRetry} />;
   }
 
   const handleRowPress = (sectionId: MySpacePrimaryTab) => {
+    if (sectionId === 'identity') {
+      if (onOpenIdentity) {
+        onOpenIdentity();
+      } else {
+        console.warn('Missing onOpenIdentity callback');
+      }
+      return;
+    }
+
     switch (sectionId) {
       case 'orders':
         return onOpenOrders ? onOpenOrders() : console.warn('Missing onOpenOrders callback');
@@ -204,12 +246,12 @@ export function DshMySpaceScreen({
             : console.warn('Missing onOpenCommercial callback');
       case 'addresses-location':
         return onOpenAddressesLocation ? onOpenAddressesLocation() : console.warn('Missing onOpenAddressesLocation callback');
-      case 'identity':
-        return onOpenIdentity ? onOpenIdentity() : console.warn('Missing onOpenIdentity callback');
       case 'appearance':
         return onOpenAppearance ? onOpenAppearance() : console.warn('Missing onOpenAppearance callback');
       case 'preferences':
         return onOpenPreferences ? onOpenPreferences() : console.warn('Missing onOpenPreferences callback');
+      default:
+        break;
     }
   };
 
@@ -227,15 +269,54 @@ export function DshMySpaceScreen({
         contentContainerStyle={{ paddingBottom: safeArea.comfortable + spacing[12] }}
       >
         <Box gap={3}>
-          {primaryTabs.map((section) => (
-            <MySpacePrimaryRow
-              key={section.id}
-              title={section.label}
-              subtitle={section.summary}
-              iconName={section.iconName}
-              onPress={() => handleRowPress(section.id)}
-            />
-          ))}
+          {primaryTabs.map((section) => {
+            let actionElement: React.ReactNode = undefined;
+
+            if (section.id === 'appearance') {
+              actionElement = (
+                <SegmentedControl
+                  size="sm"
+                  fullWidth={false}
+                  style={{ width: 140 }}
+                  options={[
+                    { value: 'lightPremium', label: 'فاتح' },
+                    { value: 'darkGlass', label: 'داكن' },
+                  ]}
+                  value={appearanceMode === 'darkGlass' || appearanceMode === 'dark' ? 'darkGlass' : 'lightPremium'}
+                  onValueChange={(nextValue) => {
+                    onAppearanceModeChange?.(nextValue as BThwaniAppearanceMode);
+                  }}
+                />
+              );
+            } else if (section.id === 'language') {
+              actionElement = (
+                <SegmentedControl
+                  size="sm"
+                  fullWidth={false}
+                  style={{ width: 140 }}
+                  options={[
+                    { value: 'ar', label: 'عربي' },
+                    { value: 'en', label: 'EN' },
+                  ]}
+                  value={language === 'en' ? 'en' : 'ar'}
+                  onValueChange={(nextValue) => {
+                    setLanguage(nextValue as Language);
+                  }}
+                />
+              );
+            }
+
+            return (
+              <MySpacePrimaryRow
+                key={section.id}
+                title={section.label}
+                subtitle={section.summary}
+                iconName={section.iconName}
+                actionElement={actionElement}
+                onPress={() => handleRowPress(section.id)}
+              />
+            );
+          })}
         </Box>
       </MobileScrollView>
     </View>

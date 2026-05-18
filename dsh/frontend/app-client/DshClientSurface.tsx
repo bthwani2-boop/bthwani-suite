@@ -24,6 +24,7 @@ import {
   DshListingStatusUpdateScreen,
 } from './screens/OperationScreens';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
+import { DshIdentityHubScreen } from './screens/MySpaceSubScreens';
 import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
 import {
   dshHomeGetFixturePromos,
@@ -455,7 +456,17 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       if (routeTransitionFromBackRef.current) {
         routeTransitionFromBackRef.current = false;
       } else {
-        routeHistoryRef.current.push(route);
+        if (route === 'home') {
+          routeHistoryRef.current = ['home'];
+        } else {
+          // Prevent navigation loops by trimming history if route already exists in stack
+          const routeIndex = routeHistoryRef.current.indexOf(route);
+          if (routeIndex !== -1) {
+            routeHistoryRef.current = routeHistoryRef.current.slice(0, routeIndex + 1);
+          } else {
+            routeHistoryRef.current.push(route);
+          }
+        }
         if (Platform.OS === 'web' && typeof window !== 'undefined') {
           window.history.pushState({ route }, '');
         }
@@ -819,6 +830,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     ['DshZoneSetScreen', DshZoneSetScreen as unknown],
     ['DshListingStatusUpdateScreen', DshListingStatusUpdateScreen as unknown],
     ['DshAddressLocationScreen', DshAddressLocationScreen as unknown],
+    ['DshIdentityHubScreen', DshIdentityHubScreen as unknown],
   ];
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
@@ -864,7 +876,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onOpenLoyalty={() => { setSelectedOperationScreen('loyalty-points-client-balance'); setRoute('benefits'); }}
         onOpenSubscriptions={() => { setSelectedOperationScreen('subscription-sync'); setRoute('benefits'); }}
         onOpenAddressesLocation={() => setRoute('addresses-location')}
-        onOpenIdentity={() => { setSelectedOperationScreen('entitlements-get'); setRoute('service-settings'); }}
+        onOpenIdentity={() => setRoute('identity')}
         onOpenCommercial={() => { setSelectedOperationScreen('promo-apply'); setRoute('benefits'); }}
         onOpenAppearance={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
         onOpenPreferences={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
@@ -1121,6 +1133,14 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'addresses-location') {
     return (
       <DshAddressLocationScreen
+        onBack={() => setRoute('my-space')}
+      />
+    );
+  }
+
+  if (route === 'identity') {
+    return (
+      <DshIdentityHubScreen
         onBack={() => setRoute('my-space')}
       />
     );

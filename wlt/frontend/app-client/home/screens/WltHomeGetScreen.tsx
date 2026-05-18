@@ -56,7 +56,7 @@ export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) 
 
   return (
     <View style={{ flex: 1 }}>
-      <TopBar title={tr('wlt.home.title', 'المحفظة')} onBack={onBack} />
+      <TopBar title={tr('wlt.home.title', 'المحفظة')} />
     <ScreenWrapper state={state} loadingMessage={tr('surfaces.loading', 'جارٍ التحميل')} successMessage={tr('wlt.topup.success', 'تم الشحن')} onSuccessAction={() => setState('content')}>
       <ScrollView ref={scrollRef} style={{ flex: 1 }}>
         {/* Prominent balance hero */}

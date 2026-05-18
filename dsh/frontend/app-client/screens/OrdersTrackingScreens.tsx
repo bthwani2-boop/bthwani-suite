@@ -10,6 +10,7 @@ import {
   Card,
   Chip,
   DeferredReviewBlock,
+  Divider,
   KeyValueDetails,
   KeyValueList,
   ListItem,
@@ -2141,34 +2142,23 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
                 ]
               : []
           }
-          trailingAction={
-            onBack
-              ? {
-                  id: 'back',
-                  icon: <Icon name="arrow-forward" size={22} color={theme.text} />,
-                  onPress: onBack,
-                  accessibilityLabel: 'العودة',
-                }
-              : undefined
-          }
         />
       )}
-      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[8] }}>
-        <Box layoutDirection="row-reverse" justify="space-between" align="center" style={{ flexDirection: 'row-reverse' }}>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>آخر طلباتك من الأحدث إلى الأقدم.</Text>
-        </Box>
-
+      <MobileScrollView fill contentContainerStyle={{ paddingBottom: spacing[8] }}>
         {sortedItems.length > 0 ? (
-          <Box style={{ backgroundColor: theme.surface, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: theme.line }}>
+          <View style={{ paddingTop: spacing[2] }}>
+            <Divider />
             {sortedItems.map((item, index) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} onReorder={onReorder} isLast={index === sortedItems.length - 1} />)}
-          </Box>
+          </View>
         ) : (
-          <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>
-            <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>لا توجد طلبات</Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>لم نعثر على أي طلب يطابق بحثك.</Text>
-            {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} style={{ marginTop: spacing[2] }} /> : null}
-            {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
-          </Surface>
+          <View style={{ padding: spacing[4] }}>
+            <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>
+              <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>لا توجد طلبات</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>لم نعثر على أي طلب يطابق بحثك.</Text>
+              {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} style={{ marginTop: spacing[2] }} /> : null}
+              {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+            </Surface>
+          </View>
         )}
       </MobileScrollView>
     </View>

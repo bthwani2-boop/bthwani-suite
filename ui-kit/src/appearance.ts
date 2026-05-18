@@ -937,7 +937,15 @@ export const bthwaniAppearanceComponentTokensByMode = Object.freeze(appearanceCo
 export const bthwaniAppearanceTokensByMode = Object.freeze(appearanceTokensByMode);
 
 export function getBThwaniAppearanceTokens(mode: BThwaniAppearanceMode = defaultBThwaniAppearanceMode) {
-  return bthwaniAppearanceTokensByMode[mode];
+  const resolvedMode =
+    mode === 'lightPremium' || mode === 'darkGlass'
+      ? mode
+      : mode === 'light'
+        ? 'lightPremium'
+        : mode === 'dark'
+          ? 'darkGlass'
+          : defaultBThwaniAppearanceMode;
+  return bthwaniAppearanceTokensByMode[resolvedMode];
 }
 
 export function getBThwaniAppearanceThemeMode(mode: BThwaniAppearanceMode) {

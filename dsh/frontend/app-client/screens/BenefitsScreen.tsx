@@ -11,6 +11,8 @@ import {
   spacing,
   useTheme,
   ActionStrip,
+  Divider,
+  Icon,
 } from '@bthwani/ui-kit';
 import { dshNotificationsFixtures } from '../data/notifications.preview-data';
 import { subscriptionPlanCards } from '../data/subscriptions-commercial.preview-data';
@@ -140,11 +142,9 @@ function ScreenHeader({ title }: { title: string }) {
 function ContentCard({
   hint,
   children,
-  feedback,
 }: {
   hint: string;
   children: React.ReactNode;
-  feedback?: string;
 }) {
   const { theme } = useTheme();
 
@@ -155,18 +155,13 @@ function ContentCard({
       </Text>
       <View style={{ height: 1, backgroundColor: theme.line }} />
       {children}
-      {feedback ? (
-        <Text role="caption" tone="soft" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
-          {feedback}
-        </Text>
-      ) : null}
     </View>
   );
 }
 
 function BenefitListRow({
   row,
-  showDivider = false,
+  isLast = false,
   onActionPress,
 }: {
   row: BenefitRow;
@@ -174,6 +169,7 @@ function BenefitListRow({
   onActionPress?: (row: BenefitRow) => void;
 }) {
   const [expanded, setExpanded] = React.useState(false);
+  const { theme } = useTheme();
   const iconMap: Record<string, import('@bthwani/ui-kit/src/components/icons').IconName> = {
     subscription: 'star-outline',
     offers: 'pricetag-outline',
@@ -197,18 +193,28 @@ function BenefitListRow({
       onPress={() => setExpanded(!expanded)}
       hideDivider={isLast}
     >
-      {row.helperText && <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginBottom: spacing[2] }}>{row.helperText}</Text>}
-      {row.actionLabel && (
-        <Button
-          label={row.actionLabel}
-          tone="secondary"
-          size="sm"
-          onPress={() => {
-            onActionPress?.(row);
-            setExpanded(false);
-          }}
-        />
-      )}
+      <View style={{ gap: spacing[3], paddingTop: spacing[1] }}>
+        {row.helperText && (
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', lineHeight: 20 }}>
+            {row.helperText}
+          </Text>
+        )}
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', marginTop: spacing[1] }}>
+          {row.actionLabel && (
+            <Button
+              label={row.actionLabel}
+              tone="brand"
+              size="sm"
+              fullWidth={false}
+              style={{ minWidth: 120, borderRadius: 8 }}
+              onPress={() => {
+                onActionPress?.(row);
+                setExpanded(false);
+              }}
+            />
+          )}
+        </View>
+      </View>
     </ActionStrip>
   );
 }
@@ -324,11 +330,11 @@ export function DshBenefitsHubScreen({
       ? [{
           id: 'subscribers-benefit',
           title: currentPlan.title,
-          subtitle: currentPlan.highlight,
-          badgeLabel: 'للمشتركين',
-          badgeTone: 'info' as const,
-          actionLabel: 'تفعيل',
-          helperText: currentPlan.note,
+          subtitle: 'مزايا اشتراكك النشط جاهزة للاستخدام',
+          badgeLabel: 'نشط للمشتركين',
+          badgeTone: 'success' as const,
+          actionLabel: 'تطبيق الميزة',
+          helperText: `التوصيل المجاني والمزايا الحصرية الخاصة بـ "${currentPlan.title}" جاهزة للتطبيق على طلبك القادم.`,
         }]
       : []),
     ...liveCampaigns.slice(0, 1).map((campaign) => ({
@@ -364,7 +370,7 @@ export function DshBenefitsHubScreen({
   const renderContent = () => {
     if (focusedSection === 'now') {
       return (
-        <ContentCard hint={sectionHints.now} feedback={feedback}>
+        <ContentCard hint={sectionHints.now}>
           <Box gap={0}>
             {nowRows.map((row, index) => (
               <BenefitListRow
@@ -381,7 +387,7 @@ export function DshBenefitsHubScreen({
 
     if (focusedSection === 'loyalty') {
       return (
-        <ContentCard hint={sectionHints.loyalty} feedback={feedback}>
+        <ContentCard hint={sectionHints.loyalty}>
           <DshLoyaltyRewardsScreen compact onStatusChange={setFeedback} />
         </ContentCard>
       );
@@ -389,7 +395,7 @@ export function DshBenefitsHubScreen({
 
     if (focusedSection === 'subscription') {
       return (
-        <ContentCard hint={sectionHints.subscription} feedback={feedback}>
+        <ContentCard hint={sectionHints.subscription}>
           <DshSubscriptionsScreen compact onStatusChange={setFeedback} />
         </ContentCard>
       );
@@ -397,7 +403,7 @@ export function DshBenefitsHubScreen({
 
     if (focusedSection === 'offers') {
       return (
-        <ContentCard hint={sectionHints.offers} feedback={feedback}>
+        <ContentCard hint={sectionHints.offers}>
           {offersRows.length > 0 ? (
             <Box gap={0}>
               {offersRows.map((row, index) => (
@@ -405,7 +411,12 @@ export function DshBenefitsHubScreen({
                   key={row.id}
                   row={row}
                   isLast={index === offersRows.length - 1}
-                  onActionPress={(r: BenefitRow) => setFeedback(`تم تجهيز "${r.title}" للاستخدام في طلبك القادم.`)}
+                  onActionPress={(r: BenefitRow) => {
+                    const msg = r.id === 'subscribers-benefit'
+                      ? `تم تطبيق مزايا "${r.title}" على طلبك القادم بنجاح.`
+                      : `تم تجهيز "${r.title}" للاستخدام في طلبك القادم.`;
+                    setFeedback(msg);
+                  }}
                 />
               ))}
             </Box>
@@ -419,7 +430,7 @@ export function DshBenefitsHubScreen({
     }
 
     return (
-      <ContentCard hint={sectionHints.history} feedback={feedback}>
+      <ContentCard hint={sectionHints.history}>
         {historyRows.length > 0 ? (
           <Box gap={0}>
             {historyRows.map((row, index) => (
@@ -453,6 +464,28 @@ export function DshBenefitsHubScreen({
           paddingTop: spacing[2],
         }}
       >
+        {/* Success Message Banner (Coherent with Subscriptions screen style) */}
+        {feedback ? (
+          <View
+            style={{
+              marginBottom: spacing[2],
+              backgroundColor: theme.successSurface,
+              padding: spacing[3],
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: theme.success,
+              flexDirection: 'row-reverse',
+              alignItems: 'center',
+              gap: spacing[2],
+            }}
+          >
+            <Icon name="checkmark-circle" tone="success" size={20} />
+            <Text role="bodyStrong" style={{ color: theme.success, textAlign: 'right', flex: 1 }}>
+              {feedback}
+            </Text>
+          </View>
+        ) : null}
+
         {renderContent()}
       </MobileScrollView>
     </View>

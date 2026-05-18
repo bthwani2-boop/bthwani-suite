@@ -53,7 +53,7 @@ export function DshRatingScreen({
   if (state === 'loading') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="تقييم الطلب" onBack={onBack} />
+        <TopBar title="تقييم الطلب" />
         <StateView stateId="loading" title="جاري الإرسال..." description="نحن نقدر رأيك، يرجى الانتظار قليلاً." />
       </Surface>
     );
@@ -62,7 +62,7 @@ export function DshRatingScreen({
   if (state === 'success') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="شكراً لك" onBack={onBack} />
+        <TopBar title="شكراً لك" />
         <StateView
           stateId="success"
           title="تم استلام تقييمك بنجاح"
@@ -77,7 +77,7 @@ export function DshRatingScreen({
   if (state === 'error') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="خطأ في الإرسال" onBack={onBack} />
+        <TopBar title="خطأ في الإرسال" />
         <StateView
           stateId="recoverableError"
           title="تعذر إرسال التقييم"
@@ -93,8 +93,6 @@ export function DshRatingScreen({
     <Surface style={styles.root}>
       <TopBar
         title="تقييم التجربة"
-        onBack={onBack}
-        rightAction={onSkip ? { icon: 'close-outline', onPress: onSkip } : undefined}
       />
       <ScrollView contentContainerStyle={styles.content}>
         <Box padding={spacing[4]} alignItems="center">

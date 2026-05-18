@@ -60,7 +60,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'loading') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <TopBar title="تأكيد الطلب" />
         <StateView stateId="loading" title="جاري التحقق من التوفر..." description="نحن نتأكد من إمكانية التوصيل لموقعك حالياً." />
       </Surface>
     );
@@ -70,7 +70,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'quote-loading') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <TopBar title="تأكيد الطلب" />
         <StateView stateId="loading" title="جاري حساب تكلفة التوصيل..." description="يُرجى الانتظار بينما نحسب التكلفة والوقت المتوقع." />
       </Surface>
     );
@@ -79,7 +79,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'order-created') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="تم إنشاء الطلب" onBack={onBack} />
+        <TopBar title="تم إنشاء الطلب" />
         <StateView
           stateId="success"
           title="تم تأكيد طلبك بنجاح"
@@ -94,7 +94,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'error' || state === 'payment-failed') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="فشل الدفع" onBack={onBack} />
+        <TopBar title="فشل الدفع" />
         <StateView
           stateId="error"
           title="تعذّر إتمام الدفع"
@@ -110,7 +110,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'quote-failed') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <TopBar title="تأكيد الطلب" />
         <StateView
           stateId="error"
           title="تعذّر حساب تكلفة التوصيل"
@@ -126,7 +126,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'quote-success') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <TopBar title="تأكيد الطلب" />
         <StateView
           stateId="success"
           title="تم التحقق من التوصيل"
@@ -141,7 +141,7 @@ export function DshCheckoutIntentScreen({
   if (state === 'blocked' || state === 'quote-unavailable') {
     return (
       <Surface style={styles.root}>
-        <TopBar title="الخدمة غير متوفرة" onBack={onBack} />
+        <TopBar title="الخدمة غير متوفرة" />
         <StateView
           stateId="blocked"
           title="عذراً، الموقع خارج نطاق التغطية"
@@ -160,7 +160,7 @@ export function DshCheckoutIntentScreen({
 
   return (
     <Surface style={styles.root}>
-      <TopBar title="تأكيد الطلب" onBack={onBack} />
+      <TopBar title="تأكيد الطلب" />
       <ScrollView contentContainerStyle={styles.content}>
         {/* Section: Delivery Address */}
         <Box padding={spacing[4]} borderBottomWidth={1} borderBottomColor={colorPalette.line}>

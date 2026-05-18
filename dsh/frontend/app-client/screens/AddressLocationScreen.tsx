@@ -12,6 +12,9 @@ import {
   safeArea,
   spacing,
   useTheme,
+  ActionStrip,
+  Badge,
+  Divider,
 } from '@bthwani/ui-kit';
 
 export type DshAddressLocationScreenProps = {
@@ -32,104 +35,59 @@ const mockSavedAddresses: SavedAddress[] = [
 
 interface AddressRowProps {
   address: SavedAddress;
+  isLast?: boolean;
   onSetDefault: (id: string) => void;
   onEdit: (id: string) => void;
 }
 
-function AddressRow({ address, onSetDefault, onEdit }: AddressRowProps) {
+function AddressRow({ address, isLast = false, onSetDefault, onEdit }: AddressRowProps) {
   const { theme } = useTheme();
+  const [expanded, setExpanded] = React.useState(false);
 
   return (
-    <Surface
-      tone="raised"
-      padding={0}
-      gap={0}
-      style={{
-        width: '100%',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: address.isDefault ? theme.brand : theme.line,
-        backgroundColor: theme.surfaceRaised,
-        overflow: 'hidden',
-      }}
+    <ActionStrip
+      icon={address.isDefault ? 'location' : 'location-outline'}
+      title={address.label}
+      subtitle={
+        address.isDefault ? (
+          <View style={{ alignItems: 'flex-end', marginTop: 2 }}>
+            <Badge label="افتراضي" tone="brand" />
+          </View>
+        ) : undefined
+      }
+      expanded={expanded}
+      onPress={() => setExpanded(!expanded)}
+      hideDivider={isLast}
     >
-      <View
-        style={{
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
-          flexDirection: 'row-reverse',
-          alignItems: 'center',
-          gap: spacing[3],
-        }}
-      >
-        <View
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 12,
-            backgroundColor: address.isDefault ? theme.brandSurface : theme.surface,
-            borderWidth: 1,
-            borderColor: address.isDefault ? theme.brand : theme.line,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Icon
-            name={address.isDefault ? 'location' : 'location-outline'}
-            size={19}
-            color={address.isDefault ? theme.brand : theme.textSoft}
+      <View style={{ gap: spacing[3], paddingTop: spacing[1] }}>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', gap: spacing[2], marginTop: spacing[1] }}>
+          {!address.isDefault && (
+            <Button
+              label="تعيين كافتراضي"
+              tone="brand"
+              size="sm"
+              fullWidth={false}
+              style={{ borderRadius: 8 }}
+              onPress={() => {
+                onSetDefault(address.id);
+                setExpanded(false);
+              }}
+            />
+          )}
+          <Button
+            label="تعديل"
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            style={{ borderRadius: 8 }}
+            onPress={() => {
+              onEdit(address.id);
+              setExpanded(false);
+            }}
           />
         </View>
-
-        <View style={{ flex: 1, alignItems: 'flex-end' }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>
-            {address.label}
-          </Text>
-          {address.isDefault ? (
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 2 }}>
-              افتراضي
-            </Text>
-          ) : null}
-        </View>
-
-        <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
-          {!address.isDefault ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => onSetDefault(address.id)}
-              style={({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => ({
-                paddingHorizontal: spacing[3],
-                paddingVertical: spacing[2],
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: theme.brand,
-                backgroundColor: pressed ? theme.brandSurface : 'transparent',
-              })}
-            >
-              <Text role="bodySm" style={{ color: theme.brand, textAlign: 'center' }}>
-                تعيين كافتراضي
-              </Text>
-            </Pressable>
-          ) : null}
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => onEdit(address.id)}
-            style={({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => ({
-              paddingHorizontal: spacing[3],
-              paddingVertical: spacing[2],
-              borderRadius: 10,
-              borderWidth: 1,
-              borderColor: theme.line,
-              backgroundColor: pressed ? theme.line : 'transparent',
-            })}
-          >
-            <Text role="bodySm" style={{ color: theme.textSoft, textAlign: 'center' }}>
-              تعديل
-            </Text>
-          </Pressable>
-        </View>
       </View>
-    </Surface>
+    </ActionStrip>
   );
 }
 
@@ -163,7 +121,6 @@ export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenPro
       <TopBar
         variant="surface"
         title="العناوين والموقع"
-        onBack={onBack}
       />
 
       <MobileScrollView
@@ -217,19 +174,22 @@ export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenPro
 
         <View style={{ height: 1, backgroundColor: theme.line, marginVertical: spacing[1] }} />
 
-        <Box gap={2}>
-          <Text role="label" style={{ textAlign: 'right', color: theme.text }}>
+        <View style={{ marginTop: spacing[4], gap: spacing[2] }}>
+          <Text role="bodyStrong" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[4] }}>
             العناوين المحفوظة
           </Text>
-          {savedAddresses.map((address) => (
+          <Divider />
+          {savedAddresses.map((address, index) => (
             <AddressRow
               key={address.id}
               address={address}
+              isLast={index === savedAddresses.length - 1}
               onSetDefault={handleSetDefault}
               onEdit={handleEdit}
             />
           ))}
-        </Box>
+          <Divider />
+        </View>
       </MobileScrollView>
     </View>
   );
