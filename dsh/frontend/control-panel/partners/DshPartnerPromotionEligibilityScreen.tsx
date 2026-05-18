@@ -104,7 +104,7 @@ export function DshPartnerPromotionEligibilityScreen({
 }: DshPartnerPromotionEligibilityScreenProps) {
   const router = useRouter();
   const [selectedId, setSelectedId] = React.useState(dshPromotionCandidates[0]?.id ?? '');
-  const [actionMessage, setActionMessage] = React.useState('المراجعة الحالية تحدد جاهزية العنصر ليُنشر في قسم التسويق.');
+  const [actionMessage, setActionMessage] = React.useState('المراجعة الحالية تحدد جاهزية العنصر ليظهر ضمن منظومة المزايا والعروض.');
 
   const selectedItem = dshPromotionCandidates.find((item) => item.id === selectedId) ?? dshPromotionCandidates[0];
   const eligibleCount = dshPromotionCandidates.filter((item) => item.eligibility === 'eligible').length;
@@ -124,7 +124,7 @@ export function DshPartnerPromotionEligibilityScreen({
   }, [selectedItem]);
 
   if (state === 'loading') {
-    return <StateView stateId="loading" title="جارٍ فحص الأهلية" description="نراجع أهلية الشريك والمتجر قبل تمرير أي عرض إلى التسويق." />;
+    return <StateView stateId="loading" title="جارٍ فحص الأهلية" description="نراجع أهلية الشريك والمتجر قبل تمرير أي ميزة أو عرض إلى التسويق." />;
   }
 
   if (state === 'empty') {
@@ -145,7 +145,7 @@ export function DshPartnerPromotionEligibilityScreen({
     }
 
     if (selectedItem.status === 'marketing-ready' || selectedItem.eligibility === 'eligible') {
-      setActionMessage(selectedItem.status === 'marketing-ready' ? 'تم فتح مسار التسويق لهذا العنصر.' : 'تم تمرير النية إلى التسويق لمتابعة الجدولة.');
+      setActionMessage(selectedItem.status === 'marketing-ready' ? 'تم فتح مسار التسويق لهذا العنصر.' : 'تم تمرير النية إلى التسويق لمتابعة مسار المزايا والعروض.');
       router.push(marketingHref);
       return;
     }
@@ -168,10 +168,10 @@ export function DshPartnerPromotionEligibilityScreen({
       header={
         <WebControlPanelDenseHeader
           eyebrow="الشركاء"
-          title="جاهزية الترويج"
-          description="مراجعة نوايا الترويج الواردة من الشركاء وتقرير ما إذا كانت جاهزة للتمرير إلى التسويق أو تحتاج تصحيحًا في الكتالوج."
+          title="جاهزية المزايا والعروض"
+          description="مراجعة ما يرسله الشركاء من عروض ومزايا، وتحديد ما إذا كان جاهزًا للتمرير إلى التسويق أو يحتاج تصحيحًا داخل الكتالوج."
           metrics={[
-            { id: 'eligible-count', label: 'مؤهل للترويج', value: String(eligibleCount) },
+            { id: 'eligible-count', label: 'مؤهل للظهور', value: String(eligibleCount) },
             { id: 'review-count', label: 'قيد المراجعة', value: String(reviewCount) },
             { id: 'marketing-ready-count', label: 'جاهز للتسويق', value: String(readyForMarketingCount) },
           ]}
@@ -187,8 +187,8 @@ export function DshPartnerPromotionEligibilityScreen({
           </Box>
 
           <WebControlPanelQueue
-            title="طابور نوايا الترويج"
-            meta="راجع العناصر المؤهلة وأبقِ قرار التحويل إلى التسويق أو الإرجاع إلى الكتالوج واضحًا في صف واحد."
+            title="طابور نوايا المزايا"
+            meta="راجع العناصر المؤهلة وأبقِ قرار تمريرها إلى التسويق أو إرجاعها إلى الكتالوج واضحًا داخل صف واحد."
             pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="كل العناصر الحالية" />}
           >
             {dshPromotionCandidates.map((item) => (
@@ -230,7 +230,7 @@ export function DshPartnerPromotionEligibilityScreen({
 
             <WebControlPanelRecommendation
               title="قرار الأهلية الحالي"
-              reason={selectedItem ? `حالة الاعتماد ${resolveStatusLabel(selectedItem.status)} · ${selectedItem.offerHint}` : 'اختر عنصرًا لعرض قرار الأهلية.'}
+              reason={selectedItem ? `حالة الاعتماد ${resolveStatusLabel(selectedItem.status)} · ${selectedItem.offerHint}` : 'اختر عنصرًا لعرض قرار أهلية الميزة أو العرض.'}
               confidence={selectedItem?.eligibility === 'eligible' ? 'high' : selectedItem?.eligibility === 'review' ? 'medium' : 'low'}
               auditTag="UI_PREVIEW_ONLY"
               primaryAction={selectedItem ? { id: `${selectedItem.id}-route-primary`, label: resolvePrimaryActionLabel(selectedItem), onAction: handlePrimaryAction } : undefined}

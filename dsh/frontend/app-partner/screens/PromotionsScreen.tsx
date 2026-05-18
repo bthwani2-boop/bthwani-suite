@@ -1,16 +1,14 @@
 import React from 'react';
 import {
+  Badge,
   Box,
   Button,
-  Chip,
-  ListItem,
-  MobileStickyPrimaryAction,
-  StateView,
+  Divider,
+  SelectField,
   Surface,
+  Tabs,
   Text,
   TextField,
-  SelectField,
-  useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
 import {
@@ -22,6 +20,7 @@ import {
 } from '../../shared/partner-offer.preview-store';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';
+type PromotionsTab = 'active' | 'pending' | 'rejected' | 'new';
 
 export type PromotionsScreenProps = {
   storeName: string;
@@ -32,7 +31,6 @@ export type PromotionsScreenProps = {
 };
 
 type IntakeFormState = {
-  open: boolean;
   title: string;
   offerType: PartnerOfferType;
   valueLabel: string;
@@ -40,7 +38,6 @@ type IntakeFormState = {
 };
 
 const INITIAL_FORM: IntakeFormState = {
-  open: false,
   title: '',
   offerType: 'discount',
   valueLabel: '',
@@ -51,7 +48,7 @@ function translateStatus(status: PartnerOfferStatus): { label: string; tone: 'de
   switch (status) {
     case 'inbound': return { label: 'في الانتظار', tone: 'default' };
     case 'review': return { label: 'قيد المراجعة', tone: 'warning' };
-    case 'marketing-ready': return { label: 'جاهز للنشر', tone: 'brand' };
+    case 'marketing-ready': return { label: 'جاهز للتسويق', tone: 'brand' };
     case 'published': return { label: 'نشط', tone: 'success' };
     case 'paused': return { label: 'موقوف', tone: 'warning' };
     case 'rejected': return { label: 'مرفوض', tone: 'danger' };
@@ -73,15 +70,68 @@ function translateOfferType(type: PartnerOfferType): string {
 
 function renderState(state: Exclude<AnalyticsWorkspaceState, 'ready'>) {
   if (state === 'loading') {
-    return <StateView stateId="loading" title="جارٍ تجهيز العروض" description="يتم الآن تحميل بيانات عروضك." />;
+    return <Text role="bodySm" tone="muted">جارٍ تجهيز العروض الحالية.</Text>;
   }
   if (state === 'empty') {
-    return <StateView stateId="empty" title="لا توجد عروض بعد" description="يمكنك تقديم أول عرض مقترح الآن." />;
+    return <Text role="bodySm" tone="muted">لا توجد عروض بعد، ويمكنك تقديم أول اقتراح الآن.</Text>;
   }
   if (state === 'offline') {
-    return <StateView stateId="offline" title="غير متصل" description="أعد المحاولة عند عودة الاتصال." />;
+    return <Text role="bodySm" tone="muted">الشاشة غير متصلة الآن. أعد المحاولة لاحقًا.</Text>;
   }
-  return <StateView stateId="recoverableError" title="تعذر فتح العروض" description="حدث خلل مؤقت. أعد المحاولة." />;
+  return <Text role="bodySm" tone="muted">تعذر تحميل مسار العروض حاليًا.</Text>;
+}
+
+function PromotionRow({
+  offer,
+  showDivider = false,
+  actionLabel,
+  onActionPress,
+}: {
+  offer: PartnerOfferRecord;
+  showDivider?: boolean;
+  actionLabel: string;
+  onActionPress: (offer: PartnerOfferRecord) => void;
+}) {
+  const { theme } = useTheme();
+  const statusMeta = translateStatus(offer.status);
+  const metaLabel = offer.activeFromDate && offer.activeToDate
+    ? `${offer.activeFromDate} → ${offer.activeToDate}`
+    : offer.rejectionReason || offer.eligibility;
+
+  return (
+    <Box
+      style={{
+        borderTopWidth: showDivider ? 1 : 0,
+        borderTopColor: theme.line,
+        paddingTop: showDivider ? 12 : 0,
+        marginTop: showDivider ? 12 : 0,
+      }}
+    >
+      <Box layoutDirection="row" align="flex-start" justify="space-between" style={{ gap: 12 }}>
+        <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+          <Box layoutDirection="row" style={{ gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start', width: '100%' }}>
+            <Badge label={statusMeta.label} tone={statusMeta.tone} />
+            <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
+              {offer.title}
+            </Text>
+          </Box>
+          <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
+            {translateOfferType(offer.offerType)} • {offer.valueLabel}
+          </Text>
+          <Text role="caption" tone="soft" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
+            {metaLabel}
+          </Text>
+        </Box>
+        <Button
+          label={actionLabel}
+          tone="secondary"
+          size="sm"
+          fullWidth={false}
+          onPress={() => onActionPress(offer)}
+        />
+      </Box>
+    </Box>
+  );
 }
 
 export function PromotionsScreen({
@@ -91,26 +141,31 @@ export function PromotionsScreen({
   todayHoursLabel,
   state = 'ready',
 }: PromotionsScreenProps) {
-  const { direction } = useDirection();
   const { theme } = useTheme();
   const [offers, setOffers] = React.useState<PartnerOfferRecord[]>([]);
+  const [activeTab, setActiveTab] = React.useState<PromotionsTab>('active');
   const [form, setForm] = React.useState<IntakeFormState>(INITIAL_FORM);
-  const [submitMessage, setSubmitMessage] = React.useState('');
+  const [statusMessage, setStatusMessage] = React.useState('');
 
   React.useEffect(() => {
     const all = getPartnerOfferItems();
-    setOffers(all.filter(o => o.partnerName === storeName || o.storeLabel === storeName || o.source === 'partner'));
+    setOffers(all.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName || offer.source === 'partner'));
   }, [storeName]);
 
   if (state !== 'ready') {
     return renderState(state);
   }
 
+  const activeOffers = offers.filter((offer) => offer.status === 'published');
+  const pendingOffers = offers.filter((offer) => offer.status === 'inbound' || offer.status === 'review' || offer.status === 'marketing-ready');
+  const rejectedOffers = offers.filter((offer) => offer.status === 'rejected');
+
   const handleSubmitOffer = () => {
     if (!form.title.trim() || !form.valueLabel.trim()) {
-      setSubmitMessage('يرجى ملء عنوان العرض وقيمته قبل الإرسال.');
+      setStatusMessage('املأ عنوان العرض وقيمته قبل الإرسال.');
       return;
     }
+
     upsertPartnerOfferItem({
       title: form.title.trim(),
       partnerName: storeName,
@@ -126,183 +181,249 @@ export function PromotionsScreen({
       eligibility: form.eligibility.trim() || 'الكل',
       displayBadge: form.valueLabel.trim(),
     });
+
     const updated = getPartnerOfferItems();
-    setOffers(updated.filter(o => o.partnerName === storeName || o.storeLabel === storeName || o.source === 'partner'));
+    setOffers(updated.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName || offer.source === 'partner'));
     setForm(INITIAL_FORM);
-    setSubmitMessage('تم إرسال العرض للمراجعة. سيتم إخطارك عند اتخاذ قرار.');
+    setActiveTab('pending');
+    setStatusMessage('تم إرسال العرض للمراجعة التسويقية.');
   };
 
-  const activeOffers = offers.filter(o => o.status === 'published');
-  const pendingOffers = offers.filter(o => o.status === 'inbound' || o.status === 'review' || o.status === 'marketing-ready');
-  const rejectedOffers = offers.filter(o => o.status === 'rejected');
+  const openOfferForm = (offer?: PartnerOfferRecord) => {
+    if (offer) {
+      setForm({
+        title: offer.title,
+        offerType: offer.offerType,
+        valueLabel: offer.valueLabel,
+        eligibility: offer.eligibility,
+      });
+    }
+    setActiveTab('new');
+  };
+
+  const renderPanelContent = () => {
+    if (activeTab === 'active') {
+      return (
+        <>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            العروض المنشورة التي يراها العميل الآن فقط.
+          </Text>
+          {activeOffers.length > 0 ? (
+            activeOffers.map((offer, index) => (
+              <PromotionRow
+                key={offer.id}
+                offer={offer}
+                showDivider={index > 0}
+                actionLabel="عرض"
+                onActionPress={() => setStatusMessage(`العرض النشط المحدد: ${offer.title}`)}
+              />
+            ))
+          ) : (
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              لا توجد عروض نشطة حاليًا.
+            </Text>
+          )}
+        </>
+      );
+    }
+
+    if (activeTab === 'pending') {
+      return (
+        <>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            هذه الاقتراحات بانتظار قبول الشركاء أو مراجعة التسويق. لا يوجد نشر مباشر من هذا السطح.
+          </Text>
+          {pendingOffers.length > 0 ? (
+            pendingOffers.map((offer, index) => (
+              <PromotionRow
+                key={offer.id}
+                offer={offer}
+                showDivider={index > 0}
+                actionLabel="متابعة"
+                onActionPress={() => setStatusMessage(`العرض ${offer.title} ما زال داخل مسار المراجعة.`)}
+              />
+            ))
+          ) : (
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              لا توجد عروض تحت المراجعة الآن.
+            </Text>
+          )}
+        </>
+      );
+    }
+
+    if (activeTab === 'rejected') {
+      return (
+        <>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            راجع سبب الرفض ثم افتح النموذج لإعادة التقديم بصياغة أو قيمة أوضح.
+          </Text>
+          {rejectedOffers.length > 0 ? (
+            rejectedOffers.map((offer, index) => (
+              <PromotionRow
+                key={offer.id}
+                offer={offer}
+                showDivider={index > 0}
+                actionLabel="إعادة"
+                onActionPress={() => {
+                  setStatusMessage(`تم تجهيز ${offer.title} لإعادة التقديم.`);
+                  openOfferForm(offer);
+                }}
+              />
+            ))
+          ) : (
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              لا توجد عروض مرفوضة حاليًا.
+            </Text>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <Box gap={3}>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          اقترح عرضًا واحدًا واضحًا بقيمة وأهلية محددتين، ثم دعه يمر عبر المراجعة بدل تكديس حملات كثيرة.
+        </Text>
+        <TextField
+          label="عنوان العرض"
+          value={form.title}
+          onChangeText={(value) => setForm((current) => ({ ...current, title: value }))}
+          placeholder="مثال: خصم 20% على القهوة"
+        />
+        <SelectField
+          label="نوع العرض"
+          value={form.offerType}
+          onValueChange={(value) => setForm((current) => ({ ...current, offerType: value as PartnerOfferType }))}
+          options={[
+            { value: 'discount', label: 'خصم مباشر' },
+            { value: 'free-delivery', label: 'توصيل مجاني' },
+            { value: 'bundle', label: 'حزمة' },
+            { value: 'buy-x-get-y', label: 'اشتر واحصل على' },
+            { value: 'coupon', label: 'كوبون' },
+          ]}
+        />
+        <TextField
+          label="قيمة العرض"
+          value={form.valueLabel}
+          onChangeText={(value) => setForm((current) => ({ ...current, valueLabel: value }))}
+          placeholder="مثال: 20% أو توصيل مجاني"
+        />
+        <TextField
+          label="شروط الأهلية"
+          value={form.eligibility}
+          onChangeText={(value) => setForm((current) => ({ ...current, eligibility: value }))}
+          placeholder="مثال: للطلبات فوق 50 ريال"
+        />
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Button label="إرسال للمراجعة" tone="brand" fullWidth={false} onPress={handleSubmitOffer} />
+          <Button
+            label="إلغاء"
+            tone="ghost"
+            fullWidth={false}
+            onPress={() => {
+              setForm(INITIAL_FORM);
+              setActiveTab('active');
+            }}
+          />
+        </Box>
+      </Box>
+    );
+  };
 
   return (
-    <Box gap={4}>
-      {/* Partner + Context */}
-      <Surface tone="raised" padding={3} gap={2}>
-        <Text role="titleSm">{storeName}</Text>
-        <Text role="caption" tone="muted">
-          {branchLabel} · {activeZoneLabel} · {todayHoursLabel}
-        </Text>
-      </Surface>
-
-      {/* Active Offers */}
-      <Surface tone="raised" padding={3} gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">العروض النشطة</Text>
-          <Text role="bodySm" tone="muted">
-            العروض التي اجتازت المراجعة وهي مرئية حالياً للعملاء.
+    <Box gap={3}>
+      <Surface
+        tone="raised"
+        padding={3}
+        gap={3}
+        style={{
+          borderWidth: 1,
+          borderColor: theme.line,
+          borderRadius: 22,
+        }}
+      >
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Text role="titleSm" style={{ textAlign: 'right' }}>
+            العروض المقترحة
           </Text>
-        </Box>
-        {activeOffers.length === 0 ? (
-          <Text role="bodySm" tone="muted">لا توجد عروض نشطة حالياً.</Text>
-        ) : (
-          <Box gap={2}>
-            {activeOffers.map(offer => {
-              const statusMeta = translateStatus(offer.status);
-              return (
-                <ListItem
-                  key={offer.id}
-                  title={offer.title}
-                  subtitle={`${translateOfferType(offer.offerType)} · ${offer.valueLabel}`}
-                  meta={offer.activeFromDate && offer.activeToDate ? `${offer.activeFromDate} → ${offer.activeToDate}` : undefined}
-                  badgeLabel={statusMeta.label}
-                  badgeTone={statusMeta.tone}
-                />
-              );
-            })}
-          </Box>
-        )}
-      </Surface>
-
-      {/* Pending / In-Review Offers */}
-      {pendingOffers.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Box gap={1}>
-            <Text role="titleSm">العروض قيد المراجعة</Text>
-            <Text role="bodySm" tone="muted">
-              هذه العروض وصلت للفريق التسويقي ويتم دراستها. لا يمكنك نشرها مباشرة.
-            </Text>
-          </Box>
-          <Box gap={2}>
-            {pendingOffers.map(offer => {
-              const statusMeta = translateStatus(offer.status);
-              return (
-                <ListItem
-                  key={offer.id}
-                  title={offer.title}
-                  subtitle={`${translateOfferType(offer.offerType)} · ${offer.valueLabel}`}
-                  badgeLabel={statusMeta.label}
-                  badgeTone={statusMeta.tone}
-                />
-              );
-            })}
-          </Box>
-        </Surface>
-      )}
-
-      {/* Rejected Offers with reason */}
-      {rejectedOffers.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Box gap={1}>
-            <Text role="titleSm">العروض المرفوضة</Text>
-            <Text role="bodySm" tone="muted">
-              يمكنك مراجعة سبب الرفض وتعديل العرض وإعادة تقديمه.
-            </Text>
-          </Box>
-          <Box gap={2}>
-            {rejectedOffers.map(offer => (
-              <Surface key={offer.id} tone="inset" padding={3} gap={2}>
-                <Text role="bodyStrong">{offer.title}</Text>
-                <Text role="bodySm" tone="muted">{translateOfferType(offer.offerType)} · {offer.valueLabel}</Text>
-                {offer.rejectionReason ? (
-                  <Surface tone="raised" padding={2} gap={1} style={{ borderWidth: 1, borderColor: theme.line }}>
-                    <Text role="caption" style={{ fontWeight: '800', color: theme.danger }}>سبب الرفض:</Text>
-                    <Text role="caption" tone="muted">{offer.rejectionReason}</Text>
-                  </Surface>
-                ) : (
-                  <Text role="caption" tone="muted">لم يُذكر سبب. تواصل مع الفريق التسويقي للاستيضاح.</Text>
-                )}
-              </Surface>
-            ))}
-          </Box>
-        </Surface>
-      )}
-
-      {/* Submit Intake Offer */}
-      <Surface tone="raised" padding={3} gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">تقديم عرض مقترح</Text>
-          <Text role="bodySm" tone="muted">
-            يمكنك تقديم عرض مقترح للفريق التسويقي. العرض سيمر بمرحلة المراجعة قبل النشر.
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {storeName} • {branchLabel} • {activeZoneLabel} • {todayHoursLabel}
           </Text>
         </Box>
 
-        {!form.open ? (
-          <Button
-            label="تقديم عرض مقترح جديد"
-            tone="secondary"
-            fullWidth={false}
-            onPress={() => setForm({ ...INITIAL_FORM, open: true })}
-          />
-        ) : (
-          <Box gap={3}>
-            <TextField
-              label="عنوان العرض"
-              value={form.title}
-              onChangeText={v => setForm(f => ({ ...f, title: v }))}
-              placeholder="مثال: خصم 20% على القهوة"
-            />
-            <SelectField
-              label="نوع العرض"
-              value={form.offerType}
-              onValueChange={v => setForm(f => ({ ...f, offerType: v as PartnerOfferType }))}
-              options={[
-                { value: 'discount', label: 'خصم مباشر' },
-                { value: 'free-delivery', label: 'توصيل مجاني' },
-                { value: 'bundle', label: 'حزمة' },
-                { value: 'buy-x-get-y', label: 'اشتر واحصل على' },
-                { value: 'coupon', label: 'كوبون' },
-              ]}
-            />
-            <TextField
-              label="قيمة العرض"
-              value={form.valueLabel}
-              onChangeText={v => setForm(f => ({ ...f, valueLabel: v }))}
-              placeholder="مثال: 20% أو توصيل مجاني"
-            />
-            <TextField
-              label="شروط الأهلية"
-              value={form.eligibility}
-              onChangeText={v => setForm(f => ({ ...f, eligibility: v }))}
-              placeholder="مثال: للطلبات فوق 50 ريال"
-            />
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              <Button label="إرسال للمراجعة" tone="brand" onPress={handleSubmitOffer} />
-              <Button label="إلغاء" tone="ghost" onPress={() => setForm(INITIAL_FORM)} />
-            </Box>
-            {submitMessage ? (
-              <Text role="caption" tone="muted">{submitMessage}</Text>
-            ) : null}
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 88 }}>
+            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>نشطة</Text>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{String(activeOffers.length)}</Text>
           </Box>
-        )}
+          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 88 }}>
+            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>قيد المراجعة</Text>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{String(pendingOffers.length)}</Text>
+          </Box>
+          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 88 }}>
+            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>مرفوضة</Text>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{String(rejectedOffers.length)}</Text>
+          </Box>
+        </Box>
+
+        <Button
+          label="اقتراح عرض جديد"
+          tone="brand"
+          size="sm"
+          fullWidth={false}
+          onPress={() => openOfferForm()}
+        />
       </Surface>
 
-      {/* Info: no direct publish */}
-      <Surface tone="inset" padding={3} gap={2}>
-        <Text role="caption" tone="muted">
-          ملاحظة: جميع العروض المقدمة تمر عبر مرحلة المراجعة التسويقية قبل أن تصبح مرئية للعملاء. لا يمكن النشر المباشر.
-        </Text>
-        <Text role="caption" tone="muted">
-          {storeName} · {branchLabel} · {activeZoneLabel}
-        </Text>
-      </Surface>
-
-      <MobileStickyPrimaryAction
-        label="تقديم عرض مقترح"
-        helperText="يمر عبر المراجعة التسويقية قبل النشر."
-        onPress={() => setForm(f => ({ ...f, open: true }))}
+      <Tabs<PromotionsTab>
+        items={[
+          { value: 'active', label: 'النشطة' },
+          { value: 'pending', label: 'قيد المراجعة' },
+          { value: 'rejected', label: 'المرفوضة' },
+          { value: 'new', label: 'اقتراح جديد' },
+        ]}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        variant="pill"
+        scrollable
       />
+
+      {statusMessage ? (
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {statusMessage}
+        </Text>
+      ) : null}
+
+      <Surface
+        tone="raised"
+        padding={3}
+        gap={3}
+        style={{
+          borderWidth: 1,
+          borderColor: theme.line,
+          borderRadius: 22,
+        }}
+      >
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Text role="titleSm" style={{ textAlign: 'right' }}>
+            {activeTab === 'active'
+              ? 'العروض النشطة'
+              : activeTab === 'pending'
+                ? 'قائمة المراجعة'
+                : activeTab === 'rejected'
+                  ? 'العروض المرفوضة'
+                  : 'نموذج الاقتراح'}
+          </Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {activeTab === 'new'
+              ? 'ارسل اقتراحًا واحدًا واضحًا بدلاً من نموذج طويل متعدد الحقول.'
+              : 'اعرض قسمًا واحدًا في كل مرة لتقليل الضجيج أثناء المتابعة.'}
+          </Text>
+        </Box>
+        <Divider />
+        {renderPanelContent()}
+      </Surface>
     </Box>
   );
 }

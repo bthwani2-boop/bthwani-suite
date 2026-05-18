@@ -89,7 +89,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     { id: 'campaigns', label: 'الحملات', icon: '' },
     { id: 'partners', label: 'عروض الشركاء', icon: '' },
     { id: 'media-review', label: 'مراجعة الصور والمنتجات', icon: '' },
-    { id: 'loyalty', label: 'الولاء والاشتراكات', icon: '' },
+    { id: 'loyalty', label: 'المزايا والاشتراك', icon: '' },
     { id: 'growth', label: 'النمو', icon: '' },
     { id: 'signals', label: 'الإشارات والقياس', icon: '' },
   ] as const;

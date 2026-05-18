@@ -1,5 +1,8 @@
 import React from 'react';
-import { View } from 'react-native';
+import {
+  DshBenefitsHubScreen,
+  type DshBenefitsInitialSection,
+} from './BenefitsScreen';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
 
 export type DshMySpaceSubScreenProps = {
@@ -22,29 +25,27 @@ export function DshWalletHubScreen({ state = 'ready', onRetry, onBack }: DshMySp
 }
 
 export function DshLoyaltyHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
+  return renderBenefitsCompatibilityScreen('loyalty', { state, onRetry, onBack });
+}
+
+function renderBenefitsCompatibilityScreen(
+  initialSection: DshBenefitsInitialSection,
+  props: DshMySpaceSubScreenProps,
+) {
+  const { onBack, onRetry, state = 'ready' } = props;
+
   return (
-    <DshOperationScreen
-      state={state}
-      title="الولاء والمكافآت"
-      subtitle="رصيد النقاط والمزايا المتاحة"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
+    <DshBenefitsHubScreen
+      initialSection={initialSection}
+      onBack={onBack}
       onRetry={onRetry}
+      state={state}
     />
   );
 }
 
 export function DshSubscriptionsHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="الاشتراكات"
-      subtitle="إدارة الباقات والخصومات الدورية"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
-      onRetry={onRetry}
-    />
-  );
+  return renderBenefitsCompatibilityScreen('subscription', { state, onRetry, onBack });
 }
 
 export function DshAddressesHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
@@ -87,16 +88,7 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
 }
 
 export function DshCommercialHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="العروض الترويجية"
-      subtitle="الحملات والخصومات المباشرة"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
-      onRetry={onRetry}
-    />
-  );
+  return renderBenefitsCompatibilityScreen('offers', { state, onRetry, onBack });
 }
 
 export function DshAppearanceHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {

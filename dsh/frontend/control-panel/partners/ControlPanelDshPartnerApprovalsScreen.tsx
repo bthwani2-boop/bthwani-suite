@@ -99,8 +99,7 @@ export function ControlPanelDshPartnerHubScreen() {
       { id: 'complaints', label: 'شكاوى الشركاء', active: activeSubTab === 'complaints' },
     ],
     eligibility: [
-      { id: 'promotions', label: 'العروض الترويجية', active: activeSubTab === 'promotions' },
-      { id: 'loyalty', label: 'برامج الولاء', active: activeSubTab === 'loyalty' },
+      { id: 'benefits', label: 'المزايا والعروض', active: activeSubTab === 'benefits' },
     ],
   };
 
@@ -128,7 +127,7 @@ export function ControlPanelDshPartnerHubScreen() {
                 <span className={styles.surfaceHeaderBadgeText}>مراجعة الشريك</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>حوكمة الشركاء، التغطية، وأهلية الترويج</p>
+            <p className={styles.surfaceHeaderSubtitle}>حوكمة الشركاء، التغطية، وأهلية مسار المزايا والعروض</p>
           </Box>
         </div>
 

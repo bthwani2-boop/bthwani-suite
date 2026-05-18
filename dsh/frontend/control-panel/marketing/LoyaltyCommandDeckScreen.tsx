@@ -2,22 +2,89 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Box, Surface, Tabs, Text, useTheme } from '@bthwani/ui-kit';
 import {
-  getLoyaltyPrograms,
-  getSubscriptionPlans,
-  getLoyaltyTiers,
-  getLoyaltyRewards,
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Surface,
+  Tabs,
+  Text,
+  useTheme,
+} from '@bthwani/ui-kit';
+import {
   getEntitlements,
+  getLoyaltyPrograms,
+  getLoyaltyRewards,
+  getLoyaltyTiers,
+  getSubscriptionPlans,
 } from '../../shared/loyalty.preview-store';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
 
-type LoyaltyTab = 'programs' | 'tiers' | 'rewards' | 'subscriptions' | 'entitlements' | 'earning' | 'redemption';
+type LoyaltyView = 'overview' | 'tiers' | 'subscriptions' | 'rewards' | 'entitlements';
+
+type DeckRow = {
+  id: string;
+  title: string;
+  subtitle: string;
+  badgeLabel?: string;
+  badgeTone?: 'default' | 'success' | 'warning' | 'danger' | 'brand' | 'info';
+  actionLabel?: string;
+};
+
+function CompactDeckRow({
+  row,
+  showDivider = false,
+  selected,
+  onAction,
+}: {
+  row: DeckRow;
+  showDivider?: boolean;
+  selected: boolean;
+  onAction?: () => void;
+}) {
+  const { theme } = useTheme();
+
+  return (
+    <Box
+      style={{
+        borderTopWidth: showDivider ? 1 : 0,
+        borderTopColor: theme.line,
+        paddingTop: showDivider ? 12 : 0,
+        marginTop: showDivider ? 12 : 0,
+      }}
+    >
+      <Box layoutDirection="row" align="flex-start" justify="space-between" style={{ gap: 12 }}>
+        <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+          <Box layoutDirection="row" style={{ gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start', width: '100%' }}>
+            {row.badgeLabel ? <Badge label={row.badgeLabel} tone={row.badgeTone ?? 'default'} /> : null}
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>
+              {row.title}
+            </Text>
+          </Box>
+          <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
+            {row.subtitle}
+          </Text>
+        </Box>
+        {row.actionLabel && onAction ? (
+          <Button
+            label={selected ? 'محدد' : row.actionLabel}
+            tone={selected ? 'brand' : 'secondary'}
+            size="sm"
+            fullWidth={false}
+            onPress={onAction}
+          />
+        ) : null}
+      </Box>
+    </Box>
+  );
+}
 
 export function LoyaltyCommandDeckScreen() {
   const { theme } = useTheme();
-  const [activeTab, setActiveTab] = React.useState<LoyaltyTab>('programs');
+  const [activeTab, setActiveTab] = React.useState<LoyaltyView>('overview');
+  const [selectedRowId, setSelectedRowId] = React.useState('');
 
   const programs = React.useMemo(() => getLoyaltyPrograms(), []);
   const tiers = React.useMemo(() => getLoyaltyTiers(), []);
@@ -25,277 +92,233 @@ export function LoyaltyCommandDeckScreen() {
   const subscriptions = React.useMemo(() => getSubscriptionPlans(), []);
   const entitlements = React.useMemo(() => getEntitlements(), []);
 
-  // KPIs Mock
-  const kpis = {
-    members: '15,240',
-    subscribers: '2,840',
-    rewards: rewards.length,
-    entitlementsCount: entitlements.length,
-    activationRate: '12%',
-  };
-  const styles = React.useMemo(() => StyleSheet.create({
-    kpiRow: {
-      flexDirection: 'row',
-      gap: 12,
-      flexWrap: 'wrap',
-    },
-    kpiCard: {
-      flex: 1,
-      minWidth: 120,
-      backgroundColor: theme.surface,
-      borderRadius: 12,
-      padding: 12,
-      borderWidth: 1,
-      borderColor: theme.line,
-      alignItems: 'flex-start',
-    },
-    mainLayout: {
-      flex: 1,
-      flexDirection: 'row',
-      gap: 16,
-      alignItems: 'stretch',
-    },
-    editorPanel: {
-      flex: 2,
-      minWidth: 400,
-      borderRadius: 16,
-      borderColor: theme.line,
-      borderWidth: 1,
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    sidePanel: {
-      flex: 1,
-      minWidth: 280,
-      borderRadius: 16,
-      borderColor: theme.line,
-      borderWidth: 1,
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    editorHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.surfaceInset,
-      backgroundColor: theme.surface,
-    },
-    panelBody: {
-      flex: 1,
-      minHeight: 0,
-      padding: 16,
-    },
-    card: {
-      padding: 16,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: theme.line,
-      backgroundColor: theme.surface,
-    },
-    badge: {
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 6,
-      backgroundColor: theme.surfaceInset,
-    },
-    badgeText: {
-      fontSize: 10,
-      fontWeight: '800',
-      color: theme.textMuted,
-    },
-    previewContainer: {
-      backgroundColor: theme.surfaceInset,
-      padding: 16,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: theme.line,
-    }
-  }), [theme]);
+  const currentTier = tiers[tiers.length - 1];
+  const activeSubscription = subscriptions.find((plan) => plan.id === 'sub-pro') ?? subscriptions[0];
+  const activeRewards = rewards.slice(0, 4);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'programs':
-        return (
-          <Box gap={3}>
-            {programs.map(p => (
-              <Surface key={p.id} tone="raised" style={styles.card}>
-                <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{p.name}</Text>
-                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{p.description} · العملة: {p.currencyLabel}</Text>
-                <View style={[styles.badge, { alignSelf: 'flex-start', marginTop: 8 }]}>
-                  <Text style={styles.badgeText}>نشط</Text>
-                </View>
-              </Surface>
-            ))}
-          </Box>
-        );
-      case 'tiers':
-        return (
-          <Box gap={3}>
-            {tiers.map(t => (
-              <Surface key={t.id} tone="raised" style={styles.card}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>المستوى: {t.name}</Text>
-                  <Text role="bodyStrong" style={{ color: theme.brand }}>{t.minimumPoints} نقطة</Text>
-                </View>
-                <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'right' }}>المزايا: {t.benefits.length ? t.benefits.join('، ') : 'لا يوجد مزايا إضافية'}</Text>
-              </Surface>
-            ))}
-          </Box>
-        );
-      case 'rewards':
-        return (
-          <Box gap={3}>
-            {rewards.map(r => (
-              <Surface key={r.id} tone="raised" style={styles.card}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>{r.title}</Text>
-                  <Text role="bodyStrong" style={{ color: theme.brand }}>{r.pointsCost} نقطة</Text>
-                </View>
-                <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'right' }}>نوع المكافأة: كوبون خصم مباشر</Text>
-                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>تنتهي بعد: 30 يوماً من الاسترداد</Text>
-              </Surface>
-            ))}
-          </Box>
-        );
-      case 'subscriptions':
-        return (
-          <Box gap={3}>
-            {subscriptions.map(s => (
-              <Surface key={s.id} tone="raised" style={styles.card}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>{s.name}</Text>
-                  <Text role="bodyStrong" style={{ color: theme.success }}>{s.monthlyFee} ريال / شهرياً</Text>
-                </View>
-                <Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'right' }}>المزايا: {s.features.join('، ')}</Text>
-                <View style={[styles.badge, { backgroundColor: theme.successSurface, alignSelf: 'flex-start', marginTop: 8 }]}>
-                  <Text style={[styles.badgeText, { color: theme.successText }]}>باقة فعالة</Text>
-                </View>
-              </Surface>
-            ))}
-          </Box>
-        );
-      case 'entitlements':
-        return (
-          <Box gap={3}>
-            {entitlements.length === 0 ? (
-              <Text role="caption" tone="muted" style={{ textAlign: 'center', padding: 20 }}>لا توجد استحقاقات مسجلة حالياً.</Text>
-            ) : (
-              entitlements.map(e => (
-                <Surface key={e.id} tone="raised" style={styles.card}>
-                  <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>استحقاق: {e.type}</Text>
-                  <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>الحالة: {e.status}</Text>
-                </Surface>
-              ))
-            )}
-          </Box>
-        );
-      case 'earning':
-        return (
-          <Surface tone="raised" style={styles.card}>
-            <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, marginBottom: 8, textAlign: 'right' }}>قواعد الكسب</Text>
-            <ul style={{ paddingInlineStart: 20, color: theme.text, fontSize: 13, margin: 0, lineHeight: 1.8, textAlign: 'right' }}>
-              <li><strong>الطلبات:</strong> نقطة واحدة لكل ريال يتم إنفاقه.</li>
-              <li><strong>مكافأة الفئة:</strong> مضاعف 1.5x لقسم المقاضي.</li>
-              <li><strong>مكافأة الشريك:</strong> 100 نقطة إضافية عند الطلب من الشركاء المميزين.</li>
-            </ul>
-          </Surface>
-        );
-      case 'redemption':
-        return (
-          <Surface tone="raised" style={styles.card}>
-            <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, marginBottom: 8, textAlign: 'right' }}>قواعد الاسترداد</Text>
-            <ul style={{ paddingInlineStart: 20, color: theme.text, fontSize: 13, margin: 0, lineHeight: 1.8, textAlign: 'right' }}>
-              <li><strong>مكافأة الكوبون:</strong> استبدال 1000 نقطة بخصم 10 ريال.</li>
-              <li><strong>مكافأة التوصيل:</strong> استبدال 1500 نقطة بتوصيل مجاني لطلب واحد.</li>
-              <li><strong>مكافأة الشريك:</strong> منتجات مختارة بأسعار مخفضة حصرياً بالنقاط.</li>
-            </ul>
-          </Surface>
-        );
-    }
+  const metrics = [
+    { label: 'الأعضاء', value: '15,240' },
+    { label: 'مشتركو البرو', value: '2,840' },
+    { label: 'المكافآت النشطة', value: String(activeRewards.length) },
+    { label: 'الاستحقاقات', value: String(entitlements.length) },
+  ];
+
+  const overviewRows: DeckRow[] = [
+    {
+      id: 'program',
+      title: programs[0]?.name ?? 'برنامج ولاء واحد',
+      subtitle: programs[0]?.description ?? 'برنامج موحّد للمزايا الحالية.',
+      badgeLabel: 'البرنامج',
+      badgeTone: 'brand',
+      actionLabel: 'عرض',
+    },
+    {
+      id: 'tier',
+      title: `المستوى ${currentTier?.name ?? 'فضي'}`,
+      subtitle: `${currentTier?.minimumPoints ?? 0} نقطة للتأهل • ${currentTier?.benefits?.length ?? 0} مزايا مرتبطة.`,
+      badgeLabel: 'النقاط',
+      badgeTone: 'info',
+      actionLabel: 'عرض',
+    },
+    {
+      id: 'subscription',
+      title: activeSubscription?.name ?? 'بثواني برو',
+      subtitle: `${activeSubscription?.weeklyFee ?? activeSubscription?.monthlyFee ?? 0} ريال • ${activeSubscription?.features?.join(' • ') ?? 'بدون ميزات ظاهرة'}`,
+      badgeLabel: 'الاشتراك',
+      badgeTone: 'success',
+      actionLabel: 'عرض',
+    },
+    {
+      id: 'reward',
+      title: activeRewards[0]?.title ?? 'لا توجد مكافأة بارزة',
+      subtitle: activeRewards[0]?.description ?? 'ستظهر هنا أقرب مكافأة قابلة للاستخدام في العميل.',
+      badgeLabel: 'مكافأة',
+      badgeTone: 'warning',
+      actionLabel: 'عرض',
+    },
+  ];
+
+  const tierRows: DeckRow[] = tiers.map((tier) => ({
+    id: tier.id,
+    title: tier.name,
+    subtitle: `${tier.minimumPoints} نقطة • ${tier.benefits.length ? tier.benefits.map((benefit) => benefit.label).join(' • ') : 'بدون مزايا إضافية'}`,
+    badgeLabel: 'مستوى',
+    badgeTone: currentTier?.id === tier.id ? 'brand' : 'default',
+    actionLabel: 'عرض',
+  }));
+
+  const subscriptionRows: DeckRow[] = subscriptions.map((subscription) => ({
+    id: subscription.id,
+    title: subscription.name,
+    subtitle: `${subscription.weeklyFee ?? subscription.monthlyFee ?? 0} ريال • ${subscription.features.join(' • ')}`,
+    badgeLabel: subscription.id === activeSubscription?.id ? 'الحالية' : 'متاحة',
+    badgeTone: subscription.id === activeSubscription?.id ? 'brand' : 'info',
+    actionLabel: 'عرض',
+  }));
+
+  const rewardRows: DeckRow[] = activeRewards.map((reward) => ({
+    id: reward.id,
+    title: reward.title,
+    subtitle: reward.description ?? 'مكافأة قابلة للاسترداد.',
+    badgeLabel: `${reward.pointsCost} نقطة`,
+    badgeTone: 'warning',
+    actionLabel: 'عرض',
+  }));
+
+  const entitlementRows: DeckRow[] = entitlements.map((entitlement) => ({
+    id: entitlement.id,
+    title: entitlement.type,
+    subtitle: `الحالة الحالية: ${entitlement.status}`,
+    badgeLabel: entitlement.status === 'active' ? 'مفعّل' : entitlement.status,
+    badgeTone: entitlement.status === 'active' ? 'success' : 'default',
+    actionLabel: 'عرض',
+  }));
+
+  const previewFeatures = mapStoreCommercialFeatures({
+    storeId: 'benefits-preview',
+    activeOffers: [],
+    activeSubscriptions: activeSubscription ? [activeSubscription] : [],
+    activeEntitlements: entitlements,
+    activeCampaigns: [],
+  });
+
+  const styles = React.useMemo(
+    () => StyleSheet.create({
+      metricRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 12,
+      },
+      metricCard: {
+        flexGrow: 1,
+        minWidth: 120,
+        borderWidth: 1,
+        borderColor: theme.line,
+        backgroundColor: theme.surface,
+        borderRadius: 14,
+        padding: 12,
+      },
+      layout: {
+        flexDirection: 'row',
+        gap: 16,
+        alignItems: 'stretch',
+      },
+      primaryPanel: {
+        flex: 1.8,
+        minWidth: 420,
+        borderWidth: 1,
+        borderColor: theme.line,
+        borderRadius: 18,
+      },
+      sidePanel: {
+        flex: 1,
+        minWidth: 280,
+        borderWidth: 1,
+        borderColor: theme.line,
+        borderRadius: 18,
+      },
+    }),
+    [theme],
+  );
+
+  const rowsByTab: Record<LoyaltyView, DeckRow[]> = {
+    overview: overviewRows,
+    tiers: tierRows,
+    subscriptions: subscriptionRows,
+    rewards: rewardRows,
+    entitlements: entitlementRows,
   };
 
-  const renderStoreCardPreview = () => {
-    const mockContext = {
-      storeId: 'store-preview',
-      activeOffers: [],
-      activeSubscriptions: subscriptions.filter(s => s.id === 'sub-pro'),
-      activeEntitlements: entitlements,
-      activeCampaigns: [],
-    };
-    const features = mapStoreCommercialFeatures(mockContext);
-
-    return (
-      <Box gap={2} style={styles.previewContainer}>
-        <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>محاكاة بطاقة المتجر</Text>
-        <CommercialParityPreview features={features} />
-      </Box>
-    );
-  };
+  const currentRows = rowsByTab[activeTab];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
-      {/* KPIs */}
-      <View style={styles.kpiRow}>
-        <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>إجمالي الأعضاء</Text>
-          <Text role="titleLg" style={{ color: theme.brandHeaderBackground, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.members}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>مشتركي برو</Text>
-          <Text role="titleLg" style={{ color: theme.brand, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.subscribers}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>المكافآت المتاحة</Text>
-          <Text role="titleLg" style={{ color: theme.warning, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.rewards}</Text>
-        </View>
-        <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>معدل التفعيل</Text>
-          <Text role="titleLg" style={{ color: theme.success, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.activationRate}</Text>
-        </View>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 16, boxSizing: 'border-box', height: '100%' }}>
+      <View style={styles.metricRow}>
+        {metrics.map((metric) => (
+          <View key={metric.label} style={styles.metricCard}>
+            <Text role="caption" tone="muted" style={{ textAlign: 'right', width: '100%' }}>
+              {metric.label}
+            </Text>
+            <Text role="titleLg" style={{ textAlign: 'right', width: '100%' }}>
+              {metric.value}
+            </Text>
+          </View>
+        ))}
       </View>
 
-      <View style={styles.mainLayout}>
-        {/* Main Panel */}
-        <Surface tone="raised" style={styles.editorPanel}>
-          <View style={styles.editorHeader}>
-            <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>إدارة الولاء والاشتراكات</Text>
-          </View>
+      <View style={styles.layout}>
+        <Surface tone="raised" padding={3} gap={3} style={styles.primaryPanel}>
+          <Box gap={1} style={{ alignItems: 'flex-end' }}>
+            <Text role="titleSm" style={{ textAlign: 'right' }}>
+              مزايا العميل
+            </Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              لوحة مختصرة لمكونات الولاء والاشتراك التي تغذي تجربة العميل بدل توزيعها على مسارات كثيرة.
+            </Text>
+          </Box>
 
-          <Tabs<LoyaltyTab>
+          <Tabs<LoyaltyView>
             items={[
-              { value: 'programs', label: 'البرامج' },
+              { value: 'overview', label: 'نظرة عامة' },
               { value: 'tiers', label: 'المستويات' },
+              { value: 'subscriptions', label: 'الاشتراك' },
               { value: 'rewards', label: 'المكافآت' },
-              { value: 'subscriptions', label: 'الاشتراكات' },
               { value: 'entitlements', label: 'الاستحقاقات' },
-              { value: 'earning', label: 'قواعد الكسب' },
-              { value: 'redemption', label: 'قواعد الاسترداد' },
             ]}
             value={activeTab}
             onValueChange={setActiveTab}
-            variant="line"
+            variant="pill"
+            scrollable
           />
 
-          <Box gap={4} style={styles.panelBody}>
-            {renderTabContent()}
+          <Divider />
+
+          <Box gap={2}>
+            {currentRows.length > 0 ? (
+              currentRows.map((row, index) => (
+                <CompactDeckRow
+                  key={row.id}
+                  row={row}
+                  showDivider={index > 0}
+                  selected={selectedRowId === row.id}
+                  onAction={() => setSelectedRowId(row.id)}
+                />
+              ))
+            ) : (
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                لا توجد عناصر معروضة لهذا القسم حاليًا.
+              </Text>
+            )}
           </Box>
+
+          {selectedRowId ? (
+            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+              تم تثبيت صف واحد للمراجعة داخل هذه اللوحة لتقليل الضجيج أثناء اتخاذ القرار.
+            </Text>
+          ) : null}
         </Surface>
 
-        {/* Side Panel for Preview */}
-        <Surface tone="raised" style={styles.sidePanel}>
-          <View style={styles.editorHeader}>
-            <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>محاكاة التأثير</Text>
-          </View>
-          <Box gap={4} style={styles.panelBody}>
-            {renderStoreCardPreview()}
-            <Text role="caption" tone="muted" style={{ lineHeight: 20, textAlign: 'right' }}>
-              هذه المحاكاة تعرض الشارات والمزايا التي ترثها المتاجر المؤهلة بناءً على استحقاقات المستخدم أو قواعد الاشتراك الفعالة.
+        <Surface tone="raised" padding={3} gap={3} style={styles.sidePanel}>
+          <Box gap={1} style={{ alignItems: 'flex-end' }}>
+            <Text role="titleSm" style={{ textAlign: 'right' }}>
+              محاكاة التأثير
+            </Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              كيف ستظهر الشارات والمزايا على بطاقة المتجر داخل تجربة العميل.
             </Text>
           </Box>
+
+          <Box gap={2} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
+            <CommercialParityPreview features={previewFeatures} />
+          </Box>
+
+          <Button
+            label="تبديل إلى نظرة عامة"
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            onPress={() => setActiveTab('overview')}
+          />
         </Surface>
       </View>
     </div>

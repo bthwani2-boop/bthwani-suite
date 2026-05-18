@@ -1,180 +1,221 @@
 import React from 'react';
-import { Pressable, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import {
   Badge,
   Box,
   Button,
-  Checkbox,
-  Chip,
-  colorPalette,
-  SectionHeader,
-  spacing,
   Surface,
   Text,
+  spacing,
   useTheme,
 } from '@bthwani/ui-kit';
-import { subscriptionHeroCopy, subscriptionPlanCards, type SubscriptionPlanCard } from '../data/subscriptions-commercial.preview-data';
+import { subscriptionHeroCopy, subscriptionPlanCards } from '../data/subscriptions-commercial.preview-data';
 
-export type DshSubscriptionsScreenProps = {};
+export type DshSubscriptionsScreenProps = {
+  title?: string;
+  compact?: boolean;
+  onStatusChange?: (message: string) => void;
+};
 
-function SubscriptionPlanTile({
-  plan,
-  selected,
-  onPress,
+function resolveRenewalLabel(cadence?: string) {
+  if (!cadence) {
+    return 'تتجدد حسب الباقة المختارة';
+  }
+
+  return cadence.includes('أسبوع') ? 'تتجدد أسبوعيًا' : 'تتجدد شهريًا';
+}
+
+function resolvePaymentSummary(cadence?: string) {
+  if (!cadence) {
+    return 'من وسيلة الدفع المحفوظة';
+  }
+
+  return cadence.includes('أسبوع')
+    ? 'من وسيلة الدفع المحفوظة للاشتراك الأسبوعي'
+    : 'من وسيلة الدفع المحفوظة للاشتراك الشهري';
+}
+
+function SubscriptionActionRow({
+  title,
+  subtitle,
+  helperText,
+  badgeLabel,
+  badgeTone,
+  actionLabel,
+  onActionPress,
+  showDivider = false,
 }: {
-  plan: SubscriptionPlanCard;
-  selected: boolean;
-  onPress: () => void;
+  title: string;
+  subtitle: string;
+  helperText?: string;
+  badgeLabel?: string;
+  badgeTone?: 'default' | 'success' | 'warning' | 'danger' | 'brand' | 'info';
+  actionLabel?: string;
+  onActionPress?: () => void;
+  showDivider?: boolean;
 }) {
   const { theme } = useTheme();
 
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ selected }} onPress={onPress} style={{ width: 120 }}>
-      <Surface
-        tone="raised"
-        gap={1}
-        padding={2}
+    <View
+      style={{
+        borderTopWidth: showDivider ? 1 : 0,
+        borderTopColor: theme.line,
+        paddingTop: showDivider ? spacing[3] : 0,
+        marginTop: showDivider ? spacing[3] : 0,
+      }}
+    >
+      <View
         style={{
-          minHeight: 142,
-          borderWidth: 2,
-          borderColor: selected ? theme.brand : theme.line,
-          backgroundColor: theme.surface,
-          shadowColor: selected ? theme.brand : colorPalette.black,
-          shadowOpacity: selected ? 0.14 : 0.06,
-          shadowRadius: selected ? 12 : 8,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: selected ? 4 : 1,
-          transform: [{ translateY: selected ? 6 : 0 }],
+          flexDirection: 'row-reverse',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: spacing[3],
         }}
       >
-        <Box gap={0} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Text role="bodyStrong">باقة</Text>
-          <Text role="titleLg" style={{ color: selected ? theme.brand : undefined }}>
-            {plan.price}
+        <View style={{ flex: 1, alignItems: 'flex-end', gap: spacing[1] }}>
+          <View
+            style={{
+              flexDirection: 'row-reverse',
+              alignItems: 'center',
+              gap: spacing[2],
+              flexWrap: 'wrap',
+              width: '100%',
+            }}
+          >
+            {badgeLabel ? <Badge label={badgeLabel} tone={badgeTone ?? 'default'} /> : null}
+            <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
+              {title}
+            </Text>
+          </View>
+          <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
+            {subtitle}
           </Text>
-          <Text role="bodySm" tone="muted">
-            {plan.cadence}
-          </Text>
-        </Box>
-        <Text role="caption" style={{ textAlign: 'center', color: selected ? theme.brand : undefined }}>
-          {plan.title}
-        </Text>
-      </Surface>
-    </Pressable>
+          {helperText ? (
+            <Text role="caption" tone="soft" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
+              {helperText}
+            </Text>
+          ) : null}
+        </View>
+
+        {actionLabel ? (
+          <Button
+            label={actionLabel}
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            onPress={onActionPress}
+          />
+        ) : null}
+      </View>
+    </View>
   );
 }
 
-export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
+export function DshSubscriptionsScreen({
+  title = 'الاشتراك',
+  compact = false,
+  onStatusChange,
+}: DshSubscriptionsScreenProps = {}) {
   const { theme } = useTheme();
-  const initialCurrentPlanId = subscriptionPlanCards.find((plan) => plan.current)?.id ?? 'weekly';
-  const [currentPlanId, setCurrentPlanId] = React.useState(initialCurrentPlanId);
-  const [selectedPlanId, setSelectedPlanId] = React.useState(initialCurrentPlanId);
-  const [paymentProfileIndex, setPaymentProfileIndex] = React.useState(0);
-  const [autoRenew, setAutoRenew] = React.useState(true);
-  const [couponOpen, setCouponOpen] = React.useState(false);
+  const defaultPlan = subscriptionPlanCards.find((plan) => plan.current) ?? subscriptionPlanCards[0];
+  const [selectedPlanId, setSelectedPlanId] = React.useState(defaultPlan?.id ?? '');
+  const [showPlanOptions, setShowPlanOptions] = React.useState(false);
+  const activePlan = subscriptionPlanCards.find((plan) => plan.id === selectedPlanId) ?? defaultPlan;
+  const alternativePlans = subscriptionPlanCards.filter((plan) => plan.id !== activePlan?.id);
 
-  const paymentProfiles = React.useMemo(
-    () => [
-      { label: 'مدى **** 4821', detail: 'تنتهي 03/27' },
-      { label: 'Visa **** 9055', detail: 'تنتهي 11/28' },
-    ],
-    [],
+  const content = (
+    <Box gap={3}>
+      {!compact ? (
+        <Box gap={1} style={{ alignItems: 'flex-end' }}>
+          <Text role="titleSm" style={{ textAlign: 'right' }}>
+            {title}
+          </Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            الخطة الحالية فقط، مع التبديل عند الحاجة بدل عرض جميع الباقات دفعة واحدة.
+          </Text>
+        </Box>
+      ) : null}
+
+      {activePlan ? (
+        <Box gap={0}>
+          <SubscriptionActionRow
+            title={activePlan.title}
+            subtitle={`${activePlan.price} • ${activePlan.cadence}`}
+            helperText={activePlan.highlight}
+            badgeLabel={subscriptionHeroCopy.eyebrow}
+            badgeTone="brand"
+            actionLabel="تغيير"
+            onActionPress={() => setShowPlanOptions((current) => !current)}
+          />
+          <SubscriptionActionRow
+            title="التجديد"
+            subtitle={resolveRenewalLabel(activePlan.cadence)}
+            helperText={activePlan.note}
+            badgeLabel="التالي"
+            badgeTone="info"
+            actionLabel="راجع"
+            onActionPress={() => onStatusChange?.(`التجديد الحالي: ${resolveRenewalLabel(activePlan.cadence)}.`)}
+            showDivider
+          />
+          <SubscriptionActionRow
+            title="طريقة الدفع"
+            subtitle={resolvePaymentSummary(activePlan.cadence)}
+            helperText="استخدم نفس وسيلة الدفع المحفوظة عند استمرار الاشتراك."
+            badgeLabel="دفع"
+            badgeTone="default"
+            actionLabel="تأكيد"
+            onActionPress={() => onStatusChange?.('تمت مراجعة طريقة الدفع المختصرة للاشتراك الحالي.')}
+            showDivider
+          />
+        </Box>
+      ) : (
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          لا توجد باقة معروضة حاليًا.
+        </Text>
+      )}
+
+      {showPlanOptions && alternativePlans.length > 0 ? (
+        <Box gap={0}>
+          {alternativePlans.map((plan, index) => (
+            <SubscriptionActionRow
+              key={plan.id}
+              title={plan.title}
+              subtitle={`${plan.price} • ${plan.cadence}`}
+              helperText={plan.note}
+              badgeLabel="متاحة"
+              badgeTone="success"
+              actionLabel="اختيار"
+              onActionPress={() => {
+                setSelectedPlanId(plan.id);
+                setShowPlanOptions(false);
+                onStatusChange?.(`تم اختيار ${plan.title} كخطة بديلة للمتابعة.`);
+              }}
+              showDivider={index > 0}
+            />
+          ))}
+        </Box>
+      ) : null}
+    </Box>
   );
 
-  const selectedPlan = subscriptionPlanCards.find((plan) => plan.id === selectedPlanId) ?? subscriptionPlanCards[0];
-  const selectedPaymentProfile = paymentProfiles[paymentProfileIndex % paymentProfiles.length];
-  const totalAmount = selectedPlan.price;
-  const visiblePlans = React.useMemo(
-    () => [
-      subscriptionPlanCards.find((plan) => plan.id === 'family'),
-      subscriptionPlanCards.find((plan) => plan.id === 'weekly'),
-      subscriptionPlanCards.find((plan) => plan.id === 'monthly'),
-    ].filter((plan): plan is SubscriptionPlanCard => Boolean(plan)),
-    [],
-  );
-
-  const applySelectedPlan = () => {
-    setCurrentPlanId(selectedPlan.id);
-    setSelectedPlanId(selectedPlan.id);
-  };
-
-  const togglePaymentProfile = () => {
-    setPaymentProfileIndex((value) => (value + 1) % paymentProfiles.length);
-  };
+  if (compact) {
+    return content;
+  }
 
   return (
-    <Box gap={3}>
-      <Surface tone="raised" gap={2} padding={3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <SectionHeader
-          title={subscriptionHeroCopy.title}
-          subtitle={subscriptionHeroCopy.subtitle}
-          trailing={<Badge tone="brand" label={subscriptionHeroCopy.eyebrow} />}
-        />
-      </Surface>
-
-      <Surface
-        gap={3}
-        padding={3}
-        style={{
-          borderWidth: 0,
-          borderRadius: 28,
-          backgroundColor: theme.brand,
-          overflow: 'hidden',
-        }}
-      >
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: spacing[1] }}>
-          <Box layoutDirection="row" gap={2}>
-            {visiblePlans.map((plan) => (
-              <SubscriptionPlanTile
-                key={plan.id}
-                plan={plan}
-                selected={selectedPlanId === plan.id}
-                onPress={() => setSelectedPlanId(plan.id)}
-              />
-            ))}
-          </Box>
-        </ScrollView>
-      </Surface>
-
-      <Surface tone="default" gap={0} padding={2} style={{ borderRadius: 18, backgroundColor: theme.brandSurface, borderWidth: 0 }}>
-        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text role="bodyStrong">استعراض الباقات المميزة</Text>
-          <Text role="titleSm">‹</Text>
-        </Box>
-      </Surface>
-
-      <Surface tone="raised" gap={2} padding={3} style={{ borderWidth: 1, borderColor: theme.line }}>
-        <Box gap={0} style={{ alignItems: 'flex-end' }}>
-          <Text role="titleSm">طريقة الدفع</Text>
-          <Text role="bodySm" tone="muted">الدفع عند أول طلب.</Text>
-        </Box>
-
-        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <Text role="bodyStrong">{selectedPaymentProfile.label}</Text>
-            <Text role="bodySm" tone="muted">{selectedPaymentProfile.detail}</Text>
-          </Box>
-          <Chip label="تغيير" tone="brand" onPress={togglePaymentProfile} />
-        </Box>
-
-        <Surface tone="inset" gap={2} padding={2} style={{ borderWidth: 1, borderColor: theme.line }}>
-          <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text role="bodyStrong">هل لديك قسيمة اشتراك؟</Text>
-            <Chip label="إضافة" tone="brand" onPress={() => setCouponOpen((value) => !value)} />
-          </Box>
-          {couponOpen ? <Text role="caption" tone="muted">يمكن إضافة القسيمة من هنا.</Text> : null}
-        </Surface>
-
-        <Checkbox label="التجديد التلقائي للاشتراك عند الانتهاء" checked={autoRenew} onCheckedChange={setAutoRenew} />
-
-        <Box layoutDirection="row" style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <Text role="bodySm" tone="muted">إجمالي الاشتراك</Text>
-          <Text role="titleSm">{totalAmount} ريال</Text>
-        </Box>
-
-        <Button label="اشترك الآن" onPress={applySelectedPlan} />
-      </Surface>
-    </Box>
+    <Surface
+      tone="raised"
+      padding={3}
+      gap={3}
+      style={{
+        borderWidth: 1,
+        borderColor: theme.line,
+        borderRadius: 22,
+      }}
+    >
+      {content}
+    </Surface>
   );
 }
 

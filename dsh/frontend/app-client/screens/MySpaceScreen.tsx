@@ -35,6 +35,7 @@ export type DshMySpaceScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
   marketingPrograms?: DshMySpaceItem[];
   onAppearanceModeChange?: (mode: BThwaniAppearanceMode) => void;
+  onOpenBenefits?: () => void;
   onOpenOrders?: () => void;
   onOpenWallet?: () => void;
   onOpenLoyalty?: () => void;
@@ -51,7 +52,17 @@ export type DshMySpaceScreenProps = {
   onRetry?: () => void;
 };
 
-type MySpacePrimaryTab = 'orders' | 'wallet' | 'loyalty' | 'subscriptions' | 'addresses' | 'location' | 'identity' | 'commercial' | 'appearance' | 'preferences';
+type MySpacePrimaryTab =
+  | 'orders'
+  | 'wallet'
+  | 'loyalty'
+  | 'subscription'
+  | 'offers'
+  | 'addresses'
+  | 'location'
+  | 'identity'
+  | 'appearance'
+  | 'preferences';
 
 type PrimaryTabConfig = {
   id: MySpacePrimaryTab;
@@ -63,12 +74,12 @@ type PrimaryTabConfig = {
 const primaryTabs: PrimaryTabConfig[] = [
   { id: 'orders', label: 'طلباتي', summary: 'الطلب والتاريخ والتتبع', iconName: 'bag-outline' },
   { id: 'wallet', label: 'المحفظة', summary: 'الرصيد، الاسترداد، وطرق الدفع', iconName: 'wallet-outline' },
-  { id: 'loyalty', label: 'الولاء والمكافآت', summary: 'رصيد النقاط والمزايا المتاحة', iconName: 'star-outline' },
-  { id: 'subscriptions', label: 'الاشتراكات', summary: 'إدارة الباقات والخصومات الدورية', iconName: 'flash-outline' },
+  { id: 'loyalty', label: 'النقاط والمكافآت', summary: 'الرصيد، المستوى، وأقرب ثلاث مكافآت', iconName: 'star-outline' },
+  { id: 'subscription', label: 'الاشتراك', summary: 'الخطة الحالية والتبديل عند الحاجة فقط', iconName: 'card-outline' },
+  { id: 'offers', label: 'العروض والكوبونات', summary: 'ثلاث فرص قابلة للاستخدام بدل قائمة طويلة', iconName: 'pricetag-outline' },
   { id: 'addresses', label: 'العناوين المحفوظة', summary: 'إدارة مواقع التوصيل والاستلام', iconName: 'location-outline' },
   { id: 'location', label: 'الموقع الحالي', summary: 'تحديد وتحديث موقعك الميداني', iconName: 'map-outline' },
   { id: 'identity', label: 'الملف الشخصي', summary: 'البيانات الشخصية والأمان', iconName: 'person-outline' },
-  { id: 'commercial', label: 'العروض الترويجية', summary: 'الحملات والخصومات المباشرة', iconName: 'megaphone-outline' },
   { id: 'appearance', label: 'المظهر', summary: 'فاتح أبيض أو داكن زجاجي', iconName: 'color-palette-outline' },
   { id: 'preferences', label: 'تفضيلات التوصيل', summary: 'إعدادات خاصة بالتسليم والاستبدال', iconName: 'options-outline' },
 ];
@@ -152,6 +163,7 @@ function MySpacePrimaryRow({
 
 export function DshMySpaceScreen({
   state = 'ready',
+  onOpenBenefits,
   onOpenOrders,
   onOpenWallet,
   onOpenLoyalty,
@@ -177,17 +189,29 @@ export function DshMySpaceScreen({
       case 'wallet':
         return onOpenWallet ? onOpenWallet() : console.warn('Missing onOpenWallet callback');
       case 'loyalty':
-        return onOpenLoyalty ? onOpenLoyalty() : console.warn('Missing onOpenLoyalty callback');
-      case 'subscriptions':
-        return onOpenSubscriptions ? onOpenSubscriptions() : console.warn('Missing onOpenSubscriptions callback');
+        return onOpenLoyalty
+          ? onOpenLoyalty()
+          : onOpenBenefits
+            ? onOpenBenefits()
+            : console.warn('Missing onOpenLoyalty callback');
+      case 'subscription':
+        return onOpenSubscriptions
+          ? onOpenSubscriptions()
+          : onOpenBenefits
+            ? onOpenBenefits()
+            : console.warn('Missing onOpenSubscriptions callback');
+      case 'offers':
+        return onOpenCommercial
+          ? onOpenCommercial()
+          : onOpenBenefits
+            ? onOpenBenefits()
+            : console.warn('Missing onOpenCommercial callback');
       case 'addresses':
         return onOpenAddresses ? onOpenAddresses() : console.warn('Missing onOpenAddresses callback');
       case 'location':
         return onOpenLocation ? onOpenLocation() : console.warn('Missing onOpenLocation callback');
       case 'identity':
         return onOpenIdentity ? onOpenIdentity() : console.warn('Missing onOpenIdentity callback');
-      case 'commercial':
-        return onOpenCommercial ? onOpenCommercial() : console.warn('Missing onOpenCommercial callback');
       case 'appearance':
         return onOpenAppearance ? onOpenAppearance() : console.warn('Missing onOpenAppearance callback');
       case 'preferences':
