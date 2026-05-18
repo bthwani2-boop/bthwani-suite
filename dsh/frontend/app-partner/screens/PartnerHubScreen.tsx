@@ -917,8 +917,11 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     onOpenBell,
     onOpenOperationalFlow,
     onOpenSupportScreen,
+    onToggleAvailability,
     canonicalStoreId,
   } = props;
+
+  const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
   const { direction } = useDirection();
   const {
@@ -965,11 +968,11 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const summaryItems = React.useMemo<readonly SummaryItem[]>(
     () => [
-      { id: 'store-status', label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
+      { id: 'store-status', label: 'حالة المتجر', value: isAvailable ? 'مفتوح الآن' : 'مغلق الآن', tone: isAvailable ? 'success' : 'warning' },
       { id: 'active-orders', label: 'الطلبات النشطة', value: String(activeOrdersCount), tone: 'brand' },
       { id: 'hours', label: 'ساعات العمل', value: resolvedTodayHoursLabel, tone: 'info' },
     ],
-    [activeOrdersCount, resolvedTodayHoursLabel, storeOpen],
+    [activeOrdersCount, resolvedTodayHoursLabel, isAvailable],
   );
 
   if (state !== 'ready') {
@@ -1320,6 +1323,21 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
         <Text role="label" tone="muted">
           إجراءات سريعة
         </Text>
+
+        {/* ML-017: availability toggle — local preview state only; runtime wiring via onToggleAvailability */}
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text role="body" tone={isAvailable ? 'success' : 'muted'}>
+            {isAvailable ? 'المتجر مفتوح' : 'المتجر مغلق'}
+          </Text>
+          <RNSwitch
+            value={isAvailable}
+            onValueChange={(next) => {
+              setIsAvailable(next);
+              onToggleAvailability?.(next);
+            }}
+            accessibilityLabel="تبديل حالة المتجر"
+          />
+        </View>
 
         <View
           style={{

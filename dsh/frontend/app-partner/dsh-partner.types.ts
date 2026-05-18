@@ -74,5 +74,6 @@ export type DshPartnerHubSurfaceProps = {
   onOpenBell?: () => void;
   onOpenOperationalFlow?: (screenId: DshPartnerOperationalFlowId) => void;
   onOpenSupportScreen?: (screenId: DshPartnerOperationalFlowId) => void;
+  onToggleAvailability?: (isAvailable: boolean) => void;
   canonicalStoreId?: string;
 };
