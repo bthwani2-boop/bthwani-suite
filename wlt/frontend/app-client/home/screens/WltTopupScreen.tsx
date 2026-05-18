@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { ScreenWrapper, ScreenState, Text, useI18n, Dialog } from '@bthwani/ui-kit';
 import { AmountInput, PaymentMethodList, SummaryCard, QuickAmountGrid, Button, TextField, amountToArabicText } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../../shared/finance/providers';
+import { financeProviders } from '../../../shared/finance/providers';
 
 export const WltTopupScreen: React.FC = () => {
   const { t } = useI18n();
