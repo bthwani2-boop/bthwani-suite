@@ -5,12 +5,11 @@ import {
   Button,
   Divider,
   Icon,
-  Radio,
   spacing,
-  Surface,
   Switch,
   Text,
   TextField,
+  ActionStrip,
   useTheme,
 } from '@bthwani/ui-kit';
 import { subscriptionHeroCopy, subscriptionPlanCards } from '../data/subscriptions-commercial.preview-data';
@@ -20,35 +19,34 @@ export type DshSubscriptionsScreenProps = {};
 export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
   const { theme } = useTheme();
 
-  // 1. Tab State
-  const [activeTab, setActiveTab] = React.useState<'my-plan' | 'plans' | 'payment' | 'benefits'>('my-plan');
-
-  // 2. Core Plan States
+  // Core Plan States
   const initialCurrentPlanId = subscriptionPlanCards.find((plan) => plan.current)?.id ?? 'weekly';
   const [currentPlanId, setCurrentPlanId] = React.useState(initialCurrentPlanId);
   const [selectedPlanId, setSelectedPlanId] = React.useState(initialCurrentPlanId);
 
-  // 3. Payment Method States
-  const [paymentProfileIndex, setPaymentProfileIndex] = React.useState(0);
-  const [showPaymentOptions, setShowPaymentOptions] = React.useState(false);
+  // Accordion State
+  const [expandedSection, setExpandedSection] = React.useState<'plan' | 'payment' | 'renew' | 'coupon' | null>(null);
 
-  // 4. Auto-Renew State
+  // Payment Method States
+  const [paymentProfileIndex, setPaymentProfileIndex] = React.useState(0);
+
+  // Auto-Renew State
   const [autoRenew, setAutoRenew] = React.useState(true);
 
-  // 5. Coupon States
-  const [couponOpen, setCouponOpen] = React.useState(false);
+  // Coupon States
   const [couponCode, setCouponCode] = React.useState('');
   const [appliedCoupon, setAppliedCoupon] = React.useState<string | null>(null);
   const [couponError, setCouponError] = React.useState<string | null>(null);
-  const [couponDiscount, setCouponDiscount] = React.useState(0); // 0.2 for 20% discount
+  const [couponDiscount, setCouponDiscount] = React.useState(0);
 
-  // 6. Success State
+  // Success State
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 
   const paymentProfiles = React.useMemo(
     () => [
-      { id: 'mada', label: 'مدى **** 4821', detail: 'تنتهي 03/27' },
-      { id: 'visa', label: 'Visa **** 9055', detail: 'تنتهي 11/28' },
+      { id: 'mada', label: 'مدى **** 4821', detail: 'تنتهي 03/27', icon: 'card' as const },
+      { id: 'visa', label: 'Visa **** 9055', detail: 'تنتهي 11/28', icon: 'card' as const },
+      { id: 'applepay', label: 'Apple Pay', detail: 'الافتراضي', icon: 'phone-portrait' as const },
     ],
     [],
   );
@@ -62,9 +60,18 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
   const discountAmount = appliedCoupon ? originalPrice * couponDiscount : 0;
   const finalPrice = originalPrice - discountAmount;
 
-  const applySelectedPlan = () => {
+  // Change flags
+  const isPlanChanged = selectedPlanId !== currentPlanId;
+  const isPaymentChanged = paymentProfileIndex !== 0;
+  const isAutoRenewChanged = autoRenew !== true;
+  const isCouponChanged = appliedCoupon !== null;
+
+  const hasChanges = isPlanChanged || isPaymentChanged || isAutoRenewChanged || isCouponChanged;
+
+  const applyChanges = () => {
     setCurrentPlanId(selectedPlanId);
-    setSuccessMessage(`تم تحديث اشتراكك وتفعيل باقة (${selectedPlan.title}) بنجاح!`);
+    setExpandedSection(null);
+    setSuccessMessage('تم تأكيد التغييرات وتحديث حالة الاشتراك بنجاح!');
     setTimeout(() => setSuccessMessage(null), 6000);
   };
 
@@ -89,604 +96,230 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
     setCouponError(null);
   };
 
-  // Change flags
-  const isPlanChanged = selectedPlanId !== currentPlanId;
-  const isPaymentChanged = paymentProfileIndex !== 0;
-  const isAutoRenewChanged = autoRenew !== true;
-  const isCouponChanged = appliedCoupon !== null;
-
-  const hasChanges = isPlanChanged || isPaymentChanged || isAutoRenewChanged || isCouponChanged;
+  const toggleSection = (section: 'plan' | 'payment' | 'renew' | 'coupon') => {
+    setExpandedSection(prev => prev === section ? null : section);
+  };
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.background }}
-      contentContainerStyle={{ padding: spacing[4], gap: spacing[4], paddingBottom: spacing[6] }}
+      style={{ flex: 1, backgroundColor: 'transparent' }} // Removed background container color
+      contentContainerStyle={{ paddingBottom: spacing[10] }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Success Banner */}
-      {successMessage ? (
-        <Surface
-          tone="raised"
-          padding={3}
-          style={{
-            borderRadius: 16,
-            backgroundColor: theme.successSurface,
-            borderColor: theme.success,
-            borderWidth: 1,
-          }}
-        >
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3] }}>
-            <Icon name="checkmark-circle" tone="success" size={24} />
-            <Text role="bodyStrong" style={{ color: theme.success, textAlign: 'right', flex: 1 }}>
-              {successMessage}
-            </Text>
-          </View>
-        </Surface>
-      ) : null}
-
-      {/* Flat Header section */}
-      <View style={{ gap: spacing[1], paddingHorizontal: spacing[2], marginBottom: spacing[1] }}>
-        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text role="titleLg" style={{ textAlign: 'right', color: theme.text }}>
-            {subscriptionHeroCopy.title}
+      {/* Success Message */}
+      {successMessage && (
+        <View style={{ margin: spacing[4], backgroundColor: theme.successSurface, padding: spacing[3], borderRadius: 12, borderWidth: 1, borderColor: theme.success, flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+          <Icon name="checkmark-circle" tone="success" size={20} />
+          <Text role="bodyStrong" style={{ color: theme.success, textAlign: 'right', flex: 1 }}>
+            {successMessage}
           </Text>
-          <Badge tone="brand" label={subscriptionHeroCopy.eyebrow} />
-        </View>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          {subscriptionHeroCopy.subtitle}
-        </Text>
-      </View>
-
-      {/* Tabs Menu */}
-      <View
-        style={{
-          flexDirection: 'row-reverse',
-          borderBottomWidth: 1,
-          borderBottomColor: theme.line,
-          marginBottom: spacing[2],
-        }}
-      >
-        {[
-          { id: 'my-plan', label: 'خطتي' },
-          { id: 'plans', label: 'الباقات' },
-          { id: 'payment', label: 'الدفع' },
-          { id: 'benefits', label: 'المزايا' },
-        ].map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <Pressable
-              key={tab.id}
-              onPress={() => {
-                setActiveTab(tab.id as any);
-                setSuccessMessage(null);
-              }}
-              style={{
-                flex: 1,
-                paddingVertical: spacing[3],
-                borderBottomWidth: 2,
-                borderBottomColor: isActive ? theme.brand : 'transparent',
-                alignItems: 'center',
-              }}
-            >
-              <Text
-                role="bodyStrong"
-                style={{
-                  color: isActive ? theme.brand : theme.text,
-                  opacity: isActive ? 1 : 0.6,
-                }}
-              >
-                {tab.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {/* Tab Contents */}
-      {activeTab === 'my-plan' && (
-        <View style={{ gap: spacing[4] }}>
-          <View
-            style={{
-              padding: spacing[4],
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: theme.line,
-              backgroundColor: theme.surface,
-              gap: spacing[3],
-            }}
-          >
-            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Text role="titleMd" style={{ color: theme.brand }}>
-                  {currentPlan.title}
-                </Text>
-                <Badge label="الخطة النشطة" tone="success" />
-              </View>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: spacing[1] }}>
-                <Text role="titleLg" style={{ color: theme.text }}>
-                  {currentPlan.price} ريال
-                </Text>
-                <Text role="bodySm" tone="muted">
-                  / {currentPlan.cadence.includes('أسبوع') ? 'أسبوع' : 'شهر'}
-                </Text>
-              </View>
-            </View>
-
-            <Divider style={{ marginVertical: spacing[1] }} />
-
-            <Switch
-              label="التجديد التلقائي للاشتراك"
-              description="تفعيل هذا الخيار يضمن استمرار مميزات بثواني برو دون انقطاع."
-              value={autoRenew}
-              onValueChange={setAutoRenew}
-            />
-
-            <Divider style={{ marginVertical: spacing[1] }} />
-
-            <View style={{ gap: spacing[2] }}>
-              <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>
-                مزايا خطتك الحالية:
-              </Text>
-              {currentPlan.note.split(' • ').map((feature, idx) => (
-                <View key={idx} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                  <Icon name="checkmark-circle" tone="success" size={16} />
-                  <Text role="bodyMd" style={{ textAlign: 'right', flex: 1 }}>
-                    {feature}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </View>
         </View>
       )}
 
-      {activeTab === 'plans' && (
-        <View style={{ gap: spacing[3] }}>
-          <Text role="titleSm" style={{ textAlign: 'right', paddingHorizontal: spacing[1] }}>
-            الباقات المتاحة للاشتراك
+      {/* Current Plan Minimal Flat Display */}
+      <View style={{ paddingHorizontal: spacing[4], paddingTop: spacing[4], paddingBottom: spacing[4], borderBottomWidth: 8, borderBottomColor: theme.surface }}>
+
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <View style={{ alignItems: 'flex-end', gap: spacing[1] }}>
+            <Text role="titleMd" style={{ color: theme.brand }}>{currentPlan.title}</Text>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
+              <Icon name="checkmark-circle" tone="success" size={14} />
+              <Text role="bodySm" tone="success">خطة نشطة</Text>
+            </View>
+          </View>
+          <View style={{ alignItems: 'baseline', flexDirection: 'row-reverse', gap: spacing[1] }}>
+            <Text role="titleMd" style={{ color: theme.text }}>{currentPlan.price} ريال</Text>
+            <Text role="bodySm" tone="muted">/ {currentPlan.cadence.includes('أسبوع') ? 'أسبوع' : 'شهر'}</Text>
+          </View>
+        </View>
+        {currentPlan.note.split(' • ')[0] && (
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: spacing[3] }}>
+            أهم ميزة: {currentPlan.note.split(' • ')[0]}
           </Text>
+        )}
+      </View>
 
-          {subscriptionPlanCards.map((plan) => {
-            const isCurrent = plan.id === currentPlanId;
-            const isSelected = plan.id === selectedPlanId;
+      {/* Action Strip List (Completely Flat, No Containers) */}
+      <View style={{ paddingTop: spacing[4] }}>
+        <Text role="bodyStrong" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[4], marginBottom: spacing[2] }}>خيارات التحكم</Text>
 
-            return (
-              <View
-                key={plan.id}
-                style={{
-                  borderRadius: 16,
-                  borderWidth: isSelected ? 1.5 : 1,
-                  borderColor: isSelected ? theme.brand : theme.line,
-                  backgroundColor: theme.surface,
-                  overflow: 'hidden',
-                }}
-              >
-                <Pressable
-                  onPress={() => {
-                    setSelectedPlanId(plan.id);
-                    setSuccessMessage(null);
-                  }}
-                  style={{
-                    padding: spacing[3.5],
-                    flexDirection: 'row-reverse',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: spacing[2],
-                  }}
-                >
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3], flex: 1 }}>
-                    <View
-                      style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 10,
-                        borderWidth: 2,
-                        borderColor: isSelected ? theme.brand : theme.lineStrong,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {isSelected && (
-                        <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: theme.brand }} />
-                      )}
-                    </View>
+        {/* Flat Divider Top */}
+        <Divider />
 
-                    <View style={{ gap: spacing[0.5], alignItems: 'flex-end', flex: 1 }}>
-                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2], flexWrap: 'wrap' }}>
-                        <Text role="bodyStrong" style={{ color: isSelected ? theme.brand : theme.text }}>
-                          {plan.title}
-                        </Text>
-                        {plan.highlight ? (
-                          <Badge label={plan.highlight} tone={plan.id === 'family' ? 'warning' : 'info'} />
-                        ) : null}
-                        {isCurrent ? <Badge label="الخطة الحالية" tone="success" /> : null}
-                      </View>
-                    </View>
-                  </View>
-
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: spacing[1] }}>
-                    <Text role="titleMd" style={{ color: isSelected ? theme.brand : theme.text }}>
-                      {plan.price} ريال
-                    </Text>
-                    <Text role="caption" tone="muted">
-                      / {plan.cadence.includes('أسبوع') ? 'أسبوع' : 'شهر'}
-                    </Text>
-                  </View>
-                </Pressable>
-
-                {isSelected && (
-                  <View
-                    style={{
-                      padding: spacing[3.5],
-                      backgroundColor: theme.brandSurface,
-                      borderTopWidth: 1,
-                      borderTopColor: theme.line,
-                      gap: spacing[3],
-                    }}
-                  >
-                    <View style={{ gap: spacing[2] }}>
-                      <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.brand }}>
-                        مزايا الباقة:
-                      </Text>
-                      {plan.note.split(' • ').map((feature, idx) => (
-                        <View key={idx} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                          <Icon name="checkmark-circle" tone="brand" size={14} />
-                          <Text role="bodyMd" style={{ textAlign: 'right', flex: 1 }}>
-                            {feature}
-                          </Text>
+        {/* Change Plan Strip */}
+        <View>
+          <ActionStrip
+            icon="cube"
+            title="تغيير الباقة"
+            subtitle={selectedPlanId !== currentPlanId ? selectedPlan.title : 'اختر باقة تناسبك'}
+            expanded={expandedSection === 'plan'}
+            onPress={() => toggleSection('plan')}
+            hideDivider
+          >
+            <View style={{ gap: spacing[4] }}>
+              {subscriptionPlanCards.map((plan, index) => {
+                const isSelected = selectedPlanId === plan.id;
+                return (
+                  <View key={plan.id}>
+                    {index > 0 && <Divider style={{ marginBottom: spacing[4] }} />}
+                    <Pressable onPress={() => setSelectedPlanId(plan.id)} style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[3], flex: 1 }}>
+                        <View style={{ marginTop: 2 }}>
+                          <Icon name={isSelected ? 'checkmark-circle' : 'ellipse-outline'} tone={isSelected ? 'brand' : 'muted'} size={24} />
                         </View>
-                      ))}
-                    </View>
-
-                    {!isCurrent && (
-                      <Button
-                        label="اختيار هذه الباقة"
-                        tone="brand"
-                        onPress={applySelectedPlan}
-                        style={{ borderRadius: 12, marginTop: spacing[1] }}
-                      />
+                        <View style={{ alignItems: 'flex-end', flex: 1 }}>
+                          <Text role="bodyStrong" style={{ color: isSelected ? theme.brand : theme.text }}>{plan.title}</Text>
+                          {plan.highlight ? <Text role="caption" tone="brand" style={{ marginTop: 2 }}>{plan.highlight}</Text> : null}
+                          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: spacing[1] }}>{plan.note}</Text>
+                        </View>
+                      </View>
+                      <Text role="bodyStrong" style={{ color: theme.text, marginLeft: spacing[2] }}>{plan.price} ريال</Text>
+                    </Pressable>
+                    {isSelected && plan.id !== currentPlanId && (
+                      <View style={{ alignItems: 'flex-start', marginTop: spacing[3], marginRight: 36 }}>
+                        <Button label="اختيار هذه الباقة" tone="brand" size="sm" onPress={() => setExpandedSection(null)} style={{ borderRadius: 8 }} />
+                      </View>
                     )}
                   </View>
-                )}
-              </View>
-            );
-          })}
+                );
+              })}
+            </View>
+          </ActionStrip>
         </View>
-      )}
+        <Divider />
 
-      {activeTab === 'payment' && (
-        <View style={{ gap: spacing[4] }}>
-          <View
-            style={{
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: theme.line,
-              backgroundColor: theme.surface,
-              overflow: 'hidden',
-            }}
+        {/* Payment Strip */}
+        <View>
+          <ActionStrip
+            icon="card"
+            title="طريقة الدفع"
+            subtitle={<Text role="bodySm" tone="muted" style={{ direction: 'ltr' }}>{selectedPaymentProfile.label}</Text>}
+            expanded={expandedSection === 'payment'}
+            onPress={() => toggleSection('payment')}
+            hideDivider
           >
-            <Pressable
-              onPress={() => setShowPaymentOptions((prev) => !prev)}
-              style={{
-                padding: spacing[4],
-                flexDirection: 'row-reverse',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <View style={{ gap: spacing[1], alignItems: 'flex-end', flex: 1 }}>
-                <Text role="bodyStrong" style={{ color: theme.text }}>
-                  طريقة الدفع الحالية
-                </Text>
-                <Text role="bodySm" tone="muted">
-                  المستعملة في عمليات التجديد والترقية تلقائياً
-                </Text>
-              </View>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Text role="bodyStrong" style={{ color: theme.brand }}>
-                  {selectedPaymentProfile.label}
-                </Text>
-                <Icon name={showPaymentOptions ? 'chevron-up' : 'chevron-down'} tone="brand" size={20} />
-              </View>
-            </Pressable>
-
-            {showPaymentOptions && (
-              <View
-                style={{
-                  padding: spacing[3],
-                  backgroundColor: theme.brandSurface,
-                  borderTopWidth: 1,
-                  borderTopColor: theme.line,
-                  gap: spacing[2],
-                }}
-              >
-                {paymentProfiles.map((profile, index) => {
-                  const active = index === paymentProfileIndex;
-                  return (
-                    <Radio
-                      key={profile.id}
-                      label={profile.label}
-                      description={profile.detail}
-                      selected={active}
-                      onSelect={() => {
-                        setPaymentProfileIndex(index);
-                        setShowPaymentOptions(false);
-                      }}
-                      style={{
-                        padding: spacing[3],
-                        borderRadius: 12,
-                        borderWidth: 1,
-                        borderColor: active ? theme.brand : theme.line,
-                        backgroundColor: active ? theme.surface : 'transparent',
-                        width: '100%',
-                      }}
-                    />
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: theme.line,
-              backgroundColor: theme.surface,
-              overflow: 'hidden',
-            }}
-          >
-            <Pressable
-              onPress={() => setCouponOpen((prev) => !prev)}
-              style={{
-                padding: spacing[4],
-                flexDirection: 'row-reverse',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <View style={{ gap: spacing[1], alignItems: 'flex-end', flex: 1 }}>
-                <Text role="bodyStrong" style={{ color: theme.text }}>
-                  هل لديك قسيمة اشتراك ترويجية؟
-                </Text>
-                <Text role="bodySm" tone="muted">
-                  أدخل رمز القسيمة للحصول على خصم فوري
-                </Text>
-              </View>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                {appliedCoupon ? (
-                  <Badge label="نشطة" tone="success" />
-                ) : (
-                  <Text role="bodyStrong" style={{ color: theme.brand }}>
-                    إضافة
-                  </Text>
-                )}
-                <Icon name={couponOpen ? 'chevron-up' : 'chevron-down'} tone="brand" size={20} />
-              </View>
-            </Pressable>
-
-            {couponOpen && (
-              <View
-                style={{
-                  padding: spacing[3],
-                  backgroundColor: theme.brandSurface,
-                  borderTopWidth: 1,
-                  borderTopColor: theme.line,
-                  gap: spacing[3],
-                }}
-              >
-                {appliedCoupon ? (
-                  <View
-                    style={{
-                      flexDirection: 'row-reverse',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: spacing[3],
-                      backgroundColor: theme.surface,
-                      borderRadius: 12,
-                      borderWidth: 1,
-                      borderColor: theme.success,
-                      width: '100%',
-                    }}
-                  >
-                    <View style={{ alignItems: 'flex-end', flex: 1 }}>
-                      <Text role="bodyStrong" style={{ color: theme.success, textAlign: 'right' }}>
-                        تم تطبيق القسيمة ({appliedCoupon})
-                      </Text>
-                      <Text role="caption" tone="success" style={{ textAlign: 'right' }}>
-                        خصم 20% ساري على الباقة المختارة
-                      </Text>
-                    </View>
-                    <Pressable
-                      onPress={handleRemoveCoupon}
-                      style={{
-                        paddingHorizontal: spacing[3],
-                        paddingVertical: spacing[2],
-                        borderRadius: 8,
-                        backgroundColor: theme.danger,
-                      }}
-                    >
-                      <Text role="bodyStrong" style={{ color: theme.brandContrast }}>
-                        إزالة
-                      </Text>
+            <View style={{ gap: spacing[4] }}>
+              {paymentProfiles.map((profile, index) => {
+                const active = index === paymentProfileIndex;
+                return (
+                  <View key={profile.id}>
+                    {index > 0 && <Divider style={{ marginBottom: spacing[4] }} />}
+                    <Pressable onPress={() => setPaymentProfileIndex(index)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3], flex: 1 }}>
+                         <Icon name={active ? 'checkmark-circle' : 'ellipse-outline'} tone={active ? 'brand' : 'muted'} size={24} />
+                         <Icon name={profile.icon} tone="muted" size={24} />
+                         <View style={{ alignItems: 'flex-end', flex: 1 }}>
+                            <Text role="bodyStrong" style={{ color: active ? theme.brand : theme.text }}>{profile.label}</Text>
+                            <Text role="caption" tone="muted">{profile.detail}</Text>
+                         </View>
+                      </View>
                     </Pressable>
                   </View>
-                ) : (
-                  <View style={{ gap: spacing[2] }}>
-                    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                      <View style={{ flex: 1 }}>
-                        <TextField
-                          placeholder="أدخل رمز القسيمة (مثال: BTH20)"
-                          value={couponCode}
-                          onChangeText={(t) => {
-                            setCouponCode(t);
-                            setCouponError(null);
-                          }}
-                          error={couponError ?? undefined}
-                        />
-                      </View>
-                      <Button
-                        label="تطبيق"
-                        size="md"
-                        tone="brand"
-                        fullWidth={false}
-                        onPress={handleApplyCoupon}
-                        style={{ height: 48 }}
-                      />
-                    </View>
-                    {couponError ? (
-                      <Text role="caption" tone="danger" style={{ textAlign: 'right' }}>
-                        {couponError}
-                      </Text>
-                    ) : (
-                      <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-                        أدخل رمز القسيمة BTH20 للحصول على خصم 20% تجريبي.
-                      </Text>
-                    )}
-                  </View>
-                )}
-              </View>
-            )}
-          </View>
-        </View>
-      )}
-
-      {activeTab === 'benefits' && (
-        <View style={{ gap: spacing[3] }}>
-          <Text role="titleSm" style={{ textAlign: 'right', paddingHorizontal: spacing[1] }}>
-            مزايا ومنافع "بثواني برو"
-          </Text>
-
-          <View
-            style={{
-              padding: spacing[4],
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: theme.line,
-              backgroundColor: theme.surface,
-              gap: spacing[4],
-            }}
-          >
-            {[
-              {
-                icon: 'checkmark-circle',
-                title: 'توصيل مجاني وسريع',
-                desc: 'احصل على توصيل مجاني كامل لجميع طلباتك المؤهلة من المتاجر المشاركة مع أولوية وسرعة تسليم مضاعفة.',
-              },
-              {
-                icon: 'checkmark-circle',
-                title: 'عروض وخصومات حصرية',
-                desc: 'الوصول الحصري لأقوى العروض وحملات الخصم الترويجية الخاصة بالمشتركين فقط بالتعاون مع شركائنا.',
-              },
-              {
-                icon: 'checkmark-circle',
-                title: 'حزمة مشاركة عائلية',
-                desc: 'أضف أفراد عائلتك في حساب واحد مشترك للاستمتاع بجميع المزايا مع باقة برو عائلي المتكاملة.',
-              },
-            ].map((benefit, idx) => (
-              <View key={idx} style={{ flexDirection: 'row-reverse', gap: spacing[3], alignItems: 'flex-start' }}>
-                <View style={{ marginTop: spacing[1] }}>
-                  <Icon name={benefit.icon} tone="brand" size={20} />
-                </View>
-                <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                  <Text role="bodyStrong" style={{ color: theme.text, textAlign: 'right' }}>
-                    {benefit.title}
-                  </Text>
-                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: spacing[0.5] }}>
-                    {benefit.desc}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {/* Change Summary Card & bottom CTA - Appears ONLY when actual modifications are present */}
-      {hasChanges && (
-        <View style={{ gap: spacing[3], marginTop: spacing[2] }}>
-          <View
-            style={{
-              padding: spacing[4],
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: theme.line,
-              backgroundColor: theme.brandSurface,
-              gap: spacing[2],
-            }}
-          >
-            <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.brand }}>
-              ملخص التغييرات
-            </Text>
-            <Divider style={{ marginVertical: spacing[1] }} />
-
-            <View style={{ gap: spacing[2] }}>
-              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="bodySm" tone="muted">الباقة الحالية</Text>
-                <Text role="bodyStrong">{currentPlan.title}</Text>
-              </View>
-
-              {isPlanChanged && (
-                <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text role="bodySm" tone="muted">الباقة الجديدة المحددة</Text>
-                  <Text role="bodyStrong" style={{ color: theme.brand }}>{selectedPlan.title}</Text>
-                </View>
-              )}
-
-              {isPaymentChanged && (
-                <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text role="bodySm" tone="muted">طريقة الدفع الجديدة</Text>
-                  <Text role="bodyStrong">{selectedPaymentProfile.label}</Text>
-                </View>
-              )}
-
-              {isAutoRenewChanged && (
-                <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text role="bodySm" tone="muted">التجديد التلقائي</Text>
-                  <Text role="bodyStrong" style={{ color: autoRenew ? theme.success : theme.danger }}>
-                    {autoRenew ? 'نشط دورياً' : 'غير نشط'}
-                  </Text>
-                </View>
-              )}
-
-              {appliedCoupon && (
-                <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text role="bodySm" tone="muted">الخصم المطبق (20%)</Text>
-                  <Text role="bodyStrong" style={{ color: theme.success }}>
-                    -{discountAmount.toFixed(0)} ريال
-                  </Text>
-                </View>
-              )}
-
-              <Divider style={{ marginVertical: spacing[1] }} />
-
-              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <Text role="bodyStrong" style={{ color: theme.text }}>المجموع الإجمالي</Text>
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: spacing[1] }}>
-                  {appliedCoupon && (
-                    <Text role="bodySm" tone="muted" style={{ textDecorationLine: 'line-through', marginLeft: spacing[2] }}>
-                      {originalPrice} ريال
-                    </Text>
-                  )}
-                  <Text role="titleLg" style={{ color: theme.brand }}>
-                    {finalPrice.toFixed(0)} ريال
-                  </Text>
-                  <Text role="bodySm" tone="muted">
-                    / {selectedPlan.cadence.includes('أسبوع') ? 'أسبوع' : 'شهر'}
-                  </Text>
-                </View>
-              </View>
+                );
+              })}
             </View>
-          </View>
-
-          <Button
-            label={isPlanChanged ? 'تأكيد وترقية الاشتراك' : 'حفظ وإرسال التعديلات'}
-            tone="brand"
-            onPress={applySelectedPlan}
-            style={{ borderRadius: 16 }}
-          />
+          </ActionStrip>
         </View>
+        <Divider />
+
+        {/* Auto Renew Strip */}
+        <View>
+          <ActionStrip
+            icon="refresh"
+            title="التجديد التلقائي"
+            subtitle={<Text role="bodySm" tone={autoRenew ? 'success' : 'muted'}>{autoRenew ? 'مُفعل' : 'مُعطل'}</Text>}
+            expanded={expandedSection === 'renew'}
+            onPress={() => toggleSection('renew')}
+            hideDivider
+          >
+            <View>
+              <Switch label="تفعيل التجديد التلقائي" description="لضمان استمرار المزايا بدون انقطاع" value={autoRenew} onValueChange={setAutoRenew} />
+            </View>
+          </ActionStrip>
+        </View>
+        <Divider />
+
+        {/* Coupon Strip */}
+        <View>
+          <ActionStrip
+            icon="pricetag"
+            title="القسيمة الترويجية"
+            subtitle={
+                appliedCoupon ? (
+                  <Text role="bodySm" tone="success">تم التطبيق: {appliedCoupon}</Text>
+                ) : (
+                  <Text role="bodySm" tone="muted">أضف رمز الخصم</Text>
+                )
+            }
+            expanded={expandedSection === 'coupon'}
+            onPress={() => toggleSection('coupon')}
+            hideDivider
+          >
+               {appliedCoupon ? (
+                  <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                     <View style={{ alignItems: 'flex-end', flex: 1 }}>
+                        <Text role="bodyStrong" tone="success" style={{ textAlign: 'right' }}>تم تطبيق القسيمة ({appliedCoupon})</Text>
+                        <Text role="caption" tone="success" style={{ textAlign: 'right' }}>خصم {couponDiscount * 100}% نشط</Text>
+                     </View>
+                     <Button label="إزالة" size="sm" tone="danger" onPress={handleRemoveCoupon} />
+                  </View>
+               ) : (
+                  <View style={{ gap: spacing[2] }}>
+                     <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                        <View style={{ flex: 1 }}>
+                           <TextField placeholder="رمز القسيمة" value={couponCode} onChangeText={(t) => { setCouponCode(t); setCouponError(null); }} error={couponError ?? undefined} />
+                        </View>
+                        <Button label="تطبيق" size="md" tone="brand" onPress={handleApplyCoupon} style={{ height: 48 }} />
+                     </View>
+                  </View>
+               )}
+          </ActionStrip>
+        </View>
+        <Divider />
+      </View>
+
+      {/* Summary Section (Only when changes are present) */}
+      {hasChanges && (
+         <View style={{ padding: spacing[4], gap: spacing[3], marginTop: spacing[2] }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.brand }}>ملخص التعديلات</Text>
+            <Divider />
+
+            <View style={{ gap: spacing[3] }}>
+               <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text role="bodySm" tone="muted">الباقة</Text>
+                  <Text role="bodyStrong" style={{ color: isPlanChanged ? theme.brand : theme.text }}>{selectedPlan.title}</Text>
+               </View>
+               <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text role="bodySm" tone="muted">الدفع</Text>
+                  <Text role="bodyStrong" style={{ direction: 'ltr', color: isPaymentChanged ? theme.brand : theme.text }}>{selectedPaymentProfile.label}</Text>
+               </View>
+               <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text role="bodySm" tone="muted">التجديد</Text>
+                  <Text role="bodyStrong" style={{ color: isAutoRenewChanged ? (autoRenew ? theme.success : theme.danger) : theme.text }}>{autoRenew ? 'نشط' : 'معطل'}</Text>
+               </View>
+               {appliedCoupon && (
+                  <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                     <Text role="bodySm" tone="muted">الخصم</Text>
+                     <Text role="bodyStrong" tone="success">-{discountAmount.toFixed(0)} ريال</Text>
+                  </View>
+               )}
+               <Divider />
+               <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'baseline', marginTop: spacing[1] }}>
+                  <Text role="bodyStrong" style={{ color: theme.text }}>المجموع الإجمالي</Text>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: spacing[1] }}>
+                     {appliedCoupon && (
+                        <Text role="bodySm" tone="muted" style={{ textDecorationLine: 'line-through', marginLeft: spacing[2] }}>
+                           {originalPrice} ريال
+                        </Text>
+                     )}
+                     <Text role="titleLg" style={{ color: theme.brand }}>{finalPrice.toFixed(0)} ريال</Text>
+                  </View>
+               </View>
+            </View>
+            <Button label="تأكيد التغييرات" tone="brand" size="lg" onPress={applyChanges} style={{ marginTop: spacing[4], borderRadius: 12 }} />
+         </View>
       )}
+
     </ScrollView>
   );
 }

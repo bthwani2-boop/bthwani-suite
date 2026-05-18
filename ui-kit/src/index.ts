@@ -302,6 +302,7 @@ export {
 	stateIds,
 	getStateDefinition,
 	CartConfirmationBlock,
+	ActionStrip,
 } from './components';
 export type {
 	AmountInputProps,
@@ -413,4 +414,5 @@ export type {
 	SummaryCardProps,
 	SummaryItem,
 	CartConfirmationBlockProps,
+	ActionStripProps,
 } from './components';

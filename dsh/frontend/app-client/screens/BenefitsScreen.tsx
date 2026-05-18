@@ -10,6 +10,7 @@ import {
   safeArea,
   spacing,
   useTheme,
+  ActionStrip,
 } from '@bthwani/ui-kit';
 import { dshNotificationsFixtures } from '../data/notifications.preview-data';
 import { subscriptionPlanCards } from '../data/subscriptions-commercial.preview-data';
@@ -48,7 +49,7 @@ type BenefitRow = {
 const sectionLabels: Record<DshBenefitsSection, string> = {
   now: 'الأولوية الآن',
   loyalty: 'النقاط والمكافآت',
-  subscription: 'الاشتراك',
+  subscription: 'الاشتراكات',
   offers: 'العروض والكوبونات',
   history: 'السجل المختصر',
 };
@@ -148,27 +149,18 @@ function ContentCard({
   const { theme } = useTheme();
 
   return (
-    <Surface
-      tone="raised"
-      padding={3}
-      gap={3}
-      style={{
-        borderWidth: 1,
-        borderColor: theme.line,
-        borderRadius: 22,
-      }}
-    >
-      <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+    <View style={{ gap: spacing[3] }}>
+      <Text role="bodySm" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
         {hint}
       </Text>
       <View style={{ height: 1, backgroundColor: theme.line }} />
       {children}
       {feedback ? (
-        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+        <Text role="caption" tone="soft" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
           {feedback}
         </Text>
       ) : null}
-    </Surface>
+    </View>
   );
 }
 
@@ -178,64 +170,46 @@ function BenefitListRow({
   onActionPress,
 }: {
   row: BenefitRow;
-  showDivider?: boolean;
+  isLast?: boolean;
   onActionPress?: (row: BenefitRow) => void;
 }) {
-  const { theme } = useTheme();
+  const [expanded, setExpanded] = React.useState(false);
+  const iconMap: Record<string, import('@bthwani/ui-kit/src/components/icons').IconName> = {
+    subscription: 'star-outline',
+    offers: 'pricetag-outline',
+    loyalty: 'wallet-outline',
+    history: 'time-outline',
+    now: 'flash-outline'
+  };
+  const icon = iconMap[row.targetSection ?? 'offers'];
 
   return (
-    <View
-      style={{
-        borderTopWidth: showDivider ? 1 : 0,
-        borderTopColor: theme.line,
-        paddingTop: showDivider ? spacing[3] : 0,
-        marginTop: showDivider ? spacing[3] : 0,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row-reverse',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: spacing[3],
-        }}
-      >
-        <View style={{ flex: 1, alignItems: 'flex-end', gap: spacing[1] }}>
-          <View
-            style={{
-              flexDirection: 'row-reverse',
-              alignItems: 'center',
-              gap: spacing[2],
-              flexWrap: 'wrap',
-              width: '100%',
-            }}
-          >
-            {row.badgeLabel ? <Badge label={row.badgeLabel} tone={row.badgeTone ?? 'default'} /> : null}
-            <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
-              {row.title}
-            </Text>
-          </View>
-          <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
-            {row.subtitle}
-          </Text>
-          {row.helperText ? (
-            <Text role="caption" tone="soft" numberOfLines={1} style={{ textAlign: 'right', width: '100%' }}>
-              {row.helperText}
-            </Text>
-          ) : null}
+    <ActionStrip
+      icon={icon}
+      title={row.title}
+      subtitle={
+        <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{row.subtitle}</Text>
+          {row.badgeLabel && <Badge label={row.badgeLabel} tone={row.badgeTone ?? 'default'} />}
         </View>
-
-        {row.actionLabel ? (
-          <Button
-            label={row.actionLabel}
-            tone="secondary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => onActionPress?.(row)}
-          />
-        ) : null}
-      </View>
-    </View>
+      }
+      expanded={expanded}
+      onPress={() => setExpanded(!expanded)}
+      hideDivider={isLast}
+    >
+      {row.helperText && <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginBottom: spacing[2] }}>{row.helperText}</Text>}
+      {row.actionLabel && (
+        <Button
+          label={row.actionLabel}
+          tone="secondary"
+          size="sm"
+          onPress={() => {
+            onActionPress?.(row);
+            setExpanded(false);
+          }}
+        />
+      )}
+    </ActionStrip>
   );
 }
 
@@ -396,7 +370,7 @@ export function DshBenefitsHubScreen({
               <BenefitListRow
                 key={row.id}
                 row={row}
-                showDivider={index > 0}
+                isLast={index === nowRows.length - 1}
                 onActionPress={(r: BenefitRow) => handleRowAction(r, `انتقلنا إلى ${sectionLabels[(r.targetSection ?? 'now') as DshBenefitsSection]}.`)}
               />
             ))}
@@ -430,7 +404,7 @@ export function DshBenefitsHubScreen({
                 <BenefitListRow
                   key={row.id}
                   row={row}
-                  showDivider={index > 0}
+                  isLast={index === offersRows.length - 1}
                   onActionPress={(r: BenefitRow) => setFeedback(`تم تجهيز "${r.title}" للاستخدام في طلبك القادم.`)}
                 />
               ))}
@@ -452,7 +426,7 @@ export function DshBenefitsHubScreen({
               <BenefitListRow
                 key={row.id}
                 row={row}
-                showDivider={index > 0}
+                isLast={index === historyRows.length - 1}
                 onActionPress={(r: BenefitRow) => handleRowAction(r, `انتقلنا إلى ${sectionLabels[(r.targetSection ?? 'history') as DshBenefitsSection]}.`)}
               />
             ))}

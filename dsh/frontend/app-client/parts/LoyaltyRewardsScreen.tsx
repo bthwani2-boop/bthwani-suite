@@ -23,83 +23,7 @@ type RewardRow = {
   helperText?: string;
 };
 
-function LoyaltyActionRow({
-  title,
-  subtitle,
-  badgeLabel,
-  badgeTone,
-  actionLabel,
-  helperText,
-  onActionPress,
-  showDivider = false,
-}: {
-  title: string;
-  subtitle: string;
-  badgeLabel?: string;
-  badgeTone?: 'default' | 'success' | 'warning' | 'danger' | 'brand' | 'info';
-  actionLabel?: string;
-  helperText?: string;
-  onActionPress?: () => void;
-  showDivider?: boolean;
-}) {
-  const { theme } = useTheme();
-
-  return (
-    <View
-      style={{
-        borderTopWidth: showDivider ? 1 : 0,
-        borderTopColor: theme.line,
-        paddingTop: showDivider ? spacing[3] : 0,
-        marginTop: showDivider ? spacing[3] : 0,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row-reverse',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: spacing[3],
-        }}
-      >
-        <View style={{ flex: 1, alignItems: 'flex-end', gap: spacing[1] }}>
-          <View
-            style={{
-              flexDirection: 'row-reverse',
-              alignItems: 'center',
-              gap: spacing[2],
-              flexWrap: 'wrap',
-              width: '100%',
-            }}
-          >
-            {badgeLabel ? <Badge label={badgeLabel} tone={badgeTone ?? 'default'} /> : null}
-            <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
-              {title}
-            </Text>
-          </View>
-          <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
-            {subtitle}
-          </Text>
-          {helperText ? (
-            <Text role="caption" tone="soft" numberOfLines={1} style={{ textAlign: 'right', width: '100%' }}>
-              {helperText}
-            </Text>
-          ) : null}
-        </View>
-
-        {actionLabel ? (
-          <Button
-            label={actionLabel}
-            tone="secondary"
-            size="sm"
-            fullWidth={false}
-            onPress={onActionPress}
-          />
-        ) : null}
-      </View>
-    </View>
-  );
-}
-
+import { ActionStrip } from '@bthwani/ui-kit';
 export function DshLoyaltyRewardsScreen({
   title = 'النقاط والولاء',
   compact = false,
@@ -111,6 +35,7 @@ export function DshLoyaltyRewardsScreen({
   const tierSection = sections.find((section) => section.title.includes('مزايا المستوى'));
   const [showAllRewards, setShowAllRewards] = React.useState(false);
   const [selectedRewardLabel, setSelectedRewardLabel] = React.useState('');
+  const [expandedRow, setExpandedRow] = React.useState<string | null>(null);
 
   const rewardItems: RewardRow[] = (rewardsSection?.items ?? []).map((item) => ({
     label: item.label,
@@ -133,46 +58,81 @@ export function DshLoyaltyRewardsScreen({
         </Box>
       ) : null}
 
-      <LoyaltyActionRow
-        title="الرصيد الحالي"
-        subtitle={metrics[0] ? `${metrics[0].value} • ${metrics[0].helperText}` : 'لا يوجد رصيد ظاهر حاليًا.'}
-        badgeLabel="نقاط"
-        badgeTone="brand"
-        actionLabel="استخدم"
-        helperText="سيتم تجهيز أقرب استبدال على الطلب القادم."
-        onActionPress={() => onStatusChange?.(`تم تجهيز رصيد ${metrics[0]?.value ?? 'النقاط'} للاستخدام في الطلب القادم.`)}
-      />
+      <View style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: theme.line, backgroundColor: theme.surface }}>
+        <ActionStrip
+          icon="wallet-outline"
+          title="الرصيد الحالي"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {metrics[0] ? `${metrics[0].value} • ${metrics[0].helperText}` : 'لا يوجد رصيد ظاهر حاليًا.'}
+              </Text>
+              <Badge label="نقاط" tone="brand" />
+            </View>
+          }
+          expanded={expandedRow === 'balance'}
+          onPress={() => setExpandedRow(expandedRow === 'balance' ? null : 'balance')}
+          hideDivider={false}
+        >
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginBottom: spacing[2] }}>سيتم تجهيز أقرب استبدال على الطلب القادم.</Text>
+          <Button label="استخدم" tone="secondary" size="sm" onPress={() => onStatusChange?.(`تم تجهيز رصيد ${metrics[0]?.value ?? 'النقاط'} للاستخدام في الطلب القادم.`)} />
+        </ActionStrip>
 
-      <LoyaltyActionRow
-        title="المستوى الحالي"
-        subtitle={metrics[1] ? `${metrics[1].value} • ${metrics[1].helperText}` : 'لا يوجد مستوى ظاهر حاليًا.'}
-        badgeLabel="مستوى"
-        badgeTone="success"
-        actionLabel="المزايا"
-        helperText={tierHighlight?.label ?? 'لا توجد مزايا مرتبطة بالمستوى الحالي.'}
-        onActionPress={() => onStatusChange?.(`المزايا المرتبطة بالمستوى الحالي: ${tierHighlight?.label ?? 'غير متاحة الآن'}.`)}
-        showDivider
-      />
+        <ActionStrip
+          icon="star-outline"
+          title="المستوى الحالي"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {metrics[1] ? `${metrics[1].value} • ${metrics[1].helperText}` : 'لا يوجد مستوى ظاهر حاليًا.'}
+              </Text>
+              <Badge label="مستوى" tone="success" />
+            </View>
+          }
+          expanded={expandedRow === 'tier'}
+          onPress={() => setExpandedRow(expandedRow === 'tier' ? null : 'tier')}
+          hideDivider={visibleRewards.length === 0}
+        >
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginBottom: spacing[2] }}>{tierHighlight?.label ?? 'لا توجد مزايا مرتبطة بالمستوى الحالي.'}</Text>
+          <Button label="المزايا" tone="secondary" size="sm" onPress={() => onStatusChange?.(`المزايا المرتبطة بالمستوى الحالي: ${tierHighlight?.label ?? 'غير متاحة الآن'}.`)} />
+        </ActionStrip>
 
-      {visibleRewards.map((reward, index) => {
-        const isSelected = selectedRewardLabel === reward.label;
-        return (
-          <LoyaltyActionRow
-            key={`${reward.label}-${reward.value}`}
-            title={reward.label}
-            subtitle={reward.helperText ?? 'مكافأة قابلة للاستبدال.'}
-            badgeLabel={reward.value}
-            badgeTone="warning"
-            actionLabel={isSelected ? 'جاهزة' : 'اخترها'}
-            helperText={isSelected ? 'تم تجهيز هذه المكافأة للاستخدام.' : 'اختر المكافأة الأقرب للطلب القادم.'}
-            onActionPress={() => {
-              setSelectedRewardLabel(reward.label);
-              onStatusChange?.(`تم اختيار ${reward.label} كمكافأة جاهزة للاستخدام.`);
-            }}
-            showDivider={index === 0}
-          />
-        );
-      })}
+        {visibleRewards.map((reward, index) => {
+          const isSelected = selectedRewardLabel === reward.label;
+          const rowId = `reward-${index}`;
+          return (
+            <ActionStrip
+              key={`${reward.label}-${reward.value}`}
+              icon="gift-outline"
+              title={reward.label}
+              subtitle={
+                <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                    {reward.helperText ?? 'مكافأة قابلة للاستبدال.'}
+                  </Text>
+                  <Badge label={reward.value} tone="warning" />
+                </View>
+              }
+              expanded={expandedRow === rowId}
+              onPress={() => setExpandedRow(expandedRow === rowId ? null : rowId)}
+              hideDivider={index === visibleRewards.length - 1}
+            >
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginBottom: spacing[2] }}>{isSelected ? 'تم تجهيز هذه المكافأة للاستخدام.' : 'اختر المكافأة الأقرب للطلب القادم.'}</Text>
+              <Button
+                label={isSelected ? 'جاهزة' : 'اخترها'}
+                tone={isSelected ? 'brand' : 'secondary'}
+                size="sm"
+                onPress={() => {
+                  setSelectedRewardLabel(reward.label);
+                  onStatusChange?.(`تم اختيار ${reward.label} كمكافأة جاهزة للاستخدام.`);
+                  setExpandedRow(null);
+                }}
+              />
+            </ActionStrip>
+          );
+        })}
+      </View>
+
 
       {rewardItems.length > 3 ? (
         <Button

@@ -27,6 +27,7 @@ import {
   radius,
   safeArea,
   spacing,
+  ActionStrip,
   useTheme,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
@@ -489,11 +490,14 @@ function OrderRow({
   item,
   onOpenOrder,
   onReorder,
+  isLast,
 }: {
   item: DshOrderListItem;
   onOpenOrder?: (orderId: string) => void;
   onReorder?: (orderId: string) => void;
+  isLast?: boolean;
 }) {
+  const [expanded, setExpanded] = React.useState(false);
   const { theme } = useTheme();
 
   const resolvedMode: DshFulfillmentDeliveryMode = item.fulfillmentMode ?? 'bthwani_delivery';
@@ -536,115 +540,31 @@ function OrderRow({
   });
 
   return (
-    <View style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => onOpenOrder?.(item.id)}
-        style={({ pressed }) => ({
-          paddingVertical: 10,
-          paddingHorizontal: spacing[4],
-          backgroundColor: pressed ? theme.line : theme.surface,
-          flexDirection: 'row-reverse',
-          alignItems: 'flex-start',
-        })}
-      >
-        <Box style={{ flex: 1, alignItems: 'flex-end', gap: 4 }}>
-          {/* Row 1: Summary (primary) + status badge */}
-          <Box
-            style={{
-              flexDirection: 'row-reverse',
-              alignItems: 'center',
-              width: '100%',
-              gap: 6,
-            }}
-          >
-            <Text
-              role="bodyStrong"
-              style={{
-                flex: 1,
-                textAlign: 'right',
-                color: theme.text,
-                fontSize: 14,
-                fontWeight: '600',
-                lineHeight: 20,
-              }}
-              numberOfLines={2}
-            >
-              {summaryText}
-            </Text>
-            <Badge
-              label={item.statusLabel}
-              tone={item.isActive ? 'brand' : 'default'}
-              size="sm"
-            />
-          </Box>
-
-          {/* Row 2: amount • delivery mode • location */}
-          <Text
-            role="bodySm"
-            style={{
-              textAlign: 'right',
-              color: theme.brand,
-              fontWeight: '600',
-              fontSize: 12.5,
-              lineHeight: 18,
-            }}
-          >
+    <ActionStrip
+      icon={item.isActive ? 'bicycle-outline' : 'receipt-outline'}
+      title={summaryText}
+      subtitle={
+        <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {metaLine}
           </Text>
-
-          {/* Row 3: action button (right) + order number / time (left) */}
-          <Box
-            style={{
-              flexDirection: 'row-reverse',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-              marginTop: 2,
-            }}
-          >
-            {item.isActive ? (
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => onOpenOrder?.(item.id)}
-                style={actionBtnStyle}
-              >
-                <Icon name="navigate-outline" size={13} color={theme.brand} />
-                <Text role="label" style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
-                  تتبع
-                </Text>
-              </Pressable>
-            ) : onReorder ? (
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => onReorder(item.id)}
-                style={actionBtnStyle}
-              >
-                <Icon name="refresh-outline" size={13} color={theme.brand} />
-                <Text role="label" style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
-                  تكرار الطلب
-                </Text>
-              </Pressable>
-            ) : (
-              <View />
-            )}
-            <Text
-              role="bodySm"
-              style={{ fontSize: 11, color: theme.textSoft, textAlign: 'left' }}
-            >
-              #{displayOrderNumber} · {formatRelativeTime(item.timestamp)}
-            </Text>
-          </Box>
-        </Box>
-
-        <Icon
-          name="chevron-back"
-          size={18}
-          color={theme.textSoft}
-          style={{ marginLeft: spacing[2], marginTop: 2 }}
-        />
-      </Pressable>
-    </View>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+            <Badge label={item.statusLabel} tone={item.isActive ? 'brand' : 'default'} />
+            <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#{displayOrderNumber} · {formatRelativeTime(item.timestamp)}</Text>
+          </View>
+        </View>
+      }
+      expanded={expanded}
+      onPress={() => setExpanded(!expanded)}
+      hideDivider={isLast}
+    >
+      <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
+        <Button style={{ flex: 1 }} label={item.isActive ? 'تتبع الطلب' : 'تفاصيل الطلب'} tone={item.isActive ? 'brand' : 'secondary'} size="sm" onPress={() => onOpenOrder?.(item.id)} />
+        {(!item.isActive && onReorder) && (
+          <Button style={{ flex: 1 }} label="تكرار الطلب" tone="ghost" size="sm" onPress={() => onReorder(item.id)} />
+        )}
+      </View>
+    </ActionStrip>
   );
 }
 
@@ -2240,7 +2160,7 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
 
         {sortedItems.length > 0 ? (
           <Box style={{ backgroundColor: theme.surface, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: theme.line }}>
-            {sortedItems.map((item) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} onReorder={onReorder} />)}
+            {sortedItems.map((item, index) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} onReorder={onReorder} isLast={index === sortedItems.length - 1} />)}
           </Box>
         ) : (
           <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>

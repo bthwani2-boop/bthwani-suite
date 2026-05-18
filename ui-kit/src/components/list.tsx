@@ -18,6 +18,8 @@ import { useDirection, useTheme } from '../providers';
 import { Badge } from './button';
 import { EmptyState } from './state';
 import { Divider, Surface, Text } from '../primitives';
+import { Icon } from './icons';
+
 
 const cardWidth = Dimensions.get('window').width - 28;
 const compactGap = 10;
@@ -427,3 +429,66 @@ export function DataTable<Row extends Record<string, unknown>>({
   );
 }
 
+export type ActionStripProps = {
+  icon?: import('./icons').IconName;
+  title: string;
+  subtitle?: React.ReactNode;
+  expanded?: boolean;
+  onPress?: () => void;
+  children?: React.ReactNode;
+  hideDivider?: boolean;
+  trailingAction?: React.ReactNode;
+  hideChevron?: boolean;
+  navigationChevron?: boolean;
+};
+
+export function ActionStrip({
+  icon,
+  title,
+  subtitle,
+  expanded,
+  onPress,
+  children,
+  hideDivider = false,
+  trailingAction,
+  hideChevron = false,
+  navigationChevron = false,
+}: ActionStripProps) {
+  const { theme } = useTheme();
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
+
+  return (
+    <View>
+      <Pressable
+        onPress={onPress}
+        style={{
+          padding: spacing[4],
+          flexDirection: isRTL ? 'row-reverse' : 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: expanded ? theme.surface : 'transparent',
+        }}
+      >
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[3], flex: 1 }}>
+          {icon ? <Icon name={icon} tone="brand" size={24} /> : null}
+          <View style={{ alignItems: isRTL ? 'flex-end' : 'flex-start', flex: 1 }}>
+            <Text role="bodyStrong" style={{ color: theme.text }}>{title}</Text>
+            {typeof subtitle === 'string' ? (
+              <Text role="bodySm" tone="muted">{subtitle}</Text>
+            ) : (
+              subtitle
+            )}
+          </View>
+        </View>
+        {trailingAction ? trailingAction : (!hideChevron && <Icon name={navigationChevron ? (isRTL ? 'chevron-back' : 'chevron-forward') : (expanded ? 'chevron-up' : 'chevron-down')} tone="muted" size={20} />)}
+      </Pressable>
+      {expanded && children ? (
+        <View style={{ backgroundColor: theme.surface, paddingHorizontal: spacing[4], paddingBottom: spacing[4], gap: spacing[4] }}>
+          {children}
+        </View>
+      ) : null}
+      {!hideDivider && <Divider color={theme.line} />}
+    </View>
+  );
+}

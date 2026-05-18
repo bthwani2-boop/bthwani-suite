@@ -37,3 +37,6 @@ export type { DateTimePickerProps } from './date-time-picker';
 
 export { CartConfirmationBlock } from './cart-confirmation-block';
 export type { CartConfirmationBlockProps } from './cart-confirmation-block';
+
+export { ActionStrip } from './list';
+export type { ActionStripProps } from './list';
