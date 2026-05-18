@@ -44,7 +44,6 @@ import type {
   DshClientWalletImpactVisibility,
   DshFulfillmentDeliveryMode,
 } from '../contracts/dsh-client-binding.contracts';
-import { getDshFulfillmentDeliveryModeMeta } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
 
 type CreateOrderValues = Pick<
@@ -63,6 +62,7 @@ type DshOrderListItem = {
   fulfillmentMode?: DshFulfillmentDeliveryMode;
   rawStatus?: DshClientState;
   summary?: string;
+  location?: string;
 };
 
 type DshTrackingTimelineItem = {
@@ -261,16 +261,17 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
 
 const fallbackOrderListItems: DshOrderListItem[] = [
   {
-    id: 'order-route',
-    orderNumber: '3770204',
+    id: 'order-active',
+    orderNumber: '3770281',
     title: 'شاورما هليل',
-    statusLabel: 'في الطريق',
-    timestamp: '2026-05-17T22:14:43+03:00',
+    statusLabel: 'جاري التوصيل',
+    timestamp: '2026-05-17T22:15:30+03:00',
     isActive: true,
     fulfillmentMode: 'bthwani_delivery',
     rawStatus: 'tracking_active',
-    total: '45.00 ر.ي',
+    total: '4,500 ر.ي',
     summary: '٢ وجبة شاورما هليل كلاسيك، ١ بطاطس عائلي، ١ عصير برتقال',
+    location: 'المنزل',
   },
   {
     id: 'order-review',
@@ -281,8 +282,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     isActive: true,
     fulfillmentMode: 'partner_delivery',
     rawStatus: 'order_created',
-    total: '120.00 ر.ي',
+    total: '12,000 ر.ي',
     summary: '١ كبسة لحم حاشي، ٢ كولا، ١ سلطة حارة',
+    location: 'العمل',
   },
   {
     id: 'order-done',
@@ -293,8 +295,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     isActive: false,
     fulfillmentMode: 'bthwani_delivery',
     rawStatus: 'delivered',
-    total: '84.00 ر.ي',
+    total: '8,400 ر.ي',
     summary: '٣ وجبة شاورما عربي، ١ بطاطس تويستر كبير',
+    location: 'المنزل',
   },
   {
     id: 'order-pickup-ready',
@@ -305,8 +308,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     isActive: false,
     fulfillmentMode: 'pickup',
     rawStatus: 'delivered',
-    total: '35.00 ر.ي',
+    total: '3,500 ر.ي',
     summary: '٦ حبات دونات مشكل، ١ قهوة باردة كبيرة',
+    location: 'فرع التحرير',
   },
   {
     id: 'order-failed',
@@ -317,8 +321,9 @@ const fallbackOrderListItems: DshOrderListItem[] = [
     isActive: false,
     fulfillmentMode: 'bthwani_delivery',
     rawStatus: 'failed',
-    total: '28.00 ر.ي',
+    total: '2,800 ر.ي',
     summary: '١ قهوة تركية، ١ دونات زعتر',
+    location: 'العمل',
   },
 ];
 
@@ -490,8 +495,43 @@ function OrderRow({
   const { theme } = useTheme();
 
   const resolvedMode: DshFulfillmentDeliveryMode = item.fulfillmentMode ?? 'bthwani_delivery';
-  const modeMeta = getDshFulfillmentDeliveryModeMeta(resolvedMode);
-  const isBrand = resolvedMode === 'bthwani_delivery';
+
+  const getFulfillmentLabel = (mode?: string): string => {
+    if (mode === 'bthwani_delivery') return 'توصيل بثواني';
+    if (mode === 'partner_delivery') return 'توصيل المتجر';
+    if (mode === 'pickup') return 'استلم بنفسك';
+    return 'توصيل بثواني';
+  };
+
+  const formatAmount = (raw?: string): string => {
+    if (!raw) return 'مبلغ غير محدد';
+    const normalized = raw.replace('ر.س', 'ر.ي');
+    return normalized.replace(/(\d+)\.00\s*(ر\.ي)/, '$1 $2');
+  };
+
+  const displayOrderNumber = item.orderNumber || item.id.replace('dsh-', '');
+
+  const summaryText = item.summary
+    ? `${item.summary} — ${item.title}`
+    : (item.title || 'تفاصيل الطلب غير مكتملة');
+
+  const metaLine = [
+    formatAmount(item.total),
+    getFulfillmentLabel(resolvedMode),
+    item.location?.trim() || null,
+  ].filter(Boolean).join(' • ');
+
+  const actionBtnStyle = ({ pressed }: { pressed: boolean }) => ({
+    flexDirection: 'row-reverse' as const,
+    alignItems: 'center' as const,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: theme.brand,
+    backgroundColor: pressed ? theme.brand : theme.brandSurface,
+    borderRadius: radius.pill,
+    height: 34,
+    paddingHorizontal: spacing[3],
+  });
 
   return (
     <View style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
@@ -499,106 +539,109 @@ function OrderRow({
         accessibilityRole="button"
         onPress={() => onOpenOrder?.(item.id)}
         style={({ pressed }) => ({
-          paddingVertical: spacing[3],
+          paddingVertical: 10,
           paddingHorizontal: spacing[4],
           backgroundColor: pressed ? theme.line : theme.surface,
           flexDirection: 'row-reverse',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          minHeight: 88,
+          alignItems: 'flex-start',
         })}
       >
-        <Box style={{ flex: 1 }} gap={1.5}>
-          <Box layoutDirection="row-reverse" align="center" justify="space-between" style={{ flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
-            <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text, fontSize: 15, fontWeight: '700' }}>
-              {item.title}
-            </Text>
-            {item.total ? (
-              <Text role="bodyStrong" style={{ color: theme.brand, fontWeight: '700', fontSize: 14 }}>
-                {item.total}
-              </Text>
-            ) : null}
-          </Box>
-          {item.summary ? (
-            <Text role="bodySm" style={{ textAlign: 'right', color: theme.textSoft, fontSize: 13, lineHeight: 18 }}>
-              {item.summary}
-            </Text>
-          ) : null}
-          <Box layoutDirection="row-reverse" align="center" gap={2} style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: spacing[1] }}>
-            <Badge label={item.statusLabel} tone={item.isActive ? 'brand' : 'default'} size="sm" />
-            <Box
-              layoutDirection="row-reverse"
-              align="center"
-              style={{
-                flexDirection: 'row-reverse',
-                alignItems: 'center',
-                backgroundColor: isBrand ? theme.brandSurface : theme.surfaceRaised,
-                borderColor: isBrand ? theme.brand : theme.line,
-                borderWidth: 1,
-                borderRadius: 4,
-                paddingHorizontal: spacing[1.5],
-                paddingVertical: spacing[0.5],
-                gap: spacing[1],
-              }}
-            >
-              <Icon
-                name={modeMeta.icon}
-                size={11}
-                color={isBrand ? theme.brand : theme.textSoft}
-              />
-              <Text
-                role="bodySm"
-                style={{
-                  fontSize: 11,
-                  fontWeight: '700',
-                  color: isBrand ? theme.brand : theme.textSoft,
-                }}
-              >
-                {modeMeta.label}
-              </Text>
-            </Box>
-            <Text role="bodySm" tone="muted" style={{ fontSize: 12 }}>
-              {item.orderNumber} · {formatRelativeTime(item.timestamp)}
-            </Text>
-          </Box>
-        </Box>
-        <Icon name="chevron-back" size={18} color={theme.textSoft} style={{ marginLeft: spacing[2] }} />
-      </Pressable>
-
-      {!item.isActive && onReorder && (
-        <Box
-          layoutDirection="row-reverse"
-          justify="flex-start"
-          style={{
-            flexDirection: 'row-reverse',
-            paddingHorizontal: spacing[4],
-            paddingBottom: spacing[3],
-            backgroundColor: theme.surface,
-          }}
-        >
-          <Button
-            tone="ghost"
-            size="sm"
+        <Box style={{ flex: 1, alignItems: 'flex-end', gap: 4 }}>
+          {/* Row 1: Summary (primary) + status badge */}
+          <Box
             style={{
-              borderWidth: 1,
-              borderColor: theme.brand,
-              backgroundColor: theme.brandSurface,
-              borderRadius: radius.pill,
-              minHeight: 32,
-              paddingVertical: spacing[1],
-              paddingHorizontal: spacing[4],
-              width: undefined,
-              alignSelf: 'flex-start',
+              flexDirection: 'row-reverse',
+              alignItems: 'center',
+              width: '100%',
+              gap: 6,
             }}
-            onPress={() => onReorder?.(item.id)}
           >
-            <Icon name="refresh-outline" size={14} color={theme.brand} />
-            <Text role="label" style={{ color: theme.brand, fontSize: 13, fontWeight: '700', lineHeight: 18 }}>
-              تكرار الطلب
+            <Text
+              role="bodyStrong"
+              style={{
+                flex: 1,
+                textAlign: 'right',
+                color: theme.text,
+                fontSize: 14,
+                fontWeight: '600',
+                lineHeight: 20,
+              }}
+              numberOfLines={2}
+            >
+              {summaryText}
             </Text>
-          </Button>
+            <Badge
+              label={item.statusLabel}
+              tone={item.isActive ? 'brand' : 'default'}
+              size="sm"
+            />
+          </Box>
+
+          {/* Row 2: amount • delivery mode • location */}
+          <Text
+            role="bodySm"
+            style={{
+              textAlign: 'right',
+              color: theme.brand,
+              fontWeight: '600',
+              fontSize: 12.5,
+              lineHeight: 18,
+            }}
+          >
+            {metaLine}
+          </Text>
+
+          {/* Row 3: action button (right) + order number / time (left) */}
+          <Box
+            style={{
+              flexDirection: 'row-reverse',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              marginTop: 2,
+            }}
+          >
+            {item.isActive ? (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => onOpenOrder?.(item.id)}
+                style={actionBtnStyle}
+              >
+                <Icon name="navigate-outline" size={13} color={theme.brand} />
+                <Text role="label" style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
+                  تتبع
+                </Text>
+              </Pressable>
+            ) : onReorder ? (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => onReorder(item.id)}
+                style={actionBtnStyle}
+              >
+                <Icon name="refresh-outline" size={13} color={theme.brand} />
+                <Text role="label" style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
+                  تكرار الطلب
+                </Text>
+              </Pressable>
+            ) : (
+              <View />
+            )}
+            <Text
+              role="bodySm"
+              style={{ fontSize: 11, color: theme.textSoft, textAlign: 'left' }}
+            >
+              #{displayOrderNumber} · {formatRelativeTime(item.timestamp)}
+            </Text>
+          </Box>
         </Box>
-      )}
+
+        <Icon
+          name="chevron-back"
+          size={18}
+          color={theme.textSoft}
+          style={{ marginLeft: spacing[2], marginTop: 2 }}
+        />
+      </Pressable>
     </View>
   );
 }
