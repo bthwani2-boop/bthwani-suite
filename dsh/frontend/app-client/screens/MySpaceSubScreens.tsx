@@ -15,6 +15,7 @@ import {
   Button,
   Switch,
   SegmentedControl,
+  Divider,
 } from '@bthwani/ui-kit';
 import {
   DshBenefitsHubScreen,
