@@ -365,8 +365,6 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
 
   // Tab 1: Delivery preferences state
   const [deliveryInstructions, setDeliveryInstructions] = React.useState('اتصل قبل الوصول بدقيقتين واترك الطلب عند الباب عند عدم الرد.');
-  const [substitutionPref, setSubstitutionPref] = React.useState('chat_first');
-  const [contactPref, setContactPref] = React.useState('in_app');
 
   // Tab 2: Notifications preferences state
   const [orderProgressAlerts, setOrderProgressAlerts] = React.useState(true);
@@ -394,8 +392,6 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
 
   const handleReset = () => {
     setDeliveryInstructions('اتصل قبل الوصول بدقيقتين واترك الطلب عند الباب عند عدم الرد.');
-    setSubstitutionPref('chat_first');
-    setContactPref('in_app');
     setOrderProgressAlerts(true);
     setSmartArrivalBell(true);
     setPromotionalAlerts(true);
@@ -527,49 +523,6 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
                   </TouchableOpacity>
                 ))}
               </Box>
-            </Surface>
-
-            {/* Substitution Preferences */}
-            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16 }}>
-              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
-                <Text role="bodyStrong" style={{ color: theme.text }}>تفضيلات استبدال السلع</Text>
-                <Icon name="swap-horizontal" size={20} tone="brand" />
-              </Box>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                كيف يتصرف المتجر أو الكابتن في حال عدم توفر أحد الأصناف المطلوبة في سلتك.
-              </Text>
-              <SegmentedControl
-                size="sm"
-                fullWidth
-                options={[
-                  { value: 'chat_first', label: 'المحادثة أولاً' },
-                  { value: 'auto_similar', label: 'بديل تلقائي' },
-                  { value: 'refund', label: 'استرداد المبلغ' },
-                ]}
-                value={substitutionPref}
-                onValueChange={setSubstitutionPref}
-              />
-            </Surface>
-
-            {/* Contact Preferences */}
-            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16 }}>
-              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
-                <Text role="bodyStrong" style={{ color: theme.text }}>طريقة التواصل المفضلة</Text>
-                <Icon name="chatbubbles" size={20} tone="brand" />
-              </Box>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                تحديد الوسيلة المفضلة للكابتن للتواصل معك أثناء تجهيز أو توصيل الطلب.
-              </Text>
-              <SegmentedControl
-                size="sm"
-                fullWidth
-                options={[
-                  { value: 'in_app', label: 'محادثة التطبيق' },
-                  { value: 'phone_call', label: 'مكالمة هاتفية' },
-                ]}
-                value={contactPref}
-                onValueChange={setContactPref}
-              />
             </Surface>
           </Box>
         )}
