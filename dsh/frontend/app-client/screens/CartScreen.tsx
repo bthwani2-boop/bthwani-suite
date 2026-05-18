@@ -148,6 +148,7 @@ export type DshCartUnifiedScreenProps = {
   onRetry?: () => void;
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
+  reorderAlertMessage?: string;
 };
 
 const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
@@ -1988,6 +1989,28 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       />
 
       <MobileScrollView fill padding={1} gap={1} contentContainerStyle={{ paddingBottom: spacing[2] }}>
+        {props.reorderAlertMessage ? (
+          <Surface
+            tone="default"
+            padding={2}
+            style={{
+              backgroundColor: colorPalette.warningSoft,
+              borderWidth: 1,
+              borderColor: colorPalette.warning,
+              borderRadius: 16,
+              paddingHorizontal: spacing[2],
+              paddingVertical: spacing[1.5],
+              flexDirection: isRTL ? 'row-reverse' : 'row',
+              alignItems: 'center',
+              gap: spacing[1.5],
+            }}
+          >
+            <Icon name="alert-circle-outline" size={20} color={colorPalette.warningStrong} />
+            <Text role="bodySm" style={{ color: colorPalette.warningStrong, textAlign: isRTL ? 'right' : 'left', flex: 1, fontWeight: '700', lineHeight: 18 }}>
+              {props.reorderAlertMessage}
+            </Text>
+          </Surface>
+        ) : null}
         <PromoBanner onPress={handleSubscribePress} />
 
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>

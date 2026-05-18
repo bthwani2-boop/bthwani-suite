@@ -74,6 +74,10 @@ type HostOrderSummary = {
   pickupAddress: string;
   dropoffAddress: string;
   note?: string;
+  orderNumber?: string;
+  summary?: string;
+  total?: string;
+  location?: string;
 };
 
 type HostCartItem = {
@@ -245,7 +249,8 @@ const hostClientStates = {
 const initialOrders: HostOrderSummary[] = [
   {
     id: 'dsh-10021',
-    title: 'طلب رقم 10021',
+    title: 'مطعم حدة المركزي',
+    orderNumber: '10021',
     subtitle: 'من حدة إلى باب اليمن',
     statusLabel: getDshClientStateMeta(hostClientStates.trackingActive).label,
     meta: 'الوصول المتوقع خلال 18 دقيقة',
@@ -254,10 +259,14 @@ const initialOrders: HostOrderSummary[] = [
     pickupAddress: 'مطعم حدة المركزي',
     dropoffAddress: 'حدة، شارع الستين',
     note: 'اتصل قبل الوصول.',
+    summary: 'برجر دجاج + بطاطس',
+    total: '34.50 ر.ي',
+    location: 'المنزل',
   },
   {
     id: 'dsh-10019',
-    title: 'طلب رقم 10019',
+    title: 'مخبز السبعين',
+    orderNumber: '10019',
     subtitle: 'من السبعين إلى التحرير',
     statusLabel: getDshClientStateMeta(hostClientStates.delivered).label,
     meta: 'اليوم 03:10 م',
@@ -265,10 +274,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'partner_delivery',
     pickupAddress: 'مخبز السبعين',
     dropoffAddress: 'التحرير، شارع الزبيري',
+    summary: '٣ منتجات طازجة',
+    total: '22.00 ر.ي',
+    location: 'العمل',
   },
   {
     id: 'dsh-10017',
-    title: 'طلب رقم 10017',
+    title: 'متجر شميلة',
+    orderNumber: '10017',
     subtitle: 'من شميلة إلى التحرير',
     statusLabel: getDshClientStateMeta(hostClientStates.cancelled).label,
     meta: 'تم الإلغاء مع توضيح سبب الحالة',
@@ -276,10 +289,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'pickup',
     pickupAddress: 'متجر شميلة',
     dropoffAddress: '',
+    summary: 'شاورما دبل + عصير طازج',
+    total: '15.00 ر.ي',
+    location: 'فرع التحرير',
   },
   {
     id: 'dsh-10016',
-    title: 'طلب رقم 10016',
+    title: 'مطبخ مذبح السريع',
+    orderNumber: '10016',
     subtitle: 'من مذبح إلى باب السلام',
     statusLabel: getDshClientStateMeta(hostClientStates.failed).label,
     meta: 'توجد حاجة إلى مسار تعافٍ أو دعم واضح',
@@ -287,10 +304,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'bthwani_delivery',
     pickupAddress: 'مطبخ مذبح السريع',
     dropoffAddress: 'باب السلام، شارع 14',
+    summary: 'وجبة غداء عائلية',
+    total: '45.00 ر.ي',
+    location: 'المنزل',
   },
   {
     id: 'dsh-10015',
-    title: 'طلب رقم 10015',
+    title: 'كافيه السنينة',
+    orderNumber: '10015',
     subtitle: 'من السنينة إلى سعوان',
     statusLabel: getDshClientStateMeta(hostClientStates.refundPending).label,
     meta: 'الاسترداد ما يزال قيد المعالجة',
@@ -298,10 +319,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'partner_delivery',
     pickupAddress: 'كافيه السنينة',
     dropoffAddress: 'سعوان، الشارع العام',
+    summary: '١ قهوة تركية + دونات زعتر',
+    total: '28.00 ر.ي',
+    location: 'العمل',
   },
   {
     id: 'dsh-10014',
-    title: 'طلب رقم 10014',
+    title: 'متجر التحرير',
+    orderNumber: '10014',
     subtitle: 'من التحرير إلى الجامعة',
     statusLabel: getDshClientStateMeta(hostClientStates.refunded).label,
     meta: 'تم تثبيت الأثر المالي النهائي للطلب',
@@ -309,10 +334,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'pickup',
     pickupAddress: 'متجر التحرير',
     dropoffAddress: '',
+    summary: 'عصير برتقال عائلي',
+    total: '12.00 ر.ي',
+    location: 'فرع التحرير',
   },
   {
     id: 'dsh-10013',
-    title: 'طلب رقم 10013',
+    title: 'فرع الحصبة',
+    orderNumber: '10013',
     subtitle: 'من الحصبة إلى بيت بوس',
     statusLabel: getDshClientStateMeta(hostClientStates.supportRequired).label,
     meta: 'هذه الحالة تحتاج متابعة دعم واضحة',
@@ -320,10 +349,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'partner_delivery',
     pickupAddress: 'فرع الحصبة',
     dropoffAddress: 'بيت بوس، شارع الخمسين',
+    summary: 'معجنات مشكلة صفيحة',
+    total: '32.00 ر.ي',
+    location: 'العمل',
   },
   {
     id: 'dsh-10012',
-    title: 'طلب رقم 10012',
+    title: 'فرع فج عطان',
+    orderNumber: '10012',
     subtitle: 'من فج عطان إلى السبعين',
     statusLabel: getDshClientStateMeta(hostClientStates.walletCreditVisible).label,
     meta: 'يوجد رصيد ظاهر للعميل داخل المحفظة',
@@ -331,10 +364,14 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'bthwani_delivery',
     pickupAddress: 'فرع فج عطان',
     dropoffAddress: 'السبعين، شارع الجزائر',
+    summary: 'بيتزا سوبر سوبريم وسط',
+    total: '38.00 ر.ي',
+    location: 'المنزل',
   },
   {
     id: 'dsh-10011',
-    title: 'طلب رقم 10011',
+    title: 'متجر باب اليمن',
+    orderNumber: '10011',
     subtitle: 'من باب اليمن إلى حدة',
     statusLabel: getDshClientStateMeta(hostClientStates.walletRefundVisible).label,
     meta: 'تظهر معلومة الاسترداد المالي ضمن المسار',
@@ -342,6 +379,9 @@ const initialOrders: HostOrderSummary[] = [
     fulfillmentMode: 'pickup',
     pickupAddress: 'متجر باب اليمن',
     dropoffAddress: '',
+    summary: 'كيكة الشوكولاتة الفاخرة',
+    total: '55.00 ر.ي',
+    location: 'فرع التحرير',
   },
 ];
 
@@ -388,6 +428,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string>(defaultTrackingOrderId);
   const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
+  const [reorderAlertMessage, setReorderAlertMessage] = React.useState<string | undefined>(undefined);
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('entitlements-get');
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
@@ -505,7 +546,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     }
 
     return initialOrders.filter((order) => {
-      const haystack = `${order.title} ${order.subtitle} ${order.statusLabel} ${order.meta}`.toLowerCase();
+      const haystack = `${order.title} ${order.orderNumber || ''} ${order.summary || ''} ${order.subtitle} ${order.statusLabel} ${order.meta}`.toLowerCase();
       return haystack.includes(query);
     });
   }, [ordersQuery]);
@@ -537,8 +578,64 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   );
 
   const openCreateOrderJourney = React.useCallback(() => {
+    setReorderAlertMessage(undefined);
     setRoute('cart-get');
   }, []);
+
+  const handleReorderClick = React.useCallback((orderId: string) => {
+    const order = initialOrders.find((o) => o.id === orderId);
+    if (!order) return;
+
+    // 1. Find store matching order title (store name)
+    const matchedStore = dshDiscoveryStores.find((s) => s.name === order.title) ?? dshDiscoveryStores[0];
+    setActiveStoreId(matchedStore.id);
+    setActiveCanonicalStoreId(matchedStore.canonicalStoreId);
+
+    // 2. Fetch products for store
+    const storeProducts = storeItemsByStoreId[matchedStore.id] ?? [];
+
+    // 3. Find matches by summary keywords
+    const summaryText = order.summary || '';
+    const keywords = summaryText.split(/[\s+\u2014\u2022•,]+/);
+    let matchedProducts = storeProducts.filter((p) =>
+      keywords.some((kw) => kw.length > 1 && (p.name.includes(kw) || (p.subtitle && p.subtitle.includes(kw))))
+    );
+
+    // Fallback if no match
+    if (matchedProducts.length === 0) {
+      matchedProducts = storeProducts.slice(0, 2);
+    }
+
+    // 4. Map to cart items
+    const newCartItems = matchedProducts.map((p, idx) => ({
+      id: p.id,
+      title: p.name,
+      priceLabel: p.priceLabel,
+      qty: idx === 0 ? 1 : 2, // realistic quantities
+      storeId: matchedStore.id,
+      storeName: matchedStore.name,
+      canonicalStoreId: matchedStore.canonicalStoreId,
+      publishStage: p.publishStage || 'published-preview',
+    }));
+
+    setCartItems(newCartItems);
+
+    // 5. Update order values
+    setCreateOrderValues((current) => ({
+      ...current,
+      fulfillmentMode: order.fulfillmentMode ?? 'bthwani_delivery',
+      pickupAddress: order.pickupAddress || matchedStore.name,
+      dropoffAddress: order.dropoffAddress || '',
+      note: order.note || 'لا توجد ملاحظات',
+    }));
+    setSelectedFulfillmentMode(order.fulfillmentMode ?? 'bthwani_delivery');
+
+    // 6. Set reorder alert message to notify user
+    setReorderAlertMessage('تنبيه: تم نسخ السلة من طلبك السابق وتحديث الأسعار ومطابقتها مباشرة مع المتجر بنجاح.');
+
+    // 7. Route to cart-get
+    setRoute('cart-get');
+  }, [createOrderValues.note]);
 
   const openTrackedOrder = React.useCallback((
     orderId?: string,
@@ -633,6 +730,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     item: HostCartInputItem,
     _payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string },
   ) => {
+    setReorderAlertMessage(undefined);
     const normalizedQty = Number.isFinite(_payload?.quantity) && (_payload?.quantity ?? 0) > 0 ? Number(_payload?.quantity) : 1;
     const nextTitle = item.name?.trim() || item.title?.trim() || item.id;
     const canonicalMetadata: HostCanonicalMetadata = {
@@ -862,6 +960,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       <DshCartGetScreen
         clientState={cartClientState}
         fulfillmentMode={selectedFulfillmentMode}
+        reorderAlertMessage={reorderAlertMessage}
         store={{
           id: activeStore.id,
           name: activeStore.name,
@@ -1032,6 +1131,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         query={ordersQuery}
         onQueryChange={setOrdersQuery}
         onOpenOrder={openTrackedOrder}
+        onReorder={handleReorderClick}
       />
     );
   }

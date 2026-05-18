@@ -101,7 +101,7 @@ export const dshNotificationsFixtures: DshNotificationFixture[] = [
   {
     id: 'notif-6',
     title: 'استرداد / رصيد محفظة',
-    subtitle: 'تم إضافة رصيد 10 ر.س إلى محفظتك.',
+    subtitle: 'تم إضافة رصيد 10 ر.ي إلى محفظتك.',
     meta: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
     relativeTime: 'منذ 10 دقائق',
     timeGroup: 'now',
