@@ -18,9 +18,9 @@ import { DshPartnerOrderAlertsPanel } from '../parts/PartnerOrderAlertsPanel';
 import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversationPanel';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
 
-// ML-018: added preparation_started; ML-019: preparing already present — distinguishing start vs in-progress
+// ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
 // ML-021: added captain_assigned / captain_arriving so partner can track handoff event
-type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'ready' | 'handoff' | 'captain_assigned' | 'captain_arriving' | 'delivering' | 'completed' | 'cancelled';
+type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'items_ready' | 'ready' | 'handoff' | 'captain_assigned' | 'captain_arriving' | 'delivering' | 'completed' | 'cancelled';
 type PartnerOrderPriority = 'high' | 'normal' | 'low';
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
 type SmartFilterId = 'all' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'issues' | 'completed';
@@ -213,6 +213,7 @@ function resolveStatusLabel(status: PartnerOrderStatus) {
   if (status === 'needs_accept') return 'تحتاج قبول';
   if (status === 'preparation_started') return 'بدأ التحضير';
   if (status === 'preparing') return 'قيد التحضير';
+  if (status === 'items_ready') return 'العناصر جاهزة';
   if (status === 'ready') return 'جاهزة';
   if (status === 'handoff') return 'تسليم للمندوب';
   if (status === 'captain_assigned') return 'تم تعيين المندوب';
@@ -224,7 +225,7 @@ function resolveStatusLabel(status: PartnerOrderStatus) {
 
 function resolveStatusTone(status: PartnerOrderStatus): 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' {
   if (status === 'needs_accept' || status === 'new') return 'warning';
-  if (status === 'preparation_started' || status === 'preparing' || status === 'delivering') return 'info';
+  if (status === 'preparation_started' || status === 'preparing' || status === 'items_ready' || status === 'delivering') return 'info';
   if (status === 'ready' || status === 'completed') return 'success';
   if (status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving') return 'brand';
   return 'danger';
@@ -244,7 +245,7 @@ function resolvePriorityTone(priority: PartnerOrderPriority): 'default' | 'brand
 
 function resolveOrderAction(status: PartnerOrderStatus): OrderHubAction {
   if (status === 'new' || status === 'needs_accept') return 'accept';
-  if (status === 'preparation_started' || status === 'preparing') return 'prepare';
+  if (status === 'preparation_started' || status === 'preparing' || status === 'items_ready') return 'prepare';
   if (status === 'ready') return 'ready';
   if (status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving') return 'handoff';
   if (status === 'delivering') return 'delivering';
@@ -304,6 +305,9 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const [query, setQuery] = React.useState('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(items[0]?.id ?? null);
   const [detailsVisible, setDetailsVisible] = React.useState(false);
+  // ML-016: acceptance timer sheet — shown when partner presses accept on a needs_accept order
+  const [acceptSheetVisible, setAcceptSheetVisible] = React.useState(false);
+  const [acceptingOrderId, setAcceptingOrderId] = React.useState<string | null>(null);
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -313,7 +317,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const summary = React.useMemo(() => ({
     active: items.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
     urgent: items.filter((item) => item.urgent || item.priority === 'high').length,
-    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'ready' || item.status === 'handoff').length,
+    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready' || item.status === 'ready' || item.status === 'handoff').length,
     issues: items.filter((item) => item.issueRequired || item.status === 'cancelled').length,
   }), [items]);
 
@@ -404,7 +408,13 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
 
   function openPrimaryAction(item: PartnerOrderItem) {
     setSelectedOrderId(item.id);
-    onOpenOrderAction?.(resolveOrderAction(item.status), item.id);
+    const action = resolveOrderAction(item.status);
+    if (action === 'accept') {
+      setAcceptingOrderId(item.id);
+      setAcceptSheetVisible(true);
+      return;
+    }
+    onOpenOrderAction?.(action, item.id);
   }
 
   return (
@@ -588,6 +598,21 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
           </Box>
         ) : null}
       </SheetFrame>
+
+      {/* ML-016: AcceptanceTimerSheet — confirms acceptance before calling onOpenOrderAction */}
+      <AcceptanceTimerSheet
+        visible={acceptSheetVisible}
+        orderCode={filteredItems.find((o) => o.id === acceptingOrderId)?.orderCode ?? ''}
+        onConfirm={() => {
+          setAcceptSheetVisible(false);
+          if (acceptingOrderId) onOpenOrderAction?.('accept', acceptingOrderId);
+          setAcceptingOrderId(null);
+        }}
+        onDecline={() => {
+          setAcceptSheetVisible(false);
+          setAcceptingOrderId(null);
+        }}
+      />
     </>
   );
 }
@@ -684,6 +709,25 @@ export function PartnerOrderDetailScreen({ state = 'ready', summary, onConfirmRe
 
 export type OrderDetailScreenProps = PartnerOrderDetailScreenProps;
 export { PartnerOrderDetailScreen as OrderDetailScreen };
+
+// ML-016: AcceptanceTimerSheet — partner confirms order acceptance before SLA timer expires
+export function AcceptanceTimerSheet({ visible, orderCode, onConfirm, onDecline }: { visible: boolean; orderCode: string; onConfirm: () => void; onDecline: () => void }) {
+  if (!visible) return null;
+  return (
+    <SheetFrame visible={visible} title="قبول الطلب" onClose={onDecline}>
+      <Box gap={3}>
+        <Box gap={1}>
+          <Text role="titleSm">الطلب: {orderCode}</Text>
+          <Text role="bodySm" tone="muted">يُرجى تأكيد الاستلام قبل انتهاء مهلة القبول. الرفض يُعيد الطلب للتوزيع.</Text>
+        </Box>
+        <Box gap={2}>
+          <Button label="قبول الطلب" onPress={onConfirm} />
+          <Button label="رفض" tone="secondary" onPress={onDecline} />
+        </Box>
+      </Box>
+    </SheetFrame>
+  );
+}
 
 export type OrdersInboxScreenProps = PartnerOrdersInboxScreenProps;
 

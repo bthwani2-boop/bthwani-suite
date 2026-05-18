@@ -33,6 +33,7 @@ export type DshClientDeliveryLifecycleStatus =
   | 'cancelled'
   | 'failed'
   | 'returned'
+  | 'refund_pending'
   | 'refunded';
 
 export type DshClientExceptionReason =

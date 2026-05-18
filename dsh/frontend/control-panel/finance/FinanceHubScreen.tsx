@@ -25,7 +25,7 @@ import {
   ControlPanelDshCaptainEligibilityScreen,
   ControlPanelDshPayoutsScreen,
   ControlPanelDshRiskAuditScreen,
-} from './closure-workspaces';
+} from './FinanceHubScreens';
 import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
 
 import styles from '../shared/control-panel-surface.module.css';

@@ -78,5 +78,5 @@ export { sectionMeta } from './section-meta';
 export { sectionCatalog } from './section-catalog';
 export { flowMeta } from './flow-meta';
 export { ControlPanelDshMarketingScreen } from './ControlPanelDshMarketingScreen';
-export { ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './closure-workspaces';
-export { default } from './closure-workspaces';
+export { ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './MarketingReviewScreens';
+export { default } from './MarketingReviewScreens';

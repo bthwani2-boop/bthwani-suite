@@ -1,7 +1,7 @@
 // ML-040: CP partner settlement workspace skeleton (WLT bridge — view-only)
 // BLOCKED_BY_WLT: replace with dedicated workspace once WLT exposes settlement read endpoints
 import React from 'react';
-import { ControlPanelDshSettlementScreen } from './closure-workspaces';
+import { ControlPanelDshSettlementScreen } from './FinanceHubScreens';
 
 export type PartnerSettlementWorkspaceProps = {
   partnerId?: string;

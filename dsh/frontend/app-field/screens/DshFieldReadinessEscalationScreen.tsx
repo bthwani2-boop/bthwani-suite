@@ -38,7 +38,7 @@ export function DshFieldReadinessEscalationScreen({
     'عدم توفر ملصقات العلامة التجارية',
   ],
   escalationTargets = [
-    { id: 'partner-ops', label: 'عمليات الشريك (Partner Ops)', isSelected: true },
+    { id: 'partner-management', label: 'قسم الشركاء (Partner Management)', isSelected: true },
     { id: 'control-panel', label: 'لوحة التحكم المركزية (Control Panel)', isSelected: false },
     { id: 'marketing', label: 'فريق التسويق (Marketing)', isSelected: false },
   ],

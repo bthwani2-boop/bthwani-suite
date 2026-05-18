@@ -17,8 +17,8 @@ import {
 } from '@bthwani/ui-kit';
 
 export type DshCheckoutIntentScreenProps = {
-  // ML-006: order-created; ML-009: payment error; ML-010: blocked+retry; ML-015: quote-loading
-  state?: 'ready' | 'loading' | 'quote-loading' | 'error' | 'disabled' | 'blocked' | 'order-created';
+  // ML-006: order-created; ML-009: payment-failed; ML-010: quote-unavailable; ML-015: quote-loading/quote-failed/quote-success
+  state?: 'ready' | 'loading' | 'quote-loading' | 'quote-failed' | 'quote-success' | 'error' | 'payment-failed' | 'quote-unavailable' | 'disabled' | 'blocked' | 'order-created';
   paymentErrorMessage?: string;
   onViewOrder?: () => void;
   address?: string;
@@ -91,7 +91,7 @@ export function DshCheckoutIntentScreen({
     );
   }
 
-  if (state === 'error') {
+  if (state === 'error' || state === 'payment-failed') {
     return (
       <Surface style={styles.root}>
         <TopBar title="فشل الدفع" onBack={onBack} />
@@ -106,7 +106,39 @@ export function DshCheckoutIntentScreen({
     );
   }
 
-  if (state === 'blocked') {
+  // ML-015: quote failed — serviceability calculation error
+  if (state === 'quote-failed') {
+    return (
+      <Surface style={styles.root}>
+        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <StateView
+          stateId="error"
+          title="تعذّر حساب تكلفة التوصيل"
+          description="تعذّر الحصول على عرض سعر التوصيل. يُرجى المحاولة مرة أخرى."
+          actionLabel="إعادة المحاولة"
+          onActionPress={onRetry}
+        />
+      </Surface>
+    );
+  }
+
+  // ML-015: quote success — serviceability confirmed, ready to confirm order
+  if (state === 'quote-success') {
+    return (
+      <Surface style={styles.root}>
+        <TopBar title="تأكيد الطلب" onBack={onBack} />
+        <StateView
+          stateId="success"
+          title="تم التحقق من التوصيل"
+          description="التوصيل متاح إلى عنوانك. يمكنك تأكيد الطلب الآن."
+          actionLabel="تأكيد الطلب"
+          onActionPress={onConfirm}
+        />
+      </Surface>
+    );
+  }
+
+  if (state === 'blocked' || state === 'quote-unavailable') {
     return (
       <Surface style={styles.root}>
         <TopBar title="الخدمة غير متوفرة" onBack={onBack} />

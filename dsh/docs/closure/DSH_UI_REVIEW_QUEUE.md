@@ -1,8 +1,8 @@
-# DSH UI Review Queue — Loop 3
+# DSH UI Review Queue — Loop 8 (Updated)
 
 Status: NEEDS_VISUAL_EVIDENCE
-Loop: 3
-Date: 2026-05-15
+Loop: 8
+Date: 2026-05-18
 
 All 63 registered DSH screens are `NEEDS_VISUAL_EVIDENCE`. No screen has been visually confirmed by a human reviewer. This document is the canonical queue for visual review ordered by priority.
 
@@ -27,21 +27,21 @@ For each screen below, a human reviewer must:
 | --- | --- | --- | --- | --- | --- | --- |
 | P0-01 | client.dsh.home.feed | app-client | HomeScreen.tsx | HIGH | Browse stores | None |
 | P0-02 | client.dsh.cart.review | app-client | CartScreen.tsx | MEDIUM | Proceed to checkout | WLT fee display |
-| P0-03 | client.dsh.checkout.intent | app-client | DshCheckoutIntentScreen.tsx | MEDIUM | Confirm order | ML-006 order-created state missing; ML-009 payment-fail state |
-| P0-04 | client.dsh.order.tracking.live | app-client | OrdersTrackingScreens.tsx | HIGH | Track order | ML-008 refund state missing; CG-007 streaming unproven |
+| P0-03 | client.dsh.checkout.intent | app-client | DshCheckoutIntentScreen.tsx | MEDIUM | Confirm order | SKELETON_ADDED: ML-006 order-created, ML-009 payment-failed, ML-010 quote-unavailable, ML-015 quote-loading/failed/success — NEEDS_VISUAL_EVIDENCE |
+| P0-04 | client.dsh.order.tracking.live | app-client | OrdersTrackingScreens.tsx | HIGH | Track order | SKELETON_ADDED: ML-007 CancelOrderSheet wired, ML-008 refund_pending label added — NEEDS_VISUAL_EVIDENCE; CG-007 streaming unproven |
 | P0-05 | client.dsh.orders.history | app-client | OrdersTrackingScreens.tsx | HIGH | View order | CG-006 unproven |
 | P0-06 | client.dsh.store.details | app-client | StoreScreen.tsx | MEDIUM | View menu | CG-002 unproven |
 | P0-07 | client.dsh.order.issue.workspace | app-client | OperationScreens.tsx | HIGH | Report issue | CG-012 unproven; OperationScreens god-file |
-| P0-08 | partner.dsh.orders.inbox | app-partner | OrdersInboxScreen.tsx | HIGH | Accept order | ML-016 acceptance timer; ML-020 mark-ready state |
-| P0-09 | partner.dsh.order.detail | app-partner | OrdersInboxScreen.tsx | HIGH | Prepare order | ML-018 ML-019 ML-020 preparation states |
+| P0-08 | partner.dsh.orders.inbox | app-partner | OrdersInboxScreen.tsx | HIGH | Accept order | SKELETON_ADDED: ML-016 AcceptanceTimerSheet wired, ML-020 onMarkReady present — NEEDS_VISUAL_EVIDENCE |
+| P0-09 | partner.dsh.order.detail | app-partner | OrdersInboxScreen.tsx | HIGH | Prepare order | SKELETON_ADDED: ML-018 preparation_started, ML-019 preparing+items_ready states added — NEEDS_VISUAL_EVIDENCE |
 | P0-10 | partner.dsh.inventory.catalog | app-partner | InventoryCatalogScreen.tsx | HIGH | Update inventory | CG-020 unproven |
 | P0-11 | partner.dsh.order.rejection | app-partner | DshPartnerOrderRejectionScreen.tsx | LOW | Reject order | CG-022 unproven; ownerKind review |
 | P0-12 | partner.dsh.entry.status | app-partner | PartnerEntryScreen.tsx | LOW | Activate store | ML-017 availability toggle |
 | P0-13 | partner.dsh.home.dashboard | app-partner | PartnerHubScreen.tsx | HIGH | View orders | PartnerHubScreen god-file (3 screens) |
-| P0-14 | captain.dsh.orders.inbox | app-captain | DshCaptainOrdersScreen.tsx | HIGH | Accept offer | ML-024 offer decline; ML-027 ML-028 accept state |
-| P0-15 | captain.dsh.orders.detail | app-captain | DshCaptainOrdersScreen.tsx | HIGH | Navigate to pickup | CG-016 unproven |
-| P0-16 | captain.dsh.orders.pickup-dropoff | app-captain | DshCaptainPickupDropoffScreen.tsx | MEDIUM | Confirm pickup | ML-025 MapScreen unregistered; ML-029 in-transit state |
-| P0-17 | captain.dsh.orders.pod-submission | app-captain | DshCaptainPoDSubmissionScreen.tsx | LOW | Submit proof | ML-031 rejection state missing |
+| P0-14 | captain.dsh.orders.inbox | app-captain | DshCaptainOrdersScreen.tsx | HIGH | Accept offer | SKELETON_ADDED: ML-024 OfferDeclineSheet, ML-026 availability-toggle, ML-027 loading-assignment states — NEEDS_VISUAL_EVIDENCE |
+| P0-15 | captain.dsh.orders.detail | app-captain | DshCaptainOrdersScreen.tsx | HIGH | Navigate to pickup | CG-016 unproven — NEEDS_VISUAL_EVIDENCE |
+| P0-16 | captain.dsh.orders.pickup-dropoff | app-captain | DshCaptainPickupDropoffScreen.tsx | MEDIUM | Confirm pickup | VERIFIED: ML-025 registered, ML-029 out-for-delivery+navigating-to-dropoff present — NEEDS_VISUAL_EVIDENCE |
+| P0-17 | captain.dsh.orders.pod-submission | app-captain | DshCaptainPoDSubmissionScreen.tsx | LOW | Submit proof | SKELETON_ADDED: ML-031 retry-required state added — NEEDS_VISUAL_EVIDENCE |
 | P0-18 | field.dsh.stores.list | app-field | DshFieldStoresScreen.tsx | HIGH | Select store | CG-024 unproven |
 | P0-19 | field.dsh.store.onboarding | app-field | DshFieldStoreOnboardingScreen.tsx | MEDIUM | Complete step | ML-002 doc section; ML-005 exit state |
 | P0-20 | field.dsh.store.visit | app-field | DshFieldStoreVisitScreen.tsx | LOW | Submit visit | ML-003 photo section |

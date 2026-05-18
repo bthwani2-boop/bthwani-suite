@@ -19,7 +19,7 @@ export {
   ControlPanelDshCodReconciliationScreen,
   ControlPanelDshRefundQueueScreen,
   ControlPanelDshRiskAuditScreen,
-} from './closure-workspaces';
+} from './FinanceHubScreens';
 
 // ML-040..ML-045: WLT bridge workspace skeletons — BLOCKED_BY_WLT (bridge contracts not proven)
 export { PartnerSettlementWorkspace } from './PartnerSettlementWorkspace';

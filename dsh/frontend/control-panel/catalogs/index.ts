@@ -6,9 +6,9 @@ export type {
   CatalogProductMaster,
 } from './catalog';
 export { ControlPanelDshCatalogScreen } from './ControlPanelDshCatalogScreen';
-export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen } from './closure-workspaces';
+export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen } from './CatalogGovernanceScreens';
 export { ControlPanelDshCatalogCategoriesScreen } from './ControlPanelDshCatalogCategoriesScreen';
-export { default } from './closure-workspaces';
+export { default } from './CatalogGovernanceScreens';
 
 // ML-053: Item approval section skeleton — BLOCKED_BY_CONTRACT (catalog approval API not proven)
 export { ItemApprovalSection } from './ItemApprovalSection';

@@ -33,7 +33,7 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
       recommendation={isAwaitingActivation ? 'جاهز للتفعيل النهائي' : 'مراجعة المستندات'}
       reason={isAwaitingActivation
-        ? 'اجتاز الشريك مراحل التسجيل والمراجعة التسويقية. القرار النهائي بيد الأوبريشن.'
+        ? 'اجتاز الشريك مراحل التسجيل والمراجعة التسويقية. القرار النهائي بيد قسم الشركاء.'
         : 'البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني.'}
       sla={translateEntityType(item.entityType)}
       primaryAction={isAwaitingActivation ? {

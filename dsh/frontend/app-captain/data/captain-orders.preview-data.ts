@@ -60,5 +60,5 @@ export type DshCaptainOrderAction =
 
 export type DshCaptainOrderProofStatus = 'idle' | 'pending' | 'uploaded' | 'verified' | 'failed';
 
-// ML-027: added 'offer-accepting' and 'offer-accepted' confirmation states
-export type DshCaptainOrdersScreenState = 'ready' | 'loading' | 'empty' | 'delivered' | 'error' | 'offer-accepting' | 'offer-accepted';
+// ML-026: availability-toggle — captain toggling on/off availability; ML-027: offer-accepting/offer-accepted + loading-assignment
+export type DshCaptainOrdersScreenState = 'ready' | 'loading' | 'empty' | 'delivered' | 'error' | 'availability-toggle' | 'offer-accepting' | 'offer-accepted' | 'loading-assignment';

@@ -30,6 +30,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
+import { CancelOrderSheet } from '../sheets/CancelOrderSheet';
 import { getDshClientStateMeta, type DshClientState } from '../data/client-state.preview-data';
 import type {
   DshClientAddressSnapshot,
@@ -122,6 +123,7 @@ export type DshTrackingScreenProps = {
   onRetry?: () => void;
   onNextAction?: () => void;
   onReorder?: () => void;
+  onCancelOrder?: () => void;
 };
 
 type DshFlowHubScreenProps = {
@@ -907,6 +909,7 @@ function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus)
     cancelled: 'تم الإلغاء',
     failed: 'فشل التنفيذ',
     returned: 'قيد الإرجاع / الاسترداد',
+    refund_pending: 'الاسترداد قيد المعالجة',
     refunded: 'تم الاسترداد',
   };
 
@@ -1420,11 +1423,12 @@ type CreateOrderJourneyScreenProps = {
   onSupport?: () => void;
   onNextAction?: () => void;
   onReorder?: () => void;
+  onCancelOrder?: () => void;
   initialPhase?: JourneyPhase;
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, onCancelOrder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const resolvedMode: DshFulfillmentDeliveryMode = fulfillmentMode ?? values.fulfillmentMode ?? 'bthwani_delivery';
@@ -1701,7 +1705,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
       : 'تم تأكيد الطلب. الإجراء الرئيسي ينقلك إلى التتبع مباشرة.';
   } else if (phase === 'route') {
     primaryAction = undefined;
-    secondaryAction = undefined;
+    secondaryAction = onCancelOrder ? { label: 'إلغاء الطلب', onPress: onCancelOrder, tone: 'secondary' as const } : undefined;
     stickyNote = '';
   } else if (phase === 'arrived') {
     primaryAction = undefined;
@@ -2272,7 +2276,8 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
   );
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, fulfillmentMode, timeline = [], onSupport, onRetry, onNextAction, onReorder }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, fulfillmentMode, timeline = [], onSupport, onRetry, onNextAction, onReorder, onCancelOrder }: DshTrackingScreenProps) {
+  const [cancelSheetVisible, setCancelSheetVisible] = React.useState(false);
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
@@ -2302,18 +2307,26 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
   }
 
   return (
-    <CreateOrderJourneyScreen
-      values={values}
-      timeline={fallbackTimeline}
-      clientState={clientState}
-      fulfillmentMode={fulfillmentMode}
-      initialPhase="route"
-      currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
-      onSupport={onSupport}
-      onNextAction={onNextAction}
-      onReorder={onReorder}
-      onBack={onSupport ?? onNextAction ?? onRetry}
-    />
+    <View style={{ flex: 1 }}>
+      <CreateOrderJourneyScreen
+        values={values}
+        timeline={fallbackTimeline}
+        clientState={clientState}
+        fulfillmentMode={fulfillmentMode}
+        initialPhase="route"
+        currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
+        onSupport={onSupport}
+        onNextAction={onNextAction}
+        onReorder={onReorder}
+        onCancelOrder={onCancelOrder ? () => setCancelSheetVisible(true) : undefined}
+        onBack={onSupport ?? onNextAction ?? onRetry}
+      />
+      <CancelOrderSheet
+        visible={cancelSheetVisible}
+        onConfirm={() => { setCancelSheetVisible(false); onCancelOrder?.(); }}
+        onCancel={() => setCancelSheetVisible(false)}
+      />
+    </View>
   );
 }
 

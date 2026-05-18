@@ -1,7 +1,7 @@
 // ML-042: CP refund queue workspace skeleton (WLT bridge + refund-candidacy flag)
 // WLT owns all refund money semantics — ops here can only flag candidacy, not initiate refunds
 import React from 'react';
-import { ControlPanelDshRefundQueueScreen } from './closure-workspaces';
+import { ControlPanelDshRefundQueueScreen } from './FinanceHubScreens';
 
 export type RefundQueueWorkspaceProps = {
   // refundCandidacyEnabled: ops can flag an order as refund-candidate — WLT decides actual refund

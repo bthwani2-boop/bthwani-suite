@@ -134,7 +134,28 @@ const demoMessages: DshCaptainOrderMessage[] = [
 const demoState: DshCaptainOrdersScreenState = 'ready';
 
 function renderOrdersState(state: DshCaptainOrdersScreenState, onRetry?: () => void) {
-	// ML-027: offer-accepting and offer-accepted confirmation states
+	// ML-026: availability-toggle — shown while captain toggles availability on/off
+	if (state === 'availability-toggle') {
+		return (
+			<StateView
+				stateId="loading"
+				title="جارٍ تحديث حالة التوفر..."
+				description="يُرجى الانتظار بينما يتم تسجيل حالتك."
+			/>
+		);
+	}
+
+	// ML-027: offer-accepting, offer-accepted, and loading-assignment states
+	if (state === 'loading-assignment') {
+		return (
+			<StateView
+				stateId="loading"
+				title="جارٍ تحميل تفاصيل المهمة..."
+				description="تم قبول الطلب. جارٍ جلب تفاصيل الاستلام والتسليم."
+			/>
+		);
+	}
+
 	if (state === 'offer-accepting') {
 		return (
 			<StateView
@@ -1101,6 +1122,24 @@ export function CaptainPickupConfirmSheet({ visible, orderTitle, onConfirm, onCa
 			<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
 			<Box gap={2}>
 				<Button label="تأكيد الاستلام" onPress={onConfirm} />
+				<Button label="إلغاء" tone="ghost" onPress={onCancel} />
+			</Box>
+		</Surface>
+	);
+}
+
+// ML-024: OfferDeclineSheet — captain confirms offer decline with reason before calling onDecline
+export function OfferDeclineSheet({ visible, orderTitle, onDecline, onCancel }: { visible: boolean; orderTitle: string; onDecline: (reason: string) => void; onCancel: () => void; }) {
+	const [reason, setReason] = React.useState('');
+	if (!visible) return null;
+
+	return (
+		<Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+			<SectionHeader title="رفض العرض" subtitle="أدخل سبب الرفض قبل تمرير العرض للكابتن التالي." />
+			<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
+			<TextField label="سبب الرفض" placeholder="مثال: بُعد الموقع، طاقة ممتلئة..." value={reason} onChangeText={setReason} />
+			<Box gap={2}>
+				<Button label="تأكيد الرفض" tone="danger" disabled={!reason.trim()} onPress={() => onDecline(reason)} />
 				<Button label="إلغاء" tone="ghost" onPress={onCancel} />
 			</Box>
 		</Surface>

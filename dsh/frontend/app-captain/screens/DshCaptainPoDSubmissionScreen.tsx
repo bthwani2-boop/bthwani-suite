@@ -18,7 +18,8 @@ import {
 import { DshOperationScreen } from '../parts/OperationScreen';
 
 export type DshCaptainPoDSubmissionScreenProps = {
-  state?: 'ready' | 'loading' | 'success' | 'error' | 'rejected';
+  // ML-031: added 'retry-required' — ops rejected proof and captain must re-capture
+  state?: 'ready' | 'loading' | 'success' | 'error' | 'rejected' | 'retry-required';
   orderId: string;
   onCapturePhoto: () => void;
   onConfirm: () => void;
@@ -60,6 +61,21 @@ export function DshCaptainPoDSubmissionScreen({
           title="فشل إثبات التسليم"
           description="الصورة المرفوعة غير واضحة أو لا تستوفي المعايير المطلوبة. يرجى إعادة المحاولة."
           actionLabel="إعادة المحاولة"
+          onActionPress={onCapturePhoto}
+        />
+      </Surface>
+    );
+  }
+
+  // ML-031: retry-required — ops explicitly requires new proof capture
+  if (state === 'retry-required') {
+    return (
+      <Surface style={styles.root}>
+        <StateView
+          stateId="blocked"
+          title="مطلوب إعادة التقاط الإثبات"
+          description="رفضت العمليات الإثبات المرفوع. يُرجى التقاط صورة جديدة واضحة وإعادة الإرسال."
+          actionLabel="التقاط صورة جديدة"
           onActionPress={onCapturePhoto}
         />
       </Surface>

@@ -1,2 +1,2 @@
-export { ControlPanelDshControlHubScreen, ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './closure-workspaces';
-export { default } from './closure-workspaces';
+export { ControlPanelDshControlHubScreen, ControlPanelDshGovernanceEvidenceScreen, ControlPanelDshGuardStatusScreen } from './ControlHubScreens';
+export { default } from './ControlHubScreens';

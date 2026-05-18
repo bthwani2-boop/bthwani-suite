@@ -30,13 +30,39 @@ This checklist defines the minimum criteria for DSH surfaces to be considered re
 | No uncommitted changes to WLT files | PASS |
 | No uncommitted changes to OpenAPI | PASS |
 
-### Skeleton coverage
+### Skeleton coverage (updated Loop 8 — 2026-05-18)
 
 | Check | Status |
 | --- | --- |
-| All P0 gap targets (ML-001, ML-006, ML-020, ML-025, ML-031, ML-040, ML-041, ML-042, ML-046, ML-047, ML-049) applied | DONE_LOCAL |
-| All P1 gap targets applied | DONE_LOCAL |
-| `DSH_MISSING_LOGIC_AND_UI_GAPS.csv` — all applied rows → `SKELETON_ADDED_NEEDS_VISUAL_REVIEW` | DONE_LOCAL |
+| ML-001..ML-005 (field + partner management) | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-006..ML-010, ML-015 (checkout intent states) | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-007 CancelOrderSheet wired in OrdersTrackingScreens | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-008 refund_pending label + lifecycle status type | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-016 AcceptanceTimerSheet wired in OrdersInboxScreen | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-018 preparation_started, ML-019 items_ready states | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-020 onMarkReady present | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-021 captain_assigned/captain_arriving states | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-024 OfferDeclineSheet added | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-025 DshCaptainPickupDropoffScreen registered | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-026 availability-toggle state, ML-027 loading-assignment state | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-029 out-for-delivery/navigating-to-dropoff states | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-031 retry-required state in DshCaptainPoDSubmissionScreen | SKELETON_ADDED_NEEDS_VISUAL_EVIDENCE |
+| ML-032..ML-034 Ops messaging workspaces | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-035 AuditTrailDetailWorkspace | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-038 PartnerDeactivationWorkspace | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-040..ML-045 WLT finance bridge workspaces | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-046..ML-052 support screens | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-053 ItemApprovalSection wired | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-054 CatalogPublishingGateSection wired | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-011,012,013,014 | OWNER_DECISION_REQUIRED |
+| ML-017 storeOpen availability toggle in PartnerHubScreen | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-022 OpsPartnerMessagingWorkspace | VERIFIED_NEEDS_VISUAL_EVIDENCE |
+| ML-023 video submission ownership | OWNER_DECISION_REQUIRED |
+| ML-028 captain viewing/accepting/accepted flow | OWNER_DECISION_REQUIRED |
+| ML-030 support workspace extraction | OWNER_DECISION_REQUIRED |
+| ML-036 auto-assignment config section | OWNER_DECISION_REQUIRED |
+| ML-037 reassign-captain action panel | OWNER_DECISION_REQUIRED |
+| ML-039 partner performance analytics | RUNTIME_LATER |
 | `DSH_SCREEN_INVENTORY.csv` — no `TBD` in screen registration rows that have matching `.tsx` files | NEEDS_HUMAN_VERIFY |
 
 ### Organization
