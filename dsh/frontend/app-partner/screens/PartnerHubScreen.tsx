@@ -138,6 +138,34 @@ const partnerAppearanceOptions: ReadonlyArray<{
 
 const hubNavigationItems: readonly HubNavigationItem[] = [
   {
+    id: 'profile',
+    title: 'ملف المتجر',
+    description: 'بيانات المتجر، الهوية، الظهور، الفرع، والنطاق في مساحة واحدة.',
+    icon: 'storefront-outline',
+    section: 'profile',
+  },
+  {
+    id: 'wallet',
+    title: wltDshPartnerUiCopy.walletSectionTitle,
+    description: wltDshPartnerUiCopy.walletSectionDescription,
+    icon: 'wallet-outline',
+    section: 'wallet',
+  },
+  {
+    id: 'operations',
+    title: 'العمليات والفريق',
+    description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
+    icon: 'people-outline',
+    section: 'operations',
+  },
+  {
+    id: 'inventory',
+    title: 'المخزون والكتالوج',
+    description: 'بحث أولًا، إضافة ذكية، أسعار ومخزون بدون تكرار.',
+    icon: 'cube-outline',
+    section: 'inventory',
+  },
+  {
     id: 'analytics',
     title: 'التحليلات والنمو والتسويق',
     description: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
@@ -872,7 +900,6 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     serviceModes = [],
     onOpenOrdersBoard,
     onOpenOrdersSearch,
-    onOpenInventoryManagement,
     onOpenStoreScope,
     onOpenSupportDirectory,
     onOpenWalletHub,
@@ -886,6 +913,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
   const { direction } = useDirection();
+  const { theme } = useTheme();
   const {
     hydrated: appearanceHydrated,
     mode: appearanceMode,

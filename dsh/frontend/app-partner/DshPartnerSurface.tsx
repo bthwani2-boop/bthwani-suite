@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
 import { Box, Button, colorPalette, Icon, ModernPremiumHeader, Surface, Text, TopBar, useTheme, BottomNavBar, MobileScrollView } from '@bthwani/ui-kit';
 import { wltDshPartnerUiCopy } from '../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import type {
@@ -435,7 +435,7 @@ export function DshPartnerSurface({
   ) : null;
 
   const renderMainShell = (content: React.ReactNode) => (
-    <Box style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1, position: 'relative' }} background="background">
       {topBar}
       <Surface
         tone="raised"
@@ -455,18 +455,18 @@ export function DshPartnerSurface({
       </Surface>
       {walletHubSheet}
       {storeScopeSheet}
-      {bottomNavBar}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>{bottomNavBar}</View>
     </Box>
   );
 
   const renderSurfaceShell = (content: React.ReactNode) => (
-    <Box style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1, position: 'relative' }} background="background">
       <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'hidden' }}>
         {content}
       </Surface>
       {walletHubSheet}
       {storeScopeSheet}
-      {bottomNavBar}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>{bottomNavBar}</View>
     </Box>
   );
 
