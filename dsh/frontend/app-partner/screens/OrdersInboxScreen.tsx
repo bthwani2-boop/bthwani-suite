@@ -1,8 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
-import { Box, Button, Card, Chip, MobileScrollView, SearchField, SearchTopBar, SheetFrame, StateView, Surface, Text, resolveRowDirection, useDirection } from '@bthwani/ui-kit';
-import { DshPartnerOrderAlertsPanel } from '../parts/PartnerOrderAlertsPanel';
-import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversationPanel';
+import { Box, Button, Card, Chip, MobileScrollView, SearchField, SheetFrame, StateView, Surface, Text, resolveRowDirection, useDirection } from '@bthwani/ui-kit';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
@@ -56,6 +53,11 @@ export type PartnerOrderItem = {
   slaRisk?: boolean;
   unread?: boolean;
   issueRequired?: boolean;
+  // Optional enrichment fields — safe to omit; callers that don't supply them get graceful fallback
+  itemsSummaryLabel?: string;   // e.g. "برغر كلاسيك، بطاطس، مشروب"
+  paymentLabel?: string;        // e.g. "نقد عند التسليم" | "محفظة" | "بطاقة"
+  slaLabel?: string;            // e.g. "يتبقى 8 دقائق"
+  nextOwnerLabel?: string;      // e.g. "موصل المتجر" | "كابتن بثواني" | "العميل"
 };
 
 export type PartnerOrdersHomeScreenProps = {
@@ -114,10 +116,14 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'توصيل المتجر',
     orderMode: 'partner_delivery',
     itemsCountLabel: '3 عناصر',
+    itemsSummaryLabel: 'برغر كلاسيك، بطاطس كبيرة، مشروب غازي',
     amountLabel: '92 ر.ي',
+    paymentLabel: 'نقد عند التسليم',
     createdAtLabel: '10:42 ص',
     elapsedLabel: 'منذ دقيقتين',
+    slaLabel: 'يتبقى 6 دقائق',
     nextActionLabel: 'قبول الطلب',
+    nextOwnerLabel: 'موصل المتجر',
     urgent: true,
     slaRisk: true,
     unread: true,
@@ -132,10 +138,13 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'استلم بنفسك',
     orderMode: 'pickup',
     itemsCountLabel: '5 عناصر',
+    itemsSummaryLabel: 'وجبة عائلية + خيارات إضافية',
     amountLabel: '124 ر.ي',
+    paymentLabel: 'محفظة بثواني',
     createdAtLabel: '10:33 ص',
     elapsedLabel: 'منذ 11 دقيقة',
     nextActionLabel: 'متابعة التحضير',
+    nextOwnerLabel: 'العميل',
     unread: true,
   },
   {
@@ -148,10 +157,13 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'توصيل المتجر',
     orderMode: 'partner_delivery',
     itemsCountLabel: '2 عنصر',
+    itemsSummaryLabel: 'بيتزا مارغريتا، عصير طبيعي',
     amountLabel: '76 ر.ي',
+    paymentLabel: 'بطاقة ائتمانية',
     createdAtLabel: '10:21 ص',
     elapsedLabel: 'منذ 20 دقيقة',
     nextActionLabel: 'تأكيد الجاهزية',
+    nextOwnerLabel: 'موصل المتجر',
     urgent: true,
   },
   {
@@ -164,10 +176,13 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'توصيل المتجر',
     orderMode: 'partner_delivery',
     itemsCountLabel: '4 عناصر',
+    itemsSummaryLabel: 'شاورما دجاج × 2، بطاطس، مشروب',
     amountLabel: '118 ر.ي',
+    paymentLabel: 'نقد عند التسليم',
     createdAtLabel: '10:10 ص',
     elapsedLabel: 'منذ 31 دقيقة',
     nextActionLabel: 'تسليم لموصل الشريك',
+    nextOwnerLabel: 'موصل المتجر',
   },
   {
     id: 'ord-4372',
@@ -179,10 +194,14 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'توصيل بثواني',
     orderMode: 'bthwani_delivery',
     itemsCountLabel: '1 عنصر',
+    itemsSummaryLabel: 'سلطة خضراء كبيرة',
     amountLabel: '41 ر.ي',
+    paymentLabel: 'محفظة بثواني',
     createdAtLabel: '09:54 ص',
     elapsedLabel: 'منذ 47 دقيقة',
+    slaLabel: 'يتبقى 3 دقائق',
     nextActionLabel: 'متابعة التسليم',
+    nextOwnerLabel: 'كابتن بثواني',
     slaRisk: true,
   },
   {
@@ -195,7 +214,9 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'استلم بنفسك',
     orderMode: 'pickup',
     itemsCountLabel: '2 عنصر',
+    itemsSummaryLabel: 'قهوة سوداء، كيكة جوز',
     amountLabel: '59 ر.ي',
+    paymentLabel: 'نقد',
     createdAtLabel: '09:40 ص',
     elapsedLabel: 'قبل 61 دقيقة',
     nextActionLabel: 'مراجعة السجل',
@@ -210,7 +231,9 @@ const demoOrders: readonly PartnerOrderItem[] = [
     orderTypeLabel: 'توصيل المتجر',
     orderMode: 'partner_delivery',
     itemsCountLabel: '3 عناصر',
+    itemsSummaryLabel: 'طلب مختلط — يحتاج مراجعة',
     amountLabel: '87 ر.ي',
+    paymentLabel: 'نقد عند التسليم',
     createdAtLabel: '09:28 ص',
     elapsedLabel: 'قبل 73 دقيقة',
     nextActionLabel: 'مراجعة المشكلة',
@@ -240,12 +263,6 @@ function resolveStatusTone(status: PartnerOrderStatus): 'default' | 'brand' | 's
   if (status === 'ready' || status === 'completed') return 'success';
   if (status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving') return 'brand';
   return 'danger';
-}
-
-function resolvePriorityLabel(priority: PartnerOrderPriority) {
-  if (priority === 'high') return 'أولوية عالية';
-  if (priority === 'normal') return 'أولوية متوسطة';
-  return 'أولوية منخفضة';
 }
 
 function resolvePriorityTone(priority: PartnerOrderPriority): 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' {
@@ -288,25 +305,103 @@ function renderState(state: Exclude<PartnerOrdersHomeScreenState, 'ready'>, onRe
   return <StateView stateId="recoverableError" title="تعذر فتح لوحة عمليات الطلب" description="حدث خلل مؤقت. أعد المحاولة من دون فقدان السياق." actionLabel={onRetry ? 'إعادة المحاولة' : undefined} onActionPress={onRetry} />;
 }
 
-function resolveEmptyStateDescription(filterLabel: string) {
-  return `لا توجد طلبات ضمن فلتر ${filterLabel} الآن. غيّر الفلتر أو البحث لرؤية طلبات أخرى.`;
+// ─── Order Card ────────────────────────────────────────────────────────────────
+function OrderCard({
+  item,
+  direction,
+  onPrimaryAction,
+  onViewDetails,
+  onQuickView,
+}: {
+  item: PartnerOrderItem;
+  direction: 'ltr' | 'rtl';
+  onPrimaryAction: () => void;
+  onViewDetails: () => void;
+  onQuickView: () => void;
+}) {
+  const rowDir = resolveRowDirection(direction);
+  const statusLabel = resolveStatusLabel(item.status);
+  const statusTone = resolveStatusTone(item.status);
+
+  return (
+    <Card
+      padding={4}
+      gap={0}
+      footer={
+        // ─── Zone 5: Actions ───────────────────────────────────────────────
+        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2} paddingTop={2}>
+          <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={onPrimaryAction} />
+          <Button label="عرض التفاصيل" size="sm" tone="secondary" fullWidth={false} onPress={onViewDetails} />
+          <Chip label="معاينة ×" tone="info" onPress={onQuickView} />
+        </Box>
+      }
+    >
+      <Box gap={3}>
+        {/* ─── Zone 1: Header ───────────────────────────────────────────── */}
+        <Box gap={1}>
+          <Box style={{ flexDirection: rowDir, alignItems: 'center', flexWrap: 'wrap' }} gap={2}>
+            <Text role="titleSm">{item.customerName}</Text>
+            <Text role="bodySm" tone="muted">· {item.orderCode}</Text>
+          </Box>
+          <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2}>
+            <Chip label={statusLabel} tone={statusTone} selected />
+            {item.priority === 'high' ? <Chip label="أولوية عالية" tone="danger" /> : null}
+            {item.urgent && item.priority !== 'high' ? <Chip label="عاجل" tone="warning" /> : null}
+            {item.unread ? <Chip label="غير مقروء" tone="warning" /> : null}
+            {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" /> : null}
+          </Box>
+        </Box>
+
+        {/* ─── Zone 2: Context row ──────────────────────────────────────── */}
+        <Box gap={1}>
+          <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
+            <Text role="bodySm" tone="muted">{item.branchLabel}</Text>
+            <Text role="bodySm" tone="muted">·</Text>
+            <Chip label={item.orderTypeLabel} tone="brand" />
+            <Text role="bodySm" tone="muted">{item.elapsedLabel}</Text>
+            {item.slaRisk && item.slaLabel ? (
+              <Chip label={item.slaLabel} tone="danger" />
+            ) : item.slaRisk ? (
+              <Chip label="SLA قريب" tone="danger" />
+            ) : null}
+          </Box>
+        </Box>
+
+        {/* ─── Zone 3: Items summary ────────────────────────────────────── */}
+        <Box gap={1}>
+          <Text role="bodySm" tone="muted">
+            {item.itemsSummaryLabel
+              ? `${item.itemsCountLabel}: ${item.itemsSummaryLabel}`
+              : item.itemsCountLabel}
+          </Text>
+        </Box>
+
+        {/* ─── Zone 4: Finance + next owner ────────────────────────────── */}
+        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
+          <Text role="bodyStrong">{item.amountLabel}</Text>
+          {item.paymentLabel ? <Text role="bodySm" tone="muted">· {item.paymentLabel}</Text> : null}
+          {item.nextOwnerLabel ? (
+            <Text role="bodySm" tone="muted">· الجهة التالية: {item.nextOwnerLabel}</Text>
+          ) : null}
+        </Box>
+
+        {/* ─── Operational note: next action ───────────────────────────── */}
+        <Text role="caption" tone={statusTone}>
+          الإجراء التالي: {item.nextActionLabel}
+        </Text>
+      </Box>
+    </Card>
+  );
 }
 
+// ─── Main Screen ───────────────────────────────────────────────────────────────
 export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const {
     state = 'ready',
     items = demoOrders,
-    branchLabel = 'الرياض، فرع الياسمين',
-    quickAlert = 'هناك طلبات تحتاج قبولًا أو متابعة سريعة خلال الدقائق القادمة.',
     searchMode = false,
-    orderMode,
-    showOrderConversation = true,
-    showOrderAlerts = true,
     onCloseSearch,
     onOpenOrderAction,
-    onOpenEntryPress,
-    onOpenMaintenancePress,
-    onOpenInventoryManagementPress,
     onRetry,
   } = props;
   const { direction } = useDirection();
@@ -322,12 +417,28 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const [advancedPanelVisible, setAdvancedPanelVisible] = React.useState(false);
 
   const normalizedQuery = query.trim().toLowerCase();
+
   const summary = React.useMemo(() => ({
     active: items.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
     urgent: items.filter((item) => item.urgent || item.priority === 'high').length,
     needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready' || item.status === 'ready' || item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving').length,
     issues: items.filter((item) => item.issueRequired || item.status === 'cancelled').length,
   }), [items]);
+
+  // Per-stage counts for chip labels
+  const stageCounts = React.useMemo(() => {
+    const counts: Partial<Record<OrderStageFilterId, number>> = {};
+    for (const item of items) {
+      if (item.status === 'new' || item.status === 'needs_accept') counts.acceptance = (counts.acceptance ?? 0) + 1;
+      else if (item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready') counts.preparation = (counts.preparation ?? 0) + 1;
+      else if (item.status === 'ready') counts.ready = (counts.ready ?? 0) + 1;
+      else if (item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving') counts.handoff = (counts.handoff ?? 0) + 1;
+      else if (item.status === 'delivering') counts.delivering = (counts.delivering ?? 0) + 1;
+      else if (item.status === 'cancelled') counts.issues = (counts.issues ?? 0) + 1;
+      if (item.issueRequired) counts.issues = (counts.issues ?? 0) + 1;
+    }
+    return counts;
+  }, [items]);
 
   const filteredItems = React.useMemo(() => {
     const scoped = items.filter((item) => {
@@ -365,7 +476,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
       const textMatch =
         normalizedQuery.length === 0
           ? true
-          : [item.orderCode, item.customerName, item.branchLabel, resolveStatusLabel(item.status)]
+          : [item.orderCode, item.customerName, item.branchLabel, resolveStatusLabel(item.status), item.itemsSummaryLabel ?? '']
               .join(' ')
               .toLowerCase()
               .includes(normalizedQuery);
@@ -559,7 +670,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
               />
             </Box>
             <Button
-              label={`فلترة ${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}`}
+              label={`فلترة${activeFiltersCount > 0 ? ` (${activeFiltersCount})` : ''}`}
               tone={activeFiltersCount > 0 ? 'primary' : 'secondary'}
               size="md"
               fullWidth={false}
@@ -569,17 +680,21 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
           {renderActiveTokens()}
         </Surface>
 
-        {/* ─── Stage chip rail (flat, no card wrapper) ─────────── */}
+        {/* ─── Stage chip rail — with per-stage count ───────────── */}
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2} paddingHorizontal={1} paddingVertical={1}>
-          {stageFilters.map((filter) => (
-            <Chip
-              key={filter.id}
-              label={filter.label}
-              selected={selectedStage === filter.id}
-              tone={filter.tone}
-              onPress={() => setSelectedStage(filter.id)}
-            />
-          ))}
+          {stageFilters.map((filter) => {
+            const count = filter.id === 'all' ? items.length : (stageCounts[filter.id] ?? 0);
+            const label = filter.id === 'all' ? `الكل ${count}` : count > 0 ? `${filter.label} ${count}` : filter.label;
+            return (
+              <Chip
+                key={filter.id}
+                label={label}
+                selected={selectedStage === filter.id}
+                tone={filter.tone}
+                onPress={() => setSelectedStage(filter.id)}
+              />
+            );
+          })}
         </Box>
 
         {/* ─── Order list ──────────────────────────────────────── */}
@@ -601,35 +716,14 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
           ) : (
             <Box gap={3}>
               {filteredItems.map((item) => (
-                <Card
+                <OrderCard
                   key={item.id}
-                  title={`${item.orderCode} · ${item.customerName}`}
-                  subtitle={`${item.branchLabel} · ${resolveStatusLabel(item.status)} · ${item.orderTypeLabel}`}
-                  padding={4}
-                  gap={3}
-                  footer={
-                    <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-                      <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={() => openPrimaryAction(item)} />
-                      <Button label="عرض التفاصيل" size="sm" tone="secondary" fullWidth={false} onPress={() => openOrderDetail(item.id)} />
-                      <Chip label="معاينة سريعة" tone="info" onPress={() => openQuickView(item.id)} />
-                    </Box>
-                  }
-                >
-                  <Box gap={2}>
-                    <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-                      <Chip label={resolvePriorityLabel(item.priority)} tone={resolvePriorityTone(item.priority)} selected />
-                      <Chip label={item.orderTypeLabel} tone="brand" />
-                      <Chip label={item.itemsCountLabel} />
-                      <Chip label={item.amountLabel} tone="success" />
-                      {item.unread ? <Chip label="غير مقروء" tone="warning" /> : null}
-                      {item.slaRisk ? <Chip label="SLA قريب" tone="danger" /> : null}
-                    </Box>
-                    <Text role="bodySm" tone="muted">{item.createdAtLabel} · {item.elapsedLabel}</Text>
-                    <Text role="caption" tone={resolveStatusTone(item.status)}>
-                      الإجراء التالي: {item.nextActionLabel}
-                    </Text>
-                  </Box>
-                </Card>
+                  item={item}
+                  direction={direction}
+                  onPrimaryAction={() => openPrimaryAction(item)}
+                  onViewDetails={() => openOrderDetail(item.id)}
+                  onQuickView={() => openQuickView(item.id)}
+                />
               ))}
             </Box>
           )}
@@ -637,18 +731,28 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
 
       </MobileScrollView>
 
+      {/* ─── Quick view sheet ─────────────────────────────────── */}
       <SheetFrame visible={detailsVisible} title={selectedOrder ? `معاينة ${selectedOrder.orderCode}` : 'معاينة الطلب'} onClose={() => setDetailsVisible(false)}>
         {selectedOrder ? (
           <Box gap={3}>
             <Box gap={1}>
               <Text role="titleSm">{selectedOrder.customerName}</Text>
-              <Text role="bodySm" tone="muted">{selectedOrder.branchLabel}</Text>
+              <Text role="bodySm" tone="muted">{selectedOrder.branchLabel} · {selectedOrder.orderTypeLabel}</Text>
             </Box>
             <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
               <Chip label={resolveStatusLabel(selectedOrder.status)} tone={resolveStatusTone(selectedOrder.status)} selected />
-              <Chip label={selectedOrder.orderTypeLabel} tone="brand" />
               <Chip label={selectedOrder.amountLabel} tone="success" />
+              {selectedOrder.priority === 'high' ? <Chip label="أولوية عالية" tone="danger" /> : null}
+              {selectedOrder.slaRisk ? <Chip label={selectedOrder.slaLabel ?? 'SLA قريب'} tone="danger" /> : null}
             </Box>
+            {selectedOrder.itemsSummaryLabel ? (
+              <Text role="bodySm" tone="muted">{selectedOrder.itemsCountLabel}: {selectedOrder.itemsSummaryLabel}</Text>
+            ) : (
+              <Text role="bodySm" tone="muted">{selectedOrder.itemsCountLabel}</Text>
+            )}
+            {selectedOrder.paymentLabel ? (
+              <Text role="bodySm" tone="muted">الدفع: {selectedOrder.paymentLabel}</Text>
+            ) : null}
             <Text role="bodySm" tone="muted">الإجراء التالي: {selectedOrder.nextActionLabel}</Text>
             <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
               <Button label={selectedOrder.nextActionLabel} fullWidth={false} onPress={() => openPrimaryAction(selectedOrder)} />
@@ -658,6 +762,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
         ) : null}
       </SheetFrame>
 
+      {/* ─── Advanced filters sheet ───────────────────────────── */}
       <SheetFrame
         visible={advancedPanelVisible}
         title="الفلاتر المتقدمة والترتيب"
@@ -705,16 +810,19 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
 
           <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), marginTop: 8 }}>
             <Button
-              label="تطبيق الفلاتر"
+              label="تطبيق"
               style={{ flex: 1 }}
               onPress={() => setAdvancedPanelVisible(false)}
             />
             {hasActiveFilters && (
               <Button
-                label="إعادة ضبط"
+                label="مسح الكل"
                 tone="secondary"
                 style={{ flex: 1 }}
-                onPress={handleClearFilters}
+                onPress={() => {
+                  handleClearFilters();
+                  setAdvancedPanelVisible(false);
+                }}
               />
             )}
           </Box>
@@ -817,8 +925,6 @@ export function PartnerOrderDetailScreen({ state = 'ready', summary, onConfirmRe
         elapsedLabel: summary.readinessNote,
         nextActionLabel: summary.nextActionLabel,
       }] : undefined}
-      showOrderAlerts
-      showOrderConversation
       onOpenOrderAction={(actionId, orderId) => {
         if (actionId === 'ready' || actionId === 'handoff' || actionId === 'details') {
           onConfirmReady?.(orderId);
