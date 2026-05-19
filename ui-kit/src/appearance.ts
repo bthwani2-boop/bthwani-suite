@@ -360,7 +360,7 @@ function createShadow(
   };
 }
 
-const appearancePaletteByMode = appearanceModeRawPalettes as const satisfies Record<BThwaniAppearanceMode, BThwaniAppearancePalette>;
+const appearancePaletteByMode = appearanceModeRawPalettes satisfies Record<BThwaniAppearanceMode, BThwaniAppearancePalette>;
 
 export const lightThemeColors = {
   pageBackground: lightTheme.background,

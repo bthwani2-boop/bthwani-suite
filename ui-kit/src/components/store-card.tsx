@@ -246,7 +246,6 @@ export const StoreCardPremium = React.memo(
       prevItem.supportsPickup === nextItem.supportsPickup &&
       prevItem.supportsPartnerDelivery === nextItem.supportsPartnerDelivery &&
       prevItem.isFavorite === nextItem.isFavorite &&
-      prevItem.isFollowing === nextItem.isFollowing &&
       prevItem.followersCount === nextItem.followersCount &&
       prevItem.hasBthwaniPro === nextItem.hasBthwaniPro &&
       prevItem.hasOffer === nextItem.hasOffer &&

@@ -141,7 +141,7 @@ export function Badge({ label, tone = 'default', style }: BadgeProps) {
     warning: appearanceTokens.components.badges.warning,
     danger: appearanceTokens.components.badges.danger,
     info: appearanceTokens.components.badges.info,
-  }[tone ?? variant ?? 'primary'];
+  }[tone];
 
   return (
     <Pressable
@@ -185,7 +185,7 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
     info: appearanceTokens.components.badges.info,
     glass: appearanceTokens.components.chips.glass,
     glassStrong: appearanceTokens.components.chips.glassSelected,
-  }[tone ?? variant ?? 'primary'];
+  }[tone];
   const selectedPalette = tone === 'glass' || tone === 'glassStrong'
     ? appearanceTokens.components.chips.glassSelected
     : appearanceTokens.components.chips.selected;

@@ -24,7 +24,7 @@ export function CartConfirmationBlock({
     <Box gap={6} padding={6} align="center" style={styles.container}>
       <Surface
         tone="success"
-        radiusToken="full"
+        radiusToken="pill"
         padding={4}
         border={false}
         style={[

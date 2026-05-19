@@ -41,7 +41,6 @@ export function SupportTicketDetailWorkspace({
   return (
     <WebControlPanelInspectorShell
       title={`تذكرة ${ticketCode}`}
-      subtitle={subject}
       onClose={onClose}
     >
       <Box gap={4} padding={4}>

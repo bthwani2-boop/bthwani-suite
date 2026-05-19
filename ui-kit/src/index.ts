@@ -133,7 +133,7 @@ export type {
 } from './providers';
 export {
 	MobileRoot,
-} from './mobile.tsx';
+} from './mobile';
 export type {
 	MobileRootProps,
 } from './mobile';

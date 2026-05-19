@@ -6,6 +6,7 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
+import styles from '../shared/control-panel-surface.module.css';
 
 type DeactivationReason =
   | 'sla_breach'
@@ -40,23 +41,20 @@ export function PartnerDeactivationWorkspace({
   return (
     <WebControlPanelInspectorShell
       title={`إيقاف الشريك — ${partnerName}`}
-      subtitle={`معرف الشريك: ${partnerId}`}
       onClose={onClose}
     >
       <Box gap={4} padding={4}>
         <Text role="bodyMd" tone="muted">اختر سبب الإيقاف:</Text>
         <Box gap={2}>
           {deactivationReasons.map((reason) => (
-            <Box
+            <button
               key={reason.id}
-              padding={3}
-              background={selectedReason === reason.id ? 'brandSurface' : 'surfaceRaised'}
-              radiusToken="md"
-              style={{ cursor: 'pointer' }}
-              onPress={() => setSelectedReason(reason.id)}
+              type="button"
+              onClick={() => setSelectedReason(reason.id)}
+              className={`${styles.selectableReasonItem} ${selectedReason === reason.id ? styles.selectableReasonItemActive : ''}`}
             >
               <Text role="bodySm" tone={selectedReason === reason.id ? 'brand' : 'default'}>{reason.label}</Text>
-            </Box>
+            </button>
           ))}
         </Box>
         <WebControlPanelActionCluster

@@ -123,7 +123,7 @@ export type DshHomeGetScreenProps = {
   onCloseSheinInline?: () => void;
   awnakInlineVisible?: boolean;
   onCloseAwnakInline?: () => void;
-  homeBackResolverRef?: React.MutableRefObject<(() => boolean) | null>;
+  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
   onRetry?: () => void;
   notificationCount?: number;
@@ -608,7 +608,7 @@ export function DshHomeGetScreen({
   onCloseSheinInline,
   awnakInlineVisible = false,
   onCloseAwnakInline,
-  homeBackResolverRef,
+  onRegisterBackHandler,
   approvedVideoShorts = [],
   renderApprovedVideoReelsViewer,
   onRetry,
@@ -795,25 +795,26 @@ export function DshHomeGetScreen({
     return () => clearInterval(timer);
   }, []);
 
-  React.useEffect(() => {
-    if (!homeBackResolverRef) return;
-    homeBackResolverRef.current = () => {
-      if (categoriesSheetVisible) { setCategoriesSheetVisible(false); return true; }
-      if (shortsVisible) { setShortsVisible(false); return true; }
-      if (inlineSearchVisible) { setInlineSearchVisible(false); setInlineSearchQuery(''); return true; }
-      if (serviceDialVisible) { setServiceDialVisible(false); return true; }
-      if (activeCategoryId !== 'all') {
-        const matched = categoryItems.find((c) => c.id === activeCategoryId);
-        if (matched?.renderMode === 'manual-order') {
-          const formShowing = (activeCategoryId === 'shein' && sheinInlineVisible) ||
-                              (activeCategoryId === 'awnak' && awnakInlineVisible);
-          if (!formShowing) { selectCategoryPage('all'); return true; }
-        }
+  const homeBackHandler = React.useCallback(() => {
+    if (categoriesSheetVisible) { setCategoriesSheetVisible(false); return true; }
+    if (shortsVisible) { setShortsVisible(false); return true; }
+    if (inlineSearchVisible) { setInlineSearchVisible(false); setInlineSearchQuery(''); return true; }
+    if (serviceDialVisible) { setServiceDialVisible(false); return true; }
+    if (activeCategoryId !== 'all') {
+      const matched = categoryItems.find((c) => c.id === activeCategoryId);
+      if (matched?.renderMode === 'manual-order') {
+        const formShowing = (activeCategoryId === 'shein' && sheinInlineVisible) ||
+                            (activeCategoryId === 'awnak' && awnakInlineVisible);
+        if (!formShowing) { selectCategoryPage('all'); return true; }
       }
-      return false;
-    };
-    return () => { homeBackResolverRef.current = null; };
-  }, [homeBackResolverRef, categoriesSheetVisible, shortsVisible, inlineSearchVisible, serviceDialVisible, activeCategoryId, categoryItems, sheinInlineVisible, awnakInlineVisible, selectCategoryPage]);
+    }
+    return false;
+  }, [categoriesSheetVisible, shortsVisible, inlineSearchVisible, serviceDialVisible, activeCategoryId, categoryItems, sheinInlineVisible, awnakInlineVisible, selectCategoryPage]);
+
+  React.useEffect(() => {
+    onRegisterBackHandler?.(homeBackHandler);
+    return () => { onRegisterBackHandler?.(null); };
+  }, [onRegisterBackHandler, homeBackHandler]);
 
   const resolveHomeCategoryContext = React.useCallback((targetId?: string) => {
     if (!targetId) {

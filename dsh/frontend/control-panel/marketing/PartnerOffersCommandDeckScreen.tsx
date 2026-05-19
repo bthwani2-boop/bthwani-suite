@@ -176,7 +176,7 @@ export function PartnerOffersCommandDeckScreen() {
   const handlePublish = (id: string) => {
     const item = items.find(i => i.id === id);
     if (!item) return;
-    const errors = validatePartnerOfferForPublish(item);
+    const errors = validatePartnerOfferForPublish(item as unknown as Parameters<typeof validatePartnerOfferForPublish>[0]);
     if (errors.length > 0) {
       console.warn('[PartnerOffers] Publish blocked:', errors);
       return;

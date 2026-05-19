@@ -55,7 +55,7 @@ const DirectionContext = createContext<DirectionContextValue>({
 	direction: directionConfig.defaultDirection,
 	language: directionConfig.defaultLanguage,
 	isRtl: directionConfig.defaultDirection === 'rtl',
-	usesLogicalStartEnd: directionConfig.useLogicalStartEnd,
+	usesLogicalStartEnd: directionConfig.logicalStartEnd,
 	setLanguage: () => undefined,
 });
 
@@ -237,7 +237,7 @@ export function DirectionProvider({ language = directionConfig.defaultLanguage, 
 			direction: resolvedDirection,
 			language: activeLanguage,
 			isRtl: resolvedDirection === 'rtl',
-			usesLogicalStartEnd: directionConfig.useLogicalStartEnd,
+			usesLogicalStartEnd: directionConfig.logicalStartEnd,
 			setLanguage,
 		}),
 		[activeLanguage, resolvedDirection, setLanguage]

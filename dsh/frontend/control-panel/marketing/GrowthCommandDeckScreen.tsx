@@ -132,8 +132,8 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
         displayBadge: 'توصيل مجاني',
       },
     ] as PartnerOfferRecord[],
-    activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [] }] as SubscriptionPlan[],
-    activeEntitlements: [{ id: 'ent-1', type: 'reward', referenceId: 'sub-pro', status: 'active' }] as Entitlement[],
+    activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [], status: 'active' }] as SubscriptionPlan[],
+    activeEntitlements: [{ id: 'ent-1', type: 'loyalty-reward', referenceId: 'sub-pro', status: 'active', source: 'loyalty' }] as Entitlement[],
     activeCampaigns: [] as CampaignRecord[],
     catalogFeatures: { priceMatch: true, hasNewProducts: false }
   }), []);

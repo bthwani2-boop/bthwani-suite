@@ -132,7 +132,7 @@ export function DateTimePicker({
           {/* Header */}
           <Box padding={4} layoutDirection="row" style={styles.header}>
             <Pressable onPress={handleBack} style={styles.iconButton}>
-              <Icon name={step === 'date' ? 'close' : 'chevron-back'} size={24} color={theme.textPrimary} />
+              <Icon name={step === 'date' ? 'close' : 'chevron-back'} size={24} color={theme.text} />
             </Pressable>
             <Box style={{ flex: 1, alignItems: 'center' }}>
               <Text role="titleMd" style={styles.title}>

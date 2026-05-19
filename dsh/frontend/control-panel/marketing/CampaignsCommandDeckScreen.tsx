@@ -468,7 +468,7 @@ export function CampaignsCommandDeckScreen() {
           storeId: 'store-preview',
           activeOffers: [],
           activeSubscriptions: [],
-          activeEntitlements: draft.linkedLoyaltyBenefitId ? [{ id: 'mock', type: 'reward', referenceId: draft.linkedLoyaltyBenefitId, status: 'active' } as Entitlement] : [],
+          activeEntitlements: draft.linkedLoyaltyBenefitId ? [{ id: 'mock', type: 'loyalty-reward', referenceId: draft.linkedLoyaltyBenefitId, status: 'active', source: 'loyalty' } as Entitlement] : [],
           activeCampaigns: [draft as CampaignRecord],
         };
         const features = mapStoreCommercialFeatures(mockContext);

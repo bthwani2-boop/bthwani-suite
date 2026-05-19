@@ -404,7 +404,7 @@ export const directionConfig = {
 	languageStorageKey: 'bth-language',
 	supportedDirections: ['rtl', 'ltr'] as const,
 	rtlLanguages: ['ar', 'fa', 'he', 'ur'] as const,
-	useLogicalStartEnd: true,
+	logicalStartEnd: true,
 	mirroredDirectionalIcons: true
 };
 

@@ -396,7 +396,7 @@ export function ControlPanelDshCatalogScreen({
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle} style={{ letterSpacing: -0.18 }}>كتالوج DSH</h1>
               <Box paddingX={1} paddingY={1} background="brandSurface" radiusToken="xs">
-                 <Text role="caption" className={styles.surfaceHeaderBadgeText}>حوكمة الماستر</Text>
+                 <span className={styles.surfaceHeaderBadgeText}>حوكمة الماستر</span>
               </Box>
             </div>
             <p className={styles.surfaceHeaderSubtitle}>إدارة المنتجات والفئات ومخاطر التبني عبر الأسطح</p>

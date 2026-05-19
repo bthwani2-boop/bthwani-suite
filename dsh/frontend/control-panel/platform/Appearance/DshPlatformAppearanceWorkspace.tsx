@@ -55,6 +55,7 @@ export function DshPlatformAppearanceWorkspace() {
           <WebSignalCard
             title="فحص التباين (Contrast)"
             value="سليم 100%"
+            description="نسبة التباين مطابقة لمعايير إمكانية الوصول."
             tone="neutral"
           />
         </Box>

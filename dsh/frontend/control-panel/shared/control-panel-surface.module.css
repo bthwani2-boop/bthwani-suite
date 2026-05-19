@@ -396,6 +396,19 @@
   color: var(--bthwani-control-panel-text-soft);
 }
 
+.selectableReasonItem {
+  all: unset;
+  display: block;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--bthwani-control-panel-surface-inset);
+}
+
+.selectableReasonItemActive {
+  background-color: var(--bthwani-brand-surface);
+}
+
 @media (max-width: 1024px) {
   .surfaceSplitGrid {
     grid-template-columns: 1fr;

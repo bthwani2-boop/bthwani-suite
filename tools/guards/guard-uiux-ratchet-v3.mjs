@@ -9,6 +9,7 @@ const files = walk(args.root).filter(f => isTextFile(f) && /\.(tsx|ts|js|mjs|md|
 const brandHex = new Set(['#0A2F5C','#0a2f5c','#FF500D','#ff500d','#FFFFFF','#ffffff']);
 for (const f of files) {
   const rp = path.relative(args.root,f).replace(/\\/g,'/');
+  if (rp === 'ui-kit/src/foundation.ts') continue; // color palette source — intentional raw hex definitions, not a consumer
   const txt = readText(f); if (!txt) continue;
   let m;
   const insideUiKit = rp.startsWith('packages/ui-kit/') || rp.startsWith('ui-kit/'); // not active path ref: scanned-file classification

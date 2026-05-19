@@ -18,7 +18,6 @@ export function AuditTrailDetailWorkspace({
   return (
     <WebControlPanelInspectorShell
       title={`سجل التدقيق — ${orderId}`}
-      subtitle="مسار الطلب الكامل من البداية إلى النهاية"
       onClose={onClose}
     >
       <Box gap={4} padding={4}>

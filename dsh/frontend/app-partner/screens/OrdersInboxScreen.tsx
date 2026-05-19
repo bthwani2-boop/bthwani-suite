@@ -309,10 +309,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const [acceptSheetVisible, setAcceptSheetVisible] = React.useState(false);
   const [acceptingOrderId, setAcceptingOrderId] = React.useState<string | null>(null);
 
-  if (state !== 'ready') {
-    return renderState(state, onRetry);
-  }
-
   const normalizedQuery = query.trim().toLowerCase();
   const summary = React.useMemo(() => ({
     active: items.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
@@ -392,6 +388,10 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
       setSelectedOrderId(filteredItems[0].id);
     }
   }, [filteredItems, selectedOrderId]);
+
+  if (state !== 'ready') {
+    return renderState(state, onRetry);
+  }
 
   const selectedOrderMode = orderMode ?? selectedOrder?.orderMode ?? 'pickup';
   const activeFilterLabel = smartFilters.find((item) => item.id === smartFilter)?.label ?? 'الكل';

@@ -14,7 +14,8 @@ export default [
       "**/dist/**",
       "**/build/**",
       "**/.expo/**",
-      "**/tamagui.generated.css"
+      "**/tamagui.generated.css",
+      "tools/registry/runs/**"
     ],
   },
   js.configs.recommended,
@@ -42,7 +43,7 @@ export default [
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-      "react-compiler/react-compiler": "warn", // React Compiler readiness only; runtime compiler is not enabled
+      "react-compiler/react-compiler": "error", // React Compiler hardened gate; compiler is enabled in all 7 surfaces.
     },
     settings: {
       react: {

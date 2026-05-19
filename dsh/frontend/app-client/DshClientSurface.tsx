@@ -435,6 +435,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
   const homeBackResolverRef = React.useRef<(() => boolean) | null>(null);
+  const handleRegisterBackHandler = React.useCallback((handler: (() => boolean) | null) => {
+    homeBackResolverRef.current = handler;
+  }, []);
 
   React.useEffect(() => {
     const nextRoute = commandTargetToRoute(command.target);
@@ -1279,7 +1282,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       onCloseSheinInline={() => setSheinInlineOpen(false)}
       awnakInlineVisible={awnakInlineOpen}
       onCloseAwnakInline={() => setAwnakInlineOpen(false)}
-      homeBackResolverRef={homeBackResolverRef}
+      onRegisterBackHandler={handleRegisterBackHandler}
       renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
       onRetry={() => setRoute('home')}
     />
