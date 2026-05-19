@@ -42,7 +42,7 @@ export default [
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-      // "react-compiler/react-compiler": "error", // readiness-only, not enforced yet
+      "react-compiler/react-compiler": "warn", // React Compiler readiness only; runtime compiler is not enabled
     },
     settings: {
       react: {
