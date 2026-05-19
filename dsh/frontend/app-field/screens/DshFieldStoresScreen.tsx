@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { Badge, Box, Button, Card, colorPalette, Icon, MobileScrollView, ScreenHeader, SearchField, StateView, Text, TopBar } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Card, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar } from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
 import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../data/field-stores.preview-data';
@@ -68,10 +68,8 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
 
   return (
     <Box style={{ flex: 1 }} background="background">
-      <TopBar
-        variant="brand"
+      <ModernPremiumHeader
         title="بثواني"
-        subtitle="تشغيل الميدان · ملفات المتاجر"
         locationLabel="الرياض · جولة المتاجر"
         actions={[
           {
@@ -87,6 +85,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
             accessibilityLabel: 'التنبيهات',
           },
         ]}
+        direction="rtl"
       />
 
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 128 }}>

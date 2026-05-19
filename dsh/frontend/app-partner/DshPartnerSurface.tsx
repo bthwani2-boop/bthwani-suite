@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform } from 'react-native';
-import { Box, Button, Icon, Surface, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, colorPalette, Icon, ModernPremiumHeader, Surface, Text, TopBar, useTheme, BottomNavBar, MobileScrollView } from '@bthwani/ui-kit';
 import { wltDshPartnerUiCopy } from '../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import type {
   DshPartnerRoute,
@@ -346,40 +346,16 @@ export function DshPartnerSurface({
   }, [openAccountHub]);
 
   const topBar = (
-    <TopBar
-      variant="brand"
-      layoutMode="relaxed-main"
+    <ModernPremiumHeader
       title={maintenanceProfile.storeName}
-      locationLabel={`الرياض، ${selectedStoreScope.label}`}
-      onTitlePress={openStoreScope}
-      titleAccessibilityLabel="فتح اختيار المتجر أو الفرع"
-      actions={[
-        {
-          id: 'profile',
-          icon: <Icon name="person-outline" size={21} color={theme.brandContrast} />,
-          accessibilityLabel: 'الحساب',
-          onPress: () => openAccountHub('hub'),
-        },
-        {
-          id: 'notifications',
-          icon: <Icon name="notifications-outline" size={21} color={theme.brandContrast} />,
-          badgeCount: 3,
-          accessibilityLabel: 'الإشعارات',
-          onPress: () => setRoute('bell'),
-        },
-        {
-          id: 'wallet',
-          icon: <Icon name="wallet-outline" size={21} color={theme.brandContrast} />,
-          accessibilityLabel: 'المحفظة والحسابات المالية',
-          onPress: () => openAccountHub('wallet'),
-        },
-        {
-          id: 'search',
-          icon: <Icon name="search-outline" size={21} color={theme.brandContrast} />,
-          accessibilityLabel: 'البحث',
-          onPress: openOrdersSearch,
-        },
-      ]}
+      locationLabel={`الرياض · ${selectedStoreScope.label} · ${maintenanceProfile.activeZoneLabel}`}
+      onProfilePress={() => openAccountHub('profile')}
+      onNotificationsPress={() => setRoute('bell')}
+      onSearchPress={openOrdersSearch}
+      onLocationPress={openStoreScope}
+      tickerStatus="مباشر"
+      tickerMessage="الطلبات والمخزون تحت المتابعة الآن."
+      direction="rtl"
     />
   );
 
@@ -400,6 +376,63 @@ export function DshPartnerSurface({
       onSelect={setSelectedStoreScopeId}
     />
   );
+
+  const showBottomNav =
+    route === 'inbox' ||
+    route === 'detail' ||
+    route === 'inventory-management' ||
+    route === 'home' ||
+    route === 'support-directory' ||
+    route === 'support-screen';
+
+  const bottomActiveId = React.useMemo(() => {
+    if (route === 'home') {
+      if (accountHubSection === 'wallet') {
+        return 'wallet';
+      }
+      if (accountHubSection === 'operations') {
+        return 'operations';
+      }
+      if (accountHubSection === 'inventory') {
+        return 'inventory';
+      }
+      return 'profile';
+    }
+    if (route === 'inventory-management') {
+      return 'inventory';
+    }
+    if (route === 'support-directory' || route === 'support-screen') {
+      return 'operations';
+    }
+    return '';
+  }, [route, accountHubSection]);
+
+  const bottomNavBar = showBottomNav ? (
+    <BottomNavBar
+      activeId={bottomActiveId}
+      direction="rtl"
+      launcherLabel="الطلبات"
+      launcherIcon="receipt-outline"
+      onLauncherPress={openOrdersBoard}
+      onSelect={(id: string) => {
+        if (id === 'profile') {
+          openAccountHub('hub');
+        } else if (id === 'wallet') {
+          openAccountHub('wallet');
+        } else if (id === 'inventory') {
+          openInventoryManagement();
+        } else if (id === 'operations') {
+          openSupportDirectory();
+        }
+      }}
+      items={[
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+        { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
+        { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
+      ]}
+    />
+  ) : null;
 
   const renderMainShell = (content: React.ReactNode) => (
     <Box style={{ flex: 1 }} background="background">
@@ -422,6 +455,7 @@ export function DshPartnerSurface({
       </Surface>
       {walletHubSheet}
       {storeScopeSheet}
+      {bottomNavBar}
     </Box>
   );
 
@@ -432,6 +466,7 @@ export function DshPartnerSurface({
       </Surface>
       {walletHubSheet}
       {storeScopeSheet}
+      {bottomNavBar}
     </Box>
   );
 
@@ -453,6 +488,7 @@ export function DshPartnerSurface({
         urgentOrdersCount={deliveryOpsSummary.delayedRisk}
         pendingActionsCount={deliveryOpsSummary.handoffReady}
         onOpenOrdersBoard={openOrdersBoard}
+        onOpenOrdersSearch={openOrdersSearch}
         onOpenInventoryManagement={openInventoryManagement}
         onOpenStoreScope={openStoreScope}
         onOpenSupportDirectory={openSupportDirectory}

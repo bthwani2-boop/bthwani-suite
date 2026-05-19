@@ -67,6 +67,7 @@ export type DshPartnerHubSurfaceProps = {
   urgentOrdersCount?: number;
   pendingActionsCount?: number;
   onOpenOrdersBoard?: () => void;
+  onOpenOrdersSearch?: () => void;
   onOpenInventoryManagement?: () => void;
   onOpenStoreScope?: () => void;
   onOpenSupportDirectory?: () => void;

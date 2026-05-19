@@ -12,6 +12,7 @@ import {
   MobileCommandSectionList,
   MobileScrollView,
   MobileStickyPrimaryAction,
+  ModernPremiumHeader,
   StateView,
   Surface,
   Text,
@@ -63,8 +64,7 @@ type HubNavigationItem = {
   title: string;
   description: string;
   icon: React.ComponentProps<typeof Icon>['name'];
-  kind: 'orders' | 'section';
-  section?: Exclude<PartnerHubSection, 'hub'>;
+  section: Exclude<PartnerHubSection, 'hub'>;
 };
 
 type SummaryItem = {
@@ -105,7 +105,7 @@ const defaultCoverageZones: readonly PartnerCoverageZone[] = [
   { id: 'nada', name: 'الندى', subtitle: 'نطاق قريب مع طلب ثابت.', active: true },
 ] as const;
 
-const partnerHubBottomInset = 112;
+const partnerHubBottomInset = 144;
 
 const defaultNotificationPreferences: NotificationPreferenceState = {
   orders: true,
@@ -138,50 +138,10 @@ const partnerAppearanceOptions: ReadonlyArray<{
 
 const hubNavigationItems: readonly HubNavigationItem[] = [
   {
-    id: 'orders',
-    title: 'الطلبات',
-    description: 'إدارة الطلبات الحالية والسابقة وتتبع حالتها.',
-    icon: 'receipt-outline',
-    kind: 'orders',
-  },
-  {
-    id: 'profile',
-    title: 'ملف المتجر',
-    description: 'بيانات المتجر، الهوية، الظهور، الفرع، والنطاق في مساحة واحدة.',
-    icon: 'storefront-outline',
-    kind: 'section',
-    section: 'profile',
-  },
-  {
-    id: 'operations',
-    title: 'العمليات والفريق',
-    description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
-    icon: 'people-outline',
-    kind: 'section',
-    section: 'operations',
-  },
-  {
-    id: 'inventory',
-    title: 'المخزون والكتالوج',
-    description: 'بحث أولًا، إضافة ذكية، أسعار ومخزون بدون تكرار.',
-    icon: 'cube-outline',
-    kind: 'section',
-    section: 'inventory',
-  },
-  {
-    id: 'wallet',
-    title: wltDshPartnerUiCopy.walletSectionTitle,
-    description: wltDshPartnerUiCopy.walletSectionDescription,
-    icon: 'wallet-outline',
-    kind: 'section',
-    section: 'wallet',
-  },
-  {
     id: 'analytics',
     title: 'التحليلات والنمو والتسويق',
     description: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
     icon: 'trending-up-outline',
-    kind: 'section',
     section: 'analytics',
   },
   {
@@ -189,7 +149,6 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
     title: 'الإعدادات',
     description: 'التنبيهات، اللغة، التفضيلات، وإعدادات المتجر.',
     icon: 'settings-outline',
-    kind: 'section',
     section: 'settings',
   },
 ] as const;
@@ -335,7 +294,6 @@ function PromotionIntentPanel({
     selectedItem?.status === 'partner-review' ? 'قيد الإرسال' :
     selectedItem?.status === 'marketing-ready' ? 'معتمد ومؤهل' :
     'مرفوض';
-
   const statusTone =
     selectedItem?.status === 'marketing-ready' ? 'success' :
     selectedItem?.status === 'partner-review' ? 'warning' :
@@ -559,6 +517,8 @@ function HubSectionShell({
     </MobileScrollView>
   );
 }
+
+
 
 function resolveServiceModeEnabled(serviceModes: readonly { id: string; enabled: boolean }[] | undefined, modeId: PartnerOperationalMode['id'], fallback: boolean) {
   const matched = serviceModes?.find((mode) => {
@@ -911,6 +871,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     activeOrdersCount = 13,
     serviceModes = [],
     onOpenOrdersBoard,
+    onOpenOrdersSearch,
+    onOpenInventoryManagement,
     onOpenStoreScope,
     onOpenSupportDirectory,
     onOpenWalletHub,
@@ -965,6 +927,15 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     onOpenSupportDirectory?.();
     onOpenSupportScreen?.('order-issue-queue');
   }
+
+  const openOrdersSearch = React.useCallback(() => {
+    if (onOpenOrdersSearch) {
+      onOpenOrdersSearch();
+      return;
+    }
+
+    onOpenOrdersBoard?.();
+  }, [onOpenOrdersBoard, onOpenOrdersSearch]);
 
   const summaryItems = React.useMemo<readonly SummaryItem[]>(
     () => [
@@ -1269,20 +1240,19 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   }
 
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <TopBar
-        variant="secondary"
-        title="مركز حساب الشريك"
-        subtitle={`${storeName} · ${branchLabel}`}
-        style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={onOpenOrdersBoard ? {
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: onOpenOrdersBoard,
-        } : undefined}
+    <Box style={{ flex: 1, position: 'relative' }} background="background">
+      <ModernPremiumHeader
+        title={resolvedStoreName}
+        locationLabel={`${resolvedBranchLabel} · ${resolvedActiveZoneLabel}`}
+        onProfilePress={() => updateSection('profile')}
+        onNotificationsPress={onOpenBell}
+        onSearchPress={openOrdersSearch}
+        onLocationPress={onOpenStoreScope}
+        tickerStatus="مباشر"
+        tickerMessage="الطلبات والمخزون تحت المتابعة الآن."
+        direction={direction === 'rtl' ? 'rtl' : 'ltr'}
       />
+      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
 
       <Surface tone="raised" padding={3} gap={3}>
         <View
@@ -1299,23 +1269,14 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
       </Surface>
 
       <MobileCommandSectionList
-        title="الأقسام الرئيسية"
-        subtitle="قائمة عمودية واضحة لكل قسم داخل الحساب."
+        title="الأقسام الثانوية"
+        subtitle="إعدادات وتحليلات إضافية فقط، دون تكرار التنقل الرئيسي في الأسفل."
         items={hubNavigationItems.map((item) => ({
           id: item.id,
           title: item.title,
           subtitle: item.description,
           icon: item.icon,
-          onPress: () => {
-            if (item.kind === 'orders') {
-              onOpenOrdersBoard?.();
-              return;
-            }
-
-            if (item.section) {
-              updateSection(item.section);
-            }
-          },
+          onPress: () => updateSection(item.section),
         }))}
       />
 
@@ -1370,6 +1331,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
         </View>
       </Surface>
     </MobileScrollView>
+
+    </Box>
   );
 }
 

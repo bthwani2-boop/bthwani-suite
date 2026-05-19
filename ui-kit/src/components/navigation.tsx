@@ -20,8 +20,10 @@ try {
 
 // ----- Modern Premium Header -----
 
+import type { TopBarAction } from './header';
+
 export type ModernPremiumHeaderProps = {
-  title: string;
+  title?: string;
   locationLabel?: string;
   onProfilePress?: () => void;
   onNotificationsPress?: () => void;
@@ -35,6 +37,7 @@ export type ModernPremiumHeaderProps = {
   onTickerPress?: () => void;
   onLocationPress?: () => void;
   direction?: Direction;
+  actions?: TopBarAction[];
 };
 
 function SmartNewsTicker({ message, status, onPress }: { message: string, status?: string, onPress?: () => void }) {
@@ -55,9 +58,6 @@ function SmartNewsTicker({ message, status, onPress }: { message: string, status
 
     translateX.setValue(-distance);
 
-    // useNativeDriver MUST be false: marquee translateX animations call
-    // __makeNative() which invokes findNodeHandle on a Fabric node that
-    // may not be attached yet, causing "property is not writable" crash.
     const animation = Animated.loop(
       Animated.timing(translateX, {
         toValue: distance,
@@ -147,6 +147,7 @@ export function ModernPremiumHeader({
   onTickerPress,
   onLocationPress,
   direction = 'rtl',
+  actions,
 }: ModernPremiumHeaderProps) {
   const insets = useSafeAreaInsets();
   const rowDirection = resolveRowDirection(direction);
@@ -160,20 +161,39 @@ export function ModernPremiumHeader({
       {/* Row 1: Actions | Location | Profile */}
       <View style={[styles.headerTopRow, { flexDirection: rowDirection }]}>
         <View style={[styles.actionCluster, { flexDirection: rowDirection }]}>
-          <HeaderIconButton
-            icon="search-outline"
-            onPress={onSearchPress}
-          />
-          <HeaderIconButton
-            icon="notifications-outline"
-            onPress={onNotificationsPress}
-            badge={notificationCount > 0 ? notificationCount : undefined}
-          />
-          <HeaderIconButton
-            icon="cart-outline"
-            onPress={onCartPress}
-            badge={cartCount > 0 ? cartCount : undefined}
-          />
+          {actions ? (
+            actions.map((action) => (
+              <HeaderIconButton
+                key={action.id}
+                icon={action.icon}
+                onPress={action.onPress}
+                badge={action.badgeCount}
+              />
+            ))
+          ) : (
+            <>
+              {onSearchPress && (
+                <HeaderIconButton
+                  icon="search-outline"
+                  onPress={onSearchPress}
+                />
+              )}
+              {onNotificationsPress && (
+                <HeaderIconButton
+                  icon="notifications-outline"
+                  onPress={onNotificationsPress}
+                  badge={notificationCount > 0 ? notificationCount : undefined}
+                />
+              )}
+              {onCartPress && (
+                <HeaderIconButton
+                  icon="cart-outline"
+                  onPress={onCartPress}
+                  badge={cartCount > 0 ? cartCount : undefined}
+                />
+              )}
+            </>
+          )}
         </View>
 
         <Pressable
@@ -181,16 +201,22 @@ export function ModernPremiumHeader({
           hitSlop={4}
           style={styles.locationContainer}
         >
-          <Text style={styles.brandText}>بثواني</Text>
-          <View style={[styles.locationBadge, { flexDirection: rowDirection }]}>
-            <Icon name="location" size={10} color={colorPalette.white} />
-            <Text role="caption" style={[styles.locationText, { fontSize: 11 }]} numberOfLines={1}>{locationLabel ?? 'حدد الموقع'}</Text>
-          </View>
+          <Text style={styles.brandText}>{title ?? 'بثواني'}</Text>
+          {locationLabel ? (
+            <View style={[styles.locationBadge, { flexDirection: rowDirection }]}>
+              <Icon name="location" size={10} color={colorPalette.white} />
+              <Text role="caption" style={[styles.locationText, { fontSize: 11 }]} numberOfLines={1}>{locationLabel}</Text>
+            </View>
+          ) : null}
         </Pressable>
 
-        <Pressable onPress={onProfilePress} style={styles.profileAvatar}>
-          <Icon name="person" size={20} color={colorPalette.brand} />
-        </Pressable>
+        {onProfilePress ? (
+          <Pressable onPress={onProfilePress} style={styles.profileAvatar}>
+            <Icon name="person" size={20} color={colorPalette.brand} />
+          </Pressable>
+        ) : (
+          <View style={{ width: 38 }} />
+        )}
       </View>
 
       {/* Row 2: Animated News Ticker */}
@@ -208,7 +234,7 @@ export function ModernPremiumHeader({
 function HeaderIconButton({ icon, onPress, badge }: { icon: any; onPress?: () => void; badge?: number }) {
   return (
     <Pressable onPress={onPress} style={styles.headerIconButton}>
-      <Icon name={icon} size={22} color={colorPalette.white} />
+      {React.isValidElement(icon) ? icon : <Icon name={icon} size={22} color={colorPalette.white} />}
       {badge !== undefined && badge > 0 && (
         <View style={styles.iconBadge} />
       )}
@@ -231,6 +257,8 @@ export type BottomNavBarProps = {
   onSelect: (id: string) => void;
   onLauncherPress?: () => void;
   direction?: Direction;
+  launcherLabel?: string;
+  launcherIcon?: React.ComponentProps<typeof Icon>['name'];
 };
 
 export function BottomNavBar({
@@ -239,6 +267,8 @@ export function BottomNavBar({
   onSelect,
   onLauncherPress,
   direction = 'rtl',
+  launcherLabel = 'الخدمات',
+  launcherIcon = 'grid',
 }: BottomNavBarProps) {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 44 : 12);
@@ -270,7 +300,7 @@ export function BottomNavBar({
 
           <View style={styles.launcherPlaceholder}>
             <Pressable onPress={onLauncherPress} style={styles.launcherButtonArea}>
-              <Text role="caption" style={[styles.launcherLabel, { color: tokens.accent }]}>الخدمات</Text>
+              <Text role="caption" style={[styles.launcherLabel, { color: tokens.accent }]}>{launcherLabel}</Text>
             </Pressable>
           </View>
 
@@ -288,7 +318,7 @@ export function BottomNavBar({
       {/* Floating Center Launcher */}
       <Pressable onPress={onLauncherPress} style={[styles.floatingLauncher, isDark ? { backgroundColor: tokens.glassSurfaceStrong } : null]}>
         <View style={styles.launcherInner}>
-          <Icon name="grid" size={24} color={colorPalette.white} />
+          <Icon name={launcherIcon} size={24} color={colorPalette.white} />
         </View>
       </Pressable>
     </View>
@@ -392,7 +422,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -1,
     right: -1,
-    backgroundColor: '#FF3B30',
+    backgroundColor: colorPalette.danger,
     minWidth: 7,
     height: 7,
     borderRadius: 4,

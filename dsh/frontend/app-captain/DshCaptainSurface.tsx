@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { AppearanceOptionCard, Badge, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { AppearanceOptionCard, Badge, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
@@ -855,34 +855,34 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
               };
 
   const topBar = (
-    <TopBar
-      variant="brand"
+    <ModernPremiumHeader
       title={captainDisplayName}
       locationLabel={wltDshCaptainUiCopy.topBarLocationLabel}
-      locationIcon={<Icon name="wallet-outline" size={14} color={theme.brandContrast} />}
+      locationIcon={<Icon name="wallet-outline" size={14} color={colorPalette.white} />}
       actions={[
         {
           id: 'account',
-          icon: <Icon name="person-outline" size={20} color={theme.brandContrast} />,
+          icon: <Icon name="person-outline" size={20} color={colorPalette.white} />,
           accessibilityLabel: 'الحساب',
           onPress: openCaptainAccount,
         },
-        { id: 'search', icon: <Icon name="search-outline" size={20} color={theme.brandContrast} />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
+        { id: 'search', icon: <Icon name="search-outline" size={20} color={colorPalette.white} />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
         {
           id: 'notifications',
-          icon: <Icon name="notifications-outline" size={20} color={theme.brandContrast} />,
+          icon: <Icon name="notifications-outline" size={20} color={colorPalette.white} />,
           badgeCount: 2,
           accessibilityLabel: 'الإشعارات',
           onPress: () => setRoute('bell'),
         },
         {
           id: 'wallet',
-          icon: <Icon name="wallet-outline" size={20} color={theme.brandContrast} />,
+          icon: <Icon name="wallet-outline" size={20} color={colorPalette.white} />,
           accessibilityLabel: wltDshCaptainUiCopy.walletAccessibilityLabel,
           onPress: () => openCaptainSupportScreen('cod-balance'),
         },
       ]}
       ticker={homeTicker}
+      direction="rtl"
     />
   );
 
@@ -1193,7 +1193,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     <Box style={{ flex: 1, position: 'relative' }}>
       {/* Map area - occupies remaining screen space */}
       <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ flex: 1, overflow: 'hidden', borderColor: theme.lineStrong }}>
-        <Box style={{ flex: 1, backgroundColor: '#EFF5FA', overflow: 'hidden' }}>
+        <Box style={{ flex: 1, backgroundColor: theme.surfaceSecondary, overflow: 'hidden' }}>
           <Box style={{ position: 'absolute', inset: 0, backgroundColor: withAlpha(colorPalette.white, 0.12) }} />
           <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.10) }} />
           <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08) }} />
