@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Box, Button, Card, Chip, MobileScrollView, SearchField, SearchTopBar, SheetFrame, StateView, Surface, Text, resolveRowDirection, useDirection, BottomNavBar } from '@bthwani/ui-kit';
+import { Box, Button, Card, Chip, MobileScrollView, SearchField, SearchTopBar, SheetFrame, StateView, Surface, Text, resolveRowDirection, useDirection } from '@bthwani/ui-kit';
 import { DshPartnerOrderAlertsPanel } from '../parts/PartnerOrderAlertsPanel';
 import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversationPanel';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
@@ -10,9 +10,31 @@ import type { DshPartnerOrderConversationMode } from '../data/partner-order-conv
 type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'items_ready' | 'ready' | 'handoff' | 'captain_assigned' | 'captain_arriving' | 'delivering' | 'completed' | 'cancelled';
 type PartnerOrderPriority = 'high' | 'normal' | 'low';
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
-type SmartFilterId = 'all' | 'needs_accept' | 'preparing' | 'ready' | 'handoff' | 'delivering' | 'issues' | 'completed';
-type QuickFilterId = 'urgent' | 'sla_risk' | 'pickup' | 'partner_delivery' | 'bthwani_delivery' | 'unread';
-type SortMode = 'newest' | 'priority' | 'sla';
+
+export type OrderStageFilterId =
+  | 'all'
+  | 'acceptance'
+  | 'preparation'
+  | 'ready'
+  | 'handoff'
+  | 'delivering'
+  | 'issues';
+
+export type QuickFilterId =
+  | 'urgent'
+  | 'sla_risk'
+  | 'unread'
+  | 'pickup'
+  | 'partner_delivery'
+  | 'bthwani_delivery'
+  | 'completed'
+  | 'cancelled';
+
+export type SortMode =
+  | 'next_action'
+  | 'newest'
+  | 'priority'
+  | 'sla';
 
 export type PartnerOrdersHomeScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'partial';
 
@@ -53,29 +75,31 @@ export type PartnerOrdersHomeScreenProps = {
   onRetry?: () => void;
 };
 
-const smartFilters: ReadonlyArray<{ id: SmartFilterId; label: string; tone: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }> = [
+const stageFilters: ReadonlyArray<{ id: OrderStageFilterId; label: string; tone: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' }> = [
   { id: 'all', label: 'الكل', tone: 'brand' },
-  { id: 'needs_accept', label: 'تحتاج قبول', tone: 'warning' },
-  { id: 'preparing', label: 'قيد التحضير', tone: 'info' },
-  { id: 'ready', label: 'جاهزة', tone: 'success' },
-  { id: 'handoff', label: 'تسليم للمندوب', tone: 'brand' },
+  { id: 'acceptance', label: 'قبول', tone: 'warning' },
+  { id: 'preparation', label: 'تجهيز', tone: 'info' },
+  { id: 'ready', label: 'جاهز', tone: 'success' },
+  { id: 'handoff', label: 'تسليم', tone: 'brand' },
   { id: 'delivering', label: 'في الطريق', tone: 'info' },
   { id: 'issues', label: 'مشاكل', tone: 'danger' },
-  { id: 'completed', label: 'مكتملة', tone: 'success' },
 ];
 
 const quickFilters: ReadonlyArray<{ id: QuickFilterId; label: string }> = [
   { id: 'urgent', label: 'عاجلة' },
   { id: 'sla_risk', label: 'SLA قريب' },
+  { id: 'unread', label: 'غير مقروء' },
   { id: 'pickup', label: 'استلم بنفسك' },
   { id: 'partner_delivery', label: 'توصيل المتجر' },
   { id: 'bthwani_delivery', label: 'توصيل بثواني' },
-  { id: 'unread', label: 'غير مقروء' },
+  { id: 'completed', label: 'مكتملة' },
+  { id: 'cancelled', label: 'ملغاة/مشكلة' },
 ];
 
 const sortModes: ReadonlyArray<{ id: SortMode; label: string }> = [
+  { id: 'next_action', label: 'الإجراء الأول' },
   { id: 'newest', label: 'الأحدث' },
-  { id: 'priority', label: 'الأعلى أولوية' },
+  { id: 'priority', label: 'الأولوية العالية' },
   { id: 'sla', label: 'الأقرب لـ SLA' },
 ];
 
@@ -286,49 +310,57 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     onRetry,
   } = props;
   const { direction } = useDirection();
-  const [smartFilter, setSmartFilter] = React.useState<SmartFilterId>('all');
-  const [quickFilter, setQuickFilter] = React.useState<QuickFilterId | null>(null);
-  const [sortMode, setSortMode] = React.useState<SortMode>('newest');
+  const [selectedStage, setSelectedStage] = React.useState<OrderStageFilterId>('all');
+  const [selectedQuickFilters, setSelectedQuickFilters] = React.useState<readonly QuickFilterId[]>([]);
+  const [sortMode, setSortMode] = React.useState<SortMode>('next_action');
   const [query, setQuery] = React.useState('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(items[0]?.id ?? null);
   const [detailsVisible, setDetailsVisible] = React.useState(false);
   // ML-016: acceptance timer sheet — shown when partner presses accept on a needs_accept order
   const [acceptSheetVisible, setAcceptSheetVisible] = React.useState(false);
   const [acceptingOrderId, setAcceptingOrderId] = React.useState<string | null>(null);
+  const [advancedPanelVisible, setAdvancedPanelVisible] = React.useState(false);
 
   const normalizedQuery = query.trim().toLowerCase();
   const summary = React.useMemo(() => ({
     active: items.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
     urgent: items.filter((item) => item.urgent || item.priority === 'high').length,
-    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready' || item.status === 'ready' || item.status === 'handoff').length,
+    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready' || item.status === 'ready' || item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving').length,
     issues: items.filter((item) => item.issueRequired || item.status === 'cancelled').length,
   }), [items]);
 
   const filteredItems = React.useMemo(() => {
     const scoped = items.filter((item) => {
-      const smartMatch =
-        smartFilter === 'all'
+      const stageMatch =
+        selectedStage === 'all'
           ? true
-          : smartFilter === 'issues'
-            ? Boolean(item.issueRequired || item.status === 'cancelled')
-            : smartFilter === 'completed'
-              ? item.status === 'completed'
-              : item.status === smartFilter;
+          : selectedStage === 'acceptance'
+            ? item.status === 'new' || item.status === 'needs_accept'
+            : selectedStage === 'preparation'
+              ? item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready'
+              : selectedStage === 'ready'
+                ? item.status === 'ready'
+                : selectedStage === 'handoff'
+                  ? item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving'
+                  : selectedStage === 'delivering'
+                    ? item.status === 'delivering'
+                    : selectedStage === 'issues'
+                      ? item.status === 'cancelled' || Boolean(item.issueRequired)
+                      : true;
 
-      const quickMatch =
-        quickFilter === null
-          ? true
-          : quickFilter === 'urgent'
-            ? Boolean(item.urgent || item.priority === 'high')
-            : quickFilter === 'sla_risk'
-              ? Boolean(item.slaRisk)
-              : quickFilter === 'pickup'
-                ? item.orderMode === 'pickup'
-                : quickFilter === 'partner_delivery'
-                  ? item.orderMode === 'partner_delivery'
-                  : quickFilter === 'bthwani_delivery'
-                    ? item.orderMode === 'bthwani_delivery'
-                    : Boolean(item.unread);
+      const quickMatch = selectedQuickFilters.length === 0
+        ? true
+        : selectedQuickFilters.every((qf) => {
+            if (qf === 'urgent') return Boolean(item.urgent || item.priority === 'high');
+            if (qf === 'sla_risk') return Boolean(item.slaRisk);
+            if (qf === 'unread') return Boolean(item.unread);
+            if (qf === 'pickup') return item.orderMode === 'pickup';
+            if (qf === 'partner_delivery') return item.orderMode === 'partner_delivery';
+            if (qf === 'bthwani_delivery') return item.orderMode === 'bthwani_delivery';
+            if (qf === 'completed') return item.status === 'completed';
+            if (qf === 'cancelled') return item.status === 'cancelled' || Boolean(item.issueRequired);
+            return true;
+          });
 
       const textMatch =
         normalizedQuery.length === 0
@@ -338,10 +370,22 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
               .toLowerCase()
               .includes(normalizedQuery);
 
-      return smartMatch && quickMatch && textMatch;
+      return stageMatch && quickMatch && textMatch;
     });
 
     return [...scoped].sort((left, right) => {
+      if (sortMode === 'next_action') {
+        const leftNeeds = left.status === 'new' || left.status === 'needs_accept' || left.status === 'preparation_started' || left.status === 'preparing' || left.status === 'items_ready' || left.status === 'ready' || left.status === 'handoff' || left.status === 'captain_assigned' || left.status === 'captain_arriving';
+        const rightNeeds = right.status === 'new' || right.status === 'needs_accept' || right.status === 'preparation_started' || right.status === 'preparing' || right.status === 'items_ready' || right.status === 'ready' || right.status === 'handoff' || right.status === 'captain_assigned' || right.status === 'captain_arriving';
+        if (leftNeeds !== rightNeeds) return leftNeeds ? -1 : 1;
+
+        const leftSla = left.slaRisk ? 1 : 0;
+        const rightSla = right.slaRisk ? 1 : 0;
+        if (leftSla !== rightSla) return rightSla - leftSla;
+
+        return right.createdAtLabel.localeCompare(left.createdAtLabel, 'ar');
+      }
+
       if (sortMode === 'priority') {
         const leftScore = left.priority === 'high' ? 3 : left.priority === 'normal' ? 2 : 1;
         const rightScore = right.priority === 'high' ? 3 : right.priority === 'normal' ? 2 : 1;
@@ -351,12 +395,13 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
       if (sortMode === 'sla') {
         const leftScore = left.slaRisk ? 1 : 0;
         const rightScore = right.slaRisk ? 1 : 0;
-        return rightScore - leftScore;
+        if (leftScore !== rightScore) return rightScore - leftScore;
+        return right.createdAtLabel.localeCompare(left.createdAtLabel, 'ar');
       }
 
       return right.createdAtLabel.localeCompare(left.createdAtLabel, 'ar');
     });
-  }, [items, normalizedQuery, quickFilter, smartFilter, sortMode]);
+  }, [items, normalizedQuery, selectedQuickFilters, selectedStage, sortMode]);
 
   const selectedOrder = React.useMemo(
     () => filteredItems.find((item) => item.id === selectedOrderId) ?? filteredItems[0] ?? null,
@@ -376,12 +421,75 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     }
   }, [filteredItems, selectedOrderId]);
 
+  const handleClearFilters = React.useCallback(() => {
+    setQuery('');
+    setSelectedStage('all');
+    setSelectedQuickFilters([]);
+    setSortMode('next_action');
+  }, []);
+
+  const hasActiveFilters = query.trim().length > 0 || selectedStage !== 'all' || selectedQuickFilters.length > 0 || sortMode !== 'next_action';
+  const activeFiltersCount = selectedQuickFilters.length + (selectedStage !== 'all' ? 1 : 0) + (sortMode !== 'next_action' ? 1 : 0);
+
+  const renderActiveTokens = () => {
+    const tokens: Array<{ id: string; label: string; onRemove: () => void }> = [];
+
+    if (selectedStage !== 'all') {
+      const label = stageFilters.find((s) => s.id === selectedStage)?.label ?? '';
+      tokens.push({
+        id: `stage-${selectedStage}`,
+        label: `مرحلة: ${label}`,
+        onRemove: () => setSelectedStage('all'),
+      });
+    }
+
+    selectedQuickFilters.forEach((qf) => {
+      const label = quickFilters.find((f) => f.id === qf)?.label ?? '';
+      tokens.push({
+        id: `qf-${qf}`,
+        label,
+        onRemove: () => setSelectedQuickFilters((current) => current.filter((x) => x !== qf)),
+      });
+    });
+
+    if (sortMode !== 'next_action') {
+      const label = sortModes.find((s) => s.id === sortMode)?.label ?? '';
+      tokens.push({
+        id: `sort-${sortMode}`,
+        label: `ترتيب: ${label}`,
+        onRemove: () => setSortMode('next_action'),
+      });
+    }
+
+    if (tokens.length === 0) return null;
+
+    return (
+      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center' }} gap={2} paddingVertical={2}>
+        {tokens.map((token) => (
+          <Chip
+            key={token.id}
+            label={`${token.label} ×`}
+            onPress={token.onRemove}
+            selected
+            tone="brand"
+          />
+        ))}
+        {tokens.length > 1 || query.trim().length > 0 ? (
+          <Button
+            label="مسح الكل"
+            size="sm"
+            tone="ghost"
+            fullWidth={false}
+            onPress={handleClearFilters}
+          />
+        ) : null}
+      </Box>
+    );
+  };
+
   if (state !== 'ready') {
     return renderState(state, onRetry);
   }
-
-  const selectedOrderMode = orderMode ?? selectedOrder?.orderMode ?? 'pickup';
-  const activeFilterLabel = smartFilters.find((item) => item.id === smartFilter)?.label ?? 'الكل';
 
   function openQuickView(orderId: string) {
     setSelectedOrderId(orderId);
@@ -406,100 +514,89 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
 
   return (
     <>
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 112 }}>
-        <Surface tone="raised" padding={3} gap={3}>
-          <Box gap={1}>
-            <Text role="label">لوحة عمليات الطلب</Text>
-            <Text role="bodySm" tone="muted">{branchLabel}</Text>
-            <Text role="bodySm" tone="muted">{quickAlert}</Text>
-          </Box>
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-            <Chip label={`${summary.active} نشطة`} tone="brand" selected />
-            <Chip label={`${summary.urgent} عاجلة`} tone="warning" />
-            <Chip label={`${summary.needsAction} تحتاج إجراء`} tone="info" />
-            <Chip label={`${summary.issues} مشاكل`} tone="danger" />
-          </Box>
-        </Surface>
+      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: 112 }}>
 
-        <Surface tone="raised" padding={3} gap={3}>
-          <Box gap={1}>
-            <Text role="label">اختصارات التشغيل</Text>
-            <Text role="bodySm" tone="muted">مدخلات مرتبطة بلوحة الطلبات فقط من دون مغادرة السياق.</Text>
-          </Box>
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-            <Button label="مدخل التشغيل" fullWidth={false} onPress={onOpenEntryPress} />
-            <Button label="صيانة الفرع" tone="secondary" fullWidth={false} onPress={onOpenMaintenancePress} />
-            <Button label="إدارة المنتجات" tone="secondary" fullWidth={false} onPress={onOpenInventoryManagementPress} />
-          </Box>
-        </Surface>
+        {/* ─── Summary chips strip ─────────────────────────────── */}
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2} paddingVertical={2}>
+          <Chip label={`${summary.active} نشطة`} tone="brand" selected />
+          <Chip label={`${summary.urgent} عاجلة`} tone="warning" />
+          <Chip label={`${summary.needsAction} تحتاج إجراء`} tone="info" />
+          {summary.issues > 0 ? <Chip label={`${summary.issues} مشاكل`} tone="danger" /> : null}
+        </Box>
 
-        <Surface tone="raised" padding={3} gap={3}>
-          <Box gap={1}>
-            <Text role="label">البحث والفلترة</Text>
-            <Text role="bodySm" tone="muted">ابحث برقم الطلب أو اسم العميل أو الفرع أو الحالة، ثم ضيق النتائج بفلتر ذكي وسريع.</Text>
+        {/* ─── Search + filter header ──────────────────────────── */}
+        <Surface tone="raised" padding={3} gap={2}>
+          <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: resolveRowDirection(direction) }}>
+            <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }} gap={2}>
+              {searchMode && (
+                <Button
+                  label="←"
+                  size="sm"
+                  tone="ghost"
+                  fullWidth={false}
+                  onPress={onCloseSearch}
+                />
+              )}
+              <Text role="label">بحث الطلبات</Text>
+            </Box>
+            {hasActiveFilters && (
+              <Button
+                label="مسح"
+                size="sm"
+                tone="ghost"
+                fullWidth={false}
+                onPress={handleClearFilters}
+              />
+            )}
           </Box>
-          {searchMode ? (
-            <SearchTopBar
-              variant="surface"
-              value={query}
-              onChangeText={setQuery}
-              onClose={() => onCloseSearch?.()}
-              placeholder="رقم الطلب أو اسم العميل أو الفرع أو الحالة"
-              hint="يمكنك متابعة الفلاتر من نفس الصفحة."
-              autoFocus
+          <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }}>
+            <Box style={{ flex: 1 }}>
+              <SearchField
+                label=""
+                value={query}
+                onChangeText={setQuery}
+                placeholder="رقم الطلب، العميل، الفرع، الحالة"
+              />
+            </Box>
+            <Button
+              label={`فلترة ${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}`}
+              tone={activeFiltersCount > 0 ? 'primary' : 'secondary'}
+              size="md"
+              fullWidth={false}
+              onPress={() => setAdvancedPanelVisible(true)}
             />
-          ) : (
-            <SearchField
-              label="بحث الطلبات"
-              value={query}
-              onChangeText={setQuery}
-              placeholder="رقم الطلب أو اسم العميل أو الفرع أو الحالة"
-              hint="الكتابة تضيق النتائج فورًا."
-            />
-          )}
-          <Box gap={2}>
-            <Text role="caption" tone="muted">الفلاتر الذكية</Text>
-            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-              {smartFilters.map((filter) => (
-                <Chip key={filter.id} label={filter.label} selected={smartFilter === filter.id} tone={filter.tone} onPress={() => setSmartFilter(filter.id)} />
-              ))}
-            </Box>
           </Box>
-          <Box gap={2}>
-            <Text role="caption" tone="muted">الفلاتر السريعة</Text>
-            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-              {quickFilters.map((filter) => (
-                <Chip key={filter.id} label={filter.label} selected={quickFilter === filter.id} onPress={() => setQuickFilter((current) => (current === filter.id ? null : filter.id))} />
-              ))}
-            </Box>
-          </Box>
-          <Box gap={2}>
-            <Text role="caption" tone="muted">الترتيب</Text>
-            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-              {sortModes.map((item) => (
-                <Chip key={item.id} label={item.label} selected={sortMode === item.id} tone="brand" onPress={() => setSortMode(item.id)} />
-              ))}
-            </Box>
-          </Box>
+          {renderActiveTokens()}
         </Surface>
 
+        {/* ─── Stage chip rail (flat, no card wrapper) ─────────── */}
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2} paddingHorizontal={1} paddingVertical={1}>
+          {stageFilters.map((filter) => (
+            <Chip
+              key={filter.id}
+              label={filter.label}
+              selected={selectedStage === filter.id}
+              tone={filter.tone}
+              onPress={() => setSelectedStage(filter.id)}
+            />
+          ))}
+        </Box>
+
+        {/* ─── Order list ──────────────────────────────────────── */}
         <Surface tone="default" padding={3} gap={3}>
-          <Box gap={1}>
-            <Text role="label">الطابور الحالي</Text>
-            <Text role="bodySm" tone="muted">{filteredItems.length === 0 ? 'لا توجد نتائج مطابقة الآن.' : `تظهر ${filteredItems.length} طلبات ضمن الفلاتر الحالية.`}</Text>
-          </Box>
+          <Text role="bodySm" tone="muted">
+            {filteredItems.length === 0
+              ? 'لا توجد نتائج مطابقة.'
+              : `${filteredItems.length} طلبات ضمن الفلاتر الحالية`}
+          </Text>
 
           {filteredItems.length === 0 ? (
             <StateView
               stateId="empty"
-              title={`لا توجد طلبات ضمن ${activeFilterLabel}`}
-              description={resolveEmptyStateDescription(activeFilterLabel)}
-              actionLabel="إعادة الضبط"
-              onActionPress={() => {
-                setSmartFilter('all');
-                setQuickFilter(null);
-                setQuery('');
-              }}
+              title="لا توجد طلبات مطابقة"
+              description="غيّر المرحلة أو امسح الفلاتر النشطة لترى طلبات أخرى."
+              actionLabel="مسح الفلاتر"
+              onActionPress={handleClearFilters}
             />
           ) : (
             <Box gap={3}>
@@ -538,31 +635,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
           )}
         </Surface>
 
-        {selectedOrder ? (
-          <Surface tone="raised" padding={3} gap={3}>
-            <Box gap={1}>
-              <Text role="label">سياق الطلب المحدد</Text>
-              <Text role="bodySm" tone="muted">{selectedOrder.orderCode} · {selectedOrder.customerName} · {selectedOrder.orderTypeLabel}</Text>
-            </Box>
-            {showOrderAlerts ? (
-              <DshPartnerOrderAlertsPanel
-                activeOrderId={selectedOrder.id}
-                onOpenOrder={(orderId) => setSelectedOrderId(orderId)}
-                onOpenFlow={() => onOpenOrderAction?.('details', selectedOrder.id)}
-              />
-            ) : null}
-            {showOrderConversation ? (
-              <DshPartnerOrderConversationPanel
-                enabledForOrderMode={selectedOrderMode}
-                onOpenFlow={(flowId) => {
-                  if (flowId === 'order-chat-read-ack' || flowId === 'order-chat-send') {
-                    onOpenOrderAction?.('details', selectedOrder.id);
-                  }
-                }}
-              />
-            ) : null}
-          </Surface>
-        ) : null}
       </MobileScrollView>
 
       <SheetFrame visible={detailsVisible} title={selectedOrder ? `معاينة ${selectedOrder.orderCode}` : 'معاينة الطلب'} onClose={() => setDetailsVisible(false)}>
@@ -584,6 +656,69 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
             </Box>
           </Box>
         ) : null}
+      </SheetFrame>
+
+      <SheetFrame
+        visible={advancedPanelVisible}
+        title="الفلاتر المتقدمة والترتيب"
+        onClose={() => setAdvancedPanelVisible(false)}
+      >
+        <Box gap={4}>
+          <Box gap={2}>
+            <Text role="titleSm">تصفية حسب الخصائص</Text>
+            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
+              {quickFilters.map((filter) => {
+                const isSelected = selectedQuickFilters.includes(filter.id);
+                return (
+                  <Chip
+                    key={filter.id}
+                    label={filter.label}
+                    selected={isSelected}
+                    tone="brand"
+                    onPress={() => {
+                      setSelectedQuickFilters((current) =>
+                        isSelected
+                          ? current.filter((x) => x !== filter.id)
+                          : [...current, filter.id]
+                      );
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
+
+          <Box gap={2}>
+            <Text role="titleSm">الترتيب</Text>
+            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
+              {sortModes.map((item) => (
+                <Chip
+                  key={item.id}
+                  label={item.label}
+                  selected={sortMode === item.id}
+                  tone="brand"
+                  onPress={() => setSortMode(item.id)}
+                />
+              ))}
+            </Box>
+          </Box>
+
+          <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), marginTop: 8 }}>
+            <Button
+              label="تطبيق الفلاتر"
+              style={{ flex: 1 }}
+              onPress={() => setAdvancedPanelVisible(false)}
+            />
+            {hasActiveFilters && (
+              <Button
+                label="إعادة ضبط"
+                tone="secondary"
+                style={{ flex: 1 }}
+                onPress={handleClearFilters}
+              />
+            )}
+          </Box>
+        </Box>
       </SheetFrame>
 
       {/* ML-016: AcceptanceTimerSheet — confirms acceptance before calling onOpenOrderAction */}
@@ -719,28 +854,7 @@ export function AcceptanceTimerSheet({ visible, orderCode, onConfirm, onDecline 
 export type OrdersInboxScreenProps = PartnerOrdersInboxScreenProps;
 
 export function OrdersInboxScreen(props: OrdersInboxScreenProps) {
-  return (
-    <>
-      <PartnerOrdersInboxScreen {...props} />
-      {/* Red placeholder for BottomNavBar */}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, backgroundColor: 'red', zIndex: 1000 }}>
-        <BottomNavBar
-          activeId=""
-          direction="rtl"
-          launcherLabel="الطلبات"
-          launcherIcon="receipt-outline"
-          onLauncherPress={() => {}}
-          items={[
-            { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
-            { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
-            { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
-            { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
-          ]}
-          onSelect={(id: string) => {}}
-        />
-      </View>
-    </>
-  );
+  return <PartnerOrdersInboxScreen {...props} />;
 }
 
 export default OrdersInboxScreen;
