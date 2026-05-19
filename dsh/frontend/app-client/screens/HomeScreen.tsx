@@ -815,10 +815,6 @@ export function DshHomeGetScreen({
     return () => { homeBackResolverRef.current = null; };
   }, [homeBackResolverRef, categoriesSheetVisible, shortsVisible, inlineSearchVisible, serviceDialVisible, activeCategoryId, categoryItems, sheinInlineVisible, awnakInlineVisible, selectCategoryPage]);
 
-  if (state !== 'ready') {
-    return renderState(state, onRetry);
-  }
-
   const resolveHomeCategoryContext = React.useCallback((targetId?: string) => {
     if (!targetId) {
       return null;
@@ -1219,7 +1215,12 @@ export function DshHomeGetScreen({
       openSheet(hasValidLayout ? { x, y, width, height } : fallbackCategoriesDialLayout);
     });
   }, [fallbackCategoriesDialLayout]);
-return (
+
+  if (state !== 'ready') {
+    return renderState(state, onRetry);
+  }
+
+  return (
     <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
         <SearchTopBar
