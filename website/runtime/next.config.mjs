@@ -6,6 +6,7 @@ const shellShimPath = (name) => path.resolve(runtimeRoot, '../shell/shims', name
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactCompiler: true,
   reactStrictMode: true,
   transpilePackages: ['@bthwani/ui-kit', '@bthwani/surfaces'],
   turbopack: {
