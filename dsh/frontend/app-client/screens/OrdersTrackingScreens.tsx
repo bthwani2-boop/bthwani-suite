@@ -2130,18 +2130,24 @@ export function DshOrdersListScreen({ items = fallbackOrderListItems, query = ''
           variant="surface"
           title="طلباتي"
           layoutMode="balanced-secondary"
-          actions={
+          actions={[
+            onBack
+              ? {
+                  id: 'back',
+                  icon: <Icon name="chevron-back" mirrored size={18} color={theme.text} />,
+                  onPress: onBack,
+                  accessibilityLabel: 'العودة',
+                }
+              : null,
             onQueryChange
-              ? [
-                  {
-                    id: 'search',
-                    icon: <Icon name="search-outline" size={20} color={theme.text} />,
-                    onPress: () => setIsSearchVisible(true),
-                    accessibilityLabel: 'البحث',
-                  },
-                ]
-              : []
-          }
+              ? {
+                  id: 'search',
+                  icon: <Icon name="search-outline" size={20} color={theme.text} />,
+                  onPress: () => setIsSearchVisible(true),
+                  accessibilityLabel: 'البحث',
+                }
+              : null,
+          ].filter(Boolean) as any}
         />
       )}
       <MobileScrollView fill contentContainerStyle={{ paddingBottom: spacing[8] }}>

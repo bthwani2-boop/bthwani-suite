@@ -6,8 +6,6 @@ export const surfaceCatalog = [
   'store-items',
   'awnak-order-create',
   'cart-get',
-  'favorite-toggle',
-  'favorites-list',
   'search',
   'store-get',
   'bell',

@@ -9,8 +9,6 @@ export type DshRoute =
   | 'notifications'
   | 'store-items'
   | 'cart-get'
-  | 'favorite-toggle'
-  | 'favorites-list'
   | 'search'
   | 'store-get'
   | 'bell'

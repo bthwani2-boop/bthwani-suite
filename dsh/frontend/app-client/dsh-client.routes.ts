@@ -5,8 +5,6 @@ export type DshClientRouteId =
   | 'dsh-notifications'
   | 'dsh-store-items'
   | 'dsh-cart'
-  | 'dsh-favorite-toggle'
-  | 'dsh-favorites'
   | 'dsh-search'
   | 'dsh-store'
   | 'dsh-bell'
@@ -37,8 +35,6 @@ export type DshClientLegacyRoute =
   | 'notifications'
   | 'store-items'
   | 'cart-get'
-  | 'favorite-toggle'
-  | 'favorites-list'
   | 'search'
   | 'store-get'
   | 'bell'
@@ -76,8 +72,6 @@ export const dshClientRoutes = [
   { routeId: 'dsh-notifications', legacyRoute: 'notifications', screenId: 'client.dsh.notifications.list', ownerPath: 'dsh/frontend/app-client/screens/NotificationsScreen.tsx' },
   { routeId: 'dsh-store-items', legacyRoute: 'store-items', screenId: 'client.dsh.store.items', ownerPath: 'dsh/frontend/app-client/screens/StoreItemsScreen.tsx' },
   { routeId: 'dsh-cart', legacyRoute: 'cart-get', screenId: 'client.dsh.cart.review', ownerPath: 'dsh/frontend/app-client/screens/CartScreen.tsx' },
-  { routeId: 'dsh-favorite-toggle', legacyRoute: 'favorite-toggle', screenId: 'client.dsh.favorites.toggle', ownerPath: 'dsh/frontend/app-client/screens/FavoriteToggleScreen.tsx' },
-  { routeId: 'dsh-favorites', legacyRoute: 'favorites-list', screenId: 'client.dsh.favorites.list', ownerPath: 'dsh/frontend/app-client/screens/FavoritesScreen.tsx' },
   { routeId: 'dsh-search', legacyRoute: 'search', screenId: 'client.dsh.discovery.search', ownerPath: 'dsh/frontend/app-client/screens/SearchScreen.tsx' },
   { routeId: 'dsh-store', legacyRoute: 'store-get', screenId: 'client.dsh.store.details', ownerPath: 'dsh/frontend/app-client/screens/StoreScreen.tsx' },
   { routeId: 'dsh-bell', legacyRoute: 'bell', screenId: 'client.dsh.bell', ownerPath: 'dsh/frontend/app-client/screens/BellScreen.tsx' },

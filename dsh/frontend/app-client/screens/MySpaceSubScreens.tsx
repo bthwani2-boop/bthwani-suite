@@ -14,7 +14,7 @@ import {
   TextField,
   Button,
   Switch,
-  SegmentedControl,
+  ActionStrip,
   Divider,
 } from '@bthwani/ui-kit';
 import {
@@ -360,8 +360,8 @@ export function DshAppearanceHubScreen({ state = 'ready', onRetry, onBack }: Dsh
 export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
   const { theme } = useTheme();
 
-  // Active Tab state
-  const [activeTab, setActiveTab] = React.useState<'delivery' | 'notifications' | 'privacy'>('delivery');
+  // Active section for accordion (defaults to 'delivery')
+  const [expandedSection, setExpandedSection] = React.useState<'delivery' | 'notifications' | 'privacy' | null>('delivery');
 
   // Tab 1: Delivery preferences state
   const [deliveryInstructions, setDeliveryInstructions] = React.useState('اتصل قبل الوصول بدقيقتين واترك الطلب عند الباب عند عدم الرد.');
@@ -424,27 +424,16 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
     'سلم الطلب يدوياً للمستلم فقط.',
   ];
 
+  const toggleSection = (section: 'delivery' | 'notifications' | 'privacy') => {
+    setExpandedSection((prev) => (prev === section ? null : section));
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
         variant="surface"
         title="تفضيلات التوصيل"
       />
-
-      {/* Segmented Control Tab Switcher */}
-      <Box padding={4} style={{ borderBottomWidth: 1, borderColor: theme.line }}>
-        <SegmentedControl
-          size="md"
-          fullWidth
-          options={[
-            { value: 'delivery', label: 'التوصيل' },
-            { value: 'notifications', label: 'التنبيهات' },
-            { value: 'privacy', label: 'الخصوصية والتجربة' },
-          ]}
-          value={activeTab}
-          onValueChange={(nextVal) => setActiveTab(nextVal as 'delivery' | 'notifications' | 'privacy')}
-        />
-      </Box>
 
       <MobileScrollView
         fill
@@ -484,138 +473,162 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
           </Surface>
         ) : null}
 
-        {activeTab === 'delivery' && (
-          <Box gap={4}>
-            {/* Delivery Instructions */}
-            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16 }}>
-              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
-                <Text role="bodyStrong" style={{ color: theme.text }}>تعليمات الكابتن والتسليم</Text>
-                <Icon name="car" size={20} tone="brand" />
+        {/* Action Strip List (Completely Flat, No Containers) */}
+        <View style={{ paddingTop: spacing[2] }}>
+          <Text role="bodyStrong" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[4], marginBottom: spacing[2] }}>
+            خيارات التفضيلات
+          </Text>
+
+          <Divider />
+
+          {/* 1. Delivery Section Strip */}
+          <View>
+            <ActionStrip
+              icon="car"
+              title="تعليمات الكابتن والتسليم"
+              subtitle={deliveryInstructions ? (deliveryInstructions.length > 40 ? deliveryInstructions.substring(0, 40) + '...' : deliveryInstructions) : 'حدد ملاحظاتك وتوجيهاتك للكابتن'}
+              expanded={expandedSection === 'delivery'}
+              onPress={() => toggleSection('delivery')}
+              hideDivider
+            >
+              <Box gap={3} style={{ paddingTop: spacing[2] }}>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  ملاحظات أو توجيهات تظهر للكابتن لمساعدته في العثور على موقعك وتوصيل الطلب بسهولة وسرعة.
+                </Text>
+                <TextField
+                  value={deliveryInstructions}
+                  onChangeText={setDeliveryInstructions}
+                  placeholder="أدخل تعليمات التوصيل هنا..."
+                  multiline
+                  numberOfLines={3}
+                  style={{ textAlign: 'right', color: theme.text, minHeight: 80 }}
+                />
+
+                {/* Quick Suggestion Chips */}
+                <Box flexDirection="row-reverse" flexWrap="wrap" gap={2} style={{ marginTop: spacing[1] }}>
+                  {quickSuggestions.map((suggestion) => (
+                    <TouchableOpacity
+                      key={suggestion}
+                      onPress={() => setDeliveryInstructions(suggestion)}
+                      style={{
+                        paddingVertical: spacing[1.5],
+                        paddingHorizontal: spacing[3],
+                        backgroundColor: theme.fieldBackground,
+                        borderRadius: 20,
+                        borderWidth: 1,
+                        borderColor: theme.line,
+                      }}
+                    >
+                      <Text role="bodySm" style={{ color: theme.text }}>{suggestion}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </Box>
               </Box>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                ملاحظات أو توجيهات تظهر للكابتن لمساعدته في العثور على موقعك وتوصيل الطلب بسهولة وسرعة.
-              </Text>
-              <TextField
-                value={deliveryInstructions}
-                onChangeText={setDeliveryInstructions}
-                placeholder="أدخل تعليمات التوصيل هنا..."
-                multiline
-                numberOfLines={3}
-                style={{ textAlign: 'right', color: theme.text, minHeight: 80 }}
-              />
+            </ActionStrip>
+          </View>
 
-              {/* Quick Suggestion Chips */}
-              <Box flexDirection="row-reverse" flexWrap="wrap" gap={2} style={{ marginTop: spacing[1] }}>
-                {quickSuggestions.map((suggestion) => (
-                  <TouchableOpacity
-                    key={suggestion}
-                    onPress={() => setDeliveryInstructions(suggestion)}
-                    style={{
-                      paddingVertical: spacing[1.5],
-                      paddingHorizontal: spacing[3],
-                      backgroundColor: theme.fieldBackground,
-                      borderRadius: 20,
-                      borderWidth: 1,
-                      borderColor: theme.line,
-                    }}
-                  >
-                    <Text role="bodySm" style={{ color: theme.text }}>{suggestion}</Text>
-                  </TouchableOpacity>
-                ))}
+          <Divider />
+
+          {/* 2. Notifications Section Strip */}
+          <View>
+            <ActionStrip
+              icon="notifications"
+              title="إعدادات التنبيهات"
+              subtitle="إشعارات حالة الطلب، جرس الوصول، والعروض"
+              expanded={expandedSection === 'notifications'}
+              onPress={() => toggleSection('notifications')}
+              hideDivider
+            >
+              <Box gap={4} style={{ paddingTop: spacing[2] }}>
+                <Switch
+                  label="إشعارات حالة الطلب المباشرة"
+                  description="تلقي تحديثات فورية عند قبول الطلب، خروج الكابتن، والوصول."
+                  value={orderProgressAlerts}
+                  onValueChange={setOrderProgressAlerts}
+                />
+
+                <Divider />
+
+                <Switch
+                  label="تفعيل جرس الوصول الذكي"
+                  description="إرسال تنبيه بصوت رنين مرتفع ونغمة مميزة عند اقتراب الكابتن."
+                  value={smartArrivalBell}
+                  onValueChange={setSmartArrivalBell}
+                />
+
+                <Divider />
+
+                <Switch
+                  label="العروض والتخفيضات الحصرية"
+                  description="تنبيهات مخصصة لأقوى التخفيضات، الهدايا، وكوبونات التوصيل المجاني."
+                  value={promotionalAlerts}
+                  onValueChange={setPromotionalAlerts}
+                />
+
+                <Divider />
+
+                <Switch
+                  label="تنبيهات النظام الأساسية"
+                  description="إشعارات الأمان والخصوصية والتحديثات الهامة للبنية التحتية للتطبيق."
+                  value={systemAlerts}
+                  onValueChange={setSystemAlerts}
+                />
               </Box>
-            </Surface>
-          </Box>
-        )}
+            </ActionStrip>
+          </View>
 
-        {activeTab === 'notifications' && (
-          <Box gap={4}>
-            <Surface tone="raised" padding={4} gap={4} style={{ borderRadius: 16 }}>
-              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center" style={{ borderBottomWidth: 1, borderColor: theme.line, paddingBottom: spacing[2] }}>
-                <Text role="bodyStrong" style={{ color: theme.text }}>إعدادات التنبيهات</Text>
-                <Icon name="notifications" size={20} tone="brand" />
+          <Divider />
+
+          {/* 3. Privacy & Experience Section Strip */}
+          <View>
+            <ActionStrip
+              icon="lock-closed"
+              title="الخصوصية وتسهيلات التجربة"
+              subtitle="الطلب السريع، حفظ العناوين، ووضع الخصوصية العالي"
+              expanded={expandedSection === 'privacy'}
+              onPress={() => toggleSection('privacy')}
+              hideDivider
+            >
+              <Box gap={4} style={{ paddingTop: spacing[2] }}>
+                <Switch
+                  label="الطلب السريع بلمسة واحدة"
+                  description="إتمام الطلب مباشرة باستخدام عنوانك وطريقة الدفع الافتراضية."
+                  value={quickOrder}
+                  onValueChange={setQuickOrder}
+                />
+
+                <Divider />
+
+                <Switch
+                  label="حفظ المواقع والعناوين تلقائياً"
+                  description="حفظ العناوين الجديدة تلقائياً لتسهيل الاستخدام مستقبلاً."
+                  value={autoSaveAddresses}
+                  onValueChange={setAutoSaveAddresses}
+                />
+
+                <Divider />
+
+                <Switch
+                  label="تفعيل وضع الخصوصية العالي"
+                  description="حظر الكباتن والمناديب من رؤية اسمك الكامل أو رقمك الفعلي."
+                  value={highPrivacy}
+                  onValueChange={setHighPrivacy}
+                />
+
+                <Divider />
+
+                <Switch
+                  label="تسهيلات الوصول وقراءة الشاشة"
+                  description="تكبير الخطوط وزيادة التباين البصري وتوافق قارئ الشاشة."
+                  value={accessibilityMode}
+                  onValueChange={setAccessibilityMode}
+                />
               </Box>
+            </ActionStrip>
+          </View>
 
-              <Switch
-                label="إشعارات حالة الطلب المباشرة"
-                description="تلقي تحديثات فورية عند قبول الطلب، خروج الكابتن، والوصول."
-                value={orderProgressAlerts}
-                onValueChange={setOrderProgressAlerts}
-              />
-
-              <Divider />
-
-              <Switch
-                label="تفعيل جرس الوصول الذكي"
-                description="إرسال تنبيه بصوت رنين مرتفع ونغمة مميزة عند اقتراب الكابتن."
-                value={smartArrivalBell}
-                onValueChange={setSmartArrivalBell}
-              />
-
-              <Divider />
-
-              <Switch
-                label="العروض والتخفيضات الحصرية"
-                description="تنبيهات مخصصة لأقوى التخفيضات، الهدايا، وكوبونات التوصيل المجاني."
-                value={promotionalAlerts}
-                onValueChange={setPromotionalAlerts}
-              />
-
-              <Divider />
-
-              <Switch
-                label="تنبيهات النظام الأساسية"
-                description="إشعارات الأمان والخصوصية والتحديثات الهامة للبنية التحتية للتطبيق."
-                value={systemAlerts}
-                onValueChange={setSystemAlerts}
-              />
-            </Surface>
-          </Box>
-        )}
-
-        {activeTab === 'privacy' && (
-          <Box gap={4}>
-            <Surface tone="raised" padding={4} gap={4} style={{ borderRadius: 16 }}>
-              <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center" style={{ borderBottomWidth: 1, borderColor: theme.line, paddingBottom: spacing[2] }}>
-                <Text role="bodyStrong" style={{ color: theme.text }}>الخصوصية وتسهيلات التجربة</Text>
-                <Icon name="lock-closed" size={20} tone="brand" />
-              </Box>
-
-              <Switch
-                label="الطلب السريع بلمسة واحدة"
-                description="إتمام الطلب مباشرة باستخدام عنوانك وطريقة الدفع الافتراضية."
-                value={quickOrder}
-                onValueChange={setQuickOrder}
-              />
-
-              <Divider />
-
-              <Switch
-                label="حفظ المواقع والعناوين تلقائياً"
-                description="حفظ العناوين الجديدة تلقائياً لتسهيل الاستخدام مستقبلاً."
-                value={autoSaveAddresses}
-                onValueChange={setAutoSaveAddresses}
-              />
-
-              <Divider />
-
-              <Switch
-                label="تفعيل وضع الخصوصية العالي"
-                description="حظر الكباتن والمناديب من رؤية اسمك الكامل أو رقمك الفعلي."
-                value={highPrivacy}
-                onValueChange={setHighPrivacy}
-              />
-
-              <Divider />
-
-              <Switch
-                label="تسهيلات الوصول وقراءة الشاشة"
-                description="تكبير الخطوط وزيادة التباين البصري وتوافق قارئ الشاشة."
-                value={accessibilityMode}
-                onValueChange={setAccessibilityMode}
-              />
-            </Surface>
-          </Box>
-        )}
+          <Divider />
+        </View>
 
         {/* Global Save & Reset Actions */}
         <Box gap={2} style={{ marginTop: spacing[4] }}>

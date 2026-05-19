@@ -11,8 +11,6 @@ import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
 import { DshOrdersListScreen, DshTrackingScreen } from './screens/OrdersTrackingScreens';
 import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
-import { DshFavoriteToggleScreen } from './screens/FavoriteToggleScreen';
-import { DshFavoritesListScreen } from './screens/FavoritesScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
 import {
   type ClientOperationScreenId,
@@ -819,8 +817,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     ['DshTrackingScreen', DshTrackingScreen as unknown],
     ['DshStoreGetScreen', DshStoreGetScreen as unknown],
     ['DshStoreItemsScreen', DshStoreItemsScreen as unknown],
-    ['DshFavoriteToggleScreen', DshFavoriteToggleScreen as unknown],
-    ['DshFavoritesListScreen', DshFavoritesListScreen as unknown],
     ['DshClientBellScreen', DshClientBellScreen as unknown],
     ['DshCartGetScreen', DshCartGetScreen as unknown],
     ['DshConversationHubScreen', DshConversationHubScreen as unknown],
@@ -1017,46 +1013,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       );
   }
 
-  if (route === 'favorite-toggle') {
-    return (
-      <DshFavoriteToggleScreen
-        itemLabel={selectedItem?.name ?? 'عنصر محفوظ'}
-        currentFavorite={favoriteOverrides[selectedItem?.id ?? activeStore.id] ?? Boolean(activeStore.isOffer)}
-        onToggleFavorite={() => {
-          const favoriteKey = selectedItem?.id ?? activeStore.id;
-          setFavoriteOverrides((previous) => ({
-            ...previous,
-            [favoriteKey]: !(previous[favoriteKey] ?? Boolean(activeStore.isOffer)),
-          }));
-        }}
-        onOpenFavorites={() => setRoute('favorites-list')}
-        onBack={() => setRoute('home')}
-        onRetry={() => setRoute('favorite-toggle')}
-        onSupport={openSupportFlow}
-      />
-    );
-  }
-
-  if (route === 'favorites-list') {
-    return (
-      <DshFavoritesListScreen
-        items={[
-          {
-            id: activeStore.id,
-            name: activeStore.name,
-            subtitle: activeStore.subtitle,
-            meta: activeStore.isFavorite ? 'متجر مفضل' : 'متجر محفوظ',
-          },
-          { id: 'item-apple-1', name: 'تفاح رويال غالا', subtitle: 'صندوق طازج 1 كجم', meta: 'عنصر محفوظ' },
-        ]}
-        onOpenItem={() => setRoute('favorite-toggle')}
-        onBack={() => setRoute('home')}
-        onRetry={() => setRoute('favorites-list')}
-        onSupport={openSupportFlow}
-      />
-    );
-  }
-
   if (route === 'search') {
     return (
       <DshSearchScreen
@@ -1064,7 +1020,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         results={filteredSearchStores.map((store) => ({ id: store.id, title: store.name, subtitle: store.subtitle, meta: store.meta }))}
         onQueryChange={setStoresQuery}
         onOpenCategories={() => setRoute('home')}
-        onOpenFavorites={() => setRoute('favorites-list')}
+        onOpenFavorites={() => setRoute('home')}
         onOpenResult={(resultId) => {
           const nextStoreMetadata = getStoreCanonicalMetadata(resultId);
           setActiveStoreId(resultId);
@@ -1185,6 +1141,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onQueryChange={setOrdersQuery}
         onOpenOrder={openTrackedOrder}
         onReorder={handleReorderClick}
+        onBack={returnHome}
       />
     );
   }
@@ -1218,6 +1175,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
   return (
     <DshHomeGetScreen
+      favoriteOverrides={favoriteOverrides}
+      onToggleFavorite={(storeId) => {
+        const currentStore = dshHomeGetFixtureStores.find((s) => s.id === storeId) || dshDiscoveryStores.find((s) => s.id === storeId);
+        const currentVal = favoriteOverrides[storeId] ?? currentStore?.isFavorite ?? false;
+        setFavoriteOverrides((previous) => ({
+          ...previous,
+          [storeId]: !currentVal,
+        }));
+      }}
       categories={dshCategoryListFixtures as any}
       promos={getPublishedMarketingHomePromos('home') as DshHomeGetPromo[]}
       homePromos={getPublishedHomePromos()}
@@ -1284,7 +1250,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         setSelectedOperationScreen(screenId as any);
         setRoute('benefits');
       }}
-      onOpenFavorites={() => setRoute('favorites-list')}
+      onOpenFavorites={() => setRoute('home')}
       onOpenSearch={() => setRoute('search')}
       onOpenOrders={() => setRoute('orders-list')}
       onOpenTracking={() => openTrackedOrder()}

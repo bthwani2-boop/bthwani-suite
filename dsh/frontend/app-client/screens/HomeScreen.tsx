@@ -108,6 +108,8 @@ export type DshHomeGetScreenProps = {
   onOpenProduct?: (storeId: string, itemId: string) => void;
   onOpenBenefits?: (screenId?: string) => void;
   onOpenFavorites?: () => void;
+  favoriteOverrides?: Record<string, boolean>;
+  onToggleFavorite?: (storeId: string) => void;
   onOpenSearch?: () => void;
   onOpenOrders?: () => void;
   onOpenTracking?: () => void;
@@ -614,6 +616,8 @@ export function DshHomeGetScreen({
   homePromos,
   notificationCount = 5,
   cartCount = 2,
+  favoriteOverrides,
+  onToggleFavorite,
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
@@ -630,7 +634,8 @@ export function DshHomeGetScreen({
   const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
 
-  const [favoriteToggles, setFavoriteToggles] = React.useState<Record<string, boolean>>({});
+  const [localFavoriteToggles, setLocalFavoriteToggles] = React.useState<Record<string, boolean>>({});
+  const favoriteToggles = favoriteOverrides ?? localFavoriteToggles;
   const [followToggles, setFollowToggles] = React.useState<Record<string, boolean>>({});
   const [followCounts, setFollowCounts] = React.useState<Record<string, number>>({});
   const [shortsVisible, setShortsVisible] = React.useState(false);
@@ -1553,10 +1558,14 @@ return (
                     item={card}
                     onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
                     onFavoritePress={() => {
-                      setFavoriteToggles((current) => ({
-                        ...current,
-                        [store.id]: !(current[store.id] ?? store.isFavorite),
-                      }));
+                      if (onToggleFavorite) {
+                        onToggleFavorite(store.id);
+                      } else {
+                        setLocalFavoriteToggles((current) => ({
+                          ...current,
+                          [store.id]: !(current[store.id] ?? store.isFavorite),
+                        }));
+                      }
                     }}
                   />
                 );
@@ -1629,9 +1638,11 @@ return (
       />
 
       <BottomNavBar
-        activeId="home"
+        activeId={activeFilter === 'favorites' ? 'favorites' : 'home'}
         onSelect={(id) => {
-          if (id === 'favorites') onOpenFavorites?.();
+          if (id === 'favorites') {
+            setActiveFilter((prev) => prev === 'favorites' ? 'all' : 'favorites');
+          }
           if (id === 'orders') onOpenOrders?.();
           if (id === 'wallet') onOpenWallet?.();
           if (id === 'profile') onOpenMySpace?.();
