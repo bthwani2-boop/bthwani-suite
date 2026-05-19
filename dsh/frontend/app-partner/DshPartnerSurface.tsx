@@ -377,13 +377,7 @@ export function DshPartnerSurface({
     />
   );
 
-  const showBottomNav =
-    route === 'inbox' ||
-    route === 'detail' ||
-    route === 'inventory-management' ||
-    route === 'home' ||
-    route === 'support-directory' ||
-    route === 'support-screen';
+  const showBottomNav = route !== 'entry';
 
   const bottomActiveId = React.useMemo(() => {
     if (route === 'home') {
@@ -448,25 +442,26 @@ export function DshPartnerSurface({
           marginTop: -2,
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
-          overflow: 'hidden',
+          overflow: 'visible',
+          paddingBottom: 80, // reserve space for BottomNavBar
         }}
       >
         {content}
       </Surface>
       {walletHubSheet}
       {storeScopeSheet}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>{bottomNavBar}</View>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, width: '100%', zIndex: 1000 }}>{bottomNavBar}</View>
     </Box>
   );
 
   const renderSurfaceShell = (content: React.ReactNode) => (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
-      <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'hidden' }}>
+      <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'visible', paddingBottom: 80 }}>
         {content}
       </Surface>
       {walletHubSheet}
       {storeScopeSheet}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>{bottomNavBar}</View>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, width: '100%', zIndex: 1000 }}>{bottomNavBar}</View>
     </Box>
   );
 

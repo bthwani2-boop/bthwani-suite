@@ -1,19 +1,6 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  Chip,
-  MobileScrollView,
-  SearchField,
-  SearchTopBar,
-  SheetFrame,
-  StateView,
-  Surface,
-  Text,
-  resolveRowDirection,
-  useDirection,
-} from '@bthwani/ui-kit';
+import { View } from 'react-native';
+import { Box, Button, Card, Chip, MobileScrollView, SearchField, SearchTopBar, SheetFrame, StateView, Surface, Text, resolveRowDirection, useDirection, BottomNavBar } from '@bthwani/ui-kit';
 import { DshPartnerOrderAlertsPanel } from '../parts/PartnerOrderAlertsPanel';
 import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversationPanel';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
@@ -732,7 +719,28 @@ export function AcceptanceTimerSheet({ visible, orderCode, onConfirm, onDecline 
 export type OrdersInboxScreenProps = PartnerOrdersInboxScreenProps;
 
 export function OrdersInboxScreen(props: OrdersInboxScreenProps) {
-  return <PartnerOrdersInboxScreen {...props} />;
+  return (
+    <>
+      <PartnerOrdersInboxScreen {...props} />
+      {/* Red placeholder for BottomNavBar */}
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, backgroundColor: 'red', zIndex: 1000 }}>
+        <BottomNavBar
+          activeId=""
+          direction="rtl"
+          launcherLabel="الطلبات"
+          launcherIcon="receipt-outline"
+          onLauncherPress={() => {}}
+          items={[
+            { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+            { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+            { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
+            { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
+          ]}
+          onSelect={(id: string) => {}}
+        />
+      </View>
+    </>
+  );
 }
 
 export default OrdersInboxScreen;
