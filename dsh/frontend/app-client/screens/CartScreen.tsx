@@ -5,6 +5,7 @@ import {
   Box,
   Card,
   colorPalette,
+  withAlpha,
   DateTimePicker,
   Icon,
   MobileScrollView,
@@ -457,7 +458,7 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
           ) : (
             <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colorPalette.brandSoft }} />
           )}
-          <View style={{ position: 'absolute', bottom: 4, left: 4, borderRadius: 6, backgroundColor: 'rgba(10, 47, 92, 0.75)', paddingHorizontal: 6, paddingVertical: 2 }}>
+          <View style={{ position: 'absolute', bottom: 4, left: 4, borderRadius: 6, backgroundColor: withAlpha(colorPalette.brandStrong, 0.75), paddingHorizontal: 6, paddingVertical: 2 }}>
             <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
               {product.priceLabel}
             </Text>
@@ -596,7 +597,7 @@ function ProductPreviewModal({
           paddingHorizontal: spacing[2],
           paddingTop: sheetTopInset,
           paddingBottom: sheetBottomInset,
-          backgroundColor: 'rgba(10, 47, 92, 0.48)',
+          backgroundColor: withAlpha(colorPalette.brandStrong, 0.48),
         }}
       >
         <Pressable
@@ -609,7 +610,7 @@ function ProductPreviewModal({
             right: 0,
             top: 0,
             bottom: 0,
-            backgroundColor: 'rgba(10, 47, 92, 0.36)',
+            backgroundColor: withAlpha(colorPalette.brandStrong, 0.36),
           }}
         />
 
