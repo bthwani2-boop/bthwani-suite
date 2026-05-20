@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform, Pressable, Switch as RNSwitch } from 'react-native';
+import { BackHandler, Platform, Pressable, Switch as RNSwitch, View } from 'react-native';
 import { useAppCaptainAppearance } from '../../../app-captain/shell/appearance';
 
 // Dynamic safe-area insets loader: avoids hard import so Metro won't fail when
@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { AppearanceOptionCard, Badge, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { AppearanceOptionCard, Badge, BottomNavBar, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Switch, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
@@ -79,6 +79,8 @@ type CaptainServiceType = 'dsh' | 'amn';
 type CaptainAvailabilityStatus = 'available' | 'unavailable' | 'break' | 'planned-leave';
 type CaptainGpsStatus = 'ready' | 'limited' | 'offline' | 'disabled';
 type ActiveOrderPhase = 'pickup' | 'delivery';
+// Two strictly-separated modes. store_courier_mode hides all BThwani captain state.
+type CaptainAppMode = 'bthwani_captain_mode' | 'store_courier_mode';
 
 function getRouteForCommandTarget(target: DshCaptainCommandTarget): DshCaptainRoute {
   if (target === 'entry') {
@@ -312,6 +314,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const [gpsStatus, setGpsStatus] = React.useState<CaptainGpsStatus>('limited');
   const [activeOrderExpanded, setActiveOrderExpanded] = React.useState(false);
   const [activeOrderPhase, setActiveOrderPhase] = React.useState<ActiveOrderPhase>('pickup');
+  const [captainAppMode, setCaptainAppMode] = React.useState<CaptainAppMode>('bthwani_captain_mode');
   const [activeOrderDraft, setActiveOrderDraft] = React.useState('');
   const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>(compactOrderChatSeed);
   const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
@@ -804,6 +807,24 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
             ))}
           </Box>
         </Surface>
+        {/* ─── App mode toggle ─────────────────────────────────────────── */}
+        <Surface tone="raised" padding={3} gap={3} radiusToken="xl">
+          <Text role="label" tone="muted" align="end">وضع التطبيق</Text>
+          <Switch
+            label="وضع موصل المتجر"
+            description={
+              captainAppMode === 'store_courier_mode'
+                ? 'مفعّل: طلبات المتجر فقط — لا طلبات بثواني ولا محفظة كابتن.'
+                : 'غير مفعّل: الوضع الافتراضي لكابتن بثواني.'
+            }
+            value={captainAppMode === 'store_courier_mode'}
+            onValueChange={(next) => {
+              setCaptainAppMode(next ? 'store_courier_mode' : 'bthwani_captain_mode');
+              setRoute('home');
+            }}
+          />
+        </Surface>
+
         <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
           <ListItem title="الإعدادات" subtitle="اللغة، الإشعارات، والتفضيلات المحلية." meta="جاهز" />
           <ListItem title="الدعم" subtitle="قنوات المساندة والتصعيد المختصر." meta="جاهز" />
@@ -854,11 +875,17 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
                 marquee: false,
               };
 
+  const isStoreCourierMode = captainAppMode === 'store_courier_mode';
+
   const topBar = (
     <ModernPremiumHeader
-      title={captainDisplayName}
-      locationLabel={wltDshCaptainUiCopy.topBarLocationLabel}
-      locationIcon={<Icon name="wallet-outline" size={14} color={colorPalette.white} />}
+      title={isStoreCourierMode ? 'موصل المتجر' : captainDisplayName}
+      locationLabel={isStoreCourierMode ? 'وضع موصل المتجر — طلبات المتجر فقط' : wltDshCaptainUiCopy.topBarLocationLabel}
+      locationIcon={
+        isStoreCourierMode
+          ? <Icon name="storefront-outline" size={14} color={colorPalette.white} />
+          : <Icon name="wallet-outline" size={14} color={colorPalette.white} />
+      }
       actions={[
         {
           id: 'account',
@@ -874,14 +901,19 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           accessibilityLabel: 'الإشعارات',
           onPress: () => setRoute('bell'),
         },
-        {
+        // Wallet action is BThwani-captain-only — hidden in store_courier_mode
+        ...(isStoreCourierMode ? [] : [{
           id: 'wallet',
           icon: <Icon name="wallet-outline" size={20} color={colorPalette.white} />,
           accessibilityLabel: wltDshCaptainUiCopy.walletAccessibilityLabel,
           onPress: () => openCaptainSupportScreen('cod-balance'),
-        },
+        }]),
       ]}
-      ticker={homeTicker}
+      ticker={
+        isStoreCourierMode
+          ? { statusLabel: 'موصل المتجر', message: 'انتظر تعيين الطلب التالي من المتجر.', marquee: false }
+          : homeTicker
+      }
       direction="rtl"
     />
   );
@@ -1189,6 +1221,64 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     );
   };
 
+  const renderStoreCourierHomeScreen = () => (
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}>
+      {/* ─── Mode badge ───────────────────────────────────────────────── */}
+      <Surface tone="raised" padding={3} gap={2} radiusToken="xl">
+        <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+          <Box gap={1}>
+            <Text role="bodyStrong">وضع موصل المتجر</Text>
+            <Text role="bodySm" tone="muted">تُعرض فقط الطلبات المسندة إليك من المتجر.</Text>
+          </Box>
+          <Badge label="نشط" tone="success" />
+        </Box>
+      </Surface>
+
+      {/* ─── Assigned store order + simple actions ────────────────────── */}
+      <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+        <Text role="label" tone="muted">الطلب المسند</Text>
+        <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+          <Text role="bodyStrong">ORD-4401</Text>
+          <Badge label="جاهز للاستلام" tone="success" />
+        </Box>
+        <KeyValueList
+          items={[
+            { label: 'المتجر', value: 'فرع الياسمين' },
+            { label: 'المرحلة', value: 'جاهز للاستلام من الفرع' },
+            { label: 'المسافة', value: '2.3 كم' },
+          ]}
+        />
+        <Box gap={2}>
+          <Button label="استلام من الفرع" tone="success" onPress={() => {}} />
+          <Button label="بدأ التوصيل" tone="primary" onPress={() => {}} />
+          <Box layoutDirection="row" gap={2}>
+            <Box style={{ flex: 1 }}>
+              <Button label="تم التوصيل" tone="ghost" onPress={() => {}} />
+            </Box>
+            <Box style={{ flex: 1 }}>
+              <Button label="تعذر التوصيل" tone="danger" onPress={() => {}} />
+            </Box>
+          </Box>
+        </Box>
+      </Surface>
+
+      {/* ─── Store earnings (policy-conditional — shown when compensation applies) ── */}
+      <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+        <Text role="label" tone="muted">مستحقاتي من المتجر</Text>
+        <KeyValueList
+          items={[
+            { label: 'اليوم', value: '45 ريال' },
+            { label: 'هذا الأسبوع', value: '210 ريال' },
+            { label: 'نوع الاستحقاق', value: 'مبلغ ثابت لكل توصيلة' },
+          ]}
+        />
+        <Surface tone="inset" padding={2} gap={1} radiusToken="lg">
+          <Text role="caption" tone="muted">هذا المبلغ من المتجر مباشرةً — ليس تسوية كابتن بثواني.</Text>
+        </Surface>
+      </Surface>
+    </MobileScrollView>
+  );
+
   const renderHomeScreen = () => (
     <Box style={{ flex: 1, position: 'relative' }}>
       {/* Map area - occupies remaining screen space */}
@@ -1357,6 +1447,59 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     );
   }
 
+  // Bottom nav visibility: store_courier_mode hides BThwani-specific routes
+  const showCaptainBottomNav = isStoreCourierMode
+    ? route === 'home' || route === 'account'
+    : route === 'home' || route === 'inbox' || route === 'account' || route === 'support-directory';
+
+  const captainBottomActiveId = isStoreCourierMode
+    ? (route === 'home' ? 'my-orders' : route === 'account' ? 'profile' : '')
+    : (route === 'home' ? 'home' : route === 'inbox' ? 'orders' : route === 'support-directory' ? 'support' : route === 'account' ? 'profile' : '');
+
+  // store_courier_mode: no wallet launcher, no BThwani orders tab
+  const captainBottomNavBar = isStoreCourierMode ? (
+    <BottomNavBar
+      activeId={captainBottomActiveId}
+      direction="rtl"
+      launcherLabel="طلباتي"
+      launcherIcon="receipt-outline"
+      launcherActive={route === 'home'}
+      onLauncherPress={() => setRoute('home')}
+      onSelect={(id: string) => {
+        if (id === 'history') { /* TBD: store order history */ }
+        if (id === 'earnings') { /* TBD: store earnings detail */ }
+        if (id === 'support') openSupportDirectory();
+        if (id === 'profile') openCaptainAccount();
+      }}
+      items={[
+        { id: 'history', label: 'السجل', icon: 'time-outline', activeIcon: 'time' },
+        { id: 'support', label: 'الدعم', icon: 'help-circle-outline', activeIcon: 'help-circle' },
+        { id: 'earnings', label: 'مستحقاتي', icon: 'cash-outline', activeIcon: 'cash' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+      ]}
+    />
+  ) : (
+    <BottomNavBar
+      activeId={captainBottomActiveId}
+      direction="rtl"
+      launcherLabel="المحفظة"
+      launcherIcon="wallet-outline"
+      onLauncherPress={() => openCaptainAccountSection('account-finance')}
+      onSelect={(id: string) => {
+        if (id === 'home') setRoute('home');
+        if (id === 'orders') setRoute('inbox');
+        if (id === 'support') openSupportDirectory();
+        if (id === 'profile') openCaptainAccount();
+      }}
+      items={[
+        { id: 'home', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
+        { id: 'orders', label: 'الطلبات', icon: 'receipt-outline', activeIcon: 'receipt' },
+        { id: 'support', label: 'الدعم', icon: 'help-circle-outline', activeIcon: 'help-circle' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+      ]}
+    />
+  );
+
   if (route !== 'home') {
     if (route === 'account-finance') {
       return renderCaptainAccountFinanceScreen();
@@ -1414,7 +1557,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     }
 
     return (
-      <Box style={{ flex: 1 }} background="background">
+      <Box style={{ flex: 1, position: 'relative' }} background="background">
         {renderRouteHeader()}
         <Surface
           tone="raised"
@@ -1428,16 +1571,22 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
             borderTopLeftRadius: 28,
             borderTopRightRadius: 28,
             overflow: 'hidden',
+            paddingBottom: showCaptainBottomNav ? 80 : 0,
           }}
         >
           {content}
         </Surface>
+        {showCaptainBottomNav && (
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+            {captainBottomNavBar}
+          </View>
+        )}
       </Box>
     );
   }
 
   return (
-    <Box style={{ flex: 1 }} background="background">
+    <Box style={{ flex: 1, position: 'relative' }} background="background">
       {topBar}
       <Surface
         tone="raised"
@@ -1451,10 +1600,14 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           overflow: 'hidden',
+          paddingBottom: 80,
         }}
       >
-        {renderHomeScreen()}
+        {isStoreCourierMode ? renderStoreCourierHomeScreen() : renderHomeScreen()}
       </Surface>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+        {captainBottomNavBar}
+      </View>
     </Box>
   );
 }

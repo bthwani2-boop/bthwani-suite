@@ -10,6 +10,7 @@ import {
 import {
   getWltControlPanelFinancePreview,
   getWltCaptainFinanceSnapshot,
+  getWltDshStoreDeliveryFinancePreview,
   type WltDshFinancePreviewRecord,
 } from '../../shared/finance/dshFinancePreview';
 import styles from './wlt-finance-control-panel.module.css';
@@ -66,6 +67,33 @@ function SectionBlock({
           {records.map((r) => <FinanceRecordCard key={r.id} record={r} />)}
         </Box>
       )}
+    </Box>
+  );
+}
+
+function StoreDeliveryFinanceSection() {
+  const storeDelivery = React.useMemo(() => getWltDshStoreDeliveryFinancePreview(), []);
+  return (
+    <Box gap={3}>
+      <Text role="label" className={styles.sectionTitle}>
+        مالية توصيل المتجر (partner_delivery)
+      </Text>
+      <WebControlPanelRecommendation
+        title="فصل مالي: توصيل المتجر ≠ تسوية كابتن بثواني"
+        reason={storeDelivery.separationNote}
+        confidence="high"
+        auditTag="CONTRACT_TBD"
+      />
+      <SectionBlock
+        title="رسوم توصيل المتجر (من العميل)"
+        records={storeDelivery.feeRecords}
+        emptyLabel="لا توجد رسوم توصيل متجر"
+      />
+      <SectionBlock
+        title="تعويض موصل المتجر (من المتجر لموصله الداخلي)"
+        records={storeDelivery.compensationRecords}
+        emptyLabel="لا يوجد تعويض مسجّل"
+      />
     </Box>
   );
 }
@@ -184,9 +212,12 @@ export function WltDshFinanceControlPanelContent({
         {/* تسويات الشركاء */}
         <SectionBlock
           title="تسويات الشركاء"
-          records={preview.partnerRecords}
+          records={preview.partnerRecords.filter((r) => r.kind === 'partner-settlement')}
           emptyLabel="لا توجد تسويات شركاء"
         />
+
+        {/* مالية توصيل المتجر — مفصول تمامًا عن تسوية الكابتن */}
+        <StoreDeliveryFinanceSection />
 
         {/* مالية الميدانيين */}
         <Box gap={4}>

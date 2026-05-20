@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Card, Chip, MobileScrollView, SearchField, SheetFrame, StateView, Surface, Text, resolveRowDirection, useDirection } from '@bthwani/ui-kit';
+import { Box, Button, Card, Chip, Icon, MobileScrollView, SearchField, SheetFrame, StateView, Surface, Text, resolveRowDirection, useBThwaniAppearance, useDirection } from '@bthwani/ui-kit';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
@@ -162,7 +162,7 @@ const demoOrders: readonly PartnerOrderItem[] = [
     paymentLabel: 'بطاقة ائتمانية',
     createdAtLabel: '10:21 ص',
     elapsedLabel: 'منذ 20 دقيقة',
-    nextActionLabel: 'تأكيد الجاهزية',
+    nextActionLabel: 'تسليم لموصل المتجر',
     nextOwnerLabel: 'موصل المتجر',
     urgent: true,
   },
@@ -181,7 +181,25 @@ const demoOrders: readonly PartnerOrderItem[] = [
     paymentLabel: 'نقد عند التسليم',
     createdAtLabel: '10:10 ص',
     elapsedLabel: 'منذ 31 دقيقة',
-    nextActionLabel: 'تسليم لموصل الشريك',
+    nextActionLabel: 'تأكيد التوصيل',
+    nextOwnerLabel: 'موصل المتجر',
+  },
+  {
+    id: 'ord-4380',
+    orderCode: 'ORD-4380',
+    customerName: 'فاطمة الغامدي',
+    branchLabel: 'فرع الياسمين',
+    status: 'delivering',
+    priority: 'normal',
+    orderTypeLabel: 'توصيل المتجر',
+    orderMode: 'partner_delivery',
+    itemsCountLabel: '2 عنصر',
+    itemsSummaryLabel: 'طبق رئيسي، حلوى',
+    amountLabel: '63 ر.ي',
+    paymentLabel: 'نقد عند التسليم',
+    createdAtLabel: '10:05 ص',
+    elapsedLabel: 'منذ 36 دقيقة',
+    nextActionLabel: 'تأكيد تسليم موصل المتجر',
     nextOwnerLabel: 'موصل المتجر',
   },
   {
@@ -242,17 +260,17 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
 ];
 
-function resolveStatusLabel(status: PartnerOrderStatus) {
+function resolveStatusLabel(status: PartnerOrderStatus, orderMode?: DshPartnerOrderConversationMode) {
   if (status === 'new') return 'جديدة';
   if (status === 'needs_accept') return 'تحتاج قبول';
   if (status === 'preparation_started') return 'بدأ التحضير';
   if (status === 'preparing') return 'قيد التحضير';
   if (status === 'items_ready') return 'العناصر جاهزة';
-  if (status === 'ready') return 'جاهزة';
-  if (status === 'handoff') return 'تسليم للمندوب';
-  if (status === 'captain_assigned') return 'تم تعيين المندوب';
-  if (status === 'captain_arriving') return 'المندوب في الطريق';
-  if (status === 'delivering') return 'في الطريق';
+  if (status === 'ready') return orderMode === 'partner_delivery' ? 'جاهز — تسليم لموصل المتجر' : 'جاهزة';
+  if (status === 'handoff') return orderMode === 'partner_delivery' ? 'سُلّم لموصل المتجر' : 'تسليم للكابتن';
+  if (status === 'captain_assigned') return 'تم تعيين الكابتن';
+  if (status === 'captain_arriving') return 'الكابتن في الطريق';
+  if (status === 'delivering') return orderMode === 'partner_delivery' ? 'مع موصل المتجر' : 'في الطريق';
   if (status === 'completed') return 'مكتملة';
   return 'مشكلة';
 }
@@ -305,6 +323,23 @@ function renderState(state: Exclude<PartnerOrdersHomeScreenState, 'ready'>, onRe
   return <StateView stateId="recoverableError" title="تعذر فتح لوحة عمليات الطلب" description="حدث خلل مؤقت. أعد المحاولة من دون فقدان السياق." actionLabel={onRetry ? 'إعادة المحاولة' : undefined} onActionPress={onRetry} />;
 }
 
+function resolveOrderHistory(status: PartnerOrderStatus, orderMode: DshPartnerOrderConversationMode) {
+  const inPrep = status === 'preparation_started' || status === 'preparing' || status === 'items_ready' || status === 'ready' || status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving' || status === 'delivering' || status === 'completed';
+  const isReady = status === 'ready' || status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving' || status === 'delivering' || status === 'completed';
+  const isHandedOff = status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving' || status === 'delivering' || status === 'completed';
+  return [
+    { id: 'placed', label: 'وصل الطلب', done: true },
+    { id: 'accepted', label: 'تم القبول', done: status !== 'new' && status !== 'needs_accept' && status !== 'cancelled' },
+    { id: 'preparing', label: 'بدأ التحضير', done: inPrep },
+    { id: 'ready', label: 'جاهز', done: isReady },
+    {
+      id: 'handoff',
+      label: orderMode === 'partner_delivery' ? 'سُلّم لموصل المتجر' : orderMode === 'pickup' ? 'جاهز للاستلام' : 'سُلّم للكابتن',
+      done: isHandedOff,
+    },
+  ];
+}
+
 // ─── Order Card — Cashier-Optimized ────────────────────────────────────────────
 // Priority: Order Code → Next Action → Items → Delivery → Payment
 function OrderCard({
@@ -321,8 +356,24 @@ function OrderCard({
   onQuickView: () => void;
 }) {
   const rowDir = resolveRowDirection(direction);
-  const statusLabel = resolveStatusLabel(item.status);
+  const statusLabel = resolveStatusLabel(item.status, item.orderMode);
   const statusTone = resolveStatusTone(item.status);
+  const { tokens } = useBThwaniAppearance();
+  const [isRead, setIsRead] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false);
+
+  // Bell shows only for new/needs_accept orders that haven't been viewed yet
+  const isNewUnread = item.unread && !isRead && (item.status === 'new' || item.status === 'needs_accept');
+
+  const handlePrimaryAction = React.useCallback(() => {
+    setIsRead(true);
+    onPrimaryAction();
+  }, [onPrimaryAction]);
+
+  const handleToggleDetails = React.useCallback(() => {
+    setIsRead(true);
+    setExpanded((v) => !v);
+  }, []);
 
   return (
     <Card
@@ -331,16 +382,17 @@ function OrderCard({
       footer={
         // ─── Zone 6: Actions — one primary, one secondary ─────────────────
         <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2} paddingTop={2}>
-          <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={onPrimaryAction} />
-          <Button label="التفاصيل" size="sm" tone="secondary" fullWidth={false} onPress={onViewDetails} />
+          <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={handlePrimaryAction} />
+          <Button label={expanded ? 'إخفاء التفاصيل' : 'التفاصيل'} size="sm" tone="secondary" fullWidth={false} onPress={handleToggleDetails} />
         </Box>
       }
     >
       <Box gap={3}>
-        {/* ─── Zone 1: Order Code (PRIMARY) + Status Badges ─────────────── */}
+        {/* ─── Zone 1: Order Code (PRIMARY) + Bell + Status Badges ──────── */}
         <Box gap={1}>
           <Box style={{ flexDirection: rowDir, alignItems: 'center', flexWrap: 'wrap' }} gap={2}>
             <Text role="titleMd" tone="brand">{item.orderCode}</Text>
+            {isNewUnread ? <Icon name="notifications" size={18} color={tokens.warning} /> : null}
             <Chip label={statusLabel} tone={statusTone} selected />
             {item.slaRisk && item.slaLabel ? (
               <Chip label={item.slaLabel} tone="danger" />
@@ -348,13 +400,12 @@ function OrderCard({
               <Chip label="SLA قريب" tone="danger" />
             ) : null}
             {item.urgent ? <Chip label="عاجل" tone="warning" /> : null}
-            {item.unread ? <Chip label="غير مقروء" tone="warning" /> : null}
             {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" /> : null}
           </Box>
         </Box>
 
         {/* ─── Zone 2: Next Action (HIGHLIGHTED) ────────────────────────── */}
-        <Box style={{ backgroundColor: statusTone === 'warning' ? 'rgba(255,180,0,0.08)' : statusTone === 'danger' ? 'rgba(220,50,50,0.08)' : 'rgba(0,180,100,0.06)', borderRadius: 8, padding: 8 }}>
+        <Box style={{ borderRadius: 8, padding: 8 }}>
           <Text role="bodySm" tone={statusTone} style={{ fontWeight: '700' }}>
             الإجراء الآن: {item.nextActionLabel}
           </Text>
@@ -384,8 +435,32 @@ function OrderCard({
           {item.paymentLabel ? <Text role="bodySm" tone="muted">· {item.paymentLabel}</Text> : null}
         </Box>
 
-        {/* ─── Customer (MINIMAL) ────────────────────────────────────────── */}
-        <Text role="caption" tone="muted">العميل: {item.customerName}</Text>
+        {/* ─── Zone 6: Inline Details ────────────────────────────────────── */}
+        {expanded ? (
+          <Box gap={2} style={{ paddingTop: 10 }}>
+            <Text role="caption" tone="muted">{item.customerName}</Text>
+            {item.itemsSummaryLabel ? (
+              <Text role="caption" tone="muted">{item.itemsCountLabel}: {item.itemsSummaryLabel}</Text>
+            ) : null}
+            {item.paymentLabel ? (
+              <Text role="caption" tone="muted">الدفع: {item.paymentLabel}</Text>
+            ) : null}
+            <Text role="caption" tone="muted">حالة التوصيل: {resolveStatusLabel(item.status, item.orderMode)}</Text>
+            {item.nextOwnerLabel ? (
+              <Text role="caption" tone="muted">الجهة التالية: {item.nextOwnerLabel}</Text>
+            ) : null}
+            <Box gap={1}>
+              {resolveOrderHistory(item.status, item.orderMode).map((step) => (
+                <Text key={step.id} role="caption" tone="muted">
+                  {step.done ? '✓ ' : '· '}{step.label}
+                </Text>
+              ))}
+            </Box>
+            <Text role="caption" tone="muted">الفرع: {item.branchLabel}</Text>
+            <Text role="caption" tone="muted">وصل: {item.createdAtLabel} · {item.elapsedLabel}</Text>
+            <Button label="مشكلة في الطلب" size="sm" tone="ghost" fullWidth={false} onPress={onQuickView} />
+          </Box>
+        ) : null}
       </Box>
     </Card>
   );
@@ -473,7 +548,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
       const textMatch =
         normalizedQuery.length === 0
           ? true
-          : [item.orderCode, item.customerName, item.branchLabel, resolveStatusLabel(item.status), item.itemsSummaryLabel ?? '']
+          : [item.orderCode, item.branchLabel, resolveStatusLabel(item.status, item.orderMode), item.itemsSummaryLabel ?? '']
               .join(' ')
               .toLowerCase()
               .includes(normalizedQuery);
@@ -695,36 +770,34 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
         </Box>
 
         {/* ─── Order list ──────────────────────────────────────── */}
-        <Surface tone="default" padding={3} gap={3}>
-          <Text role="bodySm" tone="muted">
-            {filteredItems.length === 0
-              ? 'لا توجد نتائج.'
-              : `${filteredItems.length} طلبات`}
-          </Text>
+        <Text role="bodySm" tone="muted">
+          {filteredItems.length === 0
+            ? 'لا توجد نتائج.'
+            : `${filteredItems.length} طلبات`}
+        </Text>
 
-          {filteredItems.length === 0 ? (
-            <StateView
-              stateId="empty"
-              title="لا توجد طلبات مطابقة"
-              description="غيّر المرحلة أو امسح الفلاتر النشطة لترى طلبات أخرى."
-              actionLabel="مسح الفلاتر"
-              onActionPress={handleClearFilters}
-            />
-          ) : (
-            <Box gap={3}>
-              {filteredItems.map((item) => (
-                <OrderCard
-                  key={item.id}
-                  item={item}
-                  direction={direction}
-                  onPrimaryAction={() => openPrimaryAction(item)}
-                  onViewDetails={() => openOrderDetail(item.id)}
-                  onQuickView={() => openQuickView(item.id)}
-                />
-              ))}
-            </Box>
-          )}
-        </Surface>
+        {filteredItems.length === 0 ? (
+          <StateView
+            stateId="empty"
+            title="لا توجد طلبات مطابقة"
+            description="غيّر المرحلة أو امسح الفلاتر النشطة لترى طلبات أخرى."
+            actionLabel="مسح الفلاتر"
+            onActionPress={handleClearFilters}
+          />
+        ) : (
+          <Box gap={3}>
+            {filteredItems.map((item) => (
+              <OrderCard
+                key={item.id}
+                item={item}
+                direction={direction}
+                onPrimaryAction={() => openPrimaryAction(item)}
+                onViewDetails={() => openOrderDetail(item.id)}
+                onQuickView={() => openQuickView(item.id)}
+              />
+            ))}
+          </Box>
+        )}
 
       </MobileScrollView>
 
@@ -733,7 +806,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
         {selectedOrder ? (
           <Box gap={3}>
             <Box gap={1}>
-              <Text role="titleSm">{selectedOrder.customerName}</Text>
+              <Text role="titleSm">{selectedOrder.orderCode}</Text>
               <Text role="bodySm" tone="muted">{selectedOrder.branchLabel} · {selectedOrder.orderTypeLabel}</Text>
             </Box>
             <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>

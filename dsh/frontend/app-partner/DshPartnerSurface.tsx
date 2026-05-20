@@ -24,6 +24,7 @@ import {
   OrderDetailScreen,
   type PartnerOrderDetailSummary,
 } from './screens/OrdersInboxScreen';
+import { DshPartnerStoreCourierScreen } from './screens/DshPartnerStoreCourierScreen';
 import { PartnerEntryScreen } from './screens/PartnerEntryScreen';
 import { PartnerSupportScreen, type PartnerSupportRouteId } from './screens/PartnerSupportScreen';
 
@@ -323,6 +324,10 @@ export function DshPartnerSurface({
     setRoute('inventory-management');
   }, []);
 
+  const openStoreCourier = React.useCallback(() => {
+    setRoute('store-courier');
+  }, []);
+
   const openSupportScreen = React.useCallback((screenId: PartnerSupportRouteId) => {
     setSelectedSupportScreen(screenId);
     setRoute('support-screen');
@@ -411,6 +416,7 @@ export function DshPartnerSurface({
       direction="rtl"
       launcherLabel="الطلبات"
       launcherIcon="receipt-outline"
+      launcherActive={bottomActiveId === 'orders'}
       onLauncherPress={openOrdersBoard}
       onSelect={(id: string) => {
         if (id === 'profile') {
@@ -493,6 +499,7 @@ export function DshPartnerSurface({
         onOpenSupportDirectory={openSupportDirectory}
         onOpenWalletHub={openWalletHub}
         onOpenBell={() => setRoute('bell')}
+        onOpenStoreCourierSetup={openStoreCourier}
       />,
     );
   }
@@ -578,6 +585,12 @@ export function DshPartnerSurface({
     );
   }
 
+  if (route === 'store-courier') {
+    return renderSurfaceShell(
+      <DshPartnerStoreCourierScreen onBack={() => openAccountHub('operations')} />,
+    );
+  }
+
   if (route === 'support-screen') {
     const supportScreens: Record<PartnerSupportRouteId, React.ReactNode> = {
       'auction-status-update': <AuctionStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
@@ -620,6 +633,7 @@ export function DshPartnerSurface({
       onOpenStoreScope={openStoreScope}
       onOpenWalletHub={openWalletHub}
       onOpenSupportDirectory={openSupportDirectory}
+      onOpenStoreCourierSetup={openStoreCourier}
     />,
   );
 }

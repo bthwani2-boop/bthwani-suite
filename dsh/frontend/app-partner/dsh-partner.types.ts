@@ -39,7 +39,8 @@ export type DshPartnerRoute =
   | 'support-directory'
   | 'support-screen'
   | 'inventory-management'
-  | 'order-rejection';
+  | 'order-rejection'
+  | 'store-courier';
 
 export type DshPartnerSurfaceProps = {
   initialRoute?: DshPartnerRoute;
@@ -75,6 +76,7 @@ export type DshPartnerHubSurfaceProps = {
   onOpenBell?: () => void;
   onOpenOperationalFlow?: (screenId: DshPartnerOperationalFlowId) => void;
   onOpenSupportScreen?: (screenId: DshPartnerOperationalFlowId) => void;
+  onOpenStoreCourierSetup?: () => void;
   onToggleAvailability?: (isAvailable: boolean) => void;
   canonicalStoreId?: string;
 };

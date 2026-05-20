@@ -35,6 +35,12 @@ export function CaptainPayoutWorkspace({
               <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>ربط WLT معلق</Text>
               <Text tone="muted">بيانات مدفوعات الكابتن مملوكة من WLT. سيظهر هنا ملخص المدفوعات بعد ربط CG-029.</Text>
             </Box>
+            <Box padding={3} background="surfaceRaised" radiusToken="md" gap={1}>
+              <Text role="bodySm" tone="muted" style={{ fontWeight: '700' }}>تنبيه الفصل المالي</Text>
+              <Text role="bodySm" tone="muted">
+                هذه البيانات لكباتن بثواني (bthwani_captain_mode) فقط — موصلو المتاجر (store_courier_mode) لا يظهرون هنا. تعويض موصل المتجر يُدار بين المتجر وموصله مباشرةً ولا يمر عبر تسوية WLT للكابتن.
+              </Text>
+            </Box>
             <Box gap={2}>
               {([
                 ['رقم الكابتن', captainId],

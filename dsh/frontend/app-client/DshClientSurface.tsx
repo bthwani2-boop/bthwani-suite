@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
-import { Surface, Text, colorPalette } from '@bthwani/ui-kit';
+import { BottomNavBar, Surface, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshSearchScreen } from './screens/SearchScreen';
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
@@ -432,6 +432,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [reorderAlertMessage, setReorderAlertMessage] = React.useState<string | undefined>(undefined);
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('entitlements-get');
+  const [serviceDialTrigger, setServiceDialTrigger] = React.useState(0);
   const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
   const homeBackResolverRef = React.useRef<(() => boolean) | null>(null);
@@ -582,14 +583,29 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     [selectedOrderId],
   );
 
-  const trackingTimeline = React.useMemo(
-    () => [
-      { id: 'route', title: 'في الطريق', detail: 'الطلب متجه إلى العميل الآن.', done: true },
-      { id: 'arrived', title: 'وصل للعميل', detail: 'الطلب وصل إلى العميل وهو بانتظار الاستلام.', done: false },
-      { id: 'received', title: 'استلم العميل الطلب', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: false },
-    ],
-    [],
-  );
+  const trackingTimeline = React.useMemo(() => {
+    const mode = trackingOrderValues.fulfillmentMode;
+    if (mode === 'partner_delivery') {
+      return [
+        { id: 'store-prep', title: 'يجهّز المتجر الطلب', detail: 'المتجر يجهّز طلبك ويسلّمه لموصله.', done: true },
+        { id: 'store-courier-pickup', title: 'موصل المتجر في الطريق', detail: 'موصل المتجر يتجه إليك — هذا ليس كابتن بثواني.', done: false },
+        { id: 'delivered', title: 'تم التوصيل', detail: 'استلمت طلبك من موصل المتجر.', done: false },
+      ];
+    }
+    if (mode === 'pickup') {
+      return [
+        { id: 'prep', title: 'يجهّز المتجر الطلب', detail: 'طلبك قيد التجهيز في المتجر.', done: true },
+        { id: 'ready', title: 'الطلب جاهز للاستلام', detail: 'توجّه للمتجر لاستلام طلبك.', done: false },
+        { id: 'picked-up', title: 'استلمت طلبك', detail: 'تم تأكيد استلامك للطلب من المتجر.', done: false },
+      ];
+    }
+    // bthwani_delivery
+    return [
+      { id: 'route', title: 'الكابتن في الطريق', detail: 'كابتن بثواني متجه إليك الآن.', done: true },
+      { id: 'arrived', title: 'وصل الكابتن', detail: 'الكابتن وصل وينتظر تسليم الطلب.', done: false },
+      { id: 'received', title: 'استلمت طلبك', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: false },
+    ];
+  }, [trackingOrderValues.fulfillmentMode]);
 
   const openCreateOrderJourney = React.useCallback(() => {
     setReorderAlertMessage(undefined);
@@ -1176,9 +1192,34 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     );
   }
 
+  const clientBottomNavBar = (
+    <BottomNavBar
+      activeId="home"
+      direction="rtl"
+      launcherLabel="الخدمات"
+      launcherIcon="grid"
+      onLauncherPress={() => setServiceDialTrigger((t) => t + 1)}
+      onSelect={(id) => {
+        if (id === 'favorites') setRoute('home');
+        if (id === 'orders') setRoute('orders-list');
+        if (id === 'wallet') setRoute('wlt-home');
+        if (id === 'profile') setRoute('my-space');
+      }}
+      items={[
+        { id: 'favorites', label: 'المفضلة', icon: 'heart-outline', activeIcon: 'heart' },
+        { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
+        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+      ]}
+    />
+  );
+
   return (
-    <DshHomeGetScreen
-      favoriteOverrides={favoriteOverrides}
+    <View style={{ flex: 1, position: 'relative' }}>
+      <View style={{ flex: 1, paddingBottom: 80 }}>
+        <DshHomeGetScreen
+          serviceDialTrigger={serviceDialTrigger}
+          favoriteOverrides={favoriteOverrides}
       onToggleFavorite={(storeId) => {
         const currentStore = dshHomeGetFixtureStores.find((s) => s.id === storeId) || dshDiscoveryStores.find((s) => s.id === storeId);
         const currentVal = favoriteOverrides[storeId] ?? currentStore?.isFavorite ?? false;
@@ -1286,6 +1327,11 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
       onRetry={() => setRoute('home')}
     />
+      </View>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+        {clientBottomNavBar}
+      </View>
+    </View>
   );
 }
 

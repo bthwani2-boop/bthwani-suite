@@ -16,6 +16,8 @@ export type WltDshFinanceEventKind =
   | 'wallet-payment'
   | 'cash-on-delivery'
   | 'partner-settlement'
+  | 'store-delivery-fee'
+  | 'store-courier-compensation'
   | 'captain-earning'
   | 'captain-cod-liability'
   | 'captain-eligibility-topup'
@@ -132,6 +134,46 @@ const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
     statusTone: 'success',
     timeLabel: 'أمس',
     settlementCycleId: 'CYC-05-01',
+    sourceStoreId: 'STORE-99',
+    isPreview: true,
+  },
+  // ─── Store Delivery Fee ───────────────────────────────────────────
+  // Delivery fee paid by client for partner_delivery orders — goes to partner (per policy).
+  // captainPayout does NOT apply here. This is NOT a BThwani captain earning.
+  {
+    id: 'WLT-SDF-701',
+    actor: 'partner',
+    kind: 'store-delivery-fee',
+    currencyCode: 'YER',
+    amountMinorUnits: 1200000,
+    amountLabel: formatYer(1200000),
+    tone: 'positive',
+    title: 'رسوم توصيل المتجر',
+    subtitle: 'طلب #ORD-2026-SD1 — partner_delivery (موصل المتجر)',
+    statusLabel: 'مكتمل',
+    statusTone: 'success',
+    timeLabel: 'اليوم، 09:15 ص',
+    sourceOrderId: 'ORD-2026-SD1',
+    sourceStoreId: 'STORE-99',
+    isPreview: true,
+  },
+  // ─── Store Courier Compensation ───────────────────────────────────
+  // What the PARTNER pays their OWN store courier — internal to the store.
+  // NOT a BThwani captain settlement. NOT in WLT captain payout.
+  {
+    id: 'WLT-SCC-702',
+    actor: 'partner',
+    kind: 'store-courier-compensation',
+    currencyCode: 'YER',
+    amountMinorUnits: 400000,
+    amountLabel: formatYer(400000),
+    tone: 'negative',
+    title: 'تعويض موصل المتجر',
+    subtitle: 'المتجر يدفع لموصله الداخلي — ليس تسوية كابتن بثواني',
+    statusLabel: 'مسجّل — ليس تسوية كابتن',
+    statusTone: 'info',
+    timeLabel: 'اليوم، 09:15 ص',
+    sourceOrderId: 'ORD-2026-SD1',
     sourceStoreId: 'STORE-99',
     isPreview: true,
   },
@@ -774,6 +816,28 @@ export function resolveWltDshPaymentPreviewState(
     summaryLabel: 'المحافظ الرسمية غير مفعّلة — CONTRACT_TBD.',
     blockingLabel: 'يتطلب ربطًا بـ API لم يُعرَّف بعد.',
     feedbackTone: 'warning',
+  };
+}
+
+// ─── Store Delivery Finance Preview ──────────────────────────────
+// Strictly separated from BThwani captain finance.
+// store-delivery-fee: client pays → goes to partner (per delivery policy).
+// store-courier-compensation: partner pays their own courier — NOT WLT captain payout.
+export function getWltDshStoreDeliveryFinancePreview() {
+  const feeRecords = PREVIEW_SEEDS.filter((r) => r.kind === 'store-delivery-fee');
+  const compensationRecords = PREVIEW_SEEDS.filter((r) => r.kind === 'store-courier-compensation');
+  const totalFeeMinorUnits = feeRecords.reduce((acc, r) => acc + r.amountMinorUnits, 0);
+  const totalCompensationMinorUnits = compensationRecords.reduce((acc, r) => acc + r.amountMinorUnits, 0);
+  return {
+    feeRecords,
+    compensationRecords,
+    totalFeeMinorUnits,
+    totalFeeLabel: formatYer(totalFeeMinorUnits),
+    totalCompensationMinorUnits,
+    totalCompensationLabel: formatYer(totalCompensationMinorUnits),
+    captainPayoutApplies: false as const,
+    separationNote: 'تعويض موصل المتجر: المتجر يدفع لموصله — ليس تسوية كابتن بثواني ولا يظهر في محفظة الكابتن',
+    isPreview: true as const,
   };
 }
 

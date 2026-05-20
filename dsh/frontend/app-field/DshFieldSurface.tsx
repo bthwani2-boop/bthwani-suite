@@ -1,7 +1,7 @@
 import React from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
 import { useAppFieldAppearance } from '../../../app-field/shell/appearance';
-import { Box } from '@bthwani/ui-kit';
+import { BottomNavBar, Box } from '@bthwani/ui-kit';
 import { DshFieldFinanceScreen } from './screens/DshFieldFinanceScreen';
 import { DshFieldProfileHomeScreen } from './screens/DshFieldProfileHomeScreen';
 import { DshFieldProfileScreen } from './screens/DshFieldProfileScreen';
@@ -257,7 +257,9 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
     content = (
       <DshFieldReadinessEscalationScreen
         storeName={activeStore.name}
-        missingRequirements={[]}
+        missingRequirements={[
+          'التحقق من إعداد موصل المتجر إذا طلب الشريك تفعيل توصيل المتجر (partner_delivery)',
+        ]}
         escalationTargets={[
           { id: 'partner-management', label: 'قسم الشركاء (Partner Management)', isSelected: true },
           { id: 'control-panel', label: 'لوحة التحكم المركزية (Control Panel)', isSelected: false },
@@ -271,9 +273,44 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
     );
   }
 
+  const showFieldBottomNav = route.kind === 'stores' || route.kind === 'account';
+
+  const fieldBottomActiveId =
+    route.kind === 'stores' ? 'tasks' :
+    route.kind === 'account' ? 'profile' : '';
+
+  const fieldBottomNavBar = (
+    <BottomNavBar
+      activeId={fieldBottomActiveId}
+      direction="rtl"
+      launcherLabel="إضافة"
+      launcherIcon="add-circle-outline"
+      onLauncherPress={handleCreateStore}
+      onSelect={(id: string) => {
+        if (id === 'tasks') resetToStores();
+        if (id === 'history') pushRoute({ kind: 'history' });
+        if (id === 'finance') pushRoute({ kind: 'finance' });
+        if (id === 'profile') pushRoute({ kind: 'account' });
+      }}
+      items={[
+        { id: 'tasks', label: 'المهام', icon: 'list-outline', activeIcon: 'list' },
+        { id: 'history', label: 'السجل', icon: 'time-outline', activeIcon: 'time' },
+        { id: 'finance', label: 'المالية', icon: 'cash-outline', activeIcon: 'cash' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+      ]}
+    />
+  );
+
   return (
-    <Box style={{ flex: 1 }} background="background">
-      {content}
+    <Box style={{ flex: 1, position: 'relative' }} background="background">
+      <Box style={{ flex: 1, paddingBottom: showFieldBottomNav ? 80 : 0 }}>
+        {content}
+      </Box>
+      {showFieldBottomNav && (
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+          {fieldBottomNavBar}
+        </View>
+      )}
     </Box>
   );
 }

@@ -259,6 +259,7 @@ export type BottomNavBarProps = {
   direction?: Direction;
   launcherLabel?: string;
   launcherIcon?: React.ComponentProps<typeof Icon>['name'];
+  launcherActive?: boolean;
 };
 
 export function BottomNavBar({
@@ -269,6 +270,7 @@ export function BottomNavBar({
   direction = 'rtl',
   launcherLabel = 'الخدمات',
   launcherIcon = 'grid',
+  launcherActive = false,
 }: BottomNavBarProps) {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 44 : 12);
@@ -316,7 +318,7 @@ export function BottomNavBar({
       </Surface>
 
       {/* Floating Center Launcher */}
-      <Pressable onPress={onLauncherPress} style={[styles.floatingLauncher, isDark ? { backgroundColor: tokens.glassSurfaceStrong } : null]}>
+      <Pressable onPress={onLauncherPress} style={[styles.floatingLauncher, isDark ? { backgroundColor: tokens.glassSurfaceStrong } : null, launcherActive ? { borderWidth: 2.5, borderColor: colorPalette.white } : null]}>
         <View style={styles.launcherInner}>
           <Icon name={launcherIcon} size={24} color={colorPalette.white} />
         </View>

@@ -14,7 +14,6 @@ import {
   Surface,
   Text,
   ModernPremiumHeader,
-  BottomNavBar,
   type NavItem,
   colorPalette,
   withAlpha,
@@ -128,6 +127,7 @@ export type DshHomeGetScreenProps = {
   onRetry?: () => void;
   notificationCount?: number;
   cartCount?: number;
+  serviceDialTrigger?: number;
 };
 
 export type DshHomeCategory = {
@@ -618,6 +618,7 @@ export function DshHomeGetScreen({
   cartCount = 2,
   favoriteOverrides,
   onToggleFavorite,
+  serviceDialTrigger,
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
@@ -644,6 +645,13 @@ export function DshHomeGetScreen({
   const [inlineSearchVisible, setInlineSearchVisible] = React.useState(false);
   const [inlineSearchQuery, setInlineSearchQuery] = React.useState('');
   const [serviceDialVisible, setServiceDialVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    if (serviceDialTrigger) {
+      setServiceDialVisible(true);
+    }
+  }, [serviceDialTrigger]);
+
   const handleOpenMySpace = React.useCallback(() => {
     if (onOpenMySpace) {
       onOpenMySpace();
@@ -1639,25 +1647,6 @@ export function DshHomeGetScreen({
         }}
       />
 
-      <BottomNavBar
-        activeId={activeFilter === 'favorites' ? 'favorites' : 'home'}
-        onSelect={(id) => {
-          if (id === 'favorites') {
-            setActiveFilter((prev) => prev === 'favorites' ? 'all' : 'favorites');
-          }
-          if (id === 'orders') onOpenOrders?.();
-          if (id === 'wallet') onOpenWallet?.();
-          if (id === 'profile') onOpenMySpace?.();
-        }}
-        onLauncherPress={openServiceDial}
-        direction={isRtl ? 'rtl' : 'ltr'}
-        items={[
-          { id: 'favorites', label: 'المفضلة', icon: 'heart-outline', activeIcon: 'heart' },
-          { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
-          { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
-          { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
-        ]}
-      />
     </View>
   );
 }

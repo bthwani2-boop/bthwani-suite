@@ -660,6 +660,7 @@ function OperationsPanel({
   activeZoneLabel,
   serviceModes,
   onBack,
+  onOpenStoreCourierSetup,
 }: {
   branchLabel: string;
   cityLabel: string;
@@ -669,6 +670,7 @@ function OperationsPanel({
   activeZoneLabel: string;
   serviceModes: readonly { id: string; label: string; description: string; enabled: boolean }[];
   onBack: () => void;
+  onOpenStoreCourierSetup?: () => void;
 }) {
   const { direction } = useDirection();
   const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
@@ -777,6 +779,14 @@ function OperationsPanel({
               }));
             }}
           />
+          {selectedMode.id === 'partner_delivery' && onOpenStoreCourierSetup ? (
+            <Button
+              label="إعداد موصل المتجر"
+              tone="brand"
+              fullWidth={false}
+              onPress={onOpenStoreCourierSetup}
+            />
+          ) : null}
         </Surface>
       </Surface>
 
@@ -906,6 +916,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     onOpenBell,
     onOpenOperationalFlow,
     onOpenSupportScreen,
+    onOpenStoreCourierSetup,
     onToggleAvailability,
     canonicalStoreId,
   } = props;
@@ -1251,6 +1262,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           activeZoneLabel={activeZoneLabel}
           serviceModes={serviceModes}
           onBack={() => updateSection('hub')}
+          onOpenStoreCourierSetup={onOpenStoreCourierSetup}
         />
       );
     }
