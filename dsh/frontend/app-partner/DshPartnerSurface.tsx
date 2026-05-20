@@ -21,8 +21,6 @@ import {
 } from './screens/OperationScreens';
 import {
   OrdersInboxScreen,
-  OrderDetailScreen,
-  type PartnerOrderDetailSummary,
 } from './screens/OrdersInboxScreen';
 import { DshPartnerStoreCourierScreen } from './screens/DshPartnerStoreCourierScreen';
 import { PartnerEntryScreen } from './screens/PartnerEntryScreen';
@@ -182,38 +180,7 @@ export function DshPartnerSurface({
     [selectedStoreScopeId],
   );
 
-  const activeOrderSummary = React.useMemo<PartnerOrderDetailSummary>(() => {
-    if (activeOrderId === 'partner-order-1048') {
-      return {
-        orderId: 'partner-order-1048',
-        merchantName: 'جرين بول',
-        customerName: 'نورا',
-        serviceWindowLabel: 'يتبقى 18 دقيقة قبل حد الخدمة',
-        nextActionLabel: 'تأكيد التغليف',
-        readinessNote: 'فحص التغليف ما يزال معلقًا قبل انتقال الطلب إلى التسليم.',
-      };
-    }
-
-    if (activeOrderId === 'partner-order-1051') {
-      return {
-        orderId: 'partner-order-1051',
-        merchantName: 'بين هاوس',
-        customerName: 'سارة',
-        serviceWindowLabel: 'يتبقى 24 دقيقة قبل حد الخدمة',
-        nextActionLabel: 'فتح مساحة الطلب',
-        readinessNote: 'موعد الإرسال محجوز وزمن انتظار العميل يرتفع.',
-      };
-    }
-
-    return {
-      orderId: 'partner-order-1042',
-      merchantName: 'برغر لاب',
-      customerName: 'عمر',
-      serviceWindowLabel: 'يتبقى 12 دقيقة قبل حد الخدمة',
-      nextActionLabel: 'تأكيد الجاهزية وتسليم الطلب لجهة التوصيل',
-      readinessNote: 'التغليف مكتمل ومسار التسليم متاح.',
-    };
-  }, [activeOrderId]);
+  // activeOrderSummary deprecated in favor of inline details in OrdersInboxScreen.
 
   const todayHoursLabel = React.useMemo(() => {
     const today = defaultStoreHours[0];
@@ -227,14 +194,14 @@ export function DshPartnerSurface({
 
   const maintenanceProfile = React.useMemo(
     () => ({
-      storeName: activeOrderSummary.merchantName,
+      storeName: 'جرين بول',
       branchLabel: selectedStoreScope.label,
       cityLabel: 'الرياض',
       managerLabel: 'خالد',
       todayHoursLabel,
       activeZoneLabel: defaultZone.title,
     }),
-    [activeOrderSummary.merchantName, selectedStoreScope.label, todayHoursLabel],
+    [selectedStoreScope.label, todayHoursLabel],
   );
 
   const deliveryOpsSummary = React.useMemo(
@@ -453,7 +420,7 @@ export function DshPartnerSurface({
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           overflow: 'visible',
-          paddingBottom: 80, // reserve space for BottomNavBar
+          paddingBottom: Platform.OS === 'android' ? 112 : 80, // Dynamic padding to prevent overlap with Android nav bars
         }}
       >
         {content}
@@ -466,7 +433,7 @@ export function DshPartnerSurface({
 
   const renderSurfaceShell = (content: React.ReactNode) => (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
-      <Box background="background" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'visible', paddingBottom: 80 }}>
+      <Box background="background" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'visible', paddingBottom: Platform.OS === 'android' ? 112 : 80 }}>
         {content}
       </Box>
       {walletHubSheet}
@@ -509,10 +476,7 @@ export function DshPartnerSurface({
       <PartnerEntryScreen
         state={partnerEntryState}
         onOpenOrdersBoardPress={openOrdersBoard}
-        onOpenOrderDetailPress={() => {
-          setActiveOrderId('partner-order-1042');
-          setRoute('detail');
-        }}
+        onOpenOrderDetailPress={openOrdersBoard}
         onOpenMaintenancePress={() => openAccountHub('profile')}
         onOpenIssueQueuePress={() => openAccountHub('operations')}
       />,
@@ -524,10 +488,7 @@ export function DshPartnerSurface({
       <NotificationsScreen
         activeOrderId={undefined}
         onOpenInbox={openOrdersBoard}
-        onOpenNextOrder={() => {
-          setActiveOrderId('partner-order-1042');
-          setRoute('detail');
-        }}
+        onOpenNextOrder={openOrdersBoard}
         onBack={openOrdersBoard}
         onRetry={() => setRoute('bell')}
       />,
@@ -539,27 +500,7 @@ export function DshPartnerSurface({
       <OrdersInboxScreen
         searchMode={ordersSearchMode}
         onCloseSearch={() => setOrdersSearchMode(false)}
-        onOpenOrder={(orderId) => {
-          setActiveOrderId(orderId);
-          setRoute('detail');
-        }}
-        onOpenNextOrder={(orderId) => {
-          setActiveOrderId(orderId);
-          setRoute('detail');
-        }}
         onRetry={() => setRoute('inbox')}
-      />,
-    );
-  }
-
-  if (route === 'detail') {
-    return renderSurfaceShell(
-      <OrderDetailScreen
-        summary={activeOrderSummary}
-        onConfirmReady={() => setRoute('inbox')}
-        onOpenNextOrder={() => setRoute('inbox')}
-        onBackToInbox={() => setRoute('inbox')}
-        onRetry={() => setRoute('detail')}
       />,
     );
   }

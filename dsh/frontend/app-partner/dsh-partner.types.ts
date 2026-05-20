@@ -34,7 +34,6 @@ export type DshPartnerRoute =
   | 'home'
   | 'entry'
   | 'inbox'
-  | 'detail'
   | 'bell'
   | 'support-directory'
   | 'support-screen'

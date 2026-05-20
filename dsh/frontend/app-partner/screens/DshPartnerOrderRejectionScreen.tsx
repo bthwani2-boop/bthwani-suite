@@ -20,7 +20,6 @@ import {
 export type DshPartnerOrderRejectionScreenProps = {
   state?: 'ready' | 'loading' | 'success' | 'error';
   orderCode: string;
-  customerName: string;
   amount: string;
   items: Array<{ id: string; name: string; quantity: number }>;
   rejectionReasons: Array<{ id: string; label: string }>;
@@ -32,7 +31,6 @@ export type DshPartnerOrderRejectionScreenProps = {
 export function DshPartnerOrderRejectionScreen({
   state = 'ready',
   orderCode = '#4401',
-  customerName = 'نوف العتيبي',
   amount = '92 ر.ي',
   items = [
     { id: '1', name: 'برجر كلاسيك', quantity: 2 },
@@ -87,7 +85,6 @@ export function DshPartnerOrderRejectionScreen({
           <Chip label="جديد" tone="warning" selected />
         </Box>
         <Box gap={1}>
-          <Text role="bodyStrong" style={{ color: colorPalette.white }}>{customerName}</Text>
           <Text role="bodySm" style={{ color: colorPalette.white }}>الإجمالي: {amount}</Text>
         </Box>
       </Surface>

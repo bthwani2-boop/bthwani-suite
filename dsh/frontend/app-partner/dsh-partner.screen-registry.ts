@@ -113,7 +113,7 @@ export const dshPartnerScreenRegistry = [
   },
   {
     screenId: 'partner.dsh.order.detail',
-    routeId: 'dsh-partner-order-detail',
+    routeId: 'dsh-partner-orders',
     surfaceId: 'app-partner',
     ownerKind: 'service',
     ownerId: 'dsh',
@@ -126,7 +126,7 @@ export const dshPartnerScreenRegistry = [
     analytics: { screenView: 'partner_dsh_order_detail_view' },
     fallbackRouteId: 'dsh-partner-orders',
     releaseCriticality: 'P0',
-    status: 'VERIFIED',
+    status: 'DEPRECATED',
   },
   {
     screenId: 'partner.dsh.order.issue',

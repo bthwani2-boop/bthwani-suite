@@ -6,7 +6,6 @@ export type DshPartnerRouteId =
   | 'dsh-partner-store-profile'
   | 'dsh-partner-operations'
   | 'dsh-partner-orders'
-  | 'dsh-partner-order-detail'
   | 'dsh-partner-order-issue'
   | 'dsh-partner-inventory'
   | 'dsh-partner-promotions'
@@ -30,7 +29,6 @@ export const dshPartnerRoutes = [
   { routeId: 'dsh-partner-store-profile', legacyRoute: 'home', screenId: 'partner.dsh.store.profile', ownerPath: 'dsh/frontend/app-partner/screens/StoreProfileScreen.tsx' },
   { routeId: 'dsh-partner-operations', legacyRoute: 'home', screenId: 'partner.dsh.operations.control', ownerPath: 'dsh/frontend/app-partner/screens/PartnerHubScreen.tsx' },
   { routeId: 'dsh-partner-orders', legacyRoute: 'inbox', screenId: 'partner.dsh.orders.inbox', ownerPath: 'dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx' },
-  { routeId: 'dsh-partner-order-detail', legacyRoute: 'detail', screenId: 'partner.dsh.order.detail', ownerPath: 'dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx' },
   { routeId: 'dsh-partner-order-issue', legacyRoute: 'support-screen', screenId: 'partner.dsh.order.issue', ownerPath: 'dsh/frontend/app-partner/screens/OperationScreens.tsx' },
   { routeId: 'dsh-partner-inventory', legacyRoute: 'inventory-management', screenId: 'partner.dsh.inventory.catalog', ownerPath: 'dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx' },
   { routeId: 'dsh-partner-promotions', legacyRoute: 'home', screenId: 'partner.dsh.promotions.intent', ownerPath: 'dsh/frontend/app-partner/screens/PromotionsScreen.tsx' },

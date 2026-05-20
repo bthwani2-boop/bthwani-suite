@@ -38,7 +38,6 @@ export type PartnerOrdersHomeScreenState = 'ready' | 'loading' | 'empty' | 'erro
 export type PartnerOrderItem = {
   id: string;
   orderCode: string;
-  customerName: string;
   branchLabel: string;
   status: PartnerOrderStatus;
   priority: PartnerOrderPriority;
@@ -109,7 +108,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4401',
     orderCode: 'ORD-4401',
-    customerName: 'نوف العتيبي',
     branchLabel: 'فرع الياسمين',
     status: 'needs_accept',
     priority: 'high',
@@ -131,7 +129,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4398',
     orderCode: 'ORD-4398',
-    customerName: 'خالد الزهراني',
     branchLabel: 'فرع الياسمين',
     status: 'preparing',
     priority: 'normal',
@@ -150,7 +147,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4391',
     orderCode: 'ORD-4391',
-    customerName: 'ريم الشهراني',
     branchLabel: 'فرع الياسمين',
     status: 'ready',
     priority: 'high',
@@ -169,7 +165,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4385',
     orderCode: 'ORD-4385',
-    customerName: 'محمد السالم',
     branchLabel: 'فرع الياسمين',
     status: 'handoff',
     priority: 'normal',
@@ -187,7 +182,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4380',
     orderCode: 'ORD-4380',
-    customerName: 'فاطمة الغامدي',
     branchLabel: 'فرع الياسمين',
     status: 'delivering',
     priority: 'normal',
@@ -205,7 +199,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4372',
     orderCode: 'ORD-4372',
-    customerName: 'سارة القحطاني',
     branchLabel: 'فرع الياسمين',
     status: 'delivering',
     priority: 'normal',
@@ -225,7 +218,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4368',
     orderCode: 'ORD-4368',
-    customerName: 'عبدالله المطيري',
     branchLabel: 'فرع الياسمين',
     status: 'completed',
     priority: 'low',
@@ -242,7 +234,6 @@ const demoOrders: readonly PartnerOrderItem[] = [
   {
     id: 'ord-4359',
     orderCode: 'ORD-4359',
-    customerName: 'أحمد الدوسري',
     branchLabel: 'فرع الياسمين',
     status: 'cancelled',
     priority: 'low',
@@ -346,14 +337,12 @@ function OrderCard({
   item,
   direction,
   onPrimaryAction,
-  onViewDetails,
-  onQuickView,
+  onIssueAction,
 }: {
   item: PartnerOrderItem;
   direction: 'ltr' | 'rtl';
   onPrimaryAction: () => void;
-  onViewDetails: () => void;
-  onQuickView: () => void;
+  onIssueAction: () => void;
 }) {
   const rowDir = resolveRowDirection(direction);
   const statusLabel = resolveStatusLabel(item.status, item.orderMode);
@@ -362,8 +351,8 @@ function OrderCard({
   const [isRead, setIsRead] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
 
-  // Bell shows only for new/needs_accept orders that haven't been viewed yet
-  const isNewUnread = item.unread && !isRead && (item.status === 'new' || item.status === 'needs_accept');
+  // Bell shows only for unread orders that haven't been viewed yet
+  const isNewUnread = item.unread && !isRead;
 
   const handlePrimaryAction = React.useCallback(() => {
     setIsRead(true);
@@ -378,89 +367,103 @@ function OrderCard({
   return (
     <Card
       padding={4}
-      gap={0}
+      gap={3}
       footer={
-        // ─── Zone 6: Actions — one primary, one secondary ─────────────────
-        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2} paddingTop={2}>
+        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2} paddingTop={1}>
           <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={handlePrimaryAction} />
-          <Button label={expanded ? 'إخفاء التفاصيل' : 'التفاصيل'} size="sm" tone="secondary" fullWidth={false} onPress={handleToggleDetails} />
+          <Button label={expanded ? 'إخفاء التفاصيل' : 'تفاصيل الطلب'} size="sm" tone="secondary" fullWidth={false} onPress={handleToggleDetails} />
         </Box>
       }
     >
-      <Box gap={3}>
-        {/* ─── Zone 1: Order Code (PRIMARY) + Bell + Status Badges ──────── */}
-        <Box gap={1}>
-          <Box style={{ flexDirection: rowDir, alignItems: 'center', flexWrap: 'wrap' }} gap={2}>
+      <Box gap={2}>
+        {/* Row 1: Header (Code + Badges + Bell) */}
+        <Box style={{ flexDirection: rowDir, justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box style={{ flexDirection: rowDir, alignItems: 'center' }} gap={2}>
             <Text role="titleMd" tone="brand">{item.orderCode}</Text>
-            {isNewUnread ? <Icon name="notifications" size={18} color={tokens.warning} /> : null}
-            <Chip label={statusLabel} tone={statusTone} selected />
-            {item.slaRisk && item.slaLabel ? (
-              <Chip label={item.slaLabel} tone="danger" />
-            ) : item.slaRisk ? (
-              <Chip label="SLA قريب" tone="danger" />
+            {isNewUnread ? (
+              <Box style={{ backgroundColor: tokens.warning + '15', borderRadius: 12, padding: 4 }}>
+                <Icon name="notifications" size={16} color={tokens.warning} />
+              </Box>
             ) : null}
-            {item.urgent ? <Chip label="عاجل" tone="warning" /> : null}
-            {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" /> : null}
+            <Chip label={statusLabel} tone={statusTone} selected />
+          </Box>
+          <Text role="caption" tone="muted">{item.elapsedLabel}</Text>
+        </Box>
+
+        {/* Row 2: Status alerts/SLA */}
+        {(item.slaRisk || item.urgent || item.issueRequired) && (
+          <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2}>
+            {item.slaRisk && item.slaLabel ? (
+              <Chip label={item.slaLabel} tone="danger" selected />
+            ) : item.slaRisk ? (
+              <Chip label="SLA قريب" tone="danger" selected />
+            ) : null}
+            {item.urgent ? <Chip label="عاجل" tone="warning" selected /> : null}
+            {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" selected /> : null}
+          </Box>
+        )}
+
+        {/* Row 3: Action Highlight */}
+        <Box style={{ backgroundColor: tokens.neutralLight || '#f8f9fa', borderRadius: 8, padding: 8, borderLeftWidth: 4, borderLeftColor: tokens[statusTone] || tokens.brand }}>
+          <Text role="bodySm" tone={statusTone} style={{ fontWeight: '700' }}>
+            الإجراء المطلوب: {item.nextActionLabel}
+          </Text>
+        </Box>
+
+        {/* Row 4: Items & Summary */}
+        <Box gap={1}>
+          <Text role="bodySm" style={{ fontWeight: '600' }}>
+            {item.itemsCountLabel} {item.itemsSummaryLabel ? `· ${item.itemsSummaryLabel}` : ''}
+          </Text>
+        </Box>
+
+        {/* Row 5: Fulfillment & Payment */}
+        <Box style={{ flexDirection: rowDir, justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }} gap={2}>
+          <Box style={{ flexDirection: rowDir, alignItems: 'center' }} gap={2}>
+            <Chip label={item.orderTypeLabel} tone="brand" />
+            {item.nextOwnerLabel ? (
+              <Text role="bodySm" tone="muted">· الجهة التالية: {item.nextOwnerLabel}</Text>
+            ) : null}
+          </Box>
+          <Box style={{ flexDirection: rowDir, alignItems: 'center' }} gap={2}>
+            <Text role="bodyStrong">{item.amountLabel}</Text>
+            {item.paymentLabel ? (
+              <Text role="caption" tone="muted">({item.paymentLabel})</Text>
+            ) : null}
           </Box>
         </Box>
 
-        {/* ─── Zone 2: Next Action (HIGHLIGHTED) ────────────────────────── */}
-        <Box style={{ borderRadius: 8, padding: 8 }}>
-          <Text role="bodySm" tone={statusTone} style={{ fontWeight: '700' }}>
-            الإجراء الآن: {item.nextActionLabel}
-          </Text>
-        </Box>
-
-        {/* ─── Zone 3: Items Summary ────────────────────────────────────── */}
-        <Box gap={1}>
-          <Text role="bodySm" tone="muted">
-            {item.itemsSummaryLabel
-              ? `${item.itemsCountLabel}: ${item.itemsSummaryLabel}`
-              : item.itemsCountLabel}
-          </Text>
-        </Box>
-
-        {/* ─── Zone 4: Delivery + Next Owner ───────────────────────────── */}
-        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
-          <Chip label={item.orderTypeLabel} tone="brand" />
-          {item.nextOwnerLabel ? (
-            <Text role="bodySm" tone="muted">· الجهة التالية: {item.nextOwnerLabel}</Text>
-          ) : null}
-          <Text role="bodySm" tone="muted">· {item.elapsedLabel}</Text>
-        </Box>
-
-        {/* ─── Zone 5: Payment ───────────────────────────────────────────── */}
-        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
-          <Text role="bodyStrong">{item.amountLabel}</Text>
-          {item.paymentLabel ? <Text role="bodySm" tone="muted">· {item.paymentLabel}</Text> : null}
-        </Box>
-
-        {/* ─── Zone 6: Inline Details ────────────────────────────────────── */}
-        {expanded ? (
-          <Box gap={2} style={{ paddingTop: 10 }}>
-            <Text role="caption" tone="muted">{item.customerName}</Text>
-            {item.itemsSummaryLabel ? (
-              <Text role="caption" tone="muted">{item.itemsCountLabel}: {item.itemsSummaryLabel}</Text>
-            ) : null}
-            {item.paymentLabel ? (
-              <Text role="caption" tone="muted">الدفع: {item.paymentLabel}</Text>
-            ) : null}
-            <Text role="caption" tone="muted">حالة التوصيل: {resolveStatusLabel(item.status, item.orderMode)}</Text>
-            {item.nextOwnerLabel ? (
-              <Text role="caption" tone="muted">الجهة التالية: {item.nextOwnerLabel}</Text>
-            ) : null}
+        {/* Row 6: Expandable Details (Inline Block) */}
+        {expanded && (
+          <Box gap={3} style={{ paddingTop: 12, borderTopWidth: 1, borderTopColor: tokens.border || '#e9ecef' }}>
             <Box gap={1}>
+              <Text role="caption" tone="muted">رمز الطلب: {item.orderCode}</Text>
+              <Text role="caption" tone="muted">الفرع: {item.branchLabel}</Text>
+              <Text role="caption" tone="muted">تاريخ الإنشاء: {item.createdAtLabel}</Text>
+              <Text role="caption" tone="muted">الوقت المنقضي: {item.elapsedLabel}</Text>
+            </Box>
+
+            <Box gap={1.5}>
+              <Text role="bodySm" style={{ fontWeight: '600' }}>تتبع حالة الطلب:</Text>
               {resolveOrderHistory(item.status, item.orderMode).map((step) => (
-                <Text key={step.id} role="caption" tone="muted">
-                  {step.done ? '✓ ' : '· '}{step.label}
-                </Text>
+                <Box key={step.id} style={{ flexDirection: rowDir, alignItems: 'center' }} gap={1.5}>
+                  <Icon
+                    name={step.done ? 'checkmark' : 'ellipse'}
+                    size={14}
+                    color={step.done ? tokens.success : tokens.textMuted}
+                  />
+                  <Text role="caption" tone={step.done ? 'default' : 'muted'}>
+                    {step.label}
+                  </Text>
+                </Box>
               ))}
             </Box>
-            <Text role="caption" tone="muted">الفرع: {item.branchLabel}</Text>
-            <Text role="caption" tone="muted">وصل: {item.createdAtLabel} · {item.elapsedLabel}</Text>
-            <Button label="مشكلة في الطلب" size="sm" tone="ghost" fullWidth={false} onPress={onQuickView} />
+
+            <Box style={{ flexDirection: rowDir }} justify="flex-end">
+              <Button label="مشكلة في الطلب" size="sm" tone="ghost" onPress={onIssueAction} />
+            </Box>
           </Box>
-        ) : null}
+        )}
       </Box>
     </Card>
   );
@@ -482,7 +485,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const [sortMode, setSortMode] = React.useState<SortMode>('next_action');
   const [query, setQuery] = React.useState('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(items[0]?.id ?? null);
-  const [detailsVisible, setDetailsVisible] = React.useState(false);
   // ML-016: acceptance timer sheet — shown when partner presses accept on a needs_accept order
   const [acceptSheetVisible, setAcceptSheetVisible] = React.useState(false);
   const [acceptingOrderId, setAcceptingOrderId] = React.useState<string | null>(null);
@@ -586,11 +588,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     });
   }, [items, normalizedQuery, selectedQuickFilters, selectedStage, sortMode]);
 
-  const selectedOrder = React.useMemo(
-    () => filteredItems.find((item) => item.id === selectedOrderId) ?? filteredItems[0] ?? null,
-    [filteredItems, selectedOrderId]
-  );
-
   React.useEffect(() => {
     if (filteredItems.length === 0) {
       if (selectedOrderId !== null) {
@@ -674,16 +671,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     return renderState(state, onRetry);
   }
 
-  function openQuickView(orderId: string) {
-    setSelectedOrderId(orderId);
-    setDetailsVisible(true);
-  }
-
-  function openOrderDetail(orderId: string) {
-    setSelectedOrderId(orderId);
-    onOpenOrderAction?.('details', orderId);
-  }
-
   function openPrimaryAction(item: PartnerOrderItem) {
     setSelectedOrderId(item.id);
     const action = resolveOrderAction(item.status);
@@ -697,52 +684,50 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
 
   return (
     <>
-      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: 112 }}>
+      <MobileScrollView fill padding={4} gap={3}>
 
-        {/* ─── Search + filter header ──────────────────────────── */}
-        <Surface tone="raised" padding={3} gap={2}>
-          <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: resolveRowDirection(direction) }}>
-            <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }} gap={2}>
-              {searchMode && (
-                <Button
-                  label="←"
-                  size="sm"
-                  tone="ghost"
-                  fullWidth={false}
-                  onPress={onCloseSearch}
-                />
-              )}
-              <Text role="label">بحث الطلبات</Text>
-            </Box>
-            {hasActiveFilters && (
+        {/* ─── Search + filter header ─── */}
+        <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: resolveRowDirection(direction) }}>
+          <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }} gap={2}>
+            {searchMode && (
               <Button
-                label="مسح"
+                label="←"
                 size="sm"
                 tone="ghost"
                 fullWidth={false}
-                onPress={handleClearFilters}
+                onPress={onCloseSearch}
               />
             )}
+            <Text role="label">بحث الطلبات</Text>
           </Box>
-          <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }}>
-            <Box style={{ flex: 1 }}>
-              <SearchField
-                label=""
-                value={query}
-                onChangeText={setQuery}
-                placeholder="رقم الطلب، العنصر، الحالة"
-              />
-            </Box>
+          {hasActiveFilters && (
             <Button
-              label={`فلترة${activeFiltersCount > 0 ? ` (${activeFiltersCount})` : ''}`}
-              tone={activeFiltersCount > 0 ? 'primary' : 'secondary'}
-              size="md"
+              label="مسح"
+              size="sm"
+              tone="ghost"
               fullWidth={false}
-              onPress={() => setAdvancedPanelVisible(true)}
+              onPress={handleClearFilters}
+            />
+          )}
+        </Box>
+        <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }}>
+          <Box style={{ flex: 1 }}>
+            <SearchField
+              label=""
+              value={query}
+              onChangeText={setQuery}
+              placeholder="رقم الطلب، العنصر، الحالة"
             />
           </Box>
-          {renderActiveTokens()}
-        </Surface>
+          <Button
+            label={`فلترة${activeFiltersCount > 0 ? ` (${activeFiltersCount})` : ''}`}
+            tone={activeFiltersCount > 0 ? 'primary' : 'secondary'}
+            size="md"
+            fullWidth={false}
+            onPress={() => setAdvancedPanelVisible(true)}
+          />
+        </Box>
+        {renderActiveTokens()}
 
         {/* ─── Stage chip rail — with per-stage count ───────────── */}
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2} paddingHorizontal={1} paddingVertical={1}>
@@ -784,45 +769,13 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
                 item={item}
                 direction={direction}
                 onPrimaryAction={() => openPrimaryAction(item)}
-                onViewDetails={() => openOrderDetail(item.id)}
-                onQuickView={() => openQuickView(item.id)}
+                onIssueAction={() => onOpenOrderAction?.('issue', item.id)}
               />
             ))}
           </Box>
         )}
 
       </MobileScrollView>
-
-      {/* ─── Quick view sheet ─────────────────────────────────── */}
-      <SheetFrame visible={detailsVisible} title={selectedOrder ? `معاينة ${selectedOrder.orderCode}` : 'معاينة الطلب'} onClose={() => setDetailsVisible(false)}>
-        {selectedOrder ? (
-          <Box gap={3}>
-            <Box gap={1}>
-              <Text role="titleSm">{selectedOrder.orderCode}</Text>
-              <Text role="bodySm" tone="muted">{selectedOrder.branchLabel} · {selectedOrder.orderTypeLabel}</Text>
-            </Box>
-            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-              <Chip label={resolveStatusLabel(selectedOrder.status)} tone={resolveStatusTone(selectedOrder.status)} selected />
-              <Chip label={selectedOrder.amountLabel} tone="success" />
-              {selectedOrder.priority === 'high' ? <Chip label="أولوية عالية" tone="danger" /> : null}
-              {selectedOrder.slaRisk ? <Chip label={selectedOrder.slaLabel ?? 'SLA قريب'} tone="danger" /> : null}
-            </Box>
-            {selectedOrder.itemsSummaryLabel ? (
-              <Text role="bodySm" tone="muted">{selectedOrder.itemsCountLabel}: {selectedOrder.itemsSummaryLabel}</Text>
-            ) : (
-              <Text role="bodySm" tone="muted">{selectedOrder.itemsCountLabel}</Text>
-            )}
-            {selectedOrder.paymentLabel ? (
-              <Text role="bodySm" tone="muted">الدفع: {selectedOrder.paymentLabel}</Text>
-            ) : null}
-            <Text role="bodySm" tone="muted">الإجراء التالي: {selectedOrder.nextActionLabel}</Text>
-            <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-              <Button label={selectedOrder.nextActionLabel} fullWidth={false} onPress={() => openPrimaryAction(selectedOrder)} />
-              <Button label="فتح التفاصيل" tone="secondary" fullWidth={false} onPress={() => openOrderDetail(selectedOrder.id)} />
-            </Box>
-          </Box>
-        ) : null}
-      </SheetFrame>
 
       {/* ─── Advanced filters sheet ───────────────────────────── */}
       <SheetFrame
@@ -918,14 +871,13 @@ export type PartnerOrdersInboxScreenProps = {
   items?: readonly PartnerOrdersInboxListItem[];
   searchMode?: boolean;
   onCloseSearch?: () => void;
-  onOpenOrder?: (orderId: string) => void;
-  onOpenNextOrder?: (orderId: string) => void;
   // ML-020: explicit mark-ready callback — triggered when partner confirms order ready for pickup
   onMarkReady?: (orderId: string) => void;
+  onOpenNextOrder?: (orderId: string) => void;
   onRetry?: () => void;
 };
 
-export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, onCloseSearch, onOpenOrder, onOpenNextOrder, onMarkReady, onRetry }: PartnerOrdersInboxScreenProps) {
+export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, onCloseSearch, onMarkReady, onOpenNextOrder, onRetry }: PartnerOrdersInboxScreenProps) {
   return (
     <DshPartnerOrdersScreen
       state={state}
@@ -933,10 +885,6 @@ export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, o
       searchMode={searchMode}
       onCloseSearch={onCloseSearch}
       onOpenOrderAction={(actionId, orderId) => {
-        if (actionId === 'details') {
-          onOpenOrder?.(orderId);
-          return;
-        }
         if (actionId === 'ready') {
           onMarkReady?.(orderId);
           return;
@@ -947,58 +895,6 @@ export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, o
     />
   );
 }
-
-export type PartnerOrderDetailScreenState = PartnerOrdersHomeScreenState;
-export type PartnerOrderDetailSummary = {
-  orderId: string;
-  merchantName: string;
-  customerName: string;
-  serviceWindowLabel: string;
-  nextActionLabel: string;
-  readinessNote: string;
-};
-export type PartnerOrderDetailScreenProps = {
-  state?: PartnerOrderDetailScreenState;
-  summary?: PartnerOrderDetailSummary;
-  disableReason?: string;
-  onConfirmReady?: (orderId: string) => void;
-  onOpenNextOrder?: () => void;
-  onBackToInbox?: () => void;
-  onRetry?: () => void;
-};
-
-export function PartnerOrderDetailScreen({ state = 'ready', summary, onConfirmReady, onRetry }: PartnerOrderDetailScreenProps) {
-  const fallbackOrderId = summary?.orderId ?? 'ord-detail';
-  return (
-    <DshPartnerOrdersScreen
-      state={state}
-      items={summary ? [{
-        id: fallbackOrderId,
-        orderCode: summary.orderId,
-        customerName: summary.customerName,
-        branchLabel: summary.merchantName,
-        status: 'ready',
-        priority: 'normal',
-        orderTypeLabel: 'توصيل المتجر',
-        orderMode: 'partner_delivery',
-        itemsCountLabel: '1 عنصر',
-        amountLabel: '—',
-        createdAtLabel: summary.serviceWindowLabel,
-        elapsedLabel: summary.readinessNote,
-        nextActionLabel: summary.nextActionLabel,
-      }] : undefined}
-      onOpenOrderAction={(actionId, orderId) => {
-        if (actionId === 'ready' || actionId === 'handoff' || actionId === 'details') {
-          onConfirmReady?.(orderId);
-        }
-      }}
-      onRetry={onRetry}
-    />
-  );
-}
-
-export type OrderDetailScreenProps = PartnerOrderDetailScreenProps;
-export { PartnerOrderDetailScreen as OrderDetailScreen };
 
 // ML-016: AcceptanceTimerSheet — partner confirms order acceptance before SLA timer expires
 export function AcceptanceTimerSheet({ visible, orderCode, onConfirm, onDecline }: { visible: boolean; orderCode: string; onConfirm: () => void; onDecline: () => void }) {
