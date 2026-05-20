@@ -5,6 +5,7 @@ import {
   BannerCarousel,
   type BannerCarouselItem,
   Box,
+  BThwaniFilterChip,
   CategoryOrbitCarousel,
   Icon,
   SearchTopBar,
@@ -485,48 +486,6 @@ const CategorySelectorItem = React.memo(({
   );
 });
 
-/**
- * Internal helper for Filter Chips (memoized)
- */
-const FilterChipItem = React.memo(({
-  label,
-  icon,
-  onPress,
-  isActive,
-  styles,
-  theme,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  onPress: () => void;
-  isActive: boolean;
-  styles: DshHomeGetStyles;
-  theme: DshHomeTheme;
-}) => {
-  return (
-    <Pressable
-      style={[
-        styles.filterChip,
-        {
-          backgroundColor: isActive ? theme.brand : 'transparent',
-          borderColor: isActive ? theme.brand : theme.line,
-        },
-      ]}
-      onPress={onPress}
-    >
-      <View style={styles.filterChipContent}>
-        {icon && <View style={styles.filterChipIconWrap}>{icon}</View>}
-        <Text
-          role="bodySm"
-          style={[styles.filterChipLabel, { color: isActive ? theme.textInverse : theme.textMuted }]}
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
-      </View>
-    </Pressable>
-  );
-});
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   const titles = {
@@ -1437,13 +1396,11 @@ export function DshHomeGetScreen({
           </View>
 
           <View style={styles.filtersRow}>
-            <FilterChipItem
+            <BThwaniFilterChip
               label="الكل"
-              isActive={activeCategoryId === 'all'}
+              selected={activeCategoryId === 'all'}
               icon={<Icon name="menu-outline" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
               onPress={() => selectCategoryPage('all')}
-              styles={styles}
-              theme={theme}
             />
 
             <ScrollView
@@ -1456,24 +1413,22 @@ export function DshHomeGetScreen({
               {discoveryFilters
                 .filter((filter) => filter.value !== 'all')
                 .map((filter) => (
-                  <FilterChipItem
+                  <BThwaniFilterChip
                     key={filter.value}
                     label={filter.label}
-                    isActive={filter.value === activeFilter}
+                    selected={filter.value === activeFilter}
                     icon={<Icon name={filter.iconName as any} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
                     onPress={() => setActiveFilter(filter.value)}
-                    styles={styles}
-                    theme={theme}
                   />
                 ))}
 
               {allCategoryRailItems
                 .filter((category) => category.id !== 'all')
                 .map((category) => (
-                  <FilterChipItem
+                  <BThwaniFilterChip
                     key={category.id}
                     label={category.label}
-                    isActive={category.id === activeCategoryId}
+                    selected={category.id === activeCategoryId}
                     icon={
                       <CategoryIconImage
                         uri={category.iconUrl ?? null}
@@ -1486,8 +1441,6 @@ export function DshHomeGetScreen({
                       if (category.id === 'awnak') onOpenCategory?.('awnak');
                       if (category.id === 'shein') onOpenSheinInfo?.();
                     }}
-                    styles={styles}
-                    theme={theme}
                   />
                 ))}
             </ScrollView>
@@ -2059,37 +2012,12 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       alignItems: 'center',
       gap: spacing[2],
     },
-    filterChip: {
-      height: 34,
-      borderRadius: 12, // Soft geometric look for 2026
-      paddingHorizontal: 14,
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: 'rgba(0,0,0,0.08)',
-    },
     filterChipCategory: {
       paddingRight: 16,
-    },
-    filterChipContent: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: 6,
-    },
-    filterChipIconWrap: {
-      width: 18,
-      height: 18,
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     filterChipIcon: {
       width: 16,
       height: 16,
-    },
-    filterChipLabel: {
-      fontSize: 12,
-      fontWeight: '700', // Refined from 800 for better legibility
     },
     storeListViewport: {
       marginTop: 0, // Removed top margin for direct transition

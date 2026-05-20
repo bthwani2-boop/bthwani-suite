@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, View, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { borders, radius, resolveRowDirection, sizes, spacing } from '../foundation';
 import { useBThwaniAppearance, useDirection } from '../providers';
 import { Text } from '../primitives';
@@ -222,3 +222,92 @@ export function Chip({ label, selected = false, tone = 'default', onPress }: Chi
     </Pressable>
   );
 }
+
+// ---------------------------------------------------------------------------
+// BThwaniFilterChip — centralised filter/category chip for HomeScreen & StoreScreen
+// Pixel spec is frozen: height 34, borderRadius 12, paddingHorizontal 14,
+// iconWrap 18×18, gap 6, fontSize 12, fontWeight 700.
+// Colors come exclusively from the central appearance token system.
+// RTL direction is handled internally via useDirection(); callers do not need
+// an isRTL prop.
+// ---------------------------------------------------------------------------
+
+export type BThwaniFilterChipProps = {
+  label: string;
+  selected?: boolean;
+  icon?: React.ReactNode;
+  onPress?: () => void;
+  disabled?: boolean;
+  /** 'default' = light/neutral chip. 'glass' = dark-glass overlay chip. */
+  variant?: 'default' | 'glass';
+  /** Safe pass-through for ScrollView item layout only — no visual overrides. */
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+};
+
+export const BThwaniFilterChip = React.memo(function BThwaniFilterChip({
+  label,
+  selected = false,
+  icon,
+  onPress,
+  disabled = false,
+  variant = 'default',
+  style,
+  testID,
+}: BThwaniFilterChipProps) {
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
+  const { isRtl } = useDirection();
+
+  const isGlass = variant === 'glass';
+  const chipPalette = isGlass
+    ? (selected
+        ? appearanceTokens.components.chips.glassSelected
+        : appearanceTokens.components.chips.glass)
+    : (selected
+        ? appearanceTokens.components.chips.selected
+        : appearanceTokens.components.chips.default);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityState={{ selected, disabled }}
+      style={[
+        {
+          height: 34,
+          borderRadius: 12,
+          paddingHorizontal: 14,
+          borderWidth: 1,
+          borderColor: chipPalette.borderColor,
+          backgroundColor: chipPalette.backgroundColor,
+          opacity: disabled ? 0.4 : 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+        style,
+      ]}
+    >
+      <View
+        style={{
+          flexDirection: isRtl ? 'row-reverse' : 'row',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        {icon != null && (
+          <View style={{ width: 18, height: 18, alignItems: 'center', justifyContent: 'center' }}>
+            {icon}
+          </View>
+        )}
+        <Text
+          style={{ fontSize: 12, fontWeight: '700', color: chipPalette.textColor }}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      </View>
+    </Pressable>
+  );
+});

@@ -1,5 +1,5 @@
-export { Badge, Button, Chip } from './button';
-export type { BadgeProps, ButtonProps, ButtonTone, ChipProps } from './button';
+export { Badge, BThwaniFilterChip, Button, Chip } from './button';
+export type { BadgeProps, BThwaniFilterChipProps, ButtonProps, ButtonTone, ChipProps } from './button';
 export { AppearanceOptionCard, GlassActionButton, GlassCard, GlassChip, GlassHeroOverlay } from './appearance';
 export type { AppearanceOptionCardProps, GlassActionButtonProps, GlassCardProps, GlassChipProps, GlassHeroOverlayProps } from './appearance';
 export { AttachmentPicker, Card, DashboardShell, DetailScreenShell, ProductCard, ServiceHubShell, ServiceTileCard, StatCard } from './card';

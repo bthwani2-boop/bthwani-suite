@@ -23,6 +23,7 @@ import {
 // Removed Ionicons import
 import {
   BannerCarousel,
+  BThwaniFilterChip,
   Button,
   Chip,
   GlassHeroOverlay,
@@ -263,60 +264,6 @@ function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: strin
   return 'store_open';
 }
 
-/**
- * Internal helper for Filter Chips (Synced with HomeScreen design pattern)
- */
-function FilterChipItem({
-  label,
-  icon,
-  onPress,
-  isActive,
-  isDarkGlass,
-  theme,
-  isRTL,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  onPress: () => void;
-  isActive: boolean;
-  isDarkGlass?: boolean;
-  theme: any;
-  isRTL: boolean;
-}) {
-  return (
-    <Pressable
-      style={[
-        styles.filterChip,
-        {
-          backgroundColor: isActive
-            ? (isDarkGlass ? 'rgba(255, 255, 255, 0.95)' : colorPalette.brand)
-            : (isDarkGlass ? 'rgba(255, 255, 255, 0.1)' : 'transparent'),
-          borderColor: isActive
-            ? (isDarkGlass ? colorPalette.white : colorPalette.brand)
-            : (isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0,0,0,0.08)'),
-        },
-      ]}
-      onPress={onPress}
-    >
-      <View style={[styles.filterChipContent, isRTL && styles.rowReverse]}>
-        {icon && <View style={styles.filterChipIconWrap}>{icon}</View>}
-        <Text
-          style={[
-            styles.filterChipLabel,
-            {
-              color: isActive
-                ? (isDarkGlass ? colorPalette.brand : colorPalette.white)
-                : (isDarkGlass ? 'rgba(255, 255, 255, 0.8)' : stylesTokens.muted),
-            }
-          ]}
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
-      </View>
-    </Pressable>
-  );
-}
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
   if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
@@ -1501,7 +1448,7 @@ function DshStoreGetScreenContent({
                               };
                             }}
                           >
-                            <FilterChipItem
+                            <BThwaniFilterChip
                               label={normalizeDisplayText(category.label)}
                               icon={
                                 CATEGORY_ICON[category.id] ? (
@@ -1520,10 +1467,8 @@ function DshStoreGetScreenContent({
                                   />
                                 )
                               }
-                              isActive={selected}
-                              isDarkGlass={isDarkGlass}
-                              theme={theme}
-                              isRTL={isRTL}
+                              selected={selected}
+                              variant={isDarkGlass ? 'glass' : 'default'}
                               onPress={() => changeCategory(category.id)}
                             />
                           </View>
@@ -1625,7 +1570,7 @@ function DshStoreGetScreenContent({
                     const selected = selectedCategory === category.id;
                     return (
                       <View key={category.id}>
-                        <FilterChipItem
+                        <BThwaniFilterChip
                           label={normalizeDisplayText(category.label)}
                           icon={
                             CATEGORY_ICON[category.id] ? (
@@ -1644,10 +1589,8 @@ function DshStoreGetScreenContent({
                               />
                             )
                           }
-                          isActive={selected}
-                          isDarkGlass={isDarkGlass}
-                          theme={theme}
-                          isRTL={isRTL}
+                          selected={selected}
+                          variant={isDarkGlass ? 'glass' : 'default'}
                           onPress={() => changeCategory(category.id)}
                         />
                       </View>
@@ -2174,29 +2117,6 @@ const styles = StyleSheet.create({
   smartRailSection: {
     marginTop: 12,
     marginBottom: -6,
-  },
-  filterChip: {
-    height: 34,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  filterChipContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  filterChipIconWrap: {
-    width: 18,
-    height: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterChipLabel: {
-    fontSize: 12,
-    fontWeight: '700',
   },
   modePill: {
     flex: 1,
