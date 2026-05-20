@@ -263,7 +263,7 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
             />
 
             <WebControlPanelActionCluster
-              primary={{ id: 'finance-primary', label: selectedRow?.primaryActionLabel ?? 'تنفيذ الآن' }}
+              primary={{ id: 'finance-primary', label: selectedRow?.primaryActionLabel ?? 'مراجعة' }}
               secondary={{ id: 'finance-secondary', label: selectedRow?.secondaryActionLabel ?? 'فتح الأدلة' }}
             />
           </Box>

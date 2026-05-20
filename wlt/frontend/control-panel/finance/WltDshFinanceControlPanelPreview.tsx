@@ -16,7 +16,7 @@ import {
 import styles from './wlt-finance-control-panel.module.css';
 
 const PREVIEW_NOTICE =
-  'هذا عرض تجريبي للهيكل المالي فقط — لا يمثل بيانات حقيقية ولا تسويات فعلية ولا دفعات منفذة. العملة: ر.ي. العقد: CONTRACT_TBD.';
+  'هذا عرض تجريبي للهيكل المالي فقط — لا يمثل بيانات حقيقية ولا تسويات فعلية ولا دفعات منفذة. العملة: ر.ي. قيد المراجعة الداخلية.';
 
 function FinanceRecordCard({ record }: { record: WltDshFinancePreviewRecord }) {
   return (
@@ -38,8 +38,8 @@ function FinanceRecordCard({ record }: { record: WltDshFinancePreviewRecord }) {
       recommendation={`مطابقة المعاملة — ${record.subtitle}`}
       reason={`الجهة: ${record.actor} · المصدر: ${record.sourceOrderId ?? record.sourceStoreId ?? record.sourceCaptainId ?? record.sourceFieldAgentId ?? '—'}`}
       sla={record.timeLabel}
-      primaryAction={{ label: 'تسوية فورية', onAction: () => {} }}
-      secondaryAction={{ label: 'تفاصيل السجل', onAction: () => {} }}
+      primaryAction={{ label: 'مراجعة التسوية', onAction: () => {} }}
+      secondaryAction={{ label: 'فتح الأدلة', onAction: () => {} }}
     />
   );
 }
@@ -76,13 +76,13 @@ function StoreDeliveryFinanceSection() {
   return (
     <Box gap={3}>
       <Text role="label" className={styles.sectionTitle}>
-        مالية توصيل المتجر (partner_delivery)
+        مالية توصيل المتجر
       </Text>
       <WebControlPanelRecommendation
         title="فصل مالي: توصيل المتجر ≠ تسوية كابتن بثواني"
         reason={storeDelivery.separationNote}
         confidence="high"
-        auditTag="CONTRACT_TBD"
+        auditTag="PREVIEW_ONLY"
       />
       <SectionBlock
         title="رسوم توصيل المتجر (من العميل)"
@@ -113,9 +113,9 @@ function CaptainEligibilitySection() {
         statusTone={snapshot.isEligible ? 'success' : 'warning'}
         risk={snapshot.hasEligibilityBlock ? 'warning' : 'neutral'}
         recommendation={snapshot.eligibilityBlockReason}
-        reason={`النقص: ${snapshot.eligibilityShortfallLabel} · CONTRACT_TBD`}
+        reason={`النقص: ${snapshot.eligibilityShortfallLabel} · قيد المراجعة`}
         sla="مراجعة فورية"
-        primaryAction={{ label: 'إشعار الكابتن بالشحن', onAction: () => {} }}
+        primaryAction={{ label: 'محاكاة شحن الرصيد', onAction: () => {} }}
         secondaryAction={{ label: 'فتح ملف الكابتن', onAction: () => {} }}
       />
     </Box>
@@ -162,7 +162,7 @@ export function WltDshFinanceControlPanelContent({
         title="تنبيه: الهيكل المالي التجريبي — ر.ي"
         reason={PREVIEW_NOTICE}
         confidence="high"
-        auditTag="CONTRACT_TBD"
+        auditTag="PREVIEW_ONLY"
       />
 
       <FinanceKpiBar
