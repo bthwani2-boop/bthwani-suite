@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, View, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, PanResponder, Pressable, ScrollView, View, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from 'react-native';
 import { borders, radius, resolveRowDirection, sizes, spacing } from '../foundation';
 import { useBThwaniAppearance, useDirection } from '../providers';
 import { Text } from '../primitives';
@@ -309,5 +309,247 @@ export const BThwaniFilterChip = React.memo(function BThwaniFilterChip({
         </Text>
       </View>
     </Pressable>
+  );
+});
+
+export type BThwaniFilterRailItemState = {
+  selected: boolean;
+  disabled: boolean;
+};
+
+export type BThwaniFilterRailItem = {
+  id: string;
+  label: string;
+  icon?: React.ReactNode | ((state: BThwaniFilterRailItemState) => React.ReactNode);
+  disabled?: boolean;
+};
+
+export type BThwaniFilterRailProps = {
+  items: BThwaniFilterRailItem[];
+  selectedId?: string;
+  onSelectedIdChange?: (id: string) => void;
+  onChange?: (id: string) => void;
+  variant?: 'default' | 'glass';
+  sticky?: boolean;
+  isSelected?: (item: BThwaniFilterRailItem) => boolean;
+  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+  testID?: string;
+};
+
+export type BThwaniFilterSwipeBoundaryProps = {
+  items: BThwaniFilterRailItem[];
+  selectedId?: string;
+  onSelectedIdChange?: (id: string) => void;
+  onChange?: (id: string) => void;
+  children?: React.ReactNode;
+  disabled?: boolean;
+  threshold?: number;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+};
+
+function resolveEnabledSelectionIndex(items: BThwaniFilterRailItem[], selectedId?: string) {
+  const selectedIndex = items.findIndex((item) => item.id === selectedId && !item.disabled);
+  if (selectedIndex >= 0) {
+    return selectedIndex;
+  }
+
+  return items.findIndex((item) => !item.disabled);
+}
+
+function resolveAdjacentEnabledIndex(items: BThwaniFilterRailItem[], startIndex: number, step: number) {
+  for (let nextIndex = startIndex + step; nextIndex >= 0 && nextIndex < items.length; nextIndex += step) {
+    if (!items[nextIndex]?.disabled) {
+      return nextIndex;
+    }
+  }
+
+  return -1;
+}
+
+function resolveFilterRailIcon(icon: BThwaniFilterRailItem['icon'], state: BThwaniFilterRailItemState) {
+  if (typeof icon === 'function') {
+    return icon(state);
+  }
+
+  return icon ?? null;
+}
+
+export const BThwaniFilterRail = React.memo(function BThwaniFilterRail({
+  items,
+  selectedId,
+  onSelectedIdChange,
+  onChange,
+  variant = 'default',
+  sticky = false,
+  isSelected,
+  style,
+  contentContainerStyle,
+  testID,
+}: BThwaniFilterRailProps) {
+  const { tokens: appearanceTokens } = useBThwaniAppearance();
+  const { isRtl } = useDirection();
+  const scrollViewRef = React.useRef<ScrollView | null>(null);
+  const itemLayoutsRef = React.useRef<Record<string, { x: number; width: number }>>({});
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  const stickyBackgroundColor = variant === 'glass'
+    ? appearanceTokens.glassSurfaceStrong
+    : appearanceTokens.colors.surfacePrimary;
+  const stickyBorderColor = variant === 'glass'
+    ? appearanceTokens.colors.glassBorder
+    : appearanceTokens.colors.borderSubtle;
+
+  const scrollSelectedChipIntoView = React.useCallback((targetId?: string) => {
+    if (!targetId || !containerWidth || !scrollViewRef.current) {
+      return;
+    }
+
+    const layout = itemLayoutsRef.current[targetId];
+    if (!layout) {
+      return;
+    }
+
+    const centerOffset = containerWidth / 2 - layout.width / 2;
+    const targetX = Math.max(0, layout.x - centerOffset);
+    scrollViewRef.current.scrollTo({ x: targetX, animated: true });
+  }, [containerWidth]);
+
+  React.useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      scrollSelectedChipIntoView(selectedId);
+    });
+
+    return () => cancelAnimationFrame(handle);
+  }, [items, scrollSelectedChipIntoView, selectedId]);
+
+  const handleChange = React.useCallback((id: string) => {
+    onSelectedIdChange?.(id);
+    onChange?.(id);
+  }, [onChange, onSelectedIdChange]);
+
+  return (
+    <View
+      testID={testID}
+      onLayout={(event) => setContainerWidth(event.nativeEvent.layout.width)}
+      style={[
+        sticky
+          ? {
+              backgroundColor: stickyBackgroundColor,
+              borderBottomWidth: borders.hairline,
+              borderBottomColor: stickyBorderColor,
+            }
+          : null,
+        style,
+      ]}
+    >
+      <ScrollView
+        ref={(instance) => {
+          scrollViewRef.current = instance;
+        }}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        nestedScrollEnabled
+        decelerationRate="fast"
+        contentContainerStyle={[
+          {
+            flexDirection: isRtl ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            gap: spacing[2],
+          },
+          contentContainerStyle,
+        ]}
+      >
+        {items.map((item) => {
+          const selected = isSelected ? isSelected(item) : item.id === selectedId;
+          const iconState = { selected, disabled: Boolean(item.disabled) };
+
+          return (
+            <View
+              key={item.id}
+              onLayout={(event) => {
+                itemLayoutsRef.current[item.id] = {
+                  x: event.nativeEvent.layout.x,
+                  width: event.nativeEvent.layout.width,
+                };
+              }}
+            >
+              <BThwaniFilterChip
+                label={item.label}
+                icon={resolveFilterRailIcon(item.icon, iconState)}
+                selected={selected}
+                disabled={item.disabled}
+                variant={variant}
+                onPress={() => {
+                  if (!item.disabled) {
+                    handleChange(item.id);
+                  }
+                }}
+                testID={testID ? `${testID}-${item.id}` : undefined}
+              />
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+});
+
+export const BThwaniFilterSwipeBoundary = React.memo(function BThwaniFilterSwipeBoundary({
+  items,
+  selectedId,
+  onSelectedIdChange,
+  onChange,
+  children,
+  disabled = false,
+  threshold = 60,
+  style,
+  testID,
+}: BThwaniFilterSwipeBoundaryProps) {
+  const { isRtl } = useDirection();
+
+  const handleChange = React.useCallback((id: string) => {
+    onSelectedIdChange?.(id);
+    onChange?.(id);
+  }, [onChange, onSelectedIdChange]);
+
+  const panResponder = React.useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => false,
+        onMoveShouldSetPanResponder: (_event, gestureState) => {
+          if (disabled || items.length < 2) {
+            return false;
+          }
+
+          const { dx, dy } = gestureState;
+          return Math.abs(dx) > Math.abs(dy) * 1.25 && Math.abs(dx) > 14;
+        },
+        onPanResponderRelease: (_event, gestureState) => {
+          if (disabled || Math.abs(gestureState.dx) < threshold) {
+            return;
+          }
+
+          const currentIndex = resolveEnabledSelectionIndex(items, selectedId);
+          if (currentIndex === -1) {
+            return;
+          }
+
+          const visualStep = gestureState.dx < 0 ? 1 : -1;
+          const logicalStep = isRtl ? -visualStep : visualStep;
+          const nextIndex = resolveAdjacentEnabledIndex(items, currentIndex, logicalStep);
+
+          if (nextIndex !== -1) {
+            handleChange(items[nextIndex].id);
+          }
+        },
+      }),
+    [disabled, handleChange, isRtl, items, selectedId, threshold],
+  );
+
+  return (
+    <View testID={testID} style={style} {...panResponder.panHandlers}>
+      {children}
+    </View>
   );
 });

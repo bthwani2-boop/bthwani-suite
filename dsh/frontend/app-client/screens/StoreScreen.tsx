@@ -6,7 +6,6 @@ import {
   Modal,
   Pressable,
   PanResponder,
-  ScrollView,
   FlatList,
   StatusBar,
   Vibration,
@@ -23,7 +22,8 @@ import {
 // Removed Ionicons import
 import {
   BannerCarousel,
-  BThwaniFilterChip,
+  BThwaniFilterRail,
+  BThwaniFilterSwipeBoundary,
   Button,
   Chip,
   GlassHeroOverlay,
@@ -41,6 +41,7 @@ import {
   useUiText,
   type BannerCarouselItem,
   type BThwaniAppearanceMode,
+  type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
 import { formatDshStoreFollowersLabel } from '../shared/store-profile';
@@ -599,12 +600,9 @@ function DshStoreGetScreenContent({
   const CARD_GAP = 2;
   const SNAP_INTERVAL = CARD_HEIGHT + CARD_GAP;
 
-   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
+  const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [stickyThreshold, setStickyThreshold] = React.useState(1000);
-
-  const horizontalScrollX = React.useRef(0);
-  const isSyncingHorizontal = React.useRef(false);
 
 
   // Preview carousel state
@@ -638,32 +636,6 @@ function DshStoreGetScreenContent({
       setPreviewItem(item);
     }
   }, [previewItems]);
-
-  const chipsScrollRef = React.useRef<ScrollView | null>(null);
-  const chipLayoutsRef = React.useRef<Record<string, { x: number; width: number }>>({});
-  const [chipsContainerWidth, setChipsContainerWidth] = React.useState(0);
-
-  const scrollChipIntoView = React.useCallback((categoryId: string) => {
-    const layout = chipLayoutsRef.current[categoryId];
-    if (!layout || !chipsContainerWidth || !chipsScrollRef.current) return;
-    const centerOffset = chipsContainerWidth / 2 - layout.width / 2;
-    const targetX = Math.max(0, layout.x - centerOffset);
-    chipsScrollRef.current.scrollTo({ x: targetX, animated: true });
-    stickyChipsScrollRef.current?.scrollTo({ x: targetX, animated: true });
-  }, [chipsContainerWidth]);
-
-  const stickyChipsScrollRef = React.useRef<ScrollView | null>(null);
-  const syncHorizontalScroll = (x: number, source: 'main' | 'sticky') => {
-    if (isSyncingHorizontal.current) return;
-    isSyncingHorizontal.current = true;
-    horizontalScrollX.current = x;
-    if (source === 'main') {
-      stickyChipsScrollRef.current?.scrollTo({ x, animated: false });
-    } else {
-      chipsScrollRef.current?.scrollTo({ x, animated: false });
-    }
-    setTimeout(() => { isSyncingHorizontal.current = false; }, 16);
-  };
 
   const resolveItemsForCategory = React.useCallback((categoryId: string) => {
     const scopedItems = (() => {
@@ -716,12 +688,47 @@ function DshStoreGetScreenContent({
   const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
   const previewItems = visibleItems;
 
+  React.useEffect(() => {
+    if (!categories.length) {
+      return;
+    }
+
+    if (categories.some((category) => category.id === selectedCategory)) {
+      return;
+    }
+
+    setSelectedCategory(categories[0]?.id ?? 'all');
+  }, [categories, selectedCategory]);
+
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
     setSelectedCategory(newId);
     try { Vibration.vibrate(8); } catch { /* noop */ }
-    scrollChipIntoView(newId);
-  }, [selectedCategory, scrollChipIntoView]);
+  }, [selectedCategory]);
+
+  const categoryRailItems = React.useMemo<BThwaniFilterRailItem[]>(
+    () =>
+      categories.map((category) => ({
+        id: category.id,
+        label: normalizeDisplayText(category.label),
+        icon: CATEGORY_ICON[category.id]
+          ? <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
+          : ({ selected }) => (
+              <Icon
+                name={
+                  category.id === 'all' ? 'reorder-three-outline' :
+                  category.id === 'favorites' ? 'heart-outline' :
+                  category.id === 'new' ? 'sparkles-outline' :
+                  category.id === 'offers' ? 'pricetag-outline' :
+                  'grid-outline'
+                }
+                size={16}
+                color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? tokens.glassMutedText : appearanceChrome.secondaryText)}
+              />
+            ),
+      })),
+    [appearanceChrome.secondaryText, categories, isDarkGlass, tokens.glassMutedText],
+  );
 
   // Dual-Axis Navigation PanResponder for Preview
   // Wide hit area covering the entire wrap
@@ -751,28 +758,6 @@ function DshStoreGetScreenContent({
       },
     }),
     [previewActiveIndex, previewItems, isRTL]
-  );
-
-  const mainPanResponder = React.useMemo(() =>
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_evt, gestureState) => {
-        const { dx, dy } = gestureState;
-        return Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 12;
-      },
-      onPanResponderRelease: (_evt, gestureState) => {
-        const { dx } = gestureState;
-        const threshold = 60;
-        const currentIndex = categories.findIndex((c) => c.id === selectedCategory);
-        if (currentIndex === -1) return;
-        const nextIndex = currentIndex + (isRTL ? (dx < -threshold ? -1 : 1) : (dx < -threshold ? 1 : -1));
-
-        if (nextIndex >= 0 && nextIndex < categories.length && nextIndex !== currentIndex) {
-          changeCategory(categories[nextIndex].id);
-        }
-      },
-    }),
-    [categories, selectedCategory, isRTL, changeCategory]
   );
 
   const renderPreviewItem = React.useCallback(({ item, index }: { item: DshStoreGetMenuItem, index: number }) => {
@@ -1187,7 +1172,13 @@ function DshStoreGetScreenContent({
       )}
 
         <View style={styles.feedSection}>
-          <Animated.View style={styles.feedList} {...mainPanResponder.panHandlers}>
+          <BThwaniFilterSwipeBoundary
+            items={categoryRailItems}
+            selectedId={selectedCategory}
+            onSelectedIdChange={changeCategory}
+            style={styles.feedList}
+            testID="store-category-swipe-boundary"
+          >
             <Animated.FlatList
               onScroll={Animated.event(
                 [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -1424,57 +1415,14 @@ function DshStoreGetScreenContent({
                       <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
                     </View>
 
-                   <View style={styles.sectionBlock}>
-                     <ScrollView
-                       horizontal
-                       ref={(r) => { chipsScrollRef.current = r; }}
-                       onScroll={(e) => syncHorizontalScroll(e.nativeEvent.contentOffset.x, 'main')}
-                       scrollEventThrottle={16}
-                       onLayout={(e) => setChipsContainerWidth(e.nativeEvent.layout.width)}
-                      showsHorizontalScrollIndicator={false}
-                      nestedScrollEnabled
-                      decelerationRate="fast"
-                      contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
-                    >
-                      {categories.map((category) => {
-                        const selected = selectedCategory === category.id;
-                        return (
-                          <View
-                            key={category.id}
-                            onLayout={(e) => {
-                              chipLayoutsRef.current[category.id] = {
-                                x: e.nativeEvent.layout.x,
-                                width: e.nativeEvent.layout.width,
-                              };
-                            }}
-                          >
-                            <BThwaniFilterChip
-                              label={normalizeDisplayText(category.label)}
-                              icon={
-                                CATEGORY_ICON[category.id] ? (
-                                  <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
-                                ) : (
-                                  <Icon
-                                    name={
-                                      category.id === 'all' ? 'reorder-three-outline' :
-                                      category.id === 'favorites' ? 'heart-outline' :
-                                      category.id === 'new' ? 'sparkles-outline' :
-                                      category.id === 'offers' ? 'pricetag-outline' :
-                                      'grid-outline'
-                                    }
-                                    size={16}
-                                    color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : appearanceChrome.secondaryText)}
-                                  />
-                                )
-                              }
-                              selected={selected}
-                              variant={isDarkGlass ? 'glass' : 'default'}
-                              onPress={() => changeCategory(category.id)}
-                            />
-                          </View>
-                        );
-                      })}
-                    </ScrollView>
+                    <View style={styles.sectionBlock}>
+                      <BThwaniFilterRail
+                        items={categoryRailItems}
+                        selectedId={selectedCategory}
+                        onSelectedIdChange={changeCategory}
+                        variant={isDarkGlass ? 'glass' : 'default'}
+                        testID="store-category-rail"
+                      />
                     </View>
                   </View>
                 </>
@@ -1525,7 +1473,7 @@ function DshStoreGetScreenContent({
                 </View>
               }
             />
-          </Animated.View>
+          </BThwaniFilterSwipeBoundary>
 
           {/* Premium Glass Sticky Categories Overlay - Docked at 0 */}
           <Animated.View
@@ -1556,47 +1504,14 @@ function DshStoreGetScreenContent({
                 <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]}>قائمة الأصناف</Text>
               </View>
               <View style={styles.sectionBlock}>
-                <ScrollView
-                  horizontal
-                  ref={(r) => { stickyChipsScrollRef.current = r; }}
-                  onScroll={(e) => syncHorizontalScroll(e.nativeEvent.contentOffset.x, 'sticky')}
-                  scrollEventThrottle={16}
-                  showsHorizontalScrollIndicator={false}
-                  nestedScrollEnabled
-                  decelerationRate="fast"
-                  contentContainerStyle={[styles.categoryRow, isRTL && styles.rowReverse]}
-                >
-                  {categories.map((category) => {
-                    const selected = selectedCategory === category.id;
-                    return (
-                      <View key={category.id}>
-                        <BThwaniFilterChip
-                          label={normalizeDisplayText(category.label)}
-                          icon={
-                            CATEGORY_ICON[category.id] ? (
-                              <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
-                            ) : (
-                              <Icon
-                                name={
-                                  category.id === 'all' ? 'reorder-three-outline' :
-                                  category.id === 'favorites' ? 'heart-outline' :
-                                  category.id === 'new' ? 'sparkles-outline' :
-                                  category.id === 'offers' ? 'pricetag-outline' :
-                                  'grid-outline'
-                                }
-                                size={16}
-                                color={selected ? (isDarkGlass ? colorPalette.brand : colorPalette.white) : (isDarkGlass ? 'rgba(255,255,255,0.7)' : appearanceChrome.secondaryText)}
-                              />
-                            )
-                          }
-                          selected={selected}
-                          variant={isDarkGlass ? 'glass' : 'default'}
-                          onPress={() => changeCategory(category.id)}
-                        />
-                      </View>
-                    );
-                  })}
-                </ScrollView>
+                <BThwaniFilterRail
+                  items={categoryRailItems}
+                  selectedId={selectedCategory}
+                  onSelectedIdChange={changeCategory}
+                  variant={isDarkGlass ? 'glass' : 'default'}
+                  sticky
+                  testID="store-category-rail-sticky"
+                />
               </View>
             </View>
           </Animated.View>
@@ -2151,14 +2066,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     width: '100%',
   },
-  categoryRow: {
-    marginTop: 0,
-    flexDirection: 'row',
-    gap: 6,
-    justifyContent: 'flex-end',
-    paddingVertical: 0,
-  },
-
   feedSection: {
     flex: 1,
     minHeight: 0,

@@ -5,7 +5,8 @@ import {
   BannerCarousel,
   type BannerCarouselItem,
   Box,
-  BThwaniFilterChip,
+  BThwaniFilterRail,
+  BThwaniFilterSwipeBoundary,
   CategoryOrbitCarousel,
   Icon,
   SearchTopBar,
@@ -26,6 +27,7 @@ import {
   ServiceOrbitCarousel,
   type OrbitAnchorLayout,
   type OrbitCarouselItem,
+  type BThwaniFilterRailItem,
   type Direction,
   useDirection,
   useTheme,
@@ -355,6 +357,17 @@ const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName:
   { value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
 ];
 
+const HOME_CATEGORY_FILTER_PREFIX = 'category:';
+const HOME_MODE_FILTER_PREFIX = 'mode:';
+
+function buildHomeCategoryFilterId(categoryId: string) {
+  return `${HOME_CATEGORY_FILTER_PREFIX}${categoryId}`;
+}
+
+function buildHomeModeFilterId(filter: DiscoveryFilter) {
+  return `${HOME_MODE_FILTER_PREFIX}${filter}`;
+}
+
 const categoryIconMap: Record<string, string> = {
   restaurants: '🍽️',
   grocery: '🛒',
@@ -591,6 +604,7 @@ export function DshHomeGetScreen({
   const [categoriesDialLayout, setCategoriesDialLayout] = React.useState<DialAnchorLayout | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<DiscoveryFilter>('all');
   const [activeCategoryId, setActiveCategoryId] = React.useState<string>('all');
+  const [activeRailItemId, setActiveRailItemId] = React.useState<string>(buildHomeCategoryFilterId('all'));
   const [activeSubcategoryId, setActiveSubcategoryId] = React.useState<string | null>(null);
   const [activePromoIndex, setActivePromoIndex] = React.useState(0);
 
@@ -752,6 +766,96 @@ export function DshHomeGetScreen({
       })),
     [categoryItems]
   );
+
+  const homeFilterRailItems = React.useMemo<BThwaniFilterRailItem[]>(
+    () => [
+      {
+        id: buildHomeCategoryFilterId('all'),
+        label: 'الكل',
+        icon: ({ selected }) => (
+          <Icon
+            name="menu-outline"
+            size={16}
+            color={selected ? theme.textInverse : theme.textMuted}
+          />
+        ),
+      },
+      ...discoveryFilters
+        .filter((filter) => filter.value !== 'all')
+        .map((filter) => ({
+          id: buildHomeModeFilterId(filter.value),
+          label: filter.label,
+          icon: ({ selected }: { selected: boolean }) => (
+            <Icon
+              name={filter.iconName as any}
+              size={16}
+              color={selected ? theme.textInverse : theme.textMuted}
+            />
+          ),
+        })),
+      ...allCategoryRailItems
+        .filter((category) => category.id !== 'all')
+        .map((category) => ({
+          id: buildHomeCategoryFilterId(category.id),
+          label: category.label,
+          icon: (
+            <CategoryIconImage
+              uri={category.iconUrl ?? null}
+              emojiFallback={category.icon}
+              style={styles.filterChipIcon}
+            />
+          ),
+        })),
+    ],
+    [allCategoryRailItems, styles.filterChipIcon, theme.textInverse, theme.textMuted],
+  );
+
+  const handleHomeFilterRailChange = React.useCallback((itemId: string) => {
+    setActiveRailItemId(itemId);
+
+    if (itemId.startsWith(HOME_MODE_FILTER_PREFIX)) {
+      setActiveFilter(itemId.slice(HOME_MODE_FILTER_PREFIX.length) as DiscoveryFilter);
+      return;
+    }
+
+    if (itemId.startsWith(HOME_CATEGORY_FILTER_PREFIX)) {
+      const categoryId = itemId.slice(HOME_CATEGORY_FILTER_PREFIX.length);
+      selectCategoryPage(categoryId);
+
+      if (categoryId === 'awnak') {
+        onOpenCategory?.('awnak');
+      }
+
+      if (categoryId === 'shein') {
+        onOpenSheinInfo?.();
+      }
+    }
+  }, [onOpenCategory, onOpenSheinInfo, selectCategoryPage]);
+
+  const isHomeFilterRailItemSelected = React.useCallback((item: BThwaniFilterRailItem) => {
+    if (item.id.startsWith(HOME_MODE_FILTER_PREFIX)) {
+      return item.id === buildHomeModeFilterId(activeFilter);
+    }
+
+    if (item.id.startsWith(HOME_CATEGORY_FILTER_PREFIX)) {
+      return item.id === buildHomeCategoryFilterId(activeCategoryId);
+    }
+
+    return false;
+  }, [activeCategoryId, activeFilter]);
+
+  React.useEffect(() => {
+    const categoryRailItemId = buildHomeCategoryFilterId(activeCategoryId || 'all');
+    if (activeRailItemId.startsWith(HOME_CATEGORY_FILTER_PREFIX) && activeRailItemId !== categoryRailItemId) {
+      setActiveRailItemId(categoryRailItemId);
+    }
+  }, [activeCategoryId, activeRailItemId]);
+
+  React.useEffect(() => {
+    if (!homeFilterRailItems.some((item) => item.id === activeRailItemId)) {
+      setActiveRailItemId(buildHomeCategoryFilterId(activeCategoryId || 'all'));
+    }
+  }, [activeCategoryId, activeRailItemId, homeFilterRailItems]);
 
 
   React.useEffect(() => {
@@ -1188,6 +1292,8 @@ export function DshHomeGetScreen({
     return renderState(state, onRetry);
   }
 
+  const stickyFilterIndex = inlineSearchVisible || bannerItems.length > 0 ? 2 : 1;
+
   return (
     <View style={styles.screenRoot}>
       {inlineSearchVisible ? (
@@ -1222,6 +1328,7 @@ export function DshHomeGetScreen({
 
       <ScrollView
         style={{ flex: 1 }}
+        stickyHeaderIndices={[stickyFilterIndex]}
         contentContainerStyle={{
           paddingHorizontal: spacing[3],
           paddingTop: spacing[0],
@@ -1259,195 +1366,158 @@ export function DshHomeGetScreen({
           />
         ) : null}
 
-        <Box gap={0}>
-          <View style={styles.categoriesSelectorSection}>
-            <View style={styles.categoriesSelectorRow}>
-              <View style={styles.fixedIconsContainer}>
+        <View style={styles.categoriesSelectorSection}>
+          <View style={styles.categoriesSelectorRow}>
+            <View style={styles.fixedIconsContainer}>
+              <CategorySelectorItem
+                isVideo
+                label="فيديو"
+                icon={<Icon name="play" size={22} color={colorPalette.brand} />}
+                onPress={() => setShortsVisible(true)}
+                styles={styles}
+                theme={theme}
+              />
+
+              <View ref={categoriesAnchorRef} collapsable={false}>
                 <CategorySelectorItem
-                  isVideo
-                  label="فيديو"
-                  icon={<Icon name="play" size={22} color={colorPalette.brand} />}
-                  onPress={() => setShortsVisible(true)}
+                  isHub
+                  label="الفئات"
+                  icon={<CategoryHubIcon />}
+                  onPress={openCategoriesDial}
                   styles={styles}
                   theme={theme}
                 />
-
-                <View ref={categoriesAnchorRef} collapsable={false}>
-                  <CategorySelectorItem
-                    isHub
-                    label="الفئات"
-                    icon={<CategoryHubIcon />}
-                    onPress={openCategoriesDial}
-                    styles={styles}
-                    theme={theme}
-                  />
-                </View>
-
-                {selectedCategoryFixture && (
-                  <CategorySelectorItem
-                    isSelected
-                    label={selectedCategoryLabel}
-                    icon={
-                      <CategoryIconImage
-                        uri={activeCategoryDialItem?.iconUrl ?? null}
-                        emojiFallback={activeCategoryDialItem?.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
-                        style={styles.categoryIconImage}
-                      />
-                    }
-                    onPress={() => setActiveSubcategoryId(null)}
-                    styles={styles}
-                    theme={theme}
-                  />
-                )}
               </View>
 
-              {activeHomePromo && (
-                <Pressable
-                  style={styles.heroPromoCard}
-                  onPress={() => {
-                    const promo = activeHomePromo;
-                    const mockPromo: DshHomeGetPromo = {
-                      id: promo.id,
-                      title: promo.title,
-                      subtitle: promo.subtitle,
-                      icon: '✨',
-                      actionType: normalizeHomePromoActionType(promo.targetType),
-                      actionTarget: promo.targetId,
-                    };
-                    resolveBannerPress(mockPromo)();
-                  }}
-                >
-                  {activeHomePromo.imageUrl && (
-                    <Image
-                      source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
-                      style={styles.heroPromoBackground}
-                      resizeMode="cover"
+              {selectedCategoryFixture && (
+                <CategorySelectorItem
+                  isSelected
+                  label={selectedCategoryLabel}
+                  icon={
+                    <CategoryIconImage
+                      uri={activeCategoryDialItem?.iconUrl ?? null}
+                      emojiFallback={activeCategoryDialItem?.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
+                      style={styles.categoryIconImage}
                     />
-                  )}
-                  <View style={styles.heroPromoContent}>
-                    <View style={styles.heroPromoIconContainer}>
-                      {activeHomePromo.thumbnail ? (
-                        <Image
-                          source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
-                          style={styles.heroPromoMascot}
-                          resizeMode="contain"
-                        />
-                      ) : (
-                        <Icon name="ribbon-outline" size={32} color={colorPalette.warning} />
-                      )}
-                    </View>
-                    <View style={styles.heroPromoTextWrap}>
-                      <Text style={styles.heroPromoTitle} numberOfLines={1}>
-                        بثواني برو
-                      </Text>
-                      <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
-                        {activeHomePromo.subtitle}
-                      </Text>
-                      {activeHomePromo.ctaText && (
-                        <View style={styles.heroPromoCtaButton}>
-                          <Text style={styles.heroPromoCtaText}>
-                            {activeHomePromo.ctaText}
-                          </Text>
-                          <Icon name="chevron-back" size={10} color="white" />
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                </Pressable>
-              )}
-
-              {selectedSubcategoryCards.length > 0 && (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  nestedScrollEnabled
-                  contentContainerStyle={styles.categoriesSelectorScrollContent}
-                  style={styles.categoriesSelectorScroll}
-                >
-                  {selectedSubcategoryCards.map((subcategory) => (
-                    <Pressable
-                      key={subcategory.id}
-                      style={[
-                        styles.subcategorySelectorCard,
-                        activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
-                      ]}
-                      onPress={() => setActiveSubcategoryId(subcategory.id)}
-                    >
-                      <View style={styles.subcategoryIconContainer}>
-                        <Text role="titleSm" style={styles.subcategoryEmoji}>
-                          {subcategory.emoji}
-                        </Text>
-                      </View>
-                      <Text
-                        role="bodySm"
-                        style={[
-                          styles.subcategoryName,
-                          activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {subcategory.title}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
+                  }
+                  onPress={() => setActiveSubcategoryId(null)}
+                  styles={styles}
+                  theme={theme}
+                />
               )}
             </View>
-          </View>
 
-          <View style={styles.filtersRow}>
-            <BThwaniFilterChip
-              label="الكل"
-              selected={activeCategoryId === 'all'}
-              icon={<Icon name="menu-outline" size={16} color={activeCategoryId === 'all' ? theme.textInverse : theme.textMuted} />}
-              onPress={() => selectCategoryPage('all')}
-            />
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              nestedScrollEnabled
-              contentContainerStyle={styles.filtersRowScrollContent}
-              style={styles.filtersRowScroll}
-            >
-              {discoveryFilters
-                .filter((filter) => filter.value !== 'all')
-                .map((filter) => (
-                  <BThwaniFilterChip
-                    key={filter.value}
-                    label={filter.label}
-                    selected={filter.value === activeFilter}
-                    icon={<Icon name={filter.iconName as any} size={16} color={filter.value === activeFilter ? theme.textInverse : theme.textMuted} />}
-                    onPress={() => setActiveFilter(filter.value)}
+            {activeHomePromo && (
+              <Pressable
+                style={styles.heroPromoCard}
+                onPress={() => {
+                  const promo = activeHomePromo;
+                  const mockPromo: DshHomeGetPromo = {
+                    id: promo.id,
+                    title: promo.title,
+                    subtitle: promo.subtitle,
+                    icon: '✨',
+                    actionType: normalizeHomePromoActionType(promo.targetType),
+                    actionTarget: promo.targetId,
+                  };
+                  resolveBannerPress(mockPromo)();
+                }}
+              >
+                {activeHomePromo.imageUrl && (
+                  <Image
+                    source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
+                    style={styles.heroPromoBackground}
+                    resizeMode="cover"
                   />
-                ))}
-
-              {allCategoryRailItems
-                .filter((category) => category.id !== 'all')
-                .map((category) => (
-                  <BThwaniFilterChip
-                    key={category.id}
-                    label={category.label}
-                    selected={category.id === activeCategoryId}
-                    icon={
-                      <CategoryIconImage
-                        uri={category.iconUrl ?? null}
-                        emojiFallback={category.icon}
-                        style={styles.filterChipIcon}
+                )}
+                <View style={styles.heroPromoContent}>
+                  <View style={styles.heroPromoIconContainer}>
+                    {activeHomePromo.thumbnail ? (
+                      <Image
+                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
+                        style={styles.heroPromoMascot}
+                        resizeMode="contain"
                       />
-                    }
-                    onPress={() => {
-                      selectCategoryPage(category.id);
-                      if (category.id === 'awnak') onOpenCategory?.('awnak');
-                      if (category.id === 'shein') onOpenSheinInfo?.();
-                    }}
-                  />
-                ))}
-            </ScrollView>
-          </View>
-        </Box>
+                    ) : (
+                      <Icon name="ribbon-outline" size={32} color={colorPalette.warning} />
+                    )}
+                  </View>
+                  <View style={styles.heroPromoTextWrap}>
+                    <Text style={styles.heroPromoTitle} numberOfLines={1}>
+                      بثواني برو
+                    </Text>
+                    <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
+                      {activeHomePromo.subtitle}
+                    </Text>
+                    {activeHomePromo.ctaText && (
+                      <View style={styles.heroPromoCtaButton}>
+                        <Text style={styles.heroPromoCtaText}>
+                          {activeHomePromo.ctaText}
+                        </Text>
+                        <Icon name="chevron-back" size={10} color="white" />
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </Pressable>
+            )}
 
-        <View style={styles.storeListViewport}>
+            {selectedSubcategoryCards.length > 0 && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled
+                contentContainerStyle={styles.categoriesSelectorScrollContent}
+                style={styles.categoriesSelectorScroll}
+              >
+                {selectedSubcategoryCards.map((subcategory) => (
+                  <Pressable
+                    key={subcategory.id}
+                    style={[
+                      styles.subcategorySelectorCard,
+                      activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
+                    ]}
+                    onPress={() => setActiveSubcategoryId(subcategory.id)}
+                  >
+                    <View style={styles.subcategoryIconContainer}>
+                      <Text role="titleSm" style={styles.subcategoryEmoji}>
+                        {subcategory.emoji}
+                      </Text>
+                    </View>
+                    <Text
+                      role="bodySm"
+                      style={[
+                        styles.subcategoryName,
+                        activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {subcategory.title}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+
+        <BThwaniFilterRail
+          items={homeFilterRailItems}
+          selectedId={activeRailItemId}
+          onSelectedIdChange={handleHomeFilterRailChange}
+          isSelected={isHomeFilterRailItemSelected}
+          sticky
+          style={styles.filtersRail}
+          testID="home-filter-rail"
+        />
+
+        <BThwaniFilterSwipeBoundary
+          items={homeFilterRailItems}
+          selectedId={activeRailItemId}
+          onSelectedIdChange={handleHomeFilterRailChange}
+          style={styles.storeListViewport}
+          testID="home-filter-swipe-boundary"
+        >
           <View style={styles.storeListContent}>
             {activeStorePage?.renderMode === 'manual-order' ? (
               <Box gap={3}>
@@ -1537,7 +1607,7 @@ export function DshHomeGetScreen({
               <EmptyFeed query={inlineSearchQuery} styles={styles} />
             ) : null}
           </View>
-        </View>
+        </BThwaniFilterSwipeBoundary>
 
         {shortsVisible
           ? (renderApprovedVideoReelsViewer?.({
@@ -1997,23 +2067,11 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     subcategoryNameActive: {
       color: theme.textInverse,
     },
-    filtersRow: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: spacing[2],
+    filtersRail: {
+      marginHorizontal: -spacing[3],
+      paddingHorizontal: spacing[3],
       paddingTop: 0, // Removed top padding
       paddingBottom: spacing[2], // Reduced from spacing[3]
-    },
-    filtersRowScroll: {
-      flex: 1,
-    },
-    filtersRowScrollContent: {
-      flexDirection: rowDirection,
-      alignItems: 'center',
-      gap: spacing[2],
-    },
-    filterChipCategory: {
-      paddingRight: 16,
     },
     filterChipIcon: {
       width: 16,
