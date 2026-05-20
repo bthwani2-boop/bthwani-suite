@@ -161,17 +161,21 @@ export type {
 	DshCatalogPipelineStep,
 	DshCatalogSubcategoryId,
 	DshProductFacetId,
+	DshInventoryHierarchyFilter,
 } from './catalog';
 export {
 	DSH_DOMAIN_LABELS,
 	DSH_MAIN_CATEGORY_LABELS,
 	DSH_PRODUCT_FACET_LABELS,
 	DSH_SUBCATEGORY_LABELS,
+	DSH_OPERATIONAL_FACETS,
+	isDshOperationalFacet,
 	dshCatalogMetrics,
 	dshCatalogNodes,
 	dshCatalogPipeline,
 	dshCategoryMeasurementPolicies,
 	getDshTaxonomyLabel,
+	getDshActiveFilterSummary,
 } from './catalog';
 
 export type {

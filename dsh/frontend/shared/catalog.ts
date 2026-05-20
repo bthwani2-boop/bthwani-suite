@@ -190,7 +190,26 @@ export type DshProductFacetId =
   | 'new-arrival'
   | 'seasonal'
   | 'limited-edition'
-  | 'fresh';
+  | 'fresh'
+  | 'low-stock'
+  | 'unavailable'
+  | 'not-linked'
+  | 'client-visible'
+  | 'needs-review'
+  | 'private-store'
+  | 'canonical'
+  | 'rejected'
+  | 'pending-marketing'
+  | 'pending-catalog';
+
+export const DSH_OPERATIONAL_FACETS: ReadonlyArray<DshProductFacetId> = [
+  'low-stock', 'unavailable', 'not-linked', 'client-visible', 'needs-review',
+  'private-store', 'canonical', 'rejected', 'pending-marketing', 'pending-catalog',
+];
+
+export function isDshOperationalFacet(f: DshProductFacetId): boolean {
+  return (DSH_OPERATIONAL_FACETS as ReadonlyArray<string>).includes(f);
+}
 
 export const DSH_DOMAIN_LABELS: Record<DshCatalogDomainId, string> = {
   restaurants: 'مطاعم',
@@ -260,6 +279,16 @@ export const DSH_PRODUCT_FACET_LABELS: Record<DshProductFacetId, string> = {
   seasonal: 'موسمي',
   'limited-edition': 'محدود',
   fresh: 'طازج',
+  'low-stock': 'منخفض المخزون',
+  'unavailable': 'غير متاح',
+  'not-linked': 'غير مرتبط',
+  'client-visible': 'ظاهر للعميل',
+  'needs-review': 'يحتاج مراجعة',
+  'private-store': 'منتج خاص',
+  'canonical': 'منتج مركزي',
+  'rejected': 'مرفوض',
+  'pending-marketing': 'انتظار التسويق',
+  'pending-catalog': 'انتظار الكتالوج',
 };
 
 export function getDshTaxonomyLabel(id: string): string {
@@ -270,6 +299,24 @@ export function getDshTaxonomyLabel(id: string): string {
     (DSH_PRODUCT_FACET_LABELS as Record<string, string>)[id] ??
     id
   );
+}
+
+export type DshInventoryHierarchyFilter = {
+  domainId?: DshCatalogDomainId;
+  mainCategoryId?: DshCatalogMainCategoryId;
+  subcategoryId?: DshCatalogSubcategoryId;
+  facetTags?: DshProductFacetId[];
+};
+
+export function getDshActiveFilterSummary(filter: DshInventoryHierarchyFilter): string {
+  const parts: string[] = [];
+  if (filter.domainId) parts.push(DSH_DOMAIN_LABELS[filter.domainId]);
+  if (filter.mainCategoryId) parts.push(DSH_MAIN_CATEGORY_LABELS[filter.mainCategoryId]);
+  if (filter.subcategoryId) parts.push(DSH_SUBCATEGORY_LABELS[filter.subcategoryId]);
+  if (filter.facetTags?.length) {
+    parts.push(...filter.facetTags.map((f) => DSH_PRODUCT_FACET_LABELS[f] ?? f));
+  }
+  return parts.join(' › ');
 }
 
 export const dshCatalogPipeline: ReadonlyArray<DshCatalogPipelineStep> = [

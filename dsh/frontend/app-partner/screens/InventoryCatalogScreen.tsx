@@ -11,6 +11,8 @@ import {
   DSH_MAIN_CATEGORY_LABELS as MAIN_CATEGORY_LABELS,
   DSH_SUBCATEGORY_LABELS as SUBCATEGORY_LABELS,
   DSH_PRODUCT_FACET_LABELS as FACET_LABELS,
+  DSH_OPERATIONAL_FACETS,
+  isDshOperationalFacet,
 } from '../../shared/catalog';
 import {
   Box,
@@ -41,42 +43,42 @@ import {
 } from '../../shared/workflow';
 
 
-// ── Local types (screen-scoped, no new shared files needed) ──────────
+// ── Light list model — only what is needed per row ────────────────────
 
-type InventoryCatalogItem = {
+type InventoryCatalogListItem = {
   id: string;
-  // Canonical identity — owned by catalog
   name: string;
   categoryLabel: string;
-  canonicalProductId?: string;
-  canonicalStoreId?: string;
-  sourceRecordId?: string;
-  source?: string;
-  // Identity codes
-  sku: string;
-  gtin: string;
-  barcode: string;
-  manufacturerCode: string;
-  // Catalog linkage
-  catalogLinked: boolean;
-  isCatalogOwned: boolean; // name/image/category locked
-  // PHASE 1: Hierarchical browsing
   domainId?: DshCatalogDomainId;
   mainCategoryId?: DshCatalogMainCategoryId;
   subcategoryId?: DshCatalogSubcategoryId;
   facetTags?: DshProductFacetId[];
-  isPrivateStoreProduct: boolean; // true = partner-created, false = canonical
-  mediaKey?: string; // resolved via resolveDshImageSource
-  // Partner local override
+  isPrivateStoreProduct: boolean;
+  isCatalogOwned: boolean;
+  catalogLinked: boolean;
+  mediaKey?: string;
   priceLabel: string;
   stockCount: number;
   available: boolean;
   lowStock: boolean;
-  preparationNote?: string;
-  internalNote?: string;
-  // Approval workflow
   publishStage?: string;
   reviewNeeded: boolean;
+};
+
+// ── Heavy detail model — computed on demand when item is expanded ─────
+
+type InventoryCatalogItemDetail = {
+  id: string;
+  sku: string;
+  gtin: string;
+  barcode: string;
+  manufacturerCode: string;
+  canonicalProductId?: string;
+  canonicalStoreId?: string;
+  sourceRecordId?: string;
+  source?: string;
+  preparationNote?: string;
+  internalNote?: string;
 };
 
 type PartnerLocalOverride = {
@@ -87,16 +89,7 @@ type PartnerLocalOverride = {
   internalNote: string;
 };
 
-// ── PHASE 2: Multi-layer filter state ────────────────────────────────
-
-type InventoryFilterId =
-  | 'all'
-  | 'low-stock'
-  | 'needs-review'
-  | 'not-linked'
-  | 'rejected'
-  | 'ready'
-  | 'client-visible';
+// ── Hierarchy filter — single unified funnel ──────────────────────────
 
 type ViewMode = 'cards' | 'dense-list';
 
@@ -105,34 +98,25 @@ type ActiveHierarchyFilter = {
   mainCategoryId?: DshCatalogMainCategoryId;
   subcategoryId?: DshCatalogSubcategoryId;
   facetTags?: DshProductFacetId[];
-  isPrivateStoreProduct?: boolean;
 };
 
-
-// ── Stage display helpers ────────────────────────────────────────────
+// ── Stage display helpers ─────────────────────────────────────────────
 
 function resolveStageChipTone(
   stage: string | undefined,
 ): 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info' {
   switch (stage) {
-    case 'client-visible':
-      return 'success';
-    case 'catalog-adopted':
-      return 'info';
+    case 'client-visible': return 'success';
+    case 'catalog-adopted': return 'info';
     case 'marketing-approved':
-    case 'marketing-review':
-      return 'brand';
+    case 'marketing-review': return 'brand';
     case 'partner-approved':
     case 'partner-review':
     case 'partner-submitted':
-    case 'field-submitted':
-      return 'warning';
-    case 'needs-fix':
-      return 'warning';
-    case 'rejected':
-      return 'danger';
-    default:
-      return 'default';
+    case 'field-submitted': return 'warning';
+    case 'needs-fix': return 'warning';
+    case 'rejected': return 'danger';
+    default: return 'default';
   }
 }
 
@@ -151,24 +135,69 @@ function resolveNextActionLabel(stage: string | undefined, available: boolean, s
   return 'راجع الحالة';
 }
 
-// ── Mapping ──────────────────────────────────────────────────────────
+// ── Unified filter application ────────────────────────────────────────
 
-function mapCanonicalToInventoryItem(product: DshCanonicalProductCard): InventoryCatalogItem {
+function applyHierarchyFilter(
+  items: InventoryCatalogListItem[],
+  filter: ActiveHierarchyFilter,
+): InventoryCatalogListItem[] {
+  if (!filter.domainId && !filter.mainCategoryId && !filter.subcategoryId && !filter.facetTags?.length) {
+    return items;
+  }
+  return items.filter((item) => {
+    if (filter.domainId && item.domainId !== filter.domainId) return false;
+    if (filter.mainCategoryId && item.mainCategoryId !== filter.mainCategoryId) return false;
+    if (filter.subcategoryId && item.subcategoryId !== filter.subcategoryId) return false;
+    if (filter.facetTags?.length) {
+      for (const f of filter.facetTags) {
+        if (!isDshOperationalFacet(f)) {
+          if (!item.facetTags?.includes(f)) return false;
+        } else {
+          if (f === 'low-stock' && !item.lowStock) return false;
+          if (f === 'unavailable' && item.available) return false;
+          if (f === 'not-linked' && item.catalogLinked) return false;
+          if (f === 'client-visible' && !canRenderInClientSurface(item.publishStage, 'product')) return false;
+          if (f === 'needs-review' && !item.reviewNeeded) return false;
+          if (f === 'private-store' && !item.isPrivateStoreProduct) return false;
+          if (f === 'canonical' && item.isPrivateStoreProduct) return false;
+          if (f === 'rejected' && item.publishStage !== 'rejected') return false;
+          if (f === 'pending-marketing' && item.publishStage !== 'marketing-review') return false;
+          if (f === 'pending-catalog' && item.publishStage !== 'catalog-adopted') return false;
+        }
+      }
+    }
+    return true;
+  });
+}
+
+// ── List data (light model) + detail lookup ───────────────────────────
+
+type InventoryCatalogDetailMap = Record<string, InventoryCatalogItemDetail>;
+
+const DETAIL_LOOKUP: InventoryCatalogDetailMap = {
+  'prod-1': { id: 'prod-1', sku: 'BL-BRG-001', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01' },
+  'prod-2': { id: 'prod-2', sku: 'BL-BWL-014', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14' },
+  'prod-3': { id: 'prod-3', sku: 'BL-SID-022', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22', internalNote: 'مراجعة أولية من الميداني.' },
+  'prod-4': { id: 'prod-4', sku: 'BL-DRK-090', gtin: '6280001000902', barcode: '6280001000902', manufacturerCode: 'MFR-DR-90' },
+  'prod-5': { id: 'prod-5', sku: 'BL-SAU-003', gtin: '6280001000308', barcode: '6280001000308', manufacturerCode: 'MFR-SA-03' },
+  'prod-6': { id: 'prod-6', sku: 'BL-SLD-044', gtin: '6280001000445', barcode: '6280001000445', manufacturerCode: 'MFR-SL-44' },
+  'prod-fix-me': { id: 'prod-fix-me', sku: 'BL-BKR-005', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
+  'prod-rejected': { id: 'prod-rejected', sku: 'BL-SWT-099', gtin: '6280001000995', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99', internalNote: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح.' },
+  'prod-pending-mkt': { id: 'prod-pending-mkt', sku: 'BL-DRK-102', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102' },
+};
+
+function getItemDetail(id: string): InventoryCatalogItemDetail | undefined {
+  return DETAIL_LOOKUP[id];
+}
+
+function mapCanonicalToListItem(product: DshCanonicalProductCard): InventoryCatalogListItem {
   return {
     id: product.id,
     name: product.name,
     categoryLabel: product.categoryLabel,
-    canonicalProductId: product.canonicalProductId,
-    canonicalStoreId: product.canonicalStoreId,
-    sourceRecordId: product.sourceRecordId,
-    source: product.source,
-    sku: product.sku ?? `CANONICAL-${product.sourceRecordId.toUpperCase()}`,
-    gtin: product.gtin ?? product.id,
-    barcode: product.barcode ?? product.gtin ?? product.id,
-    manufacturerCode: product.manufacturerCode ?? `FIELD-${product.sourceRecordId.toUpperCase()}`,
-    catalogLinked: true,
-    isCatalogOwned: product.publishStage === 'catalog-adopted' || product.publishStage === 'client-visible',
     isPrivateStoreProduct: false,
+    isCatalogOwned: product.publishStage === 'catalog-adopted' || product.publishStage === 'client-visible',
+    catalogLinked: true,
     mediaKey: product.mediaKey,
     priceLabel: product.priceLabel,
     stockCount: product.stockCount ?? 0,
@@ -179,12 +208,12 @@ function mapCanonicalToInventoryItem(product: DshCanonicalProductCard): Inventor
   };
 }
 
-const canonicalPreviewInventoryItems: readonly InventoryCatalogItem[] = (() => {
-  const canonicalProduct = getCanonicalPreviewProductCard('canonical-product-field-lead-5-featured');
-  return canonicalProduct ? [mapCanonicalToInventoryItem(canonicalProduct)] : [];
+const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = (() => {
+  const p = getCanonicalPreviewProductCard('canonical-product-field-lead-5-featured');
+  return p ? [mapCanonicalToListItem(p)] : [];
 })();
 
-function dedupeItems(items: ReadonlyArray<InventoryCatalogItem>) {
+function dedupeItems(items: ReadonlyArray<InventoryCatalogListItem>) {
   const seen = new Set<string>();
   return items.filter((item) => {
     if (seen.has(item.id)) return false;
@@ -193,175 +222,116 @@ function dedupeItems(items: ReadonlyArray<InventoryCatalogItem>) {
   });
 }
 
-function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
-  const scopedCanonical = canonicalPreviewInventoryItems.filter(
-    (item) => !canonicalStoreId || item.canonicalStoreId === canonicalStoreId,
+function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
+  const scopedCanonical = canonicalPreviewListItems.filter(
+    (item) => !canonicalStoreId || item.isCatalogOwned,
   );
 
   return dedupeItems([
     {
-      id: 'prod-1',
-      name: 'برغر كلاسيك',
-      sku: 'BL-BRG-001', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01',
-      categoryLabel: 'برغر',
-      catalogLinked: true, isCatalogOwned: true,
+      id: 'prod-1', name: 'برغر كلاسيك', categoryLabel: 'برغر',
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers',
       facetTags: ['bestseller', 'halal'],
-      isPrivateStoreProduct: false,
+      isPrivateStoreProduct: false, isCatalogOwned: true, catalogLinked: true,
       mediaKey: 'dsh.product.chicken.v1',
-      reviewNeeded: false,
-      available: true, lowStock: false, stockCount: 42,
-      priceLabel: '18.00 ر.ي',
-      publishStage: 'client-visible',
+      priceLabel: '18.00 ر.ي', stockCount: 42, available: true, lowStock: false,
+      publishStage: 'client-visible', reviewNeeded: false,
     },
     {
-      id: 'prod-2',
-      name: 'باول دجاج',
-      sku: 'BL-BWL-014', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14',
-      categoryLabel: 'وجبة',
-      catalogLinked: true, isCatalogOwned: true,
+      id: 'prod-2', name: 'باول دجاج', categoryLabel: 'وجبة',
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken',
       facetTags: ['spicy', 'halal'],
-      isPrivateStoreProduct: false,
+      isPrivateStoreProduct: false, isCatalogOwned: true, catalogLinked: true,
       mediaKey: 'dsh.product.chicken.v1',
-      reviewNeeded: false,
-      available: true, lowStock: true, stockCount: 3,
-      priceLabel: '24.50 ر.ي',
-      publishStage: 'client-visible',
+      priceLabel: '24.50 ر.ي', stockCount: 3, available: true, lowStock: true,
+      publishStage: 'client-visible', reviewNeeded: false,
     },
     {
-      id: 'prod-3',
-      name: 'بطاطس حارة',
-      sku: 'BL-SID-022', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22',
-      categoryLabel: 'إضافات',
-      catalogLinked: false, isCatalogOwned: false,
+      id: 'prod-3', name: 'بطاطس حارة', categoryLabel: 'إضافات',
       domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'fries',
       facetTags: ['spicy'],
-      isPrivateStoreProduct: true,
-      reviewNeeded: true,
-      available: true, lowStock: false, stockCount: 18,
-      priceLabel: '8.00 ر.ي',
-      publishStage: 'partner-submitted',
+      isPrivateStoreProduct: true, isCatalogOwned: false, catalogLinked: false,
+      priceLabel: '8.00 ر.ي', stockCount: 18, available: true, lowStock: false,
+      publishStage: 'partner-submitted', reviewNeeded: true,
     },
     {
-      id: 'prod-4',
-      name: 'عصير ليمون',
-      sku: 'BL-DRK-090', gtin: '6280001000902', barcode: '6280001000902', manufacturerCode: 'MFR-DR-90',
-      categoryLabel: 'مشروبات',
-      catalogLinked: true, isCatalogOwned: true,
+      id: 'prod-4', name: 'عصير ليمون', categoryLabel: 'مشروبات',
       domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'juices',
       facetTags: ['fresh', 'halal'],
-      isPrivateStoreProduct: false,
-      reviewNeeded: false,
-      available: true, lowStock: true, stockCount: 2,
-      priceLabel: '9.50 ر.ي',
-      publishStage: 'client-visible',
+      isPrivateStoreProduct: false, isCatalogOwned: true, catalogLinked: true,
+      priceLabel: '9.50 ر.ي', stockCount: 2, available: true, lowStock: true,
+      publishStage: 'client-visible', reviewNeeded: false,
     },
     {
-      id: 'prod-5',
-      name: 'صوص خاص',
-      sku: 'BL-SAU-003', gtin: '6280001000308', barcode: '6280001000308', manufacturerCode: 'MFR-SA-03',
-      categoryLabel: 'إضافات',
-      catalogLinked: true, isCatalogOwned: false,
+      id: 'prod-5', name: 'صوص خاص', categoryLabel: 'إضافات',
       domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'sauces',
       facetTags: ['premium'],
-      isPrivateStoreProduct: false,
-      reviewNeeded: true,
-      available: true, lowStock: false, stockCount: 9,
-      priceLabel: '2.50 ر.ي',
-      publishStage: 'partner-review',
+      isPrivateStoreProduct: false, isCatalogOwned: false, catalogLinked: true,
+      priceLabel: '2.50 ر.ي', stockCount: 9, available: true, lowStock: false,
+      publishStage: 'partner-review', reviewNeeded: true,
     },
     {
-      id: 'prod-6',
-      name: 'سلطة سيزر',
-      sku: 'BL-SLD-044', gtin: '6280001000445', barcode: '6280001000445', manufacturerCode: 'MFR-SL-44',
-      categoryLabel: 'سلطات',
-      catalogLinked: false, isCatalogOwned: false,
+      id: 'prod-6', name: 'سلطة سيزر', categoryLabel: 'سلطات',
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads',
       facetTags: ['vegetarian', 'gluten-free'],
-      isPrivateStoreProduct: true,
+      isPrivateStoreProduct: true, isCatalogOwned: false, catalogLinked: false,
       mediaKey: 'dsh.product.salad.v1',
-      reviewNeeded: true,
-      available: false, lowStock: false, stockCount: 0,
-      priceLabel: '14.75 ر.ي',
-      publishStage: 'partner-submitted',
+      priceLabel: '14.75 ر.ي', stockCount: 0, available: false, lowStock: false,
+      publishStage: 'partner-submitted', reviewNeeded: true,
     },
     {
-      id: 'prod-fix-me',
-      name: 'كرواسون زبدة',
-      sku: 'BL-BKR-005', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05',
-      categoryLabel: 'مخبوزات',
-      catalogLinked: true, isCatalogOwned: false,
+      id: 'prod-fix-me', name: 'كرواسون زبدة', categoryLabel: 'مخبوزات',
       domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads',
       facetTags: ['premium', 'new-arrival'],
-      isPrivateStoreProduct: false,
+      isPrivateStoreProduct: false, isCatalogOwned: false, catalogLinked: true,
       mediaKey: 'dsh.product.bread.v1',
-      reviewNeeded: true,
-      available: true, lowStock: false, stockCount: 12,
-      priceLabel: '9.00 ر.ي',
-      publishStage: 'needs-fix',
-      internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.',
+      priceLabel: '9.00 ر.ي', stockCount: 12, available: true, lowStock: false,
+      publishStage: 'needs-fix', reviewNeeded: true,
     },
     {
-      id: 'prod-rejected',
-      name: 'كيكة العيد',
-      sku: 'BL-SWT-099', gtin: '6280001000995', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99',
-      categoryLabel: 'حلويات',
-      catalogLinked: false, isCatalogOwned: false,
+      id: 'prod-rejected', name: 'كيكة العيد', categoryLabel: 'حلويات',
       domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes',
       facetTags: ['seasonal', 'limited-edition'],
-      isPrivateStoreProduct: true,
+      isPrivateStoreProduct: true, isCatalogOwned: false, catalogLinked: false,
       mediaKey: 'dsh.product.choco.v1',
-      reviewNeeded: false,
-      available: false, lowStock: false, stockCount: 0,
-      priceLabel: '120.00 ر.ي',
-      publishStage: 'rejected',
-      internalNote: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح.',
+      priceLabel: '120.00 ر.ي', stockCount: 0, available: false, lowStock: false,
+      publishStage: 'rejected', reviewNeeded: false,
     },
     {
-      id: 'prod-pending-mkt',
-      name: 'قهوة مثلجة',
-      sku: 'BL-DRK-102', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102',
-      categoryLabel: 'مشروبات',
-      catalogLinked: true, isCatalogOwned: false,
+      id: 'prod-pending-mkt', name: 'قهوة مثلجة', categoryLabel: 'مشروبات',
       domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'coffee',
       facetTags: ['premium', 'new-arrival'],
-      isPrivateStoreProduct: false,
-      reviewNeeded: true,
-      available: true, lowStock: false, stockCount: 25,
-      priceLabel: '15.00 ر.ي',
-      publishStage: 'marketing-review',
+      isPrivateStoreProduct: false, isCatalogOwned: false, catalogLinked: true,
+      priceLabel: '15.00 ر.ي', stockCount: 25, available: true, lowStock: false,
+      publishStage: 'marketing-review', reviewNeeded: true,
     },
     ...scopedCanonical,
   ]);
 }
 
-// ── Search dedup detection ───────────────────────────────────────────
+// ── Search state helper ───────────────────────────────────────────────
 
 type SearchMatchState = 'catalog-match' | 'needs-match' | 'not-in-catalog' | 'duplicate';
 
 function detectSearchMatch(
-  items: InventoryCatalogItem[],
+  items: InventoryCatalogListItem[],
   query: string,
 ): SearchMatchState {
   if (!query.trim()) return 'catalog-match';
   const q = query.trim().toLowerCase();
 
   const results = items.filter((item) =>
-    [item.name, item.sku, item.gtin, item.barcode, item.manufacturerCode, item.categoryLabel]
-      .join(' ').toLowerCase().includes(q),
+    [item.name, item.categoryLabel].join(' ').toLowerCase().includes(q),
   );
 
   if (results.length === 0) return 'not-in-catalog';
 
-  // Check for duplicates (same sku or gtin across different ids)
-  const skuSet = new Set<string>();
-  const gtinSet = new Set<string>();
   let hasDupe = false;
+  const nameSet = new Set<string>();
   for (const item of results) {
-    if (skuSet.has(item.sku) || gtinSet.has(item.gtin)) { hasDupe = true; break; }
-    skuSet.add(item.sku);
-    gtinSet.add(item.gtin);
+    const key = item.name.toLowerCase();
+    if (nameSet.has(key)) { hasDupe = true; break; }
+    nameSet.add(key);
   }
   if (hasDupe) return 'duplicate';
 
@@ -369,7 +339,43 @@ function detectSearchMatch(
   return 'needs-match';
 }
 
-// ── Props ────────────────────────────────────────────────────────────
+// ── Hierarchy rail helpers ────────────────────────────────────────────
+
+function getAvailableDomains(items: InventoryCatalogListItem[]): DshCatalogDomainId[] {
+  const seen = new Set<DshCatalogDomainId>();
+  items.forEach((item) => { if (item.domainId) seen.add(item.domainId); });
+  return Array.from(seen);
+}
+
+function getAvailableMainCategories(items: InventoryCatalogListItem[], domainId?: DshCatalogDomainId): DshCatalogMainCategoryId[] {
+  const seen = new Set<DshCatalogMainCategoryId>();
+  items.forEach((item) => {
+    if (item.mainCategoryId && (!domainId || item.domainId === domainId)) seen.add(item.mainCategoryId);
+  });
+  return Array.from(seen);
+}
+
+function getAvailableSubcategories(
+  items: InventoryCatalogListItem[],
+  domainId?: DshCatalogDomainId,
+  mainCategoryId?: DshCatalogMainCategoryId,
+): DshCatalogSubcategoryId[] {
+  const seen = new Set<DshCatalogSubcategoryId>();
+  items.forEach((item) => {
+    if (item.subcategoryId && (!domainId || item.domainId === domainId) && (!mainCategoryId || item.mainCategoryId === mainCategoryId)) {
+      seen.add(item.subcategoryId);
+    }
+  });
+  return Array.from(seen);
+}
+
+function getAvailableProductFacets(items: InventoryCatalogListItem[]): DshProductFacetId[] {
+  const seen = new Set<DshProductFacetId>();
+  items.forEach((item) => { item.facetTags?.forEach((f) => seen.add(f)); });
+  return Array.from(seen);
+}
+
+// ── Props ─────────────────────────────────────────────────────────────
 
 type InventoryCatalogContentProps = {
   storeName: string;
@@ -383,101 +389,36 @@ export type InventoryCatalogScreenProps = InventoryCatalogContentProps & {
   onBack?: () => void;
 };
 
-// ── PHASE 2: Filter rail ──────────────────────────────────────────────
-
-const FILTER_ITEMS: { id: InventoryFilterId; label: string }[] = [
-  { id: 'all', label: 'الكل' },
-  { id: 'low-stock', label: 'منخفض' },
-  { id: 'needs-review', label: 'يحتاج مراجعة' },
-  { id: 'not-linked', label: 'غير مرتبط' },
-  { id: 'rejected', label: 'مرفوض' },
-  { id: 'ready', label: 'جاهز للنشر' },
-  { id: 'client-visible', label: 'ظاهر للعميل' },
-];
-
-function applyFilter(items: InventoryCatalogItem[], filterId: InventoryFilterId): InventoryCatalogItem[] {
-  switch (filterId) {
-    case 'low-stock': return items.filter((item) => item.lowStock);
-    case 'needs-review': return items.filter((item) => item.reviewNeeded);
-    case 'not-linked': return items.filter((item) => !item.catalogLinked);
-    case 'rejected': return items.filter((item) => item.publishStage === 'rejected');
-    case 'ready': return items.filter((item) => item.publishStage === 'catalog-adopted');
-    case 'client-visible': return items.filter((item) => canRenderInClientSurface(item.publishStage, 'product'));
-    default: return items;
-  }
-}
-
-// ── PHASE 2: Hierarchical filter helpers ─────────────────────────────
-
-function applyHierarchyFilter(
-  items: InventoryCatalogItem[],
-  hierarchy: ActiveHierarchyFilter,
-): InventoryCatalogItem[] {
-  return items.filter((item) => {
-    if (hierarchy.domainId && item.domainId !== hierarchy.domainId) return false;
-    if (hierarchy.mainCategoryId && item.mainCategoryId !== hierarchy.mainCategoryId) return false;
-    if (hierarchy.subcategoryId && item.subcategoryId !== hierarchy.subcategoryId) return false;
-    if (hierarchy.isPrivateStoreProduct !== undefined && item.isPrivateStoreProduct !== hierarchy.isPrivateStoreProduct) return false;
-    if (hierarchy.facetTags?.length) {
-      const hasAllFacets = hierarchy.facetTags.every((f) => item.facetTags?.includes(f));
-      if (!hasAllFacets) return false;
-    }
-    return true;
-  });
-}
-
-function getAvailableDomains(items: InventoryCatalogItem[]): DshCatalogDomainId[] {
-  const seen = new Set<DshCatalogDomainId>();
-  items.forEach((item) => { if (item.domainId) seen.add(item.domainId); });
-  return Array.from(seen);
-}
-
-function getAvailableMainCategories(items: InventoryCatalogItem[], domainId?: DshCatalogDomainId): DshCatalogMainCategoryId[] {
-  const seen = new Set<DshCatalogMainCategoryId>();
-  items.forEach((item) => {
-    if (item.mainCategoryId && (!domainId || item.domainId === domainId)) seen.add(item.mainCategoryId);
-  });
-  return Array.from(seen);
-}
-
-function getAvailableSubcategories(
-  items: InventoryCatalogItem[],
-  domainId?: DshCatalogDomainId,
-  mainCategoryId?: DshCatalogMainCategoryId,
-): DshCatalogSubcategoryId[] {
-  const seen = new Set<DshCatalogSubcategoryId>();
-  items.forEach((item) => {
-    if (item.subcategoryId && (!domainId || item.domainId === domainId) && (!mainCategoryId || item.mainCategoryId === mainCategoryId)) {
-      seen.add(item.subcategoryId);
-    }
-  });
-  return Array.from(seen);
-}
-
-function getAvailableFacets(items: InventoryCatalogItem[]): DshProductFacetId[] {
-  const seen = new Set<DshProductFacetId>();
-  items.forEach((item) => { item.facetTags?.forEach((f) => seen.add(f)); });
-  return Array.from(seen);
-}
-
-// ── PHASE 2: Hierarchy filter rail component ─────────────────────────
+// ── Unified hierarchy filter rail ─────────────────────────────────────
 
 function HierarchyFilterRail({
-  hierarchy,
+  filter,
   onChange,
   items,
 }: {
-  hierarchy: ActiveHierarchyFilter;
+  filter: ActiveHierarchyFilter;
   onChange: (update: Partial<ActiveHierarchyFilter>) => void;
-  items: InventoryCatalogItem[];
+  items: InventoryCatalogListItem[];
 }) {
   const { direction } = useDirection();
   const availableDomains = getAvailableDomains(items);
-  const availableMainCategories = getAvailableMainCategories(items, hierarchy.domainId);
-  const availableSubcategories = getAvailableSubcategories(items, hierarchy.domainId, hierarchy.mainCategoryId);
-  const availableFacets = getAvailableFacets(items);
+  const availableMainCategories = getAvailableMainCategories(items, filter.domainId);
+  const availableSubcategories = getAvailableSubcategories(items, filter.domainId, filter.mainCategoryId);
+  const availableProductFacets = getAvailableProductFacets(items);
 
-  const hasActiveFilters = hierarchy.domainId || hierarchy.mainCategoryId || hierarchy.subcategoryId || hierarchy.facetTags?.length;
+  const hasActiveFilters = filter.domainId || filter.mainCategoryId || filter.subcategoryId || filter.facetTags?.length;
+
+  const activeFacetTags = filter.facetTags ?? [];
+  const activeOperationalFacets = activeFacetTags.filter(isDshOperationalFacet);
+  const activeProductFacets = activeFacetTags.filter((f) => !isDshOperationalFacet(f));
+
+  function toggleFacet(facet: DshProductFacetId) {
+    const isActive = activeFacetTags.includes(facet);
+    const next = isActive
+      ? activeFacetTags.filter((f) => f !== facet)
+      : [...activeFacetTags, facet];
+    onChange({ facetTags: next.length ? next : undefined });
+  }
 
   return (
     <Surface tone="inset" padding={2} gap={2} border={false}>
@@ -485,96 +426,112 @@ function HierarchyFilterRail({
       <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
         <Chip
           label="الكل"
-          tone={!hierarchy.domainId ? 'brand' : 'default'}
-          selected={!hierarchy.domainId}
+          tone={!filter.domainId ? 'brand' : 'default'}
+          selected={!filter.domainId}
           onPress={() => onChange({ domainId: undefined, mainCategoryId: undefined, subcategoryId: undefined })}
         />
         {availableDomains.map((d) => (
           <Chip
             key={d}
             label={DOMAIN_LABELS[d]}
-            tone={hierarchy.domainId === d ? 'brand' : 'default'}
-            selected={hierarchy.domainId === d}
+            tone={filter.domainId === d ? 'brand' : 'default'}
+            selected={filter.domainId === d}
             onPress={() => onChange({ domainId: d, mainCategoryId: undefined, subcategoryId: undefined })}
           />
         ))}
       </Box>
 
-      {/* Main category rail */}
-      {hierarchy.domainId && availableMainCategories.length > 0 ? (
+      {/* Main category rail — only after domain selected */}
+      {filter.domainId && availableMainCategories.length > 0 ? (
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
           <Chip
             label="الكل"
-            tone={!hierarchy.mainCategoryId ? 'brand' : 'default'}
-            selected={!hierarchy.mainCategoryId}
+            tone={!filter.mainCategoryId ? 'brand' : 'default'}
+            selected={!filter.mainCategoryId}
             onPress={() => onChange({ mainCategoryId: undefined, subcategoryId: undefined })}
           />
           {availableMainCategories.map((mc) => (
             <Chip
               key={mc}
               label={MAIN_CATEGORY_LABELS[mc]}
-              tone={hierarchy.mainCategoryId === mc ? 'brand' : 'default'}
-              selected={hierarchy.mainCategoryId === mc}
+              tone={filter.mainCategoryId === mc ? 'brand' : 'default'}
+              selected={filter.mainCategoryId === mc}
               onPress={() => onChange({ mainCategoryId: mc, subcategoryId: undefined })}
             />
           ))}
         </Box>
       ) : null}
 
-      {/* Subcategory rail */}
-      {hierarchy.mainCategoryId && availableSubcategories.length > 0 ? (
+      {/* Subcategory rail — only after main category selected */}
+      {filter.mainCategoryId && availableSubcategories.length > 0 ? (
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
           <Chip
             label="الكل"
-            tone={!hierarchy.subcategoryId ? 'brand' : 'default'}
-            selected={!hierarchy.subcategoryId}
+            tone={!filter.subcategoryId ? 'brand' : 'default'}
+            selected={!filter.subcategoryId}
             onPress={() => onChange({ subcategoryId: undefined })}
           />
           {availableSubcategories.map((sc) => (
             <Chip
               key={sc}
               label={SUBCATEGORY_LABELS[sc]}
-              tone={hierarchy.subcategoryId === sc ? 'brand' : 'default'}
-              selected={hierarchy.subcategoryId === sc}
+              tone={filter.subcategoryId === sc ? 'brand' : 'default'}
+              selected={filter.subcategoryId === sc}
               onPress={() => onChange({ subcategoryId: sc })}
             />
           ))}
         </Box>
       ) : null}
 
-      {/* Facet chips */}
-      {availableFacets.length > 0 ? (
+      {/* Operational facets — status-based quick filters */}
+      <Box gap={1}>
+        <Text role="caption" tone="muted">الحالة</Text>
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
-          {availableFacets.map((facet) => {
-            const isActive = hierarchy.facetTags?.includes(facet);
+          {DSH_OPERATIONAL_FACETS.map((facet) => {
+            const isActive = activeOperationalFacets.includes(facet);
             return (
               <Chip
                 key={facet}
                 label={FACET_LABELS[facet]}
                 tone={isActive ? 'brand' : 'default'}
                 selected={isActive}
-                onPress={() => {
-                  const current = hierarchy.facetTags ?? [];
-                  const next = isActive
-                    ? current.filter((f) => f !== facet)
-                    : [...current, facet];
-                  onChange({ facetTags: next.length ? next : undefined });
-                }}
+                onPress={() => toggleFacet(facet)}
               />
             );
           })}
+        </Box>
+      </Box>
+
+      {/* Product attribute facets */}
+      {availableProductFacets.length > 0 ? (
+        <Box gap={1}>
+          <Text role="caption" tone="muted">الخصائص</Text>
+          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+            {availableProductFacets.map((facet) => {
+              const isActive = activeProductFacets.includes(facet);
+              return (
+                <Chip
+                  key={facet}
+                  label={FACET_LABELS[facet]}
+                  tone={isActive ? 'brand' : 'default'}
+                  selected={isActive}
+                  onPress={() => toggleFacet(facet)}
+                />
+              );
+            })}
+          </Box>
         </Box>
       ) : null}
 
       {/* Active filter summary + clear */}
       {hasActiveFilters ? (
         <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text role="caption" tone="muted">
+          <Text role="caption" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
             {[
-              hierarchy.domainId ? DOMAIN_LABELS[hierarchy.domainId] : null,
-              hierarchy.mainCategoryId ? MAIN_CATEGORY_LABELS[hierarchy.mainCategoryId] : null,
-              hierarchy.subcategoryId ? SUBCATEGORY_LABELS[hierarchy.subcategoryId] : null,
-              hierarchy.facetTags?.length ? `${hierarchy.facetTags.length} خاصية` : null,
+              filter.domainId ? DOMAIN_LABELS[filter.domainId] : null,
+              filter.mainCategoryId ? MAIN_CATEGORY_LABELS[filter.mainCategoryId] : null,
+              filter.subcategoryId ? SUBCATEGORY_LABELS[filter.subcategoryId] : null,
+              filter.facetTags?.length ? `${filter.facetTags.length} فلتر` : null,
             ].filter(Boolean).join(' › ')}
           </Text>
           <Button
@@ -590,7 +547,7 @@ function HierarchyFilterRail({
   );
 }
 
-// ── Help block (collapsible) ──────────────────────────────────────────
+// ── Help block ────────────────────────────────────────────────────────
 
 function HelpBlock() {
   const [open, setOpen] = React.useState(false);
@@ -620,15 +577,17 @@ function HelpBlock() {
   );
 }
 
-// ── Inline local edit block ───────────────────────────────────────────
+// ── Inline local edit ─────────────────────────────────────────────────
 
 function InlineLocalEdit({
   item,
+  detail,
   override,
   onChange,
   onApply,
 }: {
-  item: InventoryCatalogItem;
+  item: InventoryCatalogListItem;
+  detail?: InventoryCatalogItemDetail;
   override: PartnerLocalOverride;
   onChange: (field: keyof PartnerLocalOverride, value: string | boolean) => void;
   onApply: () => void;
@@ -639,6 +598,13 @@ function InlineLocalEdit({
 
   return (
     <Surface tone="inset" padding={3} gap={3} border={false}>
+      {/* Canonical/private badge — shown here in expanded state */}
+      <Chip
+        label={item.isPrivateStoreProduct ? 'منتج خاص بالمتجر' : 'منتج مركزي'}
+        tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
+        selected
+      />
+
       {item.isCatalogOwned ? (
         <Surface tone="info" padding={2} gap={0} border={false}>
           <Text role="bodySm" tone="info" align={direction === 'rtl' ? 'end' : 'start'}>
@@ -647,10 +613,10 @@ function InlineLocalEdit({
         </Surface>
       ) : null}
 
-      {isNeedsFix && item.internalNote ? (
+      {isNeedsFix && detail?.internalNote ? (
         <Surface tone="warning" padding={2} gap={0} border={false}>
           <Text role="bodySm" tone="warning" align={direction === 'rtl' ? 'end' : 'start'}>
-            التعديل المطلوب: {item.internalNote}
+            التعديل المطلوب: {detail.internalNote}
           </Text>
         </Surface>
       ) : null}
@@ -658,7 +624,7 @@ function InlineLocalEdit({
       {isRejected ? (
         <Surface tone="danger" padding={2} gap={0} border={false}>
           <Text role="bodySm" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
-            المنتج مرفوض: {item.internalNote || 'يرجى مراجعة سبب الرفض قبل إعادة التقديم.'}
+            المنتج مرفوض: {detail?.internalNote ?? 'يرجى مراجعة سبب الرفض قبل إعادة التقديم.'}
           </Text>
         </Surface>
       ) : null}
@@ -666,7 +632,7 @@ function InlineLocalEdit({
       <TextField
         label="السعر"
         value={override.price}
-        onChangeText={(v) => onChange('price', v)}
+        onChangeText={(v: string) => onChange('price', v)}
         placeholder="18.00"
         dir="ltr"
         keyboardType="decimal-pad"
@@ -674,7 +640,7 @@ function InlineLocalEdit({
       <TextField
         label="المخزون"
         value={override.stock}
-        onChangeText={(v) => onChange('stock', v)}
+        onChangeText={(v: string) => onChange('stock', v)}
         placeholder="42"
         keyboardType="numeric"
         dir="ltr"
@@ -682,7 +648,7 @@ function InlineLocalEdit({
       <TextField
         label="ملاحظة داخلية"
         value={override.internalNote}
-        onChangeText={(v) => onChange('internalNote', v)}
+        onChangeText={(v: string) => onChange('internalNote', v)}
         placeholder="ملاحظة للفريق الداخلي فقط"
       />
       <Button
@@ -705,14 +671,13 @@ function InlineLocalEdit({
           tone="secondary"
           fullWidth={false}
           onPress={onApply}
-          disabled={isRejected}
         />
       )}
     </Surface>
   );
 }
 
-// ── PHASE 3: Dense list row ───────────────────────────────────────────
+// ── Dense list row — clean, fast, 5000+ friendly ──────────────────────
 
 function DenseListRow({
   item,
@@ -722,7 +687,7 @@ function DenseListRow({
   onOverrideChange,
   onApplyOverride,
 }: {
-  item: InventoryCatalogItem;
+  item: InventoryCatalogListItem;
   isEditExpanded: boolean;
   onToggleEdit: () => void;
   override: PartnerLocalOverride;
@@ -734,19 +699,20 @@ function DenseListRow({
   const isRejected = item.publishStage === 'rejected';
   const isNeedsFix = item.publishStage === 'needs-fix';
   const stageTone = resolveStageChipTone(item.publishStage);
-  const stockTone = item.lowStock ? 'warning' : item.available ? 'success' : 'danger';
+  const stockTone = item.lowStock ? 'warning' : item.available && item.stockCount > 0 ? 'success' : 'danger';
   const borderColor = isRejected ? theme.danger : isNeedsFix ? theme.warning : theme.line;
 
   const resolvedImage = item.mediaKey ? resolveDshImageSource(item.mediaKey) : undefined;
+  const detail = isEditExpanded ? getItemDetail(item.id) : undefined;
 
   return (
     <Surface tone="default" padding={2} gap={2} border style={{ borderColor }}>
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
-        {/* Product thumbnail or fallback */}
+        {/* Thumbnail or letter fallback */}
         {resolvedImage ? (
           <Image
             source={resolvedImage}
-            style={{ width: 36, height: 36, borderRadius: 4 }}
+            style={{ width: 36, height: 36, borderRadius: 4, flexShrink: 0 }}
             resizeMode="cover"
           />
         ) : (
@@ -759,40 +725,67 @@ function DenseListRow({
             <Text role="bodyStrong">{item.name.slice(0, 1)}</Text>
           </Surface>
         )}
-        {/* Canonical vs private badge (PHASE 8) */}
-        <Chip
-          label={item.isPrivateStoreProduct ? 'منتج خاص' : 'مركزي'}
-          tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
-          selected
+
+        {/* Name + category */}
+        <Box style={{ flex: 1, minWidth: 0, gap: 1 }}>
+          <Text role="bodySm" numberOfLines={1}>{item.name}</Text>
+          <Text role="caption" tone="muted" numberOfLines={1}>{item.categoryLabel}</Text>
+        </Box>
+
+        {/* Price */}
+        <Text role="bodySm" tone="brand">{item.priceLabel}</Text>
+
+        {/* Stock count with low-stock indicator */}
+        <Text role="bodySm" tone={stockTone}>
+          {item.stockCount === 0 ? 'نفد' : String(item.stockCount)}{item.lowStock && item.stockCount > 0 ? ' ⚠' : ''}
+        </Text>
+
+        {/* Stage chip */}
+        {item.publishStage ? (
+          <Chip label={translateStage(item.publishStage)} tone={stageTone} selected />
+        ) : null}
+
+        {/* Edit button */}
+        <Button
+          label="تعديل"
+          size="sm"
+          tone={isEditExpanded ? 'secondary' : 'primary'}
+          fullWidth={false}
+          onPress={onToggleEdit}
         />
-        <Text role="bodySm" numberOfLines={1} style={{ flex: 1 }}>{item.name}</Text>
-        <Chip label={item.priceLabel} tone="brand" />
-        <Chip label={item.stockCount === 0 ? 'نفد' : String(item.stockCount)} tone={stockTone} />
-        {item.publishStage ? <Chip label={translateStage(item.publishStage)} tone={stageTone} selected /> : null}
-        <Button label="تعديل" size="sm" tone="secondary" fullWidth={false} onPress={onToggleEdit} disabled={isRejected} />
       </Box>
+
+      {/* Expanded: local edit with detail */}
       {isEditExpanded ? (
-        <InlineLocalEdit item={item} override={override} onChange={onOverrideChange} onApply={onApplyOverride} />
+        <InlineLocalEdit
+          item={item}
+          detail={detail}
+          override={override}
+          onChange={onOverrideChange}
+          onApply={onApplyOverride}
+        />
       ) : null}
     </Surface>
   );
 }
 
-// ── Product Card ──────────────────────────────────────────────────────
+// ── Product Card (full view) ──────────────────────────────────────────
 
 function ProductCard({
   item,
+  detail,
   expanded,
+  showDetails,
   onToggleEdit,
   onToggleDetails,
-  showDetails,
   override,
   onOverrideChange,
   onApplyOverride,
   onSendForReview,
   onMatchCatalog,
 }: {
-  item: InventoryCatalogItem;
+  item: InventoryCatalogListItem;
+  detail?: InventoryCatalogItemDetail;
   expanded: boolean;
   showDetails: boolean;
   onToggleEdit: () => void;
@@ -812,7 +805,7 @@ function ProductCard({
 
   const stageTone = resolveStageChipTone(item.publishStage);
   const stockTone = item.lowStock ? 'warning' : item.available ? 'success' : 'danger';
-  const linkedTone: 'success' | 'warning' | 'danger' = item.catalogLinked ? 'success' : 'warning';
+  const linkedTone: 'success' | 'warning' = item.catalogLinked ? 'success' : 'warning';
 
   const borderColor = isRejected
     ? theme.danger
@@ -822,14 +815,13 @@ function ProductCard({
     ? theme.brand
     : theme.line;
 
-  // Resolve partner queue metadata for this item
   const partnerRecord = React.useMemo(
     () => getPartnerQueueRecords().find((r) => r.id === item.id || r.title.includes(item.name)),
     [item.id, item.name],
   );
 
-  const fixReason = partnerRecord?.metadata?.requiredFix ?? item.internalNote;
-  const rejectReason = partnerRecord?.metadata?.rejectionReason ?? item.internalNote;
+  const fixReason = partnerRecord?.metadata?.requiredFix ?? detail?.internalNote;
+  const rejectReason = partnerRecord?.metadata?.rejectionReason ?? detail?.internalNote;
 
   const nextAction = resolveNextActionLabel(item.publishStage, item.available, item.stockCount);
   const nextOwnerLabel = item.publishStage
@@ -837,16 +829,9 @@ function ProductCard({
     : undefined;
 
   return (
-    <Surface
-      tone="default"
-      padding={3}
-      gap={3}
-      border
-      style={{ borderColor }}
-    >
-      {/* ── Header row ── */}
+    <Surface tone="default" padding={3} gap={3} border style={{ borderColor }}>
+      {/* Header row */}
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'flex-start', gap: 10 }}>
-        {/* Product image or letter fallback */}
         {resolveDshImageSource(item.mediaKey) ? (
           <Image
             source={resolveDshImageSource(item.mediaKey)!}
@@ -864,7 +849,6 @@ function ProductCard({
           </Surface>
         )}
 
-        {/* Name + stage + action */}
         <Box style={{ flex: 1, minWidth: 0, gap: 4, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
           <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
             {item.name}
@@ -883,7 +867,7 @@ function ProductCard({
         </Box>
       </Box>
 
-      {/* ── rejected/needs-fix banners (compact) ── */}
+      {/* Rejected/needs-fix banners */}
       {isRejected && rejectReason ? (
         <Surface tone="danger" padding={2} gap={0} border={false}>
           <Text role="bodySm" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
@@ -899,9 +883,8 @@ function ProductCard({
         </Surface>
       ) : null}
 
-      {/* ── Commercial chips ── */}
+      {/* Commercial chips */}
       <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-        {/* PHASE 8: Canonical vs private product type */}
         <Chip
           label={item.isPrivateStoreProduct ? 'منتج خاص بالمتجر' : 'منتج مركزي'}
           tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
@@ -918,7 +901,7 @@ function ProductCard({
         {isClientVisible ? <Chip label="ظاهر للعميل" tone="success" selected /> : null}
       </Box>
 
-      {/* ── Action row ── */}
+      {/* Actions */}
       <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
         <Button
           label={expanded ? 'إخفاء التعديل' : 'تعديل محلي'}
@@ -936,59 +919,44 @@ function ProductCard({
           onPress={onToggleDetails}
         />
         {!item.catalogLinked ? (
-          <Button
-            label="مطابقة بالكتالوج"
-            size="sm"
-            tone="secondary"
-            fullWidth={false}
-            onPress={onMatchCatalog}
-          />
+          <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
         ) : null}
         {item.reviewNeeded && !isRejected ? (
-          <Button
-            label="إرسال للمراجعة"
-            size="sm"
-            tone="secondary"
-            fullWidth={false}
-            onPress={onSendForReview}
-          />
+          <Button label="إرسال للمراجعة" size="sm" tone="secondary" fullWidth={false} onPress={onSendForReview} />
         ) : null}
       </Box>
 
-      {/* ── Inline local edit ── */}
+      {/* Inline local edit */}
       {expanded ? (
         <InlineLocalEdit
           item={item}
+          detail={detail}
           override={override}
           onChange={onOverrideChange}
           onApply={onApplyOverride}
         />
       ) : null}
 
-      {/* ── Expanded details ── */}
-      {showDetails ? (
+      {/* Expanded details — on demand */}
+      {showDetails && detail ? (
         <Surface tone="inset" padding={3} gap={2} border={false}>
           <KeyValueList
             dense
             items={[
-              { label: 'SKU', value: item.sku },
-              { label: 'GTIN', value: item.gtin },
-              { label: 'الباركود', value: item.barcode },
-              { label: 'رمز المُصنِّع', value: item.manufacturerCode },
-              ...(item.sourceRecordId ? [{ label: 'مرجع المصدر', value: item.sourceRecordId }] : []),
-              ...(item.canonicalProductId ? [{ label: 'معرف المنتج المركزي', value: item.canonicalProductId }] : []),
-              ...(item.canonicalStoreId ? [{ label: 'معرف المتجر المركزي', value: item.canonicalStoreId }] : []),
-              ...(item.source ? [{ label: 'مصدر الإدخال', value: translateOwner(item.source) }] : []),
+              { label: 'SKU', value: detail.sku },
+              { label: 'GTIN', value: detail.gtin },
+              { label: 'الباركود', value: detail.barcode },
+              { label: 'رمز المُصنِّع', value: detail.manufacturerCode },
+              ...(detail.sourceRecordId ? [{ label: 'مرجع المصدر', value: detail.sourceRecordId }] : []),
+              ...(detail.canonicalProductId ? [{ label: 'معرف المنتج المركزي', value: detail.canonicalProductId }] : []),
+              ...(detail.canonicalStoreId ? [{ label: 'معرف المتجر المركزي', value: detail.canonicalStoreId }] : []),
+              ...(detail.source ? [{ label: 'مصدر الإدخال', value: translateOwner(detail.source) }] : []),
               { label: 'ملكية الوسائط', value: item.isCatalogOwned ? 'كتالوج مركزي' : isPartnerOwnedException(item.publishStage as ApprovalStage, 'product-media') ? 'استثناء شريك' : 'بحاجة مراجعة', tone: item.isCatalogOwned ? 'info' : 'warning' },
             ]}
           />
-
-          {/* Audit trail if available */}
           {partnerRecord?.auditTrail?.length ? (
             <Box gap={2}>
-              <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-                سجل المراحل:
-              </Text>
+              <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>سجل المراحل:</Text>
               {partnerRecord.auditTrail.map((entry, idx) => (
                 <Text key={idx} role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
                   {translateStage(entry.fromStage)} → {translateStage(entry.toStage)} · {translateOwner(entry.owner)}
@@ -1013,29 +981,14 @@ function InventoryCatalogContent({
 }: InventoryCatalogContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
-  const [activeFilter, setActiveFilter] = React.useState<InventoryFilterId>('all');
-  // PHASE 2: Hierarchy filter state
-  const [hierarchy, setHierarchy] = React.useState<ActiveHierarchyFilter>({});
-  // PHASE 3: View mode — dense list is default for 5000+ products
+  const [filter, setFilter] = React.useState<ActiveHierarchyFilter>({});
   const [viewMode, setViewMode] = React.useState<ViewMode>('dense-list');
-  const [items, setItems] = React.useState<InventoryCatalogItem[]>(() =>
-    buildInitialItems(canonicalStoreId),
+  const [items, setItems] = React.useState<InventoryCatalogListItem[]>(() =>
+    buildListItems(canonicalStoreId),
   );
   const [expandedEditId, setExpandedEditId] = React.useState<string | null>(null);
   const [expandedDetailsId, setExpandedDetailsId] = React.useState<string | null>(null);
-  const [overrides, setOverrides] = React.useState<Record<string, PartnerLocalOverride>>(() => {
-    const initial: Record<string, PartnerLocalOverride> = {};
-    buildInitialItems(canonicalStoreId).forEach((item) => {
-      initial[item.id] = {
-        price: item.priceLabel.replace(/[^0-9.]/g, '').trim(),
-        stock: String(item.stockCount),
-        available: item.available,
-        preparationNote: item.preparationNote ?? '',
-        internalNote: item.internalNote ?? '',
-      };
-    });
-    return initial;
-  });
+  const [overrides, setOverrides] = React.useState<Record<string, PartnerLocalOverride>>({});
   const [lastSavedLabel, setLastSavedLabel] = React.useState<string | null>(null);
   const [toolMessage, setToolMessage] = React.useState<string | null>(null);
   const [bulkPrice, setBulkPrice] = React.useState<{ kind: 'percent' | 'fixed'; value: string } | null>(null);
@@ -1056,16 +1009,21 @@ function InventoryCatalogContent({
     const q = query.trim().toLowerCase();
     const searched = q
       ? items.filter((item) =>
-          [item.name, item.sku, item.gtin, item.barcode, item.manufacturerCode, item.categoryLabel]
-            .join(' ')
-            .toLowerCase()
-            .includes(q),
+          [item.name, item.categoryLabel].join(' ').toLowerCase().includes(q),
         )
       : items;
-    // PHASE 2: Apply hierarchy filter
-    const hierarchyFiltered = applyHierarchyFilter(searched, hierarchy);
-    return applyFilter(hierarchyFiltered, activeFilter);
-  }, [items, query, activeFilter, hierarchy]);
+    return applyHierarchyFilter(searched, filter);
+  }, [items, query, filter]);
+
+  function getOverride(item: InventoryCatalogListItem): PartnerLocalOverride {
+    return overrides[item.id] ?? {
+      price: item.priceLabel.replace(/[^0-9.]/g, '').trim(),
+      stock: String(item.stockCount),
+      available: item.available,
+      preparationNote: '',
+      internalNote: '',
+    };
+  }
 
   const handleOverrideChange = React.useCallback(
     (id: string, field: keyof PartnerLocalOverride, value: string | boolean) => {
@@ -1078,17 +1036,13 @@ function InventoryCatalogContent({
   );
 
   const handleApplyOverride = React.useCallback(
-    (item: InventoryCatalogItem) => {
+    (item: InventoryCatalogListItem) => {
       const override = overrides[item.id];
       if (!override) return;
-
       const parsedStock = Number(override.stock.replace(/[^0-9]/g, ''));
       const cleanedPrice = override.price.replace(/[^0-9.]/g, '').trim();
-      const resolvedPrice = cleanedPrice.length > 0
-        ? `${Number(cleanedPrice).toFixed(2)} ر.ي`
-        : item.priceLabel;
+      const resolvedPrice = cleanedPrice.length > 0 ? `${Number(cleanedPrice).toFixed(2)} ر.ي` : item.priceLabel;
       const normalizedStock = Number.isFinite(parsedStock) ? parsedStock : item.stockCount;
-
       setItems((current) =>
         current.map((p) =>
           p.id === item.id
@@ -1110,11 +1064,11 @@ function InventoryCatalogContent({
     [overrides],
   );
 
-  const handleSendForReview = React.useCallback((item: InventoryCatalogItem) => {
+  const handleSendForReview = React.useCallback((item: InventoryCatalogListItem) => {
     setToolMessage(`تم إرسال ${item.name} للمراجعة — سيظهر في قائمة انتظار الشركاء.`);
   }, []);
 
-  const handleMatchCatalog = React.useCallback((item: InventoryCatalogItem) => {
+  const handleMatchCatalog = React.useCallback((item: InventoryCatalogListItem) => {
     setToolMessage(`ابدأ البحث بـ SKU أو GTIN لمطابقة ${item.name} مع الكتالوج المركزي.`);
   }, []);
 
@@ -1123,7 +1077,7 @@ function InventoryCatalogContent({
   return (
     <Box gap={4} dir="rtl">
 
-      {/* ── Summary compact ── */}
+      {/* Summary tiles */}
       <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 8 }}>
         {[
           { label: 'المنتجات', value: String(totalProducts), tone: 'brand' as const },
@@ -1132,21 +1086,14 @@ function InventoryCatalogContent({
           { label: 'غير مرتبط', value: String(notLinkedCount), tone: notLinkedCount > 0 ? 'danger' as const : 'success' as const },
           { label: 'ظاهر للعميل', value: String(clientVisibleCount), tone: 'success' as const },
         ].map((tile) => (
-          <Surface
-            key={tile.label}
-            tone="raised"
-            padding={2}
-            gap={1}
-            border
-            style={{ minWidth: 90, flex: 1 }}
-          >
+          <Surface key={tile.label} tone="raised" padding={2} gap={1} border style={{ minWidth: 90, flex: 1 }}>
             <Text role="caption" tone="muted" numberOfLines={1}>{tile.label}</Text>
             <Text role="bodyStrong" tone={tile.tone}>{tile.value}</Text>
           </Surface>
         ))}
       </Box>
 
-      {/* ── Search command ── */}
+      {/* Search */}
       <Surface tone="raised" padding={3} gap={3}>
         <SearchField
           label="بحث في الكتالوج المركزي"
@@ -1156,117 +1103,63 @@ function InventoryCatalogContent({
           hint="ابدأ بالكتالوج المركزي ثم طابق السعر والتوفر محلياً."
         />
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-          <Button
-            label="مسح باركود"
-            tone="secondary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => { setQuery('6280001000018'); setToolMessage('وضع المسح جاهز.'); }}
-          />
-          <Button
-            label="إدخال جماعي"
-            tone="secondary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => setToolMessage('تم فتح مسار الإدخال الجماعي — Excel/CSV.')}
-          />
-          <Button
-            label="منتج جديد"
-            tone="secondary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => setToolMessage('ابدأ من الكتالوج المركزي قبل إنشاء مسودة جديدة.')}
-          />
+          <Button label="مسح باركود" tone="secondary" size="sm" fullWidth={false}
+            onPress={() => { setQuery('6280001000018'); setToolMessage('وضع المسح جاهز.'); }} />
+          <Button label="إدخال جماعي" tone="secondary" size="sm" fullWidth={false}
+            onPress={() => setToolMessage('تم فتح مسار الإدخال الجماعي — Excel/CSV.')} />
+          <Button label="منتج جديد" tone="secondary" size="sm" fullWidth={false}
+            onPress={() => setToolMessage('ابدأ من الكتالوج المركزي قبل إنشاء مسودة جديدة.')} />
         </Box>
-
-        {/* Search match state */}
         {query.trim() ? (
           <Surface
-            tone={
-              searchMatchState === 'duplicate' ? 'warning'
-              : searchMatchState === 'not-in-catalog' ? 'danger'
-              : searchMatchState === 'needs-match' ? 'warning'
-              : 'inset'
-            }
-            padding={2}
-            gap={0}
-            border={false}
+            tone={searchMatchState === 'duplicate' || searchMatchState === 'needs-match' ? 'warning' : searchMatchState === 'not-in-catalog' ? 'danger' : 'inset'}
+            padding={2} gap={0} border={false}
           >
             <Text
               role="bodySm"
-              tone={
-                searchMatchState === 'duplicate' ? 'warning'
-                : searchMatchState === 'not-in-catalog' ? 'danger'
-                : searchMatchState === 'needs-match' ? 'warning'
-                : 'muted'
-              }
+              tone={searchMatchState === 'duplicate' || searchMatchState === 'needs-match' ? 'warning' : searchMatchState === 'not-in-catalog' ? 'danger' : 'muted'}
               align={direction === 'rtl' ? 'end' : 'start'}
             >
               {searchMatchState === 'catalog-match' && 'مطابق بالكتالوج'}
               {searchMatchState === 'needs-match' && 'يحتاج مطابقة بالكتالوج المركزي'}
               {searchMatchState === 'not-in-catalog' && 'غير موجود في الكتالوج — أرسل طلب إضافة'}
-              {searchMatchState === 'duplicate' && 'تكرار محتمل — راجع SKU أو GTIN'}
+              {searchMatchState === 'duplicate' && 'تكرار محتمل — راجع الاسم'}
             </Text>
           </Surface>
         ) : null}
       </Surface>
 
-      {/* ── Tool message ── */}
+      {/* Tool message */}
       {toolMessage ? (
         <Surface tone="inset" padding={2} gap={0} border={false}>
           <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{toolMessage}</Text>
         </Surface>
       ) : null}
 
-      {/* ── Help block (collapsible) ── */}
+      {/* Help */}
       <HelpBlock />
 
-      {/* ── PHASE 2: Hierarchy filter rail ── */}
-      <HierarchyFilterRail hierarchy={hierarchy} onChange={setHierarchy} items={items} />
+      {/* Unified filter funnel */}
+      <HierarchyFilterRail filter={filter} onChange={setFilter} items={items} />
 
-      {/* ── PHASE 3: View mode toggle ── */}
+      {/* View mode + result count */}
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>
         <Text role="label" tone="muted">{filteredItems.length} منتج</Text>
         <Box style={{ flexDirection: resolveRowDirection(direction), gap: 4 }}>
-          <Button
-            label="بطاقات"
-            size="sm"
-            tone={viewMode === 'cards' ? 'brand' : 'secondary'}
-            fullWidth={false}
-            onPress={() => setViewMode('cards')}
-          />
-          <Button
-            label="قائمة كثيفة"
-            size="sm"
-            tone={viewMode === 'dense-list' ? 'brand' : 'secondary'}
-            fullWidth={false}
-            onPress={() => setViewMode('dense-list')}
-          />
+          <Button label="بطاقات" size="sm" tone={viewMode === 'cards' ? 'brand' : 'secondary'} fullWidth={false} onPress={() => setViewMode('cards')} />
+          <Button label="قائمة كثيفة" size="sm" tone={viewMode === 'dense-list' ? 'brand' : 'secondary'} fullWidth={false} onPress={() => setViewMode('dense-list')} />
         </Box>
       </Box>
 
-      {/* ── Filter rail ── */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-        {FILTER_ITEMS.map((f) => (
-          <Chip
-            key={f.id}
-            label={f.label}
-            tone={activeFilter === f.id ? 'brand' : 'default'}
-            selected={activeFilter === f.id}
-            onPress={() => setActiveFilter(f.id)}
-          />
-        ))}
-      </Box>
-
-      {/* ── PHASE 3: Product stream (cards or dense list) ── */}
+      {/* Product stream */}
       <Box gap={3}>
         {filteredItems.length === 0 ? (
           <StateView
             stateId="empty"
             title="لا توجد نتائج مطابقة"
-            description="جرّب اسم مختلفاً أو SKU أو GTIN أو الباركود."
+            description="جرّب اسم مختلفاً أو صفّح الفلاتر."
             actionLabel="إعادة ضبط الفلتر والبحث"
-            onActionPress={() => { setQuery(''); setActiveFilter('all'); }}
+            onActionPress={() => { setQuery(''); setFilter({}); }}
           />
         ) : viewMode === 'dense-list' ? (
           filteredItems.map((item) => (
@@ -1275,91 +1168,66 @@ function InventoryCatalogContent({
               item={item}
               isEditExpanded={expandedEditId === item.id}
               onToggleEdit={() => setExpandedEditId((prev) => (prev === item.id ? null : item.id))}
-              override={overrides[item.id] ?? {
-                price: item.priceLabel.replace(/[^0-9.]/g, '').trim(),
-                stock: String(item.stockCount),
-                available: item.available,
-                preparationNote: '',
-                internalNote: item.internalNote ?? '',
-              }}
+              override={getOverride(item)}
               onOverrideChange={(field, value) => handleOverrideChange(item.id, field, value)}
               onApplyOverride={() => handleApplyOverride(item)}
             />
           ))
         ) : (
-          filteredItems.map((item) => (
-            <ProductCard
-              key={item.id}
-              item={item}
-              expanded={expandedEditId === item.id}
-              showDetails={expandedDetailsId === item.id}
-              onToggleEdit={() => setExpandedEditId((prev) => (prev === item.id ? null : item.id))}
-              onToggleDetails={() => setExpandedDetailsId((prev) => (prev === item.id ? null : item.id))}
-              override={overrides[item.id] ?? {
-                price: item.priceLabel.replace(/[^0-9.]/g, '').trim(),
-                stock: String(item.stockCount),
-                available: item.available,
-                preparationNote: '',
-                internalNote: item.internalNote ?? '',
-              }}
-              onOverrideChange={(field, value) => handleOverrideChange(item.id, field, value)}
-              onApplyOverride={() => handleApplyOverride(item)}
-              onSendForReview={() => handleSendForReview(item)}
-              onMatchCatalog={() => handleMatchCatalog(item)}
-            />
-          ))
+          filteredItems.map((item) => {
+            const isExpanded = expandedEditId === item.id;
+            const isShowingDetails = expandedDetailsId === item.id;
+            const cardDetail = (isExpanded || isShowingDetails) ? getItemDetail(item.id) : undefined;
+            return (
+              <ProductCard
+                key={item.id}
+                item={item}
+                detail={cardDetail}
+                expanded={isExpanded}
+                showDetails={isShowingDetails}
+                onToggleEdit={() => setExpandedEditId((prev) => (prev === item.id ? null : item.id))}
+                onToggleDetails={() => setExpandedDetailsId((prev) => (prev === item.id ? null : item.id))}
+                override={getOverride(item)}
+                onOverrideChange={(field, value) => handleOverrideChange(item.id, field, value)}
+                onApplyOverride={() => handleApplyOverride(item)}
+                onSendForReview={() => handleSendForReview(item)}
+                onMatchCatalog={() => handleMatchCatalog(item)}
+              />
+            );
+          })
         )}
       </Box>
 
-      {/* ── Bulk actions ── */}
+      {/* Bulk actions */}
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="label" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>إجراءات جماعية</Text>
-
-        {/* Quick actions */}
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
           <Button
             label={bulkPrice ? 'إلغاء تحديث الأسعار' : 'تحديث أسعار جماعي'}
             size="sm"
             tone={bulkPrice ? 'danger' : 'secondary'}
             fullWidth={false}
-            onPress={() => {
-              setBulkPrice(bulkPrice ? null : { kind: 'percent', value: '' });
-              setBulkPreviewMessage(null);
-            }}
+            onPress={() => { setBulkPrice(bulkPrice ? null : { kind: 'percent', value: '' }); setBulkPreviewMessage(null); }}
           />
           <Button label="استيراد Excel/CSV" size="sm" tone="secondary" fullWidth={false}
             onPress={() => setToolMessage('تم فتح مسار الاستيراد.')} />
           <Button label="مراجعة غير المطابقة" size="sm" tone="secondary" fullWidth={false}
-            onPress={() => { setActiveFilter('not-linked'); setToolMessage('عرض المنتجات غير المرتبطة بالكتالوج.'); }} />
+            onPress={() => { setFilter({ facetTags: ['not-linked'] }); setToolMessage('عرض المنتجات غير المرتبطة بالكتالوج.'); }} />
           <Button label="مراجعة المنتجات الخاصة" size="sm" tone="secondary" fullWidth={false}
-            onPress={() => setToolMessage('عرض المنتجات الخاصة بالمتجر التي تنتظر المراجعة.')} />
+            onPress={() => { setFilter({ facetTags: ['private-store'] }); setToolMessage('عرض المنتجات الخاصة بالمتجر.'); }} />
         </Box>
 
-        {/* Bulk price update panel */}
         {bulkPrice ? (
           <Surface tone="inset" padding={3} gap={3} border={false}>
             <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
               تحديث أسعار المنتجات ضمن الفلتر الحالي — تطبيق محلي (preview فقط)
             </Text>
-
-            {/* Kind selector */}
             <Box style={{ flexDirection: resolveRowDirection(direction), gap: 6 }}>
-              <Button
-                label="نسبة مئوية %"
-                size="sm"
-                tone={bulkPrice.kind === 'percent' ? 'brand' : 'secondary'}
-                fullWidth={false}
-                onPress={() => setBulkPrice({ ...bulkPrice, kind: 'percent' })}
-              />
-              <Button
-                label="مبلغ ثابت ر.ي"
-                size="sm"
-                tone={bulkPrice.kind === 'fixed' ? 'brand' : 'secondary'}
-                fullWidth={false}
-                onPress={() => setBulkPrice({ ...bulkPrice, kind: 'fixed' })}
-              />
+              <Button label="نسبة مئوية %" size="sm" tone={bulkPrice.kind === 'percent' ? 'brand' : 'secondary'} fullWidth={false}
+                onPress={() => setBulkPrice({ ...bulkPrice, kind: 'percent' })} />
+              <Button label="مبلغ ثابت ر.ي" size="sm" tone={bulkPrice.kind === 'fixed' ? 'brand' : 'secondary'} fullWidth={false}
+                onPress={() => setBulkPrice({ ...bulkPrice, kind: 'fixed' })} />
             </Box>
-
             <TextField
               label={bulkPrice.kind === 'percent' ? 'نسبة الزيادة/النقص (مثال: +10 أو -5)' : 'المبلغ المضاف/المطروح (مثال: +2 أو -1.5)'}
               value={bulkPrice.value}
@@ -1368,40 +1236,27 @@ function InventoryCatalogContent({
               dir="ltr"
               keyboardType="decimal-pad"
             />
-
-            {/* Preview button */}
             <Button
               label="معاينة التغييرات قبل التطبيق"
               tone="secondary"
               fullWidth={false}
               onPress={() => {
                 const rawVal = parseFloat(bulkPrice.value.replace(/[^0-9.\-]/g, ''));
-                if (Number.isNaN(rawVal)) {
-                  setBulkPreviewMessage('أدخل قيمة صحيحة أولاً.');
-                  return;
-                }
+                if (Number.isNaN(rawVal)) { setBulkPreviewMessage('أدخل قيمة صحيحة أولاً.'); return; }
                 const eligible = filteredItems.filter((item) => !item.isCatalogOwned);
                 const excluded = filteredItems.filter((item) => item.isCatalogOwned);
                 const sign = rawVal >= 0 ? '+' : '';
-                const summary = bulkPrice.kind === 'percent'
-                  ? `${sign}${rawVal}%`
-                  : `${sign}${rawVal.toFixed(2)} ر.ي`;
+                const summary = bulkPrice.kind === 'percent' ? `${sign}${rawVal}%` : `${sign}${rawVal.toFixed(2)} ر.ي`;
                 setBulkPreviewMessage(
-                  `المتأثرة: ${eligible.length} منتج | التغيير: ${summary} على كل سعر | المستثناة: ${excluded.length} منتج مركزي (الأسعار مقفلة) | تطبيق محلي فقط — لا يؤثر على الكتالوج المركزي.`,
+                  `المتأثرة: ${eligible.length} منتج | التغيير: ${summary} على كل سعر | المستثناة: ${excluded.length} منتج مركزي (الأسعار مقفلة) | تطبيق محلي فقط.`,
                 );
               }}
             />
-
-            {/* Preview result */}
             {bulkPreviewMessage ? (
               <Surface tone="warning" padding={2} gap={0} border={false}>
-                <Text role="bodySm" tone="warning" align={direction === 'rtl' ? 'end' : 'start'}>
-                  {bulkPreviewMessage}
-                </Text>
+                <Text role="bodySm" tone="warning" align={direction === 'rtl' ? 'end' : 'start'}>{bulkPreviewMessage}</Text>
               </Surface>
             ) : null}
-
-            {/* Apply button — only after preview */}
             {bulkPreviewMessage && !bulkPreviewMessage.startsWith('أدخل') ? (
               <Button
                 label="تطبيق التعديل المحلي على المنتجات المتأثرة"
@@ -1412,15 +1267,11 @@ function InventoryCatalogContent({
                   if (Number.isNaN(rawVal)) return;
                   setItems((current) =>
                     current.map((item) => {
-                      if (item.isCatalogOwned) return item;
-                      if (!filteredItems.some((f) => f.id === item.id)) return item;
+                      if (item.isCatalogOwned || !filteredItems.some((f) => f.id === item.id)) return item;
                       const currentNum = parseFloat(item.priceLabel.replace(/[^0-9.]/g, ''));
                       if (!Number.isFinite(currentNum)) return item;
-                      const newPrice = bulkPrice.kind === 'percent'
-                        ? currentNum * (1 + rawVal / 100)
-                        : currentNum + rawVal;
-                      const clamped = Math.max(0, newPrice);
-                      return { ...item, priceLabel: `${clamped.toFixed(2)} ر.ي` };
+                      const newPrice = bulkPrice.kind === 'percent' ? currentNum * (1 + rawVal / 100) : currentNum + rawVal;
+                      return { ...item, priceLabel: `${Math.max(0, newPrice).toFixed(2)} ر.ي` };
                     }),
                   );
                   setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
@@ -1436,7 +1287,7 @@ function InventoryCatalogContent({
 
       <MobileStickyPrimaryAction
         label={publishLabel}
-        helperText={lastSavedLabel ? `آخر حفظ: ${lastSavedLabel}` : 'الكتالوج المركزي هو المرجع الأول قبل النشر.'}
+        helperText={lastSavedLabel ? `آخر حفظ: ${lastSavedLabel}` : `${branchLabel} — الكتالوج المركزي هو المرجع.`}
         onPress={() => setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}
       />
     </Box>
@@ -1464,7 +1315,6 @@ export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScr
             : undefined
         }
       />
-
       <InventoryCatalogContent {...props} />
     </MobileScrollView>
   );
