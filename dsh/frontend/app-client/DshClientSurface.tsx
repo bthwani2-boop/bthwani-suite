@@ -583,6 +583,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     [selectedOrderId],
   );
 
+  const trackingOrderValues = React.useMemo<CreateOrderValues>(() => ({
+    fulfillmentMode: trackingOrderOverride?.fulfillmentMode ?? activeTrackedOrder?.fulfillmentMode ?? createOrderValues.fulfillmentMode ?? selectedFulfillmentMode,
+    pickupAddress: trackingOrderOverride?.pickupAddress ?? activeTrackedOrder?.pickupAddress ?? createOrderValues.pickupAddress,
+    dropoffAddress: trackingOrderOverride?.dropoffAddress ?? activeTrackedOrder?.dropoffAddress ?? createOrderValues.dropoffAddress,
+    contactName: createOrderValues.contactName,
+    contactPhone: createOrderValues.contactPhone,
+    note: trackingOrderOverride?.note ?? activeTrackedOrder?.note ?? createOrderValues.note,
+  }), [activeTrackedOrder, createOrderValues, selectedFulfillmentMode, trackingOrderOverride]);
+
   const trackingTimeline = React.useMemo(() => {
     const mode = trackingOrderValues.fulfillmentMode;
     if (mode === 'partner_delivery') {
@@ -731,14 +740,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
   const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
   const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
-  const trackingOrderValues = React.useMemo<CreateOrderValues>(() => ({
-    fulfillmentMode: trackingOrderOverride?.fulfillmentMode ?? activeTrackedOrder?.fulfillmentMode ?? createOrderValues.fulfillmentMode ?? selectedFulfillmentMode,
-    pickupAddress: trackingOrderOverride?.pickupAddress ?? activeTrackedOrder?.pickupAddress ?? createOrderValues.pickupAddress,
-    dropoffAddress: trackingOrderOverride?.dropoffAddress ?? activeTrackedOrder?.dropoffAddress ?? createOrderValues.dropoffAddress,
-    contactName: createOrderValues.contactName,
-    contactPhone: createOrderValues.contactPhone,
-    note: trackingOrderOverride?.note ?? activeTrackedOrder?.note ?? createOrderValues.note,
-  }), [activeTrackedOrder, createOrderValues, selectedFulfillmentMode, trackingOrderOverride]);
   const reopenTracking = React.useCallback(() => {
     openTrackedOrder(
       trackingOrderOverride ? undefined : activeTrackedOrder?.id,

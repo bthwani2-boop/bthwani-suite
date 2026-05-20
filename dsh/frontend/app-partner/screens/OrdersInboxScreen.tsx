@@ -699,14 +699,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     <>
       <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: 112 }}>
 
-        {/* ─── Summary chips strip ─────────────────────────────── */}
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2} paddingVertical={2}>
-          <Chip label={`${summary.active} نشطة`} tone="brand" selected />
-          <Chip label={`${summary.urgent} عاجلة`} tone="warning" />
-          <Chip label={`${summary.needsAction} تحتاج إجراء`} tone="info" />
-          {summary.issues > 0 ? <Chip label={`${summary.issues} مشاكل`} tone="danger" /> : null}
-        </Box>
-
         {/* ─── Search + filter header ──────────────────────────── */}
         <Surface tone="raised" padding={3} gap={2}>
           <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: resolveRowDirection(direction) }}>

@@ -441,8 +441,8 @@ export function DshPartnerSurface({
   const renderMainShell = (content: React.ReactNode) => (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
       {topBar}
-      <Surface
-        tone="raised"
+      <Box
+        background="background"
         padding={0}
         gap={0}
         radiusToken="none"
@@ -457,21 +457,21 @@ export function DshPartnerSurface({
         }}
       >
         {content}
-      </Surface>
+      </Box>
       {walletHubSheet}
       {storeScopeSheet}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, width: '100%', zIndex: 1000 }}>{bottomNavBar}</View>
+      {bottomNavBar}
     </Box>
   );
 
   const renderSurfaceShell = (content: React.ReactNode) => (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
-      <Surface tone="raised" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'visible', paddingBottom: 80 }}>
+      <Box background="background" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'visible', paddingBottom: 80 }}>
         {content}
-      </Surface>
+      </Box>
       {walletHubSheet}
       {storeScopeSheet}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, width: '100%', zIndex: 1000 }}>{bottomNavBar}</View>
+      {bottomNavBar}
     </Box>
   );
 
