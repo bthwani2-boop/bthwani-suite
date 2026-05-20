@@ -13,13 +13,18 @@ import {
   TopBar,
   useDirection,
   useTheme,
-  SegmentedControl,
   ActionStrip,
+  Divider,
 } from '@bthwani/ui-kit';
 import type { WltDshPartnerWalletTransaction } from './wlt-dsh-partner.adapter';
 import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
 import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommission } from './wlt-dsh-partner.ui-copy';
-import { getWltDshStoreDeliveryFinancePreview } from '../../shared/finance';
+import {
+  getWltDshStoreDeliveryFinancePreview,
+  getWltDshOrderCommissionBreakdown,
+  type WltDshFulfillmentMode,
+  type WltDshOrderLineItemApplicability,
+} from '../../shared/finance';
 
 type PartnerDshWalletViewState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';
@@ -154,6 +159,22 @@ function resolveServiceModeEnabled(serviceModes: readonly ServiceModeInput[] | u
   return matched?.enabled ?? fallback;
 }
 
+function formatApplicability(app: WltDshOrderLineItemApplicability) {
+  if (app.applies) {
+    if (app.label === 'UI_PREVIEW_ONLY — WLT') {
+      return 'تُحدد بواسطة WLT (قيد المعاينة)';
+    }
+    if (app.label === 'UI_PREVIEW_ONLY — حسب سياسة المتجر') {
+      return 'حسب سياسة المتجر';
+    }
+    if (app.label === 'UI_PREVIEW_ONLY — حسب اتفاق المتجر') {
+      return 'حسب اتفاق المتجر';
+    }
+    return app.label;
+  }
+  return app.reason;
+}
+
 function CompactMetric({
   label,
   value,
@@ -190,146 +211,7 @@ function CompactMetric({
   );
 }
 
-function TransactionRow({
-  item,
-  onPress,
-}: {
-  item: PartnerDshWalletTransaction;
-  onPress: (transaction: PartnerDshWalletTransaction) => void;
-}) {
-  const { direction } = useDirection();
-  const { theme } = useTheme();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
-  const amountColor = resolveToneColor(theme, item.amountTone);
 
-  return (
-    <Pressable
-      accessibilityRole={item.hasDetails ? 'button' : undefined}
-      accessibilityLabel={item.title}
-      disabled={!item.hasDetails}
-      onPress={() => onPress(item)}
-      style={({ pressed }) => [{ opacity: item.hasDetails && pressed ? 0.96 : 1 }]}
-    >
-      <Surface tone="raised" padding={3} gap={2}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12 }}>
-          <View style={{ flex: 1, flexDirection: rowDirection, alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 14,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: theme.surfaceInset,
-                borderWidth: 1,
-                borderColor: theme.line,
-                flexShrink: 0,
-              }}
-            >
-              <Icon name={item.icon} size={18} tone="brand" />
-            </View>
-
-            <View style={{ flex: 1, gap: 4, minWidth: 0, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-              <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-                {item.title}
-              </Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={2}>
-                {item.subtitle}
-              </Text>
-            </View>
-          </View>
-
-          <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 5, flexShrink: 0 }}>
-            <Text role="bodyStrong" style={{ color: amountColor, textAlign: direction === 'rtl' ? 'left' : 'right' }}>
-              {item.amountLabel}
-            </Text>
-            {item.statusLabel ? <Badge label={item.statusLabel} tone={item.statusTone ?? 'default'} /> : null}
-            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 4 }}>
-              <Text role="caption" tone="soft" style={{ textAlign: direction === 'rtl' ? 'left' : 'right' }}>
-                {item.timeLabel}
-              </Text>
-              {item.hasDetails ? <Icon name="chevron-forward-outline" mirrored tone="muted" size={16} /> : null}
-            </View>
-          </View>
-        </View>
-      </Surface>
-    </Pressable>
-  );
-}
-
-function ActionRow({
-  icon,
-  title,
-  subtitle,
-  onPress,
-}: {
-  icon: React.ComponentProps<typeof Icon>['name'];
-  title: string;
-  subtitle: string;
-  onPress: () => void;
-}) {
-  const { direction } = useDirection();
-  const { theme } = useTheme();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
-
-  return (
-    <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={({ pressed }) => [{ opacity: pressed ? 0.96 : 1 }]}>
-      <Surface tone="raised" padding={3} gap={2}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12 }}>
-          <View style={{ flex: 1, flexDirection: rowDirection, alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <View
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 13,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: theme.surfaceInset,
-                borderWidth: 1,
-                borderColor: theme.line,
-                flexShrink: 0,
-              }}
-            >
-              <Icon name={icon} size={17} tone="brand" />
-            </View>
-
-            <View style={{ flex: 1, gap: 4, minWidth: 0, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-              <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-                {title}
-              </Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={2}>
-                {subtitle}
-              </Text>
-            </View>
-          </View>
-
-          <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
-        </View>
-      </Surface>
-    </Pressable>
-  );
-}
-
-function resolveActionPanelCopy(actionId: PartnerDshWalletActionId) {
-  if (actionId === 'settlements') {
-    return {
-      title: 'مراجعة التسويات',
-      description: 'ستظهر مراجعة التسويات التفصيلية من نفس مساحة المالية فور تفعيل الربط التشغيلي.',
-    };
-  }
-
-  if (actionId === 'report') {
-    return {
-      title: 'الملخص المالي',
-      description: 'سيتم عرض التقرير المختصر أو تنزيله من هذا المسار عند جاهزية الربط الخاص بالتقارير.',
-    };
-  }
-
-  return {
-    title: 'المحفظة الموسعة',
-    description: 'هذه المساحة جاهزة لاستقبال العرض الموسع للمحفظة إذا لم يتوفر ربط مباشر من المضيف بعد.',
-  };
-}
 
 export function PartnerDshWalletBridgeView({
   state = 'ready',
@@ -347,8 +229,8 @@ export function PartnerDshWalletBridgeView({
   const { theme } = useTheme();
   const { partnerPreview, previewTransactions } = useWltDshPartnerWalletPreview();
   const [selectedTransactionId, setSelectedTransactionId] = React.useState<string | null>(null);
-  const [activeActionId, setActiveActionId] = React.useState<PartnerDshWalletActionId | null>(null);
-  const [activeTab, setActiveTab] = React.useState<'summary' | 'cycle' | 'transactions' | 'modes' | 'courier'>('summary');
+  const [selectedModeId, setSelectedModeId] = React.useState<'pickup' | 'partner_delivery' | 'bthwani_delivery' | null>(null);
+  const [activeTab, setActiveTab] = React.useState<'summary' | 'cycle' | 'transactions' | 'modes' | 'courier' | null>('summary');
 
   const linkedScopeLabel = React.useMemo(() => resolveLinkedScopeLabel(activeZoneLabel, branchLabel), [activeZoneLabel, branchLabel]);
   const storeDeliveryPreview = React.useMemo(() => getWltDshStoreDeliveryFinancePreview(), []);
@@ -382,20 +264,11 @@ export function PartnerDshWalletBridgeView({
   function openAction(actionId: PartnerDshWalletActionId) {
     if (actionId === 'expanded-wallet' && onOpenExpandedWallet) {
       onOpenExpandedWallet();
-      return;
-    }
-
-    if (actionId === 'settlements' && onOpenSettlementReview) {
+    } else if (actionId === 'settlements' && onOpenSettlementReview) {
       onOpenSettlementReview();
-      return;
-    }
-
-    if (actionId === 'report' && onOpenFinancialReport) {
+    } else if (actionId === 'report' && onOpenFinancialReport) {
       onOpenFinancialReport();
-      return;
     }
-
-    setActiveActionId(actionId);
   }
 
   const commissionRows = [
@@ -422,14 +295,11 @@ export function PartnerDshWalletBridgeView({
     },
   ];
 
-  const actionPanel = activeActionId ? resolveActionPanelCopy(activeActionId) : null;
-
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: screenBottomInset }}>
+    <MobileScrollView fill gap={4} contentContainerStyle={{ paddingBottom: screenBottomInset }}>
       <TopBar
         variant="secondary"
         title="المحفظة والحسابات المالية"
-        style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={onBack ? {
           id: 'back',
           icon: <Icon name="arrow-back" size={24} tone="brand" />,
@@ -439,117 +309,59 @@ export function PartnerDshWalletBridgeView({
         } : undefined}
       />
 
-      <SegmentedControl
-        options={[
-          { value: 'summary', label: 'الملخص' },
-          { value: 'cycle', label: 'التسوية' },
-          { value: 'transactions', label: 'الحركات' },
-          { value: 'modes', label: 'العمولات' },
-          { value: 'courier', label: 'المندوب' },
-        ]}
-        value={activeTab}
-        onValueChange={(val) => {
-          setActiveTab(val as any);
-          setSelectedTransactionId(null);
-          setActiveActionId(null);
-        }}
-        style={{ marginBottom: 4 }}
-      />
-
-      {/* ─── TAB 1: SUMMARY ─── */}
-      {activeTab === 'summary' && (
-        <Box gap={4}>
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              ملخص مالي سريع — ر.ي (ريال يمني)
-            </Text>
+      {/* SUMMARY ACCORDION */}
+      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
+        <ActionStrip
+          icon="pie-chart-outline"
+          title="ملخص مالي سريع"
+          subtitle="نظرة عامة على المبيعات والتسوية القادمة"
+          expanded={activeTab === 'summary'}
+          onPress={() => setActiveTab(activeTab === 'summary' ? null : 'summary')}
+          hideDivider={true}
+          trailingAction={
+            <Icon name={activeTab === 'summary' ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
+          }
+        >
+          <Box gap={4} padding={3}>
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10 }}>
               <CompactMetric label="إجمالي المبيعات" value={partnerPreview.grossSalesLabel} tone="info" />
               <CompactMetric label="صافي التسوية" value={partnerPreview.netSettlementLabel} tone="success" />
               <CompactMetric label="التسوية القادمة" value={partnerPreview.nextSettlementLabel} tone="warning" />
             </View>
-          </Surface>
+            <Box gap={2} marginTop={2}>
+              <Button label="تنزيل ملخص مالي" tone="ghost" icon="download-outline" size="sm" onPress={() => openAction('report')} />
+              <Button label="فتح المحفظة الموسعة" tone="ghost" icon="wallet-outline" size="sm" onPress={() => openAction('expanded-wallet')} />
+            </Box>
+          </Box>
+        </ActionStrip>
+      </Surface>
 
-          <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
-            <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-              إجراء مالي سريع
-            </Text>
-            <Text role="caption" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8, paddingTop: 8 }}>
-              عرض سريع للأقسام التفصيلية للمحفظة من مساحة واحدة.
-            </Text>
-            {financialActionsDisabled ? (
-              <StateView
-                stateId="empty"
-                title="الإجراءات المالية مقفلة مؤقتًا"
-                description="راجع الصلاحية أو حالة الحساب قبل محاولة تنفيذ إجراء مالي."
-              />
-            ) : (
-              <Box gap={0}>
-                <ActionStrip
-                  icon="document-text-outline"
-                  title="مراجعة الدورة المالية والتسويات"
-                  subtitle="تفاصيل مستحقات الدورة الحالية وتواريخ الدفع."
-                  navigationChevron
-                  onPress={() => setActiveTab('cycle')}
-                />
-                <ActionStrip
-                  icon="swap-horizontal-outline"
-                  title="عرض الحركات المفصلة"
-                  subtitle="استعراض قائمة الحركات المكتملة وآخر التسويات."
-                  navigationChevron
-                  onPress={() => setActiveTab('transactions')}
-                />
-                <ActionStrip
-                  icon="bicycle-outline"
-                  title="توزيع عمولات أوضاع التشغيل"
-                  subtitle="مراجعة شروط ورسوم الخدمات المختلفة للتوصيل."
-                  navigationChevron
-                  onPress={() => setActiveTab('modes')}
-                />
-                <ActionStrip
-                  icon="download-outline"
-                  title="تنزيل ملخص مالي"
-                  subtitle="تحميل كشف مالي مختصر للفترة الحالية."
-                  navigationChevron
-                  onPress={() => openAction('report')}
-                />
-                <ActionStrip
-                  icon="wallet-outline"
-                  title="فتح المحفظة الموسعة"
-                  subtitle="إدارة الحسابات البنكية وإعدادات الدفع المتقدمة."
-                  navigationChevron
-                  onPress={() => openAction('expanded-wallet')}
-                />
-              </Box>
-            )}
-          </Surface>
-        </Box>
-      )}
-
-      {/* ─── TAB 2: CYCLE ─── */}
-      {activeTab === 'cycle' && (
-        <Box gap={4}>
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              تفصيل الدورة المالية والتسويات
-            </Text>
+      {/* CYCLE ACCORDION */}
+      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
+        <ActionStrip
+          icon="document-text-outline"
+          title="الدورة المالية والتسويات"
+          subtitle="تفاصيل مستحقات الدورة الحالية وتواريخ الدفع"
+          expanded={activeTab === 'cycle'}
+          onPress={() => setActiveTab(activeTab === 'cycle' ? null : 'cycle')}
+          hideDivider={true}
+          trailingAction={
+            <Icon name={activeTab === 'cycle' ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
+          }
+        >
+          <Box gap={4} padding={3}>
             <KeyValueList
               dense
               items={[
-                { label: 'إجمالي المبيعات (Gross Sales)', value: partnerPreview.grossSalesLabel, tone: 'info' },
-                { label: 'عمولة المنصة (Platform Commission)', value: `-${partnerPreview.platformCommissionLabel}`, tone: 'warning' },
-                { label: 'خصومات واستردادات (Deductions/Refunds)', value: `-${partnerPreview.deductionsLabel}`, tone: 'warning' },
-                { label: 'رسوم توصيل المتجر (Store Delivery Fee)', value: `+${storeDeliveryPreview.totalFeeLabel}`, tone: 'success' },
-                { label: 'تعويض موصل المتجر (Store Courier Compensation)', value: `-${storeDeliveryPreview.totalCompensationLabel}`, tone: 'warning' },
-                { label: 'صافي التسوية المتوقع (Net Settlement)', value: partnerPreview.netSettlementLabel, tone: 'success' },
+                { label: 'إجمالي المبيعات', value: partnerPreview.grossSalesLabel, tone: 'info' },
+                { label: 'عمولة المنصة', value: `-${partnerPreview.platformCommissionLabel}`, tone: 'warning' },
+                { label: 'خصومات واستردادات', value: `-${partnerPreview.deductionsLabel}`, tone: 'warning' },
+                { label: 'رسوم توصيل المتجر', value: `+${storeDeliveryPreview.totalFeeLabel}`, tone: 'success' },
+                { label: 'تعويض موصل المتجر', value: `-${storeDeliveryPreview.totalCompensationLabel}`, tone: 'warning' },
+                { label: 'صافي التسوية', value: partnerPreview.netSettlementLabel, tone: 'success' },
               ]}
             />
-          </Surface>
-
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              الجدول الزمني والتواريخ
-            </Text>
+            <Divider />
             <KeyValueList
               dense
               items={[
@@ -557,165 +369,162 @@ export function PartnerDshWalletBridgeView({
                 { label: 'تاريخ بدء الدورة', value: partnerPreview.cycleStartDate },
                 { label: 'تاريخ نهاية الدورة', value: partnerPreview.cycleEndDate },
                 { label: 'موعد الصرف القادم', value: partnerPreview.nextPayoutDate, tone: 'info' },
-                { label: 'نطاق الفرع المرتبط', value: linkedScopeLabel },
               ]}
             />
-          </Surface>
-        </Box>
-      )}
+          </Box>
+        </ActionStrip>
+      </Surface>
 
-      {/* ─── TAB 3: TRANSACTIONS ─── */}
-      {activeTab === 'transactions' && (
-        <Box gap={4}>
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              آخر الحركات
-            </Text>
+      {/* TRANSACTIONS ACCORDION */}
+      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
+        <ActionStrip
+          icon="swap-horizontal-outline"
+          title="عرض الحركات المفصلة"
+          subtitle="قائمة الحركات المكتملة وآخر التسويات"
+          expanded={activeTab === 'transactions'}
+          onPress={() => setActiveTab(activeTab === 'transactions' ? null : 'transactions')}
+          hideDivider={true}
+          trailingAction={
+            <Icon name={activeTab === 'transactions' ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
+          }
+        >
+          <Box gap={0}>
             {visibleTransactions.length === 0 ? (
-              <StateView
-                stateId="empty"
-                title="لا توجد حركات مالية بعد"
-                description="عند وصول أول تسوية أو عمولة أو دفعة مستحقة ستظهر هنا."
-              />
-            ) : (
-              <Box gap={3}>
-                {visibleTransactions.map((item) => (
-                  <TransactionRow key={item.id} item={item} onPress={(transaction) => setSelectedTransactionId(transaction.id)} />
-                ))}
+              <Box padding={4}>
+                <StateView
+                  stateId="empty"
+                  title="لا توجد حركات مالية بعد"
+                  description="عند وصول أول تسوية أو عمولة ستظهر هنا."
+                />
               </Box>
-            )}
-          </Surface>
-
-          {selectedTransaction ? (
-            <Surface tone="inset" padding={3} gap={3}>
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-                تفاصيل الحركة
-              </Text>
-              <KeyValueList
-                dense
-                items={[
-                  { label: 'العنوان', value: selectedTransaction.title },
-                  { label: 'الوصف', value: selectedTransaction.subtitle },
-                  { label: 'المبلغ', value: selectedTransaction.amountLabel, tone: selectedTransaction.amountTone ?? 'info' },
-                  { label: 'الحالة', value: selectedTransaction.statusLabel ?? 'بدون حالة ظاهرة', tone: selectedTransaction.statusTone ?? 'default' },
-                  { label: 'الوقت', value: selectedTransaction.timeLabel },
-                ]}
-              />
-              <Button label="إخفاء التفاصيل" tone="ghost" fullWidth={false} onPress={() => setSelectedTransactionId(null)} />
-            </Surface>
-          ) : null}
-        </Box>
-      )}
-
-      {/* ─── TAB 4: FULFILLMENT MODES / COMMISSION ─── */}
-      {activeTab === 'modes' && (
-        <Box gap={4}>
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              توزيع العمولة حسب وضع الخدمة
-            </Text>
-            <Box gap={3}>
-              {commissionRows.map((row) => {
-                let costLabel = '';
-                let payResponsibility = '';
-                let netRevenueDesc = '';
-
-                if (row.id === 'bthwani_delivery') {
-                  costLabel = 'يتحملها العميل والمنصة (كابتن بثواني)';
-                  payResponsibility = 'شركة بثواني (تسوية كابتن تلقائية)';
-                  netRevenueDesc = 'صافي قيمة الطلب بعد خصم عمولة المنصة ورسوم التوصيل';
-                } else if (row.id === 'partner_delivery') {
-                  costLabel = 'يتحملها المتجر (موصل المتجر)';
-                  payResponsibility = 'المتجر يدفع لموصله (تسوية داخلية)';
-                  netRevenueDesc = 'كامل قيمة الطلب والرسوم مطروحاً منها عمولة المنصة';
-                } else {
-                  costLabel = 'لا يوجد (العميل يستلم بنفسه)';
-                  payResponsibility = 'لا ينطبق (بدون موصل)';
-                  netRevenueDesc = 'كامل قيمة الطلب مطروحاً منها عمولة المنصة فقط';
-                }
-
+            ) : (
+              visibleTransactions.map((item, index) => {
+                const isExpanded = selectedTransactionId === item.id;
                 return (
-                  <Surface key={row.id} tone="default" padding={3} gap={3}>
-                    <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}>
-                        <Icon name={row.icon} size={18} tone="brand" />
-                        <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-                          {row.title}
-                        </Text>
+                  <ActionStrip
+                    key={item.id}
+                    icon={item.icon}
+                    title={item.title}
+                    subtitle={item.subtitle}
+                    expanded={isExpanded}
+                    onPress={() => setSelectedTransactionId(isExpanded ? null : item.id)}
+                    trailingAction={
+                      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12 }}>
+                        <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4 }}>
+                          <Text role="bodyStrong" style={{ color: resolveToneColor(theme, item.amountTone) }}>{item.amountLabel}</Text>
+                          <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+                            {!!item.statusLabel ? <Badge label={item.statusLabel} tone={item.statusTone ?? 'default'} /> : null}
+                            <Text role="caption" tone="soft">{item.timeLabel}</Text>
+                          </View>
+                        </View>
+                        <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
                       </View>
-                      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
-                        <Badge label={row.enabled ? 'مفعّل' : 'غير مفعّل'} tone={row.enabled ? 'success' : 'warning'} />
-                        <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'left' : 'right' }}>
-                          {row.percentage}
-                        </Text>
-                      </View>
-                    </View>
+                    }
+                    hideDivider={index === visibleTransactions.length - 1}
+                  >
                     <KeyValueList
                       dense
                       items={[
-                        { label: 'عبء تكلفة الموصل', value: costLabel },
-                        { label: 'جهة صرف المستحقات', value: payResponsibility },
-                        { label: 'وصف الإيراد الصافي', value: netRevenueDesc },
+                        { label: 'المبلغ', value: item.amountLabel, tone: item.amountTone === 'success' ? 'success' : item.amountTone === 'danger' ? 'danger' : 'default' },
+                        { label: 'الحالة', value: item.statusLabel ?? 'مكتمل', tone: item.statusTone ?? 'success' },
+                        { label: 'رقم المرجعية', value: item.id },
                       ]}
                     />
-                  </Surface>
+                  </ActionStrip>
                 );
-              })}
-            </Box>
-          </Surface>
-        </Box>
-      )}
+              })
+            )}
+          </Box>
+        </ActionStrip>
+      </Surface>
 
-      {/* ─── TAB 5: COURIER / STORE DELIVERY ─── */}
-      {activeTab === 'courier' && (
-        <Box gap={4}>
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              سياسة توصيل المتجر الحالية
-            </Text>
+      {/* MODES ACCORDION */}
+      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
+        <ActionStrip
+          icon="bicycle-outline"
+          title="توزيع عمولات أوضاع التشغيل"
+          subtitle="شروط ورسوم الخدمات المختلفة للتوصيل"
+          expanded={activeTab === 'modes'}
+          onPress={() => setActiveTab(activeTab === 'modes' ? null : 'modes')}
+          hideDivider={true}
+          trailingAction={
+            <Icon name={activeTab === 'modes' ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
+          }
+        >
+          <Box gap={0}>
+            {commissionRows.map((row, index) => {
+              const isExpanded = selectedModeId === row.id;
+              const breakdown = getWltDshOrderCommissionBreakdown(
+                row.id === 'pickup' ? 'pickup' : row.id === 'partner_delivery' ? 'partner_delivery' : 'bthwani_delivery'
+              );
+              return (
+                <ActionStrip
+                  key={row.id}
+                  icon={row.icon}
+                  title={row.title}
+                  subtitle={
+                    <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                      <Badge label={row.enabled ? 'مفعّل في المتجر' : 'غير نشط حالياً'} tone={row.enabled ? 'success' : 'warning'} />
+                      <Text role="caption" tone="muted">• {row.percentage}</Text>
+                    </View>
+                  }
+                  expanded={isExpanded}
+                  onPress={() => setSelectedModeId(isExpanded ? null : row.id)}
+                  trailingAction={
+                    <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
+                  }
+                  hideDivider={index === commissionRows.length - 1}
+                >
+                  <KeyValueList
+                    dense
+                    items={[
+                      { label: 'رسوم التوصيل للعميل', value: formatApplicability(breakdown.deliveryFee) },
+                      { label: 'عمولة المنصة', value: formatApplicability(breakdown.platformCommission) },
+                      { label: 'مستحقات الكابتن', value: formatApplicability(breakdown.captainPayout) },
+                      { label: 'صافي مستحقات المتجر', value: formatApplicability(breakdown.partnerNet) }
+                    ]}
+                  />
+                </ActionStrip>
+              );
+            })}
+          </Box>
+        </ActionStrip>
+      </Surface>
+
+      {/* COURIER ACCORDION */}
+      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
+        <ActionStrip
+          icon="storefront-outline"
+          title="سياسة توصيل المتجر الحالية"
+          subtitle="إعدادات ورسوم توصيل المتجر (Partner Delivery)"
+          expanded={activeTab === 'courier'}
+          onPress={() => setActiveTab(activeTab === 'courier' ? null : 'courier')}
+          hideDivider={true}
+          trailingAction={
+            <Icon name={activeTab === 'courier' ? 'chevron-up' : 'chevron-down'} tone="muted" size={20} />
+          }
+        >
+          <Box gap={4} padding={3}>
             <KeyValueList
               dense
               items={[
                 { label: 'السياسة الحالية النشطة', value: 'توصيل مجاني (Free Delivery)', tone: 'success' },
                 { label: 'مستوى تسعير التوصيل للعميل', value: 'تسعير بثواني الموحد (بثواني كابتن)' },
-                { label: 'إجمالي رسوم التوصيل المحصلة للفرع', value: storeDeliveryPreview.totalFeeLabel, tone: 'success' },
-                { label: 'إجمالي مستحقات موصلي المتجر (التعويضات)', value: storeDeliveryPreview.totalCompensationLabel, tone: 'warning' },
+                { label: 'إجمالي رسوم التوصيل المحصلة', value: storeDeliveryPreview.totalFeeLabel, tone: 'success' },
+                { label: 'إجمالي مستحقات موصلي المتجر', value: storeDeliveryPreview.totalCompensationLabel, tone: 'warning' },
               ]}
             />
-
-            <Surface
-              tone="default"
-              padding={3}
-              gap={2}
-              style={{
-                backgroundColor: theme.warningSurface,
-                borderColor: theme.warning,
-                borderWidth: 1,
-                borderRadius: 14,
-              }}
-            >
+            <Surface tone="warning" padding={3} gap={2} style={{ marginTop: 8 }}>
               <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 10, alignItems: 'flex-start' }}>
                 <Icon name="warning" tone="warning" size={18} />
                 <Text role="bodySm" tone="warning" style={{ flex: 1, textAlign: 'right' }}>
-                  تنبيه: يتم تسوية مستحقات مناديب المتجر داخلياً بواسطة إدارة المتجر، ولا تنطبق عليها تسويات كباتن بثواني (Captain Payouts).
+                  تنبيه: يتم تسوية مستحقات مناديب المتجر داخلياً بواسطة إدارة المتجر، ولا تنطبق عليها تسويات كباتن بثواني.
                 </Text>
               </View>
             </Surface>
-          </Surface>
-        </Box>
-      )}
-
-      {actionPanel ? (
-        <Surface tone="inset" padding={3} gap={3}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-            {actionPanel.title}
-          </Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            {actionPanel.description}
-          </Text>
-          <Button label="إغلاق" tone="ghost" fullWidth={false} onPress={() => setActiveActionId(null)} />
-        </Surface>
-      ) : null}
+          </Box>
+        </ActionStrip>
+      </Surface>
     </MobileScrollView>
   );
 }
