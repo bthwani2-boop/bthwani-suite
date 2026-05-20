@@ -162,6 +162,7 @@ export type {
 	DshCatalogSubcategoryId,
 	DshProductFacetId,
 	DshInventoryHierarchyFilter,
+	DshProductTaxonomyLabels,
 } from './catalog';
 export {
 	DSH_DOMAIN_LABELS,
@@ -176,6 +177,11 @@ export {
 	dshCategoryMeasurementPolicies,
 	getDshTaxonomyLabel,
 	getDshActiveFilterSummary,
+	getDshCatalogDomains,
+	getDshMainCategories,
+	getDshSubcategories,
+	getDshProductFacets,
+	resolveDshProductTaxonomy,
 } from './catalog';
 
 export type {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, ScrollView } from 'react-native';
 import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import {
@@ -412,6 +412,13 @@ function HierarchyFilterRail({
   const activeOperationalFacets = activeFacetTags.filter(isDshOperationalFacet);
   const activeProductFacets = activeFacetTags.filter((f) => !isDshOperationalFacet(f));
 
+  const rowStyle = {
+    flexDirection: resolveRowDirection(direction),
+    gap: 6,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+  } as const;
+
   function toggleFacet(facet: DshProductFacetId) {
     const isActive = activeFacetTags.includes(facet);
     const next = isActive
@@ -421,9 +428,9 @@ function HierarchyFilterRail({
   }
 
   return (
-    <Surface tone="inset" padding={2} gap={2} border={false}>
-      {/* Domain rail */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+    <Box gap={2}>
+      {/* Row 1 — Domain */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
         <Chip
           label="الكل"
           tone={!filter.domainId ? 'brand' : 'default'}
@@ -439,11 +446,11 @@ function HierarchyFilterRail({
             onPress={() => onChange({ domainId: d, mainCategoryId: undefined, subcategoryId: undefined })}
           />
         ))}
-      </Box>
+      </ScrollView>
 
-      {/* Main category rail — only after domain selected */}
+      {/* Row 2 — Main Category (after domain selected) */}
       {filter.domainId && availableMainCategories.length > 0 ? (
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
           <Chip
             label="الكل"
             tone={!filter.mainCategoryId ? 'brand' : 'default'}
@@ -459,12 +466,12 @@ function HierarchyFilterRail({
               onPress={() => onChange({ mainCategoryId: mc, subcategoryId: undefined })}
             />
           ))}
-        </Box>
+        </ScrollView>
       ) : null}
 
-      {/* Subcategory rail — only after main category selected */}
+      {/* Row 3 — Subcategory (after main category selected) */}
       {filter.mainCategoryId && availableSubcategories.length > 0 ? (
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
           <Chip
             label="الكل"
             tone={!filter.subcategoryId ? 'brand' : 'default'}
@@ -480,13 +487,19 @@ function HierarchyFilterRail({
               onPress={() => onChange({ subcategoryId: sc })}
             />
           ))}
-        </Box>
+        </ScrollView>
       ) : null}
 
-      {/* Operational facets — status-based quick filters */}
+      {/* Row 4 — Operational Status */}
       <Box gap={1}>
-        <Text role="caption" tone="muted">الحالة</Text>
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+        <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الحالة</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
+          <Chip
+            label="الكل"
+            tone={activeOperationalFacets.length === 0 ? 'brand' : 'default'}
+            selected={activeOperationalFacets.length === 0}
+            onPress={() => onChange({ facetTags: activeProductFacets.length ? activeProductFacets : undefined })}
+          />
           {DSH_OPERATIONAL_FACETS.map((facet) => {
             const isActive = activeOperationalFacets.includes(facet);
             return (
@@ -499,14 +512,20 @@ function HierarchyFilterRail({
               />
             );
           })}
-        </Box>
+        </ScrollView>
       </Box>
 
-      {/* Product attribute facets */}
+      {/* Row 5 — Product Facets */}
       {availableProductFacets.length > 0 ? (
         <Box gap={1}>
-          <Text role="caption" tone="muted">الخصائص</Text>
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+          <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الخصائص</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
+            <Chip
+              label="الكل"
+              tone={activeProductFacets.length === 0 ? 'brand' : 'default'}
+              selected={activeProductFacets.length === 0}
+              onPress={() => onChange({ facetTags: activeOperationalFacets.length ? activeOperationalFacets : undefined })}
+            />
             {availableProductFacets.map((facet) => {
               const isActive = activeProductFacets.includes(facet);
               return (
@@ -519,13 +538,13 @@ function HierarchyFilterRail({
                 />
               );
             })}
-          </Box>
+          </ScrollView>
         </Box>
       ) : null}
 
       {/* Active filter summary + clear */}
       {hasActiveFilters ? (
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
           <Text role="caption" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
             {[
               filter.domainId ? DOMAIN_LABELS[filter.domainId] : null,
@@ -543,7 +562,7 @@ function HierarchyFilterRail({
           />
         </Box>
       ) : null}
-    </Surface>
+    </Box>
   );
 }
 
@@ -1140,7 +1159,7 @@ function InventoryCatalogContent({
       <HelpBlock />
 
       {/* Unified filter funnel */}
-      <HierarchyFilterRail filter={filter} onChange={setFilter} items={items} />
+      <HierarchyFilterRail filter={filter} onChange={(update) => setFilter((prev) => ({ ...prev, ...update }))} items={items} />
 
       {/* View mode + result count */}
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>

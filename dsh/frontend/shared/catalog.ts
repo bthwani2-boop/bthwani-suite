@@ -319,6 +319,47 @@ export function getDshActiveFilterSummary(filter: DshInventoryHierarchyFilter): 
   return parts.join(' › ');
 }
 
+// ── Static taxonomy helpers ──────────────────────────────────────────
+
+export function getDshCatalogDomains(): ReadonlyArray<DshCatalogDomainId> {
+  return Object.keys(DSH_DOMAIN_LABELS) as DshCatalogDomainId[];
+}
+
+export function getDshMainCategories(): ReadonlyArray<DshCatalogMainCategoryId> {
+  return Object.keys(DSH_MAIN_CATEGORY_LABELS) as DshCatalogMainCategoryId[];
+}
+
+export function getDshSubcategories(): ReadonlyArray<DshCatalogSubcategoryId> {
+  return Object.keys(DSH_SUBCATEGORY_LABELS) as DshCatalogSubcategoryId[];
+}
+
+export function getDshProductFacets(): ReadonlyArray<DshProductFacetId> {
+  return (Object.keys(DSH_PRODUCT_FACET_LABELS) as DshProductFacetId[]).filter(
+    (f) => !isDshOperationalFacet(f),
+  );
+}
+
+export type DshProductTaxonomyLabels = {
+  domainLabel?: string;
+  mainCategoryLabel?: string;
+  subcategoryLabel?: string;
+  facetLabels?: string[];
+};
+
+export function resolveDshProductTaxonomy(product: {
+  domainId?: DshCatalogDomainId;
+  mainCategoryId?: DshCatalogMainCategoryId;
+  subcategoryId?: DshCatalogSubcategoryId;
+  facetTags?: DshProductFacetId[];
+}): DshProductTaxonomyLabels {
+  return {
+    domainLabel: product.domainId ? DSH_DOMAIN_LABELS[product.domainId] : undefined,
+    mainCategoryLabel: product.mainCategoryId ? DSH_MAIN_CATEGORY_LABELS[product.mainCategoryId] : undefined,
+    subcategoryLabel: product.subcategoryId ? DSH_SUBCATEGORY_LABELS[product.subcategoryId] : undefined,
+    facetLabels: product.facetTags?.map((f) => DSH_PRODUCT_FACET_LABELS[f] ?? f),
+  };
+}
+
 export const dshCatalogPipeline: ReadonlyArray<DshCatalogPipelineStep> = [
   {
     id: 'step-field',
