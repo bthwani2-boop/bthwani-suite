@@ -30,6 +30,72 @@ import {
   canRenderInClientSurface,
 } from '../../shared/workflow';
 
+// ── PHASE 1: Hierarchical browsing model ─────────────────────────────
+
+type DshInventoryDomainId =
+  | 'restaurants'
+  | 'grocery'
+  | 'pharmacy'
+  | 'bakery'
+  | 'drinks'
+  | 'retail'
+  | 'services';
+
+type CatalogMainCategoryId =
+  | 'meals'
+  | 'drinks'
+  | 'sides'
+  | 'desserts'
+  | 'snacks'
+  | 'offers'
+  | 'household'
+  | 'health'
+  | 'beauty'
+  | 'stationery';
+
+type CatalogSubcategoryId =
+  | 'burgers'
+  | 'chicken'
+  | 'pizza'
+  | 'salads'
+  | 'sandwiches'
+  | 'rice-bowls'
+  | 'sauces'
+  | 'juices'
+  | 'smoothies'
+  | 'coffee'
+  | 'tea'
+  | 'fries'
+  | 'soups'
+  | 'cakes'
+  | 'sweets'
+  | 'ice-cream'
+  | 'breads'
+  | 'cleaning'
+  | 'personal-care'
+  | 'baby-care'
+  | 'vitamins'
+  | 'makeup'
+  | 'pens'
+  | 'notebooks';
+
+type ProductFacetId =
+  | 'spicy'
+  | 'vegetarian'
+  | 'vegan'
+  | 'gluten-free'
+  | 'sugar-free'
+  | 'organic'
+  | 'halal'
+  | 'kids-friendly'
+  | 'premium'
+  | 'budget'
+  | 'bestseller'
+  | 'new-arrival'
+  | 'seasonal'
+  | 'limited-edition'
+  | 'fresh';
+
 // ── Local types (screen-scoped, no new shared files needed) ──────────
 
 type InventoryCatalogItem = {
@@ -49,6 +115,12 @@ type InventoryCatalogItem = {
   // Catalog linkage
   catalogLinked: boolean;
   isCatalogOwned: boolean; // name/image/category locked
+  // PHASE 1: Hierarchical browsing
+  domainId?: DshInventoryDomainId;
+  mainCategoryId?: CatalogMainCategoryId;
+  subcategoryId?: CatalogSubcategoryId;
+  facetTags?: ProductFacetId[];
+  isPrivateStoreProduct: boolean; // true = partner-created, false = canonical
   // Partner local override
   priceLabel: string;
   stockCount: number;
@@ -69,6 +141,8 @@ type PartnerLocalOverride = {
   internalNote: string;
 };
 
+// ── PHASE 2: Multi-layer filter state ────────────────────────────────
+
 type InventoryFilterId =
   | 'all'
   | 'low-stock'
@@ -77,6 +151,86 @@ type InventoryFilterId =
   | 'rejected'
   | 'ready'
   | 'client-visible';
+
+type ViewMode = 'cards' | 'dense-list';
+
+type ActiveHierarchyFilter = {
+  domainId?: DshInventoryDomainId;
+  mainCategoryId?: CatalogMainCategoryId;
+  subcategoryId?: CatalogSubcategoryId;
+  facetTags?: ProductFacetId[];
+  isPrivateStoreProduct?: boolean;
+};
+
+// ── PHASE 2: Filter label maps ───────────────────────────────────────
+
+const DOMAIN_LABELS: Record<DshInventoryDomainId, string> = {
+  restaurants: 'مطاعم',
+  grocery: 'بقالة',
+  pharmacy: 'صيدلية',
+  bakery: 'مخبوزات',
+  drinks: 'مشروبات',
+  retail: 'تجزئة',
+  services: 'خدمات',
+};
+
+const MAIN_CATEGORY_LABELS: Record<CatalogMainCategoryId, string> = {
+  meals: 'وجبات',
+  drinks: 'مشروبات',
+  sides: 'إضافات',
+  desserts: 'حلويات',
+  snacks: 'وجبات خفيفة',
+  offers: 'عروض',
+  household: 'منزلية',
+  health: 'صحة',
+  beauty: 'جمال',
+  stationery: 'قرطاسية',
+};
+
+const SUBCATEGORY_LABELS: Record<CatalogSubcategoryId, string> = {
+  burgers: 'برغر',
+  chicken: 'دجاج',
+  pizza: 'بيتزا',
+  salads: 'سلطات',
+  sandwiches: 'ساندويتشات',
+  'rice-bowls': 'أرز وأطباق',
+  sauces: 'صوصات',
+  juices: 'عصائر',
+  smoothies: 'سموذي',
+  coffee: 'قهوة',
+  tea: 'شاي',
+  fries: 'بطاطس',
+  soups: 'شوربات',
+  cakes: 'كيك',
+  sweets: 'حلويات',
+  'ice-cream': 'آيس كريم',
+  breads: 'خبز',
+  cleaning: 'تنظيف',
+  'personal-care': 'عناية شخصية',
+  'baby-care': 'عناية أطفال',
+  vitamins: 'فيتامينات',
+  makeup: 'مكياج',
+  pens: 'أقلام',
+  notebooks: 'دفاتر',
+};
+
+const FACET_LABELS: Record<ProductFacetId, string> = {
+  spicy: 'حار',
+  vegetarian: 'نباتي',
+  vegan: 'نباتي صرف',
+  'gluten-free': 'خالٍ من الغلوتين',
+  'sugar-free': 'خالٍ من السكر',
+  organic: 'عضوي',
+  halal: 'حلال',
+  'kids-friendly': 'مناسب للأطفال',
+  premium: 'مميز',
+  budget: 'اقتصادي',
+  bestseller: 'الأكثر مبيعاً',
+  'new-arrival': 'جديد',
+  seasonal: 'موسمي',
+  'limited-edition': 'محدود',
+  fresh: 'طازج',
+};
 
 // ── Stage display helpers ────────────────────────────────────────────
 
@@ -172,6 +326,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-BRG-001', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01',
       categoryLabel: 'برغر',
       catalogLinked: true, isCatalogOwned: true,
+      domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers',
+      facetTags: ['bestseller', 'halal'],
+      isPrivateStoreProduct: false,
       reviewNeeded: false,
       available: true, lowStock: false, stockCount: 42,
       priceLabel: '18.00 ر.ي',
@@ -183,6 +340,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-BWL-014', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14',
       categoryLabel: 'وجبة',
       catalogLinked: true, isCatalogOwned: true,
+      domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken',
+      facetTags: ['spicy', 'halal'],
+      isPrivateStoreProduct: false,
       reviewNeeded: false,
       available: true, lowStock: true, stockCount: 3,
       priceLabel: '24.50 ر.ي',
@@ -194,6 +354,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-SID-022', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22',
       categoryLabel: 'إضافات',
       catalogLinked: false, isCatalogOwned: false,
+      domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'fries',
+      facetTags: ['spicy'],
+      isPrivateStoreProduct: true,
       reviewNeeded: true,
       available: true, lowStock: false, stockCount: 18,
       priceLabel: '8.00 ر.ي',
@@ -205,6 +368,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-DRK-090', gtin: '6280001000902', barcode: '6280001000902', manufacturerCode: 'MFR-DR-90',
       categoryLabel: 'مشروبات',
       catalogLinked: true, isCatalogOwned: true,
+      domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'juices',
+      facetTags: ['fresh', 'halal'],
+      isPrivateStoreProduct: false,
       reviewNeeded: false,
       available: true, lowStock: true, stockCount: 2,
       priceLabel: '9.50 ر.ي',
@@ -216,6 +382,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-SAU-003', gtin: '6280001000308', barcode: '6280001000308', manufacturerCode: 'MFR-SA-03',
       categoryLabel: 'إضافات',
       catalogLinked: true, isCatalogOwned: false,
+      domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'sauces',
+      facetTags: ['premium'],
+      isPrivateStoreProduct: false,
       reviewNeeded: true,
       available: true, lowStock: false, stockCount: 9,
       priceLabel: '2.50 ر.ي',
@@ -227,6 +396,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-SLD-044', gtin: '6280001000445', barcode: '6280001000445', manufacturerCode: 'MFR-SL-44',
       categoryLabel: 'سلطات',
       catalogLinked: false, isCatalogOwned: false,
+      domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads',
+      facetTags: ['vegetarian', 'gluten-free'],
+      isPrivateStoreProduct: true,
       reviewNeeded: true,
       available: false, lowStock: false, stockCount: 0,
       priceLabel: '14.75 ر.ي',
@@ -238,6 +410,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-BKR-005', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05',
       categoryLabel: 'مخبوزات',
       catalogLinked: true, isCatalogOwned: false,
+      domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads',
+      facetTags: ['premium', 'new-arrival'],
+      isPrivateStoreProduct: false,
       reviewNeeded: true,
       available: true, lowStock: false, stockCount: 12,
       priceLabel: '9.00 ر.ي',
@@ -250,6 +425,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-SWT-099', gtin: '6280001000995', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99',
       categoryLabel: 'حلويات',
       catalogLinked: false, isCatalogOwned: false,
+      domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes',
+      facetTags: ['seasonal', 'limited-edition'],
+      isPrivateStoreProduct: true,
       reviewNeeded: false,
       available: false, lowStock: false, stockCount: 0,
       priceLabel: '120.00 ر.ي',
@@ -262,6 +440,9 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       sku: 'BL-DRK-102', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102',
       categoryLabel: 'مشروبات',
       catalogLinked: true, isCatalogOwned: false,
+      domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'coffee',
+      facetTags: ['premium', 'new-arrival'],
+      isPrivateStoreProduct: false,
       reviewNeeded: true,
       available: true, lowStock: false, stockCount: 25,
       priceLabel: '15.00 ر.ي',
@@ -318,7 +499,7 @@ export type InventoryCatalogScreenProps = InventoryCatalogContentProps & {
   onBack?: () => void;
 };
 
-// ── Filter rail ──────────────────────────────────────────────────────
+// ── PHASE 2: Filter rail ──────────────────────────────────────────────
 
 const FILTER_ITEMS: { id: InventoryFilterId; label: string }[] = [
   { id: 'all', label: 'الكل' },
@@ -340,6 +521,189 @@ function applyFilter(items: InventoryCatalogItem[], filterId: InventoryFilterId)
     case 'client-visible': return items.filter((item) => canRenderInClientSurface(item.publishStage, 'product'));
     default: return items;
   }
+}
+
+// ── PHASE 2: Hierarchical filter helpers ─────────────────────────────
+
+function applyHierarchyFilter(
+  items: InventoryCatalogItem[],
+  hierarchy: ActiveHierarchyFilter,
+): InventoryCatalogItem[] {
+  return items.filter((item) => {
+    if (hierarchy.domainId && item.domainId !== hierarchy.domainId) return false;
+    if (hierarchy.mainCategoryId && item.mainCategoryId !== hierarchy.mainCategoryId) return false;
+    if (hierarchy.subcategoryId && item.subcategoryId !== hierarchy.subcategoryId) return false;
+    if (hierarchy.isPrivateStoreProduct !== undefined && item.isPrivateStoreProduct !== hierarchy.isPrivateStoreProduct) return false;
+    if (hierarchy.facetTags?.length) {
+      const hasAllFacets = hierarchy.facetTags.every((f) => item.facetTags?.includes(f));
+      if (!hasAllFacets) return false;
+    }
+    return true;
+  });
+}
+
+function getAvailableDomains(items: InventoryCatalogItem[]): DshInventoryDomainId[] {
+  const seen = new Set<DshInventoryDomainId>();
+  items.forEach((item) => { if (item.domainId) seen.add(item.domainId); });
+  return Array.from(seen);
+}
+
+function getAvailableMainCategories(items: InventoryCatalogItem[], domainId?: DshInventoryDomainId): CatalogMainCategoryId[] {
+  const seen = new Set<CatalogMainCategoryId>();
+  items.forEach((item) => {
+    if (item.mainCategoryId && (!domainId || item.domainId === domainId)) seen.add(item.mainCategoryId);
+  });
+  return Array.from(seen);
+}
+
+function getAvailableSubcategories(
+  items: InventoryCatalogItem[],
+  domainId?: DshInventoryDomainId,
+  mainCategoryId?: CatalogMainCategoryId,
+): CatalogSubcategoryId[] {
+  const seen = new Set<CatalogSubcategoryId>();
+  items.forEach((item) => {
+    if (item.subcategoryId && (!domainId || item.domainId === domainId) && (!mainCategoryId || item.mainCategoryId === mainCategoryId)) {
+      seen.add(item.subcategoryId);
+    }
+  });
+  return Array.from(seen);
+}
+
+function getAvailableFacets(items: InventoryCatalogItem[]): ProductFacetId[] {
+  const seen = new Set<ProductFacetId>();
+  items.forEach((item) => { item.facetTags?.forEach((f) => seen.add(f)); });
+  return Array.from(seen);
+}
+
+// ── PHASE 2: Hierarchy filter rail component ─────────────────────────
+
+function HierarchyFilterRail({
+  hierarchy,
+  onChange,
+  items,
+}: {
+  hierarchy: ActiveHierarchyFilter;
+  onChange: (update: Partial<ActiveHierarchyFilter>) => void;
+  items: InventoryCatalogItem[];
+}) {
+  const { direction } = useDirection();
+  const availableDomains = getAvailableDomains(items);
+  const availableMainCategories = getAvailableMainCategories(items, hierarchy.domainId);
+  const availableSubcategories = getAvailableSubcategories(items, hierarchy.domainId, hierarchy.mainCategoryId);
+  const availableFacets = getAvailableFacets(items);
+
+  const hasActiveFilters = hierarchy.domainId || hierarchy.mainCategoryId || hierarchy.subcategoryId || hierarchy.facetTags?.length;
+
+  return (
+    <Surface tone="inset" padding={2} gap={2} border={false}>
+      {/* Domain rail */}
+      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+        <Chip
+          label="الكل"
+          tone={!hierarchy.domainId ? 'brand' : 'default'}
+          selected={!hierarchy.domainId}
+          onPress={() => onChange({ domainId: undefined, mainCategoryId: undefined, subcategoryId: undefined })}
+        />
+        {availableDomains.map((d) => (
+          <Chip
+            key={d}
+            label={DOMAIN_LABELS[d]}
+            tone={hierarchy.domainId === d ? 'brand' : 'default'}
+            selected={hierarchy.domainId === d}
+            onPress={() => onChange({ domainId: d, mainCategoryId: undefined, subcategoryId: undefined })}
+          />
+        ))}
+      </Box>
+
+      {/* Main category rail */}
+      {hierarchy.domainId && availableMainCategories.length > 0 ? (
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+          <Chip
+            label="الكل"
+            tone={!hierarchy.mainCategoryId ? 'brand' : 'default'}
+            selected={!hierarchy.mainCategoryId}
+            onPress={() => onChange({ mainCategoryId: undefined, subcategoryId: undefined })}
+          />
+          {availableMainCategories.map((mc) => (
+            <Chip
+              key={mc}
+              label={MAIN_CATEGORY_LABELS[mc]}
+              tone={hierarchy.mainCategoryId === mc ? 'brand' : 'default'}
+              selected={hierarchy.mainCategoryId === mc}
+              onPress={() => onChange({ mainCategoryId: mc, subcategoryId: undefined })}
+            />
+          ))}
+        </Box>
+      ) : null}
+
+      {/* Subcategory rail */}
+      {hierarchy.mainCategoryId && availableSubcategories.length > 0 ? (
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+          <Chip
+            label="الكل"
+            tone={!hierarchy.subcategoryId ? 'brand' : 'default'}
+            selected={!hierarchy.subcategoryId}
+            onPress={() => onChange({ subcategoryId: undefined })}
+          />
+          {availableSubcategories.map((sc) => (
+            <Chip
+              key={sc}
+              label={SUBCATEGORY_LABELS[sc]}
+              tone={hierarchy.subcategoryId === sc ? 'brand' : 'default'}
+              selected={hierarchy.subcategoryId === sc}
+              onPress={() => onChange({ subcategoryId: sc })}
+            />
+          ))}
+        </Box>
+      ) : null}
+
+      {/* Facet chips */}
+      {availableFacets.length > 0 ? (
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+          {availableFacets.map((facet) => {
+            const isActive = hierarchy.facetTags?.includes(facet);
+            return (
+              <Chip
+                key={facet}
+                label={FACET_LABELS[facet]}
+                tone={isActive ? 'brand' : 'default'}
+                selected={isActive}
+                onPress={() => {
+                  const current = hierarchy.facetTags ?? [];
+                  const next = isActive
+                    ? current.filter((f) => f !== facet)
+                    : [...current, facet];
+                  onChange({ facetTags: next.length ? next : undefined });
+                }}
+              />
+            );
+          })}
+        </Box>
+      ) : null}
+
+      {/* Active filter summary + clear */}
+      {hasActiveFilters ? (
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text role="caption" tone="muted">
+            {[
+              hierarchy.domainId ? DOMAIN_LABELS[hierarchy.domainId] : null,
+              hierarchy.mainCategoryId ? MAIN_CATEGORY_LABELS[hierarchy.mainCategoryId] : null,
+              hierarchy.subcategoryId ? SUBCATEGORY_LABELS[hierarchy.subcategoryId] : null,
+              hierarchy.facetTags?.length ? `${hierarchy.facetTags.length} خاصية` : null,
+            ].filter(Boolean).join(' › ')}
+          </Text>
+          <Button
+            label="مسح"
+            size="sm"
+            tone="secondary"
+            fullWidth={false}
+            onPress={() => onChange({ domainId: undefined, mainCategoryId: undefined, subcategoryId: undefined, facetTags: undefined })}
+          />
+        </Box>
+      ) : null}
+    </Surface>
+  );
 }
 
 // ── Help block (collapsible) ──────────────────────────────────────────
@@ -460,6 +824,49 @@ function InlineLocalEdit({
           disabled={isRejected}
         />
       )}
+    </Surface>
+  );
+}
+
+// ── PHASE 3: Dense list row ───────────────────────────────────────────
+
+function DenseListRow({
+  item,
+  onToggleEdit,
+  override,
+  onOverrideChange,
+  onApplyOverride,
+}: {
+  item: InventoryCatalogItem;
+  onToggleEdit: () => void;
+  override: PartnerLocalOverride;
+  onOverrideChange: (field: keyof PartnerLocalOverride, value: string | boolean) => void;
+  onApplyOverride: () => void;
+}) {
+  const { direction } = useDirection();
+  const isRejected = item.publishStage === 'rejected';
+  const isNeedsFix = item.publishStage === 'needs-fix';
+  const stageTone = resolveStageChipTone(item.publishStage);
+  const stockTone = item.lowStock ? 'warning' : item.available ? 'success' : 'danger';
+
+  return (
+    <Surface tone="default" padding={2} gap={2} border style={{ borderColor: isRejected ? 'red' : isNeedsFix ? 'orange' : undefined }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+        {/* PHASE 4: Canonical vs private badge */}
+        <Chip
+          label={item.isPrivateStoreProduct ? 'خاص' : 'كتالوج'}
+          tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
+          selected
+        />
+        <Text role="bodySm" numberOfLines={1} style={{ flex: 1 }}>{item.name}</Text>
+        <Chip label={item.priceLabel} tone="brand" />
+        <Chip label={item.stockCount === 0 ? 'نفد' : String(item.stockCount)} tone={stockTone} />
+        {item.publishStage ? <Chip label={translateStage(item.publishStage)} tone={stageTone} selected /> : null}
+        <Button label="تعديل" size="sm" tone="secondary" fullWidth={false} onPress={onToggleEdit} disabled={isRejected} />
+      </Box>
+      {expandedEditId === item.id ? (
+        <InlineLocalEdit item={item} override={override} onChange={onOverrideChange} onApply={onApplyOverride} />
+      ) : null}
     </Surface>
   );
 }
@@ -686,6 +1093,10 @@ function InventoryCatalogContent({
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
   const [activeFilter, setActiveFilter] = React.useState<InventoryFilterId>('all');
+  // PHASE 2: Hierarchy filter state
+  const [hierarchy, setHierarchy] = React.useState<ActiveHierarchyFilter>({});
+  // PHASE 3: View mode — dense list is default for 5000+ products
+  const [viewMode, setViewMode] = React.useState<ViewMode>('dense-list');
   const [items, setItems] = React.useState<InventoryCatalogItem[]>(() =>
     buildInitialItems(canonicalStoreId),
   );
@@ -728,8 +1139,10 @@ function InventoryCatalogContent({
             .includes(q),
         )
       : items;
-    return applyFilter(searched, activeFilter);
-  }, [items, query, activeFilter]);
+    // PHASE 2: Apply hierarchy filter
+    const hierarchyFiltered = applyHierarchyFilter(searched, hierarchy);
+    return applyFilter(hierarchyFiltered, activeFilter);
+  }, [items, query, activeFilter, hierarchy]);
 
   const handleOverrideChange = React.useCallback(
     (id: string, field: keyof PartnerLocalOverride, value: string | boolean) => {
@@ -885,6 +1298,30 @@ function InventoryCatalogContent({
       {/* ── Help block (collapsible) ── */}
       <HelpBlock />
 
+      {/* ── PHASE 2: Hierarchy filter rail ── */}
+      <HierarchyFilterRail hierarchy={hierarchy} onChange={setHierarchy} items={items} />
+
+      {/* ── PHASE 3: View mode toggle ── */}
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between' }}>
+        <Text role="label" tone="muted">{filteredItems.length} منتج</Text>
+        <Box style={{ flexDirection: resolveRowDirection(direction), gap: 4 }}>
+          <Button
+            label="بطاقات"
+            size="sm"
+            tone={viewMode === 'cards' ? 'brand' : 'secondary'}
+            fullWidth={false}
+            onPress={() => setViewMode('cards')}
+          />
+          <Button
+            label="قائمة كثيفة"
+            size="sm"
+            tone={viewMode === 'dense-list' ? 'brand' : 'secondary'}
+            fullWidth={false}
+            onPress={() => setViewMode('dense-list')}
+          />
+        </Box>
+      </Box>
+
       {/* ── Filter rail ── */}
       <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
         {FILTER_ITEMS.map((f) => (
@@ -898,7 +1335,7 @@ function InventoryCatalogContent({
         ))}
       </Box>
 
-      {/* ── Product stream ── */}
+      {/* ── PHASE 3: Product stream (cards or dense list) ── */}
       <Box gap={3}>
         {filteredItems.length === 0 ? (
           <StateView
@@ -908,6 +1345,23 @@ function InventoryCatalogContent({
             actionLabel="إعادة ضبط الفلتر والبحث"
             onActionPress={() => { setQuery(''); setActiveFilter('all'); }}
           />
+        ) : viewMode === 'dense-list' ? (
+          filteredItems.map((item) => (
+            <DenseListRow
+              key={item.id}
+              item={item}
+              onToggleEdit={() => setExpandedEditId((prev) => (prev === item.id ? null : item.id))}
+              override={overrides[item.id] ?? {
+                price: item.priceLabel.replace(/[^0-9.]/g, '').trim(),
+                stock: String(item.stockCount),
+                available: item.available,
+                preparationNote: '',
+                internalNote: item.internalNote ?? '',
+              }}
+              onOverrideChange={(field, value) => handleOverrideChange(item.id, field, value)}
+              onApplyOverride={() => handleApplyOverride(item)}
+            />
+          ))
         ) : (
           filteredItems.map((item) => (
             <ProductCard
