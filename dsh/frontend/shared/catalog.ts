@@ -124,6 +124,154 @@ export const dshCatalogNodes: ReadonlyArray<DshCatalogNode> = [
   },
 ];
 
+// ── Inventory UI Taxonomy ────────────────────────────────────────────
+
+export type DshCatalogDomainId =
+  | 'restaurants'
+  | 'grocery'
+  | 'bakery'
+  | 'drinks'
+  | 'pharmacy'
+  | 'household'
+  | 'retail'
+  | 'services'
+  | 'other';
+
+export type DshCatalogMainCategoryId =
+  | 'meals'
+  | 'drinks'
+  | 'sides'
+  | 'desserts'
+  | 'snacks'
+  | 'offers'
+  | 'household'
+  | 'health'
+  | 'beauty'
+  | 'stationery';
+
+export type DshCatalogSubcategoryId =
+  | 'burgers'
+  | 'chicken'
+  | 'pizza'
+  | 'salads'
+  | 'sandwiches'
+  | 'rice-bowls'
+  | 'sauces'
+  | 'juices'
+  | 'smoothies'
+  | 'coffee'
+  | 'tea'
+  | 'fries'
+  | 'soups'
+  | 'cakes'
+  | 'sweets'
+  | 'ice-cream'
+  | 'breads'
+  | 'cleaning'
+  | 'personal-care'
+  | 'baby-care'
+  | 'vitamins'
+  | 'makeup'
+  | 'pens'
+  | 'notebooks';
+
+export type DshProductFacetId =
+  | 'spicy'
+  | 'vegetarian'
+  | 'vegan'
+  | 'gluten-free'
+  | 'sugar-free'
+  | 'organic'
+  | 'halal'
+  | 'kids-friendly'
+  | 'premium'
+  | 'budget'
+  | 'bestseller'
+  | 'new-arrival'
+  | 'seasonal'
+  | 'limited-edition'
+  | 'fresh';
+
+export const DSH_DOMAIN_LABELS: Record<DshCatalogDomainId, string> = {
+  restaurants: 'مطاعم',
+  grocery: 'بقالة',
+  pharmacy: 'صيدلية',
+  bakery: 'مخبوزات',
+  drinks: 'مشروبات',
+  household: 'منزلية',
+  retail: 'تجزئة',
+  services: 'خدمات',
+  other: 'أخرى',
+};
+
+export const DSH_MAIN_CATEGORY_LABELS: Record<DshCatalogMainCategoryId, string> = {
+  meals: 'وجبات',
+  drinks: 'مشروبات',
+  sides: 'إضافات',
+  desserts: 'حلويات',
+  snacks: 'وجبات خفيفة',
+  offers: 'عروض',
+  household: 'منزلية',
+  health: 'صحة',
+  beauty: 'جمال',
+  stationery: 'قرطاسية',
+};
+
+export const DSH_SUBCATEGORY_LABELS: Record<DshCatalogSubcategoryId, string> = {
+  burgers: 'برغر',
+  chicken: 'دجاج',
+  pizza: 'بيتزا',
+  salads: 'سلطات',
+  sandwiches: 'ساندويتشات',
+  'rice-bowls': 'أرز وأطباق',
+  sauces: 'صوصات',
+  juices: 'عصائر',
+  smoothies: 'سموذي',
+  coffee: 'قهوة',
+  tea: 'شاي',
+  fries: 'بطاطس',
+  soups: 'شوربات',
+  cakes: 'كيك',
+  sweets: 'حلويات',
+  'ice-cream': 'آيس كريم',
+  breads: 'خبز',
+  cleaning: 'تنظيف',
+  'personal-care': 'عناية شخصية',
+  'baby-care': 'عناية أطفال',
+  vitamins: 'فيتامينات',
+  makeup: 'مكياج',
+  pens: 'أقلام',
+  notebooks: 'دفاتر',
+};
+
+export const DSH_PRODUCT_FACET_LABELS: Record<DshProductFacetId, string> = {
+  spicy: 'حار',
+  vegetarian: 'نباتي',
+  vegan: 'نباتي صرف',
+  'gluten-free': 'خالٍ من الغلوتين',
+  'sugar-free': 'خالٍ من السكر',
+  organic: 'عضوي',
+  halal: 'حلال',
+  'kids-friendly': 'مناسب للأطفال',
+  premium: 'مميز',
+  budget: 'اقتصادي',
+  bestseller: 'الأكثر مبيعاً',
+  'new-arrival': 'جديد',
+  seasonal: 'موسمي',
+  'limited-edition': 'محدود',
+  fresh: 'طازج',
+};
+
+export function getDshTaxonomyLabel(id: string): string {
+  return (
+    (DSH_DOMAIN_LABELS as Record<string, string>)[id] ??
+    (DSH_MAIN_CATEGORY_LABELS as Record<string, string>)[id] ??
+    (DSH_SUBCATEGORY_LABELS as Record<string, string>)[id] ??
+    (DSH_PRODUCT_FACET_LABELS as Record<string, string>)[id] ??
+    id
+  );
+}
+
 export const dshCatalogPipeline: ReadonlyArray<DshCatalogPipelineStep> = [
   {
     id: 'step-field',

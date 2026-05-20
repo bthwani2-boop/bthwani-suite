@@ -1,5 +1,17 @@
 import React from 'react';
+import { Image } from 'react-native';
 import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
+import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
+import {
+  type DshCatalogDomainId,
+  type DshCatalogMainCategoryId,
+  type DshCatalogSubcategoryId,
+  type DshProductFacetId,
+  DSH_DOMAIN_LABELS as DOMAIN_LABELS,
+  DSH_MAIN_CATEGORY_LABELS as MAIN_CATEGORY_LABELS,
+  DSH_SUBCATEGORY_LABELS as SUBCATEGORY_LABELS,
+  DSH_PRODUCT_FACET_LABELS as FACET_LABELS,
+} from '../../shared/catalog';
 import {
   Box,
   Button,
@@ -19,10 +31,8 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import {
-  type ApprovalRecordMetadata,
   type ApprovalStage,
   getPartnerQueueRecords,
-  isCatalogOwnedMedia,
   isPartnerOwnedException,
   translateOwner,
   translateStage,
@@ -30,71 +40,6 @@ import {
   canRenderInClientSurface,
 } from '../../shared/workflow';
 
-// ── PHASE 1: Hierarchical browsing model ─────────────────────────────
-
-type DshInventoryDomainId =
-  | 'restaurants'
-  | 'grocery'
-  | 'pharmacy'
-  | 'bakery'
-  | 'drinks'
-  | 'retail'
-  | 'services';
-
-type CatalogMainCategoryId =
-  | 'meals'
-  | 'drinks'
-  | 'sides'
-  | 'desserts'
-  | 'snacks'
-  | 'offers'
-  | 'household'
-  | 'health'
-  | 'beauty'
-  | 'stationery';
-
-type CatalogSubcategoryId =
-  | 'burgers'
-  | 'chicken'
-  | 'pizza'
-  | 'salads'
-  | 'sandwiches'
-  | 'rice-bowls'
-  | 'sauces'
-  | 'juices'
-  | 'smoothies'
-  | 'coffee'
-  | 'tea'
-  | 'fries'
-  | 'soups'
-  | 'cakes'
-  | 'sweets'
-  | 'ice-cream'
-  | 'breads'
-  | 'cleaning'
-  | 'personal-care'
-  | 'baby-care'
-  | 'vitamins'
-  | 'makeup'
-  | 'pens'
-  | 'notebooks';
-
-type ProductFacetId =
-  | 'spicy'
-  | 'vegetarian'
-  | 'vegan'
-  | 'gluten-free'
-  | 'sugar-free'
-  | 'organic'
-  | 'halal'
-  | 'kids-friendly'
-  | 'premium'
-  | 'budget'
-  | 'bestseller'
-  | 'new-arrival'
-  | 'seasonal'
-  | 'limited-edition'
-  | 'fresh';
 
 // ── Local types (screen-scoped, no new shared files needed) ──────────
 
@@ -116,11 +61,12 @@ type InventoryCatalogItem = {
   catalogLinked: boolean;
   isCatalogOwned: boolean; // name/image/category locked
   // PHASE 1: Hierarchical browsing
-  domainId?: DshInventoryDomainId;
-  mainCategoryId?: CatalogMainCategoryId;
-  subcategoryId?: CatalogSubcategoryId;
-  facetTags?: ProductFacetId[];
+  domainId?: DshCatalogDomainId;
+  mainCategoryId?: DshCatalogMainCategoryId;
+  subcategoryId?: DshCatalogSubcategoryId;
+  facetTags?: DshProductFacetId[];
   isPrivateStoreProduct: boolean; // true = partner-created, false = canonical
+  mediaKey?: string; // resolved via resolveDshImageSource
   // Partner local override
   priceLabel: string;
   stockCount: number;
@@ -155,82 +101,13 @@ type InventoryFilterId =
 type ViewMode = 'cards' | 'dense-list';
 
 type ActiveHierarchyFilter = {
-  domainId?: DshInventoryDomainId;
-  mainCategoryId?: CatalogMainCategoryId;
-  subcategoryId?: CatalogSubcategoryId;
-  facetTags?: ProductFacetId[];
+  domainId?: DshCatalogDomainId;
+  mainCategoryId?: DshCatalogMainCategoryId;
+  subcategoryId?: DshCatalogSubcategoryId;
+  facetTags?: DshProductFacetId[];
   isPrivateStoreProduct?: boolean;
 };
 
-// ── PHASE 2: Filter label maps ───────────────────────────────────────
-
-const DOMAIN_LABELS: Record<DshInventoryDomainId, string> = {
-  restaurants: 'مطاعم',
-  grocery: 'بقالة',
-  pharmacy: 'صيدلية',
-  bakery: 'مخبوزات',
-  drinks: 'مشروبات',
-  retail: 'تجزئة',
-  services: 'خدمات',
-};
-
-const MAIN_CATEGORY_LABELS: Record<CatalogMainCategoryId, string> = {
-  meals: 'وجبات',
-  drinks: 'مشروبات',
-  sides: 'إضافات',
-  desserts: 'حلويات',
-  snacks: 'وجبات خفيفة',
-  offers: 'عروض',
-  household: 'منزلية',
-  health: 'صحة',
-  beauty: 'جمال',
-  stationery: 'قرطاسية',
-};
-
-const SUBCATEGORY_LABELS: Record<CatalogSubcategoryId, string> = {
-  burgers: 'برغر',
-  chicken: 'دجاج',
-  pizza: 'بيتزا',
-  salads: 'سلطات',
-  sandwiches: 'ساندويتشات',
-  'rice-bowls': 'أرز وأطباق',
-  sauces: 'صوصات',
-  juices: 'عصائر',
-  smoothies: 'سموذي',
-  coffee: 'قهوة',
-  tea: 'شاي',
-  fries: 'بطاطس',
-  soups: 'شوربات',
-  cakes: 'كيك',
-  sweets: 'حلويات',
-  'ice-cream': 'آيس كريم',
-  breads: 'خبز',
-  cleaning: 'تنظيف',
-  'personal-care': 'عناية شخصية',
-  'baby-care': 'عناية أطفال',
-  vitamins: 'فيتامينات',
-  makeup: 'مكياج',
-  pens: 'أقلام',
-  notebooks: 'دفاتر',
-};
-
-const FACET_LABELS: Record<ProductFacetId, string> = {
-  spicy: 'حار',
-  vegetarian: 'نباتي',
-  vegan: 'نباتي صرف',
-  'gluten-free': 'خالٍ من الغلوتين',
-  'sugar-free': 'خالٍ من السكر',
-  organic: 'عضوي',
-  halal: 'حلال',
-  'kids-friendly': 'مناسب للأطفال',
-  premium: 'مميز',
-  budget: 'اقتصادي',
-  bestseller: 'الأكثر مبيعاً',
-  'new-arrival': 'جديد',
-  seasonal: 'موسمي',
-  'limited-edition': 'محدود',
-  fresh: 'طازج',
-};
 
 // ── Stage display helpers ────────────────────────────────────────────
 
@@ -291,6 +168,8 @@ function mapCanonicalToInventoryItem(product: DshCanonicalProductCard): Inventor
     manufacturerCode: product.manufacturerCode ?? `FIELD-${product.sourceRecordId.toUpperCase()}`,
     catalogLinked: true,
     isCatalogOwned: product.publishStage === 'catalog-adopted' || product.publishStage === 'client-visible',
+    isPrivateStoreProduct: false,
+    mediaKey: product.mediaKey,
     priceLabel: product.priceLabel,
     stockCount: product.stockCount ?? 0,
     available: product.isAvailable,
@@ -329,6 +208,7 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers',
       facetTags: ['bestseller', 'halal'],
       isPrivateStoreProduct: false,
+      mediaKey: 'dsh.product.chicken.v1',
       reviewNeeded: false,
       available: true, lowStock: false, stockCount: 42,
       priceLabel: '18.00 ر.ي',
@@ -343,6 +223,7 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken',
       facetTags: ['spicy', 'halal'],
       isPrivateStoreProduct: false,
+      mediaKey: 'dsh.product.chicken.v1',
       reviewNeeded: false,
       available: true, lowStock: true, stockCount: 3,
       priceLabel: '24.50 ر.ي',
@@ -399,6 +280,7 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads',
       facetTags: ['vegetarian', 'gluten-free'],
       isPrivateStoreProduct: true,
+      mediaKey: 'dsh.product.salad.v1',
       reviewNeeded: true,
       available: false, lowStock: false, stockCount: 0,
       priceLabel: '14.75 ر.ي',
@@ -413,6 +295,7 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads',
       facetTags: ['premium', 'new-arrival'],
       isPrivateStoreProduct: false,
+      mediaKey: 'dsh.product.bread.v1',
       reviewNeeded: true,
       available: true, lowStock: false, stockCount: 12,
       priceLabel: '9.00 ر.ي',
@@ -428,6 +311,7 @@ function buildInitialItems(canonicalStoreId?: string): InventoryCatalogItem[] {
       domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes',
       facetTags: ['seasonal', 'limited-edition'],
       isPrivateStoreProduct: true,
+      mediaKey: 'dsh.product.choco.v1',
       reviewNeeded: false,
       available: false, lowStock: false, stockCount: 0,
       priceLabel: '120.00 ر.ي',
@@ -542,14 +426,14 @@ function applyHierarchyFilter(
   });
 }
 
-function getAvailableDomains(items: InventoryCatalogItem[]): DshInventoryDomainId[] {
-  const seen = new Set<DshInventoryDomainId>();
+function getAvailableDomains(items: InventoryCatalogItem[]): DshCatalogDomainId[] {
+  const seen = new Set<DshCatalogDomainId>();
   items.forEach((item) => { if (item.domainId) seen.add(item.domainId); });
   return Array.from(seen);
 }
 
-function getAvailableMainCategories(items: InventoryCatalogItem[], domainId?: DshInventoryDomainId): CatalogMainCategoryId[] {
-  const seen = new Set<CatalogMainCategoryId>();
+function getAvailableMainCategories(items: InventoryCatalogItem[], domainId?: DshCatalogDomainId): DshCatalogMainCategoryId[] {
+  const seen = new Set<DshCatalogMainCategoryId>();
   items.forEach((item) => {
     if (item.mainCategoryId && (!domainId || item.domainId === domainId)) seen.add(item.mainCategoryId);
   });
@@ -558,10 +442,10 @@ function getAvailableMainCategories(items: InventoryCatalogItem[], domainId?: Ds
 
 function getAvailableSubcategories(
   items: InventoryCatalogItem[],
-  domainId?: DshInventoryDomainId,
-  mainCategoryId?: CatalogMainCategoryId,
-): CatalogSubcategoryId[] {
-  const seen = new Set<CatalogSubcategoryId>();
+  domainId?: DshCatalogDomainId,
+  mainCategoryId?: DshCatalogMainCategoryId,
+): DshCatalogSubcategoryId[] {
+  const seen = new Set<DshCatalogSubcategoryId>();
   items.forEach((item) => {
     if (item.subcategoryId && (!domainId || item.domainId === domainId) && (!mainCategoryId || item.mainCategoryId === mainCategoryId)) {
       seen.add(item.subcategoryId);
@@ -570,8 +454,8 @@ function getAvailableSubcategories(
   return Array.from(seen);
 }
 
-function getAvailableFacets(items: InventoryCatalogItem[]): ProductFacetId[] {
-  const seen = new Set<ProductFacetId>();
+function getAvailableFacets(items: InventoryCatalogItem[]): DshProductFacetId[] {
+  const seen = new Set<DshProductFacetId>();
   items.forEach((item) => { item.facetTags?.forEach((f) => seen.add(f)); });
   return Array.from(seen);
 }
@@ -832,29 +716,52 @@ function InlineLocalEdit({
 
 function DenseListRow({
   item,
+  isEditExpanded,
   onToggleEdit,
   override,
   onOverrideChange,
   onApplyOverride,
 }: {
   item: InventoryCatalogItem;
+  isEditExpanded: boolean;
   onToggleEdit: () => void;
   override: PartnerLocalOverride;
   onOverrideChange: (field: keyof PartnerLocalOverride, value: string | boolean) => void;
   onApplyOverride: () => void;
 }) {
   const { direction } = useDirection();
+  const { theme } = useTheme();
   const isRejected = item.publishStage === 'rejected';
   const isNeedsFix = item.publishStage === 'needs-fix';
   const stageTone = resolveStageChipTone(item.publishStage);
   const stockTone = item.lowStock ? 'warning' : item.available ? 'success' : 'danger';
+  const borderColor = isRejected ? theme.danger : isNeedsFix ? theme.warning : theme.line;
+
+  const resolvedImage = item.mediaKey ? resolveDshImageSource(item.mediaKey) : undefined;
 
   return (
-    <Surface tone="default" padding={2} gap={2} border style={{ borderColor: isRejected ? 'red' : isNeedsFix ? 'orange' : undefined }}>
+    <Surface tone="default" padding={2} gap={2} border style={{ borderColor }}>
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
-        {/* PHASE 4: Canonical vs private badge */}
+        {/* Product thumbnail or fallback */}
+        {resolvedImage ? (
+          <Image
+            source={resolvedImage}
+            style={{ width: 36, height: 36, borderRadius: 4 }}
+            resizeMode="cover"
+          />
+        ) : (
+          <Surface
+            tone="inset"
+            padding={1}
+            gap={0}
+            style={{ width: 36, height: 36, borderRadius: 4, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+          >
+            <Text role="bodyStrong">{item.name.slice(0, 1)}</Text>
+          </Surface>
+        )}
+        {/* Canonical vs private badge (PHASE 8) */}
         <Chip
-          label={item.isPrivateStoreProduct ? 'خاص' : 'كتالوج'}
+          label={item.isPrivateStoreProduct ? 'منتج خاص' : 'مركزي'}
           tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
           selected
         />
@@ -864,7 +771,7 @@ function DenseListRow({
         {item.publishStage ? <Chip label={translateStage(item.publishStage)} tone={stageTone} selected /> : null}
         <Button label="تعديل" size="sm" tone="secondary" fullWidth={false} onPress={onToggleEdit} disabled={isRejected} />
       </Box>
-      {expandedEditId === item.id ? (
+      {isEditExpanded ? (
         <InlineLocalEdit item={item} override={override} onChange={onOverrideChange} onApply={onApplyOverride} />
       ) : null}
     </Surface>
@@ -939,15 +846,23 @@ function ProductCard({
     >
       {/* ── Header row ── */}
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'flex-start', gap: 10 }}>
-        {/* Avatar */}
-        <Surface
-          tone={isRejected ? 'danger' : isNeedsFix ? 'warning' : 'inset'}
-          padding={2}
-          gap={0}
-          style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-        >
-          <Text role="bodyStrong">{item.name.slice(0, 1)}</Text>
-        </Surface>
+        {/* Product image or letter fallback */}
+        {resolveDshImageSource(item.mediaKey) ? (
+          <Image
+            source={resolveDshImageSource(item.mediaKey)!}
+            style={{ width: 44, height: 44, borderRadius: 6, flexShrink: 0 }}
+            resizeMode="cover"
+          />
+        ) : (
+          <Surface
+            tone={isRejected ? 'danger' : isNeedsFix ? 'warning' : 'inset'}
+            padding={2}
+            gap={0}
+            style={{ width: 44, height: 44, borderRadius: 6, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+          >
+            <Text role="bodyStrong">{item.name.slice(0, 1)}</Text>
+          </Surface>
+        )}
 
         {/* Name + stage + action */}
         <Box style={{ flex: 1, minWidth: 0, gap: 4, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
@@ -986,6 +901,12 @@ function ProductCard({
 
       {/* ── Commercial chips ── */}
       <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
+        {/* PHASE 8: Canonical vs private product type */}
+        <Chip
+          label={item.isPrivateStoreProduct ? 'منتج خاص بالمتجر' : 'منتج مركزي'}
+          tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
+          selected
+        />
         <Chip label={item.priceLabel} tone="brand" />
         <Chip
           label={item.stockCount === 0 ? 'نفد المخزون' : `المخزون ${item.stockCount}`}
@@ -1117,6 +1038,8 @@ function InventoryCatalogContent({
   });
   const [lastSavedLabel, setLastSavedLabel] = React.useState<string | null>(null);
   const [toolMessage, setToolMessage] = React.useState<string | null>(null);
+  const [bulkPrice, setBulkPrice] = React.useState<{ kind: 'percent' | 'fixed'; value: string } | null>(null);
+  const [bulkPreviewMessage, setBulkPreviewMessage] = React.useState<string | null>(null);
 
   const totalProducts = items.length;
   const lowStockCount = items.filter((item) => item.lowStock).length;
@@ -1350,6 +1273,7 @@ function InventoryCatalogContent({
             <DenseListRow
               key={item.id}
               item={item}
+              isEditExpanded={expandedEditId === item.id}
               onToggleEdit={() => setExpandedEditId((prev) => (prev === item.id ? null : item.id))}
               override={overrides[item.id] ?? {
                 price: item.priceLabel.replace(/[^0-9.]/g, '').trim(),
@@ -1390,16 +1314,124 @@ function InventoryCatalogContent({
       {/* ── Bulk actions ── */}
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="label" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>إجراءات جماعية</Text>
+
+        {/* Quick actions */}
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-          <Button label="تحديث أسعار جماعي" size="sm" tone="secondary" fullWidth={false}
-            onPress={() => setToolMessage('تم فتح مسار تحديث الأسعار الجماعي.')} />
+          <Button
+            label={bulkPrice ? 'إلغاء تحديث الأسعار' : 'تحديث أسعار جماعي'}
+            size="sm"
+            tone={bulkPrice ? 'danger' : 'secondary'}
+            fullWidth={false}
+            onPress={() => {
+              setBulkPrice(bulkPrice ? null : { kind: 'percent', value: '' });
+              setBulkPreviewMessage(null);
+            }}
+          />
           <Button label="استيراد Excel/CSV" size="sm" tone="secondary" fullWidth={false}
             onPress={() => setToolMessage('تم فتح مسار الاستيراد.')} />
           <Button label="مراجعة غير المطابقة" size="sm" tone="secondary" fullWidth={false}
             onPress={() => { setActiveFilter('not-linked'); setToolMessage('عرض المنتجات غير المرتبطة بالكتالوج.'); }} />
-          <Button label="إصلاح التكرارات" size="sm" tone="secondary" fullWidth={false}
-            onPress={() => setToolMessage('تم فتح مسار إصلاح التكرارات.')} />
+          <Button label="مراجعة المنتجات الخاصة" size="sm" tone="secondary" fullWidth={false}
+            onPress={() => setToolMessage('عرض المنتجات الخاصة بالمتجر التي تنتظر المراجعة.')} />
         </Box>
+
+        {/* Bulk price update panel */}
+        {bulkPrice ? (
+          <Surface tone="inset" padding={3} gap={3} border={false}>
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              تحديث أسعار المنتجات ضمن الفلتر الحالي — تطبيق محلي (preview فقط)
+            </Text>
+
+            {/* Kind selector */}
+            <Box style={{ flexDirection: resolveRowDirection(direction), gap: 6 }}>
+              <Button
+                label="نسبة مئوية %"
+                size="sm"
+                tone={bulkPrice.kind === 'percent' ? 'brand' : 'secondary'}
+                fullWidth={false}
+                onPress={() => setBulkPrice({ ...bulkPrice, kind: 'percent' })}
+              />
+              <Button
+                label="مبلغ ثابت ر.ي"
+                size="sm"
+                tone={bulkPrice.kind === 'fixed' ? 'brand' : 'secondary'}
+                fullWidth={false}
+                onPress={() => setBulkPrice({ ...bulkPrice, kind: 'fixed' })}
+              />
+            </Box>
+
+            <TextField
+              label={bulkPrice.kind === 'percent' ? 'نسبة الزيادة/النقص (مثال: +10 أو -5)' : 'المبلغ المضاف/المطروح (مثال: +2 أو -1.5)'}
+              value={bulkPrice.value}
+              onChangeText={(v: string) => { setBulkPrice({ ...bulkPrice, value: v }); setBulkPreviewMessage(null); }}
+              placeholder={bulkPrice.kind === 'percent' ? '+10' : '+2.00'}
+              dir="ltr"
+              keyboardType="decimal-pad"
+            />
+
+            {/* Preview button */}
+            <Button
+              label="معاينة التغييرات قبل التطبيق"
+              tone="secondary"
+              fullWidth={false}
+              onPress={() => {
+                const rawVal = parseFloat(bulkPrice.value.replace(/[^0-9.\-]/g, ''));
+                if (Number.isNaN(rawVal)) {
+                  setBulkPreviewMessage('أدخل قيمة صحيحة أولاً.');
+                  return;
+                }
+                const eligible = filteredItems.filter((item) => !item.isCatalogOwned);
+                const excluded = filteredItems.filter((item) => item.isCatalogOwned);
+                const sign = rawVal >= 0 ? '+' : '';
+                const summary = bulkPrice.kind === 'percent'
+                  ? `${sign}${rawVal}%`
+                  : `${sign}${rawVal.toFixed(2)} ر.ي`;
+                setBulkPreviewMessage(
+                  `المتأثرة: ${eligible.length} منتج | التغيير: ${summary} على كل سعر | المستثناة: ${excluded.length} منتج مركزي (الأسعار مقفلة) | تطبيق محلي فقط — لا يؤثر على الكتالوج المركزي.`,
+                );
+              }}
+            />
+
+            {/* Preview result */}
+            {bulkPreviewMessage ? (
+              <Surface tone="warning" padding={2} gap={0} border={false}>
+                <Text role="bodySm" tone="warning" align={direction === 'rtl' ? 'end' : 'start'}>
+                  {bulkPreviewMessage}
+                </Text>
+              </Surface>
+            ) : null}
+
+            {/* Apply button — only after preview */}
+            {bulkPreviewMessage && !bulkPreviewMessage.startsWith('أدخل') ? (
+              <Button
+                label="تطبيق التعديل المحلي على المنتجات المتأثرة"
+                tone="primary"
+                fullWidth={false}
+                onPress={() => {
+                  const rawVal = parseFloat(bulkPrice.value.replace(/[^0-9.\-]/g, ''));
+                  if (Number.isNaN(rawVal)) return;
+                  setItems((current) =>
+                    current.map((item) => {
+                      if (item.isCatalogOwned) return item;
+                      if (!filteredItems.some((f) => f.id === item.id)) return item;
+                      const currentNum = parseFloat(item.priceLabel.replace(/[^0-9.]/g, ''));
+                      if (!Number.isFinite(currentNum)) return item;
+                      const newPrice = bulkPrice.kind === 'percent'
+                        ? currentNum * (1 + rawVal / 100)
+                        : currentNum + rawVal;
+                      const clamped = Math.max(0, newPrice);
+                      return { ...item, priceLabel: `${clamped.toFixed(2)} ر.ي` };
+                    }),
+                  );
+                  setLastSavedLabel(new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }));
+                  setBulkPrice(null);
+                  setBulkPreviewMessage(null);
+                  setToolMessage('تم تطبيق تحديث الأسعار الجماعي على المنتجات المؤهلة.');
+                }}
+              />
+            ) : null}
+          </Surface>
+        ) : null}
       </Surface>
 
       <MobileStickyPrimaryAction

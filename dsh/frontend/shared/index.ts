@@ -152,17 +152,26 @@ export {
 
 export type {
 	DshCatalogApprovalStage,
+	DshCatalogDomainId,
+	DshCatalogMainCategoryId,
 	DshCatalogMeasurementKind,
 	DshCatalogMeasurementPolicy,
 	DshCatalogNode,
 	DshCatalogNodeKind,
 	DshCatalogPipelineStep,
+	DshCatalogSubcategoryId,
+	DshProductFacetId,
 } from './catalog';
 export {
+	DSH_DOMAIN_LABELS,
+	DSH_MAIN_CATEGORY_LABELS,
+	DSH_PRODUCT_FACET_LABELS,
+	DSH_SUBCATEGORY_LABELS,
 	dshCatalogMetrics,
 	dshCatalogNodes,
 	dshCatalogPipeline,
 	dshCategoryMeasurementPolicies,
+	getDshTaxonomyLabel,
 } from './catalog';
 
 export type {
@@ -319,6 +328,9 @@ export {
 	rejectFromCatalog,
 	returnToMarketing,
 } from './catalog-adoption.preview-store';
+
+// --- Shared Media Resolver ---
+export { resolveDshImageSource } from './resolve-dsh-image-source';
 
 // --- DSH Order Journey Shared Model ---
 export type {
