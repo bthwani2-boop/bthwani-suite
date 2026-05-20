@@ -305,7 +305,8 @@ function renderState(state: Exclude<PartnerOrdersHomeScreenState, 'ready'>, onRe
   return <StateView stateId="recoverableError" title="تعذر فتح لوحة عمليات الطلب" description="حدث خلل مؤقت. أعد المحاولة من دون فقدان السياق." actionLabel={onRetry ? 'إعادة المحاولة' : undefined} onActionPress={onRetry} />;
 }
 
-// ─── Order Card ────────────────────────────────────────────────────────────────
+// ─── Order Card — Cashier-Optimized ────────────────────────────────────────────
+// Priority: Order Code → Next Action → Items → Delivery → Payment
 function OrderCard({
   item,
   direction,
@@ -328,46 +329,38 @@ function OrderCard({
       padding={4}
       gap={0}
       footer={
-        // ─── Zone 5: Actions ───────────────────────────────────────────────
+        // ─── Zone 6: Actions — one primary, one secondary ─────────────────
         <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2} paddingTop={2}>
           <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={onPrimaryAction} />
-          <Button label="عرض التفاصيل" size="sm" tone="secondary" fullWidth={false} onPress={onViewDetails} />
-          <Chip label="معاينة ×" tone="info" onPress={onQuickView} />
+          <Button label="التفاصيل" size="sm" tone="secondary" fullWidth={false} onPress={onViewDetails} />
         </Box>
       }
     >
       <Box gap={3}>
-        {/* ─── Zone 1: Header ───────────────────────────────────────────── */}
+        {/* ─── Zone 1: Order Code (PRIMARY) + Status Badges ─────────────── */}
         <Box gap={1}>
           <Box style={{ flexDirection: rowDir, alignItems: 'center', flexWrap: 'wrap' }} gap={2}>
-            <Text role="titleSm">{item.customerName}</Text>
-            <Text role="bodySm" tone="muted">· {item.orderCode}</Text>
-          </Box>
-          <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2}>
+            <Text role="titleMd" tone="brand">{item.orderCode}</Text>
             <Chip label={statusLabel} tone={statusTone} selected />
-            {item.priority === 'high' ? <Chip label="أولوية عالية" tone="danger" /> : null}
-            {item.urgent && item.priority !== 'high' ? <Chip label="عاجل" tone="warning" /> : null}
-            {item.unread ? <Chip label="غير مقروء" tone="warning" /> : null}
-            {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" /> : null}
-          </Box>
-        </Box>
-
-        {/* ─── Zone 2: Context row ──────────────────────────────────────── */}
-        <Box gap={1}>
-          <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
-            <Text role="bodySm" tone="muted">{item.branchLabel}</Text>
-            <Text role="bodySm" tone="muted">·</Text>
-            <Chip label={item.orderTypeLabel} tone="brand" />
-            <Text role="bodySm" tone="muted">{item.elapsedLabel}</Text>
             {item.slaRisk && item.slaLabel ? (
               <Chip label={item.slaLabel} tone="danger" />
             ) : item.slaRisk ? (
               <Chip label="SLA قريب" tone="danger" />
             ) : null}
+            {item.urgent ? <Chip label="عاجل" tone="warning" /> : null}
+            {item.unread ? <Chip label="غير مقروء" tone="warning" /> : null}
+            {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" /> : null}
           </Box>
         </Box>
 
-        {/* ─── Zone 3: Items summary ────────────────────────────────────── */}
+        {/* ─── Zone 2: Next Action (HIGHLIGHTED) ────────────────────────── */}
+        <Box style={{ backgroundColor: statusTone === 'warning' ? 'rgba(255,180,0,0.08)' : statusTone === 'danger' ? 'rgba(220,50,50,0.08)' : 'rgba(0,180,100,0.06)', borderRadius: 8, padding: 8 }}>
+          <Text role="bodySm" tone={statusTone} style={{ fontWeight: '700' }}>
+            الإجراء الآن: {item.nextActionLabel}
+          </Text>
+        </Box>
+
+        {/* ─── Zone 3: Items Summary ────────────────────────────────────── */}
         <Box gap={1}>
           <Text role="bodySm" tone="muted">
             {item.itemsSummaryLabel
@@ -376,19 +369,23 @@ function OrderCard({
           </Text>
         </Box>
 
-        {/* ─── Zone 4: Finance + next owner ────────────────────────────── */}
+        {/* ─── Zone 4: Delivery + Next Owner ───────────────────────────── */}
         <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
-          <Text role="bodyStrong">{item.amountLabel}</Text>
-          {item.paymentLabel ? <Text role="bodySm" tone="muted">· {item.paymentLabel}</Text> : null}
+          <Chip label={item.orderTypeLabel} tone="brand" />
           {item.nextOwnerLabel ? (
             <Text role="bodySm" tone="muted">· الجهة التالية: {item.nextOwnerLabel}</Text>
           ) : null}
+          <Text role="bodySm" tone="muted">· {item.elapsedLabel}</Text>
         </Box>
 
-        {/* ─── Operational note: next action ───────────────────────────── */}
-        <Text role="caption" tone={statusTone}>
-          الإجراء التالي: {item.nextActionLabel}
-        </Text>
+        {/* ─── Zone 5: Payment ───────────────────────────────────────────── */}
+        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap', alignItems: 'center' }} gap={2}>
+          <Text role="bodyStrong">{item.amountLabel}</Text>
+          {item.paymentLabel ? <Text role="bodySm" tone="muted">· {item.paymentLabel}</Text> : null}
+        </Box>
+
+        {/* ─── Customer (MINIMAL) ────────────────────────────────────────── */}
+        <Text role="caption" tone="muted">العميل: {item.customerName}</Text>
       </Box>
     </Card>
   );
@@ -666,7 +663,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
                 label=""
                 value={query}
                 onChangeText={setQuery}
-                placeholder="رقم الطلب، العميل، الفرع، الحالة"
+                placeholder="رقم الطلب، العنصر، الحالة"
               />
             </Box>
             <Button
@@ -701,8 +698,8 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
         <Surface tone="default" padding={3} gap={3}>
           <Text role="bodySm" tone="muted">
             {filteredItems.length === 0
-              ? 'لا توجد نتائج مطابقة.'
-              : `${filteredItems.length} طلبات ضمن الفلاتر الحالية`}
+              ? 'لا توجد نتائج.'
+              : `${filteredItems.length} طلبات`}
           </Text>
 
           {filteredItems.length === 0 ? (

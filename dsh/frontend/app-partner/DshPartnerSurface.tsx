@@ -380,6 +380,10 @@ export function DshPartnerSurface({
   const showBottomNav = route !== 'entry';
 
   const bottomActiveId = React.useMemo(() => {
+    // Orders/launcher is active when viewing inbox or detail — cashier context
+    if (route === 'inbox' || route === 'detail') {
+      return 'orders';
+    }
     if (route === 'home') {
       if (accountHubSection === 'wallet') {
         return 'wallet';
