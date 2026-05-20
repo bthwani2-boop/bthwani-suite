@@ -94,6 +94,28 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
       { id: 'audit-logs', label: 'سجلات التدقيق' },
     ],
   },
+  {
+    id: 'captain-finance',
+    label: 'مالية الكباتن',
+    description: 'مراقبة وتدقيق الحركات والذمم المالية الخاصة بكباتن بثواني.',
+    badge: 'Cap',
+    subGroups: [
+      { id: 'all', label: 'الكل' },
+      { id: 'cod-pending', label: 'COD معلّق' },
+      { id: 'payouts', label: 'مستحقات معتمدة' },
+    ],
+  },
+  {
+    id: 'store-delivery-finance',
+    label: 'مالية توصيل المتجر',
+    description: 'تدقيق ومراقبة حركات وعمولات توصيل المتاجر (توصيل المتجر الداخلي).',
+    badge: 'Store',
+    subGroups: [
+      { id: 'all', label: 'الكل' },
+      { id: 'compensation', label: 'مستحقات الموصلين' },
+      { id: 'retained-fees', label: 'رسوم محتفظة للمتجر' },
+    ],
+  },
   // tax-compliance مخفي من القيادة النشطة — [TBD] لا سياسة ضريبية يمنية مثبتة بعد
   {
     id: 'tax-compliance',

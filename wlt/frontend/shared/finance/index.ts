@@ -29,6 +29,7 @@ export {
 	getWltDshFinanceSummaryForActor,
 	getWltDshOrderCommissionBreakdown,
 	getWltDshPaymentOptionsPreview,
+	getWltDshStoreDeliveryFinancePreview,
 	getWltFieldFinancePreview,
 	getWltFieldFinanceSnapshot,
 	getWltPartnerFinanceSnapshot,

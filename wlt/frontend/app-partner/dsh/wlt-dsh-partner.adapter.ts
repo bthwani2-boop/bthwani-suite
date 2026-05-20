@@ -57,18 +57,29 @@ function resolveTransactionIcon(record: WltDshFinancePreviewRecord): React.Compo
   return 'swap-horizontal-outline';
 }
 
+function sanitizeLabel(text: string | undefined): string {
+  if (!text) return '';
+  let result = text;
+  result = result.replace(/partner_delivery/g, 'توصيل بواسطة المتجر');
+  result = result.replace(/bthwani_delivery/g, 'توصيل بواسطة بثواني');
+  result = result.replace(/pickup/g, 'استلام ذاتي');
+  result = result.replace(/UI_PREVIEW_ONLY/g, 'خاضع لسياسة المحفظة');
+  result = result.replace(/CONTRACT_TBD/g, 'قيد المراجعة');
+  return result;
+}
+
 export function mapWltDshPartnerPreviewTransactions(
   records: readonly WltDshFinancePreviewRecord[],
 ): readonly WltDshPartnerWalletTransaction[] {
   return records.map((record) => ({
     id: record.id,
-    title: record.title,
-    subtitle: record.subtitle,
-    amountLabel: record.amountLabel,
+    title: sanitizeLabel(record.title),
+    subtitle: sanitizeLabel(record.subtitle),
+    amountLabel: sanitizeLabel(record.amountLabel),
     amountTone: mapAmountTone(record.tone),
-    statusLabel: record.statusLabel,
+    statusLabel: sanitizeLabel(record.statusLabel),
     statusTone: mapStatusTone(record.statusTone),
-    timeLabel: record.timeLabel,
+    timeLabel: sanitizeLabel(record.timeLabel),
     icon: resolveTransactionIcon(record),
     hasDetails: true,
   }));

@@ -19,6 +19,8 @@ export {
   ControlPanelDshCodReconciliationScreen,
   ControlPanelDshRefundQueueScreen,
   ControlPanelDshRiskAuditScreen,
+  ControlPanelDshCaptainFinanceScreen,
+  ControlPanelDshStoreDeliveryFinanceScreen,
 } from './FinanceHubScreens';
 
 // ML-040..ML-045: WLT bridge workspace skeletons — BLOCKED_BY_WLT (bridge contracts not proven)

@@ -7,7 +7,9 @@ export type CanonicalFinanceGroupId =
   | 'ledger'
   | 'payouts'
   | 'tax-compliance'
-  | 'risk-audit';
+  | 'risk-audit'
+  | 'captain-finance'
+  | 'store-delivery-finance';
 
 export type FinancePanelId = 'detail' | 'evidence';
 

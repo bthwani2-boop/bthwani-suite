@@ -100,28 +100,7 @@ const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
   },
 ] as const;
 
-function PartnerWalletHubSheet({
-  visible,
-  onClose,
-  onNavigate,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  onNavigate: (destination: PartnerWalletHubDestination) => void;
-}) {
-  if (!visible) {
-    return null;
-  }
-
-  return (
-    <Surface tone="raised" padding={5} gap={4} radiusToken="xl" border={false} style={{ margin: 16 }}>
-      <Text role="titleMd">{wltDshPartnerUiCopy.walletHubTitle}</Text>
-      <Button onPress={() => onNavigate('partner_subscription')}>{wltDshPartnerUiCopy.walletSubscriptionLabel}</Button>
-      <Button onPress={() => onNavigate('partner_settlement_summary')}>{wltDshPartnerUiCopy.walletSettlementSummaryLabel}</Button>
-      <Button onPress={onClose}>{wltDshPartnerUiCopy.walletCloseLabel}</Button>
-    </Surface>
-  );
-}
+// Removed PartnerWalletHubSheet in favor of self-contained WltDshPartnerBridge cockpit tabs.
 
 function PartnerStoreScopeSheet({
   visible,
@@ -158,7 +137,7 @@ export function DshPartnerSurface({
   initialOrderId = 'partner-order-1042',
 }: DshPartnerSurfaceProps = {}) {
   const { theme } = useTheme();
-  const [walletHubVisible, setWalletHubVisible] = React.useState(false);
+  // walletHubVisible state removed in favor of self-contained WltDshPartnerBridge cockpit tabs.
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
   const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('hub');
   const [ordersSearchMode, setOrdersSearchMode] = React.useState(false);
@@ -239,10 +218,7 @@ export function DshPartnerSurface({
         return true;
       }
 
-      if (walletHubVisible) {
-        setWalletHubVisible(false);
-        return true;
-      }
+      // walletHubVisible check removed.
 
       if (ordersSearchMode) {
         setOrdersSearchMode(false);
@@ -266,7 +242,7 @@ export function DshPartnerSurface({
     });
 
     return () => subscription.remove();
-  }, [accountHubSection, ordersSearchMode, route, storeScopeVisible, walletHubVisible]);
+  }, [accountHubSection, ordersSearchMode, route, storeScopeVisible]);
 
   const openOrdersBoard = React.useCallback(() => {
     setOrdersSearchMode(false);
@@ -301,8 +277,8 @@ export function DshPartnerSurface({
   }, []);
 
   const openWalletHub = React.useCallback(() => {
-    setWalletHubVisible(true);
-  }, []);
+    openAccountHub('wallet');
+  }, [openAccountHub]);
 
   const openStoreScope = React.useCallback(() => {
     setStoreScopeVisible(true);
@@ -331,13 +307,7 @@ export function DshPartnerSurface({
     />
   );
 
-  const walletHubSheet = (
-    <PartnerWalletHubSheet
-      visible={walletHubVisible}
-      onClose={() => setWalletHubVisible(false)}
-      onNavigate={handleWalletHubNavigation}
-    />
-  );
+  // walletHubSheet removed.
 
   const storeScopeSheet = (
     <PartnerStoreScopeSheet
@@ -352,8 +322,8 @@ export function DshPartnerSurface({
   const showBottomNav = route !== 'entry';
 
   const bottomActiveId = React.useMemo(() => {
-    // Orders/launcher is active when viewing inbox or detail — cashier context
-    if (route === 'inbox' || route === 'detail') {
+    // Orders/launcher is active when viewing inbox — cashier context
+    if (route === 'inbox') {
       return 'orders';
     }
     if (route === 'home') {
@@ -425,7 +395,6 @@ export function DshPartnerSurface({
       >
         {content}
       </Box>
-      {walletHubSheet}
       {storeScopeSheet}
       {bottomNavBar}
     </Box>
@@ -436,7 +405,6 @@ export function DshPartnerSurface({
       <Box background="background" padding={0} gap={0} radiusToken="none" border={false} style={{ flex: 1, overflow: 'visible', paddingBottom: Platform.OS === 'android' ? 112 : 80 }}>
         {content}
       </Box>
-      {walletHubSheet}
       {storeScopeSheet}
       {bottomNavBar}
     </Box>

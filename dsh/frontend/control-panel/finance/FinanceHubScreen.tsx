@@ -17,9 +17,12 @@ import {
   FINANCE_ACTIVE_GROUPS,
 } from './finance.registry';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
+// UI_PREVIEW_ONLY / CONTRACT_TBD
 import {
   ControlPanelDshFinanceScreen,
   ControlPanelDshPayoutsScreen,
+  ControlPanelDshCaptainFinanceScreen,
+  ControlPanelDshStoreDeliveryFinanceScreen,
 } from './FinanceHubScreens';
 import { PartnerSettlementWorkspace } from './PartnerSettlementWorkspace';
 import { CaptainPayoutWorkspace } from './CaptainPayoutWorkspace';
@@ -69,6 +72,8 @@ const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hu
   payouts: ControlPanelDshPayoutsScreen,
   'tax-compliance': ControlPanelDshFinanceScreen,
   'risk-audit': PlatformFeeAuditBridgePanel,         // ML-044: platform fee audit WLT bridge
+  'captain-finance': ControlPanelDshCaptainFinanceScreen,
+  'store-delivery-finance': ControlPanelDshStoreDeliveryFinanceScreen,
 };
 
 export function ControlPanelDshFinanceHubScreen({
