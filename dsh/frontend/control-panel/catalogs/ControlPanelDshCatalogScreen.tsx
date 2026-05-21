@@ -15,6 +15,7 @@ import {
 } from './catalog';
 import { getCatalogAdoptionItems } from '../../shared/catalog-adoption.preview-store';
 import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner } from '../../shared/workflow';
+import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
 // --- Types ---
@@ -187,6 +188,9 @@ export function ControlPanelDshCatalogScreen({
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
   const { theme } = useTheme();
+  const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
+  const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
+  const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
   const [activeTab, setActiveTab] = useState<string>('catalog');
   const [activeSubTab, setActiveSubTab] = useState<string>('');
   const [showBulkOps, setShowBulkOps] = useState(false);
@@ -507,9 +511,9 @@ export function ControlPanelDshCatalogScreen({
       <Box paddingX={4} paddingY={2}>
         <WebControlPanelRecommendation
           title="تثبيت حوكمة الكتالوج"
-          reason="الكتالوج يحتوي على استثناءات ومراجعات معلقة، وأفضل خطوة الآن هي تصفية العناصر غير المطابقة قبل فتح التحرير الجماعي."
+          reason={`القسم المالك: ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} · الشريك يحرر السعر والمخزون محليًا فقط · النشر والتعارض والباركود تُراجع on-demand عبر الكتالوج، مع handoff إلى ${partnersGovernance?.sectionLabel ?? 'Partners'} و${marketingGovernance?.sectionLabel ?? 'Marketing'} عند الحاجة.`}
           confidence="high"
-          auditTag="كتالوج DSH"
+          auditTag="catalogs"
           primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
           secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner-exception') }}
         />
@@ -665,8 +669,8 @@ export function ControlPanelDshCatalogScreen({
                     )}
 
                     <Box gap={2} style={{ marginTop: 'auto' }}>
-                       <Button label="اعتماد التغييرات" tone="primary" size="sm" fullWidth />
-                       <Button label="طلب مراجعة تسويق" tone="secondary" size="sm" fullWidth />
+                       <Button label="معاينة الاعتماد" tone="primary" size="sm" fullWidth />
+                       <Button label="معاينة إحالة للتسويق" tone="secondary" size="sm" fullWidth />
                     </Box>
                  </Box>
               </div>

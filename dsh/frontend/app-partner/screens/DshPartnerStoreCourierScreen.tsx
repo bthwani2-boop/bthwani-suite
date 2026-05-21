@@ -15,6 +15,7 @@ import {
   TopBar,
   useDirection,
 } from '@bthwani/ui-kit';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 import type {
   StoreCourierCompensation,
   StoreDeliveryPolicy,
@@ -138,6 +139,13 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
           onPress: onBack,
         }}
       />
+
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodyStrong" align="start">حدود السياسة والمال</Text>
+        <Text role="bodySm" tone="muted" align="start">
+          إعداد الموصل محلي للشريك فقط. التسعير المناطقي والسياسات المركزية يملكها {resolveDshControlPanelSectionLabel('platform')}، وأي payout أو commission أو settlement يبقى مرجعًا إلى {resolveDshControlPanelSectionLabel('finance')} وWLT.
+        </Text>
+      </Surface>
 
       {/* ─── Basic Info ──────────────────────────────────────────────────── */}
       <Surface tone="raised" padding={4} gap={3}>

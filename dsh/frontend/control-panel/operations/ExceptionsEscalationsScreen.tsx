@@ -15,6 +15,7 @@ import {
   getDshRenderableFlowsForSurface,
   type DshFlowRegistryEntry,
 } from '../../shared/dsh-flow-registry';
+import { findDshControlPanelGovernanceSectionByFlowId } from '../shared/dsh-control-panel-governance.map';
 
 export type ExceptionsEscalationsScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -151,6 +152,7 @@ export function ExceptionsEscalationsScreen({
 
   const selectedFlow = filteredFlows.find((flow) => flow.id === selectedFlowId) ?? null;
   const selectedFlowSummary = selectedFlowId ? getDshFlowPolicySummary(selectedFlowId) : undefined;
+  const selectedGovernanceSection = selectedFlowId ? findDshControlPanelGovernanceSectionByFlowId(selectedFlowId) : undefined;
 
   const summaryKpi = [
     { id: 'open', label: 'مفتوحة', value: String(preview.summary.open), tone: 'danger' as const },
@@ -277,6 +279,10 @@ export function ExceptionsEscalationsScreen({
 
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
+                  <strong>ownerSection</strong>
+                  <span>{selectedGovernanceSection?.sectionLabel ?? 'عمليات / دعم حسب السياق'}</span>
+                </div>
+                <div className={styles.surfaceInspectorRow}>
                   <strong>ownerSurface</strong>
                   <span>{SURFACE_LABELS[selectedFlowSummary.ownerSurface] ?? selectedFlowSummary.ownerSurface}</span>
                 </div>
@@ -330,6 +336,17 @@ export function ExceptionsEscalationsScreen({
                   <div className={styles.surfaceInfoCardDescription}>{selectedFlowSummary.nextPolicyActionPreview}</div>
                 </div>
               </div>
+
+              {selectedGovernanceSection ? (
+                <div className={styles.surfaceInfoCard}>
+                  <div>
+                    <div className={styles.surfaceInfoCardTitle}>governance owner</div>
+                    <div className={styles.surfaceInfoCardDescription}>
+                      {`${selectedGovernanceSection.sectionLabel}: ${selectedGovernanceSection.notes}`}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               {selectedFlowSummary.financialImpact ? (
                 <div className={styles.surfaceInfoCard}>

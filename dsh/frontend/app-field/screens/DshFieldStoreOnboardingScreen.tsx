@@ -34,6 +34,7 @@ import {
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../shared/operations-support.preview';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');
 const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
@@ -312,7 +313,7 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
       <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
         <SectionHeader title="المراجعة والإرسال" subtitle="الحفظ كمسودة مسموح دائمًا. الإرسال يبقى مغلقًا حتى اكتمال الأساسيات فقط." />
         <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-          {`مالك قرار التصعيد: ${readinessFlowSummary?.escalationOwner ?? 'control-panel'} · الممنوع: ${onboardingFlowSummary?.forbiddenActions.join('، ') ?? 'غير محدد'}`}
+          {`مالك قرار التصعيد: ${resolveDshControlPanelSectionLabel('partners')} · الممنوع: ${onboardingFlowSummary?.forbiddenActions.join('، ') ?? 'غير محدد'}`}
         </Text>
         <TextField label="ملاحظات الميداني" value={draft.review.fieldNotes} editable={!readOnly} onChangeText={(value) => updateNestedField('review', 'fieldNotes', value)} />
         <TextField label="ملاحظة مراجعة الشركاء" value={draft.review.partnerReviewNote} editable={!readOnly} onChangeText={(value) => updateNestedField('review', 'partnerReviewNote', value)} />
@@ -335,7 +336,7 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           </Card>
         ) : null}
 
-        <Card title="التحقق والتصعيد" subtitle="الإثباتات والتصعيد تبقى on-demand فقط، والقرار النهائي يملكه control-panel عند الحاجة.">
+        <Card title="التحقق والتصعيد" subtitle={`الإثباتات والتصعيد تبقى on-demand فقط، والقرار النهائي يملكه ${resolveDshControlPanelSectionLabel('partners')} عند الحاجة.`}>
           <Box gap={2}>
             {FIELD_REVIEW_OPERATION_FLOWS.map((flow) => (
               <Box key={flow.flowId} gap={1}>
@@ -394,7 +395,7 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
             items={[
               { label: 'المالك', value: onboardingFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
               { label: 'سياسة الفتح', value: resolveFieldPolicyLabel(onboardingFlowSummary?.onDemandPolicy) },
-              { label: 'مالك التصعيد', value: readinessFlowSummary?.escalationOwner ?? 'control-panel' },
+              { label: 'مالك التصعيد', value: resolveDshControlPanelSectionLabel('partners') },
             ]}
           />
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>

@@ -164,10 +164,13 @@ export const NON_OPERATIONS_SECTION_SHORTCUTS: ReadonlyArray<{
   description: string;
   href: `/${NonOperationsSectionRootId}`;
 }> = [
+  { id: 'support', label: 'الدعم', description: 'التذاكر والمتابعة والتصعيد تبقى في قسم الدعم.', href: '/support' },
   { id: 'finance', label: 'المالية', description: 'الحقائق المالية تبقى في قسم المالية.', href: '/finance' },
   { id: 'catalogs', label: 'الكتالوجات', description: 'حوكمة الكتالوج تبقى في قسم الكتالوجات.', href: '/catalogs' },
   { id: 'marketing', label: 'التسويق', description: 'التسويق والنمو يبقيان في قسم التسويق.', href: '/marketing' },
   { id: 'partners', label: 'الشركاء', description: 'إدارة الشركاء تبقى في قسم الشركاء.', href: '/partners' },
+  { id: 'platform', label: 'المنصة', description: 'السياسات والمتغيرات والـ rollouts تبقى في قسم المنصة.', href: '/platform' },
+  { id: 'administration', label: 'الإدارة', description: 'الأدوار وسلسلة الاعتماد تبقى في قسم الإدارة.', href: '/administration' },
 ] as const;
 
 const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId> | 'orders' | 'overview', CanonicalOperationsGroupId> = {
@@ -208,6 +211,7 @@ const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWork
 };
 
 const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSectionRootId> = {
+  support: 'support',
   finance: 'finance',
   settlements: 'finance',
   cod: 'finance',
@@ -220,6 +224,8 @@ const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSec
   loyalty: 'marketing',
   'smart-signal': 'marketing',
   partners: 'partners',
+  platform: 'platform',
+  administration: 'administration',
 };
 
 type LegacyOperationalWorkspaceId = Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId>;

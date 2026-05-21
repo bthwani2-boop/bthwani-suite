@@ -43,6 +43,7 @@ import {
   getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -2047,6 +2048,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               </Text>
               <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
                 {checkoutFlowSummary?.nextPolicyActionPreview ?? 'هذه الشاشة تعرض الملخص أولًا، وتفتح المراجعة التفصيلية عند الطلب فقط.'}
+              </Text>
+              <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                {`الأثر المالي والتسويات المرجعية يتبعان ${resolveDshControlPanelSectionLabel('finance')} وWLT، بينما السياسة التشغيلية المركزية تتبع ${resolveDshControlPanelSectionLabel('platform')}.`}
               </Text>
             </View>
             <Text role="caption" style={{ color: ACCENT_ORANGE, fontWeight: '800', textAlign: 'right' }}>

@@ -12,6 +12,7 @@ import {
 import {
   buildOperationsHref,
   getOperationsGroupMeta,
+  NON_OPERATIONS_SECTION_SHORTCUTS,
   OPERATIONS_CANONICAL_GROUPS,
   resolveOperationsStateCopy,
 } from './operations.registry';
@@ -28,6 +29,7 @@ import { PartnerStoresScreen } from './PartnerStoresScreen';
 import { AreaCapacityScreen } from './AreaCapacityScreen';
 import { ExceptionsEscalationsScreen } from './ExceptionsEscalationsScreen';
 import { AuditSupportSlaScreen } from './AuditSupportSlaScreen';
+import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type ControlPanelDshOperationsScreenProps = {
@@ -70,6 +72,7 @@ export function ControlPanelDshOperationsScreen({
   const activeGroupMeta = getOperationsGroupMeta(activeGroup);
   const hubHref = buildOperationsHref(activeGroup, { orderId, panel });
   const ActiveScreen = SCREEN_RENDERERS[activeGroup];
+  const governance = getDshControlPanelGovernanceEntry('operations');
 
   if (state !== 'ready') {
     return (
@@ -148,6 +151,35 @@ export function ControlPanelDshOperationsScreen({
             onSelect={(id) => setActiveSubGroup(id)}
           />
         )}
+      </div>
+
+      <div className={styles.surfaceSplitGrid}>
+        <div className={styles.surfaceInfoCard}>
+          <div>
+            <div className={styles.surfaceInfoCardTitle}>حدود ملكية العمليات</div>
+            <div className={styles.surfaceInfoCardDescription}>
+              {governance.notes}
+            </div>
+          </div>
+          <div className={styles.surfaceMetaWrap}>
+            {governance.onDemandPolicySummary.map((policy) => (
+              <span key={policy} className={styles.surfaceMetaChip}>{policy}</span>
+            ))}
+          </div>
+        </div>
+        <div className={styles.surfaceInfoCard}>
+          <div>
+            <div className={styles.surfaceInfoCardTitle}>تحويلات الملكية</div>
+            <div className={styles.surfaceInfoCardDescription}>
+              الدعم والماليات والكتالوجات والشركاء والمنصة والإدارة تبقى أقسامًا مستقلة؛ العمليات تفتحها ولا تكرر منطقها.
+            </div>
+          </div>
+          <div className={styles.surfaceMetaWrap}>
+            {NON_OPERATIONS_SECTION_SHORTCUTS.map((shortcut) => (
+              <span key={shortcut.id} className={styles.surfaceMetaChip}>{shortcut.label}</span>
+            ))}
+          </div>
+        </div>
       </div>
 
       <main className={styles.surfaceMainPanel}>

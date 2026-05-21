@@ -26,6 +26,7 @@ import type {
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
 import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
 import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 
@@ -63,6 +64,30 @@ const commandCenterFilterItems: BThwaniFilterRailItem[] = [
   { id: 'inventory-branch', label: 'المخزون والفرع', icon: <Icon name="cube-outline" size={16} /> },
   { id: 'escalation', label: 'التصعيد', icon: <Icon name="arrow-up-circle-outline" size={16} /> },
 ];
+
+function resolvePartnerCaseOwnerLabel(item: OperationsSupportCase): string {
+  if (item.issueCategoryId === 'payment-refund-review') {
+    return resolveDshControlPanelSectionLabel('finance');
+  }
+
+  if (item.issueCategoryId === 'item-unavailable' || item.issueCategoryId === 'wrong-item') {
+    return resolveDshControlPanelSectionLabel('catalogs');
+  }
+
+  return resolveDshControlPanelSectionLabel('support');
+}
+
+function resolvePartnerCaseOwnerNote(item: OperationsSupportCase): string {
+  if (item.issueCategoryId === 'payment-refund-review') {
+    return 'الأثر المالي يراجع من finance/WLT فقط. هذه المساحة تعرض preview tagging بلا أي refund أو settlement mutation.';
+  }
+
+  if (item.issueCategoryId === 'item-unavailable' || item.issueCategoryId === 'wrong-item') {
+    return 'تعديل السعر والمخزون يبقى محليًا للشريك، لكن الباركود والهوية والنشر وتعارضات الميديا يملكها قسم الكتالوج.';
+  }
+
+  return 'متابعة التذكرة والتصعيد يملكها support داخل لوحة التحكم، بينما العميل يرى دعمه داخل الطلب فقط والكابتن يرى handoff أو delivery فقط.';
+}
 
 // Cross-surface contract:
 // - app-client sees support only inside the order, never this partner command center.
@@ -414,6 +439,7 @@ function CommandCenterCaseCard({
 
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
               <Chip label={flowPreview.ownerLabel} tone="brand" />
+              <Chip label={resolvePartnerCaseOwnerLabel(item)} tone="info" />
               <Chip label={item.slaLabel} tone={item.hasSlaRisk ? 'danger' : 'warning'} />
               {flowPreview.financialImpactPreview ? (
                 <Chip label="أثر مالي Preview" tone="info" />
@@ -486,6 +512,16 @@ function CommandCenterCaseCard({
             <Text role="bodyStrong">ملاحظة تشغيلية</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign }}>
               {item.operationalNote}
+            </Text>
+          </Surface>
+
+          <Surface tone="inset" padding={3} gap={2}>
+            <Text role="bodyStrong">المالك المركزي</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign }}>
+              {resolvePartnerCaseOwnerLabel(item)}
+            </Text>
+            <Text role="caption" tone="muted" style={{ textAlign }}>
+              {resolvePartnerCaseOwnerNote(item)}
             </Text>
           </Surface>
 
@@ -602,7 +638,7 @@ export function PartnerSupportScreen({
   function handleEscalate(item: OperationsSupportCase) {
     setSelectedFilterId('escalation');
     setExpandedCaseId(item.id);
-    setCaseFeedback(item.id, 'تم تمييز الحالة للتصعيد التشغيلي فقط. المالك الفعلي للتصعيد والسياسات يبقى control-panel.');
+    setCaseFeedback(item.id, `تم تمييز الحالة للتصعيد التشغيلي فقط. المالك الفعلي للمتابعة الآن هو ${resolvePartnerCaseOwnerLabel(item)}.`);
   }
 
   return (
@@ -629,6 +665,13 @@ export function PartnerSupportScreen({
         <Text role="titleSm">مركز تشغيل الطلبات والاستثناءات والدعم</Text>
         <Text role="bodySm" tone="muted">
           صف أولوية واحد يربط الطلبات النشطة، الاستثناءات، المحادثات، والمخزون دون تحويل الدعم إلى دليل عام منفصل.
+        </Text>
+      </Surface>
+
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodyStrong">حدود الملكية المركزية</Text>
+        <Text role="bodySm" tone="muted">
+          المتابعة المركزية للتذاكر والتصعيد يملكها {resolveDshControlPanelSectionLabel('support')}، والأثر المالي يبقى مرجعًا لـ {resolveDshControlPanelSectionLabel('finance')} وWLT، بينما الباركود والهوية والنشر تعود إلى {resolveDshControlPanelSectionLabel('catalogs')}.
         </Text>
       </Surface>
 

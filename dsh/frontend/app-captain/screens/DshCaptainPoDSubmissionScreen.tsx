@@ -18,6 +18,7 @@ import {
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 function resolvePodPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
   if (policy === 'evidence-on-open') {
@@ -126,7 +127,7 @@ export function DshCaptainPoDSubmissionScreen({
                 <Badge label={resolvePodPolicyLabel(podFlowPolicy)} tone="brand" />
               </Box>
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-                {`المراجعة التشغيلية النهائية يملكها ${podFlowSummary?.escalationOwner ?? 'control-panel'}.`}
+                {`المراجعة التشغيلية النهائية يملكها ${resolveDshControlPanelSectionLabel('support')}.`}
               </Text>
             </Surface>
           </Surface>

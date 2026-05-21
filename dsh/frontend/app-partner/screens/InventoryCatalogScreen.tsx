@@ -35,6 +35,7 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 import {
   type ApprovalStage,
   getPartnerQueueRecords,
@@ -1407,6 +1408,14 @@ export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScr
             : undefined
         }
       />
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>
+          حوكمة الكتالوج
+        </Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          المالك المركزي هو {resolveDshControlPanelSectionLabel('catalogs')}. يعدل الشريك السعر والمخزون والتوفر محليًا فقط، بينما الهوية والباركود والنشر وتعارضات الميديا تُراجع on-demand داخل لوحة التحكم.
+        </Text>
+      </Surface>
       <InventoryCatalogContent {...props} />
     </MobileScrollView>
   );

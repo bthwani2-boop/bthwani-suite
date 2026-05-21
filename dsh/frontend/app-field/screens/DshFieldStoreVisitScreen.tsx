@@ -20,6 +20,7 @@ import type {
 } from '../types/DshFieldStoreVisitTypes';
 import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 export type {
   DshFieldStoreVisitErrors,
@@ -147,7 +148,7 @@ export function DshFieldStoreVisitScreen({
           items={[
             { label: 'المالك', value: visitFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
             { label: 'سياسة الفتح', value: visitFlowSummary?.onDemandPolicy ?? 'evidence-on-open' },
-            { label: 'مالك التصعيد', value: visitFlowSummary?.escalationOwner ?? 'control-panel' },
+            { label: 'مالك التصعيد', value: resolveDshControlPanelSectionLabel('support') },
           ]}
         />
         <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>

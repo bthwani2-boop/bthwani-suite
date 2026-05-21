@@ -33,6 +33,7 @@ import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
+import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -727,6 +728,13 @@ function OperationsPanel({
         </View>
       </Surface>
 
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodyStrong">حدود تشغيل الشريك</Text>
+        <Text role="bodySm" tone="muted" align="start">
+          التنفيذ المحلي للطلبات والفريق يبقى هنا، لكن تصعيد التذاكر يتبع {resolveDshControlPanelSectionLabel('support')}، وأي pricing policy أو zone pricing مركزي يتبع {resolveDshControlPanelSectionLabel('platform')}، وأي payout أو commission مرجعه finance/WLT.
+        </Text>
+      </Surface>
+
       <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
         <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
           <Text role="label" tone="muted">
@@ -925,6 +933,10 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
+  const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
+  const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
+  const financeGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('finance'), []);
   const {
     hydrated: appearanceHydrated,
     mode: appearanceMode,
@@ -1306,6 +1318,13 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             <SummaryCell key={item.id} {...item} />
           ))}
         </View>
+      </Surface>
+
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodyStrong">ملكية قرارات الشريك</Text>
+        <Text role="bodySm" tone="muted">
+          {partnersGovernance?.sectionLabel ?? 'Partners'} يملك دورة حياة الشريك والجاهزية. الكتالوج والنشر عبر {catalogsGovernance?.sectionLabel ?? 'Catalogs'}، والعروض عبر {marketingGovernance?.sectionLabel ?? 'Marketing'}، وأي أثر مالي يبقى مرجعًا إلى {financeGovernance?.sectionLabel ?? 'Finance'} وWLT.
+        </Text>
       </Surface>
 
       <MobileCommandSectionList

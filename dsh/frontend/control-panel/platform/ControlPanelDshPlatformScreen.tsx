@@ -16,6 +16,7 @@ import { DshPlatformRolloutsWorkspace } from './Rollouts';
 import { DshPlatformHealthWorkspace } from './Health';
 import { DshPlatformAuditWorkspace } from './Audit';
 import { DemoPlatformProvider } from './useDemoPlatformState';
+import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
 type ActiveWorkspaceId = 'overview' | 'services' | 'vars' | 'providers' | 'appearance';
@@ -130,6 +131,8 @@ function OverviewPanel() {
 // ─── Main screen ─────────────────────────────────────────────────────────────
 
 export function ControlPanelDshPlatformScreen() {
+  const platformGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('platform'), []);
+  const operationsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('operations'), []);
   const [activeWorkspace, setActiveWorkspace] =
     React.useState<PlatformWorkspaceId>('overview');
 
@@ -183,7 +186,7 @@ export function ControlPanelDshPlatformScreen() {
       <Box paddingX={4} paddingY={3}>
         <Surface tone="warning" border padding={3} radiusToken="md">
           <Text role="bodySm" tone="warning" align="center">
-            وضع تجريبي: جميع الإجراءات تحاكي التغيير محلياً فقط ولا يتم تعديل أي إعدادات حقيقية في المنصة (لا يتم استخدام API أو حفظ أسرار).
+            وضع تجريبي: جميع الإجراءات preview فقط. لا يوجد backend أو env binding ولا يتم تعديل مزودين أو Vars حقيقية في هذه المرحلة.
           </Text>
         </Surface>
       </Box>
@@ -197,9 +200,9 @@ export function ControlPanelDshPlatformScreen() {
             value: activeTab?.label ?? '—',
             tone: 'success',
           },
-          { id: 'platform-mode', label: 'نمط المرحلة', value: 'محاكاة محلية (Demo)', tone: 'neutral' },
+          { id: 'platform-mode', label: 'نمط المرحلة', value: 'preview policy only', tone: 'neutral' },
           { id: 'financial-owner', label: 'المالك المالي', value: 'WLT bridge', tone: 'warning' },
-          { id: 'mutations', label: 'أزرار التنفيذ', value: 'تعمل كطراز (Mock)', tone: 'danger' },
+          { id: 'mutations', label: 'تعديل الإعدادات', value: 'غير مسموح في Phase 4', tone: 'danger' },
         ]}
       />
 
@@ -220,6 +223,29 @@ export function ControlPanelDshPlatformScreen() {
           }}
         />
       </div>
+
+      <Box paddingX={4} paddingY={2}>
+        <Box style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Surface tone="inset" padding={3} gap={1} style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">ملكية المنصة والسياسات</Text>
+            <Text role="bodySm" tone="muted">
+              {platformGovernance?.notes ?? 'المنصة تملك Vars وproviders وrollouts وaudit كمعاينات محكومة فقط.'}
+            </Text>
+            <Text role="caption" tone="muted">
+              {platformGovernance?.onDemandPolicySummary ?? 'الملخص أولًا ثم تفاصيل السياسات عند الفتح فقط.'}
+            </Text>
+          </Surface>
+          <Surface tone="default" padding={3} gap={1} style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">حدود التشغيل</Text>
+            <Text role="bodySm" tone="muted">
+              {`أي تنفيذ حي أو SLA تشغيلي يبقى تحت ${operationsGovernance?.sectionLabel ?? 'Operations'}، بينما هذه المساحة تشرح السياسة ولا تنفذها.`}
+            </Text>
+            <Text role="caption" tone="muted">
+              لا يوجد هنا حفظ أسرار أو provider switching فعلي أو rollout mutation.
+            </Text>
+          </Surface>
+        </Box>
+      </Box>
 
       {/* Main content */}
       <main className={styles.surfaceMainPanel}>

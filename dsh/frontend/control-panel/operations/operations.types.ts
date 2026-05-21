@@ -104,6 +104,7 @@ export type LegacyOperationsWorkspaceId =
   | 'geo-heatmap';
 
 export type LegacySectionRedirectId =
+  | 'support'
   | 'finance'
   | 'settlements'
   | 'cod'
@@ -115,11 +116,13 @@ export type LegacySectionRedirectId =
   | 'growth'
   | 'loyalty'
   | 'smart-signal'
-  | 'partners';
+  | 'partners'
+  | 'platform'
+  | 'administration';
 
 export type AnyOperationsWorkspaceId = CanonicalOperationsGroupId | LegacyOperationsWorkspaceId | LegacySectionRedirectId | 'orders' | 'overview';
 
-export type NonOperationsSectionRootId = 'finance' | 'catalogs' | 'marketing' | 'partners';
+export type NonOperationsSectionRootId = 'support' | 'finance' | 'catalogs' | 'marketing' | 'partners' | 'platform' | 'administration';
 
 export type OperationsSubGroupMeta = {
   id: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Surface, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelActionCluster,
   WebControlPanelDecisionRow,
@@ -12,6 +12,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+import { getDshFlowPolicySummary } from '../../shared';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
 import { SupportTicketDetailWorkspace } from './SupportTicketDetailWorkspace';
@@ -22,6 +23,11 @@ import {
   getOperationsSupportFlowPreview,
   type DshOperationsSupportFlowId,
 } from '../../shared/operations-support.preview';
+import {
+  findDshControlPanelGovernanceSectionByFlowId,
+  getDshControlPanelGovernanceEntry,
+  resolveDshControlPanelSectionLabel,
+} from '../shared';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
@@ -30,6 +36,7 @@ type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 type SupportRow = {
   id: string;
   flowId: DshOperationsSupportFlowId;
+  registryFlowId?: string;
   surface: string;
   title: string;
   status: string;
@@ -43,6 +50,10 @@ type SupportRow = {
   evidence: string;
   nextAction: string;
   recommendation: string;
+  governanceSectionLabel: string;
+  policyLabel: string;
+  forbiddenPreview: string;
+  financeReference?: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
 };
@@ -70,6 +81,40 @@ function resolveSupportModeBadge(mode: SupportFulfillmentMode) {
 function resolveCommitmentLabel() {
   return 'خطر الالتزام';
 }
+
+function resolveSupportPolicyLabel(policy?: string): string {
+  if (policy === 'evidence-on-open') {
+    return 'أدلة عند الفتح';
+  }
+
+  if (policy === 'detail-on-open') {
+    return 'تفاصيل عند الفتح';
+  }
+
+  if (policy === 'chat-on-open') {
+    return 'محادثة عند الفتح';
+  }
+
+  if (policy === 'finance-preview-only') {
+    return 'مالي للقراءة فقط';
+  }
+
+  if (policy === 'summary-only') {
+    return 'ملخص أولًا';
+  }
+
+  return 'سياسة مرتبطة بالسجل';
+}
+
+const SUPPORT_GOVERNANCE = getDshControlPanelGovernanceEntry('support');
+const FINANCE_GOVERNANCE = getDshControlPanelGovernanceEntry('finance');
+
+const SUPPORT_REGISTRY_FLOW_MAP: Partial<Record<DshOperationsSupportFlowId, string>> = {
+  'delivery-failed': 'client-order-issue',
+  'payment-refund-review': 'partner-finance-bridge',
+  'courier-not-arrived': 'captain-order-pickup',
+  'branch-readiness-escalation': 'field-readiness-escalation',
+};
 
 const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
   { id: 'queue', label: 'صفوف الدعم' },
@@ -101,10 +146,17 @@ const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: stri
 
 function buildSupportRow(seed: SupportRowSeed): SupportRow {
   const preview = getOperationsSupportFlowPreview(seed.flowId);
+  const registryFlowId = SUPPORT_REGISTRY_FLOW_MAP[seed.flowId];
+  const flowSummary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
+  const governanceEntry = registryFlowId ? findDshControlPanelGovernanceSectionByFlowId(registryFlowId) : SUPPORT_GOVERNANCE;
+  const governanceSectionLabel = governanceEntry?.sectionLabel ?? resolveDshControlPanelSectionLabel('support');
+  const financeReference = flowSummary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined;
+  const forbiddenPreview = (flowSummary?.forbiddenActions ?? preview.forbiddenActions).slice(0, 2).join('، ');
 
   return {
     id: seed.id,
     flowId: seed.flowId,
+    registryFlowId,
     surface: seed.surface,
     title: preview.title,
     status: seed.status,
@@ -122,7 +174,11 @@ function buildSupportRow(seed: SupportRowSeed): SupportRow {
     blocker: preview.description,
     evidence: seed.evidence,
     nextAction: preview.nextAction,
-    recommendation: `المالك التصعيدي: ${preview.escalationOwnerLabel}`,
+    recommendation: `قسم المتابعة: ${governanceSectionLabel}`,
+    governanceSectionLabel,
+    policyLabel: resolveSupportPolicyLabel(flowSummary?.onDemandPolicy),
+    forbiddenPreview,
+    financeReference,
     primaryActionLabel: seed.primaryActionLabel,
     secondaryActionLabel: seed.secondaryActionLabel,
   };
@@ -217,6 +273,8 @@ export function ControlPanelDshSupportHubScreen() {
   const rows = filterRows(activeTab, activeSubTab);
   const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0] ?? SUPPORT_ROWS[0];
   const selectedFlowPreview = selectedRow ? getOperationsSupportFlowPreview(selectedRow.flowId) : null;
+  const selectedRegistrySummary = selectedRow?.registryFlowId ? getDshFlowPolicySummary(selectedRow.registryFlowId) : undefined;
+  const selectedFinanceReference = selectedRegistrySummary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined;
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -260,7 +318,7 @@ export function ControlPanelDshSupportHubScreen() {
         items={[
           { id: 'queue', label: 'صفوف الدعم', value: String(rows.length), tone: 'neutral' },
           { id: 'selected', label: 'المحدد', value: selectedRow?.id ?? '—', tone: 'warning' },
-          { id: 'owner', label: 'المالك', value: selectedRow?.owner ?? '—', tone: 'success' },
+          { id: 'owner', label: 'قسم الملكية', value: selectedRow?.governanceSectionLabel ?? resolveDshControlPanelSectionLabel('support'), tone: 'success' },
         ]}
       />
 
@@ -279,6 +337,29 @@ export function ControlPanelDshSupportHubScreen() {
           onSelect={(id) => setActiveSubTab(id)}
         />
       </div>
+
+      <Box paddingX={4} paddingY={2}>
+        <Box style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Surface tone="inset" padding={3} gap={1} style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">ملكية قسم الدعم</Text>
+            <Text role="bodySm" tone="muted">
+              {SUPPORT_GOVERNANCE?.notes ?? 'الدعم يملك التذاكر والمحادثات ومتابعة التصعيد عبر نفس الصف.'}
+            </Text>
+            <Text role="caption" tone="muted">
+              {SUPPORT_GOVERNANCE?.onDemandPolicySummary ?? 'IDs وملخصات أولًا، ثم تفاصيل أو أدلة أو محادثات عند الفتح فقط.'}
+            </Text>
+          </Surface>
+          <Surface tone="default" padding={3} gap={1} style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">الصف المحدد</Text>
+            <Text role="bodySm" tone="muted">
+              {`القسم: ${selectedRow?.governanceSectionLabel ?? 'الدعم'} · السياسة: ${selectedRow?.policyLabel ?? '—'}`}
+            </Text>
+            <Text role="caption" tone="muted">
+              {`الممنوع: ${selectedRow?.forbiddenPreview ?? 'غير محدد'}${selectedFinanceReference ? ` · المرجع المالي: ${selectedFinanceReference}` : ''}`}
+            </Text>
+          </Surface>
+        </Box>
+      </Box>
 
       <main className={styles.surfaceMainPanel}>
         {activeTab === 'sla-risk' ? (
@@ -335,27 +416,33 @@ export function ControlPanelDshSupportHubScreen() {
                   <div className={styles.surfaceInspectorMeta}>
                     <Text role="caption" tone="muted">السطح: {selectedRow?.surface}</Text>
                     <Text role="caption" tone="muted">المالك: {selectedRow?.owner}</Text>
+                    <Text role="caption" tone="muted">قسم الحوكمة: {selectedRow?.governanceSectionLabel ?? 'الدعم'}</Text>
                     <Text role="caption" tone="muted">مالك التصعيد: {selectedFlowPreview?.escalationOwnerLabel ?? '—'}</Text>
+                    <Text role="caption" tone="muted">سياسة العرض: {selectedRow?.policyLabel ?? '—'}</Text>
                     <Text role="caption" tone="muted">وضع التنفيذ: {selectedRow?.fulfillmentLabel}</Text>
                     <Text role="caption" tone="muted">المسؤول الحالي: {selectedRow?.responsibleActor}</Text>
                     <Text role="caption" tone="muted">العائق: {selectedRow?.blocker}</Text>
                     <Text role="caption" tone="muted">الدليل: {selectedRow?.evidence}</Text>
                     <Text role="caption" tone="muted">الإجراء التالي: {selectedRow?.nextAction}</Text>
+                    <Text role="caption" tone="muted">الممنوع: {selectedRow?.forbiddenPreview ?? 'غير محدد'}</Text>
                     {selectedFlowPreview?.financialImpactPreview ? (
                       <Text role="caption" tone="muted">WLT Preview: {selectedFlowPreview.financialImpactPreview}</Text>
+                    ) : null}
+                    {selectedFinanceReference ? (
+                      <Text role="caption" tone="muted">مرجع ledger: {selectedFinanceReference}</Text>
                     ) : null}
                   </div>
                   <WebControlPanelRecommendation
                     title="توصية الدعم"
-                    reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence} · ما القرار التالي؟ ${selectedRow.nextAction}` : 'اختر صفًا.'}
+                    reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما السياسة؟ ${selectedRow.policyLabel} · ما الدليل؟ ${selectedRow.evidence} · ما القرار التالي؟ ${selectedRegistrySummary?.nextPolicyActionPreview ?? selectedRow.nextAction}` : 'اختر صفًا.'}
                     confidence="high"
-                    auditTag={selectedFlowPreview?.flowId ?? selectedRow?.owner ?? 'support'}
+                    auditTag={selectedRow?.registryFlowId ?? selectedFlowPreview?.flowId ?? selectedRow?.owner ?? 'support'}
                     primaryAction={selectedRow ? { id: `${selectedRow.id}-a`, label: selectedRow.primaryActionLabel } : undefined}
                     secondaryAction={selectedRow ? { id: `${selectedRow.id}-b`, label: selectedRow.secondaryActionLabel } : undefined}
                   />
                   <WebControlPanelActionCluster
-                    primary={{ id: 'open-queue', label: 'فتح الصف' }}
-                    secondary={{ id: 'open-evidence', label: 'فتح الأدلة' }}
+                    primary={{ id: 'open-queue', label: 'فتح التذكرة' }}
+                    secondary={{ id: 'open-evidence', label: 'فتح الأدلة عند الطلب' }}
                   />
                 </Box>
               </div>

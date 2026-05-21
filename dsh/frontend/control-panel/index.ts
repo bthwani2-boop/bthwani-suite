@@ -5,10 +5,25 @@ export type { DshControlPanelSurfaceHostProps } from './DshControlPanelSurfaceHo
 export { ControlPanelDshClosureDashboardScreen, ControlPanelDshClosureEvidenceStream } from './dashboard';
 export { ControlPanelDshFinanceHubScreen, ControlPanelDshFinanceScreen, ControlPanelDshSettlementScreen, ControlPanelDshCodReconciliationScreen, ControlPanelDshRefundQueueScreen, ControlPanelDshRiskAuditScreen, ControlPanelDshCaptainFinanceScreen, ControlPanelDshStoreDeliveryFinanceScreen } from './finance';
 export { ControlPanelDshCatalogScreen, ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen, ControlPanelDshCatalogCategoriesScreen } from './catalogs';
-export { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScreen } from './support';
+export { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScreen, ControlPanelDshSupportHubScreen } from './support';
 export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';
 export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperationsHref, coerceOperationsPanel, normalizeOperationsLocation } from './operations';
 export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
-export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace, DshPlatformAppearanceWorkspace, DshPlatformServicesWorkspace, DshPlatformProvidersWorkspace } from './platform';
+export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace, DshPlatformAppearanceWorkspace, DshPlatformServicesWorkspace, DshPlatformProvidersWorkspace, DshPlatformRolloutsWorkspace, DshPlatformHealthWorkspace, DshPlatformAuditWorkspace } from './platform';
 export { ControlPanelDshAdministrationScreen } from './administration';
-export { DSH_CROSS_SURFACE_CLOSURE_MAP, ControlPanelDshActionQueue, ControlPanelDshDecisionBoard, ControlPanelDshWorkspaceFrame } from './shared';
+export {
+  DSH_CROSS_SURFACE_CLOSURE_MAP,
+  DSH_CONTROL_PANEL_GOVERNANCE_MAP,
+  DSH_CONTROL_PANEL_GOVERNANCE_LIST,
+  DSH_CONTROL_PANEL_SECTION_IDS,
+  ControlPanelDshActionQueue,
+  ControlPanelDshDecisionBoard,
+  ControlPanelDshWorkspaceFrame,
+  getDshControlPanelGovernanceEntry,
+  getDshControlPanelGovernanceEntries,
+  findDshControlPanelGovernanceSectionByFlowId,
+  getDshControlPanelGovernanceSectionsForSurface,
+  resolveDshControlPanelSectionLabel,
+  type DshControlPanelGovernanceEntry,
+  type DshControlPanelSectionId,
+} from './shared';

@@ -6,6 +6,7 @@ import {
   WebControlPanelRecommendation,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
+import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import {
   OPERATIONS_PULSE_METRICS,
 } from './operations.preview-data';
@@ -51,6 +52,9 @@ const QUICK_ACTIONS = [
 
 export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenProps) {
   const router = useRouter();
+  const operationsGovernance = getDshControlPanelGovernanceEntry('operations');
+  const supportGovernance = getDshControlPanelGovernanceEntry('support');
+  const financeGovernance = getDshControlPanelGovernanceEntry('finance');
 
   return (
     <div className={styles.surfaceCockpitContent}>
@@ -61,6 +65,41 @@ export function CommandCenterScreen({ hubHref, subGroup }: CommandCenterScreenPr
       </div>
 
       <div className={styles.surfaceGridTwoCol}>
+        <div className={styles.surfaceCompactPanel}>
+          <h3 className={styles.surfacePanelTitle}>خريطة القرار السريع</h3>
+          <div className={styles.surfaceStackSmall}>
+            <WebControlPanelDecisionRow
+              entityId="OPS"
+              entityLabel="التنفيذ الحي"
+              status="المالك"
+              statusTone="neutral"
+              recommendation="ابقَ داخل العمليات"
+              reason={operationsGovernance.notes}
+              sla="إسناد، ضغط، live orders"
+            />
+            <WebControlPanelDecisionRow
+              entityId="SUP"
+              entityLabel="التذاكر والتصعيد"
+              status="المالك"
+              statusTone="warning"
+              recommendation="حوّل إلى الدعم"
+              reason={supportGovernance.notes}
+              sla="tickets, messaging, follow-up"
+              primaryAction={{ id: 'go-support', label: 'فتح الدعم', onAction: () => router.push('/support') }}
+            />
+            <WebControlPanelDecisionRow
+              entityId="FIN"
+              entityLabel="الأثر المالي"
+              status="WLT"
+              statusTone="warning"
+              recommendation="حوّل إلى المالية/WLT"
+              reason={financeGovernance.notes}
+              sla="preview-only"
+              primaryAction={{ id: 'go-finance', label: 'فتح المالية', onAction: () => router.push('/finance') }}
+            />
+          </div>
+        </div>
+
         {/* 2. Top System Recommendations */}
         <div className={styles.surfaceCompactPanel}>
           <h3 className={styles.surfacePanelTitle}>أعلى توصيات النظام الآن</h3>

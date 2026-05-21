@@ -10,6 +10,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import { ADMIN_ROLES, PLATFORM_PERMISSIONS, MOCK_USERS } from './administration.mock';
 import type { AdminRole, MockAdminUser, AdminUserStatus } from './administration.types';
+import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
 type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain';
@@ -424,6 +425,8 @@ function ApprovalChainPanel() {
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export function ControlPanelDshAdministrationScreen() {
+  const administrationGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('administration'), []);
+  const platformGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('platform'), []);
   const [activeWorkspace, setActiveWorkspace] = React.useState<AdminWorkspaceId>('overview');
   const activeTab = WORKSPACE_TABS.find((w) => w.id === activeWorkspace);
 
@@ -496,6 +499,29 @@ export function ControlPanelDshAdministrationScreen() {
           onSelect={(id) => setActiveWorkspace(id as AdminWorkspaceId)}
         />
       </div>
+
+      <Box paddingX={4} paddingY={2}>
+        <Box style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Surface tone="inset" padding={3} gap={1} style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">ملكية الإدارة</Text>
+            <Text role="bodySm" tone="muted">
+              {administrationGovernance?.notes ?? 'الإدارة تملك الأدوار والصلاحيات وسلسلة الاعتماد فقط، ولا تتحول إلى مخزن لمنطق DSH التشغيلي.'}
+            </Text>
+            <Text role="caption" tone="muted">
+              {administrationGovernance?.onDemandPolicySummary ?? 'اعرض الملخص أولًا، مع تفاصيل دورية عند الفتح فقط.'}
+            </Text>
+          </Surface>
+          <Surface tone="default" padding={3} gap={1} style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">صلة المنصة</Text>
+            <Text role="bodySm" tone="muted">
+              {`صلاحيات هذه الشاشة تضبط من يرى ${platformGovernance?.sectionLabel ?? 'Platform'} ومن يعتمد تغييراته، لكنها لا تنفذ تغييرات platform أو DSH اليومية.`}
+            </Text>
+            <Text role="caption" tone="muted">
+              كل الإجراءات هنا محاكاة UI فقط، بلا auth أو provider mutation حقيقي.
+            </Text>
+          </Surface>
+        </Box>
+      </Box>
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>

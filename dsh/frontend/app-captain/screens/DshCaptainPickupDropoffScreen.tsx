@@ -18,6 +18,7 @@ import {
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
   if (policy === 'detail-on-open') {
@@ -190,7 +191,7 @@ export function DshCaptainPickupDropoffScreen({
                 <Badge label={resolveCaptainPolicyLabel(pickupFlowPolicy)} tone="brand" />
               </Box>
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-                {`مالك قرار التصعيد: ${pickupFlowSummary?.escalationOwner ?? 'control-panel'}`}
+                {`مالك قرار التصعيد: ${resolveDshControlPanelSectionLabel('operations')}`}
               </Text>
               {showsHandoffContext ? (
                 <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>

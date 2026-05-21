@@ -8,6 +8,7 @@ import {
 import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
 import { Box, useTheme } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
+import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
@@ -23,6 +24,8 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
   const { theme } = useTheme();
   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
   const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
+  const supportGovernance = getDshControlPanelGovernanceEntry('support');
+  const platformGovernance = getDshControlPanelGovernanceEntry('platform');
 
   const summaryKpi = [
     { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits), tone: 'neutral' as const },
@@ -38,6 +41,21 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
       </div>
 
       <WebControlPanelKpiStrip items={summaryKpi} />
+
+      <div className={styles.surfaceSplitGrid}>
+        <div className={styles.surfaceInfoCard}>
+          <div>
+            <div className={styles.surfaceInfoCardTitle}>مالك التذاكر والمتابعة</div>
+            <div className={styles.surfaceInfoCardDescription}>{supportGovernance.notes}</div>
+          </div>
+        </div>
+        <div className={styles.surfaceInfoCard}>
+          <div>
+            <div className={styles.surfaceInfoCardTitle}>مرجع السياسات والالتزام</div>
+            <div className={styles.surfaceInfoCardDescription}>{platformGovernance.notes}</div>
+          </div>
+        </div>
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'row', gap: 0, alignItems: 'flex-start' }}>
         <Box gap={2} style={{ flex: 1 }}>

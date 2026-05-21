@@ -23,6 +23,7 @@ import {
 } from '../../shared/operations-support.preview';
 import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 function resolveClientIssuePolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'evidence-on-open') {
@@ -38,6 +39,14 @@ function resolveClientIssuePolicyLabel(policy: ReturnType<typeof getDshClientFlo
   }
 
   return 'سياسة مرتبطة بالسجل';
+}
+
+function resolveClientIssueOwnerLabel(ownerSurface?: string): string {
+  if (ownerSurface === 'control-panel') {
+    return resolveDshControlPanelSectionLabel('support');
+  }
+
+  return ownerSurface ?? 'support';
 }
 
 const clientOperationScreenIds = [
@@ -832,7 +841,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
           dense
           items={[
             { label: 'الظهور', value: issueFlowSummary?.visibility ?? 'contextual' },
-            { label: 'مالك التصعيد', value: issueFlowSummary?.escalationOwner ?? 'control-panel', tone: 'brand' },
+            { label: 'مالك التصعيد', value: resolveClientIssueOwnerLabel(issueFlowSummary?.escalationOwner), tone: 'brand' },
             { label: 'الممنوع', value: issueFlowSummary?.forbiddenActions.join('، ') ?? 'لا يوجد' },
           ]}
         />

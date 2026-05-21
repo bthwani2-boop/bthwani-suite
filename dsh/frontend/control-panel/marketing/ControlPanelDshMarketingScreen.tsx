@@ -43,12 +43,17 @@ import {
   type MarketingNewsTickerKind,
 } from '../../shared/news-ticker.preview-store';
 import { dshPromotionCandidates } from '../../shared/workflow';
+import { getDshControlPanelGovernanceEntry } from '../shared';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 
 type MarketingControlView = 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals' | 'media-review';
 
 export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingScreenProps) {
+  const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
+  const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
+  const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
+  const supportGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('support'), []);
   const [activeTab, setActiveTab] = React.useState<MarketingControlView>('banners');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('');
   const [tickers, setTickers] = React.useState<ReadonlyArray<MarketingNewsTickerItem>>([]);
@@ -563,6 +568,29 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           })}
         </div>
       )}
+
+      <Box paddingX={4} paddingY={2}>
+        <Box style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">ملكية التسويق</Text>
+            <Text role="bodySm" tone="muted">
+              {marketingGovernance?.notes ?? 'التسويق يملك المحتوى والحملات والعروض، وليس تفعيل الشريك أو نشر الكتالوج النهائي.'}
+            </Text>
+            <Text role="caption" tone="muted">
+              {marketingGovernance?.onDemandPolicySummary ?? 'المحتوى الثقيل والمعاينات تبقى on-demand فقط.'}
+            </Text>
+          </Box>
+          <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">الجسور المعتمدة</Text>
+            <Text role="bodySm" tone="muted">
+              {`النشر النهائي للمنتجات عبر ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} · أهلية الشريك عبر ${partnersGovernance?.sectionLabel ?? 'Partners'} · الحوادث التشغيلية عبر ${supportGovernance?.sectionLabel ?? 'Support'}.`}
+            </Text>
+            <Text role="caption" tone="muted">
+              لا تتحول هذه المساحة إلى نسخة من الموبايل، بل تبقى مركز اعتماد ومراجعة كثيف ومنخفض الضجيج.
+            </Text>
+          </Box>
+        </Box>
+      </Box>
 
       {/* 4. Content Area */}
       <main className={styles.surfaceMainPanel}>

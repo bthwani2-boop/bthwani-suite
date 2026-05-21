@@ -1,3 +1,12 @@
 export const sectionCatalog = [
-  'dsh',
+  'ticker',
+  'banners',
+  'promos',
+  'video',
+  'campaigns',
+  'partners',
+  'media-review',
+  'loyalty',
+  'growth',
+  'signals',
 ] as const;

@@ -16,6 +16,7 @@ import {
   getFinanceGroupMeta,
   FINANCE_ACTIVE_GROUPS,
 } from './finance.registry';
+import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
 // UI_PREVIEW_ONLY / CONTRACT_TBD
 import {
@@ -91,6 +92,8 @@ export function ControlPanelDshFinanceHubScreen({
   React.useEffect(() => { setActiveSubGroup(subGroup); }, [subGroup]);
 
   const financePreview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
+  const financeGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('finance'), []);
+  const platformGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('platform'), []);
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { panel });
   const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS.overview;
@@ -180,6 +183,29 @@ export function ControlPanelDshFinanceHubScreen({
           />
         </div>
       ) : null}
+
+      <Box paddingX={4} paddingY={2}>
+        <Box style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">ملكية المالية</Text>
+            <Text role="bodySm" tone="muted">
+              {financeGovernance?.notes ?? 'المالية داخل control-panel تراجع الأثر المالي، بينما ledger والتسويات الفعلية تبقى مملوكة لـ WLT.'}
+            </Text>
+            <Text role="caption" tone="muted">
+              {`المرجع المالي: ${financeGovernance?.financeReference ?? 'wlt-finance'} · الأفعال الممنوعة: ${(financeGovernance?.forbiddenActions ?? []).join('، ')}`}
+            </Text>
+          </Box>
+          <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">ربط السياسات</Text>
+            <Text role="bodySm" tone="muted">
+              {platformGovernance?.notes ?? 'Vars وprovider controls تبقى مرجعًا للسياسات فقط في هذه المرحلة.'}
+            </Text>
+            <Text role="caption" tone="muted">
+              {platformGovernance?.onDemandPolicySummary ?? 'افتح ملخص السياسة فقط عند الطلب، دون أي env أو backend mutation.'}
+            </Text>
+          </Box>
+        </Box>
+      </Box>
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>

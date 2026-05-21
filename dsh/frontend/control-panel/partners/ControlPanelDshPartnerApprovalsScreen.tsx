@@ -13,6 +13,7 @@ import {
   translateStage,
   translateEntityType,
 } from '../../shared/workflow';
+import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 
@@ -60,6 +61,9 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
 }
 
 export function ControlPanelDshPartnerHubScreen() {
+  const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
+  const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
+  const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
   const [activeTab, setActiveTab] = React.useState<string>('inbox');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
@@ -161,6 +165,18 @@ export function ControlPanelDshPartnerHubScreen() {
           />
         )}
       </div>
+
+      <Box padding={4} gap={3}>
+        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
+          <Text role="titleSm">ملكية دورة حياة الشريك</Text>
+          <Text role="bodySm" tone="muted">
+            {partnersGovernance?.notes ?? 'قسم الشركاء يملك onboarding والاعتماد والجاهزية والتعطيل، بينما الشريك والميدان يجمعان البيانات فقط.'}
+          </Text>
+          <Text role="caption" tone="muted">
+            {`handoff: ${marketingGovernance?.sectionLabel ?? 'Marketing'} للعروض، ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} لاعتماد الكتالوج، ولا يوجد تفعيل نهائي من app-partner.`}
+          </Text>
+        </Box>
+      </Box>
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>

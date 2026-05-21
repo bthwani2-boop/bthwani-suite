@@ -18,6 +18,7 @@ import {
   type PartnerOfferStatus,
   type PartnerOfferType,
 } from '../../shared/partner-offer.preview-store';
+import { getDshControlPanelGovernanceEntry } from '../../control-panel/shared';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';
 type PromotionsTab = 'active' | 'pending' | 'rejected' | 'new';
@@ -142,6 +143,9 @@ export function PromotionsScreen({
   state = 'ready',
 }: PromotionsScreenProps) {
   const { theme } = useTheme();
+  const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
+  const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
+  const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
   const [offers, setOffers] = React.useState<PartnerOfferRecord[]>([]);
   const [activeTab, setActiveTab] = React.useState<PromotionsTab>('active');
   const [form, setForm] = React.useState<IntakeFormState>(INITIAL_FORM);
@@ -374,6 +378,15 @@ export function PromotionsScreen({
           fullWidth={false}
           onPress={() => openOfferForm()}
         />
+      </Surface>
+
+      <Surface tone="inset" padding={3} gap={2}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>
+          ملكية العروض
+        </Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          {marketingGovernance?.sectionLabel ?? 'Marketing'} يملك اعتماد ونشر العروض. هذا السطح يرسل intent فقط، بينما أهلية الشريك تبقى عند {partnersGovernance?.sectionLabel ?? 'Partners'}، وأي نشر أو تعارض مع الكتالوج يراجع عبر {catalogsGovernance?.sectionLabel ?? 'Catalogs'}.
+        </Text>
       </Surface>
 
       <Tabs<PromotionsTab>

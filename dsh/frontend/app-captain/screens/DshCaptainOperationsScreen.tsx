@@ -9,6 +9,7 @@ import {
 	getOperationsSupportFlowsForSurface,
 	type DshOperationsSupportFlowId,
 } from '../../shared/operations-support.preview';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
 	if (policy === 'detail-on-open') {
@@ -24,6 +25,14 @@ function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPo
 	}
 
 	return 'سياسة من السجل';
+}
+
+function resolveCaptainOwnerLabel(flowId?: DshCaptainRegistryFlowId): string {
+	if (flowId === 'captain-proof-of-delivery') {
+		return resolveDshControlPanelSectionLabel('support');
+	}
+
+	return resolveDshControlPanelSectionLabel('operations');
 }
 
 type DshCaptainFlowKey = 'entry' | 'orders' | 'finance' | 'profile' | 'operations';
@@ -294,7 +303,7 @@ const CAPTAIN_OPERATIONAL_SUPPORT_ITEMS = getOperationsSupportFlowsForSurface('a
 		const summary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
 		const policy = registryFlowId ? getDshCaptainFlowPolicy(registryFlowId) : undefined;
 		const forbiddenPreview = summary?.forbiddenActions[0] ?? 'لا يوجد';
-		return `الواجهة: ${summary?.ownerSurface ?? 'app-captain'} · القرار: ${summary?.escalationOwner ?? 'control-panel'} · ${resolveCaptainPolicyLabel(policy)} · الممنوع: ${forbiddenPreview}`;
+		return `الواجهة: ${summary?.ownerSurface ?? 'app-captain'} · القرار: ${resolveCaptainOwnerLabel(registryFlowId)} · ${resolveCaptainPolicyLabel(policy)} · الممنوع: ${forbiddenPreview}`;
 	})(),
 	badgeLabel: flow.severity === 'danger' ? 'حرج' : flow.severity === 'warning' ? 'يتطلب قرارًا' : 'متابعة',
 	screenId: captainSupportFlowToScreenId[flow.flowId] ?? 'orders-list',
@@ -410,7 +419,7 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 								key={flowId}
 								title={summary.flowId}
 								subtitle={summary.nextPolicyActionPreview}
-								meta={`القرار: ${summary.escalationOwner ?? 'control-panel'} · ${resolveCaptainPolicyLabel(policy)}`}
+								meta={`القرار: ${resolveCaptainOwnerLabel(flowId)} · ${resolveCaptainPolicyLabel(policy)}`}
 								badgeLabel={summary.visibility === 'contextual' ? 'سياقي' : summary.visibility}
 							/>
 						);

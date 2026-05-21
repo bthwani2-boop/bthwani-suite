@@ -20,6 +20,7 @@ import {
   getOperationsSupportFlowsForSurface,
 } from '../../shared/operations-support.preview';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 function resolveFieldPolicyLabel(policy?: string): string {
   if (policy === 'evidence-on-open') {
@@ -55,7 +56,7 @@ export function DshFieldReadinessEscalationScreen({
   ],
   escalationTargets = [
     { id: 'partner-management', label: 'قسم الشركاء (Partner Management)', isSelected: true },
-    { id: 'control-panel', label: 'لوحة التحكم المركزية (Control Panel)', isSelected: false },
+    { id: 'control-panel', label: 'قسم الدعم في لوحة التحكم', isSelected: false },
     { id: 'marketing', label: 'فريق التسويق (Marketing)', isSelected: false },
   ],
   onSelectTarget,
@@ -66,7 +67,7 @@ export function DshFieldReadinessEscalationScreen({
   const [reason, setReason] = React.useState('');
   const readinessFlow = getOperationsSupportFlowPreview('branch-readiness-escalation');
   const registryFlowSummary = getDshFlowPolicySummary('field-readiness-escalation');
-  const registryEscalationOwner = registryFlowSummary?.escalationOwner ?? 'control-panel';
+  const registryEscalationOwner = resolveDshControlPanelSectionLabel('partners');
   const fieldFollowUpFlows = getOperationsSupportFlowsForSurface('app-field').filter(
     (item) => item.flowId === 'branch-readiness-escalation' || item.flowId === 'field-proof-required',
   );
@@ -154,7 +155,7 @@ export function DshFieldReadinessEscalationScreen({
       <Surface tone="raised" gap={3}>
         <SectionHeader
           title={readinessFlow.title}
-          subtitle="هذا التصعيد يبقى field-owned في التجميع، لكن مالك القرار والسياسة هو control-panel."
+          subtitle={`هذا التصعيد يبقى field-owned في التجميع، لكن مالك القرار والسياسة هو ${resolveDshControlPanelSectionLabel('partners')}.`}
         />
         <KeyValueList
           items={[

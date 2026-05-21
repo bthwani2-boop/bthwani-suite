@@ -50,6 +50,7 @@ import type {
 } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
 
 function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'summary-only') {
@@ -77,7 +78,7 @@ function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlow
 
 function resolveEscalationOwnerLabel(ownerSurface?: string): string {
   if (ownerSurface === 'control-panel') {
-    return 'لوحة التحكم المركزية';
+    return resolveDshControlPanelSectionLabel('support');
   }
 
   if (ownerSurface === 'app-field') {
