@@ -14,12 +14,14 @@ import {
   colorPalette,
   spacing,
   radius,
-  Icon,
 } from '@bthwani/ui-kit';
 import {
   getOperationsSupportFlowPreview,
   getOperationsSupportFlowsForSurface,
 } from '../../shared/operations-support.preview';
+// Phase 2: DSH Flow Registry consumption — escalation owner from central registry SSoT.
+// DSH_PHASE_2_CROSS_SURFACE_REGISTRY_CONSUMPTION-20260521
+import { getDshFlowById } from '../../shared/dsh-flow-registry';
 
 export type DshFieldReadinessEscalationScreenProps = {
   // ML-004: added pending-response / approved / rejected states for ops response tracking
@@ -53,6 +55,10 @@ export function DshFieldReadinessEscalationScreen({
 }: DshFieldReadinessEscalationScreenProps) {
   const [reason, setReason] = React.useState('');
   const readinessFlow = getOperationsSupportFlowPreview('branch-readiness-escalation');
+  // Phase 2: derive escalation owner from the central registry SSoT.
+  // operations-support.preview provides UI labels; registry provides ownership truth.
+  const registryFlow = getDshFlowById('field-readiness-escalation');
+  const registryEscalationOwner = registryFlow?.escalationOwner ?? 'control-panel';
   const fieldFollowUpFlows = getOperationsSupportFlowsForSurface('app-field').filter(
     (item) => item.flowId === 'branch-readiness-escalation' || item.flowId === 'field-proof-required',
   );
@@ -144,9 +150,9 @@ export function DshFieldReadinessEscalationScreen({
         />
         <KeyValueList
           items={[
-            { label: 'المالك الحالي', value: readinessFlow.ownerLabel, tone: 'brand' },
-            { label: 'مالك التصعيد', value: readinessFlow.escalationOwnerLabel },
-            { label: 'الإجراء التالي', value: readinessFlow.nextAction, tone: 'brand' },
+            { label: 'المالك الحالي', value: readinessFlow.ownerLabel, tone: 'brand' as const },
+            { label: 'مالك التصعيد (السجل المركزي)', value: registryEscalationOwner, tone: 'brand' as const },
+            { label: 'الإجراء التالي', value: readinessFlow.nextAction, tone: 'brand' as const },
           ]}
         />
         <Box gap={2}>

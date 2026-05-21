@@ -1,1 +1,4 @@
 *.csv text eol=lf
+
+# Evidence run artifacts — exempt from whitespace checks (git output, patch files, guard logs)
+tools/registry/runs/**  -whitespace

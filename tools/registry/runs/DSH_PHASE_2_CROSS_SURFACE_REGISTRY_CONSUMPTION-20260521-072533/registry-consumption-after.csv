@@ -1,0 +1,6 @@
+surface,file,consumer_type,registry_function,registry_import
+app-partner,dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx,isDshHiddenCompatFlow guard,isDshHiddenCompatFlow,YES (unchanged)
+app-client,dsh/frontend/app-client/contracts/dsh-client-binding.contracts.ts,on-demand policy bridge,getDshClientFlowPolicy / getDshFlowById,YES (Phase 2 NEW)
+app-captain,dsh/frontend/app-captain/contracts/dshCaptainBinding.contracts.ts,on-demand policy bridge,getDshCaptainFlowPolicy / getDshFlowById,YES (Phase 2 NEW)
+app-field,dsh/frontend/app-field/screens/DshFieldReadinessEscalationScreen.tsx,escalation owner lookup,getDshFlowById,YES (Phase 2 NEW)
+control-panel,dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx,escalation catalog display,getDshEscalationFlows,YES (Phase 2 NEW)

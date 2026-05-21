@@ -1,0 +1,6 @@
+flow_id,on_demand_policy,financial_impact,hidden_compat,forbidden_actions_include_mutation,renders_as_mutation_path_anywhere,wlt_mutation_triggered,check_result,notes
+partner-finance-bridge,finance-preview-only,true,true,YES,NO,NO,SAFE,Displayed in control-panel catalog as read-only reference row only; finance badge shown; no action wired
+partner-settlement-summary,finance-preview-only,true,true,YES,NO,NO,SAFE,Displayed in control-panel catalog as read-only reference row only; finance badge shown; no action wired
+partner-commission-summary,finance-preview-only,true,true,YES,NO,NO,SAFE,Displayed in control-panel catalog as read-only reference row only; finance badge shown; no action wired
+getDshFinancePreviewFlows(),N/A,N/A,N/A,N/A,NO,NO,SAFE,Utility returns read-only array; no mutation path exposed in Phase 2
+WLT frontend,N/A,N/A,N/A,N/A,NOT TOUCHED,NO,SAFE,No wlt/frontend files modified in Phase 2

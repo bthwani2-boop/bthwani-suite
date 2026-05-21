@@ -763,6 +763,29 @@ export function getDshVisibleFlowsForSurface(surfaceId: DshSurfaceId): readonly 
   );
 }
 
+/**
+ * All primary-visibility flows owned by the given surface.
+ * Excludes contextual, hidden-compat, internal, and disabled entries.
+ * Pure read-only filter — no side effects, no throws.
+ */
+export function getDshPrimaryFlowsForSurface(surfaceId: DshSurfaceId): readonly DshFlowRegistryEntry[] {
+  return DSH_FLOW_REGISTRY.filter(
+    (entry) => entry.ownerSurface === surfaceId && entry.visibility === 'primary',
+  );
+}
+
+/**
+ * All contextual-visibility flows visible on the given surface.
+ * Includes contextual entries from any ownerSurface, filtered to those
+ * that declare the requested surface in their visibleSurfaces list.
+ * Pure read-only filter — no side effects, no throws.
+ */
+export function getDshContextualFlowsForSurface(surfaceId: DshSurfaceId): readonly DshFlowRegistryEntry[] {
+  return DSH_FLOW_REGISTRY.filter(
+    (entry) => entry.visibleSurfaces.includes(surfaceId) && entry.visibility === 'contextual',
+  );
+}
+
 /** True when a flow ID is a legacy/hidden-compat entry that must NOT render primary. */
 export function isDshHiddenCompatFlow(id: string): boolean {
   const entry = getDshFlowById(id);

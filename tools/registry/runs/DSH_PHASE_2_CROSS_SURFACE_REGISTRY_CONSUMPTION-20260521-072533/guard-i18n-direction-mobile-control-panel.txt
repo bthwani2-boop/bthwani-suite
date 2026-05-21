@@ -1,0 +1,5 @@
+
+> bthwani-suite@0.0.0 guard:i18n-direction:mobile-control-panel C:\bthwani-suite
+> node tools/scripts/guard-central-i18n-direction.mjs app-client app-partner app-captain app-field control-panel webapp website
+
+Central i18n/direction guard passed.

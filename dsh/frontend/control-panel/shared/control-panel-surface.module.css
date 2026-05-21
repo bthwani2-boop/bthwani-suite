@@ -414,3 +414,50 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Phase 2: escalation flow catalog reference (read-only registry display) */
+.escalationCatalogSection {
+  margin-top: 24px;
+}
+
+.escalationCatalogRow {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  font-size: 12px;
+  direction: rtl;
+}
+
+.escalationCatalogId {
+  font-weight: 600;
+  min-width: 200px;
+  color: var(--bthwani-control-panel-text);
+}
+
+.escalationCatalogMeta {
+  color: var(--bthwani-control-panel-text-muted);
+  min-width: 100px;
+}
+
+.escalationCatalogDomain {
+  color: var(--bthwani-control-panel-text-muted);
+  min-width: 140px;
+}
+
+.escalationCatalogVisibility {
+  min-width: 100px;
+  color: var(--bthwani-control-panel-text);
+}
+
+.escalationCatalogPolicy {
+  min-width: 130px;
+  color: var(--bthwani-control-panel-text);
+}
+
+.escalationCatalogBadgeFinance {
+  color: var(--bthwani-warning);
+  font-weight: 600;
+}

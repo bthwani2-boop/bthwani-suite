@@ -442,3 +442,28 @@ export type DshClientOperationsOrderDetail = {
   eventTimeline: DshClientEventTimelineItem[];
   currentLifecycleStatus: DshClientDeliveryLifecycleStatus;
 };
+
+// --- Phase 2: DSH Flow Registry — client surface on-demand policy bridge ---
+// DSH_PHASE_2_CROSS_SURFACE_REGISTRY_CONSUMPTION-20260521
+// Registry is the SSoT for on-demand policy. Do not duplicate policy constants locally.
+import type { DshOnDemandPolicy } from '../../shared/dsh-flow-registry';
+import { getDshFlowById } from '../../shared/dsh-flow-registry';
+
+/** Canonical registry flow IDs owned by the client surface. */
+export const DSH_CLIENT_REGISTRY_FLOW_IDS = [
+  'client-order-tracking',
+  'client-cart-checkout',
+  'client-order-issue',
+] as const;
+export type DshClientRegistryFlowId = (typeof DSH_CLIENT_REGISTRY_FLOW_IDS)[number];
+
+/**
+ * Returns the on-demand loading policy for a client registry flow from the central registry.
+ * - 'client-order-tracking'  → 'summary-only'    (no detail loaded until explicit expand)
+ * - 'client-cart-checkout'   → 'detail-on-open'
+ * - 'client-order-issue'     → 'evidence-on-open' (evidence/attachments loaded only on explicit open)
+ * Returns undefined if the flow is not found in the registry.
+ */
+export function getDshClientFlowPolicy(flowId: DshClientRegistryFlowId): DshOnDemandPolicy | undefined {
+  return getDshFlowById(flowId)?.onDemandPolicy;
+}

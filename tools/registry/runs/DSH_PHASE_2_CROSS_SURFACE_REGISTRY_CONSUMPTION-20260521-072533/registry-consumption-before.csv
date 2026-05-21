@@ -1,0 +1,6 @@
+surface,file,consumer_type,registry_import
+app-partner,dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx,isDshHiddenCompatFlow guard,YES
+app-client,dsh/frontend/app-client/contracts/dsh-client-binding.contracts.ts,none,NO
+app-captain,dsh/frontend/app-captain/contracts/dshCaptainBinding.contracts.ts,none,NO
+app-field,dsh/frontend/app-field/screens/DshFieldReadinessEscalationScreen.tsx,none,NO
+control-panel,dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx,none,NO
