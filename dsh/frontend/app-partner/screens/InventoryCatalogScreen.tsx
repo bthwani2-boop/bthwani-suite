@@ -497,103 +497,113 @@ function HierarchyFilterRail({
 
   return (
     <Box gap={1}>
-      <Box gap={1}>
-        <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الأقسام</Text>
-        <BThwaniFilterRail
-          items={domainRailItems}
-          selectedId={filter.domainId ?? 'all'}
-          onSelectedIdChange={(id) =>
-            onChange({
-              domainId: id === 'all' ? undefined : (id as DshCatalogDomainId),
-              mainCategoryId: undefined,
-              subcategoryId: undefined,
-            })
-          }
-          contentContainerStyle={railContentStyle}
-          testID="inventory-domain-filter-rail"
-        />
-      </Box>
-
-      {filter.domainId && availableMainCategories.length > 0 ? (
-        <Box gap={1}>
-          <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الفئة الرئيسية</Text>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6 }}>
+        <Text role="caption" tone="muted" style={{ minWidth: 46 }}>الأقسام</Text>
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <BThwaniFilterRail
-            items={mainCategoryRailItems}
-            selectedId={filter.mainCategoryId ?? 'all'}
+            items={domainRailItems}
+            selectedId={filter.domainId ?? 'all'}
             onSelectedIdChange={(id) =>
               onChange({
-                mainCategoryId: id === 'all' ? undefined : (id as DshCatalogMainCategoryId),
+                domainId: id === 'all' ? undefined : (id as DshCatalogDomainId),
+                mainCategoryId: undefined,
                 subcategoryId: undefined,
               })
             }
             contentContainerStyle={railContentStyle}
-            testID="inventory-main-category-filter-rail"
+            testID="inventory-domain-filter-rail"
           />
+        </Box>
+      </Box>
+
+      {filter.domainId && availableMainCategories.length > 0 ? (
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6 }}>
+          <Text role="caption" tone="muted" style={{ minWidth: 46 }}>الرئيسية</Text>
+          <Box style={{ flex: 1, minWidth: 0 }}>
+            <BThwaniFilterRail
+              items={mainCategoryRailItems}
+              selectedId={filter.mainCategoryId ?? 'all'}
+              onSelectedIdChange={(id) =>
+                onChange({
+                  mainCategoryId: id === 'all' ? undefined : (id as DshCatalogMainCategoryId),
+                  subcategoryId: undefined,
+                })
+              }
+              contentContainerStyle={railContentStyle}
+              testID="inventory-main-category-filter-rail"
+            />
+          </Box>
         </Box>
       ) : null}
 
       {filter.mainCategoryId && availableSubcategories.length > 0 ? (
-        <Box gap={1}>
-          <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>التصنيف الفرعي</Text>
-          <BThwaniFilterRail
-            items={subcategoryRailItems}
-            selectedId={filter.subcategoryId ?? 'all'}
-            onSelectedIdChange={(id) =>
-              onChange({
-                subcategoryId: id === 'all' ? undefined : (id as DshCatalogSubcategoryId),
-              })
-            }
-            contentContainerStyle={railContentStyle}
-            testID="inventory-subcategory-filter-rail"
-          />
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6 }}>
+          <Text role="caption" tone="muted" style={{ minWidth: 46 }}>الفرعية</Text>
+          <Box style={{ flex: 1, minWidth: 0 }}>
+            <BThwaniFilterRail
+              items={subcategoryRailItems}
+              selectedId={filter.subcategoryId ?? 'all'}
+              onSelectedIdChange={(id) =>
+                onChange({
+                  subcategoryId: id === 'all' ? undefined : (id as DshCatalogSubcategoryId),
+                })
+              }
+              contentContainerStyle={railContentStyle}
+              testID="inventory-subcategory-filter-rail"
+            />
+          </Box>
         </Box>
       ) : null}
 
-      <Box gap={1}>
-        <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الحالة</Text>
-        <BThwaniFilterRail
-          items={operationalFacetRailItems}
-          selectedId={activeOperationalFacets[0] ?? 'all'}
-          isSelected={(railItem) => (
-            railItem.id === 'all'
-              ? activeOperationalFacets.length === 0
-              : activeOperationalFacets.includes(railItem.id as DshProductFacetId)
-          )}
-          onSelectedIdChange={(id) => {
-            if (id === 'all') {
-              onChange({ facetTags: activeProductFacets.length ? activeProductFacets : undefined });
-              return;
-            }
-
-            toggleFacet(id as DshProductFacetId);
-          }}
-          contentContainerStyle={railContentStyle}
-          testID="inventory-operational-filter-rail"
-        />
-      </Box>
-
-      {availableProductFacets.length > 0 ? (
-        <Box gap={1}>
-          <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الخصائص</Text>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6 }}>
+        <Text role="caption" tone="muted" style={{ minWidth: 46 }}>الحالة</Text>
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <BThwaniFilterRail
-            items={productFacetRailItems}
-            selectedId={activeProductFacets[0] ?? 'all'}
+            items={operationalFacetRailItems}
+            selectedId={activeOperationalFacets[0] ?? 'all'}
             isSelected={(railItem) => (
               railItem.id === 'all'
-                ? activeProductFacets.length === 0
-                : activeProductFacets.includes(railItem.id as DshProductFacetId)
+                ? activeOperationalFacets.length === 0
+                : activeOperationalFacets.includes(railItem.id as DshProductFacetId)
             )}
             onSelectedIdChange={(id) => {
               if (id === 'all') {
-                onChange({ facetTags: activeOperationalFacets.length ? activeOperationalFacets : undefined });
+                onChange({ facetTags: activeProductFacets.length ? activeProductFacets : undefined });
                 return;
               }
 
               toggleFacet(id as DshProductFacetId);
             }}
             contentContainerStyle={railContentStyle}
-            testID="inventory-product-filter-rail"
+            testID="inventory-operational-filter-rail"
           />
+        </Box>
+      </Box>
+
+      {availableProductFacets.length > 0 ? (
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6 }}>
+          <Text role="caption" tone="muted" style={{ minWidth: 46 }}>الخصائص</Text>
+          <Box style={{ flex: 1, minWidth: 0 }}>
+            <BThwaniFilterRail
+              items={productFacetRailItems}
+              selectedId={activeProductFacets[0] ?? 'all'}
+              isSelected={(railItem) => (
+                railItem.id === 'all'
+                  ? activeProductFacets.length === 0
+                  : activeProductFacets.includes(railItem.id as DshProductFacetId)
+              )}
+              onSelectedIdChange={(id) => {
+                if (id === 'all') {
+                  onChange({ facetTags: activeOperationalFacets.length ? activeOperationalFacets : undefined });
+                  return;
+                }
+
+                toggleFacet(id as DshProductFacetId);
+              }}
+              contentContainerStyle={railContentStyle}
+              testID="inventory-product-filter-rail"
+            />
+          </Box>
         </Box>
       ) : null}
 
@@ -622,9 +632,9 @@ function HelpBlock() {
   const { direction } = useDirection();
 
   return (
-    <Surface tone="inset" padding={2} gap={open ? 2 : 1} border={false}>
+    <Surface tone="inset" padding={1} gap={open ? 1 : 0} border={false}>
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
-        <Text role="bodySm" tone="muted" style={{ flex: 1 }} align={direction === 'rtl' ? 'end' : 'start'}>
+        <Text role="caption" tone="muted" style={{ flex: 1 }} align={direction === 'rtl' ? 'end' : 'start'}>
           كيف أضيف منتجاً؟
         </Text>
         <Button
@@ -781,24 +791,65 @@ function DenseListRow({
   const stockLabel = item.stockCount === 0
     ? 'نفد'
     : item.lowStock
-      ? `المخزون ${item.stockCount} · منخفض`
+      ? `منخفض · ${item.stockCount}`
       : `المخزون ${item.stockCount}`;
 
   return (
-    <Surface tone="default" padding={2} gap={isEditExpanded ? 2 : 1} border style={{ borderColor }}>
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
-        <Box style={{ flex: 1.2, minWidth: 0, gap: 1 }}>
-          <Text role="bodySm" numberOfLines={1} align={direction === 'rtl' ? 'end' : 'start'}>{item.name}</Text>
-          <Text role="caption" tone="muted" numberOfLines={1}>{item.categoryLabel}</Text>
+    <Surface
+      tone="default"
+      padding={1}
+      gap={isEditExpanded ? 1 : 0}
+      border
+      style={{ borderColor, minHeight: 84 }}
+    >
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'stretch', gap: 8 }}>
+        <Box
+          style={{
+            flex: 1.45,
+            minWidth: 0,
+            justifyContent: 'center',
+            alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start',
+            gap: 2,
+          }}
+        >
+          <Text
+            role="bodyStrong"
+            numberOfLines={1}
+            align={direction === 'rtl' ? 'end' : 'start'}
+          >
+            {item.name}
+          </Text>
+          <Text
+            role="caption"
+            tone="muted"
+            numberOfLines={1}
+            align={direction === 'rtl' ? 'end' : 'start'}
+          >
+            {item.categoryLabel}
+          </Text>
         </Box>
 
-        <Box style={{ minWidth: 90, gap: 1, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+        <Box
+          style={{
+            minWidth: 88,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
           <Text role="bodySm" tone="brand" numberOfLines={1}>{item.priceLabel}</Text>
           <Text role="caption" tone={stockTone} numberOfLines={1}>{stockLabel}</Text>
         </Box>
 
-        <Box style={{ gap: 4, alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end' }}>
-          <Text role="caption" tone={denseStatusTone} numberOfLines={1}>
+        <Box
+          style={{
+            minWidth: 78,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          <Text role="caption" tone={denseStatusTone} numberOfLines={1} align="center">
             {cardStatus.label}
           </Text>
           <Button
@@ -992,7 +1043,7 @@ function InventoryCatalogContent({
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState<ActiveHierarchyFilter>({});
-  const [viewMode, setViewMode] = React.useState<ViewMode>('cards');
+  const [viewMode, setViewMode] = React.useState<ViewMode>('dense-list');
   const [items, setItems] = React.useState<InventoryCatalogListItem[]>(() =>
     buildListItems(canonicalStoreId),
   );
@@ -1009,6 +1060,13 @@ function InventoryCatalogContent({
   const reviewCount = items.filter((item) => item.reviewNeeded).length;
   const notLinkedCount = items.filter((item) => !item.catalogLinked).length;
   const clientVisibleCount = items.filter((item) => canRenderInClientSurface(item.publishStage, 'product')).length;
+  const kpiItems = [
+    { label: 'المنتجات', value: String(totalProducts), tone: 'brand' as const },
+    { label: 'منخفض', value: String(lowStockCount), tone: lowStockCount > 0 ? 'warning' as const : 'success' as const },
+    { label: 'مراجعة', value: String(reviewCount), tone: reviewCount > 0 ? 'warning' as const : 'success' as const },
+    { label: 'غير مرتبط', value: String(notLinkedCount), tone: notLinkedCount > 0 ? 'danger' as const : 'success' as const },
+    { label: 'ظاهر', value: String(clientVisibleCount), tone: 'success' as const },
+  ];
 
   const searchMatchState = React.useMemo(
     () => detectSearchMatch(items, query),
@@ -1104,34 +1162,33 @@ function InventoryCatalogContent({
   const publishLabel = reviewCount > 0 || lowStockCount > 0 ? 'مراجعة ونشر التغييرات' : 'حفظ تحديثات المخزون';
 
   return (
-    <Box gap={3} dir="rtl">
+    <Box gap={2} dir="rtl">
 
       {/* Summary tiles */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-        {[
-          { label: 'المنتجات', value: String(totalProducts), tone: 'brand' as const },
-          { label: 'منخفض المخزون', value: String(lowStockCount), tone: lowStockCount > 0 ? 'warning' as const : 'success' as const },
-          { label: 'تحتاج مراجعة', value: String(reviewCount), tone: reviewCount > 0 ? 'warning' as const : 'success' as const },
-          { label: 'غير مرتبط', value: String(notLinkedCount), tone: notLinkedCount > 0 ? 'danger' as const : 'success' as const },
-          { label: 'ظاهر للعميل', value: String(clientVisibleCount), tone: 'success' as const },
-        ].map((tile) => (
-          <Surface key={tile.label} tone="raised" padding={1} gap={1} border style={{ minWidth: 96, flexGrow: 1, flexBasis: '31%' }}>
-            <Text role="caption" tone="muted" numberOfLines={1}>{tile.label}</Text>
-            <Text role="bodyStrong" tone={tile.tone}>{tile.value}</Text>
-          </Surface>
-        ))}
-      </Box>
+      <Surface tone="raised" padding={1} gap={0} border={false}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 4 }}>
+          {kpiItems.map((item, index) => (
+            <Box
+              key={item.label}
+              style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 4 }}
+            >
+              <Text role="caption" tone="muted" numberOfLines={1}>{item.label}</Text>
+              <Text role="label" tone={item.tone} numberOfLines={1}>{item.value}</Text>
+              {index < kpiItems.length - 1 ? <Text role="caption" tone="soft">|</Text> : null}
+            </Box>
+          ))}
+        </Box>
+      </Surface>
 
       {/* Search */}
-      <Surface tone="raised" padding={2} gap={2}>
+      <Surface tone="raised" padding={1} gap={1}>
         <SearchField
-          label="بحث في الكتالوج المركزي"
+          label="بحث"
           value={query}
           onChangeText={setQuery}
           placeholder="اسم المنتج، SKU، GTIN، الباركود"
-          hint="ابدأ بالكتالوج المركزي ثم طابق السعر والتوفر محلياً."
         />
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
           <Button label="مسح باركود" tone="secondary" size="sm" fullWidth={false}
             onPress={() => handleBarcodeScanPreviewResult(query)} />
           <Button label="إدخال جماعي" tone="secondary" size="sm" fullWidth={false}
@@ -1172,7 +1229,7 @@ function InventoryCatalogContent({
       <HierarchyFilterRail filter={filter} onChange={(update) => setFilter((prev) => ({ ...prev, ...update }))} items={items} />
 
       {/* View mode + result count */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
         <Text role="label" tone="muted">{filteredItems.length} منتج</Text>
         <SegmentedControl<ViewMode>
           size="sm"
@@ -1187,7 +1244,7 @@ function InventoryCatalogContent({
       </Box>
 
       {/* Product stream */}
-      <Box gap={2}>
+      <Box gap={1}>
         {filteredItems.length === 0 ? (
           <StateView
             stateId="empty"
@@ -1333,7 +1390,7 @@ function InventoryCatalogContent({
 
 export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScreenProps) {
   return (
-    <MobileScrollView fill padding={3} gap={3} contentContainerStyle={{ paddingBottom: 120 }}>
+    <MobileScrollView fill padding={2} gap={2} contentContainerStyle={{ paddingBottom: 120 }}>
       <TopBar
         variant="secondary"
         title="كتالوج المخزون"
