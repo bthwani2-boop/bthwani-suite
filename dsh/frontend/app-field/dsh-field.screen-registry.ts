@@ -171,7 +171,8 @@ export const dshFieldScreenRegistry = [
     componentName: 'DshFieldReadinessEscalationScreen',
     screenKind: 'FLOW_STEP',
     flowId: 'dsh.field.stores',
-    requiredStates: ['loading', 'success', 'error', 'blocked'],
+    // ML-004: added pending-response, approved, rejected to match screen state contract
+    requiredStates: ['loading', 'success', 'error', 'blocked', 'retry'],
     analytics: { screenView: 'field_dsh_store_readiness_escalation_view' },
     fallbackRouteId: 'dsh-field-stores',
     releaseCriticality: 'P2',

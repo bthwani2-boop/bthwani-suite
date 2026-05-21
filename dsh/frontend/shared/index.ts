@@ -393,6 +393,23 @@ export {
   resolveDshControlPanelSectionLabel,
 } from './dsh-governance.map';
 
+// --- DSH Partner Onboarding Journey Map — cross-surface canonical reference ---
+// Phase: DSH_TOPIC_1_PARTNER_ONBOARDING_CLOSURE-20260521-182600
+export type {
+  DshPartnerJourneyStepId,
+  DshPartnerJourneyStep,
+  DshPartnerLifecycleStage,
+  DshPartnerJourneyControlPanelSection,
+} from './dsh-partner-onboarding-journey.map';
+export {
+  DSH_PARTNER_ONBOARDING_JOURNEY,
+  getDshPartnerJourneyStep,
+  getDshPartnerJourneyStepsForSurface,
+  resolveDshPartnerLifecycleStageLabel,
+  resolveNextJourneyStepForStage,
+  resolveCpSectionForLifecycleStage,
+} from './dsh-partner-onboarding-journey.map';
+
 // --- DSH Order Journey Shared Model ---
 export type {
 	DshOrderJourneyStageId,

@@ -34,6 +34,11 @@ import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
+import {
+  getDshPartnerJourneyStep,
+  resolveDshPartnerLifecycleStageLabel,
+  type DshPartnerLifecycleStage,
+} from '../../shared/dsh-partner-onboarding-journey.map';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -927,7 +932,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     onOpenStoreCourierSetup,
     onToggleAvailability,
     canonicalStoreId,
-  } = props;
+    // ML-T1: partner lifecycle stage for readiness status summary (read-only, summary-only per on-demand contract)
+    partnerLifecycleStage = 'partner-review' as DshPartnerLifecycleStage,
+  } = props as DshPartnerHubSurfaceProps & { partnerLifecycleStage?: DshPartnerLifecycleStage };
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
@@ -937,6 +944,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
   const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
   const financeGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('finance'), []);
+  // ML-T1: journey map reference — summary-only; details on-demand per on-demand contract
+  const partnerStatusStep = React.useMemo(() => getDshPartnerJourneyStep('partner-status-visibility'), []);
   const {
     hydrated: appearanceHydrated,
     mode: appearanceMode,
@@ -1318,6 +1327,32 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             <SummaryCell key={item.id} {...item} />
           ))}
         </View>
+      </Surface>
+
+      {/* ML-T1: partner onboarding readiness status — summary-only, read-only, journey map driven */}
+      <Surface tone="raised" padding={3} gap={2}>
+        <KeyValueList
+          dense
+          items={[
+            {
+              label: 'مرحلة التأهيل',
+              value: resolveDshPartnerLifecycleStageLabel(partnerLifecycleStage),
+              tone: partnerLifecycleStage === 'active' ? 'success' : partnerLifecycleStage === 'blocked' || partnerLifecycleStage === 'rejected' ? 'danger' : 'warning',
+            },
+            {
+              label: 'الخطوة الحالية',
+              value: partnerStatusStep?.title ?? 'حالة التأهيل في تطبيق الشريك',
+            },
+            {
+              label: 'مالك القرار',
+              value: partnersGovernance?.sectionLabel ?? 'Partners',
+              tone: 'brand' as const,
+            },
+          ]}
+        />
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {partnerStatusStep?.description ?? 'الشريك يرى حالة تأهيله وجاهزيته وما ينقصه. القرار النهائي بيد قسم الشركاء في لوحة التحكم.'}
+        </Text>
       </Surface>
 
       <Surface tone="inset" padding={3} gap={2}>
