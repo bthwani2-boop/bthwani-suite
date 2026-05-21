@@ -46,8 +46,54 @@ import type {
   DshClientServiceabilityQuote,
   DshClientWalletImpactVisibility,
   DshFulfillmentDeliveryMode,
+  getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+
+function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
+  if (policy === 'summary-only') {
+    return 'ملخص أولًا';
+  }
+
+  if (policy === 'detail-on-open') {
+    return 'تفاصيل عند الفتح';
+  }
+
+  if (policy === 'evidence-on-open') {
+    return 'أدلة عند الفتح';
+  }
+
+  if (policy === 'chat-on-open') {
+    return 'دردشة عند الفتح';
+  }
+
+  if (policy === 'finance-preview-only') {
+    return 'مالي للقراءة فقط';
+  }
+
+  return 'سياسة غير محددة';
+}
+
+function resolveEscalationOwnerLabel(ownerSurface?: string): string {
+  if (ownerSurface === 'control-panel') {
+    return 'لوحة التحكم المركزية';
+  }
+
+  if (ownerSurface === 'app-field') {
+    return 'الفريق الميداني';
+  }
+
+  if (ownerSurface === 'app-captain') {
+    return 'فريق الكابتن';
+  }
+
+  if (ownerSurface === 'app-client') {
+    return 'واجهة العميل';
+  }
+
+  return ownerSurface ?? 'غير محدد';
+}
 
 type CreateOrderValues = Pick<
   DshClientCreateOrderRequest,
@@ -1371,6 +1417,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const [isSupportSubmitted, setIsSupportSubmitted] = React.useState(false);
   const [actionBarHeight, setActionBarHeight] = React.useState(0);
   const [isChatExpanded, setIsChatExpanded] = React.useState(false);
+  const [isFinancialDetailsExpanded, setIsFinancialDetailsExpanded] = React.useState(false);
   const [hasAlertedCaptain, setHasAlertedCaptain] = React.useState(false);
   const [supportAttachment, setSupportAttachment] = React.useState<string | null>(null);
 
@@ -1491,6 +1538,13 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const captainRatingLabel = captainRating > 0 ? `${captainRating}/5` : 'غير محدد';
   const proofVisibility = React.useMemo(() => buildDefaultProofOfDelivery(effectiveClientState, phase), [effectiveClientState, phase]);
   const walletImpactVisibility = React.useMemo(() => buildDefaultWalletImpact(effectiveClientState), [effectiveClientState]);
+  const trackingFlowPolicy = getDshClientFlowPolicy('client-order-tracking');
+  const trackingFlowSummary = getDshFlowPolicySummary('client-order-tracking');
+  const issueFlowPolicy = getDshClientFlowPolicy('client-order-issue');
+  const issueFlowSummary = getDshFlowPolicySummary('client-order-issue');
+  const proofPreviewLabel = proofVisibility.customer_visible && proofVisibility.proof_type !== 'none'
+    ? 'متاح من داخل الطلب عند فتحه'
+    : 'غير ظاهر تلقائيًا';
 
   const canSendMessage = phase !== 'received' && (draftMessage.trim().length > 0 || draftAttachments.length > 0);
   const chatSendLabel = draftMessage.trim().length > 0 ? 'إرسال الرسالة' : draftAttachments.length > 0 ? 'إرسال المرفقات' : 'أضف نصًا أو مرفقًا';
@@ -1711,6 +1765,21 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           />
         </Surface>
 
+        <Surface tone="inset" padding={3} radiusToken="xl" gap={2}>
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+              <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
+                <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة المتابعة داخل الطلب</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  {trackingFlowSummary?.nextPolicyActionPreview ?? 'هذا العرض يبدأ بملخص التنفيذ، ويفتح التفصيل فقط عند الحاجة.'}
+                </Text>
+              </Box>
+              <Chip label={resolveClientPolicyChipLabel(trackingFlowPolicy)} tone="info" />
+            </Box>
+            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+              {`إثبات التسليم: ${proofPreviewLabel}`}
+            </Text>
+          </Surface>
+
         {/* 2. 4-Stage Progress Bar */}
         <Surface tone="raised" padding={3} radiusToken="xl">
           <HorizontalMilestones activeStepId={activeStepId} />
@@ -1791,6 +1860,21 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
         {/* Inline Support toggled by Support Button */}
         {isSupportExpanded && (
           <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
+            <Surface tone="inset" padding={3} radiusToken="lg" gap={2}>
+              <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
+                  <Text role="bodyStrong" style={{ textAlign: 'right' }}>الدعم يبقى داخل هذا الطلب</Text>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                    {issueFlowSummary?.nextPolicyActionPreview ?? 'الأدلة لا تُفتح أو تُرفق إلا عند الحاجة ومن داخل نفس الطلب.'}
+                  </Text>
+                </Box>
+                <Chip label={resolveClientPolicyChipLabel(issueFlowPolicy)} tone="warning" />
+              </Box>
+              <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                {`مالك قرار التصعيد: ${resolveEscalationOwnerLabel(issueFlowSummary?.escalationOwner)} · الأفعال الممنوعة: ${issueFlowSummary?.forbiddenActions.join('، ') ?? 'غير محدد'}`}
+              </Text>
+            </Surface>
+
             {isSupportSubmitted ? (
               <Box gap={3} align="center" style={{ paddingVertical: 10 }}>
                 <Box
@@ -1976,21 +2060,43 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           </Surface>
         )}
 
-        {/* Wallet impact visibility (shown simplified if applicable, e.g. for completed refund impact info) */}
+        {/* Wallet/refund detail remains on-demand even when summary is visible. */}
         {walletImpactVisibility ? (
-          <Surface tone="inset" gap={2} padding={2}>
-            <SectionHeader title="الأثر المالي" subtitle="يعرض الرصيد/الاسترداد/التعويض لشفافية الحساب." />
-            <KeyValueList
-              items={[
-                { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
-                { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
-                { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
-                { label: 'رصيد المحفظة', value: `${walletImpactVisibility.wallet_credit} ر.ي` },
-                { label: 'المسترد المكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
-                { label: 'الاسترداد المعلق', value: `${walletImpactVisibility.refund_pending} ر.ي`, tone: walletImpactVisibility.refund_pending > 0 ? 'warning' : 'default' },
-              ]}
-            />
-            {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
+          <Surface tone="inset" gap={2} padding={3} radiusToken="xl">
+            <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+              <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
+                <Text role="bodyStrong" style={{ textAlign: 'right' }}>الأثر المالي داخل الطلب</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                  {trackingFlowSummary?.nextPolicyActionPreview ?? 'يبقى هذا الجزء مختصرًا حتى تفتح التفاصيل عند الحاجة.'}
+                </Text>
+              </Box>
+              <Button
+                label={isFinancialDetailsExpanded ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
+                tone={isFinancialDetailsExpanded ? 'secondary' : 'ghost'}
+                size="sm"
+                fullWidth={false}
+                onPress={() => setIsFinancialDetailsExpanded((current) => !current)}
+              />
+            </Box>
+            {isFinancialDetailsExpanded ? (
+              <>
+                <KeyValueList
+                  items={[
+                    { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
+                    { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
+                    { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
+                    { label: 'رصيد المحفظة', value: `${walletImpactVisibility.wallet_credit} ر.ي` },
+                    { label: 'المسترد المكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
+                    { label: 'الاسترداد المعلق', value: `${walletImpactVisibility.refund_pending} ر.ي`, tone: walletImpactVisibility.refund_pending > 0 ? 'warning' : 'default' },
+                  ]}
+                />
+                {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
+              </>
+            ) : (
+              <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                افتح هذا الجزء فقط عند الحاجة لمراجعة رصيد المحفظة أو حالة الاسترداد.
+              </Text>
+            )}
           </Surface>
         ) : null}
 
@@ -2023,6 +2129,9 @@ function renderTracking(
   const activeItem = timeline[activeTimelineIndex] ?? timeline[timeline.length - 1];
   const walletVisibilityCopy = getClientWalletVisibilityCopy(trackingStateMeta);
   const walletImpactVisibility = buildDefaultWalletImpact(clientState);
+  const trackingFlowPolicy = getDshClientFlowPolicy('client-order-tracking');
+  const trackingFlowSummary = getDshFlowPolicySummary('client-order-tracking');
+  const issueFlowSummary = getDshFlowPolicySummary('client-order-issue');
   const supportTitle = trackingStateMeta.isException ? 'الدعم مطلوب الآن' : 'الدعم والرجوع';
   const supportDescription = trackingStateMeta.isException
     ? 'هذه الحالة تحتاج متابعة دعم واضحة قبل أي خطوة لاحقة. استخدم زر الدعم الآن لشرح المشكلة ومتابعة الحل.'
@@ -2052,6 +2161,16 @@ function renderTracking(
         />
       </Surface>
 
+      <Surface tone="inset" gap={2} padding={2}>
+        <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة العرض داخل الطلب</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+          {trackingFlowSummary?.nextPolicyActionPreview ?? 'يبدأ هذا المسار بملخص الحالة، ويفتح التفصيل فقط عند الطلب.'}
+        </Text>
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {`النمط الحالي: ${resolveClientPolicyChipLabel(trackingFlowPolicy)}`}
+        </Text>
+      </Surface>
+
       {walletVisibilityCopy ? (
         <Surface tone="inset" gap={2} padding={2}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>{walletVisibilityCopy.title}</Text>
@@ -2063,18 +2182,10 @@ function renderTracking(
 
       {walletImpactVisibility ? (
         <Surface tone="inset" gap={2} padding={2}>
-          <SectionHeader title="الأثر المالي الظاهر" subtitle="ملخص مالي توضيحي فقط دون أي تنفيذ wallet/runtime." />
-          <KeyValueList
-            items={[
-              { label: 'المبلغ المدفوع', value: `${walletImpactVisibility.paid_amount} ر.ي` },
-              { label: 'رسوم التوصيل', value: `${walletImpactVisibility.delivery_fee} ر.ي` },
-              { label: 'الخصم', value: `${walletImpactVisibility.discount} ر.ي` },
-              { label: 'تعويض ظاهر', value: `${walletImpactVisibility.compensation} ر.ي` },
-              { label: 'استرداد معلق', value: `${walletImpactVisibility.refund_pending} ر.ي` },
-              { label: 'استرداد مكتمل', value: `${walletImpactVisibility.refund_completed} ر.ي`, tone: 'success' },
-            ]}
-          />
-          {walletImpactVisibility.note ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{walletImpactVisibility.note}</Text> : null}
+          <SectionHeader title="الأثر المالي الظاهر" subtitle="يبقى مختصرًا هنا، وتفتح التفاصيل فقط عند مراجعتها من داخل الطلب." />
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {walletImpactVisibility.note ?? 'إذا احتجت تفاصيل المبالغ أو الاسترداد، افتح الدعم أو شاشة المراجعة من داخل الطلب.'}
+          </Text>
         </Surface>
       ) : null}
 
@@ -2082,6 +2193,9 @@ function renderTracking(
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>{supportTitle}</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           {supportDescription}
+        </Text>
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {`الدعم contextual داخل الطلب فقط · مالك التصعيد: ${resolveEscalationOwnerLabel(issueFlowSummary?.escalationOwner)}`}
         </Text>
         {trackingStateMeta.isException && !onSupport ? (
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>

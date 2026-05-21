@@ -19,6 +19,7 @@ import type {
   DshFieldVisitEvidenceItem,
 } from '../types/DshFieldStoreVisitTypes';
 import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 
 export type {
   DshFieldStoreVisitErrors,
@@ -115,11 +116,17 @@ export function DshFieldStoreVisitScreen({
   onOpenEvidence,
   onRetry,
 }: DshFieldStoreVisitScreenProps) {
+  const visitFlowSummary = getDshFlowPolicySummary('field-store-visit');
+  const [selectedEvidenceId, setSelectedEvidenceId] = React.useState<string | null>(null);
+
   if (state !== 'ready' && state !== 'disabled') {
     return renderState(state, onRetry);
   }
 
   const isDisabled = state === 'disabled';
+  const selectedEvidenceItem = selectedEvidenceId
+    ? evidenceItems.find((item) => item.id === selectedEvidenceId) ?? null
+    : null;
 
   return (
     <MobileScrollView padding={4} gap={4}>
@@ -129,6 +136,24 @@ export function DshFieldStoreVisitScreen({
           سجّل ملخص الزيارة وخطوة المتابعة بدل أي log عام غير مرتبط بالسياق.
         </Text>
       </Box>
+
+      <Surface tone="inset" gap={2}>
+        <SectionHeader
+          title="سياسة الزيارة من السجل"
+          subtitle="الأدلة والوثائق تبقى on-demand، ولا تتحول الشاشة إلى معرض دائم."
+        />
+        <KeyValueList
+          dense
+          items={[
+            { label: 'المالك', value: visitFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
+            { label: 'سياسة الفتح', value: visitFlowSummary?.onDemandPolicy ?? 'evidence-on-open' },
+            { label: 'مالك التصعيد', value: visitFlowSummary?.escalationOwner ?? 'control-panel' },
+          ]}
+        />
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {visitFlowSummary?.nextPolicyActionPreview ?? 'كل دليل يفتح فقط عند اختياره من القائمة.'}
+        </Text>
+      </Surface>
 
       <Surface tone="raised" gap={3}>
         <SectionHeader
@@ -166,11 +191,35 @@ export function DshFieldStoreVisitScreen({
               subtitle={item.subtitle}
               meta={`تم الالتقاط ${item.capturedAtLabel}`}
               badgeLabel={item.statusLabel}
-              onPress={() => onOpenEvidence?.(item.id)}
+              onPress={() => {
+                setSelectedEvidenceId((current) => (current === item.id ? null : item.id));
+                onOpenEvidence?.(item.id);
+              }}
             />
           ))}
         </Box>
       </Surface>
+
+      {selectedEvidenceItem ? (
+        <Surface tone="inset" gap={2}>
+          <SectionHeader
+            title="تفاصيل الدليل المفتوح"
+            subtitle="هذا الجزء يظهر فقط بعد اختيار دليل محدد من القائمة."
+          />
+          <KeyValueList
+            dense
+            items={[
+              { label: 'العنصر', value: selectedEvidenceItem.title, tone: 'brand' },
+              { label: 'الحالة', value: selectedEvidenceItem.statusLabel },
+              { label: 'وقت الالتقاط', value: selectedEvidenceItem.capturedAtLabel },
+            ]}
+          />
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {selectedEvidenceItem.subtitle}
+          </Text>
+          <Button label="إغلاق الدليل" tone="secondary" onPress={() => setSelectedEvidenceId(null)} />
+        </Surface>
+      ) : null}
 
       <Surface tone="raised" gap={3}>
         <SectionHeader

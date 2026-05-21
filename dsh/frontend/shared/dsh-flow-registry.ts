@@ -764,6 +764,25 @@ export function getDshVisibleFlowsForSurface(surfaceId: DshSurfaceId): readonly 
 }
 
 /**
+ * Entries that can render in a visible workspace for a surface.
+ * Excludes hidden-compat and disabled everywhere, and excludes internal
+ * outside control-panel. Pure read-only filter — no side effects, no throws.
+ */
+export function getDshRenderableFlowsForSurface(surfaceId: DshSurfaceId): readonly DshFlowRegistryEntry[] {
+  return getDshFlowsForSurface(surfaceId).filter((entry) => {
+    if (entry.visibility === 'hidden-compat' || entry.visibility === 'disabled') {
+      return false;
+    }
+
+    if (entry.visibility === 'internal' && surfaceId !== 'control-panel') {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+/**
  * All primary-visibility flows owned by the given surface.
  * Excludes contextual, hidden-compat, internal, and disabled entries.
  * Pure read-only filter — no side effects, no throws.
@@ -801,11 +820,86 @@ export function getDshEscalationFlows(): readonly DshFlowRegistryEntry[] {
 }
 
 /**
+ * Escalation-aware flows relevant to a given surface.
+ * Includes flows owned by the surface, visible on the surface, or escalated to it.
+ * Pure read-only filter — no side effects, no throws.
+ */
+export function getDshEscalationFlowsForSurface(surfaceId: DshSurfaceId): readonly DshFlowRegistryEntry[] {
+  return getDshEscalationFlows().filter(
+    (entry) =>
+      entry.ownerSurface === surfaceId ||
+      entry.visibleSurfaces.includes(surfaceId) ||
+      entry.escalationOwner === surfaceId,
+  );
+}
+
+/**
  * All flows with financialImpact=true.
  * These must remain finance-preview-only — no mutation from DSH.
  */
 export function getDshFinancePreviewFlows(): readonly DshFlowRegistryEntry[] {
   return DSH_FLOW_REGISTRY.filter((entry) => entry.financialImpact === true);
+}
+
+export type DshFlowPolicySummary = {
+  readonly flowId: string;
+  readonly ownerSurface: DshSurfaceId;
+  readonly visibleSurfaces: readonly DshSurfaceId[];
+  readonly domain: DshFlowDomain;
+  readonly visibility: DshFlowVisibility;
+  readonly onDemandPolicy: DshOnDemandPolicy;
+  readonly escalationOwner?: DshSurfaceId;
+  readonly financialImpact: boolean;
+  readonly hiddenCompat: boolean;
+  readonly allowedActions: readonly string[];
+  readonly forbiddenActions: readonly string[];
+  readonly nextPolicyActionPreview: string;
+};
+
+function resolveNextPolicyActionPreview(onDemandPolicy: DshOnDemandPolicy): string {
+  if (onDemandPolicy === 'summary-only') {
+    return 'اعرض الملخص أولاً، وافتح التفاصيل فقط عند طلب المستخدم.';
+  }
+
+  if (onDemandPolicy === 'detail-on-open') {
+    return 'افتح التفاصيل عند اختيار هذا المسار، ولا تحملها مسبقًا.';
+  }
+
+  if (onDemandPolicy === 'evidence-on-open') {
+    return 'افتح الأدلة أو الصور فقط من داخل السياق وعند الطلب.';
+  }
+
+  if (onDemandPolicy === 'chat-on-open') {
+    return 'افتح المحادثة فقط عند اختيار فتح الدردشة من داخل الطلب.';
+  }
+
+  return 'اعرض المعاينة المالية للقراءة فقط من دون أي تنفيذ أو تعديل.';
+}
+
+/**
+ * Compact read-only policy snapshot for a single flow.
+ * Safe for render paths; no throws and no heavy payloads.
+ */
+export function getDshFlowPolicySummary(flowId: string): DshFlowPolicySummary | undefined {
+  const entry = getDshFlowById(flowId);
+  if (!entry) {
+    return undefined;
+  }
+
+  return {
+    flowId: entry.id,
+    ownerSurface: entry.ownerSurface,
+    visibleSurfaces: entry.visibleSurfaces,
+    domain: entry.domain,
+    visibility: entry.visibility,
+    onDemandPolicy: entry.onDemandPolicy,
+    escalationOwner: entry.escalationOwner,
+    financialImpact: entry.financialImpact === true,
+    hiddenCompat: entry.hiddenCompat === true,
+    allowedActions: entry.allowedActions,
+    forbiddenActions: entry.forbiddenActions,
+    nextPolicyActionPreview: resolveNextPolicyActionPreview(entry.onDemandPolicy),
+  };
 }
 
 // ---------------------------------------------------------------------------

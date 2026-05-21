@@ -3,6 +3,8 @@
 import React from 'react';
 import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
+import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 
 type CaptainFieldStage = 'to-store' | 'to-customer' | 'near-customer' | 'at-door' | 'bell-rang' | 'proof';
 type CaptainHeartbeatState = { lastUpdateMinutesAgo: number; etaMinutes: number | null };
@@ -82,8 +84,11 @@ const STAGE_CONFIG: Record<CaptainFieldStage, { title: string; description: stri
 
 export function DshCaptainMapScreen() {
   const [taskStage, setTaskStage] = React.useState<CaptainFieldStage>('to-store');
+  const [stagesVisible, setStagesVisible] = React.useState(false);
   const heartbeat = useCaptainHeartbeat(taskStage);
   const config = STAGE_CONFIG[taskStage];
+  const mapFlowPolicy = getDshCaptainFlowPolicy('captain-map-navigation');
+  const mapFlowSummary = getDshFlowPolicySummary('captain-map-navigation');
 
   const advanceStage = () => {
     if (config.nextStage) {
@@ -114,6 +119,15 @@ export function DshCaptainMapScreen() {
             {config.proximityLabel && (
               <Badge label={config.proximityLabel === 'near_customer' ? 'قريب من العميل' : config.proximityLabel === 'at_door' ? 'عند الباب' : 'تم قرع الجرس'} tone={proximityTone} />
             )}
+            <Surface tone="inset" gap={2} padding={3} radiusToken="lg">
+              <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة شاشة الملاحة</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {mapFlowSummary?.nextPolicyActionPreview ?? 'هذه الشاشة تعرض ملخص التنفيذ أولًا، وتبقي المحطات التفصيلية خلف فتح صريح.'}
+              </Text>
+              <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                {`النمط الحالي: ${mapFlowPolicy ?? 'summary-only'} · لا تظهر مشكلات الشريك الداخلية هنا.`}
+              </Text>
+            </Surface>
           </Surface>
 
           <Surface tone="raised" gap={3}>
@@ -128,19 +142,32 @@ export function DshCaptainMapScreen() {
           </Surface>
 
           <Surface tone="inset" gap={3}>
-            <SectionHeader title="محطات التنفيذ" subtitle="انتقل بين المحطات عند اكتمال كل مرحلة." />
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-              {(Object.keys(STAGE_CONFIG) as CaptainFieldStage[]).map((stage) => (
-                <Button
-                  key={stage}
-                  label={STAGE_CONFIG[stage].title}
-                  tone={taskStage === stage ? 'primary' : 'secondary'}
-                  size="sm"
-                  fullWidth={false}
-                  onPress={() => setTaskStage(stage)}
-                />
-              ))}
-            </Box>
+            <SectionHeader title="محطات التنفيذ" subtitle="المحطات التفصيلية تفتح عند الطلب فقط." />
+            <Button
+              label={stagesVisible ? 'إخفاء المحطات' : 'فتح المحطات'}
+              tone={stagesVisible ? 'secondary' : 'ghost'}
+              size="sm"
+              fullWidth={false}
+              onPress={() => setStagesVisible((current) => !current)}
+            />
+            {stagesVisible ? (
+              <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                {(Object.keys(STAGE_CONFIG) as CaptainFieldStage[]).map((stage) => (
+                  <Button
+                    key={stage}
+                    label={STAGE_CONFIG[stage].title}
+                    tone={taskStage === stage ? 'primary' : 'secondary'}
+                    size="sm"
+                    fullWidth={false}
+                    onPress={() => setTaskStage(stage)}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                افتح المحطات فقط عندما تحتاج تعديل مرحلة التنفيذ أو مراجعة التقدم.
+              </Text>
+            )}
           </Surface>
         </Box>
       }

@@ -21,6 +21,24 @@ import {
   getOperationsSupportSurfaceEntry,
   type DshOperationsSupportFlowId,
 } from '../../shared/operations-support.preview';
+import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+
+function resolveClientIssuePolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
+  if (policy === 'evidence-on-open') {
+    return 'أدلة عند الفتح';
+  }
+
+  if (policy === 'detail-on-open') {
+    return 'تفاصيل عند الفتح';
+  }
+
+  if (policy === 'summary-only') {
+    return 'ملخص أولًا';
+  }
+
+  return 'سياسة مرتبطة بالسجل';
+}
 
 const clientOperationScreenIds = [
   'awnak-order-create',
@@ -719,6 +737,8 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
   const [detailsText, setDetailsText] = React.useState('');
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const { theme } = useTheme();
+  const issueFlowPolicy = getDshClientFlowPolicy('client-order-issue');
+  const issueFlowSummary = getDshFlowPolicySummary('client-order-issue');
   const issueTypes = React.useMemo(
     () =>
       getOperationsSupportFlowsForSurface('app-client').filter((item) => {
@@ -798,6 +818,26 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
         </Text>
       </Box>
 
+      <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 20 }}>
+        <Box layoutDirection="row" justify="space-between" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+          <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة البلاغ من السجل المركزي</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              {issueFlowSummary?.nextPolicyActionPreview ?? 'الأدلة والملفات لا تُفتح إلا عند طلبها من داخل هذا البلاغ.'}
+            </Text>
+          </Box>
+          <Chip label={resolveClientIssuePolicyLabel(issueFlowPolicy)} tone="warning" />
+        </Box>
+        <KeyValueList
+          dense
+          items={[
+            { label: 'الظهور', value: issueFlowSummary?.visibility ?? 'contextual' },
+            { label: 'مالك التصعيد', value: issueFlowSummary?.escalationOwner ?? 'control-panel', tone: 'brand' },
+            { label: 'الممنوع', value: issueFlowSummary?.forbiddenActions.join('، ') ?? 'لا يوجد' },
+          ]}
+        />
+      </Surface>
+
       {/* Interactive Chips list */}
       <Surface tone="raised" padding={3} gap={3} style={{ borderRadius: 20 }}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما هي المشكلة التي تواجهها؟</Text>
@@ -825,6 +865,9 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
           </Text>
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
             {`الإجراء التالي: ${selectedFlow.nextAction}`}
+          </Text>
+          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+            {`يفتح هذا السياق الأدلة أو المرفقات عند الطلب فقط، ولا يفتح مركز عمليات مستقل للعميل.`}
           </Text>
           {selectedFlow.financialImpactPreview ? (
             <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>

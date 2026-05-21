@@ -40,7 +40,9 @@ import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
   getDshFulfillmentDeliveryModeMeta,
+  getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -55,6 +57,22 @@ const SURFACE_WARM_BORDER = colorPalette.brandSurface;
 const DANGER = colorPalette.danger;
 const DANGER_SOFT = colorPalette.dangerSoft;
 const EXPERIMENTAL_PAYMENT_ENABLED = true;
+
+function resolveCheckoutPolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
+  if (policy === 'detail-on-open') {
+    return 'تفاصيل عند الفتح';
+  }
+
+  if (policy === 'summary-only') {
+    return 'ملخص أولًا';
+  }
+
+  if (policy === 'finance-preview-only') {
+    return 'مالي للقراءة فقط';
+  }
+
+  return 'سياسة من السجل';
+}
 
 type ScreenNotice = {
   title: string;
@@ -1058,6 +1076,8 @@ function InlineActionEditor({ meta, value, onChangeValue, onSubmit, onClose, sub
 }
 
 export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
+  const checkoutFlowPolicy = getDshClientFlowPolicy('client-cart-checkout');
+  const checkoutFlowSummary = getDshFlowPolicySummary('client-cart-checkout');
   const [items, setItems] = useState<CartItem[]>(
     props.items !== undefined ? props.items : PREVIEW_FALLBACK_ITEMS,
   );
@@ -2014,6 +2034,27 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         ) : null}
         <PromoBanner onPress={handleSubscribePress} />
 
+        <Surface
+          tone="inset"
+          padding={2}
+          gap={1}
+          style={{ backgroundColor: colorPalette.surfaceSecondary, borderRadius: 16, borderWidth: 1, borderColor: BORDER_SOFT }}
+        >
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5] }}>
+            <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+              <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                سياسة تأكيد الطلب
+              </Text>
+              <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                {checkoutFlowSummary?.nextPolicyActionPreview ?? 'هذه الشاشة تعرض الملخص أولًا، وتفتح المراجعة التفصيلية عند الطلب فقط.'}
+              </Text>
+            </View>
+            <Text role="caption" style={{ color: ACCENT_ORANGE, fontWeight: '800', textAlign: 'right' }}>
+              {resolveCheckoutPolicyLabel(checkoutFlowPolicy)}
+            </Text>
+          </View>
+        </Surface>
+
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
           <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[2], gap: spacing[1.5], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
             <Surface tone="inset" padding={2} gap={1} style={{ borderRadius: 16 }}>
@@ -2309,6 +2350,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         >
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
             راجع كل تفاصيل الطلب قبل تأكيد التنفيذ النهائي.
+          </Text>
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+            {`هذا هو مسار التفاصيل المعتمد من السجل المركزي: ${resolveCheckoutPolicyLabel(checkoutFlowPolicy)}.`}
           </Text>
           <SummaryCard
             items={checkoutReviewItems}

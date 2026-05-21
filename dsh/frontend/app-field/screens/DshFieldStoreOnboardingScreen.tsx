@@ -33,6 +33,7 @@ import {
 } from '../data/field-stores.preview-data';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../shared/operations-support.preview';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 
 const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');
 const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
@@ -41,6 +42,22 @@ const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
 const FIELD_REVIEW_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
   (item) => item.flowId === 'field-proof-required' || item.flowId === 'branch-readiness-escalation',
 );
+
+function resolveFieldPolicyLabel(policy?: string): string {
+  if (policy === 'detail-on-open') {
+    return 'تفاصيل عند الفتح';
+  }
+
+  if (policy === 'evidence-on-open') {
+    return 'أدلة عند الفتح';
+  }
+
+  if (policy === 'summary-only') {
+    return 'ملخص أولًا';
+  }
+
+  return policy ?? 'سياسة من السجل';
+}
 
 // ML-005: added activated/exit states so field knows when onboarding is complete
 export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
@@ -102,6 +119,8 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
   const activeIndex = fieldSectionOrder.indexOf(activeSectionId);
   const isLastSection = activeIndex === fieldSectionOrder.length - 1;
   const canSubmit = missingItems.length === 0 && !readOnly;
+  const onboardingFlowSummary = getDshFlowPolicySummary('field-store-onboarding');
+  const readinessFlowSummary = getDshFlowPolicySummary('field-readiness-escalation');
 
   const patchStore = React.useCallback((updater: (current: FieldStoreFile) => FieldStoreFile) => {
     onStoreChange((current) => touchFieldStoreDraft(updater(current)));
@@ -229,6 +248,9 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           <TextField label="اسم المنتج الافتتاحي" value={draft.products.featuredProductName} editable={!readOnly} onChangeText={(value) => updateNestedField('products', 'featuredProductName', value)} />
           <TextField label="سعر المنتج الافتتاحي" value={draft.products.featuredProductPrice} editable={!readOnly} keyboardType="decimal-pad" onChangeText={(value) => updateNestedField('products', 'featuredProductPrice', value)} />
           <TextField label="ملاحظة الكتالوج المختصرة" value={draft.products.sampleCatalogNote} editable={!readOnly} onChangeText={(value) => updateNestedField('products', 'sampleCatalogNote', value)} />
+          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+            {`سياسة هذا القسم: ${resolveFieldPolicyLabel(onboardingFlowSummary?.onDemandPolicy)} · الوثائق والصور لا تُفتح إلا عند الحاجة.`}
+          </Text>
 
           <Card title="مسارات الكتالوج والباركود" subtitle="تبقى هذه المشاكل داخل onboarding والكتالوج الميداني فقط، ولا تتحول إلى مركز عمليات الشريك.">
             <Box gap={2}>
@@ -253,6 +275,9 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           <TextField label="ساعات العمل" value={draft.offer.operatingHours} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'operatingHours', value)} />
           <TextField label="الجاهزية / التوصيل" value={draft.offer.deliveryReadiness} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'deliveryReadiness', value)} />
           <TextField label="ملاحظة مالية" value={draft.offer.financeNote} editable={!readOnly} onChangeText={(value) => updateNestedField('offer', 'financeNote', value)} />
+          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+            الملاحظة المالية هنا للمرجعية فقط. لا يوجد اعتماد مالي أو تفعيل نهائي من شاشة الميداني.
+          </Text>
 
           {store.fulfillmentAgreements && store.fulfillmentAgreements.length > 0 && (
             <Card
@@ -286,6 +311,9 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
     return (
       <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
         <SectionHeader title="المراجعة والإرسال" subtitle="الحفظ كمسودة مسموح دائمًا. الإرسال يبقى مغلقًا حتى اكتمال الأساسيات فقط." />
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          {`مالك قرار التصعيد: ${readinessFlowSummary?.escalationOwner ?? 'control-panel'} · الممنوع: ${onboardingFlowSummary?.forbiddenActions.join('، ') ?? 'غير محدد'}`}
+        </Text>
         <TextField label="ملاحظات الميداني" value={draft.review.fieldNotes} editable={!readOnly} onChangeText={(value) => updateNestedField('review', 'fieldNotes', value)} />
         <TextField label="ملاحظة مراجعة الشركاء" value={draft.review.partnerReviewNote} editable={!readOnly} onChangeText={(value) => updateNestedField('review', 'partnerReviewNote', value)} />
 
@@ -357,6 +385,21 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
               { label: 'الموعد / آخر تحديث', value: `${store.nextVisitLabel} · ${store.lastUpdatedLabel}` },
             ]}
           />
+        </Surface>
+
+        <Surface tone="inset" padding={3} gap={2} radiusToken="xl">
+          <SectionHeader title="سياسة onboarding من السجل" subtitle="الملف يبقى مملوكًا للميداني، لكن لا توجد قرارات مالية أو تفعيل نهائي محلي." />
+          <KeyValueList
+            dense
+            items={[
+              { label: 'المالك', value: onboardingFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
+              { label: 'سياسة الفتح', value: resolveFieldPolicyLabel(onboardingFlowSummary?.onDemandPolicy) },
+              { label: 'مالك التصعيد', value: readinessFlowSummary?.escalationOwner ?? 'control-panel' },
+            ]}
+          />
+          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+            {onboardingFlowSummary?.nextPolicyActionPreview ?? 'افتح التفاصيل أو الوثائق عند الحاجة فقط، ولا تعتمد أي قرار مالي من هذه الشاشة.'}
+          </Text>
         </Surface>
 
         <Surface tone="raised" padding={4} gap={3} radiusToken="xl">

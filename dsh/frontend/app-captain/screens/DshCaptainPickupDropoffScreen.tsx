@@ -16,6 +16,24 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
+import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+
+function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
+  if (policy === 'detail-on-open') {
+    return 'تفاصيل عند الفتح';
+  }
+
+  if (policy === 'evidence-on-open') {
+    return 'أدلة عند الفتح';
+  }
+
+  if (policy === 'summary-only') {
+    return 'ملخص أولًا';
+  }
+
+  return 'سياسة من السجل';
+}
 
 export type DshCaptainPickupDropoffScreenProps = {
   // ML-029: added 'out-for-delivery' and 'navigating-to-dropoff' in-transit states
@@ -47,10 +65,14 @@ export function DshCaptainPickupDropoffScreen({
   onRingBell,
 }: DshCaptainPickupDropoffScreenProps) {
   const { theme } = useTheme();
+  const pickupFlowPolicy = getDshCaptainFlowPolicy('captain-order-pickup');
+  const pickupFlowSummary = getDshFlowPolicySummary('captain-order-pickup');
   const [bellRung, setBellRung] = React.useState(false);
   const [otpInput, setOtpInput] = React.useState('');
   const [otpVerified, setOtpVerified] = React.useState(false);
   const [otpError, setOtpError] = React.useState(false);
+  const [detailsVisible, setDetailsVisible] = React.useState(false);
+  const showsHandoffContext = mode === 'pickup' || mode === 'arrival' || mode === 'dropoff';
 
   const handleRingBell = () => {
     setBellRung(true);
@@ -157,24 +179,52 @@ export function DshCaptainPickupDropoffScreen({
                 { label: 'عدد الأصناف', value: `${itemsCount} أصناف`, tone: 'success' },
               ]}
             />
+            <Surface tone="inset" padding={3} radiusToken="lg" gap={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+              <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
+                  <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة تنفيذ الاستلام والتسليم</Text>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                    {pickupFlowSummary?.nextPolicyActionPreview ?? 'ابدأ بملخص المهمة، ثم افتح قائمة التحقق أو التفاصيل عند الحاجة.'}
+                  </Text>
+                </Box>
+                <Badge label={resolveCaptainPolicyLabel(pickupFlowPolicy)} tone="brand" />
+              </Box>
+              <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                {`مالك قرار التصعيد: ${pickupFlowSummary?.escalationOwner ?? 'control-panel'}`}
+              </Text>
+              {showsHandoffContext ? (
+                <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                  handoff يظهر هنا فقط ضمن سياق الاستلام أو التسليم، وليس كمسار شريك داخلي مستقل.
+                </Text>
+              ) : null}
+            </Surface>
+            <Button
+              label={detailsVisible ? 'إخفاء قائمة التحقق' : 'فتح قائمة التحقق'}
+              tone={detailsVisible ? 'secondary' : 'ghost'}
+              size="sm"
+              fullWidth={false}
+              onPress={() => setDetailsVisible((current) => !current)}
+            />
           </Surface>
 
-          <Surface tone="raised" gap={3}>
-            <SectionHeader
-              title="قائمة التحقق"
-              subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة."
-            />
-            <Box gap={2}>
-              {config.checklist.map((item, index) => (
-                <View key={index} style={styles.checkItem}>
-                  <View style={styles.checkCircle}>
-                    <Icon name="checkmark" size={12} color={colorPalette.white} />
+          {detailsVisible ? (
+            <Surface tone="raised" gap={3}>
+              <SectionHeader
+                title="قائمة التحقق"
+                subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة."
+              />
+              <Box gap={2}>
+                {config.checklist.map((item, index) => (
+                  <View key={index} style={styles.checkItem}>
+                    <View style={styles.checkCircle}>
+                      <Icon name="checkmark" size={12} color={colorPalette.white} />
+                    </View>
+                    <Text role="bodySm" style={styles.checkText}>{item}</Text>
                   </View>
-                  <Text role="bodySm" style={styles.checkText}>{item}</Text>
-                </View>
-              ))}
-            </Box>
-          </Surface>
+                ))}
+              </Box>
+            </Surface>
+          ) : null}
 
           {mode === 'arrival' && (
             <>

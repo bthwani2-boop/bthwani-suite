@@ -358,6 +358,22 @@
   border-radius: 6px;
 }
 
+.surfaceInspectorRow {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  font-size: 12px;
+  color: var(--bthwani-control-panel-text);
+}
+
+.surfaceInspectorRow:last-child {
+  border-bottom: 0;
+}
+
 .surfaceMetaChip {
   font-size: 11px;
   font-weight: 700;
@@ -379,6 +395,27 @@
   gap: 12px;
 }
 
+.surfaceInfoCardButton {
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  cursor: pointer;
+}
+
+.surfaceInfoCardActive {
+  border-color: var(--bthwani-control-panel-brand);
+  box-shadow: 0 10px 24px var(--bthwani-overlay);
+}
+
+.surfaceInfoCardTextBlock {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
 .surfaceInfoCardTitle {
   font-size: 13px;
   font-weight: 800;
@@ -394,6 +431,20 @@
 .surfaceFootnote {
   font-size: 11px;
   color: var(--bthwani-control-panel-text-soft);
+}
+
+.surfaceMetaWrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.surfaceActionWrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .selectableReasonItem {

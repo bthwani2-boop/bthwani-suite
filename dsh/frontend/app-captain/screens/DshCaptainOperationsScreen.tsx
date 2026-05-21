@@ -3,10 +3,28 @@ import { Box, KeyValueList, ListItem, SectionHeader, Surface, Text, TextField, B
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../data/captain-orders.preview-data';
 import type { DshCaptainProfileSnapshot } from '../data/captain-profile.preview-data';
+import { getDshCaptainFlowPolicy, type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import {
 	getOperationsSupportFlowsForSurface,
 	type DshOperationsSupportFlowId,
 } from '../../shared/operations-support.preview';
+
+function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
+	if (policy === 'detail-on-open') {
+		return 'تفاصيل عند الفتح';
+	}
+
+	if (policy === 'evidence-on-open') {
+		return 'أدلة عند الفتح';
+	}
+
+	if (policy === 'summary-only') {
+		return 'ملخص أولًا';
+	}
+
+	return 'سياسة من السجل';
+}
 
 type DshCaptainFlowKey = 'entry' | 'orders' | 'finance' | 'profile' | 'operations';
 
@@ -252,11 +270,32 @@ const captainSupportFlowToScreenId: Partial<Record<DshOperationsSupportFlowId, C
 	'store-wait-time': 'order-pickup',
 };
 
+const captainSupportFlowToRegistryFlowId: Partial<Record<DshOperationsSupportFlowId, DshCaptainRegistryFlowId>> = {
+	'courier-not-arrived': 'captain-order-pickup',
+	'customer-not-responding': 'captain-map-navigation',
+	'handoff-mismatch': 'captain-order-pickup',
+	'delivery-failed': 'captain-map-navigation',
+	'proof-of-delivery': 'captain-proof-of-delivery',
+	'store-wait-time': 'captain-order-pickup',
+};
+
+const CAPTAIN_BOUND_REGISTRY_FLOW_IDS: readonly DshCaptainRegistryFlowId[] = [
+	'captain-order-pickup',
+	'captain-proof-of-delivery',
+	'captain-map-navigation',
+];
+
 const CAPTAIN_OPERATIONAL_SUPPORT_ITEMS = getOperationsSupportFlowsForSurface('app-captain').map((flow) => ({
 	flowId: flow.flowId,
 	title: flow.title,
 	subtitle: flow.description,
-	meta: `المالك: ${flow.ownerLabel} · التالي: ${flow.nextAction}`,
+	meta: (() => {
+		const registryFlowId = captainSupportFlowToRegistryFlowId[flow.flowId];
+		const summary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
+		const policy = registryFlowId ? getDshCaptainFlowPolicy(registryFlowId) : undefined;
+		const forbiddenPreview = summary?.forbiddenActions[0] ?? 'لا يوجد';
+		return `الواجهة: ${summary?.ownerSurface ?? 'app-captain'} · القرار: ${summary?.escalationOwner ?? 'control-panel'} · ${resolveCaptainPolicyLabel(policy)} · الممنوع: ${forbiddenPreview}`;
+	})(),
 	badgeLabel: flow.severity === 'danger' ? 'حرج' : flow.severity === 'warning' ? 'يتطلب قرارًا' : 'متابعة',
 	screenId: captainSupportFlowToScreenId[flow.flowId] ?? 'orders-list',
 }));
@@ -354,6 +393,29 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 				</Box>
 				<Button label={resolvePrimaryActionLabel(ACTIVE_ORDER_PREVIEW.stage)} onPress={() => onOpenScreen?.(currentActionScreenId)} />
 				<Button label="فتح لقطة الطلب" tone="secondary" onPress={() => onOpenScreen?.('order-get')} />
+			</Surface>
+
+			<Surface tone="inset" gap={3}>
+				<SectionHeader title="سياسات الربط الحي" subtitle="هذه الشاشات مرتبطة الآن مباشرة بسجل DSH المركزي، وليست وصفًا Preview فقط." />
+				<Box gap={2}>
+					{CAPTAIN_BOUND_REGISTRY_FLOW_IDS.map((flowId) => {
+						const summary = getDshFlowPolicySummary(flowId);
+						const policy = getDshCaptainFlowPolicy(flowId);
+						if (!summary) {
+							return null;
+						}
+
+						return (
+							<ListItem
+								key={flowId}
+								title={summary.flowId}
+								subtitle={summary.nextPolicyActionPreview}
+								meta={`القرار: ${summary.escalationOwner ?? 'control-panel'} · ${resolveCaptainPolicyLabel(policy)}`}
+								badgeLabel={summary.visibility === 'contextual' ? 'سياقي' : summary.visibility}
+							/>
+						);
+					})}
+				</Box>
 			</Surface>
 
 			<Surface tone="raised" gap={3}>

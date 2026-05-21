@@ -353,6 +353,7 @@ export type {
   DshFlowVisibility,
   DshOnDemandPolicy,
   DshFlowRegistryEntry,
+  DshFlowPolicySummary,
   DshFlowRegistryStats,
   DshFlowRegistryValidationResult,
 } from './dsh-flow-registry';
@@ -361,11 +362,14 @@ export {
   getDshFlowById,
   getDshFlowsForSurface,
   getDshVisibleFlowsForSurface,
+  getDshRenderableFlowsForSurface,
   getDshPrimaryFlowsForSurface,
   getDshContextualFlowsForSurface,
   isDshHiddenCompatFlow,
   getDshEscalationFlows,
+  getDshEscalationFlowsForSurface,
   getDshFinancePreviewFlows,
+  getDshFlowPolicySummary,
   getDshFlowRegistryStats,
   getDshFlowRegistryValidationSummary,
 } from './dsh-flow-registry';
