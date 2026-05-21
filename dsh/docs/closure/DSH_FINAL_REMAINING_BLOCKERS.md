@@ -11,14 +11,14 @@ This file documents all blockers that prevent full runtime closure. Each blocker
 
 | Blocker | Contract | Gap | Affected file | Notes |
 |---|---|---|---|---|
-| Client order cancellation API not proven | CG-009 (POST /dsh/orders/:orderId/cancel) | ML-007 | app-client/sheets/CancelOrderSheet.tsx | Sheet exported; not mounted; WLT refund handoff required |
+| Client order cancellation API not proven | CG-009 (POST /dsh/orders/:orderId/cancel) | ML-007 | app-client/sheets/CancelOrderSheet.tsx | Sheet is mounted from OrdersTrackingScreens as a blocked confirmation flow; WLT refund handoff still required |
 | Payment result from WLT not proven | CG-004 / CG-005 | ML-006 ML-009 | DshCheckoutIntentScreen.tsx | order-created state present; error state now explicit; WLT callback not implemented |
 | Refund status WLT bridge not ready | WLT refund bridge (CG-035) | ML-008 | OrdersTrackingScreens.tsx | DSH must show WLT refund status read-only; WLT must expose endpoint |
-| Partner settlement WLT bridge not ready | CG-033 | ML-040 | finance/PartnerSettlementWorkspace.tsx | Skeleton exported; mount when CG-033 proven |
-| Captain payout WLT bridge not ready | CG-034 | ML-041 | finance/CaptainPayoutWorkspace.tsx | Skeleton exported; mount when CG-034 proven |
-| Refund queue WLT bridge not ready | CG-035 + CG-030 | ML-042 | finance/RefundQueueWorkspace.tsx | Two contracts needed |
-| Support ticket API not proven | CG-032 (READ+STREAM) | ML-046..ML-052 | control-panel/support/* | 7 support screens exported; none mounted |
-| Escalation queue API not proven | CG-032 (READ+STREAM) | ML-049 | control-panel/support/SupportEscalationQueueScreen.tsx | Field escalation → ops inbox loop broken until proven |
+| Partner settlement WLT bridge not ready | CG-033 | ML-040 | finance/PartnerSettlementWorkspace.tsx | Mounted in FinanceHubScreen as read-only WLT bridge preview; live bridge still blocked |
+| Captain payout WLT bridge not ready | CG-034 | ML-041 | finance/CaptainPayoutWorkspace.tsx | Mounted in FinanceHubScreen as read-only WLT bridge preview; live bridge still blocked |
+| Refund queue WLT bridge not ready | CG-035 + CG-030 | ML-042 | finance/RefundQueueWorkspace.tsx | Mounted in FinanceHubScreen as blocked bridge preview; two contracts are still needed |
+| Support ticket API not proven | CG-032 (READ+STREAM) | ML-046..ML-052 | control-panel/support/* | Support hub now mounts blocked detail/SLA/escalation/messaging workspaces, but the ticket runtime contract is still unproven |
+| Escalation queue API not proven | CG-032 (READ+STREAM) | ML-049 | control-panel/support/SupportEscalationQueueScreen.tsx | Field escalation is visible in the mounted ops queue preview; live inbox/stream behavior remains blocked until CG-032 is proven |
 
 ## P0 WLT Bridge Blockers
 

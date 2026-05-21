@@ -62,7 +62,7 @@ export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenPr
           { id: 'closed', label: 'مغلقة', value: '٣٨', tone: 'neutral' },
           { id: 'surged', label: 'متاجر مضغوطة', value: '١٢', tone: 'warning' },
           { id: 'delay', label: 'تأخير التجهيز', value: '٥', tone: 'danger' },
-          { id: 'store-delivery', label: 'توصيل المتجر', value: '٢', tone: 'info' },
+          { id: 'store-delivery', label: 'توصيل المتجر', value: '٢', tone: 'success' },
         ]}
       />
 

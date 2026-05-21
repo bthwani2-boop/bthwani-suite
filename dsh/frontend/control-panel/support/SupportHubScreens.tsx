@@ -184,7 +184,7 @@ function buildSupportRow(seed: SupportRowSeed): SupportRow {
   };
 }
 
-const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
+const supportRowSeeds = [
   {
     id: 'SUP-401',
     flowId: 'delivery-failed',
@@ -237,7 +237,9 @@ const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
     primaryActionLabel: 'تثبيت الموعد',
     secondaryActionLabel: 'فتح الأدلة',
   },
-].map(buildSupportRow);
+] satisfies readonly SupportRowSeed[];
+
+const SUPPORT_ROWS: ReadonlyArray<SupportRow> = supportRowSeeds.map(buildSupportRow);
 
 function filterRows(tab: SupportTab, lane: string) {
   if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging') {

@@ -1342,7 +1342,10 @@ function DshStoreGetScreenContent({
                           </View>
                         </View>
                         <View style={[styles.heroLogoWrap, { backgroundColor: stylesTokens.white, borderColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
-                          <Image source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')} style={styles.heroLogoImage} />
+                          <Image
+                            source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
+                            style={styles.heroLogoImage}
+                          />
                         </View>
                       </View>
 

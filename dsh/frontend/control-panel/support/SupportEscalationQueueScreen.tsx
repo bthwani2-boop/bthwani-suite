@@ -30,6 +30,7 @@ type EscalationRow = {
 
 const SUPPORT_GOVERNANCE = getDshControlPanelGovernanceEntry('support');
 const FINANCE_GOVERNANCE = getDshControlPanelGovernanceEntry('finance');
+type EscalationSeedRow = Omit<EscalationRow, 'governanceSectionLabel' | 'policyLabel' | 'financeReference'>;
 
 function resolveSupportPolicyLabel(policy?: string): string {
   if (policy === 'evidence-on-open') {
@@ -55,7 +56,7 @@ function resolveSupportPolicyLabel(policy?: string): string {
   return 'سياسة مرتبطة بالسجل';
 }
 
-const placeholderRows: readonly EscalationRow[] = [
+const placeholderRowSeeds = [
   {
     id: 'esc-1',
     ticketCode: '#TKT-891',
@@ -100,7 +101,9 @@ const placeholderRows: readonly EscalationRow[] = [
     slaLabel: '45 دقيقة',
     risk: 'warning',
   },
-].map((row) => {
+ ] satisfies readonly EscalationSeedRow[];
+
+const placeholderRows: readonly EscalationRow[] = placeholderRowSeeds.map((row) => {
   const summary = getDshFlowPolicySummary(row.registryFlowId);
   const governanceEntry = findDshControlPanelGovernanceSectionByFlowId(row.registryFlowId);
 

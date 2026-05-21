@@ -81,6 +81,10 @@ type CaptainGpsStatus = 'ready' | 'limited' | 'offline' | 'disabled';
 type ActiveOrderPhase = 'pickup' | 'delivery';
 // Two strictly-separated modes. store_courier_mode hides all BThwani captain state.
 type CaptainAppMode = 'bthwani_captain_mode' | 'store_courier_mode';
+type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivery_failed' | 'delivered';
+type DshCaptainPodState = NonNullable<React.ComponentProps<typeof DshCaptainPoDSubmissionScreen>['state']>;
+
+const CAPTAIN_POD_PLACEHOLDER_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+kG7wAAAAASUVORK5CYII=';
 
 function getRouteForCommandTarget(target: DshCaptainCommandTarget): DshCaptainRoute {
   if (target === 'entry') {
@@ -317,7 +321,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const [captainAppMode, setCaptainAppMode] = React.useState<CaptainAppMode>('bthwani_captain_mode');
   const [activeOrderDraft, setActiveOrderDraft] = React.useState('');
   const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>(compactOrderChatSeed);
-  const routeHistoryRef = React.useRef<CaptainRoute[]>(['home']);
+  const [storeCourierStage, setStoreCourierStage] = React.useState<StoreCourierStage>('ready_for_pickup');
+  const [captainPodState, setCaptainPodState] = React.useState<DshCaptainPodState>('ready');
+  const [captainPodPhotoUri, setCaptainPodPhotoUri] = React.useState<string | undefined>();
+  const routeHistoryRef = React.useRef<DshCaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
   const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021']!;
@@ -401,6 +408,19 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     setActiveOrderMessages(compactOrderChatSeed);
   }, [activeOrderId, inboxState]);
 
+  React.useEffect(() => {
+    setCaptainPodState('ready');
+    setCaptainPodPhotoUri(undefined);
+  }, [activeOrderId]);
+
+  React.useEffect(() => {
+    if (captainAppMode !== 'store_courier_mode') {
+      setStoreCourierStage('ready_for_pickup');
+      setCaptainPodState('ready');
+      setCaptainPodPhotoUri(undefined);
+    }
+  }, [captainAppMode]);
+
   const openOrderDetail = (orderId: string) => {
     setActiveOrderId(orderId);
     setRoute('detail');
@@ -410,13 +430,39 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     setRoute('account');
   };
 
-  const openCaptainAccountSection = (sectionRoute: CaptainRoute) => {
+  const openCaptainAccountSection = (sectionRoute: DshCaptainRoute) => {
     setRoute(sectionRoute);
   };
 
   const openSupportDirectory = () => {
     setRoute('support-directory');
   };
+
+  const capturePodPhotoPreview = React.useCallback(() => {
+    setCaptainPodPhotoUri(CAPTAIN_POD_PLACEHOLDER_URI);
+    setCaptainPodState('ready');
+  }, []);
+
+  const confirmPodSubmission = React.useCallback(() => {
+    if (!captainPodPhotoUri) {
+      return;
+    }
+
+    setCaptainPodState('success');
+
+    if (captainAppMode === 'store_courier_mode') {
+      setStoreCourierStage('delivered');
+      setInboxState('delivered');
+    }
+  }, [captainAppMode, captainPodPhotoUri]);
+
+  const reportPodFailure = React.useCallback(() => {
+    setCaptainPodState('retry-required');
+
+    if (captainAppMode === 'store_courier_mode') {
+      setStoreCourierStage('delivery_failed');
+    }
+  }, [captainAppMode]);
 
   const openCaptainSupportScreen = (screenId: CaptainSupportRoute) => {
     setSelectedSupportScreen(screenId);
@@ -599,12 +645,18 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     if (route === 'pod-submission') {
       return (
         <DshCaptainPoDSubmissionScreen
-          state="ready"
+          state={captainPodState}
           orderId={activeOrderId}
-          onCapturePhoto={() => {}}
-          onConfirm={() => setRoute('inbox')}
-          onReportFailure={() => setRoute('inbox')}
-          onBack={goBack}
+          onCapturePhoto={capturePodPhotoPreview}
+          onConfirm={confirmPodSubmission}
+          onReportFailure={reportPodFailure}
+          onBack={captainPodState === 'success'
+            ? () => {
+                setCaptainPodState('ready');
+                setRoute('home');
+              }
+            : goBack}
+          photoUri={captainPodPhotoUri}
         />
       );
     }
@@ -876,6 +928,75 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
               };
 
   const isStoreCourierMode = captainAppMode === 'store_courier_mode';
+  const storeCourierMeta = React.useMemo(() => {
+    if (storeCourierStage === 'picked_up') {
+      return {
+        badgeLabel: 'تم الاستلام',
+        badgeTone: 'brand' as const,
+        stageLabel: 'الطلب معك ويحتاج بدء التوصيل',
+        distanceLabel: '1.6 كم',
+        helperText: 'أكّد بدء التوصيل قبل الوصول إلى العميل.',
+      };
+    }
+
+    if (storeCourierStage === 'out_for_delivery') {
+      return {
+        badgeLabel: 'في الطريق',
+        badgeTone: 'warning' as const,
+        stageLabel: 'الطلب في الطريق إلى العميل',
+        distanceLabel: '0.9 كم',
+        helperText: 'بعد الوصول افتح إثبات التسليم أو صنّف الحالة كتعذر توصيل.',
+      };
+    }
+
+    if (storeCourierStage === 'delivery_failed') {
+      return {
+        badgeLabel: 'تعذر التوصيل',
+        badgeTone: 'danger' as const,
+        stageLabel: 'الحالة تحتاج دعمًا أو إعادة محاولة',
+        distanceLabel: '—',
+        helperText: 'افتح الدعم لتسجيل الاستثناء أو أعد المحاولة بعد التواصل مع العميل.',
+      };
+    }
+
+    if (storeCourierStage === 'delivered') {
+      return {
+        badgeLabel: 'مسلّم',
+        badgeTone: 'success' as const,
+        stageLabel: 'تم التسليم وتوثيق الإثبات',
+        distanceLabel: '—',
+        helperText: 'يمكنك العودة للسجل أو مراجعة إثبات التسليم عند الحاجة.',
+      };
+    }
+
+    return {
+      badgeLabel: 'جاهز للاستلام',
+      badgeTone: 'success' as const,
+      stageLabel: 'جاهز للاستلام من الفرع',
+      distanceLabel: '2.3 كم',
+      helperText: 'هذا الطلب يخص وضع موصل المتجر فقط ولا يشارك طابور كابتن بثواني.',
+    };
+  }, [storeCourierStage]);
+
+  const markStoreCourierPickedUp = React.useCallback(() => {
+    setStoreCourierStage('picked_up');
+    setActiveOrderPhase('delivery');
+  }, []);
+
+  const markStoreCourierOutForDelivery = React.useCallback(() => {
+    setStoreCourierStage('out_for_delivery');
+    setActiveOrderPhase('delivery');
+  }, []);
+
+  const openStoreCourierProof = React.useCallback(() => {
+    setCaptainPodState('ready');
+    setRoute('pod-submission');
+  }, []);
+
+  const markStoreCourierDeliveryFailed = React.useCallback(() => {
+    setStoreCourierStage('delivery_failed');
+    openSupportDirectory();
+  }, [openSupportDirectory]);
 
   const topBar = (
     <ModernPremiumHeader
@@ -1239,26 +1360,61 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
         <Text role="label" tone="muted">الطلب المسند</Text>
         <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
           <Text role="bodyStrong">ORD-4401</Text>
-          <Badge label="جاهز للاستلام" tone="success" />
+          <Badge label={storeCourierMeta.badgeLabel} tone={storeCourierMeta.badgeTone} />
         </Box>
         <KeyValueList
           items={[
             { label: 'المتجر', value: 'فرع الياسمين' },
-            { label: 'المرحلة', value: 'جاهز للاستلام من الفرع' },
-            { label: 'المسافة', value: '2.3 كم' },
+            { label: 'المرحلة', value: storeCourierMeta.stageLabel },
+            { label: 'المسافة', value: storeCourierMeta.distanceLabel },
           ]}
         />
+        <Surface tone="inset" padding={2} gap={1} radiusToken="lg">
+          <Text role="caption" tone="muted">{storeCourierMeta.helperText}</Text>
+        </Surface>
         <Box gap={2}>
-          <Button label="استلام من الفرع" tone="success" onPress={() => {}} />
-          <Button label="بدأ التوصيل" tone="primary" onPress={() => {}} />
-          <Box layoutDirection="row" gap={2}>
-            <Box style={{ flex: 1 }}>
-              <Button label="تم التوصيل" tone="ghost" onPress={() => {}} />
+          {storeCourierStage === 'ready_for_pickup' ? (
+            <>
+              <Button label="استلام من الفرع" tone="success" onPress={markStoreCourierPickedUp} />
+              <Button label="فتح الدعم" tone="secondary" onPress={openSupportDirectory} />
+            </>
+          ) : null}
+          {storeCourierStage === 'picked_up' ? (
+            <>
+              <Button label="بدأ التوصيل" tone="primary" onPress={markStoreCourierOutForDelivery} />
+              <Button label="الرجوع إلى الاستلام" tone="secondary" onPress={() => setStoreCourierStage('ready_for_pickup')} />
+            </>
+          ) : null}
+          {storeCourierStage === 'out_for_delivery' ? (
+            <Box layoutDirection="row" gap={2}>
+              <Box style={{ flex: 1 }}>
+                <Button label="تم التوصيل" tone="ghost" onPress={openStoreCourierProof} />
+              </Box>
+              <Box style={{ flex: 1 }}>
+                <Button label="تعذر التوصيل" tone="danger" onPress={markStoreCourierDeliveryFailed} />
+              </Box>
             </Box>
-            <Box style={{ flex: 1 }}>
-              <Button label="تعذر التوصيل" tone="danger" onPress={() => {}} />
+          ) : null}
+          {storeCourierStage === 'delivery_failed' ? (
+            <Box layoutDirection="row" gap={2}>
+              <Box style={{ flex: 1 }}>
+                <Button label="إعادة المحاولة" tone="secondary" onPress={() => setStoreCourierStage('out_for_delivery')} />
+              </Box>
+              <Box style={{ flex: 1 }}>
+                <Button label="الدعم" tone="danger" onPress={openSupportDirectory} />
+              </Box>
             </Box>
-          </Box>
+          ) : null}
+          {storeCourierStage === 'delivered' ? (
+            <Box layoutDirection="row" gap={2}>
+              <Box style={{ flex: 1 }}>
+                <Button label="عرض إثبات التسليم" tone="secondary" onPress={openStoreCourierProof} />
+              </Box>
+              <Box style={{ flex: 1 }}>
+                <Button label="فتح السجل" tone="ghost" onPress={() => openCaptainAccountSection('account-orders')} />
+              </Box>
+            </Box>
+          ) : null}
         </Box>
       </Surface>
 
@@ -1466,8 +1622,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       launcherActive={route === 'home'}
       onLauncherPress={() => setRoute('home')}
       onSelect={(id: string) => {
-        if (id === 'history') { /* TBD: store order history */ }
-        if (id === 'earnings') { /* TBD: store earnings detail */ }
+        if (id === 'history') openCaptainAccountSection('account-orders');
+        if (id === 'earnings') openCaptainAccountSection('account-finance');
         if (id === 'support') openSupportDirectory();
         if (id === 'profile') openCaptainAccount();
       }}

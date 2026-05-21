@@ -253,12 +253,11 @@ export function MarketingMediaReviewCommandDeckScreen() {
           ) : null}
 
           {(selected.entityType === 'product-media' || selected.entityType === 'store') && selected.stage === 'marketing-review' ? (
-            <Button
-              label="تحسين الصورة"
-              tone="ghost"
-              onPress={() => undefined}
-              disabled
-            />
+            <Surface tone="inset" padding={2}>
+              <Text role="caption" tone="muted">
+                تحسين الصورة يظل معاينة فقط حتى تثبت أداة التحسين أو مزود الوسائط المعتمد.
+              </Text>
+            </Surface>
           ) : null}
         </Surface>
       </Box>

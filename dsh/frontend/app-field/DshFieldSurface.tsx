@@ -14,9 +14,14 @@ import { readFieldStoresLocal, writeFieldStoresLocal } from './data/field-onboar
 import {
   createManualFieldStore,
   submitFieldStoreForReview,
+  touchFieldStoreDraft,
   type FieldStoreFile,
 } from './data/field-stores.preview-data';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
+
+type DshFieldReadinessEscalationState = NonNullable<React.ComponentProps<typeof DshFieldReadinessEscalationScreen>['state']>;
+
+const DEFAULT_FIELD_ESCALATION_TARGET_ID = 'partner-management';
 
 function isSameRoute(left: DshFieldRouteState, right: DshFieldRouteState) {
   if (left.kind !== right.kind) {
@@ -55,6 +60,8 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
   const [stores, setStores] = React.useState<FieldStoreFile[]>(() => readFieldStoresLocal());
   const [routeStack, setRouteStack] = React.useState<DshFieldRouteState[]>([{ kind: 'stores' }]);
   const [visitValues, setVisitValues] = React.useState<Record<string, DshFieldStoreVisitValues>>({});
+  const [selectedEscalationTargetByStore, setSelectedEscalationTargetByStore] = React.useState<Record<string, string>>({});
+  const [readinessEscalationStateByStore, setReadinessEscalationStateByStore] = React.useState<Record<string, DshFieldReadinessEscalationState>>({});
 
   const route = routeStack[routeStack.length - 1] ?? { kind: 'stores' };
   const activeStore = route.kind === 'onboarding' || route.kind === 'visit'
@@ -254,21 +261,63 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
   }
 
   if (route.kind === 'readiness-escalation' && activeStore) {
+    const selectedEscalationTargetId = selectedEscalationTargetByStore[activeStore.id] ?? DEFAULT_FIELD_ESCALATION_TARGET_ID;
+    const readinessEscalationState = readinessEscalationStateByStore[activeStore.id] ?? 'ready';
+    const escalationTargets = [
+      { id: 'partner-management', label: 'قسم الشركاء (Partner Management)' },
+      { id: 'control-panel', label: 'لوحة التحكم المركزية (Control Panel)' },
+      { id: 'marketing', label: 'فريق التسويق (Marketing)' },
+    ].map((target) => ({
+      ...target,
+      isSelected: target.id === selectedEscalationTargetId,
+    }));
+
     content = (
       <DshFieldReadinessEscalationScreen
+        state={readinessEscalationState}
         storeName={activeStore.name}
         missingRequirements={[
           'التحقق من إعداد موصل المتجر إذا طلب الشريك تفعيل توصيل المتجر (partner_delivery)',
         ]}
-        escalationTargets={[
-          { id: 'partner-management', label: 'قسم الشركاء (Partner Management)', isSelected: true },
-          { id: 'control-panel', label: 'لوحة التحكم المركزية (Control Panel)', isSelected: false },
-          { id: 'marketing', label: 'فريق التسويق (Marketing)', isSelected: false },
-        ]}
-        onSelectTarget={() => undefined}
-        onSubmit={() => resetToStores()}
+        escalationTargets={escalationTargets}
+        onSelectTarget={(targetId) => {
+          setSelectedEscalationTargetByStore((current) => ({
+            ...current,
+            [activeStore.id]: targetId,
+          }));
+        }}
+        onSubmit={(reason) => {
+          const selectedTarget = escalationTargets.find((target) => target.id === selectedEscalationTargetId);
+          const selectedTargetLabel = selectedTarget?.label ?? 'قسم الشركاء (Partner Management)';
+
+          updateStore(activeStore.id, (store) =>
+            touchFieldStoreDraft({
+              ...store,
+              lockedStatus: 'follow-up-required',
+              statusNoteOverride: `بانتظار رد ${selectedTargetLabel}`,
+              reviewFeedback: reason.trim() || store.reviewFeedback,
+              draft: {
+                ...store.draft,
+                review: {
+                  ...store.draft.review,
+                  partnerReviewNote: reason.trim() || store.draft.review.partnerReviewNote,
+                },
+              },
+            }, `تم تصعيد عائق الجاهزية إلى ${selectedTargetLabel}.`),
+          );
+
+          setReadinessEscalationStateByStore((current) => ({
+            ...current,
+            [activeStore.id]: 'pending-response',
+          }));
+        }}
         onBack={popRoute}
-        onRetry={() => pushRoute({ kind: 'readiness-escalation', storeId: activeStore.id })}
+        onRetry={() => {
+          setReadinessEscalationStateByStore((current) => ({
+            ...current,
+            [activeStore.id]: 'ready',
+          }));
+        }}
       />
     );
   }

@@ -20,7 +20,7 @@ export type {
   PartnerOffer,
   PartnerOfferKind,
   PartnerOfferSource as CommercialPartnerOfferSource,
-  PartnerOfferTarget,
+  PartnerOfferTarget as CommercialPartnerOfferTarget,
   CommercialCoupon,
   CommercialCampaign,
   CommercialBadge as CommercialContractBadge,

@@ -79,6 +79,8 @@ export function DshFieldReadinessEscalationScreen({
           stateId="loading"
           title="بانتظار رد الفريق المختص"
           description="تم إرسال بلاغ عدم الجاهزية. سيتم إعلامك عند صدور القرار."
+          actionLabel="العودة"
+          onActionPress={onBack}
         />
       </Surface>
     );

@@ -306,6 +306,7 @@ export const DSH_PARTNER_ONBOARDING_JOURNEY: readonly DshPartnerJourneyStep[] = 
       'رؤية notes الاعتماد الداخلية',
       'تحميل payload كامل للمتجر دائماً',
     ],
+    nextStepIds: [],
     clientVisibleWhen: 'stage = client-visible فقط — canRenderInClientSurface() يفرض هذا',
     notes: 'يُطبَّق عبر canRenderInClientSurface() في workflow.ts. الفلترة في طبقة الاستدعاء لا في الشاشة مباشرة.',
   },

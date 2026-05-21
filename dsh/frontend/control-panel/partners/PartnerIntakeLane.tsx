@@ -12,10 +12,26 @@ export type PartnerIntakeLaneProps = {
   state?: 'ready' | 'loading' | 'error';
   hubHref: string;
   onRetry?: () => void;
+  onOpenHubItem?: (itemId: string, intent: 'approve' | 'fix' | 'inspect') => void;
 };
 
-export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: PartnerIntakeLaneProps) {
+export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHubItem }: PartnerIntakeLaneProps) {
   const { theme } = useTheme();
+  const openHubItem = React.useCallback((itemId: string, intent: 'approve' | 'fix' | 'inspect') => {
+    if (onOpenHubItem) {
+      onOpenHubItem(itemId, intent);
+      return;
+    }
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const url = new URL(hubHref, window.location.origin);
+    url.searchParams.set('focus', itemId);
+    url.searchParams.set('intent', intent);
+    window.location.assign(`${url.pathname}${url.search}${url.hash}`);
+  }, [hubHref, onOpenHubItem]);
   if (state === 'loading') {
     return (
       <Box padding={10} align="center">
@@ -76,13 +92,13 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry }: Partner
               sla={`${item.categoryLabel} · ${item.ownerLabel}`}
               primaryAction={{
                 label: item.queue === 'offer-approval' ? 'اعتماد العرض' : item.queue === 'partner-review' ? 'إنشاء الكود' : 'إطلاق نهائي',
-                onAction: () => {}
+                onAction: () => openHubItem(item.id, 'approve')
               }}
               secondaryAction={{
                 label: 'تعديل',
-                onAction: () => {}
+                onAction: () => openHubItem(item.id, 'fix')
               }}
-              onInspect={() => {}}
+              onInspect={() => openHubItem(item.id, 'inspect')}
             />
           );
         })}

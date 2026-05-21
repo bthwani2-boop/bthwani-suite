@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Card, Chip, Icon, MobileScrollView, SearchField, SheetFrame, StateView, Surface, Text, resolveRowDirection, useBThwaniAppearance, useDirection } from '@bthwani/ui-kit';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
+import { AcceptanceTimerSheet } from '../sheets';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
 // ML-021: added captain_assigned / captain_arriving so partner can track handoff event
@@ -404,7 +405,7 @@ function OrderCard({
         )}
 
         {/* Row 3: Action Highlight */}
-        <Box style={{ backgroundColor: tokens.neutralLight || '#f8f9fa', borderRadius: 8, padding: 8, borderLeftWidth: 4, borderLeftColor: tokens[statusTone] || tokens.brand }}>
+        <Box style={{ backgroundColor: tokens.neutralLight, borderRadius: 8, padding: 8, borderLeftWidth: 4, borderLeftColor: tokens[statusTone] || tokens.brand }}>
           <Text role="bodySm" tone={statusTone} style={{ fontWeight: '700' }}>
             الإجراء المطلوب: {item.nextActionLabel}
           </Text>
@@ -435,7 +436,7 @@ function OrderCard({
 
         {/* Row 6: Expandable Details (Inline Block) */}
         {expanded && (
-          <Box gap={3} style={{ paddingTop: 12, borderTopWidth: 1, borderTopColor: tokens.border || '#e9ecef' }}>
+          <Box gap={3} style={{ paddingTop: 12, borderTopWidth: 1, borderTopColor: tokens.border }}>
             <Box gap={1}>
               <Text role="caption" tone="muted">رمز الطلب: {item.orderCode}</Text>
               <Text role="caption" tone="muted">الفرع: {item.branchLabel}</Text>
@@ -847,13 +848,18 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
       {/* ML-016: AcceptanceTimerSheet — confirms acceptance before calling onOpenOrderAction */}
       <AcceptanceTimerSheet
         visible={acceptSheetVisible}
-        orderCode={filteredItems.find((o) => o.id === acceptingOrderId)?.orderCode ?? ''}
-        onConfirm={() => {
+        orderId={acceptingOrderId ?? ''}
+        orderSummary={filteredItems.find((o) => o.id === acceptingOrderId)?.orderCode ?? 'طلب جديد'}
+        onAccept={() => {
           setAcceptSheetVisible(false);
           if (acceptingOrderId) onOpenOrderAction?.('accept', acceptingOrderId);
           setAcceptingOrderId(null);
         }}
         onDecline={() => {
+          setAcceptSheetVisible(false);
+          setAcceptingOrderId(null);
+        }}
+        onClose={() => {
           setAcceptSheetVisible(false);
           setAcceptingOrderId(null);
         }}
@@ -893,25 +899,6 @@ export function PartnerOrdersInboxScreen({ state = 'ready', items, searchMode, o
       }}
       onRetry={onRetry}
     />
-  );
-}
-
-// ML-016: AcceptanceTimerSheet — partner confirms order acceptance before SLA timer expires
-export function AcceptanceTimerSheet({ visible, orderCode, onConfirm, onDecline }: { visible: boolean; orderCode: string; onConfirm: () => void; onDecline: () => void }) {
-  if (!visible) return null;
-  return (
-    <SheetFrame visible={visible} title="قبول الطلب" onClose={onDecline}>
-      <Box gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">الطلب: {orderCode}</Text>
-          <Text role="bodySm" tone="muted">يُرجى تأكيد الاستلام قبل انتهاء مهلة القبول. الرفض يُعيد الطلب للتوزيع.</Text>
-        </Box>
-        <Box gap={2}>
-          <Button label="قبول الطلب" onPress={onConfirm} />
-          <Button label="رفض" tone="secondary" onPress={onDecline} />
-        </Box>
-      </Box>
-    </SheetFrame>
   );
 }
 

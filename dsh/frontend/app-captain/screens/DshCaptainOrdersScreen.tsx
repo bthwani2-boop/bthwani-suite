@@ -1128,24 +1128,6 @@ export function CaptainPickupConfirmSheet({ visible, orderTitle, onConfirm, onCa
 	);
 }
 
-// ML-024: OfferDeclineSheet — captain confirms offer decline with reason before calling onDecline
-export function OfferDeclineSheet({ visible, orderTitle, onDecline, onCancel }: { visible: boolean; orderTitle: string; onDecline: (reason: string) => void; onCancel: () => void; }) {
-	const [reason, setReason] = React.useState('');
-	if (!visible) return null;
-
-	return (
-		<Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-			<SectionHeader title="رفض العرض" subtitle="أدخل سبب الرفض قبل تمرير العرض للكابتن التالي." />
-			<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
-			<TextField label="سبب الرفض" placeholder="مثال: بُعد الموقع، طاقة ممتلئة..." value={reason} onChangeText={setReason} />
-			<Box gap={2}>
-				<Button label="تأكيد الرفض" tone="danger" disabled={!reason.trim()} onPress={() => onDecline(reason)} />
-				<Button label="إلغاء" tone="ghost" onPress={onCancel} />
-			</Box>
-		</Surface>
-	);
-}
-
 export function CaptainDeliveryConfirmSheet({ visible, orderTitle, onConfirm, onCancel }: { visible: boolean; orderTitle: string; onConfirm: () => void; onCancel: () => void; }) {
 	if (!visible) {
 		return null;
