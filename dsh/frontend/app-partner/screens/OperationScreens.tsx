@@ -1,12 +1,20 @@
 import React from 'react';
 import { Box, Button, Chip, ListItem, Surface, Text, TextField } from '@bthwani/ui-kit';
-import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
+import {
+  mapDshPartnerOperationalFlowToSupportRoute,
+  type DshPartnerOperationalFlowId,
+  type DshPartnerSupportIssueCategoryId,
+} from '../dsh-partner.types';
 import { DshPartnerInventoryActionPanel, type PartnerInventoryFlowId } from '../parts/PartnerInventoryActionPanel';
 import { DshPartnerOnboardingActionPanel, type PartnerOnboardingFlowId } from '../parts/PartnerOnboardingActionPanel';
 import { DshPartnerOrderActionPanel, type PartnerOrderActionFlowId } from '../parts/PartnerOrderActionPanel';
 import { DshPartnerOrderAlertsPanel } from '../parts/PartnerOrderAlertsPanel';
 import { DshPartnerOrderConversationPanel } from '../parts/PartnerOrderConversationPanel';
-import { DshPartnerOrderIssuePanel, type PartnerOrderIssueFlowId } from '../parts/PartnerOrderIssuePanel';
+import {
+  DshPartnerOrderIssuePanel,
+  resolvePartnerOrderIssueDefaultCategory,
+  type PartnerOrderIssueFlowId,
+} from '../parts/PartnerOrderIssuePanel';
 import { DshPartnerVideoSubmissionPanel } from '../parts/PartnerVideoSubmissionPanel';
 
 function OperationHeader({
@@ -208,12 +216,9 @@ export function ConversationScreen({ activeFlowId = 'chat-send', onBack, onOpenS
 
       <DshPartnerOrderConversationPanel
         onOpenFlow={(flowId) => {
-          if (flowId === 'order-chat-read-ack') {
-            onOpenScreen?.('chat-read-ack');
-            return;
-          }
-          if (flowId === 'order-chat-send') {
-            onOpenScreen?.('chat-send');
+          const routeId = mapDshPartnerOperationalFlowToSupportRoute(flowId);
+          if (routeId) {
+            onOpenScreen?.(routeId);
           }
         }}
       />
@@ -292,12 +297,20 @@ export function InventoryActionScreen({ activeFlowId = 'inventory-adjust', onBac
 export type NotificationsScreenProps = {
   activeOrderId?: string;
   onOpenInbox?: () => void;
-  onOpenNextOrder?: () => void;
+  onOpenOrderSupport?: (orderId: string) => void;
+  onOpenAlertsSupport?: (flowId: DshPartnerOperationalFlowId) => void;
   onBack?: () => void;
   onRetry?: () => void;
 };
 
-export function NotificationsScreen({ activeOrderId, onOpenInbox, onOpenNextOrder, onBack, onRetry }: NotificationsScreenProps) {
+export function NotificationsScreen({
+  activeOrderId,
+  onOpenInbox,
+  onOpenOrderSupport,
+  onOpenAlertsSupport,
+  onBack,
+  onRetry,
+}: NotificationsScreenProps) {
   return (
     <Box gap={4}>
       <OperationHeader
@@ -313,8 +326,8 @@ export function NotificationsScreen({ activeOrderId, onOpenInbox, onOpenNextOrde
 
       <DshPartnerOrderAlertsPanel
         activeOrderId={activeOrderId}
-        onOpenOrder={(_orderId) => onOpenNextOrder?.()}
-        onOpenFlow={(_flowId) => onOpenNextOrder?.()}
+        onOpenOrder={(orderId) => onOpenOrderSupport?.(orderId)}
+        onOpenFlow={(flowId) => onOpenAlertsSupport?.(flowId)}
         onRetry={onRetry}
       />
     </Box>
@@ -450,6 +463,7 @@ export function OrderActionScreen({ activeFlowId = 'order-accept', onBack, onOpe
 
 export type OrderIssueScreenProps = {
   activeFlowId?: PartnerOrderIssueFlowId;
+  selectedCategoryId?: DshPartnerSupportIssueCategoryId;
   onBack?: () => void;
   onOpenScreen?: (screenId: PartnerOrderIssueFlowId) => void;
   onSecondaryAction?: () => void;
@@ -468,8 +482,15 @@ const orderIssueFlowCopy: Record<PartnerOrderIssueFlowId, { title: string; subti
   },
 };
 
-export function OrderIssueScreen({ activeFlowId = 'order-issue-queue', onBack, onOpenScreen, onSecondaryAction }: OrderIssueScreenProps) {
+export function OrderIssueScreen({
+  activeFlowId = 'order-issue-queue',
+  selectedCategoryId,
+  onBack,
+  onOpenScreen,
+  onSecondaryAction,
+}: OrderIssueScreenProps) {
   const activeCopy = orderIssueFlowCopy[activeFlowId];
+  const resolvedCategoryId = selectedCategoryId ?? resolvePartnerOrderIssueDefaultCategory(activeFlowId);
 
   return (
     <Box gap={4}>
@@ -486,6 +507,7 @@ export function OrderIssueScreen({ activeFlowId = 'order-issue-queue', onBack, o
 
       <DshPartnerOrderIssuePanel
         activeFlowId={activeFlowId}
+        selectedCategoryId={resolvedCategoryId}
         onSelectFlow={(flowId) => {
           if (flowId === activeFlowId) {
             onSecondaryAction?.();

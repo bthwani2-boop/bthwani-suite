@@ -1,11 +1,19 @@
 import React from 'react';
-import { BackHandler, Platform, View } from 'react-native';
-import { Box, Button, colorPalette, Icon, ModernPremiumHeader, Surface, Text, TopBar, useTheme, BottomNavBar, MobileScrollView } from '@bthwani/ui-kit';
-import { wltDshPartnerUiCopy } from '../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
+import { BackHandler, Platform } from 'react-native';
+import { BottomNavBar, Box, Button, ModernPremiumHeader, Surface, Text } from '@bthwani/ui-kit';
 import type {
+  DshPartnerOperationalFlowId,
   DshPartnerRoute,
+  DshPartnerSupportCommandContext,
+  DshPartnerSupportCommandFilterId,
+  DshPartnerSupportIssueCategoryId,
+  DshPartnerSupportRouteId,
   DshPartnerSurfaceProps,
   PartnerHubSection,
+} from './dsh-partner.types';
+import {
+  mapDshPartnerOperationalFlowToSupportRoute,
+  mapDshPartnerSupportRouteToOperationalFlow,
 } from './dsh-partner.types';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';
 import { InventoryCatalogScreen } from './screens/InventoryCatalogScreen';
@@ -24,9 +32,7 @@ import {
 } from './screens/OrdersInboxScreen';
 import { DshPartnerStoreCourierScreen } from './screens/DshPartnerStoreCourierScreen';
 import { PartnerEntryScreen } from './screens/PartnerEntryScreen';
-import { PartnerSupportScreen, type PartnerSupportRouteId } from './screens/PartnerSupportScreen';
-
-type PartnerWalletHubDestination = 'partner_subscription' | 'partner_settlement_summary' | 'partner_payouts';
+import { PartnerSupportScreen } from './screens/PartnerSupportScreen';
 
 type PartnerStoreScopeOption = {
   id: string;
@@ -100,6 +106,156 @@ const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
   },
 ] as const;
 
+const defaultSupportCommandContext: DshPartnerSupportCommandContext = {
+  filterId: 'all',
+  highlightedCaseId: null,
+  highlightedIssueCategoryId: null,
+  preferredOperationalFlowId: null,
+  preferredSupportRouteId: null,
+  source: 'operations',
+};
+
+function resolveSupportFilterFromOperationalFlow(
+  flowId: DshPartnerOperationalFlowId
+): DshPartnerSupportCommandFilterId {
+  if (flowId === 'order-alerts' || flowId === 'order-sla-risk') {
+    return 'active-orders';
+  }
+
+  if (
+    flowId === 'order-chat-read-ack'
+    || flowId === 'order-chat-send'
+    || flowId === 'order-quick-reply-config'
+    || flowId === 'order-quick-reply-settings'
+    || flowId === 'order-quick-reply-setup'
+  ) {
+    return 'conversations';
+  }
+
+  if (
+    flowId === 'inventory-adjust'
+    || flowId === 'inventory-update'
+    || flowId === 'items-upsert'
+    || flowId === 'doc-upload'
+    || flowId === 'intake-start'
+    || flowId === 'store-nomination'
+  ) {
+    return 'inventory-branch';
+  }
+
+  if (
+    flowId === 'partner-finance-bridge'
+    || flowId === 'partner-settlement-summary'
+    || flowId === 'partner-commission-summary'
+  ) {
+    return 'escalation';
+  }
+
+  if (
+    flowId === 'order-issue-queue'
+    || flowId === 'order-issue-required'
+    || flowId === 'order-reject'
+  ) {
+    return 'order-issues';
+  }
+
+  return 'active-orders';
+}
+
+function resolveSupportFilterFromRoute(
+  routeId: DshPartnerSupportRouteId
+): DshPartnerSupportCommandFilterId {
+  if (
+    routeId === 'chat-read-ack'
+    || routeId === 'chat-send'
+    || routeId === 'quick-reply-config'
+    || routeId === 'quick-reply-settings'
+    || routeId === 'quick-reply-setup'
+  ) {
+    return 'conversations';
+  }
+
+  if (
+    routeId === 'inventory-adjust'
+    || routeId === 'inventory-update'
+    || routeId === 'items-upsert'
+    || routeId === 'doc-upload'
+    || routeId === 'intake-start'
+    || routeId === 'store-nomination'
+    || routeId === 'video-upload'
+  ) {
+    return 'inventory-branch';
+  }
+
+  if (routeId === 'order-issue-queue' || routeId === 'order-reject') {
+    return 'order-issues';
+  }
+
+  return 'active-orders';
+}
+
+function resolveIssueCategoryFromOperationalFlow(
+  flowId: DshPartnerOperationalFlowId
+): DshPartnerSupportIssueCategoryId | null {
+  if (flowId === 'order-sla-risk') return 'delayed-preparation';
+  if (flowId === 'order-reject') return 'partner-reject-request';
+  if (flowId === 'order-handoff') return 'handoff-mismatch';
+  if (flowId === 'order-chat-read-ack' || flowId === 'order-chat-send') return 'customer-not-responding';
+  if (flowId === 'inventory-adjust' || flowId === 'inventory-update' || flowId === 'items-upsert') return 'item-unavailable';
+  if (flowId === 'partner-finance-bridge' || flowId === 'partner-settlement-summary' || flowId === 'partner-commission-summary') {
+    return 'payment-refund-review';
+  }
+
+  return null;
+}
+
+function resolveIssueCategoryFromRoute(
+  routeId: DshPartnerSupportRouteId
+): DshPartnerSupportIssueCategoryId | null {
+  if (routeId === 'order-reject') return 'partner-reject-request';
+  if (routeId === 'order-handoff') return 'handoff-mismatch';
+  if (routeId === 'chat-read-ack' || routeId === 'chat-send' || routeId === 'quick-reply-config' || routeId === 'quick-reply-settings' || routeId === 'quick-reply-setup') {
+    return 'customer-not-responding';
+  }
+  if (routeId === 'inventory-adjust' || routeId === 'inventory-update' || routeId === 'items-upsert') {
+    return 'item-unavailable';
+  }
+
+  return null;
+}
+
+function isCommandCenterInlineManagedRoute(routeId: DshPartnerSupportRouteId): boolean {
+  return routeId === 'order-issue-queue' || routeId === 'order-reject';
+}
+
+function buildSupportCommandContextFromOperationalFlow(
+  flowId: DshPartnerOperationalFlowId,
+  source: DshPartnerSupportCommandContext['source'] = 'operations'
+): DshPartnerSupportCommandContext {
+  return {
+    filterId: resolveSupportFilterFromOperationalFlow(flowId),
+    highlightedCaseId: null,
+    highlightedIssueCategoryId: resolveIssueCategoryFromOperationalFlow(flowId),
+    preferredOperationalFlowId: flowId,
+    preferredSupportRouteId: mapDshPartnerOperationalFlowToSupportRoute(flowId),
+    source,
+  };
+}
+
+function buildSupportCommandContextFromSupportRoute(
+  routeId: DshPartnerSupportRouteId,
+  source: DshPartnerSupportCommandContext['source'] = 'operations'
+): DshPartnerSupportCommandContext {
+  return {
+    filterId: resolveSupportFilterFromRoute(routeId),
+    highlightedCaseId: null,
+    highlightedIssueCategoryId: resolveIssueCategoryFromRoute(routeId),
+    preferredOperationalFlowId: mapDshPartnerSupportRouteToOperationalFlow(routeId),
+    preferredSupportRouteId: routeId,
+    source,
+  };
+}
+
 // Removed PartnerWalletHubSheet in favor of self-contained WltDshPartnerBridge cockpit tabs.
 
 function PartnerStoreScopeSheet({
@@ -123,11 +279,14 @@ function PartnerStoreScopeSheet({
     <Surface tone="raised" padding={5} gap={4} radiusToken="xl" border={false} style={{ margin: 16 }}>
       <Text role="titleMd">نطاق الفرع</Text>
       {options.map((option) => (
-        <Button key={option.id} variant={option.id === selectedId ? 'primary' : 'secondary'} onPress={() => onSelect(option.id)}>
-          {option.label}
-        </Button>
+        <Button
+          key={option.id}
+          label={option.label}
+          variant={option.id === selectedId ? 'primary' : 'secondary'}
+          onPress={() => onSelect(option.id)}
+        />
       ))}
-      <Button onPress={onClose}>إغلاق</Button>
+      <Button label="إغلاق" onPress={onClose} />
     </Surface>
   );
 }
@@ -136,7 +295,6 @@ export function DshPartnerSurface({
   initialRoute = 'inbox',
   initialOrderId = 'partner-order-1042',
 }: DshPartnerSurfaceProps = {}) {
-  const { theme } = useTheme();
   // walletHubVisible state removed in favor of self-contained WltDshPartnerBridge cockpit tabs.
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
   const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('hub');
@@ -144,9 +302,17 @@ export function DshPartnerSurface({
   const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
   const [route, setRoute] = React.useState<DshPartnerRoute>(initialRoute);
   const [activeOrderId, setActiveOrderId] = React.useState(initialOrderId);
-  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<PartnerSupportRouteId>('order-issue-queue');
+  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<DshPartnerSupportRouteId>(
+    initialRoute === 'order-rejection' ? 'order-reject' : 'order-issue-queue'
+  );
+  const [supportCommandContext, setSupportCommandContext] = React.useState<DshPartnerSupportCommandContext>(() => (
+    initialRoute === 'order-rejection'
+      ? buildSupportCommandContextFromSupportRoute('order-reject', 'orders')
+      : { ...defaultSupportCommandContext }
+  ));
   const routeHistoryRef = React.useRef<DshPartnerRoute[]>([initialRoute]);
   const routeTransitionFromBackRef = React.useRef(false);
+  const supportDirectoryIntentRef = React.useRef(false);
 
   React.useEffect(() => {
     if (route !== 'inbox' && ordersSearchMode) {
@@ -259,9 +425,52 @@ export function DshPartnerSurface({
     setRoute('home');
   }, []);
 
-  const openSupportDirectory = React.useCallback(() => {
+  const goBackInHistory = React.useCallback(() => {
+    if (routeHistoryRef.current.length <= 1) {
+      return false;
+    }
+
+    routeTransitionFromBackRef.current = true;
+    routeHistoryRef.current.pop();
+    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'entry';
+    setRoute(previousRoute);
+    return true;
+  }, []);
+
+  const goBackToHub = React.useCallback(() => {
+    if (goBackInHistory()) {
+      return;
+    }
+
+    openAccountHub('hub');
+  }, [goBackInHistory, openAccountHub]);
+
+  const markSupportDirectoryIntent = React.useCallback(() => {
+    supportDirectoryIntentRef.current = true;
+    Promise.resolve().then(() => {
+      supportDirectoryIntentRef.current = false;
+    });
+  }, []);
+
+  const openSupportDirectory = React.useCallback((context?: Partial<DshPartnerSupportCommandContext>) => {
+    markSupportDirectoryIntent();
+    setSupportCommandContext({
+      ...defaultSupportCommandContext,
+      ...context,
+    });
+    setRoute('support-directory');
+  }, [markSupportDirectoryIntent]);
+
+  const returnToSupportDirectory = React.useCallback(() => {
     setRoute('support-directory');
   }, []);
+
+  const openSupportCommandFromOperationalFlow = React.useCallback((
+    flowId: DshPartnerOperationalFlowId,
+    source: DshPartnerSupportCommandContext['source'] = 'operations',
+  ) => {
+    openSupportDirectory(buildSupportCommandContextFromOperationalFlow(flowId, source));
+  }, [openSupportDirectory]);
 
   const openInventoryManagement = React.useCallback(() => {
     setRoute('inventory-management');
@@ -271,7 +480,21 @@ export function DshPartnerSurface({
     setRoute('store-courier');
   }, []);
 
-  const openSupportScreen = React.useCallback((screenId: PartnerSupportRouteId) => {
+  const openSupportScreen = React.useCallback((
+    screenId: DshPartnerSupportRouteId,
+    source: DshPartnerSupportCommandContext['source'] = 'operations',
+  ) => {
+    const nextContext = buildSupportCommandContextFromSupportRoute(screenId, source);
+    const shouldStayInCommandCenter = supportDirectoryIntentRef.current && isCommandCenterInlineManagedRoute(screenId);
+
+    supportDirectoryIntentRef.current = false;
+    setSupportCommandContext(nextContext);
+
+    if (shouldStayInCommandCenter) {
+      setRoute('support-directory');
+      return;
+    }
+
     setSelectedSupportScreen(screenId);
     setRoute('support-screen');
   }, []);
@@ -284,21 +507,15 @@ export function DshPartnerSurface({
     setStoreScopeVisible(true);
   }, []);
 
-  const handleWalletHubNavigation = React.useCallback((destination: PartnerWalletHubDestination) => {
-    if (destination === 'partner_subscription') {
-      openAccountHub('wallet');
-      return;
-    }
-
-    setRoute('support-directory');
-  }, [openAccountHub]);
-
   const topBar = (
     <ModernPremiumHeader
       title={maintenanceProfile.storeName}
       locationLabel={`الرياض · ${selectedStoreScope.label} · ${maintenanceProfile.activeZoneLabel}`}
       onProfilePress={() => openAccountHub('profile')}
-      onNotificationsPress={() => setRoute('bell')}
+      onNotificationsPress={() => {
+        setActiveOrderId(initialOrderId);
+        setRoute('bell');
+      }}
       onSearchPress={openOrdersSearch}
       onLocationPress={openStoreScope}
       tickerStatus="مباشر"
@@ -341,7 +558,7 @@ export function DshPartnerSurface({
     if (route === 'inventory-management') {
       return 'inventory';
     }
-    if (route === 'support-directory' || route === 'support-screen') {
+    if (route === 'support-directory' || route === 'support-screen' || route === 'order-rejection') {
       return 'operations';
     }
     return '';
@@ -363,7 +580,7 @@ export function DshPartnerSurface({
         } else if (id === 'inventory') {
           openInventoryManagement();
         } else if (id === 'operations') {
-          openSupportDirectory();
+          openSupportDirectory({ source: 'operations' });
         }
       }}
       items={[
@@ -431,9 +648,14 @@ export function DshPartnerSurface({
         onOpenOrdersSearch={openOrdersSearch}
         onOpenInventoryManagement={openInventoryManagement}
         onOpenStoreScope={openStoreScope}
-        onOpenSupportDirectory={openSupportDirectory}
+        onOpenSupportDirectory={() => openSupportDirectory({ source: 'hub' })}
         onOpenWalletHub={openWalletHub}
-        onOpenBell={() => setRoute('bell')}
+        onOpenBell={() => {
+          setActiveOrderId(initialOrderId);
+          setRoute('bell');
+        }}
+        onOpenOperationalFlow={(flowId) => openSupportCommandFromOperationalFlow(flowId, 'hub')}
+        onOpenSupportScreen={(screenId) => openSupportScreen(screenId, 'hub')}
         onOpenStoreCourierSetup={openStoreCourier}
       />,
     );
@@ -446,7 +668,7 @@ export function DshPartnerSurface({
         onOpenOrdersBoardPress={openOrdersBoard}
         onOpenOrderDetailPress={openOrdersBoard}
         onOpenMaintenancePress={() => openAccountHub('profile')}
-        onOpenIssueQueuePress={() => openAccountHub('operations')}
+        onOpenIssueQueuePress={() => openSupportCommandFromOperationalFlow('order-issue-queue', 'orders')}
       />,
     );
   }
@@ -454,9 +676,13 @@ export function DshPartnerSurface({
   if (route === 'bell') {
     return renderSurfaceShell(
       <NotificationsScreen
-        activeOrderId={undefined}
+        activeOrderId={activeOrderId === initialOrderId ? undefined : activeOrderId}
         onOpenInbox={openOrdersBoard}
-        onOpenNextOrder={openOrdersBoard}
+        onOpenOrderSupport={(orderId) => {
+          setActiveOrderId(orderId);
+          openSupportCommandFromOperationalFlow('order-alerts', 'bell');
+        }}
+        onOpenAlertsSupport={(flowId) => openSupportCommandFromOperationalFlow(flowId, 'bell')}
         onBack={openOrdersBoard}
         onRetry={() => setRoute('bell')}
       />,
@@ -488,8 +714,12 @@ export function DshPartnerSurface({
   if (route === 'support-directory') {
     return renderSurfaceShell(
       <PartnerSupportScreen
-        onBack={() => openAccountHub('hub')}
+        onBack={goBackToHub}
         onOpenScreen={openSupportScreen}
+        initialFilterId={supportCommandContext.filterId}
+        initialCaseId={supportCommandContext.highlightedCaseId ?? null}
+        initialIssueCategoryId={supportCommandContext.highlightedIssueCategoryId ?? null}
+        initialSupportRouteId={supportCommandContext.preferredSupportRouteId ?? null}
       />,
     );
   }
@@ -501,32 +731,45 @@ export function DshPartnerSurface({
   }
 
   if (route === 'support-screen') {
-    const supportScreens: Record<PartnerSupportRouteId, React.ReactNode> = {
-      'auction-status-update': <AuctionStatusUpdateScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'chat-read-ack': <ConversationScreen activeFlowId="chat-read-ack" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-config')} />,
-      'chat-send': <ConversationScreen activeFlowId="chat-send" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
-      'doc-upload': <OnboardingActionScreen activeFlowId="doc-upload" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'intake-start': <OnboardingActionScreen activeFlowId="intake-start" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'inventory-adjust': <InventoryActionScreen activeFlowId="inventory-adjust" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('inventory-update')} />,
-      'inventory-update': <InventoryActionScreen activeFlowId="inventory-update" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'items-upsert': <InventoryActionScreen activeFlowId="items-upsert" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-accept': <OrderActionScreen activeFlowId="order-accept" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('order-get')} />,
-      'order-get': <OrderActionScreen activeFlowId="order-get" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('order-handoff')} />,
-      'order-handoff': <OrderActionScreen activeFlowId="order-handoff" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-issue-queue': <OrderIssueScreen activeFlowId="order-issue-queue" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-out-for-delivery': <OrderActionScreen activeFlowId="order-out-for-delivery" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-prepare': <OrderActionScreen activeFlowId="order-prepare" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-ready': <OrderActionScreen activeFlowId="order-ready" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-reject': <OrderIssueScreen activeFlowId="order-reject" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'order-store-delivered': <OrderActionScreen activeFlowId="order-store-delivered" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'quick-reply-config': <ConversationScreen activeFlowId="quick-reply-config" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-settings')} />,
-      'quick-reply-settings': <ConversationScreen activeFlowId="quick-reply-settings" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
-      'quick-reply-setup': <ConversationScreen activeFlowId="quick-reply-setup" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'store-nomination': <OnboardingActionScreen activeFlowId="store-nomination" onBack={openSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={openSupportDirectory} />,
-      'video-upload': <VideoUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
+    const selectedIssueCategoryId = supportCommandContext.highlightedIssueCategoryId ?? undefined;
+    const supportScreens: Record<DshPartnerSupportRouteId, React.ReactNode> = {
+      'auction-status-update': <AuctionStatusUpdateScreen onBack={returnToSupportDirectory} onSecondaryAction={returnToSupportDirectory} />,
+      'chat-read-ack': <ConversationScreen activeFlowId="chat-read-ack" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-config')} />,
+      'chat-send': <ConversationScreen activeFlowId="chat-send" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
+      'doc-upload': <OnboardingActionScreen activeFlowId="doc-upload" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'intake-start': <OnboardingActionScreen activeFlowId="intake-start" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'inventory-adjust': <InventoryActionScreen activeFlowId="inventory-adjust" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('inventory-update')} />,
+      'inventory-update': <InventoryActionScreen activeFlowId="inventory-update" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'items-upsert': <InventoryActionScreen activeFlowId="items-upsert" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-accept': <OrderActionScreen activeFlowId="order-accept" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('order-get')} />,
+      'order-get': <OrderActionScreen activeFlowId="order-get" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('order-handoff')} />,
+      'order-handoff': <OrderActionScreen activeFlowId="order-handoff" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-issue-queue': <OrderIssueScreen activeFlowId="order-issue-queue" selectedCategoryId={selectedIssueCategoryId} onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-out-for-delivery': <OrderActionScreen activeFlowId="order-out-for-delivery" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-prepare': <OrderActionScreen activeFlowId="order-prepare" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-ready': <OrderActionScreen activeFlowId="order-ready" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-reject': <OrderIssueScreen activeFlowId="order-reject" selectedCategoryId={selectedIssueCategoryId} onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'order-store-delivered': <OrderActionScreen activeFlowId="order-store-delivered" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'quick-reply-config': <ConversationScreen activeFlowId="quick-reply-config" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-settings')} />,
+      'quick-reply-settings': <ConversationScreen activeFlowId="quick-reply-settings" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={() => openSupportScreen('quick-reply-setup')} />,
+      'quick-reply-setup': <ConversationScreen activeFlowId="quick-reply-setup" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'store-nomination': <OnboardingActionScreen activeFlowId="store-nomination" onBack={returnToSupportDirectory} onOpenScreen={openSupportScreen} onSecondaryAction={returnToSupportDirectory} />,
+      'video-upload': <VideoUploadScreen onBack={returnToSupportDirectory} onSecondaryAction={returnToSupportDirectory} />,
     };
 
     return renderSurfaceShell(supportScreens[selectedSupportScreen]);
+  }
+
+  if (route === 'order-rejection') {
+    return renderSurfaceShell(
+      <OrderIssueScreen
+        activeFlowId="order-reject"
+        selectedCategoryId={supportCommandContext.highlightedIssueCategoryId ?? 'partner-reject-request'}
+        onBack={returnToSupportDirectory}
+        onOpenScreen={openSupportScreen}
+        onSecondaryAction={returnToSupportDirectory}
+      />,
+    );
   }
 
   return renderMainShell(
@@ -541,7 +784,9 @@ export function DshPartnerSurface({
       onOpenInventoryManagement={openInventoryManagement}
       onOpenStoreScope={openStoreScope}
       onOpenWalletHub={openWalletHub}
-      onOpenSupportDirectory={openSupportDirectory}
+      onOpenSupportDirectory={() => openSupportDirectory({ source: 'hub' })}
+      onOpenOperationalFlow={(flowId) => openSupportCommandFromOperationalFlow(flowId, 'hub')}
+      onOpenSupportScreen={(screenId) => openSupportScreen(screenId, 'hub')}
       onOpenStoreCourierSetup={openStoreCourier}
     />,
   );
