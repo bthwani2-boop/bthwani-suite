@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ScrollView } from 'react-native';
+import { Image } from 'react-native';
 import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import {
@@ -15,6 +15,8 @@ import {
   isDshOperationalFacet,
 } from '../../shared/catalog';
 import {
+  BThwaniFilterRail,
+  type BThwaniFilterRailItem,
   Box,
   Button,
   Chip,
@@ -22,6 +24,7 @@ import {
   KeyValueList,
   MobileScrollView,
   MobileStickyPrimaryAction,
+  ProductCard as UiProductCard,
   SearchField,
   StateView,
   Surface,
@@ -38,7 +41,6 @@ import {
   isPartnerOwnedException,
   translateOwner,
   translateStage,
-  resolveNextOwner,
   canRenderInClientSurface,
 } from '../../shared/workflow';
 
@@ -133,6 +135,35 @@ function resolveNextActionLabel(stage: string | undefined, available: boolean, s
   }
   if (!available || stockCount === 0) return 'تحقق من التوفر';
   return 'راجع الحالة';
+}
+
+type InventoryCardStatusTone = 'default' | 'success' | 'warning' | 'danger';
+
+function resolveInventoryCardStatus(item: InventoryCatalogListItem): {
+  label: string;
+  tone: InventoryCardStatusTone;
+} {
+  if (item.publishStage === 'rejected') {
+    return { label: 'مرفوض', tone: 'danger' };
+  }
+
+  if (!item.available || item.stockCount === 0) {
+    return { label: 'موقوف', tone: 'danger' };
+  }
+
+  if (canRenderInClientSurface(item.publishStage, 'product')) {
+    return { label: 'ظاهر للعميل', tone: 'success' };
+  }
+
+  return { label: 'يحتاج مراجعة', tone: 'warning' };
+}
+
+function resolveInventoryCardSummary(item: InventoryCatalogListItem) {
+  return [
+    item.isPrivateStoreProduct ? 'منتج خاص بالمتجر' : 'منتج مركزي',
+    item.catalogLinked ? 'مرتبط بالكتالوج' : 'يحتاج مطابقة',
+    item.lowStock && item.stockCount > 0 ? 'مخزون منخفض' : null,
+  ].filter(Boolean).join(' · ');
 }
 
 // ── Unified filter application ────────────────────────────────────────
@@ -411,13 +442,30 @@ function HierarchyFilterRail({
   const activeFacetTags = filter.facetTags ?? [];
   const activeOperationalFacets = activeFacetTags.filter(isDshOperationalFacet);
   const activeProductFacets = activeFacetTags.filter((f) => !isDshOperationalFacet(f));
-
-  const rowStyle = {
-    flexDirection: resolveRowDirection(direction),
-    gap: 6,
+  const railContentStyle = {
     paddingHorizontal: 4,
     paddingVertical: 2,
   } as const;
+  const domainRailItems: BThwaniFilterRailItem[] = [
+    { id: 'all', label: 'الكل' },
+    ...availableDomains.map((domainId) => ({ id: domainId, label: DOMAIN_LABELS[domainId] })),
+  ];
+  const mainCategoryRailItems: BThwaniFilterRailItem[] = [
+    { id: 'all', label: 'الكل' },
+    ...availableMainCategories.map((mainCategoryId) => ({ id: mainCategoryId, label: MAIN_CATEGORY_LABELS[mainCategoryId] })),
+  ];
+  const subcategoryRailItems: BThwaniFilterRailItem[] = [
+    { id: 'all', label: 'الكل' },
+    ...availableSubcategories.map((subcategoryId) => ({ id: subcategoryId, label: SUBCATEGORY_LABELS[subcategoryId] })),
+  ];
+  const operationalFacetRailItems: BThwaniFilterRailItem[] = [
+    { id: 'all', label: 'الكل' },
+    ...DSH_OPERATIONAL_FACETS.map((facetId) => ({ id: facetId, label: FACET_LABELS[facetId] })),
+  ];
+  const productFacetRailItems: BThwaniFilterRailItem[] = [
+    { id: 'all', label: 'الكل' },
+    ...availableProductFacets.map((facetId) => ({ id: facetId, label: FACET_LABELS[facetId] })),
+  ];
 
   function toggleFacet(facet: DshProductFacetId) {
     const isActive = activeFacetTags.includes(facet);
@@ -429,122 +477,99 @@ function HierarchyFilterRail({
 
   return (
     <Box gap={2}>
-      {/* Row 1 — Domain */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
-        <Chip
-          label="الكل"
-          tone={!filter.domainId ? 'brand' : 'default'}
-          selected={!filter.domainId}
-          onPress={() => onChange({ domainId: undefined, mainCategoryId: undefined, subcategoryId: undefined })}
-        />
-        {availableDomains.map((d) => (
-          <Chip
-            key={d}
-            label={DOMAIN_LABELS[d]}
-            tone={filter.domainId === d ? 'brand' : 'default'}
-            selected={filter.domainId === d}
-            onPress={() => onChange({ domainId: d, mainCategoryId: undefined, subcategoryId: undefined })}
-          />
-        ))}
-      </ScrollView>
+      <BThwaniFilterRail
+        items={domainRailItems}
+        selectedId={filter.domainId ?? 'all'}
+        onSelectedIdChange={(id) =>
+          onChange({
+            domainId: id === 'all' ? undefined : (id as DshCatalogDomainId),
+            mainCategoryId: undefined,
+            subcategoryId: undefined,
+          })
+        }
+        contentContainerStyle={railContentStyle}
+        testID="inventory-domain-filter-rail"
+      />
 
-      {/* Row 2 — Main Category (after domain selected) */}
       {filter.domainId && availableMainCategories.length > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
-          <Chip
-            label="الكل"
-            tone={!filter.mainCategoryId ? 'brand' : 'default'}
-            selected={!filter.mainCategoryId}
-            onPress={() => onChange({ mainCategoryId: undefined, subcategoryId: undefined })}
-          />
-          {availableMainCategories.map((mc) => (
-            <Chip
-              key={mc}
-              label={MAIN_CATEGORY_LABELS[mc]}
-              tone={filter.mainCategoryId === mc ? 'brand' : 'default'}
-              selected={filter.mainCategoryId === mc}
-              onPress={() => onChange({ mainCategoryId: mc, subcategoryId: undefined })}
-            />
-          ))}
-        </ScrollView>
+        <BThwaniFilterRail
+          items={mainCategoryRailItems}
+          selectedId={filter.mainCategoryId ?? 'all'}
+          onSelectedIdChange={(id) =>
+            onChange({
+              mainCategoryId: id === 'all' ? undefined : (id as DshCatalogMainCategoryId),
+              subcategoryId: undefined,
+            })
+          }
+          contentContainerStyle={railContentStyle}
+          testID="inventory-main-category-filter-rail"
+        />
       ) : null}
 
-      {/* Row 3 — Subcategory (after main category selected) */}
       {filter.mainCategoryId && availableSubcategories.length > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
-          <Chip
-            label="الكل"
-            tone={!filter.subcategoryId ? 'brand' : 'default'}
-            selected={!filter.subcategoryId}
-            onPress={() => onChange({ subcategoryId: undefined })}
-          />
-          {availableSubcategories.map((sc) => (
-            <Chip
-              key={sc}
-              label={SUBCATEGORY_LABELS[sc]}
-              tone={filter.subcategoryId === sc ? 'brand' : 'default'}
-              selected={filter.subcategoryId === sc}
-              onPress={() => onChange({ subcategoryId: sc })}
-            />
-          ))}
-        </ScrollView>
+        <BThwaniFilterRail
+          items={subcategoryRailItems}
+          selectedId={filter.subcategoryId ?? 'all'}
+          onSelectedIdChange={(id) =>
+            onChange({
+              subcategoryId: id === 'all' ? undefined : (id as DshCatalogSubcategoryId),
+            })
+          }
+          contentContainerStyle={railContentStyle}
+          testID="inventory-subcategory-filter-rail"
+        />
       ) : null}
 
-      {/* Row 4 — Operational Status */}
       <Box gap={1}>
         <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الحالة</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
-          <Chip
-            label="الكل"
-            tone={activeOperationalFacets.length === 0 ? 'brand' : 'default'}
-            selected={activeOperationalFacets.length === 0}
-            onPress={() => onChange({ facetTags: activeProductFacets.length ? activeProductFacets : undefined })}
-          />
-          {DSH_OPERATIONAL_FACETS.map((facet) => {
-            const isActive = activeOperationalFacets.includes(facet);
-            return (
-              <Chip
-                key={facet}
-                label={FACET_LABELS[facet]}
-                tone={isActive ? 'brand' : 'default'}
-                selected={isActive}
-                onPress={() => toggleFacet(facet)}
-              />
-            );
-          })}
-        </ScrollView>
+        <BThwaniFilterRail
+          items={operationalFacetRailItems}
+          selectedId={activeOperationalFacets[0] ?? 'all'}
+          isSelected={(railItem) => (
+            railItem.id === 'all'
+              ? activeOperationalFacets.length === 0
+              : activeOperationalFacets.includes(railItem.id as DshProductFacetId)
+          )}
+          onSelectedIdChange={(id) => {
+            if (id === 'all') {
+              onChange({ facetTags: activeProductFacets.length ? activeProductFacets : undefined });
+              return;
+            }
+
+            toggleFacet(id as DshProductFacetId);
+          }}
+          contentContainerStyle={railContentStyle}
+          testID="inventory-operational-filter-rail"
+        />
       </Box>
 
-      {/* Row 5 — Product Facets */}
       {availableProductFacets.length > 0 ? (
         <Box gap={1}>
           <Text role="caption" tone="muted" style={{ paddingHorizontal: 4 }}>الخصائص</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={rowStyle}>
-            <Chip
-              label="الكل"
-              tone={activeProductFacets.length === 0 ? 'brand' : 'default'}
-              selected={activeProductFacets.length === 0}
-              onPress={() => onChange({ facetTags: activeOperationalFacets.length ? activeOperationalFacets : undefined })}
-            />
-            {availableProductFacets.map((facet) => {
-              const isActive = activeProductFacets.includes(facet);
-              return (
-                <Chip
-                  key={facet}
-                  label={FACET_LABELS[facet]}
-                  tone={isActive ? 'brand' : 'default'}
-                  selected={isActive}
-                  onPress={() => toggleFacet(facet)}
-                />
-              );
-            })}
-          </ScrollView>
+          <BThwaniFilterRail
+            items={productFacetRailItems}
+            selectedId={activeProductFacets[0] ?? 'all'}
+            isSelected={(railItem) => (
+              railItem.id === 'all'
+                ? activeProductFacets.length === 0
+                : activeProductFacets.includes(railItem.id as DshProductFacetId)
+            )}
+            onSelectedIdChange={(id) => {
+              if (id === 'all') {
+                onChange({ facetTags: activeOperationalFacets.length ? activeOperationalFacets : undefined });
+                return;
+              }
+
+              toggleFacet(id as DshProductFacetId);
+            }}
+            contentContainerStyle={railContentStyle}
+            testID="inventory-product-filter-rail"
+          />
         </Box>
       ) : null}
 
-      {/* Active filter summary + clear */}
       {hasActiveFilters ? (
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8, paddingHorizontal: 4 }}>
           <Text role="caption" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
             {[
               filter.domainId ? DOMAIN_LABELS[filter.domainId] : null,
@@ -788,9 +813,9 @@ function DenseListRow({
   );
 }
 
-// ── Product Card (full view) ──────────────────────────────────────────
+// ── Product card adapter + on-demand details ──────────────────────────
 
-function ProductCard({
+function InventoryCatalogCardPanel({
   item,
   detail,
   expanded,
@@ -816,176 +841,128 @@ function ProductCard({
   onMatchCatalog: () => void;
 }) {
   const { direction } = useDirection();
-  const { theme } = useTheme();
-
   const isRejected = item.publishStage === 'rejected';
   const isNeedsFix = item.publishStage === 'needs-fix';
-  const isClientVisible = canRenderInClientSurface(item.publishStage, 'product');
+  const isPanelOpen = expanded || showDetails;
+  const cardStatus = resolveInventoryCardStatus(item);
+  const partnerRecord = React.useMemo(() => {
+    if (!isPanelOpen) {
+      return undefined;
+    }
 
-  const stageTone = resolveStageChipTone(item.publishStage);
-  const stockTone = item.lowStock ? 'warning' : item.available ? 'success' : 'danger';
-  const linkedTone: 'success' | 'warning' = item.catalogLinked ? 'success' : 'warning';
-
-  const borderColor = isRejected
-    ? theme.danger
-    : isNeedsFix
-    ? theme.warning
-    : expanded
-    ? theme.brand
-    : theme.line;
-
-  const partnerRecord = React.useMemo(
-    () => getPartnerQueueRecords().find((r) => r.id === item.id || r.title.includes(item.name)),
-    [item.id, item.name],
-  );
+    return getPartnerQueueRecords().find((record) => record.id === item.id || record.title.includes(item.name));
+  }, [isPanelOpen, item.id, item.name]);
 
   const fixReason = partnerRecord?.metadata?.requiredFix ?? detail?.internalNote;
   const rejectReason = partnerRecord?.metadata?.rejectionReason ?? detail?.internalNote;
-
   const nextAction = resolveNextActionLabel(item.publishStage, item.available, item.stockCount);
-  const nextOwnerLabel = item.publishStage
-    ? translateOwner(resolveNextOwner(item.publishStage as ApprovalStage))
-    : undefined;
+  const summaryLine = resolveInventoryCardSummary(item);
+  const detailItems = [
+    { label: 'SKU', value: detail?.sku },
+    { label: 'GTIN', value: detail?.gtin },
+    { label: 'الباركود', value: detail?.barcode },
+    { label: 'رمز المُصنِّع', value: detail?.manufacturerCode },
+    ...(detail?.sourceRecordId ? [{ label: 'مرجع المصدر', value: detail.sourceRecordId }] : []),
+    ...(detail?.canonicalProductId ? [{ label: 'معرف المنتج المركزي', value: detail.canonicalProductId }] : []),
+    ...(detail?.canonicalStoreId ? [{ label: 'معرف المتجر المركزي', value: detail.canonicalStoreId }] : []),
+    ...(detail?.source ? [{ label: 'مصدر الإدخال', value: translateOwner(detail.source) }] : []),
+    {
+      label: 'ملكية الوسائط',
+      value: item.isCatalogOwned ? 'كتالوج مركزي' : isPartnerOwnedException(item.publishStage as ApprovalStage, 'product-media') ? 'استثناء شريك' : 'بحاجة مراجعة',
+      tone: item.isCatalogOwned ? 'info' : 'warning',
+    },
+  ].filter((entry) => entry.value);
 
   return (
-    <Surface tone="default" padding={3} gap={3} border style={{ borderColor }}>
-      {/* Header row */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'flex-start', gap: 10 }}>
-        {resolveDshImageSource(item.mediaKey) ? (
-          <Image
-            source={resolveDshImageSource(item.mediaKey)!}
-            style={{ width: 44, height: 44, borderRadius: 6, flexShrink: 0 }}
-            resizeMode="cover"
-          />
-        ) : (
-          <Surface
-            tone={isRejected ? 'danger' : isNeedsFix ? 'warning' : 'inset'}
-            padding={2}
-            gap={0}
-            style={{ width: 44, height: 44, borderRadius: 6, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-          >
-            <Text role="bodyStrong">{item.name.slice(0, 1)}</Text>
-          </Surface>
-        )}
+    <Box gap={2}>
+      <UiProductCard
+        id={item.id}
+        title={item.name}
+        subtitle={nextAction}
+        imageSource={item.mediaKey ? resolveDshImageSource(item.mediaKey) : undefined}
+        emoji={item.name.slice(0, 1)}
+        statusLabel={cardStatus.label}
+        statusTone={cardStatus.tone}
+        categoryLabel={item.categoryLabel}
+        price={{ label: item.priceLabel }}
+        onPress={onToggleDetails}
+        testID={`inventory-product-card-${item.id}`}
+      />
 
-        <Box style={{ flex: 1, minWidth: 0, gap: 4, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-          <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
-            {item.name}
+      {isPanelOpen ? (
+        <Surface tone="inset" padding={3} gap={3} border={false}>
+          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+            {summaryLine}
           </Text>
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
-            {item.publishStage ? (
-              <Chip label={translateStage(item.publishStage)} tone={stageTone} selected />
+
+          {isRejected && rejectReason ? (
+            <Surface tone="danger" padding={2} gap={0} border={false}>
+              <Text role="bodySm" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
+                سبب الرفض: {rejectReason}
+              </Text>
+            </Surface>
+          ) : null}
+
+          {isNeedsFix && fixReason ? (
+            <Surface tone="warning" padding={2} gap={0} border={false}>
+              <Text role="bodySm" tone="warning" align={direction === 'rtl' ? 'end' : 'start'}>
+                التعديل المطلوب: {fixReason}
+              </Text>
+            </Surface>
+          ) : null}
+
+          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
+            <Button
+              label={expanded ? 'إخفاء التعديل' : 'تعديل محلي'}
+              size="sm"
+              tone={expanded ? 'secondary' : 'primary'}
+              fullWidth={false}
+              onPress={onToggleEdit}
+              disabled={isRejected && !expanded}
+            />
+            <Button
+              label={showDetails ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
+              size="sm"
+              tone="secondary"
+              fullWidth={false}
+              onPress={onToggleDetails}
+            />
+            {!item.catalogLinked ? (
+              <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
             ) : null}
-            {nextOwnerLabel ? (
-              <Chip label={`← ${nextOwnerLabel}`} tone="default" />
+            {item.reviewNeeded && !isRejected ? (
+              <Button label="إرسال للمراجعة" size="sm" tone="secondary" fullWidth={false} onPress={onSendForReview} />
             ) : null}
           </Box>
-          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'} numberOfLines={1}>
-            {nextAction}
-          </Text>
-        </Box>
-      </Box>
 
-      {/* Rejected/needs-fix banners */}
-      {isRejected && rejectReason ? (
-        <Surface tone="danger" padding={2} gap={0} border={false}>
-          <Text role="bodySm" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
-            سبب الرفض: {rejectReason}
-          </Text>
-        </Surface>
-      ) : null}
-      {isNeedsFix && fixReason ? (
-        <Surface tone="warning" padding={2} gap={0} border={false}>
-          <Text role="bodySm" tone="warning" align={direction === 'rtl' ? 'end' : 'start'}>
-            التعديل المطلوب: {fixReason}
-          </Text>
-        </Surface>
-      ) : null}
+          {expanded ? (
+            <InlineLocalEdit
+              item={item}
+              detail={detail}
+              override={override}
+              onChange={onOverrideChange}
+              onApply={onApplyOverride}
+            />
+          ) : null}
 
-      {/* Commercial chips */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-        <Chip
-          label={item.isPrivateStoreProduct ? 'منتج خاص بالمتجر' : 'منتج مركزي'}
-          tone={item.isPrivateStoreProduct ? 'warning' : 'info'}
-          selected
-        />
-        <Chip label={item.priceLabel} tone="brand" />
-        <Chip
-          label={item.stockCount === 0 ? 'نفد المخزون' : `المخزون ${item.stockCount}`}
-          tone={stockTone}
-        />
-        <Chip label={item.available ? 'متاح' : 'موقوف'} tone={item.available ? 'success' : 'danger'} />
-        {item.lowStock && item.stockCount > 0 ? <Chip label="منخفض" tone="warning" /> : null}
-        <Chip label={item.catalogLinked ? 'مرتبط بالكتالوج' : 'يحتاج مطابقة'} tone={linkedTone} />
-        {isClientVisible ? <Chip label="ظاهر للعميل" tone="success" selected /> : null}
-      </Box>
-
-      {/* Actions */}
-      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 6 }}>
-        <Button
-          label={expanded ? 'إخفاء التعديل' : 'تعديل محلي'}
-          size="sm"
-          tone={expanded ? 'secondary' : 'primary'}
-          fullWidth={false}
-          onPress={onToggleEdit}
-          disabled={isRejected && !expanded}
-        />
-        <Button
-          label={showDetails ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
-          size="sm"
-          tone="secondary"
-          fullWidth={false}
-          onPress={onToggleDetails}
-        />
-        {!item.catalogLinked ? (
-          <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
-        ) : null}
-        {item.reviewNeeded && !isRejected ? (
-          <Button label="إرسال للمراجعة" size="sm" tone="secondary" fullWidth={false} onPress={onSendForReview} />
-        ) : null}
-      </Box>
-
-      {/* Inline local edit */}
-      {expanded ? (
-        <InlineLocalEdit
-          item={item}
-          detail={detail}
-          override={override}
-          onChange={onOverrideChange}
-          onApply={onApplyOverride}
-        />
-      ) : null}
-
-      {/* Expanded details — on demand */}
-      {showDetails && detail ? (
-        <Surface tone="inset" padding={3} gap={2} border={false}>
-          <KeyValueList
-            dense
-            items={[
-              { label: 'SKU', value: detail.sku },
-              { label: 'GTIN', value: detail.gtin },
-              { label: 'الباركود', value: detail.barcode },
-              { label: 'رمز المُصنِّع', value: detail.manufacturerCode },
-              ...(detail.sourceRecordId ? [{ label: 'مرجع المصدر', value: detail.sourceRecordId }] : []),
-              ...(detail.canonicalProductId ? [{ label: 'معرف المنتج المركزي', value: detail.canonicalProductId }] : []),
-              ...(detail.canonicalStoreId ? [{ label: 'معرف المتجر المركزي', value: detail.canonicalStoreId }] : []),
-              ...(detail.source ? [{ label: 'مصدر الإدخال', value: translateOwner(detail.source) }] : []),
-              { label: 'ملكية الوسائط', value: item.isCatalogOwned ? 'كتالوج مركزي' : isPartnerOwnedException(item.publishStage as ApprovalStage, 'product-media') ? 'استثناء شريك' : 'بحاجة مراجعة', tone: item.isCatalogOwned ? 'info' : 'warning' },
-            ]}
-          />
-          {partnerRecord?.auditTrail?.length ? (
-            <Box gap={2}>
-              <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>سجل المراحل:</Text>
-              {partnerRecord.auditTrail.map((entry, idx) => (
-                <Text key={idx} role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-                  {translateStage(entry.fromStage)} → {translateStage(entry.toStage)} · {translateOwner(entry.owner)}
-                </Text>
-              ))}
-            </Box>
+          {showDetails && detail ? (
+            <Surface tone="default" padding={3} gap={2} border={false}>
+              <KeyValueList dense items={detailItems} />
+              {partnerRecord?.auditTrail?.length ? (
+                <Box gap={2}>
+                  <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>سجل المراحل:</Text>
+                  {partnerRecord.auditTrail.map((entry, idx) => (
+                    <Text key={idx} role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+                      {translateStage(entry.fromStage)} → {translateStage(entry.toStage)} · {translateOwner(entry.owner)}
+                    </Text>
+                  ))}
+                </Box>
+              ) : null}
+            </Surface>
           ) : null}
         </Surface>
       ) : null}
-    </Surface>
+    </Box>
   );
 }
 
@@ -1001,7 +978,7 @@ function InventoryCatalogContent({
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
   const [filter, setFilter] = React.useState<ActiveHierarchyFilter>({});
-  const [viewMode, setViewMode] = React.useState<ViewMode>('dense-list');
+  const [viewMode, setViewMode] = React.useState<ViewMode>('cards');
   const [items, setItems] = React.useState<InventoryCatalogListItem[]>(() =>
     buildListItems(canonicalStoreId),
   );
@@ -1198,7 +1175,7 @@ function InventoryCatalogContent({
             const isShowingDetails = expandedDetailsId === item.id;
             const cardDetail = (isExpanded || isShowingDetails) ? getItemDetail(item.id) : undefined;
             return (
-              <ProductCard
+              <InventoryCatalogCardPanel
                 key={item.id}
                 item={item}
                 detail={cardDetail}
