@@ -374,6 +374,25 @@ export {
   getDshFlowRegistryValidationSummary,
 } from './dsh-flow-registry';
 
+// --- DSH Control Panel Governance Map — cross-surface shared owner ---
+// Phase 5 closure: DSH_PHASE_5_FINAL_LOGIC_CLOSURE-20260521-071500
+// Moved here from dsh/frontend/control-panel/shared/ — mobile surfaces import from here only.
+// control-panel/shared/dsh-control-panel-governance.map.ts is now a compat re-export shim.
+export type {
+  DshControlPanelSectionId,
+  DshControlPanelGovernanceEntry,
+} from './dsh-governance.map';
+export {
+  DSH_CONTROL_PANEL_SECTION_IDS,
+  DSH_CONTROL_PANEL_GOVERNANCE_MAP,
+  DSH_CONTROL_PANEL_GOVERNANCE_LIST,
+  getDshControlPanelGovernanceEntry,
+  getDshControlPanelGovernanceEntries,
+  findDshControlPanelGovernanceSectionByFlowId,
+  getDshControlPanelGovernanceSectionsForSurface,
+  resolveDshControlPanelSectionLabel,
+} from './dsh-governance.map';
+
 // --- DSH Order Journey Shared Model ---
 export type {
 	DshOrderJourneyStageId,

@@ -23,7 +23,7 @@ import {
 } from '../../shared/operations-support.preview';
 import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 function resolveClientIssuePolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'evidence-on-open') {

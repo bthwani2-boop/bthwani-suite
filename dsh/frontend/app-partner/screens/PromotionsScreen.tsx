@@ -18,7 +18,7 @@ import {
   type PartnerOfferStatus,
   type PartnerOfferType,
 } from '../../shared/partner-offer.preview-store';
-import { getDshControlPanelGovernanceEntry } from '../../control-panel/shared';
+import { getDshControlPanelGovernanceEntry } from '../../shared';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';
 type PromotionsTab = 'active' | 'pending' | 'rejected' | 'new';

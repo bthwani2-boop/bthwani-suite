@@ -33,7 +33,7 @@ import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
-import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';

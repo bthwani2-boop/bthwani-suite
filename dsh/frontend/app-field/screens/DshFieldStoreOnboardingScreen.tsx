@@ -34,7 +34,7 @@ import {
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../shared/operations-support.preview';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');
 const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(

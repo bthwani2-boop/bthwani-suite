@@ -20,7 +20,7 @@ import type {
 } from '../types/DshFieldStoreVisitTypes';
 import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 export type {
   DshFieldStoreVisitErrors,

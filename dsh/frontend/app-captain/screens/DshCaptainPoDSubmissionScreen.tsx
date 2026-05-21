@@ -18,7 +18,7 @@ import {
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 function resolvePodPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
   if (policy === 'evidence-on-open') {

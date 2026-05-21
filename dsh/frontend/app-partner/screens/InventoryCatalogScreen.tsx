@@ -35,7 +35,7 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 import {
   type ApprovalStage,
   getPartnerQueueRecords,

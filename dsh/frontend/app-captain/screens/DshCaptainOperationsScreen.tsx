@@ -9,7 +9,7 @@ import {
 	getOperationsSupportFlowsForSurface,
 	type DshOperationsSupportFlowId,
 } from '../../shared/operations-support.preview';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
 	if (policy === 'detail-on-open') {

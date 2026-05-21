@@ -20,7 +20,7 @@ import {
   getOperationsSupportFlowsForSurface,
 } from '../../shared/operations-support.preview';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 function resolveFieldPolicyLabel(policy?: string): string {
   if (policy === 'evidence-on-open') {

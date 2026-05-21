@@ -26,7 +26,7 @@ import type {
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
 import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
 import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 
