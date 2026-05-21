@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebSignalCard } from '@bthwani/ui-kit/web';
 
@@ -13,12 +14,11 @@ export function ControlPanelDshMarketingScreen({
 	hubHref = '/',
 	operationsHref = '/operations',
 }: ControlPanelDshMarketingScreenProps) {
+  const router = useRouter();
   const { theme } = useTheme();
   const navigateTo = React.useCallback((href: string) => {
-		if (typeof window !== 'undefined') {
-			window.location.assign(href);
-		}
-	}, []);
+		router.push(href);
+	}, [router]);
 
 	return (
 		<Box gap={4}>

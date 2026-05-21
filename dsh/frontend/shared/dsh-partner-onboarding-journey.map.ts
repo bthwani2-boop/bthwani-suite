@@ -48,7 +48,7 @@ export type DshPartnerLifecycleStage =
   | 'documents-review'      // control-panel/partners reviewing documents
   | 'partner-approved'      // partners approved; moving to catalog
   | 'catalog-onboarding'    // control-panel/catalogs reviewing products
-  | 'marketing-review'      // control-panel/marketing reviewing content [TBD]
+  | 'marketing-review'      // control-panel/marketing reviewing content before launch
   | 'active'                // fully approved, catalog published, client-visible
   | 'blocked'               // blocked pending resolution
   | 'needs-fix'             // returned for correction
@@ -96,7 +96,7 @@ export type DshPartnerJourneyStep = {
   readonly partnerVisibleWhen?: string;
   /** Whether this step has financial impact (WLT reference only, no mutation). */
   readonly financialImpact?: boolean;
-  /** Notes on constraints, open items, or TBD items. */
+  /** Notes on constraints, open items, or deferred items. */
   readonly notes?: string;
 };
 

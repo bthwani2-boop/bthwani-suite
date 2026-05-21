@@ -225,7 +225,7 @@ const availabilityStatusMeta: Record<
   },
   'planned-leave': {
     label: 'إجازة مخططة',
-    description: 'إدارة الإجازات والغياب ستُربط لاحقًا مع عمليات الأسطول [TBD].',
+    description: 'إدارة الإجازات والغياب ما زالت قيد الربط مع عمليات الأسطول وتظهر هنا كمتابعة محلية فقط.',
     chipTone: 'default',
     orderBadgeLabel: 'إجازة',
   },
@@ -251,12 +251,12 @@ const gpsStatusMeta: Record<
   },
   offline: {
     label: 'GPS دون اتصال',
-    description: 'تعذر تحديث الموقع الآن. المسار يعمل كـ placeholder فقط.',
+    description: 'تعذر تحديث الموقع الآن. المسار يعمل كمعاينة محلية حتى تعود الإشارة.',
     chipTone: 'warning',
   },
   disabled: {
     label: 'GPS معطل',
-    description: 'الموقع مغلق من الجهاز ويحتاج تفعيلًا لاحقًا [TBD].',
+    description: 'الموقع مغلق من الجهاز ويحتاج تفعيل الإذن من إعدادات الهاتف قبل استخدام الخريطة.',
     chipTone: 'default',
   },
 };
@@ -804,7 +804,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       { label: 'الخطوة التالية', value: <Badge label={activeSummary.nextActionLabel} tone="warning" /> },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('الطلبات', 'الطلب النشط والسجل المختصر', items, 'السجل التاريخي الكامل سيُربط لاحقًا [TBD].');
+    return renderCaptainAccountSectionPage('الطلبات', 'الطلب النشط والسجل المختصر', items, 'السجل التاريخي الكامل يبقى read-only إلى أن يثبت مصدر الأرشفة التشغيلي.');
   };
 
   const renderCaptainAccountDocsScreen = () => {
@@ -816,7 +816,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       { label: 'الاعتماد الحقيقي', value: <Badge label="قيد الربط" tone="warning" /> },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('الوثائق والتقييم', 'الملفات والمستوى وجاهزية الاعتماد', items, 'ربط الوثائق الحقيقي مع المسار التشغيلي سيكتمل لاحقًا [TBD].');
+    return renderCaptainAccountSectionPage('الوثائق والتقييم', 'الملفات والمستوى وجاهزية الاعتماد', items, 'ربط الوثائق الحقيقي ينتظر مصدر الاعتماد المركزي ويظهر هنا كمتابعة جاهزية فقط.');
   };
 
   const renderCaptainAccountShiftsScreen = () => {
@@ -827,7 +827,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       { label: 'آخر تحديث', value: <Badge label="الآن" tone="info" /> },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة الحقيقي يرتبط بإدارة الأسطول لاحقًا [TBD].');
+    return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة الحقيقي ينتظر ربط إدارة الأسطول ويظهر هنا كمعاينة حالة فقط.');
   };
 
   const renderCaptainAccountSupportScreen = () => {
@@ -1175,10 +1175,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           <Box gap={1}>
             <Text role="bodyStrong">لا يوجد طلب نشط</Text>
             <Text role="bodySm" tone="muted">
-              ابقَ على الخريطة حتى تصل الحركة التالية. التاريخ والحساب جاهزان لاحقًا كـ [TBD].
+              ابقَ على الخريطة حتى تصل الحركة التالية. التاريخ والحساب يظهران كملخص read-only إلى أن يصل المصدر المركزي.
             </Text>
             <Text role="caption" tone="muted">
-              التواصل بعد الإغلاق سيبقى read-only مؤقتًا حتى يحدد التحكم المركزي المدة [TBD].
+              التواصل بعد الإغلاق يبقى read-only مؤقتًا حتى يحدد التحكم المركزي نافذة الاحتفاظ بالمحادثة.
             </Text>
           </Box>
           <Button size="sm" fullWidth={false} label="فتح الطلبات" onPress={() => setRoute('inbox')} />
@@ -1199,10 +1199,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           <Box gap={1}>
             <Text role="bodyStrong">لا يوجد طلب نشط</Text>
             <Text role="bodySm" tone="muted">
-              تم إغلاق الطلب. التاريخ والحساب سيُربطان لاحقًا كـ [TBD].
+              تم إغلاق الطلب. التاريخ والحساب يظهران كملخص read-only إلى أن يصل مصدر الأرشفة المركزي.
             </Text>
             <Text role="caption" tone="muted">
-              التواصل هنا أصبح read-only/closed بعد مدة يحددها التحكم المركزي لاحقًا [TBD].
+              التواصل هنا أصبح read-only بعد مدة احتفاظ يحددها التحكم المركزي.
             </Text>
           </Box>
           <Button size="sm" fullWidth={false} tone="ghost" label="عرض صندوق الطلبات" onPress={() => setRoute('inbox')} />
@@ -1563,8 +1563,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     return (
       <Box style={{ flex: 1 }} background="background">
         <MobileWorkspaceHeader
-          title="AMN [TBD]"
-          description="هذا المسار غير مكتمل ولا ينافس DSH النشط حاليًا."
+          title="AMN — قيد الربط"
+          description="هذا المسار غير نشط داخل DSH حاليًا ولا ينافس السياق التنفيذي الحالي."
           icon="alert-circle-outline"
           backLabel="العودة إلى DSH"
           onBack={() => handleSelectServiceType('dsh')}
@@ -1586,15 +1586,15 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           <MobileScrollView fill padding={4} gap={4}>
             <StateView
               stateId="warning"
-              title="AMN يبقى [TBD]"
-              description="DSH هو السياق التنفيذي النشط، بينما AMN يظهر هنا كمسار placeholder فقط حتى يكتمل الربط."
+              title="AMN غير نشط داخل هذا السطح"
+              description="DSH هو السياق التنفيذي النشط، بينما يظهر AMN هنا كمرجع read-only حتى يكتمل الربط المعتمد."
               actionLabel="العودة إلى DSH"
               onActionPress={() => handleSelectServiceType('dsh')}
             />
             <Surface tone="inset" padding={4} gap={2} radiusToken="xl">
               <Text role="bodyStrong">لا نضيف أي binding جديد هنا.</Text>
               <Text role="bodySm" tone="muted">
-                AMN حاضر فقط كمرجع غير مكتمل [TBD]، ولا ينبغي أن يزاحم DSH في هذا السطح.
+                AMN حاضر هنا كمرجع read-only غير نشط، ولا ينبغي أن يزاحم DSH في هذا السطح.
               </Text>
             </Surface>
           </MobileScrollView>

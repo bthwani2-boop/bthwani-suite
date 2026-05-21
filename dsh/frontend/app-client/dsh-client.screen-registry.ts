@@ -12,7 +12,6 @@ export type DshClientScreenRegistryItem = {
   readonly componentName: string;
   readonly screenKind: 'TAB_ROOT' | 'SCREEN_ENTRY' | 'FLOW_STEP' | 'MODAL' | 'SHEET';
   readonly flowId?: string;
-  readonly requiredStates: readonly ('loading' | 'empty' | 'error' | 'success' | 'offline' | 'disabled' | 'retry' | 'blocked')[];
   readonly requiredPermissions?: readonly ('location' | 'notifications' | 'camera' | 'mediaLibrary')[];
   readonly analytics: {
     readonly screenView: string;
@@ -20,8 +19,25 @@ export type DshClientScreenRegistryItem = {
   readonly deepLinkPath?: string;
   readonly fallbackRouteId?: DshClientRouteId;
   readonly releaseCriticality: 'P0' | 'P1' | 'P2';
-  readonly status: 'TBD' | 'UNPROVEN' | 'VERIFIED' | 'CLOSED' | 'DEPRECATED';
+  readonly requiredStates: readonly DshClientScreenState[];
+  readonly status: DshClientScreenRegistryStatus;
 };
+
+export type DshClientScreenState =
+  | 'loading'
+  | 'empty'
+  | 'error'
+  | 'success'
+  | 'offline'
+  | 'disabled'
+  | 'retry'
+  | 'blocked'
+  | 'cancelled';
+
+export type DshClientScreenRegistryStatus =
+  | 'READY_FOR_REVIEW'
+  | 'VERIFIED'
+  | 'DEPRECATED';
 
 export const dshClientScreenRegistry = [
   {

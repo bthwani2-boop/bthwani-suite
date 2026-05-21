@@ -45,7 +45,7 @@ export const dshPartnerIntakeMetrics: ReadonlyArray<DshPartnerIntakeMetric> = [
     id: 'metric-marketing-review',
     label: 'جاهز للتسويق',
     value: 1,
-    description: 'طلبات اجتازت الشركاء وتنتظر المراجعة النهائية [TBD].',
+    description: 'طلبات اجتازت الشركاء وتنتظر المراجعة التسويقية النهائية قبل الإطلاق.',
   },
 ];
 
@@ -187,7 +187,7 @@ export const dshPartnerApprovalLanes = [
   },
   {
     id: 'lane-marketing',
-    title: 'Marketing Review [TBD]',
-    description: 'بعد موافقة الشركاء يُولد كود الشريك [TBD] ثم يذهب الطلب للتسويق النهائي [TBD].',
+    title: 'المراجعة التسويقية',
+    description: 'بعد موافقة الشركاء ينتقل الطلب إلى المراجعة التسويقية النهائية ثم يدخل مسار الإطلاق.',
   },
 ] as const;

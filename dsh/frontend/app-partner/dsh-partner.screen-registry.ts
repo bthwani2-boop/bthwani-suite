@@ -6,24 +6,39 @@ export type DshPartnerScreenRegistryItem = {
   readonly screenId: string;
   readonly routeId: DshPartnerRegistryRouteId;
   readonly surfaceId: 'app-partner';
-  readonly ownerKind: 'service' | 'integration';
-  readonly ownerId: 'dsh' | 'wlt.dsh';
+  readonly ownerKind: 'app' | 'service' | 'integration';
+  readonly ownerId: 'app-partner' | 'dsh' | 'wlt.dsh';
   readonly serviceId: 'dsh' | 'wlt';
   readonly linkedServiceId?: 'dsh' | 'wlt';
   readonly ownerPath: string;
   readonly componentName: string;
   readonly screenKind: 'TAB_ROOT' | 'SCREEN_ENTRY' | 'FLOW_STEP' | 'MODAL' | 'SHEET';
   readonly flowId?: string;
-  readonly requiredStates: readonly ('loading' | 'empty' | 'error' | 'success' | 'offline' | 'disabled' | 'retry' | 'blocked')[];
+  readonly requiredStates: readonly DshPartnerScreenState[];
   readonly analytics: { readonly screenView: string; readonly primaryEvents?: readonly string[] };
   readonly fallbackRouteId?: DshPartnerRouteId;
   readonly releaseCriticality: 'P0' | 'P1' | 'P2';
-  readonly status: 'TBD' | 'UNPROVEN' | 'VERIFIED' | 'CLOSED' | 'DEPRECATED';
+  readonly status: DshPartnerScreenRegistryStatus;
 };
 
-const baseStates = ['loading', 'empty', 'error', 'success', 'offline'] as const;
-const blockedStates = ['loading', 'empty', 'error', 'success', 'offline', 'blocked'] as const;
-const retryStates = ['loading', 'empty', 'error', 'success', 'offline', 'retry'] as const;
+export type DshPartnerScreenState =
+  | 'loading'
+  | 'empty'
+  | 'error'
+  | 'success'
+  | 'offline'
+  | 'disabled'
+  | 'retry'
+  | 'blocked';
+
+export type DshPartnerScreenRegistryStatus =
+  | 'READY_FOR_REVIEW'
+  | 'VERIFIED'
+  | 'DEPRECATED';
+
+const baseStates = ['loading', 'empty', 'error', 'success', 'offline'] as const satisfies readonly DshPartnerScreenState[];
+const blockedStates = ['loading', 'empty', 'error', 'success', 'offline', 'blocked'] as const satisfies readonly DshPartnerScreenState[];
+const retryStates = ['loading', 'empty', 'error', 'success', 'offline', 'retry'] as const satisfies readonly DshPartnerScreenState[];
 
 export const dshPartnerScreenRegistry = [
   {

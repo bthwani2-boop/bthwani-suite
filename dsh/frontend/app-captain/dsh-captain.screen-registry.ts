@@ -14,7 +14,7 @@ export type DshCaptainScreenRegistryItem = {
   readonly componentName: string;
   readonly screenKind: 'TAB_ROOT' | 'SCREEN_ENTRY' | 'FLOW_STEP' | 'MODAL' | 'SHEET';
   readonly flowId?: string;
-  readonly requiredStates: readonly ('loading' | 'empty' | 'error' | 'success' | 'offline' | 'disabled' | 'retry' | 'blocked')[];
+  readonly requiredStates: readonly DshCaptainScreenState[];
   readonly requiredPermissions?: readonly ('location' | 'notifications' | 'camera' | 'mediaLibrary')[];
   readonly analytics: {
     readonly screenView: string;
@@ -22,8 +22,23 @@ export type DshCaptainScreenRegistryItem = {
   readonly deepLinkPath?: string;
   readonly fallbackRouteId?: DshCaptainRouteId;
   readonly releaseCriticality: 'P0' | 'P1' | 'P2';
-  readonly status: 'TBD' | 'UNPROVEN' | 'VERIFIED' | 'CLOSED' | 'DEPRECATED';
+  readonly status: DshCaptainScreenRegistryStatus;
 };
+
+export type DshCaptainScreenState =
+  | 'loading'
+  | 'empty'
+  | 'error'
+  | 'success'
+  | 'offline'
+  | 'disabled'
+  | 'retry'
+  | 'blocked';
+
+export type DshCaptainScreenRegistryStatus =
+  | 'READY_FOR_REVIEW'
+  | 'VERIFIED'
+  | 'DEPRECATED';
 
 export const dshCaptainScreenRegistry = [
   {
@@ -316,7 +331,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_orders_pickup_dropoff_view' },
     fallbackRouteId: 'dsh-captain-inbox',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'READY_FOR_REVIEW',
   },
   {
     screenId: 'captain.dsh.orders.pod-submission',
@@ -333,7 +348,7 @@ export const dshCaptainScreenRegistry = [
     analytics: { screenView: 'captain_dsh_orders_pod_submission_view' },
     fallbackRouteId: 'dsh-captain-inbox',
     releaseCriticality: 'P1',
-    status: 'UNPROVEN',
+    status: 'READY_FOR_REVIEW',
   },
   {
     // ML-025: DshCaptainMapScreen was on disk but unregistered; wired into pickup-dropoff flow
@@ -353,6 +368,6 @@ export const dshCaptainScreenRegistry = [
     deepLinkPath: '/captain/dsh/orders/map',
     fallbackRouteId: 'dsh-captain-pickup-dropoff',
     releaseCriticality: 'P0',
-    status: 'UNPROVEN',
+    status: 'READY_FOR_REVIEW',
   },
 ] as const satisfies readonly DshCaptainScreenRegistryItem[];

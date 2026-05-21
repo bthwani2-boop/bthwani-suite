@@ -1,7 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Box, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import styles from '../shared/control-panel-surface.module.css';
 
 const TOPOLOGY_LANES = [
   { id: 'onboarding', title: 'الاستقبال', sub: 'مدخل الشريك والوثائق', flow: 'الشريك → الاستقبال → العمليات', load: 'طبيعي', tone: 'success' as const },
@@ -12,7 +12,16 @@ const TOPOLOGY_LANES = [
   { id: 'support', title: 'الدعم', sub: 'الإشارات والاعتراضات', flow: 'الشريك → المشكلات → الدعم', load: 'طبيعي', tone: 'success' as const },
 ];
 
-export function PartnerTopologyLane() {
+export type PartnerTopologyLaneProps = {
+  partnersHref?: string;
+  marketingHref?: string;
+};
+
+export function PartnerTopologyLane({
+  partnersHref = '/partners',
+  marketingHref = '/marketing',
+}: PartnerTopologyLaneProps) {
+  const router = useRouter();
   const { theme } = useTheme();
   const toneStyles = {
     success: { color: theme.success, bg: theme.successSurface },
@@ -30,7 +39,7 @@ export function PartnerTopologyLane() {
         <Text role="caption" tone="muted">تكامل السطح التشغيلي الموحد</Text>
       </div>
 
-      <div style={{  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {TOPOLOGY_LANES.map((lane) => (
           <Surface key={lane.id} tone="raised" gap={3} style={{ borderRadius: 20, padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -60,14 +69,14 @@ export function PartnerTopologyLane() {
               borderRadius: '12px',
               border: `1px solid ${theme.line}`
             }}>
-              <Text role="caption" style={{ color: theme.textMuted, fontFamily: 'monospace', direction: 'ltr', textAlign: 'left', display: 'block' }}>
+              <Text role="caption" style={{ color: theme.textMuted, fontFamily: 'monospace', direction: 'ltr', textAlign: 'left' }}>
                 {lane.flow}
               </Text>
             </div>
 
             <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-              <button onClick={() => window.location.assign('/partners')} style={{ flex: 1, padding: '8px', backgroundColor: theme.surface, border: `1px solid ${theme.line}`, borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: theme.brandHeaderBackground, cursor: 'pointer' }}>تتبع المسار</button>
-              <button onClick={() => window.location.assign('/marketing')} style={{ flex: 1, padding: '8px', backgroundColor: theme.surface, border: `1px solid ${theme.line}`, borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: theme.brandHeaderBackground, cursor: 'pointer' }}>الإعدادات</button>
+              <button type="button" onClick={() => router.push(partnersHref)} style={{ flex: 1, padding: '8px', backgroundColor: theme.surface, border: `1px solid ${theme.line}`, borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: theme.brandHeaderBackground, cursor: 'pointer' }}>فتح طابور الشركاء</button>
+              <button type="button" onClick={() => router.push(marketingHref)} style={{ flex: 1, padding: '8px', backgroundColor: theme.surface, border: `1px solid ${theme.line}`, borderRadius: '8px', fontSize: '11px', fontWeight: 700, color: theme.brandHeaderBackground, cursor: 'pointer' }}>فتح مسار التسويق</button>
             </div>
           </Surface>
         ))}

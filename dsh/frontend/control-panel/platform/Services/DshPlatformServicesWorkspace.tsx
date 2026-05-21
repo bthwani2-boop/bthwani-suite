@@ -26,11 +26,11 @@ type PlatformTopService = {
 const PLANNED_SERVICE_DEFAULTS = {
   sovereignStatus: 'مقررة — لم تُضَف بعد',
   customerVisibility: 'لا ينطبق',
-  scope: '[TBD]',
-  financialDependency: '[TBD]',
-  risks: '[TBD]',
-  impactIfStopped: '[TBD]',
-  lastModified: '[TBD]',
+  scope: 'بانتظار تحديد النطاق الرسمي',
+  financialDependency: 'بانتظار تعريف المالك المالي أو التشغيلي',
+  risks: 'لم يكتمل تقييم المخاطر بعد',
+  impactIfStopped: 'غير مطبق حتى التسجيل الرسمي',
+  lastModified: 'بانتظار التسجيل الرسمي',
   tone: 'default' as const,
   filterGroup: 'planned' as const,
 };
@@ -63,12 +63,12 @@ const PLATFORM_TOP_SERVICES: readonly PlatformTopService[] = [
     filterGroup: 'active',
   },
   { code: 'AMN', name: 'الأمن والتحقق', ...PLANNED_SERVICE_DEFAULTS },
-  { code: 'KNZ', name: '[TBD]', ...PLANNED_SERVICE_DEFAULTS },
-  { code: 'ARB', name: '[TBD]', ...PLANNED_SERVICE_DEFAULTS },
-  { code: 'MRF', name: '[TBD]', ...PLANNED_SERVICE_DEFAULTS },
-  { code: 'KWD', name: '[TBD]', ...PLANNED_SERVICE_DEFAULTS },
-  { code: 'SND', name: '[TBD]', ...PLANNED_SERVICE_DEFAULTS },
-  { code: 'ESF', name: '[TBD]', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'KNZ', name: 'KNZ — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'ARB', name: 'ARB — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'MRF', name: 'MRF — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'KWD', name: 'KWD — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'SND', name: 'SND — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'ESF', name: 'ESF — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
 ] as const;
 
 type ServiceCardProps = { service: PlatformTopService };

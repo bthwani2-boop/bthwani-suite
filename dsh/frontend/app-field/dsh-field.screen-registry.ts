@@ -14,14 +14,29 @@ export type DshFieldScreenRegistryItem = {
   readonly componentName: string;
   readonly screenKind: 'TAB_ROOT' | 'SCREEN_ENTRY' | 'FLOW_STEP' | 'MODAL' | 'SHEET';
   readonly flowId?: string;
-  readonly requiredStates: readonly ('loading' | 'empty' | 'error' | 'success' | 'offline' | 'disabled' | 'retry' | 'blocked')[];
+  readonly requiredStates: readonly DshFieldScreenState[];
   readonly analytics: {
     readonly screenView: string;
   };
   readonly fallbackRouteId?: DshFieldRouteId;
   readonly releaseCriticality: 'P0' | 'P1' | 'P2';
-  readonly status: 'TBD' | 'UNPROVEN' | 'VERIFIED' | 'CLOSED' | 'DEPRECATED';
+  readonly status: DshFieldScreenRegistryStatus;
 };
+
+export type DshFieldScreenState =
+  | 'loading'
+  | 'empty'
+  | 'error'
+  | 'success'
+  | 'offline'
+  | 'disabled'
+  | 'retry'
+  | 'blocked';
+
+export type DshFieldScreenRegistryStatus =
+  | 'READY_FOR_REVIEW'
+  | 'VERIFIED'
+  | 'DEPRECATED';
 
 export const dshFieldScreenRegistry = [
   {

@@ -116,12 +116,12 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
       { id: 'retained-fees', label: 'رسوم محتفظة للمتجر' },
     ],
   },
-  // tax-compliance مخفي من القيادة النشطة — [TBD] لا سياسة ضريبية يمنية مثبتة بعد
+  // tax-compliance مخفي من القيادة النشطة — لا سياسة ضريبية يمنية مثبتة بعد
   {
     id: 'tax-compliance',
-    label: 'الضرائب — [TBD]',
-    description: '[TBD] — لا سياسة ضريبية/زكوية يمنية مثبتة في DSH حتى الآن. هذا القسم غير نشط.',
-    badge: 'TBD',
+    label: 'الضرائب — غير مفعلة',
+    description: 'لا سياسة ضريبية أو زكوية مثبتة في DSH حتى الآن، لذلك يبقى هذا القسم read-only وغير نشط.',
+    badge: 'مؤجل',
     subGroups: [],
   },
 ] as const;

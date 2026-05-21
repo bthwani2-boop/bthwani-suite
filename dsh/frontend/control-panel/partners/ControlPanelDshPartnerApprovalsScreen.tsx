@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
-  WebControlPanelDenseHeader,
   WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
   WebControlPanelDecisionRow,
@@ -16,6 +15,9 @@ import {
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
+import { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
+import { PartnerTopologyLane } from './PartnerTopologyLane';
+import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
 
 // ML-001: approval action extended to include final ops activation step for marketing-approved records
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
@@ -86,6 +88,33 @@ export function ControlPanelDshPartnerHubScreen() {
       moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-partners', 'طلب تعديل');
     }
     refresh();
+  };
+
+  const renderInboxWorkspace = () => {
+    if (activeSubTab === 'registration') {
+      return (
+        <Box gap={3}>
+          {items.length === 0 ? (
+            <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
+              <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
+            </Box>
+          ) : (
+            items.map((item) => (
+              <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
+            ))
+          )}
+        </Box>
+      );
+    }
+
+    return (
+      <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+        <Box align="center" gap={1}>
+          <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>لا توجد قائمة مستقلة لهذا المسار الآن</Text>
+          <Text tone="muted">يظهر هذا التبويب كحالة N/A واضحة إلى أن ينتج له queue مملوك داخل الشركاء، من دون خلق شاشة وهمية أو مسار مكرر.</Text>
+        </Box>
+      </Box>
+    );
   };
 
   const PRIMARY_TABS = [
@@ -183,23 +212,21 @@ export function ControlPanelDshPartnerHubScreen() {
           <Box padding={4} gap={4}>
             {activeTab === 'deactivation' ? (
               <PartnerDeactivationWorkspace />
+            ) : activeTab === 'eligibility' ? (
+              <DshPartnerPromotionEligibilityScreen />
+            ) : activeTab === 'topology' ? (
+              <PartnerTopologyLane />
+            ) : activeTab === 'contracts' ? (
+              <PartnerFulfillmentLane />
             ) : activeTab === 'inbox' && activeSubTab === 'registration' ? (
-              <Box gap={3}>
-                {items.length === 0 ? (
-                  <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
-                    <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
-                  </Box>
-                ) : (
-                  items.map((item) => (
-                    <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
-                  ))
-                )}
-              </Box>
+              renderInboxWorkspace()
+            ) : activeTab === 'inbox' ? (
+              renderInboxWorkspace()
             ) : (
               <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
                 <Box align="center" gap={1}>
-                  <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>هذه اللوحة تعرض الآن صفوف التفعيل والمراجعة</Text>
-                  <Text tone="muted">يمكن التبديل بين التبويبات الفرعية لفرز الطلبات حسب السطح والمراجعة والإسناد.</Text>
+                  <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>المسار معروض كحالة واضحة وليس كفراغ</Text>
+                  <Text tone="muted">عند غياب queue مملوك لهذا التبويب نعرض N/A صريحة بدل شاشة عامة أو placeholder مكرر.</Text>
                 </Box>
               </Box>
             )}

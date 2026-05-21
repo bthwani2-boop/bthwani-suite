@@ -18,7 +18,7 @@ import {
 } from './finance.registry';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
-// UI_PREVIEW_ONLY / CONTRACT_TBD
+// UI_PREVIEW_ONLY / WAITING_SOURCE_CONTRACT
 import {
   ControlPanelDshFinanceScreen,
   ControlPanelDshPayoutsScreen,

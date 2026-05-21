@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
@@ -16,6 +17,7 @@ export type PartnerIntakeLaneProps = {
 };
 
 export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHubItem }: PartnerIntakeLaneProps) {
+  const router = useRouter();
   const { theme } = useTheme();
   const openHubItem = React.useCallback((itemId: string, intent: 'approve' | 'fix' | 'inspect') => {
     if (onOpenHubItem) {
@@ -30,8 +32,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
     const url = new URL(hubHref, window.location.origin);
     url.searchParams.set('focus', itemId);
     url.searchParams.set('intent', intent);
-    window.location.assign(`${url.pathname}${url.search}${url.hash}`);
-  }, [hubHref, onOpenHubItem]);
+    router.push(`${url.pathname}${url.search}${url.hash}`);
+  }, [hubHref, onOpenHubItem, router]);
   if (state === 'loading') {
     return (
       <Box padding={10} align="center">

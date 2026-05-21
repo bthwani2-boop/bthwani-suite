@@ -703,7 +703,9 @@ function DshStoreGetScreenContent({
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
     setSelectedCategory(newId);
-    try { Vibration.vibrate(8); } catch { /* noop */ }
+    if (Platform.OS !== 'web') {
+      Vibration.vibrate(8);
+    }
   }, [selectedCategory]);
 
   const categoryRailItems = React.useMemo<BThwaniFilterRailItem[]>(

@@ -39,7 +39,7 @@ type FinanceRow = {
   sla: string;
 };
 
-/* UI_PREVIEW_ONLY / CONTRACT_TBD */
+/* UI_PREVIEW_ONLY / WAITING_SOURCE_CONTRACT */
 const FINANCE_ROWS: Record<FinanceSurface, ReadonlyArray<FinanceRow>> = {
   overview: [
     { id: 'FIN-001', amount: '١٢٥٬٠٠٠ ر.ي', owner: 'مالية العمليات', status: 'مراجعة', risk: 'warning', evidence: 'مطابقة جزئية بين الكشوف', nextAction: 'افتح التسويات', recommendation: 'أغلق التسويات العالقة أولًا', primaryActionLabel: 'فتح التسويات', secondaryActionLabel: 'فتح الأدلة', sla: 'خلال ٢٤ ساعة' },

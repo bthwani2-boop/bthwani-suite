@@ -550,7 +550,7 @@ const CLIENT_FLOWS: readonly DshFlowRegistryEntry[] = [
     onDemandPolicy: 'summary-only',
     allowedActions: ['عرض حالة الطلب', 'تتبع الموقع'],
     forbiddenActions: ['تعديل بيانات الطلب', 'رؤية منطق الشريك الداخلي'],
-    notes: 'TBD: تفاصيل إضافية في Phase 2.',
+    notes: 'تفاصيل إضافية مؤجلة لمرحلة الإثراء التالية.',
   },
   {
     id: 'client-cart-checkout',
@@ -564,7 +564,7 @@ const CLIENT_FLOWS: readonly DshFlowRegistryEntry[] = [
     onDemandPolicy: 'detail-on-open',
     allowedActions: ['إضافة للعربة', 'إتمام الطلب'],
     forbiddenActions: ['تعديل أسعار المتجر', 'رؤية بيانات الكابتن'],
-    notes: 'TBD: on-demand audit في Phase 2 (66 duplications في Phase 0).',
+    notes: 'مراجعة on-demand retrieval مؤجلة لمرحلة الإثراء التالية (66 duplications في Phase 0).',
   },
   {
     id: 'client-order-issue',
@@ -599,7 +599,7 @@ const CAPTAIN_FLOWS: readonly DshFlowRegistryEntry[] = [
     onDemandPolicy: 'detail-on-open',
     allowedActions: ['تأكيد الوصول للفرع', 'طلب handoff', 'تصعيد التأخير'],
     forbiddenActions: ['تأكيد الاستلام قبل الوصول', 'رؤية مشاكل الشريك الداخلية'],
-    notes: 'TBD: تفاصيل إضافية في Phase 2.',
+    notes: 'تفاصيل إضافية مؤجلة لمرحلة الإثراء التالية.',
   },
   {
     id: 'captain-proof-of-delivery',
@@ -627,7 +627,7 @@ const CAPTAIN_FLOWS: readonly DshFlowRegistryEntry[] = [
     onDemandPolicy: 'summary-only',
     allowedActions: ['متابعة المسار', 'تحديث الموقع'],
     forbiddenActions: ['تضمين payload ثقيل في state دائمًا'],
-    notes: 'TBD: on-demand audit في Phase 2.',
+    notes: 'مراجعة on-demand retrieval مؤجلة لمرحلة الإثراء التالية.',
   },
 ];
 
@@ -649,7 +649,7 @@ const FIELD_FLOWS: readonly DshFlowRegistryEntry[] = [
     onDemandPolicy: 'detail-on-open',
     allowedActions: ['استكمال ملف التأهيل', 'رفع الوثائق', 'تحويل للمراجعة'],
     forbiddenActions: ['التفعيل النهائي دون مراجعة', 'ربط settlement محلي'],
-    notes: 'TBD: تفاصيل إضافية في Phase 2.',
+    notes: 'تفاصيل إضافية مؤجلة لمرحلة الإثراء التالية.',
   },
   {
     id: 'field-store-visit',
