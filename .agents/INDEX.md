@@ -1,4 +1,4 @@
-﻿# BThwani Agent Index
+# BThwani Agent Index
 
 ## Reading order
 
@@ -27,11 +27,13 @@
 | `bthwani-domain-governance-reader` | See `.agents/skills/bthwani-domain-governance-reader/SKILL.md`. |
 | `bthwani-ui-kit-surface-contract` | See `.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md`. |
 | `bthwani-screen-flow-binding-contract` | See `.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md`. |
+| `bthwani-integrated-system-umbrella-contract` | See `.agents/skills/bthwani-integrated-system-umbrella-contract/SKILL.md`. |
 | `bthwani-platform-vars-control-contract` | See `.agents/skills/bthwani-platform-vars-control-contract/SKILL.md`. |
 | `bthwani-runtime-provider-config-contract` | See `.agents/skills/bthwani-runtime-provider-config-contract/SKILL.md`. |
 | `bthwani-api-contract-client-boundary` | See `.agents/skills/bthwani-api-contract-client-boundary/SKILL.md`. |
 | `bthwani-go-backend-target-boundary` | See `.agents/skills/bthwani-go-backend-target-boundary/SKILL.md`. |
 | `bthwani-data-fixture-simulation-contract` | See `.agents/skills/bthwani-data-fixture-simulation-contract/SKILL.md`. |
+| `bthwani-on-demand-retrieval-contract` | See `.agents/skills/bthwani-on-demand-retrieval-contract/SKILL.md`. |
 | `bthwani-finance-ledger-contract` | See `.agents/skills/bthwani-finance-ledger-contract/SKILL.md`. |
 | `bthwani-commercial-growth-contract` | See `.agents/skills/bthwani-commercial-growth-contract/SKILL.md`. |
 | `bthwani-commerce-catalog-contract` | See `.agents/skills/bthwani-commerce-catalog-contract/SKILL.md`. |

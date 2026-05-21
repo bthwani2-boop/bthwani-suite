@@ -1,4 +1,4 @@
-﻿# BThwani Skill Catalog
+# BThwani Skill Catalog
 
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
@@ -10,11 +10,13 @@
 | `bthwani-domain-governance-reader` | Route every task to the correct governance truth before execution. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-ui-kit-surface-contract` | Guard UI kit ownership, RTL, central colors, and design-system boundaries. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-screen-flow-binding-contract` | Lock screen, route, state, binding, entry, and exit contracts. | `governance/` according to task domain | structured decision + evidence requirements |
+| `bthwani-integrated-system-umbrella-contract` | Enforce integrated multi-surface reasoning, canonical ownership, cross-surface impact maps, and no isolated implementations. | `governance/` according to task domain | integrated-system decision + cross-surface impact map |
 | `bthwani-platform-vars-control-contract` | Control vars/feature/provider precedence and UI-only vs runtime scope. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-runtime-provider-config-contract` | Review runtime provider/config/env exposure without unsafe mutation. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-api-contract-client-boundary` | Verify API contracts, types, clients, errors, and binding readiness. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-go-backend-target-boundary` | Keep backend/API decisions aligned to Go unless repo evidence proves otherwise. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-data-fixture-simulation-contract` | Separate fixtures, seeds, mocks, preview data, and runtime truth. | `governance/` according to task domain | structured decision + evidence requirements |
+| `bthwani-on-demand-retrieval-contract` | Enforce scoped retrieval, references, pagination, lazy loading, caching, and anti-payload-inflation rules. | `governance/` according to task domain | retrieval contract + payload risk decision |
 | `bthwani-finance-ledger-contract` | Review wallet/ledger/settlement/refund/fee/payment impact. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-commercial-growth-contract` | Review marketing, loyalty, subscriptions, offers, campaigns, eligibility, and budgets. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-commerce-catalog-contract` | Review catalog/store/product/cart/favorite display and ownership contracts. | `governance/` according to task domain | structured decision + evidence requirements |
