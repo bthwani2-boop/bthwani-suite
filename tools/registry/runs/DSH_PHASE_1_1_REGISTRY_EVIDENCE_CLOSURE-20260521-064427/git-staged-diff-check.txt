@@ -1,0 +1,2 @@
+PASS — no staged content to check.
+(git diff --cached --check produced no output)

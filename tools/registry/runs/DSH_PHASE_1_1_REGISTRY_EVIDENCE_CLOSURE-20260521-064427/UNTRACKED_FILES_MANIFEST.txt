@@ -1,0 +1,8 @@
+Untracked files at evidence capture (2026-05-21T06:44:27):
+
+FILE: tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_FORENSIC_REVIEW_PACKAGE.zip
+  Classification : PLAN_EVIDENCE_ARTIFACT
+  Intent         : Forensic review package ZIP from Phase 1.1 review session
+  Source change? : NO — not a source file, not a dependency, not a lockfile
+  Action         : Account in evidence; add to git tracking in final commit
+  BLOCKED?       : NO

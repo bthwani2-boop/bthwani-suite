@@ -1,0 +1,5 @@
+?? tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_FORENSIC_REVIEW_PACKAGE.zip
+
+NOTE: This is a plan/review artifact (forensic review package ZIP), not a source change.
+Classification: PLAN_EVIDENCE_ARTIFACT — intentional, not a leaked source file.
+Action: Accounted here; no auto-deletion; will be added to git tracking in final commit.

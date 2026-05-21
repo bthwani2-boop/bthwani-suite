@@ -1,0 +1,51 @@
+Phase 1.1 Source Scope — DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE-20260521-064427
+Captured: 2026-05-21T06:44:27
+Branch: ghb/0163-20260521-055416-gitattributes-dsh
+HEAD: 8e6ab3f9ef9e2a8693203f824b06ca25836ebbe5
+
+PHASE_1_1_SOURCE_FILES (committed — all changes are in HEAD):
+
+dsh/frontend/shared/dsh-flow-registry.ts
+  Action  : MODIFIED (Phase 1 added file; Phase 1.1 added stats/validation exports)
+  Added   : getDshFlowRegistryStats(), getDshFlowRegistryValidationSummary()
+  Added   : DshFlowRegistryStats type, DshFlowRegistryValidationResult type
+  Lines   : 912 total
+  Note    : Core Phase 1 baseline registry — metadata-only, no UI/backend deps
+
+dsh/frontend/shared/index.ts
+  Action  : MODIFIED (Phase 1 added barrel exports; Phase 1.1 added stats exports + session comment)
+  Added   : export getDshFlowRegistryStats, getDshFlowRegistryValidationSummary
+  Added   : export types DshFlowRegistryStats, DshFlowRegistryValidationResult
+  Comment : Phase 1.1 closure session reference (DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE-20260521-061309)
+
+dsh/frontend/app-partner/dsh-partner.types.ts
+  Action  : MODIFIED (Phase 1 added alignment comment; Phase 1.1 added authoritative count constant)
+  Added   : DSH_PARTNER_OPERATIONAL_FLOW_IDS_EXPECTED_COUNT = DSH_PARTNER_OPERATIONAL_FLOW_IDS.length
+  Corrects: Phase 1 evidence claim of 31 (actual: 27; constant tracks ground truth)
+
+dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx
+  Action  : MODIFIED (Phase 1 added import; Phase 1.1 activated import in executable guard)
+  Change  : isDshHiddenCompatFlow used in resolveCaseWorkspaceTarget()
+  Guard   : hidden-compat flows now suppressed from workspace navigation at runtime
+  Dead import: RESOLVED — import is now actively used
+
+PLAN / EVIDENCE ARTIFACTS (not source changes):
+
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_FORENSIC_REVIEW_PACKAGE.zip
+  Classification : PLAN_EVIDENCE_ARTIFACT (untracked)
+  Content        : Forensic review package from earlier Phase 1.1 review session
+
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE_PROMPT.md
+  Classification : PLAN_ARTIFACT (tracked, committed)
+
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_FORENSIC_REVIEW_REPORT.md
+  Classification : PLAN_ARTIFACT (tracked, committed)
+
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_FLOW_REGISTRY_AND_REACHABILITY_PROMPT.md
+  Classification : PLAN_ARTIFACT (tracked, committed)
+
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_0_SYSTEM_AUDIT-20260521-022034/**
+  Classification : PLAN_EVIDENCE_ARTIFACTS (tracked, committed)
+
+.gitattributes
+  Classification : REPO_CONFIG (tracked, committed) — LF normalization rule; intentional

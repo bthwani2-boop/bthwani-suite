@@ -1,0 +1,14 @@
+file_path,consumer_role,imported_symbols,executable_use,consumption_status
+dsh/frontend/shared/dsh-flow-registry.ts,REGISTRY_SOURCE,"defines: DSH_FLOW_REGISTRY + 12 exported functions/types","N/A — defines the registry",REGISTRY_SOURCE
+dsh/frontend/shared/index.ts,BARREL_EXPORT,"re-exports: DSH_FLOW_REGISTRY getDshFlowById getDshFlowsForSurface getDshVisibleFlowsForSurface isDshHiddenCompatFlow getDshEscalationFlows getDshFinancePreviewFlows getDshFlowRegistryStats getDshFlowRegistryValidationSummary + all types","barrel only — no executable logic",BARREL_ONLY
+dsh/frontend/app-partner/dsh-partner.types.ts,MAPPING_ALIGNMENT,"does not import registry directly; DSH_PARTNER_OPERATIONAL_FLOW_IDS IDs align with registry IDs; DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS aligns with registry hiddenCompat entries","DSH_PARTNER_OPERATIONAL_FLOW_IDS_EXPECTED_COUNT = .length; mapping tables DSH_PARTNER_SUPPORT_ROUTE_TO_OPERATIONAL_FLOW and reverse","ALIGNED — parallel source; registry is SSoT for metadata; types file is SSoT for partner surface route mapping"
+dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx,ACTIVE_CONSUMER,"isDshHiddenCompatFlow from ../../shared/dsh-flow-registry","resolveCaseWorkspaceTarget(): if (item.linkedFlowId && isDshHiddenCompatFlow(item.linkedFlowId)) return null — prevents hidden-compat flows from opening as primary workspace routes",EXECUTABLE_GUARD_ACTIVE
+
+CONSUMPTION_SUMMARY:
+active_consumers=1 (PartnerSupportScreen — executable guard)
+barrel_consumers=1 (shared/index.ts)
+mapping_aligned=1 (dsh-partner.types.ts)
+app_client_registry_consumption=NONE_IN_PHASE_1_1 (TODO Phase 2)
+app_captain_registry_consumption=NONE_IN_PHASE_1_1 (TODO Phase 2)
+app_field_registry_consumption=NONE_IN_PHASE_1_1 (TODO Phase 2)
+control_panel_registry_consumption=NONE_IN_PHASE_1_1 (TODO Phase 2)

@@ -1,0 +1,12 @@
+file_path,type,phase_1_1_scope,tracked_in_git,notes
+dsh/frontend/shared/dsh-flow-registry.ts,SOURCE,YES,YES,"Phase 1 added; Phase 1.1 added stats+validation exports. Core registry SSoT."
+dsh/frontend/shared/index.ts,SOURCE,YES,YES,"Phase 1 added barrel; Phase 1.1 added stats exports + session comment."
+dsh/frontend/app-partner/dsh-partner.types.ts,SOURCE,YES,YES,"Phase 1.1 added DSH_PARTNER_OPERATIONAL_FLOW_IDS_EXPECTED_COUNT; corrects 31→27 claim."
+dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx,SOURCE,YES,YES,"Phase 1.1 activated isDshHiddenCompatFlow in resolveCaseWorkspaceTarget — dead import resolved."
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE_PROMPT.md,PLAN_ARTIFACT,NO,YES,"Phase 1.1 execution prompt — plan artifact only."
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_FORENSIC_REVIEW_REPORT.md,PLAN_ARTIFACT,NO,YES,"Phase 1 forensic review report — plan artifact only."
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_FLOW_REGISTRY_AND_REACHABILITY_PROMPT.md,PLAN_ARTIFACT,NO,YES,"Phase 1 execution prompt — plan artifact only."
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_0_SYSTEM_AUDIT-20260521-022034/**,PLAN_ARTIFACT,NO,YES,"Phase 0 audit evidence — plan artifacts only."
+tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_FORENSIC_REVIEW_PACKAGE.zip,PLAN_ARTIFACT,NO,NO(untracked),"Phase 1.1 forensic review ZIP — untracked; intentional plan artifact; will be tracked in final commit."
+.gitattributes,REPO_CONFIG,NO,YES,"LF normalization rule; intentional; not source or plan."
+tools/registry/runs/DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE-20260521-064427/**,EVIDENCE,YES,NO(new),"This evidence folder — created in Phase 1.1 execution."

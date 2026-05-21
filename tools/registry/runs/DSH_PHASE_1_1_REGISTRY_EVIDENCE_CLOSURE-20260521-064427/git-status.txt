@@ -1,0 +1,9 @@
+Branch: ghb/0163-20260521-055416-gitattributes-dsh
+HEAD: 8e6ab3f9ef9e2a8693203f824b06ca25836ebbe5
+
+git status --short:
+?? tools/plan/bthwani_all_apps_dsh/DSH_PHASE_1_1_FORENSIC_REVIEW_PACKAGE.zip
+
+Working tree: CLEAN (no unstaged tracked changes)
+Staged: EMPTY (nothing staged)
+Untracked: 1 file (tools/plan artifact — plan/review ZIP, not source)

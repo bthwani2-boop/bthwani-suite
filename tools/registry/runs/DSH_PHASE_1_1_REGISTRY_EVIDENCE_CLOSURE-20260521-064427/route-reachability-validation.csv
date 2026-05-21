@@ -1,0 +1,49 @@
+registry_id,ownerSurface,routeId,screenHint,reachability_status,notes
+order-accept,app-partner,order-accept,PartnerSupportScreen > active-orders,PROVEN_REACHABLE_BY_ROUTE,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; screenHint maps to PartnerSupportScreen"
+order-get,app-partner,order-get,OrdersInboxScreen,PROVEN_REACHABLE_BY_ROUTE,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; screenHint maps to known screen"
+order-handoff,app-partner,order-handoff,PartnerSupportScreen,PROVEN_REACHABLE_BY_ROUTE,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; screenHint confirmed"
+order-prepare,app-partner,order-prepare,PartnerSupportScreen > active-orders,PROVEN_REACHABLE_BY_ROUTE,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+order-ready,app-partner,order-ready,,SCREEN_EXISTS_ONLY,"routeId present; no screenHint; screen inferred from route pattern"
+order-out-for-delivery,app-captain,order-out-for-delivery,,SCREEN_EXISTS_ONLY,"contextual; captain-owned; partner sees summary only; route registered"
+order-store-delivered,app-partner,order-store-delivered,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; no screenHint"
+order-reject,app-partner,order-reject,PartnerSupportScreen > active-orders,PROVEN_REACHABLE_BY_ROUTE,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; confirmed in PartnerSupportScreen.tsx onRejectOrCancel"
+order-issue-queue,app-partner,order-issue-queue,PartnerSupportScreen > order-issues,PROVEN_REACHABLE_BY_ROUTE,"routeId confirmed; screenHint confirmed"
+order-alerts,app-partner,,(hidden),HIDDEN_COMPAT,"hiddenCompat=true; no independent route; contextual tag only in command center"
+order-sla-risk,app-partner,,(hidden),HIDDEN_COMPAT,"hiddenCompat=true; no standalone route; embedded in command center view"
+order-issue-required,app-partner,,(hidden),HIDDEN_COMPAT,"hiddenCompat=true; deprecated in favor of order-issue-queue"
+auction-status-update,app-partner,,(hidden),HIDDEN_COMPAT,"hiddenCompat=true; legacy registry consumer alias only"
+order-rejection,app-partner,,(hidden),HIDDEN_COMPAT,"hiddenCompat=true; DshPartnerRoute 'order-rejection' kept for legacy compat — not a primary flow entry"
+order-chat-send,app-partner,chat-send,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; contextual — opened from case card"
+order-chat-read-ack,app-partner,chat-read-ack,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; contextual"
+order-quick-reply-config,app-partner,quick-reply-config,OperationScreens > ConversationScreen,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; contextual"
+order-quick-reply-settings,app-partner,quick-reply-settings,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; contextual"
+order-quick-reply-setup,app-partner,quick-reply-setup,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; contextual"
+inventory-adjust,app-partner,inventory-adjust,InventoryCatalogScreen,PROVEN_REACHABLE_BY_ROUTE,"routeId + screenHint; confirmed in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+inventory-update,app-partner,inventory-update,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+items-upsert,app-partner,items-upsert,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+doc-upload,app-partner,doc-upload,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+intake-start,app-partner,intake-start,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+store-nomination,app-partner,store-nomination,,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS"
+video-upload,app-partner,video-upload,OperationScreens > VideoUploadScreen,SCREEN_EXISTS_ONLY,"routeId in DSH_PARTNER_SUPPORT_ROUTE_IDS; screenHint present"
+partner-finance-bridge,wlt-finance,,(hidden),HIDDEN_COMPAT,"financialImpact=true finance-preview-only; no DSH-initiated navigation; WLT owns"
+partner-settlement-summary,wlt-finance,,(hidden),HIDDEN_COMPAT,"financialImpact=true finance-preview-only; no DSH-initiated navigation; WLT owns"
+partner-commission-summary,wlt-finance,,(hidden),HIDDEN_COMPAT,"financialImpact=true finance-preview-only; no DSH-initiated navigation; WLT owns"
+client-order-tracking,app-client,tracking,OrdersTrackingScreens,SUMMARY_ONLY_TBD,"client registry not consumed by surface yet; TBD Phase 2 per registry note"
+client-cart-checkout,app-client,cart,CartScreen,SUMMARY_ONLY_TBD,"client registry not consumed by surface yet; TBD Phase 2 per registry note"
+client-order-issue,app-client,order-issue-workspace,,SUMMARY_ONLY_TBD,"client registry not consumed by surface yet; TBD Phase 2"
+captain-order-pickup,app-captain,pickup-dropoff,DshCaptainPickupDropoffScreen,SUMMARY_ONLY_TBD,"captain registry not consumed by surface yet; TBD Phase 2 per registry note"
+captain-proof-of-delivery,app-captain,pod-submission,DshCaptainPoDSubmissionScreen,SUMMARY_ONLY_TBD,"captain registry not consumed; TBD Phase 2"
+captain-map-navigation,app-captain,map,DshCaptainMapScreen,SUMMARY_ONLY_TBD,"captain registry not consumed; TBD Phase 2"
+field-store-onboarding,app-field,onboarding,DshFieldStoreOnboardingScreen,SUMMARY_ONLY_TBD,"field registry not consumed; TBD Phase 2 per registry note"
+field-store-visit,app-field,visit,DshFieldStoreVisitScreen,SUMMARY_ONLY_TBD,"field registry not consumed; TBD Phase 2"
+field-readiness-escalation,app-field,readiness-escalation,DshFieldReadinessEscalationScreen,SUMMARY_ONLY_TBD,"field registry not consumed; TBD Phase 2"
+control-sla-policy,control-panel,,operations/AuditSupportSlaScreen,CONTROL_PANEL_OWNER_TBD,"internal; control-panel SSoT; not wired to getDshEscalationFlows yet in Phase 1.1"
+control-escalation-queue,control-panel,,operations/ExceptionsEscalationsScreen,CONTROL_PANEL_OWNER_TBD,"control-panel escalation queue; not wired to registry consumer in Phase 1.1"
+
+REACHABILITY_SUMMARY:
+PROVEN_REACHABLE_BY_ROUTE=7
+SCREEN_EXISTS_ONLY=14
+HIDDEN_COMPAT=8
+SUMMARY_ONLY_TBD=9
+CONTROL_PANEL_OWNER_TBD=2
+TOTAL=40
