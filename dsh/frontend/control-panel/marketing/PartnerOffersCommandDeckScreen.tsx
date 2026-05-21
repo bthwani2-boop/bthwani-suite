@@ -408,7 +408,7 @@ export function PartnerOffersCommandDeckScreen() {
           </Box>
 
           {publishGuardMessage ? (
-            <Box paddingX={4} paddingTop={3}>
+            <Box paddingX={4} style={{ paddingTop: 12 }}>
               <Surface tone="warning" padding={3}>
                 <Text role="bodySm">{publishGuardMessage}</Text>
               </Surface>

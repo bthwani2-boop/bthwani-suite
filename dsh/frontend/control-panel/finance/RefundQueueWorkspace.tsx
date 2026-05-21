@@ -8,7 +8,7 @@ import {
   getDshWltRefundStatusTone,
   buildDshWltFinanceBoundaryRecord,
   type DshWltRefundBridgeStatus,
-} from '../../../shared/dshFinancePreviewModel';
+} from '../../shared/dshFinancePreviewModel';
 import { WltBoundaryBanner } from './WltBoundaryBanner';
 import { ControlPanelDshRefundQueueScreen } from './FinanceHubScreens';
 

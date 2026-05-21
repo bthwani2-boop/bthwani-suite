@@ -59,13 +59,15 @@ import {
 } from '../../shared/partner-offer.preview-store';
 import {
   buildCommercialProjection,
-  getCampaignVisibilityRecord,
-  getPartnerOfferVisibilityRecord,
   isClientVisibleStatus,
   type CommercialCampaign,
   type CommercialLifecycleStatus,
   type PartnerOffer,
 } from '../../shared/commercial.preview-contract';
+import {
+  getCampaignVisibilityRecord,
+  getPartnerOfferVisibilityRecord,
+} from '../../shared/marketing-visibility.contract';
 import {
   getDshPartnerActivationStateMetadata,
   isDshPartnerClientVisible,
@@ -1129,24 +1131,28 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
 
       <Box paddingX={4} paddingY={2}>
         <div className={marketingStyles.governanceBridgeRow}>
-          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" className={marketingStyles.governanceBridgeCard}>
-            <Text role="titleSm">ملكية التسويق</Text>
-            <Text role="bodySm" tone="muted">
-              {marketingGovernance?.notes ?? 'التسويق يملك المحتوى والحملات والعروض، وليس تفعيل الشريك أو نشر الكتالوج النهائي.'}
-            </Text>
-            <Text role="caption" tone="muted">
-              {marketingGovernance?.onDemandPolicySummary ?? 'المحتوى الثقيل والمعاينات تبقى on-demand فقط.'}
-            </Text>
-          </Box>
-          <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" className={marketingStyles.governanceBridgeCard}>
-            <Text role="titleSm">الجسور المعتمدة</Text>
-            <Text role="bodySm" tone="muted">
-              {`النشر النهائي للمنتجات عبر ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} · أهلية الشريك عبر ${partnersGovernance?.sectionLabel ?? 'Partners'} · الحوادث التشغيلية عبر ${supportGovernance?.sectionLabel ?? 'Support'}.`}
-            </Text>
-            <Text role="caption" tone="muted">
-              لا تتحول هذه المساحة إلى نسخة من الموبايل، بل تبقى مركز اعتماد ومراجعة كثيف ومنخفض الضجيج.
-            </Text>
-          </Box>
+          <div className={marketingStyles.governanceBridgeCard}>
+            <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
+              <Text role="titleSm">ملكية التسويق</Text>
+              <Text role="bodySm" tone="muted">
+                {marketingGovernance?.notes ?? 'التسويق يملك المحتوى والحملات والعروض، وليس تفعيل الشريك أو نشر الكتالوج النهائي.'}
+              </Text>
+              <Text role="caption" tone="muted">
+                {marketingGovernance?.onDemandPolicySummary ?? 'المحتوى الثقيل والمعاينات تبقى on-demand فقط.'}
+              </Text>
+            </Box>
+          </div>
+          <div className={marketingStyles.governanceBridgeCard}>
+            <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line">
+              <Text role="titleSm">الجسور المعتمدة</Text>
+              <Text role="bodySm" tone="muted">
+                {`النشر النهائي للمنتجات عبر ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} · أهلية الشريك عبر ${partnersGovernance?.sectionLabel ?? 'Partners'} · الحوادث التشغيلية عبر ${supportGovernance?.sectionLabel ?? 'Support'}.`}
+              </Text>
+              <Text role="caption" tone="muted">
+                لا تتحول هذه المساحة إلى نسخة من الموبايل، بل تبقى مركز اعتماد ومراجعة كثيف ومنخفض الضجيج.
+              </Text>
+            </Box>
+          </div>
         </div>
       </Box>
 

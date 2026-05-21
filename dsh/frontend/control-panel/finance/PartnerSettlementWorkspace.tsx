@@ -5,7 +5,7 @@ import React from 'react';
 import { Box } from '@bthwani/ui-kit';
 import { WltBoundaryBanner } from './WltBoundaryBanner';
 import { ControlPanelDshSettlementScreen } from './FinanceHubScreens';
-import { buildDshWltFinanceBoundaryRecord } from '../../../shared/dshFinancePreviewModel';
+import { buildDshWltFinanceBoundaryRecord } from '../../shared/dshFinancePreviewModel';
 
 export type PartnerSettlementWorkspaceProps = {
   partnerId?: string;

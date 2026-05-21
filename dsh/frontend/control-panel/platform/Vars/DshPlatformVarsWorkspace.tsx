@@ -130,7 +130,7 @@ function resolvePrecedenceSummary(record: DshPlatformVarRecord) {
   return `الطبقة الفعالة: ${record.scope} · ${record.precedenceNote} · التسلسل الافتراضي: ${DEFAULT_PRECEDENCE_CHAIN_LABEL}`;
 }
 
-function resolveSimulationSummary(record: DshPlatformVarRecord, linkedScenarios: readonly typeof DSH_PLATFORM_SIMULATION_PREVIEW) {
+function resolveSimulationSummary(record: DshPlatformVarRecord, linkedScenarios: typeof DSH_PLATFORM_SIMULATION_PREVIEW) {
   if (linkedScenarios.length === 0) {
     return `لا توجد محاكاة مرتبطة بالمفتاح ${record.key} حتى الآن.`;
   }
@@ -138,7 +138,7 @@ function resolveSimulationSummary(record: DshPlatformVarRecord, linkedScenarios:
   return linkedScenarios.map((scenario) => scenario.expectedImpact).join(' · ');
 }
 
-function resolveAuditRequirementLabel(record: DshPlatformVarRecord, linkedAudits: readonly typeof DSH_PLATFORM_AUDIT_PREVIEW) {
+function resolveAuditRequirementLabel(record: DshPlatformVarRecord, linkedAudits: typeof DSH_PLATFORM_AUDIT_PREVIEW) {
   if (record.auditRequired || linkedAudits.length > 0) {
     return `نعم — ${linkedAudits.length > 0 ? `${linkedAudits.length} snapshot` : 'يتطلب مراجعة قبل أي binding أو اعتماد'}`;
   }
@@ -258,7 +258,7 @@ export function DshPlatformVarsWorkspace() {
       >
         <Box gap={4}>
           <Surface tone="warning" padding={3} radiusToken="xl" border>
-            <Text role="bodySm" tone="warning" className={styles.noticeText}>
+            <Text role="bodySm" tone="warning" style={{ lineHeight: 1.6 }}>
               mutationAllowed = false. هذه الشاشة summary-first وتفتح التفاصيل عند الطلب فقط. أي قرار مالي يبقى في WLT، وأي provider control هنا يبقى preview/reference حتى تثبت عقود التشغيل والربط.
             </Text>
           </Surface>
@@ -331,7 +331,7 @@ export function DshPlatformVarsWorkspace() {
 
               {activeDomain === 'wlt' ? (
                 <Surface tone="default" padding={3} radiusToken="xl" border>
-                  <Text role="bodySm" tone="muted" className={styles.noticeText}>
+                  <Text role="bodySm" tone="muted" style={{ lineHeight: 1.6 }}>
                     جميع عناصر WLT هنا bridge-only. الشاشة تعرض current/proposed previews لمساعدة القرار داخل DSH، لكنها لا تنشئ rollback مالي ولا truth محاسبي ولا settlement mutation.
                   </Text>
                 </Surface>
@@ -339,7 +339,7 @@ export function DshPlatformVarsWorkspace() {
 
               {activeDomain === 'provider' ? (
                 <Surface tone="default" padding={3} radiusToken="xl" border>
-                  <Text role="bodySm" tone="muted" className={styles.noticeText}>
+                  <Text role="bodySm" tone="muted" style={{ lineHeight: 1.6 }}>
                     provider controls هنا مرجعية فقط: تعرض priority وfallback وtest result وrollback target من دون أي live switching.
                   </Text>
                 </Surface>
