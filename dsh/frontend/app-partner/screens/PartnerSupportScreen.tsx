@@ -25,9 +25,6 @@ import type {
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
 import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
-// [REGISTRY Phase 1] — isDshHiddenCompatFlow guards hidden-compat flows (auction-status-update,
-// order-rejection, order-alerts, order-sla-risk, partner-finance-bridge, etc.).
-// Use getDshVisibleFlowsForSurface('app-partner') for any dynamic visible-flow list.
 import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
@@ -282,6 +279,29 @@ function resolveCaseSupportRoute(
   item: OperationsSupportCase
 ): DshPartnerSupportRouteId | undefined {
   return item.linkedSupportRoute;
+}
+
+/**
+ * Registry-enforced guard: resolves the workspace route to navigate to for a support case.
+ * Returns null when no safe route exists, or when the case is linked only to a
+ * hidden-compat flow (partner-finance-bridge, order-alerts, etc.) with no explicit support
+ * route — preventing hidden-compat flows from opening as primary workspace routes.
+ * Uses isDshHiddenCompatFlow from the shared registry for the runtime check.
+ */
+function resolveCaseWorkspaceTarget(
+  item: OperationsSupportCase
+): DshPartnerSupportRouteId | null {
+  const supportRoute = resolveCaseSupportRoute(item);
+  if (supportRoute) {
+    // A valid support route is always the safe navigation target.
+    return supportRoute;
+  }
+  // No support route — if the linked flow is hidden-compat, navigation is suppressed.
+  // Hidden-compat flows are preview/tag-only; they must not open primary workspace routes.
+  if (item.linkedFlowId && isDshHiddenCompatFlow(item.linkedFlowId)) {
+    return null;
+  }
+  return null;
 }
 
 function findBestCaseIdForSelection({
@@ -569,10 +589,10 @@ export function PartnerSupportScreen({
   }
 
   function handleOpenWorkspace(item: OperationsSupportCase) {
-    const supportRoute = resolveCaseSupportRoute(item);
+    const workspaceRoute = resolveCaseWorkspaceTarget(item);
 
-    if (supportRoute) {
-      onOpenScreen?.(supportRoute);
+    if (workspaceRoute) {
+      onOpenScreen?.(workspaceRoute);
       return;
     }
 

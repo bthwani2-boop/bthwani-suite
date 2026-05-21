@@ -343,6 +343,7 @@ export {
 export { resolveDshImageSource } from './resolve-dsh-image-source';
 
 // --- DSH Flow Registry — Phase 1 Baseline (DSH_PHASE_1_FLOW_REGISTRY-20260521-054141) ---
+// Phase 1.1 closure: DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE-20260521-061309
 // Single canonical cross-surface registry: ownership · visibility · escalation · on-demand policy.
 // See dsh-flow-registry.ts for full authoring notes and forbidden-action contract.
 export type {
@@ -351,6 +352,8 @@ export type {
   DshFlowVisibility,
   DshOnDemandPolicy,
   DshFlowRegistryEntry,
+  DshFlowRegistryStats,
+  DshFlowRegistryValidationResult,
 } from './dsh-flow-registry';
 export {
   DSH_FLOW_REGISTRY,
@@ -360,6 +363,8 @@ export {
   isDshHiddenCompatFlow,
   getDshEscalationFlows,
   getDshFinancePreviewFlows,
+  getDshFlowRegistryStats,
+  getDshFlowRegistryValidationSummary,
 } from './dsh-flow-registry';
 
 // --- DSH Order Journey Shared Model ---

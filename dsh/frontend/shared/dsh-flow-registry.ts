@@ -114,7 +114,11 @@ export type DshFlowRegistryEntry = {
 };
 
 // ---------------------------------------------------------------------------
-// Registry — Partner Operational Flows (all 31 from DSH_PARTNER_OPERATIONAL_FLOW_IDS)
+// Registry — Partner Operational Flows
+// DSH_PARTNER_OPERATIONAL_FLOW_IDS actual count: 27
+// Note: registry also covers 2 legacy support-route aliases (auction-status-update,
+// order-rejection) that exist in DSH_PARTNER_SUPPORT_ROUTE_IDS but NOT in
+// DSH_PARTNER_OPERATIONAL_FLOW_IDS — they appear in PARTNER_HIDDEN_COMPAT_FLOWS.
 // ---------------------------------------------------------------------------
 
 const PARTNER_ORDER_LIFECYCLE: readonly DshFlowRegistryEntry[] = [
@@ -779,4 +783,130 @@ export function getDshEscalationFlows(): readonly DshFlowRegistryEntry[] {
  */
 export function getDshFinancePreviewFlows(): readonly DshFlowRegistryEntry[] {
   return DSH_FLOW_REGISTRY.filter((entry) => entry.financialImpact === true);
+}
+
+// ---------------------------------------------------------------------------
+// Registry validation — read-only; no side effects, no mutations
+// ---------------------------------------------------------------------------
+
+export type DshFlowRegistryStats = {
+  /** Total number of registry entries. */
+  readonly totalEntries: number;
+  /** Entries with visibility='primary'. */
+  readonly primaryCount: number;
+  /** Entries with visibility='contextual'. */
+  readonly contextualCount: number;
+  /** Entries with hiddenCompat=true. */
+  readonly hiddenCompatCount: number;
+  /** Entries with visibility='internal'. */
+  readonly internalCount: number;
+  /** Entries with financialImpact=true (finance-preview-only). */
+  readonly financePreviewCount: number;
+  /** Entries with an escalationOwner set. */
+  readonly escalationOwnerCount: number;
+  /** Entries owned by app-partner (ownerSurface). */
+  readonly partnerOwnedCount: number;
+};
+
+/**
+ * Returns a read-only snapshot of registry aggregate counts.
+ * Safe to call at any time; no mutations, no side effects.
+ */
+export function getDshFlowRegistryStats(): DshFlowRegistryStats {
+  return {
+    totalEntries: DSH_FLOW_REGISTRY.length,
+    primaryCount: DSH_FLOW_REGISTRY.filter((e) => e.visibility === 'primary').length,
+    contextualCount: DSH_FLOW_REGISTRY.filter((e) => e.visibility === 'contextual').length,
+    hiddenCompatCount: DSH_FLOW_REGISTRY.filter((e) => e.hiddenCompat === true).length,
+    internalCount: DSH_FLOW_REGISTRY.filter((e) => e.visibility === 'internal').length,
+    financePreviewCount: DSH_FLOW_REGISTRY.filter((e) => e.financialImpact === true).length,
+    escalationOwnerCount: DSH_FLOW_REGISTRY.filter((e) => e.escalationOwner !== undefined).length,
+    partnerOwnedCount: DSH_FLOW_REGISTRY.filter((e) => e.ownerSurface === 'app-partner').length,
+  };
+}
+
+export type DshFlowRegistryValidationResult = {
+  /** True when all entries pass all validation rules. */
+  readonly isValid: boolean;
+  /** Total entries inspected. */
+  readonly totalEntries: number;
+  /** IDs that appear more than once (must be empty for a valid registry). */
+  readonly duplicateIds: readonly string[];
+  /** Entry IDs missing one or more required fields. */
+  readonly missingRequiredFields: readonly string[];
+  /**
+   * Finance-preview violations: financialImpact=true entries that don't have
+   * onDemandPolicy='finance-preview-only'.
+   */
+  readonly financePreviewViolations: readonly string[];
+  /**
+   * Hidden-compat violations: hiddenCompat=true entries that don't have
+   * visibility='hidden-compat'.
+   */
+  readonly hiddenCompatViolations: readonly string[];
+};
+
+/**
+ * Validates the registry against its structural invariants.
+ * Returns a read-only result object; never throws.
+ * Use in tests or tooling — not in production render paths.
+ */
+export function getDshFlowRegistryValidationSummary(): DshFlowRegistryValidationResult {
+  const seenIds = new Set<string>();
+  const duplicateIds: string[] = [];
+  for (const entry of DSH_FLOW_REGISTRY) {
+    if (seenIds.has(entry.id)) {
+      duplicateIds.push(entry.id);
+    }
+    seenIds.add(entry.id);
+  }
+
+  const missingRequiredFields: string[] = [];
+  for (const entry of DSH_FLOW_REGISTRY) {
+    const hasRequired =
+      entry.id &&
+      entry.label &&
+      entry.domain &&
+      entry.ownerSurface &&
+      entry.visibleSurfaces &&
+      entry.visibleSurfaces.length > 0 &&
+      entry.visibility &&
+      entry.onDemandPolicy &&
+      entry.allowedActions &&
+      entry.forbiddenActions;
+    if (!hasRequired) {
+      missingRequiredFields.push(entry.id ?? '(unknown-id)');
+    }
+  }
+
+  const financePreviewViolations: string[] = [];
+  for (const entry of DSH_FLOW_REGISTRY) {
+    if (entry.financialImpact === true && entry.onDemandPolicy !== 'finance-preview-only') {
+      financePreviewViolations.push(
+        `${entry.id}: financialImpact=true but onDemandPolicy=${entry.onDemandPolicy} (expected finance-preview-only)`
+      );
+    }
+  }
+
+  const hiddenCompatViolations: string[] = [];
+  for (const entry of DSH_FLOW_REGISTRY) {
+    if (entry.hiddenCompat === true && entry.visibility !== 'hidden-compat') {
+      hiddenCompatViolations.push(
+        `${entry.id}: hiddenCompat=true but visibility=${entry.visibility} (expected hidden-compat)`
+      );
+    }
+  }
+
+  return {
+    isValid:
+      duplicateIds.length === 0 &&
+      missingRequiredFields.length === 0 &&
+      financePreviewViolations.length === 0 &&
+      hiddenCompatViolations.length === 0,
+    totalEntries: DSH_FLOW_REGISTRY.length,
+    duplicateIds,
+    missingRequiredFields,
+    financePreviewViolations,
+    hiddenCompatViolations,
+  };
 }

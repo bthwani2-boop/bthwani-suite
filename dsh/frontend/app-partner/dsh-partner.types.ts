@@ -47,6 +47,15 @@ export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
 
 export type DshPartnerOperationalFlowId = (typeof DSH_PARTNER_OPERATIONAL_FLOW_IDS)[number];
 
+/**
+ * Authoritative runtime count of DSH_PARTNER_OPERATIONAL_FLOW_IDS.
+ * Use this constant for numeric assertions — do NOT hardcode a literal number
+ * in evidence or comments. Current value: 27.
+ * (Phase 1 evidence incorrectly stated 31; this constant tracks the ground truth.)
+ */
+export const DSH_PARTNER_OPERATIONAL_FLOW_IDS_EXPECTED_COUNT =
+  DSH_PARTNER_OPERATIONAL_FLOW_IDS.length;
+
 export const DSH_PARTNER_SUPPORT_ROUTE_IDS = [
   // Intentionally hidden compatibility-only route: keep for registry consumers, do not surface in the main IA.
   'auction-status-update',
