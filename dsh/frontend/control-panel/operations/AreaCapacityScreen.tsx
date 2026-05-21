@@ -18,7 +18,9 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProps) {
+const runPreviewOperation = () => undefined;
+
+export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: AreaCapacityScreenProps) {
   const preview = AREA_CAPACITY_OPERATIONAL_PREVIEW;
 
   const summaryKpi = [
@@ -51,12 +53,12 @@ export function AreaCapacityScreen({ hubHref, subGroup }: AreaCapacityScreenProp
             primaryAction={{
               id: 'bonus',
               label: 'تفعيل الحافز',
-              onAction: () => console.log('حافز الذروة', area.id)
+              onAction: runPreviewOperation,
             }}
             secondaryAction={{
               id: 'stop',
               label: 'إيقاف مؤقت',
-              onAction: () => console.log('إيقاف مؤقت', area.id)
+              onAction: runPreviewOperation,
             }}
           />
         ))}

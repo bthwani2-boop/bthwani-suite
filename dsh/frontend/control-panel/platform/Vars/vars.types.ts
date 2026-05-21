@@ -27,6 +27,9 @@ export type DshPlatformVarRecord = {
   effectSummary: string;
   auditRollbackHint: string;
   precedenceNote: string;
+  affectedSurfaces: readonly string[];
+  auditRequired: boolean;
+  mutationAllowed: false;
 };
 
 export type DshPlatformProviderControlRecord = DshPlatformVarRecord & {

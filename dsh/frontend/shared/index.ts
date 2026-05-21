@@ -56,6 +56,26 @@ export {
   mapCampaignToCommercialProjection,
 } from './commercial.preview-contract';
 
+export type {
+	MarketingRouteHint,
+	MarketingVisibilityApprovalStatus,
+	MarketingVisibilityContentType,
+	MarketingVisibilityDisplayStatus,
+	MarketingVisibilityRecord,
+	MarketingVisibilityTargetSurface,
+} from './marketing-visibility.contract';
+export {
+	DSH_LOYALTY_UI_BOUNDARY_NOTE,
+	getCampaignVisibilityRecord,
+	getHomePromoVisibilityRecord,
+	getLoyaltyVisibilityRecord,
+	getMarketingVideoVisibilityRecord,
+	getPartnerOfferVisibilityRecord,
+	isMarketingRenderable,
+	marketingVisibilityContractMeta,
+	resolveMarketingVisibility,
+} from './marketing-visibility.contract';
+
 // --- Commercial Marketing Contract (UI_PREVIEW_ONLY) ---
 
 export type {
@@ -353,13 +373,21 @@ export type {
   DshFlowVisibility,
   DshOnDemandPolicy,
   DshFlowRegistryEntry,
+	DshFlowClosureActor,
+	DshFlowClosureDomain,
+	DshFlowClosureEvidenceStatus,
+	DshFlowClosureRuntimeBindingStatus,
+	DshFlowClosureSummary,
   DshFlowPolicySummary,
   DshFlowRegistryStats,
   DshFlowRegistryValidationResult,
 } from './dsh-flow-registry';
 export {
   DSH_FLOW_REGISTRY,
+	DSH_FLOW_CLOSURE_SUMMARY,
   getDshFlowById,
+	getDshFlowClosureSummary,
+	getDshFlowClosureSummaryForSurface,
   getDshFlowsForSurface,
   getDshVisibleFlowsForSurface,
   getDshRenderableFlowsForSurface,

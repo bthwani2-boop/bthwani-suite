@@ -1,0 +1,375 @@
+﻿diff --git a/dsh/docs/DSH_VISUAL_REVIEW.md b/dsh/docs/DSH_VISUAL_REVIEW.md
+new file mode 100644
+index 00000000..15cd1345
+--- /dev/null
++++ b/dsh/docs/DSH_VISUAL_REVIEW.md
+@@ -0,0 +1,369 @@
++# DSH Visual Review — Unified Evidence Master File
++
++This file is the single source of truth for the `dsh` visual review evidence system.
++It replaces the retired `dsh/docs/DSH_VISUAL_REVIEW/` folder and absorbs every document and artifact that existed there.
++
++---
++
++## Status
++
++- `ACTIVE_VISUAL_EVIDENCE_CONTROL`
++- Updated: 2026-05-22
++
++## Purpose
++
++This file is the authoritative reference for:
++- visual review rules and evidence conventions
++- the screen index for all reviewable DSH surfaces
++- the live review ledger snapshot
++- the review update protocol
++- failure tracking and signoff guidance
++- device profile assumptions
++- captured git evidence for this review branch
++
++This is visual evidence only. It does not certify runtime closure, API contract closure, WLT integration closure, or backend closure.
++
++---
++
++## Core Rules
++
++### Screenshots
++
++- screenshots must be real captures from a simulator, physical device, or browser.
++- do not add fabricated, placeholder, or AI-generated images.
++- each screenshot filename must match the `screenshot_path` value in the ledger exactly.
++- use a new filename for each revision; do not overwrite old screenshots.
++
++### PASS
++
++- requires an actual `screenshot_path`.
++- requires a human reviewer name and `reviewed_at`.
++- cannot be self-reported by the engineer who wired the screen.
++
++### FAIL
++
++- requires `issue_type`, `issue_summary`, and `next_action` in the ledger row.
++- requires a corresponding entry in the failure tracking section below.
++
++### BLOCKED
++
++- requires a blocker reason in `issue_summary`.
++- `next_action` must describe what removes the block.
++
++### NOT_REVIEWED
++
++- initial state of every row in the ledger.
++- no result claim may be made from a `NOT_REVIEWED` row.
++
++---
++
++## Allowed `result` values
++
++| Value | Meaning |
++|---|---|
++| `NOT_REVIEWED` | No human review performed yet |
++| `PASS` | Reviewed and confirmed on device or browser |
++| `FAIL` | Reviewed and a visual defect was found |
++| `BLOCKED` | Cannot be reviewed because of environment or contract block |
++| `DEFERRED` | Intentionally deferred to a later review cycle |
++
++---
++
++## Master Update Protocol
++
++Use this section as the standard process for any future visual review update.
++All updates happen inside this file.
++
++### Step 1 — Confirm the master file exists
++
++- Confirm `dsh/docs/DSH_VISUAL_REVIEW.md` exists.
++- Confirm the `review_id` exists in the embedded ledger table below.
++- Confirm the `screenshot_path` is not empty if `result` is `PASS` or `FAIL`.
++- Confirm the screenshot file exists on disk if `result` is `PASS` or `FAIL`.
++- If the screenshot file is missing, do not mark `PASS` or `FAIL`. Mark `BLOCKED` and explain `SCREENSHOT_FILE_MISSING`.
++- Do not create fake screenshot files.
++- Do not overwrite previous screenshot references. If this is a revision, add a new screenshot filename and update the ledger row to point to the latest one.
++
++### Step 2 — Update the ledger row
++
++Update the row for the reviewed screen in the ledger section below.
++
++Required updates:
++- `screenshot_path`
++- `result` (`PASS`, `FAIL`, `BLOCKED`, or `DEFERRED`)
++- `issue_type` (required if `FAIL`)
++- `issue_summary` (required if `FAIL` or `BLOCKED`)
++- `reviewer`
++- `reviewed_at`
++- `next_action`
++- `review_doc_path`
++
++Do not change these row values:
++- `review_id`
++- `screen_id`
++- `surface`
++- `file_path`
++- `queue_list`
++- `priority`
++
++### Step 3 — Create or update per-screen review notes
++
++The per-screen review document path remains the canonical review note location in the ledger row.
++If `review_doc_path` references a markdown file, create or update that file accordingly.
++
++Each review note must include at minimum:
++- `review_id`
++- `screen_id`
++- `surface`
++- `result`
++- `reviewer`
++- `reviewed_at`
++- screenshot path
++- notes on what was checked
++- visual diagnosis
++- RTL diagnosis
++- overflow / clipping diagnosis
++- CTA diagnosis
++- state coverage diagnosis
++- design system compliance notes
++- issue summary
++- next action
++- final screen status
++
++Final screen status must be one of:
++- `HUMAN_VISUAL_REVIEW_CONFIRMED`
++- `HUMAN_VISUAL_REVIEW_FAILED`
++- `HUMAN_VISUAL_REVIEW_BLOCKED`
++- `HUMAN_VISUAL_REVIEW_DEFERRED`
++
++### Step 4 — Update summary counts
++
++Update the status summary and metadata inside this file as needed.
++The ledger remains the authoritative row-level source.
++
++### Step 5 — Record failures
++
++If `result = FAIL`, add or update a failure entry in the failure tracking section below.
++If a result changes from `FAIL` to `PASS`, mark the existing failure entry as `RESOLVED`; do not delete it.
++
++### Step 6 — Record signoff
++
++If a screen passes review, add or update a signoff row in the signoff section below.
++Do not mark a screen confirmed without a real screenshot.
++
++### Step 7 — Update the screen index
++
++Update the screen index section only to reflect the latest `result` status.
++Do not change queue classification or review priority in the index.
++
++---
++
++## Failure Tracking Template
++
++Use this section for screens with `result=FAIL` only.
++Each row must include:
++- `review_id`
++- `screen_id`
++- `surface`
++- `file_path`
++- `issue_type`
++- `issue_summary`
++- `screenshot_path`
++- `next_action`
++- `status`
++
++Example row:
++
++| review_id | screen_id | surface | file_path | issue_type | issue_summary | screenshot_path | next_action | status |
++|---|---|---|---|---|---|---|---|---|
++| VR-L1-002 | client.dsh.cart.review | app-client | dsh/frontend/app-client/screens/CartScreen.tsx | LAYOUT_OVERFLOW | Checkout button clipped in RTL | dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.cart.review__WIRED_IN_FLOW__iPhone15__rtl__FAIL.png | FIX_REQUIRED | OPEN |
++
++If a previous failure has been fixed, mark it as `RESOLVED` rather than deleting it.
++
++---
++
++## Signoff Template
++
++Use this section for confirmed `PASS` rows only.
++Each signoff row should contain:
++- `screen_id`
++- `surface`
++- `result`
++- `reviewer`
++- `reviewed_at`
++- `notes`
++
++---
++
++## Screenshot Filename Convention
++
++When retesting a screen after a fix, do not overwrite the old screenshot.
++Use a revision suffix like:
++
++```
++P1__app-client__client.dsh.home.feed__WIRED_IN_FLOW__iPhone15__rtl__PASS__r2.png
++```
++
++---
++
++## Screen Index
++
++Branch: `ghb/0164-20260521-205754-dsh`
++Commit: `cae3c7bf`
++
++All 33 reviewable rows grouped by surface.
++See the ledger section for full row details.
++
++### app-client (7 screens)
++
++| review_id | screen_id | file_path | queue_list | priority | result |
++|---|---|---|---|---|---|
++| VR-L1-001 | client.dsh.home.feed | dsh/frontend/app-client/screens/HomeScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-002 | client.dsh.cart.review | dsh/frontend/app-client/screens/CartScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-003 | client.dsh.order.tracking.live | dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-004 | client.dsh.orders.history | dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-005 | client.dsh.store.details | dsh/frontend/app-client/screens/StoreScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-006 | client.dsh.order.issue.workspace | dsh/frontend/app-client/screens/OperationScreens.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L2-001 | client.dsh.checkout.intent | dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++
++### app-partner (7 screens)
++
++| review_id | screen_id | file_path | queue_list | priority | result |
++|---|---|---|---|---|---|
++| VR-L1-007 | partner.dsh.orders.inbox | dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-008 | partner.dsh.order.detail | dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-009 | partner.dsh.inventory.catalog | dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-010 | partner.dsh.order.rejection | dsh/frontend/app-partner/screens/DshPartnerOrderRejectionScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-011 | partner.dsh.entry.status | dsh/frontend/app-partner/screens/PartnerEntryScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-012 | partner.dsh.home.dashboard | dsh/frontend/app-partner/screens/PartnerHubScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L2-011 | partner.wlt.dsh.wallet.bridge | dsh/frontend/app-partner/screens/WltDshPartnerBridge.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++
++### app-captain (6 screens)
++
++| review_id | screen_id | file_path | queue_list | priority | result |
++|---|---|---|---|---|---|
++| VR-L1-013 | captain.dsh.orders.inbox | dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-014 | captain.dsh.orders.detail | dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L2-002 | captain.dsh.orders.pickup-dropoff | dsh/frontend/app-captain/screens/DshCaptainPickupDropoffScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++| VR-L2-003 | captain.dsh.orders.pod-submission | dsh/frontend/app-captain/screens/DshCaptainPoDSubmissionScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++| VR-L2-004 | captain.dsh.orders.map | dsh/frontend/app-captain/screens/DshCaptainMapScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++| VR-L2-010 | captain.wlt.dsh.finance.bridge | dsh/frontend/app-captain/screens/WltDshCaptainBridge.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++
++### app-field (5 screens)
++
++| review_id | screen_id | file_path | queue_list | priority | result |
++|---|---|---|---|---|---|
++| VR-L1-015 | field.dsh.stores.list | dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-016 | field.dsh.store.onboarding | dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-017 | field.dsh.store.visit | dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L2-005 | field.dsh.store.onboarding/documents | dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++| VR-L2-006 | field.dsh.store.visit/evidence | dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++
++### control-panel (8 screens)
++
++| review_id | screen_id | file_path | queue_list | priority | result |
++|---|---|---|---|---|---|
++| VR-L1-018 | ops.dsh.operations.hub | dsh/frontend/control-panel/screens/OperationsHubScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-019 | ops.dsh.dispatch | dsh/frontend/control-panel/screens/DispatchAssignmentScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-020 | ops.dsh.exceptions | dsh/frontend/control-panel/screens/ExceptionsEscalationsScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-021 | ops.dsh.live.orders | dsh/frontend/control-panel/screens/LiveOrdersScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L1-022 | ops.dsh.audit.sla | dsh/frontend/control-panel/screens/AuditSupportSlaScreen.tsx | LIST_1_READY_NOW | P1 | NOT_REVIEWED |
++| VR-L2-007 | ops.dsh.audit.sla/detail | dsh/frontend/control-panel/screens/AuditSupportSlaScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++| VR-L2-008 | ops.dsh.catalog.approvals.quality | dsh/frontend/control-panel/screens/ControlPanelDshCatalogScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++| VR-L2-009 | ops.dsh.catalog.approvals.pricing | dsh/frontend/control-panel/screens/ControlPanelDshCatalogScreen.tsx | LIST_2_DISABLED_PREVIEW | P2 | NOT_REVIEWED |
++
++### Totals
++
++| Surface | List 1 | List 2 | Total |
++|---|---|---|---|
++| app-client | 6 | 1 | 7 |
++| app-partner | 6 | 1 | 7 |
++| app-captain | 2 | 4 | 6 |
++| app-field | 3 | 2 | 5 |
++| control-panel | 5 | 3 | 8 |
++| **Total** | **22** | **11** | **33** |
++
++---
++
++## Ledger Snapshot
++
++This embedded CSV is the authoritative row-level source for the live visual review evidence snapshot in this branch.
++
++```csv
++review_id,branch,commit,surface,screen_id,file_path,queue_list,priority,state,device,viewport,locale,direction,screenshot_path,result,issue_type,issue_summary,owner_decision_required,linked_gap_ids,reviewer,reviewed_at,next_action,review_doc_path
++VR-L1-001,ghb/0164-20260521-205754-dsh,cae3c7bf,app-client,client.dsh.home.feed,dsh/frontend/app-client/screens/HomeScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.home.feed__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L1-001__client.dsh.home.feed.md
++VR-L1-002,ghb/0164-20260521-205754-dsh,cae3c7bf,app-client,client.dsh.cart.review,dsh/frontend/app-client/screens/CartScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.cart.review__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L1-002__client.dsh.cart.review.md
++VR-L1-003,ghb/0164-20260521-205754-dsh,cae3c7bf,app-client,client.dsh.order.tracking.live,dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.order.tracking.live__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-008,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L1-003__client.dsh.order.tracking.live.md
++VR-L1-004,ghb/0164-20260521-205754-dsh,cae3c7bf,app-client,client.dsh.orders.history,dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.orders.history__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L1-004__client.dsh.orders.history.md
++VR-L1-005,ghb/0164-20260521-205754-dsh,cae3c7bf,app-client,client.dsh.store.details,dsh/frontend/app-client/screens/StoreScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.store.details__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L1-005__client.dsh.store.details.md
++VR-L1-006,ghb/0164-20260521-205754-dsh,cae3c7bf,app-client,client.dsh.order.issue.workspace,dsh/frontend/app-client/screens/OperationScreens.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P1__app-client__client.dsh.order.issue.workspace__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,true,ML-011,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L1-006__client.dsh.order.issue.workspace.md
++VR-L1-007,ghb/0164-20260521-205754-dsh,cae3c7bf,app-partner,partner.dsh.orders.inbox,dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P1__app-partner__partner.dsh.orders.inbox__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-016,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L1-007__partner.dsh.orders.inbox.md
++VR-L1-008,ghb/0164-20260521-205754-dsh,cae3c7bf,app-partner,partner.dsh.order.detail,dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P1__app-partner__partner.dsh.order.detail__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"ML-018 ML-019 ML-020",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L1-008__partner.dsh.order.detail.md
++VR-L1-009,ghb/0164-20260521-205754-dsh,cae3c7bf,app-partner,partner.dsh.inventory.catalog,dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P1__app-partner__partner.dsh.inventory.catalog__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,CG-020,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L1-009__partner.dsh.inventory.catalog.md
++VR-L1-010,ghb/0164-20260521-205754-dsh,cae3c7bf,app-partner,partner.dsh.order.rejection,dsh/frontend/app-partner/screens/DshPartnerOrderRejectionScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P1__app-partner__partner.dsh.order.rejection__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,CG-022,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L1-010__partner.dsh.order.rejection.md
++VR-L1-011,ghb/0164-20260521-205754-dsh,cae3c7bf,app-partner,partner.dsh.entry.status,dsh/frontend/app-partner/screens/PartnerEntryScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P1__app-partner__partner.dsh.entry.status__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-017,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L1-011__partner.dsh.entry.status.md
++VR-L1-012,ghb/0164-20260521-205754-dsh,cae3c7bf,app-partner,partner.dsh.home.dashboard,dsh/frontend/app-partner/screens/PartnerHubScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P1__app-partner__partner.dsh.home.dashboard__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,true,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L1-012__partner.dsh.home.dashboard.md
++VR-L1-013,ghb/0164-20260521-205754-dsh,cae3c7bf,app-captain,captain.dsh.orders.inbox,dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-captain/P1__app-captain__captain.dsh.orders.inbox__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"ML-027 ML-024",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-captain/VR-L1-013__captain.dsh.orders.inbox.md
++VR-L1-014,ghb/0164-20260521-205754-dsh,cae3c7bf,app-captain,captain.dsh.orders.detail,dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-captain/P1__app-captain__captain.dsh.orders.detail__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,CG-016,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-captain/VR-L1-014__captain.dsh.orders.detail.md
++VR-L1-015,ghb/0164-20260521-205754-dsh,cae3c7bf,app-field,field.dsh.stores.list,dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-field/P1__app-field__field.dsh.stores.list__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,CG-024,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-field/VR-L1-015__field.dsh.stores.list.md
++VR-L1-016,ghb/0164-20260521-205754-dsh,cae3c7bf,app-field,field.dsh.store.onboarding,dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-field/P1__app-field__field.dsh.store.onboarding__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"ML-002 ML-005",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-field/VR-L1-016__field.dsh.store.onboarding.md
++VR-L1-017,ghb/0164-20260521-205754-dsh,cae3c7bf,app-field,field.dsh.store.visit,dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-field/P1__app-field__field.dsh.store.visit__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-003,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-field/VR-L1-017__field.dsh.store.visit.md
++VR-L1-018,ghb/0164-20260521-205754-dsh,cae3c7bf,control-panel,ops.dsh.operations.hub,dsh/frontend/control-panel/screens/OperationsHubScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P1__control-panel__ops.dsh.operations.hub__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L1-018__ops.dsh.operations.hub.md
++VR-L1-019,ghb/0164-20260521-205754-dsh,cae3c7bf,control-panel,ops.dsh.dispatch,dsh/frontend/control-panel/screens/DispatchAssignmentScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P1__control-panel__ops.dsh.dispatch__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,true,ML-036,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L1-019__ops.dsh.dispatch.md
++VR-L1-020,ghb/0164-20260521-205754-dsh,cae3c7bf,control-panel,ops.dsh.exceptions,dsh/frontend/control-panel/screens/ExceptionsEscalationsScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P1__control-panel__ops.dsh.exceptions__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,true,ML-037,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L1-020__ops.dsh.exceptions.md
++VR-L1-021,ghb/0164-20260521-205754-dsh,cae3c7bf,control-panel,ops.dsh.live.orders,dsh/frontend/control-panel/screens/LiveOrdersScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P1__control-panel__ops.dsh.live.orders__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L1-021__ops.dsh.live.orders.md
++VR-L1-022,ghb/0164-20260521-205754-dsh,cae3c7bf,control-panel,ops.dsh.audit.sla,dsh/frontend/control-panel/screens/AuditSupportSlaScreen.tsx,LIST_1_READY_NOW,P1,WIRED_IN_FLOW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P1__control-panel__ops.dsh.audit.sla__WIRED_IN_FLOW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-035,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L1-022__ops.dsh.audit.sla.md
++VR-L2-001,ghb/0164-20260521-205754-dsh,app-client,client.dsh.checkout.intent,dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-client/P2__app-client__client.dsh.checkout.intent__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"ML-006 ML-009 ML-010",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-client/VR-L2-001__client.dsh.checkout.intent.md
++VR-L2-002,ghb/0164-20260521-205754-dsh,app-captain,captain.dsh.orders.pickup-dropoff,dsh/frontend/app-captain/screens/DshCaptainPickupDropoffScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-captain/P2__app-captain__captain.dsh.orders.pickup-dropoff__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-025,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-captain/VR-L2-002__captain.dsh.orders.pickup-dropoff.md
++VR-L2-003,ghb/0164-20260521-205754-dsh,app-captain,captain.dsh.orders.pod-submission,dsh/frontend/app-captain/screens/DshCaptainPoDSubmissionScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-captain/P2__app-captain__captain.dsh.orders.pod-submission__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"CG-018 ML-031",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-captain/VR-L2-003__captain.d.sh.orders.pod-submission.md
++VR-L2-004,ghb/0164-20260521-205754-dsh,app-captain,captain.dsh.orders.map,dsh/frontend/app-captain/screens/DshCaptainMapScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-captain/P2__app-captain__captain.dsh.orders.map__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-029,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-captain/VR-L2-004__captain.dsh.orders.map.md
++VR-L2-005,ghb/0164-20260521-205754-dsh,app-field,field.dsh.store.onboarding/documents,dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-field/P2__app-field__field.dsh.store.onboarding--documents__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-002,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-field/VR-L2-005__field.dsh.store.onboarding--documents.md
++VR-L2-006,ghb/0164-20260521-205754-dsh,app-field,field.d.dsh.store.visit/evidence,dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-field/P2__app-field__field.dsh.store.visit--evidence__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-003,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-field/VR-L2-006__field.dsh.store.visit--evidence.md
++VR-L2-007,ghb/0164-20260521-205754-dsh,control-panel,ops.dsh.audit.sla/detail,dsh/frontend/control-panel/screens/AuditSupportSlaScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P2__control-panel__ops.dsh.audit.sla--detail__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-035,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L2-007__ops.dsh.audit.sla--detail.md
++VR-L2-008,ghb/0164-20260521-205754-dsh,control-panel,ops.dsh.catalog.approvals.quality,dsh/frontend/control-panel/screens/ControlPanelDshCatalogScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P2__control-panel__ops.dsh.catalog.approvals.quality__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-053,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L2-008__ops.dsh.catalog.approvals.quality.md
++VR-L2-009,ghb/0164-20260521-205754-dsh,control-panel,ops.dsh.catalog.approvals.pricing,dsh/frontend/control-panel/screens/ControlPanelDshCatalogScreen.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/control-panel/P2__control-panel__ops.dsh.catalog.approvals.pricing__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,ML-054,,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/control-panel/VR-L2-009__ops.dsh.catalog.approvals.pricing.md
++VR-L2-010,ghb/0164-20260521-205754-dsh,app-captain,captain.wlt.dsh.finance.bridge,dsh/frontend/app-captain/screens/WltDshCaptainBridge.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-captain/P2__app-captain__captain.wlt.dsh.finance.bridge__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"ML-041 ML-043 ML-044",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-captain/VR-L2-010__captain.wlt.dsh.finance.bridge.md
++VR-L2-011,ghb/0164-20260521-205754-dsh,app-partner,partner.wlt.dsh.wallet.bridge,dsh/frontend/app-partner/screens/WltDshPartnerBridge.tsx,LIST_2_DISABLED_PREVIEW,P2,DISABLED_PREVIEW,TBD,TBD,ar,rtl,dsh/docs/DSH_VISUAL_REVIEW/screenshots/app-partner/P2__app-partner__partner.wlt.dsh.wallet.bridge__DISABLED_PREVIEW__TBD__rtl__NOT_REVIEWED.png,NOT_REVIEWED,,,false,"ML-040 ML-042",,,AWAIT_SCREENSHOT,dsh/docs/DSH_VISUAL_REVIEW/reviews/app-partner/VR-L2-011__partner.wlt.dsh.wallet.bridge.md
++```
++
++---
++
++## Device Profile
++
++```json
++{
++  "mobile_primary": "TBD",
++  "mobile_secondary": "TBD",
++  "control_panel_browser": "TBD",
++  "locale": "ar",
++  "direction": "rtl",
++  "timezone": "Asia/Muscat"
++}
++```
++
++---
++
++## Git Evidence
++
++```text
++=== git branch --show-current ===
++ghb/0164-20260521-205754-dsh
++
++=== git rev-parse --short HEAD ===
++cae3c7bf
++
++=== git status --short ===
++ M control-panel/shell/control-panel-shell.module.css
++ M dsh/frontend/app-client/screens/CartScreen.tsx
++ M dsh/frontend/control-panel/shared/control-panel-surface.module.css
++ M ui-kit/src/web/command-center.tsx
++
++=== git --no-pager diff --check ===
++(no output — diff ---check clean, no whitespace errors)
++
++=== captured_at ===
++2026-05-16
++```
++
++
++

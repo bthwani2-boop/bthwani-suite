@@ -10,20 +10,32 @@ export type DshPartnerVideoSubmissionPanelProps = {
 export function DshPartnerVideoSubmissionPanel({ onSelectFlow }: DshPartnerVideoSubmissionPanelProps) {
   const [videoTitle, setVideoTitle] = React.useState('تجربة منتج الشريك');
   const [videoSummary, setVideoSummary] = React.useState('مراجعة سريعة لأداء المنتج في المطبخ.');
+  const [videoOwner, setVideoOwner] = React.useState<'promotions' | 'catalog'>('promotions');
   const videoStage: ApprovalStage = 'partner-review';
 
   return (
     <Surface tone="raised" gap={3}>
       <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <SectionHeader title="رفع فيديو الشريك" subtitle="يجهز مسار الفيديو بوضوح داخل تصنيف الفيديو فقط." />
-        <Chip label="قيد المراجعة" tone="warning" />
+        <Chip label={videoOwner === 'catalog' ? 'ملكية الكتالوج' : 'ملكية العروض'} tone={videoOwner === 'catalog' ? 'brand' : 'warning'} />
       </Box>
       <TextField label="عنوان الفيديو" value={videoTitle} onChangeText={setVideoTitle} />
       <TextField label="ملخص الفيديو" value={videoSummary} onChangeText={setVideoSummary} multiline numberOfLines={3} />
+      <Box gap={2}>
+        <Text role="bodySm" tone="muted">
+          حدّد المالك قبل فتح المسار: فيديو الاكتشاف المرتبط بمتجر/قسم/منتج منشور يذهب إلى الكتالوج، أما فيديو القصة التسويقية أو الولاء فيذهب إلى promotions.
+        </Text>
+        <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+          <Chip label="Promotions" selected={videoOwner === 'promotions'} onPress={() => setVideoOwner('promotions')} tone={videoOwner === 'promotions' ? 'brand' : 'default'} />
+          <Chip label="Catalog" selected={videoOwner === 'catalog'} onPress={() => setVideoOwner('catalog')} tone={videoOwner === 'catalog' ? 'brand' : 'default'} />
+        </Box>
+      </Box>
       <Text role="bodySm" tone="muted">
-        الفيديو ينتظر المرور التشغيلي المناسب لاحقًا. لا توجد عملية نشر أو اعتماد في هذا المكون.
+        {videoOwner === 'catalog'
+          ? 'هذا الفيديو سيُراجع كجزء من محتوى الاكتشاف المرتبط بالكتالوج، ولن يُنشر قبل اكتمال مسار النشر والظهور.'
+          : 'هذا الفيديو يبقى ضمن promotions كقصة تسويقية أو مزايا، ولا يتحول إلى مسار كتالوج إلا إذا صار مرتبطاً بمنتج أو اكتشاف فعلي.'}
       </Text>
-      <Button label="فتح مسار رفع الفيديو" onPress={() => onSelectFlow?.('video-upload')} />
+      <Button label={videoOwner === 'catalog' ? 'فتح مسار فيديو الكتالوج' : 'فتح مسار فيديو العروض'} onPress={() => onSelectFlow?.('video-upload')} />
     </Surface>
   );
 }

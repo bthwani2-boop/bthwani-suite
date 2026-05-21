@@ -9,6 +9,8 @@
  * and which route opens on action — ensuring every signal has a destination.
  */
 
+import { getMediaReviewItems, type MediaReviewRecord } from './marketing-review.preview-store';
+
 // ─── Event Kinds ─────────────────────────────────────────────────────────────
 
 export type DshSignalEventKind =
@@ -21,6 +23,10 @@ export type DshSignalEventKind =
   | 'catalog_item_approved'
   | 'catalog_item_rejected'
   | 'catalog_published'
+  // Marketing review lifecycle
+  | 'marketing_content_approved'
+  | 'marketing_content_rejected'
+  | 'marketing_content_needs_fix'
   // Order lifecycle
   | 'order_created'
   | 'payment_failed'
@@ -62,6 +68,7 @@ export type DshSignalEntityType =
   | 'order'
   | 'partner'
   | 'catalog'
+  | 'marketing'
   | 'captain'
   | 'ticket'
   | 'refund'
@@ -149,6 +156,9 @@ export const DSH_SIGNAL_ACTOR_ROUTES: ReadonlyArray<DshSignalActorRoute> = [
   { kind: 'catalog_item_approved',   surfaces: ['app-partner', 'control-panel'], roles: ['partner', 'ops'],             routeId: 'partner/catalog/item',              priority: 'normal',    auditRequired: false, retentionHours: 24 },
   { kind: 'catalog_item_rejected',   surfaces: ['app-partner', 'control-panel'], roles: ['partner', 'ops'],             routeId: 'partner/catalog/item',              priority: 'important', auditRequired: true,  retentionHours: 24 },
   { kind: 'catalog_published',       surfaces: ['app-partner', 'control-panel'], roles: ['partner', 'ops'],             routeId: 'partner/catalog/published',         priority: 'normal',    auditRequired: false, retentionHours: 24 },
+  { kind: 'marketing_content_approved', surfaces: ['app-partner', 'control-panel'], roles: ['partner', 'ops'],         routeId: 'cp/marketing/media-review',         priority: 'normal',    auditRequired: true,  retentionHours: 48 },
+  { kind: 'marketing_content_rejected', surfaces: ['app-partner', 'control-panel'], roles: ['partner', 'ops'],         routeId: 'cp/marketing/media-review',         priority: 'important', auditRequired: true,  retentionHours: 48 },
+  { kind: 'marketing_content_needs_fix', surfaces: ['app-partner', 'control-panel'], roles: ['partner', 'ops'],        routeId: 'cp/marketing/media-review',         priority: 'important', auditRequired: true,  retentionHours: 48 },
   // Order lifecycle
   { kind: 'order_created',           surfaces: ['app-client', 'control-panel'],                   roles: ['client', 'ops'],             routeId: 'client/orders/tracking',           priority: 'normal',    auditRequired: false, retentionHours: 48 },
   { kind: 'payment_failed',          surfaces: ['app-client', 'control-panel'],                   roles: ['client', 'ops'],             routeId: 'client/orders/payment-retry',      priority: 'urgent',    auditRequired: true,  retentionHours: 6  },
@@ -180,6 +190,9 @@ const DSH_SIGNAL_EVENT_LABELS: Record<DshSignalEventKind, string> = {
   catalog_item_approved:  'تم اعتماد منتج في الكتالوج',
   catalog_item_rejected:  'تم رفض منتج في الكتالوج',
   catalog_published:      'تم نشر الكتالوج',
+  marketing_content_approved: 'تم اعتماد المحتوى تسويقياً',
+  marketing_content_rejected: 'تم رفض المحتوى تسويقياً',
+  marketing_content_needs_fix: 'المحتوى يحتاج تعديل تسويقي',
   order_created:          'طلب جديد',
   payment_failed:         'فشل الدفع',
   partner_accepted:       'قبل الشريك الطلب',
@@ -208,6 +221,9 @@ const DSH_SIGNAL_TONES: Record<DshSignalEventKind, 'brand' | 'success' | 'warnin
   catalog_item_approved:  'success',
   catalog_item_rejected:  'danger',
   catalog_published:      'success',
+  marketing_content_approved: 'success',
+  marketing_content_rejected: 'danger',
+  marketing_content_needs_fix: 'warning',
   order_created:          'brand',
   payment_failed:         'danger',
   partner_accepted:       'success',
@@ -374,6 +390,86 @@ export const DSH_SIGNAL_PREVIEW_EVENTS: ReadonlyArray<DshSignalEvent> = [
   },
 ];
 
+function resolveMarketingReviewSignalKind(item: MediaReviewRecord): DshSignalEventKind | null {
+  if (item.stage === 'marketing-approved') {
+    return 'marketing_content_approved';
+  }
+
+  if (item.stage === 'rejected') {
+    return 'marketing_content_rejected';
+  }
+
+  if (item.stage === 'needs-fix') {
+    return 'marketing_content_needs_fix';
+  }
+
+  return null;
+}
+
+function resolveMarketingSignalBody(item: MediaReviewRecord): string {
+  if (item.systemNote?.trim()) {
+    return item.systemNote;
+  }
+
+  if (item.stage === 'marketing-approved') {
+    return 'اكتملت المراجعة التسويقية، والعنصر جاهز للتسليم إلى الكتالوج أو surface المتفق عليها.';
+  }
+
+  if (item.stage === 'needs-fix') {
+    return 'المحتوى يحتاج معالجة من المصدر قبل أي ظهور جديد على العميل.';
+  }
+
+  return 'رُفض المحتوى في مرحلة التسويق ولن يظهر على العميل حتى يعاد تقديمه بشكل صحيح.';
+}
+
+function resolveMarketingSignalEmittedAt(item: MediaReviewRecord): string {
+  const lastAuditAt = item.auditTrail?.[item.auditTrail.length - 1]?.at ?? item.submittedAt;
+  const deltaMs = Math.max(0, Date.now() - new Date(lastAuditAt).getTime());
+  const deltaHours = Math.floor(deltaMs / 3600_000);
+
+  if (deltaHours <= 0) {
+    return 'منذ قليل';
+  }
+
+  if (deltaHours < 24) {
+    return `منذ ${deltaHours} ساعة`;
+  }
+
+  return `منذ ${Math.floor(deltaHours / 24)} يوم`;
+}
+
+function getAllSignalEvents(): ReadonlyArray<DshSignalEvent> {
+  const marketingReviewSignals = getMediaReviewItems()
+    .map((item) => {
+      const kind = resolveMarketingReviewSignalKind(item);
+      if (!kind) {
+        return null;
+      }
+
+      return {
+        eventId: `marketing-${item.stage}-${item.id}`,
+        kind,
+        recipientSurface: ['app-partner', 'control-panel'],
+        recipientRole: ['partner', 'ops'],
+        entityType: 'marketing',
+        entityId: item.id,
+        priority: kind === 'marketing_content_approved' ? 'normal' : 'important',
+        title: `${getDshSignalEventLabel(kind)} — ${item.title}`,
+        body: resolveMarketingSignalBody(item),
+        routeId: 'cp/marketing/media-review',
+        primaryAction: { actionId: 'open-review', label: 'فتح المراجعة', routeId: `cp/marketing/media-review?itemId=${item.id}` },
+        secondaryAction: { actionId: 'open-details', label: 'عرض القرار', routeId: `cp/marketing/media-review?itemId=${item.id}&tab=details` },
+        readState: 'unread',
+        auditRequired: true,
+        onDemandPolicy: { detailRoute: `cp/marketing/media-review?itemId=${item.id}`, summaryOnly: true, retentionHours: 48 },
+        emittedAt: resolveMarketingSignalEmittedAt(item),
+      } as const;
+    })
+    .filter((event): event is DshSignalEvent => Boolean(event));
+
+  return [...DSH_SIGNAL_PREVIEW_EVENTS, ...marketingReviewSignals];
+}
+
 // ─── Helper Functions ─────────────────────────────────────────────────────────
 
 /** Get Arabic label for a signal event kind */
@@ -408,7 +504,7 @@ export function getDshSignalSummaries(
   surface: DshSignalRecipientSurface,
   role: DshSignalRecipientRole,
 ): DshSignalSummary[] {
-  return DSH_SIGNAL_PREVIEW_EVENTS
+  return getAllSignalEvents()
     .filter((e) => e.recipientSurface.includes(surface) && e.recipientRole.includes(role))
     .slice(0, 10)
     .map((e) => ({
@@ -426,7 +522,7 @@ export function getDshSignalSummaries(
 
 /** Get full signal event detail — call only on explicit user open */
 export function getDshSignalDetail(eventId: string): DshSignalEvent | undefined {
-  return DSH_SIGNAL_PREVIEW_EVENTS.find((e) => e.eventId === eventId);
+  return getAllSignalEvents().find((e) => e.eventId === eventId);
 }
 
 /** Count unread signals for a surface+role */

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
@@ -54,8 +54,8 @@ export function DshPlatformAppearanceWorkspace() {
         <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
           <WebSignalCard
             title="فحص التباين (Contrast)"
-            value="سليم 100%"
-            description="نسبة التباين مطابقة لمعايير إمكانية الوصول."
+            value="ضمن المعاينة"
+            description="المعاينة الحالية لا تُظهر تعارضًا بصريًا بارزًا، ويثبت الاعتماد النهائي بالأدلة."
             tone="neutral"
           />
         </Box>

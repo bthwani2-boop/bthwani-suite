@@ -21,9 +21,9 @@ export function ControlPanelDshMarketingScreen({
 		router.push(href);
 	}, [router]);
 
-	// Catalog signals for marketing surface (summaries only — details on explicit open)
+	// Marketing + catalog review signals for this surface (summaries only — details on explicit open)
 	const catalogSignals = getDshSignalSummaries('control-panel', 'ops').filter(
-		(s) => s.entityType === 'catalog',
+		(s) => s.entityType === 'catalog' || s.entityType === 'marketing',
 	);
 	const catalogUnreadCount = getDshSignalUnreadCount('control-panel', 'ops');
 
@@ -58,7 +58,7 @@ export function ControlPanelDshMarketingScreen({
 			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="معدل وصول الحملات النشطة" tone="best" />
 				<WebSignalCard title="إشارات الاهتمام (المفضلة)" value="12.4K" description="إشارات نية الشراء التراكمية" tone="best" />
-				<WebSignalCard title="إشارات الكتالوج النشطة" value={String(catalogSignals.length)} description="نشر وإعتماد منتجات في طبقة الإشارات" />
+				<WebSignalCard title="إشارات التسويق والكتالوج" value={String(catalogSignals.length)} description="اعتماد ورفض وتسليم المحتوى التجاري داخل طبقة الإشارات" />
 				<WebSignalCard title="إشارات غير مقروءة" value={String(catalogUnreadCount)} description="إشارات تستلزم مراجعة أو إجراء" tone="neutral" />
 			</Box>
 

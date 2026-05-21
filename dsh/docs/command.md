@@ -1,4 +1,4 @@
-# DSH Visual Review — Single Screen Update Command
+﻿# DSH Visual Review — Single Screen Update Command
 
 Copy this prompt and fill in the bracketed placeholders, then send it to Claude.
 
@@ -10,10 +10,10 @@ Target repo:
 C:\bthwani-suite
 
 Branch:
-ghb/0144-20260516-033533-local-change-review-patch
+ghb/0164-20260521-205754-dsh
 
 Evidence root:
-dsh/docs/DSH_VISUAL_REVIEW
+dsh/docs/DSH_VISUAL_REVIEW.md
 
 Screen to update:
 review_id: [REVIEW_ID]
@@ -32,79 +32,40 @@ issue_summary: [SHORT_SUMMARY_OR_EMPTY]
 next_action: [confirmed | fix_now | owner_decision | blocked_by_contract | blocked_by_wlt | defer]
 
 Required checks before updating:
-1. Confirm dsh/docs/DSH_VISUAL_REVIEW/DSH_VISUAL_REVIEW_LEDGER.csv exists.
-2. Confirm the review_id exists in the ledger.
-3. Confirm screenshot_path is not empty if human_result is PASS or FAIL.
-4. Confirm the screenshot file exists on disk if human_result is PASS or FAIL.
-5. If screenshot file is missing, do not mark PASS or FAIL. Mark BLOCKED and write reason: SCREENSHOT_FILE_MISSING.
+1. Confirm `dsh/docs/DSH_VISUAL_REVIEW.md` exists.
+2. Confirm the `review_id` exists in the embedded ledger row inside that file.
+3. Confirm `screenshot_path` is not empty if `human_result` is PASS or FAIL.
+4. Confirm the screenshot file exists on disk if `human_result` is PASS or FAIL.
+5. If the screenshot file is missing, do not mark PASS or FAIL. Mark BLOCKED and write reason: SCREENSHOT_FILE_MISSING.
 6. Do not create fake screenshot files.
-7. Do not overwrite previous screenshot references. If this is a revision, add a new screenshot filename and update the ledger to point to the latest one.
+7. Do not overwrite previous screenshot references. If this is a revision, add a new screenshot filename and update the ledger row to point to the latest one.
 
 Update:
-1. DSH_VISUAL_REVIEW_LEDGER.csv
-   - Set result = human_result.
-   - Set screenshot_path.
-   - Set issue_type.
-   - Set issue_summary.
-   - Set reviewed_at to current local timestamp.
-   - Set next_action.
-   - Set review_doc_path.
+1. In `dsh/docs/DSH_VISUAL_REVIEW.md`, update the embedded ledger row:
+   - `result` = `human_result`
+   - `screenshot_path`
+   - `issue_type`
+   - `issue_summary`
+   - `reviewed_at`
+   - `next_action`
+   - `review_doc_path`
 
-2. Create or update per-screen review doc:
-   dsh/docs/DSH_VISUAL_REVIEW/reviews/<surface>/<review_id>__<screen_id>.md
-
-The review doc must include:
-- review_id
-- branch
-- commit
-- surface
-- screen_id
-- file_path
-- state
-- device
-- viewport
-- locale
-- direction
-- screenshot_path
-- result
-- visual diagnosis
-- RTL diagnosis
-- overflow/clipping diagnosis
-- CTA diagnosis
-- state coverage diagnosis
-- design-system compliance notes
-- issue summary
-- next action
-- final screen status:
-  HUMAN_VISUAL_REVIEW_CONFIRMED
-  or HUMAN_VISUAL_REVIEW_FAILED
-  or HUMAN_VISUAL_REVIEW_BLOCKED
-  or HUMAN_VISUAL_REVIEW_DEFERRED
-
-3. Update DSH_VISUAL_REVIEW_SUMMARY.md:
-   - Recalculate total NOT_REVIEWED/PASS/FAIL/BLOCKED/DEFERRED.
-   - Update latest reviewed screen.
-   - Update latest reviewed_at.
-   - Do not remove previous summary notes.
-
-4. Update DSH_VISUAL_REVIEW_FAILURES.md:
-   - If result = FAIL, add or update a failure row.
-   - If result changed from FAIL to PASS, mark the failure row as RESOLVED, do not delete it.
-   - If result = BLOCKED, add blocked row with reason.
-
-5. Update DSH_VISUAL_REVIEW_SIGNOFF.md:
-   - If result = PASS, add/update signoff row.
-   - If result != PASS, do not mark confirmed.
-
-6. Update DSH_VISUAL_REVIEW_SCREEN_INDEX.md:
-   - Update the screen result/status only.
-   - Do not change queue classification.
+2. Update the failure tracking section in `dsh/docs/DSH_VISUAL_REVIEW.md` if `result = FAIL`.
+3. Update the signoff section in `dsh/docs/DSH_VISUAL_REVIEW.md` if `result = PASS`.
+4. Update the summary counts and status metadata inside `dsh/docs/DSH_VISUAL_REVIEW.md`.
+5. Do not change these row values:
+   - `review_id`
+   - `screen_id`
+   - `surface`
+   - `file_path`
+   - `queue_list`
+   - `priority`
 
 Verification:
 Run:
-git --no-pager diff --check
-pnpm -w exec tsc --noEmit
-git status --short
+- git --no-pager diff --check
+- pnpm -w exec tsc --noEmit
+- git status --short
 
 Final response:
 Report only:
@@ -114,7 +75,6 @@ BLOCKED
 
 Then list:
 - updated ledger row
-- created/updated review doc
 - screenshot_path
 - result
 - next_action

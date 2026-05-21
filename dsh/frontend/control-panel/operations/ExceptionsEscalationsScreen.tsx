@@ -1,13 +1,18 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import {
+  EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
+  EXCEPTION_TICKET_MAP,
+} from './operations.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { buildOperationsHref } from './operations.registry';
 import {
   getDshEscalationFlowsForSurface,
   getDshFinancePreviewFlows,
@@ -98,6 +103,7 @@ export function ExceptionsEscalationsScreen({
   hubHref: _hubHref,
   subGroup: _subGroup,
 }: ExceptionsEscalationsScreenProps) {
+  const router = useRouter();
   const preview = EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW;
   const [filterId, setFilterId] = React.useState<WorkspaceFilterId>('all');
   const escalationWorkspaceFlows = React.useMemo(
@@ -169,30 +175,45 @@ export function ExceptionsEscalationsScreen({
 
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <Box gap={2} style={{}}>
-        {preview.exceptions.map((exc) => (
-          <WebControlPanelDecisionRow
-            key={exc.id}
-            entityId={exc.id}
-            entityLabel={exc.type}
-            status={exc.severity}
-            statusTone={TONE_MAP[exc.statusTone] ?? 'neutral'}
-            risk={exc.statusTone === 'danger' ? 'danger' : exc.statusTone === 'warning' ? 'warning' : 'neutral'}
-            recommendation={exc.suggestedAction}
-            reason={exc.note}
-            sla={`البداية: ${exc.startTime} | المالك: ${exc.currentOwner}`}
-            primaryAction={{
-              id: 'resolve',
-              label: exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد',
-              onAction: () => { /* resolve/escalate — wired to live queue in Phase 3 */ },
-            }}
-            secondaryAction={{
-              id: 'close',
-              label: 'إغلاق السجل',
-              onAction: () => { /* close record — wired to live queue in Phase 3 */ },
-            }}
-          />
-        ))}
+      <Box gap={2}>
+        {preview.exceptions.map((exc) => {
+          const linkage = EXCEPTION_TICKET_MAP[exc.id];
+          const statusTone = TONE_MAP[exc.statusTone] ?? 'neutral';
+          const supportTicketId = linkage?.supportTicketId ?? `UNPROVEN-${exc.id}`;
+          const auditEntryId = linkage?.auditEntryId;
+          const reason = auditEntryId
+            ? `${exc.note} · التذكرة: ${supportTicketId} · التدقيق: ${auditEntryId}`
+            : `${exc.note} · التذكرة: ${supportTicketId} · التدقيق يفتح من مسار الدعم`;
+          const secondaryLabel = auditEntryId ? 'فتح التدقيق' : 'فتح تذكرة الدعم';
+
+          return (
+            <WebControlPanelDecisionRow
+              key={exc.id}
+              entityId={exc.id}
+              entityLabel={`${exc.type} | السطح المتأثر: ${SURFACE_LABELS[exc.affectedSurface] ?? exc.affectedSurface}`}
+              status={exc.severity}
+              statusTone={statusTone}
+              risk={exc.statusTone === 'danger' ? 'danger' : exc.statusTone === 'warning' ? 'warning' : 'neutral'}
+              recommendation={`${exc.suggestedAction} · الطابور: ${exc.ownerQueue} · ${auditEntryId ? 'support + audit linked' : 'support linked'}`}
+              reason={reason}
+              sla={`البداية: ${exc.startTime} | المالك: ${exc.currentOwner} | السياسة: ${POLICY_LABELS[exc.onDemandDetailPolicy] ?? exc.onDemandDetailPolicy}`}
+              primaryAction={{
+                id: `${exc.id}-resolve`,
+                label: exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد',
+                onAction: () => router.push(exc.routeHint),
+              }}
+              secondaryAction={{
+                id: `${exc.id}-audit`,
+                label: secondaryLabel,
+                onAction: () => router.push(
+                  auditEntryId
+                    ? buildOperationsHref('audit-support-sla', { orderId: auditEntryId })
+                    : buildOperationsHref('audit-support-sla', { orderId: supportTicketId }),
+                ),
+              }}
+            />
+          );
+        })}
       </Box>
 
       <div className={styles.surfaceSectionHeader}>
@@ -384,7 +405,7 @@ export function ExceptionsEscalationsScreen({
             {`أثر السجل المركزي (${escalationWorkspaceFlows.length})`}
           </h3>
         </div>
-        <Box gap={1} style={{}}>
+        <Box gap={1}>
           {escalationWorkspaceFlows.map((flow) => (
             <div key={flow.id} className={styles.escalationCatalogRow}>
               <span className={styles.escalationCatalogId}>{flow.id}</span>

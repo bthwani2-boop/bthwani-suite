@@ -49,7 +49,9 @@ const STORES: readonly {
   },
 ];
 
-export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenProps) {
+const runPreviewOperation = () => undefined;
+
+export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: PartnerStoresScreenProps) {
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
@@ -81,12 +83,12 @@ export function PartnerStoresScreen({ hubHref, subGroup }: PartnerStoresScreenPr
             primaryAction={{
               id: 'primary',
               label: store.suggestion.action,
-              onAction: () => console.log('Store Primary Action', store.id)
+              onAction: runPreviewOperation,
             }}
             secondaryAction={store.suggestion.secondary ? {
               id: 'secondary',
               label: store.suggestion.secondary,
-              onAction: () => console.log('Store Secondary Action', store.id)
+              onAction: runPreviewOperation,
             } : undefined}
           />
         ))}

@@ -1,62 +1,44 @@
 # DSH Control Panel + Shared Owner Decision
 
-status: CURRENT_DECISION
-mode: DOCUMENTATION_ONLY
+status: CURRENT_FRONTEND_OWNER_DECISION
+mode: LIVE_FRONTEND_TRUTH
 repo: C:\bthwani-suite
-branch: ghb/0133-20260513-000319-agents-md-agents-codex
-head: a1a5c7e279f2fa220b5c92a6ed9227909a6d75d3
-generated_at: 2026-05-13T02:16:12.6416279+03:00
+updated_at: 2026-05-21
 
 ## Decision
 
-No move/delete/rename is approved for DSH control-panel or DSH shared.
+No move, delete, or rename is approved for `dsh/frontend/control-panel` or `dsh/frontend/shared` in P0-14.
+This phase closes frontend truth drift only.
 
-This decision closes the current owner/consumer ambiguity as documentation only.
+## Control-Panel Ownership
 
-## Control Panel
+- `control-panel/operations` owns the operational command surfaces through `operations.registry.ts` and its workspace screens.
+- `control-panel/finance` owns the DSH side of the read-only WLT bridge through `finance.registry.ts` and the finance workspaces.
+- `control-panel/support`, `control-panel/marketing`, `control-panel/partners`, `control-panel/platform`, and `control-panel/administration` remain section-owned through their section roots and index exports.
+- No extra global control-panel screen registry is justified until a runtime consumer proves a real gap.
 
-dsh/frontend/control-panel is the current DSH control-panel frontend owner area.
+## Shared Ownership
 
-Current decision:
+- `dshCrossSurfaceClosureMap.ts` is the live cross-surface frontend closure truth.
+- `dsh-flow-registry.ts` is the live flow ownership, visibility, escalation, and on-demand truth.
+- `marketing-visibility.contract.ts`, `dsh-signal-layer.model.ts`, `workflow.ts`, and `store-card-commercial-map.ts` remain shared cross-surface contracts.
+- Shared preview stores remain preview truth only. They are not runtime proof.
 
-- Keep current folder structure.
-- Do not add route files blindly.
-- Do not add a global screen registry blindly.
-- Existing composition/export files remain the owner path unless a later runtime requirement proves otherwise.
-- Any future owner registry must be introduced only by a separate DryRun + patch review.
+## Financial Boundary
 
-Reason:
+- WLT owns settlement, payout, refund, commission, ledger, wallet, and payment semantics.
+- DSH control-panel finance remains view-only.
+- No DSH finance mutation is approved here.
 
-The consumer graph showed existing control-panel consumption through current composition/shell/runtime paths. The risk was ownership clarity, not a proven runtime defect.
+## Not Approved In This Decision
 
-## Shared
-
-dsh/frontend/shared is a cross-surface DSH shared preview/model/workflow area.
-
-Current decision:
-
-- Keep as-is.
-- Do not move.
-- Do not merge.
-- Do not delete.
-- Do not split.
-- Treat preview-store/model/workflow files as shared consumers until a later exact consumer map proves a safe narrower action.
-
-Reason:
-
-The consumer graph showed shared files are consumed across multiple DSH surfaces. Moving or merging them now would create unnecessary regression risk.
-
-## Boundary Result
-
-- No direct Tamagui boundary fix is approved from this decision.
-- No API/runtime/binding implementation is approved from this decision.
-- No UI rewrite is approved from this decision.
-- No package/config/dependency change is approved from this decision.
+- no UI rewrite
+- no backend or API claim
+- no package or config change
+- no `@bthwani/ui-kit` ownership change
 
 ## Next Valid Work
 
-Only after this commit:
-
-1. Continue visual/UI closure per surface.
-2. Or prepare a focused UI-only task.
-3. Or prepare a separate consumer-map DryRun for one shared file at a time.
+1. Capture visual evidence for operations, finance bridge, and cross-surface flows.
+2. Capture runtime proof only when a real multi-surface session is available.
+3. Revisit owner boundaries only if a live consumer conflict appears.

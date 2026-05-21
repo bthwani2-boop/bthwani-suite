@@ -21,8 +21,11 @@ import { DshOperationScreen, type DshOperationScreenProps } from '../parts/Opera
 import { DshSubscriptionsScreen } from '../parts/SubscriptionsScreen';
 import { getCampaignItems } from '../../shared/campaign.preview-store';
 import {
+  DSH_LOYALTY_UI_BOUNDARY_NOTE,
+  getCampaignVisibilityRecord,
+  getPartnerOfferVisibilityRecord,
   isClientVisibleStatus,
-  normalizeCommercialStatus,
+  isMarketingRenderable,
 } from '../../shared/commercial.preview-contract';
 import { getEntitlements, getLoyaltyRewards, getLoyaltyTiers } from '../../shared/loyalty.preview-store';
 import { getPartnerOfferItems } from '../../shared/partner-offer.preview-store';
@@ -258,14 +261,12 @@ export function DshBenefitsHubScreen({
   const activeRewards = getLoyaltyRewards().filter((reward) => isClientVisibleStatus(reward.status));
   const activeEntitlements = getEntitlements().filter((entitlement) => entitlement.status === 'active');
   const currentPlan = subscriptionPlanCards.find((plan) => plan.current) ?? subscriptionPlanCards[0];
-  const liveOffers = getPartnerOfferItems().filter((offer) => {
-    const normalizedStatus = normalizeCommercialStatus(offer.status);
-    return normalizedStatus ? isClientVisibleStatus(normalizedStatus) : false;
-  });
-  const liveCampaigns = getCampaignItems().filter((campaign) => {
-    const normalizedStatus = normalizeCommercialStatus(campaign.status);
-    return normalizedStatus ? isClientVisibleStatus(normalizedStatus) : false;
-  });
+  const liveOffers = getPartnerOfferItems().filter((offer) => (
+    isMarketingRenderable(getPartnerOfferVisibilityRecord(offer, { targetSurface: 'benefits' }))
+  ));
+  const liveCampaigns = getCampaignItems().filter((campaign) => (
+    isMarketingRenderable(getCampaignVisibilityRecord(campaign, { targetSurface: 'benefits' }))
+  ));
   const commercialNotifications = dshNotificationsFixtures
     .filter((item) => item.category === 'offer' || item.category === 'subscription')
     .slice(0, 3);
@@ -291,7 +292,9 @@ export function DshBenefitsHubScreen({
       badgeLabel: 'نقاط',
       badgeTone: 'brand',
       actionLabel: 'استبدل',
-      helperText: activeEntitlements.length > 0 ? `${activeEntitlements.length} ميزة مرتبطة بمستواك` : undefined,
+      helperText: activeEntitlements.length > 0
+        ? `${activeEntitlements.length} ميزة مرتبطة بمستواك • ${DSH_LOYALTY_UI_BOUNDARY_NOTE}`
+        : DSH_LOYALTY_UI_BOUNDARY_NOTE,
       targetSection: 'loyalty',
     },
     {
@@ -422,7 +425,7 @@ export function DshBenefitsHubScreen({
             </Box>
           ) : (
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              لا توجد عروض أو كوبونات متاحة الآن.
+              لا توجد عروض أو كوبونات متاحة الآن. نعرض هنا فقط العناصر التي اجتازت بوابة الشريك والنشر والظهور.
             </Text>
           )}
         </ContentCard>

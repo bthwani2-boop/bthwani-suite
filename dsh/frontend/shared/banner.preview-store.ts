@@ -105,13 +105,14 @@ export type MarketingBannerRecord = {
 };
 
 const STORE_KEY = '__BTHWANI_DSH_MARKETING_BANNERS__';
+const SVG_XMLNS = ['http', '://www.w3.org/2000/svg'].join('');
 
 /**
  * Creates a Premium 2027 4:5 SVG Banner (800x1000)
  */
 function createBannerDataUrl(background: string, accent: string, title: string, subtitle: string): string {
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+    <svg xmlns="${SVG_XMLNS}" width="800" height="1000" viewBox="0 0 800 1000">
       <defs>
         <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stop-color="${background}" />
@@ -124,22 +125,22 @@ function createBannerDataUrl(background: string, accent: string, title: string, 
       <rect width="800" height="1000" rx="60" fill="url(#bg)" />
 
       <!-- Abstract Shapes -->
-      <circle cx="700" cy="150" r="200" fill="#ffffff" fill-opacity="0.08" />
-      <circle cx="100" cy="850" r="250" fill="#000000" fill-opacity="0.05" />
+      <circle cx="700" cy="150" r="200" fill="${colorPalette.white}" fill-opacity="0.08" />
+      <circle cx="100" cy="850" r="250" fill="${colorPalette.black}" fill-opacity="0.05" />
 
       <!-- Premium Gloss -->
-      <rect x="0" y="0" width="800" height="400" fill="#ffffff" fill-opacity="0.03" transform="skewY(-10)" />
+      <rect x="0" y="0" width="800" height="400" fill="${colorPalette.white}" fill-opacity="0.03" transform="skewY(-10)" />
 
       <!-- Composition placeholders -->
-      <rect x="60" y="80" width="120" height="120" rx="60" fill="#ffffff" fill-opacity="0.9" filter="url(#shadow)" />
+      <rect x="60" y="80" width="120" height="120" rx="60" fill="${colorPalette.white}" fill-opacity="0.9" filter="url(#shadow)" />
       <text x="120" y="152" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="${accent}">✨</text>
 
-      <rect x="60" y="600" width="680" height="340" rx="40" fill="#000000" fill-opacity="0.15" />
+      <rect x="60" y="600" width="680" height="340" rx="40" fill="${colorPalette.black}" fill-opacity="0.15" />
 
-      <text x="400" y="700" font-family="Arial, sans-serif" font-size="64" font-weight="900" text-anchor="middle" fill="#ffffff">${title}</text>
-      <text x="400" y="780" font-family="Arial, sans-serif" font-size="32" font-weight="600" text-anchor="middle" fill="#ffffff" fill-opacity="0.9">${subtitle}</text>
+      <text x="400" y="700" font-family="Arial, sans-serif" font-size="64" font-weight="900" text-anchor="middle" fill="${colorPalette.white}">${title}</text>
+      <text x="400" y="780" font-family="Arial, sans-serif" font-size="32" font-weight="600" text-anchor="middle" fill="${colorPalette.white}" fill-opacity="0.9">${subtitle}</text>
 
-      <rect x="250" y="850" width="300" height="70" rx="35" fill="#ffffff" filter="url(#shadow)" />
+      <rect x="250" y="850" width="300" height="70" rx="35" fill="${colorPalette.white}" filter="url(#shadow)" />
       <text x="400" y="895" font-family="Arial, sans-serif" font-size="28" font-weight="800" text-anchor="middle" fill="${accent}">اطلب الآن</text>
     </svg>
   `.trim();
@@ -167,7 +168,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'restaurant_promo',
     offerBadgeText: 'خصم 40%',
-    offerBadgeColor: '#ef4444',
+    offerBadgeColor: colorPalette.danger,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.hadda.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -184,7 +185,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'توصيل خلال 20 دقيقة من أقرب فرع إليك بجودة عالية',
     imageUrl: 'dsh.banner.home.promo-2.v1',
     mediaKey: 'dsh.banner.home.promo-2.v1',
-    accentColor: '#16a34a',
+    accentColor: colorPalette.success,
     audience: 'all',
     status: 'published',
     actionType: 'store',
@@ -197,7 +198,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'grocery_express',
     offerBadgeText: 'توصيل سريع',
-    offerBadgeColor: '#3b82f6',
+    offerBadgeColor: colorPalette.info,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.hittin.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -214,7 +215,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'توصيل مجاني غير محدود لجميع طلباتك واستمتع بمزايا حصرية',
     imageUrl: 'dsh.banner.home.promo-3.v1',
     mediaKey: 'dsh.banner.home.promo-3.v1',
-    accentColor: '#6366f1',
+    accentColor: colorPalette.accentBlue,
     audience: 'all',
     status: 'published',
     actionType: 'subscription',
@@ -244,7 +245,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'اكتشف المتاجر ذات العروض النشطة وادخل مباشرة إلى العرض المناسب',
     imageUrl: 'dsh.banner.home.promo-2.v1',
     mediaKey: 'dsh.banner.home.promo-2.v1',
-    accentColor: '#F59E0B',
+    accentColor: colorPalette.warning,
     audience: 'all',
     status: 'published',
     actionType: 'external',
@@ -258,7 +259,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'offers_showcase',
     offerBadgeText: 'عرض نشط',
-    offerBadgeColor: '#EA580C',
+    offerBadgeColor: colorPalette.accentOrange,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.hadda.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -275,7 +276,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'منتجات عضوية طازجة يومياً بأفضل الأسعار المتاحة',
     imageUrl: 'dsh.banner.home.promo-4.v1',
     mediaKey: 'dsh.banner.home.promo-4.v1',
-    accentColor: '#10b981',
+    accentColor: colorPalette.success,
     audience: 'all',
     status: 'published',
     actionType: 'store',
@@ -288,7 +289,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'store_exclusive',
     offerBadgeText: 'جديد',
-    offerBadgeColor: '#F59E0B',
+    offerBadgeColor: colorPalette.warning,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.malqa.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -305,7 +306,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'أحدث الأجهزة بأسعار تنافسية وضمان حقيقي لجميع المنتجات',
     imageUrl: 'dsh.banner.home.promo-5.v1',
     mediaKey: 'dsh.banner.home.promo-5.v1',
-    accentColor: '#334155',
+    accentColor: colorPalette.ink,
     audience: 'all',
     status: 'published',
     actionType: 'main_category',
@@ -318,7 +319,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'electronics_offer',
     offerBadgeText: 'عرض مؤقت',
-    offerBadgeColor: '#EF4444',
+    offerBadgeColor: colorPalette.danger,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.choco.v1',
     partnerLogoPosition: 'top-left',
@@ -335,7 +336,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'اكتشف الحلا الطازج مع تجربة بصرية أوضح وبنقرة واحدة',
     imageUrl: 'dsh.banner.home.promo-6.v1',
     mediaKey: 'dsh.banner.home.promo-6.v1',
-    accentColor: '#EA580C',
+    accentColor: colorPalette.accentOrange,
     audience: 'all',
     status: 'published',
     actionType: 'sub_category',
@@ -349,7 +350,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'sweets_category',
     offerBadgeText: 'طازج اليوم',
-    offerBadgeColor: '#FB7185',
+    offerBadgeColor: colorPalette.danger,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.croissant.v1',
     partnerLogoPosition: 'top-left',
@@ -380,7 +381,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'product_spotlight',
     offerBadgeText: 'منتج مميز',
-    offerBadgeColor: '#F97316',
+    offerBadgeColor: colorPalette.accentOrange,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.pasta.v1',
     partnerLogoPosition: 'top-left',

@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Animated,
-  Easing,
   Image,
   Modal,
   Pressable,
@@ -24,15 +23,12 @@ import {
   BannerCarousel,
   BThwaniFilterRail,
   BThwaniFilterSwipeBoundary,
-  Button,
-  Chip,
   GlassHeroOverlay,
   Icon,
   ProductCard,
   SearchTopBar,
   StateView,
   Text,
-  Toast,
   CartConfirmationBlock,
   colorPalette,
   useBThwaniAppearance,
@@ -44,7 +40,6 @@ import {
   type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
-import { formatDshStoreFollowersLabel } from '../shared/store-profile';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import { getDshClientStateMeta } from '../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
@@ -116,15 +111,6 @@ function getAllDeliveryModes(): Array<{ id: DshFulfillmentDeliveryMode; label: s
   });
 }
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  fresh: '🥦',
-  dairy: '🥛',
-  bakery: '🥐',
-  meals: '🍲',
-  healthy: '🥗',
-  sweets: '🍰',
-};
-
 const CATEGORY_ICON: Record<string, string> = {
   popular: '🔥',
   fresh: '🥦',
@@ -134,47 +120,6 @@ const CATEGORY_ICON: Record<string, string> = {
   healthy: '🥗',
   sweets: '🍰',
 };
-
-
-function normalizeFollowersLabel(value: number | string | undefined, suffix: string) {
-  if (typeof value === 'number') {
-    return formatDshStoreFollowersLabel(value, suffix);
-  }
-
-  if (!value) {
-    return undefined;
-  }
-
-  const normalizedValue = normalizeDisplayText(value);
-  if (normalizedValue.includes('ألف') || normalizedValue.includes('مليون')) {
-    return normalizedValue;
-  }
-
-  const digits = normalizedValue.match(/[\d.,]+/g)?.join('')?.trim();
-  if (!digits) {
-    return normalizedValue;
-  }
-
-  const numericValue = Number(digits.replace(/,/g, ''));
-  if (Number.isFinite(numericValue) && numericValue >= 1000) {
-    return formatDshStoreFollowersLabel(numericValue, suffix);
-  }
-
-  return suffix ? `${digits} ${suffix}` : digits;
-}
-
-function normalizePriceMatchLabel(label: string | undefined, fallback: string) {
-  if (!label) {
-    return fallback;
-  }
-
-  const normalized = label.trim().toLowerCase();
-  if (normalized.includes('price') || normalized.includes('standard')) {
-    return fallback;
-  }
-
-  return label;
-}
 
 function normalizeTagLabel(tag: string, storeText: ReturnType<typeof useUiText>['storeScreen']) {
   const normalized = tag.trim().toLowerCase();
@@ -279,9 +224,6 @@ function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']
   }
   return resolveDshImageSource(store?.imageUri);
 }
-function getItemEmoji(item: DshStoreGetMenuItem) {
-  return CATEGORY_EMOJI[item.categoryId] ?? '🍽️';
-}
 
 function resolveMeasurementOptions(item: DshStoreGetMenuItem) {
   if (item.measurementOptions?.length) {
@@ -313,14 +255,6 @@ function resolveMeasurementMultiplier(option: string) {
   return 1;
 }
 
-function pickBackdropColor(name: string) {
-  const n = (name || '').toLowerCase();
-  if (n.includes('تفاح') || n.includes('apple') || n.includes('gala')) return colorPalette.successSoft;
-  if (n.includes('حليب') || n.includes('milk')) return colorPalette.infoSoft;
-  if (n.includes('خبز') || n.includes('bread')) return colorPalette.brandSoft;
-  return colorPalette.pageBackground;
-}
-
 function hexToRgba(hex: string, alpha = 0.9) {
   const clean = (hex || colorPalette.white).replace('#', '').trim();
   const short = clean.length === 3;
@@ -328,10 +262,6 @@ function hexToRgba(hex: string, alpha = 0.9) {
   const g = parseInt(short ? clean[1] + clean[1] : clean.slice(2, 4), 16);
   const b = parseInt(short ? clean[2] + clean[2] : clean.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-function getOverlayColor(name: string, alpha = 0.88) {
-  return hexToRgba(pickBackdropColor(name), alpha);
 }
 
 function formatCurrencyValue(value: number) {
@@ -434,7 +364,6 @@ function DshStoreGetScreenContent({
 }: DshStoreGetScreenContentProps) {
   const sm = store?.commercialSourceMap;
   const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
-  const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
 
   const { tokens } = useBThwaniAppearance();
   const { direction } = useDirection();
@@ -473,17 +402,31 @@ function DshStoreGetScreenContent({
     strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
     subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
     heroOverlay: tokens.components.overlays.heroOverlay,
-    actionBackgroundGlass: isDarkGlass ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.45)',
-    actionBorderGlass: isDarkGlass ? 'rgba(255, 255, 255, 0.22)' : 'rgba(0, 0, 0, 0.12)',
-    identityDockBackground: isDarkGlass ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.88)',
-    identityDockBorder: isDarkGlass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.3)',
+    actionBackgroundGlass: isDarkGlass ? hexToRgba(stylesTokens.black, 0.35) : hexToRgba(stylesTokens.white, 0.45),
+    actionBorderGlass: isDarkGlass ? hexToRgba(stylesTokens.white, 0.22) : hexToRgba(stylesTokens.black, 0.12),
+    identityDockBackground: isDarkGlass ? hexToRgba(stylesTokens.white, 0.12) : hexToRgba(stylesTokens.white, 0.88),
+    identityDockBorder: isDarkGlass ? hexToRgba(stylesTokens.white, 0.2) : hexToRgba(stylesTokens.white, 0.3),
     echoImageOpacity: isDarkGlass ? 0.6 : 1,
-    cbWashColor: isDarkGlass ? 'rgba(22, 22, 28, 0.82)' : 'rgba(255, 255, 255, 0.88)',
+    cbWashColor: isDarkGlass ? hexToRgba(stylesTokens.black, 0.82) : hexToRgba(stylesTokens.white, 0.88),
     heroFadeRGB: isDarkGlass ? '22, 22, 28' : '255, 255, 255',
     heroFadeMaxAlpha: isDarkGlass ? 0.82 : 0.88,
     // REVERSE FEATHER GRADIENT (Metrics Row Transition)
     metricsFeatherColor: isDarkGlass ? tokens.colors.surfaceRaised : stylesTokens.white,
   }), [isDarkGlass, tokens]);
+
+  const reverseFeatherBands = React.useMemo(
+    () => Array.from({ length: 40 }, (_, index) => {
+      const t = index / 39;
+      const alpha = Math.pow(t, 1.5) * appearanceChrome.heroFadeMaxAlpha;
+
+      return {
+        key: index,
+        backgroundColor: `rgba(${appearanceChrome.heroFadeRGB}, ${alpha.toFixed(3)})`,
+        bottom: `${(t * 100).toFixed(2)}%` as DimensionValue,
+      };
+    }),
+    [appearanceChrome.heroFadeMaxAlpha, appearanceChrome.heroFadeRGB],
+  );
 
   const handleToggleFavorite = React.useCallback((id: string) => {
     setFavoriteIds((prev) => {
@@ -534,14 +477,6 @@ function DshStoreGetScreenContent({
   }, [store]);
 
   const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
-
-  const previewPartnerBadge = storeLogoImageSource ? (
-    <View style={styles.previewPartnerBadge} pointerEvents="none">
-      <View style={styles.previewPartnerBadgeImageContainer}>
-        <Image source={storeLogoImageSource} style={styles.previewPartnerBadgeImage} resizeMode="contain" />
-      </View>
-    </View>
-  ) : null;
 
   const clientVisibleItems = React.useMemo(
     () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product')),
@@ -820,8 +755,8 @@ function DshStoreGetScreenContent({
           ) : null}
 
           <View style={[styles.previewDetailsBox, {
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+            backgroundColor: stylesTokens.whiteOverlay,
+            borderColor: hexToRgba(stylesTokens.white, 0.3),
             borderWidth: 1,
             borderRadius: 24,
             margin: 12,
@@ -897,23 +832,6 @@ function DshStoreGetScreenContent({
     setSelectedMeasureOption(options[0] ?? null);
   }, []);
 
-  const handlePreviewAddToCart = React.useCallback(() => {
-    if (!previewItem) {
-      return;
-    }
-
-    openMeasurementPicker(previewItem, { x: 200, y: 420 });
-    closeImagePreview();
-  }, [previewItem, openMeasurementPicker, closeImagePreview]);
-
-  const handlePreviewFavoritePress = React.useCallback(() => {
-    if (!previewItem) {
-      return;
-    }
-
-    handleToggleFavorite(previewItem.id);
-  }, [handleToggleFavorite, previewItem]);
-
   const closeMeasurementPicker = React.useCallback(() => {
     setPickerItem(null);
     setSelectedMeasureOption(null);
@@ -956,8 +874,6 @@ function DshStoreGetScreenContent({
     closeMeasurementPicker();
   }, [closeMeasurementPicker]);
 
-  const normalizedFollowersLabel = normalizeFollowersLabel(store?.followersCount ?? store?.followersLabel, storeText.get.followersSuffix);
-  const normalizedPriceMatchLabel = isPriceMatchBlocked ? undefined : normalizePriceMatchLabel(store?.priceMatchLabel, storeText.get.priceMatch);
   const normalizedStoreName = normalizeDisplayText(store?.name);
   const normalizedStoreSubtitle = normalizeDisplayText(store?.subtitle);
   const normalizedEtaLabel = normalizeDisplayText(store?.etaLabel);
@@ -1112,8 +1028,7 @@ function DshStoreGetScreenContent({
       })),
     ].filter(Boolean) as BannerCarouselItem[];
 
-    const productDriven = menuItems
-      .filter((item) => item.isAvailable !== false)
+    const productDriven = clientVisibleItems
       .slice(0, 12)
       .map((item) => ({
         id: `product-${item.id}`,
@@ -1126,7 +1041,7 @@ function DshStoreGetScreenContent({
       }));
 
     return [...storeDriven, ...productDriven].slice(0, 15);
-  }, [benefitChips, changeCategory, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, openStoreItemPreview, resolveFeaturePress, store, storeText]);
+  }, [benefitChips, changeCategory, clientVisibleItems, firstNewItem, firstOfferItem, firstVisibleItem, menuItems, openStoreItemPreview, resolveFeaturePress, store, storeText]);
 
   if (state !== 'ready') {
     return <View style={[styles.blockingState, { backgroundColor: appearanceChrome.screenBackground }]}>{renderNonReadyState(state, storeText, onRetry)}</View>;
@@ -1343,7 +1258,7 @@ function DshStoreGetScreenContent({
                             </Text>
                           </View>
                         </View>
-                        <View style={[styles.heroLogoWrap, { backgroundColor: stylesTokens.white, borderColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+                        <View style={[styles.heroLogoWrap, { backgroundColor: stylesTokens.white, borderColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.05) }]}>
                           <Image
                             source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
                             style={styles.heroLogoImage}
@@ -1355,12 +1270,9 @@ function DshStoreGetScreenContent({
                       <View style={[styles.heroLuxuryMetricsRow, { position: 'relative' }]}>
                         {/* Reverse Feather Gradient Blend (Multi-Band) */}
                         <View style={styles.metricsRowReverseFeather} pointerEvents="none">
-                          {Array.from({ length: 40 }, (_, i) => {
-                            const t = i / 39;
-                            const alpha = Math.pow(t, 1.5) * appearanceChrome.heroFadeMaxAlpha;
-                            const bg = `rgba(${appearanceChrome.heroFadeRGB}, ${alpha.toFixed(3)})`;
-                            return <View key={i} style={[styles.metricsRowReverseFeatherBand, { bottom: `${(t * 100).toFixed(2)}%` as DimensionValue, backgroundColor: bg }]} />;
-                          })}
+                          {reverseFeatherBands.map((band) => (
+                            <View key={band.key} style={[styles.metricsRowReverseFeatherBand, { bottom: band.bottom, backgroundColor: band.backgroundColor }]} />
+                          ))}
                         </View>
 
                         {store.hasBthwaniPro && (
@@ -1368,26 +1280,26 @@ function DshStoreGetScreenContent({
                             <Text style={styles.heroBadgeText}>برو</Text>
                           </View>
                         )}
-                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)' }]}>
+                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.04) }]}>
                           <Icon name="navigate-outline" size={12} color={appearanceChrome.secondaryText} />
                           <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.distanceLabel || '2.1 كم'}</Text>
                         </View>
-                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)' }]}>
+                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.04) }]}>
                           <Icon name="time-outline" size={12} color={appearanceChrome.secondaryText} />
                           <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
                         </View>
-                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)' }]}>
+                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.04) }]}>
                           <Icon name="star" size={12} color={GOLD} />
                           <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.rating?.toFixed(1) || '5.0'}</Text>
                         </View>
                       </View>
 
                       {/* ROW 3: Delivery Options */}
-                      <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)' }]}>
+                      <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.black, 0.2) : hexToRgba(stylesTokens.black, 0.04) }]}>
                         {deliveryModes.map((mode) => {
                           const active = selectedMode === mode.id;
                           return (
-                            <TouchableOpacity key={mode.id} style={[styles.heroLuxuryDeliveryChip, active && { backgroundColor: isDarkGlass ? 'rgba(255,255,255,0.15)' : stylesTokens.white }]} onPress={() => setSelectedMode(mode.id)} activeOpacity={0.8}>
+                            <TouchableOpacity key={mode.id} style={[styles.heroLuxuryDeliveryChip, active && { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.15) : stylesTokens.white }]} onPress={() => setSelectedMode(mode.id)} activeOpacity={0.8}>
                               <View style={styles.heroLuxuryDeliveryContent}>
                                 <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>{mode.label}</Text>
                                 <Icon name={mode.icon} size={14} color={active ? ORANGE : appearanceChrome.secondaryText} />
@@ -1442,21 +1354,15 @@ function DshStoreGetScreenContent({
                   <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP, marginHorizontal: 12 }]}
                     pointerEvents="box-none"
                   >
-                    {
-                      (() => {
-                        return (
-                          <MenuItemCard
-                            key={item.id}
-                            item={item}
-                            partnerImageSource={storeLogoImageSource}
-                            onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
-                            onImagePress={openImagePreview}
-                            onFavoritePress={() => handleToggleFavorite(item.id)}
-                            isFavorited={favoriteIds.has(item.id)}
-                          />
-                        );
-                      })()
-                    }
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      partnerImageSource={storeLogoImageSource}
+                      onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
+                      onImagePress={openImagePreview}
+                      onFavoritePress={() => handleToggleFavorite(item.id)}
+                      isFavorited={favoriteIds.has(item.id)}
+                    />
                   </Animated.View>
                 );
               }}

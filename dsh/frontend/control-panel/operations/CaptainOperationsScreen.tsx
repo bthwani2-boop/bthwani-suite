@@ -41,7 +41,9 @@ const CAPTAINS = [
   },
 ] as const;
 
-export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperationsScreenProps) {
+const runPreviewOperation = () => undefined;
+
+export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup }: CaptainOperationsScreenProps) {
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
@@ -72,12 +74,12 @@ export function CaptainOperationsScreen({ hubHref, subGroup }: CaptainOperations
             primaryAction={{
               id: 'primary',
               label: cap.suggestion.action,
-              onAction: () => console.log('Primary Action', cap.id)
+              onAction: runPreviewOperation,
             }}
             secondaryAction={cap.suggestion.secondary ? {
               id: 'secondary',
               label: cap.suggestion.secondary,
-              onAction: () => console.log('Secondary Action', cap.id)
+              onAction: runPreviewOperation,
             } : undefined}
           />
         ))}

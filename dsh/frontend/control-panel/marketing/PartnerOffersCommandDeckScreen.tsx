@@ -36,6 +36,7 @@ export function PartnerOffersCommandDeckScreen() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [offersPage, setOffersPage] = React.useState(1);
   const [editorSection, setEditorSection] = React.useState<PartnerOfferEditorSection>('details');
+  const [publishGuardMessage, setPublishGuardMessage] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (selected) {
@@ -68,6 +69,7 @@ export function PartnerOffersCommandDeckScreen() {
   const refresh = () => setItems(getPartnerOfferItems());
 
   const handleCreateNew = () => {
+    setPublishGuardMessage(null);
     setEditorSection('details');
     setSelectedId(null);
   };
@@ -75,6 +77,7 @@ export function PartnerOffersCommandDeckScreen() {
   const handleSave = () => {
     const saved = upsertPartnerOfferItem(draft);
     refresh();
+    setPublishGuardMessage(null);
     setEditorSection('details');
     setSelectedId(saved.id);
   };
@@ -83,6 +86,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (!selected) return;
     const saved = upsertPartnerOfferItem({ ...selected, id: undefined, title: `${selected.title} — نسخة`, status: 'inbound' });
     refresh();
+    setPublishGuardMessage(null);
     setEditorSection('details');
     setSelectedId(saved.id);
   };
@@ -178,9 +182,10 @@ export function PartnerOffersCommandDeckScreen() {
     if (!item) return;
     const errors = validatePartnerOfferForPublish(item as unknown as Parameters<typeof validatePartnerOfferForPublish>[0]);
     if (errors.length > 0) {
-      console.warn('[PartnerOffers] Publish blocked:', errors);
+      setPublishGuardMessage(errors[0] ?? 'تعذر نشر العرض قبل استكمال متطلبات الحوكمة.');
       return;
     }
+    setPublishGuardMessage(null);
     publishPartnerOfferItem(id);
     refresh();
   };
@@ -375,6 +380,7 @@ export function PartnerOffersCommandDeckScreen() {
                     title={item.title}
                     subtitle={`${item.partnerName} · ${translateOfferType(item.offerType)} · ${translateSource(item.source)}`}
                     onPress={() => {
+                      setPublishGuardMessage(null);
                       setEditorSection('details');
                       setSelectedId(item.id);
                     }}
@@ -400,6 +406,14 @@ export function PartnerOffersCommandDeckScreen() {
             <Text role="bodyStrong">{selected ? 'مفتش العرض' : 'إنشاء عرض جديد'}</Text>
             {renderActionButtons()}
           </Box>
+
+          {publishGuardMessage ? (
+            <Box paddingX={4} paddingTop={3}>
+              <Surface tone="warning" padding={3}>
+                <Text role="bodySm">{publishGuardMessage}</Text>
+              </Surface>
+            </Box>
+          ) : null}
 
           <Box style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 12 }}>
             <Tabs<PartnerOfferEditorSection>

@@ -207,49 +207,49 @@ export function DshMySpaceScreen({
   const { theme } = useTheme();
   const { language, setLanguage } = useDirection();
 
+  const runOptionalAction = React.useCallback((action?: () => void) => {
+    action?.();
+  }, []);
+
   if (state !== 'ready') {
     return <DshOperationScreen state={state} title="مساحتي" subtitle="الهوية الشخصية داخل DSH" onRetry={onRetry} />;
   }
 
   const handleRowPress = (sectionId: MySpacePrimaryTab) => {
     if (sectionId === 'identity') {
-      if (onOpenIdentity) {
-        onOpenIdentity();
-      } else {
-        console.warn('Missing onOpenIdentity callback');
-      }
+      runOptionalAction(onOpenIdentity);
       return;
     }
 
     switch (sectionId) {
       case 'orders':
-        return onOpenOrders ? onOpenOrders() : console.warn('Missing onOpenOrders callback');
+        return runOptionalAction(onOpenOrders);
       case 'wallet':
-        return onOpenWallet ? onOpenWallet() : console.warn('Missing onOpenWallet callback');
+        return runOptionalAction(onOpenWallet);
       case 'loyalty':
-        return onOpenLoyalty
-          ? onOpenLoyalty()
-          : onOpenBenefits
-            ? onOpenBenefits()
-            : console.warn('Missing onOpenLoyalty callback');
+        if (onOpenLoyalty) {
+          onOpenLoyalty();
+          return;
+        }
+        return runOptionalAction(onOpenBenefits);
       case 'subscription':
-        return onOpenSubscriptions
-          ? onOpenSubscriptions()
-          : onOpenBenefits
-            ? onOpenBenefits()
-            : console.warn('Missing onOpenSubscriptions callback');
+        if (onOpenSubscriptions) {
+          onOpenSubscriptions();
+          return;
+        }
+        return runOptionalAction(onOpenBenefits);
       case 'offers':
-        return onOpenCommercial
-          ? onOpenCommercial()
-          : onOpenBenefits
-            ? onOpenBenefits()
-            : console.warn('Missing onOpenCommercial callback');
+        if (onOpenCommercial) {
+          onOpenCommercial();
+          return;
+        }
+        return runOptionalAction(onOpenBenefits);
       case 'addresses-location':
-        return onOpenAddressesLocation ? onOpenAddressesLocation() : console.warn('Missing onOpenAddressesLocation callback');
+        return runOptionalAction(onOpenAddressesLocation);
       case 'appearance':
-        return onOpenAppearance ? onOpenAppearance() : console.warn('Missing onOpenAppearance callback');
+        return runOptionalAction(onOpenAppearance);
       case 'preferences':
-        return onOpenPreferences ? onOpenPreferences() : console.warn('Missing onOpenPreferences callback');
+        return runOptionalAction(onOpenPreferences);
       default:
         break;
     }

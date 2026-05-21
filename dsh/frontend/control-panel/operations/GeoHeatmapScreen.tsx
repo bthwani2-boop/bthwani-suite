@@ -300,15 +300,18 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
         }
         controls={
           <Box gap={2}>
+            <Text role="bodySm" tone="muted">
+              هذه الخريطة operational preview خاصة بلوحة التحكم وتعرض إشارات الطلبات والكباتن والمتاجر summary-first من دون أي binding خرائط خارجي أو mutation ميداني.
+            </Text>
             <WebControlPanelLaneTabs
               ariaLabel="لوحات الخريطة"
               items={SUB_TABS.map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeSubTab }))}
-              onSelect={(nextTabId) => setActiveSubTab(nextTabId)}
+              onSelect={(nextTabId: string) => setActiveSubTab(nextTabId)}
             />
             <WebControlPanelTertiaryFilters
               ariaLabel="مرشحات الخريطة"
               items={TERTIARY_FILTERS.map((filter) => ({ id: filter, label: FILTER_LABELS[filter], active: filter === activeFilter }))}
-              onSelect={(nextFilterId) => setActiveFilter(nextFilterId as GeoFilterId)}
+              onSelect={(nextFilterId: string) => setActiveFilter(nextFilterId as GeoFilterId)}
             />
           </Box>
         }
@@ -316,11 +319,11 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
           <Box gap={3}>
             <WebControlPanelMapCanvas
               legend={
-                <Box gap={1} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
+                <div className={styles.surfaceActionWrap}>
                   <WebControlPanelStatusTag label="الطلب والسعة" tone="info" />
                   <WebControlPanelStatusTag label="مخاطر الالتزام" tone="warning" />
                   <WebControlPanelStatusTag label="معاينة فقط" tone="neutral" />
-                </Box>
+                </div>
               }
             >
               {selectedZoneLayout ? (

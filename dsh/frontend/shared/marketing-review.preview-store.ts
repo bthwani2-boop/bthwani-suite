@@ -44,6 +44,18 @@ function mapToMediaReview(r: ApprovalRecord): MediaReviewRecord {
   };
 }
 
+function appendMarketingSystemNote(currentNote: string | undefined, nextNote: string): string {
+  if (!currentNote?.trim()) {
+    return nextNote;
+  }
+
+  if (currentNote.includes(nextNote)) {
+    return currentNote;
+  }
+
+  return `${nextNote} — ${currentNote}`;
+}
+
 // =====================================================================
 // Selectors
 // =====================================================================
@@ -94,7 +106,11 @@ export function approveMediaReviewItem(id: string): void {
   if (item) {
     upsertApprovalRecord({
       id,
-      metadata: { ...item.metadata, nextOwner: 'control-panel-catalog' }
+      metadata: {
+        ...item.metadata,
+        nextOwner: 'control-panel-catalog',
+        systemNote: appendMarketingSystemNote(item.systemNote, 'تم اعتماد العنصر تسويقياً مع توثيق قرار المرور إلى الكتالوج.'),
+      }
     });
   }
 }
@@ -105,7 +121,11 @@ export function requestMediaFix(id: string, note?: string): void {
   if (item) {
     upsertApprovalRecord({
       id,
-      metadata: { ...item.metadata, nextOwner: 'app-partner', systemNote: note || item.systemNote }
+      metadata: {
+        ...item.metadata,
+        nextOwner: 'app-partner',
+        systemNote: appendMarketingSystemNote(item.systemNote, note || 'أُعيد العنصر للشريك مع ملاحظة مراجعة واضحة قبل أي ظهور جديد.'),
+      }
     });
   }
 }
@@ -116,7 +136,11 @@ export function rejectMediaReviewItem(id: string): void {
   if (item) {
     upsertApprovalRecord({
       id,
-      metadata: { ...item.metadata, nextOwner: 'app-partner' }
+      metadata: {
+        ...item.metadata,
+        nextOwner: 'app-partner',
+        systemNote: appendMarketingSystemNote(item.systemNote, 'تم رفض العنصر تسويقياً مع حفظ مبرر يمنع ظهوره على العميل.'),
+      }
     });
   }
 }
@@ -127,7 +151,11 @@ export function sendMediaToCatalog(id: string): void {
   if (item) {
     upsertApprovalRecord({
       id,
-      metadata: { ...item.metadata, nextOwner: 'control-panel-catalog' }
+      metadata: {
+        ...item.metadata,
+        nextOwner: 'control-panel-catalog',
+        systemNote: appendMarketingSystemNote(item.systemNote, 'تم تمرير العنصر من التسويق إلى الكتالوج لتثبيت الظهور النهائي.'),
+      }
     });
   }
 }

@@ -1,455 +1,517 @@
 'use client';
 
 import React from 'react';
-import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
-import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { Box, Surface, Text } from '@bthwani/ui-kit';
+import {
+  WebControlPanelKpiStrip,
+  WebControlPanelWorkspaceTabs,
+  WebSectionCard,
+} from '@bthwani/ui-kit/web';
+import {
+  DSH_PLATFORM_AUDIT_PREVIEW,
+  DSH_PLATFORM_OPERATIONAL_VARS,
+  DSH_PLATFORM_PROVIDER_CONTROL_VARS,
+  DSH_PLATFORM_SCOPE_PRECEDENCE,
+  DSH_PLATFORM_SIMULATION_PREVIEW,
+  DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
+} from './vars.preview';
+import type {
+  DshPlatformProviderControlRecord,
+  DshPlatformVarRecord,
+  DshPlatformVarScope,
+  DshPlatformVarStatus,
+} from './vars.types';
+import styles from './dsh-platform-vars.module.css';
 
-type HumanVarCardProps = {
-  humanName: string;
-  technicalKey: string;
-  currentValue: string;
-  proposedValue: string;
-  scope: string;
-  impact: string;
-  risk: string;
-  tone: 'brand' | 'warning' | 'danger' | 'success' | 'default';
+type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy';
+
+const STATUS_LABELS: Record<DshPlatformVarStatus, string> = {
+  'preview-only': 'Preview only — UI',
+  'contract-needed': 'Contract needed',
+  'ready-for-binding': 'Ready for binding',
 };
 
-function HumanVarCard({
-  humanName,
-  technicalKey,
-  currentValue,
-  proposedValue,
-  scope,
-  impact,
-  risk,
-  tone,
-}: HumanVarCardProps) {
-  const { addAuditEvent } = useDemoPlatformState();
-  const [showAdvanced, setShowAdvanced] = React.useState(false);
-  const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
-  const [activeValue, setActiveValue] = React.useState(currentValue);
-  const [changeReason, setChangeReason] = React.useState('');
+const RISK_LABELS: Record<DshPlatformVarRecord['risk'], string> = {
+  low: 'مخاطرة منخفضة',
+  medium: 'مخاطرة متوسطة',
+  high: 'مخاطرة عالية',
+  financial: 'مخاطرة مالية',
+};
 
-  const handleConfirm = (action: string) => {
-    const reason = changeReason.trim() || 'لم يُحدد سبب (محاكاة تجريبية)';
-    if (action === 'محاكاة (Simulation)') {
-      setActiveValue(proposedValue);
-      addAuditEvent({
-        action: `محاكاة متغير: ${humanName}`,
-        operator: 'Demo Admin',
-        status: 'success',
-        oldValue: activeValue,
-        newValue: proposedValue,
-        reason,
-        scope,
-        impact,
-        rollbackAvailable: true,
-      });
-    } else {
-      addAuditEvent({
-        action: `طلب إجراء: ${action} — ${humanName}`,
-        operator: 'Demo Admin',
-        status: 'warning',
-        oldValue: activeValue,
-        newValue: proposedValue,
-        reason,
-        scope,
-        impact,
-        rollbackAvailable: true,
-      });
+const DOMAIN_LABELS: Record<VarsDomainId, string> = {
+  dsh: 'DSH operational',
+  wlt: 'WLT bridge',
+  provider: 'Provider control',
+  policy: 'precedence + audit',
+};
+
+const SCOPE_ORDER = new Map(DSH_PLATFORM_SCOPE_PRECEDENCE.map((layer) => [layer.scope, layer.order]));
+const DEFAULT_PRECEDENCE_CHAIN_LABEL = DSH_PLATFORM_SCOPE_PRECEDENCE
+  .map((layer) => layer.scope)
+  .join(' ← ');
+
+function isProviderRecord(record: DshPlatformVarRecord): record is DshPlatformProviderControlRecord {
+  return 'providerId' in record;
+}
+
+function resolveDomainRecords(domain: VarsDomainId): readonly DshPlatformVarRecord[] {
+  if (domain === 'dsh') return DSH_PLATFORM_OPERATIONAL_VARS;
+  if (domain === 'wlt') return DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS;
+  if (domain === 'provider') return DSH_PLATFORM_PROVIDER_CONTROL_VARS;
+  return [];
+}
+
+function resolveDomainKpis(domain: VarsDomainId) {
+  if (domain === 'policy') {
+    const blockedScenarios = DSH_PLATFORM_SIMULATION_PREVIEW.filter((scenario) => scenario.blockedReason.length > 0).length;
+    return [
+      { id: 'precedence', label: 'طبقات precedence', value: String(DSH_PLATFORM_SCOPE_PRECEDENCE.length), tone: 'neutral' as const },
+      { id: 'simulation', label: 'سيناريوهات preview', value: String(DSH_PLATFORM_SIMULATION_PREVIEW.length), tone: 'warning' as const },
+      { id: 'audit', label: 'مراجع audit', value: String(DSH_PLATFORM_AUDIT_PREVIEW.length), tone: 'success' as const },
+      { id: 'blocked', label: 'محجوب عن mutation', value: String(blockedScenarios), tone: 'danger' as const },
+    ];
+  }
+
+  const records = resolveDomainRecords(domain);
+  return [
+    { id: 'total', label: 'العناصر المرئية', value: String(records.length), tone: 'neutral' as const },
+    { id: 'binding', label: 'جاهز للربط', value: String(records.filter((record) => record.status === 'ready-for-binding').length), tone: 'success' as const },
+    { id: 'contract', label: 'يحتاج عقد', value: String(records.filter((record) => record.status === 'contract-needed').length), tone: 'warning' as const },
+    { id: 'wlt', label: 'مملوك لـ WLT', value: String(records.filter((record) => record.owner === 'WLT').length), tone: 'danger' as const },
+  ];
+}
+
+function resolveScopeTabs(records: readonly DshPlatformVarRecord[], activeScope: string) {
+  const scopes = new Set(records.map((record) => record.scope));
+  const orderedScopes = DSH_PLATFORM_SCOPE_PRECEDENCE
+    .map((layer) => layer.scope)
+    .filter((scope) => scopes.has(scope));
+
+  return [
+    { id: 'all', label: 'كل الطبقات', badge: '', active: activeScope === 'all' },
+    ...orderedScopes.map((scope) => ({ id: scope, label: scope, badge: '', active: activeScope === scope })),
+  ];
+}
+
+function sortRecordsByScope(records: readonly DshPlatformVarRecord[]) {
+  return [...records].sort((left, right) => {
+    const leftOrder = SCOPE_ORDER.get(left.scope) ?? Number.MAX_SAFE_INTEGER;
+    const rightOrder = SCOPE_ORDER.get(right.scope) ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftOrder !== rightOrder) {
+      return leftOrder - rightOrder;
     }
-    setShowConfirm(null);
-    setChangeReason('');
-  };
+
+    return left.label.localeCompare(right.label, 'ar');
+  });
+}
+
+function resolveProviderEffect(record: DshPlatformVarRecord) {
+  if (isProviderRecord(record)) {
+    return `${record.providerId} · ${record.capability} · ${record.mode} · fallback=${record.fallback}`;
+  }
+
+  if (record.owner === 'WLT') {
+    return 'WLT bridge read-only: التأثير المعروض هنا مرجعي فقط ولا يتحول إلى mutation داخل DSH.';
+  }
+
+  return 'DSH operational preview: التأثير المعروض هنا يوضح القرار التشغيلي القادم بدون backend/runtime switching.';
+}
+
+function resolveLinkedScenarios(record: DshPlatformVarRecord) {
+  return DSH_PLATFORM_SIMULATION_PREVIEW.filter((scenario) => scenario.relatedKeys.includes(record.key));
+}
+
+function resolveLinkedAuditEntries(record: DshPlatformVarRecord) {
+  return DSH_PLATFORM_AUDIT_PREVIEW.filter((entry) => entry.targetKey === record.key);
+}
+
+function resolvePrecedenceSummary(record: DshPlatformVarRecord) {
+  return `الطبقة الفعالة: ${record.scope} · ${record.precedenceNote} · التسلسل الافتراضي: ${DEFAULT_PRECEDENCE_CHAIN_LABEL}`;
+}
+
+function resolveSimulationSummary(record: DshPlatformVarRecord, linkedScenarios: readonly typeof DSH_PLATFORM_SIMULATION_PREVIEW) {
+  if (linkedScenarios.length === 0) {
+    return `لا توجد محاكاة مرتبطة بالمفتاح ${record.key} حتى الآن.`;
+  }
+
+  return linkedScenarios.map((scenario) => scenario.expectedImpact).join(' · ');
+}
+
+function resolveAuditRequirementLabel(record: DshPlatformVarRecord, linkedAudits: readonly typeof DSH_PLATFORM_AUDIT_PREVIEW) {
+  if (record.auditRequired || linkedAudits.length > 0) {
+    return `نعم — ${linkedAudits.length > 0 ? `${linkedAudits.length} snapshot` : 'يتطلب مراجعة قبل أي binding أو اعتماد'}`;
+  }
+
+  return 'لا';
+}
+
+function VarCard({
+  record,
+  active,
+  onSelect,
+}: {
+  record: DshPlatformVarRecord;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const linkedScenarios = resolveLinkedScenarios(record);
+  const linkedAudits = resolveLinkedAuditEntries(record);
+  const domainLabel = DOMAIN_LABELS[
+    record.owner === 'Provider' ? 'provider' : record.owner === 'WLT' ? 'wlt' : 'dsh'
+  ];
 
   return (
-    <Surface tone="raised" border padding={4} radiusToken="xl">
-      <Box gap={3}>
-        <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="titleMd">{humanName}</Text>
-          <Surface tone={tone} padding={1} radiusToken="pill" border={false}>
-            <Text role="caption" tone={tone === 'default' ? 'muted' : 'inverse'}>{risk}</Text>
-          </Surface>
-        </Box>
+    <button
+      type="button"
+      className={`${styles.varCard} ${active ? styles.varCardActive : ''}`.trim()}
+      onClick={onSelect}
+    >
+      <div className={styles.cardHeader}>
+        <div className={styles.cardTextBlock}>
+          <div className={styles.cardTitle}>{record.label}</div>
+          <div className={styles.cardCode}>{`${record.id} · ${record.key}`}</div>
+        </div>
+        <div className={styles.chipRow}>
+          <span className={styles.chip}>{`المالك: ${record.owner}`}</span>
+          <span className={styles.chip}>{`النطاق: ${record.scope}`}</span>
+          <span className={styles.chip}>{`binding: ${STATUS_LABELS[record.status]}`}</span>
+          <span className={styles.chip}>{RISK_LABELS[record.risk]}</span>
+          <span className={styles.chip}>{`mutationAllowed: ${String(record.mutationAllowed)}`}</span>
+        </div>
+      </div>
 
-        <Surface tone="default" border padding={3} radiusToken="md">
-          <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-            <Box gap={1} style={{ flexGrow: 1 }}>
-              <Text role="caption" tone="muted">القيمة الحالية (المطبقة محلياً)</Text>
-              <Text role="bodyLg" weight="bold">{activeValue}</Text>
-            </Box>
-            <Box gap={1} style={{ flexGrow: 1 }}>
-              <Text role="caption" tone="muted">القيمة المقترحة</Text>
-              <Text role="bodyLg" weight="bold" tone="brand">{proposedValue}</Text>
-            </Box>
-          </Box>
-        </Surface>
+      <div className={styles.valueGrid}>
+        <div className={styles.valueCard}>
+          <div className={styles.valueLabel}>current_value_label</div>
+          <div className={styles.valueText}>{record.currentPreviewValue}</div>
+        </div>
+        <div className={styles.valueCard}>
+          <div className={styles.valueLabel}>proposed_value_label</div>
+          <div className={styles.valueText}>{record.proposedPreviewValue ?? 'لا يوجد proposal بعد'}</div>
+        </div>
+      </div>
 
-        <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-          <Box gap={1} style={{ flexGrow: 1 }}>
-            <Text role="caption" tone="muted">النطاق</Text>
-            <Text role="bodySm">{scope}</Text>
-          </Box>
-          <Box gap={1} style={{ flexGrow: 1 }}>
-            <Text role="caption" tone="muted">الأثر المتوقع</Text>
-            <Text role="bodySm">{impact}</Text>
-          </Box>
-        </Box>
+      <div className={styles.summaryLine}>{record.effectSummary}</div>
 
-        {showAdvanced && (
-          <Box gap={1} style={{ marginTop: 8 }}>
-            <Text role="caption" tone="muted">تفاصيل متقدمة (Technical Key):</Text>
-            <Text role="caption" style={{ fontFamily: 'monospace' }}>{technicalKey}</Text>
-          </Box>
-        )}
+      <div className={styles.chipRow}>
+        <span className={styles.chip}>{`simulation: ${linkedScenarios.length}`}</span>
+        <span className={styles.chip}>{`audit_required: ${record.auditRequired ? 'yes' : 'no'}`}</span>
+        <span className={styles.chip}>{`surfaces: ${record.affectedSurfaces.length}`}</span>
+        <span className={styles.chip}>{domainLabel}</span>
+      </div>
+    </button>
+  );
+}
 
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', marginTop: 8 }}>
-          <Button variant="secondary" onClick={() => setShowAdvanced(!showAdvanced)}>
-            {showAdvanced ? 'إخفاء التفاصيل المتقدمة' : 'عرض التفاصيل المتقدمة'}
-          </Button>
-          <Box style={{ flexGrow: 1 }} />
-          {!showConfirm && (
-            <>
-              <Button variant="secondary" onClick={() => setShowConfirm('محاكاة (Simulation)')}>محاكاة (Simulation)</Button>
-              <Button variant="primary" onClick={() => setShowConfirm('طلب اعتماد تجريبي')}>طلب اعتماد تجريبي</Button>
-              <Button variant="secondary" onClick={() => setShowConfirm('تطبيق لاحقًا Demo')}>تطبيق لاحقًا Demo</Button>
-              <Button variant="danger" onClick={() => setShowConfirm('تراجع')}>Rollback</Button>
-            </>
-          )}
-        </Box>
-
-        {showConfirm && (
-          <Surface tone="warning" border padding={4} radiusToken="xl" style={{ marginTop: 8 }}>
-            <Box gap={3}>
-              <Text role="titleSm">تأكيد الإجراء التجريبي — {showConfirm}</Text>
-
-              <Surface tone="default" border padding={3} radiusToken="md">
-                <Box gap={2}>
-                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">الإجراء</Text>
-                      <Text role="bodySm" weight="bold">{showConfirm}</Text>
-                    </Box>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">العنصر المتأثر</Text>
-                      <Text role="bodySm" weight="bold">{humanName}</Text>
-                    </Box>
-                  </Box>
-                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">قبل التغيير</Text>
-                      <Text role="bodySm">{activeValue}</Text>
-                    </Box>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">بعد التغيير</Text>
-                      <Text role="bodySm" tone="brand">{proposedValue}</Text>
-                    </Box>
-                  </Box>
-                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">النطاق الجغرافي</Text>
-                      <Text role="bodySm">{scope}</Text>
-                    </Box>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">المخاطرة</Text>
-                      <Text role="bodySm">{risk}</Text>
-                    </Box>
-                  </Box>
-                  <Box gap={1}>
-                    <Text role="caption" tone="muted">الأثر المتوقع</Text>
-                    <Text role="bodySm">{impact}</Text>
-                  </Box>
-                  <Box gap={1}>
-                    <Text role="caption" tone="muted">الـ Rollback متاح؟</Text>
-                    <Text role="bodySm">نعم — سيُسجَّل في سجل التدقيق تلقائياً</Text>
-                  </Box>
-                </Box>
-              </Surface>
-
-              <Box gap={1}>
-                <Text role="caption" tone="muted">سبب التغيير (مطلوب للتوثيق)</Text>
-                <textarea
-                  value={changeReason}
-                  onChange={(e) => setChangeReason(e.target.value)}
-                  placeholder="اكتب سبب التغيير هنا — سيُدرج في سجل التدقيق التجريبي..."
-                  rows={3}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    borderRadius: 8,
-                    border: '1px solid var(--color-border, var(--color-border-subtle, currentColor))',
-                    fontFamily: 'inherit',
-                    fontSize: 14,
-                    resize: 'vertical',
-                    background: 'transparent',
-                    color: 'inherit',
-                    direction: 'rtl',
-                  }}
-                />
-              </Box>
-
-              <Text role="caption" tone="muted">
-                هذا إجراء تجريبي محلي فقط. لن يُطبَّق على المنصة الحقيقية ولن يتصل بأي خادم.
-              </Text>
-
-              <Box layoutDirection="row" gap={2} style={{ marginTop: 4 }}>
-                <Button variant="primary" onClick={() => handleConfirm(showConfirm)}>تأكيد المحاكاة</Button>
-                <Button variant="secondary" onClick={() => { setShowConfirm(null); setChangeReason(''); }}>إلغاء</Button>
-              </Box>
-            </Box>
-          </Surface>
-        )}
-      </Box>
-    </Surface>
+function PolicyReferenceCard({
+  title,
+  description,
+  footer,
+}: {
+  title: string;
+  description: string;
+  footer?: string;
+}) {
+  return (
+    <div className={styles.referenceCard}>
+      <div className={styles.referenceTitle}>{title}</div>
+      <div className={styles.referenceText}>{description}</div>
+      {footer ? <div className={styles.referenceFooter}>{footer}</div> : null}
+    </div>
   );
 }
 
 export function DshPlatformVarsWorkspace() {
-  const [activeDomain, setActiveDomain] = React.useState('dsh');
-  const [activeCategory, setActiveCategory] = React.useState('captain');
+  const [activeDomain, setActiveDomain] = React.useState<VarsDomainId>('dsh');
+  const [activeScope, setActiveScope] = React.useState<string>('all');
+  const [selectedVarId, setSelectedVarId] = React.useState<string | null>(DSH_PLATFORM_OPERATIONAL_VARS[0]?.id ?? null);
 
+  React.useEffect(() => {
+    setActiveScope('all');
+    setSelectedVarId(resolveDomainRecords(activeDomain)[0]?.id ?? null);
+  }, [activeDomain]);
+
+  const domainRecords = sortRecordsByScope(resolveDomainRecords(activeDomain));
+  const filteredRecords = activeScope === 'all'
+    ? domainRecords
+    : domainRecords.filter((record) => record.scope === (activeScope as DshPlatformVarScope));
+  const selectedVar = filteredRecords.find((record) => record.id === selectedVarId)
+    ?? filteredRecords[0]
+    ?? domainRecords[0]
+    ?? null;
+  const scopeTabs = resolveScopeTabs(domainRecords, activeScope);
   const domainTabs = [
-    { id: 'dsh', label: 'DSH', badge: '', active: activeDomain === 'dsh' },
+    { id: 'dsh', label: 'DSH operational', badge: '', active: activeDomain === 'dsh' },
     { id: 'wlt', label: 'WLT bridge', badge: '', active: activeDomain === 'wlt' },
-    { id: 'amn', label: 'AMN', badge: '', active: activeDomain === 'amn' },
-    { id: 'platform', label: 'Platform', badge: '', active: activeDomain === 'platform' },
+    { id: 'provider', label: 'Provider control', badge: '', active: activeDomain === 'provider' },
+    { id: 'policy', label: 'precedence + audit', badge: '', active: activeDomain === 'policy' },
   ];
-
-  const categoryTabs = [
-    { id: 'availability', label: 'التوفر والظهور', badge: '', active: activeCategory === 'availability' },
-    { id: 'regions', label: 'المناطق والمدن', badge: '', active: activeCategory === 'regions' },
-    { id: 'captain', label: 'أهلية الكابتن', badge: '', active: activeCategory === 'captain' },
-    { id: 'dispatch', label: 'الإسناد', badge: '', active: activeCategory === 'dispatch' },
-    { id: 'fulfillment', label: 'أوضاع التنفيذ', badge: '', active: activeCategory === 'fulfillment' },
-    { id: 'capabilities', label: 'القدرات والأنماط', badge: '', active: activeCategory === 'capabilities' },
-    { id: 'settlements', label: 'التسويات', badge: '', active: activeCategory === 'settlements' },
-    { id: 'refunds', label: 'الاستردادات', badge: '', active: activeCategory === 'refunds' },
-    { id: 'escalation', label: 'التصعيد', badge: '', active: activeCategory === 'escalation' },
-  ];
+  const linkedScenarios = selectedVar ? resolveLinkedScenarios(selectedVar) : [];
+  const linkedAudits = selectedVar ? resolveLinkedAuditEntries(selectedVar) : [];
 
   return (
     <Box gap={4}>
       <WebSectionCard
-        title="المتغيرات السيادية"
-        description="إدارة المتغيرات التشغيلية الحساسة. كل تغيير يتطلب مراجعة للأثر واعتماد قبل التطبيق الفعلي."
+        title="سياسات المتغيرات والمنفذين"
+        description="مساحة قراءة وتحليل فقط. تعرض الملكية وprecedence والجسور والـ rollback preview بدون أي simulation/apply/provider switching داخل DSH."
       >
         <Box gap={4}>
+          <Surface tone="warning" padding={3} radiusToken="xl" border>
+            <Text role="bodySm" tone="warning" className={styles.noticeText}>
+              mutationAllowed = false. هذه الشاشة summary-first وتفتح التفاصيل عند الطلب فقط. أي قرار مالي يبقى في WLT، وأي provider control هنا يبقى preview/reference حتى تثبت عقود التشغيل والربط.
+            </Text>
+          </Surface>
+
+          <WebControlPanelKpiStrip items={resolveDomainKpis(activeDomain)} />
+
           <Box gap={2}>
-            <Text role="titleMd">1. اختر الخدمة / المجال:</Text>
+            <Text role="titleMd">المجال النشط</Text>
             <WebControlPanelWorkspaceTabs
-              ariaLabel="المجال"
+              ariaLabel="المجال النشط"
               items={domainTabs}
-              onSelect={(id) => setActiveDomain(id)}
+              onSelect={(id: string) => setActiveDomain(id as VarsDomainId)}
             />
           </Box>
 
-          <Box gap={2}>
-            <Text role="titleMd">2. اختر التصنيف التشغيلي:</Text>
-            <WebControlPanelWorkspaceTabs
-              ariaLabel="التصنيف"
-              items={categoryTabs}
-              onSelect={(id) => setActiveCategory(id)}
-            />
-          </Box>
+          {activeDomain === 'policy' ? (
+            <div className={styles.policyStack}>
+              <div className={styles.policySection}>
+                <div className={styles.sectionTitle}>precedence lattice</div>
+                <div className={styles.policyGrid}>
+                  {DSH_PLATFORM_SCOPE_PRECEDENCE.map((layer) => (
+                    <PolicyReferenceCard
+                      key={layer.id}
+                      title={`${layer.order}. ${layer.title}`}
+                      description={`${layer.description} ${layer.ownerGuard}`}
+                      footer={layer.note}
+                    />
+                  ))}
+                </div>
+              </div>
 
-          <Box gap={3} style={{ marginTop: 16 }}>
-            {activeCategory === 'captain' && activeDomain === 'dsh' && (
-              <>
-                <HumanVarCard
-                  humanName="الحد الأدنى لرصيد محفظة الكابتن لتلقي الطلبات"
-                  technicalKey="VAR_DSH_CAPTAIN_MIN_WALLET_BALANCE"
-                  currentValue="1,500 ريال"
-                  proposedValue="1,000 ريال"
-                  scope="الجمهورية اليمنية"
-                  impact="متوقع زيادة عدد الكباتن المتاحين بنسبة 15%"
-                  risk="مخاطرة مالية منخفضة"
-                  tone="warning"
-                />
-                <HumanVarCard
-                  humanName="الحد الأقصى للمديونية قبل إيقاف الكابتن"
-                  technicalKey="VAR_DSH_CAPTAIN_MAX_NEGATIVE_BALANCE"
-                  currentValue="-500 ريال"
-                  proposedValue="-1,000 ريال"
-                  scope="Global"
-                  impact="تحسين معدل قبول طلبات الدفع النقدي"
-                  risk="مخاطرة مالية متوسطة"
-                  tone="brand"
-                />
-              </>
-            )}
-            {activeCategory === 'dispatch' && activeDomain === 'dsh' && (
-              <HumanVarCard
-                humanName="نصف قطر البحث عن الكباتن (Dispatch Radius)"
-                technicalKey="VAR_DSH_DISPATCH_SEARCH_RADIUS_KM"
-                currentValue="3 كم"
-                proposedValue="5 كم"
-                scope="أمانة العاصمة"
-                impact="تغطية أوسع وتقليل زمن رفض الطلبات"
-                risk="مخاطرة عالية"
-                tone="danger"
-              />
-            )}
+              <div className={styles.policySection}>
+                <div className={styles.sectionTitle}>simulation preview</div>
+                <div className={styles.referenceList}>
+                  {DSH_PLATFORM_SIMULATION_PREVIEW.map((scenario) => (
+                    <PolicyReferenceCard
+                      key={scenario.id}
+                      title={scenario.title}
+                      description={`${scenario.expectedImpact} ${scenario.guardrail}`}
+                      footer={scenario.blockedReason}
+                    />
+                  ))}
+                </div>
+              </div>
 
-            {activeCategory === 'fulfillment' && activeDomain === 'dsh' && (
-              <>
-                <Surface tone="default" border padding={3} radiusToken="md">
-                  <Box gap={1}>
-                    <Text role="caption" tone="muted">
-                      UI_PREVIEW_ONLY — سياسات أوضاع التنفيذ هنا للوضوح والتحكم المستقبلي فقط. لا يوجد Mutation، ولا Provider switching، ولا Backend.
-                    </Text>
-                    <Text role="caption" tone="muted">
-                      أولوية التطبيق لاحقًا: Global default → Region → Partner → Store → Product/Category override.
-                    </Text>
-                  </Box>
-                </Surface>
-                <HumanVarCard
-                  humanName="الأوضاع الافتراضية المتاحة"
-                  technicalKey="defaultAvailableFulfillmentModes"
-                  currentValue="[bthwani_delivery, pickup]"
-                  proposedValue="[bthwani_delivery, partner_delivery, pickup]"
-                  scope="Global default"
-                  impact="يوضح أي أوضاع تظهر افتراضيًا قبل أي override خاص بالمنطقة أو الشريك أو المتجر."
-                  risk="مخاطرة تشغيلية منخفضة"
-                  tone="brand"
+              <div className={styles.policySection}>
+                <div className={styles.sectionTitle}>audit / rollback preview</div>
+                <div className={styles.referenceList}>
+                  {DSH_PLATFORM_AUDIT_PREVIEW.map((entry) => (
+                    <PolicyReferenceCard
+                      key={entry.id}
+                      title={entry.title}
+                      description={`${entry.event} · ${entry.stateLabel} · ${entry.evidenceHint}`}
+                      footer={entry.rollbackHint}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Box gap={2}>
+                <Text role="titleMd">طبقة النطاق</Text>
+                <WebControlPanelWorkspaceTabs
+                  ariaLabel="طبقة النطاق"
+                  items={scopeTabs}
+                  onSelect={(id: string) => setActiveScope(id)}
                 />
-                <HumanVarCard
-                  humanName="السماح بتوصيل المتجر"
-                  technicalKey="allowPartnerDelivery"
-                  currentValue="Partner/Store override only"
-                  proposedValue="Enabled by region and partner readiness"
-                  scope="Region → Partner → Store"
-                  impact="يفعّل partner_delivery فقط عندما توجد جاهزية تشغيلية وموصل شريك مثبت."
-                  risk="مخاطرة تشغيلية متوسطة"
-                  tone="warning"
-                />
-                <HumanVarCard
-                  humanName="السماح بتوصيل بثواني"
-                  technicalKey="allowBthwaniDelivery"
-                  currentValue="Enabled"
-                  proposedValue="Enabled with captain coverage gate"
-                  scope="Global → Region"
-                  impact="يبقي bthwani_delivery مشروطًا بتغطية الكباتن بدل السماح المطلق."
-                  risk="مخاطرة تشغيلية متوسطة"
-                  tone="brand"
-                />
-                <HumanVarCard
-                  humanName="السماح بالاستلام الذاتي"
-                  technicalKey="allowPickup"
-                  currentValue="Store opt-in"
-                  proposedValue="Store opt-in with readiness confirmation"
-                  scope="Partner → Store"
-                  impact="يمنع pickup من الظهور إلا للمتاجر الجاهزة فعليًا لتسليم العميل."
-                  risk="مخاطرة منخفضة"
-                  tone="success"
-                />
-                <HumanVarCard
-                  humanName="معاينة سياسة العمولات"
-                  technicalKey="commissionPolicyPreview"
-                  currentValue="Per partner + per mode (WLT owner)"
-                  proposedValue="Per partner + per mode + category/product override"
-                  scope="WLT policy preview"
-                  impact="يوضح أن العمولة ليست رقمًا عامًا، وأن WLT هو المالك الوحيد للمنطق المالي."
-                  risk="مخاطرة مالية عالية"
-                  tone="danger"
-                />
-                <HumanVarCard
-                  humanName="معاينة سياسة رسوم التوصيل"
-                  technicalKey="deliveryFeePolicyPreview"
-                  currentValue="pickup = no deliveryFee unless policy; partner/bthwani = policy-based"
-                  proposedValue="Explicit per mode + per region preview"
-                  scope="Region → Partner → Store"
-                  impact="يمنع احتساب deliveryFee في pickup بلا سياسة مثبتة، ويفصل partner عن bthwani."
-                  risk="مخاطرة مالية متوسطة"
-                  tone="warning"
-                />
-                <HumanVarCard
-                  humanName="إلزامية الإسناد بكابتن حسب الوضع"
-                  technicalKey="captainDispatchRequiredByMode"
-                  currentValue="{ bthwani_delivery: true, partner_delivery: false, pickup: false }"
-                  proposedValue="{ bthwani_delivery: true, partner_delivery: false, pickup: false }"
-                  scope="Operational policy"
-                  impact="يثبت أن dispatch/captain assignment مطلوب فقط في bthwani_delivery."
-                  risk="مخاطرة تشغيلية منخفضة"
-                  tone="brand"
-                />
-              </>
-            )}
+              </Box>
 
-            {/* DSH sub-capabilities — these are NOT top-level services; they are modes/capabilities inside DSH */}
-            {activeCategory === 'capabilities' && activeDomain === 'dsh' && (
-              <>
-                <Surface tone="default" border padding={3} radiusToken="md">
-                  <Text role="caption" tone="muted">
-                    هذه القدرات والأنماط تعمل داخل DSH وتُضبط هنا — وليست خدمات منصة عليا.
+              {activeDomain === 'wlt' ? (
+                <Surface tone="default" padding={3} radiusToken="xl" border>
+                  <Text role="bodySm" tone="muted" className={styles.noticeText}>
+                    جميع عناصر WLT هنا bridge-only. الشاشة تعرض current/proposed previews لمساعدة القرار داخل DSH، لكنها لا تنشئ rollback مالي ولا truth محاسبي ولا settlement mutation.
                   </Text>
                 </Surface>
-                <HumanVarCard
-                  humanName="قدرة عونك (Awnak — DSH Capability)"
-                  technicalKey="DSH_CAPABILITY_AWNAK_ENABLED"
-                  currentValue="مفعّل"
-                  proposedValue="موقوف"
-                  scope="محافظة صنعاء"
-                  impact="إيقاف نمط التوصيل من النظير إلى النظير عبر DSH في نطاق الخدمة"
-                  risk="متوسط"
-                  tone="brand"
-                />
-                <HumanVarCard
-                  humanName="قدرة شي إن (Shein — DSH Capability)"
-                  technicalKey="DSH_CAPABILITY_SHEIN_ENABLED"
-                  currentValue="مفعّل"
-                  proposedValue="موقوف"
-                  scope="Global"
-                  impact="إيقاف معالجة طلبات التوصيل الواردة من شي إن عبر DSH"
-                  risk="عالي"
-                  tone="warning"
-                />
-                <HumanVarCard
-                  humanName="نمط الاستلام من المتجر (Store Pickup — DSH Mode)"
-                  technicalKey="DSH_MODE_STORE_PICKUP_ENABLED"
-                  currentValue="تجريبي — داخلي فقط"
-                  proposedValue="مفعّل للعملاء (Alpha)"
-                  scope="محافظة عدن"
-                  impact="فتح خيار الاستلام من المتجر لشريحة Alpha ضمن DSH"
-                  risk="منخفض"
-                  tone="brand"
-                />
-                <HumanVarCard
-                  humanName="نمط الطلبات المجدولة (Scheduled Orders — DSH Mode)"
-                  technicalKey="DSH_MODE_SCHEDULED_ORDERS_ENABLED"
-                  currentValue="صيانة"
-                  proposedValue="مفعّل"
-                  scope="Global"
-                  impact="إعادة تفعيل الطلبات المجدولة في DSH بعد تحديث خوارزمية التعيين"
-                  risk="عالي"
-                  tone="danger"
-                />
-              </>
-            )}
-            {activeCategory === 'settlements' && activeDomain === 'wlt' && (
-              <HumanVarCard
-                humanName="جدول التسويات المالية للمتاجر"
-                technicalKey="wlt.settlement.schedule.frequency"
-                currentValue="أسبوعي"
-                proposedValue="يومي"
-                scope="Global"
-                impact="تسريع التدفق المالي للشركاء، زيادة الضغط على WLT"
-                risk="مخاطرة مالية (يحتاج Contract)"
-                tone="danger"
-              />
-            )}
+              ) : null}
 
-            {/* Fallback for empty states */}
-            {!(['captain', 'dispatch', 'fulfillment', 'capabilities'].includes(activeCategory) && activeDomain === 'dsh') &&
-             !(activeCategory === 'settlements' && activeDomain === 'wlt') && (
-              <Surface tone="default" border padding={4} radiusToken="xl">
-                <Text role="bodySm" tone="muted" align="center">لا توجد متغيرات معرّفة في هذا التصنيف والمجال حاليًا.</Text>
-              </Surface>
-            )}
-          </Box>
+              {activeDomain === 'provider' ? (
+                <Surface tone="default" padding={3} radiusToken="xl" border>
+                  <Text role="bodySm" tone="muted" className={styles.noticeText}>
+                    provider controls هنا مرجعية فقط: تعرض priority وfallback وtest result وrollback target من دون أي live switching.
+                  </Text>
+                </Surface>
+              ) : null}
+
+              <div className={styles.varsSplit}>
+                <div className={styles.varsList}>
+                  {filteredRecords.length > 0 ? (
+                    filteredRecords.map((record) => (
+                      <VarCard
+                        key={record.id}
+                        record={record}
+                        active={selectedVar?.id === record.id}
+                        onSelect={() => setSelectedVarId(record.id)}
+                      />
+                    ))
+                  ) : (
+                    <div className={styles.emptyState}>
+                      لا توجد عناصر لهذه الطبقة حاليًا. غيّر المجال أو طبقة precedence لمراجعة بقية السياسات.
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.detailPanel}>
+                  {selectedVar ? (
+                    <>
+                      <div className={styles.detailHeader}>
+                        <div className={styles.detailTitle}>{selectedVar.label}</div>
+                        <div className={styles.cardCode}>{`${selectedVar.id} · ${selectedVar.key}`}</div>
+                      </div>
+
+                      <div className={styles.detailFieldGrid}>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>var_id</div>
+                          <div className={styles.detailValue}>{selectedVar.id}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>var_key</div>
+                          <div className={styles.detailValue}>{selectedVar.key}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>owner</div>
+                          <div className={styles.detailValue}>{selectedVar.owner}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>scope</div>
+                          <div className={styles.detailValue}>{selectedVar.scope}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>precedence</div>
+                          <div className={styles.detailValue}>{resolvePrecedenceSummary(selectedVar)}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>current_value_label</div>
+                          <div className={styles.detailValue}>{selectedVar.label}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>proposed_value_label</div>
+                          <div className={styles.detailValue}>{selectedVar.proposedPreviewValue ?? 'لا يوجد proposal بعد'}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>risk</div>
+                          <div className={styles.detailValue}>{RISK_LABELS[selectedVar.risk]}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>binding_status</div>
+                          <div className={styles.detailValue}>{STATUS_LABELS[selectedVar.status]}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>affected_surfaces</div>
+                          <div className={styles.detailValue}>{selectedVar.affectedSurfaces.join('، ')}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>audit_required</div>
+                          <div className={styles.detailValue}>{resolveAuditRequirementLabel(selectedVar, linkedAudits)}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>mutation_allowed</div>
+                          <div className={styles.detailValue}>{String(selectedVar.mutationAllowed)}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>current_preview</div>
+                          <div className={styles.detailValue}>{selectedVar.currentPreviewValue}</div>
+                        </div>
+                        <div className={styles.detailField}>
+                          <div className={styles.detailLabel}>proposed_preview</div>
+                          <div className={styles.detailValue}>{selectedVar.proposedPreviewValue ?? 'لا يوجد proposal بعد'}</div>
+                        </div>
+                      </div>
+
+                      <div className={styles.detailSection}>
+                        <div className={styles.detailLabel}>provider_effect</div>
+                        <div className={styles.detailValue}>{resolveProviderEffect(selectedVar)}</div>
+                      </div>
+
+                      <div className={styles.detailSection}>
+                        <div className={styles.detailLabel}>simulation_impact</div>
+                        <div className={styles.detailValue}>{resolveSimulationSummary(selectedVar, linkedScenarios)}</div>
+                        <div className={styles.referenceList}>
+                          {linkedScenarios.length > 0 ? (
+                            linkedScenarios.map((scenario) => (
+                              <PolicyReferenceCard
+                                key={scenario.id}
+                                title={scenario.title}
+                                description={`${scenario.expectedImpact} ${scenario.guardrail}`}
+                                footer={scenario.blockedReason}
+                              />
+                            ))
+                          ) : (
+                            <div className={styles.emptyState}>لا يوجد simulation scenario مرتبط بهذا المفتاح حتى الآن.</div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className={styles.detailSection}>
+                        <div className={styles.detailLabel}>rollback_preview</div>
+                        <PolicyReferenceCard
+                          title="rollback hint"
+                          description={selectedVar.auditRollbackHint}
+                          footer={selectedVar.effectSummary}
+                        />
+                        <div className={styles.referenceList}>
+                          {linkedAudits.length > 0 ? (
+                            linkedAudits.map((entry) => (
+                              <PolicyReferenceCard
+                                key={entry.id}
+                                title={entry.title}
+                                description={`${entry.actor} · ${entry.stateLabel} · ${entry.evidenceHint}`}
+                                footer={entry.rollbackHint}
+                              />
+                            ))
+                          ) : (
+                            <div className={styles.emptyState}>لا يوجد audit snapshot مرتبط بهذا المفتاح حتى الآن.</div>
+                          )}
+                        </div>
+                      </div>
+
+                      {isProviderRecord(selectedVar) ? (
+                        <div className={styles.detailSection}>
+                          <div className={styles.detailLabel}>provider detail</div>
+                          <div className={styles.detailFieldGrid}>
+                            <div className={styles.detailField}>
+                              <div className={styles.detailLabel}>priority</div>
+                              <div className={styles.detailValue}>{selectedVar.priority}</div>
+                            </div>
+                            <div className={styles.detailField}>
+                              <div className={styles.detailLabel}>fallback</div>
+                              <div className={styles.detailValue}>{selectedVar.fallback}</div>
+                            </div>
+                            <div className={styles.detailField}>
+                              <div className={styles.detailLabel}>test_result</div>
+                              <div className={styles.detailValue}>{selectedVar.testResult}</div>
+                            </div>
+                            <div className={styles.detailField}>
+                              <div className={styles.detailLabel}>rollback_target</div>
+                              <div className={styles.detailValue}>{selectedVar.rollbackTarget}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <div className={styles.emptyState}>اختر عنصرًا من القائمة لعرض policy detail وaudit/rollback preview.</div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </Box>
       </WebSectionCard>
     </Box>
   );
 }
+
+export default DshPlatformVarsWorkspace;

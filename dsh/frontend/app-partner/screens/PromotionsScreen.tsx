@@ -18,6 +18,9 @@ import {
   type PartnerOfferStatus,
   type PartnerOfferType,
 } from '../../shared/partner-offer.preview-store';
+import {
+  getPartnerOfferVisibilityRecord,
+} from '../../shared/marketing-visibility.contract';
 import { getDshControlPanelGovernanceEntry } from '../../shared';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';
@@ -44,6 +47,14 @@ const INITIAL_FORM: IntakeFormState = {
   valueLabel: '',
   eligibility: 'الكل',
 };
+
+function buildPartnerStoreId(storeName: string) {
+  return storeName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\p{L}\p{N}-]/gu, '') || 'partner-store';
+}
 
 function translateStatus(status: PartnerOfferStatus): { label: string; tone: 'default' | 'warning' | 'brand' | 'success' | 'danger' } {
   switch (status) {
@@ -84,11 +95,13 @@ function renderState(state: Exclude<AnalyticsWorkspaceState, 'ready'>) {
 
 function PromotionRow({
   offer,
+  visibilityNote,
   showDivider = false,
   actionLabel,
   onActionPress,
 }: {
   offer: PartnerOfferRecord;
+  visibilityNote?: string;
   showDivider?: boolean;
   actionLabel: string;
   onActionPress: (offer: PartnerOfferRecord) => void;
@@ -97,7 +110,7 @@ function PromotionRow({
   const statusMeta = translateStatus(offer.status);
   const metaLabel = offer.activeFromDate && offer.activeToDate
     ? `${offer.activeFromDate} → ${offer.activeToDate}`
-    : offer.rejectionReason || offer.eligibility;
+    : visibilityNote || offer.rejectionReason || offer.eligibility;
 
   return (
     <Box
@@ -153,16 +166,27 @@ export function PromotionsScreen({
 
   React.useEffect(() => {
     const all = getPartnerOfferItems();
-    setOffers(all.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName || offer.source === 'partner'));
+    setOffers(all.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName));
   }, [storeName]);
 
   if (state !== 'ready') {
     return renderState(state);
   }
 
-  const activeOffers = offers.filter((offer) => offer.status === 'published');
-  const pendingOffers = offers.filter((offer) => offer.status === 'inbound' || offer.status === 'review' || offer.status === 'marketing-ready');
-  const rejectedOffers = offers.filter((offer) => offer.status === 'rejected');
+  const offerRows = offers.map((offer) => {
+    const visibility = getPartnerOfferVisibilityRecord(offer, { targetSurface: 'partner-promotions' });
+    const clientReady = !visibility.blockedReason && offer.status === 'published';
+
+    return {
+      offer,
+      visibility,
+      clientReady,
+    };
+  });
+
+  const activeOffers = offerRows.filter((row) => row.clientReady);
+  const pendingOffers = offerRows.filter((row) => !row.clientReady && row.offer.status !== 'rejected' && row.offer.status !== 'archived');
+  const rejectedOffers = offerRows.filter((row) => row.offer.status === 'rejected');
 
   const handleSubmitOffer = () => {
     if (!form.title.trim() || !form.valueLabel.trim()) {
@@ -174,7 +198,7 @@ export function PromotionsScreen({
       title: form.title.trim(),
       partnerName: storeName,
       storeLabel: storeName,
-      storeId: '',
+      storeId: buildPartnerStoreId(storeName),
       productId: '',
       productLabel: '',
       category: '',
@@ -187,7 +211,7 @@ export function PromotionsScreen({
     });
 
     const updated = getPartnerOfferItems();
-    setOffers(updated.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName || offer.source === 'partner'));
+  setOffers(updated.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName));
     setForm(INITIAL_FORM);
     setActiveTab('pending');
     setStatusMessage('تم إرسال العرض للمراجعة التسويقية.');
@@ -210,13 +234,14 @@ export function PromotionsScreen({
       return (
         <>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            العروض المنشورة التي يراها العميل الآن فقط.
+            العروض النشطة هنا هي فقط ما اجتاز النشر وبوابات الشريك والكتالوج على سطح العميل.
           </Text>
           {activeOffers.length > 0 ? (
-            activeOffers.map((offer, index) => (
+            activeOffers.map(({ offer, visibility }, index) => (
               <PromotionRow
                 key={offer.id}
                 offer={offer}
+                visibilityNote={visibility.blockedReason}
                 showDivider={index > 0}
                 actionLabel="عرض"
                 onActionPress={() => setStatusMessage(`العرض النشط المحدد: ${offer.title}`)}
@@ -235,16 +260,17 @@ export function PromotionsScreen({
       return (
         <>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            هذه الاقتراحات بانتظار قبول الشركاء أو مراجعة التسويق. لا يوجد نشر مباشر من هذا السطح.
+            هذه القائمة تشمل ما ينتظر الاعتماد، وما نُشر شكلياً لكنه ما زال محجوباً عن العميل بسبب بوابة الشريك أو نشر المنتج.
           </Text>
           {pendingOffers.length > 0 ? (
-            pendingOffers.map((offer, index) => (
+            pendingOffers.map(({ offer, visibility }, index) => (
               <PromotionRow
                 key={offer.id}
                 offer={offer}
+                visibilityNote={visibility.blockedReason}
                 showDivider={index > 0}
                 actionLabel="متابعة"
-                onActionPress={() => setStatusMessage(`العرض ${offer.title} ما زال داخل مسار المراجعة.`)}
+                onActionPress={() => setStatusMessage(visibility.blockedReason ? `العرض ${offer.title} محجوب عن العميل: ${visibility.blockedReason}` : `العرض ${offer.title} ما زال داخل مسار المراجعة.`)}
               />
             ))
           ) : (
@@ -263,10 +289,11 @@ export function PromotionsScreen({
             راجع سبب الرفض ثم افتح النموذج لإعادة التقديم بصياغة أو قيمة أوضح.
           </Text>
           {rejectedOffers.length > 0 ? (
-            rejectedOffers.map((offer, index) => (
+            rejectedOffers.map(({ offer, visibility }, index) => (
               <PromotionRow
                 key={offer.id}
                 offer={offer}
+                visibilityNote={visibility.blockedReason}
                 showDivider={index > 0}
                 actionLabel="إعادة"
                 onActionPress={() => {
@@ -386,6 +413,9 @@ export function PromotionsScreen({
         </Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           {marketingGovernance?.sectionLabel ?? 'Marketing'} يملك اعتماد ونشر العروض. هذا السطح يرسل intent فقط، بينما أهلية الشريك تبقى عند {partnersGovernance?.sectionLabel ?? 'Partners'}، وأي نشر أو تعارض مع الكتالوج يراجع عبر {catalogsGovernance?.sectionLabel ?? 'Catalogs'}.
+        </Text>
+        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          لا نعتبر العرض "نشطًا" للعميل إلا إذا كان مرتبطًا بمتجر مؤهل، ومع أي product-linked offer يجب أن يكون المنتج نفسه منشورًا للعملاء.
         </Text>
       </Surface>
 

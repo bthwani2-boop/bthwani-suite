@@ -2,6 +2,11 @@ import type { PartnerOfferRecord } from './partner-offer.preview-store';
 import type { SubscriptionPlan, Entitlement } from './loyalty.preview-store';
 import type { CampaignRecord } from './campaign.preview-store';
 import type { CommercialConflict } from './commercial.preview-contract';
+import {
+  getCampaignVisibilityRecord,
+  getPartnerOfferVisibilityRecord,
+  isMarketingRenderable,
+} from './marketing-visibility.contract';
 
 // Projection-local source tracking (not the same as CommercialSourceEntry from contract —
 // this tracks internal projection state including approvalStage and sourceType for map filtering).
@@ -47,11 +52,18 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
   let hasCouponAvailable = false;
   let deliveryFeeLabel: string | undefined = undefined;
 
-  const visibleOffers = context.activeOffers.filter(offer => offer.status === 'published');
+  const visibleOffers = context.activeOffers.filter((offer) => {
+    if (offer.storeId && offer.storeId !== context.storeId) {
+      return false;
+    }
+
+    return isMarketingRenderable(getPartnerOfferVisibilityRecord(offer, { targetSurface: 'store' }));
+  });
 
   // Conflict Detection: Unpublished offers trying to show up
   context.activeOffers.forEach(offer => {
-    const isVisible = offer.status === 'published';
+    const visibility = getPartnerOfferVisibilityRecord(offer, { targetSurface: 'store' });
+    const isVisible = (!offer.storeId || offer.storeId === context.storeId) && isMarketingRenderable(visibility);
     if (!isVisible && offer.displayBadge) {
       sourceMap[`offer-${offer.id}`] = {
         sourceOwner: 'partner-offers',
@@ -59,7 +71,9 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceType: 'offer',
         approvalStage: offer.status,
         conflictSeverity: 'blocker',
-        conflictReason: `العرض في حالة (${offer.status}) وغير مسموح بظهوره للعملاء.`
+        conflictReason: offer.storeId && offer.storeId !== context.storeId
+          ? 'العرض مرتبط بمتجر آخر، لذلك لا يظهر داخل هذا المتجر.'
+          : visibility.blockedReason ?? `العرض في حالة (${offer.status}) وغير مسموح بظهوره للعملاء.`
       };
     }
   });
@@ -108,8 +122,9 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
 
   // 2. Campaigns
   for (const camp of context.activeCampaigns) {
+    const visibility = getCampaignVisibilityRecord(camp, { targetSurface: 'store' });
     const isCampaignBlocked = sourceMap[`campaign-${camp.id}`]?.conflictSeverity === 'blocker';
-    if (camp.channels?.includes('store-card') && !isCampaignBlocked) {
+    if (camp.channels?.includes('store-card') && !isCampaignBlocked && isMarketingRenderable(visibility)) {
       const badgeLabel = `حملة: ${camp.title}`;
       badges.push({ label: badgeLabel, source: 'campaign' });
       sourceMap[`campaign-${camp.id}`] = {
@@ -118,6 +133,15 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
         sourceType: 'campaign',
         approvalStage: 'published',
         conflictSeverity: 'none'
+      };
+    } else if (visibility.blockedReason) {
+      sourceMap[`campaign-${camp.id}`] = {
+        sourceOwner: 'campaign.preview-store',
+        sourceRecordId: camp.id,
+        sourceType: 'campaign',
+        approvalStage: camp.status,
+        conflictSeverity: 'blocker',
+        conflictReason: visibility.blockedReason,
       };
     }
   }

@@ -7,7 +7,7 @@ import {
   WebCompactSurfaceHeader,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, DSH_CROSS_SURFACE_JOURNEYS, getDshClosureItemsByStatus, getDshClosureItemsBySurface } from '../shared';
+import { ControlPanelDshWorkspaceFrame, DSH_CROSS_SURFACE_CLOSURE_MAP, DSH_CROSS_SURFACE_JOURNEYS, getDshClosureItemsBySurface } from '../shared';
 
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -19,11 +19,9 @@ export function ControlPanelDshClosureHubScreen() {
   const closureItems = DSH_CROSS_SURFACE_CLOSURE_MAP;
   const previewReadyCount = closureItems.filter((i) => i.status === 'preview-ready').length;
   const needsEvidenceCount = closureItems.filter(
-    (i) => i.status === 'needs-visual-evidence' || i.status === 'needs-cross-surface-proof' || i.status === 'needs-evidence' || i.status === 'needs-ui-flow'
+    (i) => i.visualEvidenceRequired && i.status !== 'verified-ui-flow' && i.status !== 'blocked-by-contract' && i.status !== 'blocked-by-wlt'
   ).length;
-  const blockedCount = closureItems.filter(
-    (i) => i.status === 'blocked' || i.status === 'blocked-by-contract' || i.status === 'blocked-by-wlt'
-  ).length;
+  const blockedCount = closureItems.filter((i) => i.status === 'blocked-by-contract' || i.status === 'blocked-by-wlt').length;
   const verifiedCount = closureItems.filter((i) => i.status === 'verified-ui-flow').length;
 
   const PRIMARY_TABS = [
@@ -235,17 +233,14 @@ export function ControlPanelDshClosureEvidenceStream() {
             key={`${item.surfaceId}-${item.area}`}
             id={`${item.surfaceId}-${item.area}`}
             label={`${getSurfaceLabel(item.surfaceId)} / ${item.title}`}
-            description={item.description}
+            description={`${item.description} المتبقي: ${item.remainingBlocker}`}
             badge={
               item.status === 'verified-ui-flow' ? 'محقق'
-              : item.status === 'preview-ready' ? 'واجهة جاهزة'
-              : item.status === 'needs-visual-evidence' ? 'يحتاج إثبات بصري'
-              : item.status === 'needs-cross-surface-proof' ? 'يحتاج إثبات عابر'
               : item.status === 'blocked-by-wlt' ? 'محجوب / WLT'
               : item.status === 'blocked-by-contract' ? 'محجوب / عقد'
-              : item.status === 'needs-evidence' ? 'يحتاج دليل'
-              : item.status === 'needs-ui-flow' ? 'يحتاج فلو'
-              : 'محجوب'
+              : item.status === 'needs-visual-evidence' ? 'يحتاج إثبات بصري'
+              : item.evidenceStatus === 'pending-ui-gap' ? 'جاهز مع فجوات'
+              : 'واجهة جاهزة'
             }
             href={item.routeHint}
           />

@@ -7,6 +7,7 @@ Lean decision log for DSH closure. No DSH decision is valid without evidence pat
 
 Allowed decisions:
 
+- DONE
 - PASS
 - PASS_WITH_WARNINGS
 - FIX_REQUIRED
@@ -19,6 +20,7 @@ Allowed decisions:
 
 | Date | Session ID | Scope | Evidence Path | Decision | Remaining Risks | Next Action |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-05-21 | P0_14_FRONTEND_CLOSURE_TRUTH-20260521 | Frontend closure truth refresh after P0-02 through P0-13 | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts`; `dsh/frontend/shared/dsh-flow-registry.ts`; `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`; `dsh/docs/SCREEN_API_MATRIX.md`; `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`; `git diff --check`; `pnpm -w exec tsc --noEmit` | DONE | visual evidence is still pending; runtime, backend, and API remain unproven; finance remains WLT-owned | capture screenshots or runtime proof only; do not inflate closure claims |
 | 2026-05-12 | DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555 | DSH mobile apps final closure for `app-client`, `app-partner`, `app-captain`, and `app-field` preview-only scope | tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555 | PASS_WITH_WARNINGS | runtime and visual smoke were not captured in this gate; closure remains preview-only and does not imply backend/API/production readiness | run runtime smoke only when a mobile runtime session is actually available |
 | 2026-05-06 | DSH_DATA_017_PREVIEW_DATA_AUTHORITY-20260506-213046 | DSH-DATA-017 preview data authority and fixture consistency closure | tools/registry/runs/DSH_DATA_017_PREVIEW_DATA_AUTHORITY-20260506-213046 | PASS_WITH_WARNINGS | visual/runtime/API/backend deferred; preview/local data is not runtime truth | visual proof or first API-readiness candidate only after data authority is stable |
 | 2026-05-06 | DSH_ARCHIVE_020_ACTIVE_FRONTEND_CLEANUP-20260506-225900 | DSH-ARCHIVE-020 active frontend archive separation for dead/duplicate/noisy DSH frontend items | tools/registry/runs/DSH_ARCHIVE_020_ACTIVE_FRONTEND_CLEANUP-20260506-225900 | PASS_WITH_WARNINGS | visual/runtime/API/backend deferred; giant-screen refactors not performed; active used/publicly exported duplicates require owner decision | targeted owner decision for remaining FIX_REQUIRED only |

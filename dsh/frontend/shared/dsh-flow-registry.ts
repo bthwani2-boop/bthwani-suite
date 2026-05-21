@@ -730,6 +730,237 @@ export const DSH_FLOW_REGISTRY: readonly DshFlowRegistryEntry[] = [
   ...CONTROL_PANEL_FLOWS,
 ] as const;
 
+export type DshFlowClosureActor = 'client' | 'partner' | 'captain' | 'field' | 'operator';
+
+export type DshFlowClosureDomain =
+  | 'client-discovery'
+  | 'client-checkout'
+  | 'client-tracking-support'
+  | 'partner-operations'
+  | 'partner-catalog'
+  | 'captain-operations'
+  | 'field-operations'
+  | 'control-panel-operations'
+  | 'control-panel-finance';
+
+export type DshFlowClosureEvidenceStatus =
+  | 'captured'
+  | 'pending-visual'
+  | 'pending-ui-gap'
+  | 'blocked-by-contract'
+  | 'blocked-by-wlt';
+
+export type DshFlowClosureRuntimeBindingStatus =
+  | 'UI_PREVIEW_ONLY'
+  | 'NEEDS_BINDING_LATER'
+  | 'NEEDS_RUNTIME_EVIDENCE'
+  | 'BLOCKED_BY_CONTRACT'
+  | 'BLOCKED_BY_WLT';
+
+export type DshFlowClosureSummary = {
+  readonly flowId: string;
+  readonly surfaceId: DshSurfaceId;
+  readonly actor: DshFlowClosureActor;
+  readonly domain: DshFlowClosureDomain;
+  readonly routeHint: string;
+  readonly screenOwner: string;
+  readonly primaryAction: string;
+  readonly requiredStates: readonly string[];
+  readonly evidenceStatus: DshFlowClosureEvidenceStatus;
+  readonly runtimeBindingStatus: DshFlowClosureRuntimeBindingStatus;
+  readonly remainingBlocker: string;
+  readonly crossSurfaceDependencies: readonly string[];
+  readonly wltBoundary: string;
+  readonly visualEvidenceRequired: boolean;
+};
+
+export const DSH_FLOW_CLOSURE_SUMMARY: readonly DshFlowClosureSummary[] = [
+  {
+    flowId: 'client-discovery-closure',
+    surfaceId: 'app-client',
+    actor: 'client',
+    domain: 'client-discovery',
+    routeHint: '/app-client/discovery',
+    screenOwner: 'HomeScreen.tsx + SearchScreen.tsx + StoreScreen.tsx',
+    primaryAction: 'Open a destination, store, or category from the discovery feed.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    remainingBlocker: 'Store visibility, promo-to-store binding, and delivery-mode badges remain preview-only gaps.',
+    crossSurfaceDependencies: ['control-panel marketing visibility', 'app-partner inventory readiness', 'shared marketing visibility contract'],
+    wltBoundary: 'No WLT ownership in discovery.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'client-cart-checkout',
+    surfaceId: 'app-client',
+    actor: 'client',
+    domain: 'client-checkout',
+    routeHint: '/app-client/cart',
+    screenOwner: 'CartScreen.tsx + DshCheckoutIntentScreen.tsx',
+    primaryAction: 'Review the cart and hand off payment choice after checkout intent.',
+    requiredStates: ['loading', 'error', 'blocked', 'retry'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_BINDING_LATER',
+    remainingBlocker: 'Awaiting-payment, payment-failed, payment-confirmed, and order-create failure states are not fully closed in UI.',
+    crossSurfaceDependencies: ['wlt app-client bridge', 'control-panel finance preview', 'app-partner intake visibility'],
+    wltBoundary: 'WLT owns payment decision, wallet semantics, refunds, and settlement meaning.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'client-order-tracking',
+    surfaceId: 'app-client',
+    actor: 'client',
+    domain: 'client-tracking-support',
+    routeHint: '/app-client/orders',
+    screenOwner: 'OrdersTrackingScreens.tsx + OperationScreens.tsx',
+    primaryAction: 'Open the order timeline or issue workspace from the active order context.',
+    requiredStates: ['loading', 'error', 'success', 'offline', 'retry', 'blocked', 'cancelled'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Cancellation, refund, support-exception, and rating-pending states remain preview-only.',
+    crossSurfaceDependencies: ['app-partner lifecycle states', 'app-captain delivery milestones', 'control-panel support and audit'],
+    wltBoundary: 'WLT owns refund execution and financial adjustment only.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'order-accept',
+    surfaceId: 'app-partner',
+    actor: 'partner',
+    domain: 'partner-operations',
+    routeHint: '/app-partner/orders',
+    screenOwner: 'OrdersInboxScreen.tsx + OperationScreens.tsx + DshPartnerOrderRejectionScreen.tsx',
+    primaryAction: 'Accept, reject, or move an incoming order into preparation.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'blocked', 'retry'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Acceptance timer, reject reason, item unavailable, delay, ready, and handoff states are not fully closed.',
+    crossSurfaceDependencies: ['app-client order-created visibility', 'app-captain pickup readiness', 'control-panel operations'],
+    wltBoundary: 'WLT only appears if rejection later triggers financial reversal.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'inventory-adjust',
+    surfaceId: 'app-partner',
+    actor: 'partner',
+    domain: 'partner-catalog',
+    routeHint: '/app-partner/inventory',
+    screenOwner: 'InventoryCatalogScreen.tsx',
+    primaryAction: 'Update item readiness and publishing visibility before client exposure.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    remainingBlocker: 'Barcode, duplicate detection, publishing gate, and client visibility states remain preview-only.',
+    crossSurfaceDependencies: ['app-client storefront visibility', 'control-panel catalogs governance', 'control-panel marketing visibility'],
+    wltBoundary: 'No WLT ownership in catalog readiness.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'captain-order-pickup',
+    surfaceId: 'app-captain',
+    actor: 'captain',
+    domain: 'captain-operations',
+    routeHint: '/app-captain/orders',
+    screenOwner: 'DshCaptainOrdersScreen.tsx + DshCaptainPickupDropoffScreen.tsx + DshCaptainMapScreen.tsx',
+    primaryAction: 'Accept the assignment and complete pickup handoff.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'retry'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Availability, accept/decline reason, arrive-pickup, pickup-failed, and handoff mismatch remain preview-only.',
+    crossSurfaceDependencies: ['app-partner ready-for-pickup state', 'control-panel dispatch assignment', 'app-client milestone visibility'],
+    wltBoundary: 'No direct WLT ownership in pickup.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'captain-proof-of-delivery',
+    surfaceId: 'app-captain',
+    actor: 'captain',
+    domain: 'captain-operations',
+    routeHint: '/app-captain/map',
+    screenOwner: 'DshCaptainPoDSubmissionScreen.tsx + DshCaptainMapScreen.tsx',
+    primaryAction: 'Confirm dropoff and submit proof of delivery or failure.',
+    requiredStates: ['loading', 'success', 'error', 'retry'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Arrival, delivered, delivery-failed, and proof-policy states remain preview-only.',
+    crossSurfaceDependencies: ['app-client delivered/rating surface', 'control-panel audit and support review'],
+    wltBoundary: 'WLT only appears if a later complaint becomes financial.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'field-store-onboarding',
+    surfaceId: 'app-field',
+    actor: 'field',
+    domain: 'field-operations',
+    routeHint: '/app-field/stores',
+    screenOwner: 'DshFieldStoresScreen.tsx + DshFieldStoreOnboardingScreen.tsx',
+    primaryAction: 'Open a candidate store and submit onboarding readiness.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'disabled'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Document states and readiness result states are not fully closed.',
+    crossSurfaceDependencies: ['control-panel partner approval workflow', 'app-partner store readiness ownership'],
+    wltBoundary: 'No WLT ownership in onboarding.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'field-store-visit',
+    surfaceId: 'app-field',
+    actor: 'field',
+    domain: 'field-operations',
+    routeHint: '/app-field/visits',
+    screenOwner: 'DshFieldStoreVisitScreen.tsx + DshFieldReadinessEscalationScreen.tsx',
+    primaryAction: 'Capture visit evidence and escalate readiness blockers when needed.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'disabled', 'blocked', 'retry'],
+    evidenceStatus: 'pending-ui-gap',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Photo, location, revisit, and readiness outcome states remain preview-only.',
+    crossSurfaceDependencies: ['control-panel partner approvals', 'app-partner readiness ownership', 'field history/account surfaces'],
+    wltBoundary: 'Any later finance visibility remains WLT-owned and outside visit/readiness logic.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'control-escalation-queue',
+    surfaceId: 'control-panel',
+    actor: 'operator',
+    domain: 'control-panel-operations',
+    routeHint: '/operations',
+    screenOwner: 'operations.registry.ts + CommandCenterScreen.tsx + DispatchAssignmentScreen.tsx + ExceptionsEscalationsScreen.tsx + AuditSupportSlaScreen.tsx + GeoHeatmapScreen.tsx',
+    primaryAction: 'Inspect cross-surface risk and route the next operational intervention.',
+    requiredStates: ['success', 'error', 'retry', 'blocked'],
+    evidenceStatus: 'pending-visual',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    remainingBlocker: 'Current-branch screenshots and runtime evidence are still missing.',
+    crossSurfaceDependencies: ['app-client tracking/support', 'app-partner readiness', 'app-captain assignment/proof', 'shared signal layer model'],
+    wltBoundary: 'No direct WLT ownership in control-panel operations.',
+    visualEvidenceRequired: true,
+  },
+  {
+    flowId: 'partner-finance-bridge',
+    surfaceId: 'wlt-finance',
+    actor: 'operator',
+    domain: 'control-panel-finance',
+    routeHint: '/finance',
+    screenOwner: 'FinanceHubScreen.tsx + FinanceHubScreens.tsx + WLT bridge workspaces',
+    primaryAction: 'Inspect read-only finance visibility while keeping financial action outside DSH.',
+    requiredStates: ['loading', 'error', 'success', 'blocked'],
+    evidenceStatus: 'blocked-by-wlt',
+    runtimeBindingStatus: 'BLOCKED_BY_WLT',
+    remainingBlocker: 'Settlement, refund, payout, commission, and ledger semantics remain WLT-owned.',
+    crossSurfaceDependencies: ['wlt shared finance preview', 'partner/captain/field bridge workspaces'],
+    wltBoundary: 'Full WLT boundary: settlement, payout, refund, commission, ledger, and reconciliation remain outside DSH.',
+    visualEvidenceRequired: true,
+  },
+] as const;
+
+export function getDshFlowClosureSummary(flowId: string): DshFlowClosureSummary | undefined {
+  return DSH_FLOW_CLOSURE_SUMMARY.find((entry) => entry.flowId === flowId);
+}
+
+export function getDshFlowClosureSummaryForSurface(surfaceId: DshSurfaceId): readonly DshFlowClosureSummary[] {
+  return DSH_FLOW_CLOSURE_SUMMARY.filter((entry) => entry.surfaceId === surfaceId);
+}
+
 // ---------------------------------------------------------------------------
 // Utility functions — no side effects
 // ---------------------------------------------------------------------------

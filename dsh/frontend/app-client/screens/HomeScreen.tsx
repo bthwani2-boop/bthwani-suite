@@ -43,11 +43,17 @@ import { getDshCategoryIconUrl } from '../shared/get-dsh-category-icon-url';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../shared/growth.preview-store';
 import type { MarketingVideoRecord } from '../../shared/video.preview-store';
+import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
 import {
   getMarketingTickerItems,
   buildMarketingTickerPlan,
 } from '../../shared/news-ticker.preview-store';
 import { getPublishedHomePromos, type HomePromoRecord } from '../../shared/promo.preview-store';
+import {
+  getHomePromoVisibilityRecord,
+  getMarketingVideoVisibilityRecord,
+  isMarketingRenderable,
+} from '../../shared/marketing-visibility.contract';
 
 import { canRenderInClientSurface } from '../../shared/workflow';
 
@@ -644,9 +650,6 @@ export function DshHomeGetScreen({
 
   const resolvedCategories = categories ?? [];
   const resolvedPromos = promos ?? [];
-  const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter((promo) => (
-    canRenderInClientSurface(resolveHomePromoPublishStage(promo.status), 'promo')
-  ));
 
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
@@ -657,7 +660,26 @@ export function DshHomeGetScreen({
   const itemWidth = cardWidth + resolvedItemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
   const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
+  const visibleStoreIds = React.useMemo(() => new Set(resolvedStores.map((store) => store.id)), [resolvedStores]);
   const resolvedRecentOrders = recentOrders ?? [];
+
+  const resolveTargetPartnerStatus = React.useCallback((targetType: string, targetId?: string): DshPartnerActivationStatus | undefined => {
+    if (targetType !== 'store' || !targetId) {
+      return undefined;
+    }
+
+    return visibleStoreIds.has(targetId) ? 'client_visible' : undefined;
+  }, [visibleStoreIds]);
+
+  const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter((promo) => {
+    const visibility = getHomePromoVisibilityRecord(promo, {
+      targetSurface: 'home',
+      partnerStatus: resolveTargetPartnerStatus(promo.targetType, promo.targetId),
+    });
+
+    return isMarketingRenderable(visibility)
+      && canRenderInClientSurface(resolveHomePromoPublishStage(promo.status), 'promo');
+  });
 
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
@@ -1159,7 +1181,7 @@ export function DshHomeGetScreen({
       }
 
       if (item.routeTarget === 'promo-apply') {
-        onOpenCart?.();
+        onOpenBenefits?.('offers');
         return;
       }
 
@@ -1170,10 +1192,17 @@ export function DshHomeGetScreen({
 
       onOpenList?.();
     },
-    [onOpenBenefits, onOpenCart, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onVideoCtaClick, resolveHomeCategoryContext]
+    [onOpenBenefits, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onVideoCtaClick, resolveHomeCategoryContext]
   );
 
-  const approvedVideoReels = approvedVideoShorts.length > 0 ? approvedVideoShorts : [];
+  const approvedVideoReels = React.useMemo(() => approvedVideoShorts.filter((video) => {
+    const visibility = getMarketingVideoVisibilityRecord(video, {
+      targetSurface: 'home',
+      partnerStatus: resolveTargetPartnerStatus(video.targetType, video.targetId),
+    });
+
+    return isMarketingRenderable(visibility);
+  }), [approvedVideoShorts, resolveTargetPartnerStatus]);
   const [isTickerHidden, setIsTickerHidden] = React.useState(false);
 
   const tickerState = React.useMemo(() => {
@@ -1805,18 +1834,18 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       color: colorPalette.white,
       fontSize: 17,
       fontWeight: '900',
-      textShadowColor: 'rgba(0,0,0,0.4)',
+      textShadowColor: withAlpha(colorPalette.black, 0.4),
       textShadowOffset: { width: 0, height: 2 },
       shadowRadius: 4,
       lineHeight: 20,
       textAlign,
     },
     premiumBannerSubtitle: {
-      color: 'rgba(255,255,255,0.95)',
+      color: withAlpha(colorPalette.white, 0.95),
       fontSize: 10,
       fontWeight: '600',
       marginTop: 3,
-      textShadowColor: 'rgba(0,0,0,0.3)',
+      textShadowColor: withAlpha(colorPalette.black, 0.3),
       textShadowOffset: { width: 0, height: 1 },
       shadowRadius: 2,
       lineHeight: 13,
@@ -1852,7 +1881,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       flexDirection: 'row',
       gap: 6,
       alignItems: 'center',
-      backgroundColor: 'rgba(0,0,0,0.3)',
+      backgroundColor: withAlpha(colorPalette.black, 0.3),
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 999,
@@ -1861,7 +1890,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       width: 5,
       height: 5,
       borderRadius: 999,
-      backgroundColor: 'rgba(255,255,255,0.4)',
+      backgroundColor: withAlpha(colorPalette.white, 0.4),
     },
     premiumIndicatorActive: {
       width: 18,
@@ -1872,7 +1901,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       width: 26,
       height: 26,
       borderRadius: 13,
-      backgroundColor: 'rgba(0,0,0,0.4)',
+      backgroundColor: withAlpha(colorPalette.black, 0.4),
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -1918,7 +1947,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       justifyContent: 'center',
       overflow: 'hidden',
       borderWidth: 0.5,
-      borderColor: 'rgba(0,0,0,0.05)',
+      borderColor: withAlpha(colorPalette.black, 0.05),
       shadowColor: colorPalette.black,
       shadowOpacity: 0.08,
       shadowRadius: 12,
@@ -1974,7 +2003,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       width: 44,
       height: 44,
       borderRadius: 12,
-      backgroundColor: 'rgba(212, 175, 55, 0.08)',
+      backgroundColor: withAlpha(colorPalette.warning, 0.08),
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -2027,7 +2056,7 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
       width: 12,
       height: 3,
       borderRadius: 2,
-      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+      backgroundColor: withAlpha(colorPalette.white, 0.3),
     },
     categoriesSelectorScroll: {
       flex: 1,

@@ -1,14 +1,16 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
-import { Box, useTheme } from '@bthwani/ui-kit';
+import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
+import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
@@ -21,7 +23,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
 };
 
 export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
-  const { theme } = useTheme();
+  const router = useRouter();
   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
   const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
   const supportGovernance = getDshControlPanelGovernanceEntry('support');
@@ -57,8 +59,8 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 0, alignItems: 'flex-start' }}>
-        <Box gap={2} style={{ flex: 1 }}>
+      <div className={styles.surfaceDetailSplit}>
+        <div className={styles.surfaceListColumn}>
           {preview.audits.map((item) => (
             <WebControlPanelDecisionRow
               key={item.id}
@@ -71,20 +73,25 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
               reason={item.note}
               sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
               primaryAction={{
-                id: 'resolve',
-                label: item.resolutionPath === 'حل' ? 'حل التدقيق' : 'تصعيد',
-                onAction: () => console.log('Resolve/Escalate', item.id)
+                id: `${item.id}-route`,
+                label: item.resolutionPath === 'حل' ? 'فتح مسار الحل' : 'فتح مسار التصعيد',
+                onAction: () => router.push(
+                  buildOperationsHref(
+                    item.resolutionPath === 'حل' ? 'audit-support-sla' : 'exceptions-escalations',
+                    { orderId: item.id },
+                  ),
+                ),
               }}
               secondaryAction={{
-                id: 'detail',
+                id: `${item.id}-detail`,
                 label: detailOrderId === item.id ? 'إخفاء التفاصيل' : 'سجل التدقيق',
-                onAction: () => setDetailOrderId(detailOrderId === item.id ? null : item.id)
+                onAction: () => setDetailOrderId(detailOrderId === item.id ? null : item.id),
               }}
             />
           ))}
-        </Box>
+        </div>
         {detailOrderId !== null && (
-          <div style={{ width: 340, flexShrink: 0, borderRight: `1px solid ${theme.line}` }}>
+          <div className={styles.surfaceDetailRail}>
             <AuditTrailDetailWorkspace
               orderId={detailOrderId}
               onClose={() => setDetailOrderId(null)}

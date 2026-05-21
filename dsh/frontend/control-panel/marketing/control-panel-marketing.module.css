@@ -265,6 +265,21 @@
   color: var(--bthwani-control-panel-text-muted);
 }
 
+.statusChipWarning {
+  background-color: var(--bthwani-warning-surface);
+  color: var(--bthwani-warning-text);
+}
+
+.statusChipDanger {
+  background-color: var(--bthwani-danger-surface);
+  color: var(--bthwani-danger-text);
+}
+
+.statusChipBrand {
+  background-color: var(--bthwani-brand-surface);
+  color: var(--bthwani-brand);
+}
+
 .metaChipRow {
   display: flex;
   gap: 6px;
@@ -427,6 +442,18 @@
   color: var(--bthwani-warning-text);
 }
 
+.governanceBridgeRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.governanceBridgeCard {
+  flex-grow: 1;
+  min-width: 280px;
+}
+
 @media (max-width: 960px) {
   .editorGridWithSidebar {
     grid-template-columns: 1fr;
@@ -434,5 +461,9 @@
 
   .formGrid {
     grid-template-columns: 1fr;
+  }
+
+  .governanceBridgeRow {
+    flex-direction: column;
   }
 }

@@ -336,6 +336,13 @@
   align-items: start;
 }
 
+.surfaceDetailSplit {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  align-items: flex-start;
+}
+
 .surfaceListColumn {
   display: flex;
   flex-direction: column;
@@ -350,6 +357,12 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.surfaceDetailRail {
+  width: 340px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--bthwani-control-panel-border);
 }
 
 .surfaceInspectorMeta {
@@ -463,6 +476,16 @@
 @media (max-width: 1024px) {
   .surfaceSplitGrid {
     grid-template-columns: 1fr;
+  }
+
+  .surfaceDetailSplit {
+    flex-direction: column;
+  }
+
+  .surfaceDetailRail {
+    width: 100%;
+    border-right: 0;
+    border-top: 1px solid var(--bthwani-control-panel-border);
   }
 }
 

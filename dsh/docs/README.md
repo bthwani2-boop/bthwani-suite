@@ -1,51 +1,42 @@
 # DSH Docs Index
 
-Status: ACTIVE_LEAN_CLOSURE_CONTROL
+Status: ACTIVE_FRONTEND_CLOSURE_TRUTH
 
-This folder contains only the minimum DSH closure-control documents required to close DSH without noise.
+Purpose:
+Lean index for the live DSH frontend closure truth after P0-02 through P0-14.
 
-Canonical truth:
+## Canonical Code Truth
 
 - `dsh/SERVICE_BLUEPRINT.md`
+- `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts`
+- `dsh/frontend/shared/dsh-flow-registry.ts`
+- `dsh/frontend/app-client/dsh-client.screen-registry.ts`
+- `dsh/frontend/app-partner/dsh-partner.screen-registry.ts`
+- `dsh/frontend/app-captain/dsh-captain.screen-registry.ts`
+- `dsh/frontend/app-field/dsh-field.screen-registry.ts`
+- `dsh/frontend/control-panel/operations/operations.registry.ts`
+- `dsh/frontend/control-panel/finance/finance.registry.ts`
 
-Contract truth:
-
-- `dsh/dsh.openapi.yaml`
-
-Existing migration note:
+## Lean Docs
 
 - `dsh/docs/MIGRATION.md`
-
-Lean closure docs:
-
+- `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md`
+- `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md`
 - `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`
 - `dsh/docs/SCREEN_API_MATRIX.md`
 - `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`
-- `dsh/docs/DSH_FORENSIC_INVENTORY.md`
 - `dsh/docs/CLOSURE_DECISION_LOG.md`
-- `dsh/docs/DSH_PHASE_3R_SCREEN_GAP_INVENTORY.md`
-- `dsh/docs/DSH_PHASE_3R_OPERATING_LOGIC_MODEL.md`
-- `dsh/docs/DSH_PHASE_3R_MANUAL_DESIGN_WORK_ORDER.md`
-- `dsh/docs/DSH_PHASE_3R_PREVIEW_SCENARIOS.md`
+- `dsh/docs/DSH_VISUAL_REVIEW.md`
 
-Mobile closure docs:
+## Retired Trees
 
-- `dsh/docs/DSH_MOBILE_APPS_FINAL_CLOSURE.md`
-- `dsh/docs/DSH_MOBILE_APPS_FINAL_CLOSURE_RUNBOOK.md`
-- `dsh/docs/dsh-client-final-classification.csv`
-- `dsh/docs/dsh-partner-final-classification.csv`
-- `dsh/docs/dsh-captain-final-classification.csv`
-- `dsh/docs/dsh-field-final-classification.csv`
+- `dsh/docs/archive/` was retired after the still-useful frontend truths were absorbed into the files above.
+- `dsh/docs/closure/` was retired after closure truth moved into live registries plus the lean matrices above.
+- Historical artifacts under `tools/plan/**` may still mention retired paths. Treat those references as archival only.
 
-Current live-code note:
+## Rules
 
-- DSH-CAP-002 received preview-routing hardening in the shared marketing banner-store and control-panel deck, but runtime, API, and visual proof remain unproven.
-
-Rules:
-
-- No extra DSH docs unless a real evidence gap requires one.
-- No API endpoint without a Screen/API Matrix row.
-- No UI/UX/Flow closure without route, state, RTL, visual, and runtime evidence.
-- No runtime truth from fixture/mock/preview data.
-- No financial effect outside WLT.
-- No local design system outside `@bthwani/ui-kit`.
+- No runtime truth from fixture, preview, seed, or local-state data.
+- No DSH-owned money semantics outside WLT.
+- No API or backend claim without a matching row in `SCREEN_API_MATRIX.md`.
+- No frontend closure claim without route proof, screen proof, required states, visual evidence, and runtime proof or an explicit blocker.
