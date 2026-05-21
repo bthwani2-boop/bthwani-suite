@@ -16,6 +16,16 @@ export function ControlPanelDshClosureHubScreen() {
   const [activeTab, setActiveTab] = React.useState<string>('readiness');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('all');
 
+  const closureItems = DSH_CROSS_SURFACE_CLOSURE_MAP;
+  const previewReadyCount = closureItems.filter((i) => i.status === 'preview-ready').length;
+  const needsEvidenceCount = closureItems.filter(
+    (i) => i.status === 'needs-visual-evidence' || i.status === 'needs-cross-surface-proof' || i.status === 'needs-evidence' || i.status === 'needs-ui-flow'
+  ).length;
+  const blockedCount = closureItems.filter(
+    (i) => i.status === 'blocked' || i.status === 'blocked-by-contract' || i.status === 'blocked-by-wlt'
+  ).length;
+  const verifiedCount = closureItems.filter((i) => i.status === 'verified-ui-flow').length;
+
   const PRIMARY_TABS = [
     { id: 'readiness', label: 'حالة الجاهزية' },
     { id: 'evidence', label: 'تدفق الأدلة' },
@@ -91,9 +101,10 @@ export function ControlPanelDshClosureHubScreen() {
         <div className={styles.surfaceHeaderActions}>
           <div className={styles.surfacePulseCompact}>
             {[
-              { label: 'مكتمل', value: '١٠٠٪', tone: 'success' },
-              { label: 'بانتظار دليل', value: '٠', tone: 'success' },
-              { label: 'معطّل', value: '٠', tone: 'success' }
+              { label: 'واجهة جاهزة', value: String(previewReadyCount), tone: 'warning' as const },
+              { label: 'محقق', value: String(verifiedCount), tone: verifiedCount > 0 ? 'success' as const : 'muted' as const },
+              { label: 'يحتاج دليل', value: String(needsEvidenceCount), tone: needsEvidenceCount > 0 ? 'warning' as const : 'success' as const },
+              { label: 'محجوب', value: String(blockedCount), tone: blockedCount > 0 ? 'critical' as const : 'success' as const },
             ].map((m) => (
               <div key={m.label} className={styles.commandKpi}>
                 <span className={styles.commandKpiLabel}>{m.label}</span>
@@ -225,7 +236,17 @@ export function ControlPanelDshClosureEvidenceStream() {
             id={`${item.surfaceId}-${item.area}`}
             label={`${getSurfaceLabel(item.surfaceId)} / ${item.title}`}
             description={item.description}
-            badge={item.status === 'closed' ? 'مكتمل' : item.status === 'needs-evidence' ? 'يحتاج دليل' : item.status === 'needs-ui-flow' ? 'يحتاج فلو' : 'محجوب'}
+            badge={
+              item.status === 'verified-ui-flow' ? 'محقق'
+              : item.status === 'preview-ready' ? 'واجهة جاهزة'
+              : item.status === 'needs-visual-evidence' ? 'يحتاج إثبات بصري'
+              : item.status === 'needs-cross-surface-proof' ? 'يحتاج إثبات عابر'
+              : item.status === 'blocked-by-wlt' ? 'محجوب / WLT'
+              : item.status === 'blocked-by-contract' ? 'محجوب / عقد'
+              : item.status === 'needs-evidence' ? 'يحتاج دليل'
+              : item.status === 'needs-ui-flow' ? 'يحتاج فلو'
+              : 'محجوب'
+            }
             href={item.routeHint}
           />
         ))}

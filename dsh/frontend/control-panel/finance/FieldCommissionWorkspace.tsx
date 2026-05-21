@@ -1,8 +1,11 @@
-// ML-045: CP field agent commission workspace skeleton (WLT bridge — view-only)
-// BLOCKED_BY_WLT: implement when WLT exposes field commission read endpoint
+// P0-07: CP field agent commission workspace — WLT bridge, view-only.
+// DSH displays WLT-owned field commission data. No commission computation or payout mutation inside DSH.
+// Field agents collect evidence only — no financial activation or settlement from this surface.
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { WltBoundaryBanner } from './WltBoundaryBanner';
+import { buildDshWltFinanceBoundaryRecord } from '../../../shared/dshFinancePreviewModel';
 
 export type FieldCommissionWorkspaceProps = {
   fieldAgentId?: string;
@@ -13,6 +16,14 @@ export function FieldCommissionWorkspace({
   fieldAgentId = '—',
   fieldAgentName = 'الميداني',
 }: FieldCommissionWorkspaceProps) {
+  const boundaryRecord = buildDshWltFinanceBoundaryRecord({
+    domain: 'field-commission',
+    contractStatus: 'pending_contract',
+    affectedActor: fieldAgentName,
+    affectedEntityId: fieldAgentId !== '—' ? fieldAgentId : undefined,
+    auditVisibilityRequired: false,
+  });
+
   return (
     <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
@@ -31,18 +42,15 @@ export function FieldCommissionWorkspace({
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
-            <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
-              <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>ربط WLT معلق</Text>
-              <Text tone="muted">بيانات عمولة الميداني مملوكة من WLT. ستظهر هنا بعد ربط نقطة النهاية.</Text>
-            </Box>
-            <Box gap={2}>
-              {(['إجمالي التفعيلات', 'العمولة لكل تفعيل', 'إجمالي المكتسب', 'المصروف'] as const).map((label) => (
-                <Box key={label} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text role="bodySm" tone="muted">{label}</Text>
-                  <Text role="bodySm">— WLT</Text>
-                </Box>
-              ))}
-            </Box>
+            <WltBoundaryBanner record={boundaryRecord} />
+            <KeyValueList
+              items={[
+                { label: 'إجمالي التفعيلات', value: '— WLT' },
+                { label: 'العمولة لكل تفعيل', value: '— WLT' },
+                { label: 'إجمالي المكتسب', value: '— WLT' },
+                { label: 'المصروف', value: '— WLT' },
+              ]}
+            />
           </Box>
         </div>
       </main>

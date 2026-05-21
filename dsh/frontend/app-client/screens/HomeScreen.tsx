@@ -217,6 +217,10 @@ export type DshHomeGetStore = {
   hasCouponAvailable?: boolean;
   publishStage?: string;
   commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
+  /** P0-04: Resolved badge for client-visible stores — display-only.
+   *  Derived from DshPartnerActivationStatus via getDshPartnerVisibilityBadge().
+   *  app-client never reads raw activation status; it receives only the resolved badge. */
+  visibilityBadge?: import('../../shared/dsh-partner-activation.model').DshPartnerVisibilityBadge;
   // PREMIUM 2026 ENHANCEMENTS
   locationLabel?: string;
   deliveryTimeLabel?: string;

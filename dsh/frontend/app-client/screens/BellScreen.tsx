@@ -1,5 +1,7 @@
 import React from 'react';
 import { Badge, Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, StatCard, Surface, Text } from '@bthwani/ui-kit';
+import type { DshSignalSummary } from '../../shared/dsh-signal-layer.model';
+import { getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/dsh-signal-layer.model';
 
 type DshClientBellScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -24,7 +26,7 @@ type ClientBellSummary = {
 };
 
 const defaultSummary: ClientBellSummary = {
-  orderLabel: 'طلب DSH #1042',
+  orderLabel: 'طلب DSH رقم 1042',
   captainLabel: 'الكابتن سامر',
   etaLabel: '4 دقائق',
   distanceLabel: 'يبعد 0.9 كم',
@@ -116,11 +118,26 @@ export type DshClientBellScreenProps = {
   state?: DshClientBellScreenState;
   summary?: ClientBellSummary;
   events?: ClientBellEvent[];
+  /** Signal layer integration — summaries from getDshSignalSummaries('app-client', 'client').
+   *  When provided, signal events are shown as bell events (summaries only; open detail on press). */
+  signalEvents?: readonly DshSignalSummary[];
   onOpenTracking?: () => void;
   onOpenOrders?: () => void;
   onRetry?: () => void;
   onBack?: () => void;
 };
+
+function signalToClientBellEvent(signal: DshSignalSummary): ClientBellEvent {
+  const tone = getDshSignalEventTone(signal.kind);
+  return {
+    id: signal.eventId,
+    title: getDshSignalEventLabel(signal.kind),
+    subtitle: signal.title,
+    meta: signal.entityId,
+    badgeLabel: signal.priority === 'urgent' ? 'عاجل' : signal.priority === 'important' ? 'هام' : 'معتاد',
+    tone: tone === 'danger' ? 'warning' : tone === 'brand' ? 'info' : tone === 'success' ? 'success' : 'info',
+  };
+}
 
 function BellEventRow({ event }: { event: ClientBellEvent }) {
   return (
@@ -139,11 +156,16 @@ export function DshClientBellScreen({
   state = 'ready',
   summary = defaultSummary,
   events = defaultEvents,
+  signalEvents,
   onOpenTracking,
   onOpenOrders,
   onRetry,
   onBack,
 }: DshClientBellScreenProps) {
+  // Merge signal events (summaries only) into bell events when provided
+  const resolvedEvents = signalEvents && signalEvents.length > 0
+    ? [...signalEvents.map(signalToClientBellEvent), ...events]
+    : events;
   if (state !== 'ready') {
     const stateCopy = resolveStateCopy(state);
 
@@ -188,7 +210,7 @@ export function DshClientBellScreen({
       <Surface tone="raised" gap={3}>
         <SectionHeader title="متى يرن الجرس" subtitle="السطور التالية تختصر منطق الرن من دون ضوضاء." />
         <Box gap={2}>
-          {events.map((event) => (
+          {resolvedEvents.map((event) => (
             <BellEventRow key={event.id} event={event} />
           ))}
         </Box>

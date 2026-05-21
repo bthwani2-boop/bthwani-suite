@@ -1,4 +1,5 @@
 import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from './operations.types';
+import type { DshOrderLifecycleStatus } from '../../shared/dsh-order-journey.model';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
@@ -590,3 +591,168 @@ export const AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW = {
     },
   ] as const,
 } as const;
+
+// ─── P0-10: Operations monitoring item ───────────────────────────────────────
+// Used by CommandCenterScreen as monitoring cockpit source.
+// Summaries only — details open on explicit action (onDemandDetailPolicy).
+// No full order details loaded into the cockpit.
+
+export type DshOpsMonitoringItem = {
+  readonly entityId: string;
+  readonly entityLabel: string;
+  /** Lifecycle state ID or descriptive state key for display. */
+  readonly lifecycleState: string;
+  readonly affectedSurface: 'control-panel' | 'app-client' | 'app-partner' | 'app-captain' | 'app-field';
+  readonly ownerQueue: string;
+  readonly status: string;
+  readonly statusTone: 'neutral' | 'success' | 'warning' | 'danger';
+  readonly primaryAction: string;
+  readonly secondaryAction?: string;
+  /** Route hint for navigation — use buildOperationsHref or absolute path. */
+  readonly routeHint: string;
+  readonly evidenceNeeded: boolean;
+  readonly onDemandDetailPolicy: 'summary-only' | 'detail-on-open' | 'evidence-on-open';
+  readonly supportTicketId?: string;
+  readonly auditEntryId?: string;
+};
+
+// ─── P0-10: Service health monitoring ────────────────────────────────────────
+// Partner readiness, catalog blockers, serviceability, SLA risk, captain coverage.
+// Each item routes to its owning workspace — no data duplication.
+
+export const DSH_SERVICE_HEALTH_PREVIEW: ReadonlyArray<DshOpsMonitoringItem> = [
+  {
+    entityId: 'SH-001',
+    entityLabel: 'جاهزية الشركاء',
+    lifecycleState: 'partner_intake',
+    affectedSurface: 'app-partner',
+    ownerQueue: 'partner-stores',
+    status: '3 متاجر غير جاهزة',
+    statusTone: 'warning',
+    primaryAction: 'فتح المتاجر',
+    secondaryAction: 'تفاصيل الجاهزية',
+    routeHint: '?workspace=partner-stores',
+    evidenceNeeded: false,
+    onDemandDetailPolicy: 'summary-only',
+  },
+  {
+    entityId: 'SH-002',
+    entityLabel: 'معوّقات نشر الكتالوج',
+    lifecycleState: 'item_unavailable',
+    affectedSurface: 'control-panel',
+    ownerQueue: 'catalogs',
+    status: '5 منتجات معلّقة',
+    statusTone: 'warning',
+    primaryAction: 'فتح الكتالوجات',
+    routeHint: '/catalogs',
+    evidenceNeeded: true,
+    onDemandDetailPolicy: 'detail-on-open',
+  },
+  {
+    entityId: 'SH-003',
+    entityLabel: 'قابلية الخدمة',
+    lifecycleState: 'captain_unavailable',
+    affectedSurface: 'control-panel',
+    ownerQueue: 'area-capacity',
+    status: 'منطقتان خارج النطاق',
+    statusTone: 'danger',
+    primaryAction: 'فتح المناطق',
+    secondaryAction: 'عرض الخريطة',
+    routeHint: '?workspace=area-capacity',
+    evidenceNeeded: false,
+    onDemandDetailPolicy: 'summary-only',
+  },
+  {
+    entityId: 'SH-004',
+    entityLabel: 'خطر SLA',
+    lifecycleState: 'support_exception',
+    affectedSurface: 'control-panel',
+    ownerQueue: 'audit-support-sla',
+    status: '5 طلبات في خطر خرق SLA',
+    statusTone: 'danger',
+    primaryAction: 'فتح التدقيق',
+    routeHint: '?workspace=audit-support-sla',
+    evidenceNeeded: true,
+    onDemandDetailPolicy: 'evidence-on-open',
+    auditEntryId: 'AU-7001',
+  },
+  {
+    entityId: 'SH-005',
+    entityLabel: 'تغطية الكباتن',
+    lifecycleState: 'captain_assignment',
+    affectedSurface: 'app-captain',
+    ownerQueue: 'dispatch-assignment',
+    status: '4 كباتن متاحون',
+    statusTone: 'success',
+    primaryAction: 'فتح الإسناد',
+    secondaryAction: 'عرض الخريطة',
+    routeHint: '?workspace=dispatch-assignment',
+    evidenceNeeded: false,
+    onDemandDetailPolicy: 'summary-only',
+  },
+];
+
+// ─── P0-10: WLT finance alerts — read-only display ───────────────────────────
+// DSH displays WLT finance state; WLT owns all mutations.
+// No approve/pay/settle/refund inside DSH.
+
+export type DshWltFinanceAlert = {
+  readonly alertId: string;
+  readonly domain: 'payment' | 'refund' | 'settlement' | 'payout' | 'commission';
+  readonly label: string;
+  readonly count: number;
+  readonly statusTone: 'neutral' | 'success' | 'warning' | 'danger';
+  /** WLT bridge note shown to operator — always states read-only boundary. */
+  readonly wltBridgeNote: string;
+  readonly routeHint: string;
+};
+
+export const DSH_WLT_FINANCE_ALERTS_PREVIEW: ReadonlyArray<DshWltFinanceAlert> = [
+  {
+    alertId: 'WLT-FA-01',
+    domain: 'payment',
+    label: 'مدفوعات معلّقة',
+    count: 4,
+    statusTone: 'warning',
+    wltBridgeNote: 'awaiting_wlt_payment — عرض فقط، الإجراء في WLT',
+    routeHint: '/finance',
+  },
+  {
+    alertId: 'WLT-FA-02',
+    domain: 'refund',
+    label: 'طلبات استرداد معلّقة',
+    count: 2,
+    statusTone: 'warning',
+    wltBridgeNote: 'refund_pending_wlt — عرض فقط، لا mutation داخل DSH',
+    routeHint: '/finance',
+  },
+  {
+    alertId: 'WLT-FA-03',
+    domain: 'payout',
+    label: 'مدفوعات كباتن معلّقة',
+    count: 7,
+    statusTone: 'neutral',
+    wltBridgeNote: 'captain_payout — WLT يملك الحقيقة والتنفيذ',
+    routeHint: '/finance',
+  },
+];
+
+// ─── P0-10: Exception → support ticket + audit entry map ─────────────────────
+// Every exception must link to a support ticket or audit entry.
+// No exception without an owner and an action route.
+
+export const EXCEPTION_TICKET_MAP: Readonly<Record<string, { supportTicketId: string; auditEntryId?: string }>> = {
+  'EX-4101': { supportTicketId: 'TK-5101', auditEntryId: 'AU-7001' },
+  'EX-4102': { supportTicketId: 'TK-5102', auditEntryId: 'AU-7002' },
+  'EX-4103': { supportTicketId: 'TK-5103', auditEntryId: undefined },
+};
+
+// ─── P0-10: Dispatch lifecycle state map ─────────────────────────────────────
+// bthwani_delivery only enters captain dispatch — pickup and partner_delivery do not.
+// reassignment_required surfaces an explicit mandatory action in the dispatch board.
+
+export const DISPATCH_LIFECYCLE_STATE_MAP: Readonly<Record<string, DshOrderLifecycleStatus>> = {
+  'DA-2001': 'captain_assignment',
+  'DA-2002': 'reassignment_required',
+  'DA-2003': 'captain_unavailable',
+};

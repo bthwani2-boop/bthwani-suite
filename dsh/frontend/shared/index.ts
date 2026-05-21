@@ -425,9 +425,167 @@ export type {
 	DshOperationsDecisionPayload,
 	DshOperationsOrderDetail,
 	DshPartnerPreparationStage,
+	// P0-02 additions
+	DshOrderLifecycleActorOwner,
+	DshOrderLifecycleWltImplication,
+	DshOrderLifecycleDeliveryModeImpact,
+	DshOrderLifecycleStateAction,
+	DshOrderLifecycleStateMetadata,
 } from './dsh-order-journey.model';
 export {
 	DSH_ORDER_JOURNEY_STEPS,
 	mapLifecycleToJourneyStage,
 	mapOperationsDecisionToLifecycle,
+	// P0-02 additions
+	DSH_ORDER_LIFECYCLE_STATES,
+	getDshLifecycleStateMetadata,
 } from './dsh-order-journey.model';
+
+// --- P0-03: DSH Delivery Mode Model ---
+export type {
+	DshFulfillmentDeliveryMode,
+	DshDeliveryModeCaptainInvolvement,
+	DshDeliveryModeTrackingStageFilter,
+	DshDeliveryModeDefinition,
+} from './dsh-delivery-mode.model';
+export {
+	DSH_DELIVERY_MODE_DEFINITIONS,
+	getDshDeliveryModeDefinition,
+	getDshDeliveryModeActorLabel,
+	isDshModeDispatchRequired,
+	isDshModeCaptainTrackingVisible,
+	getDshModeTrackingStageFilter,
+	isDshFulfillmentDeliveryMode,
+} from './dsh-delivery-mode.model';
+
+// --- P0-04: DSH Partner Activation Model ---
+// Cross-surface SSoT for partner activation lifecycle and client visibility.
+// Authority: control-panel/partners owns all activation/deactivation decisions.
+// app-field: evidence collection only — never activates.
+// app-partner: reads readiness status — never self-activates.
+// app-client: sees store ONLY when status = 'client_visible'.
+export type {
+	DshPartnerActivationStatus,
+	DshPartnerVisibilityBadge,
+	DshPartnerActivationActorSurface,
+	DshPartnerReadinessCheckItem,
+	DshPartnerActivationStateMetadata,
+} from './dsh-partner-activation.model';
+export {
+	DSH_PARTNER_ACTIVATION_STATES,
+	getDshPartnerActivationStateMetadata,
+	isDshPartnerClientVisible,
+	isDshPartnerActivationComplete,
+	getDshPartnerVisibilityBadge,
+	getDshPartnerVisibilityBadgeLabel,
+	getDshPartnerVisibilityBadgeTone,
+	getDshPartnerReadinessChecklist,
+	getDshPartnerActivationStatusLabel,
+} from './dsh-partner-activation.model';
+
+// --- P0-05: DSH Product Identity Model ---
+// SSoT for product approval pipeline, barcode scan states, publishing gate
+// prerequisites, and client visibility rules.
+// Authority: control-panel/catalogs owns all approval and publishing decisions.
+// app-partner: submits and edits local overrides only.
+// app-field: submits initial entries and evidence — never approves or publishes.
+// app-client: sees ONLY products where approvalStatus = 'client_visible'.
+export type {
+	DshProductIdentityApprovalStatus,
+	DshProductPublishingStatus,
+	DshProductClientVisibilityStatus,
+	DshBarcodeSearchState,
+	DshProductCategoryMappingStatus,
+	DshProductDuplicateStatus,
+	DshProductPublishingPrerequisite,
+	DshProductIdentityRecord,
+	DshProductApprovalStateMetadata,
+} from './dsh-product-identity.model';
+export {
+	DSH_PRODUCT_APPROVAL_PIPELINE,
+	getDshProductApprovalStateMetadata,
+	isDshProductClientVisible,
+	isDshProductPublishingBlocked,
+	getDshProductPublishingPrerequisites,
+	getDshBarcodeSearchStateLabel,
+	getDshProductApprovalStatusLabel,
+	getDshProductApprovalStatusTone,
+} from './dsh-product-identity.model';
+
+// --- P0-08: DSH Signal Layer Model ---
+// Centralized signal type contract for all DSH actor surfaces.
+// On-demand retrieval: lists show summaries only; detail opens on explicit action.
+// Every signal has a routeId — no orphan signals without destination.
+// WLT finance signals (refund_pending_wlt, refund_completed_wlt, settlement_ready_wlt) are read-only display.
+export type {
+  DshSignalEventKind,
+  DshSignalRecipientSurface,
+  DshSignalRecipientRole,
+  DshSignalEntityType,
+  DshSignalPriority,
+  DshSignalAction,
+  DshSignalOnDemandPolicy,
+  DshSignalEvent,
+  DshSignalSummary,
+  DshSignalActorRoute,
+} from './dsh-signal-layer.model';
+export {
+  DSH_SIGNAL_ACTOR_ROUTES,
+  DSH_SIGNAL_PREVIEW_EVENTS,
+  getDshSignalEventLabel,
+  getDshSignalEventTone,
+  getDshSignalActorRoute,
+  getDshSignalRouteForSurface,
+  getDshSignalSummaries,
+  getDshSignalDetail,
+  getDshSignalUnreadCount,
+  isDshSignalAuditRequired,
+} from './dsh-signal-layer.model';
+
+// --- P0-06: Support Ticket Model ---
+// Cross-surface SSoT for support ticket lifecycle, message timelines, SLA classification,
+// and escalation routing.
+// Authority: control-panel/support owns all resolution and escalation decisions.
+// app-client: support visible inside order context only.
+// app-partner: support linked to order / catalog / handoff context only.
+// app-captain: handoff / delivery / PoD context only.
+// WLT boundary: financial-impact tickets display read-only preview tags — no DSH mutation.
+export type {
+	DshSupportTicketStatus,
+	DshSupportTicketActorKind,
+	DshSupportTicketMessage,
+	DshSupportTicket,
+} from './operations-support.preview';
+export {
+	getDshSupportTicketStatusLabel,
+	getDshSupportTicketStatusTone,
+	DSH_DEMO_SUPPORT_TICKETS,
+	getDshSupportTicketById,
+} from './operations-support.preview';
+
+// --- P0-09: DSH Role & Permission Model ---
+// UI-only RBAC preview — no runtime auth, no backend RBAC binding.
+// Covers 10 sensitive decision points in DSH control-panel.
+// WLT boundary: finance mutations always forbidden inside DSH.
+// Authority: control-panel/partners owns activation/deactivation;
+//            control-panel/catalogs owns approval/publishing;
+//            control-panel/operations owns dispatch/SLA/escalation;
+//            control-panel/finance reads only — WLT owns all mutations.
+export type {
+  DshRoleId,
+  DshPermissionSection,
+  DshSensitiveActionId,
+  DshRolePermissionEntry,
+  DshAuditEntryDecision,
+  DshAuditEntry,
+} from './dsh-role-permission.model';
+export {
+  DSH_ROLE_PERMISSIONS,
+  DSH_AUDIT_PREVIEW_ENTRIES,
+  getDshRoleCanPerform,
+  getDshRolePermission,
+  getDshRollbackAllowed,
+  getDshSectionAuditPolicy,
+  getDshRoleArabicName,
+  getDshAuditEntryById,
+} from './dsh-role-permission.model';

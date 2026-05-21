@@ -1,10 +1,9 @@
-// ML-046: CP support ticket list screen skeleton
-// Wraps the existing ControlPanelDshSupportHubScreen which hosts the queue tab
+// P0-06: CP support ticket list — wraps the unified SupportHubScreen queue tab.
+// The hub screen renders the ticket queue, escalation, SLA dashboard, and messaging inline.
 import React from 'react';
 import { ControlPanelDshSupportQueueScreen } from './SupportHubScreens';
 
 export function SupportTicketListScreen() {
-  // BLOCKED_BY_CONTRACT: replace with dedicated ticket-list implementation once CG-032 contract is proven
   return <ControlPanelDshSupportQueueScreen />;
 }
 

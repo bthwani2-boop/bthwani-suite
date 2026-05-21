@@ -11,15 +11,22 @@ import {
 import { ADMIN_ROLES, PLATFORM_PERMISSIONS, MOCK_USERS } from './administration.mock';
 import type { AdminRole, MockAdminUser, AdminUserStatus } from './administration.types';
 import { getDshControlPanelGovernanceEntry } from '../shared';
+import {
+  DSH_ROLE_PERMISSIONS,
+  getDshRoleCanPerform,
+  getDshRoleArabicName,
+} from '../../shared/dsh-role-permission.model';
+import type { DshRoleId } from '../../shared/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
 
-type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain';
+type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain' | 'sensitive-decisions';
 
 const WORKSPACE_TABS = [
   { id: 'overview' as AdminWorkspaceId, label: 'نظرة عامة', badge: '' },
   { id: 'roles' as AdminWorkspaceId, label: 'الأدوار والصلاحيات', badge: '' },
   { id: 'users' as AdminWorkspaceId, label: 'المستخدمون', badge: '' },
   { id: 'approval-chain' as AdminWorkspaceId, label: 'سلسلة الاعتماد', badge: '' },
+  { id: 'sensitive-decisions' as AdminWorkspaceId, label: 'القرارات الحساسة', badge: '10' },
 ] as const;
 
 function hasPermission(role: AdminRole, permId: string): boolean {
@@ -195,27 +202,137 @@ function UserCard({ user }: { user: MockAdminUser }) {
               <Text role="titleSm">تأكيد الإجراء التجريبي: {showConfirm}</Text>
               <Text role="bodySm">لن يتم تغيير صلاحيات حقيقية. هذا Demo Mode فقط.</Text>
               <Box layoutDirection="row" gap={2}>
-                <Button variant="primary" onClick={() => handleConfirm(showConfirm)}>تأكيد المحاكاة</Button>
-                <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                <Button tone="primary" label="تأكيد المحاكاة" onPress={() => handleConfirm(showConfirm)} />
+                <Button tone="secondary" label="إلغاء" onPress={() => setShowConfirm(null)} />
               </Box>
             </Box>
           </Surface>
         ) : (
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button variant="secondary" onClick={() => setShowConfirm('تعيين دور (تجريبي)')}>تعيين دور (تجريبي)</Button>
+            <Button tone="secondary" label="تعيين دور (تجريبي)" onPress={() => setShowConfirm('تعيين دور (تجريبي)')} />
             {currentStatus === 'pending' && (
-              <Button variant="primary" onClick={() => setShowConfirm('تفعيل الوصول (تجريبي)')}>تفعيل الوصول (تجريبي)</Button>
+              <Button tone="primary" label="تفعيل الوصول (تجريبي)" onPress={() => setShowConfirm('تفعيل الوصول (تجريبي)')} />
             )}
             {currentStatus === 'active' && (
-              <Button variant="danger" onClick={() => setShowConfirm('تعليق الوصول (تجريبي)')}>تعليق الوصول (تجريبي)</Button>
+              <Button tone="danger" label="تعليق الوصول (تجريبي)" onPress={() => setShowConfirm('تعليق الوصول (تجريبي)')} />
             )}
             {currentStatus === 'suspended' && (
-              <Button variant="primary" onClick={() => setShowConfirm('إعادة تفعيل (تجريبي)')}>إعادة تفعيل (تجريبي)</Button>
+              <Button tone="primary" label="إعادة تفعيل (تجريبي)" onPress={() => setShowConfirm('إعادة تفعيل (تجريبي)')} />
             )}
           </Box>
         )}
       </Box>
     </Surface>
+  );
+}
+
+// ─── Sensitive decisions panel ───────────────────────────────────────────────
+
+const ALL_DSH_ROLES: ReadonlyArray<DshRoleId> = [
+  'super-admin',
+  'platform-governor',
+  'platform-approver',
+  'platform-operator',
+  'finance-approver',
+  'viewer',
+];
+
+function SensitiveDecisionsPanel() {
+  return (
+    <Box gap={4}>
+      <WebSectionCard
+        title="القرارات الحساسة — سياسة الوصول (10 قرارات)"
+        description="كل قرار حساس يتطلب دوراً محدداً. القرارات المالية عرض فقط — WLT يملك السلطة. جميعها محاكاة UI فقط."
+      >
+        <Box gap={3}>
+          {DSH_ROLE_PERMISSIONS.map((entry) => (
+            <Surface key={entry.section} tone="raised" border padding={3} radiusToken="xl">
+              <Box gap={3}>
+                {/* Header: label + policy flags */}
+                <Box
+                  layoutDirection="row"
+                  justify="space-between"
+                  align="flex-start"
+                  style={{ flexWrap: 'wrap', rowGap: 8 }}
+                >
+                  <Box gap={1} style={{ flexGrow: 1, flexShrink: 1, minWidth: 200 }}>
+                    <Text role="bodyStrong">{entry.arabicLabel}</Text>
+                    <Text role="bodySm" tone="muted">{entry.arabicDescription}</Text>
+                  </Box>
+                  <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {entry.auditRequired && (
+                      <Surface tone="warning" padding={1} radiusToken="pill" border={false}>
+                        <Text role="caption" tone="muted">تدقيق</Text>
+                      </Surface>
+                    )}
+                    {entry.reasonRequired && (
+                      <Surface tone="raised" padding={1} radiusToken="pill" border>
+                        <Text role="caption" tone="muted">سبب</Text>
+                      </Surface>
+                    )}
+                    {entry.evidenceRequired && (
+                      <Surface tone="raised" padding={1} radiusToken="pill" border>
+                        <Text role="caption" tone="muted">إثبات</Text>
+                      </Surface>
+                    )}
+                    {entry.wltMutationForbidden && (
+                      <Surface tone="danger" padding={1} radiusToken="pill" border={false}>
+                        <Text role="caption" tone="inverse">WLT عرض فقط</Text>
+                      </Surface>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* Role access row */}
+                <Box gap={1}>
+                  <Text role="caption" tone="muted">الوصول حسب الدور:</Text>
+                  <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+                    {ALL_DSH_ROLES.map((roleId) => {
+                      const canDo = getDshRoleCanPerform(roleId, entry.section);
+                      return (
+                        <Surface
+                          key={roleId}
+                          tone={canDo ? 'success' : 'default'}
+                          padding={1}
+                          radiusToken="pill"
+                          border
+                        >
+                          <Text role="caption" tone={canDo ? 'success' : 'muted'}>
+                            {canDo ? '✓ ' : '✗ '}{getDshRoleArabicName(roleId)}
+                          </Text>
+                        </Surface>
+                      );
+                    })}
+                  </Box>
+                </Box>
+
+                {/* Affected surfaces */}
+                <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+                  {entry.affectedSurfaces.map((s) => (
+                    <Surface key={s} tone="inset" padding={1} radiusToken="pill" border={false}>
+                      <Text role="caption" tone="muted">{s}</Text>
+                    </Surface>
+                  ))}
+                </Box>
+              </Box>
+            </Surface>
+          ))}
+        </Box>
+      </WebSectionCard>
+
+      {/* Finance mutation boundary notice */}
+      <Surface tone="danger" border padding={3} radiusToken="xl">
+        <Box gap={2}>
+          <Text role="titleSm" tone="danger">حدود WLT المالي — ممنوع داخل DSH</Text>
+          <Box gap={1}>
+            <Text role="bodySm">✗ لا approve/pay/settle داخل DSH — WLT فقط</Text>
+            <Text role="bodySm">✗ لا refund mutation — يُعرض فقط من WLT bridge</Text>
+            <Text role="bodySm">✗ لا commission/payout حساب — عرض فقط من WLT</Text>
+            <Text role="bodySm">✓ finance-approver + super-admin + governor يشاهدون فقط</Text>
+          </Box>
+        </Box>
+      </Surface>
+    </Box>
   );
 }
 
@@ -530,6 +647,7 @@ export function ControlPanelDshAdministrationScreen() {
             {activeWorkspace === 'roles' && <RolesPanel />}
             {activeWorkspace === 'users' && <UsersPanel />}
             {activeWorkspace === 'approval-chain' && <ApprovalChainPanel />}
+            {activeWorkspace === 'sensitive-decisions' && <SensitiveDecisionsPanel />}
           </Box>
         </div>
       </main>

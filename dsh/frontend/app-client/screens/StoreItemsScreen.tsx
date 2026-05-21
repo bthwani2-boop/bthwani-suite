@@ -26,6 +26,11 @@ export type DshStoreItem = {
   isAvailable?: boolean;
   hasOptions?: boolean;
   preparationTime?: string;
+  /** P0-05: Client visibility derived from product approval pipeline.
+   *  'visible' = client can add to cart.
+   *  'unavailable' = client sees item but cannot add (out of stock / partner off).
+   *  'hidden' / 'removed' = item must NOT render to client — filter before passing. */
+  clientVisibilityStatus?: 'visible' | 'unavailable' | 'hidden' | 'removed';
 };
 
 export type DshStoreItemsScreenProps = {
@@ -105,12 +110,21 @@ export function DshStoreItemsScreen({
   }, [activeCategory, items]);
 
   const visibleItems = React.useMemo(() => {
+    // P0-05: Gate — items that are hidden or removed from the catalog must not render.
+    // 'visible' and 'unavailable' are both client-renderable (unavailable shows disabled state).
+    // If clientVisibilityStatus is absent, fall back to isAvailable for backward compat.
+    const gatePassed = categoryFiltered.filter((item) => {
+      const cvs = item.clientVisibilityStatus;
+      if (cvs === 'hidden' || cvs === 'removed') return false;
+      return true;
+    });
+
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) {
-      return categoryFiltered;
+      return gatePassed;
     }
 
-    return categoryFiltered.filter((item) => {
+    return gatePassed.filter((item) => {
       const haystack = `${item.name} ${item.subtitle} ${item.categoryLabel}`.toLowerCase();
       return haystack.includes(normalizedQuery);
     });
@@ -162,24 +176,33 @@ export function DshStoreItemsScreen({
           {storeText.items.sectionHint}
         </Text>
         <Box gap={2}>
-          {visibleItems.map((item) => (
-            <Card
-              key={item.id}
-              title={item.name}
-              subtitle={item.subtitle}
-              footer={
-                <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Chip label={item.priceLabel ?? ''} selected />
-                  <Chip label={item.categoryLabel} />
-                  {item.statusLabel ? <Chip label={item.statusLabel} /> : null}
-                  {item.preparationTime ? <Chip label={item.preparationTime} /> : null}
-                  {item.hasOptions ? <Chip label={storeText.items.options} /> : null}
-                  {item.isAvailable === false ? <Chip label={storeText.items.unavailable} /> : null}
-                </Box>
-              }
-              onPress={() => onOpenItem?.(item.id)}
-            />
-          ))}
+          {visibleItems.map((item) => {
+            // P0-05: Resolve item availability — clientVisibilityStatus takes precedence.
+            const isItemUnavailable =
+              item.clientVisibilityStatus === 'unavailable' ||
+              (item.clientVisibilityStatus === undefined && item.isAvailable === false);
+            return (
+              <Card
+                key={item.id}
+                title={item.name}
+                subtitle={isItemUnavailable ? storeText.items.unavailable : item.subtitle}
+                footer={
+                  <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                    {isItemUnavailable ? (
+                      <Chip label={storeText.items.unavailable} tone="danger" />
+                    ) : (
+                      <Chip label={item.priceLabel ?? ''} selected />
+                    )}
+                    <Chip label={item.categoryLabel} />
+                    {item.statusLabel && !isItemUnavailable ? <Chip label={item.statusLabel} /> : null}
+                    {item.preparationTime && !isItemUnavailable ? <Chip label={item.preparationTime} /> : null}
+                    {item.hasOptions && !isItemUnavailable ? <Chip label={storeText.items.options} /> : null}
+                  </Box>
+                }
+                onPress={isItemUnavailable ? undefined : () => onOpenItem?.(item.id)}
+              />
+            );
+          })}
         </Box>
       </Surface>
 

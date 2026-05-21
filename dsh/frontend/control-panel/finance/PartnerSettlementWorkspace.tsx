@@ -1,16 +1,31 @@
-// ML-040: CP partner settlement workspace skeleton (WLT bridge — view-only)
-// BLOCKED_BY_WLT: replace with dedicated workspace once WLT exposes settlement read endpoints
+// P0-07: CP partner settlement workspace — WLT bridge, view-only.
+// DSH displays WLT-owned settlement data. No settlement initiation, approval, or mutation inside DSH.
+// Filtering by partnerId is a WLT-side concern; DSH receives pre-filtered read views.
 import React from 'react';
+import { Box } from '@bthwani/ui-kit';
+import { WltBoundaryBanner } from './WltBoundaryBanner';
 import { ControlPanelDshSettlementScreen } from './FinanceHubScreens';
+import { buildDshWltFinanceBoundaryRecord } from '../../../shared/dshFinancePreviewModel';
 
 export type PartnerSettlementWorkspaceProps = {
   partnerId?: string;
 };
 
-export function PartnerSettlementWorkspace({ partnerId: _partnerId }: PartnerSettlementWorkspaceProps) {
-  // WLT owns all settlement money semantics — DO NOT add payment logic here
-  // BLOCKED_BY_CONTRACT: filter settlement rows by partnerId once CG-028 contract is proven
-  return <ControlPanelDshSettlementScreen />;
+export function PartnerSettlementWorkspace({ partnerId }: PartnerSettlementWorkspaceProps) {
+  const boundaryRecord = buildDshWltFinanceBoundaryRecord({
+    domain: 'settlement',
+    contractStatus: 'pending_contract',
+    affectedActor: 'شريك',
+    affectedEntityId: partnerId,
+    auditVisibilityRequired: true,
+  });
+
+  return (
+    <Box gap={4} padding={4}>
+      <WltBoundaryBanner record={boundaryRecord} />
+      <ControlPanelDshSettlementScreen />
+    </Box>
+  );
 }
 
 export default PartnerSettlementWorkspace;

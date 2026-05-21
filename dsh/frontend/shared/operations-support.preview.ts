@@ -464,3 +464,212 @@ export function isOperationsSupportHiddenCompatFlow(
 ): boolean {
   return DSH_OPERATIONS_SUPPORT_HIDDEN_COMPAT_FLOW_IDS.includes(flowId);
 }
+
+// --- P0-06: Support Ticket Model ---
+// SSoT for message timelines, escalation routing, SLA classification, and status resolution.
+// Authority contract:
+//   control-panel/support  → owns all ticket resolution, escalation, and SLA decisions.
+//   app-client             → support visible inside order context only — never a standalone hub.
+//   app-partner            → support linked to order / catalog / handoff context only.
+//   app-captain            → handoff / delivery / PoD context only.
+//   WLT boundary           → tickets with financial impact show read-only preview tags; no mutation from DSH.
+
+export type DshSupportTicketStatus =
+  | 'open'
+  | 'in-review'
+  | 'escalated'
+  | 'resolved'
+  | 'closed'
+  | 'sla-breach';
+
+export type DshSupportTicketActorKind =
+  | 'client'
+  | 'partner'
+  | 'captain'
+  | 'field'
+  | 'ops';
+
+export type DshSupportTicketMessage = {
+  readonly id: string;
+  readonly senderKind: DshSupportTicketActorKind;
+  readonly senderLabel: string;
+  readonly body: string;
+  readonly timestampLabel: string;
+  /** System-generated events (escalation, status change) rendered differently. */
+  readonly isSystem?: boolean;
+};
+
+export type DshSupportTicket = {
+  readonly ticketId: string;
+  readonly ticketCode: string;
+  readonly subject: string;
+  readonly status: DshSupportTicketStatus;
+  readonly priorityLabel: string;
+  readonly actorKind: DshSupportTicketActorKind;
+  readonly actorName: string;
+  /** Type of the linked entity: order, catalog item, delivery, captain assignment, or generic. */
+  readonly entityType: 'order' | 'catalog' | 'delivery' | 'assignment' | 'general';
+  readonly entityId?: string;
+  /** Which CP queue owns this ticket's resolution path. */
+  readonly ownerQueue: 'support' | 'finance' | 'catalogs' | 'operations' | 'partner-management';
+  readonly slaLabel: string;
+  readonly slaRisk: 'on-track' | 'at-risk' | 'breached';
+  readonly escalationOwner?: DshOperationsSupportEscalationOwner;
+  readonly messagesPreview: ReadonlyArray<DshSupportTicketMessage>;
+  readonly allowedActions: ReadonlyArray<string>;
+  readonly auditRequired: boolean;
+  readonly createdAtLabel: string;
+  readonly flowId?: DshOperationsSupportFlowId;
+};
+
+const TICKET_STATUS_LABELS: Record<DshSupportTicketStatus, string> = {
+  'open': 'مفتوح',
+  'in-review': 'قيد المراجعة',
+  'escalated': 'مصعَّد',
+  'resolved': 'تم الحل',
+  'closed': 'مغلق',
+  'sla-breach': 'انتهاك SLA',
+};
+
+const TICKET_STATUS_TONES: Record<
+  DshSupportTicketStatus,
+  'default' | 'success' | 'danger' | 'warning' | 'brand'
+> = {
+  'open': 'default',
+  'in-review': 'brand',
+  'escalated': 'danger',
+  'resolved': 'success',
+  'closed': 'default',
+  'sla-breach': 'danger',
+};
+
+export function getDshSupportTicketStatusLabel(status: DshSupportTicketStatus): string {
+  return TICKET_STATUS_LABELS[status];
+}
+
+export function getDshSupportTicketStatusTone(
+  status: DshSupportTicketStatus,
+): 'default' | 'success' | 'danger' | 'warning' | 'brand' {
+  return TICKET_STATUS_TONES[status];
+}
+
+/** Demo ticket registry — preview only. All data is fictional placeholder content. */
+export const DSH_DEMO_SUPPORT_TICKETS: ReadonlyArray<DshSupportTicket> = [
+  {
+    ticketId: 'TKT-001',
+    ticketCode: '#TKT-001',
+    subject: 'تعذّر تسليم الطلب ORD-4401',
+    status: 'escalated',
+    priorityLabel: 'عالية',
+    actorKind: 'client',
+    actorName: 'محمد العتيبي',
+    entityType: 'order',
+    entityId: 'ORD-4401',
+    ownerQueue: 'support',
+    slaLabel: 'يتبقى 8 دقائق',
+    slaRisk: 'at-risk',
+    escalationOwner: 'control-panel',
+    createdAtLabel: '2026-05-21 10:43',
+    flowId: 'delivery-failed',
+    allowedActions: ['متابعة التذكرة', 'فتح سجل التصعيد', 'مراجعة الأدلة'],
+    auditRequired: true,
+    messagesPreview: [
+      {
+        id: 'msg-001',
+        senderKind: 'client',
+        senderLabel: 'محمد العتيبي',
+        body: 'الكابتن لم يتواصل منذ 20 دقيقة والطلب لم يصل بعد.',
+        timestampLabel: '10:43 ص',
+      },
+      {
+        id: 'msg-002',
+        senderKind: 'ops',
+        senderLabel: 'فريق الدعم',
+        body: 'تم استلام بلاغك. نتابع مع الكابتن الآن.',
+        timestampLabel: '10:46 ص',
+      },
+      {
+        id: 'msg-003',
+        senderKind: 'ops',
+        senderLabel: 'النظام',
+        body: 'تم تصعيد الحالة — سيتواصل معك فريق الدعم خلال 5 دقائق.',
+        timestampLabel: '10:51 ص',
+        isSystem: true,
+      },
+    ],
+  },
+  {
+    ticketId: 'TKT-002',
+    ticketCode: '#TKT-002',
+    subject: 'مشكلة كتالوج — باركود غير مرتبط',
+    status: 'in-review',
+    priorityLabel: 'متوسطة',
+    actorKind: 'partner',
+    actorName: 'مطعم النجوم',
+    entityType: 'catalog',
+    entityId: 'CAT-881',
+    ownerQueue: 'catalogs',
+    slaLabel: 'يتبقى ساعتان',
+    slaRisk: 'on-track',
+    escalationOwner: 'control-panel',
+    createdAtLabel: '2026-05-21 09:15',
+    flowId: 'catalog-barcode-issue',
+    allowedActions: ['مراجعة الكتالوج', 'طلب إثبات ميداني', 'تصعيد لقسم الكتالوجات'],
+    auditRequired: false,
+    messagesPreview: [
+      {
+        id: 'msg-004',
+        senderKind: 'partner',
+        senderLabel: 'مطعم النجوم',
+        body: 'باركود المنتج CAT-881-SKU-04 لم يُربط بالكتالوج الرئيسي بعد الإدخال الميداني.',
+        timestampLabel: '09:15 ص',
+      },
+      {
+        id: 'msg-005',
+        senderKind: 'ops',
+        senderLabel: 'فريق الدعم',
+        body: 'تم استلام الطلب. نحوّله لقسم الكتالوجات لمراجعة الربط.',
+        timestampLabel: '09:22 ص',
+      },
+    ],
+  },
+  {
+    ticketId: 'TKT-003',
+    ticketCode: '#TKT-003',
+    subject: 'عميل غير متجاوب — محاولة تسليم ORD-4366',
+    status: 'open',
+    priorityLabel: 'متوسطة',
+    actorKind: 'captain',
+    actorName: 'الكابتن ناصر',
+    entityType: 'delivery',
+    entityId: 'ORD-4366',
+    ownerQueue: 'operations',
+    slaLabel: 'ضمن SLA',
+    slaRisk: 'on-track',
+    escalationOwner: 'control-panel',
+    createdAtLabel: '2026-05-21 10:18',
+    flowId: 'customer-not-responding',
+    allowedActions: ['تثبيت محاولة التواصل', 'فتح مسار التصعيد'],
+    auditRequired: false,
+    messagesPreview: [
+      {
+        id: 'msg-006',
+        senderKind: 'captain',
+        senderLabel: 'الكابتن ناصر',
+        body: 'وصلت للعنوان ولا يوجد رد على المكالمات أو الرسائل.',
+        timestampLabel: '10:18 ص',
+      },
+      {
+        id: 'msg-007',
+        senderKind: 'ops',
+        senderLabel: 'فريق الدعم',
+        body: 'حاول مرة أخرى خلال 3 دقائق ثم أبلغنا بالنتيجة.',
+        timestampLabel: '10:20 ص',
+      },
+    ],
+  },
+];
+
+export function getDshSupportTicketById(ticketId: string): DshSupportTicket | undefined {
+  return DSH_DEMO_SUPPORT_TICKETS.find((t) => t.ticketId === ticketId);
+}

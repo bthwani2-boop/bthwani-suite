@@ -18,7 +18,6 @@ import {
 } from './finance.registry';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
-// UI_PREVIEW_ONLY / WAITING_SOURCE_CONTRACT
 import {
   ControlPanelDshFinanceScreen,
   ControlPanelDshPayoutsScreen,
@@ -43,7 +42,7 @@ export type ControlPanelDshFinanceScreenProps = {
   fallbackHref?: string;
 };
 
-// ML-040..045: WLT bridge adapters — read-only, no financial calculations inside DSH
+// WLT bridge adapters — read-only; no financial calculations inside DSH
 function PartnerSettlementBridgePanel(_: { hubHref: string; subGroup?: string }) {
   return <PartnerSettlementWorkspace />;
 }
@@ -65,14 +64,14 @@ function FieldCommissionBridgePanel(_: { hubHref: string; subGroup?: string }) {
 
 const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   overview: ControlPanelDshFinanceScreen,
-  settlements: PartnerSettlementBridgePanel,         // ML-040: partner settlement WLT bridge
-  'cod-reconciliation': CommissionBreakdownBridgePanel, // ML-043: per-order commission breakdown
-  'captain-eligibility': CaptainPayoutBridgePanel,  // ML-041: captain payout WLT bridge
-  refunds: RefundQueueBridgePanel,                   // ML-042: refund queue WLT bridge
-  ledger: FieldCommissionBridgePanel,                // ML-045: field agent commission ledger
+  settlements: PartnerSettlementBridgePanel,         // partner settlement — WLT bridge, view-only
+  'cod-reconciliation': CommissionBreakdownBridgePanel, // per-order commission breakdown — WLT bridge, view-only
+  'captain-eligibility': CaptainPayoutBridgePanel,  // captain payout — WLT bridge, view-only
+  refunds: RefundQueueBridgePanel,                   // refund queue — WLT bridge, view-only
+  ledger: FieldCommissionBridgePanel,                // field agent commission — WLT bridge, view-only
   payouts: ControlPanelDshPayoutsScreen,
   'tax-compliance': ControlPanelDshFinanceScreen,
-  'risk-audit': PlatformFeeAuditBridgePanel,         // ML-044: platform fee audit WLT bridge
+  'risk-audit': PlatformFeeAuditBridgePanel,         // platform fee audit — WLT bridge, view-only
   'captain-finance': ControlPanelDshCaptainFinanceScreen,
   'store-delivery-finance': ControlPanelDshStoreDeliveryFinanceScreen,
 };

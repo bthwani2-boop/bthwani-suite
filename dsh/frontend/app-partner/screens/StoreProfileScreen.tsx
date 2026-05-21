@@ -13,6 +13,11 @@ import {
   useDirection,
   useTheme,
 } from '@bthwani/ui-kit';
+import {
+  type DshPartnerActivationStatus,
+  getDshPartnerActivationStatusLabel,
+  getDshPartnerReadinessChecklist,
+} from '../../shared/dsh-partner-activation.model';
 
 export type StoreProfileScreenProps = {
   storeName: string;
@@ -28,6 +33,9 @@ export type StoreProfileScreenProps = {
   deliveryReadinessLabel?: string;
   coverageSummary?: string;
   publishStage?: string;
+  /** P0-04: Partner activation status from shared SSoT — read-only display.
+   *  app-partner reads this; control-panel/partners is the only activation authority. */
+  activationStatus?: DshPartnerActivationStatus;
   onOpenStoreScope?: () => void;
 };
 
@@ -110,6 +118,7 @@ export function StoreProfileScreen({
   deliveryReadinessLabel,
   coverageSummary,
   publishStage,
+  activationStatus,
   onOpenStoreScope,
 }: StoreProfileScreenProps) {
   const { direction } = useDirection();
@@ -240,8 +249,37 @@ export function StoreProfileScreen({
               { label: 'النطاق الحالي', value: branchLabel },
               { label: 'المنطقة', value: activeZoneLabel },
               { label: 'المعروض للعملاء', value: storeOpen ? 'مؤهل للنشر' : 'موقوف مؤقتًا', tone: storeOpen ? 'success' : 'warning' },
+              ...(activationStatus
+                ? [{ label: 'حالة التفعيل', value: getDshPartnerActivationStatusLabel(activationStatus), tone: activationStatus === 'client_visible' ? ('success' as const) : ('warning' as const) }]
+                : []),
             ]}
           />
+
+          {/* P0-04: Activation readiness checklist — read-only; control-panel owns the activation decision */}
+          {activationStatus ? (() => {
+            const checks = getDshPartnerReadinessChecklist(activationStatus);
+            return (
+              <Surface tone="inset" padding={3} gap={2}>
+                <Text role="caption" tone="muted">شروط الظهور للعملاء — القرار النهائي للعمليات</Text>
+                {checks.map((check) => (
+                  <Box key={check.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+                    <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'}>
+                      {check.satisfied ? '✓' : '✗'}
+                    </Text>
+                    <Box style={{ flex: 1, gap: 2 }}>
+                      <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'}>
+                        {check.label}
+                      </Text>
+                      {!check.satisfied && check.blockedReason ? (
+                        <Text role="caption" tone="muted">{check.blockedReason}</Text>
+                      ) : null}
+                    </Box>
+                  </Box>
+                ))}
+              </Surface>
+            );
+          })() : null}
+
           <Text role="caption" tone="muted">
             يظل اختيار النطاق محليًا داخل نفس السطح، ويمكن ضمه إلى تحديث الهوية والفرع في حفظ واحد.
           </Text>

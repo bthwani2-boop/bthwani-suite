@@ -1,5 +1,5 @@
-// ML-043: CP commission breakdown workspace — per-mode breakdown (WLT bridge — view-only)
-// BLOCKED_BY_WLT: replace placeholder labels with real per-partner rates once WLT exposes commission read endpoint
+// P0-07: CP commission breakdown workspace — per-mode breakdown (WLT bridge — view-only).
+// DSH displays WLT-owned commission structure. No rate computation or mutation inside DSH.
 'use client';
 
 import React from 'react';
@@ -58,9 +58,9 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
 
-            {/* UI_PREVIEW_ONLY watermark */}
+            {/* WLT boundary notice */}
             <Box padding={3} background="warningSurface" radiusToken="md" gap={1}>
-              <Text role="label" style={{ fontWeight: '800', textAlign: 'right' }}>UI_PREVIEW_ONLY</Text>
+              <Text role="label" style={{ fontWeight: '800', textAlign: 'right' }}>معاينة — WLT عرض فقط</Text>
               <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
                 العمولة الحقيقية هي per-partner + per-mode وتُدار بالكامل عبر WLT. لا تُستخدم هذه الشاشة كمصدر مالي أو محاسبي.
               </Text>

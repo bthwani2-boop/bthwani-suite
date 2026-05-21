@@ -1,14 +1,24 @@
-// ML-044: CP platform fee audit workspace skeleton (WLT bridge — view-only)
-// BLOCKED_BY_WLT: implement when WLT exposes platform fee audit read endpoint
+// P0-07: CP platform fee audit workspace — WLT bridge, view-only.
+// DSH displays WLT-owned platform fee data. No fee computation or mutation inside DSH.
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { WltBoundaryBanner } from './WltBoundaryBanner';
+import { buildDshWltFinanceBoundaryRecord } from '../../../shared/dshFinancePreviewModel';
 
 export type PlatformFeeAuditWorkspaceProps = {
   orderId?: string;
 };
 
 export function PlatformFeeAuditWorkspace({ orderId = '—' }: PlatformFeeAuditWorkspaceProps) {
+  const boundaryRecord = buildDshWltFinanceBoundaryRecord({
+    domain: 'platform-fee',
+    contractStatus: 'pending_contract',
+    affectedActor: 'عمليات DSH',
+    affectedEntityId: orderId !== '—' ? orderId : undefined,
+    auditVisibilityRequired: false,
+  });
+
   return (
     <div className={styles.surfaceCockpit}>
       <header className={styles.surfaceTopBar}>
@@ -27,18 +37,15 @@ export function PlatformFeeAuditWorkspace({ orderId = '—' }: PlatformFeeAuditW
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
-            <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
-              <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>ربط WLT معلق</Text>
-              <Text tone="muted">بيانات رسوم المنصة مملوكة من WLT. ستظهر هنا بعد ربط نقطة النهاية.</Text>
-            </Box>
-            <Box gap={2}>
-              {(['رسوم الخدمة', 'رسوم التوصيل', 'رسوم ضريبية', 'الإجمالي'] as const).map((label) => (
-                <Box key={label} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text role="bodySm" tone="muted">{label}</Text>
-                  <Text role="bodySm">— WLT</Text>
-                </Box>
-              ))}
-            </Box>
+            <WltBoundaryBanner record={boundaryRecord} />
+            <KeyValueList
+              items={[
+                { label: 'رسوم الخدمة', value: '— WLT' },
+                { label: 'رسوم التوصيل', value: '— WLT' },
+                { label: 'رسوم ضريبية', value: '— WLT' },
+                { label: 'الإجمالي', value: '— WLT' },
+              ]}
+            />
           </Box>
         </div>
       </main>

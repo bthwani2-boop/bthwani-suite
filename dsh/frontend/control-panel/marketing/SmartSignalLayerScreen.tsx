@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebSignalCard } from '@bthwani/ui-kit/web';
+import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/dsh-signal-layer.model';
 
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;
@@ -19,6 +20,12 @@ export function ControlPanelDshMarketingScreen({
   const navigateTo = React.useCallback((href: string) => {
 		router.push(href);
 	}, [router]);
+
+	// Catalog signals for marketing surface (summaries only — details on explicit open)
+	const catalogSignals = getDshSignalSummaries('control-panel', 'ops').filter(
+		(s) => s.entityType === 'catalog',
+	);
+	const catalogUnreadCount = getDshSignalUnreadCount('control-panel', 'ops');
 
 	return (
 		<Box gap={4}>
@@ -47,12 +54,12 @@ export function ControlPanelDshMarketingScreen({
 				</Box>
 			</Surface>
 
-			{/* Executive KPIs featuring the Favorites Intent Engine */}
+			{/* Executive KPIs — signal-driven counts + static marketing KPIs */}
 			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
 				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="معدل وصول الحملات النشطة" tone="best" />
 				<WebSignalCard title="إشارات الاهتمام (المفضلة)" value="12.4K" description="إشارات نية الشراء التراكمية" tone="best" />
-				<WebSignalCard title="النقرات النشطة" value="45K" description="نقرات على البنرات الذكية" />
-				<WebSignalCard title="صحة الحملات" value="98%" description="مؤشر استقرار العروض" tone="neutral" />
+				<WebSignalCard title="إشارات الكتالوج النشطة" value={String(catalogSignals.length)} description="نشر وإعتماد منتجات في طبقة الإشارات" />
+				<WebSignalCard title="إشارات غير مقروءة" value={String(catalogUnreadCount)} description="إشارات تستلزم مراجعة أو إجراء" tone="neutral" />
 			</Box>
 
 			{/* Comprehensive Multi-Surface Favorites Engine Analytics */}

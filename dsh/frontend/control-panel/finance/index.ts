@@ -23,7 +23,8 @@ export {
   ControlPanelDshStoreDeliveryFinanceScreen,
 } from './FinanceHubScreens';
 
-// ML-040..ML-045: WLT bridge workspace skeletons — BLOCKED_BY_WLT (bridge contracts not proven)
+// WLT bridge workspaces — view-only surfaces; all financial truth owned by WLT
+export { WltBoundaryBanner } from './WltBoundaryBanner';
 export { PartnerSettlementWorkspace } from './PartnerSettlementWorkspace';
 export { CaptainPayoutWorkspace } from './CaptainPayoutWorkspace';
 export { RefundQueueWorkspace } from './RefundQueueWorkspace';

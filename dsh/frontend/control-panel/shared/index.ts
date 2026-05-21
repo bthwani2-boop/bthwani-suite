@@ -6,6 +6,7 @@ export {
 	translateDshRuntimeBindingStatus,
 	type DshActor,
 	type DshClosureArea,
+	type DshClosureProofStatus,
 	type DshClosureStatus,
 	type DshCounterpartLink,
 	type DshCrossSurfaceClosureItem,
