@@ -1,3 +1,18 @@
+/**
+ * Registry alignment — Phase 1 (DSH_PHASE_1_FLOW_REGISTRY-20260521-054141)
+ *
+ * Every ID in DSH_PARTNER_OPERATIONAL_FLOW_IDS has a corresponding entry in:
+ *   dsh/frontend/shared/dsh-flow-registry.ts → DSH_FLOW_REGISTRY
+ *
+ * This file remains the authoritative source for partner-surface route mapping
+ * and the DSH_PARTNER_SUPPORT_ROUTE_TO_OPERATIONAL_FLOW / reverse mappings.
+ * Hidden-compat flows are listed in DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS;
+ * they must NOT be rendered as primary navigation entries.
+ *
+ * Finance-preview flows (partner-finance-bridge, partner-settlement-summary,
+ * partner-commission-summary) are financialImpact=true in the registry.
+ * They remain preview-only — no mutation from DSH.
+ */
 export const DSH_PARTNER_OPERATIONAL_FLOW_IDS = [
   'order-accept',
   'order-get',

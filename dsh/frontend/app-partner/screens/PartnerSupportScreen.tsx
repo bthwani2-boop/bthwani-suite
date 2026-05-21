@@ -25,6 +25,10 @@ import type {
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
 import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
+// [REGISTRY Phase 1] — isDshHiddenCompatFlow guards hidden-compat flows (auction-status-update,
+// order-rejection, order-alerts, order-sla-risk, partner-finance-bridge, etc.).
+// Use getDshVisibleFlowsForSurface('app-partner') for any dynamic visible-flow list.
+import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 
@@ -80,14 +84,14 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     compactStatusTone: 'danger',
     slaLabel: 'يتبقى 6 دقائق',
     nextActionLabel: 'ثبّت التحضير أو أعلن التأخير بوضوح',
-    linkedFlowId: 'order-sla-risk',
+    linkedFlowId: 'order-sla-risk', // [REGISTRY: hidden-compat — isDshHiddenCompatFlow('order-sla-risk')===true; do not navigate to it as a primary route]
     linkedSupportRoute: 'order-prepare',
     filterIds: ['active-orders', 'order-issues', 'escalation'],
     linkedParties: ['الفرع', 'الدعم', 'العميل'],
     timeline: ['10:42 ص وصل الطلب', '10:48 ص بدأ التحضير', '10:56 ص ظهرت إشارة تأخير'],
     nextDecision: 'إكمال التحضير الآن أو فتح تعويض زمني تشغيلي فقط.',
     operationalNote: 'لا تفتح استردادًا محليًا. المطلوب الآن قرار تشغيل ثم تحديث واضح داخل نفس السياق.',
-    previewTags: ['order-alerts'],
+    previewTags: ['order-alerts'], // [REGISTRY: hidden-compat — order-alerts is contextual tag only; isDshHiddenCompatFlow('order-alerts')===true]
     hasSlaRisk: true,
     requiresDecision: true,
     activeOrder: true,
@@ -102,7 +106,7 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     compactStatusTone: 'warning',
     slaLabel: 'خلال 4 دقائق',
     nextActionLabel: 'عدّل المخزون أو افتح بديلًا واضحًا',
-    linkedFlowId: 'order-issue-required',
+    linkedFlowId: 'order-issue-required', // [REGISTRY: hidden-compat — isDshHiddenCompatFlow('order-issue-required')===true; use order-issue-queue for new flows]
     linkedSupportRoute: 'inventory-adjust',
     filterIds: ['active-orders', 'order-issues', 'inventory-branch'],
     linkedParties: ['الفرع', 'العميل', 'الدعم'],
@@ -130,7 +134,7 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     timeline: ['10:10 ص وصل الطلب', '10:15 ص تعذّر التنفيذ', '10:17 ص رُفع طلب الرفض'],
     nextDecision: 'إما تثبيت سبب رفض واضح أو إعادة الطلب إلى التحضير إذا زال العائق.',
     operationalNote: 'الرفض لا يصبح خطوة صامتة. يجب أن يبقى داخل مسار واضح مع سبب معلن.',
-    previewTags: ['order-rejection hidden route'],
+    previewTags: ['order-rejection hidden route'], // [REGISTRY: hidden-compat — isDshHiddenCompatFlow('order-rejection')===true; use order-reject flow instead]
     allowRejectCancel: true,
     requiresDecision: true,
     activeOrder: true,
@@ -145,7 +149,7 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     compactStatusTone: 'brand',
     slaLabel: '12 دقيقة انتظار',
     nextActionLabel: 'راجع handoff واطلب إثبات الوصول',
-    linkedFlowId: 'order-alerts',
+    linkedFlowId: 'order-alerts', // [REGISTRY: hidden-compat — isDshHiddenCompatFlow('order-alerts')===true; contextual tag only, not a primary route]
     linkedSupportRoute: 'order-handoff',
     filterIds: ['active-orders', 'escalation'],
     linkedParties: ['الفرع', 'الكابتن', 'الدعم'],
@@ -252,7 +256,7 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     compactStatusTone: 'info',
     slaLabel: 'مراجعة bridge فقط',
     nextActionLabel: 'حوّل الحالة للقراءة فقط داخل bridge المالي',
-    linkedFlowId: 'partner-finance-bridge',
+    linkedFlowId: 'partner-finance-bridge', // [REGISTRY: hidden-compat, financialImpact=true, finance-preview-only — isDshHiddenCompatFlow('partner-finance-bridge')===true; NO mutation from DSH]
     filterIds: ['order-issues', 'escalation'],
     linkedParties: ['الدعم', 'WLT', 'الفرع'],
     timeline: ['09:21 ص أُبلغ عن أثر مالي', '09:24 ص وُسمت الحالة كـ preview review'],

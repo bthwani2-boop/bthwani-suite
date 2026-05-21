@@ -342,6 +342,26 @@ export {
 // --- Shared Media Resolver ---
 export { resolveDshImageSource } from './resolve-dsh-image-source';
 
+// --- DSH Flow Registry — Phase 1 Baseline (DSH_PHASE_1_FLOW_REGISTRY-20260521-054141) ---
+// Single canonical cross-surface registry: ownership · visibility · escalation · on-demand policy.
+// See dsh-flow-registry.ts for full authoring notes and forbidden-action contract.
+export type {
+  DshSurfaceId,
+  DshFlowDomain,
+  DshFlowVisibility,
+  DshOnDemandPolicy,
+  DshFlowRegistryEntry,
+} from './dsh-flow-registry';
+export {
+  DSH_FLOW_REGISTRY,
+  getDshFlowById,
+  getDshFlowsForSurface,
+  getDshVisibleFlowsForSurface,
+  isDshHiddenCompatFlow,
+  getDshEscalationFlows,
+  getDshFinancePreviewFlows,
+} from './dsh-flow-registry';
+
 // --- DSH Order Journey Shared Model ---
 export type {
 	DshOrderJourneyStageId,

@@ -1,0 +1,65 @@
+{
+  "decision": "READY_FOR_PHASE_1_PROMPT",
+  "session_id": "DSH_PHASE_0_SYSTEM_AUDIT-20260521-022034",
+  "source_zip": "/mnt/data/bthwani-suite-ghb-0162-20260521-013004-dsh-ui-kit.zip",
+  "repo": "bthwani2-boop/bthwani-suite",
+  "local_repo_expected": "C:\\bthwani-suite",
+  "branch_inspected_from_filename": "ghb/0162-20260521-013004-dsh-ui-kit",
+  "commit_sha": "TBD_NO_GIT_METADATA_IN_ZIP",
+  "read_only": true,
+  "files_scanned": 479,
+  "surfaces_scanned": [
+    "app-client",
+    "app-partner",
+    "app-captain",
+    "app-field",
+    "control-panel",
+    "shared",
+    "dsh-docs",
+    "wlt-finance",
+    "ui-kit"
+  ],
+  "findings_by_severity": {
+    "HIGH": 6,
+    "MEDIUM": 1
+  },
+  "csv_outputs": [
+    "dsh-surface-inventory.csv",
+    "dsh-flow-inventory.csv",
+    "dsh-route-reachability.csv",
+    "dsh-cross-surface-consistency.csv",
+    "dsh-ui-ux-audit.csv",
+    "dsh-on-demand-audit.csv",
+    "dsh-control-panel-alignment.csv",
+    "dsh-priority-roadmap.csv"
+  ],
+  "limitations": [
+    "Static audit over uploaded zip snapshot, not runtime execution.",
+    "No .git metadata in zip; commit SHA and git diff are TBD.",
+    "No pnpm install/tsc/guards run in sandbox.",
+    "Reachability is static heuristic and must be verified locally in Phase 1."
+  ],
+  "recommended_phase_1": "DSH Shared Flow Registry + Route Reachability Baseline",
+  "command_outputs_summary": {
+    "git": "BLOCKED_NOT_GIT_REPOSITORY_IN_EXTRACTED_ZIP",
+    "tsc": "NOT_RUN_PNPM_PERMISSION_DENIED_IN_SANDBOX",
+    "guards": "NOT_RUN_PNPM_PERMISSION_DENIED_IN_SANDBOX",
+    "guard_scripts_declared_in_package_json": [
+      "guard:i18n-direction",
+      "guard:i18n-direction:mobile-control-panel",
+      "guard:service-blueprint",
+      "guard:test-coverage",
+      "guard:binding-proof",
+      "guard:patch-review",
+      "guard:visual",
+      "guard:rtl-visual",
+      "guard:secret-scan",
+      "guard:runtime-smoke",
+      "guard:protected-tokens",
+      "guard:tamagui-law",
+      "guard:tamagui-import-boundary",
+      "guard:governance",
+      "guard:agent"
+    ]
+  }
+}
