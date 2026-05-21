@@ -3,6 +3,10 @@ import { Box, KeyValueList, ListItem, SectionHeader, Surface, Text, TextField, B
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../data/captain-orders.preview-data';
 import type { DshCaptainProfileSnapshot } from '../data/captain-profile.preview-data';
+import {
+	getOperationsSupportFlowsForSurface,
+	type DshOperationsSupportFlowId,
+} from '../../shared/operations-support.preview';
 
 type DshCaptainFlowKey = 'entry' | 'orders' | 'finance' | 'profile' | 'operations';
 
@@ -239,6 +243,24 @@ const SUPPORT_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string; 
 	{ id: 'map', title: 'خريطة الحرارة', subtitle: 'راجع مناطق الطلب المرتفع لتمركز أفضل.', badgeLabel: 'خريطة' },
 ];
 
+const captainSupportFlowToScreenId: Partial<Record<DshOperationsSupportFlowId, CaptainSupportScreenId>> = {
+	'courier-not-arrived': 'order-pickup',
+	'customer-not-responding': 'chat-send',
+	'handoff-mismatch': 'order-pickup',
+	'delivery-failed': 'order-deliver',
+	'proof-of-delivery': 'proof-upload',
+	'store-wait-time': 'order-pickup',
+};
+
+const CAPTAIN_OPERATIONAL_SUPPORT_ITEMS = getOperationsSupportFlowsForSurface('app-captain').map((flow) => ({
+	flowId: flow.flowId,
+	title: flow.title,
+	subtitle: flow.description,
+	meta: `المالك: ${flow.ownerLabel} · التالي: ${flow.nextAction}`,
+	badgeLabel: flow.severity === 'danger' ? 'حرج' : flow.severity === 'warning' ? 'يتطلب قرارًا' : 'متابعة',
+	screenId: captainSupportFlowToScreenId[flow.flowId] ?? 'orders-list',
+}));
+
 function resolvePrimaryActionScreen(stage: DshCaptainOrderStage): CaptainSupportScreenId {
 	if (stage === 'offer') {
 		return 'order-accept';
@@ -377,6 +399,25 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 							meta="افتح أداة دعم مرتبطة بالمهمة الحالية فقط"
 							badgeLabel={item.badgeLabel}
 							onPress={() => onOpenScreen?.(item.id)}
+						/>
+					))}
+				</Box>
+			</Surface>
+
+			<Surface tone="raised" gap={3}>
+				<SectionHeader
+					title="حالات التنفيذ والدعم"
+					subtitle="الكابتن يرى فقط handoff والتسليم والإثبات وما يمنع إغلاق الرحلة، وليس مشاكل الشريك الداخلية."
+				/>
+				<Box gap={2}>
+					{CAPTAIN_OPERATIONAL_SUPPORT_ITEMS.map((item) => (
+						<ListItem
+							key={item.flowId}
+							title={item.title}
+							subtitle={item.subtitle}
+							meta={item.meta}
+							badgeLabel={item.badgeLabel}
+							onPress={() => onOpenScreen?.(item.screenId)}
 						/>
 					))}
 				</Box>

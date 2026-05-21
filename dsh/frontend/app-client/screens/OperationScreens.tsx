@@ -16,6 +16,11 @@ import {
   spacing,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
+import {
+  getOperationsSupportFlowsForSurface,
+  getOperationsSupportSurfaceEntry,
+  type DshOperationsSupportFlowId,
+} from '../../shared/operations-support.preview';
 
 const clientOperationScreenIds = [
   'awnak-order-create',
@@ -710,20 +715,19 @@ type DshOrderIssueHubScreenProps = {
 };
 
 export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshOrderIssueHubScreenProps) {
-  const [selectedIssue, setSelectedIssue] = React.useState<string | null>(null);
+  const [selectedIssue, setSelectedIssue] = React.useState<DshOperationsSupportFlowId | null>(null);
   const [detailsText, setDetailsText] = React.useState('');
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const { theme } = useTheme();
-
-  const issueTypes = [
-    { id: 'not_received', label: 'لم أستلم الطلب' },
-    { id: 'captain_not_arrived', label: 'الكابتن لم يصل' },
-    { id: 'missing_items', label: 'الطلب ناقص' },
-    { id: 'damaged_product', label: 'المنتج تالف' },
-    { id: 'huge_delay', label: 'تأخر كبير' },
-    { id: 'payment_issue', label: 'مشكلة دفع' },
-    { id: 'other', label: 'أخرى' },
-  ];
+  const issueTypes = React.useMemo(
+    () =>
+      getOperationsSupportFlowsForSurface('app-client').filter((item) => {
+        const visibility = getOperationsSupportSurfaceEntry(item.flowId, 'app-client');
+        return visibility?.routeHint === 'order-issue-workspace';
+      }),
+    [],
+  );
+  const selectedFlow = selectedIssue ? issueTypes.find((item) => item.flowId === selectedIssue) ?? null : null;
 
   if (isSubmitted) {
     return (
@@ -753,7 +757,11 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
           <KeyValueList
             dense
             items={[
-              { label: 'نوع المشكلة', value: issueTypes.find(i => i.id === selectedIssue)?.label ?? '' },
+              { label: 'نوع المشكلة', value: selectedFlow?.title ?? '' },
+              { label: 'الإجراء التالي', value: selectedFlow?.nextAction ?? 'بانتظار المراجعة', tone: 'brand' },
+              ...(selectedFlow?.financialImpactPreview
+                ? [{ label: 'الأثر المالي Preview', value: selectedFlow.financialImpactPreview, tone: 'info' as const }]
+                : []),
               { label: 'تفاصيل إضافية', value: detailsText.trim() || 'لا يوجد تفاصيل إضافية' },
             ]}
           />
@@ -771,7 +779,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
     );
   }
 
-  const handleIssuePress = (id: string) => {
+  const handleIssuePress = (id: DshOperationsSupportFlowId) => {
     setSelectedIssue(selectedIssue === id ? null : id);
   };
 
@@ -786,7 +794,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       <Box gap={1} style={{ alignItems: 'flex-end', marginBottom: 8 }}>
         <Text role="titleLg" style={{ textAlign: 'right' }}>الدعم والمساعدة</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          اختر نوع المشكلة في طلبك.
+          دعم العميل يبقى داخل الطلب الحالي فقط. اختر نوع المشكلة ثم أضف ملاحظة مختصرة عند الحاجة.
         </Text>
       </Box>
 
@@ -796,18 +804,35 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
 
         <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {issueTypes.map((issue) => {
-            const isSelected = selectedIssue === issue.id;
+            const isSelected = selectedIssue === issue.flowId;
             return (
               <Chip
-                key={issue.id}
-                label={issue.label}
+                key={issue.flowId}
+                label={issue.title}
                 tone={isSelected ? 'brand' : 'default'}
-                onPress={() => handleIssuePress(issue.id)}
+                onPress={() => handleIssuePress(issue.flowId)}
               />
             );
           })}
         </Box>
       </Surface>
+
+      {selectedFlow ? (
+        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 20 }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{selectedFlow.title}</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+            {selectedFlow.description}
+          </Text>
+          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+            {`الإجراء التالي: ${selectedFlow.nextAction}`}
+          </Text>
+          {selectedFlow.financialImpactPreview ? (
+            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+              {`Preview only: ${selectedFlow.financialImpactPreview}`}
+            </Text>
+          ) : null}
+        </Surface>
+      ) : null}
 
       {/* Details field */}
       <Surface tone="raised" padding={3} gap={2} style={{ borderRadius: 20 }}>

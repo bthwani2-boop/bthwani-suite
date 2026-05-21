@@ -32,6 +32,15 @@ import {
   type FieldStoreFile,
 } from '../data/field-stores.preview-data';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
+import { getOperationsSupportFlowsForSurface } from '../../shared/operations-support.preview';
+
+const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');
+const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
+  (item) => item.flowId === 'catalog-barcode-issue' || item.flowId === 'store-nomination-intake',
+);
+const FIELD_REVIEW_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
+  (item) => item.flowId === 'field-proof-required' || item.flowId === 'branch-readiness-escalation',
+);
 
 // ML-005: added activated/exit states so field knows when onboarding is complete
 export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
@@ -220,6 +229,18 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
           <TextField label="اسم المنتج الافتتاحي" value={draft.products.featuredProductName} editable={!readOnly} onChangeText={(value) => updateNestedField('products', 'featuredProductName', value)} />
           <TextField label="سعر المنتج الافتتاحي" value={draft.products.featuredProductPrice} editable={!readOnly} keyboardType="decimal-pad" onChangeText={(value) => updateNestedField('products', 'featuredProductPrice', value)} />
           <TextField label="ملاحظة الكتالوج المختصرة" value={draft.products.sampleCatalogNote} editable={!readOnly} onChangeText={(value) => updateNestedField('products', 'sampleCatalogNote', value)} />
+
+          <Card title="مسارات الكتالوج والباركود" subtitle="تبقى هذه المشاكل داخل onboarding والكتالوج الميداني فقط، ولا تتحول إلى مركز عمليات الشريك.">
+            <Box gap={2}>
+              {FIELD_PRODUCT_OPERATION_FLOWS.map((flow) => (
+                <Box key={flow.flowId} gap={1}>
+                  <Text role="bodyStrong" style={{ textAlign: 'right' }}>{flow.title}</Text>
+                  <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{flow.description}</Text>
+                  <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{`التالي: ${flow.nextAction}`}</Text>
+                </Box>
+              ))}
+            </Box>
+          </Card>
         </Surface>
       );
     }
@@ -285,6 +306,18 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{store.reviewFeedback}</Text>
           </Card>
         ) : null}
+
+        <Card title="التحقق والتصعيد" subtitle="الإثباتات والتصعيد تبقى on-demand فقط، والقرار النهائي يملكه control-panel عند الحاجة.">
+          <Box gap={2}>
+            {FIELD_REVIEW_OPERATION_FLOWS.map((flow) => (
+              <Box key={flow.flowId} gap={1}>
+                <Text role="bodyStrong" style={{ textAlign: 'right' }}>{flow.title}</Text>
+                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{flow.description}</Text>
+                <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{`التالي: ${flow.nextAction}`}</Text>
+              </Box>
+            ))}
+          </Box>
+        </Card>
       </Surface>
     );
   };

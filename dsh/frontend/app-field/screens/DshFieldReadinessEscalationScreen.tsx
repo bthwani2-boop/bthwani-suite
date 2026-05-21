@@ -16,6 +16,10 @@ import {
   radius,
   Icon,
 } from '@bthwani/ui-kit';
+import {
+  getOperationsSupportFlowPreview,
+  getOperationsSupportFlowsForSurface,
+} from '../../shared/operations-support.preview';
 
 export type DshFieldReadinessEscalationScreenProps = {
   // ML-004: added pending-response / approved / rejected states for ops response tracking
@@ -48,6 +52,10 @@ export function DshFieldReadinessEscalationScreen({
   onRetry,
 }: DshFieldReadinessEscalationScreenProps) {
   const [reason, setReason] = React.useState('');
+  const readinessFlow = getOperationsSupportFlowPreview('branch-readiness-escalation');
+  const fieldFollowUpFlows = getOperationsSupportFlowsForSurface('app-field').filter(
+    (item) => item.flowId === 'branch-readiness-escalation' || item.flowId === 'field-proof-required',
+  );
 
   if (state === 'pending-response') {
     return (
@@ -125,6 +133,31 @@ export function DshFieldReadinessEscalationScreen({
           <Text role="bodyStrong" style={{ color: colorPalette.white }}>المتطلبات الناقصة:</Text>
           {missingRequirements.map((req, index) => (
             <Text key={index} role="caption" style={{ color: colorPalette.white }}>• {req}</Text>
+          ))}
+        </Box>
+      </Surface>
+
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
+          title={readinessFlow.title}
+          subtitle="هذا التصعيد يبقى field-owned في التجميع، لكن مالك القرار والسياسة هو control-panel."
+        />
+        <KeyValueList
+          items={[
+            { label: 'المالك الحالي', value: readinessFlow.ownerLabel, tone: 'brand' },
+            { label: 'مالك التصعيد', value: readinessFlow.escalationOwnerLabel },
+            { label: 'الإجراء التالي', value: readinessFlow.nextAction, tone: 'brand' },
+          ]}
+        />
+        <Box gap={2}>
+          {fieldFollowUpFlows.map((flow) => (
+            <ListItem
+              key={flow.flowId}
+              title={flow.title}
+              subtitle={flow.description}
+              meta={flow.nextAction}
+              badgeLabel={flow.requiresEvidence ? 'يتطلب إثباتًا' : 'متابعة'}
+            />
           ))}
         </Box>
       </Surface>

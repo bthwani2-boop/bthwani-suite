@@ -24,6 +24,7 @@ import type {
   DshPartnerSupportRouteId,
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
+import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 
@@ -35,7 +36,6 @@ type OperationsSupportCase = {
   summary: string;
   compactStatusLabel: string;
   compactStatusTone: 'brand' | 'warning' | 'danger' | 'info' | 'success';
-  ownerActor: 'شريك' | 'كابتن' | 'عميل' | 'دعم' | 'ميداني' | 'دعم / WLT';
   slaLabel: string;
   nextActionLabel: string;
   linkedFlowId?: DshPartnerOperationalFlowId;
@@ -78,7 +78,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'التحضير تجاوز الحد المتوقع ويهدد وقت التسليم إذا لم يُتخذ قرار الآن.',
     compactStatusLabel: 'خطر SLA',
     compactStatusTone: 'danger',
-    ownerActor: 'شريك',
     slaLabel: 'يتبقى 6 دقائق',
     nextActionLabel: 'ثبّت التحضير أو أعلن التأخير بوضوح',
     linkedFlowId: 'order-sla-risk',
@@ -101,7 +100,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'عنصر أساسي غير متاح ويحتاج تعديل مخزون أو بديل قبل تثبيت الطلب.',
     compactStatusLabel: 'مخزون',
     compactStatusTone: 'warning',
-    ownerActor: 'شريك',
     slaLabel: 'خلال 4 دقائق',
     nextActionLabel: 'عدّل المخزون أو افتح بديلًا واضحًا',
     linkedFlowId: 'order-issue-required',
@@ -123,7 +121,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'الفرع يطلب رفض الطلب بسبب تعذّر التنفيذ ويحتاج سببًا تشغيليًا صريحًا.',
     compactStatusLabel: 'قرار',
     compactStatusTone: 'danger',
-    ownerActor: 'شريك',
     slaLabel: 'يتطلب قرارًا الآن',
     nextActionLabel: 'راجع السبب ثم افتح مسار الرفض عند الضرورة فقط',
     linkedFlowId: 'order-reject',
@@ -146,7 +143,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'الطلب جاهز لكن handoff لم يكتمل لأن جهة الالتقاط لم تصل بعد.',
     compactStatusLabel: 'handoff',
     compactStatusTone: 'brand',
-    ownerActor: 'كابتن',
     slaLabel: '12 دقيقة انتظار',
     nextActionLabel: 'راجع handoff واطلب إثبات الوصول',
     linkedFlowId: 'order-alerts',
@@ -169,7 +165,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'التواصل مطلوب لتأكيد العنوان أو وقت التسليم، لكن آخر المحاولات بلا رد.',
     compactStatusLabel: 'محادثة',
     compactStatusTone: 'info',
-    ownerActor: 'عميل',
     slaLabel: 'محاولة أخيرة خلال 3 دقائق',
     nextActionLabel: 'افتح المحادثة واطلب إثبات محاولة التواصل',
     linkedFlowId: 'order-chat-send',
@@ -192,7 +187,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'هناك تضارب بين جهة الالتقاط وحالة الخروج، ويجب تثبيت handoff الصحيح قبل المتابعة.',
     compactStatusLabel: 'Mismatch',
     compactStatusTone: 'danger',
-    ownerActor: 'شريك',
     slaLabel: 'تثبيت فوري',
     nextActionLabel: 'افتح handoff واطلب إثباتًا قصيرًا',
     linkedFlowId: 'order-handoff',
@@ -215,7 +209,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'التحقق الأخير كشف عنصرًا غير مطابق ويجب إيقاف التسليم إلى حين المراجعة.',
     compactStatusLabel: 'مطابقة',
     compactStatusTone: 'warning',
-    ownerActor: 'شريك',
     slaLabel: 'قبل handoff',
     nextActionLabel: 'راجع العنصر واطلب إثباتًا بصريًا',
     linkedFlowId: 'order-issue-queue',
@@ -237,7 +230,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'آخر تحديث من العميل أو الدعم يحتاج ردًا من الفرع لتثبيت القرار التالي.',
     compactStatusLabel: 'Reply',
     compactStatusTone: 'info',
-    ownerActor: 'شريك',
     slaLabel: 'رد خلال دقيقتين',
     nextActionLabel: 'افتح المحادثة أو استخدم ردًا سريعًا',
     linkedFlowId: 'order-quick-reply-config',
@@ -258,7 +250,6 @@ const operationsSupportCases: readonly OperationsSupportCase[] = [
     summary: 'هناك أثر مالي محتمل على الطلب، لكن هذه الشاشة تعرض tag تشغيليًا فقط دون أي money mutation.',
     compactStatusLabel: 'WLT Preview',
     compactStatusTone: 'info',
-    ownerActor: 'دعم / WLT',
     slaLabel: 'مراجعة bridge فقط',
     nextActionLabel: 'حوّل الحالة للقراءة فقط داخل bridge المالي',
     linkedFlowId: 'partner-finance-bridge',
@@ -351,6 +342,7 @@ function CommandCenterCaseCard({
   actionFeedback,
 }: CommandCenterCaseCardProps) {
   const { direction } = useDirection();
+  const flowPreview = getOperationsSupportFlowPreview(item.issueCategoryId);
   const category = getPartnerOrderIssueCategorySpec(item.issueCategoryId);
   const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
@@ -397,8 +389,11 @@ function CommandCenterCaseCard({
             </Text>
 
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-              <Chip label={item.ownerActor} tone="brand" />
+              <Chip label={flowPreview.ownerLabel} tone="brand" />
               <Chip label={item.slaLabel} tone={item.hasSlaRisk ? 'danger' : 'warning'} />
+              {flowPreview.financialImpactPreview ? (
+                <Chip label="أثر مالي Preview" tone="info" />
+              ) : null}
               {item.previewTags?.map((tag) => (
                 <Chip key={tag} label={tag} tone="info" />
               ))}
@@ -429,10 +424,19 @@ function CommandCenterCaseCard({
             items={[
               { label: 'مرجع الطلب', value: item.orderRef, tone: 'brand' },
               { label: 'سبب المشكلة', value: category.title, tone: item.compactStatusTone },
-              { label: 'الطرف المسؤول', value: item.ownerActor },
+              { label: 'الطرف المسؤول', value: flowPreview.ownerLabel },
               { label: 'القرار التالي', value: item.nextDecision, tone: 'brand' },
             ]}
           />
+
+          {flowPreview.financialImpactPreview ? (
+            <Surface tone="default" padding={3} gap={2}>
+              <Text role="bodyStrong">الأثر المالي Preview</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign }}>
+                {flowPreview.financialImpactPreview}
+              </Text>
+            </Surface>
+          ) : null}
 
           <Surface tone="default" padding={3} gap={2}>
             <Text role="bodyStrong">الأطراف المرتبطة</Text>

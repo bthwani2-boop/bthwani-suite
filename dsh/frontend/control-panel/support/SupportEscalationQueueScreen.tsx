@@ -6,6 +6,7 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
+import { getOperationsSupportFlowsForSurface } from '../../shared/operations-support.preview';
 
 type EscalationRow = {
   id: string;
@@ -18,10 +19,24 @@ type EscalationRow = {
   risk: 'danger' | 'warning' | 'neutral';
 };
 
-const placeholderRows: readonly EscalationRow[] = [
-  { id: 'esc-001', ticketCode: '#TKT-892', subject: 'طلب لم يصل منذ 3 ساعات', actorKind: 'client', actorName: 'نوف العتيبي', escalatedAtLabel: 'قبل 45 دقيقة', slaLabel: '15 دقيقة', risk: 'danger' },
-  { id: 'esc-002', ticketCode: '#TKT-877', subject: 'شريك يرفض الطلبات', actorKind: 'partner', actorName: 'مطعم الساحة', escalatedAtLabel: 'قبل 90 دقيقة', slaLabel: '60 دقيقة', risk: 'warning' },
-];
+const placeholderRows: readonly EscalationRow[] = getOperationsSupportFlowsForSurface('control-panel')
+  .filter((flow) => flow.escalationOwner === 'control-panel' && flow.severity !== 'success')
+  .slice(0, 4)
+  .map((flow, index) => ({
+    id: `esc-${index + 1}`,
+    ticketCode: `#TKT-${890 + index}`,
+    subject: flow.title,
+    actorKind:
+      flow.ownerSurface === 'app-partner'
+        ? 'partner'
+        : flow.ownerSurface === 'app-captain'
+          ? 'captain'
+          : 'client',
+    actorName: flow.ownerLabel,
+    escalatedAtLabel: index === 0 ? 'قبل 45 دقيقة' : index === 1 ? 'قبل 30 دقيقة' : 'قبل 15 دقيقة',
+    slaLabel: flow.severity === 'danger' ? '15 دقيقة' : '60 دقيقة',
+    risk: flow.severity === 'danger' ? 'danger' : 'warning',
+  }));
 
 export type SupportEscalationQueueScreenProps = {
   onOpenTicket?: (ticketId: string) => void;

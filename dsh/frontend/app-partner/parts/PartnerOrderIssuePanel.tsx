@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable } from 'react-native';
 import { Box, Button, Chip, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId, DshPartnerSupportIssueCategoryId } from '../dsh-partner.types';
+import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
 
 export type PartnerOrderIssueFlowId = 'order-issue-queue' | 'order-reject';
 
@@ -9,97 +10,58 @@ export type PartnerOrderIssueCategorySpec = {
   id: DshPartnerSupportIssueCategoryId;
   title: string;
   description: string;
-  owner: 'شريك' | 'كابتن' | 'عميل' | 'دعم' | 'ميداني' | 'دعم / WLT';
+  owner: 'شريك' | 'كابتن' | 'عميل' | 'دعم' | 'ميداني' | 'دعم / WLT' | 'لوحة التحكم';
   severity: 'warning' | 'danger' | 'info';
   allowedActions: readonly string[];
   forbiddenActions: readonly string[];
   nextFlowId: DshPartnerOperationalFlowId;
 };
 
+const partnerIssueNextFlowMap: Record<DshPartnerSupportIssueCategoryId, DshPartnerOperationalFlowId> = {
+  'delayed-preparation': 'order-prepare',
+  'item-unavailable': 'inventory-adjust',
+  'partner-reject-request': 'order-reject',
+  'courier-not-arrived': 'order-handoff',
+  'customer-not-responding': 'order-chat-send',
+  'handoff-mismatch': 'order-handoff',
+  'wrong-item': 'order-issue-queue',
+  'payment-refund-review': 'partner-finance-bridge',
+};
+
+function buildPartnerIssueCategorySpec(
+  categoryId: DshPartnerSupportIssueCategoryId
+): PartnerOrderIssueCategorySpec {
+  const preview = getOperationsSupportFlowPreview(categoryId);
+
+  return {
+    id: categoryId,
+    title: preview.title,
+    description: preview.description,
+    owner: preview.ownerLabel as PartnerOrderIssueCategorySpec['owner'],
+    severity:
+      preview.severity === 'danger'
+        ? 'danger'
+        : preview.severity === 'warning'
+          ? 'warning'
+          : 'info',
+    allowedActions: preview.allowedActions,
+    forbiddenActions: preview.forbiddenActions,
+    nextFlowId: partnerIssueNextFlowMap[categoryId],
+  };
+}
+
 export const PARTNER_ORDER_ISSUE_CATEGORY_SPECS: Record<
   DshPartnerSupportIssueCategoryId,
   PartnerOrderIssueCategorySpec
 > = {
-  'delayed-preparation': {
-    id: 'delayed-preparation',
-    title: 'تأخر التحضير',
-    description: 'الطلب ما زال داخل الفرع وتأخر عن وقت التحضير المتوقع ويحتاج قرارًا تشغيليًا سريعًا.',
-    owner: 'شريك',
-    severity: 'warning',
-    allowedActions: ['تحديث حالة التحضير', 'طلب مهلة قصيرة', 'فتح محادثة مع الدعم'],
-    forbiddenActions: ['إغلاق المشكلة دون تحديث الطلب', 'تحويلها إلى استرداد مالي محلي'],
-    nextFlowId: 'order-prepare',
-  },
-  'item-unavailable': {
-    id: 'item-unavailable',
-    title: 'نفاد صنف مؤثر',
-    description: 'عنصر غير متاح يهدد استمرار الطلب أو يتطلب بديلًا واضحًا قبل الحفظ.',
-    owner: 'شريك',
-    severity: 'danger',
-    allowedActions: ['تعديل المخزون', 'اقتراح بديل', 'طلب قرار سريع من الدعم'],
-    forbiddenActions: ['تأكيد الجاهزية مع بقاء الصنف ناقصًا', 'رفض الطلب تلقائيًا بلا توثيق'],
-    nextFlowId: 'inventory-adjust',
-  },
-  'partner-reject-request': {
-    id: 'partner-reject-request',
-    title: 'طلب رفض من الشريك',
-    description: 'رفض الطلب لا يتم إلا لسبب تشغيلي صريح مع توثيق واضح داخل نفس السياق.',
-    owner: 'شريك',
-    severity: 'danger',
-    allowedActions: ['فتح مسار الرفض', 'إضافة سبب تشغيلي', 'تصعيد للمراجعة عند الشك'],
-    forbiddenActions: ['رفض صامت', 'إخفاء سبب الرفض', 'تحويله إلى رد مالي محلي'],
-    nextFlowId: 'order-reject',
-  },
-  'courier-not-arrived': {
-    id: 'courier-not-arrived',
-    title: 'الكابتن / الموصل لم يصل',
-    description: 'الطلب جاهز أو قريب من الجاهزية لكن نقطة الاستلام لم تكتمل بعد.',
-    owner: 'كابتن',
-    severity: 'warning',
-    allowedActions: ['مراجعة handoff', 'طلب إثبات وصول', 'فتح محادثة متابعة'],
-    forbiddenActions: ['إغلاق الحالة كأنها تسليم ناجح', 'تأكيد تسليم بدون وصول فعلي'],
-    nextFlowId: 'order-handoff',
-  },
-  'customer-not-responding': {
-    id: 'customer-not-responding',
-    title: 'العميل غير متجاوب',
-    description: 'المحادثة أو الاتصال مطلوبان لإكمال الطلب أو تعديل الاستلام.',
-    owner: 'عميل',
-    severity: 'info',
-    allowedActions: ['فتح محادثة', 'طلب إثبات محاولة التواصل', 'رفع الحالة للتصعيد'],
-    forbiddenActions: ['إلغاء الطلب مباشرةً', 'تحميل الكابتن المسؤولية دون محاولة تواصل'],
-    nextFlowId: 'order-chat-send',
-  },
-  'handoff-mismatch': {
-    id: 'handoff-mismatch',
-    title: 'عدم تطابق في handoff',
-    description: 'هناك تضارب بين الجهة المستلمة، زمن التسليم، أو حالة الطلب عند نقطة handoff.',
-    owner: 'شريك',
-    severity: 'danger',
-    allowedActions: ['مراجعة handoff', 'طلب إثبات', 'فتح محادثة مشتركة'],
-    forbiddenActions: ['تأكيد الخروج للتوصيل قبل تثبيت handoff', 'تجاوز إثبات التسليم'],
-    nextFlowId: 'order-handoff',
-  },
-  'wrong-item': {
-    id: 'wrong-item',
-    title: 'عنصر خاطئ أو غير مطابق',
-    description: 'الطلب أو الدفعة تحتاج مراجعة لأن العنصر المجهز لا يطابق المرجع المطلوب.',
-    owner: 'شريك',
-    severity: 'warning',
-    allowedActions: ['فتح queue المشكلة', 'مراجعة العنصر', 'طلب إثبات بصري'],
-    forbiddenActions: ['إرسال الطلب كما هو', 'إغلاق الحالة دون مطابقة'],
-    nextFlowId: 'order-issue-queue',
-  },
-  'payment-refund-review': {
-    id: 'payment-refund-review',
-    title: 'مراجعة دفع / استرداد',
-    description: 'هذه الحالة Preview فقط؛ تظهر لإشارة تشغيلية ولا تملك أي منطق مالي محلي داخل DSH.',
-    owner: 'دعم / WLT',
-    severity: 'info',
-    allowedActions: ['إضافة Preview tag', 'تحويل للمراجعة', 'فتح bridge مالي للقراءة فقط'],
-    forbiddenActions: ['بدء استرداد', 'تسوية عمولة', 'تعديل رصيد أو ledger'],
-    nextFlowId: 'partner-finance-bridge',
-  },
+  'delayed-preparation': buildPartnerIssueCategorySpec('delayed-preparation'),
+  'item-unavailable': buildPartnerIssueCategorySpec('item-unavailable'),
+  'partner-reject-request': buildPartnerIssueCategorySpec('partner-reject-request'),
+  'courier-not-arrived': buildPartnerIssueCategorySpec('courier-not-arrived'),
+  'customer-not-responding': buildPartnerIssueCategorySpec('customer-not-responding'),
+  'handoff-mismatch': buildPartnerIssueCategorySpec('handoff-mismatch'),
+  'wrong-item': buildPartnerIssueCategorySpec('wrong-item'),
+  'payment-refund-review': buildPartnerIssueCategorySpec('payment-refund-review'),
 };
 
 function resolveCategoryFlowId(categoryId: DshPartnerSupportIssueCategoryId): PartnerOrderIssueFlowId {

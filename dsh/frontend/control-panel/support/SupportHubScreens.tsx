@@ -18,6 +18,10 @@ import { SupportTicketDetailWorkspace } from './SupportTicketDetailWorkspace';
 import { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
 import { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
+import {
+  getOperationsSupportFlowPreview,
+  type DshOperationsSupportFlowId,
+} from '../../shared/operations-support.preview';
 
 type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
@@ -25,6 +29,7 @@ type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
 type SupportRow = {
   id: string;
+  flowId: DshOperationsSupportFlowId;
   surface: string;
   title: string;
   status: string;
@@ -38,6 +43,20 @@ type SupportRow = {
   evidence: string;
   nextAction: string;
   recommendation: string;
+  primaryActionLabel: string;
+  secondaryActionLabel: string;
+};
+
+type SupportRowSeed = {
+  id: string;
+  flowId: DshOperationsSupportFlowId;
+  surface: string;
+  status: string;
+  slaAge: string;
+  fulfillmentMode: SupportFulfillmentMode;
+  fulfillmentLabel: string;
+  responsibleActor: string;
+  evidence: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
 };
@@ -80,80 +99,89 @@ const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: stri
   ],
 };
 
+function buildSupportRow(seed: SupportRowSeed): SupportRow {
+  const preview = getOperationsSupportFlowPreview(seed.flowId);
+
+  return {
+    id: seed.id,
+    flowId: seed.flowId,
+    surface: seed.surface,
+    title: preview.title,
+    status: seed.status,
+    severity:
+      preview.severity === 'danger'
+        ? 'danger'
+        : preview.severity === 'warning'
+          ? 'warning'
+          : 'warning',
+    slaAge: seed.slaAge,
+    owner: preview.ownerLabel,
+    fulfillmentMode: seed.fulfillmentMode,
+    fulfillmentLabel: seed.fulfillmentLabel,
+    responsibleActor: seed.responsibleActor,
+    blocker: preview.description,
+    evidence: seed.evidence,
+    nextAction: preview.nextAction,
+    recommendation: `المالك التصعيدي: ${preview.escalationOwnerLabel}`,
+    primaryActionLabel: seed.primaryActionLabel,
+    secondaryActionLabel: seed.secondaryActionLabel,
+  };
+}
+
 const SUPPORT_ROWS: ReadonlyArray<SupportRow> = [
   {
     id: 'SUP-401',
+    flowId: 'delivery-failed',
     surface: 'الطلبات',
-    title: 'تأخر تسليم طلب',
     status: 'نشط',
-    severity: 'warning',
     slaAge: '15 دقيقة',
-    owner: 'تشغيل الطلبات',
     fulfillmentMode: 'bthwani_delivery',
     fulfillmentLabel: 'توصيل بثواني',
     responsibleActor: 'الكابتن',
-    blocker: 'بانتظار إثبات الاستلام من الكابتن',
     evidence: 'سجل رنين + صورة الاستلام',
-    nextAction: 'أعد فتح الطلب واطلب الإثبات',
-    recommendation: 'ابدأ من إثبات الاستلام ثم أعد الإسناد إذا استمر التأخير',
     primaryActionLabel: 'فتح الطلب',
     secondaryActionLabel: 'فتح الأدلة',
   },
   {
     id: 'SUP-402',
+    flowId: 'payment-refund-review',
     surface: 'الشركاء',
-    title: 'نزاع شريك على فاتورة',
     status: 'تحت المراجعة',
-    severity: 'warning',
     slaAge: '32 دقيقة',
-    owner: 'دعم الشركاء',
     fulfillmentMode: 'partner_delivery',
     fulfillmentLabel: 'توصيل المتجر',
     responsibleActor: 'موصل الشريك / المتجر',
-    blocker: 'فاتورة غير مطابقة مع مسار توصيل المتجر',
     evidence: 'نسخة الفاتورة + سجل التحصيل + محضر تسليم موصل الشريك',
-    nextAction: 'طابق الفاتورة مع سجل التحصيل وتسليم موصل الشريك',
-    recommendation: 'أغلق النزاع فقط بعد مراجعة الفاتورة والسجل ومسؤولية موصل الشريك',
     primaryActionLabel: 'مراجعة الشريك',
     secondaryActionLabel: 'فتح الأدلة',
   },
   {
     id: 'SUP-403',
+    flowId: 'courier-not-arrived',
     surface: 'الكباتن',
-    title: 'تذكرة كابتن حول تعطل المسار',
     status: 'تحتاج حل',
-    severity: 'danger',
     slaAge: '5 دقائق',
-    owner: 'دعم الكباتن',
     fulfillmentMode: 'bthwani_delivery',
     fulfillmentLabel: 'توصيل بثواني',
     responsibleActor: 'الكابتن',
-    blocker: 'تعطل في الإشارة والاتصال',
     evidence: 'مراسلات الدعم + سجل الجهاز',
-    nextAction: 'اعرض كابتن بديل وفعّل التصعيد',
-    recommendation: 'لا تغلق التذكرة قبل تعيين بديل أو حل الاتصال',
     primaryActionLabel: 'إسناد بديل',
     secondaryActionLabel: 'فتح التصعيد',
   },
   {
     id: 'SUP-404',
+    flowId: 'branch-readiness-escalation',
     surface: 'الميدان',
-    title: 'تأخر زيارة ميدانية',
     status: 'مراقبة',
-    severity: 'success',
     slaAge: '47 دقيقة',
-    owner: 'الميدان',
     fulfillmentMode: 'pickup',
     fulfillmentLabel: 'استلام بنفسي',
     responsibleActor: 'العميل / المتجر',
-    blocker: 'بانتظار تأكيد جاهزية المتجر للاستلام',
     evidence: 'إثبات الموعد + سجل الحضور + تأكيد الجاهزية',
-    nextAction: 'ثبّت الجاهزية أو أغلقها مع دليل',
-    recommendation: 'أغلق الحالة فقط بعد تأكيد جاهزية المتجر أو تغيير الموعد',
     primaryActionLabel: 'تثبيت الموعد',
     secondaryActionLabel: 'فتح الأدلة',
   },
-];
+].map(buildSupportRow);
 
 function filterRows(tab: SupportTab, lane: string) {
   if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging') {
@@ -188,6 +216,7 @@ export function ControlPanelDshSupportHubScreen() {
 
   const rows = filterRows(activeTab, activeSubTab);
   const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0] ?? SUPPORT_ROWS[0];
+  const selectedFlowPreview = selectedRow ? getOperationsSupportFlowPreview(selectedRow.flowId) : null;
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -306,17 +335,21 @@ export function ControlPanelDshSupportHubScreen() {
                   <div className={styles.surfaceInspectorMeta}>
                     <Text role="caption" tone="muted">السطح: {selectedRow?.surface}</Text>
                     <Text role="caption" tone="muted">المالك: {selectedRow?.owner}</Text>
+                    <Text role="caption" tone="muted">مالك التصعيد: {selectedFlowPreview?.escalationOwnerLabel ?? '—'}</Text>
                     <Text role="caption" tone="muted">وضع التنفيذ: {selectedRow?.fulfillmentLabel}</Text>
                     <Text role="caption" tone="muted">المسؤول الحالي: {selectedRow?.responsibleActor}</Text>
                     <Text role="caption" tone="muted">العائق: {selectedRow?.blocker}</Text>
                     <Text role="caption" tone="muted">الدليل: {selectedRow?.evidence}</Text>
                     <Text role="caption" tone="muted">الإجراء التالي: {selectedRow?.nextAction}</Text>
+                    {selectedFlowPreview?.financialImpactPreview ? (
+                      <Text role="caption" tone="muted">WLT Preview: {selectedFlowPreview.financialImpactPreview}</Text>
+                    ) : null}
                   </div>
                   <WebControlPanelRecommendation
                     title="توصية الدعم"
-                    reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}` : 'اختر صفًا.'}
+                    reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence} · ما القرار التالي؟ ${selectedRow.nextAction}` : 'اختر صفًا.'}
                     confidence="high"
-                    auditTag={selectedRow?.owner ?? 'support'}
+                    auditTag={selectedFlowPreview?.flowId ?? selectedRow?.owner ?? 'support'}
                     primaryAction={selectedRow ? { id: `${selectedRow.id}-a`, label: selectedRow.primaryActionLabel } : undefined}
                     secondaryAction={selectedRow ? { id: `${selectedRow.id}-b`, label: selectedRow.secondaryActionLabel } : undefined}
                   />
