@@ -85,6 +85,27 @@ export type DshAuditEntry = {
   readonly rollbackNote?: string;
 };
 
+export type DshMakerCheckerMatrixEntry = {
+  readonly actionId: DshSensitiveActionId;
+  readonly actionLabel: string;
+  readonly makerRoleId: DshRoleId;
+  readonly checkerRoleId: DshRoleId;
+  readonly section: DshPermissionSection;
+  readonly auditRequired: boolean;
+  readonly reasonRequired: boolean;
+  readonly evidenceRequired: boolean;
+  readonly wltReadOnly: boolean;
+};
+
+export type DshReasonEvidencePolicy = {
+  readonly policyId: string;
+  readonly title: string;
+  readonly appliesToSections: ReadonlyArray<DshPermissionSection>;
+  readonly reasonRequired: boolean;
+  readonly evidenceRequired: boolean;
+  readonly exportPreviewLabel: string;
+};
+
 // ─── Explicit section access grants ──────────────────────────────────────────
 // Handles parallel access tracks (e.g. finance-approver is NOT in the main
 // governor→approver→operator hierarchy but has a dedicated finance-view grant).
@@ -375,6 +396,99 @@ export const DSH_AUDIT_PREVIEW_ENTRIES: ReadonlyArray<DshAuditEntry> = [
     rollbackNote: undefined,
   },
 ];
+
+export const DSH_MAKER_CHECKER_MATRIX: ReadonlyArray<DshMakerCheckerMatrixEntry> = [
+  {
+    actionId: 'activate-partner',
+    actionLabel: 'تفعيل الشريك',
+    makerRoleId: 'platform-operator',
+    checkerRoleId: 'platform-approver',
+    section: 'partner-activation',
+    auditRequired: true,
+    reasonRequired: true,
+    evidenceRequired: true,
+    wltReadOnly: false,
+  },
+  {
+    actionId: 'publish-catalog',
+    actionLabel: 'نشر الكتالوج',
+    makerRoleId: 'platform-operator',
+    checkerRoleId: 'platform-approver',
+    section: 'catalog-publishing',
+    auditRequired: true,
+    reasonRequired: true,
+    evidenceRequired: false,
+    wltReadOnly: false,
+  },
+  {
+    actionId: 'reassign-dispatch',
+    actionLabel: 'إعادة الإسناد',
+    makerRoleId: 'platform-operator',
+    checkerRoleId: 'platform-governor',
+    section: 'dispatch-reassignment',
+    auditRequired: true,
+    reasonRequired: true,
+    evidenceRequired: false,
+    wltReadOnly: false,
+  },
+  {
+    actionId: 'view-finance-readonly',
+    actionLabel: 'عرض الأثر المالي',
+    makerRoleId: 'platform-operator',
+    checkerRoleId: 'finance-approver',
+    section: 'finance-view',
+    auditRequired: false,
+    reasonRequired: false,
+    evidenceRequired: false,
+    wltReadOnly: true,
+  },
+  {
+    actionId: 'request-platform-rollback',
+    actionLabel: 'طلب التراجع',
+    makerRoleId: 'platform-approver',
+    checkerRoleId: 'platform-governor',
+    section: 'platform-vars',
+    auditRequired: true,
+    reasonRequired: true,
+    evidenceRequired: true,
+    wltReadOnly: false,
+  },
+] as const;
+
+export const DSH_REASON_EVIDENCE_POLICY: ReadonlyArray<DshReasonEvidencePolicy> = [
+  {
+    policyId: 'policy-critical-partner',
+    title: 'أسباب وإثباتات تفعيل/إيقاف الشريك',
+    appliesToSections: ['partner-activation', 'partner-deactivation'],
+    reasonRequired: true,
+    evidenceRequired: true,
+    exportPreviewLabel: 'Partner readiness + contract proof export',
+  },
+  {
+    policyId: 'policy-ops-escalation',
+    title: 'سبب تشغيلي إلزامي للتصعيد وإعادة الإسناد',
+    appliesToSections: ['dispatch-reassignment', 'support-escalation', 'sla-override'],
+    reasonRequired: true,
+    evidenceRequired: false,
+    exportPreviewLabel: 'Operations intervention export preview',
+  },
+  {
+    policyId: 'policy-finance-readonly',
+    title: 'سياسة الرؤية المالية فقط',
+    appliesToSections: ['finance-view'],
+    reasonRequired: false,
+    evidenceRequired: false,
+    exportPreviewLabel: 'WLT visibility export preview',
+  },
+  {
+    policyId: 'policy-platform-rollback',
+    title: 'سياسة طلبات التراجع والسياسات',
+    appliesToSections: ['platform-vars'],
+    reasonRequired: true,
+    evidenceRequired: true,
+    exportPreviewLabel: 'Provider rollback + blast radius export preview',
+  },
+] as const;
 
 /** Returns a single preview audit entry by entryId. */
 export function getDshAuditEntryById(entryId: string): DshAuditEntry | undefined {

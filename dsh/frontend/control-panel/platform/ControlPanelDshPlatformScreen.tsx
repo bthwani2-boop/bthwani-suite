@@ -124,6 +124,28 @@ function OverviewPanel() {
           </Surface>
         </Box>
       </WebSectionCard>
+
+      <WebSectionCard
+        title="أدوات السيطرة والسياسة"
+        description="المنصة تشرح التأثير والـ blast radius والـ fallback والاعتماديات من دون أي runtime mutation."
+      >
+        <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+          {[
+            { title: 'Policy impact simulator', note: 'Vars + precedence + expected impact' },
+            { title: 'Blast radius', note: 'Services + audiences + affected surfaces' },
+            { title: 'Provider degradation', note: 'Provider control + health + test result' },
+            { title: 'Safe fallback', note: 'Rollouts + rollback preview + owner guard' },
+            { title: 'Dependency graph', note: 'Services / Providers / Audit references only' },
+          ].map((item) => (
+            <Surface key={item.title} tone="raised" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
+              <Box gap={1}>
+                <Text role="titleMd" tone="brand">{item.title}</Text>
+                <Text role="bodySm" tone="muted">{item.note}</Text>
+              </Box>
+            </Surface>
+          ))}
+        </Box>
+      </WebSectionCard>
     </Box>
   );
 }

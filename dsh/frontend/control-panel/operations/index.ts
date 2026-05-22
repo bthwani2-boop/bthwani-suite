@@ -38,6 +38,8 @@ export { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScre
 export { AwnakScreen } from './AwnakScreen';
 export { CommandCenterScreen } from './CommandCenterScreen';
 export { LiveOrdersScreen } from './LiveOrdersScreen';
+export { AssistedOrderDeskScreen } from './AssistedOrderDeskScreen';
+export { OrderRescueScreen } from './OrderRescueScreen';
 export { DispatchAssignmentScreen } from './DispatchAssignmentScreen';
 export { GeoHeatmapScreen } from './GeoHeatmapScreen';
 export { PartnerStoresScreen } from './PartnerStoresScreen';

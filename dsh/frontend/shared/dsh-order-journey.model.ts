@@ -1258,3 +1258,64 @@ export function getDshLifecycleStateMetadata(
 ): DshOrderLifecycleStateMetadata | undefined {
   return DSH_ORDER_LIFECYCLE_STATES.find((s) => s.stateId === status);
 }
+
+export type DshOrderInterventionFlowId =
+  | 'manual-call-intake'
+  | 'customer-360'
+  | 'assisted-order-desk'
+  | 'order-rescue';
+
+export type DshOrderInterventionState = {
+  readonly flowId: DshOrderInterventionFlowId;
+  readonly ownerSection: 'support' | 'operations';
+  readonly triggerStatuses: ReadonlyArray<DshOrderLifecycleStatus>;
+  readonly allowedActions: ReadonlyArray<string>;
+  readonly forbiddenActions: ReadonlyArray<string>;
+  readonly wltBoundary: string;
+  readonly nextAction: string;
+};
+
+export const DSH_ORDER_INTERVENTION_STATES: ReadonlyArray<DshOrderInterventionState> = [
+  {
+    flowId: 'manual-call-intake',
+    ownerSection: 'support',
+    triggerStatuses: ['payment_failed', 'order_creation_failed', 'support_exception'],
+    allowedActions: ['تثبيت source = external_phone_manual', 'بدء التحقق من الهوية', 'فتح Customer 360'],
+    forbiddenActions: ['كشف الحقول الحساسة قبل التحقق', 'بدء refund أو payout من داخل DSH'],
+    wltBoundary: 'WLT يظهر فقط كمرجع للقراءة إذا احتاجت الحالة رؤية دفع أو استرداد.',
+    nextAction: 'إذا اكتمل التحقق افتح Assisted Order أو Order Rescue حسب blocker الرئيسي.',
+  },
+  {
+    flowId: 'customer-360',
+    ownerSection: 'support',
+    triggerStatuses: ['support_exception', 'cancellation_requested', 'refund_pending_wlt'],
+    allowedActions: ['فتح الطلب أو التذكرة', 'تحويل إلى Assisted Order أو Order Rescue', 'عرض WLT reference'],
+    forbiddenActions: ['إغلاق التذكرة خارج مالكها', 'فتح mutation مالي محلي'],
+    wltBoundary: 'أي refund أو settlement يبقى مملوكًا لـ WLT مع عرض مرجعي فقط.',
+    nextAction: 'استخدم Customer 360 لتجميع السياق ثم افتح workspace التدخل المناسب بدل نسخ التفاصيل.',
+  },
+  {
+    flowId: 'assisted-order-desk',
+    ownerSection: 'operations',
+    triggerStatuses: ['item_unavailable', 'partner_rejected', 'support_exception'],
+    allowedActions: ['إعادة بناء السلة', 'تثبيت البديل', 'إحالة الحالة إلى الشريك أو الدعم'],
+    forbiddenActions: ['إرسال الطلب دون handoff واضح', 'إجراء مالي محلي'],
+    wltBoundary: 'المدفوعات والاستردادات خارج Assisted Order وتبقى WLT-only.',
+    nextAction: 'حوّل الحالة إلى Order Rescue إذا بقي blocker التشغيلي مفتوحًا بعد التثبيت الأولي.',
+  },
+  {
+    flowId: 'order-rescue',
+    ownerSection: 'operations',
+    triggerStatuses: ['payment_failed', 'delivery_failed', 'refund_rejected_wlt', 'support_exception'],
+    allowedActions: ['تحديد blocker واحد', 'فتح ticket أو WLT reference أو partner controls', 'تثبيت next-best-action'],
+    forbiddenActions: ['دوران الحالة بين الأقسام دون قرار', 'duplicate intervention على أكثر من سطح', 'mutation مالي'],
+    wltBoundary: 'إذا كانت المشكلة مالية فالرؤية مرجعية فقط والتنفيذ في WLT.',
+    nextAction: 'أرسل الحالة إلى المالك النهائي مع audit note واضحة بدل إبقائها في صف rescue.',
+  },
+] as const;
+
+export function getDshOrderInterventionState(
+  flowId: DshOrderInterventionFlowId,
+): DshOrderInterventionState | undefined {
+  return DSH_ORDER_INTERVENTION_STATES.find((entry) => entry.flowId === flowId);
+}

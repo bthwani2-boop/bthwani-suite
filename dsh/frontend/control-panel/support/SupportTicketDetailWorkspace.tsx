@@ -80,7 +80,7 @@ export function SupportTicketDetailWorkspace({
   subject,
   statusLabel,
   priorityLabel,
-  actorKind = 'client',
+  actorKind,
   actorName,
   createdAtLabel,
   slaLabel,
@@ -95,8 +95,9 @@ export function SupportTicketDetailWorkspace({
   const resolvedStatus = statusLabel ?? getDshSupportTicketStatusLabel(demoTicket.status);
   const resolvedStatusTone = getDshSupportTicketStatusTone(demoTicket.status);
   const resolvedPriority = priorityLabel ?? demoTicket.priorityLabel;
+  const resolvedActorKind = actorKind ?? demoTicket.actorKind;
   const resolvedActorLabel =
-    actorKind === 'client' ? 'عميل' : actorKind === 'partner' ? 'شريك' : 'كابتن';
+    resolvedActorKind === 'client' ? 'عميل' : resolvedActorKind === 'partner' ? 'شريك' : 'كابتن';
   const resolvedActorName = actorName ?? demoTicket.actorName;
   const resolvedCreatedAt = createdAtLabel ?? demoTicket.createdAtLabel;
   const resolvedSla = slaLabel ?? demoTicket.slaLabel;
@@ -129,6 +130,8 @@ export function SupportTicketDetailWorkspace({
           dense
           items={[
             { label: 'رقم التذكرة', value: resolvedCode, tone: 'brand' },
+            { label: 'التصنيف', value: demoTicket.categoryLabel },
+            { label: 'مخرج المعالجة', value: demoTicket.outcomeLabel },
             { label: 'نوع الطرف', value: resolvedActorLabel },
             { label: 'الاسم', value: resolvedActorName },
             { label: 'الكيان المرتبط', value: demoTicket.entityId ? `${demoTicket.entityType} · ${demoTicket.entityId}` : demoTicket.entityType },

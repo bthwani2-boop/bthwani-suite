@@ -48,6 +48,8 @@ export type DshOperationsOrderRow = {
 export type CanonicalOperationsGroupId =
   | 'command-center'
   | 'live-orders'
+  | 'assisted-order-desk'
+  | 'order-rescue'
   | 'dispatch-assignment'
   | 'geo-heatmap'
   | 'sheinproxy'
@@ -77,6 +79,8 @@ export type LegacyOperationsWorkspaceId =
   | 'evidence'
   | 'order-detail'
   | 'orderchat'
+  | 'assisted-order-desk'
+  | 'order-rescue'
   | 'dispatch'
   | 'live-tracking'
   | 'exceptions'

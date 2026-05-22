@@ -459,6 +459,8 @@ export type {
 	DshOrderLifecycleDeliveryModeImpact,
 	DshOrderLifecycleStateAction,
 	DshOrderLifecycleStateMetadata,
+  DshOrderInterventionFlowId,
+  DshOrderInterventionState,
 } from './dsh-order-journey.model';
 export {
 	DSH_ORDER_JOURNEY_STEPS,
@@ -467,6 +469,8 @@ export {
 	// P0-02 additions
 	DSH_ORDER_LIFECYCLE_STATES,
 	getDshLifecycleStateMetadata,
+  DSH_ORDER_INTERVENTION_STATES,
+  getDshOrderInterventionState,
 } from './dsh-order-journey.model';
 
 // --- P0-03: DSH Delivery Mode Model ---
@@ -606,10 +610,14 @@ export type {
   DshRolePermissionEntry,
   DshAuditEntryDecision,
   DshAuditEntry,
+  DshMakerCheckerMatrixEntry,
+  DshReasonEvidencePolicy,
 } from './dsh-role-permission.model';
 export {
   DSH_ROLE_PERMISSIONS,
   DSH_AUDIT_PREVIEW_ENTRIES,
+  DSH_MAKER_CHECKER_MATRIX,
+  DSH_REASON_EVIDENCE_POLICY,
   getDshRoleCanPerform,
   getDshRolePermission,
   getDshRollbackAllowed,
@@ -617,3 +625,50 @@ export {
   getDshRoleArabicName,
   getDshAuditEntryById,
 } from './dsh-role-permission.model';
+
+export type {
+  DshGlobalControlLink,
+  DshAssistedOrderIdentityStatus,
+  DshAssistedOrderStage,
+  DshAssistedOrderPreview,
+} from './dsh-assisted-order.preview';
+export {
+  DSH_ASSISTED_ORDER_PREVIEW,
+  getDshAssistedOrderById,
+} from './dsh-assisted-order.preview';
+
+export type {
+  DshCustomer360VerificationStatus,
+  DshCustomer360Record,
+} from './dsh-customer-360.preview';
+export {
+  DSH_CUSTOMER_360_PREVIEW,
+  getDshCustomer360Record,
+  getDshCustomer360SectionOwnerLabel,
+} from './dsh-customer-360.preview';
+
+export type {
+  DshCallIntakeVerificationStep,
+  DshCallIntakePreview,
+} from './dsh-call-intake.preview';
+export {
+  DSH_CALL_INTAKE_PREVIEW,
+  getDshCallIntakePreview,
+} from './dsh-call-intake.preview';
+
+export type {
+  DshOrderRescueSeverity,
+  DshOrderRescueCase,
+} from './dsh-order-rescue.preview';
+export {
+  DSH_ORDER_RESCUE_PREVIEW,
+  getDshOrderRescueCase,
+} from './dsh-order-rescue.preview';
+
+export type {
+  DshOpsInterventionPlaybook,
+} from './dsh-ops-intervention-playbook.preview';
+export {
+  DSH_OPS_INTERVENTION_PLAYBOOKS,
+  getDshOpsInterventionPlaybook,
+} from './dsh-ops-intervention-playbook.preview';

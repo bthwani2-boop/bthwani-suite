@@ -447,7 +447,12 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   ] as const;
 
   const SECONDARY_TABS: Record<MarketingControlView, { id: string; label: string }[]> = {
-    visibility: [],
+    visibility: [
+      { id: 'eligibility', label: 'الأهلية' },
+      { id: 'suppression', label: 'الكبت' },
+      { id: 'audit', label: 'التدقيق' },
+      { id: 'segments', label: 'الشرائح' },
+    ],
     ticker: [],
     banners: [],
     promos: [],
@@ -486,6 +491,32 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         const blockedOffers = partnerOfferRows.filter(({ offer, visibility }) => offer.status !== 'published' || Boolean(visibility.blockedReason));
         const visibleCampaigns = campaignRows.filter(({ campaign, visibility }) => campaign.status === 'published' && !visibility.blockedReason);
         const blockedCampaigns = campaignRows.filter(({ campaign, visibility }) => campaign.status !== 'published' || Boolean(visibility.blockedReason));
+        const visibilityGovernanceRows = [
+          {
+            id: 'eligibility',
+            title: 'أهلية الظهور',
+            visible: `${visibleOffers.length + visibleCampaigns.length}`,
+            note: 'تقرأ eligibility من marketing-visibility.contract.ts فقط ولا تتجاوز partner/catalog gates.',
+          },
+          {
+            id: 'suppression',
+            title: 'الكبت والمنع',
+            visible: `${blockedOffers.length + blockedCampaigns.length}`,
+            note: 'كل suppression هنا summary-only: blockedReason, gate owner, والroute المالك فقط.',
+          },
+          {
+            id: 'audit',
+            title: 'سجل التدقيق',
+            visible: `${marketingSignalRows.length}`,
+            note: 'الإشارات التسويقية تربط القرار بsignal route وowner واضح قبل أي نشر.',
+          },
+          {
+            id: 'segments',
+            title: 'ملخص الشرائح',
+            visible: `${commercialProjection.badges.length}`,
+            note: 'segment summary-only: لا يوجد audience mutation هنا، فقط projection لما وصل فعلًا إلى client-visible.',
+          },
+        ].filter((row) => activeSubTab === '' || activeSubTab === row.id);
 
         return (
           <div className={marketingStyles.marketingStack}>
@@ -512,6 +543,30 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                 <span>product publishing gate يسبق أي banner أو promo.</span>
                 <span>commercial projection يقرأ فقط العناصر client-visible.</span>
                 <span>signal layer تبقى handoff queue منخفضة الضجيج.</span>
+              </div>
+            </div>
+
+            <div className={marketingStyles.surfaceCard}>
+              <h3 className={marketingStyles.surfaceCardTitle}>Eligibility / Suppression / Audit / Segments</h3>
+              <div className={marketingStyles.listStack}>
+                {visibilityGovernanceRows.map((row) => (
+                  <div key={row.id} className={marketingStyles.tickerRow}>
+                    <div className={marketingStyles.tickerRowBody}>
+                      <p className={marketingStyles.messageText}>{row.title}</p>
+                      <div className={marketingStyles.tickerMetaLine}>
+                        <span className={`${marketingStyles.statusChip} ${resolveToneClass(row.id === 'suppression' ? 'warning' : 'brand')}`}>
+                          {row.visible}
+                        </span>
+                        <div className={marketingStyles.metaChipRow}>
+                          <span>{row.id}</span>
+                          <span className={marketingStyles.metaSeparator}>|</span>
+                          <span>summary-only</span>
+                        </div>
+                      </div>
+                      <div className={marketingStyles.planNote}>{row.note}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

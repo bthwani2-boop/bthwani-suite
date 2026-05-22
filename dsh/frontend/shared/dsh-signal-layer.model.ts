@@ -42,6 +42,12 @@ export type DshSignalEventKind =
   | 'ticket_created'
   | 'ticket_escalated'
   | 'sla_breach'
+  | 'manual_call_intake_requested'
+  | 'customer_360_followup'
+  | 'assisted_order_requested'
+  | 'order_rescue_requested'
+  | 'partner_capacity_degraded'
+  | 'catalog_conflict_detected'
   // WLT finance — read-only display only; DSH never mutates
   | 'refund_pending_wlt'
   | 'refund_completed_wlt'
@@ -174,6 +180,12 @@ export const DSH_SIGNAL_ACTOR_ROUTES: ReadonlyArray<DshSignalActorRoute> = [
   { kind: 'ticket_created',          surfaces: ['control-panel'],                                 roles: ['ops'],                       routeId: 'cp/support/ticket',                priority: 'normal',    auditRequired: false              },
   { kind: 'ticket_escalated',        surfaces: ['control-panel'],                                 roles: ['ops'],                       routeId: 'cp/support/escalation',            priority: 'urgent',    auditRequired: true               },
   { kind: 'sla_breach',              surfaces: ['control-panel'],                                 roles: ['ops'],                       routeId: 'cp/support/sla-dashboard',         priority: 'urgent',    auditRequired: true               },
+  { kind: 'manual_call_intake_requested', surfaces: ['control-panel'],                           roles: ['ops'],                       routeId: 'cp/support/call-intake',           priority: 'important', auditRequired: true,  retentionHours: 24 },
+  { kind: 'customer_360_followup',   surfaces: ['control-panel'],                                 roles: ['ops'],                       routeId: 'cp/support/customer-360',          priority: 'important', auditRequired: false, retentionHours: 24 },
+  { kind: 'assisted_order_requested', surfaces: ['control-panel'],                                roles: ['ops'],                       routeId: 'cp/operations/assisted-order-desk', priority: 'important', auditRequired: true, retentionHours: 12 },
+  { kind: 'order_rescue_requested',  surfaces: ['control-panel'],                                 roles: ['ops'],                       routeId: 'cp/operations/order-rescue',       priority: 'urgent',    auditRequired: true,  retentionHours: 12 },
+  { kind: 'partner_capacity_degraded', surfaces: ['control-panel', 'app-partner'],               roles: ['ops', 'partner'],            routeId: 'cp/partners/control',              priority: 'important', auditRequired: true,  retentionHours: 12 },
+  { kind: 'catalog_conflict_detected', surfaces: ['control-panel', 'app-partner'],               roles: ['ops', 'partner'],            routeId: 'cp/catalogs/governance',           priority: 'important', auditRequired: true,  retentionHours: 24 },
   // WLT finance — view-only signals; DSH never initiates or mutates
   { kind: 'refund_pending_wlt',      surfaces: ['app-client', 'control-panel'],                   roles: ['client', 'ops'],             routeId: 'cp/finance/refunds',               priority: 'important', auditRequired: true,  retentionHours: 72 },
   { kind: 'refund_completed_wlt',    surfaces: ['app-client', 'control-panel'],                   roles: ['client', 'ops'],             routeId: 'cp/finance/refunds',               priority: 'normal',    auditRequired: false, retentionHours: 72 },
@@ -206,6 +218,12 @@ const DSH_SIGNAL_EVENT_LABELS: Record<DshSignalEventKind, string> = {
   ticket_created:         'تذكرة دعم جديدة',
   ticket_escalated:       'تصعيد تذكرة دعم',
   sla_breach:             'انتهاك SLA',
+  manual_call_intake_requested: 'طلب إدخال مكالمة يدوي',
+  customer_360_followup:  'متابعة Customer 360',
+  assisted_order_requested: 'طلب Assisted Order',
+  order_rescue_requested: 'طلب Order Rescue',
+  partner_capacity_degraded: 'تراجع سعة الشريك',
+  catalog_conflict_detected: 'تعارض كتالوج مكتشف',
   refund_pending_wlt:     'استرداد قيد المعالجة — WLT',
   refund_completed_wlt:   'تم الاسترداد — WLT',
   settlement_ready_wlt:   'التسوية جاهزة — WLT',
@@ -237,6 +255,12 @@ const DSH_SIGNAL_TONES: Record<DshSignalEventKind, 'brand' | 'success' | 'warnin
   ticket_created:         'warning',
   ticket_escalated:       'danger',
   sla_breach:             'danger',
+  manual_call_intake_requested: 'warning',
+  customer_360_followup:  'brand',
+  assisted_order_requested: 'warning',
+  order_rescue_requested: 'danger',
+  partner_capacity_degraded: 'warning',
+  catalog_conflict_detected: 'warning',
   refund_pending_wlt:     'warning',
   refund_completed_wlt:   'success',
   settlement_ready_wlt:   'brand',
@@ -387,6 +411,42 @@ export const DSH_SIGNAL_PREVIEW_EVENTS: ReadonlyArray<DshSignalEvent> = [
     auditRequired: true,
     onDemandPolicy: { detailRoute: 'cp/operations/exceptions?orderId=ORD-9011', summaryOnly: true, retentionHours: 4 },
     emittedAt: 'منذ دقيقتين',
+  },
+  {
+    eventId: 'sig-009',
+    kind: 'manual_call_intake_requested',
+    recipientSurface: ['control-panel'],
+    recipientRole: ['ops'],
+    entityType: 'ticket',
+    entityId: 'CALL-9021',
+    priority: 'important',
+    title: 'طلب إدخال مكالمة يدوي',
+    body: 'هناك مكالمة خارجية تحتاج source = external_phone_manual والتحقق قبل كشف البيانات الحساسة.',
+    routeId: 'cp/support/call-intake',
+    primaryAction: { actionId: 'open-call-intake', label: 'فتح الإدخال', routeId: 'cp/support/call-intake?callId=CALL-9021' },
+    secondaryAction: { actionId: 'open-customer-360', label: 'فتح Customer 360', routeId: 'cp/support/customer-360?customerId=cus-4188' },
+    readState: 'unread',
+    auditRequired: true,
+    onDemandPolicy: { detailRoute: 'cp/support/call-intake?callId=CALL-9021', summaryOnly: true, retentionHours: 24 },
+    emittedAt: 'منذ 7 دقائق',
+  },
+  {
+    eventId: 'sig-010',
+    kind: 'order_rescue_requested',
+    recipientSurface: ['control-panel'],
+    recipientRole: ['ops'],
+    entityType: 'order',
+    entityId: 'ORD-1102',
+    priority: 'urgent',
+    title: 'طلب Order Rescue — ORD-1102',
+    body: 'الطلب يحتاج تدخلاً موحدًا بعد تعثر الشريك والبديل ولم يعد يكفي المسار اليدوي الأولي.',
+    routeId: 'cp/operations/order-rescue',
+    primaryAction: { actionId: 'open-order-rescue', label: 'فتح Order Rescue', routeId: 'cp/operations/order-rescue?orderId=ORD-1102' },
+    secondaryAction: { actionId: 'open-assisted-order', label: 'فتح Assisted Order', routeId: 'cp/operations/assisted-order-desk?orderId=ORD-1102' },
+    readState: 'unread',
+    auditRequired: true,
+    onDemandPolicy: { detailRoute: 'cp/operations/order-rescue?orderId=ORD-1102', summaryOnly: true, retentionHours: 12 },
+    emittedAt: 'منذ 4 دقائق',
   },
 ];
 

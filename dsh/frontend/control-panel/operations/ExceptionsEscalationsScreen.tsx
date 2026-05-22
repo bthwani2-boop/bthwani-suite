@@ -14,6 +14,8 @@ import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
+  DSH_OPS_INTERVENTION_PLAYBOOKS,
+  DSH_ORDER_RESCUE_PREVIEW,
   getDshEscalationFlowsForSurface,
   getDshFinancePreviewFlows,
   getDshFlowPolicySummary,
@@ -398,6 +400,50 @@ export function ExceptionsEscalationsScreen({
           )}
         </aside>
       </div>
+
+      <div className={styles.surfaceSectionHeader}>
+        <h3 className={styles.surfaceSectionTitle}>Playbooks وOrder Rescue</h3>
+        <p className={styles.surfaceSectionSubtitle}>
+          التدخل هنا يحدد next-best-action ثم يفتح owner الصحيح، ولا يتحول إلى نسخة من support أو WLT.
+        </p>
+      </div>
+
+      <Box gap={2}>
+        {DSH_ORDER_RESCUE_PREVIEW.map((item) => (
+          <WebControlPanelDecisionRow
+            key={item.rescueId}
+            entityId={item.orderId}
+            entityLabel={`${item.customerName} · ${item.blocker}`}
+            status={item.issueKind}
+            statusTone={item.severity === 'danger' ? 'danger' : 'warning'}
+            risk={item.severity === 'danger' ? 'danger' : 'warning'}
+            recommendation={item.nextBestAction}
+            reason={item.wltBoundary}
+            sla={`روابط: ${item.crossSurfaceLinks.map((link) => link.sectionId).join(' · ')}`}
+            primaryAction={{ id: `${item.rescueId}-open`, label: 'فتح Order Rescue', onAction: () => router.push(buildOperationsHref('order-rescue', { orderId: item.orderId })) }}
+          />
+        ))}
+
+        {DSH_OPS_INTERVENTION_PLAYBOOKS.map((playbook) => (
+          <WebControlPanelDecisionRow
+            key={playbook.playbookId}
+            entityId={playbook.playbookId}
+            entityLabel={playbook.title}
+            status={playbook.ownerSection}
+            statusTone={playbook.severity === 'danger' ? 'danger' : 'warning'}
+            risk={playbook.severity === 'danger' ? 'danger' : 'warning'}
+            recommendation={playbook.nextDecision}
+            reason={playbook.checkpoints.join(' · ')}
+            primaryAction={{
+              id: `${playbook.playbookId}-open`,
+              label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح Order Rescue' : 'فتح Assisted Order',
+              onAction: () => router.push(buildOperationsHref(
+                playbook.supportedWorkspaces.includes('order-rescue') ? 'order-rescue' : 'assisted-order-desk',
+              )),
+            }}
+          />
+        ))}
+      </Box>
 
       <div className={styles.escalationCatalogSection}>
         <div className={styles.surfaceSectionHeader}>

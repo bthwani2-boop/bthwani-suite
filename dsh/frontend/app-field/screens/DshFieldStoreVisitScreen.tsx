@@ -158,6 +158,22 @@ export function DshFieldStoreVisitScreen({
 
       <Surface tone="raised" gap={3}>
         <SectionHeader
+          title="سياق الزيارة الميدانية"
+          subtitle="Checklist الجاهزية ودرجة الأدلة ومسودة offline وثقة الموقع تبقى داخل الزيارة نفسها."
+        />
+        <KeyValueList
+          dense
+          items={[
+            { label: 'visit checklist', value: 'الواجهة · المالك · ساعات العمل · نقطة الاستلام' },
+            { label: 'evidence score', value: `${evidenceItems.length}/4`, tone: evidenceItems.length >= 2 ? 'success' : 'warning' },
+            { label: 'offline draft', value: state === 'offline' ? 'مسودة محلية' : 'غير نشط', tone: state === 'offline' ? 'warning' : 'default' },
+            { label: 'location confidence', value: 'manual confirmation required', tone: 'brand' },
+          ]}
+        />
+      </Surface>
+
+      <Surface tone="raised" gap={3}>
+        <SectionHeader
           title="ملخص الزيارة"
           subtitle="الملخص يجب أن يوضح ما تم التحقق منه وما الذي بقي مفتوحًا."
         />

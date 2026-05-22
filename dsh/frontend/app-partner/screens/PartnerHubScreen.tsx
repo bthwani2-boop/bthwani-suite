@@ -1685,8 +1685,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
               accessibilityRole="button"
               accessibilityLabel="اختيار الفرع"
             >
-              <Icon name="git-branch-outline" size={14} color="#ffffff" />
-              <Text style={{ fontSize: 12, fontWeight: '700', color: '#ffffff', fontFamily: 'Outfit-Bold' }}>
+              <Icon name="git-branch-outline" size={14} color={theme.textInverse} />
+              <Text style={{ fontSize: 12, fontWeight: '700', color: theme.textInverse, fontFamily: 'Outfit-Bold' }}>
                 اختيار الفرع
               </Text>
             </Pressable>
@@ -1729,6 +1729,19 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                 onPress={() => updateSection('wallet')}
               />
             </View>
+          </Surface>
+
+          <Surface tone="inset" padding={3} gap={2}>
+            <Text role="label" tone="muted">سياق الشريك التشغيلي</Text>
+            <KeyValueList
+              dense
+              items={[
+                { label: 'item unavailable', value: 'يُعالج من الطلب أو المخزون فقط', tone: 'warning' },
+                { label: 'partner pause', value: 'مملوك للشركاء مع أثر ظهور واضح', tone: 'brand' },
+                { label: 'dispute / appeal', value: 'handoff إلى الشركاء أو الدعم حسب المالك', tone: 'info' },
+                { label: 'catalog conflict', value: 'يُراجع قبل أي نشر أو تسويق', tone: 'warning' },
+              ]}
+            />
           </Surface>
 
           {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}

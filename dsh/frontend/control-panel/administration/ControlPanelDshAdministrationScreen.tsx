@@ -13,19 +13,22 @@ import type { AdminRole, MockAdminUser, AdminUserStatus } from './administration
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import {
   DSH_ROLE_PERMISSIONS,
+  DSH_MAKER_CHECKER_MATRIX,
+  DSH_REASON_EVIDENCE_POLICY,
   getDshRoleCanPerform,
   getDshRoleArabicName,
 } from '../../shared/dsh-role-permission.model';
 import type { DshRoleId } from '../../shared/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
 
-type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain' | 'sensitive-decisions';
+type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain' | 'maker-checker' | 'sensitive-decisions';
 
 const WORKSPACE_TABS = [
   { id: 'overview' as AdminWorkspaceId, label: 'نظرة عامة', badge: '' },
   { id: 'roles' as AdminWorkspaceId, label: 'الأدوار والصلاحيات', badge: '' },
   { id: 'users' as AdminWorkspaceId, label: 'المستخدمون', badge: '' },
   { id: 'approval-chain' as AdminWorkspaceId, label: 'سلسلة الاعتماد', badge: '' },
+  { id: 'maker-checker' as AdminWorkspaceId, label: 'Maker / Checker', badge: '' },
   { id: 'sensitive-decisions' as AdminWorkspaceId, label: 'القرارات الحساسة', badge: '10' },
 ] as const;
 
@@ -539,6 +542,67 @@ function ApprovalChainPanel() {
   );
 }
 
+function MakerCheckerPanel() {
+  return (
+    <Box gap={4}>
+      <WebSectionCard
+        title="مصفوفة maker / checker"
+        description="المشغل يهيئ أو يطلب، والمعتمد يراجع، ومعتمد المالية يبقى مرجعيًا فقط عندما تظهر رؤية WLT."
+      >
+        <Box gap={3}>
+          {DSH_MAKER_CHECKER_MATRIX.map((entry) => (
+            <Surface key={`${entry.section}-${entry.actionId}`} tone="raised" border padding={3} radiusToken="xl">
+              <Box gap={2}>
+                <Text role="bodyStrong">{entry.actionLabel}</Text>
+                <Text role="bodySm" tone="muted">
+                  {`${getDshRoleArabicName(entry.makerRoleId)} → ${getDshRoleArabicName(entry.checkerRoleId)} · ${entry.section}`}
+                </Text>
+                <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap' }}>
+                  <Surface tone="inset" padding={1} radiusToken="pill" border={false}>
+                    <Text role="caption" tone="muted">{entry.auditRequired ? 'audit required' : 'audit optional'}</Text>
+                  </Surface>
+                  <Surface tone="inset" padding={1} radiusToken="pill" border={false}>
+                    <Text role="caption" tone="muted">{entry.reasonRequired ? 'reason required' : 'reason optional'}</Text>
+                  </Surface>
+                  <Surface tone="inset" padding={1} radiusToken="pill" border={false}>
+                    <Text role="caption" tone="muted">{entry.evidenceRequired ? 'evidence required' : 'evidence optional'}</Text>
+                  </Surface>
+                  {entry.wltReadOnly ? (
+                    <Surface tone="danger" padding={1} radiusToken="pill" border={false}>
+                      <Text role="caption" tone="inverse">WLT read-only</Text>
+                    </Surface>
+                  ) : null}
+                </Box>
+              </Box>
+            </Surface>
+          ))}
+        </Box>
+      </WebSectionCard>
+
+      <WebSectionCard
+        title="سياسات السبب والإثبات وتصدير السجل"
+        description="كل سياسة تحدد أين يجب أن يظهر السبب، متى يصبح الإثبات إلزاميًا، وما صيغة export preview المقصودة."
+      >
+        <Box gap={3}>
+          {DSH_REASON_EVIDENCE_POLICY.map((policy) => (
+            <Surface key={policy.policyId} tone="default" border padding={3} radiusToken="lg">
+              <Box gap={1}>
+                <Text role="bodyStrong">{policy.title}</Text>
+                <Text role="bodySm" tone="muted">
+                  {policy.appliesToSections.join(' · ')}
+                </Text>
+                <Text role="caption" tone="muted">
+                  {`${policy.reasonRequired ? 'reason required' : 'reason optional'} · ${policy.evidenceRequired ? 'evidence required' : 'evidence optional'} · export: ${policy.exportPreviewLabel}`}
+                </Text>
+              </Box>
+            </Surface>
+          ))}
+        </Box>
+      </WebSectionCard>
+    </Box>
+  );
+}
+
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export function ControlPanelDshAdministrationScreen() {
@@ -647,6 +711,7 @@ export function ControlPanelDshAdministrationScreen() {
             {activeWorkspace === 'roles' && <RolesPanel />}
             {activeWorkspace === 'users' && <UsersPanel />}
             {activeWorkspace === 'approval-chain' && <ApprovalChainPanel />}
+            {activeWorkspace === 'maker-checker' && <MakerCheckerPanel />}
             {activeWorkspace === 'sensitive-decisions' && <SensitiveDecisionsPanel />}
           </Box>
         </div>

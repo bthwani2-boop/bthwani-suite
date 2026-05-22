@@ -74,6 +74,62 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
   );
 }
 
+function PartnerControlWorkspace() {
+  const controlRows = [
+    {
+      id: 'perf',
+      label: 'مراجعة الأداء والتغطية',
+      status: 'مراجعة',
+      reason: 'تجميع الأداء، السعة، وتباطؤ الجاهزية ضمن مساحة الشركاء بدل تفريغه في operations.',
+      action: 'فتح مسارات الخدمة',
+    },
+    {
+      id: 'pause',
+      label: 'إغلاق أو pause مؤقت',
+      status: 'منضبط',
+      reason: 'الإيقاف المؤقت يوضح أثره على الظهور والمسارات النشطة قبل أي قرار نهائي.',
+      action: 'مراجعة الإيقاف',
+    },
+    {
+      id: 'appeal',
+      label: 'نزاعات واستئناف',
+      status: 'يتطلب owner',
+      reason: 'الاستئناف يبقى مملوكًا للشركاء مع handoff واضح إلى الدعم أو الكتالوج عند الحاجة.',
+      action: 'فتح النزاع',
+    },
+    {
+      id: 'capacity',
+      label: 'سعة الشريك والضغط',
+      status: 'مرئي',
+      reason: 'ضغط الفرع والسعة يحددان هل المشكلة تشغيلية أم شريكًا قبل أي تصعيد.',
+      action: 'فحص السعة',
+    },
+    {
+      id: 'visibility',
+      label: 'الخط الزمني للظهور',
+      status: 'client gate',
+      reason: 'التسلسل من الوثائق إلى الجاهزية إلى client visibility يظهر هنا بوضوح واحد.',
+      action: 'فتح timeline',
+    },
+  ] as const;
+
+  return (
+    <Box gap={3}>
+      {controlRows.map((row) => (
+        <WebControlPanelDecisionRow
+          key={row.id}
+          entityId={row.id}
+          entityLabel={row.label}
+          status={row.status}
+          statusTone={row.status === 'يتطلب owner' ? 'warning' : 'neutral'}
+          recommendation={row.reason}
+          primaryAction={{ id: `${row.id}-open`, label: row.action }}
+        />
+      ))}
+    </Box>
+  );
+}
+
 export function ControlPanelDshPartnerHubScreen() {
   const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
   const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
@@ -131,6 +187,7 @@ export function ControlPanelDshPartnerHubScreen() {
 
   const PRIMARY_TABS = [
     { id: 'inbox', label: 'الوارد الجديد', active: activeTab === 'inbox' },
+    { id: 'performance', label: 'الأداء والامتثال', active: activeTab === 'performance' },
     { id: 'eligibility', label: 'أهلية الترويج', active: activeTab === 'eligibility' },
     { id: 'topology', label: 'مسارات الخدمة', active: activeTab === 'topology' },
     { id: 'contracts', label: 'إدارة العقود والامتثال', active: activeTab === 'contracts' },
@@ -142,6 +199,11 @@ export function ControlPanelDshPartnerHubScreen() {
       { id: 'registration', label: 'طلبات التسجيل', active: activeSubTab === 'registration' },
       { id: 'modifications', label: 'تعديل البيانات', active: activeSubTab === 'modifications' },
       { id: 'complaints', label: 'شكاوى الشركاء', active: activeSubTab === 'complaints' },
+    ],
+    performance: [
+      { id: 'performance', label: 'الأداء والسعة', active: activeSubTab === 'performance' },
+      { id: 'disputes', label: 'النزاعات والاستئناف', active: activeSubTab === 'disputes' },
+      { id: 'visibility', label: 'الظهور والإيقاف', active: activeSubTab === 'visibility' },
     ],
     eligibility: [
       { id: 'benefits', label: 'المزايا والعروض', active: activeSubTab === 'benefits' },
@@ -224,6 +286,8 @@ export function ControlPanelDshPartnerHubScreen() {
           <Box padding={4} gap={4}>
             {activeTab === 'deactivation' ? (
               <PartnerDeactivationWorkspace />
+            ) : activeTab === 'performance' ? (
+              <PartnerControlWorkspace />
             ) : activeTab === 'eligibility' ? (
               <DshPartnerPromotionEligibilityScreen />
             ) : activeTab === 'topology' ? (

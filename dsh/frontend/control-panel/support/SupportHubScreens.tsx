@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelActionCluster,
@@ -12,10 +13,12 @@ import {
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary } from '../../shared';
+import { DSH_CALL_INTAKE_PREVIEW, DSH_CUSTOMER_360_PREVIEW, getDshFlowPolicySummary } from '../../shared';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
 import { SupportTicketDetailWorkspace } from './SupportTicketDetailWorkspace';
+import { Customer360Workspace } from './Customer360Workspace';
+import { ManualCallIntakeWorkspace } from './ManualCallIntakeWorkspace';
 import { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
 import { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
@@ -29,7 +32,7 @@ import {
   resolveDshControlPanelSectionLabel,
 } from '../shared';
 
-type SupportTab = 'queue' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
+type SupportTab = 'queue' | 'customer-360' | 'call-intake' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
 type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
@@ -114,10 +117,16 @@ const SUPPORT_REGISTRY_FLOW_MAP: Partial<Record<DshOperationsSupportFlowId, stri
   'payment-refund-review': 'partner-finance-bridge',
   'courier-not-arrived': 'captain-order-pickup',
   'branch-readiness-escalation': 'field-readiness-escalation',
+  'customer-360-review': 'customer-360',
+  'manual-call-intake': 'manual-call-intake',
+  'assisted-order-desk': 'assisted-order-desk',
+  'order-rescue': 'order-rescue',
 };
 
 const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
   { id: 'queue', label: 'صفوف الدعم' },
+  { id: 'customer-360', label: 'Customer 360' },
+  { id: 'call-intake', label: 'Call Intake' },
   { id: 'disputes', label: 'النزاعات' },
   { id: 'feedback', label: 'الآراء' },
   { id: 'escalation', label: 'التصعيد' },
@@ -133,6 +142,8 @@ const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: stri
     { id: 'الكباتن', label: 'الكباتن' },
     { id: 'الميدان', label: 'الميدان' },
   ],
+  'customer-360': [{ id: 'overview', label: 'نظرة عامة' }],
+  'call-intake': [{ id: 'manual', label: 'المكالمات اليدوية' }],
   disputes: [{ id: 'الكل', label: 'الكل' }],
   feedback: [{ id: 'الكل', label: 'الكل' }],
   escalation: [{ id: 'الكل', label: 'الكل' }],
@@ -242,7 +253,7 @@ const supportRowSeeds = [
 const SUPPORT_ROWS: ReadonlyArray<SupportRow> = supportRowSeeds.map(buildSupportRow);
 
 function filterRows(tab: SupportTab, lane: string) {
-  if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging') {
+  if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging' || tab === 'customer-360' || tab === 'call-intake') {
     return [];
   }
 
@@ -264,6 +275,7 @@ function filterRows(tab: SupportTab, lane: string) {
 }
 
 export function ControlPanelDshSupportHubScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = React.useState<SupportTab>('queue');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('الكل');
   const [selectedId, setSelectedId] = React.useState<string>(SUPPORT_ROWS[0]?.id ?? '');
@@ -277,6 +289,11 @@ export function ControlPanelDshSupportHubScreen() {
   const selectedFlowPreview = selectedRow ? getOperationsSupportFlowPreview(selectedRow.flowId) : null;
   const selectedRegistrySummary = selectedRow?.registryFlowId ? getDshFlowPolicySummary(selectedRow.registryFlowId) : undefined;
   const selectedFinanceReference = selectedRegistrySummary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined;
+  const primaryMetricValue = activeTab === 'customer-360'
+    ? DSH_CUSTOMER_360_PREVIEW.length
+    : activeTab === 'call-intake'
+      ? DSH_CALL_INTAKE_PREVIEW.length
+      : rows.length;
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -318,7 +335,7 @@ export function ControlPanelDshSupportHubScreen() {
 
       <WebControlPanelKpiStrip
         items={[
-          { id: 'queue', label: 'صفوف الدعم', value: String(rows.length), tone: 'neutral' },
+          { id: 'queue', label: activeTab === 'customer-360' ? 'عملاء 360' : activeTab === 'call-intake' ? 'المكالمات اليدوية' : 'صفوف الدعم', value: String(primaryMetricValue), tone: 'neutral' },
           { id: 'selected', label: 'المحدد', value: selectedRow?.id ?? '—', tone: 'warning' },
           { id: 'owner', label: 'قسم الملكية', value: selectedRow?.governanceSectionLabel ?? resolveDshControlPanelSectionLabel('support'), tone: 'success' },
         ]}
@@ -364,7 +381,22 @@ export function ControlPanelDshSupportHubScreen() {
       </Box>
 
       <main className={styles.surfaceMainPanel}>
-        {activeTab === 'sla-risk' ? (
+        {activeTab === 'customer-360' ? (
+          <div className={styles.surfaceInnerScroll}>
+            <Customer360Workspace
+              onOpenAssistedOrder={() => router.push('/operations?workspace=assisted-order-desk')}
+              onOpenOrderRescue={(orderId) => router.push(orderId ? `/operations?workspace=order-rescue&orderId=${orderId}` : '/operations?workspace=order-rescue')}
+              onOpenCallIntake={() => setActiveTab('call-intake')}
+            />
+          </div>
+        ) : activeTab === 'call-intake' ? (
+          <div className={styles.surfaceInnerScroll}>
+            <ManualCallIntakeWorkspace
+              onOpenCustomer360={() => setActiveTab('customer-360')}
+              onOpenAssistedOrder={() => router.push('/operations?workspace=assisted-order-desk')}
+            />
+          </div>
+        ) : activeTab === 'sla-risk' ? (
           <SupportSlaDashboardScreen />
         ) : activeTab === 'escalation' ? (
           <div className={styles.surfaceInnerScroll}>

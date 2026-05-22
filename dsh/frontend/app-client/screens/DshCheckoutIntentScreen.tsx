@@ -34,6 +34,21 @@ export type DshCheckoutIntentScreenProps = {
   onRetry?: () => void;
 };
 
+function CheckoutContextNotice({
+  title,
+  body,
+}: {
+  title: string;
+  body: string;
+}) {
+  return (
+    <Box margin={spacing[4]} padding={spacing[4]} backgroundColor={colorPalette.lightSurface} borderRadius={radius.md}>
+      <Text role="titleSm" style={{ color: colorPalette.deepBlue, marginBottom: spacing[1] }}>{title}</Text>
+      <Text role="bodySm" style={{ color: colorPalette.deepBlueLighter, lineHeight: 20 }}>{body}</Text>
+    </Box>
+  );
+}
+
 export function DshCheckoutIntentScreen({
   state = 'ready',
   address = 'مسقط، الخوير، شارع المها، بناية رقم 123',
@@ -87,6 +102,10 @@ export function DshCheckoutIntentScreen({
           actionLabel="تتبع الطلب"
           onActionPress={onViewOrder}
         />
+        <CheckoutContextNotice
+          title="رؤية الطلب بعد الإنشاء"
+          body="التتبع والدعم والبدائل ستبقى داخل نفس الطلب فقط. أي رؤية دفع أو استرداد لاحقة ستظهر كمرجع WLT للقراءة فقط."
+        />
       </Surface>
     );
   }
@@ -101,6 +120,10 @@ export function DshCheckoutIntentScreen({
           description={paymentErrorMessage}
           actionLabel="إعادة المحاولة"
           onActionPress={onRetry}
+        />
+        <CheckoutContextNotice
+          title="حدود الدفع والاسترداد"
+          body="قرار الدفع أو الاسترداد يبقى لدى WLT. هذه الشاشة تشرح الفشل وتعيدك للمسار الصحيح فقط، ولا تنفذ أي تعديل مالي محلي."
         />
       </Surface>
     );
@@ -149,6 +172,10 @@ export function DshCheckoutIntentScreen({
           actionLabel="تغيير العنوان"
           onActionPress={onChangeAddress}
         />
+        <CheckoutContextNotice
+          title="عدم التوفر والبدائل"
+          body="عدم التوفر هنا يعني غياب الخدمة أو التغطية لهذا العنوان. إذا توفرت بدائل أو handoff لاحق فسيظهر داخل نفس الطلب، وليس عبر شاشة مالية مستقلة."
+        />
         {onRetry && (
           <Box padding={4}>
             <Button label="إعادة المحاولة" tone="secondary" onPress={onRetry} />
@@ -185,6 +212,11 @@ export function DshCheckoutIntentScreen({
             <Text role="bodyMd" style={styles.etaText}>الوقت المتوقع للوصول: <Text role="titleSm" style={{ color: colorPalette.orange }}>{eta}</Text></Text>
           </View>
         </Box>
+
+        <CheckoutContextNotice
+          title="سياق الطلب والـ WLT"
+          body="Checkout intent يسلّم قرار الدفع إلى WLT فقط. إذا تعثر الدفع أو ظهر refund لاحق فستبقى الرؤية للقراءة فقط هنا، بينما البدائل أو نفاد العناصر ستفتح من داخل الطلب نفسه."
+        />
 
         {/* Section: Payment Method */}
         <Box padding={spacing[4]}>

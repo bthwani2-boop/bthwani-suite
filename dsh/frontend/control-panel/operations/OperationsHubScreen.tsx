@@ -20,6 +20,8 @@ import { OPERATIONS_PULSE_METRICS } from './operations.preview-data';
 import type { CanonicalOperationsGroupId, OperationsPanelId, OperationsViewState } from './operations.types';
 import { CommandCenterScreen } from './CommandCenterScreen';
 import { LiveOrdersScreen } from './LiveOrdersScreen';
+import { AssistedOrderDeskScreen } from './AssistedOrderDeskScreen';
+import { OrderRescueScreen } from './OrderRescueScreen';
 import { DispatchAssignmentScreen } from './DispatchAssignmentScreen';
 import { GeoHeatmapScreen } from './GeoHeatmapScreen';
 import { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';
@@ -43,6 +45,8 @@ export type ControlPanelDshOperationsScreenProps = {
 const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   'command-center': CommandCenterScreen,
   'live-orders': LiveOrdersScreen,
+  'assisted-order-desk': AssistedOrderDeskScreen,
+  'order-rescue': OrderRescueScreen,
   'dispatch-assignment': DispatchAssignmentScreen,
   'geo-heatmap': GeoHeatmapScreen,
   sheinproxy: ControlPanelDshSheinProxyScreen,

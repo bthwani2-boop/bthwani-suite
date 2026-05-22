@@ -13,6 +13,7 @@ export type DshClosureDomain =
   | 'captain-operations'
   | 'field-operations'
   | 'control-panel-operations'
+  | 'control-panel-support'
   | 'control-panel-finance';
 
 /**
@@ -131,6 +132,7 @@ export type DshClosureArea =
   | 'field-onboarding'
   | 'field-visit-evidence'
   | 'control-panel-ops'
+  | 'control-panel-support'
   | 'control-panel-governance';
 
 export type DshCrossSurfaceClosureItem = {
@@ -452,6 +454,64 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     screenProof: 'CommandCenterScreen.tsx + DispatchAssignmentScreen.tsx + ExceptionsEscalationsScreen.tsx + AuditSupportSlaScreen.tsx + GeoHeatmapScreen.tsx موجودة ومستخدمة في control-panel operations surface.',
     stateCoverageProof: 'DispatchAssignment يستهلك DISPATCH_LIFECYCLE_STATE_MAP + getDshLifecycleStateMetadata؛ ExceptionsEscalations يربط EXCEPTION_TICKET_MAP بتذاكر الدعم/audit؛ AuditSupportSla يفتح detail route بدل console/debug path؛ GeoHeatmap يعلن boundary صريحة أنه CP-only summary-first.',
     crossSurfaceProof: 'التناظر actor-to-actor صار مثبتًا في الكود: حالات captain_unavailable / reassignment_required في control-panel تعتمد نفس dsh-order-journey.model المستهلك في app-captain/app-client، وصف الاستثناءات يربط support/audit handoff، وheatmap تبقى control-panel only بدل خلطها بأسطح التشغيل الأخرى.',
+  },
+  {
+    surfaceId: 'control-panel',
+    actor: 'operator',
+    area: 'control-panel-support',
+    domain: 'control-panel-support',
+    step: 'support',
+    status: 'needs-visual-evidence',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    title: 'Customer 360 وManual Call Intake',
+    description: 'قسم الدعم يملك Customer 360 وCall Intake داخل shell الحالي مع quick actions إلى Assisted Order وOrder Rescue وWLT visibility read-only.',
+    screenOwner: 'SupportHubScreens.tsx + Customer360Workspace.tsx + ManualCallIntakeWorkspace.tsx',
+    primaryAction: 'فتح العميل أو المكالمة اليدوية ثم توجيه الحالة إلى order, ticket, assisted-order, rescue, أو WLT reference.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'blocked'],
+    evidenceStatus: 'needs-visual-evidence',
+    remainingBlocker: 'المنطق والروابط موجودة، لكن screenshots وruntime proof لمسار الهوية والربط المتقاطع ما زالت ناقصة.',
+    crossSurfaceDependencies: [
+      'app-client order context',
+      'control-panel operations assisted order',
+      'wlt finance visibility',
+    ],
+    wltBoundary: 'الرؤية المالية هنا مرجعية فقط، وأي refund/settlement/payout يبقى مملوكًا لـ WLT.',
+    visualEvidenceRequired: true,
+    evidenceHint: 'يحتاج: visual capture لـ Customer 360 وCall Intake مع identity gate وWLT read-only panel.',
+    routeHint: '/support',
+    routeProof: 'SupportHubScreens.tsx يبني تبويبات customer-360 وcall-intake داخل /support من دون route جديدة.',
+    screenProof: 'Customer360Workspace.tsx + ManualCallIntakeWorkspace.tsx موجودتان ومربوطتان داخل support hub.',
+    stateCoverageProof: 'verification required / verified / blocked + quick actions + WLT visibility notes معلنة في shared previews.',
+    crossSurfaceProof: 'Customer 360 وCall Intake يستهلكان shared previews نفسها مع quick links إلى Assisted Order وOrder Rescue وWLT reference، ما يثبت handoff حقيقي بين الدعم والعمليات والمرجع المالي.',
+  },
+  {
+    surfaceId: 'control-panel',
+    actor: 'operator',
+    area: 'control-panel-ops',
+    domain: 'control-panel-operations',
+    step: 'operations-intervention',
+    status: 'needs-visual-evidence',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    title: 'Assisted Order وOrder Rescue',
+    description: 'العمليات توسعت داخل shell نفسها لإدارة assisted-order-desk وorder-rescue مع playbooks مدمجة داخل command-center والاستثناءات.',
+    screenOwner: 'OperationsHubScreen.tsx + AssistedOrderDeskScreen.tsx + OrderRescueScreen.tsx + CommandCenterScreen.tsx + ExceptionsEscalationsScreen.tsx',
+    primaryAction: 'فتح التدخل التشغيلي المناسب أو playbook القرار التالي من نفس قسم العمليات.',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'blocked'],
+    evidenceStatus: 'needs-visual-evidence',
+    remainingBlocker: 'تدفقات التدخل والإنقاذ مربوطة، لكن visual/runtime evidence للمشغل النهائي ما زالت مفقودة.',
+    crossSurfaceDependencies: [
+      'support customer 360 and call intake',
+      'app-partner readiness and disputes',
+      'wlt preview-only finance references',
+    ],
+    wltBoundary: 'أي قرار مالي يظهر كمرجع فقط داخل rescue أو assisted-order ولا يتحول إلى mutation.',
+    visualEvidenceRequired: true,
+    evidenceHint: 'يحتاج: visual capture لـ assisted-order-desk وorder-rescue وplaybook cards داخل command-center/exceptions.',
+    routeHint: '/operations',
+    routeProof: 'operations.registry.ts يضيف assisted-order-desk وorder-rescue كـ workspace tabs داخل /operations.',
+    screenProof: 'AssistedOrderDeskScreen.tsx + OrderRescueScreen.tsx + command-center/exceptions playbook sections موجودة ومستخدمة في hub.',
+    stateCoverageProof: 'verified/pending identity + blocker + next-best-action + WLT boundary تظهر من shared preview layer عند الفتح فقط.',
+    crossSurfaceProof: 'العمليات تستهلك DSH_ASSISTED_ORDER_PREVIEW وDSH_ORDER_RESCUE_PREVIEW وDSH_OPS_INTERVENTION_PLAYBOOKS مع handoff واضح إلى support/partners/finance.',
   },
   {
     surfaceId: 'control-panel',

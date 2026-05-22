@@ -42,6 +42,28 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
     ]
   },
   {
+    id: 'assisted-order-desk',
+    label: 'Assisted Order',
+    description: 'إعادة بناء السلة، تثبيت البدائل، والتحقق من الهوية قبل أي handoff نهائي.',
+    badge: 'مساندة',
+    subGroups: [
+      { id: 'identity', label: 'الهوية' },
+      { id: 'basket', label: 'السلة' },
+      { id: 'wlt', label: 'رؤية WLT' },
+    ]
+  },
+  {
+    id: 'order-rescue',
+    label: 'Order Rescue',
+    description: 'مكتب إنقاذ يحدد blocker واحدًا ويثبت next-best-action عبر الدعم أو الشريك أو WLT المرجعي.',
+    badge: 'إنقاذ',
+    subGroups: [
+      { id: 'critical', label: 'حرج' },
+      { id: 'handoffs', label: 'handoffs' },
+      { id: 'wlt', label: 'WLT' },
+    ]
+  },
+  {
     id: 'dispatch-assignment',
     label: 'الإسناد والتوزيع',
     description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.',
@@ -190,6 +212,8 @@ const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWork
   evidence: 'audit-support-sla',
   'order-detail': 'live-orders',
   orderchat: 'live-orders',
+  'assisted-order-desk': 'assisted-order-desk',
+  'order-rescue': 'order-rescue',
   dispatch: 'dispatch-assignment',
   'live-tracking': 'live-orders',
   exceptions: 'exceptions-escalations',

@@ -7,6 +7,8 @@ export { SupportTicketListScreen } from './SupportTicketListScreen';
 export { SupportTicketDetailWorkspace } from './SupportTicketDetailWorkspace';
 export { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 export { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
+export { Customer360Workspace } from './Customer360Workspace';
+export { ManualCallIntakeWorkspace } from './ManualCallIntakeWorkspace';
 export { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
 export { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 export { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';

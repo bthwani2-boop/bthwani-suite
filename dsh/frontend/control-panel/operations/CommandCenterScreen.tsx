@@ -22,6 +22,7 @@ import {
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/dsh-signal-layer.model';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../shared';
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -185,6 +186,33 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
                   id: `go-${action.id}`,
                   label: 'انتقل',
                   onAction: () => router.push(buildOperationsHref(action.workspace)),
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 3.5. Playbooks — next-best-action without creating duplicate owners */}
+        <div className={styles.surfaceCompactPanel}>
+          <h3 className={styles.surfacePanelTitle}>Playbooks التدخل</h3>
+          <div className={styles.surfaceStackSmall}>
+            {DSH_OPS_INTERVENTION_PLAYBOOKS.slice(0, 3).map((playbook) => (
+              <WebControlPanelRecommendation
+                key={playbook.playbookId}
+                title={playbook.title}
+                reason={`${playbook.checkpoints.join(' · ')} · ${playbook.nextDecision}`}
+                confidence={playbook.severity === 'danger' ? 'high' : 'medium'}
+                auditTag={playbook.ownerSection}
+                primaryAction={{
+                  id: `${playbook.playbookId}-primary`,
+                  label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح Order Rescue' : 'فتح Assisted Order',
+                  onAction: () => router.push(
+                    buildOperationsHref(
+                      playbook.supportedWorkspaces.includes('order-rescue')
+                        ? 'order-rescue'
+                        : 'assisted-order-desk',
+                    ),
+                  ),
                 }}
               />
             ))}

@@ -203,6 +203,15 @@ export function ControlPanelDshFinanceHubScreen({
               {platformGovernance?.onDemandPolicySummary ?? 'افتح ملخص السياسة فقط عند الطلب، دون أي env أو backend mutation.'}
             </Text>
           </Box>
+          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ flexGrow: 1, minWidth: 280 }}>
+            <Text role="titleSm">WLT visibility consumers</Text>
+            <Text role="bodySm" tone="muted">
+              Customer 360 وManual Call Intake وAssisted Order وOrder Rescue تستهلك هذه اللوحة كرؤية مرجعية فقط.
+            </Text>
+            <Text role="caption" tone="muted">
+              لا يوجد هنا refund/settlement/payout/ledger mutation. أي owner مالي يبقى WLT-only مهما كان مصدر الطلب.
+            </Text>
+          </Box>
         </Box>
       </Box>
 

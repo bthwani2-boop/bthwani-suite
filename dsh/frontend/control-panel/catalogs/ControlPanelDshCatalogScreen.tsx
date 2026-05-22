@@ -360,6 +360,15 @@ export function ControlPanelDshCatalogScreen({
     setCatalogPage((currentPage) => Math.min(currentPage, catalogTotalPages));
   }, [catalogTotalPages]);
 
+  const closureRecommendations = [
+    'Bulk review للمنتجات المتقاربة',
+    'Duplicate merge قبل النشر',
+    'Barcode conflict وGTIN mismatch',
+    'Category mapping وقياس التصنيف',
+    'Substitution / replacement قبل قبول البديل',
+    'Media + client visibility audit',
+  ] as const;
+
   const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
     <th style={{ padding: '6px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width, position: 'relative' }}>
        <button
@@ -517,6 +526,15 @@ export function ControlPanelDshCatalogScreen({
           primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
           secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner-exception') }}
         />
+        <Box gap={2} marginTop={2}>
+          {closureRecommendations.map((item) => (
+            <Surface key={item} tone="inset" padding={3} radiusToken="lg" border borderTone="line">
+              <Text role="bodySm" tone="muted">
+                {item}
+              </Text>
+            </Surface>
+          ))}
+        </Box>
       </Box>
 
       {/* 6. MAIN CONTENT AREA */}

@@ -353,6 +353,17 @@ function OrderDetailSection({
 						/>
 					</Surface>
 
+					<Surface tone="inset" gap={3}>
+						<SectionHeader title="قواعد الالتقاط والتسليم" subtitle="أسباب الرفض والفشل وإثباتات التسليم تبقى إلزامية داخل نفس المسار." />
+						<KeyValueList
+							items={[
+								{ label: 'سبب إجباري', value: 'رفض العرض / فشل الالتقاط / فشل التسليم', tone: 'warning' },
+								{ label: 'Fallback buttons', value: 'الدعم · الجرس · فتح التذكرة', tone: 'brand' },
+								{ label: 'PoD states', value: 'idle → required → uploaded', tone: 'success' },
+							]}
+						/>
+					</Surface>
+
 					{/* جرس تنبيه الكابتن المدمج والمباشر */}
 					<Surface tone={bellRung ? 'success' : 'raised'} gap={2} style={{ padding: 14, borderLeftWidth: 4, borderLeftColor: bellRung ? theme.success : theme.warning }}>
 						<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
