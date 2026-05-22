@@ -2341,20 +2341,6 @@ const styles = StyleSheet.create({
   cbMilkyWash: {
     ...StyleSheet.absoluteFillObject,
   },
-  heroCoverFade: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 160,
-    overflow: 'hidden',
-  },
-  heroCoverFadeBand: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
 });
 
 export default DshStoreGetScreen;

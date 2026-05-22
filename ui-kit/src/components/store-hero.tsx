@@ -97,7 +97,7 @@ export function StoreHero({
   const { direction } = useDirection();
   const isRTL = direction === 'rtl';
   const { theme: tokens } = useTheme();
-  const { mode: appearanceMode } = useBThwaniAppearance();
+  const { mode: appearanceMode, tokens: appTokens } = useBThwaniAppearance();
   const isDarkGlass = appearanceMode === 'darkGlass';
 
   // Fallback ScrollY if not animated externally
@@ -116,19 +116,7 @@ export function StoreHero({
     };
   }, [isDarkGlass, tokens]);
 
-  // Multiband gradient array for bottom fade-out effect on the cover image
-  const reverseFeatherBands = React.useMemo(() => {
-    const bgBase = isDarkGlass ? '22, 22, 28' : '255, 255, 255';
-    return Array.from({ length: 6 }, (_, i) => {
-      const step = i / 5;
-      const alpha = Math.pow(step, 2) * (isDarkGlass ? 1 : 1);
-      return {
-        key: String(i),
-        bottom: i * 2,
-        backgroundColor: `rgba(${bgBase}, ${alpha.toFixed(3)})`,
-      };
-    });
-  }, [isDarkGlass]);
+
 
   const ORANGE = colorPalette.brand;
   const DARK_BLUE = colorPalette.infoStrong;
@@ -267,7 +255,16 @@ export function StoreHero({
         </View>
       </View>
 
-      <View style={styles.contentBlock}>
+      <View
+        style={[
+          styles.contentBlock,
+          {
+            backgroundColor: appTokens.surface,
+            borderTopLeftRadius: 32,
+            borderTopRightRadius: 32,
+          },
+        ]}
+      >
         {/* Identity & Status Card */}
         <View style={styles.heroLuxuryCard}>
           {/* Identity Cluster */}
@@ -328,17 +325,6 @@ export function StoreHero({
 
           {/* Metrics Chips Row */}
           <View style={[styles.heroLuxuryMetricsRow, isRTL && styles.rowReverse]}>
-            <View style={styles.metricsRowReverseFeather} pointerEvents="none">
-              {reverseFeatherBands.map((band) => (
-                <View
-                  key={band.key}
-                  style={[
-                    styles.metricsRowReverseFeatherBand,
-                    { bottom: band.bottom, backgroundColor: band.backgroundColor },
-                  ]}
-                />
-              ))}
-            </View>
 
             {hasBthwaniPro && (
               <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
@@ -404,6 +390,17 @@ export function StoreHero({
                       styles.heroLuxuryDeliveryChip,
                       active && !isReadonly && {
                         backgroundColor: isDarkGlass ? hexToRgba(colorPalette.white, 0.15) : colorPalette.white,
+                        ...Platform.select({
+                          ios: {
+                            shadowColor: colorPalette.black,
+                            shadowOpacity: 0.08,
+                            shadowRadius: 4,
+                            shadowOffset: { width: 0, height: 2 },
+                          },
+                          android: {
+                            elevation: 2,
+                          },
+                        }),
                       },
                       isReadonly && styles.heroLuxuryDeliveryChipReadonly,
                     ]}
@@ -436,6 +433,17 @@ export function StoreHero({
                       styles.heroLuxuryDeliveryChip,
                       active && {
                         backgroundColor: isDarkGlass ? hexToRgba(colorPalette.white, 0.15) : colorPalette.white,
+                        ...Platform.select({
+                          ios: {
+                            shadowColor: colorPalette.black,
+                            shadowOpacity: 0.08,
+                            shadowRadius: 4,
+                            shadowOffset: { width: 0, height: 2 },
+                          },
+                          android: {
+                            elevation: 2,
+                          },
+                        }),
                       },
                     ]}
                     onPress={() => onModeChange?.(mode.id)}
@@ -478,6 +486,7 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'relative',
     backgroundColor: 'transparent',
+    overflow: 'hidden',
   },
   heroCoverImage: {
     width: '100%',
@@ -519,7 +528,7 @@ const styles = StyleSheet.create({
   heroLuxuryCard: {
     paddingTop: 16,
     paddingHorizontal: 16,
-    paddingBottom: 0,
+    paddingBottom: 16,
     gap: 16,
   },
   heroLuxuryIdentityRow: {
@@ -538,20 +547,7 @@ const styles = StyleSheet.create({
     gap: 8,
     flexWrap: 'wrap',
   },
-  metricsRowReverseFeather: {
-    position: 'absolute',
-    top: -16,
-    bottom: -32,
-    left: -32,
-    right: -32,
-    zIndex: -1,
-  },
-  metricsRowReverseFeatherBand: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-  },
+
   heroLuxuryDeliveryRow: {
     flexDirection: 'row',
     alignItems: 'center',
