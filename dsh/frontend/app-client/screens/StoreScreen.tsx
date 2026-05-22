@@ -1075,8 +1075,8 @@ function DshStoreGetScreenContent({
         stateId="blockingError"
         title="المتجر غير متاح للعميل الآن"
         description={storeVisibility.blockedReason ?? 'لم يجتز هذا المتجر بوابة الظهور الكاملة بعد.'}
-        actionLabel={onBack ? 'العودة' : undefined}
-        onActionPress={onBack}
+        actionLabel={_onBack ? 'العودة' : undefined}
+        onActionPress={_onBack}
       />
     );
   }

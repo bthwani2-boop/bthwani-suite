@@ -54,6 +54,12 @@ export type StoreHeroProps = {
   deliveryModes?: readonly StoreHeroFulfillmentMode[];
   selectedMode?: string;
   onModeChange?: (id: string) => void;
+  /**
+   * 'interactive' (default) — tabs are pressable and update selectedMode.
+   * 'readonly' — tabs are display-only status indicators with no press handler.
+   *   Use 'readonly' in partner/operator surfaces where modes are not selectable by the viewer.
+   */
+  serviceModesBehavior?: 'interactive' | 'readonly';
 };
 
 function hexToRgba(hex: string, alpha = 0.9) {
@@ -83,6 +89,7 @@ export function StoreHero({
   deliveryModes = [],
   selectedMode,
   onModeChange,
+  serviceModesBehavior = 'interactive',
 }: StoreHeroProps) {
   const { direction } = useDirection();
   const isRTL = direction === 'rtl';
@@ -380,6 +387,39 @@ export function StoreHero({
             >
               {deliveryModes.map((mode) => {
                 const active = selectedMode === mode.id;
+                const isReadonly = serviceModesBehavior === 'readonly';
+                const chip = (
+                  <View
+                    key={mode.id}
+                    style={[
+                      styles.heroLuxuryDeliveryChip,
+                      active && !isReadonly && {
+                        backgroundColor: isDarkGlass ? hexToRgba(colorPalette.white, 0.15) : colorPalette.white,
+                      },
+                      isReadonly && styles.heroLuxuryDeliveryChipReadonly,
+                    ]}
+                  >
+                    <View style={[styles.heroLuxuryDeliveryContent, isRTL && styles.rowReverse]}>
+                      <Text
+                        style={[
+                          styles.heroLuxuryDeliveryTitle,
+                          { color: active && !isReadonly ? ORANGE : appearanceChrome.secondaryText },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {mode.label}
+                      </Text>
+                      <Icon
+                        name={mode.icon}
+                        size={14}
+                        color={active && !isReadonly ? ORANGE : appearanceChrome.secondaryText}
+                      />
+                    </View>
+                  </View>
+                );
+                if (isReadonly) {
+                  return chip;
+                }
                 return (
                   <TouchableOpacity
                     key={mode.id}
@@ -516,6 +556,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  heroLuxuryDeliveryChipReadonly: {
+    opacity: 0.72,
   },
   heroLuxuryDeliveryContent: {
     flexDirection: 'row',

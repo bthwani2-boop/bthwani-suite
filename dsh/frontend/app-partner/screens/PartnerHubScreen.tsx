@@ -8,7 +8,6 @@ import {
   colorPalette,
   Icon,
   KeyValueList,
-  ListItem,
   MobileCommandSectionList,
   MobileScrollView,
   MobileStickyPrimaryAction,
@@ -17,10 +16,11 @@ import {
   Surface,
   Text,
   TextField,
-  TopBar,
   useDirection,
   useTheme,
   StoreHero,
+  TopBar,
+  ListItem,
 } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import {
@@ -522,10 +522,11 @@ function SettingsOptionRow({
   );
 }
 
+/** Section shell — no TopBar/back button; hardware back handles navigation.
+ * Section title is displayed inline as a visual header inside the content. */
 function HubSectionShell({
   title,
   icon,
-  onBack,
   children,
 }: {
   title: string;
@@ -534,20 +535,45 @@ function HubSectionShell({
   onBack: () => void;
   children?: React.ReactNode;
 }) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      <TopBar
-        variant="secondary"
-        title={title}
-        style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: onBack,
+      {/* Visual section title — no back button, hardware back handles it */}
+      <View
+        style={{
+          flexDirection: rowDirection,
+          alignItems: 'center',
+          gap: 12,
+          paddingBottom: 4,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.line,
+          marginBottom: 4,
         }}
-      />
+      >
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.brandSurface,
+            flexShrink: 0,
+          }}
+        >
+          <Icon name={icon} size={18} tone="brand" />
+        </View>
+        <Text
+          role="titleSm"
+          style={{ textAlign: direction === 'rtl' ? 'right' : 'left', flex: 1 }}
+          numberOfLines={1}
+        >
+          {title}
+        </Text>
+      </View>
 
       <View style={{ gap: 16 }}>
         {children}
@@ -556,6 +582,96 @@ function HubSectionShell({
   );
 }
 
+/** Premium nav row: icon + title + subtitle on the content side, chevron on the action side. RTL-correct. */
+function HubNavRow({
+  title,
+  description,
+  icon,
+  onPress,
+}: {
+  title: string;
+  description: string;
+  icon: React.ComponentProps<typeof Icon>['name'];
+  onPress: () => void;
+}) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: rowDirection,
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        borderRadius: 16,
+        backgroundColor: pressed ? theme.surfaceInset : theme.surfaceRaised,
+        gap: 12,
+        borderWidth: 1,
+        borderColor: theme.line,
+      })}
+    >
+      {/* Icon + Text cluster — stays together on the content side */}
+      <View
+        style={{
+          flexDirection: rowDirection,
+          alignItems: 'center',
+          gap: 12,
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.brandSurface,
+            borderWidth: 1,
+            borderColor: theme.brand + '33',
+            flexShrink: 0,
+          }}
+        >
+          <Icon name={icon} size={20} tone="brand" />
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            minWidth: 0,
+            gap: 2,
+            alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start',
+          }}
+        >
+          <Text
+            role="bodyStrong"
+            numberOfLines={1}
+            style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}
+          >
+            {title}
+          </Text>
+          <Text
+            role="bodySm"
+            tone="muted"
+            numberOfLines={2}
+            style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}
+          >
+            {description}
+          </Text>
+        </View>
+      </View>
+
+      {/* Chevron — always on the action/opposite side */}
+      <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
+    </Pressable>
+  );
+}
 
 
 function resolveServiceModeEnabled(serviceModes: readonly { id: string; enabled: boolean }[] | undefined, modeId: PartnerOperationalMode['id'], fallback: boolean) {
@@ -671,6 +787,9 @@ function OperationsPanel({
   serviceModes,
   onBack,
   onOpenStoreCourierSetup,
+  listingEnabled,
+  storeVisibility,
+  visibilityLabel,
 }: {
   branchLabel: string;
   cityLabel: string;
@@ -681,6 +800,9 @@ function OperationsPanel({
   serviceModes: readonly { id: string; label: string; description: string; enabled: boolean }[];
   onBack: () => void;
   onOpenStoreCourierSetup?: () => void;
+  listingEnabled: boolean;
+  storeVisibility: ReturnType<typeof resolveDshStoreClientVisibility>;
+  visibilityLabel: string;
 }) {
   const { direction } = useDirection();
   const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
@@ -735,6 +857,48 @@ function OperationsPanel({
           <SummaryCell label="أوضاع مفعلة" value={`${activeModesCount}/3`} tone="brand" />
           <SummaryCell label="مناطق نشطة" value="منطقتان" tone="success" />
         </View>
+      </Surface>
+
+      {/* 3) Visibility and Coverage Zones (Read-Only) */}
+      <Surface tone="raised" padding={3} gap={3}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الظهور ونقاط الخدمة</Text>
+        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>شروط وجاهزية الظهور لعملاء بثواني (للمعلومة فقط).</Text>
+        <KeyValueList
+          dense
+          items={[
+            { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
+            { label: 'النطاق الحالي', value: branchLabel },
+            { label: 'المنطقة', value: activeZoneLabel },
+            {
+              label: 'المعروض للعملاء',
+              value: storeVisibility.visible ? 'ظاهر للعميل' : 'محجوب عن العميل',
+              tone: storeVisibility.visible ? 'success' : 'warning',
+            },
+            {
+              label: 'حالة التفعيل',
+              value: getDshPartnerActivationStatusLabel(storeVisibility.activationStatus),
+              tone: storeVisibility.visible ? 'success' : 'warning',
+            },
+          ]}
+        />
+        <Surface tone="inset" padding={3} gap={2}>
+          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تفاصيل تدقيق شروط الظهور</Text>
+          {storeVisibility.checklist.map((check) => (
+            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 8 }}>
+              <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'}>
+                {check.satisfied ? '✓' : '✗'}
+              </Text>
+              <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'}>
+                  {check.label}
+                </Text>
+                {!check.satisfied && check.blockedReason ? (
+                  <Text role="caption" tone="muted">{check.blockedReason}</Text>
+                ) : null}
+              </Box>
+            </Box>
+          ))}
+        </Surface>
       </Surface>
 
       <Surface tone="inset" padding={3} gap={2}>
@@ -910,7 +1074,155 @@ function OperationsPanel({
   );
 }
 
+/** Analytics view-model — preview/seed data only.
+ * No customer PII. Summary metrics only per on-demand retrieval contract.
+ * Designed for later real-data binding without layout changes. */
+const dshPartnerAnalyticsPreview = {
+  storeFavoritesCount: 847,
+  productFavoritesCount: 2_340,
+  followersCount: 1_200,
+  totalRatings: 318,
+  averageRating: 4.9,
+  topOrderedProduct: { name: 'علبة تمر فاخر', ordersCount: 214 },
+  topFavoritedProduct: { name: 'تمر المجدول الملكي', favoritesCount: 189 },
+  topViewedProduct: { name: 'تمر الأمبر الذهبي', viewsCount: 1_080 },
+  opportunityProduct: {
+    name: 'تمر المجدول الملكي',
+    favoritesCount: 189,
+    ordersCount: 22,
+    insight: 'مفضّل كثيرًا لكنه لم يتحول لطلبات كافية. فرصة عرض قصير.',
+  },
+  smartRecommendation: 'فعّل خصمًا قصيرًا 15٪ على المنتج الأعلى حفظًا لمدة 3 أيام.',
+} as const;
+
+function AnalyticsInsightMetric({ label, value, tone = 'default', icon }: { label: string; value: string; tone?: 'default' | 'brand' | 'success' | 'info'; icon: React.ComponentProps<typeof Icon>['name'] }) {
+  const { theme } = useTheme();
+  const { direction } = useDirection();
+  const accentColor = tone === 'brand' ? theme.brand : tone === 'success' ? theme.success : tone === 'info' ? theme.info : theme.lineStrong;
+
+  return (
+    <Surface
+      tone="default"
+      padding={3}
+      gap={1}
+      style={{ flex: 1, minWidth: 140, borderWidth: 1, borderColor: accentColor }}
+    >
+      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+        <Icon name={icon} size={14} tone={tone} />
+        <Text role="caption" tone="muted" numberOfLines={1} style={{ flex: 1, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+          {label}
+        </Text>
+      </View>
+      <Text role="titleSm" tone={tone} numberOfLines={1} align="start">
+        {value}
+      </Text>
+    </Surface>
+  );
+}
+
+function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const d = dshPartnerAnalyticsPreview;
+
+  return (
+    <Box gap={4}>
+      {/* Summary headline */}
+      <Surface tone="raised" padding={3} gap={2}>
+        <Text role="label" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+          ملخص الأداء — {storeName}
+        </Text>
+        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+          مؤشرات موجزة للتفاعل والنمو. لا تتضمن بيانات عملاء تفصيلية.
+        </Text>
+      </Surface>
+
+      {/* Engagement metrics grid */}
+      <Surface tone="raised" padding={3} gap={3}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مؤشرات التفاعل</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
+          <AnalyticsInsightMetric label="متابعو المتجر" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <AnalyticsInsightMetric label="حفظ المنتجات في المفضلة" value={d.productFavoritesCount.toLocaleString('ar')} tone="success" icon="bookmark-outline" />
+          <AnalyticsInsightMetric label="عدد التقييمات" value={d.totalRatings.toLocaleString('ar')} tone="default" icon="star-half-outline" />
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <AnalyticsInsightMetric label="متوسط التقييم" value={`${d.averageRating} ⭐`} tone="brand" icon="star" />
+        </View>
+      </Surface>
+
+      {/* Top products */}
+      <Surface tone="raised" padding={3} gap={3}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>أبرز المنتجات</Text>
+        <KeyValueList
+          dense
+          items={[
+            { label: 'الأكثر طلبًا', value: `${d.topOrderedProduct.name} (${d.topOrderedProduct.ordersCount} طلب)`, tone: 'brand' },
+            { label: 'الأكثر تفضيلًا', value: `${d.topFavoritedProduct.name} (${d.topFavoritedProduct.favoritesCount} حفظ)`, tone: 'success' },
+            { label: 'الأعلى مشاهدة', value: `${d.topViewedProduct.name} (${d.topViewedProduct.viewsCount} مشاهدة)`, tone: 'info' },
+          ]}
+        />
+      </Surface>
+
+      {/* Opportunity spotlight */}
+      <Surface
+        tone="inset"
+        padding={3}
+        gap={2}
+        style={{ borderWidth: 1.5, borderColor: theme.warning + '66' }}
+      >
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+          <Icon name="bulb-outline" size={18} tone="warning" />
+          <Text role="bodyStrong" tone="warning">فرصة تسويقية</Text>
+        </View>
+        <Text role="bodySm" align={direction === 'rtl' ? 'end' : 'start'}>
+          <Text role="bodySm" tone="default">{d.opportunityProduct.name}: </Text>
+          {d.opportunityProduct.insight}
+        </Text>
+        <KeyValueList
+          dense
+          items={[
+            { label: 'المفضلات', value: String(d.opportunityProduct.favoritesCount), tone: 'success' },
+            { label: 'الطلبات الفعلية', value: String(d.opportunityProduct.ordersCount), tone: 'warning' },
+          ]}
+        />
+      </Surface>
+
+      {/* Smart recommendation */}
+      <Surface
+        tone="raised"
+        padding={3}
+        gap={2}
+        style={{ borderWidth: 1.5, borderColor: theme.brand + '55' }}
+      >
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+          <Icon name="trending-up-outline" size={18} tone="brand" />
+          <Text role="bodyStrong" tone="brand">توصية ذكية</Text>
+        </View>
+        <Text role="bodySm" align={direction === 'rtl' ? 'end' : 'start'}>{d.smartRecommendation}</Text>
+        <Button
+          label="فعّل العرض"
+          tone="primary"
+          fullWidth={false}
+          onPress={() => {/* promotion intent — UI only, no backend */}}
+        />
+      </Surface>
+
+      {/* Promotion intent panel below */}
+      <PromotionIntentPanel
+        storeName={storeName}
+        branchLabel="اليرموك · الرياض"
+        activeZoneLabel="اليرموك"
+        todayHoursLabel="09:00 - 23:00"
+      />
+    </Box>
+  );
+}
+
 export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
+
   const {
     state = 'ready',
     section,
@@ -969,8 +1281,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const resolvedStoreName = activeCanonicalStore?.storeName ?? storeName;
   const resolvedCityLabel = activeCanonicalStore?.cityLabel ?? cityLabel;
   const resolvedBranchLabel = activeCanonicalStore?.branchLabel ?? branchLabel;
-  const resolvedManagerLabel = activeCanonicalStore?.managerLabel ?? managerLabel;
-  const resolvedTodayHoursLabel = activeCanonicalStore?.todayHoursLabel ?? todayHoursLabel;
+  const resolvedManagerLabel = activeCanonicalStore?.managerName ?? managerLabel;
+  const resolvedTodayHoursLabel = activeCanonicalStore?.operatingHoursLabel ?? todayHoursLabel;
   const [branchName, setBranchName] = React.useState(resolvedStoreName);
   const [branchAddress, setBranchAddress] = React.useState(`${resolvedCityLabel}، الياسمين، شارع الندى`);
   const [branchContact, setBranchContact] = React.useState('011 555 0123');
@@ -1077,18 +1389,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     if (activeSection === 'analytics') {
       return (
         <HubSectionShell title={sectionCopy.analytics.title} description={sectionCopy.analytics.description} icon={sectionCopy.analytics.icon} onBack={() => updateSection('hub')}>
-          <PromotionsScreen
-            storeName={storeName}
-            branchLabel={branchLabel}
-            activeZoneLabel={activeZoneLabel}
-            todayHoursLabel={todayHoursLabel}
-          />
-          <PromotionIntentPanel
-            storeName={storeName}
-            branchLabel={branchLabel}
-            activeZoneLabel={activeZoneLabel}
-            todayHoursLabel={todayHoursLabel}
-          />
+          <AnalyticsInsightsPanel storeName={resolvedStoreName} />
         </HubSectionShell>
       );
     }
@@ -1305,15 +1606,18 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     if (activeSection === 'operations') {
       return (
         <OperationsPanel
-          branchLabel={branchLabel}
-          cityLabel={cityLabel}
-          storeName={storeName}
-          todayHoursLabel={todayHoursLabel}
-          storeOpen={storeOpen}
-          activeZoneLabel={activeZoneLabel}
+          branchLabel={resolvedBranchLabel}
+          cityLabel={resolvedCityLabel}
+          storeName={resolvedStoreName}
+          todayHoursLabel={resolvedTodayHoursLabel}
+          storeOpen={isAvailable}
+          activeZoneLabel={resolvedActiveZoneLabel}
           serviceModes={serviceModes}
           onBack={() => updateSection('hub')}
           onOpenStoreCourierSetup={onOpenStoreCourierSetup}
+          listingEnabled={listingEnabled}
+          storeVisibility={storeVisibility}
+          visibilityLabel={visibilityLabel}
         />
       );
     }
@@ -1345,9 +1649,10 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           isOpen={isAvailable}
           hasBthwaniPro={activeCanonicalStore?.hasBthwaniPro ?? true}
           distanceLabel={activeCanonicalStore?.distanceLabel || '1.8 كم'}
-          deliveryTimeLabel={activeCanonicalStore?.deliveryTimeLabel || resolvedTodayHoursLabel}
+          deliveryTimeLabel={activeCanonicalStore?.deliveryLabel || resolvedTodayHoursLabel}
           rating={activeCanonicalStore?.rating || 4.9}
           onSearchPress={openOrdersSearch}
+          serviceModesBehavior="readonly"
           deliveryModes={defaultOperationalModes.map((mode) => ({
             id: mode.id,
             label: mode.title,
@@ -1374,76 +1679,27 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             </View>
           </Surface>
 
-          {/* 2) Editable Branch Details Card */}
+          {/* 2) Read-Only Branch Details Card */}
           <Surface tone="raised" padding={3} gap={3}>
             <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>بيانات الفرع</Text>
-            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تعديل الاسم والعنوان ورقم التواصل مباشرة.</Text>
-            <TextField label="اسم الفرع" value={branchName} onChangeText={setBranchName} placeholder="اسم الفرع الحالي" />
-            <TextField label="العنوان" value={branchAddress} onChangeText={setBranchAddress} placeholder="عنوان الفرع" multiline />
-            <TextField label="رقم التواصل" value={branchContact} onChangeText={setBranchContact} placeholder="رقم الهاتف" keyboardType="phone-pad" />
-            <Button
-              label="حفظ تغييرات الفرع"
-              tone="primary"
-              onPress={() => {
-                setBranchSavedTime(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }));
-              }}
-            />
-            {branchSavedTime ? (
-              <Text role="caption" tone="success" align={direction === 'rtl' ? 'end' : 'start'}>
-                تم حفظ التعديلات بنجاح في {branchSavedTime}
-              </Text>
-            ) : null}
-          </Surface>
-
-          {/* 3) Visibility and Coverage Zones (Read-Only) */}
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الظهور ونطاق الخدمة</Text>
-            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>شروط وجاهزية الظهور لعملاء بثواني (للمعلومة فقط).</Text>
             <KeyValueList
               dense
               items={[
-                { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
-                { label: 'النطاق الحالي', value: resolvedBranchLabel },
-                { label: 'المنطقة', value: resolvedActiveZoneLabel },
-                {
-                  label: 'المعروض للعملاء',
-                  value: storeVisibility.visible ? 'ظاهر للعميل' : 'محجوب عن العميل',
-                  tone: storeVisibility.visible ? 'success' : 'warning',
-                },
-                {
-                  label: 'حالة التفعيل',
-                  value: getDshPartnerActivationStatusLabel(storeVisibility.activationStatus),
-                  tone: storeVisibility.visible ? 'success' : 'warning',
-                },
+                { label: 'اسم الفرع', value: branchName },
+                { label: 'العنوان', value: branchAddress },
+                { label: 'رقم التواصل', value: branchContact },
               ]}
             />
-            <Surface tone="inset" padding={3} gap={2}>
-              <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تفاصيل تدقيق شروط الظهور</Text>
-              {storeVisibility.checklist.map((check) => (
-                <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 8 }}>
-                  <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'}>
-                    {check.satisfied ? '✓' : '✗'}
-                  </Text>
-                  <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-                    <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'}>
-                      {check.label}
-                    </Text>
-                    {!check.satisfied && check.blockedReason ? (
-                      <Text role="caption" tone="muted">{check.blockedReason}</Text>
-                    ) : null}
-                  </Box>
-                </Box>
-              ))}
-            </Surface>
           </Surface>
 
-          {/* 4) Direct Main Sections List (without command card wrapper) */}
-          <View style={{ gap: 10 }}>
+          {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
+          <View style={{ gap: 8 }}>
             {activeHubNavigationItems.map((item) => (
-              <ListItem
+              <HubNavRow
                 key={item.id}
                 title={item.title}
-                subtitle={item.description}
+                description={item.description}
+                icon={item.icon}
                 onPress={() => updateSection(item.section)}
               />
             ))}
@@ -1457,7 +1713,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* ML-017: availability toggle — local preview state only; runtime wiring via onToggleAvailability */}
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text role="body" tone={isAvailable ? 'success' : 'muted'}>
+              <Text role="bodyMd" tone={isAvailable ? 'success' : 'muted'}>
                 {isAvailable ? 'المتجر مفتوح' : 'المتجر مغلق'}
               </Text>
               <RNSwitch
