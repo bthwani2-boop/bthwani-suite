@@ -50,3 +50,6 @@ export type { CartConfirmationBlockProps } from './cart-confirmation-block';
 
 export { ActionStrip } from './list';
 export type { ActionStripProps } from './list';
+
+export { StoreHero } from './store-hero';
+export type { StoreHeroProps, StoreHeroFulfillmentMode } from './store-hero';

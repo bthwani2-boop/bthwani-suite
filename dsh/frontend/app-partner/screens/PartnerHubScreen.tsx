@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Switch as RNSwitch, View } from 'react-native';
+import { Pressable, Switch as RNSwitch, View, Share } from 'react-native';
 import {
   AppearanceOptionCard,
   Box,
@@ -20,6 +20,7 @@ import {
   TopBar,
   useDirection,
   useTheme,
+  StoreHero,
 } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import {
@@ -29,9 +30,9 @@ import {
 } from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../shared/dshStoreProductCardModel';
-import { mapPublishStageToPartnerActivationStatus } from '../../shared/dsh-client-visibility.model';
+import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
-import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
+import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/app-partner/dsh';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
@@ -40,6 +41,8 @@ import {
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
 } from '../../shared/dsh-partner-onboarding-journey.map';
+import { getDshPartnerActivationStatusLabel } from '../../shared/dsh-partner-activation.model';
+import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -960,12 +963,36 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     const activeCanonicalStoreId = canonicalStoreId ?? canonicalPreviewStores[0]?.id;
     return activeCanonicalStoreId ? getCanonicalPreviewStoreCard(activeCanonicalStoreId) : undefined;
   }, [canonicalStoreId]);
-  const resolvedStoreName = activeCanonicalStore?.storeName ?? storeName;
-  const resolvedBranchLabel = activeCanonicalStore?.branchLabel ?? branchLabel;
-  const resolvedCityLabel = activeCanonicalStore?.cityLabel ?? cityLabel;
-  const resolvedManagerLabel = activeCanonicalStore?.managerName ?? managerLabel;
-  const resolvedTodayHoursLabel = activeCanonicalStore?.operatingHoursLabel ?? todayHoursLabel;
   const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
+
+  const [selectedModeId, setSelectedModeId] = React.useState<string>('pickup');
+  const resolvedStoreName = activeCanonicalStore?.storeName ?? storeName;
+  const resolvedCityLabel = activeCanonicalStore?.cityLabel ?? cityLabel;
+  const resolvedBranchLabel = activeCanonicalStore?.branchLabel ?? branchLabel;
+  const resolvedManagerLabel = activeCanonicalStore?.managerLabel ?? managerLabel;
+  const resolvedTodayHoursLabel = activeCanonicalStore?.todayHoursLabel ?? todayHoursLabel;
+  const [branchName, setBranchName] = React.useState(resolvedStoreName);
+  const [branchAddress, setBranchAddress] = React.useState(`${resolvedCityLabel}، الياسمين، شارع الندى`);
+  const [branchContact, setBranchContact] = React.useState('011 555 0123');
+  const [branchSavedTime, setBranchSavedTime] = React.useState<string | null>(null);
+
+  const activeHubNavigationItems = React.useMemo(() => {
+    return hubNavigationItems.filter((item) => item.id !== 'profile');
+  }, []);
+
+  const storeVisibility = React.useMemo(() => {
+    return resolveDshStoreClientVisibility({
+      publishStage: activeCanonicalStore?.publishStage,
+      activationStatus: mapPublishStageToPartnerActivationStatus(activeCanonicalStore?.publishStage),
+      catalogPublished: listingEnabled,
+      deliveryModesReady: serviceModes.some((mode) => mode.enabled),
+      serviceabilityAvailable: true,
+      storeOpen: isAvailable,
+    });
+  }, [listingEnabled, activeCanonicalStore?.publishStage, serviceModes, isAvailable]);
+
+  const visibilityLabel = listingEnabled ? 'مفعّل' : 'موقوف';
+
   const enabledNotificationChannelsCount = React.useMemo(
     () => ['orders', 'operations', 'inventory', 'finance', 'marketing', 'system'].filter((key) => notificationPreferences[key as NotificationPreferenceId]).length,
     [notificationPreferences],
@@ -1305,130 +1332,176 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   return (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
-      <ModernPremiumHeader
-        title={resolvedStoreName}
-        locationLabel={`${resolvedBranchLabel} · ${resolvedActiveZoneLabel}`}
-        onProfilePress={() => updateSection('profile')}
-        onNotificationsPress={onOpenBell}
-        onSearchPress={openOrdersSearch}
-        onLocationPress={onOpenStoreScope}
-        tickerStatus="مباشر"
-        tickerMessage="الطلبات والمخزون تحت المتابعة الآن."
-        direction={direction === 'rtl' ? 'rtl' : 'ltr'}
-      />
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-
-      <Surface tone="raised" padding={3} gap={3}>
-        <View
-          style={{
-            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-            flexWrap: 'wrap',
-            gap: 10,
-          }}
-        >
-          {summaryItems.map((item) => (
-            <SummaryCell key={item.id} {...item} />
-          ))}
-        </View>
-      </Surface>
-
-      {/* ML-T1: partner onboarding readiness status — summary-only, read-only, journey map driven */}
-      <Surface tone="raised" padding={3} gap={2}>
-        <KeyValueList
-          dense
-          items={[
-            {
-              label: 'مرحلة التأهيل',
-              value: resolveDshPartnerLifecycleStageLabel(partnerLifecycleStage),
-              tone: partnerLifecycleStage === 'active' ? 'success' : partnerLifecycleStage === 'blocked' || partnerLifecycleStage === 'rejected' ? 'danger' : 'warning',
-            },
-            {
-              label: 'الخطوة الحالية',
-              value: partnerStatusStep?.title ?? 'حالة التأهيل في تطبيق الشريك',
-            },
-            {
-              label: 'مالك القرار',
-              value: partnersGovernance?.sectionLabel ?? 'Partners',
-              tone: 'brand' as const,
-            },
-          ]}
+      <MobileScrollView fill padding={0} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
+        <StoreHero
+          coverImage={resolveDshImageSource(activeCanonicalStore?.imageUri || 'dsh.store.malqa.cover.v1')}
+          logoImage={resolveDshImageSource(
+            activeCanonicalStore?.imageUri
+              ? activeCanonicalStore.imageUri.replace('cover', 'logo')
+              : 'dsh.store.malqa.logo.v1'
+          )}
+          name={resolvedStoreName}
+          locationLabel={`${resolvedBranchLabel} · ${resolvedActiveZoneLabel}`}
+          isOpen={isAvailable}
+          hasBthwaniPro={activeCanonicalStore?.hasBthwaniPro ?? true}
+          distanceLabel={activeCanonicalStore?.distanceLabel || '1.8 كم'}
+          deliveryTimeLabel={activeCanonicalStore?.deliveryTimeLabel || resolvedTodayHoursLabel}
+          rating={activeCanonicalStore?.rating || 4.9}
+          onSearchPress={openOrdersSearch}
+          deliveryModes={defaultOperationalModes.map((mode) => ({
+            id: mode.id,
+            label: mode.title,
+            icon: mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'partner_delivery' ? 'car-outline' : 'bicycle-outline',
+          }))}
+          selectedMode={selectedModeId}
+          onModeChange={(id) => setSelectedModeId(id)}
         />
-        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-          {partnerStatusStep?.description ?? 'الشريك يرى حالة تأهيله وجاهزيته وما ينقصه. القرار النهائي بيد قسم الشركاء في لوحة التحكم.'}
-        </Text>
-      </Surface>
 
-      <Surface tone="inset" padding={3} gap={2}>
-        <Text role="bodyStrong">ملكية قرارات الشريك</Text>
-        <Text role="bodySm" tone="muted">
-          {partnersGovernance?.sectionLabel ?? 'Partners'} يملك دورة حياة الشريك والجاهزية. الكتالوج والنشر عبر {catalogsGovernance?.sectionLabel ?? 'Catalogs'}، والعروض عبر {marketingGovernance?.sectionLabel ?? 'Marketing'}، وأي أثر مالي يبقى مرجعًا إلى {financeGovernance?.sectionLabel ?? 'Finance'} وWLT.
-        </Text>
-      </Surface>
+        <Box padding={4} gap={4}>
+          {/* 1) Wallet Balance Block */}
+          <Surface tone="raised" padding={3} gap={2}>
+            <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                <Text role="caption" tone="muted">رصيد المتجر الحالي</Text>
+                <Text role="titleLg" tone="brand">{wltDshPartnerPreviewData.wallet.balanceLabel}</Text>
+              </View>
+              <Button
+                label="عرض المحفظة"
+                tone="secondary"
+                fullWidth={false}
+                onPress={() => updateSection('wallet')}
+              />
+            </View>
+          </Surface>
 
-      <MobileCommandSectionList
-        title="الأقسام الثانوية"
-        subtitle="إعدادات وتحليلات إضافية فقط، دون تكرار التنقل الرئيسي في الأسفل."
-        items={hubNavigationItems.map((item) => ({
-          id: item.id,
-          title: item.title,
-          subtitle: item.description,
-          icon: item.icon,
-          onPress: () => updateSection(item.section),
-        }))}
-      />
+          {/* 2) Editable Branch Details Card */}
+          <Surface tone="raised" padding={3} gap={3}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>بيانات الفرع</Text>
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تعديل الاسم والعنوان ورقم التواصل مباشرة.</Text>
+            <TextField label="اسم الفرع" value={branchName} onChangeText={setBranchName} placeholder="اسم الفرع الحالي" />
+            <TextField label="العنوان" value={branchAddress} onChangeText={setBranchAddress} placeholder="عنوان الفرع" multiline />
+            <TextField label="رقم التواصل" value={branchContact} onChangeText={setBranchContact} placeholder="رقم الهاتف" keyboardType="phone-pad" />
+            <Button
+              label="حفظ تغييرات الفرع"
+              tone="primary"
+              onPress={() => {
+                setBranchSavedTime(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }));
+              }}
+            />
+            {branchSavedTime ? (
+              <Text role="caption" tone="success" align={direction === 'rtl' ? 'end' : 'start'}>
+                تم حفظ التعديلات بنجاح في {branchSavedTime}
+              </Text>
+            ) : null}
+          </Surface>
 
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">
-          إجراءات سريعة
-        </Text>
+          {/* 3) Visibility and Coverage Zones (Read-Only) */}
+          <Surface tone="raised" padding={3} gap={3}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الظهور ونطاق الخدمة</Text>
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>شروط وجاهزية الظهور لعملاء بثواني (للمعلومة فقط).</Text>
+            <KeyValueList
+              dense
+              items={[
+                { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
+                { label: 'النطاق الحالي', value: resolvedBranchLabel },
+                { label: 'المنطقة', value: resolvedActiveZoneLabel },
+                {
+                  label: 'المعروض للعملاء',
+                  value: storeVisibility.visible ? 'ظاهر للعميل' : 'محجوب عن العميل',
+                  tone: storeVisibility.visible ? 'success' : 'warning',
+                },
+                {
+                  label: 'حالة التفعيل',
+                  value: getDshPartnerActivationStatusLabel(storeVisibility.activationStatus),
+                  tone: storeVisibility.visible ? 'success' : 'warning',
+                },
+              ]}
+            />
+            <Surface tone="inset" padding={3} gap={2}>
+              <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تفاصيل تدقيق شروط الظهور</Text>
+              {storeVisibility.checklist.map((check) => (
+                <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 8 }}>
+                  <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'}>
+                    {check.satisfied ? '✓' : '✗'}
+                  </Text>
+                  <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                    <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'}>
+                      {check.label}
+                    </Text>
+                    {!check.satisfied && check.blockedReason ? (
+                      <Text role="caption" tone="muted">{check.blockedReason}</Text>
+                    ) : null}
+                  </Box>
+                </Box>
+              ))}
+            </Surface>
+          </Surface>
 
-        {/* ML-017: availability toggle — local preview state only; runtime wiring via onToggleAvailability */}
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text role="body" tone={isAvailable ? 'success' : 'muted'}>
-            {isAvailable ? 'المتجر مفتوح' : 'المتجر مغلق'}
-          </Text>
-          <RNSwitch
-            value={isAvailable}
-            onValueChange={(next) => {
-              setIsAvailable(next);
-              onToggleAvailability?.(next);
-            }}
-            accessibilityLabel="تبديل حالة المتجر"
-          />
-        </View>
+          {/* 4) Direct Main Sections List (without command card wrapper) */}
+          <View style={{ gap: 10 }}>
+            {activeHubNavigationItems.map((item) => (
+              <ListItem
+                key={item.id}
+                title={item.title}
+                subtitle={item.description}
+                onPress={() => updateSection(item.section)}
+              />
+            ))}
+          </View>
 
-        <View
-          style={{
-            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-            flexWrap: 'wrap',
-            gap: 8,
-          }}
-        >
-          <Button
-            label="تنبيهات الطلب"
-            tone="secondary"
-            fullWidth={false}
-            icon={<Icon name="notifications-outline" size={16} />}
-            onPress={openOrderAlerts}
-          />
-          <Button
-            label="اختيار الفرع"
-            tone="secondary"
-            fullWidth={false}
-            icon={<Icon name="git-branch-outline" size={16} />}
-            onPress={onOpenStoreScope}
-          />
-          <Button
-            label="دليل العمليات"
-            tone="secondary"
-            fullWidth={false}
-            icon={<Icon name="headset-outline" size={16} />}
-            onPress={openOperationsDirectory}
-          />
-        </View>
-      </Surface>
-    </MobileScrollView>
+          {/* Quick Actions & Operational Switches */}
+          <Surface tone="raised" padding={4} gap={3}>
+            <Text role="label" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              إجراءات سريعة
+            </Text>
 
+            {/* ML-017: availability toggle — local preview state only; runtime wiring via onToggleAvailability */}
+            <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text role="body" tone={isAvailable ? 'success' : 'muted'}>
+                {isAvailable ? 'المتجر مفتوح' : 'المتجر مغلق'}
+              </Text>
+              <RNSwitch
+                value={isAvailable}
+                onValueChange={(next) => {
+                  setIsAvailable(next);
+                  onToggleAvailability?.(next);
+                }}
+                accessibilityLabel="تبديل حالة المتجر"
+              />
+            </View>
+
+            <View
+              style={{
+                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <Button
+                label="تنبيهات الطلب"
+                tone="secondary"
+                fullWidth={false}
+                icon={<Icon name="notifications-outline" size={16} />}
+                onPress={openOrderAlerts}
+              />
+              <Button
+                label="اختيار الفرع"
+                tone="secondary"
+                fullWidth={false}
+                icon={<Icon name="git-branch-outline" size={16} />}
+                onPress={onOpenStoreScope}
+              />
+              <Button
+                label="دليل العمليات"
+                tone="secondary"
+                fullWidth={false}
+                icon={<Icon name="headset-outline" size={16} />}
+                onPress={openOperationsDirectory}
+              />
+            </View>
+          </Surface>
+        </Box>
+      </MobileScrollView>
     </Box>
   );
 }

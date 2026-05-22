@@ -306,6 +306,7 @@ export {
 	getStateDefinition,
 	CartConfirmationBlock,
 	ActionStrip,
+	StoreHero,
 } from './components';
 export type {
 	AmountInputProps,
@@ -420,7 +421,8 @@ export type {
 	ScreenState,
 	ScreenWrapperProps,
 	SummaryCardProps,
-	SummaryItem,
 	CartConfirmationBlockProps,
 	ActionStripProps,
+	StoreHeroProps,
+	StoreHeroFulfillmentMode,
 } from './components';

@@ -35,9 +35,11 @@ import {
   useDirection,
   useTheme,
   useUiText,
+  StoreHero,
   type BannerCarouselItem,
   type BThwaniAppearanceMode,
   type BThwaniFilterRailItem,
+  type StoreHeroFulfillmentMode,
 } from '@bthwani/ui-kit';
 import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
@@ -1129,107 +1131,52 @@ function DshStoreGetScreenContent({
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
               ListHeaderComponent={
                 <>
-                  <View style={[styles.heroPremiumWrap, { backgroundColor: 'transparent' }]}>
-                    <View style={[styles.heroCoverWrap, { backgroundColor: 'transparent' }]}>
-                      {storeCoverImageSource ? (
-                        <Animated.Image
-                          source={storeCoverImageSource}
-                          style={[
-                            styles.heroCoverImage,
-                            {
-                              transform: [
-                                {
-                                  scale: scrollY.interpolate({
-                                    inputRange: [-200, 0, 480],
-                                    outputRange: [1.3, 1, 1.1],
-                                    extrapolate: 'clamp',
-                                  }),
-                                },
-                                {
-                                  translateY: scrollY.interpolate({
-                                    inputRange: [-200, 0, 480],
-                                    outputRange: [-60, 0, 80],
-                                    extrapolate: 'clamp',
-                                  }),
-                                },
-                              ],
-                            }
-                          ]}
-                        />
-                      ) : (
-                        <View style={styles.heroCoverPlaceholder} />
-                      )}
-                      <GlassHeroOverlay strength={isDarkGlass ? 'strong' : 'default'} style={[styles.heroCoverOverlay, { backgroundColor: appearanceChrome.heroOverlay }]} />
+                  <StoreHero
+                    coverImage={storeCoverImageSource}
+                    logoImage={storeLogoImageSource}
+                    name={normalizedStoreName}
+                    locationLabel={store.locationLabel || 'حي العليا · الرياض'}
+                    isOpen={operationalState === 'store_open'}
+                    hasBthwaniPro={store.hasBthwaniPro}
+                    distanceLabel={store.distanceLabel || '2.1 كم'}
+                    deliveryTimeLabel={store.deliveryTimeLabel || normalizedEtaLabel}
+                    rating={store.rating}
+                    onBackPress={_onBack}
+                    onSearchPress={openInlineSearch}
+                    onCartPress={() => {
+                      if (onOpenCart) {
+                        onOpenCart(selectedMode);
+                      } else {
+                        onOpenItems?.();
+                      }
+                    }}
+                    onSharePress={handleStoreShare}
+                    scrollY={scrollY}
+                    deliveryModes={deliveryModes}
+                    selectedMode={selectedMode}
+                    onModeChange={setSelectedMode}
+                  />
 
-                      <View style={styles.heroCoverFade} pointerEvents="none">
-                        {Array.from({ length: 120 }, (_, i) => {
-                          const t = i / 119;
-                          const alpha = Math.pow(t, 1.5) * appearanceChrome.heroFadeMaxAlpha;
-                          const bg = `rgba(${appearanceChrome.heroFadeRGB}, ${alpha.toFixed(3)})`;
-                          return <View key={i} style={[styles.heroCoverFadeBand, { top: `${(t * 100).toFixed(2)}%` as DimensionValue, backgroundColor: bg }]} />;
-                        })}
-                      </View>
-
-                      <View style={[styles.heroTopActions, isRTL && styles.rowReverse]} pointerEvents="box-none">
-                        <View style={styles.heroTopActionsLeft} pointerEvents="box-none">
-                          <TouchableOpacity
-                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
-                            activeOpacity={0.7}
-                            onPress={openInlineSearch}
-                            hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
-                          >
-                            <Icon name="search-outline" size={22} color={isDarkGlass ? stylesTokens.white : appearanceChrome.primaryText} />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                              if (onOpenCart) {
-                                onOpenCart(selectedMode);
-                                return;
-                              }
-                              onOpenItems?.();
-                            }}
-                            hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
-                          >
-                            <Icon name="cart-outline" size={22} color={isDarkGlass ? stylesTokens.white : appearanceChrome.primaryText} />
-                          </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity
-                          style={[styles.heroActionCircle, { backgroundColor: appearanceChrome.actionBackgroundGlass, borderColor: appearanceChrome.actionBorderGlass }]}
-                          activeOpacity={0.7}
-                          onPress={handleStoreShare}
-                          hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
-                        >
-                          <Icon name="share-outline" size={22} color={isDarkGlass ? stylesTokens.white : appearanceChrome.primaryText} />
-                        </TouchableOpacity>
-                      </View>
-
-                      {/* Sticky Header Overlay */}
-                      <Animated.View
-                        pointerEvents="box-none"
-                        style={[
-                          styles.stickyHeaderContent,
-                          {
-                            opacity: scrollY.interpolate({
-                              inputRange: [200, 300, Math.max(301, stickyThreshold - 80), Math.max(302, stickyThreshold - 20)],
-                              outputRange: [0, 1, 1, 0],
-                              extrapolate: 'clamp',
-                            }),
-                            backgroundColor: appearanceChrome.modalSurface,
-                            borderColor: appearanceChrome.modalBorder,
-                          }
-                        ]}
-                      >
-                        <Text style={[styles.stickyHeaderTitle, { color: appearanceChrome.primaryText }]}>
-                          {normalizedStoreName}
-                        </Text>
-                      </Animated.View>
-
-
-                    </View>
-                  </View>
+                  {/* Sticky Header Overlay */}
+                  <Animated.View
+                    pointerEvents="box-none"
+                    style={[
+                      styles.stickyHeaderContent,
+                      {
+                        opacity: scrollY.interpolate({
+                          inputRange: [200, 300, Math.max(301, stickyThreshold - 80), Math.max(302, stickyThreshold - 20)],
+                          outputRange: [0, 1, 1, 0],
+                          extrapolate: 'clamp',
+                        }),
+                        backgroundColor: appearanceChrome.modalSurface,
+                        borderColor: appearanceChrome.modalBorder,
+                      }
+                    ]}
+                  >
+                    <Text style={[styles.stickyHeaderTitle, { color: appearanceChrome.primaryText }]}>
+                      {normalizedStoreName}
+                    </Text>
+                  </Animated.View>
 
                   {showOperationalNotice ? (
                     <View
@@ -1262,75 +1209,6 @@ function DshStoreGetScreenContent({
                   ) : null}
 
 
-                  <View style={styles.contentBlock}>
-                    {/* Luxury Store Card */}
-                    <View style={styles.heroLuxuryCard}>
-                      {/* ROW 1: Identity Cluster */}
-                      <View style={styles.heroLuxuryIdentityRow}>
-                        <View style={styles.heroLuxuryInfo}>
-                          <Text style={[styles.heroNameText, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizedStoreName}</Text>
-                          <View style={styles.heroLocationRow}>
-                            <Icon name="location-sharp" size={14} color={ORANGE} />
-                            <Text style={[styles.heroLocationText, { color: appearanceChrome.secondaryText }]} numberOfLines={1}>{store.locationLabel || 'حي العليا · الرياض'}</Text>
-                          </View>
-                          <View style={[styles.heroStatusBadge, { backgroundColor: operationalState === 'store_open' ? hexToRgba(stylesTokens.green, 0.12) : hexToRgba(stylesTokens.red, 0.12), borderColor: operationalState === 'store_open' ? hexToRgba(stylesTokens.green, 0.25) : hexToRgba(stylesTokens.red, 0.25) }]}>
-                            <View style={[styles.heroStatusDot, { backgroundColor: operationalState === 'store_open' ? stylesTokens.green : stylesTokens.red }]} />
-                            <Text style={[styles.heroStatusText, { color: operationalState === 'store_open' ? stylesTokens.green : stylesTokens.red }]}>
-                              {operationalState === 'store_open' ? 'مفتوح الآن' : 'مغلق الآن'}
-                            </Text>
-                          </View>
-                        </View>
-                        <View style={[styles.heroLogoWrap, { backgroundColor: stylesTokens.white, borderColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.05) }]}>
-                          <Image
-                            source={storeLogoImageSource || resolveDshImageSource('dsh.brand.logo.v1')}
-                            style={styles.heroLogoImage}
-                          />
-                        </View>
-                      </View>
-
-                      {/* ROW 2: Metrics Chips */}
-                      <View style={[styles.heroLuxuryMetricsRow, { position: 'relative' }]}>
-                        {/* Reverse Feather Gradient Blend (Multi-Band) */}
-                        <View style={styles.metricsRowReverseFeather} pointerEvents="none">
-                          {reverseFeatherBands.map((band) => (
-                            <View key={band.key} style={[styles.metricsRowReverseFeatherBand, { bottom: band.bottom, backgroundColor: band.backgroundColor }]} />
-                          ))}
-                        </View>
-
-                        {store.hasBthwaniPro && (
-                          <View style={[styles.heroFeatureChip, styles.heroBadgePro]}>
-                            <Text style={styles.heroBadgeText}>برو</Text>
-                          </View>
-                        )}
-                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.04) }]}>
-                          <Icon name="navigate-outline" size={12} color={appearanceChrome.secondaryText} />
-                          <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.distanceLabel || '2.1 كم'}</Text>
-                        </View>
-                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.04) }]}>
-                          <Icon name="time-outline" size={12} color={appearanceChrome.secondaryText} />
-                          <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.deliveryTimeLabel || normalizedEtaLabel}</Text>
-                        </View>
-                        <View style={[styles.heroFeatureChip, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.1) : hexToRgba(stylesTokens.black, 0.04) }]}>
-                          <Icon name="star" size={12} color={GOLD} />
-                          <Text style={[styles.heroFeatureValue, { color: appearanceChrome.primaryText }]}>{store.rating?.toFixed(1) || '5.0'}</Text>
-                        </View>
-                      </View>
-
-                      {/* ROW 3: Delivery Options */}
-                      <View style={[styles.heroLuxuryDeliveryRow, { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.black, 0.2) : hexToRgba(stylesTokens.black, 0.04) }]}>
-                        {deliveryModes.map((mode) => {
-                          const active = selectedMode === mode.id;
-                          return (
-                            <TouchableOpacity key={mode.id} style={[styles.heroLuxuryDeliveryChip, active && { backgroundColor: isDarkGlass ? hexToRgba(stylesTokens.white, 0.15) : stylesTokens.white }]} onPress={() => setSelectedMode(mode.id)} activeOpacity={0.8}>
-                              <View style={styles.heroLuxuryDeliveryContent}>
-                                <Text style={[styles.heroLuxuryDeliveryTitle, { color: active ? ORANGE : appearanceChrome.secondaryText }]} numberOfLines={1}>{mode.label}</Text>
-                                <Icon name={mode.icon} size={14} color={active ? ORANGE : appearanceChrome.secondaryText} />
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        })}
-                      </View>
-                    </View>
 
                     {smartRailItems.length ? (
                       <BannerCarousel
@@ -1363,7 +1241,6 @@ function DshStoreGetScreenContent({
                         testID="store-category-rail"
                       />
                     </View>
-                  </View>
                 </>
               }
               renderItem={({ item, index }) => {
