@@ -26,7 +26,9 @@ export type WltDshPartnerWalletTransaction = {
   sourceOrderLabel?: string;
   settlementCycleLabel?: string;
   includedInNetSettlementLabel?: string;
-  settlementImpactLabel?: string;
+  sourceTruthLabel?: string;
+  runtimeBindingLabel?: string;
+  accountingWarningLabel?: string;
   fulfillmentModeLabel?: string;
   isStoreDeliveryFee?: boolean;
   isStoreCourierCompensation?: boolean;
@@ -189,7 +191,9 @@ export function mapWltDshPartnerPreviewTransactions(
       ? `دورة #${record.settlementCycleId}`
       : undefined,
     includedInNetSettlementLabel: resolveSettlementImpact(record.kind),
-    settlementImpactLabel: resolveSettlementImpact(record.kind),
+    sourceTruthLabel: 'WLT',
+    runtimeBindingLabel: 'runtime غير مربوط',
+    accountingWarningLabel: 'معاينة فقط — لا تمثل تسوية فعلية',
     isStoreDeliveryFee: record.kind === 'store-delivery-fee',
     isStoreCourierCompensation: record.kind === 'store-courier-compensation',
     isCaptainPayout: record.kind === 'captain-earning' || record.kind === 'captain-cod-liability',

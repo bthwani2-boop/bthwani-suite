@@ -175,6 +175,9 @@ function FinancialStreamCard({
     { label: 'نوع الحركة', value: item.kindLabel ?? item.kind ?? '—' },
     { label: 'المصدر', value: item.sourceOrderLabel ?? item.settlementCycleLabel ?? '—' },
     { label: 'أثر التسوية', value: item.includedInNetSettlementLabel ?? '—' },
+    ...(item.sourceTruthLabel
+      ? [{ label: 'مصدر الحقيقة', value: `${item.sourceTruthLabel} / ${item.runtimeBindingLabel ?? 'runtime غير مربوط'}` }]
+      : []),
     { label: 'السياسة', value: item.policyLabel ?? '—' },
     ...(item.isStoreCourierCompensation
       ? [{ label: 'ملاحظة', value: 'تعويض موصل المتجر داخلي من المتجر، وليس تسوية كابتن بثواني.' }]
@@ -329,7 +332,7 @@ function SummaryTab({
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }}>
           <Icon name="warning" tone="warning" size={14} />
           <Text role="caption" tone="warning" style={{ flex: 1, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
-            بيانات تجريبية — لا تمثل تسويات فعلية أو دفعات منفذة. العملة: ر.ي
+            معاينة مالية — ليست تسوية منفذة
           </Text>
         </View>
       </Surface>

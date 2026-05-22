@@ -1,16 +1,17 @@
 import React from 'react';
-import { getWltPartnerSettlementPreview } from '../../shared/finance/dshFinancePreview';
+import { getWltPartnerFinanceSnapshot } from '../../shared/finance/dshFinancePreview';
 import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
 export function useWltDshPartnerWalletPreview() {
-  const partnerPreview = React.useMemo(() => getWltPartnerSettlementPreview(), []);
+  const partnerPreview = React.useMemo(() => getWltPartnerFinanceSnapshot(), []);
   const previewTransactions = React.useMemo(
-    () => mapWltDshPartnerPreviewTransactions(partnerPreview.records),
+    () => mapWltDshPartnerPreviewTransactions(partnerPreview.settlementRecords),
     [partnerPreview],
   );
 
   return {
     partnerPreview,
     previewTransactions,
+    warnings: partnerPreview.warnings,
   };
 }

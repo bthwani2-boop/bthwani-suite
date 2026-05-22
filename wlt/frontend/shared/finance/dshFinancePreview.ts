@@ -32,6 +32,36 @@ export type WltDshFinanceEventKind =
 export type WltDshFinanceTone = 'positive' | 'negative' | 'neutral';
 export type WltDshFinanceStatusTone = 'success' | 'warning' | 'info' | 'error';
 
+// ─── WLT Finance Read-Model Binding ────────────────────────────────
+// WltDshFinanceBindingState: حالة الربط الحالية لأي سطح مالي في DSH.
+// 'preview_only'    — seeds ثابتة فقط؛ لا مصدر runtime.
+// 'contract_tbd'    — العقد موجود لكن لا ربط runtime بعد.
+// 'runtime_unbound' — slot موجود لكن غير موصول بهذا السطح.
+export type WltDshFinanceBindingState = 'preview_only' | 'contract_tbd' | 'runtime_unbound';
+
+// WltDshFinanceOwnership: يوثّق الخدمة المالكة لكل نطاق مالي.
+// WLT يملك: ledger / payment / settlement / refund / payout / commission.
+// DSH يملك: سياق الطلب والتوصيل فقط — ليس مصدر الحقيقة المالية.
+export type WltDshFinanceOwnership = {
+  readonly ledger: 'wlt';
+  readonly payment: 'wlt';
+  readonly settlement: 'wlt';
+  readonly refund: 'wlt';
+  readonly payout: 'wlt';
+  readonly commission: 'wlt';
+  readonly deliveryContext: 'dsh';
+};
+
+export const WLT_DSH_FINANCE_OWNERSHIP = {
+  ledger: 'wlt',
+  payment: 'wlt',
+  settlement: 'wlt',
+  refund: 'wlt',
+  payout: 'wlt',
+  commission: 'wlt',
+  deliveryContext: 'dsh',
+} as const satisfies WltDshFinanceOwnership;
+
 export interface WltDshFinancePreviewRecord {
   id: string;
   actor: WltDshFinanceActor;
@@ -54,6 +84,37 @@ export interface WltDshFinancePreviewRecord {
   isPreview: true;
 }
 
+// ─── DSH Finance Preview Metadata ──────────────────────────────────
+// Metadata ثابتة لكل سطح معاينة مالي في DSH.
+// عقد هيكلي فقط — لا تحمل بيانات حية.
+export type WltDshFinancePreviewMetadata = {
+  readonly dataKind: 'preview';
+  readonly runtimeTruth: 'none — runtime_unbound';
+  readonly backendSource: 'none — preview_seeds_only';
+  readonly bindingSource: 'wlt_frontend_shared_finance';
+  readonly moneySemantics: 'display_only — no_accounting_effect';
+  readonly ownerKind: 'wlt';
+  readonly serviceId: 'wlt';
+  readonly linkedServiceId: 'dsh';
+  readonly currencyCode: 'YER';
+  readonly isPreview: true;
+};
+
+export function getWltDshFinancePreviewMetadata(): WltDshFinancePreviewMetadata {
+  return {
+    dataKind: 'preview',
+    runtimeTruth: 'none — runtime_unbound',
+    backendSource: 'none — preview_seeds_only',
+    bindingSource: 'wlt_frontend_shared_finance',
+    moneySemantics: 'display_only — no_accounting_effect',
+    ownerKind: 'wlt',
+    serviceId: 'wlt',
+    linkedServiceId: 'dsh',
+    currencyCode: 'YER',
+    isPreview: true,
+  };
+}
+
 // ─── Currency formatter ───────────────────────────────────────────
 // Uses ar-YE locale with a safe fallback to ar if runtime does not support ar-YE.
 // Currency: YER (Yemeni Rial). Label suffix: ر.ي
@@ -67,6 +128,11 @@ function formatYer(minorUnits: number, currency = 'ر.ي'): string {
   }
 }
 
+// ─── Preview Seeds ─────────────────────────────────────────────────
+// مصدر معاينة فقط — ليس حقيقة محاسبية، ليس دفعة منفذة.
+// WLT يملك جميع الأرقام المالية الحقيقية.
+// DSH يملك سياق الطلب والتوصيل فقط — ليس مصدر الحقيقة المالية.
+// لا يُستخدم أي مبلغ هنا كأساس لمحاسبة فعلية.
 const PREVIEW_SEEDS: WltDshFinancePreviewRecord[] = [
   // ─── Client Payment ───────────────────────────────────────────
   {
@@ -531,6 +597,14 @@ export type WltPartnerFinanceSnapshot = {
   cycleEndDate: string;
   nextPayoutDate: string;
   contractState: 'CONTRACT_TBD';
+  // ─── Read-model ownership & binding metadata ─────────────────────
+  dataKind: 'preview';
+  runtimeTruth: 'none — runtime_unbound';
+  backendSource: 'none — preview_seeds_only';
+  bindingSource: 'wlt_frontend_shared_finance';
+  moneySemantics: 'display_only — no_accounting_effect';
+  sourceLabel: string;
+  warnings: readonly string[];
   isPreview: true;
 };
 
@@ -601,6 +675,18 @@ export function getWltPartnerFinanceSnapshot(): WltPartnerFinanceSnapshot {
     cycleEndDate: p.cycleEndDate,
     nextPayoutDate: p.nextPayoutDate,
     contractState: 'CONTRACT_TBD',
+    dataKind: 'preview',
+    runtimeTruth: 'none — runtime_unbound',
+    backendSource: 'none — preview_seeds_only',
+    bindingSource: 'wlt_frontend_shared_finance',
+    moneySemantics: 'display_only — no_accounting_effect',
+    sourceLabel: 'WLT — preview seeds only',
+    warnings: [
+      'معاينة فقط — لا تمثل تسوية فعلية',
+      'لا يمثل بيانات محاسبة أو دفعات منفذة',
+      'WLT يملك الحقيقة المالية — DSH يملك سياق الطلب والتوصيل فقط',
+      'DSH لا يملك مصدر الحقيقة المالية في هذه المرحلة',
+    ],
     isPreview: true,
   };
 }
