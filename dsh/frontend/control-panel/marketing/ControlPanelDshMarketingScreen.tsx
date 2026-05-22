@@ -70,17 +70,18 @@ import {
 } from '../../shared/marketing-visibility.contract';
 import {
   getDshPartnerActivationStateMetadata,
-  isDshPartnerClientVisible,
   type DshPartnerActivationStatus,
 } from '../../shared/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
-  getDshProductPublishingPrerequisites,
-  isDshProductPublishingBlocked,
   type DshProductCategoryMappingStatus,
   type DshProductDuplicateStatus,
   type DshProductIdentityApprovalStatus,
 } from '../../shared/dsh-product-identity.model';
+import {
+  resolveDshProductClientVisibility,
+  resolveDshStoreClientVisibility,
+} from '../../shared/dsh-client-visibility.model';
 import {
   getDshSignalEventLabel,
   getDshSignalEventTone,
@@ -339,39 +340,44 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   });
   const partnerGateRows = PARTNER_GATE_PREVIEW.map((gate) => {
     const metadata = getDshPartnerActivationStateMetadata(gate.status);
-    const clientVisible = isDshPartnerClientVisible(gate.status);
+    const visibility = resolveDshStoreClientVisibility({
+      activationStatus: gate.status,
+      catalogPublished: gate.status === 'client_visible' || gate.status === 'partner_active',
+      deliveryModesReady: gate.status === 'delivery_modes_ready' || gate.status === 'partner_active' || gate.status === 'client_visible',
+      serviceabilityAvailable: gate.status === 'client_visible',
+      storeOpen: true,
+    });
     return {
       ...gate,
-      clientVisible,
+      clientVisible: visibility.visible,
       owner: metadata.actorResponsible,
       nextAction: metadata.nextAction,
-      blockedReason: metadata.blockedReason,
+      blockedReason: visibility.blockedReason ?? metadata.blockedReason,
       auditRequired: metadata.auditRequired,
-      tone: clientVisible ? 'success' as const : metadata.blockedReason ? 'warning' as const : 'brand' as const,
+      tone: visibility.visible ? 'success' as const : (visibility.blockedReason ?? metadata.blockedReason) ? 'warning' as const : 'brand' as const,
     };
   });
   const productGateRows = PRODUCT_GATE_PREVIEW.map((product) => {
     const approvalMeta = getDshProductApprovalStateMetadata(product.approvalStatus);
-    const publishingPrerequisites = getDshProductPublishingPrerequisites({
+    const productVisibility = resolveDshProductClientVisibility({
       approvalStatus: product.approvalStatus,
-      partnerActivationClientVisible: isDshPartnerClientVisible(product.partnerStatus),
+      activationStatus: product.partnerStatus,
+      catalogPublished: product.partnerStatus === 'client_visible',
       deliveryModesReady: product.deliveryModesReady,
+      serviceabilityAvailable: product.partnerStatus === 'client_visible',
       categoryMappingStatus: product.categoryMappingStatus,
       duplicateStatus: product.duplicateStatus,
       mediaPolicySatisfied: product.mediaPolicySatisfied,
     });
-    const blockers = publishingPrerequisites.filter((item) => !item.satisfied);
-    const publishingBlocked = isDshProductPublishingBlocked({
-      approvalStatus: product.approvalStatus,
-      duplicateStatus: product.duplicateStatus,
-      categoryMappingStatus: product.categoryMappingStatus,
-    }) || blockers.length > 0;
+    const blockers = productVisibility.publishingPrerequisites.filter((item) => !item.satisfied);
+    const publishingBlocked = !productVisibility.visible;
 
     return {
       ...product,
       approvalLabel: approvalMeta.label,
       blockers,
       publishingBlocked,
+      blockedReason: productVisibility.blockedReason,
       tone: product.approvalStatus === 'client_visible' && blockers.length === 0
         ? 'success' as const
         : blockers.length > 0

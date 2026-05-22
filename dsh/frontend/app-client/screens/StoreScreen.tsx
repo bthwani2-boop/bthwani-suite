@@ -44,6 +44,7 @@ import { resolveDshImageSource } from '../shared/resolve-image-source';
 import { getDshClientStateMeta } from '../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import { mapMenuItemToProductCard } from '../shared/map-menu-item-to-product-card';
+import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { canRenderInClientSurface } from '../../shared/workflow';
 import {
   type DshFulfillmentDeliveryMode,
@@ -881,6 +882,15 @@ function DshStoreGetScreenContent({
     () => resolveStoreOperationalState(store?.statusLabel ?? '', store?.deliveryLabel, store?.serviceLabel),
     [store?.deliveryLabel, store?.serviceLabel, store?.statusLabel],
   );
+  const storeVisibility = React.useMemo(() => resolveDshStoreClientVisibility({
+    publishStage: store?.publishStage,
+    deliveryModesReady: Boolean(store?.deliveryModes?.some((mode) => mode.isAvailable)),
+    serviceabilityAvailable: operationalState !== 'area_unserviceable',
+    serviceLabel: store?.serviceLabel,
+    deliveryLabel: store?.deliveryLabel,
+    storeOpen: operationalState === 'store_open',
+    inZone: operationalState !== 'area_unserviceable',
+  }), [operationalState, store?.deliveryLabel, store?.deliveryModes, store?.publishStage, store?.serviceLabel]);
   const operationalStateMeta = React.useMemo(() => getDshClientStateMeta(operationalState), [operationalState]);
   const showOperationalNotice = operationalState !== 'store_open';
   const supportActionLabel = operationalState === 'area_unserviceable' ? 'تحديث العنوان أو طلب الدعم' : 'طلب الدعم';
@@ -1053,6 +1063,18 @@ function DshStoreGetScreenContent({
         stateId="blockingError"
         title={storeText.states.contextMissingTitle}
         description={storeText.states.contextMissingDescription}
+      />
+    );
+  }
+
+  if (!storeVisibility.visible) {
+    return (
+      <StateView
+        stateId="blockingError"
+        title="المتجر غير متاح للعميل الآن"
+        description={storeVisibility.blockedReason ?? 'لم يجتز هذا المتجر بوابة الظهور الكاملة بعد.'}
+        actionLabel={onBack ? 'العودة' : undefined}
+        onActionPress={onBack}
       />
     );
   }

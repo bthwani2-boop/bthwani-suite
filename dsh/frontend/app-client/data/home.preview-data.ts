@@ -65,6 +65,8 @@ export type DshHomeGetFixtureStore = {
 	sourceRecordId?: string;
 	canonicalStoreId?: string;
 	commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
+	supportsPickup?: boolean;
+	supportsPartnerDelivery?: boolean;
 	// PREMIUM 2026
 	locationLabel?: string;
 	deliveryTimeLabel?: string;
@@ -105,6 +107,8 @@ function toDshHomeGetFixtureStore(store: DshDiscoveryStore): DshHomeGetFixtureSt
 		sourceRecordId: store.sourceRecordId,
 		canonicalStoreId: store.canonicalStoreId,
 		commercialSourceMap: store.commercialSourceMap,
+		supportsPickup: store.supportsPickup,
+		supportsPartnerDelivery: store.supportsPartnerDelivery,
 		logoImageUri: store.logoImageUri,
 	};
 }

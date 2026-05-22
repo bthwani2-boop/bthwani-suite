@@ -6,11 +6,12 @@ import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import {
-  getDshProductPublishingPrerequisites,
   type DshProductIdentityApprovalStatus,
   type DshProductCategoryMappingStatus,
   type DshProductDuplicateStatus,
 } from '../../shared/dsh-product-identity.model';
+import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
 
 type PublishGateStatus = 'not-started' | 'in-review' | 'approved' | 'rejected' | 'published';
 
@@ -39,10 +40,14 @@ type CatalogPublishGateRecord = {
   status: PublishGateStatus;
   /** Canonical approval status for prerequisite evaluation */
   approvalStatus?: DshProductIdentityApprovalStatus;
-  /** Whether the partner owning this catalog is currently client-visible */
-  partnerActivationClientVisible?: boolean;
+  /** Partner activation status that owns the store-side visibility gate */
+  partnerActivationStatus?: DshPartnerActivationStatus;
   /** Whether at least one delivery mode is active for this store */
   deliveryModesReady?: boolean;
+  /** Whether the store is serviceable for the current client area */
+  serviceabilityAvailable?: boolean;
+  /** Whether the store catalog is already published from the partner gate perspective */
+  catalogPublished?: boolean;
   /** Category mapping status for prerequisite evaluation */
   categoryMappingStatus?: DshProductCategoryMappingStatus;
   /** Duplicate status for prerequisite evaluation */
@@ -61,8 +66,10 @@ const demoRecord: CatalogPublishGateRecord = {
   approvedItemCount: 38,
   status: 'in-review',
   approvalStatus: 'catalog_adopted',
-  partnerActivationClientVisible: true,
+  partnerActivationStatus: 'partner_active',
   deliveryModesReady: true,
+  serviceabilityAvailable: true,
+  catalogPublished: true,
   categoryMappingStatus: 'mapped',
   duplicateStatus: 'clean',
   mediaPolicySatisfied: false, // still pending — demonstrates blocked gate
@@ -84,19 +91,20 @@ export function CatalogPublishingGateSection({
 }: CatalogPublishingGateSectionProps) {
   const readinessPercent = Math.round((record.approvedItemCount / record.itemCount) * 100);
 
-  // Resolve publishing prerequisites using the shared SSoT helper.
-  // All prerequisites must be satisfied before the publish CTA is enabled.
-  const prerequisites = getDshProductPublishingPrerequisites({
+  const productVisibility = resolveDshProductClientVisibility({
     approvalStatus: record.approvalStatus ?? 'partner_submitted',
-    partnerActivationClientVisible: record.partnerActivationClientVisible ?? false,
+    activationStatus: record.partnerActivationStatus ?? 'catalog_ready',
     deliveryModesReady: record.deliveryModesReady ?? false,
+    serviceabilityAvailable: record.serviceabilityAvailable ?? false,
+    catalogPublished: record.catalogPublished ?? false,
     categoryMappingStatus: record.categoryMappingStatus ?? 'unmapped',
     duplicateStatus: record.duplicateStatus ?? 'clean',
     mediaPolicySatisfied: record.mediaPolicySatisfied ?? false,
   });
+  const prerequisites = productVisibility.publishingPrerequisites;
 
   const allPrerequisitesMet = prerequisites.every((p) => p.satisfied);
-  const isReadyToPublish = record.status === 'approved' && allPrerequisitesMet;
+  const isReadyToPublish = (record.status === 'approved' || productVisibility.publishingStatus === 'publishing_ready') && allPrerequisitesMet;
 
   return (
     <Box gap={4} padding={4}>
@@ -125,8 +133,14 @@ export function CatalogPublishingGateSection({
             { label: 'العناصر الكلية', value: String(record.itemCount) },
             { label: 'المعتمدة', value: String(record.approvedItemCount) },
             { label: 'غير المعتمدة', value: String(record.itemCount - record.approvedItemCount) },
+            { label: 'قرار ظهور المتجر', value: productVisibility.storeVisibility.visible ? 'مفتوح للعميل' : 'محجوب', tone: productVisibility.storeVisibility.visible ? 'success' : 'warning' },
+            { label: 'قرار ظهور المنتج', value: productVisibility.visible ? 'صالح للعميل' : 'غير صالح بعد', tone: productVisibility.visible ? 'success' : 'warning' },
           ]}
         />
+
+        {productVisibility.blockedReason ? (
+          <Text role="caption" tone="muted">{productVisibility.blockedReason}</Text>
+        ) : null}
 
         {/* Publishing prerequisites checklist — all must be satisfied before publish */}
         <Box gap={2}>

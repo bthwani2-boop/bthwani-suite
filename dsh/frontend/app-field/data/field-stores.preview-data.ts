@@ -36,6 +36,13 @@ export type FieldLeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending
 
 export type FieldOnboardingSectionId = 'basics' | 'classification' | 'location' | 'photos' | 'documents' | 'products' | 'offer' | 'review';
 
+export type FieldDocumentPreviewStatus =
+  | 'missing'
+  | 'uploaded'
+  | 'approved'
+  | 'needs_reupload'
+  | 'rejected';
+
 export type FieldOnboardingDraft = {
   activeSectionId: FieldOnboardingSectionId;
   basics: {
@@ -62,6 +69,14 @@ export type FieldOnboardingDraft = {
     storefrontPhotoRef: string;
     interiorPhotoRef: string;
     signagePhotoRef: string;
+  };
+  documents: {
+    commercialRegistrationRef: string;
+    ownerIdRef: string;
+    tradeLicenseRef: string;
+    commercialRegistrationStatus: FieldDocumentPreviewStatus;
+    ownerIdStatus: FieldDocumentPreviewStatus;
+    tradeLicenseStatus: FieldDocumentPreviewStatus;
   };
   products: {
     featuredProductName: string;
@@ -237,6 +252,14 @@ export function createEmptyDraft(overrides?: Partial<FieldOnboardingDraft>): Fie
       interiorPhotoRef: '',
       signagePhotoRef: '',
     },
+    documents: {
+      commercialRegistrationRef: '',
+      ownerIdRef: '',
+      tradeLicenseRef: '',
+      commercialRegistrationStatus: 'missing',
+      ownerIdStatus: 'missing',
+      tradeLicenseStatus: 'missing',
+    },
     products: {
       featuredProductName: '',
       featuredProductPrice: '',
@@ -259,6 +282,9 @@ export function createEmptyDraft(overrides?: Partial<FieldOnboardingDraft>): Fie
 
 export function getFieldRequiredMissingItems(draft: FieldOnboardingDraft) {
   const missing: string[] = [];
+  const documentIsResolved = (ref: string, status: FieldDocumentPreviewStatus) => (
+    ref.trim().length > 0 && (status === 'uploaded' || status === 'approved')
+  );
 
   if (!draft.basics.storeName.trim()) missing.push('اسم المتجر');
   if (!draft.basics.ownerName.trim()) missing.push('اسم المالك');
@@ -267,6 +293,9 @@ export function getFieldRequiredMissingItems(draft: FieldOnboardingDraft) {
   if (!draft.location.zone.trim()) missing.push('النطاق');
   if (!draft.location.latitude.trim() || !draft.location.longitude.trim() || !draft.location.landmark.trim()) missing.push('الإحداثية GPS');
   if (!draft.photos.storefrontPhotoRef.trim()) missing.push('صورة الواجهة');
+  if (!documentIsResolved(draft.documents.commercialRegistrationRef, draft.documents.commercialRegistrationStatus)) missing.push('السجل التجاري');
+  if (!documentIsResolved(draft.documents.ownerIdRef, draft.documents.ownerIdStatus)) missing.push('هوية المالك');
+  if (draft.documents.tradeLicenseRef.trim() && (draft.documents.tradeLicenseStatus === 'needs_reupload' || draft.documents.tradeLicenseStatus === 'rejected')) missing.push('رخصة التجارة تحتاج معالجة');
   if (!draft.products.featuredProductName.trim()) missing.push('منتج افتتاحي واحد');
   if (!draft.offer.preliminaryOffer.trim()) missing.push('العرض أو الاتفاق المبدئي');
   if (!draft.offer.operatingHours.trim()) missing.push('ساعات العمل');
@@ -275,13 +304,35 @@ export function getFieldRequiredMissingItems(draft: FieldOnboardingDraft) {
 }
 
 export function resolveFieldSectionSummaries(draft: FieldOnboardingDraft): FieldSectionSummary[] {
+  const documentsMissing = [
+    {
+      ref: draft.documents.commercialRegistrationRef,
+      status: draft.documents.commercialRegistrationStatus,
+      required: true,
+    },
+    {
+      ref: draft.documents.ownerIdRef,
+      status: draft.documents.ownerIdStatus,
+      required: true,
+    },
+    {
+      ref: draft.documents.tradeLicenseRef,
+      status: draft.documents.tradeLicenseStatus,
+      required: false,
+    },
+  ].filter((item) => {
+    if (item.required) {
+      return !item.ref.trim() || (item.status !== 'uploaded' && item.status !== 'approved');
+    }
+
+    return item.ref.trim().length > 0 && (item.status === 'needs_reupload' || item.status === 'rejected');
+  }).length;
   const sectionMissing: Record<FieldOnboardingSectionId, number> = {
     basics: [draft.basics.storeName, draft.basics.ownerName, draft.basics.ownerPhone].filter((value) => !value.trim()).length,
     classification: [draft.classification.storeType, draft.classification.mainCategory].filter((value) => !value.trim()).length,
     location: [draft.location.city, draft.location.zone, draft.location.addressLine, draft.location.latitude, draft.location.longitude, draft.location.landmark].filter((value) => !value.trim()).length,
     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((value) => !value.trim()).length,
-    // ML-002: documents section is non-blocking — upload is BLOCKED_BY_CONTRACT; section always reports 0 missing
-    documents: 0,
+    documents: documentsMissing,
     products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((value) => !value.trim()).length,
     offer: [draft.offer.preliminaryOffer, draft.offer.operatingHours].filter((value) => !value.trim()).length,
     review: getFieldRequiredMissingItems(draft).length,
@@ -628,6 +679,14 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           interiorPhotoRef: '',
           signagePhotoRef: '',
         },
+        documents: {
+          commercialRegistrationRef: 'cr-lead-1.pdf',
+          ownerIdRef: '',
+          tradeLicenseRef: '',
+          commercialRegistrationStatus: 'uploaded',
+          ownerIdStatus: 'missing',
+          tradeLicenseStatus: 'missing',
+        },
         products: {
           featuredProductName: '',
           featuredProductPrice: '',
@@ -681,6 +740,14 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           storefrontPhotoRef: '',
           interiorPhotoRef: 'صورة داخلية أولية',
           signagePhotoRef: '',
+        },
+        documents: {
+          commercialRegistrationRef: 'cr-lead-2.pdf',
+          ownerIdRef: 'owner-id-lead-2.jpg',
+          tradeLicenseRef: 'trade-lead-2.pdf',
+          commercialRegistrationStatus: 'needs_reupload',
+          ownerIdStatus: 'approved',
+          tradeLicenseStatus: 'rejected',
         },
         products: {
           featuredProductName: 'وجبة شاورما',
@@ -739,6 +806,14 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           interiorPhotoRef: 'الفرن ومنطقة الخدمة',
           signagePhotoRef: 'لوحة خارجية',
         },
+        documents: {
+          commercialRegistrationRef: 'cr-lead-3.pdf',
+          ownerIdRef: 'owner-id-lead-3.jpg',
+          tradeLicenseRef: 'trade-lead-3.pdf',
+          commercialRegistrationStatus: 'approved',
+          ownerIdStatus: 'approved',
+          tradeLicenseStatus: 'uploaded',
+        },
         products: {
           featuredProductName: 'خبز بطاطس',
           featuredProductPrice: '8',
@@ -791,6 +866,14 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           storefrontPhotoRef: 'واجهة رئيسية',
           interiorPhotoRef: 'صالة الجلوس',
           signagePhotoRef: 'اللوحة الأمامية',
+        },
+        documents: {
+          commercialRegistrationRef: 'cr-lead-4.pdf',
+          ownerIdRef: 'owner-id-lead-4.jpg',
+          tradeLicenseRef: 'trade-lead-4.pdf',
+          commercialRegistrationStatus: 'uploaded',
+          ownerIdStatus: 'uploaded',
+          tradeLicenseStatus: 'uploaded',
         },
         products: {
           featuredProductName: 'لاتيه',
@@ -852,6 +935,14 @@ export function createFieldSeedStores(): FieldStoreFile[] {
           storefrontPhotoRef: 'الواجهة مكتملة',
           interiorPhotoRef: 'الرفوف الداخلية',
           signagePhotoRef: 'صورة اللوحة',
+        },
+        documents: {
+          commercialRegistrationRef: 'cr-lead-5.pdf',
+          ownerIdRef: 'owner-id-lead-5.jpg',
+          tradeLicenseRef: 'trade-lead-5.pdf',
+          commercialRegistrationStatus: 'approved',
+          ownerIdStatus: 'approved',
+          tradeLicenseStatus: 'approved',
         },
         products: {
           featuredProductName: 'علبة تمر فاخر',

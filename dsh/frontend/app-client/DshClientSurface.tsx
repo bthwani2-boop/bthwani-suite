@@ -54,6 +54,7 @@ import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
 } from './contracts/dsh-client-binding.contracts';
+import { resolveDshStoreClientVisibility } from '../shared/dsh-client-visibility.model';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
@@ -130,9 +131,29 @@ const publishedCategoryIds = new Set(
 const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publishedCategoryIds.has(category.id));
 const publishedCategoryListFixtures: PublishedCategoryItem[] = dshCategoryListFixtures;
 const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
+const clientVisibleDiscoveryStores = dshDiscoveryStores.filter((store) => (
+  resolveDshStoreClientVisibility({
+    publishStage: store.publishStage,
+    supportsPickup: store.supportsPickup,
+    supportsPartnerDelivery: store.supportsPartnerDelivery,
+    serviceLabel: store.serviceLabel,
+    deliveryLabel: store.deliveryLabel,
+    storeOpen: !store.statusLabel.includes('مغلق'),
+  }).visible
+));
+const clientVisibleHomeFixtureStores = dshHomeGetFixtureStores.filter((store) => (
+  resolveDshStoreClientVisibility({
+    publishStage: store.publishStage,
+    supportsPickup: store.supportsPickup,
+    supportsPartnerDelivery: store.supportsPartnerDelivery,
+    serviceLabel: store.serviceLabel,
+    deliveryLabel: store.deliveryLabel,
+    storeOpen: store.statusTone === 'open',
+  }).visible
+));
 
 function hasStoreTarget(storeId?: string) {
-  return typeof storeId === 'string' && dshDiscoveryStores.some((store) => store.id === storeId);
+  return typeof storeId === 'string' && clientVisibleDiscoveryStores.some((store) => store.id === storeId);
 }
 
 function hasStoreCategoryTarget(storeId?: string, categoryId?: string) {
@@ -181,7 +202,7 @@ function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
 }
 
 function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
-  const store = dshDiscoveryStores.find((entry) => entry.id === storeId);
+  const store = clientVisibleDiscoveryStores.find((entry) => entry.id === storeId) ?? dshDiscoveryStores.find((entry) => entry.id === storeId);
   return {
     canonicalStoreId: store?.canonicalStoreId,
     sourceRecordId: store?.sourceRecordId,
@@ -569,10 +590,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const filteredSearchStores = React.useMemo(() => {
     const query = storesQuery.trim().toLowerCase();
     if (!query) {
-      return dshDiscoveryStores;
+      return clientVisibleDiscoveryStores;
     }
 
-    return dshDiscoveryStores.filter((store) => {
+    return clientVisibleDiscoveryStores.filter((store) => {
       const haystack = `${store.name} ${store.subtitle} ${store.statusLabel} ${store.meta}`.toLowerCase();
       return haystack.includes(query);
     });
@@ -626,7 +647,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     if (!order) return;
 
     // 1. Find store matching order title (store name)
-    const matchedStore = dshDiscoveryStores.find((s) => s.name === order.title) ?? dshDiscoveryStores[0];
+    const matchedStore = clientVisibleDiscoveryStores.find((s) => s.name === order.title) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0];
     setActiveStoreId(matchedStore.id);
     setActiveCanonicalStoreId(matchedStore.canonicalStoreId);
 
@@ -732,7 +753,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   }, [openTrackedOrder, selectedFulfillmentMode]);
 
   const activeStore = React.useMemo(
-    () => dshDiscoveryStores.find((store) => store.id === activeStoreId) ?? dshDiscoveryStores[0],
+    () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
     [activeStoreId],
   );
 
@@ -1222,7 +1243,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           serviceDialTrigger={serviceDialTrigger}
           favoriteOverrides={favoriteOverrides}
       onToggleFavorite={(storeId) => {
-        const currentStore = dshHomeGetFixtureStores.find((s) => s.id === storeId) || dshDiscoveryStores.find((s) => s.id === storeId);
+        const currentStore = clientVisibleHomeFixtureStores.find((s) => s.id === storeId) || clientVisibleDiscoveryStores.find((s) => s.id === storeId);
         const currentVal = favoriteOverrides[storeId] ?? currentStore?.isFavorite ?? false;
         setFavoriteOverrides((previous) => ({
           ...previous,
@@ -1233,23 +1254,23 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       promos={getPublishedMarketingHomePromos('home') as DshHomeGetPromo[]}
       homePromos={getPublishedHomePromos()}
       approvedVideoShorts={liveMarketingShorts}
-      stores={dshHomeGetFixtureStores as any}
+      stores={clientVisibleHomeFixtureStores as any}
       recentOrders={[
         {
           id: 'home-recent-order-1',
-          storeId: dshHomeGetFixtureStores[0]?.id ?? 'store-1001',
+          storeId: clientVisibleHomeFixtureStores[0]?.id ?? 'store-1001',
           title: 'الطلب النشط',
-          subtitle: dshHomeGetFixtureStores[0]?.name ?? 'مطعم القلعة',
-          meta: `${dshHomeGetFixtureStores[0]?.distanceLabel ?? '2.1 كم'} · ${dshHomeGetFixtureStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
-          statusLabel: dshHomeGetFixtureStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
+          subtitle: clientVisibleHomeFixtureStores[0]?.name ?? 'مطعم القلعة',
+          meta: `${clientVisibleHomeFixtureStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeFixtureStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
+          statusLabel: clientVisibleHomeFixtureStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
         },
         {
           id: 'home-recent-order-2',
-          storeId: dshHomeGetFixtureStores[1]?.id ?? 'store-1002',
+          storeId: clientVisibleHomeFixtureStores[1]?.id ?? 'store-1002',
           title: 'آخر طلب',
-          subtitle: dshHomeGetFixtureStores[1]?.name ?? 'مطاعم الأرض الخضراء',
-          meta: `${dshHomeGetFixtureStores[1]?.distanceLabel ?? '1.8 كم'} · ${dshHomeGetFixtureStores[1]?.serviceLabel ?? 'توصيل برو'}`,
-          statusLabel: dshHomeGetFixtureStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
+          subtitle: clientVisibleHomeFixtureStores[1]?.name ?? 'مطاعم الأرض الخضراء',
+          meta: `${clientVisibleHomeFixtureStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeFixtureStores[1]?.serviceLabel ?? 'توصيل برو'}`,
+          statusLabel: clientVisibleHomeFixtureStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
         },
       ]}
       onBack={onExit}

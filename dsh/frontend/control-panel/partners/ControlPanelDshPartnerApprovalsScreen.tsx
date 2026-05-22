@@ -12,6 +12,10 @@ import {
   translateStage,
   translateEntityType,
 } from '../../shared/workflow';
+import {
+  mapApprovalStageToPartnerActivationStatus,
+  resolveDshStoreClientVisibility,
+} from '../../shared/dsh-client-visibility.model';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
@@ -21,6 +25,14 @@ import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligi
 
 // ML-001: approval action extended to include final ops activation step for marketing-approved records
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
+  const activationStatus = mapApprovalStageToPartnerActivationStatus(item.stage);
+  const visibility = resolveDshStoreClientVisibility({
+    activationStatus,
+    catalogPublished: item.stage === 'catalog-adopted' || item.stage === 'client-visible',
+    deliveryModesReady: item.stage === 'marketing-approved' || item.stage === 'catalog-adopted' || item.stage === 'client-visible',
+    serviceabilityAvailable: item.stage === 'client-visible',
+    storeOpen: true,
+  });
   const tone = (item.stage === 'marketing-review' || item.stage === 'marketing-approved') ? 'success' :
                (item.stage === 'needs-fix') ? 'danger' :
                (item.stage === 'partner-submitted' || item.stage === 'field-submitted') ? 'warning' : 'neutral';
@@ -35,10 +47,10 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       status={translateStage(item.stage)}
       statusTone={tone === 'danger' ? 'danger' : tone === 'success' ? 'success' : tone === 'warning' ? 'warning' : 'neutral'}
       risk={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'neutral'}
-      recommendation={isAwaitingActivation ? 'جاهز للتفعيل النهائي' : 'مراجعة المستندات'}
+      recommendation={visibility.visible ? 'جاهز للظهور المنطقي' : (visibility.blockedReason ?? (isAwaitingActivation ? 'جاهز للتفعيل النهائي' : 'مراجعة المستندات'))}
       reason={isAwaitingActivation
-        ? 'اجتاز الشريك مراحل التسجيل والمراجعة التسويقية. القرار النهائي بيد قسم الشركاء.'
-        : 'البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني.'}
+        ? `اجتاز الشريك مراحل التسجيل والمراجعة التسويقية. المتبقي: ${visibility.blockedReason ?? 'قرار التفعيل النهائي بيد قسم الشركاء.'}`
+        : `حالة التفعيل الحالية: ${activationStatus} · ${visibility.blockedReason ?? 'البيانات المرفوعة مكتملة وتطابق المعايير الأولية لمنصة بثواني.'}`}
       sla={translateEntityType(item.entityType)}
       primaryAction={isAwaitingActivation ? {
         id: 'activate',

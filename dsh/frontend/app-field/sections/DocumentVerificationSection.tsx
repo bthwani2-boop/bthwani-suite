@@ -7,6 +7,7 @@ import {
   StateView,
   Text,
 } from '@bthwani/ui-kit';
+import type { FieldDocumentPreviewStatus } from '../data/field-stores.preview-data';
 
 type DocumentKind = 'commercial_registration' | 'id_card' | 'trade_license' | 'other';
 
@@ -14,13 +15,14 @@ type DocumentItem = {
   id: DocumentKind;
   label: string;
   required: boolean;
-  uploaded: boolean;
+  status: FieldDocumentPreviewStatus;
+  referenceLabel?: string;
 };
 
 const defaultDocuments: readonly DocumentItem[] = [
-  { id: 'commercial_registration', label: 'السجل التجاري', required: true, uploaded: false },
-  { id: 'id_card', label: 'الهوية الوطنية', required: true, uploaded: false },
-  { id: 'trade_license', label: 'رخصة التجارة', required: false, uploaded: false },
+  { id: 'commercial_registration', label: 'السجل التجاري', required: true, status: 'missing' },
+  { id: 'id_card', label: 'الهوية الوطنية', required: true, status: 'missing' },
+  { id: 'trade_license', label: 'رخصة التجارة', required: false, status: 'missing' },
 ];
 
 export type DocumentVerificationSectionProps = {
@@ -52,23 +54,48 @@ export function DocumentVerificationSection({
     );
   }
 
-  const allRequired = documents.filter((d) => d.required).every((d) => d.uploaded);
+  const allRequired = documents
+    .filter((d) => d.required)
+    .every((d) => d.status === 'uploaded' || d.status === 'approved');
+
+  const resolveStatusTone = (status: FieldDocumentPreviewStatus) => {
+    if (status === 'approved') return 'success' as const;
+    if (status === 'uploaded') return 'brand' as const;
+    if (status === 'needs_reupload') return 'warning' as const;
+    if (status === 'rejected') return 'danger' as const;
+    return 'muted' as const;
+  };
+
+  const resolveStatusLabel = (status: FieldDocumentPreviewStatus) => {
+    if (status === 'approved') return 'معتمد';
+    if (status === 'uploaded') return 'مرفوع';
+    if (status === 'needs_reupload') return 'يحتاج إعادة رفع';
+    if (status === 'rejected') return 'مرفوض';
+    return 'مفقود';
+  };
 
   return (
     <Box gap={4}>
       <Text role="titleSm">التحقق من المستندات</Text>
+      <Text role="caption" tone="muted">المراجع والحالات هنا preview-only؛ قرار الاعتماد النهائي يبقى لدى control-panel/partners.</Text>
       <Box gap={2}>
         {documents.map((doc) => (
           <Box key={doc.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} padding={3} background="surfaceRaised" radiusToken="md">
             <Box gap={0}>
               <Text role="bodyMd">{doc.label}</Text>
               {doc.required && <Text role="bodySm" tone="danger">مطلوب</Text>}
+              {doc.referenceLabel ? <Text role="caption" tone="muted">{doc.referenceLabel}</Text> : null}
             </Box>
-            {doc.uploaded ? (
-              <Text role="bodySm" tone="success">تم الرفع</Text>
-            ) : (
-              <Button label="رفع" size="sm" fullWidth={false} onPress={() => onUploadDocument?.(doc.id)} />
-            )}
+            <Box gap={1} style={{ alignItems: 'flex-end' }}>
+              <Text role="bodySm" tone={resolveStatusTone(doc.status)}>{resolveStatusLabel(doc.status)}</Text>
+              <Button
+                label={doc.status === 'missing' ? 'رفع' : 'تحديث'}
+                size="sm"
+                fullWidth={false}
+                disabled={!onUploadDocument}
+                onPress={() => onUploadDocument?.(doc.id)}
+              />
+            </Box>
           </Box>
         ))}
       </Box>

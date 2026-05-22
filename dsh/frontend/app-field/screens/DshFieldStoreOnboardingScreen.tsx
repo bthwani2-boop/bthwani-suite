@@ -117,6 +117,29 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
   const sections = React.useMemo(() => resolveFieldSectionSummaries(draft), [draft]);
   const missingItems = React.useMemo(() => getFieldRequiredMissingItems(draft), [draft]);
   const completionPercent = React.useMemo(() => resolveFieldCompletionPercent(draft), [draft]);
+  const documentItems = React.useMemo(() => ([
+    {
+      id: 'commercial_registration' as const,
+      label: 'السجل التجاري',
+      required: true,
+      status: draft.documents.commercialRegistrationStatus,
+      referenceLabel: draft.documents.commercialRegistrationRef || 'لا يوجد مرجع مرفوع بعد',
+    },
+    {
+      id: 'id_card' as const,
+      label: 'هوية المالك',
+      required: true,
+      status: draft.documents.ownerIdStatus,
+      referenceLabel: draft.documents.ownerIdRef || 'لا يوجد مرجع مرفوع بعد',
+    },
+    {
+      id: 'trade_license' as const,
+      label: 'رخصة التجارة',
+      required: false,
+      status: draft.documents.tradeLicenseStatus,
+      referenceLabel: draft.documents.tradeLicenseRef || 'اختياري — غير مرفوع',
+    },
+  ]), [draft.documents]);
   const activeIndex = fieldSectionOrder.indexOf(activeSectionId);
   const isLastSection = activeIndex === fieldSectionOrder.length - 1;
   const canSubmit = missingItems.length === 0 && !readOnly;
@@ -236,8 +259,11 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
     if (activeSectionId === 'documents') {
       return (
         <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-          <SectionHeader title="التحقق من المستندات" subtitle="رفع المستندات معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار غير نشطة في الوضع الحالي." />
-          <DocumentVerificationSection state="ready" />
+          <SectionHeader title="التحقق من المستندات" subtitle="الحالات هنا تعكس الملف الفعلي: مفقود، مرفوع، معتمد، يحتاج إعادة رفع، أو مرفوض." />
+          <DocumentVerificationSection state="ready" documents={documentItems} />
+          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+            الرفع والتحوير الفعليان ما زالا محجوبين بعقد upload API، لكن الجاهزية لم تعد تتجاوز هذا القسم كأنه مكتمل تلقائيًا.
+          </Text>
         </Surface>
       );
     }

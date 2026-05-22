@@ -29,6 +29,7 @@ import {
 } from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../shared/dshStoreProductCardModel';
+import { mapPublishStageToPartnerActivationStatus } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/app-partner/dsh';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
@@ -1038,6 +1039,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             deliveryReadinessLabel={activeCanonicalStore?.deliveryReadinessLabel}
             coverageSummary={activeCanonicalStore?.coverageSummary}
             publishStage={activeCanonicalStore?.publishStage}
+            activationStatus={mapPublishStageToPartnerActivationStatus(activeCanonicalStore?.publishStage)}
+            serviceModes={serviceModes}
             onOpenStoreScope={onOpenStoreScope}
           />
         </HubSectionShell>

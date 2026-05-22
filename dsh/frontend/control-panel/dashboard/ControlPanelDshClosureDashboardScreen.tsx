@@ -239,7 +239,7 @@ export function ControlPanelDshClosureEvidenceStream() {
               : item.status === 'blocked-by-wlt' ? 'محجوب / WLT'
               : item.status === 'blocked-by-contract' ? 'محجوب / عقد'
               : item.status === 'needs-visual-evidence' ? 'يحتاج إثبات بصري'
-              : item.evidenceStatus === 'pending-ui-gap' ? 'جاهز مع فجوات'
+              : item.evidenceStatus === 'needs-visual-evidence' ? 'جاهز للمراجعة البصرية'
               : 'واجهة جاهزة'
             }
             href={item.routeHint}

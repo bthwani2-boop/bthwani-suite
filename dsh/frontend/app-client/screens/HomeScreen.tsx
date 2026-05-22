@@ -44,6 +44,7 @@ import { resolveDshImageSource } from '../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../shared/growth.preview-store';
 import type { MarketingVideoRecord } from '../../shared/video.preview-store';
 import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import {
   getMarketingTickerItems,
   buildMarketingTickerPlan,
@@ -223,6 +224,10 @@ export type DshHomeGetStore = {
   hasCouponAvailable?: boolean;
   publishStage?: string;
   commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
+  supportsPickup?: boolean;
+  supportsPartnerDelivery?: boolean;
+  serviceabilityAvailable?: boolean;
+  catalogPublished?: boolean;
   /** P0-04: Resolved badge for client-visible stores — display-only.
    *  Derived from DshPartnerActivationStatus via getDshPartnerVisibilityBadge().
    *  app-client never reads raw activation status; it receives only the resolved badge. */
@@ -659,8 +664,29 @@ export function DshHomeGetScreen({
   const cardHeight = Math.max(160, Math.round(cardWidth * 0.78));
   const itemWidth = cardWidth + resolvedItemGap;
   const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
-  const resolvedStores = (stores ?? []).filter((store) => canRenderInClientSurface(store.publishStage, 'store'));
-  const visibleStoreIds = React.useMemo(() => new Set(resolvedStores.map((store) => store.id)), [resolvedStores]);
+  const resolvedStoresWithVisibility = React.useMemo(() => (
+    (stores ?? []).map((store) => ({
+      ...store,
+      clientVisibility: resolveDshStoreClientVisibility({
+        publishStage: store.publishStage,
+        supportsPickup: store.supportsPickup,
+        supportsPartnerDelivery: store.supportsPartnerDelivery,
+        serviceabilityAvailable: store.serviceabilityAvailable,
+        catalogPublished: store.catalogPublished,
+        serviceLabel: store.serviceLabel,
+        deliveryLabel: store.deliveryLabel,
+        storeOpen: store.statusTone === 'open',
+      }),
+    }))
+  ), [stores]);
+  const resolvedStores = React.useMemo(
+    () => resolvedStoresWithVisibility.filter((store) => store.clientVisibility.visible),
+    [resolvedStoresWithVisibility],
+  );
+  const storeVisibilityById = React.useMemo(
+    () => new Map(resolvedStoresWithVisibility.map((store) => [store.id, store.clientVisibility])),
+    [resolvedStoresWithVisibility],
+  );
   const resolvedRecentOrders = recentOrders ?? [];
 
   const resolveTargetPartnerStatus = React.useCallback((targetType: string, targetId?: string): DshPartnerActivationStatus | undefined => {
@@ -668,8 +694,8 @@ export function DshHomeGetScreen({
       return undefined;
     }
 
-    return visibleStoreIds.has(targetId) ? 'client_visible' : undefined;
-  }, [visibleStoreIds]);
+    return storeVisibilityById.get(targetId)?.activationStatus;
+  }, [storeVisibilityById]);
 
   const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter((promo) => {
     const visibility = getHomePromoVisibilityRecord(promo, {

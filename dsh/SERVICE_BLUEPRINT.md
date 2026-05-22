@@ -17,8 +17,8 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `DSH_FRONTEND_CLOSURE_TRUTH_P0_14` |
-| Current Status | `FRONTEND_PREVIEW_ONLY_WITH_PENDING_VISUAL_EVIDENCE` |
+| Current Decision | `DSH_UIUX_FLOW_LOGICALLY_READY_FOR_VISUAL_REVIEW` |
+| Current Status | `DSH_VISUAL_REVIEW_PENDING_HUMAN_REVIEW` |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -26,10 +26,10 @@ API contract: `dsh/dsh.openapi.yaml`.
 
 | Surface | Status | Note |
 |---|---|---|
-| `app-client` | `preview-ready` | discovery, cart/checkout, and tracking/support are route-proven but remain preview-only |
-| `app-partner` | `preview-ready` | intake and catalog readiness are route-proven but still need stronger proof |
-| `app-captain` | `preview-ready` | pickup, delivery, and PoD surfaces are present but remain preview-only |
-| `app-field` | `preview-ready` | onboarding and visit/readiness surfaces are route-proven but still preview-only |
+| `app-client` | `needs-visual-evidence` | discovery, cart/checkout, and tracking/support are logically wired and now wait on human visual review |
+| `app-partner` | `needs-visual-evidence` | intake and catalog readiness are logically wired and now wait on human visual review |
+| `app-captain` | `needs-visual-evidence` | pickup, delivery, and PoD surfaces are logically wired and now wait on human visual review |
+| `app-field` | `needs-visual-evidence` | onboarding and visit/readiness surfaces are logically wired and now wait on human visual review |
 | `control-panel operations` | `needs-visual-evidence` | operations routing and screens are live; screenshots and runtime intervention proof are still missing |
 | `control-panel finance` | `blocked-by-wlt` | finance remains a read-only WLT bridge and not a DSH-owned money surface |
 
@@ -102,7 +102,7 @@ discovery -> storefront -> cart -> checkout_intent -> payment_by_WLT -> order_cr
 -> arrive_dropoff -> proof_of_delivery -> delivered -> rating -> control_panel_audit
 ```
 
-This lifecycle is still preview-only until runtime proof exists.
+This lifecycle is logically wired for human visual review, but runtime proof is still unclaimed.
 
 ---
 
@@ -127,13 +127,14 @@ This lifecycle is still preview-only until runtime proof exists.
 
 | Gate | Status |
 |---|---|
-| UI / UX / Flow | `PREVIEW_ONLY_WITH_PENDING_VISUAL_EVIDENCE` |
+| UI / UX / Flow | `DSH_UIUX_FLOW_LOGICALLY_READY_FOR_VISUAL_REVIEW` |
+| Visual Review | `PENDING_HUMAN_REVIEW` |
 | Binding | `NEEDS_BINDING_LATER` |
 | Runtime | `RUNTIME_UNPROVEN` |
-| Backend / OpenAPI | `BLOCKED_BY_CONTRACT` |
-| WLT Finance Ownership | `BLOCKED_BY_WLT` |
-| TypeScript | `PASS_ON_CURRENT_BRANCH` |
-| Production Readiness | `BLOCKED` |
+| Backend / OpenAPI | `OUT_OF_SCOPE / NOT_CLAIMED` |
+| WLT Finance Ownership | `WLT_ONLY` |
+| TypeScript | `TARGETED_REVALIDATION_PENDING` |
+| Production Readiness | `NOT_CLAIMED` |
 
 Single next action:
 attach trusted current-branch screenshots for all five DSH surfaces without inflating runtime or backend claims.
