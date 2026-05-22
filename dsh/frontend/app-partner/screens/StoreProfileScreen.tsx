@@ -1,12 +1,13 @@
 import React from 'react';
+import { View } from 'react-native';
 import {
   Box,
   Button,
   Chip,
+  Divider,
   KeyValueList,
   ListItem,
   MobileStickyPrimaryAction,
-  Surface,
   Text,
   TextField,
   resolveRowDirection,
@@ -40,12 +41,6 @@ export type StoreProfileScreenProps = {
   onOpenStoreScope?: () => void;
 };
 
-type MetricTileProps = {
-  label: string;
-  value: string;
-  tone?: 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
-};
-
 type SectionBlockProps = {
   title: string;
   subtitle: string;
@@ -61,34 +56,12 @@ const identityDocuments = [
   { id: 'bank', title: 'الحساب المرتبط', subtitle: 'مصدر التسويات والمدفوعات.', meta: 'مرتبط', badgeLabel: 'نشط' },
 ] as const;
 
-function MetricTile({ label, value, tone = 'default' }: MetricTileProps) {
-  const { theme } = useTheme();
-  const borderColor = {
-    default: theme.lineStrong,
-    brand: theme.brand,
-    success: theme.success,
-    warning: theme.warning,
-    danger: theme.danger,
-    info: theme.info,
-  }[tone];
-
-  return (
-    <Surface tone="default" padding={3} gap={1} style={{ flex: 1, minWidth: 118, borderWidth: 1, borderColor }}>
-      <Text role="caption" tone="muted" numberOfLines={1}>
-        {label}
-      </Text>
-      <Text role="bodyStrong" tone={tone} numberOfLines={2}>
-        {value}
-      </Text>
-    </Surface>
-  );
-}
-
 function SectionBlock({ title, subtitle, actionLabel, expanded, onToggle, children }: SectionBlockProps) {
   const { direction } = useDirection();
+  const { theme } = useTheme();
 
   return (
-    <Surface tone="default" padding={3} gap={3}>
+    <Box gap={3} style={{ paddingVertical: 4 }}>
       <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12 }}>
         <Box style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
@@ -98,10 +71,14 @@ function SectionBlock({ title, subtitle, actionLabel, expanded, onToggle, childr
             {subtitle}
           </Text>
         </Box>
-        <Button label={actionLabel} tone="secondary" fullWidth={false} onPress={onToggle} />
+        <Button label={actionLabel} tone="secondary" size="sm" fullWidth={false} onPress={onToggle} />
       </Box>
-      {expanded ? children : null}
-    </Surface>
+      {expanded ? (
+        <Box gap={3} style={{ marginTop: 4 }}>
+          {children}
+        </Box>
+      ) : null}
+    </Box>
   );
 }
 
@@ -124,6 +101,7 @@ export function StoreProfileScreen({
   onOpenStoreScope,
 }: StoreProfileScreenProps) {
   const { direction } = useDirection();
+  const { theme } = useTheme();
   const [branchSectionOpen, setBranchSectionOpen] = React.useState(true);
   const [identitySectionOpen, setIdentitySectionOpen] = React.useState(false);
   const [visibilitySectionOpen, setVisibilitySectionOpen] = React.useState(false);
@@ -149,21 +127,25 @@ export function StoreProfileScreen({
   }, []);
 
   return (
-    <Box gap={4}>
-      <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+    <Box gap={4} style={{ padding: 4 }}>
+      {/* 1) Flat Brief Status */}
+      <Box gap={2} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
           الحالة المختصرة
         </Text>
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
-          <MetricTile label="حالة المتجر" value={storeStateLabel} tone={storeOpen ? 'success' : 'warning'} />
-          <MetricTile label="الظهور" value={visibilityLabel} tone={listingEnabled ? 'success' : 'warning'} />
-          <MetricTile label="الهوية" value="معتمد" tone="brand" />
-          <MetricTile label="الفرع" value={branchLabel} tone="info" />
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Chip label={`حالة المتجر: ${storeStateLabel}`} tone={storeOpen ? 'success' : 'warning'} selected />
+          <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} selected />
+          <Chip label="الهوية: معتمد" tone="brand" selected />
+          <Chip label={`الفرع: ${branchLabel}`} tone="info" selected />
         </Box>
-      </Surface>
+      </Box>
 
-      <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted">
+      <Divider />
+
+      {/* 2) Flat Store Information */}
+      <Box gap={3} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
           معلومات المتجر
         </Text>
         <KeyValueList
@@ -184,8 +166,11 @@ export function StoreProfileScreen({
             { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
           ]}
         />
-      </Surface>
+      </Box>
 
+      <Divider />
+
+      {/* 3) Flat Branch Info section */}
       <SectionBlock
         title="بيانات الفرع"
         subtitle="تعديل الاسم والعنوان والاتصال من نفس المساحة، بدون قفزات خارجية."
@@ -193,16 +178,19 @@ export function StoreProfileScreen({
         expanded={branchSectionOpen}
         onToggle={() => setBranchSectionOpen((current) => !current)}
       >
-        <Box gap={3}>
+        <Box gap={3} style={{ paddingHorizontal: 4 }}>
           <TextField label="اسم الفرع" value={branchName} onChangeText={setBranchName} placeholder="اسم الفرع الحالي" />
           <TextField label="العنوان" value={branchAddress} onChangeText={setBranchAddress} placeholder="عنوان الفرع" multiline />
           <TextField label="رقم التواصل" value={branchContact} onChangeText={setBranchContact} placeholder="رقم الهاتف" keyboardType="phone-pad" />
-          <Text role="caption" tone="muted">
+          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
             التعديلات تبقى محلية حتى الضغط على زر الحفظ الأساسي أسفل الصفحة.
           </Text>
         </Box>
       </SectionBlock>
 
+      <Divider />
+
+      {/* 4) Flat Identity and Trust section */}
       <SectionBlock
         title="الهوية والاعتماد"
         subtitle="حالة الاعتماد والوثائق والسجل في مراجعة واحدة مضغوطة."
@@ -210,7 +198,7 @@ export function StoreProfileScreen({
         expanded={identitySectionOpen}
         onToggle={() => setIdentitySectionOpen((current) => !current)}
       >
-        <Box gap={3}>
+        <Box gap={3} style={{ paddingHorizontal: 4 }}>
           <KeyValueList
             dense
             items={[
@@ -221,26 +209,34 @@ export function StoreProfileScreen({
             ]}
           />
 
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2}>
+          <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
             <Chip label="الرخصة مكتملة" tone="success" />
             <Chip label="التحقق الضريبي جاهز" tone="brand" />
             <Chip label="المراجعة اليومية نشطة" tone="info" />
           </Box>
 
-          <Surface tone="inset" padding={3} gap={2}>
+          <Box gap={0}>
             {identityDocuments.map((document) => (
-              <ListItem
-                key={document.id}
-                title={document.title}
-                subtitle={document.subtitle}
-                meta={document.meta}
-                badgeLabel={document.badgeLabel}
-              />
+              <Box key={document.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', paddingHorizontal: 4 }}>
+                  <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                    <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{document.title}</Text>
+                    <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{document.subtitle}</Text>
+                  </Box>
+                  <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2 }}>
+                    <Chip label={document.badgeLabel} tone="success" />
+                    <Text role="caption" tone="muted">{document.meta}</Text>
+                  </Box>
+                </Box>
+              </Box>
             ))}
-          </Surface>
+          </Box>
         </Box>
       </SectionBlock>
 
+      <Divider />
+
+      {/* 5) Flat Visibility and Scope checklist section */}
       <SectionBlock
         title="الظهور والنطاق"
         subtitle="الظهور في القائمة ونطاق الخدمة الحالي من نفس الصفحة."
@@ -251,7 +247,7 @@ export function StoreProfileScreen({
           onOpenStoreScope?.();
         }}
       >
-        <Box gap={3}>
+        <Box gap={3} style={{ paddingHorizontal: 4 }}>
           <KeyValueList
             dense
             items={[
@@ -276,26 +272,31 @@ export function StoreProfileScreen({
             ]}
           />
 
-          <Surface tone="inset" padding={3} gap={2}>
-            <Text role="caption" tone="muted">شروط الظهور للعملاء — القرار النهائي للعمليات</Text>
+          <Box gap={2} style={{ paddingHorizontal: 4, marginTop: 4 }}>
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              شروط الظهور للعملاء — القرار النهائي للعمليات
+            </Text>
             {storeVisibility.checklist.map((check) => (
-              <Box key={check.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
-                <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'}>
+              <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+                <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'} style={{ fontWeight: 'bold' }}>
                   {check.satisfied ? '✓' : '✗'}
                 </Text>
-                <Box style={{ flex: 1, gap: 2 }}>
-                  <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'}>
-                    {check.label}
-                  </Text>
-                  {!check.satisfied && check.blockedReason ? (
-                    <Text role="caption" tone="muted">{check.blockedReason}</Text>
-                  ) : null}
-                </Box>
+                <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'} style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+                  {check.label}
+                </Text>
+                {!check.satisfied && check.blockedReason ? (
+                  <>
+                    <View style={{ flex: 1 }} />
+                    <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'left' : 'right' }}>
+                      {check.blockedReason}
+                    </Text>
+                  </>
+                ) : null}
               </Box>
             ))}
-          </Surface>
+          </Box>
 
-          <Text role="caption" tone="muted">
+          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
             يظل اختيار النطاق محليًا داخل نفس السطح، ويمكن ضمه إلى تحديث الهوية والفرع في حفظ واحد.
           </Text>
         </Box>

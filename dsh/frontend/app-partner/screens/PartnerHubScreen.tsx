@@ -6,6 +6,7 @@ import {
   Button,
   Chip,
   colorPalette,
+  Divider,
   Icon,
   KeyValueList,
   MobileCommandSectionList,
@@ -814,10 +815,13 @@ function OperationsPanel({
   visibilityLabel: string;
 }) {
   const { direction } = useDirection();
+  const { theme } = useTheme();
   const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
   const [modeOverrides, setModeOverrides] = React.useState<Partial<Record<PartnerOperationalMode['id'], boolean>>>({});
   const [teamPanelOpen, setTeamPanelOpen] = React.useState(false);
   const [coveragePanelOpen, setCoveragePanelOpen] = React.useState(false);
+  const [selectedMemberId, setSelectedMemberId] = React.useState<string>('');
+  const [selectedZoneId, setSelectedZoneId] = React.useState<string>('');
   const [inviteDraft, setInviteDraft] = React.useState('');
   const [lastSaveLabel, setLastSaveLabel] = React.useState<string | null>(null);
 
@@ -831,7 +835,6 @@ function OperationsPanel({
   );
 
   const activeModesCount = resolvedModes.filter((mode) => mode.enabled).length;
-  const selectedMode = resolvedModes.find((mode) => mode.id === selectedModeId) ?? resolvedModes[0];
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
@@ -849,27 +852,23 @@ function OperationsPanel({
         }}
       />
 
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">
+      {/* 1) Flat Header & Status Indicator Chips */}
+      <Box gap={2} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
           حالة التشغيل الآن
         </Text>
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Chip label={`حالة المتجر: ${storeOpen ? 'مفتوح' : 'مغلق'}`} tone={storeOpen ? 'success' : 'warning'} selected />
+          <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="info" selected />
+          <Chip label={`أوضاع نشطة: ${activeModesCount}/3`} tone="brand" selected />
+          <Chip label="مناطق التغطية: منطقتان" tone="success" selected />
+        </Box>
+      </Box>
 
-        <View
-          style={{
-            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-            flexWrap: 'wrap',
-            gap: 10,
-          }}
-        >
-          <SummaryCell label="حالة المتجر" value={storeOpen ? 'مفتوح الآن' : 'مغلق الآن'} tone={storeOpen ? 'success' : 'warning'} />
-          <SummaryCell label="ساعات العمل" value={todayHoursLabel} tone="info" />
-          <SummaryCell label="أوضاع مفعلة" value={`${activeModesCount}/3`} tone="brand" />
-          <SummaryCell label="مناطق نشطة" value="منطقتان" tone="success" />
-        </View>
-      </Surface>
+      <Divider />
 
-      {/* 3) Visibility and Coverage Zones (Read-Only) */}
-      <Surface tone="raised" padding={3} gap={3}>
+      {/* 2) Flat Visibility and Coverage Zones (Read-Only) */}
+      <Box gap={3} paddingVertical={2}>
         <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الظهور ونقاط الخدمة</Text>
         <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>شروط وجاهزية الظهور لعملاء بثواني (للمعلومة فقط).</Text>
         <KeyValueList
@@ -890,131 +889,177 @@ function OperationsPanel({
             },
           ]}
         />
-        <Surface tone="inset" padding={3} gap={2}>
+        <Box gap={2} style={{ paddingHorizontal: 4, marginTop: 4 }}>
           <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تفاصيل تدقيق شروط الظهور</Text>
           {storeVisibility.checklist.map((check) => (
-            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', gap: 8 }}>
-              <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'}>
+            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+              <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'} style={{ fontWeight: 'bold' }}>
                 {check.satisfied ? '✓' : '✗'}
               </Text>
-              <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-                <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'}>
-                  {check.label}
-                </Text>
-                {!check.satisfied && check.blockedReason ? (
-                  <Text role="caption" tone="muted">{check.blockedReason}</Text>
-                ) : null}
-              </Box>
+              <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'} style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+                {check.label}
+              </Text>
+              {!check.satisfied && check.blockedReason ? (
+                <>
+                  <View style={{ flex: 1 }} />
+                  <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'left' : 'right' }}>
+                    {check.blockedReason}
+                  </Text>
+                </>
+              ) : null}
             </Box>
           ))}
-        </Surface>
-      </Surface>
+        </Box>
+      </Box>
 
-      <Surface tone="inset" padding={3} gap={2}>
-        <Text role="bodyStrong">حدود تشغيل الشريك</Text>
-        <Text role="bodySm" tone="muted" align="start">
+      <Divider />
+
+      {/* 3) Flat Partnership operational boundaries notice */}
+      <Box paddingVertical={2} gap={1}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>حدود تشغيل الشريك</Text>
+        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
           التنفيذ المحلي للطلبات والفريق يبقى هنا، لكن تصعيد التذاكر يتبع {resolveDshControlPanelSectionLabel('support')}، وأي pricing policy أو zone pricing مركزي يتبع {resolveDshControlPanelSectionLabel('platform')}، وأي payout أو commission مرجعه finance/WLT.
         </Text>
-      </Surface>
+      </Box>
 
-      <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden' }}>
-        <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
-          <Text role="label" tone="muted">
-            أوضاع الخدمة
-          </Text>
-        </View>
+      <Divider />
 
-        {resolvedModes.map((mode) => (
-          <OperationsModeRow
-            key={mode.id}
-            mode={mode}
-            selected={mode.id === selectedMode.id}
-            onPress={() => setSelectedModeId(mode.id)}
-          />
-        ))}
+      {/* 4) Flat Operational Modes Row List with inline expansion */}
+      <Box gap={2} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
+          أوضاع الخدمة
+        </Text>
+        <Box gap={0}>
+          {resolvedModes.map((mode) => {
+            const isSelected = mode.id === selectedModeId;
+            return (
+              <Box key={mode.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '33' }}>
+                <Pressable
+                  onPress={() => setSelectedModeId(isSelected ? '' : mode.id)}
+                  style={({ pressed }) => ({
+                    flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                    alignItems: 'center',
+                    paddingVertical: 12,
+                    paddingHorizontal: 4,
+                    backgroundColor: pressed ? theme.surfaceInset : undefined,
+                  })}
+                >
+                  <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                    <Icon
+                      name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'partner_delivery' ? 'car-outline' : 'bicycle-outline'}
+                      size={18}
+                      tone={isSelected ? 'brand' : 'default'}
+                    />
+                    <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                      <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{mode.title}</Text>
+                      <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{mode.subtitle}</Text>
+                    </Box>
+                  </Box>
+                  <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 8 }}>
+                    <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
+                    <Text role="caption" tone="muted">
+                      {getWltDshPartnerCommissionLabel(mode.commission)}
+                    </Text>
+                  </Box>
+                  <Icon name={isSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={16} />
+                </Pressable>
 
-        <Surface tone="default" padding={3} gap={2} style={{ margin: 16, marginTop: 12 }}>
-          <View
-            style={{
-              flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text role="bodyStrong" align="start">
-                {selectedMode.title}
-              </Text>
-              <Text role="bodySm" tone="muted" align="start">
-                {selectedMode.subtitle}
-              </Text>
-            </View>
-            <Chip label={selectedMode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={selectedMode.enabled ? 'success' : 'warning'} />
-          </View>
-          <Text role="caption" tone="muted" align="start">
-            {getWltDshPartnerCommissionLabel(selectedMode.commission)}
-          </Text>
-          <Text role="bodySm" tone="muted" align="start">
-            تفاصيل هذا الوضع تظهر داخل نفس الصفحة فقط، ويمكن تبديل حالته محليًا دون أي route جديد.
-          </Text>
+                {isSelected && (
+                  <Box paddingHorizontal={4} paddingBottom={4} gap={3} style={{ paddingTop: 4 }}>
+                    <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+                      تفاصيل هذا الوضع تظهر داخل نفس الصفحة فقط، ويمكن تبديل حالته محليًا دون أي route جديد.
+                    </Text>
+                    <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8 }}>
+                      <Button
+                        label={mode.enabled ? 'إيقاف الوضع' : 'تفعيل الوضع'}
+                        tone="secondary"
+                        size="sm"
+                        fullWidth={false}
+                        onPress={() => {
+                          setModeOverrides((current) => ({
+                            ...current,
+                            [mode.id]: !mode.enabled,
+                          }));
+                        }}
+                      />
+                      {mode.id === 'partner_delivery' && onOpenStoreCourierSetup ? (
+                        <Button
+                          label="إعداد موصل المتجر"
+                          tone="brand"
+                          size="sm"
+                          fullWidth={false}
+                          onPress={onOpenStoreCourierSetup}
+                        />
+                      ) : null}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+
+      <Divider />
+
+      {/* 5) Flat Team Section with inline expansion */}
+      <Box paddingVertical={2} gap={2}>
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الفريق</Text>
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>مشرف 1 · موظف 3 · موصل 2</Text>
+          </Box>
           <Button
-            label={selectedMode.enabled ? 'إيقاف الوضع' : 'تفعيل الوضع'}
+            label={teamPanelOpen ? 'إخفاء الأعضاء' : 'إدارة الفريق'}
             tone="secondary"
+            size="sm"
             fullWidth={false}
-            onPress={() => {
-              setModeOverrides((current) => ({
-                ...current,
-                [selectedMode.id]: !selectedMode.enabled,
-              }));
-            }}
+            onPress={() => setTeamPanelOpen((current) => !current)}
           />
-          {selectedMode.id === 'partner_delivery' && onOpenStoreCourierSetup ? (
-            <Button
-              label="إعداد موصل المتجر"
-              tone="brand"
-              fullWidth={false}
-              onPress={onOpenStoreCourierSetup}
-            />
-          ) : null}
-        </Surface>
-      </Surface>
+        </Box>
 
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">
-          الفريق
-        </Text>
-        <Text role="bodyStrong" align="start">
-          مشرف 1 · موظف 3 · موصل 2
-        </Text>
-        <Button
-          label="إدارة الفريق"
-          tone="secondary"
-          fullWidth={false}
-          onPress={() => setTeamPanelOpen((current) => !current)}
-        />
-
-        {teamPanelOpen ? (
-          <Surface tone="inset" padding={3} gap={3}>
-            <View
-              style={{
-                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-                flexWrap: 'wrap',
-                gap: 8,
-              }}
-            >
+        {teamPanelOpen && (
+          <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
+            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
               <Chip label="مشرف" tone="brand" />
               <Chip label="موظف" tone="info" />
               <Chip label="موصل" tone="success" />
-            </View>
+            </Box>
 
-            <View style={{ gap: 10 }}>
-              {defaultTeamMembers.map((member) => (
-                <ListItem key={member.id} title={member.name} subtitle={member.subtitle} meta={member.roleLabel} badgeLabel={member.roleLabel} />
-              ))}
-            </View>
+            <Box gap={0}>
+              {defaultTeamMembers.map((member) => {
+                const isMemberSelected = selectedMemberId === member.id;
+                return (
+                  <Box key={member.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                    <Pressable
+                      onPress={() => setSelectedMemberId(isMemberSelected ? '' : member.id)}
+                      style={({ pressed }) => ({
+                        flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                        alignItems: 'center',
+                        backgroundColor: pressed ? theme.surfaceInset : undefined,
+                        padding: 4,
+                      })}
+                    >
+                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                        <Icon name="person-outline" size={16} tone="brand" />
+                        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{member.name}</Text>
+                      </Box>
+                      <Chip label={member.roleLabel} tone={member.roleLabel === 'مشرف' ? 'brand' : member.roleLabel === 'موظف' ? 'info' : 'success'} />
+                      <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
+                    </Pressable>
 
-            <Surface tone="default" padding={3} gap={3}>
+                    {isMemberSelected && (
+                      <Box paddingHorizontal={4} paddingTop={2} gap={1}>
+                        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{member.subtitle}</Text>
+                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>الصلاحية: {member.roleLabel}</Text>
+                      </Box>
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
+
+            <Box gap={3} style={{ marginTop: 8 }}>
               <TextField
                 label="اسم العضو أو البريد"
                 placeholder="مثال: staff@bthwani.sa"
@@ -1025,54 +1070,85 @@ function OperationsPanel({
               <Button
                 label="إضافة عضو"
                 tone="secondary"
+                size="sm"
                 fullWidth={false}
                 onPress={() => {
                   if (!inviteDraft.trim()) {
                     return;
                   }
-
                   setLastSaveLabel(`دعوة محلية: ${inviteDraft.trim()}`);
                   setInviteDraft('');
                 }}
               />
-              {lastSaveLabel ? (
-                <Text role="caption" tone="success">
+              {lastSaveLabel && (
+                <Text role="caption" tone="success" align={direction === 'rtl' ? 'end' : 'start'}>
                   {lastSaveLabel}
                 </Text>
-              ) : null}
-            </Surface>
-          </Surface>
-        ) : null}
-      </Surface>
+              )}
+            </Box>
+          </Box>
+        )}
+      </Box>
 
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">
-          مناطق التغطية
-        </Text>
-        <Text role="bodyStrong" align="start">
-          منطقتان نشطتان
-        </Text>
-        <Button
-          label="إدارة المناطق"
-          tone="secondary"
-          fullWidth={false}
-          onPress={() => setCoveragePanelOpen((current) => !current)}
-        />
+      <Divider />
 
-        {coveragePanelOpen ? (
-          <Surface tone="inset" padding={3} gap={3}>
-            <Text role="bodySm" tone="muted" align="start">
+      {/* 6) Flat Coverage Zones Section with inline expansion */}
+      <Box paddingVertical={2} gap={2}>
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مناطق التغطية</Text>
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>منطقتان نشطتان</Text>
+          </Box>
+          <Button
+            label={coveragePanelOpen ? 'إخفاء المناطق' : 'إدارة المناطق'}
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            onPress={() => setCoveragePanelOpen((current) => !current)}
+          />
+        </Box>
+
+        {coveragePanelOpen && (
+          <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
               {`النطاق الحالي: ${activeZoneLabel}`}
             </Text>
 
-            <View style={{ gap: 10 }}>
-              {defaultCoverageZones.map((zone) => (
-                <ListItem key={zone.id} title={zone.name} subtitle={zone.subtitle} badgeLabel={zone.active ? 'نشط' : 'موقوف'} />
-              ))}
-            </View>
-          </Surface>
-        ) : null}
-      </Surface>
+            <Box gap={0}>
+              {defaultCoverageZones.map((zone) => {
+                const isZoneSelected = selectedZoneId === zone.id;
+                return (
+                  <Box key={zone.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                    <Pressable
+                      onPress={() => setSelectedZoneId(isZoneSelected ? '' : zone.id)}
+                      style={({ pressed }) => ({
+                        flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                        alignItems: 'center',
+                        backgroundColor: pressed ? theme.surfaceInset : undefined,
+                        padding: 4,
+                      })}
+                    >
+                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                        <Icon name="location-outline" size={16} tone="brand" />
+                        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{zone.name}</Text>
+                      </Box>
+                      <Chip label={zone.active ? 'نشط' : 'موقوف'} tone={zone.active ? 'success' : 'warning'} />
+                      <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
+                    </Pressable>
+
+                    {isZoneSelected && (
+                      <Box paddingHorizontal={4} paddingTop={2} gap={1}>
+                        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{zone.subtitle}</Text>
+                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>حالة المنطقة: {zone.active ? 'تستقبل الطلبات' : 'مغلقة مؤقتًا'}</Text>
+                      </Box>
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
+          </Box>
+        )}
+      </Box>
 
       <MobileStickyPrimaryAction
         label="حفظ إعدادات العمليات"

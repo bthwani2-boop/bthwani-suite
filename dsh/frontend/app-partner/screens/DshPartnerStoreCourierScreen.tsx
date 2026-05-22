@@ -1,19 +1,20 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Pressable } from 'react-native';
 import {
   Box,
   Button,
   Chip,
+  Divider,
   Icon,
   KeyValueList,
   MobileScrollView,
   MobileStickyPrimaryAction,
-  Surface,
   Switch,
   Text,
   TextField,
   TopBar,
   useDirection,
+  useTheme,
 } from '@bthwani/ui-kit';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 import type {
@@ -63,31 +64,35 @@ function SelectionBlock<T extends string>({
   onSelect: (id: T) => void;
   direction: 'ltr' | 'rtl';
 }) {
+  const { theme } = useTheme();
+
   return (
-    <>
-      {options.map((option) => {
+    <Box gap={0}>
+      {options.map((option, index) => {
         const isSelected = option.id === selectedId;
         return (
-          <Surface key={option.id} tone={isSelected ? 'inset' : 'default'} padding={3} gap={2}>
-            <View
-              style={{
-                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-              }}
-            >
-              <Text role="bodyStrong" align="start" style={{ flex: 1 }}>{option.label}</Text>
-              {isSelected ? <Chip label="محدد" tone="brand" /> : null}
-            </View>
-            <Text role="caption" tone="muted" align="start">{option.description}</Text>
-            {!isSelected ? (
-              <Button label="اختيار" size="sm" tone="secondary" fullWidth={false} onPress={() => onSelect(option.id)} />
-            ) : null}
-          </Surface>
+          <Pressable
+            key={option.id}
+            onPress={() => onSelect(option.id)}
+            style={({ pressed }) => ({
+              paddingVertical: 12,
+              paddingHorizontal: 4,
+              backgroundColor: pressed ? theme.surfaceInset : undefined,
+              borderBottomWidth: index < options.length - 1 ? 1 : 0,
+              borderBottomColor: theme.line + '22',
+            })}
+          >
+            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{option.label}</Text>
+                <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{option.description}</Text>
+              </Box>
+              {isSelected && <Chip label="محدد" tone="brand" />}
+            </Box>
+          </Pressable>
         );
       })}
-    </>
+    </Box>
   );
 }
 
@@ -140,16 +145,19 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
         }}
       />
 
-      <Surface tone="inset" padding={3} gap={2}>
-        <Text role="bodyStrong" align="start">حدود السياسة والمال</Text>
-        <Text role="bodySm" tone="muted" align="start">
+      {/* 1) Flat boundaries notice */}
+      <Box paddingVertical={2} gap={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>حدود السياسة والمال</Text>
+        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
           إعداد الموصل محلي للشريك فقط. التسعير المناطقي والسياسات المركزية يملكها {resolveDshControlPanelSectionLabel('platform')}، وأي payout أو commission أو settlement يبقى مرجعًا إلى {resolveDshControlPanelSectionLabel('finance')} وWLT.
         </Text>
-      </Surface>
+      </Box>
 
-      {/* ─── Basic Info ──────────────────────────────────────────────────── */}
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">بيانات الموصل</Text>
+      <Divider />
+
+      {/* 2) Flat Basic Info */}
+      <Box gap={3} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>بيانات الموصل</Text>
         <TextField
           label="اسم موصل المتجر"
           placeholder="مثال: عمر"
@@ -169,11 +177,13 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
           value={isActive}
           onValueChange={setIsActive}
         />
-      </Surface>
+      </Box>
 
-      {/* ─── Branch Scope ────────────────────────────────────────────────── */}
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">الفروع المخصصة</Text>
+      <Divider />
+
+      {/* 3) Flat Branch Scope */}
+      <Box gap={3} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الفروع المخصصة</Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
           {BRANCH_OPTIONS.map((branch) => {
             const isSelected = selectedBranchIds.includes(branch.id);
@@ -188,64 +198,74 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
             );
           })}
         </Box>
-      </Surface>
+      </Box>
 
-      {/* ─── Delivery Policy ─────────────────────────────────────────────── */}
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">سياسة التوصيل</Text>
+      <Divider />
+
+      {/* 4) Flat Delivery Policy selection */}
+      <Box gap={3} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>سياسة التوصيل</Text>
         <SelectionBlock
           options={POLICY_OPTIONS}
           selectedId={policy}
           onSelect={setPolicy}
           direction={direction}
         />
-      </Surface>
+      </Box>
 
-      {/* ─── Pricing Source ──────────────────────────────────────────────── */}
-      <Surface tone="raised" padding={4} gap={3}>
-        <Text role="label" tone="muted">مصدر التسعير</Text>
+      <Divider />
+
+      {/* 5) Flat Pricing Source selection */}
+      <Box gap={3} paddingVertical={2}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مصدر التسعير</Text>
         <SelectionBlock
           options={PRICING_OPTIONS}
           selectedId={pricingSource}
           onSelect={setPricingSource}
           direction={direction}
         />
-      </Surface>
+      </Box>
 
-      {/* ─── Courier Compensation (only when policy requires it) ─────────── */}
+      {/* 6) Flat Courier Compensation (only when policy requires it) */}
       {requiresCompensation ? (
-        <Surface tone="raised" padding={4} gap={3}>
-          <Text role="label" tone="muted">مستحق الموصل</Text>
-          <SelectionBlock
-            options={COMPENSATION_OPTIONS}
-            selectedId={compensation}
-            onSelect={setCompensation}
-            direction={direction}
-          />
-        </Surface>
+        <>
+          <Divider />
+          <Box gap={3} paddingVertical={2}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مستحق الموصل</Text>
+            <SelectionBlock
+              options={COMPENSATION_OPTIONS}
+              selectedId={compensation}
+              onSelect={setCompensation}
+              direction={direction}
+            />
+          </Box>
+        </>
       ) : null}
 
-      {/* ─── Summary ─────────────────────────────────────────────────────── */}
+      {/* 7) Flat Summary */}
       {canSave ? (
-        <Surface tone="raised" padding={4} gap={3}>
-          <Text role="label" tone="muted">ملخص قبل الحفظ</Text>
-          <KeyValueList
-            items={[
-              { label: 'الاسم', value: courierName },
-              { label: 'الجوال', value: courierPhone },
-              { label: 'الفروع', value: branchLabel },
-              { label: 'الحالة', value: isActive ? 'مفعّل' : 'غير مفعّل' },
-              { label: 'سياسة التوصيل', value: selectedPolicyLabel },
-              { label: 'مصدر التسعير', value: selectedPricingLabel },
-              ...(requiresCompensation
-                ? [{ label: 'مستحق الموصل', value: selectedCompensationLabel }]
-                : []),
-            ]}
-          />
-          {savedLabel ? (
-            <Text role="caption" tone="success">{savedLabel}</Text>
-          ) : null}
-        </Surface>
+        <>
+          <Divider />
+          <Box gap={3} paddingVertical={2}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>ملخص قبل الحفظ</Text>
+            <KeyValueList
+              items={[
+                { label: 'الاسم', value: courierName },
+                { label: 'الجوال', value: courierPhone },
+                { label: 'الفروع', value: branchLabel },
+                { label: 'الحالة', value: isActive ? 'مفعّل' : 'غير مفعّل' },
+                { label: 'سياسة التوصيل', value: selectedPolicyLabel },
+                { label: 'مصدر التسعير', value: selectedPricingLabel },
+                ...(requiresCompensation
+                  ? [{ label: 'مستحق الموصل', value: selectedCompensationLabel }]
+                  : []),
+              ]}
+            />
+            {savedLabel ? (
+              <Text role="caption" tone="success" align={direction === 'rtl' ? 'end' : 'start'}>{savedLabel}</Text>
+            ) : null}
+          </Box>
+        </>
       ) : null}
 
       <MobileStickyPrimaryAction
@@ -261,3 +281,5 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
     </MobileScrollView>
   );
 }
+
+export default DshPartnerStoreCourierScreen;
