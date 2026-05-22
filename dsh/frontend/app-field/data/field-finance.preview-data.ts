@@ -1,3 +1,6 @@
+// PREVIEW_ONLY — field finance data re-exports for display surface only.
+// Financial truth (commission, payout) is owned by WLT (WltFieldFinanceSnapshot).
+// Authoritative finance bridge: wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx
 export type {
 	FieldFulfillmentMode,
 	FieldFulfillmentModeAgreement,
