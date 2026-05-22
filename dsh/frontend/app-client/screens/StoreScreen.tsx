@@ -1069,7 +1069,7 @@ function DshStoreGetScreenContent({
     );
   }
 
-  if (!storeVisibility.visible) {
+  if (!storeVisibility.visible && !__DEV__) {
     return (
       <StateView
         stateId="blockingError"

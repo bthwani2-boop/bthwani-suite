@@ -1207,10 +1207,10 @@ function InventoryCatalogContent({
               tone={searchMatchState === 'duplicate' || searchMatchState === 'needs-match' ? 'warning' : searchMatchState === 'not-in-catalog' ? 'danger' : 'muted'}
               align={direction === 'rtl' ? 'end' : 'start'}
             >
-              {searchMatchState === 'catalog-match' && 'مطابق بالكتالوج'}
-              {searchMatchState === 'needs-match' && 'يحتاج مطابقة بالكتالوج المركزي'}
-              {searchMatchState === 'not-in-catalog' && 'غير موجود في الكتالوج — أرسل طلب إضافة'}
-              {searchMatchState === 'duplicate' && 'تكرار محتمل — راجع الاسم'}
+              {searchMatchState === 'catalog-match' && <Text role="bodySm" tone="muted">مطابق بالكتالوج</Text>}
+              {searchMatchState === 'needs-match' && <Text role="bodySm" tone="muted">يحتاج مطابقة بالكتالوج المركزي</Text>}
+              {searchMatchState === 'not-in-catalog' && <Text role="bodySm" tone="muted">غير موجود في الكتالوج — أرسل طلب إضافة</Text>}
+              {searchMatchState === 'duplicate' && <Text role="bodySm" tone="muted">تكرار محتمل — راجع الاسم</Text>}
             </Text>
           </Surface>
         ) : null}

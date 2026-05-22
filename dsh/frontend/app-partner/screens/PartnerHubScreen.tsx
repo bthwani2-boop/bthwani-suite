@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Switch as RNSwitch, View, Share } from 'react-native';
+import { Pressable, Switch as RNSwitch, View, Share, BackHandler } from 'react-native';
 import {
   AppearanceOptionCard,
   Box,
@@ -538,6 +538,15 @@ function HubSectionShell({
   const { direction } = useDirection();
   const { theme } = useTheme();
   const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+
+  React.useEffect(() => {
+    const backAction = () => {
+      onBack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => backHandler.remove();
+  }, [onBack]);
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
