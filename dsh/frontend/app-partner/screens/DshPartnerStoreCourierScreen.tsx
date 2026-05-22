@@ -84,10 +84,10 @@ function SelectionBlock<T extends string>({
           >
             <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
               <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-                <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{option.label}</Text>
-                <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{option.description}</Text>
+                <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{option.label}</Text>
+                <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>{option.description}</Text>
               </Box>
-              {isSelected && <Chip label="محدد" tone="brand" />}
+              {isSelected && <Icon name="checkmark-circle-outline" tone="brand" size={18} />}
             </Box>
           </Pressable>
         );
@@ -146,10 +146,10 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       />
 
       {/* 1) Flat boundaries notice */}
-      <Box paddingVertical={2} gap={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>حدود السياسة والمال</Text>
-        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-          إعداد الموصل محلي للشريك فقط. التسعير المناطقي والسياسات المركزية يملكها {resolveDshControlPanelSectionLabel('platform')}، وأي payout أو commission أو settlement يبقى مرجعًا إلى {resolveDshControlPanelSectionLabel('finance')} وWLT.
+      <Box paddingVertical={1} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+        <Icon name="information-circle-outline" size={14} tone="muted" />
+        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
+          إعداد الموصل يتم محليًا هنا. أي تسعير أو عمولات أو تسويات مرجعها مركزيًا هو WLT/Finance/Control Panel.
         </Text>
       </Box>
 
@@ -157,7 +157,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
 
       {/* 2) Flat Basic Info */}
       <Box gap={3} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>بيانات الموصل</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>بيانات الموصل</Text>
         <TextField
           label="اسم موصل المتجر"
           placeholder="مثال: عمر"
@@ -183,7 +183,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
 
       {/* 3) Flat Branch Scope */}
       <Box gap={3} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الفروع المخصصة</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>الفروع المخصصة</Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
           {BRANCH_OPTIONS.map((branch) => {
             const isSelected = selectedBranchIds.includes(branch.id);
@@ -204,7 +204,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
 
       {/* 4) Flat Delivery Policy selection */}
       <Box gap={3} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>سياسة التوصيل</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>سياسة التوصيل</Text>
         <SelectionBlock
           options={POLICY_OPTIONS}
           selectedId={policy}
@@ -217,7 +217,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
 
       {/* 5) Flat Pricing Source selection */}
       <Box gap={3} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مصدر التسعير</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مصدر التسعير</Text>
         <SelectionBlock
           options={PRICING_OPTIONS}
           selectedId={pricingSource}
@@ -231,7 +231,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
         <>
           <Divider />
           <Box gap={3} paddingVertical={2}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مستحق الموصل</Text>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مستحق الموصل</Text>
             <SelectionBlock
               options={COMPENSATION_OPTIONS}
               selectedId={compensation}
@@ -247,7 +247,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
         <>
           <Divider />
           <Box gap={3} paddingVertical={2}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>ملخص قبل الحفظ</Text>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>ملخص قبل الحفظ</Text>
             <KeyValueList
               items={[
                 { label: 'الاسم', value: courierName },
@@ -262,7 +262,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
               ]}
             />
             {savedLabel ? (
-              <Text role="caption" tone="success" align={direction === 'rtl' ? 'end' : 'start'}>{savedLabel}</Text>
+              <Text role="caption" tone="success" align={direction === 'rtl' ? 'right' : 'left'}>{savedLabel}</Text>
             ) : null}
           </Box>
         </>

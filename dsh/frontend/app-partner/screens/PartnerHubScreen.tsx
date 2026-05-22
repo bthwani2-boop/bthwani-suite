@@ -742,7 +742,7 @@ function OperationsModeRow({
             flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
             alignItems: 'center',
             gap: 10,
-            flexShrink: 1,
+            flex: 1,
             minWidth: 0,
           }}
         >
@@ -762,17 +762,15 @@ function OperationsModeRow({
             <Icon name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'partner_delivery' ? 'car-outline' : 'bicycle-outline'} size={16} tone={selected ? 'brand' : 'default'} />
           </View>
 
-          <View style={{ flexShrink: 1, minWidth: 0, gap: 2 }}>
-            <Text role="bodyStrong" align="start" numberOfLines={1}>
+          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
               {mode.title}
             </Text>
-            <Text role="bodySm" tone="muted" align="start" numberOfLines={1}>
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
               {mode.subtitle}
             </Text>
           </View>
         </View>
-
-        <View style={{ flex: 1 }} />
 
         <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 10 }}>
           <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
@@ -837,7 +835,7 @@ function OperationsPanel({
   const activeModesCount = resolvedModes.filter((mode) => mode.enabled).length;
 
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 160 }}>
       <TopBar
         variant="secondary"
         title="المتجر والفريق"
@@ -854,14 +852,14 @@ function OperationsPanel({
 
       {/* 1) Flat Header & Status Indicator Chips */}
       <Box gap={2} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>
           حالة التشغيل الآن
         </Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
           <Chip label={`حالة المتجر: ${storeOpen ? 'مفتوح' : 'مغلق'}`} tone={storeOpen ? 'success' : 'warning'} selected />
-          <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="info" selected />
-          <Chip label={`أوضاع نشطة: ${activeModesCount}/3`} tone="brand" selected />
-          <Chip label="مناطق التغطية: منطقتان" tone="success" selected />
+          <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="default" selected />
+          <Chip label={`أوضاع نشطة: ${activeModesCount}/3`} tone={activeModesCount > 0 ? 'brand' : 'warning'} selected />
+          <Chip label="مناطق التغطية: منطقتان" tone="default" selected />
         </Box>
       </Box>
 
@@ -869,8 +867,7 @@ function OperationsPanel({
 
       {/* 2) Flat Visibility and Coverage Zones (Read-Only) */}
       <Box gap={3} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الظهور ونقاط الخدمة</Text>
-        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>شروط وجاهزية الظهور لعملاء بثواني (للمعلومة فقط).</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>الظهور ونقاط الخدمة</Text>
         <KeyValueList
           dense
           items={[
@@ -890,22 +887,35 @@ function OperationsPanel({
           ]}
         />
         <Box gap={2} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>تفاصيل تدقيق شروط الظهور</Text>
+          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>تدقيق شروط الظهور</Text>
           {storeVisibility.checklist.map((check) => (
-            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
-              <Text role="bodySm" tone={check.satisfied ? 'success' : 'danger'} style={{ fontWeight: 'bold' }}>
-                {check.satisfied ? '✓' : '✗'}
-              </Text>
-              <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'} style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
-                {check.label}
-              </Text>
+            <Box key={check.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '11', paddingVertical: 6 }}>
+              <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+                <Icon
+                  name={check.satisfied ? 'checkmark-circle-outline' : 'close-circle-outline'}
+                  size={16}
+                  tone={check.satisfied ? 'success' : 'danger'}
+                />
+                <Text
+                  role="bodySm"
+                  tone={check.satisfied ? 'default' : 'danger'}
+                  align={direction === 'rtl' ? 'right' : 'left'}
+                  style={{ flex: 1 }}
+                >
+                  {check.label}
+                </Text>
+                {check.satisfied ? (
+                  <Chip label="مكتمل" tone="success" size="sm" />
+                ) : (
+                  <Chip label="غير مكتمل" tone="danger" size="sm" />
+                )}
+              </Box>
               {!check.satisfied && check.blockedReason ? (
-                <>
-                  <View style={{ flex: 1 }} />
-                  <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'left' : 'right' }}>
+                <Box style={{ marginStart: direction === 'rtl' ? 0 : 24, marginEnd: direction === 'rtl' ? 24 : 0, marginTop: 2 }}>
+                  <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
                     {check.blockedReason}
                   </Text>
-                </>
+                </Box>
               ) : null}
             </Box>
           ))}
@@ -915,10 +925,10 @@ function OperationsPanel({
       <Divider />
 
       {/* 3) Flat Partnership operational boundaries notice */}
-      <Box paddingVertical={2} gap={1}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>حدود تشغيل الشريك</Text>
-        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-          التنفيذ المحلي للطلبات والفريق يبقى هنا، لكن تصعيد التذاكر يتبع {resolveDshControlPanelSectionLabel('support')}، وأي pricing policy أو zone pricing مركزي يتبع {resolveDshControlPanelSectionLabel('platform')}، وأي payout أو commission مرجعه finance/WLT.
+      <Box paddingVertical={1} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+        <Icon name="information-circle-outline" size={14} tone="muted" />
+        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
+          التنفيذ المحلي للطلبات والفريق يتم هنا. أي تسعير أو عمولات أو تسويات مرجعها مركزيًا هو WLT/Finance/Control Panel.
         </Text>
       </Box>
 
@@ -926,7 +936,7 @@ function OperationsPanel({
 
       {/* 4) Flat Operational Modes Row List with inline expansion */}
       <Box gap={2} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>
           أوضاع الخدمة
         </Text>
         <Box gap={0}>
@@ -951,8 +961,8 @@ function OperationsPanel({
                       tone={isSelected ? 'brand' : 'default'}
                     />
                     <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-                      <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{mode.title}</Text>
-                      <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{mode.subtitle}</Text>
+                      <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{mode.title}</Text>
+                      <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>{mode.subtitle}</Text>
                     </Box>
                   </Box>
                   <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 8 }}>
@@ -965,9 +975,9 @@ function OperationsPanel({
                 </Pressable>
 
                 {isSelected && (
-                  <Box paddingHorizontal={4} paddingBottom={4} gap={3} style={{ paddingTop: 4 }}>
-                    <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-                      تفاصيل هذا الوضع تظهر داخل نفس الصفحة فقط، ويمكن تبديل حالته محليًا دون أي route جديد.
+                  <Box paddingHorizontal={4} paddingBottom={3} gap={2} style={{ paddingTop: 2 }}>
+                    <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
+                      حالة الوضع: {mode.enabled ? 'نشط ويستقبل الطلبات' : 'موقف مؤقتًا'}.
                     </Text>
                     <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8 }}>
                       <Button
@@ -1006,8 +1016,8 @@ function OperationsPanel({
       <Box paddingVertical={2} gap={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>الفريق</Text>
-            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>مشرف 1 · موظف 3 · موصل 2</Text>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>الفريق</Text>
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>مشرف 1 · موظف 3 · موصل 2</Text>
           </Box>
           <Button
             label={teamPanelOpen ? 'إخفاء الأعضاء' : 'إدارة الفريق'}
@@ -1042,7 +1052,7 @@ function OperationsPanel({
                     >
                       <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flex: 1 }}>
                         <Icon name="person-outline" size={16} tone="brand" />
-                        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{member.name}</Text>
+                        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{member.name}</Text>
                       </Box>
                       <Chip label={member.roleLabel} tone={member.roleLabel === 'مشرف' ? 'brand' : member.roleLabel === 'موظف' ? 'info' : 'success'} />
                       <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
@@ -1050,8 +1060,9 @@ function OperationsPanel({
 
                     {isMemberSelected && (
                       <Box paddingHorizontal={4} paddingTop={2} gap={1}>
-                        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{member.subtitle}</Text>
-                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>الصلاحية: {member.roleLabel}</Text>
+                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
+                          {member.subtitle} · صلاحية {member.roleLabel}
+                        </Text>
                       </Box>
                     )}
                   </Box>
@@ -1081,7 +1092,7 @@ function OperationsPanel({
                 }}
               />
               {lastSaveLabel && (
-                <Text role="caption" tone="success" align={direction === 'rtl' ? 'end' : 'start'}>
+                <Text role="caption" tone="success" align={direction === 'rtl' ? 'right' : 'left'}>
                   {lastSaveLabel}
                 </Text>
               )}
@@ -1096,8 +1107,8 @@ function OperationsPanel({
       <Box paddingVertical={2} gap={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مناطق التغطية</Text>
-            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>منطقتان نشطتان</Text>
+            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مناطق التغطية</Text>
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>منطقتان نشطتان</Text>
           </Box>
           <Button
             label={coveragePanelOpen ? 'إخفاء المناطق' : 'إدارة المناطق'}
@@ -1110,7 +1121,14 @@ function OperationsPanel({
 
         {coveragePanelOpen && (
           <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+              <Icon name="information-circle-outline" size={14} tone="warning" />
+              <Text role="caption" tone="warning" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
+                إدارة الحدود الجغرافية والتغطية يتم ضبطها مركزيًا من لوحة التحكم بالتنسيق مع سياسة العمليات.
+              </Text>
+            </Box>
+
+            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
               {`النطاق الحالي: ${activeZoneLabel}`}
             </Text>
 
@@ -1130,7 +1148,7 @@ function OperationsPanel({
                     >
                       <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flex: 1 }}>
                         <Icon name="location-outline" size={16} tone="brand" />
-                        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>{zone.name}</Text>
+                        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{zone.name}</Text>
                       </Box>
                       <Chip label={zone.active ? 'نشط' : 'موقوف'} tone={zone.active ? 'success' : 'warning'} />
                       <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
@@ -1138,8 +1156,8 @@ function OperationsPanel({
 
                     {isZoneSelected && (
                       <Box paddingHorizontal={4} paddingTop={2} gap={1}>
-                        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>{zone.subtitle}</Text>
-                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>حالة المنطقة: {zone.active ? 'تستقبل الطلبات' : 'مغلقة مؤقتًا'}</Text>
+                        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>{zone.subtitle}</Text>
+                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>حالة المنطقة: {zone.active ? 'تستقبل الطلبات' : 'مغلقة مؤقتًا'}</Text>
                       </Box>
                     )}
                   </Box>
@@ -1214,17 +1232,17 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
     <Box gap={4}>
       {/* Summary headline */}
       <Surface tone="raised" padding={3} gap={2}>
-        <Text role="label" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+        <Text role="label" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
           ملخص الأداء — {storeName}
         </Text>
-        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
           مؤشرات موجزة للتفاعل والنمو. لا تتضمن بيانات عملاء تفصيلية.
         </Text>
       </Surface>
 
       {/* Engagement metrics grid */}
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>مؤشرات التفاعل</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مؤشرات التفاعل</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
           <AnalyticsInsightMetric label="متابعو المتجر" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
@@ -1240,7 +1258,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
 
       {/* Top products */}
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>أبرز المنتجات</Text>
+        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>أبرز المنتجات</Text>
         <KeyValueList
           dense
           items={[
@@ -1262,7 +1280,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           <Icon name="bulb-outline" size={18} tone="warning" />
           <Text role="bodyStrong" tone="warning">فرصة تسويقية</Text>
         </View>
-        <Text role="bodySm" align={direction === 'rtl' ? 'end' : 'start'}>
+        <Text role="bodySm" align={direction === 'rtl' ? 'right' : 'left'}>
           <Text role="bodySm" tone="default">{d.opportunityProduct.name}: </Text>
           {d.opportunityProduct.insight}
         </Text>
@@ -1286,7 +1304,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           <Icon name="trending-up-outline" size={18} tone="brand" />
           <Text role="bodyStrong" tone="brand">توصية ذكية</Text>
         </View>
-        <Text role="bodySm" align={direction === 'rtl' ? 'end' : 'start'}>{d.smartRecommendation}</Text>
+        <Text role="bodySm" align={direction === 'rtl' ? 'right' : 'left'}>{d.smartRecommendation}</Text>
         <Button
           label="فعّل العرض"
           tone="primary"
