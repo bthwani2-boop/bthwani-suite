@@ -1,19 +1,20 @@
+'use client';
+
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelActionCluster,
   WebControlPanelDecisionRow,
-  WebControlPanelInspectorShell,
   WebControlPanelRecommendation,
   WebControlPanelKpiStrip,
   WebControlPanelSubTabs,
   WebControlPanelWorkspaceTabs,
-  WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import { DSH_CALL_INTAKE_PREVIEW, DSH_CUSTOMER_360_PREVIEW, getDshFlowPolicySummary } from '../../shared';
+import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
 import { SupportTicketDetailWorkspace } from './SupportTicketDetailWorkspace';
@@ -33,8 +34,14 @@ import {
 } from '../shared';
 
 type SupportTab = 'queue' | 'customer-360' | 'call-intake' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
-type SupportLane = 'الطلبات' | 'الشركاء' | 'الكباتن' | 'الميدان';
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
+
+type SupportRouteContext = {
+  customerId?: string;
+  orderId?: string;
+  ticketId?: string;
+  callId?: string;
+};
 
 type SupportRow = {
   id: string;
@@ -134,6 +141,17 @@ const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
   { id: 'messaging', label: 'الرسائل' },
 ];
 
+const TAB_WORKSPACE_MAP: Readonly<Record<SupportTab, string>> = {
+  queue: 'queue',
+  'customer-360': 'customer-360',
+  'call-intake': 'call-intake',
+  disputes: 'disputes',
+  feedback: 'feedback',
+  escalation: 'escalation',
+  'sla-risk': 'sla-risk',
+  messaging: 'messaging',
+};
+
 const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: string }>> = {
   queue: [
     { id: 'الكل', label: 'الكل' },
@@ -154,6 +172,67 @@ const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: stri
     { id: 'captain', label: 'الكباتن' },
   ],
 };
+
+function resolveSupportTabFromWorkspace(workspace?: string | null): SupportTab {
+  if (workspace === 'customer-360') {
+    return 'customer-360';
+  }
+
+  if (workspace === 'call-intake') {
+    return 'call-intake';
+  }
+
+  if (workspace === 'escalation') {
+    return 'escalation';
+  }
+
+  if (workspace === 'sla-risk') {
+    return 'sla-risk';
+  }
+
+  if (workspace === 'messaging') {
+    return 'messaging';
+  }
+
+  if (workspace === 'disputes') {
+    return 'disputes';
+  }
+
+  if (workspace === 'feedback') {
+    return 'feedback';
+  }
+
+  return 'queue';
+}
+
+function buildSupportHref(tab: SupportTab, context?: SupportRouteContext) {
+  const searchParams = new globalThis.URLSearchParams();
+  const workspace = TAB_WORKSPACE_MAP[tab];
+
+  if (workspace && workspace !== 'queue') {
+    searchParams.set('workspace', workspace);
+  } else if (workspace === 'queue') {
+    searchParams.set('workspace', 'queue');
+  }
+
+  if (context?.customerId) {
+    searchParams.set('customerId', context.customerId);
+  }
+
+  if (context?.orderId) {
+    searchParams.set('orderId', context.orderId);
+  }
+
+  if (context?.ticketId) {
+    searchParams.set('ticketId', context.ticketId);
+  }
+
+  if (context?.callId) {
+    searchParams.set('callId', context.callId);
+  }
+
+  return `/support?${searchParams.toString()}`;
+}
 
 function buildSupportRow(seed: SupportRowSeed): SupportRow {
   const preview = getOperationsSupportFlowPreview(seed.flowId);
@@ -276,9 +355,21 @@ function filterRows(tab: SupportTab, lane: string) {
 
 export function ControlPanelDshSupportHubScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = React.useState<SupportTab>('queue');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('الكل');
   const [selectedId, setSelectedId] = React.useState<string>(SUPPORT_ROWS[0]?.id ?? '');
+
+  React.useEffect(() => {
+    const resolvedTab = resolveSupportTabFromWorkspace(searchParams.get('workspace'));
+    setActiveTab(resolvedTab);
+    setActiveSubTab(SECONDARY_TABS[resolvedTab][0]?.id ?? 'الكل');
+
+    const ticketId = searchParams.get('ticketId');
+    if (ticketId) {
+      setSelectedId(ticketId);
+    }
+  }, [searchParams]);
 
   React.useEffect(() => {
     setActiveSubTab(SECONDARY_TABS[activeTab][0]?.id ?? 'الكل');
@@ -345,7 +436,18 @@ export function ControlPanelDshSupportHubScreen() {
         <WebControlPanelWorkspaceTabs
           items={PRIMARY_TABS.map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeTab }))}
           ariaLabel="صفوف الدعم"
-          onSelect={(id) => setActiveTab(id as SupportTab)}
+          onSelect={(id) => {
+            const nextTab = id as SupportTab;
+            setActiveTab(nextTab);
+            router.push(
+              buildSupportHref(nextTab, {
+                customerId: searchParams.get('customerId') ?? undefined,
+                orderId: searchParams.get('orderId') ?? undefined,
+                ticketId: searchParams.get('ticketId') ?? undefined,
+                callId: searchParams.get('callId') ?? undefined,
+              }),
+            );
+          }}
         />
       </nav>
 
@@ -384,16 +486,78 @@ export function ControlPanelDshSupportHubScreen() {
         {activeTab === 'customer-360' ? (
           <div className={styles.surfaceInnerScroll}>
             <Customer360Workspace
-              onOpenAssistedOrder={() => router.push('/operations?workspace=assisted-order-desk')}
-              onOpenOrderRescue={(orderId) => router.push(orderId ? `/operations?workspace=order-rescue&orderId=${orderId}` : '/operations?workspace=order-rescue')}
-              onOpenCallIntake={() => setActiveTab('call-intake')}
+              onOpenAssistedOrder={(context) =>
+                router.push(
+                  buildOperationsHref('assisted-order-desk', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                  }),
+                )
+              }
+              onOpenOrderRescue={(context) =>
+                router.push(
+                  buildOperationsHref('order-rescue', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                  }),
+                )
+              }
+              onOpenCallIntake={(context) =>
+                router.push(
+                  buildSupportHref('call-intake', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                  }),
+                )
+              }
             />
           </div>
         ) : activeTab === 'call-intake' ? (
           <div className={styles.surfaceInnerScroll}>
             <ManualCallIntakeWorkspace
-              onOpenCustomer360={() => setActiveTab('customer-360')}
-              onOpenAssistedOrder={() => router.push('/operations?workspace=assisted-order-desk')}
+              onOpenCustomer360={(context) =>
+                router.push(
+                  buildSupportHref('customer-360', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                    callId: context.intakeId,
+                  }),
+                )
+              }
+              onOpenAssistedOrder={(context) =>
+                router.push(
+                  buildOperationsHref('assisted-order-desk', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                    callId: context.intakeId,
+                  }),
+                )
+              }
+              onOpenOrderRescue={(context) =>
+                router.push(
+                  buildOperationsHref('order-rescue', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                    callId: context.intakeId,
+                  }),
+                )
+              }
+              onOpenSupportEscalation={(context) =>
+                router.push(
+                  buildSupportHref('escalation', {
+                    customerId: context.customerId,
+                    orderId: context.orderId,
+                    ticketId: context.ticketId,
+                    callId: context.intakeId,
+                  }),
+                )
+              }
             />
           </div>
         ) : activeTab === 'sla-risk' ? (
@@ -471,12 +635,52 @@ export function ControlPanelDshSupportHubScreen() {
                     reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما السياسة؟ ${selectedRow.policyLabel} · ما الدليل؟ ${selectedRow.evidence} · ما القرار التالي؟ ${selectedRegistrySummary?.nextPolicyActionPreview ?? selectedRow.nextAction}` : 'اختر صفًا.'}
                     confidence="high"
                     auditTag={selectedRow?.registryFlowId ?? selectedFlowPreview?.flowId ?? selectedRow?.owner ?? 'support'}
-                    primaryAction={selectedRow ? { id: `${selectedRow.id}-a`, label: selectedRow.primaryActionLabel } : undefined}
-                    secondaryAction={selectedRow ? { id: `${selectedRow.id}-b`, label: selectedRow.secondaryActionLabel } : undefined}
+                    primaryAction={
+                      selectedRow
+                        ? {
+                            id: `${selectedRow.id}-a`,
+                            label: selectedRow.primaryActionLabel,
+                            onAction: () => setSelectedId(selectedRow.id),
+                          }
+                        : undefined
+                    }
+                    secondaryAction={
+                      selectedRow
+                        ? {
+                            id: `${selectedRow.id}-b`,
+                            label: selectedRow.secondaryActionLabel,
+                            onAction: () =>
+                              router.push(
+                                buildSupportHref('escalation', {
+                                  ticketId: selectedRow.id,
+                                  customerId: searchParams.get('customerId') ?? undefined,
+                                  orderId: searchParams.get('orderId') ?? undefined,
+                                  callId: searchParams.get('callId') ?? undefined,
+                                }),
+                              ),
+                          }
+                        : undefined
+                    }
                   />
                   <WebControlPanelActionCluster
-                    primary={{ id: 'open-queue', label: 'فتح التذكرة' }}
-                    secondary={{ id: 'open-evidence', label: 'فتح الأدلة عند الطلب' }}
+                    primary={{
+                      id: 'open-queue',
+                      label: 'فتح التذكرة',
+                      onAction: () => setSelectedId(selectedRow?.id ?? SUPPORT_ROWS[0]?.id ?? ''),
+                    }}
+                    secondary={{
+                      id: 'open-evidence',
+                      label: 'فتح الأدلة عند الطلب',
+                      onAction: () =>
+                        router.push(
+                          buildSupportHref('escalation', {
+                            ticketId: selectedRow?.id,
+                            customerId: searchParams.get('customerId') ?? undefined,
+                            orderId: searchParams.get('orderId') ?? undefined,
+                            callId: searchParams.get('callId') ?? undefined,
+                          }),
+                        ),
+                    }}
                   />
                 </Box>
               </div>

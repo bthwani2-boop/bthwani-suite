@@ -1,11 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Box, StateView, Text } from '@bthwani/ui-kit';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Box, StateView } from '@bthwani/ui-kit';
 import {
-  WebControlPanelWorkbench,
-  WebControlPanelDenseHeader,
   WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
 } from '@bthwani/ui-kit/web';
@@ -17,7 +15,12 @@ import {
   resolveOperationsStateCopy,
 } from './operations.registry';
 import { OPERATIONS_PULSE_METRICS } from './operations.preview-data';
-import type { CanonicalOperationsGroupId, OperationsPanelId, OperationsViewState } from './operations.types';
+import type {
+  CanonicalOperationsGroupId,
+  OperationsFocusParams,
+  OperationsPanelId,
+  OperationsViewState,
+} from './operations.types';
 import { CommandCenterScreen } from './CommandCenterScreen';
 import { LiveOrdersScreen } from './LiveOrdersScreen';
 import { AssistedOrderDeskScreen } from './AssistedOrderDeskScreen';
@@ -66,6 +69,7 @@ export function ControlPanelDshOperationsScreen({
   fallbackHref = '/operations',
 }: ControlPanelDshOperationsScreenProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeGroup, setActiveGroup] = React.useState<CanonicalOperationsGroupId>(group);
   const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(undefined);
 
@@ -74,9 +78,52 @@ export function ControlPanelDshOperationsScreen({
   }, [group]);
 
   const activeGroupMeta = getOperationsGroupMeta(activeGroup);
-  const hubHref = buildOperationsHref(activeGroup, { orderId, panel });
+  const focusParams: OperationsFocusParams = {
+    orderId,
+    customerId: searchParams.get('customerId') ?? undefined,
+    ticketId: searchParams.get('ticketId') ?? undefined,
+    callId: searchParams.get('callId') ?? undefined,
+    panel,
+  };
+  const hubHref = buildOperationsHref(activeGroup, focusParams);
   const ActiveScreen = SCREEN_RENDERERS[activeGroup];
   const governance = getDshControlPanelGovernanceEntry('operations');
+  const kpiItems = React.useMemo(
+    () =>
+      OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
+        label: metric.title,
+        value: String(metric.value),
+      })),
+    [],
+  );
+  const tabItems = React.useMemo(
+    () =>
+      OPERATIONS_CANONICAL_GROUPS.map((item) => ({
+        id: item.id,
+        label: item.label,
+        active: item.id === activeGroup,
+      })),
+    [activeGroup],
+  );
+  const subTabItems = React.useMemo(
+    () =>
+      activeGroupMeta.subGroups?.map((sub) => ({
+        id: sub.id,
+        label: sub.label,
+        active: (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id,
+      })),
+    [activeGroupMeta.subGroups, activeSubGroup],
+  );
+  const focusContextItems = React.useMemo(
+    () =>
+      [
+        focusParams.orderId ? { label: 'orderId', value: focusParams.orderId } : null,
+        focusParams.customerId ? { label: 'customerId', value: focusParams.customerId } : null,
+        focusParams.ticketId ? { label: 'ticketId', value: focusParams.ticketId } : null,
+        focusParams.callId ? { label: 'callId', value: focusParams.callId } : null,
+      ].filter((item): item is { label: string; value: string } => item !== null),
+    [focusParams.callId, focusParams.customerId, focusParams.orderId, focusParams.ticketId],
+  );
 
   if (state !== 'ready') {
     return (
@@ -85,23 +132,6 @@ export function ControlPanelDshOperationsScreen({
       </div>
     );
   }
-
-  const kpiItems = OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
-    label: metric.title,
-    value: String(metric.value),
-  }));
-
-  const tabItems = OPERATIONS_CANONICAL_GROUPS.map((item) => ({
-    id: item.id,
-    label: item.label,
-    active: item.id === activeGroup,
-  }));
-
-  const subTabItems = activeGroupMeta.subGroups?.map((sub) => ({
-    id: sub.id,
-    label: sub.label,
-    active: (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id,
-  }));
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -119,7 +149,7 @@ export function ControlPanelDshOperationsScreen({
                 <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>مراقبة وتنفيذ الطلبات الحية</p>
+            <p className={styles.surfaceHeaderSubtitle}>summary first، details on open، وتدخلات تشغيلية بلا أي ownership مالي داخل DSH.</p>
           </Box>
         </div>
 
@@ -142,7 +172,7 @@ export function ControlPanelDshOperationsScreen({
             const groupId = id as CanonicalOperationsGroupId;
             setActiveGroup(groupId);
             setActiveSubGroup(undefined);
-            router.push(buildOperationsHref(groupId, { orderId, panel }));
+            router.push(buildOperationsHref(groupId, focusParams));
           }}
         />
       </nav>
@@ -184,6 +214,24 @@ export function ControlPanelDshOperationsScreen({
             ))}
           </div>
         </div>
+        {focusContextItems.length > 0 ? (
+          <div className={styles.surfaceInfoCard}>
+            <div>
+              <div className={styles.surfaceInfoCardTitle}>سياق التدخل الحالي</div>
+              <div className={styles.surfaceInfoCardDescription}>
+                IDs/references first. التفاصيل والـ evidence تظل داخل workspace المفتوح فقط.
+              </div>
+            </div>
+            <div className={styles.surfaceInspectorMeta}>
+              {focusContextItems.map((item) => (
+                <div key={item.label} className={styles.surfaceInspectorRow}>
+                  <strong>{item.label}</strong>
+                  <span>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <main className={styles.surfaceMainPanel}>

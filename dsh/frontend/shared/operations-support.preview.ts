@@ -566,7 +566,6 @@ export type DshSupportTicketStatus =
   | 'in-review'
   | 'escalated'
   | 'resolved'
-  | 'closed'
   | 'sla-breach';
 
 export type DshSupportTicketActorKind =
@@ -616,7 +615,6 @@ const TICKET_STATUS_LABELS: Record<DshSupportTicketStatus, string> = {
   'in-review': 'قيد المراجعة',
   'escalated': 'مصعَّد',
   'resolved': 'تم الحل',
-  'closed': 'مغلق',
   'sla-breach': 'انتهاك SLA',
 };
 
@@ -628,7 +626,6 @@ const TICKET_STATUS_TONES: Record<
   'in-review': 'brand',
   'escalated': 'danger',
   'resolved': 'success',
-  'closed': 'default',
   'sla-breach': 'danger',
 };
 
@@ -642,7 +639,7 @@ export function getDshSupportTicketStatusTone(
   return TICKET_STATUS_TONES[status];
 }
 
-/** Demo ticket registry — preview only. All data is fictional placeholder content. */
+/** Demo ticket registry — ACCEPTED_PREVIEW_LABEL. All data is fictional preview content only. */
 export const DSH_DEMO_SUPPORT_TICKETS: ReadonlyArray<DshSupportTicket> = [
   {
     ticketId: 'TKT-001',

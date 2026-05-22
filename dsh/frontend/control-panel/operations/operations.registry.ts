@@ -4,6 +4,7 @@ import type {
   LegacyOperationsWorkspaceId,
   LegacySectionRedirectId,
   NonOperationsSectionRootId,
+  OperationsFocusParams,
   OperationsGroupMeta,
   OperationsNormalizationResult,
   OperationsPanelId,
@@ -323,13 +324,10 @@ export function normalizeOperationsLocation(
 
 export function buildOperationsHref(
   group: AnyOperationsWorkspaceId = 'command-center',
-  options?: {
-    orderId?: string;
-    panel?: OperationsPanelId;
-  },
+  options?: OperationsFocusParams,
 ) {
   const normalizedLocation = normalizeOperationsLocation(group, options?.panel);
-  const searchParams = new URLSearchParams();
+  const searchParams = new globalThis.URLSearchParams();
 
   if (normalizedLocation.kind === 'group' && normalizedLocation.group !== 'command-center') {
     searchParams.set('workspace', normalizedLocation.group);
@@ -337,6 +335,18 @@ export function buildOperationsHref(
 
   if (options?.orderId) {
     searchParams.set('orderId', options.orderId);
+  }
+
+  if (options?.customerId) {
+    searchParams.set('customerId', options.customerId);
+  }
+
+  if (options?.ticketId) {
+    searchParams.set('ticketId', options.ticketId);
+  }
+
+  if (options?.callId) {
+    searchParams.set('callId', options.callId);
   }
 
   if (options?.panel) {

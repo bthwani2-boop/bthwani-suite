@@ -628,41 +628,67 @@ export {
 
 export type {
   DshGlobalControlLink,
+  DshLookupFieldId,
+  DshLookupInputPreview,
+  DshPreviewPlaceholderStatus,
+  DshVerificationStatus,
+  DshVerificationStepPreview,
+  DshSignalRoutePreview,
+  DshRouteHintedAction,
+  DshReadOnlyFinanceVisibility,
   DshAssistedOrderIdentityStatus,
   DshAssistedOrderStage,
+  DshAssistedOrderCartItemStatus,
+  DshAssistedOrderCartItem,
+  DshAssistedOrderDeliveryModeOption,
   DshAssistedOrderPreview,
 } from './dsh-assisted-order.preview';
 export {
+  buildDshSignalRoutePreview,
   DSH_ASSISTED_ORDER_PREVIEW,
   getDshAssistedOrderById,
+  getDshAssistedOrderByContext,
 } from './dsh-assisted-order.preview';
 
 export type {
   DshCustomer360VerificationStatus,
+  DshCustomer360TicketFilterStatus,
+  DshCustomer360TimelineNoteSource,
+  DshCustomer360OrderSummary,
+  DshCustomer360TicketHistoryEntry,
+  DshCustomer360NoteEntry,
   DshCustomer360Record,
 } from './dsh-customer-360.preview';
 export {
   DSH_CUSTOMER_360_PREVIEW,
   getDshCustomer360Record,
+  getDshCustomer360ByContext,
   getDshCustomer360SectionOwnerLabel,
 } from './dsh-customer-360.preview';
 
 export type {
+  DshCallIntakeReason,
+  DshCallIntakeCloseOutcome,
   DshCallIntakeVerificationStep,
   DshCallIntakePreview,
 } from './dsh-call-intake.preview';
 export {
   DSH_CALL_INTAKE_PREVIEW,
   getDshCallIntakePreview,
+  getDshCallIntakeByContext,
 } from './dsh-call-intake.preview';
 
 export type {
   DshOrderRescueSeverity,
+  DshOrderRescueReason,
+  DshOrderRescueOwner,
+  DshOrderRescueNextActionId,
   DshOrderRescueCase,
 } from './dsh-order-rescue.preview';
 export {
   DSH_ORDER_RESCUE_PREVIEW,
   getDshOrderRescueCase,
+  getDshOrderRescueByContext,
 } from './dsh-order-rescue.preview';
 
 export type {

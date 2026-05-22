@@ -112,7 +112,43 @@ function Invoke-Git {
 
 function First-Line {
     param($Result)
-    return (($Result['output'] | Select-Object -First 1) | Out-String).Trim()
+    return ((Get-MeaningfulOutputLines -Result $Result | Select-Object -First 1) | Out-String).Trim()
+}
+
+function Test-GitDiagnosticLine {
+    param([string]$Text)
+    return $Text -match '^(warning|error|fatal|hint):\s'
+}
+
+function Get-MeaningfulOutputLines {
+    param($Result)
+    return @(
+        $Result['output'] |
+            ForEach-Object { [string]$_ } |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_) -and
+                -not (Test-GitDiagnosticLine -Text $_)
+            }
+    )
+}
+
+function Get-GitStatusEntriesFromLines {
+    param([string[]]$Lines)
+
+    $entries = New-Object System.Collections.ArrayList
+    foreach ($line in @($Lines)) {
+        $text = [string]$line
+        if ([string]::IsNullOrWhiteSpace($text)) { continue }
+        if (Test-GitDiagnosticLine -Text $text) { continue }
+        if ($text.Length -lt 4) { continue }
+        if ($text -notmatch '^[ MADRCU?!]{2}\s') { continue }
+
+        $entry = $text.Substring(3).Trim()
+        if ($entry -match ' -> ') { $entry = ($entry -split ' -> ')[-1].Trim() }
+        if (-not [string]::IsNullOrWhiteSpace($entry)) { [void]$entries.Add($entry) }
+    }
+
+    return @($entries)
 }
 
 function Assert-NoGitOperationInProgress {
@@ -132,14 +168,7 @@ function Assert-NoGitOperationInProgress {
 
 function Get-ChangedPaths {
     $result = Invoke-Git -Arguments @('status', '--porcelain') -StepName 'changed paths' -AllowFailure
-    $paths = New-Object System.Collections.ArrayList
-    foreach ($line in @($result['output'])) {
-        if ([string]::IsNullOrWhiteSpace($line) -or $line.Length -lt 4) { continue }
-        $entry = $line.Substring(3).Trim()
-        if ($entry -match ' -> ') { $entry = ($entry -split ' -> ')[-1].Trim() }
-        if (-not [string]::IsNullOrWhiteSpace($entry)) { [void]$paths.Add($entry) }
-    }
-    return @($paths)
+    return @(Get-GitStatusEntriesFromLines -Lines @($result['output']))
 }
 
 function Get-CheckpointMessage {
@@ -276,7 +305,7 @@ function Run-Verify {
     param([string]$Level)
     Write-Section 'VERIFY'
     $statusResult = Invoke-Git -Arguments @('status', '--short') -StepName 'post-checkout status' -AllowFailure
-    $statusLines = @($statusResult['output'] | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $statusLines = @(Get-GitStatusEntriesFromLines -Lines @($statusResult['output']))
     if ($statusResult['exit_code'] -eq 0 -and $statusLines.Count -eq 0) {
         Add-Verification -Name 'git status' -Status 'PASS' -Details 'Working tree is clean before evidence files are written.'
     } elseif ($statusResult['exit_code'] -eq 0) {

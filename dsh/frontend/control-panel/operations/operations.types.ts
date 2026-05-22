@@ -4,6 +4,14 @@ export type OperationsPanelId = 'detail' | 'chat';
 
 export type DshFulfillmentOperationalMode = DshFulfillmentDeliveryMode;
 
+export type OperationsFocusParams = {
+  orderId?: string;
+  customerId?: string;
+  ticketId?: string;
+  callId?: string;
+  panel?: OperationsPanelId;
+};
+
 export const DSH_FULFILLMENT_OPERATIONAL_MODE_META: Readonly<Record<DshFulfillmentOperationalMode, {
   readonly label: string;
   readonly operationalOwner: string;
