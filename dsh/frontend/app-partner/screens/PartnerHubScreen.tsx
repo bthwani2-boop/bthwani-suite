@@ -1657,6 +1657,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           distanceLabel={activeCanonicalStore?.distanceLabel || '1.8 كم'}
           deliveryTimeLabel={activeCanonicalStore?.deliveryLabel || resolvedTodayHoursLabel}
           rating={activeCanonicalStore?.rating || 4.9}
+          contactNumber={branchContact}
           onSearchPress={openOrdersSearch}
           serviceModesBehavior="readonly"
           deliveryModes={defaultOperationalModes.map((mode) => ({
@@ -1694,27 +1695,6 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
         />
 
         <Box padding={4} gap={4}>
-          {/* Contact Chip (Phone Only) */}
-          <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
-            <View
-              style={{
-                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-                alignItems: 'center',
-                gap: 8,
-                backgroundColor: theme.surfaceRaised,
-                paddingVertical: 6,
-                paddingHorizontal: 12,
-                borderRadius: 20,
-                borderWidth: 1,
-                borderColor: theme.line,
-              }}
-            >
-              <Icon name="call-outline" size={14} tone="brand" />
-              <Text role="bodySm" tone="muted">رقم التواصل:</Text>
-              <Text role="bodySmStrong">{branchContact}</Text>
-            </View>
-          </Box>
-
           {/* 1) Wallet Balance Block */}
           <Surface tone="raised" padding={3} gap={2}>
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1730,20 +1710,6 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
               />
             </View>
           </Surface>
-
-          <Surface tone="inset" padding={3} gap={2}>
-            <Text role="label" tone="muted">سياق الشريك التشغيلي</Text>
-            <KeyValueList
-              dense
-              items={[
-                { label: 'item unavailable', value: 'يُعالج من الطلب أو المخزون فقط', tone: 'warning' },
-                { label: 'partner pause', value: 'مملوك للشركاء مع أثر ظهور واضح', tone: 'brand' },
-                { label: 'dispute / appeal', value: 'handoff إلى الشركاء أو الدعم حسب المالك', tone: 'info' },
-                { label: 'catalog conflict', value: 'يُراجع قبل أي نشر أو تسويق', tone: 'warning' },
-              ]}
-            />
-          </Surface>
-
           {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
           <View style={{ gap: 8 }}>
             {activeHubNavigationItems.map((item) => (

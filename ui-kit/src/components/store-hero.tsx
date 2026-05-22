@@ -40,6 +40,8 @@ export type StoreHeroProps = {
   deliveryTimeLabel?: string;
   /** Score rating float value (e.g. 5.0) */
   rating?: number;
+  /** Contact phone number to show next to status badge */
+  contactNumber?: string;
 
   // Actions
   onSearchPress?: () => void;
@@ -83,6 +85,7 @@ export function StoreHero({
   distanceLabel,
   deliveryTimeLabel,
   rating,
+  contactNumber,
   onSearchPress,
   onCartPress,
   onSharePress,
@@ -282,30 +285,63 @@ export function StoreHero({
                 </View>
               )}
               <View
-                style={[
-                  styles.heroStatusBadge,
-                  isRTL && styles.rowReverse,
-                  {
-                    backgroundColor: isOpen ? hexToRgba(colorPalette.success, 0.12) : hexToRgba(colorPalette.danger, 0.12),
-                    borderColor: isOpen ? hexToRgba(colorPalette.success, 0.25) : hexToRgba(colorPalette.danger, 0.25),
-                    alignSelf: isRTL ? 'flex-end' : 'flex-start',
-                  },
-                ]}
+                style={{
+                  flexDirection: isRTL ? 'row-reverse' : 'row',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginTop: 4,
+                  alignSelf: isRTL ? 'flex-end' : 'flex-start',
+                }}
               >
                 <View
                   style={[
-                    styles.heroStatusDot,
-                    { backgroundColor: isOpen ? colorPalette.success : colorPalette.danger },
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.heroStatusText,
-                    { color: isOpen ? colorPalette.success : colorPalette.danger },
+                    styles.heroStatusBadge,
+                    isRTL && styles.rowReverse,
+                    {
+                      backgroundColor: isOpen ? hexToRgba(colorPalette.success, 0.12) : hexToRgba(colorPalette.danger, 0.12),
+                      borderColor: isOpen ? hexToRgba(colorPalette.success, 0.25) : hexToRgba(colorPalette.danger, 0.25),
+                      marginTop: 0,
+                    },
                   ]}
                 >
-                  {isOpen ? 'مفتوح الآن' : 'مغلق الآن'}
-                </Text>
+                  <View
+                    style={[
+                      styles.heroStatusDot,
+                      { backgroundColor: isOpen ? colorPalette.success : colorPalette.danger },
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.heroStatusText,
+                      { color: isOpen ? colorPalette.success : colorPalette.danger },
+                    ]}
+                  >
+                    {isOpen ? 'مفتوح الآن' : 'مغلق الآن'}
+                  </Text>
+                </View>
+                {contactNumber ? (
+                  <View
+                    style={[
+                      styles.heroStatusBadge,
+                      isRTL && styles.rowReverse,
+                      {
+                        backgroundColor: hexToRgba(colorPalette.brand, 0.1),
+                        borderColor: hexToRgba(colorPalette.brand, 0.25),
+                        marginTop: 0,
+                      },
+                    ]}
+                  >
+                    <Icon name="call-outline" size={10} color={ORANGE} />
+                    <Text
+                      style={[
+                        styles.heroStatusText,
+                        { color: ORANGE },
+                      ]}
+                    >
+                      {contactNumber}
+                    </Text>
+                  </View>
+                ) : null}
               </View>
             </View>
             {logoImage && (

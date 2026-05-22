@@ -159,42 +159,7 @@ function formatApplicability(app: WltDshOrderLineItemApplicability) {
   return app.reason;
 }
 
-// ─── Compact metric card ──────────────────────────────────────────
-function CompactMetric({
-  label,
-  value,
-  tone = 'default',
-}: {
-  label: string;
-  value: string;
-  tone?: PartnerDshTransactionTone;
-}) {
-  const { theme } = useTheme();
-  const accentColor = resolveToneColor(theme, tone);
 
-  return (
-    <View
-      style={{
-        flex: 1,
-        minWidth: 98,
-        borderWidth: 1,
-        borderColor: accentColor,
-        borderRadius: 18,
-        backgroundColor: theme.surface,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        gap: 6,
-      }}
-    >
-      <Text role="caption" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
-        {label}
-      </Text>
-      <Text role="titleSm" style={{ textAlign: 'right', color: accentColor }} numberOfLines={1}>
-        {value}
-      </Text>
-    </View>
-  );
-}
 
 // ─── Segment rail — لا يكسر الكلمات، horizontal scroll ──────────
 function SegmentRail({
@@ -207,6 +172,7 @@ function SegmentRail({
   onSelect: (id: WalletTabId) => void;
 }) {
   const { theme } = useTheme();
+  const { direction } = useDirection();
 
   return (
     <ScrollView
@@ -214,7 +180,7 @@ function SegmentRail({
       showsHorizontalScrollIndicator={false}
       style={{ flexGrow: 0 }}
       contentContainerStyle={{
-        flexDirection: 'row',
+        flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
         gap: 8,
         paddingHorizontal: 16,
         paddingVertical: 8,
@@ -232,7 +198,7 @@ function SegmentRail({
               borderRadius: 20,
               backgroundColor: isActive ? theme.brand : theme.surface,
               borderWidth: 1,
-              borderColor: isActive ? theme.brand : theme.borderMuted,
+              borderColor: isActive ? theme.brand : theme.line,
             }}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
@@ -240,7 +206,7 @@ function SegmentRail({
             <Text
               role="label"
               style={{
-                color: isActive ? theme.onBrand : theme.text,
+                color: isActive ? theme.brandContrast : theme.textSoft,
                 textAlign: 'center',
                 // لا نقطع الكلمات
                 flexShrink: 0,
@@ -361,31 +327,99 @@ function SummaryTab({
   openAction: (id: PartnerDshWalletActionId) => void;
 }) {
   const { direction } = useDirection();
+  const { theme } = useTheme();
 
   return (
     <Box gap={4}>
-      {/* Mini cards */}
-      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 10 }}>
-        <CompactMetric label="إجمالي المبيعات" value={partnerPreview.grossSalesLabel} tone="info" />
-        <CompactMetric label="صافي التسوية" value={partnerPreview.netSettlementLabel} tone="success" />
-        <CompactMetric label="التسوية القادمة" value={partnerPreview.nextSettlementLabel} tone="warning" />
-      </View>
+      {/* Cohesive Premium summary block */}
+      <Surface
+        tone="raised"
+        padding={3}
+        style={{
+          borderRadius: 16,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            paddingVertical: 6,
+          }}
+        >
+          {/* Column 1: صافي التسوية */}
+          <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
+            <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
+              صافي التسوية
+            </Text>
+            <Text role="titleSm" style={{ color: theme.success, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
+              {partnerPreview.netSettlementLabel}
+            </Text>
+          </View>
 
-      {/* ملاحظة البيانات التجريبية */}
-      <Surface tone="warning" padding={3} gap={2} style={{ borderRadius: 10 }}>
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, alignItems: 'flex-start' }}>
-          <Icon name="warning" tone="warning" size={16} />
-          <Text role="bodySm" tone="warning" style={{ flex: 1, textAlign: 'right' }}>
+          {/* Divider */}
+          <View style={{ width: 1, height: 32, backgroundColor: theme.line }} />
+
+          {/* Column 2: إجمالي المبيعات */}
+          <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
+            <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
+              إجمالي المبيعات
+            </Text>
+            <Text role="titleSm" style={{ color: theme.info, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
+              {partnerPreview.grossSalesLabel}
+            </Text>
+          </View>
+
+          {/* Divider */}
+          <View style={{ width: 1, height: 32, backgroundColor: theme.line }} />
+
+          {/* Column 3: التسوية القادمة */}
+          <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
+            <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
+              التسوية القادمة
+            </Text>
+            <Text role="titleSm" style={{ color: theme.warning, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
+              {partnerPreview.nextSettlementLabel}
+            </Text>
+          </View>
+        </View>
+      </Surface>
+
+      {/* ملاحظة البيانات التجريبية - Notice Compact */}
+      <Surface
+        tone="warning"
+        padding={2}
+        border={false}
+        style={{ borderRadius: 8 }}
+      >
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }}>
+          <Icon name="warning" tone="warning" size={14} />
+          <Text role="caption" tone="warning" style={{ flex: 1, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
             بيانات تجريبية — لا تمثل تسويات فعلية أو دفعات منفذة. العملة: ر.ي
           </Text>
         </View>
       </Surface>
 
-      {/* إجراءات مضغوطة */}
-      <Box gap={2}>
-        <Button label="تنزيل ملخص مالي" tone="ghost" icon="download-outline" size="sm" onPress={() => openAction('report')} />
-        <Button label="فتح المحفظة الموسعة" tone="ghost" icon="wallet-outline" size="sm" onPress={() => openAction('expanded-wallet')} />
-      </Box>
+      {/* إجراءات مضغوطة - أزرار عملية أنيقة بجانب بعضها */}
+      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 12, marginTop: 4 }}>
+        <Button
+          label="تنزيل ملخص مالي"
+          tone="secondary"
+          icon={<Icon name="download-outline" size={16} tone="brand" />}
+          size="sm"
+          fullWidth
+          style={{ flex: 1 }}
+          onPress={() => openAction('report')}
+        />
+        <Button
+          label="فتح المحفظة الموسعة"
+          tone="secondary"
+          icon={<Icon name="wallet-outline" size={16} tone="brand" />}
+          size="sm"
+          fullWidth
+          style={{ flex: 1 }}
+          onPress={() => openAction('expanded-wallet')}
+        />
+      </View>
     </Box>
   );
 }
@@ -520,7 +554,7 @@ function CommissionModeCard({
 
   return (
     <Surface
-      tone={enabled ? 'raised' : 'muted'}
+      tone={enabled ? 'raised' : 'default'}
       padding={0}
       gap={0}
       style={{ overflow: 'hidden', marginBottom: 8, borderRadius: 12, opacity: enabled ? 1 : 0.65 }}
