@@ -163,7 +163,7 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
   },
   {
     id: 'operations',
-    title: 'العمليات والفريق',
+    title: 'المتجر والفريق',
     description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
     icon: 'people-outline',
     section: 'operations',
@@ -198,7 +198,7 @@ const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; de
     icon: 'storefront-outline',
   },
   operations: {
-    title: 'العمليات والفريق',
+    title: 'المتجر والفريق',
     description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
     icon: 'people-outline',
   },
@@ -837,7 +837,7 @@ function OperationsPanel({
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
       <TopBar
         variant="secondary"
-        title="العمليات والفريق"
+        title="المتجر والفريق"
         subtitle={`${storeName} · ${branchLabel}`}
         style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={{

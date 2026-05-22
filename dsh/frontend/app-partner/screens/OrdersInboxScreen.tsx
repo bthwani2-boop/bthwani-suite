@@ -1,5 +1,22 @@
 import React from 'react';
-import { Box, Button, Card, Chip, Icon, MobileScrollView, SearchField, SheetFrame, StateView, Surface, Text, resolveRowDirection, useBThwaniAppearance, useDirection } from '@bthwani/ui-kit';
+import { View } from 'react-native';
+import {
+  Badge,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Icon,
+  MobileScrollView,
+  SearchField,
+  SheetFrame,
+  StateView,
+  Tabs,
+  Text,
+  resolveRowDirection,
+  useBThwaniAppearance,
+  useDirection,
+} from '@bthwani/ui-kit';
 import type { DshPartnerOrderConversationMode } from '../data/partner-order-conversation.preview-data';
 import { AcceptanceTimerSheet } from '../sheets';
 
@@ -332,141 +349,234 @@ function resolveOrderHistory(status: PartnerOrderStatus, orderMode: DshPartnerOr
   ];
 }
 
-// ─── Order Card — Cashier-Optimized ────────────────────────────────────────────
-// Priority: Order Code → Next Action → Items → Delivery → Payment
-function OrderCard({
+// ─── Read-only metadata label using central appearance colors ──────────────────
+function ReadOnlyMetaLabel({
+  label,
+  tone = 'info',
+}: {
+  label: string;
+  tone?: 'brand' | 'warning' | 'danger' | 'info' | 'success' | 'default';
+}) {
+  return <Badge label={label} tone={tone} />;
+}
+
+// ─── Inline Details Panel ──────────────────────────────────────────────────────
+function InlineOrderDetailsPanel({ item }: { item: PartnerOrderItem }) {
+  const { direction } = useDirection();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
+
+  return (
+    <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
+      <Text role="bodySm" style={{ textAlign }}>
+        {`رمز الطلب الكامل: ${item.orderCode}`}
+      </Text>
+      <Text role="bodySm" style={{ textAlign }}>
+        {`الفرع: ${item.branchLabel}`}
+      </Text>
+      <Text role="bodySm" style={{ textAlign }}>
+        {`تاريخ الإنشاء: ${item.createdAtLabel} (${item.elapsedLabel})`}
+      </Text>
+
+      <View style={{ gap: 2, marginTop: 4, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+        <Text role="bodySm" style={{ fontWeight: '600', textAlign }}>تتبع حالة الطلب:</Text>
+        {resolveOrderHistory(item.status, item.orderMode).map((step) => (
+          <View key={step.id} style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
+            <Icon
+              name={step.done ? 'checkmark-circle' : 'ellipse-outline'}
+              size={14}
+              tone={step.done ? 'success' : 'muted'}
+            />
+            <Text role="caption" tone={step.done ? 'default' : 'muted'} style={{ textAlign }}>
+              {step.label}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </Box>
+  );
+}
+
+// ─── Inline Action Panel ───────────────────────────────────────────────────────
+function InlineOrderActionPanel({
   item,
-  direction,
+  onClose,
   onPrimaryAction,
   onIssueAction,
 }: {
   item: PartnerOrderItem;
-  direction: 'ltr' | 'rtl';
+  onClose: () => void;
   onPrimaryAction: () => void;
   onIssueAction: () => void;
 }) {
-  const rowDir = resolveRowDirection(direction);
-  const statusLabel = resolveStatusLabel(item.status, item.orderMode);
-  const statusTone = resolveStatusTone(item.status);
-  const { tokens } = useBThwaniAppearance();
-  const [isRead, setIsRead] = React.useState(false);
-  const [expanded, setExpanded] = React.useState(false);
-
-  // Bell shows only for unread orders that haven't been viewed yet
-  const isNewUnread = item.unread && !isRead;
-
-  const handlePrimaryAction = React.useCallback(() => {
-    setIsRead(true);
-    onPrimaryAction();
-  }, [onPrimaryAction]);
-
-  const handleToggleDetails = React.useCallback(() => {
-    setIsRead(true);
-    setExpanded((v) => !v);
-  }, []);
+  const { direction } = useDirection();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   return (
-    <Card
-      padding={4}
-      gap={3}
-      footer={
-        <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2} paddingTop={1}>
-          <Button label={item.nextActionLabel} size="sm" fullWidth={false} onPress={handlePrimaryAction} />
-          <Button label={expanded ? 'إخفاء التفاصيل' : 'تفاصيل الطلب'} size="sm" tone="secondary" fullWidth={false} onPress={handleToggleDetails} />
-        </Box>
-      }
-    >
-      <Box gap={2}>
-        {/* Row 1: Header (Code + Badges + Bell) */}
-        <Box style={{ flexDirection: rowDir, justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box style={{ flexDirection: rowDir, alignItems: 'center' }} gap={2}>
-            <Text role="titleMd" tone="brand">{item.orderCode}</Text>
-            {isNewUnread ? (
-              <Box style={{ backgroundColor: tokens.warning + '15', borderRadius: 12, padding: 4 }}>
-                <Icon name="notifications" size={16} color={tokens.warning} />
-              </Box>
-            ) : null}
-            <Chip label={statusLabel} tone={statusTone} selected />
-          </Box>
-          <Text role="caption" tone="muted">{item.elapsedLabel}</Text>
-        </Box>
+    <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
+      <Text role="caption" tone="brand" style={{ textAlign }}>خيارات المعالجة الفورية</Text>
 
-        {/* Row 2: Status alerts/SLA */}
-        {(item.slaRisk || item.urgent || item.issueRequired) && (
-          <Box style={{ flexDirection: rowDir, flexWrap: 'wrap' }} gap={2}>
-            {item.slaRisk && item.slaLabel ? (
-              <Chip label={item.slaLabel} tone="danger" selected />
-            ) : item.slaRisk ? (
-              <Chip label="SLA قريب" tone="danger" selected />
-            ) : null}
-            {item.urgent ? <Chip label="عاجل" tone="warning" selected /> : null}
-            {item.issueRequired ? <Chip label="يحتاج معالجة" tone="danger" selected /> : null}
-          </Box>
-        )}
+      <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 6 }}>
+        <Button
+          label={item.nextActionLabel}
+          size="sm"
+          fullWidth={false}
+          onPress={() => {
+            onPrimaryAction();
+            onClose();
+          }}
+        />
+        {item.status !== 'completed' && item.status !== 'cancelled' ? (
+          <Button
+            label="إبلاغ عن مشكلة"
+            size="sm"
+            fullWidth={false}
+            tone="danger"
+            onPress={() => {
+              onIssueAction();
+              onClose();
+            }}
+          />
+        ) : null}
+        <Button
+          label="إلغاء"
+          size="sm"
+          fullWidth={false}
+          tone="ghost"
+          onPress={onClose}
+        />
+      </View>
+    </Box>
+  );
+}
 
-        {/* Row 3: Action Highlight */}
-        <Box style={{ backgroundColor: tokens.neutralLight, borderRadius: 8, padding: 8, borderLeftWidth: 4, borderLeftColor: tokens[statusTone] || tokens.brand }}>
-          <Text role="bodySm" tone={statusTone} style={{ fontWeight: '700' }}>
-            الإجراء المطلوب: {item.nextActionLabel}
-          </Text>
-        </Box>
+// ─── Command Center Order Row ──────────────────────────────────────────────────
+function CommandCenterOrderRow({
+  item,
+  isExpanded,
+  isActiveAction,
+  onToggleDetails,
+  onToggleAction,
+  onCloseAction,
+  onPrimaryAction,
+  onIssueAction,
+}: {
+  item: PartnerOrderItem;
+  isExpanded: boolean;
+  isActiveAction: boolean;
+  onToggleDetails: () => void;
+  onToggleAction: () => void;
+  onCloseAction: () => void;
+  onPrimaryAction: () => void;
+  onIssueAction: () => void;
+}) {
+  const { direction } = useDirection();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const statusLabel = resolveStatusLabel(item.status, item.orderMode);
+  const statusTone = resolveStatusTone(item.status);
+  const isNewUnread = item.unread;
 
-        {/* Row 4: Items & Summary */}
-        <Box gap={1}>
-          <Text role="bodySm" style={{ fontWeight: '600' }}>
-            {item.itemsCountLabel} {item.itemsSummaryLabel ? `· ${item.itemsSummaryLabel}` : ''}
-          </Text>
-        </Box>
+  return (
+    <Box gap={1} style={{ width: '100%' }}>
+      <Box paddingY={2}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: 12 }}>
+          <Icon
+            name={
+              item.orderMode === 'pickup'
+                ? 'walk-outline'
+                : item.orderMode === 'partner_delivery'
+                  ? 'car-outline'
+                  : 'bicycle-outline'
+            }
+            size={18}
+            tone="muted"
+            style={{ marginTop: 2, flexShrink: 0 }}
+          />
 
-        {/* Row 5: Fulfillment & Payment */}
-        <Box style={{ flexDirection: rowDir, justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }} gap={2}>
-          <Box style={{ flexDirection: rowDir, alignItems: 'center' }} gap={2}>
-            <Chip label={item.orderTypeLabel} tone="brand" />
-            {item.nextOwnerLabel ? (
-              <Text role="bodySm" tone="muted">· الجهة التالية: {item.nextOwnerLabel}</Text>
-            ) : null}
-          </Box>
-          <Box style={{ flexDirection: rowDir, alignItems: 'center' }} gap={2}>
-            <Text role="bodyStrong">{item.amountLabel}</Text>
-            {item.paymentLabel ? (
-              <Text role="caption" tone="muted">({item.paymentLabel})</Text>
-            ) : null}
-          </Box>
-        </Box>
+          <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+              <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
+                <Text role="bodyStrong" style={{ textAlign, fontSize: 15, color: '#0A2F5C' }}>
+                  {item.orderCode}
+                </Text>
+                {isNewUnread ? (
+                  <Icon name="notifications" size={16} tone="warning" />
+                ) : null}
+              </View>
+              <ReadOnlyMetaLabel
+                label={item.slaRisk && item.slaLabel ? item.slaLabel : `حالة: ${statusLabel}`}
+                tone={item.slaRisk ? 'danger' : (statusTone === 'default' ? 'default' : statusTone)}
+              />
+            </View>
 
-        {/* Row 6: Expandable Details (Inline Block) */}
-        {expanded && (
-          <Box gap={3} style={{ paddingTop: 12, borderTopWidth: 1, borderTopColor: tokens.border }}>
-            <Box gap={1}>
-              <Text role="caption" tone="muted">رمز الطلب: {item.orderCode}</Text>
-              <Text role="caption" tone="muted">الفرع: {item.branchLabel}</Text>
-              <Text role="caption" tone="muted">تاريخ الإنشاء: {item.createdAtLabel}</Text>
-              <Text role="caption" tone="muted">الوقت المنقضي: {item.elapsedLabel}</Text>
+            <Text role="caption" tone="muted" style={{ textAlign }}>
+              {`${item.itemsCountLabel} · ${item.itemsSummaryLabel ?? ''}`}
+            </Text>
+
+            <Box
+              background="warningSurface"
+              radiusToken="md"
+              border
+              borderTone="warning"
+              paddingX={3}
+              paddingY={2}
+              style={{
+                width: '100%',
+                borderStartWidth: 3,
+                borderEndWidth: 0,
+                borderTopWidth: 0,
+                borderBottomWidth: 0,
+                marginVertical: 2,
+                alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <Text role="caption" tone="warning" weight="bold" style={{ textAlign }}>
+                الإجراء المطلوب: {item.nextActionLabel}
+              </Text>
             </Box>
 
-            <Box gap={1.5}>
-              <Text role="bodySm" style={{ fontWeight: '600' }}>تتبع حالة الطلب:</Text>
-              {resolveOrderHistory(item.status, item.orderMode).map((step) => (
-                <Box key={step.id} style={{ flexDirection: rowDir, alignItems: 'center' }} gap={1.5}>
-                  <Icon
-                    name={step.done ? 'checkmark' : 'ellipse'}
-                    size={14}
-                    color={step.done ? tokens.success : tokens.textMuted}
-                  />
-                  <Text role="caption" tone={step.done ? 'default' : 'muted'}>
-                    {step.label}
-                  </Text>
-                </Box>
-              ))}
-            </Box>
+            <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+              <ReadOnlyMetaLabel label={item.orderTypeLabel} tone="brand" />
+              {item.nextOwnerLabel ? (
+                <Text role="caption" tone="muted" style={{ textAlign }}>
+                  {` · الجهة التالية: ${item.nextOwnerLabel}`}
+                </Text>
+              ) : null}
+              <Text role="caption" tone="muted" style={{ textAlign }}>
+                {` · ${item.amountLabel}`}
+              </Text>
+              {item.paymentLabel ? (
+                <Text role="caption" tone="muted" style={{ textAlign }}>
+                  {` (${item.paymentLabel})`}
+                </Text>
+              ) : null}
+            </View>
 
-            <Box style={{ flexDirection: rowDir }} justify="flex-end">
-              <Button label="مشكلة في الطلب" size="sm" tone="ghost" onPress={onIssueAction} />
-            </Box>
-          </Box>
-        )}
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8, marginTop: 6 }}>
+              <Button label="معالجة" size="sm" fullWidth={false} onPress={onToggleAction} />
+              <Button label={isExpanded ? "إغلاق التفاصيل" : "تفاصيل"} size="sm" fullWidth={false} tone="secondary" onPress={onToggleDetails} />
+            </View>
+          </View>
+        </View>
       </Box>
-    </Card>
+
+      {isActiveAction ? (
+        <InlineOrderActionPanel
+          item={item}
+          onClose={onCloseAction}
+          onPrimaryAction={onPrimaryAction}
+          onIssueAction={onIssueAction}
+        />
+      ) : null}
+
+      {isExpanded ? (
+        <InlineOrderDetailsPanel item={item} />
+      ) : null}
+
+      <Divider />
+    </Box>
   );
 }
 
@@ -481,11 +591,19 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     onRetry,
   } = props;
   const { direction } = useDirection();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
+
   const [selectedStage, setSelectedStage] = React.useState<OrderStageFilterId>('all');
   const [selectedQuickFilters, setSelectedQuickFilters] = React.useState<readonly QuickFilterId[]>([]);
   const [sortMode, setSortMode] = React.useState<SortMode>('next_action');
   const [query, setQuery] = React.useState('');
+  const [showSearch, setShowSearch] = React.useState(searchMode);
+
   const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(items[0]?.id ?? null);
+  const [expandedOrderId, setExpandedOrderId] = React.useState<string | null>(null);
+  const [activeActionOrderId, setActiveActionOrderId] = React.useState<string | null>(null);
+
   // ML-016: acceptance timer sheet — shown when partner presses accept on a needs_accept order
   const [acceptSheetVisible, setAcceptSheetVisible] = React.useState(false);
   const [acceptingOrderId, setAcceptingOrderId] = React.useState<string | null>(null);
@@ -683,9 +801,18 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     onOpenOrderAction?.(action, item.id);
   }
 
+  const stageTabItems = stageFilters.map((filter) => {
+    const count = filter.id === 'all' ? items.length : (stageCounts[filter.id] ?? 0);
+    const label = filter.id === 'all' ? `الكل (${count})` : count > 0 ? `${filter.label} (${count})` : filter.label;
+    return { value: filter.id, label };
+  });
+
+  const focusOrder = filteredItems[0];
+  const listOrders = filteredItems.slice(1);
+
   return (
     <>
-      <MobileScrollView fill padding={4} gap={3}>
+      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: 48 }}>
 
         {/* ─── Search + filter header ─── */}
         <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: resolveRowDirection(direction) }}>
@@ -711,41 +838,137 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
             />
           )}
         </Box>
-        <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center' }}>
-          <Box style={{ flex: 1 }}>
+
+        <Box gap={2} paddingY={1}>
+          {/* Level 1: Full-width horizontally scrollable stage filter Tabs */}
+          <Tabs
+            items={stageTabItems}
+            value={selectedStage}
+            onValueChange={(val) => setSelectedStage(val as OrderStageFilterId)}
+            variant="pill"
+            scrollable={true}
+          />
+
+          {/* Level 2: Secondary control buttons row and toggleable search field */}
+          <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
+              <Button
+                label={showSearch ? "إلغاء البحث" : "بحث"}
+                size="sm"
+                fullWidth={false}
+                tone="secondary"
+                onPress={() => {
+                  if (showSearch) {
+                    setQuery('');
+                  }
+                  setShowSearch(!showSearch);
+                }}
+              />
+              <Button
+                label={`تصفية${activeFiltersCount > 0 ? ` (${activeFiltersCount})` : ''}`}
+                tone={activeFiltersCount > 0 ? 'brand' : 'secondary'}
+                size="sm"
+                fullWidth={false}
+                onPress={() => setAdvancedPanelVisible(true)}
+              />
+            </View>
+          </View>
+
+          {showSearch ? (
             <SearchField
               label=""
               value={query}
               onChangeText={setQuery}
-              placeholder="رقم الطلب، العنصر، الحالة"
+              placeholder="رقم الطلب، العنصر، أو الحالة..."
             />
-          </Box>
-          <Button
-            label={`فلترة${activeFiltersCount > 0 ? ` (${activeFiltersCount})` : ''}`}
-            tone={activeFiltersCount > 0 ? 'primary' : 'secondary'}
-            size="md"
-            fullWidth={false}
-            onPress={() => setAdvancedPanelVisible(true)}
-          />
+          ) : null}
         </Box>
         {renderActiveTokens()}
 
-        {/* ─── Stage chip rail — with per-stage count ───────────── */}
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap' }} gap={2} paddingHorizontal={1} paddingVertical={1}>
-          {stageFilters.map((filter) => {
-            const count = filter.id === 'all' ? items.length : (stageCounts[filter.id] ?? 0);
-            const label = filter.id === 'all' ? `الكل ${count}` : count > 0 ? `${filter.label} ${count}` : filter.label;
-            return (
-              <Chip
-                key={filter.id}
-                label={label}
-                selected={selectedStage === filter.id}
-                tone={filter.tone}
-                onPress={() => setSelectedStage(filter.id)}
+        <Divider />
+
+        {/* ─── Focus Order Zone ────────────────────────────────── */}
+        {focusOrder ? (
+          <Box gap={3} padding={3} border borderTone="line" radiusToken="lg" style={{ marginVertical: 4, width: '100%' }}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
+                <Icon name="star-outline" size={18} tone="brand" />
+                <Text role="bodyStrong" style={{ textAlign }}>الطلب ذو الأولوية الآن</Text>
+              </View>
+              <ReadOnlyMetaLabel
+                label={focusOrder.slaRisk && focusOrder.slaLabel ? focusOrder.slaLabel : `حالة: ${resolveStatusLabel(focusOrder.status, focusOrder.orderMode)}`}
+                tone={focusOrder.slaRisk ? 'danger' : resolveStatusTone(focusOrder.status)}
               />
-            );
-          })}
-        </Box>
+            </View>
+
+            <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start', width: '100%' }}>
+              <Text role="bodyStrong" style={{ textAlign, fontSize: 16, color: '#0A2F5C' }}>
+                {focusOrder.orderCode}
+              </Text>
+              <Text role="caption" tone="muted" style={{ textAlign }}>
+                {`${focusOrder.itemsCountLabel} · ${focusOrder.itemsSummaryLabel ?? ''}`}
+              </Text>
+              <Box
+                background="warningSurface"
+                radiusToken="md"
+                border
+                borderTone="warning"
+                paddingX={3}
+                paddingY={2}
+                style={{
+                  width: '100%',
+                  borderStartWidth: 3,
+                  borderEndWidth: 0,
+                  borderTopWidth: 0,
+                  borderBottomWidth: 0,
+                  marginVertical: 2,
+                  alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start',
+                }}
+              >
+                <Text role="caption" tone="warning" weight="bold" style={{ textAlign }}>
+                  الإجراء المطلوب: {focusOrder.nextActionLabel}
+                </Text>
+              </Box>
+            </View>
+
+            <View style={{ flexDirection: rowDirection, gap: 8, marginTop: 4, width: '100%' }}>
+              <Button
+                label="معالجة الآن"
+                size="sm"
+                fullWidth={false}
+                onPress={() => {
+                  setActiveActionOrderId(focusOrder.id);
+                }}
+              />
+              <Button
+                label={expandedOrderId === focusOrder.id ? "إغلاق التفاصيل" : "تفاصيل"}
+                size="sm"
+                fullWidth={false}
+                tone="secondary"
+                onPress={() => {
+                  setExpandedOrderId(expandedOrderId === focusOrder.id ? null : focusOrder.id);
+                }}
+              />
+            </View>
+
+            {activeActionOrderId === focusOrder.id ? (
+              <InlineOrderActionPanel
+                item={focusOrder}
+                onClose={() => {
+                  setActiveActionOrderId(null);
+                }}
+                onPrimaryAction={() => openPrimaryAction(focusOrder)}
+                onIssueAction={() => onOpenOrderAction?.('issue', focusOrder.id)}
+              />
+            ) : null}
+
+            {expandedOrderId === focusOrder.id ? (
+              <InlineOrderDetailsPanel item={focusOrder} />
+            ) : null}
+          </Box>
+        ) : null}
+
+        <Divider />
 
         {/* ─── Order list ──────────────────────────────────────── */}
         <Text role="bodySm" tone="muted">
@@ -754,7 +977,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
             : `${filteredItems.length} طلبات`}
         </Text>
 
-        {filteredItems.length === 0 ? (
+        {filteredItems.length === 0 && !focusOrder ? (
           <StateView
             stateId="empty"
             title="لا توجد طلبات مطابقة"
@@ -763,12 +986,22 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
             onActionPress={handleClearFilters}
           />
         ) : (
-          <Box gap={3}>
-            {filteredItems.map((item) => (
-              <OrderCard
+          <Box gap={2}>
+            {listOrders.map((item) => (
+              <CommandCenterOrderRow
                 key={item.id}
                 item={item}
-                direction={direction}
+                isExpanded={expandedOrderId === item.id}
+                isActiveAction={activeActionOrderId === item.id}
+                onToggleDetails={() => {
+                  setExpandedOrderId(expandedOrderId === item.id ? null : item.id);
+                }}
+                onToggleAction={() => {
+                  setActiveActionOrderId(activeActionOrderId === item.id ? null : item.id);
+                }}
+                onCloseAction={() => {
+                  setActiveActionOrderId(null);
+                }}
                 onPrimaryAction={() => openPrimaryAction(item)}
                 onIssueAction={() => onOpenOrderAction?.('issue', item.id)}
               />

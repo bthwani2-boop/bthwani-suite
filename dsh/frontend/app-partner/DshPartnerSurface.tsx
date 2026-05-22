@@ -584,10 +584,10 @@ export function DshPartnerSurface({
         }
       }}
       items={[
-        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+        { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
         { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
         { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
-        { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
       ]}
     />
   ) : null;
