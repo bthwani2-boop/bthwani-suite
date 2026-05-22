@@ -1,21 +1,21 @@
 import React from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
   Box,
-  BThwaniFilterRail,
   Button,
   Chip,
+  Divider,
   Icon,
   KeyValueList,
-  MobileCommandSummaryStrip,
   MobileScrollView,
+  SearchField,
   SectionHeader,
   StateView,
   Surface,
+  Tabs,
   Text,
   TopBar,
   useDirection,
-  type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
 import type {
   DshPartnerOperationalFlowId,
@@ -56,14 +56,14 @@ type OperationsSupportCase = {
   activeOrder?: boolean;
 };
 
-const commandCenterFilterItems: BThwaniFilterRailItem[] = [
-  { id: 'all', label: 'الكل', icon: <Icon name="grid-outline" size={16} /> },
-  { id: 'active-orders', label: 'الطلبات النشطة', icon: <Icon name="receipt-outline" size={16} /> },
-  { id: 'order-issues', label: 'مشاكل الطلبات', icon: <Icon name="alert-circle-outline" size={16} /> },
-  { id: 'conversations', label: 'المحادثات', icon: <Icon name="chatbubble-ellipses-outline" size={16} /> },
-  { id: 'inventory-branch', label: 'المخزون والفرع', icon: <Icon name="cube-outline" size={16} /> },
-  { id: 'escalation', label: 'التصعيد', icon: <Icon name="arrow-up-circle-outline" size={16} /> },
-];
+const commandCenterFilterItems = [
+  { value: 'all', label: 'الكل' },
+  { value: 'active-orders', label: 'الطلبات النشطة' },
+  { value: 'order-issues', label: 'مشاكل الطلبات' },
+  { value: 'conversations', label: 'المحادثات' },
+  { value: 'inventory-branch', label: 'المخزون والفرع' },
+  { value: 'escalation', label: 'التصعيد' },
+] as const;
 
 function resolvePartnerCaseOwnerLabel(item: OperationsSupportCase): string {
   if (item.issueCategoryId === 'payment-refund-review') {
@@ -397,141 +397,103 @@ function CommandCenterCaseCard({
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   return (
-    <Box gap={2}>
-      <Surface
-        tone={expanded ? 'default' : 'raised'}
-        padding={3}
-        gap={3}
-      >
+    <Box gap={1} style={{ width: '100%' }}>
+      <Box paddingY={2}>
         <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: 12 }}>
-          <Surface tone="inset" padding={2} radiusToken="lg" style={{ flexShrink: 0 }}>
-            <Icon
-              name={
-                item.requiresConversation
+          <Icon
+            name={
+              item.requiresProof
+                ? 'document-text-outline'
+                : item.requiresConversation
                   ? 'chatbubble-ellipses-outline'
                   : item.issueCategoryId === 'item-unavailable' || item.issueCategoryId === 'wrong-item'
                     ? 'cube-outline'
                     : item.issueCategoryId === 'payment-refund-review'
                       ? 'wallet-outline'
                       : 'warning-outline'
-              }
-              size={18}
-              tone="brand"
-            />
-          </Surface>
+            }
+            size={22}
+            tone="brand"
+            style={{ marginTop: 2, flexShrink: 0 }}
+          />
 
-          <View style={{ flex: 1, minWidth: 0, gap: 6, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'flex-start', gap: 8 }}>
-              <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-                <Text role="bodyStrong" style={{ textAlign }}>
-                  {item.headline}
-                </Text>
-                <Text role="bodySm" tone="muted" style={{ textAlign }}>
-                  {`${item.orderRef} · ${category.title}`}
-                </Text>
-              </View>
-              <Chip label={item.compactStatusLabel} tone={item.compactStatusTone} selected={expanded} />
+          <View style={{ flex: 1, minWidth: 0, gap: 3, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+            <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
+              <Text role="bodyStrong" style={{ textAlign }}>
+                {item.headline}
+              </Text>
+              <Chip label={item.compactStatusLabel} tone={item.compactStatusTone} selected={expanded} size="sm" />
             </View>
 
             <Text role="bodySm" tone="muted" style={{ textAlign }}>
+              {`${item.orderRef} · ${category.title} · ${flowPreview.ownerLabel}`}
+            </Text>
+
+            <Text role="bodySm" style={{ textAlign }}>
               {item.summary}
             </Text>
 
-            <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-              <Chip label={flowPreview.ownerLabel} tone="brand" />
-              <Chip label={resolvePartnerCaseOwnerLabel(item)} tone="info" />
-              <Chip label={item.slaLabel} tone={item.hasSlaRisk ? 'danger' : 'warning'} />
+            <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 4, marginVertical: 2 }}>
+              <Chip label={item.slaLabel} tone={item.hasSlaRisk ? 'danger' : 'warning'} size="sm" />
               {flowPreview.financialImpactPreview ? (
-                <Chip label="أثر مالي Preview" tone="info" />
+                <Chip label="أثر مالي" tone="info" size="sm" />
               ) : null}
-              {item.previewTags?.map((tag) => (
-                <Chip key={tag} label={tag} tone="info" />
+              {item.previewTags?.slice(0, 2).map((tag) => (
+                <Chip key={tag} label={tag} tone="info" size="sm" />
               ))}
             </View>
 
-            <Text role="caption" tone="soft" style={{ textAlign }}>
+            <Text role="caption" tone="soft" style={{ textAlign, marginBottom: 4 }}>
               {`الإجراء التالي: ${item.nextActionLabel}`}
             </Text>
 
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-              <Button label="فتح" size="sm" fullWidth={false} tone="secondary" onPress={onOpenPreview} />
               <Button label="معالجة" size="sm" fullWidth={false} onPress={onOpenWorkspace} />
+              <Button label="فتح" size="sm" fullWidth={false} tone="secondary" onPress={onOpenPreview} />
               <Button label="تصعيد" size="sm" fullWidth={false} tone="ghost" onPress={onEscalate} />
             </View>
           </View>
         </View>
-      </Surface>
+      </Box>
 
       {expanded ? (
-        <Surface tone="inset" padding={3} gap={3}>
-          <SectionHeader
-            title={`تفاصيل ${item.orderRef}`}
-            subtitle="تفاصيل on-demand فقط: ملخص، سبب، أطراف، سجل مختصر، وقرار التشغيل التالي."
-          />
-
+        <Box paddingY={2} paddingX={1} gap={3} style={{ backgroundColor: 'transparent' }}>
           <KeyValueList
             dense
             items={[
-              { label: 'مرجع الطلب', value: item.orderRef, tone: 'brand' },
-              { label: 'سبب المشكلة', value: category.title, tone: item.compactStatusTone },
-              { label: 'الطرف المسؤول', value: flowPreview.ownerLabel },
               { label: 'القرار التالي', value: item.nextDecision, tone: 'brand' },
+              { label: 'المالك المركزي', value: `${resolvePartnerCaseOwnerLabel(item)} - ${resolvePartnerCaseOwnerNote(item)}` },
+              { label: 'ملاحظة تشغيلية', value: item.operationalNote },
             ]}
           />
 
-          {flowPreview.financialImpactPreview ? (
-            <Surface tone="default" padding={3} gap={2}>
-              <Text role="bodyStrong">الأثر المالي Preview</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign }}>
-                {flowPreview.financialImpactPreview}
-              </Text>
-            </Surface>
-          ) : null}
-
-          <Surface tone="default" padding={3} gap={2}>
-            <Text role="bodyStrong">الأطراف المرتبطة</Text>
-            <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 8 }}>
+          <View style={{ gap: 4 }}>
+            <Text role="bodyStrong" style={{ textAlign }}>الأطراف المرتبطة</Text>
+            <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 6 }}>
               {item.linkedParties.map((party) => (
-                <Chip key={party} label={party} tone="brand" />
+                <Chip key={party} label={party} tone="brand" size="sm" />
               ))}
             </View>
-          </Surface>
+          </View>
 
-          <Surface tone="default" padding={3} gap={2}>
-            <Text role="bodyStrong">سجل مختصر</Text>
-            <Box gap={1}>
+          <View style={{ gap: 4 }}>
+            <Text role="bodyStrong" style={{ textAlign }}>آخر سجل مختصر</Text>
+            <View style={{ gap: 2 }}>
               {item.timeline.map((event) => (
                 <Text key={event} role="caption" tone="muted" style={{ textAlign }}>
                   {`• ${event}`}
                 </Text>
               ))}
-            </Box>
-          </Surface>
-
-          <Surface tone="default" padding={3} gap={2}>
-            <Text role="bodyStrong">ملاحظة تشغيلية</Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign }}>
-              {item.operationalNote}
-            </Text>
-          </Surface>
-
-          <Surface tone="inset" padding={3} gap={2}>
-            <Text role="bodyStrong">المالك المركزي</Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign }}>
-              {resolvePartnerCaseOwnerLabel(item)}
-            </Text>
-            <Text role="caption" tone="muted" style={{ textAlign }}>
-              {resolvePartnerCaseOwnerNote(item)}
-            </Text>
-          </Surface>
+            </View>
+          </View>
 
           {actionFeedback ? (
-            <Text role="caption" tone="success" style={{ textAlign }}>
+            <Text role="caption" tone="success" style={{ textAlign, marginVertical: 4 }}>
               {actionFeedback}
             </Text>
           ) : null}
 
-          <View style={{ flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <View style={{ flexDirection: rowDirection, alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
             <Button label="تأكيد معالجة" size="sm" fullWidth={false} onPress={onConfirmHandling} />
             <Button label="طلب إثبات" size="sm" fullWidth={false} tone="secondary" onPress={onRequestProof} />
             <Button label="فتح محادثة" size="sm" fullWidth={false} tone="secondary" onPress={onOpenChat} />
@@ -539,10 +501,12 @@ function CommandCenterCaseCard({
             {item.allowRejectCancel ? (
               <Button label="رفض / إلغاء" size="sm" fullWidth={false} tone="danger" onPress={onRejectOrCancel} />
             ) : null}
-            <Button label="رجوع" size="sm" fullWidth={false} tone="ghost" onPress={onCollapse} />
+            <Button label="إغلاق التفاصيل" size="sm" fullWidth={false} tone="ghost" onPress={onCollapse} />
           </View>
-        </Surface>
+        </Box>
       ) : null}
+
+      <Divider />
     </Box>
   );
 }
@@ -564,7 +528,17 @@ export function PartnerSupportScreen({
   initialIssueCategoryId = null,
   initialSupportRouteId = null,
 }: PartnerSupportScreenProps) {
+  const { direction } = useDirection();
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
+
   const [selectedFilterId, setSelectedFilterId] = React.useState<DshPartnerSupportCommandFilterId>(initialFilterId);
+  const [supportQuery, setSupportQuery] = React.useState('');
+  const [activeKpiFilter, setActiveKpiFilter] = React.useState<'all' | 'sla-risk' | 'needs-decision' | 'conversations' | 'order-issues'>(() => {
+    if (initialFilterId === 'conversations') return 'conversations';
+    if (initialFilterId === 'order-issues') return 'order-issues';
+    return 'all';
+  });
   const [expandedCaseId, setExpandedCaseId] = React.useState<string | null>(
     findBestCaseIdForSelection({
       filterId: initialFilterId,
@@ -577,6 +551,13 @@ export function PartnerSupportScreen({
 
   React.useEffect(() => {
     setSelectedFilterId(initialFilterId);
+    setActiveKpiFilter(
+      initialFilterId === 'conversations'
+        ? 'conversations'
+        : initialFilterId === 'order-issues'
+          ? 'order-issues'
+          : 'all'
+    );
     setExpandedCaseId(
       findBestCaseIdForSelection({
         filterId: initialFilterId,
@@ -587,10 +568,41 @@ export function PartnerSupportScreen({
     );
   }, [initialCaseId, initialFilterId, initialIssueCategoryId, initialSupportRouteId]);
 
-  const visibleItems = React.useMemo(
-    () => operationsSupportCases.filter((item) => resolveCaseMatchesFilter(item, selectedFilterId)),
-    [selectedFilterId],
-  );
+  const visibleItems = React.useMemo(() => {
+    let filterPassed = operationsSupportCases.filter((item) =>
+      resolveCaseMatchesFilter(item, selectedFilterId),
+    );
+
+    if (activeKpiFilter === 'sla-risk') {
+      filterPassed = filterPassed.filter((item) => item.hasSlaRisk);
+    } else if (activeKpiFilter === 'needs-decision') {
+      filterPassed = filterPassed.filter((item) => item.requiresDecision);
+    } else if (activeKpiFilter === 'conversations') {
+      filterPassed = filterPassed.filter((item) => item.filterIds.includes('conversations'));
+    } else if (activeKpiFilter === 'order-issues') {
+      filterPassed = filterPassed.filter((item) => item.filterIds.includes('order-issues'));
+    }
+
+    const query = supportQuery.trim().toLowerCase();
+    if (!query) {
+      return filterPassed;
+    }
+
+    return filterPassed.filter((item) => {
+      const parties = item.linkedParties.join(' ').toLowerCase();
+      const tags = (item.previewTags ?? []).join(' ').toLowerCase();
+      return (
+        item.orderRef.toLowerCase().includes(query) ||
+        item.headline.toLowerCase().includes(query) ||
+        item.summary.toLowerCase().includes(query) ||
+        item.compactStatusLabel.toLowerCase().includes(query) ||
+        item.slaLabel.toLowerCase().includes(query) ||
+        item.nextActionLabel.toLowerCase().includes(query) ||
+        parties.includes(query) ||
+        tags.includes(query)
+      );
+    });
+  }, [selectedFilterId, activeKpiFilter, supportQuery]);
 
   React.useEffect(() => {
     if (!expandedCaseId) {
@@ -642,11 +654,11 @@ export function PartnerSupportScreen({
   }
 
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 32 }}>
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 48 }}>
       <TopBar
         variant="secondary"
         title="العمليات والدعم"
-        subtitle="مركز تشغيل الطلبات والاستثناءات والدعم"
+        subtitle="Partner Command Desk"
         style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={
           onBack
@@ -661,60 +673,106 @@ export function PartnerSupportScreen({
         }
       />
 
-      <Surface tone="raised" padding={3} gap={2}>
-        <Text role="titleSm">مركز تشغيل الطلبات والاستثناءات والدعم</Text>
-        <Text role="bodySm" tone="muted">
-          صف أولوية واحد يربط الطلبات النشطة، الاستثناءات، المحادثات، والمخزون دون تحويل الدعم إلى دليل عام منفصل.
+      <Box gap={1} paddingY={1}>
+        <Text role="titleSm" style={{ textAlign }}>Partner Command Desk</Text>
+        <Text role="bodySm" tone="soft" style={{ textAlign }}>
+          المتابعة والتحكم الفوري في الطلبات والاستثناءات والدعم بصف أولوية موحد.
         </Text>
-      </Surface>
+      </Box>
 
-      <Surface tone="inset" padding={3} gap={2}>
-        <Text role="bodyStrong">حدود الملكية المركزية</Text>
-        <Text role="bodySm" tone="muted">
-          المتابعة المركزية للتذاكر والتصعيد يملكها {resolveDshControlPanelSectionLabel('support')}، والأثر المالي يبقى مرجعًا لـ {resolveDshControlPanelSectionLabel('finance')} وWLT، بينما الباركود والهوية والنشر تعود إلى {resolveDshControlPanelSectionLabel('catalogs')}.
-        </Text>
-      </Surface>
+      <Divider />
 
-      <Box gap={2}>
-        <MobileCommandSummaryStrip
-          items={[
-            { id: 'active-orders', label: 'طلبات نشطة', value: String(summary.activeOrders) },
-            { id: 'sla-risk', label: 'خطر SLA', value: String(summary.slaRisk) },
-            { id: 'needs-decision', label: 'تحتاج قرار', value: String(summary.needsDecision) },
-          ]}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          flexDirection: rowDirection,
+          gap: 8,
+          paddingVertical: 4,
+        }}
+      >
+        <Chip
+          label={`الكل (${operationsSupportCases.length})`}
+          selected={activeKpiFilter === 'all'}
+          onPress={() => {
+            setActiveKpiFilter('all');
+            setSelectedFilterId('all');
+          }}
         />
-        <MobileCommandSummaryStrip
-          items={[
-            { id: 'open-issues', label: 'مشاكل مفتوحة', value: String(summary.openIssues) },
-            { id: 'pending-conversations', label: 'محادثات معلقة', value: String(summary.pendingConversations) },
-          ]}
+        <Chip
+          label={`خطر SLA (${summary.slaRisk})`}
+          selected={activeKpiFilter === 'sla-risk'}
+          onPress={() => {
+            setActiveKpiFilter('sla-risk');
+            setSelectedFilterId('all');
+          }}
+        />
+        <Chip
+          label={`تحتاج قرار (${summary.needsDecision})`}
+          selected={activeKpiFilter === 'needs-decision'}
+          onPress={() => {
+            setActiveKpiFilter('needs-decision');
+            setSelectedFilterId('all');
+          }}
+        />
+        <Chip
+          label={`المحادثات (${summary.pendingConversations})`}
+          selected={activeKpiFilter === 'conversations'}
+          onPress={() => {
+            setActiveKpiFilter('conversations');
+            setSelectedFilterId('conversations');
+          }}
+        />
+        <Chip
+          label={`المشاكل (${summary.openIssues})`}
+          selected={activeKpiFilter === 'order-issues'}
+          onPress={() => {
+            setActiveKpiFilter('order-issues');
+            setSelectedFilterId('order-issues');
+          }}
+        />
+      </ScrollView>
+
+      <Divider />
+
+      <Box gap={3} paddingY={1}>
+        <SearchField
+          value={supportQuery}
+          onChangeText={setSupportQuery}
+          placeholder="البحث عن ORD، حالة، أو أطراف..."
+        />
+
+        <Tabs
+          items={commandCenterFilterItems}
+          value={selectedFilterId}
+          onValueChange={(id) => {
+            setSelectedFilterId(id as DshPartnerSupportCommandFilterId);
+            if (id === 'conversations') {
+              setActiveKpiFilter('conversations');
+            } else if (id === 'order-issues') {
+              setActiveKpiFilter('order-issues');
+            } else {
+              setActiveKpiFilter('all');
+            }
+          }}
+          variant="pill"
+          scrollable
         />
       </Box>
 
-      <Surface tone="raised" padding={3} gap={3}>
-        <SectionHeader
-          title="الفلاتر الذكية"
-          subtitle="اعرض نفس queue بمنظور الطلبات أو المحادثات أو المخزون أو التصعيد، بدون تكرار بيانات route state."
-        />
-        <BThwaniFilterRail
-          items={commandCenterFilterItems}
-          selectedId={selectedFilterId}
-          onSelectedIdChange={(id) => setSelectedFilterId(id as DshPartnerSupportCommandFilterId)}
-          contentContainerStyle={{ paddingHorizontal: 4 }}
-        />
-      </Surface>
+      <Divider />
 
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <SectionHeader
           title="صف الأولوية"
-          subtitle="بطاقات مختصرة تربط الحالة التشغيلية بالمسار التالي أو بالتفاصيل inline عند الحاجة."
+          subtitle="حالات تشغيلية ذكية مرتبة حسب الأولوية ومربوطة بالمسار التالي مباشرة."
         />
 
         {visibleItems.length === 0 ? (
           <StateView
             stateId="empty"
-            title="لا توجد حالات في هذا الفلتر"
-            description="غيّر الفلتر أو ارجع إلى الكل لمتابعة الحالات التشغيلية الأخرى."
+            title="لا توجد نتائج مطابقة"
+            description="غيّر معايير البحث أو الفلتر للمتابعة."
           />
         ) : (
           <Box gap={3}>
@@ -738,7 +796,7 @@ export function PartnerSupportScreen({
             ))}
           </Box>
         )}
-      </Surface>
+      </Box>
     </MobileScrollView>
   );
 }
