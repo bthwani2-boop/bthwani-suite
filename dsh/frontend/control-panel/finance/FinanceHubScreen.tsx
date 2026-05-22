@@ -126,7 +126,7 @@ export function ControlPanelDshFinanceHubScreen({
                 <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>التسويات، مطابقة COD، أهلية الكابتن، الاستردادات، والرقابة المالية — العملة: ر.ي</p>
+            <p className={styles.surfaceHeaderSubtitle}>WLT — قراءة فقط / معاينة / runtime غير مربوط · التسويات، مطابقة COD، أهلية الكابتن، الاستردادات، والرقابة المالية — ر.ي</p>
           </Box>
         </div>
 
@@ -141,12 +141,12 @@ export function ControlPanelDshFinanceHubScreen({
               <span className={styles.commandKpiValue}>{financePreview.totalOutflowLabel}</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>عناصر معلقة</span>
+              <span className={styles.commandKpiLabel}>عناصر معلقة (معاينة)</span>
               <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>١٤</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>حالة المخاطر</span>
-              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>منخفض</span>
+              <span className={styles.commandKpiLabel}>حالة المخاطر (معاينة)</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>{financePreview.contractState === 'CONTRACT_TBD' ? 'معاينة — غير مربوط' : 'منخفض'}</span>
             </div>
           </div>
         </div>
