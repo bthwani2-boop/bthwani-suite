@@ -14,6 +14,8 @@ import {
   useDirection,
   useTheme,
   Divider,
+  ActionStrip,
+  spacing,
 } from '@bthwani/ui-kit';
 import type { WltDshPartnerWalletTransaction } from './wlt-dsh-partner.adapter';
 import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
@@ -59,14 +61,7 @@ type WalletStateCopy = {
 
 const screenBottomInset = 132;
 
-// ─── Segment tabs config ──────────────────────────────────────────
-const WALLET_TABS: { id: WalletTabId; label: string }[] = [
-  { id: 'summary', label: 'الملخص' },
-  { id: 'cycle', label: 'التسوية' },
-  { id: 'transactions', label: 'الحركات' },
-  { id: 'modes', label: 'العمولات' },
-  { id: 'courier', label: 'التوصيل' },
-];
+
 
 function resolveStateCopy(state: Exclude<PartnerDshWalletViewState, 'ready' | 'no-transactions'>): WalletStateCopy {
   if (state === 'loading') {
@@ -161,66 +156,7 @@ function formatApplicability(app: WltDshOrderLineItemApplicability) {
 
 
 
-// ─── Segment rail — لا يكسر الكلمات، horizontal scroll ──────────
-function SegmentRail({
-  tabs,
-  activeTab,
-  onSelect,
-}: {
-  tabs: { id: WalletTabId; label: string }[];
-  activeTab: WalletTabId;
-  onSelect: (id: WalletTabId) => void;
-}) {
-  const { theme } = useTheme();
-  const { direction } = useDirection();
 
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={{ flexGrow: 0 }}
-      contentContainerStyle={{
-        flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-        gap: 8,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-      }}
-    >
-      {tabs.map((tab) => {
-        const isActive = tab.id === activeTab;
-        return (
-          <Pressable
-            key={tab.id}
-            onPress={() => onSelect(tab.id)}
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              borderRadius: 20,
-              backgroundColor: isActive ? theme.brand : theme.surface,
-              borderWidth: 1,
-              borderColor: isActive ? theme.brand : theme.line,
-            }}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
-          >
-            <Text
-              role="label"
-              style={{
-                color: isActive ? theme.brandContrast : theme.textSoft,
-                textAlign: 'center',
-                // لا نقطع الكلمات
-                flexShrink: 0,
-              }}
-              numberOfLines={1}
-            >
-              {tab.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </ScrollView>
-  );
-}
 
 // ─── Financial stream card — بطاقة حركة مالية مع تفاصيل inline ──
 function FinancialStreamCard({
@@ -252,15 +188,14 @@ function FinancialStreamCard({
   ].filter((d) => d.value && d.value !== '—');
 
   return (
-    <Surface tone="raised" padding={0} gap={0} style={{ overflow: 'hidden', marginBottom: 8, borderRadius: 12 }}>
+    <View style={{ overflow: 'hidden' }}>
       {/* رأس البطاقة */}
       <Pressable onPress={onToggle} accessibilityRole="button">
         <View
           style={{
             flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
             alignItems: 'center',
-            paddingHorizontal: 14,
-            paddingVertical: 12,
+            paddingVertical: 10,
             gap: 10,
           }}
         >
@@ -302,7 +237,7 @@ function FinancialStreamCard({
 
       {/* التفاصيل المنسدلة داخل نفس البطاقة */}
       {isExpanded ? (
-        <Box padding={3} gap={2}>
+        <Box paddingVertical={2} gap={2}>
           <Divider />
           <KeyValueList dense items={detailItems} />
           {item.previewNoticeLabel ? (
@@ -312,7 +247,7 @@ function FinancialStreamCard({
           ) : null}
         </Box>
       ) : null}
-    </Surface>
+    </View>
   );
 }
 
@@ -483,13 +418,15 @@ function TransactionsTab({
 
   return (
     <Box gap={0}>
-      {visibleTransactions.map((item) => (
-        <FinancialStreamCard
-          key={item.id}
-          item={item}
-          isExpanded={selectedTransactionId === item.id}
-          onToggle={() => onToggle(item.id)}
-        />
+      {visibleTransactions.map((item, index) => (
+        <React.Fragment key={item.id}>
+          {index > 0 && <Divider />}
+          <FinancialStreamCard
+            item={item}
+            isExpanded={selectedTransactionId === item.id}
+            onToggle={() => onToggle(item.id)}
+          />
+        </React.Fragment>
       ))}
     </Box>
   );
@@ -553,20 +490,14 @@ function CommissionModeCard({
   })();
 
   return (
-    <Surface
-      tone={enabled ? 'raised' : 'default'}
-      padding={0}
-      gap={0}
-      style={{ overflow: 'hidden', marginBottom: 8, borderRadius: 12, opacity: enabled ? 1 : 0.65 }}
-    >
+    <View style={{ overflow: 'hidden', opacity: enabled ? 1 : 0.65 }}>
       {/* رأس البطاقة */}
       <Pressable onPress={onToggle} accessibilityRole="button">
         <View
           style={{
             flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
             alignItems: 'center',
-            paddingHorizontal: 14,
-            paddingVertical: 12,
+            paddingVertical: 10,
             gap: 10,
           }}
         >
@@ -591,7 +522,7 @@ function CommissionModeCard({
 
       {/* التفاصيل */}
       {isExpanded ? (
-        <Box padding={3} gap={3}>
+        <Box paddingVertical={2} gap={3}>
           <Divider />
           <KeyValueList
             dense
@@ -607,15 +538,15 @@ function CommissionModeCard({
           />
           {/* CTA */}
           {id === 'partner_delivery' ? (
-            <Button label="إعداد توصيل المتجر" tone="secondary" size="sm" icon="settings-outline" />
+            <Button label="إعداد توصيل المتجر" tone="secondary" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
           ) : id === 'bthwani_delivery' && !enabled ? (
-            <Button label="مراجعة السياسة" tone="ghost" size="sm" icon="document-text-outline" />
+            <Button label="مراجعة السياسة" tone="ghost" size="sm" icon={<Icon name="document-text-outline" size={16} tone="brand" />} />
           ) : (
-            <Button label="عرض الحركات المرتبطة" tone="ghost" size="sm" icon="swap-horizontal-outline" />
+            <Button label="عرض الحركات المرتبطة" tone="ghost" size="sm" icon={<Icon name="swap-horizontal-outline" size={16} tone="brand" />} />
           )}
         </Box>
       ) : null}
-    </Surface>
+    </View>
   );
 }
 
@@ -637,21 +568,23 @@ function ModesTab({
       <Text role="caption" tone="muted" style={{ textAlign: 'right', marginBottom: 4 }}>
         كل وضع تشغيل يحمل أثرًا ماليًا مختلفًا. اضغط لرؤية تفاصيل العمولة وأثر التسوية.
       </Text>
-      {modes.map((mode) => {
+      {modes.map((mode, index) => {
         const enabled = resolveServiceModeEnabled(serviceModes, mode.id, mode.defaultEnabled);
         const percentage = getWltDshPartnerCommissionLabel(getWltDshPartnerOperationalModeCommission(mode.id));
         return (
-          <CommissionModeCard
-            key={mode.id}
-            id={mode.id}
-            title={mode.title}
-            icon={mode.icon}
-            enabled={enabled}
-            percentage={percentage}
-            serviceModes={serviceModes}
-            isExpanded={expandedModeId === mode.id}
-            onToggle={() => setExpandedModeId(expandedModeId === mode.id ? null : mode.id)}
-          />
+          <React.Fragment key={mode.id}>
+            {index > 0 && <Divider />}
+            <CommissionModeCard
+              id={mode.id}
+              title={mode.title}
+              icon={mode.icon}
+              enabled={enabled}
+              percentage={percentage}
+              serviceModes={serviceModes}
+              isExpanded={expandedModeId === mode.id}
+              onToggle={() => setExpandedModeId(expandedModeId === mode.id ? null : mode.id)}
+            />
+          </React.Fragment>
         );
       })}
     </Box>
@@ -676,7 +609,7 @@ function CourierTab({
           title="لم يتم تحديد سياسة توصيل المتجر بعد"
           description="حدد السياسة لتفعيل توصيل المتجر وتتبع الرسوم والتعويضات."
         />
-        <Button label="إعداد موصل المتجر" tone="primary" size="sm" icon="settings-outline" />
+        <Button label="إعداد موصل المتجر" tone="primary" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
       </Box>
     );
   }
@@ -706,7 +639,7 @@ function CourierTab({
       </Surface>
 
       {/* CTA */}
-      <Button label="إعداد موصل المتجر" tone="ghost" size="sm" icon="settings-outline" />
+      <Button label="إعداد موصل المتجر" tone="ghost" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
     </Box>
   );
 }
@@ -727,7 +660,7 @@ export function PartnerDshWalletBridgeView({
   const { direction } = useDirection();
   const { partnerPreview, previewTransactions } = useWltDshPartnerWalletPreview();
   const [selectedTransactionId, setSelectedTransactionId] = React.useState<string | null>(null);
-  const [activeTab, setActiveTab] = React.useState<WalletTabId>('summary');
+  const [expandedSection, setExpandedSection] = React.useState<WalletTabId | null>('summary');
 
   const linkedScopeLabel = React.useMemo(
     () => resolveLinkedScopeLabel(activeZoneLabel, branchLabel),
@@ -797,58 +730,159 @@ export function PartnerDshWalletBridgeView({
         }
       />
 
-      {/* الفرع / النطاق + badge تجريبي */}
+      {/* الفرع / النطاق */}
       <View
         style={{
           flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
           alignItems: 'center',
           gap: 8,
           paddingHorizontal: 16,
-          paddingVertical: 6,
+          paddingVertical: 10,
         }}
       >
         <Icon name="location-outline" size={14} tone="soft" />
-        <Text role="caption" tone="soft" numberOfLines={1} style={{ flex: 1, textAlign: 'right' }}>
+        <Text role="caption" tone="soft" numberOfLines={1} style={{ flex: 1, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
           {linkedScopeLabel}
         </Text>
-        <Badge label="بيانات تجريبية" tone="warning" />
       </View>
 
-      {/* Segment rail — horizontal scroll، لا يكسر الكلمات */}
-      <SegmentRail tabs={WALLET_TABS} activeTab={activeTab} onSelect={setActiveTab} />
-
-      {/* محتوى التبويب */}
-      <Box padding={4} gap={4}>
-        {activeTab === 'summary' && (
+      {/* قائمة الأقسام المالية القابلة للطي — بنمط صفحة طلباتي */}
+      <Box padding={4}>
+        {/* 1. الملخص المالي */}
+        <ActionStrip
+          icon="receipt-outline"
+          title="الملخص المالي"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {`${partnerPreview.netSettlementLabel} • صافي التسوية • ريال يمني`}
+              </Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <Badge label="نشط" tone="success" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#المحفظة</Text>
+              </View>
+            </View>
+          }
+          expanded={expandedSection === 'summary'}
+          onPress={() => setExpandedSection(expandedSection === 'summary' ? null : 'summary')}
+          hideDivider={false}
+          trailingAction={
+            <Icon name={expandedSection === 'summary' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+          }
+        >
           <SummaryTab
             partnerPreview={partnerPreview}
             storeDeliveryPreview={storeDeliveryPreview}
             openAction={openAction}
           />
-        )}
+        </ActionStrip>
 
-        {activeTab === 'cycle' && (
+        {/* 2. دورة التسوية */}
+        <ActionStrip
+          icon="receipt-outline"
+          title="دورة التسوية"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {`${partnerPreview.cycleStartDate} إلى ${partnerPreview.cycleEndDate}`}
+              </Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <Badge label={partnerPreview.cycleStatus} tone="success" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#التسوية</Text>
+              </View>
+            </View>
+          }
+          expanded={expandedSection === 'cycle'}
+          onPress={() => setExpandedSection(expandedSection === 'cycle' ? null : 'cycle')}
+          hideDivider={false}
+          trailingAction={
+            <Icon name={expandedSection === 'cycle' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+          }
+        >
           <CycleTab
             partnerPreview={partnerPreview}
             storeDeliveryPreview={storeDeliveryPreview}
           />
-        )}
+        </ActionStrip>
 
-        {activeTab === 'transactions' && (
+        {/* 3. الحركات المالية */}
+        <ActionStrip
+          icon="receipt-outline"
+          title="آخر الحركات المالية"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {visibleTransactions.length === 1 ? 'حركة مالية واحدة مسجلة' : `${visibleTransactions.length} حركات مالية مسجلة`}
+              </Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <Badge label="محدث" tone="default" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#سجل_الحركات</Text>
+              </View>
+            </View>
+          }
+          expanded={expandedSection === 'transactions'}
+          onPress={() => setExpandedSection(expandedSection === 'transactions' ? null : 'transactions')}
+          hideDivider={false}
+          trailingAction={
+            <Icon name={expandedSection === 'transactions' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+          }
+        >
           <TransactionsTab
             visibleTransactions={visibleTransactions}
             selectedTransactionId={selectedTransactionId}
             onToggle={(id) => setSelectedTransactionId(selectedTransactionId === id ? null : id)}
           />
-        )}
+        </ActionStrip>
 
-        {activeTab === 'modes' && (
+        {/* 4. العمولات التشغيلية */}
+        <ActionStrip
+          icon="receipt-outline"
+          title="العمولات التشغيلية"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                عمولة المنصة حسب أوضاع التوصيل والاستلام
+              </Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <Badge label="٣ أوضاع تشغيل" tone="default" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#العمولات</Text>
+              </View>
+            </View>
+          }
+          expanded={expandedSection === 'modes'}
+          onPress={() => setExpandedSection(expandedSection === 'modes' ? null : 'modes')}
+          hideDivider={false}
+          trailingAction={
+            <Icon name={expandedSection === 'modes' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+          }
+        >
           <ModesTab serviceModes={serviceModes} />
-        )}
+        </ActionStrip>
 
-        {activeTab === 'courier' && (
+        {/* 5. توصيل المتجر */}
+        <ActionStrip
+          icon="receipt-outline"
+          title="توصيل المتجر"
+          subtitle={
+            <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                {`${storeDeliveryPreview.totalFeeLabel} رسوم محصلة • ${storeDeliveryPreview.totalCompensationLabel} تعويضات`}
+              </Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                <Badge label="سياسة نشطة" tone="success" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#توصيل_المتجر</Text>
+              </View>
+            </View>
+          }
+          expanded={expandedSection === 'courier'}
+          onPress={() => setExpandedSection(expandedSection === 'courier' ? null : 'courier')}
+          hideDivider={true}
+          trailingAction={
+            <Icon name={expandedSection === 'courier' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+          }
+        >
           <CourierTab storeDeliveryPreview={storeDeliveryPreview} direction={direction} />
-        )}
+        </ActionStrip>
       </Box>
     </MobileScrollView>
   );
