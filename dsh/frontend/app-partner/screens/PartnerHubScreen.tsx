@@ -1292,10 +1292,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const resolvedBranchLabel = activeCanonicalStore?.branchLabel ?? branchLabel;
   const resolvedManagerLabel = activeCanonicalStore?.managerName ?? managerLabel;
   const resolvedTodayHoursLabel = activeCanonicalStore?.operatingHoursLabel ?? todayHoursLabel;
-  const [branchName, setBranchName] = React.useState(resolvedStoreName);
-  const [branchAddress, setBranchAddress] = React.useState(`${resolvedCityLabel}، الياسمين، شارع الندى`);
-  const [branchContact, setBranchContact] = React.useState('011 555 0123');
-  const [branchSavedTime, setBranchSavedTime] = React.useState<string | null>(null);
+  const [branchContact] = React.useState('011 555 0123');
 
   const activeHubNavigationItems = React.useMemo(() => {
     return hubNavigationItems.filter((item) => item.id !== 'profile');
@@ -1669,9 +1666,55 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           }))}
           selectedMode={selectedModeId}
           onModeChange={(id) => setSelectedModeId(id)}
+          topOppositeAction={
+            <Pressable
+              onPress={onOpenStoreScope}
+              style={({ pressed }) => [
+                {
+                  flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  backgroundColor: pressed ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="اختيار الفرع"
+            >
+              <Icon name="git-branch-outline" size={14} color="#ffffff" />
+              <Text style={{ fontSize: 12, fontWeight: '700', color: '#ffffff', fontFamily: 'Outfit-Bold' }}>
+                اختيار الفرع
+              </Text>
+            </Pressable>
+          }
         />
 
         <Box padding={4} gap={4}>
+          {/* Contact Chip (Phone Only) */}
+          <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
+            <View
+              style={{
+                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
+                alignItems: 'center',
+                gap: 8,
+                backgroundColor: theme.surfaceRaised,
+                paddingVertical: 6,
+                paddingHorizontal: 12,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: theme.line,
+              }}
+            >
+              <Icon name="call-outline" size={14} tone="brand" />
+              <Text role="bodySm" tone="muted">رقم التواصل:</Text>
+              <Text role="bodySmStrong">{branchContact}</Text>
+            </View>
+          </Box>
+
           {/* 1) Wallet Balance Block */}
           <Surface tone="raised" padding={3} gap={2}>
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1688,19 +1731,6 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             </View>
           </Surface>
 
-          {/* 2) Read-Only Branch Details Card */}
-          <Surface tone="raised" padding={3} gap={3}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>بيانات الفرع</Text>
-            <KeyValueList
-              dense
-              items={[
-                { label: 'اسم الفرع', value: branchName },
-                { label: 'العنوان', value: branchAddress },
-                { label: 'رقم التواصل', value: branchContact },
-              ]}
-            />
-          </Surface>
-
           {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
           <View style={{ gap: 8 }}>
             {activeHubNavigationItems.map((item) => (
@@ -1713,58 +1743,6 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
               />
             ))}
           </View>
-
-          {/* Quick Actions & Operational Switches */}
-          <Surface tone="raised" padding={4} gap={3}>
-            <Text role="label" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
-              إجراءات سريعة
-            </Text>
-
-            {/* ML-017: availability toggle — local preview state only; runtime wiring via onToggleAvailability */}
-            <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text role="bodyMd" tone={isAvailable ? 'success' : 'muted'}>
-                {isAvailable ? 'المتجر مفتوح' : 'المتجر مغلق'}
-              </Text>
-              <RNSwitch
-                value={isAvailable}
-                onValueChange={(next) => {
-                  setIsAvailable(next);
-                  onToggleAvailability?.(next);
-                }}
-                accessibilityLabel="تبديل حالة المتجر"
-              />
-            </View>
-
-            <View
-              style={{
-                flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
-                flexWrap: 'wrap',
-                gap: 8,
-              }}
-            >
-              <Button
-                label="تنبيهات الطلب"
-                tone="secondary"
-                fullWidth={false}
-                icon={<Icon name="notifications-outline" size={16} />}
-                onPress={openOrderAlerts}
-              />
-              <Button
-                label="اختيار الفرع"
-                tone="secondary"
-                fullWidth={false}
-                icon={<Icon name="git-branch-outline" size={16} />}
-                onPress={onOpenStoreScope}
-              />
-              <Button
-                label="دليل العمليات"
-                tone="secondary"
-                fullWidth={false}
-                icon={<Icon name="headset-outline" size={16} />}
-                onPress={openOperationsDirectory}
-              />
-            </View>
-          </Surface>
         </Box>
       </MobileScrollView>
     </Box>

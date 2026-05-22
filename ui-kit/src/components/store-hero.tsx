@@ -46,6 +46,8 @@ export type StoreHeroProps = {
   onCartPress?: () => void;
   onSharePress?: () => void;
   onBackPress?: () => void;
+  /** Optional slot to render on the opposite side of floating top actions bar */
+  topOppositeAction?: React.ReactNode;
 
   // Scroll listener for parallax interpolation
   scrollY?: Animated.Value;
@@ -85,6 +87,7 @@ export function StoreHero({
   onCartPress,
   onSharePress,
   onBackPress,
+  topOppositeAction,
   scrollY,
   deliveryModes = [],
   selectedMode,
@@ -235,25 +238,31 @@ export function StoreHero({
             )}
           </View>
 
-          {onBackPress && (
-            <TouchableOpacity
-              style={[
-                styles.heroActionCircle,
-                {
-                  backgroundColor: appearanceChrome.actionBackgroundGlass,
-                  borderColor: appearanceChrome.actionBorderGlass,
-                },
-              ]}
-              activeOpacity={0.7}
-              onPress={onBackPress}
-              hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
-            >
-              <Icon
-                name={isRTL ? 'chevron-forward' : 'chevron-back'}
-                size={22}
-                color={isDarkGlass ? colorPalette.white : appearanceChrome.primaryText}
-              />
-            </TouchableOpacity>
+          {topOppositeAction ? (
+            <View pointerEvents="box-none">
+              {topOppositeAction}
+            </View>
+          ) : (
+            onBackPress && (
+              <TouchableOpacity
+                style={[
+                  styles.heroActionCircle,
+                  {
+                    backgroundColor: appearanceChrome.actionBackgroundGlass,
+                    borderColor: appearanceChrome.actionBorderGlass,
+                  },
+                ]}
+                activeOpacity={0.7}
+                onPress={onBackPress}
+                hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
+              >
+                <Icon
+                  name={isRTL ? 'chevron-forward' : 'chevron-back'}
+                  size={22}
+                  color={isDarkGlass ? colorPalette.white : appearanceChrome.primaryText}
+                />
+              </TouchableOpacity>
+            )
           )}
         </View>
       </View>
