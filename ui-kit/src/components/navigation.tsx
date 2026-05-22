@@ -302,7 +302,7 @@ export function BottomNavBar({
 
           <View style={styles.launcherPlaceholder}>
             <Pressable onPress={onLauncherPress} style={styles.launcherButtonArea}>
-              <Text role="caption" style={[styles.launcherLabel, { color: tokens.accent }]}>{launcherLabel}</Text>
+              <Text role="caption" style={[styles.launcherLabel, { color: launcherActive ? tokens.accent : tokens.components.navigation.navInactiveText }]}>{launcherLabel}</Text>
             </Pressable>
           </View>
 

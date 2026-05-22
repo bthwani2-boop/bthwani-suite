@@ -528,7 +528,7 @@ function PromotionIntentPanel({
 
   return (
     <Box gap={4}>
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <Text role="label" tone="muted">نية الترويج من الشريك</Text>
         <Text role="titleSm">اختر منتجًا أو متجرًا قابلًا للترويج ثم جهّز الطلب للتسويق</Text>
         <Text role="bodySm" tone="muted">
@@ -541,18 +541,22 @@ function PromotionIntentPanel({
           <Chip label={activeZoneLabel} tone="success" />
           <Chip label={todayHoursLabel} tone="warning" />
         </Box>
-      </Surface>
+      </Box>
 
-      <Surface tone="raised" padding={3} gap={3}>
+      <Divider />
+
+      <Box gap={3} paddingY={2}>
         <Text role="titleSm">العناصر القابلة للترويج</Text>
         <Box gap={2}>
           {dshPromotionCandidates.map((item) => (
             <PromotionCandidateRow key={item.id} item={item} selected={item.id === selectedItem?.id} onPress={() => setSelectedId(item.id)} />
           ))}
         </Box>
-      </Surface>
+      </Box>
 
-      <Surface tone="raised" padding={3} gap={3}>
+      <Divider />
+
+      <Box gap={3} paddingY={2}>
         <Text role="titleSm">تفاصيل نية الترويج</Text>
         <KeyValueList
           dense
@@ -569,17 +573,17 @@ function PromotionIntentPanel({
           <TextField label="ملاحظات النية" value={offerNote} onChangeText={setOfferNote} placeholder="وصف مختصر للعرض أو سبب الترويج" multiline />
         </Box>
 
-        <Surface tone="inset" padding={3} gap={2}>
+        <Box padding={3} gap={2} style={{ backgroundColor: colorPalette.line + '11', borderRadius: 12 }}>
           <Text role="bodyStrong">آخر رسالة</Text>
           <Text role="bodySm" tone="muted">{actionMessage}</Text>
-        </Surface>
+        </Box>
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Button label="تأكيد نية الترويج" tone="primary" fullWidth={false} onPress={() => setActionMessage(`تم إرسال النية: ${offerTitle}`)} />
           <Button label="طلب إبراز في الرئيسية" tone="secondary" fullWidth={false} onPress={() => setActionMessage(`طلب إبراز: ${selectedItem?.title ?? 'غير محدد'}`)} />
           <Button label="تمييز المنتج" tone="ghost" fullWidth={false} onPress={() => setActionMessage(`تم وضع العنصر ضمن قائمة الترويج: ${selectedItem?.title ?? 'غير محدد'}`)} />
         </Box>
-      </Surface>
+      </Box>
 
       <MobileStickyPrimaryAction
         label="إرسال طلب الترويج"
@@ -604,11 +608,10 @@ function SummaryCell({ label, value, tone = 'default' }: Omit<SummaryItem, 'id'>
             : theme.lineStrong;
 
   return (
-    <Surface
-      tone="default"
+    <Box
       padding={3}
       gap={1}
-      style={{ flex: 1, minWidth: 96, borderWidth: 1, borderColor: accentColor }}
+      style={{ flex: 1, minWidth: 96, borderBottomWidth: 2, borderBottomColor: accentColor }}
     >
       <Text role="caption" tone="muted" numberOfLines={1} align="start">
         {label}
@@ -616,7 +619,7 @@ function SummaryCell({ label, value, tone = 'default' }: Omit<SummaryItem, 'id'>
       <Text role="bodyStrong" tone={tone} numberOfLines={1} align="start">
         {value}
       </Text>
-    </Surface>
+    </Box>
   );
 }
 
@@ -629,6 +632,7 @@ function SettingsOptionRow({
   onPress,
   last = false,
   disabled = false,
+  compact = false,
 }: {
   title: string;
   subtitle: string;
@@ -638,6 +642,7 @@ function SettingsOptionRow({
   onPress?: () => void;
   last?: boolean;
   disabled?: boolean;
+  compact?: boolean;
 }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
@@ -655,7 +660,7 @@ function SettingsOptionRow({
         {
           width: '100%',
           paddingHorizontal: 16,
-          paddingVertical: 14,
+          paddingVertical: compact ? 10 : 14,
           backgroundColor: pressed ? theme.surfaceInset : theme.surface,
           borderBottomWidth: last ? 0 : 1,
           borderBottomColor: theme.line,
@@ -664,22 +669,26 @@ function SettingsOptionRow({
       ]}
     >
       <View style={{ flexDirection: rowDirection, alignItems: 'center' }}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 14,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: theme.surfaceInset,
-              borderWidth: 1,
-              borderColor: theme.line,
-              flexShrink: 0,
-            }}
-          >
-            <Icon name={icon} size={17} tone={isSwitchRow && value ? 'brand' : 'default'} />
-          </View>
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: compact ? 10 : 12, flexShrink: 1, minWidth: 0 }}>
+          {compact ? (
+            <Icon name={icon} size={18} tone={isSwitchRow && value ? 'brand' : 'default'} style={{ flexShrink: 0 }} />
+          ) : (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 14,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: theme.surfaceInset,
+                borderWidth: 1,
+                borderColor: theme.line,
+                flexShrink: 0,
+              }}
+            >
+              <Icon name={icon} size={17} tone={isSwitchRow && value ? 'brand' : 'default'} />
+            </View>
+          )}
 
           <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
             <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
@@ -715,6 +724,7 @@ function SettingsOptionRow({
 function HubSectionShell({
   title,
   icon,
+  onBack,
   children,
 }: {
   title: string;
@@ -1051,7 +1061,7 @@ function OperationsPanel({
         }}
       />
 
-      <Surface tone="raised" padding={3} gap={3} style={{ borderWidth: 1, borderColor: theme.brand + '22' }}>
+      <Box gap={3} paddingY={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <Box style={{ gap: 2, flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
             <Text role="label" tone="muted" align="start">
@@ -1084,9 +1094,11 @@ function OperationsPanel({
         <Text role="caption" tone="muted" align="start">
           UI_PREVIEW_ONLY · التنفيذ المحلي هنا. التسعير والتسويات مركزيًا في WLT/Finance.
         </Text>
-      </Surface>
+      </Box>
 
-      <Surface tone="raised" padding={3} gap={3}>
+      <Divider />
+
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">الظهور ونقاط الخدمة</Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
           <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} />
@@ -1112,10 +1124,12 @@ function OperationsPanel({
             </Box>
           ))}
         </Box>
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* 4) Flat Operational Modes Row List with inline expansion */}
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">
           أوضاع الخدمة
         </Text>
@@ -1190,10 +1204,12 @@ function OperationsPanel({
             );
           })}
         </Box>
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* 5) Flat Team Section with inline expansion */}
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
             <Text role="bodyStrong" align="start">الفريق</Text>
@@ -1345,10 +1361,12 @@ function OperationsPanel({
             </Box>
           </Box>
         )}
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* 6) Flat Coverage Zones Section with inline expansion */}
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
             <Text role="bodyStrong" align="start">مناطق التغطية</Text>
@@ -1461,7 +1479,7 @@ function OperationsPanel({
             </Box>
           </Box>
         )}
-      </Surface>
+      </Box>
 
       <MobileStickyPrimaryAction
         label="حفظ إعدادات العمليات"
@@ -1499,11 +1517,10 @@ function AnalyticsInsightMetric({ label, value, tone = 'default', icon }: { labe
   const accentColor = tone === 'brand' ? theme.brand : tone === 'success' ? theme.success : tone === 'info' ? theme.info : theme.lineStrong;
 
   return (
-    <Surface
-      tone="default"
+    <Box
       padding={3}
       gap={1}
-      style={{ flex: 1, minWidth: 140, borderWidth: 1, borderColor: accentColor }}
+      style={{ flex: 1, minWidth: 140, borderBottomWidth: 2, borderBottomColor: accentColor }}
     >
       <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
         <Icon name={icon} size={14} tone={tone} />
@@ -1514,7 +1531,7 @@ function AnalyticsInsightMetric({ label, value, tone = 'default', icon }: { labe
       <Text role="titleSm" tone={tone} numberOfLines={1} align="start">
         {value}
       </Text>
-    </Surface>
+    </Box>
   );
 }
 
@@ -1526,17 +1543,19 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
   return (
     <Box gap={4}>
       {/* Summary headline */}
-      <Surface tone="raised" padding={3} gap={2}>
+      <Box gap={2} paddingY={2}>
         <Text role="label" tone="muted" align="start">
           ملخص الأداء — {storeName}
         </Text>
         <Text role="bodySm" tone="muted" align="start">
           مؤشرات موجزة للتفاعل والنمو. لا تتضمن بيانات عملاء تفصيلية.
         </Text>
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* Engagement metrics grid */}
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">مؤشرات التفاعل</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
@@ -1549,10 +1568,12 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           <AnalyticsInsightMetric label="متوسط التقييم" value={`${d.averageRating} ⭐`} tone="brand" icon="star" />
         </View>
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* Top products */}
-      <Surface tone="raised" padding={3} gap={3}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">أبرز المنتجات</Text>
         <KeyValueList
           dense
@@ -1562,14 +1583,15 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
             { label: 'الأعلى مشاهدة', value: `${d.topViewedProduct.name} (${d.topViewedProduct.viewsCount} مشاهدة)`, tone: 'info' },
           ]}
         />
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* Opportunity spotlight */}
-      <Surface
-        tone="inset"
+      <Box
         padding={3}
         gap={2}
-        style={{ borderWidth: 1.5, borderColor: theme.warning + '66' }}
+        style={{ backgroundColor: theme.warning + '11', borderRadius: 12 }}
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
           <Icon name="bulb-outline" size={18} tone="warning" />
@@ -1586,14 +1608,15 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
             { label: 'الطلبات الفعلية', value: String(d.opportunityProduct.ordersCount), tone: 'warning' },
           ]}
         />
-      </Surface>
+      </Box>
+
+      <Divider />
 
       {/* Smart recommendation */}
-      <Surface
-        tone="raised"
+      <Box
         padding={3}
         gap={2}
-        style={{ borderWidth: 1.5, borderColor: theme.brand + '55' }}
+        style={{ backgroundColor: theme.brand + '11', borderRadius: 12 }}
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
           <Icon name="trending-up-outline" size={18} tone="brand" />
@@ -1606,7 +1629,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           fullWidth={false}
           onPress={() => {/* promotion intent — UI only, no backend */}}
         />
-      </Surface>
+      </Box>
 
       {/* Promotion intent panel below */}
       <PromotionIntentPanel
@@ -1667,6 +1690,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   } = useAppPartnerAppearance();
   const [internalSection, setInternalSection] = React.useState<PartnerHubSection>('hub');
   const [notificationPreferences, setNotificationPreferences] = React.useState<NotificationPreferenceState>(defaultNotificationPreferences);
+  const [showAdvancedNotifications, setShowAdvancedNotifications] = React.useState<boolean>(false);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
   const activeCanonicalStore = React.useMemo(() => {
@@ -1804,7 +1828,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     }
 
     if (activeSection === 'settings') {
-      const notificationSettingRows = [
+      const primaryNotificationRows = [
         {
           id: 'orders' as const,
           title: 'تنبيهات الطلبات',
@@ -1833,6 +1857,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           icon: 'wallet-outline' as const,
           value: notificationPreferences.finance,
         },
+      ];
+
+      const secondaryNotificationRows = [
         {
           id: 'marketing' as const,
           title: 'التسويق والنمو',
@@ -1870,84 +1897,146 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
         },
       ];
 
-      const settingsActionRows = [
-        {
-          id: 'order-alerts',
-          title: 'فتح تنبيهات الطلب',
-          subtitle: 'الانتقال إلى نفس مسار تنبيهات الطلب المرتبط مباشرةً بلوحة الطلبات.',
-          icon: 'notifications-outline' as const,
-          onPress: openOrderAlerts,
-        },
-        {
-          id: 'branch-scope',
-          title: 'اختيار الفرع',
-          subtitle: 'مراجعة النطاق والفرع المرتبطين بالإشعارات والتشغيل.',
-          icon: 'git-branch-outline' as const,
-          onPress: onOpenStoreScope,
-        },
-        {
-          id: 'operations-directory',
-          title: 'دليل العمليات',
-          subtitle: 'الوصول إلى المسارات التشغيلية المرتبطة بالمشكلات والتنفيذ من نفس مساحة الإعدادات.',
-          icon: 'headset-outline' as const,
-          onPress: openOperationsDirectory,
-        },
-      ];
+      const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
       return (
         <HubSectionShell title={sectionCopy.settings.title} description={sectionCopy.settings.description} icon={sectionCopy.settings.icon} onBack={() => updateSection('hub')}>
           <Box gap={4}>
-            <Surface tone="raised" padding={3} gap={3}>
-              <Text role="label" tone="muted">
-                المظهر
-              </Text>
-              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-                {appearanceHydrated
-                  ? 'يتم حفظ اختيار المظهر محليًا واستعادته عند فتح مساحة الشريك.'
-                  : 'جارٍ استعادة اختيار المظهر المحفوظ...'}
-              </Text>
-              <Box gap={3}>
-                {partnerAppearanceOptions.map((option) => (
-                  <AppearanceOptionCard
-                    key={option.mode}
-                    title={option.title}
-                    description={option.description}
-                    mode={option.mode}
-                    modeLabel={option.mode === 'lightPremium' ? 'Light Premium' : 'Dark Glass'}
-                    statusLabel={appearanceMode === option.mode ? 'مفعّل الآن' : 'اضغط للتفعيل'}
-                    selected={appearanceMode === option.mode}
-                    onPress={() => setAppearanceMode(option.mode)}
-                  />
-                ))}
-              </Box>
-            </Surface>
+            {/* Appearance Section */}
+            <Box padding={0} gap={0}>
+              <View
+                style={{
+                  flexDirection: rowDirection,
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                  backgroundColor: theme.surface,
+                }}
+              >
+                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+                  <View
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 10,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: theme.surfaceInset,
+                      borderWidth: 1,
+                      borderColor: theme.line,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Icon name="color-palette-outline" size={17} tone="default" />
+                  </View>
+                  <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                    <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
+                      المظهر
+                    </Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
+                      فاتح أبيض أو داكن زجاجي
+                  </Text>
+                  </View>
+                </View>
 
-            <Surface tone="raised" padding={3} gap={3}>
-              <Text role="label" tone="muted">
+                <View
+                  style={{
+                    flexDirection: rowDirection,
+                    backgroundColor: theme.surfaceInset,
+                    borderRadius: 12,
+                    padding: 3,
+                    borderWidth: 1,
+                    borderColor: theme.line,
+                    gap: 4,
+                  }}
+                >
+                  <Pressable
+                    onPress={() => setAppearanceMode('lightPremium')}
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 9,
+                      backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
+                    }}
+                  >
+                    <Text
+                      role="bodyStrong"
+                      style={{
+                        fontSize: 12,
+                        color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text,
+                      }}
+                    >
+                      فاتح
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setAppearanceMode('darkGlass')}
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 9,
+                      backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
+                    }}
+                  >
+                    <Text
+                      role="bodyStrong"
+                      style={{
+                        fontSize: 12,
+                        color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text,
+                      }}
+                    >
+                      داكن
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Box>
+
+            <Divider />
+
+            {/* Current Preferences */}
+            <Box padding={0} gap={0}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
                 التفضيلات الحالية
               </Text>
-              <KeyValueList
-                dense
-                items={[
-                  { label: 'القنوات المفعّلة', value: `${enabledNotificationChannelsCount}/6`, tone: 'brand' },
-                  { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: notificationPreferences.priorityOnly ? 'warning' : 'success' },
-                  { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: notificationPreferences.sound ? 'success' : 'warning' },
-                  { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: notificationPreferences.dailyDigest ? 'info' : 'default' },
-                  { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: listingEnabled ? 'success' : 'warning' },
-                  { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
-                  { label: 'ساعات العمل', value: todayHoursLabel },
-                ]}
-              />
-            </Surface>
+              {[
+                { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: (notificationPreferences.priorityOnly ? 'warning' : 'success') as const },
+                { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.sound ? 'success' : 'warning') as const },
+                { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.dailyDigest ? 'info' : 'default') as const },
+                { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: (listingEnabled ? 'success' : 'warning') as const },
+                { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: (storeOpen ? 'success' : 'warning') as const },
+                { label: 'ساعات العمل', value: todayHoursLabel, tone: 'default' as const },
+              ].map((item, index, arr) => (
+                <View
+                  key={item.label}
+                  style={{
+                    flexDirection: rowDirection,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    backgroundColor: theme.surface,
+                    borderBottomWidth: index === arr.length - 1 ? 0 : 1,
+                    borderBottomColor: theme.line,
+                  }}
+                >
+                  <Text role="body" style={{ color: theme.text }}>
+                    {item.label}
+                  </Text>
+                  <Chip label={item.value} tone={item.tone} />
+                </View>
+              ))}
+            </Box>
 
-            <Surface tone="raised" padding={0} gap={0}>
-              <Text role="label" tone="muted">
+            <Divider />
+
+            {/* Notification Preferences */}
+            <Box padding={0} gap={0}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
                 إعدادات الإشعارات
               </Text>
-              <Text role="caption" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8, paddingTop: 8 }}>
-                كل سطر يضبط نوعًا واحدًا من التنبيهات دون إنشاء شاشة إعدادات ثانية أو نظام محلي منفصل.
-              </Text>
-              {notificationSettingRows.map((item, index) => (
+              {primaryNotificationRows.map((item) => (
                 <SettingsOptionRow
                   key={item.id}
                   title={item.title}
@@ -1955,30 +2044,106 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   icon={item.icon}
                   value={item.value}
                   onValueChange={(nextValue) => updateNotificationPreference(item.id, nextValue)}
-                  last={index === notificationSettingRows.length - 1}
+                  compact={true}
+                  last={false}
                 />
               ))}
-            </Surface>
 
-            <Surface tone="raised" padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-                الوصول السريع
-              </Text>
-              <Text role="caption" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8, paddingTop: 8 }}>
-                كل الطرق التالية تعود إلى نفس الوجهة الموحدة بدل تكرار مركز إشعارات آخر داخل الحساب.
-              </Text>
-              {settingsActionRows.map((item, index) => (
+              <Pressable
+                onPress={() => setShowAdvancedNotifications(!showAdvancedNotifications)}
+                style={({ pressed }) => ({
+                  flexDirection: rowDirection,
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+                  borderBottomWidth: showAdvancedNotifications ? 1 : 0,
+                  borderBottomColor: theme.line,
+                })}
+              >
+                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 10, flexShrink: 1, minWidth: 0 }}>
+                  <Icon name="options-outline" size={18} tone="default" style={{ flexShrink: 0 }} />
+                  <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+                    <Text role="bodyStrong" style={{ color: theme.brand, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+                      إعدادات متقدمة
+                    </Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+                      إدارة إعدادات الصوت، الملخصات والتسويق
+                    </Text>
+                  </View>
+                </View>
+                <Icon name={showAdvancedNotifications ? "chevron-down-outline" : "chevron-forward-outline"} mirrored tone="muted" size={18} />
+              </Pressable>
+
+              {showAdvancedNotifications && secondaryNotificationRows.map((item, index, arr) => (
                 <SettingsOptionRow
                   key={item.id}
                   title={item.title}
                   subtitle={item.subtitle}
                   icon={item.icon}
-                  onPress={item.onPress}
-                  disabled={typeof item.onPress !== 'function'}
-                  last={index === settingsActionRows.length - 1}
+                  value={item.value}
+                  onValueChange={(nextValue) => updateNotificationPreference(item.id, nextValue)}
+                  compact={true}
+                  last={index === arr.length - 1}
                 />
               ))}
-            </Surface>
+            </Box>
+
+            <Divider />
+
+            {/* Quick Access */}
+            <Box padding={0} gap={0}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+                الوصول السريع
+              </Text>
+              {[
+                {
+                  id: 'order-alerts',
+                  title: 'فتح تنبيهات الطلب',
+                  icon: 'notifications-outline' as const,
+                  onPress: openOrderAlerts,
+                },
+                {
+                  id: 'branch-scope',
+                  title: 'اختيار الفرع',
+                  icon: 'git-branch-outline' as const,
+                  onPress: onOpenStoreScope,
+                },
+                {
+                  id: 'operations-directory',
+                  title: 'دليل العمليات',
+                  icon: 'headset-outline' as const,
+                  onPress: openOperationsDirectory,
+                },
+              ].map((item, index, arr) => (
+                <Pressable
+                  key={item.id}
+                  onPress={item.onPress}
+                  style={({ pressed }) => ({
+                    flexDirection: rowDirection,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+                    borderBottomWidth: index === arr.length - 1 ? 0 : 1,
+                    borderBottomColor: theme.line,
+                  })}
+                >
+                  <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 10, flexShrink: 1, minWidth: 0 }}>
+                    <Icon name={item.icon} size={18} tone="default" style={{ flexShrink: 0 }} />
+                    <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+                      {item.title}
+                    </Text>
+                  </View>
+                  <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
+                </Pressable>
+              ))}
+            </Box>
+
+            {/* Safe area spacer for bottom navigation */}
+            <View style={{ height: 140 }} />
           </Box>
         </HubSectionShell>
       );
@@ -2085,7 +2250,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
         <Box padding={4} gap={4}>
           {/* 1) Wallet Balance Block */}
-          <Surface tone="raised" padding={3} gap={2}>
+          <Box gap={2} paddingY={2}>
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                 <Text role="caption" tone="muted">رصيد المتجر الحالي</Text>
@@ -2098,7 +2263,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                 onPress={() => updateSection('wallet')}
               />
             </View>
-          </Surface>
+          </Box>
+
+          <Divider />
           {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
           <View style={{ gap: 8 }}>
             {activeHubNavigationItems.map((item) => (
