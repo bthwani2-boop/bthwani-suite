@@ -46,8 +46,8 @@ import type {
   DshClientServiceabilityQuote,
   DshClientWalletImpactVisibility,
   DshFulfillmentDeliveryMode,
-  getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
+import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
@@ -1253,7 +1253,7 @@ function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smar
   return (
     <Surface tone="raised" radiusToken="xl" gap={3} padding={3}>
       <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
-        <Box gap={0.5} style={{ alignItems: 'flex-end', flex: 1 }}>
+        <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
           <Badge label="متابعة ذكية" tone="brand" />
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>
             {phase === 'received' ? 'تم التسليم بنجاح' : 'متابعة حالة الطلب'}
@@ -1823,7 +1823,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
           </Box>
 
           {isBthwaniDelivery && hasAlertedCaptain && !hasClientReceived && (
-            <Box layoutDirection="row-reverse" align="center" gap={2} style={{ marginTop: 4 }}>
+            <Box layoutDirection="row" align="center" gap={2} style={{ marginTop: 4 }}>
               <Icon name="checkmark-circle-outline" size={16} color={theme.success} />
               <Text role="bodySm" style={{ color: theme.success, textAlign: 'right' }}>
                 أرسلنا تنبيهًا للكابتن داخل هذا الطلب.
@@ -1982,7 +1982,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
                       borderColor: theme.success,
                     }}
                   >
-                    <Box layoutDirection="row-reverse" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                    <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
                       <Icon name="checkmark-circle-outline" size={20} color={theme.success} />
                       <Text role="bodySm" style={{ color: theme.success, fontWeight: '600' }}>
                         تم إرفاق صورة الإثبات بنجاح ({supportAttachment})

@@ -240,7 +240,7 @@ function FinancialStreamCard({
 
       {/* التفاصيل المنسدلة داخل نفس البطاقة */}
       {isExpanded ? (
-        <Box paddingVertical={2} gap={2}>
+        <Box paddingY={2} gap={2}>
           <Divider />
           <KeyValueList dense items={detailItems} />
           {item.previewNoticeLabel ? (
@@ -525,7 +525,7 @@ function CommissionModeCard({
 
       {/* التفاصيل */}
       {isExpanded ? (
-        <Box paddingVertical={2} gap={3}>
+        <Box paddingY={2} gap={3}>
           <Divider />
           <KeyValueList
             dense

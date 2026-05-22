@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Switch as RNSwitch, View, Share, BackHandler } from 'react-native';
 import {
   AppearanceOptionCard,
+  Badge,
   Box,
   Button,
   Chip,
@@ -56,20 +57,6 @@ type PartnerOperationalMode = {
   enabled: boolean;
 };
 
-type PartnerTeamMember = {
-  id: string;
-  name: string;
-  roleLabel: 'مشرف' | 'موظف' | 'موصل';
-  subtitle: string;
-};
-
-type PartnerCoverageZone = {
-  id: string;
-  name: string;
-  subtitle: string;
-  active: boolean;
-};
-
 type HubNavigationItem = {
   id: string;
   title: string;
@@ -98,22 +85,222 @@ type NotificationPreferenceId =
 
 type NotificationPreferenceState = Record<NotificationPreferenceId, boolean>;
 
+type PartnerTeamRole = 'owner' | 'supervisor' | 'staff' | 'courier';
+
+type PartnerTeamStatus = 'active' | 'paused' | 'invited' | 'blocked' | 'review-needed';
+
+type PartnerTeamMember = {
+  id: string;
+  name: string;
+  role: PartnerTeamRole;
+  roleLabel: 'مالك' | 'مشرف' | 'موظف' | 'موصل';
+  status: PartnerTeamStatus;
+  statusLabel: 'نشط' | 'موقوف' | 'مدعو' | 'محظور' | 'قيد المراجعة';
+  branchAssignment: string;
+  permissionsSummary: string;
+  deliveryAssignment: string;
+  inviteLifecycle: string;
+  operationalImpact: string;
+  auditNote: string;
+  inlineActionLabel: string;
+};
+
+type PartnerCoverageZoneStatus = 'active' | 'pending' | 'blocked';
+
+type PartnerCoverageZone = {
+  id: string;
+  name: string;
+  status: PartnerCoverageZoneStatus;
+  statusLabel: 'نشطة' | 'قيد المراجعة' | 'محجوبة';
+  branchRelation: string;
+  serviceModeRelation: string;
+  policySummary: string;
+  policyReason: string;
+  operationalImpact: string;
+  pricingReference: string;
+  commissionReference: string;
+  payoutReference: string;
+  reviewActionLabel: string;
+  auditNote: string;
+};
+
+const partnerTeamPreviewMembers: readonly PartnerTeamMember[] = [
+  {
+    id: 'owner',
+    name: 'خالد',
+    role: 'owner',
+    roleLabel: 'مالك',
+    status: 'active',
+    statusLabel: 'نشط',
+    branchAssignment: 'الفرع الحالي',
+    permissionsSummary: 'صلاحيات كاملة على الفرع والفريق والاعتماد النهائي.',
+    deliveryAssignment: 'لا يوجد',
+    inviteLifecycle: 'اعتماد مالك مباشر',
+    operationalImpact: 'لا يُعطَّل محليًا في هذا السطح.',
+    auditNote: 'UI_PREVIEW_ONLY · CONTRACT_TBD · مالك الفرع ظاهر محليًا فقط.',
+    inlineActionLabel: 'عرض الدور',
+  },
+  {
+    id: 'supervisor',
+    name: 'سارة',
+    role: 'supervisor',
+    roleLabel: 'مشرف',
+    status: 'active',
+    statusLabel: 'نشط',
+    branchAssignment: 'إسناد الفرع الحالي',
+    permissionsSummary: 'إدارة الطلبات والورديات وإشراف الفريق.',
+    deliveryAssignment: 'إشراف على التوصيل عند الحاجة',
+    inviteLifecycle: 'مفعل ويعمل الآن',
+    operationalImpact: 'تعطيله يوقف المتابعة التشغيلية للفرع.',
+    auditNote: 'UI_PREVIEW_ONLY · هذا المشرف هو مرجع الحظر الأخير في هذا العرض.',
+    inlineActionLabel: 'تعطيل',
+  },
+  {
+    id: 'staff-paused',
+    name: 'مروان',
+    role: 'staff',
+    roleLabel: 'موظف',
+    status: 'paused',
+    statusLabel: 'موقوف',
+    branchAssignment: 'فرع الدعم / الوردية السابقة',
+    permissionsSummary: 'التجهيز والطلبات والتحديثات التشغيلية الخفيفة.',
+    deliveryAssignment: 'لا يوجد',
+    inviteLifecycle: 'موقوف مؤقتًا بعد مراجعة داخلية',
+    operationalImpact: 'إعادة التفعيل تعيد الوصول إلى تنفيذ الطلبات.',
+    auditNote: 'CONTRACT_TBD · إعادة التفعيل تحتاج ربطًا مركزيًا لاحقًا.',
+    inlineActionLabel: 'إعادة تفعيل',
+  },
+  {
+    id: 'courier-invited',
+    name: 'عمر',
+    role: 'courier',
+    roleLabel: 'موصل',
+    status: 'invited',
+    statusLabel: 'مدعو',
+    branchAssignment: 'نطاق التوصيل الخاص بالفرع',
+    permissionsSummary: 'تسليم فقط ضمن أوضاع التوصيل الداخلي.',
+    deliveryAssignment: 'مرتبط بتوصيل المتجر',
+    inviteLifecycle: 'الدعوة مرسلة وتنتظر القبول',
+    operationalImpact: 'قبوله يفتح الإسناد الداخلي للتوصيل.',
+    auditNote: 'UI_PREVIEW_ONLY · دعوة الموصل هنا محلية حتى تتصل الصلاحيات.',
+    inlineActionLabel: 'إعادة إرسال الدعوة',
+  },
+  {
+    id: 'staff-review',
+    name: 'رهف',
+    role: 'staff',
+    roleLabel: 'موظف',
+    status: 'review-needed',
+    statusLabel: 'قيد المراجعة',
+    branchAssignment: 'الفرع الحالي',
+    permissionsSummary: 'صلاحيات مقترحة بانتظار مراجعة تشغيلية.',
+    deliveryAssignment: 'لا يوجد',
+    inviteLifecycle: 'بانتظار اعتماد الصلاحيات',
+    operationalImpact: 'لا يظهر في المسار التشغيلي الكامل قبل الاعتماد.',
+    auditNote: 'CONTRACT_TBD · حالة المراجعة تحتاج ربطًا مركزيًا.',
+    inlineActionLabel: 'طلب مراجعة',
+  },
+  {
+    id: 'courier-blocked',
+    name: 'فهد',
+    role: 'courier',
+    roleLabel: 'موصل',
+    status: 'blocked',
+    statusLabel: 'محظور',
+    branchAssignment: 'موقوف حتى رفع الحظر المركزي',
+    permissionsSummary: 'تسليم فقط مع قفل تشغيلي حتى المراجعة.',
+    deliveryAssignment: 'موقوف عن الإسناد',
+    inviteLifecycle: 'محجوب بقرار مركزي',
+    operationalImpact: 'الحظر يمنع إسناد الطلبات لهذا الموصل.',
+    auditNote: 'UI_PREVIEW_ONLY · لا يمكن تغيير هذا الحظر داخل الشريك.',
+    inlineActionLabel: 'إعادة تفعيل',
+  },
+] as const;
+
+const partnerCoveragePreviewZones: readonly PartnerCoverageZone[] = [
+  {
+    id: 'yasmin',
+    name: 'الياسمين',
+    status: 'active',
+    statusLabel: 'نشطة',
+    branchRelation: 'مرتبطة بالفرع الحالي',
+    serviceModeRelation: 'توصيل المتجر + استلام بنفسك',
+    policySummary: 'المنطقة تحت سياسة geofence مركزية وتقبل الطلبات ضمن القواعد الحالية.',
+    policyReason: 'لا يوجد تعارض حالي مع سياسة التغطية أو السعة.',
+    operationalImpact: 'تخدم الطلبات مباشرة ولا تحتاج تدخلًا تشغيليًا إضافيًا.',
+    pricingReference: 'WLT/Finance',
+    commissionReference: 'Control Panel',
+    payoutReference: 'WLT/Finance',
+    reviewActionLabel: 'طلب مراجعة',
+    auditNote: 'UI_PREVIEW_ONLY · التفعيل هنا مرئي فقط حتى يثبت الارتباط المركزي.',
+  },
+  {
+    id: 'nada',
+    name: 'الندى',
+    status: 'pending',
+    statusLabel: 'قيد المراجعة',
+    branchRelation: 'مرتبطة بفرع الندى على مستوى النطاق',
+    serviceModeRelation: 'توصيل المتجر بانتظار الاعتماد',
+    policySummary: 'المنطقة تحتاج مراجعة geofence قبل الفتح الكامل.',
+    policyReason: 'الضبط المركزي لم يثبت بعد لهذه الحدود.',
+    operationalImpact: 'تبقى الطلبات محدودة حتى اعتماد السياسة.',
+    pricingReference: 'WLT/Finance',
+    commissionReference: 'Control Panel',
+    payoutReference: 'WLT/Finance',
+    reviewActionLabel: 'طلب مراجعة',
+    auditNote: 'CONTRACT_TBD · الشريك يطلب المراجعة ولا يغيّر السياسة محليًا.',
+  },
+  {
+    id: 'yarmouk',
+    name: 'اليرموك',
+    status: 'blocked',
+    statusLabel: 'محجوبة',
+    branchRelation: 'فرع مساند فقط بعد رفع الحظر',
+    serviceModeRelation: 'توصيل بثواني مؤجل حتى الاعتماد',
+    policySummary: 'المنطقة محجوبة وفق السياسة المركزية الحالية.',
+    policyReason: 'سعة أو جغرافيا أو قرار تشغيلي يمنع الفتح الآن.',
+    operationalImpact: 'لا تظهر للعميل حتى يرفع Control Panel الحظر.',
+    pricingReference: 'Control Panel + WLT/Finance',
+    commissionReference: 'WLT/Finance',
+    payoutReference: 'WLT/Finance',
+    reviewActionLabel: 'طلب مراجعة',
+    auditNote: 'UI_PREVIEW_ONLY · لا يوجد تجاوز محلي لهذا القرار.',
+  },
+] as const;
+
+function resolveTeamStatusTone(status: PartnerTeamStatus): 'success' | 'warning' | 'info' | 'danger' {
+  if (status === 'active') return 'success';
+  if (status === 'paused') return 'warning';
+  if (status === 'invited') return 'info';
+  if (status === 'review-needed') return 'warning';
+  return 'danger';
+}
+
+function resolveTeamRoleTone(role: PartnerTeamRole): 'brand' | 'info' | 'success' | 'default' {
+  if (role === 'owner') return 'brand';
+  if (role === 'supervisor') return 'info';
+  if (role === 'courier') return 'success';
+  return 'default';
+}
+
+function resolveZoneStatusTone(status: PartnerCoverageZoneStatus): 'success' | 'warning' | 'danger' {
+  if (status === 'active') return 'success';
+  if (status === 'pending') return 'warning';
+  return 'danger';
+}
+
+function resolveMemberActionLabel(member: PartnerTeamMember): string {
+  if (member.status === 'active') return member.role === 'supervisor' ? 'تعطيل' : 'عرض الدور';
+  if (member.status === 'paused') return 'إعادة تفعيل';
+  if (member.status === 'invited') return 'إعادة إرسال الدعوة';
+  if (member.status === 'blocked') return 'طلب مراجعة';
+  return 'إرسال للمراجعة';
+}
+
 const defaultOperationalModes: readonly PartnerOperationalMode[] = [
   { id: 'pickup', title: 'استلم بنفسك', subtitle: 'استلام من الفرع مباشرة.', commission: getWltDshPartnerOperationalModeCommission('pickup'), enabled: true },
   { id: 'partner_delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية بموصل الشريك.', commission: getWltDshPartnerOperationalModeCommission('partner_delivery'), enabled: true },
   { id: 'bthwani_delivery', title: 'توصيل بثواني', subtitle: 'توصيل عبر كابتن بثواني.', commission: getWltDshPartnerOperationalModeCommission('bthwani_delivery'), enabled: false },
-] as const;
-
-const defaultTeamMembers: readonly PartnerTeamMember[] = [
-  { id: 'manager', name: 'خالد', roleLabel: 'مشرف', subtitle: 'مشرف الفرع الحالي' },
-  { id: 'staff-1', name: 'سارة', roleLabel: 'موظف', subtitle: 'إدارة الطلبات والردود' },
-  { id: 'staff-2', name: 'مروان', roleLabel: 'موظف', subtitle: 'التجهيز والكتالوج' },
-  { id: 'rider-1', name: 'عمر', roleLabel: 'موصل', subtitle: 'التسليم والحركة' },
-] as const;
-
-const defaultCoverageZones: readonly PartnerCoverageZone[] = [
-  { id: 'yasmin', name: 'الياسمين', subtitle: 'نطاق رئيسي عالي الجاهزية.', active: true },
-  { id: 'nada', name: 'الندى', subtitle: 'نطاق قريب مع طلب ثابت.', active: true },
 ] as const;
 
 const partnerHubBottomInset = 144;
@@ -763,10 +950,10 @@ function OperationsModeRow({
           </View>
 
           <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
+            <Text role="bodyStrong" align="start" numberOfLines={1}>
               {mode.title}
             </Text>
-            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} numberOfLines={1}>
+            <Text role="bodySm" tone="muted" align="start" numberOfLines={1}>
               {mode.subtitle}
             </Text>
           </View>
@@ -814,12 +1001,14 @@ function OperationsPanel({
 }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const teamMembers = partnerTeamPreviewMembers;
+  const coverageZones = partnerCoveragePreviewZones;
   const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
   const [modeOverrides, setModeOverrides] = React.useState<Partial<Record<PartnerOperationalMode['id'], boolean>>>({});
   const [teamPanelOpen, setTeamPanelOpen] = React.useState(false);
   const [coveragePanelOpen, setCoveragePanelOpen] = React.useState(false);
-  const [selectedMemberId, setSelectedMemberId] = React.useState<string>('');
-  const [selectedZoneId, setSelectedZoneId] = React.useState<string>('');
+  const [selectedMemberId, setSelectedMemberId] = React.useState<string>(teamMembers.find((member) => member.role === 'supervisor')?.id ?? teamMembers[0]?.id ?? '');
+  const [selectedZoneId, setSelectedZoneId] = React.useState<string>(coverageZones.find((zone) => zone.status === 'active')?.id ?? coverageZones[0]?.id ?? '');
   const [inviteDraft, setInviteDraft] = React.useState('');
   const [lastSaveLabel, setLastSaveLabel] = React.useState<string | null>(null);
 
@@ -833,6 +1022,18 @@ function OperationsPanel({
   );
 
   const activeModesCount = resolvedModes.filter((mode) => mode.enabled).length;
+      const activeSupervisorCount = teamMembers.filter((member) => member.role === 'supervisor' && member.status === 'active').length;
+      const activeTeamCount = teamMembers.filter((member) => member.status === 'active').length;
+      const pausedTeamCount = teamMembers.filter((member) => member.status === 'paused').length;
+      const invitedTeamCount = teamMembers.filter((member) => member.status === 'invited').length;
+      const blockedTeamCount = teamMembers.filter((member) => member.status === 'blocked').length;
+      const reviewTeamCount = teamMembers.filter((member) => member.status === 'review-needed').length;
+      const activeZoneCount = coverageZones.filter((zone) => zone.status === 'active').length;
+      const pendingZoneCount = coverageZones.filter((zone) => zone.status === 'pending').length;
+      const blockedZoneCount = coverageZones.filter((zone) => zone.status === 'blocked').length;
+      const teamRoleSummary = `مالك ${teamMembers.filter((member) => member.role === 'owner').length} · مشرف ${teamMembers.filter((member) => member.role === 'supervisor').length} · موظف ${teamMembers.filter((member) => member.role === 'staff').length} · موصل ${teamMembers.filter((member) => member.role === 'courier').length}`;
+      const teamStatusSummary = `نشط ${activeTeamCount} · موقوف ${pausedTeamCount} · مدعو ${invitedTeamCount} · محظور ${blockedTeamCount} · قيد المراجعة ${reviewTeamCount}`;
+      const zoneStatusSummary = `نشطة ${activeZoneCount} · قيد المراجعة ${pendingZoneCount} · محجوبة ${blockedZoneCount}`;
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 160 }}>
@@ -850,93 +1051,72 @@ function OperationsPanel({
         }}
       />
 
-      {/* 1) Flat Header & Status Indicator Chips */}
-      <Box gap={2} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>
-          حالة التشغيل الآن
-        </Text>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Chip label={`حالة المتجر: ${storeOpen ? 'مفتوح' : 'مغلق'}`} tone={storeOpen ? 'success' : 'warning'} selected />
-          <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="default" selected />
-          <Chip label={`أوضاع نشطة: ${activeModesCount}/3`} tone={activeModesCount > 0 ? 'brand' : 'warning'} selected />
-          <Chip label="مناطق التغطية: منطقتان" tone="default" selected />
+      <Surface tone="raised" padding={3} gap={3} style={{ borderWidth: 1, borderColor: theme.brand + '22' }}>
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <Box style={{ gap: 2, flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
+            <Text role="label" tone="muted" align="start">
+              الحالة التشغيلية
+            </Text>
+            <Text role="titleSm" align="start">
+              {storeName}
+            </Text>
+            <Text role="bodySm" tone="muted" align="start">
+              {branchLabel} · {cityLabel}
+            </Text>
+          </Box>
+          <Badge label={storeOpen ? 'مفتوح الآن' : 'مغلق الآن'} tone={storeOpen ? 'success' : 'warning'} />
         </Box>
-      </Box>
 
-      <Divider />
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <SummaryCell label="الحالة" value={storeOpen ? 'مفتوح' : 'مغلق'} tone={storeOpen ? 'success' : 'warning'} />
+          <SummaryCell label="الظهور" value={visibilityLabel} tone={listingEnabled ? 'brand' : 'warning'} />
+          <SummaryCell label="الأوضاع" value={`${activeModesCount}/3`} tone={activeModesCount > 0 ? 'info' : 'warning'} />
+        </Box>
 
-      {/* 2) Flat Visibility and Coverage Zones (Read-Only) */}
-      <Box gap={3} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>الظهور ونقاط الخدمة</Text>
-        <KeyValueList
-          dense
-          items={[
-            { label: 'الظهور في القائمة', value: visibilityLabel, tone: listingEnabled ? 'success' : 'warning' },
-            { label: 'النطاق الحالي', value: branchLabel },
-            { label: 'المنطقة', value: activeZoneLabel },
-            {
-              label: 'المعروض للعملاء',
-              value: storeVisibility.visible ? 'ظاهر للعميل' : 'محجوب عن العميل',
-              tone: storeVisibility.visible ? 'success' : 'warning',
-            },
-            {
-              label: 'حالة التفعيل',
-              value: getDshPartnerActivationStatusLabel(storeVisibility.activationStatus),
-              tone: storeVisibility.visible ? 'success' : 'warning',
-            },
-          ]}
-        />
-        <Box gap={2} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-          <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>تدقيق شروط الظهور</Text>
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="default" selected />
+          <Chip label={`التغطية: ${zoneStatusSummary}`} tone="default" selected />
+          {onOpenStoreCourierSetup ? (
+            <Button label="إعداد موصل المتجر" tone="brand" size="sm" fullWidth={false} onPress={onOpenStoreCourierSetup} />
+          ) : null}
+        </Box>
+
+        <Text role="caption" tone="muted" align="start">
+          UI_PREVIEW_ONLY · التنفيذ المحلي هنا. التسعير والتسويات مركزيًا في WLT/Finance.
+        </Text>
+      </Surface>
+
+      <Surface tone="raised" padding={3} gap={3}>
+        <Text role="bodyStrong" align="start">الظهور ونقاط الخدمة</Text>
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} />
+          <Chip label={`النطاق: ${branchLabel}`} tone="default" />
+          <Chip label={`المنطقة: ${activeZoneLabel}`} tone="default" />
+          <Chip label={`للعملاء: ${storeVisibility.visible ? 'ظاهر' : 'محجوب'}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
+          <Chip label={`الحالة: ${getDshPartnerActivationStatusLabel(storeVisibility.activationStatus)}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
+        </Box>
+
+        <Box gap={1} style={{ marginTop: 4 }}>
           {storeVisibility.checklist.map((check) => (
-            <Box key={check.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '11', paddingVertical: 6 }}>
-              <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
-                <Icon
-                  name={check.satisfied ? 'checkmark-circle-outline' : 'close-circle-outline'}
-                  size={16}
-                  tone={check.satisfied ? 'success' : 'danger'}
-                />
-                <Text
-                  role="bodySm"
-                  tone={check.satisfied ? 'default' : 'danger'}
-                  align={direction === 'rtl' ? 'right' : 'left'}
-                  style={{ flex: 1 }}
-                >
-                  {check.label}
-                </Text>
-                {check.satisfied ? (
-                  <Chip label="مكتمل" tone="success" size="sm" />
-                ) : (
-                  <Chip label="غير مكتمل" tone="danger" size="sm" />
-                )}
-              </Box>
-              {!check.satisfied && check.blockedReason ? (
-                <Box style={{ marginStart: direction === 'rtl' ? 0 : 24, marginEnd: direction === 'rtl' ? 24 : 0, marginTop: 2 }}>
-                  <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
-                    {check.blockedReason}
-                  </Text>
-                </Box>
-              ) : null}
+            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+              <Icon
+                name={check.satisfied ? 'checkmark-circle-outline' : 'close-circle-outline'}
+                size={16}
+                tone={check.satisfied ? 'success' : 'danger'}
+              />
+              <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'} align="start" style={{ flex: 1 }}>
+                {check.label}
+                {!check.satisfied && check.blockedReason ? ` — ${check.blockedReason}` : ''}
+              </Text>
+              <Badge label={check.satisfied ? 'مكتمل' : 'غير مكتمل'} tone={check.satisfied ? 'success' : 'danger'} />
             </Box>
           ))}
         </Box>
-      </Box>
-
-      <Divider />
-
-      {/* 3) Flat Partnership operational boundaries notice */}
-      <Box paddingVertical={1} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
-        <Icon name="information-circle-outline" size={14} tone="muted" />
-        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
-          التنفيذ المحلي للطلبات والفريق يتم هنا. أي تسعير أو عمولات أو تسويات مرجعها مركزيًا هو WLT/Finance/Control Panel.
-        </Text>
-      </Box>
-
-      <Divider />
+      </Surface>
 
       {/* 4) Flat Operational Modes Row List with inline expansion */}
-      <Box gap={2} paddingVertical={2}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>
+      <Surface tone="raised" padding={3} gap={3}>
+        <Text role="bodyStrong" align="start">
           أوضاع الخدمة
         </Text>
         <Box gap={0}>
@@ -960,23 +1140,25 @@ function OperationsPanel({
                       size={18}
                       tone={isSelected ? 'brand' : 'default'}
                     />
-                    <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-                      <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{mode.title}</Text>
-                      <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>{mode.subtitle}</Text>
+                    <Box style={{ gap: 2, alignItems: 'flex-start', flex: 1 }}>
+                      <Text role="bodyStrong" align="start">{mode.title}</Text>
+                      <Text role="bodySm" tone="muted" align="start">{mode.subtitle}</Text>
                     </Box>
                   </Box>
-                  <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 8 }}>
-                    <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
-                    <Text role="caption" tone="muted">
-                      {getWltDshPartnerCommissionLabel(mode.commission)}
-                    </Text>
+                  <Box style={{ alignItems: 'center', flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, marginEnd: 8 }}>
+                    <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2 }}>
+                      <Badge label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
+                      <Text role="caption" tone="muted">
+                        {getWltDshPartnerCommissionLabel(mode.commission)}
+                      </Text>
+                    </Box>
+                    <Icon name={isSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={16} />
                   </Box>
-                  <Icon name={isSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={16} />
                 </Pressable>
 
                 {isSelected && (
                   <Box paddingHorizontal={4} paddingBottom={3} gap={2} style={{ paddingTop: 2 }}>
-                    <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
+                    <Text role="caption" tone="muted" align="start">
                       حالة الوضع: {mode.enabled ? 'نشط ويستقبل الطلبات' : 'موقف مؤقتًا'}.
                     </Text>
                     <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8 }}>
@@ -1008,16 +1190,14 @@ function OperationsPanel({
             );
           })}
         </Box>
-      </Box>
-
-      <Divider />
+      </Surface>
 
       {/* 5) Flat Team Section with inline expansion */}
-      <Box paddingVertical={2} gap={2}>
+      <Surface tone="raised" padding={3} gap={3}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>الفريق</Text>
-            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>مشرف 1 · موظف 3 · موصل 2</Text>
+          <Box style={{ gap: 2, alignItems: 'flex-start' }}>
+            <Text role="bodyStrong" align="start">الفريق</Text>
+            <Text role="caption" tone="muted" align="start">{teamRoleSummary} · {teamStatusSummary}</Text>
           </Box>
           <Button
             label={teamPanelOpen ? 'إخفاء الأعضاء' : 'إدارة الفريق'}
@@ -1028,17 +1208,29 @@ function OperationsPanel({
           />
         </Box>
 
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <SummaryCell label="نشط" value={String(activeTeamCount)} tone="success" />
+          <SummaryCell label="موقوف" value={String(pausedTeamCount)} tone="warning" />
+          <SummaryCell label="قيد المراجعة" value={String(reviewTeamCount)} tone="info" />
+        </Box>
+
         {teamPanelOpen && (
           <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-              <Chip label="مشرف" tone="brand" />
-              <Chip label="موظف" tone="info" />
-              <Chip label="موصل" tone="success" />
+            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+              <Icon name="information-circle-outline" size={14} tone="muted" />
+              <Text role="caption" tone="muted" align="start" style={{ flex: 1 }}>
+                UI_PREVIEW_ONLY · الأدوار والدعوات هنا محلية حتى يتصل Control Panel.
+              </Text>
             </Box>
 
             <Box gap={0}>
-              {defaultTeamMembers.map((member) => {
+              {teamMembers.map((member) => {
                 const isMemberSelected = selectedMemberId === member.id;
+                const roleTone = resolveTeamRoleTone(member.role);
+                const statusTone = resolveTeamStatusTone(member.status);
+                const memberActionLabel = resolveMemberActionLabel(member);
+                const isLastSupervisor = member.role === 'supervisor' && member.status === 'active' && activeSupervisorCount <= 1;
+
                 return (
                   <Box key={member.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
                     <Pressable
@@ -1050,19 +1242,72 @@ function OperationsPanel({
                         padding: 4,
                       })}
                     >
-                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-                        <Icon name="person-outline" size={16} tone="brand" />
-                        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{member.name}</Text>
+                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flexShrink: 1, minWidth: 0 }}>
+                        <Icon
+                          name={member.role === 'courier' ? 'bicycle-outline' : member.role === 'owner' ? 'shield-checkmark-outline' : member.role === 'supervisor' ? 'person-circle-outline' : 'person-outline'}
+                          size={16}
+                          tone={roleTone}
+                        />
+                        <Box style={{ gap: 2, flexShrink: 1, minWidth: 0 }}>
+                          <Text role="bodyStrong" align="start">{member.name}</Text>
+                          <Text role="caption" tone="muted" align="start">{member.branchAssignment}</Text>
+                        </Box>
                       </Box>
-                      <Chip label={member.roleLabel} tone={member.roleLabel === 'مشرف' ? 'brand' : member.roleLabel === 'موظف' ? 'info' : 'success'} />
+                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: 8 }}>
+                        <Badge label={member.roleLabel} tone={roleTone} />
+                        <Badge label={member.statusLabel} tone={statusTone} />
+                        <Text role="caption" tone="muted">{memberActionLabel}</Text>
+                      </Box>
                       <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
                     </Pressable>
 
                     {isMemberSelected && (
-                      <Box paddingHorizontal={4} paddingTop={2} gap={1}>
-                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
-                          {member.subtitle} · صلاحية {member.roleLabel}
+                      <Box paddingHorizontal={4} paddingTop={2} gap={2}>
+                        <KeyValueList
+                          dense
+                          items={[
+                            { label: 'الحالة', value: member.statusLabel, tone: statusTone },
+                            { label: 'تعيين الفرع', value: member.branchAssignment },
+                            { label: 'ملخص الصلاحيات', value: member.permissionsSummary },
+                            { label: 'إسناد التوصيل', value: member.deliveryAssignment },
+                            { label: 'دورة الدعوة', value: member.inviteLifecycle },
+                            { label: 'المراجعة/الأثر', value: member.operationalImpact },
+                          ]}
+                        />
+                        <Text role="bodySm" tone="muted" align="start">
+                          {member.auditNote}
                         </Text>
+                        {isLastSupervisor ? (
+                          <Text role="caption" tone="warning" align="start">
+                            لا يمكن تعطيل آخر مشرف.
+                          </Text>
+                        ) : null}
+                        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                          <Button
+                            label={memberActionLabel}
+                            tone={member.status === 'blocked' ? 'secondary' : 'brand'}
+                            size="sm"
+                            fullWidth={false}
+                            disabled={isLastSupervisor}
+                            onPress={() => {
+                              if (isLastSupervisor) {
+                                setLastSaveLabel('لا يمكن تعطيل آخر مشرف.');
+                                return;
+                              }
+
+                              setLastSaveLabel(`${memberActionLabel}: ${member.name}`);
+                            }}
+                          />
+                          <Button
+                            label={member.status === 'invited' ? 'إعادة إرسال الدعوة' : member.status === 'blocked' ? 'طلب مراجعة' : 'مراجعة الصلاحيات'}
+                            tone="secondary"
+                            size="sm"
+                            fullWidth={false}
+                            onPress={() => {
+                              setLastSaveLabel(`${member.statusLabel}: ${member.name}`);
+                            }}
+                          />
+                        </Box>
                       </Box>
                     )}
                   </Box>
@@ -1076,7 +1321,7 @@ function OperationsPanel({
                 placeholder="مثال: staff@bthwani.sa"
                 value={inviteDraft}
                 onChangeText={setInviteDraft}
-                hint="إضافة عضو تتم داخل نفس الصفحة بدون انتقال إلى أي route جديد."
+                hint="UI_PREVIEW_ONLY · إنشاء دعوة محلية حتى يتصل مسار العضوية المركزي."
               />
               <Button
                 label="إضافة عضو"
@@ -1087,28 +1332,27 @@ function OperationsPanel({
                   if (!inviteDraft.trim()) {
                     return;
                   }
+
                   setLastSaveLabel(`دعوة محلية: ${inviteDraft.trim()}`);
                   setInviteDraft('');
                 }}
               />
               {lastSaveLabel && (
-                <Text role="caption" tone="success" align={direction === 'rtl' ? 'right' : 'left'}>
+                <Text role="caption" tone="success" align="start">
                   {lastSaveLabel}
                 </Text>
               )}
             </Box>
           </Box>
         )}
-      </Box>
-
-      <Divider />
+      </Surface>
 
       {/* 6) Flat Coverage Zones Section with inline expansion */}
-      <Box paddingVertical={2} gap={2}>
+      <Surface tone="raised" padding={3} gap={3}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-            <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مناطق التغطية</Text>
-            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>منطقتان نشطتان</Text>
+          <Box style={{ gap: 2, alignItems: 'flex-start' }}>
+            <Text role="bodyStrong" align="start">مناطق التغطية</Text>
+            <Text role="caption" tone="muted" align="start">{zoneStatusSummary}</Text>
           </Box>
           <Button
             label={coveragePanelOpen ? 'إخفاء المناطق' : 'إدارة المناطق'}
@@ -1119,22 +1363,30 @@ function OperationsPanel({
           />
         </Box>
 
+        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <SummaryCell label="نشطة" value={String(activeZoneCount)} tone="success" />
+          <SummaryCell label="قيد المراجعة" value={String(pendingZoneCount)} tone="warning" />
+          <SummaryCell label="محجوبة" value={String(blockedZoneCount)} tone="danger" />
+        </Box>
+
         {coveragePanelOpen && (
           <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
             <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="warning" />
-              <Text role="caption" tone="warning" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
-                إدارة الحدود الجغرافية والتغطية يتم ضبطها مركزيًا من لوحة التحكم بالتنسيق مع سياسة العمليات.
+              <Text role="caption" tone="warning" align="start" style={{ flex: 1 }}>
+                المناطق تُدار مركزيًا من لوحة التحكم وWLT/Finance. الشريك يطلب مراجعة فقط ولا يبدل السياسة محليًا.
               </Text>
             </Box>
 
-            <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
+            <Text role="bodySm" tone="muted" align="start">
               {`النطاق الحالي: ${activeZoneLabel}`}
             </Text>
 
             <Box gap={0}>
-              {defaultCoverageZones.map((zone) => {
+              {coverageZones.map((zone) => {
                 const isZoneSelected = selectedZoneId === zone.id;
+                const statusTone = resolveZoneStatusTone(zone.status);
+
                 return (
                   <Box key={zone.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
                     <Pressable
@@ -1146,18 +1398,61 @@ function OperationsPanel({
                         padding: 4,
                       })}
                     >
-                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flexShrink: 1, minWidth: 0 }}>
                         <Icon name="location-outline" size={16} tone="brand" />
-                        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>{zone.name}</Text>
+                        <Box style={{ gap: 2, flexShrink: 1, minWidth: 0 }}>
+                          <Text role="bodyStrong" align="start">{zone.name}</Text>
+                          <Text role="caption" tone="muted" align="start">{zone.branchRelation}</Text>
+                        </Box>
                       </Box>
-                      <Chip label={zone.active ? 'نشط' : 'موقوف'} tone={zone.active ? 'success' : 'warning'} />
+                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: 8 }}>
+                        <Badge label={zone.statusLabel} tone={statusTone} />
+                        <Text role="caption" tone="muted">{zone.reviewActionLabel}</Text>
+                      </Box>
                       <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
                     </Pressable>
 
                     {isZoneSelected && (
-                      <Box paddingHorizontal={4} paddingTop={2} gap={1}>
-                        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>{zone.subtitle}</Text>
-                        <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>حالة المنطقة: {zone.active ? 'تستقبل الطلبات' : 'مغلقة مؤقتًا'}</Text>
+                      <Box paddingHorizontal={4} paddingTop={2} gap={2}>
+                        <KeyValueList
+                          dense
+                          items={[
+                            { label: 'الحالة', value: zone.statusLabel, tone: statusTone },
+                            { label: 'الفرع المرتبط', value: zone.branchRelation },
+                            { label: 'وضع الخدمة', value: zone.serviceModeRelation },
+                            { label: 'مرجع التسعير', value: zone.pricingReference },
+                            { label: 'مرجع العمولة', value: zone.commissionReference },
+                            { label: 'مرجع التسوية', value: zone.payoutReference },
+                          ]}
+                        />
+                        <Text role="bodySm" tone="muted" align="start">
+                          {zone.policySummary}
+                        </Text>
+                        <Text role="bodySm" tone="muted" align="start">
+                          {zone.policyReason}
+                        </Text>
+                        <Text role="caption" tone="muted" align="start">
+                          {zone.operationalImpact}
+                        </Text>
+                        <Text role="caption" tone="muted" align="start">
+                          {zone.auditNote}
+                        </Text>
+                        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+                          <Button
+                            label={zone.reviewActionLabel}
+                            tone="primary"
+                            size="sm"
+                            fullWidth={false}
+                            onPress={() => setLastSaveLabel(`طلب مراجعة المنطقة: ${zone.name}`)}
+                          />
+                          <Button
+                            label="فتح الأثر التشغيلي"
+                            tone="secondary"
+                            size="sm"
+                            fullWidth={false}
+                            onPress={() => setLastSaveLabel(zone.operationalImpact)}
+                          />
+                        </Box>
                       </Box>
                     )}
                   </Box>
@@ -1166,7 +1461,7 @@ function OperationsPanel({
             </Box>
           </Box>
         )}
-      </Box>
+      </Surface>
 
       <MobileStickyPrimaryAction
         label="حفظ إعدادات العمليات"
@@ -1232,17 +1527,17 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
     <Box gap={4}>
       {/* Summary headline */}
       <Surface tone="raised" padding={3} gap={2}>
-        <Text role="label" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
+        <Text role="label" tone="muted" align="start">
           ملخص الأداء — {storeName}
         </Text>
-        <Text role="bodySm" tone="muted" align={direction === 'rtl' ? 'right' : 'left'}>
+        <Text role="bodySm" tone="muted" align="start">
           مؤشرات موجزة للتفاعل والنمو. لا تتضمن بيانات عملاء تفصيلية.
         </Text>
       </Surface>
 
       {/* Engagement metrics grid */}
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مؤشرات التفاعل</Text>
+        <Text role="bodyStrong" align="start">مؤشرات التفاعل</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
           <AnalyticsInsightMetric label="متابعو المتجر" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
@@ -1258,7 +1553,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
 
       {/* Top products */}
       <Surface tone="raised" padding={3} gap={3}>
-        <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>أبرز المنتجات</Text>
+        <Text role="bodyStrong" align="start">أبرز المنتجات</Text>
         <KeyValueList
           dense
           items={[
@@ -1280,7 +1575,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           <Icon name="bulb-outline" size={18} tone="warning" />
           <Text role="bodyStrong" tone="warning">فرصة تسويقية</Text>
         </View>
-        <Text role="bodySm" align={direction === 'rtl' ? 'right' : 'left'}>
+        <Text role="bodySm" align="start">
           <Text role="bodySm" tone="default">{d.opportunityProduct.name}: </Text>
           {d.opportunityProduct.insight}
         </Text>
@@ -1304,7 +1599,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           <Icon name="trending-up-outline" size={18} tone="brand" />
           <Text role="bodyStrong" tone="brand">توصية ذكية</Text>
         </View>
-        <Text role="bodySm" align={direction === 'rtl' ? 'right' : 'left'}>{d.smartRecommendation}</Text>
+        <Text role="bodySm" align="start">{d.smartRecommendation}</Text>
         <Button
           label="فعّل العرض"
           tone="primary"
