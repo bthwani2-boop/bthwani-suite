@@ -2271,6 +2271,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               </View>
             ) : null}
           </View>
+          {/* WLT finance preview notice — payment display is preview-only, not a real executed payment */}
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right', paddingHorizontal: spacing[1] }}>
+            معاينة دفع — غير منفذة ماليًا · WLT يملك منطق الدفع الفعلي
+          </Text>
           <PaymentDecisionList items={paymentDecisionOptions} />
         </View>
 

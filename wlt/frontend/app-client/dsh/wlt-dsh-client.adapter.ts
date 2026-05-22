@@ -1,4 +1,8 @@
-// Self-contained WLT adapter used by surfaces. Uses localStorage for demo behavior.
+// PREVIEW_ONLY — WLT DSH Client Adapter (localStorage simulation, not a real payment runtime).
+// All operations (requestPayment, topUp, link, getBalance) use in-memory / localStorage only.
+// runtimeTruth=false / backendSource=false — see wlt-dsh-client.contract.ts for the full boundary contract.
+// No real ledger entry, no real WLT API call, no real payment mutation from this adapter.
+// When a real WLT payment runtime is available, replace this file with the actual SDK bridge.
 export type WalletAccount = { id: string; name: string };
 
 const STORAGE_KEY_ACCOUNT = 'dsh_bth_wallet_account';
