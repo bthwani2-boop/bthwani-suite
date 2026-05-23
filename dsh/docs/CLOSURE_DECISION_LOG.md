@@ -1,11 +1,18 @@
 # DSH Closure Decision Log
 
 Status: ACTIVE_CLOSURE_CONTROL
+Decision: ACTIVE_LOG_NO_SERVICE_STATE_OVERRIDE
 
 Purpose:
-Lean decision log for DSH closure. No DSH decision is valid without evidence path and remaining-risk statement.
+Lean append-only decision log for DSH closure. No DSH decision is valid without evidence path and remaining-risk statement.
 
-Allowed decisions:
+Current rule:
+
+- This file is historical evidence. It does not replace the live service-state matrices.
+- Historical `DONE`, `PASS`, `PASS_WITH_WARNINGS`, and `READY_FOR_PR` rows do not override `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`, `dsh/docs/SCREEN_API_MATRIX.md`, `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`, or `dsh/docs/DSH_VISUAL_REVIEW.md`.
+- The forward-only sequence now uses explicit phase exits rather than broad closure language.
+
+Historical log decisions:
 
 - DONE
 - PASS
@@ -18,8 +25,20 @@ Allowed decisions:
 - NEEDS_VISUAL_EVIDENCE
 - NO_ACTION_REQUIRED
 
+Current forward-only phase decisions:
+
+- REALITY_LOCKED
+- DOCS_BASELINE_READY
+- VISUAL_PROVEN_FOR_SELECTED_SLICE
+- READY_FOR_ONE_OPENAPI_ENDPOINT
+- OPENAPI_ENDPOINT_VALIDATED
+- BINDING_CONNECTED_FOR_SLICE
+- LOCAL_RUNTIME_PROVEN_FOR_SLICE
+- DSH_SLICE_L7_CLOSED
+
 | Date | Session ID | Scope | Evidence Path | Decision | Remaining Risks | Next Action |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-05-24 | DSH_DOCS_PHASE1_BASELINE_20260524 | DSH docs drift fix, branch-neutral command, and visual ledger activation | `dsh/docs/README.md`; `dsh/docs/MIGRATION.md`; `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md`; `dsh/docs/CLOSURE_DECISION_LOG.md`; `dsh/docs/command.md`; `dsh/docs/DSH_VISUAL_REVIEW.md`; `git diff --check` | DOCS_BASELINE_READY | no screenshots are captured yet; runtime, auth, API, backend, and WLT finance blockers remain unchanged | start the visual sweep only through `dsh/docs/DSH_VISUAL_REVIEW.md` queue and `tools/registry/runs/*` evidence roots |
 | 2026-05-21 | P0_14_FRONTEND_CLOSURE_TRUTH-20260521 | Frontend closure truth refresh after P0-02 through P0-13 | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts`; `dsh/frontend/shared/dsh-flow-registry.ts`; `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`; `dsh/docs/SCREEN_API_MATRIX.md`; `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`; `git diff --check`; `pnpm -w exec tsc --noEmit` | DONE | visual evidence is still pending; runtime, backend, and API remain unproven; finance remains WLT-owned | capture screenshots or runtime proof only; do not inflate closure claims |
 | 2026-05-12 | DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555 | DSH mobile apps final closure for `app-client`, `app-partner`, `app-captain`, and `app-field` preview-only scope | tools/registry/runs/DSH_MOBILE_APPS_FINAL_CLOSURE_GATE-20260511-230555 | PASS_WITH_WARNINGS | runtime and visual smoke were not captured in this gate; closure remains preview-only and does not imply backend/API/production readiness | run runtime smoke only when a mobile runtime session is actually available |
 | 2026-05-06 | DSH_DATA_017_PREVIEW_DATA_AUTHORITY-20260506-213046 | DSH-DATA-017 preview data authority and fixture consistency closure | tools/registry/runs/DSH_DATA_017_PREVIEW_DATA_AUTHORITY-20260506-213046 | PASS_WITH_WARNINGS | visual/runtime/API/backend deferred; preview/local data is not runtime truth | visual proof or first API-readiness candidate only after data authority is stable |

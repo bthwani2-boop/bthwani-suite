@@ -1,8 +1,14 @@
 # DSH Root Migration Notes
 
-Status: ACTIVE_FRONTEND_ROOT_NOTE
+Status: ACTIVE_DOCS_BASELINE_NOTE
+Decision: DOCS_ROOT_CONFIRMED
 
 `dsh/` remains the current service root.
+The current master execution sequence lives in:
+
+```text
+tools/plan/BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE_20260523/00_START_HERE_MASTER_ROADMAP.md
+```
 
 Current frontend implementation remains rooted under:
 
@@ -10,11 +16,11 @@ Current frontend implementation remains rooted under:
 dsh/frontend
 ```
 
-`app-client`, `app-partner`, `app-captain`, `app-field`, and `control-panel` remain the active DSH frontend surfaces in this branch.
+`app-client`, `app-partner`, `app-captain`, `app-field`, and `control-panel` remain the active DSH frontend surfaces in the current repo.
 
 `packages/surfaces/src/service-owned/dsh` is not the active source of truth for this slice unless a separate evidence-backed decision restores it.
 
-## Docs Migration In P0-14
+## Historical Docs Migration In P0-14
 
 - `dsh/docs/archive/` was retired.
 - `dsh/docs/closure/` was retired.
@@ -28,5 +34,12 @@ dsh/frontend
 	- `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`
 	- `dsh/docs/DSH_VISUAL_REVIEW.md`
 
-This migration note does not imply runtime, backend, API, auth, or WLT closure.
+## Current Docs Baseline
+
+- `dsh/docs/README.md` is the docs index.
+- `dsh/docs/DSH_VISUAL_REVIEW.md` is the active visual evidence ledger and queue.
+- `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`, `dsh/docs/SCREEN_API_MATRIX.md`, and `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` remain the live service-state matrices.
+- `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md` stays as historical app-client/WLT context only.
+
+This note does not imply runtime, backend, API, auth, or WLT closure.
 Those remain blocked or evidence-pending exactly as stated in the live matrices above.

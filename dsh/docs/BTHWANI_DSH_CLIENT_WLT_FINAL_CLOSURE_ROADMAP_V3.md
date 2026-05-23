@@ -1,5 +1,13 @@
 # BThwani DSH + WLT App-Client Final Closure Roadmap V3
 
+Status: HISTORICAL_APP_CLIENT_WLT_REFERENCE
+
+Current use:
+
+- historical app-client + WLT boundary context only
+- not the master DSH closure sequence
+- current service decisions come from `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`, `dsh/docs/SCREEN_API_MATRIX.md`, `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`, `dsh/docs/DSH_VISUAL_REVIEW.md`, and `tools/plan/BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE_20260523/**`
+
 Status: ACTIVE_LIVING_ROADMAP / P0_14_TRUTH_REFRESHED
 Repo: C:\bthwani-suite
 Primary scope: `dsh/frontend/app-client/**` + `wlt/frontend/app-client/dsh/**`
@@ -111,7 +119,7 @@ human_next_action
 
 ### Phase 0 — Freeze + Baseline
 
-**Mode:** Read-only  
+**Mode:** Read-only
 **Goal:** تثبيت نقطة البداية.
 
 Tasks:
@@ -134,7 +142,7 @@ BASELINE_READY
 
 ### Phase 1 — Deep App-client DSH/WLT Map
 
-**Mode:** Read-only  
+**Mode:** Read-only
 **Goal:** فهم كل ما في app-client مرتبط بـ DSH/WLT.
 
 Tasks:
@@ -158,7 +166,7 @@ CAPABILITY_MAP_READY
 
 ### Phase 2 — Related Surfaces + Control Panel Impact Map
 
-**Mode:** Read-only  
+**Mode:** Read-only
 **Goal:** لا نغلق العميل بمعزل عن بقية الأسطح.
 
 Tasks:
@@ -181,7 +189,7 @@ RELATED_SURFACES_MAP_READY
 
 ### Phase 3 — Human Direction Board Review
 
-**Mode:** Human decision only  
+**Mode:** Human decision only
 **Goal:** الإنسان يقرر التصنيف قبل أي تعديل.
 
 Allowed decisions per capability:
@@ -207,7 +215,7 @@ HUMAN_DIRECTION_APPROVED
 
 ### Phase 4 — Small APPLY 1: Truth Consistency Only
 
-**Mode:** Small apply if approved  
+**Mode:** Small apply if approved
 **Goal:** تصحيح التناقضات الصغيرة بدون تغيير تصميم.
 
 Allowed:
@@ -236,7 +244,7 @@ TRUTH_CONSISTENCY_FIXED
 
 ### Phase 5 — Human Visual Review: Current Design
 
-**Mode:** Human-led  
+**Mode:** Human-led
 **Goal:** مراجعة التصميم الحالي قبل refactor.
 
 Review list:
@@ -269,7 +277,7 @@ NEEDS_SCREENSHOT_EVIDENCE
 
 ### Phase 6 — Small APPLY 2: Visual Fixes Only
 
-**Mode:** One flow/screen at a time  
+**Mode:** One flow/screen at a time
 **Goal:** إصلاح تصميمي بدون إعادة تنظيم.
 
 Rules:
@@ -291,7 +299,7 @@ VISUAL_FIX_COMMITTED
 
 ### Phase 7 — Decomposition Plan Only
 
-**Mode:** Planning only  
+**Mode:** Planning only
 **Goal:** إذا بقيت ملفات ضخمة تعيق الإغلاق، نخطط لاستخراج داخلي.
 
 For each overgrown file:
@@ -317,7 +325,7 @@ DECOMPOSITION_PLAN_READY
 
 ### Phase 8 — Small APPLY 3: Internal Extraction Only
 
-**Mode:** One extraction per commit  
+**Mode:** One extraction per commit
 **Goal:** تفكيك داخلي بلا تغيير UX.
 
 Allowed:
@@ -340,7 +348,7 @@ INTERNAL_EXTRACTION_PASS
 
 ### Phase 9 — Surface Alignment
 
-**Mode:** Review/apply per surface  
+**Mode:** Review/apply per surface
 **Goal:** ضمان أن قرارات العميل لا تكسر بقية DSH.
 
 Tasks:
@@ -362,7 +370,7 @@ SURFACES_ALIGNED
 
 ### Phase 10 — Final Closure Gate
 
-**Mode:** Final verification  
+**Mode:** Final verification
 **Goal:** إغلاق نهائي بالأدلة.
 
 Required:
