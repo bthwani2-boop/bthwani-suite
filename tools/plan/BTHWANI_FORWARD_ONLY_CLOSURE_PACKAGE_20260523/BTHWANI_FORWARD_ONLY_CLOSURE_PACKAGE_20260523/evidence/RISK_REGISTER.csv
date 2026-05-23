@@ -1,0 +1,13 @@
+﻿risk_id,area,finding,severity,required_action,owner
+RISK-001,DSH Visual Evidence,UI/UX matrix says needs-visual-evidence and verified-ui-flow is 0.,BLOCKER,Build visual evidence ledger and screenshots before API expansion.,DSH/UI
+RISK-002,Screen/API,SCREEN_API_MATRIX decision is NOT_READY_FOR_API.,BLOCKER,Do not edit dsh.openapi.yaml until one slice moves to READY_FOR_OPENAPI_P0_DESIGN.,DSH/contracts
+RISK-003,Runtime,Runtime evidence matrix separates preview/local/fixture from runtime truth.,BLOCKER,Create local runtime proof only after contract/binding/Go/DB slice.,DSH/runtime
+RISK-004,Backend,"No .go, go.mod, migrations, docker-compose.local.yml in snapshot.",HIGH,LOP-0 tools only now; backend starts after first contract-bound slice.,backend
+RISK-005,Domain,dsh/domain README says no domain truth claimed.,HIGH,Create domain models/state machines/policies before deep order lifecycle backend.,DSH/domain
+RISK-006,Giant Screens,Multiple DSH files exceed 40KB/70KB.,HIGH,Classify SPLIT_NOW or GIANT_REFACTOR_LATER before binding.,frontend
+RISK-007,Auth,auth.openapi.yaml is CONTRACT_TBD and empty paths.,HIGH,Keep auth central; define identity/RBAC before protected runtime closure.,auth/platform
+RISK-008,WLT,WLT contract states finance ownership but backend not implemented.,HIGH,Keep DSH finance read-only; open WLT dependency slices only when blocked by payment/refund/settlement.,WLT
+RISK-009,Hardcoded Colors,"Candidate hardcoded colors found in runtime/front-end files, e.g. OrdersInboxScreen.tsx.",MEDIUM,Replace with central color tokens when touching those files.,ui-kit/frontend
+RISK-010,Root Noise,"Temporary/root artifact candidates exist: temp-controlpanel.html, tmp_diff.txt, window_dump.xml, analyze_uikit.ps1.",MEDIUM,Classify KEEP_AS_TOOL/MOVE_TO_EVIDENCE/ARCHIVE/DELETE_AFTER_REVIEW; no blind deletion.,governance/tools
+RISK-011,Local Storage,"localStorage candidates exist, including field onboarding storage and shell appearance files.",MEDIUM,Classify preview/local-runtime/public-preference; no PII/runtime-truth in localStorage.,frontend/security
+RISK-012,Provider Control,Provider/vars must not become hardcoded or env-only.,HIGH,"Route provider policy through Platform/Vars with seed policy first, not production secrets.",platform/vars

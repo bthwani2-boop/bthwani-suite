@@ -1,0 +1,41 @@
+{
+  "package": "BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE",
+  "date": "2026-05-23",
+  "generated_from": [
+    "/mnt/data/Pasted text.txt",
+    "/mnt/data/Pasted text (2).txt",
+    "/mnt/data/BTHWANI_FORWARD_ONLY_MASTER_ROADMAP_20260523.md",
+    "/mnt/data/Pasted markdown (3).md",
+    "/mnt/data/Pasted markdown (4).md",
+    "/mnt/data/Pasted markdown (5).md",
+    "/mnt/data/bthwani-suite-ghb-0165-20260522-184334-dsh.zip"
+  ],
+  "repo_snapshot": "ghb/0165-20260522-184334-dsh",
+  "analysis_counts": {
+    "snapshot_zip": "bthwani-suite-ghb-0165-20260522-184334-dsh.zip",
+    "snapshot_items": 1495,
+    "files": 1164,
+    "folders": 330,
+    "markdown_table_rows": 1812,
+    "dsh_files": 310,
+    "wlt_files": 78,
+    "ui_kit_files": 44,
+    "tools_files": 204,
+    "go_files": 0,
+    "sql_files": 0,
+    "openapi_empty_count": 10,
+    "giant_files": 11,
+    "large_files": 16
+  },
+  "main_file": "00_START_HERE_MASTER_ROADMAP.md",
+  "evidence_files": [
+    "evidence/FORENSIC_FILE_INVENTORY.csv",
+    "evidence/FORENSIC_FOLDER_INVENTORY.csv",
+    "evidence/MARKDOWN_TABLE_ROW_INVENTORY.csv",
+    "evidence/DSH_GIANT_SCREEN_RISK_MATRIX.csv",
+    "evidence/OPENAPI_CONTRACT_INVENTORY.csv",
+    "evidence/GUARD_SCRIPT_INVENTORY.csv",
+    "evidence/RISK_REGISTER.csv"
+  ],
+  "decision": "FIX_REQUIRED_BEFORE_API_BACKEND"
+}

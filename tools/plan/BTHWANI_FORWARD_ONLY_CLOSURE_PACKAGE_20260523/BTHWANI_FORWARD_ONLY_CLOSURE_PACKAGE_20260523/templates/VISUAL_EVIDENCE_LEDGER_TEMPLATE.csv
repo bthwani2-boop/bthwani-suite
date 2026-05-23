@@ -1,0 +1,2 @@
+﻿review_id,surface,screen_id,file_path,route,state,device,viewport,locale,direction,screenshot_path,rtl_result,overflow_result,ui_kit_result,central_color_result,human_result,known_warnings,reviewed_at,decision
+DSH-VIS-001,app-client,HomeScreen,dsh/frontend/app-client/screens/HomeScreen.tsx,TBD,success,TBD,TBD,ar,rtl,tools/registry/runs/<SESSION_ID>/screenshots/app-client/HomeScreen-success-rtl.png,TBD,TBD,TBD,TBD,NEEDS_REVIEW,TBD,TBD,NEEDS_VISUAL_EVIDENCE

@@ -1,0 +1,12 @@
+﻿path,title,state,paths_empty,decision
+auth.openapi.yaml,Auth API,CONTRACT_TBD,True,AUTH_CENTRAL_TBD
+master.openapi.yaml,Bthwani Master API Index,,True,INDEX_ONLY
+amn/amn.openapi.yaml,AMN API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+arb/arb.openapi.yaml,ARB API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+dsh/dsh.openapi.yaml,BThwani DSH API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+esf/esf.openapi.yaml,ESF API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+knz/knz.openapi.yaml,KNZ API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+kwd/kwd.openapi.yaml,KWD API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+mrf/mrf.openapi.yaml,MRF API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+snd/snd.openapi.yaml,SND API,CONTRACT_TBD,True,SERVICE_CONTRACT_TBD
+wlt/wlt.openapi.yaml,WLT DSH Finance API,CONTRACT_SCAFFOLD_PREVIEW_ONLY,False,SERVICE_CONTRACT_SCAFFOLD_OR_PARTIAL
