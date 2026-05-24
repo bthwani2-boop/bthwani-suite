@@ -7,6 +7,7 @@ import { Button } from './button';
 import { KeyValueList } from './list';
 import { Card } from './card';
 import { Surface, Text } from '../primitives';
+import { Icon } from './icons';
 
 const fieldFrameLaw = {
   labelGap: spacing[2],
@@ -59,11 +60,68 @@ export function TextField({ label, hint, error, style, ...rest }: TextFieldProps
   );
 }
 
-export function SearchField({ placeholder, ...props }: TextFieldProps) {
-  const { language } = useDirection();
+export function SearchField({ placeholder, style, ...props }: TextFieldProps) {
+  const { direction, language } = useDirection();
+  const { theme } = useTheme();
   const fallbackPlaceholder = String(language).toLowerCase().startsWith('en') ? 'Search' : 'ابحث';
 
-  return <TextField placeholder={placeholder ?? fallbackPlaceholder} {...props} />;
+  return (
+    <View
+      style={[
+        {
+          minHeight: fieldFrameLaw.controlMinHeight,
+          borderWidth: borders.hairline,
+          borderColor: theme.fieldBorder,
+          borderRadius: fieldFrameLaw.controlRadius,
+          backgroundColor: theme.fieldBackground,
+          flexDirection: resolveRowDirection(direction),
+          alignItems: 'center',
+          paddingHorizontal: spacing[3],
+          gap: spacing[2],
+        },
+        style,
+      ]}
+    >
+      <Icon
+        name="search-outline"
+        size={18}
+        color={theme.textMuted}
+        style={{ opacity: 0.6 }}
+      />
+      <TextInput
+        placeholder={placeholder ?? fallbackPlaceholder}
+        placeholderTextColor={theme.fieldPlaceholder}
+        style={{
+          flex: 1,
+          height: '100%',
+          color: theme.text,
+          textAlign: resolveTextAlign(direction, 'start'),
+          writingDirection: direction,
+          fontSize: 15,
+          paddingVertical: 0,
+          paddingHorizontal: 0,
+        }}
+        {...props}
+      />
+      {props.value ? (
+        <Pressable
+          onPress={() => props.onChangeText?.('')}
+          hitSlop={8}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.7 : 1,
+            padding: spacing[1],
+          })}
+        >
+          <Icon
+            name="close-circle-outline"
+            size={18}
+            color={theme.textMuted}
+            style={{ opacity: 0.8 }}
+          />
+        </Pressable>
+      ) : null}
+    </View>
+  );
 }
 
 export type SelectOption<Value extends string = string> = {
@@ -459,4 +517,3 @@ export function Switch({ label, description, value, disabled = false, onValueCha
     </Pressable>
   );
 }
-

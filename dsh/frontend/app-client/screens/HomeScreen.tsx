@@ -1375,8 +1375,7 @@ export function DshHomeGetScreen({
           onClose={closeInlineSearch}
           variant="main"
           autoFocus
-          placeholder="ابحث عن متجر أو فئة داخل الواجهة الحالية"
-          hint="بحث عام سريع داخل التجربة الحالية للوصول إلى المتاجر والمسارات بدون مغادرة الصفحة."
+          placeholder="ابحث عن متجر، خدمة، أو فئة..."
           style={styles.brandTopBarShell}
         />
       ) : (
@@ -1409,16 +1408,7 @@ export function DshHomeGetScreen({
         }}
         showsVerticalScrollIndicator={false}
       >
-        {inlineSearchVisible ? (
-          <Surface tone="raised" padding={3} gap={2}>
-            <Text role="titleSm">نتائج البحث داخل الواجهة الحالية</Text>
-            <Text role="bodySm" tone="muted">
-              {inlineSearchQuery.trim()
-                ? `يتم الآن تصفية المتاجر والمسارات المتاحة حسب: ${inlineSearchQuery}`
-                : 'ابدأ بكتابة اسم متجر أو خدمة أو فئة، وستظهر النتائج مباشرة في نفس الصفحة.'}
-            </Text>
-          </Surface>
-        ) : bannerItems.length ? (
+        {inlineSearchVisible ? null : bannerItems.length ? (
           <BannerCarousel
             banners={bannerItems}
             variant="secondary"
@@ -1758,18 +1748,19 @@ function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['
     },
     brandTopBarShell: {
       marginTop: spacing[0],
-      borderBottomLeftRadius: 28,
-      borderBottomRightRadius: 28,
+      borderBottomLeftRadius: 32,
+      borderBottomRightRadius: 32,
       overflow: 'visible',
-      paddingTop: spacing[0],
-      paddingBottom: spacing[1],
+      paddingTop: 12,
+      paddingBottom: 12,
+      paddingHorizontal: 16,
       backgroundColor: colorPalette.brand,
       borderWidth: 0,
       borderColor: 'transparent',
       shadowColor: colorPalette.black,
-      shadowOpacity: 0.12,
-      shadowRadius: 8,
-      elevation: 4,
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8,
       borderBottomWidth: 1,
       borderBottomColor: withAlpha(colorPalette.white, 0.1),
     },

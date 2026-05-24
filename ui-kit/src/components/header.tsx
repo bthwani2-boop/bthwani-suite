@@ -74,7 +74,7 @@ export function SearchTopBar({ value, onChangeText, onClose, placeholder, hint, 
           accessibilityLabel={closeAccessibilityLabel}
           hitSlop={8}
           onPress={onClose}
-          style={({ pressed }) => [{ width: isMain ? 40 : 36, height: isMain ? 40 : 36, borderRadius: isMain ? 20 : 18, alignItems: 'center', justifyContent: 'center', backgroundColor: isMain ? theme.brandHeaderSurface : theme.surface, borderWidth: 1, borderColor: isMain ? theme.brandHeaderStroke : theme.line, opacity: pressed ? 0.92 : 1 }]}
+          style={({ pressed }) => [{ width: isMain ? 40 : 36, height: isMain ? 40 : 36, borderRadius: isMain ? 20 : 18, alignItems: 'center', justifyContent: 'center', backgroundColor: isMain ? theme.danger : theme.surface, borderWidth: isMain ? 0 : 1, borderColor: isMain ? 'transparent' : theme.line, opacity: pressed ? 0.92 : 1 }]}
         >
           <Icon name="close-outline" size={20} tone={isMain ? 'inverse' : 'default'} />
         </Pressable>

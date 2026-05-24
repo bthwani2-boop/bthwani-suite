@@ -1106,7 +1106,6 @@ function DshStoreGetScreenContent({
           variant="secondary"
           autoFocus
           placeholder={`ابحث داخل ${normalizedStoreName}`}
-          hint={`بحث محلي داخل ${normalizedStoreName} فقط للوصول السريع إلى الأصناف.`}
         />
       )}
 

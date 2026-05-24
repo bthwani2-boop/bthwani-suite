@@ -172,10 +172,11 @@ export function ModernPremiumHeader({
             ))
           ) : (
             <>
-              {onSearchPress && (
+              {onCartPress && (
                 <HeaderIconButton
-                  icon="search-outline"
-                  onPress={onSearchPress}
+                  icon="cart-outline"
+                  onPress={onCartPress}
+                  badge={cartCount > 0 ? cartCount : undefined}
                 />
               )}
               {onNotificationsPress && (
@@ -185,11 +186,10 @@ export function ModernPremiumHeader({
                   badge={notificationCount > 0 ? notificationCount : undefined}
                 />
               )}
-              {onCartPress && (
+              {onSearchPress && (
                 <HeaderIconButton
-                  icon="cart-outline"
-                  onPress={onCartPress}
-                  badge={cartCount > 0 ? cartCount : undefined}
+                  icon="search-outline"
+                  onPress={onSearchPress}
                 />
               )}
             </>
