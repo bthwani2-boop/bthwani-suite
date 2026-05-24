@@ -53,7 +53,9 @@ import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
 } from './contracts/dsh-client-binding.contracts';
-import { resolveDshDiscoveryStoresBridge } from './shared/dsh-discovery-stores-bridge';
+import { resolveDshDiscoveryStoresBridge, type DshDiscoveryStoresBridgeResult } from './shared/dsh-discovery-stores-bridge';
+import { resolveDshDiscoveryStoresRuntimeConfig } from './shared/dsh-discovery-stores-runtime-config';
+import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from './shared/dsh-discovery-stores-transport';
 import { resolveDshStoreClientVisibility } from '../shared/dsh-client-visibility.model';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
@@ -152,83 +154,10 @@ const clientVisibleHomePreviewStores = dshHomeGetFixtureStores.filter((store) =>
   }).visible
 ));
 
-const clientDiscoveryStoresBridge = resolveDshDiscoveryStoresBridge({
-  previewHomeStores: clientVisibleHomePreviewStores,
-  previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
-});
-
-const clientVisibleDiscoveryStores = clientDiscoveryStoresBridge.discoveryStores;
-const clientVisibleHomeStores = clientDiscoveryStoresBridge.homeStores;
-
-function hasStoreTarget(storeId?: string) {
-  return typeof storeId === 'string' && clientVisibleDiscoveryStores.some((store) => store.id === storeId);
-}
-
-function hasStoreCategoryTarget(storeId?: string, categoryId?: string) {
-  if (!hasStoreTarget(storeId) || typeof categoryId !== 'string') {
-    return false;
-  }
-  return (storeItemsByStoreId[storeId] ?? []).some((item) => item.categoryId === categoryId);
-}
-
-function hasProductTarget(storeId?: string, productId?: string) {
-  if (!hasStoreTarget(storeId) || typeof productId !== 'string') {
-    return false;
-  }
-  return (storeItemsByStoreId[storeId] ?? []).some((item) => item.id === productId);
-}
-
-function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
-  if (
-    item.routeTarget === 'home'
-    || item.routeTarget === 'search'
-    || item.routeTarget === 'promo-apply'
-    || item.routeTarget === 'subscription'
-    || item.routeTarget === 'subscription-family-get'
-    || item.routeTarget === 'entitlements-get'
-  ) {
-    return true;
-  }
-
-  if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
-    return item.routeTargetId ? publishedPromoCategoryIds.has(item.routeTargetId) : false;
-  }
-
-  if (item.routeTarget === 'store') {
-    return hasStoreTarget(item.routeTargetId);
-  }
-
-  if (item.routeTarget === 'store_category') {
-    return hasStoreCategoryTarget(item.routeTargetId, item.routeTargetExtra);
-  }
-
-  if (item.routeTarget === 'product') {
-    return hasProductTarget(item.routeTargetExtra, item.routeTargetId);
-  }
-
-  return false;
-}
-
-function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
-  const store = clientVisibleDiscoveryStores.find((entry) => entry.id === storeId) ?? dshDiscoveryStores.find((entry) => entry.id === storeId);
-  return {
-    canonicalStoreId: store?.canonicalStoreId,
-    sourceRecordId: store?.sourceRecordId,
-    publishStage: store?.publishStage,
-  };
-}
-
-function getProductCanonicalMetadata(storeId: string, productId: string): HostCanonicalMetadata {
-  const storeMetadata = getStoreCanonicalMetadata(storeId);
-  const product = (storeItemsByStoreId[storeId] ?? []).find((entry) => entry.id === productId);
-
-  return {
-    canonicalStoreId: product?.canonicalStoreId ?? storeMetadata.canonicalStoreId,
-    canonicalProductId: product?.canonicalProductId,
-    sourceRecordId: product?.sourceRecordId ?? storeMetadata.sourceRecordId,
-    publishStage: product?.publishStage ?? storeMetadata.publishStage,
-  };
-}
+// clientVisibleDiscoveryPreviewStores and clientVisibleHomePreviewStores are kept at
+// module level as static preview data seeds. Bridge resolution, derived store lists, and
+// route-validation helpers are moved inside the component so they close over the runtime
+// bridge state and react correctly when the transport delivers a real response.
 
 function resolveStorePickupAddress(store: { subtitle?: string; name?: string }) {
   const subtitle = store.subtitle?.trim();
@@ -438,6 +367,96 @@ function commandTargetToRoute(target: DshCommandTarget): DshRoute {
 
 export function DshClientSurface({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
+
+  // ── Runtime bridge state ────────────────────────────────────────────────────
+  // Initialise with preview fallback so the first render is always populated.
+  // The transport useEffect below switches to loading → success/error/offline
+  // when a runtime config (EXPO_PUBLIC_DSH_API_BASE_URL) is present.
+  const [runtimeBridge, setRuntimeBridge] = React.useState<DshDiscoveryStoresBridgeResult>(() =>
+    resolveDshDiscoveryStoresBridge({
+      previewHomeStores: clientVisibleHomePreviewStores,
+      previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+    }),
+  );
+
+  // Aliases that match the previous module-level names so all downstream code
+  // reads from the live bridge state instead of static preview constants.
+  const clientDiscoveryStoresBridge = runtimeBridge;
+  const clientVisibleDiscoveryStores = runtimeBridge.discoveryStores;
+  const clientVisibleHomeStores = runtimeBridge.homeStores;
+
+  // ── Route-validation helpers (closed over the live store list) ──────────────
+  function hasStoreTarget(storeId?: string): boolean {
+    return typeof storeId === 'string' && clientVisibleDiscoveryStores.some((store) => store.id === storeId);
+  }
+
+  function hasStoreCategoryTarget(storeId?: string, categoryId?: string): boolean {
+    if (!hasStoreTarget(storeId) || typeof categoryId !== 'string') {
+      return false;
+    }
+    return (storeItemsByStoreId[storeId] ?? []).some((item) => item.categoryId === categoryId);
+  }
+
+  function hasProductTarget(storeId?: string, productId?: string): boolean {
+    if (!hasStoreTarget(storeId) || typeof productId !== 'string') {
+      return false;
+    }
+    return (storeItemsByStoreId[storeId] ?? []).some((item) => item.id === productId);
+  }
+
+  function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
+    if (
+      item.routeTarget === 'home'
+      || item.routeTarget === 'search'
+      || item.routeTarget === 'promo-apply'
+      || item.routeTarget === 'subscription'
+      || item.routeTarget === 'subscription-family-get'
+      || item.routeTarget === 'entitlements-get'
+    ) {
+      return true;
+    }
+
+    if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
+      return item.routeTargetId ? publishedPromoCategoryIds.has(item.routeTargetId) : false;
+    }
+
+    if (item.routeTarget === 'store') {
+      return hasStoreTarget(item.routeTargetId);
+    }
+
+    if (item.routeTarget === 'store_category') {
+      return hasStoreCategoryTarget(item.routeTargetId, item.routeTargetExtra);
+    }
+
+    if (item.routeTarget === 'product') {
+      return hasProductTarget(item.routeTargetExtra, item.routeTargetId);
+    }
+
+    return false;
+  }
+
+  function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
+    const store =
+      clientVisibleDiscoveryStores.find((entry) => entry.id === storeId)
+      ?? dshDiscoveryStores.find((entry) => entry.id === storeId);
+    return {
+      canonicalStoreId: store?.canonicalStoreId,
+      sourceRecordId: store?.sourceRecordId,
+      publishStage: store?.publishStage,
+    };
+  }
+
+  function getProductCanonicalMetadata(storeId: string, productId: string): HostCanonicalMetadata {
+    const storeMetadata = getStoreCanonicalMetadata(storeId);
+    const product = (storeItemsByStoreId[storeId] ?? []).find((entry) => entry.id === productId);
+    return {
+      canonicalStoreId: product?.canonicalStoreId ?? storeMetadata.canonicalStoreId,
+      canonicalProductId: product?.canonicalProductId,
+      sourceRecordId: product?.sourceRecordId ?? storeMetadata.sourceRecordId,
+      publishStage: product?.publishStage ?? storeMetadata.publishStage,
+    };
+  }
+
   const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
   const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
   const [route, setRoute] = React.useState<DshRoute>('home');
@@ -587,6 +606,62 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     };
   }, [route, onExit, sheinInlineOpen, awnakInlineOpen]);
 
+  // ── Runtime transport effect ────────────────────────────────────────────────
+  // Runs once on mount. When EXPO_PUBLIC_DSH_API_BASE_URL is set:
+  //   1. Immediately signals loading state (bridge.state = 'loading').
+  //   2. Calls GET /stores via the typed client + HTTP transport.
+  //   3. On success: passes the real API response into the bridge → 'ready'/'empty'.
+  //   4. On network failure: bridge.state = 'offline'.
+  //   5. On HTTP/parse error: bridge.state = 'error'.
+  // When no config is set the bridge stays on 'preview-fallback' (initial state).
+  React.useEffect(() => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+
+    if (!config) {
+      // No API base URL configured — stay on the preview fallback path.
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    // Signal loading immediately so the screen renders a skeleton.
+    setRuntimeBridge(
+      resolveDshDiscoveryStoresBridge({
+        previewHomeStores: clientVisibleHomePreviewStores,
+        previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+        state: 'loading',
+      }),
+    );
+
+    const client = createDshDiscoveryStoresClient(config);
+
+    client.listDiscoveryStores().then((response) => {
+      if (cancelled) return;
+      setRuntimeBridge(
+        resolveDshDiscoveryStoresBridge({
+          response,
+          previewHomeStores: clientVisibleHomePreviewStores,
+          previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+        }),
+      );
+    }).catch((err: unknown) => {
+      if (cancelled) return;
+      const bridgeState = isDshDiscoveryStoresOfflineError(err) ? 'offline' : 'error';
+      setRuntimeBridge(
+        resolveDshDiscoveryStoresBridge({
+          previewHomeStores: clientVisibleHomePreviewStores,
+          previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+          state: bridgeState,
+        }),
+      );
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount; preview seeds are module-level constants.
+
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();
     if (!query) {
@@ -695,7 +770,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
     // 7. Route to cart-get
     setRoute('cart-get');
-  }, [createOrderValues.note]);
+  }, [createOrderValues.note, clientVisibleDiscoveryStores]);
 
   const openTrackedOrder = React.useCallback((
     orderId?: string,
@@ -754,7 +829,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
   const activeStore = React.useMemo(
     () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
-    [activeStoreId],
+    [activeStoreId, clientVisibleDiscoveryStores],
   );
 
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);

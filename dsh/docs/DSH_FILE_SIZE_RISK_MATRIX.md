@@ -233,6 +233,21 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Next allowed batch:** Batch 9B may add local PostgreSQL runtime for this same endpoint only.
 - **Final Decision:** BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES
 
+### Batch 9C Frontend Runtime Transport Result
+
+- **Implementation scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Transport owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-transport.ts` — creates the HTTP transport using native `fetch`; no UI framework imports; no direct fetch in screens or UI parts.
+- **Config owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-runtime-config.ts` — reads `EXPO_PUBLIC_DSH_API_BASE_URL`; returns null when absent (preview fallback remains active).
+- **DshClientSurface binding:** `dsh/frontend/app-client/DshClientSurface.tsx` now holds `runtimeBridge` as React state; a single `useEffect` on mount resolves the config, transitions to `loading`, calls `listDiscoveryStores()`, and sets the bridge to `ready`/`empty`/`error`/`offline` depending on the response.
+- **Preview fallback preserved:** the bridge stays on `preview-fallback` when no config is found, when the request fails, or when the device is offline; explicit preview mode also stays on fallback.
+- **Frontend boundary:** no fetch inside `HomeScreen.tsx`, `StoreScreen.tsx`, `HomeScreenContent.tsx`, `StoreScreenContent.tsx`, or any UI part.
+- **UI change:** none — all five bridge states (loading, success, empty, error, offline) were already handled by existing UI parts from Batch 7 visual sweep; no JSX, props, routes, or visual behavior changed.
+- **Backend/domain decision:** no change — backend, domain, docker-compose, OpenAPI, or endpoint work was not touched.
+- **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, route change, `dsh.openapi.yaml` change, or endpoint beyond `GET /stores`.
+- **Evidence result:** `docker compose -f dsh/backend/docker-compose.local.yml ps` (no container running — local-only environment); `pnpm run openapi:lint:dsh` passed with 0 errors and 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` passed (0 errors); `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN (fail=0, warn=1, pre-existing `dsh_local_password` in docker-compose).
+- **Next allowed batch:** Batch 9D may provide E2E proof: start the Go backend, run `GET /stores`, confirm real response reaches `DshClientSurface` and the screen renders runtime data (not preview).
+- **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
+
 ### Batch 9B PostgreSQL Runtime Result
 
 - **Runtime scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.

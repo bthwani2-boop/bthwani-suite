@@ -1,7 +1,7 @@
 # DSH-SLICE-001 Store Discovery
 
-Status: BATCH_9B_POSTGRES_RUNTIME
-Decision: BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT
+Status: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT
+Decision: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF
 
 Purpose:
 Official coverage manifest for the first DSH slice: client discovery and storefront visibility across `HomeScreen` and `StoreScreen`, with search kept inline inside the current page.
@@ -235,12 +235,25 @@ Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-0
   - **No payment**: No credit cards, cards, or gateway tokens.
   - **No partner/captain/field actions**: Read-only store metadata lookup; no operational actions.
 
+## Batch 9C Frontend Runtime Transport Status
+
+- **Implementation scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Transport owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-transport.ts` — owns `buildHttpTransport` (native fetch, no UI imports) and `createDshDiscoveryStoresClient(config)` factory; throws `{kind:'offline'}` on network failure and `{kind:'http',status,body}` on HTTP errors.
+- **Config owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-runtime-config.ts` — reads `EXPO_PUBLIC_DSH_API_BASE_URL`; returns null when absent.
+- **DshClientSurface binding:** `runtimeBridge` is now React state; a `useEffect` on mount reads config, sets `state:'loading'`, calls `client.listDiscoveryStores()`, and resolves `resolveDshDiscoveryStoresBridge` with either the real `response` or a `state:'error'`/`'offline'` fallback.
+- **Preview fallback preserved:** bridge stays `preview-fallback` with source `preview-fallback` when: no runtime config, network error, HTTP error, or explicit preview mode.
+- **DshClientSurface reads runtime response:** YES — when `EXPO_PUBLIC_DSH_API_BASE_URL` is set and the request succeeds, bridge source becomes `openapi-response` and `homeStores`/`discoveryStores` are real API data.
+- **UI changed visually:** NO — no JSX, props, routes, colors, or component behavior changed.
+- **New endpoint added:** NO — only `GET /stores` / `listDiscoveryStores`.
+- **Evidence:** `pnpm run openapi:lint:dsh` 0 errors 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` 0 errors; `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN fail=0 warn=1 (pre-existing docker-compose password).
+- **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
+
 ## Decision
 
-Current slice decision: BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT.
+Current slice decision: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF.
 
 Explicit blockers:
-- End-to-end frontend runtime remains unproven; frontend runtime transport and UI request/response/screen evidence do not exist yet.
+- End-to-end proof is still missing: no run has started the Go backend, hit `GET /stores` from the frontend, and confirmed a real response reached `DshClientSurface` bridge source `openapi-response` with screen rendering live data.
 
 Next allowed work:
-- Proceed to Batch 9C only: frontend runtime transport for `GET /stores` only.
+- Proceed to Batch 9D only: E2E proof — start Go backend with PostgreSQL, set `EXPO_PUBLIC_DSH_API_BASE_URL`, confirm request/response/screen evidence for `GET /stores` only.
