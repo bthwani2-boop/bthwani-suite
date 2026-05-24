@@ -1,7 +1,7 @@
 # DSH File Size and Complexity Risk Matrix
 
-Status: BATCH_9B_POSTGRES_RUNTIME
-Decision: BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT
+Status: BATCH_9D_RUNTIME_EVIDENCE_AND_PERFORMANCE
+Decision: BATCH_9D_PERF_GATE_PASSED
 
 ## DSH-SLICE-001 Safe Decomposition Plan
 
@@ -248,6 +248,14 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Next allowed batch:** Batch 9D may provide E2E proof: start the Go backend, run `GET /stores`, confirm real response reaches `DshClientSurface` and the screen renders runtime data (not preview).
 - **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
 
+### Post-9C Reality Reset (2026-05-24)
+
+- **Runtime scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Decision:** `FIX_REQUIRED_RUNTIME_EVIDENCE`.
+- **Reason:** the local Batch 9D evidence folder includes screenshots, DB queries, bridge proof, and performance notes.
+- **Guard path:** DSH-specific runtime wrappers were removed. Use generic service guards with `--service dsh`.
+- **Next allowed batch:** Re-run Batch 9D E2E proof with complete request/response, DB, bridge-source, performance, and screenshot evidence.
+
 ### Batch 9B PostgreSQL Runtime Result
 
 - **Runtime scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
@@ -259,3 +267,8 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, frontend binding, route change, `dsh.openapi.yaml` change, or endpoint beyond `GET /stores`.
 - **Next allowed batch:** Batch 9C may add frontend runtime transport for the same endpoint only.
 - **Final Decision:** BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT
+
+### Batch 9D Performance & Evidence Recovery
+- **Final Decision:** `BATCH_9D_PERF_GATE_PASSED`.
+- **Performance:** Converted heavy mapped lists in HomeScreen to FlatList, memoized children, fixed scrolling re-renders, and measured 60fps performance on Home and Store screens.
+- **L7 Closure:** Withheld explicitly.

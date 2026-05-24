@@ -1,9 +1,14 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
-import { BottomNavBar, Surface, Text, colorPalette } from '@bthwani/ui-kit';
+import { BottomNavBar, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
-import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './screens/HomeScreen';
+import {
+  DshHomeGetScreen,
+  type DshHomeCategory,
+  type DshHomeGetPromo,
+  type DshHomeGetStore,
+} from './screens/HomeScreen';
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
@@ -22,11 +27,7 @@ import {
 } from './screens/OperationScreens';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
 import { DshIdentityHubScreen, DshPreferencesHubScreen } from './screens/MySpaceSubScreens';
-import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
-import {
-  dshHomeGetFixturePromos,
-  dshHomeGetFixtureStores,
-} from './data/home.preview-data';
+import { dshHomeGetFixtureStores } from './data/home.preview-data';
 import {
   buildStoreCategories,
   buildStoreDeliveryModes,
@@ -115,14 +116,6 @@ type HostCartInputItem = {
   publishStage?: string;
 };
 
-type PublishedCategoryItem = {
-  id: string;
-  label: string;
-  subtitle: string;
-  renderMode?: 'stores' | 'manual-order';
-  countLabel: string;
-};
-
 const publishedCategoryIds = new Set(
   dshPartnerIntakeItems
     .filter((item) => item.stage === 'published')
@@ -131,7 +124,6 @@ const publishedCategoryIds = new Set(
 );
 
 const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publishedCategoryIds.has(category.id));
-const publishedCategoryListFixtures: PublishedCategoryItem[] = dshCategoryListFixtures;
 const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
 const clientVisibleDiscoveryPreviewStores = dshDiscoveryStores.filter((store) => (
   resolveDshStoreClientVisibility({
@@ -153,6 +145,31 @@ const clientVisibleHomePreviewStores = dshHomeGetFixtureStores.filter((store) =>
     storeOpen: store.statusTone === 'open',
   }).visible
 ));
+
+const CLIENT_BOTTOM_NAV_ITEMS = [
+  { id: 'favorites', label: 'المفضلة', icon: 'heart-outline', activeIcon: 'heart' },
+  { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
+  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+  { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+];
+
+type DshWebWindow = {
+  history: {
+    state: unknown;
+    pushState: (data: unknown, unused: string, url?: string | null) => void;
+    replaceState: (data: unknown, unused: string, url?: string | null) => void;
+  };
+  addEventListener: (type: 'popstate', listener: () => void) => void;
+  removeEventListener: (type: 'popstate', listener: () => void) => void;
+};
+
+function getDshWebWindow(): DshWebWindow | undefined {
+  if (Platform.OS !== 'web') {
+    return undefined;
+  }
+
+  return (globalThis as typeof globalThis & { window?: DshWebWindow }).window;
+}
 
 // clientVisibleDiscoveryPreviewStores and clientVisibleHomePreviewStores are kept at
 // module level as static preview data seeds. Bridge resolution, derived store lists, and
@@ -386,25 +403,25 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const clientVisibleHomeStores = runtimeBridge.homeStores;
 
   // ── Route-validation helpers (closed over the live store list) ──────────────
-  function hasStoreTarget(storeId?: string): boolean {
+  const hasStoreTarget = React.useCallback((storeId?: string): boolean => {
     return typeof storeId === 'string' && clientVisibleDiscoveryStores.some((store) => store.id === storeId);
-  }
+  }, [clientVisibleDiscoveryStores]);
 
-  function hasStoreCategoryTarget(storeId?: string, categoryId?: string): boolean {
+  const hasStoreCategoryTarget = React.useCallback((storeId?: string, categoryId?: string): boolean => {
     if (!hasStoreTarget(storeId) || typeof categoryId !== 'string') {
       return false;
     }
     return (storeItemsByStoreId[storeId] ?? []).some((item) => item.categoryId === categoryId);
-  }
+  }, [hasStoreTarget]);
 
-  function hasProductTarget(storeId?: string, productId?: string): boolean {
+  const hasProductTarget = React.useCallback((storeId?: string, productId?: string): boolean => {
     if (!hasStoreTarget(storeId) || typeof productId !== 'string') {
       return false;
     }
     return (storeItemsByStoreId[storeId] ?? []).some((item) => item.id === productId);
-  }
+  }, [hasStoreTarget]);
 
-  function isMarketingGrowthRouteValid(item: MarketingGrowthRecord): boolean {
+  const isMarketingGrowthRouteValid = React.useCallback((item: MarketingGrowthRecord): boolean => {
     if (
       item.routeTarget === 'home'
       || item.routeTarget === 'search'
@@ -433,9 +450,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     }
 
     return false;
-  }
+  }, [hasProductTarget, hasStoreCategoryTarget, hasStoreTarget]);
 
-  function getStoreCanonicalMetadata(storeId: string): HostCanonicalMetadata {
+  const getStoreCanonicalMetadata = React.useCallback((storeId: string): HostCanonicalMetadata => {
     const store =
       clientVisibleDiscoveryStores.find((entry) => entry.id === storeId)
       ?? dshDiscoveryStores.find((entry) => entry.id === storeId);
@@ -444,9 +461,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       sourceRecordId: store?.sourceRecordId,
       publishStage: store?.publishStage,
     };
-  }
+  }, [clientVisibleDiscoveryStores]);
 
-  function getProductCanonicalMetadata(storeId: string, productId: string): HostCanonicalMetadata {
+  const getProductCanonicalMetadata = React.useCallback((storeId: string, productId: string): HostCanonicalMetadata => {
     const storeMetadata = getStoreCanonicalMetadata(storeId);
     const product = (storeItemsByStoreId[storeId] ?? []).find((entry) => entry.id === productId);
     return {
@@ -455,7 +472,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       sourceRecordId: product?.sourceRecordId ?? storeMetadata.sourceRecordId,
       publishStage: product?.publishStage ?? storeMetadata.publishStage,
     };
-  }
+  }, [getStoreCanonicalMetadata]);
 
   const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
   const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
@@ -474,7 +491,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
-  const [selectedItemId, setSelectedItemId] = React.useState<string>('');
+  const [, setSelectedItemId] = React.useState<string>('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string>(defaultTrackingOrderId);
   const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
   const [reorderAlertMessage, setReorderAlertMessage] = React.useState<string | undefined>(undefined);
@@ -521,8 +538,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
             routeHistoryRef.current.push(route);
           }
         }
-        if (Platform.OS === 'web' && typeof window !== 'undefined') {
-          window.history.pushState({ route }, '');
+        const webWindow = getDshWebWindow();
+        if (webWindow) {
+          webWindow.history.pushState({ route }, '');
         }
       }
     }
@@ -560,26 +578,27 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   }, [onExit, sheinInlineOpen, awnakInlineOpen]);
 
   React.useEffect(() => {
-    if (Platform.OS !== 'web' || typeof window === 'undefined') {
+    const webWindow = getDshWebWindow();
+    if (!webWindow) {
       return undefined;
     }
 
-    const handlePopState = (event: PopStateEvent) => {
+    const handlePopState = () => {
       // Priority 1: dismiss transient modal overlays inside HomeScreen.
       if (homeBackResolverRef.current?.()) {
-        window.history.pushState({ route }, '');
+        webWindow.history.pushState({ route }, '');
         return;
       }
 
       // Priority 2: close inline order forms.
       if (sheinInlineOpen) {
         setSheinInlineOpen(false);
-        window.history.pushState({ route }, '');
+        webWindow.history.pushState({ route }, '');
         return;
       }
       if (awnakInlineOpen) {
         setAwnakInlineOpen(false);
-        window.history.pushState({ route }, '');
+        webWindow.history.pushState({ route }, '');
         return;
       }
 
@@ -594,15 +613,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    webWindow.addEventListener('popstate', handlePopState);
 
     // Initialize/sync history state if empty
-    if (!window.history.state || window.history.state.route !== route) {
-      window.history.replaceState({ route }, '');
+    if (!webWindow.history.state || (webWindow.history.state as { route?: DshRoute }).route !== route) {
+      webWindow.history.replaceState({ route }, '');
     }
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      webWindow.removeEventListener('popstate', handlePopState);
     };
   }, [route, onExit, sheinInlineOpen, awnakInlineOpen]);
 
@@ -659,7 +678,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return () => {
       cancelled = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount; preview seeds are module-level constants.
 
   const filteredOrders = React.useMemo(() => {
@@ -770,7 +788,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
     // 7. Route to cart-get
     setRoute('cart-get');
-  }, [createOrderValues.note, clientVisibleDiscoveryStores]);
+  }, [clientVisibleDiscoveryStores]);
 
   const openTrackedOrder = React.useCallback((
     orderId?: string,
@@ -836,6 +854,24 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
   const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
   const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
+  const activeStoreScreenStore = React.useMemo(() => ({
+    id: activeStore.id,
+    name: activeStore.name,
+    subtitle: activeStore.subtitle,
+    statusLabel: activeStore.statusLabel,
+    etaLabel: activeStore.meta,
+    deliveryFeeLabel: activeStore.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
+    followersCount: activeStore.followerCount,
+    priceMatchLabel: activeStore.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
+    imageUri: activeStore.imageUri,
+    deliveryLabel: activeStore.deliveryLabel,
+    serviceLabel: activeStore.serviceLabel,
+    subscriptionPackageChips: activeStore.subscriptionPackageChips,
+    hasBthwaniPro: activeStore.hasBthwaniPro,
+    tags: activeStoreTags,
+    categories: activeStoreCategories,
+    deliveryModes: activeStoreDeliveryModes,
+  }), [activeStore, activeStoreCategories, activeStoreDeliveryModes, activeStoreTags]);
   const reopenTracking = React.useCallback(() => {
     openTrackedOrder(
       trackingOrderOverride ? undefined : activeTrackedOrder?.id,
@@ -847,11 +883,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         : undefined,
     );
   }, [activeTrackedOrder?.id, openTrackedOrder, trackingOrderOverride, trackingOrderValues.fulfillmentMode]);
-
-  const selectedItem = React.useMemo(
-    () => activeStoreItems.find((item) => item.id === selectedItemId) ?? activeStoreItems[0],
-    [activeStoreItems, selectedItemId],
-  );
 
   const addItemToHostCart = React.useCallback((
     item: HostCartInputItem,
@@ -916,10 +947,33 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     });
   }, [activeCanonicalProductId, activeCanonicalStoreId, activeStore, defaultFulfillmentMode]);
 
-  const liveMarketingPrograms = getLiveMarketingGrowthItems('client');
-  const liveMarketingShorts = liveMarketingPrograms
-    .filter((item) => item.family === 'shorts')
-    .filter(isMarketingGrowthRouteValid);
+  const liveMarketingPrograms = React.useMemo(() => getLiveMarketingGrowthItems('client'), []);
+  const liveMarketingShorts = React.useMemo(
+    () => liveMarketingPrograms
+      .filter((item) => item.family === 'shorts')
+      .filter(isMarketingGrowthRouteValid),
+    [isMarketingGrowthRouteValid, liveMarketingPrograms],
+  );
+  const homeMarketingPromos = React.useMemo(() => getPublishedMarketingHomePromos('home') as DshHomeGetPromo[], []);
+  const homePromos = React.useMemo(() => getPublishedHomePromos(), []);
+  const homeRecentOrders = React.useMemo(() => [
+    {
+      id: 'home-recent-order-1',
+      storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001',
+      title: 'الطلب النشط',
+      subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة',
+      meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
+      statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
+    },
+    {
+      id: 'home-recent-order-2',
+      storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002',
+      title: 'آخر طلب',
+      subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء',
+      meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`,
+      statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
+    },
+  ], [clientVisibleHomeStores]);
 
   // Sanity check
   const importedScreens: Array<[string, unknown]> = [
@@ -944,6 +998,95 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     ['DshIdentityHubScreen', DshIdentityHubScreen as unknown],
     ['DshPreferencesHubScreen', DshPreferencesHubScreen as unknown],
   ];
+
+  const handleOpenActiveStoreItems = React.useCallback(() => {
+    setStoreItemsEntryOrigin('store-get');
+    setRoute('store-items');
+  }, []);
+
+  const handleOpenActiveStoreCart = React.useCallback((mode?: DshFulfillmentDeliveryMode) => {
+    const nextFulfillmentMode = mode ?? selectedFulfillmentMode;
+    setSelectedFulfillmentMode(nextFulfillmentMode);
+    setCreateOrderValues((currentValues) => ({
+      ...currentValues,
+      fulfillmentMode: nextFulfillmentMode,
+      pickupAddress: resolveStorePickupAddress(activeStore),
+      dropoffAddress: nextFulfillmentMode === 'pickup' ? '' : currentValues.dropoffAddress,
+    }));
+    setRoute('cart-get');
+  }, [activeStore, selectedFulfillmentMode]);
+
+  const handleToggleHomeFavorite = React.useCallback((storeId: string) => {
+    const currentStore = clientVisibleHomeStores.find((s) => s.id === storeId) || clientVisibleDiscoveryStores.find((s) => s.id === storeId);
+    const currentVal = favoriteOverrides[storeId] ?? currentStore?.isFavorite ?? false;
+    setFavoriteOverrides((previous) => ({
+      ...previous,
+      [storeId]: !currentVal,
+    }));
+  }, [clientVisibleDiscoveryStores, clientVisibleHomeStores, favoriteOverrides]);
+
+  const handleOpenHomeCategory = React.useCallback((categoryId: string) => {
+    if (categoryId === 'shein') {
+      setSheinInlineOpen(true);
+      setRoute('home');
+      return;
+    }
+    if (categoryId === 'awnak') {
+      setAwnakInlineOpen(true);
+      setRoute('home');
+      return;
+    }
+    setRoute('home');
+  }, []);
+
+  const handleOpenHomeStoreCategory = React.useCallback((storeId: string, categoryId: string) => {
+    const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
+    setActiveStoreId(storeId);
+    setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+    setActiveCanonicalProductId(undefined);
+    setItemsCategory(categoryId);
+    setStoreItemsEntryOrigin('home');
+    setRoute('store-items');
+  }, [getStoreCanonicalMetadata]);
+
+  const handleOpenHomeProduct = React.useCallback((storeId: string, itemId: string) => {
+    const nextProductMetadata = getProductCanonicalMetadata(storeId, itemId);
+    setActiveStoreId(storeId);
+    setActiveCanonicalStoreId(nextProductMetadata.canonicalStoreId);
+    setActiveCanonicalProductId(nextProductMetadata.canonicalProductId);
+    setSelectedItemId(itemId);
+    setRoute('cart-get');
+  }, [getProductCanonicalMetadata]);
+
+  const handleOpenHomeBenefits = React.useCallback((screenId?: string) => {
+    setSelectedOperationScreen(screenId as ClientOperationScreenId);
+    setRoute('benefits');
+  }, []);
+
+  const handleOpenHomeStore = React.useCallback((storeId: string) => {
+    if (!hasStoreTarget(storeId)) {
+      return;
+    }
+    const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
+    setActiveStoreId(storeId);
+    setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
+    setActiveCanonicalProductId(undefined);
+    setItemsQuery('');
+    setItemsCategory('all');
+    setSelectedItemId('');
+    setRoute('store-get');
+  }, [getStoreCanonicalMetadata, hasStoreTarget]);
+
+  const handleClientBottomNavSelect = React.useCallback((id: string) => {
+    if (id === 'favorites') setRoute('home');
+    if (id === 'orders') setRoute('orders-list');
+    if (id === 'wallet') setRoute('wlt-home');
+    if (id === 'profile') setRoute('my-space');
+  }, []);
+
+  const handleServiceLauncherPress = React.useCallback(() => {
+    setServiceDialTrigger((token) => token + 1);
+  }, []);
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {
@@ -1020,41 +1163,11 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return (
       <DshStoreGetScreen
         appearanceMode={appearanceMode}
-        store={{
-          id: activeStore.id,
-          name: activeStore.name,
-          subtitle: activeStore.subtitle,
-          statusLabel: activeStore.statusLabel,
-          etaLabel: activeStore.meta,
-          deliveryFeeLabel: activeStore.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
-          followersCount: activeStore.followerCount,
-          priceMatchLabel: activeStore.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
-          imageUri: activeStore.imageUri,
-          deliveryLabel: activeStore.deliveryLabel,
-          serviceLabel: activeStore.serviceLabel,
-          subscriptionPackageChips: activeStore.subscriptionPackageChips,
-          hasBthwaniPro: activeStore.hasBthwaniPro,
-          tags: activeStoreTags,
-          categories: activeStoreCategories,
-          deliveryModes: activeStoreDeliveryModes,
-        }}
+        store={activeStoreScreenStore}
         menuItems={activeStoreItems}
         onAddItemToCart={addItemToHostCart}
-        onOpenItems={() => {
-          setStoreItemsEntryOrigin('store-get');
-          setRoute('store-items');
-        }}
-        onOpenCart={(mode) => {
-          const nextFulfillmentMode = mode ?? selectedFulfillmentMode;
-          setSelectedFulfillmentMode(nextFulfillmentMode);
-          setCreateOrderValues((currentValues) => ({
-            ...currentValues,
-            fulfillmentMode: nextFulfillmentMode,
-            pickupAddress: resolveStorePickupAddress(activeStore),
-            dropoffAddress: nextFulfillmentMode === 'pickup' ? '' : currentValues.dropoffAddress,
-          }));
-          setRoute('cart-get');
-        }}
+        onOpenItems={handleOpenActiveStoreItems}
+        onOpenCart={handleOpenActiveStoreCart}
         onOpenBenefits={() => {
           setSelectedOperationScreen('entitlements-get');
           setRoute('benefits');
@@ -1126,7 +1239,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'benefits') {
     return (
       <DshBenefitsHubScreen
-        screenId={selectedOperationScreen as any}
+        screenId={selectedOperationScreen}
         onPrimaryAction={returnHome}
         onSecondaryAction={returnHome}
         onRetry={() => setRoute('benefits')}
@@ -1137,7 +1250,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'conversation-workspace') {
     return (
       <DshConversationHubScreen
-        screenId={selectedOperationScreen as any}
+        screenId={selectedOperationScreen as 'chat-read-ack' | 'chat-send'}
         onPrimaryAction={returnOrdersList}
         onSecondaryAction={returnOrdersList}
         onRetry={() => setRoute('conversation-workspace')}
@@ -1158,7 +1271,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'proxy-workspace') {
     return (
       <DshProxyHubScreen
-        screenId={selectedOperationScreen as any}
+        screenId={selectedOperationScreen as 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking'}
         onPrimaryAction={() => setRoute(selectedOperationScreen === 'proxy-request-tracking' ? 'tracking' : 'orders-list')}
         onSecondaryAction={returnOrdersList}
         onRetry={() => setRoute('proxy-workspace')}
@@ -1214,7 +1327,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   if (route === 'service-settings') {
     return (
       <DshServiceSettingsHubScreen
-        screenId={selectedOperationScreen as any}
+        screenId={selectedOperationScreen as 'listing-status-update' | 'service-modes-resolve' | 'zone-set'}
         onPrimaryAction={returnHome}
         onSecondaryAction={returnHome}
         onRetry={() => setRoute('service-settings')}
@@ -1268,19 +1381,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       direction="rtl"
       launcherLabel="الخدمات"
       launcherIcon="grid"
-      onLauncherPress={() => setServiceDialTrigger((t) => t + 1)}
-      onSelect={(id) => {
-        if (id === 'favorites') setRoute('home');
-        if (id === 'orders') setRoute('orders-list');
-        if (id === 'wallet') setRoute('wlt-home');
-        if (id === 'profile') setRoute('my-space');
-      }}
-      items={[
-        { id: 'favorites', label: 'المفضلة', icon: 'heart-outline', activeIcon: 'heart' },
-        { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
-        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
-        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
-      ]}
+      onLauncherPress={handleServiceLauncherPress}
+      onSelect={handleClientBottomNavSelect}
+      items={CLIENT_BOTTOM_NAV_ITEMS}
     />
   );
 
@@ -1291,37 +1394,13 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           state={clientDiscoveryStoresBridge.state}
           serviceDialTrigger={serviceDialTrigger}
           favoriteOverrides={favoriteOverrides}
-      onToggleFavorite={(storeId) => {
-        const currentStore = clientVisibleHomeStores.find((s) => s.id === storeId) || clientVisibleDiscoveryStores.find((s) => s.id === storeId);
-        const currentVal = favoriteOverrides[storeId] ?? currentStore?.isFavorite ?? false;
-        setFavoriteOverrides((previous) => ({
-          ...previous,
-          [storeId]: !currentVal,
-        }));
-      }}
-      categories={dshCategoryListFixtures as any}
-      promos={getPublishedMarketingHomePromos('home') as DshHomeGetPromo[]}
-      homePromos={getPublishedHomePromos()}
+      onToggleFavorite={handleToggleHomeFavorite}
+      categories={dshCategoryListFixtures as DshHomeCategory[]}
+      promos={homeMarketingPromos}
+      homePromos={homePromos}
       approvedVideoShorts={liveMarketingShorts}
-      stores={clientVisibleHomeStores as any}
-      recentOrders={[
-        {
-          id: 'home-recent-order-1',
-          storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001',
-          title: 'الطلب النشط',
-          subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة',
-          meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
-          statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
-        },
-        {
-          id: 'home-recent-order-2',
-          storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002',
-          title: 'آخر طلب',
-          subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء',
-          meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`,
-          statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
-        },
-      ]}
+      stores={clientVisibleHomeStores as DshHomeGetStore[]}
+      recentOrders={homeRecentOrders}
       onBack={onExit}
       onOpenWallet={() => setRoute('wlt-home')}
       onOpenEntry={() => setRoute('entry')}
@@ -1330,41 +1409,11 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       onOpenCart={() => setRoute('cart-get')}
       onOpenService={onOpenService}
       onOpenList={() => setRoute('home')}
-      onOpenCategory={(categoryId) => {
-        if (categoryId === 'shein') {
-          setSheinInlineOpen(true);
-          setRoute('home');
-          return;
-        }
-        if (categoryId === 'awnak') {
-          setAwnakInlineOpen(true);
-          setRoute('home');
-          return;
-        }
-        setRoute('home');
-      }}
+      onOpenCategory={handleOpenHomeCategory}
       onOpenDiscovery={() => setRoute('home')}
-      onOpenStoreCategory={(storeId, categoryId) => {
-        const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
-        setActiveStoreId(storeId);
-        setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
-        setActiveCanonicalProductId(undefined);
-        setItemsCategory(categoryId);
-        setStoreItemsEntryOrigin('home');
-        setRoute('store-items');
-      }}
-      onOpenProduct={(storeId, itemId) => {
-        const nextProductMetadata = getProductCanonicalMetadata(storeId, itemId);
-        setActiveStoreId(storeId);
-        setActiveCanonicalStoreId(nextProductMetadata.canonicalStoreId);
-        setActiveCanonicalProductId(nextProductMetadata.canonicalProductId);
-        setSelectedItemId(itemId);
-        setRoute('cart-get');
-      }}
-      onOpenBenefits={(screenId) => {
-        setSelectedOperationScreen(screenId as any);
-        setRoute('benefits');
-      }}
+      onOpenStoreCategory={handleOpenHomeStoreCategory}
+      onOpenProduct={handleOpenHomeProduct}
+      onOpenBenefits={handleOpenHomeBenefits}
       onOpenFavorites={() => setRoute('home')}
       onOpenSearch={openHomeInlineSearch}
       onOpenOrders={() => setRoute('orders-list')}
@@ -1377,19 +1426,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         setSheinInlineOpen(true);
         setRoute('home');
       }}
-      onOpenStore={(storeId) => {
-        if (!hasStoreTarget(storeId)) {
-          return;
-        }
-        const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
-        setActiveStoreId(storeId);
-        setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
-        setActiveCanonicalProductId(undefined);
-        setItemsQuery('');
-        setItemsCategory('all');
-        setSelectedItemId('');
-        setRoute('store-get');
-      }}
+      onOpenStore={handleOpenHomeStore}
       searchAutoOpenToken={homeSearchAutoOpenToken}
       sheinInlineVisible={sheinInlineOpen}
       onCloseSheinInline={() => setSheinInlineOpen(false)}

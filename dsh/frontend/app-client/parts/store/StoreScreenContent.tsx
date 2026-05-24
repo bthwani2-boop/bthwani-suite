@@ -15,7 +15,6 @@ import {
 
   TouchableOpacity,
   View,
-  type DimensionValue,
   type ImageSourcePropType,
 } from 'react-native';
 // Removed Ionicons import
@@ -23,7 +22,6 @@ import {
   BannerCarousel,
   BThwaniFilterRail,
   BThwaniFilterSwipeBoundary,
-  GlassHeroOverlay,
   Icon,
   SearchTopBar,
   StateView,
@@ -38,7 +36,6 @@ import {
   type BannerCarouselItem,
   type BThwaniAppearanceMode,
   type BThwaniFilterRailItem,
-  type StoreHeroFulfillmentMode,
 } from '@bthwani/ui-kit';
 import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../data/categories.preview-data';
 import { useStoreState } from '../../hooks/useStoreState';
@@ -61,7 +58,6 @@ import {
 } from '../../shared/store-formatting';
 import {
   buildStoreSearchCategories,
-  isFavoriteItem,
   isNewItem,
   isOfferItem,
   resolveStoreItemsForCategory,
@@ -72,6 +68,8 @@ import {
   type DshFulfillmentDeliveryMode,
   getDshFulfillmentDeliveryModeMeta,
 } from '../../contracts/dsh-client-binding.contracts';
+
+declare const __DEV__: boolean | undefined;
 
 export type DshStoreGetScreenProps = {
   appearanceMode?: BThwaniAppearanceMode;
@@ -126,6 +124,17 @@ export type DshStoreGetScreenContentProps = DshStoreGetScreenProps & {
   appearanceMode: BThwaniAppearanceMode;
 };
 
+const STORE_MENU_CARD_HEIGHT = 126;
+const STORE_MENU_CARD_GAP = 2;
+const STORE_MENU_SNAP_INTERVAL = STORE_MENU_CARD_HEIGHT + STORE_MENU_CARD_GAP;
+const STORE_MENU_INITIAL_NUM_TO_RENDER = 6;
+const STORE_MENU_MAX_TO_RENDER_PER_BATCH = 6;
+const STORE_MENU_WINDOW_SIZE = 7;
+const STORE_PREVIEW_ITEM_GAP = 16;
+const STORE_PREVIEW_INITIAL_NUM_TO_RENDER = 3;
+const STORE_PREVIEW_MAX_TO_RENDER_PER_BATCH = 3;
+const STORE_PREVIEW_WINDOW_SIZE = 5;
+
 function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
   if (!canRenderInClientSurface(store?.publishStage, 'store')) {
     return undefined;
@@ -171,6 +180,58 @@ function renderNonReadyState(
     />
   );
 }
+
+const StoreMenuListItem = React.memo(function StoreMenuListItem({
+  item,
+  index,
+  scrollY,
+  partnerImageSource,
+  isFavorited,
+  onOpenMeasurementPicker,
+  onOpenImagePreview,
+  onToggleFavorite,
+}: {
+  item: DshStoreGetMenuItem;
+  index: number;
+  scrollY: Animated.Value;
+  partnerImageSource?: ImageSourcePropType | string | null;
+  isFavorited: boolean;
+  onOpenMeasurementPicker: (item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => void;
+  onOpenImagePreview: (item: DshStoreGetMenuItem) => void;
+  onToggleFavorite: (id: string) => void;
+}) {
+  const inputRange = [
+    (index - 1) * STORE_MENU_SNAP_INTERVAL,
+    index * STORE_MENU_SNAP_INTERVAL,
+    (index + 1) * STORE_MENU_SNAP_INTERVAL,
+  ];
+  const scale = scrollY.interpolate({ inputRange, outputRange: [0.986, 1, 0.986], extrapolate: 'clamp' });
+  const translateY = scrollY.interpolate({ inputRange, outputRange: [8, 0, 8], extrapolate: 'clamp' });
+  const opacity = scrollY.interpolate({ inputRange, outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' });
+  const handleAddPress = React.useCallback(
+    (anchor?: { x: number; y: number }) => onOpenMeasurementPicker(item, anchor ?? { x: 32, y: 360 }),
+    [item, onOpenMeasurementPicker],
+  );
+  const handleFavoritePress = React.useCallback(() => {
+    onToggleFavorite(item.id);
+  }, [item.id, onToggleFavorite]);
+
+  return (
+    <Animated.View
+      style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: STORE_MENU_CARD_GAP, marginHorizontal: 12 }]}
+      pointerEvents="box-none"
+    >
+      <MenuItemCard
+        item={item}
+        partnerImageSource={partnerImageSource}
+        onAddPress={handleAddPress}
+        onImagePress={onOpenImagePreview}
+        onFavoritePress={handleFavoritePress}
+        isFavorited={isFavorited}
+      />
+    </Animated.View>
+  );
+});
 
 export function DshStoreGetScreen(props: DshStoreGetScreenProps) {
   const appearanceMode = props.appearanceMode ?? 'lightPremium';
@@ -245,34 +306,10 @@ function DshStoreGetScreenContent({
     primaryText: tokens.colors.textPrimary,
     screenBackground: tokens.appBackground,
     secondaryText: tokens.colors.textSecondary,
-    strongSurface: isDarkGlass ? tokens.glassSurfaceStrong : tokens.colors.surfacePrimary,
     subtleSurface: isDarkGlass ? tokens.glassSurface : tokens.colors.surfaceRaised,
-    heroOverlay: tokens.components.overlays.heroOverlay,
-    actionBackgroundGlass: isDarkGlass ? hexToRgba(stylesTokens.black, 0.35) : hexToRgba(stylesTokens.white, 0.45),
-    actionBorderGlass: isDarkGlass ? hexToRgba(stylesTokens.white, 0.22) : hexToRgba(stylesTokens.black, 0.12),
-    identityDockBackground: isDarkGlass ? hexToRgba(stylesTokens.white, 0.12) : hexToRgba(stylesTokens.white, 0.88),
-    identityDockBorder: isDarkGlass ? hexToRgba(stylesTokens.white, 0.2) : hexToRgba(stylesTokens.white, 0.3),
     echoImageOpacity: isDarkGlass ? 0.6 : 1,
     cbWashColor: isDarkGlass ? hexToRgba(stylesTokens.black, 0.82) : hexToRgba(stylesTokens.white, 0.88),
-    heroFadeRGB: isDarkGlass ? '22, 22, 28' : '255, 255, 255',
-    heroFadeMaxAlpha: isDarkGlass ? 0.82 : 0.88,
-    // REVERSE FEATHER GRADIENT (Metrics Row Transition)
-    metricsFeatherColor: isDarkGlass ? tokens.colors.surfaceRaised : stylesTokens.white,
   }), [isDarkGlass, tokens]);
-
-  const reverseFeatherBands = React.useMemo(
-    () => Array.from({ length: 40 }, (_, index) => {
-      const t = index / 39;
-      const alpha = Math.pow(t, 1.5) * appearanceChrome.heroFadeMaxAlpha;
-
-      return {
-        key: index,
-        backgroundColor: `rgba(${appearanceChrome.heroFadeRGB}, ${alpha.toFixed(3)})`,
-        bottom: `${(t * 100).toFixed(2)}%` as DimensionValue,
-      };
-    }),
-    [appearanceChrome.heroFadeMaxAlpha, appearanceChrome.heroFadeRGB],
-  );
 
   const handleToggleFavorite = React.useCallback((id: string) => {
     setFavoriteIds((prev) => {
@@ -281,9 +318,9 @@ function DshStoreGetScreenContent({
       else next.add(id);
       return next;
     });
-  }, []);
+  }, [setFavoriteIds]);
 
-  const closeImagePreview = React.useCallback(() => setPreviewItem(null), []);
+  const closeImagePreview = React.useCallback(() => setPreviewItem(null), [setPreviewItem]);
 
   const deliveryModes = React.useMemo(() => {
     if (store?.deliveryModes?.length) {
@@ -307,7 +344,7 @@ function DshStoreGetScreenContent({
     }
 
     setSelectedMode(deliveryModes[0].id);
-  }, [deliveryModes, selectedMode]);
+  }, [deliveryModes, selectedMode, setSelectedMode]);
 
   const storeCoverImageSource = React.useMemo(() => {
     if (!store) return undefined;
@@ -337,10 +374,6 @@ function DshStoreGetScreenContent({
     });
   }, [clientVisibleItems, favoriteIds, store?.categories]);
 
-  const CARD_HEIGHT = 126;
-  const CARD_GAP = 2;
-  const SNAP_INTERVAL = CARD_HEIGHT + CARD_GAP;
-
   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
 
@@ -364,16 +397,19 @@ function DshStoreGetScreenContent({
 
   const PREVIEW_ITEM_WIDTH = viewportWidth * 0.92;
   const PREVIEW_ITEM_HEIGHT = viewportHeight * 0.54;
-  const PREVIEW_ITEM_GAP = 16;
-  const PREVIEW_SNAP_INTERVAL = PREVIEW_ITEM_HEIGHT + PREVIEW_ITEM_GAP;
+  const PREVIEW_SNAP_INTERVAL = PREVIEW_ITEM_HEIGHT + STORE_PREVIEW_ITEM_GAP;
 
-  const openImagePreview = React.useCallback((item: DshStoreGetMenuItem) => {
-    const index = previewItems.findIndex((i) => i.id === item.id);
-    if (index !== -1) {
-      setPreviewActiveIndex(index);
-      setPreviewItem(item);
-    }
-  }, [previewItems]);
+  const normalizedStoreName = normalizeDisplayText(store?.name);
+  const normalizedStoreSubtitle = normalizeDisplayText(store?.subtitle);
+  const normalizedEtaLabel = normalizeDisplayText(store?.etaLabel);
+
+  const openMeasurementPicker = React.useCallback((item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => {
+    const options = resolveMeasurementOptions(item);
+    setPickerItem(item);
+    setPickerAnchor(anchor ?? { x: 32, y: 360 });
+    setSelectedMeasureQty(1);
+    setSelectedMeasureOption(options[0] ?? null);
+  }, [setPickerAnchor, setPickerItem, setSelectedMeasureOption, setSelectedMeasureQty]);
 
   const resolveItemsForCategory = React.useCallback((categoryId: string) => {
     return resolveStoreItemsForCategory({
@@ -387,6 +423,14 @@ function DshStoreGetScreenContent({
   const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
   const previewItems = visibleItems;
 
+  const openImagePreview = React.useCallback((item: DshStoreGetMenuItem) => {
+    const index = previewItems.findIndex((i) => i.id === item.id);
+    if (index !== -1) {
+      setPreviewActiveIndex(index);
+      setPreviewItem(item);
+    }
+  }, [previewItems, setPreviewActiveIndex, setPreviewItem]);
+
   React.useEffect(() => {
     if (!categories.length) {
       return;
@@ -397,7 +441,7 @@ function DshStoreGetScreenContent({
     }
 
     setSelectedCategory(categories[0]?.id ?? 'all');
-  }, [categories, selectedCategory]);
+  }, [categories, selectedCategory, setSelectedCategory]);
 
   const changeCategory = React.useCallback((newId: string) => {
     if (newId === selectedCategory) return;
@@ -405,7 +449,7 @@ function DshStoreGetScreenContent({
     if (Platform.OS !== 'web') {
       Vibration.vibrate(8);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, setSelectedCategory]);
 
   const categoryRailItems = React.useMemo<BThwaniFilterRailItem[]>(
     () =>
@@ -458,7 +502,7 @@ function DshStoreGetScreenContent({
         }
       },
     }),
-    [previewActiveIndex, previewItems, isRTL]
+    [previewActiveIndex, previewItems, isRTL, setPreviewActiveIndex, setPreviewItem]
   );
 
   const renderPreviewItem = React.useCallback(({ item, index }: { item: DshStoreGetMenuItem, index: number }) => {
@@ -486,7 +530,7 @@ function DshStoreGetScreenContent({
         {
           width: PREVIEW_ITEM_WIDTH,
           height: PREVIEW_ITEM_HEIGHT,
-          marginVertical: PREVIEW_ITEM_GAP / 2,
+          marginVertical: STORE_PREVIEW_ITEM_GAP / 2,
           backgroundColor: appearanceChrome.modalSurface,
           borderColor: appearanceChrome.modalBorder,
           borderWidth: 1,
@@ -563,7 +607,7 @@ function DshStoreGetScreenContent({
         </View>
       </Animated.View>
     );
-  }, [previewScrollY, PREVIEW_SNAP_INTERVAL, PREVIEW_ITEM_WIDTH, PREVIEW_ITEM_HEIGHT, PREVIEW_ITEM_GAP, appearanceChrome, storeLogoImageSource, favoriteIds, isRTL, store, normalizedStoreName, handleToggleFavorite, openMeasurementPicker, closeImagePreview, viewportWidth, viewportHeight]);
+  }, [previewScrollY, PREVIEW_SNAP_INTERVAL, PREVIEW_ITEM_WIDTH, PREVIEW_ITEM_HEIGHT, appearanceChrome, storeLogoImageSource, favoriteIds, isRTL, store, normalizedStoreName, handleToggleFavorite, openMeasurementPicker, closeImagePreview, viewportWidth, viewportHeight]);
 
   const activeMeasurementOptions = React.useMemo(
     () => (pickerItem ? resolveMeasurementOptions(pickerItem) : []),
@@ -588,29 +632,21 @@ function DshStoreGetScreenContent({
     [pickerAnchor.y],
   );
 
-  const openMeasurementPicker = React.useCallback((item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => {
-    const options = resolveMeasurementOptions(item);
-    setPickerItem(item);
-    setPickerAnchor(anchor ?? { x: 32, y: 360 });
-    setSelectedMeasureQty(1);
-    setSelectedMeasureOption(options[0] ?? null);
-  }, []);
-
   const closeMeasurementPicker = React.useCallback(() => {
     setPickerItem(null);
     setSelectedMeasureOption(null);
     setSelectedMeasureQty(1);
     setIsAddedToCart(false);
-  }, []);
+  }, [setIsAddedToCart, setPickerItem, setSelectedMeasureOption, setSelectedMeasureQty]);
 
   const openInlineSearch = React.useCallback(() => {
     setHeaderSearchVisible(true);
-  }, []);
+  }, [setHeaderSearchVisible]);
 
   const closeInlineSearch = React.useCallback(() => {
     setHeaderSearchVisible(false);
     setHeaderSearchQuery('');
-  }, []);
+  }, [setHeaderSearchQuery, setHeaderSearchVisible]);
 
   const handleAddToCart = React.useCallback(() => {
     if (!pickerItem || pickerItem.isAvailable === false) {
@@ -625,22 +661,51 @@ function DshStoreGetScreenContent({
 
     setAddedItemLabel(normalizeDisplayText(pickerItem!.name));
     setIsAddedToCart(true);
-  }, [pickerItem, onAddItemToCart, selectedMeasureOption, selectedMeasureQty, selectedMode]);
+  }, [pickerItem, onAddItemToCart, selectedMeasureOption, selectedMeasureQty, selectedMode, setAddedItemLabel, setIsAddedToCart]);
 
   const handleGoToCart = React.useCallback(() => {
     setIsAddedToCart(false);
     closeMeasurementPicker();
     onOpenCart?.(selectedMode);
-  }, [closeMeasurementPicker, onOpenCart, selectedMode]);
+  }, [closeMeasurementPicker, onOpenCart, selectedMode, setIsAddedToCart]);
 
   const handleContinueShopping = React.useCallback(() => {
     setIsAddedToCart(false);
     closeMeasurementPicker();
-  }, [closeMeasurementPicker]);
+  }, [closeMeasurementPicker, setIsAddedToCart]);
 
-  const normalizedStoreName = normalizeDisplayText(store?.name);
-  const normalizedStoreSubtitle = normalizeDisplayText(store?.subtitle);
-  const normalizedEtaLabel = normalizeDisplayText(store?.etaLabel);
+  const renderStoreMenuItem = React.useCallback(({ item, index }: { item: DshStoreGetMenuItem; index: number }) => {
+    return (
+      <StoreMenuListItem
+        item={item}
+        index={index}
+        scrollY={scrollY}
+        partnerImageSource={storeLogoImageSource}
+        isFavorited={favoriteIds.has(item.id)}
+        onOpenMeasurementPicker={openMeasurementPicker}
+        onOpenImagePreview={openImagePreview}
+        onToggleFavorite={handleToggleFavorite}
+      />
+    );
+  }, [favoriteIds, handleToggleFavorite, openImagePreview, openMeasurementPicker, scrollY, storeLogoImageSource]);
+
+  const listEmptyComponent = React.useMemo(
+    () => (
+      <View style={styles.emptyFeed}>
+        <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
+        <Text style={styles.emptyFeedTitle}>
+          {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
+        </Text>
+        <Text style={styles.emptyFeedText}>
+          {headerSearchQuery.trim()
+            ? `جرّب البحث باسم منتج أو قسم آخر داخل ${normalizedStoreName}.`
+            : storeText.get.emptyCategoryDescription}
+        </Text>
+      </View>
+    ),
+    [headerSearchQuery, normalizedStoreName, storeText.get.emptyCategoryDescription, storeText.get.emptyCategoryTitle],
+  );
+
   const operationalState = React.useMemo(
     () => resolveStoreOperationalState(store?.statusLabel ?? '', store?.deliveryLabel, store?.serviceLabel),
     [store?.deliveryLabel, store?.serviceLabel, store?.statusLabel],
@@ -689,12 +754,12 @@ function DshStoreGetScreenContent({
 
   const firstOfferItem = React.useMemo(
     () => visibleItems.find((item) => isOfferItem(item)) ?? clientVisibleItems.find((item) => isOfferItem(item)) ?? firstVisibleItem,
-    [clientVisibleItems, firstVisibleItem, isOfferItem, visibleItems],
+    [clientVisibleItems, firstVisibleItem, visibleItems],
   );
 
   const firstNewItem = React.useMemo(
     () => visibleItems.find((item) => isNewItem(item)) ?? clientVisibleItems.find((item) => isNewItem(item)) ?? firstVisibleItem,
-    [clientVisibleItems, firstVisibleItem, isNewItem, visibleItems],
+    [clientVisibleItems, firstVisibleItem, visibleItems],
   );
 
   const openStoreItemPreview = React.useCallback((item?: DshStoreGetMenuItem | null) => {
@@ -749,7 +814,7 @@ function DshStoreGetScreenContent({
     if (firstVisibleItem) {
       openStoreItemPreview(firstVisibleItem);
     }
-  }, [changeCategory, firstVisibleItem, onOpenBenefits, openStoreItemPreview]);
+  }, [changeCategory, firstVisibleItem, onOpenBenefits, openStoreItemPreview, setSelectedMode]);
 
   const smartRailItems = React.useMemo<BannerCarouselItem[]>(() => {
     const featureImages = menuItems.map((item) => resolveDshStoreMenuItemImageSource(item));
@@ -889,6 +954,10 @@ function DshStoreGetScreenContent({
               ref={(r) => { listRef.current = r as unknown as FlatList<DshStoreGetMenuItem> | null; }}
               data={visibleItems as DshStoreGetMenuItem[]}
               keyExtractor={(item) => (item as DshStoreGetMenuItem).id}
+              initialNumToRender={STORE_MENU_INITIAL_NUM_TO_RENDER}
+              maxToRenderPerBatch={STORE_MENU_MAX_TO_RENDER_PER_BATCH}
+              windowSize={STORE_MENU_WINDOW_SIZE}
+              removeClippedSubviews={Platform.OS !== 'web'}
               ListHeaderComponent={
                 <>
                   <StoreHero
@@ -997,48 +1066,15 @@ function DshStoreGetScreenContent({
                         variant={isDarkGlass ? 'glass' : 'default'}
                         testID="store-category-rail"
                       />
-                    </View>
+                  </View>
                 </>
               }
-              renderItem={({ item, index }) => {
-                const inputRange = [(index - 1) * SNAP_INTERVAL, index * SNAP_INTERVAL, (index + 1) * SNAP_INTERVAL];
-                const scale = scrollY.interpolate({ inputRange, outputRange: [0.986, 1, 0.986], extrapolate: 'clamp' });
-                const translateY = scrollY.interpolate({ inputRange, outputRange: [8, 0, 8], extrapolate: 'clamp' });
-                const opacity = scrollY.interpolate({ inputRange, outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' });
-
-                return (
-                  <Animated.View style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: CARD_GAP, marginHorizontal: 12 }]}
-                    pointerEvents="box-none"
-                  >
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      partnerImageSource={storeLogoImageSource}
-                      onAddPress={(anchor) => openMeasurementPicker(item, anchor ?? { x: 32, y: 360 })}
-                      onImagePress={openImagePreview}
-                      onFavoritePress={() => handleToggleFavorite(item.id)}
-                      isFavorited={favoriteIds.has(item.id)}
-                    />
-                  </Animated.View>
-                );
-              }}
+              renderItem={renderStoreMenuItem}
               showsVerticalScrollIndicator={false}
-              snapToInterval={SNAP_INTERVAL}
+              snapToInterval={STORE_MENU_SNAP_INTERVAL}
               decelerationRate="fast"
               contentContainerStyle={{ paddingBottom: 60 }}
-              ListEmptyComponent={
-                <View style={styles.emptyFeed}>
-                  <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-                  <Text style={styles.emptyFeedTitle}>
-                    {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
-                  </Text>
-                  <Text style={styles.emptyFeedText}>
-                    {headerSearchQuery.trim()
-                      ? `جرّب البحث باسم منتج أو قسم آخر داخل ${normalizedStoreName}.`
-                      : storeText.get.emptyCategoryDescription}
-                  </Text>
-                </View>
-              }
+              ListEmptyComponent={listEmptyComponent}
             />
           </BThwaniFilterSwipeBoundary>
 
@@ -1104,6 +1140,10 @@ function DshStoreGetScreenContent({
               renderItem={renderPreviewItem}
               keyExtractor={(item) => `preview-${item.id}`}
               horizontal={false}
+              initialNumToRender={STORE_PREVIEW_INITIAL_NUM_TO_RENDER}
+              maxToRenderPerBatch={STORE_PREVIEW_MAX_TO_RENDER_PER_BATCH}
+              windowSize={STORE_PREVIEW_WINDOW_SIZE}
+              removeClippedSubviews={Platform.OS !== 'web'}
               showsVerticalScrollIndicator={false}
               snapToInterval={PREVIEW_SNAP_INTERVAL}
               snapToAlignment="center"
@@ -1113,7 +1153,7 @@ function DshStoreGetScreenContent({
                 { useNativeDriver: true }
               )}
               contentContainerStyle={{
-                paddingVertical: (viewportHeight - PREVIEW_ITEM_HEIGHT) / 2 - PREVIEW_ITEM_GAP / 2,
+                paddingVertical: (viewportHeight - PREVIEW_ITEM_HEIGHT) / 2 - STORE_PREVIEW_ITEM_GAP / 2,
               }}
               initialScrollIndex={previewActiveIndex !== -1 ? previewActiveIndex : 0}
               getItemLayout={(_, index) => ({
@@ -1264,7 +1304,6 @@ const stylesTokens = {
 
 const DARK_BLUE = stylesTokens.blue;
 const ORANGE = stylesTokens.orange;
-const GOLD = stylesTokens.warning;
 
 const styles = StyleSheet.create({
   screen: {

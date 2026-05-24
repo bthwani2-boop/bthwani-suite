@@ -29,8 +29,19 @@
     "tamagui:version": "tamagui --version",
     "tamagui:build": "tamagui build",
     "tamagui:check": "pnpm run tamagui:version && pnpm run tamagui:build",
-    "guard:governance": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Governance",
-    "guard:agent": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Agent"
+    "guard:governance": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Governance -Selection Auto",
+    "guard:governance:auto": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Governance -Selection Auto",
+    "guard:governance:all": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Governance -Selection All",
+    "guard:agent": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Agent",
+    "guard:code-hygiene": "node tools/guards/guard-live-code-organization-hygiene.mjs",
+    "guard:service-go-runtime": "node tools/guards/guard-service-go-runtime.mjs",
+    "guard:service-postgres-runtime": "node tools/guards/guard-service-postgres-runtime.mjs",
+    "guard:service-l7-closure": "node tools/guards/guard-service-l7-closure.mjs",
+    "guard:service-runtime": "node tools/guards/guard-service-runtime.mjs",
+    "guard:platform-vars": "node tools/guards/guard-platform-vars-control.mjs",
+    "guard:operating-model": "node tools/guards/guard-cross-service-operating-model.mjs",
+    "guard:operating-model:strict": "node tools/guards/guard-cross-service-operating-model.mjs --strict",
+    "guard:operating-model:research": "node tools/guards/guard-cross-service-operating-model.mjs --research-plan"
   },
   "packageManager": "pnpm@8.15.0+sha512.ea45517d5285d123eac02c3793505fa1fd6da90a2fc60d1e8d9e0c1e9292886ecfaff513f062b9d1cc8021bb8615033b1ac5bea3b2ee3fc165a6d7034bbe6b03",
   "pnpm": {

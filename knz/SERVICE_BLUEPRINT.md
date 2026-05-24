@@ -1,4 +1,4 @@
-# KNZ Service Blueprint
+﻿# KNZ Service Blueprint
 
 This file is the single truth file for the `knz` service only.
 
@@ -391,3 +391,9 @@ Classify KNZ flows and prove no DSH-like delivery/captain semantics are introduc
 7. Update this file only with verified service-specific truth.
 8. Do not duplicate platform-wide rules here.
 9. Do not claim `CLOSED` unless all applicable gates pass.
+
+## Cross-Surface Effects: Notifications
+
+| Surface | Required Effect | Status | Reason |
+|---|---|---|---|
+| notifications | notification_chain | N/A_WITH_REASON | knz is a backend/operational service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

@@ -30,7 +30,7 @@ git --no-pager diff --check 2>&1 | Set-Content -LiteralPath (Join-Path $Evidence
 
 $Guards = @('guard-steward-v3.mjs','guard-phase-scope-v3.mjs')
 if ($Profile -in @('ui','dsh','prepush','release')) { $Guards += 'guard-uiux-ratchet-v3.mjs' }
-if ($Profile -in @('dsh','finance','release')) { $Guards += 'guard-dsh-platform-vars-v3.mjs' }
+if ($Profile -in @('dsh','finance','release')) { $Guards += 'guard-platform-vars-control.mjs' }
 if ($Profile -in @('prepush','release')) { $Guards += 'guard-release-readiness-v3.mjs' }
 
 $Results = @()

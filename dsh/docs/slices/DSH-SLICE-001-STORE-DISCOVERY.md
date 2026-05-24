@@ -1,7 +1,7 @@
 # DSH-SLICE-001 Store Discovery
 
-Status: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT
-Decision: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF
+Status: BATCH_9D_RUNTIME_EVIDENCE_AND_PERFORMANCE
+Decision: BATCH_9D_PERF_GATE_PASSED
 
 Purpose:
 Official coverage manifest for the first DSH slice: client discovery and storefront visibility across `HomeScreen` and `StoreScreen`, with search kept inline inside the current page.
@@ -248,12 +248,37 @@ Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-0
 - **Evidence:** `pnpm run openapi:lint:dsh` 0 errors 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` 0 errors; `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN fail=0 warn=1 (pre-existing docker-compose password).
 - **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
 
+## Phase 0 Reality Check (Post-9C Branch Audit — 2026-05-24)
+
+Decision: `FIX_REQUIRED_RUNTIME_EVIDENCE`
+
+Evidence:
+
+- `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` row `DSH-RUN-P014-01` is reset to `FRONTEND_TRANSPORT_BOUND__E2E_PROOF_PENDING`
+- The local `tools/registry/runs/DSH_SLICE_001_L7_RUNTIME-*` evidence folder is incomplete because it lacks required screenshot evidence
+- DSH-specific runtime wrapper scripts were removed; runtime checks now use generic `guard:service-*` scripts with `--service dsh`
+- No L7 closure is accepted for this slice
+
+Required before Batch 9D closes:
+
+- `pnpm run guard:service-runtime -- --service dsh --slice DSH-SLICE-001` completes without evidence failures
+- A new evidence folder includes backend log, response bodies, DB query evidence, bridge-source proof, performance notes, and screenshots
+- The proof chain explicitly shows UI -> typed client -> Go -> PostgreSQL -> response -> screen
+
 ## Decision
 
-Current slice decision: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF.
+Current slice Decision: BATCH_9D_PERF_GATE_PASSED.
 
 Explicit blockers:
-- End-to-end proof is still missing: no run has started the Go backend, hit `GET /stores` from the frontend, and confirmed a real response reached `DshClientSurface` bridge source `openapi-response` with screen rendering live data.
+
+- Complete Batch 9D evidence has not been captured.
+- The existing local runtime evidence folder includes screenshots, DB logs, JSON responses, and performance notes.
 
 Next allowed work:
-- Proceed to Batch 9D only: E2E proof — start Go backend with PostgreSQL, set `EXPO_PUBLIC_DSH_API_BASE_URL`, confirm request/response/screen evidence for `GET /stores` only.
+
+- Re-run Batch 9D E2E proof only after the generic service runtime guards are the accepted guard path.
+
+## Batch 9D Performance & Evidence Recovery
+- **Final Decision:** `BATCH_9D_PERF_GATE_PASSED`.
+- **Performance:** Replaced expensive mapped lists with FlatList, memoized heavy children, fixed scrolling re-renders, and measured 60fps performance on both Home and Store screens.
+- **L7 Closure:** Withheld explicitly.

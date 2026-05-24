@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
+import { Image, Pressable, ScrollView, FlatList, Platform, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
   BannerCarousel,
@@ -13,16 +13,12 @@ import {
   StateView,
   StoreCardPremium,
   type StoreCardPremiumItem,
-  Surface,
   Text,
   ModernPremiumHeader,
-  type NavItem,
   colorPalette,
   withAlpha,
-  radius,
   resolveRowDirection,
   resolveTextAlign,
-  sizes,
   spacing,
   ServiceOrbitCarousel,
   type OrbitAnchorLayout,
@@ -154,6 +150,11 @@ function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType
 
 type CategoryDialItem = OrbitCarouselItem;
 type DialAnchorLayout = OrbitAnchorLayout;
+type HomeStoreCardEntry = {
+  item: StoreCardPremiumItem;
+  storeId: string;
+  baseFavorite?: boolean;
+};
 
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
@@ -163,69 +164,6 @@ const serviceDialAnchorLayout: DialAnchorLayout = {
 };
 
 const serviceDialItems: CategoryDialItem[] = dshHomeServiceDialFixtures;
-
-const serviceLauncherMarkStyles = StyleSheet.create({
-  root: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colorPalette.brandSurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  orbit: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: colorPalette.brandStrong,
-    borderTopColor: colorPalette.brand,
-  },
-  needle: {
-    position: 'absolute',
-    top: 6,
-    right: 7,
-    width: 5,
-    height: 15,
-    borderRadius: 999,
-    backgroundColor: colorPalette.brandStrong,
-    transform: [{ rotate: '24deg' }],
-  },
-  planeWrap: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colorPalette.white,
-  },
-});
-
-function DshServiceLauncherMark() {
-  return (
-    <View style={serviceLauncherMarkStyles.root}>
-      <View style={serviceLauncherMarkStyles.orbit} />
-      <View style={serviceLauncherMarkStyles.needle} />
-      <View style={serviceLauncherMarkStyles.planeWrap}>
-        <Icon name="paper-plane" size={12} color={colorPalette.brand} />
-      </View>
-    </View>
-  );
-}
-
-function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) {
-  const currentHour = now.getHours();
-
-  if (openHour < closeHour) {
-    return currentHour >= openHour && currentHour < closeHour;
-  }
-
-  return currentHour >= openHour || currentHour < closeHour;
-}
 
 // Internal resolveTickerBanner removed. Using buildMarketingTickerPlan from store.
 
@@ -259,20 +197,56 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
 
 const ACTIVE_PROMO_INTERVAL_MS = 5000;
 
+const HomeStoreCardItem = React.memo(function HomeStoreCardItem({
+  entry,
+  onOpenStore,
+  onToggleFavorite,
+  setLocalFavoriteToggles,
+}: {
+  entry: HomeStoreCardEntry;
+  onOpenStore?: (storeId: string) => void;
+  onToggleFavorite?: (storeId: string) => void;
+  setLocalFavoriteToggles: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+}) {
+  const handlePress = React.useCallback(() => {
+    onOpenStore?.(entry.storeId);
+  }, [entry.storeId, onOpenStore]);
+
+  const handleFavoritePress = React.useCallback(() => {
+    if (onToggleFavorite) {
+      onToggleFavorite(entry.storeId);
+      return;
+    }
+
+    setLocalFavoriteToggles((current) => ({
+      ...current,
+      [entry.storeId]: !(current[entry.storeId] ?? entry.baseFavorite),
+    }));
+  }, [entry.baseFavorite, entry.storeId, onToggleFavorite, setLocalFavoriteToggles]);
+
+  return (
+    <StoreCardPremium
+      item={entry.item}
+      onPress={onOpenStore ? handlePress : undefined}
+      onFavoritePress={handleFavoritePress}
+    />
+  );
+});
+
 export function DshHomeGetScreen({
   state = 'ready',
   categories,
   promos,
   stores,
-  recentOrders = [],
-  onBack,
+  recentOrders: _recentOrders = [],
+  onBack: _onBack,
   onOpenList,
   onOpenCategory,
   onOpenDiscovery,
   onOpenStoreCategory,
   onOpenProduct,
   onOpenBenefits,
-  onOpenFavorites,
+  onOpenFavorites: _onOpenFavorites,
   onOpenSearch,
   onOpenCart,
   onOpenOrders,
@@ -307,7 +281,7 @@ export function DshHomeGetScreen({
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
   const isRtl = direction === 'rtl';
-  const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
+  const { width: viewportWidth } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => createStyles(direction, theme), [direction, theme]);
@@ -330,9 +304,7 @@ export function DshHomeGetScreen({
     localFavoriteToggles,
     setLocalFavoriteToggles,
     followToggles,
-    setFollowToggles,
     followCounts,
-    setFollowCounts,
     shortsVisible,
     setShortsVisible,
     currentTime,
@@ -344,7 +316,6 @@ export function DshHomeGetScreen({
     serviceDialVisible,
     setServiceDialVisible,
     isTickerHidden,
-    setIsTickerHidden,
   } = useHomeState();
   const favoriteToggles = favoriteOverrides ?? localFavoriteToggles;
   const promoImpressionIdsRef = React.useRef<Set<string>>(new Set());
@@ -354,7 +325,7 @@ export function DshHomeGetScreen({
     if (serviceDialTrigger) {
       setServiceDialVisible(true);
     }
-  }, [serviceDialTrigger]);
+  }, [serviceDialTrigger, setServiceDialVisible]);
 
   React.useEffect(() => {
     if (!searchAutoOpenToken || searchAutoOpenToken === lastSearchAutoOpenTokenRef.current) {
@@ -364,7 +335,7 @@ export function DshHomeGetScreen({
     lastSearchAutoOpenTokenRef.current = searchAutoOpenToken;
     setInlineSearchQuery('');
     setInlineSearchVisible(true);
-  }, [searchAutoOpenToken]);
+  }, [searchAutoOpenToken, setInlineSearchQuery, setInlineSearchVisible]);
 
   const handleOpenMySpace = React.useCallback(() => {
     if (onOpenMySpace) {
@@ -379,8 +350,8 @@ export function DshHomeGetScreen({
     onOpenCart?.();
   }, [onOpenCart]);
 
-  const resolvedCategories = categories ?? [];
-  const resolvedPromos = promos ?? [];
+  const resolvedCategories = React.useMemo(() => categories ?? [], [categories]);
+  const resolvedPromos = React.useMemo(() => promos ?? [], [promos]);
 
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
@@ -388,8 +359,6 @@ export function DshHomeGetScreen({
   const baseCardWidth = Math.max(256, Math.min(326, Math.round(containerWidth - (sidePeek * 2) - (resolvedItemGap * 2))));
   const cardWidth = Math.max(220, Math.round(baseCardWidth * 0.84));
   const cardHeight = Math.max(160, Math.round(cardWidth * 0.78));
-  const itemWidth = cardWidth + resolvedItemGap;
-  const horizontalPadding = Math.max(0, Math.round((containerWidth - cardWidth) / 2));
   const resolvedStoresWithVisibility = React.useMemo(() => (
     (stores ?? []).map((store) => ({
       ...store,
@@ -413,8 +382,6 @@ export function DshHomeGetScreen({
     () => new Map(resolvedStoresWithVisibility.map((store) => [store.id, store.clientVisibility])),
     [resolvedStoresWithVisibility],
   );
-  const resolvedRecentOrders = recentOrders ?? [];
-
   const resolveTargetPartnerStatus = React.useCallback((targetType: string, targetId?: string): DshPartnerActivationStatus | undefined => {
     if (targetType !== 'store' || !targetId) {
       return undefined;
@@ -423,15 +390,18 @@ export function DshHomeGetScreen({
     return storeVisibilityById.get(targetId)?.activationStatus;
   }, [storeVisibilityById]);
 
-  const resolvedHomePromos = (homePromos ?? getPublishedHomePromos()).filter((promo) => {
-    const visibility = getHomePromoVisibilityRecord(promo, {
-      targetSurface: 'home',
-      partnerStatus: resolveTargetPartnerStatus(promo.targetType, promo.targetId),
-    });
+  const resolvedHomePromos = React.useMemo(
+    () => (homePromos ?? getPublishedHomePromos()).filter((promo) => {
+      const visibility = getHomePromoVisibilityRecord(promo, {
+        targetSurface: 'home',
+        partnerStatus: resolveTargetPartnerStatus(promo.targetType, promo.targetId),
+      });
 
-    return isMarketingRenderable(visibility)
-      && canRenderInClientSurface(resolveHomePromoPublishStage(promo.status), 'promo');
-  });
+      return isMarketingRenderable(visibility)
+        && canRenderInClientSurface(resolveHomePromoPublishStage(promo.status), 'promo');
+    }),
+    [homePromos, resolveTargetPartnerStatus],
+  );
 
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
@@ -466,11 +436,61 @@ export function DshHomeGetScreen({
     () => storePagerItems.find((page) => page.categoryId === activeCategoryId) ?? storePagerItems[0] ?? null,
     [activeCategoryId, storePagerItems],
   );
+  const activeHomeStoreCards = React.useMemo(() => {
+    if (!activeStorePage?.stores.length) {
+      return [];
+    }
+
+    return activeStorePage.stores.map((store, index) => {
+      const sm = store.commercialSourceMap;
+      const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
+      const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
+      const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
+      const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
+      const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
+
+      const item: StoreCardPremiumItem = {
+        id: store.id,
+        name: store.name,
+        subtitle: store.address,
+        image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey, store.publishStage),
+        rating: store.rating ?? null,
+        distanceKm: Number.parseFloat((store.distanceLabel || '').replace(/[^\d.]/g, '')) || null,
+        isOpen: store.statusTone === 'open',
+        supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
+        supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
+        serviceTokens: [
+          { label: store.deliveryLabel },
+          { label: isPriceMatchBlocked ? undefined : store.serviceLabel }
+        ].filter(t => t.label),
+        isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
+        isFollowing: followToggles[store.id] ?? store.isFollowing,
+        followersCount: followCounts[store.id] ?? store.followerCount,
+        hasBthwaniPro: isProBlocked ? false : store.hasBthwaniPro,
+        subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel].filter(Boolean) as string[]),
+        hasNewProducts: isNewProductsBlocked ? false : store.hasNewProducts,
+        hasOffer: isOfferBlocked ? false : store.hasOffer,
+        offerText: isOfferBlocked ? undefined : store.offerLabel,
+        pointsMultiplier: Number.parseInt((store.multiplierLabel || '').replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
+        hasCouponAvailable: isCouponBlocked ? false : store.hasCouponAvailable,
+        locationLabel: store.locationLabel,
+        deliveryTimeLabel: store.deliveryTimeLabel,
+        isPopular: store.isPopular,
+        logoImage: resolveDshHomeStoreImageSource(store.logoImageUri, store.publishStage),
+      };
+
+      return {
+        item,
+        storeId: store.id,
+        baseFavorite: store.isFavorite,
+      };
+    });
+  }, [activeStorePage, favoriteToggles, followCounts, followToggles]);
 
   const selectCategoryPage = React.useCallback((categoryId: string, _animated = true) => {
     setActiveCategoryId(categoryId);
     setActiveSubcategoryId(null);
-  }, []);
+  }, [setActiveCategoryId, setActiveSubcategoryId]);
 
   const selectedCategoryFixture = React.useMemo(
     () =>
@@ -482,7 +502,10 @@ export function DshHomeGetScreen({
   const selectedCategoryLabel =
     selectedCategoryFixture?.label ??
     'الفئات';
-  const selectedSubcategories = selectedCategoryFixture?.subcategories ?? [];
+  const selectedSubcategories = React.useMemo(
+    () => selectedCategoryFixture?.subcategories ?? [],
+    [selectedCategoryFixture],
+  );
   React.useEffect(() => {
     if (!categoryItems.length) {
       return;
@@ -496,7 +519,7 @@ export function DshHomeGetScreen({
       setActiveCategoryId('all');
       setActiveSubcategoryId(null);
     }
-  }, [activeCategoryId, categoryItems]);
+  }, [activeCategoryId, categoryItems, setActiveCategoryId, setActiveSubcategoryId]);
   const allCategoryRailItems = React.useMemo(
     () =>
       categoryItems.map((category) => ({
@@ -527,7 +550,7 @@ export function DshHomeGetScreen({
           label: filter.label,
           icon: ({ selected }: { selected: boolean }) => (
             <Icon
-              name={filter.iconName as any}
+              name={filter.iconName as React.ComponentProps<typeof Icon>['name']}
               size={16}
               color={selected ? theme.textInverse : theme.textMuted}
             />
@@ -570,7 +593,7 @@ export function DshHomeGetScreen({
         onOpenSheinInfo?.();
       }
     }
-  }, [onOpenCategory, onOpenSheinInfo, selectCategoryPage]);
+  }, [onOpenCategory, onOpenSheinInfo, selectCategoryPage, setActiveFilter, setActiveRailItemId]);
 
   const isHomeFilterRailItemSelected = React.useCallback((item: BThwaniFilterRailItem) => {
     if (item.id.startsWith(HOME_MODE_FILTER_PREFIX)) {
@@ -589,21 +612,21 @@ export function DshHomeGetScreen({
     if (activeRailItemId.startsWith(HOME_CATEGORY_FILTER_PREFIX) && activeRailItemId !== categoryRailItemId) {
       setActiveRailItemId(categoryRailItemId);
     }
-  }, [activeCategoryId, activeRailItemId]);
+  }, [activeCategoryId, activeRailItemId, setActiveRailItemId]);
 
   React.useEffect(() => {
     if (!homeFilterRailItems.some((item) => item.id === activeRailItemId)) {
       setActiveRailItemId(buildHomeCategoryFilterId(activeCategoryId || 'all'));
     }
-  }, [activeCategoryId, activeRailItemId, homeFilterRailItems]);
+  }, [activeCategoryId, activeRailItemId, homeFilterRailItems, setActiveRailItemId]);
 
   React.useEffect(() => {
-    const timer = setInterval(() => {
+    const timer = globalThis.setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => globalThis.clearInterval(timer);
+  }, [setCurrentTime]);
 
   const homeBackHandler = React.useCallback(() => {
     if (categoriesSheetVisible) { setCategoriesSheetVisible(false); return true; }
@@ -619,7 +642,22 @@ export function DshHomeGetScreen({
       }
     }
     return false;
-  }, [categoriesSheetVisible, shortsVisible, inlineSearchVisible, serviceDialVisible, activeCategoryId, categoryItems, sheinInlineVisible, awnakInlineVisible, selectCategoryPage]);
+  }, [
+    categoriesSheetVisible,
+    shortsVisible,
+    inlineSearchVisible,
+    serviceDialVisible,
+    activeCategoryId,
+    categoryItems,
+    sheinInlineVisible,
+    awnakInlineVisible,
+    selectCategoryPage,
+    setCategoriesSheetVisible,
+    setInlineSearchQuery,
+    setInlineSearchVisible,
+    setServiceDialVisible,
+    setShortsVisible,
+  ]);
 
   React.useEffect(() => {
     onRegisterBackHandler?.(homeBackHandler);
@@ -760,7 +798,25 @@ export function DshHomeGetScreen({
     // Fallback for unknown actions
     onOpenDiscovery?.();
     },
-    [activeFilter, categoryItems, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenOrders, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenTracking, onPromoClick]
+    [
+      activeFilter,
+      categoryItems,
+      onOpenBenefits,
+      onOpenDiscovery,
+      onOpenList,
+      onOpenOrders,
+      onOpenProduct,
+      onOpenSearch,
+      onOpenSheinInfo,
+      onOpenStore,
+      onOpenStoreCategory,
+      onOpenTracking,
+      onPromoClick,
+      setActiveCategoryId,
+      setActiveFilter,
+      setActiveSubcategoryId,
+      setInlineSearchVisible,
+    ]
   );
 
   const bannerItems = React.useMemo<BannerCarouselItem[]>(() => (
@@ -782,8 +838,6 @@ export function DshHomeGetScreen({
   const currentBannerPromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
   const activePromo = currentBannerPromo;
   const activeHomePromo = resolvedHomePromos[0] ?? null;
-  const promoDiscount = activePromo?.subtitle.match(/\d+%/)?.[0] ?? '';
-  const promoTail = activePromo ? activePromo.subtitle.replace(promoDiscount, '').trim() : '';
   const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
 
   React.useEffect(() => {
@@ -884,7 +938,21 @@ export function DshHomeGetScreen({
 
       onOpenList?.();
     },
-    [categoryItems, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onVideoCtaClick]
+    [
+      categoryItems,
+      onOpenBenefits,
+      onOpenDiscovery,
+      onOpenList,
+      onOpenProduct,
+      onOpenSearch,
+      onOpenSheinInfo,
+      onOpenStore,
+      onOpenStoreCategory,
+      onVideoCtaClick,
+      setActiveCategoryId,
+      setActiveSubcategoryId,
+      setShortsVisible,
+    ]
   );
 
   const approvedVideoReels = React.useMemo(() => approvedVideoShorts.filter((video) => {
@@ -939,16 +1007,16 @@ export function DshHomeGetScreen({
   }, [tickerState, tickerAction, onOpenOrders, onOpenTracking, onOpenDiscovery]);
   const openInlineSearch = React.useCallback(() => {
     setInlineSearchVisible(true);
-  }, []);
+  }, [setInlineSearchVisible]);
 
   const closeInlineSearch = React.useCallback(() => {
     setInlineSearchVisible(false);
     setInlineSearchQuery('');
-  }, []);
+  }, [setInlineSearchQuery, setInlineSearchVisible]);
 
   const openServiceDial = React.useCallback(() => {
     setServiceDialVisible(true);
-  }, []);
+  }, [setServiceDialVisible]);
 
   const categoriesDialItems = React.useMemo<CategoryDialItem[]>(() => {
     return categoryItems.map((category) => ({
@@ -1009,7 +1077,7 @@ export function DshHomeGetScreen({
       const hasValidLayout = [x, y, width, height].every((value) => Number.isFinite(value)) && width > 0 && height > 0;
       openSheet(hasValidLayout ? { x, y, width, height } : fallbackCategoriesDialLayout);
     });
-  }, [fallbackCategoriesDialLayout]);
+  }, [fallbackCategoriesDialLayout, setCategoriesDialLayout, setCategoriesSheetVisible]);
 
   if (state !== 'ready') {
     return renderState(state, onRetry);
@@ -1258,64 +1326,17 @@ export function DshHomeGetScreen({
               </Box>
             ) : null}
 
-            {activeStorePage?.stores.length ? (
-              activeStorePage.stores.map((store, index) => {
-                const sm = store.commercialSourceMap;
-                const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
-                const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
-                const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
-                const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
-                const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
-
-                const card: StoreCardPremiumItem = {
-                  id: store.id,
-                  name: store.name,
-                  subtitle: store.address,
-                  image: resolveDshHomeStoreImageSource(store.imageUri ?? store.mediaKey, store.publishStage),
-                  rating: store.rating ?? null,
-                  distanceKm: Number.parseFloat((store.distanceLabel || '').replace(/[^\d.]/g, '')) || null,
-                  isOpen: store.statusTone === 'open',
-                  supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
-                  supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
-                  serviceTokens: [
-                    { label: store.deliveryLabel },
-                    { label: isPriceMatchBlocked ? undefined : store.serviceLabel }
-                  ].filter(t => t.label),
-                  isFavorite: favoriteToggles[store.id] ?? store.isFavorite,
-                  isFollowing: followToggles[store.id] ?? store.isFollowing,
-                  followersCount: followCounts[store.id] ?? store.followerCount,
-                  hasBthwaniPro: isProBlocked ? false : store.hasBthwaniPro,
-                  subscriptionPackageChips: isProBlocked ? [] : (store.subscriptionPackageChips ?? [store.deliveryLabel, store.serviceLabel].filter(Boolean) as string[]),
-                  hasNewProducts: isNewProductsBlocked ? false : store.hasNewProducts,
-                  hasOffer: isOfferBlocked ? false : store.hasOffer,
-                  offerText: isOfferBlocked ? undefined : store.offerLabel,
-                  pointsMultiplier: Number.parseInt((store.multiplierLabel || '').replace(/[^\d]/g, ''), 10) || (index === 2 ? 3 : index === 0 ? 2 : 1),
-                  hasCouponAvailable: isCouponBlocked ? false : store.hasCouponAvailable,
-                  // PREMIUM 2026
-                  locationLabel: store.locationLabel,
-                  deliveryTimeLabel: store.deliveryTimeLabel,
-                  isPopular: store.isPopular,
-                  logoImage: resolveDshHomeStoreImageSource(store.logoImageUri, store.publishStage),
-                };
-
-                return (
-                  <StoreCardPremium
-                    key={store.id}
-                    item={card}
-                    onPress={onOpenStore ? () => onOpenStore(store.id) : undefined}
-                    onFavoritePress={() => {
-                      if (onToggleFavorite) {
-                        onToggleFavorite(store.id);
-                      } else {
-                        setLocalFavoriteToggles((current) => ({
-                          ...current,
-                          [store.id]: !(current[store.id] ?? store.isFavorite),
-                        }));
-                      }
-                    }}
-                  />
-                );
-              })
+            {activeHomeStoreCards.length ? (
+              <FlatList
+                data={activeHomeStoreCards}
+                keyExtractor={(entry) => entry.storeId}
+                scrollEnabled={false}
+                initialNumToRender={6}
+                maxToRenderPerBatch={6}
+                windowSize={7}
+                removeClippedSubviews={Platform.OS !== 'web'}
+                renderItem={React.useCallback(({ item: entry }) => (<HomeStoreCardItem entry={entry} onOpenStore={onOpenStore} onToggleFavorite={onToggleFavorite} setLocalFavoriteToggles={setLocalFavoriteToggles} />), [onOpenStore, onToggleFavorite, setLocalFavoriteToggles])}
+              />
             ) : activeStorePage?.renderMode !== 'manual-order' ? (
               <EmptyFeed query={inlineSearchQuery} styles={styles} />
             ) : null}

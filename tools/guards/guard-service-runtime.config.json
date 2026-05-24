@@ -1,0 +1,91 @@
+{
+  "version": "1.0.0",
+  "services": {
+    "dsh": {
+      "displayName": "Delivery and Shopping",
+      "backendPath": "dsh/backend",
+      "goModPath": "dsh/backend/go.mod",
+      "mainPath": "dsh/backend/cmd/dsh-api/main.go",
+      "repositoryInterfacePath": "dsh/backend/internal/store/store_repository.go",
+      "postgresRepositoryPath": "dsh/backend/internal/store/postgres_repository.go",
+      "routeRegistrationPaths": [
+        "dsh/backend/internal/http/stores_handler.go"
+      ],
+      "repositoryRequiredMethods": [
+        "ListStores"
+      ],
+      "postgresRequiredPatterns": [
+        "pgx",
+        "NewPostgresRepository",
+        "ListStores"
+      ],
+      "composePath": "dsh/backend/docker-compose.local.yml",
+      "allowedComposeServices": [
+        "dsh-postgres"
+      ],
+      "forbiddenComposeTerms": [
+        "redis",
+        "broker",
+        "kafka",
+        "rabbit",
+        "rabbitmq",
+        "kubernetes"
+      ],
+      "migrationFiles": [
+        "dsh/backend/migrations/001_store_discovery.sql"
+      ],
+      "seedFiles": [
+        "dsh/backend/seed/002_store_discovery_seed.sql"
+      ],
+      "allowedTables": [
+        "dsh_store_discovery_stores"
+      ],
+      "requiredTableColumns": [
+        "id",
+        "name",
+        "address",
+        "category_id",
+        "distance_label",
+        "delivery_label",
+        "service_label",
+        "status_label",
+        "status_tone",
+        "has_offer",
+        "publish_stage"
+      ],
+      "slices": {
+        "DSH-SLICE-001": {
+          "docPath": "dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md",
+          "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
+          "allowedRoutes": [
+            "/stores"
+          ],
+          "evidenceFolderPrefix": "DSH_SLICE_001_L7_RUNTIME-",
+          "requiredEvidenceFiles": [
+            "api-response-empty.json",
+            "api-response-invalid.txt",
+            "api-response-success.json",
+            "backend-log.txt",
+            "bridge-source-proof.txt",
+            "db-query-evidence.txt",
+            "go-test-output.txt",
+            "PERFORMANCE_NOTES.md"
+          ],
+          "requiredEvidenceText": [
+            "openapi-response",
+            "PERF_PASS"
+          ],
+          "requiredChainTokens": [
+            "UI",
+            "typed client",
+            "Go",
+            "PostgreSQL",
+            "response",
+            "screen"
+          ],
+          "requiresScreenshot": true
+        }
+      }
+    }
+  }
+}

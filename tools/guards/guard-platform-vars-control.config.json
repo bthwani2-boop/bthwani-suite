@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "services": {
+    "dsh": {
+      "scopePaths": [
+        "dsh/frontend",
+        "control-panel/runtime",
+        "wlt/frontend"
+      ],
+      "allowedFinancialOwnerPrefixes": [
+        "wlt/"
+      ],
+      "expectedVarsPaths": [
+        "dsh/frontend/control-panel/platform/Vars"
+      ],
+      "financialFinalPattern": "ledger\\s*(mutation|write|update)|wallet\\s*(mutation|write|update)|walletBalance\\s*(mutation|write|update)|refund\\s*(finalize|settle)|settlement\\s*(mutation|write)|reconciliation\\s*(mutation|write)",
+      "mutableTermsPattern": "deliveryFee|smallOrderFee|providerPriority|assignmentRadius|settlementWindow|refundPolicy|fee\\s*[:=]|commission\\s*[:=]|surge\\s*[:=]",
+      "varsContextPattern": "VAR_|varPolicy|Vars|variable",
+      "routeSprawlPathPattern": "control-panel",
+      "routeSprawlSignalPattern": "route|page|tab|workspace",
+      "routeSprawlActionPattern": "new\\s+route|router\\.push|href=",
+      "routeSprawlAllowedContextPattern": "Platform|Vars|ControlPanelDshPlatform"
+    }
+  }
+}
