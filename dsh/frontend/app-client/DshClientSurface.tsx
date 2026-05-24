@@ -970,11 +970,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           setStoreItemsEntryOrigin('store-get');
           setRoute('store-items');
         }}
-        onOpenSearch={() => {
-          setItemsQuery('');
-          setStoreItemsEntryOrigin('store-get');
-          setRoute('store-items');
-        }}
         onOpenCart={(mode) => {
           const nextFulfillmentMode = mode ?? selectedFulfillmentMode;
           setSelectedFulfillmentMode(nextFulfillmentMode);

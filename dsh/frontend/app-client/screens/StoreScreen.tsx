@@ -93,7 +93,6 @@ export type DshStoreGetScreenProps = {
   };
   menuItems?: DshStoreGetMenuItem[];
   onOpenItems?: () => void;
-  onOpenSearch?: () => void;
   onOpenCart?: (mode?: DshFulfillmentDeliveryMode) => void;
   onAddItemToCart?: (
     item: DshStoreGetMenuItem,
@@ -357,7 +356,6 @@ function DshStoreGetScreenContent({
   store,
   menuItems = [],
   onOpenItems,
-  onOpenSearch: _onOpenSearch,
   onOpenCart,
   onAddItemToCart,
   onOpenBenefits,
@@ -1141,7 +1139,6 @@ function DshStoreGetScreenContent({
                     distanceLabel={store.distanceLabel || '2.1 كم'}
                     deliveryTimeLabel={store.deliveryTimeLabel || normalizedEtaLabel}
                     rating={store.rating}
-                    onBackPress={_onBack}
                     onSearchPress={openInlineSearch}
                     onCartPress={() => {
                       if (onOpenCart) {
