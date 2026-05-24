@@ -2,12 +2,149 @@ openapi: 3.1.0
 info:
   title: BThwani DSH API
   version: 0.1.0
-x-bthwani-status: CONTRACT_TBD
+x-bthwani-status: READY_FOR_ONE_OPENAPI_ENDPOINT
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
   currentImplementationRoot: packages/surfaces/src/service-owned/dsh
   targetRoot: dsh
-paths: {}
+paths:
+  /stores:
+    get:
+      summary: List discovery stores
+      description: Retrieve a list of stores that pass the shared visibility/serviceability gates, with optional category and search query filters.
+      operationId: listDiscoveryStores
+      parameters:
+        - name: category_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter stores by category ID
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search term to filter stores by name, address, etc.
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [all, favorites, nearest, new, offers]
+            default: all
+          description: Filter mode for discovery feed
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: Maximum number of stores to return
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Number of stores to skip
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryStoresResponse'
+        '400':
+          description: Bad Request
+          content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/ErrorResponse'
 components:
-  schemas: {}
+  schemas:
+    DiscoveryStoresResponse:
+      type: object
+      required:
+        - stores
+        - pagination
+      properties:
+        stores:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryStore'
+        pagination:
+          type: object
+          required:
+            - limit
+            - offset
+            - total
+          properties:
+            limit:
+              type: integer
+            offset:
+              type: integer
+            total:
+              type: integer
+    DiscoveryStore:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - distance_label
+        - delivery_label
+        - service_label
+        - status_label
+        - status_tone
+        - has_offer
+        - publish_stage
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        category_id:
+          type: string
+        image_url:
+          type: string
+        logo_image_url:
+          type: string
+        rating:
+          type: number
+        distance_label:
+          type: string
+        delivery_label:
+          type: string
+        service_label:
+          type: string
+        status_label:
+          type: string
+        status_tone:
+          type: string
+          enum: [open, closed]
+        has_offer:
+          type: boolean
+        offer_label:
+          type: string
+        publish_stage:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
