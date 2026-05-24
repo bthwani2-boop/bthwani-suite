@@ -53,56 +53,14 @@ import {
   getDshFulfillmentDeliveryModeMeta,
 } from '../contracts/dsh-client-binding.contracts';
 
+import type {
+  DshStoreGetScreenProps,
+  DshStoreGetScreenContentProps,
+  DshStoreOperationalState,
+} from '../contracts/dsh-store-types';
+
 // Menu item view-model is shared locally to keep the screen fixture-free.
 
-export type DshStoreGetScreenProps = {
-  appearanceMode?: BThwaniAppearanceMode;
-  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
-  store?: {
-    id: string;
-    name: string;
-    subtitle: string;
-    statusLabel: string;
-    etaLabel: string;
-    deliveryFeeLabel: string;
-    followersCount?: number;
-    followersLabel?: string;
-    priceMatchLabel?: string;
-    imageUri?: string;
-    deliveryLabel?: string;
-    serviceLabel?: string;
-    subscriptionPackageChips?: string[];
-    hasBthwaniPro?: boolean;
-    publishStage?: string;
-    commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
-    tags?: string[];
-    categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
-    deliveryModes?: Array<{ id: DshFulfillmentDeliveryMode; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
-    // PREMIUM 2026 ENHANCEMENTS (Synced from DshHomeGetStore)
-    rating?: number;
-    distanceLabel?: string;
-    multiplierLabel?: string;
-    offerLabel?: string;
-    hasOffer?: boolean;
-    hasNewProducts?: boolean;
-    hasCouponAvailable?: boolean;
-    locationLabel?: string;
-    deliveryTimeLabel?: string;
-    isPopular?: boolean;
-    logoImageUri?: string;
-  };
-  menuItems?: DshStoreGetMenuItem[];
-  onOpenItems?: () => void;
-  onOpenCart?: (mode?: DshFulfillmentDeliveryMode) => void;
-  onAddItemToCart?: (
-    item: DshStoreGetMenuItem,
-    payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }
-  ) => void;
-  onOpenBenefits?: () => void;
-  onBack?: () => void;
-  onRetry?: () => void;
-  onSupport?: () => void;
-};
 
 function getAllDeliveryModes(): Array<{ id: DshFulfillmentDeliveryMode; label: string; icon: string }> {
   return (
@@ -186,7 +144,6 @@ function normalizeDisplayText(value?: string) {
     .trim();
 }
 
-type DshStoreOperationalState = 'area_unserviceable' | 'store_closed' | 'store_open';
 function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: string, serviceLabel?: string): DshStoreOperationalState {
   const normalized = [statusLabel, deliveryLabel, serviceLabel]
     .filter(Boolean)
@@ -341,9 +298,6 @@ function MenuItemCard({
   );
 }
 
-type DshStoreGetScreenContentProps = DshStoreGetScreenProps & {
-  appearanceMode: BThwaniAppearanceMode;
-};
 
 export function DshStoreGetScreen(props: DshStoreGetScreenProps) {
   const appearanceMode = props.appearanceMode ?? 'lightPremium';

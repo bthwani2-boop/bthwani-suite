@@ -58,6 +58,18 @@ import {
 
 import { canRenderInClientSurface } from '../../shared/workflow';
 
+import type {
+  DshHomeGetScreenProps,
+  DshHomeCategory,
+  DshHomeBannerActionType,
+  DiscoveryFilter,
+  StorePagerPage,
+  DshHomeGetPromo,
+  DshHomeGetStore,
+  DshHomeRecentOrder,
+  DshServiceId,
+} from '../contracts/dsh-home-types';
+
 function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ImageSourcePropType | undefined {
   if (!canRenderInClientSurface(publishStage, 'store')) {
     return undefined;
@@ -95,161 +107,17 @@ function resolveHomePromoPublishStage(status: HomePromoRecord['status']) {
 type CategoryDialItem = OrbitCarouselItem;
 type DialAnchorLayout = OrbitAnchorLayout;
 
-export type DshHomeGetScreenProps = {
-  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
-  categories?: DshHomeCategory[];
-  promos?: DshHomeGetPromo[];
-  homePromos?: HomePromoRecord[];
-  stores?: DshHomeGetStore[];
-  recentOrders?: DshHomeRecentOrder[];
-  approvedVideoShorts?: MarketingVideoRecord[];
-  onBack?: () => void;
-  onOpenEntry?: () => void;
-  onOpenMySpace?: () => void;
-  onOpenNotifications?: () => void;
-  onOpenCart?: () => void;
-  onOpenWallet?: () => void;
-  onOpenService?: (serviceId: DshServiceId) => void;
-  onOpenList?: () => void;
-  onOpenCategory?: (categoryId: string) => void;
-  onOpenDiscovery?: () => void;
-  onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
-  onOpenProduct?: (storeId: string, itemId: string) => void;
-  onOpenBenefits?: (screenId?: string) => void;
-  onOpenFavorites?: () => void;
-  favoriteOverrides?: Record<string, boolean>;
-  onToggleFavorite?: (storeId: string) => void;
-  onOpenSearch?: () => void;
-  onOpenOrders?: () => void;
-  onOpenTracking?: () => void;
-  onOpenStore?: (storeId: string) => void;
-  onPromoClick?: (promoId: string) => void;
-  onPromoImpression?: (promoId: string) => void;
-  onVideoCtaClick?: (itemId: string) => void;
-  onVideoImpression?: (itemId: string) => void;
-  onOpenSheinInfo?: () => void;
-  sheinInlineVisible?: boolean;
-  onCloseSheinInline?: () => void;
-  awnakInlineVisible?: boolean;
-  onCloseAwnakInline?: () => void;
-  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
-  renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
-  onRetry?: () => void;
-  notificationCount?: number;
-  cartCount?: number;
-  serviceDialTrigger?: number;
-  searchAutoOpenToken?: number;
-};
 
-export type DshHomeCategory = {
-  id: string;
-  label: string;
-  subtitle?: string;
-  countLabel?: string;
-  renderMode?: 'stores' | 'manual-order';
-  emojiFallback?: string;
-  subcategories?: Array<{
-    id: string;
-    label: string;
-    subtitle: string;
-  }>;
-};
 
-export type DshHomeBannerActionType = 'main_category' | 'sub_category' | 'store' | 'external' | 'store_category' | 'product' | 'subscription';
 
-type DiscoveryFilter = 'all' | 'favorites' | 'nearest' | 'new' | 'offers';
 
-type StorePagerPage = {
-  categoryId: string;
-  renderMode: 'stores' | 'manual-order';
-  stores: DshHomeGetStore[];
-};
 
 type DshHomeGetStyles = ReturnType<typeof createStyles>;
 type DshHomeTheme = ReturnType<typeof useTheme>['theme'];
 
-export type DshHomeGetPromo = {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: string;
-  actionType?: DshHomeBannerActionType;
-  actionTarget?: string;
-  actionExtra?: string;
-  mediaKey?: string;
-  imageUrl?: string;
-  accentColor?: string;
-  ctaLabel?: string;
-  templateId?: string;
-  partnerLogoUrl?: string;
-  partnerLogoPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  offerBadgeText?: string;
-  offerBadgeColor?: string;
-  offerBadgePosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  overlayImageUrl?: string;
-  overlayPosition?: 'center' | 'bottom' | 'top' | 'fill';
-  overlayOpacity?: number;
-  titlePlacement?: 'top' | 'center' | 'bottom';
-  subtitlePlacement?: 'top' | 'center' | 'bottom';
-  ctaPlacement?: 'top' | 'center' | 'bottom' | 'left' | 'right';
-  imageFit?: 'cover' | 'contain';
-  motionStyle?: 'slide' | 'soft-parallax' | 'subtle-fade' | 'snap-focus';
-  autoplayEnabled?: boolean;
-  autoplayIntervalMs?: number;
-  pauseOnInteraction?: boolean;
-};
 
-export type DshHomeGetStore = {
-  id: string;
-  name: string;
-  address: string;
-  categoryId?: string;
-  mediaKey?: string;
 
-  imageUri?: string;
-  rating?: number;
-  statusLabel: string;
-  statusTone: 'open' | 'closed';
-  distanceLabel: string;
-  deliveryLabel: string;
-  serviceLabel: string;
-  followerCount: number;
-  multiplierLabel: string;
-  subscriptionPackageChips?: string[];
-  offerLabel?: string;
-  isFavorite: boolean;
-  isFollowing: boolean;
-  hasOffer?: boolean;
-  hasBthwaniPro?: boolean;
-  hasNewProducts?: boolean;
-  hasCouponAvailable?: boolean;
-  publishStage?: string;
-  commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
-  supportsPickup?: boolean;
-  supportsPartnerDelivery?: boolean;
-  serviceabilityAvailable?: boolean;
-  catalogPublished?: boolean;
-  /** P0-04: Resolved badge for client-visible stores — display-only.
-   *  Derived from DshPartnerActivationStatus via getDshPartnerVisibilityBadge().
-   *  app-client never reads raw activation status; it receives only the resolved badge. */
-  visibilityBadge?: import('../../shared/dsh-partner-activation.model').DshPartnerVisibilityBadge;
-  // PREMIUM 2026 ENHANCEMENTS
-  locationLabel?: string;
-  deliveryTimeLabel?: string;
-  isPopular?: boolean;
-  logoImageUri?: string;
-};
 
-export type DshHomeRecentOrder = {
-  id: string;
-  storeId: string;
-  title: string;
-  subtitle: string;
-  meta: string;
-  statusLabel: string;
-};
-
-type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf' | 'snd';
 
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
