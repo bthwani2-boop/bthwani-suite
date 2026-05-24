@@ -4,7 +4,6 @@ import {
   Image,
   Modal,
   Pressable,
-  PanResponder,
   FlatList,
   StatusBar,
   Vibration,
@@ -12,7 +11,6 @@ import {
   Platform,
   Share,
   StyleSheet,
-
   TouchableOpacity,
   View,
   type ImageSourcePropType,
@@ -26,7 +24,6 @@ import {
   SearchTopBar,
   StateView,
   Text,
-  CartConfirmationBlock,
   colorPalette,
   useBThwaniAppearance,
   useDirection,
@@ -39,7 +36,11 @@ import {
 } from '@bthwani/ui-kit';
 import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../data/categories.preview-data';
 import { useStoreState } from '../../hooks/useStoreState';
+import { useStoreDerivedItems } from '../../hooks/useStoreDerivedItems';
+import { useStoreGestureHandlers } from '../../hooks/useStoreGestureHandlers';
 import { useDebounce } from '../../hooks/useDebounce';
+import { StoreMenuListItem, STORE_MENU_SNAP_INTERVAL } from './StoreMenuListSection';
+import { StoreMeasurementSheet, type StoreMeasurementAppearance } from '../../sheets/StoreMeasurementSheet';
 import {
   MenuItemCard,
   resolveDshStoreMenuItemImageSource,
@@ -49,26 +50,20 @@ import { getDshClientStateMeta } from '../../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import {
   formatCurrencyValue,
-  getAllDeliveryModes,
   isDeliveryBenefitLabel,
   normalizeDisplayText,
   normalizeTagLabel,
   resolveMeasurementOptions,
-  resolveMeasurementUnitPrice,
   resolveStoreOperationalState,
 } from '../../shared/store-formatting';
 import {
-  buildStoreSearchCategories,
   isNewItem,
   isOfferItem,
   resolveStoreItemsForCategory,
 } from '../../shared/store-search-helpers';
 import { resolveDshStoreClientVisibility } from '../../../shared/dsh-client-visibility.model';
 import { canRenderInClientSurface } from '../../../shared/workflow';
-import {
-  type DshFulfillmentDeliveryMode,
-  getDshFulfillmentDeliveryModeMeta,
-} from '../../contracts/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
 
 declare const __DEV__: boolean | undefined;
 
@@ -125,9 +120,6 @@ export type DshStoreGetScreenContentProps = DshStoreGetScreenProps & {
   appearanceMode: BThwaniAppearanceMode;
 };
 
-const STORE_MENU_CARD_HEIGHT = 126;
-const STORE_MENU_CARD_GAP = 2;
-const STORE_MENU_SNAP_INTERVAL = STORE_MENU_CARD_HEIGHT + STORE_MENU_CARD_GAP;
 const STORE_MENU_INITIAL_NUM_TO_RENDER = 6;
 const STORE_MENU_MAX_TO_RENDER_PER_BATCH = 6;
 const STORE_MENU_WINDOW_SIZE = 7;
@@ -182,57 +174,6 @@ function renderNonReadyState(
   );
 }
 
-const StoreMenuListItem = React.memo(function StoreMenuListItem({
-  item,
-  index,
-  scrollY,
-  partnerImageSource,
-  isFavorited,
-  onOpenMeasurementPicker,
-  onOpenImagePreview,
-  onToggleFavorite,
-}: {
-  item: DshStoreGetMenuItem;
-  index: number;
-  scrollY: Animated.Value;
-  partnerImageSource?: ImageSourcePropType | string | null;
-  isFavorited: boolean;
-  onOpenMeasurementPicker: (item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => void;
-  onOpenImagePreview: (item: DshStoreGetMenuItem) => void;
-  onToggleFavorite: (id: string) => void;
-}) {
-  const inputRange = [
-    (index - 1) * STORE_MENU_SNAP_INTERVAL,
-    index * STORE_MENU_SNAP_INTERVAL,
-    (index + 1) * STORE_MENU_SNAP_INTERVAL,
-  ];
-  const scale = scrollY.interpolate({ inputRange, outputRange: [0.986, 1, 0.986], extrapolate: 'clamp' });
-  const translateY = scrollY.interpolate({ inputRange, outputRange: [8, 0, 8], extrapolate: 'clamp' });
-  const opacity = scrollY.interpolate({ inputRange, outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' });
-  const handleAddPress = React.useCallback(
-    (anchor?: { x: number; y: number }) => onOpenMeasurementPicker(item, anchor ?? { x: 32, y: 360 }),
-    [item, onOpenMeasurementPicker],
-  );
-  const handleFavoritePress = React.useCallback(() => {
-    onToggleFavorite(item.id);
-  }, [item.id, onToggleFavorite]);
-
-  return (
-    <Animated.View
-      style={[{ transform: [{ scale }, { translateY }], opacity, marginBottom: STORE_MENU_CARD_GAP, marginHorizontal: 12 }]}
-      pointerEvents="box-none"
-    >
-      <MenuItemCard
-        item={item}
-        partnerImageSource={partnerImageSource}
-        onAddPress={handleAddPress}
-        onImagePress={onOpenImagePreview}
-        onFavoritePress={handleFavoritePress}
-        isFavorited={isFavorited}
-      />
-    </Animated.View>
-  );
-});
 
 export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(props: DshStoreGetScreenProps) {
   const appearanceMode = props.appearanceMode ?? 'lightPremium';
@@ -323,17 +264,16 @@ const DshStoreGetScreenContent = React.memo(function DshStoreGetScreenContentCom
 
   const closeImagePreview = React.useCallback(() => setPreviewItem(null), [setPreviewItem]);
 
-  const deliveryModes = React.useMemo(() => {
-    if (store?.deliveryModes?.length) {
-      return store.deliveryModes
-        .filter((m) => m.isAvailable)
-        .map((m) => {
-          const meta = getDshFulfillmentDeliveryModeMeta(m.id);
-          return { id: m.id, label: meta.label, icon: meta.icon };
-        });
-    }
-    return getAllDeliveryModes();
-  }, [store?.deliveryModes]);
+  const {
+    clientVisibleItems,
+    categories,
+    deliveryModes,
+  } = useStoreDerivedItems({
+    menuItems,
+    storeCategories: store?.categories,
+    storeDeliveryModes: store?.deliveryModes,
+    favoriteIds,
+  });
 
   React.useEffect(() => {
     if (deliveryModes.length === 0) {
@@ -359,21 +299,6 @@ const DshStoreGetScreenContent = React.memo(function DshStoreGetScreenContentCom
     // Fallback to brand logo only if store logo is missing, never use cover image
     return resolveDshImageSource(store.logoImageUri) || resolveDshImageSource('dsh.brand.logo.v1');
   }, [store]);
-
-  const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(() => menuItems ?? [], [menuItems]);
-
-  const clientVisibleItems = React.useMemo(
-    () => fallbackMenuItems.filter((item) => item.isAvailable !== false && canRenderInClientSurface(item.publishStage, 'product')),
-    [fallbackMenuItems],
-  );
-
-  const categories = React.useMemo(() => {
-    return buildStoreSearchCategories({
-      storeCategories: store?.categories,
-      clientVisibleItems,
-      favoriteIds,
-    });
-  }, [clientVisibleItems, favoriteIds, store?.categories]);
 
   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
@@ -478,35 +403,14 @@ const DshStoreGetScreenContent = React.memo(function DshStoreGetScreenContentCom
     [appearanceChrome.secondaryText, categories, isDarkGlass, tokens.glassMutedText],
   );
 
-  // Dual-Axis Navigation PanResponder for Preview
-  // Wide hit area covering the entire wrap
-  const previewPanResponder = React.useMemo(() =>
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_evt, gestureState) => {
-        const { dx, dy } = gestureState;
-        // Intercept only for clear horizontal swipes. Vertical moves are passed to the FlatList.
-        return Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 20;
-      },
-      onPanResponderRelease: (_evt, gestureState) => {
-        const { dx } = gestureState;
-        const threshold = 40;
-
-        if (Math.abs(dx) > threshold) {
-          const direction = dx > 0 ? -1 : 1;
-          const adjustedDirection = isRTL ? -direction : direction;
-          const nextIndex = previewActiveIndex + adjustedDirection;
-
-          if (nextIndex >= 0 && nextIndex < previewItems.length) {
-            setPreviewActiveIndex(nextIndex);
-            setPreviewItem(previewItems[nextIndex]);
-            previewListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-          }
-        }
-      },
-    }),
-    [previewActiveIndex, previewItems, isRTL, setPreviewActiveIndex, setPreviewItem]
-  );
+  const { previewPanResponder } = useStoreGestureHandlers({
+    previewActiveIndex,
+    previewItems,
+    isRTL,
+    setPreviewActiveIndex,
+    setPreviewItem,
+    previewListRef,
+  });
 
   const renderPreviewItem = React.useCallback(({ item, index }: { item: DshStoreGetMenuItem, index: number }) => {
     const inputRange = [
@@ -617,23 +521,25 @@ const DshStoreGetScreenContent = React.memo(function DshStoreGetScreenContentCom
     [pickerItem],
   );
 
-  const selectedMeasureUnitPrice = React.useMemo(() => {
-    if (!pickerItem || !selectedMeasureOption) {
-      return 0;
-    }
-
-    return resolveMeasurementUnitPrice(pickerItem!, selectedMeasureOption);
-  }, [pickerItem, selectedMeasureOption]);
-
-  const selectedMeasureTotalPrice = React.useMemo(
-    () => selectedMeasureUnitPrice * selectedMeasureQty,
-    [selectedMeasureQty, selectedMeasureUnitPrice],
-  );
-
   const measurePopoverTop = React.useMemo(
     () => Math.max(180, Math.min(pickerAnchor.y - 170, 640)),
     [pickerAnchor.y],
   );
+
+  const measurementAppearance = React.useMemo<StoreMeasurementAppearance>(() => ({
+    overlaySoft: appearanceChrome.overlaySoft,
+    activeActionBackground: appearanceChrome.activeActionBackground,
+    activeActionBorder: appearanceChrome.activeActionBorder,
+    accent: appearanceChrome.accent,
+    modalSurface: appearanceChrome.modalSurface,
+    modalBorder: appearanceChrome.modalBorder,
+    primaryText: appearanceChrome.primaryText,
+    secondaryText: appearanceChrome.secondaryText,
+    subtleSurface: appearanceChrome.subtleSurface,
+    brandContrastColor: theme.brandContrast,
+    glassMutedTextColor: tokens.glassMutedText,
+    isDarkGlass,
+  }), [appearanceChrome, isDarkGlass, theme.brandContrast, tokens.glassMutedText]);
 
   const closeMeasurementPicker = React.useCallback(() => {
     setPickerItem(null);
@@ -1176,102 +1082,22 @@ const DshStoreGetScreenContent = React.memo(function DshStoreGetScreenContentCom
         </View>
       </Modal>
 
-      <Modal visible={Boolean(pickerItem)} transparent animationType="fade" onRequestClose={closeMeasurementPicker}>
-        <Pressable style={[styles.measureOverlay, { backgroundColor: appearanceChrome.overlaySoft }]} onPress={closeMeasurementPicker}>
-          <View style={[styles.measurePopoverWrap, { top: measurePopoverTop }]} pointerEvents="box-none">
-            <View style={styles.measurePopoverDock}>
-              <View style={[styles.measureOriginBubble, { backgroundColor: appearanceChrome.activeActionBackground }]}>
-                <Icon name="cart-outline" size={18} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
-                <View style={styles.measureOriginPlusBadge}>
-                  <Icon name="add" size={10} color={appearanceChrome.accent} />
-                </View>
-              </View>
-
-              <Pressable style={[styles.measurePopoverCard, { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder }]} onPress={(event) => event.stopPropagation()}>
-                {pickerItem ? (
-                  <>
-                    <View style={styles.measurePopoverHeader}>
-                      <Text style={[styles.measureSheetTitle, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(pickerItem!.name)}</Text>
-                    </View>
-
-                    {isAddedToCart ? (
-                      <CartConfirmationBlock
-                        title="تمت إضافة المنتج للسلة"
-                        subtitle={addedItemLabel ? `${addedItemLabel}${selectedMeasureOption ? ` (${selectedMeasureOption})` : ''}` : undefined}
-                        onGoToCart={handleGoToCart}
-                        onContinueShopping={handleContinueShopping}
-                        isDarkGlass={isDarkGlass}
-                      />
-                    ) : (
-                      <>
-                        <View style={styles.measureOptionsGrid}>
-                          {activeMeasurementOptions.map((option) => {
-                            const selected = selectedMeasureOption === option;
-                            const optionPrice = formatCurrencyValue(resolveMeasurementUnitPrice(pickerItem!, option));
-                            return (
-                              <TouchableOpacity
-                                key={option}
-                                style={[
-                                  styles.measureOptionChip,
-                                  { backgroundColor: appearanceChrome.modalSurface, borderColor: appearanceChrome.modalBorder },
-                                  selected && styles.measureOptionChipActive,
-                                  selected ? { backgroundColor: appearanceChrome.activeActionBackground, borderColor: appearanceChrome.activeActionBorder } : null,
-                                ]}
-                                activeOpacity={0.88}
-                                onPress={() => setSelectedMeasureOption(option)}
-                              >
-                                <Text style={[styles.measureOptionText, { color: selected ? (isDarkGlass ? theme.brandContrast : stylesTokens.white) : appearanceChrome.primaryText }, selected && styles.measureOptionTextActive]}>{option}</Text>
-                                <Text style={[styles.measureOptionPriceText, { color: selected ? (isDarkGlass ? tokens.glassMutedText : stylesTokens.orangeSoft) : appearanceChrome.secondaryText }, selected && styles.measureOptionPriceTextActive]}>{optionPrice}</Text>
-                              </TouchableOpacity>
-                            );
-                          })}
-                        </View>
-
-                        <View style={styles.measureQtyRow}>
-                          <TouchableOpacity
-                            style={[styles.measureQtyGhostButton, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.modalBorder }]}
-                            activeOpacity={0.85}
-                            onPress={() => setSelectedMeasureQty((current) => Math.max(1, current - 1))}
-                          >
-                            <Icon name="remove" size={18} color={appearanceChrome.secondaryText} />
-                          </TouchableOpacity>
-
-                          <View style={[styles.measureQtyValuePill, { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.modalBorder }]}>
-                            <Text style={[styles.measureQtyValueText, { color: appearanceChrome.primaryText }]}>{selectedMeasureQty}</Text>
-                          </View>
-
-                          <TouchableOpacity
-                            style={[styles.measureQtyPrimaryButton, { backgroundColor: appearanceChrome.activeActionBackground, borderColor: appearanceChrome.activeActionBorder }]}
-                            activeOpacity={0.9}
-                            onPress={() => setSelectedMeasureQty((current) => current + 1)}
-                          >
-                            <Icon name="add" size={18} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
-                          </TouchableOpacity>
-                        </View>
-
-                        <View style={[styles.measureFooterBar, { borderColor: appearanceChrome.modalBorder }]}>
-                          <View style={[styles.measurePriceValueBox, { backgroundColor: appearanceChrome.modalSurface }]}>
-                            <Text style={[styles.measurePriceValueText, { color: appearanceChrome.primaryText }]}>{formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}</Text>
-                          </View>
-
-                          <TouchableOpacity
-                            style={[styles.measureConfirmButton, { backgroundColor: appearanceChrome.activeActionBackground }]}
-                            activeOpacity={0.9}
-                            onPress={handleAddToCart}
-                          >
-                            <Text style={[styles.measureConfirmText, { color: isDarkGlass ? theme.brandContrast : stylesTokens.white }]}>أضف للسلة</Text>
-                            <Icon name="cart-outline" size={16} color={isDarkGlass ? theme.brandContrast : stylesTokens.white} />
-                          </TouchableOpacity>
-                        </View>
-                      </>
-                    )}
-                  </>
-                ) : null}
-              </Pressable>
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
+      <StoreMeasurementSheet
+        pickerItem={pickerItem}
+        activeMeasurementOptions={activeMeasurementOptions}
+        selectedMeasureOption={selectedMeasureOption}
+        setSelectedMeasureOption={setSelectedMeasureOption}
+        selectedMeasureQty={selectedMeasureQty}
+        setSelectedMeasureQty={setSelectedMeasureQty}
+        isAddedToCart={isAddedToCart}
+        addedItemLabel={addedItemLabel}
+        measurePopoverTop={measurePopoverTop}
+        appearance={measurementAppearance}
+        onClose={closeMeasurementPicker}
+        onAddToCart={handleAddToCart}
+        onGoToCart={handleGoToCart}
+        onContinueShopping={handleContinueShopping}
+      />
     </View>
   );
 });

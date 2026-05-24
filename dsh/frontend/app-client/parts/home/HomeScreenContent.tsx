@@ -11,7 +11,6 @@ import {
   Icon,
   SearchTopBar,
   StateView,
-  StoreCardPremium,
   type StoreCardPremiumItem,
   Text,
   ModernPremiumHeader,
@@ -41,6 +40,7 @@ import {
   CategorySelectorItem,
 } from './HomeCategoryCarousel';
 import { EmptyFeed } from './HomeStoreFeed';
+import { HomeStoreCardItem, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { useDebounce } from '../../hooks/useDebounce';
 import {
   DSH_CATEGORY_ICONS as categoryIconMap,
@@ -53,29 +53,27 @@ import {
 import {
   normalizeHomePromoActionType,
   resolveHomeCategoryContext,
-  resolveHomePromoPublishStage,
 } from '../../shared/home-promo-mappers';
 import {
   buildHomeCategoryFilterId,
   buildHomeModeFilterId,
   HOME_CATEGORY_FILTER_PREFIX,
   HOME_MODE_FILTER_PREFIX,
-  resolveHomeStoresForCategory,
 } from '../../shared/home-search-helpers';
 import { useHomeState } from '../../hooks/useHomeState';
+import { useHomeBackHandler } from '../../hooks/useHomeBackHandler';
+import { useHomeDerivedStores } from '../../hooks/useHomeDerivedStores';
+import { useHomePromoHandlers } from '../../hooks/useHomePromoHandlers';
 import { getDshCategoryIconUrl } from '../../shared/get-dsh-category-icon-url';
 import { resolveDshImageSource } from '../../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../../shared/growth.preview-store';
 import type { MarketingVideoRecord } from '../../../shared/video.preview-store';
-import type { DshPartnerActivationStatus } from '../../../shared/dsh-partner-activation.model';
-import { resolveDshStoreClientVisibility } from '../../../shared/dsh-client-visibility.model';
 import {
   getMarketingTickerItems,
   buildMarketingTickerPlan,
 } from '../../../shared/news-ticker.preview-store';
-import { getPublishedHomePromos, type HomePromoRecord } from '../../../shared/promo.preview-store';
+import type { HomePromoRecord } from '../../../shared/promo.preview-store';
 import {
-  getHomePromoVisibilityRecord,
   getMarketingVideoVisibilityRecord,
   isMarketingRenderable,
 } from '../../../shared/marketing-visibility.contract';
@@ -85,7 +83,6 @@ import { canRenderInClientSurface } from '../../../shared/workflow';
 import type {
   DshHomeCategory,
   DiscoveryFilter,
-  StorePagerPage,
   DshHomeGetPromo,
   DshHomeGetStore,
   DshHomeRecentOrder,
@@ -151,11 +148,6 @@ function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType
 
 type CategoryDialItem = OrbitCarouselItem;
 type DialAnchorLayout = OrbitAnchorLayout;
-type HomeStoreCardEntry = {
-  item: StoreCardPremiumItem;
-  storeId: string;
-  baseFavorite?: boolean;
-};
 
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
@@ -198,41 +190,6 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
 
 const ACTIVE_PROMO_INTERVAL_MS = 5000;
 
-const HomeStoreCardItem = React.memo(function HomeStoreCardItem({
-  entry,
-  onOpenStore,
-  onToggleFavorite,
-  setLocalFavoriteToggles,
-}: {
-  entry: HomeStoreCardEntry;
-  onOpenStore?: (storeId: string) => void;
-  onToggleFavorite?: (storeId: string) => void;
-  setLocalFavoriteToggles: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-}) {
-  const handlePress = React.useCallback(() => {
-    onOpenStore?.(entry.storeId);
-  }, [entry.storeId, onOpenStore]);
-
-  const handleFavoritePress = React.useCallback(() => {
-    if (onToggleFavorite) {
-      onToggleFavorite(entry.storeId);
-      return;
-    }
-
-    setLocalFavoriteToggles((current) => ({
-      ...current,
-      [entry.storeId]: !(current[entry.storeId] ?? entry.baseFavorite),
-    }));
-  }, [entry.baseFavorite, entry.storeId, onToggleFavorite, setLocalFavoriteToggles]);
-
-  return (
-    <StoreCardPremium
-      item={entry.item}
-      onPress={onOpenStore ? handlePress : undefined}
-      onFavoritePress={handleFavoritePress}
-    />
-  );
-});
 
 export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
   state = 'ready',
@@ -319,9 +276,22 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
     isTickerHidden,
   } = useHomeState();
   const favoriteToggles = favoriteOverrides ?? localFavoriteToggles;
-  const promoImpressionIdsRef = React.useRef<Set<string>>(new Set());
   const lastSearchAutoOpenTokenRef = React.useRef(0);
   const debouncedInlineSearchQuery = useDebounce(inlineSearchQuery, 250);
+
+  const {
+    activeStorePage,
+    resolveTargetPartnerStatus,
+    resolvedHomePromos,
+  } = useHomeDerivedStores({
+    stores,
+    homePromos,
+    categories,
+    activeCategoryId,
+    activeFilter,
+    favoriteToggles,
+    debouncedInlineSearchQuery,
+  });
 
   React.useEffect(() => {
     if (serviceDialTrigger) {
@@ -361,83 +331,28 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
   const baseCardWidth = Math.max(256, Math.min(326, Math.round(containerWidth - (sidePeek * 2) - (resolvedItemGap * 2))));
   const cardWidth = Math.max(220, Math.round(baseCardWidth * 0.84));
   const cardHeight = Math.max(160, Math.round(cardWidth * 0.78));
-  const resolvedStoresWithVisibility = React.useMemo(() => (
-    (stores ?? []).map((store) => ({
-      ...store,
-      clientVisibility: resolveDshStoreClientVisibility({
-        publishStage: store.publishStage,
-        supportsPickup: store.supportsPickup,
-        supportsPartnerDelivery: store.supportsPartnerDelivery,
-        serviceabilityAvailable: store.serviceabilityAvailable,
-        catalogPublished: store.catalogPublished,
-        serviceLabel: store.serviceLabel,
-        deliveryLabel: store.deliveryLabel,
-        storeOpen: store.statusTone === 'open',
-      }),
-    }))
-  ), [stores]);
-  const resolvedStores = React.useMemo(
-    () => resolvedStoresWithVisibility.filter((store) => store.clientVisibility.visible),
-    [resolvedStoresWithVisibility],
-  );
-  const storeVisibilityById = React.useMemo(
-    () => new Map(resolvedStoresWithVisibility.map((store) => [store.id, store.clientVisibility])),
-    [resolvedStoresWithVisibility],
-  );
-  const resolveTargetPartnerStatus = React.useCallback((targetType: string, targetId?: string): DshPartnerActivationStatus | undefined => {
-    if (targetType !== 'store' || !targetId) {
-      return undefined;
-    }
-
-    return storeVisibilityById.get(targetId)?.activationStatus;
-  }, [storeVisibilityById]);
-
-  const resolvedHomePromos = React.useMemo(
-    () => (homePromos ?? getPublishedHomePromos()).filter((promo) => {
-      const visibility = getHomePromoVisibilityRecord(promo, {
-        targetSurface: 'home',
-        partnerStatus: resolveTargetPartnerStatus(promo.targetType, promo.targetId),
-      });
-
-      return isMarketingRenderable(visibility)
-        && canRenderInClientSurface(resolveHomePromoPublishStage(promo.status), 'promo');
-    }),
-    [homePromos, resolveTargetPartnerStatus],
-  );
-
   const categoryItems = React.useMemo(() => {
     return resolvedCategories;
   }, [resolvedCategories]);
 
-  const categoryPageIds = React.useMemo(() => ['all', ...categoryItems.map((category) => category.id)], [categoryItems]);
-
-  const resolveStoresForCategory = React.useCallback((categoryId: string) => {
-    return resolveHomeStoresForCategory({
-      categoryId,
-      stores: resolvedStores,
-      activeFilter,
-      favoriteToggles,
-      query: debouncedInlineSearchQuery,
-    });
-  }, [activeFilter, favoriteToggles, debouncedInlineSearchQuery, resolvedStores]);
-
-  const storePagerItems = React.useMemo<StorePagerPage[]>(() => (
-    categoryPageIds.map((categoryId) => {
-      const category = categoryItems.find((entry) => entry.id === categoryId);
-      const renderMode = category?.renderMode ?? 'stores';
-
-      return {
-        categoryId,
-        renderMode,
-        stores: renderMode === 'manual-order' ? [] : resolveStoresForCategory(categoryId),
-      };
-    })
-  ), [categoryItems, categoryPageIds, resolveStoresForCategory]);
-
-  const activeStorePage = React.useMemo(
-    () => storePagerItems.find((page) => page.categoryId === activeCategoryId) ?? storePagerItems[0] ?? null,
-    [activeCategoryId, storePagerItems],
-  );
+  const { resolveBannerPress, promoImpressionIdsRef } = useHomePromoHandlers({
+    categoryItems,
+    setActiveCategoryId,
+    setActiveSubcategoryId,
+    setActiveFilter,
+    setInlineSearchVisible,
+    onPromoClick,
+    onOpenSheinInfo,
+    onOpenStore,
+    onOpenDiscovery,
+    onOpenList,
+    onOpenOrders,
+    onOpenTracking,
+    onOpenBenefits,
+    onOpenProduct,
+    onOpenSearch,
+    onOpenStoreCategory,
+  });
   const activeHomeStoreCards = React.useMemo(() => {
     if (!activeStorePage?.stores.length) {
       return [];
@@ -630,21 +545,7 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
     return () => globalThis.clearInterval(timer);
   }, [setCurrentTime]);
 
-  const homeBackHandler = React.useCallback(() => {
-    if (categoriesSheetVisible) { setCategoriesSheetVisible(false); return true; }
-    if (shortsVisible) { setShortsVisible(false); return true; }
-    if (inlineSearchVisible) { setInlineSearchVisible(false); setInlineSearchQuery(''); return true; }
-    if (serviceDialVisible) { setServiceDialVisible(false); return true; }
-    if (activeCategoryId !== 'all') {
-      const matched = categoryItems.find((c) => c.id === activeCategoryId);
-      if (matched?.renderMode === 'manual-order') {
-        const formShowing = (activeCategoryId === 'shein' && sheinInlineVisible) ||
-                            (activeCategoryId === 'awnak' && awnakInlineVisible);
-        if (!formShowing) { selectCategoryPage('all'); return true; }
-      }
-    }
-    return false;
-  }, [
+  useHomeBackHandler({
     categoriesSheetVisible,
     shortsVisible,
     inlineSearchVisible,
@@ -659,167 +560,8 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
     setInlineSearchVisible,
     setServiceDialVisible,
     setShortsVisible,
-  ]);
-
-  React.useEffect(() => {
-    onRegisterBackHandler?.(homeBackHandler);
-    return () => { onRegisterBackHandler?.(null); };
-  }, [onRegisterBackHandler, homeBackHandler]);
-
-  const resolveBannerPress = React.useCallback(
-    (promo: DshHomeGetPromo) => () => {
-      if (promo.id) {
-        onPromoClick?.(promo.id);
-      }
-
-      if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
-        const nextHomeContext = resolveHomeCategoryContext(categoryItems, promo.actionTarget);
-
-        if (nextHomeContext) {
-          setActiveCategoryId(nextHomeContext.categoryId);
-          setActiveSubcategoryId(nextHomeContext.subcategoryId);
-          return;
-        }
-
-        if (promo.actionTarget === 'shein' && onOpenSheinInfo) {
-          onOpenSheinInfo();
-          return;
-        }
-
-        onOpenDiscovery?.();
-        return;
-      }
-
-      if (promo.actionType === 'store') {
-        if (promo.actionTarget && onOpenStore) {
-          onOpenStore(promo.actionTarget);
-          return;
-        }
-
-        if (onOpenDiscovery) {
-          onOpenDiscovery();
-          return;
-        }
-
-        setInlineSearchVisible(true);
-        return;
-      }
-
-      if (promo.actionType === 'store_category') {
-        if (promo.actionTarget && promo.actionExtra && onOpenStoreCategory) {
-          onOpenStoreCategory(promo.actionTarget, promo.actionExtra);
-          return;
-        }
-
-        if (promo.actionTarget && onOpenStore) {
-          onOpenStore(promo.actionTarget);
-          return;
-        }
-
-        if (onOpenDiscovery) {
-          onOpenDiscovery();
-          return;
-        }
-
-        onOpenList?.();
-        return;
-      }
-
-      if (promo.actionType === 'product') {
-        if (promo.actionExtra && promo.actionTarget && onOpenProduct) {
-          onOpenProduct(promo.actionExtra, promo.actionTarget);
-          return;
-        }
-
-        if (promo.actionExtra && onOpenStore) {
-          onOpenStore(promo.actionExtra);
-          return;
-        }
-
-        setInlineSearchVisible(true);
-        return;
-      }
-
-      if (promo.actionType === 'subscription') {
-        if (onOpenBenefits) {
-          onOpenBenefits(promo.actionTarget);
-          return;
-        }
-        onOpenDiscovery?.();
-        return;
-      }
-
-      if (promo.actionType === 'external') {
-        if (promo.actionTarget === 'home') {
-          setActiveCategoryId('all');
-          setActiveSubcategoryId(null);
-          setActiveFilter('all');
-          return;
-        }
-
-        if (promo.actionTarget === 'stores' || promo.actionTarget === 'DshStoresList') {
-          onOpenList?.();
-          return;
-        }
-
-        if (promo.actionTarget === 'offers') {
-          if (promo.actionExtra && onOpenStore) {
-            onOpenStore(promo.actionExtra);
-            return;
-          }
-
-          setActiveFilter('offers');
-          onOpenDiscovery?.();
-          return;
-        }
-
-        if (promo.actionTarget === 'orders-list' || promo.actionTarget === 'orders') {
-          onOpenOrders?.();
-          return;
-        }
-
-        if (promo.actionTarget === 'tracking') {
-          onOpenTracking?.();
-          return;
-        }
-
-        if (promo.actionTarget === 'entitlements-get' || promo.actionTarget === 'loyalty') {
-          onOpenBenefits?.('entitlements-get');
-          return;
-        }
-
-        if (promo.actionTarget === 'campaign') {
-          onOpenDiscovery?.();
-          return;
-        }
-
-        onOpenDiscovery?.();
-        return;
-      }
-
-    // Fallback for unknown actions
-    onOpenDiscovery?.();
-    },
-    [
-      activeFilter,
-      categoryItems,
-      onOpenBenefits,
-      onOpenDiscovery,
-      onOpenList,
-      onOpenOrders,
-      onOpenProduct,
-      onOpenSearch,
-      onOpenSheinInfo,
-      onOpenStore,
-      onOpenStoreCategory,
-      onOpenTracking,
-      onPromoClick,
-      setActiveCategoryId,
-      setActiveFilter,
-      setActiveSubcategoryId,
-      setInlineSearchVisible,
-    ]
-  );
+    onRegisterBackHandler,
+  });
 
   const bannerItems = React.useMemo<BannerCarouselItem[]>(() => (
     resolvedPromos.map((promo) => ({
@@ -1084,8 +826,6 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
   if (state !== 'ready') {
     return renderState(state, onRetry);
   }
-
-  const stickyFilterIndex = inlineSearchVisible || bannerItems.length > 0 ? 2 : 1;
 
   return (
     <View style={styles.screenRoot}>
