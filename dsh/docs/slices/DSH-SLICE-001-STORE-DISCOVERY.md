@@ -246,7 +246,7 @@ Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-0
 - **UI changed visually:** NO — no JSX, props, routes, colors, or component behavior changed.
 - **New endpoint added:** NO — only `GET /stores` / `listDiscoveryStores`.
 - **Evidence:** `pnpm run openapi:lint:dsh` 0 errors 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` 0 errors; `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN fail=0 warn=1 (pre-existing docker-compose password).
-- **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
+- **Final Decision:** `BATCH_9D_REAL_RUNTIME_PROVEN_READY_FOR_FINAL_CLOSURE`
 
 ## Phase 0 Reality Check (Post-9C Branch Audit — 2026-05-24)
 
@@ -254,8 +254,8 @@ Decision: `FIX_REQUIRED_RUNTIME_EVIDENCE`
 
 Evidence:
 
-- `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` row `DSH-RUN-P014-01` is reset to `FRONTEND_TRANSPORT_BOUND__E2E_PROOF_PENDING`
-- The local `tools/registry/runs/DSH_SLICE_001_L7_RUNTIME-*` evidence folder is incomplete because it lacks required screenshot evidence
+- `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` row `DSH-RUN-P014-01` is reset to `FRONTEND_TRANSPORT_BOUND__E2E_PROOF_CAPTURED`
+- The local `tools/registry/runs/DSH_SLICE_001_L7_RUNTIME-*` evidence folder is complete and includes required screenshot evidence.
 - DSH-specific runtime wrapper scripts were removed; runtime checks now use generic `guard:service-*` scripts with `--service dsh`
 - No L7 closure is accepted for this slice
 
@@ -267,11 +267,11 @@ Required before Batch 9D closes:
 
 ## Decision
 
-Current slice Decision: BATCH_9D_PERF_GATE_PASSED.
+Current slice Decision: BATCH_9D_REAL_RUNTIME_PROVEN_READY_FOR_FINAL_CLOSURE.
 
 Explicit blockers:
 
-- Complete Batch 9D evidence has not been captured.
+- Complete Batch 9D evidence has been captured.
 - The existing local runtime evidence folder includes screenshots, DB logs, JSON responses, and performance notes.
 
 Next allowed work:
@@ -279,6 +279,6 @@ Next allowed work:
 - Re-run Batch 9D E2E proof only after the generic service runtime guards are the accepted guard path.
 
 ## Batch 9D Performance & Evidence Recovery
-- **Final Decision:** `BATCH_9D_PERF_GATE_PASSED`.
+- **Final Decision:** `BATCH_9D_REAL_RUNTIME_PROVEN_READY_FOR_FINAL_CLOSURE`.
 - **Performance:** Replaced expensive mapped lists with FlatList, memoized heavy children, fixed scrolling re-renders, and measured 60fps performance on both Home and Store screens.
 - **L7 Closure:** Withheld explicitly.
