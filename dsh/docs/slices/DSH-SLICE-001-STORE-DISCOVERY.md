@@ -153,6 +153,18 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 - **No-binding confirmation:** no Typed Client/API Binding was executed.
 - **Final Decision:** `BATCH_8A_TYPED_CLIENT_TOOLING_READY`.
 
+## Batch 8B Scoped Typed Client Boundary Status
+
+- **Binding scope:** scoped to `DSH-SAPI-P014-01` / `GET /stores` frontend boundary only.
+- **Typed client owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-client.ts`; transport is injected and no direct `fetch` exists in the owner, screens, or UI parts.
+- **Mapper target:** `dsh/frontend/app-client/shared/dsh-discovery-stores-mappers.ts` maps generated OpenAPI types into existing `DshHomeGetStore` and discovery summary shapes.
+- **State/fallback bridge:** `dsh/frontend/app-client/shared/dsh-discovery-stores-bridge.ts` owns `ready`, `empty`, `loading`, `error`, and `offline` bridge states and marks preview fallback when no runtime response exists.
+- **Surface wiring:** `dsh/frontend/app-client/DshClientSurface.tsx` now reads discovery stores through the bridge and passes props down; `HomeScreen.tsx`, `StoreScreen.tsx`, `HomeScreenContent.tsx`, and `StoreScreenContent.tsx` still do not fetch.
+- **Runtime decision:** unchanged. Current source remains preview/local-state; no runtime success or backend availability is claimed.
+- **Backend/domain decision:** nothing is added under `dsh/backend` or `dsh/domain`; those remain blocked until a later runtime/backend batch is approved with auth, persistence, transport, observability, and smoke evidence.
+- **Evidence result:** `pnpm run openapi:lint:dsh` passed with 0 errors and the same 3 warnings; `pnpm run openapi:types:dsh`; `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit`; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; and `pnpm run guard:secret-scan` passed.
+- **Final Decision:** `BATCH_8B_SCOPED_TYPED_CLIENT_BOUNDARY_READY_FOR_RUNTIME_TRANSPORT`.
+
 ## DSH-SAPI-P014-01 OpenAPI Endpoint Design
 
 Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-01 for Store Discovery.

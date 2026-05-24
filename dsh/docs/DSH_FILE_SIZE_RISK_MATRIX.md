@@ -198,3 +198,15 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Backend/domain decision:** no files or scaffolds are added under `dsh/backend` or `dsh/domain` in Batch 8A; those remain blocked until a later scoped runtime/backend batch has contract, auth, persistence, and observability proof.
 - **No-binding confirmation:** Batch 8A added tooling and generated types only; runtime remains preview/local-state and no Typed Client/API Binding was executed.
 - **Final Decision:** BATCH_8A_TYPED_CLIENT_TOOLING_READY
+
+### Batch 8B Scoped Typed Client Boundary Result
+
+- **Binding scope:** scoped to the frontend client boundary for `DSH-SAPI-P014-01` / `GET /stores`; no backend, domain, route, UI part, Home/Store screen fetch, mapper inflation, WLT/cart/checkout/payment, Docker, PostgreSQL, or endpoint expansion was executed.
+- **Typed client owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-client.ts` defines the typed `listDiscoveryStores` boundary from `dsh-openapi.types.ts` with an injected transport only; it does not import or call `fetch`.
+- **Mapper target:** `dsh/frontend/app-client/shared/dsh-discovery-stores-mappers.ts` maps the generated OpenAPI response into existing `DshHomeGetStore` and discovery summary shapes.
+- **State/fallback bridge:** `dsh/frontend/app-client/shared/dsh-discovery-stores-bridge.ts` owns `ready`, `empty`, `loading`, `error`, and `offline` bridge states and keeps preview fallback explicit when no runtime response exists.
+- **Surface wiring:** `dsh/frontend/app-client/DshClientSurface.tsx` reads stores through the bridge and still passes props into `HomeScreen` / `StoreScreen`; no direct fetch or binding was added inside screens or UI parts.
+- **Runtime decision:** unchanged. Current source is still `preview-fallback` / local-state; there is no runtime success claim.
+- **Backend/domain decision:** still blocked. Nothing is added under `dsh/backend` or `dsh/domain` until a later runtime/backend batch has approved auth, persistence, transport, observability, and smoke evidence.
+- **Evidence result:** `pnpm run openapi:lint:dsh` passed with 0 errors and the same 3 warnings; `pnpm run openapi:types:dsh`; `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit`; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; and `pnpm run guard:secret-scan` passed.
+- **Final Decision:** BATCH_8B_SCOPED_TYPED_CLIENT_BOUNDARY_READY_FOR_RUNTIME_TRANSPORT
