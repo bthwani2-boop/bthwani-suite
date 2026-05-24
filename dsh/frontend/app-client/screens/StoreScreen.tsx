@@ -41,21 +41,32 @@ import {
   type BThwaniFilterRailItem,
   type StoreHeroFulfillmentMode,
 } from '@bthwani/ui-kit';
-import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import { getDshClientStateMeta } from '../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import { mapMenuItemToProductCard } from '../shared/map-menu-item-to-product-card';
+import {
+  formatCurrencyValue,
+  getAllDeliveryModes,
+  isDeliveryBenefitLabel,
+  normalizeDisplayText,
+  normalizeTagLabel,
+  resolveMeasurementOptions,
+  resolveMeasurementUnitPrice,
+  resolveStoreOperationalState,
+} from '../shared/store-formatting';
+import {
+  buildStoreSearchCategories,
+  isFavoriteItem,
+  isNewItem,
+  isOfferItem,
+  resolveStoreItemsForCategory,
+} from '../shared/store-search-helpers';
 import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { canRenderInClientSurface } from '../../shared/workflow';
 import {
   type DshFulfillmentDeliveryMode,
-  getDshFulfillmentDeliveryModeMeta,
 } from '../contracts/dsh-client-binding.contracts';
-
-import type {
-  DshStoreOperationalState,
-} from '../contracts/dsh-store-types';
 
 export type DshStoreGetScreenProps = {
   appearanceMode?: BThwaniAppearanceMode;
@@ -112,15 +123,6 @@ export type DshStoreGetScreenContentProps = DshStoreGetScreenProps & {
 
 // Menu item view-model is shared locally to keep the screen fixture-free.
 
-function getAllDeliveryModes(): Array<{ id: DshFulfillmentDeliveryMode; label: string; icon: string }> {
-  return (
-    ['bthwani_delivery', 'partner_delivery', 'pickup'] as const
-  ).map((id) => {
-    const meta = getDshFulfillmentDeliveryModeMeta(id);
-    return { id, label: meta.label, icon: meta.icon };
-  });
-}
-
 const CATEGORY_ICON: Record<string, string> = {
   popular: '🔥',
   fresh: '🥦',
@@ -131,93 +133,6 @@ const CATEGORY_ICON: Record<string, string> = {
   sweets: '🍰',
 };
 
-function normalizeTagLabel(tag: string, storeText: ReturnType<typeof useUiText>['storeScreen']) {
-  const normalized = tag.trim().toLowerCase();
-
-  if (normalized.includes('pro')) return 'بثواني برو';
-  if (normalized.includes('pickup')) return storeText.get.pickup;
-  if (normalized.includes('partner delivery') || normalized.includes('store delivery')) return storeText.get.storeDelivery;
-  if (normalized.includes('offer')) return 'عرض مباشر';
-  if (normalized.includes('km')) return tag.replace(/km/i, 'كم');
-
-  return tag;
-}
-
-function isDeliveryBenefitLabel(tag: string, storeText: ReturnType<typeof useUiText>['storeScreen']) {
-  const normalized = normalizeDisplayText(tag).trim().toLowerCase();
-
-  return normalized === normalizeDisplayText(storeText.get.storeDelivery).toLowerCase()
-    || normalized === normalizeDisplayText(storeText.get.pickup).toLowerCase()
-    || normalized === normalizeDisplayText(storeText.get.platformDelivery).toLowerCase()
-    || normalized.includes('توصيل المتجر')
-    || normalized.includes('استلم بنفسك')
-    || normalized.includes('توصيل بثواني');
-}
-
-function normalizeDisplayText(value?: string) {
-  if (!value) return '';
-
-  return value
-    .replace(/Hadda Fresh Market/gi, 'أسواق العليا الطازجة')
-    .replace(/Hittin Bakery/gi, 'مخبز حطين')
-    .replace(/Malqa Kitchen/gi, 'مطبخ الملقا')
-    .replace(/Groceries and daily essentials/gi, 'مقاضي يومية ومنتجات طازجة')
-    .replace(/Bread and pastries/gi, 'مخبوزات وخبز يومي')
-    .replace(/Prepared meals/gi, 'وجبات جاهزة يومياً')
-    .replace(/Royal Gala Apples/gi, 'تفاح رويال غالا')
-    .replace(/Organic Milk/gi, 'حليب عضوي')
-    .replace(/Whole Wheat Bread/gi, 'خبز قمح كامل')
-    .replace(/Butter Croissant/gi, 'كرواسون زبدة')
-    .replace(/Chocolate Slice/gi, 'شريحة شوكولاتة')
-    .replace(/Creamy Pasta Box/gi, 'باستا كريمية')
-    .replace(/Garden Salad/gi, 'سلطة جاردن')
-    .replace(/Fresh box, 1 kg/gi, 'صندوق طازج 1 كجم')
-    .replace(/1\.5L chilled bottle/gi, 'عبوة مبردة 1.5 لتر')
-    .replace(/Daily fresh bakery/gi, 'مخبوز يومي طازج')
-    .replace(/Baked every morning/gi, 'يخبز طازجًا كل صباح')
-    .replace(/Single serving/gi, 'حصة فردية جاهزة')
-    .replace(/Prepared meal ready to dispatch/gi, 'وجبة جاهزة للإرسال')
-    .replace(/Light and fresh bowl/gi, 'طبق خفيف وطازج')
-    .replace(/Popular/gi, 'الأكثر طلبًا')
-    .replace(/Best seller/gi, 'الأكثر مبيعًا')
-    .replace(/Chef pick/gi, 'اختيار الشيف')
-    .replace(/Fresh/gi, 'طازج')
-    .replace(/Dairy/gi, 'ألبان')
-    .replace(/Bakery/gi, 'مخبوزات')
-    .replace(/Meals/gi, 'وجبات')
-    .replace(/Healthy/gi, 'صحي')
-    .replace(/Sweets/gi, 'حلويات')
-    .replace(/ETA\s*/gi, '')
-    .replace(/\bmin\b/gi, 'دقيقة')
-    .replace(/\bYER\b/gi, 'ر.ي')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
-
-function resolveStoreOperationalState(statusLabel: string, deliveryLabel?: string, serviceLabel?: string): DshStoreOperationalState {
-  const normalized = [statusLabel, deliveryLabel, serviceLabel]
-    .filter(Boolean)
-    .join(' ')
-    .trim()
-    .toLowerCase();
-
-  if (
-    normalized.includes('area_unserviceable')
-    || normalized.includes('unserviceable')
-    || normalized.includes('outside coverage')
-    || normalized.includes('خارج التغطية')
-    || normalized.includes('خارج النطاق')
-    || normalized.includes('غير مخدوم')
-  ) {
-    return 'area_unserviceable';
-  }
-
-  if (normalized.includes('closed') || normalized.includes('مغلق')) {
-    return 'store_closed';
-  }
-
-  return 'store_open';
-}
 
 function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
   if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
@@ -233,35 +148,6 @@ function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']
   return resolveDshImageSource(store?.imageUri);
 }
 
-function resolveMeasurementOptions(item: DshStoreGetMenuItem) {
-  if (item.measurementOptions?.length) {
-    return item.measurementOptions;
-  }
-
-  return dshCategoryMeasurementPolicies[item.categoryId]?.options ?? ['حبة', '2 حبة'];
-}
-
-function extractPriceValue(priceLabel?: string) {
-  const normalized = Number((priceLabel ?? '').replace(/[^\d.]/g, ''));
-  return Number.isFinite(normalized) ? normalized : 0;
-}
-
-function resolveMeasurementMultiplier(option: string) {
-  const normalized = option.trim();
-
-  if (normalized.includes('250')) return 0.25;
-  if (normalized.includes('500')) return 0.5;
-  if (normalized.includes('1 كجم')) return 1;
-  if (normalized.includes('2 حبة')) return 2;
-  if (normalized.includes('4 حبة')) return 4;
-  if (normalized.includes('6 حبة')) return 6;
-  if (normalized.includes('ربع')) return 0.25;
-  if (normalized.includes('نصف')) return 0.5;
-  if (normalized.includes('نفر')) return 1;
-
-  return 1;
-}
-
 function hexToRgba(hex: string, alpha = 0.9) {
   const clean = (hex || colorPalette.white).replace('#', '').trim();
   const short = clean.length === 3;
@@ -269,15 +155,6 @@ function hexToRgba(hex: string, alpha = 0.9) {
   const g = parseInt(short ? clean[1] + clean[1] : clean.slice(2, 4), 16);
   const b = parseInt(short ? clean[2] + clean[2] : clean.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-function formatCurrencyValue(value: number) {
-  const normalized = value % 1 === 0 ? String(value) : value.toFixed(1).replace(/\.0$/, '');
-  return `${normalized} ر.ي`;
-}
-
-function resolveMeasurementUnitPrice(item: DshStoreGetMenuItem, option: string) {
-  return extractPriceValue(item.priceLabel) * resolveMeasurementMultiplier(option);
 }
 
 function renderNonReadyState(
@@ -484,53 +361,13 @@ function DshStoreGetScreenContent({
     [fallbackMenuItems],
   );
 
-  const isOfferItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if ((item as Record<string, unknown>).isOffer) return true;
-    if (item.discountLabel) return true;
-    if (item.oldPriceLabel && item.priceLabel) return true;
-    const d = normalizeDisplayText(item.discountLabel ?? '').toLowerCase();
-    if (d.includes('%') || /\d+%/.test(d)) return true;
-    return false;
-  }, []);
-
-  const isNewItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if (item.isNew) return true;
-    const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
-    if (s.includes('وصل') || s.includes('جديد') || s.includes('حديث')) return true;
-    return false;
-  }, []);
-
-  const isFavoriteItem = React.useCallback((item: DshStoreGetMenuItem) => {
-    if (item.isFavorite || item.isFavorited) return true;
-    const s = normalizeDisplayText(item.statusLabel ?? '').toLowerCase();
-    if (s.includes('مفضل') || s.includes('مفضلة')) return true;
-    // fallback: check tags or category label
-    if (normalizeDisplayText(item.categoryLabel ?? '').toLowerCase().includes('مفضل')) return true;
-    return false;
-  }, []);
-
   const categories = React.useMemo(() => {
-    const storeCategories = (store?.categories ?? []).filter((category) =>
-      clientVisibleItems.some((item) => item.categoryId === category.id),
-    );
-    const popularCount = clientVisibleItems.filter((item) => {
-      const status = normalizeDisplayText(item.statusLabel ?? '');
-      return status.includes('الأكثر') || status.includes('اختيار') || Boolean(item.hasOptions);
-    }).length;
-
-    const favoritesCount = clientVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id)).length;
-    const newCount = clientVisibleItems.filter(isNewItem).length;
-    const offersCount = clientVisibleItems.filter(isOfferItem).length;
-
-    return [
-      { id: 'all', label: 'جميع الأقسام', itemCount: clientVisibleItems.length, isPopular: true },
-      { id: 'popular', label: 'الأكثر طلبًا', itemCount: popularCount || Math.min(clientVisibleItems.length, 4), isPopular: true },
-      { id: 'favorites', label: 'المفضلة', itemCount: favoritesCount },
-      { id: 'new', label: 'الجديدة', itemCount: newCount },
-      { id: 'offers', label: 'العروض', itemCount: offersCount },
-      ...storeCategories,
-    ];
-  }, [clientVisibleItems, store?.categories, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
+    return buildStoreSearchCategories({
+      storeCategories: store?.categories,
+      clientVisibleItems,
+      favoriteIds,
+    });
+  }, [clientVisibleItems, favoriteIds, store?.categories]);
 
   const CARD_HEIGHT = 126;
   const CARD_GAP = 2;
@@ -573,52 +410,13 @@ function DshStoreGetScreenContent({
   }, [previewItems]);
 
   const resolveItemsForCategory = React.useCallback((categoryId: string) => {
-    const scopedItems = (() => {
-      if (categoryId === 'all') {
-        return clientVisibleItems;
-      }
-
-      if (categoryId === 'popular') {
-        const popularItems = clientVisibleItems.filter((item) => {
-          const status = normalizeDisplayText(item.statusLabel ?? '');
-          return status.includes('الأكثر') || status.includes('اختيار') || Boolean(item.hasOptions);
-        });
-
-        return popularItems.length ? popularItems : clientVisibleItems.slice(0, Math.min(4, clientVisibleItems.length));
-      }
-
-      if (categoryId === 'favorites') {
-        return clientVisibleItems.filter((item) => isFavoriteItem(item) || favoriteIds.has(item.id));
-      }
-
-      if (categoryId === 'new') {
-        return clientVisibleItems.filter((item) => isNewItem(item));
-      }
-
-      if (categoryId === 'offers') {
-        return clientVisibleItems.filter((item) => isOfferItem(item));
-      }
-
-      return clientVisibleItems.filter((item) => item.categoryId === categoryId);
-    })();
-
-    const normalizedQuery = headerSearchQuery.trim().toLowerCase();
-    if (!normalizedQuery) {
-      return scopedItems;
-    }
-
-    return scopedItems.filter((item) => {
-      const searchableText = [
-        normalizeDisplayText(item.name),
-        normalizeDisplayText(item.subtitle),
-        normalizeDisplayText(item.categoryLabel),
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      return searchableText.includes(normalizedQuery);
+    return resolveStoreItemsForCategory({
+      categoryId,
+      clientVisibleItems,
+      favoriteIds,
+      query: headerSearchQuery,
     });
-  }, [clientVisibleItems, headerSearchQuery, isFavoriteItem, isNewItem, isOfferItem, favoriteIds]);
+  }, [clientVisibleItems, favoriteIds, headerSearchQuery]);
 
   const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
   const previewItems = visibleItems;
@@ -914,8 +712,8 @@ function DshStoreGetScreenContent({
       ].filter(Boolean) as string[],
     ),
   )
-    .map((chip) => normalizeTagLabel(chip, storeText))
-    .filter((chip) => !isDeliveryBenefitLabel(chip, storeText))
+    .map((chip) => normalizeTagLabel(chip, storeText.get))
+    .filter((chip) => !isDeliveryBenefitLabel(chip, storeText.get))
     .slice(0, 3);
 
   const firstVisibleItem = React.useMemo(
@@ -1028,7 +826,7 @@ function DshStoreGetScreenContent({
         : null,
       ...(benefitChips ?? []).slice(0, 3).map((chip, index) => ({
         id: `${storeId}-benefit-${index}`,
-        title: normalizeTagLabel(chip, storeText),
+        title: normalizeTagLabel(chip, storeText.get),
         subtitle: 'ميزة مرتبطة بهذا المتجر',
         badge: chip.includes('برو') || chip.includes('أولوية') ? 'اشتراك' : chip.includes('كوبون') || chip.includes('خصم') || chip.includes('عرض') ? 'عرض' : 'ميزة',
         image: pickFeatureImage(index + 3) ?? null,

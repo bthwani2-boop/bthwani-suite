@@ -116,3 +116,11 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Types returned to screens temporarily:** DshHomeGetScreenProps, DshStoreGetScreenProps, DshStoreGetScreenContentProps (due to UI/React dependencies).
 - **Purity confirmation:** Validated. No React, @bthwani/ui-kit, or parts imports exist in contracts/.
 - **Final Decision:** BATCH_1_TYPES_EXTRACTED_READY_FOR_BATCH_2
+
+### Batch 2 Helper/Mapper Extraction Result
+
+- **Helpers extracted:** `home-promo-mappers.ts` (`normalizeHomePromoActionType`, `resolveHomePromoPublishStage`, `resolveHomeCategoryContext`), `home-search-helpers.ts` (`buildHomeCategoryFilterId`, `buildHomeModeFilterId`, `resolveHomeStoresForCategory`), `store-formatting.ts` (`getAllDeliveryModes`, `normalizeDisplayText`, `normalizeTagLabel`, `isDeliveryBenefitLabel`, `resolveStoreOperationalState`, `resolveMeasurementOptions`, `extractPriceValue`, `formatCurrencyValue`, `resolveMeasurementUnitPrice`), `store-search-helpers.ts` (`isOfferItem`, `isNewItem`, `isFavoriteItem`, `buildStoreSearchCategories`, `resolveStoreItemsForCategory`).
+- **Helpers deferred with reason:** `resolveDshHomeStoreImageSource`, `resolveDshHomeBannerImageSource`, `resolveDshStoreMenuItemImageSource`, and `resolveDshStoreCoverImageSource` stayed in screens because they depend on image/media ownership and `react-native` image types; `isWithinOperatingHours` stayed deferred because the same logic already exists under `dsh/frontend/shared/news-ticker.preview-store.ts`; `hexToRgba` stayed local because it is styling-adjacent rather than discovery search/formatting logic.
+- **Files created/modified:** created `dsh/frontend/app-client/shared/home-promo-mappers.ts`, `dsh/frontend/app-client/shared/home-search-helpers.ts`, `dsh/frontend/app-client/shared/store-formatting.ts`, `dsh/frontend/app-client/shared/store-search-helpers.ts`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, `dsh/docs/DSH_FILE_SIZE_RISK_MATRIX.md`.
+- **Purity confirmation:** Validated. New helpers import only contract/shared model modules and contain no JSX, React hooks, `react-native`, or `@bthwani/ui-kit` imports.
+- **Final Decision:** BATCH_2_HELPERS_EXTRACTED_READY_FOR_BATCH_3

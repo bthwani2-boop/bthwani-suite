@@ -39,6 +39,18 @@ import {
   DshHomeApprovedVideoReelsViewer,
   type DshHomeApprovedVideoReelsViewerProps,
 } from '../parts/ApprovedVideoReelsViewer';
+import {
+  normalizeHomePromoActionType,
+  resolveHomeCategoryContext,
+  resolveHomePromoPublishStage,
+} from '../shared/home-promo-mappers';
+import {
+  buildHomeCategoryFilterId,
+  buildHomeModeFilterId,
+  HOME_CATEGORY_FILTER_PREFIX,
+  HOME_MODE_FILTER_PREFIX,
+  resolveHomeStoresForCategory,
+} from '../shared/home-search-helpers';
 import { getDshCategoryIconUrl } from '../shared/get-dsh-category-icon-url';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import type { MarketingGrowthRecord } from '../../shared/growth.preview-store';
@@ -60,7 +72,6 @@ import { canRenderInClientSurface } from '../../shared/workflow';
 
 import type {
   DshHomeCategory,
-  DshHomeBannerActionType,
   DiscoveryFilter,
   StorePagerPage,
   DshHomeGetPromo,
@@ -124,29 +135,6 @@ function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string
 
 function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType | undefined {
   return resolveDshImageSource(imageUrl);
-}
-
-function normalizeHomePromoActionType(targetType: string): DshHomeBannerActionType | undefined {
-  if (targetType === 'category') {
-    return 'main_category';
-  }
-
-  switch (targetType) {
-    case 'main_category':
-    case 'sub_category':
-    case 'store':
-    case 'external':
-    case 'store_category':
-    case 'product':
-    case 'subscription':
-      return targetType;
-    default:
-      return undefined;
-  }
-}
-
-function resolveHomePromoPublishStage(status: HomePromoRecord['status']) {
-  return status === 'published' ? 'published-preview' : 'draft';
 }
 
 type CategoryDialItem = OrbitCarouselItem;
@@ -276,17 +264,6 @@ const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName:
   { value: 'new', label: 'الجديدة', iconName: 'sparkles-outline' },
   { value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
 ];
-
-const HOME_CATEGORY_FILTER_PREFIX = 'category:';
-const HOME_MODE_FILTER_PREFIX = 'mode:';
-
-function buildHomeCategoryFilterId(categoryId: string) {
-  return `${HOME_CATEGORY_FILTER_PREFIX}${categoryId}`;
-}
-
-function buildHomeModeFilterId(filter: DiscoveryFilter) {
-  return `${HOME_MODE_FILTER_PREFIX}${filter}`;
-}
 
 const categoryIconMap: Record<string, string> = {
   restaurants: '🍽️',
@@ -630,50 +607,12 @@ export function DshHomeGetScreen({
   const categoryPageIds = React.useMemo(() => ['all', ...categoryItems.map((category) => category.id)], [categoryItems]);
 
   const resolveStoresForCategory = React.useCallback((categoryId: string) => {
-    const categoryScopedStores =
-      categoryId && categoryId !== 'all'
-        ? resolvedStores.filter((store) => (store.categoryId ? store.categoryId === categoryId : false))
-        : resolvedStores;
-
-    const filteredByMode = categoryScopedStores.filter((store) => {
-      const isFavorite = favoriteToggles[store.id] ?? store.isFavorite;
-
-      if (activeFilter === 'favorites') {
-        return isFavorite;
-      }
-
-      if (activeFilter === 'nearest') {
-        return store.distanceLabel === '1.8 كم' || store.distanceLabel === '2.1 كم';
-      }
-
-      if (activeFilter === 'new') {
-        return Boolean(store.hasOffer);
-      }
-
-      if (activeFilter === 'offers') {
-        return Boolean(store.hasOffer || store.offerLabel);
-      }
-
-      return true;
-    });
-
-    const normalizedQuery = inlineSearchQuery.trim().toLowerCase();
-    if (!normalizedQuery) {
-      return filteredByMode;
-    }
-
-    return filteredByMode.filter((store) => {
-      const haystack = [
-        store.name,
-        store.address,
-        store.deliveryLabel,
-        store.serviceLabel,
-        store.offerLabel ?? '',
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      return haystack.includes(normalizedQuery);
+    return resolveHomeStoresForCategory({
+      categoryId,
+      stores: resolvedStores,
+      activeFilter,
+      favoriteToggles,
+      query: inlineSearchQuery,
     });
   }, [activeFilter, favoriteToggles, inlineSearchQuery, resolvedStores]);
 
@@ -854,27 +793,6 @@ export function DshHomeGetScreen({
     return () => { onRegisterBackHandler?.(null); };
   }, [onRegisterBackHandler, homeBackHandler]);
 
-  const resolveHomeCategoryContext = React.useCallback((targetId?: string) => {
-    if (!targetId) {
-      return null;
-    }
-
-    const matchedCategory = categoryItems.find((category) => category.id === targetId);
-    if (matchedCategory) {
-      return { categoryId: matchedCategory.id, subcategoryId: null as string | null };
-    }
-
-    const parentCategory = categoryItems.find((category) =>
-      category.subcategories?.some((subcategory) => subcategory.id === targetId),
-    );
-
-    if (parentCategory) {
-      return { categoryId: parentCategory.id, subcategoryId: targetId };
-    }
-
-    return null;
-  }, [categoryItems]);
-
   const resolveBannerPress = React.useCallback(
     (promo: DshHomeGetPromo) => () => {
       if (promo.id) {
@@ -882,7 +800,7 @@ export function DshHomeGetScreen({
       }
 
       if (promo.actionType === 'main_category' || promo.actionType === 'sub_category') {
-        const nextHomeContext = resolveHomeCategoryContext(promo.actionTarget);
+        const nextHomeContext = resolveHomeCategoryContext(categoryItems, promo.actionTarget);
 
         if (nextHomeContext) {
           setActiveCategoryId(nextHomeContext.categoryId);
@@ -1009,7 +927,7 @@ export function DshHomeGetScreen({
     // Fallback for unknown actions
     onOpenDiscovery?.();
     },
-    [activeFilter, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenOrders, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenTracking, onPromoClick, resolveHomeCategoryContext]
+    [activeFilter, categoryItems, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenOrders, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onOpenTracking, onPromoClick]
   );
 
   const bannerItems = React.useMemo<BannerCarouselItem[]>(() => (
@@ -1054,7 +972,7 @@ export function DshHomeGetScreen({
       setShortsVisible(false);
 
       if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
-        const nextHomeContext = resolveHomeCategoryContext(item.routeTargetId);
+        const nextHomeContext = resolveHomeCategoryContext(categoryItems, item.routeTargetId);
 
         if (nextHomeContext) {
           setActiveCategoryId(nextHomeContext.categoryId);
@@ -1133,7 +1051,7 @@ export function DshHomeGetScreen({
 
       onOpenList?.();
     },
-    [onOpenBenefits, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onVideoCtaClick, resolveHomeCategoryContext]
+    [categoryItems, onOpenBenefits, onOpenDiscovery, onOpenList, onOpenProduct, onOpenSearch, onOpenSheinInfo, onOpenStore, onOpenStoreCategory, onVideoCtaClick]
   );
 
   const approvedVideoReels = React.useMemo(() => approvedVideoShorts.filter((video) => {
