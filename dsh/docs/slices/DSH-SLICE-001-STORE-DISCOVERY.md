@@ -127,6 +127,12 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Gate 9 Regression | previous journey recheck after shared/contract/navigation/state changes | no shared/source change in this manifest step | `NOT_APPLICABLE_WITH_REASON` |
 | Gate 10 Evidence Lock | evidence pack and decision record | evidence folder exists at `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100`; all visual review and guard runs passed | `PASS` |
 
+## Batch 7 Binding Status
+
+- **Binding Status:** `BATCH_7_GATES_PASSED_READY_FOR_BATCH_8`; no Typed Client/API Binding was executed in Batch 7.
+- **Regression evidence:** `tools/registry/runs/DSH_BATCH7_ADB_VISUAL_SWEEP-20260524-082321` captures Home feed, Home inline search, and Store details on `SM-A125F` / `720x1600` / RTL.
+- **Runtime decision:** unchanged. Slice 001 still uses preview/local-state runtime proof until Batch 8 explicitly starts binding work.
+
 ## DSH-SAPI-P014-01 OpenAPI Endpoint Design
 
 Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-01 for Store Discovery.

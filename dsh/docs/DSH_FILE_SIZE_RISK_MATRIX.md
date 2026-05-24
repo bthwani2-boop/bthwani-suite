@@ -157,8 +157,18 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **No-behavior-change confirmation:** Screen public exports, component names, route owner paths, props, callbacks, state hooks, sheets/modals, runtime/API logic, Typed Client, Binding, backend, OpenAPI, and WLT/cart/checkout/payment scope were not changed.
 - **Final Decision:** BATCH_6_THIN_SHELL_ASSEMBLED_READY_FOR_BATCH_7
 
+### Batch 7 Visual Regression + Gates Result
+
+- **Static gates passed:** `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit` after sandbox `EPERM` rerun; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; `pnpm run guard:secret-scan`.
+- **Runtime smoke passed:** `pnpm --dir app-client/runtime exec expo export --platform android --output-dir C:\tmp\bthwani-app-client-export-batch7 --no-minify --no-bytecode --clear --max-workers 1` completed and bundled `app-client\runtime\index.js`.
+- **Visual regression evidence:** ADB device `SM-A125F`, viewport `720x1600`, RTL, package `com.bthwani.client.dev`; evidence root `tools/registry/runs/DSH_BATCH7_ADB_VISUAL_SWEEP-20260524-082321`.
+- **Screenshots captured:** Home feed `P6__app-client__relaunched-home-feed__SM-A125F__rtl__ADB_CAPTURE.png`; Home inline search `P8__app-client__home-inline-search-second-tap__SM-A125F__rtl__ADB_CAPTURE.png`; Store details `P3__app-client__after-store-card-double-tap__SM-A125F__rtl__ADB_CAPTURE.png`.
+- **Warnings/deferred evidence:** `guard:protected-tokens` remained warning-only with `DESIGN-TOKEN-DRIFT: WARN (fail=0, warn=4)`; ADB `uiautomator dump` failed with idle-state error, so the accepted visual proof is PNG screenshot evidence plus focused-window and filtered-log evidence.
+- **No-behavior-change confirmation:** Batch 7 made no UI, JSX, props, routes, runtime/API, Typed Client, Binding, backend, OpenAPI, WLT/cart/checkout/payment, or business-logic changes; it only added gate/evidence documentation and registry evidence metadata.
+- **Final Decision:** BATCH_7_GATES_PASSED_READY_FOR_BATCH_8
+
 ### Remaining Batch Gate Status
 
-- **Batch 7:** Pending. Visual regression and runtime sweep must run after Batch 6 because source-level TypeScript and guards do not prove visual equality.
-- **Batch 8:** Blocked by sequencing. Typed Client/API Binding remains forbidden until Batch 7 visual regression and gates pass.
-- **Final Decision:** FIX_REQUIRED_BATCH_7
+- **Batch 7:** Complete for DSH-SLICE-001 decomposition regression gates.
+- **Batch 8:** Allowed next by sequencing, but no Typed Client/API Binding was executed in Batch 7.
+- **Final Decision:** BATCH_7_GATES_PASSED_READY_FOR_BATCH_8
