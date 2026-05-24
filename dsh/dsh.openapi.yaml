@@ -2,18 +2,24 @@ openapi: 3.1.0
 info:
   title: BThwani DSH API
   version: 0.1.0
+  description: API contract for client-facing store discovery and storefront visibility.
 x-bthwani-status: READY_FOR_ONE_OPENAPI_ENDPOINT
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
-  currentImplementationRoot: packages/surfaces/src/service-owned/dsh
+  currentImplementationRoot: dsh
   targetRoot: dsh
 paths:
   /stores:
     get:
+      tags:
+        - Store Discovery
       summary: List discovery stores
       description: Retrieve a list of stores that pass the shared visibility/serviceability gates, with optional category and search query filters.
       operationId: listDiscoveryStores
+      security:
+        - BearerAuth: []
+        - {} # Guest-safe / Optional authentication
       parameters:
         - name: category_id
           in: query
@@ -40,6 +46,8 @@ paths:
           required: false
           schema:
             type: integer
+            minimum: 1
+            maximum: 100
             default: 20
           description: Maximum number of stores to return
         - name: offset
@@ -47,6 +55,7 @@ paths:
           required: false
           schema:
             type: integer
+            minimum: 0
             default: 0
           description: Number of stores to skip
       responses:
@@ -69,6 +78,12 @@ paths:
                schema:
                  $ref: '#/components/schemas/ErrorResponse'
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Optional bearer token for personalized store discovery (e.g. retrieving user's favorite stores).
   schemas:
     DiscoveryStoresResponse:
       type: object
