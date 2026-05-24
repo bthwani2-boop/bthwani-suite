@@ -1,5 +1,9 @@
 import { dshDiscoveryStores } from './discovery.preview-data';
 import type { DshDiscoveryStore } from '../types';
+import type {
+	DiscoveryFilter,
+	DshServiceId,
+} from '../contracts/dsh-home-types';
 import { brandPalette, dangerPalette, infoPalette, successPalette } from '@bthwani/ui-kit';
 
 /**
@@ -34,6 +38,22 @@ export type DshHomeGetFixturePromo = {
 	accentColor?: string;
 	publishStage?: string;
 	mediaPolicy?: string;
+};
+
+export type DshHomeServiceDialFixture = {
+	id: string;
+	key: DshServiceId;
+	title: string;
+	shortLabel?: string;
+	subtitle?: string;
+	iconUrl: string | null;
+	emojiFallback?: string;
+};
+
+export type DshHomeDiscoveryFilterFixture = {
+	value: DiscoveryFilter;
+	label: string;
+	iconName: string;
 };
 
 export type DshHomeGetFixtureStore = {
@@ -143,6 +163,80 @@ export const dshHomeGetFixtureTickerBanner: DshHomeGetFixtureTickerBanner = {
 	openMessage: 'المساحة مخصصة للشريط الإخباري • اطلب إلى المنزل أو افتح الطلب النشط خلال خطوة واحدة',
 	closedMessage: 'خارج الدوام تظهر المساحة مغلقة مع بقاء المسارات محفوظة للعودة لاحقًا',
 };
+
+export const dshHomeServiceDialFixtures: DshHomeServiceDialFixture[] = [
+	{
+		id: 'service-dsh',
+		key: 'dsh',
+		title: 'توصيل',
+		iconUrl: null,
+		emojiFallback: '🚚',
+	},
+	{
+		id: 'service-knz',
+		key: 'knz',
+		title: 'كنز',
+		iconUrl: null,
+		emojiFallback: '🪙',
+	},
+	{
+		id: 'service-amn',
+		key: 'amn',
+		title: 'أمان',
+		iconUrl: null,
+		emojiFallback: '🛡️',
+	},
+	{
+		id: 'service-arb',
+		key: 'arb',
+		title: 'عربون',
+		iconUrl: null,
+		emojiFallback: '💳',
+	},
+	{
+		id: 'service-wlt',
+		key: 'wlt',
+		title: 'المحفظة',
+		iconUrl: null,
+		emojiFallback: '👛',
+	},
+	{
+		id: 'service-esf',
+		key: 'esf',
+		title: 'أسعفني',
+		iconUrl: null,
+		emojiFallback: '🩺',
+	},
+	{
+		id: 'service-kwd',
+		key: 'kwd',
+		title: 'كوادر',
+		iconUrl: null,
+		emojiFallback: '🧰',
+	},
+	{
+		id: 'service-mrf',
+		key: 'mrf',
+		title: 'معروف',
+		iconUrl: null,
+		emojiFallback: '🏷️',
+	},
+	{
+		id: 'service-snd',
+		key: 'snd',
+		title: 'سند',
+		iconUrl: null,
+		emojiFallback: '🤝',
+	},
+];
+
+export const dshHomeDiscoveryFilterFixtures: DshHomeDiscoveryFilterFixture[] = [
+	{ value: 'all', label: 'الكل', iconName: 'reorder-three-outline' },
+	{ value: 'favorites', label: 'المفضلة', iconName: 'heart-outline' },
+	{ value: 'nearest', label: 'الأقرب', iconName: 'locate-outline' },
+	{ value: 'new', label: 'الجديدة', iconName: 'sparkles-outline' },
+	{ value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
+];
 
 export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 	{

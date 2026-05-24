@@ -25,7 +25,6 @@ import {
   BThwaniFilterSwipeBoundary,
   GlassHeroOverlay,
   Icon,
-  ProductCard,
   SearchTopBar,
   StateView,
   Text,
@@ -41,10 +40,14 @@ import {
   type BThwaniFilterRailItem,
   type StoreHeroFulfillmentMode,
 } from '@bthwani/ui-kit';
+import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../data/categories.preview-data';
+import {
+  MenuItemCard,
+  resolveDshStoreMenuItemImageSource,
+} from '../parts/store/StoreMenuItemCard';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import { getDshClientStateMeta } from '../data/client-state.preview-data';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
-import { mapMenuItemToProductCard } from '../shared/map-menu-item-to-product-card';
 import {
   formatCurrencyValue,
   getAllDeliveryModes,
@@ -66,6 +69,7 @@ import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibil
 import { canRenderInClientSurface } from '../../shared/workflow';
 import {
   type DshFulfillmentDeliveryMode,
+  getDshFulfillmentDeliveryModeMeta,
 } from '../contracts/dsh-client-binding.contracts';
 
 export type DshStoreGetScreenProps = {
@@ -121,26 +125,6 @@ export type DshStoreGetScreenContentProps = DshStoreGetScreenProps & {
   appearanceMode: BThwaniAppearanceMode;
 };
 
-// Menu item view-model is shared locally to keep the screen fixture-free.
-
-const CATEGORY_ICON: Record<string, string> = {
-  popular: '🔥',
-  fresh: '🥦',
-  dairy: '🥛',
-  bakery: '🥐',
-  meals: '🍲',
-  healthy: '🥗',
-  sweets: '🍰',
-};
-
-
-function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
-  if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
-    return undefined;
-  }
-  return resolveDshImageSource(item.imageUri);
-}
-
 function resolveDshStoreCoverImageSource(store?: DshStoreGetScreenProps['store']): ImageSourcePropType | undefined {
   if (!canRenderInClientSurface(store?.publishStage, 'store')) {
     return undefined;
@@ -183,41 +167,6 @@ function renderNonReadyState(
       description={storeText.states.storeErrorDescription}
       actionLabel={storeText.states.retry}
       onActionPress={onRetry}
-    />
-  );
-}
-
-function MenuItemCard({
-  item,
-  partnerImageSource,
-  onAddPress,
-  onImagePress,
-  onFavoritePress,
-  isFavorited,
-}: {
-  item: DshStoreGetMenuItem;
-  partnerImageSource?: ImageSourcePropType | string | null;
-  onAddPress?: (anchor?: { x: number; y: number }) => void;
-  onImagePress?: (item: DshStoreGetMenuItem) => void;
-  onFavoritePress?: () => void;
-  isFavorited?: boolean;
-}) {
-  const productCard = mapMenuItemToProductCard(item);
-
-  return (
-    <ProductCard
-      {...productCard}
-      title={normalizeDisplayText(productCard.title)}
-      subtitle={normalizeDisplayText(productCard.subtitle)}
-      statusLabel={normalizeDisplayText(item.statusLabel ?? productCard.statusLabel ?? '') || undefined}
-      categoryLabel={normalizeDisplayText(item.categoryLabel ?? productCard.categoryLabel ?? '') || undefined}
-      preparationTime={normalizeDisplayText(item.preparationTime ?? productCard.preparationTime ?? '') || undefined}
-      imageSource={resolveDshStoreMenuItemImageSource(item)}
-      partnerImageSource={partnerImageSource}
-      onAdd={onAddPress}
-      onImagePress={onImagePress ? () => onImagePress(item) : undefined}
-      onFavorite={onFavoritePress}
-      isFavorited={isFavorited}
     />
   );
 }

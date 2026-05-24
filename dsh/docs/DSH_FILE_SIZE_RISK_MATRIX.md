@@ -124,3 +124,19 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Files created/modified:** created `dsh/frontend/app-client/shared/home-promo-mappers.ts`, `dsh/frontend/app-client/shared/home-search-helpers.ts`, `dsh/frontend/app-client/shared/store-formatting.ts`, `dsh/frontend/app-client/shared/store-search-helpers.ts`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, `dsh/docs/DSH_FILE_SIZE_RISK_MATRIX.md`.
 - **Purity confirmation:** Validated. New helpers import only contract/shared model modules and contain no JSX, React hooks, `react-native`, or `@bthwani/ui-kit` imports.
 - **Final Decision:** BATCH_2_HELPERS_EXTRACTED_READY_FOR_BATCH_3
+
+### Batch 3 Fixture Extraction Result
+
+- **Fixtures extracted:** moved Home static service dial fixtures and discovery filter fixtures into `dsh/frontend/app-client/data/home.preview-data.ts`; moved Home category/subcategory icon fixture maps and Store category icon fixture map into `dsh/frontend/app-client/data/categories.preview-data.ts`.
+- **Fixtures deferred with reason:** `serviceDialAnchorLayout` stayed in `HomeScreen.tsx` because it is layout positioning, not preview data; `ACTIVE_PROMO_INTERVAL_MS` stayed in `HomeScreen.tsx` because it is behavior timing; `renderState` title/description maps stayed local because they are UI state copy; dynamic `mockPromo`, `StoreCardPremiumItem` card mapping, and Store smart rail objects stayed local because they bind callbacks/images/state and are not static preview fixtures.
+- **Data files created/modified:** modified existing owners `dsh/frontend/app-client/data/home.preview-data.ts` and `dsh/frontend/app-client/data/categories.preview-data.ts`; no new data file was created because suitable data owners already existed.
+- **No-behavior-change confirmation:** Screens still consume the same data shape through imported preview fixtures; no JSX, props, routes, runtime/API logic, visibility/serviceability logic, Typed Client, or Binding changes were made.
+- **Final Decision:** BATCH_3_FIXTURES_EXTRACTED_READY_FOR_BATCH_4
+
+### Batch 4 UI Parts Extraction Result
+
+- **UI parts extracted:** moved Home category carousel primitives (`CategoryIconImage`, `CategoryHubIcon`, `CategorySelectorItem`) into `dsh/frontend/app-client/parts/home/HomeCategoryCarousel.tsx`; moved Home empty feed view (`EmptyFeed`) into `dsh/frontend/app-client/parts/home/HomeStoreFeed.tsx`; moved Store menu item card view (`MenuItemCard`) with its UI-media image resolver into `dsh/frontend/app-client/parts/store/StoreMenuItemCard.tsx`.
+- **UI parts deferred with reason:** Home hero/promo/search/feed blocks stayed local because they are still interleaved with screen state, callbacks, refs, and animation ownership; `renderState` and Store `renderNonReadyState` stayed local because they own non-ready screen-state copy; Store hero/search/measurement/image-preview/cart blocks stayed local because they bind sheets, modal state, gestures, animations, and cart-intent callbacks.
+- **Parts files created/modified:** created `dsh/frontend/app-client/parts/home/HomeCategoryCarousel.tsx`, `dsh/frontend/app-client/parts/home/HomeStoreFeed.tsx`, and `dsh/frontend/app-client/parts/store/StoreMenuItemCard.tsx`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, and this matrix.
+- **No-behavior-change confirmation:** Extracted parts preserve the same props, UI-kit components, media gating, callback behavior, and call sites; no route, state hook, sheet, runtime/API logic, Typed Client, Binding, backend, or OpenAPI changes were made.
+- **Final Decision:** BATCH_4_UI_PARTS_EXTRACTED_READY_FOR_BATCH_5

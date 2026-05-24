@@ -40,6 +40,20 @@ import {
   type DshHomeApprovedVideoReelsViewerProps,
 } from '../parts/ApprovedVideoReelsViewer';
 import {
+  CategoryHubIcon,
+  CategoryIconImage,
+  CategorySelectorItem,
+} from '../parts/home/HomeCategoryCarousel';
+import { EmptyFeed } from '../parts/home/HomeStoreFeed';
+import {
+  DSH_CATEGORY_ICONS as categoryIconMap,
+  DSH_SUBCATEGORY_ICONS as subcategoryIconMap,
+} from '../data/categories.preview-data';
+import {
+  dshHomeDiscoveryFilterFixtures as discoveryFilters,
+  dshHomeServiceDialFixtures,
+} from '../data/home.preview-data';
+import {
   normalizeHomePromoActionType,
   resolveHomeCategoryContext,
   resolveHomePromoPublishStage,
@@ -140,9 +154,6 @@ function resolveDshHomeBannerImageSource(imageUrl?: string): ImageSourcePropType
 type CategoryDialItem = OrbitCarouselItem;
 type DialAnchorLayout = OrbitAnchorLayout;
 
-type DshHomeGetStyles = ReturnType<typeof createStyles>;
-type DshHomeTheme = ReturnType<typeof useTheme>['theme'];
-
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
   y: spacing[14],
@@ -150,71 +161,7 @@ const serviceDialAnchorLayout: DialAnchorLayout = {
   height: 46,
 };
 
-const serviceDialItems: CategoryDialItem[] = [
-  {
-    id: 'service-dsh',
-    key: 'dsh',
-    title: 'توصيل',
-    iconUrl: null,
-    emojiFallback: '🚚',
-  },
-  {
-    id: 'service-knz',
-    key: 'knz',
-    title: 'كنز',
-    iconUrl: null,
-    emojiFallback: '🪙',
-  },
-  {
-    id: 'service-amn',
-    key: 'amn',
-    title: 'أمان',
-    iconUrl: null,
-    emojiFallback: '🛡️',
-  },
-  {
-    id: 'service-arb',
-    key: 'arb',
-    title: 'عربون',
-    iconUrl: null,
-    emojiFallback: '💳',
-  },
-  {
-    id: 'service-wlt',
-    key: 'wlt',
-    title: 'المحفظة',
-    iconUrl: null,
-    emojiFallback: '👛',
-  },
-  {
-    id: 'service-esf',
-    key: 'esf',
-    title: 'أسعفني',
-    iconUrl: null,
-    emojiFallback: '🩺',
-  },
-  {
-    id: 'service-kwd',
-    key: 'kwd',
-    title: 'كوادر',
-    iconUrl: null,
-    emojiFallback: '🧰',
-  },
-  {
-    id: 'service-mrf',
-    key: 'mrf',
-    title: 'معروف',
-    iconUrl: null,
-    emojiFallback: '🏷️',
-  },
-  {
-    id: 'service-snd',
-    key: 'snd',
-    title: 'سند',
-    iconUrl: null,
-    emojiFallback: '🤝',
-  },
-];
+const serviceDialItems: CategoryDialItem[] = dshHomeServiceDialFixtures;
 
 const serviceLauncherMarkStyles = StyleSheet.create({
   root: {
@@ -257,72 +204,6 @@ const serviceLauncherMarkStyles = StyleSheet.create({
   },
 });
 
-const discoveryFilters: Array<{ value: DiscoveryFilter; label: string; iconName: string }> = [
-  { value: 'all', label: 'الكل', iconName: 'reorder-three-outline' },
-  { value: 'favorites', label: 'المفضلة', iconName: 'heart-outline' },
-  { value: 'nearest', label: 'الأقرب', iconName: 'locate-outline' },
-  { value: 'new', label: 'الجديدة', iconName: 'sparkles-outline' },
-  { value: 'offers', label: 'العروض', iconName: 'pricetag-outline' },
-];
-
-const categoryIconMap: Record<string, string> = {
-  restaurants: '🍽️',
-  grocery: '🛒',
-  sweets_juices: '🧃',
-  anaqati: '👗',
-  wani_store: '🏪',
-  home_projects: '🏠',
-  cloud_kitchens: '🍳',
-  awnak: '🤝',
-  gas_refill: '⛽',
-  shein: '🛍️',
-  spare_parts: '🔧',
-  honey_dates: '🍯',
-  electronics: '📱',
-};
-
-const subcategoryIconMap: Record<string, string> = {
-  grocery_vegetables_fruits: '🥬',
-  grocery_meat_fish_chicken: '🥩',
-  grocery_roasted_spices: '🌰',
-  grocery_bakeries: '🍞',
-  grocery_deals_bundle: '🎁',
-  sweets_juices_fresh: '🧃',
-  sweets_juices_sweets: '🍰',
-  sweets_juices_icecream: '🍦',
-  anaqati_perfumes: '🌸',
-  anaqati_accessories_beauty: '💄',
-  anaqati_clothing: '👕',
-  gas_refill_refill: '🧯',
-  gas_refill_repair: '🛠️',
-  gas_refill_buy: '🧰',
-};
-
-function CategoryIconImage({
-  uri,
-  emojiFallback,
-  style,
-}: {
-  uri: string | null;
-  emojiFallback: string;
-  style: object;
-}) {
-  const [failed, setFailed] = React.useState(false);
-
-  if (!uri || failed) {
-    return <Text role="titleLg" style={style}>{emojiFallback}</Text>;
-  }
-
-  return (
-    <Image
-      source={{ uri }}
-      style={style}
-      resizeMode="cover"
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
 function DshServiceLauncherMark() {
   return (
     <View style={serviceLauncherMarkStyles.root}>
@@ -332,12 +213,6 @@ function DshServiceLauncherMark() {
         <Icon name="paper-plane" size={12} color={colorPalette.brand} />
       </View>
     </View>
-  );
-}
-
-function CategoryHubIcon() {
-  return (
-    <Icon name="grid-outline" size={22} color={colorPalette.brand} />
   );
 }
 
@@ -352,49 +227,6 @@ function isWithinOperatingHours(now: Date, openHour: number, closeHour: number) 
 }
 
 // Internal resolveTickerBanner removed. Using buildMarketingTickerPlan from store.
-
-/**
- * Internal helper for Category selection items (memoized)
- */
-const CategorySelectorItem = React.memo(({
-  label,
-  icon,
-  onPress,
-  isSelected,
-  isHub,
-  isVideo,
-  styles,
-  theme,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  onPress: () => void;
-  isSelected?: boolean;
-  isHub?: boolean;
-  isVideo?: boolean;
-  styles: DshHomeGetStyles;
-  theme: DshHomeTheme;
-}) => {
-  return (
-    <Pressable style={styles.categorySelectorCard} onPress={onPress}>
-      <View
-        style={[
-          styles.categoryIconContainer,
-          isHub && styles.categoryHubIconContainer,
-          isVideo && styles.videoIconContainer,
-          isSelected && styles.categoryIconContainerSelected,
-        ]}
-      >
-        {icon}
-      </View>
-      <View style={[styles.categoryNameContainer]}>
-        <Text role="bodySm" style={[styles.categoryName, isSelected && { color: theme.brand }]} numberOfLines={1}>
-          {label}
-        </Text>
-      </View>
-    </Pressable>
-  );
-});
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   const titles = {
@@ -421,24 +253,6 @@ function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>,
       actionLabel={state !== 'loading' ? 'إعادة المحاولة' : undefined}
       onActionPress={onRetry}
     />
-  );
-}
-
-/**
- * Empty state helper to reduce redundancy
- */
-function EmptyFeed({ query, styles }: { query?: string; styles: DshHomeGetStyles }) {
-  const isSearch = Boolean(query?.trim());
-  return (
-    <View style={styles.emptyFeed}>
-      <Text style={styles.emptyFeedEmoji}>{isSearch ? '🔎' : '🍽️'}</Text>
-      <Text role="titleSm" style={styles.emptyFeedTitle}>
-        {isSearch ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
-      </Text>
-      <Text role="bodySm" style={styles.emptyFeedText}>
-        {isSearch ? 'جرّب تغيير البحث أو انتقل إلى فئة أخرى.' : 'أضف متاجر لهذه الفئة كي تظهر هنا.'}
-      </Text>
-    </View>
   );
 }
 
