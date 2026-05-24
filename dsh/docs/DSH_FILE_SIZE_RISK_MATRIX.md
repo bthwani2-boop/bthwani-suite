@@ -1,7 +1,7 @@
 # DSH File Size and Complexity Risk Matrix
 
-Status: BATCH_9B_POSTGRES_RUNTIME
-Decision: BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT
+Status: BATCH_9C_FRONTEND_RUNTIME_TRANSPORT
+Decision: FIX_REQUIRED_RUNTIME_EVIDENCE
 
 ## DSH-SLICE-001 Safe Decomposition Plan
 
@@ -247,6 +247,14 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Evidence result:** `docker compose -f dsh/backend/docker-compose.local.yml ps` (no container running — local-only environment); `pnpm run openapi:lint:dsh` passed with 0 errors and 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` passed (0 errors); `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN (fail=0, warn=1, pre-existing `dsh_local_password` in docker-compose).
 - **Next allowed batch:** Batch 9D may provide E2E proof: start the Go backend, run `GET /stores`, confirm real response reaches `DshClientSurface` and the screen renders runtime data (not preview).
 - **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
+
+### Post-9C Reality Reset (2026-05-24)
+
+- **Runtime scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Decision:** `FIX_REQUIRED_RUNTIME_EVIDENCE`.
+- **Reason:** the local Batch 9D evidence folder lacks required screenshot evidence, so it cannot prove UI -> typed client -> Go -> PostgreSQL -> response -> screen.
+- **Guard path:** DSH-specific runtime wrappers were removed. Use generic service guards with `--service dsh`.
+- **Next allowed batch:** Re-run Batch 9D E2E proof with complete request/response, DB, bridge-source, performance, and screenshot evidence.
 
 ### Batch 9B PostgreSQL Runtime Result
 

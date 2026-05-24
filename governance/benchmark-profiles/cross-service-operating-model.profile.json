@@ -1,0 +1,336 @@
+{
+  "version": "1.0.0",
+  "owner": "governance/benchmark-profiles",
+  "purpose": "Global-standard operating model benchmark profile for BThwani cross-service journey and UX/logic closure diagnosis.",
+  "defaultMode": "deterministic-local-first",
+  "sourceReferences": [
+    {
+      "id": "WCAG_2_2",
+      "authority": "W3C",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "usedFor": [
+        "accessibility",
+        "operable",
+        "understandable",
+        "status messages",
+        "input assistance",
+        "complete processes"
+      ]
+    },
+    {
+      "id": "OWASP_AUTHORIZATION",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "usedFor": [
+        "deny_by_default",
+        "least_privilege",
+        "authorize_every_request",
+        "ABAC_ReBAC",
+        "audit_sensitive_access"
+      ]
+    },
+    {
+      "id": "CORE_WEB_VITALS",
+      "authority": "web.dev",
+      "url": "https://web.dev/articles/vitals",
+      "usedFor": [
+        "loading",
+        "interactivity",
+        "visual_stability",
+        "performance_regression"
+      ],
+      "thresholds": {
+        "LCP": "2.5s",
+        "INP": "200ms",
+        "CLS": "0.1",
+        "percentile": "p75"
+      }
+    },
+    {
+      "id": "OPENTELEMETRY_OBSERVABILITY",
+      "authority": "OpenTelemetry",
+      "url": "https://opentelemetry.io/docs/concepts/observability-primer/",
+      "usedFor": [
+        "traces",
+        "metrics",
+        "logs",
+        "request_flow_evidence",
+        "distributed_debugging"
+      ]
+    },
+    {
+      "id": "PCI_DSS_PAYMENT_SECURITY",
+      "authority": "PCI SSC",
+      "url": "https://www.pcisecuritystandards.org/standards/",
+      "usedFor": [
+        "payment_data_boundary",
+        "secure_software_lifecycle",
+        "payment_security_evidence"
+      ]
+    }
+  ],
+  "canonicalServices": [
+    "dsh",
+    "wlt",
+    "knz",
+    "arb",
+    "amn",
+    "esf",
+    "mrf",
+    "snd",
+    "kwd"
+  ],
+  "canonicalSurfaces": [
+    "app-client",
+    "app-partner",
+    "app-captain",
+    "app-field",
+    "control-panel",
+    "control-panel operations",
+    "control-panel finance",
+    "WLT",
+    "notifications",
+    "support",
+    "audit",
+    "Vars"
+  ],
+  "closureClaims": [
+    "CLOSED",
+    "READY",
+    "READY_FOR_PR",
+    "FINAL",
+    "100%",
+    "VERIFIED",
+    "LOCKED",
+    "COMPLETE",
+    "RUNTIME_VERIFIED",
+    "PRODUCTION_READY"
+  ],
+  "globalRequiredGates": [
+    "service_identity",
+    "surface_inventory",
+    "journey_inventory",
+    "operation_catalog",
+    "state_model",
+    "screen_state_coverage",
+    "cross_surface_effects",
+    "control_panel_visibility",
+    "permissions_authorization",
+    "audit_log",
+    "rollback_recovery",
+    "support_escalation",
+    "notifications_inbox",
+    "WLT_financial_boundary",
+    "Vars_policy_control",
+    "on_demand_retrieval",
+    "accessibility_WCAG22",
+    "performance_budget",
+    "observability_evidence",
+    "closure_evidence"
+  ],
+  "riskSensitiveTerms": [
+    "address",
+    "customer history",
+    "customerHistory",
+    "previous orders",
+    "previousOrders",
+    "trust score",
+    "trustScore",
+    "risk score",
+    "riskScore",
+    "fraud",
+    "housing",
+    "home location",
+    "location",
+    "phone",
+    "identity",
+    "payment",
+    "refund",
+    "settlement",
+    "payout",
+    "ledger",
+    "commission",
+    "wallet"
+  ],
+  "domainProfiles": [
+    {
+      "id": "delivery_marketplace_ordering",
+      "detectTerms": [
+        "order",
+        "checkout",
+        "cart",
+        "store",
+        "partner",
+        "captain",
+        "delivery",
+        "dispatch",
+        "pickup",
+        "delivered"
+      ],
+      "requiredEffects": [
+        {
+          "id": "client_order_confirmation_tracking",
+          "surface": "app-client",
+          "terms": ["confirmation", "tracking", "order id", "orderId", "status", "cancel", "support"],
+          "why": "Client must receive immediate order confirmation, visible order identity, status timeline, cancellation/support access."
+        },
+        {
+          "id": "partner_new_order_intake",
+          "surface": "app-partner",
+          "terms": ["intake", "new order", "accept", "reject", "prepare", "ready"],
+          "why": "Partner must accept/reject and prepare before pickup or dispatch completion."
+        },
+        {
+          "id": "captain_assignment_pickup_delivery_pod",
+          "surface": "app-captain",
+          "terms": ["assignment", "accept", "arrive", "pickup", "dropoff", "proof", "pod", "delivered"],
+          "why": "Captain must receive task, pick up, deliver, and provide proof."
+        },
+        {
+          "id": "operations_order_timeline_dispatch_intervention",
+          "surface": "control-panel operations",
+          "terms": ["operations", "timeline", "dispatch", "manual", "intervention", "monitor", "escalation", "audit"],
+          "why": "Operations must monitor, intervene, escalate, and audit order lifecycle."
+        },
+        {
+          "id": "payment_and_settlement_wlt_boundary",
+          "surface": "WLT",
+          "terms": ["payment", "authorization", "capture", "commission", "fee", "settlement", "payout", "refund", "ledger", "wlt"],
+          "why": "Money semantics must remain WLT-owned and auditable."
+        },
+        {
+          "id": "notification_chain",
+          "surface": "notifications",
+          "terms": ["notification", "inbox", "push", "email", "sms", "created", "accepted", "ready", "picked", "delivered", "failed"],
+          "why": "Each actor must receive timely status changes."
+        },
+        {
+          "id": "support_escalation_order_context",
+          "surface": "support",
+          "terms": ["support", "ticket", "escalation", "sla", "issue", "complaint", "recovery"],
+          "why": "Order-linked support and escalation must exist for failures."
+        },
+        {
+          "id": "audit_and_rollback",
+          "surface": "audit",
+          "terms": ["audit", "rollback", "revert", "reason", "changedBy", "timestamp", "manual override"],
+          "why": "Every critical state change needs auditability and recovery path."
+        },
+        {
+          "id": "risk_trust_summary_policy",
+          "surface": "control-panel operations",
+          "terms": ["trust", "risk", "score", "summary", "mask", "permission", "abac", "rebac", "least privilege", "audit"],
+          "why": "Operations may need risk summary, not unrestricted sensitive customer history."
+        }
+      ]
+    },
+    {
+      "id": "wallet_payment_refund_settlement",
+      "detectTerms": ["wallet", "payment", "refund", "settlement", "payout", "ledger", "commission", "fee"],
+      "requiredEffects": [
+        {
+          "id": "ledger_truth",
+          "surface": "WLT",
+          "terms": ["ledger", "entry", "balance", "transaction", "reconcile", "settlement"],
+          "why": "Financial truth must be ledger-based, reconciled, and owned by WLT."
+        },
+        {
+          "id": "refund_reversal_policy",
+          "surface": "WLT",
+          "terms": ["refund", "reverse", "partial", "cancel", "chargeback", "audit"],
+          "why": "Refund/cancel requires explicit policy and audit trail."
+        },
+        {
+          "id": "finance_control_panel_visibility",
+          "surface": "control-panel finance",
+          "terms": ["finance", "read-only", "settlement", "payout", "reconcile", "export"],
+          "why": "Finance visibility must be controlled and not duplicate WLT ownership."
+        }
+      ]
+    },
+    {
+      "id": "admin_control_room_operations",
+      "detectTerms": ["control-panel", "operations", "admin", "monitor", "override", "policy", "vars"],
+      "requiredEffects": [
+        {
+          "id": "permissioned_manual_intervention",
+          "surface": "control-panel",
+          "terms": ["permission", "role", "policy", "audit", "reason", "manual", "override"],
+          "why": "Manual operational intervention must be permissioned, reasoned, and audited."
+        },
+        {
+          "id": "vars_policy_control",
+          "surface": "Vars",
+          "terms": ["vars", "policy", "threshold", "rollout", "provider", "experiment", "feature flag"],
+          "why": "Operational policy must be controlled centrally where configurable."
+        }
+      ]
+    },
+    {
+      "id": "community_service_request_lifecycle",
+      "detectTerms": ["community", "request", "case", "booking", "appointment", "service", "status"],
+      "requiredEffects": [
+        {
+          "id": "client_request_status",
+          "surface": "app-client",
+          "terms": ["request", "status", "confirmation", "schedule", "cancel", "support"],
+          "why": "Client must understand request progress and recovery options."
+        },
+        {
+          "id": "control_panel_case_management",
+          "surface": "control-panel",
+          "terms": ["case", "queue", "assign", "review", "approve", "reject", "audit"],
+          "why": "Control panel must provide case handling, ownership, and audit."
+        }
+      ]
+    }
+  ],
+  "uxHeuristics": [
+    {
+      "id": "visibility_of_system_status",
+      "terms": ["loading", "pending", "progress", "status", "timeline", "toast", "skeleton"],
+      "severity": "FAIL_WHEN_DATA_BOUND"
+    },
+    {
+      "id": "error_recovery",
+      "terms": ["error", "retry", "recover", "failed", "tryAgain", "fallback"],
+      "severity": "FAIL_WHEN_DATA_BOUND"
+    },
+    {
+      "id": "empty_success_disabled_states",
+      "terms": ["empty", "success", "disabled", "offline", "noData", "completed"],
+      "severity": "WARN"
+    },
+    {
+      "id": "accessibility_interaction",
+      "terms": ["accessibilityLabel", "aria-label", "role", "focus", "keyboard", "targetSize", "label"],
+      "severity": "WARN"
+    },
+    {
+      "id": "performance_feedback",
+      "terms": ["skeleton", "lazy", "pagination", "limit", "cursor", "virtual", "FlatList", "SectionList", "memo"],
+      "severity": "WARN"
+    }
+  ],
+  "unsafeAutoFixBoundaries": [
+    "api_endpoint",
+    "database_schema",
+    "payment_logic",
+    "refund_logic",
+    "settlement_logic",
+    "dispatch_logic",
+    "permission_logic",
+    "runtime_mutation",
+    "provider_switching",
+    "financial_ownership",
+    "customer_sensitive_data_exposure"
+  ],
+  "safeAutoFixKinds": [
+    "generated_gap_report",
+    "UNPROVEN_matrix_row",
+    "N/A_WITH_REASON_placeholder",
+    "research_plan",
+    "closure_warning_record",
+    "remediation_plan"
+  ]
+}

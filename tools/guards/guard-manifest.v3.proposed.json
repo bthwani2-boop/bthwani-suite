@@ -122,8 +122,9 @@
       }
     },
     {
-      "id": "GUARD_DSH_PLATFORM_VARS_V3",
-      "file": "tools/guards/guard-dsh-platform-vars-v3.mjs",
+      "id": "GUARD_PLATFORM_VARS_CONTROL",
+      "file": "tools/guards/guard-platform-vars-control.mjs",
+      "config": "tools/guards/guard-platform-vars-control.config.json",
       "logicalGuardIds": [
         "GUARD_11_WLT_FINANCIAL_OWNER",
         "GUARD_12_VAR_POLICY",

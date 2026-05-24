@@ -71,3 +71,19 @@ Guard IDs must never be reused for a different meaning. If a historical file use
 ## Guard implementation rule
 
 Guard scripts live under `tools/guards` or equivalent implementation roots. They verify this catalog; they do not invent policy. Changing a guard behavior requires updating this file or the owner file first.
+
+## Implemented guard mapping: UI kit central design ownership
+
+`GUARD_UI_KIT_CENTRAL_DESIGN_OWNERSHIP` maps to `GUARD_06_UI_KIT_AUTHORITY`.
+
+Purpose: detect reusable design components declared outside `ui-kit`, detect local design-system objects outside `ui-kit`, detect local reusable UI imports that should use `@bthwani/ui-kit` public exports, and keep early enforcement advisory until findings are classified and old debt is either centralized, justified, or explicitly baselined.
+
+Promotion rule: advisory while first inventory is being classified. Blocking for newly introduced violations after baseline. Blocking globally only after existing findings are resolved or intentionally documented with owner, expiry, risk, and rollback.
+
+## Implemented guard mapping: Live code organization hygiene
+
+`GUARD_LIVE_CODE_ORGANIZATION_HYGIENE` maps to `GUARD_02_SHARED_FOLDER_OWNERSHIP`.
+
+Purpose: detect ambiguous scatter/common/utils buckets with multiple files, detect old/temp/copy file naming, detect large files that may carry mixed responsibilities, detect tiny-file over-fragmentation, and detect exported symbols inside ambiguous directories.
+
+Promotion rule: advisory while baseline inventory is being reviewed. Blocking for newly introduced violations after baseline classification.
