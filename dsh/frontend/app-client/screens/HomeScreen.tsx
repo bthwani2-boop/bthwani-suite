@@ -59,7 +59,6 @@ import {
 import { canRenderInClientSurface } from '../../shared/workflow';
 
 import type {
-  DshHomeGetScreenProps,
   DshHomeCategory,
   DshHomeBannerActionType,
   DiscoveryFilter,
@@ -69,6 +68,52 @@ import type {
   DshHomeRecentOrder,
   DshServiceId,
 } from '../contracts/dsh-home-types';
+
+export type DshHomeGetScreenProps = {
+  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+  categories?: DshHomeCategory[];
+  promos?: DshHomeGetPromo[];
+  homePromos?: HomePromoRecord[];
+  stores?: DshHomeGetStore[];
+  recentOrders?: DshHomeRecentOrder[];
+  approvedVideoShorts?: MarketingVideoRecord[];
+  onBack?: () => void;
+  onOpenEntry?: () => void;
+  onOpenMySpace?: () => void;
+  onOpenNotifications?: () => void;
+  onOpenCart?: () => void;
+  onOpenWallet?: () => void;
+  onOpenService?: (serviceId: DshServiceId) => void;
+  onOpenList?: () => void;
+  onOpenCategory?: (categoryId: string) => void;
+  onOpenDiscovery?: () => void;
+  onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
+  onOpenProduct?: (storeId: string, itemId: string) => void;
+  onOpenBenefits?: (screenId?: string) => void;
+  onOpenFavorites?: () => void;
+  favoriteOverrides?: Record<string, boolean>;
+  onToggleFavorite?: (storeId: string) => void;
+  onOpenSearch?: () => void;
+  onOpenOrders?: () => void;
+  onOpenTracking?: () => void;
+  onOpenStore?: (storeId: string) => void;
+  onPromoClick?: (promoId: string) => void;
+  onPromoImpression?: (promoId: string) => void;
+  onVideoCtaClick?: (itemId: string) => void;
+  onVideoImpression?: (itemId: string) => void;
+  onOpenSheinInfo?: () => void;
+  sheinInlineVisible?: boolean;
+  onCloseSheinInline?: () => void;
+  awnakInlineVisible?: boolean;
+  onCloseAwnakInline?: () => void;
+  onRegisterBackHandler?: (handler: (() => boolean) | null) => void;
+  renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
+  onRetry?: () => void;
+  notificationCount?: number;
+  cartCount?: number;
+  serviceDialTrigger?: number;
+  searchAutoOpenToken?: number;
+};
 
 function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ImageSourcePropType | undefined {
   if (!canRenderInClientSurface(publishStage, 'store')) {
@@ -107,17 +152,8 @@ function resolveHomePromoPublishStage(status: HomePromoRecord['status']) {
 type CategoryDialItem = OrbitCarouselItem;
 type DialAnchorLayout = OrbitAnchorLayout;
 
-
-
-
-
-
 type DshHomeGetStyles = ReturnType<typeof createStyles>;
 type DshHomeTheme = ReturnType<typeof useTheme>['theme'];
-
-
-
-
 
 const serviceDialAnchorLayout: DialAnchorLayout = {
   x: spacing[3],
@@ -382,7 +418,6 @@ const CategorySelectorItem = React.memo(({
     </Pressable>
   );
 });
-
 
 function renderState(state: Exclude<NonNullable<DshHomeGetScreenProps['state']>, 'ready'>, onRetry?: () => void) {
   const titles = {
@@ -789,7 +824,6 @@ export function DshHomeGetScreen({
       setActiveRailItemId(buildHomeCategoryFilterId(activeCategoryId || 'all'));
     }
   }, [activeCategoryId, activeRailItemId, homeFilterRailItems]);
-
 
   React.useEffect(() => {
     const timer = setInterval(() => {

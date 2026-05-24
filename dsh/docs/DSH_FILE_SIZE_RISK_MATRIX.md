@@ -104,8 +104,15 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 
 ### Batch 0 Inventory Result
 
-- **Home type candidates:** \DshHomeGetScreenProps\, \DshHomeCategory\, \DshHomeBannerActionType\, \DiscoveryFilter\, \StorePagerPage\, \DshHomeGetPromo\, \DshHomeGetStore\, \DshHomeRecentOrder\, \DshServiceId\.
-- **Store type candidates:** \DshStoreGetScreenProps\, \DshStoreOperationalState\, \DshStoreGetScreenContentProps\.
-- **Existing contract reuse decision:** \dsh-client-binding.contracts.ts\ is strictly for global client logic. Screen-specific discovery contracts belong in their own boundaries to prevent a dumping ground. We will create \contracts/dsh-home-types.ts\ and \contracts/dsh-store-types.ts\ as defined in the Matrix.
-- **Files planned for Batch 1:** \contracts/dsh-home-types.ts\, \contracts/dsh-store-types.ts\, \HomeScreen.tsx\, \StoreScreen.tsx\.
+- **Home type candidates:** `DshHomeGetScreenProps`, `DshHomeCategory`, `DshHomeBannerActionType`, `DiscoveryFilter`, `StorePagerPage`, `DshHomeGetPromo`, `DshHomeGetStore`, `DshHomeRecentOrder`, `DshServiceId`.
+- **Store type candidates:** `DshStoreGetScreenProps`, `DshStoreOperationalState`, `DshStoreGetScreenContentProps`.
+- **Existing contract reuse decision:** `dsh-client-binding.contracts.ts` is strictly for global client logic. Screen-specific discovery contracts belong in their own boundaries to prevent a dumping ground. We will create `contracts/dsh-home-types.ts` and `contracts/dsh-store-types.ts` as defined in the Matrix.
+- **Files planned for Batch 1:** `contracts/dsh-home-types.ts`, `contracts/dsh-store-types.ts`, `HomeScreen.tsx`, `StoreScreen.tsx`.
 - **No-duplicate confirmation:** Validated. No central models are duplicated.
+
+### Batch 1 Cleanup Result
+
+- **Types kept in contracts:** DshServiceId, DshHomeBannerActionType, DiscoveryFilter, DshHomeCategory, DshHomeGetPromo, DshHomeGetStore, DshHomeRecentOrder, StorePagerPage, DshStoreOperationalState.
+- **Types returned to screens temporarily:** DshHomeGetScreenProps, DshStoreGetScreenProps, DshStoreGetScreenContentProps (due to UI/React dependencies).
+- **Purity confirmation:** Validated. No React, @bthwani/ui-kit, or parts imports exist in contracts/.
+- **Final Decision:** BATCH_1_TYPES_EXTRACTED_READY_FOR_BATCH_2
