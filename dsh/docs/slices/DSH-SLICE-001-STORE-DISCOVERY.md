@@ -1,7 +1,7 @@
 # DSH-SLICE-001 Store Discovery
 
-Status: ACTIVE_SLICE_MANIFEST
-Decision: PASS
+Status: BATCH_8C_RUNTIME_TRANSPORT_DECISION
+Decision: READY_FOR_GO_BACKEND_SLICE
 
 Purpose:
 Official coverage manifest for the first DSH slice: client discovery and storefront visibility across `HomeScreen` and `StoreScreen`, with search kept inline inside the current page.
@@ -122,7 +122,7 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Gate 4 Security | secret scan before runtime/API work | `guard:secret-scan` passed; `guard:protected-tokens` returned warning-only `DESIGN-TOKEN-DRIFT: WARN (fail=0, warn=4)` | `DEFERRED_WITH_REASON` |
 | Gate 5 Visual / RTL | screenshots, RTL, overflow, color-system proof | PASS: all states (success, loading, empty, error, offline) verified visually under `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100/screenshots/app-client/` | `PASS` |
 | Gate 6 OpenAPI | operationId, schemas, security, validation | GET /stores designed and added to dsh.openapi.yaml under READY_FOR_ONE_OPENAPI_ENDPOINT | PASS |
-| Gate 7 Runtime | request/response/log/screen-state proof | PASS: preview/local-state runtime proof verified via sweep | `PASS` |
+| Gate 7 Runtime | request/response/log/screen-state proof | `runtime-unproven`: Batch 8C opens the Go backend slice decision only; no real `GET /stores` response has reached the screen yet | `READY_FOR_GO_BACKEND_SLICE` |
 | Gate 8 Cross-Surface | client, partner, control-panel, WLT/Auth/Search/Vars impact | dependencies are classified in this manifest | `DEFERRED_WITH_REASON` |
 | Gate 9 Regression | previous journey recheck after shared/contract/navigation/state changes | no shared/source change in this manifest step | `NOT_APPLICABLE_WITH_REASON` |
 | Gate 10 Evidence Lock | evidence pack and decision record | evidence folder exists at `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100`; all visual review and guard runs passed | `PASS` |
@@ -165,6 +165,17 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 - **Evidence result:** `pnpm run openapi:lint:dsh` passed with 0 errors and the same 3 warnings; `pnpm run openapi:types:dsh`; `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit`; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; and `pnpm run guard:secret-scan` passed.
 - **Final Decision:** `BATCH_8B_SCOPED_TYPED_CLIENT_BOUNDARY_READY_FOR_RUNTIME_TRANSPORT`.
 
+## Batch 8C Runtime Transport Decision
+
+- **Decision scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Runtime opening decision:** real runtime transport is approved for the next Go backend/domain batch, but Batch 8C does not create Go code, backend handlers, Docker, PostgreSQL, frontend transport, or UI changes.
+- **Current source truth:** `DshClientSurface.tsx` still uses the discovery bridge with no runtime response, so the active screen source remains `preview-fallback` / local-state.
+- **Boundary proof retained:** typed client, OpenAPI-generated types, mapper, and bridge remain frontend contract readiness only; they are not runtime proof.
+- **Runtime proof still required:** later closure must prove UI -> typed client -> Go -> PostgreSQL -> response -> screen before any L7 closure claim.
+- **Explicit exclusions:** no `dsh.openapi.yaml` change, no WLT/cart/checkout/payment, no partner/captain/field action, no endpoint beyond `GET /stores`.
+- **Next allowed batch:** Batch 9A may create the `dsh/domain` and `dsh/backend` Go skeleton for `GET /stores` only.
+- **Final Decision:** `READY_FOR_GO_BACKEND_SLICE`.
+
 ## DSH-SAPI-P014-01 OpenAPI Endpoint Design
 
 Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-01 for Store Discovery.
@@ -200,10 +211,10 @@ Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-0
 
 ## Decision
 
-Current slice decision: PASS.
+Current slice decision: READY_FOR_GO_BACKEND_SLICE.
 
 Explicit blockers:
-- None. All visual states (success, loading, empty, error, offline) for HomeScreen and StoreScreen are captured and verified.
+- Real runtime is still unproven; no Go handler, PostgreSQL proof, frontend runtime transport, or E2E request/response/screen evidence exists yet.
 
 Next allowed work:
-- Proceed with API contract binding and runtime integration in subsequent slices.
+- Proceed to Batch 9A only: `dsh/domain` + `dsh/backend` Go skeleton for `GET /stores` only.

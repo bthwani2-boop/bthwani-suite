@@ -1,7 +1,7 @@
 # DSH File Size and Complexity Risk Matrix
 
-Status: DECOMPOSITION_PLAN_READY
-Decision: DECOMPOSITION_PLAN_READY
+Status: BATCH_8C_RUNTIME_TRANSPORT_DECISION
+Decision: READY_FOR_GO_BACKEND_SLICE
 
 ## DSH-SLICE-001 Safe Decomposition Plan
 
@@ -210,3 +210,13 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Backend/domain decision:** still blocked. Nothing is added under `dsh/backend` or `dsh/domain` until a later runtime/backend batch has approved auth, persistence, transport, observability, and smoke evidence.
 - **Evidence result:** `pnpm run openapi:lint:dsh` passed with 0 errors and the same 3 warnings; `pnpm run openapi:types:dsh`; `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit`; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; and `pnpm run guard:secret-scan` passed.
 - **Final Decision:** BATCH_8B_SCOPED_TYPED_CLIENT_BOUNDARY_READY_FOR_RUNTIME_TRANSPORT
+
+### Batch 8C Runtime Transport Decision
+
+- **Decision scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Runtime opening decision:** Batch 8C authorizes the next batch to create the Go backend/domain slice for real runtime transport, but does not implement Go, backend handlers, Docker, PostgreSQL, or frontend runtime calls.
+- **Current frontend truth:** the typed client boundary, mapper, and bridge are ready as frontend boundary proof; `DshClientSurface.tsx` still uses the bridge without a real runtime response, so current data remains `preview-fallback` / local-state.
+- **Future proof requirement:** real runtime remains unproven until later evidence shows UI -> typed client -> Go -> PostgreSQL -> response -> screen for `GET /stores`.
+- **Explicit exclusions:** no UI change, no route change, no `dsh.openapi.yaml` change, no WLT/cart/checkout/payment, no partner/captain/field action, no endpoint beyond `GET /stores`.
+- **Next allowed batch:** Batch 9A may create `dsh/domain` and `dsh/backend` Go skeleton for `GET /stores` only.
+- **Final Decision:** READY_FOR_GO_BACKEND_SLICE
