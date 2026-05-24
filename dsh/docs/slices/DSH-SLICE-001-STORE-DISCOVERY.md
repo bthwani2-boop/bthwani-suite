@@ -134,6 +134,12 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 - **Runtime decision:** unchanged. Slice 001 still uses preview/local-state runtime proof until Batch 8 explicitly starts binding work.
 - **Next allowed batch:** Batch 8 only; this documentation sync does not execute Typed Client/API Binding.
 
+## Batch 8 Preflight Status
+
+- **Preflight decision:** `BLOCKED_TYPED_CLIENT_TOOLING_MISSING`; no OpenAPI validator or typed-client generator command is currently documented in root `package.json` or active `tools/guards` / `tools/scripts`.
+- **Owner boundary:** future typed-client work must stay outside screens and UI parts; contracts belong under `dsh/frontend/app-client/contracts/`, non-UI mapping/client adapters under `dsh/frontend/app-client/shared/`, and preview fallback remains `UI_PREVIEW_ONLY` under `dsh/frontend/app-client/data/`.
+- **Runtime decision:** unchanged. No binding, backend, route, UI, OpenAPI, dependency, or runtime implementation was executed in this preflight.
+
 ## DSH-SAPI-P014-01 OpenAPI Endpoint Design
 
 Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-01 for Store Discovery.

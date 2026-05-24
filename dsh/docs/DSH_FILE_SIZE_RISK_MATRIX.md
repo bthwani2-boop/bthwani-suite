@@ -172,3 +172,16 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Batch 7:** Complete for DSH-SLICE-001 decomposition regression gates.
 - **Batch 8:** Allowed next by sequencing, but no Typed Client/API Binding was executed in Batch 7.
 - **Final Decision:** BATCH_7_GATES_PASSED_READY_FOR_BATCH_8
+
+### Batch 8 Preflight Result
+
+- **Preflight scope:** documentation-only planning for `DSH-SAPI-P014-01` / `GET /stores`; no Typed Client, API Binding, runtime, backend, OpenAPI, route, UI, WLT/cart/checkout/payment, Docker, database, or dependency change is executed here.
+- **Tooling inspection:** root `package.json` exposes guard scripts only; `tools/guards` and `tools/scripts` do not provide a dedicated OpenAPI validator or typed-client generator command for `dsh/dsh.openapi.yaml`.
+- **Preflight decision:** `BLOCKED_TYPED_CLIENT_TOOLING_MISSING`.
+- **Contract validation command:** `BLOCKED_TYPED_CLIENT_TOOLING_MISSING`; no dedicated validator command exists yet. Existing `pnpm run guard:service-blueprint` and `pnpm run guard:binding-proof` remain evidence guards, not OpenAPI validation or typed-client generation.
+- **Typed client owner:** future API types/client boundary must live outside `HomeScreen.tsx`, `StoreScreen.tsx`, `HomeScreenContent.tsx`, and `StoreScreenContent.tsx`; the contract/type target is `dsh/frontend/app-client/contracts/`, with any non-UI client adapter under `dsh/frontend/app-client/shared/`.
+- **Typed client generation/definition target:** blocked until an approved generator/definition command exists; when tooling exists, target only the single `listDiscoveryStores` operation for `GET /stores`.
+- **Mapper target:** `dsh/frontend/app-client/shared/` maps the future `listDiscoveryStores` response into the existing `DshHomeGetStore` and store-detail props; UI parts continue to receive props and must not fetch.
+- **State bridge:** loading, empty, error, and offline remain explicit screen-state props before they reach UI parts; no runtime success claim is allowed until trusted request/response evidence exists.
+- **Preview fallback rule:** `dsh/frontend/app-client/data/*.preview-data.ts` remains `UI_PREVIEW_ONLY` fallback data and must not be treated as backend, API binding, or runtime truth.
+- **Evidence commands for scoped Batch 8 work:** `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit`; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; `pnpm run guard:secret-scan`.
