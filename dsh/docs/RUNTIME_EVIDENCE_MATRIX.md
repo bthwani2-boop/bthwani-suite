@@ -1,7 +1,7 @@
 # DSH Runtime Evidence Matrix
 
 Status: ACTIVE_FRONTEND_CLOSURE_CONTROL
-Decision: DSH_UIUX_FLOW_LOGICALLY_READY_FOR_VISUAL_REVIEW
+Decision: VISUAL_PROVEN_FOR_SELECTED_SLICE
 
 Purpose:
 Lean runtime matrix for the live frontend closure truth after P0-14. This file separates route and screen proof from runtime proof.
@@ -24,7 +24,7 @@ P0-14 note:
 
 | Runtime ID | Surface / slice | Live anchors | Data classification | Closure status | Runtime binding | Evidence status | Remaining blocker | Next allowed proof |
 |---|---|---|---|---|---|---|---|---|
-| `DSH-RUN-P014-01` | app-client discovery + storefront | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | `preview`, `props-driven`, `local-state` | `needs-visual-evidence` | `UI_PREVIEW_ONLY` | `needs-visual-evidence` | shared client-visibility gate is wired; screenshots and runtime source proof are still missing | trusted current-branch screenshots plus serviceability/runtime source proof |
+| `DSH-RUN-P014-01` | app-client discovery + storefront | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | `preview`, `props-driven`, `local-state` | `PASS` | `UI_PREVIEW_ONLY` | `PASS` | none; screenshots and runtime source proof verified under `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100` | ready for OpenAPI design gate |
 | `DSH-RUN-P014-02` | app-client cart + checkout intent | `CartScreen.tsx`; `DshCheckoutIntentScreen.tsx` | `preview`, `local-state`, `WLT-adjacent` | `needs-visual-evidence` | `NEEDS_BINDING_LATER` | `needs-visual-evidence` | payment lifecycle and order-create failure states are wired; screenshots and trusted WLT runtime proof are still missing | screenshots plus trusted WLT/auth runtime proof |
 | `DSH-RUN-P014-03` | app-client tracking + support | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | `preview`, `local-state` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | `needs-visual-evidence` | cancellation/refund/support-exception/rating handoff are wired; screenshots and lifecycle runtime proof are still missing | cross-surface screenshots plus lifecycle event proof |
 | `DSH-RUN-P014-04` | app-partner intake + catalog | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `InventoryCatalogScreen.tsx`; `DshPartnerOrderRejectionScreen.tsx` | `preview`, `local-state` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | `needs-visual-evidence` | accept/reject/handoff/publishing logic is wired; screenshots and actor handoff proof are still missing | partner screenshots plus actor handoff proof |

@@ -14,13 +14,13 @@ Canonical sources:
 Current summary:
 
 - `preview-ready`: 0
-- `needs-visual-evidence`: 10
+- `needs-visual-evidence`: 9
 - `blocked-by-wlt`: 1
-- `verified-ui-flow`: 0
+- `verified-ui-flow`: 1
 
 | Surface | Actor | Domain | Route hint | Screen owner | Primary action | Required states | Status | Evidence status | Runtime binding | Remaining blocker | Cross-surface dependencies | WLT boundary | Visual evidence required |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `app-client` | `client` | `client-discovery` | `/app-client/discovery` | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | open destination, store, or category | `loading`, `empty`, `error`, `success`, `offline` | `needs-visual-evidence` | `needs-visual-evidence` | `UI_PREVIEW_ONLY` | shared client-visibility gate is wired; screenshots and visual review are still missing | marketing publish controls; partner readiness; shared marketing visibility | no WLT ownership here | `yes` |
+| `app-client` | `client` | `client-discovery` | `/app-client/discovery` | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | open destination, store, or category | `loading`, `empty`, `error`, `success`, `offline` | `verified-ui-flow` | `PASS` | `UI_PREVIEW_ONLY` | none; screenshots and visual review are captured under `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100` | marketing publish controls; partner readiness; shared marketing visibility | no WLT ownership here | `yes` |
 | `app-client` | `client` | `client-checkout` | `/app-client/cart` | `CartScreen.tsx`; `DshCheckoutIntentScreen.tsx` | review cart and hand off payment choice | `loading`, `error`, `blocked`, `retry` | `needs-visual-evidence` | `needs-visual-evidence` | `NEEDS_BINDING_LATER` | payment lifecycle and order-create failure states are wired; screenshots and runtime proof are still missing | WLT bridge; finance preview; partner intake visibility | WLT owns payment and money semantics | `yes` |
 | `app-client` | `client` | `client-tracking-support` | `/app-client/orders` | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | open timeline or issue workspace | `loading`, `error`, `success`, `offline`, `retry`, `blocked`, `cancelled` | `needs-visual-evidence` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | cancellation/refund/support-exception/rating handoff are wired; screenshots and runtime proof are still missing | partner lifecycle; captain milestones; control-panel support/audit | WLT owns refund execution only | `yes` |
 | `app-partner` | `partner` | `partner-operations` | `/app-partner/orders` | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `DshPartnerOrderRejectionScreen.tsx` | accept, reject, or prepare an order | `loading`, `empty`, `error`, `success`, `offline`, `blocked`, `retry` | `needs-visual-evidence` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | accept/reject/prepare/ready/handoff states are wired; screenshots and runtime proof are still missing | client order visibility; captain readiness; control-panel operations | WLT only enters if reversal becomes financial | `yes` |

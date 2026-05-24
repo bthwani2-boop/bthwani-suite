@@ -1,7 +1,7 @@
 # DSH Screen/API Matrix
 
 Status: ACTIVE_FRONTEND_CLOSURE_CONTROL
-Decision: NOT_READY_FOR_API
+Decision: READY_FOR_OPENAPI_P0_DESIGN
 
 Purpose:
 Freeze the frontend-facing API needs after P0-14 without inflating runtime or backend closure.
@@ -14,7 +14,7 @@ Current rule:
 
 | Matrix ID | Surface | Route hint | Screen owner | Primary action | Required states | API readiness | Auth/WLT boundary | Remaining blocker | Next allowed work |
 |---|---|---|---|---|---|---|---|---|---|
-| `DSH-SAPI-P014-01` | `app-client` | `/app-client/discovery` | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | open a destination, store, or category | `loading`, `empty`, `error`, `success`, `offline` | `CANDIDATE_AFTER_VISUAL_AND_RUNTIME_PROOF` | no WLT boundary yet | discovery visibility and serviceability truth are not runtime-proven | capture screenshots and prove source authority before API design |
+| `DSH-SAPI-P014-01` | `app-client` | `/app-client/discovery` | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | open a destination, store, or category | `loading`, `empty`, `error`, `success`, `offline` | `READY_FOR_OPENAPI_P0_DESIGN` | no WLT boundary yet | none; screenshots and visual review are captured under `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100` | ready for OpenAPI design gate |
 | `DSH-SAPI-P014-02` | `app-client` | `/app-client/cart` | `CartScreen.tsx`; `DshCheckoutIntentScreen.tsx` | review cart and hand off payment choice | `loading`, `error`, `blocked`, `retry` | `BLOCKED_BY_WLT/AUTH` | WLT owns payment decision; auth is still unproven | payment lifecycle and order-create failure states remain preview-only | keep blocked until WLT/auth runtime proof exists |
 | `DSH-SAPI-P014-03` | `app-client` | `/app-client/orders` | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | open timeline or issue workspace | `loading`, `error`, `success`, `offline`, `retry`, `blocked`, `cancelled` | `NOT_READY_FOR_API` | WLT owns refund execution only | lifecycle events, cancellation, and support-exception states are not runtime-proven | capture cross-surface proof before freezing event contracts |
 | `DSH-SAPI-P014-04` | `app-partner` | `/app-partner/orders` | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `DshPartnerOrderRejectionScreen.tsx` | accept, reject, or prepare an order | `loading`, `empty`, `error`, `success`, `offline`, `blocked`, `retry` | `CANDIDATE_AFTER_VISUAL_AND_RUNTIME_PROOF` | WLT only enters if later financial reversal is needed | acceptance timer, delay, ready, and handoff semantics are still preview-only | capture partner proof before any action contract is designed |
