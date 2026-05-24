@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, Pressable, ScrollView, FlatList, Platform, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
+import { Image, Pressable, ScrollView, FlatList, SectionList, Platform, StyleSheet, View, useWindowDimensions, type ImageSourcePropType } from 'react-native';
 
 import {
   BannerCarousel,
@@ -41,6 +41,7 @@ import {
   CategorySelectorItem,
 } from './HomeCategoryCarousel';
 import { EmptyFeed } from './HomeStoreFeed';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   DSH_CATEGORY_ICONS as categoryIconMap,
   DSH_SUBCATEGORY_ICONS as subcategoryIconMap,
@@ -233,7 +234,7 @@ const HomeStoreCardItem = React.memo(function HomeStoreCardItem({
   );
 });
 
-export function DshHomeGetScreen({
+export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent({
   state = 'ready',
   categories,
   promos,
@@ -320,6 +321,7 @@ export function DshHomeGetScreen({
   const favoriteToggles = favoriteOverrides ?? localFavoriteToggles;
   const promoImpressionIdsRef = React.useRef<Set<string>>(new Set());
   const lastSearchAutoOpenTokenRef = React.useRef(0);
+  const debouncedInlineSearchQuery = useDebounce(inlineSearchQuery, 250);
 
   React.useEffect(() => {
     if (serviceDialTrigger) {
@@ -415,9 +417,9 @@ export function DshHomeGetScreen({
       stores: resolvedStores,
       activeFilter,
       favoriteToggles,
-      query: inlineSearchQuery,
+      query: debouncedInlineSearchQuery,
     });
-  }, [activeFilter, favoriteToggles, inlineSearchQuery, resolvedStores]);
+  }, [activeFilter, favoriteToggles, debouncedInlineSearchQuery, resolvedStores]);
 
   const storePagerItems = React.useMemo<StorePagerPage[]>(() => (
     categoryPageIds.map((categoryId) => {
@@ -1116,253 +1118,270 @@ export function DshHomeGetScreen({
         />
       )}
 
-      <ScrollView
+      <BThwaniFilterSwipeBoundary
+        items={homeFilterRailItems}
+        selectedId={activeRailItemId}
+        onSelectedIdChange={handleHomeFilterRailChange}
         style={{ flex: 1 }}
-        stickyHeaderIndices={[stickyFilterIndex]}
-        contentContainerStyle={{
-          paddingHorizontal: spacing[3],
-          paddingTop: spacing[0],
-          paddingBottom: 150,
-          flexGrow: 1,
-        }}
-        showsVerticalScrollIndicator={false}
+        testID="home-filter-swipe-boundary"
       >
-        {inlineSearchVisible ? null : bannerItems.length ? (
-          <BannerCarousel
-            banners={bannerItems}
-            variant="secondary"
-            height={cardHeight + spacing[6]}
-            fullBleed={false}
-            autoPlayInterval={ACTIVE_PROMO_INTERVAL_MS}
-            itemGap={resolvedItemGap}
-            onIndexChange={setActivePromoIndex}
-            onBannerPress={(item) => {
-              if (onPromoClick) onPromoClick(item.id);
-            }}
-            style={{
-              marginLeft: -spacing[3],
-              marginRight: -spacing[3],
-              width: containerWidth,
-            }}
-          />
-        ) : null}
+        <SectionList
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingHorizontal: spacing[3],
+            paddingTop: spacing[0],
+            paddingBottom: 150,
+            flexGrow: 1,
+          }}
+          showsVerticalScrollIndicator={false}
+          stickySectionHeadersEnabled={true}
+          sections={[{ data: activeHomeStoreCards.length ? activeHomeStoreCards : (activeStorePage?.renderMode !== 'stores' ? ['empty'] : ['empty']) }]}
+          keyExtractor={(item, index) => (item === 'empty' ? `empty-${index}` : item.storeId)}
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={7}
+          removeClippedSubviews={Platform.OS !== 'web'}
+          ListHeaderComponent={
+            <>
+              {inlineSearchVisible ? null : bannerItems.length ? (
+                <BannerCarousel
+                  banners={bannerItems}
+                  variant="secondary"
+                  height={cardHeight + spacing[6]}
+                  fullBleed={false}
+                  autoPlayInterval={ACTIVE_PROMO_INTERVAL_MS}
+                  itemGap={resolvedItemGap}
+                  onIndexChange={setActivePromoIndex}
+                  onBannerPress={(item) => {
+                    if (onPromoClick) onPromoClick(item.id);
+                  }}
+                  style={{
+                    marginLeft: -spacing[3],
+                    marginRight: -spacing[3],
+                    width: containerWidth,
+                  }}
+                />
+              ) : null}
 
-        <View style={styles.categoriesSelectorSection}>
-          <View style={styles.categoriesSelectorRow}>
-            <View style={styles.fixedIconsContainer}>
-              <CategorySelectorItem
-                isVideo
-                label="فيديو"
-                icon={<Icon name="play" size={22} color={colorPalette.brand} />}
-                onPress={() => setShortsVisible(true)}
-                styles={styles}
-                theme={theme}
-              />
+              <View style={styles.categoriesSelectorSection}>
+                <View style={styles.categoriesSelectorRow}>
+                  <View style={styles.fixedIconsContainer}>
+                    <CategorySelectorItem
+                      isVideo
+                      label="فيديو"
+                      icon={<Icon name="play" size={22} color={colorPalette.brand} />}
+                      onPress={() => setShortsVisible(true)}
+                      styles={styles}
+                      theme={theme}
+                    />
 
-              <View ref={categoriesAnchorRef} collapsable={false}>
-                <CategorySelectorItem
-                  isHub
-                  label="الفئات"
-                  icon={<CategoryHubIcon />}
-                  onPress={openCategoriesDial}
-                  styles={styles}
-                  theme={theme}
+                    <View ref={categoriesAnchorRef} collapsable={false}>
+                      <CategorySelectorItem
+                        isHub
+                        label="الفئات"
+                        icon={<CategoryHubIcon />}
+                        onPress={openCategoriesDial}
+                        styles={styles}
+                        theme={theme}
+                      />
+                    </View>
+
+                    {selectedCategoryFixture && (
+                      <CategorySelectorItem
+                        isSelected
+                        label={selectedCategoryLabel}
+                        icon={
+                          <CategoryIconImage
+                            uri={activeCategoryDialItem?.iconUrl ?? null}
+                            emojiFallback={activeCategoryDialItem?.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
+                            style={styles.categoryIconImage}
+                          />
+                        }
+                        onPress={() => setActiveSubcategoryId(null)}
+                        styles={styles}
+                        theme={theme}
+                      />
+                    )}
+                  </View>
+
+                  {activeHomePromo && (
+                    <Pressable
+                      style={styles.heroPromoCard}
+                      onPress={() => {
+                        const promo = activeHomePromo;
+                        const mockPromo: DshHomeGetPromo = {
+                          id: promo.id,
+                          title: promo.title,
+                          subtitle: promo.subtitle,
+                          icon: '✨',
+                          actionType: normalizeHomePromoActionType(promo.targetType),
+                          actionTarget: promo.targetId,
+                        };
+                        resolveBannerPress(mockPromo)();
+                      }}
+                    >
+                      {activeHomePromo.imageUrl && (
+                        <Image
+                          source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
+                          style={styles.heroPromoBackground}
+                          resizeMode="cover"
+                        />
+                      )}
+                      <View style={styles.heroPromoContent}>
+                        <View style={styles.heroPromoIconContainer}>
+                          {activeHomePromo.thumbnail ? (
+                            <Image
+                              source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
+                              style={styles.heroPromoMascot}
+                              resizeMode="contain"
+                            />
+                          ) : (
+                            <Icon name="ribbon-outline" size={32} color={colorPalette.warning} />
+                          )}
+                        </View>
+                        <View style={styles.heroPromoTextWrap}>
+                          <Text style={styles.heroPromoTitle} numberOfLines={1}>
+                            بثواني برو
+                          </Text>
+                          <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
+                            {activeHomePromo.subtitle}
+                          </Text>
+                          {activeHomePromo.ctaText && (
+                            <View style={styles.heroPromoCtaButton}>
+                              <Text style={styles.heroPromoCtaText}>
+                                {activeHomePromo.ctaText}
+                              </Text>
+                              <Icon name="chevron-back" size={10} color="white" />
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                    </Pressable>
+                  )}
+
+                  {selectedSubcategoryCards.length > 0 && (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      nestedScrollEnabled
+                      contentContainerStyle={styles.categoriesSelectorScrollContent}
+                      style={styles.categoriesSelectorScroll}
+                    >
+                      {selectedSubcategoryCards.map((subcategory) => (
+                        <Pressable
+                          key={subcategory.id}
+                          style={[
+                            styles.subcategorySelectorCard,
+                            activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
+                          ]}
+                          onPress={() => setActiveSubcategoryId(subcategory.id)}
+                        >
+                          <View style={styles.subcategoryIconContainer}>
+                            <Text role="titleSm" style={styles.subcategoryEmoji}>
+                              {subcategory.emoji}
+                            </Text>
+                          </View>
+                          <Text
+                            role="bodySm"
+                            style={[
+                              styles.subcategoryName,
+                              activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {subcategory.title}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  )}
+                </View>
+              </View>
+            </>
+          }
+          renderSectionHeader={() => (
+            <BThwaniFilterRail
+              items={homeFilterRailItems}
+              selectedId={activeRailItemId}
+              onSelectedIdChange={handleHomeFilterRailChange}
+              isSelected={isHomeFilterRailItemSelected}
+              sticky
+              style={styles.filtersRail}
+              testID="home-filter-rail"
+            />
+          )}
+          renderItem={({ item: entry }) => {
+            if (entry === 'empty') {
+              if (activeStorePage?.renderMode === 'manual-order') {
+                return (
+                  <View style={styles.storeListContent}>
+                    <Box gap={3}>
+                      {activeStorePage.categoryId === 'shein' && sheinInlineVisible ? (
+                        <DshSheinOrderCreateScreen
+                          embedded
+                          onClose={() => {
+                            onCloseSheinInline?.();
+                            selectCategoryPage('all');
+                          }}
+                        />
+                      ) : null}
+                      {activeStorePage.categoryId === 'awnak' && awnakInlineVisible ? (
+                        <DshAwnakOrderCreateScreen
+                          embedded
+                          onClose={() => {
+                            onCloseAwnakInline?.();
+                            selectCategoryPage('all');
+                          }}
+                        />
+                      ) : null}
+                      {!sheinInlineVisible && !awnakInlineVisible && (
+                        <EmptyFeed query={debouncedInlineSearchQuery} styles={styles} />
+                      )}
+                    </Box>
+                  </View>
+                );
+              }
+              return (
+                <View style={styles.storeListContent}>
+                  <EmptyFeed query={debouncedInlineSearchQuery} styles={styles} />
+                </View>
+              );
+            }
+
+            return (
+              <View style={styles.storeListContent}>
+                <HomeStoreCardItem
+                  entry={entry}
+                  onOpenStore={onOpenStore}
+                  onToggleFavorite={onToggleFavorite}
+                  setLocalFavoriteToggles={setLocalFavoriteToggles}
                 />
               </View>
-
-              {selectedCategoryFixture && (
-                <CategorySelectorItem
-                  isSelected
-                  label={selectedCategoryLabel}
-                  icon={
-                    <CategoryIconImage
-                      uri={activeCategoryDialItem?.iconUrl ?? null}
-                      emojiFallback={activeCategoryDialItem?.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂'}
-                      style={styles.categoryIconImage}
-                    />
-                  }
-                  onPress={() => setActiveSubcategoryId(null)}
-                  styles={styles}
-                  theme={theme}
-                />
-              )}
-            </View>
-
-            {activeHomePromo && (
-              <Pressable
-                style={styles.heroPromoCard}
-                onPress={() => {
-                  const promo = activeHomePromo;
-                  const mockPromo: DshHomeGetPromo = {
-                    id: promo.id,
-                    title: promo.title,
-                    subtitle: promo.subtitle,
-                    icon: '✨',
-                    actionType: normalizeHomePromoActionType(promo.targetType),
-                    actionTarget: promo.targetId,
-                  };
-                  resolveBannerPress(mockPromo)();
-                }}
-              >
-                {activeHomePromo.imageUrl && (
-                  <Image
-                    source={resolveDshHomeBannerImageSource(activeHomePromo.imageUrl)}
-                    style={styles.heroPromoBackground}
-                    resizeMode="cover"
+            );
+          }}
+          ListFooterComponent={
+            shortsVisible
+              ? (renderApprovedVideoReelsViewer?.({
+                  visible: shortsVisible,
+                  items: approvedVideoReels,
+                  initialIndex: 0,
+                  onClose: () => setShortsVisible(false),
+                  onCtaPress: resolveVideoCtaPress,
+                  onItemImpression: (item) => onVideoImpression?.(item.id),
+                }) ?? (
+                  <DshHomeApprovedVideoReelsViewer
+                    visible={shortsVisible}
+                    items={approvedVideoReels}
+                    initialIndex={0}
+                    onClose={() => setShortsVisible(false)}
+                    onCtaPress={resolveVideoCtaPress}
+                    onItemImpression={(item) => onVideoImpression?.(item.id)}
                   />
-                )}
-                <View style={styles.heroPromoContent}>
-                  <View style={styles.heroPromoIconContainer}>
-                    {activeHomePromo.thumbnail ? (
-                      <Image
-                        source={resolveDshHomeBannerImageSource(activeHomePromo.thumbnail)}
-                        style={styles.heroPromoMascot}
-                        resizeMode="contain"
-                      />
-                    ) : (
-                      <Icon name="ribbon-outline" size={32} color={colorPalette.warning} />
-                    )}
-                  </View>
-                  <View style={styles.heroPromoTextWrap}>
-                    <Text style={styles.heroPromoTitle} numberOfLines={1}>
-                      بثواني برو
-                    </Text>
-                    <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
-                      {activeHomePromo.subtitle}
-                    </Text>
-                    {activeHomePromo.ctaText && (
-                      <View style={styles.heroPromoCtaButton}>
-                        <Text style={styles.heroPromoCtaText}>
-                          {activeHomePromo.ctaText}
-                        </Text>
-                        <Icon name="chevron-back" size={10} color="white" />
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </Pressable>
-            )}
-
-            {selectedSubcategoryCards.length > 0 && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                nestedScrollEnabled
-                contentContainerStyle={styles.categoriesSelectorScrollContent}
-                style={styles.categoriesSelectorScroll}
-              >
-                {selectedSubcategoryCards.map((subcategory) => (
-                  <Pressable
-                    key={subcategory.id}
-                    style={[
-                      styles.subcategorySelectorCard,
-                      activeSubcategoryId === subcategory.id && styles.subcategorySelectorCardActive,
-                    ]}
-                    onPress={() => setActiveSubcategoryId(subcategory.id)}
-                  >
-                    <View style={styles.subcategoryIconContainer}>
-                      <Text role="titleSm" style={styles.subcategoryEmoji}>
-                        {subcategory.emoji}
-                      </Text>
-                    </View>
-                    <Text
-                      role="bodySm"
-                      style={[
-                        styles.subcategoryName,
-                        activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {subcategory.title}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            )}
-          </View>
-        </View>
-
-        <BThwaniFilterRail
-          items={homeFilterRailItems}
-          selectedId={activeRailItemId}
-          onSelectedIdChange={handleHomeFilterRailChange}
-          isSelected={isHomeFilterRailItemSelected}
-          sticky
-          style={styles.filtersRail}
-          testID="home-filter-rail"
+                ))
+              : null
+          }
         />
-
-        <BThwaniFilterSwipeBoundary
-          items={homeFilterRailItems}
-          selectedId={activeRailItemId}
-          onSelectedIdChange={handleHomeFilterRailChange}
-          style={styles.storeListViewport}
-          testID="home-filter-swipe-boundary"
-        >
-          <View style={styles.storeListContent}>
-            {activeStorePage?.renderMode === 'manual-order' ? (
-              <Box gap={3}>
-                {activeStorePage.categoryId === 'shein' && sheinInlineVisible ? (
-                  <DshSheinOrderCreateScreen
-                    embedded
-                    onClose={() => {
-                      onCloseSheinInline?.();
-                      selectCategoryPage('all');
-                    }}
-                  />
-                ) : null}
-                {activeStorePage.categoryId === 'awnak' && awnakInlineVisible ? (
-                  <DshAwnakOrderCreateScreen
-                    embedded
-                    onClose={() => {
-                      onCloseAwnakInline?.();
-                      selectCategoryPage('all');
-                    }}
-                  />
-                ) : null}
-                {!sheinInlineVisible && !awnakInlineVisible && (
-                  <EmptyFeed query={inlineSearchQuery} styles={styles} />
-                )}
-              </Box>
-            ) : null}
-
-            {activeHomeStoreCards.length ? (
-              <FlatList
-                data={activeHomeStoreCards}
-                keyExtractor={(entry) => entry.storeId}
-                scrollEnabled={false}
-                initialNumToRender={6}
-                maxToRenderPerBatch={6}
-                windowSize={7}
-                removeClippedSubviews={Platform.OS !== 'web'}
-                renderItem={React.useCallback(({ item: entry }) => (<HomeStoreCardItem entry={entry} onOpenStore={onOpenStore} onToggleFavorite={onToggleFavorite} setLocalFavoriteToggles={setLocalFavoriteToggles} />), [onOpenStore, onToggleFavorite, setLocalFavoriteToggles])}
-              />
-            ) : activeStorePage?.renderMode !== 'manual-order' ? (
-              <EmptyFeed query={inlineSearchQuery} styles={styles} />
-            ) : null}
-          </View>
-        </BThwaniFilterSwipeBoundary>
-
-        {shortsVisible
-          ? (renderApprovedVideoReelsViewer?.({
-              visible: shortsVisible,
-              items: approvedVideoReels,
-              initialIndex: 0,
-              onClose: () => setShortsVisible(false),
-              onCtaPress: resolveVideoCtaPress,
-              onItemImpression: (item) => onVideoImpression?.(item.id),
-            }) ?? (
-              <DshHomeApprovedVideoReelsViewer
-                visible={shortsVisible}
-                items={approvedVideoReels}
-                initialIndex={0}
-                onClose={() => setShortsVisible(false)}
-                onCtaPress={resolveVideoCtaPress}
-                onItemImpression={(item) => onVideoImpression?.(item.id)}
-              />
-            ))
-          : null}
-      </ScrollView>
+      </BThwaniFilterSwipeBoundary>
 
       <CategoryOrbitCarousel
         visible={categoriesSheetVisible}
@@ -1406,7 +1425,7 @@ export function DshHomeGetScreen({
 
     </View>
   );
-}
+});
 
 function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['theme']) {
   const rowDirection = resolveRowDirection(direction);

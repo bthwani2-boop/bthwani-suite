@@ -39,6 +39,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../data/categories.preview-data';
 import { useStoreState } from '../../hooks/useStoreState';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   MenuItemCard,
   resolveDshStoreMenuItemImageSource,
@@ -233,12 +234,12 @@ const StoreMenuListItem = React.memo(function StoreMenuListItem({
   );
 });
 
-export function DshStoreGetScreen(props: DshStoreGetScreenProps) {
+export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(props: DshStoreGetScreenProps) {
   const appearanceMode = props.appearanceMode ?? 'lightPremium';
   return <DshStoreGetScreenContent {...props} appearanceMode={appearanceMode} />;
-}
+});
 
-function DshStoreGetScreenContent({
+const DshStoreGetScreenContent = React.memo(function DshStoreGetScreenContentComponent({
   appearanceMode,
   state = 'ready',
   store,
@@ -411,14 +412,16 @@ function DshStoreGetScreenContent({
     setSelectedMeasureOption(options[0] ?? null);
   }, [setPickerAnchor, setPickerItem, setSelectedMeasureOption, setSelectedMeasureQty]);
 
+  const debouncedHeaderSearchQuery = useDebounce(headerSearchQuery, 250);
+
   const resolveItemsForCategory = React.useCallback((categoryId: string) => {
     return resolveStoreItemsForCategory({
       categoryId,
       clientVisibleItems,
       favoriteIds,
-      query: headerSearchQuery,
+      query: debouncedHeaderSearchQuery,
     });
-  }, [clientVisibleItems, favoriteIds, headerSearchQuery]);
+  }, [clientVisibleItems, favoriteIds, debouncedHeaderSearchQuery]);
 
   const visibleItems = React.useMemo(() => resolveItemsForCategory(selectedCategory), [resolveItemsForCategory, selectedCategory]);
   const previewItems = visibleItems;
@@ -1271,7 +1274,7 @@ function DshStoreGetScreenContent({
       </Modal>
     </View>
   );
-}
+});
 
 const stylesTokens = {
   orange: colorPalette.brand,
