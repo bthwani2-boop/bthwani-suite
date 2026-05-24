@@ -16,6 +16,7 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Goal | Client can discover available stores, search, and open store details after the shared visibility gate allows exposure. |
 | Primary Actor | `client` |
 | Primary Surface | `app-client` |
+| Primary Touched Surface | `app-client` |
 | Primary Route Family | `dsh-home`; `dsh-search`; `dsh-store` |
 | Live Flow Anchor | `client-discovery-closure` in `dsh/frontend/shared/dsh-flow-registry.ts` |
 | UI Matrix Anchor | `client-discovery` row in `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` |
@@ -28,12 +29,34 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 |---|---|---|
 | Included primary screens | `PASS` | `HomeScreen.tsx`, `SearchScreen.tsx`, and `StoreScreen.tsx` are the discovery/storefront owners in current registries. |
 | Included primary routes | `PASS` | `dsh-home`, `dsh-search`, and `dsh-store` are registered in `dsh/frontend/app-client/dsh-client.routes.ts`. |
-| Included dependency surfaces | `DEFERRED_WITH_REASON` | Partner catalog and control-panel catalog/marketing are dependencies to prove visibility, not primary slice owners. |
-| Checkout intent | `NOT_APPLICABLE_WITH_REASON` | Checkout starts after discovery/store opening and belongs to a later cart/checkout slice. |
-| WLT payment semantics | `NOT_APPLICABLE_WITH_REASON` | No WLT ownership in discovery; WLT starts after checkout intent/payment decisions. |
-| Tracking/support | `NOT_APPLICABLE_WITH_REASON` | Tracking and support belong to order lifecycle slices. |
-| Captain/field operations | `NOT_APPLICABLE_WITH_REASON` | No captain or field operational action is part of this discovery slice. |
+| Included dependency surfaces | `DEFERRED_WITH_REASON` | Partner catalog, control-panel catalog/marketing, and Platform/Vars/provider policy are dependencies to prove visibility, not primary slice owners. |
+| `cart/checkout` | `NOT_APPLICABLE_WITH_REASON` | Cart and checkout start after discovery/store opening and belong to later cart/checkout slices. |
+| `WLT` | `NOT_APPLICABLE_WITH_REASON` | No WLT ownership in discovery; WLT starts after checkout/payment decisions. |
+| `tracking/support` | `NOT_APPLICABLE_WITH_REASON` | Tracking and support belong to order lifecycle and issue/support slices. |
+| `app-captain` and `app-field` | `NOT_APPLICABLE_WITH_REASON` | No captain or field operational action is part of this discovery slice. |
+| `control-panel operations` and `control-panel finance` | `NOT_APPLICABLE_WITH_REASON` | Operations and finance are explicitly accounted but excluded from this discovery/storefront slice. |
 | Finance mutation | `NOT_APPLICABLE_WITH_REASON` | DSH must not mutate wallet, ledger, settlement, refund, or fee truth. |
+
+## Surface Classification
+
+| Classification | Surface/System | Role | Required Proof | Decision |
+|---|---|---|---|---|
+| Primary touched surface | `app-client` | Owns Slice 001 visible journey through `HomeScreen.tsx`, `SearchScreen.tsx`, and `StoreScreen.tsx`. | visual review ids `VR-L1-001`, `VR-L1-023`, and `VR-L1-005`; runtime anchor `DSH-RUN-P014-01`. | `FIX_REQUIRED` |
+| Direct shared logic | shared DSH client visibility/serviceability model | Shared gate that decides whether a store/catalog can be exposed to the client. | source proof from `resolveDshStoreClientVisibility()` plus future provider/runtime proof. | `FIX_REQUIRED` |
+| Dependency surface | `app-partner inventory/catalog readiness` | Proves partner catalog publishing and inventory readiness before client visibility can be trusted. | `partner.dsh.inventory.catalog` visual and publishing-gate proof in a later or linked slice. | `DEFERRED_WITH_REASON` |
+| Dependency surface | `control-panel catalogs governance` | Proves catalog approval and governance controls. | catalog governance visual/runtime proof before API/runtime claim. | `DEFERRED_WITH_REASON` |
+| Dependency surface | `control-panel marketing visibility` | Proves marketing visibility controls that affect client discovery. | marketing visibility evidence before runtime claim. | `DEFERRED_WITH_REASON` |
+| Dependency surface | `Platform/Vars/provider policy later` | Future provider-controlled visibility/serviceability policy. | provider precedence, rollback-preview, and runtime proof when moving beyond preview. | `DEFERRED_WITH_REASON` |
+| Explicit out of scope | `app-captain` | No captain acceptance, pickup, delivery, map, or proof-of-delivery flow in Slice 001. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `app-field` | No field onboarding, verification, visit, or document operation in Slice 001. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `control-panel operations` | No dispatch, exception, live-order, SLA, rescue, or operations intervention in Slice 001. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `control-panel finance` | No settlement, fee, refund, reconciliation, or finance command in Slice 001. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `WLT` | No wallet, ledger, settlement, refund, payment, or reconciliation semantics in Slice 001. | WLT boundary remains classified as excluded. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `auth` | No protected runtime API or permission decision is designed for Slice 001 yet. | define only if API contract work starts later. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `notifications` | No notification entry or delivery event is part of discovery/storefront visibility. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `account/profile` | No account, profile, address book, or preference mutation is part of Slice 001. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `cart/checkout` | Cart and checkout start after store/item intent and belong to later slices. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
+| Explicit out of scope | `tracking/support` | Tracking and support start after order creation or issue escalation. | no proof required for this slice. | `NOT_APPLICABLE_WITH_REASON` |
 
 ## Coverage Matrix
 
@@ -64,15 +87,22 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 
 | Surface/System | Role In Slice | Owner Classification | Required Proof | Decision |
 |---|---|---|---|---|
-| `app-partner inventory readiness` | Dependency for client-visible catalog/store exposure. | dependency, not primary slice boundary | `partner.dsh.inventory.catalog` and publishing gate visual proof in a later or linked slice. | `DEFERRED_WITH_REASON` |
+| `app-client` | Primary touched surface for discovery, search, and store details. | primary slice boundary | `VR-L1-001`, `VR-L1-023`, and `VR-L1-005` visual evidence plus runtime proof. | `FIX_REQUIRED` |
+| shared DSH client visibility/serviceability model | Direct shared logic before client-visible store exposure. | shared DSH logic dependency | source proof from `resolveDshStoreClientVisibility()` and serviceability/runtime proof. | `FIX_REQUIRED` |
+| `app-partner inventory/catalog readiness` | Dependency for client-visible catalog/store exposure. | dependency, not primary slice boundary | `partner.dsh.inventory.catalog` and publishing gate visual proof in a later or linked slice. | `DEFERRED_WITH_REASON` |
 | `control-panel catalogs governance` | Dependency for catalog approval and visibility governance. | dependency, not primary slice boundary | catalog governance visual proof when Slice 001 moves toward runtime/API. | `DEFERRED_WITH_REASON` |
 | `control-panel marketing visibility` | Dependency for marketing publish controls and shared visibility contract. | dependency, not primary slice boundary | marketing/catalog visibility evidence before runtime claim. | `DEFERRED_WITH_REASON` |
-| shared client visibility/serviceability gate | Required gate before store exposure to the client. | shared DSH logic dependency | source proof from `resolveDshStoreClientVisibility()` and serviceability/runtime proof. | `FIX_REQUIRED` |
+| `Platform/Vars/provider policy later` | Dependency for future provider-controlled serviceability and visibility policy. | deferred platform dependency, not primary slice boundary | provider/runtime proof when moving past preview. | `DEFERRED_WITH_REASON` |
+| `app-captain` | No captain operational action is part of this discovery slice. | explicitly out of scope | none for Slice 001. | `NOT_APPLICABLE_WITH_REASON` |
+| `app-field` | No field onboarding or verification action is part of this discovery slice. | explicitly out of scope | none for Slice 001. | `NOT_APPLICABLE_WITH_REASON` |
+| `control-panel operations` | No dispatch, exception, rescue, or SLA operation is part of this discovery slice. | explicitly out of scope | none for Slice 001. | `NOT_APPLICABLE_WITH_REASON` |
+| `control-panel finance` | No finance command or finance dashboard action is part of this discovery slice. | explicitly out of scope | none for Slice 001. | `NOT_APPLICABLE_WITH_REASON` |
 | `WLT` | No ownership in this slice. | out of scope | none for discovery; WLT starts after checkout/payment. | `NOT_APPLICABLE_WITH_REASON` |
-| `auth` | No protected API is designed yet. | deferred platform dependency | define only when API candidate becomes contract work. | `DEFERRED_WITH_REASON` |
+| `auth` | No protected API is designed yet. | explicitly out of scope for this slice | define only when API candidate becomes contract work. | `NOT_APPLICABLE_WITH_REASON` |
 | `notifications` | No notification entry is required for discovery. | out of scope | none. | `NOT_APPLICABLE_WITH_REASON` |
-| `vars/provider` | Future provider-controlled serviceability and visibility policy. | deferred runtime dependency | runtime/provider proof when moving past preview. | `DEFERRED_WITH_REASON` |
 | `account/profile` | No account/profile operation in discovery. | out of scope | none. | `NOT_APPLICABLE_WITH_REASON` |
+| `cart/checkout` | Store continuation beyond discovery belongs to later cart/checkout slices. | explicitly out of scope | none for Slice 001. | `NOT_APPLICABLE_WITH_REASON` |
+| `tracking/support` | Order tracking and issue support belong to later lifecycle slices. | explicitly out of scope | none for Slice 001. | `NOT_APPLICABLE_WITH_REASON` |
 
 ## Evidence and Gates
 
