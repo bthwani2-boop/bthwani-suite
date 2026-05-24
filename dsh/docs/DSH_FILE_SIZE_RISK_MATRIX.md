@@ -1,7 +1,7 @@
 # DSH File Size and Complexity Risk Matrix
 
-Status: BATCH_8C_RUNTIME_TRANSPORT_DECISION
-Decision: READY_FOR_GO_BACKEND_SLICE
+Status: BATCH_9A_GO_BACKEND_SKELETON
+Decision: BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES
 
 ## DSH-SLICE-001 Safe Decomposition Plan
 
@@ -220,3 +220,15 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Explicit exclusions:** no UI change, no route change, no `dsh.openapi.yaml` change, no WLT/cart/checkout/payment, no partner/captain/field action, no endpoint beyond `GET /stores`.
 - **Next allowed batch:** Batch 9A may create `dsh/domain` and `dsh/backend` Go skeleton for `GET /stores` only.
 - **Final Decision:** READY_FOR_GO_BACKEND_SLICE
+
+### Batch 9A Go Backend Skeleton Result
+
+- **Implementation scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Domain owner:** `dsh/domain/store_discovery.go` defines `StoreSummary`, `StoreDiscoveryQuery`, `Pagination`, error codes, and the visibility/serviceability input shape required by store discovery.
+- **Backend owner:** `dsh/backend` now has a Go module with `cmd/dsh-api/main.go`, `internal/http/stores_handler.go`, `internal/store/store_repository.go`, and a temporary `internal/store/memory_repository.go`.
+- **Contract alignment:** the handler accepts only `category_id`, `query`, `filter`, `limit`, and `offset`, and returns the `DiscoveryStoresResponse` / `ErrorResponse` JSON shapes from `dsh/dsh.openapi.yaml`.
+- **Persistence decision:** PostgreSQL, Docker Compose, migrations, seed, and real DB runtime are deferred to Batch 9B.
+- **Frontend decision:** no frontend runtime transport or UI binding changed in Batch 9A; `DshClientSurface.tsx` remains preview-fallback until Batch 9C.
+- **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, Docker, PostgreSQL, frontend binding, route change, or endpoint beyond `GET /stores`.
+- **Next allowed batch:** Batch 9B may add local PostgreSQL runtime for this same endpoint only.
+- **Final Decision:** BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES

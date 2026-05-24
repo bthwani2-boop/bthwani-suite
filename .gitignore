@@ -10,6 +10,8 @@ coverage/
 .nx/
 .next/
 .cache/
+.gocache/
+**/.gocache/
 tmp/
 temp/
 # Logs

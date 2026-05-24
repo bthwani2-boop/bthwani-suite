@@ -1,7 +1,7 @@
 # DSH-SLICE-001 Store Discovery
 
-Status: BATCH_8C_RUNTIME_TRANSPORT_DECISION
-Decision: READY_FOR_GO_BACKEND_SLICE
+Status: BATCH_9A_GO_BACKEND_SKELETON
+Decision: BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES
 
 Purpose:
 Official coverage manifest for the first DSH slice: client discovery and storefront visibility across `HomeScreen` and `StoreScreen`, with search kept inline inside the current page.
@@ -122,7 +122,7 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Gate 4 Security | secret scan before runtime/API work | `guard:secret-scan` passed; `guard:protected-tokens` returned warning-only `DESIGN-TOKEN-DRIFT: WARN (fail=0, warn=4)` | `DEFERRED_WITH_REASON` |
 | Gate 5 Visual / RTL | screenshots, RTL, overflow, color-system proof | PASS: all states (success, loading, empty, error, offline) verified visually under `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100/screenshots/app-client/` | `PASS` |
 | Gate 6 OpenAPI | operationId, schemas, security, validation | GET /stores designed and added to dsh.openapi.yaml under READY_FOR_ONE_OPENAPI_ENDPOINT | PASS |
-| Gate 7 Runtime | request/response/log/screen-state proof | `runtime-unproven`: Batch 8C opens the Go backend slice decision only; no real `GET /stores` response has reached the screen yet | `READY_FOR_GO_BACKEND_SLICE` |
+| Gate 7 Runtime | request/response/log/screen-state proof | `runtime-unproven`: Batch 9A adds the Go handler skeleton only; no PostgreSQL proof, frontend transport, or UI request/response evidence exists yet | `BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES` |
 | Gate 8 Cross-Surface | client, partner, control-panel, WLT/Auth/Search/Vars impact | dependencies are classified in this manifest | `DEFERRED_WITH_REASON` |
 | Gate 9 Regression | previous journey recheck after shared/contract/navigation/state changes | no shared/source change in this manifest step | `NOT_APPLICABLE_WITH_REASON` |
 | Gate 10 Evidence Lock | evidence pack and decision record | evidence folder exists at `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-050100`; all visual review and guard runs passed | `PASS` |
@@ -176,6 +176,18 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 - **Next allowed batch:** Batch 9A may create the `dsh/domain` and `dsh/backend` Go skeleton for `GET /stores` only.
 - **Final Decision:** `READY_FOR_GO_BACKEND_SLICE`.
 
+## Batch 9A Go Backend Skeleton Status
+
+- **Implementation scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **Domain scope:** `dsh/domain` now defines the store discovery model, query, pagination, error codes, and visibility/serviceability input shape needed by this endpoint.
+- **Backend scope:** `dsh/backend` now has a Go module, one `cmd/dsh-api` entrypoint, one `/stores` handler, one repository interface, and one temporary memory repository.
+- **Contract match:** the handler parses only `category_id`, `query`, `filter`, `limit`, and `offset`, returning `DiscoveryStoresResponse` on success and `ErrorResponse` on validation/internal errors.
+- **Temporary data boundary:** memory repository data is only a Batch 9A skeleton stand-in; PostgreSQL, migrations, seed, and durable runtime are Batch 9B scope.
+- **Frontend boundary:** no frontend transport, UI, route, or `DshClientSurface.tsx` binding change was made in Batch 9A.
+- **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, Docker, PostgreSQL, frontend binding, route change, or endpoint beyond `GET /stores`.
+- **Next allowed batch:** Batch 9B may add Docker Compose + PostgreSQL + migrations/seed for `GET /stores` only.
+- **Final Decision:** `BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES`.
+
 ## DSH-SAPI-P014-01 OpenAPI Endpoint Design
 
 Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-01 for Store Discovery.
@@ -211,10 +223,10 @@ Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-0
 
 ## Decision
 
-Current slice decision: READY_FOR_GO_BACKEND_SLICE.
+Current slice decision: BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES.
 
 Explicit blockers:
-- Real runtime is still unproven; no Go handler, PostgreSQL proof, frontend runtime transport, or E2E request/response/screen evidence exists yet.
+- Real runtime is still unproven; PostgreSQL proof, frontend runtime transport, and E2E request/response/screen evidence do not exist yet.
 
 Next allowed work:
-- Proceed to Batch 9A only: `dsh/domain` + `dsh/backend` Go skeleton for `GET /stores` only.
+- Proceed to Batch 9B only: Docker Compose + PostgreSQL + migrations/seed for `GET /stores` only.
