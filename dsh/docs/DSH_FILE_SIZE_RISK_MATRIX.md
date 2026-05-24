@@ -140,3 +140,25 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Parts files created/modified:** created `dsh/frontend/app-client/parts/home/HomeCategoryCarousel.tsx`, `dsh/frontend/app-client/parts/home/HomeStoreFeed.tsx`, and `dsh/frontend/app-client/parts/store/StoreMenuItemCard.tsx`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, and this matrix.
 - **No-behavior-change confirmation:** Extracted parts preserve the same props, UI-kit components, media gating, callback behavior, and call sites; no route, state hook, sheet, runtime/API logic, Typed Client, Binding, backend, or OpenAPI changes were made.
 - **Final Decision:** BATCH_4_UI_PARTS_EXTRACTED_READY_FOR_BATCH_5
+
+### Batch 5 State Hook Extraction Result
+
+- **State hooks extracted:** moved Home local `useState` initialization into `dsh/frontend/app-client/hooks/useHomeState.ts`; moved Store local `useState` initialization into `dsh/frontend/app-client/hooks/useStoreState.ts`.
+- **State ownership deferred with reason:** refs, timers, derived memos, effects, animation values, PanResponder ownership, image preview animation, back-handler registration, and sheet/modal callbacks stayed in the screens because moving them now would change behavior ownership rather than only extracting state initialization.
+- **Hook files created/modified:** created `dsh/frontend/app-client/hooks/useHomeState.ts` and `dsh/frontend/app-client/hooks/useStoreState.ts`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, and this matrix.
+- **No-behavior-change confirmation:** The hooks preserve the same initial values and setter usage; no JSX, props, routes, sheets, runtime/API logic, Typed Client, Binding, backend, OpenAPI, or WLT/cart/checkout/payment changes were made.
+- **Final Decision:** BATCH_5_STATE_HOOKS_EXTRACTED_READY_FOR_BATCH_6
+
+### Batch 6 Thin Screen Shell Result
+
+- **Thin shells assembled:** `dsh/frontend/app-client/screens/HomeScreen.tsx` now re-exports the Home screen implementation from `dsh/frontend/app-client/parts/home/HomeScreenContent.tsx`; `dsh/frontend/app-client/screens/StoreScreen.tsx` now re-exports the Store screen implementation from `dsh/frontend/app-client/parts/store/StoreScreenContent.tsx`.
+- **Implementation moved:** moved the existing Home and Store screen implementation bodies without JSX or behavior rewrites; import paths were adjusted only for the new owner folders.
+- **Shell files created/modified:** created `dsh/frontend/app-client/parts/home/HomeScreenContent.tsx` and `dsh/frontend/app-client/parts/store/StoreScreenContent.tsx`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, and this matrix.
+- **No-behavior-change confirmation:** Screen public exports, component names, route owner paths, props, callbacks, state hooks, sheets/modals, runtime/API logic, Typed Client, Binding, backend, OpenAPI, and WLT/cart/checkout/payment scope were not changed.
+- **Final Decision:** BATCH_6_THIN_SHELL_ASSEMBLED_READY_FOR_BATCH_7
+
+### Remaining Batch Gate Status
+
+- **Batch 7:** Pending. Visual regression and runtime sweep must run after Batch 6 because source-level TypeScript and guards do not prove visual equality.
+- **Batch 8:** Blocked by sequencing. Typed Client/API Binding remains forbidden until Batch 7 visual regression and gates pass.
+- **Final Decision:** FIX_REQUIRED_BATCH_7
