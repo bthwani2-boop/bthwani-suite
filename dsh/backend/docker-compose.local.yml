@@ -1,0 +1,22 @@
+services:
+  dsh-postgres:
+    image: postgres:16-alpine
+    container_name: bthwani-dsh-postgres-local
+    environment:
+      POSTGRES_DB: dsh_local
+      POSTGRES_USER: dsh_local
+      POSTGRES_PASSWORD: dsh_local_password
+    ports:
+      - "55432:5432"
+    volumes:
+      - dsh-postgres-data:/var/lib/postgresql/data
+      - ./migrations/001_store_discovery.sql:/docker-entrypoint-initdb.d/001_store_discovery.sql:ro
+      - ./seed/002_store_discovery_seed.sql:/docker-entrypoint-initdb.d/002_store_discovery_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dsh_local -d dsh_local"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  dsh-postgres-data:

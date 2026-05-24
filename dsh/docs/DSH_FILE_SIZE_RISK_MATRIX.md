@@ -1,7 +1,7 @@
 # DSH File Size and Complexity Risk Matrix
 
-Status: BATCH_9A_GO_BACKEND_SKELETON
-Decision: BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES
+Status: BATCH_9B_POSTGRES_RUNTIME
+Decision: BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT
 
 ## DSH-SLICE-001 Safe Decomposition Plan
 
@@ -232,3 +232,15 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, Docker, PostgreSQL, frontend binding, route change, or endpoint beyond `GET /stores`.
 - **Next allowed batch:** Batch 9B may add local PostgreSQL runtime for this same endpoint only.
 - **Final Decision:** BATCH_9A_GO_BACKEND_SKELETON_READY_FOR_POSTGRES
+
+### Batch 9B PostgreSQL Runtime Result
+
+- **Runtime scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
+- **PostgreSQL owner:** `dsh/backend/docker-compose.local.yml` adds one local PostgreSQL service and no Redis, broker, Kubernetes, or extra service.
+- **Migration/seed owner:** `dsh/backend/migrations/001_store_discovery.sql` and `dsh/backend/seed/002_store_discovery_seed.sql` create and seed the discovery summary table for the single endpoint.
+- **Backend owner:** `dsh/backend/internal/store/postgres_repository.go` adds a PostgreSQL repository behind the existing `store.Repository` interface; `cmd/dsh-api/main.go` selects it through `DATABASE_URL` and keeps the memory repository as a fallback.
+- **Runtime proof:** Docker daemon and Compose were available, the PostgreSQL container reached healthy state, seed rows were queried, `go test ./...` passed, and local `GET /stores` smoke returned success, empty, and invalid-limit responses.
+- **Frontend decision:** no frontend runtime transport or UI binding changed in Batch 9B; `DshClientSurface.tsx` remains preview-fallback until Batch 9C.
+- **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, frontend binding, route change, `dsh.openapi.yaml` change, or endpoint beyond `GET /stores`.
+- **Next allowed batch:** Batch 9C may add frontend runtime transport for the same endpoint only.
+- **Final Decision:** BATCH_9B_POSTGRES_RUNTIME_READY_FOR_FRONTEND_TRANSPORT
