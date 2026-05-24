@@ -138,6 +138,7 @@ export type DshHomeGetScreenProps = {
   notificationCount?: number;
   cartCount?: number;
   serviceDialTrigger?: number;
+  searchAutoOpenToken?: number;
 };
 
 export type DshHomeCategory = {
@@ -606,6 +607,7 @@ export function DshHomeGetScreen({
   favoriteOverrides,
   onToggleFavorite,
   serviceDialTrigger,
+  searchAutoOpenToken = 0,
 }: DshHomeGetScreenProps) {
   const { direction, language: resolvedLanguage } = useDirection();
   const currentLanguage = resolvedLanguage ?? 'ar';
@@ -633,12 +635,23 @@ export function DshHomeGetScreen({
   const [inlineSearchVisible, setInlineSearchVisible] = React.useState(false);
   const [inlineSearchQuery, setInlineSearchQuery] = React.useState('');
   const [serviceDialVisible, setServiceDialVisible] = React.useState(false);
+  const lastSearchAutoOpenTokenRef = React.useRef(0);
 
   React.useEffect(() => {
     if (serviceDialTrigger) {
       setServiceDialVisible(true);
     }
   }, [serviceDialTrigger]);
+
+  React.useEffect(() => {
+    if (!searchAutoOpenToken || searchAutoOpenToken === lastSearchAutoOpenTokenRef.current) {
+      return;
+    }
+
+    lastSearchAutoOpenTokenRef.current = searchAutoOpenToken;
+    setInlineSearchQuery('');
+    setInlineSearchVisible(true);
+  }, [searchAutoOpenToken]);
 
   const handleOpenMySpace = React.useCallback(() => {
     if (onOpenMySpace) {

@@ -4,7 +4,7 @@ Status: ACTIVE_SLICE_MANIFEST
 Decision: FIX_REQUIRED
 
 Purpose:
-Official coverage manifest for the first DSH slice: client discovery and storefront visibility across `HomeScreen`, `SearchScreen`, and `StoreScreen`.
+Official coverage manifest for the first DSH slice: client discovery and storefront visibility across `HomeScreen` and `StoreScreen`, with search kept inline inside the current page.
 
 ## Identity
 
@@ -17,7 +17,7 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Primary Actor | `client` |
 | Primary Surface | `app-client` |
 | Primary Touched Surface | `app-client` |
-| Primary Route Family | `dsh-home`; `dsh-search`; `dsh-store` |
+| Primary Route Family | `dsh-home`; `dsh-home:inline-search`; `dsh-store`; `dsh-store:inline-search` |
 | Live Flow Anchor | `client-discovery-closure` in `dsh/frontend/shared/dsh-flow-registry.ts` |
 | UI Matrix Anchor | `client-discovery` row in `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` |
 | API Matrix Anchor | `DSH-SAPI-P014-01` in `dsh/docs/SCREEN_API_MATRIX.md` |
@@ -27,8 +27,8 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 
 | Boundary | Decision | Reason |
 |---|---|---|
-| Included primary screens | `PASS` | `HomeScreen.tsx`, `SearchScreen.tsx`, and `StoreScreen.tsx` are the discovery/storefront owners in current registries. |
-| Included primary routes | `PASS` | `dsh-home`, `dsh-search`, and `dsh-store` are registered in `dsh/frontend/app-client/dsh-client.routes.ts`. |
+| Included primary screens | `PASS` | `HomeScreen.tsx` and `StoreScreen.tsx` are the active same-page discovery/storefront owners. Standalone `SearchScreen.tsx` is not accepted for Slice 001 closure. |
+| Included primary routes | `PASS` | `dsh-home` and `dsh-store` are the active route boundaries; search is an inline state inside the current page, not a standalone route. |
 | Included dependency surfaces | `DEFERRED_WITH_REASON` | Partner catalog, control-panel catalog/marketing, and Platform/Vars/provider policy are dependencies to prove visibility, not primary slice owners. |
 | `cart/checkout` | `NOT_APPLICABLE_WITH_REASON` | Cart and checkout start after discovery/store opening and belong to later cart/checkout slices. |
 | `WLT` | `NOT_APPLICABLE_WITH_REASON` | No WLT ownership in discovery; WLT starts after checkout/payment decisions. |
@@ -41,14 +41,14 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 
 | Search Type | Owner Screen | Route Boundary | Scope | Decision |
 |---|---|---|---|---|
-| Global discovery search | `HomeScreen.tsx` -> `SearchScreen.tsx` | `dsh-search` | Search across discovery stores, categories, and shared client paths. | `FIX_REQUIRED`: visual proof still required for `VR-L1-023` |
+| Global discovery search | `HomeScreen.tsx` | same `dsh-home` page | Search across discovery stores, categories, and shared client paths inside the current home surface. It must not navigate to `SearchScreen.tsx`. | `FIX_REQUIRED`: same-page visual proof captured for `VR-L1-023`; remaining states still required |
 | Store-local product search | `StoreScreen.tsx` | same `dsh-store` page | Filter products/items inside the currently opened store only; it must not navigate to `SearchScreen.tsx`. | `FIX_REQUIRED`: visual proof still required for `VR-L1-005` |
 
 ## Surface Classification
 
 | Classification | Surface/System | Role | Required Proof | Decision |
 |---|---|---|---|---|
-| Primary touched surface | `app-client` | Owns Slice 001 visible journey through `HomeScreen.tsx`, `SearchScreen.tsx`, and `StoreScreen.tsx`. | visual review ids `VR-L1-001`, `VR-L1-023`, and `VR-L1-005`; runtime anchor `DSH-RUN-P014-01`. | `FIX_REQUIRED` |
+| Primary touched surface | `app-client` | Owns Slice 001 visible journey through `HomeScreen.tsx`, inline home search, and `StoreScreen.tsx`. | visual review ids `VR-L1-001`, `VR-L1-023`, and `VR-L1-005`; runtime anchor `DSH-RUN-P014-01`. | `FIX_REQUIRED` |
 | Direct shared logic | shared DSH client visibility/serviceability model | Shared gate that decides whether a store/catalog can be exposed to the client. | source proof from `resolveDshStoreClientVisibility()` plus future provider/runtime proof. | `FIX_REQUIRED` |
 | Dependency surface | `app-partner inventory/catalog readiness` | Proves partner catalog publishing and inventory readiness before client visibility can be trusted. | `partner.dsh.inventory.catalog` visual and publishing-gate proof in a later or linked slice. | `DEFERRED_WITH_REASON` |
 | Dependency surface | `control-panel catalogs governance` | Proves catalog approval and governance controls. | catalog governance visual/runtime proof before API/runtime claim. | `DEFERRED_WITH_REASON` |
@@ -69,16 +69,16 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 
 | Slice ID | Service | Business Domain | Actor | Surface | Route | Screen Owner | Primary Action | Secondary Actions | CTA List | Navigation Target | Required States | Control Panel Entry | Auth/Permission | WLT Boundary | Vars/Provider Dependency | Search Dependency | Notification Dependency | Account/Profile Dependency | API Candidate | Binding Status | Runtime Status | Visual Evidence | Git Evidence | Typecheck Evidence | Regression Evidence | Decision |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `DSH-SLICE-001` | `dsh` | `client-discovery` | `client` | `app-client` | `dsh-home` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | Open discovery feed and available store/card entry. | filter by destination/category; open store; continue to search. | discovery store card; category entry; search entry | `dsh-search`; `dsh-store` | `loading`; `empty`; `error`; `success`; `offline` | dependency: control-panel marketing/catalog visibility only | public/guest-safe until API design proves auth need | no WLT ownership in discovery | shared visibility/serviceability policy must remain provider-controlled when runtime exists | depends on `dsh-search` route | no notification dependency in this slice | no account/profile dependency in this slice | candidate from `DSH-SAPI-P014-01`; no OpenAPI edit yet | `DEFERRED_WITH_REASON`: UI preview only until contract and typed client exist | `DEFERRED_WITH_REASON`: runtime source proof missing | `FIX_REQUIRED`: success screenshot captured at `tools/registry/runs/DSH_VISUAL_SWEEP-20260524-034147/screenshots/app-client/P1__app-client__client.dsh.home.feed__success__SM-A125F__rtl__VISUAL_REVIEW.png`; remaining states still missing | `PASS`: current run captured git state | `PASS`: `pnpm -w exec tsc --noEmit` passed | `DEFERRED_WITH_REASON`: regression proof after remaining states | `FIX_REQUIRED` |
-| `DSH-SLICE-001` | `dsh` | `client-discovery` | `client` | `app-client` | `dsh-search` | `dsh/frontend/app-client/screens/SearchScreen.tsx` | Search for a store/category from discovery. | refine query; open result; return to discovery. | search query; result row/card | `dsh-store`; `dsh-home` | `loading`; `empty`; `error`; `success`; `offline` | dependency: control-panel marketing/catalog visibility only | public/guest-safe until API design proves auth need | no WLT ownership in discovery | shared visibility/serviceability policy must remain provider-controlled when runtime exists | owned inside this slice through `dsh-search` | no notification dependency in this slice | no account/profile dependency in this slice | candidate from `DSH-SAPI-P014-01`; no OpenAPI edit yet | `DEFERRED_WITH_REASON`: UI preview only until contract and typed client exist | `DEFERRED_WITH_REASON`: runtime source proof missing | `FIX_REQUIRED`: success screenshot captured at `tools/registry/runs/DSH_VISUAL_SWEEP-20260524-034147/screenshots/app-client/P1__app-client__client.dsh.discovery.search__success__SM-A125F__rtl__VISUAL_REVIEW.png`; remaining states still missing | `PASS`: current run captured git state | `PASS`: `pnpm -w exec tsc --noEmit` passed | `DEFERRED_WITH_REASON`: regression proof after remaining states | `FIX_REQUIRED` |
+| `DSH-SLICE-001` | `dsh` | `client-discovery` | `client` | `app-client` | `dsh-home` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | Open discovery feed and available store/card entry. | filter by destination/category; open store; open same-page search. | discovery store card; category entry; search entry | same `dsh-home` inline search; `dsh-store` | `loading`; `empty`; `error`; `success`; `offline` | dependency: control-panel marketing/catalog visibility only | public/guest-safe until API design proves auth need | no WLT ownership in discovery | shared visibility/serviceability policy must remain provider-controlled when runtime exists | global discovery search is inline inside `dsh-home` | no notification dependency in this slice | no account/profile dependency in this slice | candidate from `DSH-SAPI-P014-01`; no OpenAPI edit yet | `DEFERRED_WITH_REASON`: UI preview only until contract and typed client exist | `DEFERRED_WITH_REASON`: runtime source proof missing | `FIX_REQUIRED`: success screenshot captured at `tools/registry/runs/DSH_VISUAL_SWEEP-20260524-034147/screenshots/app-client/P1__app-client__client.dsh.home.feed__success__SM-A125F__rtl__VISUAL_REVIEW.png`; inline empty/search proof captured at `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-041224/screenshots/app-client/VR-L1-023__home-inline-search-same-page__SM-A125F__rtl.png`; remaining states still missing | `PASS`: current run captured git state | `PASS`: `pnpm -w exec tsc --noEmit` passed in previous run; current rerun blocked by sandbox EPERM | `DEFERRED_WITH_REASON`: regression proof after remaining states | `FIX_REQUIRED` |
+| `DSH-SLICE-001` | `dsh` | `client-discovery` | `client` | `app-client` | `dsh-home:inline-search` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | Search for a store/category without leaving the current page. | refine query; open result; close inline search. | search query; result row/card | same `dsh-home`; `dsh-store` after selecting a result | `loading`; `empty`; `error`; `success`; `offline` | dependency: control-panel marketing/catalog visibility only | public/guest-safe until API design proves auth need | no WLT ownership in discovery | shared visibility/serviceability policy must remain provider-controlled when runtime exists | owned inline inside `HomeScreen`, not a standalone `SearchScreen` route | no notification dependency in this slice | no account/profile dependency in this slice | candidate from `DSH-SAPI-P014-01`; no OpenAPI edit yet | `DEFERRED_WITH_REASON`: UI preview only until contract and typed client exist | `DEFERRED_WITH_REASON`: runtime source proof missing | `FIX_REQUIRED`: same-page screenshot captured at `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-041224/screenshots/app-client/VR-L1-023__home-inline-search-same-page__SM-A125F__rtl.png`; standalone search screen evidence rejected | `PASS`: current run captured git state | `DEFERRED_WITH_REASON`: current TypeScript rerun blocked by sandbox EPERM | `DEFERRED_WITH_REASON`: regression proof after remaining states | `FIX_REQUIRED` |
 | `DSH-SLICE-001` | `dsh` | `client-discovery` | `client` | `app-client` | `dsh-store` | `dsh/frontend/app-client/screens/StoreScreen.tsx` | Open store details after visibility gate allows exposure. | inspect serviceability; inspect catalog sections; search products inside the same store; continue toward cart later. | open store; store-local product search; open product/category section | same `dsh-store` inline search; later cart route is out of this slice | `loading`; `empty`; `error`; `success`; `offline` | dependency: control-panel marketing/catalog visibility only | public/guest-safe until API design proves auth need | no WLT ownership in discovery | shared visibility/serviceability policy must remain provider-controlled when runtime exists | global `dsh-search` is a discovery entry only; store product search stays inside `dsh-store` | no notification dependency in this slice | no account/profile dependency in this slice | candidate from `DSH-SAPI-P014-01`; no OpenAPI edit yet | `DEFERRED_WITH_REASON`: UI preview only until contract and typed client exist | `DEFERRED_WITH_REASON`: runtime source proof missing | `FIX_REQUIRED`: success screenshot captured at `tools/registry/runs/DSH_VISUAL_SWEEP-20260524-034147/screenshots/app-client/P1__app-client__client.dsh.store.details__success__SM-A125F__rtl__VISUAL_REVIEW.png`; store-local search is inline and custom floating back is removed; remaining states still missing | `PASS`: current run captured git state | `PASS`: `pnpm -w exec tsc --noEmit` passed | `DEFERRED_WITH_REASON`: regression proof after remaining states | `FIX_REQUIRED` |
 
 ## CTA Matrix
 
 | CTA | Source Screen | Target | Preconditions | Owner Classification | Decision |
 |---|---|---|---|---|---|
-| Open search | `HomeScreen.tsx` | `dsh-search` | Discovery surface renders and search entry is visible. | primary slice CTA | `FIX_REQUIRED`: visual proof missing |
-| Open store | `HomeScreen.tsx` or `SearchScreen.tsx` | `dsh-store` | Store passes shared client-visibility and serviceability gate. | primary slice CTA | `FIX_REQUIRED`: visual proof missing |
+| Open search | `HomeScreen.tsx` | same `dsh-home` inline search | Discovery surface renders and search entry is visible. | primary slice CTA | `FIX_REQUIRED`: same-page proof captured; remaining states missing |
+| Open store | `HomeScreen.tsx` or inline home search results | `dsh-store` | Store passes shared client-visibility and serviceability gate. | primary slice CTA | `FIX_REQUIRED`: visual proof missing |
 | Search inside store | `StoreScreen.tsx` | same `dsh-store` inline product filter | Store surface renders and product list is visible. | primary slice CTA | `FIX_REQUIRED`: visual proof missing |
 | Open category/destination | `HomeScreen.tsx` | discovery-filtered store list | Category/destination exists in preview state. | primary slice CTA | `FIX_REQUIRED`: visual proof missing |
 | Continue beyond store | `StoreScreen.tsx` | later cart/checkout slice | User selects items and moves toward cart. | out of slice | `NOT_APPLICABLE_WITH_REASON`: cart/checkout is excluded from Slice 001 |
@@ -88,14 +88,14 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Screen Group | Required States | Visual Review IDs | Runtime Proof | Decision |
 |---|---|---|---|---|
 | `HomeScreen.tsx` | `loading`; `empty`; `error`; `success`; `offline` | `VR-L1-001` | `DSH-RUN-P014-01` says preview/local-state runtime proof is missing. | `FIX_REQUIRED` |
-| `SearchScreen.tsx` | `loading`; `empty`; `error`; `success`; `offline` | `VR-L1-023` | `DSH-RUN-P014-01` says preview/local-state runtime proof is missing. | `FIX_REQUIRED` |
+| `HomeScreen.tsx` inline global search | `loading`; `empty`; `error`; `success`; `offline` | `VR-L1-023` | `DSH-RUN-P014-01` says preview/local-state runtime proof is missing. | `FIX_REQUIRED` |
 | `StoreScreen.tsx` | `loading`; `empty`; `error`; `success`; `offline` | `VR-L1-005` | `DSH-RUN-P014-01` says preview/local-state runtime proof is missing. | `FIX_REQUIRED` |
 
 ## Cross-Surface Impact
 
 | Surface/System | Role In Slice | Owner Classification | Required Proof | Decision |
 |---|---|---|---|---|
-| `app-client` | Primary touched surface for discovery, search, and store details. | primary slice boundary | `VR-L1-001`, `VR-L1-023`, and `VR-L1-005` visual evidence plus runtime proof. | `FIX_REQUIRED` |
+| `app-client` | Primary touched surface for discovery, same-page search, and store details. | primary slice boundary | `VR-L1-001`, `VR-L1-023`, and `VR-L1-005` visual evidence plus runtime proof. | `FIX_REQUIRED` |
 | shared DSH client visibility/serviceability model | Direct shared logic before client-visible store exposure. | shared DSH logic dependency | source proof from `resolveDshStoreClientVisibility()` and serviceability/runtime proof. | `FIX_REQUIRED` |
 | `app-partner inventory/catalog readiness` | Dependency for client-visible catalog/store exposure. | dependency, not primary slice boundary | `partner.dsh.inventory.catalog` and publishing gate visual proof in a later or linked slice. | `DEFERRED_WITH_REASON` |
 | `control-panel catalogs governance` | Dependency for catalog approval and visibility governance. | dependency, not primary slice boundary | catalog governance visual proof when Slice 001 moves toward runtime/API. | `DEFERRED_WITH_REASON` |
@@ -120,7 +120,7 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | Gate 2 TypeScript / Build | targeted type/build only when source or contracts change | `pnpm -w exec tsc --noEmit` passed after rerun outside sandbox because the first attempt hit `EPERM` on `node_modules` | `PASS` |
 | Gate 3 Architecture | Tamagui/ui-kit/service/binding guards when architecture is touched | `guard:tamagui-import-boundary`, `guard:service-blueprint`, and `guard:binding-proof` passed | `PASS` |
 | Gate 4 Security | secret scan before runtime/API work | `guard:secret-scan` passed; `guard:protected-tokens` returned warning-only `DESIGN-TOKEN-DRIFT: WARN (fail=0, warn=4)` | `DEFERRED_WITH_REASON` |
-| Gate 5 Visual / RTL | screenshots, RTL, overflow, color-system proof | success screenshots captured for `VR-L1-001`, `VR-L1-023`, and `VR-L1-005` under `tools/registry/runs/DSH_VISUAL_SWEEP-20260524-034147/screenshots/app-client/`; remaining loading/empty/error/offline states still missing | `FIX_REQUIRED` |
+| Gate 5 Visual / RTL | screenshots, RTL, overflow, color-system proof | same-page search proof captured under `tools/registry/runs/DSH_VISUAL_STATE_SWEEP-20260524-041224/screenshots/app-client/`; standalone `SearchScreen` proof is rejected; remaining loading/empty/error/offline states still missing | `FIX_REQUIRED` |
 | Gate 6 OpenAPI | operationId, schemas, security, validation | `DSH-SAPI-P014-01` is candidate only; `dsh.openapi.yaml` must not be edited yet | `DEFERRED_WITH_REASON` |
 | Gate 7 Runtime | request/response/log/screen-state proof | `DSH-RUN-P014-01` says runtime proof is missing | `FIX_REQUIRED` |
 | Gate 8 Cross-Surface | client, partner, control-panel, WLT/Auth/Search/Vars impact | dependencies are classified in this manifest | `DEFERRED_WITH_REASON` |
@@ -133,11 +133,12 @@ Current slice decision: `FIX_REQUIRED`.
 
 Explicit blockers:
 
-- success screenshots are captured for `HomeScreen`, `SearchScreen`, and `StoreScreen`, but loading, empty, error, and offline states are still missing,
+- success and same-page search screenshots are captured for `HomeScreen` and `StoreScreen`, but loading, empty, error, and offline states are still missing,
 - runtime source proof is missing for `DSH-RUN-P014-01`,
 - `DSH-SAPI-P014-01` remains a candidate and does not justify editing `dsh/dsh.openapi.yaml`,
 - partner catalog and control-panel catalog/marketing dependencies are classified but not visually proven.
-- `StoreScreen` search is now documented as store-local inline product search, while `SearchScreen` remains global discovery search only.
+- standalone `SearchScreen` is rejected for this slice; global discovery search must stay inline inside `HomeScreen`.
+- `StoreScreen` search is documented as store-local inline product search.
 
 Next allowed work:
 

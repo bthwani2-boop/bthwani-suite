@@ -1,7 +1,6 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { BottomNavBar, Surface, Text, colorPalette } from '@bthwani/ui-kit';
-import { DshSearchScreen } from './screens/SearchScreen';
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
 import { DshHomeGetScreen, type DshHomeGetPromo, type DshHomeGetStore } from './screens/HomeScreen';
@@ -441,9 +440,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [selectedFulfillmentMode, setSelectedFulfillmentMode] = React.useState<DshFulfillmentDeliveryMode>(defaultFulfillmentMode);
   const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
   const [ordersQuery, setOrdersQuery] = React.useState('');
-  const [storesQuery, setStoresQuery] = React.useState('');
   const [itemsQuery, setItemsQuery] = React.useState('');
   const [itemsCategory, setItemsCategory] = React.useState('all');
+  const [homeSearchAutoOpenToken, setHomeSearchAutoOpenToken] = React.useState(0);
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
@@ -459,6 +458,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const homeBackResolverRef = React.useRef<(() => boolean) | null>(null);
   const handleRegisterBackHandler = React.useCallback((handler: (() => boolean) | null) => {
     homeBackResolverRef.current = handler;
+  }, []);
+  const openHomeInlineSearch = React.useCallback(() => {
+    setRoute('home');
+    setHomeSearchAutoOpenToken((token) => token + 1);
   }, []);
 
   React.useEffect(() => {
@@ -586,18 +589,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       return haystack.includes(query);
     });
   }, [ordersQuery]);
-
-  const filteredSearchStores = React.useMemo(() => {
-    const query = storesQuery.trim().toLowerCase();
-    if (!query) {
-      return clientVisibleDiscoveryStores;
-    }
-
-    return clientVisibleDiscoveryStores.filter((store) => {
-      const haystack = `${store.name} ${store.subtitle} ${store.statusLabel} ${store.meta}`.toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [storesQuery]);
 
   const activeTrackedOrder = React.useMemo(
     () => initialOrders.find((order) => order.id === selectedOrderId) ?? initialOrders[0],
@@ -848,7 +839,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
   // Sanity check
   const importedScreens: Array<[string, unknown]> = [
-    ['DshSearchScreen', DshSearchScreen as unknown],
     ['DshEntryScreen', DshEntryScreen as unknown],
     ['DshHomeGetScreen', DshHomeGetScreen as unknown],
     ['DshMySpaceScreen', DshMySpaceScreen as unknown],
@@ -935,7 +925,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         }}
         onOpenTracking={() => openTrackedOrder()}
         onOpenOrders={() => setRoute('orders-list')}
-        onOpenSearch={() => setRoute('search')}
+        onOpenSearch={openHomeInlineSearch}
         onBack={() => setRoute('home')}
         onRetry={() => setRoute('notifications')}
       />
@@ -1047,27 +1037,6 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onRetry={() => setRoute('cart-get')}
       />
       );
-  }
-
-  if (route === 'search') {
-    return (
-      <DshSearchScreen
-        query={storesQuery}
-        results={filteredSearchStores.map((store) => ({ id: store.id, title: store.name, subtitle: store.subtitle, meta: store.meta }))}
-        onQueryChange={setStoresQuery}
-        onOpenCategories={() => setRoute('home')}
-        onOpenFavorites={() => setRoute('home')}
-        onOpenResult={(resultId) => {
-          const nextStoreMetadata = getStoreCanonicalMetadata(resultId);
-          setActiveStoreId(resultId);
-          setActiveCanonicalStoreId(nextStoreMetadata.canonicalStoreId);
-          setActiveCanonicalProductId(undefined);
-          setRoute('store-get');
-        }}
-        onBack={() => setRoute('home')}
-        onRetry={() => setRoute('search')}
-      />
-    );
   }
 
   if (route === 'benefits') {
@@ -1312,7 +1281,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         setRoute('benefits');
       }}
       onOpenFavorites={() => setRoute('home')}
-      onOpenSearch={() => setRoute('search')}
+      onOpenSearch={openHomeInlineSearch}
       onOpenOrders={() => setRoute('orders-list')}
       onOpenTracking={() => openTrackedOrder()}
       onPromoClick={recordMarketingBannerClick}
@@ -1336,6 +1305,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         setSelectedItemId('');
         setRoute('store-get');
       }}
+      searchAutoOpenToken={homeSearchAutoOpenToken}
       sheinInlineVisible={sheinInlineOpen}
       onCloseSheinInline={() => setSheinInlineOpen(false)}
       awnakInlineVisible={awnakInlineOpen}
