@@ -140,6 +140,19 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 - **Owner boundary:** future typed-client work must stay outside screens and UI parts; contracts belong under `dsh/frontend/app-client/contracts/`, non-UI mapping/client adapters under `dsh/frontend/app-client/shared/`, and preview fallback remains `UI_PREVIEW_ONLY` under `dsh/frontend/app-client/data/`.
 - **Runtime decision:** unchanged. No binding, backend, route, UI, OpenAPI, dependency, or runtime implementation was executed in this preflight.
 
+## Batch 8A Typed Client Tooling Status
+
+- **Tooling added:** `@stoplight/spectral-cli@6.16.0` and `openapi-typescript@7.13.0`, scoped to `dsh/dsh.openapi.yaml`.
+- **Scripts added:** `pnpm run openapi:lint:dsh`; `pnpm run openapi:types:dsh`.
+- **Generated types path:** `dsh/frontend/app-client/contracts/dsh-openapi.types.ts`.
+- **Validation result:** `pnpm run openapi:lint:dsh` passed with 0 errors and 3 warnings (`oas3-api-servers`, `info-contact`, `operation-tag-defined`).
+- **Generation result:** `pnpm run openapi:types:dsh` generated types for `GET /stores` / `listDiscoveryStores` only.
+- **Owner boundary:** OpenAPI types are contract-only. No fetch, binding, mapper, UI part, screen, backend, domain, route, or runtime change was made in Batch 8A.
+- **Runtime decision:** unchanged. DSH-SLICE-001 still uses preview/local-state proof until a later scoped binding batch is explicitly started.
+- **Backend/domain decision:** nothing is added under `dsh/backend` or `dsh/domain` in Batch 8A; backend/domain work remains blocked until contract, auth, persistence, and runtime evidence are approved in a later batch.
+- **No-binding confirmation:** no Typed Client/API Binding was executed.
+- **Final Decision:** `BATCH_8A_TYPED_CLIENT_TOOLING_READY`.
+
 ## DSH-SAPI-P014-01 OpenAPI Endpoint Design
 
 Below is the design of the single OpenAPI endpoint defined under DSH-SAPI-P014-01 for Store Discovery.

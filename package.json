@@ -8,6 +8,8 @@
     "serve:surfaces": "pnpm nx run-many --target=serve --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
+    "openapi:lint:dsh": "spectral lint dsh/dsh.openapi.yaml --ruleset .spectral.yaml",
+    "openapi:types:dsh": "openapi-typescript dsh/dsh.openapi.yaml -o dsh/frontend/app-client/contracts/dsh-openapi.types.ts",
     "guard:i18n-direction": "node tools/scripts/guard-central-i18n-direction.mjs",
     "guard:i18n-direction:mobile-control-panel": "node tools/scripts/guard-central-i18n-direction.mjs app-client app-partner app-captain app-field control-panel webapp website",
     "guard:service-blueprint": "node tools/guards/guard-service-contract-matrix.mjs",
@@ -40,6 +42,7 @@
     }
   },
   "devDependencies": {
+    "@stoplight/spectral-cli": "6.16.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
@@ -54,6 +57,7 @@
     "expo": "~54.0.0",
     "next": "16.2.2",
     "nx": "22.3.3",
+    "openapi-typescript": "7.13.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.0",

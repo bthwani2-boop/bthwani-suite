@@ -185,3 +185,16 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **State bridge:** loading, empty, error, and offline remain explicit screen-state props before they reach UI parts; no runtime success claim is allowed until trusted request/response evidence exists.
 - **Preview fallback rule:** `dsh/frontend/app-client/data/*.preview-data.ts` remains `UI_PREVIEW_ONLY` fallback data and must not be treated as backend, API binding, or runtime truth.
 - **Evidence commands for scoped Batch 8 work:** `git --no-pager diff --check`; `pnpm -w exec tsc --noEmit`; `pnpm run guard:tamagui-import-boundary`; `pnpm run guard:service-blueprint`; `pnpm run guard:binding-proof`; `pnpm run guard:secret-scan`.
+
+### Batch 8A Typed Client Tooling Result
+
+- **Tooling scope:** limited to `dsh/dsh.openapi.yaml` for DSH-SLICE-001 / `DSH-SAPI-P014-01`; no API Binding, runtime call, backend, domain, route, UI, mapper, data-preview, WLT/cart/checkout/payment, Docker, PostgreSQL, or endpoint expansion was executed.
+- **Tooling added:** `@stoplight/spectral-cli@6.16.0` for OpenAPI lint/validation and `openapi-typescript@7.13.0` for type generation; `.spectral.yaml` was normalized to a valid Spectral ruleset shape.
+- **Scripts added:** `pnpm run openapi:lint:dsh` and `pnpm run openapi:types:dsh`.
+- **Generated types path:** `dsh/frontend/app-client/contracts/dsh-openapi.types.ts`.
+- **Validation result:** `pnpm run openapi:lint:dsh` passed with 0 errors and 3 warnings (`oas3-api-servers`, `info-contact`, `operation-tag-defined`); these are documentation/governance warnings and do not require expanding the endpoint in Batch 8A.
+- **Generation result:** `pnpm run openapi:types:dsh` generated types for `GET /stores` / `listDiscoveryStores` only.
+- **Owner boundary:** generated OpenAPI types live under `dsh/frontend/app-client/contracts/`; no direct fetch belongs in `HomeScreen.tsx`, `StoreScreen.tsx`, UI parts, or preview data, and no binding belongs in backend/domain during this batch.
+- **Backend/domain decision:** no files or scaffolds are added under `dsh/backend` or `dsh/domain` in Batch 8A; those remain blocked until a later scoped runtime/backend batch has contract, auth, persistence, and observability proof.
+- **No-binding confirmation:** Batch 8A added tooling and generated types only; runtime remains preview/local-state and no Typed Client/API Binding was executed.
+- **Final Decision:** BATCH_8A_TYPED_CLIENT_TOOLING_READY
