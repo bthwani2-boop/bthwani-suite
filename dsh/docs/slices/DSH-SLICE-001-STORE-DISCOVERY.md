@@ -290,3 +290,8 @@ Next allowed work:
 - **Final Decision:** `POST_L7_FRONTEND_HARDENING_PASS`.
 - **Sweep:** Zero unused variables, zero Tamagui leaks, zero direct fetches.
 - **Evidence:** Zipped in `tools/registry/runs/DSH_SLICE_001_POST_L7_HARDENING-20260525-0527/ad766e4b-8206-49ac-b422-19f64a726a07.zip`.
+
+## Absolute Final Post-L7 Hardening — Central Data Ownership
+- **Session:** `DSH_SLICE_001_POST_L7_HARDENING-20260525-065150` (2026-05-25)
+- **Closure:** Central DSH domain preview data ownership established in `dsh/frontend/data/` (categories, discovery, items). 9 cross-surface import violations in `control-panel/marketing/` fixed. app-client surface adapters replaced with thin re-exports. All verification gates pass. TypeScript: 0 errors.
+- **Final Decision:** `POST_L7_FRONTEND_HARDENING_PASS`.

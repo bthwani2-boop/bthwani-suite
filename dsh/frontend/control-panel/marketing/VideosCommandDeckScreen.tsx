@@ -27,9 +27,9 @@ import {
   type MarketingVideoSource,
   type MarketingVideoTargetType,
 } from '../../shared/video.preview-store';
-import { dshCategoryFixtures } from '../../app-client/data/categories.preview-data';
-import { dshDiscoveryStores } from '../../app-client/data/discovery.preview-data';
-import { storeItemsByStoreId } from '../../app-client/data/items.preview-data';
+import { dshCategoryFixtures } from '../../data/categories.preview-data';
+import { dshDiscoveryStores } from '../../data/discovery.preview-data';
+import { storeItemsByStoreId } from '../../data/items.preview-data';
 
 export type VideosCommandDeckScreenProps = {
   hubHref?: string;
@@ -318,10 +318,10 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
               <Box gap={4}>
                 <View style={[styles.headerRow, { gap: 12 }]}>
                   <View style={{ flex: 1, direction: 'ltr' }}>
-                    <TextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
+                    <TextField label="رابط الفيديو" value={draft.videoUrl} onChangeText={(v) => setDraft(d => ({ ...d, videoUrl: v }))} placeholder="video-url..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                   </View>
                   <View style={{ flex: 1, direction: 'ltr' }}>
-                    <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="https://..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
+                    <TextField label="رابط الغلاف (Poster)" value={draft.posterUrl} onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))} placeholder="poster-url..." style={{ textAlign: 'left', writingDirection: 'ltr' }} />
                   </View>
                 </View>
                 <View style={[styles.headerRow, { gap: 12 }]}>

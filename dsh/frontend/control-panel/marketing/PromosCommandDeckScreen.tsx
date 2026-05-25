@@ -11,9 +11,9 @@ import {
   toggleHomePromoStatus,
   type HomePromoRecord,
 } from '../../shared/promo.preview-store';
-import { dshCategoryFixtures } from '../../app-client/data/categories.preview-data';
-import { dshDiscoveryStores } from '../../app-client/data/discovery.preview-data';
-import { storeItemsByStoreId } from '../../app-client/data/items.preview-data';
+import { dshCategoryFixtures } from '../../data/categories.preview-data';
+import { dshDiscoveryStores } from '../../data/discovery.preview-data';
+import { storeItemsByStoreId } from '../../data/items.preview-data';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 
 type PromoEditorSection = 'identity' | 'logic' | 'media';
