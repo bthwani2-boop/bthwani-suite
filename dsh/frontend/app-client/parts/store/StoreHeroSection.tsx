@@ -25,7 +25,6 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
   clientVisibleItems,
   menuItems,
   normalizedStoreName,
-  normalizedStoreSubtitle,
   normalizedEtaLabel,
   storeCoverImageSource,
   storeLogoImageSource,
@@ -49,7 +48,6 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
   setStickyThreshold,
   viewportWidth,
   appearanceChrome,
-  isDarkGlass,
   isRTL,
   styles,
 }: any) {

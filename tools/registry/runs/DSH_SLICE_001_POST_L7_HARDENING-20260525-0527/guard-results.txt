@@ -1,0 +1,46 @@
+> bthwani-suite@0.0.0 openapi:lint:dsh C:\bthwani-suite
+> spectral lint dsh/dsh.openapi.yaml --ruleset .spectral.yaml
+
+(node:14376) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+c:/bthwani-suite/dsh/dsh.openapi.yaml
+  1:1   warning  oas3-api-servers       OpenAPI "servers" must be present and non-empty array.
+  2:6   warning  info-contact           Info object must have "contact" object.                 info
+ 16:11  warning  operation-tag-defined  Operation tags must be defined in global tags.          paths./stores.get.tags[0]
+
+✖ 3 problems (0 errors, 3 warnings, 0 infos, 0 hints)
+
+> bthwani-suite@0.0.0 openapi:types:dsh C:\bthwani-suite
+> openapi-typescript dsh/dsh.openapi.yaml -o dsh/frontend/app-client/contracts/dsh-openapi.types.ts
+
+✨ openapi-typescript 7.13.0
+🚀 dsh/dsh.openapi.yaml → dsh/frontend/app-client/contracts/dsh-openapi.types.ts [48.3ms]
+
+> bthwani-suite@0.0.0 guard:service-runtime C:\bthwani-suite
+> node tools/guards/guard-service-runtime.mjs "--" "--service" "dsh" "--slice" "DSH-SLICE-001"
+
+GUARD_SERVICE_GO_RUNTIME[dsh]: PASS (fail=0, warn=0)
+GUARD_SERVICE_POSTGRES_RUNTIME[dsh]: PASS (fail=0, warn=0)
+GUARD_SERVICE_L7_CLOSURE[dsh]: PASS (fail=0, warn=0)
+GUARD_SERVICE_RUNTIME[dsh]: PASS
+
+> bthwani-suite@0.0.0 guard:tamagui-import-boundary C:\bthwani-suite
+> node tools/guards/guard-ui-architecture-boundary.mjs
+
+UI-ARCH-BOUNDARY: PASS (fail=0, warn=0)
+
+> bthwani-suite@0.0.0 guard:service-blueprint C:\bthwani-suite
+> node tools/guards/guard-service-contract-matrix.mjs
+
+SERVICE-CONTRACT-MATRIX: PASS (fail=0, warn=0)
+
+> bthwani-suite@0.0.0 guard:binding-proof C:\bthwani-suite
+> node tools/guards/guard-api-binding-runtime.mjs
+
+API-BINDING-RUNTIME: PASS (fail=0, warn=0)
+
+> bthwani-suite@0.0.0 guard:secret-scan C:\bthwani-suite
+> node tools/guards/guard-secret-scan.mjs
+
+SECRET-SCAN: WARN (fail=0, warn=1)

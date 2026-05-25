@@ -285,3 +285,8 @@ Next allowed work:
 - **Final Decision:** `L7_CLOSED`.
 - **Performance:** Replaced expensive mapped lists with FlatList, memoized heavy children, fixed scrolling re-renders, and measured 60fps performance on both Home and Store screens.
 - **L7 Closure:** `L7_CLOSED`.
+
+## Post-L7 Frontend Hardening Closure
+- **Final Decision:** `POST_L7_FRONTEND_HARDENING_PASS`.
+- **Sweep:** Zero unused variables, zero Tamagui leaks, zero direct fetches.
+- **Evidence:** Zipped in `tools/registry/runs/DSH_SLICE_001_POST_L7_HARDENING-20260525-0527/ad766e4b-8206-49ac-b422-19f64a726a07.zip`.

@@ -26,7 +26,7 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent(
   const { onOpenList, onOpenCategory, onOpenDiscovery, onOpenStoreCategory, onOpenProduct } = props;
   const { onOpenBenefits, onOpenSearch, onOpenCart, onOpenOrders, onOpenTracking, onOpenStore } = props;
   const { onOpenMySpace, onOpenSheinInfo, onOpenEntry, onRegisterBackHandler, onRetry } = props;
-  const { onPromoClick, onPromoImpression, onVideoCtaClick, onVideoImpression } = props;
+  const { onPromoClick, onPromoImpression, onVideoCtaClick } = props;
   const { sheinInlineVisible = false, awnakInlineVisible = false } = props;
   const { favoriteOverrides, serviceDialTrigger, searchAutoOpenToken = 0 } = props;
 
@@ -221,24 +221,15 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent(
       debouncedInlineSearchQuery={debouncedInlineSearchQuery}
       handleOpenMySpace={handleOpenMySpace}
       handleOpenCartFromHeader={handleOpenCartFromHeader}
-      categoryItems={categoryItems}
       promoHandlers={promoHandlers}
-      activeHomeStoreCards={derivedStores.activeHomeStoreCards}
       selectCategoryPage={selectCategoryPage}
-      selectedCategoryFixture={filterRail.selectedCategoryFixture}
-      selectedCategoryLabel={filterRail.selectedCategoryLabel}
-      allCategoryRailItems={filterRail.allCategoryRailItems}
       filterRail={filterRail}
-      bannerItems={promoHandlers.bannerItems}
       activeHomePromo={activeHomePromo}
       videoHandlers={videoHandlers}
       ticker={ticker}
       openInlineSearch={openInlineSearch}
       closeInlineSearch={closeInlineSearch}
       openServiceDial={openServiceDial}
-      categoriesDialItems={filterRail.categoriesDialItems}
-      activeCategoryDialItem={filterRail.activeCategoryDialItem}
-      selectedSubcategoryCards={filterRail.selectedSubcategoryCards}
     />
   );
 });

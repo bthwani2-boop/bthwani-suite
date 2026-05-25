@@ -86,7 +86,7 @@ export const HomeStoreFeedSection = React.memo(function HomeStoreFeedSection({
   entry,
   props,
   styles,
-  homeState,
+  setLocalFavoriteToggles,
   derivedStores,
   debouncedInlineSearchQuery,
   selectCategoryPage,
@@ -135,7 +135,7 @@ export const HomeStoreFeedSection = React.memo(function HomeStoreFeedSection({
         entry={entry}
         onOpenStore={props.onOpenStore}
         onToggleFavorite={props.onToggleFavorite}
-        setLocalFavoriteToggles={homeState.setLocalFavoriteToggles}
+        setLocalFavoriteToggles={setLocalFavoriteToggles}
       />
     </View>
   );

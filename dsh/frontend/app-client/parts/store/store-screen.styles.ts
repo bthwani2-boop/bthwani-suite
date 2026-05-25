@@ -1,6 +1,5 @@
 import { StyleSheet, Platform } from 'react-native';
-import { colorPalette, withAlpha, resolveRowDirection, resolveTextAlign, type Direction, spacing } from '@bthwani/ui-kit';
-import { useTheme } from '@bthwani/ui-kit';
+import { colorPalette } from '@bthwani/ui-kit';
 
 function hexToRgba(hex: string, opacity: number) {
   let r = 0, g = 0, b = 0;
@@ -13,7 +12,7 @@ function hexToRgba(hex: string, opacity: number) {
     g = parseInt(hex.substring(3, 5), 16);
     b = parseInt(hex.substring(5, 7), 16);
   }
-  return "rgba(${r}, ${g}, ${b}, ${opacity})";
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 export const stylesTokens = {

@@ -4,7 +4,6 @@ import {
   Dimensions,
   Image,
   Platform,
-  Share,
   StatusBar,
   Vibration,
   View,
@@ -15,22 +14,14 @@ import {
   useTheme,
   useUiText,
 } from '@bthwani/ui-kit';
-import { getDshClientStateMeta } from '../../data/client-state.preview-data';
 import { useStoreGestureHandlers } from '../../hooks/useStoreGestureHandlers';
 import { useStoreInlineSearch } from '../../hooks/useStoreInlineSearch';
 import { useStoreMeasurementState } from '../../hooks/useStoreMeasurementState';
 import { useStorePreviewState } from '../../hooks/useStorePreviewState';
+import { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import { StoreMeasurementSheet } from '../../sheets/StoreMeasurementSheet';
 import type { DshStoreGetScreenShellProps } from '../../contracts/dsh-store-screen-props';
-import { resolveDshImageSource } from '../../shared/resolve-image-source';
-import {
-  normalizeDisplayText,
-  normalizeTagLabel,
-  resolveMeasurementOptions,
-  resolveStoreOperationalState,
-} from '../../shared/store-formatting';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
-import { resolveDshStoreClientVisibility } from '../../../shared/dsh-client-visibility.model';
+import { resolveMeasurementOptions } from '../../shared/store-formatting';
 import { StoreHeroSection } from './StoreHeroSection';
 import { StoreImagePreviewSheet } from './StoreImagePreviewSheet';
 import { StoreMenuListSection } from './StoreMenuListSection';
@@ -66,15 +57,30 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
   const storeText = uiText.storeScreen;
   const isDarkGlass = appearanceMode === 'darkGlass' || themeMode === 'dark';
   const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window');
-  const { selectedMode, setSelectedMode, selectedCategory, setSelectedCategory } = storeState;
-  const { pickerItem, setPickerItem, pickerAnchor, setPickerAnchor } = storeState;
-  const { selectedMeasureOption, setSelectedMeasureOption, selectedMeasureQty, setSelectedMeasureQty } = storeState;
-  const { headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery } = storeState;
-  const { addedItemLabel, setAddedItemLabel, previewItem, setPreviewItem } = storeState;
-  const { favoriteIds, setFavoriteIds, isAddedToCart, setIsAddedToCart } = storeState;
+  const { selectedMode, setSelectedMode, selectedCategory, setSelectedCategory, pickerItem, setPickerItem, pickerAnchor, setPickerAnchor } = storeState;
+  const { selectedMeasureOption, setSelectedMeasureOption, selectedMeasureQty, setSelectedMeasureQty, headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery } = storeState;
+  const { addedItemLabel, setAddedItemLabel, previewItem, setPreviewItem, favoriteIds, setFavoriteIds, isAddedToCart, setIsAddedToCart } = storeState;
   const { stickyThreshold, setStickyThreshold, previewActiveIndex, setPreviewActiveIndex } = storeState;
   const { clientVisibleItems, categories, deliveryModes } = derivedItems;
   const appearanceChrome = useStoreAppearanceChrome({ isDarkGlass, tokens });
+
+  // Derived store display values, operational/visibility state, and share/preview/toggle handlers owned by hook
+  const {
+    storeCoverImageSource,
+    storeLogoImageSource,
+    normalizedStoreName,
+    normalizedStoreSubtitle,
+    normalizedEtaLabel,
+    operationalState,
+    storeVisibility,
+    operationalStateMeta,
+    showOperationalNotice,
+    supportActionLabel,
+    handleStoreShare,
+    openStoreItemPreview,
+    handleToggleFavorite,
+  } = useStoreShellDerivedState(store, openImagePreview, setFavoriteIds);
+
   React.useEffect(() => {
     if (deliveryModes.length && !deliveryModes.some((mode: any) => mode.id === selectedMode)) {
       setSelectedMode(deliveryModes[0].id);
@@ -85,37 +91,14 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
       setSelectedCategory(categories[0]?.id ?? 'all');
     }
   }, [categories, selectedCategory, setSelectedCategory]);
-  const storeCoverImageSource = React.useMemo(() => store ? resolveDshImageSource(store.imageUri) : undefined, [store]);
-  const storeLogoImageSource = React.useMemo(
-    () => store ? resolveDshImageSource(store.logoImageUri) || resolveDshImageSource('dsh.brand.logo.v1') : undefined,
-    [store],
-  );
+
   const listRef = React.useRef<any>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const previewListRef = React.useRef<any>(null);
   const previewScrollY = React.useRef(new Animated.Value(0)).current;
-  const normalizedStoreName = normalizeDisplayText(store?.name);
-  const normalizedStoreSubtitle = normalizeDisplayText(store?.subtitle);
-  const normalizedEtaLabel = normalizeDisplayText(store?.etaLabel);
-  const handleToggleFavorite = React.useCallback((id: string) => {
-    setFavoriteIds((prev: ReadonlySet<string>) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, [setFavoriteIds]);
-  const { openInlineSearch, closeInlineSearch } = useStoreInlineSearch({
-    headerSearchVisible,
-    setHeaderSearchVisible,
-    headerSearchQuery,
-    setHeaderSearchQuery,
-  });
-  const { previewAnim, openImagePreview, closeImagePreview } = useStorePreviewState({
-    setPreviewItem,
-    setPreviewActiveIndex,
-    previewItems,
-  });
+
+  const { openInlineSearch, closeInlineSearch } = useStoreInlineSearch({ headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery });
+  const { previewAnim, openImagePreview, closeImagePreview } = useStorePreviewState({ setPreviewItem, setPreviewActiveIndex, previewItems });
   const {
     openMeasurementPicker,
     closeMeasurementPicker,
@@ -152,81 +135,47 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
     setPreviewItem,
     previewListRef,
   });
-  const activeMeasurementOptions = React.useMemo(
-    () => (pickerItem ? resolveMeasurementOptions(pickerItem) : []),
-    [pickerItem],
-  );
-  const measurePopoverTop = React.useMemo(
-    () => Math.max(180, Math.min(pickerAnchor.y - 170, 640)),
-    [pickerAnchor.y],
-  );
+
+  const activeMeasurementOptions = React.useMemo(() => (pickerItem ? resolveMeasurementOptions(pickerItem) : []), [pickerItem]);
+  const measurePopoverTop = React.useMemo(() => Math.max(180, Math.min(pickerAnchor.y - 170, 640)), [pickerAnchor.y]);
   const measurementAppearance = useStoreMeasurementAppearance({ appearanceChrome, isDarkGlass, theme, tokens });
 
-  const operationalState = React.useMemo(
-    () => resolveStoreOperationalState(store?.statusLabel ?? '', store?.deliveryLabel, store?.serviceLabel),
-    [store?.deliveryLabel, store?.serviceLabel, store?.statusLabel],
-  );
-  const storeVisibility = React.useMemo(() => resolveDshStoreClientVisibility({
-    publishStage: store?.publishStage,
-    deliveryModesReady: Boolean(store?.deliveryModes?.some((mode) => mode.isAvailable)),
-    serviceabilityAvailable: operationalState !== 'area_unserviceable',
-    serviceLabel: store?.serviceLabel,
-    deliveryLabel: store?.deliveryLabel,
-    storeOpen: operationalState === 'store_open',
-    inZone: operationalState !== 'area_unserviceable',
-  }), [operationalState, store?.deliveryLabel, store?.deliveryModes, store?.publishStage, store?.serviceLabel]);
-  const operationalStateMeta = React.useMemo(() => getDshClientStateMeta(operationalState), [operationalState]);
-  const showOperationalNotice = operationalState !== 'store_open';
-  const supportActionLabel = operationalState === 'area_unserviceable' ? 'تحديث العنوان أو طلب الدعم' : 'طلب الدعم';
-  const handleStoreShare = React.useCallback(async () => {
-    try {
-      await Share.share({ title: normalizedStoreName, message: `${normalizedStoreName} • ${normalizedStoreSubtitle}` });
-    } catch {
-      // sharing may be dismissed without completing the action
-    }
-  }, [normalizedStoreName, normalizedStoreSubtitle]);
-  const openStoreItemPreview = React.useCallback((item?: DshStoreGetMenuItem | null) => {
-    if (item) openImagePreview(item);
-  }, [openImagePreview]);
-
   const listHeader = React.useMemo(() => (
-    <>
-      <StoreHeroSection
-        store={store}
-        storeText={storeText}
-        visibleItems={visibleItems}
-        clientVisibleItems={clientVisibleItems}
-        menuItems={menuItems}
-        normalizedStoreName={normalizedStoreName}
-        normalizedStoreSubtitle={normalizedStoreSubtitle}
-        normalizedEtaLabel={normalizedEtaLabel}
-        storeCoverImageSource={storeCoverImageSource}
-        storeLogoImageSource={storeLogoImageSource}
-        operationalState={operationalState}
-        operationalStateMeta={operationalStateMeta}
-        showOperationalNotice={showOperationalNotice}
-        supportActionLabel={supportActionLabel}
-        onSupport={onSupport}
-        onOpenCart={onOpenCart}
-        onOpenItems={onOpenItems}
-        onOpenBenefits={onOpenBenefits}
-        handleStoreShare={handleStoreShare}
-        openStoreItemPreview={openStoreItemPreview}
-        changeCategory={changeCategory}
-        setSelectedMode={setSelectedMode}
-        selectedMode={selectedMode}
-        deliveryModes={deliveryModes}
-        scrollY={scrollY}
-        stickyThreshold={stickyThreshold}
-        setStickyThreshold={setStickyThreshold}
-        viewportWidth={viewportWidth}
-        appearanceChrome={appearanceChrome}
-        isDarkGlass={isDarkGlass}
-        isRTL={isRTL}
-        styles={styles}
-        openInlineSearch={openInlineSearch}
-      />
-    </>
+    <StoreHeroSection
+      store={store}
+      storeText={storeText}
+      visibleItems={visibleItems}
+      clientVisibleItems={clientVisibleItems}
+      menuItems={menuItems}
+      normalizedStoreName={normalizedStoreName}
+      normalizedStoreSubtitle={normalizedStoreSubtitle}
+      normalizedEtaLabel={normalizedEtaLabel}
+      storeCoverImageSource={storeCoverImageSource}
+      storeLogoImageSource={storeLogoImageSource}
+      operationalState={operationalState}
+      operationalStateMeta={operationalStateMeta}
+      showOperationalNotice={showOperationalNotice}
+      supportActionLabel={supportActionLabel}
+      onSupport={onSupport}
+      onOpenCart={onOpenCart}
+      onOpenItems={onOpenItems}
+      onOpenBenefits={onOpenBenefits}
+      handleStoreShare={handleStoreShare}
+      openStoreItemPreview={openStoreItemPreview}
+      changeCategory={changeCategory}
+      setSelectedMode={setSelectedMode}
+      selectedMode={selectedMode}
+      deliveryModes={deliveryModes}
+      scrollY={scrollY}
+      stickyThreshold={stickyThreshold}
+      setStickyThreshold={setStickyThreshold}
+      viewportWidth={viewportWidth}
+      appearanceChrome={appearanceChrome}
+      isDarkGlass={isDarkGlass}
+      isRTL={isRTL}
+      styles={styles}
+      openInlineSearch={openInlineSearch}
+    />
   ), [appearanceChrome, changeCategory, clientVisibleItems, deliveryModes, handleStoreShare, isDarkGlass, isRTL, menuItems, normalizedEtaLabel, normalizedStoreName, normalizedStoreSubtitle, onOpenBenefits, onOpenCart, onOpenItems, onSupport, openInlineSearch, openStoreItemPreview, operationalState, operationalStateMeta, scrollY, selectedMode, setSelectedMode, setStickyThreshold, showOperationalNotice, stickyThreshold, store, storeCoverImageSource, storeLogoImageSource, storeText, supportActionLabel, visibleItems, viewportWidth]);
 
   if (state !== 'ready') {

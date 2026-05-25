@@ -6,18 +6,51 @@ import { HomeFilterRailSection } from './HomeFilterRailSection';
 import { HomeHeaderSection } from './HomeHeaderSection';
 import { HomeCategoryDialSection, HomeServiceDialSection } from './HomeOrbitSections';
 import { HomePromoSection } from './HomePromoSection';
-import { HomeStoreFeedSection } from './HomeStoreFeedSection';
+import { HomeStoreFeedSection, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { HomeVideoReelsSection } from './HomeVideoReelsSection';
+import type { DshHomeGetScreenProps, DshHomeCategory } from '../../contracts/dsh-home-types';
+import type { useHomeState } from '../../hooks/useHomeState';
+import type { useHomeDerivedStores } from '../../hooks/useHomeDerivedStores';
+import type { useHomePromoHandlers } from '../../hooks/useHomePromoHandlers';
+import type { useHomeFilterRail } from '../../hooks/useHomeFilterRail';
+import type { useHomeVideoHandlers } from '../../hooks/useHomeVideoHandlers';
+import type { useHomeTickerState } from '../../hooks/useHomeTickerState';
 
-function renderState(state: any, onRetry?: () => void) {
-  const titles: any = {
+export interface HomeScreenShellProps {
+  props: DshHomeGetScreenProps;
+  state: 'loading' | 'empty' | 'offline' | 'disabled' | 'error' | 'ready' | string;
+  onRetry?: () => void;
+  isRtl: boolean;
+  viewportWidth: number;
+  theme: any;
+  uiText: any;
+  styles: any;
+  categoriesAnchorRef: React.RefObject<any>;
+  homeState: ReturnType<typeof useHomeState>;
+  derivedStores: ReturnType<typeof useHomeDerivedStores>;
+  promoHandlers: ReturnType<typeof useHomePromoHandlers>;
+  filterRail: ReturnType<typeof useHomeFilterRail>;
+  videoHandlers: ReturnType<typeof useHomeVideoHandlers>;
+  ticker: ReturnType<typeof useHomeTickerState>;
+  debouncedInlineSearchQuery: string;
+  handleOpenMySpace: () => void;
+  handleOpenCartFromHeader: () => void;
+  selectCategoryPage: (categoryId: string, animated?: boolean) => void;
+  activeHomePromo: any;
+  openInlineSearch: () => void;
+  closeInlineSearch: () => void;
+  openServiceDial: () => void;
+}
+
+function renderState(state: 'loading' | 'empty' | 'offline' | 'disabled' | 'error' | 'ready' | string, onRetry?: () => void) {
+  const titles: Record<string, string> = {
     loading: 'جاري التحميل...',
     empty: 'لا توجد بيانات عرض بعد',
     offline: 'أنت غير متصل بالإنترنت',
     disabled: 'الواجهة الرئيسية موقوفة مؤقتاً',
     error: 'تعذر تحميل الواجهة الرئيسية',
   };
-  const descriptions: any = {
+  const descriptions: Record<string, string> = {
     loading: 'يرجى الانتظار بينما نقوم بتجهيز تجربتك المخصصة.',
     empty: 'أعد المحاولة لاستعادة الواجهة الرئيسية واختصاراتها.',
     offline: 'يرجى التحقق من اتصالك بالشبكة للمتابعة.',
@@ -51,22 +84,15 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
   handleOpenMySpace,
   handleOpenCartFromHeader,
   promoHandlers,
-  activeHomeStoreCards,
-  selectCategoryPage,
-  selectedCategoryFixture,
-  selectedCategoryLabel,
   filterRail,
-  bannerItems,
-  activeHomePromo,
   videoHandlers,
   ticker,
+  selectCategoryPage,
+  activeHomePromo,
   openInlineSearch,
   closeInlineSearch,
   openServiceDial,
-  categoriesDialItems,
-  activeCategoryDialItem,
-  selectedSubcategoryCards,
-}: any) {
+}: HomeScreenShellProps) {
   const fallbackCategoriesDialLayout = React.useMemo(() => ({
     x: isRtl ? Math.max(spacing[3], viewportWidth - spacing[3] - 54) : spacing[3],
     y: spacing[14],
@@ -75,7 +101,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
   }), [isRtl, viewportWidth]);
 
   const openCategoriesDial = React.useCallback(() => {
-    const openSheet = (layout?: any) => {
+    const openSheet = (layout?: { x: number; y: number; width: number; height: number }) => {
       homeState.setCategoriesDialLayout(layout ?? fallbackCategoriesDialLayout);
       homeState.setCategoriesSheetVisible(true);
     };
@@ -90,8 +116,8 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
   }, [fallbackCategoriesDialLayout, homeState, categoriesAnchorRef]);
 
   const listData = React.useMemo(
-    () => activeHomeStoreCards.length ? activeHomeStoreCards : ['empty'],
-    [activeHomeStoreCards],
+    () => derivedStores.activeHomeStoreCards.length ? derivedStores.activeHomeStoreCards : ['empty'],
+    [derivedStores.activeHomeStoreCards],
   );
   const containerWidth = viewportWidth;
   const sidePeek = Math.max(spacing[1], Math.min(spacing[4], Math.round(containerWidth * 0.045)));
@@ -138,7 +164,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
           showsVerticalScrollIndicator={false}
           stickySectionHeadersEnabled
           sections={[{ data: listData }]}
-          keyExtractor={(item: any, index) => (item === 'empty' ? `empty-${index}` : item.storeId)}
+          keyExtractor={(item: HomeStoreCardEntry | 'empty', index) => (item === 'empty' ? `empty-${index}` : item.storeId)}
           initialNumToRender={6}
           maxToRenderPerBatch={6}
           windowSize={7}
@@ -149,13 +175,13 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
               theme={theme}
               styles={styles}
               homeState={homeState}
-              bannerItems={bannerItems}
+              bannerItems={promoHandlers.bannerItems}
               activeHomePromo={activeHomePromo}
               promoHandlers={promoHandlers}
-              selectedCategoryFixture={selectedCategoryFixture}
-              selectedCategoryLabel={selectedCategoryLabel}
-              selectedSubcategoryCards={selectedSubcategoryCards}
-              activeCategoryDialItem={activeCategoryDialItem}
+              selectedCategoryFixture={filterRail.selectedCategoryFixture}
+              selectedCategoryLabel={filterRail.selectedCategoryLabel}
+              selectedSubcategoryCards={filterRail.selectedSubcategoryCards}
+              activeCategoryDialItem={filterRail.activeCategoryDialItem}
               categoriesAnchorRef={categoriesAnchorRef}
               openCategoriesDial={openCategoriesDial}
               containerWidth={containerWidth}
@@ -166,12 +192,12 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
           renderSectionHeader={() => (
             <HomeFilterRailSection filterRail={filterRail} homeState={homeState} styles={styles} />
           )}
-          renderItem={({ item: entry }: any) => (
+          renderItem={({ item: entry }: { item: HomeStoreCardEntry | 'empty' }) => (
             <HomeStoreFeedSection
               entry={entry}
               props={props}
               styles={styles}
-              homeState={homeState}
+              setLocalFavoriteToggles={homeState.setLocalFavoriteToggles}
               derivedStores={derivedStores}
               debouncedInlineSearchQuery={debouncedInlineSearchQuery}
               selectCategoryPage={selectCategoryPage}
@@ -186,7 +212,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
       <HomeCategoryDialSection
         props={props}
         homeState={homeState}
-        categoriesDialItems={categoriesDialItems}
+        categoriesDialItems={filterRail.categoriesDialItems}
         selectCategoryPage={selectCategoryPage}
       />
       <HomeServiceDialSection props={props} homeState={homeState} />
