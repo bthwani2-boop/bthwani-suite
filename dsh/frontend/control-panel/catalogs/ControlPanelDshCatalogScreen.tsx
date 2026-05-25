@@ -2,20 +2,15 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, Tabs, ListItem, Divider, useTheme } from '@bthwani/ui-kit';
-import { WebControlPanelCompactPager, WebControlPanelRecommendation, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
+import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
+import { WebControlPanelCompactPager, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import {
-  dshCatalogMetrics,
   dshCatalogCategories,
   dshCatalogProducts,
   CatalogProductMaster,
   CatalogMainCategory,
   CatalogSubCategory,
-  CatalogMainClassification
 } from './catalog';
-import { getCatalogAdoptionItems } from '../../data/marketing.preview-data';
-import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner } from '../../shared/workflow';
-import { getDshControlPanelGovernanceEntry } from '../shared';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -237,9 +232,6 @@ export function ControlPanelDshCatalogScreen({
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
   const { theme } = useTheme();
-  const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
-  const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
-  const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
   const [activeTab, setActiveTab] = useState<string>('catalog');
   const [activeSubTab, setActiveSubTab] = useState<string>('');
   const [showBulkOps, setShowBulkOps] = useState(false);
@@ -249,7 +241,24 @@ export function ControlPanelDshCatalogScreen({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [catalogPage, setCatalogPage] = useState(1);
-  const [showGovDashboard, setShowGovDashboard] = useState(false);
+  // Preview-only approval stage overrides — no backend
+  const [previewApprovalStages, setPreviewApprovalStages] = useState<Record<string, string>>({});
+
+  // ── Category Control Room State (Preview-Only) ────────────────────
+  const [previewCategories, setPreviewCategories] = useState<CatalogMainCategory[]>(
+    () => dshCatalogCategories.map((c) => ({ ...c, subcategories: [...c.subcategories] }))
+  );
+  const [hiddenCategoryIds, setHiddenCategoryIds] = useState<ReadonlySet<string>>(new Set());
+  const [categoryControlOpen, setCategoryControlOpen] = useState(false);
+  const [addingMainCat, setAddingMainCat] = useState(false);
+  const [addingSubUnder, setAddingSubUnder] = useState<string | null>(null);
+  const [formLabel, setFormLabel] = useState('');
+  const [formSubtitle, setFormSubtitle] = useState('');
+  const [catError, setCatError] = useState<string | null>(null);
+  type CatEditEntry = { type: 'main' | 'sub'; mainId: string; subId?: string };
+  const [editingEntry, setEditingEntry] = useState<CatEditEntry | null>(null);
+  const [editLabel, setEditLabel] = useState('');
+  const [editSubtitle, setEditSubtitle] = useState('');
 
   const PRIMARY_TABS = [
     { id: 'all', label: 'الكل' },
@@ -314,6 +323,103 @@ export function ControlPanelDshCatalogScreen({
     setActiveSubCategory(null);
     setSelectedProductId(null);
   };
+
+  // ── Category Control Room Handlers (Preview-Only) ────────────────
+  const effectiveCategories = useMemo(
+    () => previewCategories.filter((c) => !hiddenCategoryIds.has(c.id)),
+    [previewCategories, hiddenCategoryIds]
+  );
+
+  const getProductCountForCategory = React.useCallback(
+    (mainId: string, subId?: string): number =>
+      dshCatalogProducts.filter(
+        (p) => p.categoryPath.main === mainId && (subId ? p.categoryPath.sub === subId : true)
+      ).length,
+    []
+  );
+
+  const handleAddMainCategory = React.useCallback(() => {
+    const label = formLabel.trim();
+    if (!label) { setCatError('الاسم مطلوب'); return; }
+    if (previewCategories.some((c) => c.label.trim() === label)) { setCatError('هذا الاسم موجود مسبقاً'); return; }
+    const id = `cat-preview-${label.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
+    const emoji = label[0] ?? '📦';
+    const newCat: CatalogMainCategory = {
+      id, label, subtitle: formSubtitle.trim(),
+      subcategories: [], emojiFallback: emoji,
+      defaultMediaPolicy: 'catalog-owned-media', categoryMode: 'catalog-based',
+    };
+    setPreviewCategories((prev) => [...prev, newCat]);
+    setFormLabel(''); setFormSubtitle(''); setAddingMainCat(false); setCatError(null);
+  }, [formLabel, formSubtitle, previewCategories]);
+
+  const handleAddSubCategory = React.useCallback((parentId: string) => {
+    const label = formLabel.trim();
+    if (!label) { setCatError('الاسم مطلوب'); return; }
+    let hasError = false;
+    setPreviewCategories((prev) => prev.map((cat) => {
+      if (cat.id !== parentId) return cat;
+      if (cat.subcategories.some((s) => s.label.trim() === label)) {
+        hasError = true; return cat;
+      }
+      const id = `subcat-preview-${label.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
+      return { ...cat, subcategories: [...cat.subcategories, { id, label, subtitle: formSubtitle.trim() }] };
+    }));
+    if (hasError) { setCatError('اسم مكرر في هذه الفئة'); return; }
+    setFormLabel(''); setFormSubtitle(''); setAddingSubUnder(null); setCatError(null);
+  }, [formLabel, formSubtitle]);
+
+  const handleToggleCategoryHide = React.useCallback((id: string) => {
+    setHiddenCategoryIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next as ReadonlySet<string>;
+    });
+  }, []);
+
+  const handleResetCategoryPreview = React.useCallback(() => {
+    setPreviewCategories(dshCatalogCategories.map((c) => ({ ...c, subcategories: [...c.subcategories] })));
+    setHiddenCategoryIds(new Set());
+    setAddingMainCat(false); setAddingSubUnder(null);
+    setFormLabel(''); setFormSubtitle(''); setCatError(null); setEditingEntry(null);
+  }, []);
+
+  const handleStartCatEdit = React.useCallback((type: 'main' | 'sub', mainId: string, subId?: string) => {
+    const cat = previewCategories.find((c) => c.id === mainId);
+    if (!cat) return;
+    if (type === 'main') { setEditLabel(cat.label); setEditSubtitle(cat.subtitle); }
+    else {
+      const sub = cat.subcategories.find((s) => s.id === subId);
+      if (!sub) return;
+      setEditLabel(sub.label); setEditSubtitle(sub.subtitle);
+    }
+    setEditingEntry({ type, mainId, subId }); setCatError(null);
+    setAddingMainCat(false); setAddingSubUnder(null);
+  }, [previewCategories]);
+
+  const handleApplyCatEdit = React.useCallback(() => {
+    if (!editingEntry) return;
+    const label = editLabel.trim();
+    if (!label) { setCatError('الاسم مطلوب'); return; }
+    setPreviewCategories((prev) => {
+      if (editingEntry.type === 'main') {
+        if (prev.some((c) => c.id !== editingEntry.mainId && c.label.trim() === label)) {
+          setCatError('هذا الاسم موجود مسبقاً'); return prev;
+        }
+        return prev.map((c) => c.id === editingEntry.mainId ? { ...c, label, subtitle: editSubtitle.trim() } : c);
+      } else {
+        return prev.map((cat) => {
+          if (cat.id !== editingEntry.mainId) return cat;
+          return {
+            ...cat, subcategories: cat.subcategories.map((s) =>
+              s.id === editingEntry.subId ? { ...s, label, subtitle: editSubtitle.trim() } : s
+            ),
+          };
+        });
+      }
+    });
+    setEditingEntry(null); setEditLabel(''); setEditSubtitle(''); setCatError(null);
+  }, [editingEntry, editLabel, editSubtitle]);
 
   const selectedProduct = useMemo(() => dshCatalogProducts.find(p => p.id === selectedProductId) ?? null, [selectedProductId]);
   const isManualOrderCategory = activeMainCategory?.categoryMode === 'manual-order';
@@ -484,14 +590,93 @@ export function ControlPanelDshCatalogScreen({
     setCatalogPage((currentPage) => Math.min(currentPage, catalogTotalPages));
   }, [catalogTotalPages]);
 
-  const closureRecommendations = [
-    'Bulk review للمنتجات المتقاربة',
-    'Duplicate merge قبل النشر',
-    'Barcode conflict وGTIN mismatch',
-    'Category mapping وقياس التصنيف',
-    'Substitution / replacement قبل قبول البديل',
-    'Media + client visibility audit',
-  ] as const;
+  // ── Contextual Micro Action Strip ────────────────────────────────────
+  // Computed from activeTab + activeSubTab. Each action must change state and
+  // reflect active state visually. No action may repeat the tab label itself.
+  type MicroAction = { id: string; label: string; isActive: boolean; onAction: () => void };
+  const microActions = useMemo((): MicroAction[] => {
+    const actions: MicroAction[] = [];
+
+    if (activeTab === 'mapping') {
+      if (activeSubTab === 'gtin') {
+        actions.push(
+          { id: 'ma-gtin-conflict', label: 'حل تعارض GTIN', isActive: activeFilter === 'conflict', onAction: () => setActiveFilter('conflict') },
+          { id: 'ma-gtin-missing', label: 'عرض ناقصي الباركود', isActive: activeFilter === 'needs-link', onAction: () => setActiveFilter('needs-link') },
+        );
+      } else if (activeSubTab === 'duplicates') {
+        actions.push(
+          { id: 'ma-dup-conflicts', label: 'عرض التكرارات', isActive: activeFilter === 'conflict', onAction: () => setActiveFilter('conflict') },
+          { id: 'ma-dup-review', label: 'مراجعة التشابه', isActive: activeFilter === 'review', onAction: () => setActiveFilter('review') },
+          { id: 'ma-dup-batch', label: 'إجراءات جماعية', isActive: showBulkOps, onAction: () => setShowBulkOps((v) => !v) },
+        );
+      } else if (activeSubTab === 'categories') {
+        actions.push(
+          { id: 'ma-cat-manage', label: 'إدارة الفئات', isActive: categoryControlOpen, onAction: () => setCategoryControlOpen((v) => !v) },
+          { id: 'ma-cat-unclassified', label: 'عرض غير المصنف', isActive: activeFilter === 'needs-link', onAction: () => setActiveFilter('needs-link') },
+          { id: 'ma-cat-all', label: 'كل المصنف', isActive: activeFilter === 'all', onAction: () => setActiveFilter('all') },
+          { id: 'ma-cat-batch', label: 'ربط المحدد بفئة', isActive: showBulkOps, onAction: () => setShowBulkOps((v) => !v) },
+        );
+      } else if (activeSubTab === 'substitutions') {
+        actions.push(
+          { id: 'ma-sub-candidates', label: 'عرض المرشحين', isActive: activeFilter === 'all', onAction: () => setActiveFilter('all') },
+          { id: 'ma-sub-conflict', label: 'عرض التعارضات', isActive: activeFilter === 'conflict', onAction: () => setActiveFilter('conflict') },
+        );
+      } else if (activeSubTab === 'visibility-policy') {
+        actions.push(
+          { id: 'ma-vis-active', label: 'ظاهر للعميل', isActive: activeFilter === 'active', onAction: () => setActiveFilter('active') },
+          { id: 'ma-vis-hidden', label: 'عرض المخفي', isActive: activeFilter === 'review', onAction: () => setActiveFilter('review') },
+        );
+      }
+    } else if (activeTab === 'publishing') {
+      actions.push(
+        { id: 'ma-pub-ready', label: 'الجاهز للنشر', isActive: activeSubTab === 'ready', onAction: () => setActiveSubTab('ready') },
+        { id: 'ma-pub-visible', label: 'ظاهر للعميل', isActive: activeSubTab === 'client-visible', onAction: () => setActiveSubTab('client-visible') },
+        { id: 'ma-pub-hidden', label: 'المخفي', isActive: activeSubTab === 'hidden', onAction: () => setActiveSubTab('hidden') },
+        { id: 'ma-pub-approve', label: 'اعتماد الجاهز', isActive: showBulkOps && activeSubTab === 'ready', onAction: () => { setActiveSubTab('ready'); setShowBulkOps(true); } },
+      );
+    } else if (activeTab === 'approvals') {
+      if (activeSubTab === 'marketing') {
+        actions.push(
+          { id: 'ma-appr-batch', label: 'اعتماد الدفعة', isActive: showBulkOps, onAction: () => setShowBulkOps((v) => !v) },
+          { id: 'ma-appr-partner', label: 'عرض استثناءات الشريك', isActive: activeFilter === 'partner', onAction: () => setActiveFilter('partner') },
+        );
+      } else if (activeSubTab === 'quality') {
+        actions.push(
+          { id: 'ma-qa-images', label: 'مراجعة الصور', isActive: activeFilter === 'needs-image', onAction: () => setActiveFilter('needs-image') },
+          { id: 'ma-qa-review', label: 'بانتظار الجودة', isActive: activeFilter === 'review', onAction: () => setActiveFilter('review') },
+        );
+      } else if (activeSubTab === 'barcode') {
+        actions.push(
+          { id: 'ma-bc-conflict', label: 'حل تعارض الباركود', isActive: activeFilter === 'conflict', onAction: () => setActiveFilter('conflict') },
+          { id: 'ma-bc-match', label: 'مطابقة بالمعرف', isActive: activeFilter === 'needs-link', onAction: () => setActiveFilter('needs-link') },
+        );
+      } else if (activeSubTab === 'media') {
+        actions.push(
+          { id: 'ma-media-missing', label: 'يحتاج صورة', isActive: activeFilter === 'needs-image', onAction: () => setActiveFilter('needs-image') },
+          { id: 'ma-media-partner', label: 'صور الشريك', isActive: activeFilter === 'partner', onAction: () => setActiveFilter('partner') },
+        );
+      } else if (activeSubTab === 'pricing') {
+        actions.push(
+          { id: 'ma-price-conflict', label: 'تعارض السعر', isActive: activeFilter === 'conflict', onAction: () => setActiveFilter('conflict') },
+          { id: 'ma-price-partner', label: 'استثناءات التسعير', isActive: activeFilter === 'partner', onAction: () => setActiveFilter('partner') },
+        );
+      }
+    } else if (activeTab === 'catalog') {
+      actions.push(
+        { id: 'ma-cat-master', label: 'عرض المركزي', isActive: activeFilter === 'master', onAction: () => setActiveFilter('master') },
+        { id: 'ma-cat-exceptions', label: 'عرض الاستثناءات', isActive: activeFilter === 'partner', onAction: () => setActiveFilter('partner') },
+        { id: 'ma-cat-needs-review', label: 'يحتاج مراجعة', isActive: activeFilter === 'review', onAction: () => setActiveFilter('review') },
+      );
+    } else if (activeTab === 'intake') {
+      actions.push(
+        { id: 'ma-intake-quick', label: 'إدخال سريع', isActive: activeSubTab === 'quick', onAction: () => setActiveSubTab('quick') },
+        { id: 'ma-intake-partner', label: 'مقترح الشريك', isActive: activeSubTab === 'partner', onAction: () => setActiveSubTab('partner') },
+        { id: 'ma-intake-field', label: 'المسح الميداني', isActive: activeSubTab === 'field', onAction: () => setActiveSubTab('field') },
+      );
+    }
+    return actions;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, activeSubTab, activeFilter, showBulkOps]);
 
   const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
     <th style={{ padding: '6px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width, position: 'relative' }}>
@@ -654,12 +839,14 @@ export function ControlPanelDshCatalogScreen({
                   >
                     الكل
                   </button>
-                  {dshCatalogCategories.map(cat => {
+                  {effectiveCategories.map(cat => {
                     const isSelected = activeMainCategory?.id === cat.id;
+                    const isHidden = hiddenCategoryIds.has(cat.id);
                     return (
                       <button
                         key={cat.id}
                         onClick={() => handleMainCategorySelect(cat)}
+                        title={isHidden ? 'مخفي (معاينة)' : undefined}
                         style={{
                           padding: '2px 8px',
                           borderRadius: '10px',
@@ -670,9 +857,10 @@ export function ControlPanelDshCatalogScreen({
                           backgroundColor: isSelected ? theme.brandSurface : theme.surface,
                           color: isSelected ? theme.brand : theme.textMuted,
                           whiteSpace: 'nowrap',
+                          opacity: isHidden ? 0.5 : 1,
                         }}
                       >
-                        {cat.label}
+                        {cat.emojiFallback} {cat.label}
                       </button>
                     );
                   })}
@@ -681,13 +869,6 @@ export function ControlPanelDshCatalogScreen({
             </div>
 
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-              <Button
-                label={showGovDashboard ? "إخفاء الحوكمة" : "توصيات الحوكمة"}
-                tone="secondary"
-                size="sm"
-                onPress={() => setShowGovDashboard(!showGovDashboard)}
-                style={{ paddingVertical: 2, paddingHorizontal: 8 }}
-              />
               <Button
                 label={showBulkOps ? "إغلاق الإجراءات" : "إجراءات جماعية"}
                 tone={showBulkOps ? "brand" : "secondary"}
@@ -734,6 +915,37 @@ export function ControlPanelDshCatalogScreen({
               );
             })}
           </div>
+
+          {/* Sub-row 3: Contextual Micro Action Strip — no tab label repetition */}
+          {microActions.length > 0 && (
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap', borderTop: `1px solid ${theme.line}`, paddingTop: '6px' }}>
+              <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>إجراء:</Text>
+              {microActions.map((action) => {
+                const isActive = action.isActive;
+                return (
+                  <button
+                    key={action.id}
+                    onClick={action.onAction}
+                    aria-label={action.label}
+                    style={{
+                      padding: '2px 10px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      border: `1px solid ${isActive ? theme.brand : theme.line}`,
+                      cursor: 'pointer',
+                      backgroundColor: isActive ? theme.brandSurface : theme.surfaceInset,
+                      color: isActive ? theme.brand : theme.brandHeaderBackground,
+                      transition: 'all 0.12s ease',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {action.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </Surface>
 
@@ -803,136 +1015,253 @@ export function ControlPanelDshCatalogScreen({
         )}
       </div>
 
-      {/* Collapsible Governance Panel */}
-      {showGovDashboard && (
-        <Box paddingX={3} paddingY={2} style={{ backgroundColor: theme.surface, borderBottomWidth: 1, borderBottomColor: theme.line }}>
-          <WebControlPanelRecommendation
-            title="تثبيت حوكمة الكتالوج"
-            reason={`القسم المالك: ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} ·  الشريك يحرر السعر والمخزون محليًا فقط · النشر والتعارض والباركود تُراجع on-demand عبر الكتالوج، مع handoff إلى ${partnersGovernance?.sectionLabel ?? 'Partners'} و${marketingGovernance?.sectionLabel ?? 'Marketing'} عند الحاجة.`}
-            confidence="high"
-            auditTag="catalogs"
-            primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
-            secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner') }}
-          />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px', marginTop: '10px' }}>
-            {[
-              {
-                id: 'group-review',
-                title: 'مراجعة جماعية للمنتجات المتقاربة',
-                desc: 'تحليل وتدقيق الأسعار والمخزون للمجموعات المتشابهة لتفادي التباين وتوحيد الأصول.',
-                icon: '🔄',
-                accent: theme.brand,
-                action: () => {
-                  setActiveTab('mapping');
-                  setActiveSubTab('duplicates');
-                  setActiveFilter('review');
-                }
-              },
-              {
-                id: 'duplicates',
-                title: 'دمج التكرارات قبل النشر',
-                desc: 'دمج بطاقات المنتجات المتطابقة لضمان ظهور منتج موحد وقاعدة بيانات خالية من الضجيج.',
-                icon: '👥',
-                accent: theme.success,
-                action: () => {
-                  setActiveTab('mapping');
-                  setActiveSubTab('duplicates');
-                  setActiveFilter('all');
-                }
-              },
-              {
-                id: 'barcode',
-                title: 'تعارض الباركود ومعرفات GTIN',
-                desc: 'التحقق التلقائي من تطابق الباركود والمعرفات الدولية لمنع تداخل المنتجات.',
-                icon: '⚠️',
-                accent: theme.danger,
-                action: () => {
-                  setActiveTab('mapping');
-                  setActiveSubTab('gtin');
-                  setActiveFilter('conflict');
-                }
-              },
-              {
-                id: 'category-mapping',
-                title: 'ربط الفئات وقياس التصنيف',
-                desc: 'خرائط الفئات الذكية لربط أقسام الشركاء بأقسام العميل بدقة رقمية كاملة.',
-                icon: '🏷️',
-                accent: theme.brand,
-                action: () => {
-                  setActiveTab('mapping');
-                  setActiveSubTab('categories');
-                  setActiveFilter('all');
-                }
-              },
-              {
-                id: 'substitutions',
-                title: 'إدارة البدائل والتعويض',
-                desc: 'اقتراح البدائل الذكية للعميل في حالة عدم توفر المنتج لدى الشريك لضمان استمرارية الطلب.',
-                icon: '🔄',
-                accent: theme.warning,
-                action: () => {
-                  setActiveTab('mapping');
-                  setActiveSubTab('substitutions');
-                  setActiveFilter('all');
-                }
-              },
-              {
-                id: 'media-audit',
-                title: 'تدقيق الوسائط والظهور للعميل',
-                desc: 'تطبيق سياسة مائية موحدة وتدقيق الجودة قبل منح علامة النشاط والظهور النهائي.',
-                icon: '👁️',
-                accent: theme.success,
-                action: () => {
-                  setActiveTab('publishing');
-                  setActiveSubTab('client-visible');
-                  setActiveFilter('all');
-                }
-              },
-            ].map((card) => {
-              const isActive = (card.id === 'barcode' && activeTab === 'mapping' && activeSubTab === 'gtin' && activeFilter === 'conflict') ||
-                              (card.id === 'duplicates' && activeTab === 'mapping' && activeSubTab === 'duplicates' && activeFilter === 'all') ||
-                              (card.id === 'group-review' && activeTab === 'mapping' && activeSubTab === 'duplicates' && activeFilter === 'review') ||
-                              (card.id === 'media-audit' && activeTab === 'publishing' && activeSubTab === 'client-visible') ||
-                              (card.id === 'substitutions' && activeTab === 'mapping' && activeSubTab === 'substitutions') ||
-                              (card.id === 'category-mapping' && activeTab === 'mapping' && activeSubTab === 'categories');
 
-              return (
+      {/* Category Control Room — preview-only, shows when mapping/categories */}
+      {activeTab === 'mapping' && activeSubTab === 'categories' && (
+        <div style={{
+          backgroundColor: theme.surface,
+          borderBottom: `1px solid ${theme.line}`,
+          flexShrink: 0,
+        }}>
+          {/* Toggle header */}
+          <button
+            onClick={() => setCategoryControlOpen((v) => !v)}
+            aria-label="تبديل وضع إدارة الفئات"
+            style={{
+              width: '100%', appearance: 'none', border: 'none',
+              backgroundColor: categoryControlOpen ? theme.brandSurface : theme.surfaceInset,
+              borderBottom: categoryControlOpen ? `1px solid ${theme.brand}` : 'none',
+              padding: '5px 14px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '10px', fontWeight: 800, color: categoryControlOpen ? theme.brand : theme.textMuted }}>
+                🏷️ إدارة الفئات
+              </span>
+              <span style={{ fontSize: '9px', color: theme.warning, fontWeight: 700 }}>
+                • معاينة فقط — لا حفظ دائم
+              </span>
+              <span style={{ fontSize: '9px', color: theme.textMuted }}>
+                ({previewCategories.length} فئة • {hiddenCategoryIds.size > 0 ? `${hiddenCategoryIds.size} مخفي` : 'لا مخفي'})
+              </span>
+            </div>
+            <span style={{ fontSize: '9px', color: theme.textMuted }}>{categoryControlOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {/* Expanded panel */}
+          {categoryControlOpen && (
+            <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
+
+              {/* Error banner */}
+              {catError && (
+                <div style={{
+                  padding: '4px 10px', borderRadius: '4px', backgroundColor: theme.dangerSurface ?? theme.surfaceInset,
+                  border: `1px solid ${theme.danger}`, fontSize: '10px', color: theme.danger, fontWeight: 700,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <span>{catError}</span>
+                  <button onClick={() => setCatError(null)} style={{ appearance: 'none', border: 'none', background: 'none', color: theme.danger, cursor: 'pointer', fontSize: '10px', fontWeight: 900 }}>×</button>
+                </div>
+              )}
+
+              {/* Action header row */}
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <button
-                  key={card.id}
-                  onClick={card.action}
-                  aria-label={card.title}
+                  onClick={() => { setAddingMainCat(true); setAddingSubUnder(null); setEditingEntry(null); setFormLabel(''); setFormSubtitle(''); setCatError(null); }}
+                  aria-label="إضافة فئة رئيسية"
                   style={{
-                    appearance: 'none',
-                    border: `1px solid ${isActive ? theme.brand : theme.line}`,
-                    borderRight: `4px solid ${isActive ? theme.brand : card.accent}`,
-                    borderRadius: '6px',
-                    padding: '8px 10px',
-                    backgroundColor: isActive ? theme.brandSurface : theme.surfaceInset,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                    cursor: 'pointer',
-                    textAlign: 'right',
-                    width: '100%',
-                    transition: 'all 0.15s ease',
+                    padding: '3px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 700,
+                    border: `1px solid ${theme.brand}`, cursor: 'pointer',
+                    backgroundColor: theme.brandSurface, color: theme.brand,
                   }}
                 >
-                  <Box style={{ flexDirection: 'row-reverse', gap: '6px', alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
-                    <span style={{ fontSize: '14px' }}>{card.icon}</span>
-                    <Text role="bodyStrong" style={{ fontSize: 11, fontWeight: 700, color: isActive ? theme.brand : theme.brandHeaderBackground }}>
-                      {card.title}
-                    </Text>
-                  </Box>
-                  <Text role="caption" tone="muted" style={{ fontSize: 9, textAlign: 'right', lineHeight: 12, width: '100%' }}>
-                    {card.desc}
-                  </Text>
+                  + فئة رئيسية
                 </button>
-              );
-            })}
-          </div>
-        </Box>
-      )}
+                <button
+                  onClick={handleResetCategoryPreview}
+                  aria-label="إعادة ضبط المعاينة"
+                  style={{
+                    padding: '3px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 700,
+                    border: `1px solid ${theme.danger}`, cursor: 'pointer',
+                    backgroundColor: 'transparent', color: theme.danger,
+                  }}
+                >
+                  ↺ إعادة ضبط المعاينة
+                </button>
+              </div>
 
+              {/* Add main category form */}
+              {addingMainCat && (
+                <div style={{
+                  padding: '8px 10px', borderRadius: '6px', backgroundColor: theme.surfaceInset,
+                  border: `1px solid ${theme.brand}`, display: 'flex', flexDirection: 'column', gap: '6px',
+                }}>
+                  <span style={{ fontSize: '10px', fontWeight: 800, color: theme.brand }}>إضافة فئة رئيسية جديدة</span>
+                  <input
+                    type="text" placeholder="اسم الفئة *" value={formLabel}
+                    onChange={(e) => setFormLabel(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddMainCategory(); if (e.key === 'Escape') { setAddingMainCat(false); setCatError(null); } }}
+                    autoFocus
+                    style={{
+                      padding: '4px 8px', borderRadius: '4px', fontSize: '11px', direction: 'rtl', textAlign: 'right',
+                      border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none',
+                    }}
+                  />
+                  <input
+                    type="text" placeholder="وصف مختصر (اختياري)" value={formSubtitle}
+                    onChange={(e) => setFormSubtitle(e.target.value)}
+                    style={{
+                      padding: '4px 8px', borderRadius: '4px', fontSize: '11px', direction: 'rtl', textAlign: 'right',
+                      border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none',
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button onClick={handleAddMainCategory} style={{ padding: '3px 12px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.brand}`, backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>تأكيد</button>
+                    <button onClick={() => { setAddingMainCat(false); setFormLabel(''); setFormSubtitle(''); setCatError(null); }} style={{ padding: '3px 12px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.lineStrong}`, backgroundColor: 'transparent', color: theme.textMuted, cursor: 'pointer' }}>إلغاء</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Categories list */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {previewCategories.map((cat) => {
+                  const isHidden = hiddenCategoryIds.has(cat.id);
+                  const isSelectedMain = activeMainCategory?.id === cat.id;
+                  const productCount = getProductCountForCategory(cat.id);
+                  const isEditingThis = editingEntry?.type === 'main' && editingEntry.mainId === cat.id;
+
+                  return (
+                    <div key={cat.id} style={{
+                      borderRadius: '6px', border: `1px solid ${isSelectedMain ? theme.brand : theme.line}`,
+                      backgroundColor: isHidden ? theme.surfaceInset : (isSelectedMain ? theme.brandSurface : theme.surface),
+                      opacity: isHidden ? 0.6 : 1, overflow: 'hidden',
+                    }}>
+                      {/* Main category row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '5px 8px', gap: '6px' }}>
+                        {isEditingThis ? (
+                          <div style={{ display: 'flex', flex: 1, gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <input
+                              type="text" value={editLabel} onChange={(e) => setEditLabel(e.target.value)}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleApplyCatEdit(); if (e.key === 'Escape') { setEditingEntry(null); setCatError(null); } }}
+                              autoFocus
+                              style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '11px', direction: 'rtl', border: `1px solid ${theme.brand}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none', flex: 1, minWidth: '80px' }}
+                            />
+                            <input
+                              type="text" value={editSubtitle} onChange={(e) => setEditSubtitle(e.target.value)} placeholder="وصف"
+                              style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '11px', direction: 'rtl', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none', flex: 1, minWidth: '80px' }}
+                            />
+                            <button onClick={handleApplyCatEdit} style={{ padding: '2px 8px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: 'none', backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>حفظ</button>
+                            <button onClick={() => { setEditingEntry(null); setCatError(null); }} style={{ padding: '2px 8px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: `1px solid ${theme.lineStrong}`, backgroundColor: 'transparent', color: theme.textMuted, cursor: 'pointer' }}>إلغاء</button>
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleMainCategorySelect(isSelectedMain ? null : cat)}
+                              style={{ appearance: 'none', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', flex: 1, textAlign: 'right' }}
+                            >
+                              <span style={{ fontSize: '13px' }}>{cat.emojiFallback}</span>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 700, color: isSelectedMain ? theme.brand : theme.brandHeaderBackground }}>{cat.label}</span>
+                                {cat.subtitle && <span style={{ fontSize: '9px', color: theme.textMuted }}>{cat.subtitle}</span>}
+                              </div>
+                              <span style={{ fontSize: '9px', color: theme.textMuted, marginRight: 'auto', paddingRight: '4px' }}>{productCount} منتج</span>
+                            </button>
+                            <div style={{ display: 'flex', gap: '3px', alignItems: 'center', flexShrink: 0 }}>
+                              <button
+                                onClick={() => { setAddingSubUnder(addingSubUnder === cat.id ? null : cat.id); setFormLabel(''); setFormSubtitle(''); setCatError(null); setEditingEntry(null); setAddingMainCat(false); }}
+                                aria-label="إضافة فئة فرعية"
+                                style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: `1px solid ${theme.line}`, cursor: 'pointer', backgroundColor: addingSubUnder === cat.id ? theme.brandSurface : 'transparent', color: addingSubUnder === cat.id ? theme.brand : theme.textMuted }}
+                              >+ فرعية</button>
+                              <button
+                                onClick={() => handleStartCatEdit('main', cat.id)}
+                                aria-label="تعديل اسم الفئة"
+                                style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: `1px solid ${theme.line}`, cursor: 'pointer', backgroundColor: 'transparent', color: theme.textMuted }}
+                              >تعديل</button>
+                              <button
+                                onClick={() => handleToggleCategoryHide(cat.id)}
+                                aria-label={isHidden ? 'استعادة الفئة' : 'إخفاء الفئة'}
+                                style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: `1px solid ${isHidden ? theme.success : theme.line}`, cursor: 'pointer', backgroundColor: 'transparent', color: isHidden ? theme.success : theme.textMuted }}
+                              >{isHidden ? 'استعادة' : 'إخفاء'}</button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Add subcategory form */}
+                      {addingSubUnder === cat.id && (
+                        <div style={{ margin: '0 8px 6px 8px', padding: '6px 8px', borderRadius: '4px', backgroundColor: theme.surfaceInset, border: `1px solid ${theme.brand}`, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                          <span style={{ fontSize: '9px', fontWeight: 800, color: theme.brand }}>إضافة فئة فرعية تحت: {cat.label}</span>
+                          <input type="text" placeholder="اسم الفئة الفرعية *" value={formLabel} onChange={(e) => setFormLabel(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleAddSubCategory(cat.id); if (e.key === 'Escape') { setAddingSubUnder(null); setCatError(null); } }}
+                            autoFocus
+                            style={{ padding: '3px 7px', borderRadius: '3px', fontSize: '10px', direction: 'rtl', textAlign: 'right', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none' }}
+                          />
+                          <input type="text" placeholder="وصف (اختياري)" value={formSubtitle} onChange={(e) => setFormSubtitle(e.target.value)}
+                            style={{ padding: '3px 7px', borderRadius: '3px', fontSize: '10px', direction: 'rtl', textAlign: 'right', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none' }}
+                          />
+                          <div style={{ display: 'flex', gap: '5px' }}>
+                            <button onClick={() => handleAddSubCategory(cat.id)} style={{ padding: '2px 10px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: 'none', backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>إضافة</button>
+                            <button onClick={() => { setAddingSubUnder(null); setFormLabel(''); setFormSubtitle(''); setCatError(null); }} style={{ padding: '2px 10px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: `1px solid ${theme.lineStrong}`, backgroundColor: 'transparent', color: theme.textMuted, cursor: 'pointer' }}>إلغاء</button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Subcategories */}
+                      {cat.subcategories.length > 0 && (
+                        <div style={{ margin: '0 8px 6px 8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          {cat.subcategories.map((sub) => {
+                            const subCount = getProductCountForCategory(cat.id, sub.id);
+                            const isSelectedSub = activeSubCategory?.id === sub.id;
+                            const isEditingThisSub = editingEntry?.type === 'sub' && editingEntry.mainId === cat.id && editingEntry.subId === sub.id;
+                            return (
+                              <div key={sub.id} style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                padding: '3px 8px', borderRadius: '4px', gap: '6px',
+                                backgroundColor: isSelectedSub ? theme.brandSurface : theme.surfaceInset,
+                                border: `1px solid ${isSelectedSub ? theme.brand : 'transparent'}`,
+                              }}>
+                                {isEditingThisSub ? (
+                                  <div style={{ display: 'flex', flex: 1, gap: '5px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <input type="text" value={editLabel} onChange={(e) => setEditLabel(e.target.value)}
+                                      onKeyDown={(e) => { if (e.key === 'Enter') handleApplyCatEdit(); if (e.key === 'Escape') { setEditingEntry(null); setCatError(null); } }}
+                                      autoFocus
+                                      style={{ padding: '2px 5px', borderRadius: '3px', fontSize: '10px', direction: 'rtl', border: `1px solid ${theme.brand}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none', flex: 1, minWidth: '60px' }}
+                                    />
+                                    <input type="text" value={editSubtitle} onChange={(e) => setEditSubtitle(e.target.value)} placeholder="وصف"
+                                      style={{ padding: '2px 5px', borderRadius: '3px', fontSize: '10px', direction: 'rtl', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none', flex: 1, minWidth: '60px' }}
+                                    />
+                                    <button onClick={handleApplyCatEdit} style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '9px', fontWeight: 700, border: 'none', backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>حفظ</button>
+                                    <button onClick={() => { setEditingEntry(null); setCatError(null); }} style={{ padding: '2px 6px', borderRadius: '3px', fontSize: '9px', border: `1px solid ${theme.lineStrong}`, backgroundColor: 'transparent', color: theme.textMuted, cursor: 'pointer' }}>إلغاء</button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => { setActiveSubCategory(isSelectedSub ? null : sub); if (!isSelectedSub) handleMainCategorySelect(cat); }}
+                                      style={{ appearance: 'none', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', flex: 1, textAlign: 'right' }}
+                                    >
+                                      <span style={{ fontSize: '9px', color: theme.textMuted }}>└</span>
+                                      <span style={{ fontSize: '10px', fontWeight: isSelectedSub ? 700 : 500, color: isSelectedSub ? theme.brand : theme.textMuted }}>{sub.label}</span>
+                                      <span style={{ fontSize: '9px', color: theme.textMuted, marginRight: 'auto' }}>{subCount}</span>
+                                    </button>
+                                    <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
+                                      <button onClick={() => handleStartCatEdit('sub', cat.id, sub.id)} aria-label="تعديل الفئة الفرعية" style={{ padding: '1px 5px', borderRadius: '3px', fontSize: '9px', border: `1px solid ${theme.line}`, cursor: 'pointer', backgroundColor: 'transparent', color: theme.textMuted }}>تعديل</button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 6. MAIN CONTENT AREA */}
       <main className={styles.surfaceMainPanel}>
@@ -984,9 +1313,10 @@ export function ControlPanelDshCatalogScreen({
                           </thead>
                           <tbody>
                             {visibleProducts.map(p => {
-                              const cat = dshCatalogCategories.find(c => c.id === p.categoryPath.main);
+                              const cat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
                               const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
                               const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
+                              const resolvedStage = previewApprovalStages[p.id] ?? p.approvalStage;
                               return (
                                 <tr
                                   key={p.id}
@@ -1021,8 +1351,8 @@ export function ControlPanelDshCatalogScreen({
                                   </td>
                                   <td style={{ padding: '8px' }}>
                                      <WebControlPanelStatusTag
-                                       label={p.conflictReason ? 'تعارض' : p.approvalStage === 'client-visible' ? 'نشط' : 'مراجعة'}
-                                       tone={p.conflictReason ? 'danger' : p.approvalStage === 'client-visible' ? 'success' : 'warning'}
+                                       label={p.conflictReason ? 'تعارض' : resolvedStage === 'client-visible' ? 'نشط' : resolvedStage === 'catalog-approved' ? 'معتمد' : resolvedStage === 'marketing-review' ? 'تسويق' : 'مراجعة'}
+                                       tone={p.conflictReason ? 'danger' : resolvedStage === 'client-visible' ? 'success' : resolvedStage === 'catalog-approved' ? 'success' : resolvedStage === 'marketing-review' ? 'warning' : 'warning'}
                                      />
                                   </td>
                                 </tr>
@@ -1055,18 +1385,19 @@ export function ControlPanelDshCatalogScreen({
                     <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
                  </Box>
                  <Box gap={3} padding={3} style={{ flex: 1 }}>
+                    {/* Image + name header */}
                     <Box layoutDirection="row" gap={3} align="center">
                        <WatermarkedImage src={selectedProduct.imageUri} mediaKey={selectedProduct.mediaKey} productName={selectedProduct.name} size={48} />
                        <Box style={{ flex: 1 }} gap={0}>
                           <Text role="bodyStrong" style={{ fontSize: 13 }}>{selectedProduct.name}</Text>
-                         <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المعرف: {selectedProduct.sku}</Text>
+                          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المعرف: {selectedProduct.sku}</Text>
                        </Box>
                     </Box>
 
                     <InspectorTile title="تسلسل الفئة (Path)">
                        <Text role="caption" style={{ fontSize: 10, color: theme.textMuted, lineHeight: 14, textAlign: 'right' }}>
-                         {dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.label || 'غير معروف'}
-                         {selectedProduct.categoryPath.sub && ` > ${dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.label}`}
+                         {(previewCategories.find(c => c.id === selectedProduct.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main))?.label || 'غير معروف'}
+                         {selectedProduct.categoryPath.sub && ` > ${(previewCategories.find(c => c.id === selectedProduct.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === selectedProduct.categoryPath.main))?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub)?.label}`}
                        </Text>
                     </InspectorTile>
 
