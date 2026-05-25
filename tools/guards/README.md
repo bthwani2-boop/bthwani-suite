@@ -48,8 +48,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\guards\RUN_AGENT_GU
 tools/registry/runs/{SESSION_ID}/
 ```
 
-وينتج ZIP باسم:
-
-```text
-{SESSION_ID}.zip
-```
+ZIP باسم `{SESSION_ID}.zip` يُنتَج **فقط** عند تمرير الخيار `-CreateZip` للـ runner صراحةً.
+بدون هذا الخيار لا يُنشأ ZIP تلقائيًا. راجع GUARD_13 في `governance/14_GUARDS_CATALOG.md` وقاعدة ZIP في `governance/11_EVIDENCE_AND_TRACEABILITY.md`.

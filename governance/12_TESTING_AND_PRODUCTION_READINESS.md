@@ -28,11 +28,8 @@ git --no-pager diff --check
 
 ## Smart Execution Budget
 
-- LOW: terminal-only, docs tiny, prompt-only, text-only, port checks, or git-status work. Gates: `git status` and `git diff --check` only when writes occurred. No default full lint, workspace `tsc`, guards, registry evidence, or ZIP.
-- MEDIUM: one file or a few targeted files. Gates: `git status`, `git diff --check`, and targeted syntax/type/lint only when directly justified. No workspace lint by default.
-- UI_VISIBLE: visible UI changes. Gates: `git diff --check`, targeted TS/type verification when needed, and screenshot/RTL notes.
-- HIGH: governance, agents, guards, scripts, ui-kit exports, architecture, or other multi-file sensitive work. Gates: `git status`, `git diff --check`, targeted guards, PowerShell syntax validation for modified `.ps1`, and registry evidence only when the risk justifies it. ZIP is opt-in only.
-- COMMIT/PUSH: before commit, run `git status` and staged `git diff --check` only. Let hooks run. If a hook fails, fix only the specific failure.
+الجدول الكامل لـ task classes (LOW / MEDIUM / UI_VISIBLE / HIGH / COMMIT/PUSH) وحجم الدليل المقابل محدد في [`governance/11_EVIDENCE_AND_TRACEABILITY.md`](11_EVIDENCE_AND_TRACEABILITY.md).
+اختر الحد الأدنى من التحقق الذي تبرره طبيعة المهمة وطلب الإنسان. لا تعد تعريف الـ tiers هنا.
 
 ## Production readiness dimensions
 
