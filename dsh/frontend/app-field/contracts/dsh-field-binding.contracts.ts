@@ -1,4 +1,4 @@
-import type { DshFieldSurfaceId } from '../../data/field-state.preview-data';
+import type { DshFieldSurfaceId } from '../../data/field-stores.preview-data';
 
 export type DshFieldBindingContract = {
   surfaceId: DshFieldSurfaceId;

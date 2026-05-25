@@ -73,7 +73,7 @@ export {
   resolveMarketingTickerKindLabel,
   resolveMarketingTickerTargetLabel,
 } from '../../data/news-ticker.preview-store';
-export { dshMarketingNewsTickerSeed } from '../../data/news-ticker-fixtures';
+export { dshMarketingNewsTickerSeed } from '../../data/news-ticker.preview-store';
 export { sectionMeta } from './section-meta';
 export { sectionCatalog } from './section-catalog';
 export { flowMeta } from './flow-meta';

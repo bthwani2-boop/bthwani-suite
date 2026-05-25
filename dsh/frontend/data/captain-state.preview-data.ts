@@ -58,3 +58,36 @@ export function isDshCaptainFinanceState(state: DshCaptainState): boolean {
 export function isDshCaptainTerminalState(state: DshCaptainState): boolean {
 	return getDshCaptainStateMeta(state).terminal;
 }
+
+// --- Finance screen types (merged from captain-finance.preview-data.ts) ---
+
+export type DshCaptainFinanceScreenState = 'ready' | 'loading' | 'empty' | 'error';
+
+export type DshCaptainFinanceSection = 'cod-balance' | 'earnings' | 'settlement';
+
+/**
+ * PREVIEW_ONLY — local display snapshot for captain finance labels.
+ * Financial truth (COD, earnings, eligibility, settlement) is owned by WLT.
+ * Authoritative type: WltCaptainFinanceSnapshot (wlt/frontend/shared/finance/dshFinancePreview.ts).
+ * bthwani_delivery only — partner_delivery (store_courier_mode) is not captain payout.
+ */
+export type DshCaptainFinanceSnapshot = {
+	readonly isPreview: true;
+	codBalanceLabel: string;
+	earningsLabel: string;
+	settlementLabel: string;
+	pendingPayoutLabel?: string;
+	cycleLabel?: string;
+};
+
+// --- Profile screen types (merged from captain-profile.preview-data.ts) ---
+
+export type DshCaptainProfileScreenState = 'ready' | 'loading' | 'empty' | 'error';
+
+export type DshCaptainProfileSection = 'profile-get' | 'tier-info' | 'tier-evaluate';
+
+export type DshCaptainProfileSnapshot = {
+	displayName: string;
+	tierLabel: string;
+	readinessLabel: string;
+};

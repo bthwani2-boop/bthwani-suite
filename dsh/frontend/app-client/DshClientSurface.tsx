@@ -34,7 +34,7 @@ import {
   buildStoreTags,
   dshDiscoveryStores,
   storeItemsByStoreId,
-} from '../data/store.preview-data';
+} from '../data/stores.preview-data';
 import {
   recordMarketingBannerClick,
   recordMarketingBannerImpression,

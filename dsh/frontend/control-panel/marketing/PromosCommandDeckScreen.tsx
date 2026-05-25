@@ -12,8 +12,8 @@ import {
   type HomePromoRecord,
 } from '../../data/promo.preview-store';
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores } from '../../data/discovery.preview-data';
-import { storeItemsByStoreId } from '../../data/items.preview-data';
+import { dshDiscoveryStores } from '../../data/stores.preview-data';
+import { storeItemsByStoreId } from '../../data/stores.preview-data';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 
 type PromoEditorSection = 'identity' | 'logic' | 'media';

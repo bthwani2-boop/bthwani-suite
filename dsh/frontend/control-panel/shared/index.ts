@@ -34,4 +34,4 @@ export {
 	type DshControlPanelSectionId,
 } from './dsh-control-panel-governance.map';
 export { getDshRecommendationConfidenceLabel, getDshRecommendationSeverityLabel, type DshRecommendationConfidence, type DshRecommendationSeverity, type DshUnifiedRecommendation } from '../../data/cp-recommendation.preview-data';
-export { DSH_CROSS_SURFACE_JOURNEYS } from '../../data/cp-journey-fixtures';
+export { DSH_CROSS_SURFACE_JOURNEYS } from '../../data/cp-recommendation.preview-data';

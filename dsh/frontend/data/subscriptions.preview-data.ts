@@ -1,15 +1,28 @@
 /**
- * UI_PREVIEW_ONLY — consumer adapter.
- * Derives display fixtures from shared loyalty.preview-store + commercial.preview-contract helpers.
- * NOT a source of truth. Do not add raw fixture data here.
+ * UI_PREVIEW_ONLY — commercial subscriptions + loyalty consumer adapter.
+ * Merged from: loyalty-commercial.preview-data.ts + subscriptions-commercial.preview-data.ts
+ * Derives display fixtures from shared stores; NOT a source of truth.
  */
-import { getLoyaltyPrograms, getLoyaltyRewards, getLoyaltyTiers } from './loyalty.preview-store';
+import { getLoyaltyPrograms, getLoyaltyRewards, getLoyaltyTiers, getSubscriptionPlans } from './loyalty.preview-store';
 import {
   mapLoyaltyProgramToClientBenefits,
+  mapSubscriptionPlansToClientCards,
   type LoyaltyClientBenefits,
   type LoyaltyClientSection,
   type LoyaltyClientMetric,
+  type SubscriptionClientCard,
 } from './commercial.preview-contract';
+
+export const dshSubscriptionsPreviewDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
+// --- Loyalty ---
 
 export type LoyaltyBenefitMode = 'loyalty';
 
@@ -59,3 +72,16 @@ function buildLoyaltyRewardsFixture(): LoyaltyRewardsFixture {
 }
 
 export const loyaltyRewardsFixture: LoyaltyRewardsFixture = buildLoyaltyRewardsFixture();
+
+// --- Subscriptions ---
+
+export type SubscriptionPlanCard = SubscriptionClientCard;
+
+export const subscriptionHeroCopy = {
+  eyebrow: 'بثواني برو',
+  title: 'الاشتراكات',
+  subtitle: 'دفع وتبديل وإدارة من نفس الصفحة.',
+  note: 'العائلة حزمة داخل بثواني برو وليست منتجاً منفصلاً.',
+} as const;
+
+export const subscriptionPlanCards: SubscriptionPlanCard[] = mapSubscriptionPlansToClientCards(getSubscriptionPlans());

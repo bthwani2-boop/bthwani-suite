@@ -15,7 +15,7 @@ import {
   Icon,
 } from '@bthwani/ui-kit';
 import { dshNotificationsFixtures } from '../../data/notifications.preview-data';
-import { subscriptionPlanCards } from '../../data/subscriptions-commercial.preview-data';
+import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
 import { DshLoyaltyRewardsScreen } from '../parts/LoyaltyRewardsScreen';
 import { DshOperationScreen, type DshOperationScreenProps } from '../parts/OperationScreen';
 import { DshSubscriptionsScreen } from '../parts/SubscriptionsScreen';

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, KeyValueList, ListItem, SectionHeader, Surface, Text, TextField, Button, MobileScrollView } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../../data/captain-orders.preview-data';
-import type { DshCaptainProfileSnapshot } from '../../data/captain-profile.preview-data';
+import type { DshCaptainProfileSnapshot } from '../../data/captain-state.preview-data';
 import { getDshCaptainFlowPolicy, type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import {

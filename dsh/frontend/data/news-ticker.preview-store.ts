@@ -1,7 +1,6 @@
-import { dshMarketingNewsTickerSeed } from './news-ticker-fixtures';
-
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * Seed data merged from news-ticker-fixtures.ts.
  */
 export const newsTickerStoreDataContract = {
   dataKind: 'UI_PREVIEW_ONLY',
@@ -220,6 +219,91 @@ const targetLabelByLocale: Record<MarketingNewsTickerLocale, Record<string, stri
     promo: 'عرض',
   },
 };
+
+// Seed data (inlined from news-ticker-fixtures.ts)
+export const dshMarketingNewsTickerSeed: MarketingNewsTickerItem[] = [
+  {
+    id: 'ticker-1',
+    message: 'تمت مراجعة طلبك وسيتم تحديثك في كل مرحلة مهمة.',
+    kind: 'order',
+    severity: 'success',
+    status: 'published',
+    source: 'operations',
+    audience: 'client',
+    deliveryMode: 'auto',
+    priority: 'critical',
+    openHour: 8,
+    closeHour: 23,
+    cooldownMinutes: 25,
+    repeatGapMinutes: 90,
+    actionTarget: 'tracking',
+  },
+  {
+    id: 'ticker-2',
+    message: 'طلبك قيد التحضير الآن، وسنرسل لك التحديث عند انتقاله للمرحلة التالية.',
+    kind: 'order',
+    severity: 'info',
+    status: 'published',
+    source: 'customer',
+    audience: 'client',
+    deliveryMode: 'auto',
+    priority: 'high',
+    openHour: 8,
+    closeHour: 23,
+    cooldownMinutes: 20,
+    repeatGapMinutes: 60,
+    actionTarget: 'orders',
+    lastShownAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'ticker-3',
+    message: 'طلبك في الطريق، ويمكنك متابعة المسار أو التواصل عند الحاجة.',
+    kind: 'order',
+    severity: 'success',
+    status: 'published',
+    source: 'customer',
+    audience: 'client',
+    deliveryMode: 'auto',
+    priority: 'high',
+    openHour: 9,
+    closeHour: 23,
+    cooldownMinutes: 20,
+    repeatGapMinutes: 60,
+    actionTarget: 'tracking',
+  },
+  {
+    id: 'ticker-4',
+    message: 'خصم 20% لمدة 3 ساعات على المطعم المحدد اليوم.',
+    kind: 'promo',
+    severity: 'success',
+    status: 'draft',
+    source: 'marketing',
+    audience: 'client',
+    deliveryMode: 'manual',
+    priority: 'normal',
+    openHour: 9,
+    closeHour: 12,
+    cooldownMinutes: 45,
+    repeatGapMinutes: 180,
+    actionTarget: 'promo',
+  },
+  {
+    id: 'ticker-5',
+    message: 'قد تكون هناك صيانة مجدولة مساء اليوم، مع بقاء المسارات محفوظة للعودة إليها.',
+    kind: 'platform',
+    severity: 'warning',
+    status: 'published',
+    source: 'system',
+    audience: 'all',
+    deliveryMode: 'pinned',
+    priority: 'critical',
+    openHour: 18,
+    closeHour: 23,
+    cooldownMinutes: 60,
+    repeatGapMinutes: 240,
+    actionTarget: 'home',
+  },
+];
 
 let store = dshMarketingNewsTickerSeed.map((item) => ({ ...item }));
 let nextTickerId = store.length + 1;
