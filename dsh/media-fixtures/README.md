@@ -4,15 +4,26 @@ Status: ACTIVE
 
 Canonical location for DSH-owned seed media fixtures.
 
-Allowed future categories:
+## Structure
 
 ```text
-images
-videos
-icons
-banners
-documents
-mocks
+dsh/media-fixtures/
+  banners/              — home promo banners
+  logos/                — brand logo, store logos
+  products/             — product images
+  stores/               — store cover images
+  categories/
+    main/               — main category images
+    sub/                — sub-category images
+  classifications/
+    main/               — main classification images
+    sub/                — sub-classification images
 ```
 
-Seed images now live under `dsh/media-fixtures/assets/seed/dsh/` and are consumed by `@bthwani/media-fixtures` through compatibility paths.
+## Generator
+
+Re-generate seed images:
+
+```powershell
+pwsh tools/generate-dsh-fixture-images.ps1
+```

@@ -143,7 +143,7 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
   );
 }
 
-const WATERMARK_URL = '/dsh/media-fixtures/assets/seed/dsh/logo.png';
+const WATERMARK_URL = '/dsh/media-fixtures/logos/logo.png';
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
