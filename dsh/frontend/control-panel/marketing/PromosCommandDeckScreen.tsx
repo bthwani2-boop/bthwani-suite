@@ -28,7 +28,7 @@ export function PromosCommandDeckScreen() {
       title: item?.title ?? '',
       subtitle: item?.subtitle ?? '',
       ctaText: item?.ctaText ?? 'افتح الآن',
-      accentColor: item?.accentColor ?? theme.brandHeaderBackground,
+      accentColor: item?.accentColor ?? 'brandStrong',
       imageUrl: item?.imageUrl ?? '',
       thumbnail: item?.thumbnail ?? '',
       targetType: item?.targetType ?? 'store',
@@ -36,7 +36,7 @@ export function PromosCommandDeckScreen() {
       targetLabel: item?.targetLabel ?? '',
       status: item?.status ?? 'draft',
     };
-  }, [theme.brandHeaderBackground]);
+  }, []);
   const [items, setItems] = React.useState<HomePromoRecord[]>(() => getHomePromoItems());
   const [selectedId, setSelectedId] = React.useState<string | null>(() => getHomePromoItems()[0]?.id ?? null);
   const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);

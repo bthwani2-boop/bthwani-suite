@@ -17,7 +17,7 @@ import {
   useBThwaniAppearance,
   useDirection,
 } from '@bthwani/ui-kit';
-import type { DshPartnerOrderConversationMode } from '../../data/orders.preview-data';
+import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order-preview.contract';
 import { AcceptanceTimerSheet } from '../sheets';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done

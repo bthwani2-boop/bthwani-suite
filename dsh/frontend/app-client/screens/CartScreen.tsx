@@ -94,7 +94,8 @@ type QuickActionMeta = {
   icon?: string;
 };
 
-import { type RecommendationProduct, type CartItem, dshCartRecommendedProductsFixture, dshCartPreviewFallbackItemsFixture } from '../../data/orders.preview-data';
+import { dshCartRecommendedProductsFixture, dshCartPreviewFallbackItemsFixture } from '../../data/orders.preview-data';
+import type { RecommendationProduct, CartItem } from '../../shared/dsh-order-preview.contract';
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 

@@ -11,7 +11,7 @@ import {
   type DshCustomer360OrderSummary,
   type DshCustomer360Record,
 } from '../../data/support.preview-data';
-import type { DshGlobalControlLink } from '../../data/orders.preview-data';
+import type { DshGlobalControlLink } from '../../shared/dsh-order-preview.contract';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type Customer360WorkspaceRouteContext = {

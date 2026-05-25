@@ -4,6 +4,7 @@ import type {
   DshHomeGetPromo,
   DiscoveryFilter,
 } from '../contracts/dsh-home-types';
+import { resolvePreviewColor } from '../../shared/dsh-preview-color';
 import { resolveHomeCategoryContext } from '../shared/home-promo-mappers';
 
 type UseHomePromoHandlersParams = {
@@ -228,7 +229,7 @@ export function useHomePromoHandlers({
       badge: promo.offerBadgeText,
       cta: promo.ctaLabel,
       image: resolveBannerImageSource?.(promo.imageUrl ?? promo.mediaKey),
-      accentColor: promo.accentColor,
+      accentColor: promo.accentColor ? resolvePreviewColor(promo.accentColor) : undefined,
       onPress: () => resolveBannerPress(promo)(),
     }))
   ), [promos, resolveBannerImageSource, resolveBannerPress]);

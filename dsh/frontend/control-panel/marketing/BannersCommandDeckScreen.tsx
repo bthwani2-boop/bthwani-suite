@@ -22,6 +22,7 @@ import { dshCategoryFixtures } from '../../data/categories.preview-data';
 import { dshDiscoveryStores } from '../../data/stores.preview-data';
 import { storeItemsByStoreId } from '../../data/stores.preview-data';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
+import { resolvePreviewColor } from '../../shared/dsh-preview-color';
 
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;
@@ -372,9 +373,9 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     [items, selectedId],
   );
   const bannerDefaults = React.useMemo(() => ({
-    accentColor: theme.brandHeaderBackground,
-    offerBadgeColor: theme.brand,
-  }), [theme]);
+    accentColor: 'brandStrong',
+    offerBadgeColor: 'brand',
+  }), []);
   const [draft, setDraft] = React.useState<BannerDraft>(() => createDraft(selected, bannerDefaults));
   const [storeSearch, setStoreSearch] = React.useState('');
   const [storeFilter, setStoreFilter] = React.useState<SmartTargetStoreFilter>('all');
@@ -464,11 +465,11 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   }
 
   const templates = React.useMemo(() => ([
-    { id: 'restaurant', label: 'مطعم', accent: theme.danger, badge: 'خصم 20%', cta: 'اطلب الآن', icon: '' },
-    { id: 'fashion', label: 'متجر أزياء', accent: theme.info, badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '' },
-    { id: 'tech', label: 'إلكترونيات', accent: theme.brandHeaderBackground, badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '' },
-    { id: 'pro', label: 'اشتراك برو', accent: theme.warning, badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '' },
-  ]), [theme]);
+    { id: 'restaurant', label: 'مطعم', accent: 'danger', badge: 'خصم 20%', cta: 'اطلب الآن', icon: '' },
+    { id: 'fashion', label: 'متجر أزياء', accent: 'info', badge: 'وصل حديثاً', cta: 'تسوق الآن', icon: '' },
+    { id: 'tech', label: 'إلكترونيات', accent: 'brandStrong', badge: 'الأكثر مبيعاً', cta: 'اشترِ الآن', icon: '' },
+    { id: 'pro', label: 'اشتراك برو', accent: 'warning', badge: 'شهر مجاني', cta: 'اشترك الآن', icon: '' },
+  ]), []);
 
   const applyTemplate = (tpl: typeof templates[0]) => {
     setDraft(c => ({
@@ -753,6 +754,8 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     () => BANNER_MOTION_OPTIONS.find((option) => option.value === draft.motionStyle)?.label ?? 'انسياب',
     [draft.motionStyle],
   );
+  const resolvedDraftAccentColor = resolvePreviewColor(draft.accentColor || theme.brandHeaderBackground);
+  const resolvedDraftOfferBadgeColor = resolvePreviewColor(draft.offerBadgeColor || theme.brand);
 
   const styles = React.useMemo(() => StyleSheet.create({
     workspaceRoot: {
@@ -1073,7 +1076,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
 
   const BannerPreview = () => (
     <View style={styles.previewContainer}>
-      <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: draft.accentColor || theme.brandHeaderBackground }])}>
+      <View style={StyleSheet.flatten([styles.bannerBase, { backgroundColor: resolvedDraftAccentColor }])}>
         {draft.imageUrl || draft.mediaKey ? (
           <Image
             source={resolveDshImageSource(draft.imageUrl || draft.mediaKey)}
@@ -1081,7 +1084,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             resizeMode={draft.imageFit}
           />
         ) : (
-          <View style={[styles.bannerImageLayer as ViewStyle, { backgroundColor: draft.accentColor || theme.brandHeaderBackground, justifyContent: 'center', alignItems: 'center' }]}>
+          <View style={[styles.bannerImageLayer as ViewStyle, { backgroundColor: resolvedDraftAccentColor, justifyContent: 'center', alignItems: 'center' }]}>
              <Text style={{ fontSize: 40 }}>{templates.find(t => t.id === draft.templateId)?.label.slice(0, 1) || 'ب'}</Text>
           </View>
         )}
@@ -1094,7 +1097,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
                   ? theme.overlay
                   : draft.motionStyle === 'soft-parallax'
                     ? theme.overlaySoft
-                    : `${draft.accentColor}44`,
+                    : `${resolvedDraftAccentColor}44`,
             },
           ]}
         />
@@ -1110,13 +1113,13 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           </Box>
 
           <View style={StyleSheet.flatten([styles.bannerCta, { backgroundColor: theme.surface }])}>
-            <Text style={StyleSheet.flatten([styles.bannerCtaText, { color: draft.accentColor || theme.brandHeaderBackground }])}>{draft.ctaLabel}</Text>
+            <Text style={StyleSheet.flatten([styles.bannerCtaText, { color: resolvedDraftAccentColor }])}>{draft.ctaLabel}</Text>
           </View>
         </View>
 
         {/* Badge */}
         {draft.offerBadgeText ? (
-          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: draft.offerBadgeColor || theme.brand }, draft.offerBadgePosition === 'top-left' ? { left: 20, top: 20 } : { right: 20, top: 20 }])}>
+          <View style={StyleSheet.flatten([styles.bannerBadge, { backgroundColor: resolvedDraftOfferBadgeColor }, draft.offerBadgePosition === 'top-left' ? { left: 20, top: 20 } : { right: 20, top: 20 }])}>
             <Text style={styles.bannerBadgeText}>{draft.offerBadgeText}</Text>
           </View>
         ) : null}

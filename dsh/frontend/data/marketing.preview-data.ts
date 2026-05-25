@@ -1,24 +1,21 @@
-import { resolvePreviewColor as _rpc } from '../shared/dsh-preview-color';
 import { ApprovalRecord, ApprovalStage, getAllApprovalRecords, getCatalogQueueRecords, getClientVisibleRecords as _getClientVisible, moveApprovalRecordToStage, upsertApprovalRecord } from '../shared/workflow';
 
 // -----------------------------------------------------------------------------
 // Marketing banners
 // -----------------------------------------------------------------------------
-// Semantic color tokens resolved via shared/dsh-preview-color.
-// dsh/frontend/data keeps UI dependencies outside this payload layer.
 const bannerPalette = {
-  white: _rpc('white'),
-  black: _rpc('black'),
-  brand: _rpc('brand'),
-  brandStrong: _rpc('brandStrong'),
-  accentOrange: _rpc('accentOrange'),
-  accentBlue: _rpc('accentBlue'),
-  ink: _rpc('ink'),
-  danger: _rpc('danger'),
-  success: _rpc('success'),
-  info: _rpc('info'),
-  warning: _rpc('warning'),
-};
+  white: 'white',
+  black: 'black',
+  brand: 'brand',
+  brandStrong: 'brandStrong',
+  accentOrange: 'accentOrange',
+  accentBlue: 'accentBlue',
+  ink: 'ink',
+  danger: 'danger',
+  success: 'success',
+  info: 'info',
+  warning: 'warning',
+} as const;
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
@@ -125,48 +122,6 @@ export type MarketingBannerRecord = {
 };
 
 const BANNER_STORE_KEY = '__BTHWANI_DSH_MARKETING_BANNERS__';
-const SVG_XMLNS = ['http', '://www.w3.org/2000/svg'].join('');
-
-/**
- * Creates a Premium 2027 4:5 SVG Banner (800x1000)
- */
-function createBannerDataUrl(background: string, accent: string, title: string, subtitle: string): string {
-  const svg = `
-    <svg xmlns="${SVG_XMLNS}" width="800" height="1000" viewBox="0 0 800 1000">
-      <defs>
-        <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="${background}" />
-          <stop offset="100%" stop-color="${accent}" />
-        </linearGradient>
-        <filter id="shadow">
-          <feDropShadow dx="0" dy="4" stdDeviation="10" flood-opacity="0.2"/>
-        </filter>
-      </defs>
-      <rect width="800" height="1000" rx="60" fill="url(#bg)" />
-
-      <!-- Abstract Shapes -->
-      <circle cx="700" cy="150" r="200" fill="${bannerPalette.white}" fill-opacity="0.08" />
-      <circle cx="100" cy="850" r="250" fill="${bannerPalette.black}" fill-opacity="0.05" />
-
-      <!-- Premium Gloss -->
-      <rect x="0" y="0" width="800" height="400" fill="${bannerPalette.white}" fill-opacity="0.03" transform="skewY(-10)" />
-
-      <!-- Composition placeholders -->
-      <rect x="60" y="80" width="120" height="120" rx="60" fill="${bannerPalette.white}" fill-opacity="0.9" filter="url(#shadow)" />
-      <text x="120" y="152" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="${accent}">✨</text>
-
-      <rect x="60" y="600" width="680" height="340" rx="40" fill="${bannerPalette.black}" fill-opacity="0.15" />
-
-      <text x="400" y="700" font-family="Arial, sans-serif" font-size="64" font-weight="900" text-anchor="middle" fill="${bannerPalette.white}">${title}</text>
-      <text x="400" y="780" font-family="Arial, sans-serif" font-size="32" font-weight="600" text-anchor="middle" fill="${bannerPalette.white}" fill-opacity="0.9">${subtitle}</text>
-
-      <rect x="250" y="850" width="300" height="70" rx="35" fill="${bannerPalette.white}" filter="url(#shadow)" />
-      <text x="400" y="895" font-family="Arial, sans-serif" font-size="28" font-weight="800" text-anchor="middle" fill="${accent}">اطلب الآن</text>
-    </svg>
-  `.trim();
-
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
 
 const seededBanners: MarketingBannerRecord[] = [
   {
@@ -515,7 +470,7 @@ export function upsertMarketingBannerItem(item: Partial<MarketingBannerRecord>) 
     id: nextId,
     title: item.title?.trim() || existing?.title || 'بنر جديد',
     subtitle: item.subtitle?.trim() || existing?.subtitle || 'أضف نصًا مختصرًا وواضحًا هنا',
-    imageUrl: item.imageUrl?.trim() || existing?.imageUrl || existing?.mediaKey || createBannerDataUrl(item.accentColor?.trim() || bannerPalette.brand, bannerPalette.brandStrong, item.title?.trim() || 'بنر جديد', item.subtitle?.trim() || 'أضف النص هنا'),
+    imageUrl: item.imageUrl?.trim() || existing?.imageUrl || existing?.mediaKey || '',
     mediaKey: item.mediaKey?.trim() || existing?.mediaKey,
     accentColor: item.accentColor?.trim() || existing?.accentColor || bannerPalette.brand,
     audience: item.audience || existing?.audience || 'all',
@@ -770,9 +725,7 @@ export function removeCampaignItem(id: string) {
 // -----------------------------------------------------------------------------
 // Home promos
 // -----------------------------------------------------------------------------
-// Inline hex values derived from ui-kit/src/foundation.ts rawColorPalettes.
-// dsh/frontend/data keeps UI dependencies outside this payload layer.
-const promoPalette = { white: '#FFFFFF', brandStrong: '#0A2F5C' } as const;
+const promoPalette = { white: 'white', brandStrong: 'brandStrong' } as const;
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
@@ -1216,9 +1169,7 @@ export function removeMarketingVideoItem(id: string) {
 // -----------------------------------------------------------------------------
 // Marketing growth
 // -----------------------------------------------------------------------------
-// Inline hex value derived from ui-kit/src/foundation.ts rawColorPalettes.brand[500].
-// dsh/frontend/data keeps UI dependencies outside this payload layer.
-const _BRAND = '#FF500D' as const;
+const _BRAND = 'brand' as const;
 
 /**
  * LEGACY COMPATIBILITY:

@@ -13,7 +13,7 @@ import {
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,
-} from '../../data/orders.preview-data';
+} from '../../shared/dsh-order-preview.contract';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type ManualCallIntakeRouteContext = {

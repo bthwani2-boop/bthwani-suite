@@ -26,7 +26,7 @@ import type {
 	DshCaptainOrderServiceType,
 	DshCaptainOrderStage,
 	DshCaptainOrdersScreenState,
-} from '../../data/orders.preview-data';
+} from '../../shared/dsh-order-preview.contract';
 
 type ServiceBadge = { badgeLabel: string; badgeTone: 'warning' | 'info' | 'brand' };
 

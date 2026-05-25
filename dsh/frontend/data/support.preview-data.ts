@@ -2,7 +2,17 @@ import type { DshControlPanelSectionId } from '../shared/dsh-governance.map';
 import type { DshOnDemandPolicy } from '../shared/dsh-flow-registry';
 import { getDshSectionAuditPolicy } from '../shared/dsh-role-permission.model';
 import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
-import { buildDshSignalRoutePreview, type DshGlobalControlLink, type DshLookupInputPreview, type DshPreviewPlaceholderStatus, type DshReadOnlyFinanceVisibility, type DshRouteHintedAction, type DshSignalRoutePreview, type DshVerificationStatus, type DshVerificationStepPreview } from './orders.preview-data';
+import {
+  buildDshSignalRoutePreview,
+  type DshGlobalControlLink,
+  type DshLookupInputPreview,
+  type DshPreviewPlaceholderStatus,
+  type DshReadOnlyFinanceVisibility,
+  type DshRouteHintedAction,
+  type DshSignalRoutePreview,
+  type DshVerificationStatus,
+  type DshVerificationStepPreview,
+} from '../shared/dsh-order-preview.contract';
 
 // -----------------------------------------------------------------------------
 // Operations support preview

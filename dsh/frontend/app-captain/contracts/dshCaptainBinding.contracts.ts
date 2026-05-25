@@ -1,4 +1,4 @@
-import type { DshCaptainOrderAction, DshCaptainOrderId, DshCaptainOrderMode, DshCaptainOrderProofStatus, DshCaptainOrderStage } from '../../data/orders.preview-data';
+import type { DshCaptainOrderAction, DshCaptainOrderId, DshCaptainOrderMode, DshCaptainOrderProofStatus, DshCaptainOrderStage } from '../../shared/dsh-order-preview.contract';
 
 export type DshCaptainOrderSnapshot = {
 	id: DshCaptainOrderId;

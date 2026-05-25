@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, Chip, ListItem, StateView, Surface, Text } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId } from '../dsh-partner.types';
-import type { DshPartnerOrderAlertItem } from '../../data/orders.preview-data';
+import type { DshPartnerOrderAlertItem } from '../../shared/dsh-order-preview.contract';
 
 type DshPartnerOrderAlertsPanelState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 

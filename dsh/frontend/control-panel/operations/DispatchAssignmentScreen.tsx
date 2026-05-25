@@ -8,8 +8,8 @@ import {
 } from '@bthwani/ui-kit/web';
 import {
   DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
-  DISPATCH_LIFECYCLE_STATE_MAP,
 } from '../../data/orders.preview-data';
+import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';

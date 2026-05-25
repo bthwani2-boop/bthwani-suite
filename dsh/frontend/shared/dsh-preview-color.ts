@@ -3,10 +3,8 @@
  * Owner: dsh/frontend/shared
  *
  * Maps semantic preview-layer color token names to design-system hex values
- * via @bthwani/ui-kit. Data files store semantic token names (no raw hex);
- * this resolver is called at data-init time so consumers always receive
- * valid CSS color strings. The data layer imports from shared (correct
- * dependency direction: shared → data → surfaces).
+ * via @bthwani/ui-kit. Preview data should store semantic token names; UI or
+ * adapter layers call this resolver only when a rendered color string is needed.
  */
 import {
   colorPalette,
@@ -18,7 +16,7 @@ import {
 
 export const dshPreviewColorContractMeta = {
   dataKind: 'SHARED_HELPER',
-  purpose: 'Resolve semantic preview color tokens to ui-kit hex values at data-init time',
+  purpose: 'Resolve semantic preview color tokens to ui-kit hex values at render or adapter boundaries',
 } as const;
 
 /** Token → hex mapping derived from ui-kit design-system palette. */

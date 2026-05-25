@@ -8,9 +8,9 @@ import {
 } from '@bthwani/ui-kit/web';
 import {
   EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
-  EXCEPTION_TICKET_MAP,
   DSH_ORDER_RESCUE_PREVIEW,
 } from '../../data/orders.preview-data';
+import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
