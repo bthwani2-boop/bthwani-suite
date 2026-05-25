@@ -2407,7 +2407,7 @@ export function selectDshControlPanelMarketingPreview() {
     videos: getMarketingVideoItems(),
     growth: getMarketingGrowthItems(),
     ticker: getMarketingTickerItems(),
-    reviewQueue: getMarketingReviewItems(),
+    reviewQueue: getMediaReviewItems(),
     catalogAdoption: getCatalogAdoptionItems(),
   };
 }

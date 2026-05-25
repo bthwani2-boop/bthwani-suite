@@ -36,7 +36,7 @@ type WorkspaceMode =
   | 'media-governance'
   | 'marketing-approvals';
 
-type FilterType = 'all' | 'master' | 'partner-exception' | 'partner-review' | 'marketing-review' | 'price-conflict' | 'non-matching' | 'category-proposals';
+type FilterType = 'all' | 'active' | 'review' | 'conflict' | 'master' | 'partner' | 'needs-link' | 'needs-image';
 
 type CatalogFilterColumnId = keyof typeof initialColumnFilters;
 
@@ -115,18 +115,56 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
 
 const WATERMARK_URL = '/dsh/media-fixtures/assets/seed/dsh/logo.png';
 
-function WatermarkedImage({ src, fallback, size = 32 }: { src?: string, fallback?: string, size?: number }) {
+function getPremiumEmoji(name: string, fallback?: string): string {
+  const n = name.toLowerCase();
+  if (n.includes('تفاح')) return '🍎';
+  if (n.includes('حليب')) return '🥛';
+  if (n.includes('خبز') || n.includes('كرواسون')) return '🍞';
+  if (n.includes('دجاج')) return '🍗';
+  if (n.includes('برجر') || n.includes('برغر')) return '🍔';
+  if (n.includes('باستا')) return '🍝';
+  if (n.includes('شوكولاتة') || n.includes('شوكولاته') || n.includes('كيك') || n.includes('حلا') || n.includes('شريحة')) return '🍰';
+  if (n.includes('عصير') || n.includes('ليمون') || n.includes('برتقال')) return '🍊';
+  if (n.includes('تمر')) return '🌴';
+  if (n.includes('عسل')) return '🍯';
+  if (n.includes('ايفون') || n.includes('جوال') || n.includes('بروك ماكس')) return '📱';
+  if (n.includes('شاحن')) return '🔌';
+  if (n.includes('زيت')) return '🛢️';
+  if (n.includes('بطارية')) return '🔋';
+  return fallback || '📦';
+}
+
+function WatermarkedImage({ src, fallback, size = 32, productName = '' }: { src?: string, fallback?: string, size?: number, productName?: string }) {
   const { theme } = useTheme();
-  const fallbackLabel = 'ص';
+  // Always use premium emoji fallback for mock /dsh/media-fixtures/ paths as they don't load locally
+  const hasValidRealImage = src && !src.startsWith('/dsh/media-fixtures');
+  const emoji = getPremiumEmoji(productName || '', fallback);
 
   return (
-    <Surface tone="inset" padding={0} border radiusToken="xs" style={{ width: size, height: size, position: 'relative', overflow: 'hidden', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-      {src ? (
+    <Surface
+      tone="inset"
+      padding={0}
+      border
+      radiusToken="xs"
+      style={{
+        width: size,
+        height: size,
+        position: 'relative',
+        overflow: 'hidden',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        backgroundColor: theme.surfaceInset,
+      }}
+    >
+      {hasValidRealImage ? (
         <Image src={src} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
       ) : (
-        <Text style={{ fontSize: size / 2 }}>{fallbackLabel}</Text>
+        <span style={{ fontSize: `${size * 0.55}px`, lineHeight: 1, userSelect: 'none', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
+          {emoji}
+        </span>
       )}
-      <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.4, backgroundColor: theme.brandHeaderSurface }}>
+      <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.12 }}>
         <Image src={WATERMARK_URL} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
       </Box>
     </Surface>
@@ -200,19 +238,23 @@ export function ControlPanelDshCatalogScreen({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [catalogPage, setCatalogPage] = useState(1);
+  const [showGovDashboard, setShowGovDashboard] = useState(false);
 
   const PRIMARY_TABS = [
-    { id: 'catalog', label: 'الكتالوج' },
+    { id: 'all', label: 'الكل' },
+    { id: 'catalog', label: 'السجل الرئيسي' },
     { id: 'intake', label: 'الاستلام والإدخال' },
     { id: 'approvals', label: 'الاعتمادات والجودة' },
     { id: 'mapping', label: 'الربط والحوكمة' },
+    { id: 'publishing', label: 'النشر والرؤية' },
   ];
 
   const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
+    all: [],
     catalog: [
       { id: 'all', label: 'الكل' },
-      { id: 'master', label: 'المركزية' },
-      { id: 'exceptions', label: 'الاستثناءات' },
+      { id: 'master', label: 'مركزي' },
+      { id: 'exceptions', label: 'استثناءات شريك' },
     ],
     intake: [
       { id: 'quick', label: 'إدخال سريع' },
@@ -220,14 +262,24 @@ export function ControlPanelDshCatalogScreen({
       { id: 'field', label: 'المسح الميداني' },
     ],
     approvals: [
-      { id: 'marketing', label: 'اعتمادات التسويق' },
-      { id: 'quality', label: 'مراجعة الجودة' },
-      { id: 'pricing', label: 'تعارض الأسعار' },
+      { id: 'marketing', label: 'تسويق' },
+      { id: 'quality', label: 'جودة' },
+      { id: 'pricing', label: 'تعارض أسعار' },
+      { id: 'media', label: 'صور' },
+      { id: 'barcode', label: 'باركود' },
     ],
     mapping: [
       { id: 'categories', label: 'ربط الفئات' },
-      { id: 'duplicates', label: 'معالجة التكرارات' },
-      { id: 'media', label: 'حوكمة الميديا' },
+      { id: 'duplicates', label: 'التكرارات' },
+      { id: 'gtin', label: 'GTIN' },
+      { id: 'substitutions', label: 'البدائل' },
+      { id: 'visibility-policy', label: 'سياسة الظهور' },
+    ],
+    publishing: [
+      { id: 'ready', label: 'جاهز للنشر' },
+      { id: 'client-visible', label: 'ظاهر للعميل' },
+      { id: 'hidden', label: 'مخفي' },
+      { id: 'needs-review', label: 'يحتاج مراجعة' },
     ],
   };
 
@@ -261,7 +313,7 @@ export function ControlPanelDshCatalogScreen({
       return {
         filteredProducts: [] as CatalogProductMaster[],
         counts: {
-          'all': 0, 'master': 0, 'partner-exception': 0, 'partner-review': 0, 'marketing-review': 0, 'price-conflict': 0, 'non-matching': 0, 'category-proposals': 0
+          'all': 0, 'active': 0, 'review': 0, 'conflict': 0, 'master': 0, 'partner': 0, 'needs-link': 0, 'needs-image': 0
         },
         filterOptions: {
           ...initialColumnFilters
@@ -284,24 +336,69 @@ export function ControlPanelDshCatalogScreen({
       return matchesSearch;
     });
 
+    // Filter based on Layer 1 and Layer 2 (contextual)
+    if (activeTab === 'catalog') {
+      if (activeSubTab === 'master') {
+        products = products.filter(p => p.mediaPolicy === 'catalog-owned-media');
+      } else if (activeSubTab === 'exceptions') {
+        products = products.filter(p => p.mediaPolicy === 'partner-owned-exception');
+      }
+    } else if (activeTab === 'intake') {
+      if (activeSubTab === 'quick') {
+        products = products.filter(p => p.sourceSurface === 'catalog' || p.sourceSurface === 'client');
+      } else if (activeSubTab === 'partner') {
+        products = products.filter(p => p.sourceSurface === 'partner');
+      } else if (activeSubTab === 'field') {
+        products = products.filter(p => p.sourceSurface === 'field');
+      }
+    } else if (activeTab === 'mapping') {
+      if (activeSubTab === 'duplicates') {
+        products = products.filter(p => !!p.conflictReason);
+      } else if (activeSubTab === 'gtin') {
+        products = products.filter(p => !p.gtin);
+      } else if (activeSubTab === 'categories') {
+        products = products.filter(p => !!p.categoryPath.main);
+      }
+    } else if (activeTab === 'publishing') {
+      if (activeSubTab === 'ready') {
+        products = products.filter(p => p.approvalStage === 'catalog-adopted');
+      } else if (activeSubTab === 'client-visible') {
+        products = products.filter(p => p.approvalStage === 'client-visible');
+      } else if (activeSubTab === 'hidden') {
+        products = products.filter(p => p.approvalStage === 'catalog-draft' || p.approvalStage === 'partner-proposed');
+      } else if (activeSubTab === 'needs-review') {
+        products = products.filter(p => p.approvalStage === 'marketing-review' || p.approvalStage === 'partner-review');
+      }
+    }
+
     // 3. Dynamic counts for quick filters (based on current category/search)
     const dynamicCounts = {
       'all': products.length,
+      'active': products.filter(p => p.approvalStage === 'client-visible').length,
+      'review': products.filter(p => p.approvalStage === 'marketing-review' || p.approvalStage === 'partner-review').length,
+      'conflict': products.filter(p => !!p.conflictReason).length,
       'master': products.filter(p => p.mediaPolicy === 'catalog-owned-media').length,
-      'partner-exception': products.filter(p => p.mediaPolicy === 'partner-owned-exception').length,
-      'partner-review': products.filter(p => p.approvalStage === 'partner-review').length,
-      'marketing-review': products.filter(p => p.approvalStage === 'marketing-review').length,
-      'price-conflict': products.filter(p => !!p.conflictReason).length,
-      'non-matching': 0,
-      'category-proposals': 5
+      'partner': products.filter(p => p.mediaPolicy === 'partner-owned-exception').length,
+      'needs-link': products.filter(p => !p.gtin).length,
+      'needs-image': products.filter(p => !p.imageUri || p.imageUri.includes('placeholder')).length,
     };
 
-    // 4. Apply Active Quick Filter
-    if (activeFilter === 'master') products = products.filter(p => p.mediaPolicy === 'catalog-owned-media');
-    else if (activeFilter === 'partner-exception') products = products.filter(p => p.mediaPolicy === 'partner-owned-exception');
-    else if (activeFilter === 'partner-review') products = products.filter(p => p.approvalStage === 'partner-review');
-    else if (activeFilter === 'marketing-review') products = products.filter(p => p.approvalStage === 'marketing-review');
-    else if (activeFilter === 'price-conflict') products = products.filter(p => !!p.conflictReason);
+    // 4. Apply Layer 3 Smart Filters
+    if (activeFilter === 'active') {
+      products = products.filter(p => p.approvalStage === 'client-visible');
+    } else if (activeFilter === 'review') {
+      products = products.filter(p => p.approvalStage === 'marketing-review' || p.approvalStage === 'partner-review');
+    } else if (activeFilter === 'conflict') {
+      products = products.filter(p => !!p.conflictReason);
+    } else if (activeFilter === 'master') {
+      products = products.filter(p => p.mediaPolicy === 'catalog-owned-media');
+    } else if (activeFilter === 'partner') {
+      products = products.filter(p => p.mediaPolicy === 'partner-owned-exception');
+    } else if (activeFilter === 'needs-link') {
+      products = products.filter(p => !p.gtin);
+    } else if (activeFilter === 'needs-image') {
+      products = products.filter(p => !p.imageUri || p.imageUri.includes('placeholder'));
+    }
 
     // 5. Apply Column Filters
     const getCatName = (id: string) => dshCatalogCategories.find(c => c.id === id)?.label || 'غير معروف';
@@ -432,110 +529,333 @@ export function ControlPanelDshCatalogScreen({
         </div>
       </header>
 
-      {/* 2. Primary Tabs - Navigation Cockpit */}
-      <nav className={styles.navigationDock}>
-        {PRIMARY_TABS.map((tab) => {
-          const isSelected = tab.id === activeTab;
-          return (
-            <button
-              key={tab.id}
-              className={`${styles.surfaceTab} ${isSelected ? styles.surfaceTabActive : ''}`}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setSelectedProductId(null);
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* 3. Secondary Tabs - Sub-Navigation Dock */}
-      {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
-        <div className={`${styles.filterDock} ${styles.filterDockTint}`} style={{ padding: '4px 14px', minHeight: '36px' }}>
-          {SECONDARY_TABS[activeTab].map((sub) => {
-            const isSelected = sub.id === activeSubTab;
+      {/* Three-Layer Unified Compact Control Strip */}
+      <Surface
+        tone="inset"
+        padding={2}
+        gap={2}
+        style={{
+          borderBottomWidth: 1,
+          borderBottomColor: theme.line,
+          backgroundColor: theme.surface,
+          flexShrink: 0,
+        }}
+      >
+        {/* Layer 1: Primary Compact Tabs */}
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {PRIMARY_TABS.map((tab) => {
+            const isSelected = tab.id === activeTab;
             return (
               <button
-                key={sub.id}
-                onClick={() => setActiveSubTab(sub.id)}
-                className={styles.surfaceTab}
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setSelectedProductId(null);
+                }}
                 style={{
-                  padding: '4px 12px',
-                  fontSize: '12px',
-                  backgroundColor: isSelected ? theme.brandSurface : 'transparent',
-                  color: isSelected ? theme.brand : theme.textMuted,
-                  borderColor: isSelected ? theme.lineStrong : 'transparent',
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: isSelected ? theme.brandHeaderBackground : theme.surfaceInset,
+                  color: isSelected ? theme.textInverse : theme.textMuted,
+                  transition: 'all 0.15s ease',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                {sub.label}
+                {tab.label}
               </button>
             );
           })}
         </div>
-      )}
 
-      {/* 4. Filter Dock & Tools */}
-      <div className={styles.filterDock}>
-        <Box style={{ width: 300 }}>
-          <SearchField placeholder="بحث شامل بالمنتج أو الباركود أو المعرف..." value={searchQuery} onChangeText={setSearchQuery} />
-        </Box>
-
-        {workspaceMode === 'catalog' && (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Text role="caption" style={{ fontWeight: 800, color: theme.textMuted }}>الفئة:</Text>
-            <Chip label="الكل" tone={!activeMainCategory ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(null)} selected={!activeMainCategory} />
-            {dshCatalogCategories.map(cat => (
-              <Chip key={cat.id} label={cat.label} tone={activeMainCategory?.id === cat.id ? 'brand' : 'default'} onPress={() => handleMainCategorySelect(cat)} selected={activeMainCategory?.id === cat.id} />
-            ))}
+        {/* Layer 2: Context Sub-tabs */}
+        {SECONDARY_TABS[activeTab] && SECONDARY_TABS[activeTab].length > 0 && (
+          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px', scrollbarWidth: 'none', msOverflowStyle: 'none', borderTop: `1px solid ${theme.line}`, paddingTop: '6px' }}>
+            {SECONDARY_TABS[activeTab].map((sub) => {
+              const isSelected = sub.id === activeSubTab;
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => setActiveSubTab(sub.id)}
+                  style={{
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    border: `1px solid ${isSelected ? theme.brand : 'transparent'}`,
+                    cursor: 'pointer',
+                    backgroundColor: isSelected ? theme.brandSurface : 'transparent',
+                    color: isSelected ? theme.brand : theme.textMuted,
+                    transition: 'all 0.12s ease',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {sub.label}
+                </button>
+              );
+            })}
           </div>
         )}
 
-        <div style={{ flex: 1 }} />
+        {/* Layer 3: Smart Filters, Search, Category Selector & Actions */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: `1px solid ${theme.line}`, paddingTop: '6px' }}>
+          {/* Sub-row 1: Search & Category selector */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', flex: 1 }}>
+              <div style={{ width: '220px' }}>
+                <SearchField placeholder="بحث شامل بالمنتج أو الباركود..." value={searchQuery} onChangeText={setSearchQuery} />
+              </div>
+              {(activeTab === 'all' || activeTab === 'catalog') && (
+                <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', alignItems: 'center' }}>
+                  <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>الفئة:</Text>
+                  <button
+                    onClick={() => handleMainCategorySelect(null)}
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      border: `1px solid ${!activeMainCategory ? theme.brand : theme.lineStrong}`,
+                      cursor: 'pointer',
+                      backgroundColor: !activeMainCategory ? theme.brandSurface : theme.surface,
+                      color: !activeMainCategory ? theme.brand : theme.textMuted,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    الكل
+                  </button>
+                  {dshCatalogCategories.map(cat => {
+                    const isSelected = activeMainCategory?.id === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => handleMainCategorySelect(cat)}
+                        style={{
+                          padding: '2px 8px',
+                          borderRadius: '10px',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          border: `1px solid ${isSelected ? theme.brand : theme.lineStrong}`,
+                          cursor: 'pointer',
+                          backgroundColor: isSelected ? theme.brandSurface : theme.surface,
+                          color: isSelected ? theme.brand : theme.textMuted,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-        <Button label={showBulkOps ? "إغلاق الإجراءات" : "إجراءات جماعية"} tone={showBulkOps ? "brand" : "secondary"} size="sm" onPress={() => setShowBulkOps(!showBulkOps)} />
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <Button
+                label={showGovDashboard ? "إخفاء الحوكمة" : "توصيات الحوكمة"}
+                tone="secondary"
+                size="sm"
+                onPress={() => setShowGovDashboard(!showGovDashboard)}
+                style={{ paddingVertical: 2, paddingHorizontal: 8 }}
+              />
+              <Button
+                label={showBulkOps ? "إغلاق الإجراءات" : "إجراءات جماعية"}
+                tone={showBulkOps ? "brand" : "secondary"}
+                size="sm"
+                onPress={() => setShowBulkOps(!showBulkOps)}
+                style={{ paddingVertical: 2, paddingHorizontal: 8 }}
+              />
+            </div>
+          </div>
+
+          {/* Sub-row 2: Smart Filters chips */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>تصفية ذكية:</Text>
+            {[
+              { id: 'all', label: 'الكل' },
+              { id: 'active', label: 'نشط' },
+              { id: 'review', label: 'مراجعة' },
+              { id: 'conflict', label: 'تعارض' },
+              { id: 'master', label: 'مركزي' },
+              { id: 'partner', label: 'شريك' },
+              { id: 'needs-link', label: 'يحتاج ربط' },
+              { id: 'needs-image', label: 'يحتاج صورة' },
+            ].map(f => {
+              const isSelected = activeFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setActiveFilter(f.id as FilterType)}
+                  style={{
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    border: `1px solid ${isSelected ? theme.brand : theme.lineStrong}`,
+                    cursor: 'pointer',
+                    backgroundColor: isSelected ? theme.brandSurface : theme.surface,
+                    color: isSelected ? theme.brand : theme.textMuted,
+                    transition: 'all 0.12s ease',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </Surface>
+
+      {/* Current Context Crumb Box */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'space-between', padding: '6px 12px', backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>الكتالوج</Text>
+          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>›</Text>
+          <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: 700 }}>{PRIMARY_TABS.find(t => t.id === activeTab)?.label}</Text>
+          {SECONDARY_TABS[activeTab]?.find(s => s.id === activeSubTab)?.label && (
+            <>
+              <Text role="caption" tone="muted" style={{ fontSize: 10 }}>›</Text>
+              <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: 700 }}>{SECONDARY_TABS[activeTab].find(s => s.id === activeSubTab)?.label}</Text>
+            </>
+          )}
+          {activeFilter !== 'all' && (
+            <>
+              <Text role="caption" tone="muted" style={{ fontSize: 10 }}>›</Text>
+              <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: 700 }}>
+                {
+                  ([
+                    { id: 'all', label: 'الكل' },
+                    { id: 'active', label: 'نشط' },
+                    { id: 'review', label: 'مراجعة' },
+                    { id: 'conflict', label: 'تعارض' },
+                    { id: 'master', label: 'مركزي' },
+                    { id: 'partner', label: 'شريك' },
+                    { id: 'needs-link', label: 'يحتاج ربط' },
+                    { id: 'needs-image', label: 'يحتاج صورة' },
+                  ].find(f => f.id === activeFilter)?.label)
+                }
+              </Text>
+            </>
+          )}
+          <Text role="caption" tone="muted" style={{ fontSize: 10, marginRight: 8 }}>
+            ({filteredProducts.length} منتج)
+          </Text>
+        </div>
+
+        {/* Clear Filters indicator & trigger */}
+        {(activeFilter !== 'all' || searchQuery !== '' || activeColFiltersCount > 0 || activeMainCategory !== null || activeSubCategory !== null) && (
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <Text role="caption" style={{ fontSize: 10, color: theme.brand }}>
+              {`نشط: ${activeColFiltersCount + (activeFilter !== 'all' ? 1 : 0) + (searchQuery !== '' ? 1 : 0) + (activeMainCategory ? 1 : 0)} فلتر`}
+            </Text>
+            <button
+              onClick={() => {
+                setActiveFilter('all');
+                setSearchQuery('');
+                setColFilters(initialColumnFilters);
+                setActiveMainCategory(null);
+                setActiveSubCategory(null);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: theme.danger,
+                fontSize: '10px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              ✕ مسح الفلاتر
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* 5. Sub-filters & Active Tags */}
-      {workspaceMode === 'catalog' && (
-        <div className={`${styles.filterDock} ${styles.filterDockTint}`} style={{ padding: '4px 14px' }}>
-          {(['all', 'master', 'partner-exception', 'partner-review', 'marketing-review', 'price-conflict'] as FilterType[]).map(f => {
-              const labels: Record<string, string> = {
-                all: 'الكل', 'master': 'مركزية', 'partner-exception': 'استثناء صورة', 'partner-review': 'مراجعة شريك', 'marketing-review': 'مراجعة تسويق', 'price-conflict': 'تعارض سعر'
-              };
-              return (
-                <Chip key={f} label={labels[f]} tone={activeFilter === f ? 'brand' : 'default'} onPress={() => setActiveFilter(f)} selected={activeFilter === f} />
-              );
-          })}
-
-          {(activeFilter !== 'all' || searchQuery || activeColFiltersCount > 0) && (
-             <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginRight: 'auto' }}>
-               <Button label="مسح الكل" tone="secondary" size="sm" onPress={() => { setActiveFilter('all'); setSearchQuery(''); setColFilters(initialColumnFilters); }} />
-             </div>
-          )}
-        </div>
+      {/* Collapsible Governance Panel */}
+      {showGovDashboard && (
+        <Box paddingX={4} paddingY={2} style={{ backgroundColor: theme.surface, borderBottomWidth: 1, borderBottomColor: theme.line }}>
+          <WebControlPanelRecommendation
+            title="تثبيت حوكمة الكتالوج"
+            reason={`القسم المالك: ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} ·  الشريك يحرر السعر والمخزون محليًا فقط · النشر والتعارض والباركود تُراجع on-demand عبر الكتالوج، مع handoff إلى ${partnersGovernance?.sectionLabel ?? 'Partners'} و${marketingGovernance?.sectionLabel ?? 'Marketing'} عند الحاجة.`}
+            confidence="high"
+            auditTag="catalogs"
+            primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
+            secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner') }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px', marginTop: '16px' }}>
+            {[
+              {
+                title: 'مراجعة جماعية للمنتجات المتقاربة',
+                desc: 'تحليل وتدقيق الأسعار والمخزون للمجموعات المتشابهة لتفادي التباين وتوحيد الأصول.',
+                icon: '🔄',
+                accent: theme.brand,
+              },
+              {
+                title: 'دمج التكرارات قبل النشر',
+                desc: 'دمج بطاقات المنتجات المتطابقة لضمان ظهور منتج موحد وقاعدة بيانات خالية من الضجيج.',
+                icon: '👥',
+                accent: theme.success,
+              },
+              {
+                title: 'تعارض الباركود ومعرفات GTIN',
+                desc: 'التحقق التلقائي من تطابق الباركود والمعرفات الدولية لمنع تداخل المنتجات.',
+                icon: '⚠️',
+                accent: theme.danger,
+              },
+              {
+                title: 'ربط الفئات وقياس التصنيف',
+                desc: 'خرائط الفئات الذكية لربط أقسام الشركاء بأقسام العميل بدقة رقمية كاملة.',
+                icon: '🏷️',
+                accent: theme.brand,
+              },
+              {
+                title: 'إدارة البدائل والتعويض',
+                desc: 'اقتراح البدائل الذكية للعميل في حالة عدم توفر المنتج لدى الشريك لضمان استمرارية الطلب.',
+                icon: '🔄',
+                accent: theme.warning,
+              },
+              {
+                title: 'تدقيق الوسائط والظهور للعميل',
+                desc: 'تطبيق سياسة مائية موحدة وتدقيق الجودة قبل منح علامة النشاط والظهور النهائي.',
+                icon: '👁️',
+                accent: theme.success,
+              },
+            ].map((card) => (
+              <Surface
+                key={card.title}
+                tone="inset"
+                padding={3}
+                radiusToken="lg"
+                border
+                borderTone="line"
+                style={{
+                  borderRightWidth: 4,
+                  borderRightColor: card.accent,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <Box style={{ flexDirection: 'row-reverse', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: '18px' }}>{card.icon}</span>
+                  <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>
+                    {card.title}
+                  </Text>
+                </Box>
+                <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
+                  {card.desc}
+                </Text>
+              </Surface>
+            ))}
+          </div>
+        </Box>
       )}
 
-      <Box paddingX={4} paddingY={2}>
-        <WebControlPanelRecommendation
-          title="تثبيت حوكمة الكتالوج"
-          reason={`القسم المالك: ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} · الشريك يحرر السعر والمخزون محليًا فقط · النشر والتعارض والباركود تُراجع on-demand عبر الكتالوج، مع handoff إلى ${partnersGovernance?.sectionLabel ?? 'Partners'} و${marketingGovernance?.sectionLabel ?? 'Marketing'} عند الحاجة.`}
-          confidence="high"
-          auditTag="catalogs"
-          primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
-          secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner-exception') }}
-        />
-        <Box gap={2} marginTop={2}>
-          {closureRecommendations.map((item) => (
-            <Surface key={item} tone="inset" padding={3} radiusToken="lg" border borderTone="line">
-              <Text role="bodySm" tone="muted">
-                {item}
-              </Text>
-            </Surface>
-          ))}
-        </Box>
-      </Box>
 
       {/* 6. MAIN CONTENT AREA */}
       <main className={styles.surfaceMainPanel}>
@@ -559,7 +879,7 @@ export function ControlPanelDshCatalogScreen({
               </div>
             )}
 
-            {activeTab === 'catalog' && (
+            {(activeTab === 'all' || activeTab === 'catalog' || activeTab === 'intake' || activeTab === 'mapping' || activeTab === 'publishing' || (activeTab === 'approvals' && (activeSubTab === 'media' || activeSubTab === 'barcode'))) && (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: theme.surface, minWidth: 0 }}>
                 <div style={{ flex: 1, minHeight: 0, backgroundColor: theme.surface }}>
                    {isManualOrderCategory ? (
@@ -602,7 +922,7 @@ export function ControlPanelDshCatalogScreen({
                                     </td>
                                   )}
                                   <td style={{ padding: '8px' }}>
-                                     <WatermarkedImage src={p.imageUri} size={32} />
+                                     <WatermarkedImage src={p.imageUri} fallback={p.emojiFallback} size={32} productName={p.name} />
                                   </td>
                                   <td style={{ padding: '8px' }}>
                                      <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
@@ -651,7 +971,7 @@ export function ControlPanelDshCatalogScreen({
             )}
 
             {/* Inspector Panel */}
-            {activeTab === 'catalog' && selectedProductId && selectedProduct && (
+            {(activeTab === 'all' || activeTab === 'catalog' || activeTab === 'intake' || activeTab === 'mapping' || activeTab === 'publishing' || (activeTab === 'approvals' && (activeSubTab === 'media' || activeSubTab === 'barcode'))) && selectedProductId && selectedProduct && (
               <div style={{ width: 320, borderRight: `1px solid ${theme.line}`, backgroundColor: theme.surfaceInset, display: 'flex', flexDirection: 'column' }}>
                  <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
                     <Text role="bodyStrong" style={{ fontSize: 14 }}>تفاصيل المنتج</Text>
@@ -659,7 +979,7 @@ export function ControlPanelDshCatalogScreen({
                  </Box>
                  <Box gap={3} padding={3} style={{ flex: 1 }}>
                     <Box layoutDirection="row" gap={3} align="center">
-                       <WatermarkedImage src={selectedProduct.imageUri} size={48} />
+                       <WatermarkedImage src={selectedProduct.imageUri} productName={selectedProduct.name} size={48} />
                        <Box style={{ flex: 1 }} gap={0}>
                           <Text role="bodyStrong" style={{ fontSize: 13 }}>{selectedProduct.name}</Text>
                          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المعرف: {selectedProduct.sku}</Text>

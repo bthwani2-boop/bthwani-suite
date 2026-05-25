@@ -213,7 +213,7 @@ Pre-conditions before any implementation:
 
 | Slice | Status |
 |---|---|
-| DSH-SLICE-001-STORE-DISCOVERY | L7_CLOSED (closes client discovery edge only) |
+| DSH-SLICE-001-STORE-DISCOVERY | FULL_CROSS_SURFACE_REOPENED_FOR_PROOF |
 | DSH-SLICE-002-CATALOG-READINESS-CLIENT-VISIBILITY | PROPOSED_NEXT_SLICE |
 | Future checkout/payment cross-surface slice | FUTURE_BLOCKED_BY_WLT_AUTH_PAYMENT |
 | Future lifecycle/support cross-surface slice | FUTURE_NEEDS_CROSS_SURFACE_PROOF |

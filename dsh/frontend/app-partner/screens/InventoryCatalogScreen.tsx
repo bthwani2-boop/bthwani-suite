@@ -253,6 +253,28 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
     (item) => !canonicalStoreId || item.isCatalogOwned,
   );
 
+  const partnerRecords = getPartnerQueueRecords();
+  const mappedRecords = partnerRecords
+    .filter((r) => r.entityType === 'product' || r.entityType === 'product-media')
+    .map((r) => {
+      const isPrivate = r.entityType !== 'product';
+      const catalogLinked = r.entityType === 'product';
+      return {
+        id: r.id,
+        name: r.title,
+        categoryLabel: r.entityType === 'product' ? 'برغر' : 'وجبة',
+        isPrivateStoreProduct: isPrivate,
+        isCatalogOwned: r.stage === 'client-visible' || r.stage === 'catalog-adopted',
+        catalogLinked,
+        priceLabel: '18.00 ر.ي',
+        stockCount: 42,
+        available: true,
+        lowStock: false,
+        publishStage: r.stage,
+        reviewNeeded: r.stage !== 'client-visible',
+      } satisfies InventoryCatalogListItem;
+    });
+
   return dedupeItems([
     {
       id: 'prod-1', name: 'برغر كلاسيك', categoryLabel: 'برغر',
@@ -331,6 +353,7 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
       priceLabel: '15.00 ر.ي', stockCount: 25, available: true, lowStock: false,
       publishStage: 'marketing-review', reviewNeeded: true,
     },
+    ...mappedRecords,
     ...scopedCanonical,
   ]);
 }

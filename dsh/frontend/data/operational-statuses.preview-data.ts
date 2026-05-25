@@ -513,5 +513,5 @@ export type DshCaptainProfileSnapshot = {
 
 export function selectDshCaptainOperationalStatusesPreview(captainId?: string) {
   void captainId;
-  return Object.values(DSH_CAPTAIN_STATE_META);
+  return Object.values(stateMetaMap);
 }

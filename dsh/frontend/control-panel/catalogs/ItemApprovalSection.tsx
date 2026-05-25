@@ -8,6 +8,13 @@ import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusTone,
 } from '../../shared/dsh-product-identity.model';
+import {
+  getAllApprovalRecords,
+  moveApprovalRecordToStage,
+  upsertApprovalRecord,
+  type ApprovalRecord,
+  type ApprovalStage,
+} from '../../shared/workflow';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -40,40 +47,6 @@ const statusTone: Record<ItemApprovalStatus, 'default' | 'success' | 'danger' | 
   'needs-revision': 'warning',
 };
 
-const demoItems: CatalogItemApprovalRecord[] = [
-  {
-    id: 'item-001',
-    title: 'برجر دجاج مقرمش',
-    partnerName: 'مطعم النجوم',
-    category: 'وجبات رئيسية',
-    submittedAt: '2026-05-15',
-    status: 'pending',
-    approvalStatus: 'partner_review',
-    auditRequired: false,
-  },
-  {
-    id: 'item-002',
-    title: 'بيتزا مارجريتا',
-    partnerName: 'مطبخ البيت',
-    category: 'بيتزا',
-    submittedAt: '2026-05-14',
-    status: 'needs-revision',
-    approvalStatus: 'needs_fix',
-    approvalNote: 'يرجى تحديث صورة المنتج بدقة أعلى وإرفاق وصف موحد.',
-    auditRequired: false,
-  },
-  {
-    id: 'item-003',
-    title: 'سلطة سيزر',
-    partnerName: 'كافيه الصحة',
-    category: 'سلطات',
-    submittedAt: '2026-05-13',
-    status: 'approved',
-    approvalStatus: 'partner_approved',
-    auditRequired: false,
-  },
-];
-
 export type ItemApprovalSectionProps = {
   items?: CatalogItemApprovalRecord[];
   onApprove?: (id: string) => void;
@@ -82,12 +55,80 @@ export type ItemApprovalSectionProps = {
 };
 
 export function ItemApprovalSection({
-  items = demoItems,
-  onApprove,
-  onReject,
-  onRequestRevision,
+  items: propsItems,
+  onApprove: propsOnApprove,
+  onReject: propsOnReject,
+  onRequestRevision: propsOnRequestRevision,
 }: ItemApprovalSectionProps) {
   const { theme } = useTheme();
+
+  // Connect to the shared global store if no props are provided
+  const [records, setRecords] = React.useState<ApprovalRecord[]>([]);
+  const refresh = React.useCallback(() => {
+    setRecords(getAllApprovalRecords());
+  }, []);
+
+  React.useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const items = React.useMemo(() => {
+    if (propsItems) return propsItems;
+
+    // Map records from the shared workflow SSoT
+    return records
+      .filter((r) => r.entityType === 'product' || r.entityType === 'product-media' || r.entityType === 'category-suggestion')
+      .map((r) => {
+        let status: ItemApprovalStatus = 'pending';
+        if (r.stage === 'needs-fix') status = 'needs-revision';
+        else if (r.stage === 'rejected') status = 'rejected';
+        else if (['partner-approved', 'marketing-approved', 'catalog-adopted', 'client-visible'].includes(r.stage)) {
+          status = 'approved';
+        }
+
+        return {
+          id: r.id,
+          title: r.title,
+          partnerName: r.source === 'app-partner' ? 'تطبيق الشريك' : 'تطبيق الميداني',
+          category: r.entityType === 'product' ? 'منتج كتالوج' : r.entityType === 'product-media' ? 'صورة منتج' : 'اقتراح فئة',
+          submittedAt: r.submittedAt ? r.submittedAt.split('T')[0] : '2026-05-25',
+          status,
+          approvalStatus: r.stage as DshProductIdentityApprovalStatus,
+          approvalNote: r.metadata?.requiredFix || r.metadata?.rejectionReason,
+          auditRequired: false,
+        } satisfies CatalogItemApprovalRecord;
+      });
+  }, [records, propsItems]);
+
+  const onApprove = React.useCallback((id: string) => {
+    if (propsOnApprove) {
+      propsOnApprove(id);
+      return;
+    }
+    moveApprovalRecordToStage(id, 'partner-approved', 'control-panel-partners', 'اعتماد الجودة الأولي');
+    refresh();
+  }, [propsOnApprove, refresh]);
+
+  const onReject = React.useCallback((id: string, evidenceNote: string) => {
+    if (propsOnReject) {
+      propsOnReject(id, evidenceNote);
+      return;
+    }
+    moveApprovalRecordToStage(id, 'rejected', 'control-panel-partners', 'رفض الجودة');
+    upsertApprovalRecord({ id, metadata: { rejectionReason: evidenceNote } });
+    refresh();
+  }, [propsOnReject, refresh]);
+
+  const onRequestRevision = React.useCallback((id: string, evidenceNote: string) => {
+    if (propsOnRequestRevision) {
+      propsOnRequestRevision(id, evidenceNote);
+      return;
+    }
+    moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-partners', 'طلب تعديل الجودة');
+    upsertApprovalRecord({ id, metadata: { requiredFix: evidenceNote } });
+    refresh();
+  }, [propsOnRequestRevision, refresh]);
+
   const pendingCount = items.filter((i) => i.status === 'pending').length;
   // Evidence notes keyed by item id — required for reject/revision actions
   const [evidenceNotes, setEvidenceNotes] = React.useState<Record<string, string>>({});

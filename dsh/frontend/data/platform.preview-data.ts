@@ -1,8 +1,8 @@
 import type { AppearanceRecord, ProviderRecord, ServiceRecord, DshPlatformVarRecord, DshPlatformProviderControlRecord, DshPlatformScopeLayer, DshPlatformSimulationScenario, DshPlatformAuditEntry } from '../shared/dsh-cp-platform.contract';
 import type { AdminRole, MockAdminUser, PlatformPermission } from '../shared/dsh-cp-administration.contract';
 import type { DshSurfaceId } from '../shared/dsh-flow-registry';
-import type { DshCrossSurfaceClosureEntry, DshCrossSurfaceClosureStatus } from '../shared/dshCrossSurfaceClosureMap';
-import type { Phase12FixtureLocation } from '../types';
+import type { DshCrossSurfaceClosureItem } from '../shared/dshCrossSurfaceClosureMap';
+import type { Phase12FixtureLocation } from '../../types';
 
 // -----------------------------------------------------------------------------
 // Platform records
