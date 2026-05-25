@@ -16,6 +16,7 @@ import {
 import { getCatalogAdoptionItems } from '../../data/marketing.preview-data';
 import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner } from '../../shared/workflow';
 import { getDshControlPanelGovernanceEntry } from '../shared';
+import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import styles from '../shared/control-panel-surface.module.css';
 
 // --- Types ---
@@ -134,10 +135,20 @@ function getPremiumEmoji(name: string, fallback?: string): string {
   return fallback || '📦';
 }
 
-function WatermarkedImage({ src, fallback, size = 32, productName = '' }: { src?: string, fallback?: string, size?: number, productName?: string }) {
+function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = '' }: { src?: string, mediaKey?: string, fallback?: string, size?: number, productName?: string }) {
   const { theme } = useTheme();
-  // Always use premium emoji fallback for mock /dsh/media-fixtures/ paths as they don't load locally
-  const hasValidRealImage = src && !src.startsWith('/dsh/media-fixtures');
+
+  // Resolve image using the unified resolver for seed assets or custom URIs
+  const resolved = resolveDshImageSource(mediaKey || src);
+  const imagePath = resolved && typeof resolved === 'object' && 'src' in resolved
+    ? (resolved as any).src
+    : (resolved && typeof resolved === 'object' && 'uri' in resolved
+        ? (resolved as any).uri
+        : typeof resolved === 'string'
+          ? resolved
+          : undefined);
+
+  const hasValidRealImage = !!imagePath;
   const emoji = getPremiumEmoji(productName || '', fallback);
 
   return (
@@ -157,8 +168,8 @@ function WatermarkedImage({ src, fallback, size = 32, productName = '' }: { src?
         backgroundColor: theme.surfaceInset,
       }}
     >
-      {hasValidRealImage ? (
-        <Image src={src} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
+      {hasValidRealImage && imagePath ? (
+        <Image src={imagePath} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
       ) : (
         <span style={{ fontSize: `${size * 0.55}px`, lineHeight: 1, userSelect: 'none', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
           {emoji}
@@ -351,6 +362,18 @@ export function ControlPanelDshCatalogScreen({
       } else if (activeSubTab === 'field') {
         products = products.filter(p => p.sourceSurface === 'field');
       }
+    } else if (activeTab === 'approvals') {
+      if (activeSubTab === 'marketing') {
+        products = products.filter(p => p.approvalStage === 'marketing-review');
+      } else if (activeSubTab === 'quality') {
+        products = products.filter(p => p.approvalStage === 'partner-review');
+      } else if (activeSubTab === 'pricing') {
+        products = products.filter(p => p.price > 100);
+      } else if (activeSubTab === 'media') {
+        products = products.filter(p => p.mediaPolicy === 'partner-proposed-review' || p.mediaPolicy === 'marketing-enhancement-required' || !p.mediaKey);
+      } else if (activeSubTab === 'barcode') {
+        products = products.filter(p => !p.gtin || !!p.conflictReason);
+      }
     } else if (activeTab === 'mapping') {
       if (activeSubTab === 'duplicates') {
         products = products.filter(p => !!p.conflictReason);
@@ -358,6 +381,10 @@ export function ControlPanelDshCatalogScreen({
         products = products.filter(p => !p.gtin);
       } else if (activeSubTab === 'categories') {
         products = products.filter(p => !!p.categoryPath.main);
+      } else if (activeSubTab === 'substitutions') {
+        products = products.filter(p => p.categoryPath.main === 'restaurants'); // meals can have substitution policies
+      } else if (activeSubTab === 'visibility-policy') {
+        products = products.filter(p => p.surfaces.includes('client'));
       }
     } else if (activeTab === 'publishing') {
       if (activeSubTab === 'ready') {
@@ -778,7 +805,7 @@ export function ControlPanelDshCatalogScreen({
 
       {/* Collapsible Governance Panel */}
       {showGovDashboard && (
-        <Box paddingX={4} paddingY={2} style={{ backgroundColor: theme.surface, borderBottomWidth: 1, borderBottomColor: theme.line }}>
+        <Box paddingX={3} paddingY={2} style={{ backgroundColor: theme.surface, borderBottomWidth: 1, borderBottomColor: theme.line }}>
           <WebControlPanelRecommendation
             title="تثبيت حوكمة الكتالوج"
             reason={`القسم المالك: ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} ·  الشريك يحرر السعر والمخزون محليًا فقط · النشر والتعارض والباركود تُراجع on-demand عبر الكتالوج، مع handoff إلى ${partnersGovernance?.sectionLabel ?? 'Partners'} و${marketingGovernance?.sectionLabel ?? 'Marketing'} عند الحاجة.`}
@@ -787,71 +814,121 @@ export function ControlPanelDshCatalogScreen({
             primaryAction={{ id: 'open-approvals', label: 'فتح الاعتمادات', onAction: () => setActiveTab('approvals') }}
             secondaryAction={{ id: 'open-exceptions', label: 'فتح الاستثناءات', onAction: () => setActiveFilter('partner') }}
           />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px', marginTop: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px', marginTop: '10px' }}>
             {[
               {
+                id: 'group-review',
                 title: 'مراجعة جماعية للمنتجات المتقاربة',
                 desc: 'تحليل وتدقيق الأسعار والمخزون للمجموعات المتشابهة لتفادي التباين وتوحيد الأصول.',
                 icon: '🔄',
                 accent: theme.brand,
+                action: () => {
+                  setActiveTab('mapping');
+                  setActiveSubTab('duplicates');
+                  setActiveFilter('review');
+                }
               },
               {
+                id: 'duplicates',
                 title: 'دمج التكرارات قبل النشر',
                 desc: 'دمج بطاقات المنتجات المتطابقة لضمان ظهور منتج موحد وقاعدة بيانات خالية من الضجيج.',
                 icon: '👥',
                 accent: theme.success,
+                action: () => {
+                  setActiveTab('mapping');
+                  setActiveSubTab('duplicates');
+                  setActiveFilter('all');
+                }
               },
               {
+                id: 'barcode',
                 title: 'تعارض الباركود ومعرفات GTIN',
                 desc: 'التحقق التلقائي من تطابق الباركود والمعرفات الدولية لمنع تداخل المنتجات.',
                 icon: '⚠️',
                 accent: theme.danger,
+                action: () => {
+                  setActiveTab('mapping');
+                  setActiveSubTab('gtin');
+                  setActiveFilter('conflict');
+                }
               },
               {
+                id: 'category-mapping',
                 title: 'ربط الفئات وقياس التصنيف',
                 desc: 'خرائط الفئات الذكية لربط أقسام الشركاء بأقسام العميل بدقة رقمية كاملة.',
                 icon: '🏷️',
                 accent: theme.brand,
+                action: () => {
+                  setActiveTab('mapping');
+                  setActiveSubTab('categories');
+                  setActiveFilter('all');
+                }
               },
               {
+                id: 'substitutions',
                 title: 'إدارة البدائل والتعويض',
                 desc: 'اقتراح البدائل الذكية للعميل في حالة عدم توفر المنتج لدى الشريك لضمان استمرارية الطلب.',
                 icon: '🔄',
                 accent: theme.warning,
+                action: () => {
+                  setActiveTab('mapping');
+                  setActiveSubTab('substitutions');
+                  setActiveFilter('all');
+                }
               },
               {
+                id: 'media-audit',
                 title: 'تدقيق الوسائط والظهور للعميل',
                 desc: 'تطبيق سياسة مائية موحدة وتدقيق الجودة قبل منح علامة النشاط والظهور النهائي.',
                 icon: '👁️',
                 accent: theme.success,
+                action: () => {
+                  setActiveTab('publishing');
+                  setActiveSubTab('client-visible');
+                  setActiveFilter('all');
+                }
               },
-            ].map((card) => (
-              <Surface
-                key={card.title}
-                tone="inset"
-                padding={3}
-                radiusToken="lg"
-                border
-                borderTone="line"
-                style={{
-                  borderRightWidth: 4,
-                  borderRightColor: card.accent,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                }}
-              >
-                <Box style={{ flexDirection: 'row-reverse', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '18px' }}>{card.icon}</span>
-                  <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>
-                    {card.title}
+            ].map((card) => {
+              const isActive = (card.id === 'barcode' && activeTab === 'mapping' && activeSubTab === 'gtin' && activeFilter === 'conflict') ||
+                              (card.id === 'duplicates' && activeTab === 'mapping' && activeSubTab === 'duplicates' && activeFilter === 'all') ||
+                              (card.id === 'group-review' && activeTab === 'mapping' && activeSubTab === 'duplicates' && activeFilter === 'review') ||
+                              (card.id === 'media-audit' && activeTab === 'publishing' && activeSubTab === 'client-visible') ||
+                              (card.id === 'substitutions' && activeTab === 'mapping' && activeSubTab === 'substitutions') ||
+                              (card.id === 'category-mapping' && activeTab === 'mapping' && activeSubTab === 'categories');
+
+              return (
+                <button
+                  key={card.id}
+                  onClick={card.action}
+                  aria-label={card.title}
+                  style={{
+                    appearance: 'none',
+                    border: `1px solid ${isActive ? theme.brand : theme.line}`,
+                    borderRight: `4px solid ${isActive ? theme.brand : card.accent}`,
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    backgroundColor: isActive ? theme.brandSurface : theme.surfaceInset,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                    width: '100%',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Box style={{ flexDirection: 'row-reverse', gap: '6px', alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
+                    <span style={{ fontSize: '14px' }}>{card.icon}</span>
+                    <Text role="bodyStrong" style={{ fontSize: 11, fontWeight: 700, color: isActive ? theme.brand : theme.brandHeaderBackground }}>
+                      {card.title}
+                    </Text>
+                  </Box>
+                  <Text role="caption" tone="muted" style={{ fontSize: 9, textAlign: 'right', lineHeight: 12, display: 'block', width: '100%' }}>
+                    {card.desc}
                   </Text>
-                </Box>
-                <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
-                  {card.desc}
-                </Text>
-              </Surface>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </Box>
       )}
@@ -922,7 +999,7 @@ export function ControlPanelDshCatalogScreen({
                                     </td>
                                   )}
                                   <td style={{ padding: '8px' }}>
-                                     <WatermarkedImage src={p.imageUri} fallback={p.emojiFallback} size={32} productName={p.name} />
+                                     <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={32} productName={p.name} />
                                   </td>
                                   <td style={{ padding: '8px' }}>
                                      <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
@@ -979,7 +1056,7 @@ export function ControlPanelDshCatalogScreen({
                  </Box>
                  <Box gap={3} padding={3} style={{ flex: 1 }}>
                     <Box layoutDirection="row" gap={3} align="center">
-                       <WatermarkedImage src={selectedProduct.imageUri} productName={selectedProduct.name} size={48} />
+                       <WatermarkedImage src={selectedProduct.imageUri} mediaKey={selectedProduct.mediaKey} productName={selectedProduct.name} size={48} />
                        <Box style={{ flex: 1 }} gap={0}>
                           <Text role="bodyStrong" style={{ fontSize: 13 }}>{selectedProduct.name}</Text>
                          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المعرف: {selectedProduct.sku}</Text>

@@ -104,6 +104,7 @@ export type CatalogProductMaster = {
   sourceSurface: CatalogSourceSurface;
   surfaces: CatalogSurfaceAvailability[];
   imageUri?: string;
+  mediaKey?: string;
   emojiFallback?: string;
   partnerOverrides?: CatalogPartnerOverride[];
   conflictReason?: string;
@@ -214,6 +215,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner', 'marketing', 'field'],
     imageUri: '/dsh/media-fixtures/products/apple.v1.png',
+    mediaKey: 'dsh.product.apple.v1',
     emojiFallback: 'ت',
   },
   {
@@ -229,6 +231,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'field',
     surfaces: ['client', 'partner', 'marketing'],
     imageUri: '/dsh/media-fixtures/products/milk.v1.png',
+    mediaKey: 'dsh.product.milk.v1',
     emojiFallback: 'ح',
   },
   {
@@ -243,6 +246,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
     imageUri: '/dsh/media-fixtures/products/bread.v1.png',
+    mediaKey: 'dsh.product.bread.v1',
     emojiFallback: 'خ',
   },
   {
@@ -257,6 +261,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'partner',
     surfaces: ['client', 'partner', 'marketing'],
     imageUri: '/dsh/media-fixtures/restaurants/chicken.v1.png',
+    mediaKey: 'dsh.product.chicken.v1',
     emojiFallback: 'د',
     partnerOverrides: [
       { partnerId: 'store-1003', price: 34.00, preparationTime: '18-22 دقيقة' }
@@ -273,6 +278,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'marketing-review',
     sourceSurface: 'partner',
     surfaces: ['partner', 'marketing'],
+    mediaKey: 'dsh.product.chicken.v1', // standard fallback seed asset
     emojiFallback: 'ب',
     partnerOverrides: [
       { partnerId: 'store-1004', price: 25.00 }
@@ -289,6 +295,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'partner',
     surfaces: ['client', 'partner'],
+    mediaKey: 'dsh.product.pasta.v1',
     emojiFallback: 'ب',
   },
   {
@@ -303,6 +310,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'partner',
     surfaces: ['partner', 'marketing'],
     imageUri: '/dsh/media-fixtures/sweets/choco.v1.png',
+    mediaKey: 'dsh.product.choco.v1',
     emojiFallback: 'ش',
   },
   {
@@ -316,6 +324,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'partner',
     surfaces: ['client', 'partner'],
+    mediaKey: 'dsh.product.yogurt.v1', // fresh orange juice fits standard beverage/yogurt seed
     emojiFallback: 'ع',
   },
   {
@@ -331,6 +340,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     sourceSurface: 'catalog',
     surfaces: ['partner', 'marketing', 'field'],
     imageUri: '/dsh/media-fixtures/dates/lead-5.dates-box.v1.png',
+    mediaKey: 'dsh.product.roll.v1', // using roll.v1 as dates package placeholder
     emojiFallback: 'ت',
   },
   {
@@ -344,6 +354,7 @@ export const dshCatalogProducts: CatalogProductMaster[] = [
     approvalStage: 'client-visible',
     sourceSurface: 'catalog',
     surfaces: ['client', 'partner'],
+    mediaKey: 'dsh.product.yogurt.v1', // honey jar fits standard yogurt seed jar
     emojiFallback: 'ع',
   },
   {
