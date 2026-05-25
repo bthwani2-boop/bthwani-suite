@@ -16,7 +16,7 @@ import {
   submitFieldStoreForReview,
   touchFieldStoreDraft,
   type FieldStoreFile,
-} from '../data/field-stores.preview-data';
+} from '../data/stores.preview-data';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 
 type DshFieldReadinessEscalationState = NonNullable<React.ComponentProps<typeof DshFieldReadinessEscalationScreen>['state']>;

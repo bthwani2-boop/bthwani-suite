@@ -9,11 +9,11 @@ import {
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import {
-  DSH_OPS_INTERVENTION_PLAYBOOKS,
   DSH_ORDER_RESCUE_PREVIEW,
   getDshOrderRescueByContext,
   getDshOrderRescueCase,
-} from '../../shared';
+} from '../../data/orders.preview-data';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 

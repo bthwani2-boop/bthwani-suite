@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
 import { Box, Icon, Text, colorPalette } from '@bthwani/ui-kit';
-import type { MarketingVideoRecord } from '../data/video.preview-store';
+import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
 
 export type DshHomeApprovedVideoReelsViewerProps = {
 	visible: boolean;

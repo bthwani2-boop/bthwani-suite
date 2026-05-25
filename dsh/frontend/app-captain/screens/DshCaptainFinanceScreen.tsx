@@ -2,7 +2,7 @@ import React from 'react';
 import type { WltCaptainFinanceSection } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
 import { WltDshCaptainBridge } from '../../../../wlt/frontend/app-captain/dsh';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainFinanceScreenState } from '../../data/captain-state.preview-data';
+import type { DshCaptainFinanceScreenState } from '../../data/operational-statuses.preview-data';
 
 export type DshCaptainFinanceScreenProps = {
 	section?: WltCaptainFinanceSection;

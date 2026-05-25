@@ -33,7 +33,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
 import { CancelOrderSheet } from '../sheets/CancelOrderSheet';
-import { getDshClientStateMeta, type DshClientState } from '../../data/client-state.preview-data';
+import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
 import type {
   DshClientAddressSnapshot,
   DshClientCreateOrderRequest,

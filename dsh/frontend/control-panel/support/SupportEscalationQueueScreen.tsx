@@ -6,7 +6,7 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
-import { getDshFlowPolicySummary } from '../../shared';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,

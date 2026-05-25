@@ -10,10 +10,10 @@ import {
 } from '@bthwani/ui-kit/web';
 import {
   DSH_ASSISTED_ORDER_PREVIEW,
-  DSH_OPS_INTERVENTION_PLAYBOOKS,
   getDshAssistedOrderByContext,
   getDshAssistedOrderById,
-} from '../../shared';
+} from '../../data/orders.preview-data';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 

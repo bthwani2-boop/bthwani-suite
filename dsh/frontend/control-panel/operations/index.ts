@@ -31,7 +31,7 @@ export {
   LIVE_ORDERS_OPERATIONAL_PREVIEW,
   OPERATIONS_PULSE_METRICS,
   SHEIN_PROXY_OPERATIONAL_PREVIEW,
-} from '../../data/cp-operations.preview-data';
+} from '../../data/orders.preview-data';
 export { default as ControlPanelDshOperationsScreen, DshOperationsHubSurface } from './OperationsHubScreen';
 export type { ControlPanelDshOperationsScreenProps } from './OperationsHubScreen';
 export { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';

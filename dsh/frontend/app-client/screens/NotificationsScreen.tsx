@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Box, Button, Divider, MobileScrollView, Text, TopBar } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
-import { dshNotificationsFixtures } from '../../data/notifications.preview-data';
+import { dshNotificationsFixtures } from '../../data/support.preview-data';
 
 export type DshNotificationActionTarget = 'benefits' | 'tracking' | 'orders-list' | 'search' | 'none';
 

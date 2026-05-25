@@ -1,4 +1,4 @@
-// --- Commercial Preview Contract (UI_PREVIEW_ONLY) — unified type contract ---
+// --- Commercial Preview Contract (UI_PREVIEW_ONLY) ---
 export type {
   CommercialLifecycleStatus,
   CommercialAudience,
@@ -32,7 +32,7 @@ export type {
   LoyaltyClientBenefits,
   CommercialEligibilityContext,
   CommercialProjectionInput,
-} from '../data/commercial.preview-contract';
+} from './commercial.preview-contract';
 export {
   commercialContractMeta,
   isClientVisibleStatus,
@@ -54,110 +54,27 @@ export {
   mapRewardsToClientSections,
   mapPartnerOfferToCommercialOffer,
   mapCampaignToCommercialProjection,
-} from '../data/commercial.preview-contract';
+} from './commercial.preview-contract';
 
 export type {
-	MarketingRouteHint,
-	MarketingVisibilityApprovalStatus,
-	MarketingVisibilityContentType,
-	MarketingVisibilityDisplayStatus,
-	MarketingVisibilityRecord,
-	MarketingVisibilityTargetSurface,
+  MarketingRouteHint,
+  MarketingVisibilityApprovalStatus,
+  MarketingVisibilityContentType,
+  MarketingVisibilityDisplayStatus,
+  MarketingVisibilityRecord,
+  MarketingVisibilityTargetSurface,
 } from './marketing-visibility.contract';
 export {
-	DSH_LOYALTY_UI_BOUNDARY_NOTE,
-	getCampaignVisibilityRecord,
-	getHomePromoVisibilityRecord,
-	getLoyaltyVisibilityRecord,
-	getMarketingVideoVisibilityRecord,
-	getPartnerOfferVisibilityRecord,
-	isMarketingRenderable,
-	marketingVisibilityContractMeta,
-	resolveMarketingVisibility,
+  DSH_LOYALTY_UI_BOUNDARY_NOTE,
+  getCampaignVisibilityRecord,
+  getHomePromoVisibilityRecord,
+  getLoyaltyVisibilityRecord,
+  getMarketingVideoVisibilityRecord,
+  getPartnerOfferVisibilityRecord,
+  isMarketingRenderable,
+  marketingVisibilityContractMeta,
+  resolveMarketingVisibility,
 } from './marketing-visibility.contract';
-
-// --- Commercial Marketing Contract (UI_PREVIEW_ONLY) ---
-
-export type {
-  LoyaltyStatus,
-  LoyaltyAudience,
-  LoyaltyLane,
-  LoyaltyRecord,
-  LoyaltyProgram,
-  LoyaltyTier,
-  LoyaltyReward,
-  SubscriptionPlan,
-  Entitlement,
-  EarningRule,
-  RedemptionRule,
-} from '../data/loyalty.preview-store';
-export {
-  loyaltyStoreDataContract,
-  getLoyaltyItems,
-  getLoyaltyKpis,
-  upsertLoyaltyItem,
-  removeLoyaltyItem,
-  getLoyaltyPrograms,
-  getSubscriptionPlans,
-  getLoyaltyTiers,
-  getLoyaltyRewards,
-  getEntitlements,
-} from '../data/loyalty.preview-store';
-
-export type {
-  PartnerOfferType,
-  PartnerOfferStatus,
-  PartnerOfferSource,
-  PartnerOfferTarget,
-  PartnerOfferRecord,
-} from '../data/partner-offer.preview-store';
-export {
-  partnerOfferStoreDataContract,
-  getPartnerOfferItems,
-  getPartnerOfferKpis,
-  upsertPartnerOfferItem,
-  approvePartnerOfferItem,
-  publishPartnerOfferItem,
-  pausePartnerOfferItem,
-  rejectPartnerOfferItem,
-  archivePartnerOfferItem,
-  removePartnerOfferItem,
-  isPartnerOfferClientVisible,
-} from '../data/partner-offer.preview-store';
-
-export type {
-  CampaignStatus,
-  CampaignGoal,
-  CampaignAudience,
-  CampaignChannel,
-  CampaignPlacement,
-  CampaignPriority,
-  CampaignTargetType,
-  CampaignRecord,
-} from '../data/campaign.preview-store';
-export {
-  campaignStoreDataContract,
-  getCampaignItems,
-  getCampaignKpis,
-  upsertCampaignItem,
-  toggleCampaignStatus,
-  duplicateCampaignItem,
-  removeCampaignItem,
-} from '../data/campaign.preview-store';
-
-export type {
-  HomePromoStatus,
-  HomePromoRecord,
-} from '../data/promo.preview-store';
-export {
-  promoStoreDataContract,
-  getHomePromoItems,
-  getPublishedHomePromos,
-  isPromoClientVisible,
-  upsertHomePromoItem,
-  removeHomePromoItem,
-  toggleHomePromoStatus,
-} from '../data/promo.preview-store';
 
 export type {
   CommercialSource,
@@ -171,223 +88,101 @@ export {
 } from './store-card-commercial-map';
 
 export type {
-	DshCatalogApprovalStage,
-	DshCatalogDomainId,
-	DshCatalogMainCategoryId,
-	DshCatalogMeasurementKind,
-	DshCatalogMeasurementPolicy,
-	DshCatalogNode,
-	DshCatalogNodeKind,
-	DshCatalogPipelineStep,
-	DshCatalogSubcategoryId,
-	DshProductFacetId,
-	DshInventoryHierarchyFilter,
-	DshProductTaxonomyLabels,
+  DshCatalogApprovalStage,
+  DshCatalogDomainId,
+  DshCatalogMainCategoryId,
+  DshCatalogMeasurementKind,
+  DshCatalogMeasurementPolicy,
+  DshCatalogNode,
+  DshCatalogNodeKind,
+  DshCatalogPipelineStep,
+  DshCatalogSubcategoryId,
+  DshProductFacetId,
+  DshInventoryHierarchyFilter,
+  DshProductTaxonomyLabels,
 } from './catalog';
 export {
-	DSH_DOMAIN_LABELS,
-	DSH_MAIN_CATEGORY_LABELS,
-	DSH_PRODUCT_FACET_LABELS,
-	DSH_SUBCATEGORY_LABELS,
-	DSH_OPERATIONAL_FACETS,
-	isDshOperationalFacet,
-	dshCatalogMetrics,
-	dshCatalogNodes,
-	dshCatalogPipeline,
-	dshCategoryMeasurementPolicies,
-	getDshTaxonomyLabel,
-	getDshActiveFilterSummary,
-	getDshCatalogDomains,
-	getDshMainCategories,
-	getDshSubcategories,
-	getDshProductFacets,
-	resolveDshProductTaxonomy,
+  DSH_DOMAIN_LABELS,
+  DSH_MAIN_CATEGORY_LABELS,
+  DSH_PRODUCT_FACET_LABELS,
+  DSH_SUBCATEGORY_LABELS,
+  DSH_OPERATIONAL_FACETS,
+  isDshOperationalFacet,
+  dshCatalogMetrics,
+  dshCatalogNodes,
+  dshCatalogPipeline,
+  dshCategoryMeasurementPolicies,
+  getDshTaxonomyLabel,
+  getDshActiveFilterSummary,
+  getDshCatalogDomains,
+  getDshMainCategories,
+  getDshSubcategories,
+  getDshProductFacets,
+  resolveDshProductTaxonomy,
 } from './catalog';
 
 export type {
-	MarketingBannerActionType,
-	MarketingBannerAudience,
-	MarketingBannerMotionStyle,
-	MarketingBannerRecord,
-	MarketingBannerStatus,
-} from '../data/banner.preview-store';
-export {
-	bannerStoreDataContract,
-	computeMarketingBannerQuality,
-	duplicateMarketingBannerItem,
-	getMarketingBannerItems,
-	getMarketingBannerKpis,
-	getPublishedMarketingHomePromos,
-	isMarketingBannerLive,
-	mapMarketingBannerToPromo,
-	recordMarketingBannerClick,
-	recordMarketingBannerImpression,
-	removeMarketingBannerItem,
-	toggleMarketingBannerStatus,
-	upsertMarketingBannerItem,
-} from '../data/banner.preview-store';
-
-export type {
-	GrowthRecommendation,
-	GrowthRecommendationType,
-	MarketingGrowthAudience,
-	MarketingGrowthFamily,
-	MarketingGrowthRecord,
-	MarketingGrowthRouteTarget,
-	MarketingGrowthSource,
-	MarketingGrowthStatus,
-} from '../data/growth.preview-store';
-export {
-	approveMarketingGrowthItem,
-	duplicateMarketingGrowthItem,
-	getGrowthRecommendations,
-	getLiveMarketingGrowthItems,
-	getMarketingGrowthItems,
-	getMarketingGrowthKpis,
-	growthStoreDataContract,
-	pauseMarketingGrowthItem,
-	removeMarketingGrowthItem,
-	submitMarketingGrowthItem,
-	toggleMarketingGrowthStatus,
-	upsertMarketingGrowthItem,
-} from '../data/growth.preview-store';
-
-export type {
-	ApprovalEntityType,
-	ApprovalRecord,
-	ApprovalRecordMetadata,
-	ApprovalSourceSurface,
-	ApprovalStage,
-	AuditTrailEntry,
-	ClientVisibilityOptions,
-	DshPartnerIntakeItem,
-	DshPartnerIntakeMetric,
-	DshPartnerIntakeSource,
-	DshPartnerIntakeStage,
-	DshPromotionCandidate,
-	DshPromotionIntentStatus,
+  ApprovalEntityType,
+  ApprovalRecord,
+  ApprovalRecordMetadata,
+  ApprovalSourceSurface,
+  ApprovalStage,
+  AuditTrailEntry,
+  ClientVisibilityOptions,
+  DshPartnerIntakeItem,
+  DshPartnerIntakeMetric,
+  DshPartnerIntakeSource,
+  DshPartnerIntakeStage,
+  DshPromotionCandidate,
+  DshPromotionIntentStatus,
 } from './workflow';
 export {
-	canRenderInClientSurface,
-	dshPartnerApprovalLanes,
-	dshPartnerIntakeItems,
-	dshPartnerIntakeMetrics,
-	dshPromotionCandidates,
-	getAllApprovalRecords,
-	getCatalogQueueRecords,
-	getClientVisibleRecords,
-	getMarketingQueueRecords,
-	getPartnerQueueRecords,
-	isCatalogOwnedMedia,
-	isClientVisibleStage,
-	isLegacyPublishedPreview,
-	isPartnerOwnedException,
-	moveApprovalRecordToStage,
-	resolveNextOwner,
-	transitionApprovalStage,
-	translateEntityType,
-	translateOwner,
-	translateStage,
-	upsertApprovalRecord,
+  canRenderInClientSurface,
+  dshPartnerApprovalLanes,
+  dshPartnerIntakeItems,
+  dshPartnerIntakeMetrics,
+  dshPromotionCandidates,
+  getAllApprovalRecords,
+  getCatalogQueueRecords,
+  getClientVisibleRecords,
+  getMarketingQueueRecords,
+  getPartnerQueueRecords,
+  isCatalogOwnedMedia,
+  isClientVisibleStage,
+  isLegacyPublishedPreview,
+  isPartnerOwnedException,
+  moveApprovalRecordToStage,
+  resolveNextOwner,
+  transitionApprovalStage,
+  translateEntityType,
+  translateOwner,
+  translateStage,
+  upsertApprovalRecord,
 } from './workflow';
 
-export type {
-	MarketingNewsTickerAudience,
-	MarketingNewsTickerDeliveryMode,
-	MarketingNewsTickerItem,
-	MarketingNewsTickerKind,
-	MarketingNewsTickerLocale,
-	MarketingNewsTickerPreview,
-	MarketingNewsTickerPriority,
-	MarketingNewsTickerSeverity,
-	MarketingNewsTickerSource,
-	MarketingNewsTickerStatus,
-	MarketingTickerPlan,
-	MarketingTickerPlanEntry,
-	MarketingTickerPlanLane,
-	MarketingTickerPlanReason,
-	MarketingTickerPlanState,
-} from '../data/news-ticker.preview-store';
-export {
-	buildMarketingTickerPlan,
-	createMarketingTickerDraft,
-	getMarketingTickerItems,
-	markMarketingTickerDisplayed,
-	newsTickerStoreDataContract,
-	pauseAllMarketingTickers,
-	removeMarketingTickerItem,
-	resolveMarketingTickerAudienceLabel,
-	resolveMarketingTickerDeliveryLabel,
-	resolveMarketingTickerKindLabel,
-	resolveMarketingTickerPlanReasonLabel,
-	resolveMarketingTickerPreviewForItem,
-	resolveMarketingTickerPriorityLabel,
-	resolveMarketingTickerSourceLabel,
-	resolveMarketingTickerStatusLabel,
-	resolveMarketingTickerTargetLabel,
-	toggleMarketingTickerPinned,
-	toggleMarketingTickerStatus,
-	upsertMarketingTickerItem,
-} from '../data/news-ticker.preview-store';
-
-// --- DSH Approval Pipeline SSOT v1 ---
-// partner-intake-store was consolidated into workflow.ts
-
-export type {
-	MediaPolicyKind,
-	MediaReviewRecord,
-} from '../data/marketing-review.preview-store';
-export {
-	approveMediaReviewItem,
-	getMarketingReviewItems,
-	getMediaReviewItem,
-	getMediaReviewItems,
-	getMediaReviewKpis,
-	rejectMediaReviewItem,
-	requestMediaFix,
-	sendMediaToCatalog,
-	upsertMediaReviewItem,
-} from '../data/marketing-review.preview-store';
-export {
-	activateClientVisible,
-	adoptCatalogCentral,
-	adoptCatalogException,
-	catalogAdoptionRecords,
-	getCatalogAdoptionItems,
-	getClientVisibleItems,
-	rejectFromCatalog,
-	returnToMarketing,
-} from '../data/catalog-adoption.preview-store';
-
-// --- Shared Media Resolver ---
 export { resolveDshImageSource } from './resolve-dsh-image-source';
 
-// --- DSH Flow Registry — Phase 1 Baseline (DSH_PHASE_1_FLOW_REGISTRY-20260521-054141) ---
-// Phase 1.1 closure: DSH_PHASE_1_1_REGISTRY_EVIDENCE_CLOSURE-20260521-061309
-// Phase 2 closure: DSH_PHASE_2_CROSS_SURFACE_REGISTRY_CONSUMPTION-20260521
-// Single canonical cross-surface registry: ownership · visibility · escalation · on-demand policy.
-// See dsh-flow-registry.ts for full authoring notes and forbidden-action contract.
 export type {
   DshSurfaceId,
   DshFlowDomain,
   DshFlowVisibility,
   DshOnDemandPolicy,
   DshFlowRegistryEntry,
-	DshFlowClosureActor,
-	DshFlowClosureDomain,
-	DshFlowClosureEvidenceStatus,
-	DshFlowClosureRuntimeBindingStatus,
-	DshFlowClosureSummary,
+  DshFlowClosureActor,
+  DshFlowClosureDomain,
+  DshFlowClosureEvidenceStatus,
+  DshFlowClosureRuntimeBindingStatus,
+  DshFlowClosureSummary,
   DshFlowPolicySummary,
   DshFlowRegistryStats,
   DshFlowRegistryValidationResult,
 } from './dsh-flow-registry';
 export {
   DSH_FLOW_REGISTRY,
-	DSH_FLOW_CLOSURE_SUMMARY,
+  DSH_FLOW_CLOSURE_SUMMARY,
   getDshFlowById,
-	getDshFlowClosureSummary,
-	getDshFlowClosureSummaryForSurface,
+  getDshFlowClosureSummary,
+  getDshFlowClosureSummaryForSurface,
   getDshFlowsForSurface,
   getDshVisibleFlowsForSurface,
   getDshRenderableFlowsForSurface,
@@ -402,10 +197,6 @@ export {
   getDshFlowRegistryValidationSummary,
 } from './dsh-flow-registry';
 
-// --- DSH Control Panel Governance Map — cross-surface shared owner ---
-// Phase 5 closure: DSH_PHASE_5_FINAL_LOGIC_CLOSURE-20260521-071500
-// Moved here from dsh/frontend/control-panel/shared/ — mobile surfaces import from here only.
-// control-panel/shared/dsh-control-panel-governance.map.ts is now a compat re-export shim.
 export type {
   DshControlPanelSectionId,
   DshControlPanelGovernanceEntry,
@@ -421,8 +212,6 @@ export {
   resolveDshControlPanelSectionLabel,
 } from './dsh-governance.map';
 
-// --- DSH Partner Onboarding Journey Map — cross-surface canonical reference ---
-// Phase: DSH_TOPIC_1_PARTNER_ONBOARDING_CLOSURE-20260521-182600
 export type {
   DshPartnerJourneyStepId,
   DshPartnerJourneyStep,
@@ -438,117 +227,95 @@ export {
   resolveCpSectionForLifecycleStage,
 } from './dsh-partner-onboarding-journey.map';
 
-// --- DSH Order Journey Shared Model ---
 export type {
-	DshOrderJourneyStageId,
-	DshOrderJourneyStage,
-	DshOrderJourneyActor,
-	DshOrderJourneyEvent,
-	DshOrderLifecycleStatus,
-	DshSmartProximityState,
-	DshSmartTrackingSnapshot,
-	DshCaptainHeartbeatSnapshot,
-	DshCaptainBellEvent,
-	DshOperationsDecisionKind,
-	DshOperationsDecisionPayload,
-	DshOperationsOrderDetail,
-	DshPartnerPreparationStage,
-	// P0-02 additions
-	DshOrderLifecycleActorOwner,
-	DshOrderLifecycleWltImplication,
-	DshOrderLifecycleDeliveryModeImpact,
-	DshOrderLifecycleStateAction,
-	DshOrderLifecycleStateMetadata,
+  DshOrderJourneyStageId,
+  DshOrderJourneyStage,
+  DshOrderJourneyActor,
+  DshOrderJourneyEvent,
+  DshOrderLifecycleStatus,
+  DshSmartProximityState,
+  DshSmartTrackingSnapshot,
+  DshCaptainHeartbeatSnapshot,
+  DshCaptainBellEvent,
+  DshOperationsDecisionKind,
+  DshOperationsDecisionPayload,
+  DshOperationsOrderDetail,
+  DshPartnerPreparationStage,
+  DshOrderLifecycleActorOwner,
+  DshOrderLifecycleWltImplication,
+  DshOrderLifecycleDeliveryModeImpact,
+  DshOrderLifecycleStateAction,
+  DshOrderLifecycleStateMetadata,
   DshOrderInterventionFlowId,
   DshOrderInterventionState,
 } from './dsh-order-journey.model';
 export {
-	DSH_ORDER_JOURNEY_STEPS,
-	mapLifecycleToJourneyStage,
-	mapOperationsDecisionToLifecycle,
-	// P0-02 additions
-	DSH_ORDER_LIFECYCLE_STATES,
-	getDshLifecycleStateMetadata,
+  DSH_ORDER_JOURNEY_STEPS,
+  mapLifecycleToJourneyStage,
+  mapOperationsDecisionToLifecycle,
+  DSH_ORDER_LIFECYCLE_STATES,
+  getDshLifecycleStateMetadata,
   DSH_ORDER_INTERVENTION_STATES,
   getDshOrderInterventionState,
 } from './dsh-order-journey.model';
 
-// --- P0-03: DSH Delivery Mode Model ---
 export type {
-	DshFulfillmentDeliveryMode,
-	DshDeliveryModeCaptainInvolvement,
-	DshDeliveryModeTrackingStageFilter,
-	DshDeliveryModeDefinition,
+  DshFulfillmentDeliveryMode,
+  DshDeliveryModeCaptainInvolvement,
+  DshDeliveryModeTrackingStageFilter,
+  DshDeliveryModeDefinition,
 } from './dsh-delivery-mode.model';
 export {
-	DSH_DELIVERY_MODE_DEFINITIONS,
-	getDshDeliveryModeDefinition,
-	getDshDeliveryModeActorLabel,
-	isDshModeDispatchRequired,
-	isDshModeCaptainTrackingVisible,
-	getDshModeTrackingStageFilter,
-	isDshFulfillmentDeliveryMode,
+  DSH_DELIVERY_MODE_DEFINITIONS,
+  getDshDeliveryModeDefinition,
+  getDshDeliveryModeActorLabel,
+  isDshModeDispatchRequired,
+  isDshModeCaptainTrackingVisible,
+  getDshModeTrackingStageFilter,
+  isDshFulfillmentDeliveryMode,
 } from './dsh-delivery-mode.model';
 
-// --- P0-04: DSH Partner Activation Model ---
-// Cross-surface SSoT for partner activation lifecycle and client visibility.
-// Authority: control-panel/partners owns all activation/deactivation decisions.
-// app-field: evidence collection only — never activates.
-// app-partner: reads readiness status — never self-activates.
-// app-client: sees store ONLY when status = 'client_visible'.
 export type {
-	DshPartnerActivationStatus,
-	DshPartnerVisibilityBadge,
-	DshPartnerActivationActorSurface,
-	DshPartnerReadinessCheckItem,
-	DshPartnerActivationStateMetadata,
+  DshPartnerActivationStatus,
+  DshPartnerVisibilityBadge,
+  DshPartnerActivationActorSurface,
+  DshPartnerReadinessCheckItem,
+  DshPartnerActivationStateMetadata,
 } from './dsh-partner-activation.model';
 export {
-	DSH_PARTNER_ACTIVATION_STATES,
-	getDshPartnerActivationStateMetadata,
-	isDshPartnerClientVisible,
-	isDshPartnerActivationComplete,
-	getDshPartnerVisibilityBadge,
-	getDshPartnerVisibilityBadgeLabel,
-	getDshPartnerVisibilityBadgeTone,
-	getDshPartnerReadinessChecklist,
-	getDshPartnerActivationStatusLabel,
+  DSH_PARTNER_ACTIVATION_STATES,
+  getDshPartnerActivationStateMetadata,
+  isDshPartnerClientVisible,
+  isDshPartnerActivationComplete,
+  getDshPartnerVisibilityBadge,
+  getDshPartnerVisibilityBadgeLabel,
+  getDshPartnerVisibilityBadgeTone,
+  getDshPartnerReadinessChecklist,
+  getDshPartnerActivationStatusLabel,
 } from './dsh-partner-activation.model';
 
-// --- P0-05: DSH Product Identity Model ---
-// SSoT for product approval pipeline, barcode scan states, publishing gate
-// prerequisites, and client visibility rules.
-// Authority: control-panel/catalogs owns all approval and publishing decisions.
-// app-partner: submits and edits local overrides only.
-// app-field: submits initial entries and evidence — never approves or publishes.
-// app-client: sees ONLY products where approvalStatus = 'client_visible'.
 export type {
-	DshProductIdentityApprovalStatus,
-	DshProductPublishingStatus,
-	DshProductClientVisibilityStatus,
-	DshBarcodeSearchState,
-	DshProductCategoryMappingStatus,
-	DshProductDuplicateStatus,
-	DshProductPublishingPrerequisite,
-	DshProductIdentityRecord,
-	DshProductApprovalStateMetadata,
+  DshProductIdentityApprovalStatus,
+  DshProductPublishingStatus,
+  DshProductClientVisibilityStatus,
+  DshBarcodeSearchState,
+  DshProductCategoryMappingStatus,
+  DshProductDuplicateStatus,
+  DshProductPublishingPrerequisite,
+  DshProductIdentityRecord,
+  DshProductApprovalStateMetadata,
 } from './dsh-product-identity.model';
 export {
-	DSH_PRODUCT_APPROVAL_PIPELINE,
-	getDshProductApprovalStateMetadata,
-	isDshProductClientVisible,
-	isDshProductPublishingBlocked,
-	getDshProductPublishingPrerequisites,
-	getDshBarcodeSearchStateLabel,
-	getDshProductApprovalStatusLabel,
-	getDshProductApprovalStatusTone,
+  DSH_PRODUCT_APPROVAL_PIPELINE,
+  getDshProductApprovalStateMetadata,
+  isDshProductClientVisible,
+  isDshProductPublishingBlocked,
+  getDshProductPublishingPrerequisites,
+  getDshBarcodeSearchStateLabel,
+  getDshProductApprovalStatusLabel,
+  getDshProductApprovalStatusTone,
 } from './dsh-product-identity.model';
 
-// --- P0-08: DSH Signal Layer Model ---
-// Centralized signal type contract for all DSH actor surfaces.
-// On-demand retrieval: lists show summaries only; detail opens on explicit action.
-// Every signal has a routeId — no orphan signals without destination.
-// WLT finance signals (refund_pending_wlt, refund_completed_wlt, settlement_ready_wlt) are read-only display.
 export type {
   DshSignalEventKind,
   DshSignalRecipientSurface,
@@ -574,35 +341,6 @@ export {
   isDshSignalAuditRequired,
 } from './dsh-signal-layer.model';
 
-// --- P0-06: Support Ticket Model ---
-// Cross-surface SSoT for support ticket lifecycle, message timelines, SLA classification,
-// and escalation routing.
-// Authority: control-panel/support owns all resolution and escalation decisions.
-// app-client: support visible inside order context only.
-// app-partner: support linked to order / catalog / handoff context only.
-// app-captain: handoff / delivery / PoD context only.
-// WLT boundary: financial-impact tickets display read-only preview tags — no DSH mutation.
-export type {
-	DshSupportTicketStatus,
-	DshSupportTicketActorKind,
-	DshSupportTicketMessage,
-	DshSupportTicket,
-} from '../data/operations-support.preview';
-export {
-	getDshSupportTicketStatusLabel,
-	getDshSupportTicketStatusTone,
-	DSH_DEMO_SUPPORT_TICKETS,
-	getDshSupportTicketById,
-} from '../data/operations-support.preview';
-
-// --- P0-09: DSH Role & Permission Model ---
-// UI-only RBAC preview — no runtime auth, no backend RBAC binding.
-// Covers 10 sensitive decision points in DSH control-panel.
-// WLT boundary: finance mutations always forbidden inside DSH.
-// Authority: control-panel/partners owns activation/deactivation;
-//            control-panel/catalogs owns approval/publishing;
-//            control-panel/operations owns dispatch/SLA/escalation;
-//            control-panel/finance reads only — WLT owns all mutations.
 export type {
   DshRoleId,
   DshPermissionSection,
@@ -626,81 +364,6 @@ export {
   getDshAuditEntryById,
 } from './dsh-role-permission.model';
 
-export type {
-  DshGlobalControlLink,
-  DshLookupFieldId,
-  DshLookupInputPreview,
-  DshPreviewPlaceholderStatus,
-  DshVerificationStatus,
-  DshVerificationStepPreview,
-  DshSignalRoutePreview,
-  DshRouteHintedAction,
-  DshReadOnlyFinanceVisibility,
-  DshAssistedOrderIdentityStatus,
-  DshAssistedOrderStage,
-  DshAssistedOrderCartItemStatus,
-  DshAssistedOrderCartItem,
-  DshAssistedOrderDeliveryModeOption,
-  DshAssistedOrderPreview,
-} from '../data/dsh-assisted-order.preview';
-export {
-  buildDshSignalRoutePreview,
-  DSH_ASSISTED_ORDER_PREVIEW,
-  getDshAssistedOrderById,
-  getDshAssistedOrderByContext,
-} from '../data/dsh-assisted-order.preview';
-
-export type {
-  DshCustomer360VerificationStatus,
-  DshCustomer360TicketFilterStatus,
-  DshCustomer360TimelineNoteSource,
-  DshCustomer360OrderSummary,
-  DshCustomer360TicketHistoryEntry,
-  DshCustomer360NoteEntry,
-  DshCustomer360Record,
-} from '../data/dsh-customer-360.preview';
-export {
-  DSH_CUSTOMER_360_PREVIEW,
-  getDshCustomer360Record,
-  getDshCustomer360ByContext,
-  getDshCustomer360SectionOwnerLabel,
-} from '../data/dsh-customer-360.preview';
-
-export type {
-  DshCallIntakeReason,
-  DshCallIntakeCloseOutcome,
-  DshCallIntakeVerificationStep,
-  DshCallIntakePreview,
-} from '../data/dsh-call-intake.preview';
-export {
-  DSH_CALL_INTAKE_PREVIEW,
-  getDshCallIntakePreview,
-  getDshCallIntakeByContext,
-} from '../data/dsh-call-intake.preview';
-
-export type {
-  DshOrderRescueSeverity,
-  DshOrderRescueReason,
-  DshOrderRescueOwner,
-  DshOrderRescueNextActionId,
-  DshOrderRescueCase,
-} from '../data/dsh-order-rescue.preview';
-export {
-  DSH_ORDER_RESCUE_PREVIEW,
-  getDshOrderRescueCase,
-  getDshOrderRescueByContext,
-} from '../data/dsh-order-rescue.preview';
-
-export type {
-  DshOpsInterventionPlaybook,
-} from '../data/dsh-ops-intervention-playbook.preview';
-export {
-  DSH_OPS_INTERVENTION_PLAYBOOKS,
-  getDshOpsInterventionPlaybook,
-} from '../data/dsh-ops-intervention-playbook.preview';
-
-// --- New shared preview contracts (dependency direction fix) ---
-
 export type { DshServiceId, DiscoveryFilter } from './dsh-discovery.contract';
 export { dshDiscoveryContractMeta } from './dsh-discovery.contract';
 
@@ -713,12 +376,31 @@ export type {
 export { dshFieldVisitContractMeta } from './dsh-field-visit.contract';
 
 export type {
-  AppearanceStatus, AppearanceScope, AppearanceRisk, AppearanceOwner, AppearanceRecord,
-  ProviderCategory, ProviderEnvironment, ProviderStatus, ProviderOwner, ProviderRecord,
-  ServiceStatus, ServiceClientVisibility, ServiceScope, ServiceOwner, ServiceRisk, ServiceRecord,
-  DshPlatformVarOwner, DshPlatformVarStatus, DshPlatformVarScope, DshPlatformVarRisk,
-  DshPlatformVarRecord, DshPlatformProviderControlRecord, DshPlatformScopeLayer,
-  DshPlatformSimulationScenario, DshPlatformAuditEntry,
+  AppearanceStatus,
+  AppearanceScope,
+  AppearanceRisk,
+  AppearanceOwner,
+  AppearanceRecord,
+  ProviderCategory,
+  ProviderEnvironment,
+  ProviderStatus,
+  ProviderOwner,
+  ProviderRecord,
+  ServiceStatus,
+  ServiceClientVisibility,
+  ServiceScope,
+  ServiceOwner,
+  ServiceRisk,
+  ServiceRecord,
+  DshPlatformVarOwner,
+  DshPlatformVarStatus,
+  DshPlatformVarScope,
+  DshPlatformVarRisk,
+  DshPlatformVarRecord,
+  DshPlatformProviderControlRecord,
+  DshPlatformScopeLayer,
+  DshPlatformSimulationScenario,
+  DshPlatformAuditEntry,
 } from './dsh-cp-platform.contract';
 export { dshCpPlatformContractMeta } from './dsh-cp-platform.contract';
 
@@ -726,8 +408,12 @@ export type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from './dsh
 export { dshCpOperationsContractMeta } from './dsh-cp-operations.contract';
 
 export type {
-  AdminRoleId, PlatformPermissionId, AdminUserStatus,
-  AdminRole, MockAdminUser, PlatformPermission,
+  AdminRoleId,
+  PlatformPermissionId,
+  AdminUserStatus,
+  AdminRole,
+  MockAdminUser,
+  PlatformPermission,
 } from './dsh-cp-administration.contract';
 export { dshCpAdministrationContractMeta } from './dsh-cp-administration.contract';
 

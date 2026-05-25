@@ -17,9 +17,9 @@ import {
   type PartnerOfferStatus,
   type PartnerOfferType,
   type PartnerOfferSource,
-} from '../../data/partner-offer.preview-store';
+} from '../../data/offers.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { validatePartnerOfferForPublish } from '../../data/commercial.preview-contract';
+import { validatePartnerOfferForPublish } from '../../shared/commercial.preview-contract';
 import { CommercialParityPreview } from './commercial-parity-preview';
 
 type PartnerOfferEditorSection = 'details' | 'governance' | 'preview';

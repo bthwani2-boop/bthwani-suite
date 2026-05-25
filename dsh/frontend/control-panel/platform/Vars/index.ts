@@ -6,7 +6,7 @@ export {
   DSH_PLATFORM_SCOPE_PRECEDENCE,
   DSH_PLATFORM_SIMULATION_PREVIEW,
   DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
-} from '../../../data/cp-vars.preview';
+} from '../../../data/platform.preview-data';
 export type {
   DshPlatformAuditEntry,
   DshPlatformProviderControlRecord,

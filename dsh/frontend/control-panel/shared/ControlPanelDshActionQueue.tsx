@@ -3,7 +3,7 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import type { DshUnifiedRecommendation } from '../../data/cp-recommendation.preview-data';
+import type { DshUnifiedRecommendation } from '../../data/platform.preview-data';
 
 export type ControlPanelDshActionQueueItem = {
   id: string;

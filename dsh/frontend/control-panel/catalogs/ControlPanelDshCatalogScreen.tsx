@@ -13,7 +13,7 @@ import {
   CatalogSubCategory,
   CatalogMainClassification
 } from './catalog';
-import { getCatalogAdoptionItems } from '../../data/catalog-adoption.preview-store';
+import { getCatalogAdoptionItems } from '../../data/marketing.preview-data';
 import { ApprovalRecord, ApprovalStage, transitionApprovalStage, resolveNextOwner } from '../../shared/workflow';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';

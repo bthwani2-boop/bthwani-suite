@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { Badge, Box, Button, Card, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar } from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
-import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../data/field-stores.preview-data';
+import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../data/stores.preview-data';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getMarketingTickerItems, buildMarketingTickerPlan } from '../../data/news-ticker.preview-store';
+import { getMarketingTickerItems, buildMarketingTickerPlan } from '../../data/marketing.preview-data';
 
 export function useHomeTickerState({
   isTickerHidden,

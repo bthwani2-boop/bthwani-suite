@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, KeyValueList, SectionHeader, Surface } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from '../../data/captain-state.preview-data';
+import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
 
 export type DshCaptainProfileScreenProps = {
 	section?: 'profile-get' | 'tier-info' | 'tier-evaluate';

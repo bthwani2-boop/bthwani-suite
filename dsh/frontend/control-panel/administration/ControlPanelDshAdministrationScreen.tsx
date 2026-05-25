@@ -8,7 +8,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { ADMIN_ROLES, PLATFORM_PERMISSIONS, MOCK_USERS } from '../../data/cp-administration.mock';
+import { ADMIN_ROLES, PLATFORM_PERMISSIONS, MOCK_USERS } from '../../data/platform.preview-data';
 import type { AdminRole, MockAdminUser, AdminUserStatus } from './administration.types';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import {

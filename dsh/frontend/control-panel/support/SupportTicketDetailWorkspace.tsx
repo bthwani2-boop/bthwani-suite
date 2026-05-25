@@ -8,7 +8,7 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { getDshFlowPolicySummary } from '../../shared';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,
@@ -20,7 +20,7 @@ import {
   getDshSupportTicketStatusTone,
   type DshSupportTicketMessage,
   DSH_DEMO_SUPPORT_TICKETS,
-} from '../../data/operations-support.preview';
+} from '../../data/support.preview-data';
 
 function MessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';

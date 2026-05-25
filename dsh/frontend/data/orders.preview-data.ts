@@ -1,0 +1,1809 @@
+import { DSH_DELIVERY_MODE_DEFINITIONS, getDshDeliveryModeDefinition, type DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
+import type { DshControlPanelSectionId } from '../shared/dsh-governance.map';
+import type { DshOnDemandPolicy, DshSurfaceId } from '../shared/dsh-flow-registry';
+import { getDshSignalActorRoute, type DshSignalEventKind, type DshSignalPriority } from '../shared/dsh-signal-layer.model';
+import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from '../shared/dsh-cp-operations.contract';
+import type { DshOrderLifecycleStatus } from '../shared/dsh-order-journey.model';
+import type { DshClientState } from './operational-statuses.preview-data';
+
+// -----------------------------------------------------------------------------
+// Client cart preview
+// -----------------------------------------------------------------------------
+export type RecommendationProduct = {
+  id: string;
+  title: string;
+  priceLabel: string;
+  priceValue: number;
+  imageUri?: string;
+  description?: string;
+};
+
+export type CartItem = {
+  id: string;
+  title: string;
+  priceLabel?: string;
+  priceValue?: number;
+  qty?: number;
+  storeId?: string;
+  storeName?: string;
+};
+
+export const dshCartRecommendedProductsFixture: RecommendationProduct[] = [
+  { id: 'r1', title: 'تفاح طازج', priceLabel: '500', priceValue: 500, imageUri: 'dsh.product.apple.v1' },
+  { id: 'r2', title: 'كيس خبز', priceLabel: '100', priceValue: 100, imageUri: 'dsh.product.bread.v1' },
+  { id: 'r3', title: 'دجاج بروست', priceLabel: '1,500', priceValue: 1500, imageUri: 'dsh.product.chicken.v1' },
+  { id: 'r4', title: 'شوكولاتة فاخرة', priceLabel: '400', priceValue: 400, imageUri: 'dsh.product.choco.v1' },
+  { id: 'r5', title: 'كرواسون فرنسي', priceLabel: '300', priceValue: 300, imageUri: 'dsh.product.croissant.v1' },
+  { id: 'r6', title: 'حليب طازج', priceLabel: '600', priceValue: 600, imageUri: 'dsh.product.milk.v1' },
+  { id: 'r7', title: 'معكرونة إيطالية', priceLabel: '350', priceValue: 350, imageUri: 'dsh.product.pasta.v1' },
+  { id: 'r8', title: 'بطاطس رول', priceLabel: '250', priceValue: 250, imageUri: 'dsh.product.roll.v1' },
+  { id: 'r9', title: 'سلطة خضراء', priceLabel: '450', priceValue: 450, imageUri: 'dsh.product.salad.v1' },
+  { id: 'r10', title: 'زبادي طازج', priceLabel: '150', priceValue: 150, imageUri: 'dsh.product.yogurt.v1' },
+];
+
+export const dshCartPreviewFallbackItemsFixture: CartItem[] = [
+  { id: 'p1', title: 'دجاج فحم تركي مع التوابع', priceValue: 3000, qty: 1 },
+  { id: 'p2', title: 'كريسبي رول مفرد', priceValue: 1500, qty: 2 },
+  { id: 'p3', title: 'فتة دخن بالقشطة والعسل', priceValue: 1700, qty: 3 },
+  { id: 'p4', title: 'فتة بالقشطة والعسل', priceValue: 1500, qty: 1 },
+];
+
+// -----------------------------------------------------------------------------
+// Captain orders preview
+// -----------------------------------------------------------------------------
+export type DshCaptainOrderId = string;
+
+/**
+ * Distinguishes order service type so the captain UI can show correct labels/badges.
+ * - 'standard': regular store delivery via bthwani captain
+ * - 'awnak': local pickup/dropoff request (direct or scheduled) via bthwani captain
+ * - 'shein-final-mile': SHEIN final-mile delivery ONLY — from bthwani sorting point to customer
+ *   (captain is NOT responsible for purchasing or importing)
+ *
+ * All service types are bthwani_delivery. partner_delivery and pickup (client fulfillment modes)
+ * are NEVER routed to the captain app — they have no captain assignment.
+ */
+export type DshCaptainOrderServiceType = 'standard' | 'awnak' | 'shein-final-mile';
+
+export type DshCaptainOrderMode =
+	| 'full'
+	| 'inbox'
+	| 'detail'
+	| 'chat'
+	| 'bell'
+	| 'accept'
+	| 'offer-reject'
+	| 'pickup'
+	| 'deliver'
+	| 'proof'
+	| 'orders-list'
+	| 'orders-offers-list'
+	| 'order-get'
+	| 'order-details';
+
+export type DshCaptainOrderStage = 'offer' | 'accepted' | 'pickup' | 'delivery' | 'proof' | 'closed';
+
+export type DshCaptainOrderBellItem = {
+	id: DshCaptainOrderId;
+	serviceType: DshCaptainOrderServiceType;
+	// Enforced literal: captain inbox only contains bthwani_delivery orders.
+	// partner_delivery and pickup are never routed here.
+	readonly fulfillmentMode: 'bthwani_delivery';
+	title: string;
+	subtitle: string;
+	meta: string;
+};
+
+export type DshCaptainOrderMessage = {
+	id: string;
+	sender: string;
+	text: string;
+	time: string;
+	side: 'start' | 'end';
+};
+
+export type DshCaptainOrderAction =
+	| 'accept'
+	| 'order-offer-reject'
+	| 'pickup'
+	| 'deliver'
+	| 'proof-upload'
+	| 'back-to-inbox'
+	| 'next-order';
+
+export type DshCaptainOrderProofStatus = 'idle' | 'pending' | 'uploaded' | 'verified' | 'failed';
+
+// ML-026: availability-toggle — captain toggling on/off availability; ML-027: offer-accepting/offer-accepted + loading-assignment
+export type DshCaptainOrdersScreenState = 'ready' | 'loading' | 'empty' | 'delivered' | 'error' | 'availability-toggle' | 'offer-accepting' | 'offer-accepted' | 'loading-assignment';
+
+// -----------------------------------------------------------------------------
+// Partner orders preview
+// -----------------------------------------------------------------------------
+/**
+ * UI_PREVIEW_ONLY: app-partner order alerts + conversation fixtures.
+ * Merged from: partner-order-alert.preview-data.ts + partner-order-conversation.preview-data.ts
+ */
+export const dshPartnerOrdersPreviewDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'not_applicable',
+  moneySemantics: 'not_applicable',
+} as const;
+
+// --- Order Alerts ---
+
+export type DshPartnerOrderAlertId =
+  | 'order_needs_accept'
+  | 'order_sla_risk'
+  | 'order_ready'
+  | 'order_handoff_pending'
+  | 'order_issue_required'
+  | 'order_rejected'
+  | 'order_store_delivered';
+
+export type DshPartnerOrderAlertStatus = 'new' | 'seen';
+
+export type DshPartnerOrderAlertItem = {
+  id: string;
+  orderId: string;
+  alertId: DshPartnerOrderAlertId;
+  title: string;
+  description: string;
+  timeLabel: string;
+  status: DshPartnerOrderAlertStatus;
+  urgent?: boolean;
+};
+
+// --- Order Conversation ---
+
+export type DshPartnerOrderConversationMode = DshFulfillmentDeliveryMode;
+
+export type DshPartnerOrderConversationMessage = {
+  id: string;
+  authorLabel: string;
+  body: string;
+  timestampLabel: string;
+  acknowledged?: boolean;
+};
+
+export type DshPartnerOrderConversationVisibility = 'enabled' | 'disabled-for-mode';
+
+export function shouldShowDshPartnerOrderConversation(
+  mode: DshPartnerOrderConversationMode
+): DshPartnerOrderConversationVisibility {
+  // bthwani_delivery: the platform manages tracking; partner-to-captain chat is out of scope here
+  return mode === 'bthwani_delivery' ? 'disabled-for-mode' : 'enabled';
+}
+
+// -----------------------------------------------------------------------------
+// Assisted order desk preview
+// -----------------------------------------------------------------------------
+export type DshPreviewPlaceholderStatus =
+  | 'ACCEPTED_PREVIEW_LABEL'
+  | 'BLOCKED_BY_CONTRACT'
+  | 'BLOCKED_BY_WLT'
+  | 'MUST_REPLACE_WITH_PREVIEW_UI'
+  | 'DEAD_PLACEHOLDER_REMOVE';
+
+export type DshLookupFieldId = 'phone' | 'orderId' | 'customerId' | 'ticketId';
+
+export type DshLookupInputPreview = {
+  readonly key: DshLookupFieldId;
+  readonly label: string;
+  readonly value: string;
+  readonly summaryFirst: true;
+};
+
+export type DshVerificationStatus = 'required' | 'verified' | 'blocked';
+
+export type DshVerificationStepPreview = {
+  readonly stepId: string;
+  readonly label: string;
+  readonly completed: boolean;
+};
+
+export type DshSignalRoutePreview = {
+  readonly signalKind: DshSignalEventKind;
+  readonly routeId: string;
+  readonly auditRequired: boolean;
+  readonly priority: DshSignalPriority;
+  readonly priorityLabel: string;
+};
+
+export type DshRouteHintedAction = {
+  readonly actionId: string;
+  readonly label: string;
+  readonly routeHint: string;
+  readonly onDemandPolicy: DshOnDemandPolicy;
+  readonly routeId?: string;
+  readonly readOnly?: boolean;
+  readonly auditRequired?: boolean;
+  readonly reasonRequired?: boolean;
+};
+
+export type DshReadOnlyFinanceVisibility = {
+  readonly paymentVisibility: string;
+  readonly refundVisibility: string;
+  readonly settlementVisibility?: string;
+  readonly readOnly: true;
+  readonly mutationForbidden: true;
+  readonly calculationTruthOwner: 'WLT';
+  readonly routeHint: string;
+  readonly onDemandPolicy: 'finance-preview-only';
+  readonly placeholderClassification: DshPreviewPlaceholderStatus;
+};
+
+export type DshGlobalControlLink = DshRouteHintedAction & {
+  readonly surfaceId: DshSurfaceId;
+  readonly sectionId: DshControlPanelSectionId;
+};
+
+export type DshAssistedOrderIdentityStatus = DshVerificationStatus;
+
+export type DshAssistedOrderStage =
+  | 'identity-check'
+  | 'basket-rebuild'
+  | 'partner-confirmation'
+  | 'wlt-visibility'
+  | 'ready-to-submit';
+
+export type DshAssistedOrderCartItemStatus = 'active' | 'substitute' | 'unavailable';
+
+export type DshAssistedOrderCartItem = {
+  readonly sku: string;
+  readonly name: string;
+  readonly quantity: number;
+  readonly published: true;
+  readonly status: DshAssistedOrderCartItemStatus;
+  readonly note: string;
+};
+
+export type DshAssistedOrderDeliveryModeOption = {
+  readonly modeId: DshFulfillmentDeliveryMode;
+  readonly label: string;
+  readonly requiresDispatch: boolean;
+  readonly requiresCaptain: boolean;
+  readonly supportFallback: string;
+};
+
+export type DshAssistedOrderPreview = {
+  readonly deskId: string;
+  readonly customerId: string;
+  readonly customerName: string;
+  readonly maskedPhone: string;
+  readonly source: 'manual_call_intake' | 'customer_360_followup';
+  readonly orderId?: string;
+  readonly ticketId?: string;
+  readonly identityStatus: DshAssistedOrderIdentityStatus;
+  readonly activeStage: DshAssistedOrderStage;
+  readonly basketSummary: string;
+  readonly auditFlags: readonly string[];
+  readonly allowedActions: readonly string[];
+  readonly forbiddenActions: readonly string[];
+  readonly wltBoundary: string;
+  readonly nextAction: string;
+  readonly crossSurfaceLinks: readonly DshGlobalControlLink[];
+  readonly lookupPanel: {
+    readonly inputs: readonly DshLookupInputPreview[];
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly identityVerification: {
+    readonly verificationStatus: DshVerificationStatus;
+    readonly verificationSteps: readonly DshVerificationStepPreview[];
+    readonly sensitiveFieldsLocked: readonly string[];
+    readonly forbiddenActionsBeforeVerification: readonly string[];
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly cartBuilderPreview: {
+    readonly publishedProductsOnly: true;
+    readonly items: readonly DshAssistedOrderCartItem[];
+    readonly addItemPreview: string;
+    readonly removeItemPreview: string;
+    readonly replaceItemPreview: string;
+    readonly substituteItemPreview: string;
+    readonly unavailableItemHandling: string;
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly deliveryModeSelector: {
+    readonly selectedMode: DshFulfillmentDeliveryMode;
+    readonly options: readonly DshAssistedOrderDeliveryModeOption[];
+    readonly selectedModeSummary: string;
+    readonly forbiddenLifecycleStates: readonly string[];
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly serviceabilitySummary: {
+    readonly zoneLabel: string;
+    readonly serviceabilityStatus: 'serviceable' | 'blocked';
+    readonly blockedReason?: string;
+    readonly fallbackAction: string;
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly wltReadOnlyHandoff: DshReadOnlyFinanceVisibility;
+  readonly auditReason: {
+    readonly reasonRequired: true;
+    readonly auditRequired: true;
+    readonly operatorNote: string;
+    readonly reasonLabel: string;
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly submitDraftPreview: {
+    readonly previewOnly: true;
+    readonly noBackendCall: true;
+    readonly noOrderCreationClaim: true;
+    readonly previewState: 'ready_for_preview' | 'blocked_by_identity' | 'blocked_by_serviceability';
+    readonly nextAction: string;
+    readonly signal: DshSignalRoutePreview;
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+};
+
+function translateSignalPriority(priority: DshSignalPriority): string {
+  if (priority === 'urgent') {
+    return 'عاجل';
+  }
+
+  if (priority === 'important') {
+    return 'مهم';
+  }
+
+  return 'اعتيادي';
+}
+
+export function buildDshSignalRoutePreview(signalKind: DshSignalEventKind): DshSignalRoutePreview {
+  const route = getDshSignalActorRoute(signalKind);
+  return {
+    signalKind,
+    routeId: route?.routeId ?? 'cp/operations',
+    auditRequired: route?.auditRequired ?? false,
+    priority: route?.priority ?? 'normal',
+    priorityLabel: translateSignalPriority(route?.priority ?? 'normal'),
+  };
+}
+
+function buildDshAssistedOrderLookupInputs(values: {
+  readonly phone: string;
+  readonly orderId?: string;
+  readonly customerId: string;
+  readonly ticketId?: string;
+}): readonly DshLookupInputPreview[] {
+  return [
+    { key: 'phone', label: 'phone', value: values.phone, summaryFirst: true },
+    { key: 'orderId', label: 'orderId', value: values.orderId ?? '—', summaryFirst: true },
+    { key: 'customerId', label: 'customerId', value: values.customerId, summaryFirst: true },
+    { key: 'ticketId', label: 'ticketId', value: values.ticketId ?? '—', summaryFirst: true },
+  ] as const;
+}
+
+function buildDeliveryModeOptions(): readonly DshAssistedOrderDeliveryModeOption[] {
+  return DSH_DELIVERY_MODE_DEFINITIONS.map((definition) => ({
+    modeId: definition.modeId,
+    label: definition.label,
+    requiresDispatch: definition.requiresDispatch,
+    requiresCaptain: definition.requiresCaptain,
+    supportFallback: definition.supportFallback,
+  }));
+}
+
+function buildDeliveryModeSummary(modeId: DshFulfillmentDeliveryMode): {
+  readonly selectedMode: DshFulfillmentDeliveryMode;
+  readonly options: readonly DshAssistedOrderDeliveryModeOption[];
+  readonly selectedModeSummary: string;
+  readonly forbiddenLifecycleStates: readonly string[];
+  readonly previewClassification: DshPreviewPlaceholderStatus;
+} {
+  const mode = getDshDeliveryModeDefinition(modeId);
+  return {
+    selectedMode: modeId,
+    options: buildDeliveryModeOptions(),
+    selectedModeSummary: `${mode.label} · ${mode.controlPanelDispatchBehavior}`,
+    forbiddenLifecycleStates: ['delivered', 'cancelled', 'refund_pending_wlt', 'settlement_ready_wlt'],
+    previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+  };
+}
+
+export const DSH_ASSISTED_ORDER_PREVIEW: readonly DshAssistedOrderPreview[] = [
+  {
+    deskId: 'assist-ord-1102',
+    customerId: 'cus-9021',
+    customerName: 'لمى ناصر',
+    maskedPhone: '05*******18',
+    source: 'manual_call_intake',
+    orderId: 'ORD-1102',
+    ticketId: 'TKT-1102',
+    identityStatus: 'verified',
+    activeStage: 'partner-confirmation',
+    basketSummary: '3 عناصر منشورة مع بديل واحد مثبت قبل الإرسال.',
+    auditFlags: ['identity-verified', 'reason-required', 'audit-required', 'replacement-confirmed'],
+    allowedActions: ['إضافة عنصر منشور', 'حذف عنصر', 'استبدال عنصر غير متاح', 'فتح WLT visibility للقراءة فقط'],
+    forbiddenActions: ['تجاوز التحقق من الهوية', 'تنفيذ refund محلي', 'اعتماد حقيقة حسابية داخل DSH'],
+    wltBoundary: 'WLT يظهر للقراءة فقط: الدفع والاسترداد والتسوية تبقى خارج Assisted Order.',
+    nextAction: 'ثبّت موافقة البديل ثم حرّك الحالة إلى submit draft preview من دون claim إنشاء طلب.',
+    crossSurfaceLinks: [
+      {
+        actionId: 'customer-360',
+        label: 'Customer 360',
+        surfaceId: 'control-panel',
+        sectionId: 'support',
+        routeHint: '/support?workspace=customer-360&customerId=cus-9021&orderId=ORD-1102&ticketId=TKT-1102',
+        routeId: 'cp/support/customer-360',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+      },
+      {
+        actionId: 'wlt-visibility',
+        label: 'WLT visibility',
+        surfaceId: 'wlt-finance',
+        sectionId: 'finance',
+        routeHint: '/finance?workspace=refunds&orderId=ORD-1102',
+        routeId: 'cp/finance/refunds',
+        onDemandPolicy: 'finance-preview-only',
+        readOnly: true,
+      },
+      {
+        actionId: 'order-rescue',
+        label: 'Order rescue',
+        surfaceId: 'control-panel',
+        sectionId: 'operations',
+        routeHint: '/operations?workspace=order-rescue&orderId=ORD-1102&ticketId=TKT-1102&customerId=cus-9021',
+        routeId: 'cp/operations/order-rescue',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+        reasonRequired: true,
+      },
+    ],
+    lookupPanel: {
+      inputs: buildDshAssistedOrderLookupInputs({
+        phone: '05*******18',
+        orderId: 'ORD-1102',
+        customerId: 'cus-9021',
+        ticketId: 'TKT-1102',
+      }),
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    identityVerification: {
+      verificationStatus: 'verified',
+      verificationSteps: [
+        { stepId: 'match-phone', label: 'مطابقة الهاتف المسجل', completed: true },
+        { stepId: 'last-order-check', label: 'تأكيد آخر طلب أو معرف مرجعي', completed: true },
+        { stepId: 'unlock-sensitive', label: 'فتح الحقول الحساسة بعد التحقق', completed: true },
+      ],
+      sensitiveFieldsLocked: ['العنوان الكامل', 'قرار الاسترداد', 'تفاصيل settlement'],
+      forbiddenActionsBeforeVerification: ['إظهار الدفع', 'تعديل عنوان التسليم', 'إرسال الطلب'],
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    cartBuilderPreview: {
+      publishedProductsOnly: true,
+      items: [
+        { sku: 'SKU-441', name: 'حليب قليل الدسم', quantity: 2, published: true, status: 'active', note: 'منشور ويظهر في الكتالوج الحالي.' },
+        { sku: 'SKU-889', name: 'خبز بر', quantity: 1, published: true, status: 'substitute', note: 'بديل مثبت بعد موافقة العميل.' },
+        { sku: 'SKU-221', name: 'بيض عضوي', quantity: 1, published: true, status: 'active', note: 'لا توجد قيود إضافية.' },
+      ],
+      addItemPreview: 'إضافة عناصر منشورة فقط من نفس store context.',
+      removeItemPreview: 'الحذف مسموح بعد توثيق السبب داخل operator note.',
+      replaceItemPreview: 'الاستبدال يربط العنصر الأصلي بالبديل داخل نفس السلة.',
+      substituteItemPreview: 'البديل يحتاج visibility note للعميل أو الشريك قبل التثبيت.',
+      unavailableItemHandling: 'عند نفاد العنصر: إما بديل منشور أو remove item مع reason واضح، وإلا افتح Order Rescue.',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    deliveryModeSelector: buildDeliveryModeSummary('bthwani_delivery'),
+    serviceabilitySummary: {
+      zoneLabel: 'Riyadh / Al Yasmin',
+      serviceabilityStatus: 'serviceable',
+      fallbackAction: 'إن تعذر الكابتن لاحقًا افتح Dispatch أو Rescue بدل تبديل الحقائق المالية.',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    wltReadOnlyHandoff: {
+      paymentVisibility: 'Paid via WLT wallet snapshot — read-only.',
+      refundVisibility: 'No active refund mutation from DSH.',
+      settlementVisibility: 'Partner settlement remains WLT-owned and hidden from mutation.',
+      readOnly: true,
+      mutationForbidden: true,
+      calculationTruthOwner: 'WLT',
+      routeHint: '/finance?workspace=refunds&orderId=ORD-1102',
+      onDemandPolicy: 'finance-preview-only',
+      placeholderClassification: 'BLOCKED_BY_WLT',
+    },
+    auditReason: {
+      reasonRequired: true,
+      auditRequired: true,
+      operatorNote: 'تمت مطابقة الهوية وتثبيت بديل الخبز قبل إرسال المسودة إلى قناة التنفيذ.',
+      reasonLabel: 'Assisted order rebuild after manual call confirmation.',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    submitDraftPreview: {
+      previewOnly: true,
+      noBackendCall: true,
+      noOrderCreationClaim: true,
+      previewState: 'ready_for_preview',
+      nextAction: 'ارسل الإشارة التشغيلية ثم افتح الـ route المقابل عند قبول المشغل للخطوة التالية.',
+      signal: buildDshSignalRoutePreview('assisted_order_requested'),
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+  },
+  {
+    deskId: 'assist-ord-1184',
+    customerId: 'cus-4188',
+    customerName: 'محمد العبدلي',
+    maskedPhone: '05*******44',
+    source: 'customer_360_followup',
+    orderId: 'ORD-1184',
+    ticketId: 'TKT-1184',
+    identityStatus: 'required',
+    activeStage: 'identity-check',
+    basketSummary: 'إعادة بناء طلب سريع بعد متابعة Customer 360 مع حجب الحقول الحساسة.',
+    auditFlags: ['identity-required', 'sensitive-fields-locked', 'draft-preview-only'],
+    allowedActions: ['بدء lookup', 'التحقق من الهوية', 'تجهيز cart draft preview'],
+    forbiddenActions: ['كشف العنوان الكامل', 'إرسال الطلب مباشرة', 'بدء تحصيل أو settlement'],
+    wltBoundary: 'رؤية WLT المالية متاحة كمرجع فقط عند فتحها وبعد اكتمال التحقق.',
+    nextAction: 'أكمل التحقق أولًا، ثم حدّد delivery mode صالحًا أو حوّل الحالة إلى rescue إن بقيت غير قابلة للخدمة.',
+    crossSurfaceLinks: [
+      {
+        actionId: 'call-intake',
+        label: 'Manual Call Intake',
+        surfaceId: 'control-panel',
+        sectionId: 'support',
+        routeHint: '/support?workspace=call-intake&customerId=cus-4188&orderId=ORD-1184&ticketId=TKT-1184',
+        routeId: 'cp/support/call-intake',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+      },
+      {
+        actionId: 'customer-360',
+        label: 'Customer 360',
+        surfaceId: 'control-panel',
+        sectionId: 'support',
+        routeHint: '/support?workspace=customer-360&customerId=cus-4188&orderId=ORD-1184&ticketId=TKT-1184',
+        routeId: 'cp/support/customer-360',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+      },
+      {
+        actionId: 'wlt-visibility',
+        label: 'WLT visibility',
+        surfaceId: 'wlt-finance',
+        sectionId: 'finance',
+        routeHint: '/finance?workspace=refunds&orderId=ORD-1184',
+        routeId: 'cp/finance/refunds',
+        onDemandPolicy: 'finance-preview-only',
+        readOnly: true,
+      },
+    ],
+    lookupPanel: {
+      inputs: buildDshAssistedOrderLookupInputs({
+        phone: '05*******44',
+        orderId: 'ORD-1184',
+        customerId: 'cus-4188',
+        ticketId: 'TKT-1184',
+      }),
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    identityVerification: {
+      verificationStatus: 'required',
+      verificationSteps: [
+        { stepId: 'match-phone', label: 'مطابقة الهاتف المسجل', completed: false },
+        { stepId: 'confirm-ticket', label: 'مطابقة رقم التذكرة أو الطلب', completed: true },
+        { stepId: 'unlock-sensitive', label: 'فتح الحقول الحساسة بعد التحقق', completed: false },
+      ],
+      sensitiveFieldsLocked: ['العنوان الكامل', 'payment visibility', 'refund visibility'],
+      forbiddenActionsBeforeVerification: ['عرض تفاصيل WLT', 'تعديل delivery mode', 'replace item'],
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    cartBuilderPreview: {
+      publishedProductsOnly: true,
+      items: [
+        { sku: 'SKU-100', name: 'عصير برتقال', quantity: 1, published: true, status: 'active', note: 'صنف منشور متاح.' },
+        { sku: 'SKU-101', name: 'مياه معدنية', quantity: 2, published: true, status: 'unavailable', note: 'غير متاح حاليًا ويحتاج بديلًا منشورًا.' },
+      ],
+      addItemPreview: 'لا تتم الإضافة قبل إنهاء التحقق.',
+      removeItemPreview: 'الحذف يظل draft-only حتى اكتمال التحقق.',
+      replaceItemPreview: 'replace/substitute يتطلب customer visibility note.',
+      substituteItemPreview: 'البديل يظهر كتوصية لا كتأكيد نهائي.',
+      unavailableItemHandling: 'إن لم يتوفر بديل منشور، يحال الطلب إلى Order Rescue بدل ادعاء إنشاء جديد.',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    deliveryModeSelector: buildDeliveryModeSummary('pickup'),
+    serviceabilitySummary: {
+      zoneLabel: 'Jeddah / Al Rawdah',
+      serviceabilityStatus: 'blocked',
+      blockedReason: 'pickup only until identity verification and service window confirmation complete.',
+      fallbackAction: 'إبقِ الوضع pickup أو افتح Order Rescue لتغيير القرار التشغيلي لاحقًا.',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    wltReadOnlyHandoff: {
+      paymentVisibility: 'Payment review hidden until verification completes.',
+      refundVisibility: 'Refund visibility stays read-only and blocked pre-verification.',
+      settlementVisibility: 'No settlement context exposed in Assisted Order.',
+      readOnly: true,
+      mutationForbidden: true,
+      calculationTruthOwner: 'WLT',
+      routeHint: '/finance?workspace=refunds&orderId=ORD-1184',
+      onDemandPolicy: 'finance-preview-only',
+      placeholderClassification: 'BLOCKED_BY_WLT',
+    },
+    auditReason: {
+      reasonRequired: true,
+      auditRequired: true,
+      operatorNote: 'العميل طلب assisted order لكن الهوية ما زالت غير مكتملة، وتم إبقاء الحقول الحساسة محجوبة.',
+      reasonLabel: 'Identity-first assisted order request from Customer 360.',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    submitDraftPreview: {
+      previewOnly: true,
+      noBackendCall: true,
+      noOrderCreationClaim: true,
+      previewState: 'blocked_by_identity',
+      nextAction: 'أكمل identity verification أو غيّر المسار إلى Manual Call Intake قبل أي draft submit preview.',
+      signal: buildDshSignalRoutePreview('assisted_order_requested'),
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+  },
+] as const;
+
+export function getDshAssistedOrderById(deskId: string): DshAssistedOrderPreview | undefined {
+  return DSH_ASSISTED_ORDER_PREVIEW.find((entry) => entry.deskId === deskId);
+}
+
+export function getDshAssistedOrderByContext(context: {
+  readonly deskId?: string | null;
+  readonly orderId?: string | null;
+  readonly customerId?: string | null;
+  readonly ticketId?: string | null;
+}): DshAssistedOrderPreview | undefined {
+  if (context.deskId) {
+    const byDeskId = getDshAssistedOrderById(context.deskId);
+    if (byDeskId) {
+      return byDeskId;
+    }
+  }
+
+  return DSH_ASSISTED_ORDER_PREVIEW.find((entry) => {
+    if (context.orderId && entry.orderId === context.orderId) {
+      return true;
+    }
+
+    if (context.customerId && entry.customerId === context.customerId) {
+      return true;
+    }
+
+    if (context.ticketId && entry.ticketId === context.ticketId) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
+// -----------------------------------------------------------------------------
+// Order rescue preview
+// -----------------------------------------------------------------------------
+export type DshOrderRescueSeverity = 'warning' | 'danger';
+
+export type DshOrderRescueReason =
+  | 'item_unavailable'
+  | 'customer_not_reachable'
+  | 'store_closed_after_order'
+  | 'captain_no_show'
+  | 'captain_declined'
+  | 'pickup_failed'
+  | 'handoff_mismatch'
+  | 'delivery_failed'
+  | 'address_issue'
+  | 'payment_failure'
+  | 'wlt_visibility';
+
+export type DshOrderRescueOwner = 'support' | 'operations' | 'partner' | 'captain' | 'wlt_reference_only';
+
+export type DshOrderRescueNextActionId =
+  | 'replace_item'
+  | 'remove_item'
+  | 'wait_customer'
+  | 'change_delivery_mode'
+  | 'reassign_captain'
+  | 'convert_to_support_exception'
+  | 'create_follow_up_task'
+  | 'open_wlt_visibility';
+
+export type DshOrderRescueCase = {
+  readonly rescueId: string;
+  readonly orderId: string;
+  readonly customerId: string;
+  readonly customerName: string;
+  readonly issueKind: DshOrderRescueReason;
+  readonly severity: DshOrderRescueSeverity;
+  readonly blocker: string;
+  readonly allowedActions: readonly string[];
+  readonly forbiddenActions: readonly string[];
+  readonly nextBestAction: string;
+  readonly onDemandPolicy: DshOnDemandPolicy;
+  readonly wltBoundary: string;
+  readonly crossSurfaceLinks: readonly DshGlobalControlLink[];
+  readonly rescueReasonSelector: {
+    readonly selectedReason: DshOrderRescueReason;
+    readonly options: readonly DshOrderRescueReason[];
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly ownerSelection: {
+    readonly selectedOwner: DshOrderRescueOwner;
+    readonly options: readonly DshOrderRescueOwner[];
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly nextActionSelector: {
+    readonly selectedAction: DshOrderRescueNextActionId;
+    readonly options: readonly DshOrderRescueNextActionId[];
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly requiredEvidence: {
+    readonly reason: string;
+    readonly operatorNote: string;
+    readonly affectedEntity: string;
+    readonly auditRequired: true;
+    readonly reasonRequired: true;
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly supportHandoff: {
+    readonly ticketLink: string;
+    readonly escalationOwner: string;
+    readonly sla: string;
+    readonly routeHint: string;
+    readonly previewClassification: DshPreviewPlaceholderStatus;
+  };
+  readonly wltImpactVisibility: DshReadOnlyFinanceVisibility;
+  readonly decisionSignal: ReturnType<typeof buildDshSignalRoutePreview>;
+};
+
+const ORDER_RESCUE_REASONS: readonly DshOrderRescueReason[] = [
+  'item_unavailable',
+  'customer_not_reachable',
+  'store_closed_after_order',
+  'captain_no_show',
+  'captain_declined',
+  'pickup_failed',
+  'handoff_mismatch',
+  'delivery_failed',
+  'address_issue',
+  'payment_failure',
+  'wlt_visibility',
+] as const;
+
+const ORDER_RESCUE_OWNERS: readonly DshOrderRescueOwner[] = [
+  'support',
+  'operations',
+  'partner',
+  'captain',
+  'wlt_reference_only',
+] as const;
+
+const ORDER_RESCUE_ACTIONS: readonly DshOrderRescueNextActionId[] = [
+  'replace_item',
+  'remove_item',
+  'wait_customer',
+  'change_delivery_mode',
+  'reassign_captain',
+  'convert_to_support_exception',
+  'create_follow_up_task',
+  'open_wlt_visibility',
+] as const;
+
+export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
+  {
+    rescueId: 'rescue-1102',
+    orderId: 'ORD-1102',
+    customerId: 'cus-9021',
+    customerName: 'لمى ناصر',
+    issueKind: 'item_unavailable',
+    severity: 'danger',
+    blocker: 'الشريك أكد الجاهزية جزئيًا لكن البديل لم يثبت بعد، ما يهدد SLA والرضا.',
+    allowedActions: ['replace item', 'create follow-up task', 'فتح ticket support', 'فتح WLT visibility للقراءة فقط'],
+    forbiddenActions: ['no refund execution in DSH', 'no settlement/payout mutation', 'no item mutation without visibility note'],
+    nextBestAction: 'ثبّت owner واحدًا ثم حرّك الحالة إلى replace item أو support exception بدل تعدد القرارات.',
+    onDemandPolicy: 'detail-on-open',
+    wltBoundary: 'إذا انتهت الحالة إلى استرداد فالرؤية فقط داخل DSH والتنفيذ في WLT.',
+    crossSurfaceLinks: [
+      {
+        actionId: 'support-ticket',
+        label: 'Support ticket',
+        surfaceId: 'control-panel',
+        sectionId: 'support',
+        routeHint: '/support?workspace=queue&ticketId=TKT-1102',
+        routeId: 'cp/support/ticket',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+      },
+      {
+        actionId: 'partner-controls',
+        label: 'Partner controls',
+        surfaceId: 'control-panel',
+        sectionId: 'partners',
+        routeHint: '/partners?tab=performance&orderId=ORD-1102',
+        routeId: 'cp/partners/control',
+        onDemandPolicy: 'detail-on-open',
+      },
+      {
+        actionId: 'wlt-visibility',
+        label: 'WLT visibility',
+        surfaceId: 'wlt-finance',
+        sectionId: 'finance',
+        routeHint: '/finance?workspace=refunds&orderId=ORD-1102',
+        routeId: 'cp/finance/refunds',
+        onDemandPolicy: 'finance-preview-only',
+        readOnly: true,
+      },
+    ],
+    rescueReasonSelector: {
+      selectedReason: 'item_unavailable',
+      options: ORDER_RESCUE_REASONS,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    ownerSelection: {
+      selectedOwner: 'operations',
+      options: ORDER_RESCUE_OWNERS,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    nextActionSelector: {
+      selectedAction: 'replace_item',
+      options: ORDER_RESCUE_ACTIONS,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    requiredEvidence: {
+      reason: 'البديل لم يثبت بعد رغم بقاء الطلب نشطًا.',
+      operatorNote: 'يجب تأكيد visibility note للعميل أو الشريك قبل replace item.',
+      affectedEntity: 'ORD-1102 / SKU-889',
+      auditRequired: true,
+      reasonRequired: true,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    supportHandoff: {
+      ticketLink: 'TKT-1102',
+      escalationOwner: 'Support + Operations',
+      sla: 'يتبقى 5 دقائق',
+      routeHint: '/support?workspace=escalation&ticketId=TKT-1102',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    wltImpactVisibility: {
+      paymentVisibility: 'Payment snapshot visible only as a reference.',
+      refundVisibility: 'Refund execution blocked in DSH.',
+      settlementVisibility: 'Settlement / payout mutation remains WLT-owned.',
+      readOnly: true,
+      mutationForbidden: true,
+      calculationTruthOwner: 'WLT',
+      routeHint: '/finance?workspace=refunds&orderId=ORD-1102',
+      onDemandPolicy: 'finance-preview-only',
+      placeholderClassification: 'BLOCKED_BY_WLT',
+    },
+    decisionSignal: buildDshSignalRoutePreview('order_rescue_requested'),
+  },
+  {
+    rescueId: 'rescue-1184',
+    orderId: 'ORD-1184',
+    customerId: 'cus-4188',
+    customerName: 'محمد العبدلي',
+    issueKind: 'payment_failure',
+    severity: 'warning',
+    blocker: 'فشل الدفع ظهر للعميل بينما المكالمة اليدوية تحاول إنقاذ الطلب دون تجاوز WLT.',
+    allowedActions: ['wait customer', 'convert to support exception', 'open WLT visibility'],
+    forbiddenActions: ['no refund execution in DSH', 'no delivery mode change after forbidden lifecycle states', 'no settlement/payout mutation'],
+    nextBestAction: 'أكمل التحقق ثم افتح الرؤية المالية كمرجع فقط قبل أي قرار rescue إضافي.',
+    onDemandPolicy: 'detail-on-open',
+    wltBoundary: 'WLT يملك قرار الدفع والاسترداد بالكامل؛ Rescue يكتفي بتجميع السياق وتوجيه القرار.',
+    crossSurfaceLinks: [
+      {
+        actionId: 'manual-call-intake',
+        label: 'Manual Call Intake',
+        surfaceId: 'control-panel',
+        sectionId: 'support',
+        routeHint: '/support?workspace=call-intake&orderId=ORD-1184&customerId=cus-4188&ticketId=TKT-1184',
+        routeId: 'cp/support/call-intake',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+      },
+      {
+        actionId: 'customer-360',
+        label: 'Customer 360',
+        surfaceId: 'control-panel',
+        sectionId: 'support',
+        routeHint: '/support?workspace=customer-360&orderId=ORD-1184&customerId=cus-4188&ticketId=TKT-1184',
+        routeId: 'cp/support/customer-360',
+        onDemandPolicy: 'detail-on-open',
+        auditRequired: true,
+      },
+      {
+        actionId: 'wlt-visibility',
+        label: 'WLT visibility',
+        surfaceId: 'wlt-finance',
+        sectionId: 'finance',
+        routeHint: '/finance?workspace=refunds&orderId=ORD-1184',
+        routeId: 'cp/finance/refunds',
+        onDemandPolicy: 'finance-preview-only',
+        readOnly: true,
+      },
+    ],
+    rescueReasonSelector: {
+      selectedReason: 'payment_failure',
+      options: ORDER_RESCUE_REASONS,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    ownerSelection: {
+      selectedOwner: 'wlt_reference_only',
+      options: ORDER_RESCUE_OWNERS,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    nextActionSelector: {
+      selectedAction: 'open_wlt_visibility',
+      options: ORDER_RESCUE_ACTIONS,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    requiredEvidence: {
+      reason: 'الدفع فشل والعميل يطلب متابعة عبر الهاتف مع بقاء القرار المالي لدى WLT.',
+      operatorNote: 'لا تغيير في payment truth داخل DSH؛ rescue هنا يوجّه فقط.',
+      affectedEntity: 'ORD-1184 / payment-failure',
+      auditRequired: true,
+      reasonRequired: true,
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    supportHandoff: {
+      ticketLink: 'TKT-1184',
+      escalationOwner: 'Support',
+      sla: 'يتبقى 9 دقائق',
+      routeHint: '/support?workspace=escalation&ticketId=TKT-1184',
+      previewClassification: 'ACCEPTED_PREVIEW_LABEL',
+    },
+    wltImpactVisibility: {
+      paymentVisibility: 'Payment failure visible from WLT route only.',
+      refundVisibility: 'Refund visibility available on open, no execution.',
+      settlementVisibility: 'No settlement mutation allowed.',
+      readOnly: true,
+      mutationForbidden: true,
+      calculationTruthOwner: 'WLT',
+      routeHint: '/finance?workspace=refunds&orderId=ORD-1184',
+      onDemandPolicy: 'finance-preview-only',
+      placeholderClassification: 'BLOCKED_BY_WLT',
+    },
+    decisionSignal: buildDshSignalRoutePreview('order_rescue_requested'),
+  },
+] as const;
+
+export function getDshOrderRescueCase(rescueId: string): DshOrderRescueCase | undefined {
+  return DSH_ORDER_RESCUE_PREVIEW.find((entry) => entry.rescueId === rescueId);
+}
+
+export function getDshOrderRescueByContext(context: {
+  readonly rescueId?: string | null;
+  readonly orderId?: string | null;
+  readonly customerId?: string | null;
+}): DshOrderRescueCase | undefined {
+  if (context.rescueId) {
+    const byId = getDshOrderRescueCase(context.rescueId);
+    if (byId) {
+      return byId;
+    }
+  }
+
+  return DSH_ORDER_RESCUE_PREVIEW.find((entry) => {
+    if (context.orderId && entry.orderId === context.orderId) {
+      return true;
+    }
+
+    if (context.customerId && entry.customerId === context.customerId) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
+// -----------------------------------------------------------------------------
+// Control panel operations preview
+// -----------------------------------------------------------------------------
+/**
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ */
+export const operationsPreviewDataContract = {
+  dataKind: 'UI_PREVIEW_ONLY',
+  runtimeTruth: false,
+  backendSource: false,
+  bindingSource: false,
+  timezoneSemantics: 'preview-only local display / not runtime UTC source',
+  moneySemantics: 'preview-only display values / not accounting source',
+} as const;
+
+export const OPERATIONS_PULSE_METRICS = [
+  { id: 'command-center-open-orders', title: 'الطلبات المفتوحة', value: '128', description: 'الطلبات التي تتحرك داخل غرفة العمليات.', tone: 'brand' },
+  { id: 'command-center-dispatch-risk', title: 'مخاطر الإسناد', value: '9', description: 'طلبات تحتاج إسنادًا يدويًا الآن.', tone: 'warning' },
+  { id: 'command-center-captain-cover', title: 'تغطية الكباتن', value: '42', description: 'الكباتن المتاحون ظاهرون الآن.', tone: 'best' },
+  { id: 'command-center-escalations', title: 'الاستثناءات', value: '17', description: 'استثناءات مفتوحة تنتظر مالكًا.', tone: 'danger' },
+] as const;
+
+export const LIVE_ORDERS_OPERATIONAL_PREVIEW = {
+  summary: {
+    awaitingAcknowledgement: 3,
+    blockedRings: 2,
+    ringLabel: 'تنبيه الوصول',
+    actionHint: 'أعد الرنين ثم افتح الإسناد إذا بقي الطلب بلا رد.',
+  },
+  rows: [
+    {
+      id: 'LO-1024',
+      fulfillmentMode: 'bthwani_delivery',
+      status: 'قيد الإسناد',
+      statusTone: 'warning',
+      eta: '12 دقيقة',
+      destination: 'متجر الرياض',
+      captain: 'غير مسند',
+      notes: 'الطلب ينتظر قرار الإسناد قبل أول رنين.',
+      ringLabel: 'لم يؤكد الوصول',
+      actionHint: 'أعد الرنين ثم افحص التغطية.',
+      arrivalTimeline: ['قيد الوصول', 'الرنين الأول لم يؤكد', 'بانتظار رد مالك القرار'],
+      actionPlans: ['افتح الإسناد', 'أرسل رنينًا جديدًا', 'صعّد للمشرف إذا بقي بلا مالك'],
+      suggestion: {
+        label: 'افتح الإسناد فورًا',
+        reason: 'الطلب بلا كابتن والتأخير يتزايد.',
+        confidence: 'high',
+        action: 'فتح الإسناد',
+        secondary: 'تواصل مع الدعم',
+        auditRequired: false,
+      },
+    },
+    {
+      id: 'LO-1077',
+      fulfillmentMode: 'bthwani_delivery',
+      status: 'بانتظار إثبات',
+      statusTone: 'danger',
+      eta: '18 دقيقة',
+      destination: 'مقهى الشرق',
+      captain: 'خالد',
+      notes: 'النقل متوقف حتى يصل إثبات الاستلام.',
+      ringLabel: 'محجوب',
+      actionHint: 'اطلب إثباتًا قبل الإغلاق.',
+      arrivalTimeline: ['وصل الطلب', 'الرنين محجوب', 'الإثبات مطلوب قبل الإغلاق'],
+      actionPlans: ['اطلب الإثبات', 'افتح الدعم', 'احتفظ بالسجل'],
+      suggestion: {
+        label: 'اطلب الإثبات الآن',
+        reason: 'الإثبات مفقود والحل مرهون بالدعم.',
+        confidence: 'high',
+        action: 'طلب الإثبات',
+        secondary: 'فتح الدعم',
+        auditRequired: true,
+      },
+    },
+    {
+      id: 'LO-1099',
+      fulfillmentMode: 'bthwani_delivery',
+      status: 'في الطريق',
+      statusTone: 'best',
+      eta: '7 دقائق',
+      destination: 'مخبز الورد',
+      captain: 'سلمان',
+      notes: 'النافذة ما زالت آمنة والتسليم قريب.',
+      ringLabel: 'تنبيه الوصول',
+      actionHint: 'راقب ETA ولا تصعيد الآن.',
+      arrivalTimeline: ['الكابتن في الطريق', 'النافذة ما زالت آمنة', 'التسليم قريب'],
+      actionPlans: ['راقب ETA', 'لا تصعيد الآن', 'افتح التفاصيل إذا تأخر'],
+      suggestion: {
+        label: 'تابع وقت التسليم',
+        reason: 'الطلب في المسار الطبيعي ولا يحتاج تدخلًا الآن.',
+        confidence: 'medium',
+        action: 'مراقبة ETA',
+        secondary: 'فتح التفاصيل',
+        auditRequired: false,
+      },
+    },
+  ] as const,
+} as const;
+
+export const DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW = {
+  summary: {
+    waitingAssignment: 6,
+    availableCaptains: 4,
+    readyForPickup: 3,
+    dispatchBlockers: 2,
+  },
+  rows: [
+    {
+      id: 'DA-2001',
+      status: 'طلبات بانتظار الإسناد',
+      statusTone: 'warning',
+      captain: 'سعد م.',
+      distance: '1.2 كم',
+      pickupEta: '5 دقائق',
+      dropoffEta: '19 دقيقة',
+      confidence: 'ثقة عالية',
+      blocker: 'لا يوجد',
+      readyForPickup: 'جاهز لمسار الاستلام',
+      recommendation: 'أسند إلى سعد م. الآن',
+      note: 'الأقرب والمتاح حاليًا.',
+      actionPlans: ['تأكيد الإسناد', 'مراقبة الاستلام', 'تخفيف ضغط التوزيع'],
+    },
+    {
+      id: 'DA-2002',
+      status: 'يحتاج إعادة إسناد',
+      statusTone: 'brand',
+      captain: 'محمد ع.',
+      distance: '0.8 كم',
+      pickupEta: '2 دقيقة',
+      dropoffEta: '16 دقيقة',
+      confidence: 'ثقة عالية',
+      blocker: 'أول كابتن رفض',
+      readyForPickup: 'جاهز بعد إعادة التعيين',
+      recommendation: 'أعد الإسناد لمحمد ع.',
+      note: 'بديل أفضل مع وقت استجابة أقل.',
+      actionPlans: ['إعادة التعيين', 'تخطي الرفض الأول', 'تثبيت الكابتن البديل'],
+    },
+    {
+      id: 'DA-2003',
+      status: 'نقص كباتن',
+      statusTone: 'danger',
+      captain: 'لا يوجد',
+      distance: '-',
+      pickupEta: '-',
+      dropoffEta: '-',
+      confidence: 'ثقة منخفضة',
+      blocker: 'نقص في التغطية',
+      readyForPickup: 'يحتاج تصعيدًا',
+      recommendation: 'صعّد وراقب الضغط',
+      note: 'المنطقة تحتاج تدخلًا مباشرًا.',
+      actionPlans: ['تصعيد فوري', 'تثبيت العجز', 'فتح الضغط'],
+    },
+  ] as const,
+} as const;
+
+export type SheinProxyStage =
+  | 'intake_review'
+  | 'quote_pending'
+  | 'customer_approval'
+  | 'batch_pending'
+  | 'purchased'
+  | 'inbound'
+  | 'sorting'
+  | 'ready_for_delivery'
+  | 'captain_assignment'
+  | 'delivered'
+  | 'exception';
+
+export const SHEIN_PROXY_STAGE_LABELS: Record<SheinProxyStage, string> = {
+  intake_review: 'مراجعة الطلب',
+  quote_pending: 'بانتظار التسعير',
+  customer_approval: 'موافقة العميل',
+  batch_pending: 'بانتظار الدفعة',
+  purchased: 'تم الشراء',
+  inbound: 'في الطريق للاستقبال',
+  sorting: 'قيد الفرز',
+  ready_for_delivery: 'جاهز للتسليم',
+  captain_assignment: 'إسناد الكابتن',
+  delivered: 'تم التسليم',
+  exception: 'استثناء',
+};
+
+export const SHEIN_PROXY_OPERATIONAL_PREVIEW = {
+  summary: {
+    intake_review: 5,
+    quote_pending: 4,
+    customer_approval: 3,
+    batch_pending: 6,
+    purchased: 8,
+    inbound: 4,
+    sorting: 3,
+    ready_for_delivery: 2,
+    captain_assignment: 2,
+    delivered: 14,
+    exception: 1,
+  },
+  requests: [
+    {
+      id: 'SPX-2048',
+      customer: 'نورة الفهد',
+      stage: 'intake_review' as SheinProxyStage,
+      statusLabel: SHEIN_PROXY_STAGE_LABELS['intake_review'],
+      statusTone: 'warning',
+      amount: 'ر.ي 1,280',
+      shipping: 'ر.ي 96',
+      fee: 'ر.ي 110',
+      total: 'ر.ي 1,486',
+      updated: 'قبل 10 دقائق',
+      note: 'بانتظار مراجعة الرابط والتسعير من فريق العمليات.',
+      nextStep: 'راجع الرابط وأدخل التسعير',
+      owner: 'العمليات',
+      sla: '24 ساعة',
+    },
+    {
+      id: 'SPX-2051',
+      customer: 'مريم خالد',
+      stage: 'customer_approval' as SheinProxyStage,
+      statusLabel: SHEIN_PROXY_STAGE_LABELS['customer_approval'],
+      statusTone: 'brand',
+      amount: 'ر.ي 840',
+      shipping: 'ر.ي 62',
+      fee: 'ر.ي 88',
+      total: 'ر.ي 990',
+      updated: 'قبل 18 دقيقة',
+      note: 'العرض أُرسل للعميل وينتظر الموافقة.',
+      nextStep: 'تابع رد العميل',
+      owner: 'العمليات',
+      sla: '12 ساعة',
+    },
+    {
+      id: 'SPX-2064',
+      customer: 'سعيد حسن',
+      stage: 'batch_pending' as SheinProxyStage,
+      statusLabel: SHEIN_PROXY_STAGE_LABELS['batch_pending'],
+      statusTone: 'warning',
+      amount: 'ر.ي 1,620',
+      shipping: 'ر.ي 74',
+      fee: 'ر.ي 125',
+      total: 'ر.ي 1,819',
+      updated: 'قبل 32 دقيقة',
+      note: 'معتمد من العميل وبانتظار تجميع الدفعة.',
+      nextStep: 'أضفه للدفعة القادمة',
+      owner: 'المشتريات',
+      sla: '48 ساعة',
+    },
+    {
+      id: 'SPX-2072',
+      customer: 'دانا صالح',
+      stage: 'sorting' as SheinProxyStage,
+      statusLabel: SHEIN_PROXY_STAGE_LABELS['sorting'],
+      statusTone: 'best',
+      amount: 'ر.ي 1,010',
+      shipping: 'ر.ي 55',
+      fee: 'ر.ي 94',
+      total: 'ر.ي 1,159',
+      updated: 'قبل ساعة',
+      note: 'تم استقبال الطلب وجاري الفرز والتعبئة.',
+      nextStep: 'تحقق من المحتوى قبل الإغلاق',
+      owner: 'المستودع',
+      sla: '24 ساعة',
+    },
+    {
+      id: 'SPX-2078',
+      customer: 'لمى ناصر',
+      stage: 'captain_assignment' as SheinProxyStage,
+      statusLabel: SHEIN_PROXY_STAGE_LABELS['captain_assignment'],
+      statusTone: 'best',
+      amount: 'ر.ي 690',
+      shipping: 'ر.ي 45',
+      fee: 'ر.ي 77',
+      total: 'ر.ي 812',
+      updated: 'قبل ساعتين',
+      note: 'جاهز للتسليم النهائي — يحتاج إسناد كابتن.',
+      nextStep: 'أسند للكابتن المتاح',
+      owner: 'الإسناد',
+      sla: '4 ساعات',
+    },
+    {
+      id: 'SPX-2083',
+      customer: 'عبدالله عمر',
+      stage: 'exception' as SheinProxyStage,
+      statusLabel: SHEIN_PROXY_STAGE_LABELS['exception'],
+      statusTone: 'danger',
+      amount: 'ر.ي 560',
+      shipping: 'ر.ي 41',
+      fee: 'ر.ي 58',
+      total: 'ر.ي 659',
+      updated: 'قبل 3 ساعات',
+      note: 'تعارض في التسعير — يحتاج قرار تصعيد.',
+      nextStep: 'صعّد للمشرف وأغلق السجل',
+      owner: 'المشرف',
+      sla: 'عاجل',
+    },
+  ] as const,
+} as const;
+
+export type AwnakStage =
+  | 'intake'
+  | 'quote_review'
+  | 'dispatch_pending'
+  | 'assigned'
+  | 'in_progress'
+  | 'proof_review'
+  | 'completed'
+  | 'cancelled'
+  | 'escalated';
+
+export const AWNAK_STAGE_LABELS: Record<AwnakStage, string> = {
+  intake: 'استلام الطلب',
+  quote_review: 'مراجعة السعر',
+  dispatch_pending: 'قيد الإسناد',
+  assigned: 'تم الإسناد',
+  in_progress: 'قيد التنفيذ',
+  proof_review: 'مراجعة الإثبات',
+  completed: 'مكتمل',
+  cancelled: 'ملغى',
+  escalated: 'مصعّد',
+};
+
+export const AWNAK_OPERATIONAL_PREVIEW = {
+  summary: {
+    intake: 4,
+    quote_review: 3,
+    dispatch_pending: 5,
+    assigned: 6,
+    in_progress: 7,
+    proof_review: 3,
+    completed: 18,
+    cancelled: 2,
+    escalated: 1,
+  },
+  rows: [
+    {
+      requestId: 'AWN-3101',
+      type: 'أغراض شخصية',
+      customer: 'نورة الفهد',
+      stage: 'quote_review' as AwnakStage,
+      status: AWNAK_STAGE_LABELS['quote_review'],
+      assignmentStatus: 'معلّق',
+      nextAction: 'راجع السعر وأرسل للعميل',
+      risk: 'مرتفع',
+      owner: 'فريق عونك',
+      note: 'الطلب يحتاج تأكيد السعر قبل إسناد الكابتن.',
+      statusTone: 'warning',
+      sla: '2 ساعة',
+      captainId: null,
+    },
+    {
+      requestId: 'AWN-3104',
+      type: 'طعام',
+      customer: 'مريم خالد',
+      stage: 'assigned' as AwnakStage,
+      status: AWNAK_STAGE_LABELS['assigned'],
+      assignmentStatus: 'مسند',
+      nextAction: 'تابع تأكيد الاستلام',
+      risk: 'متوسط',
+      owner: 'المشرف المباشر',
+      note: 'الكابتن في الطريق — انتظر تأكيد الاستلام.',
+      statusTone: 'brand',
+      sla: '30 دقيقة',
+      captainId: 'CAP-0041',
+    },
+    {
+      requestId: 'AWN-3108',
+      type: 'وزن ثقيل',
+      customer: 'سعيد حسن',
+      stage: 'proof_review' as AwnakStage,
+      status: AWNAK_STAGE_LABELS['proof_review'],
+      assignmentStatus: 'مكتمل ميدانيًا',
+      nextAction: 'راجع الإثبات وأغلق الطلب',
+      risk: 'منخفض',
+      owner: 'التشغيل',
+      note: 'الكابتن أرسل إثبات التسليم — مراجعة سريعة قبل الإغلاق.',
+      statusTone: 'best',
+      sla: '1 ساعة',
+      captainId: 'CAP-0019',
+    },
+    {
+      requestId: 'AWN-3112',
+      type: 'تورتة',
+      customer: 'دانا صالح',
+      stage: 'dispatch_pending' as AwnakStage,
+      status: AWNAK_STAGE_LABELS['dispatch_pending'],
+      assignmentStatus: 'بلا كابتن',
+      nextAction: 'ابحث عن كابتن متاح',
+      risk: 'مرتفع',
+      owner: 'الإسناد',
+      note: 'الطلب قيد العرض بلا كابتن — خطر تأخير.',
+      statusTone: 'danger',
+      sla: 'عاجل',
+      captainId: null,
+    },
+    {
+      requestId: 'AWN-3115',
+      type: 'قابل للكسر',
+      customer: 'خالد العلي',
+      stage: 'escalated' as AwnakStage,
+      status: AWNAK_STAGE_LABELS['escalated'],
+      assignmentStatus: 'مصعّد',
+      nextAction: 'صعّد للمشرف وحدد مسار الحل',
+      risk: 'مرتفع',
+      owner: 'المشرف',
+      note: 'الكابتن أبلغ عن مشكلة في التسليم — يحتاج قرار تصعيد.',
+      statusTone: 'danger',
+      sla: 'عاجل',
+      captainId: 'CAP-0033',
+    },
+  ] as const,
+} as const;
+
+export const AREA_CAPACITY_OPERATIONAL_PREVIEW = {
+  summary: {
+    zoneLoad: 'أحمال مرتفعة',
+    protectedZones: 2,
+    freeZones: 1,
+    surgeBonus: 'حافز المنطقة',
+    recommendation: 'فعّل حافز المنطقة الآن',
+  },
+  zones: [
+    {
+      id: 'AR-01',
+      zone: 'شمال الرياض',
+      zoneLoad: 'مرتفع',
+      protectedZones: '2',
+      freeZones: '0',
+      surgeBonus: 'حافز مفعل',
+      reduceRadius: 'تقليل النطاق',
+      temporaryStop: 'إيقاف مؤقت متاح',
+      moveCapacity: 'نقل السعة',
+      recommendation: 'فعّل حافز المنطقة الآن',
+      note: 'العجز يحتاج تدخلًا فوريًا.',
+      statusTone: 'danger',
+    },
+    {
+      id: 'AR-02',
+      zone: 'شرق الرياض',
+      zoneLoad: 'متصاعد',
+      protectedZones: '1',
+      freeZones: '1',
+      surgeBonus: 'حافز جزئي',
+      reduceRadius: 'تقليل نصف القطر',
+      temporaryStop: 'متاح للحظات',
+      moveCapacity: 'نقل كباتن',
+      recommendation: 'قلّص النطاق مؤقتًا',
+      note: 'الضغط سيزيد خلال 15 دقيقة.',
+      statusTone: 'warning',
+    },
+    {
+      id: 'AR-03',
+      zone: 'وسط الرياض',
+      zoneLoad: 'متوازن',
+      protectedZones: '3',
+      freeZones: '2',
+      surgeBonus: 'لا حاجة',
+      reduceRadius: 'غير مطلوب',
+      temporaryStop: 'غير مطلوب',
+      moveCapacity: 'نقل بضع كباتن',
+      recommendation: 'لا تدخل مطلوب',
+      note: 'التغطية مستقرة والفائض واضح.',
+      statusTone: 'best',
+    },
+    {
+      id: 'AR-04',
+      zone: 'جنوب الرياض',
+      zoneLoad: 'فائض',
+      protectedZones: '2',
+      freeZones: '4',
+      surgeBonus: 'احتياطي',
+      reduceRadius: 'لا حاجة',
+      temporaryStop: 'لا حاجة',
+      moveCapacity: 'انقل الكباتن للشمال',
+      recommendation: 'انقل السعة للمناطق المضغوطة',
+      note: 'يمكن دعم الشمال مباشرة من هنا.',
+      statusTone: 'brand',
+    },
+  ] as const,
+} as const;
+
+export const EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW = {
+  summary: {
+    open: 17,
+    escalate: 4,
+    resolve: 12,
+    close: 29,
+  },
+  exceptions: [
+    {
+      id: 'EX-4101',
+      type: 'تأخير غير مبرر',
+      lifecycleState: 'reassignment_required',
+      affectedSurface: 'app-captain',
+      ownerQueue: 'dispatch-assignment',
+      severity: 'عالي',
+      currentOwner: 'الإسناد',
+      startTime: 'منذ 15 دقيقة',
+      lastAction: 'تنبيه للكابتن',
+      suggestedAction: 'إعادة الإسناد',
+      resolutionPath: 'حل',
+      routeHint: '/operations?workspace=dispatch-assignment&orderId=EX-4101',
+      evidenceNeeded: true,
+      onDemandDetailPolicy: 'evidence-on-open',
+      note: 'التأخير ما زال مفتوحًا بلا مالك واضح.',
+      statusTone: 'warning',
+    },
+    {
+      id: 'EX-4102',
+      type: 'تعطل مركبة كابتن',
+      lifecycleState: 'captain_unavailable',
+      affectedSurface: 'app-captain',
+      ownerQueue: 'audit-support-sla',
+      severity: 'حرج',
+      currentOwner: 'الدعم الفني',
+      startTime: 'منذ 8 دقائق',
+      lastAction: 'قيد التواصل',
+      suggestedAction: 'إسناد بديل',
+      resolutionPath: 'تصعيد',
+      routeHint: '/operations?workspace=audit-support-sla&orderId=EX-4102',
+      evidenceNeeded: true,
+      onDemandDetailPolicy: 'evidence-on-open',
+      note: 'الحل يحتاج تدخلًا مباشرًا وسريعًا.',
+      statusTone: 'danger',
+    },
+    {
+      id: 'EX-4103',
+      type: 'إغلاق متجر مفاجئ',
+      lifecycleState: 'support_exception',
+      affectedSurface: 'app-partner',
+      ownerQueue: 'partner-stores',
+      severity: 'متوسط',
+      currentOwner: 'إدارة الشركاء',
+      startTime: 'منذ 25 دقيقة',
+      lastAction: 'إيقاف الاستقبال',
+      suggestedAction: 'تثبيت الإغلاق',
+      resolutionPath: 'إغلاق',
+      routeHint: '/operations?workspace=partner-stores&orderId=EX-4103',
+      evidenceNeeded: false,
+      onDemandDetailPolicy: 'detail-on-open',
+      note: 'الاستقبال متوقف ولا حاجة لتكرار الإجراء.',
+      statusTone: 'best',
+    },
+  ] as const,
+} as const;
+
+export const FULFILLMENT_MODE_ORDER_QUEUES: Record<DshFulfillmentOperationalMode, DshOperationsOrderRow[]> = {
+  bthwani_delivery: [
+    { id: 'BD-0101', storeName: 'شاورما هليل', customerName: 'نوف العتيبي', statusLabel: 'في انتظار كابتن', statusTone: 'warning', fulfillmentMode: 'bthwani_delivery', nextAction: 'تعيين كابتن', slaLabel: 'SLA: 8 دقائق' },
+    { id: 'BD-0102', storeName: 'برغر لاب', customerName: 'خالد الزهراني', statusLabel: 'الكابتن في الطريق', statusTone: 'neutral', fulfillmentMode: 'bthwani_delivery', nextAction: 'متابعة التسليم', slaLabel: 'SLA: 12 دقيقة' },
+    { id: 'BD-0103', storeName: 'مطعم القلعة', customerName: 'ريم الشهراني', statusLabel: 'تأخير', statusTone: 'danger', fulfillmentMode: 'bthwani_delivery', nextAction: 'تصعيد', slaLabel: 'SLA: خرق وشيك' },
+  ],
+  partner_delivery: [
+    { id: 'PD-0201', storeName: 'دانكن دونتس', customerName: 'محمد السالم', statusLabel: 'في انتظار موصل الشريك', statusTone: 'warning', fulfillmentMode: 'partner_delivery', nextAction: 'تنبيه الشريك', slaLabel: 'SLA: 15 دقيقة' },
+    { id: 'PD-0202', storeName: 'بارنز كافيه', customerName: 'سارة القحطاني', statusLabel: 'موصل الشريك في الطريق', statusTone: 'neutral', fulfillmentMode: 'partner_delivery', nextAction: 'متابعة الشريك', slaLabel: 'SLA: 20 دقيقة' },
+  ],
+  pickup: [
+    { id: 'PK-0301', storeName: 'كافيه آرت', customerName: 'أحمد الدوسري', statusLabel: 'الطلب جاهز', statusTone: 'success', fulfillmentMode: 'pickup', nextAction: 'إشعار العميل', slaLabel: 'SLA: 10 دقائق' },
+    { id: 'PK-0302', storeName: 'شيك هاوس', customerName: 'عبدالله المطيري', statusLabel: 'بانتظار التحضير', statusTone: 'warning', fulfillmentMode: 'pickup', nextAction: 'متابعة الجاهزية', slaLabel: 'SLA: 8 دقائق' },
+  ],
+};
+
+export const AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW = {
+  summary: {
+    manualAudits: 12,
+    supportTickets: 6,
+    slaRisk: 5,
+    evidenceComplete: 84,
+  },
+  audits: [
+    {
+      id: 'AU-7001',
+      who: 'المشرف',
+      why: 'إسناد يدوي بعد تأخر الكابتن',
+      when: 'منذ 10 دقائق',
+      permissionResult: 'موافق',
+      slaBreachReason: 'تأخر الاستلام',
+      supportTicketLink: 'تذكرة-51',
+      proofRequired: 'صورة إيصال',
+      evidenceState: 'مفتوح',
+      resolutionPath: 'حل',
+      note: 'يحتاج إغلاقًا بعد حفظ الإثبات.',
+      statusTone: 'danger',
+    },
+    {
+      id: 'AU-7002',
+      who: 'الدعم',
+      why: 'شكوى عميل حي',
+      when: 'منذ 22 دقيقة',
+      permissionResult: 'قيد الموافقة',
+      slaBreachReason: 'نقص الطلب',
+      supportTicketLink: 'تذكرة-52',
+      proofRequired: 'رسالة من المتجر',
+      evidenceState: 'يحتاج إثبات',
+      resolutionPath: 'تصعيد',
+      note: 'الربط بالدعم هو الخطوة التالية.',
+      statusTone: 'warning',
+    },
+    {
+      id: 'AU-7003',
+      who: 'العمليات',
+      why: 'تعويض مباشر',
+      when: 'منذ ساعة',
+      permissionResult: 'معتمد',
+      slaBreachReason: 'تأخير متجر',
+      supportTicketLink: 'تذكرة-53',
+      proofRequired: 'حزمة إثبات كاملة',
+      evidenceState: 'مكتمل',
+      resolutionPath: 'إغلاق',
+      note: 'يمكن الإغلاق دون المزيد من الخطوات.',
+      statusTone: 'best',
+    },
+  ] as const,
+} as const;
+
+// ─── P0-10: Operations monitoring item ───────────────────────────────────────
+// Used by CommandCenterScreen as monitoring cockpit source.
+// Summaries only — details open on explicit action (onDemandDetailPolicy).
+// No full order details loaded into the cockpit.
+
+export type DshOpsMonitoringItem = {
+  readonly entityId: string;
+  readonly entityLabel: string;
+  /** Lifecycle state ID or descriptive state key for display. */
+  readonly lifecycleState: string;
+  readonly affectedSurface: 'control-panel' | 'app-client' | 'app-partner' | 'app-captain' | 'app-field';
+  readonly ownerQueue: string;
+  readonly status: string;
+  readonly statusTone: 'neutral' | 'success' | 'warning' | 'danger';
+  readonly primaryAction: string;
+  readonly secondaryAction?: string;
+  /** Route hint for navigation — use buildOperationsHref or absolute path. */
+  readonly routeHint: string;
+  readonly evidenceNeeded: boolean;
+  readonly onDemandDetailPolicy: 'summary-only' | 'detail-on-open' | 'evidence-on-open';
+  readonly supportTicketId?: string;
+  readonly auditEntryId?: string;
+};
+
+// ─── P0-10: Service health monitoring ────────────────────────────────────────
+// Partner readiness, catalog blockers, serviceability, SLA risk, captain coverage.
+// Each item routes to its owning workspace — no data duplication.
+
+export const DSH_SERVICE_HEALTH_PREVIEW: ReadonlyArray<DshOpsMonitoringItem> = [
+  {
+    entityId: 'SH-001',
+    entityLabel: 'جاهزية الشركاء',
+    lifecycleState: 'partner_intake',
+    affectedSurface: 'app-partner',
+    ownerQueue: 'partner-stores',
+    status: '3 متاجر غير جاهزة',
+    statusTone: 'warning',
+    primaryAction: 'فتح المتاجر',
+    secondaryAction: 'تفاصيل الجاهزية',
+    routeHint: '?workspace=partner-stores',
+    evidenceNeeded: false,
+    onDemandDetailPolicy: 'summary-only',
+  },
+  {
+    entityId: 'SH-002',
+    entityLabel: 'معوّقات نشر الكتالوج',
+    lifecycleState: 'item_unavailable',
+    affectedSurface: 'control-panel',
+    ownerQueue: 'catalogs',
+    status: '5 منتجات معلّقة',
+    statusTone: 'warning',
+    primaryAction: 'فتح الكتالوجات',
+    routeHint: '/catalogs',
+    evidenceNeeded: true,
+    onDemandDetailPolicy: 'detail-on-open',
+  },
+  {
+    entityId: 'SH-003',
+    entityLabel: 'قابلية الخدمة',
+    lifecycleState: 'captain_unavailable',
+    affectedSurface: 'control-panel',
+    ownerQueue: 'area-capacity',
+    status: 'منطقتان خارج النطاق',
+    statusTone: 'danger',
+    primaryAction: 'فتح المناطق',
+    secondaryAction: 'عرض الخريطة',
+    routeHint: '?workspace=area-capacity',
+    evidenceNeeded: false,
+    onDemandDetailPolicy: 'summary-only',
+  },
+  {
+    entityId: 'SH-004',
+    entityLabel: 'خطر SLA',
+    lifecycleState: 'support_exception',
+    affectedSurface: 'control-panel',
+    ownerQueue: 'audit-support-sla',
+    status: '5 طلبات في خطر خرق SLA',
+    statusTone: 'danger',
+    primaryAction: 'فتح التدقيق',
+    routeHint: '?workspace=audit-support-sla',
+    evidenceNeeded: true,
+    onDemandDetailPolicy: 'evidence-on-open',
+    auditEntryId: 'AU-7001',
+  },
+  {
+    entityId: 'SH-005',
+    entityLabel: 'تغطية الكباتن',
+    lifecycleState: 'captain_assignment',
+    affectedSurface: 'app-captain',
+    ownerQueue: 'dispatch-assignment',
+    status: '4 كباتن متاحون',
+    statusTone: 'success',
+    primaryAction: 'فتح الإسناد',
+    secondaryAction: 'عرض الخريطة',
+    routeHint: '?workspace=dispatch-assignment',
+    evidenceNeeded: false,
+    onDemandDetailPolicy: 'summary-only',
+  },
+];
+
+// ─── P0-10: WLT finance alerts — read-only display ───────────────────────────
+// DSH displays WLT finance state; WLT owns all mutations.
+// No approve/pay/settle/refund inside DSH.
+
+export type DshWltFinanceAlert = {
+  readonly alertId: string;
+  readonly domain: 'payment' | 'refund' | 'settlement' | 'payout' | 'commission';
+  readonly label: string;
+  readonly count: number;
+  readonly statusTone: 'neutral' | 'success' | 'warning' | 'danger';
+  /** WLT bridge note shown to operator — always states read-only boundary. */
+  readonly wltBridgeNote: string;
+  readonly routeHint: string;
+};
+
+export const DSH_WLT_FINANCE_ALERTS_PREVIEW: ReadonlyArray<DshWltFinanceAlert> = [
+  {
+    alertId: 'WLT-FA-01',
+    domain: 'payment',
+    label: 'مدفوعات معلّقة',
+    count: 4,
+    statusTone: 'warning',
+    wltBridgeNote: 'awaiting_wlt_payment — عرض فقط، الإجراء في WLT',
+    routeHint: '/finance',
+  },
+  {
+    alertId: 'WLT-FA-02',
+    domain: 'refund',
+    label: 'طلبات استرداد معلّقة',
+    count: 2,
+    statusTone: 'warning',
+    wltBridgeNote: 'refund_pending_wlt — عرض فقط، لا mutation داخل DSH',
+    routeHint: '/finance',
+  },
+  {
+    alertId: 'WLT-FA-03',
+    domain: 'payout',
+    label: 'مدفوعات كباتن معلّقة',
+    count: 7,
+    statusTone: 'neutral',
+    wltBridgeNote: 'captain_payout — WLT يملك الحقيقة والتنفيذ',
+    routeHint: '/finance',
+  },
+];
+
+// ─── P0-10: Exception → support ticket + audit entry map ─────────────────────
+// Every exception must link to a support ticket or audit entry.
+// No exception without an owner and an action route.
+
+export const EXCEPTION_TICKET_MAP: Readonly<Record<string, { supportTicketId: string; auditEntryId?: string }>> = {
+  'EX-4101': { supportTicketId: 'TK-5101', auditEntryId: 'AU-7001' },
+  'EX-4102': { supportTicketId: 'TK-5102', auditEntryId: 'AU-7002' },
+  'EX-4103': { supportTicketId: 'TK-5103', auditEntryId: undefined },
+};
+
+// ─── P0-10: Dispatch lifecycle state map ─────────────────────────────────────
+// bthwani_delivery only enters captain dispatch — pickup and partner_delivery do not.
+// reassignment_required surfaces an explicit mandatory action in the dispatch board.
+
+export const DISPATCH_LIFECYCLE_STATE_MAP: Readonly<Record<string, DshOrderLifecycleStatus>> = {
+  'DA-2001': 'captain_assignment',
+  'DA-2002': 'reassignment_required',
+  'DA-2003': 'captain_unavailable',
+};
+
+export function selectDshClientOrdersPreview(customerId?: string) {
+  void customerId;
+  return LIVE_ORDERS_OPERATIONAL_PREVIEW.rows;
+}
+
+export function selectDshPartnerOrdersPreview(storeOrBranchId?: string) {
+  void storeOrBranchId;
+  return LIVE_ORDERS_OPERATIONAL_PREVIEW.rows;
+}
+
+export function selectDshPartnerOperationalPreview(storeOrBranchId?: string) {
+  void storeOrBranchId;
+  return {
+    orderAlerts: LIVE_ORDERS_OPERATIONAL_PREVIEW.rows,
+    conversations: DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows,
+    exceptions: EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
+  };
+}
+
+export function selectDshCaptainAssignmentsPreview(captainId?: string) {
+  void captainId;
+  return DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows;
+}
+
+export function selectDshCaptainOrderPreview(orderId: string) {
+  return LIVE_ORDERS_OPERATIONAL_PREVIEW.rows.find((order) => order.id === orderId) ?? null;
+}
+
+export function selectDshControlPanelOperationsPreview() {
+  return {
+    pulse: OPERATIONS_PULSE_METRICS,
+    liveOrders: LIVE_ORDERS_OPERATIONAL_PREVIEW,
+    dispatch: DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
+    fulfillmentQueues: FULFILLMENT_MODE_ORDER_QUEUES,
+    exceptions: EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
+  };
+}

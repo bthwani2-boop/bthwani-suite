@@ -1,4 +1,9 @@
 /**
+ * UI_PREVIEW_ONLY canonical preview data graph.
+ * Owner: dsh/frontend/data
+ * Runtime/API/backend truth: false.
+ */
+/**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
  */
 export const partnerOfferStoreDataContract = {
@@ -37,7 +42,7 @@ export type PartnerOfferRecord = {
   activeToDate?: string;
 };
 
-const STORE_KEY = '__BTHWANI_DSH_PARTNER_OFFER_STORE__';
+const OFFER_STORE_KEY = '__BTHWANI_DSH_PARTNER_OFFER_STORE__';
 
 const seededOffers: PartnerOfferRecord[] = [
   {
@@ -76,24 +81,24 @@ const seededOffers: PartnerOfferRecord[] = [
   }
 ];
 
-function getGlobalStore(): typeof globalThis & { [STORE_KEY]?: PartnerOfferRecord[] } {
-  return globalThis as typeof globalThis & { [STORE_KEY]?: PartnerOfferRecord[] };
+function getOfferGlobalStore(): typeof globalThis & { [OFFER_STORE_KEY]?: PartnerOfferRecord[] } {
+  return globalThis as typeof globalThis & { [OFFER_STORE_KEY]?: PartnerOfferRecord[] };
 }
 
-function getMutableStore(): PartnerOfferRecord[] {
-  const scope = getGlobalStore();
-  if (!scope[STORE_KEY]) {
-    scope[STORE_KEY] = seededOffers.map((item) => ({ ...item }));
+function getOfferMutableStore(): PartnerOfferRecord[] {
+  const scope = getOfferGlobalStore();
+  if (!scope[OFFER_STORE_KEY]) {
+    scope[OFFER_STORE_KEY] = seededOffers.map((item) => ({ ...item }));
   }
-  return scope[STORE_KEY] ?? [];
+  return scope[OFFER_STORE_KEY] ?? [];
 }
 
-function setMutableStore(next: PartnerOfferRecord[]) {
-  getGlobalStore()[STORE_KEY] = next.map((item) => ({ ...item }));
+function setOfferMutableStore(next: PartnerOfferRecord[]) {
+  getOfferGlobalStore()[OFFER_STORE_KEY] = next.map((item) => ({ ...item }));
 }
 
 export function getPartnerOfferItems(): PartnerOfferRecord[] {
-  return getMutableStore();
+  return getOfferMutableStore();
 }
 
 export function getPartnerOfferKpis() {
@@ -139,33 +144,33 @@ export function upsertPartnerOfferItem(item: Partial<PartnerOfferRecord>) {
     ? current.map(entry => (entry.id === nextEntry.id ? nextEntry : entry))
     : [nextEntry, ...current];
 
-  setMutableStore(next);
+  setOfferMutableStore(next);
   return nextEntry;
 }
 
 export function approvePartnerOfferItem(id: string) {
   const current = getPartnerOfferItems();
-  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'marketing-ready' } : item));
+  setOfferMutableStore(current.map(item => item.id === id ? { ...item, status: 'marketing-ready' } : item));
 }
 
 export function publishPartnerOfferItem(id: string) {
   const current = getPartnerOfferItems();
-  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'published' } : item));
+  setOfferMutableStore(current.map(item => item.id === id ? { ...item, status: 'published' } : item));
 }
 
 export function pausePartnerOfferItem(id: string) {
   const current = getPartnerOfferItems();
-  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'paused' } : item));
+  setOfferMutableStore(current.map(item => item.id === id ? { ...item, status: 'paused' } : item));
 }
 
 export function rejectPartnerOfferItem(id: string, reason: string) {
   const current = getPartnerOfferItems();
-  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'rejected', rejectionReason: reason } : item));
+  setOfferMutableStore(current.map(item => item.id === id ? { ...item, status: 'rejected', rejectionReason: reason } : item));
 }
 
 export function archivePartnerOfferItem(id: string) {
   const current = getPartnerOfferItems();
-  setMutableStore(current.map(item => item.id === id ? { ...item, status: 'archived' } : item));
+  setOfferMutableStore(current.map(item => item.id === id ? { ...item, status: 'archived' } : item));
 }
 
 export function isPartnerOfferClientVisible(status: PartnerOfferStatus): boolean {
@@ -173,5 +178,14 @@ export function isPartnerOfferClientVisible(status: PartnerOfferStatus): boolean
 }
 
 export function removePartnerOfferItem(id: string) {
-  setMutableStore(getPartnerOfferItems().filter(item => item.id !== id));
+  setOfferMutableStore(getPartnerOfferItems().filter(item => item.id !== id));
+}
+
+export function selectDshClientOffersPreview(customerId?: string) {
+  void customerId;
+  return getPartnerOfferItems().filter((offer) => isPartnerOfferClientVisible(offer.status));
+}
+
+export function selectDshPartnerOffersPreview(storeId: string) {
+  return getPartnerOfferItems().filter((offer) => !offer.storeId || offer.storeId === storeId);
 }

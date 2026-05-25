@@ -1,4 +1,3 @@
-import type { CampaignRecord } from '../data/campaign.preview-store';
 import {
   getDshPartnerActivationStateMetadata,
   isDshPartnerClientVisible,
@@ -9,11 +8,40 @@ import {
   isDshProductClientVisible,
   type DshProductIdentityApprovalStatus,
 } from './dsh-product-identity.model';
-import type { LoyaltyRecord } from '../data/loyalty.preview-store';
-import type { PartnerOfferRecord } from '../data/partner-offer.preview-store';
-import type { HomePromoRecord } from '../data/promo.preview-store';
-import type { MarketingVideoRecord } from '../data/video.preview-store';
 import { canRenderInClientSurface } from './workflow';
+
+type CampaignRecord = {
+  id: string;
+  status: string;
+  targetType: string;
+  targetId: string;
+};
+
+type LoyaltyRecord = {
+  status: string;
+};
+
+type PartnerOfferRecord = {
+  linkedCampaignId?: string;
+  status: string;
+  storeId?: string;
+  productId?: string;
+  category?: string;
+};
+
+type HomePromoRecord = {
+  status: string;
+  targetType?: string;
+  actionType?: string;
+  targetId?: string;
+  actionTarget?: string;
+};
+
+type MarketingVideoRecord = {
+  status: string;
+  targetType: string;
+  targetId: string;
+};
 
 export const marketingVisibilityContractMeta = {
   dataKind: 'UI_PREVIEW_ONLY',

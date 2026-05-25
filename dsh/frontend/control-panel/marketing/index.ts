@@ -16,7 +16,7 @@ export {
   removeMarketingBannerItem,
   recordMarketingBannerClick,
   recordMarketingBannerImpression,
-} from '../../data/banner.preview-store';
+} from '../../data/marketing.preview-data';
 export {
   type MarketingGrowthFamily,
   type MarketingGrowthSource,
@@ -37,7 +37,7 @@ export {
   duplicateMarketingGrowthItem,
   removeMarketingGrowthItem,
   getGrowthRecommendations,
-} from '../../data/growth.preview-store';
+} from '../../data/marketing.preview-data';
 export {
   type MarketingNewsTickerLocale,
   type MarketingNewsTickerKind,
@@ -72,8 +72,8 @@ export {
   resolveMarketingTickerStatusLabel,
   resolveMarketingTickerKindLabel,
   resolveMarketingTickerTargetLabel,
-} from '../../data/news-ticker.preview-store';
-export { dshMarketingNewsTickerSeed } from '../../data/news-ticker.preview-store';
+} from '../../data/marketing.preview-data';
+export { dshMarketingNewsTickerSeed } from '../../data/marketing.preview-data';
 export { sectionMeta } from './section-meta';
 export { sectionCatalog } from './section-catalog';
 export { flowMeta } from './flow-meta';

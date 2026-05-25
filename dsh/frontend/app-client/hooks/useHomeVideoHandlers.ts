@@ -1,6 +1,6 @@
 import * as React from 'react';
-import type { MarketingGrowthRecord } from '../../data/growth.preview-store';
-import type { MarketingVideoRecord } from '../../data/video.preview-store';
+import type { MarketingGrowthRecord } from '../../data/marketing.preview-data';
+import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
 import { resolveHomeCategoryContext } from '../shared/home-promo-mappers';
 import { getMarketingVideoVisibilityRecord, isMarketingRenderable } from '../../shared/marketing-visibility.contract';
 

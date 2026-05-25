@@ -5,7 +5,7 @@ import {
   shouldShowDshPartnerOrderConversation,
   type DshPartnerOrderConversationMessage,
   type DshPartnerOrderConversationMode,
-} from '../../data/partner-orders.preview-data';
+} from '../../data/orders.preview-data';
 
 export type DshPartnerOrderConversationPanelProps = {
   enabledForOrderMode?: DshPartnerOrderConversationMode;

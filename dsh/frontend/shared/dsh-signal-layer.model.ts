@@ -9,7 +9,23 @@
  * and which route opens on action — ensuring every signal has a destination.
  */
 
-import { getMediaReviewItems, type MediaReviewRecord } from '../data/marketing-review.preview-store';
+import { getAllApprovalRecords, type ApprovalRecord } from './workflow';
+
+type MediaReviewRecord = ApprovalRecord & {
+  systemNote?: string;
+};
+
+function getMediaReviewItems(): MediaReviewRecord[] {
+  const entityTypes = ['product', 'product-media', 'category-suggestion', 'store'];
+  const stages = ['marketing-review', 'marketing-approved', 'needs-fix', 'catalog-adopted', 'rejected'];
+
+  return getAllApprovalRecords()
+    .filter((record) => entityTypes.includes(record.entityType) && stages.includes(record.stage))
+    .map((record) => ({
+      ...record,
+      systemNote: record.metadata?.systemNote ?? record.metadata?.requiredFix ?? record.metadata?.rejectionReason,
+    }));
+}
 
 // ─── Event Kinds ─────────────────────────────────────────────────────────────
 

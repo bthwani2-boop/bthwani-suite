@@ -7,7 +7,7 @@ import {
   StateView,
   Text,
 } from '@bthwani/ui-kit';
-import type { FieldDocumentPreviewStatus } from '../../data/field-stores.preview-data';
+import type { FieldDocumentPreviewStatus } from '../../data/stores.preview-data';
 
 type DocumentKind = 'commercial_registration' | 'id_card' | 'trade_license' | 'other';
 

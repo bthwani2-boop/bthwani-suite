@@ -4,7 +4,7 @@
 import React from 'react';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import { DSH_DEMO_SUPPORT_TICKETS, type DshSupportTicketMessage } from '../../data/operations-support.preview';
+import { DSH_DEMO_SUPPORT_TICKETS, type DshSupportTicketMessage } from '../../data/support.preview-data';
 
 const DEMO_TICKET = DSH_DEMO_SUPPORT_TICKETS[1]; // catalog/partner-linked demo ticket
 

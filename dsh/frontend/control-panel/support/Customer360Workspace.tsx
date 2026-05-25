@@ -10,8 +10,8 @@ import {
   getDshCustomer360Record,
   type DshCustomer360OrderSummary,
   type DshCustomer360Record,
-  type DshGlobalControlLink,
-} from '../../shared';
+} from '../../data/support.preview-data';
+import type { DshGlobalControlLink } from '../../data/orders.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type Customer360WorkspaceRouteContext = {

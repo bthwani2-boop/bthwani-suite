@@ -9,9 +9,11 @@ import {
   getDshCallIntakeByContext,
   getDshCallIntakePreview,
   type DshCallIntakePreview,
-  type DshGlobalControlLink,
-  type DshRouteHintedAction,
-} from '../../shared';
+} from '../../data/support.preview-data';
+import type {
+  DshGlobalControlLink,
+  DshRouteHintedAction,
+} from '../../data/orders.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type ManualCallIntakeRouteContext = {

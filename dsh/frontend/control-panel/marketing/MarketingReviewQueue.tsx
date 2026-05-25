@@ -14,7 +14,7 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { translateDshRuntimeBindingStatus } from '../shared';
-import { getMarketingReviewItems, approveMediaReviewItem, requestMediaFix, rejectMediaReviewItem, sendMediaToCatalog } from '../../data/marketing-review.preview-store';
+import { getMarketingReviewItems, approveMediaReviewItem, requestMediaFix, rejectMediaReviewItem, sendMediaToCatalog } from '../../data/marketing.preview-data';
 import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared/workflow';
 
 export function MarketingReviewQueue() {

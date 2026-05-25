@@ -1,3 +1,8 @@
+import { buildCanonicalPreviewStoreItemsByStoreId, type DshStoreFixtureItem, type StoreItemsByStoreId } from '../shared/dshStoreProductCardModel';
+
+// -----------------------------------------------------------------------------
+// Store products
+// -----------------------------------------------------------------------------
 /**
  * CENTRAL DSH DOMAIN PREVIEW DATA — SINGLE SOURCE OF TRUTH
  * Owner: dsh/frontend/data (central DSH domain preview data owner)
@@ -7,7 +12,6 @@
  * Used by: app-client (via surface adapter), control-panel/marketing
  */
 
-import { buildCanonicalPreviewStoreItemsByStoreId, type DshStoreFixtureItem, type StoreItemsByStoreId } from '../shared/dshStoreProductCardModel';
 
 export const itemsFixturesDataContract = {
 	dataKind: 'UI_PREVIEW_ONLY',
@@ -390,3 +394,15 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 
 	...buildCanonicalPreviewStoreItemsByStoreId(),
 };
+
+export function selectDshClientProductPreview(productId: string) {
+  for (const products of Object.values(storeItemsByStoreId)) {
+    const product = products.find((item) => item.id === productId);
+    if (product) return product;
+  }
+  return null;
+}
+
+export function selectDshPartnerCatalogPreview(storeOrBranchId: string) {
+  return storeItemsByStoreId[storeOrBranchId] ?? [];
+}

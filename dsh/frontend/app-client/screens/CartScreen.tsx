@@ -26,10 +26,10 @@ import {
   type PaymentDecisionOption,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
-import { getDshClientStateMeta, type DshClientState } from '../../data/client-state.preview-data';
-import { getPartnerOfferItems } from '../../data/partner-offer.preview-store';
-import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../data/commercial.preview-contract';
-import { getEntitlements } from '../../data/loyalty.preview-store';
+import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
+import { getPartnerOfferItems } from '../../data/offers.preview-data';
+import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial.preview-contract';
+import { getEntitlements } from '../../data/subscriptions.preview-data';
 import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletPreview,
@@ -94,7 +94,7 @@ type QuickActionMeta = {
   icon?: string;
 };
 
-import { type RecommendationProduct, type CartItem, dshCartRecommendedProductsFixture, dshCartPreviewFallbackItemsFixture } from '../../data/cart.preview-data';
+import { type RecommendationProduct, type CartItem, dshCartRecommendedProductsFixture, dshCartPreviewFallbackItemsFixture } from '../../data/orders.preview-data';
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 

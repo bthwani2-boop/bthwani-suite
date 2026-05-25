@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebControlActionCard, WebControlDisclosureItem, WebControlPanelKpiStrip, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshDecisionBoard } from './ControlPanelDshDecisionBoard';
-import type { DshUnifiedRecommendation } from '../../data/cp-recommendation.preview-data';
+import type { DshUnifiedRecommendation } from '../../data/platform.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
 type WorkspaceSignal = {

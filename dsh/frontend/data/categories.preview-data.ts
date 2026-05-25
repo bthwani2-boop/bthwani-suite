@@ -203,6 +203,10 @@ export function getDshCategoryFixture(categoryId: string) {
 	return dshCategoryFixtures.find((category) => category.id === categoryId) ?? null;
 }
 
+export function selectDshClientCategoriesPreview() {
+	return dshCategoryListFixtures;
+}
+
 export const DSH_CATEGORY_ICONS: Record<string, string> = {
 	restaurants: '🍽️',
 	grocery: '🛒',

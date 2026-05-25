@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CategoryOrbitCarousel, ServiceOrbitCarousel, spacing } from '@bthwani/ui-kit';
 
 import type { DshServiceId } from '../../contracts/dsh-home-types';
-import { dshHomeServiceDialFixtures } from '../../../data/home.preview-data';
+import { dshHomeServiceDialFixtures } from '../../../data/stores.preview-data';
 
 const serviceDialAnchorLayout = {
   x: spacing[3],

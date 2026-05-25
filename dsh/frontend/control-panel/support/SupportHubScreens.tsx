@@ -13,7 +13,8 @@ import {
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-import { DSH_CALL_INTAKE_PREVIEW, DSH_CUSTOMER_360_PREVIEW, getDshFlowPolicySummary } from '../../shared';
+import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { DSH_CALL_INTAKE_PREVIEW, DSH_CUSTOMER_360_PREVIEW } from '../../data/support.preview-data';
 import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
@@ -26,7 +27,7 @@ import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
 import {
   getOperationsSupportFlowPreview,
   type DshOperationsSupportFlowId,
-} from '../../data/operations-support.preview';
+} from '../../data/support.preview-data';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,

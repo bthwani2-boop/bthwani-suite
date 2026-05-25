@@ -1,14 +1,14 @@
 import React from 'react';
 import { Box, KeyValueList, ListItem, SectionHeader, Surface, Text, TextField, Button, MobileScrollView } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainOrderStage } from '../../data/captain-orders.preview-data';
-import type { DshCaptainProfileSnapshot } from '../../data/captain-state.preview-data';
+import type { DshCaptainOrderStage } from '../../data/orders.preview-data';
+import type { DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
 import { getDshCaptainFlowPolicy, type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import {
 	getOperationsSupportFlowsForSurface,
 	type DshOperationsSupportFlowId,
-} from '../../data/operations-support.preview';
+} from '../../data/support.preview-data';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {

@@ -6,7 +6,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { AWNAK_OPERATIONAL_PREVIEW, AWNAK_STAGE_LABELS } from '../../data/cp-operations.preview-data';
+import { AWNAK_OPERATIONAL_PREVIEW, AWNAK_STAGE_LABELS } from '../../data/orders.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 

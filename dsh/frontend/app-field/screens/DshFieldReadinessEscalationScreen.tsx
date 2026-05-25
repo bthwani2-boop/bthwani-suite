@@ -18,7 +18,7 @@ import {
 import {
   getOperationsSupportFlowPreview,
   getOperationsSupportFlowsForSurface,
-} from '../../data/operations-support.preview';
+} from '../../data/support.preview-data';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 

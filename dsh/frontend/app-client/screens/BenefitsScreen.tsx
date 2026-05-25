@@ -14,21 +14,21 @@ import {
   Divider,
   Icon,
 } from '@bthwani/ui-kit';
-import { dshNotificationsFixtures } from '../../data/notifications.preview-data';
+import { dshNotificationsFixtures } from '../../data/support.preview-data';
 import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
 import { DshLoyaltyRewardsScreen } from '../parts/LoyaltyRewardsScreen';
 import { DshOperationScreen, type DshOperationScreenProps } from '../parts/OperationScreen';
 import { DshSubscriptionsScreen } from '../parts/SubscriptionsScreen';
-import { getCampaignItems } from '../../data/campaign.preview-store';
+import { getCampaignItems } from '../../data/marketing.preview-data';
 import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
   isClientVisibleStatus,
   isMarketingRenderable,
-} from '../../data/commercial.preview-contract';
-import { getEntitlements, getLoyaltyRewards, getLoyaltyTiers } from '../../data/loyalty.preview-store';
-import { getPartnerOfferItems } from '../../data/partner-offer.preview-store';
+} from '../../shared/commercial.preview-contract';
+import { getEntitlements, getLoyaltyRewards, getLoyaltyTiers } from '../../data/subscriptions.preview-data';
+import { getPartnerOfferItems } from '../../data/offers.preview-data';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 

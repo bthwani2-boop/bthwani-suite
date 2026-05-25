@@ -27,7 +27,7 @@ import {
 } from './screens/OperationScreens';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
 import { DshIdentityHubScreen, DshPreferencesHubScreen } from './screens/MySpaceSubScreens';
-import { dshHomeGetFixtureStores } from '../data/home.preview-data';
+import { dshHomeGetFixtureStores } from '../data/stores.preview-data';
 import {
   buildStoreCategories,
   buildStoreDeliveryModes,
@@ -39,15 +39,15 @@ import {
   recordMarketingBannerClick,
   recordMarketingBannerImpression,
   getPublishedMarketingHomePromos,
-} from '../data/banner.preview-store';
+} from '../data/marketing.preview-data';
 import {
   getLiveMarketingGrowthItems,
   recordMarketingGrowthClick,
   recordMarketingGrowthImpression,
   type MarketingGrowthRecord,
-} from '../data/growth.preview-store';
-import { getDshClientStateMeta, type DshClientState } from '../data/client-state.preview-data';
-import { getPublishedHomePromos } from '../data/promo.preview-store';
+} from '../data/marketing.preview-data';
+import { getDshClientStateMeta, type DshClientState } from '../data/operational-statuses.preview-data';
+import { getPublishedHomePromos } from '../data/marketing.preview-data';
 import { dshCategoryFixtures, dshCategoryListFixtures } from '../data/categories.preview-data';
 import {
   isDshFulfillmentDeliveryMode,

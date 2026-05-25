@@ -8,7 +8,7 @@ import {
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
   type FieldStoreFile,
-} from '../../data/field-stores.preview-data';
+} from '../../data/stores.preview-data';
 
 type FieldStoreCardProps = {
   store: FieldStoreFile;
