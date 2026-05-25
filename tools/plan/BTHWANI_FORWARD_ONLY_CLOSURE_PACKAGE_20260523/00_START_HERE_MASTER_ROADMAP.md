@@ -135,3 +135,110 @@ Large files >40KB: 16
 - `evidence/OPENAPI_CONTRACT_INVENTORY.csv`
 - `evidence/GUARD_SCRIPT_INVENTORY.csv`
 - `evidence/RISK_REGISTER.csv`
+
+---
+
+## 8. Cross-Surface Journey Slice Model
+
+### تعريف الشريحة الإلزامي
+
+```text
+Slice = cross-surface business/operational journey from start to finish.
+
+A slice is NOT:
+  - a single screen
+  - a surface row in a matrix
+  - a single actor surface
+  - a matrix row treated as a standalone deliverable
+
+A slice IS:
+  Actor Chain + Operation Chain + Multi-Surface Journey + Evidence + Business Outcome
+```
+
+كل شريحة يجب أن:
+- تحدد business outcome مكتملًا عبر كل الأسطح المرتبطة.
+- تصنّف كل سطح مذكور: primary / supporting / dependency / excluded / blocked / deferred.
+- توثق أي نقص في شاشة/عملية/CTA/state كـ REQUIRED_ADDITION أو BLOCKED_WITH_REASON.
+- لا تُغلق صامتةً بدون حل كل REQUIRED_ADDITION أو تصنيفه بسبب موثق.
+
+### client-checkout — تصحيح إلزامي
+
+```text
+client-checkout remains a future cross-surface WLT/Auth/payment slice,
+not the immediate next safe slice.
+Status: FUTURE_BLOCKED_BY_WLT_AUTH_PAYMENT
+
+لا يجوز معاملة client-checkout كالشريحة الثانية الآمنة المباشرة.
+```
+
+### DSH-SLICE-002 — الشريحة الثانية المقترحة
+
+```text
+Slice ID:       DSH-SLICE-002-CATALOG-READINESS-CLIENT-VISIBILITY
+Status:         PROPOSED_NEXT_SLICE
+
+Primary Outcome:
+  Partner/catalog readiness becomes safely visible to client.
+
+Surfaces:
+  primary      → app-partner inventory/catalog
+  supporting   → control-panel catalog governance
+  supporting   → control-panel marketing visibility
+  supporting   → app-client visibility consumption
+  dependency   → shared DSH data/visibility/serviceability model
+
+Excluded:
+  cart                  — belongs to checkout slice
+  checkout              — FUTURE_BLOCKED_BY_WLT_AUTH_PAYMENT
+  WLT/payment           — future slice
+  refund                — future slice
+  settlement            — future slice
+  captain delivery      — future delivery execution slice
+  field visits          — future field readiness slice
+  support escalation    — future lifecycle/support slice
+
+Pre-conditions before any implementation:
+  □ slice manifest complete (all Cross-Surface Journey Model fields)
+  □ cross-surface impact map
+  □ screen inventory per surface
+  □ CTA/state inventory per surface
+  □ data ownership map
+  □ API/runtime readiness decision
+  □ WLT/Auth/Vars classification per surface
+  □ visual evidence plan per surface
+  □ missing-process detection section
+```
+
+### Slice Sequence (مبدئي — قابل للتحديث بالدليل)
+
+| Slice | Status |
+|---|---|
+| DSH-SLICE-001-STORE-DISCOVERY | L7_CLOSED (closes client discovery edge only) |
+| DSH-SLICE-002-CATALOG-READINESS-CLIENT-VISIBILITY | PROPOSED_NEXT_SLICE |
+| Future checkout/payment cross-surface slice | FUTURE_BLOCKED_BY_WLT_AUTH_PAYMENT |
+| Future lifecycle/support cross-surface slice | FUTURE_NEEDS_CROSS_SURFACE_PROOF |
+| Future delivery execution cross-surface slice | FUTURE_NEEDS_CAPTAIN_PARTNER_CLIENT_CONTROL_PANEL_PROOF |
+| Future field readiness cross-surface slice | FUTURE_NEEDS_FIELD_CONTROL_PANEL_PARTNER_PROOF |
+
+المصدر الرسمي لهذه المصفوفة: `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` — Initial Editable Cross-Surface Slice Matrix.
+
+---
+
+## 9. Future Guard Requirements (توثيق — لا تنفيذ الآن)
+
+الحراس التالية يجب إضافتها في مرحلة لاحقة (لا تُنفَّذ الآن):
+
+```text
+GUARD: slice without supporting surfaces classified → BLOCKED
+GUARD: slice without data ownership documented → BLOCKED
+GUARD: slice without WLT/Auth/Vars classification → BLOCKED
+GUARD: slice without visual/runtime evidence mapping → BLOCKED
+GUARD: surface row treated as standalone slice → BLOCKED
+GUARD: L7_CLOSED at file header while other rows are pending without MIXED status → BLOCKED
+GUARD: missing REQUIRED_ADDITION section at closure attempt → BLOCKED
+GUARD: unclassified excluded/deferred/blocked surface at closure → BLOCKED
+GUARD: client-checkout treated as immediate next safe slice → BLOCKED
+GUARD: new slice starts without cross-surface impact map → BLOCKED
+```
+
+هذه الحراس موثقة فقط — تُضاف للـ guards عند بدء DSH-SLICE-002 أو ما بعدها.

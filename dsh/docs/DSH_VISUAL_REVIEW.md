@@ -13,6 +13,9 @@ Active docs-side queue and capture ledger for DSH visual evidence. No screenshot
 3. Queue metadata is stable. Evidence rows are additive or corrective; they do not mutate ownership truths.
 4. WLT-owned finance semantics remain read-only and may only be documented as visual evidence or explicit blockers.
 5. Do not claim `PASS`, `CLOSED`, `FINAL`, or `100%` for the service from this file.
+6. Visual rows are surface evidence rows. A visual row does not equal a slice. A cross-surface slice closes only when all required visual rows for that journey are resolved or explicitly deferred/blocked with reason.
+7. Missing screen/state/CTA discovered during visual review must be proposed back into the slice manifest as `REQUIRED_ADDITION` or `BLOCKED_WITH_REASON` before the related slice may close.
+8. No visual `PASS` can override missing runtime/API/ops/data ownership proof.
 
 ## Summary Snapshot
 

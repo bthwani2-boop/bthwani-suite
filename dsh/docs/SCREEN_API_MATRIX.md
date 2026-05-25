@@ -1,7 +1,7 @@
 # DSH Screen/API Matrix
 
-Status: L7_CLOSED
-Decision: L7_CLOSED
+Status: MIXED_SERVICE_MATRIX
+Decision: DSH_SLICE_001_L7_CLOSED__OTHER_ROWS_PENDING_OR_BLOCKED
 
 Purpose:
 Freeze the frontend-facing API needs after P0-14 without inflating runtime or backend closure.
@@ -11,6 +11,10 @@ Current rule:
 - no `dsh/dsh.openapi.yaml` edit is justified by route proof alone
 - every row below remains preview-only unless trusted runtime proof exists
 - WLT-owned finance rows stay explicitly blocked-by-wlt
+- API rows are evidence units for cross-surface slices; they are not standalone slices.
+- No endpoint may be designed until the cross-surface slice proves screen/flow/readiness and all related surfaces are classified.
+- If an API row reveals missing operation/state/auth boundary/WLT boundary/provider variable/control-panel owner, it must be added as REQUIRED_ADDITION or BLOCKED_WITH_REASON to the related slice before closure.
+- No API PASS can override missing screen/flow/ops/data ownership proof.
 
 | Matrix ID | Surface | Route hint | Screen owner | Primary action | Required states | API readiness | Auth/WLT boundary | Remaining blocker | Next allowed work |
 |---|---|---|---|---|---|---|---|---|---|

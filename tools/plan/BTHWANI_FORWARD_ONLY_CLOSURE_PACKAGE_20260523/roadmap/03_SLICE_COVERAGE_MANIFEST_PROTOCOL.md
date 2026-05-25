@@ -104,9 +104,40 @@ TBD_NOT_ALLOWED_AT_CLOSURE
 9. افحص WLT/Auth references.
 10. اربط كل ذلك في manifest واحد.
 
+## Cross-Surface Journey Requirement
+
+كل شريحة DSH هي رحلة تجارية/تشغيلية رأسية متعددة الأسطح — وليست شاشة منفردة، ولا صفًا في matrix، ولا سطحًا منفصلًا.
+
+**قبل البدء في أي شريحة يجب:**
+
+1. تعداد كل الأسطح المرتبطة بالرحلة التجارية من البداية إلى النهاية.
+2. تصنيف كل سطح: `primary` / `supporting` / `dependency` / `excluded` / `blocked` / `deferred`.
+3. توثيق السبب لكل سطح خارج النطاق أو مؤجل.
+4. ملء حقول Cross-Surface Journey Model في `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md`.
+
+**قاعدة اكتشاف النواقص (إلزامية):**
+
+إذا ظهر أثناء إغلاق أي شريحة نقص في شاشة أو عملية أو CTA أو state أو guard أو data owner أو API/runtime boundary أو auth boundary أو WLT boundary أو control-panel owner، يجب توثيقه فورًا كـ:
+
+```text
+REQUIRED_ADDITION   — يجب حله قبل إغلاق الشريحة
+BLOCKED_WITH_REASON — لا يمكن حله الآن؛ السبب موثق بدقة
+```
+
+الإغلاق الصامت لأي نقص محظور تمامًا.
+
+**قاعدة الانتقال للأمام:**
+
+لا يتم الانتقال للشريحة التالية إلا بعد:
+- حل كل `REQUIRED_ADDITION` بدليل، أو
+- تصنيف كل عنصر غير محلول كـ `BLOCKED_WITH_REASON` مع سبب محدد وموثق.
+
+لا يجوز بقاء أي عنصر كـ TBD عند الانتقال.
+
 ## مخرجات هذا البروتوكول
 
 استخدم:
 - `templates/SLICE_COVERAGE_MANIFEST_TEMPLATE.csv`
 - `evidence/MARKDOWN_TABLE_ROW_INVENTORY.csv`
 - `evidence/FORENSIC_FILE_INVENTORY.csv`
+- `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` — Initial Editable Cross-Surface Slice Matrix

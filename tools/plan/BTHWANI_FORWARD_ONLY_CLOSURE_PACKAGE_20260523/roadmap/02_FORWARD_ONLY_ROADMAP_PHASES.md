@@ -93,7 +93,7 @@
 **المرشح المفضل:**
 
 ```text
-DSH Store Discovery / Store Visibility
+DSH-SLICE-001-STORE-DISCOVERY (L7_CLOSED)
 ```
 
 **لماذا؟**
@@ -101,6 +101,51 @@ DSH Store Discovery / Store Visibility
 - لا يصطدم مباشرة بـ WLT.
 - يمكن إثباته عبر app-client + control-panel.
 - مناسب لأول local runtime.
+
+**Cross-Surface Journey Requirement (إلزامي لكل شريحة قبل الاختيار):**
+
+قبل اختيار أي شريحة، يجب:
+
+1. تعداد كل الأسطح المرتبطة بالرحلة التجارية (وليس مجرد السطح الأساسي).
+2. تصنيف كل سطح كـ:
+   - `primary` — يملك رحلة المستخدم الرئيسية في هذه الشريحة
+   - `supporting` — يشارك في الرحلة لكن لا يملكها
+   - `dependency` — يجب إثباته قبل إغلاق الشريحة
+   - `excluded` — خارج النطاق صراحةً (السبب إلزامي)
+   - `blocked` — لا يمكن تصنيفه الآن (السبب إلزامي)
+   - `deferred` — مؤجل لشريحة لاحقة (الشريحة المستهدفة إلزامية)
+3. توثيق أي شاشة/عملية/CTA/state/owner ناقصة كـ `REQUIRED_ADDITION` أو `BLOCKED_WITH_REASON` قبل تأكيد اختيار الشريحة.
+
+**تحذير: client-checkout ليس الشريحة الثانية الآمنة المباشرة.**
+
+```text
+client-checkout remains a future cross-surface WLT/Auth/payment slice,
+not the immediate next safe slice.
+Status: FUTURE_BLOCKED_BY_WLT_AUTH_PAYMENT
+```
+
+**الشريحة الثانية المقترحة:**
+
+```text
+DSH-SLICE-002-CATALOG-READINESS-CLIENT-VISIBILITY
+Status: PROPOSED_NEXT_SLICE
+Outcome: Partner/catalog readiness becomes safely visible to client.
+Surfaces: app-partner inventory/catalog; control-panel catalog governance;
+          control-panel marketing visibility; app-client visibility consumption;
+          shared DSH data/visibility/serviceability model.
+Excluded: cart; checkout; WLT/payment; refund; settlement;
+          captain delivery; field visits; support escalation.
+Pre-conditions before any implementation:
+  - slice manifest complete
+  - cross-surface impact map
+  - screen inventory
+  - CTA/state inventory
+  - data ownership map
+  - API/runtime readiness decision
+  - WLT/Auth/Vars classification
+  - visual evidence plan
+  - missing-process detection section
+```
 
 ---
 

@@ -1,7 +1,7 @@
 # DSH Runtime Evidence Matrix
 
-Status: L7_CLOSED
-Decision: L7_CLOSED
+Status: MIXED_RUNTIME_MATRIX
+Decision: DSH_SLICE_001_L7_CLOSED__OTHER_RUNTIME_ROWS_PENDING_OR_BLOCKED
 
 ## Matrix Evidence Requirement
 Purpose:
@@ -15,6 +15,10 @@ Current rule:
 - Batch 8C only opens the Go backend slice decision for `GET /stores`; it does not prove runtime transport
 - Batch 9A creates a Go skeleton with a temporary memory repository; it still does not prove PostgreSQL or frontend runtime transport
 - Batch 9B proves local PostgreSQL-backed `GET /stores` runtime at the Go API boundary only; it does not prove frontend transport or screen runtime binding
+- Runtime rows are proof units for cross-surface slices; they do not define slices by themselves.
+- Runtime closure requires: UI action → typed client → service/backend where applicable → data store where applicable → response → screen state → logs/evidence.
+- If runtime proof reveals a missing process/screen/state/operation, it must be recorded as REQUIRED_ADDITION or BLOCKED_WITH_REASON in the related slice.
+- Runtime proof does not promote preview/fixtures to API/runtime truth.
 
 Historic anchors:
 

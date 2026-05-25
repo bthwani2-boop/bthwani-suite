@@ -54,3 +54,9 @@ Lean index for the current DSH docs baseline. Service-state truth lives in the l
 - No frontend closure claim without route proof, screen proof, required states, visual evidence, and runtime proof or an explicit blocker.
 - No DSH slice can start or close without a row-complete manifest under `dsh/docs/slices/`.
 - No branch-specific instruction may live in `dsh/docs/command.md` or `dsh/docs/DSH_VISUAL_REVIEW.md`.
+- DSH slices are cross-surface business/operational journeys, not isolated surface rows. A slice closes a complete business outcome across all related surfaces or explicitly classifies each surface as excluded/blocked/deferred with reason.
+- Live matrices (`UI_UX_FLOW_CLOSURE_MATRIX.md`, `SCREEN_API_MATRIX.md`, `RUNTIME_EVIDENCE_MATRIX.md`, `DSH_VISUAL_REVIEW.md`) are evidence inventories; they do not define standalone slices.
+- DSH domain preview data lives in `dsh/frontend/data`. Surfaces own only presentation adapters, view models, labels, layout state, and screen-only UI fixtures. Never duplicate contradictory customers/products/categories/orders across DSH surfaces.
+- Never treat preview/fixtures as runtime/API truth.
+- `tools/plan/BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE_20260523` follows the same cross-surface slice model defined in `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md`.
+- On-demand retrieval is the default: do not push bulk data across all surfaces; use references/IDs/lean summaries/lazy loading/pagination/caching when documenting future slice models.

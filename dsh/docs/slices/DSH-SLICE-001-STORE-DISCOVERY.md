@@ -40,6 +40,15 @@ Official coverage manifest for the first DSH slice: client discovery and storefr
 | `control-panel operations` and `control-panel finance` | `NOT_APPLICABLE_WITH_REASON` | Operations and finance are explicitly accounted but excluded from this discovery/storefront slice. |
 | Finance mutation | `NOT_APPLICABLE_WITH_REASON` | DSH must not mutate wallet, ledger, settlement, refund, or fee truth. |
 
+## Slice Scope Clarification
+
+- DSH-SLICE-001 closes the client discovery edge and its proven runtime path only.
+- Upstream catalog readiness, partner publishing, control-panel catalog/marketing governance, provider policy, checkout, WLT/payment, lifecycle/support, delivery execution, and field readiness are deferred into later cross-surface slices.
+- This slice must not be used as proof that the full DSH ecosystem is closed.
+- Slice 001 is accepted as the first closed edge slice. Its L7_CLOSED status and evidence are final.
+- Future slices must use the stricter cross-surface journey model defined in `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md`.
+- No reopened work is required for Slice 001 unless a future cross-surface slice proves a contradiction.
+
 ## Search Boundary Rule
 
 | Search Type | Owner Screen | Route Boundary | Scope | Decision |
