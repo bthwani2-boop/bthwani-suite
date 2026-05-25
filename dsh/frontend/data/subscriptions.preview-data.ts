@@ -1,11 +1,9 @@
-import { resolvePreviewColor as _rpc } from '../shared/dsh-preview-color';
 import { mapLoyaltyProgramToClientBenefits, mapSubscriptionPlansToClientCards, type CommercialEntitlement, type CommercialEarningRule, type CommercialProgram, type CommercialRedemptionRule, type LoyaltyClientBenefits, type LoyaltyClientMetric, type LoyaltyClientSection, type LoyaltyReward, type LoyaltyTier, type SubscriptionClientCard, type SubscriptionPlan } from '../shared/commercial.preview-contract';
 
 // -----------------------------------------------------------------------------
 // Loyalty and subscription source records
 // -----------------------------------------------------------------------------
-// Semantic color tokens resolved via shared/dsh-preview-color.
-const loyaltyPalette = { danger: _rpc('danger'), brandStrong: _rpc('brandStrong') };
+// Semantic color tokens — stored as token strings; resolution happens at adapter/render boundary only.
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
@@ -53,7 +51,7 @@ const seededLoyaltyItems: LoyaltyRecord[] = [
     ctaLabel: 'مراجعة الاشتراك',
     highlight: 'مرتبط بمسار الاشتراك الحقيقي',
     metricValue: '٢,٨٤٠ عضو نشط',
-    accentColor: loyaltyPalette.danger,
+    accentColor: 'danger',
     impressions: 33000,
     clicks: 1910,
   },
@@ -68,7 +66,7 @@ const seededLoyaltyItems: LoyaltyRecord[] = [
     ctaLabel: 'عرض النقاط',
     highlight: 'عرض محدود',
     metricValue: '١٥,٠٠٠ مستفيد',
-    accentColor: loyaltyPalette.brandStrong,
+    accentColor: 'brandStrong',
     impressions: 45000,
     clicks: 5200,
   }
@@ -123,7 +121,7 @@ export function upsertLoyaltyItem(item: Partial<LoyaltyRecord>) {
     ctaLabel: item.ctaLabel?.trim() || existing?.ctaLabel || 'فتح',
     highlight: item.highlight?.trim() || existing?.highlight || '',
     metricValue: item.metricValue?.trim() || existing?.metricValue || '0',
-    accentColor: item.accentColor?.trim() || existing?.accentColor || loyaltyPalette.brandStrong,
+    accentColor: item.accentColor?.trim() || existing?.accentColor || 'brandStrong',
     impressions: item.impressions ?? existing?.impressions ?? 0,
     clicks: item.clicks ?? existing?.clicks ?? 0,
   };

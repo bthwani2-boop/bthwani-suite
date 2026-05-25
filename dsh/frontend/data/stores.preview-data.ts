@@ -2,7 +2,6 @@ import { buildCanonicalPreviewDiscoveryStores, type DshCanonicalProductCard, typ
 import { buildStoreCategories, buildStoreDeliveryModes, buildStoreTags, dshStoreBuildersContractMeta as buildersDataContract } from '../shared/dsh-store-builders';
 import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 import type { DiscoveryFilter, DshServiceId } from '../shared/dsh-discovery.contract';
-import { resolvePreviewColor as _rpc } from '../shared/dsh-preview-color';
 import type { Phase12FixtureLocation } from '../../types';
 
 // -----------------------------------------------------------------------------
@@ -254,11 +253,7 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 // -----------------------------------------------------------------------------
 // Home stores and discovery surface
 // -----------------------------------------------------------------------------
-// Semantic color tokens resolved via shared/dsh-preview-color.
-const _brandPalette = { 400: _rpc('brand.400'), 500: _rpc('brand.500'), 600: _rpc('brand.600') };
-const _dangerPalette = { 400: _rpc('danger.400'), 600: _rpc('danger.600') };
-const _infoPalette = { 600: _rpc('info.600'), 700: _rpc('info.700') };
-const _successPalette = { 600: _rpc('success.600') };
+// Semantic color tokens — stored as token strings; resolution happens at adapter/render boundary only.
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
@@ -499,7 +494,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'تخفيضات حصرية',
 		subtitle: 'خصم 30% على طلبك الأول عبر التطبيق',
 		icon: '🔥',
-		accentColor: _brandPalette[500],
+		accentColor: 'brand.500',
 		actionType: 'main_category',
 		actionTarget: 'restaurants',
 	},
@@ -509,7 +504,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'تتبع طلبك',
 		subtitle: 'تابع حالة طلبك مباشرة وبدقة عالية',
 		icon: '📍',
-		accentColor: _infoPalette[600],
+		accentColor: 'info.600',
 		actionType: 'store',
 		actionTarget: 'store-1001',
 	},
@@ -519,7 +514,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'خضروات طازجة',
 		subtitle: 'أفضل الفواكه والخضروات تصلك لباب المنزل',
 		icon: '✨',
-		accentColor: _dangerPalette[600],
+		accentColor: 'danger.600',
 		actionType: 'sub_category',
 		actionTarget: 'grocery',
 		actionExtra: 'grocery_vegetables_fruits',
@@ -530,7 +525,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'وجبات عائلية',
 		subtitle: 'وفر 40% على منيو العائلة اليوم',
 		icon: '🍽️',
-		accentColor: _successPalette[600],
+		accentColor: 'success.600',
 		actionType: 'main_category',
 		actionTarget: 'restaurants',
 	},
@@ -540,7 +535,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'حلويات ومشروبات',
 		subtitle: 'أشهى الحلويات والعصائر الطازجة بخطوة واحدة',
 		icon: '🧃',
-		accentColor: _brandPalette[400],
+		accentColor: 'brand.400',
 		actionType: 'main_category',
 		actionTarget: 'sweets_juices',
 	},
@@ -550,7 +545,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'مخابز حطين',
 		subtitle: 'خبز طازج يومياً مع توصيل مجاني',
 		icon: '🍞',
-		accentColor: _dangerPalette[400],
+		accentColor: 'danger.400',
 		actionType: 'store',
 		actionTarget: 'store-1002',
 	},
@@ -560,7 +555,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'اشتراك بثواني برو',
 		subtitle: 'توصيل مجاني غير محدود + عروض حصرية',
 		icon: '⭐',
-		accentColor: _infoPalette[700],
+		accentColor: 'info.700',
 		actionType: 'subscription',
 		actionTarget: 'subscription-family-get',
 	},
