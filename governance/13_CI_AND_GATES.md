@@ -5,17 +5,19 @@
 
 ## Gate types
 
-| Gate | Mode | Blocks merge when |
-|---|---|---|
-| Scope gate | blocking | changed files outside approved scope |
-| Diff hygiene | blocking | `git diff --check` fails |
-| TypeScript | blocking for code | typecheck fails |
-| Security/secrets | blocking | secret risk detected |
-| Boundary guard | blocking for boundary changes | forbidden imports/exports found |
-| Governance references | blocking for governance changes | retired or invalid active references remain |
-| UI evidence | blocking for UI closure | screenshots missing |
-| Runtime evidence | blocking for runtime closure | logs/tests missing |
-| Warning classification | report/block depending severity | warnings unclassified |
+Only applicable gates run for a given change. A docs/policy/agents/governance-only change does not trigger TypeScript, UI evidence, or runtime evidence gates.
+
+| Gate | Mode | Blocks merge when | Applicable to |
+|---|---|---|---|
+| Scope gate | blocking | changed files outside approved scope | all changes |
+| Diff hygiene | blocking | `git diff --check` fails | all changes with writes |
+| TypeScript | blocking for code | typecheck fails | TS/TSX/config/export changes |
+| Security/secrets | blocking | secret risk detected | all changes |
+| Boundary guard | blocking for boundary changes | forbidden imports/exports found | import/export/package changes |
+| Governance references | blocking for governance changes | retired or invalid active references remain | governance/agent changes |
+| UI evidence | blocking for UI closure | screenshots missing | visible UI changes |
+| Runtime evidence | blocking for runtime closure | logs/tests missing | runtime/behavior changes |
+| Warning classification | report/block depending severity | warnings unclassified | when warnings are produced |
 
 ## Report-only gates
 

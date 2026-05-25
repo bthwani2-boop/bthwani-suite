@@ -15,17 +15,29 @@ tools/registry/runs/{SESSION_ID}/
 
 ## Evidence pack standard
 
-### Smart evidence selection by task risk
+### Human-requested and task-specific evidence
 
-Evidence remains required, but its shape must match task risk. Do not create a registry run folder or ZIP for every small task.
+Evidence form is human-requested and task-specific. Task classification (LOW / MEDIUM / UI_VISIBLE / HIGH / COMMIT/PUSH) helps estimate execution risk only — it does not determine fixed evidence size or prescribe fixed evidence tiers.
 
-| Task class | Minimum evidence | ZIP required? |
-|---|---|---|
-| LOW: terminal-only, docs tiny, prompt-only, text-only, port checks, git status | direct answer or terminal output; `git status` and `git diff --check` only when writes occurred | No |
-| MEDIUM: one file or a few targeted files | `git status`, `git diff --check`, changed-file list, and targeted syntax/type/lint only when directly justified | No by default |
-| UI_VISIBLE: visible UI change | `git diff --check`, targeted TS/type verification when needed, and screenshot/RTL/overflow/spacing notes | No by default |
-| HIGH: governance, agents, guards, scripts, ui-kit exports, architecture, or other multi-file sensitive work | `git status`, `git diff --check`, targeted guards, PowerShell syntax validation for modified `.ps1`, and registry evidence only when the risk justifies it | Optional and opt-in only |
-| COMMIT/PUSH: publishing step | before commit, run `git status` and staged `git diff --check`; let hooks run; if a hook fails, fix only the specific failure | No by default |
+**Minimum proof required to avoid false acceptance claims after local writes:**
+
+- `git status` — understand what changed.
+- `git diff --name-status` — confirm scope.
+- `git diff --check` — confirm no whitespace violations.
+
+**Evidence by change type (not by tier):**
+
+- `docs / policy / agents / governance only` → Git proof above. No tsc, no build, no evidence pack.
+- `TS/TSX / config / exports affected` → targeted typecheck for affected project/path. Workspace `tsc` only on explicit human request, release, or broad architecture change.
+- `UI visible change` → screenshots required; targeted type verification when needed.
+- `runtime / behavior changed` → runtime smoke or log evidence.
+- `release / deploy / native / dependency changed` → build output required.
+
+**Evidence pack and ZIP are not default:**
+
+- Registry folder `tools/registry/runs/{SESSION_ID}/` is created only when the human requests it or the workflow is sensitive and proven: patch review, checkpoint, CI, release, guard runner, scripted change.
+- ZIP is optional and created only when the human explicitly requests it, or when one upload artifact is practically needed.
+- No registry folder and no ZIP for docs, policy, agents, or governance-only work unless explicitly requested.
 
 ### Minimum evidence after code/doc changes
 

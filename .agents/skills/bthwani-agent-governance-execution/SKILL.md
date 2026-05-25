@@ -13,11 +13,11 @@ Force agent-related work through a controlled execution flow.
 ## Steps
 
 1. CHECK current Git state and target files.
-2. FORENSICS current and donor references.
+2. FORENSICS current and donor references — scoped to changed paths only.
 3. DRYRUN before writes.
 4. APPLY only approved paths.
-5. VERIFY diff, registry, frontmatter, and project gates.
-6. EXPORT patch/evidence/rollback instructions.
+5. VERIFY diff and project gates: `git status`, `git diff --name-status`, `git diff --check`.
+6. EXPORT patch/evidence/rollback instructions only when the human requests it or the workflow is sensitive and proven (patch review, checkpoint, CI, release, guard runner, scripted change).
 
 ## Forbidden
 

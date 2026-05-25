@@ -54,8 +54,8 @@ Core laws:
 - Backend target is Go unless current repo evidence explicitly says otherwise.
 - UI architecture: Screen / Surface / App -> `@bthwani/ui-kit` public exports -> Tamagui internally inside ui-kit only.
 - Arabic/RTL UI must be directionally correct: icon+text cluster on the right, action/chevron opposite, right-aligned text, safe spacing, no clipping.
-- ØªÙˆØ¬Ø¨ Ø§Ù„Ø§Ù„ØªØ²Ø§Ù… Ø¨Ù†Ø¸Ø§Ù… Ø§Ù„Ø£Ù„ÙˆØ§Ù† Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ.
-- ØªØ¬Ø¨ Ø¥Ø²Ø§Ù„Ø© ÙˆÙ…Ø¹Ø§Ù„Ø¬Ø© ÙˆØªØµØ­ÙŠØ­ Ø§Ù„Ø¶Ø¬ÙŠØ¬ ÙˆØ§Ù„ØªÙƒØ±Ø§Ø± ÙˆØ§Ù„ÙƒÙˆØ¯ Ø§Ù„Ù…ÙŠØª ÙˆØ§Ù„ØªØ³Ø±Ø¨ ÙˆØ§Ù„ØªØ´Ø¸ÙŠ ÙˆØ§Ù„ØªØ¨Ø¹Ø«Ø±.
+- توجب الالتزام بنظام الألوان المركزي.
+- تجب إزالة ومعالجة وتصحيح الضجيج والتكرار والكود الميت والتسرب والتشظي والتبعثر.
 - Any reusable design belongs in approved design system / `@bthwani/ui-kit`.
 - No new UI-kit files unless the need is non-negotiable, proven by evidence, and human-approved.
 - Service/application/domain specialization belongs in `governance/`; `.agents` skills remain general.
@@ -63,16 +63,30 @@ Core laws:
 
 Smart Execution Budget:
 
+Task classification (LOW / MEDIUM / UI_VISIBLE / HIGH / COMMIT/PUSH) estimates execution risk only — it does not prescribe fixed evidence layers or fixed evidence size. Evidence form and size are determined by human request and task nature. See [`governance/15_AGENT_AND_AI_EXECUTION.md`](governance/15_AGENT_AND_AI_EXECUTION.md) for the canonical universal agent law and [`governance/11_EVIDENCE_AND_TRACEABILITY.md`](governance/11_EVIDENCE_AND_TRACEABILITY.md) for the canonical evidence law.
+
 - LOW: terminal-only, docs tiny, prompt-only, text-only, port checks, or git-status work. Gates: `git status` and `git diff --check` only when writes occurred. Do not run full lint, workspace `tsc`, full guards, registry evidence, ZIP, or bulk skill reads.
 - MEDIUM: one file or a few targeted files. Gates: `git status`, `git diff --check`, and targeted syntax/type/lint only when directly justified. Do not run workspace lint by default.
 - UI_VISIBLE: visible UI changes. Gates: `git diff --check`, targeted TS/type verification when needed, and screenshot/RTL/overflow notes. Do not claim closure without visual evidence.
 - HIGH: governance, agents, guards, scripts, ui-kit exports, architecture, or other multi-file sensitive work. Gates: `git status`, `git diff --check`, targeted guards, PowerShell syntax validation for modified `.ps1`, and registry evidence only when the risk justifies it. ZIP is opt-in only.
 - COMMIT/PUSH: before commit, run `git status` and staged `git diff --check` only. Do not rerun hooks manually; let hooks run. If a hook fails, fix only the specific failure.
 
+No evidence pack and no ZIP by default. Registry folder and ZIP are created only on explicit human request, or when the workflow is sensitive and proven: patch review, checkpoint, CI, release, guard runner, scripted change.
+
 Skill and wait budget:
 
 - `Use relevant skills` means choose the narrowest 1-2 project-owned skills for the task. Do not open the full skill catalog or unrelated skills unless direct evidence shows they are needed.
 - Do not emit repetitive wait-loop updates such as repeated "wait 60 seconds" or "continue to wait" messages. One timed wait notice is the maximum when a real blocking operation is running.
+- Do not produce long reports or summaries unless explicitly requested by the human.
+
+Heavy commands — opt-in only when explicitly requested or scope-proven:
+
+- `pnpm run serve:surfaces` / `pnpm run build:surfaces`
+- `pnpm run build:mobile-control-panel`
+- `pnpm nx run-many --target=build` / `pnpm nx run-many --target=serve`
+- `pnpm run guard:governance:all`
+
+No agent may run these automatically for a docs, policy, agent, or governance-only change.
 
 Use these project-owned skills when relevant:
 

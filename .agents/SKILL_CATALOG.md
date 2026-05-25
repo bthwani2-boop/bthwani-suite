@@ -4,7 +4,7 @@
 |---|---|---|---|
 | `bthwani-current-workspace-authority` | Resolve active roots and block stale/donor paths. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-governance-execution` | Enforce scoped execution, forensics, dry-run, apply, verification, and evidence. | `governance/` according to task domain | structured decision + evidence requirements |
-| `bthwani-local-evidence-pack` | Build local registry evidence packs using `{SESSION_ID}.zip`. | `governance/` according to task domain | structured decision + evidence requirements |
+| `bthwani-local-evidence-pack` | Collect human-requested or workflow-justified local evidence; ZIP only when explicitly requested or when one upload artifact is practically needed. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-patch-review-and-evidence` | Review diffs, patches, and evidence before acceptance. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-restoration-forensics` | Extract donor value without restoring noisy deleted structures. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-domain-governance-reader` | Route every task to the correct governance truth before execution. | `governance/` according to task domain | structured decision + evidence requirements |

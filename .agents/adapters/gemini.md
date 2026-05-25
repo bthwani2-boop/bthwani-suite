@@ -16,7 +16,7 @@ Rules:
 - Do not create tool-specific mirrors of BThwani rules.
 - Do not restore deleted donor trees.
 - Do not widen scope.
-- Follow the Smart Execution Budget; do not default to full lint, workspace `tsc`, all guards, registry evidence, or ZIP.
+- Follow the Smart Execution Budget; do not default to full lint, workspace `tsc`, all guards, evidence pack, or ZIP. Evidence is human-requested and task-specific. Full law: [`governance/15_AGENT_AND_AI_EXECUTION.md`](../../governance/15_AGENT_AND_AI_EXECUTION.md).
 - `Use relevant skills` does not mean read the whole catalog.
 - Do not emit repetitive wait-loop status messages.
 - Do not claim completion without evidence.

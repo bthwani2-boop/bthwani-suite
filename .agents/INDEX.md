@@ -11,9 +11,13 @@
 
 ## Execution budget
 
-- `Use relevant skills` means read only the narrowest 1-2 skills that materially help the task.
-- Do not default to full lint, workspace `tsc`, all guards, registry evidence, or ZIP for LOW or MEDIUM work.
+- `Use relevant skills` means read only the narrowest 1–2 skills that materially help the task.
+- Do not open `.agents/SKILL_CATALOG.md` or unrelated skills unless skill selection is genuinely unclear.
+- No full lint, workspace `tsc`, all guards by default.
+- No evidence pack (registry folder) and no ZIP by default — only on explicit human request or proven sensitive workflow (patch review, checkpoint, CI, release, guard runner, scripted change).
+- docs/policy/agents/governance-only work → Git proof only. No tsc, no build, no evidence pack.
 - Do not emit repetitive wait-loop chatter; one timed wait message is the maximum when a blocking operation is actually in progress.
+- Full token budget and agent law: [`governance/15_AGENT_AND_AI_EXECUTION.md`](../governance/15_AGENT_AND_AI_EXECUTION.md).
 
 ## General BThwani skills
 

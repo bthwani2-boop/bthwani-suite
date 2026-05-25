@@ -30,9 +30,12 @@
 
 ## Execution budget
 
-- `Use relevant skills` means select the narrowest 1-2 relevant skills, not the whole catalog.
-- Do not default to full lint, workspace `tsc`, all guards, registry evidence, or ZIP for LOW or MEDIUM tasks.
-- Do not emit repetitive wait-loop status chatter; one timed wait notice is the maximum when a real blocking operation is running.
+Canonical law: [`governance/15_AGENT_AND_AI_EXECUTION.md`](../governance/15_AGENT_AND_AI_EXECUTION.md).
+
+- Read the narrowest 1–2 relevant skills only; do not open the full catalog.
+- No full lint, workspace `tsc`, all guards, evidence pack, or ZIP by default.
+- Evidence form and size are determined by human request and task nature — not by task class alone.
+- No repetitive wait-loop chatter; one timed wait notice maximum.
 
 ## Acceptance rule
 

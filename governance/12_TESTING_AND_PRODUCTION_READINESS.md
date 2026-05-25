@@ -28,8 +28,16 @@ git --no-pager diff --check
 
 ## Smart Execution Budget
 
-الجدول الكامل لـ task classes (LOW / MEDIUM / UI_VISIBLE / HIGH / COMMIT/PUSH) وحجم الدليل المقابل محدد في [`governance/11_EVIDENCE_AND_TRACEABILITY.md`](11_EVIDENCE_AND_TRACEABILITY.md).
-اختر الحد الأدنى من التحقق الذي تبرره طبيعة المهمة وطلب الإنسان. لا تعد تعريف الـ tiers هنا.
+Evidence and verification are human-requested and task-specific. The canonical evidence law is in [`governance/11_EVIDENCE_AND_TRACEABILITY.md`](11_EVIDENCE_AND_TRACEABILITY.md).
+
+**Verification by change impact — choose only applicable gates:**
+
+- `docs / policy / agents / governance only` → Git proof only (`git status`, `git diff --name-status`, `git diff --check`). No tsc, no build, no lint, no evidence pack.
+- `TS/TSX / config / exports affected` → targeted typecheck for the affected project/path only. Workspace `tsc` only on explicit human request, release, or broad architecture change. Otherwise record `NOT_RUN_REASON`.
+- `UI visible change` → screenshots required; targeted type verification when needed.
+- `runtime / behavior changed` → runtime smoke or log evidence.
+- `release / deploy / native / dependency changed` → build output required.
+- No workspace `tsc`, no `run-many`, no `all guards`, no evidence pack by default.
 
 ## Production readiness dimensions
 

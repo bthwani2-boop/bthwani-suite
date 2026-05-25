@@ -13,7 +13,11 @@ Prevent accidental release/runtime breakage.
 ## Steps
 
 1. Classify change as `DOC_ONLY`, `JS_ONLY`, `UI_ONLY`, `CONFIG`, `NATIVE`, `DEPENDENCY`, `RUNTIME`, `RELEASE`, or `UNKNOWN`.
-2. Detect whether Expo Dev Client/EAS rebuild, Next build, or runtime smoke is needed.
+2. Apply only applicable gates:
+   - `DOC_ONLY` → no build, no runtime smoke, no evidence pack required.
+   - `JS_ONLY` / `UI_ONLY` → no native rebuild; targeted typecheck when TS/config is touched.
+   - `CONFIG` / `NATIVE` / `DEPENDENCY` → Expo Dev Client/EAS rebuild or Next build as needed; block unless explicitly in scope.
+   - `RUNTIME` / `RELEASE` → runtime smoke and rollback evidence required.
 3. Block dependency/native/config changes unless explicitly in scope.
 4. Require rollback and evidence for release-impacting changes.
 
