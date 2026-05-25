@@ -1,4 +1,4 @@
-import { AppearanceRecord } from '../control-panel/platform/Appearance/appearance.types';
+import type { AppearanceRecord } from '../shared/dsh-cp-platform.contract';
 
 export const PREVIEW_APPEARANCE_RECORDS: readonly AppearanceRecord[] = [
   {

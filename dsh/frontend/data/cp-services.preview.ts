@@ -1,4 +1,4 @@
-import { ServiceRecord } from '../control-panel/platform/Services/services.types';
+import type { ServiceRecord } from '../shared/dsh-cp-platform.contract';
 
 // Top-level platform services only: DSH, KNZ, WLT, AMN, ARB, MRF, KWD, SND, ESF.
 // Sub-capabilities (عونك, شي إن, Store Pickup, Scheduled Orders) are NOT here —

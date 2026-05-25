@@ -1,4 +1,4 @@
-import { ProviderRecord } from '../control-panel/platform/Providers/providers.types';
+import type { ProviderRecord } from '../shared/dsh-cp-platform.contract';
 
 /** Masked credential placeholder — never show real keys */
 const MASKED = '●●●●●●●●●●●●●';

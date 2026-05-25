@@ -4,7 +4,7 @@ import type {
   DshPlatformScopeLayer,
   DshPlatformSimulationScenario,
   DshPlatformVarRecord,
-} from '../control-panel/platform/Vars/vars.types';
+} from '../shared/dsh-cp-platform.contract';
 
 // DSH operational vars — human labels first, technical keys are secondary metadata.
 // Captain eligibility = WALLET BALANCE THRESHOLD owned by WLT, consumed by DSH.

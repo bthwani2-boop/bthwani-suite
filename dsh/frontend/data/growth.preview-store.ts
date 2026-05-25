@@ -1,4 +1,6 @@
-import { colorPalette } from '@bthwani/ui-kit';
+// Inline hex value derived from ui-kit/src/foundation.ts rawColorPalettes.brand[500].
+// dsh/frontend/data must not import from @bthwani/ui-kit.
+const _BRAND = '#FF500D' as const;
 
 /**
  * LEGACY COMPATIBILITY:
@@ -127,7 +129,7 @@ export function upsertMarketingGrowthItem(item: Partial<MarketingGrowthRecord>) 
     ctaLabel: item.ctaLabel?.trim() || existing?.ctaLabel || 'فتح الآن',
     highlight: item.highlight?.trim() || existing?.highlight || 'مهيأ للنشر',
     metricValue: item.metricValue?.trim() || existing?.metricValue || 'بدون بيانات',
-    accentColor: item.accentColor?.trim() || existing?.accentColor || colorPalette.brand,
+    accentColor: item.accentColor?.trim() || existing?.accentColor || _BRAND,
     impressions: item.impressions ?? existing?.impressions ?? 0,
     clicks: item.clicks ?? existing?.clicks ?? 0,
   };

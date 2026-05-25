@@ -698,3 +698,50 @@ export {
   DSH_OPS_INTERVENTION_PLAYBOOKS,
   getDshOpsInterventionPlaybook,
 } from '../data/dsh-ops-intervention-playbook.preview';
+
+// --- New shared preview contracts (dependency direction fix) ---
+
+export type { DshServiceId, DiscoveryFilter } from './dsh-discovery.contract';
+export { dshDiscoveryContractMeta } from './dsh-discovery.contract';
+
+export type {
+  DshFieldStoreVisitErrors,
+  DshFieldStoreVisitState,
+  DshFieldStoreVisitValues,
+  DshFieldVisitEvidenceItem,
+} from './dsh-field-visit.contract';
+export { dshFieldVisitContractMeta } from './dsh-field-visit.contract';
+
+export type {
+  AppearanceStatus, AppearanceScope, AppearanceRisk, AppearanceOwner, AppearanceRecord,
+  ProviderCategory, ProviderEnvironment, ProviderStatus, ProviderOwner, ProviderRecord,
+  ServiceStatus, ServiceClientVisibility, ServiceScope, ServiceOwner, ServiceRisk, ServiceRecord,
+  DshPlatformVarOwner, DshPlatformVarStatus, DshPlatformVarScope, DshPlatformVarRisk,
+  DshPlatformVarRecord, DshPlatformProviderControlRecord, DshPlatformScopeLayer,
+  DshPlatformSimulationScenario, DshPlatformAuditEntry,
+} from './dsh-cp-platform.contract';
+export { dshCpPlatformContractMeta } from './dsh-cp-platform.contract';
+
+export type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from './dsh-cp-operations.contract';
+export { dshCpOperationsContractMeta } from './dsh-cp-operations.contract';
+
+export type {
+  AdminRoleId, PlatformPermissionId, AdminUserStatus,
+  AdminRole, MockAdminUser, PlatformPermission,
+} from './dsh-cp-administration.contract';
+export { dshCpAdministrationContractMeta } from './dsh-cp-administration.contract';
+
+export type {
+  StoreDeliveryModeEntry,
+} from './dsh-store-builders';
+export {
+  buildStoreCategories,
+  buildStoreDeliveryModes,
+  buildStoreTags,
+  dshStoreBuildersContractMeta,
+} from './dsh-store-builders';
+
+export {
+  resolvePreviewColor,
+  dshPreviewColorContractMeta,
+} from './dsh-preview-color';

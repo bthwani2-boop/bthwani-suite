@@ -1,4 +1,19 @@
-import { colorPalette } from '@bthwani/ui-kit';
+// Semantic color tokens resolved via shared/dsh-preview-color (which imports from @bthwani/ui-kit).
+// dsh/frontend/data must not import from @bthwani/ui-kit directly; shared is the correct intermediary.
+import { resolvePreviewColor as _rpc } from '../shared/dsh-preview-color';
+const _P = {
+  white: _rpc('white'),
+  black: _rpc('black'),
+  brand: _rpc('brand'),
+  brandStrong: _rpc('brandStrong'),
+  accentOrange: _rpc('accentOrange'),
+  accentBlue: _rpc('accentBlue'),
+  ink: _rpc('ink'),
+  danger: _rpc('danger'),
+  success: _rpc('success'),
+  info: _rpc('info'),
+  warning: _rpc('warning'),
+};
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
@@ -125,22 +140,22 @@ function createBannerDataUrl(background: string, accent: string, title: string, 
       <rect width="800" height="1000" rx="60" fill="url(#bg)" />
 
       <!-- Abstract Shapes -->
-      <circle cx="700" cy="150" r="200" fill="${colorPalette.white}" fill-opacity="0.08" />
-      <circle cx="100" cy="850" r="250" fill="${colorPalette.black}" fill-opacity="0.05" />
+      <circle cx="700" cy="150" r="200" fill="${_P.white}" fill-opacity="0.08" />
+      <circle cx="100" cy="850" r="250" fill="${_P.black}" fill-opacity="0.05" />
 
       <!-- Premium Gloss -->
-      <rect x="0" y="0" width="800" height="400" fill="${colorPalette.white}" fill-opacity="0.03" transform="skewY(-10)" />
+      <rect x="0" y="0" width="800" height="400" fill="${_P.white}" fill-opacity="0.03" transform="skewY(-10)" />
 
       <!-- Composition placeholders -->
-      <rect x="60" y="80" width="120" height="120" rx="60" fill="${colorPalette.white}" fill-opacity="0.9" filter="url(#shadow)" />
+      <rect x="60" y="80" width="120" height="120" rx="60" fill="${_P.white}" fill-opacity="0.9" filter="url(#shadow)" />
       <text x="120" y="152" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="${accent}">✨</text>
 
-      <rect x="60" y="600" width="680" height="340" rx="40" fill="${colorPalette.black}" fill-opacity="0.15" />
+      <rect x="60" y="600" width="680" height="340" rx="40" fill="${_P.black}" fill-opacity="0.15" />
 
-      <text x="400" y="700" font-family="Arial, sans-serif" font-size="64" font-weight="900" text-anchor="middle" fill="${colorPalette.white}">${title}</text>
-      <text x="400" y="780" font-family="Arial, sans-serif" font-size="32" font-weight="600" text-anchor="middle" fill="${colorPalette.white}" fill-opacity="0.9">${subtitle}</text>
+      <text x="400" y="700" font-family="Arial, sans-serif" font-size="64" font-weight="900" text-anchor="middle" fill="${_P.white}">${title}</text>
+      <text x="400" y="780" font-family="Arial, sans-serif" font-size="32" font-weight="600" text-anchor="middle" fill="${_P.white}" fill-opacity="0.9">${subtitle}</text>
 
-      <rect x="250" y="850" width="300" height="70" rx="35" fill="${colorPalette.white}" filter="url(#shadow)" />
+      <rect x="250" y="850" width="300" height="70" rx="35" fill="${_P.white}" filter="url(#shadow)" />
       <text x="400" y="895" font-family="Arial, sans-serif" font-size="28" font-weight="800" text-anchor="middle" fill="${accent}">اطلب الآن</text>
     </svg>
   `.trim();
@@ -155,7 +170,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'وفر 40% على منيو العائلة اليوم من أفضل المطاعم المختارة',
     imageUrl: 'dsh.banner.home.promo-1.v1',
     mediaKey: 'dsh.banner.home.promo-1.v1',
-    accentColor: colorPalette.accentOrange,
+    accentColor: _P.accentOrange,
     audience: 'all',
     status: 'published',
     actionType: 'main_category',
@@ -168,7 +183,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'restaurant_promo',
     offerBadgeText: 'خصم 40%',
-    offerBadgeColor: colorPalette.danger,
+    offerBadgeColor: _P.danger,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.hadda.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -185,7 +200,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'توصيل خلال 20 دقيقة من أقرب فرع إليك بجودة عالية',
     imageUrl: 'dsh.banner.home.promo-2.v1',
     mediaKey: 'dsh.banner.home.promo-2.v1',
-    accentColor: colorPalette.success,
+    accentColor: _P.success,
     audience: 'all',
     status: 'published',
     actionType: 'store',
@@ -198,7 +213,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'grocery_express',
     offerBadgeText: 'توصيل سريع',
-    offerBadgeColor: colorPalette.info,
+    offerBadgeColor: _P.info,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.hittin.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -215,7 +230,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'توصيل مجاني غير محدود لجميع طلباتك واستمتع بمزايا حصرية',
     imageUrl: 'dsh.banner.home.promo-3.v1',
     mediaKey: 'dsh.banner.home.promo-3.v1',
-    accentColor: colorPalette.accentBlue,
+    accentColor: _P.accentBlue,
     audience: 'all',
     status: 'published',
     actionType: 'subscription',
@@ -228,7 +243,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'subscription_premium',
     offerBadgeText: 'أسبوع مجاني',
-    offerBadgeColor: colorPalette.accentBlue,
+    offerBadgeColor: _P.accentBlue,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.pasta.v1',
     partnerLogoPosition: 'top-left',
@@ -245,7 +260,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'اكتشف المتاجر ذات العروض النشطة وادخل مباشرة إلى العرض المناسب',
     imageUrl: 'dsh.banner.home.promo-2.v1',
     mediaKey: 'dsh.banner.home.promo-2.v1',
-    accentColor: colorPalette.warning,
+    accentColor: _P.warning,
     audience: 'all',
     status: 'published',
     actionType: 'external',
@@ -259,7 +274,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'offers_showcase',
     offerBadgeText: 'عرض نشط',
-    offerBadgeColor: colorPalette.accentOrange,
+    offerBadgeColor: _P.accentOrange,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.hadda.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -276,7 +291,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'منتجات عضوية طازجة يومياً بأفضل الأسعار المتاحة',
     imageUrl: 'dsh.banner.home.promo-4.v1',
     mediaKey: 'dsh.banner.home.promo-4.v1',
-    accentColor: colorPalette.success,
+    accentColor: _P.success,
     audience: 'all',
     status: 'published',
     actionType: 'store',
@@ -289,7 +304,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'store_exclusive',
     offerBadgeText: 'جديد',
-    offerBadgeColor: colorPalette.warning,
+    offerBadgeColor: _P.warning,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.store.malqa.cover.v1',
     partnerLogoPosition: 'top-left',
@@ -306,7 +321,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'أحدث الأجهزة بأسعار تنافسية وضمان حقيقي لجميع المنتجات',
     imageUrl: 'dsh.banner.home.promo-5.v1',
     mediaKey: 'dsh.banner.home.promo-5.v1',
-    accentColor: colorPalette.ink,
+    accentColor: _P.ink,
     audience: 'all',
     status: 'published',
     actionType: 'main_category',
@@ -319,7 +334,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'electronics_offer',
     offerBadgeText: 'عرض مؤقت',
-    offerBadgeColor: colorPalette.danger,
+    offerBadgeColor: _P.danger,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.choco.v1',
     partnerLogoPosition: 'top-left',
@@ -336,7 +351,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'اكتشف الحلا الطازج مع تجربة بصرية أوضح وبنقرة واحدة',
     imageUrl: 'dsh.banner.home.promo-6.v1',
     mediaKey: 'dsh.banner.home.promo-6.v1',
-    accentColor: colorPalette.accentOrange,
+    accentColor: _P.accentOrange,
     audience: 'all',
     status: 'published',
     actionType: 'sub_category',
@@ -350,7 +365,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'sweets_category',
     offerBadgeText: 'طازج اليوم',
-    offerBadgeColor: colorPalette.danger,
+    offerBadgeColor: _P.danger,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.croissant.v1',
     partnerLogoPosition: 'top-left',
@@ -367,7 +382,7 @@ const seededBanners: MarketingBannerRecord[] = [
     subtitle: 'منتج تجريبي يختبر مظهر الصورة والربط المباشر في نفس المسار',
     imageUrl: 'dsh.banner.home.promo-7.v1',
     mediaKey: 'dsh.banner.home.promo-7.v1',
-    accentColor: colorPalette.accentBlue,
+    accentColor: _P.accentBlue,
     audience: 'all',
     status: 'published',
     actionType: 'product',
@@ -381,7 +396,7 @@ const seededBanners: MarketingBannerRecord[] = [
     updatedAt: new Date().toISOString(),
     templateId: 'product_spotlight',
     offerBadgeText: 'منتج مميز',
-    offerBadgeColor: colorPalette.accentOrange,
+    offerBadgeColor: _P.accentOrange,
     offerBadgePosition: 'top-right',
     partnerLogoUrl: 'dsh.product.pasta.v1',
     partnerLogoPosition: 'top-left',
@@ -495,9 +510,9 @@ export function upsertMarketingBannerItem(item: Partial<MarketingBannerRecord>) 
     id: nextId,
     title: item.title?.trim() || existing?.title || 'بنر جديد',
     subtitle: item.subtitle?.trim() || existing?.subtitle || 'أضف نصًا مختصرًا وواضحًا هنا',
-    imageUrl: item.imageUrl?.trim() || existing?.imageUrl || existing?.mediaKey || createBannerDataUrl(item.accentColor?.trim() || colorPalette.brand, colorPalette.brandStrong, item.title?.trim() || 'بنر جديد', item.subtitle?.trim() || 'أضف النص هنا'),
+    imageUrl: item.imageUrl?.trim() || existing?.imageUrl || existing?.mediaKey || createBannerDataUrl(item.accentColor?.trim() || _P.brand, _P.brandStrong, item.title?.trim() || 'بنر جديد', item.subtitle?.trim() || 'أضف النص هنا'),
     mediaKey: item.mediaKey?.trim() || existing?.mediaKey,
-    accentColor: item.accentColor?.trim() || existing?.accentColor || colorPalette.brand,
+    accentColor: item.accentColor?.trim() || existing?.accentColor || _P.brand,
     audience: item.audience || existing?.audience || 'all',
     status: item.status || existing?.status || 'draft',
     actionType: item.actionType || existing?.actionType || 'external',

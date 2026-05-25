@@ -1,4 +1,4 @@
-import type { AdminRole, MockAdminUser, PlatformPermission } from '../control-panel/administration/administration.types';
+import type { AdminRole, MockAdminUser, PlatformPermission } from '../shared/dsh-cp-administration.contract';
 
 export const ADMIN_ROLES: readonly AdminRole[] = [
   {

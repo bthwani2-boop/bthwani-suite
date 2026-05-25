@@ -1,5 +1,6 @@
-
-import { colorPalette } from '@bthwani/ui-kit';
+// Inline hex values derived from ui-kit/src/foundation.ts rawColorPalettes.
+// dsh/frontend/data must not import from @bthwani/ui-kit.
+const _P = { white: '#FFFFFF', brandStrong: '#0A2F5C' } as const;
 import { MarketingBannerActionType } from './banner.preview-store';
 
 /**
@@ -56,7 +57,7 @@ const seededPromos: HomePromoRecord[] = [
     subtitle: 'توصيل شبه مجاني لكل طلباتك!',
     badgeText: '',
     ctaText: 'اشترك الآن!',
-    accentColor: colorPalette.white,
+    accentColor: _P.white,
     imageUrl: 'dsh.mascot.robot.v1',
     thumbnail: '',
     targetType: 'subscription',
@@ -74,7 +75,7 @@ const seededPromos: HomePromoRecord[] = [
     subtitle: 'منتجات عضوية طازجة يومياً',
     badgeText: '',
     ctaText: 'تسوق الآن',
-    accentColor: colorPalette.white,
+    accentColor: _P.white,
     imageUrl: 'dsh.banner.home.promo-4.v1',
     thumbnail: '',
     targetType: 'store',
@@ -127,7 +128,7 @@ export function upsertHomePromoItem(item: Partial<HomePromoRecord>) {
     subtitle: item.subtitle || existing?.subtitle || 'وصف مختصر للبرومو',
     badgeText: item.badgeText || existing?.badgeText || '',
     ctaText: item.ctaText || existing?.ctaText || 'افتح الآن',
-    accentColor: item.accentColor || existing?.accentColor || colorPalette.brandStrong,
+    accentColor: item.accentColor || existing?.accentColor || _P.brandStrong,
     imageUrl: item.imageUrl || existing?.imageUrl || '',
     thumbnail: item.thumbnail || existing?.thumbnail || '',
     targetType: item.targetType || existing?.targetType || 'custom',

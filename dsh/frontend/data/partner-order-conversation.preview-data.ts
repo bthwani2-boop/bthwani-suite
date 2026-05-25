@@ -1,4 +1,4 @@
-import type { DshFulfillmentDeliveryMode } from '../app-client/contracts/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 
 // UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
 export const dshPartnerOrderConversationPreviewDataContract = {

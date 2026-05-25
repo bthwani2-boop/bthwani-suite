@@ -13,13 +13,13 @@ export type {
 	DshStoreFixtureItem,
 	MeasurementOption,
 	StoreItemsByStoreId,
-} from '../app-client/dsh-client.types';
+} from '../shared/dshStoreProductCardModel';
 export {
 	buildStoreCategories,
 	buildStoreDeliveryModes,
 	buildStoreTags,
-	buildersDataContract,
-} from '../app-client/shared/store-builders';
+	dshStoreBuildersContractMeta as buildersDataContract,
+} from '../shared/dsh-store-builders';
 export {
 	dshDiscoveryStores,
 	dshDiscoveryStoresDataContract,

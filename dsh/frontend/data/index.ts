@@ -35,9 +35,6 @@ export * from './field-state.preview-data';
 export * from './field-visit.preview-data';
 export * from './field-finance.preview-data';
 
-// app-field storage helper
-export * from './field-onboarding.storage';
-
 // app-partner surface preview data
 export * from './partner-order-alert.preview-data';
 export * from './partner-order-conversation.preview-data';

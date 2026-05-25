@@ -1,4 +1,4 @@
-import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from '../control-panel/operations/operations.types';
+import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from '../shared/dsh-cp-operations.contract';
 import type { DshOrderLifecycleStatus } from '../shared/dsh-order-journey.model';
 
 /**

@@ -10,7 +10,7 @@ import { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboarding
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
 import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
-import { readFieldStoresLocal, writeFieldStoresLocal } from '../data/field-onboarding.storage';
+import { readFieldStoresLocal, writeFieldStoresLocal } from './storage/field-onboarding.storage';
 import {
   createManualFieldStore,
   submitFieldStoreForReview,

@@ -1,10 +1,12 @@
 import { dshDiscoveryStores } from './discovery.preview-data';
 import type { DshDiscoveryStore } from '../shared/dshStoreProductCardModel';
-import type {
-	DiscoveryFilter,
-	DshServiceId,
-} from '../app-client/contracts/dsh-home-types';
-import { brandPalette, dangerPalette, infoPalette, successPalette } from '@bthwani/ui-kit';
+import type { DiscoveryFilter, DshServiceId } from '../shared/dsh-discovery.contract';
+// Semantic color tokens resolved via shared/dsh-preview-color.
+import { resolvePreviewColor as _rpc } from '../shared/dsh-preview-color';
+const _brandPalette = { 400: _rpc('brand.400'), 500: _rpc('brand.500'), 600: _rpc('brand.600') };
+const _dangerPalette = { 400: _rpc('danger.400'), 600: _rpc('danger.600') };
+const _infoPalette = { 600: _rpc('info.600'), 700: _rpc('info.700') };
+const _successPalette = { 600: _rpc('success.600') };
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
@@ -245,7 +247,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'تخفيضات حصرية',
 		subtitle: 'خصم 30% على طلبك الأول عبر التطبيق',
 		icon: '🔥',
-		accentColor: brandPalette[500],
+		accentColor: _brandPalette[500],
 		actionType: 'main_category',
 		actionTarget: 'restaurants',
 	},
@@ -255,7 +257,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'تتبع طلبك',
 		subtitle: 'تابع حالة طلبك مباشرة وبدقة عالية',
 		icon: '📍',
-		accentColor: infoPalette[600],
+		accentColor: _infoPalette[600],
 		actionType: 'store',
 		actionTarget: 'store-1001',
 	},
@@ -265,7 +267,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'خضروات طازجة',
 		subtitle: 'أفضل الفواكه والخضروات تصلك لباب المنزل',
 		icon: '✨',
-		accentColor: dangerPalette[600],
+		accentColor: _dangerPalette[600],
 		actionType: 'sub_category',
 		actionTarget: 'grocery',
 		actionExtra: 'grocery_vegetables_fruits',
@@ -276,7 +278,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'وجبات عائلية',
 		subtitle: 'وفر 40% على منيو العائلة اليوم',
 		icon: '🍽️',
-		accentColor: successPalette[600],
+		accentColor: _successPalette[600],
 		actionType: 'main_category',
 		actionTarget: 'restaurants',
 	},
@@ -286,7 +288,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'حلويات ومشروبات',
 		subtitle: 'أشهى الحلويات والعصائر الطازجة بخطوة واحدة',
 		icon: '🧃',
-		accentColor: brandPalette[400],
+		accentColor: _brandPalette[400],
 		actionType: 'main_category',
 		actionTarget: 'sweets_juices',
 	},
@@ -296,7 +298,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'مخابز حطين',
 		subtitle: 'خبز طازج يومياً مع توصيل مجاني',
 		icon: '🍞',
-		accentColor: dangerPalette[400],
+		accentColor: _dangerPalette[400],
 		actionType: 'store',
 		actionTarget: 'store-1002',
 	},
@@ -306,7 +308,7 @@ export const dshHomeGetFixturePromos: DshHomeGetFixturePromo[] = [
 		title: 'اشتراك بثواني برو',
 		subtitle: 'توصيل مجاني غير محدود + عروض حصرية',
 		icon: '⭐',
-		accentColor: infoPalette[700],
+		accentColor: _infoPalette[700],
 		actionType: 'subscription',
 		actionTarget: 'subscription-family-get',
 	},
