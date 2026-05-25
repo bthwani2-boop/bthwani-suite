@@ -40,7 +40,7 @@ export type DshClientSurfaceProps = {
 
 export type DshSurfaceHostProps = DshClientSurfaceProps;
 
-export type { DshClientState } from './data/client-state.preview-data';
+export type { DshClientState } from '../data/client-state.preview-data';
 export type {
 	DshClientBindingError,
 	DshClientCartLine,

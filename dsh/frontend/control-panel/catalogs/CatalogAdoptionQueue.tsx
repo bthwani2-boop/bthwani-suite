@@ -8,7 +8,7 @@ import {
   activateClientVisible,
   returnToMarketing,
   rejectFromCatalog,
-} from '../../shared/catalog-adoption.preview-store';
+} from '../../data/catalog-adoption.preview-store';
 import { ApprovalRecord, ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../shared/workflow';
 
 export function CatalogAdoptionQueue() {

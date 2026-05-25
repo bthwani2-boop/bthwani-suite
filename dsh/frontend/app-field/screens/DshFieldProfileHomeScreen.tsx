@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { AppearanceOptionCard, Badge, Box, Button, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import { resolveFieldFilterCounts, type FieldStoreFile } from '../data/field-stores.preview-data';
+import { resolveFieldFilterCounts, type FieldStoreFile } from '../../data/field-stores.preview-data';
 
 const fieldAppearanceOptions: ReadonlyArray<{
   mode: BThwaniAppearanceMode;

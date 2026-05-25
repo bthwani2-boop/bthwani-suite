@@ -17,7 +17,7 @@ import {
   type MarketingBannerMotionStyle,
   type MarketingBannerRecord,
   type MarketingBannerStatus,
-} from '../../shared/banner.preview-store';
+} from '../../data/banner.preview-store';
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
 import { dshDiscoveryStores } from '../../data/discovery.preview-data';
 import { storeItemsByStoreId } from '../../data/items.preview-data';

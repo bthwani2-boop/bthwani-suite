@@ -3,7 +3,7 @@ import {
   getCatalogQueueRecords,
   getClientVisibleRecords as _getClientVisible,
   moveApprovalRecordToStage,
-} from './workflow';
+} from '../shared/workflow';
 
 // =====================================================================
 // catalog-adoption-store.ts — Compatibility layer over shared workflow store

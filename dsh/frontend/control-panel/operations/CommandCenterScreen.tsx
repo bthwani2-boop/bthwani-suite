@@ -18,7 +18,7 @@ import {
   OPERATIONS_PULSE_METRICS,
   DSH_SERVICE_HEALTH_PREVIEW,
   DSH_WLT_FINANCE_ALERTS_PREVIEW,
-} from './operations.preview-data';
+} from '../../data/cp-operations.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/dsh-signal-layer.model';

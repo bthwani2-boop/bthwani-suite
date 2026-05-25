@@ -11,7 +11,7 @@ import {
   useTheme,
   ActionStrip,
 } from '@bthwani/ui-kit';
-import { loyaltyRewardsFixture } from '../data/loyalty-commercial.preview-data';
+import { loyaltyRewardsFixture } from '../../data/loyalty-commercial.preview-data';
 
 export type DshLoyaltyRewardsScreenProps = {
   title?: string;

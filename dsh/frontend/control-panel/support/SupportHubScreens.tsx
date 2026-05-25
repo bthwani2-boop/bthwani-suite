@@ -26,7 +26,7 @@ import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
 import {
   getOperationsSupportFlowPreview,
   type DshOperationsSupportFlowId,
-} from '../../shared/operations-support.preview';
+} from '../../data/operations-support.preview';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,

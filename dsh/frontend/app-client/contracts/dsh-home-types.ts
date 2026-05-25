@@ -1,5 +1,5 @@
-import type { MarketingVideoRecord } from '../../shared/video.preview-store';
-import type { HomePromoRecord } from '../../shared/promo.preview-store';
+import type { MarketingVideoRecord } from '../../data/video.preview-store';
+import type { HomePromoRecord } from '../../data/promo.preview-store';
 import type { CommercialSourceMap } from '../../shared/store-card-commercial-map';
 import type { DshPartnerVisibilityBadge } from '../../shared/dsh-partner-activation.model';
 

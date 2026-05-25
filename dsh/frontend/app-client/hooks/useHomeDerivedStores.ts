@@ -1,11 +1,11 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import type {
   DshHomeCategory,
   DshHomeGetStore,
   DiscoveryFilter,
   StorePagerPage,
 } from '../contracts/dsh-home-types';
-import type { HomePromoRecord } from '../../shared/promo.preview-store';
+import type { HomePromoRecord } from '../../data/promo.preview-store';
 import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
 import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import {
@@ -15,7 +15,7 @@ import {
 import { resolveHomePromoPublishStage } from '../shared/home-promo-mappers';
 import { resolveHomeStoresForCategory } from '../shared/home-search-helpers';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
-import { getPublishedHomePromos } from '../../shared/promo.preview-store';
+import { getPublishedHomePromos } from '../../data/promo.preview-store';
 import { canRenderInClientSurface } from '../../shared/workflow';
 
 type UseHomeDerivedStoresParams = {

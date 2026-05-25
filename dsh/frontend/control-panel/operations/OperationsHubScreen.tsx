@@ -14,7 +14,7 @@ import {
   OPERATIONS_CANONICAL_GROUPS,
   resolveOperationsStateCopy,
 } from './operations.registry';
-import { OPERATIONS_PULSE_METRICS } from './operations.preview-data';
+import { OPERATIONS_PULSE_METRICS } from '../../data/cp-operations.preview-data';
 import type {
   CanonicalOperationsGroupId,
   OperationsFocusParams,

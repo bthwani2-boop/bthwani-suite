@@ -9,7 +9,7 @@ import {
 import {
   EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
   EXCEPTION_TICKET_MAP,
-} from './operations.preview-data';
+} from '../../data/cp-operations.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';

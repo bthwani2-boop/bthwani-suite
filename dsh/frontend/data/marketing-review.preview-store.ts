@@ -4,7 +4,7 @@ import {
   getAllApprovalRecords,
   moveApprovalRecordToStage,
   upsertApprovalRecord,
-} from './workflow';
+} from '../shared/workflow';
 
 // =====================================================================
 // marketing-review-store.ts — DSH Media & Product Review SSOT v2

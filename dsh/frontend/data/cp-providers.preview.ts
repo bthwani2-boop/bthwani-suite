@@ -1,4 +1,4 @@
-import { ProviderRecord } from './providers.types';
+import { ProviderRecord } from '../control-panel/platform/Providers/providers.types';
 
 /** Masked credential placeholder — never show real keys */
 const MASKED = '●●●●●●●●●●●●●';

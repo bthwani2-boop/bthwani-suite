@@ -22,7 +22,7 @@ import type {
   DshPartnerSupportRouteId,
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
-import { getOperationsSupportFlowPreview } from '../../shared/operations-support.preview';
+import { getOperationsSupportFlowPreview } from '../../data/operations-support.preview';
 import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 

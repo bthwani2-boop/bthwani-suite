@@ -3,13 +3,13 @@
  * Derives display fixtures from shared loyalty.preview-store + commercial.preview-contract helpers.
  * NOT a source of truth. Do not add raw fixture data here.
  */
-import { getLoyaltyPrograms, getLoyaltyRewards, getLoyaltyTiers } from '../../shared/loyalty.preview-store';
+import { getLoyaltyPrograms, getLoyaltyRewards, getLoyaltyTiers } from './loyalty.preview-store';
 import {
   mapLoyaltyProgramToClientBenefits,
   type LoyaltyClientBenefits,
   type LoyaltyClientSection,
   type LoyaltyClientMetric,
-} from '../../shared/commercial.preview-contract';
+} from './commercial.preview-contract';
 
 export type LoyaltyBenefitMode = 'loyalty';
 

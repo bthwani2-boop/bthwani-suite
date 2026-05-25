@@ -1,15 +1,15 @@
-import type { DshControlPanelSectionId } from './dsh-governance.map';
+import type { DshControlPanelSectionId } from '../shared/dsh-governance.map';
 import {
   DSH_DELIVERY_MODE_DEFINITIONS,
   getDshDeliveryModeDefinition,
   type DshFulfillmentDeliveryMode,
-} from './dsh-delivery-mode.model';
-import type { DshOnDemandPolicy, DshSurfaceId } from './dsh-flow-registry';
+} from '../shared/dsh-delivery-mode.model';
+import type { DshOnDemandPolicy, DshSurfaceId } from '../shared/dsh-flow-registry';
 import {
   getDshSignalActorRoute,
   type DshSignalEventKind,
   type DshSignalPriority,
-} from './dsh-signal-layer.model';
+} from '../shared/dsh-signal-layer.model';
 
 export type DshPreviewPlaceholderStatus =
   | 'ACCEPTED_PREVIEW_LABEL'

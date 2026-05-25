@@ -5,7 +5,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from './operations.preview-data';
+import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/cp-operations.preview-data';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 import { Box, useTheme } from '@bthwani/ui-kit';

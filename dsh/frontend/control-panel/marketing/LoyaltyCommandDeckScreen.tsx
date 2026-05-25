@@ -18,7 +18,7 @@ import {
   getLoyaltyRewards,
   getLoyaltyTiers,
   getSubscriptionPlans,
-} from '../../shared/loyalty.preview-store';
+} from '../../data/loyalty.preview-store';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
 

@@ -1,4 +1,4 @@
-import type { DshSurfaceId } from '../shared';
+import type { DshSurfaceId } from '../shared/dsh-flow-registry';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.

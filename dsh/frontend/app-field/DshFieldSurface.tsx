@@ -10,13 +10,13 @@ import { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboarding
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
 import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
-import { readFieldStoresLocal, writeFieldStoresLocal } from './data/field-onboarding.storage';
+import { readFieldStoresLocal, writeFieldStoresLocal } from '../data/field-onboarding.storage';
 import {
   createManualFieldStore,
   submitFieldStoreForReview,
   touchFieldStoreDraft,
   type FieldStoreFile,
-} from './data/field-stores.preview-data';
+} from '../data/field-stores.preview-data';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 
 type DshFieldReadinessEscalationState = NonNullable<React.ComponentProps<typeof DshFieldReadinessEscalationScreen>['state']>;

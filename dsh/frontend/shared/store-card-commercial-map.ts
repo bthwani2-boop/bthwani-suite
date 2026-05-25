@@ -1,7 +1,7 @@
-import type { PartnerOfferRecord } from './partner-offer.preview-store';
-import type { SubscriptionPlan, Entitlement } from './loyalty.preview-store';
-import type { CampaignRecord } from './campaign.preview-store';
-import type { CommercialConflict } from './commercial.preview-contract';
+import type { PartnerOfferRecord } from '../data/partner-offer.preview-store';
+import type { SubscriptionPlan, Entitlement } from '../data/loyalty.preview-store';
+import type { CampaignRecord } from '../data/campaign.preview-store';
+import type { CommercialConflict } from '../data/commercial.preview-contract';
 import {
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,

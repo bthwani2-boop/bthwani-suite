@@ -1,5 +1,5 @@
-import type { DshControlPanelSectionId } from './dsh-governance.map';
-import type { DshOnDemandPolicy } from './dsh-flow-registry';
+import type { DshControlPanelSectionId } from '../shared/dsh-governance.map';
+import type { DshOnDemandPolicy } from '../shared/dsh-flow-registry';
 
 export type DshOpsInterventionPlaybook = {
   readonly playbookId: string;

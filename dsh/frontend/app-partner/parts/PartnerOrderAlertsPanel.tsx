@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, Chip, ListItem, StateView, Surface, Text } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId } from '../dsh-partner.types';
-import type { DshPartnerOrderAlertItem } from '../data/partner-order-alert.preview-data';
+import type { DshPartnerOrderAlertItem } from '../../data/partner-order-alert.preview-data';
 
 type DshPartnerOrderAlertsPanelState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -20,7 +20,7 @@ const defaultItems: DshPartnerOrderAlertItem[] = [
     orderId: 'ord-4401',
     alertId: 'order_needs_accept',
     title: 'طلب يحتاج قبولًا فوريًا',
-    description: 'الطلب #4401 دخل الآن إلى الفرع ويحتاج قرار قبول سريع قبل بدء التجهيز.',
+    description: 'الطلب 4401 دخل الآن إلى الفرع ويحتاج قرار قبول سريع قبل بدء التجهيز.',
     timeLabel: 'منذ دقيقتين',
     status: 'new',
     urgent: true,
@@ -30,7 +30,7 @@ const defaultItems: DshPartnerOrderAlertItem[] = [
     orderId: 'ord-4391',
     alertId: 'order_ready',
     title: 'طلب جاهز للتسليم',
-    description: 'الطلب #4391 أصبح جاهزًا ويحتاج نقلًا فوريًا إلى مسار التسليم للكابتن.',
+    description: 'الطلب 4391 أصبح جاهزًا ويحتاج نقلًا فوريًا إلى مسار التسليم للكابتن.',
     timeLabel: 'منذ 5 دقائق',
     status: 'new',
   },
@@ -39,7 +39,7 @@ const defaultItems: DshPartnerOrderAlertItem[] = [
     orderId: 'ord-4385',
     alertId: 'order_handoff_pending',
     title: 'تسليم للكابتن بانتظار الإغلاق',
-    description: 'الطلب #4385 بانتظار تثبيت التسليم للكابتن من نفس دورة الطلب.',
+    description: 'الطلب 4385 بانتظار تثبيت التسليم للكابتن من نفس دورة الطلب.',
     timeLabel: 'منذ 9 دقائق',
     status: 'seen',
   },
@@ -48,7 +48,7 @@ const defaultItems: DshPartnerOrderAlertItem[] = [
     orderId: 'ord-4359',
     alertId: 'order_issue_required',
     title: 'طلب يحتاج معالجة مشكلة',
-    description: 'الطلب #4359 يحتاج قرارًا واضحًا بسبب نقص عنصر بعد القبول.',
+    description: 'الطلب 4359 يحتاج قرارًا واضحًا بسبب نقص عنصر بعد القبول.',
     timeLabel: 'منذ 14 دقيقة',
     status: 'new',
     urgent: true,

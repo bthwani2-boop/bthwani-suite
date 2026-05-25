@@ -1,5 +1,5 @@
-import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from './operations.types';
-import type { DshOrderLifecycleStatus } from '../../shared/dsh-order-journey.model';
+import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from '../control-panel/operations/operations.types';
+import type { DshOrderLifecycleStatus } from '../shared/dsh-order-journey.model';
 
 /**
  * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.

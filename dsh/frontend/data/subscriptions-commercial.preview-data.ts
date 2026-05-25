@@ -3,11 +3,11 @@
  * Derives subscription plan cards from shared loyalty.preview-store + commercial.preview-contract helpers.
  * NOT a source of truth. Do not add raw fixture data here.
  */
-import { getSubscriptionPlans } from '../../shared/loyalty.preview-store';
+import { getSubscriptionPlans } from './loyalty.preview-store';
 import {
   mapSubscriptionPlansToClientCards,
   type SubscriptionClientCard,
-} from '../../shared/commercial.preview-contract';
+} from './commercial.preview-contract';
 
 export type SubscriptionPlanCard = SubscriptionClientCard;
 

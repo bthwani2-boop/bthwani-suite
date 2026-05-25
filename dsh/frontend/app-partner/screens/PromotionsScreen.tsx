@@ -17,7 +17,7 @@ import {
   type PartnerOfferRecord,
   type PartnerOfferStatus,
   type PartnerOfferType,
-} from '../../shared/partner-offer.preview-store';
+} from '../../data/partner-offer.preview-store';
 import {
   getPartnerOfferVisibilityRecord,
 } from '../../shared/marketing-visibility.contract';

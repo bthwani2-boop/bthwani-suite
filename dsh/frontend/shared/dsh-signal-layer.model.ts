@@ -9,7 +9,7 @@
  * and which route opens on action — ensuring every signal has a destination.
  */
 
-import { getMediaReviewItems, type MediaReviewRecord } from './marketing-review.preview-store';
+import { getMediaReviewItems, type MediaReviewRecord } from '../data/marketing-review.preview-store';
 
 // ─── Event Kinds ─────────────────────────────────────────────────────────────
 

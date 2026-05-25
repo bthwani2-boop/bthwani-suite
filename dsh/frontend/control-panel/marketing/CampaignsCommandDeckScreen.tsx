@@ -18,10 +18,10 @@ import {
   type CampaignChannel,
   type CampaignPriority,
   type CampaignTargetType,
-} from '../../shared/campaign.preview-store';
+} from '../../data/campaign.preview-store';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import type { Entitlement } from '../../shared/loyalty.preview-store';
+import type { Entitlement } from '../../data/loyalty.preview-store';
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 

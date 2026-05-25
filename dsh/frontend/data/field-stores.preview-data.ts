@@ -2,8 +2,8 @@ import {
   type DshCanonicalProductCard,
   type DshCanonicalPublishStage,
   type DshCanonicalStoreCard,
-} from '../../shared/dshStoreProductCardModel';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+} from '../shared/dshStoreProductCardModel';
+import type { DshFulfillmentDeliveryMode } from '../app-client/contracts/dsh-client-binding.contracts';
 
 export type FieldFulfillmentMode = DshFulfillmentDeliveryMode;
 

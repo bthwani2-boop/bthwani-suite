@@ -1,9 +1,9 @@
 import { dshDiscoveryStores } from './discovery.preview-data';
-import type { DshDiscoveryStore } from '../types';
+import type { DshDiscoveryStore } from '../shared/dshStoreProductCardModel';
 import type {
 	DiscoveryFilter,
 	DshServiceId,
-} from '../contracts/dsh-home-types';
+} from '../app-client/contracts/dsh-home-types';
 import { brandPalette, dangerPalette, infoPalette, successPalette } from '@bthwani/ui-kit';
 
 /**

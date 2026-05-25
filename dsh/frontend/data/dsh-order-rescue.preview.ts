@@ -1,4 +1,4 @@
-import type { DshOnDemandPolicy } from './dsh-flow-registry';
+import type { DshOnDemandPolicy } from '../shared/dsh-flow-registry';
 import {
   buildDshSignalRoutePreview,
   type DshGlobalControlLink,

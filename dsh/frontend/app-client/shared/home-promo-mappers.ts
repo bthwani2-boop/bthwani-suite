@@ -1,4 +1,4 @@
-import type { HomePromoRecord } from '../../shared/promo.preview-store';
+import type { HomePromoRecord } from '../../data/promo.preview-store';
 
 import type {
   DshHomeBannerActionType,

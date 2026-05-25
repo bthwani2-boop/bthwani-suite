@@ -1,4 +1,4 @@
-import { AppearanceRecord } from './appearance.types';
+import { AppearanceRecord } from '../control-panel/platform/Appearance/appearance.types';
 
 export const PREVIEW_APPEARANCE_RECORDS: readonly AppearanceRecord[] = [
   {
@@ -43,7 +43,7 @@ export const PREVIEW_APPEARANCE_RECORDS: readonly AppearanceRecord[] = [
     auditRollbackHint: 'Requires DesignSystem approval. Rollback to Global Tokens.',
     centralColorSystemNote: 'أي override لا يعني نظام ألوان محلي. يجب استخدام Design System Tokens.',
     reason: 'Operational dashboard readability',
-    evidence: 'UX Research Ticket #502',
+    evidence: 'UX Research Ticket 502',
     rollbackTarget: 'Global Tokens',
   },
 ];

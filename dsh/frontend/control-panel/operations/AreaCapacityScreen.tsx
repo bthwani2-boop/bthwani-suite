@@ -5,7 +5,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../../data/cp-operations.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 

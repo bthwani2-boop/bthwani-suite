@@ -9,7 +9,7 @@ import {
 import {
   DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
   DISPATCH_LIFECYCLE_STATE_MAP,
-} from './operations.preview-data';
+} from '../../data/cp-operations.preview-data';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';

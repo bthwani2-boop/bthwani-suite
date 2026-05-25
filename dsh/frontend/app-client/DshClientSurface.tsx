@@ -27,28 +27,28 @@ import {
 } from './screens/OperationScreens';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
 import { DshIdentityHubScreen, DshPreferencesHubScreen } from './screens/MySpaceSubScreens';
-import { dshHomeGetFixtureStores } from './data/home.preview-data';
+import { dshHomeGetFixtureStores } from '../data/home.preview-data';
 import {
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
   dshDiscoveryStores,
   storeItemsByStoreId,
-} from './data/store.preview-data';
+} from '../data/store.preview-data';
 import {
   recordMarketingBannerClick,
   recordMarketingBannerImpression,
   getPublishedMarketingHomePromos,
-} from '../shared/banner.preview-store';
+} from '../data/banner.preview-store';
 import {
   getLiveMarketingGrowthItems,
   recordMarketingGrowthClick,
   recordMarketingGrowthImpression,
   type MarketingGrowthRecord,
-} from '../shared/growth.preview-store';
-import { getDshClientStateMeta, type DshClientState } from './data/client-state.preview-data';
-import { getPublishedHomePromos } from '../shared/promo.preview-store';
-import { dshCategoryFixtures, dshCategoryListFixtures } from './data/categories.preview-data';
+} from '../data/growth.preview-store';
+import { getDshClientStateMeta, type DshClientState } from '../data/client-state.preview-data';
+import { getPublishedHomePromos } from '../data/promo.preview-store';
+import { dshCategoryFixtures, dshCategoryListFixtures } from '../data/categories.preview-data';
 import {
   isDshFulfillmentDeliveryMode,
   type DshClientCreateOrderRequest,

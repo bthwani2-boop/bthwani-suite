@@ -41,7 +41,7 @@ import {
   type MarketingNewsTickerStatus,
   type MarketingNewsTickerDeliveryMode,
   type MarketingNewsTickerKind,
-} from '../../shared/news-ticker.preview-store';
+} from '../../data/news-ticker.preview-store';
 import { dshPromotionCandidates } from '../../shared/workflow';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import {
@@ -51,19 +51,19 @@ import {
   type CampaignRecord,
   type CampaignStatus,
   type CampaignTargetType,
-} from '../../shared/campaign.preview-store';
+} from '../../data/campaign.preview-store';
 import {
   getPartnerOfferItems,
   type PartnerOfferRecord,
   type PartnerOfferStatus,
-} from '../../shared/partner-offer.preview-store';
+} from '../../data/partner-offer.preview-store';
 import {
   buildCommercialProjection,
   isClientVisibleStatus,
   type CommercialCampaign,
   type CommercialLifecycleStatus,
   type PartnerOffer,
-} from '../../shared/commercial.preview-contract';
+} from '../../data/commercial.preview-contract';
 import {
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,

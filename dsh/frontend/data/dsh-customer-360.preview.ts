@@ -1,5 +1,5 @@
-import type { DshControlPanelSectionId } from './dsh-governance.map';
-import type { DshOnDemandPolicy } from './dsh-flow-registry';
+import type { DshControlPanelSectionId } from '../shared/dsh-governance.map';
+import type { DshOnDemandPolicy } from '../shared/dsh-flow-registry';
 import {
   buildDshSignalRoutePreview,
   type DshGlobalControlLink,
@@ -9,7 +9,7 @@ import {
   type DshRouteHintedAction,
   type DshVerificationStatus,
 } from './dsh-assisted-order.preview';
-import type { DshFulfillmentDeliveryMode } from './dsh-delivery-mode.model';
+import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 
 export type DshCustomer360VerificationStatus = DshVerificationStatus;
 

@@ -1,4 +1,4 @@
-import type { DshUnifiedRecommendation } from './recommendation.preview-data';
+import type { DshUnifiedRecommendation } from './cp-recommendation.preview-data';
 
 /**
  * UI_PREVIEW_ONLY: Cross-surface journey closure examples.
@@ -90,7 +90,7 @@ export const DSH_CROSS_SURFACE_JOURNEYS: readonly DshUnifiedRecommendation[] = [
     risk: 'توقف المسار',
     severity: 'critical',
     confidence: 'high',
-    affectedEntity: 'طلب #8822',
+    affectedEntity: 'طلب 8822',
     reason: 'الكابتن وصل للمتجر لكن الطلب غير موجود في النظام المحلي للمتجر.',
     evidence: 'رسالة خطأ في الربط التقني للمتجر.',
     nextAction: 'تصعيد الدعم التقني لحل تعارض النظام',

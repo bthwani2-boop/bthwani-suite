@@ -1362,5 +1362,5 @@ export function getDshFlowRegistryValidationSummary(): DshFlowRegistryValidation
   };
 }
 
-export { DSH_ORDER_RESCUE_PREVIEW } from './dsh-order-rescue.preview';
-export { DSH_OPS_INTERVENTION_PLAYBOOKS } from './dsh-ops-intervention-playbook.preview';
+export { DSH_ORDER_RESCUE_PREVIEW } from '../data/dsh-order-rescue.preview';
+export { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../data/dsh-ops-intervention-playbook.preview';

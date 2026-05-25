@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Share } from 'react-native';
-import { getDshClientStateMeta } from '../data/client-state.preview-data';
+import { getDshClientStateMeta } from '../../data/client-state.preview-data';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import {
   normalizeDisplayText,

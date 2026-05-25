@@ -1,4 +1,4 @@
-import type { DshClientState } from '../data/client-state.preview-data';
+import type { DshClientState } from '../../data/client-state.preview-data';
 
 export type DshClientId = string;
 

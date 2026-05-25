@@ -32,7 +32,7 @@ export type {
   LoyaltyClientBenefits,
   CommercialEligibilityContext,
   CommercialProjectionInput,
-} from './commercial.preview-contract';
+} from '../data/commercial.preview-contract';
 export {
   commercialContractMeta,
   isClientVisibleStatus,
@@ -54,7 +54,7 @@ export {
   mapRewardsToClientSections,
   mapPartnerOfferToCommercialOffer,
   mapCampaignToCommercialProjection,
-} from './commercial.preview-contract';
+} from '../data/commercial.preview-contract';
 
 export type {
 	MarketingRouteHint,
@@ -90,7 +90,7 @@ export type {
   Entitlement,
   EarningRule,
   RedemptionRule,
-} from './loyalty.preview-store';
+} from '../data/loyalty.preview-store';
 export {
   loyaltyStoreDataContract,
   getLoyaltyItems,
@@ -102,7 +102,7 @@ export {
   getLoyaltyTiers,
   getLoyaltyRewards,
   getEntitlements,
-} from './loyalty.preview-store';
+} from '../data/loyalty.preview-store';
 
 export type {
   PartnerOfferType,
@@ -110,7 +110,7 @@ export type {
   PartnerOfferSource,
   PartnerOfferTarget,
   PartnerOfferRecord,
-} from './partner-offer.preview-store';
+} from '../data/partner-offer.preview-store';
 export {
   partnerOfferStoreDataContract,
   getPartnerOfferItems,
@@ -123,7 +123,7 @@ export {
   archivePartnerOfferItem,
   removePartnerOfferItem,
   isPartnerOfferClientVisible,
-} from './partner-offer.preview-store';
+} from '../data/partner-offer.preview-store';
 
 export type {
   CampaignStatus,
@@ -134,7 +134,7 @@ export type {
   CampaignPriority,
   CampaignTargetType,
   CampaignRecord,
-} from './campaign.preview-store';
+} from '../data/campaign.preview-store';
 export {
   campaignStoreDataContract,
   getCampaignItems,
@@ -143,12 +143,12 @@ export {
   toggleCampaignStatus,
   duplicateCampaignItem,
   removeCampaignItem,
-} from './campaign.preview-store';
+} from '../data/campaign.preview-store';
 
 export type {
   HomePromoStatus,
   HomePromoRecord,
-} from './promo.preview-store';
+} from '../data/promo.preview-store';
 export {
   promoStoreDataContract,
   getHomePromoItems,
@@ -157,7 +157,7 @@ export {
   upsertHomePromoItem,
   removeHomePromoItem,
   toggleHomePromoStatus,
-} from './promo.preview-store';
+} from '../data/promo.preview-store';
 
 export type {
   CommercialSource,
@@ -210,7 +210,7 @@ export type {
 	MarketingBannerMotionStyle,
 	MarketingBannerRecord,
 	MarketingBannerStatus,
-} from './banner.preview-store';
+} from '../data/banner.preview-store';
 export {
 	bannerStoreDataContract,
 	computeMarketingBannerQuality,
@@ -225,7 +225,7 @@ export {
 	removeMarketingBannerItem,
 	toggleMarketingBannerStatus,
 	upsertMarketingBannerItem,
-} from './banner.preview-store';
+} from '../data/banner.preview-store';
 
 export type {
 	GrowthRecommendation,
@@ -236,7 +236,7 @@ export type {
 	MarketingGrowthRouteTarget,
 	MarketingGrowthSource,
 	MarketingGrowthStatus,
-} from './growth.preview-store';
+} from '../data/growth.preview-store';
 export {
 	approveMarketingGrowthItem,
 	duplicateMarketingGrowthItem,
@@ -250,7 +250,7 @@ export {
 	submitMarketingGrowthItem,
 	toggleMarketingGrowthStatus,
 	upsertMarketingGrowthItem,
-} from './growth.preview-store';
+} from '../data/growth.preview-store';
 
 export type {
 	ApprovalEntityType,
@@ -307,7 +307,7 @@ export type {
 	MarketingTickerPlanLane,
 	MarketingTickerPlanReason,
 	MarketingTickerPlanState,
-} from './news-ticker.preview-store';
+} from '../data/news-ticker.preview-store';
 export {
 	buildMarketingTickerPlan,
 	createMarketingTickerDraft,
@@ -328,7 +328,7 @@ export {
 	toggleMarketingTickerPinned,
 	toggleMarketingTickerStatus,
 	upsertMarketingTickerItem,
-} from './news-ticker.preview-store';
+} from '../data/news-ticker.preview-store';
 
 // --- DSH Approval Pipeline SSOT v1 ---
 // partner-intake-store was consolidated into workflow.ts
@@ -336,7 +336,7 @@ export {
 export type {
 	MediaPolicyKind,
 	MediaReviewRecord,
-} from './marketing-review.preview-store';
+} from '../data/marketing-review.preview-store';
 export {
 	approveMediaReviewItem,
 	getMarketingReviewItems,
@@ -347,7 +347,7 @@ export {
 	requestMediaFix,
 	sendMediaToCatalog,
 	upsertMediaReviewItem,
-} from './marketing-review.preview-store';
+} from '../data/marketing-review.preview-store';
 export {
 	activateClientVisible,
 	adoptCatalogCentral,
@@ -357,7 +357,7 @@ export {
 	getClientVisibleItems,
 	rejectFromCatalog,
 	returnToMarketing,
-} from './catalog-adoption.preview-store';
+} from '../data/catalog-adoption.preview-store';
 
 // --- Shared Media Resolver ---
 export { resolveDshImageSource } from './resolve-dsh-image-source';
@@ -587,13 +587,13 @@ export type {
 	DshSupportTicketActorKind,
 	DshSupportTicketMessage,
 	DshSupportTicket,
-} from './operations-support.preview';
+} from '../data/operations-support.preview';
 export {
 	getDshSupportTicketStatusLabel,
 	getDshSupportTicketStatusTone,
 	DSH_DEMO_SUPPORT_TICKETS,
 	getDshSupportTicketById,
-} from './operations-support.preview';
+} from '../data/operations-support.preview';
 
 // --- P0-09: DSH Role & Permission Model ---
 // UI-only RBAC preview — no runtime auth, no backend RBAC binding.
@@ -642,13 +642,13 @@ export type {
   DshAssistedOrderCartItem,
   DshAssistedOrderDeliveryModeOption,
   DshAssistedOrderPreview,
-} from './dsh-assisted-order.preview';
+} from '../data/dsh-assisted-order.preview';
 export {
   buildDshSignalRoutePreview,
   DSH_ASSISTED_ORDER_PREVIEW,
   getDshAssistedOrderById,
   getDshAssistedOrderByContext,
-} from './dsh-assisted-order.preview';
+} from '../data/dsh-assisted-order.preview';
 
 export type {
   DshCustomer360VerificationStatus,
@@ -658,25 +658,25 @@ export type {
   DshCustomer360TicketHistoryEntry,
   DshCustomer360NoteEntry,
   DshCustomer360Record,
-} from './dsh-customer-360.preview';
+} from '../data/dsh-customer-360.preview';
 export {
   DSH_CUSTOMER_360_PREVIEW,
   getDshCustomer360Record,
   getDshCustomer360ByContext,
   getDshCustomer360SectionOwnerLabel,
-} from './dsh-customer-360.preview';
+} from '../data/dsh-customer-360.preview';
 
 export type {
   DshCallIntakeReason,
   DshCallIntakeCloseOutcome,
   DshCallIntakeVerificationStep,
   DshCallIntakePreview,
-} from './dsh-call-intake.preview';
+} from '../data/dsh-call-intake.preview';
 export {
   DSH_CALL_INTAKE_PREVIEW,
   getDshCallIntakePreview,
   getDshCallIntakeByContext,
-} from './dsh-call-intake.preview';
+} from '../data/dsh-call-intake.preview';
 
 export type {
   DshOrderRescueSeverity,
@@ -684,17 +684,17 @@ export type {
   DshOrderRescueOwner,
   DshOrderRescueNextActionId,
   DshOrderRescueCase,
-} from './dsh-order-rescue.preview';
+} from '../data/dsh-order-rescue.preview';
 export {
   DSH_ORDER_RESCUE_PREVIEW,
   getDshOrderRescueCase,
   getDshOrderRescueByContext,
-} from './dsh-order-rescue.preview';
+} from '../data/dsh-order-rescue.preview';
 
 export type {
   DshOpsInterventionPlaybook,
-} from './dsh-ops-intervention-playbook.preview';
+} from '../data/dsh-ops-intervention-playbook.preview';
 export {
   DSH_OPS_INTERVENTION_PLAYBOOKS,
   getDshOpsInterventionPlaybook,
-} from './dsh-ops-intervention-playbook.preview';
+} from '../data/dsh-ops-intervention-playbook.preview';

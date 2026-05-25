@@ -1,5 +1,5 @@
-import type { DshOnDemandPolicy } from './dsh-flow-registry';
-import { getDshSectionAuditPolicy } from './dsh-role-permission.model';
+import type { DshOnDemandPolicy } from '../shared/dsh-flow-registry';
+import { getDshSectionAuditPolicy } from '../shared/dsh-role-permission.model';
 import {
   buildDshSignalRoutePreview,
   type DshGlobalControlLink,

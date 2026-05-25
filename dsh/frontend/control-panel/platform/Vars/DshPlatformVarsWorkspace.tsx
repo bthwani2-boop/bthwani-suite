@@ -14,7 +14,7 @@ import {
   DSH_PLATFORM_SCOPE_PRECEDENCE,
   DSH_PLATFORM_SIMULATION_PREVIEW,
   DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
-} from './vars.preview';
+} from '../../../data/cp-vars.preview';
 import type {
   DshPlatformProviderControlRecord,
   DshPlatformVarRecord,

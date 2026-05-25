@@ -12,7 +12,7 @@ import {
   ActionStrip,
   useTheme,
 } from '@bthwani/ui-kit';
-import { subscriptionHeroCopy, subscriptionPlanCards } from '../data/subscriptions-commercial.preview-data';
+import { subscriptionHeroCopy, subscriptionPlanCards } from '../../data/subscriptions-commercial.preview-data';
 
 export type DshSubscriptionsScreenProps = {};
 

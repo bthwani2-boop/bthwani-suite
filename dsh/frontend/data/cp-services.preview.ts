@@ -1,4 +1,4 @@
-import { ServiceRecord } from './services.types';
+import { ServiceRecord } from '../control-panel/platform/Services/services.types';
 
 // Top-level platform services only: DSH, KNZ, WLT, AMN, ARB, MRF, KWD, SND, ESF.
 // Sub-capabilities (عونك, شي إن, Store Pickup, Scheduled Orders) are NOT here —
@@ -16,7 +16,7 @@ export const PREVIEW_SERVICE_RECORDS: readonly ServiceRecord[] = [
     effectSummary: 'الخدمة مفعلة عالميًا وظاهرة للعملاء.',
     auditRollbackHint: 'الرجوع إلى internal-only يتطلب موافقة Platform Governor.',
     reason: 'الخدمة الأساسية للمنصة',
-    evidence: 'Platform Approval #001',
+    evidence: 'Platform Approval 001',
     rollbackTarget: 'internal-only',
   },
   {
@@ -31,7 +31,7 @@ export const PREVIEW_SERVICE_RECORDS: readonly ServiceRecord[] = [
     effectSummary: 'مفعلة كـ API داخلي — لا واجهة مباشرة للعملاء.',
     auditRollbackHint: 'إيقاف WLT يجمد كل التسويات والمحافظ.',
     reason: 'صاحب القرار المالي للمنصة',
-    evidence: 'Platform Approval #002',
+    evidence: 'Platform Approval 002',
     rollbackTarget: 'internal-only',
   },
   {

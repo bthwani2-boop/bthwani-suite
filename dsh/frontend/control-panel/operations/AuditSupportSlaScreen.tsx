@@ -6,7 +6,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from './operations.preview-data';
+import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from '../../data/cp-operations.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
