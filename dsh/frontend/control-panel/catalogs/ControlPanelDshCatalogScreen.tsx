@@ -923,7 +923,7 @@ export function ControlPanelDshCatalogScreen({
                       {card.title}
                     </Text>
                   </Box>
-                  <Text role="caption" tone="muted" style={{ fontSize: 9, textAlign: 'right', lineHeight: 12, display: 'block', width: '100%' }}>
+                  <Text role="caption" tone="muted" style={{ fontSize: 9, textAlign: 'right', lineHeight: 12, width: '100%' }}>
                     {card.desc}
                   </Text>
                 </button>
