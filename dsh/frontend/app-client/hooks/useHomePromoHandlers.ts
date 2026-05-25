@@ -8,6 +8,9 @@ import { resolveHomeCategoryContext } from '../shared/home-promo-mappers';
 
 type UseHomePromoHandlersParams = {
   categoryItems: DshHomeCategory[];
+  promos?: DshHomeGetPromo[];
+  activePromoIndex?: number;
+  resolveBannerImageSource?: (imageUrl?: string) => any;
   setActiveCategoryId: (id: string) => void;
   setActiveSubcategoryId: (id: string | null) => void;
   setActiveFilter: (filter: DiscoveryFilter) => void;
@@ -27,8 +30,11 @@ type UseHomePromoHandlersParams = {
 };
 
 type UseHomePromoHandlersResult = {
+  activePromo: any;
+  bannerItems: any[];
   resolveBannerPress: (promo: DshHomeGetPromo) => () => void;
   promoImpressionIdsRef: React.MutableRefObject<Set<string>>;
+  tickerAction?: () => void;
 };
 
 /**
@@ -38,11 +44,15 @@ type UseHomePromoHandlersResult = {
  */
 export function useHomePromoHandlers({
   categoryItems,
+  promos,
+  activePromoIndex = 0,
+  resolveBannerImageSource,
   setActiveCategoryId,
   setActiveSubcategoryId,
   setActiveFilter,
   setInlineSearchVisible,
   onPromoClick,
+  onPromoImpression,
   onOpenSheinInfo,
   onOpenStore,
   onOpenDiscovery,
@@ -210,5 +220,28 @@ export function useHomePromoHandlers({
     ],
   );
 
-  return { resolveBannerPress, promoImpressionIdsRef };
+  const bannerItems = React.useMemo(() => (
+    (promos ?? []).map((promo) => ({
+      id: promo.id,
+      title: promo.title,
+      subtitle: promo.subtitle,
+      badge: promo.offerBadgeText,
+      cta: promo.ctaLabel,
+      image: resolveBannerImageSource?.(promo.imageUrl ?? promo.mediaKey),
+      accentColor: promo.accentColor,
+      onPress: () => resolveBannerPress(promo)(),
+    }))
+  ), [promos, resolveBannerImageSource, resolveBannerPress]);
+
+  const activePromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
+  const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
+
+  React.useEffect(() => {
+    if (!activePromo?.id || !onPromoImpression) return;
+    if (promoImpressionIdsRef.current.has(activePromo.id)) return;
+    promoImpressionIdsRef.current.add(activePromo.id);
+    onPromoImpression(activePromo.id);
+  }, [activePromo?.id, onPromoImpression, bannerItems.length]);
+
+  return { activePromo, bannerItems, resolveBannerPress, promoImpressionIdsRef, tickerAction };
 }

@@ -21,7 +21,7 @@ import {
 } from '../shared/store-formatting';
 
 // ---------------------------------------------------------------------------
-// Appearance token subset passed from the parent DshStoreGetScreenContent.
+// Appearance token subset passed from the Store screen shell.
 // Matches the keys used by measurePopoverCard, overlay, and buttons.
 // ---------------------------------------------------------------------------
 export type StoreMeasurementAppearance = {
@@ -59,8 +59,8 @@ export type StoreMeasurementSheetProps = {
 };
 
 /**
- * Measurement/quantity picker modal extracted from StoreScreenContent.
- * No internal state — all state owned by DshStoreGetScreenContent.
+ * Measurement/quantity picker modal extracted from the Store screen shell.
+ * No internal state — all state owned by the Store screen hooks/shell.
  * Isolated so measurement changes don't re-render the main menu FlatList.
  */
 export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({

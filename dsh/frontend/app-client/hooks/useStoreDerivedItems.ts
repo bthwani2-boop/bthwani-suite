@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { DshStoreSearchCategory } from '../shared/store-search-helpers';
@@ -28,7 +28,7 @@ type UseStoreDerivedItemsResult = {
 
 /**
  * Derives filtered item list, search categories, and delivery modes from store props.
- * Pure data hook — no JSX, no react-native UI imports.
+ * Pure data hook â€” no JSX, no react-native UI imports.
  * Caller holds useStoreState() to avoid duplicate state instances.
  */
 export function useStoreDerivedItems({

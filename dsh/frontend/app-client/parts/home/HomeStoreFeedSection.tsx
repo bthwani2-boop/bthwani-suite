@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import { StoreCardPremium, type StoreCardPremiumItem } from '@bthwani/ui-kit';
+import { Box, StoreCardPremium, type StoreCardPremiumItem } from '@bthwani/ui-kit';
+
+import { DshAwnakOrderCreateScreen } from '../AwnakOrderCreateScreen';
+import { DshSheinOrderCreateScreen } from '../SheinOrderCreateScreen';
+import { EmptyFeed } from './HomeStoreFeed';
 
 export type HomeStoreCardEntry = {
   item: StoreCardPremiumItem;
@@ -11,7 +15,7 @@ export type HomeStoreCardEntry = {
 // ---------------------------------------------------------------------------
 // HomeStoreCardItem
 // Memoized card component used as FlatList/SectionList renderItem.
-// Extracted from HomeScreenContent.tsx to isolate per-card renders.
+// Isolates per-card renders from Home screen orchestration.
 // ---------------------------------------------------------------------------
 export const HomeStoreCardItem = React.memo(function HomeStoreCardItem({
   entry,
@@ -73,6 +77,65 @@ export const HomeStoreFeedItemWrapper = React.memo(function HomeStoreFeedItemWra
         onOpenStore={onOpenStore}
         onToggleFavorite={onToggleFavorite}
         setLocalFavoriteToggles={setLocalFavoriteToggles}
+      />
+    </View>
+  );
+});
+
+export const HomeStoreFeedSection = React.memo(function HomeStoreFeedSection({
+  entry,
+  props,
+  styles,
+  homeState,
+  derivedStores,
+  debouncedInlineSearchQuery,
+  selectCategoryPage,
+}: any) {
+  if (entry === 'empty') {
+    if (derivedStores.activeStorePage?.renderMode === 'manual-order') {
+      return (
+        <View style={styles.storeListContent}>
+          <Box gap={3}>
+            {derivedStores.activeStorePage.categoryId === 'shein' && props.sheinInlineVisible ? (
+              <DshSheinOrderCreateScreen
+                embedded
+                onClose={() => {
+                  props.onCloseSheinInline?.();
+                  selectCategoryPage('all');
+                }}
+              />
+            ) : null}
+            {derivedStores.activeStorePage.categoryId === 'awnak' && props.awnakInlineVisible ? (
+              <DshAwnakOrderCreateScreen
+                embedded
+                onClose={() => {
+                  props.onCloseAwnakInline?.();
+                  selectCategoryPage('all');
+                }}
+              />
+            ) : null}
+            {!props.sheinInlineVisible && !props.awnakInlineVisible && (
+              <EmptyFeed query={debouncedInlineSearchQuery} styles={styles} />
+            )}
+          </Box>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.storeListContent}>
+        <EmptyFeed query={debouncedInlineSearchQuery} styles={styles} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.storeListContent}>
+      <HomeStoreCardItem
+        entry={entry}
+        onOpenStore={props.onOpenStore}
+        onToggleFavorite={props.onToggleFavorite}
+        setLocalFavoriteToggles={homeState.setLocalFavoriteToggles}
       />
     </View>
   );

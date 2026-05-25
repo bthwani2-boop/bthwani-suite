@@ -1,0 +1,71 @@
+import * as React from 'react';
+import { Animated, Platform, View } from 'react-native';
+import { BThwaniFilterRail, Text } from '@bthwani/ui-kit';
+
+export const StoreFilterRailSection = React.memo(function StoreFilterRailSection({
+  categoryRailItems,
+  selectedCategory,
+  changeCategory,
+  isDarkGlass,
+  scrollY,
+  stickyThreshold,
+  appearanceChrome,
+  styles,
+  mode = 'inline',
+}: any) {
+  if (mode === 'sticky') {
+    return (
+      <Animated.View
+        style={[
+          styles.stickyCategoriesOverlay,
+          {
+            backgroundColor: isDarkGlass ? 'rgba(22, 22, 28, 0.94)' : 'rgba(255, 255, 255, 0.94)',
+            borderBottomColor: appearanceChrome.modalBorder,
+            transform: [{
+              translateY: scrollY.interpolate({
+                inputRange: [0, Math.max(1, stickyThreshold)],
+                outputRange: [stickyThreshold, 0],
+                extrapolate: 'clamp',
+              }),
+            }],
+            opacity: scrollY.interpolate({
+              inputRange: [stickyThreshold - 120, stickyThreshold - 20],
+              outputRange: [0, 1],
+              extrapolate: 'clamp',
+            }),
+            paddingTop: Platform.OS === 'ios' ? 48 : 28,
+          },
+        ]}
+        pointerEvents="box-none"
+      >
+        <View style={styles.stickyCategoriesContent}>
+          <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginBottom: 8 }]}>
+            <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]}>قائمة الأصناف</Text>
+          </View>
+          <View style={styles.sectionBlock}>
+            <BThwaniFilterRail
+              items={categoryRailItems}
+              selectedId={selectedCategory}
+              onSelectedIdChange={changeCategory}
+              variant={isDarkGlass ? 'glass' : 'default'}
+              sticky
+              testID="store-category-rail-sticky"
+            />
+          </View>
+        </View>
+      </Animated.View>
+    );
+  }
+
+  return (
+    <View style={styles.sectionBlock}>
+      <BThwaniFilterRail
+        items={categoryRailItems}
+        selectedId={selectedCategory}
+        onSelectedIdChange={changeCategory}
+        variant={isDarkGlass ? 'glass' : 'default'}
+        testID="store-category-rail"
+      />
+    </View>
+  );
+});

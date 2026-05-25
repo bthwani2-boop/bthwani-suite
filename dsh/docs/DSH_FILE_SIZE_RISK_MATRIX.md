@@ -105,7 +105,7 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 ### Batch 0 Inventory Result
 
 - **Home type candidates:** `DshHomeGetScreenProps`, `DshHomeCategory`, `DshHomeBannerActionType`, `DiscoveryFilter`, `StorePagerPage`, `DshHomeGetPromo`, `DshHomeGetStore`, `DshHomeRecentOrder`, `DshServiceId`.
-- **Store type candidates:** `DshStoreGetScreenProps`, `DshStoreOperationalState`, `DshStoreGetScreenContentProps`.
+- **Store type candidates (historical, superseded post-L7):** `DshStoreGetScreenProps`, `DshStoreOperationalState`, `DshStoreGetScreenContentProps`.
 - **Existing contract reuse decision:** `dsh-client-binding.contracts.ts` is strictly for global client logic. Screen-specific discovery contracts belong in their own boundaries to prevent a dumping ground. We will create `contracts/dsh-home-types.ts` and `contracts/dsh-store-types.ts` as defined in the Matrix.
 - **Files planned for Batch 1:** `contracts/dsh-home-types.ts`, `contracts/dsh-store-types.ts`, `HomeScreen.tsx`, `StoreScreen.tsx`.
 - **No-duplicate confirmation:** Validated. No central models are duplicated.
@@ -113,7 +113,7 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 ### Batch 1 Cleanup Result
 
 - **Types kept in contracts:** DshServiceId, DshHomeBannerActionType, DiscoveryFilter, DshHomeCategory, DshHomeGetPromo, DshHomeGetStore, DshHomeRecentOrder, StorePagerPage, DshStoreOperationalState.
-- **Types returned to screens temporarily:** DshHomeGetScreenProps, DshStoreGetScreenProps, DshStoreGetScreenContentProps (due to UI/React dependencies).
+- **Types returned to screens temporarily (historical, superseded post-L7):** DshHomeGetScreenProps, DshStoreGetScreenProps, DshStoreGetScreenContentProps (due to UI/React dependencies).
 - **Purity confirmation:** Validated. No React, @bthwani/ui-kit, or parts imports exist in contracts/.
 - **Final Decision:** BATCH_1_TYPES_EXTRACTED_READY_FOR_BATCH_2
 
@@ -151,9 +151,9 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 
 ### Batch 6 Thin Screen Shell Result
 
-- **Thin shells assembled:** `dsh/frontend/app-client/screens/HomeScreen.tsx` now re-exports the Home screen implementation from `dsh/frontend/app-client/parts/home/HomeScreenContent.tsx`; `dsh/frontend/app-client/screens/StoreScreen.tsx` now re-exports the Store screen implementation from `dsh/frontend/app-client/parts/store/StoreScreenContent.tsx`.
+- **Thin shells assembled (historical, superseded post-L7):** `dsh/frontend/app-client/screens/HomeScreen.tsx` re-exported the Home screen implementation from `dsh/frontend/app-client/parts/home/HomeScreenContent.tsx`; `dsh/frontend/app-client/screens/StoreScreen.tsx` re-exported the Store screen implementation from `dsh/frontend/app-client/parts/store/StoreScreenContent.tsx`.
 - **Implementation moved:** moved the existing Home and Store screen implementation bodies without JSX or behavior rewrites; import paths were adjusted only for the new owner folders.
-- **Shell files created/modified:** created `dsh/frontend/app-client/parts/home/HomeScreenContent.tsx` and `dsh/frontend/app-client/parts/store/StoreScreenContent.tsx`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, and this matrix.
+- **Shell files created/modified (historical, superseded post-L7):** created `dsh/frontend/app-client/parts/home/HomeScreenContent.tsx` and `dsh/frontend/app-client/parts/store/StoreScreenContent.tsx`; modified `dsh/frontend/app-client/screens/HomeScreen.tsx`, `dsh/frontend/app-client/screens/StoreScreen.tsx`, and this matrix.
 - **No-behavior-change confirmation:** Screen public exports, component names, route owner paths, props, callbacks, state hooks, sheets/modals, runtime/API logic, Typed Client, Binding, backend, OpenAPI, and WLT/cart/checkout/payment scope were not changed.
 - **Final Decision:** BATCH_6_THIN_SHELL_ASSEMBLED_READY_FOR_BATCH_7
 
@@ -179,7 +179,7 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 - **Tooling inspection:** root `package.json` exposes guard scripts only; `tools/guards` and `tools/scripts` do not provide a dedicated OpenAPI validator or typed-client generator command for `dsh/dsh.openapi.yaml`.
 - **Preflight decision:** `BLOCKED_TYPED_CLIENT_TOOLING_MISSING`.
 - **Contract validation command:** `BLOCKED_TYPED_CLIENT_TOOLING_MISSING`; no dedicated validator command exists yet. Existing `pnpm run guard:service-blueprint` and `pnpm run guard:binding-proof` remain evidence guards, not OpenAPI validation or typed-client generation.
-- **Typed client owner:** future API types/client boundary must live outside `HomeScreen.tsx`, `StoreScreen.tsx`, `HomeScreenContent.tsx`, and `StoreScreenContent.tsx`; the contract/type target is `dsh/frontend/app-client/contracts/`, with any non-UI client adapter under `dsh/frontend/app-client/shared/`.
+- **Typed client owner:** future API types/client boundary must live outside active screen/shell UI files; the contract/type target is `dsh/frontend/app-client/contracts/`, with any non-UI client adapter under `dsh/frontend/app-client/shared/`.
 - **Typed client generation/definition target:** blocked until an approved generator/definition command exists; when tooling exists, target only the single `listDiscoveryStores` operation for `GET /stores`.
 - **Mapper target:** `dsh/frontend/app-client/shared/` maps the future `listDiscoveryStores` response into the existing `DshHomeGetStore` and store-detail props; UI parts continue to receive props and must not fetch.
 - **State bridge:** loading, empty, error, and offline remain explicit screen-state props before they reach UI parts; no runtime success claim is allowed until trusted request/response evidence exists.
@@ -236,15 +236,15 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 ### Batch 9C Frontend Runtime Transport Result
 
 - **Implementation scope:** `DSH-SLICE-001` only, for `DSH-SAPI-P014-01` / `GET /stores` only.
-- **Transport owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-transport.ts` — creates the HTTP transport using native `fetch`; no UI framework imports; no direct fetch in screens or UI parts.
-- **Config owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-runtime-config.ts` — reads `EXPO_PUBLIC_DSH_API_BASE_URL`; returns null when absent (preview fallback remains active).
+- **Transport owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-transport.ts` â€” creates the HTTP transport using native `fetch`; no UI framework imports; no direct fetch in screens or UI parts.
+- **Config owner:** `dsh/frontend/app-client/shared/dsh-discovery-stores-runtime-config.ts` â€” reads `EXPO_PUBLIC_DSH_API_BASE_URL`; returns null when absent (preview fallback remains active).
 - **DshClientSurface binding:** `dsh/frontend/app-client/DshClientSurface.tsx` now holds `runtimeBridge` as React state; a single `useEffect` on mount resolves the config, transitions to `loading`, calls `listDiscoveryStores()`, and sets the bridge to `ready`/`empty`/`error`/`offline` depending on the response.
 - **Preview fallback preserved:** the bridge stays on `preview-fallback` when no config is found, when the request fails, or when the device is offline; explicit preview mode also stays on fallback.
-- **Frontend boundary:** no fetch inside `HomeScreen.tsx`, `StoreScreen.tsx`, `HomeScreenContent.tsx`, `StoreScreenContent.tsx`, or any UI part.
-- **UI change:** none — all five bridge states (loading, success, empty, error, offline) were already handled by existing UI parts from Batch 7 visual sweep; no JSX, props, routes, or visual behavior changed.
-- **Backend/domain decision:** no change — backend, domain, docker-compose, OpenAPI, or endpoint work was not touched.
+- **Frontend boundary:** no fetch inside `HomeScreen.tsx`, `StoreScreen.tsx`, shell/section UI files, or any UI part.
+- **UI change:** none â€” all five bridge states (loading, success, empty, error, offline) were already handled by existing UI parts from Batch 7 visual sweep; no JSX, props, routes, or visual behavior changed.
+- **Backend/domain decision:** no change â€” backend, domain, docker-compose, OpenAPI, or endpoint work was not touched.
 - **Explicit exclusions:** no cart, checkout, WLT, payment, partner/captain/field actions, route change, `dsh.openapi.yaml` change, or endpoint beyond `GET /stores`.
-- **Evidence result:** `docker compose -f dsh/backend/docker-compose.local.yml ps` (no container running — local-only environment); `pnpm run openapi:lint:dsh` passed with 0 errors and 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` passed (0 errors); `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN (fail=0, warn=1, pre-existing `dsh_local_password` in docker-compose).
+- **Evidence result:** `docker compose -f dsh/backend/docker-compose.local.yml ps` (no container running â€” local-only environment); `pnpm run openapi:lint:dsh` passed with 0 errors and 3 pre-existing warnings; `pnpm run openapi:types:dsh` passed; `git --no-pager diff --check` clean; `pnpm -w exec tsc --noEmit` passed (0 errors); `guard:tamagui-import-boundary` PASS; `guard:service-blueprint` PASS; `guard:binding-proof` PASS; `guard:secret-scan` WARN (fail=0, warn=1, pre-existing `dsh_local_password` in docker-compose).
 - **Next allowed batch:** Batch 9D may provide E2E proof: start the Go backend, run `GET /stores`, confirm real response reaches `DshClientSurface` and the screen renders runtime data (not preview).
 - **Final Decision:** `BATCH_9C_FRONTEND_RUNTIME_TRANSPORT_READY_FOR_E2E_PROOF`
 
@@ -276,12 +276,119 @@ Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) are curren
 
 ### Post-L7 Performance Hardening Result
 
-- **Scope:** Post-closure structural hardening only. No UI change, no route change, no API change, no `dsh.openapi.yaml` change, no L7_CLOSED removal, no WLT/cart/checkout/payment touch.
-- **Home decomposition:** Extracted 3 hooks from `HomeScreenContent.tsx` — `useHomeDerivedStores` (store visibility filtering, promo filtering, store pager, active page), `useHomePromoHandlers` (entire `resolveBannerPress` routing callback, `promoImpressionIdsRef` deduplication), `useHomeBackHandler` (back handler callback + `onRegisterBackHandler` effect). Extracted `HomeStoreFeedSection.tsx` with `HomeStoreCardItem` (React.memo) and `HomeStoreFeedItemWrapper` moved out of the content file. `HomeScreenContent.tsx` now delegates store derivation, promo routing, and back-handler registration to dedicated hooks.
-- **Store decomposition:** Extracted 2 hooks from `StoreScreenContent.tsx` — `useStoreDerivedItems` (clientVisibleItems, categories, deliveryModes derived from menuItems/store props) and `useStoreGestureHandlers` (PanResponder wrapped in `React.useMemo`, preview swipe navigation). Extracted `StoreMenuListSection.tsx` with `StoreMenuListItem` (React.memo, parallax animation) and exported `STORE_MENU_SNAP_INTERVAL` shared constant. Extracted `sheets/StoreMeasurementSheet.tsx` — measurement picker Modal with its own `StyleSheet.create`; receives flat `StoreMeasurementAppearance` token object; all measure-related styles removed from `StoreScreenContent.tsx`.
-- **Hooks purity:** All 5 new hooks (`useHomeDerivedStores`, `useHomePromoHandlers`, `useHomeBackHandler`, `useStoreDerivedItems`, `useStoreGestureHandlers`) accept state values as parameters — no duplicate `useHomeState`/`useStoreState` calls. No JSX, no `@bthwani/ui-kit`, no Tamagui in any new hook file.
-- **Performance guarantees locked in:** `StoreMenuListItem` and `HomeStoreCardItem` are `React.memo`; measurement picker state changes cannot trigger FlatList re-renders; PanResponder created once inside `useMemo` inside `useStoreGestureHandlers`; `StoreMeasurementAppearance` built with `useMemo` in content file to avoid new object on each render.
-- **Image source resolver governance (Batch 2 decision):** `resolveDshHomeStoreImageSource` and `resolveDshStoreCoverImageSource` remain in content files — they depend on `ImageSourcePropType` and are intentionally not extracted to hooks.
-- **Line count result:** `HomeScreenContent.tsx` 1,871 → 1,610 lines; `StoreScreenContent.tsx` 2,146 → 1,784 lines. Full shell + section decomposition (HomeScreenShell, StoreScreenShell, remaining section files) is deferred — current pass extracted the highest-impact state/callback logic; render bodies remain in content files pending a follow-on structural batch.
-- **New files:** `hooks/useHomeDerivedStores.ts`, `hooks/useHomePromoHandlers.ts`, `hooks/useHomeBackHandler.ts`, `hooks/useStoreDerivedItems.ts`, `hooks/useStoreGestureHandlers.ts`, `parts/home/HomeStoreFeedSection.tsx`, `parts/store/StoreMenuListSection.tsx`, `sheets/StoreMeasurementSheet.tsx`.
-- **Final Decision:** POST_L7_PERFORMANCE_HARDENING_PASS
+- **Scope:** Post-closure structural hardening only. No UI change, no route change, no API change, no `dsh.openapi.yaml` change, no L7_CLOSED removal, and no WLT/cart/checkout/payment touch.
+- **Actual slowdown / risk source:** Home and Store had screen-sized Content/Shell files mixing orchestration, derived data, callbacks, list rendering, search, sheets, and gesture/preview behavior. The immediate runtime blocker was incorrect relative imports from hooks into `dsh/frontend/shared` versus `dsh/frontend/app-client/shared`.
+- **Isolated:** Home store-card derivation, promo/banner state, filter rail state, ticker state, video CTA routing, Home shell sections, Store menu list rendering, Store hero/smart rail, Store category rail, Store image preview, Store blocking states, Store appearance chrome, inline search, measurement picker state, preview state, and gesture state.
+- **Memoized / debounced / lazy:** Home and Store inline search remain debounced; store cards/menu items remain memoized; filter rail arrays are memoized in their owning hooks/sections; preview/measurement state is isolated from the main list render path; Expo Android export completed without the previous import-resolution failures.
+- **Inline search still a performance blocker:** No.
+- **Content file still huge:** No. `HomeScreenContent.tsx` and `StoreScreenContent.tsx` were deleted after reference scan proved they were unused re-export layers.
+- **Remaining documented size exceptions:** `home-screen.styles.ts` and `store-screen.styles.ts` are style-only token/style maps. `HomeScreen.tsx` is slightly above the 220-line soft target by physical line count because it remains the screen orchestrator with hook wiring; measured logical lines are near target and no screen-sized JSX remains there.
+- **Decision:** `PERF_PASS_POST_L7`.
+
+---
+
+## Post-L7 Controlled Hardening Audit
+
+**Scope:** Structural anti-noise pass for `DSH-SLICE-001` only. No route, API, OpenAPI schema, UI-kit source, cart, checkout, WLT, or payment ownership changed.
+
+### Current File Sizes
+
+| File | Lines | Current responsibility |
+|---|---:|---|
+| `screens/HomeScreen.tsx` | 246 | Screen orchestrator: state hooks, derived hooks, effects, shell render. |
+| `screens/StoreScreen.tsx` | 54 | Screen orchestrator: store state, derived items, visible items, shell render. |
+| `parts/home/HomeScreenShell.tsx` | 195 | Home shell layout only. |
+| `parts/store/StoreScreenShell.tsx` | 338 | Store shell layout and top-level screen composition only. |
+
+### Responsibility / Ownership Map
+
+| Owner | Responsibility |
+|---|---|
+| `screens/HomeScreen.tsx` | Home screen orchestrator; no section JSX blocks. |
+| `parts/home/HomeScreenShell.tsx` | Home shell composition and SectionList wiring. |
+| `parts/home/HomeHeaderSection.tsx` | Header / inline search top area. |
+| `parts/home/HomePromoSection.tsx` | Banner, category selector strip, hero promo, and subcategory strip. |
+| `parts/home/HomeFilterRailSection.tsx` | Home filter rail rendering only. |
+| `parts/home/HomeStoreFeedSection.tsx` | Store feed item/empty/manual-order rendering. |
+| `parts/home/HomeVideoReelsSection.tsx` | Video reels overlay ownership. |
+| `parts/home/HomeOrbitSections.tsx` | Category and service orbit overlays. |
+| `hooks/useHomeDerivedStores.ts` | Store visibility, promo visibility, active store page, and store-card derivation. |
+| `hooks/useHomePromoHandlers.ts` | Promo routing, banner items, active promo, impression dedupe, ticker action. |
+| `hooks/useHomeFilterRail.tsx` | Home rail item model, selected category model, category dial model. |
+| `hooks/useHomeTickerState.ts` | Ticker state and action handler. |
+| `hooks/useHomeVideoHandlers.ts` | Approved video filtering and video CTA routing. |
+| `screens/StoreScreen.tsx` | Store screen orchestrator; no large JSX body. |
+| `parts/store/StoreScreenShell.tsx` | Store shell composition and overlay wiring. |
+| `parts/store/StoreHeroSection.tsx` | Store hero, operational notice, smart rail. |
+| `parts/store/StoreFilterRailSection.tsx` | Store category rail and sticky rail. |
+| `parts/store/StoreMenuListSection.tsx` | Store list, menu item renderer, empty state, category rail model. |
+| `parts/store/StoreImagePreviewSheet.tsx` | Image preview modal and preview item renderer. |
+| `parts/store/StoreNonReadyState.tsx` | Store loading/empty/error/missing/blocked states. |
+| `parts/store/store-appearance-chrome.ts` | Store appearance chrome and measurement appearance tokens. |
+| `hooks/useStoreDerivedItems.ts` | Store visible item/category/delivery mode derivation. |
+| `hooks/useStoreInlineSearch.ts` | Store inline search visibility and debounce. |
+| `hooks/useStoreMeasurementState.ts` | Measurement picker and cart-confirmation actions. |
+| `hooks/useStorePreviewState.ts` | Preview open/close animation state. |
+| `hooks/useStoreGestureHandlers.ts` | Preview gesture handling. |
+
+### Duplication / Leakage / Dead-Code Result
+
+| Check | Result |
+|---|---|
+| Search/filter duplication | Home and Store search/filter state moved into owning hooks/sections; no duplicate runtime helper introduced. |
+| Runtime/domain leakage into UI | Visibility and workflow imports point to the existing shared owners; no bridge or duplicate shared file was created. |
+| UI-kit leakage | No new `ui-kit` file and no `@tamagui/*` or `tamagui` import in app-client DSH screens/parts/hooks/contracts. |
+| Design primitive reimplementation | Existing `@bthwani/ui-kit` primitives remain in use: `ModernPremiumHeader`, `SearchTopBar`, `BannerCarousel`, `BThwaniFilterRail`, `StoreHero`, `StateView`, orbit carousels, and cards. |
+| Dead compatibility layers | `HomeScreenContent.tsx` and `StoreScreenContent.tsx` removed after `rg` found no external imports. |
+| Future UI-kit Candidate | None added in this pass; extracted compositions are DSH-client specific and remain in `parts/home` or `parts/store`. |
+
+### Post-L7 Target Ownership Map
+
+| Target | Result |
+|---|---|
+| Small screen orchestrators | `StoreScreen.tsx` is 54 lines. `HomeScreen.tsx` is 246 physical lines / 222 logical measured lines; remaining size is hook wiring and documented as a soft-target exception. |
+| Shells under 350 lines | `HomeScreenShell.tsx` is 195 lines; `StoreScreenShell.tsx` is 338 lines. |
+| Section file target | All section files are under 300 lines. Largest section: `StoreHeroSection.tsx` at 274 lines. |
+| Hook file target | Hook files are within the 60-220 target except `useHomePromoHandlers.ts` at 247 physical lines / 214 logical measured lines; accepted because it owns promo routing plus banner/ticker/impression logic without duplicating navigation branches. |
+| No random folders | No `common/`, `generic/`, `misc/`, `utils/`, or `components/` folder was created. |
+
+## Post-L7 Hardening Verification (Phase 8)
+
+| Check | Result |
+|---|---|
+| `pnpm run openapi:lint:dsh` | PASS with 3 existing warnings: missing OpenAPI servers, missing contact, undefined operation tag. No errors. |
+| `pnpm run openapi:types:dsh` | PASS; regenerated `dsh/frontend/app-client/contracts/dsh-openapi.types.ts` with no resulting diff. |
+| `pnpm run guard:service-runtime -- --service dsh --slice DSH-SLICE-001` | PASS. |
+| `git --no-pager diff --check` | PASS. |
+| `pnpm -w exec tsc --noEmit` | PASS. |
+| `pnpm run guard:tamagui-import-boundary` | PASS. |
+| `pnpm run guard:service-blueprint` | PASS. |
+| `pnpm run guard:binding-proof` | PASS. |
+| `pnpm run guard:secret-scan` | WARN only: fail=0, warn=1. |
+| Expo runtime smoke | PASS: `pnpm --dir app-client/runtime exec expo export --platform android --output-dir C:\tmp\dsh-post-l7-hardening-export-after-content-delete` bundled `app-client/runtime/index.js` successfully after deleting unused Content files; previous import-resolution failures did not recur. |
+| Direct Tamagui import outside ui-kit | No. `rg "tamagui|@tamagui" dsh/frontend/app-client/screens dsh/frontend/app-client/parts dsh/frontend/app-client/hooks dsh/frontend/app-client/contracts` returned no matches. |
+| New hardcoded color | No new random palette. Existing rgba overlays were moved with their visual owner or tokenized through `store-appearance-chrome.ts`; no raw hex color was introduced. |
+| New ui-kit file | No. |
+| `dsh.openapi.yaml` changed | No. |
+| Route/API changed | No route or API file changed. |
+| Visual UI changed intentionally | No intended visual change; structural ownership only. |
+| Re-export-only Content files | Removed; `rg` found no `HomeScreenContent`, `StoreScreenContent`, or old `DshStoreGetScreenContentProps` references in active app-client code. |
+
+### Top 10 Parts Files After Hardening
+
+| File | Lines | Note |
+|---|---:|---|
+| `parts/store/store-screen.styles.ts` | 698 | StyleSheet/token owner only. |
+| `parts/home/home-screen.styles.ts` | 443 | StyleSheet/token owner only. |
+| `parts/store/StoreScreenShell.tsx` | 338 | Store shell under 350. |
+| `parts/store/StoreHeroSection.tsx` | 274 | Largest Store section; within 300. |
+| `parts/store/StoreMenuListSection.tsx` | 222 | Store list and category rail model. |
+| `parts/store/StoreImagePreviewSheet.tsx` | 210 | Preview modal and preview item renderer. |
+| `parts/home/HomeScreenShell.tsx` | 195 | Home shell under 350. |
+| `parts/home/HomePromoSection.tsx` | 187 | Home promo/category strip. |
+| `parts/home/HomeStoreFeedSection.tsx` | 142 | Home feed and manual-order empty handling. |
+| `parts/home/HomeCategoryCarousel.tsx` | 96 | Existing category icon/selector owner. |
+
+### Final Decision
+
+**POST_L7_HARDENING_PASS**
