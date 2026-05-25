@@ -1119,7 +1119,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 				sourceRecordId: 'sub-pro',
 				sourceType: 'subscription',
 				approvalStage: 'active',
-				conflictStatus: 'blocker',
+				conflictSeverity: 'blocker',
 				conflictReason: 'تعارض أمني في الشارات'
 			},
 			'offerLabel': {
@@ -1127,7 +1127,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 				sourceRecordId: 'offer-123',
 				sourceType: 'offer',
 				approvalStage: 'approved',
-				conflictStatus: 'blocker',
+				conflictSeverity: 'blocker',
 				conflictReason: 'تعارض في العروض'
 			},
 			'deliveryFeeLabel': {
@@ -1135,7 +1135,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 				sourceRecordId: 'del-456',
 				sourceType: 'delivery',
 				approvalStage: 'active',
-				conflictStatus: 'blocker',
+				conflictSeverity: 'blocker',
 				conflictReason: 'تعارض في التوصيل'
 			},
 			'hasCouponAvailable': {
@@ -1143,7 +1143,7 @@ export const dshHomeGetFixtureStoresRaw: DshHomeGetFixtureStore[] = [
 				sourceRecordId: 'coupon-789',
 				sourceType: 'partner',
 				approvalStage: 'active',
-				conflictStatus: 'blocker',
+				conflictSeverity: 'blocker',
 				conflictReason: 'تعارض في الكوبونات'
 			}
 		}

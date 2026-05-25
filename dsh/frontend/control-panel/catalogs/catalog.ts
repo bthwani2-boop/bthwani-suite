@@ -28,11 +28,17 @@ export type CatalogQuickEntryMode =
 export type CatalogSubClassification = {
   id: string;
   label: string;
+  emojiFallback?: string;
+  imageUri?: string;
+  mediaKey?: string;
 };
 
 export type CatalogMainClassification = {
   id: string;
   label: string;
+  emojiFallback?: string;
+  imageUri?: string;
+  mediaKey?: string;
   subClassifications?: CatalogSubClassification[];
 };
 
@@ -40,6 +46,9 @@ export type CatalogSubCategory = {
   id: string;
   label: string;
   subtitle: string;
+  emojiFallback?: string;
+  imageUri?: string;
+  mediaKey?: string;
   mainClassifications?: CatalogMainClassification[];
 };
 
@@ -51,6 +60,8 @@ export type CatalogMainCategory = {
   subtitle: string;
   subcategories: CatalogSubCategory[];
   emojiFallback: string;
+  imageUri?: string;
+  mediaKey?: string;
   defaultMediaPolicy: CatalogMediaPolicy;
   renderMode?: 'stores' | 'manual-order';
   categoryMode?: CatalogCategoryMode;
@@ -137,277 +148,147 @@ export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [
   { id: 'q-2', productId: 'prd-review-coffee', stage: 'partner-review', requestedBy: 'Field Agent 3' },
 ];
 
-export const dshCatalogCategories: CatalogMainCategory[] = [
-  {
-    id: 'restaurants', label: 'المطاعم', subtitle: 'طلب الوجبات والمأكولات الجاهزة', emojiFallback: 'ط', defaultMediaPolicy: 'partner-owned-exception',
-    categoryMode: 'catalog-based',
-    subcategories: [
-      {
-        id: 'res_meals', label: 'وجبات', subtitle: '',
-        mainClassifications: [
-          { id: 'burger', label: 'برجر' },
-          { id: 'grill', label: 'مشويات' },
-          { id: 'pasta', label: 'باستا' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'grocery', label: 'مقاضي', subtitle: 'سوبر ماركت مواد غذائية', emojiFallback: 'م', defaultMediaPolicy: 'catalog-owned-media',
-    categoryMode: 'catalog-based',
-    subcategories: [
-      { id: 'grocery_dairy', label: 'ألبان', subtitle: 'منتجات الألبان والأجبان' },
-      { id: 'grocery_bakeries', label: 'مخابز', subtitle: 'خبز ومعجنات' },
-      { id: 'grocery_vegetables_fruits', label: 'خضار وفواكه', subtitle: 'منتجات طازجة' },
-      { id: 'grocery_beverages', label: 'مشروبات', subtitle: 'مشروبات غازية وعصائر معلبة' },
-    ]
-  },
-  {
-    id: 'sweets_juices', label: 'حلا وعصائر', subtitle: 'عصائر طازجة وحلويات', emojiFallback: 'ح', defaultMediaPolicy: 'partner-owned-exception',
-    categoryMode: 'catalog-based',
-    subcategories: [
-      { id: 'cake', label: 'كيك', subtitle: 'كيك ومخبوزات' },
-      { id: 'fresh_juices', label: 'عصائر', subtitle: 'عصائر طازجة' },
-      { id: 'sweets', label: 'حلويات', subtitle: 'حلويات شرقية وغربية' },
-    ]
-  },
-  {
-    id: 'honey_dates', label: 'عسل وتمور', subtitle: 'منتجات طبيعية', emojiFallback: 'ع', defaultMediaPolicy: 'catalog-owned-media',
-    categoryMode: 'catalog-based',
-    subcategories: [
-      { id: 'honey', label: 'عسل', subtitle: 'عسل طبيعي' },
-      { id: 'dates', label: 'تمور', subtitle: 'تمور فاخرة' },
-      { id: 'gifts', label: 'هدايا', subtitle: 'باقات هدايا' }
-    ]
-  },
-  {
-    id: 'electronics', label: 'إلكترونيات', subtitle: 'أجهزة واكسسوارات', emojiFallback: 'إ', defaultMediaPolicy: 'catalog-owned-media',
-    categoryMode: 'catalog-based',
-    subcategories: [
-      { id: 'phones', label: 'جوالات', subtitle: 'أجهزة الجوال' },
-      { id: 'accessories', label: 'إكسسوارات', subtitle: 'إكسسوارات الجوال' }
-    ]
-  },
-  {
-    id: 'spare_parts', label: 'قطع غيار', subtitle: 'مستلزمات سيارات', emojiFallback: 'ق', defaultMediaPolicy: 'catalog-owned-media',
-    categoryMode: 'catalog-based',
-    subcategories: [
-      { id: 'oils', label: 'زيوت', subtitle: 'زيوت محركات' },
-      { id: 'batteries', label: 'بطاريات', subtitle: 'بطاريات سيارات' },
-      { id: 'tires', label: 'إطارات', subtitle: 'كفرات' }
-    ]
-  },
-  { id: 'awnak', label: 'عونك', subtitle: 'خدمات ومشاوير', emojiFallback: 'ع', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order', categoryMode: 'manual-order' },
-  { id: 'shein', label: 'شي ان', subtitle: 'طلبات من شي إن', emojiFallback: 'ش', defaultMediaPolicy: 'catalog-owned-media', subcategories: [], renderMode: 'manual-order', categoryMode: 'manual-order' }
-];
+import { dshCategoryFixtures } from '../../data/categories.preview-data';
+import { storeItemsByStoreId } from '../../data/products.preview-data';
 
-export const dshCatalogProducts: CatalogProductMaster[] = [
-  {
-    id: 'prd-grocery-apple',
-    name: 'تفاح رويال غالا طازج 1 كجم',
-    sku: 'BTH-GRO-FR-001',
-    gtin: '6281000000012',
-    measurementUnit: '1 كجم',
-    categoryPath: { main: 'grocery', sub: 'grocery_vegetables_fruits' },
-    price: 18.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner', 'marketing', 'field'],
-    imageUri: '/dsh/media-fixtures/products/apple.v1.png',
-    mediaKey: 'dsh.product.apple.v1',
-    emojiFallback: 'ت',
-  },
-  {
-    id: 'prd-grocery-milk',
-    name: 'حليب عضوي 1.5 لتر',
-    sku: 'BTH-GRO-DA-002',
-    gtin: '6281000000029',
-    measurementUnit: '1.5 لتر',
-    categoryPath: { main: 'grocery', sub: 'grocery_dairy' },
-    price: 11.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'field',
-    surfaces: ['client', 'partner', 'marketing'],
-    imageUri: '/dsh/media-fixtures/products/milk.v1.png',
-    mediaKey: 'dsh.product.milk.v1',
-    emojiFallback: 'ح',
-  },
-  {
-    id: 'prd-grocery-bread',
-    name: 'خبز قمح كامل',
-    sku: 'BTH-GRO-BK-003',
-    measurementUnit: '1 حبة',
-    categoryPath: { main: 'grocery', sub: 'grocery_bakeries' },
-    price: 7.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner'],
-    imageUri: '/dsh/media-fixtures/products/bread.v1.png',
-    mediaKey: 'dsh.product.bread.v1',
-    emojiFallback: 'خ',
-  },
-  {
-    id: 'prd-restaurant-chicken',
-    name: 'دجاج مشوي مع بطاطس',
-    sku: 'BTH-RES-001',
-    measurementUnit: '1 وجبة',
-    categoryPath: { main: 'restaurants', sub: 'res_meals', mainClassification: 'grill' },
-    price: 34.00,
-    mediaPolicy: 'partner-owned-exception',
-    approvalStage: 'client-visible',
-    sourceSurface: 'partner',
-    surfaces: ['client', 'partner', 'marketing'],
-    imageUri: '/dsh/media-fixtures/restaurants/chicken.v1.png',
-    mediaKey: 'dsh.product.chicken.v1',
-    emojiFallback: 'د',
-    partnerOverrides: [
-      { partnerId: 'store-1003', price: 34.00, preparationTime: '18-22 دقيقة' }
-    ]
-  },
-  {
-    id: 'prd-restaurant-burger',
-    name: 'برجر لحم كلاسيك',
-    sku: 'BTH-RES-002',
-    measurementUnit: '1 وجبة',
-    categoryPath: { main: 'restaurants', sub: 'res_meals', mainClassification: 'burger' },
-    price: 25.00,
-    mediaPolicy: 'partner-owned-exception',
-    approvalStage: 'marketing-review',
-    sourceSurface: 'partner',
-    surfaces: ['partner', 'marketing'],
-    mediaKey: 'dsh.product.chicken.v1', // standard fallback seed asset
-    emojiFallback: 'ب',
-    partnerOverrides: [
-      { partnerId: 'store-1004', price: 25.00 }
-    ]
-  },
-  {
-    id: 'prd-restaurant-pasta',
-    name: 'باستا ألفريدو',
-    sku: 'BTH-RES-003',
-    measurementUnit: '1 وجبة',
-    categoryPath: { main: 'restaurants', sub: 'res_meals', mainClassification: 'pasta' },
-    price: 35.00,
-    mediaPolicy: 'partner-owned-exception',
-    approvalStage: 'client-visible',
-    sourceSurface: 'partner',
-    surfaces: ['client', 'partner'],
-    mediaKey: 'dsh.product.pasta.v1',
-    emojiFallback: 'ب',
-  },
-  {
-    id: 'prd-sweets-cake',
-    name: 'شريحة شوكولاتة',
-    sku: 'BTH-SWT-001',
-    measurementUnit: '1 شريحة',
-    categoryPath: { main: 'sweets_juices', sub: 'cake' },
-    price: 14.00,
-    mediaPolicy: 'partner-proposed-review',
-    approvalStage: 'marketing-review',
-    sourceSurface: 'partner',
-    surfaces: ['partner', 'marketing'],
-    imageUri: '/dsh/media-fixtures/sweets/choco.v1.png',
-    mediaKey: 'dsh.product.choco.v1',
-    emojiFallback: 'ش',
-  },
-  {
-    id: 'prd-sweets-juice',
-    name: 'عصير برتقال طازج',
-    sku: 'BTH-SWT-002',
-    measurementUnit: '1 كوب',
-    categoryPath: { main: 'sweets_juices', sub: 'fresh_juices' },
-    price: 12.00,
-    mediaPolicy: 'partner-owned-exception',
-    approvalStage: 'client-visible',
-    sourceSurface: 'partner',
-    surfaces: ['client', 'partner'],
-    mediaKey: 'dsh.product.yogurt.v1', // fresh orange juice fits standard beverage/yogurt seed
-    emojiFallback: 'ع',
-  },
-  {
-    id: 'prd-dates-box',
+export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.map((c) => {
+  return {
+    id: c.id,
+    label: c.label,
+    subtitle: c.subtitle,
+    emojiFallback: c.emojiFallback || '📦',
+    defaultMediaPolicy: 'catalog-owned-media',
+    renderMode: c.renderMode,
+    categoryMode: c.isManualLike ? 'manual-order' : 'catalog-based',
+    subcategories: c.subcategories.map((sub) => {
+      // Initialize with default classifications so the user has some classifications to see/edit
+      const mainClassifications: CatalogMainClassification[] = [
+        {
+          id: `classif-main-${sub.id}-1`,
+          label: 'تصنيف رئيسي 1',
+          subClassifications: [
+            { id: `classif-sub-${sub.id}-1a`, label: 'تصنيف فرعي أ' },
+            { id: `classif-sub-${sub.id}-1b`, label: 'تصنيف فرعي ب' }
+          ]
+        },
+        {
+          id: `classif-main-${sub.id}-2`,
+          label: 'تصنيف رئيسي 2',
+          subClassifications: []
+        }
+      ];
+      return {
+        id: sub.id,
+        label: sub.label,
+        subtitle: sub.subtitle,
+        mainClassifications
+      };
+    })
+  };
+});
+
+// Deduplicate products by ID
+const allProductsMap = new Map<string, CatalogProductMaster>();
+
+Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
+  items.forEach((item) => {
+    // Find main category
+    let mainCat = 'grocery';
+    let subCat: string | undefined = undefined;
+
+    // Try to match the item categoryId to subcategories
+    for (const cat of dshCategoryFixtures) {
+      if (cat.id === item.categoryId) {
+        mainCat = cat.id;
+        break;
+      }
+      const sub = cat.subcategories.find(s => s.id === item.categoryId);
+      if (sub) {
+        mainCat = cat.id;
+        subCat = sub.id;
+        break;
+      }
+    }
+
+    // If categoryId doesn't match directly, map default fallback
+    if (item.categoryId === 'fresh' || item.categoryId === 'dairy' || item.categoryId === 'bakery') {
+      mainCat = 'grocery';
+      if (item.categoryId === 'fresh') subCat = 'grocery_vegetables_fruits';
+      else if (item.categoryId === 'dairy') subCat = 'grocery_dairy';
+      else if (item.categoryId === 'bakery') subCat = 'grocery_bakeries';
+    } else if (item.categoryId === 'meals' || item.categoryId === 'sides' || item.categoryId === 'drinks') {
+      mainCat = 'restaurants';
+      if (item.categoryId === 'meals') subCat = 'res_meals';
+    } else if (item.categoryId === 'sweets' || item.categoryId === 'dessert') {
+      mainCat = 'sweets_juices';
+      subCat = 'sweets_juices_sweets';
+    }
+
+    const approvalStage: CatalogApprovalStage =
+      item.publishStage === 'client-visible' || item.publishStage === 'published-preview'
+        ? 'client-visible'
+        : item.publishStage === 'catalog-adopted'
+          ? 'catalog-adopted'
+          : item.publishStage === 'marketing-review'
+            ? 'marketing-review'
+            : item.publishStage === 'partner-review'
+              ? 'partner-review'
+              : 'catalog-draft';
+
+    const sku = item.id.toUpperCase().replace('ITEM-', 'BTH-');
+    const gtin = item.id === 'item-apple-1' ? '6281000000012' : undefined;
+
+    const product: CatalogProductMaster = {
+      id: item.id,
+      name: item.name,
+      sku: sku,
+      gtin: gtin,
+      barcode: gtin,
+      measurementUnit: item.measurementType === 'weight' ? '1 كجم' : '1 حبة',
+      categoryPath: {
+        main: mainCat,
+        sub: subCat,
+        mainClassification: subCat ? `classif-main-${subCat}-1` : undefined,
+        subClassification: subCat ? `classif-sub-${subCat}-1a` : undefined,
+      },
+      price: parseFloat(item.priceLabel ?? '') || 15,
+      mediaPolicy: (item.mediaPolicy as any) || 'catalog-owned-media',
+      approvalStage: approvalStage,
+      sourceSurface: 'catalog',
+      surfaces: ['client', 'partner'],
+      imageUri: item.imageUri,
+      mediaKey: item.mediaKey,
+      emojiFallback: item.name[0],
+    };
+
+    if (!allProductsMap.has(product.id)) {
+      allProductsMap.set(product.id, product);
+    }
+  });
+});
+
+// Let's add the canonical LEAD-5 featured product specifically if not present
+if (!allProductsMap.has('canonical-product-field-lead-5-featured')) {
+  allProductsMap.set('canonical-product-field-lead-5-featured', {
+    id: 'canonical-product-field-lead-5-featured',
     name: 'علبة تمر فاخر',
-    sku: 'BTH-DAT-001',
+    sku: 'LEAD5-DATES-BOX',
     gtin: '6280001055001',
+    barcode: '6280001055001',
     measurementUnit: '1 علبة',
-    categoryPath: { main: 'honey_dates', sub: 'dates' },
+    categoryPath: {
+      main: 'honey_dates',
+      sub: undefined,
+    },
     price: 55.00,
     mediaPolicy: 'catalog-owned-media',
     approvalStage: 'marketing-review',
-    sourceSurface: 'catalog',
+    sourceSurface: 'field',
     surfaces: ['partner', 'marketing', 'field'],
-    imageUri: '/dsh/media-fixtures/dates/lead-5.dates-box.v1.png',
-    mediaKey: 'dsh.product.roll.v1', // using roll.v1 as dates package placeholder
+    imageUri: 'dsh.product.lead-5.dates-box.v1',
+    mediaKey: 'dsh.product.lead-5.dates-box.v1',
     emojiFallback: 'ت',
-  },
-  {
-    id: 'prd-honey-jar',
-    name: 'عسل سدر جبلي',
-    sku: 'BTH-DAT-002',
-    measurementUnit: '1 كيلو',
-    categoryPath: { main: 'honey_dates', sub: 'honey' },
-    price: 250.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner'],
-    mediaKey: 'dsh.product.yogurt.v1', // honey jar fits standard yogurt seed jar
-    emojiFallback: 'ع',
-  },
-  {
-    id: 'prd-electronics-iphone',
-    name: 'ايفون 15 برو ماكس',
-    sku: 'BTH-ELE-001',
-    gtin: '194253100010',
-    measurementUnit: '1 حبة',
-    categoryPath: { main: 'electronics', sub: 'phones' },
-    price: 4500.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner', 'marketing'],
-    emojiFallback: 'ج',
-  },
-  {
-    id: 'prd-electronics-charger',
-    name: 'شاحن سريع 20W',
-    sku: 'BTH-ELE-002',
-    measurementUnit: '1 حبة',
-    categoryPath: { main: 'electronics', sub: 'accessories' },
-    price: 85.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner'],
-    emojiFallback: 'ش',
-  },
-  {
-    id: 'prd-spare-oil',
-    name: 'زيت محرك 5W30',
-    sku: 'BTH-SPR-001',
-    measurementUnit: '1 علبة',
-    categoryPath: { main: 'spare_parts', sub: 'oils' },
-    price: 150.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner'],
-    emojiFallback: 'ز',
-  },
-  {
-    id: 'prd-spare-battery',
-    name: 'بطارية سيارة 70 امبير',
-    sku: 'BTH-SPR-002',
-    measurementUnit: '1 حبة',
-    categoryPath: { main: 'spare_parts', sub: 'batteries' },
-    price: 350.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'client-visible',
-    sourceSurface: 'catalog',
-    surfaces: ['client', 'partner'],
-    emojiFallback: 'ب',
-  }
-];
+  });
+}
+
+export const dshCatalogProducts: CatalogProductMaster[] = Array.from(allProductsMap.values());

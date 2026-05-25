@@ -1,7 +1,7 @@
 import type { AppearanceRecord, ProviderRecord, ServiceRecord, DshPlatformVarRecord, DshPlatformProviderControlRecord, DshPlatformScopeLayer, DshPlatformSimulationScenario, DshPlatformAuditEntry } from '../shared/dsh-cp-platform.contract';
 import type { AdminRole, MockAdminUser, PlatformPermission } from '../shared/dsh-cp-administration.contract';
 import type { DshSurfaceId } from '../shared/dsh-flow-registry';
-import type { DshCrossSurfaceClosureItem } from '../shared/dshCrossSurfaceClosureMap';
+import type { DshCrossSurfaceClosureItem, DshActor, DshLifecycleStep, DshRuntimeBindingStatus, DshCounterpartLink } from '../shared/dshCrossSurfaceClosureMap';
 import type { Phase12FixtureLocation } from '../../types';
 
 // -----------------------------------------------------------------------------
@@ -82,9 +82,9 @@ export const PREVIEW_PROVIDER_RECORDS: readonly ProviderRecord[] = [
   { id: 'provider-sms-primary', label: 'مزود SMS', category: 'الرسائل SMS', selectedProvider: 'Twilio', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'Unifonic', lastTestResult: 'pass', rollbackTarget: 'Unifonic', evidence: 'SMS Integration #S-001', activationNote: 'يستخدم لرسائل التحقق والإشعارات النصية' },
   { id: 'provider-payment-primary', label: 'مزود الدفع', category: 'الدفع', selectedProvider: 'Telr', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'Checkout.com', lastTestResult: 'pass', rollbackTarget: 'Checkout.com', evidence: 'Payment Integration #P-001', activationNote: 'معالجة الدفع الآمن للعملاء' },
   { id: 'provider-hosting-primary', label: 'مزود الاستضافة', category: 'البنية التحتية', selectedProvider: 'AWS', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'GCP', lastTestResult: 'pass', rollbackTarget: 'GCP', activationNote: 'استضافة خوادم المنصة وقواعد البيانات' },
-  { id: 'provider-storage-primary', label: 'مزود التخزين', category: 'التخزين السحابي', selectedProvider: 'Firebase Storage', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'AWS S3', lastTestResult: 'pass', rollbackTarget: 'AWS S3', activationNote: 'تخزين الصور والمستندات' },
+  { id: 'provider-storage-primary', label: 'مزود التخزين', category: 'التخزين', selectedProvider: 'Firebase Storage', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'AWS S3', lastTestResult: 'pass', rollbackTarget: 'AWS S3', activationNote: 'تخزين الصور والمستندات' },
   { id: 'provider-email-primary', label: 'مزود البريد', category: 'البريد الإلكتروني', selectedProvider: 'Mailgun', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'SendGrid', lastTestResult: 'pass', rollbackTarget: 'SendGrid', activationNote: 'إرسال الفواتير والتنبيهات عبر البريد' },
-  { id: 'provider-push-primary', label: 'مزود الإشعارات', category: 'الإشعارات الفورية', selectedProvider: 'Firebase Cloud Messaging', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'OneSignal', lastTestResult: 'pass', rollbackTarget: 'OneSignal', activationNote: 'إشعارات التطبيق' },
+  { id: 'provider-push-primary', label: 'مزود الإشعارات', category: 'الإشعارات', selectedProvider: 'Firebase Cloud Messaging', maskedCredential: MASKED, environment: 'production', status: 'active', owner: 'Platform', priority: 1, fallbackProvider: 'OneSignal', lastTestResult: 'pass', rollbackTarget: 'OneSignal', activationNote: 'إشعارات التطبيق' },
 ];
 
 // --- Services ---

@@ -9,6 +9,7 @@ const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.product.milk.v1': require('../../media-fixtures/assets/seed/dsh/products/dsh-product-milk-v1.png') as ImageSourcePropType,
   'dsh.product.pasta.v1': require('../../media-fixtures/assets/seed/dsh/products/dsh-product-pasta-v1.png') as ImageSourcePropType,
   'dsh.product.roll.v1': require('../../media-fixtures/assets/seed/dsh/products/dsh-product-roll-v1.png') as ImageSourcePropType,
+  'dsh.product.lead-5.dates-box.v1': require('../../media-fixtures/assets/seed/dsh/products/dsh-product-roll-v1.png') as ImageSourcePropType,
   'dsh.product.salad.v1': require('../../media-fixtures/assets/seed/dsh/products/dsh-product-salad-v1.png') as ImageSourcePropType,
   'dsh.product.yogurt.v1': require('../../media-fixtures/assets/seed/dsh/products/dsh-product-yogurt-v1.png') as ImageSourcePropType,
   'dsh.store.hadda.cover.v1': require('../../media-fixtures/assets/seed/dsh/stores/dsh-store-hadda-cover-v1.png') as ImageSourcePropType,

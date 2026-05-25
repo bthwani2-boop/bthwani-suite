@@ -53,7 +53,8 @@ export type ProviderCategory =
   | 'التحليلات'
   | 'البحث'
   | 'الذكاء الاصطناعي'
-  | 'المخاطر والاحتيال';
+  | 'المخاطر والاحتيال'
+  | 'البنية التحتية';
 
 export type ProviderEnvironment = 'test' | 'sandbox' | 'production';
 export type ProviderStatus = 'active' | 'inactive' | 'test-only' | 'pending-approval';
