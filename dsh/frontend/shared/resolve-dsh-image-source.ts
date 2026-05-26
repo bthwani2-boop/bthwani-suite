@@ -12,16 +12,12 @@ import type { ImageSourcePropType } from 'react-native';
  *   categories/main  → ../media-fixtures/categories/main/   (keys: dsh.category.main.<id>.v1)
  *   categories/sub   → ../media-fixtures/categories/sub/    (keys: dsh.category.sub.<id>.v1)
  *
- * Category keys resolve to undefined until image files are placed in the approved directories.
- * Callers use emojiFallback from DshCategoryFixture as the active fallback.
  * DSH_CATEGORY_ICONS is emoji fallback only — not a primary image source.
+ * Callers use emojiFallback from DshCategoryFixture as the active fallback.
  */
 
 const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.product.apple.v1': require('../media-fixtures/products/dsh-product-apple-v1.png') as ImageSourcePropType,
-  // Generic product placeholder — used when no dedicated product image exists in media-fixtures/products.
-  // Intentional: points to apple image as a clean, round, visually neutral generic placeholder.
-  'dsh.product.generic.v1': require('../media-fixtures/products/dsh-product-apple-v1.png') as ImageSourcePropType,
   'dsh.product.bread.v1': require('../media-fixtures/products/dsh-product-bread-v1.png') as ImageSourcePropType,
   'dsh.product.chicken.v1': require('../media-fixtures/products/dsh-product-chicken-v1.png') as ImageSourcePropType,
   'dsh.product.choco.v1': require('../media-fixtures/products/dsh-product-choco-v1.png') as ImageSourcePropType,

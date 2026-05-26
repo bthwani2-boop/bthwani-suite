@@ -142,25 +142,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			imageUri: 'dsh.product.yogurt.v1',
 			publishStage: 'published-preview',
 		},
-		{
-			id: 'item-bananas-1',
-			name: 'موز طازج',
-			subtitle: 'حزمة يومية مختارة',
-			priceLabel: '12 ر.ي',
-			oldPriceLabel: '15 ر.ي',
-			discountLabel: 'خصم 20%',
-			measurementType: 'piece',
-			measurementOptions: ['حبة', '2 حبة', '4 حبات'],
-			categoryId: 'fresh',
-			categoryLabel: 'طازج',
-			statusLabel: 'جديد اليوم',
-			isAvailable: true,
-			hasOptions: false,
-			preparationTime: '5-10 دقائق',
-			// No dedicated banana image in media-fixtures/products; using generic placeholder.
-			mediaKey: 'dsh.product.generic.v1',
-			imageUri: 'dsh.product.generic.v1',
-		},
+
 		{
 			id: 'item-croissant-2',
 			name: 'كرواسون زبدة طازج',
@@ -230,46 +212,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			imageUri: 'dsh.product.choco.v1',
 			publishStage: 'published-preview'
 		},
-		{
-			id: 'item-hidden-marketing',
-			name: 'منتج في التسويق',
-			subtitle: 'يجب ألا يظهر',
-			priceLabel: '50 ر.ي',
-			categoryId: 'fresh',
-			categoryLabel: 'طازج',
-			isAvailable: true,
-			publishStage: 'marketing-review',
-		},
-		{
-			id: 'item-hidden-partner',
-			name: 'منتج في الشريك',
-			subtitle: 'يجب ألا يظهر',
-			priceLabel: '50 ر.ي',
-			categoryId: 'fresh',
-			categoryLabel: 'طازج',
-			isAvailable: true,
-			publishStage: 'partner-review',
-		},
-		{
-			id: 'item-hidden-catalog',
-			name: 'منتج معتمد كتالوج',
-			subtitle: 'يجب ألا يظهر',
-			priceLabel: '50 ر.ي',
-			categoryId: 'fresh',
-			categoryLabel: 'طازج',
-			isAvailable: true,
-			publishStage: 'catalog-adopted',
-		},
-		{
-			id: 'item-visible-client',
-			name: 'منتج مرئي للعميل',
-			subtitle: 'يجب أن يظهر',
-			priceLabel: '50 ر.ي',
-			categoryId: 'fresh',
-			categoryLabel: 'طازج',
-			isAvailable: true,
-			publishStage: 'client-visible',
-		},
+
 		{
 			id: 'item-exception-visible',
 			name: 'منتج استثناء شريك',
@@ -280,23 +223,10 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			isAvailable: true,
 			publishStage: 'marketing-review',
 			mediaPolicy: 'partner-owned-exception',
+			mediaKey: 'dsh.product.apple.v1',
 			imageUri: 'dsh.product.apple.v1',
 		},
-		{
-			id: 'prd-restaurant-burger',
-			name: 'برجر لحم كلاسيك',
-			subtitle: 'لحم مشوي محضر طازجاً',
-			priceLabel: '18.00 ر.ي',
-			categoryId: 'burgers',
-			categoryLabel: 'برجر',
-			isAvailable: true,
-			hasOptions: true,
-			preparationTime: '15 دقيقة',
-			// No dedicated burger image; roll is the closest bun/bread shape in media-fixtures/products.
-			mediaKey: 'dsh.product.roll.v1',
-			imageUri: 'dsh.product.roll.v1',
-			publishStage: 'client-visible',
-		},
+
 		{
 			id: 'prd-restaurant-chicken',
 			name: 'دجاج مشوي مع بطاطس',
@@ -325,21 +255,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			imageUri: 'dsh.product.pasta.v1',
 			publishStage: 'partner-submitted',
 		},
-		{
-			id: 'prd-sweets-juice',
-			name: 'عصير برتقال طازج',
-			subtitle: 'عصير طبيعي معصور طازجاً',
-			priceLabel: '9.50 ر.ي',
-			categoryId: 'drinks-juice',
-			categoryLabel: 'مشروبات',
-			isAvailable: true,
-			hasOptions: false,
-			preparationTime: '5 دقائق',
-			// No dedicated juice image; milk is the closest clean liquid product in media-fixtures/products.
-			mediaKey: 'dsh.product.milk.v1',
-			imageUri: 'dsh.product.milk.v1',
-			publishStage: 'client-visible',
-		},
+
 		{
 			id: 'prd-grocery-bread',
 			name: 'خبز قمح كامل (مكثف)',
@@ -396,21 +312,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			imageUri: 'dsh.product.roll.v1',
 			publishStage: 'rejected',
 		},
-		{
-			id: 'prd-honey-jar',
-			name: 'عسل سدر جبلي',
-			subtitle: 'عسل طبيعي نقي 100%',
-			priceLabel: '15.00 ر.ي',
-			categoryId: 'drinks-honey',
-			categoryLabel: 'مشروبات',
-			isAvailable: true,
-			hasOptions: false,
-			preparationTime: '5 دقائق',
-			// No dedicated honey image; lead-5-dates-box is the closest natural/artisanal product in media-fixtures/products.
-			mediaKey: 'dsh.product.lead-5.dates-box.v1',
-			imageUri: 'dsh.product.lead-5.dates-box.v1',
-			publishStage: 'marketing-review',
-		},
+
 	]),
 
 	'store-1002': withPublishedPreviewStage([
