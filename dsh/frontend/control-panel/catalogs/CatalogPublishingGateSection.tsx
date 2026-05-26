@@ -2,8 +2,9 @@
 // All prerequisites must be satisfied before the publish CTA is enabled.
 // Prerequisites: partner active + all items approved + delivery modes ready + category mapped + no duplicates.
 // Audit note is shown when the gate record flags auditRequired = true.
+// UI_PREVIEW_ONLY: gate actions produce visible result state but no backend/API binding.
 import React from 'react';
-import { Box, Button, Chip, KeyValueList, Text } from '@bthwani/ui-kit';
+import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import {
   type DshProductIdentityApprovalStatus,
@@ -33,8 +34,8 @@ const gateStatusTone: Record<PublishGateStatus, 'default' | 'success' | 'danger'
 
 type CatalogPublishGateRecord = {
   id: string;
-  catalogName: string;
-  partnerName: string;
+  catalogLabel: string;
+  partnerLabel: string;
   itemCount: number;
   approvedItemCount: number;
   status: PublishGateStatus;
@@ -60,8 +61,8 @@ type CatalogPublishGateRecord = {
 
 const demoRecord: CatalogPublishGateRecord = {
   id: 'catalog-001',
-  catalogName: 'قائمة الطعام الرئيسية — الموسم الصيفي',
-  partnerName: 'مطعم النجوم',
+  catalogLabel: 'قائمة الطعام الرئيسية — الموسم الصيفي',
+  partnerLabel: 'مطعم النجوم',
   itemCount: 42,
   approvedItemCount: 38,
   status: 'in-review',
@@ -76,6 +77,23 @@ const demoRecord: CatalogPublishGateRecord = {
   auditRequired: false,
 };
 
+// Gate action result — UI_PREVIEW_ONLY
+type GateActionResult = {
+  action: 'publish' | 'request-revision' | 'reject';
+  label: string;
+  status: 'sent' | 'preview-only';
+  owner: 'control-panel-catalog' | 'control-panel-marketing' | 'control-panel-operations';
+  note: string;
+} | null;
+
+function resolveGateOwnerLabel(owner: 'control-panel-catalog' | 'control-panel-marketing' | 'control-panel-operations'): string {
+  switch (owner) {
+    case 'control-panel-catalog': return 'الكتالوج';
+    case 'control-panel-marketing': return 'التسويق';
+    case 'control-panel-operations': return 'العمليات';
+  }
+}
+
 export type CatalogPublishingGateSectionProps = {
   record?: CatalogPublishGateRecord;
   onApproveForPublish?: (id: string) => void;
@@ -89,6 +107,9 @@ export function CatalogPublishingGateSection({
   onReject,
   onRequestRevision,
 }: CatalogPublishingGateSectionProps) {
+  const { theme } = useTheme();
+  const [gateActionResult, setGateActionResult] = React.useState<GateActionResult>(null);
+
   const readinessPercent = Math.round((record.approvedItemCount / record.itemCount) * 100);
 
   const productVisibility = resolveDshProductClientVisibility({
@@ -106,6 +127,52 @@ export function CatalogPublishingGateSection({
   const allPrerequisitesMet = prerequisites.every((p) => p.satisfied);
   const isReadyToPublish = (record.status === 'approved' || productVisibility.publishingStatus === 'publishing_ready') && allPrerequisitesMet;
 
+  const unsatisfiedPrereqs = prerequisites.filter((p) => !p.satisfied);
+  const firstBlockedReason = unsatisfiedPrereqs[0]?.blockedReason ?? null;
+
+  const handleApproveForPublish = React.useCallback(() => {
+    if (onApproveForPublish) {
+      onApproveForPublish(record.id);
+      setGateActionResult({
+        action: 'publish',
+        label: 'تمت الموافقة على النشر',
+        status: 'sent',
+        owner: 'control-panel-catalog',
+        note: 'تم إرسال الطلب للمالك',
+      });
+    } else {
+      setGateActionResult({
+        action: 'publish',
+        label: 'معاينة النشر',
+        status: 'preview-only',
+        owner: 'control-panel-catalog',
+        note: 'UI_PREVIEW_ONLY — لا يعني نشرًا فعليًا في runtime/API',
+      });
+    }
+  }, [record.id, onApproveForPublish]);
+
+  const handleRequestRevision = React.useCallback(() => {
+    onRequestRevision?.(record.id);
+    setGateActionResult({
+      action: 'request-revision',
+      label: 'تم طلب المراجعة',
+      status: onRequestRevision ? 'sent' : 'preview-only',
+      owner: 'control-panel-marketing',
+      note: onRequestRevision ? 'تم الإرسال للمالك' : 'UI_PREVIEW_ONLY — لا يعني إرسالًا فعليًا',
+    });
+  }, [record.id, onRequestRevision]);
+
+  const handleReject = React.useCallback(() => {
+    onReject?.(record.id);
+    setGateActionResult({
+      action: 'reject',
+      label: 'تم الرفض',
+      status: onReject ? 'sent' : 'preview-only',
+      owner: 'control-panel-operations',
+      note: onReject ? 'تم الإرسال للمالك' : 'UI_PREVIEW_ONLY — لا يعني رفضًا فعليًا',
+    });
+  }, [record.id, onReject]);
+
   return (
     <Box gap={4} padding={4}>
       <WebCompactSurfaceHeader
@@ -119,8 +186,8 @@ export function CatalogPublishingGateSection({
 
       <Box gap={3}>
         <Box gap={1}>
-          <Text role="titleSm">{record.catalogName}</Text>
-          <Text role="bodySm" tone="muted">{record.partnerName}</Text>
+          <Text role="titleSm">{record.catalogLabel}</Text>
+          <Text role="bodySm" tone="muted">{record.partnerLabel}</Text>
           <Chip
             label={gateStatusLabel[record.status]}
             tone={gateStatusTone[record.status]}
@@ -175,28 +242,47 @@ export function CatalogPublishingGateSection({
         {(record.status === 'in-review' || record.status === 'not-started' || record.status === 'approved') ? (
           <Box gap={2}>
             {!allPrerequisitesMet ? (
-              <Text role="caption" tone="danger">
-                {`${prerequisites.filter((p) => !p.satisfied).length} شرط غير مستوفٍ — أكمل المتطلبات لتفعيل النشر.`}
-              </Text>
+              <Box gap={1}>
+                <Text role="caption" tone="danger">
+                  {`${unsatisfiedPrereqs.length} شرط غير مستوفٍ — أكمل المتطلبات لتفعيل النشر.`}
+                </Text>
+                {firstBlockedReason ? (
+                  <Text role="caption" tone="muted">{`أول مانع: ${firstBlockedReason}`}</Text>
+                ) : null}
+              </Box>
             ) : null}
             <Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               <Button
                 label="الموافقة على النشر"
                 tone="primary"
                 disabled={!isReadyToPublish}
-                onPress={isReadyToPublish ? () => onApproveForPublish?.(record.id) : undefined}
+                onPress={isReadyToPublish ? handleApproveForPublish : undefined}
               />
               <Button
                 label="طلب مراجعة"
                 tone="secondary"
-                onPress={() => onRequestRevision?.(record.id)}
+                onPress={handleRequestRevision}
               />
               <Button
                 label="رفض"
                 tone="danger"
-                onPress={() => onReject?.(record.id)}
+                onPress={handleReject}
               />
             </Box>
+
+            {/* Gate action result banner — UI_PREVIEW_ONLY */}
+            {gateActionResult ? (
+              <div
+                role="status"
+                aria-live="polite"
+                style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 10, backgroundColor: theme.surfaceInset, borderRadius: 8 }}
+              >
+                <Text role="bodySm">{gateActionResult.label}</Text>
+                <Text role="caption" tone="muted">
+                  {`المالك: ${resolveGateOwnerLabel(gateActionResult.owner)} · ${gateActionResult.note}`}
+                </Text>
+              </div>
+            ) : null}
           </Box>
         ) : null}
 

@@ -504,6 +504,8 @@ export function ControlPanelDshCatalogScreen({
   // Column Filters
   const [colFilters, setColFilters] = useState<Record<CatalogFilterColumnId, string[]>>(initialColumnFilters);
   const [openFilterCol, setOpenFilterCol] = useState<CatalogFilterColumnId | null>(null);
+  // UI_PREVIEW_ONLY action feedback — replaces setActionMessage() calls throughout the screen.
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   // Handlers
   const handleMainCategorySelect = (cat: CatalogMainCategory | null) => {
@@ -1105,7 +1107,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم تبديل سياسة الصور للمنتجات المحددة في الجدول');
+            setActionMessage('تم تبديل سياسة الصور للمنتجات المحددة في الجدول');
           }
         },
         {
@@ -1115,7 +1117,7 @@ export function ControlPanelDshCatalogScreen({
           onAction: () => {
             setProducts(dshCatalogProducts);
             setPreviewApprovalStages({});
-            alert('تمت إعادة الكتالوج لحالة المصدر الأولية');
+            setActionMessage('تمت إعادة الكتالوج لحالة المصدر الأولية');
           }
         }
       );
@@ -1133,7 +1135,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية');
+            setActionMessage('تم اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية');
           }
         }
       );
@@ -1151,7 +1153,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم اعتماد مراجعات التسويق المحددة بنجاح');
+            setActionMessage('تم اعتماد مراجعات التسويق المحددة بنجاح');
           }
         });
       } else if (activeSubTab === 'quality') {
@@ -1167,7 +1169,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم تمرير فحوصات الجودة لمنتجات الشركاء بنجاح');
+            setActionMessage('تم تمرير فحوصات الجودة لمنتجات الشركاء بنجاح');
           }
         });
       } else if (activeSubTab === 'pricing') {
@@ -1183,7 +1185,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير');
+            setActionMessage('تم خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير');
           }
         });
       } else if (activeSubTab === 'media') {
@@ -1199,7 +1201,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور');
+            setActionMessage('تم تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور');
           }
         });
       } else if (activeSubTab === 'barcode') {
@@ -1215,7 +1217,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم توليد أرقام باركود GTIN عشوائية لجميع المنتجات المحددة');
+            setActionMessage('تم توليد أرقام باركود GTIN عشوائية لجميع المنتجات المحددة');
           }
         });
       }
@@ -1239,7 +1241,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم دمج التكرارات وحل النزاعات للمنتجات المحددة');
+            setActionMessage('تم دمج التكرارات وحل النزاعات للمنتجات المحددة');
           }
         });
       } else if (activeSubTab === 'gtin') {
@@ -1255,7 +1257,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم تعيين GTIN بالاعتماد على SKU للمنتجات المحددة');
+            setActionMessage('تم تعيين GTIN بالاعتماد على SKU للمنتجات المحددة');
           }
         });
       } else if (activeSubTab === 'media') {
@@ -1264,7 +1266,7 @@ export function ControlPanelDshCatalogScreen({
           label: '📸 فرض سياسة الصور المركزية',
           isActive: false,
           onAction: () => {
-            alert('معاينة محلية فقط / preview-only: تم فرض سياسة الصور المركزية للمنتجات المؤهلة');
+            setActionMessage('معاينة محلية فقط / preview-only: تم فرض سياسة الصور المركزية للمنتجات المؤهلة');
           }
         });
       } else if (activeSubTab === 'substitutions') {
@@ -1273,7 +1275,7 @@ export function ControlPanelDshCatalogScreen({
           label: '🔒 تطبيق سياسة بدائل صارمة',
           isActive: false,
           onAction: () => {
-            alert('تم تطبيق سياسة بدائل صارمة بنجاح عبر الكتالوج');
+            setActionMessage('تم تطبيق سياسة بدائل صارمة بنجاح عبر الكتالوج');
           }
         });
       } else if (activeSubTab === 'visibility-policy') {
@@ -1293,7 +1295,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم تعديل منصات العرض المتاحة للمنتجات المحددة');
+            setActionMessage('تم تعديل منصات العرض المتاحة للمنتجات المحددة');
           }
         });
       }
@@ -1310,7 +1312,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم نشر جميع المنتجات الجاهزة بنجاح للعميل');
+            setActionMessage('تم نشر جميع المنتجات الجاهزة بنجاح للعميل');
           }
         },
         {
@@ -1324,7 +1326,7 @@ export function ControlPanelDshCatalogScreen({
               }
               return p;
             }));
-            alert('تم التأكد من إخفاء جميع المسودات ومقترحات الشركاء');
+            setActionMessage('تم التأكد من إخفاء جميع المسودات ومقترحات الشركاء');
           }
         }
       );
@@ -2172,6 +2174,14 @@ export function ControlPanelDshCatalogScreen({
       </div>
 
 
+      {/* Action message banner -- replaces alert() calls; UI_PREVIEW_ONLY, no backend */}
+      {actionMessage ? (
+        <div role="status" aria-live="polite" style={{ padding: '8px 14px', backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexShrink: 0 }}>
+          <span style={{ fontSize: '11px', color: theme.brandHeaderBackground, fontWeight: 600 }}>{actionMessage}</span>
+          <span style={{ fontSize: '10px', color: theme.textMuted }}>UI_PREVIEW_ONLY</span>
+          <button type="button" onClick={() => setActionMessage(null)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '12px', cursor: 'pointer', padding: '0 4px' }}>x</button>
+        </div>
+      ) : null}
       {/* Category Control Room — preview-only, shows when mapping/categories */}
       {activeTab === 'mapping' && activeSubTab === 'categories' && (
         <div style={{
@@ -2618,7 +2628,7 @@ export function ControlPanelDshCatalogScreen({
                                           }
                                           return p;
                                         }));
-                                        alert('تم نشر جميع المنتجات الجاهزة بنجاح وأصبحت مرئية للعميل!');
+                                        setActionMessage('تم نشر جميع المنتجات الجاهزة بنجاح وأصبحت مرئية للعميل!');
                                       }}
                                     />
                                   </Box>
@@ -2879,7 +2889,7 @@ export function ControlPanelDshCatalogScreen({
                                     style={{ flex: 1 }}
                                     onPress={() => {
                                       setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-adopted', mediaPolicy: 'catalog-owned-media' } : p));
-                                      alert('تم الاعتماد كمنتج مركزي');
+                                      setActionMessage('تم الاعتماد كمنتج مركزي');
                                     }}
                                   />
                                   <Button
@@ -2889,7 +2899,7 @@ export function ControlPanelDshCatalogScreen({
                                     style={{ flex: 1 }}
                                     onPress={() => {
                                       setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-adopted', mediaPolicy: 'partner-owned-exception' } : p));
-                                      alert('تم الاعتماد كاستثناء شريك');
+                                      setActionMessage('تم الاعتماد كاستثناء شريك');
                                     }}
                                   />
                                 </Box>
@@ -2901,7 +2911,7 @@ export function ControlPanelDshCatalogScreen({
                                     style={{ flex: 1 }}
                                     onPress={() => {
                                       setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-draft' } : p));
-                                      alert('تمت الإعادة لمسودة الكتالوج لتصحيح البيانات');
+                                      setActionMessage('تمت الإعادة لمسودة الكتالوج لتصحيح البيانات');
                                     }}
                                   />
                                 </Box>
@@ -2919,7 +2929,7 @@ export function ControlPanelDshCatalogScreen({
                                     style={{ flex: 1 }}
                                     onPress={() => {
                                       setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-adopted' } : p));
-                                      alert('تم تمرير فحص الجودة بنجاح');
+                                      setActionMessage('تم تمرير فحص الجودة بنجاح');
                                     }}
                                   />
                                   <Button
@@ -2929,7 +2939,7 @@ export function ControlPanelDshCatalogScreen({
                                     style={{ flex: 1 }}
                                     onPress={() => {
                                       setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-draft' } : p));
-                                      alert('تم إرجاع المنتج للمسودة للتعديل');
+                                      setActionMessage('تم إرجاع المنتج للمسودة للتعديل');
                                     }}
                                   />
                                 </Box>
@@ -2945,7 +2955,7 @@ export function ControlPanelDshCatalogScreen({
                                   size="sm"
                                   onPress={() => {
                                     setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'client-visible' } : p));
-                                    alert('تم النشر والظهور الفوري للعميل');
+                                    setActionMessage('تم النشر والظهور الفوري للعميل');
                                   }}
                                 />
                               </Box>
@@ -2960,7 +2970,7 @@ export function ControlPanelDshCatalogScreen({
                                   size="sm"
                                   onPress={() => {
                                     setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, conflictReason: undefined } : p));
-                                    alert('تم حل التعارض والدمج بنجاح');
+                                    setActionMessage('تم حل التعارض والدمج بنجاح');
                                   }}
                                 />
                               </Box>
@@ -2975,7 +2985,7 @@ export function ControlPanelDshCatalogScreen({
                                   onPress={() => {
                                     const barcode = `628${Math.floor(1000000000 + Math.random() * 9000000000)}`;
                                     setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, gtin: barcode } : p));
-                                    alert(`تم توليد باركود: ${barcode}`);
+                                    setActionMessage(`تم توليد باركود: ${barcode}`);
                                   }}
                                 />
                               </Box>
@@ -2990,7 +3000,7 @@ export function ControlPanelDshCatalogScreen({
                                   size="sm"
                                   onPress={() => {
                                     setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, price: 45.00 } : p));
-                                    alert('تمت تسوية سعر المنتج');
+                                    setActionMessage('تمت تسوية سعر المنتج');
                                   }}
                                 />
                               </Box>
@@ -3956,7 +3966,7 @@ export function ControlPanelDshCatalogScreen({
                 tone="brand"
                 onPress={() => {
                   if (!modalForm.name || !modalForm.sku) {
-                    alert('الاسم والمعرف مطلوبان');
+                    setActionMessage('الاسم والمعرف مطلوبان');
                     return;
                   }
                   if (modalMode === 'add') {

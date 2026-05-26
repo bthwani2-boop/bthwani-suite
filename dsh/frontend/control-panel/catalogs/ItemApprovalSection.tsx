@@ -20,8 +20,8 @@ type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision'
 
 type CatalogItemApprovalRecord = {
   id: string;
-  title: string;
-  partnerName: string;
+  displayCaption: string;
+  partnerLabel: string;
   category: string;
   submittedAt: string;
   status: ItemApprovalStatus;
@@ -88,8 +88,8 @@ export function ItemApprovalSection({
 
         return {
           id: r.id,
-          title: r.title,
-          partnerName: r.source === 'app-partner' ? 'تطبيق الشريك' : 'تطبيق الميداني',
+          displayCaption: r.title,
+          partnerLabel: r.source === 'app-partner' ? 'تطبيق الشريك' : 'تطبيق الميداني',
           category: r.entityType === 'product' ? 'منتج كتالوج' : r.entityType === 'product-media' ? 'صورة منتج' : 'اقتراح فئة',
           submittedAt: r.submittedAt ? r.submittedAt.split('T')[0] : '2026-05-25',
           status,
@@ -105,7 +105,8 @@ export function ItemApprovalSection({
       propsOnApprove(id);
       return;
     }
-    moveApprovalRecordToStage(id, 'partner-approved', 'control-panel-partners', 'اعتماد الجودة الأولي');
+    // control-panel/catalogs owns catalog adoption — correct owner and stage
+    moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-catalog', 'اعتماد الكتالوج');
     refresh();
   }, [propsOnApprove, refresh]);
 
@@ -114,7 +115,8 @@ export function ItemApprovalSection({
       propsOnReject(id, evidenceNote);
       return;
     }
-    moveApprovalRecordToStage(id, 'rejected', 'control-panel-partners', 'رفض الجودة');
+    // control-panel/catalogs owns rejection decisions — correct owner
+    moveApprovalRecordToStage(id, 'rejected', 'control-panel-catalog', 'رفض الكتالوج');
     upsertApprovalRecord({ id, metadata: { rejectionReason: evidenceNote } });
     refresh();
   }, [propsOnReject, refresh]);
@@ -124,7 +126,8 @@ export function ItemApprovalSection({
       propsOnRequestRevision(id, evidenceNote);
       return;
     }
-    moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-partners', 'طلب تعديل الجودة');
+    // control-panel/catalogs owns revision requests — correct owner
+    moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-catalog', 'طلب تعديل الكتالوج');
     upsertApprovalRecord({ id, metadata: { requiredFix: evidenceNote } });
     refresh();
   }, [propsOnRequestRevision, refresh]);
@@ -159,8 +162,8 @@ export function ItemApprovalSection({
           return (
             <Box key={item.id} gap={1}>
               <ListItem
-                title={item.title}
-                subtitle={`${item.partnerName} · ${item.category} · ${item.submittedAt}`}
+                title={item.displayCaption}
+                subtitle={`${item.partnerLabel} · ${item.category} · ${item.submittedAt}`}
                 badgeLabel={statusLabel[item.status]}
                 badgeTone={approvalTone === 'muted' ? 'default' : approvalTone}
                 meta={

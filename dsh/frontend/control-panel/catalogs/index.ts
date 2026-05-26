@@ -10,10 +10,10 @@ export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceS
 export { ControlPanelDshCatalogCategoriesScreen } from './ControlPanelDshCatalogCategoriesScreen';
 export { default } from './CatalogGovernanceScreens';
 
-// ML-053: Item approval section skeleton — BLOCKED_BY_CONTRACT (catalog approval API not proven)
+// ML-053: Item approval section — UI_PREVIEW_ONLY flow implemented (catalog approval API not yet bound)
 export { ItemApprovalSection } from './ItemApprovalSection';
 export type { ItemApprovalSectionProps } from './ItemApprovalSection';
 
-// ML-054: Catalog publishing gate section skeleton — BLOCKED_BY_CONTRACT (catalog publish API not proven)
+// ML-054: Catalog publishing gate section — UI_PREVIEW_ONLY flow implemented (catalog publish API not yet bound)
 export { CatalogPublishingGateSection } from './CatalogPublishingGateSection';
 export type { CatalogPublishingGateSectionProps } from './CatalogPublishingGateSection';
