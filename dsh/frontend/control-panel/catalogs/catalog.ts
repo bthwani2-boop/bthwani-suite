@@ -141,39 +141,21 @@ export type CatalogProductMaster = {
   categoryType?: string; // e.g. product, service
 };
 
-// Authoritative preview catalog metrics for control-panel governance view.
-// UI_PREVIEW_ONLY — not runtime truth, not backend source.
-// These values reflect the full catalog scope (categories from dshCategoryFixtures,
-// products from storeItemsByStoreId + canonical field products).
-// NOTE: shared/catalog.ts contains a smaller stale dshCatalogMetrics — this one supersedes it.
-export const dshCatalogMetrics = {
-  mainCategories: 13,
-  subCategories: 24,
-  approvedProducts: 14500,
-  pendingPartnerReviews: 42,
-  pendingMarketingReviews: 18,
-  priceConflicts: 7,
-  imageExceptions: 124,
-} as const;
-
-export const dshCatalogSmartFilters: CatalogSmartFilter[] = [
-  { id: 'all', label: 'الكل', count: 14500 },
-  { id: 'master', label: 'منتجات مركزية', count: 12300 },
-  { id: 'partner-exception', label: 'استثناء صورة', count: 124 },
-  { id: 'partner-review', label: 'مراجعة شريك', count: 42 },
-  { id: 'marketing-review', label: 'مراجعة تسويق', count: 18 },
-  { id: 'price-conflict', label: 'تعارض سعر', count: 7 },
-  { id: 'non-matching', label: 'غير مطابق', count: 3 },
-  { id: 'category-proposals', label: 'مقترحات فئات', count: 5 },
-];
-
-export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [
-  { id: 'q-1', productId: 'prd-sweets-cake', stage: 'marketing-review', requestedBy: 'Partner 1002' },
-  { id: 'q-2', productId: 'prd-review-coffee', stage: 'partner-review', requestedBy: 'Field Agent 3' },
-];
-
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { storeItemsByStoreId } from '../../data/products.preview-data';
+import {
+  storeItemsByStoreId,
+  dshCatalogMetrics,
+  dshCatalogSmartFilters,
+  dshCatalogApprovalQueues,
+} from '../../data/products.preview-data';
+import {
+  getProductCategoryPath,
+  deriveProductSku,
+  deriveProductGtin,
+  getSubcategoryClassifications,
+} from '../../shared/catalog-central-adapter';
+
+export { dshCatalogMetrics, dshCatalogSmartFilters, dshCatalogApprovalQueues };
 
 export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.map((c) => {
   return {
@@ -185,28 +167,11 @@ export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.m
     renderMode: c.renderMode,
     categoryMode: c.isManualLike ? 'manual-order' : 'catalog-based',
     subcategories: c.subcategories.map((sub) => {
-      // Initialize with default classifications so the user has some classifications to see/edit
-      // DEFERRED_DATA_CENTRALIZATION: generated classifications such as "تصنيف رئيسي 1" and "تصنيف فرعي أ" should be moved to categories.preview-data.ts in future centralization sweep.
-      const mainClassifications: CatalogMainClassification[] = [
-        {
-          id: `classif-main-${sub.id}-1`,
-          label: 'تصنيف رئيسي 1',
-          subClassifications: [
-            { id: `classif-sub-${sub.id}-1a`, label: 'تصنيف فرعي أ' },
-            { id: `classif-sub-${sub.id}-1b`, label: 'تصنيف فرعي ب' }
-          ]
-        },
-        {
-          id: `classif-main-${sub.id}-2`,
-          label: 'تصنيف رئيسي 2',
-          subClassifications: []
-        }
-      ];
       return {
         id: sub.id,
         label: sub.label,
         subtitle: sub.subtitle,
-        mainClassifications
+        mainClassifications: getSubcategoryClassifications(sub.id)
       };
     })
   };
@@ -217,37 +182,9 @@ const allProductsMap = new Map<string, CatalogProductMaster>();
 
 Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
   items.forEach((item) => {
-    // Find main category
-    let mainCat = 'grocery';
-    let subCat: string | undefined = undefined;
-
-    // Try to match the item categoryId to subcategories
-    for (const cat of dshCategoryFixtures) {
-      if (cat.id === item.categoryId) {
-        mainCat = cat.id;
-        break;
-      }
-      const sub = cat.subcategories.find(s => s.id === item.categoryId);
-      if (sub) {
-        mainCat = cat.id;
-        subCat = sub.id;
-        break;
-      }
-    }
-
-    // If categoryId doesn't match directly, map default fallback
-    if (item.categoryId === 'fresh' || item.categoryId === 'dairy' || item.categoryId === 'bakery') {
-      mainCat = 'grocery';
-      if (item.categoryId === 'fresh') subCat = 'grocery_vegetables_fruits';
-      else if (item.categoryId === 'dairy') subCat = 'grocery_dairy';
-      else if (item.categoryId === 'bakery') subCat = 'grocery_bakeries';
-    } else if (item.categoryId === 'meals' || item.categoryId === 'sides' || item.categoryId === 'drinks') {
-      mainCat = 'restaurants';
-      if (item.categoryId === 'meals') subCat = 'res_meals';
-    } else if (item.categoryId === 'sweets' || item.categoryId === 'dessert') {
-      mainCat = 'sweets_juices';
-      subCat = 'sweets_juices_sweets';
-    }
+    const path = getProductCategoryPath(item.categoryId);
+    const sku = deriveProductSku(item.id);
+    const gtin = deriveProductGtin(item.id);
 
     const approvalStage: CatalogApprovalStage =
       item.publishStage === 'client-visible' || item.publishStage === 'published-preview'
@@ -260,9 +197,6 @@ Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
               ? 'partner-review'
               : 'catalog-draft';
 
-    const sku = item.id.toUpperCase().replace('ITEM-', 'BTH-');
-    const gtin = item.id === 'item-apple-1' ? '6281000000012' : undefined;
-
     const product: CatalogProductMaster = {
       id: item.id,
       name: item.name,
@@ -271,10 +205,10 @@ Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
       barcode: gtin,
       measurementUnit: item.measurementType === 'weight' ? '1 كجم' : '1 حبة',
       categoryPath: {
-        main: mainCat,
-        sub: subCat,
-        mainClassification: subCat ? `classif-main-${subCat}-1` : undefined,
-        subClassification: subCat ? `classif-sub-${subCat}-1a` : undefined,
+        main: path.main,
+        sub: path.sub,
+        mainClassification: path.sub ? `classif-main-${path.sub}-1` : undefined,
+        subClassification: path.sub ? `classif-sub-${path.sub}-1a` : undefined,
       },
       price: parseFloat(item.priceLabel ?? '') || 15,
       mediaPolicy: (item.mediaPolicy as any) || 'catalog-owned-media',

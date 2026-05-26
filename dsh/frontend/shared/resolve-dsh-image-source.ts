@@ -10,7 +10,7 @@ const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.product.pasta.v1': require('../media-fixtures/products/dsh-product-pasta-v1.png') as ImageSourcePropType,
   'dsh.product.roll.v1': require('../media-fixtures/products/dsh-product-roll-v1.png') as ImageSourcePropType,
   // DEFERRED_MEDIA_FIXTURE: lead-5 featured product image falls back to roll-v1 until real media assets are generated
-  'dsh.product.lead-5.dates-box.v1': require('../media-fixtures/products/dsh-product-roll-v1.png') as ImageSourcePropType,
+  'dsh.product.lead-5.dates-box.v1': require('../media-fixtures/products/dsh-product-lead-5-dates-box-v1.png') as ImageSourcePropType,
   'dsh.product.salad.v1': require('../media-fixtures/products/dsh-product-salad-v1.png') as ImageSourcePropType,
   'dsh.product.yogurt.v1': require('../media-fixtures/products/dsh-product-yogurt-v1.png') as ImageSourcePropType,
   'dsh.store.hadda.cover.v1': require('../media-fixtures/stores/dsh-store-hadda-cover-v1.png') as ImageSourcePropType,
@@ -19,10 +19,8 @@ const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.store.hadda.logo.v1': require('../media-fixtures/logos/dsh-store-hadda-logo-v1.png') as ImageSourcePropType,
   'dsh.store.hittin.logo.v1': require('../media-fixtures/logos/dsh-store-hittin-logo-v1.png') as ImageSourcePropType,
   'dsh.store.malqa.logo.v1': require('../media-fixtures/logos/dsh-store-malqa-logo-v1.png') as ImageSourcePropType,
-  // DEFERRED_MEDIA_FIXTURE: lead-5 canonical store cover falls back to malqa cover until real media assets are generated
-  'dsh.store.lead-5.cover.v1': require('../media-fixtures/stores/dsh-store-malqa-cover-v1.png') as ImageSourcePropType,
-  // DEFERRED_MEDIA_FIXTURE: lead-5 canonical store logo falls back to malqa logo until real media assets are generated
-  'dsh.store.lead-5.logo.v1': require('../media-fixtures/logos/dsh-store-malqa-logo-v1.png') as ImageSourcePropType,
+  'dsh.store.lead-5.cover.v1': require('../media-fixtures/stores/dsh-store-lead-5-cover-v1.png') as ImageSourcePropType,
+  'dsh.store.lead-5.logo.v1': require('../media-fixtures/logos/dsh-store-lead-5-logo-v1.png') as ImageSourcePropType,
   'dsh.brand.logo.v1': require('../media-fixtures/logos/brand-logo.png') as ImageSourcePropType,
   'dsh.banner.home.promo-1.v1': require('../media-fixtures/banners/dsh-banner-home-promo-1-v1.png') as ImageSourcePropType,
   'dsh.banner.home.promo-2.v1': require('../media-fixtures/banners/dsh-banner-home-promo-2-v1.png') as ImageSourcePropType,

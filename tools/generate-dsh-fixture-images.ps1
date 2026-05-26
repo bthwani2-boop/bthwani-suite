@@ -99,13 +99,19 @@ $productMap = @(
     @{ Name = 'dsh-product-pasta-v1.png'; Title = 'PASTA'; Subtitle = 'Hot plate'; Accent = '#0f766e'; Accent2 = '#22c55e'; Width = 800; Height = 600 },
     @{ Name = 'dsh-product-roll-v1.png'; Title = 'ROLL'; Subtitle = 'Quick bite'; Accent = '#be185d'; Accent2 = '#f97316'; Width = 800; Height = 600 },
     @{ Name = 'dsh-product-salad-v1.png'; Title = 'SALAD'; Subtitle = 'Healthy choice'; Accent = '#16a34a'; Accent2 = '#86efac'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-yogurt-v1.png'; Title = 'YOGURT'; Subtitle = 'Cold and fresh'; Accent = '#1d4ed8'; Accent2 = '#a5f3fc'; Width = 800; Height = 600 }
+    @{ Name = 'dsh-product-yogurt-v1.png'; Title = 'YOGURT'; Subtitle = 'Cold and fresh'; Accent = '#1d4ed8'; Accent2 = '#a5f3fc'; Width = 800; Height = 600 },
+    @{ Name = 'dsh-product-lead-5-dates-box-v1.png'; Title = 'DATES BOX'; Subtitle = 'Premium Box'; Accent = '#d97706'; Accent2 = '#f59e0b'; Width = 800; Height = 600 }
 )
 
 $storeMap = @(
     @{ Name = 'dsh-store-hadda-cover-v1.png'; Title = 'STORE A'; Subtitle = 'Neighborhood store'; Accent = '#dc2626'; Accent2 = '#f97316'; Width = 900; Height = 700 },
     @{ Name = 'dsh-store-hittin-cover-v1.png'; Title = 'STORE B'; Subtitle = 'Visible cover'; Accent = '#1d4ed8'; Accent2 = '#38bdf8'; Width = 900; Height = 700 },
-    @{ Name = 'dsh-store-malqa-cover-v1.png'; Title = 'STORE C'; Subtitle = 'Store identity'; Accent = '#7c3aed'; Accent2 = '#f59e0b'; Width = 900; Height = 700 }
+    @{ Name = 'dsh-store-malqa-cover-v1.png'; Title = 'STORE C'; Subtitle = 'Store identity'; Accent = '#7c3aed'; Accent2 = '#f59e0b'; Width = 900; Height = 700 },
+    @{ Name = 'dsh-store-lead-5-cover-v1.png'; Title = 'STORE LEAD-5'; Subtitle = 'Canonical Store Cover'; Accent = '#7c3aed'; Accent2 = '#f59e0b'; Width = 900; Height = 700 }
+)
+
+$logoMap = @(
+    @{ Name = 'dsh-store-lead-5-logo-v1.png'; Title = 'L5'; Subtitle = 'Logo'; Accent = '#7c3aed'; Accent2 = '#0f172a'; Width = 400; Height = 400 }
 )
 
 foreach ($item in $bannerMap) {
@@ -118,4 +124,8 @@ foreach ($item in $productMap) {
 
 foreach ($item in $storeMap) {
     New-SeedImage -Path (Join-Path (Join-Path $root 'stores') $item.Name) -Width $item.Width -Height $item.Height -Title $item.Title -Subtitle $item.Subtitle -Accent $item.Accent -Accent2 $item.Accent2
+}
+
+foreach ($item in $logoMap) {
+    New-SeedImage -Path (Join-Path (Join-Path $root 'logos') $item.Name) -Width $item.Width -Height $item.Height -Title $item.Title -Subtitle $item.Subtitle -Accent $item.Accent -Accent2 $item.Accent2
 }

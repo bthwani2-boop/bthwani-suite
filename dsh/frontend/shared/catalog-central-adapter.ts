@@ -147,58 +147,80 @@ export function buildCentralPartnerInventoryItems(
   return result;
 }
 
-/**
- * Partner inventory detail record — partner-local operational data.
- * These are partner surface overrides only (sku, gtin, notes).
- * They do NOT own canonical product identity.
- */
-export type PartnerInventoryDetail = {
-  id: string;
-  name?: string;
-  sku: string;
-  gtin?: string;
-  barcode?: string;
-  manufacturerCode?: string;
-  internalNote?: string;
-  preparationNote?: string;
-};
+import { dshCategoryFixtures } from '../data/categories.preview-data';
+import {
+  type PartnerInventoryDetail,
+  CENTRAL_PRODUCT_DETAIL_LOOKUP,
+} from '../data/partner.preview-data';
+
+export type { PartnerInventoryDetail };
+export { CENTRAL_PRODUCT_DETAIL_LOOKUP };
 
 /**
- * Seed detail records for central products.
- * Owner: app-partner surface — partner operational data only.
- * PREVIEW_DERIVED_ONLY: not canonical, not runtime binding.
+ * Maps the category ID to a path containing main category and optional subcategory.
+ * Resolves fallback mapping rules centrally.
  */
-export const CENTRAL_PRODUCT_DETAIL_LOOKUP: Record<string, PartnerInventoryDetail> = {
-  // store-1001 items
-  'item-apple-1': { id: 'item-apple-1', sku: 'BTH-GRO-FR-001', gtin: '6281000000012', barcode: '6281000000012', manufacturerCode: 'MFR-SL-44' },
-  'item-milk-1': { id: 'item-milk-1', sku: 'BTH-GRO-DA-001', gtin: '6280001000445', barcode: '6280001000445', manufacturerCode: 'MFR-DA-01' },
-  'item-bread-1': { id: 'item-bread-1', sku: 'BTH-GRO-BK-001', gtin: '6280001000308', barcode: '6280001000308', manufacturerCode: 'MFR-SA-03' },
-  'item-yogurt-1': { id: 'item-yogurt-1', sku: 'BTH-GRO-DA-002', gtin: '6280001000112', barcode: '6280001000112', manufacturerCode: 'MFR-DA-02' },
-  'item-croissant-2': { id: 'item-croissant-2', sku: 'BTH-BAK-001', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05' },
-  'item-chicken-2': { id: 'item-chicken-2', sku: 'BTH-RES-001', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14' },
-  'item-salad-2': { id: 'item-salad-2', sku: 'BTH-RES-SL-001', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22' },
-  'item-choco-2': { id: 'item-choco-2', sku: 'BTH-SWT-001', gtin: '6280001000552', barcode: '6280001000552', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
-  // store-1002 items
-  'item-croissant-1': { id: 'item-croissant-1', sku: 'BTH-BAK-002', gtin: '6280001000188', barcode: '6280001000188', manufacturerCode: 'MFR-BKR-06' },
-  'item-cake-1': { id: 'item-cake-1', sku: 'BTH-SWT-002', gtin: '6280001000902', barcode: '6280001000902', manufacturerCode: 'MFR-DR-90' },
-  'item-roll-1': { id: 'item-roll-1', sku: 'BTH-BAK-003', gtin: '6280001000317', barcode: '6280001000317', manufacturerCode: 'MFR-BK-31' },
-  'item-choco-1': { id: 'item-choco-1', sku: 'BTH-SWT-003', gtin: '6280001000419', barcode: '6280001000419', manufacturerCode: 'MFR-SW-41' },
-  // store-1003 items
-  'item-pasta-1': { id: 'item-pasta-1', sku: 'BTH-RES-003', gtin: '6280001000225', barcode: '6280001000225', manufacturerCode: 'MFR-SD-22' },
-  'item-salad-1': { id: 'item-salad-1', sku: 'BTH-RES-SL-002', gtin: '6280001000227', barcode: '6280001000227', manufacturerCode: 'MFR-SD-23' },
-  'item-chicken-1': { id: 'item-chicken-1', sku: 'BTH-RES-002', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01' },
-  // canonical field-lead-5
-  'canonical-product-field-lead-5-featured': { ['id']: 'canonical-product-field-lead-5-featured', ['name']: 'علبة تمر فاخر', sku: 'LEAD5-DATES-BOX', ['gtin']: '6280001055001', ['barcode']: '6280001055001', manufacturerCode: 'FIELD-LEAD5-01', internalNote: 'منتج ميداني افتتاحي — بانتظار مراجعة التسويق.' },
-  // LEGACY_WORKFLOW_PREVIEW_ONLY: Kept for previewing legacy approval states and simulation screens.
-  // Consumers: InventoryCatalogScreen, ControlPanelDshCatalogScreen, PartnerHubScreen.
-  // Reason: Required to populate partner/marketing lists for workflow verification.
-  'prd-restaurant-burger': { id: 'prd-restaurant-burger', sku: 'BTH-RES-002', gtin: '6280001000019', barcode: '6280001000019', manufacturerCode: 'MFR-CL-01' },
-  'prd-restaurant-chicken': { id: 'prd-restaurant-chicken', sku: 'BTH-RES-001', gtin: '6280001000149', barcode: '6280001000149', manufacturerCode: 'MFR-CH-14' },
-  'prd-restaurant-pasta': { id: 'prd-restaurant-pasta', sku: 'BTH-RES-003', gtin: '6280001000224', barcode: '6280001000224', manufacturerCode: 'MFR-SD-22', internalNote: 'مراجعة أولية من الميداني.' },
-  'prd-sweets-juice': { id: 'prd-sweets-juice', sku: 'BTH-SWT-002', gtin: '6280001000903', barcode: '6280001000903', manufacturerCode: 'MFR-DR-90' },
-  'prd-grocery-bread': { id: 'prd-grocery-bread', sku: 'BTH-GRO-BK-003', gtin: '6280001000309', barcode: '6280001000309', manufacturerCode: 'MFR-SA-03' },
-  'prd-grocery-apple': { id: 'prd-grocery-apple', sku: 'BTH-GRO-FR-001', gtin: '6280001000441', barcode: '6280001000441', manufacturerCode: 'MFR-SL-44' },
-  'prd-sweets-cake': { id: 'prd-sweets-cake', sku: 'BTH-SWT-001', gtin: '6280001000553', barcode: '6280001000553', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
-  'prd-dates-box': { id: 'prd-dates-box', sku: 'BTH-DAT-001', gtin: '6280001055009', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99', internalNote: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح.' },
-  'prd-honey-jar': { id: 'prd-honey-jar', sku: 'BTH-DAT-002', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102' },
-};
+export function getProductCategoryPath(categoryId: string): { main: string; sub?: string } {
+  // Try to match the item categoryId to subcategories
+  for (const cat of dshCategoryFixtures) {
+    if (cat.id === categoryId) {
+      return { main: cat.id };
+    }
+    const sub = cat.subcategories.find((s) => s.id === categoryId);
+    if (sub) {
+      return { main: cat.id, sub: sub.id };
+    }
+  }
+
+  // Fallbacks
+  if (categoryId === 'fresh' || categoryId === 'dairy' || categoryId === 'bakery') {
+    let sub: string | undefined = undefined;
+    if (categoryId === 'fresh') sub = 'grocery_vegetables_fruits';
+    else if (categoryId === 'dairy') sub = 'grocery_dairy';
+    else if (categoryId === 'bakery') sub = 'grocery_bakeries';
+    return { main: 'grocery', sub };
+  } else if (categoryId === 'meals' || categoryId === 'sides' || categoryId === 'drinks') {
+    let sub: string | undefined = undefined;
+    if (categoryId === 'meals') sub = 'res_meals';
+    return { main: 'restaurants', sub };
+  } else if (categoryId === 'sweets' || categoryId === 'dessert') {
+    return { main: 'sweets_juices', sub: 'sweets_juices_sweets' };
+  }
+
+  return { main: 'grocery' };
+}
+
+/**
+ * Derives SKU from product ID.
+ */
+export function deriveProductSku(productId: string): string {
+  return productId.toUpperCase().replace('ITEM-', 'BTH-');
+}
+
+/**
+ * Derives GTIN from product ID.
+ */
+export function deriveProductGtin(productId: string): string | undefined {
+  return productId === 'item-apple-1' ? '6281000000012' : undefined;
+}
+
+/**
+ * Returns default classifications for a subcategory.
+ */
+export function getSubcategoryClassifications(subcategoryId: string) {
+  return [
+    {
+      id: `classif-main-${subcategoryId}-1`,
+      label: 'تصنيف رئيسي 1',
+      subClassifications: [
+        { id: `classif-sub-${subcategoryId}-1a`, label: 'تصنيف فرعي أ' },
+        { id: `classif-sub-${subcategoryId}-1b`, label: 'تصنيف فرعي ب' }
+      ]
+    },
+    {
+      id: `classif-main-${subcategoryId}-2`,
+      label: 'تصنيف رئيسي 2',
+      subClassifications: []
+    }
+  ];
+}

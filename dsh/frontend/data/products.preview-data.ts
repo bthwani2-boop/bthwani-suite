@@ -565,3 +565,44 @@ export function selectDshClientProductPreview(productId: string) {
 export function selectDshPartnerCatalogPreview(storeOrBranchId: string) {
   return storeItemsByStoreId[storeOrBranchId] ?? [];
 }
+
+// CENTRAL_DATA_CLOSED: Centralized truth for metrics, smart filters, and approval queues.
+// Moving these out of UI controllers into the data layer.
+export const dshCatalogMetrics = {
+  mainCategories: 13,
+  subCategories: 24,
+  approvedProducts: 14500,
+  pendingPartnerReviews: 42,
+  pendingMarketingReviews: 18,
+  priceConflicts: 7,
+  imageExceptions: 124,
+} as const;
+
+export type CatalogSmartFilter = {
+  id: string;
+  label: string;
+  count: number;
+};
+
+export type CatalogApprovalQueueItem = {
+  id: string;
+  productId: string;
+  stage: string;
+  requestedBy: string;
+};
+
+export const dshCatalogSmartFilters: CatalogSmartFilter[] = [
+  { id: 'all', label: 'الكل', count: 14500 },
+  { id: 'master', label: 'منتجات مركزية', count: 12300 },
+  { id: 'partner-exception', label: 'استثناء صورة', count: 124 },
+  { id: 'partner-review', label: 'مراجعة شريك', count: 42 },
+  { id: 'marketing-review', label: 'مراجعة تسويق', count: 18 },
+  { id: 'price-conflict', label: 'تعارض سعر', count: 7 },
+  { id: 'non-matching', label: 'غير مطابق', count: 3 },
+  { id: 'category-proposals', label: 'مقترحات فئات', count: 5 },
+];
+
+export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [
+  { id: 'q-1', productId: 'prd-sweets-cake', stage: 'marketing-review', requestedBy: 'Partner 1002' },
+  { id: 'q-2', productId: 'prd-review-coffee', stage: 'partner-review', requestedBy: 'Field Agent 3' },
+];
