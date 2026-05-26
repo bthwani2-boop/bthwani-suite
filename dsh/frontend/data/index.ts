@@ -2,6 +2,7 @@
  * CENTRAL DSH CANONICAL PREVIEW DATA API
  * UI_PREVIEW_ONLY: not runtime truth, not API/binding source.
  */
+export * from './canonical.preview-data';
 export * from './preview-data.contract';
 export * from './categories.preview-data';
 export * from './stores.preview-data';

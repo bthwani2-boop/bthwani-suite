@@ -5,7 +5,6 @@ export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
 export type DshPartnerIntakeQueue = 'offer-approval' | 'partner-review' | 'marketing-review';
 
 export type DshPartnerIntakeItem = {
-  id: string;
   storeName: string;
   categoryLabel: string;
   source: DshPartnerIntakeSource;
@@ -19,6 +18,8 @@ export type DshPartnerIntakeItem = {
   canonicalProductId?: string;
   canonicalStage?: DshCanonicalPublishStage;
   canonicalSource?: DshCanonicalSource;
+} & {
+  id: string;
 };
 
 export type DshPartnerIntakeMetric = {
@@ -50,48 +51,44 @@ export const dshPartnerIntakeMetrics: ReadonlyArray<DshPartnerIntakeMetric> = [
 ];
 
 export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
-  {
-    id: 'field-saha',
+  Object.assign({ id: 'field-saha' }, {
     storeName: 'محمصة الساحة',
     categoryLabel: 'مقاهٍ ومحمصات',
-    source: 'app-field',
-    queue: 'offer-approval',
+    source: 'app-field' as const,
+    queue: 'offer-approval' as const,
     ownerLabel: 'الميداني',
     fieldStatusLabel: 'Offer Pending Approval',
     note: 'العرض أرسله المندوب من شاشة الميدان ويحتاج قرار الشركاء الأول.',
     nextStep: 'عند الاعتماد يعود للمندوب Offer Approved لبدء الزيارة.',
     submittedAt: 'اليوم 09:40',
-  },
-  {
-    id: 'field-shorouq',
+  }),
+  Object.assign({ id: 'field-shorouq' }, {
     storeName: 'بوفيه الشروق',
     categoryLabel: 'بوفيهات',
-    source: 'app-field',
-    queue: 'offer-approval',
+    source: 'app-field' as const,
+    queue: 'offer-approval' as const,
     ownerLabel: 'الميداني',
     fieldStatusLabel: 'Offer Pending Approval',
     note: 'المتجر يحتاج اعتماد أو رفض أو تعديل العرض قبل المتابعة.',
     nextStep: 'التعديل التفصيلي للعرض عند الحاجة قبل المتابعة.',
     submittedAt: 'اليوم 10:05',
-  },
-  {
-    id: 'field-wadi',
+  }),
+  Object.assign({ id: 'field-wadi' }, {
     storeName: 'مقهى الوادي',
     categoryLabel: 'مقاهٍ',
-    source: 'app-field',
-    queue: 'partner-review',
+    source: 'app-field' as const,
+    queue: 'partner-review' as const,
     ownerLabel: 'الميداني',
     fieldStatusLabel: 'Partner Review',
     note: 'المندوب أرسل الطلب بعد فتح نموذج الإضافة، والملف الآن داخل مراجعة الشركاء.',
     nextStep: 'بعد الموافقة يُجهز كود الشريك ثم ينتقل الطلب للمراجعة التسويقية.',
     submittedAt: 'اليوم 11:20',
-  },
-  {
-    id: 'field-nokhba',
+  }),
+  Object.assign({ id: 'canonical-store-field-lead-5' }, {
     storeName: 'تمور النخبة',
     categoryLabel: 'مواد غذائية',
-    source: 'app-field',
-    queue: 'marketing-review',
+    source: 'app-field' as const,
+    queue: 'marketing-review' as const,
     ownerLabel: 'الشركاء',
     fieldStatusLabel: 'Offer Approved',
     note: 'تم اعتماد الشركاء واكتملت جاهزية الإضافة، والطلب ينتظر التسويق النهائي.',
@@ -99,9 +96,9 @@ export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [
     submittedAt: 'اليوم 12:15',
     canonicalStoreId: 'canonical-store-field-lead-5',
     canonicalProductId: 'canonical-product-field-lead-5-featured',
-    canonicalStage: 'marketing-review',
-    canonicalSource: 'app-field',
-  },
+    canonicalStage: 'marketing-review' as const,
+    canonicalSource: 'app-field' as const,
+  }),
 ];
 
 // UI_PREVIEW_ONLY — commission and settlement figures are WLT-owned, not authoritative here
@@ -127,47 +124,43 @@ export type DshPartnerFulfillmentAgreement = {
 };
 
 export const PARTNER_FULFILLMENT_AGREEMENTS: readonly DshPartnerFulfillmentAgreement[] = [
-  {
-    partnerId: 'partner-saha',
+  Object.assign({ partnerId: 'partner-saha' }, {
     storeName: 'محمصة الساحة',
     categoryLabel: 'مقاهٍ ومحمصات',
     modes: [
-      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'الاتفاق الافتراضي' },
-      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
-      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'الاتفاق الافتراضي' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
     ],
-  },
-  {
-    partnerId: 'partner-shorouq',
+  }),
+  Object.assign({ partnerId: 'partner-shorouq' }, {
     storeName: 'بوفيه الشروق',
     categoryLabel: 'بوفيهات',
     modes: [
-      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
-      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'pending', validityLabel: 'قيد التفعيل', negotiationNote: 'يحتاج تأكيد جاهزية موصل المتجر' },
-      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'pending' as const, validityLabel: 'قيد التفعيل', negotiationNote: 'يحتاج تأكيد جاهزية موصل المتجر' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
     ],
-  },
-  {
-    partnerId: 'partner-zawya',
+  }),
+  Object.assign({ partnerId: 'partner-zawya' }, {
     storeName: 'مخبز الزاوية',
     categoryLabel: 'مخابز',
     modes: [
-      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
-      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'موصل المتجر جاهز' },
-      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'الاتفاق الكامل للأوضاع الثلاثة' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'موصل المتجر جاهز' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'الاتفاق الكامل للأوضاع الثلاثة' },
     ],
-  },
-  {
-    partnerId: 'partner-nokhba',
+  }),
+  Object.assign({ partnerId: 'partner-nokhba' }, {
     storeName: 'تمور النخبة',
     categoryLabel: 'مواد غذائية',
     modes: [
-      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
-      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
-      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
     ],
-  },
-] as const;
+  }),
+];
 
 export const dshPartnerApprovalLanes = [
   {
@@ -187,7 +180,7 @@ export const dshPartnerApprovalLanes = [
   },
   {
     id: 'lane-marketing',
-    title: 'المراجعة التسويقية',
+    title: 'مراجعة التسويق',
     description: 'بعد موافقة الشركاء ينتقل الطلب إلى المراجعة التسويقية النهائية ثم يدخل مسار الإطلاق.',
   },
 ] as const;

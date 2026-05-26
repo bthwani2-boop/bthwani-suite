@@ -12,7 +12,8 @@
  * Surfaces must not define product identity independently.
  */
 import React from 'react';
-import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
+import { getCanonicalPreviewProductCard } from '../../data/canonical.preview-data';
+import type { DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import {
   type DshCatalogDomainId,

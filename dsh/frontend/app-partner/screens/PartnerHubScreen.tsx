@@ -31,7 +31,7 @@ import {
   wltDshPartnerUiCopy,
 } from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
-import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../shared/dshStoreProductCardModel';
+import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../data/canonical.preview-data';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/app-partner/dsh';

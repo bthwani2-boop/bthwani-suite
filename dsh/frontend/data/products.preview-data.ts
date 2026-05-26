@@ -1,85 +1,37 @@
 import {
   type DshStoreFixtureItem,
   type StoreItemsByStoreId,
-  type DshCanonicalProductCard,
-  type DshCanonicalPreviewEvidence,
-  mapCanonicalProductToStoreFixtureItem,
 } from '../shared/dshStoreProductCardModel';
 import {
   canonicalStoreId,
   canonicalProductId,
   canonicalStoreCard,
   canonicalPreviewStores,
-} from './stores.preview-data';
+  canonicalProductCard,
+  canonicalPreviewProducts,
+  getCanonicalPreviewStoreCard,
+  getCanonicalPreviewProductCard,
+  getCanonicalPreviewProductForStore,
+  getCanonicalPreviewEvidence,
+  buildCanonicalPreviewStoreItemsByStoreId,
+} from './canonical.preview-data';
 
-// ── Canonical Mock Data ──────────────────────────────────────────────────
 
-export const canonicalProductCard: DshCanonicalProductCard = {
-  id: canonicalProductId,
-  sourceRecordId: 'lead-5',
-  storeId: canonicalStoreId,
-  source: 'app-field',
-  publishStage: 'marketing-review',
-  name: 'علبة تمر فاخر',
-  subtitle: 'المنتج الافتتاحي موثق.',
-  categoryId: 'field:مواد غذائية:تمور وهدايا',
-  categoryLabel: 'تمور وهدايا',
-  priceLabel: '55 ر.ي',
-  priceValue: 55,
-  measurementType: 'piece',
-  measurementOptions: ['حبة', '2 حبة', '4 حبات'],
-  sku: 'LEAD5-DATES-BOX',
-  gtin: '6280001055001',
-  barcode: '6280001055001',
-  manufacturerCode: 'FIELD-LEAD5-01',
-  stockCount: 12,
-  isAvailable: true,
-  hasOptions: false,
-  preparationTime: 'جاهز الآن',
-  mediaKey: 'dsh.product.lead-5.dates-box.v1',
-  imageUri: 'dsh.product.lead-5.dates-box.v1',
+// ── Canonical Re-exports ──────────────────────────────────────────────────
+// Defined in canonical.preview-data; re-exported here for backward compatibility.
+export {
   canonicalStoreId,
   canonicalProductId,
-};
-
-export const canonicalPreviewProducts: ReadonlyArray<DshCanonicalProductCard> = [canonicalProductCard];
-
-export function getCanonicalPreviewStoreCard(id: string) {
-  return canonicalPreviewStores.find((store) => store.id === id);
-}
-
-export function getCanonicalPreviewProductCard(id: string) {
-  return canonicalPreviewProducts.find((product) => product.id === id);
-}
-
-export function getCanonicalPreviewProductForStore(storeId: string) {
-  return canonicalPreviewProducts.find((product) => product.storeId === storeId);
-}
-
-export function getCanonicalPreviewEvidence(): DshCanonicalPreviewEvidence {
-  return {
-    storeId: canonicalStoreCard.id,
-    productId: canonicalProductCard.id,
-    sourceRecordId: canonicalStoreCard.sourceRecordId,
-    publishStage: canonicalProductCard.publishStage,
-    source: canonicalProductCard.source,
-    storeName: canonicalStoreCard.storeName,
-    productName: canonicalProductCard.name,
-    priceLabel: canonicalProductCard.priceLabel,
-  };
-}
-
-export function buildCanonicalPreviewStoreItemsByStoreId() {
-  return canonicalPreviewStores.reduce<Record<string, DshStoreFixtureItem[]>>((result, store) => {
-    const product = getCanonicalPreviewProductForStore(store.id);
-
-    if (product) {
-      result[store.id] = [mapCanonicalProductToStoreFixtureItem(product)];
-    }
-
-    return result;
-  }, {});
-}
+  canonicalStoreCard,
+  canonicalPreviewStores,
+  canonicalProductCard,
+  canonicalPreviewProducts,
+  getCanonicalPreviewStoreCard,
+  getCanonicalPreviewProductCard,
+  getCanonicalPreviewProductForStore,
+  getCanonicalPreviewEvidence,
+  buildCanonicalPreviewStoreItemsByStoreId,
+} from './canonical.preview-data';
 
 // -----------------------------------------------------------------------------
 // Store products
@@ -429,8 +381,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 		},
 		{
 			id: 'prd-dates-box',
-			name: 'علبة تمر فاخرة خاص',
-			subtitle: 'تمر خلاص فاخر مختار بعناية',
+			name: 'علبة تمر سيراميك — رفض',
+			subtitle: 'عينة مرفوضة — تمر خلاص غير معتمد',
 			priceLabel: '120.00 ر.ي',
 			categoryId: 'bakery-dates',
 			categoryLabel: 'حلويات',

@@ -5,35 +5,8 @@ import {
   canRenderInClientSurface,
 } from './workflow';
 import type { CommercialSourceMap } from './store-card-commercial-map';
-import {
-  canonicalStoreId,
-  canonicalProductId,
-  canonicalStoreCard,
-  canonicalProductCard,
-  canonicalPreviewStores,
-  canonicalPreviewProducts,
-  getCanonicalPreviewStoreCard,
-  getCanonicalPreviewProductCard,
-  getCanonicalPreviewProductForStore,
-  getCanonicalPreviewEvidence,
-  buildCanonicalPreviewDiscoveryStores,
-  buildCanonicalPreviewStoreItemsByStoreId,
-} from '../data';
 
-export {
-  canonicalStoreId,
-  canonicalProductId,
-  canonicalStoreCard,
-  canonicalProductCard,
-  canonicalPreviewStores,
-  canonicalPreviewProducts,
-  getCanonicalPreviewStoreCard,
-  getCanonicalPreviewProductCard,
-  getCanonicalPreviewProductForStore,
-  getCanonicalPreviewEvidence,
-  buildCanonicalPreviewDiscoveryStores,
-  buildCanonicalPreviewStoreItemsByStoreId,
-};
+
 
 export type DshCanonicalSource =
   | 'app-field'

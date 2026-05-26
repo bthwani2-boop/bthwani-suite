@@ -3,6 +3,7 @@ import { buildStoreCategories, buildStoreDeliveryModes, buildStoreTags, dshStore
 import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 import type { DiscoveryFilter, DshServiceId } from '../shared/dsh-discovery.contract';
 import type { Phase12FixtureLocation } from '../../types';
+import { buildCanonicalPreviewDiscoveryStores } from './canonical.preview-data';
 
 // -----------------------------------------------------------------------------
 // Discovery stores
@@ -247,7 +248,6 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 			}
 		}
 	},
-	...buildCanonicalPreviewDiscoveryStores(),
 ];
 
 // -----------------------------------------------------------------------------
@@ -2252,55 +2252,16 @@ export function selectDshControlPanelCatalogPreview() {
 }
 
 // ── Canonical Mock Data ──────────────────────────────────────────────────
-
-export const canonicalStoreId = 'canonical-store-field-lead-5';
-export const canonicalProductId = 'canonical-product-field-lead-5-featured';
-
-export const canonicalStoreCard: DshCanonicalStoreCard = {
-  id: canonicalStoreId,
-  sourceRecordId: 'lead-5',
-  source: 'app-field',
-  publishStage: 'marketing-review',
-  storeName: 'تمور النخبة',
-  branchLabel: 'اليرموك • الرياض',
-  cityLabel: 'الرياض',
-  categoryLabel: 'مواد غذائية',
-  subcategoryLabel: 'تمور وهدايا',
-  addressLabel: 'شارع النجاح',
-  zoneLabel: 'اليرموك',
-  ownerName: 'خالد المطيري',
-  ownerPhone: '0500000005',
-  managerName: 'عبدالعزيز',
-  operatingHoursLabel: '9 ص - 11 م',
-  deliveryReadinessLabel: 'جاهز',
-  coverageSummary: 'شرق الرياض',
-  latitude: '24.7881',
-  longitude: '46.7441',
-  landmark: 'مقابل الحديقة',
-  storefrontPhotoRef: 'الواجهة مكتملة',
-  mediaKey: 'dsh.store.lead-5.cover.v1',
-  imageUri: 'dsh.store.lead-5.cover.v1',
-  statusLabel: 'مفتوح',
-  statusTone: 'success',
-  rating: 4.9,
-  distanceLabel: '2.4 كم',
-  etaLabel: '18 دقيقة',
-  deliveryLabel: 'توصيل سريع',
-  serviceLabel: 'بثواني برو',
-  deliveryFeeLabel: 'رسوم التوصيل 10 ر.ي',
-  priceMatchLabel: 'الأسعار مطابقة للكتالوج',
-  offerLabel: 'منتج افتتاحي موثق',
-  followerCount: 4200,
-  supportsPickup: true,
-  supportsPartnerDelivery: true,
-  hasBthwaniPro: true,
-  hasNewProducts: true,
-  hasCouponAvailable: true,
+// Re-exported from canonical.preview-data to maintain backward-compatible public API.
+export {
+  canonicalStoreId,
   canonicalProductId,
-};
+  canonicalStoreCard,
+  canonicalPreviewStores,
+  buildCanonicalPreviewDiscoveryStores,
+} from './canonical.preview-data';
 
-export const canonicalPreviewStores: ReadonlyArray<DshCanonicalStoreCard> = [canonicalStoreCard];
-
-export function buildCanonicalPreviewDiscoveryStores(): DshDiscoveryStore[] {
-  return canonicalPreviewStores.map((store) => mapCanonicalStoreToDiscoveryStore(store));
-}
+// Append canonical stores now that `canonicalPreviewStores` is initialized.
+// This avoids the TDZ crash that occurs when spreading buildCanonicalPreviewDiscoveryStores()
+// directly inside the dshDiscoveryStores array literal above.
+dshDiscoveryStores.push(...buildCanonicalPreviewDiscoveryStores());
