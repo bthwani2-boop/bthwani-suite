@@ -7,7 +7,7 @@ Canonical location for DSH-owned seed media fixtures.
 ## Structure
 
 ```text
-dsh/media-fixtures/
+dsh/frontend/media-fixtures/
   banners/              — home promo banners
   logos/                — brand logo, store logos
   products/             — product images

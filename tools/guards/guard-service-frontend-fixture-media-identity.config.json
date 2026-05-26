@@ -8,15 +8,17 @@
         "dsh/frontend"
       ],
       "canonicalDataRoot": "dsh/frontend/data",
-      "canonicalMediaRoot": "dsh/media-fixtures/assets/seed/dsh",
+      "canonicalMediaRoot": "dsh/frontend/media-fixtures",
       "canonicalDataStatus": "VERIFIED",
       "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
       "allowedFixtureFilePatterns": [
         "^dsh/frontend/data/",
-        "^dsh/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+        "^dsh/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/",
+        "^dsh/frontend/shared/resolve-dsh-image-source\\.ts$"
       ],
       "allowedMediaReferencePatterns": [
-        "dsh/media-fixtures/assets/seed/dsh",
+        "dsh/frontend/media-fixtures",
+        "media-fixtures/",
         "@bthwani/ui-kit"
       ],
       "forbiddenLocalMockPatterns": [
@@ -35,7 +37,7 @@
         "titleAr",
         "titleEn"
       ],
-      "remediationTemplate": "Move or unify demo identities under dsh/frontend/data, reference media from dsh/media-fixtures/assets/seed/dsh, and expose only ids/references/lean summaries through adapters or view models."
+      "remediationTemplate": "Move or unify demo identities under dsh/frontend/data, reference media from dsh/frontend/media-fixtures, and expose only ids/references/lean summaries through adapters or view models."
     },
     {
       "serviceId": "esf",
@@ -349,7 +351,8 @@
     "__generated__"
   ],
   "skipPathPrefixes": [
-    "tools/registry/runs"
+    "tools/registry/runs",
+    "dsh/frontend/media-fixtures"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

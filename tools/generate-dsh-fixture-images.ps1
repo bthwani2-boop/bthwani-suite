@@ -77,7 +77,7 @@ function New-SeedImage {
     }
 }
 
-$root = 'C:\bthwani-suite\dsh\media-fixtures'
+$root = 'C:\bthwani-suite\dsh\frontend\media-fixtures'
 
 $bannerMap = @(
     @{ Name = 'dsh-banner-home-promo-1-v1.png'; Title = 'PROMO 1'; Subtitle = 'First order discount'; Accent = '#f97316'; Accent2 = '#1d4ed8'; Width = 1200; Height = 680 },
