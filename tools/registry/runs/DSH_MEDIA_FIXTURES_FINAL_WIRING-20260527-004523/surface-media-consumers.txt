@@ -1,0 +1,7 @@
+Surfaces:
+- app-client: category orbit carousel, filter chip rails, products cards.
+- app-partner: catalog screens, menu preview.
+- app-field: stores view, task cards.
+- control-panel/catalogs: main taxonomy editor, products table, WatermarkedImage inspect tiles.
+
+All utilize the shared resolveDshImageSource or the publicNextPath mapping. No direct requires inside screens.

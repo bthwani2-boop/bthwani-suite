@@ -1,0 +1,3 @@
+No duplicate or dead media files were deleted.
+All files in dsh/frontend/media-fixtures are actively mapped and needed.
+No dead exports remain.

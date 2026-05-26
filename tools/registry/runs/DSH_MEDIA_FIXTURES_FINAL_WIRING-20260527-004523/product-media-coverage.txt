@@ -1,0 +1,4 @@
+All products defined in products.preview-data.ts have mediaKey and imageUri correctly populated.
+All product mediaKeys map successfully to resolve-dsh-image-source.ts.
+Products without specific dedicated files (e.g. bananas) utilize the explicit 'dsh.product.generic.v1' key which resolves correctly to dsh-product-apple-v1.png placeholder.
+No unresolved product media keys or random URLs.
