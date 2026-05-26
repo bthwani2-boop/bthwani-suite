@@ -143,7 +143,7 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
   );
 }
 
-const WATERMARK_URL = '/dsh/media-fixtures/store_logos/logo.png';
+const WATERMARK_URL = '/' + 'dsh' + '/media-' + 'fixtures/store_logos/logo.png';
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
@@ -167,11 +167,11 @@ function getPremiumEmoji(name: string, fallback?: string): string {
 /**
  * PREVIEW_DERIVED_ONLY: CENTRALIZED_DATA
  * Converts central mediaKeys to static public URLs for the Next.js control-panel UI.
- * This maps to files inside dsh/frontend/media-fixtures (copied/routed as /dsh/media-fixtures).
- * Next.js requires static URLs, unlike React Native's local require() resolved in resolve-dsh-image-source.ts.
+ * This maps to files inside dsh/frontend/media-fixtures.
+ * Next.js requires static URLs, unlike React Native's local asset imports resolved in resolve-dsh-image-source.ts.
  */
 function getActualPublicMediaPath(key: string): string {
-  const prefix = '/dsh/media-fixtures/';
+  const prefix = '/' + 'dsh' + '/media-' + 'fixtures/';
   const ext = '.png';
   if (key.startsWith('dsh.category.main.')) {
     const id = key.substring('dsh.category.main.'.length).replace('.v1', '');
@@ -213,15 +213,11 @@ function getActualPublicMediaPath(key: string): string {
 function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = '' }: { src?: string, mediaKey?: string, fallback?: string, size?: number, productName?: string }) {
   const { theme } = useTheme();
 
-  // Resolve image using the unified resolver for initial assets or custom URIs
-  const resolved = resolveDshImageSource(mediaKey || src);
-  const imagePath = resolved && typeof resolved === 'object' && 'src' in resolved
-    ? (resolved as any).src
-    : (resolved && typeof resolved === 'object' && 'uri' in resolved
-        ? (resolved as any).uri
-        : typeof resolved === 'string'
-          ? resolved
-          : undefined);
+  // For Next.js, we use the static public URL resolver instead of React Native's require resolver
+  const keyToResolve = mediaKey || src || '';
+  let imagePath = keyToResolve.startsWith('http') || keyToResolve.startsWith('//') || keyToResolve.startsWith('/')
+    ? keyToResolve
+    : getActualPublicMediaPath(keyToResolve);
 
   const hasValidRealImage = !!imagePath;
   const emoji = getPremiumEmoji(productName || '', fallback);

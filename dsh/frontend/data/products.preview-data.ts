@@ -239,6 +239,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			categoryLabel: 'طازج',
 			isAvailable: true,
 			publishStage: 'marketing-review',
+			mediaKey: 'dsh.product.generic.v1',
+			imageUri: 'dsh.product.generic.v1',
 		},
 		{
 			id: 'item-hidden-partner',
@@ -249,6 +251,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			categoryLabel: 'طازج',
 			isAvailable: true,
 			publishStage: 'partner-review',
+			mediaKey: 'dsh.product.generic.v1',
+			imageUri: 'dsh.product.generic.v1',
 		},
 		{
 			id: 'item-hidden-catalog',
@@ -259,6 +263,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			categoryLabel: 'طازج',
 			isAvailable: true,
 			publishStage: 'catalog-adopted',
+			mediaKey: 'dsh.product.generic.v1',
+			imageUri: 'dsh.product.generic.v1',
 		},
 		{
 			id: 'item-visible-client',
@@ -269,6 +275,8 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			categoryLabel: 'طازج',
 			isAvailable: true,
 			publishStage: 'client-visible',
+			mediaKey: 'dsh.product.generic.v1',
+			imageUri: 'dsh.product.generic.v1',
 		},
 		{
 			id: 'item-exception-visible',
@@ -280,6 +288,7 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			isAvailable: true,
 			publishStage: 'marketing-review',
 			mediaPolicy: 'partner-owned-exception',
+			mediaKey: 'dsh.product.apple.v1',
 			imageUri: 'dsh.product.apple.v1',
 		},
 		{

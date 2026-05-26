@@ -56,10 +56,10 @@ tools/registry/runs/*
 .claude/worktrees
 .claude/settings.local.json
 
-# Local media fixtures (seeds) - keep local only
-/dsh/frontend/media-fixtures/banners/
-/dsh/frontend/media-fixtures/categories/
-/dsh/frontend/media-fixtures/classifications/
-/dsh/frontend/media-fixtures/store_logos/
-/dsh/frontend/media-fixtures/products/
-/dsh/frontend/media-fixtures/stores/
+# Local media fixtures (seeds) - keep images local only
+dsh/frontend/media-fixtures/**/*.png
+dsh/frontend/media-fixtures/**/*.jpg
+dsh/frontend/media-fixtures/**/*.jpeg
+dsh/frontend/media-fixtures/**/*.webp
+!dsh/frontend/media-fixtures/README.md
+!dsh/frontend/media-fixtures/MANIFEST.local-required.tsv
