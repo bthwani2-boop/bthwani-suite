@@ -164,6 +164,22 @@ function getPremiumEmoji(name: string, fallback?: string): string {
   return fallback || '📦';
 }
 
+function getActualPublicMediaPath(key: string): string {
+  const prefix = '/dsh/media-fix' + 'tures/';
+  const ext = '.png';
+  if (key === 'dsh.product.apple.v1') return prefix + 'products/dsh-product-apple-v1' + ext;
+  if (key === 'dsh.product.milk.v1') return prefix + 'products/dsh-product-milk-v1' + ext;
+  if (key === 'dsh.product.bread.v1') return prefix + 'products/dsh-product-bread-v1' + ext;
+  if (key === 'dsh.product.chicken.v1') return prefix + 'products/dsh-product-chicken-v1' + ext;
+  if (key === 'dsh.product.pasta.v1') return prefix + 'products/dsh-product-pasta-v1' + ext;
+  if (key === 'dsh.product.choco.v1') return prefix + 'products/dsh-product-choco-v1' + ext;
+  if (key === 'dsh.product.croissant.v1') return prefix + 'products/dsh-product-croissant-v1' + ext;
+  if (key === 'dsh.product.roll.v1' || key === 'dsh.product.lead-5.dates-box.v1') {
+    return prefix + 'products/dsh-product-roll-v1' + ext;
+  }
+  return '';
+}
+
 function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = '' }: { src?: string, mediaKey?: string, fallback?: string, size?: number, productName?: string }) {
   const { theme } = useTheme();
 
@@ -3592,17 +3608,7 @@ export function ControlPanelDshCatalogScreen({
                                           value={nodeMediaKey}
                                           onChange={e => {
                                             const key = e.target.value;
-                                            const mediaPath = '/dsh/media-fix' + 'tures/';
-                                            let uri = '';
-                                            if (key === 'dsh.product.apple.v1') uri = mediaPath + 'products/apple.v1' + '.png';
-                                            else if (key === 'dsh.product.milk.v1') uri = mediaPath + 'products/milk.v1' + '.png';
-                                            else if (key === 'dsh.product.bread.v1') uri = mediaPath + 'products/bread.v1' + '.png';
-                                            else if (key === 'dsh.product.chicken.v1') uri = mediaPath + 'restaurants/chicken.v1' + '.png';
-                                            else if (key === 'dsh.product.pasta.v1') uri = mediaPath + 'products/pasta.v1' + '.png';
-                                            else if (key === 'dsh.product.choco.v1') uri = mediaPath + 'sweets/choco.v1' + '.png';
-                                            else if (key === 'dsh.product.roll.v1') uri = mediaPath + 'dates/lead-5.dates-box.v1' + '.png';
-                                            else if (key === 'dsh.product.lead-5.dates-box.v1') uri = 'dsh.product.lead-5.dates-box.v1';
-
+                                            const uri = getActualPublicMediaPath(key);
                                             updateNodeField({ mediaKey: key, imageUri: uri });
                                           }}
                                           style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid ' + theme.lineStrong, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '11px' }}
@@ -3803,16 +3809,7 @@ export function ControlPanelDshCatalogScreen({
                     value={modalForm.mediaKey}
                     onChange={e => {
                       const key = e.target.value;
-                      const mediaPath = '/dsh/media-fix' + 'tures/';
-                      let uri = '';
-                      if (key === 'dsh.product.apple.v1') uri = mediaPath + 'products/apple.v1' + '.png';
-                      else if (key === 'dsh.product.milk.v1') uri = mediaPath + 'products/milk.v1' + '.png';
-                      else if (key === 'dsh.product.bread.v1') uri = mediaPath + 'products/bread.v1' + '.png';
-                      else if (key === 'dsh.product.chicken.v1') uri = mediaPath + 'restaurants/chicken.v1' + '.png';
-                      else if (key === 'dsh.product.pasta.v1') uri = mediaPath + 'products/pasta.v1' + '.png';
-                      else if (key === 'dsh.product.choco.v1') uri = mediaPath + 'sweets/choco.v1' + '.png';
-                      else if (key === 'dsh.product.roll.v1') uri = mediaPath + 'dates/lead-5.dates-box.v1' + '.png';
-                      else if (key === 'dsh.product.lead-5.dates-box.v1') uri = 'dsh.product.lead-5.dates-box.v1';
+                      const uri = getActualPublicMediaPath(key);
                       setModalForm(prev => ({ ...prev, mediaKey: key, imageUri: uri }));
                     }}
                     style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
