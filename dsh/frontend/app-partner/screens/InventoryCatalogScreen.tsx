@@ -1,3 +1,16 @@
+/**
+ * InventoryCatalogScreen — Partner Surface
+ *
+ * UI_PREVIEW_ONLY: not runtime truth, not backend/API binding source.
+ * Owner: app-partner surface (local state/overrides only)
+ *
+ * Catalog identity (name, mediaKey, categoryLabel, publishStage) comes from:
+ *   central data: dsh/frontend/data/products.preview-data.ts
+ *   via adapter:  dsh/frontend/shared/catalog-central-adapter.ts
+ *
+ * Partner surface owns ONLY: stock, availability, preparationNote, internalNote, price override.
+ * Surfaces must not define product identity independently.
+ */
 import React from 'react';
 import { getCanonicalPreviewProductCard, type DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
@@ -13,6 +26,11 @@ import {
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
 } from '../../shared/catalog';
+import {
+  buildCentralPartnerInventoryItems,
+  CENTRAL_PRODUCT_DETAIL_LOOKUP,
+} from '../../shared/catalog-central-adapter';
+
 import {
   BThwaniFilterRail,
   type BThwaniFilterRailItem,
@@ -183,10 +201,21 @@ function applyHierarchyFilter(
 }
 
 // ── List data (light model) + detail lookup ───────────────────────────
+// Identity (name, mediaKey, categoryLabel) sourced from central data via adapter.
+// Partner-local fields (stock, price, availability) remain surface-owned.
 
 type InventoryCatalogDetailMap = Record<string, InventoryCatalogItemDetail>;
 
+// Detail lookup — partner operational data only.
+// Uses CENTRAL_PRODUCT_DETAIL_LOOKUP from shared adapter as the base,
+// plus the legacy prd-* ids that were previously hardcoded here.
+// PREVIEW_DERIVED_ONLY — not canonical, not runtime binding.
 const DETAIL_LOOKUP: InventoryCatalogDetailMap = {
+  ...CENTRAL_PRODUCT_DETAIL_LOOKUP,
+  // Legacy preview detail records (prd-* ids) — partner surface operational data only.
+  // These ids do not appear in central products.preview-data.ts;
+  // they represent workflow/approval state previews used in this screen.
+  // PREVIEW_DERIVED_ONLY: DEFERRED_DATA_CENTRALIZATION (intake/approval flow demo data)
   'prd-restaurant-burger': { id: 'prd-restaurant-burger', sku: 'BTH-RES-002', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01' },
   'prd-restaurant-chicken': { id: 'prd-restaurant-chicken', sku: 'BTH-RES-001', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14' },
   'prd-restaurant-pasta': { id: 'prd-restaurant-pasta', sku: 'BTH-RES-003', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22', internalNote: 'مراجعة أولية من الميداني.' },
@@ -239,6 +268,12 @@ const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = (() => {
   return p ? [mapCanonicalToListItem(p)] : [];
 })();
 
+// Central data-derived inventory items — sourced from dsh/frontend/data/products.preview-data.ts
+// via buildCentralPartnerInventoryItems adapter.
+// These replace the previously hardcoded prd-* items.
+// UI_PREVIEW_ONLY — not runtime truth.
+const centralInventoryItems: readonly InventoryCatalogListItem[] = buildCentralPartnerInventoryItems();
+
 function dedupeItems(items: ReadonlyArray<InventoryCatalogListItem>) {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -275,7 +310,10 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
       } satisfies InventoryCatalogListItem;
     });
 
-  return dedupeItems([
+  // Workflow/approval state demo items — PREVIEW_DERIVED_ONLY: DEFERRED_DATA_CENTRALIZATION
+  // These prd-* items represent approval pipeline states not yet covered by central products data.
+  // They will be replaced by workflow records from shared/workflow.ts once intake flow is proven.
+  const workflowDemoItems: InventoryCatalogListItem[] = [
     {
       id: 'prd-restaurant-burger', name: 'برجر لحم كلاسيك', categoryLabel: 'برجر',
       domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers',
@@ -357,6 +395,13 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
       priceLabel: '15.00 ر.ي', stockCount: 25, available: true, lowStock: false,
       publishStage: 'marketing-review', reviewNeeded: true,
     },
+  ];
+
+  // Merge: central data items take priority; workflow demo items supplement with approval states
+  // not yet represented in central products.preview-data.ts.
+  return dedupeItems([
+    ...centralInventoryItems,
+    ...workflowDemoItems,
     ...mappedRecords,
     ...scopedCanonical,
   ]);

@@ -1,3 +1,22 @@
+/**
+ * DSH Catalog Control-Panel View Models — UI_PREVIEW_ONLY
+ * Owner: control-panel/catalogs (governance/approval/mapping consumer)
+ * NOT runtime truth. NOT backend/API/DB binding source.
+ *
+ * Identity sources:
+ *   Categories: dsh/frontend/data/categories.preview-data.ts (via dshCategoryFixtures)
+ *   Products:   dsh/frontend/data/products.preview-data.ts (via storeItemsByStoreId)
+ *   Media:      dsh/frontend/media-fixtures (via shared/resolve-dsh-image-source.ts)
+ *
+ * Client app was the donor/reference for current correct preview data.
+ * Surfaces consume through adapters only.
+ * Surface-specific overrides must be lean and id-based.
+ *
+ * control-panel/catalogs is a governance/approval/mapping consumer.
+ * It does NOT add canonical products or categories locally.
+ * Deferred items are marked: PREVIEW_DERIVED_ONLY / DEFERRED_DATA_CENTRALIZATION
+ */
+
 export type CatalogMediaPolicy =
   | 'catalog-owned-media'
   | 'partner-owned-exception'
@@ -122,6 +141,11 @@ export type CatalogProductMaster = {
   categoryType?: string; // e.g. product, service
 };
 
+// Authoritative preview catalog metrics for control-panel governance view.
+// UI_PREVIEW_ONLY — not runtime truth, not backend source.
+// These values reflect the full catalog scope (categories from dshCategoryFixtures,
+// products from storeItemsByStoreId + canonical field products).
+// NOTE: shared/catalog.ts contains a smaller stale dshCatalogMetrics — this one supersedes it.
 export const dshCatalogMetrics = {
   mainCategories: 13,
   subCategories: 24,

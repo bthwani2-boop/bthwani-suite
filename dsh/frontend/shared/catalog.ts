@@ -26,13 +26,14 @@ export type DshCatalogMeasurementPolicy = {
   options: ReadonlyArray<string>;
 };
 
-export const dshCatalogMetrics = {
-  mainCategories: 6,
-  subCategories: 14,
-  approvedProducts: 28,
-  pendingPartnerReviews: 4,
-  pendingMarketingReviews: 2,
-} as const;
+// DATA_CENTRALIZATION_DONE: dshCatalogMetrics was previously duplicated here with stale values.
+// It has been removed. The authoritative version lives in:
+//   control-panel/catalogs/catalog.ts → re-exported via control-panel/catalogs/index.ts
+// UI_PREVIEW_ONLY — not runtime truth, not backend source.
+// Consumers should import dshCatalogMetrics from control-panel/catalogs (if in control-panel context)
+// or from shared/index.ts (which re-exports the CP version below).
+export { dshCatalogMetrics } from '../control-panel/catalogs/catalog';
+
 
 export const dshCategoryMeasurementPolicies: Readonly<Record<string, DshCatalogMeasurementPolicy>> = {
   fresh: {
