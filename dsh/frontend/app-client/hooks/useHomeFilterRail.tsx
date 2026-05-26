@@ -58,6 +58,7 @@ export function useHomeFilterRail({
         ...category,
         iconUrl: getDshCategoryIconUrl(category.id),
         icon: categoryIconMap[category.id] ?? '📂',
+        mediaKey: category.mediaKey,
       })),
     [categoryItems],
   );
@@ -68,6 +69,8 @@ export function useHomeFilterRail({
         key: category.id,
         title: category.label,
         subtitle: category.subtitle,
+        // mediaKey threads the fixture key to DshCategoryOrbitCarouselBase → resolveDshImageSource
+        mediaKey: category.mediaKey,
         iconUrl: getDshCategoryIconUrl(category.id),
         emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
       })),
@@ -80,6 +83,7 @@ export function useHomeFilterRail({
       key: selectedCategoryFixture.id,
       title: selectedCategoryLabel,
       subtitle: selectedCategoryFixture.subtitle,
+      mediaKey: selectedCategoryFixture.mediaKey,
       iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
       emojiFallback: selectedCategoryFixture.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂',
     };

@@ -157,8 +157,9 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			isAvailable: true,
 			hasOptions: false,
 			preparationTime: '5-10 دقائق',
-			mediaKey: 'dsh.product.apple.v1',
-			imageUri: 'dsh.product.apple.v1',
+			// No dedicated banana image in media-fixtures/products; using generic placeholder.
+			mediaKey: 'dsh.product.generic.v1',
+			imageUri: 'dsh.product.generic.v1',
 		},
 		{
 			id: 'item-croissant-2',
@@ -291,8 +292,9 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			isAvailable: true,
 			hasOptions: true,
 			preparationTime: '15 دقيقة',
-			mediaKey: 'dsh.product.chicken.v1',
-			imageUri: 'dsh.product.chicken.v1',
+			// No dedicated burger image; roll is the closest bun/bread shape in media-fixtures/products.
+			mediaKey: 'dsh.product.roll.v1',
+			imageUri: 'dsh.product.roll.v1',
 			publishStage: 'client-visible',
 		},
 		{
@@ -333,8 +335,9 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			isAvailable: true,
 			hasOptions: false,
 			preparationTime: '5 دقائق',
-			mediaKey: 'dsh.product.yogurt.v1',
-			imageUri: 'dsh.product.yogurt.v1',
+			// No dedicated juice image; milk is the closest clean liquid product in media-fixtures/products.
+			mediaKey: 'dsh.product.milk.v1',
+			imageUri: 'dsh.product.milk.v1',
 			publishStage: 'client-visible',
 		},
 		{
@@ -403,8 +406,9 @@ export const storeItemsByStoreId: StoreItemsByStoreId = {
 			isAvailable: true,
 			hasOptions: false,
 			preparationTime: '5 دقائق',
-			mediaKey: 'dsh.product.yogurt.v1',
-			imageUri: 'dsh.product.yogurt.v1',
+			// No dedicated honey image; lead-5-dates-box is the closest natural/artisanal product in media-fixtures/products.
+			mediaKey: 'dsh.product.lead-5.dates-box.v1',
+			imageUri: 'dsh.product.lead-5.dates-box.v1',
 			publishStage: 'marketing-review',
 		},
 	]),

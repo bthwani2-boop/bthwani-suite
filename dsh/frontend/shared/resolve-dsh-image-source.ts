@@ -19,6 +19,9 @@ import type { ImageSourcePropType } from 'react-native';
 
 const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.product.apple.v1': require('../media-fixtures/products/dsh-product-apple-v1.png') as ImageSourcePropType,
+  // Generic product placeholder — used when no dedicated product image exists in media-fixtures/products.
+  // Intentional: points to apple image as a clean, round, visually neutral generic placeholder.
+  'dsh.product.generic.v1': require('../media-fixtures/products/dsh-product-apple-v1.png') as ImageSourcePropType,
   'dsh.product.bread.v1': require('../media-fixtures/products/dsh-product-bread-v1.png') as ImageSourcePropType,
   'dsh.product.chicken.v1': require('../media-fixtures/products/dsh-product-chicken-v1.png') as ImageSourcePropType,
   'dsh.product.choco.v1': require('../media-fixtures/products/dsh-product-choco-v1.png') as ImageSourcePropType,

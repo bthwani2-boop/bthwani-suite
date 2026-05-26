@@ -16,10 +16,13 @@ export type DshHomeCategory = {
   countLabel?: string;
   renderMode?: 'stores' | 'manual-order';
   emojiFallback?: string;
+  /** Central media key resolved via resolveDshImageSource → media-fixtures/categories/main */
+  mediaKey?: string;
   subcategories?: Array<{
     id: string;
     label: string;
     subtitle: string;
+    mediaKey?: string;
   }>;
 };
 

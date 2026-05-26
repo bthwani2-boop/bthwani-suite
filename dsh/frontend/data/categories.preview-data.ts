@@ -230,6 +230,9 @@ export const dshCategoryListFixtures = dshCategoryFixtures.map((category) => ({
 	label: category.label,
 	subtitle: category.subtitle,
 	renderMode: category.renderMode,
+	emojiFallback: category.emojiFallback,
+	mediaKey: category.mediaKey,
+	subcategories: category.subcategories,
 	countLabel: category.subcategories.length > 0 ? `${category.subcategories.length} فئات فرعية` : 'فئة رئيسية',
 }));
 

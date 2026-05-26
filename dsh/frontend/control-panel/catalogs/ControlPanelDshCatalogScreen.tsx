@@ -143,7 +143,7 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
   );
 }
 
-const WATERMARK_URL = '/dsh/media-fix' + 'tures/logos/logo' + '.png';
+const WATERMARK_URL = '/dsh/media-fixtures/store_logos/logo.png';
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
@@ -171,7 +171,7 @@ function getPremiumEmoji(name: string, fallback?: string): string {
  * Next.js requires static URLs, unlike React Native's local require() resolved in resolve-dsh-image-source.ts.
  */
 function getActualPublicMediaPath(key: string): string {
-  const prefix = '/dsh/media-fix' + 'tures/';
+  const prefix = '/dsh/media-fixtures/';
   const ext = '.png';
   if (key.startsWith('dsh.category.main.')) {
     const id = key.substring('dsh.category.main.'.length).replace('.v1', '');
@@ -182,6 +182,7 @@ function getActualPublicMediaPath(key: string): string {
     return prefix + 'categories/sub/dsh-category-sub-' + id + '-v1' + ext;
   }
   if (key === 'dsh.product.apple.v1') return prefix + 'products/dsh-product-apple-v1' + ext;
+  if (key === 'dsh.product.generic.v1') return prefix + 'products/dsh-product-apple-v1' + ext; // intentional generic placeholder
   if (key === 'dsh.product.milk.v1') return prefix + 'products/dsh-product-milk-v1' + ext;
   if (key === 'dsh.product.bread.v1') return prefix + 'products/dsh-product-bread-v1' + ext;
   if (key === 'dsh.product.chicken.v1') return prefix + 'products/dsh-product-chicken-v1' + ext;
@@ -189,7 +190,23 @@ function getActualPublicMediaPath(key: string): string {
   if (key === 'dsh.product.choco.v1') return prefix + 'products/dsh-product-choco-v1' + ext;
   if (key === 'dsh.product.croissant.v1') return prefix + 'products/dsh-product-croissant-v1' + ext;
   if (key === 'dsh.product.roll.v1') return prefix + 'products/dsh-product-roll-v1' + ext;
+  if (key === 'dsh.product.salad.v1') return prefix + 'products/dsh-product-salad-v1' + ext;
+  if (key === 'dsh.product.yogurt.v1') return prefix + 'products/dsh-product-yogurt-v1' + ext;
   if (key === 'dsh.product.lead-5.dates-box.v1') return prefix + 'products/dsh-product-lead-5-dates-box-v1' + ext;
+  if (key === 'dsh.store.hadda.cover.v1') return prefix + 'stores/dsh-store-hadda-cover-v1' + ext;
+  if (key === 'dsh.store.hittin.cover.v1') return prefix + 'stores/dsh-store-hittin-cover-v1' + ext;
+  if (key === 'dsh.store.malqa.cover.v1') return prefix + 'stores/dsh-store-malqa-cover-v1' + ext;
+  if (key === 'dsh.store.lead-5.cover.v1') return prefix + 'stores/dsh-store-lead-5-cover-v1' + ext;
+  if (key === 'dsh.store.hadda.logo.v1') return prefix + 'store_logos/dsh-store-hadda-logo-v1' + ext;
+  if (key === 'dsh.store.hittin.logo.v1') return prefix + 'store_logos/dsh-store-hittin-logo-v1' + ext;
+  if (key === 'dsh.store.malqa.logo.v1') return prefix + 'store_logos/dsh-store-malqa-logo-v1' + ext;
+  if (key === 'dsh.store.lead-5.logo.v1') return prefix + 'store_logos/dsh-store-lead-5-logo-v1' + ext;
+  if (key === 'dsh.brand.logo.v1') return prefix + 'store_logos/brand-logo' + ext;
+  if (key.startsWith('dsh.banner.home.')) {
+    // e.g. dsh.banner.home.promo-1.v1 → banners/dsh-banner-home-promo-1-v1.png
+    const slug = key.replace('dsh.banner.home.', '').replace('.v1', '');
+    return prefix + 'banners/dsh-banner-home-' + slug + '-v1' + ext;
+  }
   return '';
 }
 
