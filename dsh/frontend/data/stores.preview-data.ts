@@ -1719,7 +1719,8 @@ export function mapFieldStoreToCanonicalStoreCard(store: FieldStoreFile): DshCan
     longitude: store.draft.location.longitude.trim() || undefined,
     landmark: store.draft.location.landmark.trim() || undefined,
     storefrontPhotoRef: photoRef,
-    mediaKey: photoRef ? `${photoRef}.media` : undefined,
+    // FIELD_PROPOSAL_ONLY: photoRef is not a registered media fixture key, so mediaKey is undefined.
+    mediaKey: undefined,
     imageUri: photoRef ? `${photoRef}.media` : undefined,
     statusLabel: resolveFieldStoreStatusLabel(store),
     statusTone: resolveFieldStoreStatusTone(store),
@@ -1751,13 +1752,14 @@ export function mapFieldStoreToCanonicalProductCard(store: FieldStoreFile): DshC
   const priceLabel = formatFieldProductPriceLabel(store.draft.products.featuredProductPrice);
   const categoryLabel = store.draft.classification.subCategory.trim() || store.draft.classification.mainCategory.trim() || store.category;
 
+  // FIELD_PROPOSAL_ONLY: generated as draft proposal for workflow evaluation, not SSoT canonical catalog item.
   return {
     id: `canonical-product-field-${store.id}-featured`,
     sourceRecordId: store.id,
     storeId: `canonical-store-field-${store.id}`,
     source: 'app-field',
     publishStage: resolveFieldCanonicalPublishStage(store),
-    name: featuredProductName,
+    name: `${featuredProductName} (FIELD_PROPOSAL_ONLY)`,
     subtitle: store.draft.products.sampleCatalogNote.trim() || undefined,
     categoryId: resolveFieldProductCategoryId(store),
     categoryLabel,

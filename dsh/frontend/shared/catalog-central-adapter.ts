@@ -189,7 +189,9 @@ export const CENTRAL_PRODUCT_DETAIL_LOOKUP: Record<string, PartnerInventoryDetai
   'item-chicken-1': { id: 'item-chicken-1', sku: 'BTH-RES-002', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01' },
   // canonical field-lead-5
   'canonical-product-field-lead-5-featured': { ['id']: 'canonical-product-field-lead-5-featured', ['name']: 'علبة تمر فاخر', sku: 'LEAD5-DATES-BOX', ['gtin']: '6280001055001', ['barcode']: '6280001055001', manufacturerCode: 'FIELD-LEAD5-01', internalNote: 'منتج ميداني افتتاحي — بانتظار مراجعة التسويق.' },
-  // Legacy workflow/approval preview details
+  // LEGACY_WORKFLOW_PREVIEW_ONLY: Kept for previewing legacy approval states and simulation screens.
+  // Consumers: InventoryCatalogScreen, ControlPanelDshCatalogScreen, PartnerHubScreen.
+  // Reason: Required to populate partner/marketing lists for workflow verification.
   'prd-restaurant-burger': { id: 'prd-restaurant-burger', sku: 'BTH-RES-002', gtin: '6280001000019', barcode: '6280001000019', manufacturerCode: 'MFR-CL-01' },
   'prd-restaurant-chicken': { id: 'prd-restaurant-chicken', sku: 'BTH-RES-001', gtin: '6280001000149', barcode: '6280001000149', manufacturerCode: 'MFR-CH-14' },
   'prd-restaurant-pasta': { id: 'prd-restaurant-pasta', sku: 'BTH-RES-003', gtin: '6280001000224', barcode: '6280001000224', manufacturerCode: 'MFR-SD-22', internalNote: 'مراجعة أولية من الميداني.' },

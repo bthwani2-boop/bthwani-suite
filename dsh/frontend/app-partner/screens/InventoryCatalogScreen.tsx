@@ -61,6 +61,7 @@ import {
   isPartnerOwnedException,
   translateOwner,
   translateStage,
+  translateEntityType,
   canRenderInClientSurface,
 } from '../../shared/workflow';
 
@@ -284,12 +285,12 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
       return {
         id: r.id,
         name: r.title,
-        categoryLabel: r.entityType === 'product' ? 'برغر' : 'وجبة',
+        categoryLabel: translateEntityType(r.entityType),
         isPrivateStoreProduct: isPrivate,
         isCatalogOwned: r.stage === 'client-visible' || r.stage === 'catalog-adopted',
         catalogLinked,
-        priceLabel: '18.00 ر.ي',
-        stockCount: 42,
+        priceLabel: r.metadata?.priceLabel || '0.00 ر.ي',
+        stockCount: 0,
         available: true,
         lowStock: false,
         publishStage: r.stage,

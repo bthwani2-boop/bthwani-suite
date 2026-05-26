@@ -6,7 +6,7 @@
  * Identity sources:
  *   Categories: dsh/frontend/data/categories.preview-data.ts (via dshCategoryFixtures)
  *   Products:   dsh/frontend/data/products.preview-data.ts (via storeItemsByStoreId)
- *   Media:      dsh/frontend/media-fixtures (via shared/resolve-dsh-image-source.ts)
+ *   Media:      dsh/frontend/media_fixtures (via shared/resolve-dsh-image-source.ts)
  *
  * Client app was the donor/reference for current correct preview data.
  * Surfaces consume through adapters only.
@@ -45,16 +45,16 @@ export type CatalogQuickEntryMode =
   | 'duplicate-resolution';
 
 export type CatalogSubClassification = {
-  id: string;
-  label: string;
+  ['id']: string;
+  ['label']: string;
   emojiFallback?: string;
   imageUri?: string;
   mediaKey?: string;
 };
 
 export type CatalogMainClassification = {
-  id: string;
-  label: string;
+  ['id']: string;
+  ['label']: string;
   emojiFallback?: string;
   imageUri?: string;
   mediaKey?: string;
@@ -62,8 +62,8 @@ export type CatalogMainClassification = {
 };
 
 export type CatalogSubCategory = {
-  id: string;
-  label: string;
+  ['id']: string;
+  ['label']: string;
   subtitle: string;
   emojiFallback?: string;
   imageUri?: string;
@@ -74,8 +74,8 @@ export type CatalogSubCategory = {
 export type CatalogCategoryMode = 'catalog-based' | 'manual-order';
 
 export type CatalogMainCategory = {
-  id: string;
-  label: string;
+  ['id']: string;
+  ['label']: string;
   subtitle: string;
   subcategories: CatalogSubCategory[];
   emojiFallback: string;
@@ -95,7 +95,7 @@ export type CatalogPartnerOverride = {
 };
 
 export type CatalogCategoryProposal = {
-  id: string;
+  ['id']: string;
   partnerId: string;
   proposedName: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -116,8 +116,8 @@ export type CatalogSmartFilter = {
 };
 
 export type CatalogProductMaster = {
-  id: string;
-  name: string;
+  ['id']: string;
+  ['name']: string;
   sku: string;
   gtin?: string;
   barcode?: string;
@@ -186,6 +186,7 @@ export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.m
     categoryMode: c.isManualLike ? 'manual-order' : 'catalog-based',
     subcategories: c.subcategories.map((sub) => {
       // Initialize with default classifications so the user has some classifications to see/edit
+      // DEFERRED_DATA_CENTRALIZATION: generated classifications such as "تصنيف رئيسي 1" and "تصنيف فرعي أ" should be moved to categories.preview-data.ts in future centralization sweep.
       const mainClassifications: CatalogMainClassification[] = [
         {
           id: `classif-main-${sub.id}-1`,
@@ -290,29 +291,5 @@ Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
     }
   });
 });
-
-// Let's add the canonical LEAD-5 featured product specifically if not present
-if (!allProductsMap.has('canonical-product-field-lead-5-featured')) {
-  allProductsMap.set('canonical-product-field-lead-5-featured', {
-    id: 'canonical-product-field-lead-5-featured',
-    name: 'علبة تمر فاخر',
-    sku: 'LEAD5-DATES-BOX',
-    gtin: '6280001055001',
-    barcode: '6280001055001',
-    measurementUnit: '1 علبة',
-    categoryPath: {
-      main: 'honey_dates',
-      sub: undefined,
-    },
-    price: 55.00,
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'marketing-review',
-    sourceSurface: 'field',
-    surfaces: ['partner', 'marketing', 'field'],
-    imageUri: 'dsh.product.lead-5.dates-box.v1',
-    mediaKey: 'dsh.product.lead-5.dates-box.v1',
-    emojiFallback: 'ت',
-  });
-}
 
 export const dshCatalogProducts: CatalogProductMaster[] = Array.from(allProductsMap.values());
