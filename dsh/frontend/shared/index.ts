@@ -88,13 +88,10 @@ export {
 } from './store-card-commercial-map';
 
 export type {
-  DshCatalogApprovalStage,
   DshCatalogDomainId,
   DshCatalogMainCategoryId,
   DshCatalogMeasurementKind,
   DshCatalogMeasurementPolicy,
-  DshCatalogNode,
-  DshCatalogNodeKind,
   DshCatalogPipelineStep,
   DshCatalogSubcategoryId,
   DshProductFacetId,
@@ -109,7 +106,6 @@ export {
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
   dshCatalogMetrics,
-  dshCatalogNodes,
   dshCatalogPipeline,
   dshCategoryMeasurementPolicies,
   getDshTaxonomyLabel,

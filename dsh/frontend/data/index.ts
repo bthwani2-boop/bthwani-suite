@@ -18,3 +18,4 @@ export * from './support.preview-data';
 export * from './operational-statuses.preview-data';
 export * from './marketing.preview-data';
 export * from './platform.preview-data';
+export * from './partner.preview-data';

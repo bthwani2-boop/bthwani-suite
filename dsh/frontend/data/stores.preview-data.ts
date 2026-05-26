@@ -1,4 +1,4 @@
-import { buildCanonicalPreviewDiscoveryStores, type DshCanonicalProductCard, type DshCanonicalPublishStage, type DshCanonicalStoreCard, type DshDiscoveryStore, type MeasurementOption } from '../shared/dshStoreProductCardModel';
+import { mapCanonicalStoreToDiscoveryStore, type DshCanonicalProductCard, type DshCanonicalPublishStage, type DshCanonicalStoreCard, type DshDiscoveryStore, type MeasurementOption } from '../shared/dshStoreProductCardModel';
 import { buildStoreCategories, buildStoreDeliveryModes, buildStoreTags, dshStoreBuildersContractMeta as buildersDataContract } from '../shared/dsh-store-builders';
 import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 import type { DiscoveryFilter, DshServiceId } from '../shared/dsh-discovery.contract';
@@ -2249,4 +2249,58 @@ export function selectDshControlPanelCatalogPreview() {
     stores: dshDiscoveryStores,
     homeStores: dshHomeGetFixtureStores,
   };
+}
+
+// ── Canonical Mock Data ──────────────────────────────────────────────────
+
+export const canonicalStoreId = 'canonical-store-field-lead-5';
+export const canonicalProductId = 'canonical-product-field-lead-5-featured';
+
+export const canonicalStoreCard: DshCanonicalStoreCard = {
+  id: canonicalStoreId,
+  sourceRecordId: 'lead-5',
+  source: 'app-field',
+  publishStage: 'marketing-review',
+  storeName: 'تمور النخبة',
+  branchLabel: 'اليرموك • الرياض',
+  cityLabel: 'الرياض',
+  categoryLabel: 'مواد غذائية',
+  subcategoryLabel: 'تمور وهدايا',
+  addressLabel: 'شارع النجاح',
+  zoneLabel: 'اليرموك',
+  ownerName: 'خالد المطيري',
+  ownerPhone: '0500000005',
+  managerName: 'عبدالعزيز',
+  operatingHoursLabel: '9 ص - 11 م',
+  deliveryReadinessLabel: 'جاهز',
+  coverageSummary: 'شرق الرياض',
+  latitude: '24.7881',
+  longitude: '46.7441',
+  landmark: 'مقابل الحديقة',
+  storefrontPhotoRef: 'الواجهة مكتملة',
+  mediaKey: 'dsh.store.lead-5.cover.v1',
+  imageUri: 'dsh.store.lead-5.cover.v1',
+  statusLabel: 'مفتوح',
+  statusTone: 'success',
+  rating: 4.9,
+  distanceLabel: '2.4 كم',
+  etaLabel: '18 دقيقة',
+  deliveryLabel: 'توصيل سريع',
+  serviceLabel: 'بثواني برو',
+  deliveryFeeLabel: 'رسوم التوصيل 10 ر.ي',
+  priceMatchLabel: 'الأسعار مطابقة للكتالوج',
+  offerLabel: 'منتج افتتاحي موثق',
+  followerCount: 4200,
+  supportsPickup: true,
+  supportsPartnerDelivery: true,
+  hasBthwaniPro: true,
+  hasNewProducts: true,
+  hasCouponAvailable: true,
+  canonicalProductId,
+};
+
+export const canonicalPreviewStores: ReadonlyArray<DshCanonicalStoreCard> = [canonicalStoreCard];
+
+export function buildCanonicalPreviewDiscoveryStores(): DshDiscoveryStore[] {
+  return canonicalPreviewStores.map((store) => mapCanonicalStoreToDiscoveryStore(store));
 }
