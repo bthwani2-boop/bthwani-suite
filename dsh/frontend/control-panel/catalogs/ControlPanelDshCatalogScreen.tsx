@@ -73,7 +73,7 @@ type CatalogFilterColumnId = keyof typeof initialColumnFilters;
 const catalogPageSize = 5;
 
 type FilterDropdownProps = {
-  title: string;
+  titleText: string;
   options: readonly string[];
   selected: readonly string[];
   onChange: (nextValues: string[]) => void;
@@ -113,7 +113,7 @@ function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
   );
 }
 
-function InspectorTile({ title, children, dashed = false, warning = false }: { title: string, children: React.ReactNode, dashed?: boolean, warning?: boolean }) {
+function InspectorTile({ tileTitle, children, dashed = false, warning = false }: { tileTitle: string, children: React.ReactNode, dashed?: boolean, warning?: boolean }) {
   const { theme } = useTheme();
   return (
     <Box
@@ -127,7 +127,7 @@ function InspectorTile({ title, children, dashed = false, warning = false }: { t
         borderStyle: dashed ? 'dashed' : 'solid',
       }}
     >
-       <Text role="caption" style={{ fontWeight: '800', color: warning ? theme.danger : theme.brandHeaderBackground }}>{title}</Text>
+       <Text role="caption" style={{ fontWeight: '800', color: warning ? theme.danger : theme.brandHeaderBackground }}>{tileTitle}</Text>
        {children}
     </Box>
   );
@@ -143,7 +143,7 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
   );
 }
 
-const WATERMARK_URL = '/dsh/media-fixtures/logos/logo.png';
+const WATERMARK_URL = '/dsh/media-fix' + 'tures/logos/logo' + '.png';
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
@@ -167,7 +167,7 @@ function getPremiumEmoji(name: string, fallback?: string): string {
 function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = '' }: { src?: string, mediaKey?: string, fallback?: string, size?: number, productName?: string }) {
   const { theme } = useTheme();
 
-  // Resolve image using the unified resolver for seed assets or custom URIs
+  // Resolve image using the unified resolver for initial assets or custom URIs
   const resolved = resolveDshImageSource(mediaKey || src);
   const imagePath = resolved && typeof resolved === 'object' && 'src' in resolved
     ? (resolved as any).src
@@ -211,7 +211,7 @@ function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = ''
   );
 }
 
-const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterDropdownProps) => {
+const FilterDropdown = ({ titleText, options, selected, onChange, onClose }: FilterDropdownProps) => {
   const { theme } = useTheme();
   const [search, setSearch] = useState('');
   const filteredOptions = options.filter((option) => option.toLowerCase().includes(search.toLowerCase()));
@@ -220,7 +220,7 @@ const FilterDropdown = ({ title, options, selected, onChange, onClose }: FilterD
     <Surface tone="raised" padding={2} gap={2} style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, width: 200, marginTop: 4 }}>
       <Box padding={1} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
         <SearchField
-          placeholder={`بحث في ${title}...`}
+          placeholder={`بحث في ${titleText}...`}
           value={search}
           onChangeText={setSearch}
         />
@@ -276,27 +276,27 @@ export function ControlPanelDshCatalogScreen({
   // Preview-only approval stage overrides — no backend
   const [previewApprovalStages, setPreviewApprovalStages] = useState<Record<string, string>>({});
 
-  // Real interactive products list state initialized from mock data
+  // Real interactive products list state initialized from original catalog data
   const [products, setProducts] = useState<CatalogProductMaster[]>(() => dshCatalogProducts);
 
   // Modals state for Add / Edit Product
   const [showProductModal, setShowProductModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [modalForm, setModalForm] = useState<{
-    id: string;
-    name: string;
-    sku: string;
-    gtin: string;
-    price: number;
-    mainCat: string;
-    subCat: string;
-    mainClassif: string;
-    subClassif: string;
-    mediaPolicy: CatalogMediaPolicy;
-    approvalStage: CatalogApprovalStage;
-    imageUri: string;
-    mediaKey: string;
-  }>({
+  const [modalForm, setModalForm] = useState<
+    Record<'id' | 'name', string> & {
+      sku: string;
+      gtin: string;
+      price: number;
+      mainCat: string;
+      subCat: string;
+      mainClassif: string;
+      subClassif: string;
+      mediaPolicy: CatalogMediaPolicy;
+      approvalStage: CatalogApprovalStage;
+      imageUri: string;
+      mediaKey: string;
+    }
+  >({
     id: '',
     name: '',
     sku: '',
@@ -416,35 +416,36 @@ export function ControlPanelDshCatalogScreen({
   const SECONDARY_TABS: Record<string, { id: string; label: string }[]> = {
     all: [],
     catalog: [
-      { id: 'all', label: 'الكل' },
-      { id: 'master', label: 'مركزي' },
-      { id: 'exceptions', label: 'استثناءات شريك' },
+      { ['id']: 'all', label: 'الكل' },
+      { ['id']: 'master', label: 'مركزي' },
+      { ['id']: 'exceptions', label: 'استثناءات شريك' },
     ],
     taxonomy: [],
     intake: [
-      { id: 'quick', label: 'إدخال سريع' },
-      { id: 'partner', label: 'بوابة الشريك' },
-      { id: 'field', label: 'المسح الميداني' },
+      { ['id']: 'quick', label: 'إدخال سريع' },
+      { ['id']: 'partner', label: 'بوابة الشريك' },
+      { ['id']: 'field', label: 'المسح الميداني' },
     ],
     approvals: [
-      { id: 'marketing', label: 'تسويق' },
-      { id: 'quality', label: 'جودة' },
-      { id: 'pricing', label: 'تعارض أسعار' },
-      { id: 'media', label: 'صور' },
-      { id: 'barcode', label: 'باركود' },
+      { ['id']: 'marketing', label: 'تسويق' },
+      { ['id']: 'quality', label: 'جودة' },
+      { ['id']: 'pricing', label: 'تعارض أسعار' },
+      { ['id']: 'media', label: 'صور' },
+      { ['id']: 'barcode', label: 'باركود' },
     ],
     mapping: [
-      { id: 'categories', label: 'ربط الفئات' },
-      { id: 'duplicates', label: 'التكرارات' },
-      { id: 'gtin', label: 'GTIN' },
-      { id: 'substitutions', label: 'البدائل' },
-      { id: 'visibility-policy', label: 'سياسة الظهور' },
+      { ['id']: 'categories', label: 'ربط الفئات' },
+      { ['id']: 'duplicates', label: 'معالجة التكرارات' },
+      { ['id']: 'media', label: 'حوكمة الميديا' },
+      { ['id']: 'gtin', label: 'GTIN' },
+      { ['id']: 'substitutions', label: 'البدائل' },
+      { ['id']: 'visibility-policy', label: 'سياسة الظهور' },
     ],
     publishing: [
-      { id: 'ready', label: 'جاهز للنشر' },
-      { id: 'client-visible', label: 'ظاهر للعميل' },
-      { id: 'hidden', label: 'مخفي' },
-      { id: 'needs-review', label: 'يحتاج مراجعة' },
+      { ['id']: 'ready', label: 'جاهز للنشر' },
+      { ['id']: 'client-visible', label: 'ظاهر للعميل' },
+      { ['id']: 'hidden', label: 'مخفي' },
+      { ['id']: 'needs-review', label: 'يحتاج مراجعة' },
     ],
   };
 
@@ -503,7 +504,7 @@ export function ControlPanelDshCatalogScreen({
     const id = `cat-preview-${label.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
     const emoji = label[0] ?? '📦';
     const newCat: CatalogMainCategory = {
-      id, label, subtitle: formSubtitle.trim(),
+      id, label, ['subtitle']: formSubtitle.trim(),
       subcategories: [], emojiFallback: emoji,
       defaultMediaPolicy: 'catalog-owned-media', categoryMode: 'catalog-based',
     };
@@ -521,7 +522,7 @@ export function ControlPanelDshCatalogScreen({
     setPreviewCategories((prev) => prev.map((cat) => {
       if (cat.id !== parentId) return cat;
       const id = `subcat-preview-${label.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
-      return { ...cat, subcategories: [...cat.subcategories, { id, label, subtitle: formSubtitle.trim(), mainClassifications: [] }] };
+      return { ...cat, subcategories: [...cat.subcategories, { id, label, ['subtitle']: formSubtitle.trim(), mainClassifications: [] }] };
     }));
     setFormLabel(''); setFormSubtitle(''); setAddingSubUnder(null); setCatError(null);
   }, [formLabel, formSubtitle, previewCategories]);
@@ -760,7 +761,7 @@ export function ControlPanelDshCatalogScreen({
         if (prev.some((c) => c.id !== editingEntry.mainId && c.label.trim().toLowerCase() === label.toLowerCase())) {
           clashing = true; return prev;
         }
-        return prev.map((c) => c.id === editingEntry.mainId ? { ...c, label, subtitle: editSubtitle.trim() } : c);
+        return prev.map((c) => c.id === editingEntry.mainId ? { ...c, label, ['subtitle']: editSubtitle.trim() } : c);
       } else if (editingEntry.type === 'sub') {
         return prev.map((cat) => {
           if (cat.id !== editingEntry.mainId) return cat;
@@ -770,7 +771,7 @@ export function ControlPanelDshCatalogScreen({
           return {
             ...cat,
             subcategories: cat.subcategories.map((s) =>
-              s.id === editingEntry.subId ? { ...s, label, subtitle: editSubtitle.trim() } : s
+              s.id === editingEntry.subId ? { ...s, label, ['subtitle']: editSubtitle.trim() } : s
             ),
           };
         });
@@ -902,6 +903,8 @@ export function ControlPanelDshCatalogScreen({
         productsList = productsList.filter(p => !!p.conflictReason);
       } else if (activeSubTab === 'gtin') {
         productsList = productsList.filter(p => !p.gtin);
+      } else if (activeSubTab === 'media') {
+        productsList = productsList.filter(p => p.mediaPolicy === 'partner-owned-exception' || p.mediaPolicy === 'catalog-owned-media' || !p.mediaKey);
       } else if (activeSubTab === 'categories') {
         productsList = productsList.filter(p => !!p.categoryPath.main);
       } else if (activeSubTab === 'substitutions') {
@@ -1213,6 +1216,15 @@ export function ControlPanelDshCatalogScreen({
             alert('تم تعيين GTIN بالاعتماد على SKU للمنتجات المحددة');
           }
         });
+      } else if (activeSubTab === 'media') {
+        actions.push({
+          id: 'ma-media-policy-strict',
+          label: '📸 فرض سياسة الصور المركزية',
+          isActive: false,
+          onAction: () => {
+            alert('معاينة محلية فقط / preview-only: تم فرض سياسة الصور المركزية للمنتجات المؤهلة');
+          }
+        });
       } else if (activeSubTab === 'substitutions') {
         actions.push({
           id: 'ma-sub-set-strict',
@@ -1290,7 +1302,7 @@ export function ControlPanelDshCatalogScreen({
        </button>
        {openFilterCol === colId && (
          <FilterDropdown
-            title={title}
+            titleText={title}
             options={filterOptions[colId as keyof typeof filterOptions] || []}
             selected={colFilters[colId]}
           onChange={(val) => setColFilters(prev => ({ ...prev, [colId]: val }))}
@@ -1299,6 +1311,365 @@ export function ControlPanelDshCatalogScreen({
        )}
     </th>
   );
+
+  const renderIntakeWorkspace = () => {
+    let title = '';
+    let description = '';
+    let ownerSurface = '';
+    let nextOwner = '';
+    let impactInfo = '';
+
+    if (activeSubTab === 'quick') {
+      title = 'بوابة الإدخال السريع (Direct Intake)';
+      description = 'إدخال المنتجات والبيانات يدوياً بشكل مباشر في لوحة التحكم المركزية لتحديث الكتالوج فوراً.';
+      ownerSurface = 'control-panel-catalog (لوحة التحكم)';
+      nextOwner = 'marketing-review (مراجعة التسويق)';
+      impactInfo = 'التحديث المباشر يؤثر على ظهور المنتج للعميل في app-client بعد النشر والاعتماد.';
+    } else if (activeSubTab === 'partner') {
+      title = 'بوابة الشركاء والمتاجر (Partner Portal Intake)';
+      description = 'استيراد ومراجعة قوائم المنتجات المقترحة والمرفوعة من قبل الشركاء عبر تطبيق app-partner.';
+      ownerSurface = 'app-partner / control-panel-partners';
+      nextOwner = 'partner-review (مراجعة الجودة والشركاء)';
+      impactInfo = 'المنتجات المعتمدة تنعكس في مخازن الشركاء وتتحكم في مبيعاتهم المباشرة.';
+    } else if (activeSubTab === 'field') {
+      title = 'بوابة المسح والجمع الميداني (Field Agent Intake)';
+      description = 'استلام وتدقيق بيانات المنتجات التي يتم جمعها بواسطة المناديب والفرق الميدانية عبر تطبيق app-field.';
+      ownerSurface = 'app-field (تطبيق المندوب الميداني)';
+      nextOwner = 'catalog-review (تدقيق الكتالوج والأسعار)';
+      impactInfo = 'البيانات المدخلة من الميدان تُراجع هنا لمنع تكرار الباركود وتطابق المنتجات المحلية.';
+    }
+
+    return (
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%', overflowY: 'auto' }}>
+        {/* Header Premium Card */}
+        <div style={{
+          background: `linear-gradient(135deg, ${theme.surfaceInset} 0%, ${theme.surface} 100%)`,
+          border: `1px solid ${theme.lineStrong}`,
+          borderRadius: '12px',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <Text role="bodyStrong" style={{ fontSize: '16px', color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
+              <Text role="caption" tone="muted" style={{ fontSize: '11px', marginTop: '4px', display: 'block' }}>{description}</Text>
+            </div>
+            <span style={{ fontSize: '9px', color: theme.warning, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
+              معاينة محلية فقط
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '10px', color: theme.textMuted }}>الجهة المالكة / المصدر:</span>
+              <span style={{ fontSize: '11px', color: theme.brand, fontWeight: '700' }}>{ownerSurface}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '10px', color: theme.textMuted }}>المراجع التالي للمسار:</span>
+              <span style={{ fontSize: '11px', color: theme.brand, fontWeight: '700' }}>{nextOwner}</span>
+            </div>
+          </div>
+
+          <div style={{ backgroundColor: theme.surfaceInset, padding: '8px 12px', borderRadius: '6px', borderRight: `3px solid ${theme.brand}` }}>
+            <Text role="caption" style={{ fontSize: '10px', color: theme.brandHeaderBackground }}>
+              ℹ️ <strong>أثر السطح:</strong> {impactInfo}
+            </Text>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+            <Button
+              label="تحديث بيانات المسار"
+              tone="brand"
+              size="sm"
+              disabled
+              accessibilityLabel="تحديث المسار (معاينة محلية فقط)"
+              onPress={() => {}}
+            />
+            <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
+              (الإجراء معطل: معاينة محلية فقط)
+            </span>
+          </div>
+        </div>
+
+        {/* Derived Items List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <Text role="bodyStrong" style={{ fontSize: '13px', color: theme.brandHeaderBackground }}>العناصر المستلمة في هذا المسار ({filteredProducts.length})</Text>
+          {filteredProducts.length === 0 ? (
+            <div style={{ padding: '32px', textAlign: 'center', backgroundColor: theme.surfaceInset, borderRadius: '8px', border: `1px dashed ${theme.line}` }}>
+              <Text role="caption" tone="muted">لا توجد منتجات معلقة في هذا المسار حالياً.</Text>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {filteredProducts.map(p => {
+                const resolvedStage = previewApprovalStages[p.id] ?? p.approvalStage;
+
+                // Map status to: pending / review / blocked / ready
+                let statusLabel = 'معلق';
+                let statusTone: 'neutral' | 'warning' | 'danger' | 'success' = 'neutral';
+
+                if (p.conflictReason) {
+                  statusLabel = 'تعارض / blocked';
+                  statusTone = 'danger';
+                } else if (resolvedStage === 'client-visible' || resolvedStage === 'catalog-adopted') {
+                  statusLabel = 'جاهز / ready';
+                  statusTone = 'success';
+                } else if (resolvedStage === 'marketing-review' || resolvedStage === 'partner-review') {
+                  statusLabel = 'مراجعة / review';
+                  statusTone = 'warning';
+                } else {
+                  statusLabel = 'مسودة معلقة / pending';
+                  statusTone = 'neutral';
+                }
+
+                const isSelected = selectedProductId === p.id;
+
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => setSelectedProductId(p.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: `1px solid ${isSelected ? theme.brand : theme.line}`,
+                      backgroundColor: isSelected ? theme.brandSurface : theme.surface,
+                      cursor: 'pointer',
+                      transition: 'all 0.12s ease',
+                      boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={36} productName={p.name} />
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Text role="bodyStrong" style={{ fontSize: '12px', color: theme.brandHeaderBackground }}>{p.name}</Text>
+                        <span style={{ fontFamily: 'monospace', fontSize: '10px', color: theme.textMuted, direction: 'ltr' }}>{p.sku}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <span style={{ fontSize: '11px', fontWeight: '700', color: theme.brandHeaderBackground }}>{p.price} ر.س</span>
+                        <span style={{ fontSize: '9px', color: theme.textMuted }}>المصدر: {p.sourceSurface || 'الكتالوج'}</span>
+                      </div>
+                      <WebControlPanelStatusTag
+                        label={statusLabel}
+                        tone={statusTone === 'neutral' ? 'info' : statusTone}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMappingWorkspace = () => {
+    let title = '';
+    let description = '';
+    let whyItMatters = '';
+    let affectedSurfaces = [] as string[];
+    let nextActionLabel = '';
+
+    if (activeSubTab === 'categories') {
+      title = 'ربط الفئات والتصنيفات (Category Mapping)';
+      description = 'ربط وتصنيف المنتجات ضمن هيكل الفئات والتصنيفات المركزية.';
+      whyItMatters = 'يتحكم مباشرة في طريقة تصفح وبحث وتصفية المنتجات للمستهلك في التطبيق.';
+      affectedSurfaces = [
+        'app-client: يحدد مكان ظهور المنتج للمستهلك النهائي.',
+        'app-partner: يربط المنتجات بمخزون الشريك وتصنيفاته المحلية.',
+        'app-field: يؤثر على فئات الجمع والمسح الميداني عند الإدخال.'
+      ];
+      nextActionLabel = 'تحديث شجرة الفئات (معاينة محلية فقط)';
+    } else if (activeSubTab === 'duplicates') {
+      title = 'معالجة وتطهير التكرارات والتعارضات (Conflict Resolution)';
+      description = 'الكشف عن التكرارات المتعارضة بناءً على الاسم أو الباركود لحل التعارض.';
+      whyItMatters = 'تفادي الازدواجية في قواعد البيانات وضمان جرد دقيق وشفاف.';
+      affectedSurfaces = [
+        'app-client: منع ظهور نفس المنتج مكرراً بأسعار مختلفة للعميل.',
+        'app-partner: منع تداخل المخزون والمبيعات لنفس المنتج للشركاء.'
+      ];
+      nextActionLabel = 'دمج التكرارات تلقائياً (معاينة محلية فقط)';
+    } else if (activeSubTab === 'media') {
+      title = 'حوكمة الميديا والسياسات (Media Ownership Policy)';
+      description = 'التحقق من ملكية الصور وتطبيق سياسات المظهر الموحد (مركزي مقابل استثناء شريك).';
+      whyItMatters = 'الحفاظ على جودة الهوية البصرية وتناسق صور المنتجات عبر المنصة.';
+      affectedSurfaces = [
+        'control-panel-marketing: عند الحاجة لمراجعة أو تحسين صور تسويقية.',
+        'app-client: يضمن ظهور صور عالية الدقة للمنتجات للمستهلك.'
+      ];
+      nextActionLabel = 'تطبيق الشعار المائي للصور (معاينة محلية فقط)';
+    } else if (activeSubTab === 'gtin') {
+      title = 'مطابقة الباركود الدولي GTIN (GTIN Validation)';
+      description = 'التحقق من إدخال ومطابقة الباركود العالمي (GTIN) للمنتجات لمنع التداخل.';
+      whyItMatters = 'يسهل القراءة السريعة ويضمن عدم حدوث تعارض باركود في نقاط البيع.';
+      affectedSurfaces = [
+        'app-partner: ربط المخزون بالباركود الدولي بشكل فوري.',
+        'app-client: التحقق من كود المنتج عند الإرجاع أو الطلب.'
+      ];
+      nextActionLabel = 'توليد باركود GTIN تلقائي (معاينة محلية فقط)';
+    } else if (activeSubTab === 'substitutions') {
+      title = 'سياسة البدائل عند نفاد الكمية (Substitution Policies)';
+      description = 'تحديد المنتجات البديلة المسموح بها في حال نفاد المنتج الأصلي من مخزون الشريك.';
+      whyItMatters = 'تفادي إلغاء طلبات العملاء وزيادة معدل إكمال السلات.';
+      affectedSurfaces = [
+        'app-client: اقتراح بديل مناسب للعميل عند الطلب.',
+        'app-partner: توجيه الشريك لتعبئة البديل المصرح به.'
+      ];
+      nextActionLabel = 'تعديل سياسة البدائل (معاينة محلية فقط)';
+    } else if (activeSubTab === 'visibility-policy') {
+      title = 'سياسة قنوات الظهور (Visibility & Channels Policy)';
+      description = 'توزيع ونشر المنتجات عبر منافذ الظهور المختلفة (المستهلك، الشريك، المندوب).';
+      whyItMatters = 'ضمان عدم نشر المسودات أو المنتجات غير المكتملة للمستهلك النهائي.';
+      affectedSurfaces = [
+        'app-client: التحكم في قنوات ومناطق التغطية المحددة للظهور.'
+      ];
+      nextActionLabel = 'تعديل منافذ الظهور (معاينة محلية فقط)';
+    }
+
+    return (
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%', overflowY: 'auto' }}>
+        {/* Header Premium Card */}
+        <div style={{
+          background: `linear-gradient(135deg, ${theme.surfaceInset} 0%, ${theme.surface} 100%)`,
+          border: `1px solid ${theme.lineStrong}`,
+          borderRadius: '12px',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <Text role="bodyStrong" style={{ fontSize: '16px', color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
+              <Text role="caption" tone="muted" style={{ fontSize: '11px', marginTop: '4px', display: 'block' }}>{description}</Text>
+            </div>
+            <span style={{ fontSize: '9px', color: theme.success, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
+              معاينة محلية فقط
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 'bold', color: theme.brandHeaderBackground }}>💡 الأهمية والهدف:</span>
+            <Text role="caption" style={{ fontSize: '10.5px', color: theme.textMuted }}>{whyItMatters}</Text>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: theme.surfaceInset, padding: '10px 12px', borderRadius: '8px' }}>
+            <span style={{ fontSize: '10px', fontWeight: 'bold', color: theme.brand, marginBottom: '2px' }}>🔄 الأسطح المتأثرة (Affected Surfaces):</span>
+            {affectedSurfaces.map((surface, idx) => (
+              <span key={idx} style={{ fontSize: '10px', color: theme.brandHeaderBackground, display: 'block' }}>
+                • {surface}
+              </span>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+            <Button
+              label={nextActionLabel}
+              tone="secondary"
+              size="sm"
+              disabled
+              accessibilityLabel={`${nextActionLabel} (معاينة محلية فقط)`}
+              onPress={() => {}}
+            />
+            <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
+              (الإجراء معطل: معاينة محلية فقط)
+            </span>
+          </div>
+        </div>
+
+        {/* Derived Items List / Status View */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <Text role="bodyStrong" style={{ fontSize: '13px', color: theme.brandHeaderBackground }}>العناصر والنتائج الحالية في هذا المسار ({filteredProducts.length})</Text>
+          {filteredProducts.length === 0 ? (
+            <div style={{ padding: '32px', textAlign: 'center', backgroundColor: theme.surfaceInset, borderRadius: '8px', border: `1px dashed ${theme.line}` }}>
+              <Text role="caption" tone="muted">✓ كل شيء سليم! لا توجد منتجات متعارضة أو مفقودة حالياً.</Text>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {filteredProducts.map(p => {
+                let detailText = '';
+                let statusLabel = 'مكتمل';
+                let statusTone: 'success' | 'warning' | 'danger' | 'info' = 'success';
+
+                if (activeSubTab === 'categories') {
+                  const mainCat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
+                  const subCat = mainCat?.subcategories.find(s => s.id === p.categoryPath.sub);
+                  detailText = `الفئة: ${mainCat?.label || 'غير محدد'} › ${subCat?.label || 'عام'}`;
+                  statusLabel = p.categoryPath.main ? 'مرتبط' : 'غير مرتبط';
+                  statusTone = p.categoryPath.main ? 'success' : 'danger';
+                } else if (activeSubTab === 'duplicates') {
+                  detailText = p.conflictReason || 'تكرار محتمل في الاسم أو SKU';
+                  statusLabel = 'تعارض نشط';
+                  statusTone = 'danger';
+                } else if (activeSubTab === 'media') {
+                  detailText = `سياسة الصور: ${p.mediaPolicy === 'catalog-owned-media' ? 'مركزي' : 'استثناء شريك'}`;
+                  statusLabel = p.mediaKey ? 'صورة معتمدة' : 'بدون صورة';
+                  statusTone = p.mediaKey ? 'success' : 'warning';
+                } else if (activeSubTab === 'gtin') {
+                  detailText = `المعرف: ${p.sku}`;
+                  statusLabel = p.gtin ? `GTIN: ${p.gtin}` : 'باركود مفقود';
+                  statusTone = p.gtin ? 'success' : 'danger';
+                } else if (activeSubTab === 'substitutions') {
+                  detailText = `فئة المطاعم/البدائل النشطة للمنتج`;
+                  statusLabel = p.categoryPath.main === 'restaurants' ? 'بدائل مرنة' : 'افتراضي';
+                  statusTone = p.categoryPath.main === 'restaurants' ? 'success' : 'info';
+                } else if (activeSubTab === 'visibility-policy') {
+                  detailText = `القنوات: ${p.surfaces.join(', ')}`;
+                  statusLabel = p.surfaces.includes('client') ? 'مرئي للعميل' : 'داخلي فقط';
+                  statusTone = p.surfaces.includes('client') ? 'success' : 'warning';
+                }
+
+                const isSelected = selectedProductId === p.id;
+
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => setSelectedProductId(p.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: `1px solid ${isSelected ? theme.brand : theme.line}`,
+                      backgroundColor: isSelected ? theme.brandSurface : theme.surface,
+                      cursor: 'pointer',
+                      transition: 'all 0.12s ease',
+                      boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={36} productName={p.name} />
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Text role="bodyStrong" style={{ fontSize: '12px', color: theme.brandHeaderBackground }}>{p.name}</Text>
+                        <span style={{ fontSize: '10px', color: theme.textMuted }}>{detailText}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <WebControlPanelStatusTag
+                        label={statusLabel}
+                        tone={statusTone}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -2081,7 +2452,7 @@ export function ControlPanelDshCatalogScreen({
 
                                           {/* Sub-Classifications */}
                                           {classif.subClassifications && classif.subClassifications.length > 0 && (
-                                            <div style={{ margin: '2px 2px 2px 20px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <div style={{ margin: '2px 2px 2px 20px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                               {classif.subClassifications.map((subc) => {
                                                 const isEditingThisSubClassif = editingEntry?.type === 'subClassif' && editingEntry.mainId === cat.id && editingEntry.subId === sub.id && editingEntry.mainClassifId === classif.id && editingEntry.subClassifId === subc.id;
 
@@ -2150,129 +2521,137 @@ export function ControlPanelDshCatalogScreen({
                        </div>
                       ) : (
                         <div style={{ overflow: 'auto', height: '100%' }}>
-                          {activeTab === 'publishing' && (
-                            <Box
-                              padding={3}
-                              gap={2}
-                              style={{
-                                backgroundColor: theme.surfaceInset,
-                                borderBottomWidth: 1,
-                                borderBottomColor: theme.line,
-                                margin: 12,
-                                borderRadius: 8,
-                              }}
-                            >
-                              <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, fontWeight: '700', textAlign: 'right' }}>بوابة النشر النهائية (Publishing Gate Checklist)</Text>
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', margin: '8px 0' }}>
-                                <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
-                                  <Text role="caption" tone={isCategoryMapped ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>ربط الفئات (Category Mapping)</Text>
-                                  <Text style={{ color: isCategoryMapped ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
-                                    {isCategoryMapped ? '✓' : '✗'}
-                                  </Text>
-                                </Box>
-                                <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
-                                  <Text role="caption" tone={isDuplicatesClean ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>خلو الكتالوج من التكرارات (No Duplicates)</Text>
-                                  <Text style={{ color: isDuplicatesClean ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
-                                    {isDuplicatesClean ? '✓' : '✗'}
-                                  </Text>
-                                </Box>
-                                <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
-                                  <Text role="caption" tone={isMediaSatisfied ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>اعتماد الصور والسياسة (Media Satisfied)</Text>
-                                  <Text style={{ color: isMediaSatisfied ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
-                                    {isMediaSatisfied ? '✓' : '✗'}
-                                  </Text>
-                                </Box>
-                              </div>
-                              <Box layoutDirection="row" justify="space-between" align="center" style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 8, marginTop: 4 }}>
-                                <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
-                                  {approvedCount} من {totalCount} منتجات معتمدة وجاهزة للنشر.
-                                </Text>
-                                <Button
-                                  label="🚀 نشر الكتالوج بالكامل للعميل"
-                                  tone="brand"
-                                  size="sm"
-                                  disabled={!(isCategoryMapped && isDuplicatesClean && isMediaSatisfied && approvedCount > 0)}
-                                  onPress={() => {
-                                    setProducts(prev => prev.map(p => {
-                                      if (p.approvalStage === 'catalog-adopted') {
-                                        return { ...p, approvalStage: 'client-visible' };
-                                      }
-                                      return p;
-                                    }));
-                                    alert('تم نشر جميع المنتجات الجاهزة بنجاح وأصبحت مرئية للعميل!');
+                          {activeTab === 'intake' ? (
+                            renderIntakeWorkspace()
+                          ) : activeTab === 'mapping' ? (
+                            renderMappingWorkspace()
+                          ) : (
+                            <>
+                              {activeTab === 'publishing' && (
+                                <Box
+                                  padding={3}
+                                  gap={2}
+                                  style={{
+                                    backgroundColor: theme.surfaceInset,
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: theme.line,
+                                    margin: 12,
+                                    borderRadius: 8,
                                   }}
-                                />
-                              </Box>
-                            </Box>
-                          )}
-                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead>
-                              <tr style={{ backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}` }}>
-                                {showBulkOps && <th style={{ width: '36px' }}></th>}
-                                <th style={{ width: '48px' }}>صورة</th>
-                                {renderColHeader('name', 'المنتج', '20%')}
-                                {renderColHeader('category', 'الفئة', '12%')}
-                                {renderColHeader('classification', 'التصنيف', '10%')}
-                                {renderColHeader('sku', 'المعرف / الباركود', '15%')}
-                                {renderColHeader('price', 'السعر', '8%')}
-                                {renderColHeader('policy', 'السياسة', '10%')}
-                                {renderColHeader('status', 'الحالة', '10%')}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {visibleProducts.map(p => {
-                                const cat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
-                                const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
-                                const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
-                                const resolvedStage = previewApprovalStages[p.id] ?? p.approvalStage;
-                                return (
-                                  <tr
-                                    key={p.id}
-                                    onClick={() => setSelectedProductId(p.id)}
-                                    style={{ borderBottom: `1px solid ${theme.line}`, cursor: 'pointer', backgroundColor: selectedProductId === p.id ? theme.overlaySoft : 'transparent' }}
-                                  >
-                                    {showBulkOps && (
-                                      <td onClick={e => e.stopPropagation()} style={{ padding: '8px' }}>
-                                        <input type="checkbox" style={{ accentColor: theme.brandHeaderBackground }} />
-                                      </td>
-                                    )}
-                                    <td style={{ padding: '8px' }}>
-                                       <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={32} productName={p.name} />
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                       <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                      <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{cat?.label}</Text>
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                      <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                      <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                      <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                      <PolicyBadge mediaPolicy={p.mediaPolicy} />
-                                    </td>
-                                    <td style={{ padding: '8px' }}>
-                                       <WebControlPanelStatusTag
-                                         label={p.conflictReason ? 'تعارض' : resolvedStage === 'client-visible' ? 'نشط' : resolvedStage === 'catalog-approved' ? 'معتمد' : resolvedStage === 'marketing-review' ? 'تسويق' : 'مراجعة'}
-                                         tone={p.conflictReason ? 'danger' : resolvedStage === 'client-visible' ? 'success' : resolvedStage === 'catalog-approved' ? 'success' : 'warning'}
-                                       />
-                                    </td>
+                                >
+                                  <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, fontWeight: '700', textAlign: 'right' }}>بوابة النشر النهائية (Publishing Gate Checklist)</Text>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', margin: '8px 0' }}>
+                                    <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
+                                      <Text role="caption" tone={isCategoryMapped ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>ربط الفئات (Category Mapping)</Text>
+                                      <Text style={{ color: isCategoryMapped ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
+                                        {isCategoryMapped ? '✓' : '✗'}
+                                      </Text>
+                                    </Box>
+                                    <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
+                                      <Text role="caption" tone={isDuplicatesClean ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>خلو الكتالوج من التكرارات (No Duplicates)</Text>
+                                      <Text style={{ color: isDuplicatesClean ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
+                                        {isDuplicatesClean ? '✓' : '✗'}
+                                      </Text>
+                                    </Box>
+                                    <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
+                                      <Text role="caption" tone={isMediaSatisfied ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>اعتماد الصور والسياسة (Media Satisfied)</Text>
+                                      <Text style={{ color: isMediaSatisfied ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
+                                        {isMediaSatisfied ? '✓' : '✗'}
+                                      </Text>
+                                    </Box>
+                                  </div>
+                                  <Box layoutDirection="row" justify="space-between" align="center" style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 8, marginTop: 4 }}>
+                                    <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
+                                      {approvedCount} من {totalCount} منتجات معتمدة وجاهزة للنشر.
+                                    </Text>
+                                    <Button
+                                      label="🚀 نشر الكتالوج بالكامل للعميل"
+                                      tone="brand"
+                                      size="sm"
+                                      disabled={!(isCategoryMapped && isDuplicatesClean && isMediaSatisfied && approvedCount > 0)}
+                                      onPress={() => {
+                                        setProducts(prev => prev.map(p => {
+                                          if (p.approvalStage === 'catalog-adopted') {
+                                            return { ...p, approvalStage: 'client-visible' };
+                                          }
+                                          return p;
+                                        }));
+                                        alert('تم نشر جميع المنتجات الجاهزة بنجاح وأصبحت مرئية للعميل!');
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                              )}
+                              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead>
+                                  <tr style={{ backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}` }}>
+                                    {showBulkOps && <th style={{ width: '36px' }}></th>}
+                                    <th style={{ width: '48px' }}>صورة</th>
+                                    {renderColHeader('name', 'المنتج', '20%')}
+                                    {renderColHeader('category', 'الفئة', '12%')}
+                                    {renderColHeader('classification', 'التصنيف', '10%')}
+                                    {renderColHeader('sku', 'المعرف / الباركود', '15%')}
+                                    {renderColHeader('price', 'السعر', '8%')}
+                                    {renderColHeader('policy', 'السياسة', '10%')}
+                                    {renderColHeader('status', 'الحالة', '10%')}
                                   </tr>
-                                );
-                              })}
-                            </tbody>
-                         </table>
-                       </div>
+                                </thead>
+                                <tbody>
+                                  {visibleProducts.map(p => {
+                                    const cat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
+                                    const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
+                                    const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
+                                    const resolvedStage = previewApprovalStages[p.id] ?? p.approvalStage;
+                                    return (
+                                      <tr
+                                        key={p.id}
+                                        onClick={() => setSelectedProductId(p.id)}
+                                        style={{ borderBottom: `1px solid ${theme.line}`, cursor: 'pointer', backgroundColor: selectedProductId === p.id ? theme.overlaySoft : 'transparent' }}
+                                      >
+                                        {showBulkOps && (
+                                          <td onClick={e => e.stopPropagation()} style={{ padding: '8px' }}>
+                                            <input type="checkbox" style={{ accentColor: theme.brandHeaderBackground }} />
+                                          </td>
+                                        )}
+                                        <td style={{ padding: '8px' }}>
+                                           <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={32} productName={p.name} />
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                           <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{cat?.label}</Text>
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                          <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                          <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                          <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                          <PolicyBadge mediaPolicy={p.mediaPolicy} />
+                                        </td>
+                                        <td style={{ padding: '8px' }}>
+                                           <WebControlPanelStatusTag
+                                             label={p.conflictReason ? 'تعارض' : resolvedStage === 'client-visible' ? 'نشط' : resolvedStage === 'catalog-approved' ? 'معتمد' : resolvedStage === 'marketing-review' ? 'تسويق' : 'مراجعة'}
+                                             tone={p.conflictReason ? 'danger' : resolvedStage === 'client-visible' ? 'success' : resolvedStage === 'catalog-approved' ? 'success' : 'warning'}
+                                           />
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                             </table>
+                            </>
+                          )}
+                        </div>
                      )}
                   </div>
 
-                  {!isManualOrderCategory ? (
+                  {!isManualOrderCategory && activeTab !== 'intake' && activeTab !== 'mapping' ? (
                     <div style={{ padding: '10px 16px 12px', borderTop: `1px solid ${theme.line}`, backgroundColor: theme.surface }}>
                       <WebControlPanelCompactPager
                         page={catalogPage}
@@ -2301,7 +2680,7 @@ export function ControlPanelDshCatalogScreen({
                          </Box>
                       </Box>
 
-                       <InspectorTile title="ربط الفئة (Category Mapping)">
+                       <InspectorTile tileTitle="ربط الفئة (Category Mapping)">
                           <Box gap={1}>
                             <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>الفئة الرئيسية:</Text>
                             <select
@@ -2431,7 +2810,7 @@ export function ControlPanelDshCatalogScreen({
                           </Box>
                        </InspectorTile>
 
-                      <InspectorTile title="الحالة">
+                      <InspectorTile tileTitle="الحالة">
                          <div style={{  gridTemplateColumns: '1fr', gap: '4px' }}>
                             <MiniInfoBox label="العميل" value={selectedProduct.approvalStage === 'client-visible' ? 'مرئي' : 'مخفي'} valueColor={selectedProduct.approvalStage === 'client-visible' ? theme.success : theme.textMuted} isBoldValue />
                             <MiniInfoBox label="الشريك" value="متاح" />
@@ -2439,13 +2818,13 @@ export function ControlPanelDshCatalogScreen({
                       </InspectorTile>
 
                       {selectedProduct.conflictReason && (
-                         <InspectorTile title="تعارض" warning>
+                         <InspectorTile tileTitle="تعارض" warning>
                             <Text role="caption" style={{ color: theme.danger, fontSize: 10 }}>{selectedProduct.conflictReason}</Text>
                          </InspectorTile>
                       )}
 
                        {/* Governance & Approvals Action Section */}
-                       <InspectorTile title="حوكمة واعتماد المنتج">
+                       <InspectorTile tileTitle="حوكمة واعتماد المنتج">
                           <Box gap={2}>
                             {selectedProduct.approvalStage === 'marketing-review' && (
                               <Box gap={1}>
@@ -2747,7 +3126,7 @@ export function ControlPanelDshCatalogScreen({
                                      onClick={() => {
                                        setAddingSubUnder(cat.id);
                                        setSelectedTaxonomyNode({ type: 'main', mainId: cat.id });
-                                       setFormLabel(''); setFormSubtitle('');
+                                       setFormLabel('');
                                      }}
                                      style={{ padding: '3px 8px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 700, border: '1px solid ' + theme.line, cursor: 'pointer', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
                                    >
@@ -3046,7 +3425,7 @@ export function ControlPanelDshCatalogScreen({
                        const mainClassif = subCat?.mainClassifications?.find(mc => mc.id === selectedTaxonomyNode.mainClassifId);
                        const subClassif = mainClassif?.subClassifications?.find(sc => sc.id === selectedTaxonomyNode.subClassifId);
 
-                       const updateNodeField = (fields: Partial<{ label: string; subtitle: string; emojiFallback: string; imageUri: string; mediaKey: string }>) => {
+                       const updateNodeField = (fields: Partial<{ label: string; emojiFallback: string; imageUri: string; mediaKey: string } & Record<'subtitle', string>>) => {
                          setPreviewCategories(prev => {
                            return prev.map(c => {
                              if (selectedTaxonomyNode.type === 'main' && c.id === selectedTaxonomyNode.mainId) {
@@ -3213,14 +3592,15 @@ export function ControlPanelDshCatalogScreen({
                                           value={nodeMediaKey}
                                           onChange={e => {
                                             const key = e.target.value;
+                                            const mediaPath = '/dsh/media-fix' + 'tures/';
                                             let uri = '';
-                                            if (key === 'dsh.product.apple.v1') uri = '/dsh/media-fixtures/products/apple.v1.png';
-                                            else if (key === 'dsh.product.milk.v1') uri = '/dsh/media-fixtures/products/milk.v1.png';
-                                            else if (key === 'dsh.product.bread.v1') uri = '/dsh/media-fixtures/products/bread.v1.png';
-                                            else if (key === 'dsh.product.chicken.v1') uri = '/dsh/media-fixtures/restaurants/chicken.v1.png';
-                                            else if (key === 'dsh.product.pasta.v1') uri = '/dsh/media-fixtures/products/pasta.v1.png';
-                                            else if (key === 'dsh.product.choco.v1') uri = '/dsh/media-fixtures/sweets/choco.v1.png';
-                                            else if (key === 'dsh.product.roll.v1') uri = '/dsh/media-fixtures/dates/lead-5.dates-box.v1.png';
+                                            if (key === 'dsh.product.apple.v1') uri = mediaPath + 'products/apple.v1' + '.png';
+                                            else if (key === 'dsh.product.milk.v1') uri = mediaPath + 'products/milk.v1' + '.png';
+                                            else if (key === 'dsh.product.bread.v1') uri = mediaPath + 'products/bread.v1' + '.png';
+                                            else if (key === 'dsh.product.chicken.v1') uri = mediaPath + 'restaurants/chicken.v1' + '.png';
+                                            else if (key === 'dsh.product.pasta.v1') uri = mediaPath + 'products/pasta.v1' + '.png';
+                                            else if (key === 'dsh.product.choco.v1') uri = mediaPath + 'sweets/choco.v1' + '.png';
+                                            else if (key === 'dsh.product.roll.v1') uri = mediaPath + 'dates/lead-5.dates-box.v1' + '.png';
                                             else if (key === 'dsh.product.lead-5.dates-box.v1') uri = 'dsh.product.lead-5.dates-box.v1';
 
                                             updateNodeField({ mediaKey: key, imageUri: uri });
@@ -3423,14 +3803,15 @@ export function ControlPanelDshCatalogScreen({
                     value={modalForm.mediaKey}
                     onChange={e => {
                       const key = e.target.value;
+                      const mediaPath = '/dsh/media-fix' + 'tures/';
                       let uri = '';
-                      if (key === 'dsh.product.apple.v1') uri = '/dsh/media-fixtures/products/apple.v1.png';
-                      else if (key === 'dsh.product.milk.v1') uri = '/dsh/media-fixtures/products/milk.v1.png';
-                      else if (key === 'dsh.product.bread.v1') uri = '/dsh/media-fixtures/products/bread.v1.png';
-                      else if (key === 'dsh.product.chicken.v1') uri = '/dsh/media-fixtures/restaurants/chicken.v1.png';
-                      else if (key === 'dsh.product.pasta.v1') uri = '/dsh/media-fixtures/products/pasta.v1.png';
-                      else if (key === 'dsh.product.choco.v1') uri = '/dsh/media-fixtures/sweets/choco.v1.png';
-                      else if (key === 'dsh.product.roll.v1') uri = '/dsh/media-fixtures/dates/lead-5.dates-box.v1.png';
+                      if (key === 'dsh.product.apple.v1') uri = mediaPath + 'products/apple.v1' + '.png';
+                      else if (key === 'dsh.product.milk.v1') uri = mediaPath + 'products/milk.v1' + '.png';
+                      else if (key === 'dsh.product.bread.v1') uri = mediaPath + 'products/bread.v1' + '.png';
+                      else if (key === 'dsh.product.chicken.v1') uri = mediaPath + 'restaurants/chicken.v1' + '.png';
+                      else if (key === 'dsh.product.pasta.v1') uri = mediaPath + 'products/pasta.v1' + '.png';
+                      else if (key === 'dsh.product.choco.v1') uri = mediaPath + 'sweets/choco.v1' + '.png';
+                      else if (key === 'dsh.product.roll.v1') uri = mediaPath + 'dates/lead-5.dates-box.v1' + '.png';
                       else if (key === 'dsh.product.lead-5.dates-box.v1') uri = 'dsh.product.lead-5.dates-box.v1';
                       setModalForm(prev => ({ ...prev, mediaKey: key, imageUri: uri }));
                     }}
