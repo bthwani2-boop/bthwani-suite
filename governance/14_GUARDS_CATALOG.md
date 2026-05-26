@@ -40,6 +40,7 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 | GUARD_23_WARNING_CLASSIFICATION | warnings | warnings and false positives | BLOCKING if unclassified | Warning owner/severity/expiry | 23 |
 | GUARD_24_TRACEABILITY_ROADMAP | roadmap | traceability and phase discipline | REPORT/BLOCK | No task without phase/evidence | 24 |
 | GUARD_25_SERVICE_BLUEPRINT | services | blueprint and operation catalog | BLOCKING for service closure | Blueprint exists and complete | 10 |
+| GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY | fixtures/media/data-integrity | prevent demo fixture and media identity drift across service frontends | REPORT/BLOCKING_ON_CHANGED_FILES | JSON/MD guard outputs classify legacy debt vs changed-file fixes | 14 |
 
 ## Guard severity
 
@@ -87,3 +88,11 @@ Promotion rule: advisory while first inventory is being classified. Blocking for
 Purpose: detect ambiguous scatter/common/utils buckets with multiple files, detect old/temp/copy file naming, detect large files that may carry mixed responsibilities, detect tiny-file over-fragmentation, and detect exported symbols inside ambiguous directories.
 
 Promotion rule: advisory while baseline inventory is being reviewed. Blocking for newly introduced violations after baseline classification.
+
+## Implemented guard mapping: Service frontend fixture and media identity
+
+`GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY` maps to `fixtures/media/data-integrity`.
+
+| id | domain | purpose | severity | mode | owner file | evidence | remediation | false-positive policy |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY | fixtures/media/data-integrity | Prevent drift in demo data and media identity across service frontends. | REPORT for legacy debt; BLOCKING_ON_CHANGED_FILES for changed files that introduce fixture/media identity drift. | advisory changed-files-blocking | governance/14_GUARDS_CATALOG.md | JSON/MD outputs from the guard runner evidence. | Move or unify the entity in `canonicalDataRoot`, link media from `canonicalMediaRoot`, and use ids/references/adapters/view models instead of independent mocks. | Clear internal test fixtures are INFO or WARN unless a changed file adds frontend demo service identity drift. Any override must be documented in guard config, not ad hoc code comments. |

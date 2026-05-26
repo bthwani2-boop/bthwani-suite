@@ -1,0 +1,383 @@
+{
+  "version": "1.0.0",
+  "serviceFixtureOwnershipMap": [
+    {
+      "serviceId": "dsh",
+      "serviceRoot": "dsh",
+      "frontendScanRoots": [
+        "dsh/frontend"
+      ],
+      "canonicalDataRoot": "dsh/frontend/data",
+      "canonicalMediaRoot": "dsh/media-fixtures/assets/seed/dsh",
+      "canonicalDataStatus": "VERIFIED",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^dsh/frontend/data/",
+        "^dsh/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "dsh/media-fixtures/assets/seed/dsh",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under dsh/frontend/data, reference media from dsh/media-fixtures/assets/seed/dsh, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "esf",
+      "serviceRoot": "esf",
+      "frontendScanRoots": [
+        "esf/frontend"
+      ],
+      "canonicalDataRoot": "esf/frontend/data",
+      "canonicalMediaRoot": "esf/media-fixtures/assets/seed/esf",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^esf/frontend/data/",
+        "^esf/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "esf/media-fixtures/assets/seed/esf",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under esf/frontend/data, reference media from esf/media-fixtures/assets/seed/esf, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "knz",
+      "serviceRoot": "knz",
+      "frontendScanRoots": [
+        "knz/frontend"
+      ],
+      "canonicalDataRoot": "knz/frontend/data",
+      "canonicalMediaRoot": "knz/media-fixtures/assets/seed/knz",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^knz/frontend/data/",
+        "^knz/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "knz/media-fixtures/assets/seed/knz",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under knz/frontend/data, reference media from knz/media-fixtures/assets/seed/knz, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "kwd",
+      "serviceRoot": "kwd",
+      "frontendScanRoots": [
+        "kwd/frontend"
+      ],
+      "canonicalDataRoot": "kwd/frontend/data",
+      "canonicalMediaRoot": "kwd/media-fixtures/assets/seed/kwd",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^kwd/frontend/data/",
+        "^kwd/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "kwd/media-fixtures/assets/seed/kwd",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under kwd/frontend/data, reference media from kwd/media-fixtures/assets/seed/kwd, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "mrf",
+      "serviceRoot": "mrf",
+      "frontendScanRoots": [
+        "mrf/frontend"
+      ],
+      "canonicalDataRoot": "mrf/frontend/data",
+      "canonicalMediaRoot": "mrf/media-fixtures/assets/seed/mrf",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^mrf/frontend/data/",
+        "^mrf/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "mrf/media-fixtures/assets/seed/mrf",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under mrf/frontend/data, reference media from mrf/media-fixtures/assets/seed/mrf, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "snd",
+      "serviceRoot": "snd",
+      "frontendScanRoots": [
+        "snd/frontend"
+      ],
+      "canonicalDataRoot": "snd/frontend/data",
+      "canonicalMediaRoot": "snd/media-fixtures/assets/seed/snd",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^snd/frontend/data/",
+        "^snd/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "snd/media-fixtures/assets/seed/snd",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under snd/frontend/data, reference media from snd/media-fixtures/assets/seed/snd, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "wlt",
+      "serviceRoot": "wlt",
+      "frontendScanRoots": [
+        "wlt/frontend"
+      ],
+      "canonicalDataRoot": "wlt/frontend/data",
+      "canonicalMediaRoot": "wlt/media-fixtures/assets/seed/wlt",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^wlt/frontend/data/",
+        "^wlt/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "wlt/media-fixtures/assets/seed/wlt",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under wlt/frontend/data, reference media from wlt/media-fixtures/assets/seed/wlt, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "arb",
+      "serviceRoot": "arb",
+      "frontendScanRoots": [
+        "arb/frontend"
+      ],
+      "canonicalDataRoot": "arb/frontend/data",
+      "canonicalMediaRoot": "arb/media-fixtures/assets/seed/arb",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^arb/frontend/data/",
+        "^arb/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "arb/media-fixtures/assets/seed/arb",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under arb/frontend/data, reference media from arb/media-fixtures/assets/seed/arb, and expose only ids/references/lean summaries through adapters or view models."
+    },
+    {
+      "serviceId": "amn",
+      "serviceRoot": "amn",
+      "frontendScanRoots": [
+        "amn/frontend"
+      ],
+      "canonicalDataRoot": "amn/frontend/data",
+      "canonicalMediaRoot": "amn/media-fixtures/assets/seed/amn",
+      "canonicalDataStatus": "TBD_UNVERIFIED_PATH",
+      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
+      "allowedFixtureFilePatterns": [
+        "^amn/frontend/data/",
+        "^amn/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/"
+      ],
+      "allowedMediaReferencePatterns": [
+        "amn/media-fixtures/assets/seed/amn",
+        "@bthwani/ui-kit"
+      ],
+      "forbiddenLocalMockPatterns": [
+        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
+        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
+      ],
+      "identityKeys": [
+        "id",
+        "slug",
+        "barcode",
+        "sku",
+        "name",
+        "nameAr",
+        "nameEn",
+        "title",
+        "titleAr",
+        "titleEn"
+      ],
+      "remediationTemplate": "Move or unify demo identities under amn/frontend/data, reference media from amn/media-fixtures/assets/seed/amn, and expose only ids/references/lean summaries through adapters or view models."
+    }
+  ],
+  "scanFileExtensions": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".json",
+    ".jsonc",
+    ".md",
+    ".yml",
+    ".yaml"
+  ],
+  "skipPathSegments": [
+    "node_modules",
+    ".git",
+    "dist",
+    "build",
+    ".next",
+    ".expo",
+    "coverage",
+    "generated",
+    "__generated__"
+  ],
+  "skipPathPrefixes": [
+    "tools/registry/runs"
+  ],
+  "lockfileNames": [
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    "bun.lockb"
+  ],
+  "surfaceRootSegments": [
+    "app-client",
+    "app-partner",
+    "app-field",
+    "app-captain",
+    "control-panel"
+  ],
+  "testFilePatterns": [
+    "\\.test\\.",
+    "\\.spec\\.",
+    "__tests__/",
+    "/tests?/"
+  ],
+  "entityTermsPattern": "\\b(product|products|category|categories|store|stores|branch|branches|service|services|sku|barcode|slug)\\b",
+  "demoTermsPattern": "\\b(mock|mocks|fixture|fixtures|demo|sample|seed|preview|fake)\\b",
+  "mediaReferencePattern": "['\\\"]([^'\\\"]+\\.(?:png|jpg|jpeg|webp|gif|svg|avif))(?:\\?[^'\\\"]*)?['\\\"]",
+  "largeInlineDataMinIdentityHits": 5,
+  "largeInlineDataMaxLineSpan": 120,
+  "falsePositivePolicy": {
+    "internalTestFixtures": "Clear internal test fixtures are INFO or WARN unless a changed file adds frontend demo service identity drift.",
+    "overrides": "Overrides must be recorded in this config, not as ad hoc code comments.",
+    "allowedOverridePatterns": []
+  }
+}
