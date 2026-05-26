@@ -9,7 +9,6 @@ const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.product.milk.v1': require('../media-fixtures/products/dsh-product-milk-v1.png') as ImageSourcePropType,
   'dsh.product.pasta.v1': require('../media-fixtures/products/dsh-product-pasta-v1.png') as ImageSourcePropType,
   'dsh.product.roll.v1': require('../media-fixtures/products/dsh-product-roll-v1.png') as ImageSourcePropType,
-  // DEFERRED_MEDIA_FIXTURE: lead-5 featured product image falls back to roll-v1 until real media assets are generated
   'dsh.product.lead-5.dates-box.v1': require('../media-fixtures/products/dsh-product-lead-5-dates-box-v1.png') as ImageSourcePropType,
   'dsh.product.salad.v1': require('../media-fixtures/products/dsh-product-salad-v1.png') as ImageSourcePropType,
   'dsh.product.yogurt.v1': require('../media-fixtures/products/dsh-product-yogurt-v1.png') as ImageSourcePropType,

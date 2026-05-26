@@ -165,7 +165,7 @@ function getPremiumEmoji(name: string, fallback?: string): string {
 }
 
 /**
- * PREVIEW_DERIVED_ONLY: DEFERRED_DATA_CENTRALIZATION
+ * PREVIEW_DERIVED_ONLY: CENTRALIZED_DATA
  * Converts central mediaKeys to static public URLs for the Next.js control-panel UI.
  * This maps to files inside dsh/frontend/media-fixtures (copied/routed as /dsh/media-fixtures).
  * Next.js requires static URLs, unlike React Native's local require() resolved in resolve-dsh-image-source.ts.
@@ -180,9 +180,8 @@ function getActualPublicMediaPath(key: string): string {
   if (key === 'dsh.product.pasta.v1') return prefix + 'products/dsh-product-pasta-v1' + ext;
   if (key === 'dsh.product.choco.v1') return prefix + 'products/dsh-product-choco-v1' + ext;
   if (key === 'dsh.product.croissant.v1') return prefix + 'products/dsh-product-croissant-v1' + ext;
-  if (key === 'dsh.product.roll.v1' || key === 'dsh.product.lead-5.dates-box.v1') {
-    return prefix + 'products/dsh-product-roll-v1' + ext;
-  }
+  if (key === 'dsh.product.roll.v1') return prefix + 'products/dsh-product-roll-v1' + ext;
+  if (key === 'dsh.product.lead-5.dates-box.v1') return prefix + 'products/dsh-product-lead-5-dates-box-v1' + ext;
   return '';
 }
 

@@ -14,7 +14,6 @@
  *
  * control-panel/catalogs is a governance/approval/mapping consumer.
  * It does NOT add canonical products or categories locally.
- * Deferred items are marked: PREVIEW_DERIVED_ONLY / DEFERRED_DATA_CENTRALIZATION
  */
 
 export type CatalogMediaPolicy =
