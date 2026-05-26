@@ -249,3 +249,23 @@ export const DSH_STORE_CATEGORY_ICONS: Record<string, string> = {
 	healthy: '🥗',
 	sweets: '🍰',
 };
+
+export const CATEGORY_TAXONOMY_MAP = {
+  fresh: { domainId: 'grocery', mainCategoryId: 'meals', subcategoryId: 'salads', facetTags: ['fresh', 'vegetarian'] },
+  dairy: { domainId: 'grocery', mainCategoryId: 'health', facetTags: ['halal'] },
+  bakery: { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads', facetTags: ['premium'] },
+  meals: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken', facetTags: ['halal'] },
+  healthy: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads', facetTags: ['vegetarian'] },
+  sweets: { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'sweets', facetTags: ['premium'] },
+  dessert: { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes' },
+  // Workflow categories
+  burgers: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers', facetTags: ['bestseller', 'halal'] },
+  chicken: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken', facetTags: ['spicy', 'halal'] },
+  'sides-pasta': { domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'fries', facetTags: ['spicy'] },
+  'drinks-juice': { domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'juices', facetTags: ['fresh', 'halal'] },
+  'sides-bread': { domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'sauces', facetTags: ['premium'] },
+  'meals-apple': { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads', facetTags: ['vegetarian', 'gluten-free'] },
+  'bakery-cake': { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads', facetTags: ['premium', 'new-arrival'] },
+  'bakery-dates': { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes', facetTags: ['seasonal', 'limited-edition'] },
+  'drinks-honey': { domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'coffee', facetTags: ['premium', 'new-arrival'] },
+} as const;

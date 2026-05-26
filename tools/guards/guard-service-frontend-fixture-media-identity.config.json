@@ -362,6 +362,7 @@
     "dsh/frontend/data/partner.preview-data.ts",
     "dsh/frontend/data/stores.preview-data.ts",
     "dsh/frontend/data/products.preview-data.ts",
+    "dsh/frontend/data/categories.preview-data.ts",
     "dsh/frontend/shared/dshStoreProductCardModel.ts"
   ],
   "lockfileNames": [
