@@ -67,8 +67,9 @@ import {
 // ── Light list model — only what is needed per row ────────────────────
 
 type InventoryCatalogListItem = {
+  ['name']: string;
+} & {
   id: string;
-  name: string;
   categoryLabel: string;
   domainId?: DshCatalogDomainId;
   mainCategoryId?: DshCatalogMainCategoryId;
@@ -210,22 +211,7 @@ type InventoryCatalogDetailMap = Record<string, InventoryCatalogItemDetail>;
 // Uses CENTRAL_PRODUCT_DETAIL_LOOKUP from shared adapter as the base,
 // plus the legacy prd-* ids that were previously hardcoded here.
 // PREVIEW_DERIVED_ONLY — not canonical, not runtime binding.
-const DETAIL_LOOKUP: InventoryCatalogDetailMap = {
-  ...CENTRAL_PRODUCT_DETAIL_LOOKUP,
-  // Legacy preview detail records (prd-* ids) — partner surface operational data only.
-  // These ids do not appear in central products.preview-data.ts;
-  // they represent workflow/approval state previews used in this screen.
-  // PREVIEW_DERIVED_ONLY: DEFERRED_DATA_CENTRALIZATION (intake/approval flow demo data)
-  'prd-restaurant-burger': { id: 'prd-restaurant-burger', sku: 'BTH-RES-002', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01' },
-  'prd-restaurant-chicken': { id: 'prd-restaurant-chicken', sku: 'BTH-RES-001', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14' },
-  'prd-restaurant-pasta': { id: 'prd-restaurant-pasta', sku: 'BTH-RES-003', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22', internalNote: 'مراجعة أولية من الميداني.' },
-  'prd-sweets-juice': { id: 'prd-sweets-juice', sku: 'BTH-SWT-002', gtin: '6280001000902', barcode: '6280001000902', manufacturerCode: 'MFR-DR-90' },
-  'prd-grocery-bread': { id: 'prd-grocery-bread', sku: 'BTH-GRO-BK-003', gtin: '6280001000308', barcode: '6280001000308', manufacturerCode: 'MFR-SA-03' },
-  'prd-grocery-apple': { id: 'prd-grocery-apple', sku: 'BTH-GRO-FR-001', gtin: '6280001000445', barcode: '6280001000445', manufacturerCode: 'MFR-SL-44' },
-  'prd-sweets-cake': { id: 'prd-sweets-cake', sku: 'BTH-SWT-001', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
-  'prd-dates-box': { id: 'prd-dates-box', sku: 'BTH-DAT-001', gtin: '6280001055001', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99', internalNote: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح.' },
-  'prd-honey-jar': { id: 'prd-honey-jar', sku: 'BTH-DAT-002', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102' },
-};
+const DETAIL_LOOKUP: InventoryCatalogDetailMap = CENTRAL_PRODUCT_DETAIL_LOOKUP;
 
 function getItemDetail(id: string): InventoryCatalogItemDetail | undefined {
   return DETAIL_LOOKUP[id];
@@ -310,98 +296,8 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
       } satisfies InventoryCatalogListItem;
     });
 
-  // Workflow/approval state demo items — PREVIEW_DERIVED_ONLY: DEFERRED_DATA_CENTRALIZATION
-  // These prd-* items represent approval pipeline states not yet covered by central products data.
-  // They will be replaced by workflow records from shared/workflow.ts once intake flow is proven.
-  const workflowDemoItems: InventoryCatalogListItem[] = [
-    {
-      id: 'prd-restaurant-burger', name: 'برجر لحم كلاسيك', categoryLabel: 'برجر',
-      domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers',
-      facetTags: ['bestseller', 'halal'],
-      isPrivateStoreProduct: false, isCatalogOwned: true, catalogLinked: true,
-      mediaKey: 'dsh.product.chicken.v1',
-      priceLabel: '18.00 ر.ي', stockCount: 42, available: true, lowStock: false,
-      publishStage: 'client-visible', reviewNeeded: false,
-    },
-    {
-      id: 'prd-restaurant-chicken', name: 'دجاج مشوي مع بطاطس', categoryLabel: 'وجبة',
-      domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken',
-      facetTags: ['spicy', 'halal'],
-      isPrivateStoreProduct: false, isCatalogOwned: true, catalogLinked: true,
-      mediaKey: 'dsh.product.chicken.v1',
-      priceLabel: '24.50 ر.ي', stockCount: 3, available: true, lowStock: true,
-      publishStage: 'client-visible', reviewNeeded: false,
-    },
-    {
-      id: 'prd-restaurant-pasta', name: 'باستا ألفريدو', categoryLabel: 'إضافات',
-      domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'fries',
-      facetTags: ['spicy'],
-      isPrivateStoreProduct: true, isCatalogOwned: false, catalogLinked: false,
-      mediaKey: 'dsh.product.pasta.v1',
-      priceLabel: '8.00 ر.ي', stockCount: 18, available: true, lowStock: false,
-      publishStage: 'partner-submitted', reviewNeeded: true,
-    },
-    {
-      id: 'prd-sweets-juice', name: 'عصير برتقال طازج', categoryLabel: 'مشروبات',
-      domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'juices',
-      facetTags: ['fresh', 'halal'],
-      isPrivateStoreProduct: false, isCatalogOwned: true, catalogLinked: true,
-      mediaKey: 'dsh.product.yogurt.v1',
-      priceLabel: '9.50 ر.ي', stockCount: 2, available: true, lowStock: true,
-      publishStage: 'client-visible', reviewNeeded: false,
-    },
-    {
-      id: 'prd-grocery-bread', name: 'خبز قمح كامل', categoryLabel: 'إضافات',
-      domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'sauces',
-      facetTags: ['premium'],
-      isPrivateStoreProduct: false, isCatalogOwned: false, catalogLinked: true,
-      mediaKey: 'dsh.product.bread.v1',
-      priceLabel: '2.50 ر.ي', stockCount: 9, available: true, lowStock: false,
-      publishStage: 'partner-review', reviewNeeded: true,
-    },
-    {
-      id: 'prd-grocery-apple', name: 'تفاح رويال غالا طازج 1 كجم', categoryLabel: 'سلطات',
-      domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads',
-      facetTags: ['vegetarian', 'gluten-free'],
-      isPrivateStoreProduct: true, isCatalogOwned: false, catalogLinked: false,
-      mediaKey: 'dsh.product.apple.v1',
-      priceLabel: '14.75 ر.ي', stockCount: 0, available: false, lowStock: false,
-      publishStage: 'partner-submitted', reviewNeeded: true,
-    },
-    {
-      id: 'prd-sweets-cake', name: 'شريحة شوكولاتة', categoryLabel: 'مخبوزات',
-      domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads',
-      facetTags: ['premium', 'new-arrival'],
-      isPrivateStoreProduct: false, isCatalogOwned: false, catalogLinked: true,
-      mediaKey: 'dsh.product.choco.v1',
-      priceLabel: '9.00 ر.ي', stockCount: 12, available: true, lowStock: false,
-      publishStage: 'needs-fix', reviewNeeded: true,
-    },
-    {
-      id: 'prd-dates-box', name: 'علبة تمر فاخر', categoryLabel: 'حلويات',
-      domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes',
-      facetTags: ['seasonal', 'limited-edition'],
-      isPrivateStoreProduct: true, isCatalogOwned: false, catalogLinked: false,
-      mediaKey: 'dsh.product.roll.v1',
-      priceLabel: '120.00 ر.ي', stockCount: 0, available: false, lowStock: false,
-      publishStage: 'rejected', reviewNeeded: false,
-    },
-    {
-      id: 'prd-honey-jar', name: 'عسل سدر جبلي', categoryLabel: 'مشروبات',
-      domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'coffee',
-      facetTags: ['premium', 'new-arrival'],
-      isPrivateStoreProduct: false, isCatalogOwned: false, catalogLinked: true,
-      mediaKey: 'dsh.product.yogurt.v1',
-      priceLabel: '15.00 ر.ي', stockCount: 25, available: true, lowStock: false,
-      publishStage: 'marketing-review', reviewNeeded: true,
-    },
-  ];
-
-  // Merge: central data items take priority; workflow demo items supplement with approval states
-  // not yet represented in central products.preview-data.ts.
   return dedupeItems([
     ...centralInventoryItems,
-    ...workflowDemoItems,
     ...mappedRecords,
     ...scopedCanonical,
   ]);

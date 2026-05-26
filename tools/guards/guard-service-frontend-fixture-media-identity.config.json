@@ -14,6 +14,7 @@
       "allowedFixtureFilePatterns": [
         "^dsh/frontend/data/",
         "^dsh/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/",
+        "^dsh/frontend/shared/catalog-central-adapter\\.ts$",
         "^dsh/frontend/shared/resolve-dsh-image-source\\.ts$"
       ],
       "allowedMediaReferencePatterns": [
@@ -352,13 +353,7 @@
   ],
   "skipPathPrefixes": [
     "tools/registry/runs",
-    "dsh/frontend/media-fixtures",
-    "dsh/frontend/shared/catalog-central-adapter.ts",
-    "dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx",
-    "dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx",
-    "dsh/frontend/control-panel/catalogs/catalog.ts",
-    "dsh/frontend/shared/catalog.ts",
-    "dsh/frontend/shared/index.ts"
+    "dsh/frontend/media-fixtures"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

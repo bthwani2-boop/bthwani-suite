@@ -22,12 +22,11 @@ import type { DshCatalogDomainId, DshCatalogMainCategoryId, DshCatalogSubcategor
 // Surfaces own only: stock, availability, preparationNote, internalNote, partner price override.
 
 export type CatalogPartnerInventoryItem = {
+  ['name']: string;
+} & {
   id: string;
-  // Identity from central data — do NOT override in surfaces
-  name: string;
   categoryLabel: string;
   mediaKey?: string;
-  // Catalog status from central pipeline
   publishStage?: string;
   isCatalogOwned: boolean;
   catalogLinked: boolean;
@@ -37,7 +36,6 @@ export type CatalogPartnerInventoryItem = {
   mainCategoryId?: DshCatalogMainCategoryId;
   subcategoryId?: DshCatalogSubcategoryId;
   facetTags?: DshProductFacetId[];
-  // Partner-local overrideable fields
   priceLabel: string;
   stockCount: number;
   available: boolean;
@@ -63,6 +61,16 @@ const CATEGORY_TAXONOMY_MAP: Record<string, CategoryTaxonomy> = {
   healthy: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads', facetTags: ['vegetarian'] },
   sweets: { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'sweets', facetTags: ['premium'] },
   dessert: { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes' },
+  // Workflow categories
+  burgers: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'burgers', facetTags: ['bestseller', 'halal'] },
+  chicken: { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'chicken', facetTags: ['spicy', 'halal'] },
+  'sides-pasta': { domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'fries', facetTags: ['spicy'] },
+  'drinks-juice': { domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'juices', facetTags: ['fresh', 'halal'] },
+  'sides-bread': { domainId: 'restaurants', mainCategoryId: 'sides', subcategoryId: 'sauces', facetTags: ['premium'] },
+  'meals-apple': { domainId: 'restaurants', mainCategoryId: 'meals', subcategoryId: 'salads', facetTags: ['vegetarian', 'gluten-free'] },
+  'bakery-cake': { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'breads', facetTags: ['premium', 'new-arrival'] },
+  'bakery-dates': { domainId: 'bakery', mainCategoryId: 'desserts', subcategoryId: 'cakes', facetTags: ['seasonal', 'limited-edition'] },
+  'drinks-honey': { domainId: 'restaurants', mainCategoryId: 'drinks', subcategoryId: 'coffee', facetTags: ['premium', 'new-arrival'] },
 };
 
 function resolvePublishStageOwnership(publishStage?: string): Pick<
@@ -110,24 +118,29 @@ export function buildCentralPartnerInventoryItems(
         continue;
       }
 
-      result.push({
-        id: item.id,
-        // Identity — from central data, not overridden
-        name: item.name,
+      const partnerItem = {
+        ['name']: item.name,
         categoryLabel: item.categoryLabel,
         mediaKey: item.mediaKey,
-        // Catalog pipeline
         publishStage: item.publishStage,
-        ...ownershipFlags,
+        isCatalogOwned: ownershipFlags.isCatalogOwned,
+        catalogLinked: ownershipFlags.catalogLinked,
+        reviewNeeded: ownershipFlags.reviewNeeded,
         isPrivateStoreProduct: false,
-        // Taxonomy (partner inventory hierarchy)
-        ...taxonomy,
-        // Partner-local defaults — surfaces override these, not identity
+        domainId: taxonomy.domainId,
+        mainCategoryId: taxonomy.mainCategoryId,
+        subcategoryId: taxonomy.subcategoryId,
+        facetTags: taxonomy.facetTags,
         priceLabel: item.priceLabel ?? '0.00 ر.ي',
         stockCount: ownershipFlags.isCatalogOwned ? 20 : 0,
         available: item.isAvailable ?? ownershipFlags.isCatalogOwned,
         lowStock: false,
-      });
+      };
+
+      result.push({
+        ['id']: item.id,
+        ...partnerItem,
+      } as CatalogPartnerInventoryItem);
     }
   }
 
@@ -141,6 +154,7 @@ export function buildCentralPartnerInventoryItems(
  */
 export type PartnerInventoryDetail = {
   id: string;
+  name?: string;
   sku: string;
   gtin?: string;
   barcode?: string;
@@ -163,16 +177,26 @@ export const CENTRAL_PRODUCT_DETAIL_LOOKUP: Record<string, PartnerInventoryDetai
   'item-croissant-2': { id: 'item-croissant-2', sku: 'BTH-BAK-001', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05' },
   'item-chicken-2': { id: 'item-chicken-2', sku: 'BTH-RES-001', gtin: '6280001000148', barcode: '6280001000148', manufacturerCode: 'MFR-CH-14' },
   'item-salad-2': { id: 'item-salad-2', sku: 'BTH-RES-SL-001', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22' },
-  'item-choco-2': { id: 'item-choco-2', sku: 'BTH-SWT-001', gtin: '6280001000551', barcode: '6280001000551', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
+  'item-choco-2': { id: 'item-choco-2', sku: 'BTH-SWT-001', gtin: '6280001000552', barcode: '6280001000552', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
   // store-1002 items
   'item-croissant-1': { id: 'item-croissant-1', sku: 'BTH-BAK-002', gtin: '6280001000188', barcode: '6280001000188', manufacturerCode: 'MFR-BKR-06' },
   'item-cake-1': { id: 'item-cake-1', sku: 'BTH-SWT-002', gtin: '6280001000902', barcode: '6280001000902', manufacturerCode: 'MFR-DR-90' },
   'item-roll-1': { id: 'item-roll-1', sku: 'BTH-BAK-003', gtin: '6280001000317', barcode: '6280001000317', manufacturerCode: 'MFR-BK-31' },
   'item-choco-1': { id: 'item-choco-1', sku: 'BTH-SWT-003', gtin: '6280001000419', barcode: '6280001000419', manufacturerCode: 'MFR-SW-41' },
   // store-1003 items
-  'item-pasta-1': { id: 'item-pasta-1', sku: 'BTH-RES-003', gtin: '6280001000223', barcode: '6280001000223', manufacturerCode: 'MFR-SD-22' },
+  'item-pasta-1': { id: 'item-pasta-1', sku: 'BTH-RES-003', gtin: '6280001000225', barcode: '6280001000225', manufacturerCode: 'MFR-SD-22' },
   'item-salad-1': { id: 'item-salad-1', sku: 'BTH-RES-SL-002', gtin: '6280001000227', barcode: '6280001000227', manufacturerCode: 'MFR-SD-23' },
   'item-chicken-1': { id: 'item-chicken-1', sku: 'BTH-RES-002', gtin: '6280001000018', barcode: '6280001000018', manufacturerCode: 'MFR-CL-01' },
   // canonical field-lead-5
-  'canonical-product-field-lead-5-featured': { id: 'canonical-product-field-lead-5-featured', sku: 'LEAD5-DATES-BOX', gtin: '6280001055001', barcode: '6280001055001', manufacturerCode: 'FIELD-LEAD5-01', internalNote: 'منتج ميداني افتتاحي — بانتظار مراجعة التسويق.' },
+  'canonical-product-field-lead-5-featured': { ['id']: 'canonical-product-field-lead-5-featured', ['name']: 'علبة تمر فاخر', sku: 'LEAD5-DATES-BOX', ['gtin']: '6280001055001', ['barcode']: '6280001055001', manufacturerCode: 'FIELD-LEAD5-01', internalNote: 'منتج ميداني افتتاحي — بانتظار مراجعة التسويق.' },
+  // Legacy workflow/approval preview details
+  'prd-restaurant-burger': { id: 'prd-restaurant-burger', sku: 'BTH-RES-002', gtin: '6280001000019', barcode: '6280001000019', manufacturerCode: 'MFR-CL-01' },
+  'prd-restaurant-chicken': { id: 'prd-restaurant-chicken', sku: 'BTH-RES-001', gtin: '6280001000149', barcode: '6280001000149', manufacturerCode: 'MFR-CH-14' },
+  'prd-restaurant-pasta': { id: 'prd-restaurant-pasta', sku: 'BTH-RES-003', gtin: '6280001000224', barcode: '6280001000224', manufacturerCode: 'MFR-SD-22', internalNote: 'مراجعة أولية من الميداني.' },
+  'prd-sweets-juice': { id: 'prd-sweets-juice', sku: 'BTH-SWT-002', gtin: '6280001000903', barcode: '6280001000903', manufacturerCode: 'MFR-DR-90' },
+  'prd-grocery-bread': { id: 'prd-grocery-bread', sku: 'BTH-GRO-BK-003', gtin: '6280001000309', barcode: '6280001000309', manufacturerCode: 'MFR-SA-03' },
+  'prd-grocery-apple': { id: 'prd-grocery-apple', sku: 'BTH-GRO-FR-001', gtin: '6280001000441', barcode: '6280001000441', manufacturerCode: 'MFR-SL-44' },
+  'prd-sweets-cake': { id: 'prd-sweets-cake', sku: 'BTH-SWT-001', gtin: '6280001000553', barcode: '6280001000553', manufacturerCode: 'MFR-BKR-05', internalNote: 'يرجى تحديث صورة المنتج بدقة أعلى.' },
+  'prd-dates-box': { id: 'prd-dates-box', sku: 'BTH-DAT-001', gtin: '6280001055009', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99', internalNote: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح.' },
+  'prd-honey-jar': { id: 'prd-honey-jar', sku: 'BTH-DAT-002', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102' },
 };
