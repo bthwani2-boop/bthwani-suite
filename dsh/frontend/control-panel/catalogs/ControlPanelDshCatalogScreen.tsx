@@ -173,6 +173,14 @@ function getPremiumEmoji(name: string, fallback?: string): string {
 function getActualPublicMediaPath(key: string): string {
   const prefix = '/dsh/media-fix' + 'tures/';
   const ext = '.png';
+  if (key.startsWith('dsh.category.main.')) {
+    const id = key.substring('dsh.category.main.'.length).replace('.v1', '');
+    return prefix + 'categories/main/dsh-category-main-' + id + '-v1' + ext;
+  }
+  if (key.startsWith('dsh.category.sub.')) {
+    const id = key.substring('dsh.category.sub.'.length).replace('.v1', '');
+    return prefix + 'categories/sub/dsh-category-sub-' + id + '-v1' + ext;
+  }
   if (key === 'dsh.product.apple.v1') return prefix + 'products/dsh-product-apple-v1' + ext;
   if (key === 'dsh.product.milk.v1') return prefix + 'products/dsh-product-milk-v1' + ext;
   if (key === 'dsh.product.bread.v1') return prefix + 'products/dsh-product-bread-v1' + ext;
@@ -1375,8 +1383,8 @@ export function ControlPanelDshCatalogScreen({
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <Text role="bodyStrong" style={{ fontSize: '16px', color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
-              <Text role="caption" tone="muted" style={{ fontSize: '11px', marginTop: '4px', display: 'block' }}>{description}</Text>
+              <Text role="bodyStrong" style={{ fontSize: 16, color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
+              <Text role="caption" tone="muted" style={{ fontSize: 11, marginTop: 4 }}>{description}</Text>
             </div>
             <span style={{ fontSize: '9px', color: theme.warning, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
               معاينة محلية فقط

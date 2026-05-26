@@ -6,7 +6,7 @@
  * Identity sources:
  *   Categories: dsh/frontend/data/categories.preview-data.ts (via dshCategoryFixtures)
  *   Products:   dsh/frontend/data/products.preview-data.ts (via storeItemsByStoreId)
- *   Media:      dsh/frontend/media_fixtures (via shared/resolve-dsh-image-source.ts)
+ *   Media:      dsh/frontend/media-fixtures (via shared/resolve-dsh-image-source.ts)
  *
  * Client app was the donor/reference for current correct preview data.
  * Surfaces consume through adapters only.
@@ -162,6 +162,8 @@ export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.m
     label: c.label,
     subtitle: c.subtitle,
     emojiFallback: c.emojiFallback || '📦',
+    mediaKey: c.mediaKey,
+    imageUri: c.imageUri,
     defaultMediaPolicy: 'catalog-owned-media',
     renderMode: c.renderMode,
     categoryMode: c.isManualLike ? 'manual-order' : 'catalog-based',
@@ -170,11 +172,14 @@ export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.m
         id: sub.id,
         label: sub.label,
         subtitle: sub.subtitle,
+        mediaKey: sub.mediaKey,
+        imageUri: sub.imageUri,
         mainClassifications: getSubcategoryClassifications(sub.id)
       };
     })
   };
 });
+
 
 // Deduplicate products by ID
 const allProductsMap = new Map<string, CatalogProductMaster>();

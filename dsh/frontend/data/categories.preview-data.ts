@@ -11,6 +11,10 @@ export type DshCategorySubcategoryFixture = {
 	id: string;
 	label: string;
 	subtitle: string;
+	/** Central media key resolved via resolve-dsh-image-source.ts → media-fixtures/categories/sub */
+	mediaKey?: string;
+	/** Mirrors mediaKey for resolver; never a raw path or ad-hoc URI */
+	imageUri?: string;
 };
 
 export type DshCategoryFixture = {
@@ -24,6 +28,10 @@ export type DshCategoryFixture = {
 	priority?: number;
 	orbitWeight?: number;
 	isManualLike?: boolean;
+	/** Central media key resolved via resolve-dsh-image-source.ts → media-fixtures/categories/main */
+	mediaKey?: string;
+	/** Mirrors mediaKey for resolver; never a raw path or ad-hoc URI */
+	imageUri?: string;
 };
 
 export const dshCategoriesFixturesDataContract = {
@@ -45,6 +53,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '🍽️',
 		priority: 1,
 		orbitWeight: 1.2,
+		mediaKey: 'dsh.category.main.restaurants.v1',
+		imageUri: 'dsh.category.main.restaurants.v1',
 	},
 	{
 		id: 'grocery',
@@ -52,15 +62,17 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		shortLabel: 'مقاضي',
 		subtitle: 'سوبر ماركت ومواد تموينية',
 		subcategories: [
-			{ id: 'grocery_vegetables_fruits', label: 'خضروات وفواكة', subtitle: 'منتجات طازجة ومبردة' },
-			{ id: 'grocery_meat_fish_chicken', label: 'لحوم وأسماك ودجاج', subtitle: 'اختيارات بروتينية ومبردة' },
-			{ id: 'grocery_roasted_spices', label: 'محامص وبهارات', subtitle: 'بهارات وتتبيلات للمطبخ' },
-			{ id: 'grocery_bakeries', label: 'مخابز', subtitle: 'خبز ومعجنات وخبز يومي' },
-			{ id: 'grocery_deals_bundle', label: 'باكج عروضات', subtitle: 'سلال مجمعة وعروض موسمية' },
+			{ id: 'grocery_vegetables_fruits', label: 'خضروات وفواكة', subtitle: 'منتجات طازجة ومبردة', mediaKey: 'dsh.category.sub.grocery_vegetables_fruits.v1', imageUri: 'dsh.category.sub.grocery_vegetables_fruits.v1' },
+			{ id: 'grocery_meat_fish_chicken', label: 'لحوم وأسماك ودجاج', subtitle: 'اختيارات بروتينية ومبردة', mediaKey: 'dsh.category.sub.grocery_meat_fish_chicken.v1', imageUri: 'dsh.category.sub.grocery_meat_fish_chicken.v1' },
+			{ id: 'grocery_roasted_spices', label: 'محامص وبهارات', subtitle: 'بهارات وتتبيلات للمطبخ', mediaKey: 'dsh.category.sub.grocery_roasted_spices.v1', imageUri: 'dsh.category.sub.grocery_roasted_spices.v1' },
+			{ id: 'grocery_bakeries', label: 'مخابز', subtitle: 'خبز ومعجنات وخبز يومي', mediaKey: 'dsh.category.sub.grocery_bakeries.v1', imageUri: 'dsh.category.sub.grocery_bakeries.v1' },
+			{ id: 'grocery_deals_bundle', label: 'باكج عروضات', subtitle: 'سلال مجمعة وعروض موسمية', mediaKey: 'dsh.category.sub.grocery_deals_bundle.v1', imageUri: 'dsh.category.sub.grocery_deals_bundle.v1' },
 		],
 		emojiFallback: '🛒',
 		priority: 2,
 		orbitWeight: 1.1,
+		mediaKey: 'dsh.category.main.grocery.v1',
+		imageUri: 'dsh.category.main.grocery.v1',
 	},
 	{
 		id: 'sweets_juices',
@@ -68,13 +80,15 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		shortLabel: 'حلا',
 		subtitle: 'عصائر طازجة وحلويات وآيسكريم',
 		subcategories: [
-			{ id: 'sweets_juices_fresh', label: 'عصائر طازجة', subtitle: 'عصائر معصورة ومخلوطة' },
-			{ id: 'sweets_juices_sweets', label: 'حلويات', subtitle: 'تحليات وكعك ومعجنات' },
-			{ id: 'sweets_juices_icecream', label: 'آيسكريم', subtitle: 'حلويات مجمدة وأحواض' },
+			{ id: 'sweets_juices_fresh', label: 'عصائر طازجة', subtitle: 'عصائر معصورة ومخلوطة', mediaKey: 'dsh.category.sub.sweets_juices_fresh.v1', imageUri: 'dsh.category.sub.sweets_juices_fresh.v1' },
+			{ id: 'sweets_juices_sweets', label: 'حلويات', subtitle: 'تحليات وكعك ومعجنات', mediaKey: 'dsh.category.sub.sweets_juices_sweets.v1', imageUri: 'dsh.category.sub.sweets_juices_sweets.v1' },
+			{ id: 'sweets_juices_icecream', label: 'آيسكريم', subtitle: 'حلويات مجمدة وأحواض', mediaKey: 'dsh.category.sub.sweets_juices_icecream.v1', imageUri: 'dsh.category.sub.sweets_juices_icecream.v1' },
 		],
 		emojiFallback: '🧃',
 		priority: 3,
 		orbitWeight: 1.0,
+		mediaKey: 'dsh.category.main.sweets_juices.v1',
+		imageUri: 'dsh.category.main.sweets_juices.v1',
 	},
 	{
 		id: 'anaqati',
@@ -82,13 +96,15 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		shortLabel: 'أناقتي',
 		subtitle: 'عطور، إكسسوارات، وملابس',
 		subcategories: [
-			{ id: 'anaqati_perfumes', label: 'عطور', subtitle: 'اختيارات عطرية وروائح' },
-			{ id: 'anaqati_accessories_beauty', label: 'إكسسوارات وأدوات تجميل', subtitle: 'العناية الشخصية وأدوات الجمال' },
-			{ id: 'anaqati_clothing', label: 'ملابس', subtitle: 'ملابس وإطلالات يومية' },
+			{ id: 'anaqati_perfumes', label: 'عطور', subtitle: 'اختيارات عطرية وروائح', mediaKey: 'dsh.category.sub.anaqati_perfumes.v1', imageUri: 'dsh.category.sub.anaqati_perfumes.v1' },
+			{ id: 'anaqati_accessories_beauty', label: 'إكسسوارات وأدوات تجميل', subtitle: 'العناية الشخصية وأدوات الجمال', mediaKey: 'dsh.category.sub.anaqati_accessories_beauty.v1', imageUri: 'dsh.category.sub.anaqati_accessories_beauty.v1' },
+			{ id: 'anaqati_clothing', label: 'ملابس', subtitle: 'ملابس وإطلالات يومية', mediaKey: 'dsh.category.sub.anaqati_clothing.v1', imageUri: 'dsh.category.sub.anaqati_clothing.v1' },
 		],
 		emojiFallback: '👗',
 		priority: 4,
 		orbitWeight: 0.9,
+		mediaKey: 'dsh.category.main.anaqati.v1',
+		imageUri: 'dsh.category.main.anaqati.v1',
 	},
 	{
 		id: 'wani_store',
@@ -99,6 +115,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '🏪',
 		priority: 5,
 		orbitWeight: 1.0,
+		mediaKey: 'dsh.category.main.wani_store.v1',
+		imageUri: 'dsh.category.main.wani_store.v1',
 	},
 	{
 		id: 'home_projects',
@@ -109,6 +127,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '🏠',
 		priority: 6,
 		orbitWeight: 0.8,
+		mediaKey: 'dsh.category.main.home_projects.v1',
+		imageUri: 'dsh.category.main.home_projects.v1',
 	},
 	{
 		id: 'cloud_kitchens',
@@ -119,6 +139,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '🍳',
 		priority: 7,
 		orbitWeight: 0.8,
+		mediaKey: 'dsh.category.main.cloud_kitchens.v1',
+		imageUri: 'dsh.category.main.cloud_kitchens.v1',
 	},
 	{
 		id: 'awnak',
@@ -131,6 +153,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		priority: 8,
 		orbitWeight: 0.7,
 		isManualLike: true,
+		mediaKey: 'dsh.category.main.awnak.v1',
+		imageUri: 'dsh.category.main.awnak.v1',
 	},
 	{
 		id: 'gas_refill',
@@ -138,14 +162,16 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		shortLabel: 'غاز',
 		subtitle: 'تعبئة، إصلاح، وشراء',
 		subcategories: [
-			{ id: 'gas_refill_refill', label: 'التعبئة', subtitle: 'تعبئة الأسطوانة والتوصيل' },
-			{ id: 'gas_refill_repair', label: 'الإصلاح', subtitle: 'صيانة وفحص سلامة' },
-			{ id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة وتبديل' },
+			{ id: 'gas_refill_refill', label: 'التعبئة', subtitle: 'تعبئة الأسطوانة والتوصيل', mediaKey: 'dsh.category.sub.gas_refill_refill.v1', imageUri: 'dsh.category.sub.gas_refill_refill.v1' },
+			{ id: 'gas_refill_repair', label: 'الإصلاح', subtitle: 'صيانة وفحص سلامة', mediaKey: 'dsh.category.sub.gas_refill_repair.v1', imageUri: 'dsh.category.sub.gas_refill_repair.v1' },
+			{ id: 'gas_refill_buy', label: 'شراء تعبئة', subtitle: 'وحدات جديدة وتبديل', mediaKey: 'dsh.category.sub.gas_refill_buy.v1', imageUri: 'dsh.category.sub.gas_refill_buy.v1' },
 		],
 		emojiFallback: '⛽',
 		priority: 9,
 		orbitWeight: 0.7,
 		isManualLike: true,
+		mediaKey: 'dsh.category.main.gas_refill.v1',
+		imageUri: 'dsh.category.main.gas_refill.v1',
 	},
 	{
 		id: 'shein',
@@ -158,6 +184,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		priority: 10,
 		orbitWeight: 0.7,
 		isManualLike: true,
+		mediaKey: 'dsh.category.main.shein.v1',
+		imageUri: 'dsh.category.main.shein.v1',
 	},
 	{
 		id: 'spare_parts',
@@ -168,6 +196,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '🔧',
 		priority: 11,
 		orbitWeight: 0.8,
+		mediaKey: 'dsh.category.main.spare_parts.v1',
+		imageUri: 'dsh.category.main.spare_parts.v1',
 	},
 	{
 		id: 'honey_dates',
@@ -178,6 +208,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '🍯',
 		priority: 12,
 		orbitWeight: 0.8,
+		mediaKey: 'dsh.category.main.honey_dates.v1',
+		imageUri: 'dsh.category.main.honey_dates.v1',
 	},
 	{
 		id: 'electronics',
@@ -188,6 +220,8 @@ export const dshCategoryFixtures: DshCategoryFixture[] = [
 		emojiFallback: '📱',
 		priority: 13,
 		orbitWeight: 0.9,
+		mediaKey: 'dsh.category.main.electronics.v1',
+		imageUri: 'dsh.category.main.electronics.v1',
 	},
 ];
 
@@ -207,6 +241,11 @@ export function selectDshClientCategoriesPreview() {
 	return dshCategoryListFixtures;
 }
 
+/**
+ * EMOJI FALLBACK ONLY — not the primary image source.
+ * Primary image is resolved via mediaKey (dsh.category.main.<id>.v1) through resolve-dsh-image-source.ts.
+ * Use emojiFallback from DshCategoryFixture entries as the single source of fallback truth.
+ */
 export const DSH_CATEGORY_ICONS: Record<string, string> = {
 	restaurants: '🍽️',
 	grocery: '🛒',
