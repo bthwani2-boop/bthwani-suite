@@ -1,4 +1,4 @@
-﻿{
+{
     "version":  "2.0.0",
     "owner":  "tools/guards",
     "policy_source_rule":  "governance/ and .agents/ own policy text; tools/guards executes verification only",
