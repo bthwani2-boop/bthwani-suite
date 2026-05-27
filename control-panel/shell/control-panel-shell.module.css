@@ -349,7 +349,6 @@
 }
 
 .controlPanelRailOverrides :global(.ui-web-command-center-root) {
-  --rail-width: 212px;
   width: 100%;
   max-width: 100%;
   height: 100%;
@@ -357,145 +356,34 @@
   overflow: hidden;
 }
 
-.controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true']) {
-  --rail-width: 64px;
+.railSupplementaryCard {
+  margin-top: auto;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--bthwani-control-panel-surface-inset);
+  border: 1px solid var(--bthwani-control-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.controlPanelRailOverrides :global(.ui-web-command-center-root[dir='ltr'] .ui-web-command-center__workspace) {
-  grid-template-columns: var(--rail-width) minmax(0, 1fr) !important;
-  grid-template-areas: 'rail stage' !important;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root[dir='rtl'] .ui-web-command-center__workspace) {
-  grid-template-columns: var(--rail-width) minmax(0, 1fr) !important;
-  grid-template-areas: 'rail stage' !important;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip) {
-  height: 48px;
-  padding: 0 14px;
-  gap: 12px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip__identity) {
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: 10px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip__filters) {
-  flex-wrap: nowrap;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip__filter-chip) {
-  height: 30px;
-  padding: 0 10px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip__search-container) {
-  flex: 0 1 240px;
-  max-width: 240px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip__search-input) {
-  height: 36px;
-  padding: 0 40px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-strip__actions) {
+.railSupplementaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 8px;
 }
 
-.controlPanelRailOverrides :global(.ui-web-command-strip__action-btn) {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  font-size: 16px;
+.railSupplementaryLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text-soft);
 }
 
-.controlPanelRailOverrides :global(.ui-web-command-strip__user-profile) {
-  width: 32px;
-  height: 32px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail) {
-  padding: 10px 8px;
-  height: 100%;
-  min-height: 0;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-nav) {
-  min-height: 0;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__stage) {
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  padding: 12px 14px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__stage-content) {
-  flex: 1;
-  height: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-header) {
-  align-items: center;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-toggle) {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  font-size: 18px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item) {
-  min-height: 44px;
-  padding: 0 12px;
-  border-radius: 14px;
-  gap: 10px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item:hover) {
-  background: var(--bthwani-control-panel-surface-inset);
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item--active) {
-  background: var(--bthwani-control-panel-brand-surface);
+.railSupplementaryVal {
+  font-size: 10px;
+  font-weight: 900;
   color: var(--bthwani-control-panel-brand);
-  border-color: var(--bthwani-control-panel-border-strong);
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root .ui-web-command-center__rail-item-icon) {
-  width: 26px;
-  height: 26px;
-  font-size: 22px;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true'] .ui-web-command-center__rail-item) {
-  width: 44px;
-  min-height: 44px;
-  padding: 0;
-  justify-content: center;
-}
-
-.controlPanelRailOverrides :global(.ui-web-command-center-root[data-rail-collapsed='true'] .ui-web-command-center__rail-item-icon) {
-  width: 28px;
-  height: 28px;
-  font-size: 24px;
 }
 
 .dashboardSectionBoard,
@@ -990,4 +878,160 @@
   .shellContractStatusText {
     white-space: normal;
   }
+}
+
+.profileUserInfoSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px;
+  text-align: start;
+}
+
+.profileUserAvatarLarge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bthwani-control-panel-brand) 0%, var(--bthwani-brand) 100%);
+  color: var(--bthwani-brand-contrast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 4px 10px var(--bthwani-overlay-soft);
+  flex-shrink: 0;
+}
+
+.profileUserDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.profileUserName {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-brand);
+}
+
+.profileUserRole {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bthwani-brand);
+  margin-top: 1px;
+}
+
+.profileUserJob {
+  font-size: 10px;
+  color: var(--bthwani-control-panel-text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileMenuDivider {
+  border: none;
+  border-top: 1px solid var(--bthwani-control-panel-border);
+  margin: 6px 0;
+  width: 100%;
+}
+
+.profilePreferenceSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: start;
+}
+
+.profileSectionHeading {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--bthwani-control-panel-text-soft);
+  letter-spacing: 0.05em;
+  padding: 0 4px;
+}
+
+.profileLangSegmented {
+  display: flex;
+  background: var(--bthwani-control-panel-surface-inset);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--bthwani-control-panel-border);
+}
+
+.profileLangTab {
+  appearance: none;
+  flex: 1;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profileLangTab:hover {
+  color: var(--bthwani-control-panel-brand);
+}
+
+.profileLangTabActive {
+  background: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-brand);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  font-weight: 800;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.92); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.92); opacity: 0.6; }
+}
+
+.profilePulseDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--bthwani-success);
+  border-radius: 50%;
+  margin-inline-start: 6px;
+  animation: pulse 2s infinite ease-in-out;
+  vertical-align: middle;
+}
+
+.profileExtraSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--bthwani-control-panel-text-muted);
+  padding: 4px 6px;
+  text-align: start;
+}
+
+.profileExtraItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profileStatusIndicator {
+  color: var(--bthwani-success);
+  font-weight: 800;
+}
+
+.profileSessionId {
+  font-family: monospace;
+  background: var(--bthwani-control-panel-surface-inset);
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: var(--bthwani-control-panel-text-soft);
 }

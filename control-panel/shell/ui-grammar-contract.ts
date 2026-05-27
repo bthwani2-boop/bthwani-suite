@@ -97,6 +97,18 @@ export const ControlPanelUiGrammar = {
    * - Central Color System only. No local random colors.
    */
   colorSystem: 'central_ui_kit_only' as const,
+
+  /**
+   * Search / Command CommandCenter Grammar:
+   * - Must perform immediate smart local search.
+   * - Must support sections, services, and action handlers.
+   * - Keyboard control mapping: Down/Up to navigate, Enter to select, Escape to close.
+   */
+  searchGrammar: {
+    requiresLocalIndex: true,
+    requiresPrioritySorting: true,
+    supportedTriggerKeys: ['ArrowDown', 'ArrowUp', 'Enter', 'Escape'] as const,
+  },
 } as const;
 
 export type ControlPanelScreenDensity = typeof ControlPanelUiGrammar.density[number];

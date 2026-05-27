@@ -19,9 +19,10 @@ import { useRouter } from "next/navigation";
 import {
   useDirection,
   useUiText,
+  useUiLanguage,
   type BThwaniAppearanceMode,
 } from "@bthwani/ui-kit";
-import { WebCommandCenterFrame } from "@bthwani/ui-kit/web";
+import { WebCommandCenterFrame, type WebSearchItem } from "@bthwani/ui-kit/web";
 import {
   type AnyOperationsWorkspaceId,
   type OperationsPanelId,
@@ -206,7 +207,9 @@ export function ControlPanelSurfaceHost({
   const { direction } = useDirection();
   const uiText = useUiText();
   const { hydrated, mode, setMode } = useControlPanelAppearance();
+  const { language, toggleLanguage } = useUiLanguage();
   const panelText = uiText.controlPanel;
+  const resolvedLanguageLabel = panelText.ui.languageLabel;
   const [alertCount, setAlertCount] = React.useState(1);
   const [selectedServiceId, setSelectedServiceId] =
     React.useState<string>(allServiceTabId);
@@ -222,6 +225,164 @@ export function ControlPanelSurfaceHost({
       "الشل جاهز، وكل إجراء علوي يجب أن يترك أثرًا ظاهرًا داخل هذا الشريط.",
   });
   const appearanceMenuRef = React.useRef<HTMLDivElement | null>(null);
+
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  // Normalize search queries to handle common Arabic character variation
+  const normalizeSearchText = (text: string): string => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/[أإآا]/g, "ا")
+      .replace(/ة/g, "ه")
+      .replace(/[ىي]/g, "ي");
+  };
+
+  const searchIndex = React.useMemo(() => {
+    const items: Array<WebSearchItem & { searchTerms: string[]; type: "section" | "service" | "action"; key: string }> = [];
+
+    // 1. Sections index
+    primarySectionIds.forEach((sectionId) => {
+      const sectionTitle = panelText.surfaceTitles[sectionId] || sectionId;
+      const sectionDesc = isPhaseOneSection(sectionId)
+        ? compactSectionDescriptions[sectionId]
+        : panelText.surfaceDescriptions[sectionId] || "";
+
+      const searchTerms = [
+        sectionId.toLowerCase(),
+        sectionTitle.toLowerCase(),
+        sectionDesc.toLowerCase(),
+      ];
+
+      // Arabic & English synonym matching helpers
+      if (sectionId === "dashboard") searchTerms.push("dsh", "لوحه القياده", "الرئيسيه", "النظره العامه", "dashboard");
+      if (sectionId === "operations") searchTerms.push("العمليات", "التشغيل", "حاله التشغيل", "operations");
+      if (sectionId === "finance") searchTerms.push("wlt", "الماليه", "ماليه", "المركز المالي", "حسابات", "finance");
+      if (sectionId === "community-services") searchTerms.push("knz", "kwd", "esf", "mrf", "snd", "خدمات المجتمع", "المجتمع", "الخدمات المجتمعيه", "community");
+      if (sectionId === "support") searchTerms.push("الدعم", "دعم فني", "المساعده", "تذاكر", "support");
+      if (sectionId === "partners") searchTerms.push("الشركاء", "شركاء", "الموافقه على الشركاء", "partners");
+      if (sectionId === "catalogs") searchTerms.push("الكتالوجات", "المنتجات", "المتاجر", "catalogs", "catalog");
+      if (sectionId === "marketing") searchTerms.push("التسويق", "تسويق", "العروض", "الحملات", "marketing");
+      if (sectionId === "platform") searchTerms.push("المنصه", "منصه", "اعدادات المنصه", "platform");
+      if (sectionId === "administration") searchTerms.push("الاداره", "اداره", "النظام", "administration", "admin");
+      if (sectionId === "hr") searchTerms.push("الموارد البشريه", "موارد بشريه", "طاقم العمل", "وظائف", "hr");
+
+      items.push({
+        id: `section:${sectionId}`,
+        type: "section",
+        key: sectionId,
+        label: sectionTitle,
+        description: sectionDesc,
+        meta: "قسم لوحة التحكم",
+        searchTerms,
+      });
+    });
+
+    // 2. Services index
+    controlPanelRuntimeData.services.forEach((service) => {
+      const serviceLabel = getServiceLabel(uiText, service.id);
+      const serviceDesc = service.placeholder ? "خدمة مرجعية" : "خدمة نشطة";
+      const statusLabel = service.placeholder ? "مرجعي" : "نشط";
+      const searchTerms = [
+        service.id.toLowerCase(),
+        serviceLabel.toLowerCase(),
+        statusLabel,
+      ];
+
+      if (service.id === "dsh") searchTerms.push("dashboard", "لوحه القياده", "لوحه التحكم");
+      if (service.id === "arb") searchTerms.push("عرب");
+      if (service.id === "amn") searchTerms.push("امن");
+      if (service.id === "wlt") searchTerms.push("finance", "الماليه", "محفظه");
+      if (service.id === "knz") searchTerms.push("كنز");
+      if (service.id === "kwd") searchTerms.push("كويت");
+      if (service.id === "esf") searchTerms.push("ايسف");
+      if (service.id === "mrf") searchTerms.push("مرف");
+      if (service.id === "snd") searchTerms.push("سند");
+
+      items.push({
+        id: `service:${service.id}`,
+        type: "service",
+        key: service.id,
+        label: serviceLabel,
+        description: serviceDesc,
+        meta: `خدمة (${statusLabel})`,
+        tone: service.placeholder ? "neutral" : "success",
+        searchTerms,
+      });
+    });
+
+    // 3. Actions index
+    items.push({
+      id: "action:refresh",
+      type: "action",
+      key: "refresh",
+      label: "تحديث الشل",
+      description: "تحديث حالة لوحة التحكم وتصفير التنبيهات محلياً",
+      meta: "إجراء الشل",
+      tone: "warning",
+      searchTerms: ["refresh", "reload", "تحديث", "اعاده تحميل"],
+    });
+
+    items.push({
+      id: "action:alerts",
+      type: "action",
+      key: "alerts",
+      label: "مراجعة التنبيهات",
+      description: "عرض التنبيهات وتصفير المؤشر",
+      meta: "إجراء الشل",
+      tone: "danger",
+      searchTerms: ["alerts", "notifications", "تنبيهات", "التنبيهات"],
+    });
+
+    items.push({
+      id: "action:appearance",
+      type: "action",
+      key: "appearance",
+      label: "تبديل المظهر",
+      description: "تبديل مظهر الواجهة بين الفاتح والداكن الزجاجي",
+      meta: "إجراء الشل",
+      searchTerms: ["appearance", "theme", "dark", "light", "مظهر", "تغيير المظهر", "داكن", "فاتح"],
+    });
+
+    return items;
+  }, [panelText, uiText]);
+
+  const filteredSearchResults = React.useMemo(() => {
+    const query = normalizeSearchText(searchQuery);
+    if (!query) return [];
+
+    const matches = searchIndex.filter((item) => {
+      return item.searchTerms.some((term) => {
+        const normalizedTerm = normalizeSearchText(term);
+        return normalizedTerm.includes(query);
+      });
+    });
+
+    const currentActiveSectionId = activeSectionHref.slice(1) as ControlPanelSectionId;
+
+    return [...matches].sort((a, b) => {
+      if (a.type === "section" && a.key === currentActiveSectionId) return -1;
+      if (b.type === "section" && b.key === currentActiveSectionId) return 1;
+
+      if (a.type === "section" && b.type !== "section") return -1;
+      if (b.type === "section" && a.type !== "section") return 1;
+
+      if (a.type === "service" && b.type === "service") {
+        const aService = controlPanelRuntimeData.services.find((s) => s.id === a.key);
+        const bService = controlPanelRuntimeData.services.find((s) => s.id === b.key);
+        const aLive = aService && aService.statusKind === "live" && !aService.placeholder;
+        const bLive = bService && bService.statusKind === "live" && !bService.placeholder;
+        if (aLive && !bLive) return -1;
+        if (!aLive && bLive) return 1;
+      }
+
+      if (a.type === "service" && b.type === "action") return -1;
+      if (b.type === "service" && a.type === "action") return 1;
+
+      return 0;
+    });
+  }, [searchIndex, searchQuery, activeSectionHref]);
 
   React.useEffect(() => {
     setActiveSectionHref(
@@ -286,6 +447,7 @@ export function ControlPanelSurfaceHost({
   const activeAppearance =
     appearanceOptions.find((option) => option.mode === mode) ??
     appearanceOptions[0];
+
   const activeMission = controlPanelRuntimeData.missions.find(
     (mission) => mission.sectionId === activeSectionId && !mission.placeholder,
   );
@@ -301,6 +463,7 @@ export function ControlPanelSurfaceHost({
       return serviceMeta && !serviceMeta.placeholder;
     },
   ).length;
+
   const hasPrimarySectionContent = hasRenderableSection(activeSectionId);
   const sectionOwnershipLabel = activeMission
     ? `owner:${activeMission.ownerSectionId} / flow:${activeMission.flowId}`
@@ -351,6 +514,112 @@ export function ControlPanelSurfaceHost({
     });
   }, []);
 
+  const handleSearchResultSelect = React.useCallback(
+    (id: string) => {
+      const [type, key] = id.split(":");
+
+      if (type === "section") {
+        const sectionId = key as ControlPanelSectionId;
+        const nextHref = sectionRouteMap[sectionId];
+        setActiveSectionHref(nextHref);
+        router.push(nextHref);
+        const sectionTitle = panelText.surfaceTitles[sectionId] || sectionId;
+        setCommandStatus({
+          kind: "search",
+          label: "انتقال سريع",
+          description: `تم الانتقال سريعًا إلى قسم "${sectionTitle}" عبر موجه الأوامر.`,
+        });
+        setSearchQuery("");
+      } else if (type === "service") {
+        const serviceId = key;
+        setSelectedServiceId(serviceId);
+        const serviceMeta = controlPanelRuntimeData.services.find(
+          (s) => s.id === serviceId,
+        );
+        const serviceLabel = serviceMeta
+          ? getServiceLabel(uiText, serviceMeta.id)
+          : serviceId.toUpperCase();
+
+        const isSectionInService =
+          serviceMeta && serviceMeta.sections.includes(activeSectionId);
+        if (!isSectionInService && serviceMeta && serviceMeta.sections.length > 0) {
+          const targetSection = serviceMeta.sections[0] as ControlPanelSectionId;
+          const nextHref = sectionRouteMap[targetSection];
+          setActiveSectionHref(nextHref);
+          router.push(nextHref);
+          const targetTitle =
+            panelText.surfaceTitles[targetSection] || targetSection;
+          setCommandStatus({
+            kind: "filter",
+            label: `خدمة ${serviceLabel}`,
+            description: `تم تصفية الشل على الخدمة ${serviceLabel} والانتقال لقسمها الأول "${targetTitle}".`,
+          });
+        } else {
+          setCommandStatus({
+            kind: "filter",
+            label: `تصفية الخدمة: ${serviceLabel}`,
+            description: `تم حصر لوحة التحكم على الخدمة ${serviceLabel}.`,
+          });
+        }
+        setSearchQuery("");
+      } else if (type === "action") {
+        if (key === "refresh") {
+          handleRefreshClick();
+        } else if (key === "alerts") {
+          handleAlertClick();
+        } else if (key === "appearance") {
+          const nextMode = mode === "lightPremium" ? "darkGlass" : "lightPremium";
+          setMode(nextMode);
+          setCommandStatus({
+            kind: "ready",
+            label: "تغيير المظهر",
+            description: `تم تبديل المظهر إلى ${
+              nextMode === "darkGlass" ? "الداكن الزجاجي" : "الفاتح الأبيض"
+            } عبر البحث الذكي.`,
+          });
+        }
+        setSearchQuery("");
+      }
+    },
+    [
+      router,
+      activeSectionId,
+      panelText,
+      uiText,
+      mode,
+      setMode,
+      handleRefreshClick,
+      handleAlertClick,
+    ],
+  );
+
+  const railSupplementary = React.useMemo(() => {
+    return (
+      <div className={styles.railSupplementaryCard}>
+        <div className={styles.railSupplementaryRow}>
+          <span className={styles.railSupplementaryLabel}>المالك والتدفق</span>
+          <span className={styles.railSupplementaryVal}>
+            {activeMission
+              ? `${activeMission.ownerSectionId} / ${activeMission.flowId}`
+              : "لا يوجد"}
+          </span>
+        </div>
+        <div className={styles.railSupplementaryRow}>
+          <span className={styles.railSupplementaryLabel}>الخدمات النشطة</span>
+          <span className={styles.railSupplementaryVal}>
+            {liveSectionServiceCount}/{activeSectionServiceIds.length}
+          </span>
+        </div>
+        <div className={styles.railSupplementaryRow}>
+          <span className={styles.railSupplementaryLabel}>الأمر النشط</span>
+          <span className={styles.railSupplementaryVal}>
+            {commandStatus.label}
+          </span>
+        </div>
+      </div>
+    );
+  }, [activeMission, liveSectionServiceCount, activeSectionServiceIds, commandStatus.label]);
+
   const profileControl = (
     <div className={styles.appearanceMenu} ref={appearanceMenuRef}>
       <button
@@ -358,12 +627,12 @@ export function ControlPanelSurfaceHost({
         className={styles.appearanceMenuTrigger}
         aria-expanded={isAppearanceMenuOpen}
         aria-haspopup="menu"
-        aria-label={`المظهر الحالي: ${activeAppearance.title}`}
-        title={`المظهر الحالي: ${activeAppearance.title}`}
+        aria-label="الملف الشخصي والإعدادات"
+        title="الملف الشخصي والإعدادات"
         onClick={() => setIsAppearanceMenuOpen((current) => !current)}
       >
         <span className={styles.appearanceMenuTriggerAvatar} aria-hidden="true">
-          {mode === "darkGlass" ? "◐" : "◌"}
+          ب
         </span>
       </button>
 
@@ -371,39 +640,97 @@ export function ControlPanelSurfaceHost({
         <div
           className={styles.appearanceMenuPopover}
           role="menu"
-          aria-label="اختيار مظهر لوحة التحكم"
+          aria-label="الملف الشخصي والإعدادات"
         >
-          <div className={styles.appearanceMenuHeader}>
-            <span className={styles.appearanceMenuEyebrow}>مظهر الشل</span>
-            <strong className={styles.appearanceMenuCurrent}>
-              {hydrated ? activeAppearance.title : "جارٍ استعادة التفضيل..."}
-            </strong>
+          {/* User profile section */}
+          <div className={styles.profileUserInfoSection}>
+            <div className={styles.profileUserAvatarLarge}>ب</div>
+            <div className={styles.profileUserDetails}>
+              <strong className={styles.profileUserName}>بدر الثواني</strong>
+              <span className={styles.profileUserRole}>مدير النظام</span>
+              <span className={styles.profileUserJob}>مدير التطوير والعمليات</span>
+            </div>
           </div>
 
-          <div className={styles.appearanceMenuOptions}>
-            {appearanceOptions.map((option) => (
+          <hr className={styles.profileMenuDivider} />
+
+          {/* Quick Info & Language preferences */}
+          <div className={styles.profilePreferenceSection}>
+            <span className={styles.profileSectionHeading}>اللغة المفضلة</span>
+            <div className={styles.profileLangSegmented}>
               <button
-                key={option.mode}
                 type="button"
-                role="menuitemradio"
-                aria-checked={mode === option.mode}
                 className={[
-                  styles.appearanceMenuOption,
-                  mode === option.mode ? styles.appearanceMenuOptionActive : "",
+                  styles.profileLangTab,
+                  language === "ar" ? styles.profileLangTabActive : "",
                 ].join(" ")}
                 onClick={() => {
-                  setMode(option.mode);
-                  setIsAppearanceMenuOpen(false);
+                  if (language !== "ar") {
+                    toggleLanguage();
+                    setIsAppearanceMenuOpen(false);
+                  }
                 }}
               >
-                <span className={styles.appearanceMenuOptionTitle}>
-                  {option.title}
-                </span>
-                <span className={styles.appearanceMenuOptionDescription}>
-                  {option.description}
-                </span>
+                العربية
               </button>
-            ))}
+              <button
+                type="button"
+                className={[
+                  styles.profileLangTab,
+                  language === "en" ? styles.profileLangTabActive : "",
+                ].join(" ")}
+                onClick={() => {
+                  if (language !== "en") {
+                    toggleLanguage();
+                    setIsAppearanceMenuOpen(false);
+                  }
+                }}
+              >
+                English
+              </button>
+            </div>
+          </div>
+
+          <hr className={styles.profileMenuDivider} />
+
+          {/* Appearance Section */}
+          <div className={styles.profilePreferenceSection}>
+            <span className={styles.profileSectionHeading}>مظهر الشل</span>
+            <div className={styles.profileLangSegmented}>
+              {appearanceOptions.map((option) => (
+                <button
+                  key={option.mode}
+                  type="button"
+                  className={[
+                    styles.profileLangTab,
+                    mode === option.mode ? styles.profileLangTabActive : "",
+                  ].join(" ")}
+                  onClick={() => {
+                    setMode(option.mode);
+                    setIsAppearanceMenuOpen(false);
+                  }}
+                >
+                  {option.title}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <hr className={styles.profileMenuDivider} />
+
+          {/* Additional Info / Extras */}
+          <div className={styles.profileExtraSection}>
+            <div className={styles.profileExtraItem}>
+              <span>حالة النظام:</span>
+              <span className={styles.profileStatusIndicator}>
+                متصل بالشبكة
+                <span className={styles.profilePulseDot} />
+              </span>
+            </div>
+            <div className={styles.profileExtraItem}>
+              <span>معرف الجلسة:</span>
+              <code className={styles.profileSessionId}>18e1d781</code>
+            </div>
           </div>
         </div>
       ) : null}
@@ -484,8 +811,14 @@ export function ControlPanelSurfaceHost({
               : selectedServiceLabel
           }
           railItems={railItems}
-          railSupplementary={null}
+          railSupplementary={railSupplementary}
           alertCountLabel={String(alertCount)}
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchResults={filteredSearchResults}
+          onSearchResultSelect={handleSearchResultSelect}
+          searchHint="ابحث عن قسم، خدمة، أو إجراء (مثال: DSH, المالية, العمليات...)"
+          searchEmptyLabel="لا توجد نتائج مطابقة لبحثك"
         >
           <div className={styles.stageStack} dir={direction}>
             <section className={styles.shellContractStrip} aria-live="polite">
