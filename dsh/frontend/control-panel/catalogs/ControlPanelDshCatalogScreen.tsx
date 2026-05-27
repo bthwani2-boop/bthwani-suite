@@ -15,6 +15,12 @@ import {
 } from './catalog';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import styles from '../shared/control-panel-surface.module.css';
+import { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
+import { CatalogIdentityGovernanceWorkspace } from './CatalogIdentityGovernanceWorkspace';
+import { CatalogDuplicateResolutionWorkspace, type DuplicatePair } from './CatalogDuplicateResolutionWorkspace';
+import { CatalogVisibilityPolicyWorkspace } from './CatalogVisibilityPolicyWorkspace';
+import { CatalogPartnerHandoffWorkspace } from './CatalogPartnerHandoffWorkspace';
+import { CatalogMediaGovernanceWorkspace } from './CatalogMediaGovernanceWorkspace';
 
 // Helper to recursively filter the Category & Classification Tree
 function filterCategoryTree(categories: CatalogMainCategory[], query: string): CatalogMainCategory[] {
@@ -65,6 +71,16 @@ type WorkspaceMode =
   | 'category-mapping'
   | 'media-governance'
   | 'marketing-approvals';
+
+// Detail-on-open workspace overlays — decomposed from monolith tabs (UI_PREVIEW_ONLY)
+type ActiveWorkspaceOverlay =
+  | { type: 'item-detail'; productId: string }
+  | { type: 'duplicate-resolution' }
+  | { type: 'identity-governance' }
+  | { type: 'visibility-policy'; productId: string }
+  | { type: 'partner-handoff' }
+  | { type: 'media-governance' }
+  | null;
 
 type FilterType = 'all' | 'active' | 'review' | 'conflict' | 'master' | 'partner' | 'needs-link' | 'needs-image';
 
@@ -309,6 +325,8 @@ export function ControlPanelDshCatalogScreen({
   const [activeTab, setActiveTab] = useState<string>('catalog');
   const [activeSubTab, setActiveSubTab] = useState<string>('');
   const [showBulkOps, setShowBulkOps] = useState(false);
+  // Detail-on-open workspace overlay — null means no overlay shown
+  const [activeWorkspaceOverlay, setActiveWorkspaceOverlay] = useState<ActiveWorkspaceOverlay>(null);
   const [activeMainCategory, setActiveMainCategory] = useState<CatalogMainCategory | null>(null);
   const [activeSubCategory, setActiveSubCategory] = useState<CatalogSubCategory | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
@@ -1435,6 +1453,14 @@ export function ControlPanelDshCatalogScreen({
             <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
               (الإجراء معطل: معاينة محلية فقط)
             </span>
+            {activeSubTab === 'partner' && (
+              <Button
+                label="▸ فتح workspace استلام الشريك"
+                tone="secondary"
+                size="sm"
+                onPress={() => setActiveWorkspaceOverlay({ type: 'partner-handoff' })}
+              />
+            )}
           </div>
         </div>
 
@@ -1615,7 +1641,7 @@ export function ControlPanelDshCatalogScreen({
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
             <Button
               label={nextActionLabel}
               tone="secondary"
@@ -1627,6 +1653,46 @@ export function ControlPanelDshCatalogScreen({
             <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
               (الإجراء معطل: معاينة محلية فقط)
             </span>
+            {/* Workspace overlay openers — detail-on-open pattern */}
+            {activeSubTab === 'duplicates' && (
+              <Button
+                label="▸ فتح workspace حل التكرارات"
+                tone="brand"
+                size="sm"
+                onPress={() => setActiveWorkspaceOverlay({ type: 'duplicate-resolution' })}
+              />
+            )}
+            {(activeSubTab === 'gtin') && (
+              <Button
+                label="▸ فتح workspace حوكمة الهوية"
+                tone="brand"
+                size="sm"
+                onPress={() => setActiveWorkspaceOverlay({ type: 'identity-governance' })}
+              />
+            )}
+            {activeSubTab === 'media' && (
+              <Button
+                label="▸ فتح workspace حوكمة الوسائط"
+                tone="brand"
+                size="sm"
+                onPress={() => setActiveWorkspaceOverlay({ type: 'media-governance' })}
+              />
+            )}
+            {activeSubTab === 'visibility-policy' && (
+              <Button
+                label="▸ فتح workspace سياسة الظهور"
+                tone="brand"
+                size="sm"
+                onPress={() => {
+                  const firstProduct = filteredProducts[0];
+                  if (firstProduct) {
+                    setActiveWorkspaceOverlay({ type: 'visibility-policy', productId: firstProduct.id });
+                  }
+                }}
+                disabled={filteredProducts.length === 0}
+                accessibilityHint="اختر منتجاً لفتح workspace الظهور"
+              />
+            )}
           </div>
         </div>
 
@@ -2720,7 +2786,16 @@ export function ControlPanelDshCatalogScreen({
                 <div style={{ width: 320, borderRight: `1px solid ${theme.line}`, backgroundColor: theme.surfaceInset, display: 'flex', flexDirection: 'column' }}>
                    <Box padding={3} background="surfaceRaised" style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
                       <Text role="bodyStrong" style={{ fontSize: 14 }}>تفاصيل المنتج</Text>
-                      <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
+                      <Box layoutDirection="row" gap={2} align="center">
+                        <Button
+                          label="▸ Workspace"
+                          tone="brand"
+                          size="sm"
+                          onPress={() => setActiveWorkspaceOverlay({ type: 'item-detail', productId: selectedProductId })}
+                          accessibilityLabel="فتح workspace تفاصيل العنصر"
+                        />
+                        <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
+                      </Box>
                    </Box>
                    <Box gap={3} padding={3} style={{ flex: 1 }}>
                       {/* Image + name header */}
@@ -4016,6 +4091,106 @@ export function ControlPanelDshCatalogScreen({
               <Button label="إلغاء" tone="secondary" onPress={() => setShowProductModal(false)} />
             </Box>
           </Surface>
+        </div>
+      )}
+
+      {/* ─── Workspace Overlay Layer — detail-on-open (UI_PREVIEW_ONLY) ──────────────
+          Each workspace renders as a positioned overlay panel.
+          Close via setActiveWorkspaceOverlay(null).
+          Owner: control-panel/catalogs. No backend/API. ────────────────────────── */}
+      {activeWorkspaceOverlay !== null && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', justifyContent: 'flex-end' }}>
+          {/* Backdrop */}
+          <div
+            onClick={() => setActiveWorkspaceOverlay(null)}
+            style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.32)' }}
+          />
+
+          {/* ── item-detail ──────────────────────────────────────────────────── */}
+          {activeWorkspaceOverlay.type === 'item-detail' && (() => {
+            const p = products.find((pr) => pr.id === activeWorkspaceOverlay.productId);
+            if (!p) return null;
+            return (
+              <CatalogItemDetailWorkspace
+                product={p}
+                onClose={() => setActiveWorkspaceOverlay(null)}
+              />
+            );
+          })()}
+
+          {/* ── duplicate-resolution ─────────────────────────────────────────── */}
+          {activeWorkspaceOverlay.type === 'duplicate-resolution' && (() => {
+            const conflictingProducts = products.filter((p) => !!p.conflictReason);
+            const pairs: DuplicatePair[] = conflictingProducts.map((p, idx) => ({
+              sourceId: p.id,
+              candidateId: conflictingProducts[(idx + 1) % Math.max(conflictingProducts.length, 1)]?.id ?? p.id,
+              reason: p.conflictReason || 'تشابه في الاسم أو SKU',
+              conflictFields: ['name', 'sku', ...(p.gtin ? ['gtin'] : []), ...(p.mediaKey ? ['mediaKey'] : [])],
+            }));
+            return (
+              <CatalogDuplicateResolutionWorkspace
+                duplicatePairs={pairs}
+                products={products}
+                onClose={() => setActiveWorkspaceOverlay(null)}
+              />
+            );
+          })()}
+
+          {/* ── identity-governance ──────────────────────────────────────────── */}
+          {activeWorkspaceOverlay.type === 'identity-governance' && (
+            <CatalogIdentityGovernanceWorkspace
+              items={products.map((p) => ({ id: p.id, name: p.name, sku: p.sku, gtin: p.gtin, barcode: p.barcode }))}
+              onClose={() => setActiveWorkspaceOverlay(null)}
+            />
+          )}
+
+          {/* ── visibility-policy ────────────────────────────────────────────── */}
+          {activeWorkspaceOverlay.type === 'visibility-policy' && (() => {
+            const p = products.find((pr) => pr.id === activeWorkspaceOverlay.productId)
+              ?? products[0];
+            if (!p) return null;
+            const approvalStageToStatus = (stage: string) => {
+              if (stage === 'client-visible') return 'client_visible' as const;
+              if (stage === 'catalog-adopted') return 'partner_active' as const;
+              if (stage === 'marketing-review') return 'catalog_ready' as const;
+              if (stage === 'partner-review') return 'catalog_not_ready' as const;
+              return 'submitted' as const;
+            };
+            return (
+              <CatalogVisibilityPolicyWorkspace
+                product={p}
+                partnerActivationStatus={approvalStageToStatus(p.approvalStage)}
+                onClose={() => setActiveWorkspaceOverlay(null)}
+              />
+            );
+          })()}
+
+          {/* ── partner-handoff ───────────────────────────────────────────────── */}
+          {activeWorkspaceOverlay.type === 'partner-handoff' && (
+            <CatalogPartnerHandoffWorkspace
+              partnerId="partner-preview-001"
+              partnerLabel="شريك النموذج الأولي"
+              activationStatus="catalog_not_ready"
+              incomingItems={products
+                .filter((p) => p.sourceSurface === 'partner' || p.approvalStage === 'partner-proposed' || p.approvalStage === 'partner-review')
+                .map((p) => ({ id: p.id, name: p.name, approvalStage: p.approvalStage }))}
+              onClose={() => setActiveWorkspaceOverlay(null)}
+            />
+          )}
+
+          {/* ── media-governance ─────────────────────────────────────────────── */}
+          {activeWorkspaceOverlay.type === 'media-governance' && (
+            <CatalogMediaGovernanceWorkspace
+              items={products.map((p) => ({
+                id: p.id,
+                name: p.name,
+                mediaKey: p.mediaKey,
+                mediaPolicy: p.mediaPolicy,
+                imageUri: p.imageUri,
+              }))}
+              onClose={() => setActiveWorkspaceOverlay(null)}
+            />
+          )}
         </div>
       )}
     </div>
