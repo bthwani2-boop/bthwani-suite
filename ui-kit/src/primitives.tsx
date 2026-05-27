@@ -239,10 +239,13 @@ export function Surface({
 		);
 	}
 
-	const toneConfig = surfaceToneLaw[tone];
-	if ((process.env.NODE_ENV ?? '') !== 'production' && !(tone in surfaceToneLaw)) {
-		// eslint-disable-next-line no-console
-		console.warn(`Surface: unknown tone "${String(tone)}" — falling back to 'default'`);
+	let toneConfig = surfaceToneLaw[tone as BaseSurfaceVariant];
+	if (!toneConfig) {
+		if ((process.env.NODE_ENV ?? '') !== 'production') {
+			// eslint-disable-next-line no-console
+			console.warn(`Surface: unknown tone "${String(tone)}" — falling back to 'default'`);
+		}
+		toneConfig = surfaceToneLaw['default'];
 	}
 
 	return (

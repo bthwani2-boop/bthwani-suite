@@ -4,9 +4,23 @@ import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
+import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformAuditWorkspace() {
   const { auditEvents, rollbackEvent } = useDemoPlatformState();
+  const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (auditEvents.length > 0) {
+      if (!selectedEventId || !auditEvents.some((e) => e.id === selectedEventId)) {
+        setSelectedEventId(auditEvents[0].id);
+      }
+    } else {
+      setSelectedEventId(null);
+    }
+  }, [auditEvents, selectedEventId]);
+
+  const selectedEvent = auditEvents.find((e) => e.id === selectedEventId) || null;
 
   return (
     <Box gap={4}>
@@ -14,81 +28,130 @@ export function DshPlatformAuditWorkspace() {
         title="سجل التغييرات والتراجع (Audit & Rollback)"
         description="تتبع من قام بالتغييرات، ومتى، والسبب، مع توفر خيار التراجع (Rollback) الفوري للإعدادات السابقة."
       >
-        <Box gap={3}>
-          {auditEvents.length === 0 && (
-            <Surface tone="default" border padding={4} radiusToken="xl">
-              <Text role="bodySm" tone="muted" align="center">لا توجد أحداث تدقيق حتى الآن. ابدأ بتنفيذ إجراء تجريبي.</Text>
-            </Surface>
-          )}
+        <div className={styles.surfaceSplitGrid}>
+          {/* Left Column: Timeline List */}
+          <div className={styles.surfaceListColumn}>
+            <Box gap={2}>
+              <Text role="titleMd">الجدول الزمني للأحداث ({auditEvents.length})</Text>
+              {auditEvents.length === 0 ? (
+                <Surface tone="default" border padding={4} radiusToken="xl">
+                  <Text role="bodySm" tone="muted" align="center">لا توجد أحداث تدقيق حتى الآن.</Text>
+                </Surface>
+              ) : (
+                auditEvents.map((event) => {
+                  const isActive = event.id === selectedEventId;
+                  return (
+                    <button
+                      key={event.id}
+                      type="button"
+                      className={`${styles.surfaceInfoCard} ${styles.surfaceInfoCardButton} ${isActive ? styles.surfaceInfoCardActive : ''}`}
+                      onClick={() => setSelectedEventId(event.id)}
+                    >
+                      <div className={styles.surfaceInfoCardTextBlock}>
+                        <div className={styles.surfaceInfoCardTitle} style={{ textAlign: 'right' }}>{event.action}</div>
+                        <div className={styles.surfaceInfoCardDescription}>
+                          {event.operator} · {event.timestamp}
+                        </div>
+                      </div>
+                      <div className={styles.surfaceMetaWrap}>
+                        <Surface
+                          tone={event.status === 'success' ? 'success' : event.status === 'warning' ? 'warning' : 'danger'}
+                          padding={1}
+                          radiusToken="pill"
+                          border={false}
+                        >
+                          <Text role="caption" tone={event.status === 'warning' ? 'muted' : 'inverse'}>
+                            {event.status === 'success'
+                              ? 'نشط'
+                              : event.status === 'warning'
+                              ? 'معتمد'
+                              : 'تراجع'}
+                          </Text>
+                        </Surface>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </Box>
+          </div>
 
-          {auditEvents.map((event) => (
-            <Surface key={event.id} tone="raised" border padding={3} radiusToken="xl">
+          {/* Right Column: Event detail inspector */}
+          <aside className={styles.surfaceInspectorPanel}>
+            {selectedEvent ? (
               <Box gap={3}>
-                <Box layoutDirection="row" justify="space-between" align="center" style={{ flexWrap: 'wrap', rowGap: 8 }}>
-                  <Box gap={1}>
-                    <Text role="titleMd">{event.action}</Text>
-                    <Text role="caption" tone="muted">
-                      المسؤول: {event.operator} • {event.timestamp}
-                    </Text>
-                  </Box>
-                  <Surface
-                    tone={event.status === 'success' ? 'success' : event.status === 'warning' ? 'warning' : 'danger'}
-                    padding={1}
-                    radiusToken="pill"
-                    border={false}
-                  >
-                    <Text role="caption" tone={event.status === 'warning' ? 'muted' : 'inverse'}>
-                      {event.status === 'success'
-                        ? 'مُطبّق بنجاح (Mock)'
-                        : event.status === 'warning'
-                        ? 'مسودة تجريبية'
-                        : 'تراجع / إيقاف (Mock)'}
-                    </Text>
-                  </Surface>
-                </Box>
+                <div className={styles.surfaceSectionHeader}>
+                  <h4 className={styles.surfaceSectionTitle}>تفاصيل حدث التدقيق</h4>
+                  <p className={styles.surfaceSectionSubtitle}>{selectedEvent.timestamp}</p>
+                </div>
+
+                <div className={styles.surfaceInspectorMeta}>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>العملية</strong>
+                    <span>{selectedEvent.action}</span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>المسؤول</strong>
+                    <span>{selectedEvent.operator}</span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>نطاق الأثر</strong>
+                    <span>{selectedEvent.scope}</span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>الأثر المتوقع</strong>
+                    <span>{selectedEvent.impact}</span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>الحالة</strong>
+                    <span style={{ fontWeight: 'bold', color: selectedEvent.status === 'success' ? 'var(--bthwani-success)' : selectedEvent.status === 'warning' ? 'var(--bthwani-warning)' : 'var(--bthwani-danger)' }}>
+                      {selectedEvent.status === 'success' ? 'نشط ومطبّق' : selectedEvent.status === 'warning' ? 'معتمد وموثق' : 'تم التراجع / الطوارئ'}
+                    </span>
+                  </div>
+                </div>
 
                 <Surface tone="default" border padding={3} radiusToken="md">
-                  <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">القيمة القديمة:</Text>
-                      <Text role="bodySm" tone="danger">{event.oldValue}</Text>
+                  <Box gap={2}>
+                    <Box gap={1}>
+                      <Text role="caption" tone="muted">القيمة السابقة:</Text>
+                      <Text role="bodySm" tone="danger" style={{ textDecorationLine: 'line-through' }}>{selectedEvent.oldValue}</Text>
                     </Box>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
+                    <Box gap={1}>
                       <Text role="caption" tone="muted">القيمة الجديدة:</Text>
-                      <Text role="bodySm" tone="success">{event.newValue}</Text>
+                      <Text role="bodySm" tone="success" style={{ fontWeight: 'bold' }}>{selectedEvent.newValue}</Text>
                     </Box>
-                    <Box gap={1} style={{ flexGrow: 1 }}>
-                      <Text role="caption" tone="muted">السبب:</Text>
-                      <Text role="bodySm">{event.reason}</Text>
+                    <Box gap={1}>
+                      <Text role="caption" tone="muted">السبب للقرار:</Text>
+                      <Text role="bodySm">{selectedEvent.reason}</Text>
                     </Box>
                   </Box>
                 </Surface>
 
-                <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-                  <Box gap={1} style={{ flexGrow: 1 }}>
-                    <Text role="caption" tone="muted">النطاق المتأثر:</Text>
-                    <Text role="bodySm">{event.scope}</Text>
-                  </Box>
-                  <Box gap={1} style={{ flexGrow: 1 }}>
-                    <Text role="caption" tone="muted">الأثر المتوقع:</Text>
-                    <Text role="bodySm">{event.impact}</Text>
-                  </Box>
-                </Box>
-
-                <Box layoutDirection="row" justify="flex-end">
-                  <Button
-                    variant="danger"
-                    disabled={!event.rollbackAvailable}
-                    onClick={() => rollbackEvent(event.id)}
-                  >
-                    تراجع عن هذا التعديل (Rollback تجريبي)
-                  </Button>
-                </Box>
+                <Button
+                  variant="danger"
+                  disabled={!selectedEvent.rollbackAvailable}
+                  onClick={() => rollbackEvent(selectedEvent.id)}
+                  style={{ width: '100%' }}
+                >
+                  تراجع فوري عن هذا التعديل (Rollback)
+                </Button>
               </Box>
-            </Surface>
-          ))}
-        </Box>
+            ) : (
+              <Box gap={3}>
+                <div className={styles.surfaceSectionHeader}>
+                  <h4 className={styles.surfaceSectionTitle}>معاينة تفاصيل التغيير</h4>
+                  <p className={styles.surfaceSectionSubtitle}>اختر حدثاً من الجدول الزمني لمراجعته</p>
+                </div>
+                <Surface tone="default" border padding={3} radiusToken="md">
+                  <Text role="bodySm" tone="muted" align="center">لا يوجد حدث محدد حالياً.</Text>
+                </Surface>
+              </Box>
+            )}
+          </aside>
+        </div>
       </WebSectionCard>
     </Box>
   );
 }
+
+export default DshPlatformAuditWorkspace;

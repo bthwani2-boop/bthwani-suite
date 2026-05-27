@@ -992,6 +992,180 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
   },
 ];
 
+export type RolloutLevel = 'service' | 'capability';
+
+export type RolloutRecord = {
+  key: string;
+  level: RolloutLevel;
+  title: string;
+  parentService?: string;
+  scope: string;
+  initialStage: string;
+  stageOptions: string[];
+};
+
+export const PREVIEW_ROLLOUT_RECORDS: readonly RolloutRecord[] = [
+  {
+    key: 'DSH:sanaa-pilot',
+    level: 'service',
+    title: 'DSH — تجربة محافظة صنعاء',
+    scope: 'محافظة صنعاء فقط',
+    initialStage: 'تفعيل تجريبي (Pilot)',
+    stageOptions: ['10% تفعيل', '25% تفعيل', '50% تفعيل', '100% تفعيل'],
+  },
+  {
+    key: 'DSH:capability:store-pickup',
+    level: 'capability',
+    title: 'نمط الاستلام من المتجر (Store Pickup)',
+    parentService: 'DSH',
+    scope: 'Global',
+    initialStage: 'داخلي فقط (Internal Only)',
+    stageOptions: ['فتح لمجموعة Alpha', 'فتح لمجموعة Beta', 'فتح للجميع'],
+  },
+  {
+    key: 'DSH:capability:awnak',
+    level: 'capability',
+    title: 'قدرة عونك (Awnak)',
+    parentService: 'DSH',
+    scope: 'محافظة صنعاء',
+    initialStage: 'نشط (Active)',
+    stageOptions: ['تقليص إلى 50%', 'توسيع نطاق جغرافي', 'تفعيل في مدينة جديدة'],
+  },
+] as const;
+
+export type SystemWarning = {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'warning' | 'danger';
+  targetWorkspace: string;
+  actionLogName: string;
+  reason: string;
+  scope: string;
+  impact: string;
+};
+
+export const PREVIEW_SYSTEM_WARNINGS: readonly SystemWarning[] = [
+  {
+    id: 'store-pickup',
+    title: 'قدرة غير مرئية للعملاء (Store Pickup)',
+    description: 'قدرة "الاستلام من المتجر" (Store Pickup) داخل DSH مفعلة ولكنها غير ظاهرة للعملاء (Internal Only).',
+    severity: 'warning',
+    targetWorkspace: 'Rollouts',
+    actionLogName: 'قدرة Store Pickup غير مرئية للعملاء',
+    reason: 'مراجعة وإقرار من المشغل المعني',
+    scope: 'DSH — Global',
+    impact: 'توثيق إقرار المشغل وإغلاق التحذير في سجل التدقيق المباشر',
+  },
+  {
+    id: 'telr-latency',
+    title: 'مزود الدفع يحتاج اختبار (Telr)',
+    description: 'مزود الدفع (Telr) في بيئة Sandbox ولم يُختبر بعد. تفعيله كمزود افتراضي يتطلب نتيجة اختبار ناجحة أولاً.',
+    severity: 'danger',
+    targetWorkspace: 'Providers',
+    actionLogName: 'مزود الدفع Telr يحتاج اختبار',
+    reason: 'مراجعة وإقرار من المشغل — الاختبار مجدول',
+    scope: 'Global — Providers',
+    impact: 'توثيق إقرار المشغل وإغلاق التحذير في سجل التدقيق المباشر',
+  },
+] as const;
+
+export type PlatformTopService = {
+  code: 'DSH' | 'KNZ' | 'WLT' | 'AMN' | 'ARB' | 'MRF' | 'KWD' | 'SND' | 'ESF';
+  name: string;
+  sovereignStatus: string;
+  customerVisibility: string;
+  scope: string;
+  financialDependency: string;
+  risks: string;
+  impactIfStopped: string;
+  lastModified: string;
+  tone: 'brand' | 'warning' | 'danger' | 'success' | 'default';
+  filterGroup: 'active' | 'planned';
+};
+
+const PLANNED_SERVICE_DEFAULTS = {
+  sovereignStatus: 'مقررة — لم تُضَف بعد',
+  customerVisibility: 'لا ينطبق',
+  scope: 'بانتظار تحديد النطاق الرسمي',
+  financialDependency: 'بانتظار تعريف المالك المالي أو التشغيلي',
+  risks: 'لم يكتمل تقييم المخاطر بعد',
+  impactIfStopped: 'غير مطبق حتى التسجيل الرسمي',
+  lastModified: 'بانتظار التسجيل الرسمي',
+  tone: 'default' as const,
+  filterGroup: 'planned' as const,
+};
+
+export const PREVIEW_TOP_SERVICES: readonly PlatformTopService[] = [
+  {
+    code: 'DSH',
+    name: 'دليفري وخدمات اللوجستية',
+    sovereignStatus: 'مفعلة (Active)',
+    customerVisibility: 'ظاهر للعملاء',
+    scope: 'Global (جميع المدن المعتمدة)',
+    financialDependency: 'يعتمد على WLT للتسويات المالية',
+    risks: 'عالي جداً — توقفه يوقف جميع عمليات التوصيل فوراً',
+    impactIfStopped: 'توقف كامل لخدمة التوصيل في كل المناطق المعتمدة',
+    lastModified: 'قبل 3 أيام • System',
+    tone: 'success',
+    filterGroup: 'active',
+  },
+  {
+    code: 'WLT',
+    name: 'المحافظ والمالية',
+    sovereignStatus: 'مفعلة (Active)',
+    customerVisibility: 'مخفي (API داخلي)',
+    scope: 'Global',
+    financialDependency: 'صاحب القرار المالي — يمتلك التسويات ومحافظ الكباتن والمتاجر',
+    risks: 'حرج — أي توقف يجمد كل المعاملات المالية',
+    impactIfStopped: 'تجميد التسويات، إيقاف محافظ الكباتن، توقف مدفوعات المتاجر',
+    lastModified: 'قبل أسبوع • Finance Team',
+    tone: 'warning',
+    filterGroup: 'active',
+  },
+  { code: 'AMN', name: 'الأمن والتحقق', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'KNZ', name: 'KNZ — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'ARB', name: 'ARB — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'MRF', name: 'MRF — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'KWD', name: 'KWD — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'SND', name: 'SND — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+  { code: 'ESF', name: 'ESF — خدمة قيد التعريف الرسمي', ...PLANNED_SERVICE_DEFAULTS },
+] as const;
+
+export type AppearanceCustomization = {
+  id: string;
+  app: string;
+  component: string;
+  defaultTone: 'brand' | 'warning';
+  proposedTone: 'brand' | 'warning';
+  contrastRatio: string;
+  owner: string;
+  description: string;
+};
+
+export const PREVIEW_APPEARANCE_ITEMS: readonly AppearanceCustomization[] = [
+  {
+    id: 'client-header',
+    app: 'تطبيق العميل (Client App)',
+    component: 'الهيدر الرئيسي (Main Header)',
+    defaultTone: 'brand',
+    proposedTone: 'warning',
+    contrastRatio: '4.8',
+    owner: 'Platform Design Team',
+    description: 'تعديل لون ومظهر الهيدر لتطبيق العميل الأساسي لتعزيز التباين أثناء العمليات المسائية.',
+  },
+  {
+    id: 'partner-header',
+    app: 'تطبيق الشريك (Partner App)',
+    component: 'الهيدر الفرعي (Sub Header)',
+    defaultTone: 'brand',
+    proposedTone: 'brand',
+    contrastRatio: '5.2',
+    owner: 'Platform Design Team',
+    description: 'تهيئة هوية وتنسيق تطبيق الشركاء والتأكد من مطابقة الخطوط والأوزان لنظام التوكنز.',
+  },
+] as const;
+
 export function selectDshControlPanelPlatformPreview() {
   return {
     appearance: PREVIEW_APPEARANCE_RECORDS,
@@ -1002,5 +1176,7 @@ export function selectDshControlPanelPlatformPreview() {
     recommendations: DSH_CROSS_SURFACE_JOURNEYS,
     geoZones: GEO_HEATMAP_ZONES,
     admins: MOCK_USERS,
+    rollouts: PREVIEW_ROLLOUT_RECORDS,
+    warnings: PREVIEW_SYSTEM_WARNINGS,
   };
 }

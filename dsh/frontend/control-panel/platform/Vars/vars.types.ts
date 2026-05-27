@@ -23,7 +23,7 @@ export type DshPlatformVarRecord = {
   scope: DshPlatformVarScope;
   risk: DshPlatformVarRisk;
   currentPreviewValue: string;
-  proposedPreviewValue?: string;
+  proposedPreviewValue?: string | null;
   effectSummary: string;
   auditRollbackHint: string;
   precedenceNote: string;

@@ -1,39 +1,52 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
+import { PREVIEW_APPEARANCE_ITEMS, type AppearanceCustomization } from '../../../data/platform.preview-data';
+import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformAppearanceWorkspace() {
   const { addAuditEvent } = useDemoPlatformState();
+  const [selectedId, setSelectedId] = React.useState<string>('client-header');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
-  const [activeTone, setActiveTone] = React.useState<'brand' | 'warning'>('brand');
+
+  const [activeTones, setActiveTones] = React.useState<Record<string, 'brand' | 'warning'>>({
+    'client-header': 'brand',
+    'partner-header': 'brand',
+  });
+
+  const selectedItem = PREVIEW_APPEARANCE_ITEMS.find((item) => item.id === selectedId) || PREVIEW_APPEARANCE_ITEMS[0];
+  const activeTone = activeTones[selectedItem.id] || 'brand';
 
   const handleConfirm = (action: string) => {
-    if (action === 'معاينة حيّة (Simulation)') {
-      setActiveTone('warning');
+    if (action === 'تفعيل المعاينة الحية') {
+      setActiveTones((prev) => ({
+        ...prev,
+        [selectedItem.id]: selectedItem.proposedTone,
+      }));
       addAuditEvent({
-        action: 'محاكاة مظهر: تطبيق العميل - الهيدر',
-        operator: 'Demo Admin',
+        action: `تحديث الهوية البصرية: ${selectedItem.component}`,
+        operator: 'Ahmed.Sharif',
         status: 'success',
         oldValue: 'Brand Primary',
         newValue: 'Brand Accent',
-        reason: 'محاكاة الألوان محلياً',
-        scope: 'تطبيق العميل',
-        impact: 'تغيير لون الهيدر إلى البرتقالي',
+        reason: 'تعديل وتطبيق اللون المعتمد للمظهر وتحديث الهوية',
+        scope: selectedItem.app,
+        impact: `تحديث لون المكون إلى البرتقالي لتعزيز تباين العمليات`,
         rollbackAvailable: true,
       });
     } else {
       addAuditEvent({
-        action: `إجراء المظهر: ${action}`,
-        operator: 'Demo Admin',
+        action: `إجراء المظهر (${selectedItem.component}): ${action}`,
+        operator: 'Ahmed.Sharif',
         status: 'warning',
         oldValue: activeTone,
-        newValue: 'Brand Accent',
-        reason: 'حفظ كمسودة تجريبية',
-        scope: 'تطبيق العميل',
-        impact: 'قيد الاعتماد',
+        newValue: selectedItem.proposedTone,
+        reason: 'حفظ وتأكيد التعديل الحالي للهوية البصرية',
+        scope: selectedItem.app,
+        impact: 'بانتظار المزامنة التلقائية مع قنوات التوزيع',
         rollbackAvailable: true,
       });
     }
@@ -42,94 +55,139 @@ export function DshPlatformAppearanceWorkspace() {
 
   return (
     <Box gap={4}>
-      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
-          <WebSignalCard
-            title="نظام الألوان المركزي"
-            value="مفعل ومقفل"
-            description="جميع الألوان مرتبطة بنظام الـ Tokens المركزي. لا يسمح بإدخال ألوان عشوائية أو Hex codes يدوية."
-            tone="brand"
-          />
-        </Box>
-        <Box style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
-          <WebSignalCard
-            title="فحص التباين (Contrast)"
-            value="ضمن المعاينة"
-            description="المعاينة الحالية لا تُظهر تعارضًا بصريًا بارزًا، ويثبت الاعتماد النهائي بالأدلة."
-            tone="neutral"
-          />
-        </Box>
-      </Box>
-
       <WebSectionCard
         title="تخصيص هوية التطبيقات"
         description="التحكم بألوان وهوية كل تطبيق من النظام المركزي. لا يتم استخدام هذه الواجهة للحملات التسويقية."
       >
-        <Box gap={4}>
-          <Box layoutDirection="row" gap={3}>
-            <Surface tone="default" border padding={2} radiusToken="md" style={{ flexGrow: 1 }}>
-              <Text role="caption" tone="muted">التطبيق المستهدف</Text>
-              <Text role="bodySm">تطبيق العميل (Client App)</Text>
-            </Surface>
-            <Surface tone="default" border padding={2} radiusToken="md" style={{ flexGrow: 1 }}>
-              <Text role="caption" tone="muted">المكون (Component)</Text>
-              <Text role="bodySm">الهيدر الرئيسي (Main Header)</Text>
-            </Surface>
-          </Box>
-
-          <Surface tone="raised" border padding={4} radiusToken="xl">
-            <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
-              <Box gap={2} style={{ flexGrow: 1 }}>
-                <Text role="titleMd">اللون الحالي (المطبق محلياً)</Text>
-                <Surface tone={activeTone} padding={4} radiusToken="md">
-                  <Text role="bodySm" tone="inverse" align="center">{activeTone === 'brand' ? 'Brand Primary (Deep Blue)' : 'Brand Accent (Orange)'}</Text>
-                </Surface>
+        <div className={styles.surfaceSplitGrid}>
+          {/* Left Column: UI Components list & KPIs */}
+          <div className={styles.surfaceListColumn}>
+            {/* KPI Cards Strip - moved inside left column */}
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', marginBottom: 12 }}>
+              <Box style={{ flexGrow: 1, flexBasis: 140, minWidth: 0 }}>
+                <WebSignalCard
+                  title="نظام الألوان المركزي"
+                  value="مفعل ومقفل"
+                  description="مرتبط بالـ Tokens."
+                  tone="brand"
+                />
               </Box>
-
-              <Box gap={2} style={{ flexGrow: 1 }}>
-                <Text role="titleMd">اللون المقترح</Text>
-                <Surface tone="warning" padding={4} radiusToken="md">
-                  <Text role="bodySm" tone="inverse" align="center">Brand Accent (Orange)</Text>
-                </Surface>
+              <Box style={{ flexGrow: 1, flexBasis: 140, minWidth: 0 }}>
+                <WebSignalCard
+                  title="فحص التباين"
+                  value="ضمن المعاينة"
+                  description="لا تعارض بصري بارز."
+                  tone="neutral"
+                />
               </Box>
+            </Box>
+            {PREVIEW_APPEARANCE_ITEMS.map((item) => {
+              const currentTone = activeTones[item.id] || 'brand';
+              const isActive = item.id === selectedId;
 
-              <Box gap={2} style={{ flexGrow: 1 }}>
-                <Text role="titleMd">معاينة قبل/بعد</Text>
-                <Box layoutDirection="row" gap={1}>
-                  <Surface tone={activeTone} padding={2} radiusToken="sm" style={{ flexGrow: 1 }}>
-                    <Text role="caption" tone="inverse" align="center">قبل</Text>
-                  </Surface>
-                  <Surface tone="warning" padding={2} radiusToken="sm" style={{ flexGrow: 1 }}>
-                    <Text role="caption" tone="inverse" align="center">بعد</Text>
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`${styles.surfaceInfoCard} ${styles.surfaceInfoCardButton} ${isActive ? styles.surfaceInfoCardActive : ''}`}
+                  onClick={() => {
+                    setSelectedId(item.id);
+                    setShowConfirm(null);
+                  }}
+                >
+                  <div className={styles.surfaceInfoCardTextBlock}>
+                    <div className={styles.surfaceInfoCardTitle}>{item.component}</div>
+                    <div className={styles.surfaceInfoCardDescription}>
+                      التطبيق: {item.app}
+                    </div>
+                  </div>
+                  <div className={styles.surfaceMetaWrap}>
+                    <span className={styles.surfaceMetaChip}>
+                      {currentTone === 'brand' ? 'Primary' : 'Accent'}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right Column: Previews and controls */}
+          <aside className={styles.surfaceInspectorPanel}>
+            <div className={styles.surfaceSectionHeader}>
+              <h4 className={styles.surfaceSectionTitle}>{selectedItem.component}</h4>
+              <p className={styles.surfaceSectionSubtitle}>{selectedItem.app}</p>
+            </div>
+
+            <div className={styles.surfaceInspectorMeta}>
+              <div className={styles.surfaceInspectorRow}>
+                <strong>معرف المكون</strong>
+                <span>{selectedItem.id}</span>
+              </div>
+              <div className={styles.surfaceInspectorRow}>
+                <strong>المالك الفني</strong>
+                <span>{selectedItem.owner}</span>
+              </div>
+              <div className={styles.surfaceInspectorRow}>
+                <strong>نسبة التباين</strong>
+                <span>Contrast Ratio: {selectedItem.contrastRatio}</span>
+              </div>
+              <div className={styles.surfaceInspectorRow}>
+                <strong>شرح المكون</strong>
+                <span>{selectedItem.description}</span>
+              </div>
+            </div>
+
+            <Box gap={2}>
+              <Text role="titleSm">معاينة وتحديث الألوان</Text>
+              <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
+                <Box gap={1} style={{ flexGrow: 1, minWidth: 100 }}>
+                  <Text role="caption" tone="muted">اللون النشط</Text>
+                  <Surface tone={activeTone} padding={2} radiusToken="md">
+                    <Text role="caption" tone="inverse" align="center">
+                      {activeTone === 'brand' ? 'Primary' : 'Accent'}
+                    </Text>
                   </Surface>
                 </Box>
-                <Text role="caption" tone="muted">حالة التباين: ممتاز (Contrast Ratio: 4.8)</Text>
+                <Box gap={1} style={{ flexGrow: 1, minWidth: 100 }}>
+                  <Text role="caption" tone="muted">اللون المقترح</Text>
+                  <Surface tone={selectedItem.proposedTone} padding={2} radiusToken="md">
+                    <Text role="caption" tone="inverse" align="center">
+                      {selectedItem.proposedTone === 'brand' ? 'Primary' : 'Accent'}
+                    </Text>
+                  </Surface>
+                </Box>
               </Box>
             </Box>
 
-            {!showConfirm ? (
-              <Box layoutDirection="row" gap={2} justify="flex-end" style={{ marginTop: 24 }}>
-                <Button variant="secondary" onClick={() => setShowConfirm('معاينة حيّة (Simulation)')}>معاينة حيّة (Simulation)</Button>
-                <Button variant="primary" onClick={() => setShowConfirm('طلب اعتماد')}>طلب اعتماد</Button>
-                <Button variant="secondary" onClick={() => setShowConfirm('تطبيق لاحقًا Demo')}>تطبيق لاحقًا Demo</Button>
-                <Button variant="danger" onClick={() => setShowConfirm('Rollback Demo')}>Rollback Demo</Button>
-              </Box>
-            ) : (
+            {showConfirm ? (
               <Surface tone="warning" border padding={3} radiusToken="md" style={{ marginTop: 24 }}>
                 <Box gap={2}>
-                  <Text role="titleSm">تأكيد الإجراء التجريبي: {showConfirm}</Text>
-                  <Text role="bodySm">محاكاة التغيير اللوني محلياً ولن تؤثر على الإنتاج الفعلي.</Text>
+                  <Text role="titleSm">تأكيد تعديل المظهر: {showConfirm}</Text>
+                  <Text role="bodySm">هل أنت متأكد من حفظ وتطبيق هذا التعديل البصري في النظام المركزي؟</Text>
                   <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-                    <Button variant="primary" onClick={() => handleConfirm(showConfirm)}>تأكيد المحاكاة</Button>
+                    <Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null}>تأكيد وحفظ التغيير</Button>
                     <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
                   </Box>
                 </Box>
               </Surface>
+            ) : (
+              <Box gap={2}>
+                <Text role="titleSm">أدوات التحكم البصري</Text>
+                <Box layoutDirection="row" gap={2}>
+                  <Button variant="secondary" onClick={() => setShowConfirm('تفعيل المعاينة الحية')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تفعيل المعاينة</Button>
+                  <Button variant="primary" onClick={() => setShowConfirm('طلب اعتماد التعديل')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>طلب الاعتماد</Button>
+                </Box>
+                <Box layoutDirection="row" gap={2}>
+                  <Button variant="secondary" onClick={() => setShowConfirm('تأكيد الطلب المجدول')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تأكيد المجدول</Button>
+                  <Button variant="danger" onClick={() => setShowConfirm('استعادة الهوية الأساسية')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>استعادة الهوية</Button>
+                </Box>
+              </Box>
             )}
-          </Surface>
-
-        </Box>
+          </aside>
+        </div>
       </WebSectionCard>
     </Box>
   );
 }
+
+export default DshPlatformAppearanceWorkspace;

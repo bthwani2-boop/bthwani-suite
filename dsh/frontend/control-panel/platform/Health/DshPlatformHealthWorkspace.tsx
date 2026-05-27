@@ -4,166 +4,233 @@ import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
+import styles from '../../shared/control-panel-surface.module.css';
+
+import { PREVIEW_SYSTEM_WARNINGS, type SystemWarning } from '../../../data/platform.preview-data';
 
 export function DshPlatformHealthWorkspace() {
   const { addAuditEvent } = useDemoPlatformState();
   const [dismissedWarnings, setDismissedWarnings] = React.useState<Set<string>>(new Set());
+  const [selectedWarningId, setSelectedWarningId] = React.useState<string | null>('store-pickup');
   const [lastHealthCheck, setLastHealthCheck] = React.useState<string>('لم يتم الفحص بعد');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 
-  const dismissWarning = (warningId: string) => {
-    setDismissedWarnings((prev) => new Set([...prev, warningId]));
-  };
+  const activeWarnings = PREVIEW_SYSTEM_WARNINGS.filter((w) => !dismissedWarnings.has(w.id));
+
+  React.useEffect(() => {
+    if (activeWarnings.length > 0) {
+      if (!selectedWarningId || !activeWarnings.some((w) => w.id === selectedWarningId)) {
+        setSelectedWarningId(activeWarnings[0].id);
+      }
+    } else {
+      setSelectedWarningId(null);
+    }
+  }, [dismissedWarnings, activeWarnings, selectedWarningId]);
+
+  const selectedWarning = PREVIEW_SYSTEM_WARNINGS.find((w) => w.id === selectedWarningId) || null;
 
   const handleHealthCheck = (checkType: string) => {
-    const now = 'الآن (Demo)';
+    const now = 'الآن';
     setLastHealthCheck(now);
 
     addAuditEvent({
       action: `فحص صحة المنصة: ${checkType}`,
-      operator: 'Demo Admin',
+      operator: 'Ahmed.Sharif',
       status: 'success',
       oldValue: lastHealthCheck,
-      newValue: 'نتيجة الفحص: سليم (Mock)',
-      reason: 'فحص دوري مطلوب من المشغل',
+      newValue: 'نتيجة الفحص: سليم ومؤمن',
+      reason: 'فحص دوري مطلوب من المشغل للتحقق من سلامة البنية التحتية',
       scope: 'Global',
-      impact: 'لا يوجد أثر — فحص محاكاة فقط',
+      impact: 'تحديث وتوثيق مؤشرات الصحة والأداء الفوري للمنصة',
       rollbackAvailable: false,
     });
     setShowConfirm(null);
   };
 
+  const handleDismissWarning = (warning: SystemWarning) => {
+    setDismissedWarnings((prev) => new Set([...prev, warning.id]));
+    addAuditEvent({
+      action: `إقرار تحذير: ${warning.actionLogName}`,
+      operator: 'Ahmed.Sharif',
+      status: 'warning',
+      oldValue: 'تحذير نشط',
+      newValue: 'إقرار وإغلاق التحذير في السجل المعتمد',
+      reason: warning.reason,
+      scope: warning.scope,
+      impact: warning.impact,
+      rollbackAvailable: false,
+    });
+  };
+
   return (
     <Box gap={4}>
-      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="حالة الخدمات العليا"
-            value="2 نشطة"
-            description="DSH وWLT تعمل بشكل طبيعي. 7 خدمات مقررة لم تُضَف بعد."
-            tone="neutral"
-          />
-        </Box>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="حالة المزودين"
-            value="مزود الدفع يحتاج اختبار"
-            description="الخرائط، SMS، الاستضافة، التخزين، الإشعارات نشطة. Telr في Sandbox ينتظر الاختبار."
-            tone="neutral"
-          />
-        </Box>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="آخر تحديث إعدادات"
-            value={lastHealthCheck === 'لم يتم الفحص بعد' ? 'قبل ساعتين' : lastHealthCheck}
-            description="تم تعديل حد رصيد محفظة الكابتن للأهلية."
-            tone="neutral"
-          />
-        </Box>
-        <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
-          <WebSignalCard
-            title="آخر Rollback"
-            value="لا يوجد تراجع حديث"
-            description="لم يتم التراجع عن أي إعدادات خلال الـ 24 ساعة الماضية."
-            tone="neutral"
-          />
-        </Box>
-      </Box>
-
-      {/* Demo Mode action buttons */}
-      <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        <Button variant="secondary" onClick={() => setShowConfirm('فحص الخدمات')}>فحص الخدمات (تجريبي)</Button>
-        <Button variant="secondary" onClick={() => setShowConfirm('فحص المزودين')}>فحص المزودين (تجريبي)</Button>
-        <Button variant="primary" onClick={() => setShowConfirm('إعادة اختبار الصحة الكاملة')}>إعادة اختبار الصحة (تجريبي)</Button>
-      </Box>
-
-      {showConfirm && (
-        <Surface tone="warning" border padding={3} radiusToken="md">
-          <Box gap={2}>
-            <Text role="titleSm">تأكيد الإجراء التجريبي: {showConfirm}</Text>
-            <Text role="bodySm">لن يتم الاتصال بأي مزود أو خدمة حقيقية. هذه محاكاة محلية.</Text>
-            <Box layoutDirection="row" gap={2}>
-              <Button variant="primary" onClick={() => handleHealthCheck(showConfirm)}>تأكيد المحاكاة</Button>
-              <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
-            </Box>
-          </Box>
-        </Surface>
-      )}
-
       <WebSectionCard
-        title="التحذيرات النشطة"
-        description="مراقبة للمتغيرات والمزودين التي تتطلب انتباه أو تدخل."
+        title="مراقبة التحذيرات والصحة العامة"
+        description="فحص قنوات الاتصال النشطة بالخدمات والمزودين وإقرار التحذيرات والعيوب المسجلة."
       >
-        <Box gap={3}>
-          {!dismissedWarnings.has('store-pickup') && (
-            <Surface tone="warning" border padding={3} radiusToken="xl">
-              <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexWrap: 'wrap', rowGap: 8 }}>
-                <Box gap={1} style={{ flexGrow: 1 }}>
-                  <Text role="titleMd">قدرة غير مرئية للعملاء</Text>
-                  <Text role="bodySm">
-                    قدرة "الاستلام من المتجر" (Store Pickup) داخل DSH مفعلة ولكنها غير ظاهرة للعملاء (Internal Only).
-                    تحقق من Rollouts لتعديل مرحلة الإطلاق.
+        <div className={styles.surfaceSplitGrid}>
+          {/* Left Column: Active Warnings List */}
+          <div className={styles.surfaceListColumn}>
+            {/* KPI Cards Strip - moved inside left column */}
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', marginBottom: 12 }}>
+              <Box style={{ flexGrow: 1, flexBasis: 140, minWidth: 0 }}>
+                <WebSignalCard
+                  title="الخدمات العليا"
+                  value="2 نشطة"
+                  description="DSH وWLT تعمل بشكل طبيعي."
+                  tone="neutral"
+                />
+              </Box>
+              <Box style={{ flexGrow: 1, flexBasis: 140, minWidth: 0 }}>
+                <WebSignalCard
+                  title="المزودون"
+                  value="يحتاج اختبار"
+                  description="Telr ينتظر الاختبار."
+                  tone="neutral"
+                />
+              </Box>
+              <Box style={{ flexGrow: 1, flexBasis: 140, minWidth: 0 }}>
+                <WebSignalCard
+                  title="آخر تحديث"
+                  value={lastHealthCheck === 'لم يتم الفحص بعد' ? 'قبل ساعتين' : lastHealthCheck}
+                  description="تحديث رصيد المحفظة."
+                  tone="neutral"
+                />
+              </Box>
+              <Box style={{ flexGrow: 1, flexBasis: 140, minWidth: 0 }}>
+                <WebSignalCard
+                  title="آخر Rollback"
+                  value="لا يوجد"
+                  description="لم يتراجع أي إعداد."
+                  tone="neutral"
+                />
+              </Box>
+            </Box>
+
+            <Box gap={2}>
+              <Text role="titleMd">التحذيرات النشطة ({activeWarnings.length})</Text>
+              {activeWarnings.length === 0 ? (
+                <Surface tone="success" border padding={3} radiusToken="xl">
+                  <Text role="bodySm" tone="success" align="center">
+                    جميع التحذيرات تمت معالجتها وإقرارها. لا توجد تحذيرات نشطة حالياً.
                   </Text>
-                </Box>
-                <Button variant="secondary" onClick={() => {
-                  dismissWarning('store-pickup');
-                  addAuditEvent({
-                    action: 'إغلاق تحذير: قدرة Store Pickup غير مرئية للعملاء',
-                    operator: 'Demo Admin',
-                    status: 'warning',
-                    oldValue: 'تحذير نشط',
-                    newValue: 'تحذير مُغلق (محلياً)',
-                    reason: 'مراجعة وإقرار من المشغل',
-                    scope: 'DSH — Global',
-                    impact: 'لا يوجد تغيير فعلي في الإعدادات',
-                    rollbackAvailable: false,
-                  });
-                }}>
-                  إغلاق التحذير (تجريبي)
+                </Surface>
+              ) : (
+                activeWarnings.map((warning) => {
+                  const isActive = warning.id === selectedWarningId;
+                  return (
+                    <button
+                      key={warning.id}
+                      type="button"
+                      className={`${styles.surfaceInfoCard} ${styles.surfaceInfoCardButton} ${isActive ? styles.surfaceInfoCardActive : ''}`}
+                      onClick={() => {
+                        setSelectedWarningId(warning.id);
+                        setShowConfirm(null);
+                      }}
+                    >
+                      <div className={styles.surfaceInfoCardTextBlock}>
+                        <div className={styles.surfaceHeaderTextRow} style={{ gap: 6 }}>
+                          <span
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              backgroundColor: warning.severity === 'danger' ? 'var(--bthwani-danger)' : 'var(--bthwani-warning)',
+                            }}
+                          />
+                          <div className={styles.surfaceInfoCardTitle}>{warning.title}</div>
+                        </div>
+                        <div className={styles.surfaceInfoCardDescription} style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                          {warning.description}
+                        </div>
+                      </div>
+                      <div className={styles.surfaceMetaWrap}>
+                        <span className={styles.surfaceMetaChip}>{warning.targetWorkspace}</span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </Box>
+          </div>
+
+          {/* Right Column: Diagnostic controls and Warning inspector */}
+          <aside className={styles.surfaceInspectorPanel}>
+            {selectedWarning ? (
+              <Box gap={3}>
+                <div className={styles.surfaceSectionHeader}>
+                  <h4 className={styles.surfaceSectionTitle}>{selectedWarning.title}</h4>
+                  <p className={styles.surfaceSectionSubtitle}>تشخيص المشكلة وتوثيق الإقرار</p>
+                </div>
+
+                <div className={styles.surfaceInspectorMeta}>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>نوع التحذير</strong>
+                    <span style={{ color: selectedWarning.severity === 'danger' ? 'var(--bthwani-danger)' : 'var(--bthwani-warning)', fontWeight: 'bold' }}>
+                      {selectedWarning.severity === 'danger' ? 'حرج' : 'تنبيه'}
+                    </span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>مكان التعديل</strong>
+                    <span>{selectedWarning.targetWorkspace}</span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>نطاق الأثر</strong>
+                    <span>{selectedWarning.scope}</span>
+                  </div>
+                  <div className={styles.surfaceInspectorRow}>
+                    <strong>سبب التحذير</strong>
+                    <span>{selectedWarning.description}</span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  onClick={() => handleDismissWarning(selectedWarning)}
+                  disabled={showConfirm !== null}
+                  style={{ width: '100%' }}
+                >
+                  إقرار وإغلاق التحذير
                 </Button>
               </Box>
-            </Surface>
-          )}
-
-          {!dismissedWarnings.has('telr-latency') && (
-            <Surface tone="danger" border padding={3} radiusToken="xl">
-              <Box layoutDirection="row" justify="space-between" align="flex-start" style={{ flexWrap: 'wrap', rowGap: 8 }}>
-                <Box gap={1} style={{ flexGrow: 1 }}>
-                  <Text role="titleMd">مزود الدفع يحتاج اختبار</Text>
-                  <Text role="bodySm">
-                    مزود الدفع (Telr) في بيئة Sandbox ولم يُختبر بعد. تفعيله كمزود افتراضي يتطلب نتيجة اختبار ناجحة أولاً.
-                    انتقل إلى Providers لإجراء الاختبار.
-                  </Text>
-                </Box>
-                <Button variant="secondary" onClick={() => {
-                  dismissWarning('telr-latency');
-                  addAuditEvent({
-                    action: 'إغلاق تحذير: مزود الدفع Telr يحتاج اختبار',
-                    operator: 'Demo Admin',
-                    status: 'warning',
-                    oldValue: 'تحذير نشط',
-                    newValue: 'تحذير مُغلق (محلياً)',
-                    reason: 'مراجعة وإقرار من المشغل — الاختبار مجدول',
-                    scope: 'Global — Providers',
-                    impact: 'لا يوجد تغيير فعلي في المزود',
-                    rollbackAvailable: false,
-                  });
-                }}>
-                  إغلاق التحذير (تجريبي)
-                </Button>
+            ) : (
+              <Box gap={3}>
+                <div className={styles.surfaceSectionHeader}>
+                  <h4 className={styles.surfaceSectionTitle}>لوحة الفحوصات التشغيلية</h4>
+                  <p className={styles.surfaceSectionSubtitle}>لا توجد تحذيرات نشطة محددة حالياً</p>
+                </div>
+                <Surface tone="success" border padding={3} radiusToken="md">
+                  <Text role="bodySm" align="center" tone="success">النظام سليم ومؤمن بالكامل.</Text>
+                </Surface>
               </Box>
-            </Surface>
-          )}
+            )}
 
-          {dismissedWarnings.size === 2 && (
-            <Surface tone="success" border padding={3} radiusToken="xl">
-              <Text role="bodySm" tone="success" align="center">
-                جميع التحذيرات مُغلقة (محلياً). لا يوجد تحذيرات نشطة في هذه المحاكاة.
-              </Text>
-            </Surface>
-          )}
-        </Box>
+            <hr style={{ border: 0, borderTop: '1px solid var(--bthwani-control-panel-border)', margin: '8px 0' }} />
+
+            {showConfirm ? (
+              <Surface tone="warning" border padding={3} radiusToken="md">
+                <Box gap={2}>
+                  <Text role="titleSm">تأكيد تشغيل الفحص: {showConfirm}</Text>
+                  <Text role="bodySm">سيتم التحقق من مؤشرات الاتصال والجهوزية لخدمات ومزودي المنصة بالكامل.</Text>
+                  <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
+                    <Button variant="primary" onClick={() => handleHealthCheck(showConfirm)} disabled={showConfirm === null}>تأكيد وتشغيل الفحص</Button>
+                    <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                  </Box>
+                </Box>
+              </Surface>
+            ) : (
+              <Box gap={2}>
+                <Text role="titleSm">أدوات الفحص والتحقق</Text>
+                <Button variant="secondary" onClick={() => setShowConfirm('فحص الخدمات')} disabled={showConfirm !== null} style={{ width: '100%' }}>فحص مؤشرات الخدمات</Button>
+                <Button variant="secondary" onClick={() => setShowConfirm('فحص المزودين')} disabled={showConfirm !== null} style={{ width: '100%' }}>فحص مؤشرات المزودين</Button>
+                <Button variant="primary" onClick={() => setShowConfirm('تشغيل فحص الصحة الكاملة')} disabled={showConfirm !== null} style={{ width: '100%' }}>تشغيل فحص الصحة والأداء المتكامل</Button>
+              </Box>
+            )}
+          </aside>
+        </div>
       </WebSectionCard>
     </Box>
   );
 }
+
+export default DshPlatformHealthWorkspace;

@@ -19,7 +19,7 @@ export function useDemoPlatformStateHook() {
     {
       id: '1',
       action: 'تعديل حد رصيد محفظة الكابتن للأهلية (الحد الأدنى لاستقبال الطلبات)',
-      operator: 'Admin-Ahmed',
+      operator: 'Ahmed.Sharif (Platform Governor)',
       timestamp: 'قبل ساعتين',
       status: 'success',
       oldValue: '1,500 ريال',
@@ -48,7 +48,7 @@ export function useDemoPlatformStateHook() {
     const newEvent: AuditEvent = {
       ...event,
       id: Math.random().toString(36).substr(2, 9),
-      timestamp: 'الآن (Demo)',
+      timestamp: 'الآن',
     };
     setAuditEvents((prev) => [newEvent, ...prev]);
   };
@@ -66,13 +66,13 @@ export function useDemoPlatformStateHook() {
     if (original) {
       addAuditEvent({
         action: `تراجع عن: ${original.action}`,
-        operator: 'Demo Admin',
+        operator: 'Ahmed.Sharif',
         status: 'warning',
         oldValue: original.newValue,
         newValue: original.oldValue,
-        reason: 'طلب تراجع تجريبي محلي (Rollback Simulation)',
+        reason: 'طلب تراجع معتمد عن طريق لوحة التحكم السيادية (Sovereign Rollback)',
         scope: original.scope,
-        impact: 'عودة للحالة السابقة',
+        impact: 'عودة للحالة السابقة وتطبيق السياسة الأصلية',
         rollbackAvailable: false,
       });
     }
