@@ -47,6 +47,7 @@ export type ControlPanelSurfaceHostProps = {
   operationsOverlayMode?: OperationsPanelId;
   financeWorkspace?: string;
   financePanel?: string;
+  administrationWorkspace?: string;
 };
 
 const allServiceTabId = 'all-services';
@@ -170,6 +171,7 @@ export function ControlPanelSurfaceHost({
   operationsOverlayMode,
   financeWorkspace,
   financePanel,
+  administrationWorkspace,
 }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
   const { direction } = useDirection();
@@ -451,14 +453,16 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {activeSectionId === 'administration' ? (
-          <ControlPanelDshAdministrationScreen />
+          <ControlPanelDshAdministrationScreen
+            initialWorkspace={administrationWorkspace as any}
+          />
         ) : null}
 
         {activeSectionId === 'support' ? (
           <ControlPanelDshSupportQueueScreen />
         ) : null}
 
-        {!hasPrimarySectionContent ? (
+        {!hasRenderableSection(activeSectionId) ? (
           <section className={styles.shellBoundaryState} role="status" aria-label="حالة حدود القسم">
             <span className={styles.shellBoundaryEyebrow}>حدود القسم</span>
             <h2 className={styles.shellBoundaryTitle}>{shellCopy.title}</h2>

@@ -605,10 +605,14 @@ function MakerCheckerPanel() {
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
-export function ControlPanelDshAdministrationScreen() {
+export type ControlPanelDshAdministrationScreenProps = {
+  initialWorkspace?: AdminWorkspaceId;
+};
+
+export function ControlPanelDshAdministrationScreen({ initialWorkspace = 'overview' }: ControlPanelDshAdministrationScreenProps = {}) {
   const administrationGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('administration'), []);
   const platformGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('platform'), []);
-  const [activeWorkspace, setActiveWorkspace] = React.useState<AdminWorkspaceId>('overview');
+  const [activeWorkspace, setActiveWorkspace] = React.useState<AdminWorkspaceId>(initialWorkspace);
   const activeTab = WORKSPACE_TABS.find((w) => w.id === activeWorkspace);
 
   return (
