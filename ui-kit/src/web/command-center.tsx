@@ -81,20 +81,20 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-strip__search-container {
-  flex: 0 1 280px;
-  min-width: 140px;
-  max-width: 280px;
+  flex: 0 0 280px;
   position: relative;
+  box-sizing: border-box;
 }
 
 .ui-web-command-strip__search-input {
+  box-sizing: border-box;
   width: 100%;
-  height: 34px;
-  padding: 0 34px;
-  border-radius: 8px;
+  height: 32px;
+  padding: 0 32px;
+  border-radius: 6px;
   border: 1px solid var(--bth-shell-field-border);
   background: var(--bth-shell-field);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--bth-shell-text);
   transition: all 0.2s ease;
 }
@@ -112,17 +112,17 @@ const webCommandCenterCss = `
   inset-inline-start: 10px;
   transform: translateY(-50%);
   color: var(--bth-shell-text-muted);
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .ui-web-command-strip__search-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 4px);
   inset-inline-start: 0;
   inset-inline-end: 0;
   background: var(--bth-shell-surface);
   border: 1px solid var(--bth-shell-line-strong);
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 8px 24px var(--bthwani-overlay, rgba(0, 0, 0, 0.15));
   z-index: 200;
   max-height: 280px;
@@ -176,6 +176,20 @@ const webCommandCenterCss = `
   gap: 8px;
 }
 
+.ui-web-command-strip__search-item-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-web-command-strip__search-item-icon {
+  font-size: 14px;
+  opacity: 0.8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .ui-web-command-strip__search-item-label {
   font-size: 13px;
   font-weight: 700;
@@ -219,15 +233,15 @@ const webCommandCenterCss = `
   gap: 2px;
   background: var(--bth-shell-surface-inset);
   padding: 2px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid var(--bth-shell-line);
   overflow-x: auto;
   white-space: nowrap;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  flex: 1 1 auto;
-  max-width: 480px;
-  justify-content: flex-start;
+  flex: 0 1 auto;
+  max-width: 580px;
+  box-sizing: border-box;
 }
 
 .ui-web-command-strip__filters::-webkit-scrollbar {
@@ -235,9 +249,9 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-strip__filter-chip {
-  height: 26px;
-  padding: 0 10px;
-  border-radius: 6px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 4px;
   border: none;
   background: transparent;
   color: var(--bth-shell-text-muted);
@@ -259,31 +273,32 @@ const webCommandCenterCss = `
 .ui-web-command-strip__filter-chip--active {
   background: var(--bth-shell-surface);
   color: var(--bth-shell-brand);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.08);
   font-weight: 800;
 }
 
 .ui-web-command-strip__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
   margin-inline-start: auto;
+  box-sizing: border-box;
 }
 
 .ui-web-command-strip__action-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--bth-shell-text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .ui-web-command-strip__action-btn:hover {
@@ -292,12 +307,12 @@ const webCommandCenterCss = `
 }
 
 .ui-web-command-strip__user-profile {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--bth-shell-brand), var(--bth-shell-accent));
-  border: 2px solid var(--bth-shell-surface);
-  box-shadow: 0 2px 6px var(--bthwani-overlay-soft);
+  border: 1px solid var(--bth-shell-surface);
+  box-shadow: 0 2px 4px var(--bthwani-overlay-soft);
   cursor: pointer;
 }
 
@@ -704,6 +719,7 @@ export type WebSearchItem = {
   description?: string;
   meta?: string;
   tone?: 'neutral' | 'success' | 'warning' | 'danger';
+  icon?: string;
 };
 
 export type WebCommandStripFilter = WebCommandCenterFilter;
@@ -808,6 +824,7 @@ export function WebCommandStrip({
       e.preventDefault();
       setIsFocused(false);
       onSearchChange?.('');
+      e.currentTarget.blur();
     }
   };
 
@@ -863,7 +880,12 @@ export function WebCommandStrip({
                     }}
                   >
                     <div className="ui-web-command-strip__search-item-header">
-                      <span className="ui-web-command-strip__search-item-label">{item.label}</span>
+                      <div className="ui-web-command-strip__search-item-cluster">
+                        {item.icon && (
+                          <span className="ui-web-command-strip__search-item-icon">{item.icon}</span>
+                        )}
+                        <span className="ui-web-command-strip__search-item-label">{item.label}</span>
+                      </div>
                       {item.meta && (
                         <span className="ui-web-command-strip__search-item-meta">{item.meta}</span>
                       )}

@@ -348,6 +348,7 @@
   overflow: hidden;
 }
 
+/* Shell-specific layout binding constraints. Visual behaviors are kept in CommandCenter components directly. */
 .controlPanelRailOverrides :global(.ui-web-command-center-root) {
   width: 100%;
   max-width: 100%;

@@ -108,6 +108,12 @@ export const ControlPanelUiGrammar = {
     requiresLocalIndex: true,
     requiresPrioritySorting: true,
     supportedTriggerKeys: ['ArrowDown', 'ArrowUp', 'Enter', 'Escape'] as const,
+    localSearchRules: {
+      type: 'local_command_search',
+      queryResults: 'summary_only',
+      onSelect: 'opens_details_or_navigates',
+      noBackendClaim: true,
+    },
   },
 } as const;
 

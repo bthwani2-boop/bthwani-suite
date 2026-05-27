@@ -242,6 +242,20 @@ export function ControlPanelSurfaceHost({
   const searchIndex = React.useMemo(() => {
     const items: Array<WebSearchItem & { searchTerms: string[]; type: "section" | "service" | "action"; key: string }> = [];
 
+    const iconMap: Record<string, string> = {
+      dashboard: "⌂",
+      operations: "◎",
+      finance: "¤",
+      "community-services": "◌",
+      support: "☏",
+      partners: "▣",
+      catalogs: "⌗",
+      marketing: "▤",
+      platform: "⚙",
+      administration: "⚙",
+      hr: "◐",
+    };
+
     // 1. Sections index
     primarySectionIds.forEach((sectionId) => {
       const sectionTitle = panelText.surfaceTitles[sectionId] || sectionId;
@@ -275,6 +289,7 @@ export function ControlPanelSurfaceHost({
         label: sectionTitle,
         description: sectionDesc,
         meta: "قسم لوحة التحكم",
+        icon: iconMap[sectionId] ?? "•",
         searchTerms,
       });
     });
@@ -308,6 +323,7 @@ export function ControlPanelSurfaceHost({
         description: serviceDesc,
         meta: `خدمة (${statusLabel})`,
         tone: service.placeholder ? "neutral" : "success",
+        icon: service.placeholder ? "◌" : "⚡",
         searchTerms,
       });
     });
@@ -321,6 +337,7 @@ export function ControlPanelSurfaceHost({
       description: "تحديث حالة لوحة التحكم وتصفير التنبيهات محلياً",
       meta: "إجراء الشل",
       tone: "warning",
+      icon: "↻",
       searchTerms: ["refresh", "reload", "تحديث", "اعاده تحميل"],
     });
 
@@ -332,7 +349,20 @@ export function ControlPanelSurfaceHost({
       description: "عرض التنبيهات وتصفير المؤشر",
       meta: "إجراء الشل",
       tone: "danger",
+      icon: "🔔",
       searchTerms: ["alerts", "notifications", "تنبيهات", "التنبيهات"],
+    });
+
+    items.push({
+      id: "action:dashboard",
+      type: "action",
+      key: "dashboard",
+      label: "لوحة القيادة الرئيسية",
+      description: "الرجوع إلى شاشة لوحة القيادة وتصفير الفلاتر",
+      meta: "إجراء الشل",
+      tone: "success",
+      icon: "⌂",
+      searchTerms: ["dashboard", "الرئيسية", "لوحة القيادة", "الرئيسيه", "لوحه القياده"],
     });
 
     items.push({
@@ -342,6 +372,7 @@ export function ControlPanelSurfaceHost({
       label: "تبديل المظهر",
       description: "تبديل مظهر الواجهة بين الفاتح والداكن الزجاجي",
       meta: "إجراء الشل",
+      icon: "◐",
       searchTerms: ["appearance", "theme", "dark", "light", "مظهر", "تغيير المظهر", "داكن", "فاتح"],
     });
 
@@ -567,6 +598,8 @@ export function ControlPanelSurfaceHost({
           handleRefreshClick();
         } else if (key === "alerts") {
           handleAlertClick();
+        } else if (key === "dashboard") {
+          handleBrandClick();
         } else if (key === "appearance") {
           const nextMode = mode === "lightPremium" ? "darkGlass" : "lightPremium";
           setMode(nextMode);
@@ -590,6 +623,7 @@ export function ControlPanelSurfaceHost({
       setMode,
       handleRefreshClick,
       handleAlertClick,
+      handleBrandClick,
     ],
   );
 
