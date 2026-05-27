@@ -364,6 +364,7 @@
     "dsh/frontend/data/stores.preview-data.ts",
     "dsh/frontend/data/products.preview-data.ts",
     "dsh/frontend/data/categories.preview-data.ts",
+    "dsh/frontend/data/marketing.preview-data.ts",
     "dsh/frontend/shared/dshStoreProductCardModel.ts",
     "dsh/frontend/app-client/contracts/dsh-home-types.ts",
     "dsh/frontend/app-client/hooks/useHomeFilterRail.tsx",

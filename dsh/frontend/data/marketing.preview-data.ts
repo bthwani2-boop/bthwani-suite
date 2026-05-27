@@ -782,7 +782,7 @@ const seededPromos: HomePromoRecord[] = [
     badgeText: '',
     ctaText: 'اشترك الآن!',
     accentColor: promoPalette.white,
-    imageUrl: 'dsh.mascot.robot.v1',
+    imageUrl: 'dsh.banner.home.promo-7.v1',
     thumbnail: '',
     targetType: 'subscription',
     targetId: 'entitlements-get',

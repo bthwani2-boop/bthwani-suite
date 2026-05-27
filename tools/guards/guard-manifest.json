@@ -896,6 +896,41 @@
                                                  ".cjs",
                                                  ".css"
                                              ]
-                   }
+                   },
+                   {
+                        "id":  "GUARD_DSH_MEDIA_MANIFEST",
+                        "file":  "tools/guards/guard-dsh-media-manifest.mjs",
+                        "ownerPolicy":  [
+                                            "governance/14_GUARDS_CATALOG.md",
+                                            "governance/22_DSH_GOLDEN_SLICE.md"
+                                        ],
+                        "purpose":  "verify DSH media keys are registered in manifest and resolvers, and consumer screens have no raw path leaks",
+                        "runners":  [
+                                        "governance"
+                                    ],
+                        "mode":  "blocking",
+                        "outputs":  [
+                                        "json",
+                                        "md"
+                                    ],
+                        "alwaysRun":  false,
+                        "selectionTier":  "service",
+                        "triggerAnyChange":  false,
+                        "triggerPaths":  [
+                                             "dsh/frontend/data/**",
+                                             "dsh/frontend/media-fixtures/**",
+                                             "dsh/frontend/shared/**",
+                                             "governance/14_GUARDS_CATALOG.md",
+                                             "governance/22_DSH_GOLDEN_SLICE.md"
+                                         ],
+                        "triggerExtensions":  [
+                                                  ".ts",
+                                                  ".tsx",
+                                                  ".js",
+                                                  ".jsx",
+                                                  ".tsv",
+                                                  ".md"
+                                              ]
+                    }
                ]
 }
