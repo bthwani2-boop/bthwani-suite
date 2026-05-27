@@ -13,7 +13,7 @@ import {
   CatalogMediaPolicy,
   CatalogApprovalStage,
 } from './catalog';
-import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
+import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
 import styles from '../shared/control-panel-surface.module.css';
 // Workspace imports — consumed via CatalogWorkspaceRouter (not rendered inline)
 import { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
@@ -158,7 +158,7 @@ function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label:
   );
 }
 
-const WATERMARK_URL = '/' + 'dsh' + '/media-' + 'fixtures/store_logos/logo.png';
+const WATERMARK_URL = getActualPublicMediaPath('dsh.brand.logo.v1');
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
@@ -177,52 +177,6 @@ function getPremiumEmoji(name: string, fallback?: string): string {
   if (n.includes('زيت')) return '🛢️';
   if (n.includes('بطارية')) return '🔋';
   return fallback || '📦';
-}
-
-/**
- * PREVIEW_DERIVED_ONLY: CENTRALIZED_DATA
- * Converts central mediaKeys to static public URLs for the Next.js control-panel UI.
- * This maps to files inside dsh/frontend/media-fixtures.
- * Next.js requires static URLs, unlike React Native's local asset imports resolved in resolve-dsh-image-source.ts.
- */
-function getActualPublicMediaPath(key: string): string {
-  const prefix = '/' + 'dsh' + '/media-' + 'fixtures/';
-  const ext = '.png';
-  if (key.startsWith('dsh.category.main.')) {
-    const id = key.substring('dsh.category.main.'.length).replace('.v1', '');
-    return prefix + 'categories/main/dsh-category-main-' + id + '-v1' + ext;
-  }
-  if (key.startsWith('dsh.category.sub.')) {
-    const id = key.substring('dsh.category.sub.'.length).replace('.v1', '');
-    return prefix + 'categories/sub/dsh-category-sub-' + id + '-v1' + ext;
-  }
-  if (key === 'dsh.product.apple.v1') return prefix + 'products/dsh-product-apple-v1' + ext;
-
-  if (key === 'dsh.product.milk.v1') return prefix + 'products/dsh-product-milk-v1' + ext;
-  if (key === 'dsh.product.bread.v1') return prefix + 'products/dsh-product-bread-v1' + ext;
-  if (key === 'dsh.product.chicken.v1') return prefix + 'products/dsh-product-chicken-v1' + ext;
-  if (key === 'dsh.product.pasta.v1') return prefix + 'products/dsh-product-pasta-v1' + ext;
-  if (key === 'dsh.product.choco.v1') return prefix + 'products/dsh-product-choco-v1' + ext;
-  if (key === 'dsh.product.croissant.v1') return prefix + 'products/dsh-product-croissant-v1' + ext;
-  if (key === 'dsh.product.roll.v1') return prefix + 'products/dsh-product-roll-v1' + ext;
-  if (key === 'dsh.product.salad.v1') return prefix + 'products/dsh-product-salad-v1' + ext;
-  if (key === 'dsh.product.yogurt.v1') return prefix + 'products/dsh-product-yogurt-v1' + ext;
-  if (key === 'dsh.product.lead-5.dates-box.v1') return prefix + 'products/dsh-product-lead-5-dates-box-v1' + ext;
-  if (key === 'dsh.store.hadda.cover.v1') return prefix + 'stores/dsh-store-hadda-cover-v1' + ext;
-  if (key === 'dsh.store.hittin.cover.v1') return prefix + 'stores/dsh-store-hittin-cover-v1' + ext;
-  if (key === 'dsh.store.malqa.cover.v1') return prefix + 'stores/dsh-store-malqa-cover-v1' + ext;
-  if (key === 'dsh.store.lead-5.cover.v1') return prefix + 'stores/dsh-store-lead-5-cover-v1' + ext;
-  if (key === 'dsh.store.hadda.logo.v1') return prefix + 'store_logos/dsh-store-hadda-logo-v1' + ext;
-  if (key === 'dsh.store.hittin.logo.v1') return prefix + 'store_logos/dsh-store-hittin-logo-v1' + ext;
-  if (key === 'dsh.store.malqa.logo.v1') return prefix + 'store_logos/dsh-store-malqa-logo-v1' + ext;
-  if (key === 'dsh.store.lead-5.logo.v1') return prefix + 'store_logos/dsh-store-lead-5-logo-v1' + ext;
-  if (key === 'dsh.brand.logo.v1') return prefix + 'store_logos/brand-logo' + ext;
-  if (key.startsWith('dsh.banner.home.')) {
-    // e.g. dsh.banner.home.promo-1.v1 → banners/dsh-banner-home-promo-1-v1.png
-    const slug = key.replace('dsh.banner.home.', '').replace('.v1', '');
-    return prefix + 'banners/dsh-banner-home-' + slug + '-v1' + ext;
-  }
-  return '';
 }
 
 function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = '' }: { src?: string, mediaKey?: string, fallback?: string, size?: number, productName?: string }) {

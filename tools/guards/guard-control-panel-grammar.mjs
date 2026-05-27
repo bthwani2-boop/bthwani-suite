@@ -16,7 +16,31 @@
 import fs from 'fs';
 import path from 'path';
 
-const repoRoot = process.cwd();
+function parseArgs(argv = process.argv.slice(2)) {
+  const args = { root: process.cwd(), mode: 'CHECK', jsonOut: '', mdOut: '' };
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    if (token === '--root') args.root = argv[++i];
+    else if (token === '--mode') args.mode = argv[++i];
+    else if (token === '--json-out') args.jsonOut = argv[++i];
+    else if (token === '--md-out') args.mdOut = argv[++i];
+    else if (token.startsWith('--root=')) args.root = token.slice('--root='.length);
+    else if (token.startsWith('--mode=')) args.mode = token.slice('--mode='.length);
+    else if (token.startsWith('--json-out=')) args.jsonOut = token.slice('--json-out='.length);
+    else if (token.startsWith('--md-out=')) args.mdOut = token.slice('--md-out='.length);
+  }
+  args.root = path.resolve(args.root);
+  return args;
+}
+
+const args = parseArgs();
+const repoRoot = args.root;
+
+function writeFile(filePath, content) {
+  if (!filePath) return;
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, content, 'utf8');
+}
 
 const SCAN_DIRS = [
   path.join(repoRoot, 'dsh', 'frontend', 'control-panel'),
@@ -158,16 +182,62 @@ for (const f of allFiles.filter((x) => x.endsWith('.module.css'))) {
 }
 
 // ─── Report ───────────────────────────────────────────────────────────────────
+const status = errors.length > 0 ? 'FAIL' : warnings.length > 0 ? 'WARN' : 'PASS';
+const severity = errors.length > 0 ? 'BLOCKING_ON_CHANGED_FILES' : 'REPORT';
+const output = {
+  guardId: 'GUARD_CONTROL_PANEL_GRAMMAR',
+  status,
+  severity,
+  mode: args.mode || 'CHECK',
+  summary: {
+    errorsCount: errors.length,
+    warningsCount: warnings.length,
+    findingsTotal: errors.length + warnings.length,
+  },
+  errors,
+  warnings,
+  failCount: errors.length,
+  warnCount: warnings.length,
+  infoCount: 0,
+};
+
+writeFile(args.jsonOut, JSON.stringify(output, null, 2));
+
+const mdLines = [
+  '# Control Panel UI Grammar Guard',
+  '',
+  `- status: ${output.status}`,
+  `- severity: ${output.severity}`,
+  `- mode: ${output.mode}`,
+  '',
+  '## Summary',
+  '',
+  `- Errors: ${output.summary.errorsCount}`,
+  `- Warnings: ${output.summary.warningsCount}`,
+  '',
+];
+if (errors.length) {
+  mdLines.push('## Errors', '');
+  for (const e of errors) mdLines.push(`- ERROR: ${e}`);
+  mdLines.push('');
+}
+if (warnings.length) {
+  mdLines.push('## Warnings', '');
+  for (const w of warnings) mdLines.push(`- WARN: ${w}`);
+  mdLines.push('');
+}
+writeFile(args.mdOut, mdLines.join('\n'));
+
 if (errors.length) {
   console.error('CONTROL_PANEL_GRAMMAR_GUARD: FAIL');
   for (const e of errors) console.error(`  ERROR: ${e}`);
   if (warnings.length) {
     for (const w of warnings) console.warn(`  WARN:  ${w}`);
   }
-  process.exit(1);
-}
-
-console.log('CONTROL_PANEL_GRAMMAR_GUARD: PASS');
-if (warnings.length) {
-  for (const w of warnings) console.warn(`  WARN:  ${w}`);
+  process.exitCode = 1;
+} else {
+  console.log('CONTROL_PANEL_GRAMMAR_GUARD: PASS');
+  if (warnings.length) {
+    for (const w of warnings) console.warn(`  WARN:  ${w}`);
+  }
 }
