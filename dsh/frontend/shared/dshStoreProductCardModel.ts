@@ -253,7 +253,7 @@ export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard):
     canonicalProductId: store.canonicalProductId,
     publishStage: store.publishStage,
     source: store.source,
-    logoImageUri: store.imageUri?.replace('cover', 'logo'),
+    logoImageUri: store.logoImageUri ?? 'dsh.store.lead-5.logo.v1',
   };
 }
 

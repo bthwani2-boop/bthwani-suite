@@ -369,7 +369,8 @@
     "dsh/frontend/app-client/contracts/dsh-home-types.ts",
     "dsh/frontend/app-client/hooks/useHomeFilterRail.tsx",
     "dsh/frontend/app-client/parts/home/HomeOrbitSections.tsx",
-    "dsh/frontend/shared/resolve-dsh-public-media-path.ts"
+    "dsh/frontend/shared/resolve-dsh-public-media-path.ts",
+    "dsh/frontend/shared/workflow.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

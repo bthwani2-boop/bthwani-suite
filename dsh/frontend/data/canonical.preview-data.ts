@@ -48,6 +48,8 @@ export const canonicalStoreCard: DshCanonicalStoreCard = {
   storefrontPhotoRef: 'الواجهة مكتملة',
   mediaKey: 'dsh.store.lead-5.cover.v1',
   imageUri: 'dsh.store.lead-5.cover.v1',
+  logoImageUri: 'dsh.store.lead-5.logo.v1',
+  logoImageUri: 'dsh.store.lead-5.logo.v1',
   statusLabel: 'مفتوح',
   statusTone: 'success',
   rating: 4.9,

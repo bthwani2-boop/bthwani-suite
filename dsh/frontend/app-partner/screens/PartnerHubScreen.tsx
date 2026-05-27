@@ -2012,11 +2012,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
       <MobileScrollView fill padding={0} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
         <StoreHero
           coverImage={resolveDshImageSource(activeCanonicalStore?.imageUri || 'dsh.store.malqa.cover.v1')}
-          logoImage={resolveDshImageSource(
-            activeCanonicalStore?.imageUri
-              ? activeCanonicalStore.imageUri.replace('cover', 'logo')
-              : 'dsh.store.malqa.logo.v1'
-          )}
+          logoImage={resolveDshImageSource(activeCanonicalStore?.logoImageUri || 'dsh.store.malqa.logo.v1')}
           name={resolvedStoreName}
           locationLabel={`${resolvedBranchLabel} · ${resolvedActiveZoneLabel}`}
           isOpen={isAvailable}
