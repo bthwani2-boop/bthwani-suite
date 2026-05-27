@@ -15,12 +15,16 @@ import {
 } from './catalog';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import styles from '../shared/control-panel-surface.module.css';
+// Workspace imports — consumed via CatalogWorkspaceRouter (not rendered inline)
 import { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
 import { CatalogIdentityGovernanceWorkspace } from './CatalogIdentityGovernanceWorkspace';
 import { CatalogDuplicateResolutionWorkspace, type DuplicatePair } from './CatalogDuplicateResolutionWorkspace';
 import { CatalogVisibilityPolicyWorkspace } from './CatalogVisibilityPolicyWorkspace';
 import { CatalogPartnerHandoffWorkspace } from './CatalogPartnerHandoffWorkspace';
 import { CatalogMediaGovernanceWorkspace } from './CatalogMediaGovernanceWorkspace';
+// Orchestration — workspace routing extracted from monolith
+import { CatalogWorkspaceRouter } from './CatalogWorkspaceRouter';
+import type { CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
 
 // Helper to recursively filter the Category & Classification Tree
 function filterCategoryTree(categories: CatalogMainCategory[], query: string): CatalogMainCategory[] {
@@ -72,15 +76,10 @@ type WorkspaceMode =
   | 'media-governance'
   | 'marketing-approvals';
 
-// Detail-on-open workspace overlays — decomposed from monolith tabs (UI_PREVIEW_ONLY)
-type ActiveWorkspaceOverlay =
-  | { type: 'item-detail'; productId: string }
-  | { type: 'duplicate-resolution' }
-  | { type: 'identity-governance' }
-  | { type: 'visibility-policy'; productId: string }
-  | { type: 'partner-handoff' }
-  | { type: 'media-governance' }
-  | null;
+// ActiveWorkspaceOverlay → replaced by CatalogWorkspaceState from catalog-workspace.types.ts
+// Kept as local alias for backward compatibility during transition.
+// router-ready: maps to future URL query params.
+// Not URL binding yet.
 
 type FilterType = 'all' | 'active' | 'review' | 'conflict' | 'master' | 'partner' | 'needs-link' | 'needs-image';
 
@@ -325,8 +324,24 @@ export function ControlPanelDshCatalogScreen({
   const [activeTab, setActiveTab] = useState<string>('catalog');
   const [activeSubTab, setActiveSubTab] = useState<string>('');
   const [showBulkOps, setShowBulkOps] = useState(false);
-  // Detail-on-open workspace overlay — null means no overlay shown
-  const [activeWorkspaceOverlay, setActiveWorkspaceOverlay] = useState<ActiveWorkspaceOverlay>(null);
+  // Controlled selection for bulk operations — required for CatalogBulkOperationsWorkspace
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  // Workspace state — router-ready, not URL binding yet
+  const [workspaceState, setWorkspaceState] = useState<CatalogWorkspaceState | null>(null);
+  // Preview proposals — replaces local runtime-like mutations
+  const [pendingProposals, setPendingProposals] = useState<CatalogPreviewProposal[]>([]);
+  // Detail-on-open workspace overlay — alias kept for gradual migration
+  // TODO: replace all setActiveWorkspaceOverlay calls with setWorkspaceState
+  const setActiveWorkspaceOverlay = (
+    overlay: { type: string; productId?: string } | null
+  ) => {
+    if (!overlay) { setWorkspaceState(null); return; }
+    setWorkspaceState({
+      workspace: overlay.type as CatalogWorkspaceState['workspace'],
+      productId: overlay.productId,
+      sourceSurface: 'catalogs',
+    });
+  };
   const [activeMainCategory, setActiveMainCategory] = useState<CatalogMainCategory | null>(null);
   const [activeSubCategory, setActiveSubCategory] = useState<CatalogSubCategory | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
@@ -1088,26 +1103,12 @@ export function ControlPanelDshCatalogScreen({
       actions.push(
         {
           id: 'ma-cat-add-item',
-          label: '➕ إضافة منتج جديد',
-          isActive: showProductModal && modalMode === 'add',
+          // UI_PREVIEW_ONLY: opens CatalogQuickEntryDraftWorkspace — no local product mutation
+          // Previous behavior (setProducts with prd-custom-${Date.now()}) replaced by proposal.
+          label: '➕ إدخال سريع (مسودة)',
+          isActive: workspaceState?.workspace === 'quick-entry-drafts',
           onAction: () => {
-            setModalMode('add');
-            setModalForm({
-              id: '',
-              name: '',
-              sku: `BTH-NEW-${Date.now().toString().slice(-4)}`,
-              gtin: '',
-              price: 15,
-              mainCat: activeMainCategory?.id || 'grocery',
-              subCat: activeSubCategory?.id || '',
-              mainClassif: activeMainClassifId || '',
-              subClassif: activeSubClassifId || '',
-              mediaPolicy: 'catalog-owned-media',
-              approvalStage: 'catalog-draft',
-              imageUri: '',
-              mediaKey: '',
-            });
-            setShowProductModal(true);
+            setWorkspaceState({ workspace: 'quick-entry-drafts', sourceSurface: 'catalogs', reason: 'add-product' });
           }
         },
         {
@@ -1225,17 +1226,14 @@ export function ControlPanelDshCatalogScreen({
       } else if (activeSubTab === 'barcode') {
         actions.push({
           id: 'ma-barcode-generate-gtin',
-          label: '🏷️ توليد باركود GTIN تلقائي',
-          isActive: false,
+          // UI_PREVIEW_ONLY: opens Identity Governance Workspace — no random GTIN generation
+          // Previous behavior (Math.random GTIN) removed — barcode reservation is an API operation.
+          // API boundary: POST /catalog/identity/barcode-reservation
+          label: '🏷️ حوكمة الهوية والباركود',
+          isActive: workspaceState?.workspace === 'identity-governance',
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && !p.gtin) {
-                return { ...p, gtin: `628${Math.floor(1000000000 + Math.random() * 9000000000)}`, conflictReason: undefined };
-              }
-              return p;
-            }));
-            setActionMessage('تم توليد أرقام باركود GTIN عشوائية لجميع المنتجات المحددة');
+            setWorkspaceState({ workspace: 'identity-governance', sourceSurface: 'catalogs', reason: 'barcode-governance' });
+            setActionMessage('افتح Identity Governance Workspace لإدارة GTIN/SKU — لا توليد عشوائي');
           }
         });
       }
@@ -2098,6 +2096,14 @@ export function ControlPanelDshCatalogScreen({
                 onPress={() => setShowBulkOps(!showBulkOps)}
                 style={{ paddingVertical: 2, paddingHorizontal: 8 }}
               />
+              {/* Open bulk workspace — disabled if no selection */}
+              <Button
+                label={`📋 تنفيذ مجمع${selectedProductIds.length > 0 ? ` (${selectedProductIds.length})` : ''}`}
+                tone={selectedProductIds.length > 0 ? 'brand' : 'secondary'}
+                size="sm"
+                onPress={() => setWorkspaceState({ workspace: 'bulk-operations', sourceSurface: 'catalogs' })}
+                style={{ paddingVertical: 2, paddingHorizontal: 8 }}
+              />
             </div>
           </div>
 
@@ -2728,7 +2734,19 @@ export function ControlPanelDshCatalogScreen({
                                       >
                                         {showBulkOps && (
                                           <td onClick={e => e.stopPropagation()} style={{ padding: '8px' }}>
-                                            <input type="checkbox" style={{ accentColor: theme.brandHeaderBackground }} />
+                                            {/* Controlled selection — required for CatalogBulkOperationsWorkspace */}
+                                            <input
+                                              type="checkbox"
+                                              checked={selectedProductIds.includes(p.id)}
+                                              onChange={(e) => {
+                                                if (e.target.checked) {
+                                                  setSelectedProductIds((prev) => [...prev, p.id]);
+                                                } else {
+                                                  setSelectedProductIds((prev) => prev.filter((id) => id !== p.id));
+                                                }
+                                              }}
+                                              style={{ accentColor: theme.brandHeaderBackground }}
+                                            />
                                           </td>
                                         )}
                                         <td style={{ padding: '8px' }}>
@@ -4094,103 +4112,68 @@ export function ControlPanelDshCatalogScreen({
         </div>
       )}
 
-      {/* ─── Workspace Overlay Layer — detail-on-open (UI_PREVIEW_ONLY) ──────────────
-          Each workspace renders as a positioned overlay panel.
-          Close via setActiveWorkspaceOverlay(null).
-          Owner: control-panel/catalogs. No backend/API. ────────────────────────── */}
-      {activeWorkspaceOverlay !== null && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', justifyContent: 'flex-end' }}>
-          {/* Backdrop */}
-          <div
-            onClick={() => setActiveWorkspaceOverlay(null)}
-            style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.32)' }}
-          />
+      {/* ─── Workspace Overlay Layer — CatalogWorkspaceRouter (UI_PREVIEW_ONLY) ─────
+          Extracted from monolith. All workspace rendering delegated to router.
+          router-ready: CatalogWorkspaceState maps to future URL query params.
+          Owner: control-panel/catalogs. No backend/API. ─────────────────────── */}
+      <CatalogWorkspaceRouter
+        workspaceState={workspaceState}
+        products={products}
+        selectedProductIds={selectedProductIds}
+        onClose={() => setWorkspaceState(null)}
+        onProposal={(proposal) => {
+          setPendingProposals((prev) => [proposal, ...prev.slice(0, 9)]);
+          setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
+        }}
+      />
 
-          {/* ── item-detail ──────────────────────────────────────────────────── */}
-          {activeWorkspaceOverlay.type === 'item-detail' && (() => {
-            const p = products.find((pr) => pr.id === activeWorkspaceOverlay.productId);
-            if (!p) return null;
-            return (
-              <CatalogItemDetailWorkspace
-                product={p}
-                onClose={() => setActiveWorkspaceOverlay(null)}
+      {/* ─── Pending Proposals Banner ────────────────────────────────────────────
+          Displays the last submitted preview proposal. No canonical data change.
+          All proposals require API binding before taking effect. ────────────── */}
+      {pendingProposals.length > 0 && pendingProposals[0] && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 300,
+            maxWidth: 560,
+            width: '90%',
+          }}
+        >
+          <Surface
+            tone="raised"
+            padding={3}
+            gap={2}
+            style={{
+              borderRadius: 12,
+              boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+              borderWidth: 2,
+              borderColor: pendingProposals[0].status === 'ready-for-api' ? theme.success : theme.warning,
+              borderStyle: 'solid',
+            }}
+          >
+            <Box layoutDirection="row" justify="space-between" align="center">
+              <Text role="caption" style={{ fontWeight: '800', fontSize: 13 }}>
+                📋 {pendingProposals[0].label}
+              </Text>
+              <Button
+                label="✕"
+                tone="secondary"
+                size="sm"
+                onPress={() => setPendingProposals((p) => p.slice(1))}
+                style={{ minWidth: 0, padding: 0, backgroundColor: 'transparent', borderWidth: 0 }}
               />
-            );
-          })()}
-
-          {/* ── duplicate-resolution ─────────────────────────────────────────── */}
-          {activeWorkspaceOverlay.type === 'duplicate-resolution' && (() => {
-            const conflictingProducts = products.filter((p) => !!p.conflictReason);
-            const pairs: DuplicatePair[] = conflictingProducts.map((p, idx) => ({
-              sourceId: p.id,
-              candidateId: conflictingProducts[(idx + 1) % Math.max(conflictingProducts.length, 1)]?.id ?? p.id,
-              reason: p.conflictReason || 'تشابه في الاسم أو SKU',
-              conflictFields: ['name', 'sku', ...(p.gtin ? ['gtin'] : []), ...(p.mediaKey ? ['mediaKey'] : [])],
-            }));
-            return (
-              <CatalogDuplicateResolutionWorkspace
-                duplicatePairs={pairs}
-                products={products}
-                onClose={() => setActiveWorkspaceOverlay(null)}
-              />
-            );
-          })()}
-
-          {/* ── identity-governance ──────────────────────────────────────────── */}
-          {activeWorkspaceOverlay.type === 'identity-governance' && (
-            <CatalogIdentityGovernanceWorkspace
-              items={products.map((p) => ({ id: p.id, name: p.name, sku: p.sku, gtin: p.gtin, barcode: p.barcode }))}
-              onClose={() => setActiveWorkspaceOverlay(null)}
-            />
-          )}
-
-          {/* ── visibility-policy ────────────────────────────────────────────── */}
-          {activeWorkspaceOverlay.type === 'visibility-policy' && (() => {
-            const p = products.find((pr) => pr.id === activeWorkspaceOverlay.productId)
-              ?? products[0];
-            if (!p) return null;
-            const approvalStageToStatus = (stage: string) => {
-              if (stage === 'client-visible') return 'client_visible' as const;
-              if (stage === 'catalog-adopted') return 'partner_active' as const;
-              if (stage === 'marketing-review') return 'catalog_ready' as const;
-              if (stage === 'partner-review') return 'catalog_not_ready' as const;
-              return 'submitted' as const;
-            };
-            return (
-              <CatalogVisibilityPolicyWorkspace
-                product={p}
-                partnerActivationStatus={approvalStageToStatus(p.approvalStage)}
-                onClose={() => setActiveWorkspaceOverlay(null)}
-              />
-            );
-          })()}
-
-          {/* ── partner-handoff ───────────────────────────────────────────────── */}
-          {activeWorkspaceOverlay.type === 'partner-handoff' && (
-            <CatalogPartnerHandoffWorkspace
-              partnerId="partner-preview-001"
-              partnerLabel="شريك النموذج الأولي"
-              activationStatus="catalog_not_ready"
-              incomingItems={products
-                .filter((p) => p.sourceSurface === 'partner' || p.approvalStage === 'partner-proposed' || p.approvalStage === 'partner-review')
-                .map((p) => ({ id: p.id, name: p.name, approvalStage: p.approvalStage }))}
-              onClose={() => setActiveWorkspaceOverlay(null)}
-            />
-          )}
-
-          {/* ── media-governance ─────────────────────────────────────────────── */}
-          {activeWorkspaceOverlay.type === 'media-governance' && (
-            <CatalogMediaGovernanceWorkspace
-              items={products.map((p) => ({
-                id: p.id,
-                name: p.name,
-                mediaKey: p.mediaKey,
-                mediaPolicy: p.mediaPolicy,
-                imageUri: p.imageUri,
-              }))}
-              onClose={() => setActiveWorkspaceOverlay(null)}
-            />
-          )}
+            </Box>
+            <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
+              {pendingProposals[0].note}
+            </Text>
+            <Text role="caption" style={{ fontSize: 10, fontWeight: '600', direction: 'ltr', unicodeBidi: 'embed' }}>
+              status: {pendingProposals[0].status} | owner: {pendingProposals[0].owner}
+              {pendingProposals[0].apiBoundary ? ` | API: ${pendingProposals[0].apiBoundary}` : ''}
+            </Text>
+          </Surface>
         </div>
       )}
     </div>

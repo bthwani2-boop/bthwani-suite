@@ -14,3 +14,11 @@ export type { DshPartnerRegistryRouteId, DshPartnerScreenRegistryItem } from './
 export { dshPartnerScreenRegistry } from './dsh-partner.screen-registry';
 export type { DshPartnerBindingContract, DshPartnerBindingContracts, DshPartnerSurfaceId } from './contracts/dsh-partner-binding.contracts';
 export { DSH_PARTNER_BINDING_CONTRACTS } from './contracts/dsh-partner-binding.contracts';
+
+// CAT-BRIDGE-01: Partner catalog readiness panel
+// Shows catalog stage, blocked reason, owner, and partner-editable fields.
+// UI_PREVIEW_ONLY: GET /partner/catalog-readiness — not yet bound
+// Partner CANNOT: approve, publish, set client-visible, modify product identity.
+// Partner CAN: stock, availability, price override, preparationNote, internalNote.
+export { PartnerCatalogReadinessPanel } from './parts/PartnerCatalogReadinessPanel';
+export type { PartnerCatalogReadinessPanelProps } from './parts/PartnerCatalogReadinessPanel';
