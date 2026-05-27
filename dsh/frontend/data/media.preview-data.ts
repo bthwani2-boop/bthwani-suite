@@ -1,3 +1,4 @@
+import { dshCategoryFixtures } from './categories.preview-data';
 import { getMarketingBannerItems, getMarketingVideoItems } from './marketing.preview-data';
 import { dshHomeGetFixtureProducts, dshHomeGetFixtureStores } from './stores.preview-data';
 
@@ -6,18 +7,55 @@ export const dshMediaPreviewDataContract = {
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
+  ownership: 'dsh/frontend/data',
+  mediaOwnership: 'dsh/frontend/media-fixtures',
 } as const;
+
+export type DshPreviewMediaOwnerKind =
+  | 'store'
+  | 'product'
+  | 'banner'
+  | 'video'
+  | 'category'
+  | 'subcategory'
+  | 'storeLogo'
+  | 'brand';
 
 export type DshPreviewMediaAsset = {
   id: string;
   ownerId: string;
-  ownerKind: 'store' | 'product' | 'banner' | 'video';
+  ownerKind: DshPreviewMediaOwnerKind;
   mediaKey: string;
 };
 
+function mediaAsset(
+  ownerKind: DshPreviewMediaOwnerKind,
+  ownerId: string,
+  mediaKey?: string | null,
+): DshPreviewMediaAsset[] {
+  if (!mediaKey || !mediaKey.startsWith('dsh.')) return [];
+  return [
+    {
+      id: `media-${ownerKind}-${ownerId}`,
+      ownerId,
+      ownerKind,
+      mediaKey,
+    },
+  ];
+}
+
+const categoryMediaAssets: DshPreviewMediaAsset[] = dshCategoryFixtures.flatMap((category) => [
+  ...mediaAsset('category', category.id, category.mediaKey ?? category.imageUri),
+  ...category.subcategories.flatMap((subcategory) =>
+    mediaAsset('subcategory', subcategory.id, subcategory.mediaKey ?? subcategory.imageUri),
+  ),
+]);
+
 export const dshPreviewMediaAssets: readonly DshPreviewMediaAsset[] = [
-  ...dshHomeGetFixtureStores.flatMap((store) => (store.mediaKey ? [{ id: `media-${store.id}`, ownerId: store.id, ownerKind: 'store' as const, mediaKey: store.mediaKey }] : [])),
-  ...dshHomeGetFixtureProducts.map((product) => ({ id: `media-${product.id}`, ownerId: product.id, ownerKind: 'product' as const, mediaKey: product.mediaKey })),
-  ...getMarketingBannerItems().flatMap((banner) => (banner.imageUrl ? [{ id: `media-${banner.id}`, ownerId: banner.id, ownerKind: 'banner' as const, mediaKey: banner.imageUrl }] : [])),
-  ...getMarketingVideoItems().map((video) => ({ id: `media-${video.id}`, ownerId: video.id, ownerKind: 'video' as const, mediaKey: video.thumbnailUrl })),
+  ...dshHomeGetFixtureStores.flatMap((store) => mediaAsset('store', store.id, store.mediaKey)),
+  ...dshHomeGetFixtureProducts.flatMap((product) => mediaAsset('product', product.id, product.mediaKey)),
+  ...categoryMediaAssets,
+  ...getMarketingBannerItems().flatMap((banner) => mediaAsset('banner', banner.id, banner.imageUrl)),
+  ...getMarketingVideoItems().flatMap((video) => mediaAsset('video', video.id, video.thumbnailUrl)),
+  ...mediaAsset('brand', 'dsh-brand', 'dsh.brand.logo.v1'),
 ];

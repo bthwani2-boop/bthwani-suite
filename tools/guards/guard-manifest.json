@@ -931,6 +931,41 @@
                                                   ".tsv",
                                                   ".md"
                                               ]
+                    },
+                    {
+                        "id":  "GUARD_DSH_SHARED_FOUNDATIONS_FINAL",
+                        "file":  "tools/guards/guard-dsh-shared-foundations-final.mjs",
+                        "ownerPolicy":  [
+                                            "governance/14_GUARDS_CATALOG.md",
+                                            "governance/22_DSH_GOLDEN_SLICE.md"
+                                        ],
+                        "purpose":  "verify DSH media keys, resolver coverage, raw path leakage, and scattered preview stores under dsh/frontend",
+                        "runners":  [
+                                        "governance"
+                                    ],
+                        "mode":  "blocking",
+                        "outputs":  [
+                                        "json",
+                                        "md"
+                                    ],
+                        "alwaysRun":  false,
+                        "selectionTier":  "service",
+                        "triggerAnyChange":  false,
+                        "triggerPaths":  [
+                                             "dsh/frontend/data/**",
+                                             "dsh/frontend/media-fixtures/**",
+                                             "dsh/frontend/shared/**",
+                                             "governance/14_GUARDS_CATALOG.md",
+                                             "governance/22_DSH_GOLDEN_SLICE.md"
+                                         ],
+                        "triggerExtensions":  [
+                                                  ".ts",
+                                                  ".tsx",
+                                                  ".js",
+                                                  ".jsx",
+                                                  ".tsv",
+                                                  ".md"
+                                              ]
                     }
                ]
 }
