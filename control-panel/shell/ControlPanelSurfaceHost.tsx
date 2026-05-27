@@ -13,6 +13,7 @@ import {
   ControlPanelDshPlatformScreen,
   ControlPanelDshAdministrationScreen,
 } from '../../dsh/frontend/control-panel';
+import { ControlPanelHrScreen } from './ControlPanelHrScreen';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDirection, useUiText, type BThwaniAppearanceMode } from '@bthwani/ui-kit';
@@ -47,7 +48,6 @@ export type ControlPanelSurfaceHostProps = {
   operationsOverlayMode?: OperationsPanelId;
   financeWorkspace?: string;
   financePanel?: string;
-  administrationWorkspace?: string;
 };
 
 const allServiceTabId = 'all-services';
@@ -69,6 +69,7 @@ const renderedSectionIds = [
   'marketing',
   'platform',
   'administration',
+  'hr',
 ] as const satisfies readonly ControlPanelSectionId[];
 
 function hasRenderableSection(sectionId: ControlPanelSectionId) {
@@ -171,7 +172,6 @@ export function ControlPanelSurfaceHost({
   operationsOverlayMode,
   financeWorkspace,
   financePanel,
-  administrationWorkspace,
 }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
   const { direction } = useDirection();
@@ -453,9 +453,11 @@ export function ControlPanelSurfaceHost({
         ) : null}
 
         {activeSectionId === 'administration' ? (
-          <ControlPanelDshAdministrationScreen
-            initialWorkspace={administrationWorkspace as any}
-          />
+          <ControlPanelDshAdministrationScreen />
+        ) : null}
+
+        {activeSectionId === 'hr' ? (
+          <ControlPanelHrScreen />
         ) : null}
 
         {activeSectionId === 'support' ? (
