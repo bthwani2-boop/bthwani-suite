@@ -207,24 +207,11 @@ export function ControlPanelSurfaceHost({
 
     return allItems.filter((item) => {
       const sectionId = item.id.slice(1) as ControlPanelSectionId;
-      return serviceMeta.sections.includes(sectionId);
+      return sectionId === activeSectionId || serviceMeta.sections.includes(sectionId);
     });
-  }, [activeSectionHref, isAllFilterActive, panelText, selectedServiceId]);
+  }, [activeSectionHref, isAllFilterActive, panelText, selectedServiceId, activeSectionId]);
 
-  React.useEffect(() => {
-    if (isAllFilterActive) return;
-    const serviceMeta = controlPanelRuntimeData.services.find((s) => s.id === selectedServiceId);
-    if (!serviceMeta) return;
 
-    if (!serviceMeta.sections.includes(activeSectionId)) {
-      const firstAvailableSection = serviceMeta.sections[0];
-      if (firstAvailableSection) {
-        const nextHref = `/${firstAvailableSection}` as PrimarySectionHref;
-        setActiveSectionHref(nextHref);
-        router.push(sectionRouteMap[firstAvailableSection as ControlPanelSectionId]);
-      }
-    }
-  }, [selectedServiceId, isAllFilterActive, activeSectionId, router]);
 
   React.useEffect(() => {
     if (!isAppearanceMenuOpen) {
@@ -380,10 +367,14 @@ export function ControlPanelSurfaceHost({
         const nextLabel = serviceId === allServiceTabId
           ? panelText.filters.allServices
           : getServiceLabel(uiText, serviceId);
+        const serviceMeta = serviceId === allServiceTabId ? undefined : controlPanelRuntimeData.services.find(s => s.id === serviceId);
+        const isSectionOutsideFilter = serviceMeta && !serviceMeta.sections.includes(activeSectionId);
         setCommandStatus({
           kind: 'filter',
           label: 'فلتر الخدمات',
-          description: `تم حصر rail على ${nextLabel} مع الحفاظ على section ثابت وعدم إنشاء route إضافي.`,
+          description: isSectionOutsideFilter
+            ? 'القسم الحالي خارج فلتر الخدمة، بقي القسم ثابتًا ويمكن الانتقال يدويًا من rail.'
+            : `تم حصر rail على ${nextLabel} مع الحفاظ على section ثابت وعدم إنشاء route إضافي.`,
         });
       }}
       onRailItemSelect={(itemId) => {
