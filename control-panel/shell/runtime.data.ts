@@ -43,7 +43,6 @@ const controlPanelSections: ControlPanelRuntimeSection[] = [
   { id: 'platform', serviceIds: ['dsh'] },
   { id: 'administration', serviceIds: ['dsh'] },
   { id: 'hr', serviceIds: ['dsh'] },
-  { id: 'community-services', serviceIds: [] },
 ];
 
 const controlPanelMissions: ControlPanelRuntimeMission[] = [

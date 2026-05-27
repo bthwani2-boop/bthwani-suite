@@ -849,3 +849,145 @@
     justify-items: start;
   }
 }
+
+.shellContractStrip {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  border-radius: 14px;
+  background: var(--bthwani-control-panel-surface);
+  color: var(--bthwani-control-panel-text);
+}
+
+.shellContractBreadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.shellContractBreadcrumbs strong {
+  color: var(--bthwani-control-panel-brand);
+  font-weight: 900;
+}
+
+.shellContractStatusCluster {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.shellContractStatusPill,
+.shellContractMeta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.shellContractStatusPill {
+  background: var(--bthwani-brand-surface);
+  color: var(--bthwani-brand);
+}
+
+.shellContractStatusPillBlocked {
+  background: var(--bthwani-warning-surface);
+  color: var(--bthwani-warning);
+}
+
+.shellContractStatusPillAlert {
+  background: var(--bthwani-success-surface);
+  color: var(--bthwani-success);
+}
+
+.shellContractStatusText {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shellContractMeta {
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.shellBoundaryState {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  justify-items: start;
+  min-height: 280px;
+  padding: 22px;
+  border: 1px dashed var(--bthwani-control-panel-border-strong);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--bthwani-control-panel-surface) 0%, var(--bthwani-control-panel-surface-raised) 100%);
+}
+
+.shellBoundaryEyebrow {
+  color: var(--bthwani-brand);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.shellBoundaryTitle {
+  margin: 0;
+  color: var(--bthwani-control-panel-brand);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.shellBoundaryDescription {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.8;
+}
+
+.shellBoundaryAction {
+  appearance: none;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--bthwani-control-panel-border-strong);
+  border-radius: 12px;
+  background: var(--bthwani-control-panel-brand);
+  color: var(--bthwani-brand-contrast);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 1100px) {
+  .shellContractStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .shellContractStatusCluster {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .shellContractStatusText {
+    white-space: normal;
+  }
+}
