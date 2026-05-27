@@ -13,7 +13,7 @@ import {
   ControlPanelDshPlatformScreen,
   ControlPanelDshAdministrationScreen,
 } from '../../dsh/frontend/control-panel';
-import { ControlPanelHrScreen } from './ControlPanelHrScreen';
+import { ControlPanelHrScreen } from '../../dsh/frontend/control-panel/hr/ControlPanelHrScreen';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useDirection, useUiText, type BThwaniAppearanceMode } from '@bthwani/ui-kit';
