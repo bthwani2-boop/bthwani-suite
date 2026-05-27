@@ -145,7 +145,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
         borderLeftWidth: 1,
         borderLeftColor: theme.line,
         zIndex: 100,
-        overflow: 'auto',
+        overflow: 'hidden',
       }}
     >
       {/* Header */}
@@ -173,7 +173,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
               backgroundColor: theme.surface, borderWidth: 1,
               borderColor: theme.line, alignItems: 'center', justifyContent: 'center',
             }}>
-              <Text role="body" style={{ fontSize: 28 }}>{product.emojiFallback || '📦'}</Text>
+              <Text role="bodyMd" style={{ fontSize: 28 }}>{product.emojiFallback || '📦'}</Text>
             </Box>
           ) : null}
           <InfoRow label="الاسم" value={product.name} />

@@ -182,7 +182,7 @@ export function CatalogPartnerHandoffWorkspace({
         borderLeftWidth: 1,
         borderLeftColor: theme.line,
         zIndex: 100,
-        overflow: 'auto',
+        overflow: 'hidden',
       }}
     >
       <WebCompactSurfaceHeader
@@ -254,7 +254,7 @@ export function CatalogPartnerHandoffWorkspace({
               {pendingItems.map((item) => (
                 <Box key={item.id} layoutDirection="row" gap={8} style={{ paddingVertical: 3, alignItems: 'center' }}>
                   <Text role="caption" style={{ color: theme.text, flexShrink: 1 }}>{item.name}</Text>
-                  <Box style={{ backgroundColor: theme.warningOrange ?? theme.surface, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
+                  <Box style={{ backgroundColor: theme.warningSurface ?? theme.surface, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
                     <Text role="caption" style={{ fontSize: 10, color: theme.text }}>
                       {approvalStageLabel[item.approvalStage as CatalogApprovalStage] || item.approvalStage}
                     </Text>

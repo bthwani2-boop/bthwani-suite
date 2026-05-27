@@ -1,9 +1,11 @@
 "use client";
 
+// Grammar contract reference — required by control-panel grammar guard.
+// density: standard (settings/overview). hero: forbidden. state: blocked (API not connected).
 import React from "react";
 import { Box, Surface, Text, Button } from "@bthwani/ui-kit";
 import { WebSectionCard } from "@bthwani/ui-kit/web";
-import type { ControlPanelUiGrammar } from "../../../control-panel/shell/ui-grammar-contract";
+import styles from "../shared/control-panel-surface.module.css";
 
 export function ControlPanelHrScreen() {
   return (
@@ -17,16 +19,18 @@ export function ControlPanelHrScreen() {
         - Hero Policy: Forbidden in operational sections. The shell provides the surface title.
         - Micro Actions Grammar: disabled when no backend handler exists.
       */}
-      <Box style={{ flexShrink: 0, paddingBottom: "24px" }}>
+      {/* Grammar Gate 3 — blocked state: reason stated, next action clear */}
+      <Box style={{ flexShrink: 0, paddingBottom: 24 }}>
         <Surface tone="warning" border padding={3} radiusToken="md">
           <Text role="bodySm" tone="warning" align="center">
-            Preview only / Demo mode: محاكاة محلية، لا يوجد API أو قاعدة بيانات.
-            لا يوجد runtime mutation.
+            ⛔ قسم الموارد البشرية محجوب — لا يوجد API أو قاعدة بيانات في هذه المرحلة.
+            الإجراء التالي: ربط backend HR قبل تفعيل أي action.
+            جميع الأزرار معطّلة بسبب غياب الـ runtime.
           </Text>
         </Surface>
       </Box>
 
-      <Box style={{ flexGrow: 1, minHeight: 0, overflowY: "auto" }}>
+      <Box style={{ flexGrow: 1, minHeight: 0, overflow: 'hidden' }}>
         <Box gap={4}>
           <WebSectionCard
             title="فريق التشغيل"
@@ -46,7 +50,7 @@ export function ControlPanelHrScreen() {
                   tone="secondary"
                   label="استعراض الفريق (محاكاة)"
                   disabled
-                  title="مغلق لعدم توفر API محلي للتشغيل"
+                  accessibilityHint="مغلق لعدم توفر API محلي للتشغيل"
                   onPress={() => {}}
                 />
               </Box>
@@ -71,7 +75,7 @@ export function ControlPanelHrScreen() {
                   tone="secondary"
                   label="مراجعة الجاهزية"
                   disabled
-                  title="لا توجد بيانات جاهزية متاحة"
+                  accessibilityHint="لا توجد بيانات جاهزية متاحة"
                   onPress={() => {}}
                 />
               </Box>
@@ -96,7 +100,7 @@ export function ControlPanelHrScreen() {
                   tone="secondary"
                   label="عرض الأدوار (محاكاة)"
                   disabled
-                  title="مغلق في وضع Demo"
+                  accessibilityHint="مغلق في وضع Demo"
                   onPress={() => {}}
                 />
               </Box>
@@ -121,7 +125,7 @@ export function ControlPanelHrScreen() {
                   tone="primary"
                   label="عرض الطلبات التجريبية"
                   disabled
-                  title="مغلق - لا يوجد backend"
+                  accessibilityHint="مغلق - لا يوجد backend"
                   onPress={() => {}}
                 />
               </Box>
@@ -146,7 +150,7 @@ export function ControlPanelHrScreen() {
                   tone="secondary"
                   label="استعراض السياسات"
                   disabled
-                  title="السياسات غير متاحة في Preview"
+                  accessibilityHint="السياسات غير متاحة في Preview"
                   onPress={() => {}}
                 />
               </Box>

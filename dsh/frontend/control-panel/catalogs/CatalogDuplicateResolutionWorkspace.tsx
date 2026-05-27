@@ -91,7 +91,7 @@ function ProductCard({
   return (
     <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12, flex: 1 }} gap={2}>
       <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground, fontSize: 11 }}>{label}</Text>
-      <Text role="body" style={{ fontWeight: '700' }}>{product.name}</Text>
+      <Text role="bodyMd" style={{ fontWeight: '700' }}>{product.name}</Text>
       <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>SKU: {product.sku}</Text>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>GTIN: {product.gtin || '—'}</Text>
@@ -116,7 +116,7 @@ function MergePreviewCard({ merged }: { merged: Partial<CatalogProductMaster> })
       <Text role="caption" style={{ fontWeight: '800', color: theme.success, fontSize: 11 }}>
         معاينة الدمج (محلية فقط)
       </Text>
-      <Text role="body" style={{ fontWeight: '700' }}>{merged.name}</Text>
+      <Text role="bodyMd" style={{ fontWeight: '700' }}>{merged.name}</Text>
       <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>SKU: {merged.sku}</Text>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>GTIN: {merged.gtin || '—'}</Text>
@@ -228,7 +228,7 @@ export function CatalogDuplicateResolutionWorkspace({
         borderLeftWidth: 1,
         borderLeftColor: theme.line,
         zIndex: 100,
-        overflow: 'auto',
+        overflow: 'hidden',
       }}
     >
       <WebCompactSurfaceHeader
@@ -253,7 +253,7 @@ export function CatalogDuplicateResolutionWorkspace({
             <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>{duplicatePairs.length}</Text>
           </Box>
           <Box style={{
-            backgroundColor: duplicatePairs.some((p) => pairStates[pairKey(p)]?.resolution == null) ? theme.warningOrange ?? theme.surface : theme.successSurface,
+            backgroundColor: duplicatePairs.some((p) => pairStates[pairKey(p)]?.resolution == null) ? theme.warningSurface ?? theme.surface : theme.successSurface,
             borderRadius: 8, padding: 10, flex: 1
           }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>تمت معالجته</Text>
@@ -265,7 +265,7 @@ export function CatalogDuplicateResolutionWorkspace({
 
         {duplicatePairs.length === 0 && (
           <Box style={{ backgroundColor: theme.successSurface, borderRadius: 8, padding: 12 }}>
-            <Text role="body" style={{ color: theme.success, fontWeight: '700' }}>لا توجد تكرارات مكتشفة ✓</Text>
+            <Text role="bodyMd" style={{ color: theme.success, fontWeight: '700' }}>لا توجد تكرارات مكتشفة ✓</Text>
           </Box>
         )}
 

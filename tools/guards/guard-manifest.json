@@ -1,555 +1,901 @@
-{
-  "version": "2.0.0",
-  "owner": "tools/guards",
-  "policy_source_rule": "governance/ and .agents/ own policy text; tools/guards executes verification only",
-  "guards": [
-    {
-      "id": "GUARD_GOVERNANCE_BOUNDARIES",
-      "file": "tools/guards/guard-governance-boundaries.mjs",
-      "config": "tools/guards/guard-governance-boundaries.config.json",
-      "ownerPolicy": [
-        "governance/03_REPO_BOUNDARIES.md",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "purpose": "validate tools/guards file/config/manifest alignment and block legacy refs inside active guard sources",
-      "runners": ["governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": true,
-      "selectionTier": "core",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "tools/guards/**",
-        "governance/03_REPO_BOUNDARIES.md",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "triggerExtensions": [".mjs", ".json", ".md", ".ps1", ".yml", ".yaml"]
-    },
-    {
-      "id": "GUARD_AGENT_GLOBAL_AUTHORITY",
-      "file": "tools/guards/guard-agent-global-authority.mjs",
-      "config": "tools/guards/guard-agent-global-authority.config.json",
-      "ownerPolicy": [
-        "AGENTS.md",
-        ".agents/AUTHORITY_BOUNDARY.md",
-        ".agents/UPDATE_POLICY.md"
-      ],
-      "purpose": "validate .agents authority roots, required files, legacy-agent-root retirement, and adapter hygiene",
-      "runners": ["agent", "governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "agent",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        ".agents/**",
-        "AGENTS.md",
-        "tools/guards/guard-agent-global-authority.mjs",
-        "tools/guards/RUN_AGENT_GUARDS.ps1"
-      ],
-      "triggerExtensions": [".md", ".json", ".mjs", ".ps1"]
-    },
-    {
-      "id": "GUARD_UI_ARCHITECTURE_BOUNDARY",
-      "file": "tools/guards/guard-ui-architecture-boundary.mjs",
-      "config": "tools/guards/guard-ui-architecture-boundary.config.json",
-      "ownerPolicy": [
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "purpose": "block direct Tamagui imports outside ui-kit and block deep ui-kit source imports",
-      "runners": ["governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "ui",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "app-client/runtime/**",
-        "app-partner/runtime/**",
-        "app-captain/runtime/**",
-        "app-field/runtime/**",
-        "control-panel/runtime/**",
-        "webapp/runtime/**",
-        "website/runtime/**",
-        "ui-kit/**",
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]
-    },
-    {
-      "id": "GUARD_DESIGN_TOKEN_DRIFT",
-      "file": "tools/guards/guard-design-token-drift.mjs",
-      "ownerPolicy": [
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "purpose": "report hardcoded non-brand hex colors outside ui-kit",
-      "runners": ["governance"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "ui",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "app-client/runtime/**",
-        "app-partner/runtime/**",
-        "app-captain/runtime/**",
-        "app-field/runtime/**",
-        "control-panel/runtime/**",
-        "webapp/runtime/**",
-        "website/runtime/**",
-        "ui-kit/**",
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".css", ".scss", ".mdx"]
-    },
-    {
-      "id": "GUARD_UI_KIT_CENTRAL_DESIGN_OWNERSHIP",
-      "file": "tools/guards/guard-ui-kit-central-design-ownership.mjs",
-      "config": "tools/guards/guard-ui-kit-central-design-ownership.config.json",
-      "ownerPolicy": [
-        "governance/08_UI_KIT_AND_BRAND.md",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "purpose": "report reusable design components, local design-system objects, and local reusable design imports outside ui-kit central ownership",
-      "runners": ["governance"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "ui",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "app-client/runtime/**",
-        "app-partner/runtime/**",
-        "app-captain/runtime/**",
-        "app-field/runtime/**",
-        "control-panel/runtime/**",
-        "webapp/runtime/**",
-        "website/runtime/**",
-        "ui-kit/**",
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]
-    },
-    {
-      "id": "GUARD_LIVE_CODE_ORGANIZATION_HYGIENE",
-      "file": "tools/guards/guard-live-code-organization-hygiene.mjs",
-      "config": "tools/guards/guard-live-code-organization-hygiene.config.json",
-      "ownerPolicy": [
-        "governance/03_REPO_BOUNDARIES.md",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "purpose": "report scatter/common/utils directories, old/temp naming, large mixed-responsibility files, tiny-file fragmentation, and orphan exports inside ambiguous directories",
-      "runners": ["governance"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "hygiene",
-      "triggerAnyChange": true,
-      "triggerPaths": [],
-      "triggerExtensions": []
-    },
-    {
-      "id": "GUARD_SERVICE_CONTRACT_MATRIX",
-      "file": "tools/guards/guard-service-contract-matrix.mjs",
-      "config": "tools/guards/guard-service-contract-matrix.config.json",
-      "ownerPolicy": [
-        "governance/10_SERVICE_CLOSURE.md"
-      ],
-      "purpose": "verify canonical service roots carry SERVICE_BLUEPRINT.md and service OpenAPI files",
-      "runners": ["governance"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/10_SERVICE_CLOSURE.md"
-      ],
-      "triggerExtensions": [".md", ".yaml", ".yml", ".json", ".ts", ".tsx"]
-    },
-    {
-      "id": "GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY",
-      "file": "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
-      "config": "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "purpose": "detect service frontend fixture/media identity drift and report immediate remediation paths",
-      "runners": ["governance"],
-      "mode": "advisory changed-files-blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
-        "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".json", ".jsonc", ".md", ".yml", ".yaml"]
-    },
-    {
-      "id": "GUARD_API_BINDING_RUNTIME",
-      "file": "tools/guards/guard-api-binding-runtime.mjs",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md"
-      ],
-      "purpose": "report data-bound screens that appear to miss explicit state coverage or contract hints",
-      "runners": ["governance"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "runtime",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "app-client/runtime/**",
-        "app-partner/runtime/**",
-        "app-captain/runtime/**",
-        "app-field/runtime/**",
-        "control-panel/runtime/**",
-        "webapp/runtime/**",
-        "website/runtime/**",
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/09_API_BINDING_RUNTIME.md"
-      ],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".json", ".yaml", ".yml", ".md"]
-    },
-    {
-      "id": "GUARD_EVIDENCE_REGISTRY_RUNS_HYGIENE",
-      "file": "tools/guards/guard-evidence-registry-runs-hygiene.mjs",
-      "config": "tools/guards/guard-evidence-registry-runs-hygiene.config.json",
-      "ownerPolicy": [
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md"
-      ],
-      "purpose": "report evidence runs missing required files or using legacy zip naming",
-      "runners": ["governance"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "evidence",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "tools/registry/runs/**",
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "tools/guards/RUN_GOVERNANCE_GUARDS.ps1"
-      ],
-      "triggerExtensions": [".md", ".json", ".txt", ".zip", ".ps1"]
-    },
-    {
-      "id": "GUARD_WORKFLOW_CI_PARITY",
-      "file": "tools/guards/guard-workflow-ci-parity.mjs",
-      "ownerPolicy": [
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "verify governance workflows still invoke the active guard runners",
-      "runners": ["governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "ci",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        ".github/workflows/**",
-        "tools/guards/RUN_GOVERNANCE_GUARDS.ps1",
-        "tools/guards/RUN_AGENT_GUARDS.ps1",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "triggerExtensions": [".yml", ".yaml", ".ps1", ".md", ".json"]
-    },
-    {
-      "id": "GUARD_SECRET_SCAN",
-      "file": "tools/guards/guard-secret-scan.mjs",
-      "config": "tools/guards/guard-secret-scan.config.json",
-      "ownerPolicy": [
-        "governance/16_SECURITY_AND_SECRETS.md"
-      ],
-      "purpose": "scan tracked text files for obvious secret patterns",
-      "runners": ["governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "security",
-      "triggerAnyChange": true,
-      "triggerPaths": [],
-      "triggerExtensions": []
-    },
-    {
-      "id": "GUARD_BTHWANI_AGENT_PACKAGE",
-      "file": "tools/guards/guard-bthwani-agent-package.mjs",
-      "ownerPolicy": [
-        "AGENTS.md",
-        ".agents/README.md",
-        ".agents/INDEX.md",
-        ".agents/SKILL_CATALOG.md",
-        ".agents/AUTHORITY_BOUNDARY.md",
-        ".agents/UPDATE_POLICY.md",
-        "governance/15_AGENT_AND_AI_EXECUTION.md"
-      ],
-      "purpose": "validate BThwani-owned active agent package files, adapter hygiene, required skills, and unsafe active mirror roots",
-      "runners": ["agent", "governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "agent",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        ".agents/**",
-        "AGENTS.md",
-        "tools/guards/guard-bthwani-agent-package.mjs",
-        "governance/15_AGENT_AND_AI_EXECUTION.md"
-      ],
-      "triggerExtensions": [".md", ".json", ".mjs", ".ps1"]
-    },
-    {
-      "id": "GUARD_STEWARD_V3",
-      "file": "tools/guards/guard-steward-v3.mjs",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "validate additive V3 guard system health without replacing existing guards",
-      "runners": ["v3"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": ["tools/guards/**", "governance/14_GUARDS_CATALOG.md"],
-      "triggerExtensions": [".mjs", ".json", ".md", ".ps1"]
-    },
-    {
-      "id": "GUARD_PHASE_SCOPE_V3",
-      "file": "tools/guards/guard-phase-scope-v3.mjs",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/24_TRACEABILITY_AND_ROADMAP.md"
-      ],
-      "purpose": "phase-aware scope guard for UI/UX, API, runtime, and production stages",
-      "runners": ["v3"],
-      "mode": "phase-aware",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": ["governance/24_TRACEABILITY_AND_ROADMAP.md", "governance/09_API_BINDING_RUNTIME.md"],
-      "triggerExtensions": [".md", ".json"]
-    },
-    {
-      "id": "GUARD_UIUX_RATCHET_V3",
-      "file": "tools/guards/guard-uiux-ratchet-v3.mjs",
-      "ownerPolicy": [
-        "governance/08_UI_KIT_AND_BRAND.md",
-        "governance/24_TRACEABILITY_AND_ROADMAP.md"
-      ],
-      "purpose": "UI/UX ratchet guard for central colors, RTL, ui-kit ownership, local design drift, and touched-scope discipline",
-      "runners": ["v3"],
-      "mode": "audit",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": ["ui-kit/**", "dsh/**", "wlt/**", "app-client/runtime/**", "app-partner/runtime/**", "governance/08_UI_KIT_AND_BRAND.md"],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".css"]
-    },
-    {
-      "id": "GUARD_PLATFORM_VARS_CONTROL",
-      "file": "tools/guards/guard-platform-vars-control.mjs",
-      "config": "tools/guards/guard-platform-vars-control.config.json",
-      "ownerPolicy": [
-        "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
-      ],
-      "purpose": "generic service-scoped Platform/Vars control guard for mutable policy, provider control, WLT financial ownership, and control-panel route sprawl signals",
-      "runners": ["v3"],
-      "mode": "audit",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": ["dsh/**", "wlt/**", "control-panel/runtime/**", "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md", "governance/22_DSH_GOLDEN_SLICE.md"],
-      "triggerExtensions": [".ts", ".tsx", ".js", ".jsx", ".json", ".md"]
-    },
-    {
-      "id": "GUARD_RELEASE_READINESS_V3",
-      "file": "tools/guards/guard-release-readiness-v3.mjs",
-      "ownerPolicy": [
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "release readiness evidence, diff, warning, rollback, and guard-result aggregation",
-      "runners": ["v3"],
-      "mode": "advisory",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": ["governance/11_EVIDENCE_AND_TRACEABILITY.md", "governance/13_CI_AND_GATES.md", "tools/registry/runs/**"],
-      "triggerExtensions": [".md", ".json", ".txt"]
-    },
-    {
-      "id": "GUARD_SERVICE_GO_RUNTIME",
-      "file": "tools/guards/guard-service-go-runtime.mjs",
-      "config": "tools/guards/guard-service-runtime.config.json",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/10_SERVICE_CLOSURE.md"
-      ],
-      "purpose": "generic service Go runtime guard: validates registered Go files, route scope, repository interface, PostgreSQL repository, and go test ./...",
-      "runners": ["manual"],
-      "note": "Requires --service <id>. Optional --slice <id> limits route scope to one slice.",
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "manual",
-      "triggerAnyChange": false,
-      "triggerPaths": ["dsh/**", "wlt/**", "knz/**", "arb/**", "amn/**", "esf/**", "mrf/**", "snd/**", "kwd/**"],
-      "triggerExtensions": [".go", ".mod", ".sum"]
-    },
-    {
-      "id": "GUARD_SERVICE_POSTGRES_RUNTIME",
-      "file": "tools/guards/guard-service-postgres-runtime.mjs",
-      "config": "tools/guards/guard-service-runtime.config.json",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/10_SERVICE_CLOSURE.md"
-      ],
-      "purpose": "generic service PostgreSQL runtime guard: validates PostgreSQL-only compose, registered migration/seed files, and allowed table scope",
-      "runners": ["manual"],
-      "note": "Requires --service <id>.",
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "manual",
-      "triggerAnyChange": false,
-      "triggerPaths": ["dsh/**", "wlt/**", "knz/**", "arb/**", "amn/**", "esf/**", "mrf/**", "snd/**", "kwd/**"],
-      "triggerExtensions": [".sql", ".yaml", ".yml"]
-    },
-    {
-      "id": "GUARD_SERVICE_L7_CLOSURE",
-      "file": "tools/guards/guard-service-l7-closure.mjs",
-      "config": "tools/guards/guard-service-runtime.config.json",
-      "ownerPolicy": [
-        "governance/10_SERVICE_CLOSURE.md",
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md"
-      ],
-      "purpose": "generic service L7 closure guard: blocks closure claims without complete evidence, fails incomplete evidence folders, and requires screenshot plus runtime chain proof when configured",
-      "runners": ["manual"],
-      "note": "Requires --service <id>. Optional --slice <id> limits the check.",
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "manual",
-      "triggerAnyChange": false,
-      "triggerPaths": ["tools/registry/runs/**"],
-      "triggerExtensions": [".md", ".json", ".txt", ".zip"]
-    },
-    {
-      "id": "GUARD_SERVICE_RUNTIME",
-      "file": "tools/guards/guard-service-runtime.mjs",
-      "config": "tools/guards/guard-service-runtime.config.json",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/10_SERVICE_CLOSURE.md",
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md"
-      ],
-      "purpose": "generic service runtime suite runner: runs service Go, PostgreSQL, and L7 closure guards in sequence",
-      "runners": ["manual"],
-      "note": "Requires --service <id>. Optional --slice <id> is forwarded to child guards.",
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "manual",
-      "triggerAnyChange": false,
-      "triggerPaths": ["dsh/**", "wlt/**", "knz/**", "arb/**", "amn/**", "esf/**", "mrf/**", "snd/**", "kwd/**"],
-      "triggerExtensions": [".go", ".sql", ".yaml", ".yml", ".md"]
-    },
-    {
-      "id": "GUARD_CROSS_SERVICE_OPERATING_MODEL",
-      "file": "tools/guards/guard-cross-service-operating-model.mjs",
-      "ownerPolicy": [
-        "governance/10_SERVICE_CLOSURE.md",
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "governance/13_CI_AND_GATES.md",
-        "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
-        "governance/benchmark-profiles/cross-service-operating-model.profile.json"
-      ],
-      "purpose": "progress-aware cross-service operating model guard that diagnoses journeys, operations, UX logic, cross-surface effects, permissions, WLT finance boundaries, Vars policy, observability, evidence, and unsafe closure claims against global benchmark profiles",
-      "runners": ["governance"],
-      "mode": "blocking",
-      "outputs": ["json", "md"],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/10_SERVICE_CLOSURE.md",
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
-        "governance/benchmark-profiles/**"
-      ],
-      "triggerExtensions": [".ts", ".tsx", ".go", ".md", ".yaml", ".yml", ".json"]
-    }
-  ]
+﻿{
+    "version":  "2.0.0",
+    "owner":  "tools/guards",
+    "policy_source_rule":  "governance/ and .agents/ own policy text; tools/guards executes verification only",
+    "guards":  [
+                   {
+                       "id":  "GUARD_GOVERNANCE_BOUNDARIES",
+                       "file":  "tools/guards/guard-governance-boundaries.mjs",
+                       "config":  "tools/guards/guard-governance-boundaries.config.json",
+                       "ownerPolicy":  [
+                                           "governance/03_REPO_BOUNDARIES.md",
+                                           "governance/14_GUARDS_CATALOG.md"
+                                       ],
+                       "purpose":  "validate tools/guards file/config/manifest alignment and block legacy refs inside active guard sources",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  true,
+                       "selectionTier":  "core",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "tools/guards/**",
+                                            "governance/03_REPO_BOUNDARIES.md",
+                                            "governance/14_GUARDS_CATALOG.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".mjs",
+                                                 ".json",
+                                                 ".md",
+                                                 ".ps1",
+                                                 ".yml",
+                                                 ".yaml"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_AGENT_GLOBAL_AUTHORITY",
+                       "file":  "tools/guards/guard-agent-global-authority.mjs",
+                       "config":  "tools/guards/guard-agent-global-authority.config.json",
+                       "ownerPolicy":  [
+                                           "AGENTS.md",
+                                           ".agents/AUTHORITY_BOUNDARY.md",
+                                           ".agents/UPDATE_POLICY.md"
+                                       ],
+                       "purpose":  "validate .agents authority roots, required files, legacy-agent-root retirement, and adapter hygiene",
+                       "runners":  [
+                                       "agent",
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "agent",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            ".agents/**",
+                                            "AGENTS.md",
+                                            "tools/guards/guard-agent-global-authority.mjs",
+                                            "tools/guards/RUN_AGENT_GUARDS.ps1"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".json",
+                                                 ".mjs",
+                                                 ".ps1"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_UI_ARCHITECTURE_BOUNDARY",
+                       "file":  "tools/guards/guard-ui-architecture-boundary.mjs",
+                       "config":  "tools/guards/guard-ui-architecture-boundary.config.json",
+                       "ownerPolicy":  [
+                                           "governance/08_UI_KIT_AND_BRAND.md"
+                                       ],
+                       "purpose":  "block direct Tamagui imports outside ui-kit and block deep ui-kit source imports",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "ui",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "app-client/runtime/**",
+                                            "app-partner/runtime/**",
+                                            "app-captain/runtime/**",
+                                            "app-field/runtime/**",
+                                            "control-panel/runtime/**",
+                                            "webapp/runtime/**",
+                                            "website/runtime/**",
+                                            "ui-kit/**",
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "governance/08_UI_KIT_AND_BRAND.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".mjs",
+                                                 ".cjs"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_DESIGN_TOKEN_DRIFT",
+                       "file":  "tools/guards/guard-design-token-drift.mjs",
+                       "ownerPolicy":  [
+                                           "governance/08_UI_KIT_AND_BRAND.md"
+                                       ],
+                       "purpose":  "report hardcoded non-brand hex colors outside ui-kit",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "ui",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "app-client/runtime/**",
+                                            "app-partner/runtime/**",
+                                            "app-captain/runtime/**",
+                                            "app-field/runtime/**",
+                                            "control-panel/runtime/**",
+                                            "webapp/runtime/**",
+                                            "website/runtime/**",
+                                            "ui-kit/**",
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "governance/08_UI_KIT_AND_BRAND.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".mjs",
+                                                 ".cjs",
+                                                 ".css",
+                                                 ".scss",
+                                                 ".mdx"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_UI_KIT_CENTRAL_DESIGN_OWNERSHIP",
+                       "file":  "tools/guards/guard-ui-kit-central-design-ownership.mjs",
+                       "config":  "tools/guards/guard-ui-kit-central-design-ownership.config.json",
+                       "ownerPolicy":  [
+                                           "governance/08_UI_KIT_AND_BRAND.md",
+                                           "governance/14_GUARDS_CATALOG.md"
+                                       ],
+                       "purpose":  "report reusable design components, local design-system objects, and local reusable design imports outside ui-kit central ownership",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "ui",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "app-client/runtime/**",
+                                            "app-partner/runtime/**",
+                                            "app-captain/runtime/**",
+                                            "app-field/runtime/**",
+                                            "control-panel/runtime/**",
+                                            "webapp/runtime/**",
+                                            "website/runtime/**",
+                                            "ui-kit/**",
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "governance/08_UI_KIT_AND_BRAND.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".mjs",
+                                                 ".cjs"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_LIVE_CODE_ORGANIZATION_HYGIENE",
+                       "file":  "tools/guards/guard-live-code-organization-hygiene.mjs",
+                       "config":  "tools/guards/guard-live-code-organization-hygiene.config.json",
+                       "ownerPolicy":  [
+                                           "governance/03_REPO_BOUNDARIES.md",
+                                           "governance/14_GUARDS_CATALOG.md"
+                                       ],
+                       "purpose":  "report scatter/common/utils directories, old/temp naming, large mixed-responsibility files, tiny-file fragmentation, and orphan exports inside ambiguous directories",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "hygiene",
+                       "triggerAnyChange":  true,
+                       "triggerPaths":  [
+
+                                        ],
+                       "triggerExtensions":  [
+
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SERVICE_CONTRACT_MATRIX",
+                       "file":  "tools/guards/guard-service-contract-matrix.mjs",
+                       "config":  "tools/guards/guard-service-contract-matrix.config.json",
+                       "ownerPolicy":  [
+                                           "governance/10_SERVICE_CLOSURE.md"
+                                       ],
+                       "purpose":  "verify canonical service roots carry SERVICE_BLUEPRINT.md and service OpenAPI files",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "service",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "governance/10_SERVICE_CLOSURE.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".yaml",
+                                                 ".yml",
+                                                 ".json",
+                                                 ".ts",
+                                                 ".tsx"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY",
+                       "file":  "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
+                       "config":  "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
+                       "ownerPolicy":  [
+                                           "governance/14_GUARDS_CATALOG.md"
+                                       ],
+                       "purpose":  "detect service frontend fixture/media identity drift and report immediate remediation paths",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory changed-files-blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "service",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
+                                            "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
+                                            "governance/14_GUARDS_CATALOG.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".json",
+                                                 ".jsonc",
+                                                 ".md",
+                                                 ".yml",
+                                                 ".yaml"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_API_BINDING_RUNTIME",
+                       "file":  "tools/guards/guard-api-binding-runtime.mjs",
+                       "ownerPolicy":  [
+                                           "governance/09_API_BINDING_RUNTIME.md"
+                                       ],
+                       "purpose":  "report data-bound screens that appear to miss explicit state coverage or contract hints",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "runtime",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "app-client/runtime/**",
+                                            "app-partner/runtime/**",
+                                            "app-captain/runtime/**",
+                                            "app-field/runtime/**",
+                                            "control-panel/runtime/**",
+                                            "webapp/runtime/**",
+                                            "website/runtime/**",
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "governance/09_API_BINDING_RUNTIME.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".json",
+                                                 ".yaml",
+                                                 ".yml",
+                                                 ".md"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_EVIDENCE_REGISTRY_RUNS_HYGIENE",
+                       "file":  "tools/guards/guard-evidence-registry-runs-hygiene.mjs",
+                       "config":  "tools/guards/guard-evidence-registry-runs-hygiene.config.json",
+                       "ownerPolicy":  [
+                                           "governance/11_EVIDENCE_AND_TRACEABILITY.md"
+                                       ],
+                       "purpose":  "report evidence runs missing required files or using legacy zip naming",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "evidence",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "tools/registry/runs/**",
+                                            "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+                                            "tools/guards/RUN_GOVERNANCE_GUARDS.ps1"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".json",
+                                                 ".txt",
+                                                 ".zip",
+                                                 ".ps1"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_WORKFLOW_CI_PARITY",
+                       "file":  "tools/guards/guard-workflow-ci-parity.mjs",
+                       "ownerPolicy":  [
+                                           "governance/13_CI_AND_GATES.md"
+                                       ],
+                       "purpose":  "verify governance workflows still invoke the active guard runners",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "ci",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            ".github/workflows/**",
+                                            "tools/guards/RUN_GOVERNANCE_GUARDS.ps1",
+                                            "tools/guards/RUN_AGENT_GUARDS.ps1",
+                                            "governance/13_CI_AND_GATES.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".yml",
+                                                 ".yaml",
+                                                 ".ps1",
+                                                 ".md",
+                                                 ".json"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SECRET_SCAN",
+                       "file":  "tools/guards/guard-secret-scan.mjs",
+                       "config":  "tools/guards/guard-secret-scan.config.json",
+                       "ownerPolicy":  [
+                                           "governance/16_SECURITY_AND_SECRETS.md"
+                                       ],
+                       "purpose":  "scan tracked text files for obvious secret patterns",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "security",
+                       "triggerAnyChange":  true,
+                       "triggerPaths":  [
+
+                                        ],
+                       "triggerExtensions":  [
+
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_BTHWANI_AGENT_PACKAGE",
+                       "file":  "tools/guards/guard-bthwani-agent-package.mjs",
+                       "ownerPolicy":  [
+                                           "AGENTS.md",
+                                           ".agents/README.md",
+                                           ".agents/INDEX.md",
+                                           ".agents/SKILL_CATALOG.md",
+                                           ".agents/AUTHORITY_BOUNDARY.md",
+                                           ".agents/UPDATE_POLICY.md",
+                                           "governance/15_AGENT_AND_AI_EXECUTION.md"
+                                       ],
+                       "purpose":  "validate BThwani-owned active agent package files, adapter hygiene, required skills, and unsafe active mirror roots",
+                       "runners":  [
+                                       "agent",
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "agent",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            ".agents/**",
+                                            "AGENTS.md",
+                                            "tools/guards/guard-bthwani-agent-package.mjs",
+                                            "governance/15_AGENT_AND_AI_EXECUTION.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".json",
+                                                 ".mjs",
+                                                 ".ps1"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_STEWARD_V3",
+                       "file":  "tools/guards/guard-steward-v3.mjs",
+                       "ownerPolicy":  [
+                                           "governance/14_GUARDS_CATALOG.md",
+                                           "governance/13_CI_AND_GATES.md"
+                                       ],
+                       "purpose":  "validate additive V3 guard system health without replacing existing guards",
+                       "runners":  [
+                                       "v3"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "v3",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "tools/guards/**",
+                                            "governance/14_GUARDS_CATALOG.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".mjs",
+                                                 ".json",
+                                                 ".md",
+                                                 ".ps1"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_PHASE_SCOPE_V3",
+                       "file":  "tools/guards/guard-phase-scope-v3.mjs",
+                       "ownerPolicy":  [
+                                           "governance/09_API_BINDING_RUNTIME.md",
+                                           "governance/24_TRACEABILITY_AND_ROADMAP.md"
+                                       ],
+                       "purpose":  "phase-aware scope guard for UI/UX, API, runtime, and production stages",
+                       "runners":  [
+                                       "v3"
+                                   ],
+                       "mode":  "phase-aware",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "v3",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "governance/24_TRACEABILITY_AND_ROADMAP.md",
+                                            "governance/09_API_BINDING_RUNTIME.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".json"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_UIUX_RATCHET_V3",
+                       "file":  "tools/guards/guard-uiux-ratchet-v3.mjs",
+                       "ownerPolicy":  [
+                                           "governance/08_UI_KIT_AND_BRAND.md",
+                                           "governance/24_TRACEABILITY_AND_ROADMAP.md"
+                                       ],
+                       "purpose":  "UI/UX ratchet guard for central colors, RTL, ui-kit ownership, local design drift, and touched-scope discipline",
+                       "runners":  [
+                                       "v3"
+                                   ],
+                       "mode":  "audit",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "v3",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "ui-kit/**",
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "app-client/runtime/**",
+                                            "app-partner/runtime/**",
+                                            "governance/08_UI_KIT_AND_BRAND.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".mjs",
+                                                 ".css"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_PLATFORM_VARS_CONTROL",
+                       "file":  "tools/guards/guard-platform-vars-control.mjs",
+                       "config":  "tools/guards/guard-platform-vars-control.config.json",
+                       "ownerPolicy":  [
+                                           "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
+                                           "governance/22_DSH_GOLDEN_SLICE.md"
+                                       ],
+                       "purpose":  "generic service-scoped Platform/Vars control guard for mutable policy, provider control, WLT financial ownership, and control-panel route sprawl signals",
+                       "runners":  [
+                                       "v3"
+                                   ],
+                       "mode":  "audit",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "v3",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "control-panel/runtime/**",
+                                            "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
+                                            "governance/22_DSH_GOLDEN_SLICE.md"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".json",
+                                                 ".md"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_RELEASE_READINESS_V3",
+                       "file":  "tools/guards/guard-release-readiness-v3.mjs",
+                       "ownerPolicy":  [
+                                           "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+                                           "governance/13_CI_AND_GATES.md"
+                                       ],
+                       "purpose":  "release readiness evidence, diff, warning, rollback, and guard-result aggregation",
+                       "runners":  [
+                                       "v3"
+                                   ],
+                       "mode":  "advisory",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "v3",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+                                            "governance/13_CI_AND_GATES.md",
+                                            "tools/registry/runs/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".json",
+                                                 ".txt"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SERVICE_GO_RUNTIME",
+                       "file":  "tools/guards/guard-service-go-runtime.mjs",
+                       "config":  "tools/guards/guard-service-runtime.config.json",
+                       "ownerPolicy":  [
+                                           "governance/09_API_BINDING_RUNTIME.md",
+                                           "governance/10_SERVICE_CLOSURE.md"
+                                       ],
+                       "purpose":  "generic service Go runtime guard: validates registered Go files, route scope, repository interface, PostgreSQL repository, and go test ./...",
+                       "runners":  [
+                                       "manual"
+                                   ],
+                       "note":  "Requires --service \u003cid\u003e. Optional --slice \u003cid\u003e limits route scope to one slice.",
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "manual",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".go",
+                                                 ".mod",
+                                                 ".sum"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SERVICE_POSTGRES_RUNTIME",
+                       "file":  "tools/guards/guard-service-postgres-runtime.mjs",
+                       "config":  "tools/guards/guard-service-runtime.config.json",
+                       "ownerPolicy":  [
+                                           "governance/09_API_BINDING_RUNTIME.md",
+                                           "governance/10_SERVICE_CLOSURE.md"
+                                       ],
+                       "purpose":  "generic service PostgreSQL runtime guard: validates PostgreSQL-only compose, registered migration/seed files, and allowed table scope",
+                       "runners":  [
+                                       "manual"
+                                   ],
+                       "note":  "Requires --service \u003cid\u003e.",
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "manual",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".sql",
+                                                 ".yaml",
+                                                 ".yml"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SERVICE_L7_CLOSURE",
+                       "file":  "tools/guards/guard-service-l7-closure.mjs",
+                       "config":  "tools/guards/guard-service-runtime.config.json",
+                       "ownerPolicy":  [
+                                           "governance/10_SERVICE_CLOSURE.md",
+                                           "governance/11_EVIDENCE_AND_TRACEABILITY.md"
+                                       ],
+                       "purpose":  "generic service L7 closure guard: blocks closure claims without complete evidence, fails incomplete evidence folders, and requires screenshot plus runtime chain proof when configured",
+                       "runners":  [
+                                       "manual"
+                                   ],
+                       "note":  "Requires --service \u003cid\u003e. Optional --slice \u003cid\u003e limits the check.",
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "manual",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "tools/registry/runs/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".md",
+                                                 ".json",
+                                                 ".txt",
+                                                 ".zip"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_SERVICE_RUNTIME",
+                       "file":  "tools/guards/guard-service-runtime.mjs",
+                       "config":  "tools/guards/guard-service-runtime.config.json",
+                       "ownerPolicy":  [
+                                           "governance/09_API_BINDING_RUNTIME.md",
+                                           "governance/10_SERVICE_CLOSURE.md",
+                                           "governance/11_EVIDENCE_AND_TRACEABILITY.md"
+                                       ],
+                       "purpose":  "generic service runtime suite runner: runs service Go, PostgreSQL, and L7 closure guards in sequence",
+                       "runners":  [
+                                       "manual"
+                                   ],
+                       "note":  "Requires --service \u003cid\u003e. Optional --slice \u003cid\u003e is forwarded to child guards.",
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "manual",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".go",
+                                                 ".sql",
+                                                 ".yaml",
+                                                 ".yml",
+                                                 ".md"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_CROSS_SERVICE_OPERATING_MODEL",
+                       "file":  "tools/guards/guard-cross-service-operating-model.mjs",
+                       "ownerPolicy":  [
+                                           "governance/10_SERVICE_CLOSURE.md",
+                                           "governance/09_API_BINDING_RUNTIME.md",
+                                           "governance/11_EVIDENCE_AND_TRACEABILITY.md",
+                                           "governance/13_CI_AND_GATES.md",
+                                           "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
+                                           "governance/benchmark-profiles/cross-service-operating-model.profile.json"
+                                       ],
+                       "purpose":  "progress-aware cross-service operating model guard that diagnoses journeys, operations, UX logic, cross-surface effects, permissions, WLT finance boundaries, Vars policy, observability, evidence, and unsafe closure claims against global benchmark profiles",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "service",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "dsh/**",
+                                            "wlt/**",
+                                            "knz/**",
+                                            "arb/**",
+                                            "amn/**",
+                                            "esf/**",
+                                            "mrf/**",
+                                            "snd/**",
+                                            "kwd/**",
+                                            "governance/10_SERVICE_CLOSURE.md",
+                                            "governance/09_API_BINDING_RUNTIME.md",
+                                            "governance/20_VARIABLE_POLICY_AND_PROVIDER_CONTROL.md",
+                                            "governance/benchmark-profiles/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".go",
+                                                 ".md",
+                                                 ".yaml",
+                                                 ".yml",
+                                                 ".json"
+                                             ]
+                   },
+                   {
+                       "id":  "GUARD_CONTROL_PANEL_GRAMMAR",
+                       "file":  "tools/guards/guard-control-panel-grammar.mjs",
+                       "ownerPolicy":  [
+                                           "governance/08_UI_KIT_AND_BRAND.md"
+                                       ],
+                       "purpose":  "enforce control-panel UI grammar: no hero in operational sections, no direct Tamagui imports, no command-center CSS override outside shell, grammar contract reference required in hub screens",
+                       "runners":  [
+                                       "governance"
+                                   ],
+                       "mode":  "blocking",
+                       "outputs":  [
+                                       "json",
+                                       "md"
+                                   ],
+                       "alwaysRun":  false,
+                       "selectionTier":  "ui",
+                       "triggerAnyChange":  false,
+                       "triggerPaths":  [
+                                            "control-panel/shell/**",
+                                            "control-panel/runtime/**",
+                                            "dsh/frontend/control-panel/**",
+                                            "ui-kit/src/web/**"
+                                        ],
+                       "triggerExtensions":  [
+                                                 ".ts",
+                                                 ".tsx",
+                                                 ".js",
+                                                 ".jsx",
+                                                 ".mjs",
+                                                 ".cjs",
+                                                 ".css"
+                                             ]
+                   }
+               ]
 }

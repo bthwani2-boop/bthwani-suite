@@ -135,7 +135,7 @@ export function CatalogVisibilityPolicyWorkspace({
   const categoryMappingStatus: DshProductCategoryMappingStatus =
     product.categoryPath.main ? 'mapped' : 'unmapped';
   const duplicateStatus: DshProductDuplicateStatus =
-    product.conflictReason ? 'has_duplicates' : 'clean';
+    product.conflictReason ? 'possible_duplicate' : 'clean';
   const mediaPolicySatisfied =
     product.mediaPolicy === 'catalog-owned-media' || product.mediaPolicy === 'partner-owned-exception';
 
@@ -197,7 +197,7 @@ export function CatalogVisibilityPolicyWorkspace({
         borderLeftWidth: 1,
         borderLeftColor: theme.line,
         zIndex: 100,
-        overflow: 'auto',
+        overflow: 'hidden',
       }}
     >
       <WebCompactSurfaceHeader
@@ -228,7 +228,7 @@ export function CatalogVisibilityPolicyWorkspace({
             <Text role="caption" style={{ fontSize: 18 }}>
               {storeVisibility.visible ? '✅' : '❌'}
             </Text>
-            <Text role="body" style={{
+            <Text role="bodyMd" style={{
               fontWeight: '700',
               color: storeVisibility.visible ? theme.success : theme.danger,
             }}>
@@ -260,7 +260,7 @@ export function CatalogVisibilityPolicyWorkspace({
             <Text role="caption" style={{ fontSize: 18 }}>
               {productVisibility.visible ? '✅' : '❌'}
             </Text>
-            <Text role="body" style={{
+            <Text role="bodyMd" style={{
               fontWeight: '700',
               color: productVisibility.visible ? theme.success : theme.danger,
             }}>

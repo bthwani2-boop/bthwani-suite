@@ -1178,18 +1178,22 @@ export function WebControlDisclosureItem({
 
 export type WebCompactSurfaceHeaderProps = {
   title: string;
+  /** @deprecated Use description instead */
+  subtitle?: string;
   description?: string;
   metrics?: ReadonlyArray<{ id: string; title: string; value: string }>;
+  onBack?: () => void;
 };
 
-export function WebCompactSurfaceHeader({ title, description, metrics = [] }: WebCompactSurfaceHeaderProps) {
+export function WebCompactSurfaceHeader({ title, description, subtitle, onBack, metrics = [] }: WebCompactSurfaceHeaderProps) {
+  const resolvedDescription = description ?? subtitle;
   return (
     <>
       <WebControlSurfaceStyles />
       <header className="ui-web-compact-surface-header" dir="rtl">
         <div className="ui-web-compact-surface-header__title-block">
           <h1 className="ui-web-compact-surface-header__title">{title}</h1>
-          {description && <p className="ui-web-compact-surface-header__description">{description}</p>}
+          {resolvedDescription && <p className="ui-web-compact-surface-header__description">{resolvedDescription}</p>}
         </div>
         <div className="ui-web-compact-surface-header__pulse">
           {metrics.map((metric) => (

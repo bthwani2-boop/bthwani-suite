@@ -589,6 +589,11 @@ export function ControlPanelDshSupportHubScreen() {
             <div className={styles.surfaceSplitGrid}>
               <div className={styles.surfaceListColumn}>
                 <Text role="titleSm">صفوف {activeTab === 'queue' ? 'الدعم' : activeTab === 'disputes' ? 'النزاعات' : 'الآراء'}</Text>
+                {rows.length === 0 ? (
+                  <Box padding={4} background="surfaceInset" radiusToken="xl" border borderTone="line">
+                    <Text role="bodySm" tone="muted" align="center">لا توجد عناصر في هذا الفلتر. اختر فلترًا آخر أو تحقق لاحقًا.</Text>
+                  </Box>
+                ) : null}
                 <Box gap={2}>
                   {rows.map((row) => (
                     <WebControlPanelDecisionRow

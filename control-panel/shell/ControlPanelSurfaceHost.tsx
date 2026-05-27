@@ -384,7 +384,7 @@ export function ControlPanelSurfaceHost({
     if (!query) return [];
 
     const matches = searchIndex.filter((item) => {
-      return item.searchTerms.some((term) => {
+      return item.searchTerms.some((term: string) => {
         const normalizedTerm = normalizeSearchText(term);
         return normalizedTerm.includes(query);
       });

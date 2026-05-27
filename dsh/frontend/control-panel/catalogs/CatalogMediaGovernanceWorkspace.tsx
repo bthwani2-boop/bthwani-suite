@@ -190,7 +190,7 @@ export function CatalogMediaGovernanceWorkspace({
         borderLeftWidth: 1,
         borderLeftColor: theme.line,
         zIndex: 100,
-        overflow: 'auto',
+        overflow: 'hidden',
       }}
     >
       <WebCompactSurfaceHeader
