@@ -4,7 +4,7 @@ import type {
   CatalogProductMaster,
   CatalogSubCategory,
   CatalogSubClassification,
-} from './catalog';
+} from './catalogs.data';
 import type { CatalogPreviewProposal } from './catalog-workspace.types';
 
 // Helper to recursively filter the Category & Classification Tree

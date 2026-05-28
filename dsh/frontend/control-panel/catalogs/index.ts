@@ -1,10 +1,10 @@
-export { dshCatalogMetrics, dshCatalogCategories, dshCatalogProducts } from './catalog';
+export { dshCatalogMetrics, dshCatalogCategories, dshCatalogProducts } from './catalogs.data';
 export type {
   CatalogMainCategory,
   CatalogSubCategory,
   CatalogMainClassification,
   CatalogProductMaster,
-} from './catalog';
+} from './catalogs.data';
 export { ControlPanelDshCatalogScreen } from './ControlPanelDshCatalogScreen';
 export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen } from './CatalogGovernanceScreens';
 export { CategoriesScreen, CategoriesScreen as ControlPanelDshCatalogCategoriesScreen } from './categories/categories.screen';

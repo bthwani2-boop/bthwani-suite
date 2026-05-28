@@ -358,7 +358,7 @@
     "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx",
     "dsh/frontend/shared/index.ts",
     "dsh/frontend/shared/catalog.ts",
-    "dsh/frontend/control-panel/catalogs/catalog.ts",
+    "dsh/frontend/control-panel/catalogs/catalogs.data.ts",
     "dsh/frontend/control-panel/catalogs/ControlPanelDshCatalogScreen.tsx",
     "dsh/frontend/data/partner.preview-data.ts",
     "dsh/frontend/data/stores.preview-data.ts",

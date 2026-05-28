@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster } from './catalog';
+import type { CatalogProductMaster } from './catalogs.data';
 import {
   resolveDshProductClientVisibility,
   type DshClientVisibilityBlockedCode,

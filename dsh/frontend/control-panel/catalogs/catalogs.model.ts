@@ -1,6 +1,6 @@
 export type FilterType = 'all' | 'active' | 'review' | 'conflict' | 'master' | 'partner' | 'needs-link' | 'needs-image';
 
-import type { CatalogApprovalStage, CatalogMediaPolicy, CatalogProductMaster } from './catalog';
+import type { CatalogApprovalStage, CatalogMediaPolicy, CatalogProductMaster } from './catalogs.data';
 import type {
   CatalogPreviewProposal,
   CatalogPreviewProposalStatus,

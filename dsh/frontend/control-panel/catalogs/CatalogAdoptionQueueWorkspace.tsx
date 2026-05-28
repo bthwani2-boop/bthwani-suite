@@ -59,7 +59,7 @@ function resolveActionOwner(action: CatalogQueueAction): string {
   }
 }
 
-export function CatalogAdoptionQueue() {
+export function CatalogAdoptionQueueWorkspace() {
   const { theme } = useTheme();
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
   const [page, setPage] = React.useState(1);

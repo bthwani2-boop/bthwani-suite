@@ -23,7 +23,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, TextField, useTheme } from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from './catalog-workspace.types';
-import { dshCatalogCategories } from './catalog';
+import { dshCatalogCategories } from './catalogs.data';
 
 export type CatalogQuickEntryDraftWorkspaceProps = {
   onClose: () => void;

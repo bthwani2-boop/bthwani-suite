@@ -17,7 +17,7 @@
 
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import type { CatalogProductMaster } from './catalog';
+import type { CatalogProductMaster } from './catalogs.data';
 
 export type CatalogAuditTrailWorkspaceProps = {
   productId?: string;

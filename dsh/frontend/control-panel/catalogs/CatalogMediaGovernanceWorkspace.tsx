@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster, CatalogMediaPolicy } from './catalog';
+import type { CatalogProductMaster, CatalogMediaPolicy } from './catalogs.data';
 import { catalogMediaPolicyOptions } from './catalogs.model';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

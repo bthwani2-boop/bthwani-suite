@@ -17,7 +17,7 @@
 
 import React from 'react';
 import type { CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
-import type { CatalogProductMaster } from './catalog';
+import type { CatalogProductMaster } from './catalogs.data';
 import type { DuplicatePair } from './CatalogDuplicateResolutionWorkspace';
 import { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
 import { CatalogIdentityGovernanceWorkspace } from './CatalogIdentityGovernanceWorkspace';
