@@ -26,8 +26,8 @@ import { CatalogMediaGovernanceWorkspace } from './CatalogMediaGovernanceWorkspa
 import { CatalogWorkspaceRouter } from './CatalogWorkspaceRouter';
 import type { CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
 
-import { filterCategoryTree } from './adapters/filter-category-tree';
-import { FilterType, CatalogFilterColumnId, initialColumnFilters } from './model/filters';
+import { filterCategoryTree } from './catalogs.adapters';
+import { initialColumnFilters, type CatalogFilterColumnId, type FilterType } from './catalogs.model';
 import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalog.parts';
 
 // --- Types ---

@@ -11,8 +11,8 @@ export { CategoriesScreen } from './categories/categories.screen';
 export { default } from './CatalogGovernanceScreens';
 
 // ML-053: Item approval section — UI_PREVIEW_ONLY flow implemented (catalog approval API not yet bound)
-export { ItemApprovalScreen } from './approvals/item-approval.screen';
-export type { ItemApprovalScreenProps } from './approvals/item-approval.screen';
+export { ItemApprovalScreen } from './approvals/approvals.screen';
+export type { ItemApprovalScreenProps } from './approvals/approvals.screen';
 
 // ML-054: Catalog publishing gate section — UI_PREVIEW_ONLY flow implemented (catalog publish API not yet bound)
 export { ListingGovernanceScreen } from './listing-governance/listing-governance.screen';
