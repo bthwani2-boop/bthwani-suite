@@ -7,7 +7,7 @@ export type {
 } from './catalog';
 export { ControlPanelDshCatalogScreen } from './ControlPanelDshCatalogScreen';
 export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen } from './CatalogGovernanceScreens';
-export { CategoriesScreen } from './categories/categories.screen';
+export { CategoriesScreen, CategoriesScreen as ControlPanelDshCatalogCategoriesScreen } from './categories/categories.screen';
 export { default } from './CatalogGovernanceScreens';
 
 // ML-053: Item approval section — UI_PREVIEW_ONLY flow implemented (catalog approval API not yet bound)

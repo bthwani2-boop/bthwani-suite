@@ -55,6 +55,13 @@ const BULK_ACTION_LABELS: Record<BulkAction, string> = {
   'bulk-export-evidence': '📤 تصدير الأدلة',
 };
 
+const BULK_ACTIONS: readonly BulkAction[] = [
+  'bulk-approve',
+  'bulk-send-marketing',
+  'bulk-request-fix',
+  'bulk-export-evidence',
+];
+
 const BULK_ACTION_NOTES: Record<BulkAction, (ids: readonly string[]) => string> = {
   'bulk-approve': (ids) =>
     `اعتماد ${ids.length} منتج للكتالوج. Rollback: يمكن إعادة للمسودة عبر API. API boundary: POST /catalog/products/bulk-approve`,
@@ -131,8 +138,8 @@ export function CatalogBulkOperationsWorkspace({
         height: '100%',
         overflow: 'scroll',
         borderRadius: 0,
-        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)' as any,
-        direction: 'rtl' as any,
+        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)',
+        direction: 'rtl',
       }}
     >
       {/* Header */}
@@ -208,10 +215,10 @@ export function CatalogBulkOperationsWorkspace({
           الإجراءات المجمعة
         </Text>
 
-        {(Object.entries(BULK_ACTION_LABELS) as [BulkAction, string][]).map(([action, label]) => (
+        {BULK_ACTIONS.map((action) => (
           <Box key={action} gap={1}>
             <Button
-              label={label}
+              label={BULK_ACTION_LABELS[action]}
               tone={isEmpty ? 'secondary' : 'brand'}
               size="sm"
               disabled={isEmpty}

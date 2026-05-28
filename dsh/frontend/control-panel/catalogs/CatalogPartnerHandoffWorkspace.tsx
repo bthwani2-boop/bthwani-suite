@@ -256,7 +256,7 @@ export function CatalogPartnerHandoffWorkspace({
                   <Text role="caption" style={{ color: theme.text, flexShrink: 1 }}>{item.name}</Text>
                   <Box style={{ backgroundColor: theme.warningSurface ?? theme.surface, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
                     <Text role="caption" style={{ fontSize: 10, color: theme.text }}>
-                      {approvalStageLabel[item.approvalStage as CatalogApprovalStage] || item.approvalStage}
+                      {approvalStageLabel[item.approvalStage] || item.approvalStage}
                     </Text>
                   </Box>
                 </Box>
@@ -272,7 +272,7 @@ export function CatalogPartnerHandoffWorkspace({
                 <Box key={item.id} layoutDirection="row" gap={8} style={{ paddingVertical: 3, alignItems: 'center' }}>
                   <Text role="caption" style={{ color: theme.success, flexShrink: 1 }}>✓ {item.name}</Text>
                   <Text role="caption" tone="muted" style={{ fontSize: 10 }}>
-                    {approvalStageLabel[item.approvalStage as CatalogApprovalStage] || item.approvalStage}
+                    {approvalStageLabel[item.approvalStage] || item.approvalStage}
                   </Text>
                 </Box>
               ))}

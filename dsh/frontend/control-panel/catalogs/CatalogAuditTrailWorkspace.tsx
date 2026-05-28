@@ -179,8 +179,8 @@ export function CatalogAuditTrailWorkspace({
         height: '100%',
         overflow: 'scroll',
         borderRadius: 0,
-        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)' as any,
-        direction: 'rtl' as any,
+        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)',
+        direction: 'rtl',
       }}
     >
       {/* Header */}
@@ -218,7 +218,7 @@ export function CatalogAuditTrailWorkspace({
             padding: '8px 12px',
             borderRadius: 8,
             border: `1px solid ${theme.lineStrong}`,
-            direction: 'rtl' as any,
+            direction: 'rtl',
             backgroundColor: theme.surface,
             color: theme.brandHeaderBackground,
             fontSize: 14,

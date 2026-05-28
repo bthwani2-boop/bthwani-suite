@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster, CatalogMediaPolicy } from './catalog';
+import { catalogMediaPolicyOptions } from './catalogs.model';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,7 +57,13 @@ const mediaPolicyConfig: Record<CatalogMediaPolicy, {
 
 function getToneColor(
   tone: 'success' | 'warning' | 'danger' | 'info',
-  theme: Record<string, string>,
+  theme: {
+    success: string;
+    warning: string;
+    danger: string;
+    info?: string;
+    brand: string;
+  },
 ): string {
   if (tone === 'success') return theme.success;
   if (tone === 'warning') return theme.warning;
@@ -66,7 +73,14 @@ function getToneColor(
 
 function getToneBg(
   tone: 'success' | 'warning' | 'danger' | 'info',
-  theme: Record<string, string>,
+  theme: {
+    successSurface: string;
+    warningSurface?: string;
+    dangerSurface: string;
+    infoSurface?: string;
+    surface: string;
+    surfaceInset: string;
+  },
 ): string {
   if (tone === 'success') return theme.successSurface;
   if (tone === 'warning') return theme.warningSurface ?? theme.surface;
@@ -88,7 +102,7 @@ function SectionTitle({ children }: { children: string }) {
 function PolicyBadge({ policy }: { policy: CatalogMediaPolicy }) {
   const { theme } = useTheme();
   const config = mediaPolicyConfig[policy];
-  const color = getToneColor(config.toneKey, theme as unknown as Record<string, string>);
+  const color = getToneColor(config.toneKey, theme);
   return (
     <Box
       style={{
@@ -173,7 +187,7 @@ export function CatalogMediaGovernanceWorkspace({
   }
 
   const missingMedia = items.filter((i) => !i.mediaKey && !i.imageUri);
-  const policyGroups = (Object.keys(mediaPolicyConfig) as CatalogMediaPolicy[]).map((policy) => ({
+  const policyGroups = catalogMediaPolicyOptions.map((policy) => ({
     policy,
     items: items.filter((i) => i.mediaPolicy === policy),
   }));
@@ -222,14 +236,14 @@ export function CatalogMediaGovernanceWorkspace({
             <Box
               key={policy}
               style={{
-                backgroundColor: getToneBg(mediaPolicyConfig[policy].toneKey, theme as unknown as Record<string, string>),
+                backgroundColor: getToneBg(mediaPolicyConfig[policy].toneKey, theme),
                 borderRadius: 8, padding: 10, flex: 1, minWidth: 80,
               }}
             >
               <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{mediaPolicyConfig[policy].label}</Text>
               <Text role="label" style={{
                 fontWeight: '800',
-                color: getToneColor(mediaPolicyConfig[policy].toneKey, theme as unknown as Record<string, string>),
+                color: getToneColor(mediaPolicyConfig[policy].toneKey, theme),
               }}>
                 {groupItems.length}
               </Text>
@@ -266,7 +280,7 @@ export function CatalogMediaGovernanceWorkspace({
         {policyGroups.map(({ policy, items: groupItems }) => {
           if (groupItems.length === 0) return null;
           const config = mediaPolicyConfig[policy];
-          const toneColor = getToneColor(config.toneKey, theme as unknown as Record<string, string>);
+          const toneColor = getToneColor(config.toneKey, theme);
           return (
             <Box key={policy} gap={3} style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12 }}>
               <Box layoutDirection="row" gap={8} style={{ alignItems: 'center' }}>

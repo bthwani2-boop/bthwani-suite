@@ -140,6 +140,18 @@ export type CatalogProductMaster = {
   categoryType?: string; // e.g. product, service
 };
 
+function resolveCatalogMediaPolicy(value: string | undefined): CatalogMediaPolicy {
+  switch (value) {
+    case 'catalog-owned-media':
+    case 'partner-owned-exception':
+    case 'partner-proposed-review':
+    case 'marketing-enhancement-required':
+      return value;
+    default:
+      return 'catalog-owned-media';
+  }
+}
+
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
 import {
   storeItemsByStoreId,
@@ -215,7 +227,7 @@ Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
         subClassification: path.sub ? `classif-sub-${path.sub}-1a` : undefined,
       },
       price: parseFloat(item.priceLabel ?? '') || 15,
-      mediaPolicy: (item.mediaPolicy as CatalogMediaPolicy) || 'catalog-owned-media',
+      mediaPolicy: resolveCatalogMediaPolicy(item.mediaPolicy),
       approvalStage: approvalStage,
       sourceSurface: 'catalog',
       surfaces: ['client', 'partner'],

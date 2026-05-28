@@ -47,6 +47,32 @@ const statusTone: Record<ItemApprovalStatus, 'default' | 'success' | 'danger' | 
   'needs-revision': 'warning',
 };
 
+function mapWorkflowStageToIdentityStatus(stage: ApprovalStage): DshProductIdentityApprovalStatus {
+  switch (stage) {
+    case 'partner-submitted':
+      return 'partner_submitted';
+    case 'partner-review':
+      return 'partner_review';
+    case 'partner-approved':
+      return 'partner_approved';
+    case 'marketing-review':
+      return 'marketing_review';
+    case 'marketing-approved':
+      return 'marketing_approved';
+    case 'catalog-adopted':
+      return 'catalog_adopted';
+    case 'client-visible':
+      return 'client_visible';
+    case 'needs-fix':
+      return 'needs_fix';
+    case 'rejected':
+      return 'rejected';
+    case 'field-submitted':
+    default:
+      return 'field_draft';
+  }
+}
+
 export type ItemApprovalScreenProps = {
   items?: CatalogItemApprovalRecord[];
   onApprove?: (id: string) => void;
@@ -93,7 +119,7 @@ export function ItemApprovalScreen({
           category: r.entityType === 'product' ? 'منتج كتالوج' : r.entityType === 'product-media' ? 'صورة منتج' : 'اقتراح فئة',
           submittedAt: r.submittedAt ? r.submittedAt.split('T')[0] : '2026-05-25',
           status,
-          approvalStatus: r.stage as DshProductIdentityApprovalStatus,
+          approvalStatus: mapWorkflowStageToIdentityStatus(r.stage),
           approvalNote: r.metadata?.requiredFix || r.metadata?.rejectionReason,
           auditRequired: false,
         } satisfies CatalogItemApprovalRecord;

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Image from 'next/image';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import {
@@ -15,19 +14,35 @@ import {
 } from './catalog';
 import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
 import styles from '../shared/control-panel-surface.module.css';
-// Workspace imports — consumed via CatalogWorkspaceRouter (not rendered inline)
-import { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
-import { CatalogIdentityGovernanceWorkspace } from './CatalogIdentityGovernanceWorkspace';
-import { CatalogDuplicateResolutionWorkspace, type DuplicatePair } from './CatalogDuplicateResolutionWorkspace';
-import { CatalogVisibilityPolicyWorkspace } from './CatalogVisibilityPolicyWorkspace';
-import { CatalogPartnerHandoffWorkspace } from './CatalogPartnerHandoffWorkspace';
-import { CatalogMediaGovernanceWorkspace } from './CatalogMediaGovernanceWorkspace';
 // Orchestration — workspace routing extracted from monolith
 import { CatalogWorkspaceRouter } from './CatalogWorkspaceRouter';
-import type { CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
+import type { CatalogWorkspaceId, CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
 
-import { filterCategoryTree } from './catalogs.adapters';
-import { initialColumnFilters, type CatalogFilterColumnId, type FilterType } from './catalogs.model';
+import {
+  appendCatalogPreviewProposal,
+  applyCatalogProductPreviewPatches,
+  cloneCatalogCategories,
+  createPreviewMainCategory,
+  createPreviewMainClassification,
+  createPreviewSubCategory,
+  createPreviewSubClassification,
+  filterCategoryTree,
+  hasDuplicateCatalogLabel,
+  mergeCatalogProductPreviewPatch,
+  toggleReadonlyStringSet,
+  type CatalogProductPreviewPatch,
+} from './catalogs.adapters';
+import {
+  createCatalogPreviewProposal,
+  createCatalogProductPatchProposal,
+  initialColumnFilters,
+  toCatalogApprovalStage,
+  toCatalogMediaPolicy,
+  type CatalogEditEntry,
+  type CatalogFilterColumnId,
+  type CatalogTaxonomyNodeRef,
+  type FilterType,
+} from './catalogs.model';
 import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalog.parts';
 
 // --- Types ---
@@ -47,11 +62,6 @@ type WorkspaceMode =
   | 'category-mapping'
   | 'media-governance'
   | 'marketing-approvals';
-
-// ActiveWorkspaceOverlay → replaced by CatalogWorkspaceState from catalog-workspace.types.ts
-// Kept as local alias for backward compatibility during transition.
-// router-ready: maps to future URL query params.
-// Not URL binding yet.
 
 const catalogPageSize = 5;
 
@@ -77,15 +87,10 @@ export function ControlPanelDshCatalogScreen({
   const [workspaceState, setWorkspaceState] = useState<CatalogWorkspaceState | null>(null);
   // Preview proposals — replaces local runtime-like mutations
   const [pendingProposals, setPendingProposals] = useState<CatalogPreviewProposal[]>([]);
-  // Detail-on-open workspace overlay — alias kept for gradual migration
-  // TODO: replace all setActiveWorkspaceOverlay calls with setWorkspaceState
-  const setActiveWorkspaceOverlay = (
-    overlay: { type: string; productId?: string } | null
-  ) => {
-    if (!overlay) { setWorkspaceState(null); return; }
+  const openWorkspace = (workspace: CatalogWorkspaceId, productId?: string) => {
     setWorkspaceState({
-      workspace: overlay.type as CatalogWorkspaceState['workspace'],
-      productId: overlay.productId,
+      workspace,
+      productId,
       sourceSurface: 'catalogs',
     });
   };
@@ -95,11 +100,33 @@ export function ControlPanelDshCatalogScreen({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [catalogPage, setCatalogPage] = useState(1);
-  // Preview-only approval stage overrides — no backend
-  const [previewApprovalStages, setPreviewApprovalStages] = useState<Record<string, string>>({});
+  const [productPreviewPatches, setProductPreviewPatches] = useState<Record<string, CatalogProductPreviewPatch>>({});
+  const products = useMemo(
+    () => applyCatalogProductPreviewPatches(dshCatalogProducts, productPreviewPatches),
+    [productPreviewPatches]
+  );
 
-  // Real interactive products list state initialized from original catalog data
-  const [products, setProducts] = useState<CatalogProductMaster[]>(() => dshCatalogProducts);
+  const pushPreviewProposal = React.useCallback((proposal: CatalogPreviewProposal) => {
+    setPendingProposals((prev) => appendCatalogPreviewProposal(prev, proposal));
+  }, []);
+
+  const queueProductPreviewPatch = React.useCallback((
+    product: CatalogProductMaster,
+    patch: CatalogProductPreviewPatch,
+    label: string,
+    note: string,
+    apiBoundary?: string,
+  ) => {
+    setProductPreviewPatches((prev) => mergeCatalogProductPreviewPatch(prev, product.id, patch));
+    pushPreviewProposal(createCatalogProductPatchProposal({
+      product,
+      patchKeys: Object.keys(patch),
+      label,
+      note,
+      apiBoundary,
+    }));
+    setActionMessage(label);
+  }, [pushPreviewProposal]);
 
   // Modals state for Add / Edit Product
   const [showProductModal, setShowProductModal] = useState(false);
@@ -136,16 +163,7 @@ export function ControlPanelDshCatalogScreen({
 
   // ── Category Control Room State (Preview-Only) ────────────────────
   const [previewCategories, setPreviewCategories] = useState<CatalogMainCategory[]>(
-    () => dshCatalogCategories.map((c) => ({
-      ...c,
-      subcategories: c.subcategories.map(sub => ({
-        ...sub,
-        mainClassifications: sub.mainClassifications ? sub.mainClassifications.map(mc => ({
-          ...mc,
-          subClassifications: mc.subClassifications ? [...mc.subClassifications] : []
-        })) : []
-      }))
-    }))
+    () => cloneCatalogCategories(dshCatalogCategories)
   );
 
   const [hiddenCategoryIds, setHiddenCategoryIds] = useState<ReadonlySet<string>>(new Set());
@@ -160,14 +178,7 @@ export function ControlPanelDshCatalogScreen({
   const [formSubtitle, setFormSubtitle] = useState('');
   const [catError, setCatError] = useState<string | null>(null);
 
-  type CatEditEntry = {
-    type: 'main' | 'sub' | 'mainClassif' | 'subClassif';
-    mainId: string;
-    subId?: string;
-    mainClassifId?: string;
-    subClassifId?: string;
-  };
-  const [editingEntry, setEditingEntry] = useState<CatEditEntry | null>(null);
+  const [editingEntry, setEditingEntry] = useState<CatalogEditEntry | null>(null);
   const [editLabel, setEditLabel] = useState('');
   const [editSubtitle, setEditSubtitle] = useState('');
 
@@ -175,13 +186,7 @@ export function ControlPanelDshCatalogScreen({
   const [activeMainClassifId, setActiveMainClassifId] = useState<string | null>(null);
   const [activeSubClassifId, setActiveSubClassifId] = useState<string | null>(null);
 
-  const [selectedTaxonomyNode, setSelectedTaxonomyNode] = useState<{
-    type: 'main' | 'sub' | 'mainClassif' | 'subClassif';
-    mainId: string;
-    subId?: string;
-    mainClassifId?: string;
-    subClassifId?: string;
-  } | null>(null);
+  const [selectedTaxonomyNode, setSelectedTaxonomyNode] = useState<CatalogTaxonomyNodeRef | null>(null);
 
   // Collapse/Expand state for central taxonomy tree
   const [expandedMainCategoryIds, setExpandedMainCategoryIds] = useState<ReadonlySet<string>>(new Set());
@@ -317,21 +322,12 @@ export function ControlPanelDshCatalogScreen({
       [products]
   );
 
-  const checkDuplicateName = (label: string, list: { label: string }[]) => {
-    return list.some((item) => item.label.trim().toLowerCase() === label.trim().toLowerCase());
-  };
-
   const handleAddMainCategory = React.useCallback(() => {
     const label = formLabel.trim();
     if (!label) { setCatError('الاسم مطلوب'); return; }
-    if (checkDuplicateName(label, previewCategories)) { setCatError('هذا الاسم موجود مسبقاً'); return; }
+    if (hasDuplicateCatalogLabel(label, previewCategories)) { setCatError('هذا الاسم موجود مسبقاً'); return; }
     const id = `cat-preview-${label.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
-    const emoji = label[0] ?? '📦';
-    const newCat: CatalogMainCategory = {
-      id, label, ['subtitle']: formSubtitle.trim(),
-      subcategories: [], emojiFallback: emoji,
-      defaultMediaPolicy: 'catalog-owned-media', categoryMode: 'catalog-based',
-    };
+    const newCat = createPreviewMainCategory(id, label, formSubtitle.trim());
     setPreviewCategories((prev) => [...prev, newCat]);
     setFormLabel(''); setFormSubtitle(''); setAddingMainCat(false); setCatError(null);
   }, [formLabel, formSubtitle, previewCategories]);
@@ -340,13 +336,13 @@ export function ControlPanelDshCatalogScreen({
     const label = formLabel.trim();
     if (!label) { setCatError('الاسم مطلوب'); return; }
     const parentCat = previewCategories.find(c => c.id === parentId);
-    if (parentCat && checkDuplicateName(label, parentCat.subcategories)) {
+    if (parentCat && hasDuplicateCatalogLabel(label, parentCat.subcategories)) {
       setCatError('اسم مكرر في هذه الفئة الفرعية'); return;
     }
     setPreviewCategories((prev) => prev.map((cat) => {
       if (cat.id !== parentId) return cat;
       const id = `subcat-preview-${label.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
-      return { ...cat, subcategories: [...cat.subcategories, { id, label, ['subtitle']: formSubtitle.trim(), mainClassifications: [] }] };
+      return { ...cat, subcategories: [...cat.subcategories, createPreviewSubCategory(id, label, formSubtitle.trim())] };
     }));
     setFormLabel(''); setFormSubtitle(''); setAddingSubUnder(null); setCatError(null);
   }, [formLabel, formSubtitle, previewCategories]);
@@ -356,7 +352,7 @@ export function ControlPanelDshCatalogScreen({
     if (!label) { setCatError('الاسم مطلوب'); return; }
     const parentCat = previewCategories.find(c => c.id === mainId);
     const parentSub = parentCat?.subcategories.find(s => s.id === subId);
-    if (parentSub && checkDuplicateName(label, parentSub.mainClassifications || [])) {
+    if (parentSub && hasDuplicateCatalogLabel(label, parentSub.mainClassifications || [])) {
       setCatError('اسم تصنيف رئيسي مكرر في هذه الفئة الفرعية'); return;
     }
     setPreviewCategories((prev) => prev.map((cat) => {
@@ -368,7 +364,7 @@ export function ControlPanelDshCatalogScreen({
           const id = `classif-main-${subId}-${Date.now()}`;
           return {
             ...sub,
-            mainClassifications: [...(sub.mainClassifications || []), { id, label, subClassifications: [] }]
+            mainClassifications: [...(sub.mainClassifications || []), createPreviewMainClassification(id, label)]
           };
         })
       };
@@ -382,7 +378,7 @@ export function ControlPanelDshCatalogScreen({
     const parentCat = previewCategories.find(c => c.id === mainId);
     const parentSub = parentCat?.subcategories.find(s => s.id === subId);
     const parentClassif = parentSub?.mainClassifications?.find(c => c.id === mainClassifId);
-    if (parentClassif && checkDuplicateName(label, parentClassif.subClassifications || [])) {
+    if (parentClassif && hasDuplicateCatalogLabel(label, parentClassif.subClassifications || [])) {
       setCatError('اسم تصنيف فرعي مكرر في هذا التصنيف الرئيسي'); return;
     }
     setPreviewCategories((prev) => prev.map((cat) => {
@@ -398,7 +394,7 @@ export function ControlPanelDshCatalogScreen({
               const id = `classif-sub-${mainClassifId}-${Date.now()}`;
               return {
                 ...mc,
-                subClassifications: [...(mc.subClassifications || []), { id, label }]
+                subClassifications: [...(mc.subClassifications || []), createPreviewSubClassification(id, label)]
               };
             })
           };
@@ -409,19 +405,11 @@ export function ControlPanelDshCatalogScreen({
   }, [formLabel, previewCategories]);
 
   const handleToggleCategoryHide = React.useCallback((id: string) => {
-    setHiddenCategoryIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next as ReadonlySet<string>;
-    });
+    setHiddenCategoryIds((prev) => toggleReadonlyStringSet(prev, id));
   }, []);
 
   const handleToggleSubCategoryHide = React.useCallback((id: string) => {
-    setHiddenSubCategoryIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next as ReadonlySet<string>;
-    });
+    setHiddenSubCategoryIds((prev) => toggleReadonlyStringSet(prev, id));
   }, []);
 
   const handleDeleteNode = React.useCallback((
@@ -458,32 +446,12 @@ export function ControlPanelDshCatalogScreen({
       }
     });
 
-    // Clean up product links to deleted items
-    setProducts((prevProducts) => prevProducts.map((p) => {
-      const path = { ...p.categoryPath };
-      let updated = false;
-
-      if (type === 'main' && path.main === mainId) {
-        path.main = 'grocery';
-        path.sub = undefined;
-        path.mainClassification = undefined;
-        path.subClassification = undefined;
-        updated = true;
-      } else if (type === 'sub' && path.main === mainId && path.sub === subId) {
-        path.sub = undefined;
-        path.mainClassification = undefined;
-        path.subClassification = undefined;
-        updated = true;
-      } else if (type === 'mainClassif' && path.mainClassification === mainClassifId) {
-        path.mainClassification = undefined;
-        path.subClassification = undefined;
-        updated = true;
-      } else if (type === 'subClassif' && path.subClassification === subClassifId) {
-        path.subClassification = undefined;
-        updated = true;
-      }
-
-      return updated ? { ...p, categoryPath: path } : p;
+    pushPreviewProposal(createCatalogPreviewProposal({
+      type: 'taxonomy-mapping',
+      label: 'تم تسجيل تعديل شجرة الفئات كمعاينة',
+      status: 'ready-for-api',
+      note: `حذف ${type} ضمن شجرة الفئات. لم يتم تعديل بيانات المنتجات المركزية؛ يحتاج API لتحديث الروابط المتأثرة.`,
+      apiBoundary: 'PATCH /catalog/taxonomy',
     }));
 
     // Reset filtering selectors if currently filtered by deleted items
@@ -505,21 +473,10 @@ export function ControlPanelDshCatalogScreen({
 
     setEditingEntry(null);
     setCatError(null);
-  }, [activeMainCategory, activeSubCategory, activeMainClassifId, activeSubClassifId]);
+  }, [activeMainCategory, activeSubCategory, activeMainClassifId, activeSubClassifId, pushPreviewProposal]);
 
   const handleResetCategoryPreview = React.useCallback(() => {
-    setPreviewCategories(
-      dshCatalogCategories.map((c) => ({
-        ...c,
-        subcategories: c.subcategories.map(sub => ({
-          ...sub,
-          mainClassifications: sub.mainClassifications ? sub.mainClassifications.map(mc => ({
-            ...mc,
-            subClassifications: mc.subClassifications ? [...mc.subClassifications] : []
-          })) : []
-        }))
-      }))
-    );
+    setPreviewCategories(cloneCatalogCategories(dshCatalogCategories));
     setHiddenCategoryIds(new Set());
     setHiddenSubCategoryIds(new Set());
     setAddingMainCat(false);
@@ -660,8 +617,9 @@ export function ControlPanelDshCatalogScreen({
   const { filteredProducts, counts, filterOptions } = useMemo(() => {
     // 1. Base set: filter by Category and Manual Order mode
     if (isManualOrderCategory) {
+      const emptyFilteredProducts: CatalogProductMaster[] = [];
       return {
-        filteredProducts: [] as CatalogProductMaster[],
+        filteredProducts: emptyFilteredProducts,
         counts: {
           'all': 0, 'active': 0, 'review': 0, 'conflict': 0, 'master': 0, 'partner': 0, 'needs-link': 0, 'needs-image': 0
         },
@@ -870,10 +828,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'تبديل سياسة صور المجموعة',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'تبديل سياسة الصور للمنتجات المحددة في الجدول',
+              note: 'UI_PREVIEW_ONLY | تبديل سياسة الصور للمنتجات المحددة في الجدول',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         },
@@ -882,8 +840,7 @@ export function ControlPanelDshCatalogScreen({
           label: '↺ إعادة ضبط الكتالوج',
           isActive: false,
           onAction: () => {
-            setProducts(dshCatalogProducts);
-            setPreviewApprovalStages({});
+            setProductPreviewPatches({});
             setActionMessage('تمت إعادة الكتالوج لحالة المصدر الأولية');
           }
         }
@@ -902,10 +859,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'اعتماد مقترحات الشركاء',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية',
+              note: 'UI_PREVIEW_ONLY | اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         }
@@ -924,10 +881,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'اعتماد كل مراجعات التسويق',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'اعتماد مراجعات التسويق المحددة بنجاح',
+              note: 'UI_PREVIEW_ONLY | اعتماد مراجعات التسويق المحددة بنجاح',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -944,10 +901,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'تمرير جميع فحوصات الجودة',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'تمرير فحوصات الجودة لمنتجات الشركاء بنجاح',
+              note: 'UI_PREVIEW_ONLY | تمرير فحوصات الجودة لمنتجات الشركاء بنجاح',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -964,10 +921,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'تسوية تعارض الأسعار تلقائياً',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير',
+              note: 'UI_PREVIEW_ONLY | خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -984,10 +941,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'تعيين صور مركزية معتمدة',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور',
+              note: 'UI_PREVIEW_ONLY | تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -1025,10 +982,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'دمج وحل جميع التكرارات',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'دمج التكرارات وحل النزاعات للمنتجات المحددة',
+              note: 'UI_PREVIEW_ONLY | دمج التكرارات وحل النزاعات للمنتجات المحددة',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -1045,10 +1002,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'مزامنة الباركود مع المعرف',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'تعيين GTIN بالاعتماد على SKU للمنتجات المحددة',
+              note: 'UI_PREVIEW_ONLY | تعيين GTIN بالاعتماد على SKU للمنتجات المحددة',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -1083,10 +1040,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'تبديل الظهور للمستهلكين',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'تعديل منصات العرض المتاحة للمنتجات المحددة',
+              note: 'UI_PREVIEW_ONLY | تعديل منصات العرض المتاحة للمنتجات المحددة',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
@@ -1105,10 +1062,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'نشر جميع المنتجات الجاهزة للعميل',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'نشر جميع المنتجات الجاهزة بنجاح للعميل',
+              note: 'UI_PREVIEW_ONLY | نشر جميع المنتجات الجاهزة بنجاح للعميل',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         },
@@ -1124,10 +1081,10 @@ export function ControlPanelDshCatalogScreen({
               label: 'إخفاء جميع المسودات والمقترحات',
               status: 'ready-for-api',
               owner: 'control-panel-catalogs',
-              note: 'التأكد من إخفاء جميع المسودات ومقترحات الشركاء',
+              note: 'UI_PREVIEW_ONLY | التأكد من إخفاء جميع المسودات ومقترحات الشركاء',
               productIds
             };
-            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         }
@@ -1149,7 +1106,7 @@ export function ControlPanelDshCatalogScreen({
        {openFilterCol === colId && (
          <FilterDropdown
             titleText={title}
-            options={filterOptions[colId as keyof typeof filterOptions] || []}
+            options={filterOptions[colId] || []}
             selected={colFilters[colId]}
           onChange={(val) => setColFilters(prev => ({ ...prev, [colId]: val }))}
             onClose={() => setOpenFilterCol(null)}
@@ -1242,7 +1199,7 @@ export function ControlPanelDshCatalogScreen({
                 label="▸ فتح workspace استلام الشريك"
                 tone="secondary"
                 size="sm"
-                onPress={() => setActiveWorkspaceOverlay({ type: 'partner-handoff' })}
+                onPress={() => openWorkspace('partner-handoff')}
               />
             )}
           </div>
@@ -1258,7 +1215,7 @@ export function ControlPanelDshCatalogScreen({
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {filteredProducts.map(p => {
-                const resolvedStage = previewApprovalStages[p.id] ?? p.approvalStage;
+                const resolvedStage = p.approvalStage;
 
                 // Map status to: pending / review / blocked / ready
                 let statusLabel = 'معلق';
@@ -1329,7 +1286,7 @@ export function ControlPanelDshCatalogScreen({
     let title = '';
     let description = '';
     let whyItMatters = '';
-    let affectedSurfaces = [] as string[];
+    let affectedSurfaces: string[] = [];
     let nextActionLabel = '';
 
     if (activeSubTab === 'categories') {
@@ -1443,7 +1400,7 @@ export function ControlPanelDshCatalogScreen({
                 label="▸ فتح workspace حل التكرارات"
                 tone="brand"
                 size="sm"
-                onPress={() => setActiveWorkspaceOverlay({ type: 'duplicate-resolution' })}
+                onPress={() => openWorkspace('duplicate-resolution')}
               />
             )}
             {(activeSubTab === 'gtin') && (
@@ -1451,7 +1408,7 @@ export function ControlPanelDshCatalogScreen({
                 label="▸ فتح workspace حوكمة الهوية"
                 tone="brand"
                 size="sm"
-                onPress={() => setActiveWorkspaceOverlay({ type: 'identity-governance' })}
+                onPress={() => openWorkspace('identity-governance')}
               />
             )}
             {activeSubTab === 'media' && (
@@ -1459,7 +1416,7 @@ export function ControlPanelDshCatalogScreen({
                 label="▸ فتح workspace حوكمة الوسائط"
                 tone="brand"
                 size="sm"
-                onPress={() => setActiveWorkspaceOverlay({ type: 'media-governance' })}
+                onPress={() => openWorkspace('media-governance')}
               />
             )}
             {activeSubTab === 'visibility-policy' && (
@@ -1470,7 +1427,7 @@ export function ControlPanelDshCatalogScreen({
                 onPress={() => {
                   const firstProduct = filteredProducts[0];
                   if (firstProduct) {
-                    setActiveWorkspaceOverlay({ type: 'visibility-policy', productId: firstProduct.id });
+                    openWorkspace('visibility-policy', firstProduct.id);
                   }
                 }}
                 disabled={filteredProducts.length === 0}
@@ -1896,7 +1853,7 @@ export function ControlPanelDshCatalogScreen({
           {/* Sub-row 2: Smart Filters chips */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
             <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>تصفية ذكية:</Text>
-            {[
+            {([
               { id: 'all', label: 'الكل' },
               { id: 'active', label: 'نشط' },
               { id: 'review', label: 'مراجعة' },
@@ -1905,12 +1862,12 @@ export function ControlPanelDshCatalogScreen({
               { id: 'partner', label: 'شريك' },
               { id: 'needs-link', label: 'يحتاج ربط' },
               { id: 'needs-image', label: 'يحتاج صورة' },
-            ].map(f => {
+            ] satisfies { id: FilterType; label: string }[]).map(f => {
               const isSelected = activeFilter === f.id;
               return (
                 <button
                   key={f.id}
-                  onClick={() => setActiveFilter(f.id as FilterType)}
+                  onClick={() => setActiveFilter(f.id)}
                   style={{
                     padding: '2px 8px',
                     borderRadius: '10px',
@@ -2480,13 +2437,19 @@ export function ControlPanelDshCatalogScreen({
                                       size="sm"
                                       disabled={!(isCategoryMapped && isDuplicatesClean && isMediaSatisfied && approvedCount > 0)}
                                       onPress={() => {
-                                        setProducts(prev => prev.map(p => {
-                                          if (p.approvalStage === 'catalog-adopted') {
-                                            return { ...p, approvalStage: 'client-visible' };
-                                          }
-                                          return p;
+                                        const readyProducts = products.filter((p) => p.approvalStage === 'catalog-adopted');
+                                        setProductPreviewPatches((prev) => readyProducts.reduce(
+                                          (next, product) => mergeCatalogProductPreviewPatch(next, product.id, { approvalStage: 'client-visible' }),
+                                          prev
+                                        ));
+                                        pushPreviewProposal(createCatalogPreviewProposal({
+                                          type: 'visibility-change',
+                                          productIds: readyProducts.map((product) => product.id),
+                                          label: 'نشر الكتالوج بالكامل للعميل',
+                                          note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                                          apiBoundary: 'POST /catalog/products/publish',
                                         }));
-                                        setActionMessage('تم نشر جميع المنتجات الجاهزة بنجاح وأصبحت مرئية للعميل!');
+                                        setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');
                                       }}
                                     />
                                   </Box>
@@ -2511,7 +2474,7 @@ export function ControlPanelDshCatalogScreen({
                                     const cat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
                                     const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
                                     const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
-                                    const resolvedStage = previewApprovalStages[p.id] ?? p.approvalStage;
+                                    const resolvedStage = p.approvalStage;
                                     return (
                                       <tr
                                         key={p.id}
@@ -2595,7 +2558,7 @@ export function ControlPanelDshCatalogScreen({
                           label="▸ Workspace"
                           tone="brand"
                           size="sm"
-                          onPress={() => setActiveWorkspaceOverlay({ type: 'item-detail', productId: selectedProductId })}
+                          onPress={() => openWorkspace('item-detail', selectedProductId ?? undefined)}
                           accessibilityLabel="فتح workspace تفاصيل العنصر"
                         />
                         <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setSelectedProductId(null)} />
@@ -2618,10 +2581,12 @@ export function ControlPanelDshCatalogScreen({
                               value={selectedProduct.categoryPath.main}
                               onChange={(e) => {
                                 const newMain = e.target.value;
-                                setProducts(prev => prev.map(p => p.id === selectedProduct.id ? {
-                                  ...p,
-                                  categoryPath: { ...p.categoryPath, main: newMain, sub: undefined, mainClassification: undefined, subClassification: undefined }
-                                } : p));
+                                queueProductPreviewPatch(
+                                  selectedProduct,
+                                  { categoryPath: { ...selectedProduct.categoryPath, main: newMain, sub: undefined, mainClassification: undefined, subClassification: undefined } },
+                                  'تم تسجيل مقترح تغيير الفئة الرئيسية',
+                                  'تغيير categoryPath.main كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
+                                );
                               }}
                               style={{
                                 padding: '4px 6px',
@@ -2644,10 +2609,12 @@ export function ControlPanelDshCatalogScreen({
                               value={selectedProduct.categoryPath.sub || ''}
                               onChange={(e) => {
                                 const newSub = e.target.value || undefined;
-                                setProducts(prev => prev.map(p => p.id === selectedProduct.id ? {
-                                  ...p,
-                                  categoryPath: { ...p.categoryPath, sub: newSub, mainClassification: undefined, subClassification: undefined }
-                                } : p));
+                                queueProductPreviewPatch(
+                                  selectedProduct,
+                                  { categoryPath: { ...selectedProduct.categoryPath, sub: newSub, mainClassification: undefined, subClassification: undefined } },
+                                  'تم تسجيل مقترح تغيير الفئة الفرعية',
+                                  'تغيير categoryPath.sub كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
+                                );
                               }}
                               style={{
                                 padding: '4px 6px',
@@ -2678,10 +2645,12 @@ export function ControlPanelDshCatalogScreen({
                                     value={selectedProduct.categoryPath.mainClassification || ''}
                                     onChange={(e) => {
                                       const newMainClassif = e.target.value || undefined;
-                                      setProducts(prev => prev.map(p => p.id === selectedProduct.id ? {
-                                        ...p,
-                                        categoryPath: { ...p.categoryPath, mainClassification: newMainClassif, subClassification: undefined }
-                                      } : p));
+                                      queueProductPreviewPatch(
+                                        selectedProduct,
+                                        { categoryPath: { ...selectedProduct.categoryPath, mainClassification: newMainClassif, subClassification: undefined } },
+                                        'تم تسجيل مقترح تغيير التصنيف الرئيسي',
+                                        'تغيير categoryPath.mainClassification كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
+                                      );
                                     }}
                                     style={{
                                       padding: '4px 6px',
@@ -2711,10 +2680,12 @@ export function ControlPanelDshCatalogScreen({
                                           value={selectedProduct.categoryPath.subClassification || ''}
                                           onChange={(e) => {
                                             const newSubClassif = e.target.value || undefined;
-                                            setProducts(prev => prev.map(p => p.id === selectedProduct.id ? {
-                                              ...p,
-                                              categoryPath: { ...p.categoryPath, subClassification: newSubClassif }
-                                            } : p));
+                                            queueProductPreviewPatch(
+                                              selectedProduct,
+                                              { categoryPath: { ...selectedProduct.categoryPath, subClassification: newSubClassif } },
+                                              'تم تسجيل مقترح تغيير التصنيف الفرعي',
+                                              'تغيير categoryPath.subClassification كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
+                                            );
                                           }}
                                           style={{
                                             padding: '4px 6px',
@@ -2767,8 +2738,12 @@ export function ControlPanelDshCatalogScreen({
                                     size="sm"
                                     style={{ flex: 1 }}
                                     onPress={() => {
-                                      setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-adopted', mediaPolicy: 'catalog-owned-media' } : p));
-                                      setActionMessage('تم الاعتماد كمنتج مركزي');
+                                      queueProductPreviewPatch(
+                                        selectedProduct,
+                                        { approvalStage: 'catalog-adopted', mediaPolicy: 'catalog-owned-media' },
+                                        'تم تسجيل مقترح الاعتماد كمنتج مركزي',
+                                        'اعتماد المنتج كمنتج مركزي كمعاينة فقط.',
+                                      );
                                     }}
                                   />
                                   <Button
@@ -2777,8 +2752,12 @@ export function ControlPanelDshCatalogScreen({
                                     size="sm"
                                     style={{ flex: 1 }}
                                     onPress={() => {
-                                      setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-adopted', mediaPolicy: 'partner-owned-exception' } : p));
-                                      setActionMessage('تم الاعتماد كاستثناء شريك');
+                                      queueProductPreviewPatch(
+                                        selectedProduct,
+                                        { approvalStage: 'catalog-adopted', mediaPolicy: 'partner-owned-exception' },
+                                        'تم تسجيل مقترح الاعتماد كاستثناء شريك',
+                                        'اعتماد المنتج كاستثناء شريك كمعاينة فقط.',
+                                      );
                                     }}
                                   />
                                 </Box>
@@ -2789,8 +2768,12 @@ export function ControlPanelDshCatalogScreen({
                                     size="sm"
                                     style={{ flex: 1 }}
                                     onPress={() => {
-                                      setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-draft' } : p));
-                                      setActionMessage('تمت الإعادة لمسودة الكتالوج لتصحيح البيانات');
+                                      queueProductPreviewPatch(
+                                        selectedProduct,
+                                        { approvalStage: 'catalog-draft' },
+                                        'تم تسجيل مقترح إعادة المنتج للمسودة',
+                                        'إعادة المنتج لمسودة الكتالوج كمعاينة فقط.',
+                                      );
                                     }}
                                   />
                                 </Box>
@@ -2807,8 +2790,12 @@ export function ControlPanelDshCatalogScreen({
                                     size="sm"
                                     style={{ flex: 1 }}
                                     onPress={() => {
-                                      setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-adopted' } : p));
-                                      setActionMessage('تم تمرير فحص الجودة بنجاح');
+                                      queueProductPreviewPatch(
+                                        selectedProduct,
+                                        { approvalStage: 'catalog-adopted' },
+                                        'تم تسجيل مقترح تمرير فحص الجودة',
+                                        'تمرير فحص الجودة كمعاينة فقط.',
+                                      );
                                     }}
                                   />
                                   <Button
@@ -2817,8 +2804,12 @@ export function ControlPanelDshCatalogScreen({
                                     size="sm"
                                     style={{ flex: 1 }}
                                     onPress={() => {
-                                      setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'catalog-draft' } : p));
-                                      setActionMessage('تم إرجاع المنتج للمسودة للتعديل');
+                                      queueProductPreviewPatch(
+                                        selectedProduct,
+                                        { approvalStage: 'catalog-draft' },
+                                        'تم تسجيل مقترح إرجاع المنتج للمسودة',
+                                        'إرجاع المنتج للمسودة كمعاينة فقط.',
+                                      );
                                     }}
                                   />
                                 </Box>
@@ -2833,8 +2824,12 @@ export function ControlPanelDshCatalogScreen({
                                   tone="brand"
                                   size="sm"
                                   onPress={() => {
-                                    setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, approvalStage: 'client-visible' } : p));
-                                    setActionMessage('تم النشر والظهور الفوري للعميل');
+                                    queueProductPreviewPatch(
+                                      selectedProduct,
+                                      { approvalStage: 'client-visible' },
+                                      'تم تسجيل مقترح النشر للعميل',
+                                      'تغيير الظهور إلى client-visible كمعاينة فقط.',
+                                    );
                                   }}
                                 />
                               </Box>
@@ -2848,8 +2843,12 @@ export function ControlPanelDshCatalogScreen({
                                   tone="primary"
                                   size="sm"
                                   onPress={() => {
-                                    setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, conflictReason: undefined } : p));
-                                    setActionMessage('تم حل التعارض والدمج بنجاح');
+                                    queueProductPreviewPatch(
+                                      selectedProduct,
+                                      { conflictReason: undefined },
+                                      'تم تسجيل مقترح حل التعارض',
+                                      'إزالة conflictReason كمعاينة فقط؛ الدمج الفعلي يحتاج API.',
+                                    );
                                   }}
                                 />
                               </Box>
@@ -2863,8 +2862,13 @@ export function ControlPanelDshCatalogScreen({
                                   size="sm"
                                   onPress={() => {
                                     const barcode = `628${Math.floor(1000000000 + Math.random() * 9000000000)}`;
-                                    setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, gtin: barcode } : p));
-                                    setActionMessage(`تم توليد باركود: ${barcode}`);
+                                    queueProductPreviewPatch(
+                                      selectedProduct,
+                                      { gtin: barcode, barcode },
+                                      `تم تسجيل مقترح حجز باركود: ${barcode}`,
+                                      'حجز GTIN كمعاينة فقط؛ لا يوجد binding مع سجل الباركود.',
+                                      'POST /catalog/products/{id}/barcode-reservations',
+                                    );
                                   }}
                                 />
                               </Box>
@@ -2878,8 +2882,13 @@ export function ControlPanelDshCatalogScreen({
                                   tone="secondary"
                                   size="sm"
                                   onPress={() => {
-                                    setProducts(prev => prev.map(p => p.id === selectedProduct.id ? { ...p, price: 45.00 } : p));
-                                    setActionMessage('تمت تسوية سعر المنتج');
+                                    queueProductPreviewPatch(
+                                      selectedProduct,
+                                      { price: 45.00 },
+                                      'تم تسجيل مقترح تسوية سعر المنتج',
+                                      'تسوية السعر إلى 45.00 كمعاينة فقط.',
+                                      'PATCH /catalog/products/{id}/price',
+                                    );
                                   }}
                                 />
                               </Box>
@@ -3582,8 +3591,10 @@ export function ControlPanelDshCatalogScreen({
                                              if (file) {
                                                const reader = new FileReader();
                                                reader.onload = (event) => {
-                                                 const base64 = event.target?.result as string;
-                                                 updateNodeField({ mediaKey: '', imageUri: base64 });
+                                                 const result = event.target?.result;
+                                                 if (typeof result === 'string') {
+                                                   updateNodeField({ mediaKey: '', imageUri: result });
+                                                 }
                                                };
                                                reader.readAsDataURL(file);
                                              }
@@ -3672,7 +3683,7 @@ export function ControlPanelDshCatalogScreen({
           justifyContent: 'center',
           zIndex: 9999,
         }}>
-          <Surface tone="raised" padding={4} gap={3} style={{ width: 420, maxWidth: '90%', maxHeight: '90%', overflowY: 'auto' } as any}>
+          <Surface tone="raised" padding={4} gap={3} style={{ width: 420, maxWidth: '90%', maxHeight: '90%', overflowY: 'auto' }}>
             <Box layoutDirection="row" justify="space-between" align="center" style={{ borderBottomWidth: 1, borderBottomColor: theme.line, paddingBottom: 8 }}>
               <Text role="bodyStrong" style={{ fontSize: 16 }}>{modalMode === 'add' ? 'إضافة منتج جديد' : 'تعديل منتج الكتالوج'}</Text>
               <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setShowProductModal(false)} />
@@ -3813,7 +3824,10 @@ export function ControlPanelDshCatalogScreen({
                   <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>السياسة *</Text>
                   <select
                     value={modalForm.mediaPolicy}
-                    onChange={e => setModalForm(prev => ({ ...prev, mediaPolicy: e.target.value as any }))}
+                    onChange={e => setModalForm(prev => ({
+                      ...prev,
+                      mediaPolicy: toCatalogMediaPolicy(e.target.value, prev.mediaPolicy),
+                    }))}
                     style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
                   >
                     <option value="catalog-owned-media">مركزي</option>
@@ -3826,7 +3840,10 @@ export function ControlPanelDshCatalogScreen({
                   <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>حالة الاعتماد *</Text>
                   <select
                     value={modalForm.approvalStage}
-                    onChange={e => setModalForm(prev => ({ ...prev, approvalStage: e.target.value as any }))}
+                    onChange={e => setModalForm(prev => ({
+                      ...prev,
+                      approvalStage: toCatalogApprovalStage(e.target.value, prev.approvalStage),
+                    }))}
                     style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
                   >
                     <option value="catalog-draft">مسودة</option>
@@ -3849,30 +3866,17 @@ export function ControlPanelDshCatalogScreen({
                     return;
                   }
                   if (modalMode === 'add') {
-                    const newProd: CatalogProductMaster = {
-                      id: `prd-custom-${Date.now()}`,
-                      name: modalForm.name,
-                      sku: modalForm.sku,
-                      gtin: modalForm.gtin || undefined,
-                      price: modalForm.price,
-                      categoryPath: {
-                        main: modalForm.mainCat,
-                        sub: modalForm.subCat || undefined,
-                        mainClassification: modalForm.mainClassif || undefined,
-                        subClassification: modalForm.subClassif || undefined,
-                      },
-                      mediaPolicy: modalForm.mediaPolicy,
-                      approvalStage: modalForm.approvalStage,
-                      sourceSurface: 'catalog',
-                      surfaces: ['client', 'partner'],
-                      imageUri: modalForm.imageUri || undefined,
-                      mediaKey: modalForm.mediaKey || undefined,
-                      emojiFallback: modalForm.name[0],
-                    };
-                    setProducts(prev => [...prev, newProd]);
+                    pushPreviewProposal(createCatalogPreviewProposal({
+                      type: 'create-product',
+                      label: 'تم تسجيل مقترح إضافة منتج',
+                      note: `اسم المنتج: ${modalForm.name} | sku: ${modalForm.sku} | categoryPath: ${modalForm.mainCat}/${modalForm.subCat || 'عام'} | mediaKey: ${modalForm.mediaKey || 'غير محدد'}`,
+                      apiBoundary: 'POST /catalog/products',
+                    }));
+                    setActionMessage('تم تسجيل مقترح إضافة المنتج كمعاينة');
                   } else {
-                    setProducts(prev => prev.map(p => p.id === modalForm.id ? {
-                      ...p,
+                    const product = products.find((p) => p.id === modalForm.id);
+                    if (product) {
+                      queueProductPreviewPatch(product, {
                       name: modalForm.name,
                       sku: modalForm.sku,
                       gtin: modalForm.gtin || undefined,
@@ -3887,7 +3891,8 @@ export function ControlPanelDshCatalogScreen({
                       approvalStage: modalForm.approvalStage,
                       imageUri: modalForm.imageUri || undefined,
                       mediaKey: modalForm.mediaKey || undefined,
-                    } : p));
+                      }, 'تم تسجيل مقترح تعديل بيانات المنتج', 'تعديل بيانات المنتج كمعاينة فقط.');
+                    }
                   }
                   setShowProductModal(false);
                 }}
@@ -3908,7 +3913,7 @@ export function ControlPanelDshCatalogScreen({
         selectedProductIds={selectedProductIds}
         onClose={() => setWorkspaceState(null)}
         onProposal={(proposal) => {
-          setPendingProposals((prev) => [proposal, ...prev.slice(0, 9)]);
+          pushPreviewProposal(proposal);
           setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
         }}
       />

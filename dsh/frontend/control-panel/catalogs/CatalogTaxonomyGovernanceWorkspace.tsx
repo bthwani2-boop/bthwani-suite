@@ -102,8 +102,8 @@ export function CatalogTaxonomyGovernanceWorkspace({
         height: '100%',
         overflow: 'scroll',
         borderRadius: 0,
-        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)' as any,
-        direction: 'rtl' as any,
+        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)',
+        direction: 'rtl',
       }}
     >
       {/* Header */}

@@ -107,7 +107,7 @@ export function CatalogQuickEntryDraftWorkspace({
           maxWidth: '100%',
           height: '100%',
           borderRadius: 0,
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.18)' as any,
+          boxShadow: '-4px 0 24px rgba(0,0,0,0.18)',
           direction: 'rtl',
         }}
       >
@@ -153,8 +153,8 @@ export function CatalogQuickEntryDraftWorkspace({
         height: '100%',
         overflow: 'scroll',
         borderRadius: 0,
-        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)' as any,
-        direction: 'rtl' as any,
+        boxShadow: '-4px 0 24px rgba(0,0,0,0.18)',
+        direction: 'rtl',
       }}
     >
       <Box layoutDirection="row" justify="space-between" align="center">

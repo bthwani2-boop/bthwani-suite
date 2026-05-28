@@ -13,10 +13,6 @@ import {
   type DshClientVisibilityBlockedCode,
 } from '../../shared/dsh-client-visibility.model';
 import {
-  translateStage,
-  type ApprovalStage,
-} from '../../shared/workflow';
-import {
   mapApprovalStageToPartnerActivationStatus,
 } from '../../shared/dsh-client-visibility.model';
 
@@ -41,6 +37,16 @@ const mediaPolicyLabel: Record<string, string> = {
   'partner-owned-exception':       'استثناء شريك',
   'partner-proposed-review':       'مقترح للمراجعة',
   'marketing-enhancement-required':'يحتاج تسويق',
+};
+
+const catalogApprovalStageLabel: Record<CatalogProductMaster['approvalStage'], string> = {
+  'catalog-draft': 'مسودة الكتالوج',
+  'catalog-approved': 'معتمد في الكتالوج',
+  'partner-proposed': 'مقترح من الشريك',
+  'partner-review': 'مراجعة الشركاء',
+  'marketing-review': 'مراجعة التسويق',
+  'catalog-adopted': 'مُعتمد ومُدمج',
+  'client-visible': 'ظاهر للعميل',
 };
 
 const blockedCodeLabel: Record<DshClientVisibilityBlockedCode, string> = {
@@ -110,7 +116,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
 
   // Map catalog approval stage to partner activation status for visibility resolver
   const partnerActivationStatus = mapApprovalStageToPartnerActivationStatus(
-    product.approvalStage as ApprovalStage
+    product.approvalStage
   );
   const visibility = resolveDshProductClientVisibility({
     activationStatus: partnerActivationStatus,
@@ -209,7 +215,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
           <SectionTitle>مرحلة الاعتماد</SectionTitle>
           <InfoRow
             label="المرحلة"
-            value={translateStage(product.approvalStage as ApprovalStage)}
+            value={catalogApprovalStageLabel[product.approvalStage]}
             valueColor={isClientVisible ? theme.success : theme.warning}
           />
           {product.conflictReason && (
