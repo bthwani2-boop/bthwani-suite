@@ -153,7 +153,7 @@ export function CatalogWorkspaceRouter({
       {workspace === 'duplicate-resolution' && (
         <CatalogDuplicateResolutionWorkspace
           duplicatePairs={toDuplicatePairs(products)}
-          products={products as CatalogProductMaster[]}
+          products={products}
           onClose={onClose}
         />
       )}
@@ -217,8 +217,8 @@ export function CatalogWorkspaceRouter({
       {/* ── bulk-operations ───────────────────────────────────────────── */}
       {workspace === 'bulk-operations' && (
         <CatalogBulkOperationsWorkspace
-          selectedProductIds={selectedProductIds as string[]}
-          products={products as CatalogProductMaster[]}
+          selectedProductIds={selectedProductIds}
+          products={products}
           onClose={onClose}
           onProposal={onProposal}
         />
@@ -228,7 +228,7 @@ export function CatalogWorkspaceRouter({
       {workspace === 'audit-trail' && (
         <CatalogAuditTrailWorkspace
           productId={productId}
-          products={products as CatalogProductMaster[]}
+          products={products}
           onClose={onClose}
         />
       )}
@@ -236,7 +236,7 @@ export function CatalogWorkspaceRouter({
       {/* ── publication-readiness ─────────────────────────────────────── */}
       {workspace === 'publication-readiness' && (
         <CatalogPublicationReadinessMatrix
-          products={products as CatalogProductMaster[]}
+          products={products}
           onClose={onClose}
         />
       )}

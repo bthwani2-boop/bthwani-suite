@@ -20,7 +20,7 @@ export type DuplicatePair = {
 
 export type CatalogDuplicateResolutionWorkspaceProps = {
   duplicatePairs: DuplicatePair[];
-  products: CatalogProductMaster[];
+  products: readonly CatalogProductMaster[];
   onClose: () => void;
 };
 

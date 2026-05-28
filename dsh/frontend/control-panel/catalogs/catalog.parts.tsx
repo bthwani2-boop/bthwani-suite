@@ -1,6 +1,9 @@
-// --- FilterDropdown.tsx ---
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
+import Image from 'next/image';
+import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
+
+// --- FilterDropdown.tsx ---
 
 export type FilterDropdownProps = {
   titleText: string;
@@ -52,10 +55,7 @@ export const FilterDropdown = ({ titleText, options, selected, onChange, onClose
   );
 };
 
-
 // --- FilterToken.tsx ---
-import React from 'react';
-import { Surface, Text, Button } from '@bthwani/ui-kit';
 
 export function FilterToken({ label, onRemove }: { label: string, onRemove: () => void }) {
   return (
@@ -66,10 +66,7 @@ export function FilterToken({ label, onRemove }: { label: string, onRemove: () =
   );
 }
 
-
 // --- InspectorTile.tsx ---
-import React from 'react';
-import { Box, Text, useTheme } from '@bthwani/ui-kit';
 
 export function InspectorTile({ tileTitle, children, dashed = false, warning = false }: { tileTitle: string, children: React.ReactNode, dashed?: boolean, warning?: boolean }) {
   const { theme } = useTheme();
@@ -91,10 +88,7 @@ export function InspectorTile({ tileTitle, children, dashed = false, warning = f
   );
 }
 
-
 // --- MiniInfoBox.tsx ---
-import React from 'react';
-import { Box, Text, useTheme } from '@bthwani/ui-kit';
 
 export function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: { label: string, value: string | React.ReactNode, valueColor?: string, isBoldValue?: boolean }) {
   const { theme } = useTheme();
@@ -106,10 +100,7 @@ export function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: {
   );
 }
 
-
 // --- PolicyBadge.tsx ---
-import React from 'react';
-import { Text, useTheme } from '@bthwani/ui-kit';
 
 export function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
   const { theme } = useTheme();
@@ -121,12 +112,7 @@ export function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
   );
 }
 
-
 // --- WatermarkedImage.tsx ---
-import React from 'react';
-import Image from 'next/image';
-import { Box, Surface, useTheme } from '@bthwani/ui-kit';
-import { getActualPublicMediaPath } from '../../../shared/resolve-dsh-public-media-path';
 
 const WATERMARK_URL = getActualPublicMediaPath('dsh.brand.logo.v1');
 
