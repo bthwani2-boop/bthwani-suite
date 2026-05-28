@@ -10,72 +10,13 @@ import {
   type DshProductIdentityApprovalStatus,
   type DshProductCategoryMappingStatus,
   type DshProductDuplicateStatus,
-} from '../../shared/dsh-product-identity.model';
-import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
-import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
+} from '../../../shared/dsh-product-identity.model';
+import type { DshPartnerActivationStatus } from '../../../shared/dsh-partner-activation.model';
+import { resolveDshProductClientVisibility } from '../../../shared/dsh-client-visibility.model';
 
-type PublishGateStatus = 'not-started' | 'in-review' | 'approved' | 'rejected' | 'published';
+import { PublishGateStatus, CatalogPublishGateRecord, demoPublishGateRecord } from '../../../data/publishing-gates.preview-data';
 
-const gateStatusLabel: Record<PublishGateStatus, string> = {
-  'not-started': 'لم تبدأ المراجعة',
-  'in-review': 'قيد المراجعة',
-  'approved': 'معتمد — جاهز للنشر',
-  'rejected': 'مرفوض',
-  'published': 'منشور',
-};
 
-const gateStatusTone: Record<PublishGateStatus, 'default' | 'success' | 'danger' | 'warning' | 'brand'> = {
-  'not-started': 'default',
-  'in-review': 'warning',
-  'approved': 'brand',
-  'rejected': 'danger',
-  'published': 'success',
-};
-
-type CatalogPublishGateRecord = {
-  id: string;
-  catalogLabel: string;
-  partnerLabel: string;
-  itemCount: number;
-  approvedItemCount: number;
-  status: PublishGateStatus;
-  /** Canonical approval status for prerequisite evaluation */
-  approvalStatus?: DshProductIdentityApprovalStatus;
-  /** Partner activation status that owns the store-side visibility gate */
-  partnerActivationStatus?: DshPartnerActivationStatus;
-  /** Whether at least one delivery mode is active for this store */
-  deliveryModesReady?: boolean;
-  /** Whether the store is serviceable for the current client area */
-  serviceabilityAvailable?: boolean;
-  /** Whether the store catalog is already published from the partner gate perspective */
-  catalogPublished?: boolean;
-  /** Category mapping status for prerequisite evaluation */
-  categoryMappingStatus?: DshProductCategoryMappingStatus;
-  /** Duplicate status for prerequisite evaluation */
-  duplicateStatus?: DshProductDuplicateStatus;
-  /** Whether media policy is satisfied */
-  mediaPolicySatisfied?: boolean;
-  /** Whether an audit trail is required for this gate transition */
-  auditRequired?: boolean;
-};
-
-const demoRecord: CatalogPublishGateRecord = {
-  id: 'catalog-001',
-  catalogLabel: 'قائمة الطعام الرئيسية — الموسم الصيفي',
-  partnerLabel: 'مطعم النجوم',
-  itemCount: 42,
-  approvedItemCount: 38,
-  status: 'in-review',
-  approvalStatus: 'catalog_adopted',
-  partnerActivationStatus: 'partner_active',
-  deliveryModesReady: true,
-  serviceabilityAvailable: true,
-  catalogPublished: true,
-  categoryMappingStatus: 'mapped',
-  duplicateStatus: 'clean',
-  mediaPolicySatisfied: false, // still pending — demonstrates blocked gate
-  auditRequired: false,
-};
 
 // Gate action result — UI_PREVIEW_ONLY
 type GateActionResult = {
@@ -94,19 +35,19 @@ function resolveGateOwnerLabel(owner: 'control-panel-catalog' | 'control-panel-m
   }
 }
 
-export type CatalogPublishingGateSectionProps = {
+export type ListingGovernanceScreenProps = {
   record?: CatalogPublishGateRecord;
   onApproveForPublish?: (id: string) => void;
   onReject?: (id: string) => void;
   onRequestRevision?: (id: string) => void;
 };
 
-export function CatalogPublishingGateSection({
-  record = demoRecord,
+export function ListingGovernanceScreen({
+  record = demoPublishGateRecord,
   onApproveForPublish,
   onReject,
   onRequestRevision,
-}: CatalogPublishingGateSectionProps) {
+}: ListingGovernanceScreenProps) {
   const { theme } = useTheme();
   const [gateActionResult, setGateActionResult] = React.useState<GateActionResult>(null);
 
@@ -294,4 +235,4 @@ export function CatalogPublishingGateSection({
   );
 }
 
-export default CatalogPublishingGateSection;
+export default ListingGovernanceScreen;

@@ -7,14 +7,14 @@ import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusTone,
-} from '../../shared/dsh-product-identity.model';
+} from '../../../shared/dsh-product-identity.model';
 import {
   getAllApprovalRecords,
   moveApprovalRecordToStage,
   upsertApprovalRecord,
   type ApprovalRecord,
   type ApprovalStage,
-} from '../../shared/workflow';
+} from '../../../shared/workflow';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -47,19 +47,19 @@ const statusTone: Record<ItemApprovalStatus, 'default' | 'success' | 'danger' | 
   'needs-revision': 'warning',
 };
 
-export type ItemApprovalSectionProps = {
+export type ItemApprovalScreenProps = {
   items?: CatalogItemApprovalRecord[];
   onApprove?: (id: string) => void;
   onReject?: (id: string, evidenceNote: string) => void;
   onRequestRevision?: (id: string, evidenceNote: string) => void;
 };
 
-export function ItemApprovalSection({
+export function ItemApprovalScreen({
   items: propsItems,
   onApprove: propsOnApprove,
   onReject: propsOnReject,
   onRequestRevision: propsOnRequestRevision,
-}: ItemApprovalSectionProps) {
+}: ItemApprovalScreenProps) {
   const { theme } = useTheme();
 
   // Connect to the shared global store if no props are provided
@@ -238,4 +238,4 @@ export function ItemApprovalSection({
   );
 }
 
-export default ItemApprovalSection;
+export default ItemApprovalScreen;

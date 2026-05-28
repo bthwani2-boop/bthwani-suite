@@ -7,16 +7,16 @@ export type {
 } from './catalog';
 export { ControlPanelDshCatalogScreen } from './ControlPanelDshCatalogScreen';
 export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen } from './CatalogGovernanceScreens';
-export { ControlPanelDshCatalogCategoriesScreen } from './ControlPanelDshCatalogCategoriesScreen';
+export { CategoriesScreen } from './categories/categories.screen';
 export { default } from './CatalogGovernanceScreens';
 
 // ML-053: Item approval section — UI_PREVIEW_ONLY flow implemented (catalog approval API not yet bound)
-export { ItemApprovalSection } from './ItemApprovalSection';
-export type { ItemApprovalSectionProps } from './ItemApprovalSection';
+export { ItemApprovalScreen } from './approvals/item-approval.screen';
+export type { ItemApprovalScreenProps } from './approvals/item-approval.screen';
 
 // ML-054: Catalog publishing gate section — UI_PREVIEW_ONLY flow implemented (catalog publish API not yet bound)
-export { CatalogPublishingGateSection } from './CatalogPublishingGateSection';
-export type { CatalogPublishingGateSectionProps } from './CatalogPublishingGateSection';
+export { ListingGovernanceScreen } from './listing-governance/listing-governance.screen';
+export type { ListingGovernanceScreenProps } from './listing-governance/listing-governance.screen';
 
 // CAT-S01: Item detail workspace — single product detail-on-open
 export { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
