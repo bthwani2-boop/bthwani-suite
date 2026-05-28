@@ -215,7 +215,7 @@ Object.entries(storeItemsByStoreId).forEach(([storeId, items]) => {
         subClassification: path.sub ? `classif-sub-${path.sub}-1a` : undefined,
       },
       price: parseFloat(item.priceLabel ?? '') || 15,
-      mediaPolicy: (item.mediaPolicy as any) || 'catalog-owned-media',
+      mediaPolicy: (item.mediaPolicy as CatalogMediaPolicy) || 'catalog-owned-media',
       approvalStage: approvalStage,
       sourceSurface: 'catalog',
       surfaces: ['client', 'partner'],

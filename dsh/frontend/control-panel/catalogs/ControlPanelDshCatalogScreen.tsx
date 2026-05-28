@@ -864,16 +864,17 @@ export function ControlPanelDshCatalogScreen({
           isActive: false,
           onAction: () => {
             const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id)) {
-                return {
-                  ...p,
-                  mediaPolicy: p.mediaPolicy === 'catalog-owned-media' ? 'partner-owned-exception' : 'catalog-owned-media'
-                };
-              }
-              return p;
-            }));
-            setActionMessage('تم تبديل سياسة الصور للمنتجات المحددة في الجدول');
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-media-policy-${Date.now()}`,
+              type: 'media-policy-change',
+              label: 'تبديل سياسة صور المجموعة',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'تبديل سياسة الصور للمنتجات المحددة في الجدول',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         },
         {
@@ -894,14 +895,18 @@ export function ControlPanelDshCatalogScreen({
           label: '✅ اعتماد مقترحات الشركاء',
           isActive: false,
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && (p.approvalStage === 'partner-proposed' || p.sourceSurface === 'partner')) {
-                return { ...p, approvalStage: 'catalog-adopted' };
-              }
-              return p;
-            }));
-            setActionMessage('تم اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية');
+            const productIds = filteredProducts.filter(p => p.approvalStage === 'partner-proposed' || p.sourceSurface === 'partner').map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-adopt-${Date.now()}`,
+              type: 'bulk-approve',
+              label: 'اعتماد مقترحات الشركاء',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         }
       );
@@ -912,14 +917,18 @@ export function ControlPanelDshCatalogScreen({
           label: '📢 اعتماد كل مراجعات التسويق',
           isActive: false,
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && p.approvalStage === 'marketing-review') {
-                return { ...p, approvalStage: 'catalog-adopted' };
-              }
-              return p;
-            }));
-            setActionMessage('تم اعتماد مراجعات التسويق المحددة بنجاح');
+            const productIds = filteredProducts.filter(p => p.approvalStage === 'marketing-review').map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-mkt-approve-${Date.now()}`,
+              type: 'bulk-approve',
+              label: 'اعتماد كل مراجعات التسويق',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'اعتماد مراجعات التسويق المحددة بنجاح',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       } else if (activeSubTab === 'quality') {
@@ -928,14 +937,18 @@ export function ControlPanelDshCatalogScreen({
           label: '🛡️ تمرير جميع فحوصات الجودة',
           isActive: false,
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && p.approvalStage === 'partner-review') {
-                return { ...p, approvalStage: 'catalog-approved' };
-              }
-              return p;
-            }));
-            setActionMessage('تم تمرير فحوصات الجودة لمنتجات الشركاء بنجاح');
+            const productIds = filteredProducts.filter(p => p.approvalStage === 'partner-review').map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-quality-${Date.now()}`,
+              type: 'bulk-approve',
+              label: 'تمرير جميع فحوصات الجودة',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'تمرير فحوصات الجودة لمنتجات الشركاء بنجاح',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       } else if (activeSubTab === 'pricing') {
@@ -944,14 +957,18 @@ export function ControlPanelDshCatalogScreen({
           label: '💸 تسوية تعارض الأسعار تلقائياً',
           isActive: false,
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && p.price > 100) {
-                return { ...p, price: 45.00, conflictReason: undefined };
-              }
-              return p;
-            }));
-            setActionMessage('تم خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير');
+            const productIds = filteredProducts.filter(p => p.price > 100).map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-price-${Date.now()}`,
+              type: 'price-change',
+              label: 'تسوية تعارض الأسعار تلقائياً',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       } else if (activeSubTab === 'media') {
@@ -960,14 +977,18 @@ export function ControlPanelDshCatalogScreen({
           label: '📸 تعيين صور مركزية معتمدة',
           isActive: false,
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && !p.mediaKey) {
-                return { ...p, mediaPolicy: 'catalog-owned-media', mediaKey: 'dsh.product.roll.v1' };
-              }
-              return p;
-            }));
-            setActionMessage('تم تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور');
+            const productIds = filteredProducts.filter(p => !p.mediaKey).map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-media-assign-${Date.now()}`,
+              type: 'media-policy-change',
+              label: 'تعيين صور مركزية معتمدة',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       } else if (activeSubTab === 'barcode') {
@@ -998,13 +1019,17 @@ export function ControlPanelDshCatalogScreen({
           isActive: false,
           onAction: () => {
             const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id)) {
-                return { ...p, conflictReason: undefined };
-              }
-              return p;
-            }));
-            setActionMessage('تم دمج التكرارات وحل النزاعات للمنتجات المحددة');
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-dup-${Date.now()}`,
+              type: 'conflict-resolution',
+              label: 'دمج وحل جميع التكرارات',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'دمج التكرارات وحل النزاعات للمنتجات المحددة',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       } else if (activeSubTab === 'gtin') {
@@ -1013,14 +1038,18 @@ export function ControlPanelDshCatalogScreen({
           label: '🔄 مزامنة الباركود مع المعرف',
           isActive: false,
           onAction: () => {
-            const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id) && !p.gtin) {
-                return { ...p, gtin: p.sku.replace('BTH-', '628') };
-              }
-              return p;
-            }));
-            setActionMessage('تم تعيين GTIN بالاعتماد على SKU للمنتجات المحددة');
+            const productIds = filteredProducts.filter(p => !p.gtin).map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-gtin-${Date.now()}`,
+              type: 'edit-product',
+              label: 'مزامنة الباركود مع المعرف',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'تعيين GTIN بالاعتماد على SKU للمنتجات المحددة',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       } else if (activeSubTab === 'media') {
@@ -1048,17 +1077,17 @@ export function ControlPanelDshCatalogScreen({
           isActive: false,
           onAction: () => {
             const productIds = filteredProducts.map(f => f.id);
-            setProducts(prev => prev.map(p => {
-              if (productIds.includes(p.id)) {
-                const hasClient = p.surfaces.includes('client');
-                return {
-                  ...p,
-                  surfaces: hasClient ? p.surfaces.filter(s => s !== 'client') : [...p.surfaces, 'client' as any]
-                };
-              }
-              return p;
-            }));
-            setActionMessage('تم تعديل منصات العرض المتاحة للمنتجات المحددة');
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-vis-${Date.now()}`,
+              type: 'visibility-change',
+              label: 'تبديل الظهور للمستهلكين',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'تعديل منصات العرض المتاحة للمنتجات المحددة',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         });
       }
@@ -1069,13 +1098,18 @@ export function ControlPanelDshCatalogScreen({
           label: '🚀 نشر جميع المنتجات الجاهزة للعميل',
           isActive: false,
           onAction: () => {
-            setProducts(prev => prev.map(p => {
-              if (p.approvalStage === 'catalog-adopted') {
-                return { ...p, approvalStage: 'client-visible' };
-              }
-              return p;
-            }));
-            setActionMessage('تم نشر جميع المنتجات الجاهزة بنجاح للعميل');
+            const productIds = filteredProducts.filter(p => p.approvalStage === 'catalog-adopted').map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-pub-${Date.now()}`,
+              type: 'visibility-change',
+              label: 'نشر جميع المنتجات الجاهزة للعميل',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'نشر جميع المنتجات الجاهزة بنجاح للعميل',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         },
         {
@@ -1083,13 +1117,18 @@ export function ControlPanelDshCatalogScreen({
           label: '🙈 إخفاء جميع المسودات والمقترحات',
           isActive: false,
           onAction: () => {
-            setProducts(prev => prev.map(p => {
-              if (p.approvalStage === 'catalog-draft' || p.approvalStage === 'partner-proposed') {
-                return { ...p, approvalStage: 'catalog-draft' }; // ensure they stay as draft/hidden
-              }
-              return p;
-            }));
-            setActionMessage('تم التأكد من إخفاء جميع المسودات ومقترحات الشركاء');
+            const productIds = filteredProducts.filter(p => p.approvalStage === 'catalog-draft' || p.approvalStage === 'partner-proposed').map(f => f.id);
+            const proposal: CatalogPreviewProposal = {
+              id: `prop-hide-${Date.now()}`,
+              type: 'visibility-change',
+              label: 'إخفاء جميع المسودات والمقترحات',
+              status: 'ready-for-api',
+              owner: 'control-panel-catalogs',
+              note: 'التأكد من إخفاء جميع المسودات ومقترحات الشركاء',
+              productIds
+            };
+            setPendingProposals(prev => [proposal, ...prev.slice(0, 9)]);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           }
         }
       );

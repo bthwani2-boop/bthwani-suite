@@ -29,5 +29,5 @@ export function filterCategoryTree(categories: CatalogMainCategory[], query: str
       return { ...cat, subcategories: filteredSubs };
     }
     return null;
-  }).filter(Boolean) as CatalogMainCategory[];
+  }).filter((x): x is CatalogMainCategory => Boolean(x));
 }
