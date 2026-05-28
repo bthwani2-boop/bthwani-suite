@@ -28,7 +28,7 @@ import type { CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-wo
 
 import { filterCategoryTree } from './adapters/filter-category-tree';
 import { FilterType, CatalogFilterColumnId, initialColumnFilters } from './model/filters';
-import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './parts';
+import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalog.parts';
 
 // --- Types ---
 export type ControlPanelDshCatalogScreenProps = {

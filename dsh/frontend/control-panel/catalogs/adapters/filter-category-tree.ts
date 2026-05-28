@@ -17,13 +17,13 @@ export function filterCategoryTree(categories: CatalogMainCategory[], query: str
           return { ...mc, subClassifications: filteredSubClassifs };
         }
         return null;
-      }).filter(Boolean) as any[];
+      }).filter(Boolean) as unknown[];
 
       if (subMatches || filteredMainClassifs.length > 0) {
         return { ...sub, mainClassifications: filteredMainClassifs };
       }
       return null;
-    }).filter(Boolean) as any[];
+    }).filter(Boolean) as unknown[];
 
     if (catMatches || filteredSubs.length > 0) {
       return { ...cat, subcategories: filteredSubs };
