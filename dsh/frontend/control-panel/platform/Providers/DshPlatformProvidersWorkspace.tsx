@@ -19,27 +19,27 @@ type ProviderPreviewActionId =
   | 'return-plan-preview';
 
 const ACTION_LABELS: Record<ProviderPreviewActionId, string> = {
-  'masked-key-preview': 'فحص المفتاح المقنّع',
-  'connectivity-preview': 'فحص الاتصال الفوري',
-  'traffic-shift-preview': 'تحويل الحركة الفعلي',
-  'degradation-preview': 'تعطيل وتحويل تلقائي',
-  'fallback-preview': 'تطبيق سياسة البديل',
-  'return-plan-preview': 'تفعيل خطة الرجوع',
+  'masked-key-preview': 'فحص المفتاح المقنّع للمعاينة',
+  'connectivity-preview': 'محاكاة فحص الاتصال',
+  'traffic-shift-preview': 'محاكاة تحويل الحركة',
+  'degradation-preview': 'محاكاة تعطيل وتحويل تلقائي',
+  'fallback-preview': 'محاكاة سياسة البديل',
+  'return-plan-preview': 'معاينة خطة الرجوع والتراجع',
 };
 
 const ACTION_DESCRIPTIONS: Record<ProviderPreviewActionId, string> = {
   'masked-key-preview':
-    'عرض نموذج مفتاح الربط المقنّع والمشفر للمزود الحالي.',
+    'عرض نموذج مفتاح الربط المقنّع والمشفر للمزود الحالي (معاينة فقط).',
   'connectivity-preview':
-    'إجراء فحص فوري وموثق للاتصال بالمزود والتحقق من الاستجابة.',
+    'إجراء فحص فوري ومحاكات للاتصال بالمزود والتحقق من الاستجابة (UI preview).',
   'traffic-shift-preview':
-    'تحويل الحركة التشغيلية الفعلية وتوجيهها للمزود المعتمد.',
+    'محاكاة تحويل الحركة التشغيلية وتوجيهها للمزود المعتمد في المعاينة.',
   'degradation-preview':
-    'تعطيل المزود الحالي قسريًا وتحويل الطلبات تلقائيًا إلى المزود البديل.',
+    'محاكاة تعطيل المزود الحالي تلقائيًا وتوجيه الطلبات إلى المزود البديل في المعاينة.',
   'fallback-preview':
-    'تطبيق وضبط سياسة البديل النشطة (Fallback Policy) لهذا المزود.',
+    'تطبيق محاكاة ضبط سياسة البديل النشطة (Fallback Policy) لهذا المزود.',
   'return-plan-preview':
-    'استعادة خط الأساس للمزود (Rollback) واعتماد التراجع في سجل التدقيق.',
+    'استعادة خط الأساس للمزود (Rollback preview) واعتماد المعاينة في سجل التدقيق.',
 };
 
 function resolveProviderTone(record: ProviderRecord): ProviderTone {
@@ -52,14 +52,14 @@ function resolveProviderTone(record: ProviderRecord): ProviderTone {
 function resolveProviderStatusLabel(status: ProviderRecord['status']) {
   if (status === 'active') return 'نشط بالكامل (Active)';
   if (status === 'inactive') return 'غير نشط (Inactive)';
-  if (status === 'test-only') return 'اختبار فقط (Test)';
-  return 'بانتظار الاعتماد (Pending)';
+  if (status === 'test-only') return 'معاينة فحص الاتصال (Test)';
+  return 'بانتظار الاعتماد والربط (Pending)';
 }
 
 function resolveEnvironmentLabel(environment: ProviderRecord['environment']) {
-  if (environment === 'production') return 'بيئة التشغيل الفعلية (Production)';
+  if (environment === 'production') return 'بيئة المعاينة الفعلية (Production)';
   if (environment === 'sandbox') return 'بيئة المعاينة الآمنة (Sandbox)';
-  return 'بيئة الاختبار (Test)';
+  return 'بيئة فحص الاتصال (Test)';
 }
 
 function resolveLastTestLabel(result: ProviderRecord['lastTestResult']) {
@@ -74,26 +74,26 @@ function resolveActionImpact(
   statusLabel: string,
 ) {
   if (action === 'masked-key-preview') {
-    return `فحص مفتاح الربط المشفر للمزود ${record.selectedProvider}.`;
+    return `محاكاة فحص مفتاح الربط المشفر للمزود ${record.selectedProvider}.`;
   }
 
   if (action === 'connectivity-preview') {
-    return `تحديث حالة فحص الاتصال للمزود ${record.selectedProvider}.`;
+    return `محاكاة تحديث حالة فحص الاتصال للمزود ${record.selectedProvider}.`;
   }
 
   if (action === 'traffic-shift-preview') {
-    return `تحويل الحركة التشغيلية بالكامل إلى المزود ${record.selectedProvider}.`;
+    return `محاكاة تحويل الحركة التشغيلية بالكامل إلى المزود ${record.selectedProvider}.`;
   }
 
   if (action === 'degradation-preview') {
-    return `تعطيل المزود وتفعيل التوجيه التلقائي إلى البديل: ${record.fallbackProvider ?? 'غير محدد'}.`;
+    return `محاكاة تعطيل المزود وتفعيل التوجيه التلقائي إلى البديل: ${record.fallbackProvider ?? 'غير محدد'}.`;
   }
 
   if (action === 'fallback-preview') {
-    return `تحديث سياسة البديل النشطة إلى: ${record.fallbackProvider ?? 'غير محدد'}.`;
+    return `محاكاة تحديث سياسة البديل النشطة إلى: ${record.fallbackProvider ?? 'غير محدد'}.`;
   }
 
-  return `تطبيق التراجع الفوري من الحالة ${statusLabel} إلى خط الأساس المعتمد.`;
+  return `محاكاة تطبيق التراجع الفوري من الحالة ${statusLabel} إلى خط الأساس المعتمد.`;
 }
 
 export function DshPlatformProvidersWorkspace() {
@@ -203,7 +203,7 @@ export function DshPlatformProvidersWorkspace() {
                   <div className={styles.surfaceInfoCardTextBlock}>
                     <div className={styles.surfaceInfoCardTitle}>{record.label}</div>
                     <div className={styles.surfaceInfoCardDescription}>
-                      المزود: {record.selectedProvider} · البديل: {record.fallbackProvider || 'بدون'}
+                      المزود: <span dir="ltr">{record.selectedProvider}</span> · البديل: <span dir="ltr">{record.fallbackProvider || 'بدون'}</span>
                     </div>
                   </div>
                   <div className={styles.surfaceMetaWrap}>
@@ -228,11 +228,11 @@ export function DshPlatformProvidersWorkspace() {
             <div className={styles.surfaceInspectorMeta}>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المزود الحالي</strong>
-                <span>{selectedRecord.selectedProvider}</span>
+                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.selectedProvider}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المزود البديل</strong>
-                <span>{fallbackProvider}</span>
+                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{fallbackProvider}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>الحالة التشغيلية</strong>
@@ -248,11 +248,11 @@ export function DshPlatformProvidersWorkspace() {
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>الأولوية</strong>
-                <span>{selectedRecord.priority}</span>
+                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.priority}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المالك الرئيسي</strong>
-                <span>{selectedRecord.owner}</span>
+                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.owner}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>الفئة</strong>
@@ -263,7 +263,7 @@ export function DshPlatformProvidersWorkspace() {
             <Surface tone="default" border padding={3} radiusToken="md">
               <Box gap={1}>
                 <Text role="caption" tone="muted">مفتاح الربط المشفر (Credentials)</Text>
-                <Text role="bodySm" weight="bold">{selectedRecord.maskedCredential}</Text>
+                <Text role="bodySm" weight="bold" dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.maskedCredential}</Text>
               </Box>
             </Surface>
 
@@ -271,7 +271,7 @@ export function DshPlatformProvidersWorkspace() {
               <Box gap={1}>
                 <Text role="caption" tone="muted">حدود التنفيذ والسيادة</Text>
                 <Text role="bodySm">
-                  أي تغيير لمفاتيح الربط أو سياسات التوجيه يتطلب تفويضاً مباشراً ويسجل في سجلات التدقيق السيادية للمنصة.
+                  أي تعديل محاكٍ لمفاتيح الربط أو سياسات التوجيه يتطلب إقراراً ومطابقة مع حدود العمليات والمالية.
                 </Text>
               </Box>
             </Surface>
@@ -281,35 +281,35 @@ export function DshPlatformProvidersWorkspace() {
             {showConfirm ? (
               <Surface tone="warning" border padding={3} radiusToken="md">
                 <Box gap={2}>
-                  <Text role="titleSm">تأكيد الإجراء التشغيلي: {ACTION_LABELS[showConfirm]}</Text>
+                  <Text role="titleSm">تأكيد محاكاة المعاينة: {ACTION_LABELS[showConfirm]}</Text>
                   <Text role="bodySm">{ACTION_DESCRIPTIONS[showConfirm]}</Text>
 
                   {showConfirm === 'masked-key-preview' ? (
                     <Surface tone="default" border padding={2} radiusToken="md">
-                      <Text role="bodySm" tone="muted">{selectedRecord.maskedCredential} (أمن الوصول موثق وسجل)</Text>
+                      <Text role="bodySm" tone="muted" dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.maskedCredential} (أمن الوصول موثق وسجل)</Text>
                     </Surface>
                   ) : null}
 
                   <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-                    <Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null}>تأكيد وتطبيق التغيير</Button>
-                    <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                    <Box style={{ flexGrow: 1 }}><Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null} style={{ width: '100%' }}>تأكيد معاينة التغيير</Button></Box>
+                    <Box style={{ flexGrow: 1 }}><Button variant="secondary" onClick={() => setShowConfirm(null)} style={{ width: '100%' }}>إلغاء</Button></Box>
                   </Box>
                 </Box>
               </Surface>
             ) : (
               <Box gap={2}>
-                <Text role="titleSm">أدوات التحكم والسيادة</Text>
+                <Text role="titleSm">أدوات السيطرة والمعاينة</Text>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button variant="secondary" onClick={() => setShowConfirm('masked-key-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>فحص المفتاح</Button>
-                  <Button variant="secondary" onClick={() => setShowConfirm('connectivity-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>فحص الاتصال</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('masked-key-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>معاينة مفتاح الربط</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('connectivity-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>محاكاة فحص الاتصال</Button>
                 </Box>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button variant="primary" onClick={() => setShowConfirm('traffic-shift-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تحويل الحركة</Button>
-                  <Button variant="danger" onClick={() => setShowConfirm('degradation-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تعطيل المزود</Button>
+                  <Button variant="primary" onClick={() => setShowConfirm('traffic-shift-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>محاكاة تحويل الحركة</Button>
+                  <Button variant="danger" onClick={() => setShowConfirm('degradation-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>محاكاة تعطيل المزود</Button>
                 </Box>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button variant="secondary" onClick={() => setShowConfirm('fallback-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تغيير البديل</Button>
-                  <Button variant="secondary" onClick={() => setShowConfirm('return-plan-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>خطة الرجوع</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('fallback-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>محاكاة تغيير البديل</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('return-plan-preview')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>معاينة خطة التراجع</Button>
                 </Box>
               </Box>
             )}

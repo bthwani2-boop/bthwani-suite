@@ -53,20 +53,20 @@ export function DshPlatformServicesWorkspace() {
     let newVisibility = serviceState.visibility;
     let newTone = serviceState.tone;
 
-    if (action === 'تفعيل الخدمة') {
+    if (action === 'محاكاة تفعيل الخدمة') {
       newStatus = 'مفعلة (Active)';
       newTone = 'success';
-    } else if (action === 'تعطيل الخدمة') {
+    } else if (action === 'محاكاة تعطيل الخدمة') {
       newStatus = 'متوقفة (Inactive)';
       newTone = 'danger';
-    } else if (action === 'وضع الصيانة') {
+    } else if (action === 'محاكاة وضع الصيانة') {
       newStatus = 'صيانة (Maintenance)';
       newTone = 'warning';
-    } else if (action === 'إظهار للعملاء') {
+    } else if (action === 'محاكاة الإظهار للعملاء') {
       newVisibility = 'ظاهر للعملاء';
-    } else if (action === 'إخفاء عن العملاء') {
+    } else if (action === 'محاكاة الإخفاء عن العملاء') {
       newVisibility = 'مخفي عن العملاء';
-    } else if (action === 'استعادة الحالة (Rollback)') {
+    } else if (action === 'معاينة استعادة الحالة (Rollback preview)') {
       newStatus = serviceState.rollbackStatus;
       newTone = serviceState.rollbackTone;
     }
@@ -77,22 +77,22 @@ export function DshPlatformServicesWorkspace() {
         status: newStatus,
         visibility: newVisibility,
         tone: newTone,
-        rollbackStatus: action === 'استعادة الحالة (Rollback)' ? prevStatus : serviceState.rollbackStatus,
-        rollbackTone: action === 'استعادة الحالة (Rollback)' ? prevStatus === 'متوقفة (Inactive)' ? 'danger' : prevStatus === 'صيانة (Maintenance)' ? 'warning' : 'success' : serviceState.rollbackTone,
+        rollbackStatus: action === 'معاينة استعادة الحالة (Rollback preview)' ? prevStatus : serviceState.rollbackStatus,
+        rollbackTone: action === 'معاينة استعادة الحالة (Rollback preview)' ? prevStatus === 'متوقفة (Inactive)' ? 'danger' : prevStatus === 'صيانة (Maintenance)' ? 'warning' : 'success' : serviceState.rollbackTone,
       },
     }));
 
     setShowConfirm(null);
 
     addAuditEvent({
-      action: `تحكم خدمة عليا (${selectedService.code}): ${action}`,
+      action: `محاكاة تحكم خدمة عليا (${selectedService.code}): ${action}`,
       operator: 'Ahmed.Sharif',
       status: action.includes('تعطيل') ? 'danger' : 'success',
       oldValue: `${prevStatus} / ${prevVisibility}`,
       newValue: `${newStatus} / ${newVisibility}`,
-      reason: 'تحديث الحالة التشغيلية للمنصة بطلب من المسؤول',
+      reason: 'تحديث وتأكيد مسار المعاينة للخدمة العليا بالمنصة',
       scope: selectedService.scope,
-      impact: action === 'تعطيل الخدمة' ? selectedService.impactIfStopped : 'تحديث وتأكيد مسار تشغيل الخدمة',
+      impact: action === 'محاكاة تعطيل الخدمة' ? selectedService.impactIfStopped : 'تحديث وتأكيد مسار تشغيل الخدمة في المعاينة',
       rollbackAvailable: true,
     });
   };
@@ -214,30 +214,30 @@ export function DshPlatformServicesWorkspace() {
             ) : showConfirm ? (
               <Surface tone="warning" border padding={3} radiusToken="md">
                 <Box gap={2}>
-                  <Text role="titleSm">تأكيد إجراء التحكم: {showConfirm}</Text>
+                  <Text role="titleSm">تأكيد محاكاة الإجراء: {showConfirm}</Text>
                   <Text role="bodySm">
-                    {showConfirm.includes('تعطيل') ? selectedService.impactIfStopped : 'تحديث وتأكيد مسار تشغيل الخدمة.'}
+                    {showConfirm.includes('تعطيل') ? selectedService.impactIfStopped : 'تحديث وتأكيد مسار تشغيل الخدمة في المعاينة.'}
                   </Text>
                   <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-                    <Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null}>تأكيد وتطبيق الإجراء</Button>
-                    <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                    <Box style={{ flexGrow: 1 }}><Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null} style={{ width: '100%' }}>تأكيد معاينة الإجراء</Button></Box>
+                    <Box style={{ flexGrow: 1 }}><Button variant="secondary" onClick={() => setShowConfirm(null)} style={{ width: '100%' }}>إلغاء</Button></Box>
                   </Box>
                 </Box>
               </Surface>
             ) : (
               <Box gap={2}>
-                <Text role="titleSm">أدوات التحكم والسيادة</Text>
+                <Text role="titleSm">أدوات السيطرة والمعاينة</Text>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button variant="primary" onClick={() => setShowConfirm('تفعيل الخدمة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تفعيل الخدمة</Button>
-                  <Button variant="danger" onClick={() => setShowConfirm('تعطيل الخدمة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تعطيل الخدمة</Button>
+                  <Button variant="primary" onClick={() => setShowConfirm('محاكاة تفعيل الخدمة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تفعيل الخدمة</Button>
+                  <Button variant="danger" onClick={() => setShowConfirm('محاكاة تعطيل الخدمة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تعطيل الخدمة</Button>
                 </Box>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button variant="secondary" onClick={() => setShowConfirm('إظهار للعملاء')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>إظهار للعملاء</Button>
-                  <Button variant="secondary" onClick={() => setShowConfirm('إخفاء عن العملاء')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>إخفاء عن العملاء</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('محاكاة الإظهار للعملاء')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>إظهار للعملاء</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('محاكاة الإخفاء عن العملاء')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>إخفاء عن العملاء</Button>
                 </Box>
                 <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-                  <Button variant="warning" onClick={() => setShowConfirm('وضع الصيانة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>وضع الصيانة</Button>
-                  <Button variant="secondary" onClick={() => setShowConfirm('استعادة الحالة (Rollback)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>استعادة الحالة</Button>
+                  <Button variant="warning" onClick={() => setShowConfirm('محاكاة وضع الصيانة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>وضع الصيانة</Button>
+                  <Button variant="secondary" onClick={() => setShowConfirm('معاينة استعادة الحالة (Rollback preview)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>معاينة استعادة الحالة</Button>
                 </Box>
               </Box>
             )}

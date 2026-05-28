@@ -133,7 +133,7 @@ export function DshPlatformAuditWorkspace() {
                   onClick={() => rollbackEvent(selectedEvent.id)}
                   style={{ width: '100%' }}
                 >
-                  تراجع فوري عن هذا التعديل (Rollback)
+                  تراجع محاكٍ في المعاينة (Rollback preview)
                 </Button>
               </Box>
             ) : (

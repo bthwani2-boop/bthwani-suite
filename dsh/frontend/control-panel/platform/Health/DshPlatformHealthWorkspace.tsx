@@ -34,14 +34,14 @@ export function DshPlatformHealthWorkspace() {
     setLastHealthCheck(now);
 
     addAuditEvent({
-      action: `فحص صحة المنصة: ${checkType}`,
+      action: `محاكاة فحص صحة المنصة: ${checkType}`,
       operator: 'Ahmed.Sharif',
       status: 'success',
       oldValue: lastHealthCheck,
-      newValue: 'نتيجة الفحص: سليم ومؤمن',
-      reason: 'فحص دوري مطلوب من المشغل للتحقق من سلامة البنية التحتية',
+      newValue: 'نتيجة الفحص: سليم ومؤمن (معاينة)',
+      reason: 'محاكاة فحص دوري للتحقق من سلامة البنية التحتية المعروضة',
       scope: 'Global',
-      impact: 'تحديث وتوثيق مؤشرات الصحة والأداء الفوري للمنصة',
+      impact: 'تحديث وتوثيق مؤشرات الصحة والأداء في المعاينة',
       rollbackAvailable: false,
     });
     setShowConfirm(null);
@@ -210,20 +210,20 @@ export function DshPlatformHealthWorkspace() {
             {showConfirm ? (
               <Surface tone="warning" border padding={3} radiusToken="md">
                 <Box gap={2}>
-                  <Text role="titleSm">تأكيد تشغيل الفحص: {showConfirm}</Text>
-                  <Text role="bodySm">سيتم التحقق من مؤشرات الاتصال والجهوزية لخدمات ومزودي المنصة بالكامل.</Text>
+                  <Text role="titleSm">تأكيد محاكاة فحص الصحة: {showConfirm}</Text>
+                  <Text role="bodySm">سيتم محاكاة التحقق من مؤشرات الاتصال والجاهزية لخدمات ومزودي المنصة (UI preview).</Text>
                   <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-                    <Button variant="primary" onClick={() => handleHealthCheck(showConfirm)} disabled={showConfirm === null}>تأكيد وتشغيل الفحص</Button>
-                    <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                    <Box style={{ flexGrow: 1 }}><Button variant="primary" onClick={() => handleHealthCheck(showConfirm)} disabled={showConfirm === null} style={{ width: '100%' }}>تأكيد معاينة الفحص</Button></Box>
+                    <Box style={{ flexGrow: 1 }}><Button variant="secondary" onClick={() => setShowConfirm(null)} style={{ width: '100%' }}>إلغاء</Button></Box>
                   </Box>
                 </Box>
               </Surface>
             ) : (
               <Box gap={2}>
-                <Text role="titleSm">أدوات الفحص والتحقق</Text>
-                <Button variant="secondary" onClick={() => setShowConfirm('فحص الخدمات')} disabled={showConfirm !== null} style={{ width: '100%' }}>فحص مؤشرات الخدمات</Button>
-                <Button variant="secondary" onClick={() => setShowConfirm('فحص المزودين')} disabled={showConfirm !== null} style={{ width: '100%' }}>فحص مؤشرات المزودين</Button>
-                <Button variant="primary" onClick={() => setShowConfirm('تشغيل فحص الصحة الكاملة')} disabled={showConfirm !== null} style={{ width: '100%' }}>تشغيل فحص الصحة والأداء المتكامل</Button>
+                <Text role="titleSm">أدوات محاكاة فحص الصحة</Text>
+                <Button variant="secondary" onClick={() => setShowConfirm('محاكاة فحص مؤشرات الخدمات')} disabled={showConfirm !== null} style={{ width: '100%' }}>محاكاة فحص الخدمات</Button>
+                <Button variant="secondary" onClick={() => setShowConfirm('محاكاة فحص مؤشرات المزودين')} disabled={showConfirm !== null} style={{ width: '100%' }}>محاكاة فحص المزودين</Button>
+                <Button variant="primary" onClick={() => setShowConfirm('محاكاة تشغيل فحص الصحة المتكامل')} disabled={showConfirm !== null} style={{ width: '100%' }}>محاكاة تشغيل فحص الصحة المتكامل</Button>
               </Box>
             )}
           </aside>

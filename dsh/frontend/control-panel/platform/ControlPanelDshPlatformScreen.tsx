@@ -1,15 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
+import { Box, Surface, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelLaneTabs,
-  WebControlPanelWorkspaceTabs,
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
 import { DshPlatformVarsWorkspace } from './Vars';
-import { DshPlatformAppearanceWorkspace } from './Appearance';
 import { DshPlatformServicesWorkspace } from './Services';
 import { DshPlatformProvidersWorkspace } from './Providers';
 import { DshPlatformRolloutsWorkspace } from './Rollouts';
@@ -19,7 +17,7 @@ import { DemoPlatformProvider } from './useDemoPlatformState';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
-type ActiveWorkspaceId = 'overview' | 'services' | 'vars' | 'providers' | 'appearance';
+type ActiveWorkspaceId = 'overview' | 'services' | 'vars' | 'providers';
 type SimulationWorkspaceId = 'rollouts' | 'health' | 'audit';
 type PlatformWorkspaceId = ActiveWorkspaceId | SimulationWorkspaceId;
 
@@ -36,18 +34,9 @@ const WORKSPACE_TABS: readonly WorkspaceTab[] = [
   { id: 'providers', label: 'المزودون', badge: '', active: true },
   { id: 'rollouts', label: 'الإطلاق التدريجي', badge: '', active: true },
   { id: 'health', label: 'الصحة والأداء', badge: '', active: true },
-  { id: 'appearance', label: 'المظهر', badge: '', active: true },
   { id: 'audit', label: 'السجل والتراجع', badge: '', active: true },
-  { id: 'overview', label: 'نظرة عامة (عن المنصة)', badge: '', active: true },
+  { id: 'overview', label: 'نظرة عامة عن المنصة', badge: '', active: true },
 ] as const;
-
-const ACTIVE_WORKSPACE_IDS: readonly ActiveWorkspaceId[] = [
-  'overview',
-  'services',
-  'vars',
-  'providers',
-  'appearance',
-];
 
 function isActiveWorkspace(id: PlatformWorkspaceId): id is ActiveWorkspaceId | SimulationWorkspaceId {
   return true; // All are active now
@@ -58,11 +47,21 @@ function isActiveWorkspace(id: PlatformWorkspaceId): id is ActiveWorkspaceId | S
 function OverviewPanel({ platformGovernance }: { platformGovernance: any }) {
   return (
     <Box gap={4}>
+      {/* status strip notice */}
+      <Surface tone="brand" padding={3} radiusToken="md" border>
+        <Box layoutDirection="row" gap={2} align="center" justify="space-between" style={{ flexWrap: 'wrap' }}>
+          <Text role="bodySm" tone="brand" style={{ fontWeight: 'bold' }}>
+            تنبيه النظام: تفضيلات المظهر والهوية البصرية خاصة بملف تعريف المستخدم (Shell Profile) وليست جزءاً من السياسات السيادية للمنصة.
+          </Text>
+          <span className={styles.surfaceMetaChip}>إقرار الحرس التشغيلي</span>
+        </Box>
+      </Surface>
+
       {/* Split Grid for Governance information */}
       <div className={styles.surfaceSplitGrid}>
         <div className={styles.surfaceInfoCard}>
           <div>
-            <div className={styles.surfaceInfoCardTitle}>ملكية المنصة والسياسات السيادية</div>
+            <div className={styles.surfaceInfoCardTitle}>ملكية السياسات والأولوية السيادية</div>
             <div className={styles.surfaceInfoCardDescription}>
               {platformGovernance?.notes ?? 'إدارة المتغيرات السيادية والمزودين والإطلاق التدريجي وسجل التدقيق الفعلي للمنصة.'}
             </div>
@@ -75,9 +74,9 @@ function OverviewPanel({ platformGovernance }: { platformGovernance: any }) {
 
         <div className={styles.surfaceInfoCard}>
           <div>
-            <div className={styles.surfaceInfoCardTitle}>حدود التشغيل والـ SLA</div>
+            <div className={styles.surfaceInfoCardTitle}>حدود ملكية المنصة والـ SLA</div>
             <div className={styles.surfaceInfoCardDescription}>
-              تكامل مباشر مع نظام العمليات وSLA، مع المراقبة الفورية وضمان توافق السياسات السيادية.
+              تكامل مباشر مع نظام العمليات وSLA، مع المراقبة الفورية وضمان توافق السياسات السيادية ومطابقة العقود.
             </div>
           </div>
           <div className={styles.surfaceMetaWrap}>
@@ -91,63 +90,63 @@ function OverviewPanel({ platformGovernance }: { platformGovernance: any }) {
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
             title="الخدمات العليا"
-            value="9"
-            description="DSH، KNZ، WLT، AMN، ARB، MRF، KWD، SND، ESF — خارطة المنصة الكاملة."
+            value="9 خدمات"
+            description="خارطة المنصة الكاملة: DSH، KNZ، WLT، AMN، ARB، MRF، KWD، SND، ESF."
             tone="neutral"
           />
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
             title="المفعلة حالياً"
-            value="2"
-            description="DSH (ظاهر للعملاء) و WLT (API داخلي). 7 خدمات مقررة ولم تُضَف بعد."
+            value="خدمتان"
+            description="خدمة التوصيل DSH (ظاهرة للعملاء) والمحفظة WLT (API داخلي)."
             tone="neutral"
           />
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
             title="مخفية عن العملاء"
-            value="1"
-            description="WLT: API داخلي للمحافظ والتسويات — لا واجهة مباشرة للعملاء."
+            value="خدمة واحدة"
+            description="المحافظ والتسويات WLT: تعمل كـ API داخلي دون واجهة عميل مباشرة."
             tone="neutral"
           />
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
           <WebSignalCard
             title="تحتاج مراجعة"
-            value="7"
-            description="خدمات مقررة في خارطة المنصة ولم يُحدَّد وقت إضافتها بعد."
+            value="7 خدمات"
+            description="خدمات مقررة في خارطة المنصة ولم يكتمل تقييم الجاهزية والربط بعد."
             tone="neutral"
           />
         </Box>
       </Box>
 
       <WebSectionCard
-        title="التكامل مع الأقسام المتخصصة (Handoffs)"
-        description="المهام التشغيلية اليومية محالة إلى مساحات التحكم المتخصصة التالية لتجنب تسربها إلى لوحة التحكم السيادية."
+        title="التكامل وحدود المسؤولية (Handoffs & Limits)"
+        description="المهام المتخصصة محالة إلى مساحات التحكم التالية لتجنب تداخلها مع لوحة التحكم السيادية."
       >
         <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
           <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
             <Box gap={1}>
-              <Text role="titleMd" tone="brand">الكتالوجات (Catalogs)</Text>
+              <Text role="titleMd" tone="brand">إدارة الكتالوجات (Catalogs)</Text>
               <Text role="bodySm" tone="muted">
-                إدارة الفئات، المنتجات، وأقسام العرض.
+                تعديل وتنسيق فئات المنتجات والقوائم، والأسعار المحلية.
               </Text>
             </Box>
           </Surface>
           <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
             <Box gap={1}>
-              <Text role="titleMd" tone="brand">التسويق (Marketing)</Text>
+              <Text role="titleMd" tone="brand">التسويق والعروض (Marketing)</Text>
               <Text role="bodySm" tone="muted">
-                إدارة الحملات، العروض، والبنرات الترويجية.
+                إدارة العروض الترويجية، برامج الولاء، وتوزيع الكوبونات للمستخدمين.
               </Text>
             </Box>
           </Surface>
           <Surface tone="default" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 200, minWidth: 0 }}>
             <Box gap={1}>
-              <Text role="titleMd" tone="brand">الإدارة (Administration)</Text>
+              <Text role="titleMd" tone="brand">إدارة الصلاحيات (Administration)</Text>
               <Text role="bodySm" tone="muted">
-                إدارة المستخدمين، الأدوار، والصلاحيات.
+                إدارة أدوار المشغلين، الهويات، وامتيازات الوصول الفني للمنصة.
               </Text>
             </Box>
           </Surface>
@@ -155,16 +154,16 @@ function OverviewPanel({ platformGovernance }: { platformGovernance: any }) {
       </WebSectionCard>
 
       <WebSectionCard
-        title="أدوات السيطرة والسياسة"
-        description="المنصة تشرح التأثير والـ blast radius والـ fallback والاعتماديات من دون أي runtime mutation."
+        title="أدوات السيطرة والسياسة (Sovereign Policy Tools)"
+        description="تحاكي منصة التحكم الأثر المتوقع وتدفقات التراجع دون إحداث تعديلات فورية في بيئة التشغيل."
       >
         <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>
           {[
-            { title: 'Policy impact simulator', note: 'Vars + precedence + expected impact' },
-            { title: 'Blast radius', note: 'Services + audiences + affected surfaces' },
-            { title: 'Provider degradation', note: 'Provider control + health + test result' },
-            { title: 'Safe fallback', note: 'Rollouts + rollback preview + owner guard' },
-            { title: 'Dependency graph', note: 'Services / Providers / Audit references only' },
+            { title: 'محاكي أثر السياسات', note: 'معاينة المتغيرات + ترتيب الأسبقية + الأثر المتوقع للسياسة.' },
+            { title: 'نطاق وتأثير التغيير', note: 'الخدمات المتأثرة + الشرائح التشغيلية + الأسطح والواجهات النشطة.' },
+            { title: 'تراجع جودة الخدمات والمزودين', note: 'التحكم بالمزودين + مؤشر الصحة والأداء + نتائج فحوصات الاتصال.' },
+            { title: 'البديل الآمن والرجوع التلقائي', note: 'الإطلاقات التدريجية + معاينة التراجع + حرس المالك المعتمد.' },
+            { title: 'مخطط الاعتماديات الفنية', note: 'مخطط الاعتماد بين الخدمات العليا والمزودين ومراجع التدقيق.' },
           ].map((item) => (
             <Surface key={item.title} tone="raised" border padding={3} radiusToken="xl" style={{ flexGrow: 1, flexBasis: 220, minWidth: 0 }}>
               <Box gap={1}>
@@ -183,11 +182,8 @@ function OverviewPanel({ platformGovernance }: { platformGovernance: any }) {
 
 export function ControlPanelDshPlatformScreen() {
   const platformGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('platform'), []);
-  const operationsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('operations'), []);
   const [activeWorkspace, setActiveWorkspace] =
     React.useState<PlatformWorkspaceId>('vars');
-
-  const activeTab = WORKSPACE_TABS.find((w) => w.id === activeWorkspace);
 
   return (
     <DemoPlatformProvider>
@@ -209,7 +205,7 @@ export function ControlPanelDshPlatformScreen() {
               </Box>
             </div>
             <p className={styles.surfaceHeaderSubtitle}>
-              التحكم في المتغيرات السيادية والمزودين والمظهر العام عبر هيكلية النظام المركزي.
+              إدارة المتغيرات السيادية، والمزودين، وسياسات الإطلاق والتشغيل الآمن للمنصة.
             </p>
           </Box>
         </div>
@@ -217,16 +213,20 @@ export function ControlPanelDshPlatformScreen() {
         <div className={styles.surfaceHeaderActions}>
           <div className={styles.surfacePulseCompact}>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>المساحات النشطة</span>
-              <span className={styles.commandKpiValue}>{String(WORKSPACE_TABS.length)}</span>
+              <span className={styles.commandKpiLabel}>السياسات</span>
+              <span className={styles.commandKpiValue}>13</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>حالة النظام</span>
-              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>نشط ومؤمن</span>
+              <span className={styles.commandKpiLabel}>المزودون</span>
+              <span className={styles.commandKpiValue}>7</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>نمط المرحلة</span>
-              <span className={styles.commandKpiValue}>بوابة سيادية نشطة</span>
+              <span className={styles.commandKpiLabel}>الإطلاقات النشطة</span>
+              <span className={styles.commandKpiValue}>3</span>
+            </div>
+            <div className={styles.commandKpi}>
+              <span className={styles.commandKpiLabel}>التنبيهات والتدقيق</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>2</span>
             </div>
           </div>
         </div>
@@ -256,7 +256,6 @@ export function ControlPanelDshPlatformScreen() {
             {activeWorkspace === 'services' && <DshPlatformServicesWorkspace />}
             {activeWorkspace === 'vars' && <DshPlatformVarsWorkspace />}
             {activeWorkspace === 'providers' && <DshPlatformProvidersWorkspace />}
-            {activeWorkspace === 'appearance' && <DshPlatformAppearanceWorkspace />}
             {activeWorkspace === 'rollouts' && <DshPlatformRolloutsWorkspace />}
             {activeWorkspace === 'health' && <DshPlatformHealthWorkspace />}
             {activeWorkspace === 'audit' && <DshPlatformAuditWorkspace />}

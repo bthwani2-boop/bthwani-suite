@@ -27,9 +27,9 @@ import styles from './dsh-platform-vars.module.css';
 type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy';
 
 const STATUS_LABELS: Record<DshPlatformVarStatus, string> = {
-  'preview-only': 'سياسة محلية نشطة',
-  'contract-needed': 'ربط تشغيلي',
-  'ready-for-binding': 'ربط كامل معتمد',
+  'preview-only': 'معاينة فقط (UI-only preview)',
+  'contract-needed': 'يحتاج مطابقة عقد (API/backend later)',
+  'ready-for-binding': 'جاهز للربط الفني (Ready for binding)',
 };
 
 const RISK_LABELS: Record<DshPlatformVarRecord['risk'], string> = {
@@ -40,10 +40,10 @@ const RISK_LABELS: Record<DshPlatformVarRecord['risk'], string> = {
 };
 
 const DOMAIN_LABELS: Record<VarsDomainId, string> = {
-  dsh: 'DSH operational',
-  wlt: 'WLT bridge',
-  provider: 'Provider control',
-  policy: 'precedence + audit',
+  dsh: 'عمليات DSH التشغيلية',
+  wlt: 'جسر WLT المالي',
+  provider: 'سياسات المزودين',
+  policy: 'الأولوية والتدقيق',
 };
 
 const SCOPE_ORDER = new Map(DSH_PLATFORM_SCOPE_PRECEDENCE.map((layer) => [layer.scope, layer.order]));
@@ -107,16 +107,20 @@ function sortRecordsByScope(records: readonly DshPlatformVarRecord[]) {
   });
 }
 
-function resolveProviderEffect(record: DshPlatformVarRecord) {
+function resolveProviderEffect(record: DshPlatformVarRecord): React.ReactNode {
   if (isProviderRecord(record)) {
-    return `${record.providerId} · ${record.capability} · ${record.mode} · fallback=${record.fallback}`;
+    return (
+      <span dir="rtl">
+        مؤشر المزود: <code dir="ltr" style={{ unicodeBidi: 'isolate' }}>{record.providerId}</code> · القدرة: <code dir="ltr" style={{ unicodeBidi: 'isolate' }}>{record.capability}</code> · النمط: <code dir="ltr" style={{ unicodeBidi: 'isolate' }}>{record.mode}</code> · البديل: <code dir="ltr" style={{ unicodeBidi: 'isolate' }}>{record.fallback}</code>
+      </span>
+    );
   }
 
   if (record.owner === 'WLT') {
-    return 'WLT bridge read-only: التأثير المعروض هنا مرجعي فقط ولا يتحول إلى mutation داخل DSH.';
+    return 'جسر WLT المالي (مرجعي فقط): التأثير المعروض هنا للمعاينة ولا يؤدي إلى أي تغيير مالي أو تعديل (no mutation) داخل DSH.';
   }
 
-  return 'DSH operational preview: التأثير المعروض هنا يوضح القرار التشغيلي القادم بدون backend/runtime switching.';
+  return 'معاينة عمليات DSH التشغيلية: الأثر المعروض يوضح القرار التشغيلي المقترح ولا يطبق مباشرة على خوادم المنصة (UI preview only).';
 }
 
 function resolveLinkedScenarios(record: DshPlatformVarRecord) {
@@ -127,8 +131,12 @@ function resolveLinkedAuditEntries(record: DshPlatformVarRecord) {
   return DSH_PLATFORM_AUDIT_PREVIEW.filter((entry) => entry.targetKey === record.key);
 }
 
-function resolvePrecedenceSummary(record: DshPlatformVarRecord) {
-  return `الطبقة الفعالة: ${record.scope} · ${record.precedenceNote} · التسلسل الافتراضي: ${DEFAULT_PRECEDENCE_CHAIN_LABEL}`;
+function resolvePrecedenceSummary(record: DshPlatformVarRecord): React.ReactNode {
+  return (
+    <span dir="rtl">
+      الطبقة الفعالة: <span style={{ fontWeight: 'bold' }}>{record.scope}</span> · {record.precedenceNote} · التسلسل الافتراضي: <code dir="ltr" style={{ unicodeBidi: 'isolate' }}>{DEFAULT_PRECEDENCE_CHAIN_LABEL}</code>
+    </span>
+  );
 }
 
 function resolveSimulationSummary(record: DshPlatformVarRecord, linkedScenarios: typeof DSH_PLATFORM_SIMULATION_PREVIEW) {
@@ -142,14 +150,14 @@ function resolveSimulationSummary(record: DshPlatformVarRecord, linkedScenarios:
 
 function resolveExecutionBoundaryLabel(record: DshPlatformVarRecord) {
   if (record.status === 'preview-only') {
-    return 'سياسة محلية — نشطة وتخضع لرقابة المنصة';
+    return 'سياسة محلية — نشطة وتخضع لرقابة المعاينة (UI-only)';
   }
 
   if (record.status === 'contract-needed') {
-    return 'ربط تشغيلي — متصل بالـ Backend ومؤمن بعقد تشغيل';
+    return 'ربط تشغيلي — بانتظار مطابقة عقد الـ Backend';
   }
 
-  return 'ربط كامل معتمد — متصل بالكامل ويخضع للتدقيق الآلي المباشر';
+  return 'ربط كامل معتمد — جاهز للربط الفني وتدفقات التدقيق';
 }
 function resolveAuditRequirementLabel(record: DshPlatformVarRecord, linkedAudits: typeof DSH_PLATFORM_AUDIT_PREVIEW) {
   if (record.auditRequired || linkedAudits.length > 0) {
@@ -183,34 +191,36 @@ function VarCard({
       <div className={styles.cardHeader}>
         <div className={styles.cardTextBlock}>
           <div className={styles.cardTitle}>{record.label}</div>
-          <div className={styles.cardCode}>{`${record.id} · ${record.key}`}</div>
+          <div className={styles.cardCode} dir="ltr" style={{ unicodeBidi: 'isolate' }}>
+            <span style={{ fontWeight: 'bold' }}>{record.id}</span> · <code>{record.key}</code>
+          </div>
         </div>
         <div className={styles.chipRow}>
-          <span className={styles.chip}>{`المالك: ${record.owner}`}</span>
-          <span className={styles.chip}>{`النطاق: ${record.scope}`}</span>
-          <span className={styles.chip}>{`binding: ${STATUS_LABELS[record.status]}`}</span>
+          <span className={styles.chip}>المالك: <span dir="ltr">{record.owner}</span></span>
+          <span className={styles.chip}>النطاق: {record.scope}</span>
+          <span className={styles.chip}>{STATUS_LABELS[record.status]}</span>
           <span className={styles.chip}>{RISK_LABELS[record.risk]}</span>
-          <span className={styles.chip}>حد التنفيذ: نشط تحت الرقابة</span>
+          <span className={styles.chip}>طبيعة المعاينة: نشط تحت الرقابة</span>
         </div>
       </div>
 
       <div className={styles.valueGrid}>
         <div className={styles.valueCard}>
-          <div className={styles.valueLabel}>القيمة الحالية</div>
+          <div className={styles.valueLabel}>القيمة الحالية (معاينة)</div>
           <div className={styles.valueText}>{record.currentPreviewValue}</div>
         </div>
         <div className={styles.valueCard}>
-          <div className={styles.valueLabel}>القيمة المقترحة</div>
-          <div className={styles.valueText}>{record.proposedPreviewValue ?? 'لا يوجد proposal بعد'}</div>
+          <div className={styles.valueLabel}>القيمة المقترحة (معاينة)</div>
+          <div className={styles.valueText}>{record.proposedPreviewValue ?? 'لا يوجد مقترح بعد'}</div>
         </div>
       </div>
 
       <div className={styles.summaryLine}>{record.effectSummary}</div>
 
       <div className={styles.chipRow}>
-        <span className={styles.chip}>{`محاكاة مرتبطة: ${linkedScenarios.length}`}</span>
-        <span className={styles.chip}>{`audit_required: ${record.auditRequired ? 'yes' : 'no'}`}</span>
-        <span className={styles.chip}>{`أسطح متأثرة: ${record.affectedSurfaces.length}`}</span>
+        <span className={styles.chip}>المحاكاة المرتبطة: {linkedScenarios.length}</span>
+        <span className={styles.chip}>التدقيق مطلوب: {record.auditRequired ? 'نعم' : 'لا'}</span>
+        <span className={styles.chip}>الأسطح المتأثرة: {record.affectedSurfaces.length}</span>
         <span className={styles.chip}>{domainLabel}</span>
       </div>
     </button>
@@ -323,10 +333,10 @@ export function DshPlatformVarsWorkspace() {
   const selectedVar = selectedVarRaw ? getLiveVar(selectedVarRaw) : null;
   const scopeTabs = resolveScopeTabs(domainRecords, activeScope);
   const domainTabs = [
-    { id: 'dsh', label: 'DSH operational', badge: '', active: activeDomain === 'dsh' },
-    { id: 'wlt', label: 'WLT bridge', badge: '', active: activeDomain === 'wlt' },
-    { id: 'provider', label: 'Provider control', badge: '', active: activeDomain === 'provider' },
-    { id: 'policy', label: 'precedence + audit', badge: '', active: activeDomain === 'policy' },
+    { id: 'dsh', label: 'عمليات DSH التشغيلية', badge: '', active: activeDomain === 'dsh' },
+    { id: 'wlt', label: 'جسر WLT المالي', badge: '', active: activeDomain === 'wlt' },
+    { id: 'provider', label: 'سياسات المزودين', badge: '', active: activeDomain === 'provider' },
+    { id: 'policy', label: 'الأولوية والتدقيق', badge: '', active: activeDomain === 'policy' },
   ];
   const linkedScenarios = selectedVar ? resolveLinkedScenarios(selectedVar) : [];
   const linkedAudits = selectedVar ? resolveLinkedAuditEntries(selectedVar) : [];
@@ -338,17 +348,17 @@ export function DshPlatformVarsWorkspace() {
     let nextProposed = prevLive.proposedPreviewValue;
     let nextStatus = prevLive.status;
 
-    if (action === 'تحديث المقترح') {
+    if (action === 'تحديث المقترح للمعاينة') {
       nextProposed = editProposedVal || null;
-    } else if (action === 'تطبيق المقترح وتفعيل التغيير') {
+    } else if (action === 'اعتماد المعاينة المحلية') {
       if (prevLive.proposedPreviewValue) {
         nextCurrent = prevLive.proposedPreviewValue;
         nextProposed = null;
       }
-    } else if (action === 'تراجع فوري (Rollback)') {
+    } else if (action === 'تراجع في المعاينة (Rollback preview)') {
       nextCurrent = selectedVar.currentPreviewValue;
       nextProposed = null;
-    } else if (action === 'فحص مطابقة العقد') {
+    } else if (action === 'محاكاة مطابقة العقد') {
       nextStatus = 'ready-for-binding';
     }
 
@@ -362,12 +372,12 @@ export function DshPlatformVarsWorkspace() {
     }));
 
     addAuditEvent({
-      action: `إدارة وتعديل السياسة السيادية لـ (${selectedVar.label}): ${action}`,
+      action: `محاكاة وتعديل المعاينة لـ (${selectedVar.label}): ${action}`,
       operator: 'Ahmed.Sharif',
       status: action.includes('تراجع') ? 'danger' : 'success',
       oldValue: prevLive.currentPreviewValue,
       newValue: nextCurrent,
-      reason: 'طلب تعديل فني ومطابقة مع نظام العمليات',
+      reason: 'تحديث وتأكيد مسار المعاينة المحلية لمطابقة المتغيرات',
       scope: selectedVar.scope,
       impact: selectedVar.effectSummary,
       rollbackAvailable: true,
@@ -560,13 +570,13 @@ export function DshPlatformVarsWorkspace() {
                     </Box>
 
                     <Box layoutDirection="row" gap={2} style={{ marginTop: 4 }}>
-                      <Button variant="secondary" onClick={() => setShowConfirm('تحديث المقترح')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>حفظ المقترح</Button>
-                      <Button variant="primary" onClick={() => setShowConfirm('تطبيق المقترح وتفعيل التغيير')} disabled={showConfirm !== null || !selectedVar.proposedPreviewValue} style={{ flexGrow: 1 }}>تطبيق وتفعيل</Button>
+                      <Button variant="secondary" onClick={() => setShowConfirm('تحديث المقترح للمعاينة')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>حفظ المقترح للمعاينة</Button>
+                      <Button variant="primary" onClick={() => setShowConfirm('اعتماد المعاينة المحلية')} disabled={showConfirm !== null || !selectedVar.proposedPreviewValue} style={{ flexGrow: 1 }}>معاينة أثر التغيير</Button>
                     </Box>
 
                     <Box layoutDirection="row" gap={2}>
-                      <Button variant="secondary" onClick={() => setShowConfirm('فحص مطابقة العقد')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>فحص العقد</Button>
-                      <Button variant="danger" onClick={() => setShowConfirm('تراجع فوري (Rollback)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تراجع (Rollback)</Button>
+                      <Button variant="secondary" onClick={() => setShowConfirm('محاكاة مطابقة العقد')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>محاكاة مطابقة العقد</Button>
+                      <Button variant="danger" onClick={() => setShowConfirm('تراجع في المعاينة (Rollback preview)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>تراجع في المعاينة (Rollback preview)</Button>
                     </Box>
                   </Box>
                 </Surface>
@@ -574,10 +584,10 @@ export function DshPlatformVarsWorkspace() {
                 {showConfirm && (
                   <Surface tone="warning" border padding={3} radiusToken="md">
                     <Box gap={2}>
-                      <Text role="titleSm">تأكيد الإجراء التشغيلي: {showConfirm}</Text>
-                      <Text role="bodySm">هل أنت متأكد من رغبتك في تطبيق هذا الإجراء المباشر على خوادم المنصة؟</Text>
+                      <Text role="titleSm">تأكيد محاكاة المعاينة: {showConfirm}</Text>
+                      <Text role="bodySm">هل أنت متأكد من رغبتك في تطبيق هذه المعاينة التشغيلية المحلية؟ التغيير للمحاكاة الفورية فقط (UI preview فقط ولاحقاً backend/API).</Text>
                       <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-                        <Button variant="primary" onClick={() => handleConfirmAction(showConfirm)} disabled={showConfirm === null}>تأكيد وتطبيق التغيير</Button>
+                        <Button variant="primary" onClick={() => handleConfirmAction(showConfirm)} disabled={showConfirm === null}>تأكيد معاينة التغيير</Button>
                         <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
                       </Box>
                     </Box>
@@ -626,11 +636,11 @@ export function DshPlatformVarsWorkspace() {
                     <div className={styles.detailValue}>{resolveAuditRequirementLabel(selectedVar, linkedAudits)}</div>
                   </div>
                   <div className={styles.detailField}>
-                    <div className={styles.detailLabel}>حد التنفيذ</div>
-                    <div className={styles.detailValue}>تعديل نشط بموافقة المشرف (Active with Audit)</div>
+                    <div className={styles.detailLabel}>طبيعة المعاينة</div>
+                    <div className={styles.detailValue}>معاينة التدقيق المطلوبة (Audit required / UI preview only)</div>
                   </div>
                   <div className={styles.detailField}>
-                    <div className={styles.detailLabel}>تصنيف الربط القادم</div>
+                    <div className={styles.detailLabel}>تصنيف المعاينة والربط</div>
                     <div className={styles.detailValue}>{resolveExecutionBoundaryLabel(selectedVar)}</div>
                   </div>
                   <div className={styles.detailField}>

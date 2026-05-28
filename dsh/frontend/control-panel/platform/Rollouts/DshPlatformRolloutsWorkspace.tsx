@@ -43,11 +43,11 @@ export function DshPlatformRolloutsWorkspace() {
 
   const handleConfirm = (action: string) => {
     let newStage = currentState.activeStage;
-    if (action === 'إيقاف فوري (Kill Switch)') {
-      newStage = 'موقوف (Kill Switch)';
+    if (action === 'إيقاف فوري في المعاينة (Kill preview)') {
+      newStage = 'موقوف في المعاينة (Kill preview)';
     } else if (selectedRecord.stageOptions.includes(action)) {
       newStage = action;
-    } else if (action === 'استعادة الحالة (Rollback)') {
+    } else if (action === 'استعادة الحالة في المعاينة (Rollback preview)') {
       newStage = selectedRecord.initialStage;
     }
 
@@ -57,14 +57,14 @@ export function DshPlatformRolloutsWorkspace() {
     }));
 
     addAuditEvent({
-      action: `إطلاق تدريجي (${selectedRecord.key}): ${action}`,
+      action: `إطلاق تدريجي محاكٍ (${selectedRecord.key}): ${action}`,
       operator: 'Ahmed.Sharif',
       status: action.includes('Kill') || action.includes('موقوف') || action.includes('إيقاف') ? 'danger' : 'success',
       oldValue: currentState.activeStage,
       newValue: newStage,
-      reason: 'تعديل مرحلة الإطلاق وتأكيد استقرار النظام التشغيلي',
+      reason: 'محاكاة تعديل مرحلة الإطلاق وتأكيد استقرار النظام',
       scope: selectedRecord.scope,
-      impact: `تغيير مرحلة الإطلاق إلى ${newStage}`,
+      impact: `تغيير مرحلة المعاينة للإطلاق إلى ${newStage}`,
       rollbackAvailable: true,
     });
     setShowConfirm(null);
@@ -127,7 +127,7 @@ export function DshPlatformRolloutsWorkspace() {
             <div className={styles.surfaceInspectorMeta}>
               <div className={styles.surfaceInspectorRow}>
                 <strong>معرف الرول-أوت</strong>
-                <span>{selectedRecord.key}</span>
+                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.key}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المستوى</strong>
@@ -136,7 +136,7 @@ export function DshPlatformRolloutsWorkspace() {
               {selectedRecord.parentService && (
                 <div className={styles.surfaceInspectorRow}>
                   <strong>الخدمة الأب</strong>
-                  <span>{selectedRecord.parentService}</span>
+                  <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.parentService}</span>
                 </div>
               )}
               <div className={styles.surfaceInspectorRow}>
@@ -152,11 +152,11 @@ export function DshPlatformRolloutsWorkspace() {
             {showConfirm ? (
               <Surface tone="warning" border padding={3} radiusToken="md">
                 <Box gap={2}>
-                  <Text role="titleSm">تأكيد الإجراء التشغيلي: {showConfirm}</Text>
-                  <Text role="bodySm">هل أنت متأكد من تطبيق هذا التغيير على مرحلة الإطلاق للخدمة؟</Text>
+                  <Text role="titleSm">تأكيد محاكاة المعاينة: {showConfirm}</Text>
+                  <Text role="bodySm">هل أنت متأكد من تطبيق هذه المحاكاة لمرحلة الإطلاق؟ التغيير لمعاينة أثر التوجيه فقط (UI preview).</Text>
                   <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-                    <Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null}>تأكيد وتطبيق التغيير</Button>
-                    <Button variant="secondary" onClick={() => setShowConfirm(null)}>إلغاء</Button>
+                    <Box style={{ flexGrow: 1 }}><Button variant="primary" onClick={() => handleConfirm(showConfirm)} disabled={showConfirm === null} style={{ width: '100%' }}>تأكيد معاينة التغيير</Button></Box>
+                    <Box style={{ flexGrow: 1 }}><Button variant="secondary" onClick={() => setShowConfirm(null)} style={{ width: '100%' }}>إلغاء</Button></Box>
                   </Box>
                 </Box>
               </Surface>
@@ -171,15 +171,15 @@ export function DshPlatformRolloutsWorkspace() {
                   ))}
                 </Box>
                 <Box gap={2}>
-                  <Button variant="primary" onClick={() => setShowConfirm('تأكيد وإطلاق التغيير')} disabled={showConfirm !== null} style={{ width: '100%' }}>
-                    تأكيد وإطلاق التغيير
+                  <Button variant="primary" onClick={() => setShowConfirm('تأكيد معاينة الإطلاق')} disabled={showConfirm !== null} style={{ width: '100%' }}>
+                    تأكيد معاينة الإطلاق
                   </Button>
                   <Box layoutDirection="row" gap={2}>
-                    <Button variant="danger" onClick={() => setShowConfirm('إيقاف فوري (Kill Switch)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>
+                    <Button variant="danger" onClick={() => setShowConfirm('إيقاف فوري في المعاينة (Kill preview)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>
                       إيقاف فوري (Kill)
                     </Button>
-                    <Button variant="secondary" onClick={() => setShowConfirm('استعادة الحالة (Rollback)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>
-                      استعادة الحالة (Rollback)
+                    <Button variant="secondary" onClick={() => setShowConfirm('استعادة الحالة في المعاينة (Rollback preview)')} disabled={showConfirm !== null} style={{ flexGrow: 1 }}>
+                      استعادة الحالة
                     </Button>
                   </Box>
                 </Box>
