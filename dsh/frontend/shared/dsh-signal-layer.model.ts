@@ -9,18 +9,24 @@
  * and which route opens on action — ensuring every signal has a destination.
  */
 
-import { getAllApprovalRecords, type ApprovalRecord } from './workflow';
+import {
+  getAllApprovalRecords,
+  MARKETING_SIGNAL_ENTITY_TYPES,
+  MARKETING_SIGNAL_STAGES,
+  type ApprovalRecord,
+} from './workflow';
+import { dshSignalPreviewEvents } from '../data/signals.preview-data';
 
 type MediaReviewRecord = ApprovalRecord & {
   systemNote?: string;
 };
 
 function getMediaReviewItems(): MediaReviewRecord[] {
-  const entityTypes = ['product', 'product-media', 'category-suggestion', 'store'];
-  const stages = ['marketing-review', 'marketing-approved', 'needs-fix', 'catalog-adopted', 'rejected'];
-
   return getAllApprovalRecords()
-    .filter((record) => entityTypes.includes(record.entityType) && stages.includes(record.stage))
+    .filter((record) =>
+      (MARKETING_SIGNAL_ENTITY_TYPES as readonly string[]).includes(record.entityType) &&
+      (MARKETING_SIGNAL_STAGES as readonly string[]).includes(record.stage)
+    )
     .map((record) => ({
       ...record,
       systemNote: record.metadata?.systemNote ?? record.metadata?.requiredFix ?? record.metadata?.rejectionReason,
@@ -282,189 +288,11 @@ const DSH_SIGNAL_TONES: Record<DshSignalEventKind, 'brand' | 'success' | 'warnin
   settlement_ready_wlt:   'brand',
 };
 
-// ─── Preview Fixtures ─────────────────────────────────────────────────────────
-// UI_PREVIEW_ONLY — 8 representative events covering all actor surfaces.
-// Production: server delivers signal summaries; details fetched on explicit open.
-
-export const DSH_SIGNAL_PREVIEW_EVENTS: ReadonlyArray<DshSignalEvent> = [
-  {
-    eventId: 'sig-001',
-    kind: 'partner_submitted',
-    recipientSurface: ['control-panel', 'app-partner'],
-    recipientRole: ['ops', 'partner'],
-    entityType: 'partner',
-    entityId: 'STORE-1091',
-    priority: 'important',
-    title: 'طلب تسجيل شريك جديد',
-    body: 'الشريك STORE-1091 رفع طلب تسجيل جديد بانتظار المراجعة الأولية.',
-    routeId: 'cp/partners/approval',
-    primaryAction:   { actionId: 'view-partner', label: 'مراجعة الطلب', routeId: 'cp/partners/approval?partnerId=STORE-1091' },
-    secondaryAction: { actionId: 'view-docs',    label: 'فتح الوثائق',  routeId: 'cp/partners/docs?partnerId=STORE-1091' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/partners/approval?partnerId=STORE-1091', summaryOnly: true, retentionHours: 48 },
-    emittedAt: 'منذ 20 دقيقة',
-  },
-  {
-    eventId: 'sig-002',
-    kind: 'payment_failed',
-    recipientSurface: ['app-client', 'control-panel'],
-    recipientRole: ['client', 'ops'],
-    entityType: 'payment',
-    entityId: 'ORD-8821',
-    priority: 'urgent',
-    title: 'فشل الدفع — ORD-8821',
-    body: 'فشل دفع الطلب ORD-8821 عبر WLT. يلزم إعادة المحاولة أو اختيار وسيلة دفع بديلة.',
-    routeId: 'client/orders/payment-retry',
-    primaryAction: { actionId: 'retry-payment', label: 'إعادة المحاولة', routeId: 'client/orders/payment-retry?orderId=ORD-8821' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'client/orders/payment-retry?orderId=ORD-8821', summaryOnly: true, retentionHours: 6 },
-    emittedAt: 'منذ 5 دقائق',
-  },
-  {
-    eventId: 'sig-003',
-    kind: 'captain_declined',
-    recipientSurface: ['control-panel'],
-    recipientRole: ['ops'],
-    entityType: 'captain',
-    entityId: 'CAP-77',
-    priority: 'important',
-    title: 'رفض الكابتن CAP-77 الطلب',
-    body: 'الكابتن CAP-77 رفض الطلب ORD-9012. يلزم إعادة الإسناد فوراً.',
-    routeId: 'cp/operations/dispatch-assignment',
-    primaryAction:   { actionId: 'reassign',  label: 'إعادة الإسناد', routeId: 'cp/operations/dispatch-assignment?orderId=ORD-9012' },
-    secondaryAction: { actionId: 'view-ops',  label: 'فتح العمليات',  routeId: 'cp/operations' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/operations/dispatch-assignment?orderId=ORD-9012', summaryOnly: true, retentionHours: 2 },
-    emittedAt: 'منذ 8 دقائق',
-  },
-  {
-    eventId: 'sig-004',
-    kind: 'sla_breach',
-    recipientSurface: ['control-panel'],
-    recipientRole: ['ops'],
-    entityType: 'sla',
-    entityId: 'TKT-001',
-    priority: 'urgent',
-    title: 'انتهاك SLA — TKT-001',
-    body: 'تذكرة TKT-001 تجاوزت نافذة الاستجابة المحددة. يلزم التصعيد الفوري.',
-    routeId: 'cp/support/sla-dashboard',
-    primaryAction:   { actionId: 'escalate',  label: 'تصعيد',      routeId: 'cp/support/escalation?ticketId=TKT-001' },
-    secondaryAction: { actionId: 'view-sla',  label: 'لوحة SLA',   routeId: 'cp/support/sla-dashboard' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/support/ticket?ticketId=TKT-001', summaryOnly: true },
-    emittedAt: 'منذ 3 دقائق',
-  },
-  {
-    eventId: 'sig-005',
-    kind: 'delivered',
-    recipientSurface: ['app-client', 'control-panel'],
-    recipientRole: ['client', 'ops'],
-    entityType: 'order',
-    entityId: 'ORD-7720',
-    priority: 'normal',
-    title: 'تم تسليم الطلب ORD-7720',
-    body: 'تم تسليم الطلب ORD-7720 بنجاح. يمكن الآن تقييم التجربة.',
-    routeId: 'client/orders/receipt',
-    primaryAction:   { actionId: 'rate-order',   label: 'تقييم الطلب',    routeId: 'client/orders/receipt?orderId=ORD-7720' },
-    secondaryAction: { actionId: 'view-orders',  label: 'قائمة الطلبات', routeId: 'client/orders' },
-    readState: 'read',
-    auditRequired: false,
-    onDemandPolicy: { detailRoute: 'client/orders/receipt?orderId=ORD-7720', summaryOnly: true, retentionHours: 24 },
-    emittedAt: 'منذ ساعة',
-  },
-  {
-    eventId: 'sig-006',
-    kind: 'refund_pending_wlt',
-    recipientSurface: ['app-client', 'control-panel'],
-    recipientRole: ['client', 'ops'],
-    entityType: 'refund',
-    entityId: 'ORD-8821',
-    priority: 'important',
-    title: 'استرداد قيد المعالجة — WLT',
-    body: 'WLT يعالج استرداد الطلب ORD-8821. هذه الحالة للعرض فقط — لا دور لـ DSH في قرار الاسترداد.',
-    routeId: 'cp/finance/refunds',
-    primaryAction: { actionId: 'view-refund', label: 'عرض الاسترداد', routeId: 'cp/finance/refunds?orderId=ORD-8821' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/finance/refunds?orderId=ORD-8821', summaryOnly: true, retentionHours: 72 },
-    emittedAt: 'منذ 15 دقيقة',
-  },
-  {
-    eventId: 'sig-007',
-    kind: 'catalog_published',
-    recipientSurface: ['app-partner', 'control-panel'],
-    recipientRole: ['partner', 'ops'],
-    entityType: 'catalog',
-    entityId: 'STORE-1091',
-    priority: 'normal',
-    title: 'تم نشر الكتالوج — STORE-1091',
-    body: 'تم نشر كتالوج المتجر STORE-1091 وأصبح مرئياً للعملاء.',
-    routeId: 'partner/catalog/published',
-    primaryAction: { actionId: 'view-catalog', label: 'عرض الكتالوج', routeId: 'partner/catalog/published?storeId=STORE-1091' },
-    readState: 'read',
-    auditRequired: false,
-    onDemandPolicy: { detailRoute: 'partner/catalog/published?storeId=STORE-1091', summaryOnly: true, retentionHours: 24 },
-    emittedAt: 'منذ ساعتين',
-  },
-  {
-    eventId: 'sig-008',
-    kind: 'delivery_failed',
-    recipientSurface: ['app-client', 'app-captain', 'control-panel'],
-    recipientRole: ['client', 'captain', 'ops'],
-    entityType: 'order',
-    entityId: 'ORD-9011',
-    priority: 'urgent',
-    title: 'فشل التسليم — ORD-9011',
-    body: 'الكابتن أبلغ عن فشل تسليم الطلب ORD-9011. يلزم التدخل من مركز العمليات.',
-    routeId: 'cp/operations/exceptions',
-    primaryAction:   { actionId: 'open-exceptions', label: 'فتح الاستثناءات',  routeId: 'cp/operations/exceptions?orderId=ORD-9011' },
-    secondaryAction: { actionId: 'contact-client',  label: 'تواصل مع العميل', routeId: 'cp/support' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/operations/exceptions?orderId=ORD-9011', summaryOnly: true, retentionHours: 4 },
-    emittedAt: 'منذ دقيقتين',
-  },
-  {
-    eventId: 'sig-009',
-    kind: 'manual_call_intake_requested',
-    recipientSurface: ['control-panel'],
-    recipientRole: ['ops'],
-    entityType: 'ticket',
-    entityId: 'CALL-9021',
-    priority: 'important',
-    title: 'طلب إدخال مكالمة يدوي',
-    body: 'هناك مكالمة خارجية تحتاج source = external_phone_manual والتحقق قبل كشف البيانات الحساسة.',
-    routeId: 'cp/support/call-intake',
-    primaryAction: { actionId: 'open-call-intake', label: 'فتح الإدخال', routeId: 'cp/support/call-intake?callId=CALL-9021' },
-    secondaryAction: { actionId: 'open-customer-360', label: 'فتح Customer 360', routeId: 'cp/support/customer-360?customerId=cus-4188' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/support/call-intake?callId=CALL-9021', summaryOnly: true, retentionHours: 24 },
-    emittedAt: 'منذ 7 دقائق',
-  },
-  {
-    eventId: 'sig-010',
-    kind: 'order_rescue_requested',
-    recipientSurface: ['control-panel'],
-    recipientRole: ['ops'],
-    entityType: 'order',
-    entityId: 'ORD-1102',
-    priority: 'urgent',
-    title: 'طلب Order Rescue — ORD-1102',
-    body: 'الطلب يحتاج تدخلاً موحدًا بعد تعثر الشريك والبديل ولم يعد يكفي المسار اليدوي الأولي.',
-    routeId: 'cp/operations/order-rescue',
-    primaryAction: { actionId: 'open-order-rescue', label: 'فتح Order Rescue', routeId: 'cp/operations/order-rescue?orderId=ORD-1102' },
-    secondaryAction: { actionId: 'open-assisted-order', label: 'فتح Assisted Order', routeId: 'cp/operations/assisted-order-desk?orderId=ORD-1102' },
-    readState: 'unread',
-    auditRequired: true,
-    onDemandPolicy: { detailRoute: 'cp/operations/order-rescue?orderId=ORD-1102', summaryOnly: true, retentionHours: 12 },
-    emittedAt: 'منذ 4 دقائق',
-  },
-];
+// ─── Signal Layer Preview Events ─────────────────────────────────────────────
+// Canonical data lives in dsh/frontend/data/signals.preview-data.ts
+// Re-exported here typed for the signal layer contract.
+export const DSH_SIGNAL_PREVIEW_EVENTS =
+  dshSignalPreviewEvents as unknown as ReadonlyArray<DshSignalEvent>;
 
 function resolveMarketingReviewSignalKind(item: MediaReviewRecord): DshSignalEventKind | null {
   if (item.stage === 'marketing-approved') {
@@ -541,7 +369,7 @@ function getAllSignalEvents(): ReadonlyArray<DshSignalEvent> {
         emittedAt: resolveMarketingSignalEmittedAt(item),
       } as const;
     })
-    .filter((event): event is DshSignalEvent => Boolean(event));
+    .filter((event): event is NonNullable<typeof event> => event !== null) as DshSignalEvent[];
 
   return [...DSH_SIGNAL_PREVIEW_EVENTS, ...marketingReviewSignals];
 }

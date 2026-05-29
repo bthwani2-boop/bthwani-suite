@@ -188,6 +188,16 @@ export type ApprovalEntityType =
   | 'banner'
   | 'promo';
 
+/** Entity types routed to the marketing signal layer (media governance signals). */
+export const MARKETING_SIGNAL_ENTITY_TYPES: ReadonlyArray<ApprovalEntityType> = [
+  'product', 'product-media', 'category-suggestion', 'store',
+];
+
+/** Approval stages that produce active marketing governance signals. */
+export const MARKETING_SIGNAL_STAGES: ReadonlyArray<ApprovalStage> = [
+  'marketing-review', 'marketing-approved', 'needs-fix', 'catalog-adopted', 'rejected',
+];
+
 export type ApprovalSourceSurface =
   | 'app-partner'
   | 'app-field'
