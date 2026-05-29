@@ -1080,20 +1080,6 @@ export function useCatalogScreen() {
     // Classification filters
     activeMainClassifId, setActiveMainClassifId,
     activeSubClassifId, setActiveSubClassifId,
-    // Taxonomy node
-    selectedTaxonomyNode, setSelectedTaxonomyNode,
-    // Tree expand/collapse
-    expandedMainCategoryIds, setExpandedMainCategoryIds,
-    expandedSubCategoryIds, setExpandedSubCategoryIds,
-    expandedMainClassifIds, setExpandedMainClassifIds,
-    // Tree search & hover
-    treeSearchQuery, setTreeSearchQuery,
-    hoveredNodeId, setHoveredNodeId,
-    filteredCategories,
-    // Tree toggle handlers
-    toggleMainCategoryExpand,
-    toggleSubCategoryExpand,
-    toggleMainClassifExpand,
     // Category handlers
     handleMainCategorySelect,
     handleSubCategorySelect,
