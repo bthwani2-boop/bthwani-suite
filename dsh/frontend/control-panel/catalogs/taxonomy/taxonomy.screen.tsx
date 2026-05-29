@@ -19,7 +19,6 @@ export function TaxonomyScreen({ taxonomy, products }: TaxonomyScreenProps) {
     previewCategories, setPreviewCategories,
     filteredCategories,
     hiddenCategoryIds,
-    categoryControlOpen: _categoryControlOpen,
     addingMainCat, setAddingMainCat,
     addingSubUnder, setAddingSubUnder,
     addingMainClassifUnder, setAddingMainClassifUnder,
