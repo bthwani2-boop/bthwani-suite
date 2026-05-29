@@ -5,7 +5,6 @@ import {
   dshCatalogCategories,
   dshCatalogProducts,
   type CatalogMainCategory,
-  type CatalogSubCategory,
 } from '../catalogs.data';
 import {
   cloneCatalogCategories,
@@ -29,17 +28,10 @@ export type UseTaxonomyScreenParams = {
 };
 
 export function useTaxonomyScreen({ onPushProposal }: UseTaxonomyScreenParams) {
-  const [activeMainCategory, setActiveMainCategory] = useState<CatalogMainCategory | null>(null);
-  const [activeSubCategory, setActiveSubCategory] = useState<CatalogSubCategory | null>(null);
-  const [activeMainClassifId, setActiveMainClassifId] = useState<string | null>(null);
-  const [activeSubClassifId, setActiveSubClassifId] = useState<string | null>(null);
-
   const [previewCategories, setPreviewCategories] = useState<CatalogMainCategory[]>(
     () => cloneCatalogCategories(dshCatalogCategories)
   );
   const [hiddenCategoryIds, setHiddenCategoryIds] = useState<ReadonlySet<string>>(new Set());
-  const [hiddenSubCategoryIds, setHiddenSubCategoryIds] = useState<ReadonlySet<string>>(new Set());
-  const [categoryControlOpen, setCategoryControlOpen] = useState(false);
   const [addingMainCat, setAddingMainCat] = useState(false);
   const [addingSubUnder, setAddingSubUnder] = useState<string | null>(null);
   const [addingMainClassifUnder, setAddingMainClassifUnder] = useState<{ mainId: string; subId: string } | null>(null);
@@ -60,11 +52,6 @@ export function useTaxonomyScreen({ onPushProposal }: UseTaxonomyScreenParams) {
   const filteredCategories = useMemo(
     () => filterCategoryTree(previewCategories, treeSearchQuery),
     [previewCategories, treeSearchQuery]
-  );
-
-  const effectiveCategories = useMemo(
-    () => previewCategories.filter((c) => !hiddenCategoryIds.has(c.id)),
-    [previewCategories, hiddenCategoryIds]
   );
 
   const getProductCountForCategory = React.useCallback(
@@ -98,19 +85,6 @@ export function useTaxonomyScreen({ onPushProposal }: UseTaxonomyScreenParams) {
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
-  };
-
-  const handleMainCategorySelect = (cat: CatalogMainCategory | null) => {
-    setActiveMainCategory(cat);
-    setActiveSubCategory(null);
-    setActiveMainClassifId(null);
-    setActiveSubClassifId(null);
-  };
-
-  const handleSubCategorySelect = (sub: CatalogSubCategory | null) => {
-    setActiveSubCategory(sub);
-    setActiveMainClassifId(null);
-    setActiveSubClassifId(null);
   };
 
   const handleAddMainCategory = React.useCallback(() => {
@@ -193,10 +167,6 @@ export function useTaxonomyScreen({ onPushProposal }: UseTaxonomyScreenParams) {
     setHiddenCategoryIds((prev) => toggleReadonlyStringSet(prev, id));
   }, []);
 
-  const handleToggleSubCategoryHide = React.useCallback((id: string) => {
-    setHiddenSubCategoryIds((prev) => toggleReadonlyStringSet(prev, id));
-  }, []);
-
   const handleDeleteNode = React.useCallback((
     type: 'main' | 'sub' | 'mainClassif' | 'subClassif',
     mainId: string,
@@ -237,41 +207,9 @@ export function useTaxonomyScreen({ onPushProposal }: UseTaxonomyScreenParams) {
       apiBoundary: 'PATCH /catalog/taxonomy',
     }));
 
-    if (type === 'main' && activeMainCategory?.id === mainId) {
-      setActiveMainCategory(null);
-      setActiveSubCategory(null);
-      setActiveMainClassifId(null);
-      setActiveSubClassifId(null);
-    } else if (type === 'sub' && activeSubCategory?.id === subId) {
-      setActiveSubCategory(null);
-      setActiveMainClassifId(null);
-      setActiveSubClassifId(null);
-    } else if (type === 'mainClassif' && activeMainClassifId === mainClassifId) {
-      setActiveMainClassifId(null);
-      setActiveSubClassifId(null);
-    } else if (type === 'subClassif' && activeSubClassifId === subClassifId) {
-      setActiveSubClassifId(null);
-    }
-
     setEditingEntry(null);
     setCatError(null);
-  }, [activeMainCategory, activeSubCategory, activeMainClassifId, activeSubClassifId, onPushProposal]);
-
-  const handleResetCategoryPreview = React.useCallback(() => {
-    setPreviewCategories(cloneCatalogCategories(dshCatalogCategories));
-    setHiddenCategoryIds(new Set());
-    setHiddenSubCategoryIds(new Set());
-    setAddingMainCat(false);
-    setAddingSubUnder(null);
-    setAddingMainClassifUnder(null);
-    setAddingSubClassifUnder(null);
-    setFormLabel('');
-    setFormSubtitle('');
-    setCatError(null);
-    setEditingEntry(null);
-    setActiveMainClassifId(null);
-    setActiveSubClassifId(null);
-  }, []);
+  }, [onPushProposal]);
 
   const handleStartCatEdit = React.useCallback((
     type: 'main' | 'sub' | 'mainClassif' | 'subClassif',
@@ -417,7 +355,6 @@ export function useTaxonomyScreen({ onPushProposal }: UseTaxonomyScreenParams) {
     handleAddMainClassification,
     handleAddSubClassification,
     handleToggleCategoryHide,
-    handleToggleSubCategoryHide,
     handleDeleteNode,
     handleStartCatEdit,
     handleApplyCatEdit,

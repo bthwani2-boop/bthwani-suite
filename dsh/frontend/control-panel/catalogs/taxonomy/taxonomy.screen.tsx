@@ -41,7 +41,6 @@ export function TaxonomyScreen({ taxonomy, products }: TaxonomyScreenProps) {
     handleAddMainClassification,
     handleAddSubClassification,
     handleToggleCategoryHide,
-    handleToggleSubCategoryHide,
     handleDeleteNode,
     handleStartCatEdit,
     handleApplyCatEdit,
