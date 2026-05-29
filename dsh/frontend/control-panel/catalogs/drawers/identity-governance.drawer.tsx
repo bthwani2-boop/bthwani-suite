@@ -244,7 +244,7 @@ export function CatalogIdentityGovernanceWorkspace({
                 />
               </Box>
 
-              <ResultBanner result={result} />
+              <ResultBanner result={result || null} />
             </Box>
           );
         })}

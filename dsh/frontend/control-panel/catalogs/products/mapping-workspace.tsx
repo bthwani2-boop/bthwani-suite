@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
-import { WatermarkedImage } from '../catalogs.parts';
+import { WatermarkedImage, WorkspaceIntroBanner } from '../catalogs.parts';
 import { dshCatalogCategories } from '../catalogs.data';
 import type { CatalogProductMaster, CatalogMainCategory } from '../catalogs.data';
 import type { CatalogWorkspaceId } from '../catalogs.model';

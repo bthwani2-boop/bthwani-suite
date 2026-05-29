@@ -7,7 +7,7 @@ import type { useTaxonomyScreen } from './taxonomy.hooks';
 
 // ─── Shared ───────────────────────────────────────────────────────────────────
 
-function actionButtonStyle(theme: unknown, isDanger = false) {
+function actionButtonStyle(theme: any, isDanger = false) {
   return {
     padding: '2px 6px',
     borderRadius: '4px',

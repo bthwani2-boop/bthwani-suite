@@ -18,6 +18,10 @@ import { CatalogBreadcrumb } from './catalogs.breadcrumb';
 import { CatalogProposalsBanner } from './catalogs.proposals-banner';
 import { CatalogProductsTable } from './products/catalog-products-table';
 import { PublishingGateChecklist } from './products/publishing-gate-checklist';
+import { ItemApprovalScreen } from './approvals/approvals.screen';
+import { ListingGovernanceScreen } from './listing-governance/listing-governance.screen';
+import { mergeCatalogProductPreviewPatch } from './catalogs.adapters';
+import { createCatalogPreviewProposal } from './catalogs.model';
 
 export type ControlPanelDshCatalogScreenProps = {
   hubHref?: string;
@@ -197,7 +201,7 @@ export function ControlPanelDshCatalogScreen({
         setActiveFilter={setActiveFilter}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        colFilters={colFilters}
+        _colFilters={colFilters}
         setColFilters={setColFilters}
         activeMainCategory={activeMainCategory}
         setActiveMainCategory={setActiveMainCategory}
@@ -259,42 +263,82 @@ export function ControlPanelDshCatalogScreen({
                             openWorkspace={openWorkspace}
                             previewCategories={previewCategories}
                           />
-                        ) : (
-                          <>
-                            {activeTab === 'publishing' && (
-                              <PublishingGateChecklist
-                                isCategoryMapped={isCategoryMapped}
-                                isDuplicatesClean={isDuplicatesClean}
-                                isMediaSatisfied={isMediaSatisfied}
-                                approvedCount={approvedCount}
-                                totalCount={totalCount}
-                                products={products}
-                                setProductPreviewPatches={setProductPreviewPatches}
-                                pushPreviewProposal={pushPreviewProposal}
-                                setActionMessage={setActionMessage}
-                              />
-                            )}
-                            <CatalogProductsTable
-                              showBulkOps={showBulkOps}
-                              selectedProductIds={selectedProductIds}
-                              setSelectedProductIds={setSelectedProductIds}
-                              visibleProducts={visibleProducts}
-                              previewCategories={previewCategories}
-                              selectedProductId={selectedProductId}
-                              setSelectedProductId={setSelectedProductId}
-                              colFilters={colFilters}
-                              setColFilters={setColFilters}
-                              openFilterCol={openFilterCol}
-                              setOpenFilterCol={setOpenFilterCol}
-                              filterOptions={filterOptions}
+                        ) : activeTab === 'approvals' ? (
+                          <ItemApprovalScreen
+                            onApprove={(id) => {
+                              const p = products.find(prod => prod.id === id);
+                              if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-adopted' }, 'تم تسجيل مقترح اعتماد العنصر', 'اعتماد العنصر ونقله إلى معتمد مركزي كمعاينة فقط.');
+                            }}
+                            onReject={(id, note) => {
+                              const p = products.find(prod => prod.id === id);
+                              if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-draft' }, 'تم تسجيل مقترح رفض العنصر', note);
+                            }}
+                            onRequestRevision={(id, note) => {
+                              const p = products.find(prod => prod.id === id);
+                              if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-draft' }, 'تم تسجيل مقترح طلب تعديل العنصر', note);
+                            }}
+                          />
+                        ) : activeTab === 'publishing' ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px' }}>
+                            <ListingGovernanceScreen
+                              onApproveForPublish={(id) => {
+                                const readyProducts = products.filter((p) => p.approvalStage === 'catalog-adopted');
+                                setProductPreviewPatches((prev) =>
+                                  readyProducts.reduce(
+                                    (next, product) => mergeCatalogProductPreviewPatch(next, product.id, { approvalStage: 'client-visible' }),
+                                    prev
+                                  )
+                                );
+                                pushPreviewProposal(createCatalogPreviewProposal({
+                                  type: 'visibility-change',
+                                  productIds: readyProducts.map((p) => p.id),
+                                  label: 'نشر الكتالوج بالكامل للعميل',
+                                  note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                                  apiBoundary: 'POST /catalog/products/publish',
+                                }));
+                                setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');
+                              }}
+                              onRequestRevision={(id) => {
+                                setActionMessage('تم طلب مراجعة النشر');
+                              }}
+                              onReject={(id) => {
+                                setActionMessage('تم رفض طلب النشر');
+                              }}
                             />
-                          </>
+                            <PublishingGateChecklist
+                              isCategoryMapped={isCategoryMapped}
+                              isDuplicatesClean={isDuplicatesClean}
+                              isMediaSatisfied={isMediaSatisfied}
+                              approvedCount={approvedCount}
+                              totalCount={totalCount}
+                              products={products}
+                              setProductPreviewPatches={setProductPreviewPatches}
+                              pushPreviewProposal={pushPreviewProposal}
+                              setActionMessage={setActionMessage}
+                              openWorkspace={openWorkspace}
+                            />
+                          </div>
+                        ) : (
+                          <CatalogProductsTable
+                            showBulkOps={showBulkOps}
+                            selectedProductIds={selectedProductIds}
+                            setSelectedProductIds={setSelectedProductIds}
+                            visibleProducts={visibleProducts}
+                            previewCategories={previewCategories}
+                            selectedProductId={selectedProductId}
+                            setSelectedProductId={setSelectedProductId}
+                            colFilters={colFilters}
+                            setColFilters={setColFilters}
+                            openFilterCol={openFilterCol}
+                            setOpenFilterCol={setOpenFilterCol}
+                            filterOptions={filterOptions}
+                          />
                         )}
                       </div>
                     )}
                   </div>
 
-                  {!isManualOrderCategory && activeTab !== 'intake' && activeTab !== 'mapping' ? (
+                  {!isManualOrderCategory && activeTab !== 'intake' && activeTab !== 'mapping' && activeTab !== 'approvals' && activeTab !== 'publishing' ? (
                     <div style={{ padding: '10px 16px 12px', borderTop: `1px solid ${theme.line}`, backgroundColor: theme.surface }}>
                       <WebControlPanelCompactPager
                         page={catalogPage}

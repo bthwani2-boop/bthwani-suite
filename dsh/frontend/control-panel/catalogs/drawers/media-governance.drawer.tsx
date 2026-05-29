@@ -317,7 +317,7 @@ export function CatalogMediaGovernanceWorkspace({
                       ) : null}
                     </Box>
 
-                    <ResultBanner result={result} />
+                    <ResultBanner result={result || null} />
                   </Box>
                 );
               })}

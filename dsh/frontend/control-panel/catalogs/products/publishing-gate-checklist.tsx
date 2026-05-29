@@ -5,7 +5,7 @@ import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import type { CatalogProductMaster } from '../catalogs.data';
 import type { CatalogProductPreviewPatch } from '../catalogs.adapters';
 import { mergeCatalogProductPreviewPatch } from '../catalogs.adapters';
-import { createCatalogPreviewProposal, type CatalogPreviewProposal } from '../catalogs.model';
+import { createCatalogPreviewProposal, type CatalogPreviewProposal, type CatalogWorkspaceId } from '../catalogs.model';
 
 type PublishingGateChecklistProps = {
   isCategoryMapped: boolean;
@@ -17,12 +17,14 @@ type PublishingGateChecklistProps = {
   setProductPreviewPatches: React.Dispatch<React.SetStateAction<Record<string, CatalogProductPreviewPatch>>>;
   pushPreviewProposal: (p: CatalogPreviewProposal) => void;
   setActionMessage: (msg: string | null) => void;
+  openWorkspace: (ws: CatalogWorkspaceId, productId?: string) => void;
 };
 
 export function PublishingGateChecklist({
   isCategoryMapped, isDuplicatesClean, isMediaSatisfied,
   approvedCount, totalCount, products,
   setProductPreviewPatches, pushPreviewProposal, setActionMessage,
+  openWorkspace,
 }: PublishingGateChecklistProps) {
   const { theme } = useTheme();
 
@@ -65,29 +67,37 @@ export function PublishingGateChecklist({
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
           {approvedCount} من {totalCount} منتجات معتمدة وجاهزة للنشر.
         </Text>
-        <Button
-          label="🚀 نشر الكتالوج بالكامل للعميل"
-          tone="brand"
-          size="sm"
-          disabled={!(isCategoryMapped && isDuplicatesClean && isMediaSatisfied && approvedCount > 0)}
-          onPress={() => {
-            const readyProducts = products.filter((p) => p.approvalStage === 'catalog-adopted');
-            setProductPreviewPatches((prev) =>
-              readyProducts.reduce(
-                (next, product) => mergeCatalogProductPreviewPatch(next, product.id, { approvalStage: 'client-visible' }),
-                prev
-              )
-            );
-            pushPreviewProposal(createCatalogPreviewProposal({
-              type: 'visibility-change',
-              productIds: readyProducts.map((p) => p.id),
-              label: 'نشر الكتالوج بالكامل للعميل',
-              note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
-              apiBoundary: 'POST /catalog/products/publish',
-            }));
-            setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');
-          }}
-        />
+        <Box layoutDirection="row" gap={2} align="center">
+          <Button
+            label="📊 مصفوفة جاهزية النشر"
+            tone="secondary"
+            size="sm"
+            onPress={() => openWorkspace('publication-readiness')}
+          />
+          <Button
+            label="🚀 نشر الكتالوج بالكامل للعميل"
+            tone="brand"
+            size="sm"
+            disabled={!(isCategoryMapped && isDuplicatesClean && isMediaSatisfied && approvedCount > 0)}
+            onPress={() => {
+              const readyProducts = products.filter((p) => p.approvalStage === 'catalog-adopted');
+              setProductPreviewPatches((prev) =>
+                readyProducts.reduce(
+                  (next, product) => mergeCatalogProductPreviewPatch(next, product.id, { approvalStage: 'client-visible' }),
+                  prev
+                )
+              );
+              pushPreviewProposal(createCatalogPreviewProposal({
+                type: 'visibility-change',
+                productIds: readyProducts.map((p) => p.id),
+                label: 'نشر الكتالوج بالكامل للعميل',
+                note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                apiBoundary: 'POST /catalog/products/publish',
+              }));
+              setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');
+            }}
+          />
+        </Box>
       </Box>
     </Box>
   );

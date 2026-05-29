@@ -3,7 +3,7 @@ import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-k
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import Image from 'next/image';
 import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
-import type { CatalogProductMaster } from '../catalogs.data';
+import type { CatalogProductMaster, CatalogMainCategory } from './catalogs.data';
 
 // --- FilterDropdown.tsx ---
 

@@ -76,7 +76,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
       status = 'ready-for-api';
     }
 
-    const result: ActionResult = { action, categoryId: id, categoryLabel: catLabel, note };
+    const result: TaxonomyActionResult = { action, categoryId: id, categoryLabel: catLabel, note };
     setActionResult(result);
 
     onProposal({

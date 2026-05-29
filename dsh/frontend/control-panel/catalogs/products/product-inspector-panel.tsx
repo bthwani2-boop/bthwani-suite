@@ -247,6 +247,13 @@ export function ProductInspectorPanel({
             }}
           />
           <Button label="معاينة إحالة للتسويق" tone="secondary" size="sm" fullWidth />
+          <Button
+            label="📋 سجل التدقيق"
+            tone="secondary"
+            size="sm"
+            fullWidth
+            onPress={() => openWorkspace('audit-trail', selectedProduct.id)}
+          />
         </Box>
       </Box>
     </div>

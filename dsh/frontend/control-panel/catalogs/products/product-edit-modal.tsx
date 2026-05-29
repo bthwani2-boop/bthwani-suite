@@ -9,6 +9,7 @@ import {
   createCatalogPreviewProposal,
   toCatalogApprovalStage,
   toCatalogMediaPolicy,
+  type CatalogPreviewProposal,
 } from '../catalogs.model';
 import { WorkspaceCategoryPicker } from '../catalogs.parts';
 import { DSH_COMMON_MEDIA_KEYS } from '../catalogs.data';
