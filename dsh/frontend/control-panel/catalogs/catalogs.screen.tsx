@@ -18,8 +18,8 @@ import { CatalogBreadcrumb } from './catalogs.breadcrumb';
 import { CatalogProposalsBanner } from './catalogs.proposals-banner';
 import { CatalogProductsTable } from './products/catalog-products-table';
 import { PublishingGateChecklist } from './products/publishing-gate-checklist';
-import { ItemApprovalScreen } from './approvals/approvals.screen';
-import { ListingGovernanceScreen } from './listing-governance/listing-governance.screen';
+import { ItemApprovalScreen } from './catalogs.approvals';
+import { ListingGovernanceScreen } from './catalogs.listing-governance';
 import { mergeCatalogProductPreviewPatch } from './catalogs.adapters';
 import { createCatalogPreviewProposal } from './catalogs.model';
 

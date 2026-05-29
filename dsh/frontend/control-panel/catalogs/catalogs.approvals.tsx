@@ -7,14 +7,14 @@ import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusTone,
-} from '../../../shared/dsh-product-identity.model';
+} from '../../shared/dsh-product-identity.model';
 import {
   getAllApprovalRecords,
   moveApprovalRecordToStage,
   upsertApprovalRecord,
   type ApprovalRecord,
   type ApprovalStage,
-} from '../../../shared/workflow';
+} from '../../shared/workflow';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -40,7 +40,7 @@ const statusLabel: Record<ItemApprovalStatus, string> = {
   'needs-revision': 'يحتاج تعديل',
 };
 
-const statusTone: Record<ItemApprovalStatus, 'default' | 'success' | 'danger' | 'warning'> = {
+const statusTone: Record<ItemApprovalStatus, 'default' | 'success' | 'warning' | 'danger'> = {
   pending: 'default',
   approved: 'success',
   rejected: 'danger',

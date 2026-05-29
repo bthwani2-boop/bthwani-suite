@@ -68,6 +68,13 @@ export function useCatalogMicroActions({
           onAction: () => { setProductPreviewPatches({}); setActionMessage('تمت إعادة الكتالوج لحالة المصدر الأولية'); },
         }
       );
+    } else if (activeTab === 'taxonomy') {
+      actions.push({
+        id: 'ma-taxonomy-governance',
+        label: '🗂 حوكمة التصنيف والفئات',
+        isActive: workspaceState?.workspace === 'taxonomy-governance',
+        onAction: () => setWorkspaceState({ workspace: 'taxonomy-governance', sourceSurface: 'catalogs', reason: 'taxonomy-governance' }),
+      });
     } else if (activeTab === 'intake') {
       actions.push({
         id: 'ma-intake-adopt-all',

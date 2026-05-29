@@ -6,8 +6,8 @@
 import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import { resolveDshProductClientVisibility } from '../../../shared/dsh-client-visibility.model';
-import { PublishGateStatus, CatalogPublishGateRecord, demoPublishGateRecord } from '../../../data/publishing-gates.preview-data';
+import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
+import { PublishGateStatus, CatalogPublishGateRecord, demoPublishGateRecord } from '../../data/publishing-gates.preview-data';
 
 
 // Gate action result — UI_PREVIEW_ONLY

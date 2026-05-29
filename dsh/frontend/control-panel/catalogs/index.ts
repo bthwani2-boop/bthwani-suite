@@ -7,16 +7,16 @@ export type {
 } from './catalogs.data';
 export { ControlPanelDshCatalogScreen } from './catalogs.screen';
 export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen } from './CatalogGovernanceScreens';
-export { CategoriesScreen, CategoriesScreen as ControlPanelDshCatalogCategoriesScreen } from './categories/categories.screen';
+export { CategoriesScreen, CategoriesScreen as ControlPanelDshCatalogCategoriesScreen } from './catalogs.categories';
 export { default } from './CatalogGovernanceScreens';
 
 // ML-053: Item approval section — UI_PREVIEW_ONLY flow implemented (catalog approval API not yet bound)
-export { ItemApprovalScreen } from './approvals/approvals.screen';
-export type { ItemApprovalScreenProps } from './approvals/approvals.screen';
+export { ItemApprovalScreen } from './catalogs.approvals';
+export type { ItemApprovalScreenProps } from './catalogs.approvals';
 
 // ML-054: Catalog publishing gate section — UI_PREVIEW_ONLY flow implemented (catalog publish API not yet bound)
-export { ListingGovernanceScreen } from './listing-governance/listing-governance.screen';
-export type { ListingGovernanceScreenProps } from './listing-governance/listing-governance.screen';
+export { ListingGovernanceScreen } from './catalogs.listing-governance';
+export type { ListingGovernanceScreenProps } from './catalogs.listing-governance';
 
 // CAT-S01: Item detail workspace — single product detail-on-open
 export { CatalogItemDetailWorkspace } from './drawers/item-detail.drawer';

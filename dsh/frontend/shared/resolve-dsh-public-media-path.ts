@@ -6,7 +6,7 @@
 
 const dshPublicMediaPrefix = '/dsh/media-fixtures/';
 
-const explicitPublicMediaPathByKey: Record<string, string> = {
+export const explicitPublicMediaPathByKey: Record<string, string> = {
   'dsh.product.apple.v1': 'products/dsh-product-apple-v1.png',
   'dsh.product.bread.v1': 'products/dsh-product-bread-v1.png',
   'dsh.product.chicken.v1': 'products/dsh-product-chicken-v1.png',

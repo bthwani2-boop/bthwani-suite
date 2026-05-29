@@ -7,7 +7,7 @@ import {
   WebControlPanelWorkspaceTabs,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { dshCatalogCategories } from '../catalogs.data';
+import { dshCatalogCategories } from './catalogs.data';
 
 // UI_PREVIEW_ONLY: category governance actions — no backend/API binding.
 // control-panel/catalogs is the ONLY surface that can approve category nodes.

@@ -35,7 +35,7 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 | `app-client` | `HomeScreen.tsx` | `dsh-home:inline-search` | Search inline | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-023` | none | `PASS` |
 | `app-client` | `StoreScreen.tsx` | `dsh-store` | View store details | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-005` | none | `PASS` |
 | `app-partner` | `InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | Update readiness and publishing visibility | same page | `loading`, `empty`, `error`, `success`, `offline` | none | Visual & runtime proof | `DEFERRED_WITH_REASON` |
-| `control-panel` | `ControlPanelDshCatalogScreen.tsx` | `/catalogs` | Approve catalog / marketing | same page | `success`, `error`, `loading` | none | Visual & runtime proof | `DEFERRED_WITH_REASON` |
+| `control-panel` | `catalogs.screen.tsx` | `/catalogs` | Approve catalog / marketing | same page | `success`, `error`, `loading` | none | Visual & runtime proof | `DEFERRED_WITH_REASON` |
 
 ## 4. Data Ownership Matrix
 

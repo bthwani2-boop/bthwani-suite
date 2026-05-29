@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import Image from 'next/image';
-import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
+import { getActualPublicMediaPath, explicitPublicMediaPathByKey } from '../../shared/resolve-dsh-public-media-path';
+import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import type { CatalogProductMaster, CatalogMainCategory } from './catalogs.data';
 
 // --- FilterDropdown.tsx ---
@@ -105,7 +106,67 @@ export function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
 
 // --- WatermarkedImage.tsx ---
 
-const WATERMARK_URL = getActualPublicMediaPath('dsh.brand.logo.v1');
+function getMediaKeyFromPublicPath(path: string): string | null {
+  if (!path.startsWith('/dsh/media-fixtures/')) return null;
+  const rel = path.substring('/dsh/media-fixtures/'.length);
+
+  for (const [key, value] of Object.entries(explicitPublicMediaPathByKey)) {
+    if (value === rel) return key;
+  }
+
+  if (rel.startsWith('categories/main/dsh-category-main-')) {
+    const id = rel.substring('categories/main/dsh-category-main-'.length).replace('-v1.png', '');
+    return `dsh.category.main.${id}.v1`;
+  }
+  if (rel.startsWith('categories/sub/dsh-category-sub-')) {
+    const id = rel.substring('categories/sub/dsh-category-sub-'.length).replace('-v1.png', '');
+    return `dsh.category.sub.${id}.v1`;
+  }
+  if (rel.startsWith('banners/dsh-banner-home-')) {
+    const slug = rel.substring('banners/dsh-banner-home-'.length).replace('-v1.png', '');
+    return `dsh.banner.home.${slug}.v1`;
+  }
+
+  return null;
+}
+
+function resolveWebImageSource(keyOrUri?: string | null): any {
+  if (!keyOrUri) return null;
+
+  let keyToResolve = keyOrUri;
+  const extractedKey = getMediaKeyFromPublicPath(keyOrUri);
+  if (extractedKey) {
+    keyToResolve = extractedKey;
+  }
+
+  if (
+    keyToResolve.startsWith('http://') ||
+    keyToResolve.startsWith('https://') ||
+    keyToResolve.startsWith('/') ||
+    keyToResolve.startsWith('//')
+  ) {
+    return keyToResolve;
+  }
+
+  const resolved = resolveDshImageSource(keyToResolve);
+  if (!resolved) return null;
+
+  if (typeof resolved === 'object') {
+    if ('uri' in resolved) {
+      return resolved.uri;
+    }
+    if ('src' in resolved) {
+      return resolved;
+    }
+    if (resolved.default && typeof resolved.default === 'object' && 'src' in resolved.default) {
+      return resolved.default;
+    }
+  }
+
+  return resolved;
+}
+
+const WATERMARK_SRC = resolveWebImageSource('dsh.brand.logo.v1');
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
@@ -129,13 +190,10 @@ function getPremiumEmoji(name: string, fallback?: string): string {
 export function WatermarkedImage({ src, mediaKey, fallback, size = 32, productName = '' }: { src?: string, mediaKey?: string, fallback?: string, size?: number, productName?: string }) {
   const { theme } = useTheme();
 
-  // For Next.js, we use the static public URL resolver instead of React Native's require resolver
   const keyToResolve = mediaKey || src || '';
-  let imagePath = keyToResolve.startsWith('http') || keyToResolve.startsWith('//') || keyToResolve.startsWith('/')
-    ? keyToResolve
-    : getActualPublicMediaPath(keyToResolve);
+  const resolvedSrc = resolveWebImageSource(keyToResolve);
 
-  const hasValidRealImage = !!imagePath;
+  const hasValidRealImage = !!resolvedSrc;
   const emoji = getPremiumEmoji(productName || '', fallback);
 
   return (
@@ -155,15 +213,17 @@ export function WatermarkedImage({ src, mediaKey, fallback, size = 32, productNa
         backgroundColor: theme.surfaceInset,
       }}
     >
-      {hasValidRealImage && imagePath ? (
-        <Image src={imagePath} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
+      {hasValidRealImage && resolvedSrc ? (
+        <Image src={resolvedSrc} fill style={{ objectFit: 'cover' }} alt="صورة المنتج" />
       ) : (
         <span style={{ fontSize: `${size * 0.55}px`, lineHeight: 1, userSelect: 'none', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
           {emoji}
         </span>
       )}
       <Box style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', alignItems: 'center', justifyContent: 'center', opacity: 0.12 }}>
-        <Image src={WATERMARK_URL} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
+        {WATERMARK_SRC ? (
+          <Image src={WATERMARK_SRC} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
+        ) : null}
       </Box>
     </Surface>
   );
