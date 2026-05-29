@@ -1,22 +1,23 @@
-# BTHWANI PACKAGE AUDIT REPORT — V4
+# BTHWANI PACKAGE AUDIT REPORT — V6
 
 ## Verdict
 
-V4 is the corrected package for controlled execution. It supersedes V1, V2, and V3.
+V6 is the corrected navigation-focused package for controlled execution. It supersedes V1, V2, V3, V4, and V5.
 
-## What V4 adds over V3
+## Why V6 exists
 
-| Area | V3 Status | V4 Fix |
-|---|---|---|
-| Package identity | Good but not strict enough | Adds explicit V4 identity/adoption gates |
-| Install safety | Present | Adds `-Strict` and `-QuarantineOldPackageFiles` |
-| Package recheck | Evidence-based | Requires PASS evidence ZIP + version |
-| Legacy package noise | Not strict enough | Adds legacy/extra package classification |
-| Benchmark unavailable path | Present | Adds confidence impact and approval gate |
-| Performance unproven path | Present | Clarifies that unproven is not PASS |
-| Evidence ZIP | Present | Makes ZIP mandatory for apply cycles |
-| Adoption wording | Could imply absolute certainty | Replaces with controlled-execution evidence readiness |
+V5 added clarity, but a weak agent could still open all package files or jump between files without a fixed navigation path. V6 adds a mandatory Agent Navigation Map.
+
+## V6 additions
+
+| Added / changed | Purpose |
+|---|---|
+| BTHWANI_AGENT_NAVIGATION_MAP.md | Defines exact read order, stage transitions, playbook selection, token budget, and drift recovery |
+| Main package V6 Navigation Layer | Makes navigation evidence mandatory |
+| Quick Start update | Forces navigation map before playbooks |
+| Check script update | Verifies navigation map and navigation terms |
+| Manifest update | Declares navigation map as required |
 
 ## Final recommendation
 
-Use V4 only. Do not use V1, V2, or V3 for new execution cycles.
+Use V6 only. Do not use V1, V2, V3, V4, or V5 for new execution cycles.

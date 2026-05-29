@@ -1,14 +1,16 @@
 {
   "package_id": "BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE",
-  "version": "4.0.0",
+  "version": "6.0.0",
   "date": "2026-05-29",
   "placement": "C:\\bthwani-suite\\tools\\plan",
   "supersedes": [
     "1.0.0",
     "2.0.0",
-    "3.0.0"
+    "3.0.0",
+    "4.0.0",
+    "5.0.0"
   ],
-  "decision": "Use V4 only for controlled execution",
+  "decision": "Use V6 only for controlled execution with mandatory navigation gates",
   "branch_rule": "current local branch only; no hardcoded branch name",
   "github_write": "forbidden unless explicitly requested by the human",
   "canonical_paths": {
@@ -50,11 +52,16 @@
   "required_package_recheck": [
     "PACKAGE_RECHECK_EVIDENCE",
     "PACKAGE_RECHECK_STATUS: PASS",
-    "PACKAGE_RECHECK_VERSION: 4.0.0"
+    "PACKAGE_RECHECK_VERSION: 6.0.0"
+  ],
+  "source_coverage_files": [
+    "امر الواجهات.txt",
+    "Pasted text.txt",
+    "تقسييم الشاشات.txt"
   ],
   "hardening": [
-    "no old section-count wording",
     "28-section output only",
+    "compact 28-section mode",
     "SHA256 verification",
     "manifest verification",
     "safe install with backup",
@@ -65,7 +72,16 @@
     "audit-only safe mode",
     "evidence standard",
     "rollback protocol",
-    "exact Arabic BThwani rules"
+    "operator field manual",
+    "source coverage matrix",
+    "target archetype guide",
+    "performance playbook",
+    "structure refactor playbook",
+    "agent failure modes",
+    "exact Arabic BThwani rules",
+    "agent navigation map",
+    "navigation evidence",
+    "no read-all package files"
   ],
   "files": [
     "README.md",
@@ -75,6 +91,14 @@
     "BTHWANI_MATRICES_TEMPLATE.md",
     "BTHWANI_EXECUTION_CYCLE_RECORD.md",
     "BTHWANI_PACKAGE_AUDIT_REPORT.md",
+    "BTHWANI_AGENT_NAVIGATION_MAP.md",
+    "BTHWANI_OPERATOR_FIELD_MANUAL.md",
+    "BTHWANI_SOURCE_COVERAGE_MATRIX.md",
+    "BTHWANI_TARGET_ARCHETYPE_GUIDE.md",
+    "BTHWANI_PERFORMANCE_PLAYBOOK.md",
+    "BTHWANI_STRUCTURE_REFACTOR_PLAYBOOK.md",
+    "BTHWANI_AGENT_FAILURE_MODES.md",
+    "BTHWANI_QUICK_START_FOR_AGENTS.md",
     "EVIDENCE_STANDARD.md",
     "ROLLBACK_PROTOCOL.md",
     "CHECK_TARGET_CLOSURE_PACKAGE.ps1",

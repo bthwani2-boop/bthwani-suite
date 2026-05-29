@@ -1,4 +1,4 @@
-# BTHWANI AGENT START COMMAND — V4
+# BTHWANI AGENT START COMMAND — V6
 
 ```text
 Read and follow exactly:
@@ -34,5 +34,18 @@ Required Arabic rules:
 Required package evidence:
 PACKAGE_RECHECK_EVIDENCE: tools/registry/runs/<SESSION_ID>/<SESSION_ID>.zip
 PACKAGE_RECHECK_STATUS: PASS
-PACKAGE_RECHECK_VERSION: 4.0.0
+PACKAGE_RECHECK_VERSION: 6.0.0
+```
+
+Read also:
+```text
+C:\bthwani-suite\tools\plan\BTHWANI_OPERATOR_FIELD_MANUAL.md
+C:\bthwani-suite\tools\plan\BTHWANI_TARGET_ARCHETYPE_GUIDE.md
+```
+
+
+Read navigation file before any playbook:
+
+```text
+C:\bthwani-suite\tools\plan\BTHWANI_AGENT_NAVIGATION_MAP.md
 ```

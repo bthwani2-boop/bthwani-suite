@@ -1,6 +1,6 @@
 # BTHWANI TARGET CLOSURE EXECUTION PACKAGE
 
-**Version:** 4.0.0
+**Version:** 6.0.0
 **Date:** 2026-05-29
 **Placement:** `C:\bthwani-suite\tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md`
 **Scope:** Universal execution protocol for any BThwani target: app, surface, screen, section, tab, flow, folder, control-panel workspace, DSH data/media owner, shared module, governance file, guard, agent file, or cross-surface journey.
@@ -11,7 +11,7 @@
 
 ## 0. V3 Verdict and Supersession
 
-V4 supersedes every earlier version of this package.
+V6 supersedes every earlier version of this package.
 
 V2 is not approved for final execution because it contained these defects:
 
@@ -27,7 +27,7 @@ V2 is not approved for final execution because it contained these defects:
 - rollback existed as a field, not a protocol;
 - required Arabic BThwani phrases were not guaranteed in the execution contract.
 
-V4 includes and extends these defects. Use V4 only.
+V6 includes and extends these defects. Use V6 only.
 
 ---
 
@@ -925,16 +925,16 @@ A next phase without human approval is invalid.
 
 ---
 
-# V4 Final Hardening — Package Integrity, Install Safety, and Anti-Drift Enforcement
+# V6 Final Hardening — Package Integrity, Install Safety, and Anti-Drift Enforcement
 
-This V4 section supersedes weaker wording above. If any conflict exists, V4 wins.
+This V6 section supersedes weaker wording above. If any conflict exists, V6 wins.
 
-## V4.1 Final Package Identity
+## V6.1 Final Package Identity
 
 The package is valid only if:
 
 ```text
-manifest.version = 4.0.0
+manifest.version = 6.0.0
 manifest.package_id = BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE
 BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md contains Version: 4.0.0
 SHA256SUMS.json matches all package files except itself
@@ -950,7 +950,7 @@ If any item fails:
 PACKAGE_INVALID_DO_NOT_USE
 ```
 
-## V4.2 Install Safety Modes
+## V6.2 Install Safety Modes
 
 The install script must support these modes:
 
@@ -980,18 +980,18 @@ Known old package artifacts include files with names matching:
 *DRAFT*
 ```
 
-and package-specific files not listed in the V4 manifest.
+and package-specific files not listed in the V6 manifest.
 
 No destructive deletion is allowed by default.
 
-## V4.3 Package Recheck Is Evidence, Not Text
+## V6.3 Package Recheck Is Evidence, Not Text
 
 `PACKAGE_RECHECK_DONE: yes` is invalid unless accompanied by:
 
 ```text
 PACKAGE_RECHECK_EVIDENCE: tools/registry/runs/<SESSION_ID>/<SESSION_ID>.zip
 PACKAGE_RECHECK_STATUS: PASS
-PACKAGE_RECHECK_VERSION: 4.0.0
+PACKAGE_RECHECK_VERSION: 6.0.0
 ```
 
 If the package check was not run:
@@ -1003,7 +1003,7 @@ CONFIDENCE_REDUCED: yes
 HUMAN_APPROVAL_REQUIRED_BEFORE_APPLY: yes
 ```
 
-## V4.4 Required Execution Evidence ZIP
+## V6.4 Required Execution Evidence ZIP
 
 Every execution cycle that applies changes must produce or request an evidence ZIP under:
 
@@ -1037,7 +1037,7 @@ EVIDENCE_ZIP_MISSING
 FINAL_DECISION_CANNOT_BE_READY
 ```
 
-## V4.5 No-Extra Legacy Package Noise
+## V6.5 No-Extra Legacy Package Noise
 
 After install, if legacy package files exist in `tools/plan`, the check script must classify them:
 
@@ -1049,7 +1049,7 @@ UNKNOWN_LOCAL_FILE
 
 Strict mode fails on legacy package files.
 
-## V4.6 Benchmark Confidence Gate
+## V6.6 Benchmark Confidence Gate
 
 `WEB_RESEARCH_UNAVAILABLE` is allowed only with:
 
@@ -1070,7 +1070,7 @@ BENCHMARK_CONFIDENCE_REDUCED: yes
 HUMAN_APPROVAL_REQUIRED_BEFORE_APPLY: yes
 ```
 
-## V4.7 Performance Gate Is Actionable
+## V6.7 Performance Gate Is Actionable
 
 If the target touches performance-sensitive areas, the agent must output one of:
 
@@ -1083,7 +1083,7 @@ PERFORMANCE_BLOCKED_WITH_REASON
 
 `PERFORMANCE_NUMBERS_UNPROVEN_WITH_REASON` is not a PASS. It only allows a cycle to continue when the current task is not claiming measured performance improvement.
 
-## V4.8 Audit-Only Does Not Mean Weak
+## V6.8 Audit-Only Does Not Mean Weak
 
 `AUDIT_ONLY_ALLOWED_WITH_REASON` is valid when the current human request is to inspect, verify, or prepare the package itself; or when local evidence is insufficient for safe apply.
 
@@ -1096,7 +1096,7 @@ next safe action
 patch/package/script if a safe package correction is possible
 ```
 
-## V4.9 Final Adoption Rule
+## V6.9 Final Adoption Rule
 
 A package version is adoptable only if:
 
@@ -1105,7 +1105,7 @@ CHECK_TARGET_CLOSURE_PACKAGE.ps1 = PASS
 SHA256SUMS.json verified
 manifest verified
 no contradiction found
-V4 package identity verified
+V6 package identity verified
 install script present
 rollback protocol present
 evidence standard present
@@ -1123,3 +1123,179 @@ Never say globally “impossible to fail.” The correct claim is:
 ```text
 The package passed its static integrity and policy checks and is ready for controlled execution with evidence gates.
 ```
+
+
+---
+
+# V6 Clarity Layer — Full Agent Picture
+
+V6 adds the missing clarity layer. The package is not only a policy file; it is a field operating kit.
+
+The agent must understand the package in this order:
+
+```text
+1. BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md
+2. BTHWANI_OPERATOR_FIELD_MANUAL.md
+3. BTHWANI_TARGET_ARCHETYPE_GUIDE.md
+4. BTHWANI_MATRICES_TEMPLATE.md
+5. Relevant playbook:
+   - BTHWANI_STRUCTURE_REFACTOR_PLAYBOOK.md
+   - BTHWANI_PERFORMANCE_PLAYBOOK.md
+   - BTHWANI_AGENT_FAILURE_MODES.md
+```
+
+## V6.1 Compact 28-Section Rule
+
+The 28 sections are mandatory, but verbosity is not.
+
+For small tasks:
+
+```text
+section present
+one-line result allowed
+NOT_APPLICABLE_WITH_REASON allowed
+```
+
+For large tasks:
+
+```text
+full matrices required
+```
+
+No section may be omitted.
+
+## V6.2 Source Coverage Rule
+
+The agent must respect the source coverage map in:
+
+```text
+BTHWANI_SOURCE_COVERAGE_MATRIX.md
+```
+
+If a source requirement is not represented in the cycle output:
+
+```text
+SOURCE_COVERAGE_GAP
+```
+
+## V6.3 Target Archetype Rule
+
+Before selecting Task 1, classify the target using:
+
+```text
+BTHWANI_TARGET_ARCHETYPE_GUIDE.md
+```
+
+This prevents the agent from treating a section, tab, data owner, governance file, and cross-surface journey as the same type of work.
+
+## V6.4 Operational Clarity Rule
+
+If the agent is unsure what to do first, it must use this priority:
+
+```text
+1. package/governance/guard blocker
+2. structural hygiene blocker
+3. logic/flow/action/state blocker
+4. data/media truth blocker
+5. runtime/API boundary blocker
+6. performance blocker
+7. design closure
+```
+
+## V6.5 Weak Agent Rule
+
+A weak agent must not infer missing details. It must choose from the documented decisions only:
+
+```text
+HYGIENE_FIX_FIRST
+AUDIT_ONLY_ALLOWED_WITH_REASON
+BLOCKED_WITH_REASON
+TARGET_TASK_APPLIED_NEXT_TASK_REQUIRED
+CYCLE_INVALID
+```
+
+## V6.6 Adoption Statement
+
+A valid V6 check means:
+
+```text
+PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION
+```
+
+It does not mean future execution is impossible to fail. It means the package has the gates, scripts, and evidence requirements needed to catch failure and stop unsafe continuation.
+
+
+---
+
+# V6 Navigation Layer — Zero Drift Movement
+
+V6 adds a mandatory navigation map to remove execution confusion.
+
+The agent must read:
+
+```text
+BTHWANI_AGENT_NAVIGATION_MAP.md
+```
+
+before opening playbooks or selecting Task 1.
+
+## V6.1 Agent Navigation Rule
+
+```text
+AGENT_NAVIGATION_RULE:
+ممنوع قراءة كل ملفات tools/plan دفعة واحدة.
+ابدأ بـ BTHWANI_QUICK_START_FOR_AGENTS.md فقط.
+ثم اقرأ BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md.
+ثم اقرأ BTHWANI_AGENT_NAVIGATION_MAP.md.
+ثم اقرأ BTHWANI_OPERATOR_FIELD_MANUAL.md.
+ثم اقرأ BTHWANI_TARGET_ARCHETYPE_GUIDE.md.
+ثم اقرأ BTHWANI_MATRICES_TEMPLATE.md.
+بعد تصنيف نوع TARGET، افتح فقط playbook المناسب.
+أي قراءة عشوائية أو فتح شامل لكل الملفات = TOKEN_WASTE_RISK.
+إذا سببت القراءة العشوائية انحرافًا أو تغيير نطاق = CYCLE_INVALID.
+```
+
+## V6.2 Navigation Evidence
+
+Every cycle must include:
+
+```text
+NAVIGATION_STATE:
+NAVIGATION_STAGE:
+NAVIGATION_FILES_READ:
+PLAYBOOK_SELECTED:
+PLAYBOOK_SELECTION_REASON:
+NAVIGATION_DRIFT_RISK:
+```
+
+If any value is missing:
+
+```text
+NAVIGATION_GATE_MISSING
+CYCLE_INVALID
+```
+
+## V6.3 No Stage Jump
+
+The agent cannot move to implementation until:
+
+```text
+package recheck passed or explicitly blocked
+current branch status classified
+navigation state declared
+target type classified
+linked surfaces classified
+structural hygiene checked
+Task 1 selected with reason
+```
+
+## V6.4 Adoption Statement
+
+A valid V6 package check means:
+
+```text
+PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION
+NAVIGATION_MAP_PRESENT: yes
+```
+
+It means the package has explicit navigation gates to catch drift. It does not mean execution can never fail.

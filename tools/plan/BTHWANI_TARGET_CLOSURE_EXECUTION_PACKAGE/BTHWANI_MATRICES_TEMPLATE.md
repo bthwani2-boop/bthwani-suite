@@ -1,4 +1,4 @@
-# BTHWANI MATRICES TEMPLATE — V4
+# BTHWANI MATRICES TEMPLATE — V6
 
 ## Web/Open-Source Benchmark Matrix
 

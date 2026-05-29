@@ -1,4 +1,4 @@
-# BTHWANI EVIDENCE STANDARD — V4
+# BTHWANI EVIDENCE STANDARD — V6
 
 Required evidence after package check or execution.
 
@@ -34,7 +34,7 @@ Required evidence after package check or execution.
 - screenshots only when the visual evidence gate requires them
 
 
-## V4 Required Evidence Status Fields
+## V6 Required Evidence Status Fields
 
 ```text
 PACKAGE_RECHECK_STATUS:

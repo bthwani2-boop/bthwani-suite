@@ -60,7 +60,7 @@ try {
       $Manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
       Add-Result "manifest_json_valid" "PASS" "valid"
       if ($Manifest.package_id -eq "BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE") { Add-Result "manifest_package_id" "PASS" $Manifest.package_id } else { Add-Result "manifest_package_id" "FAIL" $Manifest.package_id }
-      if ($Manifest.version -eq "4.0.0") { Add-Result "manifest_version_4" "PASS" $Manifest.version } else { Add-Result "manifest_version_4" "FAIL" $Manifest.version }
+      if ($Manifest.version -eq "6.0.0") { Add-Result "manifest_version_5" "PASS" $Manifest.version } else { Add-Result "manifest_version_5" "FAIL" $Manifest.version }
     } catch { Add-Result "manifest_json_valid" "FAIL" $_.Exception.Message }
   }
 
@@ -110,7 +110,7 @@ try {
     if ($contradictions.Count -eq 0) { Add-Result "contradiction_check" "PASS" "none" } else { Add-Result "contradiction_check" "FAIL" ($contradictions -join ",") }
 
     $requiredPhrases = @(
-      "Version:** 4.0.0",
+      "Version:** 6.0.0",
       "Required 28-Section Cycle Output",
       "PACKAGE_RECHECK_EVIDENCE",
       "PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION",
@@ -131,7 +131,16 @@ try {
       "INP target: <= 200ms",
       "CLS target: <= 0.1",
       "توجب الالتزام بنظام الألوان المركزي",
-      "تجب إزالة ومعالجة وتصحيح الضجيج والتكرار والكود الميت والتسرب والتشظي والتبعثر"
+      "تجب إزالة ومعالجة وتصحيح الضجيج والتكرار والكود الميت والتسرب والتشظي والتبعثر",
+      "BTHWANI_AGENT_NAVIGATION_MAP.md",
+      "AGENT_NAVIGATION_RULE",
+      "NAVIGATION_GATE_MISSING",
+      "BTHWANI_OPERATOR_FIELD_MANUAL.md",
+      "BTHWANI_SOURCE_COVERAGE_MATRIX.md",
+      "BTHWANI_TARGET_ARCHETYPE_GUIDE.md",
+      "BTHWANI_PERFORMANCE_PLAYBOOK.md",
+      "BTHWANI_STRUCTURE_REFACTOR_PLAYBOOK.md",
+      "BTHWANI_AGENT_FAILURE_MODES.md"
     )
     foreach ($phrase in $requiredPhrases) {
       if ($main.Contains($phrase)) { Add-Result "main_contains:$phrase" "PASS" "found" } else { Add-Result "main_contains:$phrase" "FAIL" "missing" }
@@ -173,7 +182,7 @@ try {
     }
   }
 
-  foreach ($f in @("INSTALL_TARGET_CLOSURE_PACKAGE.ps1","ROLLBACK_PROTOCOL.md","EVIDENCE_STANDARD.md")) {
+  foreach ($f in @("INSTALL_TARGET_CLOSURE_PACKAGE.ps1","ROLLBACK_PROTOCOL.md","EVIDENCE_STANDARD.md","BTHWANI_AGENT_NAVIGATION_MAP.md","BTHWANI_OPERATOR_FIELD_MANUAL.md","BTHWANI_SOURCE_COVERAGE_MATRIX.md","BTHWANI_TARGET_ARCHETYPE_GUIDE.md","BTHWANI_PERFORMANCE_PLAYBOOK.md","BTHWANI_STRUCTURE_REFACTOR_PLAYBOOK.md","BTHWANI_AGENT_FAILURE_MODES.md","BTHWANI_QUICK_START_FOR_AGENTS.md")) {
     if (Test-Path -LiteralPath (Join-Path $PlanRoot $f)) { Add-Result "hardening_file_present:$f" "PASS" "present" } else { Add-Result "hardening_file_present:$f" "FAIL" "missing" }
   }
 
@@ -184,7 +193,7 @@ try {
 
   $summary = @"
 status: $finalStatus
-package_version: 4.0.0
+package_version: 6.0.0
 session_id: $SessionId
 repo: $RepoRoot
 plan_root: $PlanRoot
@@ -199,7 +208,7 @@ decision: $(if ($finalStatus -eq "PASS") { "PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXE
   Compress-Archive -Path (Join-Path $RunRoot "*") -DestinationPath $zipPath -Force
 
   Write-Host "RESULT: $finalStatus"
-  Write-Host "PACKAGE_VERSION: 4.0.0"
+  Write-Host "PACKAGE_VERSION: 6.0.0"
   Write-Host "SESSION_ID: $SessionId"
   Write-Host "EVIDENCE_ROOT: $RunRoot"
   Write-Host "ZIP: $zipPath"
