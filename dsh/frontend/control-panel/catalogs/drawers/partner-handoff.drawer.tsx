@@ -16,6 +16,7 @@ import {
   getDshPartnerVisibilityBadge,
   getDshPartnerVisibilityBadgeLabel,
 } from '../../../shared/dsh-partner-activation.model';
+import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,7 +28,7 @@ export type CatalogPartnerHandoffWorkspaceProps = {
   onClose: () => void;
 };
 
-type ActionResult = { type: 'success' | 'blocked' | 'info'; message: string } | null;
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -60,15 +61,6 @@ const PARTNER_CANNOT_DO = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionTitle({ children }: { children: string }) {
-  const { theme } = useTheme();
-  return (
-    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
-      {children}
-    </Text>
-  );
-}
-
 function ChecklistRow({ label, satisfied, blockedReason }: {
   label: string;
   satisfied: boolean;
@@ -90,22 +82,6 @@ function ChecklistRow({ label, satisfied, blockedReason }: {
           <Text role="caption" style={{ color: theme.danger, fontSize: 11 }}>{blockedReason}</Text>
         </Box>
       )}
-    </Box>
-  );
-}
-
-function ResultBanner({ result }: { result: ActionResult }) {
-  const { theme } = useTheme();
-  if (!result) return null;
-  const bg = result.type === 'success' ? theme.successSurface
-    : result.type === 'blocked' ? theme.dangerSurface
-    : theme.surfaceInset;
-  const color = result.type === 'success' ? theme.success
-    : result.type === 'blocked' ? theme.danger
-    : theme.text;
-  return (
-    <Box style={{ backgroundColor: bg, borderRadius: 8, padding: 10, marginTop: 8 }}>
-      <Text role="caption" style={{ color, fontWeight: '700' }}>{result.message}</Text>
     </Box>
   );
 }

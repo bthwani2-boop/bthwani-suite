@@ -10,6 +10,7 @@ import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster, CatalogMediaPolicy } from '../catalogs.data';
 import { catalogMediaPolicyOptions } from '../catalogs.model';
+import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -18,8 +19,7 @@ export type CatalogMediaGovernanceWorkspaceProps = {
   onClose: () => void;
 };
 
-type ItemActionResult = { type: 'success' | 'blocked' | 'info'; message: string };
-type ItemActionResults = Record<string, ItemActionResult | undefined>;
+type ItemActionResults = Record<string, ActionResult | undefined>;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -88,16 +88,7 @@ function getToneBg(
   return theme.infoSurface ?? theme.surfaceInset;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionTitle({ children }: { children: string }) {
-  const { theme } = useTheme();
-  return (
-    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
-      {children}
-    </Text>
-  );
-}
 
 function PolicyBadge({ policy }: { policy: CatalogMediaPolicy }) {
   const { theme } = useTheme();
@@ -119,21 +110,7 @@ function PolicyBadge({ policy }: { policy: CatalogMediaPolicy }) {
   );
 }
 
-function ResultBanner({ result }: { result: ItemActionResult | undefined }) {
-  const { theme } = useTheme();
-  if (!result) return null;
-  const bg = result.type === 'success' ? theme.successSurface
-    : result.type === 'blocked' ? theme.dangerSurface
-    : theme.surfaceInset;
-  const color = result.type === 'success' ? theme.success
-    : result.type === 'blocked' ? theme.danger
-    : theme.text;
-  return (
-    <Box style={{ backgroundColor: bg, borderRadius: 6, padding: 8, marginTop: 4 }}>
-      <Text role="caption" style={{ color, fontWeight: '700', fontSize: 11 }}>{result.message}</Text>
-    </Box>
-  );
-}
+
 
 // ─── Main workspace ───────────────────────────────────────────────────────────
 
@@ -144,7 +121,7 @@ export function CatalogMediaGovernanceWorkspace({
   const { theme } = useTheme();
   const [actionResults, setActionResults] = useState<ItemActionResults>({});
 
-  function setResult(id: string, result: ItemActionResult) {
+  function setResult(id: string, result: ActionResult) {
     setActionResults((prev) => ({ ...prev, [id]: result }));
   }
 

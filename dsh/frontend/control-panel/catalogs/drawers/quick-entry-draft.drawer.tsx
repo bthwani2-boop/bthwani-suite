@@ -23,7 +23,8 @@
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, TextField, useTheme } from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
-import { dshCatalogCategories } from '../catalogs.data';
+import { WorkspacePreviewNotice, WorkspaceSuccessBanner, WorkspaceCategoryPicker } from '../catalogs.parts';
+import { dshCatalogCategories, DSH_COMMON_MEDIA_KEYS } from '../catalogs.data';
 
 export type CatalogQuickEntryDraftWorkspaceProps = {
   onClose: () => void;
@@ -118,22 +119,10 @@ export function CatalogQuickEntryDraftWorkspace({
           <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
         </Box>
 
-        <Surface
-          tone="inset"
-          padding={4}
-          gap={3}
-          style={{ borderRadius: 10, borderWidth: 2, borderColor: theme.success, borderStyle: 'solid' }}
-        >
-          <Text role="bodyMd" style={{ fontWeight: '800', color: theme.success, fontSize: 16 }}>
-            ✅ تم إرسال طلب الإنشاء كمسودة
-          </Text>
-          <Text role="caption" tone="muted">
-            لم يتم حفظ أي منتج في الكتالوج الرسمي. هذا الطلب يحتاج ربطًا بـ API لإنشاء المنتج الفعلي.
-          </Text>
-          <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '600' }}>
-            API boundary: POST /catalog/products — not yet bound
-          </Text>
-        </Surface>
+        <WorkspaceSuccessBanner
+          bannerTitle="✅ تم تسجيل طلب مسودة بنجاح"
+          note="الطلب متاح الآن كمسودة بانتظار مراجعة مشرف الكتالوج."
+        />
 
         <Button label="إدخال منتج آخر" tone="brand" onPress={() => { setForm(EMPTY_FORM); setSubmitted(false); }} />
       </Surface>
@@ -165,20 +154,10 @@ export function CatalogQuickEntryDraftWorkspace({
       </Box>
 
       {/* Notice banner */}
-      <Surface
-        tone="inset"
-        padding={3}
-        gap={1}
-        style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
-      >
-        <Text role="caption" style={{ fontWeight: '700', color: theme.warning }}>
-          ⚠️ UI_PREVIEW_ONLY — مسودة اقتراح فقط
-        </Text>
-        <Text role="caption" tone="muted">
-          لن يُنشئ هذا النموذج منتجًا في الكتالوج. الإرسال يولّد طلب مسودة يحتاج ربط API.
-          لا يُولَّد معرّف منتج أو باركود هنا.
-        </Text>
-      </Surface>
+      <WorkspacePreviewNotice
+        bannerTitle="⚠️ UI_PREVIEW_ONLY — مسودة اقتراح فقط"
+        subtitle="لن يُنشئ هذا النموذج منتجًا في الكتالوج. الإرسال يولّد طلب مسودة يحتاج ربط API. لا يُولَّد معرّف منتج أو باركود هنا."
+      />
 
       <Box gap={3}>
         {/* Name */}
@@ -194,61 +173,17 @@ export function CatalogQuickEntryDraftWorkspace({
           />
         </Box>
 
-        {/* Main Category */}
-        <Box gap={1}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
-            الفئة الرئيسية *
-          </Text>
-          <select
-            aria-label="الفئة الرئيسية"
-            title="الفئة الرئيسية"
-            value={form.categoryMainId}
-            onChange={(e) => setForm((f) => ({ ...f, categoryMainId: e.target.value, categorySubId: '' }))}
-            style={{
-              padding: '8px 12px',
-              borderRadius: 8,
-              border: `1px solid ${theme.lineStrong}`,
-              direction: 'rtl',
-              backgroundColor: theme.surface,
-              color: theme.brandHeaderBackground,
-              fontSize: 14,
-            }}
-          >
-            <option value="">اختر فئة...</option>
-            {dshCatalogCategories.map((c) => (
-              <option key={c.id} value={c.id}>{c.emojiFallback} {c.label}</option>
-            ))}
-          </select>
-        </Box>
-
-        {/* Sub Category */}
-        {selectedMainCat && selectedMainCat.subcategories.length > 0 && (
-          <Box gap={1}>
-            <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
-              الفئة الفرعية
-            </Text>
-            <select
-              aria-label="الفئة الفرعية"
-              title="الفئة الفرعية"
-              value={form.categorySubId}
-              onChange={(e) => setForm((f) => ({ ...f, categorySubId: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: 8,
-                border: `1px solid ${theme.lineStrong}`,
-                direction: 'rtl',
-                backgroundColor: theme.surface,
-                color: theme.brandHeaderBackground,
-                fontSize: 14,
-              }}
-            >
-              <option value="">لا يوجد (عام)</option>
-              {selectedMainCat.subcategories.map((s) => (
-                <option key={s.id} value={s.id}>{s.label}</option>
-              ))}
-            </select>
-          </Box>
-        )}
+        <WorkspaceCategoryPicker
+          categories={dshCatalogCategories}
+          value={{
+            mainCat: form.categoryMainId,
+            subCat: form.categorySubId,
+            mainClassif: '',
+            subClassif: ''
+          }}
+          onChange={(val) => setForm((f) => ({ ...f, categoryMainId: val.mainCat, categorySubId: val.subCat }))}
+          hideClassifications
+        />
 
         {/* Media Key */}
         <Box gap={1}>
@@ -271,11 +206,9 @@ export function CatalogQuickEntryDraftWorkspace({
             }}
           >
             <option value="">بدون (emoji fallback)</option>
-            <option value="dsh.product.apple.v1">dsh.product.apple.v1</option>
-            <option value="dsh.product.milk.v1">dsh.product.milk.v1</option>
-            <option value="dsh.product.bread.v1">dsh.product.bread.v1</option>
-            <option value="dsh.product.chicken.v1">dsh.product.chicken.v1</option>
-            <option value="dsh.product.pasta.v1">dsh.product.pasta.v1</option>
+            {DSH_COMMON_MEDIA_KEYS.map(k => (
+              <option key={k.value} value={k.value}>{k.label}</option>
+            ))}
           </select>
           <Text role="caption" tone="muted" style={{ fontSize: 10 }}>
             Media key يُحدد صورة المنتج من مخزن الوسائط المركزي. لا تُنسخ الصور.

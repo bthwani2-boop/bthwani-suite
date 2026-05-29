@@ -19,6 +19,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
+import { type ActionResult, WorkspacePreviewNotice, WorkspaceSuccessBanner } from '../catalogs.parts';
 import { dshCatalogCategories } from '../catalogs.data';
 
 export type CatalogTaxonomyGovernanceWorkspaceProps = {
@@ -32,7 +33,7 @@ type TaxonomyAction =
   | 'mark-duplicate'
   | 'send-marketing';
 
-type ActionResult = {
+type TaxonomyActionResult = {
   action: TaxonomyAction;
   categoryId: string;
   categoryLabel: string;
@@ -46,7 +47,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
   const { theme } = useTheme();
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
   const [selectedSubId, setSelectedSubId] = useState<string | null>(null);
-  const [actionResult, setActionResult] = useState<ActionResult | null>(null);
+  const [actionResult, setActionResult] = useState<TaxonomyActionResult | null>(null);
 
   const selectedCat = dshCatalogCategories.find((c) => c.id === selectedCatId);
   const selectedSub = selectedCat?.subcategories.find((s) => s.id === selectedSubId);
@@ -115,18 +116,10 @@ export function CatalogTaxonomyGovernanceWorkspace({
       </Box>
 
       {/* Notice */}
-      <Surface
-        tone="inset"
-        padding={3}
-        style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
-      >
-        <Text role="caption" style={{ color: theme.warning, fontWeight: '700' }}>
-          UI_PREVIEW_ONLY — لا إضافة أو تعديل فعلي للفئات
-        </Text>
-        <Text role="caption" tone="muted">
-          كل الإجراءات هنا تُنتج طلب مقترح فقط. API boundary: PATCH /catalog/categories
-        </Text>
-      </Surface>
+      <WorkspacePreviewNotice
+        bannerTitle="UI_PREVIEW_ONLY — لا إضافة أو تعديل فعلي للفئات"
+        subtitle="كل الإجراءات هنا تُنتج طلب مقترح فقط. API boundary: PATCH /catalog/categories"
+      />
 
       {/* Category tree selector */}
       <Box gap={2}>
@@ -295,20 +288,11 @@ export function CatalogTaxonomyGovernanceWorkspace({
 
           {/* Action result */}
           {actionResult && (
-            <Surface
-              tone="inset"
-              padding={3}
-              gap={2}
-              style={{ borderRadius: 8, borderWidth: 2, borderColor: theme.success, borderStyle: 'solid' }}
-            >
-              <Text role="caption" style={{ fontWeight: '800', color: theme.success }}>
-                ✅ تم إرسال الاقتراح
-              </Text>
-              <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
-                {actionResult.categoryLabel}
-              </Text>
-              <Text role="caption" tone="muted">{actionResult.note}</Text>
-            </Surface>
+            <WorkspaceSuccessBanner
+              bannerTitle="✅ تم إرسال الاقتراح"
+              subtitle={actionResult.categoryLabel}
+              note={actionResult.note}
+            />
           )}
         </Box>
       )}

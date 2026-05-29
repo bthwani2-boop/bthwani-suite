@@ -21,6 +21,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
+import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
 
 export type CatalogBulkOperationsWorkspaceProps = {
@@ -151,18 +152,10 @@ export function CatalogBulkOperationsWorkspace({
       </Box>
 
       {/* Notice */}
-      <Surface
-        tone="inset"
-        padding={3}
-        style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
-      >
-        <Text role="caption" style={{ color: theme.warning, fontWeight: '700' }}>
-          UI_PREVIEW_ONLY — لا تعديل فعلي على الكتالوج
-        </Text>
-        <Text role="caption" tone="muted">
-          كل الإجراءات المجمعة تُنتج مقترحًا يحتاج ربط API. لا تعديل local على البيانات.
-        </Text>
-      </Surface>
+      <WorkspacePreviewNotice
+        bannerTitle="UI_PREVIEW_ONLY — لا تعديل فعلي على الكتالوج"
+        subtitle="كل الإجراءات المجمعة تُنتج مقترحًا يحتاج ربط API. لا تعديل local على البيانات."
+      />
 
       {/* Selection status */}
       <Surface

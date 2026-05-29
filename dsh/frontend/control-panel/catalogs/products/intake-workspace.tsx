@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Button, Text, useTheme } from '@bthwani/ui-kit';
-import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
-import { WatermarkedImage } from '../catalogs.parts';
+import { WorkspaceProductListItem, WorkspaceIntroBanner } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
 import type { CatalogWorkspaceId } from '../catalogs.model';
 
@@ -52,65 +51,24 @@ export function IntakeWorkspaceView({
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%', overflowY: 'auto' }}>
-      <div style={{
-        background: `linear-gradient(135deg, ${theme.surfaceInset} 0%, ${theme.surface} 100%)`,
-        border: `1px solid ${theme.lineStrong}`,
-        borderRadius: '12px',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-          <div>
-            <Text role="bodyStrong" style={{ fontSize: 16, color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
-            <Text role="caption" tone="muted" style={{ fontSize: 11, marginTop: 4 }}>{description}</Text>
-          </div>
-          <span style={{ fontSize: '9px', color: theme.warning, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
-            معاينة محلية فقط
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <span style={{ fontSize: '10px', color: theme.textMuted }}>الجهة المالكة / المصدر:</span>
-            <span style={{ fontSize: '11px', color: theme.brand, fontWeight: '700' }}>{ownerSurface}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <span style={{ fontSize: '10px', color: theme.textMuted }}>المراجع التالي للمسار:</span>
-            <span style={{ fontSize: '11px', color: theme.brand, fontWeight: '700' }}>{nextOwner}</span>
-          </div>
-        </div>
-
-        <div style={{ backgroundColor: theme.surfaceInset, padding: '8px 12px', borderRadius: '6px', borderRight: `3px solid ${theme.brand}` }}>
-          <Text role="caption" style={{ fontSize: 10, color: theme.brandHeaderBackground }}>
-            ℹ️ <strong>أثر السطح:</strong> {impactInfo}
-          </Text>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-          <Button
-            label="تحديث بيانات المسار"
-            tone="brand"
-            size="sm"
-            disabled
-            accessibilityLabel="تحديث المسار (معاينة محلية فقط)"
-            onPress={() => {}}
-          />
-          <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
-            (الإجراء معطل: معاينة محلية فقط)
-          </span>
-          {activeSubTab === 'partner' && (
+      <WorkspaceIntroBanner
+        bannerTitle={title}
+        description={description}
+        ownerSurface={ownerSurface}
+        nextOwner={nextOwner}
+        impactInfo={impactInfo}
+        nextActionLabel="تحديث بيانات المسار"
+        extraActions={
+          activeSubTab === 'partner' && (
             <Button
               label="▸ فتح workspace استلام الشريك"
               tone="secondary"
               size="sm"
               onPress={() => openWorkspace('partner-handoff')}
             />
-          )}
-        </div>
-      </div>
+          )
+        }
+      />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>العناصر المستلمة في هذا المسار ({filteredProducts.length})</Text>
@@ -139,42 +97,22 @@ export function IntakeWorkspaceView({
                 statusTone = 'neutral';
               }
 
-              const isSelected = selectedProductId === p.id;
               return (
-                <div
+                <WorkspaceProductListItem
                   key={p.id}
-                  onClick={() => setSelectedProductId(p.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: `1px solid ${isSelected ? theme.brand : theme.line}`,
-                    backgroundColor: isSelected ? theme.brandSurface : theme.surface,
-                    cursor: 'pointer',
-                    transition: 'all 0.12s ease',
-                    boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={36} productName={p.name} />
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <Text role="bodyStrong" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>{p.name}</Text>
-                      <span style={{ fontFamily: 'monospace', fontSize: '10px', color: theme.textMuted, direction: 'ltr' }}>{p.sku}</span>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  product={p}
+                  isSelected={selectedProductId === p.id}
+                  onSelect={() => setSelectedProductId(p.id)}
+                  detailText={p.sku}
+                  statusLabel={statusLabel}
+                  statusTone={statusTone}
+                  rightSide={
                     <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                       <span style={{ fontSize: '11px', fontWeight: '700', color: theme.brandHeaderBackground }}>{p.price} ر.س</span>
                       <span style={{ fontSize: '9px', color: theme.textMuted }}>المصدر: {p.sourceSurface || 'الكتالوج'}</span>
                     </div>
-                    <WebControlPanelStatusTag
-                      label={statusLabel}
-                      tone={statusTone === 'neutral' ? 'info' : statusTone}
-                    />
-                  </div>
-                </div>
+                  }
+                />
               );
             })}
           </div>

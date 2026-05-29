@@ -91,91 +91,54 @@ export function MappingWorkspaceView({
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%', overflowY: 'auto' }}>
-      <div style={{
-        background: `linear-gradient(135deg, ${theme.surfaceInset} 0%, ${theme.surface} 100%)`,
-        border: `1px solid ${theme.lineStrong}`,
-        borderRadius: '12px',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-          <div>
-            <Text role="bodyStrong" style={{ fontSize: 16, color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
-            <Text role="caption" tone="muted" style={{ fontSize: 11, marginTop: 4 }}>{description}</Text>
-          </div>
-          <span style={{ fontSize: '9px', color: theme.success, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
-            معاينة محلية فقط
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
-          <span style={{ fontSize: '11px', fontWeight: 'bold', color: theme.brandHeaderBackground }}>💡 الأهمية والهدف:</span>
-          <Text role="caption" style={{ fontSize: 10, color: theme.textMuted }}>{whyItMatters}</Text>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: theme.surfaceInset, padding: '10px 12px', borderRadius: '8px' }}>
-          <span style={{ fontSize: '10px', fontWeight: 'bold', color: theme.brand, marginBottom: '2px' }}>🔄 الأسطح المتأثرة (Affected Surfaces):</span>
-          {affectedSurfaces.map((surface, idx) => (
-            <span key={idx} style={{ fontSize: '10px', color: theme.brandHeaderBackground, display: 'block' }}>
-              • {surface}
-            </span>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', marginTop: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <Button
-            label={nextActionLabel}
-            tone="secondary"
-            size="sm"
-            disabled
-            accessibilityLabel={`${nextActionLabel} (معاينة محلية فقط)`}
-            onPress={() => {}}
-          />
-          <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
-            (الإجراء معطل: معاينة محلية فقط)
-          </span>
-          {activeSubTab === 'duplicates' && (
-            <Button
-              label="▸ فتح workspace حل التكرارات"
-              tone="brand"
-              size="sm"
-              onPress={() => openWorkspace('duplicate-resolution')}
-            />
-          )}
-          {activeSubTab === 'gtin' && (
-            <Button
-              label="▸ فتح workspace حوكمة الهوية"
-              tone="brand"
-              size="sm"
-              onPress={() => openWorkspace('identity-governance')}
-            />
-          )}
-          {activeSubTab === 'media' && (
-            <Button
-              label="▸ فتح workspace حوكمة الوسائط"
-              tone="brand"
-              size="sm"
-              onPress={() => openWorkspace('media-governance')}
-            />
-          )}
-          {activeSubTab === 'visibility-policy' && (
-            <Button
-              label="▸ فتح workspace سياسة الظهور"
-              tone="brand"
-              size="sm"
-              onPress={() => {
-                const firstProduct = filteredProducts[0];
-                if (firstProduct) openWorkspace('visibility-policy', firstProduct.id);
-              }}
-              disabled={filteredProducts.length === 0}
-              accessibilityHint="اختر منتجاً لفتح workspace الظهور"
-            />
-          )}
-        </div>
-      </div>
+      <WorkspaceIntroBanner
+        bannerTitle={title}
+        description={description}
+        whyItMatters={whyItMatters}
+        affectedSurfaces={affectedSurfaces}
+        nextActionLabel={nextActionLabel}
+        extraActions={
+          <>
+            {activeSubTab === 'duplicates' && (
+              <Button
+                label="▸ فتح workspace حل التكرارات"
+                tone="brand"
+                size="sm"
+                onPress={() => openWorkspace('duplicate-resolution')}
+              />
+            )}
+            {activeSubTab === 'gtin' && (
+              <Button
+                label="▸ فتح workspace حوكمة الهوية"
+                tone="brand"
+                size="sm"
+                onPress={() => openWorkspace('identity-governance')}
+              />
+            )}
+            {activeSubTab === 'media' && (
+              <Button
+                label="▸ فتح workspace حوكمة الوسائط"
+                tone="brand"
+                size="sm"
+                onPress={() => openWorkspace('media-governance')}
+              />
+            )}
+            {activeSubTab === 'visibility-policy' && (
+              <Button
+                label="▸ فتح workspace سياسة الظهور"
+                tone="brand"
+                size="sm"
+                onPress={() => {
+                  const firstProduct = filteredProducts[0];
+                  if (firstProduct) openWorkspace('visibility-policy', firstProduct.id);
+                }}
+                disabled={filteredProducts.length === 0}
+                accessibilityHint="اختر منتجاً لفتح workspace الظهور"
+              />
+            )}
+          </>
+        }
+      />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>العناصر والنتائج الحالية في هذا المسار ({filteredProducts.length})</Text>

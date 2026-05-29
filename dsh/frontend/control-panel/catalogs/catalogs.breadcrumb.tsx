@@ -24,7 +24,7 @@ type CatalogBreadcrumbProps = {
   setActiveFilter: (f: FilterType) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  colFilters: Record<CatalogFilterColumnId, string[]>;
+  _colFilters: Record<CatalogFilterColumnId, string[]>;
   setColFilters: (v: Record<CatalogFilterColumnId, string[]>) => void;
   activeMainCategory: CatalogMainCategory | null;
   setActiveMainCategory: (cat: CatalogMainCategory | null) => void;
@@ -40,7 +40,7 @@ type CatalogBreadcrumbProps = {
 
 export function CatalogBreadcrumb({
   activeTab, activeSubTab, activeFilter, setActiveFilter,
-  searchQuery, setSearchQuery, colFilters, setColFilters,
+  searchQuery, setSearchQuery, _colFilters, setColFilters,
   activeMainCategory, setActiveMainCategory, activeSubCategory, setActiveSubCategory,
   activeMainClassifId, setActiveMainClassifId, activeSubClassifId, setActiveSubClassifId,
   activeColFiltersCount, filteredProductCount,

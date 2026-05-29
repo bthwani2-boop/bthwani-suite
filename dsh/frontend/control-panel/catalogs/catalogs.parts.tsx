@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
+import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import Image from 'next/image';
 import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
+import type { CatalogProductMaster } from '../catalogs.data';
 
 // --- FilterDropdown.tsx ---
 
@@ -164,5 +166,353 @@ export function WatermarkedImage({ src, mediaKey, fallback, size = 32, productNa
         <Image src={WATERMARK_URL} width={size * 0.8} height={size * 0.8} style={{ objectFit: 'contain' }} alt="شعار المنصة" />
       </Box>
     </Surface>
+  );
+}
+
+// --- Drawer Parts ---
+
+export function SectionTitle({ children }: { children: string }) {
+  const { theme } = useTheme();
+  return (
+    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
+      {children}
+    </Text>
+  );
+}
+
+export type ActionResult = { type: 'success' | 'blocked' | 'info'; message: string } | null;
+
+export function ResultBanner({ result }: { result: ActionResult }) {
+  const { theme } = useTheme();
+  if (!result) return null;
+  const bg = result.type === 'success' ? theme.successSurface
+    : result.type === 'blocked' ? theme.dangerSurface
+    : theme.infoSurface ?? theme.surfaceInset;
+  const color = result.type === 'success' ? theme.success
+    : result.type === 'blocked' ? theme.danger
+    : theme.text;
+  return (
+    <Box style={{ backgroundColor: bg, borderRadius: 8, padding: 10, marginTop: 8 }}>
+      <Text role="caption" style={{ color, fontWeight: '700' }}>{result.message}</Text>
+    </Box>
+  );
+}
+
+export function WorkspacePreviewNotice({ bannerTitle, subtitle }: { bannerTitle: string; subtitle: string | React.ReactNode }) {
+  const { theme } = useTheme();
+  return (
+    <Surface
+      tone="inset"
+      padding={3}
+      gap={1}
+      style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
+    >
+      <Text role="caption" style={{ color: theme.warning, fontWeight: '700' }}>
+        {bannerTitle}
+      </Text>
+      <Text role="caption" tone="muted">
+        {subtitle}
+      </Text>
+    </Surface>
+  );
+}
+
+export function WorkspaceSuccessBanner({ bannerTitle, subtitle, note }: { bannerTitle: string; subtitle?: string; note?: string }) {
+  const { theme } = useTheme();
+  return (
+    <Surface
+      tone="inset"
+      padding={3}
+      gap={1}
+      style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.success, borderStyle: 'solid' }}
+    >
+      <Text role="caption" style={{ fontWeight: '800', color: theme.success }}>
+        {bannerTitle}
+      </Text>
+      {subtitle && (
+        <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+          {subtitle}
+        </Text>
+      )}
+      {note && (
+        <Text role="caption" tone="muted">
+          {note}
+        </Text>
+      )}
+    </Surface>
+  );
+}
+
+export function WorkspaceIntroBanner({
+  bannerTitle,
+  description,
+  whyItMatters,
+  affectedSurfaces,
+  ownerSurface,
+  nextOwner,
+  impactInfo,
+  nextActionLabel,
+  extraActions,
+}: {
+  bannerTitle: string;
+  description: string;
+  nextActionLabel: string;
+  whyItMatters?: string;
+  affectedSurfaces?: string[];
+  ownerSurface?: string;
+  nextOwner?: string;
+  impactInfo?: string;
+  extraActions?: React.ReactNode;
+}) {
+  const { theme } = useTheme();
+  return (
+    <div style={{
+      background: `linear-gradient(135deg, ${theme.surfaceInset} 0%, ${theme.surface} 100%)`,
+      border: `1px solid ${theme.lineStrong}`,
+      borderRadius: '12px',
+      padding: '16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+        <div>
+          <Text role="bodyStrong" style={{ fontSize: 16, color: theme.brandHeaderBackground, fontWeight: '800' }}>{bannerTitle}</Text>
+          <Text role="caption" tone="muted" style={{ fontSize: 11, marginTop: 4 }}>{description}</Text>
+        </div>
+        <span style={{ fontSize: '9px', color: theme.success, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
+          معاينة محلية فقط
+        </span>
+      </div>
+
+      {whyItMatters && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 'bold', color: theme.brandHeaderBackground }}>💡 الأهمية والهدف:</span>
+          <Text role="caption" style={{ fontSize: 10, color: theme.textMuted }}>{whyItMatters}</Text>
+        </div>
+      )}
+
+      {affectedSurfaces && affectedSurfaces.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: theme.surfaceInset, padding: '10px 12px', borderRadius: '8px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 'bold', color: theme.brand, marginBottom: '2px' }}>🔄 الأسطح المتأثرة (Affected Surfaces):</span>
+          {affectedSurfaces.map((surface, idx) => (
+            <span key={idx} style={{ fontSize: '10px', color: theme.brandHeaderBackground, display: 'block' }}>
+              • {surface}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {(ownerSurface || nextOwner) && (
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
+          {ownerSurface && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '10px', color: theme.textMuted }}>الجهة المالكة / المصدر:</span>
+              <span style={{ fontSize: '11px', color: theme.brand, fontWeight: '700' }}>{ownerSurface}</span>
+            </div>
+          )}
+          {nextOwner && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: '10px', color: theme.textMuted }}>المراجع التالي للمسار:</span>
+              <span style={{ fontSize: '11px', color: theme.brand, fontWeight: '700' }}>{nextOwner}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {impactInfo && (
+        <div style={{ backgroundColor: theme.surfaceInset, padding: '8px 12px', borderRadius: '6px', borderRight: `3px solid ${theme.brand}` }}>
+          <Text role="caption" style={{ fontSize: 10, color: theme.brandHeaderBackground }}>
+            ℹ️ <strong>أثر السطح:</strong> {impactInfo}
+          </Text>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: '8px', marginTop: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <Button
+          label={nextActionLabel}
+          tone="secondary"
+          size="sm"
+          disabled
+          accessibilityLabel={`${nextActionLabel} (معاينة محلية فقط)`}
+          onPress={() => {}}
+        />
+        <span style={{ fontSize: '10px', color: theme.textMuted, alignSelf: 'center' }}>
+          (الإجراء معطل: معاينة محلية فقط)
+        </span>
+        {extraActions}
+      </div>
+    </div>
+  );
+}
+
+export function WorkspaceProductListItem({
+  product,
+  isSelected,
+  onSelect,
+  detailText,
+  statusLabel,
+  statusTone,
+  rightSide,
+}: {
+  product: CatalogProductMaster;
+  isSelected: boolean;
+  onSelect: () => void;
+  detailText: React.ReactNode;
+  statusLabel: string;
+  statusTone: 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+  rightSide?: React.ReactNode;
+}) {
+  const { theme } = useTheme();
+  return (
+    <div
+      onClick={onSelect}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px',
+        borderRadius: '8px',
+        border: `1px solid ${isSelected ? theme.brand : theme.line}`,
+        backgroundColor: isSelected ? theme.brandSurface : theme.surface,
+        cursor: 'pointer',
+        transition: 'all 0.12s ease',
+        boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <WatermarkedImage src={product.imageUri} mediaKey={product.mediaKey} fallback={product.emojiFallback} size={36} productName={product.name} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <Text role="bodyStrong" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>{product.name}</Text>
+          <span style={{ fontSize: '10px', color: theme.textMuted, fontFamily: typeof detailText === 'string' && detailText.match(/^[a-zA-Z0-9-]*$/) ? 'monospace' : undefined, direction: typeof detailText === 'string' && detailText.match(/^[a-zA-Z0-9-]*$/) ? 'ltr' : undefined }}>{detailText}</span>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {rightSide}
+        <WebControlPanelStatusTag label={statusLabel} tone={statusTone === 'neutral' ? 'info' : statusTone} />
+      </div>
+    </div>
+  );
+}
+
+export type WorkspaceCategoryPickerProps = {
+  categories: CatalogMainCategory[];
+  value: {
+    mainCat: string;
+    subCat: string;
+    mainClassif: string;
+    subClassif: string;
+  };
+  onChange: (value: {
+    mainCat: string;
+    subCat: string;
+    mainClassif: string;
+    subClassif: string;
+  }) => void;
+  layout?: 'vertical' | 'horizontal';
+  hideClassifications?: boolean;
+};
+
+export function WorkspaceCategoryPicker({ categories, value, onChange, layout = 'vertical', hideClassifications = false }: WorkspaceCategoryPickerProps) {
+  const { theme } = useTheme();
+
+  const selectStyle = {
+    padding: '6px 10px',
+    borderRadius: '6px',
+    border: `1px solid ${theme.lineStrong}`,
+    direction: 'rtl' as const,
+    backgroundColor: theme.surface,
+    color: theme.brandHeaderBackground,
+    width: '100%',
+    fontSize: '11px',
+    outline: 'none'
+  };
+
+  const labelStyle = { fontSize: 10, textAlign: 'right' as const, marginBottom: 4 };
+
+  const handleMainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ mainCat: e.target.value, subCat: '', mainClassif: '', subClassif: '' });
+  };
+  const handleSubChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ ...value, subCat: e.target.value, mainClassif: '', subClassif: '' });
+  };
+  const handleMainClassifChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ ...value, mainClassif: e.target.value, subClassif: '' });
+  };
+  const handleSubClassifChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange({ ...value, subClassif: e.target.value });
+  };
+
+  const selectedMain = categories.find(c => c.id === value.mainCat);
+  const selectedSub = selectedMain?.subcategories.find(s => s.id === value.subCat);
+  const mainClassifs = selectedSub?.mainClassifications || [];
+  const selectedMainClassif = mainClassifs.find(mc => mc.id === value.mainClassif);
+  const subClassifs = selectedMainClassif?.subClassifications || [];
+
+  const mainSelect = (
+    <Box style={{ flex: 1 }} gap={1}>
+      <Text role="caption" tone="muted" style={labelStyle}>الفئة الرئيسية *</Text>
+      <select aria-label="الفئة الرئيسية" value={value.mainCat} onChange={handleMainChange} style={selectStyle}>
+        <option value="">اختر فئة رئيسية...</option>
+        {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+      </select>
+    </Box>
+  );
+
+  const subSelect = (
+    <Box style={{ flex: 1 }} gap={1}>
+      <Text role="caption" tone="muted" style={labelStyle}>الفئة الفرعية</Text>
+      <select aria-label="الفئة الفرعية" value={value.subCat} onChange={handleSubChange} style={selectStyle}>
+        <option value="">لا يوجد (عام)</option>
+        {(selectedMain?.subcategories || []).map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+      </select>
+    </Box>
+  );
+
+  const mainClassifSelect = !hideClassifications && mainClassifs.length > 0 ? (
+    <Box style={{ flex: 1 }} gap={1}>
+      <Text role="caption" tone="muted" style={labelStyle}>التصنيف الرئيسي</Text>
+      <select aria-label="التصنيف الرئيسي" value={value.mainClassif} onChange={handleMainClassifChange} style={selectStyle}>
+        <option value="">لا يوجد (عام)</option>
+        {mainClassifs.map(mc => <option key={mc.id} value={mc.id}>{mc.label}</option>)}
+      </select>
+    </Box>
+  ) : null;
+
+  const subClassifSelect = !hideClassifications && subClassifs.length > 0 ? (
+    <Box style={{ flex: 1 }} gap={1}>
+      <Text role="caption" tone="muted" style={labelStyle}>التصنيف الفرعي</Text>
+      <select aria-label="التصنيف الفرعي" value={value.subClassif} onChange={handleSubClassifChange} style={selectStyle}>
+        <option value="">لا يوجد (عام)</option>
+        {subClassifs.map(sc => <option key={sc.id} value={sc.id}>{sc.label}</option>)}
+      </select>
+    </Box>
+  ) : null;
+
+  if (layout === 'horizontal') {
+    return (
+      <Box gap={2}>
+        <Box layoutDirection="row" gap={2}>
+          {mainSelect}
+          {subSelect}
+        </Box>
+        {(mainClassifSelect || subClassifSelect) && (
+          <Box layoutDirection="row" gap={2}>
+            {mainClassifSelect || <Box style={{ flex: 1 }} />}
+            {subClassifSelect || <Box style={{ flex: 1 }} />}
+          </Box>
+        )}
+      </Box>
+    );
+  }
+
+  return (
+    <Box gap={1}>
+      {mainSelect}
+      {subSelect}
+      {mainClassifSelect}
+      {subClassifSelect}
+    </Box>
   );
 }

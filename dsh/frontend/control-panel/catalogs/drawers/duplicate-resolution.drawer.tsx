@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Box, Button, Text, TextField, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
+import { ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,6 +30,16 @@ type PairResolution =
   | { decision: 'merge-preview'; mergePreview: Partial<CatalogProductMaster> }
   | { decision: 'rejected'; auditNote: string }
   | { decision: 'sent-to-review' };
+
+function toActionResult(res: PairResolution | null): ActionResult {
+  if (!res) return null;
+  switch (res.decision) {
+    case 'keep-canonical': return { type: 'success', message: '✓ تم الاحتفاظ بالنسخة الأصلية (محاكاة محلية)' };
+    case 'merge-preview': return { type: 'success', message: '✓ معاينة الدمج جاهزة (محلية فقط — UI_PREVIEW_ONLY)' };
+    case 'rejected': return { type: 'blocked', message: `✓ تم رفض التكرار (محاكاة محلية) · ملاحظة: ${res.auditNote}` };
+    case 'sent-to-review': return { type: 'success', message: '✓ تم الإرسال للمراجعة (محاكاة محلية)' };
+  }
+}
 
 type PairState = {
   auditNote: string;
@@ -64,14 +75,7 @@ function pairKey(pair: DuplicatePair) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionTitle({ children }: { children: string }) {
-  const { theme } = useTheme();
-  return (
-    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
-      {children}
-    </Text>
-  );
-}
+
 
 function ProductCard({
   product,
@@ -129,22 +133,7 @@ function MergePreviewCard({ merged }: { merged: Partial<CatalogProductMaster> })
   );
 }
 
-function ResolutionBanner({ resolution }: { resolution: PairResolution | null }) {
-  const { theme } = useTheme();
-  if (!resolution) return null;
-  const label =
-    resolution.decision === 'keep-canonical' ? '✓ تم الاحتفاظ بالنسخة الأصلية (محاكاة محلية)'
-    : resolution.decision === 'merge-preview' ? '✓ معاينة الدمج جاهزة (محلية فقط — UI_PREVIEW_ONLY)'
-    : resolution.decision === 'rejected' ? `✓ تم رفض التكرار (محاكاة محلية) · ملاحظة: ${resolution.auditNote}`
-    : '✓ تم الإرسال للمراجعة (محاكاة محلية)';
-  const tone = resolution.decision === 'rejected' ? theme.dangerSurface : theme.successSurface;
-  const textColor = resolution.decision === 'rejected' ? theme.danger : theme.success;
-  return (
-    <Box style={{ backgroundColor: tone, borderRadius: 6, padding: 8, marginTop: 4 }}>
-      <Text role="caption" style={{ color: textColor, fontWeight: '700', fontSize: 11 }}>{label}</Text>
-    </Box>
-  );
-}
+
 
 // ─── Main workspace ───────────────────────────────────────────────────────────
 
@@ -198,7 +187,7 @@ export function CatalogDuplicateResolutionWorkspace({
         resolution: null,
       });
       // Use a transient message approach via a flag
-      alert('ملاحظة التدقيق مطلوبة (10 أحرف على الأقل) — UI_PREVIEW_ONLY');
+      globalThis.alert('ملاحظة التدقيق مطلوبة (10 أحرف على الأقل) — UI_PREVIEW_ONLY');
       return;
     }
     updatePairState(pair, {
@@ -366,7 +355,7 @@ export function CatalogDuplicateResolutionWorkspace({
                 </Box>
               )}
 
-              <ResolutionBanner resolution={state.resolution} />
+              <ResultBanner result={toActionResult(state.resolution)} />
             </Box>
           );
         })}

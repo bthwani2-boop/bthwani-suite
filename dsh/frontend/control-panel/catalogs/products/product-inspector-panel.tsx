@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
-import { WatermarkedImage, InspectorTile, MiniInfoBox } from '../catalogs.parts';
+import { WatermarkedImage, InspectorTile, MiniInfoBox, WorkspaceCategoryPicker } from '../catalogs.parts';
 import type { CatalogProductMaster, CatalogMainCategory } from '../catalogs.data';
 import type { CatalogProductPreviewPatch } from '../catalogs.adapters';
 import type { CatalogWorkspaceId } from '../catalogs.model';
@@ -64,109 +64,35 @@ export function ProductInspectorPanel({
         </Box>
 
         <InspectorTile tileTitle="ربط الفئة (Category Mapping)">
-          <Box gap={1}>
-            <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>الفئة الرئيسية:</Text>
-            <select
-              aria-label="الفئة الرئيسية"
-              value={selectedProduct.categoryPath.main}
-              onChange={(e) => {
-                const newMain = e.target.value;
-                queueProductPreviewPatch(
-                  selectedProduct,
-                  { categoryPath: { ...selectedProduct.categoryPath, main: newMain, sub: undefined, mainClassification: undefined, subClassification: undefined } },
-                  'تم تسجيل مقترح تغيير الفئة الرئيسية',
-                  'تغيير categoryPath.main كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
-                );
-              }}
-              style={{ padding: '4px 6px', borderRadius: '4px', fontSize: '11px', backgroundColor: theme.surface, color: theme.brandHeaderBackground, border: `1px solid ${theme.lineStrong}`, direction: 'rtl', width: '100%' }}
-            >
-              {previewCategories.map(c => (
-                <option key={c.id} value={c.id}>{c.label}</option>
-              ))}
-            </select>
-
-            <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right', marginTop: 4 }}>الفئة الفرعية:</Text>
-            <select
-              aria-label="الفئة الفرعية"
-              value={selectedProduct.categoryPath.sub || ''}
-              onChange={(e) => {
-                const newSub = e.target.value || undefined;
-                queueProductPreviewPatch(
-                  selectedProduct,
-                  { categoryPath: { ...selectedProduct.categoryPath, sub: newSub, mainClassification: undefined, subClassification: undefined } },
-                  'تم تسجيل مقترح تغيير الفئة الفرعية',
-                  'تغيير categoryPath.sub كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
-                );
-              }}
-              style={{ padding: '4px 6px', borderRadius: '4px', fontSize: '11px', backgroundColor: theme.surface, color: theme.brandHeaderBackground, border: `1px solid ${theme.lineStrong}`, direction: 'rtl', width: '100%' }}
-            >
-              <option value="">لا يوجد (عام)</option>
-              {(previewCategories.find(c => c.id === selectedProduct.categoryPath.main)?.subcategories || []).map(s => (
-                <option key={s.id} value={s.id}>{s.label}</option>
-              ))}
-            </select>
-
-            {(() => {
-              const mainCat = previewCategories.find(c => c.id === selectedProduct.categoryPath.main);
-              const subCat = mainCat?.subcategories.find(s => s.id === selectedProduct.categoryPath.sub);
-              const mainClassifs = subCat?.mainClassifications || [];
-              if (!subCat || mainClassifs.length === 0) return null;
-              return (
-                <>
-                  <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right', marginTop: 4 }}>التصنيف الرئيسي:</Text>
-                  <select
-                    aria-label="التصنيف الرئيسي"
-                    value={selectedProduct.categoryPath.mainClassification || ''}
-                    onChange={(e) => {
-                      const newMainClassif = e.target.value || undefined;
-                      queueProductPreviewPatch(
-                        selectedProduct,
-                        { categoryPath: { ...selectedProduct.categoryPath, mainClassification: newMainClassif, subClassification: undefined } },
-                        'تم تسجيل مقترح تغيير التصنيف الرئيسي',
-                        'تغيير categoryPath.mainClassification كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
-                      );
-                    }}
-                    style={{ padding: '4px 6px', borderRadius: '4px', fontSize: '11px', backgroundColor: theme.surface, color: theme.brandHeaderBackground, border: `1px solid ${theme.lineStrong}`, direction: 'rtl', width: '100%' }}
-                  >
-                    <option value="">لا يوجد (عام)</option>
-                    {mainClassifs.map(mc => (
-                      <option key={mc.id} value={mc.id}>{mc.label}</option>
-                    ))}
-                  </select>
-
-                  {(() => {
-                    const selMainClassif = mainClassifs.find(mc => mc.id === selectedProduct.categoryPath.mainClassification);
-                    const subClassifs = selMainClassif?.subClassifications || [];
-                    if (!selMainClassif || subClassifs.length === 0) return null;
-                    return (
-                      <>
-                        <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right', marginTop: 4 }}>التصنيف الفرعي:</Text>
-                        <select
-                          aria-label="التصنيف الفرعي"
-                          value={selectedProduct.categoryPath.subClassification || ''}
-                          onChange={(e) => {
-                            const newSubClassif = e.target.value || undefined;
-                            queueProductPreviewPatch(
-                              selectedProduct,
-                              { categoryPath: { ...selectedProduct.categoryPath, subClassification: newSubClassif } },
-                              'تم تسجيل مقترح تغيير التصنيف الفرعي',
-                              'تغيير categoryPath.subClassification كمعاينة فقط؛ لا تعديل على المصدر المركزي.',
-                            );
-                          }}
-                          style={{ padding: '4px 6px', borderRadius: '4px', fontSize: '11px', backgroundColor: theme.surface, color: theme.brandHeaderBackground, border: `1px solid ${theme.lineStrong}`, direction: 'rtl', width: '100%' }}
-                        >
-                          <option value="">لا يوجد (عام)</option>
-                          {subClassifs.map(sc => (
-                            <option key={sc.id} value={sc.id}>{sc.label}</option>
-                          ))}
-                        </select>
-                      </>
-                    );
-                  })()}
-                </>
+          <WorkspaceCategoryPicker
+            categories={previewCategories}
+            value={{
+              mainCat: selectedProduct.categoryPath.main,
+              subCat: selectedProduct.categoryPath.sub || '',
+              mainClassif: selectedProduct.categoryPath.mainClassification || '',
+              subClassif: selectedProduct.categoryPath.subClassification || ''
+            }}
+            onChange={(val) => {
+              const changedField = val.mainCat !== selectedProduct.categoryPath.main ? 'الفئة الرئيسية' :
+                val.subCat !== (selectedProduct.categoryPath.sub || '') ? 'الفئة الفرعية' :
+                val.mainClassif !== (selectedProduct.categoryPath.mainClassification || '') ? 'التصنيف الرئيسي' :
+                'التصنيف الفرعي';
+              queueProductPreviewPatch(
+                selectedProduct,
+                {
+                  categoryPath: {
+                    main: val.mainCat,
+                    sub: val.subCat || undefined,
+                    mainClassification: val.mainClassif || undefined,
+                    subClassification: val.subClassif || undefined
+                  }
+                },
+                `تم تسجيل مقترح تغيير ${changedField}`,
+                `تغيير تصنيف المنتج كمعاينة فقط؛ لا تعديل على المصدر المركزي.`
               );
-            })()}
-          </Box>
+            }}
+            layout="vertical"
+          />
         </InspectorTile>
 
         <InspectorTile tileTitle="الحالة">

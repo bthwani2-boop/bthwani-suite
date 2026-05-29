@@ -16,6 +16,7 @@ import {
   type DshClientVisibilityBlockedCode,
 } from '../../../shared/dsh-client-visibility.model';
 import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../../shared/dsh-product-identity.model';
+import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,10 +25,6 @@ export type CatalogVisibilityPolicyWorkspaceProps = {
   partnerActivationStatus: DshPartnerActivationStatus;
   onClose: () => void;
 };
-
-type ActionResult = { type: 'success' | 'blocked' | 'info'; message: string } | null;
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const blockedCodeLabel: Record<DshClientVisibilityBlockedCode, string> = {
   'field_readiness_not_ready':   'الملف الميداني غير مكتمل',
@@ -56,15 +53,6 @@ const prerequisiteIdLabel: Record<string, string> = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionTitle({ children }: { children: string }) {
-  const { theme } = useTheme();
-  return (
-    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
-      {children}
-    </Text>
-  );
-}
-
 function ChecklistRow({
   label,
   satisfied,
@@ -90,22 +78,6 @@ function ChecklistRow({
           <Text role="caption" style={{ color: theme.danger, fontSize: 11 }}>{blockedReason}</Text>
         </Box>
       )}
-    </Box>
-  );
-}
-
-function ResultBanner({ result }: { result: ActionResult }) {
-  const { theme } = useTheme();
-  if (!result) return null;
-  const bg = result.type === 'success' ? theme.successSurface
-    : result.type === 'blocked' ? theme.dangerSurface
-    : theme.surfaceInset;
-  const color = result.type === 'success' ? theme.success
-    : result.type === 'blocked' ? theme.danger
-    : theme.text;
-  return (
-    <Box style={{ backgroundColor: bg, borderRadius: 8, padding: 10, marginTop: 8 }}>
-      <Text role="caption" style={{ color, fontWeight: '700' }}>{result.message}</Text>
     </Box>
   );
 }

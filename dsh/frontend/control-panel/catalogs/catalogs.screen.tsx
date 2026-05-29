@@ -33,6 +33,7 @@ export function ControlPanelDshCatalogScreen({
   marketingHref = '/marketing',
 }: ControlPanelDshCatalogScreenProps) {
   const { theme } = useTheme();
+  const screen = useCatalogScreen();
   const {
     activeTab, setActiveTab,
     activeSubTab, setActiveSubTab,
@@ -61,31 +62,9 @@ export function ControlPanelDshCatalogScreen({
     hiddenCategoryIds,
     hiddenSubCategoryIds,
     categoryControlOpen, setCategoryControlOpen,
-    addingMainCat, setAddingMainCat,
-    addingSubUnder, setAddingSubUnder,
-    addingMainClassifUnder, setAddingMainClassifUnder,
-    addingSubClassifUnder, setAddingSubClassifUnder,
-    formLabel, setFormLabel,
-    formSubtitle, setFormSubtitle,
-    catError, setCatError,
-    editingEntry, setEditingEntry,
-    editLabel, setEditLabel,
-    editSubtitle, setEditSubtitle,
+    catError,
     activeMainClassifId, setActiveMainClassifId,
     activeSubClassifId, setActiveSubClassifId,
-    handleMainCategorySelect,
-    handleSubCategorySelect,
-    handleAddMainCategory,
-    handleAddSubCategory,
-    handleAddMainClassification,
-    handleAddSubClassification,
-    handleToggleCategoryHide,
-    handleToggleSubCategoryHide,
-    handleDeleteNode,
-    handleResetCategoryPreview,
-    handleStartCatEdit,
-    handleApplyCatEdit,
-    getProductCountForCategory,
     colFilters, setColFilters,
     openFilterCol, setOpenFilterCol,
     activeColFiltersCount,
@@ -93,9 +72,52 @@ export function ControlPanelDshCatalogScreen({
     isCategoryMapped, isDuplicatesClean, isMediaSatisfied, approvedCount,
     isManualOrderCategory,
     microActions,
-  } = useCatalogScreen();
+  } = screen;
 
   const taxonomyHook = useTaxonomyScreen({ onPushProposal: pushPreviewProposal });
+
+  // CategoryControlRoom props — built once, spread below
+  const categoryRoomProps = {
+    categoryControlOpen, setCategoryControlOpen,
+    previewCategories,
+    hiddenCategoryIds,
+    hiddenSubCategoryIds: screen.hiddenSubCategoryIds,
+    activeMainCategory,
+    activeSubCategory,
+    catError,
+    setCatError: screen.setCatError,
+    addingMainCat: screen.addingMainCat,
+    setAddingMainCat: screen.setAddingMainCat,
+    addingSubUnder: screen.addingSubUnder,
+    setAddingSubUnder: screen.setAddingSubUnder,
+    addingMainClassifUnder: screen.addingMainClassifUnder,
+    setAddingMainClassifUnder: screen.setAddingMainClassifUnder,
+    addingSubClassifUnder: screen.addingSubClassifUnder,
+    setAddingSubClassifUnder: screen.setAddingSubClassifUnder,
+    formLabel: screen.formLabel,
+    setFormLabel: screen.setFormLabel,
+    formSubtitle: screen.formSubtitle,
+    setFormSubtitle: screen.setFormSubtitle,
+    editingEntry: screen.editingEntry,
+    setEditingEntry: screen.setEditingEntry,
+    editLabel: screen.editLabel,
+    setEditLabel: screen.setEditLabel,
+    editSubtitle: screen.editSubtitle,
+    setEditSubtitle: screen.setEditSubtitle,
+    handleMainCategorySelect: screen.handleMainCategorySelect,
+    handleSubCategorySelect: screen.handleSubCategorySelect,
+    handleAddMainCategory: screen.handleAddMainCategory,
+    handleAddSubCategory: screen.handleAddSubCategory,
+    handleAddMainClassification: screen.handleAddMainClassification,
+    handleAddSubClassification: screen.handleAddSubClassification,
+    handleToggleCategoryHide: screen.handleToggleCategoryHide,
+    handleToggleSubCategoryHide: screen.handleToggleSubCategoryHide,
+    handleDeleteNode: screen.handleDeleteNode,
+    handleResetCategoryPreview: screen.handleResetCategoryPreview,
+    handleStartCatEdit: screen.handleStartCatEdit,
+    handleApplyCatEdit: screen.handleApplyCatEdit,
+    getProductCountForCategory: screen.getProductCountForCategory,
+  } satisfies React.ComponentProps<typeof CategoryControlRoom>;
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -151,9 +173,9 @@ export function ControlPanelDshCatalogScreen({
         hiddenCategoryIds={hiddenCategoryIds}
         hiddenSubCategoryIds={hiddenSubCategoryIds}
         activeMainCategory={activeMainCategory}
-        handleMainCategorySelect={handleMainCategorySelect}
+        handleMainCategorySelect={screen.handleMainCategorySelect}
         activeSubCategory={activeSubCategory}
-        handleSubCategorySelect={handleSubCategorySelect}
+        handleSubCategorySelect={screen.handleSubCategorySelect}
         activeMainClassifId={activeMainClassifId}
         setActiveMainClassifId={setActiveMainClassifId}
         activeSubClassifId={activeSubClassifId}
@@ -200,48 +222,7 @@ export function ControlPanelDshCatalogScreen({
 
       {/* Category Control Room */}
       {activeTab === 'mapping' && activeSubTab === 'categories' && (
-        <CategoryControlRoom
-          categoryControlOpen={categoryControlOpen}
-          setCategoryControlOpen={setCategoryControlOpen}
-          previewCategories={previewCategories}
-          hiddenCategoryIds={hiddenCategoryIds}
-          hiddenSubCategoryIds={hiddenSubCategoryIds}
-          activeMainCategory={activeMainCategory}
-          activeSubCategory={activeSubCategory}
-          catError={catError}
-          setCatError={setCatError}
-          addingMainCat={addingMainCat}
-          setAddingMainCat={setAddingMainCat}
-          addingSubUnder={addingSubUnder}
-          setAddingSubUnder={setAddingSubUnder}
-          addingMainClassifUnder={addingMainClassifUnder}
-          setAddingMainClassifUnder={setAddingMainClassifUnder}
-          addingSubClassifUnder={addingSubClassifUnder}
-          setAddingSubClassifUnder={setAddingSubClassifUnder}
-          formLabel={formLabel}
-          setFormLabel={setFormLabel}
-          formSubtitle={formSubtitle}
-          setFormSubtitle={setFormSubtitle}
-          editingEntry={editingEntry}
-          setEditingEntry={setEditingEntry}
-          editLabel={editLabel}
-          setEditLabel={setEditLabel}
-          editSubtitle={editSubtitle}
-          setEditSubtitle={setEditSubtitle}
-          handleMainCategorySelect={handleMainCategorySelect}
-          handleSubCategorySelect={handleSubCategorySelect}
-          handleAddMainCategory={handleAddMainCategory}
-          handleAddSubCategory={handleAddSubCategory}
-          handleAddMainClassification={handleAddMainClassification}
-          handleAddSubClassification={handleAddSubClassification}
-          handleToggleCategoryHide={handleToggleCategoryHide}
-          handleToggleSubCategoryHide={handleToggleSubCategoryHide}
-          handleDeleteNode={handleDeleteNode}
-          handleResetCategoryPreview={handleResetCategoryPreview}
-          handleStartCatEdit={handleStartCatEdit}
-          handleApplyCatEdit={handleApplyCatEdit}
-          getProductCountForCategory={getProductCountForCategory}
-        />
+        <CategoryControlRoom {...categoryRoomProps} />
       )}
 
       {/* Main Content */}

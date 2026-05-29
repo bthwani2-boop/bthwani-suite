@@ -21,6 +21,7 @@
 
 import React, { useMemo } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
 import { mapApprovalStageToPartnerActivationStatus } from '../../../shared/dsh-client-visibility.model';
 
@@ -183,19 +184,10 @@ export function CatalogPublicationReadinessMatrix({
       </Box>
 
       {/* Notice */}
-      <Surface
-        tone="inset"
-        padding={3}
-        style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
-      >
-        <Text role="caption" style={{ color: theme.warning, fontWeight: '700' }}>
-          UI_PREVIEW_ONLY — جاهزية مشتقة من حالة البيانات الحالية
-        </Text>
-        <Text role="caption" tone="muted">
-          النتائج الحقيقية تأتي من: GET /catalog/readiness — not yet bound.
-          visibility mapping يستخدم shared resolver: mapApprovalStageToPartnerActivationStatus
-        </Text>
-      </Surface>
+      <WorkspacePreviewNotice
+        bannerTitle="وضع المعاينة"
+        subtitle="جميع إجراءات الجاهزية والنشر هنا تنعكس على قاعدة البيانات المحلية فقط (طالما أنك في وضع المعاينة). النتائج الحقيقية تأتي من: GET /catalog/readiness — not yet bound. visibility mapping يستخدم shared resolver: mapApprovalStageToPartnerActivationStatus"
+      />
 
       {/* Summary KPIs */}
       <Box layoutDirection="row" gap={3} style={{ flexWrap: 'wrap' }}>

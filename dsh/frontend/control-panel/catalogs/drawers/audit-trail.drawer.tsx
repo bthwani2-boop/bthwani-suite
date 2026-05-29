@@ -17,6 +17,7 @@
 
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
 
 export type CatalogAuditTrailWorkspaceProps = {
@@ -192,19 +193,10 @@ export function CatalogAuditTrailWorkspace({
       </Box>
 
       {/* Notice */}
-      <Surface
-        tone="inset"
-        padding={3}
-        style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
-      >
-        <Text role="caption" style={{ color: theme.warning, fontWeight: '700' }}>
-          UI_PREVIEW_ONLY — سجل أحداث اشتقاقي
-        </Text>
-        <Text role="caption" tone="muted">
-          الأحداث مشتقة من حالة المنتج الحالية للعرض فقط.
-          السجل الحقيقي يأتي من: GET /catalog/audit/:productId — not yet bound.
-        </Text>
-      </Surface>
+      <WorkspacePreviewNotice
+        bannerTitle="UI_PREVIEW_ONLY — سجل أحداث اشتقاقي"
+        subtitle="الأحداث مشتقة من حالة المنتج الحالية للعرض فقط. السجل الحقيقي يأتي من: GET /catalog/audit/:productId — not yet bound."
+      />
 
       {/* Product selector */}
       <Box gap={2}>

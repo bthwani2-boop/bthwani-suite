@@ -9,8 +9,9 @@ import {
   createCatalogPreviewProposal,
   toCatalogApprovalStage,
   toCatalogMediaPolicy,
-  type CatalogPreviewProposal,
 } from '../catalogs.model';
+import { WorkspaceCategoryPicker } from '../catalogs.parts';
+import { DSH_COMMON_MEDIA_KEYS } from '../catalogs.data';
 import type { useCatalogScreen } from '../catalogs.hooks';
 
 type CatalogModalForm = ReturnType<typeof useCatalogScreen>['modalForm'];
@@ -118,87 +119,24 @@ export function ProductEditModal({
                 style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
               >
                 <option value="">بدون (أيقونة تعبيرية)</option>
-                <option value="dsh.product.apple.v1">🍎 تفاح</option>
-                <option value="dsh.product.milk.v1">🥛 حليب</option>
-                <option value="dsh.product.bread.v1">🍞 خبز</option>
-                <option value="dsh.product.chicken.v1">🍗 دجاج</option>
-                <option value="dsh.product.pasta.v1">🍝 باستا</option>
-                <option value="dsh.product.choco.v1">🍰 كيكة</option>
-                <option value="dsh.product.roll.v1">🌴 تمر (مؤقت)</option>
-                <option value="dsh.product.lead-5.dates-box.v1">🌴 علبة التمر الفاخرة</option>
-              </select>
-            </Box>
-          </Box>
-
-          <Box layoutDirection="row" gap={2}>
-            <Box style={{ flex: 1 }} gap={1}>
-              <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>الفئة الرئيسية *</Text>
-              <select
-                aria-label="الفئة الرئيسية"
-                value={modalForm.mainCat}
-                onChange={e => setModalForm(prev => ({ ...prev, mainCat: e.target.value, subCat: '', mainClassif: '', subClassif: '' }))}
-                style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
-              >
-                {previewCategories.map(c => (
-                  <option key={c.id} value={c.id}>{c.label}</option>
-                ))}
-              </select>
-            </Box>
-            <Box style={{ flex: 1 }} gap={1}>
-              <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>الفئة الفرعية</Text>
-              <select
-                aria-label="الفئة الفرعية"
-                value={modalForm.subCat}
-                onChange={e => setModalForm(prev => ({ ...prev, subCat: e.target.value, mainClassif: '', subClassif: '' }))}
-                style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
-              >
-                <option value="">لا يوجد (عام)</option>
-                {(previewCategories.find(c => c.id === modalForm.mainCat)?.subcategories || []).map(s => (
-                  <option key={s.id} value={s.id}>{s.label}</option>
+                {DSH_COMMON_MEDIA_KEYS.map(k => (
+                  <option key={k.value} value={k.value}>{k.label}</option>
                 ))}
               </select>
             </Box>
           </Box>
 
-          <Box layoutDirection="row" gap={2}>
-            <Box style={{ flex: 1 }} gap={1}>
-              <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>التصنيف الرئيسي</Text>
-              <select
-                aria-label="التصنيف الرئيسي"
-                value={modalForm.mainClassif}
-                onChange={e => setModalForm(prev => ({ ...prev, mainClassif: e.target.value, subClassif: '' }))}
-                style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
-              >
-                <option value="">لا يوجد (عام)</option>
-                {(() => {
-                  const mCat = previewCategories.find(c => c.id === modalForm.mainCat);
-                  const sCat = mCat?.subcategories.find(s => s.id === modalForm.subCat);
-                  return (sCat?.mainClassifications || []).map(mc => (
-                    <option key={mc.id} value={mc.id}>{mc.label}</option>
-                  ));
-                })()}
-              </select>
-            </Box>
-            <Box style={{ flex: 1 }} gap={1}>
-              <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>التصنيف الفرعي</Text>
-              <select
-                aria-label="التصنيف الفرعي"
-                value={modalForm.subClassif}
-                onChange={e => setModalForm(prev => ({ ...prev, subClassif: e.target.value }))}
-                style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground }}
-              >
-                <option value="">لا يوجد (عام)</option>
-                {(() => {
-                  const mCat = previewCategories.find(c => c.id === modalForm.mainCat);
-                  const sCat = mCat?.subcategories.find(s => s.id === modalForm.subCat);
-                  const mClassif = sCat?.mainClassifications?.find(mc => mc.id === modalForm.mainClassif);
-                  return (mClassif?.subClassifications || []).map(sc => (
-                    <option key={sc.id} value={sc.id}>{sc.label}</option>
-                  ));
-                })()}
-              </select>
-            </Box>
-          </Box>
+          <WorkspaceCategoryPicker
+            categories={previewCategories}
+            value={{
+              mainCat: modalForm.mainCat,
+              subCat: modalForm.subCat,
+              mainClassif: modalForm.mainClassif,
+              subClassif: modalForm.subClassif
+            }}
+            onChange={(val) => setModalForm(prev => ({ ...prev, ...val }))}
+            layout="horizontal"
+          />
 
           <Box layoutDirection="row" gap={2}>
             <Box style={{ flex: 1 }} gap={1}>

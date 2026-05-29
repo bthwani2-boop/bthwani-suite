@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { CatalogProductMaster } from './catalogs.data';
 import type { CatalogPreviewProposal, CatalogWorkspaceState } from './catalogs.model';
 import type { CatalogProductPreviewPatch } from './catalogs.adapters';

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import type { CatalogMainCategory, CatalogProductMaster } from '../catalogs.data';
+import { DSH_COMMON_MEDIA_KEYS, type CatalogMainCategory, type CatalogProductMaster } from '../catalogs.data';
 import type { CatalogTaxonomyNodeRef } from '../catalogs.model';
 import { WatermarkedImage } from '../catalogs.parts';
 import { getActualPublicMediaPath } from '../../../shared/resolve-dsh-public-media-path';
@@ -195,14 +195,9 @@ export function TaxonomyNodeInspector({
                   style={{ padding: '6px 10px', borderRadius: '6px', border: `1px solid ${theme.lineStrong}`, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '11px' }}
                 >
                   <option value="">بدون صورة</option>
-                  <option value="dsh.product.apple.v1">🍎 تفاح</option>
-                  <option value="dsh.product.milk.v1">🥛 حليب</option>
-                  <option value="dsh.product.bread.v1">🍞 خبز</option>
-                  <option value="dsh.product.chicken.v1">🍗 دجاج</option>
-                  <option value="dsh.product.pasta.v1">🍝 باستا</option>
-                  <option value="dsh.product.choco.v1">🍰 كيكة</option>
-                  <option value="dsh.product.roll.v1">🌴 تمر (مؤقت)</option>
-                  <option value="dsh.product.lead-5.dates-box.v1">🌴 علبة التمر الفاخرة</option>
+                  {DSH_COMMON_MEDIA_KEYS.map(k => (
+                    <option key={k.value} value={k.value}>{k.label}</option>
+                  ))}
                 </select>
               </Box>
             </Box>

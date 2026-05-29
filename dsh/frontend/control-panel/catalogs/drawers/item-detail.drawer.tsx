@@ -15,6 +15,7 @@ import {
 import {
   mapApprovalStageToPartnerActivationStatus,
 } from '../../../shared/dsh-client-visibility.model';
+import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,7 +29,7 @@ export type CatalogItemDetailWorkspaceProps = {
   onClose: () => void;
 };
 
-type ActionResult = { type: 'success' | 'blocked' | 'info'; message: string } | null;
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,37 +74,12 @@ const linkedSurfaces = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionTitle({ children }: { children: string }) {
-  const { theme } = useTheme();
-  return (
-    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
-      {children}
-    </Text>
-  );
-}
-
 function InfoRow({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
   const { theme } = useTheme();
   return (
     <Box layoutDirection="row" gap={6} style={{ justifyContent: 'space-between', paddingVertical: 2 }}>
       <Text role="caption" tone="muted" style={{ fontSize: 12 }}>{label}</Text>
       <Text role="caption" style={{ fontWeight: '700', color: valueColor || theme.text, textAlign: 'right', flexShrink: 1 }}>{value}</Text>
-    </Box>
-  );
-}
-
-function ResultBanner({ result }: { result: ActionResult }) {
-  const { theme } = useTheme();
-  if (!result) return null;
-  const bg = result.type === 'success' ? theme.successSurface
-    : result.type === 'blocked' ? theme.dangerSurface
-    : theme.infoSurface ?? theme.surface;
-  const color = result.type === 'success' ? theme.success
-    : result.type === 'blocked' ? theme.danger
-    : theme.info ?? theme.text;
-  return (
-    <Box style={{ backgroundColor: bg, borderRadius: 8, padding: 10, marginTop: 8 }}>
-      <Text role="caption" style={{ color, fontWeight: '700' }}>{result.message}</Text>
     </Box>
   );
 }
