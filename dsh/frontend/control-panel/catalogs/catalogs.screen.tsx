@@ -3,11 +3,10 @@
 import React from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
-import { dshCatalogCategories, type CatalogProductMaster, type CatalogMediaPolicy, type CatalogApprovalStage } from './catalogs.data';
+import { dshCatalogCategories } from './catalogs.data';
 import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
 import styles from '../shared/control-panel-surface.module.css';
 import { CatalogWorkspaceRouter } from './drawers/catalog-workspace-router';
-import type { CatalogPreviewProposal } from './catalogs.model';
 import { mergeCatalogProductPreviewPatch } from './catalogs.adapters';
 import {
   createCatalogPreviewProposal,
@@ -17,7 +16,7 @@ import {
   type CatalogFilterColumnId,
   type FilterType,
 } from './catalogs.model';
-import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalogs.parts';
+import { PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalogs.parts';
 import { useCatalogScreen, PRIMARY_TABS, SECONDARY_TABS } from './catalogs.hooks';
 import { TaxonomyScreen } from './taxonomy/taxonomy.screen';
 import { useTaxonomyScreen } from './taxonomy/taxonomy.hooks';
@@ -29,22 +28,6 @@ export type ControlPanelDshCatalogScreenProps = {
   partnersHref?: string;
   marketingHref?: string;
 };
-
-type WorkspaceMode =
-  | 'catalog'
-  | 'quick-entry'
-  | 'partner-entry'
-  | 'field-intake'
-  | 'duplicate-resolution'
-  | 'category-mapping'
-  | 'media-governance'
-  | 'marketing-approvals';
-
-const catalogPageSize = 5;
-
-// --- Shared Components ---
-
-// Removed duplicate sub-page imports for unified main table rendering
 
 // --- Main Screen Component ---
 
@@ -118,9 +101,6 @@ export function ControlPanelDshCatalogScreen({
   } = useCatalogScreen();
 
   const taxonomyHook = useTaxonomyScreen({ onPushProposal: pushPreviewProposal });
-
-  const workspaceMode = activeTab;
-
 
   const renderColHeader = (colId: CatalogFilterColumnId, title: string, width?: string) => (
     <th style={{ padding: '6px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width, position: 'relative' }}>

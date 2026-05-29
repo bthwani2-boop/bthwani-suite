@@ -9,7 +9,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import { dshCatalogCategories } from '../catalogs.data';
 
-// UI_PREVIEW_ONLY: category governance actions â€” no backend/API binding.
+// UI_PREVIEW_ONLY: category governance actions — no backend/API binding.
 // control-panel/catalogs is the ONLY surface that can approve category nodes.
 
 type CategoryGovernanceAction = 'approve-node' | 'request-edit';
@@ -24,14 +24,14 @@ type CategoryActionResult = {
 };
 
 function resolveCategoryOwnerLabel(owner: string) {
-  if (owner === 'partner') return 'Ø§Ù„Ø´Ø±ÙƒØ§Ø¡';
-  if (owner === 'marketing') return 'Ø§Ù„ØªØ³ÙˆÙŠÙ‚';
-  return 'Ø§Ù„ÙƒØªØ§Ù„ÙˆØ¬';
+  if (owner === 'partner') return 'الشركاء';
+  if (owner === 'marketing') return 'التسويق';
+  return 'الكتالوج';
 }
 
 function resolveNextOwnerLabel(owner: 'control-panel-catalog' | 'control-panel-marketing') {
-  if (owner === 'control-panel-marketing') return 'Ø§Ù„ØªØ³ÙˆÙŠÙ‚';
-  return 'Ø§Ù„ÙƒØªØ§Ù„ÙˆØ¬';
+  if (owner === 'control-panel-marketing') return 'التسويق';
+  return 'الكتالوج';
 }
 
 export function CategoriesScreen() {
@@ -53,10 +53,10 @@ export function CategoriesScreen() {
     setLastActionResult({
       categoryId: activeNode.id,
       action: 'approve-node',
-      label: 'Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„ÙØ¦Ø©',
+      label: 'اعتماد الفئة',
       status: 'success',
       nextOwner: 'control-panel-catalog',
-      note: 'UI_PREVIEW_ONLY â€” Ù„Ù… ÙŠÙØ­ÙØ¸ ÙÙŠ runtime/API',
+      note: 'UI_PREVIEW_ONLY — لم يُحفظ في runtime/API',
     });
   }, [activeNode]);
 
@@ -65,21 +65,21 @@ export function CategoriesScreen() {
     setLastActionResult({
       categoryId: activeNode.id,
       action: 'request-edit',
-      label: 'Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„',
+      label: 'طلب تعديل',
       status: 'blocked',
       nextOwner: 'control-panel-marketing',
-      note: 'UI_PREVIEW_ONLY â€” ÙŠÙØ±Ø³Ù„ Ù„Ù„ØªØ³ÙˆÙŠÙ‚ Ø¹Ù†Ø¯ ØªÙØ¹ÙŠÙ„ API',
+      note: 'UI_PREVIEW_ONLY — يُرسل للتسويق عند تفعيل API',
     });
   }, [activeNode]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <WebCompactSurfaceHeader
-        title="Ø­ÙˆÙƒÙ…Ø© Ø§Ù„ÙØ¦Ø§Øª"
-        description="Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¹Ù‚Ø¯Ø© Ø§Ù„ÙØ¦Ø© ÙˆØ§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª"
+        title="حوكمة الفئات"
+        description="مراجعة عقدة الفئة والموافقة على التعديلات"
         metrics={[
-          { id: 'total', title: 'Ø§Ù„ÙØ¦Ø§Øª', value: String(categoryNodes.length) },
-          { id: 'verified', title: 'ØªÙ… Ø§Ù„ØªØ­Ù‚Ù‚', value: String(categoryNodes.length) },
+          { id: 'total', title: 'الفئات', value: String(categoryNodes.length) },
+          { id: 'verified', title: 'تم التحقق', value: String(categoryNodes.length) },
         ]}
       />
       <WebControlPanelWorkspaceTabs
@@ -89,7 +89,7 @@ export function CategoriesScreen() {
           active: node.id === activeCategoryId,
         }))}
         onSelect={handleSelectCategory}
-        ariaLabel="ÙØ¦Ø§Øª Ø§Ù„ÙƒØªØ§Ù„ÙˆØ¬"
+        ariaLabel="فئات الكتالوج"
       />
       {activeNode && (
         <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -98,27 +98,27 @@ export function CategoriesScreen() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0, flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '13px', fontWeight: 800, color: theme.brandHeaderBackground }}>{activeNode.label}</span>
-                <WebControlPanelStatusTag label="Ù…ÙØ¹Ù„Ø© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„" tone="success" />
+                <WebControlPanelStatusTag label="مفعلة بالكامل" tone="success" />
                 <WebControlPanelStatusTag label={resolveCategoryOwnerLabel('catalog')} tone="neutral" />
               </div>
               {activeNode.subtitle && (
                 <span style={{ fontSize: '11px', color: theme.textMuted, lineHeight: 1.35 }}>{activeNode.subtitle}</span>
               )}
               <span style={{ fontSize: '10px', fontWeight: 800, color: theme.textMuted }}>
-                {activeNode.subcategories.length > 0 ? `${activeNode.subcategories.length} ÙØ±ÙˆØ¹` : 'ÙØ¦Ø© Ø±Ø¦ÙŠØ³ÙŠØ©'}
-                {' Â· '}Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø©: ØªÙ… Ø§Ù„ØªØ­Ù‚Ù‚ âœ“
+                {activeNode.subcategories.length > 0 ? `${activeNode.subcategories.length} فروع` : 'فئة رئيسية'}
+                {' · '}حالة المزامنة: تم التحقق ✓
               </span>
             </div>
             {/* Actions: replaced WebControlPanelActionCluster with explicit Button handlers */}
             <Box style={{ flexDirection: 'row', gap: 6, alignItems: 'center', flexShrink: 0 }}>
               <Button
-                label="Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„"
+                label="طلب تعديل"
                 tone="secondary"
                 size="sm"
                 onPress={handleRequestEdit}
               />
               <Button
-                label="Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„ÙØ¦Ø©"
+                label="اعتماد الفئة"
                 tone="primary"
                 size="sm"
                 onPress={handleApproveNode}
@@ -126,7 +126,7 @@ export function CategoriesScreen() {
             </Box>
           </div>
 
-          {/* Action result banner â€” UI_PREVIEW_ONLY */}
+          {/* Action result banner — UI_PREVIEW_ONLY */}
           {lastActionResult && (
             <div
               role="status"
@@ -143,11 +143,11 @@ export function CategoriesScreen() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 700, color: lastActionResult.status === 'success' ? theme.brandHeaderBackground : theme.textMuted }}>
-                  {lastActionResult.status === 'success' ? 'âœ“' : 'â†©'} Ù†ØªÙŠØ¬Ø©: {lastActionResult.label}
+                  {lastActionResult.status === 'success' ? '✓' : '↩'} نتيجة: {lastActionResult.label}
                 </span>
               </div>
               <span style={{ fontSize: '11px', color: theme.textMuted }}>
-                Ø§Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„ØªØ§Ù„ÙŠ: {resolveNextOwnerLabel(lastActionResult.nextOwner)}
+                المالك التالي: {resolveNextOwnerLabel(lastActionResult.nextOwner)}
               </span>
               <span style={{ fontSize: '10px', color: theme.textMuted }}>
                 {lastActionResult.note}
