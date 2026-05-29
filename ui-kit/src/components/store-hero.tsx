@@ -109,13 +109,13 @@ export function StoreHero({
 
   const appearanceChrome = React.useMemo(() => {
     return {
-      heroOverlay: tokens.components?.overlays?.heroOverlay || 'rgba(0,0,0,0.3)',
+      heroOverlay: 'rgba(0,0,0,0.3)',
       heroFadeRGB: isDarkGlass ? '22, 22, 28' : '255, 255, 255',
       heroFadeMaxAlpha: isDarkGlass ? 0.82 : 0.88,
       actionBackgroundGlass: isDarkGlass ? hexToRgba(colorPalette.black, 0.35) : hexToRgba(colorPalette.white, 0.45),
       actionBorderGlass: isDarkGlass ? hexToRgba(colorPalette.white, 0.22) : hexToRgba(colorPalette.black, 0.12),
       primaryText: isDarkGlass ? colorPalette.white : colorPalette.ink,
-      secondaryText: isDarkGlass ? tokens.glassMutedText || 'rgba(255,255,255,0.7)' : colorPalette.inkMuted,
+      secondaryText: isDarkGlass ? 'rgba(255,255,255,0.7)' : colorPalette.inkMuted,
     };
   }, [isDarkGlass, tokens]);
 

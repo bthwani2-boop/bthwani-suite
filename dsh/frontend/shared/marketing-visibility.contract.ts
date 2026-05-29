@@ -266,7 +266,7 @@ function resolvePartnerBlockedReason(status: DshPartnerActivationStatus | undefi
   }
 
   const metadata = getDshPartnerActivationStateMetadata(status);
-  return `الشريك المرتبط غير ظاهر للعملاء: ${metadata.label}.`;
+  return `الشريك المرتبط غير ظاهر للعملاء: ${metadata.nextAction ?? status}.`;
 }
 
 function resolveProductBlockedReason(status: DshProductIdentityApprovalStatus | undefined): string {
@@ -302,7 +302,7 @@ function resolveClientBlockedReason(
   }
 
   const catalogPublishingRequired = input.catalogPublishingRequired ?? Boolean(input.linkedProductId);
-  if (catalogPublishingRequired && !isDshProductClientVisible(input.productApprovalStatus ?? 'draft')) {
+  if (catalogPublishingRequired && !isDshProductClientVisible(input.productApprovalStatus ?? 'field_draft')) {
     return resolveProductBlockedReason(input.productApprovalStatus);
   }
 

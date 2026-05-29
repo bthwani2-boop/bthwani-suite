@@ -203,7 +203,7 @@ export function DshPlatformProvidersWorkspace() {
                   <div className={styles.surfaceInfoCardTextBlock}>
                     <div className={styles.surfaceInfoCardTitle}>{record.label}</div>
                     <div className={styles.surfaceInfoCardDescription}>
-                      المزود: <span dir="ltr">{record.selectedProvider}</span> · البديل: <span dir="ltr">{record.fallbackProvider || 'بدون'}</span>
+                      المزود: <span>{record.selectedProvider}</span> · البديل: <span>{record.fallbackProvider || 'بدون'}</span>
                     </div>
                   </div>
                   <div className={styles.surfaceMetaWrap}>
@@ -228,11 +228,11 @@ export function DshPlatformProvidersWorkspace() {
             <div className={styles.surfaceInspectorMeta}>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المزود الحالي</strong>
-                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.selectedProvider}</span>
+                <span style={{ unicodeBidi: 'isolate' }}>{selectedRecord.selectedProvider}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المزود البديل</strong>
-                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{fallbackProvider}</span>
+                <span style={{ unicodeBidi: 'isolate' }}>{fallbackProvider}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>الحالة التشغيلية</strong>
@@ -248,11 +248,11 @@ export function DshPlatformProvidersWorkspace() {
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>الأولوية</strong>
-                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.priority}</span>
+                <span style={{ unicodeBidi: 'isolate' }}>{selectedRecord.priority}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>المالك الرئيسي</strong>
-                <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.owner}</span>
+                <span style={{ unicodeBidi: 'isolate' }}>{selectedRecord.owner}</span>
               </div>
               <div className={styles.surfaceInspectorRow}>
                 <strong>الفئة</strong>
@@ -263,7 +263,7 @@ export function DshPlatformProvidersWorkspace() {
             <Surface tone="default" border padding={3} radiusToken="md">
               <Box gap={1}>
                 <Text role="caption" tone="muted">مفتاح الربط المشفر (Credentials)</Text>
-                <Text role="bodySm" weight="bold" dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.maskedCredential}</Text>
+                <Text role="bodySm" weight="bold">{selectedRecord.maskedCredential}</Text>
               </Box>
             </Surface>
 
@@ -286,7 +286,7 @@ export function DshPlatformProvidersWorkspace() {
 
                   {showConfirm === 'masked-key-preview' ? (
                     <Surface tone="default" border padding={2} radiusToken="md">
-                      <Text role="bodySm" tone="muted" dir="ltr" style={{ unicodeBidi: 'isolate' }}>{selectedRecord.maskedCredential} (أمن الوصول موثق وسجل)</Text>
+                      <Text role="bodySm" tone="muted">{selectedRecord.maskedCredential} (أمن الوصول موثق وسجل)</Text>
                     </Surface>
                   ) : null}
 

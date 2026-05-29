@@ -22,7 +22,8 @@ import {
   useUiLanguage,
   type BThwaniAppearanceMode,
 } from "@bthwani/ui-kit";
-import { WebCommandCenterFrame, type WebSearchItem } from "@bthwani/ui-kit/web";
+import { WebCommandCenterFrame } from "@bthwani/ui-kit/web";
+import type { WebSearchItem } from "../../ui-kit/src/web/command-center";
 import {
   type AnyOperationsWorkspaceId,
   type OperationsPanelId,
@@ -849,7 +850,7 @@ export function ControlPanelSurfaceHost({
           alertCountLabel={String(alertCount)}
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchResults={filteredSearchResults}
+          searchResults={filteredSearchResults as unknown as WebSearchItem[]}
           onSearchResultSelect={handleSearchResultSelect}
           searchHint="ابحث عن قسم، خدمة، أو إجراء (مثال: DSH, المالية, العمليات...)"
           searchEmptyLabel="لا توجد نتائج مطابقة لبحثك"

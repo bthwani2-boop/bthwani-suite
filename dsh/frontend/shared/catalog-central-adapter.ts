@@ -87,7 +87,7 @@ export function buildCentralPartnerInventoryItems(
       if (seen.has(item.id)) continue;
       seen.add(item.id);
 
-      const taxonomy = CATEGORY_TAXONOMY_MAP[item.categoryId] ?? {};
+      const taxonomy = ((CATEGORY_TAXONOMY_MAP as Record<string, unknown>)[item.categoryId] ?? {}) as { domainId?: string; mainCategoryId?: string; subcategoryId?: string; facetTags?: readonly string[] };
       const ownershipFlags = resolvePublishStageOwnership(item.publishStage);
 
       // Skip visibility-test items (marketing-review / partner-review without exception)

@@ -34,10 +34,10 @@ const _TOKEN_MAP: Record<string, string | undefined> = {
   info: colorPalette.info,
   warning: colorPalette.warning,
   // Raw palette shade variants (used in preview home feature items)
-  'brand.400': brandPalette[400],
+  'brand.400': (brandPalette as Record<number, string>)[400],
   'brand.500': brandPalette[500],
   'brand.600': brandPalette[600],
-  'danger.400': dangerPalette[400],
+  'danger.400': (dangerPalette as Record<number, string>)[400],
   'danger.600': dangerPalette[600],
   'info.600': infoPalette[600],
   'info.700': infoPalette[700],
