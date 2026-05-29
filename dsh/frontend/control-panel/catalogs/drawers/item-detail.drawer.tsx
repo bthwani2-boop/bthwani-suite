@@ -7,14 +7,14 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster } from './catalogs.data';
+import type { CatalogProductMaster } from '../catalogs.data';
 import {
   resolveDshProductClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../shared/dsh-client-visibility.model';
+} from '../../../shared/dsh-client-visibility.model';
 import {
   mapApprovalStageToPartnerActivationStatus,
-} from '../../shared/dsh-client-visibility.model';
+} from '../../../shared/dsh-client-visibility.model';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

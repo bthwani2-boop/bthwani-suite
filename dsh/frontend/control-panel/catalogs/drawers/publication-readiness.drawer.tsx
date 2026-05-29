@@ -21,8 +21,8 @@
 
 import React, { useMemo } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import type { CatalogProductMaster } from './catalogs.data';
-import { mapApprovalStageToPartnerActivationStatus } from '../../shared/dsh-client-visibility.model';
+import type { CatalogProductMaster } from '../catalogs.data';
+import { mapApprovalStageToPartnerActivationStatus } from '../../../shared/dsh-client-visibility.model';
 
 export type CatalogPublicationReadinessMatrixProps = {
   products: readonly CatalogProductMaster[];

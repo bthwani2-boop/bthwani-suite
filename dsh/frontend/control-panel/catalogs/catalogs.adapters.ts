@@ -5,7 +5,7 @@ import type {
   CatalogSubCategory,
   CatalogSubClassification,
 } from './catalogs.data';
-import type { CatalogPreviewProposal } from './catalog-workspace.types';
+import type { CatalogPreviewProposal } from './catalogs.model';
 
 // Helper to recursively filter the Category & Classification Tree
 export function filterCategoryTree(categories: CatalogMainCategory[], query: string): CatalogMainCategory[] {
@@ -36,7 +36,7 @@ export function filterCategoryTree(categories: CatalogMainCategory[], query: str
       return { ...cat, subcategories: filteredSubs };
     }
     return null;
-  }).filter((x): x is CatalogMainCategory => Boolean(x));
+  }).filter((x): x is NonNullable<typeof x> => x !== null) as CatalogMainCategory[];
 }
 
 export type CatalogProductPreviewPatch = Partial<

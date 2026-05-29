@@ -1,11 +1,86 @@
+// ── Workspace IDs ─────────────────────────────────────────────────────────────
+
+export type CatalogWorkspaceId =
+  | 'overview'
+  | 'item-detail'
+  | 'identity-governance'
+  | 'duplicate-resolution'
+  | 'visibility-policy'
+  | 'partner-handoff'
+  | 'media-governance'
+  | 'quick-entry-drafts'
+  | 'taxonomy-governance'
+  | 'bulk-operations'
+  | 'audit-trail'
+  | 'publication-readiness';
+
+// ── Workspace State ───────────────────────────────────────────────────────────
+
+export type CatalogWorkspaceState = {
+  workspace: CatalogWorkspaceId;
+  productId?: string;
+  sourceSurface?: 'catalogs' | 'partners' | 'marketing' | 'app-partner' | 'app-field' | 'app-client';
+  reason?: string;
+};
+
+// ── Preview Proposal ──────────────────────────────────────────────────────────
+
+export type CatalogPreviewProposalType =
+  | 'create-product'
+  | 'edit-product'
+  | 'barcode-reservation'
+  | 'visibility-change'
+  | 'price-change'
+  | 'category-change'
+  | 'media-policy-change'
+  | 'bulk-approve'
+  | 'bulk-send-marketing'
+  | 'bulk-request-fix'
+  | 'conflict-resolution'
+  | 'taxonomy-mapping';
+
+export type CatalogPreviewProposalStatus =
+  | 'draft'
+  | 'blocked'
+  | 'ready-for-api';
+
+export type CatalogPreviewProposalOwner =
+  | 'control-panel-catalogs'
+  | 'control-panel-marketing'
+  | 'control-panel-partners';
+
+export type CatalogPreviewProposal = {
+  readonly id: string;
+  readonly type: CatalogPreviewProposalType;
+  readonly productId?: string;
+  readonly productIds?: readonly string[];
+  readonly label: string;
+  readonly status: CatalogPreviewProposalStatus;
+  readonly owner: CatalogPreviewProposalOwner;
+  readonly note: string;
+  readonly apiBoundary?: string;
+};
+
+export const CATALOG_WORKSPACE_OWNERS: Record<CatalogWorkspaceId, CatalogPreviewProposalOwner> = {
+  'overview': 'control-panel-catalogs',
+  'item-detail': 'control-panel-catalogs',
+  'identity-governance': 'control-panel-catalogs',
+  'duplicate-resolution': 'control-panel-catalogs',
+  'visibility-policy': 'control-panel-catalogs',
+  'partner-handoff': 'control-panel-catalogs',
+  'media-governance': 'control-panel-catalogs',
+  'quick-entry-drafts': 'control-panel-catalogs',
+  'taxonomy-governance': 'control-panel-catalogs',
+  'bulk-operations': 'control-panel-catalogs',
+  'audit-trail': 'control-panel-catalogs',
+  'publication-readiness': 'control-panel-catalogs',
+};
+
+// ── Filter & Column Model ─────────────────────────────────────────────────────
+
 export type FilterType = 'all' | 'active' | 'review' | 'conflict' | 'master' | 'partner' | 'needs-link' | 'needs-image';
 
 import type { CatalogApprovalStage, CatalogMediaPolicy, CatalogProductMaster } from './catalogs.data';
-import type {
-  CatalogPreviewProposal,
-  CatalogPreviewProposalStatus,
-  CatalogPreviewProposalType,
-} from './catalog-workspace.types';
 
 export const initialColumnFilters = {
   name: [],

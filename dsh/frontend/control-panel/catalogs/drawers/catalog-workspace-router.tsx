@@ -16,20 +16,20 @@
  */
 
 import React from 'react';
-import type { CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
-import type { CatalogProductMaster } from './catalogs.data';
-import type { DuplicatePair } from './CatalogDuplicateResolutionWorkspace';
-import { CatalogItemDetailWorkspace } from './CatalogItemDetailWorkspace';
-import { CatalogIdentityGovernanceWorkspace } from './CatalogIdentityGovernanceWorkspace';
-import { CatalogDuplicateResolutionWorkspace } from './CatalogDuplicateResolutionWorkspace';
-import { CatalogVisibilityPolicyWorkspace } from './CatalogVisibilityPolicyWorkspace';
-import { CatalogPartnerHandoffWorkspace } from './CatalogPartnerHandoffWorkspace';
-import { CatalogMediaGovernanceWorkspace } from './CatalogMediaGovernanceWorkspace';
-import { CatalogQuickEntryDraftWorkspace } from './CatalogQuickEntryDraftWorkspace';
-import { CatalogTaxonomyGovernanceWorkspace } from './CatalogTaxonomyGovernanceWorkspace';
-import { CatalogBulkOperationsWorkspace } from './CatalogBulkOperationsWorkspace';
-import { CatalogAuditTrailWorkspace } from './CatalogAuditTrailWorkspace';
-import { CatalogPublicationReadinessMatrix } from './CatalogPublicationReadinessMatrix';
+import type { CatalogWorkspaceState, CatalogPreviewProposal } from '../catalogs.model';
+import type { CatalogProductMaster } from '../catalogs.data';
+import type { DuplicatePair } from './duplicate-resolution.drawer';
+import { CatalogItemDetailWorkspace } from './item-detail.drawer';
+import { CatalogIdentityGovernanceWorkspace } from './identity-governance.drawer';
+import { CatalogDuplicateResolutionWorkspace } from './duplicate-resolution.drawer';
+import { CatalogVisibilityPolicyWorkspace } from './visibility-policy.drawer';
+import { CatalogPartnerHandoffWorkspace } from './partner-handoff.drawer';
+import { CatalogMediaGovernanceWorkspace } from './media-governance.drawer';
+import { CatalogQuickEntryDraftWorkspace } from './quick-entry-draft.drawer';
+import { CatalogTaxonomyGovernanceWorkspace } from './taxonomy-governance.drawer';
+import { CatalogBulkOperationsWorkspace } from './bulk-operations.drawer';
+import { CatalogAuditTrailWorkspace } from './audit-trail.drawer';
+import { CatalogPublicationReadinessMatrix } from './publication-readiness.drawer';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 

@@ -11,7 +11,7 @@ import {
 import { ControlPanelDshSupportHubScreen } from './support/SupportHubScreens';
 import { ControlPanelDshFinanceHubScreen } from './finance/FinanceHubScreen';
 import type { CanonicalFinanceGroupId, FinancePanelId } from './finance/finance.types';
-import { ControlPanelDshCatalogScreen } from './catalogs/ControlPanelDshCatalogScreen';
+import { ControlPanelDshCatalogScreen } from './catalogs/catalogs.screen';
 import { ControlPanelDshPartnerApprovalsScreen } from './partners/ControlPanelDshPartnerApprovalsScreen';
 import { ControlPanelDshMarketingScreen } from './marketing/ControlPanelDshMarketingScreen';
 import { ControlPanelDshPlatformScreen } from './platform/ControlPanelDshPlatformScreen';

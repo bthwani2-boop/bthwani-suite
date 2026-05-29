@@ -18,8 +18,8 @@
 
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import type { CatalogPreviewProposal } from './catalog-workspace.types';
-import { dshCatalogCategories } from './catalogs.data';
+import type { CatalogPreviewProposal } from '../catalogs.model';
+import { dshCatalogCategories } from '../catalogs.data';
 
 export type CatalogTaxonomyGovernanceWorkspaceProps = {
   onClose: () => void;

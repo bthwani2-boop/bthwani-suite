@@ -27,6 +27,22 @@ type GateActionResult = {
   note: string;
 } | null;
 
+const gateStatusLabel: Record<PublishGateStatus, string> = {
+  'not-started': 'لم يبدأ',
+  'in-review': 'قيد المراجعة',
+  'approved': 'معتمد',
+  'rejected': 'مرفوض',
+  'published': 'منشور',
+};
+
+const gateStatusTone: Record<PublishGateStatus, 'default' | 'success' | 'warning' | 'danger'> = {
+  'not-started': 'default',
+  'in-review': 'warning',
+  'approved': 'success',
+  'rejected': 'danger',
+  'published': 'success',
+};
+
 function resolveGateOwnerLabel(owner: 'control-panel-catalog' | 'control-panel-marketing' | 'control-panel-operations'): string {
   switch (owner) {
     case 'control-panel-catalog': return 'الكتالوج';

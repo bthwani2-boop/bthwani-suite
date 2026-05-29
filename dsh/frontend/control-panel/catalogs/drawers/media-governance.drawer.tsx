@@ -8,8 +8,8 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster, CatalogMediaPolicy } from './catalogs.data';
-import { catalogMediaPolicyOptions } from './catalogs.model';
+import type { CatalogProductMaster, CatalogMediaPolicy } from '../catalogs.data';
+import { catalogMediaPolicyOptions } from '../catalogs.model';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -254,7 +254,7 @@ export function CatalogMediaGovernanceWorkspace({
         {/* Missing media section */}
         {missingMedia.length > 0 && (
           <Box gap={2} style={{ backgroundColor: theme.dangerSurface, borderRadius: 8, padding: 12 }}>
-            <SectionTitle>بدون وسائط ({missingMedia.length})</SectionTitle>
+            <SectionTitle>{`بدون وسائط (${missingMedia.length})`}</SectionTitle>
             {missingMedia.map((item) => (
               <Box key={item.id} layoutDirection="row" gap={8} style={{ alignItems: 'center', paddingVertical: 2 }}>
                 <Text role="caption" style={{ color: theme.danger, flexShrink: 1 }}>✗ {item.name}</Text>
@@ -284,7 +284,7 @@ export function CatalogMediaGovernanceWorkspace({
           return (
             <Box key={policy} gap={3} style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12 }}>
               <Box layoutDirection="row" gap={8} style={{ alignItems: 'center' }}>
-                <SectionTitle>{config.label} ({groupItems.length})</SectionTitle>
+                <SectionTitle>{`${config.label} (${groupItems.length})`}</SectionTitle>
                 <Text role="caption" style={{ color: toneColor, fontSize: 11 }}>{config.description}</Text>
               </Box>
               <Text role="caption" tone="muted" style={{ fontSize: 11 }}>المالك: {config.owner}</Text>

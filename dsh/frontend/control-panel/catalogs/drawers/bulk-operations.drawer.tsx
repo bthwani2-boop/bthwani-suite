@@ -20,8 +20,8 @@
 
 import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import type { CatalogPreviewProposal } from './catalog-workspace.types';
-import type { CatalogProductMaster } from './catalogs.data';
+import type { CatalogPreviewProposal } from '../catalogs.model';
+import type { CatalogProductMaster } from '../catalogs.data';
 
 export type CatalogBulkOperationsWorkspaceProps = {
   /** IDs of products currently selected in the table. Required for batch operations. */

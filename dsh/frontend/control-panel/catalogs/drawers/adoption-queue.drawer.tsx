@@ -8,8 +8,8 @@ import {
   activateClientVisible,
   returnToMarketing,
   rejectFromCatalog,
-} from '../../data/marketing.preview-data';
-import { ApprovalRecord, ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../shared/workflow';
+} from '../../../data/marketing.preview-data';
+import { ApprovalRecord, ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared/workflow';
 
 // UI_PREVIEW_ONLY: adoption queue actions — no backend/API binding.
 // control-panel/catalogs is the ONLY surface that can adopt or activate catalog items.

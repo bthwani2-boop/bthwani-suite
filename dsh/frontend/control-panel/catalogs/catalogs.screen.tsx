@@ -3,19 +3,21 @@
 import React from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster, CatalogMediaPolicy, CatalogApprovalStage } from './catalogs.data';
+import { dshCatalogCategories, type CatalogProductMaster, type CatalogMediaPolicy, type CatalogApprovalStage } from './catalogs.data';
 import { getActualPublicMediaPath } from '../../shared/resolve-dsh-public-media-path';
 import styles from '../shared/control-panel-surface.module.css';
-import { CatalogWorkspaceRouter } from './CatalogWorkspaceRouter';
-import type { CatalogPreviewProposal } from './catalog-workspace.types';
+import { CatalogWorkspaceRouter } from './drawers/catalog-workspace-router';
+import type { CatalogPreviewProposal } from './catalogs.model';
 import { mergeCatalogProductPreviewPatch } from './catalogs.adapters';
 import {
   createCatalogPreviewProposal,
   toCatalogApprovalStage,
   toCatalogMediaPolicy,
+  initialColumnFilters,
   type CatalogFilterColumnId,
+  type FilterType,
 } from './catalogs.model';
-import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalog.parts';
+import { FilterToken, PolicyBadge, InspectorTile, MiniInfoBox, WatermarkedImage, FilterDropdown } from './catalogs.parts';
 import { useCatalogScreen, PRIMARY_TABS, SECONDARY_TABS } from './catalogs.hooks';
 
 // --- Types ---
@@ -57,7 +59,7 @@ export function ControlPanelDshCatalogScreen({
     showBulkOps, setShowBulkOps,
     selectedProductIds, setSelectedProductIds,
     workspaceState, setWorkspaceState, openWorkspace,
-    pendingProposals, pushPreviewProposal,
+    pendingProposals, pushPreviewProposal, dismissPreviewProposal,
     activeMainCategory, setActiveMainCategory,
     activeSubCategory, setActiveSubCategory,
     activeFilter, setActiveFilter,
@@ -210,7 +212,7 @@ export function ControlPanelDshCatalogScreen({
           </div>
 
           <div style={{ backgroundColor: theme.surfaceInset, padding: '8px 12px', borderRadius: '6px', borderRight: `3px solid ${theme.brand}` }}>
-            <Text role="caption" style={{ fontSize: '10px', color: theme.brandHeaderBackground }}>
+            <Text role="caption" style={{ fontSize: 10, color: theme.brandHeaderBackground }}>
               ℹ️ <strong>أثر السطح:</strong> {impactInfo}
             </Text>
           </div>
@@ -240,7 +242,7 @@ export function ControlPanelDshCatalogScreen({
 
         {/* Derived Items List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Text role="bodyStrong" style={{ fontSize: '13px', color: theme.brandHeaderBackground }}>العناصر المستلمة في هذا المسار ({filteredProducts.length})</Text>
+          <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>العناصر المستلمة في هذا المسار ({filteredProducts.length})</Text>
           {filteredProducts.length === 0 ? (
             <div style={{ padding: '32px', textAlign: 'center', backgroundColor: theme.surfaceInset, borderRadius: '8px', border: `1px dashed ${theme.line}` }}>
               <Text role="caption" tone="muted">لا توجد منتجات معلقة في هذا المسار حالياً.</Text>
@@ -290,7 +292,7 @@ export function ControlPanelDshCatalogScreen({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={36} productName={p.name} />
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <Text role="bodyStrong" style={{ fontSize: '12px', color: theme.brandHeaderBackground }}>{p.name}</Text>
+                        <Text role="bodyStrong" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>{p.name}</Text>
                         <span style={{ fontFamily: 'monospace', fontSize: '10px', color: theme.textMuted, direction: 'ltr' }}>{p.sku}</span>
                       </div>
                     </div>
@@ -393,8 +395,8 @@ export function ControlPanelDshCatalogScreen({
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <Text role="bodyStrong" style={{ fontSize: '16px', color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
-              <Text role="caption" tone="muted" style={{ fontSize: '11px', marginTop: '4px', display: 'block' }}>{description}</Text>
+              <Text role="bodyStrong" style={{ fontSize: 16, color: theme.brandHeaderBackground, fontWeight: '800' }}>{title}</Text>
+              <Text role="caption" tone="muted" style={{ fontSize: 11, marginTop: 4 }}>{description}</Text>
             </div>
             <span style={{ fontSize: '9px', color: theme.success, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>
               معاينة محلية فقط
@@ -403,7 +405,7 @@ export function ControlPanelDshCatalogScreen({
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: `1px solid ${theme.line}`, paddingTop: '10px' }}>
             <span style={{ fontSize: '11px', fontWeight: 'bold', color: theme.brandHeaderBackground }}>💡 الأهمية والهدف:</span>
-            <Text role="caption" style={{ fontSize: '10.5px', color: theme.textMuted }}>{whyItMatters}</Text>
+            <Text role="caption" style={{ fontSize: 10, color: theme.textMuted }}>{whyItMatters}</Text>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: theme.surfaceInset, padding: '10px 12px', borderRadius: '8px' }}>
@@ -472,7 +474,7 @@ export function ControlPanelDshCatalogScreen({
 
         {/* Derived Items List / Status View */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Text role="bodyStrong" style={{ fontSize: '13px', color: theme.brandHeaderBackground }}>العناصر والنتائج الحالية في هذا المسار ({filteredProducts.length})</Text>
+          <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>العناصر والنتائج الحالية في هذا المسار ({filteredProducts.length})</Text>
           {filteredProducts.length === 0 ? (
             <div style={{ padding: '32px', textAlign: 'center', backgroundColor: theme.surfaceInset, borderRadius: '8px', border: `1px dashed ${theme.line}` }}>
               <Text role="caption" tone="muted">✓ كل شيء سليم! لا توجد منتجات متعارضة أو مفقودة حالياً.</Text>
@@ -534,7 +536,7 @@ export function ControlPanelDshCatalogScreen({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={36} productName={p.name} />
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <Text role="bodyStrong" style={{ fontSize: '12px', color: theme.brandHeaderBackground }}>{p.name}</Text>
+                        <Text role="bodyStrong" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>{p.name}</Text>
                         <span style={{ fontSize: '10px', color: theme.textMuted }}>{detailText}</span>
                       </div>
                     </div>
@@ -2716,7 +2718,7 @@ export function ControlPanelDshCatalogScreen({
           justifyContent: 'center',
           zIndex: 9999,
         }}>
-          <Surface tone="raised" padding={4} gap={3} style={{ width: 420, maxWidth: '90%', maxHeight: '90%', overflowY: 'auto' }}>
+          <Surface tone="raised" padding={4} gap={3} style={{ width: 420, maxWidth: '90%', maxHeight: '90%', overflow: 'scroll' }}>
             <Box layoutDirection="row" justify="space-between" align="center" style={{ borderBottomWidth: 1, borderBottomColor: theme.line, paddingBottom: 8 }}>
               <Text role="bodyStrong" style={{ fontSize: 16 }}>{modalMode === 'add' ? 'إضافة منتج جديد' : 'تعديل منتج الكتالوج'}</Text>
               <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setShowProductModal(false)} />
@@ -2986,14 +2988,14 @@ export function ControlPanelDshCatalogScreen({
                 label="✕"
                 tone="secondary"
                 size="sm"
-                onPress={() => setPendingProposals((p) => p.slice(1))}
+                onPress={() => dismissPreviewProposal()}
                 style={{ minWidth: 0, padding: 0, backgroundColor: 'transparent', borderWidth: 0 }}
               />
             </Box>
             <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
               {pendingProposals[0].note}
             </Text>
-            <Text role="caption" style={{ fontSize: 10, fontWeight: '600', direction: 'ltr', unicodeBidi: 'embed' }}>
+            <Text role="caption" style={{ fontSize: 10, fontWeight: '600', direction: 'ltr' }}>
               status: {pendingProposals[0].status} | owner: {pendingProposals[0].owner}
               {pendingProposals[0].apiBoundary ? ` | API: ${pendingProposals[0].apiBoundary}` : ''}
             </Text>

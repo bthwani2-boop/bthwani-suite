@@ -8,14 +8,14 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, TextField, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster } from './catalogs.data';
-import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import type { CatalogProductMaster } from '../catalogs.data';
+import type { DshPartnerActivationStatus } from '../../../shared/dsh-partner-activation.model';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../shared/dsh-client-visibility.model';
-import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../shared/dsh-product-identity.model';
+} from '../../../shared/dsh-client-visibility.model';
+import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../../shared/dsh-product-identity.model';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

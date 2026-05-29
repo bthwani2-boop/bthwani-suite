@@ -20,7 +20,7 @@ export type DshCatalogMeasurementPolicy = {
 // UI_PREVIEW_ONLY — not runtime truth, not backend source.
 // Consumers should import dshCatalogMetrics from control-panel/catalogs (if in control-panel context)
 // or from shared/index.ts (which re-exports the CP version below).
-export { dshCatalogMetrics } from '../control-panel/catalogs/catalog';
+export { dshCatalogMetrics } from '../control-panel/catalogs/catalogs.data';
 
 
 export const dshCategoryMeasurementPolicies: Readonly<Record<string, DshCatalogMeasurementPolicy>> = {

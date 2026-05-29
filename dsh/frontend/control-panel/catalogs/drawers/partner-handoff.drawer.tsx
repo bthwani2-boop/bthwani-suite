@@ -8,14 +8,14 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import type { CatalogProductMaster, CatalogApprovalStage } from './catalogs.data';
+import type { CatalogProductMaster, CatalogApprovalStage } from '../catalogs.data';
 import {
   type DshPartnerActivationStatus,
   getDshPartnerActivationStateMetadata,
   getDshPartnerReadinessChecklist,
   getDshPartnerVisibilityBadge,
   getDshPartnerVisibilityBadgeLabel,
-} from '../../shared/dsh-partner-activation.model';
+} from '../../../shared/dsh-partner-activation.model';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

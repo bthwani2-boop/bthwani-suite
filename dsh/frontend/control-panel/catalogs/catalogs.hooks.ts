@@ -33,7 +33,7 @@ import {
   type CatalogTaxonomyNodeRef,
   type FilterType,
 } from './catalogs.model';
-import type { CatalogWorkspaceId, CatalogWorkspaceState, CatalogPreviewProposal } from './catalog-workspace.types';
+import type { CatalogWorkspaceId, CatalogWorkspaceState, CatalogPreviewProposal } from './catalogs.model';
 
 const catalogPageSize = 5;
 
@@ -116,6 +116,10 @@ export function useCatalogScreen() {
 
   const pushPreviewProposal = React.useCallback((proposal: CatalogPreviewProposal) => {
     setPendingProposals((prev) => appendCatalogPreviewProposal(prev, proposal));
+  }, []);
+
+  const dismissPreviewProposal = React.useCallback(() => {
+    setPendingProposals((prev) => prev.slice(1));
   }, []);
 
   const queueProductPreviewPatch = React.useCallback((
@@ -1034,7 +1038,7 @@ export function useCatalogScreen() {
     // Workspace
     workspaceState, setWorkspaceState, openWorkspace,
     // Proposals
-    pendingProposals, pushPreviewProposal,
+    pendingProposals, pushPreviewProposal, dismissPreviewProposal,
     // Category navigation
     activeMainCategory, setActiveMainCategory,
     activeSubCategory, setActiveSubCategory,
