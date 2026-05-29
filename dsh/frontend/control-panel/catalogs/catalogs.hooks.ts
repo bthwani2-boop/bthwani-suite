@@ -18,7 +18,6 @@ import {
   createPreviewMainClassification,
   createPreviewSubCategory,
   createPreviewSubClassification,
-  filterCategoryTree,
   hasDuplicateCatalogLabel,
   mergeCatalogProductPreviewPatch,
   toggleReadonlyStringSet,
@@ -30,7 +29,6 @@ import {
   initialColumnFilters,
   type CatalogEditEntry,
   type CatalogFilterColumnId,
-  type CatalogTaxonomyNodeRef,
   type FilterType,
 } from './catalogs.model';
 import type { CatalogWorkspaceId, CatalogWorkspaceState, CatalogPreviewProposal } from './catalogs.model';
@@ -194,46 +192,6 @@ export function useCatalogScreen() {
 
   const [activeMainClassifId, setActiveMainClassifId] = useState<string | null>(null);
   const [activeSubClassifId, setActiveSubClassifId] = useState<string | null>(null);
-
-  const [selectedTaxonomyNode, setSelectedTaxonomyNode] = useState<CatalogTaxonomyNodeRef | null>(null);
-
-  const [expandedMainCategoryIds, setExpandedMainCategoryIds] = useState<ReadonlySet<string>>(new Set());
-  const [expandedSubCategoryIds, setExpandedSubCategoryIds] = useState<ReadonlySet<string>>(new Set());
-  const [expandedMainClassifIds, setExpandedMainClassifIds] = useState<ReadonlySet<string>>(new Set());
-
-  const [treeSearchQuery, setTreeSearchQuery] = useState('');
-  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-
-  const filteredCategories = useMemo(() => {
-    return filterCategoryTree(previewCategories, treeSearchQuery);
-  }, [previewCategories, treeSearchQuery]);
-
-  const toggleMainCategoryExpand = (id: string) => {
-    setExpandedMainCategoryIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleSubCategoryExpand = (id: string) => {
-    setExpandedSubCategoryIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleMainClassifExpand = (id: string) => {
-    setExpandedMainClassifIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
 
   React.useEffect(() => {
     if (SECONDARY_TABS[activeTab]?.length > 0) {
