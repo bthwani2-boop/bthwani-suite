@@ -140,21 +140,7 @@ export function useCatalogScreen() {
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [modalForm, setModalForm] = useState<
-    Record<'id' | 'name', string> & {
-      sku: string;
-      gtin: string;
-      price: number;
-      mainCat: string;
-      subCat: string;
-      mainClassif: string;
-      subClassif: string;
-      mediaPolicy: CatalogMediaPolicy;
-      approvalStage: CatalogApprovalStage;
-      imageUri: string;
-      mediaKey: string;
-    }
-  >({
+  const [modalForm, setModalForm] = useState({
     id: '',
     name: '',
     sku: '',
@@ -164,8 +150,8 @@ export function useCatalogScreen() {
     subCat: '',
     mainClassif: '',
     subClassif: '',
-    mediaPolicy: 'catalog-owned-media',
-    approvalStage: 'catalog-draft',
+    mediaPolicy: 'catalog-owned-media' as CatalogMediaPolicy,
+    approvalStage: 'catalog-draft' as CatalogApprovalStage,
     imageUri: '',
     mediaKey: '',
   });
