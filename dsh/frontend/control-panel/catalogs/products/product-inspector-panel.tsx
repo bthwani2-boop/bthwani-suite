@@ -22,7 +22,6 @@ export type ProductInspectorPanelProps = {
     apiBoundary?: string,
   ) => void;
   previewCategories: CatalogMainCategory[];
-  setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>;
   setModalForm: React.Dispatch<React.SetStateAction<CatalogModalForm>>;
   setShowProductModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -33,7 +32,6 @@ export function ProductInspectorPanel({
   openWorkspace,
   queueProductPreviewPatch,
   previewCategories,
-  setModalMode,
   setModalForm,
   setShowProductModal,
 }: ProductInspectorPanelProps) {
@@ -227,7 +225,6 @@ export function ProductInspectorPanel({
             size="sm"
             fullWidth
             onPress={() => {
-              setModalMode('edit');
               setModalForm({
                 id: selectedProduct.id,
                 name: selectedProduct.name,

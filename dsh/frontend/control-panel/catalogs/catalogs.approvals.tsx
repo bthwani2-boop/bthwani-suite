@@ -1,9 +1,7 @@
-// P0-05: Catalog item approval section — control-panel/catalogs owns all approval decisions.
-// Evidence note is required for rejection and revision requests (feeds audit trail).
-// app-partner and app-field cannot approve catalog items; only this surface can.
 import React from 'react';
-import { Box, Button, ListItem, Text, TextField, useTheme } from '@bthwani/ui-kit';
-import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
+import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { WebCompactSurfaceHeader, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
+import { FilterDropdown } from './catalogs.parts';
 import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusTone,
@@ -75,6 +73,7 @@ function mapWorkflowStageToIdentityStatus(stage: ApprovalStage): DshProductIdent
 
 export type ItemApprovalScreenProps = {
   items?: CatalogItemApprovalRecord[];
+  activeSubTab?: string;
   onApprove?: (id: string) => void;
   onReject?: (id: string, evidenceNote: string) => void;
   onRequestRevision?: (id: string, evidenceNote: string) => void;
@@ -82,6 +81,7 @@ export type ItemApprovalScreenProps = {
 
 export function ItemApprovalScreen({
   items: propsItems,
+  activeSubTab = 'marketing',
   onApprove: propsOnApprove,
   onReject: propsOnReject,
   onRequestRevision: propsOnRequestRevision,
@@ -101,47 +101,80 @@ export function ItemApprovalScreen({
   const items = React.useMemo(() => {
     if (propsItems) return propsItems;
 
-    // Map records from the shared workflow SSoT
-    return records
-      .filter((r) => r.entityType === 'product' || r.entityType === 'product-media' || r.entityType === 'category-suggestion')
-      .map((r) => {
-        let status: ItemApprovalStatus = 'pending';
-        if (r.stage === 'needs-fix') status = 'needs-revision';
-        else if (r.stage === 'rejected') status = 'rejected';
-        else if (['partner-approved', 'marketing-approved', 'catalog-adopted', 'client-visible'].includes(r.stage)) {
-          status = 'approved';
-        }
+    // Filter records from the shared workflow SSoT based on sub-tab
+    let filteredRecords = records.filter(
+      (r) => r.entityType === 'product' || r.entityType === 'product-media' || r.entityType === 'category-suggestion'
+    );
 
-        return {
-          id: r.id,
-          displayCaption: r.title,
-          partnerLabel: r.source === 'app-partner' ? 'تطبيق الشريك' : 'تطبيق الميداني',
-          category: r.entityType === 'product' ? 'منتج كتالوج' : r.entityType === 'product-media' ? 'صورة منتج' : 'اقتراح فئة',
-          submittedAt: r.submittedAt ? r.submittedAt.split('T')[0] : '2026-05-25',
-          status,
-          approvalStatus: mapWorkflowStageToIdentityStatus(r.stage),
-          approvalNote: r.metadata?.requiredFix || r.metadata?.rejectionReason,
-          auditRequired: false,
-        } satisfies CatalogItemApprovalRecord;
-      });
-  }, [records, propsItems]);
+    if (activeSubTab === 'marketing') {
+      filteredRecords = filteredRecords.filter((r) => r.stage === 'marketing-review' || r.stage === 'marketing-approved');
+    } else if (activeSubTab === 'quality') {
+      filteredRecords = filteredRecords.filter(
+        (r) => r.stage === 'partner-review' || r.stage === 'partner-submitted' || r.stage === 'field-submitted' || r.stage === 'partner-approved'
+      );
+    } else if (activeSubTab === 'pricing') {
+      filteredRecords = filteredRecords.filter(
+        (r) => r.id.includes('price') || r.title.includes('تعارض سعر')
+      );
+    } else if (activeSubTab === 'barcode') {
+      filteredRecords = filteredRecords.filter(
+        (r) => r.id.includes('barcode') || r.title.includes('تعارض باركود')
+      );
+    } else if (activeSubTab === 'media') {
+      filteredRecords = filteredRecords.filter(
+        (r) => r.entityType === 'product-media' || r.id.includes('media')
+      );
+    }
+
+    return filteredRecords.map((r) => {
+      let status: ItemApprovalStatus = 'pending';
+      if (r.stage === 'needs-fix') status = 'needs-revision';
+      else if (r.stage === 'rejected') status = 'rejected';
+      else if (['partner-approved', 'marketing-approved', 'catalog-adopted', 'client-visible'].includes(r.stage)) {
+        status = 'approved';
+      }
+
+      return {
+        id: r.id,
+        displayCaption: r.title,
+        partnerLabel: r.source === 'app-partner' ? 'تطبيق الشريك' : 'تطبيق الميداني',
+        category: r.entityType === 'product' ? 'منتج كتالوج' : r.entityType === 'product-media' ? 'صورة منتج' : 'اقتراح فئة',
+        submittedAt: r.submittedAt ? r.submittedAt.split('T')[0] : '2026-05-25',
+        status,
+        approvalStatus: mapWorkflowStageToIdentityStatus(r.stage),
+        approvalNote: r.metadata?.requiredFix || r.metadata?.rejectionReason,
+        auditRequired: false,
+      } satisfies CatalogItemApprovalRecord;
+    });
+  }, [records, propsItems, activeSubTab]);
+
+  const [crossSurfaceNotification, setCrossSurfaceNotification] = React.useState<{
+    itemCaption: string;
+    targetSurface: string;
+    apiBoundary: string;
+  } | null>(null);
 
   const onApprove = React.useCallback((id: string) => {
     if (propsOnApprove) {
       propsOnApprove(id);
       return;
     }
-    // control-panel/catalogs owns catalog adoption — correct owner and stage
+    const record = records.find((r) => r.id === id);
     moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-catalog', 'اعتماد الكتالوج');
     refresh();
-  }, [propsOnApprove, refresh]);
+    // GAP-L06 fix: show cross-surface notification so user knows where the item went
+    setCrossSurfaceNotification({
+      itemCaption: record?.title ?? id,
+      targetSurface: 'control-panel/catalogs → طابور الاعتماد الموحد',
+      apiBoundary: 'PATCH /catalog/products/:id/stage → catalog-adopted',
+    });
+  }, [propsOnApprove, records, refresh]);
 
   const onReject = React.useCallback((id: string, evidenceNote: string) => {
     if (propsOnReject) {
       propsOnReject(id, evidenceNote);
       return;
     }
-    // control-panel/catalogs owns rejection decisions — correct owner
     moveApprovalRecordToStage(id, 'rejected', 'control-panel-catalog', 'رفض الكتالوج');
     upsertApprovalRecord({ id, metadata: { rejectionReason: evidenceNote } });
     refresh();
@@ -152,15 +185,21 @@ export function ItemApprovalScreen({
       propsOnRequestRevision(id, evidenceNote);
       return;
     }
-    // control-panel/catalogs owns revision requests — correct owner
     moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-catalog', 'طلب تعديل الكتالوج');
     upsertApprovalRecord({ id, metadata: { requiredFix: evidenceNote } });
     refresh();
   }, [propsOnRequestRevision, refresh]);
 
   const pendingCount = items.filter((i) => i.status === 'pending').length;
+
   // Evidence notes keyed by item id — required for reject/revision actions
   const [evidenceNotes, setEvidenceNotes] = React.useState<Record<string, string>>({});
+
+  // Filter states
+  const [partnerFilter, setPartnerFilter] = React.useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = React.useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = React.useState<string[]>([]);
+  const [openFilter, setOpenFilter] = React.useState<'partner' | 'category' | 'status' | null>(null);
 
   function getNote(id: string) {
     return evidenceNotes[id] ?? '';
@@ -170,6 +209,15 @@ export function ItemApprovalScreen({
     setEvidenceNotes((prev) => ({ ...prev, [id]: value }));
   }
 
+  const filteredItems = React.useMemo(() => {
+    return items.filter((item) => {
+      const matchPartner = partnerFilter.length === 0 || partnerFilter.includes(item.partnerLabel);
+      const matchCategory = categoryFilter.length === 0 || categoryFilter.includes(item.category);
+      const matchStatus = statusFilter.length === 0 || statusFilter.includes(item.status);
+      return matchPartner && matchCategory && matchStatus;
+    });
+  }, [items, partnerFilter, categoryFilter, statusFilter]);
+
   return (
     <>
       <WebCompactSurfaceHeader
@@ -177,89 +225,310 @@ export function ItemApprovalScreen({
         description="مراجعة واعتماد العناصر المقدَّمة من الشركاء قبل نشرها. الرفض والتعديل يتطلبان ملاحظة إثبات."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
-      <Box gap={2} padding={3} style={{ backgroundColor: theme.surfaceInset }}>
-        {items.map((item) => {
-          const note = getNote(item.id);
-          const canRejectOrRevise = note.trim().length > 0;
-          const approvalTone = item.approvalStatus
-            ? getDshProductApprovalStatusTone(item.approvalStatus)
-            : statusTone[item.status];
 
-          return (
-            <Box key={item.id} gap={1}>
-              <ListItem
-                title={item.displayCaption}
-                subtitle={`${item.partnerLabel} · ${item.category} · ${item.submittedAt}`}
-                badgeLabel={statusLabel[item.status]}
-                badgeTone={approvalTone === 'muted' ? 'default' : approvalTone}
-                meta={
-                  item.status === 'pending' ? (
-                    <Box style={{ flexDirection: 'row', gap: '4px' }}>
-                      <Button
-                        label="اعتماد"
-                        tone="primary"
-                        size="sm"
-                        onPress={() => onApprove?.(item.id)}
-                      />
-                    </Box>
-                  ) : undefined
-                }
-              />
+      {/* GAP-L06: Cross-surface notification — appears after approve action */}
+      {crossSurfaceNotification && (
+        <div
+          role="status" aria-live="polite"
+          style={{
+            margin: '0 16px 10px',
+            padding: '10px 14px',
+            borderRadius: 8,
+            backgroundColor: `${theme.success as string}10`,
+            border: `1px solid ${theme.success as string}40`,
+            borderRight: `4px solid ${theme.success as string}`,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 10,
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: theme.success as string }}>
+              ✓ تم اعتماد العنصر وإرساله إلى الخطوة التالية
+            </div>
+            <div style={{ fontSize: 11, color: theme.brandHeaderBackground, fontWeight: 600 }}>
+              {crossSurfaceNotification.itemCaption}
+            </div>
+            <div style={{ fontSize: 10, color: theme.textMuted }}>
+              الوجهة: <strong>{crossSurfaceNotification.targetSurface}</strong>
+            </div>
+            <div style={{ fontSize: 9, color: theme.textMuted, direction: 'ltr', textAlign: 'right', marginTop: 2 }}>
+              {crossSurfaceNotification.apiBoundary} — UI_PREVIEW_ONLY
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCrossSurfaceNotification(null)}
+            style={{
+              appearance: 'none', border: 'none', background: 'transparent',
+              cursor: 'pointer', fontSize: 14, color: theme.textMuted,
+              padding: '0 2px', lineHeight: 1, flexShrink: 0,
+            }}
+            aria-label="إغلاق الإشعار"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
-              {/* Existing approval note (from previous review) */}
-              {item.approvalNote ? (
-                <Box style={{ paddingHorizontal: 8 }}>
-                  <Text role="caption" tone="warning">{`ملاحظة المراجع: ${item.approvalNote}`}</Text>
-                </Box>
-              ) : null}
+      {/* Approval pipeline indicator — shows where catalog sits in the full flow */}
 
-              {/* Audit flag notice */}
-              {item.auditRequired ? (
-                <Box style={{ paddingHorizontal: 8 }}>
-                  <Text role="caption" tone="warning">⚠ هذا الإجراء يستلزم مراجعة من فريق التدقيق.</Text>
-                </Box>
-              ) : null}
+      <div style={{
+        margin: '0 16px 12px',
+        padding: '10px 14px',
+        backgroundColor: theme.surfaceInset,
+        borderRadius: 8,
+        border: `1px solid ${theme.line}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 8,
+        flexWrap: 'wrap',
+      }}>
+        {/* Stage flow */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {[
+            { id: 'partner', label: 'الشريك يُقدّم', icon: '▣', active: false, done: true },
+            { id: 'catalog', label: 'اعتماد الكتالوج', icon: '⌗', active: true, done: false },
+            { id: 'marketing', label: 'مراجعة التسويق', icon: '▤', active: false, done: false },
+            { id: 'publish', label: 'نشر للعميل', icon: '✓', active: false, done: false },
+          ].map((stage, i, arr) => (
+            <div key={stage.id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+              }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: '50%', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', fontSize: 11,
+                  backgroundColor: stage.active
+                    ? theme.brand
+                    : stage.done
+                      ? theme.successSurface ?? theme.surfaceInset
+                      : theme.surfaceInset,
+                  border: `2px solid ${stage.active ? theme.brand : stage.done ? (theme.success ?? theme.line) : theme.line}`,
+                  color: stage.active ? theme.textInverse : stage.done ? (theme.success ?? theme.textMuted) : theme.textMuted,
+                  fontWeight: stage.active ? 900 : 600,
+                  boxShadow: stage.active ? `0 0 0 3px ${theme.brandSurface}` : 'none',
+                  flexShrink: 0,
+                }}>
+                  {stage.icon}
+                </div>
+                <span style={{
+                  fontSize: 9, fontWeight: stage.active ? 800 : 500,
+                  color: stage.active ? theme.brand : theme.textMuted,
+                  whiteSpace: 'nowrap',
+                }}>
+                  {stage.label}
+                </span>
+              </div>
+              {i < arr.length - 1 && (
+                <div style={{
+                  width: 20, height: 2, marginBottom: 14,
+                  backgroundColor: stage.done ? (theme.success ?? theme.line) : theme.line,
+                  borderRadius: 1, flexShrink: 0,
+                }} />
+              )}
+            </div>
+          ))}
+        </div>
 
-              {/* Evidence note + reject/revision actions for pending items */}
-              {item.status === 'pending' ? (
-                <Box gap={1} style={{ paddingHorizontal: 8 }}>
-                  <TextField
-                    label="ملاحظة الإثبات (مطلوبة للرفض أو التعديل)"
-                    value={note}
-                    onChangeText={(v: string) => setNote(item.id, v)}
-                    placeholder="وصف سبب الرفض أو التعديل المطلوب..."
-                    multiline
+        {/* Context note */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-end' }}>
+          <span style={{ fontSize: 10, color: theme.textMuted, textAlign: 'right' }}>
+            ✓ الاعتماد هنا يُحيل العنصر تلقائياً لمراجعة التسويق
+          </span>
+          <span style={{ fontSize: 9, color: theme.textMuted, textAlign: 'right', direction: 'ltr' }}>
+            POST /catalog/marketing-review → owner: control-panel/marketing
+          </span>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: theme.surface, borderRadius: '12px', borderWidth: 1, borderColor: theme.lineStrong, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', margin: 16 }}>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}` }}>
+              <th style={{ width: '48px', padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right' }}>صورة</th>
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '22%' }}>العنصر والمقترح</th>
+
+              {/* Submitter Filter */}
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '12%', position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenFilter(openFilter === 'partner' ? null : 'partner')}
+                  style={{ appearance: 'none', border: 'none', background: 'transparent', padding: 0, font: 'inherit', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                >
+                  <span style={{ color: theme.textMuted }}>المرسل</span>
+                  <span style={{ color: partnerFilter.length > 0 ? theme.brand : theme.lineStrong, fontSize: 10 }}>▼</span>
+                </button>
+                {openFilter === 'partner' && (
+                  <FilterDropdown
+                    titleText="المرسل"
+                    options={Array.from(new Set(items.map((i) => i.partnerLabel)))}
+                    selected={partnerFilter}
+                    onChange={setPartnerFilter}
+                    onClose={() => setOpenFilter(null)}
                   />
-                  <Box style={{ flexDirection: 'row', gap: '4px' }}>
-                    <Button
-                      label="طلب تعديل"
-                      tone="secondary"
-                      size="sm"
-                      disabled={!canRejectOrRevise}
-                      onPress={canRejectOrRevise ? () => onRequestRevision?.(item.id, note.trim()) : undefined}
-                    />
-                    <Button
-                      label="رفض"
-                      tone="danger"
-                      size="sm"
-                      disabled={!canRejectOrRevise}
-                      onPress={canRejectOrRevise ? () => onReject?.(item.id, note.trim()) : undefined}
-                    />
-                  </Box>
-                  {!canRejectOrRevise ? (
-                    <Text role="caption" tone="muted">أدخل ملاحظة الإثبات لتفعيل الرفض أو طلب التعديل.</Text>
-                  ) : null}
-                </Box>
-              ) : null}
-            </Box>
-          );
-        })}
-        {items.length === 0 ? (
-          <Box padding={6} align="center">
-            <Text tone="muted">لا توجد عناصر بانتظار الاعتماد.</Text>
-          </Box>
-        ) : null}
-      </Box>
+                )}
+              </th>
+
+              {/* Category Filter */}
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '12%', position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenFilter(openFilter === 'category' ? null : 'category')}
+                  style={{ appearance: 'none', border: 'none', background: 'transparent', padding: 0, font: 'inherit', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                >
+                  <span style={{ color: theme.textMuted }}>الفئة</span>
+                  <span style={{ color: categoryFilter.length > 0 ? theme.brand : theme.lineStrong, fontSize: 10 }}>▼</span>
+                </button>
+                {openFilter === 'category' && (
+                  <FilterDropdown
+                    titleText="الفئة"
+                    options={Array.from(new Set(items.map((i) => i.category)))}
+                    selected={categoryFilter}
+                    onChange={setCategoryFilter}
+                    onClose={() => setOpenFilter(null)}
+                  />
+                )}
+              </th>
+
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '10%' }}>تاريخ التقديم</th>
+
+              {/* Status Filter */}
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '12%', position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenFilter(openFilter === 'status' ? null : 'status')}
+                  style={{ appearance: 'none', border: 'none', background: 'transparent', padding: 0, font: 'inherit', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                >
+                  <span style={{ color: theme.textMuted }}>الحالة</span>
+                  <span style={{ color: statusFilter.length > 0 ? theme.brand : theme.lineStrong, fontSize: 10 }}>▼</span>
+                </button>
+                {openFilter === 'status' && (
+                  <FilterDropdown
+                    titleText="الحالة"
+                    options={Object.keys(statusLabel)}
+                    selected={statusFilter}
+                    onChange={setStatusFilter}
+                    onClose={() => setOpenFilter(null)}
+                    optionLabels={statusLabel}
+                  />
+                )}
+              </th>
+
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '20%' }}>ملاحظة الإثبات (مطلوبة للرفض/التعديل)</th>
+              <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '12%' }}>العمليات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredItems.map((item) => {
+              const note = getNote(item.id);
+              const canRejectOrRevise = note.trim().length > 0;
+              const approvalTone = item.approvalStatus
+                ? getDshProductApprovalStatusTone(item.approvalStatus)
+                : statusTone[item.status];
+
+              return (
+                <tr
+                  key={item.id}
+                  style={{
+                    borderBottom: `1px solid ${theme.line}`,
+                    backgroundColor: theme.surface,
+                    transition: 'background-color 0.12s ease'
+                  }}
+                >
+                  <td style={{ padding: '12px' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 6, backgroundColor: theme.surfaceInset, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 14 }}>📦</span>
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{item.displayCaption}</Text>
+                      {item.approvalNote && (
+                        <Text role="caption" tone="warning" style={{ fontSize: 9 }}>{`ملاحظة سابقة: ${item.approvalNote}`}</Text>
+                      )}
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <Text role="caption" tone="muted">{item.partnerLabel}</Text>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <Text role="caption" tone="muted">{item.category}</Text>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{item.submittedAt}</Text>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <WebControlPanelStatusTag label={statusLabel[item.status]} tone={(approvalTone === 'muted' || approvalTone === 'default') ? 'neutral' : approvalTone as 'success' | 'warning' | 'danger'} />
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    {item.status === 'pending' ? (
+                      <input
+                        aria-label="ملاحظة الإثبات"
+                        type="text"
+                        value={note}
+                        onChange={(e) => setNote(item.id, e.target.value)}
+                        placeholder="وصف سبب الرفض أو التعديل..."
+                        style={{
+                          width: '100%',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          direction: 'rtl',
+                          border: `1px solid ${theme.lineStrong}`,
+                          backgroundColor: theme.surface,
+                          color: theme.brandHeaderBackground,
+                          outline: 'none'
+                        }}
+                      />
+                    ) : (
+                      <Text role="caption" tone="muted">—</Text>
+                    )}
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    {item.status === 'pending' ? (
+                      <Box style={{ flexDirection: 'row', gap: 6, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+                        <Button
+                          label="اعتماد"
+                          tone="primary"
+                          size="sm"
+                          onPress={() => onApprove?.(item.id)}
+                        />
+                        <Button
+                          label="تعديل"
+                          tone="secondary"
+                          size="sm"
+                          disabled={!canRejectOrRevise}
+                          onPress={canRejectOrRevise ? () => onRequestRevision?.(item.id, note.trim()) : undefined}
+                        />
+                        <Button
+                          label="رفض"
+                          tone="danger"
+                          size="sm"
+                          disabled={!canRejectOrRevise}
+                          onPress={canRejectOrRevise ? () => onReject?.(item.id, note.trim()) : undefined}
+                        />
+                      </Box>
+                    ) : (
+                      <Text role="caption" tone="success">✓ معتمد</Text>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            {filteredItems.length === 0 && (
+              <tr>
+                <td colSpan={8} style={{ padding: '32px', textAlign: 'center' }}>
+                  <Text tone="muted">لا توجد عناصر مطابقة لخيارات التصفية.</Text>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

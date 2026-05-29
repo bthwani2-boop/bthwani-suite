@@ -123,20 +123,36 @@ export function ListingGovernanceScreen({
   }, [record.id, onReject]);
 
   return (
-    <Box gap={4} padding={4}>
-      <WebCompactSurfaceHeader
-        title="بوابة نشر الكتالوج"
-        description="يجب على الفريق التشغيلي الموافقة قبل أي نشر. هذه البوابة تضمن الجودة والامتثال."
-        metrics={[
-          { id: 'readiness', title: 'نسبة الجاهزية', value: `${readinessPercent}%` },
-          { id: 'items', title: 'العناصر المعتمدة', value: `${record.approvedItemCount} / ${record.itemCount}` },
-        ]}
-      />
+    <Box gap={4} padding={4} style={{ alignItems: 'center', width: '100%' }}>
+      <Box style={{ width: '100%', maxWidth: 640 }}>
+        <WebCompactSurfaceHeader
+          title="بوابة نشر الكتالوج"
+          description="يجب على الفريق التشغيلي الموافقة قبل أي نشر. هذه البوابة تضمن الجودة والامتثال."
+          metrics={[
+            { id: 'readiness', title: 'نسبة الجاهزية', value: `${readinessPercent}%` },
+            { id: 'items', title: 'العناصر المعتمدة', value: `${record.approvedItemCount} / ${record.itemCount}` },
+          ]}
+        />
+      </Box>
 
-      <Box gap={3}>
-        <Box gap={1}>
-          <Text role="titleSm">{record.catalogLabel}</Text>
-          <Text role="bodySm" tone="muted">{record.partnerLabel}</Text>
+      <Box
+        gap={3}
+        style={{
+          width: '100%',
+          maxWidth: 640,
+          backgroundColor: theme.surface,
+          borderRadius: '12px',
+          borderWidth: 1,
+          borderColor: theme.lineStrong,
+          padding: 24,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+        }}
+      >
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: theme.line, paddingBottom: 16, marginBottom: 8 }}>
+          <Box gap={1}>
+            <Text role="titleSm" style={{ fontWeight: 'bold' }}>{record.catalogLabel}</Text>
+            <Text role="bodySm" tone="muted">{record.partnerLabel}</Text>
+          </Box>
           <Chip
             label={gateStatusLabel[record.status]}
             tone={gateStatusTone[record.status]}
@@ -155,43 +171,74 @@ export function ListingGovernanceScreen({
         />
 
         {productVisibility.blockedReason ? (
-          <Text role="caption" tone="muted">{productVisibility.blockedReason}</Text>
+          <Box style={{ backgroundColor: 'rgba(239, 83, 80, 0.05)', padding: 12, borderRadius: 8, marginTop: 4 }}>
+            <Text role="caption" tone="danger">{productVisibility.blockedReason}</Text>
+          </Box>
         ) : null}
 
-        {/* Publishing prerequisites checklist — all must be satisfied before publish */}
-        <Box gap={2}>
-          <Text role="label" tone="muted">شروط بوابة النشر</Text>
-          {prerequisites.map((prereq) => (
-            <Box key={prereq.id} gap={1}>
-              <Box style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
-                <Text role="bodySm" tone={prereq.satisfied ? 'success' : 'danger'}>
-                  {prereq.satisfied ? '✓' : '✗'}
-                </Text>
+        {/* Publishing prerequisites checklist — styled as a premium grid of cards */}
+        <Box gap={2} style={{ backgroundColor: theme.surfaceInset, padding: 16, borderRadius: 8, marginTop: 8 }}>
+          <Text role="label" tone="muted" style={{ fontWeight: 'bold' }}>شروط بوابة النشر</Text>
+          <Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+            {prerequisites.map((prereq) => (
+              <Box
+                key={prereq.id}
+                style={{
+                  flex: 1,
+                  minWidth: 250,
+                  backgroundColor: theme.surface,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: prereq.satisfied ? theme.line : theme.lineStrong,
+                  padding: 12,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <Box
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    backgroundColor: prereq.satisfied ? 'rgba(46, 125, 50, 0.08)' : 'rgba(198, 40, 40, 0.08)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
+                    role="bodySm"
+                    tone={prereq.satisfied ? 'success' : 'danger'}
+                    style={{ fontWeight: 'bold', fontSize: 13 }}
+                  >
+                    {prereq.satisfied ? '✓' : '✗'}
+                  </Text>
+                </Box>
                 <Box style={{ flex: 1, gap: 2 }}>
-                  <Text role="bodySm" tone={prereq.satisfied ? 'default' : 'danger'}>
+                  <Text role="bodySm" tone={prereq.satisfied ? 'default' : 'danger'} style={{ fontWeight: '500' }}>
                     {prereq.label}
                   </Text>
                   {!prereq.satisfied && prereq.blockedReason ? (
-                    <Text role="caption" tone="muted">{prereq.blockedReason}</Text>
+                    <Text role="caption" tone="muted" style={{ fontSize: 11 }}>{prereq.blockedReason}</Text>
                   ) : null}
                 </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
+          </Box>
         </Box>
 
         {/* Audit notice */}
         {record.auditRequired ? (
-          <Box gap={1}>
+          <Box style={{ backgroundColor: 'rgba(255, 152, 0, 0.05)', padding: 12, borderRadius: 8, marginTop: 4 }}>
             <Text role="bodySm" tone="warning">⚠ هذا النشر يستلزم مراجعة من فريق التدقيق بعد التنفيذ.</Text>
           </Box>
         ) : null}
 
         {/* Gate actions */}
         {(record.status === 'in-review' || record.status === 'not-started' || record.status === 'approved') ? (
-          <Box gap={2}>
+          <Box gap={2} style={{ marginTop: 12 }}>
             {!allPrerequisitesMet ? (
-              <Box gap={1}>
+              <Box gap={1} style={{ paddingHorizontal: 4 }}>
                 <Text role="caption" tone="danger">
                   {`${unsatisfiedPrereqs.length} شرط غير مستوفٍ — أكمل المتطلبات لتفعيل النشر.`}
                 </Text>
@@ -200,22 +247,25 @@ export function ListingGovernanceScreen({
                 ) : null}
               </Box>
             ) : null}
-            <Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <Box style={{ flexDirection: 'row', gap: 8, justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: 8 }}>
               <Button
                 label="الموافقة على النشر"
                 tone="primary"
                 disabled={!isReadyToPublish}
                 onPress={isReadyToPublish ? handleApproveForPublish : undefined}
+                style={{ flex: 1, minWidth: 140 }}
               />
               <Button
                 label="طلب مراجعة"
                 tone="secondary"
                 onPress={handleRequestRevision}
+                style={{ flex: 1, minWidth: 120 }}
               />
               <Button
                 label="رفض"
                 tone="danger"
                 onPress={handleReject}
+                style={{ flex: 1, minWidth: 100 }}
               />
             </Box>
 
@@ -224,9 +274,9 @@ export function ListingGovernanceScreen({
               <div
                 role="status"
                 aria-live="polite"
-                style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 10, backgroundColor: theme.surfaceInset, borderRadius: 8 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 12, backgroundColor: theme.surfaceInset, borderRadius: 8, marginTop: 12, borderRightWidth: 3, borderRightColor: theme.brand }}
               >
-                <Text role="bodySm">{gateActionResult.label}</Text>
+                <Text role="bodySm" style={{ fontWeight: 'bold' }}>{gateActionResult.label}</Text>
                 <Text role="caption" tone="muted">
                   {`المالك: ${resolveGateOwnerLabel(gateActionResult.owner)} · ${gateActionResult.note}`}
                 </Text>
@@ -236,7 +286,9 @@ export function ListingGovernanceScreen({
         ) : null}
 
         {record.status === 'published' ? (
-          <Text role="bodySm" tone="success">تم النشر بنجاح — الكتالوج مرئي للعملاء.</Text>
+          <Box style={{ backgroundColor: 'rgba(46, 125, 50, 0.08)', padding: 16, borderRadius: 8, marginTop: 12 }}>
+            <Text role="bodySm" tone="success" style={{ fontWeight: 'bold' }}>تم النشر بنجاح — الكتالوج مرئي للعملاء.</Text>
+          </Box>
         ) : null}
       </Box>
     </Box>

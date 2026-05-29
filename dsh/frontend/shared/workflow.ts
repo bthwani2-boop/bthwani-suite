@@ -673,6 +673,42 @@ let _globalStore: ApprovalRecord[] = [
       { at: new Date(Date.now() - 3600_000 * 4).toISOString(), fromStage: 'marketing-review', toStage: 'marketing-approved', owner: 'control-panel-marketing', actionLabel: 'اعتماد تسويقي' },
     ],
   },
+  {
+    id: 'price-conflict-1',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'partner-submitted',
+    title: 'تعارض سعر: تفاح رويال غالا (سعر الشريك 32 ر.س مقابل المرجعي 18 ر.س)',
+    submittedAt: new Date(Date.now() - 3600_000 * 12).toISOString(),
+    metadata: {
+      systemNote: 'فرق السعر يتجاوز حد التسامح المسموح به (20%).',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'price-conflict-2',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'partner-review',
+    title: 'تعارض سعر: حليب عضوي 1.5 لتر (سعر الشريك 25 ر.س مقابل المرجعي 11 ر.س)',
+    submittedAt: new Date(Date.now() - 3600_000 * 6).toISOString(),
+    metadata: {
+      systemNote: 'تعارض تسعير نشط مع الفئات المجاورة.',
+    },
+    auditTrail: [],
+  },
+  {
+    id: 'barcode-conflict-1',
+    entityType: 'product',
+    source: 'app-partner',
+    stage: 'partner-submitted',
+    title: 'تعارض باركود: خبز قمح كامل (الباركود 6281100223344 مستخدم بالفعل لـ منتج آخر)',
+    submittedAt: new Date(Date.now() - 3600_000 * 8).toISOString(),
+    metadata: {
+      systemNote: 'الباركود متطابق مع منتج نشط في الكتالوج.',
+    },
+    auditTrail: [],
+  },
 ];
 
 // ── Selectors ────────────────────────────────────────────────────────

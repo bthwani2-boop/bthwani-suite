@@ -84,42 +84,42 @@ export function CategoryControlRoom({
   };
 
   return (
-    <div style={{ backgroundColor: theme.surface, borderBottom: `1px solid ${theme.line}`, flexShrink: 0 }}>
+    <div style={{ backgroundColor: theme.surface, display: 'flex', flexDirection: 'column', height: '100%', flexShrink: 0, minHeight: 0 }}>
       <button
         onClick={() => setCategoryControlOpen((v) => !v)}
         aria-label="تبديل وضع إدارة الفئات"
-        style={{ width: '100%', appearance: 'none', border: 'none', backgroundColor: categoryControlOpen ? theme.brandSurface : theme.surfaceInset, borderBottom: categoryControlOpen ? `1px solid ${theme.brand}` : 'none', padding: '5px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        style={{ width: '100%', appearance: 'none', border: 'none', backgroundColor: categoryControlOpen ? theme.brandSurface : theme.surfaceInset, borderBottom: `1px solid ${theme.line}`, padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '10px', fontWeight: 800, color: categoryControlOpen ? theme.brand : theme.textMuted }}>🏷️ إدارة الفئات</span>
-          <span style={{ fontSize: '9px', color: theme.warning, fontWeight: 700 }}>• معاينة فقط — لا حفظ دائم</span>
-          <span style={{ fontSize: '9px', color: theme.textMuted }}>({previewCategories.length} فئة • {hiddenCategoryIds.size > 0 ? `${hiddenCategoryIds.size} مخفي` : 'لا مخفي'})</span>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: theme.brand }}>🏷️ هيكل الفئات والتصنيفات</span>
+          <span style={{ fontSize: '9px', color: theme.warning, fontWeight: 700 }}>• معاينة</span>
+          <span style={{ fontSize: '9px', color: theme.textMuted }}>({previewCategories.length} فئة • {hiddenCategoryIds.size > 0 ? `${hiddenCategoryIds.size} مخفي` : 'نشط'})</span>
         </div>
         <span style={{ fontSize: '9px', color: theme.textMuted }}>{categoryControlOpen ? '▲' : '▼'}</span>
       </button>
 
       {categoryControlOpen && (
-        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
+        <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, overflowY: 'auto' }}>
           {catError && (
-            <div style={{ padding: '4px 10px', borderRadius: '4px', backgroundColor: theme.dangerSurface ?? theme.surfaceInset, border: `1px solid ${theme.danger}`, fontSize: '10px', color: theme.danger, fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '6px 10px', borderRadius: '4px', backgroundColor: theme.dangerSurface ?? theme.surfaceInset, border: `1px solid ${theme.danger}`, fontSize: '10px', color: theme.danger, fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{catError}</span>
               <button onClick={() => setCatError(null)} style={{ appearance: 'none', border: 'none', background: 'none', color: theme.danger, cursor: 'pointer', fontSize: '10px', fontWeight: 900 }}>×</button>
             </div>
           )}
 
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => { setAddingMainCat(true); setAddingSubUnder(null); setEditingEntry(null); setFormLabel(''); setFormSubtitle(''); setCatError(null); }} aria-label="إضافة فئة رئيسية" style={{ padding: '3px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.brand}`, cursor: 'pointer', backgroundColor: theme.brandSurface, color: theme.brand }}>+ فئة رئيسية</button>
-            <button onClick={handleResetCategoryPreview} aria-label="إعادة ضبط المعاينة" style={{ padding: '3px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.danger}`, cursor: 'pointer', backgroundColor: 'transparent', color: theme.danger }}>↺ إعادة ضبط المعاينة</button>
+            <button onClick={() => { setAddingMainCat(true); setAddingSubUnder(null); setEditingEntry(null); setFormLabel(''); setFormSubtitle(''); setCatError(null); }} aria-label="إضافة فئة رئيسية" style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.brand}`, cursor: 'pointer', backgroundColor: theme.brandSurface, color: theme.brand }}>+ فئة رئيسية</button>
+            <button onClick={handleResetCategoryPreview} aria-label="إعادة ضبط المعاينة" style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.danger}`, cursor: 'pointer', backgroundColor: 'transparent', color: theme.danger }}>↺ إعادة ضبط المعاينة</button>
           </div>
 
           {addingMainCat && (
-            <div style={{ padding: '8px 10px', borderRadius: '6px', backgroundColor: theme.surfaceInset, border: `1px solid ${theme.brand}`, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ padding: '10px', borderRadius: '6px', backgroundColor: theme.surfaceInset, border: `1px solid ${theme.brand}`, display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '10px', fontWeight: 800, color: theme.brand }}>إضافة فئة رئيسية جديدة</span>
-              <input aria-label="اسم الفئة الرئيسية" type="text" placeholder="اسم الفئة *" value={formLabel} onChange={(e) => setFormLabel(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleAddMainCategory(); if (e.key === 'Escape') { setAddingMainCat(false); setCatError(null); } }} autoFocus style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '11px', direction: 'rtl', textAlign: 'right', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none' }} />
-              <input aria-label="وصف الفئة الرئيسية" type="text" placeholder="وصف مختصر (اختياري)" value={formSubtitle} onChange={(e) => setFormSubtitle(e.target.value)} style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '11px', direction: 'rtl', textAlign: 'right', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none' }} />
+              <input aria-label="اسم الفئة الرئيسية" type="text" placeholder="اسم الفئة *" value={formLabel} onChange={(e) => setFormLabel(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleAddMainCategory(); if (e.key === 'Escape') { setAddingMainCat(false); setCatError(null); } }} autoFocus style={{ padding: '6px 8px', borderRadius: '4px', fontSize: '11px', direction: 'rtl', textAlign: 'right', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none' }} />
+              <input aria-label="وصف الفئة الرئيسية" type="text" placeholder="وصف مختصر (اختياري)" value={formSubtitle} onChange={(e) => setFormSubtitle(e.target.value)} style={{ padding: '6px 8px', borderRadius: '4px', fontSize: '11px', direction: 'rtl', textAlign: 'right', border: `1px solid ${theme.lineStrong}`, backgroundColor: theme.surface, color: theme.brandHeaderBackground, outline: 'none' }} />
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button onClick={handleAddMainCategory} style={{ padding: '3px 12px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.brand}`, backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>تأكيد</button>
-                <button onClick={() => { setAddingMainCat(false); setFormLabel(''); setFormSubtitle(''); setCatError(null); }} style={{ padding: '3px 12px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.lineStrong}`, backgroundColor: 'transparent', color: theme.textMuted, cursor: 'pointer' }}>إلغاء</button>
+                <button onClick={handleAddMainCategory} style={{ padding: '4px 12px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.brand}`, backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>تأكيد</button>
+                <button onClick={() => { setAddingMainCat(false); setFormLabel(''); setFormSubtitle(''); setCatError(null); }} style={{ padding: '4px 12px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, border: `1px solid ${theme.lineStrong}`, backgroundColor: 'transparent', color: theme.textMuted, cursor: 'pointer' }}>إلغاء</button>
               </div>
             </div>
           )}

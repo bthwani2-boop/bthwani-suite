@@ -59,7 +59,6 @@ export function ControlPanelDshCatalogScreen({
     selectedProduct,
     totalCount,
     showProductModal, setShowProductModal,
-    modalMode, setModalMode,
     modalForm, setModalForm,
     previewCategories,
     effectiveCategories,
@@ -164,6 +163,72 @@ export function ControlPanelDshCatalogScreen({
         </div>
       </header>
 
+      {/* Cross-section navigation — Catalog is a hub between Partners and Marketing */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '6px 16px',
+        backgroundColor: theme.surfaceInset,
+        borderBottom: `1px solid ${theme.line}`,
+        flexShrink: 0,
+        gap: 8,
+        flexWrap: 'wrap',
+      }}>
+        {/* Pipeline flow indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <span style={{ fontSize: 10, color: theme.textMuted, fontWeight: 600 }}>مسار الاعتماد:</span>
+          {[
+            { label: 'الشريك', color: theme.textMuted },
+            { label: 'الكتالوج', color: theme.brand, bold: true },
+            { label: 'التسويق', color: theme.textMuted },
+            { label: 'النشر', color: theme.textMuted },
+          ].map((step, i, arr) => (
+            <span key={step.label} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: 10, fontWeight: step.bold ? 800 : 500, color: step.color,
+                ...(step.bold ? { backgroundColor: theme.brandSurface, padding: '1px 6px', borderRadius: 4 } : {})
+              }}>{step.label}</span>
+              {i < arr.length - 1 && <span style={{ fontSize: 9, color: theme.lineStrong }}>›</span>}
+            </span>
+          ))}
+        </div>
+
+        {/* Quick navigation links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 10, color: theme.textMuted }}>روابط سريعة:</span>
+          <a
+            href={partnersHref}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 10, fontWeight: 700, color: theme.brand,
+              padding: '3px 8px', borderRadius: 4,
+              border: `1px solid ${theme.line}`,
+              backgroundColor: theme.surface,
+              textDecoration: 'none',
+              transition: 'all 0.12s',
+            }}
+            title="إدارة الشركاء — تفعيل الشريك شرط لنشر الكتالوج"
+          >
+            ▣ الشركاء
+          </a>
+          <a
+            href={marketingHref}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 10, fontWeight: 700, color: theme.brand,
+              padding: '3px 8px', borderRadius: 4,
+              border: `1px solid ${theme.line}`,
+              backgroundColor: theme.surface,
+              textDecoration: 'none',
+              transition: 'all 0.12s',
+            }}
+            title="التسويق — مراجعة الوسائط والمحتوى قبل النشر"
+          >
+            ▤ التسويق
+          </a>
+        </div>
+      </div>
+
       {/* Three-Layer Control Strip */}
       <CatalogControlStrip
         activeTab={activeTab}
@@ -224,10 +289,6 @@ export function ControlPanelDshCatalogScreen({
         </div>
       ) : null}
 
-      {/* Category Control Room */}
-      {activeTab === 'mapping' && activeSubTab === 'categories' && (
-        <CategoryControlRoom {...categoryRoomProps} />
-      )}
 
       {/* Main Content */}
       <main className={styles.surfaceMainPanel}>
@@ -235,6 +296,11 @@ export function ControlPanelDshCatalogScreen({
           <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', height: '100%' }}>
             {activeTab !== 'taxonomy' ? (
               <>
+                {activeTab === 'mapping' && activeSubTab === 'categories' && categoryControlOpen && (
+                  <div style={{ width: 340, borderLeft: `1px solid ${theme.lineStrong}`, display: 'flex', flexDirection: 'column', backgroundColor: theme.surface, flexShrink: 0, height: '100%' }}>
+                    <CategoryControlRoom {...categoryRoomProps} />
+                  </div>
+                )}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: theme.surface, minWidth: 0 }}>
                   <div style={{ flex: 1, minHeight: 0, backgroundColor: theme.surface }}>
                     {isManualOrderCategory ? (
@@ -265,6 +331,7 @@ export function ControlPanelDshCatalogScreen({
                           />
                         ) : activeTab === 'approvals' ? (
                           <ItemApprovalScreen
+                            activeSubTab={activeSubTab}
                             onApprove={(id) => {
                               const p = products.find(prod => prod.id === id);
                               if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-adopted' }, 'تم تسجيل مقترح اعتماد العنصر', 'اعتماد العنصر ونقله إلى معتمد مركزي كمعاينة فقط.');
@@ -357,7 +424,6 @@ export function ControlPanelDshCatalogScreen({
                     openWorkspace={openWorkspace}
                     queueProductPreviewPatch={queueProductPreviewPatch}
                     previewCategories={previewCategories}
-                    setModalMode={setModalMode}
                     setModalForm={setModalForm}
                     setShowProductModal={setShowProductModal}
                   />
@@ -373,7 +439,6 @@ export function ControlPanelDshCatalogScreen({
       {showProductModal && (
         <ProductEditModal
           setShowProductModal={setShowProductModal}
-          modalMode={modalMode}
           modalForm={modalForm}
           setModalForm={setModalForm}
           previewCategories={previewCategories}

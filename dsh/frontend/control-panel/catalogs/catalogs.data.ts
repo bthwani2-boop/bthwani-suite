@@ -138,6 +138,7 @@ export type CatalogProductMaster = {
   partnerOverrides?: CatalogPartnerOverride[];
   conflictReason?: string;
   categoryType?: string; // e.g. product, service
+  partnerId?: string;
 };
 
 function resolveCatalogMediaPolicy(value: string | undefined): CatalogMediaPolicy {
@@ -229,11 +230,17 @@ Object.entries(storeItemsByStoreId).forEach(([_storeId, items]) => {
       price: parseFloat(item.priceLabel ?? '') || 15,
       mediaPolicy: resolveCatalogMediaPolicy(item.mediaPolicy),
       approvalStage: approvalStage,
-      sourceSurface: 'catalog',
+      sourceSurface:
+        item.id.includes('restaurant') || item.id.includes('grocery') || item.id.includes('exception') || item.id.includes('sweets') || item.id.includes('dates')
+          ? 'partner'
+          : item.id.includes('croissant') || item.id.includes('salad')
+            ? 'field'
+            : 'catalog',
       surfaces: ['client', 'partner'],
       imageUri: item.imageUri,
       mediaKey: item.mediaKey,
       emojiFallback: item.name[0],
+      partnerId: _storeId,
     };
 
     if (!allProductsMap.has(product.id)) {

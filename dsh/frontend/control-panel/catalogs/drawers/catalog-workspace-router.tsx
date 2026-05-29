@@ -30,6 +30,7 @@ import { CatalogTaxonomyGovernanceWorkspace } from './taxonomy-governance.drawer
 import { CatalogBulkOperationsWorkspace } from './bulk-operations.drawer';
 import { CatalogAuditTrailWorkspace } from './audit-trail.drawer';
 import { CatalogPublicationReadinessMatrix } from './publication-readiness.drawer';
+import { CatalogAdoptionQueueWorkspace } from './adoption-queue.drawer';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -180,15 +181,32 @@ export function CatalogWorkspaceRouter({
       })()}
 
       {/* ── partner-handoff ───────────────────────────────────────────── */}
-      {workspace === 'partner-handoff' && (
-        <CatalogPartnerHandoffWorkspace
-          partnerId={workspaceState.sourceSurface === 'partners' ? workspaceState.reason ?? 'partner-preview-001' : 'partner-preview-001'}
-          partnerLabel="شريك النموذج الأولي"
-          activationStatus="catalog_not_ready"
-          incomingItems={toPartnerIncomingItems(products)}
-          onClose={onClose}
-        />
-      )}
+      {workspace === 'partner-handoff' && (() => {
+        // GAP-L05 fix: resolve partner identity from workspaceState, not a hardcoded placeholder
+        const resolvedPartnerId   = workspaceState.partnerId ?? workspaceState.reason ?? 'partner-preview-001';
+        const resolvedPartnerLabel = workspaceState.partnerLabel ?? 'شريك';
+        // Derive activation status from actual product data for this partner
+        const partnerItems = toPartnerIncomingItems(products);
+        const hasClientVisible = partnerItems.some((p) => p.approvalStage === 'client-visible');
+        const hasCatalogAdopted = partnerItems.some((p) => p.approvalStage === 'catalog-adopted');
+        const resolvedActivationStatus = hasClientVisible
+          ? ('client_visible' as const)
+          : hasCatalogAdopted
+            ? ('partner_active' as const)
+            : partnerItems.length > 0
+              ? ('catalog_not_ready' as const)
+              : ('submitted' as const);
+        return (
+          <CatalogPartnerHandoffWorkspace
+            partnerId={resolvedPartnerId}
+            partnerLabel={resolvedPartnerLabel}
+            activationStatus={resolvedActivationStatus}
+            incomingItems={partnerItems}
+            onClose={onClose}
+          />
+        );
+      })()}
+
 
       {/* ── media-governance ──────────────────────────────────────────── */}
       {workspace === 'media-governance' && (
@@ -238,6 +256,14 @@ export function CatalogWorkspaceRouter({
         <CatalogPublicationReadinessMatrix
           products={products}
           onClose={onClose}
+        />
+      )}
+
+      {/* ── adoption-queue ────────────────────────────────────────────── */}
+      {workspace === 'adoption-queue' && (
+        <CatalogAdoptionQueueWorkspace
+          onClose={onClose}
+          onProposal={onProposal}
         />
       )}
     </div>

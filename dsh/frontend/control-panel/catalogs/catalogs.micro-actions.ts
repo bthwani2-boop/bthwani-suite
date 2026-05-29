@@ -88,13 +88,21 @@ export function useCatalogMicroActions({
       });
     } else if (activeTab === 'approvals') {
       if (activeSubTab === 'marketing') {
-        actions.push({
-          id: 'ma-appr-marketing-approve-all', label: '📢 اعتماد كل مراجعات التسويق', isActive: false,
-          onAction: () => {
-            const proposal = makeProposal({ type: 'bulk-approve', label: 'اعتماد كل مراجعات التسويق', note: 'UI_PREVIEW_ONLY | اعتماد مراجعات التسويق المحددة بنجاح', productIds: filteredProducts.filter(p => p.approvalStage === 'marketing-review').map(f => f.id) });
-            pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
+        actions.push(
+          {
+            id: 'ma-appr-marketing-approve-all', label: '📢 اعتماد كل مراجعات التسويق', isActive: false,
+            onAction: () => {
+              const proposal = makeProposal({ type: 'bulk-approve', label: 'اعتماد كل مراجعات التسويق', note: 'UI_PREVIEW_ONLY | اعتماد مراجعات التسويق المحددة بنجاح', productIds: filteredProducts.filter(p => p.approvalStage === 'marketing-review').map(f => f.id) });
+              pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
+            },
           },
-        });
+          {
+            id: 'ma-appr-open-adoption-queue',
+            label: '✅ فتح طابور اعتماد الكتالوج الموحد',
+            isActive: workspaceState?.workspace === 'adoption-queue',
+            onAction: () => setWorkspaceState({ workspace: 'adoption-queue', sourceSurface: 'catalogs', reason: 'marketing-approved-items' }),
+          }
+        );
       } else if (activeSubTab === 'quality') {
         actions.push({
           id: 'ma-appr-quality-pass-all', label: '🛡️ تمرير جميع فحوصات الجودة', isActive: false,
@@ -164,6 +172,18 @@ export function useCatalogMicroActions({
       }
     } else if (activeTab === 'publishing') {
       actions.push(
+        {
+          id: 'ma-pub-adoption-queue',
+          label: '✅ طابور اعتماد الكتالوج — اعتماد نهائي',
+          isActive: workspaceState?.workspace === 'adoption-queue',
+          onAction: () => setWorkspaceState({ workspace: 'adoption-queue', sourceSurface: 'catalogs', reason: 'final-adoption' }),
+        },
+        {
+          id: 'ma-pub-readiness-matrix',
+          label: '🚦 مصفوفة جاهزية النشر',
+          isActive: workspaceState?.workspace === 'publication-readiness',
+          onAction: () => setWorkspaceState({ workspace: 'publication-readiness', sourceSurface: 'catalogs', reason: 'readiness-check' }),
+        },
         {
           id: 'ma-pub-publish-ready', label: '🚀 نشر جميع المنتجات الجاهزة للعميل', isActive: false,
           onAction: () => {

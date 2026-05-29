@@ -86,3 +86,9 @@ export type { CatalogAuditTrailWorkspaceProps } from './drawers/audit-trail.draw
 // UI_PREVIEW_ONLY: derived from product state — not yet bound to readiness API
 export { CatalogPublicationReadinessMatrix } from './drawers/publication-readiness.drawer';
 export type { CatalogPublicationReadinessMatrixProps } from './drawers/publication-readiness.drawer';
+
+// CAT-S13: Adoption queue — final catalog adoption step (marketing-approved → catalog-adopted → client-visible)
+// The ONLY workspace that controls final client-visibility activation
+// UI_PREVIEW_ONLY: emits CatalogPreviewProposal — not yet bound to adoption API
+export { CatalogAdoptionQueueWorkspace } from './drawers/adoption-queue.drawer';
+export type { CatalogAdoptionQueueWorkspaceProps } from './drawers/adoption-queue.drawer';

@@ -14,12 +14,16 @@ export type FilterDropdownProps = {
   selected: readonly string[];
   onChange: (nextValues: string[]) => void;
   onClose: () => void;
+  optionLabels?: Record<string, string>;
 };
 
-export const FilterDropdown = ({ titleText, options, selected, onChange, onClose }: FilterDropdownProps) => {
+export const FilterDropdown = ({ titleText, options, selected, onChange, onClose, optionLabels }: FilterDropdownProps) => {
   const { theme } = useTheme();
   const [search, setSearch] = useState('');
-  const filteredOptions = options.filter((option) => option.toLowerCase().includes(search.toLowerCase()));
+  const filteredOptions = options.filter((option) => {
+    const label = optionLabels?.[option] ?? option;
+    return label.toLowerCase().includes(search.toLowerCase());
+  });
 
   return (
     <Surface tone="raised" padding={2} gap={2} style={{ position: 'absolute', top: '100%', right: 0, zIndex: 50, width: 200, marginTop: 4 }}>
@@ -46,7 +50,9 @@ export const FilterDropdown = ({ titleText, options, selected, onChange, onClose
               }}
               style={{ accentColor: theme.brandHeaderBackground }}
             />
-            <Text role="caption" style={{ flex: 1, textAlign: 'right' }}>{opt}</Text>
+            <Text role="caption" style={{ flex: 1, textAlign: 'right' }}>
+              {optionLabels?.[opt] ?? opt}
+            </Text>
           </Box>
         ))}
       </Box>
@@ -158,8 +164,9 @@ function resolveWebImageSource(keyOrUri?: string | null): any {
     if ('src' in resolved) {
       return resolved;
     }
-    if (resolved.default && typeof resolved.default === 'object' && 'src' in resolved.default) {
-      return resolved.default;
+    const resolvedAny = resolved as unknown as Record<string, unknown>;
+    if (resolvedAny['default'] && typeof resolvedAny['default'] === 'object' && 'src' in (resolvedAny['default'] as object)) {
+      return resolvedAny['default'] as typeof resolved;
     }
   }
 

@@ -82,8 +82,18 @@ export function useCatalogScreen() {
   const [workspaceState, setWorkspaceState] = useState<CatalogWorkspaceState | null>(null);
   const [pendingProposals, setPendingProposals] = useState<CatalogPreviewProposal[]>([]);
 
-  const openWorkspace = (workspace: CatalogWorkspaceId, productId?: string) => {
-    setWorkspaceState({ workspace, productId, sourceSurface: 'catalogs' });
+  const openWorkspace = (
+    workspace: CatalogWorkspaceId,
+    productId?: string,
+    extra?: { partnerId?: string; partnerLabel?: string }
+  ) => {
+    setWorkspaceState({
+      workspace,
+      productId,
+      sourceSurface: 'catalogs',
+      partnerId: extra?.partnerId,
+      partnerLabel: extra?.partnerLabel,
+    });
   };
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +105,6 @@ export function useCatalogScreen() {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [showProductModal, setShowProductModal] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [modalForm, setModalForm] = useState({
     id: '',
     name: '',
@@ -242,7 +251,6 @@ export function useCatalogScreen() {
     totalCount,
     // Product modal
     showProductModal, setShowProductModal,
-    modalMode, setModalMode,
     modalForm, setModalForm,
     // Column filters
     colFilters, setColFilters,

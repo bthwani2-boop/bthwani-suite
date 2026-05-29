@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
-import { WatermarkedImage, WorkspaceIntroBanner } from '../catalogs.parts';
+import { WatermarkedImage, WorkspaceIntroBanner, PolicyBadge } from '../catalogs.parts';
 import { dshCatalogCategories } from '../catalogs.data';
 import type { CatalogProductMaster, CatalogMainCategory } from '../catalogs.data';
 import type { CatalogWorkspaceId } from '../catalogs.model';
@@ -91,127 +91,148 @@ export function MappingWorkspaceView({
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%', overflowY: 'auto' }}>
-      <WorkspaceIntroBanner
-        bannerTitle={title}
-        description={description}
-        whyItMatters={whyItMatters}
-        affectedSurfaces={affectedSurfaces}
-        nextActionLabel={nextActionLabel}
-        extraActions={
-          <>
-            {activeSubTab === 'duplicates' && (
-              <Button
-                label="▸ فتح workspace حل التكرارات"
-                tone="brand"
-                size="sm"
-                onPress={() => openWorkspace('duplicate-resolution')}
-              />
-            )}
-            {activeSubTab === 'gtin' && (
-              <Button
-                label="▸ فتح workspace حوكمة الهوية"
-                tone="brand"
-                size="sm"
-                onPress={() => openWorkspace('identity-governance')}
-              />
-            )}
-            {activeSubTab === 'media' && (
-              <Button
-                label="▸ فتح workspace حوكمة الوسائط"
-                tone="brand"
-                size="sm"
-                onPress={() => openWorkspace('media-governance')}
-              />
-            )}
-            {activeSubTab === 'visibility-policy' && (
-              <Button
-                label="▸ فتح workspace سياسة الظهور"
-                tone="brand"
-                size="sm"
-                onPress={() => {
-                  const firstProduct = filteredProducts[0];
-                  if (firstProduct) openWorkspace('visibility-policy', firstProduct.id);
-                }}
-                disabled={filteredProducts.length === 0}
-                accessibilityHint="اختر منتجاً لفتح workspace الظهور"
-              />
-            )}
-          </>
-        }
-      />
+      <div style={{ width: '100%' }}>
+        <WorkspaceIntroBanner
+          bannerTitle={title}
+          description={description}
+          whyItMatters={whyItMatters}
+          affectedSurfaces={affectedSurfaces}
+          nextActionLabel={nextActionLabel}
+          extraActions={
+            <>
+              {activeSubTab === 'duplicates' && (
+                <Button
+                  label="▸ فتح workspace حل التكرارات"
+                  tone="brand"
+                  size="sm"
+                  onPress={() => openWorkspace('duplicate-resolution')}
+                />
+              )}
+              {activeSubTab === 'gtin' && (
+                <Button
+                  label="▸ فتح workspace حوكمة الهوية"
+                  tone="brand"
+                  size="sm"
+                  onPress={() => openWorkspace('identity-governance')}
+                />
+              )}
+              {activeSubTab === 'media' && (
+                <Button
+                  label="▸ فتح workspace حوكمة الوسائط"
+                  tone="brand"
+                  size="sm"
+                  onPress={() => openWorkspace('media-governance')}
+                />
+              )}
+              {activeSubTab === 'visibility-policy' && (
+                <Button
+                  label="▸ فتح workspace سياسة الظهور"
+                  tone="brand"
+                  size="sm"
+                  onPress={() => {
+                    const firstProduct = filteredProducts[0];
+                    if (firstProduct) openWorkspace('visibility-policy', firstProduct.id);
+                  }}
+                  disabled={filteredProducts.length === 0}
+                  accessibilityHint="اختر منتجاً لفتح workspace الظهور"
+                />
+              )}
+            </>
+          }
+        />
+      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
         <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground }}>العناصر والنتائج الحالية في هذا المسار ({filteredProducts.length})</Text>
         {filteredProducts.length === 0 ? (
           <div style={{ padding: '32px', textAlign: 'center', backgroundColor: theme.surfaceInset, borderRadius: '8px', border: `1px dashed ${theme.line}` }}>
             <Text role="caption" tone="muted">✓ كل شيء سليم! لا توجد منتجات متعارضة أو مفقودة حالياً.</Text>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {filteredProducts.map(p => {
-              let detailText = '';
-              let statusLabel = 'مكتمل';
-              let statusTone: 'success' | 'warning' | 'danger' | 'info' = 'success';
+          <div style={{ backgroundColor: theme.surface, borderRadius: '12px', borderWidth: 1, borderColor: theme.lineStrong, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}` }}>
+                  <th style={{ width: '48px', padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right' }}>صورة</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '25%' }}>المنتج</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '15%' }}>الفئة</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '15%' }}>التصنيف</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '15%' }}>المعرف / الباركود</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '10%' }}>السعر</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '10%' }}>السياسة</th>
+                  <th style={{ padding: '10px 12px', fontSize: '11px', color: theme.textMuted, textAlign: 'right', width: '10%' }}>الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map(p => {
+                  const cat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
+                  const sub = cat?.subcategories.find(s => s.id === p.categoryPath.sub);
+                  const classif = sub?.mainClassifications?.find(c => c.id === p.categoryPath.mainClassification);
 
-              if (activeSubTab === 'categories') {
-                const mainCat = previewCategories.find(c => c.id === p.categoryPath.main) ?? dshCatalogCategories.find(c => c.id === p.categoryPath.main);
-                const subCat = mainCat?.subcategories.find(s => s.id === p.categoryPath.sub);
-                detailText = `الفئة: ${mainCat?.label || 'غير محدد'} › ${subCat?.label || 'عام'}`;
-                statusLabel = p.categoryPath.main ? 'مرتبط' : 'غير مرتبط';
-                statusTone = p.categoryPath.main ? 'success' : 'danger';
-              } else if (activeSubTab === 'duplicates') {
-                detailText = p.conflictReason || 'تكرار محتمل في الاسم أو SKU';
-                statusLabel = 'تعارض نشط';
-                statusTone = 'danger';
-              } else if (activeSubTab === 'media') {
-                detailText = `سياسة الصور: ${p.mediaPolicy === 'catalog-owned-media' ? 'مركزي' : 'استثناء شريك'}`;
-                statusLabel = p.mediaKey ? 'صورة معتمدة' : 'بدون صورة';
-                statusTone = p.mediaKey ? 'success' : 'warning';
-              } else if (activeSubTab === 'gtin') {
-                detailText = `المعرف: ${p.sku}`;
-                statusLabel = p.gtin ? `GTIN: ${p.gtin}` : 'باركود مفقود';
-                statusTone = p.gtin ? 'success' : 'danger';
-              } else if (activeSubTab === 'substitutions') {
-                detailText = `فئة المطاعم/البدائل النشطة للمنتج`;
-                statusLabel = p.categoryPath.main === 'restaurants' ? 'بدائل مرنة' : 'افتراضي';
-                statusTone = p.categoryPath.main === 'restaurants' ? 'success' : 'info';
-              } else if (activeSubTab === 'visibility-policy') {
-                detailText = `القنوات: ${p.surfaces.join(', ')}`;
-                statusLabel = p.surfaces.includes('client') ? 'مرئي للعميل' : 'داخلي فقط';
-                statusTone = p.surfaces.includes('client') ? 'success' : 'warning';
-              }
+                  let statusLabel = 'مكتمل';
+                  let statusTone: 'success' | 'warning' | 'danger' | 'info' = 'success';
 
-              const isSelected = selectedProductId === p.id;
-              return (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedProductId(p.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: `1px solid ${isSelected ? theme.brand : theme.line}`,
-                    backgroundColor: isSelected ? theme.brandSurface : theme.surface,
-                    cursor: 'pointer',
-                    transition: 'all 0.12s ease',
-                    boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={36} productName={p.name} />
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <Text role="bodyStrong" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>{p.name}</Text>
-                      <span style={{ fontSize: '10px', color: theme.textMuted }}>{detailText}</span>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <WebControlPanelStatusTag label={statusLabel} tone={statusTone} />
-                  </div>
-                </div>
-              );
-            })}
+                  if (activeSubTab === 'categories') {
+                    statusLabel = p.categoryPath.main ? 'مرتبط' : 'غير مرتبط';
+                    statusTone = p.categoryPath.main ? 'success' : 'danger';
+                  } else if (activeSubTab === 'duplicates') {
+                    statusLabel = 'تعارض نشط';
+                    statusTone = 'danger';
+                  } else if (activeSubTab === 'media') {
+                    statusLabel = p.mediaKey ? 'معتمد' : 'بدون صورة';
+                    statusTone = p.mediaKey ? 'success' : 'warning';
+                  } else if (activeSubTab === 'gtin') {
+                    statusLabel = p.gtin ? `GTIN` : 'مفقود';
+                    statusTone = p.gtin ? 'success' : 'danger';
+                  } else if (activeSubTab === 'substitutions') {
+                    statusLabel = p.categoryPath.main === 'restaurants' ? 'بدائل' : 'افتراضي';
+                    statusTone = p.categoryPath.main === 'restaurants' ? 'success' : 'info';
+                  } else if (activeSubTab === 'visibility-policy') {
+                    statusLabel = p.surfaces.includes('client') ? 'مرئي للعميل' : 'داخلي';
+                    statusTone = p.surfaces.includes('client') ? 'success' : 'warning';
+                  }
+
+                  const isSelected = selectedProductId === p.id;
+                  return (
+                    <tr
+                      key={p.id}
+                      onClick={() => setSelectedProductId(p.id)}
+                      style={{
+                        borderBottom: `1px solid ${theme.line}`,
+                        cursor: 'pointer',
+                        backgroundColor: isSelected ? theme.brandSurface : 'transparent',
+                        transition: 'background-color 0.12s ease'
+                      }}
+                    >
+                      <td style={{ padding: '10px 12px' }}>
+                        <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={32} productName={p.name} />
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{cat?.label || 'غير محدد'}</Text>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <PolicyBadge mediaPolicy={p.mediaPolicy} />
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <WebControlPanelStatusTag label={statusLabel} tone={statusTone} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -12,7 +12,8 @@ export type CatalogWorkspaceId =
   | 'taxonomy-governance'
   | 'bulk-operations'
   | 'audit-trail'
-  | 'publication-readiness';
+  | 'publication-readiness'
+  | 'adoption-queue';
 
 // ── Workspace State ───────────────────────────────────────────────────────────
 
@@ -21,6 +22,9 @@ export type CatalogWorkspaceState = {
   productId?: string;
   sourceSurface?: 'catalogs' | 'partners' | 'marketing' | 'app-partner' | 'app-field' | 'app-client';
   reason?: string;
+  /** Partner identity — used by partner-handoff workspace to avoid hardcoded placeholder */
+  partnerId?: string;
+  partnerLabel?: string;
 };
 
 // ── Preview Proposal ──────────────────────────────────────────────────────────
@@ -74,6 +78,7 @@ export const CATALOG_WORKSPACE_OWNERS: Record<CatalogWorkspaceId, CatalogPreview
   'bulk-operations': 'control-panel-catalogs',
   'audit-trail': 'control-panel-catalogs',
   'publication-readiness': 'control-panel-catalogs',
+  'adoption-queue': 'control-panel-catalogs',
 };
 
 // ── Filter & Column Model ─────────────────────────────────────────────────────

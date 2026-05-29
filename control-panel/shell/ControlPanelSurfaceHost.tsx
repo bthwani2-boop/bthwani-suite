@@ -496,21 +496,6 @@ export function ControlPanelSurfaceHost({
     },
   ).length;
 
-  const hasPrimarySectionContent = hasRenderableSection(activeSectionId);
-  const sectionOwnershipLabel = activeMission
-    ? `owner:${activeMission.ownerSectionId} / flow:${activeMission.flowId}`
-    : "owner:TBD / flow:TBD";
-  const sectionCoverageLabel =
-    activeSectionServiceIds.length > 0
-      ? `${liveSectionServiceCount}/${activeSectionServiceIds.length} live services`
-      : "لا توجد خدمات مرتبطة";
-  const shellStatusClassName = [
-    styles.shellContractStatusPill,
-    commandStatus.kind === "blocked"
-      ? styles.shellContractStatusPillBlocked
-      : "",
-    commandStatus.kind === "alert" ? styles.shellContractStatusPillAlert : "",
-  ].join(" ");
 
   const handleBrandClick = React.useCallback(() => {
     setSelectedServiceId(allServiceTabId);
@@ -856,31 +841,7 @@ export function ControlPanelSurfaceHost({
           searchEmptyLabel="لا توجد نتائج مطابقة لبحثك"
         >
           <div className={styles.stageStack} dir={direction}>
-            <section className={styles.shellContractStrip} aria-live="polite">
-              <nav
-                className={styles.shellContractBreadcrumbs}
-                aria-label="مسار لوحة التحكم"
-              >
-                <span>{panelText.brandLabel}</span>
-                <span aria-hidden="true">/</span>
-                <strong>{shellCopy.title}</strong>
-              </nav>
 
-              <div className={styles.shellContractStatusCluster}>
-                <span className={shellStatusClassName}>
-                  {commandStatus.label}
-                </span>
-                <span className={styles.shellContractStatusText}>
-                  {commandStatus.description}
-                </span>
-                <span className={styles.shellContractMeta}>
-                  {sectionOwnershipLabel}
-                </span>
-                <span className={styles.shellContractMeta}>
-                  {sectionCoverageLabel}
-                </span>
-              </div>
-            </section>
 
             {activeSectionId === "dashboard" ? (
               <ControlPanelDshClosureDashboardScreen />

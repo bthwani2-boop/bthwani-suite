@@ -11,8 +11,18 @@ export type IntakeWorkspaceViewProps = {
   filteredProducts: CatalogProductMaster[];
   selectedProductId: string | null;
   setSelectedProductId: (id: string | null) => void;
-  openWorkspace: (ws: CatalogWorkspaceId, productId?: string) => void;
+  openWorkspace: (ws: CatalogWorkspaceId, productId?: string, extra?: { partnerId?: string; partnerLabel?: string }) => void;
 };
+
+function resolveStoreLabel(storeId?: string): string {
+  if (!storeId) return 'شريك غير محدد';
+  switch (storeId) {
+    case 'store-1001': return 'البيت (السوبر ماركت)';
+    case 'store-1002': return 'مخبز النور';
+    case 'store-1003': return 'شاورما وجريل';
+    default: return `شريك ${storeId}`;
+  }
+}
 
 export function IntakeWorkspaceView({
   activeSubTab,
@@ -49,6 +59,10 @@ export function IntakeWorkspaceView({
     impactInfo = 'البيانات المدخلة من الميدان تُراجع هنا لمنع تكرار الباركود وتطابق المنتجات المحلية.';
   }
 
+  const selectedProduct = filteredProducts.find(p => p.id === selectedProductId);
+  const resolvedPartnerId = selectedProduct?.partnerId ?? 'store-1001';
+  const resolvedPartnerLabel = resolveStoreLabel(selectedProduct?.partnerId);
+
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%', overflowY: 'auto' }}>
       <WorkspaceIntroBanner
@@ -59,14 +73,21 @@ export function IntakeWorkspaceView({
         impactInfo={impactInfo}
         nextActionLabel="تحديث بيانات المسار"
         extraActions={
-          activeSubTab === 'partner' && (
+          activeSubTab === 'partner' ? (
             <Button
-              label="▸ فتح workspace استلام الشريك"
+              label={selectedProduct ? `▸ فتح workspace استلام الشريك (${resolvedPartnerLabel})` : "▸ فتح workspace استلام الشريك"}
               tone="secondary"
               size="sm"
-              onPress={() => openWorkspace('partner-handoff')}
+              onPress={() => openWorkspace('partner-handoff', undefined, { partnerId: resolvedPartnerId, partnerLabel: resolvedPartnerLabel })}
             />
-          )
+          ) : activeSubTab === 'field' ? (
+            <Button
+              label="▸ فتح workspace معالجة التكرارات"
+              tone="secondary"
+              size="sm"
+              onPress={() => openWorkspace('duplicate-resolution')}
+            />
+          ) : null
         }
       />
 

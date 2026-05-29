@@ -19,7 +19,6 @@ type CatalogModalForm = ReturnType<typeof useCatalogScreen>['modalForm'];
 
 export type ProductEditModalProps = {
   setShowProductModal: React.Dispatch<React.SetStateAction<boolean>>;
-  modalMode: 'add' | 'edit';
   modalForm: CatalogModalForm;
   setModalForm: React.Dispatch<React.SetStateAction<CatalogModalForm>>;
   previewCategories: CatalogMainCategory[];
@@ -37,7 +36,6 @@ export type ProductEditModalProps = {
 
 export function ProductEditModal({
   setShowProductModal,
-  modalMode,
   modalForm,
   setModalForm,
   previewCategories,
@@ -59,7 +57,7 @@ export function ProductEditModal({
     }}>
       <Surface tone="raised" padding={4} gap={3} style={{ width: 420, maxWidth: '90%', maxHeight: '90%', overflow: 'scroll' }}>
         <Box layoutDirection="row" justify="space-between" align="center" style={{ borderBottomWidth: 1, borderBottomColor: theme.line, paddingBottom: 8 }}>
-          <Text role="bodyStrong" style={{ fontSize: 16 }}>{modalMode === 'add' ? 'إضافة منتج جديد' : 'تعديل منتج الكتالوج'}</Text>
+          <Text role="bodyStrong" style={{ fontSize: 16 }}>تعديل منتج الكتالوج</Text>
           <Button label="✕" accessibilityLabel="إغلاق" tone="secondary" size="sm" onPress={() => setShowProductModal(false)} />
         </Box>
 
@@ -174,41 +172,31 @@ export function ProductEditModal({
 
         <Box layoutDirection="row" justify="space-between" style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 12, marginTop: 12 }}>
           <Button
-            label={modalMode === 'add' ? 'إضافة المنتج' : 'حفظ التعديلات'}
+            label="حفظ التعديلات"
             tone="brand"
             onPress={() => {
               if (!modalForm.name || !modalForm.sku) {
                 setActionMessage('الاسم والمعرف مطلوبان');
                 return;
               }
-              if (modalMode === 'add') {
-                pushPreviewProposal(createCatalogPreviewProposal({
-                  type: 'create-product',
-                  label: 'تم تسجيل مقترح إضافة منتج',
-                  note: `اسم المنتج: ${modalForm.name} | sku: ${modalForm.sku} | categoryPath: ${modalForm.mainCat}/${modalForm.subCat || 'عام'} | mediaKey: ${modalForm.mediaKey || 'غير محدد'}`,
-                  apiBoundary: 'POST /catalog/products',
-                }));
-                setActionMessage('تم تسجيل مقترح إضافة المنتج كمعاينة');
-              } else {
-                const product = products.find((p) => p.id === modalForm.id);
-                if (product) {
-                  queueProductPreviewPatch(product, {
-                    name: modalForm.name,
-                    sku: modalForm.sku,
-                    gtin: modalForm.gtin || undefined,
-                    price: modalForm.price,
-                    categoryPath: {
-                      main: modalForm.mainCat,
-                      sub: modalForm.subCat || undefined,
-                      mainClassification: modalForm.mainClassif || undefined,
-                      subClassification: modalForm.subClassif || undefined,
-                    },
-                    mediaPolicy: modalForm.mediaPolicy,
-                    approvalStage: modalForm.approvalStage,
-                    imageUri: modalForm.imageUri || undefined,
-                    mediaKey: modalForm.mediaKey || undefined,
-                  }, 'تم تسجيل مقترح تعديل بيانات المنتج', 'تعديل بيانات المنتج كمعاينة فقط.');
-                }
+              const product = products.find((p) => p.id === modalForm.id);
+              if (product) {
+                queueProductPreviewPatch(product, {
+                  name: modalForm.name,
+                  sku: modalForm.sku,
+                  gtin: modalForm.gtin || undefined,
+                  price: modalForm.price,
+                  categoryPath: {
+                    main: modalForm.mainCat,
+                    sub: modalForm.subCat || undefined,
+                    mainClassification: modalForm.mainClassif || undefined,
+                    subClassification: modalForm.subClassif || undefined,
+                  },
+                  mediaPolicy: modalForm.mediaPolicy,
+                  approvalStage: modalForm.approvalStage,
+                  imageUri: modalForm.imageUri || undefined,
+                  mediaKey: modalForm.mediaKey || undefined,
+                }, 'تم تسجيل مقترح تعديل بيانات المنتج', 'تعديل بيانات المنتج كمعاينة فقط.');
               }
               setShowProductModal(false);
             }}
