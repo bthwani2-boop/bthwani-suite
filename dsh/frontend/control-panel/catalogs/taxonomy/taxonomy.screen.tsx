@@ -204,7 +204,7 @@ export function TaxonomyScreen({ taxonomy, products }: TaxonomyScreenProps) {
                 {/* Add sub-category form */}
                 {addingSubUnder === cat.id && (
                   <div style={{ padding: '8px 14px', borderTop: '1px solid ' + theme.line, backgroundColor: theme.surfaceInset, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <Text role="caption" style={{ fontSize: '10px', fontWeight: 700, color: theme.brandHeaderBackground }}>إضافة فئة فرعية لـ: {cat.label}</Text>
+                    <Text role="caption" style={{ fontSize: 10, fontWeight: 700, color: theme.brandHeaderBackground }}>إضافة فئة فرعية لـ: {cat.label}</Text>
                     <input type="text" placeholder="اسم الفئة الفرعية *" value={formLabel} onChange={e => setFormLabel(e.target.value)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid ' + theme.lineStrong, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '11px' }} />
                     <input type="text" placeholder="وصف (اختياري)" value={formSubtitle} onChange={e => setFormSubtitle(e.target.value)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid ' + theme.lineStrong, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '11px' }} />
                     <div style={{ display: 'flex', gap: '6px' }}>
@@ -268,7 +268,7 @@ export function TaxonomyScreen({ taxonomy, products }: TaxonomyScreenProps) {
 
                           {addingMainClassifUnder?.mainId === cat.id && addingMainClassifUnder.subId === sub.id && (
                             <div style={{ padding: '6px 28px', borderTop: '1px solid ' + theme.line, display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: theme.surfaceInset }}>
-                              <Text role="caption" style={{ fontSize: '9px', fontWeight: 700, color: theme.brandHeaderBackground }}>تصنيف رئيسي جديد لـ: {sub.label}</Text>
+                              <Text role="caption" style={{ fontSize: 9, fontWeight: 700, color: theme.brandHeaderBackground }}>تصنيف رئيسي جديد لـ: {sub.label}</Text>
                               <input type="text" placeholder="اسم التصنيف *" value={formLabel} onChange={e => setFormLabel(e.target.value)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid ' + theme.lineStrong, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '10px' }} />
                               <div style={{ display: 'flex', gap: '4px' }}>
                                 <button onClick={() => handleAddMainClassification(cat.id, sub.id)} style={{ padding: '2px 10px', borderRadius: '4px', fontSize: '9px', fontWeight: 700, border: 'none', backgroundColor: theme.brand, color: theme.textInverse, cursor: 'pointer' }}>تأكيد</button>
