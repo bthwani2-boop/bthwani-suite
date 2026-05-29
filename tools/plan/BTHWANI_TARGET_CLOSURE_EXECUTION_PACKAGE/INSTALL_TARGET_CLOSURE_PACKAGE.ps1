@@ -11,7 +11,7 @@ if ([string]::IsNullOrWhiteSpace($SourcePlanRoot)) {
   $SourcePlanRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
 
-$TargetPlanRoot = Join-Path $RepoRoot "tools\plan"
+$TargetPlanRoot = Join-Path $RepoRoot "tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE"
 $SessionId = "INSTALL_TARGET_CLOSURE_PACKAGE-" + (Get-Date -Format "yyyyMMdd-HHmmss")
 $RunRoot = Join-Path $RepoRoot "tools\registry\runs\$SessionId"
 New-Item -ItemType Directory -Force -Path $RunRoot | Out-Null

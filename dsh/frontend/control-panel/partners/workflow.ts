@@ -184,3 +184,22 @@ export const dshPartnerApprovalLanes = [
     description: 'بعد موافقة الشركاء ينتقل الطلب إلى المراجعة التسويقية النهائية ثم يدخل مسار الإطلاق.',
   },
 ] as const;
+
+// Re-export centralized models and getters/setters from shared workflow store
+export type {
+  DshPartnerDocumentKind,
+  DshPartnerDocumentVerification,
+  DshPartnerCatalogOverride,
+} from '../../shared/workflow';
+
+export {
+  resolvePartnerIdForStore,
+  getPartnerActivationStatus,
+  updatePartnerActivationStatus,
+  getAllPartnerActivationStatuses,
+  getPartnerDocuments,
+  updatePartnerDocumentStatus,
+  getPartnerCatalogOverrides,
+  upsertPartnerCatalogOverride,
+  deletePartnerCatalogOverride,
+} from '../../shared/workflow';

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, useTheme, Surface } from '@bthwani/ui-kit';
 import {
   WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
   WebControlPanelDecisionRow,
+  WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import { getPartnerIntakeItems } from '../../shared/workflow';
 import {
@@ -22,6 +23,18 @@ import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 import { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
 import { PartnerTopologyLane } from './PartnerTopologyLane';
 import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
+import { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './PartnerManagementScreens';
+import { PartnerCatalogOverridesWorkspace } from './PartnerCatalogOverridesWorkspace';
+import { PartnerPerformanceWorkspace } from './PartnerPerformanceWorkspace';
+import { PartnerModificationsWorkspace } from './PartnerModificationsWorkspace';
+import { PartnerComplaintsWorkspace } from './PartnerComplaintsWorkspace';
+import {
+  PARTNER_FULFILLMENT_AGREEMENTS,
+  getPartnerActivationStatus,
+  updatePartnerActivationStatus,
+  getAllPartnerActivationStatuses,
+} from './workflow';
+import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
 
 // ML-001: approval action extended to include final ops activation step for marketing-approved records
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
@@ -74,58 +87,117 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
   );
 }
 
-function PartnerControlWorkspace() {
-  const controlRows = [
-    {
-      id: 'perf',
-      label: 'مراجعة الأداء والتغطية',
-      status: 'مراجعة',
-      reason: 'تجميع الأداء، السعة، وتباطؤ الجاهزية ضمن مساحة الشركاء بدل تفريغه في operations.',
-      action: 'فتح مسارات الخدمة',
-    },
-    {
-      id: 'pause',
-      label: 'إغلاق أو pause مؤقت',
-      status: 'منضبط',
-      reason: 'الإيقاف المؤقت يوضح أثره على الظهور والمسارات النشطة قبل أي قرار نهائي.',
-      action: 'مراجعة الإيقاف',
-    },
-    {
-      id: 'appeal',
-      label: 'نزاعات واستئناف',
-      status: 'يتطلب owner',
-      reason: 'الاستئناف يبقى مملوكًا للشركاء مع handoff واضح إلى الدعم أو الكتالوج عند الحاجة.',
-      action: 'فتح النزاع',
-    },
-    {
-      id: 'capacity',
-      label: 'سعة الشريك والضغط',
-      status: 'مرئي',
-      reason: 'ضغط الفرع والسعة يحددان هل المشكلة تشغيلية أم شريكًا قبل أي تصعيد.',
-      action: 'فحص السعة',
-    },
-    {
-      id: 'visibility',
-      label: 'الخط الزمني للظهور',
-      status: 'client gate',
-      reason: 'التسلسل من الوثائق إلى الجاهزية إلى client visibility يظهر هنا بوضوح واحد.',
-      action: 'فتح timeline',
-    },
-  ] as const;
+
+
+function ControlPanelDshPartnerDeactivationTab() {
+  const { theme } = useTheme();
+  const [partnerStatuses, setPartnerStatuses] = React.useState<Record<string, DshPartnerActivationStatus>>({});
+  const [selectedPartnerId, setSelectedPartnerId] = React.useState('partner-saha');
+  const [actionMessage, setActionMessage] = React.useState('اختر شريكاً لإلغاء تفعيله أو مراجعة سبب إيقافه.');
+
+  React.useEffect(() => {
+    setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+  }, []);
+
+  const currentStatus = partnerStatuses[selectedPartnerId] ?? getPartnerActivationStatus(selectedPartnerId);
+  const currentPartner = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedPartnerId) || PARTNER_FULFILLMENT_AGREEMENTS[0];
+
+  const handleDeactivateConfirm = (partnerId: string, reason: string, note: string) => {
+    updatePartnerActivationStatus(partnerId, 'partner_deactivated');
+    setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+    setActionMessage(`تم إلغاء تفعيل الشريك بنجاح. السبب: ${reason} · الملاحظة: ${note}`);
+  };
+
+  const isDeactivated = currentStatus === 'partner_deactivated';
 
   return (
-    <Box gap={3}>
-      {controlRows.map((row) => (
-        <WebControlPanelDecisionRow
-          key={row.id}
-          entityId={row.id}
-          entityLabel={row.label}
-          status={row.status}
-          statusTone={row.status === 'يتطلب owner' ? 'warning' : 'neutral'}
-          recommendation={row.reason}
-          primaryAction={{ id: `${row.id}-open`, label: row.action }}
-        />
-      ))}
+    <Box gap={4} style={{ direction: 'rtl' }}>
+      {/* Partner selector chips */}
+      <Box gap={2}>
+        <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>اختر الشريك لإجراءات إلغاء التفعيل</Text>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+          {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
+            const status = partnerStatuses[partner.partnerId] ?? getPartnerActivationStatus(partner.partnerId);
+            const isActive = selectedPartnerId === partner.partnerId;
+            return (
+              <button
+                key={partner.partnerId}
+                type="button"
+                onClick={() => {
+                  setSelectedPartnerId(partner.partnerId);
+                  setActionMessage(`تم تحديد الشريك: ${partner.storeName}`);
+                }}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '12px',
+                  border: `1px solid ${isActive ? theme.brand : theme.line}`,
+                  background: isActive ? theme.brandSurface : theme.surface,
+                  color: isActive ? theme.brand : theme.text,
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                {partner.storeName} ({status === 'partner_deactivated' ? 'ملغى التفعيل' : 'نشط/جاهز'})
+              </button>
+            );
+          })}
+        </Box>
+      </Box>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start' }}>
+        <Box gap={4}>
+          {isDeactivated ? (
+            <Surface tone="raised" padding={5} gap={3} style={{ borderRadius: '16px' }}>
+              <Text role="titleLg" style={{ fontWeight: '900', color: theme.danger }}>الشريك ملغى التفعيل</Text>
+              <Text role="bodyMd" tone="muted">
+                تم إلغاء تفعيل متجر <strong>{currentPartner.storeName}</strong> بالكامل من لوحة التحكم ولا يمكنه استقبال طلبات العملاء.
+              </Text>
+              <Box style={{ background: theme.surfaceInset, padding: '12px', borderRadius: '10px', border: `1px solid ${theme.line}` }}>
+                <Text role="caption" tone="brand">الملاحظة التشغيلية الحالية:</Text>
+                <Text role="bodySm" style={{ marginTop: '4px' }}>
+                  الشريك في حالة تعطيل بسبب خلل في الامتثال أو بطلب مباشر. يجب إعادة مراجعة المستندات لإعادة التفعيل.
+                </Text>
+              </Box>
+              <button
+                type="button"
+                onClick={() => {
+                  updatePartnerActivationStatus(selectedPartnerId, 'submitted');
+                  setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+                  setActionMessage('تم إعادة تعيين حالة الشريك إلى التقديم الأولي.');
+                }}
+                style={{
+                  padding: '10px',
+                  borderRadius: '8px',
+                  background: theme.brand,
+                  color: theme.surface,
+                  border: 'none',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                إعادة تعيين إلى التقديم الأولي (Reset to Submitted)
+              </button>
+            </Surface>
+          ) : (
+            <PartnerDeactivationWorkspace
+              partnerId={selectedPartnerId}
+              partnerName={currentPartner.storeName}
+              auditRequired={true}
+              onConfirmDeactivate={handleDeactivateConfirm}
+            />
+          )}
+        </Box>
+
+        <Box gap={4}>
+          <WebControlPanelRecommendation
+            title="إجراءات إلغاء التفعيل"
+            reason={actionMessage}
+            confidence="high"
+            auditTag="UI_PREVIEW_ONLY"
+          />
+        </Box>
+      </div>
     </Box>
   );
 }
@@ -175,6 +247,14 @@ export function ControlPanelDshPartnerHubScreen() {
       );
     }
 
+    if (activeSubTab === 'modifications') {
+      return <PartnerModificationsWorkspace />;
+    }
+
+    if (activeSubTab === 'complaints') {
+      return <PartnerComplaintsWorkspace />;
+    }
+
     return (
       <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
         <Box align="center" gap={1}>
@@ -187,6 +267,9 @@ export function ControlPanelDshPartnerHubScreen() {
 
   const PRIMARY_TABS = [
     { id: 'inbox', label: 'الوارد الجديد', active: activeTab === 'inbox' },
+    { id: 'activation', label: 'تفعيل الشريك', active: activeTab === 'activation' },
+    { id: 'documents', label: 'وثائق الشركاء', active: activeTab === 'documents' },
+    { id: 'overrides', label: 'تجاوزات الكتالوج', active: activeTab === 'overrides' },
     { id: 'performance', label: 'الأداء والامتثال', active: activeTab === 'performance' },
     { id: 'eligibility', label: 'أهلية الترويج', active: activeTab === 'eligibility' },
     { id: 'topology', label: 'مسارات الخدمة', active: activeTab === 'topology' },
@@ -285,15 +368,21 @@ export function ControlPanelDshPartnerHubScreen() {
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
             {activeTab === 'deactivation' ? (
-              <PartnerDeactivationWorkspace />
+              <ControlPanelDshPartnerDeactivationTab />
             ) : activeTab === 'performance' ? (
-              <PartnerControlWorkspace />
+              <PartnerPerformanceWorkspace activeSubTab={activeSubTab} />
             ) : activeTab === 'eligibility' ? (
               <DshPartnerPromotionEligibilityScreen />
             ) : activeTab === 'topology' ? (
               <PartnerTopologyLane />
             ) : activeTab === 'contracts' ? (
               <PartnerFulfillmentLane />
+            ) : activeTab === 'activation' ? (
+              <ControlPanelDshPartnerActivationScreen />
+            ) : activeTab === 'documents' ? (
+              <ControlPanelDshPartnerDocumentReviewScreen />
+            ) : activeTab === 'overrides' ? (
+              <PartnerCatalogOverridesWorkspace />
             ) : activeTab === 'inbox' && activeSubTab === 'registration' ? (
               renderInboxWorkspace()
             ) : activeTab === 'inbox' ? (
@@ -306,6 +395,7 @@ export function ControlPanelDshPartnerHubScreen() {
                 </Box>
               </Box>
             )}
+
           </Box>
         </div>
       </main>

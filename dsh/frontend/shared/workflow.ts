@@ -1,3 +1,5 @@
+import type { DshPartnerActivationStatus } from './dsh-partner-activation.model';
+
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
 export type DshPartnerIntakeStage = 'pending-partner' | 'pending-marketing' | 'published';
 
@@ -776,4 +778,134 @@ export function moveApprovalRecordToStage(
       auditTrail: [...(r.auditTrail || []), entry],
     };
   });
+}
+
+// =====================================================================
+// DSH Shared Partner Activation, Documents & Overrides SSoT — UI_PREVIEW_ONLY
+// =====================================================================
+
+export type DshPartnerDocumentKind = 'commercial_registration' | 'tax_certificate' | 'identity_proof';
+
+export type DshPartnerDocumentVerification = {
+  id: string;
+  kind: DshPartnerDocumentKind;
+  label: string;
+  status: 'uploaded' | 'missing' | 'verified' | 'rejected';
+  uploadedAt?: string;
+  rejectionReason?: string;
+  verifiedByFieldAgent?: string;
+  fieldVisitDate?: string;
+  fieldEvidencePhoto?: string;
+  geoCoordinates?: string;
+};
+
+export type DshPartnerCatalogOverride = {
+  productId: string;
+  priceOverride?: string;
+  stockOverride?: number;
+  availableOverride?: boolean;
+  prepNoteOverride?: string;
+  owner: 'partner' | 'cp_manager';
+  state: 'active' | 'draft' | 'pending_review';
+  lastUpdated: string;
+};
+
+// Global shared states
+let _globalPartnerStatuses: Record<string, DshPartnerActivationStatus> = {
+  'partner-saha': 'client_visible',
+  'partner-shorouq': 'submitted',
+  'partner-zawya': 'documents_uploaded',
+  'partner-nokhba': 'ops_approved',
+};
+
+let _globalPartnerDocuments: Record<string, DshPartnerDocumentVerification[]> = {
+  'partner-saha': [
+    { id: 'doc-cr-saha', kind: 'commercial_registration', label: 'السجل التجاري (محمصة الساحة)', status: 'verified', uploadedAt: '2026-05-20T10:00:00Z', verifiedByFieldAgent: 'ناصر القحطاني', fieldVisitDate: '2026-05-22', fieldEvidencePhoto: 'CR_SAHA_01.jpg', geoCoordinates: '24.7136, 46.6753' },
+    { id: 'doc-tax-saha', kind: 'tax_certificate', label: 'الشهادة الضريبية', status: 'verified', uploadedAt: '2026-05-20T10:05:00Z', verifiedByFieldAgent: 'ناصر القحطاني', fieldVisitDate: '2026-05-22', fieldEvidencePhoto: 'TAX_SAHA_01.jpg', geoCoordinates: '24.7136, 46.6753' },
+    { id: 'doc-id-saha', kind: 'identity_proof', label: 'هوية المالك / المفوض', status: 'verified', uploadedAt: '2026-05-20T10:10:00Z', verifiedByFieldAgent: 'ناصر القحطاني', fieldVisitDate: '2026-05-22', fieldEvidencePhoto: 'ID_SAHA_01.jpg', geoCoordinates: '24.7136, 46.6753' },
+  ],
+  'partner-shorouq': [
+    { id: 'doc-cr-shorouq', kind: 'commercial_registration', label: 'السجل التجاري (بوفيه الشروق)', status: 'uploaded', uploadedAt: '2026-05-28T14:30:00Z', verifiedByFieldAgent: 'عبد الله الشمري', fieldVisitDate: '2026-05-28', fieldEvidencePhoto: 'CR_SHOROUQ.png', geoCoordinates: '24.8122, 46.7329' },
+    { id: 'doc-tax-shorouq', kind: 'tax_certificate', label: 'الشهادة الضريبية', status: 'missing' },
+    { id: 'doc-id-shorouq', kind: 'identity_proof', label: 'هوية المالك / المفوض', status: 'uploaded', uploadedAt: '2026-05-28T14:35:00Z', verifiedByFieldAgent: 'عبد الله الشمري', fieldVisitDate: '2026-05-28', fieldEvidencePhoto: 'ID_SHOROUQ.png', geoCoordinates: '24.8122, 46.7329' },
+  ],
+  'partner-zawya': [
+    { id: 'doc-cr-zawya', kind: 'commercial_registration', label: 'السجل التجاري (مخبز الزاوية)', status: 'verified', uploadedAt: '2026-05-15T09:00:00Z', verifiedByFieldAgent: 'ناصر القحطاني', fieldVisitDate: '2026-05-16', fieldEvidencePhoto: 'CR_ZAWYA.jpg', geoCoordinates: '24.7562, 46.6111' },
+    { id: 'doc-tax-zawya', kind: 'tax_certificate', label: 'الشهادة الضريبية', status: 'verified', uploadedAt: '2026-05-15T09:02:00Z', verifiedByFieldAgent: 'ناصر القحطاني', fieldVisitDate: '2026-05-16', fieldEvidencePhoto: 'TAX_ZAWYA.jpg', geoCoordinates: '24.7562, 46.6111' },
+    { id: 'doc-id-zawya', kind: 'identity_proof', label: 'هوية المالك / المفوض', status: 'rejected', uploadedAt: '2026-05-15T09:05:00Z', rejectionReason: 'صورة الهوية منتهية الصلاحية — يرجى رفع الهوية الوطنية سارية المفعول.', verifiedByFieldAgent: 'ناصر القحطاني' },
+  ],
+  'partner-nokhba': [
+    { id: 'doc-cr-nokhba', kind: 'commercial_registration', label: 'السجل التجاري (تمور النخبة)', status: 'verified', uploadedAt: '2026-05-25T11:00:00Z', verifiedByFieldAgent: 'عبد العزيز الحربي', fieldVisitDate: '2026-05-26', fieldEvidencePhoto: 'CR_NOKHBA.png', geoCoordinates: '24.7891, 46.8012' },
+    { id: 'doc-tax-nokhba', kind: 'tax_certificate', label: 'الشهادة الضريبية', status: 'verified', uploadedAt: '2026-05-25T11:05:00Z', verifiedByFieldAgent: 'عبد العزيز الحربي', fieldVisitDate: '2026-05-26', fieldEvidencePhoto: 'TAX_NOKHBA.png', geoCoordinates: '24.7891, 46.8012' },
+    { id: 'doc-id-nokhba', kind: 'identity_proof', label: 'هوية المالك / المفوض', status: 'verified', uploadedAt: '2026-05-25T11:10:00Z', verifiedByFieldAgent: 'عبد العزيز الحربي', fieldVisitDate: '2026-05-26', fieldEvidencePhoto: 'ID_NOKHBA.png', geoCoordinates: '24.7891, 46.8012' },
+  ],
+};
+
+let _globalPartnerOverrides: Record<string, DshPartnerCatalogOverride[]> = {
+  'partner-saha': [
+    { productId: 'item-apple-1', priceOverride: '22.00 ر.س', stockOverride: 45, availableOverride: true, prepNoteOverride: 'تفاح طازج مقطع عند الطلب', owner: 'partner', state: 'active', lastUpdated: 'أمس 18:30' },
+    { productId: 'item-milk-1', priceOverride: '13.50 ر.س', stockOverride: 5, availableOverride: true, owner: 'cp_manager', state: 'active', lastUpdated: 'اليوم 08:40' },
+    { productId: 'item-choco-2', availableOverride: false, prepNoteOverride: 'غير متوفر مؤقتاً بسبب نفاد الشوكولاتة الخاصة', owner: 'partner', state: 'active', lastUpdated: 'اليوم 10:15' },
+  ],
+  'partner-shorouq': [
+    { productId: 'item-chicken-2', priceOverride: '18.00 ر.س', stockOverride: 120, availableOverride: true, prepNoteOverride: 'تحضير طازج يستغرق ١٥ دقيقة', owner: 'partner', state: 'active', lastUpdated: 'اليوم 09:20' },
+  ],
+  'partner-zawya': [
+    { productId: 'item-bread-1', priceOverride: '12.00 ر.س', stockOverride: 0, availableOverride: false, owner: 'partner', state: 'pending_review', lastUpdated: 'أمس 12:00' },
+  ],
+  'partner-nokhba': [
+    { productId: 'canonical-product-field-lead-5-featured', priceOverride: '95.00 ر.س', stockOverride: 300, availableOverride: true, prepNoteOverride: 'تغليف ملكي خاص للهدايا الميدانية', owner: 'cp_manager', state: 'active', lastUpdated: 'اليوم 12:15' },
+  ],
+};
+
+// Getters & Setters
+export function resolvePartnerIdForStore(storeId: string): string {
+  if (storeId.includes('saha') || storeId === 'store-1001' || storeId === 'store-2001') return 'partner-saha';
+  if (storeId.includes('shorouq') || storeId === 'store-1002' || storeId === 'store-2002') return 'partner-shorouq';
+  if (storeId.includes('zawya') || storeId === 'store-1003' || storeId === 'store-2102') return 'partner-zawya';
+  if (storeId.includes('nokhba') || storeId === 'store-visible-client' || storeId === 'canonical-store-field-lead-5') return 'partner-nokhba';
+  return storeId;
+}
+
+export function getPartnerActivationStatus(partnerId: string): DshPartnerActivationStatus {
+  return _globalPartnerStatuses[partnerId] ?? 'draft';
+}
+
+export function updatePartnerActivationStatus(partnerId: string, status: DshPartnerActivationStatus): void {
+  _globalPartnerStatuses = { ..._globalPartnerStatuses, [partnerId]: status };
+}
+
+export function getAllPartnerActivationStatuses(): Record<string, DshPartnerActivationStatus> {
+  return _globalPartnerStatuses;
+}
+
+export function getPartnerDocuments(partnerId: string): DshPartnerDocumentVerification[] {
+  return _globalPartnerDocuments[partnerId] ?? [];
+}
+
+export function updatePartnerDocumentStatus(
+  partnerId: string,
+  docId: string,
+  status: 'uploaded' | 'missing' | 'verified' | 'rejected',
+  reason?: string
+): void {
+  const docs = _globalPartnerDocuments[partnerId] ?? [];
+  const updated = docs.map(d => d.id === docId ? { ...d, status, rejectionReason: reason } : d);
+  _globalPartnerDocuments = { ..._globalPartnerDocuments, [partnerId]: updated };
+}
+
+export function getPartnerCatalogOverrides(partnerId: string): DshPartnerCatalogOverride[] {
+  return _globalPartnerOverrides[partnerId] ?? [];
+}
+
+export function upsertPartnerCatalogOverride(partnerId: string, override: DshPartnerCatalogOverride): void {
+  const current = _globalPartnerOverrides[partnerId] ?? [];
+  const filtered = current.filter(o => o.productId !== override.productId);
+  _globalPartnerOverrides = { ..._globalPartnerOverrides, [partnerId]: [...filtered, override] };
+}
+
+export function deletePartnerCatalogOverride(partnerId: string, productId: string): void {
+  const current = _globalPartnerOverrides[partnerId] ?? [];
+  const filtered = current.filter(o => o.productId !== productId);
+  _globalPartnerOverrides = { ..._globalPartnerOverrides, [partnerId]: filtered };
 }

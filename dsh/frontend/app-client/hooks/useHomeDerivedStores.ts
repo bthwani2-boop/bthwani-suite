@@ -72,6 +72,7 @@ export function useHomeDerivedStores({
       (stores ?? []).map((store) => ({
         store,
         clientVisibility: resolveDshStoreClientVisibility({
+          storeId: store.id,
           publishStage: store.publishStage,
           supportsPickup: store.supportsPickup,
           supportsPartnerDelivery: store.supportsPartnerDelivery,

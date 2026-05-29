@@ -249,3 +249,151 @@ export const CENTRAL_PRODUCT_DETAIL_LOOKUP: Record<string, PartnerInventoryDetai
   'prd-dates-box': { id: 'prd-dates-box', sku: 'BTH-DAT-001', gtin: '6280001055009', barcode: '6280001000995', manufacturerCode: 'MFR-SW-99', internalNote: 'نسبة الخصم عالية جداً وتؤثر على هامش الربح.' },
   'prd-honey-jar': { id: 'prd-honey-jar', sku: 'BTH-DAT-002', gtin: '6280001001022', barcode: '6280001001022', manufacturerCode: 'MFR-DR-102' },
 };
+
+export type PartnerComplaint = {
+  id: string;
+  partnerId: string;
+  category: string;
+  submittedAt: string;
+  status: 'open' | 'investigating' | 'resolved';
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+  relatedOrderId?: string;
+  assignedTo?: string;
+};
+
+export const PARTNER_COMPLAINTS_DATA: PartnerComplaint[] = [
+  {
+    id: 'cmp-001',
+    partnerId: 'partner-saha',
+    category: 'تأخير استلام المندوب',
+    submittedAt: 'منذ ساعتين',
+    status: 'open',
+    severity: 'high',
+    description: 'المندوب لم يصل لاستلام الطلب لأكثر من 45 دقيقة مما أدى إلى تلف الوجبة.',
+    relatedOrderId: 'ORD-88219-A',
+  },
+  {
+    id: 'cmp-002',
+    partnerId: 'partner-zawya',
+    category: 'مشكلة مالية/تسوية',
+    submittedAt: 'أمس 14:20',
+    status: 'investigating',
+    severity: 'medium',
+    description: 'يوجد فارق في تسوية الأسبوع الماضي بمقدار 150 ريال لم يتم احتسابه ضمن التحويل البنكي.',
+    assignedTo: 'فريق المالية',
+  },
+  {
+    id: 'cmp-003',
+    partnerId: 'partner-shorouq',
+    category: 'سلوك مندوب',
+    submittedAt: 'منذ 3 أيام',
+    status: 'resolved',
+    severity: 'low',
+    description: 'تم التعامل بأسلوب غير احترافي من قبل المندوب عند استلام الطلب.',
+    relatedOrderId: 'ORD-77112-B',
+  },
+];
+
+export type PartnerModificationRequest = {
+  id: string;
+  partnerId: string;
+  type: string;
+  submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  risk: 'neutral' | 'warning' | 'danger';
+  changes: { field: string; old: string; new: string }[];
+  reason: string;
+};
+
+export const PARTNER_MODIFICATION_REQUESTS: PartnerModificationRequest[] = [
+  {
+    id: 'mod-001',
+    partnerId: 'partner-shorouq',
+    type: 'تحديث بيانات بنكية (IBAN)',
+    submittedAt: 'اليوم 08:30',
+    status: 'pending',
+    risk: 'danger',
+    changes: [
+      { field: 'الآيبان', old: 'SA123456789...', new: 'SA987654321...' },
+      { field: 'اسم المستفيد', old: 'بوفيه الشروق', new: 'شركة الشروق لتقديم الإعاشة' },
+    ],
+    reason: 'يتطلب التحقق من الحساب البنكي لتجنب رفض الحوالات المالية. يصنف الإجراء عالي الخطورة.',
+  },
+  {
+    id: 'mod-002',
+    partnerId: 'partner-saha',
+    type: 'تغيير أوقات العمل',
+    submittedAt: 'أمس 22:15',
+    status: 'pending',
+    risk: 'warning',
+    changes: [
+      { field: 'الدوام (من)', old: '06:00', new: '07:00' },
+      { field: 'الدوام (إلى)', old: '23:00', new: '01:00' },
+    ],
+    reason: 'تحديث تشغيلي يؤثر على استقبال الطلبات. التحقق الآلي سليم.',
+  },
+  {
+    id: 'mod-003',
+    partnerId: 'partner-zawya',
+    type: 'تحديث شعار وهوية',
+    submittedAt: 'منذ يومين',
+    status: 'pending',
+    risk: 'neutral',
+    changes: [
+      { field: 'الشعار', old: 'logo-v1.png', new: 'logo-v2.png' },
+    ],
+    reason: 'يتطلب مراجعة بسيطة من فريق الكتالوج لضمان الجودة قبل الاعتماد.',
+  },
+];
+
+export type PartnerPerformanceMetric = {
+  id: string;
+  kpis: { onTime: string; cancelRate: string; rating: string };
+  capacity: string;
+  disputes: number;
+  compliance: 'high' | 'medium' | 'danger';
+};
+
+export const PARTNER_PERFORMANCE_METRICS: PartnerPerformanceMetric[] = [
+  { id: 'partner-saha', kpis: { onTime: '98%', cancelRate: '0.5%', rating: '4.8/5' }, capacity: 'مستقر', disputes: 0, compliance: 'high' },
+  { id: 'partner-shorouq', kpis: { onTime: '85%', cancelRate: '3.2%', rating: '4.1/5' }, capacity: 'ضغط مرتفع', disputes: 2, compliance: 'medium' },
+  { id: 'partner-zawya', kpis: { onTime: '95%', cancelRate: '1.0%', rating: '4.5/5' }, capacity: 'مستقر', disputes: 0, compliance: 'high' },
+  { id: 'partner-nokhba', kpis: { onTime: '90%', cancelRate: '2.5%', rating: '4.3/5' }, capacity: 'مستقر', disputes: 1, compliance: 'medium' },
+];
+
+export type PartnerDispute = {
+  id: string;
+  partnerId: string;
+  type: string;
+  status: string;
+  date: string;
+  sla: string;
+};
+
+export const PARTNER_DISPUTES_DATA: PartnerDispute[] = [
+  { id: 'disp-001', partnerId: 'partner-shorouq', type: 'إلغاء طلب متأخر', status: 'مفتوح', date: 'اليوم 10:30', sla: 'تحذير 4 ساعات' },
+  { id: 'disp-002', partnerId: 'partner-shorouq', type: 'اعتراض على تقييم', status: 'قيد المراجعة', date: 'أمس 14:00', sla: 'ضمن الوقت' },
+  { id: 'disp-003', partnerId: 'partner-nokhba', type: 'نزاع تسوية مالية', status: 'مفتوح', date: 'اليوم 09:15', sla: 'تحذير 8 ساعات' },
+];
+
+export type PartnerVisibilityEvent = {
+  id: string;
+  partnerId: string;
+  date: string;
+  eventType: 'activated' | 'deactivated_by_partner' | 'deactivated_by_admin' | 'catalog_hidden';
+  reason: string;
+  actionBy: string;
+};
+
+export const PARTNER_VISIBILITY_TIMELINE_DATA: PartnerVisibilityEvent[] = [
+  { id: 'vis-001', partnerId: 'partner-saha', date: '2025-01-10 09:00', eventType: 'activated', reason: 'اكمال التسجيل واعتماد المستندات', actionBy: 'النظام' },
+  { id: 'vis-002', partnerId: 'partner-saha', date: '2025-06-15 14:30', eventType: 'deactivated_by_partner', reason: 'إغلاق مؤقت للصيانة', actionBy: 'الشريك' },
+  { id: 'vis-003', partnerId: 'partner-saha', date: '2025-06-16 10:00', eventType: 'activated', reason: 'انتهاء فترة الصيانة', actionBy: 'الشريك' },
+  { id: 'vis-004', partnerId: 'partner-shorouq', date: '2025-10-05 11:20', eventType: 'activated', reason: 'اعتماد المستندات وتفعيل الحساب', actionBy: 'مدير الشركاء' },
+  { id: 'vis-005', partnerId: 'partner-shorouq', date: '2026-02-12 16:45', eventType: 'deactivated_by_admin', reason: 'تجاوز حد الشكاوى المسموح به - إيقاف مؤقت', actionBy: 'فريق الامتثال' },
+  { id: 'vis-006', partnerId: 'partner-shorouq', date: '2026-02-15 09:10', eventType: 'activated', reason: 'تعهد من الشريك بإصلاح الخلل وإعادة التفعيل', actionBy: 'فريق الامتثال' },
+  { id: 'vis-007', partnerId: 'partner-zawya', date: '2026-03-20 08:00', eventType: 'activated', reason: 'تفعيل المتجر', actionBy: 'النظام' },
+  { id: 'vis-008', partnerId: 'partner-nokhba', date: '2026-04-01 13:15', eventType: 'catalog_hidden', reason: 'إخفاء الكتالوج لعدم توفر أسعار صحيحة', actionBy: 'مدير الكتالوج' },
+  { id: 'vis-009', partnerId: 'partner-nokhba', date: '2026-04-03 10:00', eventType: 'activated', reason: 'تحديث الكتالوج وإعادة التفعيل', actionBy: 'النظام' },
+];

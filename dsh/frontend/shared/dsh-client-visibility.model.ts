@@ -1,4 +1,5 @@
 import type { ApprovalStage } from './workflow';
+import { getPartnerActivationStatus, resolvePartnerIdForStore } from './workflow';
 import {
   getDshPartnerActivationStateMetadata,
   getDshPartnerReadinessChecklist,
@@ -58,6 +59,7 @@ export type DshProductClientVisibilityResult = {
 };
 
 type DshStoreClientVisibilityOptions = {
+  readonly storeId?: string;
   readonly publishStage?: string;
   readonly approvalStage?: ApprovalStage;
   readonly activationStatus?: DshPartnerActivationStatus;
@@ -280,8 +282,14 @@ function withServiceabilityChecklist(
 export function resolveDshStoreClientVisibility(
   options: DshStoreClientVisibilityOptions,
 ): DshStoreClientVisibilityResult {
-  const activationStatus = options.activationStatus
-    ?? mapPublishStageToPartnerActivationStatus(options.approvalStage ?? options.publishStage);
+  let activationStatus = options.activationStatus;
+  if (!activationStatus && options.storeId) {
+    const partnerId = resolvePartnerIdForStore(options.storeId);
+    activationStatus = getPartnerActivationStatus(partnerId);
+  }
+  if (!activationStatus) {
+    activationStatus = mapPublishStageToPartnerActivationStatus(options.approvalStage ?? options.publishStage);
+  }
   const fieldReadinessReady = inferFieldReadinessReady(activationStatus, options.fieldReadinessReady);
   const documentsVerified = inferDocumentsVerified(activationStatus, options.documentsVerified);
   const opsApproved = inferOpsApproved(activationStatus, options.opsApproved);

@@ -10,11 +10,9 @@ export { ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceS
 export { CategoriesScreen, CategoriesScreen as ControlPanelDshCatalogCategoriesScreen } from './catalogs.categories';
 export { default } from './CatalogGovernanceScreens';
 
-// ML-053: Item approval section — UI_PREVIEW_ONLY flow implemented (catalog approval API not yet bound)
 export { ItemApprovalScreen } from './catalogs.approvals';
 export type { ItemApprovalScreenProps } from './catalogs.approvals';
 
-// ML-054: Catalog publishing gate section — UI_PREVIEW_ONLY flow implemented (catalog publish API not yet bound)
 export { ListingGovernanceScreen } from './catalogs.listing-governance';
 export type { ListingGovernanceScreenProps } from './catalogs.listing-governance';
 

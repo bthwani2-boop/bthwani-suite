@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$RepoRoot = "C:\bthwani-suite",
   [string]$PlanRoot = "",
   [switch]$Strict
@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location -LiteralPath $RepoRoot
 if ([string]::IsNullOrWhiteSpace($PlanRoot)) {
-  $PlanRoot = Join-Path $RepoRoot "tools\plan"
+  $PlanRoot = Join-Path $RepoRoot "tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE"
 }
 
 $SessionId = "TARGET_CLOSURE_PACKAGE_CHECK-" + (Get-Date -Format "yyyyMMdd-HHmmss")

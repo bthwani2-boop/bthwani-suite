@@ -9,7 +9,6 @@ export { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligi
 export { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './PartnerManagementScreens';
 export { default } from './PartnerManagementScreens';
 
-// ML-038: Partner deactivation workspace skeleton — BLOCKED_BY_CONTRACT (partner management API not proven)
 export { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 export type { PartnerDeactivationWorkspaceProps } from './PartnerDeactivationWorkspace';
 
