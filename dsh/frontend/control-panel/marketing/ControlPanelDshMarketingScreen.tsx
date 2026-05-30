@@ -92,18 +92,14 @@ export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 
 type MarketingControlView = 'visibility' | 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals' | 'media-review';
 
-type MarketingPartnerGateSeed = {
-  id: string;
-  title: string;
+type MarketingPartnerGateSeed = Record<'id' | 'title', string> & {
   status: DshPartnerActivationStatus;
   affectedSurface: 'app-partner' | 'app-client' | 'control-panel';
   routeTab: Extract<MarketingControlView, 'signals' | 'campaigns' | 'partners'>;
   routeLabel: string;
 };
 
-type MarketingProductGateSeed = {
-  id: string;
-  title: string;
+type MarketingProductGateSeed = Record<'id' | 'title', string> & {
   approvalStatus: DshProductIdentityApprovalStatus;
   partnerStatus: DshPartnerActivationStatus;
   categoryMappingStatus: DshProductCategoryMappingStatus;
@@ -285,6 +281,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const [activeSubTab, setActiveSubTab] = React.useState<string>('');
   const [tickers, setTickers] = React.useState<ReadonlyArray<MarketingNewsTickerItem>>([]);
   const [editingTickerId, setEditingTickerId] = React.useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setTickers(getMarketingTickerItems());
@@ -524,16 +521,16 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
               <div className={marketingStyles.cardHeaderRow}>
                 <Text role="labelLg" tone="brand">بوابات الظهور عبر الأسطح</Text>
                 <div className={marketingStyles.actionRow}>
-                  <button onClick={() => setActiveTab('partners')} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonPrimary}`}>
+                  <button type="button" onClick={() => setActiveTab('partners')} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonPrimary}`}>
                     عروض الشركاء
                   </button>
-                  <button onClick={() => setActiveTab('campaigns')} className={marketingStyles.actionButton}>
+                  <button type="button" onClick={() => setActiveTab('campaigns')} className={marketingStyles.actionButton}>
                     الحملات
                   </button>
-                  <button onClick={() => setActiveTab('media-review')} className={marketingStyles.actionButton}>
+                  <button type="button" onClick={() => setActiveTab('media-review')} className={marketingStyles.actionButton}>
                     مراجعة الميديا
                   </button>
-                  <button onClick={() => setActiveTab('signals')} className={marketingStyles.actionButton}>
+                  <button type="button" onClick={() => setActiveTab('signals')} className={marketingStyles.actionButton}>
                     الإشارات
                   </button>
                 </div>
@@ -596,7 +593,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                           </div>
                         </div>
                         <div className={marketingStyles.tickerActions}>
-                          <button onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
                             {row.routeLabel}
                           </button>
                         </div>
@@ -631,7 +628,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                           </div>
                         </div>
                         <div className={marketingStyles.tickerActions}>
-                          <button onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
                             {row.routeLabel}
                           </button>
                         </div>
@@ -683,7 +680,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                           <div className={marketingStyles.planNote}>{row.note}</div>
                         </div>
                         <div className={marketingStyles.tickerActions}>
-                          <button onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
                             {row.actionLabel}
                           </button>
                         </div>
@@ -732,7 +729,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                           </div>
                         </div>
                         <div className={marketingStyles.tickerActions}>
-                          <button onClick={() => setActiveTab('signals')} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => setActiveTab('signals')} className={marketingStyles.actionButton}>
                             فتح الإشارات
                           </button>
                         </div>
@@ -771,6 +768,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                 <Text role="labelLg" tone="brand">الرسالة النشطة الآن</Text>
                 <div className={marketingStyles.actionRow}>
                   <button
+                    type="button"
                     onClick={() => {
                       const draft = createMarketingTickerDraft();
                       upsertMarketingTickerItem(draft);
@@ -782,6 +780,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                     + إضافة رسالة
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       pauseAllMarketingTickers();
                       refreshTickers();
@@ -791,6 +790,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                     إيقاف الكل
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       if (selectedTicker && selectedTicker.status !== 'published') {
                         upsertMarketingTickerItem({ ...selectedTicker, status: 'published' });
@@ -897,30 +897,29 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                           </div>
                         </div>
                         <div className={marketingStyles.tickerActions}>
-                          <button onClick={() => {
-                              toggleMarketingTickerStatus(ticker.id);
-                              refreshTickers();
-                            }} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => { toggleMarketingTickerStatus(ticker.id); refreshTickers(); }} className={marketingStyles.actionButton}>
                             {isPublished ? 'إيقاف' : 'تفعيل'}
                           </button>
-                          <button onClick={() => setEditingTickerId(ticker.id)} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => setEditingTickerId(ticker.id)} className={marketingStyles.actionButton}>
                             تعديل
                           </button>
-                          <button onClick={() => {
-                              toggleMarketingTickerPinned(ticker.id);
-                              refreshTickers();
-                            }} className={marketingStyles.actionButton}>
+                          <button type="button" onClick={() => { toggleMarketingTickerPinned(ticker.id); refreshTickers(); }} className={marketingStyles.actionButton}>
                             {ticker.deliveryMode === 'pinned' ? 'إلغاء التثبيت' : 'تثبيت'}
                           </button>
-                          <button onClick={() => {
-                              if (window.confirm('هل أنت متأكد من حذف هذه الرسالة؟')) {
-                                removeMarketingTickerItem(ticker.id);
-                                if (editingTickerId === ticker.id) setEditingTickerId(null);
-                                refreshTickers();
-                              }
-                            }} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
-                            حذف
-                          </button>
+                          {deleteConfirmId === ticker.id ? (
+                            <>
+                              <button type="button" onClick={() => { removeMarketingTickerItem(ticker.id); if (editingTickerId === ticker.id) setEditingTickerId(null); setDeleteConfirmId(null); refreshTickers(); }} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
+                                تأكيد الحذف
+                              </button>
+                              <button type="button" onClick={() => setDeleteConfirmId(null)} className={marketingStyles.actionButton}>
+                                إلغاء
+                              </button>
+                            </>
+                          ) : (
+                            <button type="button" onClick={() => setDeleteConfirmId(ticker.id)} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
+                              حذف
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -932,7 +931,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
                 <div className={`${marketingStyles.surfaceCard} ${marketingStyles.editorCardAccent}`}>
                   <div className={marketingStyles.editorHeader}>
                     <h4 className={marketingStyles.editorTitle}>محرر الرسالة</h4>
-                    <button onClick={() => setEditingTickerId(null)} className={marketingStyles.closeButton}>إغلاق</button>
+                    <button type="button" onClick={() => setEditingTickerId(null)} className={marketingStyles.closeButton}>إغلاق</button>
                   </div>
                   <div className={marketingStyles.formStack}>
                     <Box gap={1}>
@@ -1163,6 +1162,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
           return (
             <button
               key={tab.id}
+              type="button"
               className={`${styles.surfaceTab} ${isSelected ? styles.surfaceTabActive : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
@@ -1180,6 +1180,7 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
             return (
               <button
                 key={sub.id}
+                type="button"
                 onClick={() => setActiveSubTab(sub.id)}
                 className={`${styles.surfaceTab} ${marketingStyles.subTabButton} ${isSelected ? marketingStyles.selectedSubTab : ''}`}
               >

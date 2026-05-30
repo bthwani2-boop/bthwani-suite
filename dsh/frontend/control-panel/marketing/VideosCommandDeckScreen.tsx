@@ -36,25 +36,15 @@ export type VideosCommandDeckScreenProps = {
   operationsHref?: string;
 };
 
-type VideoDraft = {
+type VideoDraft = Record<'title' | 'subtitle' | 'videoUrl' | 'posterUrl' | 'durationSeconds' | 'ctaLabel' | 'highlight' | 'targetId' | 'targetExtra' | 'order', string> & {
   id?: string;
-  title: string;
-  subtitle: string;
   status: MarketingVideoStatus;
   audience: MarketingVideoAudience;
   source: MarketingVideoSource;
-  videoUrl: string;
-  posterUrl: string;
-  durationSeconds: string;
   mute: boolean;
   autoplay: boolean;
   loop: boolean;
-  ctaLabel: string;
-  highlight: string;
   targetType: MarketingVideoTargetType;
-  targetId: string;
-  targetExtra: string;
-  order: string;
   reviewState: 'none' | 'pending' | 'approved' | 'rejected';
 };
 
@@ -63,26 +53,28 @@ type EditorWorkspaceTab = 'content' | 'media' | 'target' | 'publish';
 const videosPageSize = 5;
 
 function createDraft(item?: MarketingVideoRecord | null): VideoDraft {
+  const id = item?.id;
+  const title = item?.title ?? '';
+  const subtitle = item?.subtitle ?? '';
+  const status = item?.status ?? 'draft';
+  const audience = item?.audience ?? 'client';
+  const source = item?.source ?? 'marketing';
+  const videoUrl = item?.videoUrl ?? '';
+  const posterUrl = item?.posterUrl ?? '';
+  const durationSeconds = String(item?.durationSeconds ?? 15);
+  const mute = item?.mute ?? true;
+  const autoplay = item?.autoplay ?? true;
+  const loop = item?.loop ?? true;
+  const ctaLabel = item?.ctaLabel ?? 'اكتشف الآن';
+  const highlight = item?.highlight ?? '';
+  const targetType = item?.targetType ?? 'home';
+  const targetId = item?.targetId ?? 'home';
+  const targetExtra = item?.targetExtra ?? '';
+  const order = String(item?.order ?? 1);
+  const reviewState = item?.reviewState ?? 'none';
+
   return {
-    id: item?.id,
-    title: item?.title ?? '',
-    subtitle: item?.subtitle ?? '',
-    status: item?.status ?? 'draft',
-    audience: item?.audience ?? 'client',
-    source: item?.source ?? 'marketing',
-    videoUrl: item?.videoUrl ?? '',
-    posterUrl: item?.posterUrl ?? '',
-    durationSeconds: String(item?.durationSeconds ?? 15),
-    mute: item?.mute ?? true,
-    autoplay: item?.autoplay ?? true,
-    loop: item?.loop ?? true,
-    ctaLabel: item?.ctaLabel ?? 'اكتشف الآن',
-    highlight: item?.highlight ?? '',
-    targetType: item?.targetType ?? 'home',
-    targetId: item?.targetId ?? 'home',
-    targetExtra: item?.targetExtra ?? '',
-    order: String(item?.order ?? 1),
-    reviewState: item?.reviewState ?? 'none',
+    id, title, subtitle, status, audience, source, videoUrl, posterUrl, durationSeconds, mute, autoplay, loop, ctaLabel, highlight, targetType, targetId, targetExtra, order, reviewState,
   };
 }
 
@@ -114,6 +106,7 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   const [draft, setDraft] = React.useState<VideoDraft>(() => createDraft(selected));
   const [activeEditorTab, setActiveEditorTab] = React.useState<EditorWorkspaceTab>('content');
   const [videosPage, setVideosPage] = React.useState(1);
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (selected) {
@@ -180,8 +173,8 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   }
 
   function handleDelete(item: MarketingVideoRecord) {
-    if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
     removeMarketingVideoItem(item.id);
+    setDeleteConfirmId(null);
     refresh();
     const next = getMarketingVideoItems();
     setSelectedId(next[0]?.id ?? null);
@@ -279,7 +272,14 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
             <View style={[styles.headerRow, { gap: 8 }]}>
               {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" size="sm" onPress={() => handleToggle(selected)} /> : null}
               <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected} />
-              <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && handleDelete(selected)} disabled={!selected} />
+              {selected && deleteConfirmId === selected.id ? (
+                <>
+                  <Button label="تأكيد الحذف" tone="danger" size="sm" onPress={() => handleDelete(selected)} />
+                  <Button label="إلغاء" tone="ghost" size="sm" onPress={() => setDeleteConfirmId(null)} />
+                </>
+              ) : (
+                <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && setDeleteConfirmId(selected.id)} disabled={!selected} />
+              )}
               <Button label="حفظ" tone="primary" size="sm" onPress={handleSave} />
             </View>
           </View>

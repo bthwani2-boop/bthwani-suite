@@ -35,6 +35,7 @@ export function CampaignsCommandDeckScreen() {
   const [draft, setDraft] = React.useState<Partial<CampaignRecord>>({});
   const [editorTab, setEditorTab] = React.useState<EditorTab>('plan');
   const [campaignsPage, setCampaignsPage] = React.useState(1);
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (selected) {
@@ -278,6 +279,7 @@ export function CampaignsCommandDeckScreen() {
 
   const handleDelete = (id: string) => {
     removeCampaignItem(id);
+    setDeleteConfirmId(null);
     refresh();
     setSelectedId(getCampaignItems()[0]?.id ?? null);
   };
@@ -464,14 +466,14 @@ export function CampaignsCommandDeckScreen() {
           </Box>
         );
       case 'impact': {
-        const mockContext = {
+        const previewContext = {
           storeId: 'store-preview',
           activeOffers: [],
           activeSubscriptions: [],
-          activeEntitlements: draft.linkedLoyaltyBenefitId ? [{ id: 'mock', type: 'loyalty-reward', referenceId: draft.linkedLoyaltyBenefitId, status: 'active', source: 'loyalty' } as Entitlement] : [],
+          activeEntitlements: draft.linkedLoyaltyBenefitId ? [{ id: 'entitlement-preview', type: 'loyalty-reward', referenceId: draft.linkedLoyaltyBenefitId, status: 'active', source: 'loyalty' } as Entitlement] : [],
           activeCampaigns: [draft as CampaignRecord],
         };
-        const features = mapStoreCommercialFeatures(mockContext);
+        const features = mapStoreCommercialFeatures(previewContext);
 
         return (
           <Box gap={3}>
@@ -567,7 +569,14 @@ export function CampaignsCommandDeckScreen() {
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {selected ? <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected.id)} style={styles.smallButton} /> : null}
               {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} /> : null}
-              {selected ? <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} /> : null}
+              {selected && deleteConfirmId === selected.id ? (
+                <>
+                  <Button label="تأكيد الحذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} />
+                  <Button label="إلغاء" tone="ghost" fullWidth={false} onPress={() => setDeleteConfirmId(null)} style={styles.smallButton} />
+                </>
+              ) : selected ? (
+                <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => setDeleteConfirmId(selected.id)} style={styles.smallButtonTextRed} />
+              ) : null}
               <Button label="حفظ" onPress={handleSave} tone="primary" fullWidth={false} style={styles.smallButtonPrimary} />
             </View>
           </View>

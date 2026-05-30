@@ -1,3 +1,5 @@
+'use client';
+
 // P0-09: CP audit trail detail workspace — full audit entry display.
 // Shows: actor/role, timestamp, section, decision, reason, evidence,
 // related entity, affected surfaces, rollback note, section policy.

@@ -10,30 +10,40 @@ import {
 import { dshPartnerIntakeItems, dshPartnerIntakeMetrics } from './workflow';
 
 export type PartnerIntakeLaneProps = {
-  state?: 'ready' | 'loading' | 'error';
-  hubHref: string;
-  onRetry?: () => void;
-  onOpenHubItem?: (itemId: string, intent: 'approve' | 'fix' | 'inspect') => void;
+  readonly state?: 'ready' | 'loading' | 'error';
+  readonly hubHref: string;
+  readonly onRetry?: () => void;
+  readonly onOpenHubItem?: (itemId: string, intent: 'approve' | 'fix' | 'inspect') => void;
 };
+
+function resolveStatusTone(queue: string): 'warning' | 'success' | 'neutral' {
+  if (queue === 'offer-approval') return 'warning';
+  if (queue === 'marketing-review') return 'success';
+  return 'neutral';
+}
+
+function resolveApproveLabel(queue: string): string {
+  if (queue === 'offer-approval') return 'اعتماد العرض';
+  if (queue === 'partner-review') return 'إنشاء الكود';
+  return 'إطلاق نهائي';
+}
 
 export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHubItem }: PartnerIntakeLaneProps) {
   const router = useRouter();
   const { theme } = useTheme();
+
   const openHubItem = React.useCallback((itemId: string, intent: 'approve' | 'fix' | 'inspect') => {
     if (onOpenHubItem) {
       onOpenHubItem(itemId, intent);
       return;
     }
-
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const url = new URL(hubHref, window.location.origin);
+    if (typeof globalThis.window === 'undefined') return;
+    const url = new URL(hubHref, globalThis.location.origin);
     url.searchParams.set('focus', itemId);
     url.searchParams.set('intent', intent);
     router.push(`${url.pathname}${url.search}${url.hash}`);
   }, [hubHref, onOpenHubItem, router]);
+
   if (state === 'loading') {
     return (
       <Box padding={10} align="center">
@@ -46,7 +56,18 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
     return (
       <Box padding={10} align="center" gap={4}>
         <Text role="titleSm" style={{ color: theme.danger }}>تعذر تحميل طلبات الشركاء</Text>
-        <button onClick={onRetry} style={{ padding: '8px 16px', borderRadius: '8px', border: `1px solid ${theme.danger}`, color: theme.danger, background: 'transparent', cursor: 'pointer' }}>
+        <button
+          type="button"
+          onClick={onRetry}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '8px',
+            border: `1px solid ${theme.danger}`,
+            color: theme.danger,
+            background: 'transparent',
+            cursor: 'pointer',
+          }}
+        >
           إعادة المحاولة
         </button>
       </Box>
@@ -58,28 +79,28 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={1}>
           <Text role="caption" style={{ color: theme.brand, fontWeight: '800' }}>مسار استقبال الشركاء</Text>
-          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: theme.brandHeaderBackground }}>طلبات الميدان والشركاء</Text>
+          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: theme.brandHeaderBackground }}>
+            طلبات الميدان والشركاء
+          </Text>
         </Box>
       </Box>
 
-      {/* KPI Strip */}
       <WebControlPanelKpiStrip
         items={[
           ...dshPartnerIntakeMetrics.map((m, i) => ({
             id: m.id,
             label: m.label,
             value: m.value,
-            tone: i === 0 ? 'warning' : 'neutral' as const
+            tone: i === 0 ? ('warning' as const) : ('neutral' as const),
           })),
-          { id: 'decision-time', label: 'متوسط وقت القرار', value: '١٤ د', tone: 'success' }
+          { id: 'decision-time', label: 'متوسط وقت القرار', value: '١٤ د', tone: 'success' as const },
         ]}
       />
 
-      {/* Intake Rows */}
       <Box gap={3}>
         {dshPartnerIntakeItems.map((item) => {
-          const isWarning = item.queue === 'offer-approval';
-          const isSuccess = item.queue === 'marketing-review';
+          const statusTone = resolveStatusTone(item.queue);
+          const approveLabel = resolveApproveLabel(item.queue);
 
           return (
             <WebControlPanelDecisionRow
@@ -87,18 +108,20 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
               entityId={item.id}
               entityLabel={item.storeName}
               status={item.fieldStatusLabel}
-              statusTone={isWarning ? 'warning' : isSuccess ? 'success' : 'neutral'}
-              risk={isWarning ? 'warning' : 'neutral'}
+              statusTone={statusTone}
+              risk={item.queue === 'offer-approval' ? 'warning' : 'neutral'}
               recommendation={item.nextStep}
               reason={item.note}
               sla={`${item.categoryLabel} · ${item.ownerLabel}`}
               primaryAction={{
-                label: item.queue === 'offer-approval' ? 'اعتماد العرض' : item.queue === 'partner-review' ? 'إنشاء الكود' : 'إطلاق نهائي',
-                onAction: () => openHubItem(item.id, 'approve')
+                id: `intake-approve-${item.id}`,
+                label: approveLabel,
+                onAction: () => openHubItem(item.id, 'approve'),
               }}
               secondaryAction={{
+                id: `intake-fix-${item.id}`,
                 label: 'تعديل',
-                onAction: () => openHubItem(item.id, 'fix')
+                onAction: () => openHubItem(item.id, 'fix'),
               }}
               onInspect={() => openHubItem(item.id, 'inspect')}
             />

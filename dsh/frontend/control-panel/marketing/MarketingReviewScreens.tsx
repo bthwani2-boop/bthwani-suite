@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
@@ -5,9 +7,7 @@ import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../sh
 
 type MarketingReviewKind = 'approval' | 'video';
 
-type MarketingReviewRow = {
-  id: string;
-  title: string;
+type MarketingReviewRow = Record<'id' | 'title', string> & {
   status: string;
   ownerSurface: string;
   blocker: string;
@@ -45,15 +45,16 @@ function buildMarketingRows(kind: MarketingReviewKind) {
   })) satisfies readonly MarketingReviewRow[];
 }
 
+type MarketingReviewBoardProps = Record<'title', string> & {
+  purpose: string;
+  kind: MarketingReviewKind;
+};
+
 function MarketingReviewBoard({
   title,
   purpose,
   kind,
-}: {
-  title: string;
-  purpose: string;
-  kind: MarketingReviewKind;
-}) {
+}: MarketingReviewBoardProps) {
   const items = React.useMemo(() => buildMarketingRows(kind), [kind]);
   const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
   const [lastAction, setLastAction] = React.useState('جاهز للمراجعة التسويقية');

@@ -1,8 +1,9 @@
+'use client';
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, KeyValueList, StateView, Text } from '@bthwani/ui-kit';
 import {
-  WebControlPanelActionCluster,
   WebControlPanelCompactPager,
   WebControlPanelDecisionRow,
   WebControlPanelDenseHeader,
@@ -236,17 +237,6 @@ export function DshPartnerPromotionEligibilityScreen({
               primaryAction={selectedItem ? { id: `${selectedItem.id}-route-primary`, label: resolvePrimaryActionLabel(selectedItem), onAction: handlePrimaryAction } : undefined}
               secondaryAction={selectedItem ? { id: `${selectedItem.id}-route-secondary`, label: 'فتح الكتالوج', onAction: handleSecondaryAction } : undefined}
             />
-
-            <WebControlPanelActionCluster
-              primary={{ id: 'promotion-primary', label: selectedItem ? resolvePrimaryActionLabel(selectedItem) : 'فتح التسويق', onAction: handlePrimaryAction }}
-              secondary={{ id: 'promotion-secondary', label: 'فتح الكتالوج', onAction: handleSecondaryAction }}
-            />
-
-            <Box gap={1}>
-              <WebControlPanelStatusTag label={selectedItem?.availability ?? 'غير محدد'} tone="info" />
-              <WebControlPanelStatusTag label={resolveEligibilityLabel(selectedItem?.eligibility ?? 'review')} tone={resolveEligibilityTone(selectedItem?.eligibility ?? 'review')} />
-              <WebControlPanelStatusTag label={resolveStatusLabel(selectedItem?.status ?? 'draft')} tone={resolveApprovalTone(selectedItem?.status ?? 'draft')} />
-            </Box>
 
             <Text role="bodySm" tone="muted">{actionMessage}</Text>
           </Box>

@@ -190,7 +190,7 @@ export function PartnerCatalogOverridesWorkspace() {
       <WebControlPanelKpiStrip
         items={[
           { id: 'total-items', label: 'منتجات معروضة للشريك', value: String(partnerItems.length), tone: 'neutral' },
-          { id: 'overridden-items', label: 'منتجات معدلة (Overrides)', value: String(currentPartnerOverrides.length), tone: 'brand' },
+          { id: 'overridden-items', label: 'منتجات معدلة (Overrides)', value: String(currentPartnerOverrides.length), tone: 'warning' },
           { id: 'active-overrides', label: 'تجاوزات نشطة للعملاء', value: String(currentPartnerOverrides.filter(o => o.availableOverride !== false).length), tone: 'success' },
         ]}
       />

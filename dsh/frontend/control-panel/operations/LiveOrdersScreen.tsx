@@ -103,7 +103,7 @@ const mockTicketsForOrder: Record<string, {
     statusTone: 'warning',
     type: 'تأخير في الاستلام من المتجر',
     description: 'الكابتن يفيد بازدحام شديد عند بوابة التحضير في بيك إن بريستو.',
-    attachedImage: 'صورة_مزدحمة_التحضير.jpg',
+    attachedImage: '',
     chatHistory: [
       { sender: 'العميل', text: 'مرحباً كابتن، هل استلمت الطلب؟ مكتوب في التطبيق قيد التحضير.', time: '10:11' },
       { sender: 'الكابتن', text: 'أهلاً بك يا غالي. نعم أنا متواجد بالمتجر الآن، لكن هناك ازدحام كبير جداً عند كاونتر الاستلام.', time: '10:12' },
@@ -317,7 +317,7 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
                   <div style={{ fontSize: '12px', fontWeight: 700, color: theme.brand }}>{ticketData.attachedImage}</div>
                   <div style={{ fontSize: '10px', color: theme.success }}>محملة ومؤمنة بنجاح عبر نظام DSH</div>
                 </div>
-                <button style={{ padding: '4px 10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '6px', fontSize: '11px', cursor: 'pointer', color: theme.text }}>معاينة</button>
+                <button type="button" style={{ padding: '4px 10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '6px', fontSize: '11px', cursor: 'pointer', color: theme.text }}>معاينة</button>
               </div>
             </div>
           )}
@@ -372,13 +372,13 @@ function OpsOrderDetailPanel({ order, onDecision }: { order: PendingApprovalOrde
       </div>
 
       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-start' }}>
-        <button style={decisionButtonStyle('approve')} onClick={() => handleDecision('approve')}>
+        <button type="button" style={decisionButtonStyle('approve')} onClick={() => handleDecision('approve')}>
           موافقة
         </button>
-        <button style={decisionButtonStyle('request_edit')} onClick={() => handleDecision('request_edit')}>
+        <button type="button" style={decisionButtonStyle('request_edit')} onClick={() => handleDecision('request_edit')}>
           طلب تعديل
         </button>
-        <button style={decisionButtonStyle('reject')} onClick={() => handleDecision('reject')}>
+        <button type="button" style={decisionButtonStyle('reject')} onClick={() => handleDecision('reject')}>
           رفض
         </button>
       </div>
@@ -411,7 +411,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
       <div className={styles.surfaceInnerScroll} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
         <div style={{ textAlign: 'center', border: `1px solid ${theme.danger}`, padding: '24px', borderRadius: '10px', background: theme.dangerSurface }}>
           <p style={{ color: theme.dangerText, fontSize: '13px', marginBottom: '12px' }}>تعذر الاتصال بخادم العمليات المباشرة.</p>
-          <button onClick={onRetry} style={{ padding: '6px 18px', background: theme.danger, color: theme.textInverse, border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>إعادة المحاولة</button>
+          <button type="button" onClick={onRetry} style={{ padding: '6px 18px', background: theme.danger, color: theme.textInverse, border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>إعادة المحاولة</button>
         </div>
       </div>
     );
@@ -458,6 +458,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
             return (
               <div key={order.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <button
+                  type="button"
                   onClick={() => setExpandedApprovalId(isExpanded ? null : order.id)}
                   style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',

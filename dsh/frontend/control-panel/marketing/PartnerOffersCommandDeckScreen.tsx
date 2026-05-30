@@ -240,7 +240,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (editorSection === 'details') {
       return (
         <Box gap={4}>
-          <div style={{  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             <TextField label="عنوان العرض" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} />
             <TextField label="اسم الشريك" value={draft.partnerName || ''} onChangeText={v => setDraft({ ...draft, partnerName: v })} />
 
@@ -257,7 +257,7 @@ export function PartnerOffersCommandDeckScreen() {
     if (editorSection === 'governance') {
       return (
         <Box gap={4}>
-          <div style={{  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             <TextField label="التصنيف" value={draft.category || ''} onChangeText={v => setDraft({ ...draft, category: v })} />
             <TextField label="قيمة العرض" value={draft.valueLabel || ''} onChangeText={v => setDraft({ ...draft, valueLabel: v })} hint="مثال: خصم 20%" />
 

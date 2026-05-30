@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Box, Text, useTheme, Surface } from '@bthwani/ui-kit';
 import {
@@ -23,7 +25,8 @@ import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 import { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
 import { PartnerTopologyLane } from './PartnerTopologyLane';
 import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
-import { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './PartnerManagementScreens';
+import { ControlPanelDshPartnerActivationScreen } from './PartnerActivationWorkspace';
+import { ControlPanelDshPartnerDocumentReviewScreen } from './PartnerDocumentReviewWorkspace';
 import { PartnerCatalogOverridesWorkspace } from './PartnerCatalogOverridesWorkspace';
 import { PartnerPerformanceWorkspace } from './PartnerPerformanceWorkspace';
 import { PartnerModificationsWorkspace } from './PartnerModificationsWorkspace';
@@ -35,6 +38,23 @@ import {
   getAllPartnerActivationStatuses,
 } from './workflow';
 import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import { partnerCoveragePreviewZones } from '../../data/partner.preview-data';
+
+const SUB_TAB_DEFINITIONS: Record<string, { id: string; label: string }[]> = {
+  inbox: [
+    { id: 'registration', label: 'طلبات التسجيل' },
+    { id: 'modifications', label: 'تعديل البيانات' },
+    { id: 'complaints', label: 'شكاوى الشركاء' },
+  ],
+  performance: [
+    { id: 'performance', label: 'الأداء والسعة' },
+    { id: 'disputes', label: 'النزاعات والاستئناف' },
+    { id: 'visibility', label: 'الظهور والإيقاف' },
+  ],
+  eligibility: [
+    { id: 'benefits', label: 'المزايا والعروض' },
+  ],
+};
 
 // ML-001: approval action extended to include final ops activation step for marketing-approved records
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
@@ -131,7 +151,7 @@ function ControlPanelDshPartnerDeactivationTab() {
                   padding: '8px 16px',
                   borderRadius: '12px',
                   border: `1px solid ${isActive ? theme.brand : theme.line}`,
-                  background: isActive ? theme.brandSurface : theme.surface,
+                  backgroundColor: isActive ? theme.brandSurface : theme.surface,
                   color: isActive ? theme.brand : theme.text,
                   fontWeight: 700,
                   fontSize: '13px',
@@ -153,9 +173,9 @@ function ControlPanelDshPartnerDeactivationTab() {
               <Text role="bodyMd" tone="muted">
                 تم إلغاء تفعيل متجر <strong>{currentPartner.storeName}</strong> بالكامل من لوحة التحكم ولا يمكنه استقبال طلبات العملاء.
               </Text>
-              <Box style={{ background: theme.surfaceInset, padding: '12px', borderRadius: '10px', border: `1px solid ${theme.line}` }}>
+              <Box style={{ backgroundColor: theme.surfaceInset, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: theme.line }}>
                 <Text role="caption" tone="brand">الملاحظة التشغيلية الحالية:</Text>
-                <Text role="bodySm" style={{ marginTop: '4px' }}>
+                <Text role="bodySm" style={{ marginTop: 4 }}>
                   الشريك في حالة تعطيل بسبب خلل في الامتثال أو بطلب مباشر. يجب إعادة مراجعة المستندات لإعادة التفعيل.
                 </Text>
               </Box>
@@ -169,7 +189,7 @@ function ControlPanelDshPartnerDeactivationTab() {
                 style={{
                   padding: '10px',
                   borderRadius: '8px',
-                  background: theme.brand,
+                  backgroundColor: theme.brand,
                   color: theme.surface,
                   border: 'none',
                   fontWeight: 700,
@@ -211,6 +231,13 @@ export function ControlPanelDshPartnerHubScreen() {
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
   const refresh = () => setItems(getPartnerIntakeItems());
+
+  const pendingCount = React.useMemo(
+    () => items.filter(i => ['partner-submitted', 'field-submitted', 'partner-review', 'marketing-review'].includes(i.stage)).length,
+    [items],
+  );
+  const activePartnersCount = PARTNER_FULFILLMENT_AGREEMENTS.length;
+  const activeZoneCount = partnerCoveragePreviewZones.filter(z => z.status === 'active').length;
 
   React.useEffect(() => {
     refresh();
@@ -277,28 +304,13 @@ export function ControlPanelDshPartnerHubScreen() {
     { id: 'deactivation', label: 'إلغاء التفعيل', active: activeTab === 'deactivation' },
   ];
 
-  const SECONDARY_TABS: Record<string, { id: string; label: string; active?: boolean }[]> = {
-    inbox: [
-      { id: 'registration', label: 'طلبات التسجيل', active: activeSubTab === 'registration' },
-      { id: 'modifications', label: 'تعديل البيانات', active: activeSubTab === 'modifications' },
-      { id: 'complaints', label: 'شكاوى الشركاء', active: activeSubTab === 'complaints' },
-    ],
-    performance: [
-      { id: 'performance', label: 'الأداء والسعة', active: activeSubTab === 'performance' },
-      { id: 'disputes', label: 'النزاعات والاستئناف', active: activeSubTab === 'disputes' },
-      { id: 'visibility', label: 'الظهور والإيقاف', active: activeSubTab === 'visibility' },
-    ],
-    eligibility: [
-      { id: 'benefits', label: 'المزايا والعروض', active: activeSubTab === 'benefits' },
-    ],
-  };
+  const activeSubTabs = React.useMemo(
+    () => (SUB_TAB_DEFINITIONS[activeTab] ?? []).map(t => ({ ...t, active: t.id === activeSubTab })),
+    [activeTab, activeSubTab],
+  );
 
   React.useEffect(() => {
-    if (SECONDARY_TABS[activeTab]?.length > 0) {
-      setActiveSubTab(SECONDARY_TABS[activeTab][0].id);
-    } else {
-      setActiveSubTab('');
-    }
+    setActiveSubTab(SUB_TAB_DEFINITIONS[activeTab]?.[0]?.id ?? '');
   }, [activeTab]);
 
   return (
@@ -325,15 +337,15 @@ export function ControlPanelDshPartnerHubScreen() {
           <div className={styles.surfacePulseCompact}>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>شركاء نشطون</span>
-              <span className={styles.commandKpiValue}>١,٢٥٤</span>
+              <span className={styles.commandKpiValue}>{activePartnersCount}</span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>طلبات معلقة</span>
-              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>٢٨</span>
+              <span className={`${styles.commandKpiValue} ${pendingCount > 0 ? styles.commandKpiValueAlert : ''}`}>{pendingCount}</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>تغطية المناطق</span>
-              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>٨٤٪</span>
+              <span className={styles.commandKpiLabel}>مناطق نشطة</span>
+              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>{activeZoneCount}/{partnerCoveragePreviewZones.length}</span>
             </div>
           </div>
         </div>
@@ -344,9 +356,9 @@ export function ControlPanelDshPartnerHubScreen() {
       </nav>
 
       <div className={styles.filterDock}>
-        {SECONDARY_TABS[activeTab] && (
+        {activeSubTabs.length > 0 && (
           <WebControlPanelSubTabs
-            items={SECONDARY_TABS[activeTab]}
+            items={activeSubTabs}
             onSelect={(id) => setActiveSubTab(id)}
           />
         )}
@@ -383,8 +395,6 @@ export function ControlPanelDshPartnerHubScreen() {
               <ControlPanelDshPartnerDocumentReviewScreen />
             ) : activeTab === 'overrides' ? (
               <PartnerCatalogOverridesWorkspace />
-            ) : activeTab === 'inbox' && activeSubTab === 'registration' ? (
-              renderInboxWorkspace()
             ) : activeTab === 'inbox' ? (
               renderInboxWorkspace()
             ) : (

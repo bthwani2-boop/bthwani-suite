@@ -23,18 +23,20 @@ const promoPageSize = 5;
 export function PromosCommandDeckScreen() {
   const { theme } = useTheme();
   const createDraft = React.useCallback((item?: HomePromoRecord | null) => {
+    const id = item?.id;
+    const title = item?.title ?? '';
+    const subtitle = item?.subtitle ?? '';
+    const ctaText = item?.ctaText ?? 'افتح الآن';
+    const accentColor = item?.accentColor ?? 'brandStrong';
+    const imageUrl = item?.imageUrl ?? '';
+    const thumbnail = item?.thumbnail ?? '';
+    const targetType = item?.targetType ?? 'store';
+    const targetId = item?.targetId ?? '';
+    const targetLabel = item?.targetLabel ?? '';
+    const status = item?.status ?? 'draft';
+
     return {
-      id: item?.id,
-      title: item?.title ?? '',
-      subtitle: item?.subtitle ?? '',
-      ctaText: item?.ctaText ?? 'افتح الآن',
-      accentColor: item?.accentColor ?? 'brandStrong',
-      imageUrl: item?.imageUrl ?? '',
-      thumbnail: item?.thumbnail ?? '',
-      targetType: item?.targetType ?? 'store',
-      targetId: item?.targetId ?? '',
-      targetLabel: item?.targetLabel ?? '',
-      status: item?.status ?? 'draft',
+      id, title, subtitle, ctaText, accentColor, imageUrl, thumbnail, targetType, targetId, targetLabel, status,
     };
   }, []);
   const [items, setItems] = React.useState<HomePromoRecord[]>(() => getHomePromoItems());
@@ -43,6 +45,7 @@ export function PromosCommandDeckScreen() {
   const [draft, setDraft] = React.useState(createDraft(selected));
    const [promoPage, setPromoPage] = React.useState(1);
    const [editorSection, setEditorSection] = React.useState<PromoEditorSection>('identity');
+   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => { setDraft(createDraft(selected)); }, [createDraft, selected]);
 
@@ -178,7 +181,14 @@ export function PromosCommandDeckScreen() {
                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <Text style={{ fontSize: 11, fontWeight: '900', color: theme.textMuted }}>استوديو التحرير</Text>
                     <View style={{ flexDirection: 'row', gap: 8 }}>
-                      <Button label="حذف" onPress={() => { if (!selectedId) return; removeHomePromoItem(selectedId); refresh(); }} tone="danger" size="sm" />
+                      {selectedId && deleteConfirmId === selectedId ? (
+                        <>
+                          <Button label="تأكيد" tone="danger" size="sm" onPress={() => { removeHomePromoItem(selectedId); setDeleteConfirmId(null); refresh(); }} />
+                          <Button label="إلغاء" tone="secondary" size="sm" onPress={() => setDeleteConfirmId(null)} />
+                        </>
+                      ) : (
+                        <Button label="حذف" onPress={() => selectedId && setDeleteConfirmId(selectedId)} tone="danger" size="sm" />
+                      )}
                       <Button label={draft.status === 'published' ? 'إيقاف' : 'نشر'} onPress={() => setDraft(d => ({ ...d, status: d.status === 'published' ? 'draft' : 'published' }))} tone="secondary" size="sm" />
                       <Button label="حفظ" onPress={handleSave} tone="primary" size="sm" />
                     </View>
@@ -223,8 +233,8 @@ export function PromosCommandDeckScreen() {
                <Text style={{ fontWeight: '900', fontSize: 11, color: theme.textMuted, marginBottom: 12 }}>الرؤى</Text>
                <Box gap={8}>
                   <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
-                     <Text style={{ fontSize: 9, color: theme.textMuted }}>الوصول المتوقع</Text>
-                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.brandHeaderBackground }}>12,500 مستخدم</Text>
+                     <Text style={{ fontSize: 9, color: theme.textMuted }}>الوصول المتوقع · معاينة</Text>
+                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.brandHeaderBackground }}>12.5K</Text>
                   </View>
                   <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
                      <Text style={{ fontSize: 9, color: theme.textMuted }}>جاهزية الربط</Text>

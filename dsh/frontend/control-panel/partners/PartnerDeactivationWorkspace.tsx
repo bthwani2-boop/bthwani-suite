@@ -1,3 +1,5 @@
+'use client';
+
 // P0-04/P0-09: Partner deactivation workspace — CP-owned authority surface.
 // control-panel/partners is the ONLY surface authorised to deactivate a partner.
 // Evidence note is mandatory alongside reason — both required before confirm is enabled.

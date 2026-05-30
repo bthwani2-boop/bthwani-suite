@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text, useTheme, Surface, KeyValueList } from '@bthwani/ui-kit';
@@ -37,15 +37,15 @@ export function PartnerModificationsWorkspace() {
       <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
         <Box layoutDirection="row" justify="space-between" align="center">
           <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
-            Ø·Ù„Ø¨Ø§Øª ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+            طلبات تعديل البيانات
           </Text>
-          <WebControlPanelStatusTag label={`${pendingCount} Ø·Ù„Ø¨Ø§Øª Ù…Ø¹Ù„Ù‚Ø©`} tone={pendingCount > 0 ? 'warning' : 'neutral'} />
+          <WebControlPanelStatusTag label={`${pendingCount} طلبات معلقة`} tone={pendingCount > 0 ? 'warning' : 'neutral'} />
         </Box>
 
         <Box gap={3}>
           {requests.length === 0 || pendingCount === 0 ? (
             <Box padding={8} align="center" style={{ backgroundColor: theme.surfaceInset, borderRadius: '12px' }}>
-              <Text tone="muted">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ø¹Ù„Ù‚Ø©.</Text>
+              <Text tone="muted">لا توجد طلبات تعديل بيانات معلقة.</Text>
             </Box>
           ) : (
             requests.filter(r => r.status === 'pending').map((req) => {
@@ -54,16 +54,16 @@ export function PartnerModificationsWorkspace() {
                 <WebControlPanelDecisionRow
                   key={req.id}
                   entityId={req.id}
-                  entityLabel={`${pInfo?.storeName ?? 'Ù…Ø¬Ù‡ÙˆÙ„'} Â· ${req.type}`}
-                  status="Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©"
+                  entityLabel={`${pInfo?.storeName ?? 'مجهول'} · ${req.type}`}
+                  status="بانتظار المراجعة"
                   statusTone="warning"
                   risk={req.risk}
                   recommendation={req.reason}
-                  reason={`ØªØ§Ø±ÙŠØ® Ø§Ù„Ø·Ù„Ø¨: ${req.submittedAt}`}
-                  sla={req.risk === 'danger' ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¯Ù‚ÙŠÙ‚Ø©' : 'Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ø¹ØªÙŠØ§Ø¯ÙŠ'}
+                  reason={`تاريخ الطلب: ${req.submittedAt}`}
+                  sla={req.risk === 'danger' ? 'مراجعة دقيقة' : 'إجراء اعتيادي'}
                   primaryAction={{
                     id: `view-${req.id}`,
-                    label: selectedId === req.id ? 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØªØ¯Ù‚ÙŠÙ‚',
+                    label: selectedId === req.id ? 'قيد المراجعة' : 'مراجعة وتدقيق',
                     onAction: () => setSelectedId(req.id),
                   }}
                 />
@@ -79,17 +79,17 @@ export function PartnerModificationsWorkspace() {
           <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: '12px' }}>
             <Box layoutDirection="row" justify="space-between" align="center">
               <Text role="titleSm" style={{ fontWeight: '800', color: theme.brand }}>
-                Ù…Ø±Ø§Ø¬Ø¹Ø©: {partner.storeName}
+                مراجعة: {partner.storeName}
               </Text>
               <WebControlPanelStatusTag label={selectedRequest.type} tone={selectedRequest.risk} />
             </Box>
 
             <Text role="bodySm" tone="muted">
-              ÙŠØ±Ø¬Ù‰ Ù…Ù‚Ø§Ø±Ù†Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù‚Ø¨Ù„ Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ù„Ø§Ø¹ØªÙ…Ø§Ø¯Ù‡Ø§ Ø¨Ø´ÙƒÙ„ Ù†Ù‡Ø§Ø¦ÙŠ ÙÙŠ Ù…Ù„Ù Ø§Ù„Ø´Ø±ÙŠÙƒ.
+              يرجى مقارنة البيانات المطلوبة قبل الموافقة لاعتمادها بشكل نهائي في ملف الشريك.
             </Text>
 
-            <Box gap={2} style={{ marginTop: '8px' }}>
-              <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©:</Text>
+            <Box gap={2} style={{ marginTop: 8 }}>
+              <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>التغييرات المطلوبة:</Text>
               {selectedRequest.changes.map((change, idx) => (
                 <div key={idx} style={{
                   backgroundColor: theme.surface,
@@ -114,13 +114,13 @@ export function PartnerModificationsWorkspace() {
             </Box>
 
             <WebControlPanelRecommendation
-              title="ØªÙˆØ¬ÙŠÙ‡ Ø£Ù…Ù†ÙŠ/Ø¹Ù…Ù„ÙŠØ§ØªÙŠ"
+              title="توجيه أمني/عملياتي"
               reason={selectedRequest.reason}
               confidence={selectedRequest.risk === 'danger' ? 'medium' : 'high'}
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box layoutDirection="row" gap={2} style={{ marginTop: '12px' }}>
+            <Box layoutDirection="row" gap={2} style={{ marginTop: 12 }}>
               <button
                 onClick={() => handleApprove(selectedRequest.id)}
                 style={{
@@ -128,7 +128,7 @@ export function PartnerModificationsWorkspace() {
                   backgroundColor: theme.success, color: theme.surface,
                   border: 'none', fontWeight: 700, cursor: 'pointer'
                 }}>
-                Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª
+                اعتماد التعديلات
               </button>
               <button
                 onClick={() => handleReject(selectedRequest.id)}
@@ -137,14 +137,14 @@ export function PartnerModificationsWorkspace() {
                   backgroundColor: 'transparent', color: theme.danger,
                   border: `1px solid ${theme.danger}`, fontWeight: 700, cursor: 'pointer'
                 }}>
-                Ø±ÙØ¶
+                رفض
               </button>
             </Box>
           </Surface>
         ) : (
           <WebControlPanelRecommendation
-            title="Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª"
-            reason="Ø§Ø®ØªØ± Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø¬Ø§Ù†Ø¨ÙŠØ© Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨ Ø¥Ø¬Ø±Ø§Ø¤Ù‡Ø§ Ø¹Ù„Ù‰ Ù…Ù„Ù Ø§Ù„Ø´Ø±ÙŠÙƒ ÙˆØ§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„ÙŠÙ‡Ø§."
+            title="مراجعة التعديلات"
+            reason="اختر طلب تعديل من القائمة الجانبية لمراجعة التغييرات المطلوب إجراؤها على ملف الشريك والموافقة عليها."
             confidence="high"
             auditTag="UI_PREVIEW_ONLY"
           />

@@ -30,29 +30,13 @@ export type BannersCommandDeckScreenProps = {
   activeSubTab?: string;
 };
 
-type BannerDraft = {
+type BannerDraft = Record<'title' | 'subtitle' | 'mediaKey' | 'accentColor' | 'actionTarget' | 'actionExtra' | 'ctaLabel' | 'partnerName' | 'imageUrl' | 'position' | 'templateId' | 'offerBadgeText' | 'offerBadgeColor' | 'partnerLogoUrl' | 'overlayImageUrl', string> & {
   id?: string;
-  title: string;
-  subtitle: string;
-  mediaKey: string;
-  accentColor: string;
   audience: MarketingBannerAudience;
   status: MarketingBannerStatus;
   actionType: MarketingBannerActionType;
-  actionTarget: string;
-  actionExtra: string;
-  ctaLabel: string;
-  partnerName: string;
-  imageUrl: string;
-  position: string;
-  // Template fields
-  templateId: string;
-  offerBadgeText: string;
-  offerBadgeColor: string;
   offerBadgePosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  partnerLogoUrl: string;
   partnerLogoPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  overlayImageUrl: string;
   overlayPosition: 'center' | 'bottom' | 'top' | 'fill';
   titlePlacement: 'top' | 'center' | 'bottom';
   imageFit: 'cover' | 'contain';
@@ -308,36 +292,37 @@ function createDraft(
   defaults: { accentColor: string; offerBadgeColor: string },
 ): BannerDraft {
   const targetType = deriveSmartTargetType(item);
+  const id = item?.id;
+  const title = item?.title ?? '';
+  const subtitle = item?.subtitle ?? '';
+  const mediaKey = item?.mediaKey ?? '';
+  const accentColor = item?.accentColor ?? defaults.accentColor;
+  const audience = item?.audience ?? 'all';
+  const status = item?.status ?? 'draft';
+  const actionType = item?.actionType ?? 'store';
+  const actionTarget = item?.actionTarget ?? 'store-1001';
+  const actionExtra = item?.actionExtra ?? '';
+  const ctaLabel = item?.ctaLabel ?? 'اكتشف الآن';
+  const partnerName = item?.partnerName ?? '';
+  const imageUrl = item?.imageUrl ?? '';
+  const position = String(item?.position ?? '');
+  const templateId = item?.templateId ?? 'default';
+  const offerBadgeText = item?.offerBadgeText ?? '';
+  const offerBadgeColor = item?.offerBadgeColor ?? defaults.offerBadgeColor;
+  const offerBadgePosition = item?.offerBadgePosition ?? 'top-right';
+  const partnerLogoUrl = item?.partnerLogoUrl ?? '';
+  const partnerLogoPosition = item?.partnerLogoPosition ?? 'top-left';
+  const overlayImageUrl = item?.overlayImageUrl ?? '';
+  const overlayPosition = item?.overlayPosition ?? 'center';
+  const titlePlacement = item?.titlePlacement ?? 'bottom';
+  const imageFit = item?.imageFit ?? 'cover';
+  const motionStyle = item?.motionStyle ?? 'slide';
+  const autoplayEnabled = item?.autoplayEnabled ?? true;
+  const autoplayIntervalMs = String(item?.autoplayIntervalMs ?? 4500);
+  const pauseOnInteraction = item?.pauseOnInteraction ?? true;
+
   return {
-    id: item?.id,
-    title: item?.title ?? '',
-    subtitle: item?.subtitle ?? '',
-    mediaKey: item?.mediaKey ?? '',
-    accentColor: item?.accentColor ?? defaults.accentColor,
-    audience: item?.audience ?? 'all',
-    status: item?.status ?? 'draft',
-    actionType: item?.actionType ?? 'store',
-    actionTarget: item?.actionTarget ?? 'store-1001',
-    actionExtra: item?.actionExtra ?? '',
-    ctaLabel: item?.ctaLabel ?? 'اكتشف الآن',
-    partnerName: item?.partnerName ?? '',
-    imageUrl: item?.imageUrl ?? '',
-    position: String(item?.position ?? ''),
-    templateId: item?.templateId ?? 'default',
-    offerBadgeText: item?.offerBadgeText ?? '',
-    offerBadgeColor: item?.offerBadgeColor ?? defaults.offerBadgeColor,
-    offerBadgePosition: item?.offerBadgePosition ?? 'top-right',
-    partnerLogoUrl: item?.partnerLogoUrl ?? '',
-    partnerLogoPosition: item?.partnerLogoPosition ?? 'top-left',
-    overlayImageUrl: item?.overlayImageUrl ?? '',
-    overlayPosition: item?.overlayPosition ?? 'center',
-    titlePlacement: item?.titlePlacement ?? 'bottom',
-    imageFit: item?.imageFit ?? 'cover',
-    targetType,
-    motionStyle: item?.motionStyle ?? 'slide',
-    autoplayEnabled: item?.autoplayEnabled ?? true,
-    autoplayIntervalMs: String(item?.autoplayIntervalMs ?? 4500),
-    pauseOnInteraction: item?.pauseOnInteraction ?? true,
+    id, title, subtitle, mediaKey, accentColor, audience, status, actionType, actionTarget, actionExtra, ctaLabel, partnerName, imageUrl, position, templateId, offerBadgeText, offerBadgeColor, offerBadgePosition, partnerLogoUrl, partnerLogoPosition, overlayImageUrl, overlayPosition, titlePlacement, imageFit, targetType, motionStyle, autoplayEnabled, autoplayIntervalMs, pauseOnInteraction,
   };
 }
 
@@ -388,6 +373,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   const [offerSearch, setOfferSearch] = React.useState('');
   const [subscriptionSearch, setSubscriptionSearch] = React.useState('');
   const [activeEditorTab, setActiveEditorTab] = React.useState<EditorWorkspaceTab>('content');
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (selected) {
@@ -457,9 +443,9 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   }
 
   function handleDelete(item: MarketingBannerRecord) {
-    if (!confirm('هل أنت متأكد من حذف هذا البنر؟')) return;
     removeMarketingBannerItem(item.id);
     refresh();
+    setDeleteConfirmId(null);
     const nextItems = getMarketingBannerItems();
     setSelectedId(nextItems[0]?.id ?? null);
   }
@@ -1183,12 +1169,12 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       {activeEditorTab === 'content' ? (
         <View style={styles.editorCard}>
           <Box gap={3}>
-            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <TextField label="العنوان الرئيسي" value={draft.title} onChangeText={(v) => setDraft(c => ({ ...c, title: v }))} />
               <TextField label="اسم العلامة" value={draft.partnerName} onChangeText={(v) => setDraft(c => ({ ...c, partnerName: v }))} />
             </div>
             <TextField label="الوصف الترويجي" value={draft.subtitle} onChangeText={(v) => setDraft(c => ({ ...c, subtitle: v }))} multiline numberOfLines={2} />
-            <div style={{  gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <TextField label="نص الزر" value={draft.ctaLabel} onChangeText={(v) => setDraft(c => ({ ...c, ctaLabel: v }))} />
               <TextField label="لون الهوية" value={draft.accentColor} onChangeText={(v) => setDraft(c => ({ ...c, accentColor: v }))} />
               <TextField label="ترتيب الظهور" value={draft.position} onChangeText={(v) => setDraft(c => ({ ...c, position: v }))} />
@@ -1200,18 +1186,18 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       {activeEditorTab === 'media' ? (
         <View style={styles.editorCard}>
           <Box gap={3}>
-            <div style={{  gridTemplateColumns: '1.6fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 12 }}>
               <TextField label="صورة الخلفية" value={draft.imageUrl} onChangeText={(v) => setDraft(c => ({ ...c, imageUrl: v }))} />
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>احتواء الصورة</label>
                 <Tabs<BannerImageFit> items={IMAGE_FIT_TAB_ITEMS} value={draft.imageFit} onValueChange={(v) => setDraft(c => ({ ...c, imageFit: v }))} variant="pill" />
               </Box>
             </div>
-            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <TextField label="رابط الشعار" value={draft.partnerLogoUrl} onChangeText={(v) => setDraft(c => ({ ...c, partnerLogoUrl: v }))} />
               <TextField label="نص الشارة" value={draft.offerBadgeText} onChangeText={(v) => setDraft(c => ({ ...c, offerBadgeText: v }))} />
             </div>
-            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>موقع الشعار</label>
                 <Tabs<BannerLogoPosition>
@@ -1230,7 +1216,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
       {activeEditorTab === 'target' ? (
         <View style={styles.editorCard}>
           <Box gap={4}>
-            <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Box gap={1}>
                 <label style={{ fontSize: '12px', fontWeight: '800', color: theme.textMuted }}>نطاق العرض</label>
                 <Tabs<MarketingBannerAudience>
@@ -1304,7 +1290,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             )}
 
             {draft.targetType === 'subcategory' && (
-              <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Box gap={2}>
                   <SearchField label="ابحث في الفئات الأم" value={subcategoryParentSearch} onChangeText={setSubcategoryParentSearch} />
                   <SelectField
@@ -1329,7 +1315,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             )}
 
             {draft.targetType === 'product' && (
-              <div style={{  gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Box gap={2}>
                   <SearchField label="ابحث في المتاجر" value={productStoreSearch} onChangeText={setProductStoreSearch} />
                 <SelectField
@@ -1426,7 +1412,14 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
           <Button label="جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
           <Button label="تكرار" tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleDuplicate(selected)} />
           <Button label={selected?.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleToggle(selected)} />
-          <Button label="حذف" tone="danger" fullWidth={false} disabled={!selected} onPress={() => selected && handleDelete(selected)} />
+          {deleteConfirmId === selected?.id ? (
+            <>
+              <Button label="تأكيد الحذف" tone="danger" fullWidth={false} onPress={() => selected && handleDelete(selected)} />
+              <Button label="إلغاء" tone="secondary" fullWidth={false} onPress={() => setDeleteConfirmId(null)} />
+            </>
+          ) : (
+            <Button label="حذف" tone="danger" fullWidth={false} disabled={!selected} onPress={() => selected && setDeleteConfirmId(selected.id)} />
+          )}
           <Button label="حفظ" tone="primary" fullWidth={false} onPress={handleSave} style={{ paddingHorizontal: 24 }} />
         </View>
       </View>

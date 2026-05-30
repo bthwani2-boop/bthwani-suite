@@ -54,10 +54,10 @@ export function ControlPanelDshMarketingScreen({
 				</Box>
 			</Surface>
 
-			{/* Executive KPIs — signal-driven counts + static marketing KPIs */}
+			{/* Executive KPIs — signal-driven counts (live) + static marketing estimates (UI_PREVIEW_ONLY) */}
 			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="معدل وصول الحملات النشطة" tone="best" />
-				<WebSignalCard title="إشارات الاهتمام (المفضلة)" value="12.4K" description="إشارات نية الشراء التراكمية" tone="best" />
+				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="تقدير معاينة · UI_PREVIEW_ONLY" tone="best" />
+				<WebSignalCard title="إشارات الاهتمام (المفضلة)" value="12.4K" description="تقدير معاينة · UI_PREVIEW_ONLY" tone="best" />
 				<WebSignalCard title="إشارات التسويق والكتالوج" value={String(catalogSignals.length)} description="اعتماد ورفض وتسليم المحتوى التجاري داخل طبقة الإشارات" />
 				<WebSignalCard title="إشارات غير مقروءة" value={String(catalogUnreadCount)} description="إشارات تستلزم مراجعة أو إجراء" tone="neutral" />
 			</Box>

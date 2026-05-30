@@ -6,8 +6,9 @@ export { moveApprovalRecordToStage, getPartnerIntakeItems, translateEntityType, 
 
 export { ControlPanelDshPartnerApprovalsScreen } from './ControlPanelDshPartnerApprovalsScreen';
 export { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
-export { ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './PartnerManagementScreens';
-export { default } from './PartnerManagementScreens';
+export { ControlPanelDshPartnerActivationScreen } from './PartnerActivationWorkspace';
+export { ControlPanelDshPartnerDocumentReviewScreen } from './PartnerDocumentReviewWorkspace';
+export { default } from './PartnerActivationWorkspace';
 
 export { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 export type { PartnerDeactivationWorkspaceProps } from './PartnerDeactivationWorkspace';
