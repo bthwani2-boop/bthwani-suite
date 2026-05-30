@@ -1,4 +1,4 @@
-# BTHWANI STRUCTURE REFACTOR PLAYBOOK — V6
+# BTHWANI STRUCTURE REFACTOR PLAYBOOK — V7
 
 ## 1. Default topic structure
 
@@ -219,3 +219,21 @@ wrapper does nothing
 topic name is technical
 nested folder does not meet threshold
 ```
+
+## 7. Mandatory File Boundary Matrix
+
+Before restructuring, output the following matrix for every file:
+
+```text
+file path | current role | correct role | current issues | exact evidence | target folder/file | should be flat? | role file needed? | role file can be removed? | nested folder allowed? | split needed? | merge needed? | move needed? | delete/retire? | owner reason | shared status | risk | priority | safe now? | design impact | design preservation action
+```
+
+## 8. Mandatory Demo Data / Media Centralization Matrix
+
+For any demo data or media within `TARGET_SCOPE`, output this matrix:
+
+```text
+current file/path | entity type (product/media/etc) | current owner | should be central? | central target path | duplicate/conflict? | demo-only? | safe to delete/regenerate? | adapter needed? | consumers to update | risk | action (keep/move/centralize/block)
+```
+
+**Rule:** `dsh/frontend/data` and `dsh/media-fixtures` are the absolute source of truth for DSH demo resources. Eliminate local duplicate mocks entirely.

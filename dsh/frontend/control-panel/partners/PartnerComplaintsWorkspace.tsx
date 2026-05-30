@@ -1,18 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface } from '@bthwani/ui-kit';
+import { Box, Text, Surface } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
   WebControlPanelStatusTag,
+  WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
-
 import { PARTNER_COMPLAINTS_DATA, type PartnerComplaint } from '../../data/partner.preview-data';
+import styles from '../shared/control-panel-surface.module.css';
 
 export function PartnerComplaintsWorkspace() {
-  const { theme } = useTheme();
   const [complaints, setComplaints] = React.useState<PartnerComplaint[]>(PARTNER_COMPLAINTS_DATA);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
 
@@ -29,11 +29,11 @@ export function PartnerComplaintsWorkspace() {
   const openComplaintsCount = complaints.filter(c => c.status === 'open' || c.status === 'investigating').length;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start', direction: 'rtl' }}>
+    <div className={styles.surfaceSplitGrid} dir="rtl">
       {/* Complaints List */}
-      <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
+      <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
         <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+          <Text role="titleLg" tone="brand">
             شكاوى الشركاء
           </Text>
           <WebControlPanelStatusTag label={`${openComplaintsCount} شكاوى نشطة`} tone={openComplaintsCount > 0 ? 'danger' : 'neutral'} />
@@ -41,9 +41,9 @@ export function PartnerComplaintsWorkspace() {
 
         <Box gap={3}>
           {complaints.length === 0 || openComplaintsCount === 0 ? (
-            <Box padding={8} align="center" style={{ backgroundColor: theme.surfaceInset, borderRadius: '12px' }}>
+            <Surface padding={8} align="center" background="surfaceInset" radiusToken="lg">
               <Text tone="muted">لا توجد شكاوى نشطة حالياً.</Text>
-            </Box>
+            </Surface>
           ) : (
             complaints.filter(c => c.status !== 'resolved').map((cmp) => {
               const pInfo = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === cmp.partnerId);
@@ -73,28 +73,32 @@ export function PartnerComplaintsWorkspace() {
       {/* Complaint Inspector Panel */}
       <Box gap={4}>
         {selectedComplaint && partner ? (
-          <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: '12px' }}>
+          <Surface tone="inset" padding={4} gap={3} radiusToken="lg">
             <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="titleSm" style={{ fontWeight: '800', color: theme.brand }}>
+              <Text role="titleSm" tone="brand">
                 تفاصيل الشكوى
               </Text>
               <WebControlPanelStatusTag label={selectedComplaint.category} tone={selectedComplaint.severity === 'high' ? 'danger' : 'warning'} />
             </Box>
 
-            <Box style={{ backgroundColor: theme.surface, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: theme.line }}>
-              <Text role="caption" tone="muted">المتجر المشتكي:</Text>
-              <Text role="bodySm" style={{ fontWeight: 800, marginBottom: 8 }}>{partner.storeName}</Text>
+            <Surface background="surface" padding={3} radiusToken="sm" border borderTone="line">
+              <Box gap={1} marginY={2}>
+                <Text role="caption" tone="muted">المتجر المشتكي:</Text>
+                <Text role="titleSm" tone="base">{partner.storeName}</Text>
+              </Box>
 
               {selectedComplaint.relatedOrderId && (
-                <>
+                <Box gap={1} marginY={2}>
                   <Text role="caption" tone="muted">رقم الطلب المرتبط:</Text>
-                  <Text role="bodySm" style={{ fontWeight: 800, marginBottom: 8 }}>{selectedComplaint.relatedOrderId}</Text>
-                </>
+                  <Text role="titleSm" tone="base">{selectedComplaint.relatedOrderId}</Text>
+                </Box>
               )}
 
-              <Text role="caption" tone="muted">الوصف:</Text>
-              <Text role="bodySm" style={{ lineHeight: 1.5 }}>{selectedComplaint.description}</Text>
-            </Box>
+              <Box gap={1} marginY={2}>
+                <Text role="caption" tone="muted">الوصف:</Text>
+                <Text role="bodySm" tone="base">{selectedComplaint.description}</Text>
+              </Box>
+            </Surface>
 
             <WebControlPanelRecommendation
               title="توجيه معالجة الشكوى"
@@ -103,27 +107,23 @@ export function PartnerComplaintsWorkspace() {
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box layoutDirection="row" gap={2} style={{ marginTop: 12 }}>
-              {selectedComplaint.status === 'open' && (
-                <button
-                  onClick={() => handleStatusChange(selectedComplaint.id, 'investigating')}
-                  style={{
-                    flex: 1, padding: '10px', borderRadius: '8px',
-                    backgroundColor: theme.brand, color: theme.surface,
-                    border: 'none', fontWeight: 700, cursor: 'pointer'
-                  }}>
-                  بدء التحقيق
-                </button>
-              )}
-              <button
-                onClick={() => handleStatusChange(selectedComplaint.id, 'resolved')}
-                style={{
-                  flex: 1, padding: '10px', borderRadius: '8px',
-                  backgroundColor: 'transparent', color: theme.success,
-                  border: `1px solid ${theme.success}`, fontWeight: 700, cursor: 'pointer'
-                }}>
-                إغلاق التذكرة
-              </button>
+            <Box marginY={3}>
+              <WebControlPanelActionCluster
+                primary={
+                  selectedComplaint.status === 'open'
+                    ? {
+                        id: 'start-investigation',
+                        label: 'بدء التحقيق',
+                        onAction: () => handleStatusChange(selectedComplaint.id, 'investigating'),
+                      }
+                    : undefined
+                }
+                secondary={{
+                  id: 'close-ticket',
+                  label: 'إغلاق التذكرة',
+                  onAction: () => handleStatusChange(selectedComplaint.id, 'resolved'),
+                }}
+              />
             </Box>
           </Surface>
         ) : (

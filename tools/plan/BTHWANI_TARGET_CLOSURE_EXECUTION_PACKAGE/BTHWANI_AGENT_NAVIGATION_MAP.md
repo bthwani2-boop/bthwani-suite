@@ -1,4 +1,4 @@
-# BTHWANI AGENT NAVIGATION MAP — V6
+# BTHWANI AGENT NAVIGATION MAP — V7
 
 This file is mandatory. It controls how the agent moves through the package without drift, confusion, or token waste.
 
@@ -179,8 +179,9 @@ CYCLE_INVALID_IF_SCOPE_CHANGED: yes
 
 ## 6. Execution navigation timeline
 
-The agent must move in this exact timeline:
+The agent must move in this exact timeline within the package operations, AND must strictly adhere to the **Cross-Surface Closure Sequence (19 Stages)** when applying closure to the entire system.
 
+**Package Operations Timeline:**
 ```text
 01 Package Recheck
 02 Current Branch Rule Status
@@ -200,6 +201,31 @@ The agent must move in this exact timeline:
 16 Re-Diagnosis
 17 Human Approval Gate
 18 Final Decision
+```
+
+**Cross-Surface Closure Sequence (The 19 Stages):**
+Never skip or reorder these stages when targeting BThwani surfaces.
+```text
+0. Control Panel Shell / IA / Navigation Contract
+1. Control Panel Global UI Grammar
+2. DSH Shared Data / Media / Adapters
+3. Platform / Vars / Provider Policy
+4. Catalogs
+5. Partners
+6. Marketing
+7. Operations
+8. Finance / WLT Bridge
+9. Support / Disputes / Escalations
+10. Administration / Governance / Roles
+11. Dashboard / Closure Evidence
+12. app-client
+13. app-partner
+14. app-field
+15. app-captain
+16. Cross-Surface Consistency Sweep
+17. API Binding Readiness Map
+18. Visual Evidence Sweep
+19. Cross-Surface Slices
 ```
 
 Do not reorder unless a blocker requires stopping earlier.

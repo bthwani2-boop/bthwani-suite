@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface, TextField, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Text, Surface, TextField, KeyValueList } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelInspectorShell,
@@ -14,7 +14,6 @@ import {
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
   deriveProductSku,
   deriveProductGtin,
-  type CatalogPartnerInventoryItem,
 } from '../../shared/catalog-central-adapter';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
@@ -23,23 +22,19 @@ import {
   deletePartnerCatalogOverride,
   type DshPartnerCatalogOverride,
 } from './workflow';
+import styles from '../shared/control-panel-surface.module.css';
 
 export function PartnerCatalogOverridesWorkspace() {
-  const { theme } = useTheme();
   const [selectedPartnerId, setSelectedPartnerId] = React.useState('partner-saha');
   const [overrides, setOverrides] = React.useState<Record<string, DshPartnerCatalogOverride[]>>({});
   const [selectedProductId, setSelectedProductId] = React.useState<string | null>(null);
   const [actionMessage, setActionMessage] = React.useState('اختر منتجاً لتعديل تجاوزات الشريك المحلية.');
 
-  // Form states for selected product override
   const [formPrice, setFormPrice] = React.useState('');
   const [formStock, setFormStock] = React.useState('0');
   const [formAvailable, setFormAvailable] = React.useState(true);
   const [formPrepNote, setFormPrepNote] = React.useState('');
 
-  const currentPartner = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedPartnerId) || PARTNER_FULFILLMENT_AGREEMENTS[0];
-
-  // Load all partner overrides from central SSoT on mount
   React.useEffect(() => {
     const initialOverrides: Record<string, DshPartnerCatalogOverride[]> = {};
     for (const partner of PARTNER_FULFILLMENT_AGREEMENTS) {
@@ -48,15 +43,9 @@ export function PartnerCatalogOverridesWorkspace() {
     setOverrides(initialOverrides);
   }, []);
 
-  // Fetch all central products
   const centralItems = React.useMemo(() => buildCentralPartnerInventoryItems(), []);
 
-  // Filter products relevant to partner category domain (e.g. cafe, buffet, dates/grocery)
   const partnerItems = React.useMemo(() => {
-    // For Saha (cafe/sweets): show choco, apple, croissant, milk, yogurt
-    // For Shorouq (buffet/restaurant): show chicken, salad, burger
-    // For Zawya (bakery): show bread, croissant, roll
-    // For Nokhba (grocery/dates): show dates-box, honey, apple, milk
     if (selectedPartnerId === 'partner-saha') {
       return centralItems.filter(i => ['item-choco-2', 'item-apple-1', 'item-milk-1', 'item-yogurt-1'].includes(i.id));
     }
@@ -66,7 +55,6 @@ export function PartnerCatalogOverridesWorkspace() {
     if (selectedPartnerId === 'partner-zawya') {
       return centralItems.filter(i => ['item-bread-1', 'item-croissant-2', 'item-roll-1'].includes(i.id));
     }
-    // Nokhba or default
     return centralItems.filter(i => ['canonical-product-field-lead-5-featured', 'item-apple-1', 'item-milk-1'].includes(i.id));
   }, [selectedPartnerId, centralItems]);
 
@@ -128,7 +116,6 @@ export function PartnerCatalogOverridesWorkspace() {
     setActionMessage('تم إزالة التجاوز واستعادة بيانات الكتالوج المركزي الافتراضية.');
   };
 
-  // Resolve detail for selected product (to avoid duplicate product truth)
   const selectedProductDetail = selectedProductId ? (CENTRAL_PRODUCT_DETAIL_LOOKUP[selectedProductId] ?? {
     id: selectedProductId,
     sku: deriveProductSku(selectedProductId),
@@ -139,54 +126,42 @@ export function PartnerCatalogOverridesWorkspace() {
   const selectedCentralItem = selectedProductId ? centralItems.find(i => i.id === selectedProductId) : null;
 
   return (
-    <Box gap={4} style={{ direction: 'rtl' }}>
-      {/* Partner dropdown selector */}
+    <Box gap={4} dir="rtl">
       <Box gap={2}>
-        <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>اختر الشريك لإدارة تجاوزات الكتالوج</Text>
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <Text role="caption" tone="brand">اختر الشريك لإدارة تجاوزات الكتالوج</Text>
+        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const isSelected = selectedPartnerId === partner.partnerId;
             const overridesCount = (overrides[partner.partnerId] ?? []).length;
 
             return (
-              <button
+              <Surface
                 key={partner.partnerId}
-                type="button"
+                as="button"
                 onClick={() => handlePartnerChange(partner.partnerId)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '12px',
-                  border: `1px solid ${isSelected ? theme.brand : theme.line}`,
-                  background: isSelected ? theme.brandSurface : theme.surface,
-                  color: isSelected ? theme.brand : theme.text,
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                padding={2}
+                radiusToken="sm"
+                border
+                borderTone={isSelected ? 'brand' : 'line'}
+                background={isSelected ? 'brandSurface' : 'surface'}
+                layoutDirection="row"
+                align="center"
+                gap={2}
               >
-                <span>{partner.storeName}</span>
+                <Text role="bodySm" tone={isSelected ? 'brand' : 'base'}>{partner.storeName}</Text>
                 {overridesCount > 0 && (
-                  <span style={{
-                    background: theme.brand,
-                    color: theme.surface,
-                    borderRadius: '99px',
-                    padding: '2px 6px',
-                    fontSize: '10px',
-                    fontWeight: 900
-                  }}>
-                    {overridesCount}
-                  </span>
+                  <Surface padding={1} radiusToken="pill" background="brand" border={false}>
+                    <Text role="caption" tone="inverse">
+                      {overridesCount}
+                    </Text>
+                  </Surface>
                 )}
-              </button>
+              </Surface>
             );
           })}
         </Box>
       </Box>
 
-      {/* KPI Strip */}
       <WebControlPanelKpiStrip
         items={[
           { id: 'total-items', label: 'منتجات معروضة للشريك', value: String(partnerItems.length), tone: 'neutral' },
@@ -195,11 +170,10 @@ export function PartnerCatalogOverridesWorkspace() {
         ]}
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '20px', alignItems: 'start' }}>
-        {/* Products list with override states */}
-        <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
+      <div className={styles.surfaceSplitGrid}>
+        <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
           <Box gap={1}>
-            <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+            <Text role="titleLg" tone="brand">
               تجاوزات منتجات الشريك
             </Text>
             <Text role="caption" tone="muted">
@@ -241,7 +215,6 @@ export function PartnerCatalogOverridesWorkspace() {
           </Box>
         </Surface>
 
-        {/* Editor Inspector Drawer */}
         <Box gap={4}>
           {selectedProductId && selectedProductDetail && selectedCentralItem ? (
             <WebControlPanelInspectorShell
@@ -249,9 +222,8 @@ export function PartnerCatalogOverridesWorkspace() {
               onClose={() => setSelectedProductId(null)}
             >
               <Box gap={4} padding={4}>
-                {/* STRICT SSoT identity block - read-only */}
-                <Surface tone="inset" padding={3} gap={1} style={{ borderRadius: '10px' }}>
-                  <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>ℹ الهوية المركزية للمنتج (قراءة فقط لمنع التكرار)</Text>
+                <Surface tone="inset" padding={3} gap={1} radiusToken="sm">
+                  <Text role="caption" tone="brand">ℹ الهوية المركزية للمنتج (قراءة فقط لمنع التكرار)</Text>
                   <KeyValueList
                     dense
                     items={[
@@ -264,9 +236,8 @@ export function PartnerCatalogOverridesWorkspace() {
                   />
                 </Surface>
 
-                {/* Overridable field forms */}
                 <Box gap={3}>
-                  <Text role="titleSm" style={{ fontWeight: '800' }}>المتغيرات المحلية للشريك</Text>
+                  <Text role="titleSm" tone="base">المتغيرات المحلية للشريك</Text>
 
                   <TextField
                     label="سعر الشريك المخصص (Price Override)"
@@ -283,35 +254,37 @@ export function PartnerCatalogOverridesWorkspace() {
                     placeholder="مثال: 50"
                   />
 
-                  <Box gap={1}>
+                  <Box gap={2}>
                     <Text role="caption" tone="muted">حالة التوفر للطلب</Text>
                     <Box layoutDirection="row" gap={2}>
-                      <button
-                        type="button"
+                      <Surface
+                        as="button"
                         onClick={() => setFormAvailable(true)}
-                        style={{
-                          flex: 1, padding: '8px', borderRadius: '8px',
-                          border: `1px solid ${formAvailable ? theme.success : theme.line}`,
-                          background: formAvailable ? theme.successSurface : theme.surface,
-                          color: formAvailable ? theme.success : theme.text,
-                          fontWeight: 700, fontSize: '12px', cursor: 'pointer',
-                        }}
+                        padding={2}
+                        radiusToken="sm"
+                        border
+                        borderTone={formAvailable ? 'success' : 'line'}
+                        background={formAvailable ? 'successSurface' : 'surface'}
+                        className={styles.surfaceActionWrap}
                       >
-                        متاح للطلب
-                      </button>
-                      <button
-                        type="button"
+                        <Text role="bodySm" tone={formAvailable ? 'success' : 'base'}>
+                          متاح للطلب
+                        </Text>
+                      </Surface>
+                      <Surface
+                        as="button"
                         onClick={() => setFormAvailable(false)}
-                        style={{
-                          flex: 1, padding: '8px', borderRadius: '8px',
-                          border: `1px solid ${!formAvailable ? theme.danger : theme.line}`,
-                          background: !formAvailable ? theme.dangerSurface : theme.surface,
-                          color: !formAvailable ? theme.danger : theme.text,
-                          fontWeight: 700, fontSize: '12px', cursor: 'pointer',
-                        }}
+                        padding={2}
+                        radiusToken="sm"
+                        border
+                        borderTone={!formAvailable ? 'danger' : 'line'}
+                        background={!formAvailable ? 'dangerSurface' : 'surface'}
+                        className={styles.surfaceActionWrap}
                       >
-                        غير متوفر (موقوف)
-                      </button>
+                        <Text role="bodySm" tone={!formAvailable ? 'danger' : 'base'}>
+                          غير متوفر (موقوف)
+                        </Text>
+                      </Surface>
                     </Box>
                   </Box>
 
@@ -323,8 +296,7 @@ export function PartnerCatalogOverridesWorkspace() {
                   />
                 </Box>
 
-                {/* Metadata & Effect details */}
-                <Surface tone="inset" padding={3} gap={1} style={{ borderRadius: '8px' }}>
+                <Surface tone="inset" padding={3} gap={1} radiusToken="sm">
                   <KeyValueList
                     dense
                     items={[
@@ -358,8 +330,8 @@ export function PartnerCatalogOverridesWorkspace() {
             />
           )}
 
-          <Surface tone="raised" padding={4} gap={2} style={{ borderRadius: '12px' }}>
-            <Text role="titleSm" style={{ fontWeight: '800' }}>مبدأ عدم تكرار المنتج</Text>
+          <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
+            <Text role="titleSm" tone="base">مبدأ عدم تكرار المنتج</Text>
             <Text role="bodySm" tone="muted">
               لتفادي تشتت البيانات، يتم دمج كل التجاوزات على معرف المنتج المركزي. أي تعديل في الصورة أو الاسم أو الباركود يجب أن يتم عبر إدارة الكتالوج العام وليس من هنا.
             </Text>

@@ -6,6 +6,7 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
   WebControlPanelStatusTag,
+  WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
 import {
@@ -14,6 +15,7 @@ import {
   PARTNER_VISIBILITY_TIMELINE_DATA,
   type PartnerDispute,
 } from '../../data/partner.preview-data';
+import styles from '../shared/control-panel-surface.module.css';
 
 function parseKpiPercent(value: string): number {
   const n = parseFloat(value);
@@ -27,7 +29,6 @@ export type PartnerPerformanceWorkspaceProps = {
 // ─── Sub-screen 1: الأداء التشغيلي والسعة ────────────────────────────────────
 
 function PartnerOperationalPerformanceTab() {
-  const { theme } = useTheme();
   const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(null);
 
   const selectedPerf = selectedPartnerId
@@ -38,9 +39,9 @@ function PartnerOperationalPerformanceTab() {
     : null;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start' }}>
-      <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
-        <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+    <div className={styles.surfaceSplitGrid}>
+      <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
+        <Text role="titleLg" tone="brand">
           الأداء التشغيلي والسعة
         </Text>
         <Box gap={3}>
@@ -73,8 +74,8 @@ function PartnerOperationalPerformanceTab() {
 
       <Box gap={4}>
         {selectedPerf && selectedPartner ? (
-          <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: '12px' }}>
-            <Text role="titleSm" style={{ fontWeight: '800', color: theme.brand }}>
+          <Surface tone="inset" padding={4} gap={3} radiusToken="md">
+            <Text role="titleSm" tone="brand">
               مؤشرات: {selectedPartner.storeName}
             </Text>
             <KeyValueList
@@ -125,7 +126,6 @@ function PartnerOperationalPerformanceTab() {
 // ─── Sub-screen 2: النزاعات المفتوحة والاستئناف ───────────────────────────────
 
 function PartnerDisputesTab() {
-  const { theme } = useTheme();
   const [disputes, setDisputes] = React.useState<PartnerDispute[]>(PARTNER_DISPUTES_DATA);
   const [selectedDisputeId, setSelectedDisputeId] = React.useState<string | null>(null);
 
@@ -144,10 +144,10 @@ function PartnerDisputesTab() {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start' }}>
-      <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
+    <div className={styles.surfaceSplitGrid}>
+      <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
         <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+          <Text role="titleLg" tone="brand">
             النزاعات المفتوحة والاستئناف
           </Text>
           <WebControlPanelStatusTag
@@ -157,9 +157,9 @@ function PartnerDisputesTab() {
         </Box>
         <Box gap={3}>
           {openCount === 0 ? (
-            <Box padding={8} align="center" style={{ backgroundColor: theme.surfaceInset, borderRadius: '12px' }}>
+            <Surface padding={8} align="center" background="surfaceInset" radiusToken="md">
               <Text tone="muted">لا توجد نزاعات مفتوحة حالياً.</Text>
-            </Box>
+            </Surface>
           ) : (
             disputes.filter(d => d.status !== 'مغلق').map((dispute) => {
               const partner = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === dispute.partnerId);
@@ -194,9 +194,9 @@ function PartnerDisputesTab() {
 
       <Box gap={4}>
         {selectedDispute && selectedDisputePartner ? (
-          <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: '12px' }}>
+          <Surface tone="inset" padding={4} gap={3} radiusToken="md">
             <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="titleSm" style={{ fontWeight: '800', color: theme.brand }}>
+              <Text role="titleSm" tone="brand">
                 تفاصيل النزاع
               </Text>
               <WebControlPanelStatusTag
@@ -205,20 +205,22 @@ function PartnerDisputesTab() {
               />
             </Box>
 
-            <Box style={{ backgroundColor: theme.surface, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: theme.line }}>
+            <Surface padding={3} background="surface" radiusToken="sm" border borderTone="line">
               <Text role="caption" tone="muted">الشريك:</Text>
-              <Text role="bodySm" style={{ fontWeight: 800, marginBottom: 8 }}>
+              <Text role="bodySm" tone="base">
                 {selectedDisputePartner.storeName}
               </Text>
+              <Box marginY={2} />
               <Text role="caption" tone="muted">تاريخ الرفع:</Text>
-              <Text role="bodySm" style={{ fontWeight: 700, marginBottom: 8 }}>
+              <Text role="bodySm" tone="base">
                 {selectedDispute.date}
               </Text>
+              <Box marginY={2} />
               <Text role="caption" tone="muted">SLA:</Text>
-              <Text role="bodySm" style={{ color: theme.warning, fontWeight: 700 }}>
+              <Text role="bodySm" tone="warning">
                 {selectedDispute.sla}
               </Text>
-            </Box>
+            </Surface>
 
             <WebControlPanelRecommendation
               title="توجيه معالجة النزاع"
@@ -227,23 +229,14 @@ function PartnerDisputesTab() {
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box layoutDirection="row" gap={2} style={{ marginTop: 8 }}>
-              <button
-                type="button"
-                onClick={() => handleDisputeAction(selectedDispute.id, 'مغلق')}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  borderRadius: '8px',
-                  backgroundColor: 'transparent',
-                  color: theme.success,
-                  border: `1px solid ${theme.success}`,
-                  fontWeight: 700,
-                  cursor: 'pointer',
+            <Box marginY={2}>
+              <WebControlPanelActionCluster
+                primary={{
+                  id: 'close-dispute',
+                  label: 'إغلاق النزاع',
+                  onAction: () => handleDisputeAction(selectedDispute.id, 'مغلق')
                 }}
-              >
-                إغلاق النزاع
-              </button>
+              />
             </Box>
           </Surface>
         ) : (
@@ -262,7 +255,6 @@ function PartnerDisputesTab() {
 // ─── Sub-screen 3: الظهور والإيقاف ────────────────────────────────────────────
 
 function PartnerVisibilityTab() {
-  const { theme } = useTheme();
   const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(null);
 
   const timelineEvents = selectedPartnerId
@@ -273,9 +265,9 @@ function PartnerVisibilityTab() {
     : null;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start', direction: 'rtl' }}>
-      <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
-        <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+    <div className={styles.surfaceSplitGrid} dir="rtl">
+      <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
+        <Text role="titleLg" tone="brand">
           الظهور والإيقاف
         </Text>
         <Box gap={3}>
@@ -312,9 +304,9 @@ function PartnerVisibilityTab() {
 
       <Box gap={4}>
         {selectedPartner ? (
-          <Surface tone="inset" padding={4} gap={4} style={{ borderRadius: '12px' }}>
+          <Surface tone="inset" padding={4} gap={4} radiusToken="md">
             <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="titleSm" style={{ fontWeight: '800', color: theme.brand }}>
+              <Text role="titleSm" tone="brand">
                 تاريخ ظهور: {selectedPartner.storeName}
               </Text>
               <WebControlPanelStatusTag label={`${timelineEvents.length} أحداث`} tone="neutral" />
@@ -323,63 +315,37 @@ function PartnerVisibilityTab() {
             {timelineEvents.length === 0 ? (
               <Text tone="muted">لا يوجد سجل أحداث متاح.</Text>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: '11px',
-                    top: '10px',
-                    bottom: '10px',
-                    width: '2px',
-                    backgroundColor: theme.line,
-                    zIndex: 0,
-                  }}
-                />
+              <Box gap={4}>
                 {timelineEvents.map((event) => {
                   const isActivation = event.eventType === 'activated';
-                  const color = isActivation ? theme.success : theme.danger;
                   return (
-                    <div key={event.id} style={{ display: 'flex', gap: '12px', position: 'relative', zIndex: 1 }}>
-                      <div
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          backgroundColor: isActivation ? theme.successSurface : theme.dangerSurface,
-                          border: `2px solid ${color}`,
-                          flexShrink: 0,
-                          marginTop: '2px',
-                        }}
-                      />
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '4px',
-                          backgroundColor: theme.surface,
-                          padding: '12px',
-                          borderRadius: '8px',
-                          border: `1px solid ${theme.line}`,
-                          flex: 1,
-                        }}
+                    <Box key={event.id} layoutDirection="row" gap={3}>
+                      <Surface
+                        background={isActivation ? 'successSurface' : 'dangerSurface'}
+                        border
+                        borderTone={isActivation ? 'success' : 'danger'}
+                        padding={3}
+                        radiusToken="md"
+                        gap={1}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Text role="caption" style={{ fontWeight: 800, color }}>
+                         <Box layoutDirection="row" justify="space-between">
+                          <Text role="caption" tone={isActivation ? 'success' : 'danger'}>
                             {isActivation ? 'تفعيل المتجر' : 'إيقاف مؤقت'}
                           </Text>
-                          <Text role="caption" tone="muted" style={{ direction: 'ltr' }}>
+                          <Text role="caption" tone="muted" dir="ltr">
                             {event.date}
                           </Text>
-                        </div>
+                        </Box>
                         <Text role="bodySm">{event.reason}</Text>
-                        <Text role="caption" tone="muted" style={{ marginTop: 4 }}>
+                        <Box marginY={1} />
+                        <Text role="caption" tone="muted">
                           بواسطة: {event.actionBy}
                         </Text>
-                      </div>
-                    </div>
+                      </Surface>
+                    </Box>
                   );
                 })}
-              </div>
+              </Box>
             )}
 
             <WebControlPanelRecommendation

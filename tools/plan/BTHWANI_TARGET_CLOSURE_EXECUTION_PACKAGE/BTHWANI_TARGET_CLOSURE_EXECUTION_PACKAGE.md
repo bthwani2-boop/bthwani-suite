@@ -1,7 +1,7 @@
 # BTHWANI TARGET CLOSURE EXECUTION PACKAGE
 
-**Version:** 6.0.0
-**Date:** 2026-05-29
+**Version:** 7.0.0
+**Date:** 2026-05-30
 **Placement:** `C:\bthwani-suite\tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md`
 **Scope:** Universal execution protocol for any BThwani target: app, surface, screen, section, tab, flow, folder, control-panel workspace, DSH data/media owner, shared module, governance file, guard, agent file, or cross-surface journey.
 **Branch rule:** Execute on the **current local branch only**, whatever its name is. Do not hardcode, mention, or depend on any branch name inside execution instructions.
@@ -9,25 +9,19 @@
 
 ---
 
-## 0. V3 Verdict and Supersession
+## 0. V6 Verdict and Supersession
 
-V6 supersedes every earlier version of this package.
+V7 supersedes every earlier version of this package.
 
-V2 is not approved for final execution because it contained these defects:
+V6 is not approved for final execution because it contained these defects:
 
-- an internal contradiction between old old section-count wording and the required 28-section output;
-- a weak package check script that only searched for keywords;
-- `SHA256SUMS.json` existed but was not verified;
-- no safe install/apply script with backup;
-- `PACKAGE_RECHECK_DONE: yes` could be faked verbally without evidence;
-- incomplete evidence pack requirements;
-- insufficient branch sanity gate;
-- no explicit audit-only safe mode;
-- benchmark and performance gates were under-operationalized;
-- rollback existed as a field, not a protocol;
-- required Arabic BThwani phrases were not guaranteed in the execution contract.
+- Superficial Logic Closure gate (missing 24 strict closure steps).
+- Missing 19-stage Cross-Surface Navigation Map.
+- Weak performance gates lacking strict enforcement of 22 UI/UX and Core Web Vitals criteria.
+- Missing strict Demo Data Centralization Matrix and File Boundary Matrix.
+- Lacked rigid gap matrix and target execution map requirements in every response.
 
-V6 includes and extends these defects. Use V6 only.
+V7 fixes all these defects. Use V7 only.
 
 ---
 
@@ -380,58 +374,40 @@ If `HYGIENE_FIX_FIRST`, Task 1 must be hygiene work, not feature work.
 
 ---
 
-## 9a. Technical / Logic Gap Discovery
+## 9a. Technical / Operational Logic Closure Stage
 
-Run this gate after Structural Hygiene and before Data/Media gates. No design work begins before this gate is complete.
+Run this gate after Structural Hygiene and before Data/Media/Design gates. No design work begins before this gate is complete.
 
 ```text
 NO_DESIGN_BEFORE_LOGIC_GATE: enforced
 ```
 
-Discover and classify every UI element that appears functional but has no backing logic. Scan for:
+Discover and classify every UI element that appears functional but has no backing logic. You MUST execute these 24 strict closure steps before claiming logic is closed:
 
-```text
-button without handler
-tab without state/result
-flow without end
-KPI without source
-status without mapping
-action without result/boundary
-adapter missing
-validation missing
-permission boundary missing
-conflict resolution missing
-runtime/API dependency unclassified
-static UI claiming runtime function
-```
-
-### 9a.1 Required closure areas
-
-For each area, classify as `UI-only now` / `API/runtime later` / `BLOCKED` / `CLOSED`:
-
-```text
-1.  Logic Gap Discovery         — what appears in UI but does not work
-2.  Button/Action Closure       — button/CTA/chip/tab/row action/bulk action/filter/search/sort/pagination
-3.  State Machine Closure       — idle/loading/empty/ready/dirty/invalid/submitting/success/error/blocked/disabled
-4.  Flow Logic Closure          — start→entry→action→intermediate state→result→end/failure/cancel
-5.  ViewModel/Adapter Closure   — source data / adapter / view model / status mapping / badges / labels / mediaKey
-6.  Domain Logic Closure        — product identity/campaign lifecycle/vars scope/partner override per target domain
-7.  Permissions/Visibility      — who sees, who edits, who approves, who publishes, who disables
-8.  Validation Rules            — required fields / format / range / duplicate / conflict / error / success
-9.  Conflict Resolution         — detect/display/owner/resolution action — audit/API-later for each conflict type
-10. KPI / Calculations          — source / formula / adapter / format / fallback / staleness / API-later
-11. Navigation / Routing        — route / registry / tab active state / breadcrumb / back / drawer open-close
-12. Data Loading Logic          — summary-first / detail-on-open / pagination / filtering / refresh / stale / retry
-13. Mutations as Boundaries     — create/update/approve/reject/publish/hide/rollback — UI-only or API-later, no backend now
-14. Audit / History / Rollback  — audit trail / rollback preview / before-after UI — especially publish/finance/vars
-15. Error Handling              — network/validation/permission/not-found/conflict/stale/blocked/partial/retry
-16. Empty / Loading / Blocked   — loading/empty/error/blocked/disabled/success/retry/guidance per screen/list/drawer
-17. Cross-Surface Consistency   — canonical owner per domain across all linked surfaces; no per-surface divergence
-18. Security / Privacy          — secrets/tokens/env leakage/unsafe logs — classify for guard:secret-scan
-19. Observability (deferred)    — analytics/audit log/event/trace/metric — classify now, implement later
-20. Tests / Guards Readiness    — typecheck/guard/unit/component/registry/visual/performance checks needed
-21. Technical Debt in Scope     — TODO/FIXME/dead branch/orphan/stale adapter/temp file — fix/retire/defer/block
-```
+1. **اكتشاف المنطق الناقص**: افحص كل زر، تبويب، flow، KPI، status بلا مصدر. صنّفها: UI-only now, API/runtime later, أو BLOCKED.
+2. **إغلاق منطق الأزرار والإجراءات**: حدد handler، target، disabled reason لكل CTA أو زر. ممنوع زر شكلي، أو إجراء approve/publish/delete بلا boundary.
+3. **إغلاق State Machine**: حدد الحالات لكل شاشة (idle, loading, empty, ready, dirty, invalid, submitting, success, error, blocked, disabled). من يبدأ الحالة ومن ينهيها.
+4. **إغلاق Flow Logic**: start → entry → action → intermediate state → result → end/failure/cancel. ممنوع flow يبدأ بزر وينتهي بلا نتيجة.
+5. **إغلاق ViewModel / Adapter Logic**: افصل البيانات الخام عن الشاشة. حدد: source data, adapter, view model, status mapping. ممنوع formatting داخل JSX.
+6. **إغلاق Domain Logic**: لكل Target حدد منطق المجال الخاص به (مثال الكتالوج: SKU, visibility, media ownership. التسويق: campaigns, promotions. Platform: provider policy).
+7. **إغلاق الصلاحيات والظهور**: حدد من يرى ويعدل ويوافق. صنّف permission, role, scope. ممنوع إجراء سيادي بلا permission boundary.
+8. **إغلاق Validation Rules**: لكل form/action حدد required fields, format rules, range, duplicate, conflict, disabled reason.
+9. **إغلاق Conflict Resolution**: افحص التعارضات (duplicate product, category conflict, partner override). حدد detect, display, owner, resolution action.
+10. **إغلاق Calculations / KPIs**: أي رقم ظاهر يجب أن يملك source, formula, adapter, format. ممنوع KPI أو badge بلا مصدر.
+11. **إغلاق Navigation / Routing**: افحص route, registry, tab active state, breadcrumb, back behavior. ممنوع تبويب يغير الشكل فقط أو drawer بلا selected item.
+12. **إغلاق Data Loading Logic**: حدد summary load, detail-on-open, pagination, filtering. ممنوع تحميل كل شيء دفعة واحدة.
+13. **إغلاق Mutations كحدود لا Backend**: صنّف كل mutation (create, update, approve, rollback). لا backend/API بدون موافقة صريحة.
+14. **إغلاق Audit / History / Rollback Preview**: لكل action مهم (publish, approval, refund) حدد ما يثبت الـ history أو يعطي preview للمراجعة.
+15. **إغلاق Error Handling**: غطِّ network, validation, permission, not found, conflict. ممنوع catch صامت.
+16. **إغلاق Empty / Loading / Blocked / Disabled**: لكل جدول وقائمة حدد loading, empty, error, blocked. ممنوع جدول فارغ بلا empty state.
+17. **إغلاق Cross-Surface Consistency**: افحص المنطق عبر الأسطح (client, partner, control-panel). حدد الـ canonical owner والـ consumers.
+18. **إغلاق Security / Privacy / Secrets**: افحص secrets, tokens, private IDs. (شغل guard:secret-scan إذا لزم الأمر).
+19. **إغلاق Observability / Telemetry لاحقًا**: صنّف actions لـ analytics, audit log (لا تنفذها الآن بل صنفها فقط).
+20. **إغلاق Tests / Guards Readiness**: حدد ما يلزم من typecheck, guard, unit test.
+21. **إغلاق Technical Debt داخل النطاق**: افحص TODO, unused code, orphan file. القرار: fix now, retire, defer.
+22. **إنتاج Technical / Logic Gap Matrix**: اكتب المصفوفة المفصلة (كما هو موضح أدناه).
+23. **اختيار Task 1 بعد هذه المرحلة**: بناءً على الأولوية.
+24. **Technical / Logic Closure Gate**: لا READY إذا بقي زر بلا handler, action بلا result, KPI بلا source.
 
 ### 9a.2 Technical / Logic Gap Matrix
 
@@ -1020,18 +996,18 @@ A next phase without human approval is invalid.
 
 ---
 
-# V6 Final Hardening — Package Integrity, Install Safety, and Anti-Drift Enforcement
+# V7 Final Hardening — Package Integrity, Install Safety, and Anti-Drift Enforcement
 
-This V6 section supersedes weaker wording above. If any conflict exists, V6 wins.
+This V7 section supersedes weaker wording above. If any conflict exists, V7 wins.
 
-## V6.1 Final Package Identity
+## V7.1 Final Package Identity
 
 The package is valid only if:
 
 ```text
-manifest.version = 6.0.0
+manifest.version = 7.0.0
 manifest.package_id = BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE
-BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md contains Version: 6.0.0
+BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md contains Version: 7.0.0
 SHA256SUMS.json matches all package files except itself
 all required files are present
 no forbidden old section-count wording exists
@@ -1045,7 +1021,7 @@ If any item fails:
 PACKAGE_INVALID_DO_NOT_USE
 ```
 
-## V6.2 Install Safety Modes
+## V7.2 Install Safety Modes
 
 The install script must support these modes:
 
@@ -1079,7 +1055,7 @@ and package-specific files not listed in the V6 manifest.
 
 No destructive deletion is allowed by default.
 
-## V6.3 Package Recheck Is Evidence, Not Text
+## V7.3 Package Recheck Is Evidence, Not Text
 
 `PACKAGE_RECHECK_DONE: yes` is invalid unless accompanied by:
 
@@ -1098,7 +1074,7 @@ CONFIDENCE_REDUCED: yes
 HUMAN_APPROVAL_REQUIRED_BEFORE_APPLY: yes
 ```
 
-## V6.4 Required Execution Evidence ZIP
+## V7.4 Required Execution Evidence ZIP
 
 Every execution cycle that applies changes must produce or request an evidence ZIP under:
 
@@ -1132,7 +1108,7 @@ EVIDENCE_ZIP_MISSING
 FINAL_DECISION_CANNOT_BE_READY
 ```
 
-## V6.5 No-Extra Legacy Package Noise
+## V7.5 No-Extra Legacy Package Noise
 
 After install, if legacy package files exist in `tools/plan`, the check script must classify them:
 
@@ -1144,7 +1120,7 @@ UNKNOWN_LOCAL_FILE
 
 Strict mode fails on legacy package files.
 
-## V6.6 Benchmark Confidence Gate
+## V7.6 Benchmark Confidence Gate
 
 `WEB_RESEARCH_UNAVAILABLE` is allowed only with:
 
@@ -1165,7 +1141,7 @@ BENCHMARK_CONFIDENCE_REDUCED: yes
 HUMAN_APPROVAL_REQUIRED_BEFORE_APPLY: yes
 ```
 
-## V6.7 Performance Gate Is Actionable
+## V7.7 Performance Gate Is Actionable
 
 If the target touches performance-sensitive areas, the agent must output one of:
 
@@ -1178,7 +1154,7 @@ PERFORMANCE_BLOCKED_WITH_REASON
 
 `PERFORMANCE_NUMBERS_UNPROVEN_WITH_REASON` is not a PASS. It only allows a cycle to continue when the current task is not claiming measured performance improvement.
 
-## V6.8 Audit-Only Does Not Mean Weak
+## V7.8 Audit-Only Does Not Mean Weak
 
 `AUDIT_ONLY_ALLOWED_WITH_REASON` is valid when the current human request is to inspect, verify, or prepare the package itself; or when local evidence is insufficient for safe apply.
 
@@ -1191,7 +1167,7 @@ next safe action
 patch/package/script if a safe package correction is possible
 ```
 
-## V6.9 Final Adoption Rule
+## V7.9 Final Adoption Rule
 
 A package version is adoptable only if:
 
@@ -1200,7 +1176,7 @@ CHECK_TARGET_CLOSURE_PACKAGE.ps1 = PASS
 SHA256SUMS.json verified
 manifest verified
 no contradiction found
-V6 package identity verified
+V7 package identity verified
 install script present
 rollback protocol present
 evidence standard present
@@ -1222,9 +1198,9 @@ The package passed its static integrity and policy checks and is ready for contr
 
 ---
 
-# V6 Clarity Layer — Full Agent Picture
+# V7 Clarity Layer — Full Agent Picture
 
-V6 adds the missing clarity layer. The package is not only a policy file; it is a field operating kit.
+V7 adds the missing clarity layer. The package is not only a policy file; it is a field operating kit.
 
 The agent must understand the package in this order:
 
@@ -1239,7 +1215,7 @@ The agent must understand the package in this order:
    - BTHWANI_AGENT_FAILURE_MODES.md
 ```
 
-## V6.1 Compact 28-Section Rule
+## V7.1 Compact 28-Section Rule
 
 The 28 sections are mandatory, but verbosity is not.
 
@@ -1259,7 +1235,7 @@ full matrices required
 
 No section may be omitted.
 
-## V6.2 Source Coverage Rule
+## V7.2 Source Coverage Rule
 
 The agent must respect the source coverage map in:
 
@@ -1273,7 +1249,7 @@ If a source requirement is not represented in the cycle output:
 SOURCE_COVERAGE_GAP
 ```
 
-## V6.3 Target Archetype Rule
+## V7.3 Target Archetype Rule
 
 Before selecting Task 1, classify the target using:
 
@@ -1283,7 +1259,7 @@ BTHWANI_TARGET_ARCHETYPE_GUIDE.md
 
 This prevents the agent from treating a section, tab, data owner, governance file, and cross-surface journey as the same type of work.
 
-## V6.4 Operational Clarity Rule
+## V7.4 Operational Clarity Rule
 
 If the agent is unsure what to do first, it must use this priority:
 
@@ -1298,7 +1274,7 @@ If the agent is unsure what to do first, it must use this priority:
 8. design closure
 ```
 
-## V6.5 Weak Agent Rule
+## V7.5 Weak Agent Rule
 
 A weak agent must not infer missing details. It must choose from the documented decisions only:
 
@@ -1310,9 +1286,9 @@ TARGET_TASK_APPLIED_NEXT_TASK_REQUIRED
 CYCLE_INVALID
 ```
 
-## V6.6 Adoption Statement
+## V7.6 Adoption Statement
 
-A valid V6 check means:
+A valid V7 check means:
 
 ```text
 PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION
@@ -1323,9 +1299,9 @@ It does not mean future execution is impossible to fail. It means the package ha
 
 ---
 
-# V6 Navigation Layer — Zero Drift Movement
+# V7 Navigation Layer — Zero Drift Movement
 
-V6 adds a mandatory navigation map to remove execution confusion.
+V7 adds a mandatory navigation map to remove execution confusion.
 
 The agent must read:
 
@@ -1335,7 +1311,7 @@ BTHWANI_AGENT_NAVIGATION_MAP.md
 
 before opening playbooks or selecting Task 1.
 
-## V6.1 Agent Navigation Rule
+## V7.1 Agent Navigation Rule
 
 ```text
 AGENT_NAVIGATION_RULE:
@@ -1351,7 +1327,7 @@ AGENT_NAVIGATION_RULE:
 إذا سببت القراءة العشوائية انحرافًا أو تغيير نطاق = CYCLE_INVALID.
 ```
 
-## V6.2 Navigation Evidence
+## V7.2 Navigation Evidence
 
 Every cycle must include:
 
@@ -1371,7 +1347,7 @@ NAVIGATION_GATE_MISSING
 CYCLE_INVALID
 ```
 
-## V6.3 No Stage Jump
+## V7.3 No Stage Jump
 
 The agent cannot move to implementation until:
 
@@ -1385,9 +1361,9 @@ structural hygiene checked
 Task 1 selected with reason
 ```
 
-## V6.4 Adoption Statement
+## V7.4 Adoption Statement
 
-A valid V6 package check means:
+A valid V7 package check means:
 
 ```text
 PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION

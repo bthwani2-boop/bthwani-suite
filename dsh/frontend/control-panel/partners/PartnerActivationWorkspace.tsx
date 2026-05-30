@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
 import {
   WebControlPanelStatusTag,
   WebControlPanelActionCluster,
@@ -24,6 +24,7 @@ import {
 } from './workflow';
 import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
 import { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
+import styles from '../shared/control-panel-surface.module.css';
 
 function checkMarketingEligibility(status: DshPartnerActivationStatus): {
   eligible: boolean;
@@ -40,7 +41,6 @@ function checkMarketingEligibility(status: DshPartnerActivationStatus): {
 }
 
 export function ControlPanelDshPartnerActivationScreen() {
-  const { theme } = useTheme();
   const [partnerStatuses, setPartnerStatuses] = React.useState<Record<string, DshPartnerActivationStatus>>({});
   const [selectedPartnerId, setSelectedPartnerId] = React.useState('partner-saha');
   const [isDeactivating, setIsDeactivating] = React.useState(false);
@@ -88,38 +88,37 @@ export function ControlPanelDshPartnerActivationScreen() {
   };
 
   return (
-    <Box gap={4} style={{ direction: 'rtl' }}>
+    <Box gap={4} dir="rtl">
       {/* Partner selector chips */}
       <Box gap={2}>
-        <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>اختر الشريك للمعاينة والتفعيل</Text>
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <Text role="caption" tone="brand">اختر الشريك للمعاينة والتفعيل</Text>
+        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const status = partnerStatuses[partner.partnerId] ?? getPartnerActivationStatus(partner.partnerId);
             const isActive = selectedPartnerId === partner.partnerId;
             return (
-              <button
+              <Surface
                 key={partner.partnerId}
-                type="button"
+                as="button"
                 onClick={() => handlePartnerSelect(partner.partnerId)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '12px',
-                  border: `1px solid ${isActive ? theme.brand : theme.line}`,
-                  background: isActive ? theme.brandSurface : theme.surface,
-                  color: isActive ? theme.brand : theme.text,
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                }}
+                padding={2}
+                radiusToken="sm"
+                border
+                borderTone={isActive ? 'brand' : 'line'}
+                background={isActive ? 'brandSurface' : 'surface'}
+                layoutDirection="row"
+                align="center"
               >
-                {partner.storeName} ({getDshPartnerActivationStatusLabel(status)})
-              </button>
+                <Text role="bodySm" tone={isActive ? 'brand' : 'base'}>
+                  {partner.storeName} ({getDshPartnerActivationStatusLabel(status)})
+                </Text>
+              </Surface>
             );
           })}
         </Box>
       </Box>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start' }}>
+      <div className={styles.surfaceSplitGrid}>
         <Box gap={4}>
           {isDeactivating ? (
             <PartnerDeactivationWorkspace
@@ -130,10 +129,10 @@ export function ControlPanelDshPartnerActivationScreen() {
               onClose={() => setIsDeactivating(false)}
             />
           ) : (
-            <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
+            <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
               <Box layoutDirection="row" justify="space-between" align="center">
                 <Box gap={1}>
-                  <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+                  <Text role="titleLg" tone="brand">
                     حالة الجاهزية والتفعيل
                   </Text>
                   <Text role="caption" tone="muted">
@@ -164,15 +163,7 @@ export function ControlPanelDshPartnerActivationScreen() {
                 </Box>
               </Box>
 
-              <Box
-                style={{
-                  backgroundColor: theme.surfaceInset,
-                  padding: 12,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: theme.line,
-                }}
-              >
+              <Surface background="surfaceInset" padding={3} radiusToken="sm" border borderTone="line">
                 <KeyValueList
                   dense
                   items={[
@@ -181,68 +172,58 @@ export function ControlPanelDshPartnerActivationScreen() {
                     { label: 'الخطوة القادمة', value: currentMeta.nextAction, tone: 'default' },
                   ]}
                 />
-              </Box>
+              </Surface>
 
               {/* Marketing Eligibility Banner */}
-              <div
-                style={{
-                  background: theme[`${marketingElig.tone}Surface`],
-                  border: `1px solid ${theme[marketingElig.tone]}`,
-                  padding: '12px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
+              <Surface
+                background={`${marketingElig.tone}Surface` as any}
+                border
+                borderTone={marketingElig.tone}
+                padding={3}
+                radiusToken="sm"
+                layoutDirection="row"
+                align="center"
+                gap={2}
               >
-                <Text role="bodySm" style={{ color: theme[marketingElig.tone], fontWeight: '800' }}>
+                <Text role="titleSm" tone={marketingElig.tone}>
                   {marketingElig.eligible ? '✓' : '⚠'} {marketingElig.label}
                 </Text>
-              </div>
+              </Surface>
 
               {/* Readiness Checklist */}
               <Box gap={3}>
-                <Text role="titleSm" style={{ fontWeight: '800' }}>قائمة شروط التفعيل النهائي</Text>
+                <Text role="titleSm" tone="base">قائمة شروط التفعيل النهائي</Text>
                 <Box gap={2}>
                   {readinessChecklist.map((item) => (
-                    <div
+                    <Surface
                       key={item.id}
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px',
-                        padding: '10px 14px',
-                        borderRadius: '10px',
-                        background: item.satisfied ? theme.successSurface : theme.dangerSurface,
-                        border: `1px solid ${item.satisfied ? theme.success : theme.danger}`,
-                      }}
+                      padding={3}
+                      radiusToken="sm"
+                      background={item.satisfied ? 'successSurface' : 'dangerSurface'}
+                      border
+                      borderTone={item.satisfied ? 'success' : 'danger'}
+                      gap={1}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span
-                          style={{
-                            fontSize: '13px',
-                            fontWeight: 800,
-                            color: item.satisfied ? theme.success : theme.danger,
-                          }}
+                      <Box layoutDirection="row" justify="space-between" align="center">
+                        <Text
+                          role="titleSm"
+                          tone={item.satisfied ? 'success' : 'danger'}
                         >
                           {item.label}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            color: item.satisfied ? theme.success : theme.danger,
-                          }}
+                        </Text>
+                        <Text
+                          role="titleSm"
+                          tone={item.satisfied ? 'success' : 'danger'}
                         >
                           {item.satisfied ? '✓ مكتمل' : '✗ غير مكتمل'}
-                        </span>
-                      </div>
+                        </Text>
+                      </Box>
                       {!item.satisfied && item.blockedReason && (
-                        <span style={{ fontSize: '11px', color: theme.danger }}>
+                        <Text role="caption" tone="danger">
                           العائق: {item.blockedReason}
-                        </span>
+                        </Text>
                       )}
-                    </div>
+                    </Surface>
                   ))}
                 </Box>
               </Box>
@@ -275,8 +256,8 @@ export function ControlPanelDshPartnerActivationScreen() {
             confidence={allReady ? 'high' : 'low'}
             auditTag="UI_PREVIEW_ONLY"
           />
-          <Surface tone="raised" padding={4} gap={2} style={{ borderRadius: '12px' }}>
-            <Text role="titleSm" style={{ fontWeight: '800' }}>ملاحظة تشغيلية</Text>
+          <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
+            <Text role="titleSm" tone="base">ملاحظة تشغيلية</Text>
             <Text role="bodySm" tone="muted">
               حسب سياسة الحوكمة في بثواني، لا يمكن تفعيل أي شريك للعملاء إلا بعد أن يتم مراجعة وثائقه بنسبة 100%
               واعتماد الكتالوج الخاص به.

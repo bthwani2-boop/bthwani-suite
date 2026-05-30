@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Text, Surface } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelKpiStrip,
+  WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { dshPartnerIntakeItems, dshPartnerIntakeMetrics } from './workflow';
 
@@ -30,7 +31,6 @@ function resolveApproveLabel(queue: string): string {
 
 export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHubItem }: PartnerIntakeLaneProps) {
   const router = useRouter();
-  const { theme } = useTheme();
 
   const openHubItem = React.useCallback((itemId: string, intent: 'approve' | 'fix' | 'inspect') => {
     if (onOpenHubItem) {
@@ -55,31 +55,24 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
   if (state === 'error') {
     return (
       <Box padding={10} align="center" gap={4}>
-        <Text role="titleSm" style={{ color: theme.danger }}>تعذر تحميل طلبات الشركاء</Text>
-        <button
-          type="button"
-          onClick={onRetry}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '8px',
-            border: `1px solid ${theme.danger}`,
-            color: theme.danger,
-            background: 'transparent',
-            cursor: 'pointer',
+        <Text role="titleSm" tone="danger">تعذر تحميل طلبات الشركاء</Text>
+        <WebControlPanelActionCluster
+          secondary={{
+            id: 'retry',
+            label: 'إعادة المحاولة',
+            onAction: onRetry,
           }}
-        >
-          إعادة المحاولة
-        </button>
+        />
       </Box>
     );
   }
 
   return (
-    <Box gap={6} style={{ direction: 'rtl' }}>
+    <Box gap={6} dir="rtl">
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={1}>
-          <Text role="caption" style={{ color: theme.brand, fontWeight: '800' }}>مسار استقبال الشركاء</Text>
-          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', color: theme.brandHeaderBackground }}>
+          <Text role="caption" tone="brand">مسار استقبال الشركاء</Text>
+          <Text role="titleLg" tone="brand">
             طلبات الميدان والشركاء
           </Text>
         </Box>

@@ -1,4 +1,4 @@
-# BTHWANI PERFORMANCE PLAYBOOK — V6
+# BTHWANI PERFORMANCE PLAYBOOK — V7
 
 Performance is checked while coding.
 
@@ -150,7 +150,7 @@ PERFORMANCE_NUMBERS_UNPROVEN_WITH_REASON
 PERFORMANCE_BLOCKED_WITH_REASON
 ```
 
-## 6. No guessing
+## 7. No guessing
 
 Forbidden wording:
 
@@ -166,3 +166,30 @@ Allowed without numeric measurement:
 performance risk reduced by avoiding eager load / full payload / heavy import
 numbers unproven
 ```
+
+## 8. 22 Comprehensive Performance & UI/UX Standards
+
+You must adhere to the following 22 rigorous standards for UI/UX flow and performance during all development stages:
+
+1. **Light First Render**: Start with light, useful content. No heavy empty screens.
+2. **Summary-First & Detail-on-Demand**: Never load full data objects on initial load. Load summaries; details on click.
+3. **No Unjustified Elements**: No excessive cards, heroes, or nested layouts without reason.
+4. **List Optimization**: Pagination/virtualization is mandatory for any large list.
+5. **Clear Flows**: Each flow has one primary CTA and the minimum number of steps.
+6. **No Route Sprawl**: Use tabs, drawers, or split panes for details instead of full new routes.
+7. **Immediate Feedback**: Every tap/click must have immediate visual feedback.
+8. **Skeletons over Spinners**: Use light skeletons instead of long blocking spinners.
+9. **Mandatory States**: Every screen MUST cover: loading, empty, error, offline, blocked, disabled, success.
+10. **RTL Correctness**: 100% correct Arabic RTL. No misplaced chevrons. LTR for raw data/SKUs.
+11. **No Clipping/Overflow**: Prevent visual noise and layout bugs.
+12. **Centralized UI-Kit**: No local design patterns. Every reusable component comes from `@bthwani/ui-kit`.
+13. **Core Web Vitals**: Strict adherence to LCP <= 2.5s, INP <= 200ms, CLS <= 0.1.
+14. **Lazy Loading**: Heavy components, maps, charts, editors, and modals must be lazy-loaded.
+15. **Optimized Media**: Thumbnails in lists. Full images only in detail view. Explicit width/height.
+16. **No Duplicate Demo Data**: ALL DSH demo data and media must point exclusively to `dsh/frontend/data` and `dsh/media-fixtures`.
+17. **Optimized React Renders**: Strict state partitioning. Use `memo` / `useMemo` / `useCallback` appropriately. No object creation in heavy list row props.
+18. **Mobile Efficiency**: No `ScrollView` for lists. Use `FlatList`/`FlashList`. Light row components. Reduce JS thread animations.
+19. **Control Panel Density**: Calculated density, fixed table toolbar, deferred/debounced filters, bulk actions only on selection.
+20. **Network Efficiency**: Separate summary vs detail endpoints. Debounce requests. Cache repeat queries. No `N+1` fetches.
+21. **Security without Lag**: No secrets in logs. No heavy decryption on UI thread.
+22. **Evidence-Driven**: No claim of "faster" without before/after evidence (Git status, network waterfall, bundle size, render count, screenshot).

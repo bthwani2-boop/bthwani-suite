@@ -4,24 +4,33 @@ import React from 'react';
 import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
-import { CatalogWorkspaceRouter } from './drawers/catalog-workspace-router';
-import { useCatalogScreen } from './catalogs.hooks';
-import { TaxonomyScreen } from './taxonomy/taxonomy.screen';
-import { useTaxonomyScreen } from './taxonomy/taxonomy.hooks';
-import { IntakeWorkspaceView } from './products/intake-workspace';
-import { MappingWorkspaceView } from './products/mapping-workspace';
-import { ProductInspectorPanel } from './products/product-inspector-panel';
-import { ProductEditModal } from './products/product-edit-modal';
-import { CategoryControlRoom } from './products/category-control-room';
 import { CatalogControlStrip } from './catalogs.control-strip';
 import { CatalogBreadcrumb } from './catalogs.breadcrumb';
 import { CatalogProposalsBanner } from './catalogs.proposals-banner';
-import { CatalogProductsTable } from './products/catalog-products-table';
-import { PublishingGateChecklist } from './products/publishing-gate-checklist';
-import { ItemApprovalScreen } from './catalogs.approvals';
-import { ListingGovernanceScreen } from './catalogs.listing-governance';
 import { mergeCatalogProductPreviewPatch } from './catalogs.adapters';
 import { createCatalogPreviewProposal } from './catalogs.model';
+import { useCatalogScreen } from './catalogs.hooks';
+import { useTaxonomyScreen } from './taxonomy/taxonomy.hooks';
+
+const CatalogWorkspaceRouter = React.lazy(() => import('./drawers/catalog-workspace-router').then(m => ({ default: m.CatalogWorkspaceRouter })));
+const TaxonomyScreen = React.lazy(() => import('./taxonomy/taxonomy.screen').then(m => ({ default: m.TaxonomyScreen })));
+const IntakeWorkspaceView = React.lazy(() => import('./products/intake-workspace').then(m => ({ default: m.IntakeWorkspaceView })));
+const MappingWorkspaceView = React.lazy(() => import('./products/mapping-workspace').then(m => ({ default: m.MappingWorkspaceView })));
+const ProductInspectorPanel = React.lazy(() => import('./products/product-inspector-panel').then(m => ({ default: m.ProductInspectorPanel })));
+const ProductEditModal = React.lazy(() => import('./products/product-edit-modal').then(m => ({ default: m.ProductEditModal })));
+const CategoryControlRoom = React.lazy(() => import('./products/category-control-room').then(m => ({ default: m.CategoryControlRoom })));
+const CatalogProductsTable = React.lazy(() => import('./products/catalog-products-table').then(m => ({ default: m.CatalogProductsTable })));
+const PublishingGateChecklist = React.lazy(() => import('./products/publishing-gate-checklist').then(m => ({ default: m.PublishingGateChecklist })));
+const ItemApprovalScreen = React.lazy(() => import('./catalogs.approvals').then(m => ({ default: m.ItemApprovalScreen })));
+const ListingGovernanceScreen = React.lazy(() => import('./catalogs.listing-governance').then(m => ({ default: m.ListingGovernanceScreen })));
+
+function WorkspaceSkeleton() {
+  return (
+    <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={4} style={{ width: '100%', height: '100%' }}>
+      <Text role="titleSm" tone="muted">جارٍ التحميل...</Text>
+    </Box>
+  );
+}
 
 export type ControlPanelDshCatalogScreenProps = {
   hubHref?: string;
@@ -123,7 +132,7 @@ export function ControlPanelDshCatalogScreen({
   } satisfies React.ComponentProps<typeof CategoryControlRoom>;
 
   return (
-    <div className={styles.surfaceCockpit}>
+    <div className={styles.surfaceCockpit} dir="rtl">
       {/* Header */}
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
@@ -293,172 +302,178 @@ export function ControlPanelDshCatalogScreen({
       {/* Main Content */}
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', height: '100%' }}>
-            {activeTab !== 'taxonomy' ? (
-              <>
-                {activeTab === 'mapping' && activeSubTab === 'categories' && categoryControlOpen && (
-                  <div style={{ width: 340, borderLeft: `1px solid ${theme.lineStrong}`, display: 'flex', flexDirection: 'column', backgroundColor: theme.surface, flexShrink: 0, height: '100%' }}>
-                    <CategoryControlRoom {...categoryRoomProps} />
-                  </div>
-                )}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: theme.surface, minWidth: 0 }}>
-                  <div style={{ flex: 1, minHeight: 0, backgroundColor: theme.surface }}>
-                    {isManualOrderCategory ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
-                        <Text role="titleMd" style={{ color: theme.brandHeaderBackground }}>فئة الطلب اليدوي</Text>
-                        <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 400, marginTop: 8 }}>
-                          المنتجات في هذه الفئة (مثل شي إن، عونك) تُعامل كطلبات مرنة ولا تحتوي على منتجات كتالوج قياسية محددة مسبقاً.
-                        </Text>
-                      </div>
-                    ) : (
-                      <div style={{ overflow: 'auto', height: '100%' }}>
-                        {activeTab === 'intake' ? (
-                          <IntakeWorkspaceView
-                            activeSubTab={activeSubTab}
-                            filteredProducts={filteredProducts}
-                            selectedProductId={selectedProductId}
-                            setSelectedProductId={setSelectedProductId}
-                            openWorkspace={openWorkspace}
-                          />
-                        ) : activeTab === 'mapping' ? (
-                          <MappingWorkspaceView
-                            activeSubTab={activeSubTab}
-                            filteredProducts={filteredProducts}
-                            selectedProductId={selectedProductId}
-                            setSelectedProductId={setSelectedProductId}
-                            openWorkspace={openWorkspace}
-                            previewCategories={previewCategories}
-                          />
-                        ) : activeTab === 'approvals' ? (
-                          <ItemApprovalScreen
-                            activeSubTab={activeSubTab}
-                            onApprove={(id) => {
-                              const p = products.find(prod => prod.id === id);
-                              if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-adopted' }, 'تم تسجيل مقترح اعتماد العنصر', 'اعتماد العنصر ونقله إلى معتمد مركزي كمعاينة فقط.');
-                            }}
-                            onReject={(id, note) => {
-                              const p = products.find(prod => prod.id === id);
-                              if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-draft' }, 'تم تسجيل مقترح رفض العنصر', note);
-                            }}
-                            onRequestRevision={(id, note) => {
-                              const p = products.find(prod => prod.id === id);
-                              if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-draft' }, 'تم تسجيل مقترح طلب تعديل العنصر', note);
-                            }}
-                          />
-                        ) : activeTab === 'publishing' ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px' }}>
-                            <ListingGovernanceScreen
-                              onApproveForPublish={(id) => {
-                                const readyProducts = products.filter((p) => p.approvalStage === 'catalog-adopted');
-                                setProductPreviewPatches((prev) =>
-                                  readyProducts.reduce(
-                                    (next, product) => mergeCatalogProductPreviewPatch(next, product.id, { approvalStage: 'client-visible' }),
-                                    prev
-                                  )
-                                );
-                                pushPreviewProposal(createCatalogPreviewProposal({
-                                  type: 'visibility-change',
-                                  productIds: readyProducts.map((p) => p.id),
-                                  label: 'نشر الكتالوج بالكامل للعميل',
-                                  note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
-                                  apiBoundary: 'POST /catalog/products/publish',
-                                }));
-                                setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');
-                              }}
-                              onRequestRevision={(id) => {
-                                setActionMessage('تم طلب مراجعة النشر');
-                              }}
-                              onReject={(id) => {
-                                setActionMessage('تم رفض طلب النشر');
-                              }}
-                            />
-                            <PublishingGateChecklist
-                              isCategoryMapped={isCategoryMapped}
-                              isDuplicatesClean={isDuplicatesClean}
-                              isMediaSatisfied={isMediaSatisfied}
-                              approvedCount={approvedCount}
-                              totalCount={totalCount}
-                              products={products}
-                              setProductPreviewPatches={setProductPreviewPatches}
-                              pushPreviewProposal={pushPreviewProposal}
-                              setActionMessage={setActionMessage}
+          <React.Suspense fallback={<WorkspaceSkeleton />}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'row', overflow: 'hidden', height: '100%' }}>
+              {activeTab !== 'taxonomy' ? (
+                <>
+                  {activeTab === 'mapping' && activeSubTab === 'categories' && categoryControlOpen && (
+                    <div style={{ width: 340, borderLeft: `1px solid ${theme.lineStrong}`, display: 'flex', flexDirection: 'column', backgroundColor: theme.surface, flexShrink: 0, height: '100%' }}>
+                      <CategoryControlRoom {...categoryRoomProps} />
+                    </div>
+                  )}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: theme.surface, minWidth: 0 }}>
+                    <div style={{ flex: 1, minHeight: 0, backgroundColor: theme.surface }}>
+                      {isManualOrderCategory ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '48px', opacity: 0.7 }}>
+                          <Text role="titleMd" style={{ color: theme.brandHeaderBackground }}>فئة الطلب اليدوي</Text>
+                          <Text role="bodySm" tone="muted" style={{ textAlign: 'center', maxWidth: 400, marginTop: 8 }}>
+                            المنتجات في هذه الفئة (مثل شي إن، عونك) تُعامل كطلبات مرنة ولا تحتوي على منتجات كتالوج قياسية محددة مسبقاً.
+                          </Text>
+                        </div>
+                      ) : (
+                        <div style={{ overflow: 'auto', height: '100%' }}>
+                          {activeTab === 'intake' ? (
+                            <IntakeWorkspaceView
+                              activeSubTab={activeSubTab}
+                              filteredProducts={filteredProducts}
+                              selectedProductId={selectedProductId}
+                              setSelectedProductId={setSelectedProductId}
                               openWorkspace={openWorkspace}
                             />
-                          </div>
-                        ) : (
-                          <CatalogProductsTable
-                            showBulkOps={showBulkOps}
-                            selectedProductIds={selectedProductIds}
-                            setSelectedProductIds={setSelectedProductIds}
-                            visibleProducts={visibleProducts}
-                            previewCategories={previewCategories}
-                            selectedProductId={selectedProductId}
-                            setSelectedProductId={setSelectedProductId}
-                            colFilters={colFilters}
-                            setColFilters={setColFilters}
-                            openFilterCol={openFilterCol}
-                            setOpenFilterCol={setOpenFilterCol}
-                            filterOptions={filterOptions}
-                          />
-                        )}
+                          ) : activeTab === 'mapping' ? (
+                            <MappingWorkspaceView
+                              activeSubTab={activeSubTab}
+                              filteredProducts={filteredProducts}
+                              selectedProductId={selectedProductId}
+                              setSelectedProductId={setSelectedProductId}
+                              openWorkspace={openWorkspace}
+                              previewCategories={previewCategories}
+                            />
+                          ) : activeTab === 'approvals' ? (
+                            <ItemApprovalScreen
+                              activeSubTab={activeSubTab}
+                              onApprove={(id) => {
+                                const p = products.find(prod => prod.id === id);
+                                if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-adopted' }, 'تم تسجيل مقترح اعتماد العنصر', 'اعتماد العنصر ونقله إلى معتمد مركزي كمعاينة فقط.');
+                              }}
+                              onReject={(id, note) => {
+                                const p = products.find(prod => prod.id === id);
+                                if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-draft' }, 'تم تسجيل مقترح رفض العنصر', note);
+                              }}
+                              onRequestRevision={(id, note) => {
+                                const p = products.find(prod => prod.id === id);
+                                if (p) queueProductPreviewPatch(p, { approvalStage: 'catalog-draft' }, 'تم تسجيل مقترح طلب تعديل العنصر', note);
+                              }}
+                            />
+                          ) : activeTab === 'publishing' ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px' }}>
+                              <ListingGovernanceScreen
+                                onApproveForPublish={(id) => {
+                                  const readyProducts = products.filter((p) => p.approvalStage === 'catalog-adopted');
+                                  setProductPreviewPatches((prev) =>
+                                    readyProducts.reduce(
+                                      (next, product) => mergeCatalogProductPreviewPatch(next, product.id, { approvalStage: 'client-visible' }),
+                                      prev
+                                    )
+                                  );
+                                  pushPreviewProposal(createCatalogPreviewProposal({
+                                    type: 'visibility-change',
+                                    productIds: readyProducts.map((p) => p.id),
+                                    label: 'نشر الكتالوج بالكامل للعميل',
+                                    note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                                    apiBoundary: 'POST /catalog/products/publish',
+                                  }));
+                                  setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');
+                                }}
+                                onRequestRevision={(id) => {
+                                  setActionMessage('تم طلب مراجعة النشر');
+                                }}
+                                onReject={(id) => {
+                                  setActionMessage('تم رفض طلب النشر');
+                                }}
+                              />
+                              <PublishingGateChecklist
+                                isCategoryMapped={isCategoryMapped}
+                                isDuplicatesClean={isDuplicatesClean}
+                                isMediaSatisfied={isMediaSatisfied}
+                                approvedCount={approvedCount}
+                                totalCount={totalCount}
+                                products={products}
+                                setProductPreviewPatches={setProductPreviewPatches}
+                                pushPreviewProposal={pushPreviewProposal}
+                                setActionMessage={setActionMessage}
+                                openWorkspace={openWorkspace}
+                              />
+                            </div>
+                          ) : (
+                            <CatalogProductsTable
+                              showBulkOps={showBulkOps}
+                              selectedProductIds={selectedProductIds}
+                              setSelectedProductIds={setSelectedProductIds}
+                              visibleProducts={visibleProducts}
+                              previewCategories={previewCategories}
+                              selectedProductId={selectedProductId}
+                              setSelectedProductId={setSelectedProductId}
+                              colFilters={colFilters}
+                              setColFilters={setColFilters}
+                              openFilterCol={openFilterCol}
+                              setOpenFilterCol={setOpenFilterCol}
+                              filterOptions={filterOptions}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {!isManualOrderCategory && activeTab !== 'intake' && activeTab !== 'mapping' && activeTab !== 'approvals' && activeTab !== 'publishing' ? (
+                      <div style={{ padding: '10px 16px 12px', borderTop: `1px solid ${theme.line}`, backgroundColor: theme.surface }}>
+                        <WebControlPanelCompactPager
+                          page={catalogPage}
+                          totalPages={catalogTotalPages}
+                          onPrevious={() => setCatalogPage(p => Math.max(1, p - 1))}
+                          onNext={() => setCatalogPage(p => Math.min(catalogTotalPages, p + 1))}
+                        />
                       </div>
-                    )}
+                    ) : null}
                   </div>
 
-                  {!isManualOrderCategory && activeTab !== 'intake' && activeTab !== 'mapping' && activeTab !== 'approvals' && activeTab !== 'publishing' ? (
-                    <div style={{ padding: '10px 16px 12px', borderTop: `1px solid ${theme.line}`, backgroundColor: theme.surface }}>
-                      <WebControlPanelCompactPager
-                        page={catalogPage}
-                        totalPages={catalogTotalPages}
-                        onPrevious={() => setCatalogPage(p => Math.max(1, p - 1))}
-                        onNext={() => setCatalogPage(p => Math.min(catalogTotalPages, p + 1))}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {selectedProductId && selectedProduct && (
-                  <ProductInspectorPanel
-                    selectedProduct={selectedProduct}
-                    setSelectedProductId={setSelectedProductId}
-                    openWorkspace={openWorkspace}
-                    queueProductPreviewPatch={queueProductPreviewPatch}
-                    previewCategories={previewCategories}
-                    setModalForm={setModalForm}
-                    setShowProductModal={setShowProductModal}
-                  />
-                )}
-              </>
-            ) : (
-              <TaxonomyScreen taxonomy={taxonomyHook} products={products} />
-            )}
-          </div>
+                  {selectedProductId && selectedProduct && (
+                    <ProductInspectorPanel
+                      selectedProduct={selectedProduct}
+                      setSelectedProductId={setSelectedProductId}
+                      openWorkspace={openWorkspace}
+                      queueProductPreviewPatch={queueProductPreviewPatch}
+                      previewCategories={previewCategories}
+                      setModalForm={setModalForm}
+                      setShowProductModal={setShowProductModal}
+                    />
+                  )}
+                </>
+              ) : (
+                <TaxonomyScreen taxonomy={taxonomyHook} products={products} />
+              )}
+            </div>
+          </React.Suspense>
         </div>
       </main>
 
-      {showProductModal && (
-        <ProductEditModal
-          setShowProductModal={setShowProductModal}
-          modalForm={modalForm}
-          setModalForm={setModalForm}
-          previewCategories={previewCategories}
-          products={products}
-          pushPreviewProposal={pushPreviewProposal}
-          queueProductPreviewPatch={queueProductPreviewPatch}
-          setActionMessage={setActionMessage}
-        />
-      )}
+      <React.Suspense fallback={null}>
+        {showProductModal && (
+          <ProductEditModal
+            setShowProductModal={setShowProductModal}
+            modalForm={modalForm}
+            setModalForm={setModalForm}
+            previewCategories={previewCategories}
+            products={products}
+            pushPreviewProposal={pushPreviewProposal}
+            queueProductPreviewPatch={queueProductPreviewPatch}
+            setActionMessage={setActionMessage}
+          />
+        )}
+      </React.Suspense>
 
-      <CatalogWorkspaceRouter
-        workspaceState={workspaceState}
-        products={products}
-        selectedProductIds={selectedProductIds}
-        onClose={() => setWorkspaceState(null)}
-        onProposal={(proposal) => {
-          pushPreviewProposal(proposal);
-          setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
-        }}
-      />
+      <React.Suspense fallback={null}>
+        <CatalogWorkspaceRouter
+          workspaceState={workspaceState}
+          products={products}
+          selectedProductIds={selectedProductIds}
+          onClose={() => setWorkspaceState(null)}
+          onProposal={(proposal) => {
+            pushPreviewProposal(proposal);
+            setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
+          }}
+        />
+      </React.Suspense>
 
       <CatalogProposalsBanner
         pendingProposals={pendingProposals}

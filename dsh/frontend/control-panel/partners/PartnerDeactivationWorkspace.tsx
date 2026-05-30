@@ -1,10 +1,5 @@
 'use client';
 
-// P0-04/P0-09: Partner deactivation workspace — CP-owned authority surface.
-// control-panel/partners is the ONLY surface authorised to deactivate a partner.
-// Evidence note is mandatory alongside reason — both required before confirm is enabled.
-// Audit trail is displayed when auditRequired = true for the current activation status.
-// P0-09: Role policy context displayed from DSH role/permission model (UI preview only).
 import React from 'react';
 import { Box, Surface, Text, TextField } from '@bthwani/ui-kit';
 import {
@@ -14,7 +9,6 @@ import {
 import { getDshRolePermission } from '../../shared/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
 
-// Policy for partner deactivation section (loaded once at module level — no churn)
 const DEACTIVATION_POLICY = getDshRolePermission('partner-deactivation');
 
 type DeactivationReason =
@@ -35,7 +29,6 @@ const deactivationReasons: ReadonlyArray<{ id: DeactivationReason; label: string
 export type PartnerDeactivationWorkspaceProps = {
   partnerId?: string;
   partnerName?: string;
-  /** Whether an audit trail entry is required for this deactivation (from activation state metadata) */
   auditRequired?: boolean;
   onConfirmDeactivate?: (partnerId: string, reason: DeactivationReason, evidenceNote: string) => void;
   onClose?: () => void;
@@ -50,9 +43,19 @@ export function PartnerDeactivationWorkspace({
 }: PartnerDeactivationWorkspaceProps) {
   const [selectedReason, setSelectedReason] = React.useState<DeactivationReason | null>(null);
   const [evidenceNote, setEvidenceNote] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  // Both reason and evidence note are required before the confirm action is enabled.
   const canConfirm = selectedReason !== null && evidenceNote.trim().length > 0;
+
+  const handleConfirm = () => {
+    if (!canConfirm) return;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      onConfirmDeactivate?.(partnerId, selectedReason!, evidenceNote.trim());
+      setIsSubmitting(false);
+      onClose?.();
+    }, 600);
+  };
 
   return (
     <WebControlPanelInspectorShell
@@ -60,10 +63,9 @@ export function PartnerDeactivationWorkspace({
       onClose={onClose}
     >
       <Box gap={4} padding={4}>
-        {/* Role policy context — P0-09: UI preview only, no runtime auth */}
         {DEACTIVATION_POLICY ? (
           <Surface tone="inset" padding={3} gap={2} radiusToken="md">
-            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+            <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
               <Surface tone="warning" padding={1} radiusToken="pill" border={false}>
                 <Text role="caption" tone="muted">تدقيق إلزامي</Text>
               </Surface>
@@ -82,19 +84,27 @@ export function PartnerDeactivationWorkspace({
 
         <Text role="bodyMd" tone="muted">اختر سبب الإيقاف:</Text>
         <Box gap={2}>
-          {deactivationReasons.map((reason) => (
-            <button
-              key={reason.id}
-              type="button"
-              onClick={() => setSelectedReason(reason.id)}
-              className={`${styles.selectableReasonItem} ${selectedReason === reason.id ? styles.selectableReasonItemActive : ''}`}
-            >
-              <Text role="bodySm" tone={selectedReason === reason.id ? 'brand' : 'default'}>{reason.label}</Text>
-            </button>
-          ))}
+          {deactivationReasons.map((reason) => {
+            const isSelected = selectedReason === reason.id;
+            return (
+              <Surface
+                key={reason.id}
+                as="button"
+                onClick={() => setSelectedReason(reason.id)}
+                padding={3}
+                radiusToken="sm"
+                border
+                borderTone={isSelected ? 'brand' : 'line'}
+                background={isSelected ? 'brandSurface' : 'surface'}
+                layoutDirection="row"
+                align="center"
+              >
+                <Text role="bodySm" tone={isSelected ? 'brand' : 'base'}>{reason.label}</Text>
+              </Surface>
+            );
+          })}
         </Box>
 
-        {/* Evidence note — mandatory for all deactivations; feeds audit trail */}
         <Box gap={1}>
           <TextField
             label="ملاحظة الإثبات (إلزامية)"
@@ -102,13 +112,13 @@ export function PartnerDeactivationWorkspace({
             onChangeText={setEvidenceNote}
             placeholder="وصف مختصر للسبب الفعلي، الحادثة، أو الدليل المرجعي..."
             multiline
+            disabled={isSubmitting}
           />
           <Text role="caption" tone="muted">
             تُحفظ هذه الملاحظة في سجل الأحداث وتُعدّ جزءًا من قرار الإيقاف الرسمي.
           </Text>
         </Box>
 
-        {/* Audit notice — shown when the partner's current activation state flags auditRequired */}
         {auditRequired ? (
           <Box gap={1}>
             <Text role="bodySm" tone="warning">⚠ هذا الإيقاف يستلزم مراجعة من فريق التدقيق بعد التنفيذ.</Text>
@@ -121,12 +131,11 @@ export function PartnerDeactivationWorkspace({
         <WebControlPanelActionCluster
           primary={{
             id: 'deactivate',
-            label: 'تأكيد الإيقاف',
-            onAction: canConfirm
-              ? () => onConfirmDeactivate?.(partnerId, selectedReason!, evidenceNote.trim())
-              : undefined,
+            label: isSubmitting ? 'جارٍ الإيقاف...' : 'تأكيد الإيقاف',
+            disabled: !canConfirm || isSubmitting,
+            onAction: handleConfirm,
           }}
-          secondary={{ id: 'cancel', label: 'إلغاء', onAction: onClose }}
+          secondary={{ id: 'cancel', label: 'إلغاء', disabled: isSubmitting, onAction: onClose }}
         />
       </Box>
     </WebControlPanelInspectorShell>

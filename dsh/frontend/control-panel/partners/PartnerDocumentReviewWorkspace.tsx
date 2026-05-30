@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelInspectorShell,
@@ -18,14 +18,16 @@ import {
   getPartnerDocuments,
   updatePartnerDocumentStatus,
 } from './workflow';
+import styles from '../shared/control-panel-surface.module.css';
 
 export function ControlPanelDshPartnerDocumentReviewScreen() {
-  const { theme } = useTheme();
   const [partnerStatuses, setPartnerStatuses] = React.useState<Record<string, DshPartnerActivationStatus>>({});
   const [documents, setDocuments] = React.useState<DshPartnerDocumentVerification[]>([]);
   const [selectedPartnerId, setSelectedPartnerId] = React.useState('partner-saha');
   const [selectedDocId, setSelectedDocId] = React.useState<string | null>(null);
   const [actionMessage, setActionMessage] = React.useState('حدد وثيقة شريك للبدء في مراجعتها واعتمادها.');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [rejectReason, setRejectReason] = React.useState('');
 
   React.useEffect(() => {
     setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
@@ -38,89 +40,87 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
   const handlePartnerSelect = (id: string) => {
     setSelectedPartnerId(id);
     setSelectedDocId(null);
+    setRejectReason('');
     setActionMessage(
       `تحديد الشريك: ${PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === id)?.storeName}`,
     );
   };
 
   const handleApproveDoc = (docId: string) => {
-    updatePartnerDocumentStatus(selectedPartnerId, docId, 'verified');
-    const updatedDocs = getPartnerDocuments(selectedPartnerId);
-    setDocuments(updatedDocs);
-    setActionMessage('تم اعتماد الوثيقة وربطها بدليل الميداني.');
+    setIsSubmitting(true);
+    setTimeout(() => {
+      updatePartnerDocumentStatus(selectedPartnerId, docId, 'verified');
+      const updatedDocs = getPartnerDocuments(selectedPartnerId);
+      setDocuments(updatedDocs);
+      setActionMessage('تم اعتماد الوثيقة وربطها بدليل الميداني.');
 
-    const allVerified = updatedDocs.every(d => d.status === 'verified');
-    if (allVerified && currentStatus === 'submitted') {
-      updatePartnerActivationStatus(selectedPartnerId, 'documents_verified');
-      setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
-    }
+      const allVerified = updatedDocs.every(d => d.status === 'verified');
+      if (allVerified && currentStatus === 'submitted') {
+        updatePartnerActivationStatus(selectedPartnerId, 'documents_verified');
+        setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+      }
+      setIsSubmitting(false);
+    }, 600);
   };
 
   const handleRejectDoc = (docId: string, reason: string) => {
-    updatePartnerDocumentStatus(selectedPartnerId, docId, 'rejected', reason);
-    const updatedDocs = getPartnerDocuments(selectedPartnerId);
-    setDocuments(updatedDocs);
-    setActionMessage(`تم رفض الوثيقة. السبب: ${reason}`);
+    setIsSubmitting(true);
+    setTimeout(() => {
+      updatePartnerDocumentStatus(selectedPartnerId, docId, 'rejected', reason);
+      const updatedDocs = getPartnerDocuments(selectedPartnerId);
+      setDocuments(updatedDocs);
+      setActionMessage(`تم رفض الوثيقة. السبب: ${reason}`);
 
-    updatePartnerActivationStatus(selectedPartnerId, 'documents_missing');
-    setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+      updatePartnerActivationStatus(selectedPartnerId, 'documents_missing');
+      setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+      setIsSubmitting(false);
+      setRejectReason('');
+    }, 600);
   };
 
   return (
-    <Box gap={4} style={{ direction: 'rtl' }}>
+    <Box gap={4} dir="rtl">
       {/* Partner selectors */}
       <Box gap={2}>
-        <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>اختر الشريك لمراجعة مستنداته</Text>
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <Text role="caption" tone="brand">اختر الشريك لمراجعة مستنداته</Text>
+        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const docs = getPartnerDocuments(partner.partnerId);
             const pendingCount = docs.filter(d => d.status === 'uploaded').length;
             const isSelected = selectedPartnerId === partner.partnerId;
 
             return (
-              <button
+              <Surface
                 key={partner.partnerId}
-                type="button"
+                as="button"
                 onClick={() => handlePartnerSelect(partner.partnerId)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '12px',
-                  border: `1px solid ${isSelected ? theme.brand : theme.line}`,
-                  background: isSelected ? theme.brandSurface : theme.surface,
-                  color: isSelected ? theme.brand : theme.text,
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                padding={2}
+                radiusToken="sm"
+                border
+                borderTone={isSelected ? 'brand' : 'line'}
+                background={isSelected ? 'brandSurface' : 'surface'}
+                layoutDirection="row"
+                align="center"
+                gap={2}
               >
-                <span>{partner.storeName}</span>
+                <Text role="bodySm" tone={isSelected ? 'brand' : 'base'}>{partner.storeName}</Text>
                 {pendingCount > 0 && (
-                  <span
-                    style={{
-                      background: theme.warning,
-                      color: theme.surface,
-                      borderRadius: '99px',
-                      padding: '2px 6px',
-                      fontSize: '10px',
-                      fontWeight: 900,
-                    }}
-                  >
-                    {pendingCount}
-                  </span>
+                  <Surface padding={1} radiusToken="pill" background="warning" border={false}>
+                    <Text role="caption" tone="inverse">
+                      {pendingCount}
+                    </Text>
+                  </Surface>
                 )}
-              </button>
+              </Surface>
             );
           })}
         </Box>
       </Box>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start' }}>
+      <div className={styles.surfaceSplitGrid}>
         {/* Document list board */}
-        <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
-          <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+        <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
+          <Text role="titleLg" tone="brand">
             وثائق الشريك والمطابقة
           </Text>
 
@@ -174,6 +174,7 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
                     label: isSelected ? 'قيد المراجعة' : 'تفاصيل ومراجعة',
                     onAction: () => {
                       setSelectedDocId(doc.id);
+                      setRejectReason('');
                       setActionMessage(`تفاصيل وثيقة: ${doc.label}`);
                     },
                   }}
@@ -210,8 +211,8 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
                 />
 
                 {selectedDoc.verifiedByFieldAgent && (
-                  <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: '10px' }}>
-                    <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>
+                  <Surface tone="inset" padding={3} gap={2} radiusToken="sm">
+                    <Text role="caption" tone="brand">
                       ✓ دليل التحقق الميداني (Field Onboarding Evidence)
                     </Text>
                     <KeyValueList
@@ -227,38 +228,43 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
                 )}
 
                 {selectedDoc.status === 'rejected' && selectedDoc.rejectionReason && (
-                  <Box
-                    style={{
-                      backgroundColor: theme.dangerSurface,
-                      borderWidth: 1,
-                      borderColor: theme.danger,
-                      padding: 10,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <Text role="bodySm" style={{ color: theme.danger, fontWeight: '700' }}>
+                  <Surface tone="dangerSurface" padding={3} radiusToken="sm" border borderTone="danger">
+                    <Text role="bodySm" tone="danger">
                       ⚠ سبب الرفض:
                     </Text>
-                    <Text role="caption" style={{ color: theme.danger }}>
+                    <Text role="caption" tone="danger">
                       {selectedDoc.rejectionReason}
                     </Text>
-                  </Box>
+                  </Surface>
                 )}
 
                 {selectedDoc.status === 'uploaded' && (
-                  <WebControlPanelActionCluster
-                    primary={{
-                      id: 'btn-doc-approve',
-                      label: 'اعتماد المستند',
-                      onAction: () => handleApproveDoc(selectedDoc.id),
-                    }}
-                    secondary={{
-                      id: 'btn-doc-reject',
-                      label: 'رفض المستند',
-                      onAction: () =>
-                        handleRejectDoc(selectedDoc.id, 'المستند غير واضح أو منتهي الصلاحية.'),
-                    }}
-                  />
+                  <Box gap={3}>
+                    <Text role="caption" tone="muted">ملاحظة الرفض (إلزامية في حالة الرفض فقط)</Text>
+                    <input
+                      type="text"
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      placeholder="اكتب سبب الرفض هنا..."
+                      style={{ padding: '8px', borderRadius: '4px', border: '1px solid var(--bth-color-line)', width: '100%' }}
+                      disabled={isSubmitting}
+                    />
+                    <WebControlPanelActionCluster
+                      primary={{
+                        id: 'btn-doc-approve',
+                        label: isSubmitting ? 'جارٍ المعالجة...' : 'اعتماد المستند',
+                        disabled: isSubmitting,
+                        onAction: () => handleApproveDoc(selectedDoc.id),
+                      }}
+                      secondary={{
+                        id: 'btn-doc-reject',
+                        label: 'رفض المستند',
+                        disabled: isSubmitting || rejectReason.trim() === '',
+                        onAction: () =>
+                          handleRejectDoc(selectedDoc.id, rejectReason),
+                      }}
+                    />
+                  </Box>
                 )}
               </Box>
             </WebControlPanelInspectorShell>
@@ -271,15 +277,15 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
             />
           )}
 
-          <Surface tone="raised" padding={4} gap={2} style={{ borderRadius: '12px' }}>
-            <Text role="titleSm" style={{ fontWeight: '800' }}>أهلية الترويج والتسويق</Text>
-            <Box style={{ backgroundColor: theme.surfaceInset, padding: 10, borderRadius: 8 }}>
+          <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
+            <Text role="titleSm" tone="base">أهلية الترويج والتسويق</Text>
+            <Surface background="surfaceInset" padding={3} radiusToken="sm">
               <Text role="bodySm" tone={currentStatus === 'client_visible' ? 'success' : 'danger'}>
                 {currentStatus === 'client_visible'
                   ? 'الشريك مفعّل ومستنداته مكتملة ويحق له إنشاء عروض ترويجية.'
                   : 'معطّل: يجب مراجعة واعتماد كافة وثائق الشريك قبل فتح مسار أهلية الترويج.'}
               </Text>
-            </Box>
+            </Surface>
           </Surface>
         </Box>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Surface, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 
 // UI_PREVIEW_ONLY: load values are static structural reference — not live runtime metrics
@@ -24,59 +24,42 @@ export function PartnerTopologyLane({
   marketingHref = '/marketing',
 }: PartnerTopologyLaneProps) {
   const router = useRouter();
-  const { theme } = useTheme();
-
-  const toneStyles = {
-    success: { color: theme.success, bg: theme.successSurface },
-    danger: { color: theme.danger, bg: theme.dangerSurface },
-    neutral: { color: theme.textMuted, bg: theme.surfaceInset },
-  } as const;
 
   return (
-    <Box gap={4} style={{ direction: 'rtl' }}>
+    <Box gap={4} dir="rtl">
       <div className={styles.topologyHeader}>
         <Box gap={1}>
-          <Text role="caption" style={{ color: theme.brand, fontWeight: '800' }}>خارطة نظام الشركاء</Text>
-          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900' }}>خارطة مسارات الشركاء</Text>
+          <Text role="caption" tone="brand">خارطة نظام الشركاء</Text>
+          <Text role="titleLg">خارطة مسارات الشركاء</Text>
         </Box>
         <Text role="caption" tone="muted">تكامل السطح التشغيلي الموحد · UI_PREVIEW_ONLY</Text>
       </div>
 
       <div className={styles.topologyCardGrid}>
         {TOPOLOGY_LANES.map((lane) => {
-          const laneTone = toneStyles[lane.tone];
           return (
-            <Surface key={lane.id} tone="raised" gap={3} style={{ borderRadius: 20, padding: 20 }}>
+            <Surface key={lane.id} tone="raised" gap={3} radiusToken="lg" padding={4}>
               <div className={styles.topologyHeader}>
                 <Box gap={0}>
-                  <Text role="titleSm" style={{ color: theme.brandHeaderBackground, fontWeight: '800' }}>{lane.title}</Text>
+                  <Text role="titleSm" tone="brand">{lane.title}</Text>
                   <Text role="caption" tone="muted">{lane.sub}</Text>
                 </Box>
-                <div style={{
-                  padding: '4px 10px',
-                  borderRadius: '20px',
-                  backgroundColor: laneTone.bg,
-                  color: laneTone.color,
-                }}>
-                  <Text role="caption" style={{ fontWeight: '900', fontSize: 10 }}>{lane.load}</Text>
-                </div>
+                <Box paddingX={2} paddingY={1} background={lane.tone === 'success' ? 'successSurface' : lane.tone === 'danger' ? 'dangerSurface' : 'surfaceInset'} radiusToken="round">
+                  <Text role="caption" tone={lane.tone === 'success' ? 'success' : lane.tone === 'danger' ? 'danger' : 'muted'}>{lane.load}</Text>
+                </Box>
               </div>
 
-              <div
-                className={styles.topologyFlowBox}
-                style={{ backgroundColor: theme.surfaceInset, border: `1px solid ${theme.line}` }}
-              >
-                <Text role="caption" style={{ color: theme.textMuted, fontFamily: 'monospace', direction: 'ltr' }}>
+              <Box padding={2} background="surfaceInset" radiusToken="sm" border borderTone="line" className={styles.topologyFlowBox}>
+                <Text role="caption" tone="muted" dir="ltr">
                   {lane.flow}
                 </Text>
-              </div>
+              </Box>
 
               <div className={styles.topologyCardActions}>
                 <button
                   type="button"
                   onClick={() => router.push(partnersHref)}
                   className={styles.topologyActionBtn}
-                  style={{ backgroundColor: theme.surface, border: `1px solid ${theme.line}`, color: theme.brandHeaderBackground }}
                 >
                   فتح طابور الشركاء
                 </button>
@@ -84,7 +67,6 @@ export function PartnerTopologyLane({
                   type="button"
                   onClick={() => router.push(marketingHref)}
                   className={styles.topologyActionBtn}
-                  style={{ backgroundColor: theme.surface, border: `1px solid ${theme.line}`, color: theme.brandHeaderBackground }}
                 >
                   فتح مسار التسويق
                 </button>

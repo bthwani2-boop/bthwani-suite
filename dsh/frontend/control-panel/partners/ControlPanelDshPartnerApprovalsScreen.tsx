@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface } from '@bthwani/ui-kit';
+import { Box, Text, Surface } from '@bthwani/ui-kit';
 import {
   WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
+  WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { getPartnerIntakeItems } from '../../shared/workflow';
 import {
@@ -21,16 +22,24 @@ import {
 } from '../../shared/dsh-client-visibility.model';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
-import { PartnerDeactivationWorkspace } from './PartnerDeactivationWorkspace';
-import { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
-import { PartnerTopologyLane } from './PartnerTopologyLane';
-import { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
-import { ControlPanelDshPartnerActivationScreen } from './PartnerActivationWorkspace';
-import { ControlPanelDshPartnerDocumentReviewScreen } from './PartnerDocumentReviewWorkspace';
-import { PartnerCatalogOverridesWorkspace } from './PartnerCatalogOverridesWorkspace';
-import { PartnerPerformanceWorkspace } from './PartnerPerformanceWorkspace';
-import { PartnerModificationsWorkspace } from './PartnerModificationsWorkspace';
-import { PartnerComplaintsWorkspace } from './PartnerComplaintsWorkspace';
+const PartnerDeactivationWorkspace = React.lazy(() => import('./PartnerDeactivationWorkspace'));
+const PartnerFulfillmentLane = React.lazy(() => import('./PartnerFulfillmentLane'));
+const PartnerTopologyLane = React.lazy(() => import('./PartnerTopologyLane'));
+const DshPartnerPromotionEligibilityScreen = React.lazy(() => import('./DshPartnerPromotionEligibilityScreen'));
+const ControlPanelDshPartnerActivationScreen = React.lazy(() => import('./PartnerActivationWorkspace'));
+const ControlPanelDshPartnerDocumentReviewScreen = React.lazy(() => import('./PartnerDocumentReviewWorkspace'));
+const PartnerCatalogOverridesWorkspace = React.lazy(() => import('./PartnerCatalogOverridesWorkspace'));
+const PartnerPerformanceWorkspace = React.lazy(() => import('./PartnerPerformanceWorkspace'));
+const PartnerModificationsWorkspace = React.lazy(() => import('./PartnerModificationsWorkspace'));
+const PartnerComplaintsWorkspace = React.lazy(() => import('./PartnerComplaintsWorkspace'));
+
+function WorkspaceSkeleton() {
+  return (
+    <Surface padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={4}>
+      <Text role="titleSm" tone="muted">جارٍ التحميل...</Text>
+    </Surface>
+  );
+}
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   getPartnerActivationStatus,
@@ -56,7 +65,6 @@ const SUB_TAB_DEFINITIONS: Record<string, { id: string; label: string }[]> = {
   ],
 };
 
-// ML-001: approval action extended to include final ops activation step for marketing-approved records
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
   const activationStatus = mapApprovalStageToPartnerActivationStatus(item.stage);
   const visibility = resolveDshStoreClientVisibility({
@@ -73,6 +81,16 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
   const isAwaitingActivation = item.stage === 'marketing-approved';
   const isAwaitingReview = ['partner-submitted', 'field-submitted', 'partner-review'].includes(item.stage);
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleActionWithDelay = (actionType: 'approve' | 'reject' | 'fix' | 'activate') => {
+    setIsSubmitting(true);
+    setTimeout(() => {
+      onAction(item.id, actionType);
+      setIsSubmitting(false);
+    }, 600);
+  };
+
   return (
     <WebControlPanelDecisionRow
       entityId={item.id}
@@ -87,21 +105,25 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       sla={translateEntityType(item.entityType)}
       primaryAction={isAwaitingActivation ? {
         id: 'activate',
-        label: 'تفعيل الشريك',
-        onAction: () => onAction(item.id, 'activate')
+        label: isSubmitting ? 'جارٍ التفعيل...' : 'تفعيل الشريك',
+        disabled: isSubmitting,
+        onAction: () => handleActionWithDelay('activate')
       } : isAwaitingReview ? {
         id: 'approve',
-        label: 'قبول للمراجعة',
-        onAction: () => onAction(item.id, 'approve')
+        label: isSubmitting ? 'جارٍ المعالجة...' : 'قبول للمراجعة',
+        disabled: isSubmitting,
+        onAction: () => handleActionWithDelay('approve')
       } : undefined}
       secondaryAction={isAwaitingReview ? {
         id: 'fix',
         label: 'طلب تعديل',
-        onAction: () => onAction(item.id, 'fix')
+        disabled: isSubmitting,
+        onAction: () => handleActionWithDelay('fix')
       } : {
         id: 'reject',
         label: 'رفض',
-        onAction: () => onAction(item.id, 'reject')
+        disabled: isSubmitting,
+        onAction: () => handleActionWithDelay('reject')
       }}
     />
   );
@@ -110,7 +132,6 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
 
 
 function ControlPanelDshPartnerDeactivationTab() {
-  const { theme } = useTheme();
   const [partnerStatuses, setPartnerStatuses] = React.useState<Record<string, DshPartnerActivationStatus>>({});
   const [selectedPartnerId, setSelectedPartnerId] = React.useState('partner-saha');
   const [actionMessage, setActionMessage] = React.useState('اختر شريكاً لإلغاء تفعيله أو مراجعة سبب إيقافه.');
@@ -131,73 +152,68 @@ function ControlPanelDshPartnerDeactivationTab() {
   const isDeactivated = currentStatus === 'partner_deactivated';
 
   return (
-    <Box gap={4} style={{ direction: 'rtl' }}>
+    <Box gap={4} dir="rtl">
       {/* Partner selector chips */}
       <Box gap={2}>
-        <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>اختر الشريك لإجراءات إلغاء التفعيل</Text>
-        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
+        <Text role="caption" tone="brand">اختر الشريك لإجراءات إلغاء التفعيل</Text>
+        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const status = partnerStatuses[partner.partnerId] ?? getPartnerActivationStatus(partner.partnerId);
             const isActive = selectedPartnerId === partner.partnerId;
             return (
-              <button
+              <Surface
                 key={partner.partnerId}
-                type="button"
+                as="button"
                 onClick={() => {
                   setSelectedPartnerId(partner.partnerId);
                   setActionMessage(`تم تحديد الشريك: ${partner.storeName}`);
                 }}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '12px',
-                  border: `1px solid ${isActive ? theme.brand : theme.line}`,
-                  backgroundColor: isActive ? theme.brandSurface : theme.surface,
-                  color: isActive ? theme.brand : theme.text,
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                }}
+                padding={2}
+                radiusToken="sm"
+                border
+                borderTone={isActive ? 'brand' : 'line'}
+                background={isActive ? 'brandSurface' : 'surface'}
+                layoutDirection="row"
+                align="center"
               >
-                {partner.storeName} ({status === 'partner_deactivated' ? 'ملغى التفعيل' : 'نشط/جاهز'})
-              </button>
+                <Text role="bodySm" tone={isActive ? 'brand' : 'base'}>
+                  {partner.storeName} ({status === 'partner_deactivated' ? 'ملغى التفعيل' : 'نشط/جاهز'})
+                </Text>
+              </Surface>
             );
           })}
         </Box>
       </Box>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start' }}>
+      <div className={styles.surfaceSplitGrid}>
         <Box gap={4}>
           {isDeactivated ? (
-            <Surface tone="raised" padding={5} gap={3} style={{ borderRadius: '16px' }}>
-              <Text role="titleLg" style={{ fontWeight: '900', color: theme.danger }}>الشريك ملغى التفعيل</Text>
+            <Surface tone="raised" padding={5} gap={3} radiusToken="lg">
+              <Text role="titleLg" tone="danger">الشريك ملغى التفعيل</Text>
               <Text role="bodyMd" tone="muted">
                 تم إلغاء تفعيل متجر <strong>{currentPartner.storeName}</strong> بالكامل من لوحة التحكم ولا يمكنه استقبال طلبات العملاء.
               </Text>
-              <Box style={{ backgroundColor: theme.surfaceInset, padding: 12, borderRadius: 10, borderWidth: 1, borderColor: theme.line }}>
+              <Surface background="surfaceInset" padding={3} radiusToken="sm" border borderTone="line">
                 <Text role="caption" tone="brand">الملاحظة التشغيلية الحالية:</Text>
-                <Text role="bodySm" style={{ marginTop: 4 }}>
-                  الشريك في حالة تعطيل بسبب خلل في الامتثال أو بطلب مباشر. يجب إعادة مراجعة المستندات لإعادة التفعيل.
-                </Text>
+                <Box marginY={1}>
+                  <Text role="bodySm" tone="base">
+                    الشريك في حالة تعطيل بسبب خلل في الامتثال أو بطلب مباشر. يجب إعادة مراجعة المستندات لإعادة التفعيل.
+                  </Text>
+                </Box>
+              </Surface>
+              <Box marginY={2}>
+                <WebControlPanelActionCluster
+                  primary={{
+                    id: 'reset',
+                    label: 'إعادة تعيين إلى التقديم الأولي',
+                    onAction: () => {
+                      updatePartnerActivationStatus(selectedPartnerId, 'submitted');
+                      setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+                      setActionMessage('تم إعادة تعيين حالة الشريك إلى التقديم الأولي.');
+                    }
+                  }}
+                />
               </Box>
-              <button
-                type="button"
-                onClick={() => {
-                  updatePartnerActivationStatus(selectedPartnerId, 'submitted');
-                  setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
-                  setActionMessage('تم إعادة تعيين حالة الشريك إلى التقديم الأولي.');
-                }}
-                style={{
-                  padding: '10px',
-                  borderRadius: '8px',
-                  backgroundColor: theme.brand,
-                  color: theme.surface,
-                  border: 'none',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                إعادة تعيين إلى التقديم الأولي (Reset to Submitted)
-              </button>
             </Surface>
           ) : (
             <PartnerDeactivationWorkspace
@@ -247,7 +263,6 @@ export function ControlPanelDshPartnerHubScreen() {
     if (action === 'approve') {
       moveApprovalRecordToStage(id, 'marketing-review', 'control-panel-partners', 'قبول للمراجعة التسويقية');
     } else if (action === 'activate') {
-      // ML-001: final ops activation — transitions marketing-approved partner to catalog-adopted (store goes live)
       moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-partners', 'تفعيل الشريك');
     } else if (action === 'reject') {
       moveApprovalRecordToStage(id, 'rejected', 'control-panel-partners', 'رفض');
@@ -262,9 +277,9 @@ export function ControlPanelDshPartnerHubScreen() {
       return (
         <Box gap={3}>
           {items.length === 0 ? (
-            <Box padding={8} align="center" background="surfaceRaised" radiusToken="lg">
+            <Surface padding={8} align="center" background="surfaceRaised" radiusToken="lg">
               <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
-            </Box>
+            </Surface>
           ) : (
             items.map((item) => (
               <PartnerApprovalCard key={item.id} item={item} onAction={handleAction} />
@@ -283,12 +298,12 @@ export function ControlPanelDshPartnerHubScreen() {
     }
 
     return (
-      <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+      <Surface padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
         <Box align="center" gap={1}>
-          <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>لا توجد قائمة مستقلة لهذا المسار الآن</Text>
+          <Text role="titleSm" tone="brand">لا توجد قائمة مستقلة لهذا المسار الآن</Text>
           <Text tone="muted">يظهر هذا التبويب كحالة N/A واضحة إلى أن ينتج له queue مملوك داخل الشركاء، من دون خلق شاشة وهمية أو مسار مكرر.</Text>
         </Box>
-      </Box>
+      </Surface>
     );
   };
 
@@ -314,7 +329,7 @@ export function ControlPanelDshPartnerHubScreen() {
   }, [activeTab]);
 
   return (
-    <div className={styles.surfaceCockpit}>
+    <div className={styles.surfaceCockpit} dir="rtl">
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
@@ -365,7 +380,7 @@ export function ControlPanelDshPartnerHubScreen() {
       </div>
 
       <Box padding={4} gap={3}>
-        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
+        <Surface padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
           <Text role="titleSm">ملكية دورة حياة الشريك</Text>
           <Text role="bodySm" tone="muted">
             {partnersGovernance?.notes ?? 'قسم الشركاء يملك onboarding والاعتماد والجاهزية والتعطيل، بينما الشريك والميدان يجمعان البيانات فقط.'}
@@ -373,39 +388,40 @@ export function ControlPanelDshPartnerHubScreen() {
           <Text role="caption" tone="muted">
             {`handoff: ${marketingGovernance?.sectionLabel ?? 'Marketing'} للعروض، ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} لاعتماد الكتالوج، ولا يوجد تفعيل نهائي من app-partner.`}
           </Text>
-        </Box>
+        </Surface>
       </Box>
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
-            {activeTab === 'deactivation' ? (
-              <ControlPanelDshPartnerDeactivationTab />
-            ) : activeTab === 'performance' ? (
-              <PartnerPerformanceWorkspace activeSubTab={activeSubTab} />
-            ) : activeTab === 'eligibility' ? (
-              <DshPartnerPromotionEligibilityScreen />
-            ) : activeTab === 'topology' ? (
-              <PartnerTopologyLane />
-            ) : activeTab === 'contracts' ? (
-              <PartnerFulfillmentLane />
-            ) : activeTab === 'activation' ? (
-              <ControlPanelDshPartnerActivationScreen />
-            ) : activeTab === 'documents' ? (
-              <ControlPanelDshPartnerDocumentReviewScreen />
-            ) : activeTab === 'overrides' ? (
-              <PartnerCatalogOverridesWorkspace />
-            ) : activeTab === 'inbox' ? (
-              renderInboxWorkspace()
-            ) : (
-              <Box padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
-                <Box align="center" gap={1}>
-                  <Text role="titleSm" tone="brand" style={{ fontWeight: '800' }}>المسار معروض كحالة واضحة وليس كفراغ</Text>
-                  <Text tone="muted">عند غياب queue مملوك لهذا التبويب نعرض N/A صريحة بدل شاشة عامة أو placeholder مكرر.</Text>
-                </Box>
-              </Box>
-            )}
-
+            <React.Suspense fallback={<WorkspaceSkeleton />}>
+              {activeTab === 'deactivation' ? (
+                <ControlPanelDshPartnerDeactivationTab />
+              ) : activeTab === 'performance' ? (
+                <PartnerPerformanceWorkspace activeSubTab={activeSubTab} />
+              ) : activeTab === 'eligibility' ? (
+                <DshPartnerPromotionEligibilityScreen />
+              ) : activeTab === 'topology' ? (
+                <PartnerTopologyLane />
+              ) : activeTab === 'contracts' ? (
+                <PartnerFulfillmentLane />
+              ) : activeTab === 'activation' ? (
+                <ControlPanelDshPartnerActivationScreen />
+              ) : activeTab === 'documents' ? (
+                <ControlPanelDshPartnerDocumentReviewScreen />
+              ) : activeTab === 'overrides' ? (
+                <PartnerCatalogOverridesWorkspace />
+              ) : activeTab === 'inbox' ? (
+                renderInboxWorkspace()
+              ) : (
+                <Surface padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+                  <Box align="center" gap={1}>
+                    <Text role="titleSm" tone="brand">المسار معروض كحالة واضحة وليس كفراغ</Text>
+                    <Text tone="muted">عند غياب queue مملوك لهذا التبويب نعرض N/A صريحة بدل شاشة عامة أو placeholder مكرر.</Text>
+                  </Box>
+                </Surface>
+              )}
+            </React.Suspense>
           </Box>
         </div>
       </main>

@@ -1,42 +1,51 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Text, Surface } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
   WebControlPanelStatusTag,
+  WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
-
 import { PARTNER_MODIFICATION_REQUESTS, type PartnerModificationRequest } from '../../data/partner.preview-data';
+import styles from '../shared/control-panel-surface.module.css';
 
 export function PartnerModificationsWorkspace() {
-  const { theme } = useTheme();
   const [requests, setRequests] = React.useState<PartnerModificationRequest[]>(PARTNER_MODIFICATION_REQUESTS);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const selectedRequest = requests.find((r) => r.id === selectedId);
   const partner = selectedRequest ? PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedRequest.partnerId) : null;
 
   const handleApprove = (id: string) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r));
-    setSelectedId(null);
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r));
+      setSelectedId(null);
+      setIsSubmitting(false);
+    }, 600);
   };
 
   const handleReject = (id: string) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
-    setSelectedId(null);
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
+      setSelectedId(null);
+      setIsSubmitting(false);
+    }, 600);
   };
 
   const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px', alignItems: 'start', direction: 'rtl' }}>
+    <div className={styles.surfaceSplitGrid} dir="rtl">
       {/* Modification Requests List */}
-      <Surface tone="raised" padding={5} gap={4} style={{ borderRadius: '16px' }}>
+      <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
         <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+          <Text role="titleLg" tone="brand">
             طلبات تعديل البيانات
           </Text>
           <WebControlPanelStatusTag label={`${pendingCount} طلبات معلقة`} tone={pendingCount > 0 ? 'warning' : 'neutral'} />
@@ -44,9 +53,9 @@ export function PartnerModificationsWorkspace() {
 
         <Box gap={3}>
           {requests.length === 0 || pendingCount === 0 ? (
-            <Box padding={8} align="center" style={{ backgroundColor: theme.surfaceInset, borderRadius: '12px' }}>
+            <Surface padding={8} align="center" background="surfaceInset" radiusToken="lg">
               <Text tone="muted">لا توجد طلبات تعديل بيانات معلقة.</Text>
-            </Box>
+            </Surface>
           ) : (
             requests.filter(r => r.status === 'pending').map((req) => {
               const pInfo = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === req.partnerId);
@@ -76,9 +85,9 @@ export function PartnerModificationsWorkspace() {
       {/* Review Inspector panel */}
       <Box gap={4}>
         {selectedRequest && partner ? (
-          <Surface tone="inset" padding={4} gap={3} style={{ borderRadius: '12px' }}>
+          <Surface tone="inset" padding={4} gap={3} radiusToken="lg">
             <Box layoutDirection="row" justify="space-between" align="center">
-              <Text role="titleSm" style={{ fontWeight: '800', color: theme.brand }}>
+              <Text role="titleSm" tone="brand">
                 مراجعة: {partner.storeName}
               </Text>
               <WebControlPanelStatusTag label={selectedRequest.type} tone={selectedRequest.risk} />
@@ -88,28 +97,20 @@ export function PartnerModificationsWorkspace() {
               يرجى مقارنة البيانات المطلوبة قبل الموافقة لاعتمادها بشكل نهائي في ملف الشريك.
             </Text>
 
-            <Box gap={2} style={{ marginTop: 8 }}>
-              <Text role="caption" tone="brand" style={{ fontWeight: '800' }}>التغييرات المطلوبة:</Text>
+            <Box gap={2} marginY={2}>
+              <Text role="caption" tone="brand">التغييرات المطلوبة:</Text>
               {selectedRequest.changes.map((change, idx) => (
-                <div key={idx} style={{
-                  backgroundColor: theme.surface,
-                  border: `1px solid ${theme.line}`,
-                  borderRadius: '8px',
-                  padding: '10px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px'
-                }}>
-                  <Text role="caption" style={{ fontWeight: 800 }}>{change.field}</Text>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '11px', color: theme.danger, textDecoration: 'line-through' }}>
+                <Surface key={idx} background="surface" padding={3} radiusToken="sm" border borderTone="line" gap={2}>
+                  <Text role="caption" tone="base">{change.field}</Text>
+                  <Box layoutDirection="row" justify="space-between">
+                    <Text role="caption" tone="danger">
                       {change.old}
-                    </span>
-                    <span style={{ fontSize: '11px', color: theme.success, fontWeight: 700 }}>
+                    </Text>
+                    <Text role="caption" tone="success">
                       {change.new}
-                    </span>
-                  </div>
-                </div>
+                    </Text>
+                  </Box>
+                </Surface>
               ))}
             </Box>
 
@@ -120,25 +121,21 @@ export function PartnerModificationsWorkspace() {
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box layoutDirection="row" gap={2} style={{ marginTop: 12 }}>
-              <button
-                onClick={() => handleApprove(selectedRequest.id)}
-                style={{
-                  flex: 1, padding: '10px', borderRadius: '8px',
-                  backgroundColor: theme.success, color: theme.surface,
-                  border: 'none', fontWeight: 700, cursor: 'pointer'
-                }}>
-                اعتماد التعديلات
-              </button>
-              <button
-                onClick={() => handleReject(selectedRequest.id)}
-                style={{
-                  flex: 1, padding: '10px', borderRadius: '8px',
-                  backgroundColor: 'transparent', color: theme.danger,
-                  border: `1px solid ${theme.danger}`, fontWeight: 700, cursor: 'pointer'
-                }}>
-                رفض
-              </button>
+            <Box marginY={2}>
+              <WebControlPanelActionCluster
+                primary={{
+                  id: 'approve',
+                  label: isSubmitting ? 'جارٍ الاعتماد...' : 'اعتماد التعديلات',
+                  disabled: isSubmitting,
+                  onAction: () => handleApprove(selectedRequest.id)
+                }}
+                secondary={{
+                  id: 'reject',
+                  label: 'رفض',
+                  disabled: isSubmitting,
+                  onAction: () => handleReject(selectedRequest.id)
+                }}
+              />
             </Box>
           </Surface>
         ) : (

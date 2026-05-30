@@ -14,6 +14,7 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { translateDshRuntimeBindingStatus } from '../shared';
+import styles from '../shared/control-panel-surface.module.css';
 
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 
@@ -165,7 +166,8 @@ export function DshPartnerPromotionEligibilityScreen({
   };
 
   return (
-    <WebControlPanelWorkbench
+    <div dir="rtl" style={{ display: 'contents' }}>
+      <WebControlPanelWorkbench
       header={
         <WebControlPanelDenseHeader
           eyebrow="الشركاء"
@@ -180,7 +182,7 @@ export function DshPartnerPromotionEligibilityScreen({
       }
       main={
         <Box gap={3}>
-          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
+          <Box gap={2} layoutDirection="row" className={styles.surfaceActionWrap}>
             <WebControlPanelStatusTag label={resolveStatusLabel(selectedItem?.status ?? 'draft')} tone={resolveApprovalTone(selectedItem?.status ?? 'draft')} />
             <WebControlPanelStatusTag label={selectedItem?.kind === 'product' ? 'منتج' : 'متجر'} tone="info" />
             <WebControlPanelStatusTag label={resolveEligibilityLabel(selectedItem?.eligibility ?? 'review')} tone={resolveEligibilityTone(selectedItem?.eligibility ?? 'review')} />
@@ -243,6 +245,7 @@ export function DshPartnerPromotionEligibilityScreen({
         </WebControlPanelInspectorShell>
       }
     />
+    </div>
   );
 }
 
