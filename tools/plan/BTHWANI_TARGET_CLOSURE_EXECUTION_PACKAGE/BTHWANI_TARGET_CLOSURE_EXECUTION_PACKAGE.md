@@ -408,6 +408,25 @@ Discover and classify every UI element that appears functional but has no backin
     ```
     ممنوع catch صامت أو success بلا نتيجة.
 16. **إغلاق Empty / Loading / Blocked / Disabled**: لكل جدول وقائمة حدد loading, empty, error, blocked. ممنوع جدول فارغ بلا empty state.
+
+    **حالة التنفيذ — Marketing Control Panel (2026-05-31):**
+    ```text
+    GrowthCommandDeckScreen: empty ✅ | loading API-later | blocked ✅ | guidance ✅
+    SmartSignalLayerScreen:  empty ✅ | loading API-later | blocked ✅ | guidance ✅
+    LoyaltyCommandDeckScreen: empty ✅ (Surface مع icon) | loading API-later | blocked ✅
+    BannersCommandDeckScreen: empty ✅ | disabled ✅ | blocked ✅
+    CampaignsCommandDeckScreen: empty ✅ | disabled ✅ | blocked ✅
+    MarketingReviewScreens: empty ✅ | disabled ✅ | blocked ✅
+    MarketingMediaReviewCommandDeckScreen: empty ✅ | disabled ✅ | blocked ✅
+    MarketingReviewQueue: empty ✅ | blocked ✅
+    PartnerOffersCommandDeckScreen: empty ✅ | disabled ✅
+    PromosCommandDeckScreen: empty ✅ | disabled ✅
+    TickerCommandDeckScreen: empty ✅ | disabled ✅
+    VideosCommandDeckScreen: empty ✅ | disabled ✅
+    VisibilityCommandDeckScreen: empty ✅
+    ControlPanelDshMarketingScreen: empty ✅ (signals) | guidance ✅
+    SmartSignalLayerScreen: empty ✅ (signals) | guidance ✅
+    ```
 17. **إغلاق Cross-Surface Consistency**: افحص المنطق عبر الأسطح (client, partner, control-panel). حدد الـ canonical owner والـ consumers.
 18. **إغلاق Security / Privacy / Secrets**: افحص secrets, tokens, private IDs. (شغل guard:secret-scan إذا لزم الأمر).
 19. **إغلاق Observability / Telemetry لاحقًا**: صنّف actions لـ analytics, audit log (لا تنفذها الآن بل صنفها فقط).

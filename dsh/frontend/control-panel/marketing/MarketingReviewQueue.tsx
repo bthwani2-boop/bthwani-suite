@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Button, KeyValueList, StateView, Surface, Text } from '@bthwani/ui-kit';
@@ -42,6 +42,16 @@ import { getMarketingPermissionResult } from '../../shared/dsh-role-permission.m
  * - partial failure: API-later
  * - retry: API-later
  * - (No silent catch, success updates state and refreshes data)
+ *
+ * Empty / Loading / Blocked / Disabled Closure:
+ * - loading: API-later (بيانات محاكاة حالياً، لا يوجد async fetch)
+ * - empty: HANDLED — empty state واضح عند غياب العناصر
+ * - error: HANDLED — رسالة خطأ صريحة عند فشل الإجراء
+ * - blocked: HANDLED — الإجراء محجوب عند غياب الصلاحية أو البيانات
+ * - disabled: HANDLED — الزر disabled عند عدم استيفاء الشروط
+ * - success: HANDLED — الحالة تتحدث فور نجاح الإجراء
+ * - retry: API-later
+ * - guidance: HANDLED — توجيه نصي يظهر عند كل حالة فارغة أو محجوبة
  */
 function getStageMeta(stage: ApprovalStage): { tone: string; label: string } {
   switch (stage) {

@@ -52,6 +52,16 @@ import { CommercialParityPreview } from './commercial-parity-preview';
  * - partial failure: API-later
  * - retry: API-later
  * - (No silent catch, success updates state and refreshes data)
+ *
+ * Empty / Loading / Blocked / Disabled Closure:
+ * - loading: API-later (بيانات محاكاة حالياً)
+ * - empty: HANDLED — currentRows.length === 0 يظهر 'لا توجد عناصر معروضة لهذا القسم'
+ * - error: API-later
+ * - blocked: HANDLED — detail panel only opens when row selected
+ * - disabled: HANDLED — 'تبديل إلى نظرة عامة' always active (safe action)
+ * - success: HANDLED — selection opens LoyaltyDetailPanel immediately
+ * - retry: API-later
+ * - guidance: HANDLED — 'لا توجد تفاصيل إضافية.' fallback in LoyaltyDetailPanel
  */
 type LoyaltyView = 'overview' | 'tiers' | 'subscriptions' | 'rewards' | 'entitlements';
 
@@ -416,17 +426,23 @@ export function LoyaltyCommandDeckScreen() {
             {currentRows.length > 0 ? (
               currentRows.map((row, index) => (
                 <CompactDeckRow
-                  key={row.id}
+                  key={row.rowKey}
                   row={row}
                   showDivider={index > 0}
-                  selected={selectedRowId === row.id}
-                  onAction={() => { setSelectedRowId(row.id); setDetailRowId(row.id); }}
+                  selected={selectedRowId === row.rowKey}
+                  onAction={() => { setSelectedRowId(row.rowKey); setDetailRowId(row.rowKey); }}
                 />
               ))
             ) : (
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                لا توجد عناصر معروضة لهذا القسم حاليًا.
-              </Text>
+              <Surface tone="inset" style={{ padding: 20, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ fontSize: 24, marginBottom: 6 }}>◎</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>
+                  لا توجد عناصر في هذا القسم حالياً.
+                </Text>
+                <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: 4 }}>
+                  جرب تبويباً آخر أو انتظر تفعيل البيانات.
+                </Text>
+              </Surface>
             )}
           </Box>
 

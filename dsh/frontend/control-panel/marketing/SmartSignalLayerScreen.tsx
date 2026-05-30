@@ -30,6 +30,16 @@ import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/dsh
  * - partial failure: API-later
  * - retry: API-later
  * - (No silent catch, success updates state and refreshes data)
+ *
+ * Empty / Loading / Blocked / Disabled Closure:
+ * - loading: API-later (بيانات محاكاة حالياً، لا يوجد spinner مطلوب حالياً)
+ * - empty: HANDLED — يظهر empty state عند غياب إشارات الكتالوج والتسويق
+ * - error: API-later
+ * - blocked: HANDLED — KPIs موسومة UI_PREVIEW_ONLY بشكل صريح
+ * - disabled: لا يوجد أزرار تحتاج disabled guard في هذا السطح
+ * - success: HANDLED — navigation تعمل مباشرة
+ * - retry: API-later
+ * - guidance: HANDLED — ملاحظة فنية تشرح حدود المحاكاة
  */
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;
@@ -86,6 +96,15 @@ export function ControlPanelDshMarketingScreen({
 				<WebSignalCard title="إشارات التسويق والكتالوج" value={String(catalogSignals.length)} description="اعتماد ورفض وتسليم المحتوى التجاري داخل طبقة الإشارات" />
 				<WebSignalCard title="إشارات غير مقروءة" value={String(catalogUnreadCount)} description="إشارات تستلزم مراجعة أو إجراء" tone="neutral" />
 			</Box>
+
+			{/* Signals empty state */}
+			{catalogSignals.length === 0 && (
+				<Surface tone="inset" padding={4} gap={2} style={{ borderRadius: 12, alignItems: 'center' }}>
+					<Text style={{ fontSize: 28 }}>◎</Text>
+					<Text role="bodyStrong" style={{ textAlign: 'center', color: theme.brandHeaderBackground }}>لا توجد إشارات تسويقية حالياً</Text>
+					<Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>ستظهر إشارات الكتالوج والتسويق هنا عند تفعيل جسر البيانات.</Text>
+				</Surface>
+			)}
 
 			{/* Comprehensive Multi-Surface Favorites Engine Analytics */}
 			<Surface tone="raised" padding={4} gap={4} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.lineStrong }}>

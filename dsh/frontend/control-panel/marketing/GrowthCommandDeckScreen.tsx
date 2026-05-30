@@ -39,6 +39,16 @@ import type { CampaignRecord } from '../../data/marketing.preview-data';
  * - partial failure: API-later
  * - retry: API-later
  * - (No silent catch, success updates state and refreshes data)
+ *
+ * Empty / Loading / Blocked / Disabled Closure:
+ * - loading: UI-only (data is simulated; spinner shown when recommendations empty)
+ * - empty: HANDLED — shows guidance message when no recommendations available
+ * - error: API-later (currently no error path in simulated data)
+ * - blocked: HANDLED — action button only active when selectedRec !== null
+ * - disabled: HANDLED — navigation buttons disabled when tab/href is missing
+ * - success: HANDLED — selection updates detail panel immediately
+ * - retry: API-later
+ * - guidance: HANDLED — shows 'اختر توصية لعرض التفاصيل' when no selection
  */
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;
@@ -224,39 +234,49 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
             </View>
 
             <Box gap={3} style={styles.queueBody}>
-                {visibleRecommendations.map((rec) => (
-                  <View
-                    key={rec.id}
-                    style={{
-                      flexDirection: 'row',
-                      borderRadius: 12,
-                      borderWidth: 1,
-                      borderColor: selectedRecId === rec.id ? theme.brand : theme.line,
-                      backgroundColor: theme.surface,
-                      padding: 14,
-                      gap: 12,
-                      alignItems: 'flex-start',
-                    }}
-                  >
-                    <View style={{ justifyContent: 'center', alignItems: 'center', width: 32 }}>
-                      <Text style={{ fontSize: 20 }}>{getRecommendationIcon(rec.type)}</Text>
-                    </View>
-                    <Box style={{ flex: 1 }}>
-                      <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{rec.title}</Text>
-                      <Text role="caption" style={{ color: getSeverityColor(rec.severity), fontWeight: '800', marginTop: 2, textAlign: 'right' }}>
-                        الأهمية: {getSeverityLabel(rec.severity)}
-                      </Text>
-                      <Button label="عرض" size="sm" tone="ghost" onPress={() => setSelectedRecId(rec.id)} style={{ alignSelf: 'flex-start', marginTop: 4 }} />
-                    </Box>
-                  </View>
-                ))}
-                <WebControlPanelCompactPager
-                  page={recommendationsPage}
-                  totalPages={totalPages}
-                  summaryLabel={`عرض ${visibleRecommendations.length} من ${recommendations.length} توصيات`}
-                  onPrevious={recommendationsPage > 1 ? () => setRecommendationsPage((currentPage) => currentPage - 1) : undefined}
-                  onNext={recommendationsPage < totalPages ? () => setRecommendationsPage((currentPage) => currentPage + 1) : undefined}
-                />
+                {visibleRecommendations.length === 0 ? (
+                  <Surface tone="inset" style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 12, padding: 24, minHeight: 120 }}>
+                    <Text style={{ fontSize: 28, marginBottom: 8 }}>◎</Text>
+                    <Text role="bodyStrong" style={{ textAlign: 'center', color: theme.brandHeaderBackground }}>لا توجد توصيات حالياً</Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'center', marginTop: 4 }}>سيتم توليد التوصيات تلقائياً عند رصد فجوات في الكتالوج أو الحملات أو الولاء.</Text>
+                  </Surface>
+                ) : (
+                  <>
+                    {visibleRecommendations.map((rec) => (
+                      <View
+                        key={rec.id}
+                        style={{
+                          flexDirection: 'row',
+                          borderRadius: 12,
+                          borderWidth: 1,
+                          borderColor: selectedRecId === rec.id ? theme.brand : theme.line,
+                          backgroundColor: theme.surface,
+                          padding: 14,
+                          gap: 12,
+                          alignItems: 'flex-start',
+                        }}
+                      >
+                        <View style={{ justifyContent: 'center', alignItems: 'center', width: 32 }}>
+                          <Text style={{ fontSize: 20 }}>{getRecommendationIcon(rec.type)}</Text>
+                        </View>
+                        <Box style={{ flex: 1 }}>
+                          <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{rec.title}</Text>
+                          <Text role="caption" style={{ color: getSeverityColor(rec.severity), fontWeight: '800', marginTop: 2, textAlign: 'right' }}>
+                            الأهمية: {getSeverityLabel(rec.severity)}
+                          </Text>
+                          <Button label="عرض" size="sm" tone="ghost" onPress={() => setSelectedRecId(rec.id)} style={{ alignSelf: 'flex-start', marginTop: 4 }} />
+                        </Box>
+                      </View>
+                    ))}
+                    <WebControlPanelCompactPager
+                      page={recommendationsPage}
+                      totalPages={totalPages}
+                      summaryLabel={`عرض ${visibleRecommendations.length} من ${recommendations.length} توصيات`}
+                      onPrevious={recommendationsPage > 1 ? () => setRecommendationsPage((currentPage) => currentPage - 1) : undefined}
+                      onNext={recommendationsPage < totalPages ? () => setRecommendationsPage((currentPage) => currentPage + 1) : undefined}
+                    />
+                  </>
+                )}
             </Box>
           </Surface>
         </Box>
