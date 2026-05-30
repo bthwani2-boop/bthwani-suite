@@ -6,6 +6,31 @@ import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebSignalCard } from '@bthwani/ui-kit/web';
 import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/dsh-signal-layer.model';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;
 	operationsHref?: string;

@@ -132,3 +132,21 @@ Identified three directories containing exactly one screen file. These single-fi
 
 ## 28. Final Decision
 - **Verdict**: `READY_FOR_PR` (Git status cleanly matches task, all verification tests passed, package is valid).
+
+## 29. Validation Rules Closure (Marketing Control Panel)
+| Form/Action | Required Fields | Format Rules | Range | Duplicate/Conflict | Disabled Reason | Error | Success |
+|---|---|---|---|---|---|---|---|
+| **Ticker** | message | Kind, Source, Audience, Priority, Delivery, Target | openHour (0-23), cooldown (>=0) | No active ticker with same message | Missing `marketing.edit` or `marketing.publish` | Negative ranges or duplicate message | Live preview & list update |
+| **Banners** | title, media/image, targetId (if needed) | actionType match target logic | position (>=1), autoplay (>=2500) | No active banner in same position | Missing permissions | "وجهة الحدث مطلوبة", "الموضع محجوز" | Visual grid updates |
+| **Campaigns** | title, channels, targetId (if targeted) | Date formats for start/end | endDate > startDate | N/A (Handled via multiple channels limits) | Missing permissions | "تاريخ النهاية يسبق البداية" | Transitions to draft/publish |
+| **Videos** | title, videoUrl, targetId | URL cannot contain spaces | durationSeconds | Handled implicitly | Missing permissions | "رابط الفيديو مطلوب/يحتوي مسافات" | Editor resets, grid updates |
+| **Promos** | title, targetId | valid targetType map | order (>=1) | Limits active via toggle bounds | Missing permissions | "الوجهة مطلوبة" | Direct preview reflects changes |
+
+## 30. Conflict Resolution Closure (Marketing Control Panel)
+| Conflict Type | Detect | Display | Owner | Resolution Action | Audit/API-later |
+|---|---|---|---|---|---|
+| **Duplicate Product/Category** | Check `actionTarget` uniqueness across active items | Red validation text or toast | `control-panel-marketing` | Prevent publish if pointing to same target | Backend unique constraint on `target_id` & `status=published` |
+| **Media Conflict** | Check `mediaKey` vs `imageUrl` overlap | Missing media placeholder | `control-panel-marketing` | Require explicit mediaKey, fallback to placeholder | API asset validation before CDN publish |
+| **Partner Override** | Check `PartnerOffers` active count | 'مفعل' badge overrides draft | `control-panel-marketing` | Pause previous partner offer if slots full | Ledger override priority check |
+| **Vars Precedence** | Local `targetType` vs global `campaign` vars | Precedence labels | `control-panel-marketing` | Local item overrides general campaign link | Configuration DB resolver |
+| **Publish vs Hidden** | Draft item switching to Published | Toggle switches / Status dots | `control-panel-marketing` | Warn if hitting slot limits (e.g. duplicate positions) | Transactional state change API |

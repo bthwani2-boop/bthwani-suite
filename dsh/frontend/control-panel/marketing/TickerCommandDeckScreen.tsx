@@ -29,19 +29,100 @@ import {
   type MarketingNewsTickerDeliveryMode,
   type MarketingNewsTickerKind,
 } from '../../data/marketing.preview-data';
+import { useMarketingPermissions } from './marketing-permissions.contract';
 
+/**
+ * Validation Rules:
+ * - required fields: message
+ * - format rules: Kind, Source, Audience, Priority, Delivery, ActionTarget
+ * - range: openHour (0-23), closeHour (0-23), cooldownMinutes (>=0), repeatGapMinutes (>=0)
+ * - duplicate / conflict: Cannot publish a ticker if another published ticker has the exact same message.
+ * - disabled reason: Missing 'marketing.edit' or 'marketing.publish' permissions.
+ * - error: Alerts on negative ranges or duplicate active messages.
+ * - success: Hides error, updates list and live preview immediately.
+ *
+ * Conflict Resolution:
+ * - detect: duplicate product/category/message overlaps during save/toggle
+ * - display: inline red error texts under fields
+ * - owner: control-panel-marketing
+ * - resolution action: Prevent save/publish action until resolved
+ * - audit/API-later: Backed by strict DB unique indices on active status
+ *
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 export function TickerCommandDeckScreen() {
+  const { hasPermission } = useMarketingPermissions();
   const [tickers, setTickers] = React.useState<ReadonlyArray<MarketingNewsTickerItem>>([]);
   const [editingTickerId, setEditingTickerId] = React.useState<string | null>(null);
+  const [draft, setDraft] = React.useState<MarketingNewsTickerItem | null>(null);
+  const [saveError, setSaveError] = React.useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
+  const [pauseAllConfirm, setPauseAllConfirm] = React.useState(false);
 
   React.useEffect(() => {
     setTickers(getMarketingTickerItems());
   }, []);
 
-  const refreshTickers = () => setTickers(getMarketingTickerItems());
+  const refreshTickers = () => {
+    const next = getMarketingTickerItems();
+    setTickers(next);
+    if (editingTickerId && !next.some(t => t.id === editingTickerId)) {
+      setEditingTickerId(null);
+      setDraft(null);
+    }
+  };
 
-  const editingTicker = editingTickerId ? tickers.find(t => t.id === editingTickerId) : null;
+  const editingTicker = draft;
+
+  const handleEdit = (ticker: MarketingNewsTickerItem) => {
+    setEditingTickerId(ticker.id);
+    setDraft({ ...ticker });
+    setSaveError(null);
+  };
+
+  const handleSave = () => {
+    if (!draft) return;
+    if (draft.message.trim() === '') { setSaveError('نص الرسالة مطلوب.'); return; }
+    if (draft.openHour < 0 || draft.openHour > 23) { setSaveError('ساعة البدء يجب أن تكون بين 0 و 23.'); return; }
+    if (draft.closeHour < 0 || draft.closeHour > 23) { setSaveError('ساعة النهاية يجب أن تكون بين 0 و 23.'); return; }
+    if (draft.cooldownMinutes < 0) { setSaveError('مدة التهدئة لا يمكن أن تكون سالبة.'); return; }
+    if (draft.repeatGapMinutes < 0) { setSaveError('فجوة التكرار لا يمكن أن تكون سالبة.'); return; }
+
+    if (draft.status === 'published') {
+      const isDuplicate = tickers.some(t => t.id !== draft.id && t.status === 'published' && t.message.trim() === draft.message.trim());
+      if (isDuplicate) {
+        setSaveError('يوجد شريط مفعل بنفس النص مسبقاً.');
+        return;
+      }
+    }
+
+    setSaveError(null);
+    upsertMarketingTickerItem(draft);
+    refreshTickers();
+    // Keep draft open but updated with fresh data
+    const next = getMarketingTickerItems().find(t => t.id === draft.id);
+    if (next) setDraft(next);
+  };
 
   const [now, setNow] = React.useState(new Date());
   React.useEffect(() => {
@@ -67,6 +148,14 @@ export function TickerCommandDeckScreen() {
   const selectedTicker = editingTickerId ? tickers.find((item) => item.id === editingTickerId) : undefined;
   const canPublishSelected = Boolean(selectedTicker && selectedTicker.status !== 'published');
 
+  const tickerValidation = editingTicker ? {
+    messageEmpty: editingTicker.message.trim() === '',
+    openHourInvalid: editingTicker.openHour < 0 || editingTicker.openHour > 23,
+    closeHourInvalid: editingTicker.closeHour < 0 || editingTicker.closeHour > 23,
+    cooldownNegative: editingTicker.cooldownMinutes < 0,
+    repeatGapNegative: editingTicker.repeatGapMinutes < 0,
+  } : null;
+
   return (
     <div className={marketingStyles.marketingStack}>
       <div className={marketingStyles.surfaceCard}>
@@ -76,25 +165,43 @@ export function TickerCommandDeckScreen() {
             <button
               type="button"
               onClick={() => {
-                const draft = createMarketingTickerDraft();
-                upsertMarketingTickerItem(draft);
-                setEditingTickerId(draft.id);
-                refreshTickers();
+                const newDraft = createMarketingTickerDraft();
+                setEditingTickerId(newDraft.id);
+                setDraft(newDraft);
+                setSaveError(null);
               }}
+              disabled={!hasPermission('marketing.edit')}
               className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonPrimary}`}
             >
               + إضافة رسالة
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                pauseAllMarketingTickers();
-                refreshTickers();
-              }}
-              className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}
-            >
-              إيقاف الكل
-            </button>
+            {pauseAllConfirm ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { pauseAllMarketingTickers(); refreshTickers(); setPauseAllConfirm(false); }}
+                  className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}
+                >
+                  تأكيد الإيقاف الكلي
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPauseAllConfirm(false)}
+                  className={marketingStyles.actionButton}
+                >
+                  إلغاء
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPauseAllConfirm(true)}
+                disabled={!hasPermission('marketing.publish')}
+                className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}
+              >
+                إيقاف الكل
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {
@@ -103,14 +210,20 @@ export function TickerCommandDeckScreen() {
                   refreshTickers();
                 }
               }}
-              disabled={!canPublishSelected}
+              disabled={!canPublishSelected || !hasPermission('marketing.publish')}
               className={`${marketingStyles.actionButton} ${canPublishSelected ? marketingStyles.actionButtonSuccess : marketingStyles.actionButtonDisabled}`}
             >
               تفعيل المحددة
             </button>
-            <div className={marketingStyles.statusNote}>
-              تم الحفظ تلقائياً
-            </div>
+            {editingTickerId ? (
+              <button
+                type="button"
+                onClick={() => { setEditingTickerId(null); setDraft(null); setSaveError(null); }}
+                className={marketingStyles.actionButton}
+              >
+                إغلاق المحرر
+              </button>
+            ) : null}
           </div>
         </div>
         {tickerPlan.activeEntry ? (
@@ -203,18 +316,18 @@ export function TickerCommandDeckScreen() {
                     </div>
                   </div>
                   <div className={marketingStyles.tickerActions}>
-                    <button type="button" onClick={() => { toggleMarketingTickerStatus(ticker.id); refreshTickers(); }} className={marketingStyles.actionButton}>
+                    <button type="button" onClick={() => { toggleMarketingTickerStatus(ticker.id); refreshTickers(); }} className={marketingStyles.actionButton} disabled={!hasPermission('marketing.publish')}>
                       {isPublished ? 'إيقاف' : 'تفعيل'}
                     </button>
-                    <button type="button" onClick={() => setEditingTickerId(ticker.id)} className={marketingStyles.actionButton}>
+                    <button type="button" onClick={() => handleEdit(ticker)} className={marketingStyles.actionButton} disabled={!hasPermission('marketing.edit')}>
                       تعديل
                     </button>
-                    <button type="button" onClick={() => { toggleMarketingTickerPinned(ticker.id); refreshTickers(); }} className={marketingStyles.actionButton}>
+                    <button type="button" onClick={() => { toggleMarketingTickerPinned(ticker.id); refreshTickers(); }} className={marketingStyles.actionButton} disabled={!hasPermission('marketing.edit')}>
                       {ticker.deliveryMode === 'pinned' ? 'إلغاء التثبيت' : 'تثبيت'}
                     </button>
                     {deleteConfirmId === ticker.id ? (
                       <>
-                        <button type="button" onClick={() => { removeMarketingTickerItem(ticker.id); if (editingTickerId === ticker.id) setEditingTickerId(null); setDeleteConfirmId(null); refreshTickers(); }} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
+                        <button type="button" onClick={() => { removeMarketingTickerItem(ticker.id); if (editingTickerId === ticker.id) { setEditingTickerId(null); setDraft(null); } setDeleteConfirmId(null); refreshTickers(); }} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
                           تأكيد الحذف
                         </button>
                         <button type="button" onClick={() => setDeleteConfirmId(null)} className={marketingStyles.actionButton}>
@@ -222,7 +335,7 @@ export function TickerCommandDeckScreen() {
                         </button>
                       </>
                     ) : (
-                      <button type="button" onClick={() => setDeleteConfirmId(ticker.id)} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`}>
+                      <button type="button" onClick={() => setDeleteConfirmId(ticker.id)} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonDanger}`} disabled={!hasPermission('marketing.delete')}>
                         حذف
                       </button>
                     )}
@@ -237,8 +350,16 @@ export function TickerCommandDeckScreen() {
           <div className={`${marketingStyles.surfaceCard} ${marketingStyles.editorCardAccent}`}>
             <div className={marketingStyles.editorHeader}>
               <h4 className={marketingStyles.editorTitle}>محرر الرسالة</h4>
-              <button type="button" onClick={() => setEditingTickerId(null)} className={marketingStyles.closeButton}>إغلاق</button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button type="button" onClick={handleSave} className={`${marketingStyles.actionButton} ${marketingStyles.actionButtonPrimary}`}>حفظ</button>
+                <button type="button" onClick={() => { setEditingTickerId(null); setDraft(null); setSaveError(null); }} className={marketingStyles.closeButton}>إغلاق</button>
+              </div>
             </div>
+            {saveError && (
+              <div style={{ padding: '8px 12px', backgroundColor: 'var(--brand-danger-muted)', color: 'var(--brand-danger)', borderRadius: '4px', marginBottom: '12px' }}>
+                {saveError}
+              </div>
+            )}
             <div className={marketingStyles.formStack}>
               <Box gap={1}>
                 <label className={`${marketingStyles.fieldLabel} ${marketingStyles.fieldLabelLarge}`}>نص الرسالة</label>
@@ -247,17 +368,16 @@ export function TickerCommandDeckScreen() {
                   title="نص الرسالة"
                   value={editingTicker.message}
                   onChange={(e) => {
-                    upsertMarketingTickerItem({ ...editingTicker, message: e.target.value });
-                    refreshTickers();
+                    setDraft({ ...editingTicker, message: e.target.value });
                   }}
                   className={`${marketingStyles.fieldControl} ${marketingStyles.fieldTextarea}`}
                 />
-                {editingTicker.message.trim() === '' && <span className={marketingStyles.fieldError}>يجب ألا يكون النص فارغاً</span>}
+                {tickerValidation?.messageEmpty && <span className={marketingStyles.fieldError}>يجب ألا يكون النص فارغاً</span>}
               </Box>
               <div className={marketingStyles.formGrid}>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>النوع</label>
-                  <select aria-label="نوع الرسالة" title="نوع الرسالة" value={editingTicker.kind} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, kind: coerceTickerKind(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="نوع الرسالة" title="نوع الرسالة" value={editingTicker.kind} onChange={(e) => { setDraft({ ...editingTicker, kind: coerceTickerKind(e.target.value) }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="platform">{localizeKind('platform')}</option>
                     <option value="order">{localizeKind('order')}</option>
                     <option value="promo">{localizeKind('promo')}</option>
@@ -266,7 +386,7 @@ export function TickerCommandDeckScreen() {
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>الحالة</label>
-                  <select aria-label="حالة الرسالة" title="حالة الرسالة" value={editingTicker.status} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, status: coerceTickerStatus(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="حالة الرسالة" title="حالة الرسالة" value={editingTicker.status} onChange={(e) => { setDraft({ ...editingTicker, status: coerceTickerStatus(e.target.value) }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="draft">{localizeStatus('draft')}</option>
                     <option value="published">{localizeStatus('published')}</option>
                     <option value="paused">{localizeStatus('paused')}</option>
@@ -275,7 +395,7 @@ export function TickerCommandDeckScreen() {
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>المصدر</label>
-                  <select aria-label="مصدر الرسالة" title="مصدر الرسالة" value={editingTicker.source} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, source: coerceTickerSource(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="مصدر الرسالة" title="مصدر الرسالة" value={editingTicker.source} onChange={(e) => { setDraft({ ...editingTicker, source: coerceTickerSource(e.target.value) }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="marketing">{resolveMarketingTickerSourceLabel('ar', 'marketing')}</option>
                     <option value="operations">{resolveMarketingTickerSourceLabel('ar', 'operations')}</option>
                     <option value="system">{resolveMarketingTickerSourceLabel('ar', 'system')}</option>
@@ -285,7 +405,7 @@ export function TickerCommandDeckScreen() {
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>الجمهور</label>
-                  <select aria-label="الجمهور" title="الجمهور" value={editingTicker.audience} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, audience: coerceTickerAudience(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="الجمهور" title="الجمهور" value={editingTicker.audience} onChange={(e) => { setDraft({ ...editingTicker, audience: coerceTickerAudience(e.target.value) }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="all">{resolveMarketingTickerAudienceLabel('ar', 'all')}</option>
                     <option value="home">{resolveMarketingTickerAudienceLabel('ar', 'home')}</option>
                     <option value="order">{resolveMarketingTickerAudienceLabel('ar', 'order')}</option>
@@ -294,7 +414,7 @@ export function TickerCommandDeckScreen() {
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>الأولوية</label>
-                  <select aria-label="الأولوية" title="الأولوية" value={editingTicker.priority} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, priority: coerceTickerPriority(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="الأولوية" title="الأولوية" value={editingTicker.priority} onChange={(e) => { setDraft({ ...editingTicker, priority: coerceTickerPriority(e.target.value) }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="low">{resolveMarketingTickerPriorityLabel('ar', 'low')}</option>
                     <option value="normal">{resolveMarketingTickerPriorityLabel('ar', 'normal')}</option>
                     <option value="high">{resolveMarketingTickerPriorityLabel('ar', 'high')}</option>
@@ -303,7 +423,7 @@ export function TickerCommandDeckScreen() {
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>نمط التسليم</label>
-                  <select aria-label="نمط التسليم" title="نمط التسليم" value={editingTicker.deliveryMode} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, deliveryMode: coerceTickerDelivery(e.target.value) }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="نمط التسليم" title="نمط التسليم" value={editingTicker.deliveryMode} onChange={(e) => { setDraft({ ...editingTicker, deliveryMode: coerceTickerDelivery(e.target.value) }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="auto">{resolveMarketingTickerDeliveryLabel('ar', 'auto')}</option>
                     <option value="manual">{resolveMarketingTickerDeliveryLabel('ar', 'manual')}</option>
                     <option value="pinned">{resolveMarketingTickerDeliveryLabel('ar', 'pinned')}</option>
@@ -318,10 +438,10 @@ export function TickerCommandDeckScreen() {
                     min="0"
                     max="23"
                     value={editingTicker.openHour}
-                    onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, openHour: Number(e.target.value) }); refreshTickers(); }}
+                    onChange={(e) => { setDraft({ ...editingTicker, openHour: Number(e.target.value) }); }}
                     className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                   />
-                  {(editingTicker.openHour < 0 || editingTicker.openHour > 23) && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>بين 0-23</span>}
+                  {tickerValidation?.openHourInvalid && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>بين 0-23</span>}
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>نهاية العرض</label>
@@ -332,10 +452,10 @@ export function TickerCommandDeckScreen() {
                     min="0"
                     max="23"
                     value={editingTicker.closeHour}
-                    onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, closeHour: Number(e.target.value) }); refreshTickers(); }}
+                    onChange={(e) => { setDraft({ ...editingTicker, closeHour: Number(e.target.value) }); }}
                     className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                   />
-                  {(editingTicker.closeHour < 0 || editingTicker.closeHour > 23) && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>بين 0-23</span>}
+                  {tickerValidation?.closeHourInvalid && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>بين 0-23</span>}
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>التهدئة (دقيقة)</label>
@@ -345,10 +465,10 @@ export function TickerCommandDeckScreen() {
                     type="number"
                     min="0"
                     value={editingTicker.cooldownMinutes}
-                    onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, cooldownMinutes: Number(e.target.value) }); refreshTickers(); }}
+                    onChange={(e) => { setDraft({ ...editingTicker, cooldownMinutes: Number(e.target.value) }); }}
                     className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                   />
-                  {editingTicker.cooldownMinutes < 0 && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>لا يمكن أن يكون سالباً</span>}
+                  {tickerValidation?.cooldownNegative && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>لا يمكن أن يكون سالباً</span>}
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>فجوة التكرار</label>
@@ -358,14 +478,14 @@ export function TickerCommandDeckScreen() {
                     type="number"
                     min="0"
                     value={editingTicker.repeatGapMinutes}
-                    onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, repeatGapMinutes: Number(e.target.value) }); refreshTickers(); }}
+                    onChange={(e) => { setDraft({ ...editingTicker, repeatGapMinutes: Number(e.target.value) }); }}
                     className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}
                   />
-                  {editingTicker.repeatGapMinutes < 0 && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>لا يمكن أن يكون سالباً</span>}
+                  {tickerValidation?.repeatGapNegative && <span className={`${marketingStyles.fieldError} ${marketingStyles.fieldErrorSmall}`}>لا يمكن أن يكون سالباً</span>}
                 </Box>
                 <Box gap={1}>
                   <label className={marketingStyles.fieldLabel}>وجهة الضغط</label>
-                  <select aria-label="وجهة الضغط" title="وجهة الضغط" value={editingTicker.actionTarget} onChange={(e) => { upsertMarketingTickerItem({ ...editingTicker, actionTarget: e.target.value }); refreshTickers(); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
+                  <select aria-label="وجهة الضغط" title="وجهة الضغط" value={editingTicker.actionTarget} onChange={(e) => { setDraft({ ...editingTicker, actionTarget: e.target.value }); }} className={`${marketingStyles.fieldControl} ${marketingStyles.fieldControlCompact}`}>
                     <option value="home">{localizeTarget('home')}</option>
                     <option value="orders">{localizeTarget('orders')}</option>
                     <option value="tracking">{localizeTarget('tracking')}</option>

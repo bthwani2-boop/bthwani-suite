@@ -5,6 +5,8 @@ import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, Key
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getPartnerOfferItems,
+  getPartnerOfferSummaries,
+  getPartnerOfferDetail,
   getPartnerOfferKpis,
   upsertPartnerOfferItem,
   approvePartnerOfferItem,
@@ -14,6 +16,7 @@ import {
   archivePartnerOfferItem,
   removePartnerOfferItem,
   type PartnerOfferRecord,
+  type PartnerOfferSummary,
   type PartnerOfferStatus,
   type PartnerOfferType,
   type PartnerOfferSource,
@@ -21,23 +24,85 @@ import {
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { validatePartnerOfferForPublish } from '../../shared/commercial.preview-contract';
 import { CommercialParityPreview } from './commercial-parity-preview';
+import { useMarketingPermissions } from './marketing-permissions.contract';
 
 type PartnerOfferEditorSection = 'details' | 'governance' | 'preview';
 
 const partnerOffersPageSize = 5;
 
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 export function PartnerOffersCommandDeckScreen() {
+  const { hasPermission } = useMarketingPermissions();
   const { theme } = useTheme();
-  const [items, setItems] = React.useState<PartnerOfferRecord[]>(() => getPartnerOfferItems());
-  const [selectedId, setSelectedId] = React.useState<string | null>(() => getPartnerOfferItems()[0]?.id ?? null);
-  const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const selectedId = searchParams?.get('id') ?? null;
+  const editorSection = (searchParams?.get('tab') as PartnerOfferEditorSection) || 'details';
+  const offersPageParam = parseInt(searchParams?.get('page') || '1', 10);
+  const offersPage = isNaN(offersPageParam) || offersPageParam < 1 ? 1 : offersPageParam;
+
+  const updateQueryParams = React.useCallback((updates: Record<string, string | null>, historyAction: 'push' | 'replace' = 'replace') => {
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    for (const [k, v] of Object.entries(updates)) {
+      if (v === null) params.delete(k);
+      else params.set(k, v);
+    }
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (historyAction === 'push') {
+      router.push(newUrl, { scroll: false });
+    } else {
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, pathname, router]);
+
+  const setSelectedId = React.useCallback((id: string | null) => {
+    updateQueryParams({ id, tab: 'details' }, 'push');
+  }, [updateQueryParams]);
+
+  const setEditorSection = React.useCallback((tab: PartnerOfferEditorSection) => {
+    updateQueryParams({ tab }, 'replace');
+  }, [updateQueryParams]);
+
+  const setOffersPage = React.useCallback((page: number | ((p: number) => number)) => {
+    const nextPage = typeof page === 'function' ? page(offersPage) : page;
+    updateQueryParams({ page: nextPage.toString() }, 'replace');
+  }, [offersPage, updateQueryParams]);
+
   const [draft, setDraft] = React.useState<Partial<PartnerOfferRecord>>({});
   const [pipelineFilter, setPipelineFilter] = React.useState<PartnerOfferStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [offersPage, setOffersPage] = React.useState(1);
-  const [editorSection, setEditorSection] = React.useState<PartnerOfferEditorSection>('details');
   const [publishGuardMessage, setPublishGuardMessage] = React.useState<string | null>(null);
-
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
+  const [rejectConfirmId, setRejectConfirmId] = React.useState<string | null>(null);
+  const [archiveConfirmId, setArchiveConfirmId] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (selected) {
       setDraft({ ...selected });
@@ -57,16 +122,20 @@ export function PartnerOffersCommandDeckScreen() {
         eligibility: '',
         displayBadge: '',
         marginRiskNote: '',
+        rejectionReason: '',
         linkedCampaignId: '',
         activeFromDate: '',
         activeToDate: '',
       });
     }
-  }, [selectedId, items]);
+  }, [selected]);
 
-  const kpis = React.useMemo(() => getPartnerOfferKpis(), [items]);
+  const kpis = React.useMemo(() => getPartnerOfferKpis(), [summaries]);
 
-  const refresh = () => setItems(getPartnerOfferItems());
+  const refresh = () => {
+    loadData();
+    if (selectedId) setSelected(getPartnerOfferDetail(selectedId));
+  };
 
   const handleCreateNew = () => {
     setPublishGuardMessage(null);
@@ -91,55 +160,53 @@ export function PartnerOffersCommandDeckScreen() {
     setSelectedId(saved.id);
   };
 
+  const [summaries, setSummaries] = React.useState<PartnerOfferSummary[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [selected, setSelected] = React.useState<PartnerOfferRecord | null>(null);
+
+  const loadData = React.useCallback(() => {
+    const result = getPartnerOfferSummaries({
+      page: offersPage,
+      pageSize: partnerOffersPageSize,
+      search: searchQuery,
+      status: pipelineFilter,
+    });
+    setSummaries(result.items);
+    setTotalItems(result.total);
+  }, [offersPage, searchQuery, pipelineFilter]);
+
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  React.useEffect(() => {
+    if (selectedId) {
+      setSelected(getPartnerOfferDetail(selectedId));
+    } else if (summaries.length > 0 && !selectedId) {
+      const newUrl = `${pathname}?id=${summaries[0].id}&tab=details&page=${offersPage}`;
+      router.replace(newUrl, { scroll: false });
+    } else {
+      setSelected(null);
+    }
+  }, [selectedId, summaries, pathname, router, offersPage]);
+
   const setStatus = (id: string, newStatus: PartnerOfferStatus) => {
-    const item = items.find(i => i.id === id);
+    const item = getPartnerOfferDetail(id);
     if (!item) return;
     upsertPartnerOfferItem({ ...item, status: newStatus });
     refresh();
   };
 
-  const filteredItems = React.useMemo(() => {
-    let base = items;
-    if (pipelineFilter !== 'all') {
-      base = base.filter(i => i.status === pipelineFilter);
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      base = base.filter(i => i.title.toLowerCase().includes(q) || i.partnerName.toLowerCase().includes(q));
-    }
-    return base;
-  }, [items, pipelineFilter, searchQuery]);
-
-  const offersTotalPages = Math.max(1, Math.ceil(filteredItems.length / partnerOffersPageSize));
-  const visibleItems = React.useMemo(() => {
-    const startIndex = (offersPage - 1) * partnerOffersPageSize;
-    return filteredItems.slice(startIndex, startIndex + partnerOffersPageSize);
-  }, [filteredItems, offersPage]);
+  const offersTotalPages = Math.max(1, Math.ceil(totalItems / partnerOffersPageSize));
+  const visibleItems = summaries;
 
   React.useEffect(() => {
     setOffersPage((currentPage) => Math.min(currentPage, offersTotalPages));
-  }, [offersTotalPages]);
+  }, [offersTotalPages, setOffersPage]);
 
   React.useEffect(() => {
     setOffersPage(1);
   }, [pipelineFilter, searchQuery]);
-
-  React.useEffect(() => {
-    if (selectedId === null) {
-      return;
-    }
-
-    if (filteredItems.length === 0) {
-      setSelectedId(null);
-      return;
-    }
-
-    if (filteredItems.some((item) => item.id === selectedId)) {
-      return;
-    }
-
-    setSelectedId(filteredItems[0].id);
-  }, [filteredItems, selectedId]);
 
   type OfferTone = 'default' | 'warning' | 'brand' | 'success' | 'danger';
 
@@ -178,13 +245,20 @@ export function PartnerOffersCommandDeckScreen() {
   };
 
   const handlePublish = (id: string) => {
-    const item = items.find(i => i.id === id);
+    const item = getPartnerOfferDetail(id);
     if (!item) return;
     const errors = validatePartnerOfferForPublish(item as unknown as Parameters<typeof validatePartnerOfferForPublish>[0]);
     if (errors.length > 0) {
       setPublishGuardMessage(errors[0] ?? 'تعذر نشر العرض قبل استكمال متطلبات الحوكمة.');
       return;
     }
+
+    // Partner Override: Auto-pause old active offers for the same partner
+    const activePartnerOffers = getPartnerOfferItems().filter(i => i.status === 'published' && i.storeId === item.storeId && i.id !== item.id);
+    activePartnerOffers.forEach(oldOffer => {
+      pausePartnerOfferItem(oldOffer.id);
+    });
+
     setPublishGuardMessage(null);
     publishPartnerOfferItem(id);
     refresh();
@@ -195,30 +269,49 @@ export function PartnerOffersCommandDeckScreen() {
     const s = selected.status;
     return (
       <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-        {s === 'inbound' && <Button label="قبول للمراجعة" tone="secondary" size="sm" onPress={() => setStatus(selected.id, 'review')} />}
-        {s === 'review' && <Button label="جاهز للتسويق" tone="secondary" size="sm" onPress={() => { approvePartnerOfferItem(selected.id); refresh(); }} />}
-        {s === 'marketing-ready' && <Button label="نشر الآن" tone="success" size="sm" onPress={() => handlePublish(selected.id)} />}
-        {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => { pausePartnerOfferItem(selected.id); refresh(); }} />}
-        {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => handlePublish(selected.id)} />}
+        {s === 'inbound' && <Button label="قبول للمراجعة" tone="secondary" size="sm" onPress={() => setStatus(selected.id, 'review')} disabled={!hasPermission('marketing.approve')} />}
+        {s === 'review' && <Button label="جاهز للتسويق" tone="secondary" size="sm" onPress={() => { approvePartnerOfferItem(selected.id); refresh(); }} disabled={!hasPermission('marketing.approve')} />}
+        {s === 'review' && <Button label="إعادة للوارد" tone="ghost" size="sm" onPress={() => { setStatus(selected.id, 'inbound'); }} disabled={!hasPermission('marketing.approve')} />}
+        {s === 'marketing-ready' && <Button label="نشر الآن" tone="success" size="sm" onPress={() => handlePublish(selected.id)} disabled={!hasPermission('marketing.publish')} />}
+        {s === 'published' && <Button label="إيقاف" tone="danger" size="sm" onPress={() => { pausePartnerOfferItem(selected.id); refresh(); }} disabled={!hasPermission('marketing.publish')} />}
+        {s === 'paused' && <Button label="إعادة النشر" tone="success" size="sm" onPress={() => handlePublish(selected.id)} disabled={!hasPermission('marketing.publish')} />}
 
         {(s === 'inbound' || s === 'review') && (
-          <Button label="رفض" tone="danger" size="sm" onPress={() => {
-            rejectPartnerOfferItem(selected.id, 'لا يستوفي معايير السياسة التجارية.');
-            refresh();
-          }} />
+          rejectConfirmId === selected.id ? (
+            <>
+              <Button label="تأكيد الرفض" tone="danger" size="sm" onPress={() => { rejectPartnerOfferItem(selected.id, 'لا يستوفي معايير السياسة التجارية.'); setRejectConfirmId(null); refresh(); }} disabled={!hasPermission('marketing.approve')} />
+              <Button label="إلغاء" tone="ghost" size="sm" onPress={() => setRejectConfirmId(null)} />
+            </>
+          ) : (
+            <Button label="رفض" tone="danger" size="sm" onPress={() => setRejectConfirmId(selected.id)} disabled={!hasPermission('marketing.approve')} />
+          )
         )}
         {(s === 'published' || s === 'paused' || s === 'rejected') && (
-          <Button label="أرشفة" tone="ghost" size="sm" onPress={() => { archivePartnerOfferItem(selected.id); refresh(); }} />
+          archiveConfirmId === selected.id ? (
+            <>
+              <Button label="تأكيد الأرشفة" tone="ghost" size="sm" onPress={() => { archivePartnerOfferItem(selected.id); setArchiveConfirmId(null); refresh(); }} disabled={!hasPermission('marketing.edit')} />
+              <Button label="إلغاء" tone="ghost" size="sm" onPress={() => setArchiveConfirmId(null)} />
+            </>
+          ) : (
+            <Button label="أرشفة" tone="ghost" size="sm" onPress={() => setArchiveConfirmId(selected.id)} disabled={!hasPermission('marketing.edit')} />
+          )
         )}
 
-        <Button label="نسخ" tone="ghost" size="sm" onPress={handleDuplicate} />
-        <Button label="حذف" tone="danger" size="sm" onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); }} />
+        <Button label="نسخ" tone="ghost" size="sm" onPress={handleDuplicate} disabled={!hasPermission('marketing.edit')} />
+        {deleteConfirmId === selected.id ? (
+          <>
+            <Button label="تأكيد الحذف" tone="danger" size="sm" onPress={() => { removePartnerOfferItem(selected.id); setSelectedId(null); setDeleteConfirmId(null); refresh(); }} disabled={!hasPermission('marketing.delete')} />
+            <Button label="إلغاء" tone="ghost" size="sm" onPress={() => setDeleteConfirmId(null)} />
+          </>
+        ) : (
+          <Button label="حذف" tone="danger" size="sm" onPress={() => setDeleteConfirmId(selected.id)} disabled={!hasPermission('marketing.delete')} />
+        )}
       </Box>
     );
   };
 
   const renderStoreCardPreview = () => {
-    const mockContext = {
+    const simulatedContext = {
       storeId: draft.storeId || 'store-preview',
       activeOffers: draft.id && draft.status === 'published' ? [draft as PartnerOfferRecord] : [draft as PartnerOfferRecord],
       activeSubscriptions: [],
@@ -226,7 +319,7 @@ export function PartnerOffersCommandDeckScreen() {
       activeCampaigns: [],
       catalogFeatures: { priceMatch: true, hasNewProducts: false },
     };
-    const features = mapStoreCommercialFeatures(mockContext);
+    const features = mapStoreCommercialFeatures(simulatedContext);
 
     return (
       <Surface tone="inset" padding={4} gap={3}>
@@ -356,8 +449,8 @@ export function PartnerOffersCommandDeckScreen() {
         {/* Offers Table / List */}
         <Surface tone="raised" padding={0} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }} layoutDirection="row" justify="space-between" align="center">
-            <Text role="bodyStrong">العروض ({filteredItems.length})</Text>
-            <Button label="+ عرض جديد" tone="brand" size="sm" onPress={handleCreateNew} />
+            <Text role="bodyStrong">العروض ({totalItems})</Text>
+            <Button label="+ عرض جديد" tone="brand" size="sm" onPress={handleCreateNew} disabled={!hasPermission('marketing.edit')} />
           </Box>
           <Box padding={3} gap={3}>
             <TextField
@@ -393,7 +486,7 @@ export function PartnerOffersCommandDeckScreen() {
             <WebControlPanelCompactPager
               page={offersPage}
               totalPages={offersTotalPages}
-              summaryLabel={`عرض ${visibleItems.length} من ${filteredItems.length} عروض`}
+              summaryLabel={`عرض ${visibleItems.length} من ${totalItems} عروض`}
               onPrevious={offersPage > 1 ? () => setOffersPage((currentPage) => currentPage - 1) : undefined}
               onNext={offersPage < offersTotalPages ? () => setOffersPage((currentPage) => currentPage + 1) : undefined}
             />
@@ -432,7 +525,7 @@ export function PartnerOffersCommandDeckScreen() {
             {renderEditorContent()}
 
             <Box layoutDirection="row" justify="flex-end" paddingY={4} style={{ marginTop: 'auto' }}>
-              <Button label="حفظ التعديلات" tone="brand" onPress={handleSave} />
+              <Button label="حفظ التعديلات" tone="brand" onPress={handleSave} disabled={!hasPermission('marketing.edit')} />
             </Box>
           </Box>
         </Surface>

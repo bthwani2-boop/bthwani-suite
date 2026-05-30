@@ -4,16 +4,42 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
+import { useRouter } from 'next/navigation';
 import {
   getGrowthRecommendations,
   type GrowthRecommendation,
 } from '../../data/marketing.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import type { PartnerOfferRecord } from '../../data/offers.preview-data';
+import { getPartnerOfferItems, type PartnerOfferRecord } from '../../data/offers.preview-data';
 import type { SubscriptionPlan, Entitlement } from '../../data/subscriptions.preview-data';
 import type { CampaignRecord } from '../../data/marketing.preview-data';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 export type GrowthCommandDeckScreenProps = {
   hubHref?: string;
   operationsHref?: string;
@@ -22,13 +48,63 @@ export type GrowthCommandDeckScreenProps = {
 
 const growthRecommendationsPageSize = 5;
 
+function getRecommendationIcon(type: GrowthRecommendation['type']): string {
+  switch (type) {
+    case 'opportunity': return '◆';
+    case 'gap': return '◎';
+    case 'risk': return '▲';
+    default: return '·';
+  }
+}
+
+function getSeverityLabel(severity: string): string {
+  switch (severity) {
+    case 'critical': return 'حرج جداً';
+    case 'high': return 'مرتفع الأهمية';
+    case 'medium': return 'متوسط';
+    case 'low': return 'منخفض';
+    default: return severity;
+  }
+}
+
+function getConfidenceLabel(confidence: string): string {
+  switch (confidence) {
+    case 'high': return 'موثوقية عالية (نظام الذكاء)';
+    case 'medium': return 'موثوقية متوسطة';
+    case 'low': return 'موثوقية منخفضة';
+    default: return confidence;
+  }
+}
+
+const SEVERITY_ORDER: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+
+function sortGrowthRecommendationsBySeverity(recs: GrowthRecommendation[]): GrowthRecommendation[] {
+  return [...recs].sort((a, b) => (SEVERITY_ORDER[a.severity] ?? 4) - (SEVERITY_ORDER[b.severity] ?? 4));
+}
+
+function getActionTabLabel(tab: string): string {
+  switch (tab) {
+    case 'campaigns': return 'الحملات';
+    case 'partners': return 'الشركاء';
+    case 'loyalty': return 'الولاء';
+    case 'media-review': return 'مراجعة الميديا';
+    case 'signals': return 'الإشارات';
+    case 'visibility': return 'الظهور';
+    case 'videos': return 'الفيديو';
+    case 'promos': return 'البروموهات';
+    case 'banners': return 'البنرات';
+    default: return tab;
+  }
+}
+
 export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab }: GrowthCommandDeckScreenProps) {
   const { theme } = useTheme();
+  const router = useRouter();
   const recommendations = React.useMemo(() => getGrowthRecommendations(), []);
   const [selectedRecId, setSelectedRecId] = React.useState<string | null>(recommendations[0]?.id || null);
   const [recommendationsPage, setRecommendationsPage] = React.useState(1);
   const sortedRecommendations = React.useMemo(
-    () => [...recommendations].sort((a, b) => b.severity === 'critical' ? 1 : -1),
+    () => sortGrowthRecommendationsBySeverity(recommendations),
     [recommendations]
   );
   const totalPages = Math.max(1, Math.ceil(sortedRecommendations.length / growthRecommendationsPageSize));
@@ -59,15 +135,6 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
     setRecommendationsPage(Math.floor(selectedIndex / growthRecommendationsPageSize) + 1);
   }, [selectedRecId, sortedRecommendations]);
 
-  const renderRecommendationIcon = (type: GrowthRecommendation['type']) => {
-    switch (type) {
-      case 'opportunity': return '';
-      case 'gap': return '';
-      case 'risk': return '';
-      default: return '';
-    }
-  };
-
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return theme.danger;
@@ -77,61 +144,9 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
     }
   };
 
-  const getSeverityLabel = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'حرج جداً';
-      case 'high': return 'مرتفع الأهمية';
-      case 'medium': return 'متوسط';
-      case 'low': return 'منخفض';
-      default: return severity;
-    }
-  };
-
-  const getConfidenceLabel = (confidence: string) => {
-    switch (confidence) {
-      case 'high': return 'موثوقية عالية (نظام الذكاء)';
-      case 'medium': return 'موثوقية متوسطة';
-      case 'low': return 'موثوقية منخفضة';
-      default: return confidence;
-    }
-  };
-
   const parityContext = React.useMemo(() => ({
     storeId: 'preview-store-1',
-    activeOffers: [
-      {
-        id: 'off-1',
-        title: 'خصم 20%',
-        partnerName: 'شريك نمو',
-        storeId: 'store-preview-1',
-        storeLabel: 'المتجر التجريبي',
-        productId: '',
-        productLabel: '',
-        category: 'العروض',
-        offerType: 'discount',
-        status: 'published',
-        source: 'marketing',
-        valueLabel: '20%',
-        eligibility: 'الكل',
-        displayBadge: 'خصم 20%',
-      },
-      {
-        id: 'off-2',
-        title: 'توصيل مجاني',
-        partnerName: 'شريك نمو',
-        storeId: 'store-preview-1',
-        storeLabel: 'المتجر التجريبي',
-        productId: '',
-        productLabel: '',
-        category: 'العروض',
-        offerType: 'free-delivery',
-        status: 'draft',
-        source: 'marketing',
-        valueLabel: 'توصيل مجاني',
-        eligibility: 'الكل',
-        displayBadge: 'توصيل مجاني',
-      },
-    ] as PartnerOfferRecord[],
+    activeOffers: getPartnerOfferItems().filter(o => o.status === 'published').slice(0, 2) as PartnerOfferRecord[],
     activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [], status: 'active' }] as SubscriptionPlan[],
     activeEntitlements: [{ id: 'ent-1', type: 'loyalty-reward', referenceId: 'sub-pro', status: 'active', source: 'loyalty' }] as Entitlement[],
     activeCampaigns: [] as CampaignRecord[],
@@ -178,11 +193,17 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
   return (
     <Box gap={4} padding={4} style={{ flex: 1 }}>
       <Surface tone="raised" gap={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.line, padding: 16 }}>
-        <Box gap={1}>
-          <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
-          <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', textAlign: 'right' }}>التوصيات والفرص الذكية</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يتم استنتاج هذه التوصيات بناءً على تحليل فجوات الكتالوج، الحملات، والولاء.</Text>
-        </Box>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Box gap={1} style={{ flex: 1 }}>
+            <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
+            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', textAlign: 'right' }}>التوصيات والفرص الذكية</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يتم استنتاج هذه التوصيات بناءً على تحليل فجوات الكتالوج، الحملات، والولاء.</Text>
+          </Box>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            {hubHref ? <Button label="المركز" tone="ghost" size="sm" fullWidth={false} onPress={() => router.push(hubHref)} /> : null}
+            {operationsHref ? <Button label="العمليات" tone="ghost" size="sm" fullWidth={false} onPress={() => router.push(operationsHref)} /> : null}
+          </View>
+        </View>
       </Surface>
 
       <Surface tone="inset" gap={3} style={{ borderRadius: 16, padding: 16, backgroundColor: theme.surfaceInset }}>
@@ -218,7 +239,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                     }}
                   >
                     <View style={{ justifyContent: 'center', alignItems: 'center', width: 32 }}>
-                      <Text style={{ fontSize: 20 }}>{renderRecommendationIcon(rec.type)}</Text>
+                      <Text style={{ fontSize: 20 }}>{getRecommendationIcon(rec.type)}</Text>
                     </View>
                     <Box style={{ flex: 1 }}>
                       <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{rec.title}</Text>
@@ -288,7 +309,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                       }
                     }}
                   />
-                  <Text role="caption" tone="muted" style={{ textAlign: 'center', fontSize: 10 }}>سيتم توجيهك إلى تبويب: {selectedRec.actionTargetTab}</Text>
+                  <Text role="caption" tone="muted" style={{ textAlign: 'center', fontSize: 10 }}>سيتم توجيهك إلى: {getActionTabLabel(selectedRec.actionTargetTab)}</Text>
                 </Box>
               </Surface>
             </Box>

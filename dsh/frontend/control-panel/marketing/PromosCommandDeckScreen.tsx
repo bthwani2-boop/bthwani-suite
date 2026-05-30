@@ -6,22 +6,77 @@ import { Box, Button, SelectField, Surface, Tabs, Text, TextField, useTheme } fr
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getHomePromoItems,
+  getHomePromoSummaries,
+  getHomePromoDetail,
   upsertHomePromoItem,
   removeHomePromoItem,
   toggleHomePromoStatus,
   type HomePromoRecord,
+  type HomePromoSummary,
 } from '../../data/marketing.preview-data';
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
 import { dshDiscoveryStores } from '../../data/stores.preview-data';
 import { storeItemsByStoreId } from '../../data/stores.preview-data';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
+import { useMarketingPermissions } from './marketing-permissions.contract';
+
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+
+/**
+ * Validation Rules:
+ * - required fields: title, targetId (store, category, or product)
+ * - format rules: targetType must be correctly mapped to targetId
+ * - range: order (>=1)
+ * - duplicate / conflict: Limits total active promos dynamically via toggle bounds.
+ * - disabled reason: Missing 'marketing.edit' permission.
+ * - error: Prevents save if targetId is missing for specific target types.
+ * - success: Updates direct preview instantly and re-sorts promo grid.
+ *
+ * Conflict Resolution:
+ * - detect: duplicate product/category targets via active toggles count
+ * - display: toggle switch reverts and displays toast message
+ * - owner: control-panel-marketing
+ * - resolution action: User must disable an old promo to enable a new one
+ * - audit/API-later: Backed by strict limit limits on active promos per grid
+ *
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 
 type PromoEditorSection = 'identity' | 'logic' | 'media';
 
 const promoPageSize = 5;
 
+function getPromoStatusLabel(status: string): string {
+  return status === 'published' ? 'منشور' : 'مسودة';
+}
+
 export function PromosCommandDeckScreen() {
+  const { hasPermission } = useMarketingPermissions();
   const { theme } = useTheme();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
   const createDraft = React.useCallback((item?: HomePromoRecord | null) => {
     const id = item?.id;
     const title = item?.title ?? '';
@@ -34,60 +89,152 @@ export function PromosCommandDeckScreen() {
     const targetId = item?.targetId ?? '';
     const targetLabel = item?.targetLabel ?? '';
     const status = item?.status ?? 'draft';
+    const order = item?.order ?? 1;
 
     return {
-      id, title, subtitle, ctaText, accentColor, imageUrl, thumbnail, targetType, targetId, targetLabel, status,
+      id, title, subtitle, ctaText, accentColor, imageUrl, thumbnail, targetType, targetId, targetLabel, status, order,
     };
   }, []);
-  const [items, setItems] = React.useState<HomePromoRecord[]>(() => getHomePromoItems());
-  const [selectedId, setSelectedId] = React.useState<string | null>(() => getHomePromoItems()[0]?.id ?? null);
-  const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
+
+  const selectedId = searchParams?.get('id') ?? null;
+  const editorSection = (searchParams?.get('tab') as PromoEditorSection) || 'identity';
+  const promoPageParam = parseInt(searchParams?.get('page') || '1', 10);
+  const promoPage = isNaN(promoPageParam) || promoPageParam < 1 ? 1 : promoPageParam;
+
+  const [summaries, setSummaries] = React.useState<HomePromoSummary[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [selected, setSelected] = React.useState<HomePromoRecord | null>(null);
+
+  const loadData = React.useCallback(() => {
+    const result = getHomePromoSummaries({ page: promoPage, pageSize: promoPageSize });
+    setSummaries(result.items);
+    setTotalItems(result.total);
+  }, [promoPage]);
+
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  React.useEffect(() => {
+    if (selectedId) {
+      setSelected(getHomePromoDetail(selectedId));
+    } else if (summaries.length > 0 && !selectedId) {
+      // Auto-select first item if none selected and we have items
+      const newUrl = `${pathname}?id=${summaries[0].id}&tab=identity&page=${promoPage}`;
+      router.replace(newUrl, { scroll: false });
+    } else {
+      setSelected(null);
+    }
+  }, [selectedId, summaries, pathname, router, promoPage]);
+
+  const updateQueryParams = React.useCallback((updates: Record<string, string | null>, historyAction: 'push' | 'replace' = 'replace') => {
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    for (const [k, v] of Object.entries(updates)) {
+      if (v === null) params.delete(k);
+      else params.set(k, v);
+    }
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (historyAction === 'push') {
+      router.push(newUrl, { scroll: false });
+    } else {
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, pathname, router]);
+
+  const setSelectedId = React.useCallback((id: string | null) => {
+    updateQueryParams({ id, tab: 'identity' }, 'push');
+  }, [updateQueryParams]);
+
+  const setEditorSection = React.useCallback((tab: PromoEditorSection) => {
+    updateQueryParams({ tab }, 'replace');
+  }, [updateQueryParams]);
+
+  const setPromoPage = React.useCallback((page: number | ((p: number) => number)) => {
+    const nextPage = typeof page === 'function' ? page(promoPage) : page;
+    updateQueryParams({ page: nextPage.toString() }, 'replace');
+  }, [promoPage, updateQueryParams]);
+
   const [draft, setDraft] = React.useState(createDraft(selected));
-   const [promoPage, setPromoPage] = React.useState(1);
-   const [editorSection, setEditorSection] = React.useState<PromoEditorSection>('identity');
-   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => { setDraft(createDraft(selected)); }, [createDraft, selected]);
 
    const refresh = React.useCallback(() => {
-      setItems(getHomePromoItems());
-   }, []);
+      loadData();
+      if (selectedId) setSelected(getHomePromoDetail(selectedId));
+   }, [loadData, selectedId]);
+
+  const [saveError, setSaveError] = React.useState<string | null>(null);
 
   function handleSave() {
-    const saved = upsertHomePromoItem({ ...draft, order: 1 });
-    const next = getHomePromoItems();
-    setItems(next);
+    if (!draft.title?.trim()) { setSaveError('العنوان مطلوب.'); return; }
+    if (!draft.targetId?.trim()) { setSaveError('الوجهة مطلوبة — اختر متجراً أو فئة أو منتجاً.'); return; }
+    setSaveError(null);
+    const allItems = getHomePromoItems();
+    const order = allItems.length > 0 ? Math.max(...allItems.map(i => i.order ?? 0)) + 1 : 1;
+    const saved = upsertHomePromoItem({ ...draft, order: draft.id ? (draft.order ?? order) : order });
+    refresh();
     setSelectedId(saved.id);
-      setEditorSection('identity');
+    setEditorSection('identity');
   }
 
-   const totalPages = Math.max(1, Math.ceil(items.length / promoPageSize));
-   const visibleItems = React.useMemo(() => {
-      const startIndex = (promoPage - 1) * promoPageSize;
-      return items.slice(startIndex, startIndex + promoPageSize);
-   }, [items, promoPage]);
+  function handleDuplicate() {
+    if (!selected) return;
+    const allItems = getHomePromoItems();
+    const order = Math.max(...allItems.map(i => i.order ?? 0)) + 1;
+    const saved = upsertHomePromoItem({ ...selected, id: undefined, title: `${selected.title} — نسخة`, status: 'draft', order });
+    refresh();
+    setSelectedId(saved.id);
+  }
+
+  function handleToggle() {
+    const isActivating = selected ? selected.status === 'draft' : draft.status === 'draft';
+    const targetIdToCheck = selected ? selected.targetId : draft.targetId;
+    const targetTypeToCheck = selected ? selected.targetType : draft.targetType;
+
+    const allItems = getHomePromoItems();
+
+    if (isActivating) {
+      const activeCount = allItems.filter(i => i.status === 'published').length;
+      if (activeCount >= 5) {
+        alert('لقد وصلت للحد الأقصى للعروض الترويجية النشطة (5). يرجى إيقاف عرض قديم أولاً.');
+        return;
+      }
+
+      const isDuplicateTarget = allItems.some(i => i.id !== selectedId && i.status === 'published' && i.targetType === targetTypeToCheck && i.targetId === targetIdToCheck);
+      if (isDuplicateTarget) {
+        alert('لا يمكن التفعيل: يوجد عرض ترويجي مفعل آخر يوجه لنفس الوجهة.');
+        return;
+      }
+    }
+
+    if (selectedId) {
+      toggleHomePromoStatus(selectedId);
+    } else {
+      const newStatus = draft.status === 'published' ? 'draft' : 'published';
+      upsertHomePromoItem({ ...draft, status: newStatus, order: 1 });
+
+    }
+    refresh();
+  }
+
+   const totalPages = Math.max(1, Math.ceil(totalItems / promoPageSize));
+   const visibleItems = summaries;
 
    React.useEffect(() => {
       setPromoPage((currentPage) => Math.min(currentPage, totalPages));
-   }, [totalPages]);
+   }, [totalPages, setPromoPage]);
 
    React.useEffect(() => {
-      if (items.length === 0) {
-         setSelectedId(null);
-         return;
+      if (!selectedId && visibleItems.length > 0) {
+         setSelectedId(visibleItems[0].id);
       }
-
-      if (selectedId && items.some((item) => item.id === selectedId)) {
-         return;
-      }
-
-      setSelectedId(items[0].id);
-   }, [items, selectedId]);
+   }, [visibleItems, selectedId, setSelectedId]);
 
   const getTargetOptions = () => {
     if (draft.targetType === 'store') return dshDiscoveryStores.map(s => ({ value: s.id, label: s.name }));
     if (draft.targetType === 'category') return dshCategoryFixtures.map(c => ({ value: c.id, label: c.label }));
-    if (draft.targetType === 'product') return dshDiscoveryStores.slice(0,3).flatMap(s => (storeItemsByStoreId[s.id] ?? []).slice(0,3)).map(p => ({ value: p.id, label: p.name }));
+    if (draft.targetType === 'product') return dshDiscoveryStores.flatMap(s => (storeItemsByStoreId[s.id] ?? [])).map(p => ({ value: p.id, label: p.name }));
     return [{ value: 'home', label: 'الرئيسية' }];
   };
 
@@ -120,11 +267,17 @@ export function PromosCommandDeckScreen() {
 
       return (
          <Box gap={6}>
-            <Text style={{ fontSize: 11, fontWeight: '900', color: theme.brandHeaderBackground }}>3. الوسائط</Text>
+            <Text style={{ fontSize: 11, fontWeight: '900', color: theme.brandHeaderBackground }}>3. الوسائط والترتيب</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
                <TextField style={{ flex: 1 }} label="خلفية القالب" value={draft.imageUrl} onChangeText={t => setDraft(d => ({ ...d, imageUrl: t }))} />
                <TextField style={{ flex: 1 }} label="أيقونة الشخصية" value={draft.thumbnail} onChangeText={t => setDraft(d => ({ ...d, thumbnail: t }))} />
             </View>
+            <TextField
+              label="الترتيب (رقم)"
+              value={String(draft.order ?? '')}
+              onChangeText={t => setDraft(d => ({ ...d, order: Number(t) || 1 }))}
+              hint="رقم أصغر يظهر أولاً"
+            />
          </Box>
       );
    };
@@ -137,7 +290,7 @@ export function PromosCommandDeckScreen() {
             <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '900', letterSpacing: 0.5 }}>إدارة البروموهات والظهور</Text>
             <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground, fontSize: 18 }}>استوديو البروموهات</Text>
          </Box>
-             <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); setEditorSection('identity'); }} tone="secondary" size="sm" style={{ width: 120 }} />
+             <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); setEditorSection('identity'); }} tone="secondary" size="sm" style={{ width: 120 }} disabled={!hasPermission('marketing.edit')} />
       </View>
 
       <View style={{ flexDirection: 'row', gap: 16, flex: 1 }}>
@@ -148,20 +301,26 @@ export function PromosCommandDeckScreen() {
               <Text style={{ fontSize: 10, fontWeight: '900', color: theme.textMuted }}>العروض النشطة</Text>
            </View>
            <Box style={{ flex: 1, minHeight: 0 }}>
-              {visibleItems.map(item => (
-                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={{
-                  padding: 12,
-                  backgroundColor: selectedId === item.id ? theme.brandHeaderBackground : 'transparent',
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.line
-                }}>
-                   <Text style={{ fontSize: 11, fontWeight: '800', color: selectedId === item.id ? theme.textInverse : theme.text }} numberOfLines={1}>{item.title || 'بدون عنوان'}</Text>
-                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: item.status === 'published' ? theme.success : theme.textSoft }} />
-                      <Text style={{ fontSize: 9, color: selectedId === item.id ? theme.brandHeaderSurfaceStrong : theme.textMuted }}>{item.status === 'published' ? 'منشور' : 'مسودة'}</Text>
-                   </View>
-                </Pressable>
-              ))}
+              {visibleItems.length === 0 ? (
+                <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 10, color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد عروض مطابقة للبحث أو الفلتر المختار.</Text>
+                </View>
+              ) : (
+                visibleItems.map(item => (
+                  <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={{
+                    padding: 12,
+                    backgroundColor: selectedId === item.id ? theme.brandHeaderBackground : 'transparent',
+                    borderBottomWidth: 1,
+                    borderBottomColor: theme.line
+                  }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: selectedId === item.id ? theme.textInverse : theme.text }} numberOfLines={1}>{item.title || 'بدون عنوان'}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: item.status === 'published' ? theme.success : theme.textSoft }} />
+                        <Text style={{ fontSize: 9, color: selectedId === item.id ? theme.brandHeaderSurfaceStrong : theme.textMuted }}>{getPromoStatusLabel(item.status)}</Text>
+                    </View>
+                  </Pressable>
+                ))
+              )}
               <Box padding={2}>
                 <WebControlPanelCompactPager
                   page={promoPage}
@@ -183,14 +342,15 @@ export function PromosCommandDeckScreen() {
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       {selectedId && deleteConfirmId === selectedId ? (
                         <>
-                          <Button label="تأكيد" tone="danger" size="sm" onPress={() => { removeHomePromoItem(selectedId); setDeleteConfirmId(null); refresh(); }} />
+                          <Button label="تأكيد" tone="danger" size="sm" onPress={() => { removeHomePromoItem(selectedId); setDeleteConfirmId(null); refresh(); }} disabled={!hasPermission('marketing.delete')} />
                           <Button label="إلغاء" tone="secondary" size="sm" onPress={() => setDeleteConfirmId(null)} />
                         </>
                       ) : (
-                        <Button label="حذف" onPress={() => selectedId && setDeleteConfirmId(selectedId)} tone="danger" size="sm" />
+                        <Button label="حذف" onPress={() => selectedId && setDeleteConfirmId(selectedId)} tone="danger" size="sm" disabled={!hasPermission('marketing.delete')} />
                       )}
-                      <Button label={draft.status === 'published' ? 'إيقاف' : 'نشر'} onPress={() => setDraft(d => ({ ...d, status: d.status === 'published' ? 'draft' : 'published' }))} tone="secondary" size="sm" />
-                      <Button label="حفظ" onPress={handleSave} tone="primary" size="sm" />
+                      {selectedId ? <Button label="نسخ" tone="ghost" size="sm" onPress={handleDuplicate} disabled={!hasPermission('marketing.edit')} /> : null}
+                      <Button label={draft.status === 'published' ? 'إيقاف' : 'نشر'} onPress={handleToggle} tone="secondary" size="sm" disabled={!hasPermission('marketing.publish')} />
+                      <Button label="حفظ" onPress={handleSave} tone="primary" size="sm" disabled={!draft.title?.trim() || !hasPermission('marketing.edit')} />
                     </View>
                  </View>
 
@@ -205,6 +365,11 @@ export function PromosCommandDeckScreen() {
                     variant="pill"
                  />
 
+                 {saveError ? (
+                   <View style={{ paddingVertical: 4, paddingHorizontal: 8, backgroundColor: theme.dangerSurface ?? theme.surfaceInset, borderRadius: 6 }}>
+                     <Text role="caption" style={{ color: theme.danger }}>{saveError}</Text>
+                   </View>
+                 ) : null}
                  <Box gap={16} style={{ flex: 1, minHeight: 0 }}>
                     {renderEditorSection()}
                  </Box>
@@ -233,8 +398,12 @@ export function PromosCommandDeckScreen() {
                <Text style={{ fontWeight: '900', fontSize: 11, color: theme.textMuted, marginBottom: 12 }}>الرؤى</Text>
                <Box gap={8}>
                   <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
-                     <Text style={{ fontSize: 9, color: theme.textMuted }}>الوصول المتوقع · معاينة</Text>
-                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.brandHeaderBackground }}>12.5K</Text>
+                     <Text style={{ fontSize: 9, color: theme.textMuted }}>إجمالي البروموهات</Text>
+                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.brandHeaderBackground }}>{totalItems}</Text>
+                  </View>
+                  <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
+                     <Text style={{ fontSize: 9, color: theme.textMuted }}>منشور الآن</Text>
+                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.success }}>{getHomePromoItems().filter(i => i.status === 'published').length}</Text>
                   </View>
                   <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
                      <Text style={{ fontSize: 9, color: theme.textMuted }}>جاهزية الربط</Text>

@@ -397,8 +397,16 @@ Discover and classify every UI element that appears functional but has no backin
 11. **إغلاق Navigation / Routing**: افحص route, registry, tab active state, breadcrumb, back behavior. ممنوع تبويب يغير الشكل فقط أو drawer بلا selected item.
 12. **إغلاق Data Loading Logic**: حدد summary load, detail-on-open, pagination, filtering. ممنوع تحميل كل شيء دفعة واحدة.
 13. **إغلاق Mutations كحدود لا Backend**: صنّف كل mutation (create, update, approve, rollback). لا backend/API بدون موافقة صريحة.
-14. **إغلاق Audit / History / Rollback Preview**: لكل action مهم (publish, approval, refund) حدد ما يثبت الـ history أو يعطي preview للمراجعة.
-15. **إغلاق Error Handling**: غطِّ network, validation, permission, not found, conflict. ممنوع catch صامت.
+14. **إغلاق Audit / History / Rollback Preview**: لكل action مهم حدد:
+    ```text
+    audit؟ history؟ rollback؟ reason/comment؟ before/after preview؟ UI-only؟ API-later؟
+    ```
+    مهم خصوصًا في: publish، approval، visibility، vars، finance، refund، provider policy.
+15. **إغلاق Error Handling**: غطِّ:
+    ```text
+    network / validation / permission / not found / conflict / stale data / blocked action / partial failure / retry
+    ```
+    ممنوع catch صامت أو success بلا نتيجة.
 16. **إغلاق Empty / Loading / Blocked / Disabled**: لكل جدول وقائمة حدد loading, empty, error, blocked. ممنوع جدول فارغ بلا empty state.
 17. **إغلاق Cross-Surface Consistency**: افحص المنطق عبر الأسطح (client, partner, control-panel). حدد الـ canonical owner والـ consumers.
 18. **إغلاق Security / Privacy / Secrets**: افحص secrets, tokens, private IDs. (شغل guard:secret-scan إذا لزم الأمر).

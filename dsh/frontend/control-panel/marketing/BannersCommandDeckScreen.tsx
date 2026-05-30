@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Pressable, StyleSheet, View, Image, type ImageStyle, type ViewStyle } from 'react-native';
 import { Box, Button, SearchField, SelectField, Surface, Tabs, Text, TextField, useDirection, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
@@ -8,6 +9,9 @@ import {
   computeMarketingBannerQuality,
   duplicateMarketingBannerItem,
   getMarketingBannerItems,
+  getMarketingBannerSummaries,
+  getMarketingBannerDetail,
+  type MarketingBannerSummary,
   getMarketingBannerKpis,
   removeMarketingBannerItem,
   toggleMarketingBannerStatus,
@@ -23,6 +27,47 @@ import { dshDiscoveryStores } from '../../data/stores.preview-data';
 import { storeItemsByStoreId } from '../../data/stores.preview-data';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 import { resolvePreviewColor } from '../../shared/dsh-preview-color';
+import { useMarketingPermissions } from './marketing-permissions.contract';
+
+/**
+ * Validation Rules:
+ * - required fields: title, imageUrl or mediaKey, actionTarget (if type is not subscription)
+ * - format rules: actionType must match the target logic (store, product, category, etc.)
+ * - range: position (>=1), autoplayIntervalMs (>=2500)
+ * - duplicate / conflict: Cannot activate a banner if another active banner occupies the same position.
+ * - disabled reason: Missing 'marketing.edit' or 'marketing.publish'.
+ * - error: Alerts "عنوان البنر مطلوب", "وجهة الحدث مطلوبة", "يوجد بنر مفعل آخر في الموضع"
+ * - success: Updates the live visual grid and switches active editor state.
+ *
+ * Conflict Resolution:
+ * - detect: duplicate product/category targets or position conflicts via array `some` checks
+ * - display: top-level error strings before saving
+ * - owner: control-panel-marketing
+ * - resolution action: Rejects publish action and blocks UI commit
+ * - audit/API-later: Relies on runtime position uniqueness constraints in the database
+ *
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 
 export type BannersCommandDeckScreenProps = {
   hubHref?: string;
@@ -346,17 +391,73 @@ function bannerActionTypeLabel(item: MarketingBannerRecord) {
   return 'اشتراك';
 }
 
-export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) {
+export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCommandDeckScreenProps) {
+  const { hasPermission } = useMarketingPermissions();
   const { direction } = useDirection();
   const { theme } = useTheme();
+  const router = useRouter();
   const isRtl = direction === 'rtl';
-  const [items, setItems] = React.useState<MarketingBannerRecord[]>(() => getMarketingBannerItems());
-  const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingBannerItems()[0]?.id ?? null);
-  const [bannersPage, setBannersPage] = React.useState(1);
-  const selected = React.useMemo(
-    () => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null),
-    [items, selectedId],
-  );
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const selectedId = searchParams?.get('id') ?? null;
+  const activeEditorTab = (searchParams?.get('tab') as EditorWorkspaceTab) || 'content';
+  const bannersPageParam = parseInt(searchParams?.get('page') || '1', 10);
+  const bannersPage = isNaN(bannersPageParam) || bannersPageParam < 1 ? 1 : bannersPageParam;
+
+  const [summaries, setSummaries] = React.useState<MarketingBannerSummary[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [selected, setSelected] = React.useState<MarketingBannerRecord | null>(null);
+
+  const loadData = React.useCallback(() => {
+    const result = getMarketingBannerSummaries({ page: bannersPage, pageSize: 5 });
+    setSummaries(result.items);
+    setTotalItems(result.total);
+  }, [bannersPage]);
+
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  React.useEffect(() => {
+    if (selectedId) {
+      setSelected(getMarketingBannerDetail(selectedId));
+    } else if (summaries.length > 0 && !selectedId) {
+      // Auto-select first item if none selected and we have items
+      const newUrl = `${pathname}?id=${summaries[0].id}&tab=content&page=${bannersPage}`;
+      router.replace(newUrl, { scroll: false });
+    } else {
+      setSelected(null);
+    }
+  }, [selectedId, summaries, pathname, router, bannersPage]);
+
+  const updateQueryParams = React.useCallback((updates: Record<string, string | null>, historyAction: 'push' | 'replace' = 'replace') => {
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    for (const [k, v] of Object.entries(updates)) {
+      if (v === null) params.delete(k);
+      else params.set(k, v);
+    }
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (historyAction === 'push') {
+      router.push(newUrl, { scroll: false });
+    } else {
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, pathname, router]);
+
+  const setSelectedId = React.useCallback((id: string | null) => {
+    updateQueryParams({ id, tab: 'content' }, 'push');
+  }, [updateQueryParams]);
+
+  const setActiveEditorTab = React.useCallback((tab: EditorWorkspaceTab) => {
+    updateQueryParams({ tab }, 'replace');
+  }, [updateQueryParams]);
+
+  const setBannersPage = React.useCallback((page: number | ((p: number) => number)) => {
+    const nextPage = typeof page === 'function' ? page(bannersPage) : page;
+    updateQueryParams({ page: nextPage.toString() }, 'replace');
+  }, [bannersPage, updateQueryParams]);
+
   const bannerDefaults = React.useMemo(() => ({
     accentColor: 'brandStrong',
     offerBadgeColor: 'brand',
@@ -372,7 +473,6 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   const [productCategoryFilter, setProductCategoryFilter] = React.useState<string>('all');
   const [offerSearch, setOfferSearch] = React.useState('');
   const [subscriptionSearch, setSubscriptionSearch] = React.useState('');
-  const [activeEditorTab, setActiveEditorTab] = React.useState<EditorWorkspaceTab>('content');
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -381,37 +481,21 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     }
   }, [bannerDefaults, selected]);
 
-  const kpis = React.useMemo(() => getMarketingBannerKpis(), [items]);
+  const kpis = React.useMemo(() => getMarketingBannerKpis(), [summaries]); // KPI relies on full data, adapter handles it internally
   const quality = React.useMemo(
     () => computeMarketingBannerQuality({ ...draft, position: Number.parseInt(draft.position, 10) || 0 } as unknown as Partial<MarketingBannerRecord>),
     [draft],
   );
-  const totalPages = Math.max(1, Math.ceil(items.length / 5));
-  const visibleItems = React.useMemo(() => {
-    const startIndex = (bannersPage - 1) * 5;
-    return items.slice(startIndex, startIndex + 5);
-  }, [bannersPage, items]);
+  const totalPages = Math.max(1, Math.ceil(totalItems / 5));
+  const visibleItems = summaries;
 
   React.useEffect(() => {
     setBannersPage((currentPage) => Math.min(currentPage, totalPages));
-  }, [totalPages]);
-
-  React.useEffect(() => {
-    if (!selectedId) {
-      return;
-    }
-
-    const selectedIndex = items.findIndex((item) => item.id === selectedId);
-    if (selectedIndex < 0) {
-      return;
-    }
-
-    setBannersPage(Math.floor(selectedIndex / 5) + 1);
-  }, [items, selectedId]);
+  }, [totalPages, setBannersPage]);
 
   function refresh() {
-    const nextItems = getMarketingBannerItems();
-    setItems(nextItems);
+    loadData();
+    if (selectedId) setSelected(getMarketingBannerDetail(selectedId));
   }
 
   function handleCreateNew() {
@@ -419,17 +503,68 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
     setDraft(createDraft(null, bannerDefaults));
   }
 
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+
   function handleSave() {
+    if (!draft.title?.trim()) { setSaveError('عنوان البنر مطلوب.'); return; }
+    if (!draft.imageUrl?.trim() && !draft.mediaKey?.trim()) { setSaveError('صورة البنر مطلوبة — أدخل رابط الصورة أو مفتاح الوسائط.'); return; }
+    if (draft.actionType !== 'subscription' && !draft.actionTarget?.trim()) {
+      setSaveError('وجهة الحدث (Target) مطلوبة لهذا النوع من الإجراءات.'); return;
+    }
+
+    const allItems = getMarketingBannerItems();
+    const parsedPosition = Number.parseInt(draft.position as any, 10);
+    const resolvedPosition = Number.isFinite(parsedPosition) ? parsedPosition : (allItems.length + 1);
+
+    if (draft.status === 'published') {
+      const isDuplicatePos = allItems.some(i => i.id !== draft.id && i.status === 'published' && i.position === resolvedPosition);
+      if (isDuplicatePos) {
+        setSaveError(`يوجد بنر مفعل آخر في الموضع (${resolvedPosition}). يرجى تغيير الموضع لتجنب التعارض.`);
+        return;
+      }
+      if (draft.actionType === 'product' || draft.actionType === 'category') {
+        const isDuplicateTarget = allItems.some(i => i.id !== draft.id && i.status === 'published' && i.actionType === draft.actionType && i.actionTarget === draft.actionTarget);
+        if (isDuplicateTarget) {
+          setSaveError(`يوجد بنر مفعل آخر يوجه لنفس الـ ${draft.actionType === 'product' ? 'منتج' : 'فئة'} لتجنب تكرار التوجيهات.`);
+          return;
+        }
+      }
+      if (draft.mediaKey === 'placeholder' || draft.imageUrl?.includes('placeholder')) {
+         setSaveError('لا يمكن نشر البنر باستخدام صورة وهمية (Placeholder). يرجى توفير وسائط حقيقية.');
+         return;
+      }
+    }
+
+    setSaveError(null);
     const saved = upsertMarketingBannerItem({
       ...draft,
-      position: Number.parseInt(draft.position, 10) || undefined,
-      autoplayIntervalMs: Math.max(2500, Number.parseInt(draft.autoplayIntervalMs, 10) || 4500),
+      position: resolvedPosition,
+      autoplayIntervalMs: Math.max(2500, Number.parseInt(draft.autoplayIntervalMs as any, 10) || 4500),
     } as unknown as Partial<MarketingBannerRecord>);
     refresh();
     setSelectedId(saved.id);
   }
 
   function handleToggle(item: MarketingBannerRecord) {
+    const allItems = getMarketingBannerItems();
+    if (item.status === 'draft') {
+      const isDuplicatePos = allItems.some(i => i.id !== item.id && i.status === 'published' && i.position === item.position);
+      if (isDuplicatePos) {
+        alert(`لا يمكن التفعيل: يوجد بنر مفعل آخر في الموضع (${item.position}).`);
+        return;
+      }
+      if (item.actionType === 'product' || item.actionType === 'category') {
+        const isDuplicateTarget = allItems.some(i => i.id !== item.id && i.status === 'published' && i.actionType === item.actionType && i.actionTarget === item.actionTarget);
+        if (isDuplicateTarget) {
+          alert(`لا يمكن التفعيل: يوجد بنر مفعل آخر يوجه لنفس الـ ${item.actionType === 'product' ? 'منتج' : 'فئة'}.`);
+          return;
+        }
+      }
+      if (item.mediaKey === 'placeholder' || item.imageUrl?.includes('placeholder')) {
+         alert('لا يمكن التفعيل: البنر يحتوي على صورة وهمية (Placeholder).');
+         return;
+      }
+    }
     toggleMarketingBannerStatus(item.id);
     refresh();
   }
@@ -742,6 +877,7 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
   );
   const resolvedDraftAccentColor = resolvePreviewColor(draft.accentColor || theme.brandHeaderBackground);
   const resolvedDraftOfferBadgeColor = resolvePreviewColor(draft.offerBadgeColor || theme.brand);
+  const bannerCtrPercent = `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`;
 
   const styles = React.useMemo(() => StyleSheet.create({
     workspaceRoot: {
@@ -1408,19 +1544,26 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             variant="pill"
           />
         </Box>
+        {saveError ? (
+          <View style={{ paddingHorizontal: 8, paddingVertical: 6, backgroundColor: theme.dangerSurface ?? theme.surfaceInset, borderRadius: 8, marginBottom: 4 }}>
+            <Text role="caption" style={{ color: theme.danger }}>{saveError}</Text>
+          </View>
+        ) : null}
         <View style={styles.actionButtonsRow}>
-          <Button label="جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} />
-          <Button label="تكرار" tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleDuplicate(selected)} />
-          <Button label={selected?.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} disabled={!selected} onPress={() => selected && handleToggle(selected)} />
+          <Button label="جديد" tone="secondary" fullWidth={false} onPress={handleCreateNew} disabled={!hasPermission('marketing.edit')} />
+          <Button label="تكرار" tone="secondary" fullWidth={false} disabled={!selected || !hasPermission('marketing.edit')} onPress={() => selected && handleDuplicate(selected)} />
+          <Button label={selected?.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} disabled={!selected || !hasPermission('marketing.publish')} onPress={() => selected && handleToggle(selected)} />
           {deleteConfirmId === selected?.id ? (
             <>
-              <Button label="تأكيد الحذف" tone="danger" fullWidth={false} onPress={() => selected && handleDelete(selected)} />
+              <Button label="تأكيد الحذف" tone="danger" fullWidth={false} onPress={() => selected && handleDelete(selected)} disabled={!hasPermission('marketing.delete')} />
               <Button label="إلغاء" tone="secondary" fullWidth={false} onPress={() => setDeleteConfirmId(null)} />
             </>
           ) : (
-            <Button label="حذف" tone="danger" fullWidth={false} disabled={!selected} onPress={() => selected && setDeleteConfirmId(selected.id)} />
+            <Button label="حذف" tone="danger" fullWidth={false} disabled={!selected || !hasPermission('marketing.delete')} onPress={() => selected && setDeleteConfirmId(selected.id)} />
           )}
-          <Button label="حفظ" tone="primary" fullWidth={false} onPress={handleSave} style={{ paddingHorizontal: 24 }} />
+          <Button label="حفظ" tone="primary" fullWidth={false} onPress={handleSave} disabled={!draft.title?.trim() || !hasPermission('marketing.edit')} style={{ paddingHorizontal: 24 }} />
+          {hubHref ? <Button label="المركز" tone="ghost" fullWidth={false} onPress={() => router.push(hubHref)} /> : null}
+          {operationsHref ? <Button label="العمليات" tone="ghost" fullWidth={false} onPress={() => router.push(operationsHref)} /> : null}
         </View>
       </View>
     </Box>
@@ -1434,15 +1577,15 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
             <Text role="caption" style={{ color: theme.brand, fontWeight: '900', letterSpacing: 0.5 }}>لوحة إدارة المحتوى الإعلاني</Text>
             <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground, fontSize: 24 }}>استوديو البنرات</Text>
           </Box>
-          <Button label="إضافة بنر جديد" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: theme.brandHeaderBackground, borderRadius: 10, height: 38 }} />
+          <Button label="إضافة بنر جديد" tone="primary" fullWidth={false} onPress={handleCreateNew} style={{ backgroundColor: theme.brandHeaderBackground, borderRadius: 10, height: 38 }} disabled={!hasPermission('marketing.edit')} />
         </View>
 
         <View style={styles.kpiGrid}>
           {[
-            { label: 'إجمالي البنرات', value: kpis.total, color: theme.brandHeaderBackground, bg: theme.surface },
-            { label: 'البنرات النشطة', value: kpis.live, color: theme.success, bg: theme.surface },
-            { label: 'مشاهدات اليوم', value: kpis.impressions, color: theme.brandHeaderBackground, bg: theme.surface },
-            { label: 'نسبة التفاعل', value: `${((kpis.clicks / (kpis.impressions || 1)) * 100).toFixed(1)}%`, color: theme.brand, bg: theme.surface },
+            { label: 'إجمالي البنرات', value: kpis.total.value, color: theme.brandHeaderBackground, bg: theme.surface },
+            { label: 'البنرات النشطة', value: kpis.live.value, color: theme.success, bg: theme.surface },
+            { label: 'مشاهدات اليوم', value: kpis.impressions.value, color: theme.brandHeaderBackground, bg: theme.surface },
+            { label: 'نسبة التفاعل', value: kpis.ctr.value, color: theme.brand, bg: theme.surface },
           ].map(k => (
             <View key={k.label} style={StyleSheet.flatten([styles.kpiCard, { backgroundColor: k.bg }])}>
               <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted }}>{k.label}</Text>
@@ -1510,25 +1653,31 @@ export function BannersCommandDeckScreen(_props: BannersCommandDeckScreenProps) 
         <Surface tone="raised" gap={3} style={styles.sidebarColumn}>
           <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground, paddingHorizontal: 4 }}>جميع الحملات</Text>
           <Box gap={3} style={styles.sidebarBody}>
-            {visibleItems.map(item => (
-              <Pressable
-                key={item.id}
-                onPress={() => setSelectedId(item.id)}
-                style={StyleSheet.flatten([styles.listCard, selectedId === item.id && styles.listCardSelected])}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={[styles.statusDot, { backgroundColor: item.status === 'published' ? theme.success : theme.disabledText }]} />
-                  <Box gap={0} style={{ flex: 1 }}>
-                    <Text role="bodySm" style={{ fontWeight: '900', color: selectedId === item.id ? theme.brandHeaderBackground : theme.text }} numberOfLines={1}>{item.title}</Text>
-                    <Text role="caption" tone="muted">{bannerActionTypeLabel(item)}</Text>
-                  </Box>
-                </View>
-              </Pressable>
-            ))}
+            {visibleItems.length === 0 ? (
+              <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.surfaceInset, borderRadius: 12 }}>
+                <Text style={{ color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد بنرات مطابقة للبحث أو الفلتر المختار.</Text>
+              </View>
+            ) : (
+              visibleItems.map(item => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => setSelectedId(item.id)}
+                  style={StyleSheet.flatten([styles.listCard, selectedId === item.id && styles.listCardSelected])}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <View style={[styles.statusDot, { backgroundColor: item.status === 'published' ? theme.success : theme.disabledText }]} />
+                    <Box gap={0} style={{ flex: 1 }}>
+                      <Text role="bodySm" style={{ fontWeight: '900', color: selectedId === item.id ? theme.brandHeaderBackground : theme.text }} numberOfLines={1}>{item.title}</Text>
+                      <Text role="caption" tone="muted">{bannerActionTypeLabel(item)}</Text>
+                    </Box>
+                  </View>
+                </Pressable>
+              ))
+            )}
             <WebControlPanelCompactPager
               page={bannersPage}
               totalPages={totalPages}
-              summaryLabel={`عرض ${visibleItems.length} من ${items.length} بنرات`}
+              summaryLabel={`عرض ${visibleItems.length} من ${totalItems} بنرات`}
               onPrevious={bannersPage > 1 ? () => setBannersPage((currentPage) => currentPage - 1) : undefined}
               onNext={bannersPage < totalPages ? () => setBannersPage((currentPage) => currentPage + 1) : undefined}
             />

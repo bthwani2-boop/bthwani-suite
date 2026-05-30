@@ -1,10 +1,43 @@
 'use client';
 
 import React from 'react';
-import { Box } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+import {
+  getCampaignItems,
+  upsertCampaignItem,
+  getMarketingVideoItems,
+  upsertMarketingVideoItem,
+} from '../../data/marketing.preview-data';
+import { getPartnerOfferItems, approvePartnerOfferItem, rejectPartnerOfferItem } from '../../data/offers.preview-data';
+import { useMarketingPermissions } from './marketing-permissions.contract';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 type MarketingReviewKind = 'approval' | 'video';
 
 type MarketingReviewRow = Record<'id' | 'title', string> & {
@@ -18,31 +51,58 @@ type MarketingReviewRow = Record<'id' | 'title', string> & {
   tone: 'brand' | 'best' | 'warning' | 'danger';
 };
 
-function buildMarketingRows(kind: MarketingReviewKind) {
-  const baseRows = kind === 'approval'
-    ? [
-        { id: 'campaign-approval', title: 'اعتماد الحملة', status: 'جاهز', blocker: 'بوابة الإصدار تحتاج مراجعة محلية نهائية.', evidence: 'دليل الحملة وبوابة الإصدار', tone: 'brand' as const },
-        { id: 'offer-review', title: 'مراجعة العرض', status: 'في الانتظار', blocker: 'نسخة العرض تحتاج وضوحاً قبل الإصدار.', evidence: 'نسخة العرض ودليل السياسة', tone: 'warning' as const },
-        { id: 'handoff-review', title: 'مراجعة التسليم', status: 'متابَع', blocker: 'تسليم الأسطح لا يزال يحتاج تأكيداً.', evidence: 'سلسلة التسليم ودليل المالك', tone: 'best' as const },
-      ]
-    : [
-        { id: 'video-review', title: 'مراجعة الفيديو', status: 'جاهز', blocker: 'التقديم يحتاج اعتماداً نهائياً أو تعديلاً.', evidence: 'دليل الفيديو وبوابة الإصدار', tone: 'brand' as const },
-        { id: 'banner-review', title: 'مراجعة البنر', status: 'في الانتظار', blocker: 'النسخة المرئية لا تزال تحتاج قراراً محلياً.', evidence: 'دليل البنر وتسليم المسار', tone: 'warning' as const },
-        { id: 'growth-review', title: 'مراجعة النمو', status: 'متابَع', blocker: 'دليل مسار النمو لا يزال ظاهراً.', evidence: 'دليل النمو وتسليم المالك', tone: 'best' as const },
-      ];
+function buildMarketingRows(kind: MarketingReviewKind): MarketingReviewRow[] {
+  if (kind === 'approval') {
+    const pendingCampaigns = getCampaignItems().filter(c => c.status === 'pending');
+    const reviewOffers = getPartnerOfferItems().filter(o => o.status === 'review');
+    const campaignRows: MarketingReviewRow[] = pendingCampaigns.map(c => ({
+      id: c.id,
+      title: c.title,
+      status: 'بانتظار الموافقة',
+      ownerSurface: 'marketing',
+      blocker: `الحملة "${c.title}" بانتظار اعتماد التسويق قبل النشر.`,
+      evidence: `الهدف: ${c.goal} · الأولوية: ${c.priority} · القنوات: ${c.channels.length}`,
+      primaryActionLabel: 'اعتماد ونشر',
+      secondaryActionLabel: 'إعادة للمسودة',
+      evidenceActionLabel: 'فتح تفاصيل الحملة',
+      tone: 'warning' as const,
+    }));
+    const offerRows: MarketingReviewRow[] = reviewOffers.map(o => ({
+      id: o.id,
+      title: o.title,
+      status: 'قيد المراجعة',
+      ownerSurface: 'marketing',
+      blocker: `عرض "${o.title}" من ${o.partnerName} — ينتظر اعتماد التسويق للانتقال إلى marketing-ready.`,
+      evidence: `النوع: ${o.offerType} · القيمة: ${o.valueLabel}`,
+      primaryActionLabel: 'قبول للتسويق',
+      secondaryActionLabel: 'رفض العرض',
+      evidenceActionLabel: 'فتح بوابة العرض',
+      tone: 'brand' as const,
+    }));
+    const rows = [...campaignRows, ...offerRows];
+    if (rows.length === 0) {
+      return [{ id: 'empty-approval', title: 'لا توجد عناصر تحتاج اعتماداً حالياً', status: 'فارغ', ownerSurface: 'marketing', blocker: 'كل الحملات والعروض في حالة مستقرة.', evidence: 'لا يوجد دليل مطلوب', primaryActionLabel: 'اعتماد', secondaryActionLabel: 'طلب تعديل', evidenceActionLabel: 'فتح التسليم', tone: 'best' as const }];
+    }
+    return rows;
+  }
 
-  return baseRows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    status: row.status,
+  const videoRows = getMarketingVideoItems().filter(v => v.reviewState === 'pending' || v.reviewState === 'none');
+  const rows: MarketingReviewRow[] = videoRows.map(v => ({
+    id: v.id,
+    title: v.title,
+    status: v.reviewState === 'pending' ? 'قيد المراجعة' : 'لم يُرسَل بعد',
     ownerSurface: 'marketing',
-    blocker: row.blocker,
-    evidence: row.evidence,
+    blocker: v.reviewState === 'pending' ? `الفيديو "${v.title}" ينتظر قرار الاعتماد أو الرفض.` : `الفيديو "${v.title}" لم يُرسَل للمراجعة بعد.`,
+    evidence: `المدة: ${v.durationSeconds}ث · الجمهور: ${v.audience}`,
     primaryActionLabel: 'اعتماد',
-    secondaryActionLabel: 'طلب تعديل',
-    evidenceActionLabel: kind === 'approval' ? 'فتح التسليم' : 'فتح الدليل',
-    tone: row.tone,
-  })) satisfies readonly MarketingReviewRow[];
+    secondaryActionLabel: 'رفض',
+    evidenceActionLabel: 'فتح الفيديو',
+    tone: v.reviewState === 'pending' ? 'warning' as const : 'brand' as const,
+  }));
+  if (rows.length === 0) {
+    return [{ id: 'empty-video', title: 'لا توجد فيديوهات بانتظار المراجعة', status: 'فارغ', ownerSurface: 'marketing', blocker: 'كل الفيديوهات معتمدة أو مرفوضة.', evidence: 'لا يوجد دليل مطلوب', primaryActionLabel: 'اعتماد', secondaryActionLabel: 'رفض', evidenceActionLabel: 'فتح الدليل', tone: 'best' as const }];
+  }
+  return rows;
 }
 
 type MarketingReviewBoardProps = Record<'title', string> & {
@@ -55,10 +115,60 @@ function MarketingReviewBoard({
   purpose,
   kind,
 }: MarketingReviewBoardProps) {
-  const items = React.useMemo(() => buildMarketingRows(kind), [kind]);
+  const { hasPermission } = useMarketingPermissions();
+  const [items, setItems] = React.useState(() => buildMarketingRows(kind));
+  const refresh = React.useCallback(() => setItems(buildMarketingRows(kind)), [kind]);
   const [selectedId, setSelectedId] = React.useState(items[0]?.id ?? null);
   const [lastAction, setLastAction] = React.useState('جاهز للمراجعة التسويقية');
+  const [confirmPending, setConfirmPending] = React.useState<{ targetRef: string; type: 'primary' | 'secondary'; label: string } | null>(null);
   const selectedItem = items.find((item) => item.id === selectedId) ?? items[0];
+
+  const applyPrimaryAction = React.useCallback((targetRef: string) => {
+    if (kind === 'approval') {
+      const campaigns = getCampaignItems();
+      const campaign = campaigns.find(c => c.id === targetRef);
+      if (campaign) { upsertCampaignItem({ ...campaign, status: 'published' }); refresh(); return; }
+      approvePartnerOfferItem(targetRef);
+      refresh();
+    } else {
+      const videos = getMarketingVideoItems();
+      const video = videos.find(v => v.id === targetRef);
+      if (video) { upsertMarketingVideoItem({ ...video, reviewState: 'approved' }); refresh(); }
+    }
+  }, [kind, refresh]);
+
+  const applySecondaryAction = React.useCallback((targetRef: string) => {
+    if (kind === 'approval') {
+      const campaigns = getCampaignItems();
+      const campaign = campaigns.find(c => c.id === targetRef);
+      if (campaign) { upsertCampaignItem({ ...campaign, status: 'draft' }); refresh(); return; }
+      const offers = getPartnerOfferItems();
+      const offer = offers.find(o => o.id === targetRef);
+      if (offer) { rejectPartnerOfferItem(offer.id, 'مرفوض من صف المراجعة التسويقية.'); refresh(); return; }
+    } else {
+      const videos = getMarketingVideoItems();
+      const video = videos.find(v => v.id === targetRef);
+      if (video) { upsertMarketingVideoItem({ ...video, reviewState: 'rejected' }); refresh(); }
+    }
+  }, [kind, refresh]);
+
+  const executeConfirm = React.useCallback(() => {
+    if (!confirmPending) return;
+    const item = items.find(i => i.id === confirmPending.targetRef);
+    if (!item) { setConfirmPending(null); return; }
+    if (confirmPending.type === 'primary') {
+      applyPrimaryAction(confirmPending.targetRef);
+      setLastAction(`${item.primaryActionLabel}: ${item.title}`);
+    } else {
+      applySecondaryAction(confirmPending.targetRef);
+      setLastAction(`${item.secondaryActionLabel}: ${item.title}`);
+    }
+    setConfirmPending(null);
+  }, [confirmPending, items, applyPrimaryAction, applySecondaryAction]);
+
+  const cancelConfirm = React.useCallback(() => setConfirmPending(null), []);
+
+  const selectedItem2 = selectedItem;
 
   return (
     <Box gap={4}>
@@ -88,6 +198,16 @@ function MarketingReviewBoard({
         ]}
       />
 
+      {confirmPending && (
+        <Surface tone="inset" padding={4} gap={3}>
+          <Text role="bodyStrong">{confirmPending.label}</Text>
+          <Box layoutDirection="row" gap={2}>
+            <Button label="تأكيد" tone="danger" size="sm" fullWidth={false} onPress={executeConfirm} disabled={confirmPending.type === 'primary' ? !hasPermission('marketing.approve') : !hasPermission('marketing.edit')} />
+            <Button label="إلغاء" tone="ghost" size="sm" fullWidth={false} onPress={cancelConfirm} />
+          </Box>
+        </Surface>
+      )}
+
       <ControlPanelDshActionQueue
         title={kind === 'approval' ? 'صف الاعتماد' : 'صف الفيديو'}
         purpose="اختر صفاً، اعتمد أو اطلب تعديلاً، ثم افتح الدليل أو التسليم محلياً."
@@ -95,12 +215,14 @@ function MarketingReviewBoard({
         selectedId={selectedId}
         onSelect={setSelectedId}
         primaryAction={(item) => {
+          if (item.id.startsWith('empty')) return;
           setSelectedId(item.id);
-          setLastAction(`اعتماد: ${item.title}`);
+          setConfirmPending({ targetRef: item.id, type: 'primary', label: `${item.primaryActionLabel}: "${item.title}"` });
         }}
         secondaryAction={(item) => {
+          if (item.id.startsWith('empty')) return;
           setSelectedId(item.id);
-          setLastAction(`طلب تعديل: ${item.title}`);
+          setConfirmPending({ targetRef: item.id, type: 'secondary', label: `${item.secondaryActionLabel}: "${item.title}"` });
         }}
         evidenceAction={(item) => {
           setSelectedId(item.id);
@@ -110,16 +232,16 @@ function MarketingReviewBoard({
 
       <WebControlPanelRecommendation
         title={kind === 'approval' ? 'تسليم التسويق' : 'دليل الفيديو'}
-        reason={selectedItem ? `${selectedItem.title} · ${selectedItem.evidence}` : 'اختر صفاً للمتابعة.'}
-        primaryAction={selectedItem ? {
+        reason={selectedItem2 ? `${selectedItem2.title} · ${selectedItem2.evidence}` : 'اختر صفاً للمتابعة.'}
+        primaryAction={selectedItem2 && !selectedItem2.id.startsWith('empty') ? {
           id: 'approve',
-          label: 'اعتماد',
-          onAction: () => selectedItem && setLastAction(`اعتماد: ${selectedItem.title}`),
+          label: selectedItem2.primaryActionLabel,
+          onAction: () => setConfirmPending({ targetRef: selectedItem2.id, type: 'primary', label: `${selectedItem2.primaryActionLabel}: "${selectedItem2.title}"` }),
         } : undefined}
-        secondaryAction={selectedItem ? {
+        secondaryAction={selectedItem2 && !selectedItem2.id.startsWith('empty') ? {
           id: 'edit',
-          label: 'طلب تعديل',
-          onAction: () => selectedItem && setLastAction(`طلب تعديل: ${selectedItem.title}`),
+          label: selectedItem2.secondaryActionLabel,
+          onAction: () => setConfirmPending({ targetRef: selectedItem2.id, type: 'secondary', label: `${selectedItem2.secondaryActionLabel}: "${selectedItem2.title}"` }),
         } : undefined}
       />
     </Box>

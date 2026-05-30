@@ -15,6 +15,9 @@ const PartnerOffersCommandDeckScreen = React.lazy(() => import('./PartnerOffersC
 const MarketingMediaReviewCommandDeckScreen = React.lazy(() => import('./MarketingMediaReviewCommandDeckScreen').then(m => ({ default: m.MarketingMediaReviewCommandDeckScreen })));
 const VisibilityCommandDeckScreen = React.lazy(() => import('./VisibilityCommandDeckScreen').then(m => ({ default: m.VisibilityCommandDeckScreen })));
 const TickerCommandDeckScreen = React.lazy(() => import('./TickerCommandDeckScreen').then(m => ({ default: m.TickerCommandDeckScreen })));
+const MarketingReviewQueueScreen = React.lazy(() => import('./MarketingReviewQueue').then(m => ({ default: m.MarketingReviewQueue })));
+const MarketingApprovalScreen = React.lazy(() => import('./MarketingReviewScreens').then(m => ({ default: m.ControlPanelDshMarketingApprovalScreen })));
+const VideoReviewScreen = React.lazy(() => import('./MarketingReviewScreens').then(m => ({ default: m.ControlPanelDshVideoSubmissionsReviewScreen })));
 
 function WorkspaceSkeleton() {
   return (
@@ -30,6 +33,31 @@ import { dshPromotionCandidates } from '../../shared/workflow';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { MarketingControlView } from './types';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 import {
   getCampaignItems,
   type CampaignAudience,
@@ -306,6 +334,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     { id: 'loyalty', label: 'المزايا والاشتراك', icon: '' },
     { id: 'growth', label: 'النمو', icon: '' },
     { id: 'signals', label: 'الإشارات والقياس', icon: '' },
+    { id: 'approval-queue', label: 'صف المراجعة', icon: '' },
+    { id: 'video-review', label: 'مراجعة الفيديو', icon: '' },
   ] as const;
 
   const SECONDARY_TABS: Record<MarketingControlView, { id: string; label: string }[]> = {
@@ -334,6 +364,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       { id: 'builder', label: 'المصمم' },
       { id: 'sync', label: 'المزامنة' },
     ],
+    'approval-queue': [],
+    'video-review': [],
   };
 
   React.useEffect(() => {
@@ -368,6 +400,10 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
         return <SmartSignalLayerScreen hubHref={props.hubHref} operationsHref={props.operationsHref} />;
       case 'loyalty':
         return <LoyaltyCommandDeckScreen />;
+      case 'approval-queue':
+        return <MarketingReviewQueueScreen />;
+      case 'video-review':
+        return <VideoReviewScreen />;
       default:
         return null;
     }

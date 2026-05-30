@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View, Image } from 'react-native';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Button,
@@ -16,24 +17,70 @@ import {
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getMarketingVideoItems,
+  getMarketingVideoSummaries,
+  getMarketingVideoDetail,
   getMarketingVideoKpis,
   upsertMarketingVideoItem,
   toggleMarketingVideoStatus,
   duplicateMarketingVideoItem,
   removeMarketingVideoItem,
   type MarketingVideoRecord,
+  type MarketingVideoSummary,
   type MarketingVideoStatus,
   type MarketingVideoAudience,
   type MarketingVideoSource,
   type MarketingVideoTargetType,
 } from '../../data/marketing.preview-data';
+import { useMarketingPermissions } from './marketing-permissions.contract';
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
 import { dshDiscoveryStores } from '../../data/stores.preview-data';
 import { storeItemsByStoreId } from '../../data/stores.preview-data';
 
+/**
+ * Validation Rules:
+ * - required fields: title, videoUrl, targetId (if targetType is not general like home/stores)
+ * - format rules: videoUrl must not contain spaces
+ * - range: durationSeconds (converted to Number)
+ * - duplicate / conflict: N/A (Handled via grid positioning and active status limit implicitly)
+ * - disabled reason: Missing 'marketing.edit' or 'marketing.publish' permissions.
+ * - error: Alerts "عنوان الفيديو مطلوب", "رابط الفيديو مطلوب", "رابط الفيديو يجب ألا يحتوي على مسافات"
+ * - success: Updates video grid and resets editor selection.
+ *
+ * Conflict Resolution:
+ * - detect: duplicate product/category targets across video entities
+ * - display: top-level error in editor or toggle switch bouncing back
+ * - owner: control-panel-marketing
+ * - resolution action: User must use unique targets or replace the old video
+ * - audit/API-later: Backed by runtime media validation checks on URL reachability
+ *
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
+
 export type VideosCommandDeckScreenProps = {
   hubHref?: string;
   operationsHref?: string;
+  activeSubTab?: string;
+  setActiveTab?: (tab: string) => void;
 };
 
 type VideoDraft = Record<'title' | 'subtitle' | 'videoUrl' | 'posterUrl' | 'durationSeconds' | 'ctaLabel' | 'highlight' | 'targetId' | 'targetExtra' | 'order', string> & {
@@ -84,28 +131,79 @@ const TARGET_TYPE_OPTIONS: Array<{ value: MarketingVideoTargetType; label: strin
   { value: 'store', label: 'متجر', description: 'يربط الفيديو بمتجر واحد محدد.' },
   { value: 'category', label: 'فئة', description: 'يربط الفيديو بفئة رئيسية داخل DSH.' },
   { value: 'subcategory', label: 'فئة فرعية', description: 'يفتح فئة فرعية بعد اختيار الفئة الأم.' },
-  { value: 'product', label: 'منتج', description: 'يربط الفيديو بمنتج داخل متجر محدد.' },
+  { value: 'product', label: 'منتج', description: 'يربط الفيديو بمنتج داخل متجر المحدد.' },
   { value: 'offer', label: 'عرض', description: 'يعرض متجرًا فيه عرض نشط وملفت.' },
   { value: 'campaign', label: 'حملة', description: 'يفتح وجهة حملات عامة ضمن القناة الحالية.' },
   { value: 'search', label: 'بحث', description: 'يفتح واجهة البحث.' },
   { value: 'custom', label: 'مخصص', description: 'مسار محدود ومضبوط عندما لا تكفي الخيارات المنظمة.' },
 ];
 
-export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
+export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosCommandDeckScreenProps) {
+  const { hasPermission } = useMarketingPermissions();
   const { theme } = useTheme();
   const { direction } = useDirection();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const isRtl = direction === 'rtl';
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
   // RTL Text styles helper
   const rtlText = { textAlign: isRtl ? 'right' : 'left', writingDirection: isRtl ? 'rtl' : 'ltr' } as const;
 
-  const [items, setItems] = React.useState<MarketingVideoRecord[]>(() => getMarketingVideoItems());
-  const [selectedId, setSelectedId] = React.useState<string | null>(() => getMarketingVideoItems()[0]?.id ?? null);
-  const selected = React.useMemo(() => (selectedId ? (items.find((item) => item.id === selectedId) ?? null) : null), [items, selectedId]);
+  const [summaries, setSummaries] = React.useState<MarketingVideoSummary[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [selected, setSelected] = React.useState<MarketingVideoRecord | null>(null);
+
+  const loadData = React.useCallback(() => {
+    const result = getMarketingVideoSummaries({ page: videosPage, pageSize: videosPageSize });
+    setSummaries(result.items);
+    setTotalItems(result.total);
+  }, [videosPage]);
+
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  React.useEffect(() => {
+    if (selectedId) {
+      setSelected(getMarketingVideoDetail(selectedId));
+    } else if (summaries.length > 0 && !selectedId) {
+      const newUrl = `${pathname}?id=${summaries[0].id}&tab=content&page=${videosPage}`;
+      router.replace(newUrl, { scroll: false });
+    } else {
+      setSelected(null);
+    }
+  }, [selectedId, summaries, pathname, router, videosPage]);
+
+  const updateQueryParams = React.useCallback((updates: Record<string, string | null>, historyAction: 'push' | 'replace' = 'replace') => {
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    for (const [k, v] of Object.entries(updates)) {
+      if (v === null) params.delete(k);
+      else params.set(k, v);
+    }
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (historyAction === 'push') {
+      router.push(newUrl, { scroll: false });
+    } else {
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, pathname, router]);
+
+  const setSelectedId = React.useCallback((id: string | null) => {
+    updateQueryParams({ id, tab: 'content' }, 'push');
+  }, [updateQueryParams]);
+
+  const setActiveEditorTab = React.useCallback((tab: EditorWorkspaceTab) => {
+    updateQueryParams({ tab }, 'replace');
+  }, [updateQueryParams]);
+
+  const setVideosPage = React.useCallback((page: number | ((p: number) => number)) => {
+    const nextPage = typeof page === 'function' ? page(videosPage) : page;
+    updateQueryParams({ page: nextPage.toString() }, 'replace');
+  }, [videosPage, updateQueryParams]);
+
   const [draft, setDraft] = React.useState<VideoDraft>(() => createDraft(selected));
-  const [activeEditorTab, setActiveEditorTab] = React.useState<EditorWorkspaceTab>('content');
-  const [videosPage, setVideosPage] = React.useState(1);
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -114,33 +212,18 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
     }
   }, [selected]);
 
-  const kpis = React.useMemo(() => getMarketingVideoKpis(), [items]);
+  const kpis = React.useMemo(() => getMarketingVideoKpis(), [summaries]);
 
-  const totalPages = Math.max(1, Math.ceil(items.length / videosPageSize));
-  const visibleItems = React.useMemo(() => {
-    const startIndex = (videosPage - 1) * videosPageSize;
-    return items.slice(startIndex, startIndex + videosPageSize);
-  }, [items, videosPage]);
+  const totalPages = Math.max(1, Math.ceil(totalItems / videosPageSize));
+  const visibleItems = summaries;
 
   React.useEffect(() => {
     setVideosPage((currentPage) => Math.min(currentPage, totalPages));
-  }, [totalPages]);
-
-  React.useEffect(() => {
-    if (!selectedId) {
-      return;
-    }
-
-    const selectedIndex = items.findIndex((item) => item.id === selectedId);
-    if (selectedIndex < 0) {
-      return;
-    }
-
-    setVideosPage(Math.floor(selectedIndex / videosPageSize) + 1);
-  }, [items, selectedId]);
+  }, [totalPages, setVideosPage]);
 
   function refresh() {
-    setItems(getMarketingVideoItems());
+    loadData();
+    if (selectedId) setSelected(getMarketingVideoDetail(selectedId));
   }
 
   function handleCreateNew() {
@@ -149,7 +232,33 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
     setActiveEditorTab('content');
   }
 
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+
   function handleSave() {
+    if (!draft.title?.trim()) { setSaveError('عنوان الفيديو مطلوب.'); return; }
+    if (!draft.videoUrl?.trim()) { setSaveError('رابط الفيديو مطلوب.'); return; }
+    if (draft.videoUrl.includes(' ')) { setSaveError('رابط الفيديو يجب ألا يحتوي على مسافات.'); return; }
+    if (draft.targetType && !['home', 'stores', 'loyalty'].includes(draft.targetType) && !draft.targetId?.trim()) {
+      setSaveError('الوجهة المستهدفة (Target ID) مطلوبة لهذا النوع.');
+      return;
+    }
+
+    if (draft.status === 'published') {
+      if (draft.videoUrl.includes('placeholder')) {
+         setSaveError('لا يمكن نشر فيديو باستخدام رابط وهمي (Placeholder). يرجى توفير وسائط حقيقية.');
+         return;
+      }
+      if (draft.targetType === 'product' || draft.targetType === 'category') {
+        const allItems = getMarketingVideoItems();
+        const isDuplicateTarget = allItems.some(i => i.id !== draft.id && i.status === 'published' && i.targetType === draft.targetType && i.targetId === draft.targetId);
+        if (isDuplicateTarget) {
+          setSaveError(`يوجد فيديو مفعل آخر يوجه لنفس الـ ${draft.targetType === 'product' ? 'منتج' : 'فئة'} لتجنب تكرار التوجيهات.`);
+          return;
+        }
+      }
+    }
+
+    setSaveError(null);
     const saved = upsertMarketingVideoItem({
       ...draft,
       durationSeconds: Number(draft.durationSeconds) || 0,
@@ -160,6 +269,20 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
   }
 
   function handleToggle(item: MarketingVideoRecord) {
+    if (item.status === 'draft') {
+      if (item.videoUrl.includes('placeholder')) {
+         alert('لا يمكن التفعيل: الفيديو يحتوي على رابط وهمي (Placeholder).');
+         return;
+      }
+      if (item.targetType === 'product' || item.targetType === 'category') {
+        const allItems = getMarketingVideoItems();
+        const isDuplicateTarget = allItems.some(i => i.id !== item.id && i.status === 'published' && i.targetType === item.targetType && i.targetId === item.targetId);
+        if (isDuplicateTarget) {
+          alert(`لا يمكن التفعيل: يوجد فيديو مفعل آخر يوجه لنفس الـ ${item.targetType === 'product' ? 'منتج' : 'فئة'}.`);
+          return;
+        }
+      }
+    }
     toggleMarketingVideoStatus(item.id);
     refresh();
   }
@@ -206,9 +329,9 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
 
           <View style={[styles.kpiRow]}>
             {[
-              { label: 'إجمالي المحتوى', value: kpis.total, color: theme.brandHeaderBackground, bg: theme.surface },
-              { label: 'نشط الآن', value: kpis.live, color: theme.success, bg: theme.surface },
-              { label: 'قيد المراجعة', value: kpis.review, color: theme.warning, bg: theme.surface },
+              { label: 'إجمالي المحتوى', value: kpis.total.value, color: theme.brandHeaderBackground, bg: theme.surface },
+              { label: 'نشط الآن', value: kpis.live.value, color: theme.success, bg: theme.surface },
+              { label: 'قيد المراجعة', value: kpis.review.value, color: theme.warning, bg: theme.surface },
             ].map((kpi) => (
               <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg, borderWidth: 1, borderColor: theme.lineStrong }]}>
                 <Text role="caption" style={[{ fontWeight: '800', fontSize: 10, color: theme.textMuted }, rtlText]}>{kpi.label}</Text>
@@ -230,31 +353,37 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
             <Text role="caption" tone="muted" style={rtlText}>{items.length} فيديوهات</Text>
           </View>
           <Box gap={2} style={styles.listBody}>
-            {visibleItems.map((item) => {
-              const isSelected = selected?.id === item.id;
-              return (
-                <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.compactRow, isSelected && styles.compactRowSelected]}>
-                  <View style={styles.compactPoster}>
-                    {item.posterUrl ? <Image source={{ uri: item.posterUrl }} style={styles.compactImage} resizeMode="cover" /> : null}
-                  </View>
-                  <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <View style={[styles.headerRow, { alignItems: 'center' }]}>
-                      <Text role="bodyStrong" numberOfLines={1} style={[{ flex: 1, fontSize: 13, color: theme.brandHeaderBackground }, rtlText]}>{item.title}</Text>
-                      <View style={[styles.statusBadge, { backgroundColor: item.status === 'published' ? theme.successSurface : theme.surfaceSecondary }]}>
-                        <Text role="caption" style={[{ color: item.status === 'published' ? theme.success : theme.textMuted, fontWeight: '900', fontSize: 9 }, rtlText]}>{statusLabel(item.status)}</Text>
+            {visibleItems.length === 0 ? (
+              <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.surfaceInset, borderRadius: 12 }}>
+                <Text style={{ color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد فيديوهات مطابقة للبحث أو الفلتر المختار.</Text>
+              </View>
+            ) : (
+              visibleItems.map((item) => {
+                const isSelected = selected?.id === item.id;
+                return (
+                  <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.compactRow, isSelected && styles.compactRowSelected]}>
+                    <View style={styles.compactPoster}>
+                      {item.posterUrl ? <Image source={{ uri: item.posterUrl }} style={styles.compactImage} resizeMode="cover" /> : null}
+                    </View>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                      <View style={[styles.headerRow, { alignItems: 'center' }]}>
+                        <Text role="bodyStrong" numberOfLines={1} style={[{ flex: 1, fontSize: 13, color: theme.brandHeaderBackground }, rtlText]}>{item.title}</Text>
+                        <View style={[styles.statusBadge, { backgroundColor: item.status === 'published' ? theme.successSurface : theme.surfaceSecondary }]}>
+                          <Text role="caption" style={[{ color: item.status === 'published' ? theme.success : theme.textMuted, fontWeight: '900', fontSize: 9 }, rtlText]}>{statusLabel(item.status)}</Text>
+                        </View>
+                      </View>
+                      <View style={[styles.headerRow, { gap: 6, marginTop: 4, justifyContent: 'flex-start' }]}>
+                        <Text role="caption" style={[{ color: theme.textMuted, fontSize: 10 }, rtlText]}>{item.durationSeconds}ث</Text>
+                        <Text role="caption" style={[{ color: theme.lineStrong, fontSize: 10 }, rtlText]}>•</Text>
+                        <Text role="caption" style={[{ color: theme.textMuted, fontSize: 10 }, rtlText]}>{TARGET_TYPE_OPTIONS.find(o => o.value === item.targetType)?.label}</Text>
+                        <Text role="caption" style={[{ color: theme.lineStrong, fontSize: 10 }, rtlText]}>•</Text>
+                        <Text role="caption" style={[{ color: theme.textMuted, fontSize: 10 }, rtlText]}>{item.source === 'partner' ? 'شريك' : 'داخلي'}</Text>
                       </View>
                     </View>
-                    <View style={[styles.headerRow, { gap: 6, marginTop: 4, justifyContent: 'flex-start' }]}>
-                      <Text role="caption" style={[{ color: theme.textMuted, fontSize: 10 }, rtlText]}>{item.durationSeconds}ث</Text>
-                      <Text role="caption" style={[{ color: theme.lineStrong, fontSize: 10 }, rtlText]}>•</Text>
-                      <Text role="caption" style={[{ color: theme.textMuted, fontSize: 10 }, rtlText]}>{TARGET_TYPE_OPTIONS.find(o => o.value === item.targetType)?.label}</Text>
-                      <Text role="caption" style={[{ color: theme.lineStrong, fontSize: 10 }, rtlText]}>•</Text>
-                      <Text role="caption" style={[{ color: theme.textMuted, fontSize: 10 }, rtlText]}>{item.source === 'partner' ? 'شريك' : 'داخلي'}</Text>
-                    </View>
-                  </View>
-                </Pressable>
-              );
-            })}
+                  </Pressable>
+                );
+              })
+            )}
             <WebControlPanelCompactPager
               page={videosPage}
               totalPages={totalPages}
@@ -269,20 +398,27 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
         <Surface tone="raised" style={styles.editorPanel}>
           <View style={[styles.panelHeader]}>
             <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>محرر الفيديو الذكي</Text>
-            <View style={[styles.headerRow, { gap: 8 }]}>
-              {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" size="sm" onPress={() => handleToggle(selected)} /> : null}
-              <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected} />
+            <View style={[styles.headerRow, { gap: 8, flexWrap: 'wrap' }]}>
+              {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" size="sm" onPress={() => handleToggle(selected)} disabled={!hasPermission('marketing.publish')} /> : null}
+              <Button label="نسخة" tone="ghost" size="sm" onPress={() => selected && handleDuplicate(selected)} disabled={!selected || !hasPermission('marketing.edit')} />
               {selected && deleteConfirmId === selected.id ? (
                 <>
                   <Button label="تأكيد الحذف" tone="danger" size="sm" onPress={() => handleDelete(selected)} />
                   <Button label="إلغاء" tone="ghost" size="sm" onPress={() => setDeleteConfirmId(null)} />
                 </>
               ) : (
-                <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && setDeleteConfirmId(selected.id)} disabled={!selected} />
+                <Button label="حذف" tone="ghost" size="sm" onPress={() => selected && setDeleteConfirmId(selected.id)} disabled={!selected || !hasPermission('marketing.delete')} />
               )}
-              <Button label="حفظ" tone="primary" size="sm" onPress={handleSave} />
+              <Button label="حفظ" tone="primary" size="sm" onPress={handleSave} disabled={!draft.title?.trim() || !draft.videoUrl?.trim()} />
+              {hubHref ? <Button label="المركز" tone="ghost" size="sm" onPress={() => router.push(hubHref)} /> : null}
+              {operationsHref ? <Button label="العمليات" tone="ghost" size="sm" onPress={() => router.push(operationsHref)} /> : null}
             </View>
           </View>
+          {saveError ? (
+            <View style={{ paddingHorizontal: 16, paddingVertical: 6, backgroundColor: theme.dangerSurface ?? theme.surfaceInset }}>
+              <Text role="caption" style={[{ color: theme.danger }, rtlText]}>{saveError}</Text>
+            </View>
+          ) : null}
 
           <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
             <Tabs<EditorWorkspaceTab>
@@ -466,6 +602,74 @@ export function VideosCommandDeckScreen(_: VideosCommandDeckScreenProps) {
                   </View>
                 </View>
                 <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} style={rtlText} />
+
+                <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12 }}>
+                  <Text role="caption" style={[{ fontWeight: '900', color: theme.textMuted }, rtlText]}>حالة المراجعة</Text>
+                  {draft.reviewState === 'none' && (
+                    <Button
+                      label="إرسال للمراجعة"
+                      tone="secondary"
+                      size="sm"
+                      fullWidth={false}
+                      onPress={() => {
+                        const updated = { ...draft, reviewState: 'pending' as const, durationSeconds: Number(draft.durationSeconds) || 0, order: Number(draft.order) || 0 };
+                        setDraft(d => ({ ...d, reviewState: 'pending' }));
+                        upsertMarketingVideoItem(updated);
+                        refresh();
+                      }}
+                    />
+                  )}
+                  {draft.reviewState === 'pending' && (
+                    <View style={[styles.headerRow, { gap: 8, justifyContent: 'flex-start' }]}>
+                      <Button
+                        label="اعتماد"
+                        tone="primary"
+                        size="sm"
+                        fullWidth={false}
+                        onPress={() => {
+                          const updated = { ...draft, reviewState: 'approved' as const, durationSeconds: Number(draft.durationSeconds) || 0, order: Number(draft.order) || 0 };
+                          setDraft(d => ({ ...d, reviewState: 'approved' }));
+                          upsertMarketingVideoItem(updated);
+                          refresh();
+                        }}
+                      />
+                      <Button
+                        label="رفض"
+                        tone="ghost"
+                        size="sm"
+                        fullWidth={false}
+                        onPress={() => {
+                          const updated = { ...draft, reviewState: 'rejected' as const, durationSeconds: Number(draft.durationSeconds) || 0, order: Number(draft.order) || 0 };
+                          setDraft(d => ({ ...d, reviewState: 'rejected' }));
+                          upsertMarketingVideoItem(updated);
+                          refresh();
+                        }}
+                      />
+                      <Button
+                        label="سحب الطلب"
+                        tone="ghost"
+                        size="sm"
+                        fullWidth={false}
+                        onPress={() => {
+                          const updated = { ...draft, reviewState: 'none' as const, durationSeconds: Number(draft.durationSeconds) || 0, order: Number(draft.order) || 0 };
+                          setDraft(d => ({ ...d, reviewState: 'none' }));
+                          upsertMarketingVideoItem(updated);
+                          refresh();
+                        }}
+                      />
+                    </View>
+                  )}
+                  {draft.reviewState === 'approved' && (
+                    <View style={[styles.statusBadge, { backgroundColor: theme.successSurface, alignSelf: 'flex-start' }]}>
+                      <Text role="caption" style={[{ color: theme.success, fontWeight: '900' }, rtlText]}>معتمد</Text>
+                    </View>
+                  )}
+                  {draft.reviewState === 'rejected' && (
+                    <View style={[styles.statusBadge, { backgroundColor: theme.dangerSurface ?? theme.surfaceInset, alignSelf: 'flex-start' }]}>
+                      <Text role="caption" style={[{ color: theme.danger, fontWeight: '900' }, rtlText]}>مرفوض</Text>
+                    </View>
+                  )}
+                </Surface>
               </Box>
             )}
           </Box>

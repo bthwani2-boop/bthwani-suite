@@ -1,1 +1,1 @@
-export type MarketingControlView = 'visibility' | 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals' | 'media-review';
+export type MarketingControlView = 'visibility' | 'ticker' | 'banners' | 'promos' | 'video' | 'campaigns' | 'partners' | 'loyalty' | 'growth' | 'signals' | 'media-review' | 'approval-queue' | 'video-review';

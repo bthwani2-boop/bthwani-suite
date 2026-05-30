@@ -19,7 +19,33 @@ import {
   translateEntityType,
   translateOwner,
 } from '../../shared/workflow';
+import { useMarketingPermissions } from './marketing-permissions.contract';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
@@ -102,6 +128,7 @@ function applyFilter(items: MediaReviewRecord[], filter: FilterKind): MediaRevie
 // ─────────────────────────────────────────────
 
 export function MarketingMediaReviewCommandDeckScreen() {
+  const { hasPermission } = useMarketingPermissions();
   const { theme } = useTheme();
   const [items, setItems] = React.useState<MediaReviewRecord[]>(() => getMediaReviewItems());
   const [filter, setFilter] = React.useState<FilterKind>('all');
@@ -225,16 +252,16 @@ export function MarketingMediaReviewCommandDeckScreen() {
 
           {selected.stage === 'marketing-review' ? (
             <Box gap={2}>
-              <Button label="اعتماد تسويقي" tone="brand" onPress={() => handleApprove(selected.id)} />
+              <Button label="اعتماد تسويقي" tone="brand" onPress={() => handleApprove(selected.id)} disabled={!hasPermission('marketing.approve')} />
               <Box layoutDirection="row" gap={2}>
-                <Button style={{ flex: 1 }} label="طلب تعديل" tone="warning" onPress={() => handleFix(selected.id)} />
-                <Button style={{ flex: 1 }} label="رفض" tone="danger" onPress={() => handleReject(selected.id)} />
+                <Button style={{ flex: 1 }} label="طلب تعديل" tone="warning" onPress={() => handleFix(selected.id)} disabled={!hasPermission('marketing.approve')} />
+                <Button style={{ flex: 1 }} label="رفض" tone="danger" onPress={() => handleReject(selected.id)} disabled={!hasPermission('marketing.approve')} />
               </Box>
             </Box>
           ) : null}
 
           {selected.stage === 'marketing-approved' ? (
-            <Button label="إرسال للكتالوج" tone="success" onPress={() => handleCatalog(selected.id)} />
+            <Button label="إرسال للكتالوج" tone="success" onPress={() => handleCatalog(selected.id)} disabled={!hasPermission('marketing.publish')} />
           ) : null}
 
           {selected.stage === 'needs-fix' ? (

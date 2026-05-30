@@ -14,19 +14,50 @@ import {
 } from '@bthwani/ui-kit';
 import {
   getEntitlements,
+  getLoyaltyKpis,
   getLoyaltyPrograms,
   getLoyaltyRewards,
   getLoyaltyTiers,
   getSubscriptionPlans,
+  type LoyaltyProgram,
+  type LoyaltyTier,
+  type LoyaltyReward,
+  type SubscriptionPlan,
+  type Entitlement,
 } from '../../data/subscriptions.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 type LoyaltyView = 'overview' | 'tiers' | 'subscriptions' | 'rewards' | 'entitlements';
 
 type DeckRow = {
-  id: string;
-  title: string;
+  rowKey: string;
+  rowHeading: string;
   subtitle: string;
   badgeLabel?: string;
   badgeTone?: 'default' | 'success' | 'warning' | 'danger' | 'brand' | 'info';
@@ -60,7 +91,7 @@ function CompactDeckRow({
           <Box layoutDirection="row" style={{ gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start', width: '100%' }}>
             {row.badgeLabel ? <Badge label={row.badgeLabel} tone={row.badgeTone ?? 'default'} /> : null}
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-              {row.title}
+              {row.rowHeading}
             </Text>
           </Box>
           <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right', width: '100%' }}>
@@ -81,10 +112,117 @@ function CompactDeckRow({
   );
 }
 
+type LoyaltyDetailPanelProps = {
+  rowKey: string;
+  tab: LoyaltyView;
+  tiers: LoyaltyTier[];
+  subscriptions: SubscriptionPlan[];
+  rewards: LoyaltyReward[];
+  entitlements: Entitlement[];
+  programs: LoyaltyProgram[];
+  onClose: () => void;
+};
+
+function LoyaltyDetailPanel({ rowKey, tab, tiers, subscriptions, rewards, entitlements, programs, onClose }: LoyaltyDetailPanelProps) {
+  const { theme } = useTheme();
+
+  const renderBody = () => {
+    if (tab === 'tiers' || tab === 'overview') {
+      const tier = tiers.find(t => t.id === rowKey);
+      if (tier) {
+        return (
+          <Box gap={2}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{tier.name}</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{tier.minimumPoints} نقطة للتأهل</Text>
+            {tier.benefits.length > 0 ? (
+              tier.benefits.map(b => (
+                <View key={b.id} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: theme.line }}>
+                  <Text role="caption" style={{ color: theme.textMuted }}>{b.description ?? ''}</Text>
+                  <Badge label={b.label} tone="info" />
+                </View>
+              ))
+            ) : (
+              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>بدون مزايا إضافية</Text>
+            )}
+            <Text role="caption" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>تعديل المستويات يتم من تبويب المصمم.</Text>
+          </Box>
+        );
+      }
+    }
+    if (tab === 'subscriptions') {
+      const sub = subscriptions.find(s => s.id === rowKey);
+      if (sub) {
+        return (
+          <Box gap={2}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{sub.name}</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{sub.weeklyFee ?? sub.monthlyFee ?? 0} ريال</Text>
+            {sub.features.map((f, i) => (
+              <View key={i} style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: theme.line }}>
+                <Text role="caption">{f}</Text>
+              </View>
+            ))}
+            <Text role="caption" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>تعديل خطط الاشتراك يتم من تبويب المصمم.</Text>
+          </Box>
+        );
+      }
+    }
+    if (tab === 'rewards') {
+      const reward = rewards.find(r => r.id === rowKey);
+      if (reward) {
+        return (
+          <Box gap={2}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{reward.title}</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{reward.description}</Text>
+            <Badge label={`${reward.pointsCost} نقطة للاسترداد`} tone="warning" />
+            <Text role="caption" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>المكافآت في وضع المعاينة — التعديل من لوحة المصمم.</Text>
+          </Box>
+        );
+      }
+    }
+    if (tab === 'entitlements') {
+      const ent = entitlements.find(e => e.id === rowKey);
+      if (ent) {
+        return (
+          <Box gap={2}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }}>{ent.type}</Text>
+            <Badge label={ent.status === 'active' ? 'مفعّل' : ent.status} tone={ent.status === 'active' ? 'success' : 'default'} />
+            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>المرجع: {ent.referenceId ?? '—'}</Text>
+            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>الحالة: {ent.source} · {ent.type}</Text>
+          </Box>
+        );
+      }
+    }
+    const prog = programs.find(p => p.id === rowKey);
+    if (prog) {
+      return (
+        <Box gap={2}>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{prog.name}</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{prog.description}</Text>
+        </Box>
+      );
+    }
+    return <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>لا توجد تفاصيل إضافية.</Text>;
+  };
+
+  return (
+    <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12, borderWidth: 1, borderColor: theme.brand }}>
+      <Box layoutDirection="row" justify="space-between" align="center">
+        <Box layoutDirection="row" gap={2}>
+          <Button label="إغلاق" tone="ghost" size="sm" fullWidth={false} onPress={onClose} />
+        </Box>
+        <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', textAlign: 'right' }}>تفاصيل العنصر</Text>
+      </Box>
+      <Divider />
+      {renderBody()}
+    </Surface>
+  );
+}
+
 export function LoyaltyCommandDeckScreen() {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = React.useState<LoyaltyView>('overview');
   const [selectedRowId, setSelectedRowId] = React.useState('');
+  const [detailRowId, setDetailRowId] = React.useState<string | null>(null);
 
   const programs = React.useMemo(() => getLoyaltyPrograms(), []);
   const tiers = React.useMemo(() => getLoyaltyTiers(), []);
@@ -95,83 +233,84 @@ export function LoyaltyCommandDeckScreen() {
   const currentTier = tiers[tiers.length - 1];
   const activeSubscription = subscriptions.find((plan) => plan.id === 'sub-pro') ?? subscriptions[0];
   const activeRewards = rewards.slice(0, 4);
+  const loyaltyKpis = React.useMemo(() => getLoyaltyKpis(), []);
 
   const metrics = [
-    { label: 'الأعضاء', value: '15,240' },
-    { label: 'مشتركو البرو', value: '2,840' },
+    { label: 'الأعضاء', value: String(loyaltyKpis.total) },
+    { label: 'مشتركو البرو', value: String(loyaltyKpis.subscriptions) },
     { label: 'المكافآت النشطة', value: String(activeRewards.length) },
     { label: 'الاستحقاقات', value: String(entitlements.length) },
   ];
 
   const overviewRows: DeckRow[] = [
     {
-      id: 'program',
-      title: programs[0]?.name ?? 'برنامج ولاء واحد',
+      rowKey: 'loyalty-overview-program',
+      rowHeading: programs[0]?.name ?? 'برنامج ولاء واحد',
       subtitle: programs[0]?.description ?? 'برنامج موحّد للمزايا الحالية.',
       badgeLabel: 'البرنامج',
       badgeTone: 'brand',
-      actionLabel: 'عرض',
+      actionLabel: 'عرض البرنامج',
     },
     {
-      id: 'tier',
-      title: `المستوى ${currentTier?.name ?? 'فضي'}`,
+      rowKey: 'loyalty-overview-tier',
+      rowHeading: `المستوى ${currentTier?.name ?? 'فضي'}`,
       subtitle: `${currentTier?.minimumPoints ?? 0} نقطة للتأهل • ${currentTier?.benefits?.length ?? 0} مزايا مرتبطة.`,
       badgeLabel: 'النقاط',
       badgeTone: 'info',
-      actionLabel: 'عرض',
+      actionLabel: 'اختيار مستوى',
     },
     {
-      id: 'subscription',
-      title: activeSubscription?.name ?? 'بثواني برو',
+      rowKey: 'loyalty-overview-subscription',
+      rowHeading: activeSubscription?.name ?? 'بثواني برو',
       subtitle: `${activeSubscription?.weeklyFee ?? activeSubscription?.monthlyFee ?? 0} ريال • ${activeSubscription?.features?.join(' • ') ?? 'بدون ميزات ظاهرة'}`,
       badgeLabel: 'الاشتراك',
       badgeTone: 'success',
-      actionLabel: 'عرض',
+      actionLabel: 'عرض مزايا',
     },
     {
-      id: 'reward',
-      title: activeRewards[0]?.title ?? 'لا توجد مكافأة بارزة',
+      rowKey: 'loyalty-overview-reward',
+      rowHeading: activeRewards[0]?.title ?? 'لا توجد مكافأة بارزة',
       subtitle: activeRewards[0]?.description ?? 'ستظهر هنا أقرب مكافأة قابلة للاستخدام في العميل.',
       badgeLabel: 'مكافأة',
       badgeTone: 'warning',
-      actionLabel: 'عرض',
+      actionLabel: 'استرداد',
     },
   ];
 
   const tierRows: DeckRow[] = tiers.map((tier) => ({
-    id: tier.id,
-    title: tier.name,
+    rowKey: tier.id,
+    rowHeading: tier.name,
     subtitle: `${tier.minimumPoints} نقطة • ${tier.benefits.length ? tier.benefits.map((benefit) => benefit.label).join(' • ') : 'بدون مزايا إضافية'}`,
     badgeLabel: 'مستوى',
     badgeTone: currentTier?.id === tier.id ? 'brand' : 'default',
-    actionLabel: 'عرض',
+    actionLabel: 'اختيار مستوى',
   }));
 
   const subscriptionRows: DeckRow[] = subscriptions.map((subscription) => ({
-    id: subscription.id,
-    title: subscription.name,
+    rowKey: subscription.id,
+    rowHeading: subscription.name,
     subtitle: `${subscription.weeklyFee ?? subscription.monthlyFee ?? 0} ريال • ${subscription.features.join(' • ')}`,
     badgeLabel: subscription.id === activeSubscription?.id ? 'الحالية' : 'متاحة',
     badgeTone: subscription.id === activeSubscription?.id ? 'brand' : 'info',
-    actionLabel: 'عرض',
+    actionLabel: 'عرض مزايا',
   }));
 
   const rewardRows: DeckRow[] = activeRewards.map((reward) => ({
-    id: reward.id,
-    title: reward.title,
+    rowKey: reward.id,
+    rowHeading: reward.title,
     subtitle: reward.description ?? 'مكافأة قابلة للاسترداد.',
     badgeLabel: `${reward.pointsCost} نقطة`,
     badgeTone: 'warning',
-    actionLabel: 'عرض',
+    actionLabel: 'استرداد',
   }));
 
   const entitlementRows: DeckRow[] = entitlements.map((entitlement) => ({
-    id: entitlement.id,
-    title: entitlement.type,
+    rowKey: entitlement.id,
+    rowHeading: entitlement.type,
     subtitle: `الحالة الحالية: ${entitlement.status}`,
     badgeLabel: entitlement.status === 'active' ? 'مفعّل' : entitlement.status,
     badgeTone: entitlement.status === 'active' ? 'success' : 'default',
-    actionLabel: 'عرض',
+    actionLabel: 'فحص',
   }));
 
   const previewFeatures = mapStoreCommercialFeatures({
@@ -281,7 +420,7 @@ export function LoyaltyCommandDeckScreen() {
                   row={row}
                   showDivider={index > 0}
                   selected={selectedRowId === row.id}
-                  onAction={() => setSelectedRowId(row.id)}
+                  onAction={() => { setSelectedRowId(row.id); setDetailRowId(row.id); }}
                 />
               ))
             ) : (
@@ -291,10 +430,17 @@ export function LoyaltyCommandDeckScreen() {
             )}
           </Box>
 
-          {selectedRowId ? (
-            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-              تم تثبيت صف واحد للمراجعة داخل هذه اللوحة لتقليل الضجيج أثناء اتخاذ القرار.
-            </Text>
+          {detailRowId ? (
+            <LoyaltyDetailPanel
+              rowKey={detailRowId}
+              tab={activeTab}
+              tiers={tiers}
+              subscriptions={subscriptions}
+              rewards={activeRewards}
+              entitlements={entitlements}
+              programs={programs}
+              onClose={() => { setDetailRowId(null); setSelectedRowId(''); }}
+            />
           ) : null}
         </Surface>
 

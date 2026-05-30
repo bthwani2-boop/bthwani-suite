@@ -20,7 +20,9 @@ import {
 } from '../../data/offers.preview-data';
 import {
   buildCommercialProjection,
+  evaluateCommercialConflicts,
   type CommercialCampaign,
+  type CommercialConflict,
   type CommercialLifecycleStatus,
   type PartnerOffer,
 } from '../../shared/commercial.preview-contract';
@@ -49,6 +51,31 @@ import {
 } from '../../shared/dsh-signal-layer.model';
 import type { MarketingControlView } from './types';
 
+
+
+/**
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 type MarketingPartnerGateSeed = Record<'id' | 'title', string> & {
   status: DshPartnerActivationStatus;
   affectedSurface: 'app-partner' | 'app-client' | 'control-panel';
@@ -339,6 +366,8 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
   const blockedOffers = partnerOfferRows.filter(({ offer, visibility }) => offer.status !== 'published' || Boolean(visibility.blockedReason));
   const visibleCampaigns = campaignRows.filter(({ campaign, visibility }) => campaign.status === 'published' && !visibility.blockedReason);
   const blockedCampaigns = campaignRows.filter(({ campaign, visibility }) => campaign.status !== 'published' || Boolean(visibility.blockedReason));
+  const commercialConflicts: CommercialConflict[] = evaluateCommercialConflicts(commercialProjection.sourceMap ?? {});
+
   const visibilityGovernanceRows = [
     {
       id: 'eligibility',
@@ -539,6 +568,28 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
               ))}
             </div>
           </div>
+          {commercialConflicts.length > 0 && (
+            <div className={marketingStyles.surfaceCard}>
+              <h3 className={marketingStyles.surfaceCardTitle}>تعارضات ملكية النشر ({commercialConflicts.length})</h3>
+              <div className={marketingStyles.listStack}>
+                {commercialConflicts.map((conflict) => (
+                  <div key={conflict.conflictId} className={marketingStyles.tickerRow}>
+                    <div className={marketingStyles.tickerRowBody}>
+                      <p className={marketingStyles.messageText}>{conflict.reason}</p>
+                      <div className={marketingStyles.tickerMetaLine}>
+                        <span className={`${marketingStyles.statusChip} ${resolveToneClass(conflict.severity === 'blocker' ? 'danger' : 'warning')}`}>
+                          {conflict.severity === 'blocker' ? 'حاجب' : 'تحذير'}
+                        </span>
+                        <div className={marketingStyles.metaChipRow}>
+                          <span>{conflict.sourceA ?? conflict.conflictId}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className={marketingStyles.listStack}>

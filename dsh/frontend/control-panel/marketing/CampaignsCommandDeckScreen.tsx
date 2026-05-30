@@ -6,12 +6,15 @@ import { Box, Button, Surface, Tabs, Text, TextField, useTheme } from '@bthwani/
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCampaignItems,
+  getCampaignSummaries,
+  getCampaignDetail,
   getCampaignKpis,
   upsertCampaignItem,
   toggleCampaignStatus,
   duplicateCampaignItem,
   removeCampaignItem,
   type CampaignRecord,
+  type CampaignSummary,
   type CampaignStatus,
   type CampaignGoal,
   type CampaignAudience,
@@ -19,23 +22,172 @@ import {
   type CampaignPriority,
   type CampaignTargetType,
 } from '../../data/marketing.preview-data';
+import { dshCategoryFixtures } from '../../data/categories.preview-data';
+import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
 import type { Entitlement } from '../../data/subscriptions.preview-data';
+import { useMarketingPermissions } from './marketing-permissions.contract';
+
+/**
+ * Validation Rules:
+ * - required fields: title, channels (at least 1), targetId (if audience is targeted)
+ * - format rules: Start Date, End Date (must parse to valid timestamps)
+ * - range: endDate must be strictly greater than startDate
+ * - duplicate / conflict: N/A (Handled via multiple campaign channels limits visually)
+ * - disabled reason: Missing 'marketing.edit' or 'marketing.publish' permissions.
+ * - error: Alerts "تاريخ النهاية يجب أن يكون بعد تاريخ البداية", "لا يمكن نشر حملة بدون قنوات"
+ * - success: Transitions campaign to draft/published status and updates KPIs.
+ *
+ * Conflict Resolution:
+ * - detect: vars precedence when local campaign overlaps global flags
+ * - display: inline warnings or status priority overriding
+ * - owner: control-panel-marketing
+ * - resolution action: User must disable older campaigns if channel limit is hit
+ * - audit/API-later: Backed by runtime provider config checks on API endpoints
+ *
+ * Audit / History / Rollback Preview:
+ * - publish / approval / toggle / visibility actions:
+ *   - audit? API-later (via signal layer/events)
+ *   - history? API-later (history log)
+ *   - rollback? UI-only (pause/draft toggle)
+ *   - reason/comment? UI-only now
+ *   - before/after preview? UI-only (local visual grid/preview)
+ *   - UI-only? Yes (currently simulated/preview states)
+ *   - API-later? Yes (backend mutation boundary)
+ *
+ * Error Handling Closure:
+ * - network: API-later (currently simulated/preview)
+ * - validation: Top-level error messages (e.g. required fields, conflict targets)
+ * - permission: UI disabled state via hasPermission contract
+ * - not found: Auto-fallback or disabled action
+ * - conflict: Toast/Alert blocker on duplicate/position conflict
+ * - stale data: Handled via refresh() after every mutation
+ * - blocked action: Handled via permission/validation state
+ * - partial failure: API-later
+ * - retry: API-later
+ * - (No silent catch, success updates state and refreshes data)
+ */
 
 type EditorTab = 'plan' | 'audience' | 'channels' | 'schedule' | 'impact';
 
 const campaignsPageSize = 5;
 
+const CAMPAIGN_CHANNEL_LABELS: Record<string, string> = {
+  banner: 'بنر',
+  promo: 'عرض ترويجي',
+  video: 'فيديو',
+  ticker: 'شريط إخباري',
+  'store-card': 'بطاقة متجر',
+};
+
+function getCampaignStatusLabel(status: string): string {
+  switch (status) {
+    case 'draft': return 'مسودة';
+    case 'pending': return 'بانتظار الموافقة';
+    case 'published': return 'منشورة';
+    case 'paused': return 'موقوفة';
+    case 'archived': return 'مؤرشفة';
+    default: return status;
+  }
+}
+
+function validateCampaignDraft(draft: Partial<CampaignRecord>): string | null {
+  if (!draft.title?.trim()) return 'العنوان مطلوب.';
+  if (!draft.channels?.length) return 'يجب اختيار قناة واحدة على الأقل.';
+
+  if (draft.audience === 'targeted' && !draft.targetId?.trim()) {
+    return 'الجمهور المستهدف يتطلب تحديد المستهدف (Target ID).';
+  }
+
+  if (draft.startDate && draft.endDate) {
+    const start = new Date(draft.startDate).getTime();
+    const end = new Date(draft.endDate).getTime();
+    if (end <= start) {
+      return 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية.';
+    }
+  }
+
+  return null;
+}
+
+function validateCampaignForPublish(item: CampaignRecord): string | null {
+  if (!item.channels?.length) return 'لا يمكن نشر حملة بدون قنوات محددة.';
+  if (item.audience === 'targeted' && !item.targetId?.trim()) return 'لا يمكن نشر حملة موجهة بدون مستهدف.';
+
+  if (item.startDate && item.endDate) {
+    const start = new Date(item.startDate).getTime();
+    const end = new Date(item.endDate).getTime();
+    if (end <= start) return 'تاريخ النهاية يسبق أو يساوي تاريخ البداية.';
+  }
+
+  return null;
+}
+
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+
 export function CampaignsCommandDeckScreen() {
+  const { hasPermission } = useMarketingPermissions();
   const { theme } = useTheme();
-  const [items, setItems] = React.useState<CampaignRecord[]>(() => getCampaignItems());
-  const [selectedId, setSelectedId] = React.useState<string | null>(() => getCampaignItems()[0]?.id ?? null);
-  const selected = React.useMemo(() => items.find(i => i.id === selectedId) ?? null, [items, selectedId]);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [summaries, setSummaries] = React.useState<CampaignSummary[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [selected, setSelected] = React.useState<CampaignRecord | null>(null);
+
+  const loadData = React.useCallback(() => {
+    const result = getCampaignSummaries({ page: campaignsPage, pageSize: 5 });
+    setSummaries(result.items);
+    setTotalItems(result.total);
+  }, [campaignsPage]);
+
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  React.useEffect(() => {
+    if (selectedId) {
+      setSelected(getCampaignDetail(selectedId));
+    } else if (summaries.length > 0 && !selectedId) {
+      const newUrl = `${pathname}?id=${summaries[0].id}&tab=plan&page=${campaignsPage}`;
+      router.replace(newUrl, { scroll: false });
+    } else {
+      setSelected(null);
+    }
+  }, [selectedId, summaries, pathname, router, campaignsPage]);
+
+  const updateQueryParams = React.useCallback((updates: Record<string, string | null>, historyAction: 'push' | 'replace' = 'replace') => {
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
+    for (const [k, v] of Object.entries(updates)) {
+      if (v === null) params.delete(k);
+      else params.set(k, v);
+    }
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (historyAction === 'push') {
+      router.push(newUrl, { scroll: false });
+    } else {
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, pathname, router]);
+
+  const setSelectedId = React.useCallback((id: string | null) => {
+    updateQueryParams({ id, tab: 'plan' }, 'push');
+  }, [updateQueryParams]);
+
+  const setEditorTab = React.useCallback((tab: EditorTab) => {
+    updateQueryParams({ tab }, 'replace');
+  }, [updateQueryParams]);
+
+  const setCampaignsPage = React.useCallback((page: number | ((p: number) => number)) => {
+    const nextPage = typeof page === 'function' ? page(campaignsPage) : page;
+    updateQueryParams({ page: nextPage.toString() }, 'replace');
+  }, [campaignsPage, updateQueryParams]);
+
   const [draft, setDraft] = React.useState<Partial<CampaignRecord>>({});
-  const [editorTab, setEditorTab] = React.useState<EditorTab>('plan');
-  const [campaignsPage, setCampaignsPage] = React.useState(1);
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
+  const [archiveConfirmId, setArchiveConfirmId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (selected) {
@@ -56,34 +208,21 @@ export function CampaignsCommandDeckScreen() {
         endDate: '',
       });
     }
-  }, [selectedId, items]);
+  }, [selectedId, summaries]);
 
-  const kpis = React.useMemo(() => getCampaignKpis(), [items]);
+  const kpis = React.useMemo(() => getCampaignKpis(), [summaries]);
 
-  const refresh = () => setItems(getCampaignItems());
+  const refresh = () => {
+    loadData();
+    if (selectedId) setSelected(getCampaignDetail(selectedId));
+  };
 
-  const totalPages = Math.max(1, Math.ceil(items.length / campaignsPageSize));
-  const visibleItems = React.useMemo(() => {
-    const startIndex = (campaignsPage - 1) * campaignsPageSize;
-    return items.slice(startIndex, startIndex + campaignsPageSize);
-  }, [campaignsPage, items]);
+  const totalPages = Math.max(1, Math.ceil(totalItems / campaignsPageSize));
+  const visibleItems = summaries;
 
   React.useEffect(() => {
     setCampaignsPage((currentPage) => Math.min(currentPage, totalPages));
-  }, [totalPages]);
-
-  React.useEffect(() => {
-    if (items.length === 0) {
-      setSelectedId(null);
-      return;
-    }
-
-    if (selectedId && items.some((item) => item.id === selectedId)) {
-      return;
-    }
-
-    setSelectedId(items[0].id);
-  }, [items, selectedId]);
+  }, [totalPages, setCampaignsPage]);
 
   const inlineStyles = React.useMemo(() => ({
     selectInput: {
@@ -257,14 +396,31 @@ export function CampaignsCommandDeckScreen() {
     setEditorTab('plan');
   };
 
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+
   const handleSave = () => {
+    const error = validateCampaignDraft(draft);
+    if (error) { setSaveError(error); return; }
+    setSaveError(null);
     const saved = upsertCampaignItem(draft);
     refresh();
     setSelectedId(saved.id);
   };
 
   const handleToggle = (id: string) => {
+    const item = getCampaignDetail(id);
+    if (!item) return;
+    const error = validateCampaignForPublish(item);
+    if (error) { setSaveError(error); return; }
+    setSaveError(null);
     toggleCampaignStatus(id);
+    refresh();
+  };
+
+  const handleStatusAdvance = (id: string, next: CampaignStatus) => {
+    const item = getCampaignDetail(id);
+    if (!item) return;
+    upsertCampaignItem({ ...item, status: next });
     refresh();
   };
 
@@ -281,7 +437,7 @@ export function CampaignsCommandDeckScreen() {
     removeCampaignItem(id);
     setDeleteConfirmId(null);
     refresh();
-    setSelectedId(getCampaignItems()[0]?.id ?? null);
+    setSelectedId(null);
   };
 
   const renderTargetIdOptions = () => {
@@ -303,24 +459,78 @@ export function CampaignsCommandDeckScreen() {
         return (
           <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
             <option value="">-- اختر الفئة --</option>
-            <option value="food">طعام</option>
-            <option value="grocery">مقاضي</option>
-            <option value="health">صحة</option>
+            {dshCategoryFixtures.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
         );
       case 'store':
         return (
           <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
             <option value="">-- اختر المتجر --</option>
-            <option value="store-1">متجر 1</option>
-            <option value="store-2">متجر 2</option>
-            <option value="store-3">متجر 3</option>
+            {dshDiscoveryStores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+        );
+      case 'subcategory': {
+        const parentCat = dshCategoryFixtures.find(c => c.id === draft.targetId) ?? dshCategoryFixtures[0];
+        return (
+          <Box gap={2}>
+            <select title="الفئة الرئيسية" value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+              <option value="">-- اختر الفئة الرئيسية --</option>
+              {dshCategoryFixtures.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+            <select title="الفئة الفرعية" value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+              <option value="">-- اختر الفئة الفرعية --</option>
+              {(parentCat?.subcategories ?? []).map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+          </Box>
+        );
+      }
+      case 'product': {
+        const storeId = draft.linkedBannerId ?? '';
+        const products = storeItemsByStoreId[storeId] ?? [];
+        return (
+          <Box gap={2}>
+            <select title="متجر المنتج" value={storeId} onChange={(e) => setDraft({ ...draft, linkedBannerId: e.target.value, targetId: '' })} style={inlineStyles.selectInput}>
+              <option value="">-- اختر المتجر --</option>
+              {dshDiscoveryStores.filter(s => (storeItemsByStoreId[s.id] ?? []).length > 0).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <select title="المنتج" value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+              <option value="">-- اختر المنتج --</option>
+              {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </Box>
+        );
+      }
+      case 'offer':
+        return (
+          <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
+            <option value="">-- اختر متجر العرض --</option>
+            {dshDiscoveryStores.filter(s => s.isOffer || s.offerLabel).map(s => <option key={s.id} value={s.id}>{s.name}{s.offerLabel ? ` (${s.offerLabel})` : ''}</option>)}
+          </select>
+        );
+      case 'campaign':
+        return (
+          <input
+            type="text"
+            value={draft.targetId ?? ''}
+            onChange={(e) => setDraft({ ...draft, targetId: e.target.value })}
+            placeholder="معرف الحملة المرتبطة"
+            style={{ ...inlineStyles.selectInput, direction: 'ltr' } as React.CSSProperties}
+          />
+        );
+      case 'custom':
+        return (
+          <input
+            type="text"
+            value={draft.targetId ?? ''}
+            onChange={(e) => setDraft({ ...draft, targetId: e.target.value })}
+            placeholder="مسار مخصص (custom route)"
+            style={{ ...inlineStyles.selectInput, direction: 'ltr' } as React.CSSProperties}
+          />
         );
       default:
         return (
           <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
-            <option value="">-- غير متاح للنوع المختار --</option>
+            <option value="">-- اختر الوجهة --</option>
           </select>
         );
     }
@@ -413,13 +623,6 @@ export function CampaignsCommandDeckScreen() {
             <View style={styles.chipsContainer}>
               {(['banner', 'promo', 'video', 'ticker', 'store-card'] as CampaignChannel[]).map(ch => {
                 const isActive = draft.channels?.includes(ch);
-                const arabicLabels: Record<string, string> = {
-                  'banner': 'بنر',
-                  'promo': 'عرض ترويجي',
-                  'video': 'فيديو',
-                  'ticker': 'شريط إخباري',
-                  'store-card': 'بطاقة متجر'
-                };
                 return (
                   <Pressable
                     key={ch}
@@ -432,7 +635,7 @@ export function CampaignsCommandDeckScreen() {
                     }}
                     style={[styles.chip, isActive && styles.chipActive]}
                   >
-                    <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{arabicLabels[ch] || ch}</Text>
+                    <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{CAMPAIGN_CHANNEL_LABELS[ch] ?? ch}</Text>
                   </Pressable>
                 );
               })}
@@ -483,6 +686,7 @@ export function CampaignsCommandDeckScreen() {
                 <li><strong>الظهور:</strong> ستظهر هذه الحملة في <span style={{ color: theme.brand }}>{draft.targetType || 'غير محدد'}</span>.</li>
                 <li><strong>الولاء:</strong> {draft.linkedLoyaltyBenefitId ? 'مرتبط بميزة ولاء فعالة.' : 'غير مرتبط بالولاء.'}</li>
                 <li><strong>الشركاء:</strong> {draft.linkedOfferId ? 'مرتبط بعرض شريك.' : 'غير مرتبط.'}</li>
+                <li><strong>التجاوز (Precedence):</strong> {draft.priority === 'urgent' ? <span style={{ color: theme.warning, fontWeight: 'bold' }}>تتجاوز متغيرات المنصة الأساسية</span> : 'تخضع للأولوية العادية'}</li>
               </ul>
             </div>
 
@@ -494,36 +698,25 @@ export function CampaignsCommandDeckScreen() {
     }
   };
 
-  const getStatusArabic = (status: string) => {
-    switch(status) {
-      case 'draft': return 'مسودة';
-      case 'pending': return 'بانتظار الموافقة';
-      case 'published': return 'منشورة';
-      case 'paused': return 'موقوفة';
-      case 'archived': return 'مؤرشفة';
-      default: return status;
-    }
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
       {/* KPIs Header */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
           <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
-          <Text role="titleLg" style={{ color: theme.brandHeaderBackground, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.total}</Text>
+          <Text role="titleLg" style={{ color: theme.brandHeaderBackground, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.total.value}</Text>
         </View>
         <View style={styles.kpiCard}>
           <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>حي الآن</Text>
-          <Text role="titleLg" style={{ color: theme.success, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.live}</Text>
+          <Text role="titleLg" style={{ color: theme.success, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.live.value}</Text>
         </View>
         <View style={styles.kpiCard}>
           <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
-          <Text role="titleLg" style={{ color: theme.warning, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{items.filter(i => i.status === 'pending').length}</Text>
+          <Text role="titleLg" style={{ color: theme.warning, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.pending.value}</Text>
         </View>
         <View style={styles.kpiCard}>
           <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
-          <Text role="titleLg" style={{ color: theme.brand, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.impressions}</Text>
+          <Text role="titleLg" style={{ color: theme.brand, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.impressions.value}</Text>
         </View>
       </View>
 
@@ -531,27 +724,40 @@ export function CampaignsCommandDeckScreen() {
         {/* List Panel */}
         <Surface tone="raised" style={styles.listPanel}>
           <View style={styles.panelHeader}>
-            <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>الحملات ({items.length})</Text>
-            <Button label="+ حملة جديدة" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={styles.smallButton} />
+            <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>الحملات ({totalItems})</Text>
+            <Button label="+ حملة جديدة" tone="secondary" fullWidth={false} onPress={handleCreateNew} style={styles.smallButton} disabled={!hasPermission('marketing.edit')} />
           </View>
           <Box gap={2} style={{ flex: 1, minHeight: 0, padding: 12 }}>
-            {visibleItems.map(item => (
-              <Pressable
-                key={item.id}
-                style={[styles.rowItem, selectedId === item.id && styles.rowItemSelected]}
-                onPress={() => setSelectedId(item.id)}
-              >
-                <View style={{ flex: 1, alignItems: 'flex-start' }}>
-                  <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground, textAlign: 'right' }}>{item.title}</Text>
-                  <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
-                    {item.goal} · {item.priority} · {item.channels.length} قنوات
-                  </Text>
-                </View>
-                <View style={[styles.statusBadge, item.status === 'published' && styles.statusBadgeActive]}>
-                  <Text style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{getStatusArabic(item.status)}</Text>
-                </View>
-              </Pressable>
-            ))}
+            {visibleItems.length === 0 ? (
+              <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.surfaceInset, borderRadius: 12 }}>
+                <Text style={{ color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد حملات مطابقة للبحث أو الفلتر المختار.</Text>
+              </View>
+            ) : (
+              visibleItems.map(item => (
+                <Pressable
+                  key={item.id}
+                  style={[styles.rowItem, selectedId === item.id && styles.rowItemSelected]}
+                  onPress={() => setSelectedId(item.id)}
+                >
+                  <View style={{ flex: 1, alignItems: 'flex-start' }}>
+                    <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brandHeaderBackground, textAlign: 'right' }}>{item.title}</Text>
+                    <Text role="caption" tone="muted" style={{ fontSize: 11, textAlign: 'right' }}>
+                      {item.goal} · {item.priority} · {item.channels.length} قنوات
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    {item.status === 'published' && item.priority === 'urgent' && (
+                      <View style={[styles.statusBadge, { backgroundColor: theme.warning }]}>
+                        <Text style={[styles.statusText, { color: theme.background }]}>تجاوز المتغيرات</Text>
+                      </View>
+                    )}
+                    <View style={[styles.statusBadge, item.status === 'published' && styles.statusBadgeActive]}>
+                      <Text style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{getCampaignStatusLabel(item.status)}</Text>
+                    </View>
+                  </View>
+                </Pressable>
+              ))
+            )}
             <WebControlPanelCompactPager
 				page={campaignsPage}
 				totalPages={totalPages}
@@ -566,20 +772,38 @@ export function CampaignsCommandDeckScreen() {
         <Surface tone="raised" style={styles.editorPanel}>
           <View style={styles.panelHeader}>
             <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>{selected ? 'تعديل الحملة' : 'حملة جديدة'}</Text>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              {selected ? <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected.id)} style={styles.smallButton} /> : null}
-              {selected ? <Button label={selected.status === 'published' ? 'إيقاف' : 'نشر'} tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} /> : null}
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              {selected ? <Button label="نسخ" tone="ghost" fullWidth={false} onPress={() => handleDuplicate(selected.id)} style={styles.smallButton} disabled={!hasPermission('marketing.edit')} /> : null}
+              {selected?.status === 'draft' ? <Button label="إرسال للمراجعة" tone="secondary" fullWidth={false} onPress={() => handleStatusAdvance(selected.id, 'pending')} style={styles.smallButton} disabled={!hasPermission('marketing.approve')} /> : null}
+              {selected?.status === 'pending' ? <Button label="نشر" tone="secondary" fullWidth={false} onPress={() => handleToggle(selected.id)} style={styles.smallButton} disabled={!hasPermission('marketing.publish')} /> : null}
+              {selected?.status === 'published' ? <Button label="إيقاف" tone="ghost" fullWidth={false} onPress={() => handleStatusAdvance(selected.id, 'paused')} style={styles.smallButton} disabled={!hasPermission('marketing.publish')} /> : null}
+              {selected?.status === 'paused' ? <Button label="إعادة النشر" tone="secondary" fullWidth={false} onPress={() => handleStatusAdvance(selected.id, 'published')} style={styles.smallButton} disabled={!hasPermission('marketing.publish')} /> : null}
+              {(selected?.status === 'published' || selected?.status === 'paused') ? (
+                archiveConfirmId === selected.id ? (
+                  <>
+                    <Button label="تأكيد الأرشفة" tone="ghost" fullWidth={false} onPress={() => { handleStatusAdvance(selected.id, 'archived'); setArchiveConfirmId(null); }} style={styles.smallButtonTextRed} disabled={!hasPermission('marketing.edit')} />
+                    <Button label="إلغاء" tone="ghost" fullWidth={false} onPress={() => setArchiveConfirmId(null)} style={styles.smallButton} />
+                  </>
+                ) : (
+                  <Button label="أرشفة" tone="ghost" fullWidth={false} onPress={() => setArchiveConfirmId(selected.id)} style={styles.smallButton} disabled={!hasPermission('marketing.edit')} />
+                )
+              ) : null}
               {selected && deleteConfirmId === selected.id ? (
                 <>
-                  <Button label="تأكيد الحذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} />
+                  <Button label="تأكيد الحذف" tone="ghost" fullWidth={false} onPress={() => handleDelete(selected.id)} style={styles.smallButtonTextRed} disabled={!hasPermission('marketing.delete')} />
                   <Button label="إلغاء" tone="ghost" fullWidth={false} onPress={() => setDeleteConfirmId(null)} style={styles.smallButton} />
                 </>
               ) : selected ? (
-                <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => setDeleteConfirmId(selected.id)} style={styles.smallButtonTextRed} />
+                <Button label="حذف" tone="ghost" fullWidth={false} onPress={() => setDeleteConfirmId(selected.id)} style={styles.smallButtonTextRed} disabled={!hasPermission('marketing.delete')} />
               ) : null}
-              <Button label="حفظ" onPress={handleSave} tone="primary" fullWidth={false} style={styles.smallButtonPrimary} />
+              <Button label="حفظ" onPress={handleSave} tone="primary" fullWidth={false} style={styles.smallButtonPrimary} disabled={!draft.title?.trim() || !hasPermission('marketing.edit')} />
             </View>
           </View>
+          {saveError ? (
+            <View style={{ paddingHorizontal: 16, paddingVertical: 6, backgroundColor: theme.dangerSurface ?? theme.surfaceInset }}>
+              <Text role="caption" style={{ color: theme.danger }}>{saveError}</Text>
+            </View>
+          ) : null}
 
           <Tabs<EditorTab>
             items={[
