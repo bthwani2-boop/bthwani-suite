@@ -140,7 +140,9 @@ try {
       "BTHWANI_TARGET_ARCHETYPE_GUIDE.md",
       "BTHWANI_PERFORMANCE_PLAYBOOK.md",
       "BTHWANI_STRUCTURE_REFACTOR_PLAYBOOK.md",
-      "BTHWANI_AGENT_FAILURE_MODES.md"
+      "BTHWANI_AGENT_FAILURE_MODES.md",
+      "Technical / Logic Gap Discovery",
+      "Technical / Logic Gap Matrix"
     )
     foreach ($phrase in $requiredPhrases) {
       if ($main.Contains($phrase)) { Add-Result "main_contains:$phrase" "PASS" "found" } else { Add-Result "main_contains:$phrase" "FAIL" "missing" }

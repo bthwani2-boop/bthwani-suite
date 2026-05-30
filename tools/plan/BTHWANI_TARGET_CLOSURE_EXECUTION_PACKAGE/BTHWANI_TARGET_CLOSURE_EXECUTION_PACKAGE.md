@@ -380,6 +380,101 @@ If `HYGIENE_FIX_FIRST`, Task 1 must be hygiene work, not feature work.
 
 ---
 
+## 9a. Technical / Logic Gap Discovery
+
+Run this gate after Structural Hygiene and before Data/Media gates. No design work begins before this gate is complete.
+
+```text
+NO_DESIGN_BEFORE_LOGIC_GATE: enforced
+```
+
+Discover and classify every UI element that appears functional but has no backing logic. Scan for:
+
+```text
+button without handler
+tab without state/result
+flow without end
+KPI without source
+status without mapping
+action without result/boundary
+adapter missing
+validation missing
+permission boundary missing
+conflict resolution missing
+runtime/API dependency unclassified
+static UI claiming runtime function
+```
+
+### 9a.1 Required closure areas
+
+For each area, classify as `UI-only now` / `API/runtime later` / `BLOCKED` / `CLOSED`:
+
+```text
+1.  Logic Gap Discovery         — what appears in UI but does not work
+2.  Button/Action Closure       — button/CTA/chip/tab/row action/bulk action/filter/search/sort/pagination
+3.  State Machine Closure       — idle/loading/empty/ready/dirty/invalid/submitting/success/error/blocked/disabled
+4.  Flow Logic Closure          — start→entry→action→intermediate state→result→end/failure/cancel
+5.  ViewModel/Adapter Closure   — source data / adapter / view model / status mapping / badges / labels / mediaKey
+6.  Domain Logic Closure        — product identity/campaign lifecycle/vars scope/partner override per target domain
+7.  Permissions/Visibility      — who sees, who edits, who approves, who publishes, who disables
+8.  Validation Rules            — required fields / format / range / duplicate / conflict / error / success
+9.  Conflict Resolution         — detect/display/owner/resolution action — audit/API-later for each conflict type
+10. KPI / Calculations          — source / formula / adapter / format / fallback / staleness / API-later
+11. Navigation / Routing        — route / registry / tab active state / breadcrumb / back / drawer open-close
+12. Data Loading Logic          — summary-first / detail-on-open / pagination / filtering / refresh / stale / retry
+13. Mutations as Boundaries     — create/update/approve/reject/publish/hide/rollback — UI-only or API-later, no backend now
+14. Audit / History / Rollback  — audit trail / rollback preview / before-after UI — especially publish/finance/vars
+15. Error Handling              — network/validation/permission/not-found/conflict/stale/blocked/partial/retry
+16. Empty / Loading / Blocked   — loading/empty/error/blocked/disabled/success/retry/guidance per screen/list/drawer
+17. Cross-Surface Consistency   — canonical owner per domain across all linked surfaces; no per-surface divergence
+18. Security / Privacy          — secrets/tokens/env leakage/unsafe logs — classify for guard:secret-scan
+19. Observability (deferred)    — analytics/audit log/event/trace/metric — classify now, implement later
+20. Tests / Guards Readiness    — typecheck/guard/unit/component/registry/visual/performance checks needed
+21. Technical Debt in Scope     — TODO/FIXME/dead branch/orphan/stale adapter/temp file — fix/retire/defer/block
+```
+
+### 9a.2 Technical / Logic Gap Matrix
+
+Produce this matrix before selecting Task 1:
+
+```text
+ID | technical/logic area | file/path | visible symptom | missing logic | current behavior | required behavior | owner | UI-only now? | API/runtime later? | safe to implement now? | linked surfaces | state impact | data impact | verification | priority | decision
+```
+
+### 9a.3 Task 1 priority after this gate
+
+```text
+governance/guard/agent blocker
+→ structural hygiene blocker
+→ missing technical logic blocker
+→ missing action/state/flow blocker
+→ data/media truth blocker
+→ runtime/API boundary blocker
+→ performance blocker
+→ design closure
+```
+
+### 9a.4 Technical / Logic Closure Gate
+
+No `READY` is valid if any of the following remains unclassified:
+
+```text
+button without handler
+action without result
+tab without state
+flow without end
+KPI without source
+status without mapping
+adapter incomplete
+validation missing
+permission boundary missing
+conflict resolution missing
+unclassified runtime/API dependency
+static UI claiming functionality
+```
+
+---
+
 ## 10. DSH Data / Media Canonical Paths
 
 Use only:
@@ -936,7 +1031,7 @@ The package is valid only if:
 ```text
 manifest.version = 6.0.0
 manifest.package_id = BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE
-BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md contains Version: 4.0.0
+BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md contains Version: 6.0.0
 SHA256SUMS.json matches all package files except itself
 all required files are present
 no forbidden old section-count wording exists
@@ -1195,11 +1290,12 @@ If the agent is unsure what to do first, it must use this priority:
 ```text
 1. package/governance/guard blocker
 2. structural hygiene blocker
-3. logic/flow/action/state blocker
-4. data/media truth blocker
-5. runtime/API boundary blocker
-6. performance blocker
-7. design closure
+3. missing technical logic blocker (Technical / Logic Gap Discovery gate)
+4. missing action/state/flow blocker
+5. data/media truth blocker
+6. runtime/API boundary blocker
+7. performance blocker
+8. design closure
 ```
 
 ## V6.5 Weak Agent Rule

@@ -19,6 +19,7 @@ Execution contract:
 - Return the required 28-section cycle output.
 - Do not move files before Topic Decision Matrix and Topic Boundary Contract.
 - Do not start design polish before logic/flow/data/media/technical/structural gaps are closed or blocked.
+- Technical / Logic Gap Discovery gate is required before any design work (NO_DESIGN_BEFORE_LOGIC_GATE: yes).
 - Do not capture screenshots before the screenshot gate allows it.
 - Do not stack code over duplication/dead code/leakage/fragmentation.
 - If stale governance/guards/agents block the target, classify and fix or block them first.
@@ -37,15 +38,12 @@ PACKAGE_RECHECK_STATUS: PASS
 PACKAGE_RECHECK_VERSION: 6.0.0
 ```
 
-Read also:
+Read in this order:
 ```text
-C:\bthwani-suite\tools\plan\BTHWANI_OPERATOR_FIELD_MANUAL.md
-C:\bthwani-suite\tools\plan\BTHWANI_TARGET_ARCHETYPE_GUIDE.md
-```
-
-
-Read navigation file before any playbook:
-
-```text
-C:\bthwani-suite\tools\plan\BTHWANI_AGENT_NAVIGATION_MAP.md
+1. C:\bthwani-suite\tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md
+2. C:\bthwani-suite\tools\plan\BTHWANI_AGENT_NAVIGATION_MAP.md
+3. C:\bthwani-suite\tools\plan\BTHWANI_OPERATOR_FIELD_MANUAL.md
+4. C:\bthwani-suite\tools\plan\BTHWANI_TARGET_ARCHETYPE_GUIDE.md
+5. C:\bthwani-suite\tools\plan\BTHWANI_MATRICES_TEMPLATE.md
+6. ONE relevant playbook only (after classifying target type)
 ```

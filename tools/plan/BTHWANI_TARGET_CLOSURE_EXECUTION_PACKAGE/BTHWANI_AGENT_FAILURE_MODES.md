@@ -17,3 +17,6 @@ If any item occurs, output `CYCLE_INVALID` or `FIX_REQUIRED`.
 | Agent changes UI in refactor without reason | `NEEDS_VISUAL_EVIDENCE_AFTER_APPLY` + risk |
 | Agent ignores untracked files | `EVIDENCE_INCOMPLETE` |
 | Agent cannot run web benchmark for major decision | `BENCHMARK_CONFIDENCE_REDUCED` + human approval |
+| Agent skips Technical / Logic Gap Discovery gate and proceeds to design | `CYCLE_INVALID` — logic gate must precede design |
+| Agent claims UI ready while logic/handler/state/flow gaps remain unclassified | `CYCLE_INVALID` — all gaps must be classified before READY |
+| Agent produces screenshots outside the permitted visual gate | `EVIDENCE_NOISE` — `SCREENSHOTS_DEFERRED` must remain until visual gate |

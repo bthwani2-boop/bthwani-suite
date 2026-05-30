@@ -25,6 +25,28 @@
 | ID | file/path | issue type | evidence | impact | fix first? | safe now? | owner | decision |
 |---|---|---|---|---|---|---|---|---|
 
+## Technical / Logic Gap Matrix
+
+First-class gap types that must be classified (not left blank):
+
+```text
+button without handler
+tab without state/result
+flow without end
+KPI without source
+status without mapping
+static UI claiming runtime function
+action without result/boundary
+adapter incomplete
+validation missing
+permission boundary missing
+conflict resolution missing
+unclassified runtime/API dependency
+```
+
+| ID | technical/logic area | file/path | visible symptom | missing logic | current behavior | required behavior | owner | UI-only now? | API/runtime later? | safe to implement now? | linked surfaces | state impact | data impact | verification | priority | decision |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
 ## Gap Matrix
 
 | ID | gap type | exact file/path | evidence from code | impact | required fix | safe now? | needs API/backend/runtime later? | priority | owner | blocked reason |

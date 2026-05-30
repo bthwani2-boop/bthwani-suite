@@ -56,8 +56,10 @@
   ],
   "source_coverage_files": [
     "امر الواجهات.txt",
-    "Pasted text.txt",
-    "تقسييم الشاشات.txt"
+    "تقسييم الشاشات.txt",
+    "ماهي الاسباب الشائعه اللتي تجعل تصف.txt",
+    "متدرج.txt",
+    "خارطة تحرك.txt"
   ],
   "hardening": [
     "28-section output only",
