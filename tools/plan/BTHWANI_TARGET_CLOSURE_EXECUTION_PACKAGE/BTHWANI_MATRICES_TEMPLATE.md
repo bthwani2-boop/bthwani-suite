@@ -1,4 +1,4 @@
-# BTHWANI MATRICES TEMPLATE — V6
+# BTHWANI MATRICES TEMPLATE — V7
 
 ## Web/Open-Source Benchmark Matrix
 
@@ -81,3 +81,9 @@ unclassified runtime/API dependency
 
 | task id | goal | why now | files to edit | exact changes | linked surfaces touched | preliminary only | forbidden changes | acceptance criteria | verification | rollback | blocker rule | human approval |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
+## Conflict Resolution Matrix
+
+| معرّف | نوع التعارض | وصف التعارض | السطح 1 | السطح 2 | سلوك حالي | السلوك المطلوب | المالك | إجراء الكشف | طريقة العرض | قرار الحل | API؟ | UI-only الآن؟ | خطر | أولوية | القرار |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+> انظر `BTHWANI_CONFLICT_RESOLUTION_MATRIX_TEMPLATE.md` للقيم المسموحة لكل عمود.

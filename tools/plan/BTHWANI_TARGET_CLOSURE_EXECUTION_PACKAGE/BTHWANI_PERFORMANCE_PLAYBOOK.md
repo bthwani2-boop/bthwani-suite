@@ -186,7 +186,7 @@ You must adhere to the following 22 rigorous standards for UI/UX flow and perfor
 13. **Core Web Vitals**: Strict adherence to LCP <= 2.5s, INP <= 200ms, CLS <= 0.1.
 14. **Lazy Loading**: Heavy components, maps, charts, editors, and modals must be lazy-loaded.
 15. **Optimized Media**: Thumbnails in lists. Full images only in detail view. Explicit width/height.
-16. **No Duplicate Demo Data**: ALL DSH demo data and media must point exclusively to `dsh/frontend/data` and `dsh/media-fixtures`.
+16. **No Duplicate Demo Data**: ALL DSH demo data and media must point exclusively to `dsh/frontend/data` and `dsh/frontend/media-fixtures`.
 17. **Optimized React Renders**: Strict state partitioning. Use `memo` / `useMemo` / `useCallback` appropriately. No object creation in heavy list row props.
 18. **Mobile Efficiency**: No `ScrollView` for lists. Use `FlatList`/`FlashList`. Light row components. Reduce JS thread animations.
 19. **Control Panel Density**: Calculated density, fixed table toolbar, deferred/debounced filters, bulk actions only on selection.

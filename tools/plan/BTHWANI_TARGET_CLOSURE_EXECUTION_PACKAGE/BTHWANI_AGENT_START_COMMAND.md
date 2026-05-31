@@ -1,4 +1,4 @@
-# BTHWANI AGENT START COMMAND — V6
+# BTHWANI AGENT START COMMAND — V7
 
 ```text
 Read and follow exactly:
@@ -35,15 +35,16 @@ Required Arabic rules:
 Required package evidence:
 PACKAGE_RECHECK_EVIDENCE: tools/registry/runs/<SESSION_ID>/<SESSION_ID>.zip
 PACKAGE_RECHECK_STATUS: PASS
-PACKAGE_RECHECK_VERSION: 6.0.0
+PACKAGE_RECHECK_VERSION: 7.0.0
 ```
 
 Read in this order:
 ```text
-1. C:\bthwani-suite\tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md
-2. C:\bthwani-suite\tools\plan\BTHWANI_AGENT_NAVIGATION_MAP.md
-3. C:\bthwani-suite\tools\plan\BTHWANI_OPERATOR_FIELD_MANUAL.md
-4. C:\bthwani-suite\tools\plan\BTHWANI_TARGET_ARCHETYPE_GUIDE.md
-5. C:\bthwani-suite\tools\plan\BTHWANI_MATRICES_TEMPLATE.md
-6. ONE relevant playbook only (after classifying target type)
+1. C:\bthwani-suite\tools\plan\BTHWANI_QUICK_START_FOR_AGENTS.md
+2. C:\bthwani-suite\tools\plan\BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE.md
+3. C:\bthwani-suite\tools\plan\BTHWANI_AGENT_NAVIGATION_MAP.md
+4. C:\bthwani-suite\tools\plan\BTHWANI_OPERATOR_FIELD_MANUAL.md
+5. C:\bthwani-suite\tools\plan\BTHWANI_TARGET_ARCHETYPE_GUIDE.md
+6. C:\bthwani-suite\tools\plan\BTHWANI_MATRICES_TEMPLATE.md
+7. ONE relevant playbook only (after classifying target type)
 ```

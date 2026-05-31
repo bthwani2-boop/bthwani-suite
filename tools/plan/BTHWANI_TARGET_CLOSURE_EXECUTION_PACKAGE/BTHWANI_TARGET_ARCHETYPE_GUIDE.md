@@ -1,4 +1,4 @@
-# BTHWANI TARGET ARCHETYPE GUIDE — V6
+# BTHWANI TARGET ARCHETYPE GUIDE — V7
 
 Use this file to make the target clear before execution.
 

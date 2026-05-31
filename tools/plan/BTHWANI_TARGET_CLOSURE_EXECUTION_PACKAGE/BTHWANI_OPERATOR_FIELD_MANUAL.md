@@ -1,4 +1,4 @@
-# BTHWANI OPERATOR FIELD MANUAL — V6
+# BTHWANI OPERATOR FIELD MANUAL — V7
 
 This file explains the package to a weak or strong agent in operational language.
 

@@ -1,4 +1,4 @@
-﻿param(
+param(
   [string]$RepoRoot = "C:\bthwani-suite",
   [string]$PlanRoot = "",
   [switch]$Strict
@@ -60,7 +60,7 @@ try {
       $Manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
       Add-Result "manifest_json_valid" "PASS" "valid"
       if ($Manifest.package_id -eq "BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE") { Add-Result "manifest_package_id" "PASS" $Manifest.package_id } else { Add-Result "manifest_package_id" "FAIL" $Manifest.package_id }
-      if ($Manifest.version -eq "6.0.0") { Add-Result "manifest_version_5" "PASS" $Manifest.version } else { Add-Result "manifest_version_5" "FAIL" $Manifest.version }
+      if ($Manifest.version -eq "7.0.0") { Add-Result "manifest_version" "PASS" $Manifest.version } else { Add-Result "manifest_version" "FAIL" "expected 7.0.0 got $($Manifest.version)" }
     } catch { Add-Result "manifest_json_valid" "FAIL" $_.Exception.Message }
   }
 
@@ -110,7 +110,7 @@ try {
     if ($contradictions.Count -eq 0) { Add-Result "contradiction_check" "PASS" "none" } else { Add-Result "contradiction_check" "FAIL" ($contradictions -join ",") }
 
     $requiredPhrases = @(
-      "Version:** 6.0.0",
+      "Version:** 7.0.0",
       "Required 28-Section Cycle Output",
       "PACKAGE_RECHECK_EVIDENCE",
       "PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION",
@@ -195,7 +195,7 @@ try {
 
   $summary = @"
 status: $finalStatus
-package_version: 6.0.0
+package_version: 7.0.0
 session_id: $SessionId
 repo: $RepoRoot
 plan_root: $PlanRoot
@@ -210,7 +210,7 @@ decision: $(if ($finalStatus -eq "PASS") { "PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXE
   Compress-Archive -Path (Join-Path $RunRoot "*") -DestinationPath $zipPath -Force
 
   Write-Host "RESULT: $finalStatus"
-  Write-Host "PACKAGE_VERSION: 6.0.0"
+  Write-Host "PACKAGE_VERSION: 7.0.0"
   Write-Host "SESSION_ID: $SessionId"
   Write-Host "EVIDENCE_ROOT: $RunRoot"
   Write-Host "ZIP: $zipPath"

@@ -1,4 +1,4 @@
-# BTHWANI EVIDENCE STANDARD — V6
+# BTHWANI EVIDENCE STANDARD — V7
 
 Required evidence after package check or execution.
 
@@ -34,11 +34,11 @@ Required evidence after package check or execution.
 - screenshots only when the visual evidence gate requires them
 
 
-## V6 Required Evidence Status Fields
+## V7 Required Evidence Status Fields
 
 ```text
 PACKAGE_RECHECK_STATUS:
-PACKAGE_RECHECK_VERSION:
+PACKAGE_RECHECK_VERSION: 7.0.0
 EVIDENCE_ZIP:
 LEGACY_PACKAGE_FILES:
 UNTRACKED_FILES_CLASSIFIED:

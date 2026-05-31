@@ -1,4 +1,4 @@
-# BTHWANI ROLLBACK PROTOCOL — V6
+# BTHWANI ROLLBACK PROTOCOL — V7
 
 Rollback must be explicit per task.
 
@@ -40,7 +40,7 @@ Rollback risk:
 ```
 
 
-## V6 Rollback Completeness Gate
+## V7 Rollback Completeness Gate
 
 A task rollback is incomplete if any of these are missing:
 

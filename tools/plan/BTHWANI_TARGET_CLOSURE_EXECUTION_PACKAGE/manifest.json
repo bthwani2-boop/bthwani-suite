@@ -1,16 +1,17 @@
 {
   "package_id": "BTHWANI_TARGET_CLOSURE_EXECUTION_PACKAGE",
-  "version": "6.0.0",
-  "date": "2026-05-29",
+  "version": "7.0.0",
+  "date": "2026-05-31",
   "placement": "C:\\bthwani-suite\\tools\\plan",
   "supersedes": [
     "1.0.0",
     "2.0.0",
     "3.0.0",
     "4.0.0",
-    "5.0.0"
+    "5.0.0",
+    "6.0.0"
   ],
-  "decision": "Use V6 only for controlled execution with mandatory navigation gates",
+  "decision": "Use V7 only for controlled execution with mandatory navigation gates and 24-step logic closure",
   "branch_rule": "current local branch only; no hardcoded branch name",
   "github_write": "forbidden unless explicitly requested by the human",
   "canonical_paths": {
@@ -103,6 +104,10 @@
     "BTHWANI_QUICK_START_FOR_AGENTS.md",
     "EVIDENCE_STANDARD.md",
     "ROLLBACK_PROTOCOL.md",
+    "BTHWANI_VERSION_CHANGELOG.md",
+    "BTHWANI_ARABIC_RTL_CONTRACT.md",
+    "BTHWANI_CONFLICT_RESOLUTION_MATRIX_TEMPLATE.md",
+    "BTHWANI_SYNTHESIS_DEEP_DIAGNOSIS_20260531.md",
     "CHECK_TARGET_CLOSURE_PACKAGE.ps1",
     "INSTALL_TARGET_CLOSURE_PACKAGE.ps1",
     "manifest.json",

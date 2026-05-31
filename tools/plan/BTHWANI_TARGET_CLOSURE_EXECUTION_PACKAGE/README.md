@@ -1,15 +1,30 @@
-# BThwani Target Closure Package — README V6
+# BThwani Target Closure Package — README V7
 
 ## Status
 
-Use V6 only. V1, V2, V3, V4, and V5 are superseded.
+Use V7 only. V1, V2, V3, V4, V5, and V6 are superseded.
 
-## What V6 adds
+## What V7 adds over V6
 
-V6 adds the mandatory navigation layer:
+V7 adds:
 
 ```text
-BTHWANI_AGENT_NAVIGATION_MAP.md
+24-step Technical / Logic Closure Stage (Section 9a)
+19-Stage Cross-Surface Navigation Map
+22 comprehensive performance and UI/UX standards
+Strict Demo Data Centralization Matrix
+Strict File Boundary Matrix with design preservation columns
+V7 Hardening Layer (V7.1–V7.9) for package integrity
+3 new package files:
+  BTHWANI_VERSION_CHANGELOG.md
+  BTHWANI_ARABIC_RTL_CONTRACT.md
+  BTHWANI_CONFLICT_RESOLUTION_MATRIX_TEMPLATE.md
+```
+
+## What V6 added (retained in V7)
+
+```text
+BTHWANI_AGENT_NAVIGATION_MAP.md — mandatory navigation layer
 ```
 
 This file tells the agent:
@@ -43,7 +58,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ".\tools\plan\CHECK_TARGET_CLOSURE
 ```text
 PACKAGE_RECHECK_EVIDENCE: tools/registry/runs/<SESSION_ID>/<SESSION_ID>.zip
 PACKAGE_RECHECK_STATUS: PASS
-PACKAGE_RECHECK_VERSION: 6.0.0
+PACKAGE_RECHECK_VERSION: 7.0.0
 ```
 
 ## Agent start

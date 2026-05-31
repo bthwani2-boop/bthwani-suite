@@ -1,4 +1,4 @@
-# BTHWANI TARGET INPUT TEMPLATE — V6
+# BTHWANI TARGET INPUT TEMPLATE — V7
 
 ```text
 TARGET:
@@ -12,6 +12,12 @@ HUMAN INTENT:
 
 STRICT FORBIDDEN CHANGES:
 [dependencies, backend, API, DB, runtime, visual redesign, ui-kit files, etc.]
+
+LINKED_SURFACES_SCOPE:
+[all / specify: app-client / app-partner / app-captain / app-field / control-panel / catalogs / marketing / partners / platform-vars / finance-WLT / support / operations / administration / shared-data-media / guards-docs-tests]
+
+PREVIOUS_CYCLES:
+[none / describe what was closed in previous cycles for this target]
 
 EXPECTED FIRST CYCLE:
 One closed cycle only:

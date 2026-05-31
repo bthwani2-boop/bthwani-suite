@@ -524,6 +524,9 @@ pagination/cursor when data grows
 lazy sections
 no full duplicated objects
 no eager loading across unrelated surfaces
+request dedupe
+abort/cancel on navigation away
+cache repeat queries
 ```
 
 Forbidden:

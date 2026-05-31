@@ -1,4 +1,4 @@
-# BTHWANI AGENT FAILURE MODES — V6
+# BTHWANI AGENT FAILURE MODES — V7
 
 If any item occurs, output `CYCLE_INVALID` or `FIX_REQUIRED`.
 
@@ -20,3 +20,7 @@ If any item occurs, output `CYCLE_INVALID` or `FIX_REQUIRED`.
 | Agent skips Technical / Logic Gap Discovery gate and proceeds to design | `CYCLE_INVALID` — logic gate must precede design |
 | Agent claims UI ready while logic/handler/state/flow gaps remain unclassified | `CYCLE_INVALID` — all gaps must be classified before READY |
 | Agent produces screenshots outside the permitted visual gate | `EVIDENCE_NOISE` — `SCREENSHOTS_DEFERRED` must remain until visual gate |
+| Agent detects navigation drift and continues without stopping | `NAVIGATION_DRIFT_DETECTED: yes` + `STOP_APPLYING: yes` + `RETURN_TO_FILE: BTHWANI_AGENT_NAVIGATION_MAP.md` + `HUMAN_APPROVAL_REQUIRED_BEFORE_CONTINUING: yes` |
+| Agent opens all package files at once without reason | `NAVIGATION_DRIFT_DETECTED` + `TOKEN_WASTE_RISK: yes` — restart from QUICK_START |
+| Agent moves to implementation without declaring NAVIGATION_STATE | `NAVIGATION_GATE_MISSING` + `CYCLE_INVALID` |
+| Agent claims PASS with manifest.version mismatch or SHA256 failure | `PACKAGE_INVALID_DO_NOT_USE` — fix package identity before proceeding |

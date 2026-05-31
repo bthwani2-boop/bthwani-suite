@@ -236,4 +236,4 @@ For any demo data or media within `TARGET_SCOPE`, output this matrix:
 current file/path | entity type (product/media/etc) | current owner | should be central? | central target path | duplicate/conflict? | demo-only? | safe to delete/regenerate? | adapter needed? | consumers to update | risk | action (keep/move/centralize/block)
 ```
 
-**Rule:** `dsh/frontend/data` and `dsh/media-fixtures` are the absolute source of truth for DSH demo resources. Eliminate local duplicate mocks entirely.
+**Rule:** `dsh/frontend/data` and `dsh/frontend/media-fixtures` are the absolute source of truth for DSH demo resources. Eliminate local duplicate mocks entirely.

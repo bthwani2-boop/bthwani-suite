@@ -1,4 +1,4 @@
-# BTHWANI QUICK START FOR AGENTS — V6
+# BTHWANI QUICK START FOR AGENTS — V7
 
 Paste this to the agent:
 
