@@ -22,160 +22,57 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
       { id: 'overview', label: 'نظرة عامة' },
       { id: 'anomalies', label: 'شواذ النظام' },
       { id: 'recommendations', label: 'توصيات ذكية' },
-    ]
+    ],
   },
   {
     id: 'live-orders',
     label: 'الطلبات الحية',
-    description: 'قائمة الطلبات، التفاصيل، الدردشة، وتدخلات التنفيذ — مصنّفة حسب وضع التنفيذ.',
+    description: 'الصف الحي، وضع التنفيذ، التدخل المباشر، والمساعدة والإنقاذ.',
     badge: 'أساس',
     subGroups: [
-      { id: 'all', label: 'الكل' },
+      { id: 'queue', label: 'الصف الحي' },
       { id: 'bthwani_delivery', label: 'توصيل بثواني' },
       { id: 'partner_delivery', label: 'توصيل المتجر' },
       { id: 'pickup', label: 'استلام بنفسي' },
       { id: 'unassigned', label: 'غير مسندة' },
       { id: 'delayed', label: 'متأخرة' },
-      { id: 'pickup-proof', label: 'إثبات الاستلام' },
-      { id: 'delivery-proof', label: 'إثبات التسليم' },
-      { id: 'exceptions', label: 'الاستثناءات' },
-      { id: 'audit', label: 'التدقيق' },
-    ]
-  },
-  {
-    id: 'assisted-order-desk',
-    label: 'الطلبات المساعدة',
-    description: 'إعادة بناء السلة، تثبيت البدائل، والتحقق من الهوية قبل أي handoff نهائي.',
-    badge: 'مساندة',
-    subGroups: [
-      { id: 'identity', label: 'الهوية' },
-      { id: 'basket', label: 'السلة' },
-      { id: 'wlt', label: 'رؤية WLT' },
-    ]
-  },
-  {
-    id: 'order-rescue',
-    label: 'إنقاذ الطلبات',
-    description: 'مكتب إنقاذ يحدد blocker واحدًا ويثبت next-best-action عبر الدعم أو الشريك أو WLT المرجعي.',
-    badge: 'إنقاذ',
-    subGroups: [
-      { id: 'critical', label: 'حرج' },
-      { id: 'handoffs', label: 'التسليمات' },
-      { id: 'wlt', label: 'WLT' },
-    ]
-  },
-  {
-    id: 'dispatch-assignment',
-    label: 'الإسناد والتوزيع',
-    description: 'لوحة الإسناد، تغطية الكباتن، وإعادة الإسناد اليدوي.',
-    badge: 'مباشر',
-    subGroups: [
-      { id: 'pending', label: 'غير مسندة' },
-      { id: 'captains', label: 'توافر الكباتن' },
-      { id: 'partner-readiness', label: 'جاهزية الشريك' },
-      { id: 'surge', label: 'الذروة' },
-    ]
-  },
-  {
-    id: 'geo-heatmap',
-    label: 'خريطة الإسناد الحي',
-    description: 'الطلبات الحية وتمركز الكباتن وضغط المتاجر ومخاطر الالتزام في مشهد واحد.',
-    badge: 'حي',
-    subGroups: [
-      { id: 'orders', label: 'الطلبات' },
-      { id: 'captains', label: 'الكباتن' },
-      { id: 'stores', label: 'المتاجر' },
-      { id: 'sla', label: 'الالتزام' },
-      { id: 'peak', label: 'الذروة' },
+      { id: 'proofs', label: 'الإثباتات' },
+      { id: 'assisted', label: 'مساعدة' },
+      { id: 'rescue', label: 'إنقاذ' },
     ],
-    tertiaryFilters: ['الآن', '١٥ دقيقة', '٣٠ دقيقة', 'خطر عالٍ', 'نقص كباتن', 'ضغط متاجر'],
   },
   {
-    id: 'sheinproxy',
-    label: 'شي إن',
-    description: 'مسار الإسناد اليدوي لطلبات شي إن والدفعات المرتبطة بها.',
-    badge: 'يدوي',
+    id: 'dispatch-capacity',
+    label: 'الإسناد والسعة',
+    description: 'الإسناد، الكباتن، خريطة المناطق، والسعة التشغيلية — مسار واحد.',
+    badge: 'إسناد',
     subGroups: [
-      { id: 'batches', label: 'الدفعات' },
-      { id: 'orders', label: 'الطلبات' },
-      { id: 'errors', label: 'أخطاء الربط' },
-    ]
-  },
-  {
-    id: 'awnak-operations',
-    label: 'عونك',
-    description: 'مسار عونك التشغيلي: استلام الطلبات، المراجعة، الإسناد، التنفيذ، ومراجعة الإثبات.',
-    badge: 'يدوي',
-    subGroups: [
-      { id: 'intake', label: 'الاستلام' },
-      { id: 'quote-review', label: 'مراجعة السعر' },
-      { id: 'dispatch-pending', label: 'قيد الإسناد' },
-      { id: 'assigned', label: 'تم الإسناد' },
-      { id: 'in-progress', label: 'قيد التنفيذ' },
-      { id: 'proof-review', label: 'مراجعة الإثبات' },
-      { id: 'completed', label: 'مكتمل' },
-      { id: 'cancelled', label: 'ملغى' },
-      { id: 'escalated', label: 'مصعّد' },
-    ]
-  },
-  {
-    id: 'captain-operations',
-    label: 'تشغيل الكباتن',
-    description: 'توافر الكباتن، الجاهزية، وضغط التغطية.',
-    badge: 'كباتن',
-    subGroups: [
-      { id: 'availability', label: 'التوافر' },
-      { id: 'readiness', label: 'الجاهزية' },
-      { id: 'performance', label: 'الأداء' },
-    ]
-  },
-  {
-    id: 'partner-stores',
-    label: 'المتاجر والشركاء',
-    description: 'جاهزية المتاجر، التحضير، وضغط الاستلام.',
-    badge: 'متاجر',
-    subGroups: [
-      { id: 'preparation', label: 'تحت التحضير' },
-      { id: 'ready', label: 'جاهز للاستلام' },
-      { id: 'delays', label: 'تأخيرات' },
-      { id: 'readiness', label: 'الجاهزية' },
-      { id: 'pressure', label: 'الضغط' },
-    ]
-  },
-  {
-    id: 'area-capacity',
-    label: 'المناطق والسعة',
-    description: 'ضغط السعة، النوافذ المحجوزة، والتحكم في الطفرات.',
-    badge: 'سعة',
-    subGroups: [
-      { id: 'density', label: 'كثافة المناطق' },
-      { id: 'surge', label: 'إدارة الطفرات' },
-      { id: 'windows', label: 'نوافذ الخدمة' },
+      { id: 'pending', label: 'قيد الإسناد' },
       { id: 'captains', label: 'الكباتن' },
-      { id: 'stores', label: 'المتاجر' },
-    ]
+      { id: 'heatmap', label: 'خريطة المناطق' },
+      { id: 'zones', label: 'المناطق والسعة' },
+    ],
   },
   {
-    id: 'exceptions-escalations',
+    id: 'exceptions',
     label: 'الاستثناءات والتصعيد',
-    description: 'قائمة الاستثناءات، إجراءات التعافي، وتوجيه المالك.',
+    description: 'الاستثناءات النشطة، التدقيق والالتزام، وجاهزية المتاجر.',
     badge: 'مخاطر',
     subGroups: [
-      { id: 'level-1', label: 'مستوى ١' },
-      { id: 'level-2', label: 'مستوى ٢' },
-      { id: 'critical', label: 'حرج جداً' },
-    ]
+      { id: 'active', label: 'الاستثناءات النشطة' },
+      { id: 'audit', label: 'التدقيق والالتزام' },
+      { id: 'stores', label: 'المتاجر' },
+    ],
   },
   {
-    id: 'audit-support-sla',
-    label: 'التدقيق والدعم والالتزام',
-    description: 'تدقيق الإجراءات اليدوية، جسر الدعم، وانضباط الالتزام.',
-    badge: 'التزام',
+    id: 'special-ops',
+    label: 'العمليات الخاصة',
+    description: 'المسارات اليدوية والعمليات ذات المعالجة الخاصة.',
+    badge: 'يدوي',
     subGroups: [
-      { id: 'procedures', label: 'إجراءات' },
-      { id: 'proofs', label: 'إثباتات' },
-      { id: 'sla', label: 'مقاييس الالتزام' },
-    ]
+      { id: 'shein', label: 'شي إن' },
+      { id: 'awnak', label: 'عونك' },
+    ],
   },
 ] as const;
 
@@ -196,43 +93,60 @@ export const NON_OPERATIONS_SECTION_SHORTCUTS: ReadonlyArray<{
   { id: 'administration', label: 'الإدارة', description: 'الأدوار وسلسلة الاعتماد تبقى في قسم الإدارة.', href: '/administration' },
 ] as const;
 
-const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId> | 'orders' | 'overview', CanonicalOperationsGroupId> = {
-  overview: 'command-center',
-  orders: 'live-orders',
-  dashboard: 'command-center',
-  'dispatch-fleet': 'dispatch-assignment',
-  'tracking-handoff': 'live-orders',
-  'exceptions-sla': 'exceptions-escalations',
-  'partner-readiness': 'partner-stores',
-  'audit-evidence': 'audit-support-sla',
-  'captain-ops': 'captain-operations',
-  'field-ops': 'partner-stores',
-  issues: 'exceptions-escalations',
-  serviceability: 'area-capacity',
-  'guard-status': 'audit-support-sla',
-  evidence: 'audit-support-sla',
-  'order-detail': 'live-orders',
-  orderchat: 'live-orders',
-  'assisted-order-desk': 'assisted-order-desk',
-  'order-rescue': 'order-rescue',
-  dispatch: 'dispatch-assignment',
-  'live-tracking': 'live-orders',
-  exceptions: 'exceptions-escalations',
-  sla: 'exceptions-escalations',
-  audit: 'audit-support-sla',
-  'partner-prep': 'partner-stores',
-  handoff: 'live-orders',
-  'proof-review': 'live-orders',
-  capacity: 'area-capacity',
-  sheinproxy: 'dispatch-assignment',
-  reassign: 'dispatch-assignment',
-  'peak-mode': 'dispatch-assignment',
-  bell: 'live-orders',
-  'arrival-bell': 'live-orders',
-  'zone-set': 'area-capacity',
-  'live-map-capacity': 'geo-heatmap',
-  'geo-heatmap': 'geo-heatmap',
-  'proxy-shein-awnak': 'awnak-operations', // legacy alias → canonical awnak-operations
+type CanonicalMapping = { group: CanonicalOperationsGroupId; subGroup?: string };
+
+type LegacyOperationalWorkspaceId = Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId>;
+
+const LEGACY_OPERATIONAL_TO_CANONICAL_GROUP: Record<LegacyOperationalWorkspaceId | 'orders' | 'overview', CanonicalMapping> = {
+  // command-center
+  overview:              { group: 'command-center' },
+  dashboard:             { group: 'command-center' },
+  // live-orders — queue/filters
+  orders:                { group: 'live-orders', subGroup: 'queue' },
+  'tracking-handoff':    { group: 'live-orders', subGroup: 'queue' },
+  'order-detail':        { group: 'live-orders', subGroup: 'queue' },
+  orderchat:             { group: 'live-orders', subGroup: 'queue' },
+  'live-tracking':       { group: 'live-orders', subGroup: 'queue' },
+  handoff:               { group: 'live-orders', subGroup: 'queue' },
+  'proof-review':        { group: 'live-orders', subGroup: 'proofs' },
+  bell:                  { group: 'live-orders', subGroup: 'queue' },
+  'arrival-bell':        { group: 'live-orders', subGroup: 'queue' },
+  // live-orders — assisted & rescue
+  'assisted-order-desk': { group: 'live-orders', subGroup: 'assisted' },
+  'order-rescue':        { group: 'live-orders', subGroup: 'rescue' },
+  // dispatch-capacity
+  'dispatch-assignment': { group: 'dispatch-capacity', subGroup: 'pending' },
+  dispatch:              { group: 'dispatch-capacity', subGroup: 'pending' },
+  'dispatch-fleet':      { group: 'dispatch-capacity', subGroup: 'pending' },
+  reassign:              { group: 'dispatch-capacity', subGroup: 'pending' },
+  'peak-mode':           { group: 'dispatch-capacity', subGroup: 'pending' },
+  'captain-operations':  { group: 'dispatch-capacity', subGroup: 'captains' },
+  'captain-ops':         { group: 'dispatch-capacity', subGroup: 'captains' },
+  'geo-heatmap':         { group: 'dispatch-capacity', subGroup: 'heatmap' },
+  'live-map-capacity':   { group: 'dispatch-capacity', subGroup: 'heatmap' },
+  'area-capacity':       { group: 'dispatch-capacity', subGroup: 'zones' },
+  capacity:              { group: 'dispatch-capacity', subGroup: 'zones' },
+  'zone-set':            { group: 'dispatch-capacity', subGroup: 'zones' },
+  serviceability:        { group: 'dispatch-capacity', subGroup: 'zones' },
+  // exceptions
+  'exceptions-escalations': { group: 'exceptions', subGroup: 'active' },
+  'exceptions-sla':      { group: 'exceptions', subGroup: 'active' },
+  exceptions:            { group: 'exceptions', subGroup: 'active' },
+  issues:                { group: 'exceptions', subGroup: 'active' },
+  'audit-support-sla':   { group: 'exceptions', subGroup: 'audit' },
+  'audit-evidence':      { group: 'exceptions', subGroup: 'audit' },
+  audit:                 { group: 'exceptions', subGroup: 'audit' },
+  'guard-status':        { group: 'exceptions', subGroup: 'audit' },
+  evidence:              { group: 'exceptions', subGroup: 'audit' },
+  sla:                   { group: 'exceptions', subGroup: 'audit' },
+  'partner-stores':      { group: 'exceptions', subGroup: 'stores' },
+  'partner-readiness':   { group: 'exceptions', subGroup: 'stores' },
+  'field-ops':           { group: 'exceptions', subGroup: 'stores' },
+  'partner-prep':        { group: 'exceptions', subGroup: 'stores' },
+  // special-ops
+  sheinproxy:            { group: 'special-ops', subGroup: 'shein' },
+  'awnak-operations':    { group: 'special-ops', subGroup: 'awnak' },
+  'proxy-shein-awnak':   { group: 'special-ops', subGroup: 'awnak' },
 };
 
 const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSectionRootId> = {
@@ -252,8 +166,6 @@ const LEGACY_SECTION_REDIRECTS: Record<LegacySectionRedirectId, NonOperationsSec
   platform: 'platform',
   administration: 'administration',
 };
-
-type LegacyOperationalWorkspaceId = Exclude<LegacyOperationsWorkspaceId, LegacySectionRedirectId>;
 
 export function coerceOperationsPanel(panel?: string): OperationsPanelId | undefined {
   if (panel === 'detail' || panel === 'chat') {
@@ -316,7 +228,8 @@ export function normalizeOperationsLocation(
 
   return {
     kind: 'group',
-    group: mapped,
+    group: mapped.group,
+    subGroup: mapped.subGroup,
     sourceWorkspace: workspace as AnyOperationsWorkspaceId,
     panel: derivedPanel,
   };
@@ -353,8 +266,10 @@ export function buildOperationsHref(
     searchParams.set('panel', options.panel);
   }
 
-  if (options?.subGroup) {
-    searchParams.set('subGroup', options.subGroup);
+  // Explicit caller subGroup takes precedence; fall back to the legacy-derived subGroup
+  const resolvedSubGroup = options?.subGroup ?? (normalizedLocation.kind === 'group' ? normalizedLocation.subGroup : undefined);
+  if (resolvedSubGroup) {
+    searchParams.set('subGroup', resolvedSubGroup);
   }
 
   const query = searchParams.toString();

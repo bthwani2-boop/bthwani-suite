@@ -140,7 +140,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
     <Box gap={3}>
       <Box gap={2} style={{ marginBottom: 4 }}>
         <Text role="bodySm" tone="muted">
-          هذه الخريطة operational preview خاصة بلوحة التحكم وتعرض إشارات الطلبات والكباتن والمتاجر summary-first من دون أي binding خرائط خارجي أو mutation ميداني.
+          هذه معاينة خريطة تشغيلية خاصة بلوحة التحكم، تعرض إشارات الطلبات والكباتن والمتاجر ملخصةً أولاً دون أي ربط بخرائط خارجية أو تعديل ميداني.
         </Text>
         <WebControlPanelTertiaryFilters
           ariaLabel="مرشحات الخريطة"

@@ -326,9 +326,9 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
 
           {/* Lazy Loaded indicator */}
           <div style={{ background: 'var(--bthwani-success-surface)', border: '1px solid var(--bthwani-control-panel-success)', borderRadius: '8px', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--bthwani-control-panel-success)' }}>⚡ تحميل أداء ذكي (Lazy Payload)</div>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--bthwani-control-panel-success)' }}>⚡ تحميل أداء ذكي</div>
             <p style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)', margin: 0, lineHeight: 1.4 }}>
-              تم جلب مؤشرات الضغط ومخطط السعة لهذه المنطقة بنجاح بشكل منفصل (Lazy-fetched on open) لتخفيف حِمل الاتصال وحماية سرعة استجابة الصفحة.
+              تم جلب مؤشرات الضغط ومخطط السعة لهذه المنطقة بنجاح بشكل منفصل عند الفتح لتخفيف حِمل الاتصال وحماية سرعة استجابة الصفحة.
             </p>
           </div>
 
@@ -412,7 +412,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
                   fontSize: '12px',
                 }}
               >
-                تقليص نصف قطر التغطية (Reduce Radius)
+                تقليص نطاق التغطية
               </button>
 
               <button
@@ -501,7 +501,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
                   borderRadius: '50%',
                   animation: 'spin 0.8s linear infinite',
                 }} />
-                <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)', marginTop: '4px' }}>جاري تحميل الصفحة التالية (Lazy Load)...</span>
+                <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)', marginTop: '4px' }}>جارٍ تحميل الصفحة التالية...</span>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

@@ -40,6 +40,12 @@ const AreaCapacityScreen = React.lazy(() => import('./AreaCapacityScreen').then(
 const ExceptionsEscalationsScreen = React.lazy(() => import('./ExceptionsEscalationsScreen').then((m) => ({ default: m.ExceptionsEscalationsScreen })));
 const AuditSupportSlaScreen = React.lazy(() => import('./AuditSupportSlaScreen').then((m) => ({ default: m.AuditSupportSlaScreen })));
 
+type ScreenComponent = React.ComponentType<{ hubHref: string; subGroup?: string }>;
+
+type GroupScreenConfig = {
+  default: ScreenComponent;
+  bySubGroup?: Record<string, ScreenComponent>;
+};
 
 export type ControlPanelDshOperationsScreenProps = {
   group?: CanonicalOperationsGroupId;
@@ -49,20 +55,38 @@ export type ControlPanelDshOperationsScreenProps = {
   fallbackHref?: string;
 };
 
-const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
-  'command-center': CommandCenterScreen,
-  'live-orders': LiveOrdersScreen,
-  'assisted-order-desk': AssistedOrderDeskScreen,
-  'order-rescue': OrderRescueScreen,
-  'dispatch-assignment': DispatchAssignmentScreen,
-  'geo-heatmap': GeoHeatmapScreen,
-  sheinproxy: ControlPanelDshSheinProxyScreen,
-  'awnak-operations': AwnakScreen,
-  'captain-operations': CaptainOperationsScreen,
-  'partner-stores': PartnerStoresScreen,
-  'area-capacity': AreaCapacityScreen,
-  'exceptions-escalations': ExceptionsEscalationsScreen,
-  'audit-support-sla': AuditSupportSlaScreen,
+const SCREEN_RENDERERS: Record<CanonicalOperationsGroupId, GroupScreenConfig> = {
+  'command-center': {
+    default: CommandCenterScreen,
+  },
+  'live-orders': {
+    default: LiveOrdersScreen,
+    bySubGroup: {
+      assisted: AssistedOrderDeskScreen,
+      rescue: OrderRescueScreen,
+    },
+  },
+  'dispatch-capacity': {
+    default: DispatchAssignmentScreen,
+    bySubGroup: {
+      captains: CaptainOperationsScreen,
+      heatmap: GeoHeatmapScreen,
+      zones: AreaCapacityScreen,
+    },
+  },
+  exceptions: {
+    default: ExceptionsEscalationsScreen,
+    bySubGroup: {
+      audit: AuditSupportSlaScreen,
+      stores: PartnerStoresScreen,
+    },
+  },
+  'special-ops': {
+    default: ControlPanelDshSheinProxyScreen,
+    bySubGroup: {
+      awnak: AwnakScreen,
+    },
+  },
 };
 
 export function ControlPanelDshOperationsScreen({
@@ -93,7 +117,11 @@ export function ControlPanelDshOperationsScreen({
     subGroup: searchParams.get('subGroup') ?? undefined,
   };
   const hubHref = buildOperationsHref(activeGroup, focusParams);
-  const ActiveScreen = SCREEN_RENDERERS[activeGroup];
+
+  const screenConfig = SCREEN_RENDERERS[activeGroup];
+  const ActiveScreen = (activeSubGroup && screenConfig.bySubGroup?.[activeSubGroup])
+    ?? screenConfig.default;
+
   const governance = getDshControlPanelGovernanceEntry('operations');
   const kpiItems = React.useMemo(
     () =>
@@ -241,12 +269,12 @@ export function ControlPanelDshOperationsScreen({
             </div>
 
             <div className={styles.surfaceHeaderTextRow}>
-              <h1 className={styles.surfaceHeaderTitle}>عمليات DSH</h1>
+              <h1 className={styles.surfaceHeaderTitle}>العمليات</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
                 <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>summary first، details on open، وتدخلات تشغيلية بلا أي ownership مالي داخل DSH.</p>
+            <p className={styles.surfaceHeaderSubtitle}>ملخص أولاً، التفاصيل عند الطلب، وتدخلات تشغيلية بلا قرارات مالية داخل DSH.</p>
           </Box>
         </div>
         <div className={styles.surfaceHeaderActions}>

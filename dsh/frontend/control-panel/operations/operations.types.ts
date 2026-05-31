@@ -22,21 +22,21 @@ export const DSH_FULFILLMENT_OPERATIONAL_MODE_META: Readonly<Record<DshFulfillme
 }>> = {
   bthwani_delivery: {
     label: 'توصيل بثواني',
-    operationalOwner: 'DSH Operations + Captain',
+    operationalOwner: 'بثواني + كابتن',
     requiresCaptain: true,
     requiresPartnerCourier: false,
     requiresCustomerPickup: false,
   },
   partner_delivery: {
     label: 'توصيل المتجر',
-    operationalOwner: 'Partner / Store Courier',
+    operationalOwner: 'مندوب المتجر',
     requiresCaptain: false,
     requiresPartnerCourier: true,
     requiresCustomerPickup: false,
   },
   pickup: {
     label: 'استلام بنفسي',
-    operationalOwner: 'Client + Store',
+    operationalOwner: 'عميل + متجر',
     requiresCaptain: false,
     requiresPartnerCourier: false,
     requiresCustomerPickup: true,
@@ -57,18 +57,9 @@ export type DshOperationsOrderRow = {
 export type CanonicalOperationsGroupId =
   | 'command-center'
   | 'live-orders'
-  | 'assisted-order-desk'
-  | 'order-rescue'
-  | 'dispatch-assignment'
-  | 'geo-heatmap'
-  | 'sheinproxy'
-  // 'proxy-shein-awnak' is a LEGACY alias — canonical is 'awnak-operations'
-  | 'awnak-operations'
-  | 'captain-operations'
-  | 'partner-stores'
-  | 'area-capacity'
-  | 'exceptions-escalations'
-  | 'audit-support-sla';
+  | 'dispatch-capacity'
+  | 'exceptions'
+  | 'special-ops';
 
 export type LegacyOperationsWorkspaceId =
   | 'overview'
@@ -78,7 +69,7 @@ export type LegacyOperationsWorkspaceId =
   | 'tracking-handoff'
   | 'exceptions-sla'
   | 'partner-readiness'
-  | 'proxy-shein-awnak' // legacy alias → awnak-operations
+  | 'proxy-shein-awnak'
   | 'audit-evidence'
   | 'captain-ops'
   | 'field-ops'
@@ -88,8 +79,18 @@ export type LegacyOperationsWorkspaceId =
   | 'evidence'
   | 'order-detail'
   | 'orderchat'
+  // demoted canonical group IDs (now legacy aliases)
   | 'assisted-order-desk'
   | 'order-rescue'
+  | 'dispatch-assignment'
+  | 'geo-heatmap'
+  | 'sheinproxy'
+  | 'awnak-operations'
+  | 'captain-operations'
+  | 'partner-stores'
+  | 'area-capacity'
+  | 'exceptions-escalations'
+  | 'audit-support-sla'
   | 'dispatch'
   | 'live-tracking'
   | 'exceptions'
@@ -107,14 +108,12 @@ export type LegacyOperationsWorkspaceId =
   | 'growth'
   | 'loyalty'
   | 'smart-signal'
-  | 'sheinproxy'
   | 'reassign'
   | 'peak-mode'
   | 'bell'
   | 'arrival-bell'
   | 'zone-set'
-  | 'live-map-capacity'
-  | 'geo-heatmap';
+  | 'live-map-capacity';
 
 export type LegacySectionRedirectId =
   | 'support'
@@ -159,6 +158,7 @@ export type OperationsNormalizationResult =
       group: CanonicalOperationsGroupId;
       sourceWorkspace?: AnyOperationsWorkspaceId;
       panel?: OperationsPanelId;
+      subGroup?: string;
     }
   | {
       kind: 'redirect';

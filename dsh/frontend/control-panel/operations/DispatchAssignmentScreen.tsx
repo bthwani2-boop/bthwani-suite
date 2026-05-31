@@ -224,7 +224,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
       {/* Delivery mode scope boundary — explicit, not implied */}
       <Box paddingX={3} paddingY={1}>
         <Text role="bodySm" tone="muted">
-          {`نطاق الإسناد: ${BTHWANI_DELIVERY_META.label} only — توصيل المتجر والاستلام الذاتي لا يحتاجان تعيين كابتن.`}
+          {`نطاق الإسناد: ${BTHWANI_DELIVERY_META.label} — توصيل المتجر والاستلام الذاتي لا يحتاجان تعيين كابتن.`}
         </Text>
       </Box>
 
@@ -235,7 +235,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
         <Box gap={4}>
           <Box paddingX={3} paddingY={1}>
             <Text role="bodySm" tone="muted">
-              ترتبط صفوف الإسناد هنا الآن بحالات lifecycle الموحدة. تفاصيل الطلب تُفتح عند الطلب فقط، مع إبقاء هذه المساحة summary-first.
+              ترتبط صفوف الإسناد هنا الآن بحالات دورة الحياة الموحدة. تفاصيل الطلب تُفتح عند الطلب فقط، مع إبقاء هذه المساحة ملخصاً أولاً.
             </Text>
           </Box>
 
