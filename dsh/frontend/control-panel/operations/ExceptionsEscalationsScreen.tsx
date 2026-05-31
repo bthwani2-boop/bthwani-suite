@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
-  WebControlPanelSplitPane,
+  WebControlPanelRecommendation,
   WebControlPanelQueue,
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,

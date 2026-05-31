@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
-  WebControlPanelSplitPane,
+  WebControlPanelRecommendation,
   WebControlPanelQueue,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
@@ -162,7 +162,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
                 </div>
               );
             })}
-          </Box>
+          </WebControlPanelQueue>
         </Box>
 
         <Box gap={4}>
