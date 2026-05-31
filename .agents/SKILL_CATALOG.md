@@ -2,6 +2,7 @@
 
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
+| `bthwani-graphify-query-first` | Use Graphify before broad raw-file search for repo architecture, ownership, dependency, routing, UI-kit, DSH data/media, and cross-surface questions. | local `graphify-out/graph.json` cache + exact owner files | focused file set + evidence-aware next action |
 | `bthwani-current-workspace-authority` | Resolve active roots and block stale/donor paths. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-governance-execution` | Enforce scoped execution, forensics, dry-run, apply, verification, and evidence. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-local-evidence-pack` | Collect human-requested or workflow-justified local evidence; ZIP only when explicitly requested or when one upload artifact is practically needed. | `governance/` according to task domain | structured decision + evidence requirements |

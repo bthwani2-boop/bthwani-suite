@@ -52,6 +52,7 @@
 | `bthwani-agent-registry-validator` | See `.agents/skills/bthwani-agent-registry-validator/SKILL.md`. |
 | `bthwani-frontend-design-excellence-contract` | See `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`. |
 | `bthwani-stop-slop-prose-contract` | See `.agents/skills/bthwani-stop-slop-prose-contract/SKILL.md`. |
+| `bthwani-graphify-query-first` | See `.agents/skills/bthwani-graphify-query-first/SKILL.md`. |
 
 ## Preserved external/generated skills
 
