@@ -471,6 +471,8 @@ const webControlSurfaceCss = `
   grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
   gap: 10px;
   width: 100%;
+  height: 100%;
+  flex: 1;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -523,7 +525,7 @@ const webControlSurfaceCss = `
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .ui-web-cp-workbench__body {
@@ -533,7 +535,7 @@ const webControlSurfaceCss = `
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 .ui-web-cp-workbench__main {
   display: flex;
@@ -548,9 +550,18 @@ const webControlSurfaceCss = `
 .ui-web-cp-lane-tabs,
 .ui-web-cp-tertiary-filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+.ui-web-cp-lane-tabs::-webkit-scrollbar,
+.ui-web-cp-tertiary-filters::-webkit-scrollbar {
+  display: none;
 }
 
 .ui-web-cp-lane-tabs__button,

@@ -621,13 +621,19 @@ const webCommandCenterCss = `
 /* === ControlPanel: WorkspaceTabs === */
 .ui-web-cp-workspace-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
   padding: 10px 14px 8px;
   background: var(--bth-shell-surface);
   border-bottom: 1px solid var(--bth-shell-line-strong);
-  overflow: hidden;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.ui-web-cp-workspace-tabs::-webkit-scrollbar {
+  display: none;
 }
 .ui-web-cp-workspace-tab {
   flex-shrink: 0;
@@ -652,13 +658,19 @@ const webCommandCenterCss = `
 /* === ControlPanel: SubTabs === */
 .ui-web-cp-sub-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
   padding: 8px 14px 10px;
   background: var(--bth-shell-stage);
   border-bottom: 1px solid var(--bth-shell-line);
-  overflow: hidden;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.ui-web-cp-sub-tabs::-webkit-scrollbar {
+  display: none;
 }
 .ui-web-cp-sub-tab {
   padding: 6px 12px;
