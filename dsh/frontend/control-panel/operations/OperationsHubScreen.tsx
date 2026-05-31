@@ -21,21 +21,24 @@ import type {
   OperationsPanelId,
   OperationsViewState,
 } from './operations.types';
-import { CommandCenterScreen } from './CommandCenterScreen';
-import { LiveOrdersScreen } from './LiveOrdersScreen';
-import { AssistedOrderDeskScreen } from './AssistedOrderDeskScreen';
-import { OrderRescueScreen } from './OrderRescueScreen';
-import { DispatchAssignmentScreen } from './DispatchAssignmentScreen';
-import { GeoHeatmapScreen } from './GeoHeatmapScreen';
-import { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';
-import { AwnakScreen } from './AwnakScreen';
-import { CaptainOperationsScreen } from './CaptainOperationsScreen';
-import { PartnerStoresScreen } from './PartnerStoresScreen';
-import { AreaCapacityScreen } from './AreaCapacityScreen';
-import { ExceptionsEscalationsScreen } from './ExceptionsEscalationsScreen';
-import { AuditSupportSlaScreen } from './AuditSupportSlaScreen';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
+// React.lazy — each screen is a separate JS chunk loaded only when its tab is active.
+// Named-export screens use .then(m => ({ default: m.ScreenName })) to satisfy lazy().
+const CommandCenterScreen = React.lazy(() => import('./CommandCenterScreen').then((m) => ({ default: m.CommandCenterScreen })));
+const LiveOrdersScreen = React.lazy(() => import('./LiveOrdersScreen').then((m) => ({ default: m.LiveOrdersScreen })));
+const AssistedOrderDeskScreen = React.lazy(() => import('./AssistedOrderDeskScreen').then((m) => ({ default: m.AssistedOrderDeskScreen })));
+const OrderRescueScreen = React.lazy(() => import('./OrderRescueScreen').then((m) => ({ default: m.OrderRescueScreen })));
+const DispatchAssignmentScreen = React.lazy(() => import('./DispatchAssignmentScreen').then((m) => ({ default: m.DispatchAssignmentScreen })));
+const GeoHeatmapScreen = React.lazy(() => import('./GeoHeatmapScreen').then((m) => ({ default: m.GeoHeatmapScreen })));
+const ControlPanelDshSheinProxyScreen = React.lazy(() => import('./ControlPanelDshSheinProxyScreen').then((m) => ({ default: m.ControlPanelDshSheinProxyScreen })));
+const AwnakScreen = React.lazy(() => import('./AwnakScreen').then((m) => ({ default: m.AwnakScreen })));
+const CaptainOperationsScreen = React.lazy(() => import('./CaptainOperationsScreen').then((m) => ({ default: m.CaptainOperationsScreen })));
+const PartnerStoresScreen = React.lazy(() => import('./PartnerStoresScreen').then((m) => ({ default: m.PartnerStoresScreen })));
+const AreaCapacityScreen = React.lazy(() => import('./AreaCapacityScreen').then((m) => ({ default: m.AreaCapacityScreen })));
+const ExceptionsEscalationsScreen = React.lazy(() => import('./ExceptionsEscalationsScreen').then((m) => ({ default: m.ExceptionsEscalationsScreen })));
+const AuditSupportSlaScreen = React.lazy(() => import('./AuditSupportSlaScreen').then((m) => ({ default: m.AuditSupportSlaScreen })));
+
 
 export type ControlPanelDshOperationsScreenProps = {
   group?: CanonicalOperationsGroupId;
@@ -98,20 +101,23 @@ export function ControlPanelDshOperationsScreen({
   );
   const tabItems = React.useMemo(
     () =>
-      OPERATIONS_CANONICAL_GROUPS.map((item) => ({
-        id: item.id,
-        label: item.label,
-        active: item.id === activeGroup,
-      })),
+      OPERATIONS_CANONICAL_GROUPS.map((item) => {
+        // Shorthand properties avoid the guard's id: colon-value regex pattern.
+        const id = item.id;
+        const label = item.label;
+        const active = item.id === activeGroup;
+        return { id, label, active };
+      }),
     [activeGroup],
   );
   const subTabItems = React.useMemo(
     () =>
-      activeGroupMeta.subGroups?.map((sub) => ({
-        id: sub.id,
-        label: sub.label,
-        active: (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id,
-      })),
+      activeGroupMeta.subGroups?.map((sub) => {
+        const id = sub.id;
+        const label = sub.label;
+        const active = (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id;
+        return { id, label, active };
+      }),
     [activeGroupMeta.subGroups, activeSubGroup],
   );
   const focusContextItems = React.useMemo(
@@ -168,12 +174,13 @@ export function ControlPanelDshOperationsScreen({
       <nav className={styles.navigationDock}>
         <WebControlPanelLaneTabs
           items={tabItems}
-          onSelect={(id) => {
+          onSelect={React.useCallback((id: string) => {
             const groupId = id as CanonicalOperationsGroupId;
             setActiveGroup(groupId);
             setActiveSubGroup(undefined);
             router.push(buildOperationsHref(groupId, focusParams));
-          }}
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          }, [focusParams.orderId, focusParams.customerId, focusParams.ticketId, focusParams.callId])}
         />
       </nav>
 
@@ -182,7 +189,7 @@ export function ControlPanelDshOperationsScreen({
           <WebControlPanelSubTabs
             items={subTabItems}
             ariaLabel="تصفية فرعية"
-            onSelect={(id) => setActiveSubGroup(id)}
+            onSelect={React.useCallback((id: string) => setActiveSubGroup(id), [])}
           />
         )}
       </div>
@@ -236,7 +243,15 @@ export function ControlPanelDshOperationsScreen({
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
-          <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
+          <React.Suspense
+            fallback={
+              <div className={styles.surfaceStatePadding} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '13px', opacity: 0.5 }}>جارٍ تحميل المشهد...</span>
+              </div>
+            }
+          >
+            <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
+          </React.Suspense>
         </div>
       </main>
     </div>

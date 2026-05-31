@@ -1,57 +1,27 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelKpiStrip,
 } from '@bthwani/ui-kit/web';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { buildOperationsHref } from './operations.registry';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
-type StoreDeliveryMode = 'bthwani_delivery' | 'partner_delivery';
+import { PARTNER_STORES_PREVIEW, type StoreDeliveryMode } from '../../data';
 
-const STORES: readonly {
-  id: string; name: string; branch: string; status: string;
-  deliveryMode: StoreDeliveryMode;
-  prepTime: string; readyOrders: number; issue: string;
-  suggestion: { label: string; reason: string; confidence: 'high' | 'medium'; action: string; secondary: string | null; auditRequired: boolean };
-  statusTone: 'warning' | 'danger' | 'success';
-}[] = [
-  {
-    id: 'STR-402', name: 'متجر الرياض', branch: 'العليا', status: 'مضغوط',
-    deliveryMode: 'bthwani_delivery',
-    prepTime: '18 دقيقة', readyOrders: 3, issue: 'تأخير مستمر: تجاوز المعدل بـ 8 دقائق',
-    suggestion: { label: 'تواصل مع المتجر فوراً', reason: 'وقت التجهيز تجاوز المعدل بـ 8 دقائق', confidence: 'high', action: 'تواصل', secondary: 'إيقاف مؤقت', auditRequired: false },
-    statusTone: 'warning',
-  },
-  {
-    id: 'STR-405', name: 'مقهى الشرق', branch: 'الملز', status: 'تأخير',
-    deliveryMode: 'bthwani_delivery',
-    prepTime: '24 دقيقة', readyOrders: 5, issue: '5 طلبات جاهزة لم يستلمها كابتن',
-    suggestion: { label: 'وجّه كابتن للاستلام فوراً', reason: '5 طلبات جاهزة بلا كابتن ووقت انتظار مرتفع', confidence: 'high', action: 'توجيه كباتن', secondary: 'إيقاف استقبال', auditRequired: false },
-    statusTone: 'danger',
-  },
-  {
-    id: 'STR-412', name: 'مخبز الورد', branch: 'اليرموك', status: 'مفتوح',
-    deliveryMode: 'partner_delivery',
-    prepTime: '8 دقائق', readyOrders: 0, issue: '',
-    suggestion: { label: 'لا تدخل مطلوب', reason: 'وضع المتجر طبيعي ولا طلبات معلقة', confidence: 'high', action: 'عرض تفاصيل', secondary: null, auditRequired: false },
-    statusTone: 'success',
-  },
-  {
-    id: 'STR-415', name: 'مطعم الساحل', branch: 'النفل', status: 'مفتوح',
-    deliveryMode: 'partner_delivery',
-    prepTime: '12 دقيقة', readyOrders: 1, issue: '',
-    suggestion: { label: 'تابع الطلب الواحد الجاهز', reason: 'طلب جاهز — موصل المتجر يتولى التوصيل', confidence: 'medium', action: 'تواصل مع المتجر', secondary: null, auditRequired: false },
-    statusTone: 'success',
-  },
-];
+const STORES = PARTNER_STORES_PREVIEW;
 
-const runPreviewOperation = () => undefined;
+
+const runPreviewOperation = () => undefined; // fallback for non-routable preview actions
 
 export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: PartnerStoresScreenProps) {
+  const router = useRouter();
+
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
@@ -81,14 +51,28 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
             reason={store.suggestion.reason}
             sla={`التجهيز: ${store.prepTime} | جاهزة: ${store.readyOrders} | ${store.deliveryMode === 'partner_delivery' ? 'توصيل المتجر' : 'توصيل بثواني'}`}
             primaryAction={{
-              id: 'primary',
+              id: `${store.id}-primary`,
               label: store.suggestion.action,
-              onAction: runPreviewOperation,
+              onAction: () => {
+                if (store.suggestion.action === 'توجيه كباتن') {
+                  router.push(buildOperationsHref('dispatch-assignment'));
+                } else if (store.suggestion.action === 'تواصل مع المتجر') {
+                  router.push(buildOperationsHref('partner-stores', { orderId: store.id }));
+                } else {
+                  runPreviewOperation();
+                }
+              },
             }}
             secondaryAction={store.suggestion.secondary ? {
-              id: 'secondary',
+              id: `${store.id}-secondary`,
               label: store.suggestion.secondary,
-              onAction: runPreviewOperation,
+              onAction: () => {
+                if (store.suggestion.secondary === 'إيقاف مؤقت' || store.suggestion.secondary === 'إيقاف استقبال') {
+                  router.push(buildOperationsHref('exceptions-escalations'));
+                } else {
+                  runPreviewOperation();
+                }
+              },
             } : undefined}
           />
         ))}

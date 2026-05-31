@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelKpiStrip,
 } from '@bthwani/ui-kit/web';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { buildOperationsHref } from './operations.registry';
 
 export type CaptainOperationsScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -41,9 +43,11 @@ const CAPTAINS = [
   },
 ] as const;
 
-const runPreviewOperation = () => undefined;
+const runPreviewOperation = () => undefined; // fallback for non-routable preview actions
 
 export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup }: CaptainOperationsScreenProps) {
+  const router = useRouter();
+
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
@@ -52,10 +56,10 @@ export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup
 
       <WebControlPanelKpiStrip
         items={[
-          { id: 'online', label: 'متصل الآن', value: '٤٢', tone: 'success' },
-          { id: 'busy', label: 'مشغول', value: '١٢', tone: 'warning' },
-          { id: 'offline', label: 'غير متصل', value: '٨', tone: 'neutral' },
-          { id: 'blocked', label: 'موقوف', value: '٣', tone: 'danger' }
+          { id: 'cap-kpi-online', label: 'متصل الآن', value: '٤٢', tone: 'success' },
+          { id: 'cap-kpi-busy', label: 'مشغول', value: '١٢', tone: 'warning' },
+          { id: 'cap-kpi-offline', label: 'غير متصل', value: '٨', tone: 'neutral' },
+          { id: 'cap-kpi-blocked', label: 'موقوف', value: '٣', tone: 'danger' }
         ]}
       />
 
@@ -72,14 +76,28 @@ export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup
             reason={cap.suggestion.reason}
             sla={`الموقع: ${cap.location} | تقييم: ${cap.performance}`}
             primaryAction={{
-              id: 'primary',
+              id: `${cap.id}-primary`,
               label: cap.suggestion.action,
-              onAction: runPreviewOperation,
+              onAction: () => {
+                if (cap.suggestion.action === 'إسناد طلب') {
+                  router.push(buildOperationsHref('dispatch-assignment'));
+                } else if (cap.suggestion.action === 'تصعيد') {
+                  router.push(buildOperationsHref('exceptions-escalations'));
+                } else {
+                  runPreviewOperation();
+                }
+              },
             }}
             secondaryAction={cap.suggestion.secondary ? {
-              id: 'secondary',
+              id: `${cap.id}-secondary`,
               label: cap.suggestion.secondary,
-              onAction: runPreviewOperation,
+              onAction: () => {
+                if (cap.suggestion.secondary === 'تعطيل مؤقت') {
+                  router.push(buildOperationsHref('exceptions-escalations'));
+                } else {
+                  runPreviewOperation();
+                }
+              },
             } : undefined}
           />
         ))}

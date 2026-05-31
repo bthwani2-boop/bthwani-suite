@@ -2253,6 +2253,40 @@ export function selectDshControlPanelCatalogPreview() {
   };
 }
 
+
+export type StoreDeliveryMode = 'bthwani_delivery' | 'partner_delivery';
+
+export const PARTNER_STORES_PREVIEW = [
+  {
+    id: 'STR-402', name: 'متجر الرياض', branch: 'العليا', status: 'مضغوط',
+    deliveryMode: 'bthwani_delivery' as const,
+    prepTime: '18 دقيقة', readyOrders: 3, issue: 'تأخير مستمر: تجاوز المعدل بـ 8 دقائق',
+    suggestion: { label: 'تواصل مع المتجر فوراً', reason: 'وقت التجهيز تجاوز المعدل بـ 8 دقائق', confidence: 'high' as const, action: 'تواصل', secondary: 'إيقاف مؤقت', auditRequired: false },
+    statusTone: 'warning' as const,
+  },
+  {
+    id: 'STR-405', name: 'مقهى الشرق', branch: 'الملز', status: 'تأخير',
+    deliveryMode: 'bthwani_delivery' as const,
+    prepTime: '24 دقيقة', readyOrders: 5, issue: '5 طلبات جاهزة لم يستلمها كابتن',
+    suggestion: { label: 'وجّه كابتن للاستلام فوراً', reason: '5 طلبات جاهزة بلا كابتن ووقت انتظار مرتفع', confidence: 'high' as const, action: 'توجيه كباتن', secondary: 'إيقاف استقبال', auditRequired: false },
+    statusTone: 'danger' as const,
+  },
+  {
+    id: 'STR-412', name: 'مخبز الورد', branch: 'اليرموك', status: 'مفتوح',
+    deliveryMode: 'partner_delivery' as const,
+    prepTime: '8 دقائق', readyOrders: 0, issue: '',
+    suggestion: { label: 'لا تدخل مطلوب', reason: 'وضع المتجر طبيعي ولا طلبات معلقة', confidence: 'high' as const, action: 'عرض تفاصيل', secondary: null, auditRequired: false },
+    statusTone: 'success' as const,
+  },
+  {
+    id: 'STR-415', name: 'مطعم الساحل', branch: 'النفل', status: 'مفتوح',
+    deliveryMode: 'partner_delivery' as const,
+    prepTime: '12 دقيقة', readyOrders: 1, issue: '',
+    suggestion: { label: 'تابع الطلب الواحد الجاهز', reason: 'طلب جاهز — موصل المتجر يتولى التوصيل', confidence: 'medium' as const, action: 'تواصل مع المتجر', secondary: null, auditRequired: false },
+    statusTone: 'success' as const,
+  },
+] as const;
+
 // ── Canonical Mock Data ──────────────────────────────────────────────────
 // Re-exported from canonical.preview-data to maintain backward-compatible public API.
 export {

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
@@ -8,6 +9,7 @@ import {
 import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { buildOperationsHref } from './operations.registry';
 
 export type AreaCapacityScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -18,9 +20,8 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-const runPreviewOperation = () => undefined;
-
 export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: AreaCapacityScreenProps) {
+  const router = useRouter();
   const preview = AREA_CAPACITY_OPERATIONAL_PREVIEW;
 
   const summaryKpi = [
@@ -51,14 +52,14 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
             reason={area.note}
             sla={`محمية: ${area.protectedZones} | حرة: ${area.freeZones} | ${area.surgeBonus}`}
             primaryAction={{
-              id: 'bonus',
+              id: `${area.id}-bonus`,
               label: 'تفعيل الحافز',
-              onAction: runPreviewOperation,
+              onAction: () => router.push(buildOperationsHref('dispatch-assignment', { orderId: area.id })),
             }}
             secondaryAction={{
-              id: 'stop',
-              label: 'إيقاف مؤقت',
-              onAction: runPreviewOperation,
+              id: `${area.id}-stop`,
+              label: 'مراجعة الخريطة',
+              onAction: () => router.push(buildOperationsHref('geo-heatmap')),
             }}
           />
         ))}

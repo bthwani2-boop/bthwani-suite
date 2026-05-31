@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$RepoRoot = "C:\bthwani-suite",
   [string]$PlanRoot = "",
   [switch]$Strict
