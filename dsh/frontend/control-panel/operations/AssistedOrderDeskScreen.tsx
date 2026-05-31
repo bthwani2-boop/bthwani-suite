@@ -14,11 +14,26 @@ import {
 } from '../../data/orders.preview-data';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
+import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type AssistedOrderDeskScreenProps = {
   hubHref: string;
   subGroup?: string;
+};
+
+const translateDesc = (text: string) => {
+  const descTranslations: Record<string, string> = {
+    'Paid via WLT wallet snapshot — controllable directly.': 'تم الدفع عبر لقطة محفظة WLT — قابلة للتحكم المباشر.',
+    'Refund mutation allowed and managed from DSH.': 'تعديل الاسترداد مسموح به وتتم إدارته من DSH.',
+    'Partner settlement mutable and managed directly.': 'تسوية الشريك قابلة للتعديل وتتم إدارتها مباشرة.',
+    'Assisted order rebuild after manual call confirmation.': 'إعادة بناء الطلب المساعد بعد التأكيد الهاتفي اليدوي.',
+    'DSH & WLT': 'نظام DSH والمحفظة WLT',
+    'Riyadh / Al Yasmin': 'الرياض / الياسمين',
+    'Riyadh / Al Malaz': 'الرياض / الملز',
+    'Riyadh / Al Olaya': 'الرياض / العليا',
+  };
+  return descTranslations[text] ?? text;
 };
 
 const IDENTITY_STATUS_META = {
@@ -172,7 +187,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
     setDesks((prev) =>
       prev.map((d) => {
         if (d.deskId !== selectedDesk.deskId) return d;
-        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId } };
+        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId as import('../../app-client/contracts/dsh-client-binding.contracts').DshFulfillmentDeliveryMode } };
       }),
     );
   };
@@ -281,6 +296,13 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
             {desks.map((desk) => {
               const deskIdentity = IDENTITY_STATUS_META[desk.identityVerification.verificationStatus];
               const isSelected = desk.deskId === selectedDeskId;
+              const modeLabel = DSH_FULFILLMENT_OPERATIONAL_MODE_META[desk.deliveryModeSelector.selectedMode]?.label ?? desk.deliveryModeSelector.selectedMode;
+              const zoneLabels: Record<string, string> = {
+                'Riyadh / Al Yasmin': 'الرياض / الياسمين',
+                'Riyadh / Al Malaz': 'الرياض / الملز',
+                'Riyadh / Al Olaya': 'الرياض / العليا',
+              };
+              const zone = zoneLabels[desk.serviceabilitySummary.zoneLabel] ?? desk.serviceabilitySummary.zoneLabel;
               return (
                 <WebControlPanelDecisionRow
                   key={desk.deskId}
@@ -290,9 +312,8 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
                   statusTone={deskIdentity.tone}
                   risk={deskIdentity.risk}
                   recommendation={desk.submitDraftPreview.nextAction}
-                  reason={`${desk.deliveryModeSelector.selectedMode} · ${desk.serviceabilitySummary.zoneLabel}`}
+                  reason={`${modeLabel} · ${zone}`}
                   sla={desk.auditFlags.join(' · ')}
-                  isActive={isSelected}
                   onInspect={isSelected ? () => setSelectedDeskId(null) : undefined}
                   primaryAction={{
                     id: `${desk.deskId}-open`,
@@ -340,7 +361,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
             <div className={styles.surfaceInspectorSummary}>
               <div className={styles.surfaceInspectorSummaryRow}>
                 <span className={styles.surfaceInspectorSummaryLabel}>الطلب</span>
-                <span className={styles.surfaceInspectorSummaryValue}>{selectedDesk.orderId ?? '—'}</span>
+                <span className={styles.surfaceInspectorSummaryValue} dir="ltr" style={{ display: 'inline-block' }}>{selectedDesk.orderId ?? '—'}</span>
               </div>
               <div className={styles.surfaceInspectorSummaryRow}>
                 <span className={styles.surfaceInspectorSummaryLabel}>الهوية</span>
@@ -364,17 +385,27 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
             <div className={styles.surfaceInspectorSection}>
               <h4 className={styles.surfaceInspectorSectionTitle}>بيانات العميل</h4>
               <div className={styles.surfaceInspectorMeta}>
-                {selectedDesk.lookupPanel.inputs.map((input) => (
-                  <div key={input.key} className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-                    <strong>{input.label}</strong>
-                    <input
-                      type="text"
-                      value={input.value}
-                      onChange={(e) => handleUpdateLookup(input.key, e.target.value)}
-                      className={styles.inspectorInput}
-                    />
-                  </div>
-                ))}
+                {selectedDesk.lookupPanel.inputs.map((input) => {
+                  const lookupLabels: Record<string, string> = {
+                    phone: 'رقم الهاتف',
+                    orderId: 'معرّف الطلب',
+                    customerId: 'معرّف العميل',
+                    ticketId: 'معرّف التذكرة',
+                  };
+                  return (
+                    <div key={input.key} className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                      <strong>{lookupLabels[input.key] ?? input.label}</strong>
+                      <input
+                        type="text"
+                        value={input.value}
+                        onChange={(e) => handleUpdateLookup(input.key, e.target.value)}
+                        className={styles.inspectorInput}
+                        dir="ltr"
+                        style={{ textAlign: 'right' }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -492,7 +523,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
                   <strong>المنطقة</strong>
-                  <span>{selectedDesk.serviceabilitySummary.zoneLabel}</span>
+                  <span>{translateDesc(selectedDesk.serviceabilitySummary.zoneLabel)}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
                   <strong>الحالة</strong>
@@ -512,14 +543,14 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
             <div className={styles.surfaceInspectorSection}>
               <h4 className={styles.surfaceInspectorSectionTitle}>
                 رؤية WLT
-                <span className={styles.surfaceInspectorSectionToken}>{selectedDesk.wltReadOnlyHandoff.calculationTruthOwner}</span>
+                <span className={styles.surfaceInspectorSectionToken}>{translateDesc(selectedDesk.wltReadOnlyHandoff.calculationTruthOwner)}</span>
               </h4>
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
                   <strong>رؤية الدفع</strong>
                   <input
                     type="text"
-                    value={selectedDesk.wltReadOnlyHandoff.paymentVisibility}
+                    value={translateDesc(selectedDesk.wltReadOnlyHandoff.paymentVisibility)}
                     onChange={(e) => handleUpdateWltHandoff('paymentVisibility', e.target.value)}
                     className={styles.inspectorInput}
                   />
@@ -528,7 +559,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
                   <strong>رؤية الاسترداد</strong>
                   <input
                     type="text"
-                    value={selectedDesk.wltReadOnlyHandoff.refundVisibility}
+                    value={translateDesc(selectedDesk.wltReadOnlyHandoff.refundVisibility)}
                     onChange={(e) => handleUpdateWltHandoff('refundVisibility', e.target.value)}
                     className={styles.inspectorInput}
                   />
@@ -538,7 +569,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
                     <strong>رؤية التسوية</strong>
                     <input
                       type="text"
-                      value={selectedDesk.wltReadOnlyHandoff.settlementVisibility}
+                      value={translateDesc(selectedDesk.wltReadOnlyHandoff.settlementVisibility)}
                       onChange={(e) => handleUpdateWltHandoff('settlementVisibility', e.target.value)}
                       className={styles.inspectorInput}
                     />
@@ -555,7 +586,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
                   <strong>سبب القرار</strong>
                   <input
                     type="text"
-                    value={selectedDesk.auditReason.reasonLabel}
+                    value={translateDesc(selectedDesk.auditReason.reasonLabel)}
                     onChange={(e) => handleUpdateAuditReason('reasonLabel', e.target.value)}
                     className={styles.inspectorInput}
                   />

@@ -490,9 +490,30 @@ export const DSH_REASON_EVIDENCE_POLICY: ReadonlyArray<DshReasonEvidencePolicy> 
   },
 ] as const;
 
+let _dynamicAuditEntries: DshAuditEntry[] = [];
+
+export function addDshAuditEntry(entry: DshAuditEntry) {
+  _dynamicAuditEntries.push(entry);
+}
+
+export function getDshAuditEntries(): DshAuditEntry[] {
+  return [...DSH_AUDIT_PREVIEW_ENTRIES, ..._dynamicAuditEntries];
+}
+
+export function resolveAuditEntry(id: string): DshAuditEntry | undefined {
+  if (id.startsWith('audit-') || id.endsWith('-audit')) {
+    return getDshAuditEntries().find((e) => e.entryId === id);
+  }
+  // Static mappings for AU-
+  if (id === 'AU-7001') return getDshAuditEntryById('audit-004');
+  if (id === 'AU-7002') return getDshAuditEntryById('audit-003');
+  if (id === 'AU-7003') return getDshAuditEntryById('audit-001');
+  return undefined;
+}
+
 /** Returns a single preview audit entry by entryId. */
 export function getDshAuditEntryById(entryId: string): DshAuditEntry | undefined {
-  return DSH_AUDIT_PREVIEW_ENTRIES.find((e) => e.entryId === entryId);
+  return getDshAuditEntries().find((e) => e.entryId === entryId);
 }
 
 export function getMarketingPermissionResult(action?: string) {

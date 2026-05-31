@@ -11,6 +11,7 @@ import {
 import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
+import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -30,8 +31,11 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
   const supportGovernance = getDshControlPanelGovernanceEntry('support');
   const platformGovernance = getDshControlPanelGovernanceEntry('platform');
 
+  const dynamicAudits = getDynamicUiAudits();
+  const allAudits = [...dynamicAudits, ...preview.audits];
+
   const summaryKpi = [
-    { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits), tone: 'neutral' as const },
+    { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits + dynamicAudits.length), tone: 'neutral' as const },
     { id: 'support', label: 'تذاكر الدعم', value: String(preview.summary.supportTickets), tone: 'neutral' as const },
     { id: 'sla', label: 'خطر SLA', value: String(preview.summary.slaRisk), tone: 'danger' as const },
     { id: 'evidence', label: 'اكتمال الإثبات', value: `${preview.summary.evidenceComplete}%`, tone: 'success' as const },
@@ -63,7 +67,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
         <Box gap={3}>
           <WebControlPanelQueue
             title="سجل التدقيق والمتابعة"
-            meta={`${preview.audits.length} تدقيقات نشطة`}
+            meta={`${allAudits.length} تدقيقات نشطة`}
           >
             {/* Table Column Headers */}
             <div
@@ -88,7 +92,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
             </div>
 
             {/* Table Rows */}
-            {preview.audits.map((item) => {
+            {allAudits.map((item) => {
               const statusTone = TONE_MAP[item.statusTone] ?? 'neutral';
               const isSelected = detailOrderId === item.id;
 
@@ -120,7 +124,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
                     <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{item.note}</span>
                     <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '9px', background: 'var(--bthwani-control-panel-surface-inset)', color: 'var(--bthwani-control-panel-text-muted)', padding: '1px 5px', borderRadius: '4px' }}>
-                        ID: {item.id}
+                        المعرّف: <span dir="ltr" style={{ display: 'inline-block' }}>{item.id}</span>
                       </span>
                     </div>
                   </div>
@@ -169,6 +173,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
           {detailOrderId !== null ? (
             <AuditTrailDetailWorkspace
               orderId={detailOrderId}
+              auditEntry={resolveAuditEntry(detailOrderId)}
               onClose={() => setDetailOrderId(null)}
             />
           ) : (

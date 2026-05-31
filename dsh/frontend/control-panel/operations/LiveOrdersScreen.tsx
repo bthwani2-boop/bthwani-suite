@@ -51,6 +51,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const activeMode = FULFILLMENT_MODE_IDS.find((m) => m === subGroup) ?? null;
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
   const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
+  const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
 
   const handleDecision = React.useCallback((orderId: string, decision: OpsDecision, note: string) => {
     const nextStatus = mapOperationsDecisionToLifecycle(decision);
@@ -63,7 +64,8 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
     if (actionLabel.includes('إسناد')) {
       router.push(buildOperationsHref('dispatch-assignment', { orderId }));
     } else if (actionLabel.includes('إثبات') || actionLabel.includes('طلب')) {
-      alert(`تم طلب إثبات الاستلام للطلب ${orderId} بنجاح. قيد المتابعة مع الدعم.`);
+      setActionFeedback(`تم طلب إثبات الاستلام للطلب ${orderId} بنجاح. قيد المتابعة مع الدعم.`);
+      setTimeout(() => setActionFeedback(null), 3500);
     } else {
       router.push(buildOperationsHref('order-rescue', { orderId }));
     }
@@ -130,7 +132,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
             title={`تفاصيل الطلب الحي — ${order.id}`}
             onClose={() => setSelectedItemId(null)}
           >
-            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px', overflowY: 'auto', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة الحالية:</span>
                 <WebControlPanelStatusTag
@@ -224,7 +226,12 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                   </button>
                 )}
               </div>
-            </Box>
+              {actionFeedback && (
+                <div className={styles.overrideNotification} style={{ marginTop: '8px', textAlign: 'center' }}>
+                  {actionFeedback}
+                </div>
+              )}
+            </div>
           </WebControlPanelInspectorShell>
         );
       }
@@ -271,11 +278,19 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     fontWeight: 700,
                     fontSize: '11px',
                   }}
-                  onClick={() => alert(`تم اتخاذ الإجراء: ${order.nextAction}`)}
+                  onClick={() => {
+                    setActionFeedback(`تم اتخاذ الإجراء: ${order.nextAction} للطلب ${order.id}`);
+                    setTimeout(() => setActionFeedback(null), 3500);
+                  }}
                 >
                   {order.nextAction}
                 </button>
               </div>
+              {actionFeedback && (
+                <div className={styles.overrideNotification} style={{ marginTop: '8px', textAlign: 'center' }}>
+                  {actionFeedback}
+                </div>
+              )}
             </Box>
           </WebControlPanelInspectorShell>
         );
@@ -286,6 +301,12 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   return (
     <Box gap={3}>
       <WebControlPanelKpiStrip items={summaryKpi} />
+
+      {actionFeedback && !selectedItemId && (
+        <div className={styles.overrideNotification} style={{ padding: '8px 12px', background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', textAlign: 'center' }}>
+          {actionFeedback}
+        </div>
+      )}
 
       <div className={styles.surfaceSplitGrid}>
         <Box gap={3}>
@@ -375,7 +396,10 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                   primaryAction={{
                     id: `${row.id}-action`,
                     label: row.nextAction,
-                    onAction: () => alert(`تم اتخاذ الإجراء: ${row.nextAction}`),
+                    onAction: () => {
+                      setActionFeedback(`تم اتخاذ الإجراء: ${row.nextAction} للطلب ${row.id}`);
+                      setTimeout(() => setActionFeedback(null), 3500);
+                    },
                   }}
                 />
               ))}

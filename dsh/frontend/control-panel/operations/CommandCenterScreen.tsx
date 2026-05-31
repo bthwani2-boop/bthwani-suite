@@ -96,7 +96,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
               statusTone="neutral"
               recommendation="داخل العمليات"
               reason={operationsGovernance.notes}
-              sla="إسناد، ضغط، live orders"
+              sla="إسناد، ضغط، الطلبات الحية"
               primaryAction={{
                 id: 'go-live-orders',
                 label: 'الطلبات الحية',
@@ -110,7 +110,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
               statusTone="warning"
               recommendation="حوّل إلى الدعم"
               reason={supportGovernance.notes}
-              sla="tickets, messaging, follow-up"
+              sla="التذاكر، المحادثات، المتابعة"
               primaryAction={{ id: 'go-support', label: 'فتح الدعم', onAction: () => router.push('/support') }}
             />
             <WebControlPanelDecisionRow
@@ -120,7 +120,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
               statusTone="warning"
               recommendation="حوّل إلى WLT — عرض فقط"
               reason={financeGovernance.notes}
-              sla="preview-only — لا تعديل مالي"
+              sla="معاينة فقط — لا تعديل مالي"
               primaryAction={{ id: 'go-finance', label: 'فتح المالية', onAction: () => router.push('/finance') }}
             />
           </div>

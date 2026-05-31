@@ -75,19 +75,22 @@ export function ControlPanelDshOperationsScreen({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeGroup, setActiveGroup] = React.useState<CanonicalOperationsGroupId>(group);
-  const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
     setActiveGroup(group);
   }, [group]);
 
   const activeGroupMeta = getOperationsGroupMeta(activeGroup);
+  const activeSubGroup = searchParams.get('subGroup') || activeGroupMeta.subGroups?.[0]?.id || undefined;
+  const activeSubGroupMeta = activeGroupMeta.subGroups?.find((sub) => sub.id === activeSubGroup);
+
   const focusParams: OperationsFocusParams = {
     orderId,
     customerId: searchParams.get('customerId') ?? undefined,
     ticketId: searchParams.get('ticketId') ?? undefined,
     callId: searchParams.get('callId') ?? undefined,
     panel,
+    subGroup: searchParams.get('subGroup') ?? undefined,
   };
   const hubHref = buildOperationsHref(activeGroup, focusParams);
   const ActiveScreen = SCREEN_RENDERERS[activeGroup];
@@ -117,7 +120,7 @@ export function ControlPanelDshOperationsScreen({
       activeGroupMeta.subGroups?.map((sub) => {
         const id = sub.id;
         const label = sub.label;
-        const active = (activeSubGroup || activeGroupMeta.subGroups?.[0]?.id) === sub.id;
+        const active = activeSubGroup === sub.id;
         return { id, label, active };
       }),
     [activeGroupMeta.subGroups, activeSubGroup],
@@ -144,14 +147,22 @@ export function ControlPanelDshOperationsScreen({
   const handleSelectTab = React.useCallback((id: string) => {
     const groupId = id as CanonicalOperationsGroupId;
     setActiveGroup(groupId);
-    setActiveSubGroup(undefined);
-    router.push(buildOperationsHref(groupId, focusParams));
+    // Switch main tabs, reset subGroup
+    const nextParams = {
+      orderId: focusParams.orderId,
+      customerId: focusParams.customerId,
+      ticketId: focusParams.ticketId,
+      callId: focusParams.callId,
+      panel: focusParams.panel,
+    };
+    router.push(buildOperationsHref(groupId, nextParams));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusParams.orderId, focusParams.customerId, focusParams.ticketId, focusParams.callId]);
+  }, [focusParams.orderId, focusParams.customerId, focusParams.ticketId, focusParams.callId, focusParams.panel, router]);
 
   const handleSelectSubTab = React.useCallback((id: string) => {
-    setActiveSubGroup(id);
-  }, []);
+    router.push(buildOperationsHref(activeGroup, { ...focusParams, subGroup: id }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGroup, focusParams.orderId, focusParams.customerId, focusParams.ticketId, focusParams.callId, focusParams.panel, router]);
 
   return (
     <div className={styles.surfaceCockpit} dir="rtl">
@@ -163,6 +174,72 @@ export function ControlPanelDshOperationsScreen({
             </div>
           </div>
           <Box gap={0}>
+            {/* Breadcrumb Navigation */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px',
+                color: 'var(--bthwani-control-panel-text-muted)',
+                marginBottom: '4px',
+                userSelect: 'none',
+              }}
+            >
+              <span
+                style={{ cursor: 'pointer', transition: 'color 0.2s' }}
+                onClick={() => router.push('/')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--bthwani-control-panel-brand)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '')}
+              >
+                الرئيسية
+              </span>
+              <span style={{ fontSize: '9px', opacity: 0.5 }}>◀</span>
+              <span
+                style={{ cursor: 'pointer', transition: 'color 0.2s' }}
+                onClick={() => router.push('/operations')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--bthwani-control-panel-brand)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '')}
+              >
+                العمليات
+              </span>
+              <span style={{ fontSize: '9px', opacity: 0.5 }}>◀</span>
+              <span
+                style={{
+                  cursor: 'pointer',
+                  fontWeight: !activeSubGroupMeta ? 700 : 'normal',
+                  color: !activeSubGroupMeta ? 'var(--bthwani-control-panel-text)' : undefined,
+                  transition: 'color 0.2s',
+                }}
+                onClick={() => router.push(buildOperationsHref(activeGroup))}
+                onMouseEnter={(e) => {
+                  if (activeSubGroupMeta) {
+                    e.currentTarget.style.color = 'var(--bthwani-control-panel-brand)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeSubGroupMeta) {
+                    e.currentTarget.style.color = '';
+                  }
+                }}
+              >
+                {activeGroupMeta.label}
+              </span>
+              {activeSubGroupMeta && (
+                <>
+                  <span style={{ fontSize: '9px', opacity: 0.5 }}>◀</span>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      color: 'var(--bthwani-control-panel-text)',
+                    }}
+                  >
+                    {activeSubGroupMeta.label}
+                  </span>
+                </>
+              )}
+            </div>
+
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>عمليات DSH</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
@@ -206,11 +283,22 @@ export function ControlPanelDshOperationsScreen({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                   <span className={styles.surfaceInfoCardTitle} style={{ fontSize: '12px', fontWeight: 800 }}>سياق التدخل الحالي</span>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    {focusContextItems.map((item) => (
-                      <div key={item.label} style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>
-                        <strong>{item.label}:</strong> <span style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.value}</span>
-                      </div>
-                    ))}
+                    {focusContextItems.map((item) => {
+                      const labels: Record<string, string> = {
+                        orderId: 'معرّف الطلب',
+                        customerId: 'معرّف العميل',
+                        ticketId: 'معرّف التذكرة',
+                        callId: 'معرّف المكالمة',
+                      };
+                      return (
+                        <div key={item.label} style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>
+                          <strong>{labels[item.label] ?? item.label}:</strong>{' '}
+                          <span dir="ltr" style={{ color: 'var(--bthwani-control-panel-brand)', display: 'inline-block' }}>
+                            {item.value}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

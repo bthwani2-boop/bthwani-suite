@@ -34,7 +34,7 @@ try {
   if (!(Test-Path -LiteralPath $ShaPath)) { throw "Missing SHA256SUMS.json in source: $SourcePlanRoot" }
 
   $Manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-  if ($Manifest.version -ne "6.0.0") { throw "Refusing to install non-V6 package. Found version: $($Manifest.version)" }
+  if ($Manifest.version -ne "7.0.0") { throw "Refusing to install non-V7 package. Found version: $($Manifest.version)" }
   Add-Result "source_manifest_version" "PASS" $Manifest.version
 
   $Sha = Get-Content -LiteralPath $ShaPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -97,7 +97,7 @@ try {
   $Results | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $RunRoot "evidence.json") -Encoding UTF8
   $summary = @"
 status: PASS
-package_version: 6.0.0
+package_version: 7.0.0
 session_id: $SessionId
 repo: $RepoRoot
 source_plan_root: $SourcePlanRoot
@@ -112,7 +112,7 @@ decision: PACKAGE_ADOPTABLE_FOR_CONTROLLED_EXECUTION
   Compress-Archive -Path (Join-Path $RunRoot "*") -DestinationPath $zipPath -Force
 
   Write-Host "RESULT: PASS"
-  Write-Host "PACKAGE_VERSION: 6.0.0"
+  Write-Host "PACKAGE_VERSION: 7.0.0"
   Write-Host "SESSION_ID: $SessionId"
   Write-Host "EVIDENCE_ROOT: $RunRoot"
   Write-Host "ZIP: $zipPath"

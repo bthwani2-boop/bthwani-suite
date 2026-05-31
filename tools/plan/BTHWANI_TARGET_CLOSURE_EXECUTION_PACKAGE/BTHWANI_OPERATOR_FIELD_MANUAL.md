@@ -120,7 +120,7 @@ It does not mean the entire product is closed after one cycle.
 ```
 
 
-## V6 Navigation
+## V7 Navigation
 
 Before opening any playbook, read:
 

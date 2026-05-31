@@ -154,6 +154,7 @@ export {
   translateOwner,
   translateStage,
   upsertApprovalRecord,
+  getDynamicUiAudits,
 } from './workflow';
 
 export { resolveDshImageSource } from './resolve-dsh-image-source';
@@ -416,6 +417,8 @@ export {
   getDshSectionAuditPolicy,
   getDshRoleArabicName,
   getDshAuditEntryById,
+  getDshAuditEntries,
+  resolveAuditEntry,
 } from './dsh-role-permission.model';
 
 export type { DshServiceId, DiscoveryFilter } from './dsh-discovery.contract';

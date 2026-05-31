@@ -120,6 +120,138 @@ export function ExceptionsEscalationsScreen({
   const [filterId, setFilterId] = React.useState<WorkspaceFilterId>('all');
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
 
+  // Friendly queue names and simulated default owners
+  const QUEUE_LABELS: Record<string, { label: string; owner: string }> = {
+    'customer-support': { label: 'دعم العملاء (Customer Support)', owner: 'فريق دعم العملاء' },
+    'captain-operations': { label: 'تشغيل الكباتن (Captain Operations)', owner: 'إدارة الكباتن' },
+    'partner-stores': { label: 'جاهزية وإدارة الشركاء (Partner Stores)', owner: 'إدارة الشركاء' },
+    'dispatch-assignment': { label: 'الإسناد والجدولة (Dispatch)', owner: 'فريق الإسناد' },
+    'audit-support-sla': { label: 'تدقيق الدعم والالتزام (SLA Audit)', owner: 'الدعم الفني' },
+  };
+
+  // Stateful exceptions state
+  const [exceptions, setExceptions] = React.useState(() =>
+    preview.exceptions.map((exc) => ({
+      ...exc,
+      customOwner: exc.currentOwner as string,
+      customQueue: exc.ownerQueue as string,
+      customSlaState: 'نشط' as 'نشط' | 'مصعّد' | 'محلول',
+      customNote: exc.note as string,
+      customStatusTone: exc.statusTone as 'warning' | 'danger' | 'best' | 'brand',
+    }))
+  );
+
+  // Stateful KPIs statistics
+  const [kpis, setKpis] = React.useState<{ open: number; escalate: number; resolve: number; close: number }>(() => ({
+    open: preview.summary.open,
+    escalate: preview.summary.escalate,
+    resolve: preview.summary.resolve,
+    close: preview.summary.close,
+  }));
+
+  const [activeForm, setActiveForm] = React.useState<null | 'escalate' | 'resolve'>(null);
+  const [actionStatus, setActionStatus] = React.useState<'idle' | 'pending' | 'success'>('idle');
+  const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+
+  // Form input states
+  const [selectedEscalationQueue, setSelectedEscalationQueue] = React.useState('customer-support');
+  const [handoffNote, setHandoffNote] = React.useState('');
+  const [resolutionNote, setResolutionNote] = React.useState('');
+
+  // Reset form status when selection changes
+  React.useEffect(() => {
+    setActiveForm(null);
+    setSelectedEscalationQueue('customer-support');
+    setHandoffNote('');
+    setResolutionNote('');
+    setActionStatus('idle');
+    setActionFeedback(null);
+  }, [selectedItemId]);
+
+  const handleEscalate = React.useCallback((id: string, targetQueue: string, noteText: string) => {
+    setActionStatus('pending');
+    setActionFeedback(null);
+
+    setTimeout(() => {
+      const queueDetails = QUEUE_LABELS[targetQueue] || { label: targetQueue, owner: 'مدير العمليات' };
+      const formattedNote = noteText.trim()
+        ? `[تم التصعيد إلى ${queueDetails.label}] الملاحظة: ${noteText}`
+        : `[تم التصعيد إلى ${queueDetails.label}]`;
+
+      setExceptions((prev) =>
+        prev.map((e) =>
+          e.id === id
+            ? {
+                ...e,
+                customOwner: queueDetails.owner,
+                customQueue: targetQueue,
+                customSlaState: 'مصعّد',
+                customStatusTone: 'danger',
+                customNote: e.customNote ? `${e.customNote} | ${formattedNote}` : formattedNote,
+              }
+            : e
+        )
+      );
+
+      setKpis((prev) => ({
+        ...prev,
+        escalate: prev.escalate + 1,
+      }));
+
+      setActionStatus('success');
+      setActionFeedback(`تم تصعيد الاستثناء ونقل ملكيته إلى (${queueDetails.label}) بنجاح.`);
+
+      setTimeout(() => {
+        setActionStatus('idle');
+        setActionFeedback(null);
+        setActiveForm(null);
+        setSelectedEscalationQueue('customer-support');
+        setHandoffNote('');
+      }, 1500);
+    }, 1000);
+  }, []);
+
+  const handleResolve = React.useCallback((id: string, noteText: string) => {
+    setActionStatus('pending');
+    setActionFeedback(null);
+
+    setTimeout(() => {
+      const formattedNote = noteText.trim()
+        ? `[تم الحل والإغلاق] الملاحظة: ${noteText}`
+        : `[تم الحل والإغلاق]`;
+
+      setExceptions((prev) =>
+        prev.map((e) =>
+          e.id === id
+            ? {
+                ...e,
+                customSlaState: 'محلول',
+                customStatusTone: 'best',
+                customNote: e.customNote ? `${e.customNote} | ${formattedNote}` : formattedNote,
+              }
+            : e
+        )
+      );
+
+      setKpis((prev) => ({
+        ...prev,
+        open: Math.max(0, prev.open - 1),
+        resolve: prev.resolve + 1,
+        close: prev.close + 1,
+      }));
+
+      setActionStatus('success');
+      setActionFeedback('تم حل الاستثناء وإغلاق تذكرته بنجاح وتحويل حالة الـ SLA إلى مستقر.');
+
+      setTimeout(() => {
+        setActionStatus('idle');
+        setActionFeedback(null);
+        setActiveForm(null);
+        setResolutionNote('');
+      }, 1500);
+    }, 1000);
+  }, []);
+
   const escalationWorkspaceFlows = React.useMemo(
     () => [...getDshEscalationFlowsForSurface('control-panel')].sort(byWorkspacePriority),
     [],
@@ -161,29 +293,30 @@ export function ExceptionsEscalationsScreen({
 
 
   const summaryKpi = [
-    { id: 'open', label: 'مفتوحة', value: String(preview.summary.open), tone: 'danger' as const },
-    { id: 'escalate', label: 'تصعيد', value: String(preview.summary.escalate), tone: 'warning' as const },
-    { id: 'resolve', label: 'حل', value: String(preview.summary.resolve), tone: 'neutral' as const },
-    { id: 'close', label: 'إغلاق', value: String(preview.summary.close), tone: 'success' as const },
+    { id: 'open', label: 'مفتوحة', value: String(kpis.open), tone: 'danger' as const },
+    { id: 'escalate', label: 'تصعيد', value: String(kpis.escalate), tone: 'warning' as const },
+    { id: 'resolve', label: 'حل', value: String(kpis.resolve), tone: 'neutral' as const },
+    { id: 'close', label: 'إغلاق', value: String(kpis.close), tone: 'success' as const },
   ];
 
   // Selected details lookup
   let inspectorContent: React.ReactNode = null;
   if (selectedItemId) {
     if (selectedItemId.type === 'exception') {
-      const exc = preview.exceptions.find((e) => e.id === selectedItemId.id);
+      const exc = exceptions.find((e) => e.id === selectedItemId.id);
       if (exc) {
         const linkage = EXCEPTION_TICKET_MAP[exc.id];
         const supportTicketId = linkage?.supportTicketId ?? `UNPROVEN-${exc.id}`;
         const auditEntryId = linkage?.auditEntryId;
-        const statusTone = TONE_MAP[exc.statusTone] ?? 'neutral';
+        const statusTone = TONE_MAP[exc.customStatusTone] ?? 'neutral';
+        const slaStateLabel = exc.customSlaState === 'نشط' ? 'نشط (مفتوح)' : exc.customSlaState === 'مصعّد' ? 'مصعّد (تحت المراجعة)' : 'مستقر (محلول)';
 
         inspectorContent = (
           <WebControlPanelInspectorShell
             title={`تفاصيل الاستثناء — ${exc.id}`}
             onClose={() => setSelectedItemId(null)}
           >
-            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', overflowY: 'auto', flex: 1, direction: 'rtl', textAlign: 'right' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الخطورة:</span>
                 <WebControlPanelStatusTag label={exc.severity} tone={statusTone} />
@@ -193,8 +326,9 @@ export function ExceptionsEscalationsScreen({
                 items={[
                   { label: 'النوع', value: exc.type },
                   { label: 'السطح المتأثر', value: SURFACE_LABELS[exc.affectedSurface] ?? exc.affectedSurface },
-                  { label: 'طابور المالك', value: exc.ownerQueue },
-                  { label: 'المالك الحالي', value: exc.currentOwner },
+                  { label: 'طابور المالك', value: QUEUE_LABELS[exc.customQueue]?.label ?? exc.customQueue },
+                  { label: 'المالك الحالي', value: exc.customOwner },
+                  { label: 'حالة الـ SLA', value: slaStateLabel },
                   { label: 'وقت البدء', value: exc.startTime },
                   { label: 'الإجراء الأخير', value: exc.lastAction },
                   { label: 'الإجراء المقترح', value: exc.suggestedAction },
@@ -203,54 +337,269 @@ export function ExceptionsEscalationsScreen({
                 ]}
               />
 
-              <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '8px 12px', borderRadius: '6px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>ملاحظة العمليات:</div>
-                <div style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-text)', marginTop: '2px' }}>{exc.note}</div>
+              <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--bthwani-control-panel-border)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)', fontWeight: 700 }}>سجل الملاحظات والإجراءات:</div>
+                <div style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-text)', marginTop: '4px', lineHeight: 1.5 }}>{exc.customNote}</div>
               </div>
 
-              <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                  }}
-                  onClick={() => router.push(exc.routeHint)}
-                >
-                  {exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد'}
-                </button>
-                <button
-                  type="button"
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: '1px solid var(--bthwani-control-panel-border-strong)',
-                    color: 'var(--bthwani-control-panel-text)',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                  }}
-                  onClick={() =>
-                    router.push(
-                      auditEntryId
-                        ? buildOperationsHref('audit-support-sla', { orderId: auditEntryId })
-                        : buildOperationsHref('audit-support-sla', { orderId: supportTicketId })
-                    )
-                  }
-                >
-                  {auditEntryId ? 'فتح التدقيق' : 'فتح تذكرة الدعم'}
-                </button>
-              </div>
-            </Box>
+              {actionFeedback && (
+                <div style={{ background: 'var(--bthwani-control-panel-brand-surface)', border: '1px solid var(--bthwani-control-panel-brand)', color: 'var(--bthwani-control-panel-brand)', borderRadius: '8px', padding: '10px', fontSize: '12px', fontWeight: 700, textAlign: 'center' }}>
+                  {actionFeedback}
+                </div>
+              )}
+
+              {actionStatus === 'pending' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', gap: '8px' }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    border: '3px solid var(--bthwani-control-panel-border)',
+                    borderTop: '3px solid var(--bthwani-control-panel-brand)',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                  }} />
+                  <span style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-text-muted)' }}>جاري معالجة الإجراء وحفظ التغييرات...</span>
+                  <style>{`
+                    @keyframes spin {
+                      0% { transform: rotate(0deg); }
+                      100% { transform: rotate(360deg); }
+                    }
+                  `}</style>
+                </div>
+              ) : activeForm === 'escalate' ? (
+                <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--bthwani-control-panel-brand)' }}>تصعيد وتعيين المالك الجديد</div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label htmlFor="escalation-queue-select" style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>طابور التصعيد المستهدف:</label>
+                    <select
+                      id="escalation-queue-select"
+                      value={selectedEscalationQueue}
+                      onChange={(e) => setSelectedEscalationQueue(e.target.value)}
+                      style={{
+                        padding: '8px',
+                        fontSize: '12px',
+                        background: 'var(--bthwani-control-panel-surface)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        border: '1px solid var(--bthwani-control-panel-border)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                      }}
+                    >
+                      {Object.entries(QUEUE_LABELS).map(([key, value]) => (
+                        <option key={key} value={key}>{value.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label htmlFor="handoff-note-textarea" style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>ملاحظات تسليم الدعم (Support Handoff Notes):</label>
+                    <textarea
+                      id="handoff-note-textarea"
+                      rows={3}
+                      value={handoffNote}
+                      onChange={(e) => setHandoffNote(e.target.value)}
+                      placeholder="اكتب مبررات التصعيد وتعليمات المتابعة للفريق المستلم..."
+                      style={{
+                        padding: '8px',
+                        fontSize: '12px',
+                        background: 'var(--bthwani-control-panel-surface)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        border: '1px solid var(--bthwani-control-panel-border)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleEscalate(exc.id, selectedEscalationQueue, handoffNote)}
+                      style={{
+                        flex: 1,
+                        padding: '8px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: 'var(--bthwani-control-panel-brand)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      تأكيد التصعيد
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveForm(null)}
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: 'transparent',
+                        border: '1px solid var(--bthwani-control-panel-border-strong)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      إلغاء
+                    </button>
+                  </div>
+                </div>
+              ) : activeForm === 'resolve' ? (
+                <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--bthwani-control-panel-success)' }}>حل وإغلاق الاستثناء</div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label htmlFor="resolution-note-textarea" style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>ملاحظات الحل والإغلاق (Resolution Details):</label>
+                    <textarea
+                      id="resolution-note-textarea"
+                      rows={3}
+                      value={resolutionNote}
+                      onChange={(e) => setResolutionNote(e.target.value)}
+                      placeholder="اكتب كيفية معالجة الاستثناء والحل النهائي المطبق..."
+                      style={{
+                        padding: '8px',
+                        fontSize: '12px',
+                        background: 'var(--bthwani-control-panel-surface)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        border: '1px solid var(--bthwani-control-panel-border)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleResolve(exc.id, resolutionNote)}
+                      style={{
+                        flex: 1,
+                        padding: '8px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: 'var(--bthwani-control-panel-success)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      تأكيد الحل والإغلاق
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveForm(null)}
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: 'transparent',
+                        border: '1px solid var(--bthwani-control-panel-border-strong)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      إلغاء
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+                  {exc.customSlaState !== 'محلول' ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setActiveForm('resolve')}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          background: 'var(--bthwani-control-panel-success)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 700,
+                          fontSize: '12px',
+                        }}
+                      >
+                        حل وإغلاق الاستثناء (Resolve SLA)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveForm('escalate')}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          background: 'var(--bthwani-control-panel-brand)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 700,
+                          fontSize: '12px',
+                        }}
+                      >
+                        تصعيد ونقل المالك (Escalate & Transfer)
+                      </button>
+                    </>
+                  ) : (
+                    <div style={{ background: 'var(--bthwani-success-surface)', border: '1px solid var(--bthwani-control-panel-success)', color: 'var(--bthwani-control-panel-success)', borderRadius: '8px', padding: '12px', fontSize: '12px', fontWeight: 700, textAlign: 'center' }}>
+                      ✓ تم حل هذا الاستثناء وإغلاق الـ SLA المرتبط بنجاح.
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        background: 'transparent',
+                        border: '1px solid var(--bthwani-control-panel-border-strong)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 700,
+                        fontSize: '11px',
+                      }}
+                      onClick={() => router.push(exc.routeHint)}
+                    >
+                      🔗 الانتقال لمسار الحل المساعد
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        background: 'transparent',
+                        border: '1px solid var(--bthwani-control-panel-border-strong)',
+                        color: 'var(--bthwani-control-panel-text)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 700,
+                        fontSize: '11px',
+                      }}
+                      onClick={() =>
+                        router.push(
+                          auditEntryId
+                            ? buildOperationsHref('audit-support-sla', { orderId: auditEntryId })
+                            : buildOperationsHref('audit-support-sla', { orderId: supportTicketId })
+                        )
+                      }
+                    >
+                      {auditEntryId ? 'فتح التدقيق' : 'فتح تذكرة الدعم'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </WebControlPanelInspectorShell>
         );
       }
@@ -265,7 +614,7 @@ export function ExceptionsEscalationsScreen({
             title={`سياسة التدفق — ${flow.label}`}
             onClose={() => setSelectedItemId(null)}
           >
-            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px', overflowY: 'auto', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الظهور:</span>
                 <WebControlPanelStatusTag label={VISIBILITY_LABELS[flow.visibility]} tone="neutral" />
@@ -315,7 +664,7 @@ export function ExceptionsEscalationsScreen({
                   <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)', marginTop: '2px' }}>{governance.notes}</div>
                 </div>
               )}
-            </Box>
+            </div>
           </WebControlPanelInspectorShell>
         );
       }
@@ -327,7 +676,7 @@ export function ExceptionsEscalationsScreen({
             title={`إنقاذ الطلب — ${item.orderId}`}
             onClose={() => setSelectedItemId(null)}
           >
-            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px', overflowY: 'auto', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>حالة المشكلة:</span>
                 <WebControlPanelStatusTag
@@ -371,7 +720,7 @@ export function ExceptionsEscalationsScreen({
                   فتح إنقاذ الطلب
                 </button>
               </div>
-            </Box>
+            </div>
           </WebControlPanelInspectorShell>
         );
       }
@@ -383,7 +732,7 @@ export function ExceptionsEscalationsScreen({
             title={`دليل العمل — ${playbook.title}`}
             onClose={() => setSelectedItemId(null)}
           >
-            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px', overflowY: 'auto', flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>القسم المالك:</span>
                 <WebControlPanelStatusTag label={playbook.ownerSection} tone={playbook.severity === 'danger' ? 'danger' : 'warning'} />
@@ -433,7 +782,7 @@ export function ExceptionsEscalationsScreen({
                   {playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح إنقاذ الطلب' : 'فتد الطلب المساعد'}
                 </button>
               </div>
-            </Box>
+            </div>
           </WebControlPanelInspectorShell>
         );
       }
@@ -449,25 +798,30 @@ export function ExceptionsEscalationsScreen({
           {/* 1. Active Exceptions & Escalations Queue */}
           <WebControlPanelQueue
             title="الاستثناءات النشطة"
-            meta={`${preview.exceptions.length} استثناءات مفتوحة`}
+            meta={`${exceptions.filter((e) => e.customSlaState !== 'محلول').length} استثناءات مفتوحة`}
           >
-            {preview.exceptions.map((exc) => {
-              const statusTone = TONE_MAP[exc.statusTone] ?? 'neutral';
+            {exceptions.map((exc) => {
+              const statusTone = TONE_MAP[exc.customStatusTone] ?? 'neutral';
+              const displayStatus = exc.customSlaState === 'محلول'
+                ? 'محلول'
+                : exc.customSlaState === 'مصعّد'
+                ? `${exc.severity} - مصعّد`
+                : exc.severity;
               return (
                 <WebControlPanelDecisionRow
                   key={exc.id}
                   entityId={exc.id}
                   entityLabel={`${exc.type} | السطح المتأثر: ${SURFACE_LABELS[exc.affectedSurface] ?? exc.affectedSurface}`}
-                  status={exc.severity}
+                  status={displayStatus}
                   statusTone={statusTone}
-                  risk={exc.statusTone === 'danger' ? 'danger' : exc.statusTone === 'warning' ? 'warning' : 'neutral'}
+                  risk={exc.customStatusTone === 'danger' ? 'danger' : exc.customStatusTone === 'warning' ? 'warning' : 'neutral'}
                   recommendation={exc.suggestedAction}
-                  sla={`البداية: ${exc.startTime} | المالك الحالي: ${exc.currentOwner}`}
+                  sla={`البداية: ${exc.startTime} | المالك الحالي: ${exc.customOwner}`}
                   onInspect={() => setSelectedItemId({ type: 'exception', id: exc.id })}
                   primaryAction={{
                     id: `${exc.id}-action`,
-                    label: exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد',
-                    onAction: () => router.push(exc.routeHint),
+                    label: exc.customSlaState === 'محلول' ? 'معاينة التفاصيل' : exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد',
+                    onAction: () => setSelectedItemId({ type: 'exception', id: exc.id }),
                   }}
                 />
               );

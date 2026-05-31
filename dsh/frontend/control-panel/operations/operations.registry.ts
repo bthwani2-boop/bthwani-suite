@@ -44,7 +44,7 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   },
   {
     id: 'assisted-order-desk',
-    label: 'Assisted Order',
+    label: 'الطلبات المساعدة',
     description: 'إعادة بناء السلة، تثبيت البدائل، والتحقق من الهوية قبل أي handoff نهائي.',
     badge: 'مساندة',
     subGroups: [
@@ -55,12 +55,12 @@ export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   },
   {
     id: 'order-rescue',
-    label: 'Order Rescue',
+    label: 'إنقاذ الطلبات',
     description: 'مكتب إنقاذ يحدد blocker واحدًا ويثبت next-best-action عبر الدعم أو الشريك أو WLT المرجعي.',
     badge: 'إنقاذ',
     subGroups: [
       { id: 'critical', label: 'حرج' },
-      { id: 'handoffs', label: 'handoffs' },
+      { id: 'handoffs', label: 'التسليمات' },
       { id: 'wlt', label: 'WLT' },
     ]
   },
@@ -351,6 +351,10 @@ export function buildOperationsHref(
 
   if (options?.panel) {
     searchParams.set('panel', options.panel);
+  }
+
+  if (options?.subGroup) {
+    searchParams.set('subGroup', options.subGroup);
   }
 
   const query = searchParams.toString();

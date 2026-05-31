@@ -142,7 +142,7 @@ function RescueCaseRow({
 
         {/* Info cluster */}
         <div className={styles.rescueRowInfo}>
-          <span className={styles.rescueRowId}>{item.orderId}</span>
+          <span className={styles.rescueRowId} dir="ltr" style={{ display: 'inline-block' }}>{item.orderId}</span>
           <span className={styles.rescueRowCustomer}>{item.customerName}</span>
           <span className={styles.rescueRowBlocker}>{item.blocker}</span>
         </div>
@@ -335,7 +335,7 @@ function RescueCaseRow({
                       key={action}
                       style={{
                         display: 'flex',
-                        flexDirection: 'row-reverse',
+                        flexDirection: 'row',
                         alignItems: 'center',
                         gap: '10px',
                         padding: '8px 12px',
@@ -395,7 +395,7 @@ function RescueCaseRow({
             <div className={styles.rescueSupportBar}>
               <div className={styles.rescueSupportBarCell}>
                 <span className={styles.rescueSupportBarCellLabel}>التذكرة</span>
-                <span className={styles.rescueSupportBarCellValue} style={{ fontFamily: 'monospace', direction: 'ltr' }}>
+                <span className={styles.rescueSupportBarCellValue} dir="ltr" style={{ fontFamily: 'monospace', display: 'inline-block' }}>
                   {item.supportHandoff.ticketLink}
                 </span>
               </div>
@@ -465,20 +465,27 @@ function RescueCaseRow({
                 <span className={styles.rescueStepTitle}>روابط الأسطح ذات الصلة</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {item.crossSurfaceLinks.map((link) => (
-                  <div key={link.actionId} className={styles.rescueLinkItem}>
-                    <span className={styles.rescueLinkItemLabel}>
-                      {link.label}
-                    </span>
-                    <button
-                      type="button"
-                      className={styles.rescueLinkItemBtn}
-                      onClick={() => onNavigate(link.routeHint)}
-                    >
-                      فتح ←
-                    </button>
-                  </div>
-                ))}
+                {item.crossSurfaceLinks.map((link) => {
+                  const linkLabels: Record<string, string> = {
+                    'Customer 360': 'ملف العميل المتكامل',
+                    'WLT control': 'تحكم محفظة WLT',
+                    'Order rescue': 'إنقاذ الطلبات',
+                  };
+                  return (
+                    <div key={link.actionId} className={styles.rescueLinkItem}>
+                      <span className={styles.rescueLinkItemLabel}>
+                        {linkLabels[link.label] ?? link.label}
+                      </span>
+                      <button
+                        type="button"
+                        className={styles.rescueLinkItemBtn}
+                        onClick={() => onNavigate(link.routeHint)}
+                      >
+                        فتح ←
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -583,7 +590,7 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
           style={{
             padding: '12px 16px',
             display: 'flex',
-            flexDirection: 'row-reverse',
+            flexDirection: 'row',
             alignItems: 'center',
             gap: '12px',
             flexWrap: 'wrap',

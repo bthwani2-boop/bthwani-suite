@@ -1,4 +1,5 @@
 import type { DshFulfillmentOperationalMode, DshOperationsOrderRow } from '../shared/dsh-cp-operations.contract';
+import type { DshOperationsOrderDetail } from '../shared/dsh-order-journey.model';
 import {
   AWNAK_STAGE_LABELS,
   buildDshAssistedOrderDeliveryModeSummary,
@@ -364,7 +365,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       {
         actionId: 'support-ticket',
         label: 'تذكرة الدعم',
-        surfaceId: 'لوحة التحكم',
+        surfaceId: 'control-panel',
         sectionId: 'support',
         routeHint: '/support?workspace=queue&ticketId=TKT-1102',
         routeId: 'cp/support/ticket',
@@ -374,7 +375,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       {
         actionId: 'partner-controls',
         label: 'تحكم الشريك',
-        surfaceId: 'لوحة التحكم',
+        surfaceId: 'control-panel',
         sectionId: 'partners',
         routeHint: '/partners?tab=performance&orderId=ORD-1102',
         routeId: 'cp/partners/control',
@@ -383,7 +384,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       {
         actionId: 'wlt-visibility',
         label: 'تحكم WLT',
-        surfaceId: 'المالية',
+        surfaceId: 'wlt-finance',
         sectionId: 'finance',
         routeHint: '/finance?workspace=refunds&orderId=ORD-1102',
         routeId: 'cp/finance/refunds',
@@ -451,7 +452,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       {
         actionId: 'manual-call-intake',
         label: 'استقبال المكالمة اليدوي',
-        surfaceId: 'لوحة التحكم',
+        surfaceId: 'control-panel',
         sectionId: 'support',
         routeHint: '/support?workspace=call-intake&orderId=ORD-1184&customerId=cus-4188&ticketId=TKT-1184',
         routeId: 'cp/support/call-intake',
@@ -461,7 +462,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       {
         actionId: 'customer-360',
         label: 'ملف العميل الشامل',
-        surfaceId: 'لوحة التحكم',
+        surfaceId: 'control-panel',
         sectionId: 'support',
         routeHint: '/support?workspace=customer-360&orderId=ORD-1184&customerId=cus-4188&ticketId=TKT-1184',
         routeId: 'cp/support/customer-360',
@@ -471,7 +472,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       {
         actionId: 'wlt-visibility',
         label: 'تحكم WLT',
-        surfaceId: 'المالية',
+        surfaceId: 'wlt-finance',
         sectionId: 'finance',
         routeHint: '/finance?workspace=refunds&orderId=ORD-1184',
         routeId: 'cp/finance/refunds',
@@ -1257,4 +1258,79 @@ export function selectDshControlPanelOperationsPreview() {
     fulfillmentQueues: FULFILLMENT_MODE_ORDER_QUEUES,
     exceptions: EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
   };
+}
+
+// -----------------------------------------------------------------------------
+// Control panel ops approval queue preview
+// UI_PREVIEW_ONLY — pending approval orders for the ops approval panel.
+// Authority: control-panel/operations LiveOrdersScreen → OpsOrderDetailPanel.
+// No backend call, no claim of runtime truth, no mutation.
+// -----------------------------------------------------------------------------
+
+/** Ops approval order — extends DshOperationsOrderDetail with a fulfillment mode. */
+export type DshOpsApprovalOrder = DshOperationsOrderDetail & {
+  readonly fulfillmentMode: DshFulfillmentOperationalMode;
+};
+
+export const PENDING_APPROVAL_ORDERS: readonly DshOpsApprovalOrder[] = [
+  {
+    id: 'PA-0081',
+    fulfillmentMode: 'bthwani_delivery',
+    customerName: 'أحمد محمد',
+    customerPhone: '770000000',
+    dropoffAddress: 'العليا، طريق الملك فهد',
+    pickupAddress: 'رياض بارك، البوابة 2',
+    storeName: 'بيك إن بريستو',
+    paymentMethod: 'عند الاستلام',
+    paymentStatus: 'معلق — لم يتم تحصيله بعد',
+    cartItems: [
+      { title: 'دجاج فحم تركي', qty: 1, priceLabel: '3,000 ر.ي' },
+      { title: 'كريسبي رول', qty: 2, priceLabel: '1,500 ر.ي' },
+    ],
+    subtotalLabel: '6,000 ر.ي',
+    deliveryLabel: '950 ر.ي',
+    totalLabel: '6,950 ر.ي',
+    customerNote: 'سلّم عند الباب الجانبي.',
+    customerInstructions: 'اتصل قبل الوصول بـ 5 دقائق.',
+    couponCode: '',
+    eventLog: [
+      { status: 'تم إنشاء الطلب', actor: 'العميل', timestamp: '2026-05-16T10:10:00+03:00' },
+      { status: 'قيد مراجعة العمليات', actor: 'النظام', timestamp: '2026-05-16T10:10:30+03:00' },
+    ],
+  },
+  {
+    id: 'PA-0082',
+    fulfillmentMode: 'pickup',
+    customerName: 'سارة خالد',
+    customerPhone: '771111111',
+    dropoffAddress: '',
+    pickupAddress: 'الواحة مول، المدخل الرئيسي',
+    storeName: 'برغر لاب',
+    paymentMethod: 'محفظة WLT',
+    paymentStatus: 'تجريبي — مسجل محليًا',
+    cartItems: [
+      { title: 'برغر لاب كلاسيك', qty: 2, priceLabel: '2,500 ر.ي' },
+      { title: 'بطاطس كبير', qty: 1, priceLabel: '800 ر.ي' },
+    ],
+    subtotalLabel: '5,800 ر.ي',
+    deliveryLabel: '0 ر.ي',
+    totalLabel: '5,800 ر.ي',
+    customerNote: 'سأصل خلال 15 دقيقة.',
+    customerInstructions: 'أبرز رقم الطلب للمتجر عند الاستلام.',
+    couponCode: 'DSH10',
+    eventLog: [
+      { status: 'تم إنشاء الطلب', actor: 'العميل', timestamp: '2026-05-16T10:15:00+03:00' },
+      { status: 'قيد مراجعة العمليات', actor: 'النظام', timestamp: '2026-05-16T10:15:20+03:00' },
+    ],
+  },
+] as const;
+
+/** Returns all pending approval orders for the ops approval queue panel. */
+export function getDshOpsApprovalQueuePreview(): readonly DshOpsApprovalOrder[] {
+  return PENDING_APPROVAL_ORDERS;
+}
+
+/** Returns a single pending approval order by id, or null if not found. */
+export function getDshOpsApprovalOrderById(orderId: string): DshOpsApprovalOrder | null {
+  return PENDING_APPROVAL_ORDERS.find((o) => o.id === orderId) ?? null;
 }

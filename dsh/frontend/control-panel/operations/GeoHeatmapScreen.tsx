@@ -83,6 +83,24 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
   const [activeSubTab, setActiveSubTab] = React.useState(subGroup ?? 'orders');
   const [activeFilter, setActiveFilter] = React.useState<GeoFilterId>('الآن');
   const [selectedZoneId, setSelectedZoneId] = React.useState(GEO_HEATMAP_ZONES[0]?.id ?? '');
+  const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+
+  const handleApplyPlan = React.useCallback((zoneId: string, actionLabel: string) => {
+    const zone = GEO_HEATMAP_ZONES.find((z) => z.id === zoneId);
+    const zoneName = zone ? zone.name : zoneId;
+    setActionFeedback(`تم تثبيت القرار التشغيلي للمنطقة [${zoneName}] بنجاح (الإجراء المطبق: ${actionLabel}). سيقوم النظام بتوجيه السعة لتغطية الطلبات المباشرة.`);
+    setTimeout(() => setActionFeedback(null), 3500);
+  }, []);
+
+  const handleShowEvidence = React.useCallback((zoneId: string) => {
+    const zone = GEO_HEATMAP_ZONES.find((z) => z.id === zoneId);
+    if (zone) {
+      setActionFeedback(`دليل المنطقة [${zone.name}]: التقاطات متأخرة ${zone.delayedPickups}، الالتزام بمستوى الخدمة ${zone.slaRisk}، ضغط المتاجر الشريكة ${zone.storePressure}.`);
+    } else {
+      setActionFeedback(`جاري عرض الدليل للتحقق من المنطقة ${zoneId}.`);
+    }
+    setTimeout(() => setActionFeedback(null), 3500);
+  }, []);
 
   React.useEffect(() => {
     if (subGroup) setActiveSubTab(subGroup);
@@ -120,7 +138,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
 
   return (
     <Box gap={3}>
-      <Box gap={2} style={{ marginBottom: '4px' }}>
+      <Box gap={2} style={{ marginBottom: 4 }}>
         <Text role="bodySm" tone="muted">
           هذه الخريطة operational preview خاصة بلوحة التحكم وتعرض إشارات الطلبات والكباتن والمتاجر summary-first من دون أي binding خرائط خارجي أو mutation ميداني.
         </Text>
@@ -207,7 +225,14 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                   reason={`فجوة السعة ${zone.supplyDemandGap} · التقاطات متأخرة ${zone.delayedPickups}`}
                   sla={`الالتزام ${zone.slaRisk} · ضغط المتاجر ${zone.storePressure} · ثقة ${zone.confidence}`}
                   primaryAction={{ id: `${zone.id}-select`, label: 'تثبيت المنطقة', onAction: () => setSelectedZoneId(zone.id) }}
-                  secondaryAction={{ id: `${zone.id}-guide`, label: recommendation.secondaryActionLabel, onAction: () => setSelectedZoneId(zone.id) }}
+                  secondaryAction={{
+                    id: `${zone.id}-guide`,
+                    label: recommendation.secondaryActionLabel,
+                    onAction: () => {
+                      setSelectedZoneId(zone.id);
+                      handleShowEvidence(zone.id);
+                    }
+                  }}
                   onInspect={() => setSelectedZoneId(zone.id)}
                 />
               );
@@ -221,6 +246,11 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
             onClose={() => setSelectedZoneId(visibleZones[0]?.id ?? GEO_HEATMAP_ZONES[0]?.id ?? '')}
           >
             <Box gap={2}>
+              {actionFeedback && (
+                <div className={styles.overrideNotification} style={{ padding: '8px 12px', background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', textAlign: 'center', fontSize: '11px', fontWeight: 'bold' }}>
+                  {actionFeedback}
+                </div>
+              )}
               <Box gap={2}>
                 {[
                   { label: 'نوع الكيان', value: 'منطقة تشغيلية' },
@@ -242,13 +272,13 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                 reason={selectedRecommendation ? `${selectedRecommendation.reason} · ${selectedRecommendation.evidence}` : 'اختر منطقة لعرض التوصية.'}
                 confidence={selectedRecommendation?.confidence ?? 'medium'}
                 auditTag={translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY')}
-                primaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-primary`, label: selectedRecommendation.primaryActionLabel, onAction: () => setSelectedZoneId(selectedZone?.id ?? '') } : undefined}
-                secondaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-secondary`, label: selectedRecommendation.secondaryActionLabel, onAction: () => setSelectedZoneId(selectedZone?.id ?? '') } : undefined}
+                primaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-primary`, label: selectedRecommendation.primaryActionLabel, onAction: () => handleApplyPlan(selectedZone.id, selectedRecommendation.nextAction) } : undefined}
+                secondaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-secondary`, label: selectedRecommendation.secondaryActionLabel, onAction: () => handleShowEvidence(selectedZone.id) } : undefined}
               />
 
               <WebControlPanelActionCluster
-                primary={{ id: 'apply-plan', label: 'تثبيت القرار', onAction: () => setSelectedZoneId(selectedZone?.id ?? '') }}
-                secondary={{ id: 'show-evidence', label: 'عرض الدليل', onAction: () => setSelectedZoneId(selectedZone?.id ?? '') }}
+                primary={{ id: 'apply-plan', label: 'تثبيت القرار', onAction: () => handleApplyPlan(selectedZone.id, selectedZone.recommendedAction) }}
+                secondary={{ id: 'show-evidence', label: 'عرض الدليل', onAction: () => handleShowEvidence(selectedZone.id) }}
               />
 
               <Box gap={1}>

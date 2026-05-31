@@ -1092,7 +1092,7 @@ No destructive deletion is allowed by default.
 ```text
 PACKAGE_RECHECK_EVIDENCE: tools/registry/runs/<SESSION_ID>/<SESSION_ID>.zip
 PACKAGE_RECHECK_STATUS: PASS
-PACKAGE_RECHECK_VERSION: 6.0.0
+PACKAGE_RECHECK_VERSION: 7.0.0
 ```
 
 If the package check was not run:

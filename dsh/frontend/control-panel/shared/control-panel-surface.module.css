@@ -376,7 +376,7 @@
 /* Inspector header row */
 .surfaceInspectorHeader {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -448,7 +448,7 @@
 
 .surfaceInspectorSummaryRow {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -481,7 +481,7 @@
 
 .surfaceInspectorSectionTitle {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: 6px;
   font-size: 11px;
@@ -534,7 +534,7 @@
 
 .surfaceInspectorRow {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
@@ -843,7 +843,7 @@
 
 .rescueRowSummary {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
@@ -982,7 +982,7 @@
 
 .rescueStepHeader {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
 }
@@ -1027,7 +1027,7 @@
 /* Option chips */
 .rescueChipGrid {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   flex-wrap: wrap;
   gap: 6px;
 }
@@ -1082,7 +1082,7 @@
 /* Forbidden actions block */
 .rescueForbiddenBlock {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: flex-start;
   gap: 10px;
   padding: 10px 12px;
@@ -1109,7 +1109,7 @@
   opacity: 0.8;
   padding: 2px 0;
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: 6px;
 }
@@ -1117,7 +1117,7 @@
 /* Support bar */
 .rescueSupportBar {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: 0;
   background: var(--bthwani-control-panel-surface-inset);
@@ -1134,11 +1134,11 @@
   padding: 8px 14px;
   flex: 1;
   text-align: right;
-  border-left: 1px solid var(--bthwani-control-panel-border);
+  border-right: 1px solid var(--bthwani-control-panel-border);
 }
 
 .rescueSupportBarCell:first-child {
-  border-left: none;
+  border-right: none;
 }
 
 .rescueSupportBarCellLabel {
@@ -1191,7 +1191,7 @@
 /* Cross-surface links */
 .rescueLinkItem {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -1230,7 +1230,7 @@
 /* Accordion footer */
 .rescueAccordionFooter {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 10px;

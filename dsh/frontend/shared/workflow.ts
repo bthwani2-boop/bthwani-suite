@@ -1,4 +1,5 @@
 import type { DshPartnerActivationStatus } from './dsh-partner-activation.model';
+import { addDshAuditEntry, DshAuditEntry } from './dsh-role-permission.model';
 import {
   PARTNER_COMPLAINTS_DATA,
   PARTNER_MODIFICATION_REQUESTS,
@@ -997,6 +998,17 @@ export function updatePromotionCandidateStatus(id: string, status: DshPromotionI
 // Central store for live order queue decisions
 let _globalLiveOrderDecisions: Record<string, { decision: string; note: string; submitted: boolean; nextLifecycleStatus: string }> = {};
 
+const PENDING_APPROVAL_LOOKUP: Record<string, { customerName: string; storeName: string }> = {
+  'PA-0081': { customerName: 'أحمد محمد', storeName: 'بيك إن بريستو' },
+  'PA-0082': { customerName: 'سارة خالد', storeName: 'برغر لاب' },
+};
+
+let _globalUiAuditRows: any[] = [];
+
+export function getDynamicUiAudits(): any[] {
+  return _globalUiAuditRows;
+}
+
 export function getLiveOrderDecisions(): Record<string, { decision: string; note: string; submitted: boolean; nextLifecycleStatus: string }> {
   return _globalLiveOrderDecisions;
 }
@@ -1006,4 +1018,45 @@ export function updateLiveOrderDecision(orderId: string, decision: string, note:
     ..._globalLiveOrderDecisions,
     [orderId]: { decision, note, submitted: true, nextLifecycleStatus },
   };
+
+  const info = PENDING_APPROVAL_LOOKUP[orderId] || { customerName: 'عميل', storeName: 'متجر' };
+  const orderLabel = `${info.customerName} — ${info.storeName}`;
+  const decisionResult = decision === 'approve' ? 'approved' : decision === 'reject' ? 'rejected' : 'pending';
+  const decisionLabel = decision === 'approve' ? 'موافق' : decision === 'reject' ? 'مرفوض' : 'طلب تعديل';
+  const statusTone = decision === 'approve' ? 'success' : decision === 'reject' ? 'danger' : 'warning';
+
+  const auditEntry: DshAuditEntry = {
+    entryId: `${orderId}-audit`,
+    actorRoleId: 'platform-operator',
+    actorName: 'مشغّل المنصة',
+    timestamp: new Date().toISOString(),
+    section: 'catalog-approval',
+    sensitiveAction: 'approve-catalog',
+    decision: decisionResult,
+    reason: note || 'مراجعة واعتماد الطلب المعلق تشغيلياً.',
+    evidence: 'مرفقات الطلب ومستند إثبات الشريك',
+    relatedEntityId: orderId,
+    relatedEntityLabel: orderLabel,
+    affectedSurfaces: ['control-panel', 'app-partner', 'app-client'],
+    wltReadOnly: false,
+    rollbackNote: decision === 'approve' ? 'يمكن إلغاء الموافقة وإعادة الطلب للمراجعة' : undefined,
+  };
+  addDshAuditEntry(auditEntry);
+
+  const ticketId = orderId === 'PA-0081' ? 'تذكرة-4022' : orderId === 'PA-0082' ? 'تذكرة-4025' : 'عام';
+  const uiAuditRow = {
+    id: `${orderId}-audit`,
+    who: 'مشغّل المنصة',
+    why: 'قرار مراجعة العمليات',
+    when: 'منذ ثوانٍ',
+    permissionResult: decisionLabel,
+    slaBreachReason: 'مراجعة تشغيلية',
+    supportTicketLink: ticketId,
+    proofRequired: 'صورة إثبات',
+    evidenceState: 'مكتمل',
+    resolutionPath: 'حل',
+    note: note || 'مراجعة واعتماد الطلب المعلق تشغيلياً.',
+    statusTone: statusTone,
+  };
+  _globalUiAuditRows = [uiAuditRow, ..._globalUiAuditRows];
 }

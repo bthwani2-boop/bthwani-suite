@@ -53,7 +53,7 @@
   "required_package_recheck": [
     "PACKAGE_RECHECK_EVIDENCE",
     "PACKAGE_RECHECK_STATUS: PASS",
-    "PACKAGE_RECHECK_VERSION: 6.0.0"
+    "PACKAGE_RECHECK_VERSION: 7.0.0"
   ],
   "source_coverage_files": [
     "امر الواجهات.txt",

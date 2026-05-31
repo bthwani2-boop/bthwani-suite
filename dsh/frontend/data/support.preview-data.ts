@@ -1901,3 +1901,83 @@ export function selectDshControlPanelSupportPreview() {
     playbooks: DSH_OPS_INTERVENTION_PLAYBOOKS,
   };
 }
+
+// -----------------------------------------------------------------------------
+// Ops approval panel — order-linked support chat tickets (UI_PREVIEW_ONLY)
+// Authority: control-panel/operations -> OpsOrderDetailPanel (approval queue).
+// attachmentRef: canonical ops proof ID — never a raw file path.
+// Moved from surface-level OpsOrderDetailPanel.tsx to canonical support data.
+// -----------------------------------------------------------------------------
+
+export type DshOpsApprovalChatSender =
+  | 'العميل'
+  | 'الكابتن'
+  | 'موصل المتجر'
+  | 'المتجر'
+  | 'النظام';
+
+export type DshOpsApprovalChatMessage = {
+  readonly sender: DshOpsApprovalChatSender;
+  readonly text: string;
+  readonly time: string;
+};
+
+export type DshOpsApprovalChatTicket = {
+  readonly ticketId: string;
+  readonly status: string;
+  readonly statusTone: 'warning' | 'success' | 'danger';
+  readonly type: string;
+  readonly description: string;
+  /** Canonical ops proof ID — resolved at render time; never a raw file path. */
+  readonly attachmentRef: string | null;
+  readonly chatHistory: readonly DshOpsApprovalChatMessage[];
+};
+
+/**
+ * Ops approval chat tickets keyed by orderId.
+ * UI_PREVIEW_ONLY — fictional preview entries only.
+ * Consumed by: OpsOrderDetailPanel (control-panel/operations).
+ */
+export const DSH_OPS_APPROVAL_CHAT_TICKETS: Readonly<Record<string, DshOpsApprovalChatTicket>> = {
+  'PA-0081': {
+    ticketId: 'TK-4022',
+    status: 'نشط / قيد المراجعة',
+    statusTone: 'warning',
+    type: 'تأخير في الاستلام من المتجر',
+    description: 'الكابتن يفيد بازدحام شديد عند بوابة التحضير في بيك إن بريستو.',
+    attachmentRef: 'ops-proof-pa0081',
+    chatHistory: [
+      { sender: 'العميل', text: 'مرحباً كابتن، هل استلمت الطلب؟ مكتوب في التطبيق قيد التحضير.', time: '10:11' },
+      { sender: 'الكابتن', text: 'أهلاً بك يا غالي. نعم أنا متواجد بالمتجر الآن، لكن هناك ازدحام كبير جداً عند كاونتر الاستلام.', time: '10:12' },
+      { sender: 'النظام', text: '🔔 تم قرع جرس تنبيه الكابتن من قبل العميل للاستفسار عن الحالة.', time: '10:13' },
+      { sender: 'الكابتن', text: 'قمت برفع بلاغ دعم لتنبيه العمليات بتأخر المتجر في تسليم الأصناف.', time: '10:14' },
+      { sender: 'العميل', text: 'شكراً جزيلاً لك على التوضيح والمتابعة، بانتظارك.', time: '10:15' },
+    ],
+  },
+  'PA-0082': {
+    ticketId: 'TK-4025',
+    status: 'نشط / متابعة جاهزية الاستلام',
+    statusTone: 'warning',
+    type: 'الطلب غير جاهز في المتجر',
+    description: 'العميل يسأل عن جاهزية الطلب قبل التوجه إلى المتجر.',
+    attachmentRef: 'ops-proof-pa0082',
+    chatHistory: [
+      { sender: 'العميل', text: 'هل أصبح الطلب جاهزًا للاستلام من المتجر؟', time: '10:16' },
+      { sender: 'المتجر', text: 'يتبقى بضع دقائق على الجاهزية. سنؤكد لك فور الانتهاء.', time: '10:17' },
+      { sender: 'النظام', text: '🔔 تم تنبيه العمليات بوجود طلب استلام ذاتي بانتظار تأكيد الجاهزية.', time: '10:18' },
+    ],
+  },
+};
+
+/** Returns the ops approval chat ticket for orderId, with fallback for unknown orders. */
+export function getDshOpsApprovalChatTicket(orderId: string): DshOpsApprovalChatTicket {
+  return DSH_OPS_APPROVAL_CHAT_TICKETS[orderId] ?? {
+    ticketId: 'TK-0000',
+    status: 'لا يوجد بلاغات نشطة',
+    statusTone: 'success' as const,
+    type: 'عام',
+    description: 'لا توجد بلاغات دعم مرتبطة بهذا الطلب.',
+    attachmentRef: null,
+    chatHistory: [],
+  };
+}

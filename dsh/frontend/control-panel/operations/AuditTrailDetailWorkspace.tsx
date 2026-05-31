@@ -69,7 +69,7 @@ export function AuditTrailDetailWorkspace({
 
   return (
     <WebControlPanelInspectorShell title={shellTitle} onClose={onClose}>
-      <Box gap={4} padding={4} style={{ overflowY: 'auto', height: '100%', paddingRight: '2px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', overflowY: 'auto', height: '100%', paddingRight: '2px' }}>
 
         {/* ── Decision banner ── */}
         <Surface tone={decisionTone} padding={3} radiusToken="md" border>
@@ -85,20 +85,56 @@ export function AuditTrailDetailWorkspace({
         </Surface>
 
         {/* ── Actor & section ── */}
-        <KeyValueList
-          items={[
-            { label: 'المنفّذ',        value: entry.actorName },
-            { label: 'الدور',          value: getDshRoleArabicName(entry.actorRoleId) },
-            { label: 'القسم',          value: policy?.arabicLabel ?? entry.section },
-            { label: 'الإجراء',        value: entry.sensitiveAction },
-            {
-              label: 'الكيان المرتبط',
-              value: entry.relatedEntityLabel
-                ? `${entry.relatedEntityLabel} (${entry.relatedEntityId ?? '—'})`
-                : '—',
-            },
-          ]}
-        />
+        {(() => {
+          const actionLabels: Record<string, string> = {
+            'activate-partner': 'تفعيل الشريك',
+            'deactivate-partner': 'إيقاف الشريك',
+            'approve-catalog': 'اعتماد الكتالوج',
+            'publish-catalog': 'نشر الكتالوج',
+            'view-order-cancellation': 'عرض إلغاء الطلب',
+            'reassign-dispatch': 'إعادة إسناد الطلب',
+            'escalate-support': 'تصعيد الدعم',
+            'override-sla': 'تجاوز SLA',
+            'view-finance-readonly': 'عرض الأثر المالي',
+            'preview-platform-vars': 'معاينة متغيرات المنصة',
+            'request-platform-rollback': 'طلب تراجع المنصة',
+          };
+          const sectionLabels: Record<string, string> = {
+            'partner-activation': 'تفعيل الشركاء',
+            'partner-deactivation': 'إيقاف الشركاء',
+            'catalog-approval': 'اعتماد الكتالوج',
+            'catalog-publishing': 'نشر الكتالوج',
+            'order-cancellation': 'إلغاء الطلبات',
+            'dispatch-reassignment': 'إعادة إسناد التوزيع',
+            'support-escalation': 'تصعيد الدعم',
+            'sla-override': 'تجاوز SLA',
+            'finance-view': 'الرؤية المالية',
+            'platform-vars': 'متغيرات المنصة',
+          };
+          const relatedEntityValue = entry.relatedEntityLabel
+            ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <span>{entry.relatedEntityLabel}</span>
+                <span dir="ltr">({entry.relatedEntityId ?? '—'})</span>
+              </span>
+            )
+            : '—';
+
+          return (
+            <KeyValueList
+              items={[
+                { label: 'المنفّذ',        value: entry.actorName },
+                { label: 'الدور',          value: getDshRoleArabicName(entry.actorRoleId) },
+                { label: 'القسم',          value: policy?.arabicLabel ?? sectionLabels[entry.section] ?? entry.section },
+                { label: 'الإجراء',        value: actionLabels[entry.sensitiveAction] ?? entry.sensitiveAction },
+                {
+                  label: 'الكيان المرتبط',
+                  value: relatedEntityValue as any,
+                },
+              ]}
+            />
+          );
+        })()}
 
         {/* ── Reason ── */}
         <Box gap={1}>
@@ -122,11 +158,21 @@ export function AuditTrailDetailWorkspace({
         <Box gap={1}>
           <Text role="titleSm">الأسطح المتأثرة</Text>
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            {entry.affectedSurfaces.map((s) => (
-              <Surface key={s} tone="raised" padding={1} radiusToken="pill" border>
-                <Text role="caption" tone="muted">{s}</Text>
-              </Surface>
-            ))}
+            {entry.affectedSurfaces.map((s) => {
+              const surfaceLabels: Record<string, string> = {
+                'app-client': 'تطبيق العميل',
+                'app-partner': 'تطبيق الشريك',
+                'app-captain': 'تطبيق الكابتن',
+                'app-field': 'التطبيق الميداني',
+                'control-panel': 'لوحة التحكم',
+                'wlt-finance': 'المالية WLT',
+              };
+              return (
+                <Surface key={s} tone="raised" padding={1} radiusToken="pill" border>
+                  <Text role="caption" tone="muted">{surfaceLabels[s] ?? s}</Text>
+                </Surface>
+              );
+            })}
           </Box>
         </Box>
 
@@ -169,7 +215,7 @@ export function AuditTrailDetailWorkspace({
           </Surface>
         ) : null}
 
-      </Box>
+      </div>
     </WebControlPanelInspectorShell>
   );
 }

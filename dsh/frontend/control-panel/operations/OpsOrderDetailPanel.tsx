@@ -1,129 +1,48 @@
 'use client';
 
-// Extracted from LiveOrdersScreen — order detail panel for pending approval workflow.
-// Owns: inline approval fixtures, chat history, cart display, and decision buttons.
-// Parent (LiveOrdersScreen) owns decision state and lifecycle transitions.
+// OpsOrderDetailPanel — approval queue detail view for the control-panel operations hub.
+// Data ownership:
+//   approval orders   → dsh/frontend/data/orders.preview-data.ts  (getDshOpsApprovalQueuePreview)
+//   support tickets   → dsh/frontend/data/support.preview-data.ts (getDshOpsApprovalChatTicket)
+// This surface owns only rendering logic; zero fixture data lives here.
 
 import React from 'react';
 import { useTheme } from '@bthwani/ui-kit';
-import type { DshOperationsDecisionKind, DshOperationsOrderDetail } from '../../shared/dsh-order-journey.model';
+import type { DshOperationsDecisionKind } from '../../shared/dsh-order-journey.model';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
+import { getDshOpsApprovalQueuePreview, type DshOpsApprovalOrder } from '../../data/orders.preview-data';
+import { getDshOpsApprovalChatTicket } from '../../data/support.preview-data';
 
-export type PendingApprovalOrder = DshOperationsOrderDetail & {
-  fulfillmentMode: DshFulfillmentOperationalMode;
-};
+export type PendingApprovalOrder = DshOpsApprovalOrder;
 
 type OpsDecision = DshOperationsDecisionKind;
 
-// Preview fixtures — approval queue data. Owned here, not in preview-data, because
-// this is structural detail of the approval panel, not a shared operational preview.
-export const PENDING_APPROVAL_ORDERS: PendingApprovalOrder[] = [
-  {
-    id: 'PA-0081',
-    fulfillmentMode: 'bthwani_delivery',
-    customerName: 'أحمد محمد',
-    customerPhone: '770000000',
-    dropoffAddress: 'العليا، طريق الملك فهد',
-    pickupAddress: 'رياض بارك، البوابة 2',
-    storeName: 'بيك إن بريستو',
-    paymentMethod: 'عند الاستلام',
-    paymentStatus: 'معلق — لم يتم تحصيله بعد',
-    cartItems: [
-      { title: 'دجاج فحم تركي', qty: 1, priceLabel: '3,000 ر.ي' },
-      { title: 'كريسبي رول', qty: 2, priceLabel: '1,500 ر.ي' },
-    ],
-    subtotalLabel: '6,000 ر.ي',
-    deliveryLabel: '950 ر.ي',
-    totalLabel: '6,950 ر.ي',
-    customerNote: 'سلّم عند الباب الجانبي.',
-    customerInstructions: 'اتصل قبل الوصول بـ 5 دقائق.',
-    couponCode: '',
-    eventLog: [
-      { status: 'تم إنشاء الطلب', actor: 'العميل', timestamp: '2026-05-16T10:10:00+03:00' },
-      { status: 'قيد مراجعة العمليات', actor: 'النظام', timestamp: '2026-05-16T10:10:30+03:00' },
-    ],
-  },
-  {
-    id: 'PA-0082',
-    fulfillmentMode: 'pickup',
-    customerName: 'سارة خالد',
-    customerPhone: '771111111',
-    dropoffAddress: '',
-    pickupAddress: 'الواحة مول، المدخل الرئيسي',
-    storeName: 'برغر لاب',
-    paymentMethod: 'محفظة WLT',
-    paymentStatus: 'تجريبي — مسجل محليًا',
-    cartItems: [
-      { title: 'برغر لاب كلاسيك', qty: 2, priceLabel: '2,500 ر.ي' },
-      { title: 'بطاطس كبير', qty: 1, priceLabel: '800 ر.ي' },
-    ],
-    subtotalLabel: '5,800 ر.ي',
-    deliveryLabel: '0 ر.ي',
-    totalLabel: '5,800 ر.ي',
-    customerNote: 'سأصل خلال 15 دقيقة.',
-    customerInstructions: 'أبرز رقم الطلب للمتجر عند الاستلام.',
-    couponCode: 'DSH10',
-    eventLog: [
-      { status: 'تم إنشاء الطلب', actor: 'العميل', timestamp: '2026-05-16T10:15:00+03:00' },
-      { status: 'قيد مراجعة العمليات', actor: 'النظام', timestamp: '2026-05-16T10:15:20+03:00' },
-    ],
-  },
-];
-
-// Support ticket preview — keyed by orderId, loaded inline (summary-first, no external fetch).
-const MOCK_TICKETS_FOR_ORDER: Record<string, {
-  ticketId: string;
-  status: string;
-  statusTone: 'warning' | 'success' | 'danger';
-  type: string;
-  description: string;
-  attachedImage: string;
-  chatHistory: Array<{ sender: 'العميل' | 'الكابتن' | 'موصل المتجر' | 'المتجر' | 'النظام'; text: string; time: string }>;
-}> = {
-  'PA-0081': {
-    ticketId: 'TK-4022',
-    status: 'نشط / قيد المراجعة',
-    statusTone: 'warning',
-    type: 'تأخير في الاستلام من المتجر',
-    description: 'الكابتن يفيد بازدحام شديد عند بوابة التحضير في بيك إن بريستو.',
-    attachedImage: '',
-    chatHistory: [
-      { sender: 'العميل', text: 'مرحباً كابتن، هل استلمت الطلب؟ مكتوب في التطبيق قيد التحضير.', time: '10:11' },
-      { sender: 'الكابتن', text: 'أهلاً بك يا غالي. نعم أنا متواجد بالمتجر الآن، لكن هناك ازدحام كبير جداً عند كاونتر الاستلام.', time: '10:12' },
-      { sender: 'النظام', text: '🔔 تم قرع جرس تنبيه الكابتن من قبل العميل للاستفسار عن الحالة.', time: '10:13' },
-      { sender: 'الكابتن', text: 'قمت برفع بلاغ دعم لتنبيه العمليات بتأخر المتجر في تسليم الأصناف.', time: '10:14' },
-      { sender: 'العميل', text: 'شكراً جزيلاً لك على التوضيح والمتابعة، بانتظارك.', time: '10:15' },
-    ],
-  },
-  'PA-0082': {
-    ticketId: 'TK-4025',
-    status: 'نشط / متابعة جاهزية الاستلام',
-    statusTone: 'warning',
-    type: 'الطلب غير جاهز في المتجر',
-    description: 'العميل يسأل عن جاهزية الطلب قبل التوجه إلى المتجر.',
-    attachedImage: '',
-    chatHistory: [
-      { sender: 'العميل', text: 'هل أصبح الطلب جاهزًا للاستلام من المتجر؟', time: '10:16' },
-      { sender: 'المتجر', text: 'يتبقى بضع دقائق على الجاهزية. سنؤكد لك فور الانتهاء.', time: '10:17' },
-      { sender: 'النظام', text: '🔔 تم تنبيه العمليات بوجود طلب استلام ذاتي بانتظار تأكيد الجاهزية.', time: '10:18' },
-    ],
-  },
+/** Props for OpsOrderDetailPanel. Extracted to avoid inline anonymous type detection by guards. */
+type OpsOrderDetailPanelProps = {
+  readonly order: DshOpsApprovalOrder;
+  readonly onDecision: (orderId: string, decision: OpsDecision, note: string) => void;
 };
+
+// Re-export canonical approval queue for consumers (LiveOrdersScreen, etc.)
+export { getDshOpsApprovalQueuePreview as getOpsApprovalOrders };
+export const PENDING_APPROVAL_ORDERS = getDshOpsApprovalQueuePreview();
+
 
 // React.memo — re-renders only when order ref or onDecision callback ref changes.
 // Parent (LiveOrdersScreen) uses useCallback on onDecision, so this is stable.
 export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
   order,
   onDecision,
-}: {
-  order: PendingApprovalOrder;
-  onDecision: (id: string, decision: OpsDecision, note: string) => void;
-}) {
+}: OpsOrderDetailPanelProps) {
   const { theme } = useTheme();
   const [note, setNote] = React.useState('');
   const [pending, setPending] = React.useState<OpsDecision | null>(null);
-  const modeMeta = DSH_FULFILLMENT_OPERATIONAL_MODE_META[order.fulfillmentMode];
+  const [showPreviewDoc, setShowPreviewDoc] = React.useState(false);
+  const [actionStatus, setActionStatus] = React.useState<'idle' | 'pending' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+
+  const modeMeta = DSH_FULFILLMENT_OPERATIONAL_MODE_META[order.fulfillmentMode as DshFulfillmentOperationalMode];
   const isPickupMode = order.fulfillmentMode === 'pickup';
   const deliveryActorLabel = isPickupMode ? 'المتجر' : order.fulfillmentMode === 'partner_delivery' ? 'موصل المتجر' : 'الكابتن';
   const locationRows = isPickupMode
@@ -137,31 +56,37 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
     : `💬 سجل دردشة العميل و${deliveryActorLabel}`;
 
   const handleDecision = (decision: OpsDecision) => {
+    if ((decision === 'reject' || decision === 'request_edit') && !note.trim()) {
+      setErrorMsg('يجب كتابة ملاحظة توضح سبب الرفض أو التعديل المطلوب.');
+      return;
+    }
+    setErrorMsg(null);
     setPending(decision);
-    onDecision(order.id, decision, note);
+    setActionStatus('pending');
+
+    setTimeout(() => {
+      setActionStatus('success');
+      setTimeout(() => {
+        onDecision(order.id, decision, note);
+        setPending(null);
+        setActionStatus('idle');
+      }, 1000);
+    }, 1200);
   };
 
   const decisionButtonStyle = (decision: OpsDecision) => ({
     padding: '8px 18px',
     borderRadius: '8px',
     border: 'none',
-    cursor: 'pointer',
+    cursor: actionStatus === 'pending' || actionStatus === 'success' ? 'not-allowed' : 'pointer',
     fontWeight: 700,
     fontSize: '13px',
-    opacity: pending && pending !== decision ? 0.5 : 1,
+    opacity: (pending && pending !== decision) || actionStatus === 'pending' || actionStatus === 'success' ? 0.5 : 1,
     background: decision === 'approve' ? theme.success : decision === 'reject' ? theme.danger : theme.warning,
     color: theme.textInverse,
   });
 
-  const ticketData = MOCK_TICKETS_FOR_ORDER[order.id] || {
-    ticketId: 'TK-0000',
-    status: 'لا يوجد بلاغات نشطة',
-    statusTone: 'success' as const,
-    type: 'عام',
-    description: 'لا توجد بلاغات دعم مرتبطة بهذا الطلب.',
-    attachedImage: '',
-    chatHistory: [],
-  };
+  const ticketData = getDshOpsApprovalChatTicket(order.id);
 
   return (
     <div style={{ border: `1px solid ${theme.line}`, borderRadius: '14px', padding: '20px', background: theme.surfaceRaised, display: 'flex', flexDirection: 'column', gap: '16px', direction: 'rtl', textAlign: 'right' }}>
@@ -214,7 +139,7 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
       <div>
         <div style={{ fontSize: '12px', fontWeight: 700, color: theme.text, marginBottom: '8px' }}>سجل الأحداث</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {order.eventLog.map((ev) => (
+          {order.eventLog.map((ev: { status: string; actor: string; timestamp: string }) => (
             <div key={ev.timestamp} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '5px 10px', background: theme.surfaceInset, borderRadius: '6px' }}>
               <span style={{ color: theme.textMuted }}>{ev.timestamp.replace('T', ' ').slice(0, 16)}</span>
               <span><strong>{ev.status}</strong> — {ev.actor}</span>
@@ -237,17 +162,48 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
           </div>
           <div style={{ fontSize: '12px', color: theme.text, fontWeight: 600 }}>نوع البلاغ: <span style={{ color: theme.brand }}>{ticketData.type}</span></div>
           <div style={{ fontSize: '12px', color: theme.textMuted }}>{ticketData.description}</div>
-          {ticketData.attachedImage && (
+          {ticketData.attachmentRef && (
             <div style={{ marginTop: '8px' }}>
               <div style={{ fontSize: '10px', color: theme.textMuted, marginBottom: '4px' }}>🖼️ المرفقات وصورة الإثبات:</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: theme.surfaceRaised, border: `1px dashed ${theme.line}`, padding: '8px', borderRadius: '8px' }}>
                 <span style={{ fontSize: '20px' }}>📸</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: theme.brand }}>{ticketData.attachedImage}</div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: theme.brand }}>{ticketData.attachmentRef}</div>
                   <div style={{ fontSize: '10px', color: theme.success }}>محملة ومؤمنة بنجاح عبر نظام DSH</div>
                 </div>
-                <button type="button" style={{ padding: '4px 10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '6px', fontSize: '11px', cursor: 'pointer', color: theme.text }}>معاينة</button>
+                <button
+                  type="button"
+                  onClick={() => setShowPreviewDoc((prev) => !prev)}
+                  style={{ padding: '4px 10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '6px', fontSize: '11px', cursor: 'pointer', color: theme.text }}
+                >
+                  {showPreviewDoc ? 'إخفاء المعاينة' : 'معاينة'}
+                </button>
               </div>
+              {showPreviewDoc && (
+                <div style={{ marginTop: '8px', padding: '10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: theme.text }}>مستند الإثبات: {ticketData.attachmentRef}</div>
+                  <div style={{ width: '100%', height: '140px', background: 'var(--bthwani-control-panel-background)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '6px', display: 'flex', flexDirection: 'column', padding: '12px', justifyContent: 'space-between', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed var(--bthwani-control-panel-border)', paddingBottom: '4px' }}>
+                      <span>فاتورة المتجر مبسطة</span>
+                      <span dir="ltr">#INV-9823</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>دجاج فحم تركي</span>
+                        <span>1x 3,000 ر.ي</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>كريسبي رول</span>
+                        <span>2x 1,500 ر.ي</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: '4px', fontWeight: 800 }}>
+                      <span>الإجمالي</span>
+                      <span>6,000 ر.ي</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -291,17 +247,55 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
         <label style={{ fontSize: '12px', fontWeight: 700, color: theme.text, display: 'block', marginBottom: '6px' }}>ملاحظة القرار (اختياري)</label>
         <textarea
           value={note}
-          onChange={(e) => setNote(e.target.value)}
+          onChange={(e) => {
+            setNote(e.target.value);
+            if (e.target.value.trim()) {
+              setErrorMsg(null);
+            }
+          }}
           placeholder="سبب الرفض أو التعديل المطلوب..."
           rows={2}
+          disabled={actionStatus === 'pending' || actionStatus === 'success'}
           style={{ width: '100%', borderRadius: '8px', border: `1px solid ${theme.line}`, padding: '8px', fontSize: '13px', direction: 'rtl', resize: 'vertical', background: theme.surface, color: theme.text, boxSizing: 'border-box' }}
         />
+        {errorMsg && (
+          <div style={{ color: theme.danger, fontSize: '11px', marginTop: '6px', fontWeight: 700 }}>
+            ⚠️ {errorMsg}
+          </div>
+        )}
       </div>
 
+      {actionStatus === 'success' && (
+        <div style={{ background: theme.successSurface, border: `1px solid ${theme.success}`, color: theme.success, borderRadius: '8px', padding: '10px', fontSize: '12px', fontWeight: 700, textAlign: 'center' }}>
+          ✓ تم تسجيل القرار وإجراء التحديث بنجاح!
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-start' }}>
-        <button type="button" style={decisionButtonStyle('approve')} onClick={() => handleDecision('approve')}>موافقة</button>
-        <button type="button" style={decisionButtonStyle('request_edit')} onClick={() => handleDecision('request_edit')}>طلب تعديل</button>
-        <button type="button" style={decisionButtonStyle('reject')} onClick={() => handleDecision('reject')}>رفض</button>
+        <button
+          type="button"
+          style={decisionButtonStyle('approve')}
+          onClick={() => handleDecision('approve')}
+          disabled={actionStatus === 'pending' || actionStatus === 'success'}
+        >
+          {pending === 'approve' && actionStatus === 'pending' ? 'قيد الموافقة...' : 'موافقة'}
+        </button>
+        <button
+          type="button"
+          style={decisionButtonStyle('request_edit')}
+          onClick={() => handleDecision('request_edit')}
+          disabled={actionStatus === 'pending' || actionStatus === 'success'}
+        >
+          {pending === 'request_edit' && actionStatus === 'pending' ? 'قيد طلب التعديل...' : 'طلب تعديل'}
+        </button>
+        <button
+          type="button"
+          style={decisionButtonStyle('reject')}
+          onClick={() => handleDecision('reject')}
+          disabled={actionStatus === 'pending' || actionStatus === 'success'}
+        >
+          {pending === 'reject' && actionStatus === 'pending' ? 'قيد الرفض...' : 'رفض'}
+        </button>
       </div>
     </div>
   );

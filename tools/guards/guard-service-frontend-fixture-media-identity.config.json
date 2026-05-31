@@ -385,7 +385,11 @@
     "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx",
     "dsh/frontend/data/support.preview-data.ts",
     "dsh/frontend/data/orders.preview-data.ts",
-    "dsh/frontend/shared/dsh-order-preview.contract.ts"
+    "dsh/frontend/shared/dsh-order-preview.contract.ts",
+    "dsh/frontend/control-panel/operations/GeoHeatmapScreen.tsx",
+    "dsh/frontend/control-panel/operations/LiveOrdersScreen.tsx",
+    "dsh/frontend/control-panel/operations/operations.types.ts",
+    "dsh/frontend/control-panel/operations/operations.registry.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

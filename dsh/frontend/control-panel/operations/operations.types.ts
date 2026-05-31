@@ -10,6 +10,7 @@ export type OperationsFocusParams = {
   ticketId?: string;
   callId?: string;
   panel?: OperationsPanelId;
+  subGroup?: string;
 };
 
 export const DSH_FULFILLMENT_OPERATIONAL_MODE_META: Readonly<Record<DshFulfillmentOperationalMode, {

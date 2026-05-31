@@ -43,10 +43,22 @@ const CAPTAINS = [
   },
 ] as const;
 
-const runPreviewOperation = () => undefined; // fallback for non-routable preview actions
-
 export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup }: CaptainOperationsScreenProps) {
   const router = useRouter();
+  const [loadingCap, setLoadingCap] = React.useState<Record<string, boolean>>({});
+  const [successMsg, setSuccessMsg] = React.useState<Record<string, string | null>>({});
+
+  const triggerAction = React.useCallback((capId: string, actionLabel: string) => {
+    setLoadingCap((prev) => ({ ...prev, [capId]: true }));
+    setSuccessMsg((prev) => ({ ...prev, [capId]: null }));
+    setTimeout(() => {
+      setLoadingCap((prev) => ({ ...prev, [capId]: false }));
+      setSuccessMsg((prev) => ({ ...prev, [capId]: `تمت عملية (${actionLabel}) بنجاح.` }));
+      setTimeout(() => {
+        setSuccessMsg((prev) => ({ ...prev, [capId]: null }));
+      }, 3000);
+    }, 800);
+  }, []);
 
   return (
     <Box gap={3}>
@@ -74,31 +86,38 @@ export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup
             risk={cap.suggestion.auditRequired ? 'warning' : 'neutral'}
             recommendation={cap.suggestion.label}
             reason={cap.suggestion.reason}
-            sla={`الموقع: ${cap.location} | تقييم: ${cap.performance}`}
+            sla={successMsg[cap.id]
+              ? `✓ ${successMsg[cap.id]}`
+              : `الموقع: ${cap.location} | تقييم: ${cap.performance}`}
             primaryAction={{
               id: `${cap.id}-primary`,
-              label: cap.suggestion.action,
+              label: loadingCap[cap.id] ? 'جاري الإرسال...' : cap.suggestion.action,
               onAction: () => {
+                if (loadingCap[cap.id]) return;
                 if (cap.suggestion.action === 'إسناد طلب') {
                   router.push(buildOperationsHref('dispatch-assignment'));
                 } else if (cap.suggestion.action === 'تصعيد') {
                   router.push(buildOperationsHref('exceptions-escalations'));
                 } else {
-                  runPreviewOperation();
+                  triggerAction(cap.id, cap.suggestion.action);
                 }
               },
             }}
-            secondaryAction={cap.suggestion.secondary ? {
-              id: `${cap.id}-secondary`,
-              label: cap.suggestion.secondary,
-              onAction: () => {
-                if (cap.suggestion.secondary === 'تعطيل مؤقت') {
-                  router.push(buildOperationsHref('exceptions-escalations'));
-                } else {
-                  runPreviewOperation();
-                }
-              },
-            } : undefined}
+            secondaryAction={cap.suggestion.secondary ? (() => {
+              const secAction = cap.suggestion.secondary;
+              return {
+                id: `${cap.id}-secondary`,
+                label: secAction,
+                onAction: () => {
+                  if (loadingCap[cap.id]) return;
+                  if (secAction === 'تعطيل مؤقت') {
+                    router.push(buildOperationsHref('exceptions-escalations'));
+                  } else {
+                    triggerAction(cap.id, secAction);
+                  }
+                },
+              };
+            })() : undefined}
           />
         ))}
       </Box>
