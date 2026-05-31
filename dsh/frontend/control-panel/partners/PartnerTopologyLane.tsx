@@ -26,7 +26,7 @@ export function PartnerTopologyLane({
   const router = useRouter();
 
   return (
-    <Box gap={4} dir="rtl">
+    <Box gap={4}>
       <div className={styles.topologyHeader}>
         <Box gap={1}>
           <Text role="caption" tone="brand">خارطة نظام الشركاء</Text>
@@ -44,13 +44,13 @@ export function PartnerTopologyLane({
                   <Text role="titleSm" tone="brand">{lane.title}</Text>
                   <Text role="caption" tone="muted">{lane.sub}</Text>
                 </Box>
-                <Box paddingX={2} paddingY={1} background={lane.tone === 'success' ? 'successSurface' : lane.tone === 'danger' ? 'dangerSurface' : 'surfaceInset'} radiusToken="round">
+                <Box paddingX={2} paddingY={1} background={lane.tone === 'success' ? 'successSurface' : lane.tone === 'danger' ? 'dangerSurface' : 'surfaceInset'} radiusToken="pill">
                   <Text role="caption" tone={lane.tone === 'success' ? 'success' : lane.tone === 'danger' ? 'danger' : 'muted'}>{lane.load}</Text>
                 </Box>
               </div>
 
-              <Box padding={2} background="surfaceInset" radiusToken="sm" border borderTone="line" className={styles.topologyFlowBox}>
-                <Text role="caption" tone="muted" dir="ltr">
+              <Box padding={2} background="surfaceInset" radiusToken="sm" border borderTone="line">
+                <Text role="caption" tone="muted">
                   {lane.flow}
                 </Text>
               </Box>

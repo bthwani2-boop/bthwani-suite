@@ -6,14 +6,9 @@ import { Box, StateView } from '@bthwani/ui-kit';
 import {
   WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
+  WebControlPanelWorkbench,
+  WebControlPanelDenseHeader,
 } from '@bthwani/ui-kit/web';
-import {
-  buildOperationsHref,
-  getOperationsGroupMeta,
-  NON_OPERATIONS_SECTION_SHORTCUTS,
-  OPERATIONS_CANONICAL_GROUPS,
-  resolveOperationsStateCopy,
-} from './operations.registry';
 import { OPERATIONS_PULSE_METRICS } from '../../data/orders.preview-data';
 import type {
   CanonicalOperationsGroupId,
@@ -23,6 +18,12 @@ import type {
 } from './operations.types';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
+import {
+  getOperationsGroupMeta,
+  buildOperationsHref,
+  OPERATIONS_CANONICAL_GROUPS,
+  resolveOperationsStateCopy,
+} from './operations.registry';
 // React.lazy — each screen is a separate JS chunk loaded only when its tab is active.
 // Named-export screens use .then(m => ({ default: m.ScreenName })) to satisfy lazy().
 const CommandCenterScreen = React.lazy(() => import('./CommandCenterScreen').then((m) => ({ default: m.CommandCenterScreen })));
@@ -94,6 +95,7 @@ export function ControlPanelDshOperationsScreen({
   const kpiItems = React.useMemo(
     () =>
       OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
+        id: metric.title,
         label: metric.title,
         value: String(metric.value),
       })),
@@ -139,122 +141,70 @@ export function ControlPanelDshOperationsScreen({
     );
   }
 
+  const handleSelectTab = React.useCallback((id: string) => {
+    const groupId = id as CanonicalOperationsGroupId;
+    setActiveGroup(groupId);
+    setActiveSubGroup(undefined);
+    router.push(buildOperationsHref(groupId, focusParams));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusParams.orderId, focusParams.customerId, focusParams.ticketId, focusParams.callId]);
+
+  const handleSelectSubTab = React.useCallback((id: string) => {
+    setActiveSubGroup(id);
+  }, []);
+
   return (
-    <div className={styles.surfaceCockpit}>
-      <header className={styles.surfaceTopBar}>
-        <div className={styles.surfaceTitleBlock}>
-          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
-            <div className={styles.surfaceHeaderGlyph}>
-              <div className={styles.surfaceHeaderGlyphMinus} />
-            </div>
-          </div>
-          <Box gap={0}>
-            <div className={styles.surfaceHeaderTextRow}>
-              <h1 className={styles.surfaceHeaderTitle}>عمليات DSH</h1>
-              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
-              </Box>
-            </div>
-            <p className={styles.surfaceHeaderSubtitle}>summary first، details on open، وتدخلات تشغيلية بلا أي ownership مالي داخل DSH.</p>
-          </Box>
-        </div>
-
-        <div className={styles.surfaceHeaderActions}>
-          <div className={styles.surfacePulseCompact}>
-            {kpiItems.map((m) => (
-              <div key={m.label} className={styles.commandKpi}>
-                <span className={styles.commandKpiLabel}>{m.label}</span>
-                <span className={styles.commandKpiValue}>{m.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </header>
-
-      <nav className={styles.navigationDock}>
-        <WebControlPanelLaneTabs
-          items={tabItems}
-          onSelect={React.useCallback((id: string) => {
-            const groupId = id as CanonicalOperationsGroupId;
-            setActiveGroup(groupId);
-            setActiveSubGroup(undefined);
-            router.push(buildOperationsHref(groupId, focusParams));
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          }, [focusParams.orderId, focusParams.customerId, focusParams.ticketId, focusParams.callId])}
+    <WebControlPanelWorkbench
+      header={
+        <WebControlPanelDenseHeader
+          eyebrow="غرفة قيادة"
+          title="عمليات DSH"
+          description="summary first، details on open، وتدخلات تشغيلية بلا أي ownership مالي داخل DSH."
+          metrics={kpiItems}
         />
-      </nav>
-
-      <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
-        {subTabItems && subTabItems.length > 0 && (
-          <WebControlPanelSubTabs
-            items={subTabItems}
-            ariaLabel="تصفية فرعية"
-            onSelect={React.useCallback((id: string) => setActiveSubGroup(id), [])}
-          />
-        )}
-      </div>
-
-      <div className={styles.surfaceSplitGrid}>
-        <div className={styles.surfaceInfoCard}>
-          <div>
-            <div className={styles.surfaceInfoCardTitle}>حدود ملكية العمليات</div>
-            <div className={styles.surfaceInfoCardDescription}>
-              {governance.notes}
-            </div>
-          </div>
-          <div className={styles.surfaceMetaWrap}>
-            {governance.onDemandPolicySummary.map((policy) => (
-              <span key={policy} className={styles.surfaceMetaChip}>{policy}</span>
-            ))}
-          </div>
+      }
+      controls={
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <WebControlPanelLaneTabs items={tabItems} onSelect={handleSelectTab} />
+          {subTabItems && subTabItems.length > 0 && (
+            <WebControlPanelSubTabs
+              items={subTabItems}
+              ariaLabel="تصفية فرعية"
+              onSelect={handleSelectSubTab}
+            />
+          )}
         </div>
-        <div className={styles.surfaceInfoCard}>
-          <div>
-            <div className={styles.surfaceInfoCardTitle}>تحويلات الملكية</div>
-            <div className={styles.surfaceInfoCardDescription}>
-              الدعم والماليات والكتالوجات والشركاء والمنصة والإدارة تبقى أقسامًا مستقلة؛ العمليات تفتحها ولا تكرر منطقها.
-            </div>
-          </div>
-          <div className={styles.surfaceMetaWrap}>
-            {NON_OPERATIONS_SECTION_SHORTCUTS.map((shortcut) => (
-              <span key={shortcut.id} className={styles.surfaceMetaChip}>{shortcut.label}</span>
-            ))}
-          </div>
-        </div>
-        {focusContextItems.length > 0 ? (
-          <div className={styles.surfaceInfoCard}>
-            <div>
-              <div className={styles.surfaceInfoCardTitle}>سياق التدخل الحالي</div>
-              <div className={styles.surfaceInfoCardDescription}>
-                IDs/references first. التفاصيل والـ evidence تظل داخل workspace المفتوح فقط.
-              </div>
-            </div>
-            <div className={styles.surfaceInspectorMeta}>
-              {focusContextItems.map((item) => (
-                <div key={item.label} className={styles.surfaceInspectorRow}>
-                  <strong>{item.label}</strong>
-                  <span>{item.value}</span>
+      }
+      main={
+        <div className={styles.surfaceCockpitContent} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {focusContextItems.length > 0 && (
+            <div className={styles.surfaceInfoCard} style={{ padding: '6px 12px', background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <span className={styles.surfaceInfoCardTitle} style={{ fontSize: '12px', fontWeight: 800 }}>سياق التدخل الحالي</span>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  {focusContextItems.map((item) => (
+                    <div key={item.label} style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>
+                      <strong>{item.label}:</strong> <span style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.value}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <main className={styles.surfaceMainPanel}>
-        <div className={styles.surfaceInnerScroll}>
-          <React.Suspense
-            fallback={
-              <div className={styles.surfaceStatePadding} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '13px', opacity: 0.5 }}>جارٍ تحميل المشهد...</span>
               </div>
-            }
-          >
-            <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
-          </React.Suspense>
+            </div>
+          )}
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <React.Suspense
+              fallback={
+                <div className={styles.surfaceStatePadding} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+                  <span style={{ fontSize: '13px', opacity: 0.5 }}>جارٍ تحميل المشهد...</span>
+                </div>
+              }
+            >
+              <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
+            </React.Suspense>
+          </div>
         </div>
-      </main>
-    </div>
+      }
+    />
   );
 }
 

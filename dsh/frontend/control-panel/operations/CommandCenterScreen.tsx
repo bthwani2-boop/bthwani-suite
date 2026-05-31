@@ -1,32 +1,24 @@
 'use client';
 
-// P0-10: Command Center — monitoring cockpit only.
-// Reads summaries from lifecycle, signal, and service-health models.
-// No full order details loaded here — details open on explicit action only.
-// WLT finance alerts are read-only display; no mutation inside DSH.
-
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
-  WebControlPanelKpiStrip,
   WebControlPanelRecommendation,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import {
-  OPERATIONS_PULSE_METRICS,
   DSH_SERVICE_HEALTH_PREVIEW,
   DSH_WLT_FINANCE_ALERTS_PREVIEW,
 } from '../../data/orders.preview-data';
-import { buildOperationsHref } from './operations.registry';
+import { buildOperationsHref, NON_OPERATIONS_SECTION_SHORTCUTS } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/dsh-signal-layer.model';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 
-// Cockpit tone map — maps preview-data tone strings to ui-kit allowed values
 const PULSE_TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand:   'neutral',
   best:    'success',
@@ -36,8 +28,6 @@ const PULSE_TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger
   success: 'success',
 };
 
-// Top system recommendations — cockpit summary refs, not new source-of-truth.
-// Each href routes to the owning workspace via buildOperationsHref.
 const TOP_SUGGESTIONS = [
   {
     id: 'sug-1',
@@ -68,15 +58,12 @@ const TOP_SUGGESTIONS = [
   },
 ] as const;
 
-// Quick actions — direct workspace shortcuts with explicit route via buildOperationsHref.
 const QUICK_ACTIONS = [
   { id: 'QA-1', label: 'إعادة إسناد 12 طلب متأخر', time: 'منذ 5 دقائق', workspace: 'dispatch-assignment' as const },
   { id: 'QA-2', label: 'تواصل مع المتجر رقم 402', time: 'منذ 12 دقيقة', workspace: 'partner-stores' as const },
   { id: 'QA-3', label: 'تصعيد شكوى عميل (تأخير)', time: 'منذ 18 دقيقة', workspace: 'audit-support-sla' as const },
 ] as const;
 
-// Signal summaries — lean, loaded once at module level.
-// Details open only on explicit action via routeId → onDemandDetailPolicy.
 const OPS_SIGNAL_SUMMARIES = getDshSignalSummaries('control-panel', 'ops');
 const OPS_URGENT_SIGNALS = OPS_SIGNAL_SUMMARIES
   .filter((s) => s.priority === 'urgent' && s.readState === 'unread')
@@ -88,36 +75,26 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
   const supportGovernance = getDshControlPanelGovernanceEntry('support');
   const financeGovernance = getDshControlPanelGovernanceEntry('finance');
 
-  const pulseKpiItems = OPERATIONS_PULSE_METRICS.map((m) => ({
-    id: m.id,
-    label: m.title,
-    value: m.value,
-    tone: PULSE_TONE_MAP[m.tone] ?? 'neutral' as const,
-  }));
-
   return (
-    <div className={styles.surfaceCockpitContent}>
+    <div className={styles.surfaceCockpitContent} style={{ gap: '10px', overflowY: 'auto', paddingInlineEnd: '4px' }}>
       {/* ── Header ── */}
-      <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>نبض العمليات</h2>
-        <p className={styles.surfaceSectionSubtitle}>مراقبة الأداء — التدخلات السريعة — توجيه القرار</p>
+      <div className={styles.surfaceSectionHeader} style={{ marginBottom: '4px' }}>
+        <h2 className={styles.surfaceSectionTitle} style={{ fontSize: '15px' }}>لوحة التحكم والمراقبة النشطة</h2>
+        <p className={styles.surfaceSectionSubtitle} style={{ fontSize: '11px' }}>التدخلات السريعة وتوجيه قرارات الإسناد وحوكمة أسطح DSH</p>
       </div>
 
-      {/* ── Pulse KPI strip — aggregate metrics, no order detail ── */}
-      <WebControlPanelKpiStrip items={pulseKpiItems} />
+      <div className={styles.surfaceGridTwoCol} style={{ gap: '10px' }}>
 
-      <div className={styles.surfaceGridTwoCol}>
-
-        {/* 1. Decision routing map — governance-sourced ownership boundaries */}
-        <div className={styles.surfaceCompactPanel}>
-          <h3 className={styles.surfacePanelTitle}>خريطة القرار السريع</h3>
-          <div className={styles.surfaceStackSmall}>
+        {/* 1. Decision routing map */}
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>خريطة القرار السريع</h3>
+          <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             <WebControlPanelDecisionRow
               entityId="OPS"
-              entityLabel="التنفيذ الحي"
-              status="المالك"
+              entityLabel="التنفيذ التشغيلي الحي"
+              status="العمليات"
               statusTone="neutral"
-              recommendation="ابقَ داخل العمليات"
+              recommendation="داخل العمليات"
               reason={operationsGovernance.notes}
               sla="إسناد، ضغط، live orders"
               primaryAction={{
@@ -129,7 +106,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
             <WebControlPanelDecisionRow
               entityId="SUP"
               entityLabel="التذاكر والتصعيد"
-              status="حوّل"
+              status="دعم خارجي"
               statusTone="warning"
               recommendation="حوّل إلى الدعم"
               reason={supportGovernance.notes}
@@ -143,16 +120,16 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
               statusTone="warning"
               recommendation="حوّل إلى WLT — عرض فقط"
               reason={financeGovernance.notes}
-              sla="preview-only — لا mutation داخل DSH"
+              sla="preview-only — لا تعديل مالي"
               primaryAction={{ id: 'go-finance', label: 'فتح المالية', onAction: () => router.push('/finance') }}
             />
           </div>
         </div>
 
-        {/* 2. Top system recommendations — cockpit refs to owning workspaces */}
-        <div className={styles.surfaceCompactPanel}>
-          <h3 className={styles.surfacePanelTitle}>أعلى توصيات النظام الآن</h3>
-          <div className={styles.surfaceStackSmall}>
+        {/* 2. Top system recommendations */}
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>أعلى توصيات النظام الآن</h3>
+          <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             {TOP_SUGGESTIONS.map((s) => (
               <WebControlPanelRecommendation
                 key={s.id}
@@ -171,9 +148,9 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
         </div>
 
         {/* 3. Urgent quick actions */}
-        <div className={styles.surfaceCompactPanel}>
-          <h3 className={styles.surfacePanelTitle}>تدخل سريع مطلوب</h3>
-          <div className={styles.surfaceStackSmall}>
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>تدخل سريع مطلوب</h3>
+          <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             {QUICK_ACTIONS.map((action) => (
               <WebControlPanelDecisionRow
                 key={action.id}
@@ -192,10 +169,10 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
           </div>
         </div>
 
-        {/* 3.5. Playbooks — next-best-action without creating duplicate owners */}
-        <div className={styles.surfaceCompactPanel}>
-          <h3 className={styles.surfacePanelTitle}>Playbooks التدخل</h3>
-          <div className={styles.surfaceStackSmall}>
+        {/* 3.5. Playbooks */}
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>Playbooks التدخل</h3>
+          <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             {DSH_OPS_INTERVENTION_PLAYBOOKS.slice(0, 3).map((playbook) => (
               <WebControlPanelRecommendation
                 key={playbook.playbookId}
@@ -219,11 +196,11 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
           </div>
         </div>
 
-        {/* 4. Signal layer — urgent ops signals, summaries only */}
+        {/* 4. Signal layer */}
         {OPS_URGENT_SIGNALS.length > 0 ? (
-          <div className={styles.surfaceCompactPanel}>
-            <h3 className={styles.surfacePanelTitle}>إشارات النظام العاجلة</h3>
-            <div className={styles.surfaceStackSmall}>
+          <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+            <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>إشارات النظام العاجلة</h3>
+            <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
               {OPS_URGENT_SIGNALS.map((signal) => {
                 const tone = getDshSignalEventTone(signal.kind);
                 const statusTone = tone === 'danger' ? 'danger' as const
@@ -251,11 +228,10 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
           </div>
         ) : null}
 
-        {/* 5. Service health — partner readiness, catalog blockers, serviceability, SLA */}
-        {/* Summaries only — each item routes to its owning workspace */}
-        <div className={styles.surfaceCompactPanel}>
-          <h3 className={styles.surfacePanelTitle}>حالة الخدمة</h3>
-          <div className={styles.surfaceStackSmall}>
+        {/* 5. Service health */}
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>حالة الخدمة والمؤشرات</h3>
+          <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             {DSH_SERVICE_HEALTH_PREVIEW.map((item) => (
               <WebControlPanelDecisionRow
                 key={item.entityId}
@@ -264,7 +240,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
                 status={item.status}
                 statusTone={item.statusTone}
                 risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
-                recommendation={`الطابور: ${item.ownerQueue} · ${item.onDemandDetailPolicy}`}
+                recommendation={`الطابور: ${item.ownerQueue}`}
                 reason={`الحالة: ${item.lifecycleState} · السطح: ${item.affectedSurface}`}
                 sla={item.evidenceNeeded ? 'يتطلب إثباتاً' : '—'}
                 primaryAction={{
@@ -278,25 +254,20 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
                     }
                   },
                 }}
-                secondaryAction={item.secondaryAction ? {
-                  id: `sh-secondary-${item.entityId}`,
-                  label: item.secondaryAction,
-                  onAction: () => router.push(buildOperationsHref('geo-heatmap')),
-                } : undefined}
               />
             ))}
           </div>
         </div>
 
-        {/* 6. WLT finance alerts — read-only display, no mutation */}
-        <div className={styles.surfaceCompactPanel}>
-          <h3 className={styles.surfacePanelTitle}>تنبيهات WLT المالية</h3>
-          <Box gap={1} paddingX={2} paddingY={1}>
+        {/* 6. WLT finance alerts */}
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>تنبيهات WLT المالية (قراءة فقط)</h3>
+          <Box gap={1} paddingX={1} paddingY={1}>
             <Text role="caption" tone="muted">
-              عرض فقط — لا approve/pay/settle داخل DSH. WLT يملك الحقيقة المالية.
+              لا تعديل مالي أو تسوية داخل DSH؛ المرجعية الكاملة لـ WLT.
             </Text>
           </Box>
-          <div className={styles.surfaceStackSmall}>
+          <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             {DSH_WLT_FINANCE_ALERTS_PREVIEW.map((alert) => (
               <WebControlPanelDecisionRow
                 key={alert.alertId}
@@ -317,6 +288,35 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
           </div>
         </div>
 
+      </div>
+
+      {/* ── Governance Footnote Section ── */}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid var(--bthwani-control-panel-border)', paddingTop: '10px' }}>
+        <div className={styles.surfaceInfoCard} style={{ flex: '1 1 300px', padding: '6px 10px' }}>
+          <div>
+            <div className={styles.surfaceInfoCardTitle} style={{ fontSize: '11px', fontWeight: 800 }}>حدود ملكية العمليات</div>
+            <div className={styles.surfaceInfoCardDescription} style={{ fontSize: '10px' }}>{operationsGovernance.notes}</div>
+          </div>
+          <div className={styles.surfaceMetaWrap} style={{ gap: '4px' }}>
+            {operationsGovernance.onDemandPolicySummary.map((policy) => (
+              <span key={policy} className={styles.surfaceMetaChip} style={{ fontSize: '9px', padding: '2px 6px' }}>{policy}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.surfaceInfoCard} style={{ flex: '1 1 300px', padding: '6px 10px' }}>
+          <div>
+            <div className={styles.surfaceInfoCardTitle} style={{ fontSize: '11px', fontWeight: 800 }}>تحويلات الملكية والحوكمة</div>
+            <div className={styles.surfaceInfoCardDescription} style={{ fontSize: '10px' }}>
+              الدعم والماليات والكتالوجات والشركاء والمنصة والإدارة أقسام مستقلة؛ العمليات تفتحها ولا تكرر منطقها.
+            </div>
+          </div>
+          <div className={styles.surfaceMetaWrap} style={{ gap: '4px' }}>
+            {NON_OPERATIONS_SECTION_SHORTCUTS.map((shortcut) => (
+              <span key={shortcut.id} className={styles.surfaceMetaChip} style={{ fontSize: '9px', padding: '2px 6px' }}>{shortcut.label}</span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

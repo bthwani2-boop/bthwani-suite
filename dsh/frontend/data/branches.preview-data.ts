@@ -18,7 +18,7 @@ export const dshPreviewBranches: readonly DshPreviewBranch[] = dshDiscoveryStore
   id: `${store.id}-main`,
   storeId: store.id,
   label: `${store.name} — الفرع الرئيسي`,
-  zoneLabel: store.areaLabel,
+  zoneLabel: store.subtitle.split(' • ')[0] ?? store.subtitle,
 }));
 
 export function getDshPreviewBranch(branchId: string) {

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Text, Surface, TextField, KeyValueList } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelInspectorShell,
@@ -126,37 +127,40 @@ export function PartnerCatalogOverridesWorkspace() {
   const selectedCentralItem = selectedProductId ? centralItems.find(i => i.id === selectedProductId) : null;
 
   return (
-    <Box gap={4} dir="rtl">
+    <Box gap={4}>
       <Box gap={2}>
         <Text role="caption" tone="brand">اختر الشريك لإدارة تجاوزات الكتالوج</Text>
-        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const isSelected = selectedPartnerId === partner.partnerId;
             const overridesCount = (overrides[partner.partnerId] ?? []).length;
 
             return (
-              <Surface
+              <Pressable
                 key={partner.partnerId}
-                as="button"
-                onClick={() => handlePartnerChange(partner.partnerId)}
-                padding={2}
-                radiusToken="sm"
-                border
-                borderTone={isSelected ? 'brand' : 'line'}
-                background={isSelected ? 'brandSurface' : 'surface'}
-                layoutDirection="row"
-                align="center"
-                gap={2}
+                onPress={() => handlePartnerChange(partner.partnerId)}
+                style={{ cursor: 'pointer' }}
               >
-                <Text role="bodySm" tone={isSelected ? 'brand' : 'base'}>{partner.storeName}</Text>
-                {overridesCount > 0 && (
-                  <Surface padding={1} radiusToken="pill" background="brand" border={false}>
-                    <Text role="caption" tone="inverse">
-                      {overridesCount}
-                    </Text>
-                  </Surface>
-                )}
-              </Surface>
+                <Surface
+                  padding={2}
+                  radiusToken="sm"
+                  border
+                  borderTone={isSelected ? 'brand' : 'line'}
+                  tone={isSelected ? 'brand' : 'default'}
+                  layoutDirection="row"
+                  align="center"
+                  gap={2}
+                >
+                  <Text role="bodySm" tone={isSelected ? 'brand' : 'default'}>{partner.storeName}</Text>
+                  {overridesCount > 0 && (
+                    <Surface padding={1} radiusToken="pill" tone="brand" border={false}>
+                      <Text role="caption" tone="inverse">
+                        {overridesCount}
+                      </Text>
+                    </Surface>
+                  )}
+                </Surface>
+              </Pressable>
             );
           })}
         </Box>
@@ -237,7 +241,7 @@ export function PartnerCatalogOverridesWorkspace() {
                 </Surface>
 
                 <Box gap={3}>
-                  <Text role="titleSm" tone="base">المتغيرات المحلية للشريك</Text>
+                  <Text role="titleSm" tone="default">المتغيرات المحلية للشريك</Text>
 
                   <TextField
                     label="سعر الشريك المخصص (Price Override)"
@@ -257,34 +261,38 @@ export function PartnerCatalogOverridesWorkspace() {
                   <Box gap={2}>
                     <Text role="caption" tone="muted">حالة التوفر للطلب</Text>
                     <Box layoutDirection="row" gap={2}>
-                      <Surface
-                        as="button"
-                        onClick={() => setFormAvailable(true)}
-                        padding={2}
-                        radiusToken="sm"
-                        border
-                        borderTone={formAvailable ? 'success' : 'line'}
-                        background={formAvailable ? 'successSurface' : 'surface'}
-                        className={styles.surfaceActionWrap}
+                      <Pressable
+                        onPress={() => setFormAvailable(true)}
+                        style={{ cursor: 'pointer' }}
                       >
-                        <Text role="bodySm" tone={formAvailable ? 'success' : 'base'}>
-                          متاح للطلب
-                        </Text>
-                      </Surface>
-                      <Surface
-                        as="button"
-                        onClick={() => setFormAvailable(false)}
-                        padding={2}
-                        radiusToken="sm"
-                        border
-                        borderTone={!formAvailable ? 'danger' : 'line'}
-                        background={!formAvailable ? 'dangerSurface' : 'surface'}
-                        className={styles.surfaceActionWrap}
+                        <Surface
+                          padding={2}
+                          radiusToken="sm"
+                          border
+                          borderTone={formAvailable ? 'success' : 'line'}
+                          tone={formAvailable ? 'success' : 'default'}
+                        >
+                          <Text role="bodySm" tone={formAvailable ? 'success' : 'default'}>
+                            متاح للطلب
+                          </Text>
+                        </Surface>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => setFormAvailable(false)}
+                        style={{ cursor: 'pointer' }}
                       >
-                        <Text role="bodySm" tone={!formAvailable ? 'danger' : 'base'}>
-                          غير متوفر (موقوف)
-                        </Text>
-                      </Surface>
+                        <Surface
+                          padding={2}
+                          radiusToken="sm"
+                          border
+                          borderTone={!formAvailable ? 'danger' : 'line'}
+                          tone={!formAvailable ? 'danger' : 'default'}
+                        >
+                          <Text role="bodySm" tone={!formAvailable ? 'danger' : 'default'}>
+                            غير متوفر (موقوف)
+                          </Text>
+                        </Surface>
+                      </Pressable>
                     </Box>
                   </Box>
 
@@ -331,7 +339,7 @@ export function PartnerCatalogOverridesWorkspace() {
           )}
 
           <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
-            <Text role="titleSm" tone="base">مبدأ عدم تكرار المنتج</Text>
+            <Text role="titleSm" tone="default">مبدأ عدم تكرار المنتج</Text>
             <Text role="bodySm" tone="muted">
               لتفادي تشتت البيانات، يتم دمج كل التجاوزات على معرف المنتج المركزي. أي تعديل في الصورة أو الاسم أو الباركود يجب أن يتم عبر إدارة الكتالوج العام وليس من هنا.
             </Text>

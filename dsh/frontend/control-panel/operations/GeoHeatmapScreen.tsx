@@ -151,7 +151,8 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
           </Box>
         }
         main={
-          <Box gap={3}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
+            <Box gap={3}>
             <WebControlPanelMapCanvas
               legend={
                 <div className={styles.surfaceActionWrap}>
@@ -233,13 +234,14 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
               })}
             </WebControlPanelQueue>
           </Box>
+          </div>
         }
         inspector={
           <WebControlPanelInspectorShell
             title={selectedZone ? `تفاصيل ${selectedZone.name}` : 'تفاصيل المنطقة'}
             onClose={() => setSelectedZoneId(visibleZones[0]?.id ?? GEO_HEATMAP_ZONES[0]?.id ?? '')}
           >
-            <Box gap={2}>
+            <Box gap={2} style={{ overflowY: 'auto', height: '100%', paddingRight: '2px' }}>
               <Box gap={2}>
                 {[
                   { label: 'نوع الكيان', value: 'منطقة تشغيلية' },

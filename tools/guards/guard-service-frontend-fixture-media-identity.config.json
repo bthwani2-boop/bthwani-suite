@@ -377,7 +377,12 @@
     "dsh/frontend/shared/dsh-role-permission.model.ts",
     "dsh/frontend/control-panel/marketing/banner-target-utils.ts",
     "dsh/frontend/control-panel/platform",
-    "dsh/frontend/data/platform.preview-data.ts"
+    "dsh/frontend/data/platform.preview-data.ts",
+    "dsh/frontend/control-panel/operations/AssistedOrderDeskScreen.tsx",
+    "dsh/frontend/control-panel/operations/OrderRescueScreen.tsx",
+    "dsh/frontend/data/customers.preview-data.ts",
+    "dsh/frontend/control-panel/operations/DispatchAssignmentScreen.tsx",
+    "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

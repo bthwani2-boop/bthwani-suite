@@ -69,7 +69,7 @@ export function AuditTrailDetailWorkspace({
 
   return (
     <WebControlPanelInspectorShell title={shellTitle} onClose={onClose}>
-      <Box gap={4} padding={4}>
+      <Box gap={4} padding={4} style={{ overflowY: 'auto', height: '100%', paddingRight: '2px' }}>
 
         {/* ── Decision banner ── */}
         <Surface tone={decisionTone} padding={3} radiusToken="md" border>

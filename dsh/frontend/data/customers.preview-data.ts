@@ -1,4 +1,4 @@
-import { DSH_CUSTOMER_360_PREVIEW, DSH_DEMO_SUPPORT_TICKETS } from './support.preview-data';
+import { DSH_CUSTOMER_360_PREVIEW } from './support.preview-data';
 
 export const dshCustomersPreviewDataContract = {
   dataKind: 'UI_PREVIEW_ONLY',
@@ -16,7 +16,7 @@ export type DshPreviewCustomer = {
 export const dshPreviewCustomers: readonly DshPreviewCustomer[] = DSH_CUSTOMER_360_PREVIEW.map((customer) => ({
   id: customer.customerId,
   name: customer.customerName,
-  latestTicketId: customer.ticketHistory[0]?.ticketId ?? DSH_DEMO_SUPPORT_TICKETS.find((ticket) => ticket.customerId === customer.customerId)?.ticketId,
+  latestTicketId: customer.ticketsHistory?.[0]?.ticketId,
 }));
 
 export function getDshPreviewCustomer(customerId: string) {

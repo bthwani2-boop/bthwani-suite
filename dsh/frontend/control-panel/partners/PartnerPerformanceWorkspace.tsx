@@ -164,7 +164,7 @@ function PartnerDisputesTab() {
         </Box>
         <Box gap={3}>
           {openCount === 0 ? (
-            <Surface padding={8} align="center" background="surfaceInset" radiusToken="md">
+            <Surface padding={8} align="center" tone="inset" radiusToken="md">
               <Text tone="muted">لا توجد نزاعات مفتوحة حالياً.</Text>
             </Surface>
           ) : (
@@ -212,24 +212,24 @@ function PartnerDisputesTab() {
               />
             </Box>
 
-            <Surface padding={3} background="surface" radiusToken="sm" border borderTone="line">
+            <Surface padding={3} tone="default" radiusToken="sm" border borderTone="line">
               <Text role="caption" tone="muted">الشريك:</Text>
-              <Text role="bodySm" tone="base">
+              <Text role="bodySm" tone="default">
                 {selectedDisputePartner.storeName}
               </Text>
-              <Box marginY={2} />
+              <Box style={{ marginVertical: 8 }} />
               <Text role="caption" tone="muted">تاريخ الرفع:</Text>
-              <Text role="bodySm" tone="base">
+              <Text role="bodySm" tone="default">
                 {selectedDispute.date}
               </Text>
-              <Box marginY={2} />
+              <Box style={{ marginVertical: 8 }} />
               <Text role="caption" tone="muted">SLA:</Text>
               <Text role="bodySm" tone="warning">
                 {selectedDispute.sla}
               </Text>
             </Surface>
 
-            <Box gap={2} marginY={2}>
+            <Box gap={2} style={{ marginVertical: 8 }}>
               <TextField
                 label="ملاحظات وتوجيهات حل النزاع (تُحفظ في سجل التدقيق)"
                 value={disputeNote}
@@ -245,7 +245,7 @@ function PartnerDisputesTab() {
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box marginY={2}>
+            <Box style={{ marginVertical: 8 }}>
               <WebControlPanelActionCluster
                 primary={{
                   id: 'close-dispute',
@@ -337,9 +337,7 @@ function PartnerVisibilityTab() {
                   return (
                     <Box key={event.id} layoutDirection="row" gap={3}>
                       <Surface
-                        background={isActivation ? 'successSurface' : 'dangerSurface'}
-                        border
-                        borderTone={isActivation ? 'success' : 'danger'}
+                        tone={isActivation ? 'success' : 'danger'}
                         padding={3}
                         radiusToken="md"
                         gap={1}
@@ -348,12 +346,12 @@ function PartnerVisibilityTab() {
                           <Text role="caption" tone={isActivation ? 'success' : 'danger'}>
                             {isActivation ? 'تفعيل المتجر' : 'إيقاف مؤقت'}
                           </Text>
-                          <Text role="caption" tone="muted" dir="ltr">
+                          <Text role="caption" tone="muted">
                             {event.date}
                           </Text>
                         </Box>
                         <Text role="bodySm">{event.reason}</Text>
-                        <Box marginY={1} />
+                        <Box style={{ marginVertical: 4 }} />
                         <Text role="caption" tone="muted">
                           بواسطة: {event.actionBy}
                         </Text>

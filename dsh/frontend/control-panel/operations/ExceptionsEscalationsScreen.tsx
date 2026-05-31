@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
+  WebControlPanelSplitPane,
+  WebControlPanelQueue,
+  WebControlPanelInspectorShell,
+  WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import {
   EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
@@ -12,7 +16,7 @@ import {
 } from '../../data/orders.preview-data';
 import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
-import { Box } from '@bthwani/ui-kit';
+import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
@@ -27,6 +31,12 @@ import { findDshControlPanelGovernanceSectionByFlowId } from '../shared/dsh-cont
 export type ExceptionsEscalationsScreenProps = { hubHref: string; subGroup?: string; };
 
 type WorkspaceFilterId = 'all' | 'mobile-owned' | 'finance-preview' | 'hidden-compat' | 'control-policy';
+type SelectedItem =
+  | { type: 'exception'; id: string }
+  | { type: 'flow'; id: string }
+  | { type: 'rescue'; id: string }
+  | { type: 'playbook'; id: string }
+  | null;
 
 const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   warning: 'warning',
@@ -108,6 +118,8 @@ export function ExceptionsEscalationsScreen({
   const router = useRouter();
   const preview = EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW;
   const [filterId, setFilterId] = React.useState<WorkspaceFilterId>('all');
+  const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
+
   const escalationWorkspaceFlows = React.useMemo(
     () => [...getDshEscalationFlowsForSurface('control-panel')].sort(byWorkspacePriority),
     [],
@@ -141,26 +153,6 @@ export function ExceptionsEscalationsScreen({
 
     return escalationWorkspaceFlows;
   }, [escalationWorkspaceFlows, filterId, financePreviewFlowIds]);
-  const [selectedFlowId, setSelectedFlowId] = React.useState<string | null>(
-    escalationWorkspaceFlows.find((flow) => flow.hiddenCompat !== true && flow.visibility !== 'hidden-compat')?.id
-      ?? escalationWorkspaceFlows[0]?.id
-      ?? null,
-  );
-
-  React.useEffect(() => {
-    if (!filteredFlows.length) {
-      setSelectedFlowId(null);
-      return;
-    }
-
-    if (!selectedFlowId || !filteredFlows.some((flow) => flow.id === selectedFlowId)) {
-      setSelectedFlowId(filteredFlows[0]?.id ?? null);
-    }
-  }, [filteredFlows, selectedFlowId]);
-
-  const selectedFlow = filteredFlows.find((flow) => flow.id === selectedFlowId) ?? null;
-  const selectedFlowSummary = selectedFlowId ? getDshFlowPolicySummary(selectedFlowId) : undefined;
-  const selectedGovernanceSection = selectedFlowId ? findDshControlPanelGovernanceSectionByFlowId(selectedFlowId) : undefined;
 
   const summaryKpi = [
     { id: 'open', label: 'مفتوحة', value: String(preview.summary.open), tone: 'danger' as const },
@@ -169,303 +161,408 @@ export function ExceptionsEscalationsScreen({
     { id: 'close', label: 'إغلاق', value: String(preview.summary.close), tone: 'success' as const },
   ];
 
-  return (
-    <div className={styles.surfaceCockpitContent}>
-      <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>الاستثناءات والتصعيد</h2>
-      </div>
+  // Selected details lookup
+  let inspectorContent: React.ReactNode = null;
+  if (selectedItemId) {
+    if (selectedItemId.type === 'exception') {
+      const exc = preview.exceptions.find((e) => e.id === selectedItemId.id);
+      if (exc) {
+        const linkage = EXCEPTION_TICKET_MAP[exc.id];
+        const supportTicketId = linkage?.supportTicketId ?? `UNPROVEN-${exc.id}`;
+        const auditEntryId = linkage?.auditEntryId;
+        const statusTone = TONE_MAP[exc.statusTone] ?? 'neutral';
 
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`تفاصيل الاستثناء — ${exc.id}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>الخطورة:</span>
+                <WebControlPanelStatusTag label={exc.severity} tone={statusTone} />
+              </div>
+
+              <KeyValueList
+                items={[
+                  { label: 'النوع', value: exc.type },
+                  { label: 'السطح المتأثر', value: SURFACE_LABELS[exc.affectedSurface] ?? exc.affectedSurface },
+                  { label: 'طابور المالك', value: exc.ownerQueue },
+                  { label: 'المالك الحالي', value: exc.currentOwner },
+                  { label: 'وقت البدء', value: exc.startTime },
+                  { label: 'الإجراء الأخير', value: exc.lastAction },
+                  { label: 'الإجراء المقترح', value: exc.suggestedAction },
+                  { label: 'تذكرة الدعم المرتبطة', value: supportTicketId },
+                  { label: 'سجل التدقيق المرتبط', value: auditEntryId ?? 'غير مربوط' },
+                ]}
+              />
+
+              <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '8px 12px', borderRadius: '6px' }}>
+                <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>ملاحظة العمليات:</div>
+                <div style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-text)', marginTop: '2px' }}>{exc.note}</div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'var(--bthwani-control-panel-brand)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '11px',
+                  }}
+                  onClick={() => router.push(exc.routeHint)}
+                >
+                  {exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد'}
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: '1px solid var(--bthwani-control-panel-border-strong)',
+                    color: 'var(--bthwani-control-panel-text)',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '11px',
+                  }}
+                  onClick={() =>
+                    router.push(
+                      auditEntryId
+                        ? buildOperationsHref('audit-support-sla', { orderId: auditEntryId })
+                        : buildOperationsHref('audit-support-sla', { orderId: supportTicketId })
+                    )
+                  }
+                >
+                  {auditEntryId ? 'فتح التدقيق' : 'فتح تذكرة الدعم'}
+                </button>
+              </div>
+            </Box>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    } else if (selectedItemId.type === 'flow') {
+      const flow = escalationWorkspaceFlows.find((f) => f.id === selectedItemId.id);
+      if (flow) {
+        const summary = getDshFlowPolicySummary(flow.id);
+        const governance = findDshControlPanelGovernanceSectionByFlowId(flow.id);
+
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`سياسة التدفق — ${flow.id}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>الظهور:</span>
+                <WebControlPanelStatusTag label={VISIBILITY_LABELS[flow.visibility]} tone="neutral" />
+              </div>
+
+              <KeyValueList
+                items={[
+                  { label: 'التدفق', value: flow.label },
+                  { label: 'السطح المالك', value: SURFACE_LABELS[flow.ownerSurface] ?? flow.ownerSurface },
+                  { label: 'القسم المالك (حوكمة)', value: governance?.sectionLabel ?? 'عمليات / دعم حسب السياق' },
+                  { label: 'المجال', value: DOMAIN_LABELS[flow.domain] ?? flow.domain },
+                  { label: 'سياسة المعاينة', value: POLICY_LABELS[flow.onDemandPolicy] ?? flow.onDemandPolicy },
+                  { label: 'الأثر المالي', value: flow.financialImpact ? 'نعم (عرض فقط)' : 'لا يوجد' },
+                ]}
+              />
+
+              {summary && (
+                <>
+                  <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>الإجراءات المسموحة:</div>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                      {summary.allowedActions.map((act) => (
+                        <span key={act} style={{ fontSize: '10px', background: 'var(--bthwani-success-surface)', color: 'var(--bthwani-success-text)', padding: '2px 6px', borderRadius: '4px' }}>{act}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>الإجراءات الممنوعة:</div>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                      {summary.forbiddenActions.map((act) => (
+                        <span key={act} style={{ fontSize: '10px', background: 'var(--bthwani-danger-surface)', color: 'var(--bthwani-danger-text)', padding: '2px 6px', borderRadius: '4px' }}>{act}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>معاينة السياسة:</div>
+                    <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)', marginTop: '2px', fontWeight: 600 }}>{summary.nextPolicyActionPreview}</div>
+                  </div>
+                </>
+              )}
+
+              {governance && (
+                <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', padding: '8px', borderRadius: '6px' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>تعليمات الحوكمة:</div>
+                  <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)', marginTop: '2px' }}>{governance.notes}</div>
+                </div>
+              )}
+            </Box>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    } else if (selectedItemId.type === 'rescue') {
+      const item = DSH_ORDER_RESCUE_PREVIEW.find((r) => r.rescueId === selectedItemId.id);
+      if (item) {
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`تفاصيل Order Rescue — ${item.orderId}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>حالة المشكلة:</span>
+                <WebControlPanelStatusTag label={item.issueKind} tone={item.severity === 'danger' ? 'danger' : 'warning'} />
+              </div>
+
+              <KeyValueList
+                items={[
+                  { label: 'رقم الطلب', value: item.orderId },
+                  { label: 'العميل', value: item.customerName },
+                  { label: 'العائق التشغيلي', value: item.blocker },
+                  { label: 'الإجراء المالي المقترح', value: item.wltBoundary },
+                  { label: 'الإجراء المقترح التالي', value: item.nextBestAction },
+                ]}
+              />
+
+              <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'var(--bthwani-control-panel-brand)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '11px',
+                  }}
+                  onClick={() => router.push(buildOperationsHref('order-rescue', { orderId: item.orderId }))}
+                >
+                  فتح Order Rescue
+                </button>
+              </div>
+            </Box>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    } else if (selectedItemId.type === 'playbook') {
+      const playbook = DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.playbookId === selectedItemId.id);
+      if (playbook) {
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`Playbook — ${playbook.playbookId}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>القسم المالك:</span>
+                <WebControlPanelStatusTag label={playbook.ownerSection} tone={playbook.severity === 'danger' ? 'danger' : 'warning'} />
+              </div>
+
+              <KeyValueList
+                items={[
+                  { label: 'عنوان الدليل', value: playbook.title },
+                  { label: 'القرار المقترح التالي', value: playbook.nextDecision },
+                  { label: 'المساحات المدعومة', value: playbook.supportedWorkspaces.join(' · ') },
+                ]}
+              />
+
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--bthwani-control-panel-text)', marginBottom: '4px' }}>النقاط المرجعية للتحقق (Checkpoints):</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {playbook.checkpoints.map((item, index) => (
+                    <div key={index} style={{ fontSize: '11px', padding: '4px 6px', background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '4px' }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'var(--bthwani-control-panel-brand)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '11px',
+                  }}
+                  onClick={() =>
+                    router.push(
+                      buildOperationsHref(
+                        playbook.supportedWorkspaces.includes('order-rescue') ? 'order-rescue' : 'assisted-order-desk'
+                      )
+                    )
+                  }
+                >
+                  {playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح Order Rescue' : 'فتح Assisted Order'}
+                </button>
+              </div>
+            </Box>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    }
+  }
+
+  return (
+    <div className={styles.surfaceCockpitContent} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <Box gap={2}>
-        {preview.exceptions.map((exc) => {
-          const linkage = EXCEPTION_TICKET_MAP[exc.id];
-          const statusTone = TONE_MAP[exc.statusTone] ?? 'neutral';
-          const supportTicketId = linkage?.supportTicketId ?? `UNPROVEN-${exc.id}`;
-          const auditEntryId = linkage?.auditEntryId;
-          const reason = auditEntryId
-            ? `${exc.note} · التذكرة: ${supportTicketId} · التدقيق: ${auditEntryId}`
-            : `${exc.note} · التذكرة: ${supportTicketId} · التدقيق يفتح من مسار الدعم`;
-          const secondaryLabel = auditEntryId ? 'فتح التدقيق' : 'فتح تذكرة الدعم';
+      <WebControlPanelSplitPane
+        primary={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
+            {/* 1. Active Exceptions & Escalations Queue */}
+            <WebControlPanelQueue
+              title="الاستثناءات النشطة"
+              meta={`${preview.exceptions.length} استثناءات مفتوحة`}
+            >
+              {preview.exceptions.map((exc) => {
+                const statusTone = TONE_MAP[exc.statusTone] ?? 'neutral';
+                return (
+                  <WebControlPanelDecisionRow
+                    key={exc.id}
+                    entityId={exc.id}
+                    entityLabel={`${exc.type} | السطح المتأثر: ${SURFACE_LABELS[exc.affectedSurface] ?? exc.affectedSurface}`}
+                    status={exc.severity}
+                    statusTone={statusTone}
+                    risk={exc.statusTone === 'danger' ? 'danger' : exc.statusTone === 'warning' ? 'warning' : 'neutral'}
+                    recommendation={exc.suggestedAction}
+                    sla={`البداية: ${exc.startTime} | المالك الحالي: ${exc.currentOwner}`}
+                    onInspect={() => setSelectedItemId({ type: 'exception', id: exc.id })}
+                    primaryAction={{
+                      id: `${exc.id}-action`,
+                      label: exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد',
+                      onAction: () => router.push(exc.routeHint),
+                    }}
+                  />
+                );
+              })}
+            </WebControlPanelQueue>
 
-          return (
-            <WebControlPanelDecisionRow
-              key={exc.id}
-              entityId={exc.id}
-              entityLabel={`${exc.type} | السطح المتأثر: ${SURFACE_LABELS[exc.affectedSurface] ?? exc.affectedSurface}`}
-              status={exc.severity}
-              statusTone={statusTone}
-              risk={exc.statusTone === 'danger' ? 'danger' : exc.statusTone === 'warning' ? 'warning' : 'neutral'}
-              recommendation={`${exc.suggestedAction} · الطابور: ${exc.ownerQueue} · ${auditEntryId ? 'support + audit linked' : 'support linked'}`}
-              reason={reason}
-              sla={`البداية: ${exc.startTime} | المالك: ${exc.currentOwner} | السياسة: ${POLICY_LABELS[exc.onDemandDetailPolicy] ?? exc.onDemandDetailPolicy}`}
-              primaryAction={{
-                id: `${exc.id}-resolve`,
-                label: exc.resolutionPath === 'حل' ? 'حل الاستثناء' : 'تصعيد',
-                onAction: () => router.push(exc.routeHint),
-              }}
-              secondaryAction={{
-                id: `${exc.id}-audit`,
-                label: secondaryLabel,
-                onAction: () => router.push(
-                  auditEntryId
-                    ? buildOperationsHref('audit-support-sla', { orderId: auditEntryId })
-                    : buildOperationsHref('audit-support-sla', { orderId: supportTicketId }),
-                ),
-              }}
-            />
-          );
-        })}
-      </Box>
+            {/* 2. Playbooks & Rescue Queue */}
+            <WebControlPanelQueue title="Playbooks وOrder Rescue" meta="توجيه الإجراء السريع">
+              {DSH_ORDER_RESCUE_PREVIEW.map((item) => (
+                <WebControlPanelDecisionRow
+                  key={item.rescueId}
+                  entityId={item.orderId}
+                  entityLabel={`Order Rescue | العميل: ${item.customerName} | العائق: ${item.blocker}`}
+                  status={item.issueKind}
+                  statusTone={item.severity === 'danger' ? 'danger' : 'warning'}
+                  sla={item.wltBoundary}
+                  onInspect={() => setSelectedItemId({ type: 'rescue', id: item.rescueId })}
+                  primaryAction={{
+                    id: `${item.rescueId}-open`,
+                    label: 'فتح Rescue',
+                    onAction: () => router.push(buildOperationsHref('order-rescue', { orderId: item.orderId })),
+                  }}
+                />
+              ))}
 
-      <div className={styles.surfaceSectionHeader}>
-        <h3 className={styles.surfaceSectionTitle}>مساحة سياسات التصعيد</h3>
-        <p className={styles.surfaceSectionSubtitle}>
-          workspace قراءة فقط داخل لوحة التحكم: اختيار تدفق، مراجعة مالكه وسياساته، ومعاينة الإجراء التالي بدون أي mutation.
-        </p>
-      </div>
+              {DSH_OPS_INTERVENTION_PLAYBOOKS.map((playbook) => (
+                <WebControlPanelDecisionRow
+                  key={playbook.playbookId}
+                  entityId={playbook.playbookId}
+                  entityLabel={`Playbook | ${playbook.title}`}
+                  status={playbook.ownerSection}
+                  statusTone={playbook.severity === 'danger' ? 'danger' : 'warning'}
+                  sla={playbook.nextDecision}
+                  onInspect={() => setSelectedItemId({ type: 'playbook', id: playbook.playbookId })}
+                  primaryAction={{
+                    id: `${playbook.playbookId}-open`,
+                    label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح Rescue' : 'فتح Assisted',
+                    onAction: () => router.push(buildOperationsHref(
+                      playbook.supportedWorkspaces.includes('order-rescue') ? 'order-rescue' : 'assisted-order-desk',
+                    )),
+                  }}
+                />
+              ))}
+            </WebControlPanelQueue>
 
-      <div className={styles.surfaceSplitGrid}>
-        <div className={styles.surfaceListColumn}>
-          <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
-            {WORKSPACE_FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                className={`${styles.surfaceTab} ${filterId === filter.id ? styles.surfaceTabActive : ''}`}
-                onClick={() => setFilterId(filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.surfaceInfoCard}>
-            <div>
-              <div className={styles.surfaceInfoCardTitle}>مدى الوصول الحالي</div>
-              <div className={styles.surfaceInfoCardDescription}>
-                {`القابل للعرض مباشرة: ${renderableControlFlows.length} · تدفقات التصعيد في workspace: ${escalationWorkspaceFlows.length} · بعد الفلتر: ${filteredFlows.length}`}
-              </div>
-            </div>
-          </div>
-
-          {filteredFlows.map((flow) => {
-            const summary = getDshFlowPolicySummary(flow.id);
-            const isActive = flow.id === selectedFlowId;
-
-            return (
-              <button
-                key={flow.id}
-                type="button"
-                className={`${styles.surfaceInfoCard} ${styles.surfaceInfoCardButton} ${isActive ? styles.surfaceInfoCardActive : ''}`}
-                onClick={() => setSelectedFlowId(flow.id)}
-              >
-                <div className={styles.surfaceInfoCardTextBlock}>
-                  <div className={styles.surfaceInfoCardTitle}>{flow.label}</div>
-                  <div className={styles.surfaceInfoCardDescription}>
-                    {summary?.nextPolicyActionPreview ?? 'لا توجد معاينة للسياسة.'}
-                  </div>
-                  <div className={styles.surfaceFootnote}>
-                    {`${SURFACE_LABELS[flow.ownerSurface] ?? flow.ownerSurface} · ${DOMAIN_LABELS[flow.domain] ?? flow.domain}`}
-                  </div>
-                </div>
-                <div className={styles.surfaceMetaWrap}>
-                  <span className={styles.surfaceMetaChip}>{VISIBILITY_LABELS[flow.visibility] ?? flow.visibility}</span>
-                  <span className={styles.surfaceMetaChip}>{POLICY_LABELS[flow.onDemandPolicy] ?? flow.onDemandPolicy}</span>
-                  {flow.financialImpact === true ? (
-                    <span className={styles.surfaceMetaChip}>finance-preview</span>
-                  ) : null}
-                  {flow.hiddenCompat === true ? (
-                    <span className={styles.surfaceMetaChip}>hidden-compat</span>
-                  ) : null}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <aside className={styles.surfaceInspectorPanel}>
-          {selectedFlow && selectedFlowSummary ? (
-            <>
-              <div className={styles.surfaceSectionHeader}>
-                <h4 className={styles.surfaceSectionTitle}>{selectedFlow.label}</h4>
-                <p className={styles.surfaceSectionSubtitle}>
-                  {selectedFlowSummary.nextPolicyActionPreview}
-                </p>
-              </div>
-
-              <div className={styles.surfaceMetaWrap}>
-                <span className={styles.surfaceMetaChip}>{selectedFlowSummary.flowId}</span>
-                <span className={styles.surfaceMetaChip}>{VISIBILITY_LABELS[selectedFlowSummary.visibility] ?? selectedFlowSummary.visibility}</span>
-                <span className={styles.surfaceMetaChip}>{POLICY_LABELS[selectedFlowSummary.onDemandPolicy] ?? selectedFlowSummary.onDemandPolicy}</span>
-              </div>
-
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>ownerSection</strong>
-                  <span>{selectedGovernanceSection?.sectionLabel ?? 'عمليات / دعم حسب السياق'}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>ownerSurface</strong>
-                  <span>{SURFACE_LABELS[selectedFlowSummary.ownerSurface] ?? selectedFlowSummary.ownerSurface}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>visibleSurfaces</strong>
-                  <span>{selectedFlowSummary.visibleSurfaces.map((surfaceId) => SURFACE_LABELS[surfaceId] ?? surfaceId).join('، ')}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>domain</strong>
-                  <span>{DOMAIN_LABELS[selectedFlowSummary.domain] ?? selectedFlowSummary.domain}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>visibility</strong>
-                  <span>{VISIBILITY_LABELS[selectedFlowSummary.visibility] ?? selectedFlowSummary.visibility}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>onDemandPolicy</strong>
-                  <span>{POLICY_LABELS[selectedFlowSummary.onDemandPolicy] ?? selectedFlowSummary.onDemandPolicy}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>financialImpact</strong>
-                  <span>{selectedFlowSummary.financialImpact ? 'finance-preview فقط' : 'لا يوجد'}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>escalationOwner</strong>
-                  <span>{selectedFlowSummary.escalationOwner ? (SURFACE_LABELS[selectedFlowSummary.escalationOwner] ?? selectedFlowSummary.escalationOwner) : 'غير محدد'}</span>
-                </div>
-              </div>
-
-              <div className={styles.surfaceStackSmall}>
-                <div className={styles.surfaceInfoCardTitle}>allowedActions</div>
-                <div className={styles.surfaceActionWrap}>
-                  {selectedFlowSummary.allowedActions.map((action) => (
-                    <span key={action} className={styles.surfaceMetaChip}>{action}</span>
+            {/* 3. Escalation Policy workspace */}
+            <WebControlPanelQueue title="سياسات التصعيد والتدفقات" meta="معاينة السياسة المعتمدة">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div className={`${styles.filterDock} ${styles.filterDockTint}`} style={{ padding: '6px 10px', borderRadius: '6px' }}>
+                  {WORKSPACE_FILTERS.map((filter) => (
+                    <button
+                      key={filter.id}
+                      type="button"
+                      className={`${styles.surfaceTab} ${filterId === filter.id ? styles.surfaceTabActive : ''}`}
+                      style={{ padding: '4px 10px', fontSize: '11px' }}
+                      onClick={() => setFilterId(filter.id)}
+                    >
+                      {filter.label}
+                    </button>
                   ))}
                 </div>
+
+                {filteredFlows.map((flow) => {
+                  const summary = getDshFlowPolicySummary(flow.id);
+                  return (
+                    <WebControlPanelDecisionRow
+                      key={flow.id}
+                      entityId={flow.id}
+                      entityLabel={flow.label}
+                      status={VISIBILITY_LABELS[flow.visibility]}
+                      statusTone="neutral"
+                      recommendation={summary?.nextPolicyActionPreview}
+                      sla={`${SURFACE_LABELS[flow.ownerSurface] ?? flow.ownerSurface} · ${DOMAIN_LABELS[flow.domain] ?? flow.domain}`}
+                      onInspect={() => setSelectedItemId({ type: 'flow', id: flow.id })}
+                    />
+                  );
+                })}
               </div>
+            </WebControlPanelQueue>
 
-              <div className={styles.surfaceStackSmall}>
-                <div className={styles.surfaceInfoCardTitle}>forbiddenActions</div>
-                <div className={styles.surfaceActionWrap}>
-                  {selectedFlowSummary.forbiddenActions.map((action) => (
-                    <span key={action} className={styles.surfaceMetaChip}>{action}</span>
-                  ))}
+            {/* 4. Central Registry display */}
+            <WebControlPanelQueue title="أثر السجل المركزي للتصعيد" meta={`${escalationWorkspaceFlows.length} تدفقًا`}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div className={styles.escalationCatalogRow} style={{ fontWeight: 800, background: 'var(--bthwani-control-panel-surface-inset)', border: 0 }}>
+                  <span className={styles.escalationCatalogId}>مُعرف التدفق</span>
+                  <span className={styles.escalationCatalogMeta}>السطح المالك</span>
+                  <span className={styles.escalationCatalogDomain}>المجال</span>
+                  <span className={styles.escalationCatalogVisibility}>الظهور</span>
+                  <span className={styles.escalationCatalogPolicy}>سياسة الطلب</span>
                 </div>
+                {escalationWorkspaceFlows.map((flow) => (
+                  <div key={flow.id} className={styles.escalationCatalogRow}>
+                    <span className={styles.escalationCatalogId}>{flow.id}</span>
+                    <span className={styles.escalationCatalogMeta}>{SURFACE_LABELS[flow.ownerSurface] ?? flow.ownerSurface}</span>
+                    <span className={styles.escalationCatalogDomain}>{DOMAIN_LABELS[flow.domain] ?? flow.domain}</span>
+                    <span className={styles.escalationCatalogVisibility}>{VISIBILITY_LABELS[flow.visibility] ?? flow.visibility}</span>
+                    <span className={styles.escalationCatalogPolicy}>{POLICY_LABELS[flow.onDemandPolicy] ?? flow.onDemandPolicy}</span>
+                    {flow.financialImpact === true && (
+                      <span className={styles.escalationCatalogBadgeFinance}>مالي</span>
+                    )}
+                  </div>
+                ))}
               </div>
-
-              <div className={styles.surfaceInfoCard}>
-                <div>
-                  <div className={styles.surfaceInfoCardTitle}>next policy action preview</div>
-                  <div className={styles.surfaceInfoCardDescription}>{selectedFlowSummary.nextPolicyActionPreview}</div>
-                </div>
-              </div>
-
-              {selectedGovernanceSection ? (
-                <div className={styles.surfaceInfoCard}>
-                  <div>
-                    <div className={styles.surfaceInfoCardTitle}>governance owner</div>
-                    <div className={styles.surfaceInfoCardDescription}>
-                      {`${selectedGovernanceSection.sectionLabel}: ${selectedGovernanceSection.notes}`}
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              {selectedFlowSummary.financialImpact ? (
-                <div className={styles.surfaceInfoCard}>
-                  <div>
-                    <div className={styles.surfaceInfoCardTitle}>finance-preview</div>
-                    <div className={styles.surfaceInfoCardDescription}>
-                      هذا التدفق يبقى read-only. لا توجد أي تسوية، استرداد، أو mutation مالية من هذه المساحة.
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              {selectedFlowSummary.hiddenCompat ? (
-                <div className={styles.surfaceInfoCard}>
-                  <div>
-                    <div className={styles.surfaceInfoCardTitle}>hidden-compat</div>
-                    <div className={styles.surfaceInfoCardDescription}>
-                      هذا التدفق يبقى مرجعًا توافقيًا فقط ولا يُستخدم كمدخل أساسي في workspace.
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <div className={styles.surfaceInspectorMeta}>
-              لا يوجد تدفق مطابق لهذا الفلتر حاليًا.
-            </div>
-          )}
-        </aside>
-      </div>
-
-      <div className={styles.surfaceSectionHeader}>
-        <h3 className={styles.surfaceSectionTitle}>Playbooks وOrder Rescue</h3>
-        <p className={styles.surfaceSectionSubtitle}>
-          التدخل هنا يحدد next-best-action ثم يفتح owner الصحيح، ولا يتحول إلى نسخة من support أو WLT.
-        </p>
-      </div>
-
-      <Box gap={2}>
-        {DSH_ORDER_RESCUE_PREVIEW.map((item) => (
-          <WebControlPanelDecisionRow
-            key={item.rescueId}
-            entityId={item.orderId}
-            entityLabel={`${item.customerName} · ${item.blocker}`}
-            status={item.issueKind}
-            statusTone={item.severity === 'danger' ? 'danger' : 'warning'}
-            risk={item.severity === 'danger' ? 'danger' : 'warning'}
-            recommendation={item.nextBestAction}
-            reason={item.wltBoundary}
-            sla={`روابط: ${item.crossSurfaceLinks.map((link) => link.sectionId).join(' · ')}`}
-            primaryAction={{ id: `${item.rescueId}-open`, label: 'فتح Order Rescue', onAction: () => router.push(buildOperationsHref('order-rescue', { orderId: item.orderId })) }}
-          />
-        ))}
-
-        {DSH_OPS_INTERVENTION_PLAYBOOKS.map((playbook) => (
-          <WebControlPanelDecisionRow
-            key={playbook.playbookId}
-            entityId={playbook.playbookId}
-            entityLabel={playbook.title}
-            status={playbook.ownerSection}
-            statusTone={playbook.severity === 'danger' ? 'danger' : 'warning'}
-            risk={playbook.severity === 'danger' ? 'danger' : 'warning'}
-            recommendation={playbook.nextDecision}
-            reason={playbook.checkpoints.join(' · ')}
-            primaryAction={{
-              id: `${playbook.playbookId}-open`,
-              label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح Order Rescue' : 'فتح Assisted Order',
-              onAction: () => router.push(buildOperationsHref(
-                playbook.supportedWorkspaces.includes('order-rescue') ? 'order-rescue' : 'assisted-order-desk',
-              )),
-            }}
-          />
-        ))}
-      </Box>
-
-      <div className={styles.escalationCatalogSection}>
-        <div className={styles.surfaceSectionHeader}>
-          <h3 className={styles.surfaceSectionTitle}>
-            {`أثر السجل المركزي (${escalationWorkspaceFlows.length})`}
-          </h3>
-        </div>
-        <Box gap={1}>
-          {escalationWorkspaceFlows.map((flow) => (
-            <div key={flow.id} className={styles.escalationCatalogRow}>
-              <span className={styles.escalationCatalogId}>{flow.id}</span>
-              <span className={styles.escalationCatalogMeta}>{flow.ownerSurface}</span>
-              <span className={styles.escalationCatalogDomain}>{flow.domain}</span>
-              <span className={styles.escalationCatalogVisibility}>{flow.visibility}</span>
-              <span className={styles.escalationCatalogPolicy}>{flow.onDemandPolicy}</span>
-              {flow.financialImpact === true && (
-                <span className={styles.escalationCatalogBadgeFinance}>مالي</span>
-              )}
-            </div>
-          ))}
-        </Box>
-      </div>
+            </WebControlPanelQueue>
+          </div>
+        }
+        secondary={inspectorContent}
+        secondaryWidth="wide"
+      />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
   const router = useRouter();
 
   return (
-    <div className={styles.surfaceCockpitContent}>
+    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>المتاجر والشركاء</h2>
       </div>

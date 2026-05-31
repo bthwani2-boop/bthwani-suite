@@ -138,7 +138,7 @@
 }
 
 .surfaceInnerScroll {
-  padding: 16px;
+  padding: 10px;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -147,7 +147,7 @@
 .surfaceCockpitContent {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
   height: 100%;
   min-height: 0;
 }
@@ -290,7 +290,7 @@
 .surfaceGridTwoCol {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 10px;
   flex: 1;
   min-height: 0;
 }
@@ -298,25 +298,24 @@
 @media (max-width: 1024px) {
   .surfaceGridTwoCol {
     grid-template-columns: 1fr;
-    /* mobile-only scroll handled by viewport if needed; no nested scroll in shared surface */
   }
 }
 
 .surfaceCompactPanel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 8px;
+  padding: 10px;
   background-color: var(--bthwani-control-panel-surface);
   border: 1px solid var(--bthwani-control-panel-border);
-  border-radius: 12px;
+  border-radius: 10px;
   min-height: 0;
   max-height: 100%;
 }
 
 .surfacePanelTitle {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--bthwani-control-panel-text);
   flex-shrink: 0;
@@ -325,14 +324,14 @@
 .surfaceStackSmall {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   overflow: hidden;
 }
 
 .surfaceSplitGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 20px;
+  gap: 10px;
   align-items: start;
 }
 

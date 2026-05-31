@@ -68,6 +68,7 @@ export type {
   DshPartnerDocumentKind,
   DshPartnerDocumentVerification,
   DshPartnerCatalogOverride,
+  DshPromotionCandidate,
 } from '../../shared/workflow';
 
 export {

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelInspectorShell,
@@ -79,39 +80,42 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
   };
 
   return (
-    <Box gap={4} dir="rtl">
+    <Box gap={4}>
       {/* Partner selectors */}
       <Box gap={2}>
         <Text role="caption" tone="brand">اختر الشريك لمراجعة مستنداته</Text>
-        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const docs = getPartnerDocuments(partner.partnerId);
             const pendingCount = docs.filter(d => d.status === 'uploaded').length;
             const isSelected = selectedPartnerId === partner.partnerId;
 
             return (
-              <Surface
+              <Pressable
                 key={partner.partnerId}
-                as="button"
-                onClick={() => handlePartnerSelect(partner.partnerId)}
-                padding={2}
-                radiusToken="sm"
-                border
-                borderTone={isSelected ? 'brand' : 'line'}
-                background={isSelected ? 'brandSurface' : 'surface'}
-                layoutDirection="row"
-                align="center"
-                gap={2}
+                onPress={() => handlePartnerSelect(partner.partnerId)}
+                style={{ cursor: 'pointer' }}
               >
-                <Text role="bodySm" tone={isSelected ? 'brand' : 'base'}>{partner.storeName}</Text>
-                {pendingCount > 0 && (
-                  <Surface padding={1} radiusToken="pill" background="warning" border={false}>
-                    <Text role="caption" tone="inverse">
-                      {pendingCount}
-                    </Text>
-                  </Surface>
-                )}
-              </Surface>
+                <Surface
+                  padding={2}
+                  radiusToken="sm"
+                  border
+                  borderTone={isSelected ? 'brand' : 'line'}
+                  tone={isSelected ? 'brand' : 'default'}
+                  layoutDirection="row"
+                  align="center"
+                  gap={2}
+                >
+                  <Text role="bodySm" tone={isSelected ? 'brand' : 'default'}>{partner.storeName}</Text>
+                  {pendingCount > 0 && (
+                    <Surface padding={1} radiusToken="pill" tone="warning" border={false}>
+                      <Text role="caption" tone="inverse">
+                        {pendingCount}
+                      </Text>
+                    </Surface>
+                  )}
+                </Surface>
+              </Pressable>
             );
           })}
         </Box>
@@ -228,7 +232,7 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
                 )}
 
                 {selectedDoc.status === 'rejected' && selectedDoc.rejectionReason && (
-                  <Surface tone="dangerSurface" padding={3} radiusToken="sm" border borderTone="danger">
+                  <Surface tone="danger" padding={3} radiusToken="sm" border borderTone="danger">
                     <Text role="bodySm" tone="danger">
                       ⚠ سبب الرفض:
                     </Text>
@@ -250,16 +254,14 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
                       disabled={isSubmitting}
                     />
                     <WebControlPanelActionCluster
-                      primary={{
+                      primary={isSubmitting ? undefined : {
                         id: 'btn-doc-approve',
-                        label: isSubmitting ? 'جارٍ المعالجة...' : 'اعتماد المستند',
-                        disabled: isSubmitting,
+                        label: 'اعتماد المستند',
                         onAction: () => handleApproveDoc(selectedDoc.id),
                       }}
-                      secondary={{
+                      secondary={(isSubmitting || rejectReason.trim() === '') ? undefined : {
                         id: 'btn-doc-reject',
                         label: 'رفض المستند',
-                        disabled: isSubmitting || rejectReason.trim() === '',
                         onAction: () =>
                           handleRejectDoc(selectedDoc.id, rejectReason),
                       }}
@@ -278,8 +280,8 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
           )}
 
           <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
-            <Text role="titleSm" tone="base">أهلية الترويج والتسويق</Text>
-            <Surface background="surfaceInset" padding={3} radiusToken="sm">
+            <Text role="titleSm" tone="default">أهلية الترويج والتسويق</Text>
+            <Surface tone="inset" padding={3} radiusToken="sm">
               <Text role="bodySm" tone={currentStatus === 'client_visible' ? 'success' : 'danger'}>
                 {currentStatus === 'client_visible'
                   ? 'الشريك مفعّل ومستنداته مكتملة ويحق له إنشاء عروض ترويجية.'

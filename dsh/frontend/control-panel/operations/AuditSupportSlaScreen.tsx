@@ -4,13 +4,14 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
-  WebControlPanelDecisionRow,
+  WebControlPanelSplitPane,
+  WebControlPanelQueue,
+  WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
-import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
@@ -22,7 +23,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScreenProps) {
+export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }: AuditSupportSlaScreenProps) {
   const router = useRouter();
   const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
   const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
@@ -37,21 +38,19 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent}>
-      <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>التدقيق والدعم وSLA</h2>
-      </div>
-
+    <div className={styles.surfaceCockpitContent} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {/* ── KPIs ── */}
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <div className={styles.surfaceSplitGrid}>
-        <div className={styles.surfaceInfoCard}>
+      {/* ── Governance Header Cards ── */}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div className={styles.surfaceInfoCard} style={{ flex: '1 1 300px', padding: '6px 12px' }}>
           <div>
             <div className={styles.surfaceInfoCardTitle}>مالك التذاكر والمتابعة</div>
             <div className={styles.surfaceInfoCardDescription}>{supportGovernance.notes}</div>
           </div>
         </div>
-        <div className={styles.surfaceInfoCard}>
+        <div className={styles.surfaceInfoCard} style={{ flex: '1 1 300px', padding: '6px 12px' }}>
           <div>
             <div className={styles.surfaceInfoCardTitle}>مرجع السياسات والالتزام</div>
             <div className={styles.surfaceInfoCardDescription}>{platformGovernance.notes}</div>
@@ -59,46 +58,126 @@ export function AuditSupportSlaScreen({ hubHref, subGroup }: AuditSupportSlaScre
         </div>
       </div>
 
-      <div className={styles.surfaceDetailSplit}>
-        <div className={styles.surfaceListColumn}>
-          {preview.audits.map((item) => (
-            <WebControlPanelDecisionRow
-              key={item.id}
-              entityId={item.id}
-              entityLabel={`${item.who} — ${item.why}`}
-              status={item.permissionResult}
-              statusTone={TONE_MAP[item.statusTone] ?? 'neutral'}
-              risk={item.statusTone === 'danger' ? 'danger' : item.statusTone === 'warning' ? 'warning' : 'neutral'}
-              recommendation={item.resolutionPath}
-              reason={item.note}
-              sla={`الوقت: ${item.when} | الإثبات: ${item.proofRequired}`}
-              primaryAction={{
-                id: `${item.id}-route`,
-                label: item.resolutionPath === 'حل' ? 'فتح مسار الحل' : 'فتح مسار التصعيد',
-                onAction: () => router.push(
-                  buildOperationsHref(
-                    item.resolutionPath === 'حل' ? 'audit-support-sla' : 'exceptions-escalations',
-                    { orderId: item.id },
-                  ),
-                ),
-              }}
-              secondaryAction={{
-                id: `${item.id}-detail`,
-                label: detailOrderId === item.id ? 'إخفاء التفاصيل' : 'سجل التدقيق',
-                onAction: () => setDetailOrderId(detailOrderId === item.id ? null : item.id),
-              }}
-            />
-          ))}
-        </div>
-        {detailOrderId !== null && (
-          <div className={styles.surfaceDetailRail}>
-            <AuditTrailDetailWorkspace
-              orderId={detailOrderId}
-              onClose={() => setDetailOrderId(null)}
-            />
+      {/* ── Split Layout ── */}
+      <WebControlPanelSplitPane
+        primary={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
+            <WebControlPanelQueue
+              title="سجل التدقيق والمتابعة"
+              meta={`${preview.audits.length} تدقيقات نشطة`}
+            >
+              {/* Table Column Headers */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  background: 'var(--bthwani-control-panel-surface-inset)',
+                  borderRadius: '6px',
+                  fontWeight: 800,
+                  fontSize: '11px',
+                  color: 'var(--bthwani-control-panel-text-muted)',
+                  borderBottom: '1px solid var(--bthwani-control-panel-border)',
+                }}
+              >
+                <span>المُنفّذ والسبب</span>
+                <span>الملاحظة والتدقيق</span>
+                <span>المستند والربط</span>
+                <span>الحالة والتوقيت</span>
+                <span style={{ width: '40px', textAlign: 'center' }}>العمل</span>
+              </div>
+
+              {/* Table Rows */}
+              {preview.audits.map((item) => {
+                const statusTone = TONE_MAP[item.statusTone] ?? 'neutral';
+                const isSelected = detailOrderId === item.id;
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => setDetailOrderId(isSelected ? null : item.id)}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
+                      gap: '8px',
+                      padding: '10px 12px',
+                      background: isSelected ? 'var(--bthwani-brand-surface)' : 'var(--bthwani-control-panel-surface)',
+                      border: isSelected ? '1px solid var(--bthwani-brand)' : '1px solid var(--bthwani-control-panel-border)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {/* Column 1: Who and Why (Clear Arabic Label) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <strong style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.who}</strong>
+                      <span style={{ color: 'var(--bthwani-control-panel-text)', fontSize: '11px' }}>{item.why}</span>
+                    </div>
+
+                    {/* Column 2: Note and technical token as secondary muted tag */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{item.note}</span>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '9px', background: 'var(--bthwani-control-panel-surface-inset)', color: 'var(--bthwani-control-panel-text-muted)', padding: '1px 5px', borderRadius: '4px' }}>
+                          ID: {item.id}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Column 3: Proof and Ticket link */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>{item.proofRequired}</span>
+                      <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-brand)' }}>{item.supportTicketLink}</span>
+                    </div>
+
+                    {/* Column 4: Status and Time */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div>
+                        <WebControlPanelStatusTag label={item.permissionResult} tone={statusTone} />
+                      </div>
+                      <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>{item.when}</span>
+                    </div>
+
+                    {/* Column 5: Inspect button */}
+                    <button
+                      type="button"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--bthwani-control-panel-brand)',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        width: '40px',
+                        textAlign: 'center',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailOrderId(isSelected ? null : item.id);
+                      }}
+                      aria-label="فتح التفاصيل"
+                    >
+                      {isSelected ? '◀' : '►'}
+                    </button>
+                  </div>
+                );
+              })}
+            </WebControlPanelQueue>
           </div>
-        )}
-      </div>
+        }
+        secondary={
+          detailOrderId !== null ? (
+            <div style={{ height: '100%', overflowY: 'auto' }}>
+              <AuditTrailDetailWorkspace
+                orderId={detailOrderId}
+                onClose={() => setDetailOrderId(null)}
+              />
+            </div>
+          ) : null
+        }
+        secondaryWidth="wide"
+      />
     </div>
   );
 }

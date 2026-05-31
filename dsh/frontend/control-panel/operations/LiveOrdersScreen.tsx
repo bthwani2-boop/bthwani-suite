@@ -1,25 +1,24 @@
-'use client';
-
-// P0-12: Live Orders screen — approval queue + live decision rows.
-// Heavy components extracted: OpsOrderDetailPanel, FulfillmentModeQueueSection.
-// Decision state persisted via workflow.ts; no direct lifecycle mutation here.
-
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
+  WebControlPanelSplitPane,
+  WebControlPanelQueue,
+  WebControlPanelInspectorShell,
+  WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
-import { Box, useTheme } from '@bthwani/ui-kit';
+import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/orders.preview-data';
+import { Box, KeyValueList, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/dsh-order-journey.model';
 import { mapOperationsDecisionToLifecycle } from '../../shared/dsh-order-journey.model';
 import { buildOperationsHref } from './operations.registry';
 import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../shared/workflow';
 import { OpsOrderDetailPanel, PENDING_APPROVAL_ORDERS } from './OpsOrderDetailPanel';
-import { FulfillmentModeQueueSection, getOperationsActorLabel } from './FulfillmentModeQueueSection';
+import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';
+import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -37,6 +36,11 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
 
 type OpsDecision = DshOperationsDecisionKind;
 type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshOrderLifecycleStatus }>;
+type SelectedItem =
+  | { type: 'approval'; id: string }
+  | { type: 'live'; id: string }
+  | { type: 'fulfillment'; id: string; mode: DshFulfillmentOperationalMode }
+  | null;
 
 const FULFILLMENT_MODE_IDS: readonly DshFulfillmentOperationalMode[] = ['bthwani_delivery', 'partner_delivery', 'pickup'];
 
@@ -45,14 +49,14 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const { theme } = useTheme();
   const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
   const activeMode = FULFILLMENT_MODE_IDS.find((m) => m === subGroup) ?? null;
-  const [expandedApprovalId, setExpandedApprovalId] = React.useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
   const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
 
   const handleDecision = React.useCallback((orderId: string, decision: OpsDecision, note: string) => {
     const nextStatus = mapOperationsDecisionToLifecycle(decision);
     updateLiveOrderDecision(orderId, decision, note, nextStatus);
     setDecisions(getLiveOrderDecisions() as any);
-    setExpandedApprovalId(null);
+    setSelectedItemId(null);
   }, []);
 
   const handlePrimaryAction = React.useCallback((orderId: string, actionLabel: string) => {
@@ -99,89 +103,290 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
     { id: 'hint', label: preview.summary.ringLabel, value: preview.summary.actionHint, tone: 'neutral' as const },
   ];
 
-  return (
-    <div className={styles.surfaceCockpitContent}>
-      <WebControlPanelKpiStrip items={summaryKpi} />
+  const pendingApprovalsCount = PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length;
 
-      {/* Operations approval queue */}
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '14px', fontWeight: 800, color: theme.text, marginBottom: '10px', direction: 'rtl', textAlign: 'right', borderBottom: `1px solid ${theme.line}`, paddingBottom: '8px' }}>
-          طلبات قيد الموافقة التشغيلية
-          <span style={{ marginRight: '8px', fontSize: '11px', background: theme.warningSurface, color: theme.warning, padding: '2px 8px', borderRadius: '99px', fontWeight: 700 }}>
-            {PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length} طلب
-          </span>
-        </div>
+  // Selected details lookup
+  let inspectorContent: React.ReactNode = null;
+  if (selectedItemId) {
+    if (selectedItemId.type === 'approval') {
+      const order = PENDING_APPROVAL_ORDERS.find((o) => o.id === selectedItemId.id);
+      if (order) {
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`موافقة تشغيلية — ${order.id}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <div style={{ overflowY: 'auto', flex: 1, padding: '4px' }}>
+              <OpsOrderDetailPanel order={order} onDecision={handleDecision} />
+            </div>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    } else if (selectedItemId.type === 'live') {
+      const order = preview.rows.find((r) => r.id === selectedItemId.id);
+      if (order) {
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`تفاصيل الطلب الحي — ${order.id}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <Box gap={3} padding={2} style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة الحالية:</span>
+                <WebControlPanelStatusTag
+                  label={order.status}
+                  tone={TONE_MAP[order.statusTone] ?? 'neutral'}
+                />
+              </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {PENDING_APPROVAL_ORDERS.map((order) => {
-            const submitted = decisions[order.id];
-            const isExpanded = expandedApprovalId === order.id;
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                {[
+                  { label: 'الوجهة', value: order.destination },
+                  { label: 'الكابتن', value: order.captain },
+                  { label: 'ETA المتوقع', value: order.eta },
+                  { label: 'تنبيه الوصول', value: order.ringLabel },
+                  { label: 'توجيه الإجراء', value: order.actionHint },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '6px', padding: '6px 10px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)', marginBottom: '2px' }}>{label}</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--bthwani-control-panel-text)' }}>{value}</div>
+                  </div>
+                ))}
+              </div>
 
-            if (submitted) {
-              const decisionLabel = submitted.decision === 'approve' ? 'تمت الموافقة' : submitted.decision === 'reject' ? 'تم الرفض' : 'طلب تعديل';
-              const decisionColor = submitted.decision === 'approve' ? theme.success : submitted.decision === 'reject' ? theme.danger : theme.warning;
-              return (
-                <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', border: `1px solid ${theme.line}`, borderRadius: '10px', background: theme.surfaceRaised, direction: 'rtl', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '11px', color: theme.textMuted }}>الحالة التالية: <strong style={{ color: theme.text }}>{submitted.nextLifecycleStatus}</strong></span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: decisionColor }}>{decisionLabel}</span>
-                  <span style={{ fontSize: '13px', color: theme.text }}>#{order.id} — {order.customerName}</span>
+              <div style={{ borderTop: '1px solid var(--bthwani-control-panel-border)', paddingTop: '8px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--bthwani-control-panel-brand)' }}>توصية النظام المعتمدة:</div>
+                <p style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-text)', marginTop: '4px', fontWeight: 700 }}>
+                  {order.suggestion.label}
+                </p>
+                <p style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)', marginTop: '2px' }}>
+                  {order.suggestion.reason}
+                </p>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--bthwani-control-panel-text)', marginBottom: '4px' }}>سجل الوصول والتنبيهات:</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {order.arrivalTimeline.map((item, index) => (
+                    <div key={index} style={{ fontSize: '11px', padding: '4px 6px', background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '4px' }}>
+                      {item}
+                    </div>
+                  ))}
                 </div>
-              );
-            }
+              </div>
 
-            return (
-              <div key={order.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--bthwani-control-panel-text)', marginBottom: '4px' }}>خطط الإجراء التشغيلي:</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {order.actionPlans.map((item, index) => (
+                    <div key={index} style={{ fontSize: '11px', padding: '4px 6px', background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '4px' }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
                 <button
                   type="button"
-                  onClick={() => setExpandedApprovalId(isExpanded ? null : order.id)}
                   style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '10px 14px', border: `1px solid ${isExpanded ? theme.brand : theme.line}`,
-                    borderRadius: '10px', background: isExpanded ? theme.brandSurface : theme.surfaceRaised,
-                    cursor: 'pointer', direction: 'rtl', textAlign: 'right', width: '100%',
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'var(--bthwani-control-panel-brand)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '11px',
                   }}
+                  onClick={() => handlePrimaryAction(order.id, order.suggestion.action)}
                 >
-                  <span style={{ fontSize: '12px', color: theme.textMuted }}>{isExpanded ? 'إخفاء التفاصيل ▲' : 'عرض التفاصيل ▼'}</span>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: theme.text }}>#{order.id} — {order.customerName} — {order.storeName}</span>
+                  {order.suggestion.action}
                 </button>
-                {isExpanded && <OpsOrderDetailPanel order={order} onDecision={handleDecision} />}
+                {order.suggestion.secondary && (
+                  <button
+                    type="button"
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      background: 'transparent',
+                      border: '1px solid var(--bthwani-control-panel-border-strong)',
+                      color: 'var(--bthwani-control-panel-text)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      fontSize: '11px',
+                    }}
+                    onClick={() => handleSecondaryAction(order.id, order.suggestion.secondary)}
+                  >
+                    {order.suggestion.secondary}
+                  </button>
+                )}
               </div>
-            );
-          })}
-        </div>
-      </div>
+            </Box>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    } else if (selectedItemId.type === 'fulfillment') {
+      const rows = FULFILLMENT_MODE_ORDER_QUEUES[selectedItemId.mode] || [];
+      const order = rows.find((r) => r.id === selectedItemId.id);
+      if (order) {
+        inspectorContent = (
+          <WebControlPanelInspectorShell
+            title={`تفاصيل طلب التوصيل — ${order.id}`}
+            onClose={() => setSelectedItemId(null)}
+          >
+            <Box gap={3} padding={2}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة:</span>
+                <WebControlPanelStatusTag
+                  label={order.statusLabel}
+                  tone={order.statusTone as any}
+                />
+              </div>
 
-      {/* Live decision rows */}
-      <div style={{ fontSize: '14px', fontWeight: 800, color: theme.text, marginBottom: '10px', direction: 'rtl', textAlign: 'right', borderBottom: `1px solid ${theme.line}`, paddingBottom: '8px' }}>
-        الطلبات المباشرة
-      </div>
-      <Box gap={2}>
-        {preview.rows.map((order) => (
-          <WebControlPanelDecisionRow
-            key={order.id}
-            entityId={order.id}
-            entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
-            status={order.status}
-            statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
-            risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
-            recommendation={order.suggestion.label}
-            reason={order.suggestion.reason}
-            sla={`ETA: ${order.eta} | ${order.ringLabel}`}
-            primaryAction={{
-              id: `${order.id}-primary`,
-              label: order.suggestion.action,
-              onAction: () => handlePrimaryAction(order.id, order.suggestion.action),
-            }}
-            secondaryAction={order.suggestion.secondary ? {
-              id: `${order.id}-secondary`,
-              label: order.suggestion.secondary,
-              onAction: () => handleSecondaryAction(order.id, order.suggestion.secondary),
-            } : undefined}
-          />
-        ))}
-      </Box>
+              <KeyValueList
+                items={[
+                  { label: 'مُعرّف الطلب', value: order.id },
+                  { label: 'المتجر', value: order.storeName },
+                  { label: 'العميل', value: order.customerName },
+                  { label: 'SLA المتبقي', value: order.slaLabel },
+                  { label: 'قناة التنفيذ', value: DSH_FULFILLMENT_OPERATIONAL_MODE_META[order.fulfillmentMode]?.label || order.fulfillmentMode },
+                  { label: 'المالك التشغيلي', value: DSH_FULFILLMENT_OPERATIONAL_MODE_META[order.fulfillmentMode]?.operationalOwner || 'غير محدد' },
+                ]}
+              />
 
-      {activeMode && <FulfillmentModeQueueSection mode={activeMode} />}
+              <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'var(--bthwani-control-panel-brand)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: '11px',
+                  }}
+                  onClick={() => alert(`تم اتخاذ الإجراء: ${order.nextAction}`)}
+                >
+                  {order.nextAction}
+                </button>
+              </div>
+            </Box>
+          </WebControlPanelInspectorShell>
+        );
+      }
+    }
+  }
+
+  return (
+    <div className={styles.surfaceCockpitContent} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <WebControlPanelKpiStrip items={summaryKpi} />
+
+      <WebControlPanelSplitPane
+        primary={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
+            {/* 1. Pending Approvals Queue */}
+            <WebControlPanelQueue
+              title="طلبات قيد الموافقة التشغيلية"
+              meta={`${pendingApprovalsCount} طلبات معلقة`}
+            >
+              {PENDING_APPROVAL_ORDERS.map((order) => {
+                const submitted = decisions[order.id];
+                if (submitted) {
+                  const decisionLabel = submitted.decision === 'approve' ? 'تمت الموافقة' : submitted.decision === 'reject' ? 'تم الرفض' : 'طلب تعديل';
+                  const decisionTone = submitted.decision === 'approve' ? 'success' as const : submitted.decision === 'reject' ? 'danger' as const : 'warning' as const;
+                  return (
+                    <WebControlPanelDecisionRow
+                      key={order.id}
+                      entityId={order.id}
+                      entityLabel={`${order.customerName} — ${order.storeName}`}
+                      status={decisionLabel}
+                      statusTone={decisionTone}
+                      sla={`الحالة التالية: ${submitted.nextLifecycleStatus}`}
+                    />
+                  );
+                }
+
+                return (
+                  <WebControlPanelDecisionRow
+                    key={order.id}
+                    entityId={order.id}
+                    entityLabel={`${order.customerName} — ${order.storeName}`}
+                    status="قيد مراجعة العمليات"
+                    statusTone="warning"
+                    onInspect={() => setSelectedItemId({ type: 'approval', id: order.id })}
+                    primaryAction={{
+                      id: `${order.id}-decide`,
+                      label: 'مراجعة واتخاذ قرار',
+                      onAction: () => setSelectedItemId({ type: 'approval', id: order.id }),
+                    }}
+                  />
+                );
+              })}
+            </WebControlPanelQueue>
+
+            {/* 2. Live Orders Queue */}
+            <WebControlPanelQueue title="الطلبات المباشرة" meta={`${preview.rows.length} طلبات نشطة`}>
+              {preview.rows.map((order) => (
+                <WebControlPanelDecisionRow
+                  key={order.id}
+                  entityId={order.id}
+                  entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
+                  status={order.status}
+                  statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
+                  risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
+                  recommendation={order.suggestion.label}
+                  reason={order.suggestion.reason}
+                  sla={`ETA: ${order.eta} | ${order.ringLabel}`}
+                  onInspect={() => setSelectedItemId({ type: 'live', id: order.id })}
+                  primaryAction={{
+                    id: `${order.id}-primary`,
+                    label: order.suggestion.action,
+                    onAction: () => handlePrimaryAction(order.id, order.suggestion.action),
+                  }}
+                  secondaryAction={order.suggestion.secondary ? {
+                    id: `${order.id}-secondary`,
+                    label: order.suggestion.secondary,
+                    onAction: () => handleSecondaryAction(order.id, order.suggestion.secondary),
+                  } : undefined}
+                />
+              ))}
+            </WebControlPanelQueue>
+
+            {/* 3. Fulfillment Mode subGroup Queue (if active) */}
+            {activeMode && (
+              <WebControlPanelQueue
+                title={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.label || activeMode}
+                meta={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.operationalOwner}
+              >
+                {(FULFILLMENT_MODE_ORDER_QUEUES[activeMode] || []).map((row) => (
+                  <WebControlPanelDecisionRow
+                    key={row.id}
+                    entityId={row.id}
+                    entityLabel={`${row.customerName} — ${row.storeName}`}
+                    status={row.statusLabel}
+                    statusTone={row.statusTone as any}
+                    sla={row.slaLabel}
+                    onInspect={() => setSelectedItemId({ type: 'fulfillment', id: row.id, mode: activeMode })}
+                    primaryAction={{
+                      id: `${row.id}-action`,
+                      label: row.nextAction,
+                      onAction: () => alert(`تم اتخاذ الإجراء: ${row.nextAction}`),
+                    }}
+                  />
+                ))}
+              </WebControlPanelQueue>
+            )}
+          </div>
+        }
+        secondary={inspectorContent}
+        secondaryWidth="wide"
+      />
     </div>
   );
 }

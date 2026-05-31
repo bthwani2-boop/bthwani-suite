@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
 import {
   WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
@@ -65,7 +66,7 @@ export function PartnerDeactivationWorkspace({
       <Box gap={4} padding={4}>
         {DEACTIVATION_POLICY ? (
           <Surface tone="inset" padding={3} gap={2} radiusToken="md">
-            <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
+            <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
               <Surface tone="warning" padding={1} radiusToken="pill" border={false}>
                 <Text role="caption" tone="muted">تدقيق إلزامي</Text>
               </Surface>
@@ -87,20 +88,23 @@ export function PartnerDeactivationWorkspace({
           {deactivationReasons.map((reason) => {
             const isSelected = selectedReason === reason.id;
             return (
-              <Surface
+              <Pressable
                 key={reason.id}
-                as="button"
-                onClick={() => setSelectedReason(reason.id)}
-                padding={3}
-                radiusToken="sm"
-                border
-                borderTone={isSelected ? 'brand' : 'line'}
-                background={isSelected ? 'brandSurface' : 'surface'}
-                layoutDirection="row"
-                align="center"
+                onPress={() => setSelectedReason(reason.id)}
+                style={{ cursor: 'pointer' }}
               >
-                <Text role="bodySm" tone={isSelected ? 'brand' : 'base'}>{reason.label}</Text>
-              </Surface>
+                <Surface
+                  padding={3}
+                  radiusToken="sm"
+                  border
+                  borderTone={isSelected ? 'brand' : 'line'}
+                  tone={isSelected ? 'brand' : 'default'}
+                  layoutDirection="row"
+                  align="center"
+                >
+                  <Text role="bodySm" tone={isSelected ? 'brand' : 'default'}>{reason.label}</Text>
+                </Surface>
+              </Pressable>
             );
           })}
         </Box>
@@ -112,7 +116,7 @@ export function PartnerDeactivationWorkspace({
             onChangeText={setEvidenceNote}
             placeholder="وصف مختصر للسبب الفعلي، الحادثة، أو الدليل المرجعي..."
             multiline
-            disabled={isSubmitting}
+            editable={!isSubmitting}
           />
           <Text role="caption" tone="muted">
             تُحفظ هذه الملاحظة في سجل الأحداث وتُعدّ جزءًا من قرار الإيقاف الرسمي.
@@ -129,13 +133,12 @@ export function PartnerDeactivationWorkspace({
         ) : null}
 
         <WebControlPanelActionCluster
-          primary={{
+          primary={(!canConfirm || isSubmitting) ? undefined : {
             id: 'deactivate',
             label: isSubmitting ? 'جارٍ الإيقاف...' : 'تأكيد الإيقاف',
-            disabled: !canConfirm || isSubmitting,
             onAction: handleConfirm,
           }}
-          secondary={{ id: 'cancel', label: 'إلغاء', disabled: isSubmitting, onAction: onClose }}
+          secondary={isSubmitting ? undefined : { id: 'cancel', label: 'إلغاء', onAction: onClose }}
         />
       </Box>
     </WebControlPanelInspectorShell>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Text, Surface } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
 import {
   WebControlPanelLaneTabs,
   WebControlPanelSubTabs,
@@ -35,7 +36,7 @@ const PartnerComplaintsWorkspace = React.lazy(() => import('./PartnerComplaintsW
 
 function WorkspaceSkeleton() {
   return (
-    <Surface padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={4}>
+    <Surface padding={6} align="center" tone="raised" radiusToken="lg" gap={4}>
       <Text role="titleSm" tone="muted">جارٍ التحميل...</Text>
     </Surface>
   );
@@ -106,24 +107,20 @@ function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onActio
       primaryAction={isAwaitingActivation ? {
         id: 'activate',
         label: isSubmitting ? 'جارٍ التفعيل...' : 'تفعيل الشريك',
-        disabled: isSubmitting,
-        onAction: () => handleActionWithDelay('activate')
+        onAction: isSubmitting ? undefined : () => handleActionWithDelay('activate')
       } : isAwaitingReview ? {
         id: 'approve',
         label: isSubmitting ? 'جارٍ المعالجة...' : 'قبول للمراجعة',
-        disabled: isSubmitting,
-        onAction: () => handleActionWithDelay('approve')
+        onAction: isSubmitting ? undefined : () => handleActionWithDelay('approve')
       } : undefined}
       secondaryAction={isAwaitingReview ? {
         id: 'fix',
         label: 'طلب تعديل',
-        disabled: isSubmitting,
-        onAction: () => handleActionWithDelay('fix')
+        onAction: isSubmitting ? undefined : () => handleActionWithDelay('fix')
       } : {
         id: 'reject',
         label: 'رفض',
-        disabled: isSubmitting,
-        onAction: () => handleActionWithDelay('reject')
+        onAction: isSubmitting ? undefined : () => handleActionWithDelay('reject')
       }}
     />
   );
@@ -152,34 +149,37 @@ function ControlPanelDshPartnerDeactivationTab() {
   const isDeactivated = currentStatus === 'partner_deactivated';
 
   return (
-    <Box gap={4} dir="rtl">
+    <Box gap={4}>
       {/* Partner selector chips */}
       <Box gap={2}>
         <Text role="caption" tone="brand">اختر الشريك لإجراءات إلغاء التفعيل</Text>
-        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const status = partnerStatuses[partner.partnerId] ?? getPartnerActivationStatus(partner.partnerId);
             const isActive = selectedPartnerId === partner.partnerId;
             return (
-              <Surface
+              <Pressable
                 key={partner.partnerId}
-                as="button"
-                onClick={() => {
+                onPress={() => {
                   setSelectedPartnerId(partner.partnerId);
                   setActionMessage(`تم تحديد الشريك: ${partner.storeName}`);
                 }}
-                padding={2}
-                radiusToken="sm"
-                border
-                borderTone={isActive ? 'brand' : 'line'}
-                background={isActive ? 'brandSurface' : 'surface'}
-                layoutDirection="row"
-                align="center"
+                style={{ cursor: 'pointer' }}
               >
-                <Text role="bodySm" tone={isActive ? 'brand' : 'base'}>
-                  {partner.storeName} ({status === 'partner_deactivated' ? 'ملغى التفعيل' : 'نشط/جاهز'})
-                </Text>
-              </Surface>
+                <Surface
+                  padding={2}
+                  radiusToken="sm"
+                  border
+                  borderTone={isActive ? 'brand' : 'line'}
+                  tone={isActive ? 'brand' : 'default'}
+                  layoutDirection="row"
+                  align="center"
+                >
+                  <Text role="bodySm" tone={isActive ? 'brand' : 'default'}>
+                    {partner.storeName} ({status === 'partner_deactivated' ? 'ملغى التفعيل' : 'نشط/جاهز'})
+                  </Text>
+                </Surface>
+              </Pressable>
             );
           })}
         </Box>
@@ -193,15 +193,15 @@ function ControlPanelDshPartnerDeactivationTab() {
               <Text role="bodyMd" tone="muted">
                 تم إلغاء تفعيل متجر <strong>{currentPartner.storeName}</strong> بالكامل من لوحة التحكم ولا يمكنه استقبال طلبات العملاء.
               </Text>
-              <Surface background="surfaceInset" padding={3} radiusToken="sm" border borderTone="line">
+              <Surface tone="inset" padding={3} radiusToken="sm" border borderTone="line">
                 <Text role="caption" tone="brand">الملاحظة التشغيلية الحالية:</Text>
-                <Box marginY={1}>
-                  <Text role="bodySm" tone="base">
+                <Box style={{ marginVertical: 4 }}>
+                  <Text role="bodySm" tone="default">
                     الشريك في حالة تعطيل بسبب خلل في الامتثال أو بطلب مباشر. يجب إعادة مراجعة المستندات لإعادة التفعيل.
                   </Text>
                 </Box>
               </Surface>
-              <Box marginY={2}>
+              <Box style={{ marginVertical: 8 }}>
                 <WebControlPanelActionCluster
                   primary={{
                     id: 'reset',
@@ -277,7 +277,7 @@ export function ControlPanelDshPartnerHubScreen() {
       return (
         <Box gap={3}>
           {items.length === 0 ? (
-            <Surface padding={8} align="center" background="surfaceRaised" radiusToken="lg">
+            <Surface padding={8} align="center" tone="raised" radiusToken="lg">
               <Text tone="muted">لا توجد طلبات واردة حالياً</Text>
             </Surface>
           ) : (
@@ -298,7 +298,7 @@ export function ControlPanelDshPartnerHubScreen() {
     }
 
     return (
-      <Surface padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+      <Surface padding={6} align="center" tone="raised" radiusToken="lg" gap={2}>
         <Box align="center" gap={1}>
           <Text role="titleSm" tone="brand">لا توجد قائمة مستقلة لهذا المسار الآن</Text>
           <Text tone="muted">يظهر هذا التبويب كحالة N/A واضحة إلى أن ينتج له queue مملوك داخل الشركاء، من دون خلق شاشة وهمية أو مسار مكرر.</Text>
@@ -380,7 +380,7 @@ export function ControlPanelDshPartnerHubScreen() {
       </div>
 
       <Box padding={4} gap={3}>
-        <Surface padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
+        <Surface padding={3} tone="inset" radiusToken="lg" border borderTone="line">
           <Text role="titleSm">ملكية دورة حياة الشريك</Text>
           <Text role="bodySm" tone="muted">
             {partnersGovernance?.notes ?? 'قسم الشركاء يملك onboarding والاعتماد والجاهزية والتعطيل، بينما الشريك والميدان يجمعان البيانات فقط.'}
@@ -414,7 +414,7 @@ export function ControlPanelDshPartnerHubScreen() {
               ) : activeTab === 'inbox' ? (
                 renderInboxWorkspace()
               ) : (
-                <Surface padding={6} align="center" background="surfaceRaised" radiusToken="lg" gap={2}>
+                <Surface padding={6} align="center" tone="raised" radiusToken="lg" gap={2}>
                   <Box align="center" gap={1}>
                     <Text role="titleSm" tone="brand">المسار معروض كحالة واضحة وليس كفراغ</Text>
                     <Text tone="muted">عند غياب queue مملوك لهذا التبويب نعرض N/A صريحة بدل شاشة عامة أو placeholder مكرر.</Text>

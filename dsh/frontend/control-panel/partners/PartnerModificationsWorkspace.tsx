@@ -60,7 +60,7 @@ export function PartnerModificationsWorkspace() {
 
         <Box gap={3}>
           {requests.length === 0 || pendingCount === 0 ? (
-            <Surface padding={8} align="center" background="surfaceInset" radiusToken="lg">
+            <Surface padding={8} align="center" tone="inset" radiusToken="lg">
               <Text tone="muted">لا توجد طلبات تعديل بيانات معلقة.</Text>
             </Surface>
           ) : (
@@ -104,11 +104,11 @@ export function PartnerModificationsWorkspace() {
               يرجى مقارنة البيانات المطلوبة قبل الموافقة لاعتمادها بشكل نهائي في ملف الشريك.
             </Text>
 
-            <Box gap={2} marginY={2}>
+            <Box gap={2} style={{ marginVertical: 8 }}>
               <Text role="caption" tone="brand">التغييرات المطلوبة:</Text>
               {selectedRequest.changes.map((change, idx) => (
-                <Surface key={idx} background="surface" padding={3} radiusToken="sm" border borderTone="line" gap={2}>
-                  <Text role="caption" tone="base">{change.field}</Text>
+                <Surface key={idx} tone="default" padding={3} radiusToken="sm" border borderTone="line" gap={2}>
+                  <Text role="caption" tone="default">{change.field}</Text>
                   <Box layoutDirection="row" justify="space-between">
                     <Text role="caption" tone="danger">
                       {change.old}
@@ -128,18 +128,16 @@ export function PartnerModificationsWorkspace() {
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box marginY={2}>
+            <Box style={{ marginVertical: 8 }}>
               <WebControlPanelActionCluster
-                primary={{
+                primary={isSubmitting ? undefined : {
                   id: 'approve',
-                  label: isSubmitting ? 'جارٍ الاعتماد...' : 'اعتماد التعديلات',
-                  disabled: isSubmitting,
+                  label: 'اعتماد التعديلات',
                   onAction: () => handleApprove(selectedRequest.id)
                 }}
-                secondary={{
+                secondary={isSubmitting ? undefined : {
                   id: 'reject',
                   label: 'رفض',
-                  disabled: isSubmitting,
                   onAction: () => handleReject(selectedRequest.id)
                 }}
               />

@@ -475,6 +475,12 @@ const webControlSurfaceCss = `
   min-height: 0;
   overflow: hidden;
 }
+.ui-web-cp-split-pane--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ui-web-cp-split-pane--solo .ui-web-cp-split-pane__primary {
+  grid-column: 1 / -1;
+}
 
 .ui-web-cp-split-pane--narrow {
   grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
@@ -486,6 +492,13 @@ const webControlSurfaceCss = `
 
 .ui-web-cp-split-pane--secondary-start {
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+}
+.ui-web-cp-split-pane--secondary-start .ui-web-cp-split-pane__primary {
+  grid-column: 2;
+}
+.ui-web-cp-split-pane--secondary-start .ui-web-cp-split-pane__secondary {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .ui-web-cp-split-pane--secondary-start.ui-web-cp-split-pane--narrow {
@@ -500,7 +513,7 @@ const webControlSurfaceCss = `
 .ui-web-cp-split-pane__secondary {
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .ui-web-cp-workbench {
@@ -510,10 +523,18 @@ const webControlSurfaceCss = `
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.ui-web-cp-workbench__body,
+.ui-web-cp-workbench__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+}
 .ui-web-cp-workbench__main {
   display: flex;
   flex-direction: column;
@@ -521,7 +542,7 @@ const webControlSurfaceCss = `
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .ui-web-cp-lane-tabs,
@@ -1384,19 +1405,21 @@ export function WebControlPanelSplitPane({
   secondaryPosition = 'end',
   secondaryWidth = 'regular',
 }: WebControlPanelSplitPaneProps) {
+  const hasSecondary = !!secondary;
   return (
     <>
       <WebControlSurfaceStyles />
       <div
         className={joinClassNames(
           'ui-web-cp-split-pane',
-          secondaryWidth === 'narrow' && 'ui-web-cp-split-pane--narrow',
-          secondaryWidth === 'wide' && 'ui-web-cp-split-pane--wide',
-          secondaryPosition === 'start' && 'ui-web-cp-split-pane--secondary-start',
+          !hasSecondary && 'ui-web-cp-split-pane--solo',
+          hasSecondary && secondaryWidth === 'narrow' && 'ui-web-cp-split-pane--narrow',
+          hasSecondary && secondaryWidth === 'wide' && 'ui-web-cp-split-pane--wide',
+          hasSecondary && secondaryPosition === 'start' && 'ui-web-cp-split-pane--secondary-start',
         )}
       >
         <div className="ui-web-cp-split-pane__primary">{primary}</div>
-        {secondary ? <div className="ui-web-cp-split-pane__secondary">{secondary}</div> : null}
+        {hasSecondary ? <div className="ui-web-cp-split-pane__secondary">{secondary}</div> : null}
       </div>
     </>
   );

@@ -50,7 +50,7 @@ export function PartnerComplaintsWorkspace() {
 
         <Box gap={3}>
           {complaints.length === 0 || openComplaintsCount === 0 ? (
-            <Surface padding={8} align="center" background="surfaceInset" radiusToken="lg">
+            <Surface padding={8} align="center" tone="inset" radiusToken="lg">
               <Text tone="muted">لا توجد شكاوى نشطة حالياً.</Text>
             </Surface>
           ) : (
@@ -90,26 +90,26 @@ export function PartnerComplaintsWorkspace() {
               <WebControlPanelStatusTag label={selectedComplaint.category} tone={selectedComplaint.severity === 'high' ? 'danger' : 'warning'} />
             </Box>
 
-            <Surface background="surface" padding={3} radiusToken="sm" border borderTone="line">
-              <Box gap={1} marginY={2}>
+            <Surface tone="default" padding={3} radiusToken="sm" border borderTone="line">
+              <Box gap={1} style={{ marginVertical: 8 }}>
                 <Text role="caption" tone="muted">المتجر المشتكي:</Text>
-                <Text role="titleSm" tone="base">{partner.storeName}</Text>
+                <Text role="titleSm" tone="default">{partner.storeName}</Text>
               </Box>
 
               {selectedComplaint.relatedOrderId && (
-                <Box gap={1} marginY={2}>
+                <Box gap={1} style={{ marginVertical: 8 }}>
                   <Text role="caption" tone="muted">رقم الطلب المرتبط:</Text>
-                  <Text role="titleSm" tone="base">{selectedComplaint.relatedOrderId}</Text>
+                  <Text role="titleSm" tone="default">{selectedComplaint.relatedOrderId}</Text>
                 </Box>
               )}
 
-              <Box gap={1} marginY={2}>
+              <Box gap={1} style={{ marginVertical: 8 }}>
                 <Text role="caption" tone="muted">الوصف:</Text>
-                <Text role="bodySm" tone="base">{selectedComplaint.description}</Text>
+                <Text role="bodySm" tone="default">{selectedComplaint.description}</Text>
               </Box>
             </Surface>
 
-            <Box gap={2} marginY={2}>
+            <Box gap={2} style={{ marginVertical: 8 }}>
               <TextField
                 label="ملاحظات وتوجيهات الحل (تُحفظ في سجل التدقيق)"
                 value={resolutionNote}
@@ -125,7 +125,7 @@ export function PartnerComplaintsWorkspace() {
               auditTag="UI_PREVIEW_ONLY"
             />
 
-            <Box marginY={3}>
+            <Box style={{ marginVertical: 12 }}>
               <WebControlPanelActionCluster
                 primary={
                   selectedComplaint.status === 'open'

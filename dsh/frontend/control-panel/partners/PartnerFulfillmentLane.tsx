@@ -69,7 +69,7 @@ export function PartnerFulfillmentLane({ state = 'ready', onRetry }: PartnerFulf
   const totalDisabled = PARTNER_FULFILLMENT_AGREEMENTS.flatMap((p) => p.modes).filter((m) => !m.enabled).length;
 
   return (
-    <Box gap={6} dir="rtl">
+    <Box gap={6}>
       <WebControlPanelRecommendation
         title="مرجع الأرقام التشغيلية والمالية"
         reason="أرقام العمولة والتسوية المعروضة هنا مخصصة للوضوح التشغيلي فقط. نظام WLT المالي هو المالك الحقيقي والمرجع النهائي لجميع أرقام العمولات والتسويات، ولا توجد سلطة إدارية لتعديلها من هذه الشاشة."
@@ -87,19 +87,19 @@ export function PartnerFulfillmentLane({ state = 'ready', onRetry }: PartnerFulf
           { id: 'enabled', label: 'أوضاع مفعّلة', value: String(totalEnabled), tone: 'success' },
           { id: 'pending', label: 'قيد المراجعة', value: String(totalPending), tone: 'warning' },
           { id: 'disabled', label: 'معطّلة', value: String(totalDisabled), tone: 'danger' },
-          { id: 'partners', label: 'إجمالي الشركاء', value: String(PARTNER_FULFILLMENT_AGREEMENTS.length), tone: 'brand' },
+          { id: 'partners', label: 'إجمالي الشركاء', value: String(PARTNER_FULFILLMENT_AGREEMENTS.length), tone: 'neutral' },
         ]} />
 
         <Box gap={5}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => (
-            <Surface key={partner.partnerId} background="surface" radiusToken="lg" border borderTone="line" dir="rtl">
-              <Surface background="surfaceInset" padding={4} border borderTone="line" layoutDirection="row" justify="space-between" align="center" dir="rtl">
+            <Surface key={partner.partnerId} radiusToken="lg" border borderTone="line">
+              <Surface tone="inset" padding={4} border borderTone="line" layoutDirection="row" align="center" style={{ justifyContent: 'space-between' }}>
                 <Box gap={1}>
-                  <Text role="titleSm" tone="base">{partner.storeName}</Text>
+                  <Text role="titleSm" tone="default">{partner.storeName}</Text>
                   <Text role="caption" tone="muted">{partner.categoryLabel}</Text>
                 </Box>
-                <Surface padding={2} radiusToken="sm" background="surface" border borderTone="line">
-                  <Text role="caption" tone="muted" dir="ltr">{partner.partnerId}</Text>
+                <Surface padding={2} radiusToken="sm" border borderTone="line">
+                  <Text role="caption" tone="muted">{partner.partnerId}</Text>
                 </Surface>
               </Surface>
               <Box padding={4} gap={3}>

@@ -105,7 +105,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
   const serviceabilityMeta = SERVICEABILITY_STATUS_META[selectedDesk.serviceabilitySummary.serviceabilityStatus];
 
   return (
-    <div className={styles.surfaceCockpitContent}>
+    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>Assisted Order Desk</h2>
         <p className={styles.surfaceSectionSubtitle}>

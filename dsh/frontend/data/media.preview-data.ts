@@ -56,6 +56,6 @@ export const dshPreviewMediaAssets: readonly DshPreviewMediaAsset[] = [
   ...dshHomeGetFixtureProducts.flatMap((product) => mediaAsset('product', product.id, product.mediaKey)),
   ...categoryMediaAssets,
   ...getMarketingBannerItems().flatMap((banner) => mediaAsset('banner', banner.id, banner.imageUrl)),
-  ...getMarketingVideoItems().flatMap((video) => mediaAsset('video', video.id, video.thumbnailUrl)),
+  ...getMarketingVideoItems().flatMap((video) => mediaAsset('video', video.id, video.posterUrl)),
   ...mediaAsset('brand', 'dsh-brand', 'dsh.brand.logo.v1'),
 ];

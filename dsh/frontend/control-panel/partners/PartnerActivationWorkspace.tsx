@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
+import { Pressable } from 'react-native';
 import {
   WebControlPanelStatusTag,
   WebControlPanelActionCluster,
@@ -95,31 +96,34 @@ export function ControlPanelDshPartnerActivationScreen() {
 
 
   return (
-    <Box gap={4} dir="rtl">
+    <Box gap={4}>
       {/* Partner selector chips */}
       <Box gap={2}>
         <Text role="caption" tone="brand">اختر الشريك للمعاينة والتفعيل</Text>
-        <Box layoutDirection="row" gap={2} className={styles.surfaceActionWrap}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           {PARTNER_FULFILLMENT_AGREEMENTS.map((partner) => {
             const status = partnerStatuses[partner.partnerId] ?? getPartnerActivationStatus(partner.partnerId);
             const isActive = selectedPartnerId === partner.partnerId;
             return (
-              <Surface
+              <Pressable
                 key={partner.partnerId}
-                as="button"
-                onClick={() => handlePartnerSelect(partner.partnerId)}
-                padding={2}
-                radiusToken="sm"
-                border
-                borderTone={isActive ? 'brand' : 'line'}
-                background={isActive ? 'brandSurface' : 'surface'}
-                layoutDirection="row"
-                align="center"
+                onPress={() => handlePartnerSelect(partner.partnerId)}
+                style={{ cursor: 'pointer' }}
               >
-                <Text role="bodySm" tone={isActive ? 'brand' : 'base'}>
-                  {partner.storeName} ({getDshPartnerActivationStatusLabel(status)})
-                </Text>
-              </Surface>
+                <Surface
+                  padding={2}
+                  radiusToken="sm"
+                  border
+                  borderTone={isActive ? 'brand' : 'line'}
+                  tone={isActive ? 'brand' : 'default'}
+                  layoutDirection="row"
+                  align="center"
+                >
+                  <Text role="bodySm" tone={isActive ? 'brand' : 'default'}>
+                    {partner.storeName} ({getDshPartnerActivationStatusLabel(status)})
+                  </Text>
+                </Surface>
+              </Pressable>
             );
           })}
         </Box>
@@ -170,7 +174,7 @@ export function ControlPanelDshPartnerActivationScreen() {
                 </Box>
               </Box>
 
-              <Surface background="surfaceInset" padding={3} radiusToken="sm" border borderTone="line">
+              <Surface tone="inset" padding={3} radiusToken="sm" border borderTone="line">
                 <KeyValueList
                   dense
                   items={[
@@ -183,9 +187,7 @@ export function ControlPanelDshPartnerActivationScreen() {
 
               {/* Marketing Eligibility Banner */}
               <Surface
-                background={`${marketingElig.tone}Surface` as any}
-                border
-                borderTone={marketingElig.tone}
+                tone={marketingElig.tone}
                 padding={3}
                 radiusToken="sm"
                 layoutDirection="row"
@@ -199,16 +201,14 @@ export function ControlPanelDshPartnerActivationScreen() {
 
               {/* Readiness Checklist */}
               <Box gap={3}>
-                <Text role="titleSm" tone="base">قائمة شروط التفعيل النهائي</Text>
+                <Text role="titleSm" tone="default">قائمة شروط التفعيل النهائي</Text>
                 <Box gap={2}>
                   {readinessChecklist.map((item) => (
                     <Surface
                       key={item.id}
                       padding={3}
                       radiusToken="sm"
-                      background={item.satisfied ? 'successSurface' : 'dangerSurface'}
-                      border
-                      borderTone={item.satisfied ? 'success' : 'danger'}
+                      tone={item.satisfied ? 'success' : 'danger'}
                       gap={1}
                     >
                       <Box layoutDirection="row" justify="space-between" align="center">
@@ -266,7 +266,7 @@ export function ControlPanelDshPartnerActivationScreen() {
             auditTag="UI_PREVIEW_ONLY"
           />
           <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
-            <Text role="titleSm" tone="base">ملاحظة تشغيلية</Text>
+            <Text role="titleSm" tone="default">ملاحظة تشغيلية</Text>
             <Text role="bodySm" tone="muted">
               حسب سياسة الحوكمة في بثواني، لا يمكن تفعيل أي شريك للعملاء إلا بعد أن يتم مراجعة وثائقه بنسبة 100%
               واعتماد الكتالوج الخاص به.
