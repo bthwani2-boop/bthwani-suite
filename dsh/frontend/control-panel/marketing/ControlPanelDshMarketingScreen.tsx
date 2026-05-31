@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
@@ -238,6 +238,13 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const [activeTab, setActiveTab] = React.useState<MarketingControlView>('visibility');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('');
 
+  const [partnerGates, setPartnerGates] = React.useState(() =>
+    PARTNER_GATE_PREVIEW.map((gate) => ({ ...gate, bypassed: false }))
+  );
+  const [productGates, setProductGates] = React.useState(() =>
+    PRODUCT_GATE_PREVIEW.map((product) => ({ ...product, bypassed: false }))
+  );
+
   const partnerOfferRecords = getPartnerOfferItems();
   const campaignRecords = getCampaignItems();
   const partnerOfferRows = partnerOfferRecords.map((offer) => ({
@@ -276,27 +283,35 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     },
   });
 
-  const partnerGateRows = PARTNER_GATE_PREVIEW.map((gate) => {
+  const partnerGateRows = partnerGates.map((gate) => {
+    const effectiveStatus = gate.bypassed ? 'client_visible' : gate.status;
     const visibility = resolveDshStoreClientVisibility({
-      activationStatus: gate.status,
-      catalogPublished: gate.status === 'client_visible' || gate.status === 'partner_active',
-      deliveryModesReady: gate.status === 'delivery_modes_ready' || gate.status === 'partner_active' || gate.status === 'client_visible',
-      serviceabilityAvailable: gate.status === 'client_visible',
+      activationStatus: effectiveStatus,
+      catalogPublished: effectiveStatus === 'client_visible' || effectiveStatus === 'partner_active',
+      deliveryModesReady: effectiveStatus === 'delivery_modes_ready' || effectiveStatus === 'partner_active' || effectiveStatus === 'client_visible',
+      serviceabilityAvailable: effectiveStatus === 'client_visible',
       storeOpen: true,
     });
     return { ...gate, clientVisible: visibility.visible };
   });
 
-  const productGateRows = PRODUCT_GATE_PREVIEW.map((product) => {
+  const productGateRows = productGates.map((product) => {
+    const effectiveApprovalStatus = product.bypassed ? 'client_visible' : product.approvalStatus;
+    const effectivePartnerStatus = product.bypassed ? 'client_visible' : product.partnerStatus;
+    const effectiveCategoryMappingStatus = product.bypassed ? 'mapped' : product.categoryMappingStatus;
+    const effectiveDuplicateStatus = product.bypassed ? 'clean' : product.duplicateStatus;
+    const effectiveDeliveryModesReady = product.bypassed ? true : product.deliveryModesReady;
+    const effectiveMediaPolicySatisfied = product.bypassed ? true : product.mediaPolicySatisfied;
+
     const productVisibility = resolveDshProductClientVisibility({
-      approvalStatus: product.approvalStatus,
-      activationStatus: product.partnerStatus,
-      catalogPublished: product.partnerStatus === 'client_visible',
-      deliveryModesReady: product.deliveryModesReady,
-      serviceabilityAvailable: product.partnerStatus === 'client_visible',
-      categoryMappingStatus: product.categoryMappingStatus,
-      duplicateStatus: product.duplicateStatus,
-      mediaPolicySatisfied: product.mediaPolicySatisfied,
+      approvalStatus: effectiveApprovalStatus,
+      activationStatus: effectivePartnerStatus,
+      catalogPublished: effectivePartnerStatus === 'client_visible',
+      deliveryModesReady: effectiveDeliveryModesReady,
+      serviceabilityAvailable: effectivePartnerStatus === 'client_visible',
+      categoryMappingStatus: effectiveCategoryMappingStatus,
+      duplicateStatus: effectiveDuplicateStatus,
+      mediaPolicySatisfied: effectiveMediaPolicySatisfied,
     });
     return { ...product, publishingBlocked: !productVisibility.visible, blockers: productVisibility.publishingPrerequisites.filter(i => !i.satisfied) };
   });
@@ -308,26 +323,26 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const marketingHeaderMetrics = [
     {
       label: 'بوابات الشركاء',
-      value: String(partnerGateRows.filter((row) => row.clientVisible).length),
-      trend: `${partnerGateRows.length} مسارات`,
+      value: `${partnerGateRows.filter((row) => row.clientVisible).length} / ${partnerGateRows.length}`,
+      trend: 'مسارات نشطة',
       trendTone: partnerGateRows.some((row) => !row.clientVisible) ? 'warning' : 'success',
     },
     {
       label: 'منتجات محجوبة',
-      value: String(productGateRows.filter((row) => row.publishingBlocked).length),
-      trend: `${productGateRows.reduce((sum, row) => sum + row.blockers.length, 0)} موانع`,
+      value: `${productGateRows.filter((row) => row.publishingBlocked).length} / ${productGateRows.length}`,
+      trend: `${productGateRows.reduce((sum, row) => sum + row.blockers.length, 0)} موانع نشطة`,
       trendTone: productGateRows.some((row) => row.publishingBlocked) ? 'warning' : 'success',
     },
     {
       label: 'ظهور تجاري',
       value: String(commercialProjection.badges.length),
-      trend: commercialProjection.isClientVisible ? 'جاهز' : 'محجوب',
+      trend: commercialProjection.isClientVisible ? 'جاهز للعملاء' : 'محجوب حالياً',
       trendTone: commercialProjection.isClientVisible ? 'success' : 'warning',
     },
     {
       label: 'إشارات غير مقروءة',
       value: String(marketingSignalRows.filter((signal) => signal.readState === 'unread').length),
-      trend: `${dshPromotionCandidates.filter((candidate) => candidate.eligibility === 'eligible').length} مرشح`,
+      trend: `${dshPromotionCandidates.filter((candidate) => candidate.eligibility === 'eligible').length} مرشحين ترويج`,
       trendTone: marketingSignalRows.some((signal) => signal.priority === 'urgent') ? 'warning' : 'success',
     },
   ] as const;
@@ -389,7 +404,17 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
   const renderActiveLane = () => {
     switch (activeTab) {
       case 'visibility':
-        return <VisibilityCommandDeckScreen activeSubTab={activeSubTab} setActiveTab={(tab: string) => setActiveTab(tab as MarketingControlView)} marketingHeaderMetrics={marketingHeaderMetrics} />;
+        return (
+          <VisibilityCommandDeckScreen
+            activeSubTab={activeSubTab}
+            setActiveTab={(tab: string) => setActiveTab(tab as MarketingControlView)}
+            marketingHeaderMetrics={marketingHeaderMetrics}
+            partnerGates={partnerGates}
+            setPartnerGates={setPartnerGates}
+            productGates={productGates}
+            setProductGates={setProductGates}
+          />
+        );
       case 'ticker':
         return <TickerCommandDeckScreen />;
       case 'banners':
@@ -489,29 +514,32 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
       )}
 
       <Box paddingX={4} paddingY={2}>
-        <div className={marketingStyles.governanceBridgeRow}>
-          <div className={marketingStyles.governanceBridgeCard}>
-            <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
-              <Text role="titleSm">ملكية التسويق</Text>
-              <Text role="bodySm" tone="muted">
-                {marketingGovernance?.notes ?? 'التسويق يملك المحتوى والحملات والعروض، وليس تفعيل الشريك أو نشر الكتالوج النهائي.'}
-              </Text>
-              <Text role="caption" tone="muted">
-                {marketingGovernance?.onDemandPolicySummary ?? 'المحتوى الثقيل والمعاينات تبقى on-demand فقط.'}
-              </Text>
-            </Box>
-          </div>
-          <div className={marketingStyles.governanceBridgeCard}>
-            <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line">
-              <Text role="titleSm">الجسور المعتمدة</Text>
-              <Text role="bodySm" tone="muted">
-                {`النشر النهائي للمنتجات عبر ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} · أهلية الشريك عبر ${partnersGovernance?.sectionLabel ?? 'Partners'} · الحوادث التشغيلية عبر ${supportGovernance?.sectionLabel ?? 'Support'}.`}
-              </Text>
-              <Text role="caption" tone="muted">
-                لا تتحول هذه المساحة إلى نسخة من الموبايل، بل تبقى مركز اعتماد ومراجعة كثيف ومنخفض الضجيج.
-              </Text>
-            </Box>
-          </div>
+        <div className={styles.surfacePulseCompact} style={{ justifyContent: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+          <span className={styles.commandKpiLabel} style={{ fontSize: '11px', alignSelf: 'center', margin: 0 }}>جسور الحوكمة التفاعلية:</span>
+          <button
+            type="button"
+            onClick={() => setActiveTab('partners')}
+            className={styles.surfaceMetaChip}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', border: `1px solid var(--bthwani-control-panel-border)` }}
+          >
+            <span>أهلية الشريك (Partners) ←</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('media-review')}
+            className={styles.surfaceMetaChip}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', border: `1px solid var(--bthwani-control-panel-border)` }}
+          >
+            <span>اعتماد الصور والكتالوج (Catalogs) ←</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('signals')}
+            className={styles.surfaceMetaChip}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', border: `1px solid var(--bthwani-control-panel-border)` }}
+          >
+            <span>إشارات الحوادث والتوصيات (Support) ←</span>
+          </button>
         </div>
       </Box>
 

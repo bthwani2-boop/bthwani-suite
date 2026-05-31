@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Text } from '@bthwani/ui-kit';
@@ -258,6 +258,26 @@ function mapCampaignRecordToCommercial(record: CampaignRecord): CommercialCampai
   };
 }
 
+function translateStatus(status: string): string {
+  switch (status) {
+    case 'documents_missing': return 'وثائق ناقصة';
+    case 'delivery_modes_ready': return 'أنماط التوصيل جاهزة';
+    case 'client_visible': return 'مرئي للعميل';
+    case 'catalog_ready': return 'الكتالوج جاهز';
+    case 'partner_active': return 'نشط';
+    default: return status;
+  }
+}
+
+function translateAffectedSurface(surface: string): string {
+  switch (surface) {
+    case 'app-partner': return 'تطبيق الشريك';
+    case 'app-client': return 'تطبيق العميل';
+    case 'control-panel': return 'لوحة التحكم';
+    default: return surface;
+  }
+}
+
 function resolveToneClass(tone: 'brand' | 'success' | 'warning' | 'danger' | 'default') {
   if (tone === 'success') return marketingStyles.statusChipSuccess;
   if (tone === 'warning') return marketingStyles.statusChipWarning;
@@ -275,9 +295,21 @@ export interface VisibilityCommandDeckScreenProps {
     trend: string;
     trendTone: string;
   }[];
+  partnerGates: any[];
+  setPartnerGates: React.Dispatch<React.SetStateAction<any[]>>;
+  productGates: any[];
+  setProductGates: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, marketingHeaderMetrics }: VisibilityCommandDeckScreenProps) {
+export function VisibilityCommandDeckScreen({
+  activeSubTab,
+  setActiveTab,
+  marketingHeaderMetrics,
+  partnerGates,
+  setPartnerGates,
+  productGates,
+  setProductGates,
+}: VisibilityCommandDeckScreenProps) {
   const partnerOfferRecords = getPartnerOfferItems();
   const campaignRecords = getCampaignItems();
   const partnerOfferRows = partnerOfferRecords.map((offer) => ({
@@ -315,47 +347,55 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
       }])),
     },
   });
-  const partnerGateRows = PARTNER_GATE_PREVIEW.map((gate) => {
-    const metadata = getDshPartnerActivationStateMetadata(gate.status);
+  const partnerGateRows = partnerGates.map((gate) => {
+    const effectiveStatus = gate.bypassed ? 'client_visible' : gate.status;
+    const metadata = getDshPartnerActivationStateMetadata(effectiveStatus);
     const visibility = resolveDshStoreClientVisibility({
-      activationStatus: gate.status,
-      catalogPublished: gate.status === 'client_visible' || gate.status === 'partner_active',
-      deliveryModesReady: gate.status === 'delivery_modes_ready' || gate.status === 'partner_active' || gate.status === 'client_visible',
-      serviceabilityAvailable: gate.status === 'client_visible',
+      activationStatus: effectiveStatus,
+      catalogPublished: effectiveStatus === 'client_visible' || effectiveStatus === 'partner_active',
+      deliveryModesReady: effectiveStatus === 'delivery_modes_ready' || effectiveStatus === 'partner_active' || effectiveStatus === 'client_visible',
+      serviceabilityAvailable: effectiveStatus === 'client_visible',
       storeOpen: true,
     });
     return {
       ...gate,
       clientVisible: visibility.visible,
-      owner: metadata.actorResponsible,
-      nextAction: metadata.nextAction,
-      blockedReason: visibility.blockedReason ?? metadata.blockedReason,
-      auditRequired: metadata.auditRequired,
+      owner: gate.bypassed ? 'تجاوز المشرف (نظام التسويق)' : metadata.actorResponsible,
+      nextAction: gate.bypassed ? 'تم التجاوز بنجاح' : metadata.nextAction,
+      blockedReason: gate.bypassed ? undefined : (visibility.blockedReason ?? metadata.blockedReason),
+      auditRequired: gate.bypassed ? false : metadata.auditRequired,
       tone: visibility.visible ? 'success' as const : (visibility.blockedReason ?? metadata.blockedReason) ? 'warning' as const : 'brand' as const,
     };
   });
-  const productGateRows = PRODUCT_GATE_PREVIEW.map((product) => {
-    const approvalMeta = getDshProductApprovalStateMetadata(product.approvalStatus);
+  const productGateRows = productGates.map((product) => {
+    const effectiveApprovalStatus = product.bypassed ? 'client_visible' : product.approvalStatus;
+    const effectivePartnerStatus = product.bypassed ? 'client_visible' : product.partnerStatus;
+    const effectiveCategoryMappingStatus = product.bypassed ? 'mapped' : product.categoryMappingStatus;
+    const effectiveDuplicateStatus = product.bypassed ? 'clean' : product.duplicateStatus;
+    const effectiveDeliveryModesReady = product.bypassed ? true : product.deliveryModesReady;
+    const effectiveMediaPolicySatisfied = product.bypassed ? true : product.mediaPolicySatisfied;
+
+    const approvalMeta = getDshProductApprovalStateMetadata(effectiveApprovalStatus);
     const productVisibility = resolveDshProductClientVisibility({
-      approvalStatus: product.approvalStatus,
-      activationStatus: product.partnerStatus,
-      catalogPublished: product.partnerStatus === 'client_visible',
-      deliveryModesReady: product.deliveryModesReady,
-      serviceabilityAvailable: product.partnerStatus === 'client_visible',
-      categoryMappingStatus: product.categoryMappingStatus,
-      duplicateStatus: product.duplicateStatus,
-      mediaPolicySatisfied: product.mediaPolicySatisfied,
+      approvalStatus: effectiveApprovalStatus,
+      activationStatus: effectivePartnerStatus,
+      catalogPublished: effectivePartnerStatus === 'client_visible',
+      deliveryModesReady: effectiveDeliveryModesReady,
+      serviceabilityAvailable: effectivePartnerStatus === 'client_visible',
+      categoryMappingStatus: effectiveCategoryMappingStatus,
+      duplicateStatus: effectiveDuplicateStatus,
+      mediaPolicySatisfied: effectiveMediaPolicySatisfied,
     });
     const blockers = productVisibility.publishingPrerequisites.filter((item) => !item.satisfied);
     const publishingBlocked = !productVisibility.visible;
 
     return {
       ...product,
-      approvalLabel: approvalMeta.label,
-      blockers,
-      publishingBlocked,
-      blockedReason: productVisibility.blockedReason,
-      tone: product.approvalStatus === 'client_visible' && blockers.length === 0
+      approvalLabel: product.bypassed ? 'معتمد تلقائياً' : approvalMeta.label,
+      blockers: product.bypassed ? [] : blockers,
+      publishingBlocked: product.bypassed ? false : publishingBlocked,
+      blockedReason: product.bypassed ? undefined : productVisibility.blockedReason,
+      tone: product.bypassed || (effectiveApprovalStatus === 'client_visible' && blockers.length === 0)
         ? 'success' as const
         : blockers.length > 0
           ? 'warning' as const
@@ -383,25 +423,25 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
       id: 'eligibility',
       title: 'أهلية الظهور',
       visible: `${visibleOffers.length + visibleCampaigns.length}`,
-      note: 'تقرأ eligibility من marketing-visibility.contract.ts فقط ولا تتجاوز partner/catalog gates.',
+      note: 'التحقق من توافق معايير الحملات والشركاء مع سياسات النشر دون تجاوز ضوابط التفعيل.',
     },
     {
       id: 'suppression',
       title: 'الكبت والمنع',
       visible: `${blockedOffers.length + blockedCampaigns.length}`,
-      note: 'كل suppression هنا summary-only: blockedReason, gate owner, والroute المالك فقط.',
+      note: 'حصر العناصر الموقوفة أو المحجوبة وتحديد الجهة المسؤولة عن قرار الحجب لتسهيل المعالجة.',
     },
     {
       id: 'audit',
       title: 'سجل التدقيق',
       visible: `${marketingSignalRows.length}`,
-      note: 'الإشارات التسويقية تربط القرار بsignal route وowner واضح قبل أي نشر.',
+      note: 'متابعة تدفق إشارات النشر والاعتماد لضمان تزامن الحوكمة والقرارات التشغيلية.',
     },
     {
       id: 'segments',
       title: 'ملخص الشرائح',
       visible: `${commercialProjection.badges.length}`,
-      note: 'segment summary-only: لا يوجد audience mutation هنا، فقط projection لما وصل فعلًا إلى client-visible.',
+      note: 'عرض توزيعات الجمهور والشرائح المستهدفة للعروض والـ Placements النشطة للعملاء.',
     },
   ].filter((row) => activeSubTab === '' || activeSubTab === row.id);
 
@@ -426,15 +466,15 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
           </div>
         </div>
         <div className={marketingStyles.metaWrap}>
-          <span>partner activation gate يسبق أي commercial placement.</span>
-          <span>product publishing gate يسبق أي banner أو promo.</span>
-          <span>commercial projection يقرأ فقط العناصر client-visible.</span>
-          <span>signal layer تبقى handoff queue منخفضة الضجيج.</span>
+          <span>بوابة تفعيل الشركاء تتحقق من جاهزية المتجر قبل إطلاق أي عروض تسويقية.</span>
+          <span>بوابة نشر المنتجات تضمن سلامة مواصفات وصور المنتج قبل النشر.</span>
+          <span>توقعات الظهور التجاري تقتصر على محاكاة العناصر المرئية للعملاء.</span>
+          <span>قنوات إشارات التنسيق تعمل على تزامن القرارات لحظياً وبدون تداخل.</span>
         </div>
       </div>
 
       <div className={marketingStyles.surfaceCard}>
-        <h3 className={marketingStyles.surfaceCardTitle}>Eligibility / Suppression / Audit / Segments</h3>
+        <h3 className={marketingStyles.surfaceCardTitle}>أهلية الظهور / موانع النشر / سجلات التدقيق والشرائح</h3>
         <div className={marketingStyles.listStack}>
           {visibilityGovernanceRows.map((row) => (
             <div key={row.id} className={marketingStyles.tickerRow}>
@@ -447,7 +487,7 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
                   <div className={marketingStyles.metaChipRow}>
                     <span>{row.id}</span>
                     <span className={marketingStyles.metaSeparator}>|</span>
-                    <span>summary-only</span>
+                    <span>ملخص الحوكمة</span>
                   </div>
                 </div>
                 <div className={marketingStyles.planNote}>{row.note}</div>
@@ -473,9 +513,9 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
                       <div className={marketingStyles.metaChipRow}>
                         <span>{`المالك: ${row.owner}`}</span>
                         <span className={marketingStyles.metaSeparator}>|</span>
-                        <span>{`السطح المتأثر: ${row.affectedSurface}`}</span>
+                        <span>{`السطح المتأثر: ${translateAffectedSurface(row.affectedSurface)}`}</span>
                         <span className={marketingStyles.metaSeparator}>|</span>
-                        <span>{row.auditRequired ? 'يتطلب audit' : 'بدون audit إضافي'}</span>
+                        <span>{row.auditRequired ? 'يتطلب تدقيقاً' : 'بدون تدقيق إضافي'}</span>
                       </div>
                     </div>
                     <div className={marketingStyles.planNote}>
@@ -485,6 +525,15 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
                   <div className={marketingStyles.tickerActions}>
                     <button type="button" onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
                       {row.routeLabel}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPartnerGates(prev => prev.map(g => g.id === row.id ? { ...g, bypassed: !g.bypassed } : g));
+                      }}
+                      className={`${marketingStyles.actionButton} ${row.bypassed ? marketingStyles.actionButtonDanger : marketingStyles.actionButtonSuccess}`}
+                    >
+                      {row.bypassed ? 'تفعيل القيود' : 'تجاوز البوابة'}
                     </button>
                   </div>
                 </div>
@@ -504,22 +553,31 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
                         {row.approvalLabel}
                       </span>
                       <div className={marketingStyles.metaChipRow}>
-                        <span>{`blockers: ${row.blockers.length}`}</span>
+                        <span>{`الموانع: ${row.blockers.length}`}</span>
                         <span className={marketingStyles.metaSeparator}>|</span>
-                        <span>{row.publishingBlocked ? 'publishing blocked' : 'ready for campaign'}</span>
+                        <span>{row.publishingBlocked ? 'النشر محجوب' : 'جاهز للحملة'}</span>
                         <span className={marketingStyles.metaSeparator}>|</span>
-                        <span>{`partner gate: ${row.partnerStatus}`}</span>
+                        <span>{`بوابة الشريك: ${translateStatus(row.partnerStatus)}`}</span>
                       </div>
                     </div>
                     <div className={marketingStyles.planNote}>
                       {row.blockers.length > 0
-                        ? row.blockers.map((blocker) => blocker.blockedReason ?? blocker.label).join(' · ')
+                        ? row.blockers.map((blocker: any) => blocker.blockedReason ?? blocker.label).join(' · ')
                         : 'جميع متطلبات النشر مستوفاة ويمكن تمرير المنتج إلى الحملات أو الـ placements العميلية.'}
                     </div>
                   </div>
                   <div className={marketingStyles.tickerActions}>
                     <button type="button" onClick={() => setActiveTab(row.routeTab)} className={marketingStyles.actionButton}>
                       {row.routeLabel}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProductGates(prev => prev.map(p => p.id === row.id ? { ...p, bypassed: !p.bypassed } : p));
+                      }}
+                      className={`${marketingStyles.actionButton} ${row.bypassed ? marketingStyles.actionButtonDanger : marketingStyles.actionButtonSuccess}`}
+                    >
+                      {row.bypassed ? 'تفعيل القيود' : 'تجاوز الموانع'}
                     </button>
                   </div>
                 </div>
@@ -564,7 +622,7 @@ export function VisibilityCommandDeckScreen({ activeSubTab, setActiveTab, market
                       <div className={marketingStyles.metaChipRow}>
                         <span>{`مرشحو الترويج: ${dshPromotionCandidates.length}`}</span>
                         <span className={marketingStyles.metaSeparator}>|</span>
-                        <span>{`visible badges: ${commercialProjection.badges.length}`}</span>
+                        <span>{`الشارات المرئية: ${commercialProjection.badges.length}`}</span>
                       </div>
                     </div>
                     <div className={marketingStyles.planNote}>{row.note}</div>

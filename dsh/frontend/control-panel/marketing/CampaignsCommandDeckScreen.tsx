@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
@@ -142,6 +142,12 @@ export function CampaignsCommandDeckScreen() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+
+  // --- URL-driven state ---
+  const selectedId = searchParams?.get('id') ?? null;
+  const editorTab = (searchParams?.get('tab') as EditorTab) || 'plan';
+  const campaignsPageParam = parseInt(searchParams?.get('page') || '1', 10);
+  const campaignsPage = isNaN(campaignsPageParam) || campaignsPageParam < 1 ? 1 : campaignsPageParam;
 
   const [summaries, setSummaries] = React.useState<CampaignSummary[]>([]);
   const [totalItems, setTotalItems] = React.useState(0);
@@ -696,7 +702,7 @@ export function CampaignsCommandDeckScreen() {
                 <li><strong>الظهور:</strong> ستظهر هذه الحملة في <span style={{ color: theme.brand }}>{draft.targetType || 'غير محدد'}</span>.</li>
                 <li><strong>الولاء:</strong> {draft.linkedLoyaltyBenefitId ? 'مرتبط بميزة ولاء فعالة.' : 'غير مرتبط بالولاء.'}</li>
                 <li><strong>الشركاء:</strong> {draft.linkedOfferId ? 'مرتبط بعرض شريك.' : 'غير مرتبط.'}</li>
-                <li><strong>التجاوز (Precedence):</strong> {draft.priority === 'urgent' ? <span style={{ color: theme.warning, fontWeight: 'bold' }}>تتجاوز متغيرات المنصة الأساسية</span> : 'تخضع للأولوية العادية'}</li>
+                <li><strong>التجاوز (Precedence):</strong> {draft.priority === 'critical' ? <span style={{ color: theme.warning, fontWeight: 'bold' }}>تتجاوز متغيرات المنصة الأساسية</span> : 'تخضع للأولوية العادية'}</li>
               </ul>
             </div>
 
@@ -756,7 +762,7 @@ export function CampaignsCommandDeckScreen() {
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 4 }}>
-                    {item.status === 'published' && item.priority === 'urgent' && (
+                    {item.status === 'published' && item.priority === 'critical' && (
                       <View style={[styles.statusBadge, { backgroundColor: theme.warning }]}>
                         <Text style={[styles.statusText, { color: theme.background }]}>تجاوز المتغيرات</Text>
                       </View>
@@ -771,7 +777,7 @@ export function CampaignsCommandDeckScreen() {
             <WebControlPanelCompactPager
 				page={campaignsPage}
 				totalPages={totalPages}
-				summaryLabel={`عرض ${visibleItems.length} من ${items.length} حملات`}
+				summaryLabel={`عرض ${visibleItems.length} من ${totalItems} حملات`}
 				onPrevious={campaignsPage > 1 ? () => setCampaignsPage((currentPage) => currentPage - 1) : undefined}
 				onNext={campaignsPage < totalPages ? () => setCampaignsPage((currentPage) => currentPage + 1) : undefined}
 			/>

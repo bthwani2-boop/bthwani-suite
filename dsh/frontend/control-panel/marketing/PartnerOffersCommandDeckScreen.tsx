@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList, useTheme } from '@bthwani/ui-kit';
@@ -78,6 +78,10 @@ export function PartnerOffersCommandDeckScreen() {
   const editorSection = (searchParams?.get('tab') as PartnerOfferEditorSection) || 'details';
   const offersPageParam = parseInt(searchParams?.get('page') || '1', 10);
   const offersPage = isNaN(offersPageParam) || offersPageParam < 1 ? 1 : offersPageParam;
+
+  const [summaries, setSummaries] = React.useState<PartnerOfferSummary[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [selected, setSelected] = React.useState<PartnerOfferRecord | null>(null);
 
   const updateQueryParams = React.useCallback((updates: Record<string, string | null>, historyAction: 'push' | 'replace' = 'replace') => {
     const params = new URLSearchParams(searchParams?.toString() ?? '');
@@ -170,9 +174,6 @@ export function PartnerOffersCommandDeckScreen() {
     setSelectedId(saved.id);
   };
 
-  const [summaries, setSummaries] = React.useState<PartnerOfferSummary[]>([]);
-  const [totalItems, setTotalItems] = React.useState(0);
-  const [selected, setSelected] = React.useState<PartnerOfferRecord | null>(null);
 
   const loadData = React.useCallback(() => {
     const result = getPartnerOfferSummaries({

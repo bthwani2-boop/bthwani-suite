@@ -3,44 +3,9 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import { WebSignalCard } from '@bthwani/ui-kit/web';
 import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/dsh-signal-layer.model';
+import styles from '../shared/control-panel-surface.module.css';
 
-
-
-/**
- * Audit / History / Rollback Preview:
- * - publish / approval / toggle / visibility actions:
- *   - audit? API-later (via signal layer/events)
- *   - history? API-later (history log)
- *   - rollback? UI-only (pause/draft toggle)
- *   - reason/comment? UI-only now
- *   - before/after preview? UI-only (local visual grid/preview)
- *   - UI-only? Yes (currently simulated/preview states)
- *   - API-later? Yes (backend mutation boundary)
- *
- * Error Handling Closure:
- * - network: API-later (currently simulated/preview)
- * - validation: Top-level error messages (e.g. required fields, conflict targets)
- * - permission: UI disabled state via hasPermission contract
- * - not found: Auto-fallback or disabled action
- * - conflict: Toast/Alert blocker on duplicate/position conflict
- * - stale data: Handled via refresh() after every mutation
- * - blocked action: Handled via permission/validation state
- * - partial failure: API-later
- * - retry: API-later
- * - (No silent catch, success updates state and refreshes data)
- *
- * Empty / Loading / Blocked / Disabled Closure:
- * - loading: API-later (بيانات محاكاة حالياً، لا يوجد spinner مطلوب حالياً)
- * - empty: HANDLED — يظهر empty state عند غياب إشارات الكتالوج والتسويق
- * - error: API-later
- * - blocked: HANDLED — KPIs موسومة UI_PREVIEW_ONLY بشكل صريح
- * - disabled: لا يوجد أزرار تحتاج disabled guard في هذا السطح
- * - success: HANDLED — navigation تعمل مباشرة
- * - retry: API-later
- * - guidance: HANDLED — ملاحظة فنية تشرح حدود المحاكاة
- */
 export type ControlPanelDshMarketingScreenProps = {
 	hubHref?: string;
 	operationsHref?: string;
@@ -64,122 +29,136 @@ export function ControlPanelDshMarketingScreen({
 
 	return (
 		<Box gap={4}>
-			{/* Header Dashboard Banner */}
-			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.lineStrong }}>
-				<Box gap={1}>
-					<Text role="caption" tone="muted" style={{ fontWeight: '900' }}>غرفة قيادة الإشارات الذكية</Text>
-					<Text role="titleMd" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>لوحة الإشارات التسويقية ومنظومة المفضلة المشتركة</Text>
-					<Text role="bodySm" tone="muted">طبقة مضغوطة لمراقبة نية الشراء، والطلب الكامن، وأداء الحملات التلقائية الموجهة بالمفضلة.</Text>
+			{/* Sleek DSH Header (Unified Style) */}
+			<div className={styles.surfaceTopBar} style={{ padding: '12px 16px', border: `1px solid var(--bthwani-control-panel-border)`, borderRadius: '16px', backgroundColor: 'var(--bthwani-control-panel-surface)' }}>
+				<Box gap={0} style={{ flex: 1 }}>
+					<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>غرفة قيادة الإشارات الذكية</Text>
+					<h2 className={styles.surfaceHeaderTitle} style={{ margin: '4px 0 0 0', fontSize: '18px', color: 'var(--bthwani-control-panel-text)' }}>لوحة الإشارات التسويقية ومنظومة المفضلة المشتركة</h2>
+					<p className={styles.surfaceHeaderSubtitle} style={{ marginTop: '2px', fontSize: '11px' }}>طبقة مضغوطة لمراقبة نية الشراء، والطلب الكامن، وأداء الحملات التلقائية الموجهة بالمفضلة.</p>
 				</Box>
+				<div className={styles.surfaceHeaderActions}>
+					<div className={styles.surfacePulseCompact} style={{ gap: '8px' }}>
+						<div className={styles.commandKpi} style={{ padding: '4px 8px', minWidth: '90px' }}>
+							<span className={styles.commandKpiLabel}>حالة الربط</span>
+							<span className={styles.commandKpiValue} style={{ fontSize: '12px', color: 'var(--bthwani-success)' }}>معاينة تشغيلية</span>
+						</div>
+						<div className={styles.commandKpi} style={{ padding: '4px 8px', minWidth: '90px' }}>
+							<span className={styles.commandKpiLabel}>محرك التوصيات</span>
+							<span className={styles.commandKpiValue} style={{ fontSize: '12px', color: 'var(--bthwani-brand)' }}>نشط ومحدّث</span>
+						</div>
+						<Button label="العمليات" tone="primary" size="sm" onPress={() => navigateTo(operationsHref)} />
+						<Button label="لوحة القيادة" tone="secondary" size="sm" onPress={() => navigateTo(hubHref)} />
+					</div>
+				</div>
+			</div>
 
-				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-					<Surface tone="inset" padding={2} style={{ borderRadius: 10 }}>
-						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>حالة الربط</Text>
-						<Text role="bodySm" style={{ color: theme.success, fontWeight: '900' }}>معاينة تشغيلية (Preview-Only)</Text>
-					</Surface>
-					<Surface tone="inset" padding={2} style={{ borderRadius: 10 }}>
-						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>محرك التوصيات</Text>
-						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>نشط ومحدث محلياً</Text>
-					</Surface>
-				</Box>
-
-				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-					<Button label="العمليات" tone="primary" size="sm" onPress={() => navigateTo(operationsHref)} />
-					<Button label="لوحة القيادة" tone="secondary" size="sm" onPress={() => navigateTo(hubHref)} />
-				</Box>
-			</Surface>
-
-			{/* Executive KPIs — signal-driven counts (live) + static marketing estimates (UI_PREVIEW_ONLY) */}
-			<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-				<WebSignalCard title="إجمالي الوصول" value="1.2M" description="تقدير معاينة · UI_PREVIEW_ONLY" tone="best" />
-				<WebSignalCard title="إشارات الاهتمام (المفضلة)" value="12.4K" description="تقدير معاينة · UI_PREVIEW_ONLY" tone="best" />
-				<WebSignalCard title="إشارات التسويق والكتالوج" value={String(catalogSignals.length)} description="اعتماد ورفض وتسليم المحتوى التجاري داخل طبقة الإشارات" />
-				<WebSignalCard title="إشارات غير مقروءة" value={String(catalogUnreadCount)} description="إشارات تستلزم مراجعة أو إجراء" tone="neutral" />
-			</Box>
+			{/* Executive KPIs in Sleek Row */}
+			<div className={styles.surfacePulseCompact} style={{ flexWrap: 'wrap', gap: '12px' }}>
+				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
+					<span className={styles.commandKpiLabel}>إجمالي الوصول</span>
+					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>1.2M</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>تقدير معاينة · UI_PREVIEW_ONLY</span>
+				</div>
+				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
+					<span className={styles.commandKpiLabel}>إشارات الاهتمام (المفضلة)</span>
+					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>12.4K</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>تقدير معاينة · UI_PREVIEW_ONLY</span>
+				</div>
+				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
+					<span className={styles.commandKpiLabel}>إشارات التسويق والكتالوج</span>
+					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>{catalogSignals.length}</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>اعتماد ورفض وتسليم المحتوى التجاري</span>
+				</div>
+				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
+					<span className={styles.commandKpiLabel}>إشارات غير مقروءة</span>
+					<span className={styles.commandKpiValue}>{catalogUnreadCount}</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>إشارات تستلزم مراجعة أو إجراء</span>
+				</div>
+			</div>
 
 			{/* Signals empty state */}
 			{catalogSignals.length === 0 && (
-				<Surface tone="inset" padding={4} gap={2} style={{ borderRadius: 12, alignItems: 'center' }}>
+				<div className={styles.surfaceCompactPanel} style={{ alignItems: 'center', padding: '24px', gap: '8px' }}>
 					<Text style={{ fontSize: 28 }}>◎</Text>
-					<Text role="bodyStrong" style={{ textAlign: 'center', color: theme.brandHeaderBackground }}>لا توجد إشارات تسويقية حالياً</Text>
+					<Text role="bodyStrong" style={{ textAlign: 'center', color: 'var(--bthwani-control-panel-text)' }}>لا توجد إشارات تسويقية حالياً</Text>
 					<Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>ستظهر إشارات الكتالوج والتسويق هنا عند تفعيل جسر البيانات.</Text>
-				</Surface>
+				</div>
 			)}
 
-			{/* Comprehensive Multi-Surface Favorites Engine Analytics */}
-			<Surface tone="raised" padding={4} gap={4} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.lineStrong }}>
-				<Box gap={1}>
-					<Text role="titleMd" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>تحليلات منظومة المفضلة الذكية (DSH Favorites Engine)</Text>
-					<Text role="bodySm" tone="muted">تحليل تفصيلي لدور المفضلة كإشارة نية شراء ومحرك نمو متعدد الأبعاد وليس مجرد صفحة عميل مستقلة.</Text>
-				</Box>
+			{/* Comprehensive Multi-Surface Favorites Engine Analytics (Sleek Panel) */}
+			<div className={styles.surfaceCompactPanel} style={{ gap: '16px' }}>
+				<div className={styles.surfaceSectionHeader}>
+					<h3 className={styles.surfacePanelTitle}>تحليلات منظومة المفضلة الذكية (DSH Favorites Engine)</h3>
+					<p className={styles.surfaceHeaderSubtitle}>تحليل تفصيلي لدور المفضلة كإشارة نية شراء ومحرك نمو متعدد الأبعاد وليس مجرد صفحة عميل مستقلة.</p>
+				</div>
 
-				<Box gap={3}>
+				<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
 					{/* Dimension 1: Purchase Intent */}
-					<Surface tone="inset" padding={3} gap={1} style={{ borderRadius: 12 }}>
-						<Box layoutDirection="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-							<Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>1. إشارات الاهتمام ونية الشراء (Purchase Intent)</Text>
-							<Surface tone="raised" padding={1} style={{ borderRadius: 6 }}><Text role="caption" style={{ color: theme.success }}>عالية الدقة</Text></Surface>
-						</Box>
-						<Text role="bodySm" tone="muted">
-							• تفاح رويال غالا: تمت إضافته بواسطة 1,850 مستخدماً هذا الأسبوع (نية شراء مرتفعة للسلع الطازجة).{"\n"}
+					<div className={styles.surfaceInfoCard} style={{ flexDirection: 'column', alignItems: 'stretch', padding: '12px', gap: '6px' }}>
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+							<span className={styles.surfaceInfoCardTitle}>1. إشارات الاهتمام ونية الشراء (Purchase Intent)</span>
+							<span className={styles.surfaceMetaChip} style={{ margin: 0, color: 'var(--bthwani-success)' }}>عالية الدقة</span>
+						</div>
+						<p className={styles.surfaceInfoCardDescription} style={{ margin: 0, fontSize: '11px', lineHeight: '1.5' }}>
+							• تفاح رويال غالا: تمت إضافته بواسطة 1,850 مستخدماً هذا الأسبوع (نية شراء مرتفعة للسلع الطازجة).<br />
 							• مطعم القلعة: 3,240 مستخدماً أضافوه للمفضلة كوجهة مفضلة رئيسية.
-						</Text>
-					</Surface>
+						</p>
+					</div>
 
 					{/* Dimension 2: Partner Growth */}
-					<Surface tone="inset" padding={3} gap={1} style={{ borderRadius: 12 }}>
-						<Box layoutDirection="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-							<Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>2. مؤشر نمو الشريك وأهليته (Partner Growth Index)</Text>
-							<Surface tone="raised" padding={1} style={{ borderRadius: 6 }}><Text role="caption" style={{ color: theme.info }}>بثواني برو</Text></Surface>
-						</Box>
-						<Text role="bodySm" tone="muted">
-							• تأهيل المتاجر: رفع أهلية الشريك تلقائياً للاشتراك في باقات "بثواني برو" بناءً على تجاوز عتبة 500 مفضلة نشطة.{"\n"}
+					<div className={styles.surfaceInfoCard} style={{ flexDirection: 'column', alignItems: 'stretch', padding: '12px', gap: '6px' }}>
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+							<span className={styles.surfaceInfoCardTitle}>2. مؤشر نمو الشريك وأهليته (Partner Growth Index)</span>
+							<span className={styles.surfaceMetaChip} style={{ margin: 0, color: 'var(--bthwani-brand)' }}>بثواني برو</span>
+						</div>
+						<p className={styles.surfaceInfoCardDescription} style={{ margin: 0, fontSize: '11px', lineHeight: '1.5' }}>
+							• تأهيل المتاجر: رفع أهلية الشريك تلقائياً للاشتراك في باقات "بثواني برو" بناءً على تجاوز عتبة 500 مفضلة نشطة.<br />
 							• الاحتفاظ بالعملاء: يسجل الشركاء ذوو التفضيل العالي معدل تكرار طلبات أعلى بنسبة 42% مقارنة بالمتاجر الأخرى.
-						</Text>
-					</Surface>
+						</p>
+					</div>
 
 					{/* Dimension 3: Marketing Trigger */}
-					<Surface tone="inset" padding={3} gap={1} style={{ borderRadius: 12 }}>
-						<Box layoutDirection="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-							<Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>3. المدخل التسويقي للحملات والعروض (Marketing Input Trigger)</Text>
-							<Surface tone="raised" padding={1} style={{ borderRadius: 6 }}><Text role="caption" style={{ color: theme.warning }}>تلقائي ذكي</Text></Surface>
-						</Box>
-						<Text role="bodySm" tone="muted">
-							• كوبونات مستهدفة: تم توليد حملة كوبونات آلية بخصم 15% لـ 1,200 مستخدم يفضلون "مطعم القلعة".{"\n"}
+					<div className={styles.surfaceInfoCard} style={{ flexDirection: 'column', alignItems: 'stretch', padding: '12px', gap: '6px' }}>
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+							<span className={styles.surfaceInfoCardTitle}>3. المدخل التسويقي للحملات والعروض (Marketing Input Trigger)</span>
+							<span className={styles.surfaceMetaChip} style={{ margin: 0, color: 'var(--bthwani-warning)' }}>تلقائي ذكي</span>
+						</div>
+						<p className={styles.surfaceInfoCardDescription} style={{ margin: 0, fontSize: '11px', lineHeight: '1.5' }}>
+							• كوبونات مستهدفة: تم توليد حملة كوبونات آلية بخصم 15% لـ 1,200 مستخدم يفضلون "مطعم القلعة".<br />
 							• العروض الكامنة: تنبيه بوجود عروض غير مفعلة تسويقياً لدى متاجر مدرجة في قائمة مفضلة نشطة لدى العملاء.
-						</Text>
-					</Surface>
+						</p>
+					</div>
 
 					{/* Dimension 4: Operational Latent Demand */}
-					<Surface tone="inset" padding={3} gap={1} style={{ borderRadius: 12 }}>
-						<Box layoutDirection="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-							<Text role="bodyStrong" style={{ color: theme.brandHeaderBackground }}>4. مؤشر الطلب الكامن والضغط التشغيلي (Latent Demand & Operational Pressure)</Text>
-							<Surface tone="raised" padding={1} style={{ borderRadius: 6 }}><Text role="caption" style={{ color: theme.danger }}>مراقبة جغرافية</Text></Surface>
-						</Box>
-						<Text role="bodySm" tone="muted">
-							• المنطقة الغربية: رصد ضغط طلب كامن متزايد (820 مفضلة نشطة لمنتجات تبعد مسافة أطول من 5 كم عن العميل).{"\n"}
+					<div className={styles.surfaceInfoCard} style={{ flexDirection: 'column', alignItems: 'stretch', padding: '12px', gap: '6px' }}>
+						<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+							<span className={styles.surfaceInfoCardTitle}>4. مؤشر الطلب الكامن والضغط التشغيلي (Latent Demand)</span>
+							<span className={styles.surfaceMetaChip} style={{ margin: 0, color: 'var(--bthwani-danger)' }}>مراقبة جغرافية</span>
+						</div>
+						<p className={styles.surfaceInfoCardDescription} style={{ margin: 0, fontSize: '11px', lineHeight: '1.5' }}>
+							• المنطقة الغربية: رصد ضغط طلب كامن متزايد (820 مفضلة نشطة لمنتجات تبعد مسافة أطول من 5 كم عن العميل).<br />
 							• فرصة التوسع: 1,500 منتج محفوظ خارج النطاق الفعلي للتغطية السريعة - مؤشر جغرافي مهم لتوجيه الشركاء الجدد.
-						</Text>
-					</Surface>
-				</Box>
-			</Surface>
+						</p>
+					</div>
+				</div>
+			</div>
 
-			{/* Bottom Policy & Diagnostics Panel */}
-			<Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.lineStrong }}>
-				<Text role="titleSm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>ملاحظة فنية وهيكلية</Text>
-				<Text role="bodySm" tone="muted">جميع قراءات وإشارات المفضلة في هذا السطح هي محاكاة تفاعلية (Preview-only) ولا تتطلب ربطاً برمجياً بالـ Backend أو قواعد البيانات حالياً لضمان خفة واستقرار منظومة DSH الموزعة.</Text>
+			{/* Bottom Policy & Diagnostics Panel (Sleek Panel) */}
+			<div className={styles.surfaceCompactPanel} style={{ gap: '12px' }}>
+				<h3 className={styles.surfacePanelTitle} style={{ fontSize: '13px' }}>ملاحظة فنية وهيكلية</h3>
+				<p className={styles.surfaceHeaderSubtitle} style={{ fontSize: '11px', margin: 0 }}>
+					جميع قراءات وإشارات المفضلة في هذا السطح هي محاكاة تفاعلية (Preview-only) ولا تتطلب ربطاً برمجياً بالـ Backend أو قواعد البيانات حالياً لضمان خفة واستقرار منظومة DSH الموزعة.
+				</p>
 
-				<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-					<Surface tone="inset" padding={3} style={{ borderRadius: 12, flex: 1, minWidth: 180 }}>
-						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>قنوات إطلاق الإشارات</Text>
-						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>عبر التفضيل المباشر من HomeScreen و FavoriteToggle</Text>
-					</Surface>
-					<Surface tone="inset" padding={3} style={{ borderRadius: 12, flex: 1, minWidth: 180 }}>
-						<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>الأثر التسويقي</Text>
-						<Text role="bodySm" style={{ color: theme.brandHeaderBackground, fontWeight: '900' }}>رفع معدل التحويل العضوي بنسبة متوقعة تصل إلى 15%</Text>
-					</Surface>
-				</Box>
-			</Surface>
+				<div className={styles.surfaceMetaWrap} style={{ justifyContent: 'flex-start', gap: '8px' }}>
+					<span className={styles.surfaceMetaChip}>
+						{`قنوات إطلاق الإشارات: عبر التفضيل المباشر من HomeScreen و FavoriteToggle`}
+					</span>
+					<span className={styles.surfaceMetaChip}>
+						{`الأثر التسويقي: رفع معدل التحويل العضوي بنسبة متوقعة تصل إلى 15%`}
+					</span>
+				</div>
+			</div>
 		</Box>
 	);
 }

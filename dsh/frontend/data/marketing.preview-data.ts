@@ -411,14 +411,66 @@ export function getMarketingBannerItems(): MarketingBannerRecord[] {
 
 export function getMarketingBannerKpis() {
   const items = getMarketingBannerItems();
+  const total = items.length;
+  const published = items.filter((item) => item.status === 'published').length;
+  const drafts = items.filter((item) => item.status === 'draft').length;
+  const live = items.filter((item) => isMarketingBannerLive(item)).length;
+  const impressions = items.reduce((sum, item) => sum + item.impressions, 0);
+  const clicks = items.reduce((sum, item) => sum + item.clicks, 0);
+  const ctrVal = impressions > 0 ? ((clicks / impressions) * 100).toFixed(1) + '%' : '0%';
   return {
-    total: items.length,
-    published: items.filter((item) => item.status === 'published').length,
-    drafts: items.filter((item) => item.status === 'draft').length,
-    live: items.filter((item) => isMarketingBannerLive(item)).length,
-    impressions: items.reduce((sum, item) => sum + item.impressions, 0),
-    clicks: items.reduce((sum, item) => sum + item.clicks, 0),
+    total: { value: total },
+    published: { value: published },
+    drafts: { value: drafts },
+    live: { value: live },
+    impressions: { value: impressions },
+    clicks: { value: clicks },
+    ctr: { value: ctrVal },
   };
+}
+
+export type MarketingBannerSummary = {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl?: string;
+  status: MarketingBannerStatus;
+  actionType: MarketingBannerActionType;
+  impressions: number;
+  clicks: number;
+  position: number;
+};
+
+export function getMarketingBannerSummaries(options: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const page = options.page ?? 1;
+  const pageSize = options.pageSize ?? 5;
+  let items = getMarketingBannerItems();
+
+  if (options.search) {
+    const q = options.search.toLowerCase();
+    items = items.filter(i => i.title.toLowerCase().includes(q) || i.subtitle.toLowerCase().includes(q));
+  }
+  if (options.status && options.status !== 'all') {
+    items = items.filter(i => i.status === options.status);
+  }
+
+  const total = items.length;
+  const start = (page - 1) * pageSize;
+  const paginated = items.slice(start, start + pageSize);
+
+  return {
+    items: paginated as MarketingBannerSummary[],
+    total,
+  };
+}
+
+export function getMarketingBannerDetail(id: string): MarketingBannerRecord | null {
+  return getMarketingBannerItems().find(i => i.id === id) ?? null;
 }
 
 export function mapMarketingBannerToPromo(item: MarketingBannerRecord): DshHomeGetPromo {
@@ -654,13 +706,60 @@ export function getCampaignItems(): CampaignRecord[] {
 
 export function getCampaignKpis() {
   const items = getCampaignItems();
-  const live = items.filter(item => item.status === 'published');
+  const total = items.length;
+  const live = items.filter(item => item.status === 'published').length;
+  const pending = items.filter(item => item.status === 'pending').length;
+  const impressions = items.reduce((sum, item) => sum + item.impressions, 0);
   return {
-    total: items.length,
-    live: live.length,
-    impressions: live.reduce((sum, item) => sum + item.impressions, 0),
-    clicks: live.reduce((sum, item) => sum + item.clicks, 0),
+    total: { value: total },
+    live: { value: live },
+    pending: { value: pending },
+    impressions: { value: impressions },
   };
+}
+
+export type CampaignSummary = {
+  id: string;
+  title: string;
+  subtitle: string;
+  status: CampaignStatus;
+  priority: CampaignPriority;
+  goal: CampaignGoal;
+  channels: CampaignChannel[];
+  impressions: number;
+  clicks: number;
+};
+
+export function getCampaignSummaries(options: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const page = options.page ?? 1;
+  const pageSize = options.pageSize ?? 5;
+  let items = getCampaignItems();
+
+  if (options.search) {
+    const q = options.search.toLowerCase();
+    items = items.filter(i => i.title.toLowerCase().includes(q) || i.subtitle.toLowerCase().includes(q));
+  }
+  if (options.status && options.status !== 'all') {
+    items = items.filter(i => i.status === options.status);
+  }
+
+  const total = items.length;
+  const start = (page - 1) * pageSize;
+  const paginated = items.slice(start, start + pageSize);
+
+  return {
+    items: paginated as CampaignSummary[],
+    total,
+  };
+}
+
+export function getCampaignDetail(id: string): CampaignRecord | null {
+  return getCampaignItems().find(i => i.id === id) ?? null;
 }
 
 export function upsertCampaignItem(item: Partial<CampaignRecord>) {
@@ -831,6 +930,48 @@ function setPromoMutableStore(next: HomePromoRecord[]) {
 
 export function getHomePromoItems(): HomePromoRecord[] {
   return [...getPromoMutableStore()].sort((left, right) => left.order - right.order);
+}
+
+export type HomePromoSummary = {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl?: string;
+  status: HomePromoStatus;
+  targetType: string;
+  order: number;
+};
+
+export function getHomePromoSummaries(options: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const page = options.page ?? 1;
+  const pageSize = options.pageSize ?? 5;
+  let items = getHomePromoItems();
+
+  if (options.search) {
+    const q = options.search.toLowerCase();
+    items = items.filter(i => i.title.toLowerCase().includes(q) || i.subtitle.toLowerCase().includes(q));
+  }
+  if (options.status && options.status !== 'all') {
+    items = items.filter(i => i.status === options.status);
+  }
+
+  const total = items.length;
+  const start = (page - 1) * pageSize;
+  const paginated = items.slice(start, start + pageSize);
+
+  return {
+    items: paginated as HomePromoSummary[],
+    total,
+  };
+}
+
+export function getHomePromoDetail(id: string): HomePromoRecord | null {
+  return getHomePromoItems().find(i => i.id === id) ?? null;
 }
 
 export function getPublishedHomePromos(): HomePromoRecord[] {
@@ -1093,13 +1234,59 @@ export function getMarketingVideoKpis() {
   const items = getMarketingVideoItems();
   const live = items.filter((item) => item.status === 'published');
   return {
-    total: items.length,
-    live: live.length,
-    draft: items.filter((item) => item.status === 'draft').length,
-    review: items.filter((item) => item.status === 'review').length,
-    impressions: live.reduce((sum, item) => sum + item.impressions, 0),
-    clicks: live.reduce((sum, item) => sum + item.clicks, 0),
+    total: { value: items.length },
+    live: { value: live.length },
+    draft: { value: items.filter((item) => item.status === 'draft').length },
+    review: { value: items.filter((item) => item.status === 'review').length },
+    impressions: { value: live.reduce((sum, item) => sum + item.impressions, 0) },
+    clicks: { value: live.reduce((sum, item) => sum + item.clicks, 0) },
   };
+}
+
+export type MarketingVideoSummary = {
+  id: string;
+  title: string;
+  subtitle: string;
+  status: MarketingVideoStatus;
+  audience: MarketingVideoAudience;
+  videoUrl: string;
+  posterUrl: string;
+  order: number;
+  durationSeconds: number;
+  targetType: MarketingVideoTargetType;
+  source: MarketingVideoSource;
+};
+
+export function getMarketingVideoSummaries(options: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const page = options.page ?? 1;
+  const pageSize = options.pageSize ?? 5;
+  let items = getMarketingVideoItems();
+
+  if (options.search) {
+    const q = options.search.toLowerCase();
+    items = items.filter(i => i.title.toLowerCase().includes(q) || i.subtitle.toLowerCase().includes(q));
+  }
+  if (options.status && options.status !== 'all') {
+    items = items.filter(i => i.status === options.status);
+  }
+
+  const total = items.length;
+  const start = (page - 1) * pageSize;
+  const paginated = items.slice(start, start + pageSize);
+
+  return {
+    items: paginated as MarketingVideoSummary[],
+    total,
+  };
+}
+
+export function getMarketingVideoDetail(id: string): MarketingVideoRecord | null {
+  return getMarketingVideoItems().find(i => i.id === id) ?? null;
 }
 
 export function upsertMarketingVideoItem(item: Partial<MarketingVideoRecord>) {

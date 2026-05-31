@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import { Pressable, StyleSheet, View, Image } from 'react-native';
@@ -335,7 +335,7 @@ export function PromosCommandDeckScreen() {
                 <WebControlPanelCompactPager
                   page={promoPage}
                   totalPages={totalPages}
-                  summaryLabel={`عرض ${visibleItems.length} من ${items.length}`}
+                  summaryLabel={`عرض ${visibleItems.length} من ${totalItems}`}
                   onPrevious={promoPage > 1 ? () => setPromoPage((currentPage) => currentPage - 1) : undefined}
                   onNext={promoPage < totalPages ? () => setPromoPage((currentPage) => currentPage + 1) : undefined}
                 />

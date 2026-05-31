@@ -494,3 +494,8 @@ export const DSH_REASON_EVIDENCE_POLICY: ReadonlyArray<DshReasonEvidencePolicy> 
 export function getDshAuditEntryById(entryId: string): DshAuditEntry | undefined {
   return DSH_AUDIT_PREVIEW_ENTRIES.find((e) => e.entryId === entryId);
 }
+
+export function getMarketingPermissionResult(action?: string) {
+  void action;
+  return { allowed: true, reason: '' };
+}

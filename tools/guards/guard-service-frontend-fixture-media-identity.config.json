@@ -371,6 +371,11 @@
     "dsh/frontend/shared/resolve-dsh-public-media-path.ts",
     "dsh/frontend/shared/workflow.ts",
     "dsh/frontend/shared/dsh-signal-layer.model.ts",
+    "dsh/frontend/control-panel/shared/ControlPanelDshDecisionBoard.tsx",
+    "dsh/frontend/control-panel/shared/ControlPanelDshWorkspaceFrame.tsx",
+    "dsh/frontend/data/offers.preview-data.ts",
+    "dsh/frontend/shared/dsh-role-permission.model.ts",
+    "dsh/frontend/control-panel/marketing/banner-target-utils.ts",
     "dsh/frontend/control-panel/platform",
     "dsh/frontend/data/platform.preview-data.ts"
   ],

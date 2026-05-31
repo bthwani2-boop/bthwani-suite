@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { WebControlActionCard, WebControlDisclosureItem, WebControlPanelKpiStrip, WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
+import { WebControlActionCard, WebControlDisclosureItem, WebControlPanelKpiStrip, WebSectionCard } from '@bthwani/ui-kit/web';
 import { ControlPanelDshDecisionBoard } from './ControlPanelDshDecisionBoard';
 import type { DshUnifiedRecommendation } from '../../data/platform.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
@@ -10,7 +10,7 @@ type WorkspaceSignal = {
   title: string;
   value: string;
   description: string;
-  tone?: React.ComponentProps<typeof WebSignalCard>['tone'];
+  tone?: 'brand' | 'best' | 'warning' | 'danger' | 'success' | 'neutral' | string;
 };
 
 type WorkspaceAction = {
@@ -52,7 +52,7 @@ export type ControlPanelDshWorkspaceFrameProps = {
     ownerSurface: string;
     evidenceHint: string;
     routeHint: string;
-    decisionTone?: React.ComponentProps<typeof WebSignalCard>['tone'];
+    decisionTone?: 'brand' | 'best' | 'warning' | 'danger' | 'success' | 'neutral' | string;
     recommendation?: DshUnifiedRecommendation;
   };
   footerNote?: string;
@@ -132,11 +132,25 @@ export function ControlPanelDshWorkspaceFrame({
         <div className={styles.surfaceInnerScroll}>
           <Box gap={3}>
             {signals.length ? (
-              <Box gap={2}>
+              <div className={styles.surfacePulseCompact} style={{ flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
                 {signals.map((signal) => (
-                  <WebSignalCard key={signal.id} title={signal.title} value={signal.value} description={signal.description} tone={signal.tone} />
+                  <div key={signal.id} className={styles.commandKpi} style={{ flex: 1, minWidth: '140px' }}>
+                    <span className={styles.commandKpiLabel}>{signal.title}</span>
+                    <div className={styles.commandKpiTrend}>
+                      <span className={`${styles.commandKpiValue} ${
+                        signal.tone === 'best' || signal.tone === 'success' ? styles.commandKpiValueSuccess :
+                        signal.tone === 'warning' ? styles.commandKpiValueAlert :
+                        signal.tone === 'danger' ? styles.commandKpiValueDanger : ''
+                      }`}>
+                        {signal.value}
+                      </span>
+                      <span className={styles.commandKpiTrendValue} style={{ color: 'var(--bthwani-control-panel-text-muted)', fontWeight: '600' }}>
+                        {signal.description}
+                      </span>
+                    </div>
+                  </div>
                 ))}
-              </Box>
+              </div>
             ) : null}
 
             {decisionBoard ? (

@@ -181,6 +181,50 @@ export function removePartnerOfferItem(id: string) {
   setOfferMutableStore(getPartnerOfferItems().filter(item => item.id !== id));
 }
 
+export type PartnerOfferSummary = {
+  id: string;
+  title: string;
+  partnerName: string;
+  storeId: string;
+  storeLabel: string;
+  offerType: PartnerOfferType;
+  status: PartnerOfferStatus;
+  source: PartnerOfferSource;
+  valueLabel: string;
+};
+
+export function getPartnerOfferSummaries(options: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const page = options.page ?? 1;
+  const pageSize = options.pageSize ?? 5;
+  let items = getPartnerOfferItems();
+
+  if (options.search) {
+    const q = options.search.toLowerCase();
+    items = items.filter(i => i.title.toLowerCase().includes(q) || i.partnerName.toLowerCase().includes(q));
+  }
+  if (options.status && options.status !== 'all') {
+    items = items.filter(i => i.status === options.status);
+  }
+
+  const total = items.length;
+  const start = (page - 1) * pageSize;
+  const paginated = items.slice(start, start + pageSize);
+
+  return {
+    items: paginated as PartnerOfferSummary[],
+    total,
+  };
+}
+
+export function getPartnerOfferDetail(id: string): PartnerOfferRecord | null {
+  return getPartnerOfferItems().find(i => i.id === id) ?? null;
+}
+
 export function selectDshClientOffersPreview(customerId?: string) {
   void customerId;
   return getPartnerOfferItems().filter((offer) => isPartnerOfferClientVisible(offer.status));
