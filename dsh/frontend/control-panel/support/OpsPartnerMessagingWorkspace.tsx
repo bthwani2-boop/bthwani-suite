@@ -136,7 +136,7 @@ export function OpsPartnerMessagingWorkspace({
                 label="رسالة للشريك"
                 value={draft}
                 onChangeText={setDraft}
-                placeholder="اكتب ردًا مرتبطًا بالطلب أو الكتالوج أو مشكلة الـ handoff..."
+                placeholder="اكتب ردًا مرتبطًا بالطلب أو الكتالوج أو مشكلة التسليم..."
               />
               <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 <Button

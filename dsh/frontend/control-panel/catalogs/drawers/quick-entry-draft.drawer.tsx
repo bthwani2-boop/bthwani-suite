@@ -188,11 +188,11 @@ export function CatalogQuickEntryDraftWorkspace({
         {/* Media Key */}
         <Box gap={1}>
           <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
-            Media Key (اختياري)
+            مفتاح الميديا (اختياري)
           </Text>
           <select
-            aria-label="Media Key للمنتج"
-            title="Media Key للمنتج"
+            aria-label="مفتاح الميديا للمنتج"
+            title="مفتاح الميديا للمنتج"
             value={form.mediaKey}
             onChange={(e) => setForm((f) => ({ ...f, mediaKey: e.target.value }))}
             style={{

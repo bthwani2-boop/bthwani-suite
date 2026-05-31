@@ -115,11 +115,11 @@ const PARTNER_GATE_PREVIEW: readonly MarketingPartnerGateSeed[] = [
   },
   {
     id: 'partner-delivery-ready',
-    title: 'شريك أكمل أوضاع التوصيل لكنه لم يصل بعد إلى client visibility',
+    title: 'شريك أكمل أوضاع التوصيل لكنه لم يصل بعد إلى ظهور العميل',
     status: 'delivery_modes_ready',
     affectedSurface: 'control-panel',
     routeTab: 'signals',
-    routeLabel: 'فتح handoff الإشارات',
+    routeLabel: 'فتح إشارات التسليم',
   },
   {
     id: 'partner-client-visible',
@@ -134,7 +134,7 @@ const PARTNER_GATE_PREVIEW: readonly MarketingPartnerGateSeed[] = [
 const PRODUCT_GATE_PREVIEW: readonly MarketingProductGateSeed[] = [
   {
     id: 'product-marketing-review',
-    title: 'منتج بانتظار اعتماد التسويق قبل أي placement',
+    title: 'منتج بانتظار اعتماد التسويق للنشر',
     approvalStatus: 'marketing_review',
     partnerStatus: 'delivery_modes_ready',
     categoryMappingStatus: 'mapped',
@@ -441,7 +441,7 @@ export function VisibilityCommandDeckScreen({
       id: 'segments',
       title: 'ملخص الشرائح',
       visible: `${commercialProjection.badges.length}`,
-      note: 'عرض توزيعات الجمهور والشرائح المستهدفة للعروض والـ Placements النشطة للعملاء.',
+      note: 'عرض توزيعات الجمهور والشرائح المستهدفة للعروض والتوزيعات النشطة للعملاء.',
     },
   ].filter((row) => activeSubTab === '' || activeSubTab === row.id);
 
@@ -542,7 +542,7 @@ export function VisibilityCommandDeckScreen({
           </div>
 
           <div className={marketingStyles.surfaceCard}>
-            <h3 className={marketingStyles.surfaceCardTitle}>بوابة نشر المنتج قبل placement</h3>
+            <h3 className={marketingStyles.surfaceCardTitle}>بوابة نشر المنتج</h3>
             <div className={marketingStyles.listStack}>
               {productGateRows.map((row) => (
                 <div key={row.id} className={marketingStyles.tickerRow}>
@@ -563,7 +563,7 @@ export function VisibilityCommandDeckScreen({
                     <div className={marketingStyles.planNote}>
                       {row.blockers.length > 0
                         ? row.blockers.map((blocker: any) => blocker.blockedReason ?? blocker.label).join(' · ')
-                        : 'جميع متطلبات النشر مستوفاة ويمكن تمرير المنتج إلى الحملات أو الـ placements العميلية.'}
+                        : 'جميع متطلبات النشر مستوفاة ويمكن تمرير المنتج إلى الحملات أو التوزيعات التسويقية.'}
                     </div>
                   </div>
                   <div className={marketingStyles.tickerActions}>
@@ -602,7 +602,7 @@ export function VisibilityCommandDeckScreen({
                 },
                 {
                   id: 'campaigns-lane',
-                  title: 'الحملات والـ placements',
+                  title: 'الحملات والتوزيعات التسويقية',
                   tone: commercialProjection.isClientVisible ? 'success' as const : 'warning' as const,
                   statusLabel: `${visibleCampaigns.length} فعّالة / ${blockedCampaigns.length} خارج gate`,
                   note: commercialProjection.isClientVisible

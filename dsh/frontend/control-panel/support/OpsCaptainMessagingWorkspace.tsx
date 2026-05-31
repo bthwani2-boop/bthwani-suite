@@ -112,14 +112,14 @@ export function OpsCaptainMessagingWorkspace({
             <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <Chip label={DEMO_TICKET.ticketCode} tone="brand" />
               <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone="default" />
-              <Chip label="handoff / توصيل / إثبات" />
+              <Chip label="تسليم / توصيل / إثبات" />
               {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
 
             {/* Boundary note */}
             <Surface tone="inset" padding={2} gap={1}>
               <Text role="caption" tone="muted">
-                الكابتن يرى حالات الـ handoff والتسليم والإثبات فقط. أي تصعيد يمر عبر control-panel — لا مسار مباشر خارج هذا الصف.
+                الكابتن يرى حالات التسليم والتوصيل والإثبات فقط. أي تصعيد يمر عبر لوحة التحكم — لا مسار مباشر خارج هذا الصف.
               </Text>
             </Surface>
 
@@ -143,7 +143,7 @@ export function OpsCaptainMessagingWorkspace({
                 label="رسالة للكابتن"
                 value={draft}
                 onChangeText={setDraft}
-                placeholder="اكتب تحديثًا موجزًا مرتبطًا بالـ handoff أو التسليم أو الإثبات..."
+                placeholder="اكتب تحديثًا موجزًا مرتبطًا بالتسليم أو التوصيل أو الإثبات..."
               />
               <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 <Button

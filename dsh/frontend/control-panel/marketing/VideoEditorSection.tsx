@@ -166,7 +166,7 @@ export function VideoEditorSection({
               </View>
               <View style={{ flex: 1, direction: 'ltr' }}>
                 <TextField
-                  label="رابط الغلاف (Poster)"
+                  label="رابط الغلاف"
                   value={draft.posterUrl}
                   onChangeText={(v) => setDraft(d => ({ ...d, posterUrl: v }))}
                   placeholder="poster-url..."

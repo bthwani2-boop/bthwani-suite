@@ -386,7 +386,7 @@ export function ControlPanelDshPartnerHubScreen() {
             {partnersGovernance?.notes ?? 'قسم الشركاء يملك onboarding والاعتماد والجاهزية والتعطيل، بينما الشريك والميدان يجمعان البيانات فقط.'}
           </Text>
           <Text role="caption" tone="muted">
-            {`handoff: ${marketingGovernance?.sectionLabel ?? 'Marketing'} للعروض، ${catalogsGovernance?.sectionLabel ?? 'Catalogs'} لاعتماد الكتالوج، ولا يوجد تفعيل نهائي من app-partner.`}
+            {`تسليم: ${marketingGovernance?.sectionLabel ?? 'التسويق'} للعروض، ${catalogsGovernance?.sectionLabel ?? 'الكتالوجات'} لاعتماد الكتالوج، ولا يوجد تفعيل نهائي من app-partner.`}
           </Text>
         </Surface>
       </Box>

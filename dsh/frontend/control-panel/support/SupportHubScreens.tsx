@@ -44,12 +44,15 @@ type SupportRouteContext = {
   callId?: string;
 };
 
+type SupportRowKey = string;
+type SupportRowDisplay = string;
+
 type SupportRow = {
-  id: string;
+  id: SupportRowKey;
   flowId: DshOperationsSupportFlowId;
   registryFlowId?: string;
   surface: string;
-  title: string;
+  title: SupportRowDisplay;
   status: string;
   severity: 'danger' | 'warning' | 'success';
   slaAge: string;
@@ -133,8 +136,8 @@ const SUPPORT_REGISTRY_FLOW_MAP: Partial<Record<DshOperationsSupportFlowId, stri
 
 const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
   { id: 'queue', label: 'صفوف الدعم' },
-  { id: 'customer-360', label: 'Customer 360' },
-  { id: 'call-intake', label: 'Call Intake' },
+  { id: 'customer-360', label: 'ملف العميل المتكامل' },
+  { id: 'call-intake', label: 'استقبال المكالمات' },
   { id: 'disputes', label: 'النزاعات' },
   { id: 'feedback', label: 'الآراء' },
   { id: 'escalation', label: 'التصعيد' },
@@ -235,43 +238,43 @@ function buildSupportHref(tab: SupportTab, context?: SupportRouteContext) {
   return `/support?${searchParams.toString()}`;
 }
 
-function buildSupportRow(seed: SupportRowSeed): SupportRow {
-  const preview = getOperationsSupportFlowPreview(seed.flowId);
-  const registryFlowId = SUPPORT_REGISTRY_FLOW_MAP[seed.flowId];
+function buildSupportRow(rowData: SupportRowSeed): SupportRow {
+  const flowEntry = getOperationsSupportFlowPreview(rowData.flowId);
+  const registryFlowId = SUPPORT_REGISTRY_FLOW_MAP[rowData.flowId];
   const flowSummary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
   const governanceEntry = registryFlowId ? findDshControlPanelGovernanceSectionByFlowId(registryFlowId) : SUPPORT_GOVERNANCE;
   const governanceSectionLabel = governanceEntry?.sectionLabel ?? resolveDshControlPanelSectionLabel('support');
   const financeReference = flowSummary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined;
-  const forbiddenPreview = (flowSummary?.forbiddenActions ?? preview.forbiddenActions).slice(0, 2).join('، ');
+  const forbiddenPreview = (flowSummary?.forbiddenActions ?? flowEntry.forbiddenActions).slice(0, 2).join('، ');
 
   return {
-    id: seed.id,
-    flowId: seed.flowId,
+    id: rowData.id,
+    flowId: rowData.flowId,
     registryFlowId,
-    surface: seed.surface,
-    title: preview.title,
-    status: seed.status,
+    surface: rowData.surface,
+    title: flowEntry.title,
+    status: rowData.status,
     severity:
-      preview.severity === 'danger'
+      flowEntry.severity === 'danger'
         ? 'danger'
-        : preview.severity === 'warning'
+        : flowEntry.severity === 'warning'
           ? 'warning'
           : 'warning',
-    slaAge: seed.slaAge,
-    owner: preview.ownerLabel,
-    fulfillmentMode: seed.fulfillmentMode,
-    fulfillmentLabel: seed.fulfillmentLabel,
-    responsibleActor: seed.responsibleActor,
-    blocker: preview.description,
-    evidence: seed.evidence,
-    nextAction: preview.nextAction,
+    slaAge: rowData.slaAge,
+    owner: flowEntry.ownerLabel,
+    fulfillmentMode: rowData.fulfillmentMode,
+    fulfillmentLabel: rowData.fulfillmentLabel,
+    responsibleActor: rowData.responsibleActor,
+    blocker: flowEntry.description,
+    evidence: rowData.evidence,
+    nextAction: flowEntry.nextAction,
     recommendation: `قسم المتابعة: ${governanceSectionLabel}`,
     governanceSectionLabel,
     policyLabel: resolveSupportPolicyLabel(flowSummary?.onDemandPolicy),
     forbiddenPreview,
     financeReference,
-    primaryActionLabel: seed.primaryActionLabel,
-    secondaryActionLabel: seed.secondaryActionLabel,
+    primaryActionLabel: rowData.primaryActionLabel,
+    secondaryActionLabel: rowData.secondaryActionLabel,
   };
 }
 

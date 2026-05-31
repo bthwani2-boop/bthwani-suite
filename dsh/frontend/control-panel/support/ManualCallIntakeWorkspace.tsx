@@ -31,20 +31,16 @@ export type ManualCallIntakeWorkspaceProps = {
 };
 
 const VERIFICATION_STATUS_META = {
-  verified: { label: 'verified', tone: 'success' as const },
-  required: { label: 'required', tone: 'warning' as const },
-  blocked: { label: 'blocked', tone: 'danger' as const },
+  verified: { label: 'موثق', tone: 'success' as const },
+  required: { label: 'مطلوب', tone: 'warning' as const },
+  blocked: { label: 'محظور', tone: 'danger' as const },
 } as const;
 
-function ManualCallSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+type ManualSectionHeading = string;
+type ManualSectionNote = string;
+type ManualCallSectionProps = { title: ManualSectionHeading; description?: ManualSectionNote; children: React.ReactNode };
+
+function ManualCallSection({ title, description, children }: ManualCallSectionProps) {
   return (
     <div className={styles.surfaceInfoCard}>
       <div className={styles.surfaceInfoCardTextBlock}>
@@ -94,20 +90,20 @@ export function ManualCallIntakeWorkspace({
   );
   const kpis = React.useMemo(
     () => [
-      { id: 'calls', label: 'manual calls', value: String(DSH_CALL_INTAKE_PREVIEW.length), tone: 'neutral' as const },
+      { id: 'calls', label: 'مكالمات يدوية', value: String(DSH_CALL_INTAKE_PREVIEW.length), tone: 'neutral' as const },
       {
         id: 'verified',
-        label: 'verified',
+        label: 'هويات موثقة',
         value: String(DSH_CALL_INTAKE_PREVIEW.filter((item) => item.identityVerificationResult.verificationStatus === 'verified').length),
         tone: 'success' as const,
       },
       {
         id: 'blocked',
-        label: 'blocked identity',
+        label: 'هويات محظورة',
         value: String(DSH_CALL_INTAKE_PREVIEW.filter((item) => item.closeCallOutcome.outcome === 'blocked_identity').length),
         tone: 'warning' as const,
       },
-      { id: 'source', label: 'source', value: 'external_phone_manual', tone: 'danger' as const },
+      { id: 'source', label: 'المصدر', value: 'هاتفي يدوي', tone: 'danger' as const },
     ],
     [],
   );
@@ -184,9 +180,9 @@ export function ManualCallIntakeWorkspace({
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>Manual Call Intake</h2>
+        <h2 className={styles.surfaceSectionTitle}>استقبال المكالمات اليدوية</h2>
         <p className={styles.surfaceSectionSubtitle}>
-          external_phone_manual فقط: lookup ثم reason ثم identity/ticket preview ثم transfer/close outcome، من دون أي call runtime أو mutation مالي.
+          هاتفي يدوي فقط: بحث العميل، ثم سبب المكالمة، ثم معاينة الهوية والتذكرة، ثم التحويل أو الإغلاق — بدون أي وقت تشغيل للمكالمة أو تعديل مالي.
         </p>
       </div>
 
@@ -206,8 +202,8 @@ export function ManualCallIntakeWorkspace({
                   status={recordVerificationMeta.label}
                   statusTone={recordVerificationMeta.tone}
                   recommendation={record.nextAction}
-                  reason={`source=${record.source} · reason=${record.callReasonSelector.selectedReason}`}
-                  sla={`ticket=${record.ticketPreview.ticketId} · outcome=${record.closeCallOutcome.outcome}`}
+                  reason={`مصدر=${record.source} · سبب=${record.callReasonSelector.selectedReason}`}
+                  sla={`تذكرة=${record.ticketPreview.ticketId} · نتيجة=${record.closeCallOutcome.outcome}`}
                   primaryAction={{
                     id: `${record.intakeId}-open`,
                     label: 'فتح المكالمة',
@@ -215,7 +211,7 @@ export function ManualCallIntakeWorkspace({
                   }}
                   secondaryAction={{
                     id: `${record.intakeId}-customer360`,
-                    label: 'فتح Customer 360',
+                    label: 'فتح ملف العميل',
                     onAction: () =>
                       onOpenCustomer360
                         ? onOpenCustomer360({
@@ -244,8 +240,8 @@ export function ManualCallIntakeWorkspace({
 
           <div className={styles.surfaceGridTwoCol}>
             <ManualCallSection
-              title="lookup inputs"
-              description={`source=${selectedRecord.source} · ${selectedRecord.onDemandPolicy}`}
+              title="بيانات البحث"
+              description={`مصدر=${selectedRecord.source} · ${selectedRecord.onDemandPolicy}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 {selectedRecord.lookupPanel.inputs.map((input) => (
@@ -258,13 +254,13 @@ export function ManualCallIntakeWorkspace({
             </ManualCallSection>
 
             <ManualCallSection
-              title="call reason selector"
-              description={`selected=${selectedRecord.callReasonSelector.selectedReason} · ${selectedRecord.callReasonSelector.previewClassification}`}
+              title="سبب المكالمة"
+              description={`محدد=${selectedRecord.callReasonSelector.selectedReason} · ${selectedRecord.callReasonSelector.previewClassification}`}
             >
               <div className={styles.surfaceActionWrap}>
                 {selectedRecord.callReasonSelector.options.map((reason) => (
                   <span key={reason} className={styles.surfaceMetaChip}>
-                    {reason === selectedRecord.callReasonSelector.selectedReason ? 'selected' : 'available'} · {reason}
+                    {reason === selectedRecord.callReasonSelector.selectedReason ? 'محدد' : 'متاح'} · {reason}
                   </span>
                 ))}
               </div>
@@ -273,16 +269,16 @@ export function ManualCallIntakeWorkspace({
 
           <div className={styles.surfaceGridTwoCol}>
             <ManualCallSection
-              title="identity verification result"
-              description={`status=${verificationMeta.label} · ${selectedRecord.identityVerificationResult.previewClassification}`}
+              title="نتيجة التحقق من الهوية"
+              description={`حالة=${verificationMeta.label} · ${selectedRecord.identityVerificationResult.previewClassification}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>verification</strong>
+                  <strong>التحقق</strong>
                   <span>{selectedRecord.identityVerificationResult.verificationStatus}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>locked</strong>
+                  <strong>الحقول المحظورة</strong>
                   <span>{selectedRecord.identityVerificationResult.sensitiveFieldsLocked.join('، ')}</span>
                 </div>
               </div>
@@ -294,25 +290,25 @@ export function ManualCallIntakeWorkspace({
                 ))}
               </div>
               <p className={styles.surfaceFootnote}>
-                forbidden actions: {selectedRecord.forbiddenActions.join(' · ')}
+                الإجراءات المحظورة: {selectedRecord.forbiddenActions.join(' · ')}
               </p>
             </ManualCallSection>
 
             <ManualCallSection
-              title="create / link ticket preview"
-              description={`mode=${selectedRecord.ticketPreview.mode} · auditRequired=${String(selectedRecord.ticketPreview.auditRequired)}`}
+              title="إنشاء / ربط تذكرة"
+              description={`وضع=${selectedRecord.ticketPreview.mode} · تدقيق=${String(selectedRecord.ticketPreview.auditRequired)}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>ticketId</strong>
+                  <strong>رقم التذكرة</strong>
                   <span>{selectedRecord.ticketPreview.ticketId}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>summary</strong>
+                  <strong>الملخص</strong>
                   <span>{selectedRecord.ticketPreview.summary}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>route</strong>
+                  <strong>المسار</strong>
                   <span>{selectedRecord.ticketPreview.routeHint}</span>
                 </div>
               </div>
@@ -320,8 +316,8 @@ export function ManualCallIntakeWorkspace({
           </div>
 
           <ManualCallSection
-            title="transfer context to operations"
-            description="to assisted-order-desk / to order-rescue / to support escalation"
+            title="تحويل السياق إلى العمليات"
+            description="مساعدة الطلب / إنقاذ الطلب / تصعيد الدعم"
           >
             <Box gap={2}>
               {selectedRecord.transferContextToOperations.map((action) => (
@@ -329,9 +325,9 @@ export function ManualCallIntakeWorkspace({
                   key={action.actionId}
                   entityId={selectedRecord.ticketPreview.ticketId}
                   entityLabel={action.label}
-                  status={action.routeId ?? 'routeHint'}
+                  status={action.routeId ?? 'مسار'}
                   statusTone="neutral"
-                  recommendation={`${action.onDemandPolicy} · audit=${String(action.auditRequired ?? false)}`}
+                  recommendation={`${action.onDemandPolicy} · تدقيق=${String(action.auditRequired ?? false)}`}
                   reason={action.routeHint}
                   primaryAction={{
                     id: action.actionId,
@@ -345,28 +341,28 @@ export function ManualCallIntakeWorkspace({
 
           <div className={styles.surfaceGridTwoCol}>
             <ManualCallSection
-              title="close call outcome"
-              description={`outcome=${selectedRecord.closeCallOutcome.outcome} · auditRequired=${String(selectedRecord.closeCallOutcome.auditRequired)}`}
+              title="نتيجة إغلاق المكالمة"
+              description={`نتيجة=${selectedRecord.closeCallOutcome.outcome} · تدقيق=${String(selectedRecord.closeCallOutcome.auditRequired)}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>summary</strong>
+                  <strong>الملخص</strong>
                   <span>{selectedRecord.closeCallOutcome.summary}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>signal</strong>
+                  <strong>الإشارة</strong>
                   <span>{selectedRecord.closeCallOutcome.signal.routeId}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>priority</strong>
+                  <strong>الأولوية</strong>
                   <span>{selectedRecord.closeCallOutcome.signal.priorityLabel}</span>
                 </div>
               </div>
             </ManualCallSection>
 
             <ManualCallSection
-              title="audit + quick actions"
-              description={`auditRequired=${String(selectedRecord.auditRequired)} · IDs/references first`}
+              title="التدقيق والإجراءات السريعة"
+              description={`تدقيق=${String(selectedRecord.auditRequired)} · المعرّفات أولاً`}
             >
               <Box gap={2}>
                 {selectedRecord.quickActions.map((action) => (
@@ -376,7 +372,7 @@ export function ManualCallIntakeWorkspace({
                     entityLabel={action.label}
                     status={action.surfaceId}
                     statusTone={action.readOnly ? 'warning' : 'neutral'}
-                    recommendation={`${action.routeId ?? 'routeHint'} · ${action.onDemandPolicy}`}
+                    recommendation={`${action.routeId ?? 'مسار'} · ${action.onDemandPolicy}`}
                     reason={action.routeHint}
                     primaryAction={{
                       id: `${selectedRecord.intakeId}-${action.actionId}`,

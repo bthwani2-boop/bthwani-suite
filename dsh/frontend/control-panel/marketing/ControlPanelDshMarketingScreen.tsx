@@ -131,12 +131,12 @@ type MarketingProductGateSeed = Record<'id' | 'title', string> & {
 
 const PARTNER_GATE_PREVIEW: readonly MarketingPartnerGateSeed[] = [
   { id: 'partner-docs-missing', title: 'شريك ينتظر استكمال الوثائق قبل أي ظهور تسويقي', status: 'documents_missing', affectedSurface: 'app-partner', routeTab: 'signals', routeLabel: 'فتح الإشارات' },
-  { id: 'partner-delivery-ready', title: 'شريك أكمل أوضاع التوصيل لكنه لم يصل بعد إلى client visibility', status: 'delivery_modes_ready', affectedSurface: 'control-panel', routeTab: 'signals', routeLabel: 'فتح handoff الإشارات' },
+  { id: 'partner-delivery-ready', title: 'شريك أكمل أوضاع التوصيل لكنه لم يصل بعد إلى ظهور العميل', status: 'delivery_modes_ready', affectedSurface: 'control-panel', routeTab: 'signals', routeLabel: 'فتح إشارات التسليم' },
   { id: 'partner-client-visible', title: 'شريك جاهز للحملات لأنه ظاهر فعليًا في app-client', status: 'client_visible', affectedSurface: 'app-client', routeTab: 'campaigns', routeLabel: 'فتح الحملات' },
 ];
 
 const PRODUCT_GATE_PREVIEW: readonly MarketingProductGateSeed[] = [
-  { id: 'product-marketing-review', title: 'منتج بانتظار اعتماد التسويق قبل أي placement', approvalStatus: 'marketing_review', partnerStatus: 'delivery_modes_ready', categoryMappingStatus: 'mapped', duplicateStatus: 'clean', deliveryModesReady: true, mediaPolicySatisfied: false, routeTab: 'media-review', routeLabel: 'فتح مراجعة الميديا' },
+  { id: 'product-marketing-review', title: 'منتج بانتظار اعتماد التسويق للنشر', approvalStatus: 'marketing_review', partnerStatus: 'delivery_modes_ready', categoryMappingStatus: 'mapped', duplicateStatus: 'clean', deliveryModesReady: true, mediaPolicySatisfied: false, routeTab: 'media-review', routeLabel: 'فتح مراجعة الميديا' },
   { id: 'product-ready-for-campaign', title: 'منتج اجتاز بوابات النشر وأصبح صالحًا للحملة', approvalStatus: 'client_visible', partnerStatus: 'client_visible', categoryMappingStatus: 'mapped', duplicateStatus: 'clean', deliveryModesReady: true, mediaPolicySatisfied: true, routeTab: 'campaigns', routeLabel: 'فتح الحملات' },
   { id: 'product-needs-fix', title: 'منتج محجوب عن الظهور بسبب publish blockers متعددة', approvalStatus: 'needs_fix', partnerStatus: 'catalog_ready', categoryMappingStatus: 'unmapped', duplicateStatus: 'possible_duplicate', deliveryModesReady: false, mediaPolicySatisfied: false, routeTab: 'media-review', routeLabel: 'فتح مسار التصحيح' },
 ];

@@ -27,9 +27,9 @@ export type Customer360WorkspaceProps = {
 };
 
 const VERIFICATION_STATUS_META = {
-  verified: { label: 'verified', tone: 'success' as const },
-  required: { label: 'required', tone: 'warning' as const },
-  blocked: { label: 'blocked', tone: 'danger' as const },
+  verified: { label: 'موثق', tone: 'success' as const },
+  required: { label: 'مطلوب', tone: 'warning' as const },
+  blocked: { label: 'محظور', tone: 'danger' as const },
 } as const;
 
 const TICKET_STATUS_META = {
@@ -38,15 +38,11 @@ const TICKET_STATUS_META = {
   escalated: { tone: 'danger' as const },
 } as const;
 
-function Customer360Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+type SectionHeadingText = string;
+type SectionNoteText = string;
+type Customer360SectionProps = { title: SectionHeadingText; description?: SectionNoteText; children: React.ReactNode };
+
+function Customer360Section({ title, description, children }: Customer360SectionProps) {
   return (
     <div className={styles.surfaceInfoCard}>
       <div className={styles.surfaceInfoCardTextBlock}>
@@ -96,19 +92,19 @@ export function Customer360Workspace({
       { id: 'customers', label: 'سجلات 360', value: String(DSH_CUSTOMER_360_PREVIEW.length), tone: 'neutral' as const },
       {
         id: 'verified',
-        label: 'verified',
+        label: 'موثقون',
         value: String(DSH_CUSTOMER_360_PREVIEW.filter((item) => item.verificationStatus === 'verified').length),
         tone: 'success' as const,
       },
       {
         id: 'escalated',
-        label: 'tickets escalated',
+        label: 'تذاكر مصعّدة',
         value: String(
           DSH_CUSTOMER_360_PREVIEW.flatMap((item) => item.ticketsHistory).filter((ticket) => ticket.status === 'escalated').length,
         ),
         tone: 'warning' as const,
       },
-      { id: 'wlt', label: 'WLT', value: 'read-only', tone: 'danger' as const },
+      { id: 'wlt', label: 'المحفظة المالية WLT', value: 'قراءة فقط', tone: 'danger' as const },
     ],
     [],
   );
@@ -168,9 +164,9 @@ export function Customer360Workspace({
   return (
     <div className={styles.surfaceCockpitContent}>
       <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>Customer 360</h2>
+        <h2 className={styles.surfaceSectionTitle}>ملف العميل المتكامل</h2>
         <p className={styles.surfaceSectionSubtitle}>
-          summary first ثم details on open: filters، آخر 5 طلبات، history، WLT visibility، notes، ثم quick actions إلى العمليات أو الدعم.
+          ملخص أولاً ثم تفاصيل عند الفتح: الفلاتر، آخر 5 طلبات، السجل التاريخي، رؤية المحفظة المالية WLT، الملاحظات، ثم الإجراءات السريعة إلى العمليات أو الدعم.
         </p>
       </div>
 
@@ -190,16 +186,16 @@ export function Customer360Workspace({
                   status={verificationMeta.label}
                   statusTone={verificationMeta.tone}
                   recommendation={item.wltVisibilitySummary}
-                  reason={`${item.searchFilters.areaZoneLabel} · order=${item.activeOrderId ?? '—'} · ticket=${item.openTicketId ?? '—'}`}
-                  sla={`filters=${item.searchFilters.dateRangeLabel} · ${item.searchFilters.wltVisibilityLabel}`}
+                  reason={`${item.searchFilters.areaZoneLabel} · طلب=${item.activeOrderId ?? '—'} · تذكرة=${item.openTicketId ?? '—'}`}
+                  sla={`فلتر=${item.searchFilters.dateRangeLabel} · ${item.searchFilters.wltVisibilityLabel}`}
                   primaryAction={{
                     id: `${item.customerId}-open`,
-                    label: 'فتح customer',
+                    label: 'فتح سجل العميل',
                     onAction: () => setSelectedCustomerId(item.customerId),
                   }}
                   secondaryAction={{
                     id: `${item.customerId}-ops`,
-                    label: 'فتح Assisted Order',
+                    label: 'فتح مساعدة الطلب',
                     onAction: () =>
                       onOpenAssistedOrder
                         ? onOpenAssistedOrder({
@@ -227,8 +223,8 @@ export function Customer360Workspace({
 
           <div className={styles.surfaceGridTwoCol}>
             <Customer360Section
-              title="search / filter"
-              description={`date=${selectedRecord.searchFilters.dateRangeLabel} · delivery=${searchDeliveryModeLabel}`}
+              title="البحث والفلتر"
+              description={`تاريخ=${selectedRecord.searchFilters.dateRangeLabel} · توصيل=${searchDeliveryModeLabel}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 {selectedRecord.searchFilters.lookupInputs.map((input) => (
@@ -238,51 +234,51 @@ export function Customer360Workspace({
                   </div>
                 ))}
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>ticket status</strong>
+                  <strong>حالة التذكرة</strong>
                   <span>{selectedRecord.searchFilters.ticketStatus}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>WLT visibility</strong>
+                  <strong>رؤية المحفظة المالية WLT</strong>
                   <span>{selectedRecord.searchFilters.wltVisibilityLabel}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>area / zone</strong>
+                  <strong>المنطقة / النطاق</strong>
                   <span>{selectedRecord.searchFilters.areaZoneLabel}</span>
                 </div>
               </div>
             </Customer360Section>
 
             <Customer360Section
-              title="WLT visibility"
-              description={`classification=${selectedRecord.wltReadOnlyVisibility.placeholderClassification} · ${selectedRecord.wltReadOnlyVisibility.calculationTruthOwner}`}
+              title="رؤية المحفظة المالية WLT"
+              description={`تصنيف=${selectedRecord.wltReadOnlyVisibility.placeholderClassification} · ${selectedRecord.wltReadOnlyVisibility.calculationTruthOwner}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>payment</strong>
+                  <strong>الدفع</strong>
                   <span>{selectedRecord.wltReadOnlyVisibility.paymentVisibility}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>refund</strong>
+                  <strong>الاسترداد</strong>
                   <span>{selectedRecord.wltReadOnlyVisibility.refundVisibility}</span>
                 </div>
                 {selectedRecord.wltReadOnlyVisibility.settlementVisibility ? (
                   <div className={styles.surfaceInspectorRow}>
-                    <strong>settlement</strong>
+                    <strong>التسوية</strong>
                     <span>{selectedRecord.wltReadOnlyVisibility.settlementVisibility}</span>
                   </div>
                 ) : null}
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>route</strong>
+                  <strong>المسار</strong>
                   <span>{selectedRecord.wltReadOnlyVisibility.routeHint}</span>
                 </div>
               </div>
-              <p className={styles.surfaceFootnote}>No mutation. Payment, refund, and settlement truth remain WLT-owned.</p>
+              <p className={styles.surfaceFootnote}>للقراءة فقط — حقائق الدفع والاسترداد والتسوية تبقى مملوكة لـ WLT.</p>
             </Customer360Section>
           </div>
 
           <Customer360Section
-            title="last 5 orders summary"
-            description={`verification=${selectedVerificationMeta.label} · ${selectedRecord.onDemandPolicy}`}
+            title="ملخص آخر 5 طلبات"
+            description={`توثيق=${selectedVerificationMeta.label} · ${selectedRecord.onDemandPolicy}`}
           >
             <Box gap={2}>
               {selectedRecord.lastFiveOrdersSummary.map((order) => (
@@ -293,8 +289,8 @@ export function Customer360Workspace({
                   status={order.lifecycleStatus}
                   statusTone={order.refundVisibility.toLowerCase().includes('refund') ? 'warning' : 'neutral'}
                   recommendation={order.paymentVisibility}
-                  reason={`refund=${order.refundVisibility} · latestTicket=${order.latestTicket}`}
-                  sla={`route=${order.primaryAction.routeId ?? order.primaryAction.routeHint}`}
+                  reason={`استرداد=${order.refundVisibility} · آخر تذكرة=${order.latestTicket}`}
+                  sla={`مسار=${order.primaryAction.routeId ?? order.primaryAction.routeHint}`}
                   primaryAction={{
                     id: order.primaryAction.actionId,
                     label: order.primaryAction.label,
@@ -307,8 +303,8 @@ export function Customer360Workspace({
 
           <div className={styles.surfaceGridTwoCol}>
             <Customer360Section
-              title="tickets history"
-              description="open / resolved / escalated مع SLA وowner وlatest note."
+              title="سجل التذاكر"
+              description="مفتوحة / محلولة / مصعّدة مع مدة SLA وصاحب التذكرة وآخر ملاحظة."
             >
               <Box gap={2}>
                 {selectedRecord.ticketsHistory.map((ticket) => (
@@ -319,11 +315,11 @@ export function Customer360Workspace({
                     status={ticket.statusLabel}
                     statusTone={TICKET_STATUS_META[ticket.status].tone}
                     recommendation={ticket.latestNote}
-                    reason={`route=${ticket.routeHint}`}
-                    sla={`SLA ${ticket.sla}`}
+                    reason={`مسار=${ticket.routeHint}`}
+                    sla={`مدة SLA: ${ticket.sla}`}
                     primaryAction={{
                       id: `${ticket.ticketId}-open`,
-                      label: 'فتح ticket',
+                      label: 'فتح التذكرة',
                       onAction: () => openRouteHint(ticket.routeHint),
                     }}
                   />
@@ -332,17 +328,17 @@ export function Customer360Workspace({
             </Customer360Section>
 
             <Customer360Section
-              title="address / serviceability"
-              description={`status=${selectedRecord.addressServiceability.serviceabilityStatus} · ${selectedRecord.addressServiceability.previewClassification}`}
+              title="العنوان والخدمة"
+              description={`حالة=${selectedRecord.addressServiceability.serviceabilityStatus} · ${selectedRecord.addressServiceability.previewClassification}`}
             >
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>last address</strong>
+                  <strong>آخر عنوان</strong>
                   <span>{selectedRecord.addressServiceability.lastAddress}</span>
                 </div>
                 {selectedRecord.addressServiceability.outOfZoneReason ? (
                   <div className={styles.surfaceInspectorRow}>
-                    <strong>out-of-zone reason</strong>
+                    <strong>سبب خارج النطاق</strong>
                     <span>{selectedRecord.addressServiceability.outOfZoneReason}</span>
                   </div>
                 ) : null}
@@ -351,8 +347,8 @@ export function Customer360Workspace({
           </div>
 
           <Customer360Section
-            title="notes timeline"
-            description="support note / ops note / audit note"
+            title="سجل الملاحظات"
+            description="ملاحظة دعم / ملاحظة عمليات / ملاحظة تدقيق"
           >
             <Box gap={2}>
               {selectedRecord.notesTimeline.map((note) => (
@@ -368,8 +364,8 @@ export function Customer360Workspace({
           </Customer360Section>
 
           <Customer360Section
-            title="quick actions"
-            description={`signal=${selectedRecord.contextSignal.routeId} · priority=${selectedRecord.contextSignal.priorityLabel}`}
+            title="الإجراءات السريعة"
+            description={`إشارة=${selectedRecord.contextSignal.routeId} · أولوية=${selectedRecord.contextSignal.priorityLabel}`}
           >
             <Box gap={2}>
               {selectedRecord.quickActions.map((action) => (
@@ -379,7 +375,7 @@ export function Customer360Workspace({
                   entityLabel={action.label}
                   status={action.surfaceId}
                   statusTone={action.readOnly ? 'warning' : 'neutral'}
-                  recommendation={`${action.routeId ?? 'routeHint'} · ${action.onDemandPolicy}`}
+                  recommendation={`${action.routeId ?? 'مسار'} · ${action.onDemandPolicy}`}
                   reason={action.routeHint}
                   primaryAction={{
                     id: `${selectedRecord.customerId}-${action.actionId}`,
