@@ -13,7 +13,7 @@ import {
   Text,
   colorPalette,
 } from '@bthwani/ui-kit';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import {
   formatCurrencyValue,
   normalizeDisplayText,

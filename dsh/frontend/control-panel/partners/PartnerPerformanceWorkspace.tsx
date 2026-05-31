@@ -1,17 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, useTheme, Surface, KeyValueList } from '@bthwani/ui-kit';
+import { Box, Text, useTheme, Surface, KeyValueList, TextField } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
   WebControlPanelStatusTag,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
+import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerDisputes, updatePartnerDisputeStatus } from './workflow';
 import {
   PARTNER_PERFORMANCE_METRICS,
-  PARTNER_DISPUTES_DATA,
   PARTNER_VISIBILITY_TIMELINE_DATA,
   type PartnerDispute,
 } from '../../data/partner.preview-data';
@@ -126,8 +125,13 @@ function PartnerOperationalPerformanceTab() {
 // ─── Sub-screen 2: النزاعات المفتوحة والاستئناف ───────────────────────────────
 
 function PartnerDisputesTab() {
-  const [disputes, setDisputes] = React.useState<PartnerDispute[]>(PARTNER_DISPUTES_DATA);
+  const [disputes, setDisputes] = React.useState<PartnerDispute[]>([]);
   const [selectedDisputeId, setSelectedDisputeId] = React.useState<string | null>(null);
+  const [disputeNote, setDisputeNote] = React.useState('');
+
+  React.useEffect(() => {
+    setDisputes(getPartnerDisputes());
+  }, []);
 
   const selectedDispute = disputes.find(d => d.id === selectedDisputeId);
   const selectedDisputePartner = selectedDispute
@@ -137,11 +141,14 @@ function PartnerDisputesTab() {
   const openCount = disputes.filter(d => d.status === 'مفتوح' || d.status === 'قيد المراجعة').length;
 
   const handleDisputeAction = (id: string, newStatus: string) => {
-    setDisputes(prev => prev.map(d => d.id === id ? { ...d, status: newStatus } : d));
+    updatePartnerDisputeStatus(id, newStatus, disputeNote.trim() || undefined);
+    setDisputes(getPartnerDisputes());
+    setDisputeNote('');
     if (newStatus !== 'قيد المراجعة') {
       setSelectedDisputeId(null);
     }
   };
+
 
   return (
     <div className={styles.surfaceSplitGrid}>
@@ -221,6 +228,15 @@ function PartnerDisputesTab() {
                 {selectedDispute.sla}
               </Text>
             </Surface>
+
+            <Box gap={2} marginY={2}>
+              <TextField
+                label="ملاحظات وتوجيهات حل النزاع (تُحفظ في سجل التدقيق)"
+                value={disputeNote}
+                onChangeText={setDisputeNote}
+                placeholder="اكتب تفاصيل القرار وأدلة التسوية هنا..."
+              />
+            </Box>
 
             <WebControlPanelRecommendation
               title="توجيه معالجة النزاع"

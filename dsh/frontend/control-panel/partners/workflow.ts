@@ -60,7 +60,6 @@ export type DshPartnerFulfillmentAgreement = {
 export {
   dshPartnerIntakeMetrics,
   dshPartnerIntakeItems,
-  PARTNER_FULFILLMENT_AGREEMENTS,
   dshPartnerApprovalLanes,
 } from '../../data/partner.preview-data';
 
@@ -81,4 +80,13 @@ export {
   getPartnerCatalogOverrides,
   upsertPartnerCatalogOverride,
   deletePartnerCatalogOverride,
+  PARTNER_FULFILLMENT_AGREEMENTS,
+  getPartnerComplaints,
+  updatePartnerComplaintStatus,
+  getPartnerModifications,
+  updatePartnerModificationStatus,
+  getPartnerDisputes,
+  updatePartnerDisputeStatus,
+  getPromotionCandidates,
+  updatePromotionCandidateStatus,
 } from '../../shared/workflow';

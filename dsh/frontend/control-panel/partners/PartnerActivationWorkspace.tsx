@@ -74,6 +74,12 @@ export function ControlPanelDshPartnerActivationScreen() {
     setActionMessage('تم تفعيل الشريك بنجاح وهو الآن ظاهر لعملاء منصة بثواني.');
   };
 
+  const handleOpsActivate = () => {
+    updatePartnerActivationStatus(selectedPartnerId, 'partner_active');
+    setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
+    setActionMessage('تم تنشيط الشريك تشغيلياً وهو جاهز للتفعيل للعملاء.');
+  };
+
   const handlePause = () => {
     updatePartnerActivationStatus(selectedPartnerId, 'client_hidden');
     setPartnerStatuses({ ...getAllPartnerActivationStatuses() });
@@ -86,6 +92,7 @@ export function ControlPanelDshPartnerActivationScreen() {
     setIsDeactivating(false);
     setActionMessage(`تم إلغاء تفعيل الشريك. السبب: ${reason} · الملاحظة: ${note}`);
   };
+
 
   return (
     <Box gap={4} dir="rtl">
@@ -230,7 +237,9 @@ export function ControlPanelDshPartnerActivationScreen() {
 
               <WebControlPanelActionCluster
                 primary={
-                  allReady && currentStatus !== 'client_visible'
+                  currentStatus === 'ops_approved'
+                    ? { id: 'btn-ops-activate', label: 'تنشيط الشريك تشغيلياً', onAction: handleOpsActivate }
+                    : allReady && currentStatus !== 'client_visible'
                     ? { id: 'btn-activate', label: 'تفعيل للعملاء (Go Live)', onAction: handleActivate }
                     : currentStatus === 'client_visible'
                     ? { id: 'btn-pause', label: 'إيقاف مؤقت (إخفاء)', onAction: handlePause }

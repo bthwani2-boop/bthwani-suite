@@ -50,6 +50,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
   appearanceChrome,
   isRTL,
   styles,
+  onBack,
 }: any) {
   const isProBlocked = store?.commercialSourceMap?.['hasBthwaniPro']?.conflictStatus === 'blocker';
   const benefitChips = React.useMemo(
@@ -193,6 +194,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
           else onOpenItems?.();
         }}
         onSharePress={handleStoreShare}
+        onBackPress={onBack}
         scrollY={scrollY}
         deliveryModes={deliveryModes}
         selectedMode={selectedMode}

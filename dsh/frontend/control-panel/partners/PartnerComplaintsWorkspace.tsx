@@ -1,30 +1,39 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, Surface } from '@bthwani/ui-kit';
+import { Box, Text, Surface, TextField } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
   WebControlPanelStatusTag,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
-import { PARTNER_COMPLAINTS_DATA, type PartnerComplaint } from '../../data/partner.preview-data';
+import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerComplaints, updatePartnerComplaintStatus } from './workflow';
+import type { PartnerComplaint } from '../../data/partner.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
+
 export function PartnerComplaintsWorkspace() {
-  const [complaints, setComplaints] = React.useState<PartnerComplaint[]>(PARTNER_COMPLAINTS_DATA);
+  const [complaints, setComplaints] = React.useState<PartnerComplaint[]>([]);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [resolutionNote, setResolutionNote] = React.useState('');
+
+  React.useEffect(() => {
+    setComplaints(getPartnerComplaints());
+  }, []);
 
   const selectedComplaint = complaints.find((c) => c.id === selectedId);
   const partner = selectedComplaint ? PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedComplaint.partnerId) : null;
 
   const handleStatusChange = (id: string, newStatus: 'investigating' | 'resolved') => {
-    setComplaints(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c));
+    updatePartnerComplaintStatus(id, newStatus, resolutionNote.trim() || undefined);
+    setComplaints(getPartnerComplaints());
+    setResolutionNote('');
     if (newStatus === 'resolved') {
       setSelectedId(null);
     }
   };
+
 
   const openComplaintsCount = complaints.filter(c => c.status === 'open' || c.status === 'investigating').length;
 
@@ -99,6 +108,15 @@ export function PartnerComplaintsWorkspace() {
                 <Text role="bodySm" tone="base">{selectedComplaint.description}</Text>
               </Box>
             </Surface>
+
+            <Box gap={2} marginY={2}>
+              <TextField
+                label="ملاحظات وتوجيهات الحل (تُحفظ في سجل التدقيق)"
+                value={resolutionNote}
+                onChangeText={setResolutionNote}
+                placeholder="اكتب الإجراء المتخذ لحل المشكلة هنا..."
+              />
+            </Box>
 
             <WebControlPanelRecommendation
               title="توجيه معالجة الشكوى"

@@ -138,11 +138,11 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
       >
         <View style={{ gap: spacing[3] }}>
           {/* Header & Verification Status Badge */}
-          <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center" gap={2}>
+          <Box align="center" gap={2} style={{ flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
             <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>بيانات الحساب الشخصي</Text>
-            <Box flexDirection="row-reverse" alignItems="center" gap={1}>
-              <Icon name="checkmark-circle" size={16} color={colorPalette.green600} />
-              <Text role="bodySm" style={{ color: colorPalette.green600, fontWeight: 'bold' }}>نشط وآمن</Text>
+            <Box align="center" gap={1} style={{ flexDirection: 'row-reverse' }}>
+              <Icon name="checkmark-circle" size={16} color={colorPalette.success} />
+              <Text role="bodySm" style={{ color: colorPalette.success, fontWeight: 'bold' }}>نشط وآمن</Text>
             </Box>
           </Box>
 
@@ -224,14 +224,14 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
                       role="bodySm"
                       style={{
                         textAlign: 'right',
-                        color: passwordStatusTone === 'success' ? colorPalette.green600 : colorPalette.red600
+                        color: passwordStatusTone === 'success' ? colorPalette.success : colorPalette.danger
                       }}
                     >
                       {passwordStatusMsg}
                     </Text>
                   ) : null}
 
-                  <Box flexDirection="row-reverse" gap={2}>
+                  <Box gap={2} style={{ flexDirection: 'row-reverse' }}>
                     <Button
                       label="حفظ كلمة المرور"
                       tone="brand"
@@ -278,17 +278,17 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
                 <Button
                   tone="danger"
                   onPress={() => setIsDeletingAccount(true)}
-                  style={{ width: '100%', backgroundColor: colorPalette.red50, borderColor: colorPalette.red200, borderWidth: 1 }}
+                  style={{ width: '100%', backgroundColor: colorPalette.dangerSoft, borderColor: colorPalette.dangerSoft, borderWidth: 1 }}
                 >
-                  <Text role="bodyStrong" style={{ color: colorPalette.red600 }}>حذف الحساب</Text>
+                  <Text role="bodyStrong" style={{ color: colorPalette.danger }}>حذف الحساب</Text>
                 </Button>
               ) : (
-                <Box gap={2} padding={3} style={{ backgroundColor: colorPalette.red50, borderRadius: 15, borderWidth: 1, borderColor: colorPalette.red200 }}>
-                  <Text role="bodyStrong" style={{ textAlign: 'right', color: colorPalette.red800 }}>تنبيه أمان حساس وحرِج!</Text>
-                  <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.red700 }}>
+                <Box gap={2} padding={3} style={{ backgroundColor: colorPalette.dangerSoft, borderRadius: 15, borderWidth: 1, borderColor: colorPalette.dangerSoft }}>
+                  <Text role="bodyStrong" style={{ textAlign: 'right', color: colorPalette.dangerStrong }}>تنبيه أمان حساس وحرِج!</Text>
+                  <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.dangerStrong }}>
                     حذف الحساب سيؤدي إلى مسح كافة البيانات والطلبات والمحفظة بشكل نهائي ولا يمكن استرجاعها.
                   </Text>
-                  <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.red700, marginTop: 4 }}>
+                  <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.dangerStrong, marginTop: 4 }}>
                     لتأكيد الإجراء, يرجى كتابة "حذف" في الحقل أدناه:
                   </Text>
 
@@ -296,16 +296,16 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
                     value={deleteConfirmText}
                     onChangeText={setDeleteConfirmText}
                     placeholder="اكتب حذف لتأكيد الطلب"
-                    style={{ textAlign: 'right', color: colorPalette.red800, backgroundColor: theme.fieldBackground, borderColor: colorPalette.red200 }}
+                    style={{ textAlign: 'right', color: colorPalette.dangerStrong, backgroundColor: theme.fieldBackground, borderColor: colorPalette.dangerSoft }}
                   />
 
                   {deleteStatusMsg ? (
-                    <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.green600, fontWeight: 'bold', marginTop: 4 }}>
+                    <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.success, fontWeight: 'bold', marginTop: 4 }}>
                       {deleteStatusMsg}
                     </Text>
                   ) : null}
 
-                  <Box flexDirection="row-reverse" gap={2} style={{ marginTop: spacing[2] }}>
+                  <Box gap={2} style={{ marginTop: spacing[2], flexDirection: 'row-reverse' }}>
                     <Button
                       label="حذف الحساب نهائياً"
                       disabled={deleteConfirmText !== 'حذف'}
@@ -318,7 +318,7 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
                           setDeleteStatusMsg('');
                         }, 2000);
                       }}
-                      style={{ flex: 1, backgroundColor: deleteConfirmText === 'حذف' ? colorPalette.red600 : colorPalette.red200 }}
+                      style={{ flex: 1, backgroundColor: deleteConfirmText === 'حذف' ? colorPalette.danger : colorPalette.dangerSoft }}
                     />
                     <Button
                       label="تراجع"
@@ -446,22 +446,22 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
             tone="raised"
             padding={3}
             style={{
-              backgroundColor: statusTone === 'success' ? colorPalette.green50 : colorPalette.red50,
-              borderColor: statusTone === 'success' ? colorPalette.green200 : colorPalette.red200,
+              backgroundColor: statusTone === 'success' ? colorPalette.successSoft : colorPalette.dangerSoft,
+              borderColor: statusTone === 'success' ? colorPalette.successSoft : colorPalette.dangerSoft,
               borderWidth: 1,
               borderRadius: 12,
             }}
           >
-            <Box flexDirection="row-reverse" alignItems="center" gap={2}>
+            <Box align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
               <Icon
                 name={statusTone === 'success' ? 'checkmark-circle' : 'alert-circle'}
                 size={20}
-                color={statusTone === 'success' ? colorPalette.green600 : colorPalette.red600}
+                color={statusTone === 'success' ? colorPalette.success : colorPalette.danger}
               />
               <Text
                 role="bodySm"
                 style={{
-                  color: statusTone === 'success' ? colorPalette.green700 : colorPalette.red700,
+                  color: statusTone === 'success' ? colorPalette.successStrong : colorPalette.dangerStrong,
                   fontWeight: 'bold',
                   flex: 1,
                   textAlign: 'right',
@@ -505,13 +505,13 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
                 />
 
                 {/* Quick Suggestion Chips */}
-                <Box flexDirection="row-reverse" flexWrap="wrap" gap={2} style={{ marginTop: spacing[1] }}>
+                <Box gap={2} style={{ marginTop: spacing[1], flexDirection: 'row-reverse', flexWrap: 'wrap' }}>
                   {quickSuggestions.map((suggestion) => (
                     <TouchableOpacity
                       key={suggestion}
                       onPress={() => setDeliveryInstructions(suggestion)}
                       style={{
-                        paddingVertical: spacing[1.5],
+                        paddingVertical: 6,
                         paddingHorizontal: spacing[3],
                         backgroundColor: theme.fieldBackground,
                         borderRadius: 20,

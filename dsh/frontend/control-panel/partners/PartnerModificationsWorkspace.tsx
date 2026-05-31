@@ -8,14 +8,18 @@ import {
   WebControlPanelStatusTag,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
-import { PARTNER_MODIFICATION_REQUESTS, type PartnerModificationRequest } from '../../data/partner.preview-data';
+import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerModifications, updatePartnerModificationStatus } from './workflow';
+import type { PartnerModificationRequest } from '../../data/partner.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
 export function PartnerModificationsWorkspace() {
-  const [requests, setRequests] = React.useState<PartnerModificationRequest[]>(PARTNER_MODIFICATION_REQUESTS);
+  const [requests, setRequests] = React.useState<PartnerModificationRequest[]>([]);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    setRequests(getPartnerModifications());
+  }, []);
 
   const selectedRequest = requests.find((r) => r.id === selectedId);
   const partner = selectedRequest ? PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedRequest.partnerId) : null;
@@ -23,7 +27,8 @@ export function PartnerModificationsWorkspace() {
   const handleApprove = (id: string) => {
     setIsSubmitting(true);
     setTimeout(() => {
-      setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r));
+      updatePartnerModificationStatus(id, 'approved');
+      setRequests(getPartnerModifications());
       setSelectedId(null);
       setIsSubmitting(false);
     }, 600);
@@ -32,13 +37,15 @@ export function PartnerModificationsWorkspace() {
   const handleReject = (id: string) => {
     setIsSubmitting(true);
     setTimeout(() => {
-      setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
+      updatePartnerModificationStatus(id, 'rejected');
+      setRequests(getPartnerModifications());
       setSelectedId(null);
       setIsSubmitting(false);
     }, 600);
   };
 
   const pendingCount = requests.filter(r => r.status === 'pending').length;
+
 
   return (
     <div className={styles.surfaceSplitGrid} dir="rtl">

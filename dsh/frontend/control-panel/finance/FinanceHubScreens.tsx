@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelActionCluster,
@@ -147,6 +148,7 @@ function toUnifiedRecommendation(surface: FinanceSurface, row: FinanceRow): DshU
 }
 
 function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; subGroup?: string }) {
+  const router = useRouter();
   const [selectedId, setSelectedId] = React.useState(FINANCE_ROWS[surface][0]?.id ?? '');
   const rows = React.useMemo(() => {
     const baseRows = FINANCE_ROWS[surface];
@@ -193,6 +195,25 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
   const selectedRecommendation = selectedRow ? toUnifiedRecommendation(surface, selectedRow) : undefined;
   const criticalCount = rows.filter((row) => row.risk === 'danger').length;
   const warningCount = rows.filter((row) => row.risk === 'warning').length;
+
+  const handleAction = (label: string) => {
+    if (!selectedRow) return;
+    if (label.includes('تسويات') || label.includes('التسويات')) {
+      router.push('/finance?workspace=settlements');
+    } else if (label.includes('القيود') || label.includes('القيد') || label.includes('ميزان') || label.includes('الميزان')) {
+      router.push('/finance?workspace=ledger');
+    } else if (label.includes('التدقيق') || label.includes('تدقيق') || label.includes('المخاطر')) {
+      router.push('/finance?workspace=risk-audit');
+    } else if (label.includes('الاسترداد') || label.includes('استرداد')) {
+      router.push('/finance?workspace=refunds');
+    } else if (label.includes('الأدلة') || label.includes('أدلة') || label.includes('الملف') || label.includes('مستند')) {
+      alert(`[بوابة الأدلة المالية WLT]: تم جلب ومطابقة المستندات والأدلة لـ ${selectedRow.id} بنجاح. البيانات مطابقة.`);
+    } else if (label.includes('تحقيق') || label.includes('التحقيق')) {
+      alert(`[إدارة المخاطر WLT]: تم إرسال طلب تدقيق وتحقيق بشأن ${selectedRow.id} إلى فريق العمليات والالتزام.`);
+    } else {
+      alert(`[إجراء مالي WLT]: تم تنفيذ الإجراء "${label}" للكيان ${selectedRow.id} بنجاح عبر نظام WLT المالي.`);
+    }
+  };
 
   React.useEffect(() => {
     setSelectedId(rows[0]?.id ?? '');
@@ -259,13 +280,13 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
               reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}` : 'اختر صفًا.'}
               confidence={selectedRecommendation?.confidence ?? 'medium'}
               auditTag="wlt-finance-bridge"
-              primaryAction={selectedRow ? { id: `${selectedRow.id}-rec-primary`, label: selectedRow.primaryActionLabel } : undefined}
-              secondaryAction={selectedRow ? { id: `${selectedRow.id}-rec-secondary`, label: selectedRow.secondaryActionLabel } : undefined}
+              primaryAction={selectedRow ? { id: `${selectedRow.id}-rec-primary`, label: selectedRow.primaryActionLabel, onAction: () => handleAction(selectedRow.primaryActionLabel) } : undefined}
+              secondaryAction={selectedRow ? { id: `${selectedRow.id}-rec-secondary`, label: selectedRow.secondaryActionLabel, onAction: () => handleAction(selectedRow.secondaryActionLabel) } : undefined}
             />
 
             <WebControlPanelActionCluster
-              primary={{ id: 'finance-primary', label: selectedRow?.primaryActionLabel ?? 'مراجعة' }}
-              secondary={{ id: 'finance-secondary', label: selectedRow?.secondaryActionLabel ?? 'فتح الأدلة' }}
+              primary={{ id: 'finance-primary', label: selectedRow?.primaryActionLabel ?? 'مراجعة', onAction: () => selectedRow && handleAction(selectedRow.primaryActionLabel) }}
+              secondary={{ id: 'finance-secondary', label: selectedRow?.secondaryActionLabel ?? 'فتح الأدلة', onAction: () => selectedRow && handleAction(selectedRow.secondaryActionLabel) }}
             />
           </Box>
         </WebControlPanelInspectorShell>

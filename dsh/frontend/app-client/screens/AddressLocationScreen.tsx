@@ -121,6 +121,12 @@ export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenPro
       <TopBar
         variant="surface"
         title="العناوين والموقع"
+        actions={onBack ? [{
+          id: 'back',
+          icon: <Icon name="chevron-back" mirrored size={18} />,
+          accessibilityLabel: 'العودة',
+          onPress: onBack,
+        }] : []}
       />
 
       <MobileScrollView

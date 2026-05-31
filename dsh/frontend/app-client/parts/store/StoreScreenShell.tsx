@@ -175,8 +175,9 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
       isRTL={isRTL}
       styles={styles}
       openInlineSearch={openInlineSearch}
+      onBack={_onBack}
     />
-  ), [appearanceChrome, changeCategory, clientVisibleItems, deliveryModes, handleStoreShare, isDarkGlass, isRTL, menuItems, normalizedEtaLabel, normalizedStoreName, normalizedStoreSubtitle, onOpenBenefits, onOpenCart, onOpenItems, onSupport, openInlineSearch, openStoreItemPreview, operationalState, operationalStateMeta, scrollY, selectedMode, setSelectedMode, setStickyThreshold, showOperationalNotice, stickyThreshold, store, storeCoverImageSource, storeLogoImageSource, storeText, supportActionLabel, visibleItems, viewportWidth]);
+  ), [appearanceChrome, changeCategory, clientVisibleItems, deliveryModes, handleStoreShare, isDarkGlass, isRTL, menuItems, normalizedEtaLabel, normalizedStoreName, normalizedStoreSubtitle, onOpenBenefits, onOpenCart, onOpenItems, onSupport, openInlineSearch, openStoreItemPreview, operationalState, operationalStateMeta, scrollY, selectedMode, setSelectedMode, setStickyThreshold, showOperationalNotice, stickyThreshold, store, storeCoverImageSource, storeLogoImageSource, storeText, supportActionLabel, visibleItems, viewportWidth, _onBack]);
 
   if (state !== 'ready') {
     return (

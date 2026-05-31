@@ -51,9 +51,41 @@ export function OpsCaptainMessagingWorkspace({
   orderId,
 }: OpsCaptainMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
+  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>(DEMO_TICKET.messagesPreview);
+  const [isEscalated, setIsEscalated] = React.useState(DEMO_TICKET.status === 'escalated');
+
   const resolvedCaptainName = captainName ?? DEMO_TICKET.actorName;
   const resolvedOrderId = orderId ?? DEMO_TICKET.entityId;
-  const messages = DEMO_TICKET.messagesPreview;
+
+  const handleSend = () => {
+    if (!draft.trim()) return;
+    const newMessage: DshSupportTicketMessage = {
+      id: `msg-captain-custom-${Date.now()}`,
+      senderKind: 'ops',
+      senderLabel: 'فريق الدعم',
+      body: draft.trim(),
+      timestampLabel: 'الآن',
+    };
+    setMessages((prev) => [...prev, newMessage]);
+    setDraft('');
+  };
+
+  const handleEscalate = () => {
+    if (isEscalated) return;
+    const newSystemMsg: DshSupportTicketMessage = {
+      id: `msg-captain-system-${Date.now()}`,
+      senderKind: 'ops',
+      senderLabel: 'النظام',
+      body: 'تم تصعيد المحادثة إلى إدارة الدعم والالتزام لشؤون الكباتن والتوصيل.',
+      timestampLabel: 'الآن',
+      isSystem: true,
+    };
+    setMessages((prev) => [...prev, newSystemMsg]);
+    setIsEscalated(true);
+    if (typeof window !== 'undefined') {
+      window.alert('سياق الحوكمة: تم تصعيد محادثة الكابتن. القرار المالي النهائي خاضع لحوكمة WLT.');
+    }
+  };
 
   return (
     <div className={styles.surfaceCockpit}>
@@ -81,6 +113,7 @@ export function OpsCaptainMessagingWorkspace({
               <Chip label={DEMO_TICKET.ticketCode} tone="brand" />
               <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone="default" />
               <Chip label="handoff / توصيل / إثبات" />
+              {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
 
             {/* Boundary note */}
@@ -103,7 +136,7 @@ export function OpsCaptainMessagingWorkspace({
               </Box>
             </Surface>
 
-            {/* Compose area — preview-only */}
+            {/* Compose area */}
             <Surface tone="inset" padding={3} gap={3}>
               <Text role="titleSm">إرسال رسالة</Text>
               <TextField
@@ -115,14 +148,13 @@ export function OpsCaptainMessagingWorkspace({
               <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 <Button
                   label="إرسال"
-                  disabled
-                  onPress={undefined}
+                  onPress={handleSend}
                 />
                 <Button
-                  label="تصعيد للدعم"
+                  label={isEscalated ? 'تم التصعيد' : 'تصعيد للدعم'}
                   tone="secondary"
-                  disabled
-                  onPress={undefined}
+                  disabled={isEscalated}
+                  onPress={handleEscalate}
                 />
               </Box>
               <Text role="caption" tone="muted">

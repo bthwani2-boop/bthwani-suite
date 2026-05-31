@@ -16,7 +16,7 @@ import {
 import { translateDshRuntimeBindingStatus } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
-import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
+import { getPromotionCandidates, updatePromotionCandidateStatus, type DshPromotionCandidate } from './workflow';
 
 type PromotionEligibilityState = 'ready' | 'empty' | 'pending' | 'blocked' | 'loading';
 
@@ -105,19 +105,26 @@ export function DshPartnerPromotionEligibilityScreen({
   state = 'ready',
 }: DshPartnerPromotionEligibilityScreenProps) {
   const router = useRouter();
-  const [selectedId, setSelectedId] = React.useState(dshPromotionCandidates[0]?.id ?? '');
+  const [candidates, setCandidates] = React.useState<DshPromotionCandidate[]>([]);
+  const [selectedId, setSelectedId] = React.useState('');
   const [actionMessage, setActionMessage] = React.useState('المراجعة الحالية تحدد جاهزية العنصر ليظهر ضمن منظومة المزايا والعروض.');
 
-  const selectedItem = dshPromotionCandidates.find((item) => item.id === selectedId) ?? dshPromotionCandidates[0];
-  const eligibleCount = dshPromotionCandidates.filter((item) => item.eligibility === 'eligible').length;
-  const reviewCount = dshPromotionCandidates.filter((item) => item.eligibility === 'review').length;
-  const readyForMarketingCount = dshPromotionCandidates.filter((item) => item.status === 'marketing-ready').length;
+  React.useEffect(() => {
+    const data = getPromotionCandidates();
+    setCandidates(data);
+    setSelectedId(data[0]?.id ?? '');
+  }, []);
+
+  const selectedItem = candidates.find((item) => item.id === selectedId) ?? candidates[0];
+  const eligibleCount = candidates.filter((item) => item.eligibility === 'eligible').length;
+  const reviewCount = candidates.filter((item) => item.eligibility === 'review').length;
+  const readyForMarketingCount = candidates.filter((item) => item.status === 'marketing-ready').length;
 
   React.useEffect(() => {
-    if (!dshPromotionCandidates.some((item) => item.id === selectedId)) {
-      setSelectedId(dshPromotionCandidates[0]?.id ?? '');
+    if (candidates.length > 0 && !candidates.some((item) => item.id === selectedId)) {
+      setSelectedId(candidates[0]?.id ?? '');
     }
-  }, [selectedId]);
+  }, [selectedId, candidates]);
 
   React.useEffect(() => {
     if (selectedItem) {
@@ -147,13 +154,21 @@ export function DshPartnerPromotionEligibilityScreen({
     }
 
     if (selectedItem.status === 'marketing-ready' || selectedItem.eligibility === 'eligible') {
+      if (selectedItem.status !== 'marketing-ready') {
+        updatePromotionCandidateStatus(selectedItem.id, 'marketing-ready');
+        setCandidates(getPromotionCandidates());
+      }
       setActionMessage(selectedItem.status === 'marketing-ready' ? 'تم فتح مسار التسويق لهذا العنصر.' : 'تم تمرير النية إلى التسويق لمتابعة مسار المزايا والعروض.');
-      router.push(marketingHref);
+      setTimeout(() => {
+        router.push(marketingHref);
+      }, 600);
       return;
     }
 
     setActionMessage('أُعيدت النية إلى الكتالوج لاستكمال الجاهزية المطلوبة.');
-    router.push(catalogHref);
+    setTimeout(() => {
+      router.push(catalogHref);
+    }, 600);
   };
 
   const handleSecondaryAction = () => {
@@ -162,7 +177,9 @@ export function DshPartnerPromotionEligibilityScreen({
     }
 
     setActionMessage('تمت إعادة النية إلى مسار الكتالوج لاستكمال التعديلات قبل الترويج.');
-    router.push(catalogHref);
+    setTimeout(() => {
+      router.push(catalogHref);
+    }, 600);
   };
 
   return (
@@ -194,7 +211,7 @@ export function DshPartnerPromotionEligibilityScreen({
             meta="راجع العناصر المؤهلة وأبقِ قرار تمريرها إلى التسويق أو إرجاعها إلى الكتالوج واضحًا داخل صف واحد."
             pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="كل العناصر الحالية" />}
           >
-            {dshPromotionCandidates.map((item) => (
+            {candidates.map((item) => (
               <WebControlPanelDecisionRow
                 key={item.id}
                 entityId={item.id}
@@ -216,7 +233,7 @@ export function DshPartnerPromotionEligibilityScreen({
       inspector={
         <WebControlPanelInspectorShell
           title={selectedItem ? `تفاصيل ${selectedItem.title}` : 'تفاصيل الأهلية'}
-          onClose={() => setSelectedId(dshPromotionCandidates[0]?.id ?? '')}
+          onClose={() => setSelectedId(candidates[0]?.id ?? '')}
         >
           <Box gap={2}>
             <KeyValueList

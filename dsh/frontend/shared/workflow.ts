@@ -1,4 +1,16 @@
 import type { DshPartnerActivationStatus } from './dsh-partner-activation.model';
+import {
+  PARTNER_COMPLAINTS_DATA,
+  PARTNER_MODIFICATION_REQUESTS,
+  PARTNER_DISPUTES_DATA,
+  PARTNER_FULFILLMENT_AGREEMENTS as PARTNER_FULFILLMENT_AGREEMENTS_SEED,
+} from '../data/partner.preview-data';
+import type {
+  PartnerComplaint,
+  PartnerModificationRequest,
+  PartnerDispute,
+} from '../data/partner.preview-data';
+
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
 export type DshPartnerIntakeStage = 'pending-partner' | 'pending-marketing' | 'published';
@@ -908,4 +920,90 @@ export function deletePartnerCatalogOverride(partnerId: string, productId: strin
   const current = _globalPartnerOverrides[partnerId] ?? [];
   const filtered = current.filter(o => o.productId !== productId);
   _globalPartnerOverrides = { ..._globalPartnerOverrides, [partnerId]: filtered };
+}
+
+// Shared mutable store for in-memory persistence
+let _globalPartnerComplaints = [...PARTNER_COMPLAINTS_DATA];
+let _globalPartnerModifications = [...PARTNER_MODIFICATION_REQUESTS];
+let _globalPartnerDisputes = [...PARTNER_DISPUTES_DATA];
+let _globalPromotionCandidates = [...dshPromotionCandidates];
+export let PARTNER_FULFILLMENT_AGREEMENTS = [...PARTNER_FULFILLMENT_AGREEMENTS_SEED];
+
+export function getPartnerComplaints(): PartnerComplaint[] {
+  return _globalPartnerComplaints;
+}
+
+export function updatePartnerComplaintStatus(id: string, status: 'open' | 'investigating' | 'resolved', notes?: string): void {
+  _globalPartnerComplaints = _globalPartnerComplaints.map(c => {
+    if (c.id !== id) return c;
+    return {
+      ...c,
+      status,
+      description: notes ? `${c.description}\n[ملاحظة التدقيق]: ${notes}` : c.description,
+    };
+  });
+}
+
+export function getPartnerModifications(): PartnerModificationRequest[] {
+  return _globalPartnerModifications;
+}
+
+export function updatePartnerModificationStatus(id: string, status: 'approved' | 'rejected'): void {
+  _globalPartnerModifications = _globalPartnerModifications.map(r => {
+    if (r.id !== id) return r;
+    if (status === 'approved') {
+      const partner = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === r.partnerId);
+      if (partner) {
+        const storeNameChange = r.changes.find(c => c.field === 'اسم المستفيد' || c.field === 'الاسم');
+        if (storeNameChange) {
+          (partner as any).storeName = storeNameChange.new;
+        }
+      }
+    }
+    return { ...r, status };
+  });
+}
+
+export function getPartnerDisputes(): PartnerDispute[] {
+  return _globalPartnerDisputes;
+}
+
+export function updatePartnerDisputeStatus(id: string, status: string, notes?: string): void {
+  _globalPartnerDisputes = _globalPartnerDisputes.map(d => {
+    if (d.id !== id) return d;
+    return {
+      ...d,
+      status,
+      ...(notes ? { type: `${d.type} (ملاحظة: ${notes})` } : {}),
+    };
+  });
+}
+
+export function getPromotionCandidates(): DshPromotionCandidate[] {
+  return _globalPromotionCandidates;
+}
+
+export function updatePromotionCandidateStatus(id: string, status: DshPromotionIntentStatus, eligibility?: 'eligible' | 'review' | 'blocked'): void {
+  _globalPromotionCandidates = _globalPromotionCandidates.map(c => {
+    if (c.id !== id) return c;
+    return {
+      ...c,
+      status,
+      ...(eligibility ? { eligibility } : {}),
+    };
+  });
+}
+
+// Central store for live order queue decisions
+let _globalLiveOrderDecisions: Record<string, { decision: string; note: string; submitted: boolean; nextLifecycleStatus: string }> = {};
+
+export function getLiveOrderDecisions(): Record<string, { decision: string; note: string; submitted: boolean; nextLifecycleStatus: string }> {
+  return _globalLiveOrderDecisions;
+}
+
+export function updateLiveOrderDecision(orderId: string, decision: string, note: string, nextLifecycleStatus: string): void {
+  _globalLiveOrderDecisions = {
+    ..._globalLiveOrderDecisions,
+    [orderId]: { decision, note, submitted: true, nextLifecycleStatus },
+  };
 }
