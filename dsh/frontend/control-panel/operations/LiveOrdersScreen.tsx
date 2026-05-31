@@ -395,6 +395,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
         </Box>
       </div>
     </Box>
+  );
 }
 
 export default LiveOrdersScreen;
