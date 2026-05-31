@@ -382,7 +382,10 @@
     "dsh/frontend/control-panel/operations/OrderRescueScreen.tsx",
     "dsh/frontend/data/customers.preview-data.ts",
     "dsh/frontend/control-panel/operations/DispatchAssignmentScreen.tsx",
-    "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx"
+    "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx",
+    "dsh/frontend/data/support.preview-data.ts",
+    "dsh/frontend/data/orders.preview-data.ts",
+    "dsh/frontend/shared/dsh-order-preview.contract.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

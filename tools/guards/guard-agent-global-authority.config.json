@@ -52,7 +52,8 @@
     "allowed when documented",
     "documented or safest",
     "safest documented launcher",
-    "justified in evidence"
+    "justified in evidence",
+    "link-workspace-packages"
   ],
   "allowSectionPatterns": [
     "Forbidden actions",

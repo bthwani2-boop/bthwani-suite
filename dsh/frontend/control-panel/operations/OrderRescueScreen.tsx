@@ -3,15 +3,10 @@
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@bthwani/ui-kit';
-import {
-  WebControlPanelDecisionRow,
-  WebControlPanelKpiStrip,
-  WebControlPanelRecommendation,
-} from '@bthwani/ui-kit/web';
+import { WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
 import {
   DSH_ORDER_RESCUE_PREVIEW,
   getDshOrderRescueByContext,
-  getDshOrderRescueCase,
 } from '../../data/orders.preview-data';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
@@ -22,354 +17,656 @@ export type OrderRescueScreenProps = {
   subGroup?: string;
 };
 
-const OWNER_LABELS = {
-  support: 'support',
-  operations: 'operations',
-  partner: 'partner',
-  captain: 'captain',
-  wlt_reference_only: 'WLT reference only',
-} as const;
+type RescueCase = (typeof DSH_ORDER_RESCUE_PREVIEW)[number];
+type DshOrderRescueReason = RescueCase['rescueReasonSelector']['selectedReason'];
+type DshOrderRescueOwner = RescueCase['ownerSelection']['selectedOwner'];
+type DshOrderRescueNextActionId = RescueCase['nextActionSelector']['selectedAction'];
 
-const ACTION_LABELS = {
-  replace_item: 'replace item',
-  remove_item: 'remove item',
-  wait_customer: 'wait customer',
-  change_delivery_mode: 'change delivery mode',
-  reassign_captain: 'reassign captain',
-  convert_to_support_exception: 'convert to support_exception',
-  create_follow_up_task: 'create follow-up task',
-  open_wlt_visibility: 'open WLT visibility',
-} as const;
+// Label maps — enum keys only (values from data are already Arabic)
+const REASON_LABELS: Record<string, string> = {
+  item_unavailable:        'صنف غير متاح',
+  customer_not_reachable:  'العميل لا يرد',
+  store_closed_after_order:'المتجر مغلق بعد الطلب',
+  captain_no_show:         'الكابتن لم يظهر',
+  captain_declined:        'الكابتن رفض الطلب',
+  pickup_failed:           'فشل الاستلام',
+  handoff_mismatch:        'خلل في التسليم',
+  delivery_failed:         'فشل التوصيل',
+  address_issue:           'مشكلة في العنوان',
+  payment_failure:         'فشل الدفع',
+  wlt_visibility:          'مراقبة WLT',
+};
 
-function OrderRescueSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+const OWNER_LABELS: Record<string, string> = {
+  support:           'الدعم',
+  operations:        'العمليات',
+  partner:           'الشريك',
+  captain:           'الكابتن',
+  wlt_reference_only:'WLT — مرجع',
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  replace_item:               'استبدال الصنف',
+  remove_item:                'إزالة الصنف',
+  wait_customer:              'انتظار العميل',
+  change_delivery_mode:       'تغيير طريقة التوصيل',
+  reassign_captain:           'إعادة إسناد الكابتن',
+  convert_to_support_exception:'تحويل لاستثناء دعم',
+  create_follow_up_task:      'إنشاء مهمة متابعة',
+  open_wlt_visibility:        'فتح رؤية WLT',
+};
+
+const WLT_FIELD_LABELS: Record<string, string> = {
+  paymentVisibility:    'رؤية الدفع',
+  refundVisibility:     'رؤية الاسترداد',
+  settlementVisibility: 'رؤية التسوية',
+};
+
+function resolveLabel(map: Record<string, string>, key: string): string {
+  return map[key] ?? key;
+}
+
+/** Count how many of the 3 decision steps are "filled" */
+function getCompletedSteps(item: RescueCase): number {
+  let count = 0;
+  if (item.rescueReasonSelector.selectedReason) count++;
+  if (item.ownerSelection.selectedOwner) count++;
+  if (item.nextActionSelector.selectedAction) count++;
+  return count;
+}
+
+// ── Step number renderer ──────────────────────────────────────────────────────
+
+function StepNum({ n, muted = false }: { n: string | number; muted?: boolean }) {
   return (
-    <div className={styles.surfaceInfoCard}>
-      <div className={styles.surfaceInfoCardTextBlock}>
-        <div className={styles.surfaceInfoCardTitle}>{title}</div>
-        {description ? <div className={styles.surfaceInfoCardDescription}>{description}</div> : null}
+    <span
+      className={`${styles.rescueStepNum} ${muted ? styles.rescueStepNumMuted : ''}`}
+      aria-hidden="true"
+    >
+      {n}
+    </span>
+  );
+}
+
+// ── Single rescue case row + inline accordion ─────────────────────────────────
+
+function RescueCaseRow({
+  item,
+  isOpen,
+  overriddenActions,
+  onToggle,
+  onSelectReason,
+  onSelectOwner,
+  onSelectNextAction,
+  onUpdateEvidence,
+  onUpdateWlt,
+  onToggleForbidden,
+  onSubmit,
+  submitNote,
+  onNavigate,
+}: {
+  item: RescueCase;
+  isOpen: boolean;
+  overriddenActions: Record<string, boolean>;
+  onToggle: () => void;
+  onSelectReason: (r: DshOrderRescueReason) => void;
+  onSelectOwner: (o: DshOrderRescueOwner) => void;
+  onSelectNextAction: (a: DshOrderRescueNextActionId) => void;
+  onUpdateEvidence: (key: string, value: string) => void;
+  onUpdateWlt: (key: string, value: string) => void;
+  onToggleForbidden: (action: string) => void;
+  onSubmit: () => void;
+  submitNote: string | null;
+  onNavigate: (href: string) => void;
+}) {
+  const isDanger = item.severity === 'danger';
+  const completedSteps = getCompletedSteps(item);
+  const totalDecisionSteps = 3;
+
+  return (
+    <div className={`${styles.rescueRowWrap} ${isOpen ? styles.rescueRowWrapActive : ''}`}>
+
+      {/* ── Compact summary row ─────────────────────────────────────────── */}
+      <div
+        className={styles.rescueRowSummary}
+        onClick={onToggle}
+        role="button"
+        aria-expanded={isOpen}
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && onToggle()}
+      >
+        {/* Severity bar */}
+        <div
+          className={`${styles.rescueSeverityBar} ${isDanger ? styles.rescueSeverityBarDanger : styles.rescueSeverityBarWarning}`}
+        />
+
+        {/* Info cluster */}
+        <div className={styles.rescueRowInfo}>
+          <span className={styles.rescueRowId}>{item.orderId}</span>
+          <span className={styles.rescueRowCustomer}>{item.customerName}</span>
+          <span className={styles.rescueRowBlocker}>{item.blocker}</span>
+        </div>
+
+        {/* Badges + SLA */}
+        <div className={styles.rescueRowMeta}>
+          <span
+            className={`${styles.rescueSeverityBadge} ${isDanger ? styles.rescueSeverityBadgeDanger : styles.rescueSeverityBadgeWarning}`}
+          >
+            {isDanger ? 'خطر' : 'تحذير'}
+          </span>
+          <span className={styles.rescueRowSla}>{item.supportHandoff.sla}</span>
+          {isOpen && (
+            <span
+              style={{
+                fontSize: '9px',
+                fontWeight: 700,
+                color: completedSteps === totalDecisionSteps
+                  ? 'var(--bthwani-success-text)'
+                  : 'var(--bthwani-control-panel-text-muted)',
+              }}
+            >
+              {completedSteps}/{totalDecisionSteps} خطوات
+            </span>
+          )}
+        </div>
+
+        {/* Expand toggle */}
+        <button
+          type="button"
+          className={`${styles.rescueToggleBtn} ${isOpen ? styles.rescueToggleBtnActive : ''}`}
+          onClick={(e) => { e.stopPropagation(); onToggle(); }}
+          aria-label={isOpen ? 'إغلاق' : 'فتح تفاصيل الحالة'}
+        >
+          ▼
+        </button>
       </div>
-      {children}
+
+      {/* ── Accordion body ──────────────────────────────────────────────── */}
+      {isOpen && (
+        <div className={styles.rescueAccordion}>
+
+          {/* Progress bar */}
+          <div style={{
+            height: '3px',
+            background: 'var(--bthwani-control-panel-border)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute',
+              insetInlineStart: 0,
+              top: 0,
+              bottom: 0,
+              width: `${(completedSteps / totalDecisionSteps) * 100}%`,
+              background: completedSteps === totalDecisionSteps
+                ? 'var(--bthwani-success)'
+                : 'var(--bthwani-control-panel-brand)',
+              transition: 'width 0.3s ease',
+            }} />
+          </div>
+
+          {/* ── STEP 1: السبب ─────────────────────────────────────────── */}
+          <div className={styles.rescueStep}>
+            <div className={styles.rescueStepHeader}>
+              <StepNum n="١" />
+              <span className={styles.rescueStepTitle}>سبب الإنقاذ</span>
+              <span className={styles.rescueStepSelected}>
+                {resolveLabel(REASON_LABELS, item.rescueReasonSelector.selectedReason)}
+              </span>
+            </div>
+            <div className={styles.rescueChipGrid}>
+              {item.rescueReasonSelector.options.map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  onClick={() => onSelectReason(reason)}
+                  className={`${styles.rescueChip} ${reason === item.rescueReasonSelector.selectedReason ? styles.rescueChipActive : ''}`}
+                >
+                  {resolveLabel(REASON_LABELS, reason)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── STEP 2: المالك ─────────────────────────────────────────── */}
+          <div className={styles.rescueStep}>
+            <div className={styles.rescueStepHeader}>
+              <StepNum n="٢" />
+              <span className={styles.rescueStepTitle}>المالك</span>
+              <span className={styles.rescueStepSelected}>
+                {resolveLabel(OWNER_LABELS, item.ownerSelection.selectedOwner)}
+              </span>
+            </div>
+            <div className={styles.rescueChipGrid}>
+              {item.ownerSelection.options.map((owner) => (
+                <button
+                  key={owner}
+                  type="button"
+                  onClick={() => onSelectOwner(owner)}
+                  className={`${styles.rescueChip} ${owner === item.ownerSelection.selectedOwner ? styles.rescueChipActive : ''}`}
+                >
+                  {resolveLabel(OWNER_LABELS, owner)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── STEP 3: الإجراء ─────────────────────────────────────────── */}
+          <div className={styles.rescueStep}>
+            <div className={styles.rescueStepHeader}>
+              <StepNum n="٣" />
+              <span className={styles.rescueStepTitle}>الإجراء التالي</span>
+              <span className={styles.rescueStepSelected}>
+                {resolveLabel(ACTION_LABELS, item.nextActionSelector.selectedAction)}
+              </span>
+            </div>
+            <div className={styles.rescueChipGrid}>
+              {item.nextActionSelector.options.map((action) => (
+                <button
+                  key={action}
+                  type="button"
+                  onClick={() => onSelectNextAction(action)}
+                  className={`${styles.rescueChip} ${action === item.nextActionSelector.selectedAction ? styles.rescueChipActive : ''}`}
+                >
+                  {resolveLabel(ACTION_LABELS, action)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── STEP 4: الدليل ──────────────────────────────────────────── */}
+          <div className={styles.rescueStep}>
+            <div className={styles.rescueStepHeader}>
+              <StepNum n="٤" />
+              <span className={styles.rescueStepTitle}>الدليل والملاحظات</span>
+            </div>
+            <div className={styles.rescueEvidenceGrid}>
+              <div>
+                <label className={styles.rescueFieldLabel}>السبب الموثّق</label>
+                <input
+                  type="text"
+                  value={item.requiredEvidence.reason}
+                  onChange={(e) => onUpdateEvidence('reason', e.target.value)}
+                  className={styles.inspectorInput}
+                  placeholder="وصف مختصر للسبب..."
+                  dir="rtl"
+                />
+              </div>
+              <div>
+                <label className={styles.rescueFieldLabel}>الجهة المتأثرة</label>
+                <input
+                  type="text"
+                  value={item.requiredEvidence.affectedEntity}
+                  onChange={(e) => onUpdateEvidence('affectedEntity', e.target.value)}
+                  className={styles.inspectorInput}
+                  placeholder="مثال: ORD-1102 / payment-failure"
+                  dir="ltr"
+                />
+              </div>
+              <div className={styles.rescueEvidenceFieldFull}>
+                <label className={styles.rescueFieldLabel}>ملاحظة المشغّل</label>
+                <textarea
+                  value={item.requiredEvidence.operatorNote}
+                  onChange={(e) => onUpdateEvidence('operatorNote', e.target.value)}
+                  className={styles.inspectorTextarea}
+                  rows={2}
+                  placeholder="ما الذي حدث وما الخطوة التالية..."
+                  dir="rtl"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Forbidden actions ────────────────────────────────────────── */}
+          {item.forbiddenActions.length > 0 && (
+            <div className={styles.rescueStep} style={{ padding: '12px 16px' }}>
+              <div className={styles.rescueStepHeader}>
+                <StepNum n="⚠" muted />
+                <span className={styles.rescueStepTitle} style={{ color: 'var(--bthwani-danger-text)' }}>
+                  إجراءات ممنوعة في هذه الحالة
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {item.forbiddenActions.map((action) => {
+                  const key = `${item.rescueId}-${action}`;
+                  const isOverridden = overriddenActions[key];
+                  return (
+                    <div
+                      key={action}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row-reverse',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        background: isOverridden
+                          ? 'color-mix(in srgb, var(--bthwani-warning) 10%, transparent)'
+                          : 'color-mix(in srgb, var(--bthwani-danger) 8%, transparent)',
+                        border: `1px solid ${isOverridden
+                          ? 'color-mix(in srgb, var(--bthwani-warning) 30%, transparent)'
+                          : 'color-mix(in srgb, var(--bthwani-danger) 25%, transparent)'}`,
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{ fontSize: '14px', flexShrink: 0 }}>
+                        {isOverridden ? '⚠️' : '🚫'}
+                      </span>
+                      <span style={{
+                        flex: 1,
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: isOverridden ? 'var(--bthwani-warning-text)' : 'var(--bthwani-danger-text)',
+                        textAlign: 'right',
+                      }}>
+                        {action}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => onToggleForbidden(action)}
+                        style={{
+                          flexShrink: 0,
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          padding: '3px 10px',
+                          borderRadius: '6px',
+                          border: `1.5px solid ${isOverridden ? 'var(--bthwani-warning-text)' : 'color-mix(in srgb, var(--bthwani-danger) 50%, transparent)'}`,
+                          background: 'transparent',
+                          color: isOverridden ? 'var(--bthwani-warning-text)' : 'var(--bthwani-danger-text)',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {isOverridden ? 'إلغاء الترخيص' : 'ترخيص استثناءً'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── Support handoff ──────────────────────────────────────────── */}
+          <div className={styles.rescueStep}>
+            <div className={styles.rescueStepHeader}>
+              <StepNum n="◎" muted />
+              <span className={styles.rescueStepTitle}>تسليم الدعم</span>
+            </div>
+            <div className={styles.rescueSupportBar}>
+              <div className={styles.rescueSupportBarCell}>
+                <span className={styles.rescueSupportBarCellLabel}>التذكرة</span>
+                <span className={styles.rescueSupportBarCellValue} style={{ fontFamily: 'monospace', direction: 'ltr' }}>
+                  {item.supportHandoff.ticketLink}
+                </span>
+              </div>
+              <div className={styles.rescueSupportBarCell}>
+                <span className={styles.rescueSupportBarCellLabel}>SLA المتبقي</span>
+                <span className={styles.rescueSupportBarCellValue}>{item.supportHandoff.sla}</span>
+              </div>
+              <button
+                type="button"
+                className={styles.rescueSupportNavBtn}
+                onClick={() => onNavigate(item.supportHandoff.routeHint)}
+                aria-label="فتح مسار الدعم"
+              >
+                فتح ←
+              </button>
+            </div>
+          </div>
+
+          {/* ── WLT impact ──────────────────────────────────────────────── */}
+          <div className={styles.rescueStep}>
+            <div className={styles.rescueStepHeader}>
+              <StepNum n="◎" muted />
+              <span className={styles.rescueStepTitle}>أثر WLT على هذا الطلب</span>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '6px',
+                background: 'color-mix(in srgb, var(--bthwani-control-panel-brand) 12%, transparent)',
+                color: 'var(--bthwani-control-panel-brand)',
+              }}>
+                {item.wltImpactVisibility.calculationTruthOwner}
+              </span>
+            </div>
+            <div className={styles.rescueWltRow}>
+              {(['paymentVisibility', 'refundVisibility', 'settlementVisibility'] as const).map((fieldKey) => {
+                const val = item.wltImpactVisibility[fieldKey];
+                if (!val) return null;
+                return (
+                  <div key={fieldKey} className={styles.rescueWltCell}>
+                    <label className={styles.rescueFieldLabel}>{WLT_FIELD_LABELS[fieldKey]}</label>
+                    <div style={{
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      background: 'color-mix(in srgb, var(--bthwani-control-panel-brand) 8%, transparent)',
+                      border: '1px solid color-mix(in srgb, var(--bthwani-control-panel-brand) 20%, transparent)',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: 'var(--bthwani-control-panel-brand)',
+                      textAlign: 'right',
+                      direction: 'ltr',
+                      cursor: 'default',
+                    }}>
+                      {val}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── Cross-surface links ──────────────────────────────────────── */}
+          {item.crossSurfaceLinks.length > 0 && (
+            <div className={styles.rescueStep}>
+              <div className={styles.rescueStepHeader}>
+                <StepNum n="◎" muted />
+                <span className={styles.rescueStepTitle}>روابط الأسطح ذات الصلة</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {item.crossSurfaceLinks.map((link) => (
+                  <div key={link.actionId} className={styles.rescueLinkItem}>
+                    <span className={styles.rescueLinkItemLabel}>
+                      {link.label}
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.rescueLinkItemBtn}
+                      onClick={() => onNavigate(link.routeHint)}
+                    >
+                      فتح ←
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Footer: submit ───────────────────────────────────────────── */}
+          <div className={styles.rescueAccordionFooter}>
+            <button
+              type="button"
+              className={styles.rescueSubmitBtn}
+              onClick={onSubmit}
+              style={{
+                opacity: completedSteps < totalDecisionSteps ? 0.6 : 1,
+              }}
+              title={completedSteps < totalDecisionSteps ? 'أكمل خطوات القرار أولاً' : undefined}
+            >
+              ✓ تأكيد قرار الإنقاذ
+            </button>
+            <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+              <button
+                type="button"
+                className={styles.rescueSecondaryBtn}
+                onClick={() => onNavigate(buildOperationsHref('command-center', { orderId: item.orderId }))}
+              >
+                غرفة القيادة
+              </button>
+              <button
+                type="button"
+                className={styles.rescueSecondaryBtn}
+                onClick={() => onNavigate(buildOperationsHref('exceptions-escalations'))}
+              >
+                الاستثناءات
+              </button>
+            </div>
+            {submitNote && (
+              <div className={styles.rescueToast} style={{ marginInlineStart: 'auto' }}>
+                ✓ {submitNote}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
     </div>
   );
 }
 
+// ── Main screen ──────────────────────────────────────────────────────────────
+
 export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: OrderRescueScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedRescueId, setSelectedRescueId] = React.useState<string>(DSH_ORDER_RESCUE_PREVIEW[0]?.rescueId ?? '');
 
+  const [cases, setCases] = React.useState<RescueCase[]>(() => [...DSH_ORDER_RESCUE_PREVIEW]);
+  const [openRescueId, setOpenRescueId] = React.useState<string | null>(null);
+  const [overriddenActions, setOverriddenActions] = React.useState<Record<string, boolean>>({});
+  const [submitNotes, setSubmitNotes] = React.useState<Record<string, string | null>>({});
+
+  // Deep-link: auto-open if URL contains a rescue/order context
   React.useEffect(() => {
-    const matchedCase = getDshOrderRescueByContext({
+    const matched = getDshOrderRescueByContext({
       rescueId: searchParams.get('rescueId'),
       orderId: searchParams.get('orderId'),
       customerId: searchParams.get('customerId'),
     });
-
-    if (matchedCase) {
-      setSelectedRescueId(matchedCase.rescueId);
-    }
+    if (matched) setOpenRescueId(matched.rescueId);
   }, [searchParams]);
 
-  const selectedCase = React.useMemo(
-    () => getDshOrderRescueCase(selectedRescueId) ?? DSH_ORDER_RESCUE_PREVIEW[0],
-    [selectedRescueId],
-  );
   const playbook = React.useMemo(
-    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((item) => item.triggerFlowIds.includes('order-rescue')),
-    [],
-  );
-  const kpis = React.useMemo(
-    () => [
-      { id: 'total', label: 'rescue cases', value: String(DSH_ORDER_RESCUE_PREVIEW.length), tone: 'neutral' as const },
-      {
-        id: 'critical',
-        label: 'critical',
-        value: String(DSH_ORDER_RESCUE_PREVIEW.filter((item) => item.severity === 'danger').length),
-        tone: 'danger' as const,
-      },
-      {
-        id: 'wlt',
-        label: 'WLT reference',
-        value: String(
-          DSH_ORDER_RESCUE_PREVIEW.filter(
-            (item) =>
-              item.issueKind === 'payment_failure' ||
-              item.issueKind === 'wlt_visibility' ||
-              item.ownerSelection.selectedOwner === 'wlt_reference_only',
-          ).length,
-        ),
-        tone: 'warning' as const,
-      },
-      { id: 'audit', label: 'audit required', value: 'yes', tone: 'success' as const },
-    ],
+    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.triggerFlowIds.includes('order-rescue')),
     [],
   );
 
-  if (!selectedCase) {
-    return null;
-  }
+  const kpis = React.useMemo(() => [
+    { id: 'total',    label: 'حالات الإنقاذ', value: String(cases.length),                                                                                                                                                                             tone: 'neutral'  as const },
+    { id: 'critical', label: 'حرجة',          value: String(cases.filter((c) => c.severity === 'danger').length),                                                                                                                                        tone: 'danger'   as const },
+    { id: 'wlt',      label: 'WLT',           value: String(cases.filter((c) => c.issueKind === 'payment_failure' || c.issueKind === 'wlt_visibility' || c.ownerSelection.selectedOwner === 'wlt_reference_only').length),                             tone: 'warning'  as const },
+    { id: 'audit',    label: 'تدقيق مطلوب',   value: 'نعم',                                                                                                                                                                                             tone: 'success'  as const },
+  ], [cases]);
 
-  function openRouteHint(routeHint: string) {
-    router.push(routeHint);
-  }
+  // Immutable updater — only mutates the targeted rescueId
+  const updateCase = React.useCallback(
+    (rescueId: string, updater: (c: RescueCase) => RescueCase) =>
+      setCases((prev) => prev.map((c) => (c.rescueId === rescueId ? updater(c) : c))),
+    [],
+  );
 
   return (
     <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>Order Rescue</h2>
+        <h2 className={styles.surfaceSectionTitle}>إنقاذ الطلبات</h2>
         <p className={styles.surfaceSectionSubtitle}>
-          reason ثم owner ثم next action ثم evidence/support handoff ثم WLT visibility read-only فقط.
+          اضغط على أي طلب لعرض خطوات الإنقاذ والتحكم الكامل — ينسدل من الطلب مباشرة.
         </p>
       </div>
 
       <WebControlPanelKpiStrip items={kpis} />
 
-      {playbook ? (
-        <WebControlPanelRecommendation
-          title={playbook.title}
-          reason={`${playbook.checkpoints.join(' · ')} · القرار التالي: ${selectedCase.nextBestAction}`}
-          confidence={playbook.severity === 'danger' ? 'high' : 'medium'}
-          auditTag={playbook.playbookId}
-          primaryAction={{
-            id: 'open-exceptions',
-            label: 'فتح الاستثناءات',
-            onAction: () =>
-              router.push(
-                buildOperationsHref('exceptions-escalations', {
-                  orderId: selectedCase.orderId,
-                  customerId: selectedCase.customerId,
-                }),
-              ),
+      {/* Playbook hint — only when nothing is open */}
+      {playbook && !openRescueId && (
+        <div
+          className={styles.surfaceCompactPanel}
+          style={{
+            padding: '12px 16px',
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
           }}
-          secondaryAction={{
-            id: 'open-assisted',
-            label: 'فتح Assisted Order',
-            onAction: () =>
-              router.push(
-                buildOperationsHref('assisted-order-desk', {
-                  orderId: selectedCase.orderId,
-                  customerId: selectedCase.customerId,
-                }),
-              ),
-          }}
-        />
-      ) : null}
-
-      <div className={styles.surfaceSplitGrid}>
-        <div className={styles.surfaceListColumn}>
-          <Box gap={2}>
-            {DSH_ORDER_RESCUE_PREVIEW.map((item) => (
-              <WebControlPanelDecisionRow
-                key={item.rescueId}
-                entityId={item.orderId}
-                entityLabel={`${item.customerName} · ${item.blocker}`}
-                status={item.issueKind}
-                statusTone={item.severity === 'danger' ? 'danger' : 'warning'}
-                risk={item.severity === 'danger' ? 'danger' : 'warning'}
-                recommendation={item.nextBestAction}
-                reason={`${OWNER_LABELS[item.ownerSelection.selectedOwner]} · ${ACTION_LABELS[item.nextActionSelector.selectedAction]}`}
-                sla={`${item.supportHandoff.ticketLink} · ${item.supportHandoff.sla}`}
-                primaryAction={{
-                  id: `${item.rescueId}-open`,
-                  label: 'فتح الحالة',
-                  onAction: () => setSelectedRescueId(item.rescueId),
-                }}
-                secondaryAction={{
-                  id: `${item.rescueId}-command`,
-                  label: 'غرفة القيادة',
-                  onAction: () =>
-                    router.push(
-                      buildOperationsHref('command-center', {
-                        orderId: item.orderId,
-                        customerId: item.customerId,
-                      }),
-                    ),
-                }}
-              />
-            ))}
-          </Box>
-        </div>
-
-        <aside className={styles.surfaceInspectorPanel}>
-          <div className={styles.surfaceSectionHeader}>
-            <h3 className={styles.surfaceSectionTitle}>{selectedCase.orderId}</h3>
-            <p className={styles.surfaceSectionSubtitle}>{selectedCase.blocker}</p>
+        >
+          <div style={{ flex: 1, textAlign: 'right', minWidth: 0 }}>
+            <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--bthwani-control-panel-text)', marginBottom: '2px' }}>
+              {playbook.title}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+              {playbook.checkpoints.slice(0, 2).join(' · ')}
+            </div>
           </div>
-
-          <div className={styles.surfaceGridTwoCol}>
-            <OrderRescueSection
-              title="rescue reason selector"
-              description={`selected=${selectedCase.rescueReasonSelector.selectedReason} · ${selectedCase.rescueReasonSelector.previewClassification}`}
-            >
-              <div className={styles.surfaceActionWrap}>
-                {selectedCase.rescueReasonSelector.options.map((reason) => (
-                  <span key={reason} className={styles.surfaceMetaChip}>
-                    {reason === selectedCase.rescueReasonSelector.selectedReason ? 'selected' : 'available'} · {reason}
-                  </span>
-                ))}
-              </div>
-            </OrderRescueSection>
-
-            <OrderRescueSection
-              title="owner selection"
-              description={`owner=${OWNER_LABELS[selectedCase.ownerSelection.selectedOwner]} · ${selectedCase.ownerSelection.previewClassification}`}
-            >
-              <div className={styles.surfaceActionWrap}>
-                {selectedCase.ownerSelection.options.map((owner) => (
-                  <span key={owner} className={styles.surfaceMetaChip}>
-                    {owner === selectedCase.ownerSelection.selectedOwner ? 'selected' : 'available'} · {OWNER_LABELS[owner]}
-                  </span>
-                ))}
-              </div>
-            </OrderRescueSection>
-          </div>
-
-          <div className={styles.surfaceGridTwoCol}>
-            <OrderRescueSection
-              title="next action selector"
-              description={`action=${ACTION_LABELS[selectedCase.nextActionSelector.selectedAction]} · ${selectedCase.nextActionSelector.previewClassification}`}
-            >
-              <div className={styles.surfaceActionWrap}>
-                {selectedCase.nextActionSelector.options.map((action) => (
-                  <span key={action} className={styles.surfaceMetaChip}>
-                    {action === selectedCase.nextActionSelector.selectedAction ? 'selected' : 'available'} · {ACTION_LABELS[action]}
-                  </span>
-                ))}
-              </div>
-              <p className={styles.surfaceFootnote}>{selectedCase.nextBestAction}</p>
-            </OrderRescueSection>
-
-            <OrderRescueSection
-              title="required evidence"
-              description={`auditRequired=${String(selectedCase.requiredEvidence.auditRequired)} · reasonRequired=${String(selectedCase.requiredEvidence.reasonRequired)}`}
-            >
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>reason</strong>
-                  <span>{selectedCase.requiredEvidence.reason}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>operator note</strong>
-                  <span>{selectedCase.requiredEvidence.operatorNote}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>affected entity</strong>
-                  <span>{selectedCase.requiredEvidence.affectedEntity}</span>
-                </div>
-              </div>
-            </OrderRescueSection>
-          </div>
-
-          <div className={styles.surfaceGridTwoCol}>
-            <OrderRescueSection
-              title="forbidden actions"
-              description="no refund / settlement mutation, no invalid delivery-mode change, no item mutation بلا visibility note."
-            >
-              <div className={styles.surfaceActionWrap}>
-                {selectedCase.forbiddenActions.map((action) => (
-                  <span key={action} className={styles.surfaceMetaChip}>{action}</span>
-                ))}
-              </div>
-            </OrderRescueSection>
-
-            <OrderRescueSection
-              title="support handoff"
-              description={`owner=${selectedCase.supportHandoff.escalationOwner} · ${selectedCase.supportHandoff.previewClassification}`}
-            >
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>ticket link</strong>
-                  <span>{selectedCase.supportHandoff.ticketLink}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>SLA</strong>
-                  <span>{selectedCase.supportHandoff.sla}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>route</strong>
-                  <span>{selectedCase.supportHandoff.routeHint}</span>
-                </div>
-              </div>
-            </OrderRescueSection>
-          </div>
-
-          <div className={styles.surfaceGridTwoCol}>
-            <OrderRescueSection
-              title="WLT impact visibility"
-              description={`classification=${selectedCase.wltImpactVisibility.placeholderClassification} · ${selectedCase.wltImpactVisibility.calculationTruthOwner}`}
-            >
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>payment</strong>
-                  <span>{selectedCase.wltImpactVisibility.paymentVisibility}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>refund</strong>
-                  <span>{selectedCase.wltImpactVisibility.refundVisibility}</span>
-                </div>
-                {selectedCase.wltImpactVisibility.settlementVisibility ? (
-                  <div className={styles.surfaceInspectorRow}>
-                    <strong>settlement</strong>
-                    <span>{selectedCase.wltImpactVisibility.settlementVisibility}</span>
-                  </div>
-                ) : null}
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>route</strong>
-                  <span>{selectedCase.wltImpactVisibility.routeHint}</span>
-                </div>
-              </div>
-            </OrderRescueSection>
-
-            <OrderRescueSection
-              title="decision signal"
-              description={`routeId=${selectedCase.decisionSignal.routeId} · auditRequired=${String(selectedCase.decisionSignal.auditRequired)}`}
-            >
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>signal kind</strong>
-                  <span>{selectedCase.decisionSignal.signalKind}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>priority</strong>
-                  <span>{selectedCase.decisionSignal.priorityLabel}</span>
-                </div>
-              </div>
-            </OrderRescueSection>
-          </div>
-
-          <OrderRescueSection
-            title="cross-surface links"
-            description={`allowed=${selectedCase.allowedActions.join(' · ')}`}
+          <button
+            type="button"
+            className={styles.rescueSecondaryBtn}
+            onClick={() => router.push(buildOperationsHref('exceptions-escalations'))}
           >
-            <Box gap={2}>
-              {selectedCase.crossSurfaceLinks.map((link) => (
-                <WebControlPanelDecisionRow
-                  key={link.actionId}
-                  entityId={link.sectionId}
-                  entityLabel={link.label}
-                  status={link.surfaceId}
-                  statusTone={link.readOnly ? 'warning' : 'neutral'}
-                  recommendation={`${link.routeId ?? 'routeHint'} · ${link.onDemandPolicy}`}
-                  reason={link.routeHint}
-                  primaryAction={{
-                    id: link.actionId,
-                    label: 'فتح الرابط',
-                    onAction: () => openRouteHint(link.routeHint),
-                  }}
-                />
-              ))}
-            </Box>
-          </OrderRescueSection>
-        </aside>
-      </div>
+            فتح الاستثناءات
+          </button>
+        </div>
+      )}
+
+      <Box gap={2}>
+        {cases.map((item) => (
+          <RescueCaseRow
+            key={item.rescueId}
+            item={item}
+            isOpen={item.rescueId === openRescueId}
+            overriddenActions={overriddenActions}
+            onToggle={() =>
+              setOpenRescueId((prev) => (prev === item.rescueId ? null : item.rescueId))
+            }
+            onSelectReason={(reason) =>
+              updateCase(item.rescueId, (c) => ({
+                ...c,
+                issueKind: reason,
+                rescueReasonSelector: { ...c.rescueReasonSelector, selectedReason: reason },
+              }))
+            }
+            onSelectOwner={(owner) =>
+              updateCase(item.rescueId, (c) => ({
+                ...c,
+                ownerSelection: { ...c.ownerSelection, selectedOwner: owner },
+              }))
+            }
+            onSelectNextAction={(action) =>
+              updateCase(item.rescueId, (c) => ({
+                ...c,
+                nextActionSelector: { ...c.nextActionSelector, selectedAction: action },
+              }))
+            }
+            onUpdateEvidence={(key, value) =>
+              updateCase(item.rescueId, (c) => ({
+                ...c,
+                requiredEvidence: { ...c.requiredEvidence, [key]: value },
+              }))
+            }
+            onUpdateWlt={(key, value) =>
+              updateCase(item.rescueId, (c) => ({
+                ...c,
+                wltImpactVisibility: { ...c.wltImpactVisibility, [key]: value },
+              }))
+            }
+            onToggleForbidden={(action) => {
+              const key = `${item.rescueId}-${action}`;
+              setOverriddenActions((prev) => ({ ...prev, [key]: !prev[key] }));
+            }}
+            onSubmit={() => {
+              setSubmitNotes((prev) => ({
+                ...prev,
+                [item.rescueId]: `تم تأكيد قرار الإنقاذ للطلب ${item.orderId}.`,
+              }));
+              setTimeout(
+                () => setSubmitNotes((prev) => ({ ...prev, [item.rescueId]: null })),
+                3500,
+              );
+            }}
+            submitNote={submitNotes[item.rescueId] ?? null}
+            onNavigate={(href) => router.push(href)}
+          />
+        ))}
+      </Box>
     </Box>
   );
 }

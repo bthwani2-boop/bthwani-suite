@@ -328,11 +328,18 @@
   overflow: hidden;
 }
 
+/* Split grid: full width when no inspector, with-inspector when item is selected */
 .surfaceSplitGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 12px;
   align-items: start;
+}
+
+/* Full-width: no inspector panel active */
+.surfaceSplitGridFull {
+  display: block;
+  width: 100%;
 }
 
 .surfaceDetailSplit {
@@ -345,21 +352,176 @@
 .surfaceListColumn {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
+/* Inspector panel: only rendered when user selects a row */
 .surfaceInspectorPanel {
+  width: 360px;
+  flex-shrink: 0;
   background-color: var(--bthwani-control-panel-surface);
-  border-right: 1px solid var(--bthwani-control-panel-border);
-  padding: 16px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  border-radius: 10px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+/* Inspector header row */
+.surfaceInspectorHeader {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  flex-shrink: 0;
+}
+
+.surfaceInspectorHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+
+.surfaceInspectorTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.surfaceInspectorSubtitle {
+  font-size: 11px;
+  color: var(--bthwani-control-panel-text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.surfaceInspectorCloseBtn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.surfaceInspectorCloseBtn:hover {
+  background: var(--bthwani-control-panel-border);
+  color: var(--bthwani-control-panel-text);
+}
+
+/* Inspector summary block at top */
+.surfaceInspectorSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bthwani-control-panel-surface-inset);
+  border-radius: 8px;
+}
+
+.surfaceInspectorSummaryRow {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.surfaceInspectorSummaryLabel {
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.surfaceInspectorSummaryValue {
+  color: var(--bthwani-control-panel-text);
+  font-weight: 700;
+  font-size: 12px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Inspector section (collapsible group) */
+.surfaceInspectorSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.surfaceInspectorSectionTitle {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text);
+  margin: 0;
+}
+
+.surfaceInspectorSectionToken {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--bthwani-control-panel-text-muted);
+  background: var(--bthwani-control-panel-surface-inset);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  opacity: 0.7;
+}
+
+/* Fix UI distortion/overlap inside inspector panel by stacking grids and cards vertically */
+.surfaceInspectorPanel .surfaceGridTwoCol {
+  grid-template-columns: 1fr;
+}
+
+.surfaceInspectorPanel .surfaceInfoCard {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.surfaceInspectorPanel .surfaceInfoCardTextBlock {
+  align-items: stretch;
+}
+
+.surfaceInspectorPanel .surfaceActionWrap {
+  justify-content: flex-start;
 }
 
 .surfaceDetailRail {
-  width: 340px;
+  width: 360px;
   flex-shrink: 0;
   border-right: 1px solid var(--bthwani-control-panel-border);
 }
@@ -394,6 +556,79 @@
   background-color: var(--bthwani-control-panel-surface-inset);
   border-radius: 999px;
   border: 1px solid var(--bthwani-control-panel-border);
+}
+
+.surfaceMetaChipClickable {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease-in-out;
+}
+
+.surfaceMetaChipClickable:hover {
+  background-color: var(--bthwani-control-panel-border);
+  border-color: var(--bthwani-control-panel-text-muted);
+}
+
+.surfaceMetaChipActive {
+  background-color: var(--bthwani-control-panel-brand);
+  color: var(--bthwani-text-inverse);
+  border-color: var(--bthwani-control-panel-brand);
+}
+
+.inspectorInput,
+.inspectorTextarea,
+.inspectorSelect {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--bthwani-control-panel-surface);
+  border: 1px solid var(--bthwani-control-panel-border);
+  border-radius: 6px;
+  color: var(--bthwani-control-panel-text);
+  font-family: inherit;
+  font-size: 12px;
+  box-sizing: border-box;
+  margin-top: 4px;
+  outline: none;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.inspectorInput:focus,
+.inspectorTextarea:focus,
+.inspectorSelect:focus {
+  border-color: var(--bthwani-control-panel-brand);
+}
+
+.inspectorTextarea {
+  resize: vertical;
+}
+
+.quantityBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background-color: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.quantityBtn:hover {
+  background-color: var(--bthwani-control-panel-border);
+}
+
+.overrideNotification {
+  font-size: 11px;
+  color: var(--bthwani-success);
+  margin-top: 4px;
+  font-weight: bold;
 }
 
 .surfaceInfoCard {
@@ -477,6 +712,12 @@
     grid-template-columns: 1fr;
   }
 
+  .surfaceInspectorPanel {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+
   .surfaceDetailSplit {
     flex-direction: column;
   }
@@ -495,7 +736,7 @@
 
 .escalationCatalogRow {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
@@ -508,31 +749,37 @@
   font-weight: 600;
   min-width: 200px;
   color: var(--bthwani-control-panel-text);
+  text-align: right;
 }
 
 .escalationCatalogMeta {
   color: var(--bthwani-control-panel-text-muted);
   min-width: 100px;
+  text-align: right;
 }
 
 .escalationCatalogDomain {
   color: var(--bthwani-control-panel-text-muted);
   min-width: 140px;
+  text-align: right;
 }
 
 .escalationCatalogVisibility {
   min-width: 100px;
   color: var(--bthwani-control-panel-text);
+  text-align: right;
 }
 
 .escalationCatalogPolicy {
   min-width: 130px;
   color: var(--bthwani-control-panel-text);
+  text-align: right;
 }
 
 .escalationCatalogBadgeFinance {
   color: var(--bthwani-warning);
   font-weight: 600;
+  text-align: right;
 }
 
 /* ── Topology Lane ─────────────────────────────────────────────────────────── */
@@ -572,4 +819,463 @@
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INLINE ACCORDION — ينسدل من الطلب نفسه
+   Used by OrderRescueScreen and AssistedOrderDeskScreen
+   ═══════════════════════════════════════════════════════════════ */
+
+.rescueRowWrap {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--bthwani-control-panel-border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--bthwani-control-panel-surface);
+}
+
+.rescueRowWrapActive {
+  border-color: var(--bthwani-control-panel-brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bthwani-control-panel-brand) 20%, transparent);
+}
+
+.rescueRowSummary {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.rescueRowSummary:hover {
+  background: var(--bthwani-control-panel-surface-inset);
+}
+
+.rescueSeverityBar {
+  width: 3px;
+  align-self: stretch;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.rescueSeverityBarDanger { background: var(--bthwani-danger); }
+.rescueSeverityBarWarning { background: var(--bthwani-warning); }
+
+.rescueRowInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  text-align: right;
+}
+
+.rescueRowId {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text-muted);
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.rescueRowCustomer {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rescueRowBlocker {
+  font-size: 11px;
+  color: var(--bthwani-control-panel-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+}
+
+.rescueRowMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.rescueSeverityBadge {
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.rescueSeverityBadgeDanger {
+  background: var(--bthwani-danger-surface);
+  color: var(--bthwani-danger-text);
+}
+
+.rescueSeverityBadgeWarning {
+  background: var(--bthwani-warning-surface);
+  color: var(--bthwani-warning-text);
+}
+
+.rescueRowSla {
+  font-size: 10px;
+  color: var(--bthwani-control-panel-text-muted);
+  font-weight: 600;
+  direction: rtl;
+}
+
+.rescueToggleBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid var(--bthwani-control-panel-border);
+  background: transparent;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.rescueToggleBtn:hover {
+  background: var(--bthwani-control-panel-border);
+  color: var(--bthwani-control-panel-text);
+}
+
+.rescueToggleBtnActive {
+  background: var(--bthwani-control-panel-brand);
+  border-color: var(--bthwani-control-panel-brand);
+  color: white;
+  transform: rotate(180deg);
+}
+
+/* ── Accordion body ── */
+.rescueAccordion {
+  border-top: 2px solid var(--bthwani-control-panel-brand);
+  display: flex;
+  flex-direction: column;
+  background: var(--bthwani-control-panel-surface);
+}
+
+/* Step block */
+.rescueStep {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+}
+
+.rescueStepHeader {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 8px;
+}
+
+.rescueStepNum {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bthwani-control-panel-brand);
+  color: white;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rescueStepNumMuted {
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.rescueStepTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text);
+  flex: 1;
+  text-align: right;
+}
+
+.rescueStepSelected {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-brand);
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--bthwani-control-panel-brand) 12%, transparent);
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Option chips */
+.rescueChipGrid {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rescueChip {
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1.5px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.13s ease;
+  white-space: nowrap;
+}
+
+.rescueChip:hover {
+  border-color: var(--bthwani-control-panel-brand);
+  color: var(--bthwani-control-panel-brand);
+  background: color-mix(in srgb, var(--bthwani-control-panel-brand) 8%, transparent);
+}
+
+.rescueChipActive {
+  background: var(--bthwani-control-panel-brand);
+  border-color: var(--bthwani-control-panel-brand);
+  color: white;
+  font-weight: 800;
+}
+
+/* Evidence grid — 2 cols */
+.rescueEvidenceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  direction: rtl;
+}
+
+.rescueEvidenceFieldFull {
+  grid-column: 1 / -1;
+}
+
+.rescueFieldLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+  margin-bottom: 4px;
+  text-align: right;
+  display: block;
+}
+
+/* Forbidden actions block */
+.rescueForbiddenBlock {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--bthwani-danger) 8%, transparent);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--bthwani-danger) 25%, transparent);
+}
+
+.rescueForbiddenContent {
+  flex: 1;
+  text-align: right;
+}
+
+.rescueForbiddenTitle {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bthwani-danger-text);
+  margin-bottom: 4px;
+}
+
+.rescueForbiddenItem {
+  font-size: 11px;
+  color: var(--bthwani-danger-text);
+  opacity: 0.8;
+  padding: 2px 0;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Support bar */
+.rescueSupportBar {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 0;
+  background: var(--bthwani-control-panel-surface-inset);
+  border-radius: 8px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+
+.rescueSupportBarCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  flex: 1;
+  text-align: right;
+  border-left: 1px solid var(--bthwani-control-panel-border);
+}
+
+.rescueSupportBarCell:first-child {
+  border-left: none;
+}
+
+.rescueSupportBarCellLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.rescueSupportBarCellValue {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text);
+}
+
+.rescueSupportNavBtn {
+  padding: 0 14px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  background: var(--bthwani-control-panel-brand);
+  color: white;
+  border: none;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.rescueSupportNavBtn:hover {
+  opacity: 0.85;
+}
+
+/* WLT row */
+.rescueWltRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  direction: rtl;
+}
+
+.rescueWltCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Cross-surface links */
+.rescueLinkItem {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bthwani-control-panel-surface-inset);
+  border-radius: 8px;
+  border: 1px solid var(--bthwani-control-panel-border);
+}
+
+.rescueLinkItemLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text);
+  text-align: right;
+}
+
+.rescueLinkItemBtn {
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--bthwani-control-panel-brand);
+  background: transparent;
+  color: var(--bthwani-control-panel-brand);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.13s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rescueLinkItemBtn:hover {
+  background: var(--bthwani-control-panel-brand);
+  color: white;
+}
+
+/* Accordion footer */
+.rescueAccordionFooter {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bthwani-control-panel-surface-inset);
+  border-top: 1px solid var(--bthwani-control-panel-border);
+  flex-wrap: wrap;
+}
+
+.rescueSubmitBtn {
+  padding: 10px 28px;
+  border-radius: 8px;
+  background: var(--bthwani-control-panel-brand);
+  color: white;
+  border: none;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.rescueSubmitBtn:hover { opacity: 0.85; }
+
+.rescueSecondaryBtn {
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--bthwani-control-panel-text);
+  border: 1.5px solid var(--bthwani-control-panel-border);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.13s;
+}
+
+.rescueSecondaryBtn:hover {
+  border-color: var(--bthwani-control-panel-brand);
+  color: var(--bthwani-control-panel-brand);
+}
+
+.rescueToast {
+  padding: 8px 14px;
+  background: var(--bthwani-success-surface);
+  color: var(--bthwani-success-text);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
 }

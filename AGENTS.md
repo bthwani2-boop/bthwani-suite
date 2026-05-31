@@ -90,34 +90,43 @@ No agent may run these automatically for a docs, policy, agent, or governance-on
 
 Use these project-owned skills when relevant:
 
-- `.agents/skills/bthwani-current-workspace-authority/SKILL.md`
 - `.agents/skills/bthwani-agent-governance-execution/SKILL.md`
-- `.agents/skills/bthwani-local-evidence-pack/SKILL.md`
-- `.agents/skills/bthwani-patch-review-and-evidence/SKILL.md`
+- `.agents/skills/bthwani-agent-registry-validator/SKILL.md`
 - `.agents/skills/bthwani-agent-restoration-forensics/SKILL.md`
-- `.agents/skills/bthwani-domain-governance-reader/SKILL.md`
-- `.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md`
-- `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`
-- `.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md`
-- `.agents/skills/bthwani-platform-vars-control-contract/SKILL.md`
-- `.agents/skills/bthwani-runtime-provider-config-contract/SKILL.md`
+- `.agents/skills/bthwani-agent-skill-authoring-contract/SKILL.md`
 - `.agents/skills/bthwani-api-contract-client-boundary/SKILL.md`
-- `.agents/skills/bthwani-go-backend-target-boundary/SKILL.md`
-- `.agents/skills/bthwani-data-fixture-simulation-contract/SKILL.md`
-- `.agents/skills/bthwani-finance-ledger-contract/SKILL.md`
-- `.agents/skills/bthwani-commercial-growth-contract/SKILL.md`
 - `.agents/skills/bthwani-commerce-catalog-contract/SKILL.md`
-- `.agents/skills/bthwani-operations-dispatch-contract/SKILL.md`
+- `.agents/skills/bthwani-commercial-growth-contract/SKILL.md`
+- `.agents/skills/bthwani-current-workspace-authority/SKILL.md`
+- `.agents/skills/bthwani-data-fixture-simulation-contract/SKILL.md`
+- `.agents/skills/bthwani-domain-governance-reader/SKILL.md`
+- `.agents/skills/bthwani-dsh-ui-kit-golden-slice/SKILL.md`
+- `.agents/skills/bthwani-finance-ledger-contract/SKILL.md`
+- `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`
+- `.agents/skills/bthwani-go-backend-target-boundary/SKILL.md`
+- `.agents/skills/bthwani-graphify-query-first/SKILL.md`
+- `.agents/skills/bthwani-integrated-system-umbrella-contract/SKILL.md`
+- `.agents/skills/bthwani-local-evidence-pack/SKILL.md`
 - `.agents/skills/bthwani-mobile-navigation-back-contract/SKILL.md`
+- `.agents/skills/bthwani-observability-performance-contract/SKILL.md`
+- `.agents/skills/bthwani-on-demand-retrieval-contract/SKILL.md`
+- `.agents/skills/bthwani-operations-dispatch-contract/SKILL.md`
+- `.agents/skills/bthwani-patch-review-and-evidence/SKILL.md`
+- `.agents/skills/bthwani-platform-vars-control-contract/SKILL.md`
+- `.agents/skills/bthwani-release-runtime-gates/SKILL.md`
+- `.agents/skills/bthwani-runtime-provider-config-contract/SKILL.md`
+- `.agents/skills/bthwani-screen-flow-binding-contract/SKILL.md`
 - `.agents/skills/bthwani-security-secrets-privacy-contract/SKILL.md`
+- `.agents/skills/bthwani-stop-slop-prose-contract/SKILL.md`
 - `.agents/skills/bthwani-supply-chain-intake-contract/SKILL.md`
 - `.agents/skills/bthwani-test-quality-gates-contract/SKILL.md`
-- `.agents/skills/bthwani-release-runtime-gates/SKILL.md`
-- `.agents/skills/bthwani-observability-performance-contract/SKILL.md`
-- `.agents/skills/bthwani-agent-skill-authoring-contract/SKILL.md`
-- `.agents/skills/bthwani-agent-registry-validator/SKILL.md`
-- `.agents/skills/nx-workspace/SKILL.md`
+- `.agents/skills/bthwani-ui-kit-surface-contract/SKILL.md`
+- `.agents/skills/link-workspace-packages/SKILL.md`
+- `.agents/skills/monitor-ci/SKILL.md`
 - `.agents/skills/nx-generate/SKILL.md`
+- `.agents/skills/nx-import/SKILL.md`
+- `.agents/skills/nx-plugins/SKILL.md`
 - `.agents/skills/nx-run-tasks/SKILL.md`
+- `.agents/skills/nx-workspace/SKILL.md`
 
 <!-- BTHWANI_CURRENT_AGENT_CONTRACT_END -->

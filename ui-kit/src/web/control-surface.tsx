@@ -1810,7 +1810,7 @@ export function WebControlPanelDecisionRow({
         <div className="ui-web-cp-action-cluster">
           {primaryAction?.onAction && <button type="button" className="ui-web-cp-action-cluster__primary" onClick={primaryAction.onAction}>{primaryAction.label}</button>}
           {secondaryAction?.onAction && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={secondaryAction.onAction}>{secondaryAction.label}</button>}
-          {onInspect && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={onInspect} aria-label="فتح التفاصيل">►</button>}
+          {onInspect && <button type="button" className="ui-web-cp-action-cluster__secondary" onClick={onInspect} aria-label="فتح التفاصيل">←</button>}
         </div>
       </div>
     </>

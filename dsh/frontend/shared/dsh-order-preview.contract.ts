@@ -169,11 +169,11 @@ export type DshReadOnlyFinanceVisibility = {
   readonly paymentVisibility: string;
   readonly refundVisibility: string;
   readonly settlementVisibility?: string;
-  readonly readOnly: true;
-  readonly mutationForbidden: true;
-  readonly calculationTruthOwner: 'WLT';
+  readonly readOnly: boolean;
+  readonly mutationForbidden: boolean;
+  readonly calculationTruthOwner: string;
   readonly routeHint: string;
-  readonly onDemandPolicy: 'finance-preview-only';
+  readonly onDemandPolicy: string;
   readonly placeholderClassification: DshPreviewPlaceholderStatus;
 };
 

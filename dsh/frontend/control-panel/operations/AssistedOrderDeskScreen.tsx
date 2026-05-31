@@ -11,7 +11,6 @@ import {
 import {
   DSH_ASSISTED_ORDER_PREVIEW,
   getDshAssistedOrderByContext,
-  getDshAssistedOrderById,
 } from '../../data/orders.preview-data';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
@@ -23,40 +22,24 @@ export type AssistedOrderDeskScreenProps = {
 };
 
 const IDENTITY_STATUS_META = {
-  verified: { label: 'verified', tone: 'success' as const, risk: 'neutral' as const },
-  required: { label: 'required', tone: 'warning' as const, risk: 'warning' as const },
-  blocked: { label: 'blocked', tone: 'danger' as const, risk: 'danger' as const },
+  verified: { label: 'هوية مؤكدة', tone: 'success' as const, risk: 'neutral' as const },
+  required: { label: 'التحقق مطلوب', tone: 'warning' as const, risk: 'warning' as const },
+  blocked: { label: 'محظور', tone: 'danger' as const, risk: 'danger' as const },
 } as const;
 
 const SERVICEABILITY_STATUS_META = {
-  serviceable: { label: 'serviceable', tone: 'success' as const },
-  blocked: { label: 'blocked', tone: 'danger' as const },
+  serviceable: { label: 'قابل للخدمة', tone: 'success' as const },
+  blocked: { label: 'محظور', tone: 'danger' as const },
 } as const;
-
-function AssistedOrderSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={styles.surfaceInfoCard}>
-      <div className={styles.surfaceInfoCardTextBlock}>
-        <div className={styles.surfaceInfoCardTitle}>{title}</div>
-        {description ? <div className={styles.surfaceInfoCardDescription}>{description}</div> : null}
-      </div>
-      {children}
-    </div>
-  );
-}
 
 export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup }: AssistedOrderDeskScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedDeskId, setSelectedDeskId] = React.useState<string>(DSH_ASSISTED_ORDER_PREVIEW[0]?.deskId ?? '');
+
+  const [desks, setDesks] = React.useState(() => [...DSH_ASSISTED_ORDER_PREVIEW]);
+  // null = no selection = full width queue
+  const [selectedDeskId, setSelectedDeskId] = React.useState<string | null>(null);
+  const [submitStatus, setSubmitStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const matchedDesk = getDshAssistedOrderByContext({
@@ -65,87 +48,239 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
       customerId: searchParams.get('customerId'),
       ticketId: searchParams.get('ticketId'),
     });
-
     if (matchedDesk) {
       setSelectedDeskId(matchedDesk.deskId);
     }
   }, [searchParams]);
 
   const selectedDesk = React.useMemo(
-    () => getDshAssistedOrderById(selectedDeskId) ?? DSH_ASSISTED_ORDER_PREVIEW[0],
-    [selectedDeskId],
+    () => (selectedDeskId ? desks.find((d) => d.deskId === selectedDeskId) ?? null : null),
+    [desks, selectedDeskId],
   );
+
   const relevantPlaybook = React.useMemo(
-    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((playbook) => playbook.triggerFlowIds.includes('assisted-order-desk')),
+    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.triggerFlowIds.includes('assisted-order-desk')),
     [],
   );
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
+
+  const handleUpdateLookup = (key: string, value: string) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) =>
+        d.deskId === selectedDesk.deskId
+          ? { ...d, lookupPanel: { ...d.lookupPanel, inputs: d.lookupPanel.inputs.map((inp) => (inp.key === key ? { ...inp, value } : inp)) } }
+          : d,
+      ),
+    );
+  };
+
+  const handleToggleVerificationStep = (stepId: string) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        const newSteps = d.identityVerification.verificationSteps.map((step) =>
+          step.stepId === stepId ? { ...step, completed: !step.completed } : step,
+        );
+        const allCompleted = newSteps.every((s) => s.completed);
+        return {
+          ...d,
+          identityVerification: {
+            ...d.identityVerification,
+            verificationStatus: allCompleted ? 'verified' : 'required',
+            verificationSteps: newSteps,
+          },
+        };
+      }),
+    );
+  };
+
+  const handleUpdateCartItemQty = (sku: string, increment: number) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        return {
+          ...d,
+          cartBuilderPreview: {
+            ...d.cartBuilderPreview,
+            items: d.cartBuilderPreview.items.map((item) =>
+              item.sku === sku ? { ...item, quantity: Math.max(1, item.quantity + increment) } : item,
+            ),
+          },
+        };
+      }),
+    );
+  };
+
+  const handleUpdateCartItemStatus = (sku: string, status: 'active' | 'substitute' | 'unavailable') => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        return {
+          ...d,
+          cartBuilderPreview: {
+            ...d.cartBuilderPreview,
+            items: d.cartBuilderPreview.items.map((item) => (item.sku === sku ? { ...item, status } : item)),
+          },
+        };
+      }),
+    );
+  };
+
+  const handleAddCartItem = () => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        const newSku = `SKU-${Math.floor(100 + Math.random() * 900)}`;
+        return {
+          ...d,
+          cartBuilderPreview: {
+            ...d.cartBuilderPreview,
+            items: [
+              ...d.cartBuilderPreview.items,
+              { sku: newSku, name: 'تفاح طازج مضاف', quantity: 1, published: true, status: 'active', note: 'صنف مضاف يدوياً.' },
+            ],
+          },
+        };
+      }),
+    );
+  };
+
+  const handleRemoveCartItem = (sku: string) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        return {
+          ...d,
+          cartBuilderPreview: {
+            ...d.cartBuilderPreview,
+            items: d.cartBuilderPreview.items.filter((item) => item.sku !== sku),
+          },
+        };
+      }),
+    );
+  };
+
+  const handleSelectDeliveryMode = (modeId: string) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId } };
+      }),
+    );
+  };
+
+  const handleToggleServiceability = () => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        const current = d.serviceabilitySummary.serviceabilityStatus;
+        return {
+          ...d,
+          serviceabilitySummary: {
+            ...d.serviceabilitySummary,
+            serviceabilityStatus: current === 'serviceable' ? 'blocked' : 'serviceable',
+          },
+        };
+      }),
+    );
+  };
+
+  const handleUpdateWltHandoff = (key: string, value: string) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        return { ...d, wltReadOnlyHandoff: { ...d.wltReadOnlyHandoff, [key]: value } };
+      }),
+    );
+  };
+
+  const handleUpdateAuditReason = (key: string, value: string) => {
+    if (!selectedDesk) return;
+    setDesks((prev) =>
+      prev.map((d) => {
+        if (d.deskId !== selectedDesk.deskId) return d;
+        return { ...d, auditReason: { ...d.auditReason, [key]: value } };
+      }),
+    );
+  };
+
+  const handleSubmitDraft = () => {
+    if (!selectedDesk) return;
+    setSubmitStatus(`تم تقديم مسودة الطلب للعميل ${selectedDesk.customerName} بنجاح.`);
+    setTimeout(() => setSubmitStatus(null), 3500);
+  };
+
+  // ── KPIs ──────────────────────────────────────────────────────────────────
+
   const kpis = React.useMemo(
     () => [
-      { id: 'desk', label: 'حالات المساعدة', value: String(DSH_ASSISTED_ORDER_PREVIEW.length), tone: 'neutral' as const },
+      { id: 'desk', label: 'حالات المساعدة', value: String(desks.length), tone: 'neutral' as const },
       {
         id: 'verified',
-        label: 'هوية verified',
-        value: String(DSH_ASSISTED_ORDER_PREVIEW.filter((item) => item.identityVerification.verificationStatus === 'verified').length),
+        label: 'هوية مؤكدة',
+        value: String(desks.filter((d) => d.identityVerification.verificationStatus === 'verified').length),
         tone: 'success' as const,
       },
       {
         id: 'blocked',
-        label: 'serviceability blocked',
-        value: String(DSH_ASSISTED_ORDER_PREVIEW.filter((item) => item.serviceabilitySummary.serviceabilityStatus === 'blocked').length),
+        label: 'خدمة محظورة',
+        value: String(desks.filter((d) => d.serviceabilitySummary.serviceabilityStatus === 'blocked').length),
         tone: 'warning' as const,
       },
-      { id: 'wlt', label: 'WLT', value: 'read-only', tone: 'danger' as const },
+      { id: 'wlt', label: 'WLT نشط', value: 'تفاعلي', tone: 'success' as const },
     ],
-    [],
+    [desks],
   );
 
-  if (!selectedDesk) {
-    return null;
-  }
-  const serviceabilityMeta = SERVICEABILITY_STATUS_META[selectedDesk.serviceabilitySummary.serviceabilityStatus];
+  const hasInspector = selectedDesk !== null;
 
   return (
     <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
-        <h2 className={styles.surfaceSectionTitle}>Assisted Order Desk</h2>
+        <h2 className={styles.surfaceSectionTitle}>مكتب الطلبات المساعدة</h2>
         <p className={styles.surfaceSectionSubtitle}>
-          lookup ثم verification ثم cart/delivery/serviceability ثم WLT read-only ثم audit/submit preview.
+          اختر حالة من القائمة لعرض مسار المعالجة والتحكم الكامل.
         </p>
       </div>
 
       <WebControlPanelKpiStrip items={kpis} />
 
-      {relevantPlaybook ? (
+      {relevantPlaybook && !hasInspector ? (
         <WebControlPanelRecommendation
           title={relevantPlaybook.title}
-          reason={`${relevantPlaybook.checkpoints.join(' · ')} · القرار التالي: ${selectedDesk.submitDraftPreview.nextAction}`}
+          reason={relevantPlaybook.checkpoints.join(' · ')}
           confidence={relevantPlaybook.severity === 'danger' ? 'high' : 'medium'}
           auditTag={relevantPlaybook.playbookId}
           primaryAction={{
             id: 'open-rescue',
             label: 'فتح Order Rescue',
-            onAction: () =>
-              router.push(
-                buildOperationsHref('order-rescue', {
-                  orderId: selectedDesk.orderId,
-                  customerId: selectedDesk.customerId,
-                  ticketId: selectedDesk.ticketId,
-                }),
-              ),
+            onAction: () => router.push(buildOperationsHref('order-rescue')),
           }}
           secondaryAction={{
             id: 'open-command',
             label: 'غرفة القيادة',
-            onAction: () => router.push(buildOperationsHref('command-center', { orderId: selectedDesk.orderId })),
+            onAction: () => router.push(buildOperationsHref('command-center')),
           }}
         />
       ) : null}
 
-      <div className={styles.surfaceSplitGrid}>
+      <div className={hasInspector ? styles.surfaceSplitGrid : styles.surfaceSplitGridFull}>
+        {/* ── Queue column ── */}
         <div className={styles.surfaceListColumn}>
           <Box gap={2}>
-            {DSH_ASSISTED_ORDER_PREVIEW.map((desk) => {
+            {desks.map((desk) => {
               const deskIdentity = IDENTITY_STATUS_META[desk.identityVerification.verificationStatus];
+              const isSelected = desk.deskId === selectedDeskId;
               return (
                 <WebControlPanelDecisionRow
                   key={desk.deskId}
@@ -156,8 +291,14 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
                   risk={deskIdentity.risk}
                   recommendation={desk.submitDraftPreview.nextAction}
                   reason={`${desk.deliveryModeSelector.selectedMode} · ${desk.serviceabilitySummary.zoneLabel}`}
-                  sla={`${desk.auditFlags.join(' · ')} · signal=${desk.submitDraftPreview.signal.routeId}`}
-                  primaryAction={{ id: `${desk.deskId}-open`, label: 'فتح workspace', onAction: () => setSelectedDeskId(desk.deskId) }}
+                  sla={desk.auditFlags.join(' · ')}
+                  isActive={isSelected}
+                  onInspect={isSelected ? () => setSelectedDeskId(null) : undefined}
+                  primaryAction={{
+                    id: `${desk.deskId}-open`,
+                    label: isSelected ? 'إغلاق' : 'فتح workspace',
+                    onAction: () => setSelectedDeskId(isSelected ? null : desk.deskId),
+                  }}
                   secondaryAction={{
                     id: `${desk.deskId}-rescue`,
                     label: 'فتح الإنقاذ',
@@ -176,202 +317,275 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
           </Box>
         </div>
 
-        <aside className={styles.surfaceInspectorPanel}>
-          <div className={styles.surfaceSectionHeader}>
-            <h3 className={styles.surfaceSectionTitle}>{selectedDesk.customerName}</h3>
-            <p className={styles.surfaceSectionSubtitle}>{selectedDesk.nextAction}</p>
-          </div>
+        {/* ── Inspector — only when desk is selected ── */}
+        {hasInspector && selectedDesk ? (
+          <aside className={styles.surfaceInspectorPanel}>
+            {/* Header */}
+            <div className={styles.surfaceInspectorHeader}>
+              <div className={styles.surfaceInspectorHeaderText}>
+                <p className={styles.surfaceInspectorTitle}>مسار المعالجة</p>
+                <p className={styles.surfaceInspectorSubtitle}>{selectedDesk.customerName} · {selectedDesk.nextAction}</p>
+              </div>
+              <button
+                type="button"
+                className={styles.surfaceInspectorCloseBtn}
+                onClick={() => setSelectedDeskId(null)}
+                aria-label="إغلاق"
+              >
+                ✕
+              </button>
+            </div>
 
-          <div className={styles.surfaceGridTwoCol}>
-            <AssistedOrderSection title="customer lookup panel" description="summary first: IDs/references only.">
+            {/* Summary */}
+            <div className={styles.surfaceInspectorSummary}>
+              <div className={styles.surfaceInspectorSummaryRow}>
+                <span className={styles.surfaceInspectorSummaryLabel}>الطلب</span>
+                <span className={styles.surfaceInspectorSummaryValue}>{selectedDesk.orderId ?? '—'}</span>
+              </div>
+              <div className={styles.surfaceInspectorSummaryRow}>
+                <span className={styles.surfaceInspectorSummaryLabel}>الهوية</span>
+                <span className={styles.surfaceInspectorSummaryValue}>
+                  {IDENTITY_STATUS_META[selectedDesk.identityVerification.verificationStatus].label}
+                </span>
+              </div>
+              <div className={styles.surfaceInspectorSummaryRow}>
+                <span className={styles.surfaceInspectorSummaryLabel}>الخدمة</span>
+                <span className={styles.surfaceInspectorSummaryValue}>
+                  {SERVICEABILITY_STATUS_META[selectedDesk.serviceabilitySummary.serviceabilityStatus].label}
+                </span>
+              </div>
+              <div className={styles.surfaceInspectorSummaryRow}>
+                <span className={styles.surfaceInspectorSummaryLabel}>الإجراء التالي</span>
+                <span className={styles.surfaceInspectorSummaryValue}>{selectedDesk.submitDraftPreview.nextAction}</span>
+              </div>
+            </div>
+
+            {/* Section: بحث العميل */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>بيانات العميل</h4>
               <div className={styles.surfaceInspectorMeta}>
                 {selectedDesk.lookupPanel.inputs.map((input) => (
-                  <div key={input.key} className={styles.surfaceInspectorRow}>
+                  <div key={input.key} className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
                     <strong>{input.label}</strong>
-                    <span>{input.value}</span>
+                    <input
+                      type="text"
+                      value={input.value}
+                      onChange={(e) => handleUpdateLookup(input.key, e.target.value)}
+                      className={styles.inspectorInput}
+                    />
                   </div>
                 ))}
               </div>
-            </AssistedOrderSection>
+            </div>
 
-            <AssistedOrderSection
-              title="identity verification"
-              description={`status=${selectedDesk.identityVerification.verificationStatus} · classification=${selectedDesk.identityVerification.previewClassification}`}
-            >
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>verificationStatus</strong>
-                  <span>{selectedDesk.identityVerification.verificationStatus}</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>sensitiveFieldsLocked</strong>
-                  <span>{selectedDesk.identityVerification.sensitiveFieldsLocked.join('، ')}</span>
-                </div>
-              </div>
+            {/* Section: التحقق من الهوية */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>
+                التحقق من الهوية
+                <span className={styles.surfaceInspectorSectionToken}>
+                  {selectedDesk.identityVerification.verificationStatus}
+                </span>
+              </h4>
               <div className={styles.surfaceActionWrap}>
                 {selectedDesk.identityVerification.verificationSteps.map((step) => (
-                  <span key={step.stepId} className={styles.surfaceMetaChip}>
-                    {step.completed ? '✓' : '…'} {step.label}
-                  </span>
+                  <button
+                    type="button"
+                    key={step.stepId}
+                    onClick={() => handleToggleVerificationStep(step.stepId)}
+                    className={`${styles.surfaceMetaChip} ${styles.surfaceMetaChipClickable} ${
+                      step.completed ? styles.surfaceMetaChipActive : ''
+                    }`}
+                    style={{ border: 'none' }}
+                  >
+                    {step.completed ? '✓' : '○'} {step.label}
+                  </button>
                 ))}
               </div>
-              <p className={styles.surfaceFootnote}>
-                forbidden before verification: {selectedDesk.identityVerification.forbiddenActionsBeforeVerification.join(' · ')}
-              </p>
-            </AssistedOrderSection>
-          </div>
+            </div>
 
-          <div className={styles.surfaceGridTwoCol}>
-            <AssistedOrderSection
-              title="cart builder preview"
-              description={`published products only · ${selectedDesk.cartBuilderPreview.previewClassification}`}
-            >
-              <Box gap={2}>
+            {/* Section: السلة */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>السلة</h4>
+              <Box gap={1}>
                 {selectedDesk.cartBuilderPreview.items.map((item) => (
                   <div key={item.sku} className={styles.surfaceInspectorMeta}>
                     <div className={styles.surfaceInspectorRow}>
-                      <strong>{item.name}</strong>
-                      <span>{`qty=${item.quantity} · ${item.status}`}</span>
+                      <strong style={{ fontSize: '11px' }}>{item.name}</strong>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCartItemQty(item.sku, -1)}
+                          className={styles.quantityBtn}
+                        >
+                          −
+                        </button>
+                        <span style={{ fontSize: '12px', fontWeight: 700 }}>{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCartItemQty(item.sku, 1)}
+                          className={styles.quantityBtn}
+                        >
+                          +
+                        </button>
+                        <select
+                          value={item.status}
+                          onChange={(e) => handleUpdateCartItemStatus(item.sku, e.target.value as 'active' | 'substitute' | 'unavailable')}
+                          className={styles.inspectorSelect}
+                          style={{ width: 'auto', padding: '2px 4px', margin: 0 }}
+                        >
+                          <option value="active">نشط</option>
+                          <option value="substitute">بديل</option>
+                          <option value="unavailable">غير متاح</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCartItem(item.sku)}
+                          className={styles.quantityBtn}
+                          style={{ background: 'var(--bthwani-danger)', color: 'var(--bthwani-text-inverse)', border: 'none' }}
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
-                    <p className={styles.surfaceFootnote}>{item.note}</p>
                   </div>
                 ))}
               </Box>
-              <div className={styles.surfaceActionWrap}>
-                <span className={styles.surfaceMetaChip}>add item</span>
-                <span className={styles.surfaceMetaChip}>remove item</span>
-                <span className={styles.surfaceMetaChip}>replace item</span>
-                <span className={styles.surfaceMetaChip}>substitute item</span>
-              </div>
-              <p className={styles.surfaceFootnote}>{selectedDesk.cartBuilderPreview.unavailableItemHandling}</p>
-            </AssistedOrderSection>
+              <button
+                type="button"
+                onClick={handleAddCartItem}
+                className={`${styles.surfaceMetaChip} ${styles.surfaceMetaChipClickable}`}
+                style={{ border: 'none' }}
+              >
+                + إضافة صنف
+              </button>
+            </div>
 
-            <AssistedOrderSection
-              title="delivery mode selector"
-              description={`${selectedDesk.deliveryModeSelector.selectedMode} · ${selectedDesk.deliveryModeSelector.previewClassification}`}
-            >
+            {/* Section: وضع التوصيل */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>
+                وضع التوصيل
+                <span className={styles.surfaceInspectorSectionToken}>{selectedDesk.deliveryModeSelector.selectedMode}</span>
+              </h4>
               <div className={styles.surfaceActionWrap}>
-                {selectedDesk.deliveryModeSelector.options.map((option) => (
-                  <span key={option.modeId} className={styles.surfaceMetaChip}>
-                    {option.modeId === selectedDesk.deliveryModeSelector.selectedMode ? 'selected' : 'available'} · {option.label}
-                  </span>
-                ))}
+                {selectedDesk.deliveryModeSelector.options.map((option) => {
+                  const isSelected = option.modeId === selectedDesk.deliveryModeSelector.selectedMode;
+                  return (
+                    <button
+                      type="button"
+                      key={option.modeId}
+                      onClick={() => handleSelectDeliveryMode(option.modeId)}
+                      className={`${styles.surfaceMetaChip} ${styles.surfaceMetaChipClickable} ${
+                        isSelected ? styles.surfaceMetaChipActive : ''
+                      }`}
+                      style={{ border: 'none' }}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
               </div>
-              <p className={styles.surfaceFootnote}>{selectedDesk.deliveryModeSelector.selectedModeSummary}</p>
-              <p className={styles.surfaceFootnote}>
-                forbidden lifecycle states: {selectedDesk.deliveryModeSelector.forbiddenLifecycleStates.join(' · ')}
-              </p>
-            </AssistedOrderSection>
-          </div>
+            </div>
 
-          <div className={styles.surfaceGridTwoCol}>
-            <AssistedOrderSection
-              title="serviceability summary"
-              description={`${serviceabilityMeta.label} · zone=${selectedDesk.serviceabilitySummary.zoneLabel}`}
-            >
+            {/* Section: قابلية الخدمة */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>قابلية الخدمة</h4>
               <div className={styles.surfaceInspectorMeta}>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>zone</strong>
+                  <strong>المنطقة</strong>
                   <span>{selectedDesk.serviceabilitySummary.zoneLabel}</span>
                 </div>
                 <div className={styles.surfaceInspectorRow}>
-                  <strong>status</strong>
-                  <span>{serviceabilityMeta.label}</span>
+                  <strong>الحالة</strong>
+                  <button
+                    type="button"
+                    onClick={handleToggleServiceability}
+                    className={`${styles.surfaceMetaChip} ${styles.surfaceMetaChipClickable}`}
+                    style={{ border: 'none', padding: '2px 8px' }}
+                  >
+                    {SERVICEABILITY_STATUS_META[selectedDesk.serviceabilitySummary.serviceabilityStatus].label}
+                  </button>
                 </div>
-                {selectedDesk.serviceabilitySummary.blockedReason ? (
-                  <div className={styles.surfaceInspectorRow}>
-                    <strong>blockedReason</strong>
-                    <span>{selectedDesk.serviceabilitySummary.blockedReason}</span>
-                  </div>
-                ) : null}
               </div>
-              <p className={styles.surfaceFootnote}>{selectedDesk.serviceabilitySummary.fallbackAction}</p>
-            </AssistedOrderSection>
+            </div>
 
-            <AssistedOrderSection
-              title="WLT read-only handoff"
-              description={`classification=${selectedDesk.wltReadOnlyHandoff.placeholderClassification} · ${selectedDesk.wltReadOnlyHandoff.calculationTruthOwner}`}
-            >
+            {/* Section: رؤية WLT */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>
+                رؤية WLT
+                <span className={styles.surfaceInspectorSectionToken}>{selectedDesk.wltReadOnlyHandoff.calculationTruthOwner}</span>
+              </h4>
               <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>payment visibility</strong>
-                  <span>{selectedDesk.wltReadOnlyHandoff.paymentVisibility}</span>
+                <div className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                  <strong>رؤية الدفع</strong>
+                  <input
+                    type="text"
+                    value={selectedDesk.wltReadOnlyHandoff.paymentVisibility}
+                    onChange={(e) => handleUpdateWltHandoff('paymentVisibility', e.target.value)}
+                    className={styles.inspectorInput}
+                  />
                 </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>refund visibility</strong>
-                  <span>{selectedDesk.wltReadOnlyHandoff.refundVisibility}</span>
+                <div className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                  <strong>رؤية الاسترداد</strong>
+                  <input
+                    type="text"
+                    value={selectedDesk.wltReadOnlyHandoff.refundVisibility}
+                    onChange={(e) => handleUpdateWltHandoff('refundVisibility', e.target.value)}
+                    className={styles.inspectorInput}
+                  />
                 </div>
                 {selectedDesk.wltReadOnlyHandoff.settlementVisibility ? (
-                  <div className={styles.surfaceInspectorRow}>
-                    <strong>settlement visibility</strong>
-                    <span>{selectedDesk.wltReadOnlyHandoff.settlementVisibility}</span>
+                  <div className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                    <strong>رؤية التسوية</strong>
+                    <input
+                      type="text"
+                      value={selectedDesk.wltReadOnlyHandoff.settlementVisibility}
+                      onChange={(e) => handleUpdateWltHandoff('settlementVisibility', e.target.value)}
+                      className={styles.inspectorInput}
+                    />
                   </div>
                 ) : null}
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>route</strong>
-                  <span>{selectedDesk.wltReadOnlyHandoff.routeHint}</span>
-                </div>
               </div>
-              <p className={styles.surfaceFootnote}>No mutation. No calculation truth inside DSH.</p>
-            </AssistedOrderSection>
-          </div>
+            </div>
 
-          <div className={styles.surfaceGridTwoCol}>
-            <AssistedOrderSection
-              title="audit reason"
-              description={`reasonRequired=${String(selectedDesk.auditReason.reasonRequired)} · auditRequired=${String(selectedDesk.auditReason.auditRequired)}`}
-            >
+            {/* Section: التدقيق */}
+            <div className={styles.surfaceInspectorSection}>
+              <h4 className={styles.surfaceInspectorSectionTitle}>التدقيق</h4>
               <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>reason</strong>
-                  <span>{selectedDesk.auditReason.reasonLabel}</span>
+                <div className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                  <strong>سبب القرار</strong>
+                  <input
+                    type="text"
+                    value={selectedDesk.auditReason.reasonLabel}
+                    onChange={(e) => handleUpdateAuditReason('reasonLabel', e.target.value)}
+                    className={styles.inspectorInput}
+                  />
                 </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>operator note</strong>
-                  <span>{selectedDesk.auditReason.operatorNote}</span>
-                </div>
-              </div>
-            </AssistedOrderSection>
-
-            <AssistedOrderSection
-              title="submit draft preview"
-              description={`previewState=${selectedDesk.submitDraftPreview.previewState} · signal=${selectedDesk.submitDraftPreview.signal.routeId}`}
-            >
-              <div className={styles.surfaceInspectorMeta}>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>backend</strong>
-                  <span>no backend call</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>creation claim</strong>
-                  <span>no order creation claim</span>
-                </div>
-                <div className={styles.surfaceInspectorRow}>
-                  <strong>next action</strong>
-                  <span>{selectedDesk.submitDraftPreview.nextAction}</span>
+                <div className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                  <strong>ملاحظة المشغّل</strong>
+                  <textarea
+                    value={selectedDesk.auditReason.operatorNote}
+                    onChange={(e) => handleUpdateAuditReason('operatorNote', e.target.value)}
+                    className={styles.inspectorTextarea}
+                    rows={2}
+                  />
                 </div>
               </div>
-              <p className={styles.surfaceFootnote}>
-                signal route: {selectedDesk.submitDraftPreview.signal.routeId} · priority: {selectedDesk.submitDraftPreview.signal.priorityLabel}
-              </p>
-            </AssistedOrderSection>
-          </div>
+            </div>
 
-          <Box gap={2}>
-            {selectedDesk.crossSurfaceLinks.map((link) => (
-              <WebControlPanelDecisionRow
-                key={link.actionId}
-                entityId={link.sectionId}
-                entityLabel={link.label}
-                status={link.surfaceId}
-                statusTone={link.readOnly ? 'warning' : 'neutral'}
-                recommendation={`${link.routeId ?? 'routeHint'} · ${link.onDemandPolicy}`}
-                reason={link.routeHint}
-                primaryAction={{ id: link.actionId, label: 'فتح الرابط', onAction: () => router.push(link.routeHint) }}
-              />
-            ))}
-          </Box>
-        </aside>
+            {/* Submit draft */}
+            <div style={{ paddingTop: '4px' }}>
+              <button
+                type="button"
+                onClick={handleSubmitDraft}
+                className={`${styles.surfaceTab} ${styles.surfaceTabActive}`}
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                إرسال مسودة الطلب
+              </button>
+              {submitStatus && <div className={styles.overrideNotification}>{submitStatus}</div>}
+            </div>
+          </aside>
+        ) : null}
       </div>
     </Box>
   );
