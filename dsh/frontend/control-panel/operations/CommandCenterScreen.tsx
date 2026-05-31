@@ -12,6 +12,7 @@ import {
   DSH_SERVICE_HEALTH_PREVIEW,
   DSH_WLT_FINANCE_ALERTS_PREVIEW,
 } from '../../data/orders.preview-data';
+import type { AnyOperationsWorkspaceId } from './operations.registry';
 import { buildOperationsHref, NON_OPERATIONS_SECTION_SHORTCUTS } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/dsh-signal-layer.model';
@@ -116,9 +117,9 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
             <WebControlPanelDecisionRow
               entityId="FIN"
               entityLabel="الأثر المالي"
-              status="WLT"
+              status="المحفظة المالية"
               statusTone="warning"
-              recommendation="حوّل إلى WLT — عرض فقط"
+              recommendation="حوّل إلى المحفظة المالية WLT — عرض فقط"
               reason={financeGovernance.notes}
               sla="معاينة فقط — لا تعديل مالي"
               primaryAction={{ id: 'go-finance', label: 'فتح المالية', onAction: () => router.push('/finance') }}
@@ -171,7 +172,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
 
         {/* 3.5. Playbooks */}
         <div className={styles.surfaceCompactPanel} style={{ padding: '10px' }}>
-          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>Playbooks التدخل</h3>
+          <h3 className={styles.surfacePanelTitle} style={{ fontSize: '12px', marginBottom: '8px' }}>خطط التدخل</h3>
           <div className={styles.surfaceStackSmall} style={{ gap: '6px' }}>
             {DSH_OPS_INTERVENTION_PLAYBOOKS.slice(0, 3).map((playbook) => (
               <WebControlPanelRecommendation
@@ -182,7 +183,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
                 auditTag={playbook.ownerSection}
                 primaryAction={{
                   id: `${playbook.playbookId}-primary`,
-                  label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح Order Rescue' : 'فتح Assisted Order',
+                  label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح إنقاذ الطلب' : 'فتح مساعدة الطلب',
                   onAction: () => router.push(
                     buildOperationsHref(
                       playbook.supportedWorkspaces.includes('order-rescue')
@@ -219,7 +220,14 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
                     primaryAction={{
                       id: `sig-${signal.eventId}`,
                       label: 'فتح التفاصيل',
-                      onAction: () => router.push(`${hubHref}/${signal.routeId}`),
+                      onAction: () => {
+                        const OPS_PREFIX = 'cp/operations/';
+                        if (signal.routeId.startsWith(OPS_PREFIX)) {
+                          router.push(buildOperationsHref(signal.routeId.slice(OPS_PREFIX.length) as AnyOperationsWorkspaceId));
+                        } else {
+                          router.push(`/${signal.routeId}`);
+                        }
+                      },
                     }}
                   />
                 );
@@ -276,7 +284,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
                 status={String(alert.count)}
                 statusTone={alert.statusTone}
                 recommendation={alert.wltBridgeNote}
-                reason="WLT — قراءة فقط"
+                reason="المحفظة المالية WLT — قراءة فقط"
                 sla={`نطاق: ${alert.domain}`}
                 primaryAction={{
                   id: `wlt-${alert.alertId}`,

@@ -278,7 +278,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
           auditTag={relevantPlaybook.playbookId}
           primaryAction={{
             id: 'open-rescue',
-            label: 'فتح Order Rescue',
+            label: 'فتح إنقاذ الطلب',
             onAction: () => router.push(buildOperationsHref('order-rescue')),
           }}
           secondaryAction={{

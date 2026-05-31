@@ -8,6 +8,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import { AWNAK_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
 import { AWNAK_STAGE_LABELS } from '../../shared/dsh-order-preview.contract';
+import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -25,7 +26,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
 
 const STAGE_ORDER = Object.keys(AWNAK_STAGE_LABELS) as Array<keyof typeof AWNAK_STAGE_LABELS>;
 
-export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenProps) {
+export function AwnakScreen({ hubHref: _hubHref, subGroup }: AwnakScreenProps) {
   const router = useRouter();
   const preview = AWNAK_OPERATIONAL_PREVIEW;
 
@@ -62,12 +63,12 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
             primaryAction={{
               id: 'approve',
               label: item.nextAction,
-              onAction: () => router.push(`${hubHref}?workspace=awnak-operations&requestId=${item.requestId}`)
+              onAction: () => router.push(buildOperationsHref('awnak-operations', { requestId: item.requestId }))
             }}
             secondaryAction={{
               id: 'details',
               label: 'عرض التفاصيل',
-              onAction: () => router.push(`${hubHref}?workspace=awnak-operations&panel=detail&requestId=${item.requestId}`)
+              onAction: () => router.push(buildOperationsHref('awnak-operations', { panel: 'detail', requestId: item.requestId }))
             }}
           />
         ))}

@@ -393,7 +393,7 @@ export function ExceptionsEscalationsScreen({
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label htmlFor="handoff-note-textarea" style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>ملاحظات تسليم الدعم (Support Handoff Notes):</label>
+                    <label htmlFor="handoff-note-textarea" style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>ملاحظات تسليم الدعم:</label>
                     <textarea
                       id="handoff-note-textarea"
                       rows={3}
@@ -929,7 +929,7 @@ export function ExceptionsEscalationsScreen({
           {inspectorContent ?? (
             <WebControlPanelRecommendation
               title="سياسة وتوجيه الاستثناء"
-              reason="اختر استثناءً نشطاً أو دليل عمل (Playbook) أو سياسة تصعيد لمعاينة تفاصيل التوجيه والسياسة المعتمدة."
+              reason="اختر استثناءً نشطاً أو دليل تدخل أو سياسة تصعيد لمعاينة تفاصيل التوجيه والسياسة المعتمدة."
               confidence="high"
               auditTag="UI_PREVIEW_ONLY"
             />

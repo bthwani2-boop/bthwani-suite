@@ -262,6 +262,10 @@ export function buildOperationsHref(
     searchParams.set('callId', options.callId);
   }
 
+  if (options?.requestId) {
+    searchParams.set('requestId', options.requestId);
+  }
+
   if (options?.panel) {
     searchParams.set('panel', options.panel);
   }

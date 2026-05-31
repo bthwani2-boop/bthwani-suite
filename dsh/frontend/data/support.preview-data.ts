@@ -140,7 +140,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     forbiddenActions: ['إعلان الجاهزية مع بقاء النقص', 'رفض صامت بلا سبب'],
     relatedOrderState: 'item_unavailable',
     requiresEvidence: false,
-    nextAction: 'ثبّت البديل أو أوقف التنفيذ قبل handoff.',
+    nextAction: 'ثبّت البديل أو أوقف التنفيذ قبل التسليم.',
   },
   {
     flowId: 'partner-reject-request',
@@ -164,7 +164,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
   {
     flowId: 'courier-not-arrived',
     title: 'الكابتن / الموصل لم يصل',
-    description: 'نقطة الالتقاط أو handoff متوقفة لأن جهة الاستلام لم تصل بعد رغم جاهزية الطلب.',
+    description: 'نقطة الالتقاط أو التسليم متوقفة لأن جهة الاستلام لم تصل بعد رغم جاهزية الطلب.',
     surfaceVisibility: [
       visibility('app-partner', 'context-only', 'support-directory', 'يظهر أثره على تنفيذ الشريك.'),
       visibility('app-captain', 'primary', 'support-directory', 'الكابتن يرى handoff/delivery issues فقط.'),
@@ -175,8 +175,8 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     escalationOwner: 'control-panel',
     escalationOwnerLabel: controlPanelEscalationOwnerLabel,
     severity: 'warning',
-    allowedActions: ['طلب إثبات وصول', 'فتح محادثة', 'تصعيد تأخير handoff'],
-    forbiddenActions: ['تأكيد handoff دون وصول فعلي', 'إغلاق الحالة كتسليم ناجح'],
+    allowedActions: ['طلب إثبات وصول', 'فتح محادثة', 'تصعيد تأخير التسليم'],
+    forbiddenActions: ['تأكيد التسليم دون وصول فعلي', 'إغلاق الحالة كتسليم ناجح'],
     relatedOrderState: 'courier_not_arrived',
     requiresEvidence: true,
     nextAction: 'ثبّت الوصول أو صعّد الحالة قبل خرق SLA.',
@@ -203,8 +203,8 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
   },
   {
     flowId: 'handoff-mismatch',
-    title: 'عدم تطابق في handoff',
-    description: 'هناك تضارب بين الجهة المستلمة أو حالة الخروج ويجب تثبيت handoff الصحيح قبل المتابعة.',
+    title: 'عدم تطابق في التسليم',
+    description: 'هناك تضارب بين الجهة المستلمة أو حالة الخروج ويجب تثبيت التسليم الصحيح قبل المتابعة.',
     surfaceVisibility: [
       visibility('app-partner', 'primary', 'order-handoff', 'الشريك يرى أثر handoff على الطلب.'),
       visibility('app-captain', 'primary', 'support-directory', 'الكابتن يرى handoff فقط ضمن رحلته.'),
@@ -215,8 +215,8 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     escalationOwner: 'control-panel',
     escalationOwnerLabel: controlPanelEscalationOwnerLabel,
     severity: 'danger',
-    allowedActions: ['مراجعة handoff', 'طلب إثبات', 'فتح محادثة مشتركة'],
-    forbiddenActions: ['متابعة التوصيل قبل تثبيت handoff', 'تجاوز الإثبات'],
+    allowedActions: ['مراجعة التسليم', 'طلب إثبات', 'فتح محادثة مشتركة'],
+    forbiddenActions: ['متابعة التوصيل قبل تثبيت التسليم', 'تجاوز الإثبات'],
     relatedOrderState: 'handoff_mismatch',
     requiresEvidence: true,
     nextAction: 'ثبّت الجهة الصحيحة ثم أعد الطلب إلى المسار السليم.',
@@ -239,7 +239,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     forbiddenActions: ['إرسال الطلب كما هو', 'إغلاق الحالة قبل المطابقة'],
     relatedOrderState: 'wrong_item',
     requiresEvidence: true,
-    nextAction: 'راجع المطابقة بصريًا ثم أعد الطلب للتحضير أو handoff.',
+    nextAction: 'راجع المطابقة بصريًا ثم أعد الطلب للتحضير أو التسليم.',
   },
   {
     flowId: 'payment-refund-review',
@@ -276,7 +276,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     escalationOwner: 'control-panel',
     escalationOwnerLabel: controlPanelEscalationOwnerLabel,
     severity: 'warning',
-    allowedActions: ['تسجيل المكالمة', 'فتح Customer 360', 'تحويل إلى Assisted Order بعد التحقق'],
+    allowedActions: ['تسجيل المكالمة', 'فتح Customer 360', 'تحويل إلى مساعدة الطلب بعد التحقق'],
     forbiddenActions: ['كشف الحقول الحساسة قبل التحقق', 'تغيير المصدر اليدوي', 'بدء refund محلي'],
     relatedOrderState: 'manual_call_intake',
     financialImpactPreview: 'wlt-visibility-only',
@@ -286,7 +286,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
   {
     flowId: 'customer-360-review',
     title: 'Customer 360',
-    description: 'عرض موحّد للطلب والتذكرة ورؤية WLT المرجعية مع quick actions إلى Assisted Order وOrder Rescue.',
+    description: 'عرض موحّد للطلب والتذكرة ورؤية WLT المرجعية مع إجراءات سريعة إلى مساعدة الطلب وإنقاذ الطلب.',
     surfaceVisibility: [
       visibility('control-panel', 'primary', 'support/customer-360', 'يبقى داخل الدعم كمركز سياقي واحد.'),
       visibility('app-client', 'context-only', 'orders', 'يرتبط بسياق الطلب الفعلي فقط.'),
@@ -296,7 +296,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     escalationOwner: 'control-panel',
     escalationOwnerLabel: controlPanelEscalationOwnerLabel,
     severity: 'info',
-    allowedActions: ['فتح الطلب أو التذكرة', 'فتح Assisted Order', 'فتح Order Rescue'],
+    allowedActions: ['فتح الطلب أو التذكرة', 'فتح مساعدة الطلب', 'فتح إنقاذ الطلب'],
     forbiddenActions: ['بدء refund أو settlement', 'نسخ منطق الشاشات العميلية', 'إغلاق ticket خارج owner الدعم'],
     relatedOrderState: 'customer_360_review',
     financialImpactPreview: 'wlt-preview-links',
@@ -305,7 +305,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
   },
   {
     flowId: 'assisted-order-desk',
-    title: 'Assisted Order Desk',
+    title: 'مساعدة الطلب',
     description: 'معالجة طلبات المساعدة اليدوية وإعادة بناء السلة مع تثبيت البدائل وهويات العميل.',
     surfaceVisibility: [
       visibility('control-panel', 'primary', 'operations/assisted-order-desk', 'workspace تشغيلي مخصص للتدخل قبل الإنقاذ.'),
@@ -322,14 +322,14 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     relatedOrderState: 'assisted_order_desk',
     financialImpactPreview: 'payment-visibility-only',
     requiresEvidence: true,
-    nextAction: 'إذا بقي blocker التشغيلي مفتوحًا فحوّل الحالة مباشرة إلى Order Rescue.',
+    nextAction: 'إذا بقي المعوق التشغيلي مفتوحًا فحوّل الحالة مباشرة إلى إنقاذ الطلب.',
   },
   {
     flowId: 'order-rescue',
-    title: 'Order Rescue',
-    description: 'مكتب إنقاذ يحدد blocker واحدًا ويثبت next-best-action عبر الدعم أو الشريك أو WLT المرجعي.',
+    title: 'إنقاذ الطلب',
+    description: 'مكتب إنقاذ يحدد معوقاً واحداً ويثبت أفضل إجراء تالٍ عبر الدعم أو الشريك أو WLT المرجعي.',
     surfaceVisibility: [
-      visibility('control-panel', 'primary', 'operations/order-rescue', 'يبقى داخل العمليات مع handoff واضح للمالك الصحيح.'),
+      visibility('control-panel', 'primary', 'operations/order-rescue', 'يبقى داخل العمليات مع تسليم واضح للمالك الصحيح.'),
       visibility('app-client', 'context-only', 'orders', 'العميل يرى أثر الإنقاذ على حالته فقط.'),
       visibility('app-partner', 'context-only', 'orders', 'الشريك يرى أثر الحل على الطلب دون منطق rescue الكامل.'),
       visibility('wlt', 'reference-only', 'finance/refund-preview', 'تظهر الرؤية المالية المرجعية فقط عند الحاجة.'),
@@ -339,8 +339,8 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     escalationOwner: 'control-panel',
     escalationOwnerLabel: controlPanelEscalationOwnerLabel,
     severity: 'danger',
-    allowedActions: ['تحديد blocker رئيسي', 'فتح ticket support', 'فتح مرجع WLT', 'تحويل الحالة إلى الشريك أو الكتالوج أو الدعم'],
-    forbiddenActions: ['إغلاق الحالة بلا blocker واضح', 'إطلاق refund محلي', 'تكرار نفس القرار عبر أكثر من owner'],
+    allowedActions: ['تحديد المعوق الرئيسي', 'فتح تذكرة دعم', 'فتح مرجع WLT', 'تحويل الحالة إلى الشريك أو الكتالوج أو الدعم'],
+    forbiddenActions: ['إغلاق الحالة بلا معوق واضح', 'إطلاق استرداد محلي', 'تكرار نفس القرار عبر أكثر من مالك'],
     relatedOrderState: 'order_rescue',
     financialImpactPreview: 'refund-visibility-only',
     requiresEvidence: true,
@@ -388,7 +388,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
   {
     flowId: 'store-wait-time',
     title: 'انتظار داخل الفرع',
-    description: 'الكابتن أو الموصل ينتظر داخل الفرع لأن الطلب أو handoff لم يثبت بعد.',
+    description: 'الكابتن أو الموصل ينتظر داخل الفرع لأن الطلب أو التسليم لم يثبت بعد.',
     surfaceVisibility: [
       visibility('app-partner', 'context-only', 'order-prepare', 'يظهر كأثر استعداد داخل الفرع.'),
       visibility('app-captain', 'primary', 'support-directory', 'الكابتن يرى مشكلة الانتظار ضمن الالتقاط فقط.'),
@@ -399,11 +399,11 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     escalationOwner: 'control-panel',
     escalationOwnerLabel: controlPanelEscalationOwnerLabel,
     severity: 'warning',
-    allowedActions: ['تثبيت زمن الانتظار', 'فتح handoff', 'تصعيد ضغط الفرع'],
+    allowedActions: ['تثبيت زمن الانتظار', 'فتح التسليم', 'تصعيد ضغط الفرع'],
     forbiddenActions: ['تحميل الكابتن السبب دون توثيق', 'إخفاء المشكلة من سجل الطلب'],
     relatedOrderState: 'store_wait_time',
     requiresEvidence: false,
-    nextAction: 'ثبّت سبب الانتظار ثم حرّك الطلب إلى handoff أو التصعيد.',
+    nextAction: 'ثبّت سبب الانتظار ثم حرّك الطلب إلى التسليم أو التصعيد.',
   },
   {
     flowId: 'catalog-barcode-issue',
@@ -908,7 +908,7 @@ export const DSH_CALL_INTAKE_PREVIEW: readonly DshCallIntakePreview[] = [
     allowedActions: ['تثبيت المصدر اليدوي', 'فتح Customer 360', 'ربط أو إنشاء ticket preview', 'تحويل إلى العمليات'],
     forbiddenActions: ['تغيير source', 'إظهار الحقول الحساسة قبل التحقق', 'بدء refund أو settlement'],
     onDemandPolicy: 'detail-on-open',
-    nextAction: 'أنشئ ticket preview ثم حوّل الحالة إلى Assisted Order Desk مع السياق الكامل.',
+    nextAction: 'أنشئ معاينة تذكرة ثم حوّل الحالة إلى مساعدة الطلب مع السياق الكامل.',
     quickActions: [
       {
         actionId: 'customer-360',
@@ -921,7 +921,7 @@ export const DSH_CALL_INTAKE_PREVIEW: readonly DshCallIntakePreview[] = [
       },
       {
         actionId: 'assisted-order',
-        label: 'Assisted Order Desk',
+        label: 'مساعدة الطلب',
         surfaceId: 'control-panel',
         sectionId: 'operations',
         routeHint: '/operations?workspace=assisted-order-desk&customerId=cus-4188&orderId=ORD-1184&ticketId=TKT-1184&callId=call-9021',
@@ -958,7 +958,7 @@ export const DSH_CALL_INTAKE_PREVIEW: readonly DshCallIntakePreview[] = [
     ticketPreview: {
       mode: 'create',
       ticketId: 'TKT-1184',
-      summary: 'Create ticket preview only: linked to order/customer and flagged for ops handoff.',
+      summary: 'معاينة تذكرة فقط: مرتبطة بالطلب والعميل ومُصنَّفة للتسليم التشغيلي.',
       routeHint: '/support?workspace=queue&ticketId=TKT-1184',
       auditRequired: true,
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
@@ -1018,7 +1018,7 @@ export const DSH_CALL_INTAKE_PREVIEW: readonly DshCallIntakePreview[] = [
     allowedActions: ['طلب تحقق إضافي', 'ربط ticket موجود', 'تصعيد للدعم عند الهوية المحجوبة'],
     forbiddenActions: ['إظهار قرار الاسترداد', 'بدء assisted order', 'افتراض incoming call popup'],
     onDemandPolicy: 'detail-on-open',
-    nextAction: 'ابقِ الحقول الحساسة محجوبة واربط المكالمة بتذكرة الدعم بدلاً من أي handoff تشغيلي مباشر.',
+    nextAction: 'ابقِ الحقول الحساسة محجوبة واربط المكالمة بتذكرة الدعم بدلاً من أي تسليم تشغيلي مباشر.',
     quickActions: [
       {
         actionId: 'support-ticket',
@@ -1255,7 +1255,7 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
     openTicketId: 'TKT-1102',
     latestIssueSummary: 'بديل منتج بانتظار تثبيت نهائي قبل إرسال الطلب.',
     wltVisibilitySummary: 'المدفوعات والاستردادات والتسوية تظهر هنا كمرجع WLT للقراءة فقط.',
-    allowedActions: ['فتح Assisted Order', 'فتح Order Rescue', 'فتح التذكرة أو الطلب أو WLT visibility'],
+    allowedActions: ['فتح مساعدة الطلب', 'فتح إنقاذ الطلب', 'فتح التذكرة أو الطلب أو مرجعية WLT'],
     forbiddenActions: ['بدء refund من Customer 360', 'إظهار PII غير المتحقق منها', 'نسخ payloads مالية داخل الشاشة'],
     onDemandPolicy: 'detail-on-open',
     quickActions: [
@@ -1331,7 +1331,7 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
       deliveryMode: 'bthwani_delivery',
       ticketStatus: 'escalated',
       wltVisibilityLabel: 'payment + refund + settlement visibility',
-      areaZoneLabel: 'Riyadh / Al Yasmin',
+      areaZoneLabel: 'الرياض / الياسمين',
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
     lastFiveOrdersSummary: [
@@ -1392,9 +1392,9 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
       },
     ],
     ticketsHistory: [
-      { ticketId: 'TKT-1102', status: 'escalated', statusLabel: 'مصعّد', sla: '5 دقائق', owner: 'Operations', latestNote: 'بانتظار تثبيت البديل', routeHint: '/support?workspace=queue&ticketId=TKT-1102' },
-      { ticketId: 'TKT-1041', status: 'resolved', statusLabel: 'resolved view', sla: 'أغلق خلال 18 دقيقة', owner: 'Support', latestNote: 'اكتمل التوضيح للعميل', routeHint: '/support?workspace=queue&ticketId=TKT-1041' },
-      { ticketId: 'TKT-0997', status: 'open', statusLabel: 'مفتوح', sla: '12 دقيقة', owner: 'Support', latestNote: 'تحويل إلى Order Rescue', routeHint: '/support?workspace=queue&ticketId=TKT-0997' },
+      { ticketId: 'TKT-1102', status: 'escalated', statusLabel: 'مصعّد', sla: '5 دقائق', owner: 'عمليات', latestNote: 'بانتظار تثبيت البديل', routeHint: '/support?workspace=queue&ticketId=TKT-1102' },
+      { ticketId: 'TKT-1041', status: 'resolved', statusLabel: 'محلول', sla: 'أغلق خلال 18 دقيقة', owner: 'دعم', latestNote: 'اكتمل التوضيح للعميل', routeHint: '/support?workspace=queue&ticketId=TKT-1041' },
+      { ticketId: 'TKT-0997', status: 'open', statusLabel: 'مفتوح', sla: '12 دقيقة', owner: 'دعم', latestNote: 'تحويل إلى إنقاذ الطلب', routeHint: '/support?workspace=queue&ticketId=TKT-0997' },
     ],
     wltReadOnlyVisibility: {
       paymentVisibility: 'Payment snapshot mutable and controlled.',
@@ -1505,7 +1505,7 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
       deliveryMode: 'pickup',
       ticketStatus: 'open',
       wltVisibilityLabel: 'payment/refund visibility on open only',
-      areaZoneLabel: 'Jeddah / Al Rawdah',
+      areaZoneLabel: 'جدة / الروضة',
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
     lastFiveOrdersSummary: [
@@ -1590,7 +1590,7 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
     notesTimeline: [
       { noteId: 'note-1184-1', source: 'support note', body: 'المكالمة الخارجية مثبتة كمصدر وحيد لهذه الحالة.', timestampLabel: 'منذ 21 دقيقة' },
       { noteId: 'note-1184-2', source: 'ops note', body: 'العمليات لن تتابع الحالة قبل اكتمال التحقق أو تحويلها رسميًا.', timestampLabel: 'منذ 15 دقيقة' },
-      { noteId: 'note-1184-3', source: 'audit note', body: 'أي handoff لاحق يجب أن يحمل operator note وreason واضحين.', timestampLabel: 'منذ 11 دقيقة' },
+      { noteId: 'note-1184-3', source: 'audit note', body: 'أي تسليم لاحق يجب أن يحمل ملاحظة المشغل وسبباً واضحين.', timestampLabel: 'منذ 11 دقيقة' },
     ],
     contextSignal: buildDshSignalRoutePreview('customer_360_followup'),
   },
@@ -1657,33 +1657,33 @@ export type DshOpsInterventionPlaybook = {
 export const DSH_OPS_INTERVENTION_PLAYBOOKS: readonly DshOpsInterventionPlaybook[] = [
   {
     playbookId: 'playbook-assisted-order',
-    title: 'Playbook: Assisted Order من مكالمة يدوية',
+    title: 'خطة التدخل: مساعدة الطلب من مكالمة يدوية',
     severity: 'warning',
     supportedWorkspaces: ['command-center', 'assisted-order-desk'],
     triggerFlowIds: ['manual-call-intake', 'customer-360', 'assisted-order-desk'],
     ownerSection: 'operations',
-    checkpoints: ['تحقق الهوية', 'إعادة بناء السلة', 'تثبيت البديل', 'WLT visibility فقط عند الحاجة'],
-    allowedActions: ['فتح Assisted Order', 'التحويل إلى Support أو WLT visibility', 'تسجيل audit note'],
-    forbiddenActions: ['تجاوز التحقق', 'إنشاء refund محلي', 'إرسال الطلب بدون handoff واضح'],
-    nextDecision: 'إذا بقيت الهوية أو البدائل معلقة فحوّل الحالة إلى Order Rescue بدل تكرار نفس التدخل.',
+    checkpoints: ['تحقق الهوية', 'إعادة بناء السلة', 'تثبيت البديل', 'مرجعية WLT فقط عند الحاجة'],
+    allowedActions: ['فتح مساعدة الطلب', 'التحويل إلى الدعم أو مرجعية WLT', 'تسجيل ملاحظة تدقيق'],
+    forbiddenActions: ['تجاوز التحقق', 'إنشاء استرداد محلي', 'إرسال الطلب بدون تسليم واضح للمالك'],
+    nextDecision: 'إذا بقيت الهوية أو البدائل معلقة فحوّل الحالة إلى إنقاذ الطلب بدل تكرار نفس التدخل.',
     onDemandPolicy: 'detail-on-open',
   },
   {
     playbookId: 'playbook-order-rescue',
-    title: 'Playbook: Order Rescue متعدد الأسطح',
+    title: 'خطة التدخل: إنقاذ الطلب متعدد الأسطح',
     severity: 'danger',
     supportedWorkspaces: ['command-center', 'exceptions-escalations', 'order-rescue'],
     triggerFlowIds: ['order-rescue', 'client-order-issue', 'delivery-failed', 'partner-finance-bridge'],
     ownerSection: 'operations',
-    checkpoints: ['حدد السطح المالك', 'ثبّت blocker الرئيسي', 'افتح التذكرة أو الشريك أو WLT المرجعي', 'أغلق التشتت'],
-    allowedActions: ['تحديد next-best-action', 'تثبيت handoff للمالك الصحيح', 'ربط ticket أو WLT reference'],
-    forbiddenActions: ['فتح أكثر من owner decision متضارب', 'إغلاق rescue قبل blocker واضح', 'mutation مالي'],
-    nextDecision: 'أرسل الحالة إلى المالك النهائي مع audit trail مختصر بدل تدويرها بين الأقسام.',
+    checkpoints: ['حدد السطح المالك', 'ثبّت المعوق الرئيسي', 'افتح التذكرة أو الشريك أو WLT المرجعي', 'أغلق التشتت'],
+    allowedActions: ['تحديد أفضل إجراء تالٍ', 'تثبيت تسليم المالك الصحيح', 'ربط التذكرة أو مرجعية WLT'],
+    forbiddenActions: ['فتح أكثر من قرار مالك متضارب', 'إغلاق الإنقاذ قبل معوق واضح', 'تعديل مالي'],
+    nextDecision: 'أرسل الحالة إلى المالك النهائي مع سجل مراجعة مختصر بدل تدويرها بين الأقسام.',
     onDemandPolicy: 'detail-on-open',
   },
   {
     playbookId: 'playbook-partner-capacity',
-    title: 'Playbook: تراجع السعة أو pause مؤقت للشريك',
+    title: 'خطة التدخل: تراجع السعة أو إيقاف مؤقت للشريك',
     severity: 'warning',
     supportedWorkspaces: ['command-center', 'exceptions-escalations'],
     triggerFlowIds: ['partner_capacity_degraded', 'order-ready', 'item-unavailable'],

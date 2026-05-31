@@ -1,6 +1,6 @@
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 
-export type OperationsPanelId = 'detail' | 'chat';
+export type OperationsPanelId = 'detail' | 'chat' | 'batches';
 
 export type DshFulfillmentOperationalMode = DshFulfillmentDeliveryMode;
 
@@ -9,6 +9,7 @@ export type OperationsFocusParams = {
   customerId?: string;
   ticketId?: string;
   callId?: string;
+  requestId?: string;
   panel?: OperationsPanelId;
   subGroup?: string;
 };

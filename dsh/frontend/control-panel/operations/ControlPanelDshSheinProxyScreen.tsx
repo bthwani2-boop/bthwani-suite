@@ -8,6 +8,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import { SHEIN_PROXY_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
 import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/dsh-order-preview.contract';
+import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -25,7 +26,7 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
 
 const STAGE_ORDER = Object.keys(SHEIN_PROXY_STAGE_LABELS) as Array<keyof typeof SHEIN_PROXY_STAGE_LABELS>;
 
-export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations', subGroup }: ControlPanelDshSheinProxyScreenProps) {
+export function ControlPanelDshSheinProxyScreen({ hubHref: _hubHref, subGroup }: ControlPanelDshSheinProxyScreenProps) {
   const router = useRouter();
   const preview = SHEIN_PROXY_OPERATIONAL_PREVIEW;
 
@@ -62,12 +63,12 @@ export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations', subGr
             primaryAction={{
               id: 'inspect',
               label: request.nextStep,
-              onAction: () => router.push(`${hubHref}?workspace=sheinproxy&requestId=${request.id}`)
+              onAction: () => router.push(buildOperationsHref('sheinproxy', { requestId: request.id }))
             }}
             secondaryAction={{
               id: 'batches',
               label: 'إدارة الدُفعة',
-              onAction: () => router.push(`${hubHref}?workspace=sheinproxy&panel=batches&requestId=${request.id}`)
+              onAction: () => router.push(buildOperationsHref('sheinproxy', { panel: 'batches', requestId: request.id }))
             }}
           />
         ))}

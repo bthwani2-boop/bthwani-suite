@@ -208,7 +208,7 @@ export function AuditTrailDetailWorkspace({
               ) : null}
               {policy.wltMutationForbidden ? (
                 <Surface tone="danger" padding={1} radiusToken="pill" border={false}>
-                  <Text role="caption" tone="inverse">mutation مالي ممنوع</Text>
+                  <Text role="caption" tone="inverse">تعديل مالي ممنوع</Text>
                 </Surface>
               ) : null}
             </Box>
