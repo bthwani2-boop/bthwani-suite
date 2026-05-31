@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
-  WebControlPanelSplitPane,
+  WebControlPanelRecommendation,
   WebControlPanelQueue,
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,
@@ -284,111 +284,117 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   }
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <Box gap={3}>
       <WebControlPanelKpiStrip items={summaryKpi} />
 
-      <WebControlPanelSplitPane
-        primary={
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
-            {/* 1. Pending Approvals Queue */}
-            <WebControlPanelQueue
-              title="طلبات قيد الموافقة التشغيلية"
-              meta={`${pendingApprovalsCount} طلبات معلقة`}
-            >
-              {PENDING_APPROVAL_ORDERS.map((order) => {
-                const submitted = decisions[order.id];
-                if (submitted) {
-                  const decisionLabel = submitted.decision === 'approve' ? 'تمت الموافقة' : submitted.decision === 'reject' ? 'تم الرفض' : 'طلب تعديل';
-                  const decisionTone = submitted.decision === 'approve' ? 'success' as const : submitted.decision === 'reject' ? 'danger' as const : 'warning' as const;
-                  return (
-                    <WebControlPanelDecisionRow
-                      key={order.id}
-                      entityId={order.id}
-                      entityLabel={`${order.customerName} — ${order.storeName}`}
-                      status={decisionLabel}
-                      statusTone={decisionTone}
-                      sla={`الحالة التالية: ${submitted.nextLifecycleStatus}`}
-                    />
-                  );
-                }
-
+      <div className={styles.surfaceSplitGrid}>
+        <Box gap={3}>
+          {/* 1. Pending Approvals Queue */}
+          <WebControlPanelQueue
+            title="طلبات قيد الموافقة التشغيلية"
+            meta={`${pendingApprovalsCount} طلبات معلقة`}
+          >
+            {PENDING_APPROVAL_ORDERS.map((order) => {
+              const submitted = decisions[order.id];
+              if (submitted) {
+                const decisionLabel = submitted.decision === 'approve' ? 'تمت الموافقة' : submitted.decision === 'reject' ? 'تم الرفض' : 'طلب تعديل';
+                const decisionTone = submitted.decision === 'approve' ? 'success' as const : submitted.decision === 'reject' ? 'danger' as const : 'warning' as const;
                 return (
                   <WebControlPanelDecisionRow
                     key={order.id}
                     entityId={order.id}
                     entityLabel={`${order.customerName} — ${order.storeName}`}
-                    status="قيد مراجعة العمليات"
-                    statusTone="warning"
-                    onInspect={() => setSelectedItemId({ type: 'approval', id: order.id })}
-                    primaryAction={{
-                      id: `${order.id}-decide`,
-                      label: 'مراجعة واتخاذ قرار',
-                      onAction: () => setSelectedItemId({ type: 'approval', id: order.id }),
-                    }}
+                    status={decisionLabel}
+                    statusTone={decisionTone}
+                    sla={`الحالة التالية: ${submitted.nextLifecycleStatus}`}
                   />
                 );
-              })}
-            </WebControlPanelQueue>
+              }
 
-            {/* 2. Live Orders Queue */}
-            <WebControlPanelQueue title="الطلبات المباشرة" meta={`${preview.rows.length} طلبات نشطة`}>
-              {preview.rows.map((order) => (
+              return (
                 <WebControlPanelDecisionRow
                   key={order.id}
                   entityId={order.id}
-                  entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
-                  status={order.status}
-                  statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
-                  risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
-                  recommendation={order.suggestion.label}
-                  reason={order.suggestion.reason}
-                  sla={`ETA: ${order.eta} | ${order.ringLabel}`}
-                  onInspect={() => setSelectedItemId({ type: 'live', id: order.id })}
+                  entityLabel={`${order.customerName} — ${order.storeName}`}
+                  status="قيد مراجعة العمليات"
+                  statusTone="warning"
+                  onInspect={() => setSelectedItemId({ type: 'approval', id: order.id })}
                   primaryAction={{
-                    id: `${order.id}-primary`,
-                    label: order.suggestion.action,
-                    onAction: () => handlePrimaryAction(order.id, order.suggestion.action),
+                    id: `${order.id}-decide`,
+                    label: 'مراجعة واتخاذ قرار',
+                    onAction: () => setSelectedItemId({ type: 'approval', id: order.id }),
                   }}
-                  secondaryAction={order.suggestion.secondary ? {
-                    id: `${order.id}-secondary`,
-                    label: order.suggestion.secondary,
-                    onAction: () => handleSecondaryAction(order.id, order.suggestion.secondary),
-                  } : undefined}
+                />
+              );
+            })}
+          </WebControlPanelQueue>
+
+          {/* 2. Live Orders Queue */}
+          <WebControlPanelQueue title="الطلبات المباشرة" meta={`${preview.rows.length} طلبات نشطة`}>
+            {preview.rows.map((order) => (
+              <WebControlPanelDecisionRow
+                key={order.id}
+                entityId={order.id}
+                entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
+                status={order.status}
+                statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
+                risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
+                recommendation={order.suggestion.label}
+                reason={order.suggestion.reason}
+                sla={`ETA: ${order.eta} | ${order.ringLabel}`}
+                onInspect={() => setSelectedItemId({ type: 'live', id: order.id })}
+                primaryAction={{
+                  id: `${order.id}-primary`,
+                  label: order.suggestion.action,
+                  onAction: () => handlePrimaryAction(order.id, order.suggestion.action),
+                }}
+                secondaryAction={order.suggestion.secondary ? {
+                  id: `${order.id}-secondary`,
+                  label: order.suggestion.secondary,
+                  onAction: () => handleSecondaryAction(order.id, order.suggestion.secondary),
+                } : undefined}
+              />
+            ))}
+          </WebControlPanelQueue>
+
+          {/* 3. Fulfillment Mode subGroup Queue (if active) */}
+          {activeMode && (
+            <WebControlPanelQueue
+              title={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.label || activeMode}
+              meta={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.operationalOwner}
+            >
+              {(FULFILLMENT_MODE_ORDER_QUEUES[activeMode] || []).map((row) => (
+                <WebControlPanelDecisionRow
+                  key={row.id}
+                  entityId={row.id}
+                  entityLabel={`${row.customerName} — ${row.storeName}`}
+                  status={row.statusLabel}
+                  statusTone={row.statusTone as any}
+                  sla={row.slaLabel}
+                  onInspect={() => setSelectedItemId({ type: 'fulfillment', id: row.id, mode: activeMode })}
+                  primaryAction={{
+                    id: `${row.id}-action`,
+                    label: row.nextAction,
+                    onAction: () => alert(`تم اتخاذ الإجراء: ${row.nextAction}`),
+                  }}
                 />
               ))}
             </WebControlPanelQueue>
+          )}
+        </Box>
 
-            {/* 3. Fulfillment Mode subGroup Queue (if active) */}
-            {activeMode && (
-              <WebControlPanelQueue
-                title={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.label || activeMode}
-                meta={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.operationalOwner}
-              >
-                {(FULFILLMENT_MODE_ORDER_QUEUES[activeMode] || []).map((row) => (
-                  <WebControlPanelDecisionRow
-                    key={row.id}
-                    entityId={row.id}
-                    entityLabel={`${row.customerName} — ${row.storeName}`}
-                    status={row.statusLabel}
-                    statusTone={row.statusTone as any}
-                    sla={row.slaLabel}
-                    onInspect={() => setSelectedItemId({ type: 'fulfillment', id: row.id, mode: activeMode })}
-                    primaryAction={{
-                      id: `${row.id}-action`,
-                      label: row.nextAction,
-                      onAction: () => alert(`تم اتخاذ الإجراء: ${row.nextAction}`),
-                    }}
-                  />
-                ))}
-              </WebControlPanelQueue>
-            )}
-          </div>
-        }
-        secondary={inspectorContent}
-        secondaryWidth="wide"
-      />
-    </div>
-  );
+        <Box gap={4}>
+          {inspectorContent ?? (
+            <WebControlPanelRecommendation
+              title="تفاصيل الإجراء والتحكم"
+              reason="اختر طلباً معلقاً للموافقة، أو طلباً مباشراً نشطاً من قائمة العمليات الحية لعرض تفاصيل الإجراء وسجل التنبيهات الموصى بها."
+              confidence="high"
+              auditTag="LIVE_ORDERS_MONITOR"
+            />
+          )}
+        </Box>
+      </div>
+    </Box>
 }
 
 export default LiveOrdersScreen;

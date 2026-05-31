@@ -154,44 +154,67 @@ export function ControlPanelDshOperationsScreen({
   }, []);
 
   return (
-    <WebControlPanelWorkbench
-      header={
-        <WebControlPanelDenseHeader
-          eyebrow="غرفة قيادة"
-          title="عمليات DSH"
-          description="summary first، details on open، وتدخلات تشغيلية بلا أي ownership مالي داخل DSH."
-          metrics={kpiItems}
-        />
-      }
-      controls={
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <WebControlPanelLaneTabs items={tabItems} onSelect={handleSelectTab} />
-          {subTabItems && subTabItems.length > 0 && (
-            <WebControlPanelSubTabs
-              items={subTabItems}
-              ariaLabel="تصفية فرعية"
-              onSelect={handleSelectSubTab}
-            />
-          )}
+    <div className={styles.surfaceCockpit} dir="rtl">
+      <header className={styles.surfaceTopBar}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
+            <div className={styles.surfaceHeaderGlyph}>
+              <div className={styles.surfaceHeaderGlyphMinus} />
+            </div>
+          </div>
+          <Box gap={0}>
+            <div className={styles.surfaceHeaderTextRow}>
+              <h1 className={styles.surfaceHeaderTitle}>عمليات DSH</h1>
+              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
+                <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
+              </Box>
+            </div>
+            <p className={styles.surfaceHeaderSubtitle}>summary first، details on open، وتدخلات تشغيلية بلا أي ownership مالي داخل DSH.</p>
+          </Box>
         </div>
-      }
-      main={
-        <div className={styles.surfaceCockpitContent} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {focusContextItems.length > 0 && (
-            <div className={styles.surfaceInfoCard} style={{ padding: '6px 12px', background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                <span className={styles.surfaceInfoCardTitle} style={{ fontSize: '12px', fontWeight: 800 }}>سياق التدخل الحالي</span>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                  {focusContextItems.map((item) => (
-                    <div key={item.label} style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>
-                      <strong>{item.label}:</strong> <span style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.value}</span>
-                    </div>
-                  ))}
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact}>
+            {kpiItems.map((metric) => (
+              <div className={styles.commandKpi} key={metric.id}>
+                <span className={styles.commandKpiLabel}>{metric.label}</span>
+                <span className={styles.commandKpiValue}>{metric.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <nav className={styles.navigationDock}>
+        <WebControlPanelLaneTabs items={tabItems} onSelect={handleSelectTab} />
+      </nav>
+
+      <div className={styles.filterDock}>
+        {subTabItems && subTabItems.length > 0 && (
+          <WebControlPanelSubTabs
+            items={subTabItems}
+            ariaLabel="تصفية فرعية"
+            onSelect={handleSelectSubTab}
+          />
+        )}
+      </div>
+
+      <main className={styles.surfaceMainPanel}>
+        <div className={styles.surfaceInnerScroll}>
+          <Box padding={4} gap={4}>
+            {focusContextItems.length > 0 && (
+              <div className={styles.surfaceInfoCard} style={{ padding: '6px 12px', background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                  <span className={styles.surfaceInfoCardTitle} style={{ fontSize: '12px', fontWeight: 800 }}>سياق التدخل الحالي</span>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    {focusContextItems.map((item) => (
+                      <div key={item.label} style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>
+                        <strong>{item.label}:</strong> <span style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            )}
             <React.Suspense
               fallback={
                 <div className={styles.surfaceStatePadding} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
@@ -201,10 +224,10 @@ export function ControlPanelDshOperationsScreen({
             >
               <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
             </React.Suspense>
-          </div>
+          </Box>
         </div>
-      }
-    />
+      </main>
+    </div>
   );
 }
 

@@ -122,7 +122,7 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
   }
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>Order Rescue</h2>
         <p className={styles.surfaceSectionSubtitle}>
@@ -370,7 +370,7 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
           </OrderRescueSection>
         </aside>
       </div>
-    </div>
+    </Box>
   );
 }
 

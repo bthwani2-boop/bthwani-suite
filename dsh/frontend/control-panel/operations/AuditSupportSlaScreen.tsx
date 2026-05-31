@@ -38,7 +38,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <Box gap={3}>
       {/* ── KPIs ── */}
       <WebControlPanelKpiStrip items={summaryKpi} />
 
@@ -59,126 +59,129 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
       </div>
 
       {/* ── Split Layout ── */}
-      <WebControlPanelSplitPane
-        primary={
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
-            <WebControlPanelQueue
-              title="سجل التدقيق والمتابعة"
-              meta={`${preview.audits.length} تدقيقات نشطة`}
+      <div className={styles.surfaceSplitGrid}>
+        <Box gap={3}>
+          <WebControlPanelQueue
+            title="سجل التدقيق والمتابعة"
+            meta={`${preview.audits.length} تدقيقات نشطة`}
+          >
+            {/* Table Column Headers */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
+                gap: '8px',
+                padding: '8px 12px',
+                background: 'var(--bthwani-control-panel-surface-inset)',
+                borderRadius: '6px',
+                fontWeight: 800,
+                fontSize: '11px',
+                color: 'var(--bthwani-control-panel-text-muted)',
+                borderBottom: '1px solid var(--bthwani-control-panel-border)',
+              }}
             >
-              {/* Table Column Headers */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
-                  gap: '8px',
-                  padding: '8px 12px',
-                  background: 'var(--bthwani-control-panel-surface-inset)',
-                  borderRadius: '6px',
-                  fontWeight: 800,
-                  fontSize: '11px',
-                  color: 'var(--bthwani-control-panel-text-muted)',
-                  borderBottom: '1px solid var(--bthwani-control-panel-border)',
-                }}
-              >
-                <span>المُنفّذ والسبب</span>
-                <span>الملاحظة والتدقيق</span>
-                <span>المستند والربط</span>
-                <span>الحالة والتوقيت</span>
-                <span style={{ width: '40px', textAlign: 'center' }}>العمل</span>
-              </div>
-
-              {/* Table Rows */}
-              {preview.audits.map((item) => {
-                const statusTone = TONE_MAP[item.statusTone] ?? 'neutral';
-                const isSelected = detailOrderId === item.id;
-
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => setDetailOrderId(isSelected ? null : item.id)}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      background: isSelected ? 'var(--bthwani-brand-surface)' : 'var(--bthwani-control-panel-surface)',
-                      border: isSelected ? '1px solid var(--bthwani-brand)' : '1px solid var(--bthwani-control-panel-border)',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {/* Column 1: Who and Why (Clear Arabic Label) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <strong style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.who}</strong>
-                      <span style={{ color: 'var(--bthwani-control-panel-text)', fontSize: '11px' }}>{item.why}</span>
-                    </div>
-
-                    {/* Column 2: Note and technical token as secondary muted tag */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{item.note}</span>
-                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '9px', background: 'var(--bthwani-control-panel-surface-inset)', color: 'var(--bthwani-control-panel-text-muted)', padding: '1px 5px', borderRadius: '4px' }}>
-                          ID: {item.id}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Column 3: Proof and Ticket link */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>{item.proofRequired}</span>
-                      <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-brand)' }}>{item.supportTicketLink}</span>
-                    </div>
-
-                    {/* Column 4: Status and Time */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <div>
-                        <WebControlPanelStatusTag label={item.permissionResult} tone={statusTone} />
-                      </div>
-                      <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>{item.when}</span>
-                    </div>
-
-                    {/* Column 5: Inspect button */}
-                    <button
-                      type="button"
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--bthwani-control-panel-brand)',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        width: '40px',
-                        textAlign: 'center',
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDetailOrderId(isSelected ? null : item.id);
-                      }}
-                      aria-label="فتح التفاصيل"
-                    >
-                      {isSelected ? '◀' : '►'}
-                    </button>
-                  </div>
-                );
-              })}
-            </WebControlPanelQueue>
-          </div>
-        }
-        secondary={
-          detailOrderId !== null ? (
-            <div style={{ height: '100%', overflowY: 'auto' }}>
-              <AuditTrailDetailWorkspace
-                orderId={detailOrderId}
-                onClose={() => setDetailOrderId(null)}
-              />
+              <span>المُنفّذ والسبب</span>
+              <span>الملاحظة والتدقيق</span>
+              <span>المستند والربط</span>
+              <span>الحالة والتوقيت</span>
+              <span style={{ width: '40px', textAlign: 'center' }}>العمل</span>
             </div>
-          ) : null
-        }
-        secondaryWidth="wide"
-      />
-    </div>
+
+            {/* Table Rows */}
+            {preview.audits.map((item) => {
+              const statusTone = TONE_MAP[item.statusTone] ?? 'neutral';
+              const isSelected = detailOrderId === item.id;
+
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setDetailOrderId(isSelected ? null : item.id)}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
+                    gap: '8px',
+                    padding: '10px 12px',
+                    background: isSelected ? 'var(--bthwani-brand-surface)' : 'var(--bthwani-control-panel-surface)',
+                    border: isSelected ? '1px solid var(--bthwani-brand)' : '1px solid var(--bthwani-control-panel-border)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    alignItems: 'center',
+                  }}
+                >
+                  {/* Column 1: Who and Why (Clear Arabic Label) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <strong style={{ color: 'var(--bthwani-control-panel-brand)' }}>{item.who}</strong>
+                    <span style={{ color: 'var(--bthwani-control-panel-text)', fontSize: '11px' }}>{item.why}</span>
+                  </div>
+
+                  {/* Column 2: Note and technical token as secondary muted tag */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{item.note}</span>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '9px', background: 'var(--bthwani-control-panel-surface-inset)', color: 'var(--bthwani-control-panel-text-muted)', padding: '1px 5px', borderRadius: '4px' }}>
+                        ID: {item.id}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Column 3: Proof and Ticket link */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>{item.proofRequired}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-brand)' }}>{item.supportTicketLink}</span>
+                  </div>
+
+                  {/* Column 4: Status and Time */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <div>
+                      <WebControlPanelStatusTag label={item.permissionResult} tone={statusTone} />
+                    </div>
+                    <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>{item.when}</span>
+                  </div>
+
+                  {/* Column 5: Inspect button */}
+                  <button
+                    type="button"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--bthwani-control-panel-brand)',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      width: '40px',
+                      textAlign: 'center',
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDetailOrderId(isSelected ? null : item.id);
+                    }}
+                    aria-label="فتح التفاصيل"
+                  >
+                    {isSelected ? '◀' : '►'}
+                  </button>
+                </div>
+              );
+            })}
+          </Box>
+        </Box>
+
+        <Box gap={4}>
+          {detailOrderId !== null ? (
+            <AuditTrailDetailWorkspace
+              orderId={detailOrderId}
+              onClose={() => setDetailOrderId(null)}
+            />
+          ) : (
+            <WebControlPanelRecommendation
+              title="تفاصيل سجل التدقيق"
+              reason="اختر أحد التدقيقات التشغيلية من سجل التدقيق لمعاينة تفاصيل الإثبات ومراجعة SLA."
+              confidence="high"
+              auditTag="UI_PREVIEW_ONLY"
+            />
+          )}
+        </Box>
+      </div>
+    </Box>
   );
 }
 

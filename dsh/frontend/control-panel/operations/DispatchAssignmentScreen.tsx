@@ -43,7 +43,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       {/* Delivery mode scope boundary — explicit, not implied */}
       <Box paddingX={3} paddingY={1}>
         <Text role="bodySm" tone="muted">
@@ -106,7 +106,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
           );
         })}
       </Box>
-    </div>
+    </Box>
   );
 }
 

@@ -40,7 +40,7 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
   }));
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>عونك — العمليات</h2>
       </div>
@@ -72,7 +72,7 @@ export function AwnakScreen({ hubHref = '/operations', subGroup }: AwnakScreenPr
           />
         ))}
       </Box>
-    </div>
+    </Box>
   );
 }
 

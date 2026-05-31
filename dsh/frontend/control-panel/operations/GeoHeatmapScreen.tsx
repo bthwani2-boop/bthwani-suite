@@ -120,128 +120,107 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
 
   return (
     <Box gap={3}>
-      <WebControlPanelWorkbench
-        header={
-          <WebControlPanelDenseHeader
-            eyebrow="عمليات لوحة التحكم"
-            title="خريطة الإسناد الحي"
-            description="الطلبات الحية وتمركز الكباتن وضغط المتاجر ومخاطر الالتزام في مشهد واحد بلا SDK خارجي."
-            metrics={[
-              { id: 'zone-count', label: 'المناطق المرئية', value: String(visibleZones.length) },
-              { id: 'active-orders', label: 'إجمالي الطلبات', value: String(visibleZones.reduce((sum, zone) => sum + zone.demandOrders, 0)) },
-              { id: 'active-captains', label: 'الكباتن النشطون', value: String(visibleZones.reduce((sum, zone) => sum + zone.activeCaptains, 0)) },
-            ]}
-          />
-        }
-        controls={
-          <Box gap={2}>
-            <Text role="bodySm" tone="muted">
-              هذه الخريطة operational preview خاصة بلوحة التحكم وتعرض إشارات الطلبات والكباتن والمتاجر summary-first من دون أي binding خرائط خارجي أو mutation ميداني.
-            </Text>
-            <WebControlPanelLaneTabs
-              ariaLabel="لوحات الخريطة"
-              items={SUB_TABS.map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeSubTab }))}
-              onSelect={(nextTabId: string) => setActiveSubTab(nextTabId)}
-            />
-            <WebControlPanelTertiaryFilters
-              ariaLabel="مرشحات الخريطة"
-              items={TERTIARY_FILTERS.map((filter) => ({ id: filter, label: FILTER_LABELS[filter], active: filter === activeFilter }))}
-              onSelect={(nextFilterId: string) => setActiveFilter(nextFilterId as GeoFilterId)}
-            />
-          </Box>
-        }
-        main={
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', paddingRight: '2px', height: '100%' }}>
-            <Box gap={3}>
-            <WebControlPanelMapCanvas
-              legend={
-                <div className={styles.surfaceActionWrap}>
-                  <WebControlPanelStatusTag label="الطلب والسعة" tone="info" />
-                  <WebControlPanelStatusTag label="مخاطر الالتزام" tone="warning" />
-                  <WebControlPanelStatusTag label="معاينة فقط" tone="neutral" />
-                </div>
-              }
-            >
-              {selectedZoneLayout ? (
-                <WebControlPanelRouteLine
-                  points={selectedZoneLayout.routePoints}
-                  tone={selectedZone?.severity === 'danger' ? 'danger' : selectedZone?.severity === 'warning' ? 'warning' : 'success'}
-                />
-              ) : null}
-              {visibleZones.map((zone) => {
-                const layout = ZONE_LAYOUT[zone.id];
-                if (!layout) return null;
-                const isSelected = zone.id === selectedZoneId;
-                return (
-                  <React.Fragment key={zone.id}>
-                    <WebControlPanelMiniMapZone
-                      label={zone.name}
-                      tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : zone.severity === 'best' ? 'success' : 'neutral'}
-                      width={layout.zone.width}
-                      height={layout.zone.height}
-                      position={{ top: layout.zone.top, right: layout.zone.right }}
+      <Box gap={2} style={{ marginBottom: '4px' }}>
+        <Text role="bodySm" tone="muted">
+          هذه الخريطة operational preview خاصة بلوحة التحكم وتعرض إشارات الطلبات والكباتن والمتاجر summary-first من دون أي binding خرائط خارجي أو mutation ميداني.
+        </Text>
+        <WebControlPanelTertiaryFilters
+          ariaLabel="مرشحات الخريطة"
+          items={TERTIARY_FILTERS.map((filter) => ({ id: filter, label: FILTER_LABELS[filter], active: filter === activeFilter }))}
+          onSelect={(nextFilterId: string) => setActiveFilter(nextFilterId as GeoFilterId)}
+        />
+      </Box>
+
+      <div className={styles.surfaceSplitGrid}>
+        <Box gap={3}>
+          <WebControlPanelMapCanvas
+            legend={
+              <div className={styles.surfaceActionWrap}>
+                <WebControlPanelStatusTag label="الطلب والسعة" tone="info" />
+                <WebControlPanelStatusTag label="مخاطر الالتزام" tone="warning" />
+                <WebControlPanelStatusTag label="معاينة فقط" tone="neutral" />
+              </div>
+            }
+          >
+            {selectedZoneLayout ? (
+              <WebControlPanelRouteLine
+                points={selectedZoneLayout.routePoints}
+                tone={selectedZone?.severity === 'danger' ? 'danger' : selectedZone?.severity === 'warning' ? 'warning' : 'success'}
+              />
+            ) : null}
+            {visibleZones.map((zone) => {
+              const layout = ZONE_LAYOUT[zone.id];
+              if (!layout) return null;
+              const isSelected = zone.id === selectedZoneId;
+              return (
+                <React.Fragment key={zone.id}>
+                  <WebControlPanelMiniMapZone
+                    label={zone.name}
+                    tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : zone.severity === 'best' ? 'success' : 'neutral'}
+                    width={layout.zone.width}
+                    height={layout.zone.height}
+                    position={{ top: layout.zone.top, right: layout.zone.right }}
+                    onSelect={() => setSelectedZoneId(zone.id)}
+                  />
+                  {!isSelected && (
+                    <WebControlPanelMapPin
+                      label={resolveMapPinLabel(zone, activeSubTab as GeoSubTabId)}
+                      tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'success'}
+                      position={
+                        activeSubTab === 'orders' ? layout.order
+                          : activeSubTab === 'captains' ? layout.captain
+                          : layout.store
+                      }
                       onSelect={() => setSelectedZoneId(zone.id)}
                     />
-                    {!isSelected && (
-                      <WebControlPanelMapPin
-                        label={resolveMapPinLabel(zone, activeSubTab as GeoSubTabId)}
-                        tone={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'success'}
-                        position={
-                          activeSubTab === 'orders' ? layout.order
-                            : activeSubTab === 'captains' ? layout.captain
-                            : layout.store
-                        }
-                        onSelect={() => setSelectedZoneId(zone.id)}
-                      />
-                    )}
-                    {isSelected && (
-                      <>
-                        <WebControlPanelMapPin label={`${zone.demandOrders} طلب`} tone="neutral" position={layout.order} onSelect={() => setSelectedZoneId(zone.id)} />
-                        <WebControlPanelMapPin label={`${zone.activeCaptains} كابتن`} tone="success" position={layout.captain} onSelect={() => setSelectedZoneId(zone.id)} />
-                        <WebControlPanelMapPin label={`ضغط ${zone.storePressure}`} tone="warning" position={layout.store} onSelect={() => setSelectedZoneId(zone.id)} />
-                      </>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </WebControlPanelMapCanvas>
+                  )}
+                  {isSelected && (
+                    <>
+                      <WebControlPanelMapPin label={`${zone.demandOrders} طلب`} tone="neutral" position={layout.order} onSelect={() => setSelectedZoneId(zone.id)} />
+                      <WebControlPanelMapPin label={`${zone.activeCaptains} كابتن`} tone="success" position={layout.captain} onSelect={() => setSelectedZoneId(zone.id)} />
+                      <WebControlPanelMapPin label={`ضغط ${zone.storePressure}`} tone="warning" position={layout.store} onSelect={() => setSelectedZoneId(zone.id)} />
+                    </>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </WebControlPanelMapCanvas>
 
-            <WebControlPanelQueue
-              title="مصفوفة المناطق"
-              meta="حتى ٥ صفوف مرئية في هذا المشهد مع تثبيت المنطقة المختارة في المفتش."
-              pager={
-                <WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />
-              }
-            >
-              {visibleZones.map((zone) => {
-                const recommendation = zoneRecommendations[zone.id];
-                return (
-                  <WebControlPanelDecisionRow
-                    key={zone.id}
-                    entityId={zone.id}
-                    entityLabel={`${zone.name} · الطلبات ${zone.demandOrders} · الكباتن ${zone.activeCaptains}`}
-                    status={resolveStatusLabel(zone, activeSubTab as GeoSubTabId)}
-                    statusTone={resolveStatusTone(zone)}
-                    risk={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'neutral'}
-                    recommendation={zone.recommendedAction}
-                    reason={`فجوة السعة ${zone.supplyDemandGap} · التقاطات متأخرة ${zone.delayedPickups}`}
-                    sla={`الالتزام ${zone.slaRisk} · ضغط المتاجر ${zone.storePressure} · ثقة ${zone.confidence}`}
-                    primaryAction={{ id: `${zone.id}-select`, label: 'تثبيت المنطقة', onAction: () => setSelectedZoneId(zone.id) }}
-                    secondaryAction={{ id: `${zone.id}-guide`, label: recommendation.secondaryActionLabel, onAction: () => setSelectedZoneId(zone.id) }}
-                    onInspect={() => setSelectedZoneId(zone.id)}
-                  />
-                );
-              })}
-            </WebControlPanelQueue>
-          </Box>
-          </div>
-        }
-        inspector={
+          <WebControlPanelQueue
+            title="مصفوفة المناطق"
+            meta="حتى ٥ صفوف مرئية في هذا المشهد مع تثبيت المنطقة المختارة في المفتش."
+            pager={
+              <WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />
+            }
+          >
+            {visibleZones.map((zone) => {
+              const recommendation = zoneRecommendations[zone.id];
+              return (
+                <WebControlPanelDecisionRow
+                  key={zone.id}
+                  entityId={zone.id}
+                  entityLabel={`${zone.name} · الطلبات ${zone.demandOrders} · الكباتن ${zone.activeCaptains}`}
+                  status={resolveStatusLabel(zone, activeSubTab as GeoSubTabId)}
+                  statusTone={resolveStatusTone(zone)}
+                  risk={zone.severity === 'danger' ? 'danger' : zone.severity === 'warning' ? 'warning' : 'neutral'}
+                  recommendation={zone.recommendedAction}
+                  reason={`فجوة السعة ${zone.supplyDemandGap} · التقاطات متأخرة ${zone.delayedPickups}`}
+                  sla={`الالتزام ${zone.slaRisk} · ضغط المتاجر ${zone.storePressure} · ثقة ${zone.confidence}`}
+                  primaryAction={{ id: `${zone.id}-select`, label: 'تثبيت المنطقة', onAction: () => setSelectedZoneId(zone.id) }}
+                  secondaryAction={{ id: `${zone.id}-guide`, label: recommendation.secondaryActionLabel, onAction: () => setSelectedZoneId(zone.id) }}
+                  onInspect={() => setSelectedZoneId(zone.id)}
+                />
+              );
+            })}
+          </WebControlPanelQueue>
+        </Box>
+
+        <Box gap={4}>
           <WebControlPanelInspectorShell
             title={selectedZone ? `تفاصيل ${selectedZone.name}` : 'تفاصيل المنطقة'}
             onClose={() => setSelectedZoneId(visibleZones[0]?.id ?? GEO_HEATMAP_ZONES[0]?.id ?? '')}
           >
-            <Box gap={2} style={{ overflowY: 'auto', height: '100%', paddingRight: '2px' }}>
+            <Box gap={2}>
               <Box gap={2}>
                 {[
                   { label: 'نوع الكيان', value: 'منطقة تشغيلية' },
@@ -281,8 +260,8 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
               </Box>
             </Box>
           </WebControlPanelInspectorShell>
-        }
-      />
+        </Box>
+      </div>
     </Box>
   );
 }

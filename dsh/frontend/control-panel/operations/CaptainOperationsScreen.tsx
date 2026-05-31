@@ -49,7 +49,7 @@ export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup
   const router = useRouter();
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>تشغيل الكباتن</h2>
       </div>
@@ -102,7 +102,7 @@ export function CaptainOperationsScreen({ hubHref: _hubHref, subGroup: _subGroup
           />
         ))}
       </Box>
-    </div>
+    </Box>
   );
 }
 

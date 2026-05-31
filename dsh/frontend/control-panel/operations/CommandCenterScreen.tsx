@@ -76,7 +76,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
   const financeGovernance = getDshControlPanelGovernanceEntry('finance');
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ gap: '10px', overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       {/* ── Header ── */}
       <div className={styles.surfaceSectionHeader} style={{ marginBottom: '4px' }}>
         <h2 className={styles.surfaceSectionTitle} style={{ fontSize: '15px' }}>لوحة التحكم والمراقبة النشطة</h2>
@@ -318,7 +318,7 @@ export function CommandCenterScreen({ hubHref, subGroup: _subGroup }: CommandCen
           </div>
         </div>
       </div>
-    </div>
+    </Box>
   );
 }
 

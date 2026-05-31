@@ -40,7 +40,7 @@ export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations', subGr
   }));
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>شي إن — عمليات الوكالة</h2>
       </div>
@@ -72,7 +72,7 @@ export function ControlPanelDshSheinProxyScreen({ hubHref = '/operations', subGr
           />
         ))}
       </Box>
-    </div>
+    </Box>
   );
 }
 

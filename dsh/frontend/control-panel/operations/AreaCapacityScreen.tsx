@@ -32,7 +32,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
   ];
 
   return (
-    <div className={styles.surfaceCockpitContent} style={{ overflowY: 'auto', paddingInlineEnd: '4px' }}>
+    <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>المناطق والسعة</h2>
       </div>
@@ -64,7 +64,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
           />
         ))}
       </Box>
-    </div>
+    </Box>
   );
 }
 
