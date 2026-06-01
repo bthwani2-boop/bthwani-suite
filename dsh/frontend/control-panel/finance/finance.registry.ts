@@ -133,6 +133,12 @@ export const FINANCE_ACTIVE_GROUPS = FINANCE_CANONICAL_GROUPS.filter(
   (g) => g.id !== 'tax-compliance',
 );
 
+// P1: التبويبات الرئيسية في الشريط العلوي فقط.
+// captain-finance وstore-delivery-finance تُعرض كفلاتر داخلية، لا كتبويبات رئيسية.
+export const FINANCE_NAV_GROUPS = FINANCE_CANONICAL_GROUPS.filter(
+  (g) => g.id !== 'tax-compliance' && g.id !== 'captain-finance' && g.id !== 'store-delivery-finance',
+);
+
 export function normalizeFinanceLocation(
   workspace?: string,
   panel?: string,

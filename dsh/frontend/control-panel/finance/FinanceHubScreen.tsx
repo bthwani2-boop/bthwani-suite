@@ -14,13 +14,17 @@ import {
 import {
   buildFinanceHref,
   getFinanceGroupMeta,
-  FINANCE_ACTIVE_GROUPS,
+  FINANCE_NAV_GROUPS,
 } from './finance.registry';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from './finance.types';
 import {
   ControlPanelDshFinanceScreen,
+  ControlPanelDshCodReconciliationScreen,
+  ControlPanelDshCaptainEligibilityScreen,
   ControlPanelDshPayoutsScreen,
+  ControlPanelDshRiskAuditScreen,
+  ControlPanelDshLedgerScreen,
   ControlPanelDshCaptainFinanceScreen,
   ControlPanelDshStoreDeliveryFinanceScreen,
 } from './FinanceHubScreens';
@@ -64,14 +68,14 @@ function FieldCommissionBridgePanel(_: { hubHref: string; subGroup?: string }) {
 
 const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hubHref: string; subGroup?: string }>> = {
   overview: ControlPanelDshFinanceScreen,
-  settlements: PartnerSettlementBridgePanel,         // partner settlement — WLT bridge, view-only
-  'cod-reconciliation': CommissionBreakdownBridgePanel, // per-order commission breakdown — WLT bridge, view-only
-  'captain-eligibility': CaptainPayoutBridgePanel,  // captain payout — WLT bridge, view-only
-  refunds: RefundQueueBridgePanel,                   // refund queue — WLT bridge, view-only
-  ledger: FieldCommissionBridgePanel,                // field agent commission — WLT bridge, view-only
+  settlements: PartnerSettlementBridgePanel,
+  'cod-reconciliation': ControlPanelDshCodReconciliationScreen,
+  'captain-eligibility': ControlPanelDshCaptainEligibilityScreen,
+  refunds: RefundQueueBridgePanel,
+  ledger: ControlPanelDshLedgerScreen,
   payouts: ControlPanelDshPayoutsScreen,
   'tax-compliance': ControlPanelDshFinanceScreen,
-  'risk-audit': PlatformFeeAuditBridgePanel,         // platform fee audit — WLT bridge, view-only
+  'risk-audit': ControlPanelDshRiskAuditScreen,
   'captain-finance': ControlPanelDshCaptainFinanceScreen,
   'store-delivery-finance': ControlPanelDshStoreDeliveryFinanceScreen,
 };
@@ -192,14 +196,12 @@ function FinanceErrorState({ onRetry }: { onRetry: () => void }) {
         حدث خطأ أثناء الاتصال بمحرك WLT المالي أو استرداد بيانات المعاينة. لم نتمكن من تدقيق العقد النشط أو مزامنة التبويبات الفرعية.
       </p>
 
-      {/* Diagnostics / Audit details */}
       <div className={styles.errorStateDiagnostics}>
         <div className={styles.errorStateDiagnosticsHeader}>
-          [DIAGNOSTICS LOGS · WLT ENGINE GATEWAY]
+          [بيئة معاينة — لا بيانات runtime حقيقية]
         </div>
-        <div>ERROR_CODE: WLT_RPC_CONNECTION_TIMEOUT (504 Gateway Timeout)</div>
-        <div>TARGET: grpc://wlt-core.bthwani.internal:9090/v1.FinanceService</div>
-        <div>{"STATE_TRACE: getWltControlPanelFinancePreview() -> failed to resolve dynamic adapter"}</div>
+        <div>السبب: لم يتم ربط WLT API بعد (CONTRACT_TBD)</div>
+        <div>المصدر: bيانات معاينة ثابتة فقط — لا اتصال بخادم مالي</div>
       </div>
 
       <div className={styles.stateActionsRow}>
@@ -224,9 +226,8 @@ function FinanceOfflineState({ onRetry }: { onRetry: () => void }) {
         تعذر تحديث المؤشرات المالية الحية من خادم WLT المركزي. يتم حاليًا عرض نسخة المعاينة المحلية المخزنة مؤقتًا لتسهيل المراجعة التشغيلية.
       </p>
 
-      {/* Audit info */}
       <div className={styles.offlineStateInfo}>
-        <strong>حالة المزامنة:</strong> غير متصل · <strong>آخر تحديث ناجح:</strong> منذ دقيقتين · <strong>المصدر النشط:</strong> wlt.preview-data.ts (Local Backup)
+        <strong>حالة المزامنة:</strong> غير متصل · <strong>المصدر النشط:</strong> بيانات معاينة محلية فقط (لا runtime)
       </div>
 
       <div className={styles.stateActionsRow}>
@@ -314,6 +315,11 @@ export function ControlPanelDshFinanceHubScreen({
   const financePreview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
   const financeGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('finance'), []);
   const platformGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('platform'), []);
+  // P6: Derive pending count from WLT preview records instead of hardcoding
+  const pendingCount = React.useMemo(
+    () => financePreview.allRecords.filter((r) => r.statusTone === 'error' || r.statusTone === 'warning').length,
+    [financePreview],
+  );
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { panel });
   const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS.overview;
@@ -365,8 +371,10 @@ export function ControlPanelDshFinanceHubScreen({
               <span className={styles.commandKpiValue}>{financePreview.totalOutflowLabel}</span>
             </div>
             <div className={styles.commandKpi}>
-              <span className={styles.commandKpiLabel}>عناصر معلقة (معاينة)</span>
-              <span className={`${styles.commandKpiValue} ${styles.commandKpiValueAlert}`}>١٤</span>
+              <span className={styles.commandKpiLabel}>عناصر معلقة [معاينة]</span>
+              <span className={`${styles.commandKpiValue} ${pendingCount > 0 ? styles.commandKpiValueAlert : ''}`}>
+                {pendingCount.toLocaleString('ar-YE')}
+              </span>
             </div>
             <div className={styles.commandKpi}>
               <span className={styles.commandKpiLabel}>حالة المخاطر (معاينة)</span>
@@ -378,7 +386,7 @@ export function ControlPanelDshFinanceHubScreen({
 
       <nav className={styles.navigationDock}>
         <WebControlPanelWorkspaceTabs
-          items={FINANCE_ACTIVE_GROUPS.map((item) => ({
+          items={FINANCE_NAV_GROUPS.map((item) => ({
             id: item.id,
             label: item.label,
             active: item.id === activeGroup,

@@ -13,6 +13,7 @@ import {
   getWltDshStoreDeliveryFinancePreview,
   getWltFieldFinancePreview,
   type WltDshFinancePreviewRecord,
+  type WltDshFinanceEventKind,
 } from '../../../wlt/frontend/shared/finance/dshFinancePreview';
 
 export const dshWalletPreviewDataContract = {
@@ -56,6 +57,31 @@ export type DshFinancePreviewRow = {
   primaryActionLabel: string;
   secondaryActionLabel: string;
   sla: string;
+  // P3: Typed actor/event fields — filters must use these, never string.includes()
+  actorType: 'client' | 'partner' | 'captain' | 'field' | 'storeCourier' | 'platform';
+  eventKind: WltDshFinanceEventKind | 'unknown';
+  // P4: Zero-variance model — varianceMinorUnits must be 0 before "closed/matched" display
+  expectedMinorUnits: number;
+  actualMinorUnits: number;
+  varianceMinorUnits: number;
+  evidenceStatus: 'missing' | 'partial' | 'complete';
+  reconciliationStatus: 'unmatched' | 'matched' | 'disputed' | 'closed';
+  // Ownership + contract constants (always WLT / view_only in DSH)
+  currencyCode: 'YER';
+  ownerService: 'wlt';
+  dshRole: 'view_only';
+  // Source identifiers (optional — from WLT record)
+  sourceOrderId?: string;
+  sourceStoreId?: string;
+  sourceCaptainId?: string;
+  sourceFieldAgentId?: string;
+  // Ledger identifiers (preview placeholders — real values from WLT ledger only)
+  debitAccountId?: string;
+  creditAccountId?: string;
+  auditTrailId?: string;
+  // Allowed DSH action for this row — never a real mutation
+  allowedAction: 'review' | 'view_evidence' | 'prepare_decision' | 'none';
+  blockedReason?: string;
 };
 
 export const dshWalletReferencePreviews: readonly DshWalletReferencePreview[] = [
@@ -98,6 +124,57 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
     : record.actor === 'field' && record.sourceFieldAgentId ? `ميداني · ${record.sourceFieldAgentId}`
     : record.title;
 
+  // P3: Typed actor type
+  const actorType: DshFinancePreviewRow['actorType'] =
+    record.actor === 'captain' ? 'captain'
+    : record.actor === 'partner' ? 'partner'
+    : record.actor === 'field' ? 'field'
+    : record.actor === 'client' ? 'client'
+    : 'platform';
+
+  // P3: Evidence and reconciliation status from WLT record tone
+  const evidenceStatus: DshFinancePreviewRow['evidenceStatus'] =
+    record.statusTone === 'error' ? 'missing'
+    : record.holdReason ? 'partial'
+    : 'complete';
+
+  const reconciliationStatus: DshFinancePreviewRow['reconciliationStatus'] =
+    record.statusTone === 'error' ? 'unmatched'
+    : record.statusTone === 'warning' ? 'disputed'
+    : 'matched';
+
+  // P4: For preview, expected = record amount; actual = 0 if error (unknown), else same as expected.
+  const expectedMinorUnits = record.amountMinorUnits;
+  const actualMinorUnits = record.statusTone === 'error' ? 0 : record.amountMinorUnits;
+  const varianceMinorUnits = expectedMinorUnits - actualMinorUnits;
+
+  // Allowed DSH action based on event kind — DSH never mutates, always view-only
+  const allowedAction: DshFinancePreviewRow['allowedAction'] =
+    record.kind === 'refund-adjustment' ? 'review'
+    : record.kind === 'captain-cod-liability' ? 'view_evidence'
+    : record.kind === 'partner-settlement' || record.kind === 'field-payout' ? 'prepare_decision'
+    : record.kind === 'reconciliation-export' || record.kind === 'platform-commission' ? 'review'
+    : 'none';
+
+  // Preview ledger account placeholders — real IDs come from WLT ledger only
+  const captainSuffix = record.sourceCaptainId ? `:${record.sourceCaptainId}` : '';
+  const storeSuffix = record.sourceStoreId ? `:${record.sourceStoreId}` : '';
+  const fieldSuffix = record.sourceFieldAgentId ? `:${record.sourceFieldAgentId}` : '';
+  const debitAccountId =
+    record.actor === 'captain' ? `[معاينة] wlt:captain${captainSuffix}:cod-escrow`
+    : record.actor === 'partner' ? `[معاينة] wlt:partner${storeSuffix}:settlement`
+    : record.actor === 'field' ? `[معاينة] wlt:field${fieldSuffix}:commission`
+    : `[معاينة] wlt:platform:fees`;
+  const creditAccountId =
+    record.actor === 'captain' ? `[معاينة] wlt:captain${captainSuffix}:earnings`
+    : record.actor === 'partner' ? `[معاينة] wlt:partner${storeSuffix}:payout`
+    : record.actor === 'field' ? `[معاينة] wlt:field${fieldSuffix}:payout`
+    : `[معاينة] wlt:platform:revenue`;
+
+  const auditTrailId = record.settlementCycleId
+    ? `AUD-${record.settlementCycleId}`
+    : `AUD-PRV-${record.id}`;
+
   return {
     id: record.id,
     amount: record.amountLabel,
@@ -110,6 +187,25 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
     primaryActionLabel,
     secondaryActionLabel: 'فتح الأدلة المالية',
     sla: record.timeLabel,
+    actorType,
+    eventKind: record.kind,
+    expectedMinorUnits,
+    actualMinorUnits,
+    varianceMinorUnits,
+    evidenceStatus,
+    reconciliationStatus,
+    currencyCode: 'YER',
+    ownerService: 'wlt',
+    dshRole: 'view_only',
+    sourceOrderId: record.sourceOrderId,
+    sourceStoreId: record.sourceStoreId,
+    sourceCaptainId: record.sourceCaptainId,
+    sourceFieldAgentId: record.sourceFieldAgentId,
+    debitAccountId,
+    creditAccountId,
+    auditTrailId,
+    allowedAction,
+    blockedReason: record.holdReason,
   };
 }
 
@@ -191,25 +287,52 @@ export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSur
     }
   });
 
-  // Construct Captain Eligibility Row from WLT snapshot
+  // P6: Captain Eligibility Row from WLT snapshot — clearly marked [معاينة] fixture, not a real captain record.
+  const celEligible = capSnap.isEligible;
   captainEligibilityRows.push({
     id: 'CEL-401',
     amount: capSnap.eligibilityBalanceLabel,
-    owner: 'كابتن فهد · CAP-77',
-    status: capSnap.isEligible ? 'مؤهل' : 'غير مؤهل',
-    risk: capSnap.isEligible ? 'success' : 'warning',
+    owner: '[معاينة] كابتن · CAP-77',
+    status: celEligible ? 'مؤهل' : 'غير مؤهل',
+    risk: celEligible ? 'success' : 'warning',
     evidence: capSnap.eligibilityBlockReason,
     nextAction: 'فحص الرصيد الضامن والشحن للتأهل',
     recommendation: capSnap.eligibilityBlockReason,
     primaryActionLabel: 'محاكاة شحن الرصيد',
     secondaryActionLabel: 'فتح ملف الكابتن',
     sla: 'خلال ٢٤ ساعة',
+    actorType: 'captain',
+    eventKind: 'captain-eligibility-topup',
+    expectedMinorUnits: capSnap.minimumEligibilityMinorUnits,
+    actualMinorUnits: celEligible ? capSnap.minimumEligibilityMinorUnits : capSnap.eligibilityBalanceMinorUnits,
+    varianceMinorUnits: celEligible ? 0 : capSnap.eligibilityShortfallMinorUnits,
+    evidenceStatus: celEligible ? 'complete' : 'partial',
+    reconciliationStatus: celEligible ? 'matched' : 'unmatched',
+    currencyCode: 'YER',
+    ownerService: 'wlt',
+    dshRole: 'view_only',
+    sourceCaptainId: 'CAP-77',
+    debitAccountId: '[معاينة] wlt:captain:CAP-77:eligibility-reserve',
+    creditAccountId: '[معاينة] wlt:captain:CAP-77:eligibility-balance',
+    auditTrailId: 'AUD-PRV-CEL-401',
+    allowedAction: celEligible ? 'view_evidence' : 'prepare_decision',
+    blockedReason: celEligible ? undefined : capSnap.eligibilityBlockReason,
   });
 
+  const emptyOverviewFallback: DshFinancePreviewRow = {
+    id: 'FIN-EMPTY-1', amount: '٠ ر.ي', owner: '[معاينة] نظرة عامة', status: 'لا فوارق معاينة',
+    risk: 'success', evidence: 'لا توجد فوارق مالية في بيانات المعاينة الحالية', nextAction: 'مراقبة مستمرة',
+    recommendation: 'لا توجد إجراءات إضافية مطلوبة في بيانات المعاينة',
+    primaryActionLabel: 'معاينة', secondaryActionLabel: 'فتح السجل', sla: 'مباشر',
+    actorType: 'platform', eventKind: 'reconciliation-export',
+    expectedMinorUnits: 0, actualMinorUnits: 0, varianceMinorUnits: 0,
+    evidenceStatus: 'complete', reconciliationStatus: 'closed',
+    currencyCode: 'YER', ownerService: 'wlt', dshRole: 'view_only',
+    allowedAction: 'none', auditTrailId: 'AUD-PRV-EMPTY',
+  };
+
   cachedRows = {
-    overview: overviewRows.length > 0 ? overviewRows : [
-      { id: 'FIN-EMPTY-1', amount: '٠ ر.ي', owner: 'نظرة عامة', status: 'سليم', risk: 'success', evidence: 'لا توجد فوارق مالية اليوم', nextAction: 'مراقبة مستمرة', recommendation: 'لا توجد إجراءات إضافية مطلوبة', primaryActionLabel: 'معاينة', secondaryActionLabel: 'فتح السجل', sla: 'مباشر' }
-    ],
+    overview: overviewRows.length > 0 ? overviewRows : [emptyOverviewFallback],
     settlements: settlementsRows,
     'cod-reconciliation': codReconciliationRows,
     refunds: refundsRows,
@@ -221,7 +344,7 @@ export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSur
     'store-delivery-finance': storeDeliveryFinanceRows,
   };
 
-  return cachedRows;
+  return cachedRows!;
 }
 
 export const dshFinanceControlPanelPreviewRows = {
