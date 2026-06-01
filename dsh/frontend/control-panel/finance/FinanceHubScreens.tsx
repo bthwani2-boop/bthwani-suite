@@ -54,7 +54,7 @@ function resolveSurfaceLabel(surface: FinanceSurface) {
 
 function resolveSurfaceDescription(surface: FinanceSurface) {
   if (surface === 'overview') return 'ملخص مالي مضغوط يوضح أهم الصفوف الحرجة والاستحقاقات الحالية (معاينة فقط — مملوكة لـ WLT). العملة: ر.ي';
-  if (surface === 'settlements') return 'غرفة مراجعة واعتماد التسويات للشركاء والكباتن والميدانيين (معاينة فقط — مملوكة لـ WLT).';
+  if (surface === 'settlements') return 'غرفة مراجعة التسويات للشركاء والكباتن والميدانيين — WLT ينفذ التسوية (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'cod-reconciliation') return 'مطابقة الدفع عند الاستلام — الفوارق النقدية والتحقيقات المفتوحة. الكابتن مسؤول عن COD كذمة حتى الإيداع (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'refunds') return 'صف الاستردادات والنزاعات وما يرتبط بها من مراجعات (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'captain-eligibility') return 'مراقبة الرصيد الضامن للكباتن — من مؤهل لاستقبال الطلبات ومن يحتاج شحن رصيد (معاينة فقط — مملوكة لـ WLT).';
@@ -105,6 +105,7 @@ import { WltBoundaryBanner } from './WltBoundaryBanner';
 import { buildDshWltFinanceBoundaryRecord } from '../../shared/dshFinancePreviewModel';
 import type { DshWltFinanceBoundaryRecord } from '../../shared/dshFinancePreviewModel';
 import { getFinanceApiBinding } from './finance.api-matrix';
+import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
 
 function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; subGroup?: string }) {
   const router = useRouter();
@@ -114,6 +115,10 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
     const wltPreview = getWltControlPanelFinancePreview();
 
     if (!subGroup || subGroup === 'all') return baseRows;
+
+    if (surface === 'overview' && subGroup === 'daily-close') {
+      return baseRows; // Workbench renders its own data — just return all for context
+    }
 
     if (surface === 'overview') {
       if (subGroup === 'inflow') {
@@ -228,46 +233,50 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
         />
       }
       main={
-        <Box gap={3}>
-          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap', direction: 'rtl' }}>
-            <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
-            <WebControlPanelStatusTag label={subGroup ? `الفلتر: ${subGroup}` : 'كل الصفوف'} tone="neutral" />
-            <WebControlPanelStatusTag label={selectedRow?.owner ?? 'لا يوجد تحديد'} tone={selectedRow ? resolveRowTone(selectedRow) : 'neutral'} />
-            <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('UI_PREVIEW_ONLY')} tone="warning" />
-          </Box>
-
-          {rows.length === 0 ? (
-            <Box padding={6} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-              <Text role="titleSm" tone="muted" style={{ fontWeight: '700', textAlign: 'center' }}>لا توجد سجلات حالية</Text>
-              <Text role="bodySm" tone="soft" style={{ textAlign: 'center', lineHeight: 22 }}>
-                لا توجد حركات أو مطالبات مالية مطابقة لهذا الفلتر المحدّد حالياً في بيئة المعاينة.
-              </Text>
+        surface === 'overview' && subGroup === 'daily-close' ? (
+          <DailyReconciliationWorkbench />
+        ) : (
+          <Box gap={3}>
+            <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap', direction: 'rtl' }}>
+              <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
+              <WebControlPanelStatusTag label={subGroup ? `الفلتر: ${subGroup}` : 'كل الصفوف'} tone="neutral" />
+              <WebControlPanelStatusTag label={selectedRow?.owner ?? 'لا يوجد تحديد'} tone={selectedRow ? resolveRowTone(selectedRow) : 'neutral'} />
+              <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('UI_PREVIEW_ONLY')} tone="warning" />
             </Box>
-          ) : (
-            <WebControlPanelQueue
-              title={`صف ${resolveSurfaceLabel(surface)}`}
-              meta="كل صف مالي يحتفظ بإجراء واحد: مراجعة الوضع أو فتح الأدلة — لا تنفيذ مالي من DSH."
-              pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />}
-            >
-              {rows.slice(0, 6).map((row) => (
-                <WebControlPanelDecisionRow
-                  key={row.id}
-                  entityId={row.id}
-                  entityLabel={`${row.owner} · ${row.amount}`}
-                  status={row.status}
-                  statusTone={resolveRowTone(row)}
-                  risk={resolveRisk(row)}
-                  recommendation={row.recommendation}
-                  reason={row.evidence}
-                  sla={`زمن الالتزام: ${row.sla} · الإجراء التالي: ${row.nextAction}`}
-                  primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
-                  secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
-                  onInspect={() => setSelectedId(row.id)}
-                />
-              ))}
-            </WebControlPanelQueue>
-          )}
-        </Box>
+
+            {rows.length === 0 ? (
+              <Box padding={6} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <Text role="titleSm" tone="muted" style={{ fontWeight: '700', textAlign: 'center' }}>لا توجد سجلات حالية</Text>
+                <Text role="bodySm" tone="soft" style={{ textAlign: 'center', lineHeight: 22 }}>
+                  لا توجد حركات أو مطالبات مالية مطابقة لهذا الفلتر المحدّد حالياً في بيئة المعاينة.
+                </Text>
+              </Box>
+            ) : (
+              <WebControlPanelQueue
+                title={`صف ${resolveSurfaceLabel(surface)}`}
+                meta="كل صف مالي يحتفظ بإجراء واحد: مراجعة الوضع أو فتح الأدلة — لا تنفيذ مالي من DSH."
+                pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />}
+              >
+                {rows.slice(0, 6).map((row) => (
+                  <WebControlPanelDecisionRow
+                    key={row.id}
+                    entityId={row.id}
+                    entityLabel={`${row.owner} · ${row.amount}`}
+                    status={row.status}
+                    statusTone={resolveRowTone(row)}
+                    risk={resolveRisk(row)}
+                    recommendation={row.recommendation}
+                    reason={row.evidence}
+                    sla={`زمن الالتزام: ${row.sla} · الإجراء التالي: ${row.nextAction}`}
+                    primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
+                    secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
+                    onInspect={() => setSelectedId(row.id)}
+                  />
+                ))}
+              </WebControlPanelQueue>
+            )}
+          </Box>
+        )
       }
       inspector={
         <WebControlPanelInspectorShell title={`تفاصيل الكيان ${selectedRow?.id ?? ''}`}>
@@ -337,6 +346,9 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
                       <Text role="caption" tone="muted" style={{ textAlign: 'right', fontWeight: '700' }}>WLT OpenAPI Binding [P7]</Text>
                       <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{binding.httpMethod} {binding.wltEndpoint}</Text>
                       <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>operationId: {binding.operationId}</Text>
+                      <Text role="caption" tone={binding.endpointStatus === 'exact' ? 'muted' : 'danger'} style={{ textAlign: 'right' }}>
+                        endpoint: {binding.endpointStatus === 'exact' ? '✓ exact' : '⚠ BLOCKED_BY_MISSING_WLT_CONTRACT'}
+                      </Text>
                       <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
                         {binding.requiresIdempotency ? 'Idempotency-Key مطلوب' : 'قراءة فقط — لا Idempotency'} · {binding.contractState}
                       </Text>

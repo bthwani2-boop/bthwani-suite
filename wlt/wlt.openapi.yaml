@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: WLT DSH Finance API
-  version: 0.2.0-scaffold
+  version: 0.3.0-scaffold
   description: >
     WLT contract scaffold for DSH finance surfaces.
     CONTRACT_SCAFFOLD_PREVIEW_ONLY — no backend implemented.
@@ -375,6 +375,136 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 
+  /wlt/dsh/control-panel/refund-queue:
+    get:
+      operationId: listControlPanelRefundQueue
+      summary: List refund cases in control panel review queue
+      description: >
+        WLT-owned. Lists pending and processed refund cases for control panel review.
+        Control panel prepares decisions; WLT executes all refund outcomes.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Refund case queue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefundCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/ledger-entries:
+    get:
+      operationId: listControlPanelLedgerEntries
+      summary: List general ledger entries for control panel
+      description: >
+        WLT-owned. Returns general ledger entries — journal entries, debit/credit records.
+        Control panel is read-only. No ledger write from DSH.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ledger entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LedgerEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/store-delivery/finance-summary:
+    get:
+      operationId: getStoreDeliveryFinanceSummary
+      summary: Get store delivery courier finance summary
+      description: >
+        WLT-owned. Returns finance summary for store delivery couriers (store_courier_mode).
+        Separated from bthwani captain finance. Control panel is read-only consumer.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+      tags: [store-delivery-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Store delivery finance summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreDeliveryFinanceSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/daily-close:
+    post:
+      operationId: submitDailyClose
+      summary: Submit daily financial close request to WLT
+      description: >
+        WLT-owned. Control panel submits daily close initiation after verifying
+        zero total variance and complete evidence. WLT engine performs the close.
+        Idempotency-Key required. Maker-Checker workflow enforced server-side by WLT.
+        422 returned if varianceTotalMinorUnits !== 0 or evidence incomplete.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyCloseRequest'
+      responses:
+        '201':
+          description: Daily close submitted — WLT engine will process
+        '409':
+          description: Duplicate idempotency key
+        '422':
+          description: Unresolved variance or incomplete evidence — close blocked by WLT
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/reconciliation-close-status:
+    get:
+      operationId: getReconciliationCloseStatus
+      summary: Get daily reconciliation close gate status
+      description: >
+        WLT-owned. Returns current daily close status: total variance, evidence completeness,
+        and whether close gate is open. gateOpen is true only when varianceTotalMinorUnits === 0
+        AND evidenceComplete === true. Any non-zero variance blocks the gate.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reconciliation close status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationCloseStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -412,13 +542,13 @@ components:
     MoneyAmount:
       type: object
       description: >
-        Monetary amount in minor units (fils for YER).
+        Monetary amount in minor units (YER minor units — use amountMinorUnits as the canonical field).
         Currency defaults to YER per x-bthwani-currency-default.
       required: [amountMinorUnits, currency]
       properties:
         amountMinorUnits:
           type: integer
-          description: Amount in minor currency units (e.g., fils for YER)
+          description: Amount in minor currency units (YER minor units — not fils/halala; use amountMinorUnits as the canonical field name)
         currency:
           type: string
           default: YER
@@ -695,6 +825,82 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    StoreDeliveryFinanceSummary:
+      type: object
+      description: WLT-owned store delivery courier finance summary (store_courier_mode).
+      required: [totalEarningsMinorUnits, currency, periodDate]
+      properties:
+        totalEarningsMinorUnits:
+          type: integer
+          description: Total courier earnings in minor units
+        currency:
+          type: string
+          default: YER
+        pendingCount:
+          type: integer
+        periodDate:
+          type: string
+          format: date
+        deliveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldCommission'
+
+    DailyCloseRequest:
+      type: object
+      description: >
+        Daily close initiation payload sent from DSH control panel to WLT.
+        WLT engine verifies zero total variance and complete evidence before executing close.
+        DSH initiates only — WLT owns all close logic.
+      required: [periodDate, makerUserId, checkerUserId]
+      properties:
+        periodDate:
+          type: string
+          format: date
+        makerUserId:
+          type: string
+          description: ID of the maker who prepared the close decision
+        checkerUserId:
+          type: string
+          description: ID of the checker who reviewed and approved the close
+        note:
+          type: string
+
+    ReconciliationCloseStatus:
+      type: object
+      description: >
+        WLT-computed daily reconciliation close gate status.
+        gateOpen is true ONLY when varianceTotalMinorUnits === 0 AND evidenceComplete === true.
+        Any non-zero variance or incomplete evidence keeps the gate closed.
+      required: [periodDate, varianceTotalMinorUnits, evidenceComplete, gateOpen, currency]
+      properties:
+        periodDate:
+          type: string
+          format: date
+        varianceTotalMinorUnits:
+          type: integer
+          description: Sum of all unresolved variances across all rows. Must be 0 for gate to open.
+        evidenceComplete:
+          type: boolean
+          description: True only when every row has evidenceStatus === complete.
+        gateOpen:
+          type: boolean
+          description: True only when varianceTotalMinorUnits === 0 AND evidenceComplete === true.
+        currency:
+          type: string
+          default: YER
+        blockedReasons:
+          type: array
+          items:
+            type: string
+          description: Human-readable list of reasons preventing daily close
+        rowCount:
+          type: integer
+          description: Total number of financial rows in the reconciliation set
+        resolvedRowCount:
+          type: integer
+          description: Number of rows with varianceMinorUnits === 0 and evidenceStatus === complete
 
     ErrorResponse:
       type: object

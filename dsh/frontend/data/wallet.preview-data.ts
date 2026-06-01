@@ -82,6 +82,16 @@ export type DshFinancePreviewRow = {
   // Allowed DSH action for this row — never a real mutation
   allowedAction: 'review' | 'view_evidence' | 'prepare_decision' | 'none';
   blockedReason?: string;
+  // P9: Independent source tracking — expected and actual must come from different sources
+  expectedSource: 'order-invoice' | 'settlement-cycle' | 'commission-schedule' | 'eligibility-calc' | 'preview-seed';
+  actualSource: 'bank-deposit' | 'wallet-debit' | 'cash-bag-delivery' | 'pos-receipt' | 'preview-seed';
+  evidenceSource: 'bank-statement' | 'pos-log' | 'audit-entry' | 'receipt-upload' | 'none';
+  varianceReason?: string;
+  bankDepositRef?: string;
+  cashBagRef?: string;
+  ledgerEntryRef?: string;
+  // P11: Maker-checker preview workflow state
+  workflowState: 'draft' | 'prepared' | 'reviewed' | 'checked' | 'approved' | 'blocked_wlt';
 };
 
 export const dshWalletReferencePreviews: readonly DshWalletReferencePreview[] = [
@@ -175,6 +185,52 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
     ? `AUD-${record.settlementCycleId}`
     : `AUD-PRV-${record.id}`;
 
+  // P9: Source separation — expected from the originating financial event, actual from delivery
+  const expectedSource: DshFinancePreviewRow['expectedSource'] =
+    record.kind === 'captain-cod-liability' ? 'order-invoice'
+    : record.kind === 'partner-settlement' || record.kind === 'field-payout' ? 'settlement-cycle'
+    : record.kind === 'field-commission-pending' ? 'commission-schedule'
+    : record.kind === 'reconciliation-export' || record.kind === 'platform-commission' ? 'order-invoice'
+    : 'preview-seed';
+
+  const actualSource: DshFinancePreviewRow['actualSource'] =
+    record.kind === 'captain-cod-liability' ? 'cash-bag-delivery'
+    : record.kind === 'partner-settlement' || record.kind === 'field-payout' ? 'bank-deposit'
+    : record.kind === 'field-commission-pending' ? 'bank-deposit'
+    : record.kind === 'platform-commission' ? 'wallet-debit'
+    : 'preview-seed';
+
+  const evidenceSource: DshFinancePreviewRow['evidenceSource'] =
+    record.statusTone === 'error' ? 'none'
+    : record.kind === 'captain-cod-liability' ? 'pos-log'
+    : record.kind === 'partner-settlement' ? 'bank-statement'
+    : record.kind === 'field-commission-pending' ? 'receipt-upload'
+    : record.kind === 'reconciliation-export' ? 'audit-entry'
+    : 'audit-entry';
+
+  const varianceReason: string | undefined =
+    varianceMinorUnits !== 0 ? (record.holdReason || 'فارق غير مبرر — يجب مراجعة مصدر الفعلي')
+    : undefined;
+
+  // Preview deposit/cash refs — placeholders only
+  const bankDepositRef = actualSource === 'bank-deposit'
+    ? `[معاينة] DEP-${record.id}`
+    : undefined;
+  const cashBagRef = actualSource === 'cash-bag-delivery'
+    ? `[معاينة] BAG-${record.id}`
+    : undefined;
+  const ledgerEntryRef = record.settlementCycleId
+    ? `[معاينة] LED-${record.settlementCycleId}`
+    : `[معاينة] LED-PRV-${record.id}`;
+
+  // P11: Maker-checker preview workflow — in preview all rows start as 'draft'
+  const workflowState: DshFinancePreviewRow['workflowState'] =
+    record.statusTone === 'error' ? 'blocked_wlt'
+    : reconciliationStatus === 'closed' ? 'approved'
+    : reconciliationStatus === 'matched' && evidenceStatus === 'complete' ? 'reviewed'
+    : allowedAction === 'prepare_decision' ? 'draft'
+    : 'draft';
+
   return {
     id: record.id,
     amount: record.amountLabel,
@@ -206,6 +262,14 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
     auditTrailId,
     allowedAction,
     blockedReason: record.holdReason,
+    expectedSource,
+    actualSource,
+    evidenceSource,
+    varianceReason,
+    bankDepositRef,
+    cashBagRef,
+    ledgerEntryRef,
+    workflowState,
   };
 }
 
@@ -317,6 +381,12 @@ export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSur
     auditTrailId: 'AUD-PRV-CEL-401',
     allowedAction: celEligible ? 'view_evidence' : 'prepare_decision',
     blockedReason: celEligible ? undefined : capSnap.eligibilityBlockReason,
+    expectedSource: 'eligibility-calc',
+    actualSource: 'wallet-debit',
+    evidenceSource: celEligible ? 'audit-entry' : 'none',
+    varianceReason: celEligible ? undefined : capSnap.eligibilityBlockReason,
+    ledgerEntryRef: '[معاينة] LED-PRV-CEL-401',
+    workflowState: celEligible ? 'reviewed' : 'draft',
   });
 
   const emptyOverviewFallback: DshFinancePreviewRow = {
@@ -329,6 +399,9 @@ export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSur
     evidenceStatus: 'complete', reconciliationStatus: 'closed',
     currencyCode: 'YER', ownerService: 'wlt', dshRole: 'view_only',
     allowedAction: 'none', auditTrailId: 'AUD-PRV-EMPTY',
+    expectedSource: 'preview-seed', actualSource: 'preview-seed', evidenceSource: 'audit-entry',
+    ledgerEntryRef: '[معاينة] LED-PRV-EMPTY',
+    workflowState: 'approved',
   };
 
   cachedRows = {

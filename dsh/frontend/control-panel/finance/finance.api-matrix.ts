@@ -12,13 +12,22 @@ import type { CanonicalFinanceGroupId } from './finance.types';
 
 export type WltApiMethod = 'GET' | 'POST';
 
+/**
+ * exact — endpoint in WLT scaffold exactly matches this screen's domain.
+ * BLOCKED_BY_MISSING_WLT_CONTRACT — no exact WLT endpoint exists yet for this screen;
+ *   the wltEndpoint field is a placeholder only and must not be called in production.
+ */
+export type WltEndpointStatus = 'exact' | 'BLOCKED_BY_MISSING_WLT_CONTRACT';
+
 export type DshFinanceApiBinding = {
   readonly screen: CanonicalFinanceGroupId;
   readonly screenLabel: string;
-  // WLT OpenAPI endpoint
+  // WLT OpenAPI endpoint — only valid if endpointStatus === 'exact'
   readonly wltEndpoint: string;
   readonly operationId: string;
   readonly httpMethod: WltApiMethod;
+  // Whether the wltEndpoint is an exact domain match or a missing contract placeholder
+  readonly endpointStatus: WltEndpointStatus;
   // DSH capability on this endpoint
   readonly dshRole: 'view_only' | 'initiate_only';
   // Idempotency-Key required on POST mutations
@@ -41,6 +50,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/control-panel/finance/overview',
     operationId: 'getControlPanelFinanceOverview',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -55,6 +65,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/captain/cod-liabilities',
     operationId: 'getCaptainCodLiabilities',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -69,6 +80,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/partner/settlement-cycles',
     operationId: 'getPartnerSettlementCycles',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -83,13 +95,14 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/control-panel/payout-decisions',
     operationId: 'createPayoutDecision',
     httpMethod: 'POST',
+    endpointStatus: 'exact',
     dshRole: 'initiate_only',
     requiresIdempotency: true,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['direct_transfer', 'bank_write', 'balance_debit'],
-    displayDomain: 'قرارات إطلاق المدفوعات — DSH يُعدّ القرار فقط، WLT ينفذه',
+    displayDomain: 'قرارات تحضير المدفوعات — DSH يُعدّ القرار فقط، WLT ينفذه',
   },
   {
     screen: 'captain-eligibility',
@@ -97,6 +110,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/captain/eligibility',
     operationId: 'getCaptainEligibility',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -108,30 +122,32 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
   {
     screen: 'refunds',
     screenLabel: 'الاستردادات',
-    wltEndpoint: '/wlt/dsh/control-panel/reconciliation-runs',
-    operationId: 'listReconciliationRuns',
+    wltEndpoint: '/wlt/dsh/control-panel/refund-queue',
+    operationId: 'listControlPanelRefundQueue',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['refund_approve', 'refund_reject', 'refund_write'],
-    displayDomain: 'طلبات الاسترداد والنزاعات عبر دورات المطابقة — WLT يقرر النتيجة؛ endpoint استرداد مستقل لم يُعرَّف في scaffold بعد',
+    displayDomain: 'قائمة حالات الاسترداد والنزاعات — WLT يقرر النتيجة، DSH يراجع فقط',
   },
   {
     screen: 'ledger',
     screenLabel: 'دفتر الأستاذ',
-    wltEndpoint: '/wlt/dsh/control-panel/finance/overview',
-    operationId: 'getControlPanelFinanceOverview',
+    wltEndpoint: '/wlt/dsh/control-panel/ledger-entries',
+    operationId: 'listControlPanelLedgerEntries',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['journal_entry', 'balance_adjust', 'ledger_write'],
-    displayDomain: 'قيود اليومية وميزان المراجعة — endpoint دفتر الأستاذ المستقل لم يُعرَّف في WLT scaffold بعد؛ يستخدم overview كبديل مؤقت',
+    displayDomain: 'قيود اليومية وميزان المراجعة العام — debit/credit/amountMinorUnits/sourceEvent',
   },
   {
     screen: 'risk-audit',
@@ -139,6 +155,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/control-panel/audit-events',
     operationId: 'listAuditEvents',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -153,6 +170,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     wltEndpoint: '/wlt/dsh/captain/cod-liabilities',
     operationId: 'getCaptainCodLiabilities',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -164,16 +182,17 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
   {
     screen: 'store-delivery-finance',
     screenLabel: 'مالية توصيل المتجر',
-    wltEndpoint: '/wlt/dsh/field/commissions',
-    operationId: 'getFieldCommissions',
+    wltEndpoint: '/wlt/dsh/store-delivery/finance-summary',
+    operationId: 'getStoreDeliveryFinanceSummary',
     httpMethod: 'GET',
+    endpointStatus: 'exact',
     dshRole: 'view_only',
     requiresIdempotency: false,
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['courier_payout', 'fee_adjust', 'compensation_override'],
-    displayDomain: 'عمولات ورسوم موصلي المتاجر (store_courier_mode) — مفصولة عن كباتن بثواني؛ يستخدم field/commissions كأقرب endpoint متاح في scaffold',
+    displayDomain: 'عمولات ورسوم موصلي المتاجر (store_courier_mode) — مفصولة عن كباتن بثواني',
   },
 ] as const;
 

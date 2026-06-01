@@ -16,6 +16,7 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
       { id: 'inflow', label: 'الدخل' },
       { id: 'outflow', label: 'الصرف' },
       { id: 'net', label: 'الصافي' },
+      { id: 'daily-close', label: 'إغلاق اليوم' },
     ],
   },
   {
@@ -66,7 +67,7 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
   {
     id: 'payouts',
     label: 'المدفوعات',
-    description: 'تحويل الأموال وتتبع الحوالات البنكية لجميع الأطراف.',
+    description: 'تحضير قرارات المدفوعات وتتبع الحوالات البنكية — WLT ينفذ التحويل.',
     badge: 'Bank',
     subGroups: [
       { id: 'partner-payouts', label: 'مستحقات الشركاء' },
