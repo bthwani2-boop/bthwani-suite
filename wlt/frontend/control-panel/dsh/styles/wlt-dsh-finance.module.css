@@ -327,3 +327,181 @@
   color: var(--bth-control-panel-text);
   font-variant-numeric: tabular-nums;
 }
+
+/* Operational Signal Strip */
+.signalStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  width: 100%;
+  direction: rtl;
+}
+
+.signalCard {
+  background: var(--bth-control-panel-surface);
+  border: 1px solid var(--bth-control-panel-border);
+  border-right: 4px solid var(--bth-control-panel-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: right;
+  gap: 4px;
+}
+
+.signalCardInfo { border-right-color: var(--bth-info-text); }
+.signalCardSuccess { border-right-color: var(--bth-success-text); }
+.signalCardWarning { border-right-color: var(--bth-warning-text); }
+.signalCardDanger { border-right-color: var(--bth-danger-text); }
+
+.signalLabel {
+  font-size: 11px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.signalValue {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--bth-control-panel-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Operational Readiness Panel */
+.readinessPanel {
+  background: var(--bth-control-panel-surface-raised);
+  border: 1px solid var(--bth-control-panel-border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  direction: rtl;
+}
+
+.readinessInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.readinessIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.readinessIndicatorReady { background-color: var(--bth-success-text); }
+.readinessIndicatorAction { background-color: var(--bth-warning-text); }
+.readinessIndicatorBlocked { background-color: var(--bth-danger-text); }
+
+.readinessText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.readinessTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+}
+
+.readinessDesc {
+  font-size: 11px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+/* Technical Audit Context Drawer */
+.techDrawer {
+  background: var(--bth-control-panel-surface-raised);
+  border: 1px solid var(--bth-control-panel-border);
+  border-radius: 10px;
+  padding: 16px;
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.techDrawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--bth-control-panel-border);
+  padding-bottom: 8px;
+}
+
+.techGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.techItem {
+  background: var(--bth-control-panel-surface);
+  border: 1px solid var(--bth-control-panel-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.techLabel {
+  font-size: 10px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.techValue {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--bth-control-panel-text);
+}
+
+/* State Screens (empty, error, offline, disabled, blocked) */
+.stateScreen {
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--bth-control-panel-surface);
+  border: 1px solid var(--bth-control-panel-border);
+  border-radius: 12px;
+  gap: 16px;
+  max-width: 600px;
+  margin: 32px auto;
+  direction: rtl;
+}
+
+.stateIcon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.stateTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--bth-control-panel-text);
+  margin: 0;
+}
+
+.stateDesc {
+  font-size: 13px;
+  color: var(--bth-control-panel-text-muted);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0;
+}
+
+.stateActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}

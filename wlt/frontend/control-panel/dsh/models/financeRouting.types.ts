@@ -1,15 +1,21 @@
 export type FinanceCanonicalWorkspaceId =
+  | 'financial-command-center'
+  | 'ledger-order-finance'
+  | 'payments-wallets'
+  | 'settlements-payouts'
+  | 'refunds-disputes-holds'
+  | 'commissions-fees-promo'
+  | 'reconciliation-risk'
+  | 'reports-policies-approvals';
+
+export type FinanceLegacyWorkspaceAlias =
   | 'financial-center'
   | 'account-statements'
   | 'store-settlements'
   | 'settlement-calendar'
-  | 'refund-ledger'
   | 'cod-cash'
-  | 'settlements-payouts'
-  | 'ledger'
-  | 'daily-close';
-
-export type FinanceLegacyWorkspaceAlias =
+  | 'refund-ledger'
+  | 'daily-close'
   | 'overview'
   | 'settlements'
   | 'cod-reconciliation'
@@ -41,4 +47,4 @@ export interface FinanceGroupMeta {
 }
 
 export type FinanceNormalizationResult =
-  { kind: 'group'; group: CanonicalFinanceGroupId; sourceWorkspace?: string; panel?: FinancePanelId };
+  { kind: 'group'; group: CanonicalFinanceGroupId; sourceWorkspace?: string; panel?: FinancePanelId; subGroup?: string };
