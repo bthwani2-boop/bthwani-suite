@@ -8,8 +8,8 @@ import styles from '../../../../../dsh/frontend/control-panel/shared/control-pan
 import {
   getWltDshOrderCommissionBreakdown,
   WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
-} from '../../../../../dsh/frontend/data/dshFinancePreview';
-import type { WltDshFulfillmentMode } from '../../../../../dsh/frontend/data/dshFinancePreview';
+} from '../financeContracts';
+import type { WltDshFulfillmentMode } from '../financeContracts';
 
 export type CommissionBreakdownWorkspaceProps = {
   orderId?: string;

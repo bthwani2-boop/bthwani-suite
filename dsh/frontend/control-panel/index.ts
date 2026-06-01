@@ -3,7 +3,7 @@ export { surfaceCatalog as DSH_SURFACE_CATALOG } from './surface-catalog';
 export { DshControlPanelSurfaceHost } from './DshControlPanelSurfaceHost';
 export type { DshControlPanelSurfaceHostProps } from './DshControlPanelSurfaceHost';
 export { ControlPanelDshClosureDashboardScreen, ControlPanelDshClosureEvidenceStream } from './dashboard';
-export { ControlPanelDshFinanceHubScreen, ControlPanelDshFinanceScreen, ControlPanelDshSettlementScreen, ControlPanelDshCodReconciliationScreen, ControlPanelDshRefundQueueScreen, ControlPanelDshRiskAuditScreen, ControlPanelDshCaptainFinanceScreen, ControlPanelDshStoreDeliveryFinanceScreen } from './finance';
+export { ControlPanelDshFinanceHubScreen } from './finance';
 export { ControlPanelDshCatalogScreen, ControlPanelDshCatalogApprovalScreen, ControlPanelDshListingGovernanceScreen, ControlPanelDshCatalogCategoriesScreen } from './catalogs';
 export { ControlPanelDshSupportQueueScreen, ControlPanelDshDisputeResolutionScreen, ControlPanelDshSupportHubScreen } from './support';
 export { ControlPanelDshPartnerApprovalsScreen, ControlPanelDshPartnerActivationScreen, ControlPanelDshPartnerDocumentReviewScreen } from './partners';

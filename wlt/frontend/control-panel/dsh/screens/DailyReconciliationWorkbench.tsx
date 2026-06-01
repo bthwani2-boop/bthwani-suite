@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Text, Button } from '@bthwani/ui-kit';
-import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../../../../../dsh/frontend/data/wallet.preview-data';
+import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
 
 type DayLifecycleStage =
   | 'open'

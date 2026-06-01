@@ -1,15 +1,15 @@
-export type CanonicalFinanceGroupId =
+export type FinanceCanonicalWorkspaceId =
   | 'financial-center'
   | 'account-statements'
   | 'store-settlements'
   | 'settlement-calendar'
   | 'refund-ledger'
-  | 'daily-close'
-  | 'variances'
   | 'cod-cash'
   | 'settlements-payouts'
   | 'ledger'
-  | 'refunds'
+  | 'daily-close';
+
+export type FinanceLegacyWorkspaceAlias =
   | 'overview'
   | 'settlements'
   | 'cod-reconciliation'
@@ -18,7 +18,15 @@ export type CanonicalFinanceGroupId =
   | 'tax-compliance'
   | 'risk-audit'
   | 'captain-finance'
-  | 'store-delivery-finance';
+  | 'store-delivery-finance'
+  | 'refunds'
+  | 'variances';
+
+export type FinanceWorkspaceInput =
+  | FinanceCanonicalWorkspaceId
+  | FinanceLegacyWorkspaceAlias;
+
+export type CanonicalFinanceGroupId = FinanceCanonicalWorkspaceId;
 
 export type FinancePanelId = 'detail' | 'evidence';
 

@@ -23,14 +23,19 @@ export type {
   WltDshPaymentPreviewState,
   WltFieldFinanceSnapshot,
   WltPartnerFinanceSnapshot,
-} from '../../../../dsh/frontend/data/dshFinancePreview';
+} from './models/dshFinance.types';
+
 export {
   formatWltYer,
+  WLT_DSH_FINANCE_OWNERSHIP,
+  getWltDshFinancePreviewMetadata,
+} from './models/dshFinance.types';
+
+export {
   getWltCaptainFinancePreview,
   getWltCaptainFinanceSnapshot,
   getWltControlPanelFinancePreview,
   getWltDshClientPaymentPreview,
-  getWltDshFinancePreviewMetadata,
   getWltDshFinanceRecordsForActor,
   getWltDshFinanceSummaryForActor,
   getWltDshOrderCommissionBreakdown,
@@ -42,9 +47,8 @@ export {
   getWltPartnerSettlementPreview,
   resolveWltDshFinanceEventKindForPaymentMethod,
   resolveWltDshPaymentPreviewState,
-  WLT_DSH_FINANCE_OWNERSHIP,
   WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
-} from '../../../../dsh/frontend/data/dshFinancePreview';
+} from './adapters/dshFinanceFixture.adapter';
 
 // ─── Chart of Accounts ─────────────────────────────────────────────
 
@@ -164,12 +168,12 @@ export type { WltDshSettlementCalendarCycle } from './models/settlementCalendar.
 
 export type { WltDshRefundLedgerCase } from './models/refundLedger.types';
 
-// ─── Preview Data (centralized in dsh/frontend/data/) ─────────────
+// ─── Preview Data (adapted via WLT adapters) ─────────────────────
 
 export {
-  getWltDshAccountStatementsPreview,
-  getWltDshRefundLedgerPreview,
-  getWltDshSettlementCalendarPreview,
-  getWltDshStoreSettlementStatementsPreview,
+  getWltDshAccountStatementsPreviewAdapter as getWltDshAccountStatementsPreview,
+  getWltDshRefundLedgerPreviewAdapter as getWltDshRefundLedgerPreview,
+  getWltDshSettlementCalendarPreviewAdapter as getWltDshSettlementCalendarPreview,
+  getWltDshStoreSettlementStatementsPreviewAdapter as getWltDshStoreSettlementStatementsPreview,
   WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT,
-} from '../../../../dsh/frontend/data/finance.preview-data';
+} from './adapters/dshFinanceFixture.adapter';

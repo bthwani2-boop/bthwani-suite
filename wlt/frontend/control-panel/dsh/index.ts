@@ -12,8 +12,8 @@ export type { FieldCommissionWorkspaceProps } from './screens/FieldCommissionWor
 export { PlatformFeeAuditWorkspace } from './screens/PlatformFeeAuditWorkspace';
 export type { PlatformFeeAuditWorkspaceProps } from './screens/PlatformFeeAuditWorkspace';
 
-// FinanceHubScreens (old hub screens — used by DSH)
-export * from './screens/FinanceHubScreens';
+// legacy aliases only
+export { ControlPanelDshCodReconciliationScreen, ControlPanelDshSettlementScreen } from './screens/FinanceHubScreens';
 
 // components
 export { WltBoundaryBanner } from './components/WltBoundaryBanner';

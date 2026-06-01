@@ -68,11 +68,13 @@ export function WltDshAccountStatement() {
 
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={3}>
         <Text role="titleSm" style={{ fontWeight: 800 }}>{statement.actorLabel} · {statement.actorId}</Text>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
           <SummaryCell label="الرصيد الافتتاحي" value={statement.openingBalanceLabel} />
           <SummaryCell label="مدين الفترة" value={statement.periodDebitLabel} />
           <SummaryCell label="دائن الفترة" value={statement.periodCreditLabel} />
+          <SummaryCell label="التعديلات" value={statement.adjustmentsLabel} />
           <SummaryCell label="الحجوزات" value={statement.holdsLabel} />
+          <SummaryCell label="مفرج عنه" value={statement.releasesLabel} />
           <SummaryCell label="الاستردادات" value={statement.refundsLabel} />
           <SummaryCell label="الدفعات" value={statement.payoutsLabel} />
           <SummaryCell label="الرصيد الختامي" value={statement.closingBalanceLabel} />

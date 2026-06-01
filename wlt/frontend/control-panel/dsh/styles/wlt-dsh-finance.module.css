@@ -96,3 +96,173 @@
   border-bottom: 1px solid var(--bthwani-control-panel-border);
   font-variant-numeric: tabular-nums;
 }
+
+/* Loading & Shell specific */
+.loadingWrapper {
+  opacity: 0.85;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.loadingText {
+  text-align: right;
+}
+
+/* Header Text Row */
+.headerTextRow {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerSubtitle {
+  margin-top: 4px;
+}
+
+.fontWeight700 {
+  font-weight: 700;
+}
+
+.colorWarning {
+  color: var(--bth-warning-text);
+}
+
+.headerActionsArea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+/* Technical Audit Toggle */
+.technicalToggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-direction: row-reverse;
+  background: var(--bthwani-control-panel-border);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.technicalToggleLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.technicalToggleButton {
+  border: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.technicalToggleKnob {
+  background: var(--bthwani-text-inverse);
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  position: absolute;
+  top: 2px;
+  transition: left 0.25s;
+}
+
+/* Governance Banner */
+.govBannerWrap {
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-raised);
+  padding: 8px 16px;
+}
+
+.govBannerFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: rtl;
+}
+
+.govBannerText {
+  font-size: 13px;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.govBannerButton {
+  background: transparent;
+  border: 1px solid var(--bthwani-control-panel-border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--bthwani-brand-primary);
+  font-weight: 700;
+}
+
+/* Governance Modal */
+.govModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(3px);
+}
+
+.govModalContainer {
+  background: var(--bthwani-control-panel-surface);
+  border: 1px solid var(--bthwani-control-panel-border);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 800px;
+  width: 90%;
+  direction: rtl;
+  text-align: right;
+}
+
+.govModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.govModalCloseBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.govModalContentGap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.govModalFooter {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+
+.govModalActionBtn {
+  background: var(--bthwani-brand-primary);
+  color: var(--bthwani-text-inverse);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}

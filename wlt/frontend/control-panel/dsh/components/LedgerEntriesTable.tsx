@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
+import { useRouter } from 'next/navigation';
 import type { WltLedgerEntry } from '../models/financialCenter.types';
 import { getWltPostingRuleForEvent } from '../models/postingRules.types';
 
@@ -23,6 +24,7 @@ export function LedgerEntriesTable({ entries, pageSize = 10 }: {
   entries: readonly WltLedgerEntry[];
   pageSize?: number;
 }) {
+  const router = useRouter();
   const [showAll, setShowAll] = React.useState(false);
   const visible = showAll ? entries : entries.slice(0, pageSize);
 
@@ -44,9 +46,25 @@ export function LedgerEntriesTable({ entries, pageSize = 10 }: {
               ))}
             </tr>
           </thead>
-          <tbody>
+                  <tbody>
             {visible.map((entry, i) => {
               const rule = getWltPostingRuleForEvent(entry.entryKind as Parameters<typeof getWltPostingRuleForEvent>[0]);
+
+              const handleSourceClick = () => {
+                const ref = entry.sourceRef;
+                if (ref.startsWith('ORD-') || ref.includes('ORD-') || ref.includes('SD')) {
+                  const match = ref.match(/ORD-\d+-\w+|ORD-\d+-\w+/);
+                  const orderId = match ? match[0] : (ref.startsWith('INV-') ? ref.replace('INV-', '') : ref);
+                  router.push(`/operations?orderId=${orderId}`);
+                } else if (ref.startsWith('CYC-')) {
+                  router.push('/finance?workspace=settlement-calendar');
+                } else if (ref.startsWith('REF-') || ref.includes('REF-')) {
+                  router.push('/finance?workspace=refund-ledger');
+                } else {
+                  alert(`تفاصيل الحركة المحاسبية:\n\nالمرجع المالي: ${ref}\nالجهة: ${entry.party}\nالحساب المدين: ${entry.debitAccountLabel}\nالحساب الدائن: ${entry.creditAccountLabel}\n\nالحقيقة المحاسبية تقع 100% تحت حوكمة محرك WLT.`);
+                }
+              };
+
               return (
                 <tr key={entry.id} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.015)', borderBottom: '1px solid var(--bthwani-control-panel-border)', opacity: entry.isPending ? 0.75 : 1 }}>
                   <td style={{ padding: '5px 10px' }}>
@@ -64,7 +82,15 @@ export function LedgerEntriesTable({ entries, pageSize = 10 }: {
                   <td style={{ padding: '5px 10px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: 'var(--bthwani-control-panel-text)' }}>{entry.amountLabel}</td>
                   <td style={{ padding: '5px 10px', color: 'var(--bthwani-control-panel-text-muted)', whiteSpace: 'nowrap' }}>{entry.party}</td>
                   <td style={{ padding: '5px 10px' }}>
-                    <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 5px', borderRadius: 3 }}>{entry.sourceRef}</code>
+                    <button
+                      onClick={handleSourceClick}
+                      style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-block' }}
+                      title="فتح تفاصيل المصدر"
+                    >
+                      <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '2px 6px', borderRadius: 3, color: 'var(--bthwani-brand-primary)', fontWeight: '700' }}>
+                        {entry.sourceRef} ↗
+                      </code>
+                    </button>
                   </td>
                   <td style={{ padding: '5px 10px' }}>
                     {rule ? (

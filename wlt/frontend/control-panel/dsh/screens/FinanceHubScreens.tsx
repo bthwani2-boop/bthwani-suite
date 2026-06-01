@@ -11,11 +11,11 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import {
-  dshFinanceControlPanelPreviewRows,
+  getAdaptedFinanceControlPanelRows,
   type DshFinancePreviewRow,
   type DshFinancePreviewSurface,
-} from '../../../../../dsh/frontend/data';
-import { getWltControlPanelFinancePreview } from '../../../../../dsh/frontend/data/dshFinancePreview';
+} from '../adapters/dshFinanceFixture.adapter';
+import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
 import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
 import { getFinanceApiBinding } from '../adapters/finance.api-matrix';
@@ -24,7 +24,7 @@ import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
 type FinanceSurface = DshFinancePreviewSurface;
 type FinanceRow = DshFinancePreviewRow;
 
-const FINANCE_ROWS = dshFinanceControlPanelPreviewRows;
+const FINANCE_ROWS = getAdaptedFinanceControlPanelRows();
 
 // Arabic translations for sources and actions (Staff Mode)
 const EXPECTED_SOURCE_AR: Record<string, string> = {

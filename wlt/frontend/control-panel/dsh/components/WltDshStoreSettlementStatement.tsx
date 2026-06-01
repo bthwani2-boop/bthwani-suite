@@ -75,7 +75,7 @@ export function WltDshStoreSettlementStatement() {
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 920 }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--bthwani-control-panel-border)' }}>
-                {['الطلب', 'تاريخ الطلب', 'التسليم', 'الدفع', 'قيمة المنتجات', 'التوصيل', 'العمولة', 'الخصم', 'الاسترداد', 'الأثر الصافي', 'الحالة'].map((header) => (
+                {['الطلب', 'تاريخ الطلب', 'التسليم', 'الدفع', 'قيمة المنتجات', 'التوصيل', 'العمولة', 'الخصم', 'الاسترداد', 'الأثر الصافي', 'الحالة', 'مرجع الأدلة / سبب الاستبعاد'].map((header) => (
                   <th key={header} style={{ textAlign: 'right', padding: '8px 10px', fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)' }}>{header}</th>
                 ))}
               </tr>
@@ -94,6 +94,11 @@ export function WltDshStoreSettlementStatement() {
                   <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{order.refundLabel}</td>
                   <td style={{ padding: '8px 10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{order.netSettlementImpactLabel}</td>
                   <td style={{ padding: '8px 10px' }}>{ORDER_STATUS_LABEL[order.settlementStatus]}</td>
+                  <td style={{ padding: '8px 10px' }}>
+                    <code style={{ fontSize: 9, background: 'rgba(0, 0, 0, 0.05)', padding: '2px 6px', borderRadius: 4, color: order.settlementStatus === 'held' ? 'var(--bth-danger-text)' : 'var(--bthwani-control-panel-text)' }}>
+                      {order.evidenceRef || '—'}
+                    </code>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { getAdaptedFinanceControlPanelRows } from '../../../../../dsh/frontend/data/wallet.preview-data';
+import { getAdaptedFinanceControlPanelRows } from '../adapters/dshFinanceFixture.adapter';
 import { buildWltAuditPackPreview } from '../models/auditPack.types';
 import { WLT_MAKER_CHECKER_STATE_LABELS } from '../models/makerChecker.types';
 import { getWltCloseGateSubledgers } from '../models/subledger.types';
