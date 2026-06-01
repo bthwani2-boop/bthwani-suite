@@ -62,7 +62,7 @@ type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof Cap
 type CaptainSupportRoute =
   | 'chat-read-ack'
   | 'chat-send'
-  | 'cod-balance'
+  | 'cod-liability'
   | 'order-accept'
   | 'order-deliver'
   | 'order-details'
@@ -1022,7 +1022,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           id: 'wallet',
           icon: <Icon name="wallet-outline" size={20} color={colorPalette.white} />,
           accessibilityLabel: wltDshCaptainUiCopy.walletAccessibilityLabel,
-          onPress: () => openCaptainSupportScreen('cod-balance'),
+          onPress: () => openCaptainSupportScreen('cod-liability'),
         }]),
       ]}
       ticker={
@@ -1679,7 +1679,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     const supportScreens: Record<CaptainSupportRoute, React.ReactNode> = {
       'chat-read-ack': <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'chat-send': <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'cod-balance': <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
+      'cod-liability': <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
       'order-accept': <DshCaptainOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-get')} />,
       'order-deliver': <DshCaptainOrderDeliverScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('proof-upload')} />,
       'order-details': <DshCaptainOrderDetailsScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,

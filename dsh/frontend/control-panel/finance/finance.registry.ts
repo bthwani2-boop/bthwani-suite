@@ -61,7 +61,6 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
       { id: 'pending', label: 'طلبات جديدة' },
       { id: 'processed', label: 'تمت المعالجة' },
       { id: 'rejected', label: 'مرفوضة' },
-      { id: 'disputes', label: 'النزاعات والاعتراضات (Chargebacks)' },
     ],
   },
   {
@@ -83,8 +82,6 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
     subGroups: [
       { id: 'journal', label: 'قيود اليومية' },
       { id: 'trial-balance', label: 'ميزان المراجعة' },
-      { id: 'audit-trail', label: 'سجل التدقيق المالي (Audit Trail)' },
-      { id: 'invoices', label: 'الفواتير والإيصالات' },
     ],
   },
   {
@@ -94,7 +91,6 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
     badge: 'Audit',
     subGroups: [
       { id: 'suspicious', label: 'عمليات مشبوهة' },
-      { id: 'holds', label: 'حجز الأموال والمخاطر (Holds)' },
       { id: 'audit-logs', label: 'سجلات التدقيق' },
     ],
   },

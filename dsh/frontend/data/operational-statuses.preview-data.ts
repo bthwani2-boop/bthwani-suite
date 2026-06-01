@@ -428,7 +428,7 @@ export type DshCaptainState =
 	| 'order-pickup'
 	| 'order-deliver'
 	| 'proof-upload'
-	| 'cod-balance'
+	| 'cod-liability'
 	| 'profile-get'
 	| 'tier-info'
 	| 'tier-evaluate'
@@ -455,7 +455,7 @@ const stateMetaMap: Record<DshCaptainState, DshCaptainStateMeta> = {
 	'order-pickup': { id: 'order-pickup', label: 'الاستلام', description: 'مرحلة الاستلام.', group: 'orders', terminal: false },
 	'order-deliver': { id: 'order-deliver', label: 'التسليم', description: 'مرحلة التسليم.', group: 'orders', terminal: false },
 	'proof-upload': { id: 'proof-upload', label: 'رفع الإثبات', description: 'مرحلة إثبات التسليم.', group: 'orders', terminal: false },
-	'cod-balance': { id: 'cod-balance', label: 'رصيد COD', description: 'مسار الرصيد النقدي.', group: 'finance', terminal: false },
+	'cod-liability': { id: 'cod-liability', label: 'ذمة COD', description: 'مسار الذمة النقدية المستحقة.', group: 'finance', terminal: false },
 	'profile-get': { id: 'profile-get', label: 'ملف الكابتن', description: 'لقطة الملف.', group: 'profile', terminal: false },
 	'tier-info': { id: 'tier-info', label: 'معلومات الطبقة', description: 'بيانات الطبقة الحالية.', group: 'profile', terminal: false },
 	'tier-evaluate': { id: 'tier-evaluate', label: 'تقييم الطبقة', description: 'فحص أهلية الطبقة.', group: 'profile', terminal: false },
@@ -482,7 +482,7 @@ export function isDshCaptainTerminalState(state: DshCaptainState): boolean {
 
 export type DshCaptainFinanceScreenState = 'ready' | 'loading' | 'empty' | 'error';
 
-export type DshCaptainFinanceSection = 'cod-balance' | 'earnings' | 'settlement';
+export type DshCaptainFinanceSection = 'cod-liability' | 'earnings' | 'settlement';
 
 /**
  * PREVIEW_ONLY — local display snapshot for captain finance labels.

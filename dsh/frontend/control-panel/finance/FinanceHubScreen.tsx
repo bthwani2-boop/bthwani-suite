@@ -76,6 +76,227 @@ const SCREEN_RENDERERS: Record<CanonicalFinanceGroupId, React.ComponentType<{ hu
   'store-delivery-finance': ControlPanelDshStoreDeliveryFinanceScreen,
 };
 
+// ==========================================
+// Custom Beautiful Visual State Components
+// ==========================================
+
+function FinanceSkeletonLoader() {
+  return (
+    <div className={styles.surfaceCockpit} style={{ opacity: 0.85, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Warning strip skeleton */}
+      <div className={styles.warningStripSkeleton}>
+        <div className={styles.skeletonBlock} style={{ width: 140, height: 12 }} />
+        <span className={styles.warningStripSep}>•</span>
+        <div className={styles.skeletonBlock} style={{ width: 80, height: 12 }} />
+        <span className={styles.warningStripSep}>•</span>
+        <div className={styles.skeletonBlock} style={{ width: 180, height: 12 }} />
+      </div>
+
+      {/* Header skeleton */}
+      <header className={styles.surfaceTopBar} style={{ padding: '16px 20px' }}>
+        <div className={styles.surfaceTitleBlock}>
+          <div className={styles.skeletonBlock} style={{ width: 40, height: 40, borderRadius: 10 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse' }}>
+              <div className={styles.skeletonBlock} style={{ width: 160, height: 24 }} />
+              <div className={styles.skeletonBlock} style={{ width: 100, height: 16 }} />
+            </div>
+            <div className={styles.skeletonBlock} style={{ width: 280, height: 12 }} />
+          </div>
+        </div>
+
+        {/* Signal bar skeleton */}
+        <div className={styles.surfaceHeaderActions}>
+          <div className={styles.surfacePulseCompact} style={{ gap: 8 }}>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className={styles.commandKpi} style={{ padding: '6px 12px', minWidth: 110 }}>
+                <div className={styles.skeletonBlock} style={{ width: 70, height: 10, marginBottom: 4 }} />
+                <div className={styles.skeletonBlock} style={{ width: 90, height: 18 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation Dock Skeleton */}
+      <div className={styles.navigationDock} style={{ padding: '8px 20px', gap: 8 }}>
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className={styles.skeletonBlock} style={{ width: 90, height: 28, borderRadius: 8 }} />
+        ))}
+      </div>
+
+      {/* Workbench main panel skeleton */}
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 16, padding: 16, direction: 'rtl', flex: 1 }}>
+        {/* Right side list skeleton (70%) */}
+        <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className={styles.skeletonBlock} style={{ width: '100%', height: 36, borderRadius: 8 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--bthwani-control-panel-border)', borderRadius: 10, overflow: 'hidden' }}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className={styles.skeletonTableRow} style={{ background: 'var(--bthwani-control-panel-surface)', justifyContent: 'space-between', padding: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexDirection: 'row-reverse' }}>
+                  <div className={styles.skeletonBlock} style={{ width: 32, height: 32, borderRadius: 8 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div className={styles.skeletonBlock} style={{ width: 120, height: 14 }} />
+                    <div className={styles.skeletonBlock} style={{ width: 80, height: 10 }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexDirection: 'row-reverse' }}>
+                  <div className={styles.skeletonBlock} style={{ width: 90, height: 16 }} />
+                  <div className={styles.skeletonBlock} style={{ width: 60, height: 20, borderRadius: 12 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Left side inspector skeleton (30%) */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className={styles.skeletonBlock} style={{ width: '100%', height: 120, borderRadius: 10 }} />
+          <div className={styles.skeletonBlock} style={{ width: '100%', height: 120, borderRadius: 10 }} />
+          <div className={styles.skeletonBlock} style={{ width: '100%', height: 100, borderRadius: 10 }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FinanceEmptyState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className={styles.emptyStateContainer}>
+      <div className={styles.emptyStateIconBox}>
+        📂
+      </div>
+      <h3 className={styles.emptyStateTitle}>
+        لا توجد سجلات لهذا الفلتر
+      </h3>
+      <p className={styles.emptyStateDesc}>
+        لا توجد حركات، قيود، أو تسويات مالية معلقة مطابقة لهذا القسم أو الفلتر المختار حاليًا في قاعدة بيانات المعاينة WLT.
+      </p>
+      <button className={styles.emptyStateButton} onClick={onRetry}>
+        تحديث ومزامنة البيانات
+      </button>
+    </div>
+  );
+}
+
+function FinanceErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className={styles.errorStateContainer}>
+      <div className={styles.errorStateTitleRow}>
+        <span style={{ fontSize: 24 }}>⚠️</span>
+        <h3 className={styles.errorStateTitle}>
+          فشل تحميل العقد المالي والربط المركزي
+        </h3>
+      </div>
+      <p className={styles.errorStateDesc}>
+        حدث خطأ أثناء الاتصال بمحرك WLT المالي أو استرداد بيانات المعاينة. لم نتمكن من تدقيق العقد النشط أو مزامنة التبويبات الفرعية.
+      </p>
+
+      {/* Diagnostics / Audit details */}
+      <div className={styles.errorStateDiagnostics}>
+        <div className={styles.errorStateDiagnosticsHeader}>
+          [DIAGNOSTICS LOGS · WLT ENGINE GATEWAY]
+        </div>
+        <div>ERROR_CODE: WLT_RPC_CONNECTION_TIMEOUT (504 Gateway Timeout)</div>
+        <div>TARGET: grpc://wlt-core.bthwani.internal:9090/v1.FinanceService</div>
+        <div>{"STATE_TRACE: getWltControlPanelFinancePreview() -> failed to resolve dynamic adapter"}</div>
+      </div>
+
+      <div className={styles.stateActionsRow}>
+        <button className={styles.errorStateButton} onClick={onRetry}>
+          إعادة محاولة الاتصال
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FinanceOfflineState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className={styles.offlineStateContainer}>
+      <div className={styles.offlineStateTitleRow}>
+        <span style={{ fontSize: 24 }}>🛜</span>
+        <h3 className={styles.offlineStateTitle}>
+          غير متصل بالشبكة (العمل في وضع المعاينة المحلية)
+        </h3>
+      </div>
+      <p className={styles.offlineStateDesc}>
+        تعذر تحديث المؤشرات المالية الحية من خادم WLT المركزي. يتم حاليًا عرض نسخة المعاينة المحلية المخزنة مؤقتًا لتسهيل المراجعة التشغيلية.
+      </p>
+
+      {/* Audit info */}
+      <div className={styles.offlineStateInfo}>
+        <strong>حالة المزامنة:</strong> غير متصل · <strong>آخر تحديث ناجح:</strong> منذ دقيقتين · <strong>المصدر النشط:</strong> wlt.preview-data.ts (Local Backup)
+      </div>
+
+      <div className={styles.stateActionsRow}>
+        <button className={styles.offlineStateButton} onClick={onRetry}>
+          إعادة الاتصال بالإنترنت ومزامنة WLT
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FinanceDisabledState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className={styles.disabledStateContainer}>
+      <div className={styles.disabledStateTitleRow}>
+        <span style={{ fontSize: 24 }}>🔒</span>
+        <h3 className={styles.disabledStateTitle}>
+          تم قفل الوصول بقرار من السياسة الأمنية
+        </h3>
+      </div>
+      <p className={styles.disabledStateDesc}>
+        حسابك الحالي لا يملك الصلاحيات الكافية للوصول إلى غرفة العمليات والقيادة المالية المشتقة من WLT Ledger. تم حظر العرض تلقائيًا.
+      </p>
+
+      {/* Audit Reason & Policy Status */}
+      <div className={styles.disabledStateInfo}>
+        <div className={styles.disabledStatePolicyHeader}>
+          🛡️ تفاصيل قرار الرقابة الأمنية (Security Policy Decision):
+        </div>
+        <div className={styles.disabledStatePolicyRow}><strong>معرف السياسة:</strong> POLICY_FIN_01_ADMIN_ONLY (قصر الوصول على المحاسبين المعتمدين)</div>
+        <div className={styles.disabledStatePolicyRow}><strong>الصلاحيات المطلوبة:</strong> READ_FINANCIAL_COCKPIT & VIEW_WLT_LEDGER</div>
+        <div><strong>حالة الطلب:</strong> تم حظر الوصول التلقائي · <strong>رمز الأثر:</strong> AUTH_DISABLED_FOR_ROLE_OPERATOR</div>
+      </div>
+
+      <div className={styles.stateActionsRow}>
+        <button className={styles.disabledStateButton} onClick={onRetry}>
+          طلب صلاحيات المحاسب
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FinanceBlockedState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className={styles.blockedStateContainer}>
+      <div className={styles.blockedStateTitleRow}>
+        <span style={{ fontSize: 24 }}>🚫</span>
+        <h3 className={styles.blockedStateTitle}>
+          العقد المالي غير نشط أو معلق (WLT Central Contract Blocked)
+        </h3>
+      </div>
+      <p className={styles.blockedStateDesc}>
+        تم إغلاق الأنشطة المالية لأن محرك العقود WLT Central Contract غير مفعل لهذه المؤسسة أو معلق بسبب عدم اكتمال التوثيق المالي. جميع الحركات والقيود مصنفة حاليًا تحت حالة <strong>CONTRACT_TBD</strong> لحماية الحسابات.
+      </p>
+
+      {/* Status Strip & Audit info */}
+      <div className={styles.blockedStateInfo}>
+        <strong>حالة العقد:</strong> معلق (CONTRACT_TBD) · <strong>السبب القانوني:</strong> عدم تفعيل توثيق المؤسسة · <strong>أثر الإجراء:</strong> منع كافة التسويات التلقائية وحركات الكباتن حتى التفعيل.
+      </div>
+
+      <div className={styles.stateActionsRow}>
+        <button className={styles.blockedStateButton} onClick={onRetry}>
+          طلب تفعيل العقد التجريبي (معاينة)
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ControlPanelDshFinanceHubScreen({
   group = 'overview',
   subGroup,
@@ -97,45 +318,19 @@ export function ControlPanelDshFinanceHubScreen({
   const hubHref = buildFinanceHref(activeGroup, { panel });
   const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS.overview;
 
-  if (state !== 'ready') {
-    let title = 'جاري تحميل البيانات المالية';
-    let description = 'يتم تجهيز غرفة القيادة المالية وتدقيق السجلات...';
-    let kind: 'info' | 'warning' | 'danger' = 'info';
-
-    if (state === 'empty') {
-      title = 'لا توجد سجلات مالية';
-      description = 'لا توجد حركات أو قيود معلقة مطابقة لهذا القسم أو الفلتر حاليًا.';
-      kind = 'info';
-    } else if (state === 'error') {
-      title = 'فشل تحميل العقد المالي';
-      description = 'حدث خطأ أثناء الاتصال بمحرك WLT المالي أو استرداد بيانات المعاينة.';
-      kind = 'danger';
-    } else if (state === 'offline') {
-      title = 'غير متصل بالشبكة';
-      description = 'تعذر تحديث المؤشرات المالية. يتم عرض آخر نسخة معاينة محلية مخزنة.';
-      kind = 'warning';
-    } else if (state === 'disabled') {
-      title = 'القسم المالي مقفل';
-      description = 'ليست لديك صلاحية الوصول إلى غرفة القيادة المالية الحالية. يرجى مراجعة الإدارة.';
-      kind = 'danger';
-    }
-
-    return (
-      <div className={`${styles.surfaceMainPanel} ${styles.surfaceStatePadding}`}>
-        <StateView
-          stateId={state}
-          title={title}
-          description={description}
-          kind={kind as any}
-          actionLabel="إعادة المحاولة"
-          onActionPress={() => router.push(fallbackHref)}
-        />
-      </div>
-    );
+  if (state === 'loading') {
+    return <FinanceSkeletonLoader />;
   }
 
   return (
     <div className={styles.surfaceCockpit}>
+      <div className={styles.warningStrip}>
+        <span className={styles.warningStripAlert}>🚨 بيئة معاينة مالية فقط (PREVIEW_ONLY)</span>
+        <span className={styles.warningStripSep}>•</span>
+        <span className={styles.warningStripAlert}>عقد معلق [CONTRACT_TBD]</span>
+        <span className={styles.warningStripSep}>•</span>
+        <span className={styles.warningStripDanger}>لا توجد حركات مالية حقيقية (NO REAL MONEY MOVEMENT)</span>
+      </div>
       <header className={styles.surfaceTopBar}>
         <div className={styles.surfaceTitleBlock}>
           <div className={styles.surfaceHeaderIconBox} aria-hidden="true">
@@ -246,7 +441,12 @@ export function ControlPanelDshFinanceHubScreen({
 
       <main className={styles.surfaceMainPanel}>
         <div className={styles.surfaceInnerScroll}>
-          <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />
+          {state === 'empty' && <FinanceEmptyState onRetry={() => router.push(fallbackHref)} />}
+          {state === 'error' && <FinanceErrorState onRetry={() => router.push(fallbackHref)} />}
+          {state === 'offline' && <FinanceOfflineState onRetry={() => router.push(fallbackHref)} />}
+          {state === 'disabled' && <FinanceDisabledState onRetry={() => router.push(fallbackHref)} />}
+          {state === 'blocked' && <FinanceBlockedState onRetry={() => router.push(fallbackHref)} />}
+          {state === 'ready' && <ActiveScreen hubHref={hubHref} subGroup={activeSubGroup} />}
         </div>
       </main>
     </div>

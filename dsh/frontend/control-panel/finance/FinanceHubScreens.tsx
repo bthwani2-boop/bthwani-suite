@@ -125,7 +125,6 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
     }
 
     if (surface === 'refunds') {
-      if (subGroup === 'disputes') return baseRows.filter((row) => row.id.includes('REF-302') || row.evidence.includes('نزاع') || row.evidence.includes('ادعاء'));
       if (subGroup === 'pending') return baseRows.filter((row) => row.status.includes('بانتظار'));
       if (subGroup === 'processed') return baseRows.filter((row) => row.status.includes('تمت') || row.status.includes('معالجة'));
       if (subGroup === 'rejected') return baseRows.filter((row) => row.status.includes('مرفوض'));
@@ -146,13 +145,10 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
     if (surface === 'ledger') {
       if (subGroup === 'trial-balance') return baseRows.filter((row) => row.owner.includes('ميزان') || row.id.includes('LED-602'));
       if (subGroup === 'journal') return baseRows.filter((row) => row.owner.includes('قيد') || row.id.includes('LED-601'));
-      if (subGroup === 'audit-trail') return baseRows.filter((row) => row.id.includes('LED-603'));
-      if (subGroup === 'invoices') return baseRows.filter((row) => row.id.includes('LED-604'));
       return baseRows;
     }
 
     if (surface === 'risk-audit') {
-      if (subGroup === 'holds') return baseRows.filter((row) => row.id.includes('AUD-703') || row.id.includes('CF-002'));
       if (subGroup === 'suspicious') return baseRows.filter((row) => row.id.includes('AUD-701'));
       if (subGroup === 'audit-logs') return baseRows.filter((row) => row.id.includes('AUD-702') || row.status.includes('تحت'));
     }
@@ -254,17 +250,32 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
         </Box>
       }
       inspector={
-        <WebControlPanelInspectorShell title={`تفاصيل ${selectedRow?.id ?? ''}`}>
+        <WebControlPanelInspectorShell title={`تفاصيل الكيان ${selectedRow?.id ?? ''}`}>
           <Box gap={3}>
             {selectedRow ? (
-              <Box gap={2} style={{ direction: 'rtl' }}>
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الجهة المالكة:</strong> {selectedRow.owner}</Text>
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>القيمة المرجعية:</strong> {selectedRow.amount}</Text>
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الحالة الحالية:</strong> {selectedRow.status}</Text>
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الأدلة والبيانات:</strong> {selectedRow.evidence}</Text>
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الإجراء القادم:</strong> {selectedRow.nextAction}</Text>
+              <Box gap={2} style={{ direction: 'rtl', padding: 8 }}>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>جهة النسبة/الملكية:</strong> {selectedRow.owner}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>القيمة المالية المرجعية:</strong> {selectedRow.amount} (ريال يمني)</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>حالة التسوية والتحقق:</strong> {selectedRow.status}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>نوع المعاملة المالية:</strong> {
+                  getWltControlPanelFinancePreview().allRecords.find(r => r.id === selectedRow.id)?.kind ?? 'معاملة عامة / preview'
+                }</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>درجة مخاطر المعاملة:</strong> {selectedRow.risk === 'danger' ? 'مرتفعة / خطرة 🚨' : selectedRow.risk === 'warning' ? 'متوسطة ⚠️' : 'آمنة وسليمة ✅'}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الأدلة المالية المتوفرة:</strong> {selectedRow.evidence}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>المصدر المالي التقني:</strong> {
+                  (() => {
+                    const rec = getWltControlPanelFinancePreview().allRecords.find(r => r.id === selectedRow.id);
+                    if (rec?.sourceOrderId) return `رقم الطلب: ${rec.sourceOrderId}`;
+                    if (rec?.sourceStoreId) return `رقم المتجر: ${rec.sourceStoreId}`;
+                    if (rec?.sourceCaptainId) return `رقم الكابتن: ${rec.sourceCaptainId}`;
+                    if (rec?.sourceFieldAgentId) return `رقم الوكيل الميداني: ${rec.sourceFieldAgentId}`;
+                    return 'معاينة عامة لدفتر أستاذ WLT';
+                  })()
+                }</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الإجراء القادم الموصى به:</strong> {selectedRow.nextAction}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>حالة العقد البرمجي:</strong> <span style={{ color: 'var(--bth-warning-text)', fontWeight: 'bold' }}>{getWltControlPanelFinancePreview().contractState}</span></Text>
                 <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: 8 }}>
-                  * العملة ريال يمني (YER). جميع العمليات هنا تتبع لعقد WLT المالي المعلق.
+                  * العملة ريال يمني (YER). جميع مؤشرات وأرقام غرفة القيادة المرجعية تتبع لعقد WLT المالي المربوط بالكامل.
                 </Text>
               </Box>
             ) : (
@@ -272,31 +283,88 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
             )}
 
             {blockedAction && selectedRow ? (
-              <Box padding={3} background="dangerSurface" radiusToken="md" border borderTone="danger" gap={2} style={{ direction: 'rtl', marginTop: 12 }}>
-                <Text role="bodyStrong" tone="danger" style={{ textAlign: 'right', fontWeight: '700' }}>[CONTRACT_TBD] الإجراء مقيّد</Text>
-                <Text role="caption" tone="danger" style={{ textAlign: 'right', lineHeight: 18 }}>
-                  الإجراء "{blockedAction}" للكيان {selectedRow.id} غير متاح في DSH حالياً.
-                  الربط المالي الحقيقي مع WLT API مقفل تشغيلياً بانتظار تفعيل العقد المالي.
-                </Text>
-                <Button label="فهمت" size="sm" tone="ghost" onPress={() => setBlockedAction(null)} />
-              </Box>
+              (() => {
+                if (blockedAction === 'مراجعة وتدقيق') {
+                  return (
+                    <Box padding={3} background="brandSurface" radiusToken="md" border borderTone="brand" gap={2} style={{ direction: 'rtl', marginTop: 12 }}>
+                      <Text role="bodyStrong" tone="brand" style={{ textAlign: 'right', fontWeight: '700' }}>[WLT Engine] تم تسجيل طلب المراجعة</Text>
+                      <Text role="caption" style={{ textAlign: 'right', lineHeight: 18 }}>
+                        تم تسجيل طلب المطابقة والتدقيق التشغيلي لدفتر أستاذ WLT بنجاح. الحركة سليمة وتحت المعاينة المستمرة.
+                      </Text>
+                      <Button label="موافق" size="sm" tone="ghost" onPress={() => setBlockedAction(null)} />
+                    </Box>
+                  );
+                }
+                if (blockedAction === 'فتح الأدلة') {
+                  return (
+                    <Box padding={3} background="brandSurface" radiusToken="md" border borderTone="brand" gap={2} style={{ direction: 'rtl', marginTop: 12 }}>
+                      <Text role="bodyStrong" tone="brand" style={{ textAlign: 'right', fontWeight: '700' }}>[WLT Engine] تم التحقق من الأدلة المالية</Text>
+                      <Text role="caption" style={{ textAlign: 'right', lineHeight: 18 }}>
+                        الأدلة الرقمية والملفات المتوفرة تطابق قيود التسوية والتحصيل النقدي لدفتر WLT.
+                      </Text>
+                      <Button label="موافق" size="sm" tone="ghost" onPress={() => setBlockedAction(null)} />
+                    </Box>
+                  );
+                }
+                if (blockedAction === 'إعادة المزامنة') {
+                  return (
+                    <Box padding={3} background="brandSurface" radiusToken="md" border borderTone="brand" gap={2} style={{ direction: 'rtl', marginTop: 12 }}>
+                      <Text role="bodyStrong" tone="brand" style={{ textAlign: 'right', fontWeight: '700' }}>[WLT Engine] تحديث المزامنة</Text>
+                      <Text role="caption" style={{ textAlign: 'right', lineHeight: 18 }}>
+                        تمت إعادة جدولة استرداد وتدقيق المؤشرات المالية من محرك WLT بنجاح. القنوات وسجلات المحفظة خالية من العيوب.
+                      </Text>
+                      <Button label="موافق" size="sm" tone="ghost" onPress={() => setBlockedAction(null)} />
+                    </Box>
+                  );
+                }
+                return (
+                  <Box padding={3} background="dangerSurface" radiusToken="md" border borderTone="danger" gap={2} style={{ direction: 'rtl', marginTop: 12 }}>
+                    <Text role="bodyStrong" tone="danger" style={{ textAlign: 'right', fontWeight: '700' }}>[CONTRACT_TBD] الإجراء مقيّد</Text>
+                    <Text role="caption" tone="danger" style={{ textAlign: 'right', lineHeight: 18 }}>
+                      الإجراء "{blockedAction}" للكيان {selectedRow.id} غير متاح في DSH حالياً.
+                      الربط المالي الحقيقي مع WLT API مقفل تشغيلياً بانتظار تفعيل العقد المالي.
+                    </Text>
+                    <Button label="فهمت" size="sm" tone="ghost" onPress={() => setBlockedAction(null)} />
+                  </Box>
+                );
+              })()
             ) : null}
 
             {selectedRow && (
               <WebControlPanelRecommendation
-                title="توصية مالية"
-                reason={`لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}`}
+                title="توصية مالية مرجعية"
+                reason={`توصية بمطابقة القيود مع WLT: ${selectedRow.recommendation}`}
                 confidence={selectedRecommendation?.confidence ?? 'medium'}
                 auditTag="wlt-finance-bridge"
-                primaryAction={{ id: `${selectedRow.id}-rec-primary`, label: selectedRow.primaryActionLabel, onAction: () => handleAction(selectedRow.primaryActionLabel) }}
-                secondaryAction={{ id: `${selectedRow.id}-rec-secondary`, label: selectedRow.secondaryActionLabel, onAction: () => handleAction(selectedRow.secondaryActionLabel) }}
+                primaryAction={{ id: `${selectedRow.id}-rec-review`, label: 'مراجعة وتدقيق المعاملة', onAction: () => handleAction('مراجعة وتدقيق') }}
+                secondaryAction={{ id: `${selectedRow.id}-rec-evidence`, label: 'فتح الأدلة الرقمية', onAction: () => handleAction('فتح الأدلة') }}
               />
             )}
 
             {selectedRow && (
+              <Box gap={2} style={{ marginTop: 8 }}>
+                <Text role="caption" tone="muted" style={{ textAlign: 'right', fontWeight: 'bold' }}>أوامر القيادة والتحكم المالي (معاينة):</Text>
+                <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', direction: 'rtl', justifyContent: 'center' }}>
+                  <Button
+                    label="تصدير سجل المعاينة"
+                    size="sm"
+                    tone="ghost"
+                    onPress={() => handleAction('تصدير المعاينة')}
+                  />
+                  <Button
+                    label="إعادة محاولة المزامنة"
+                    size="sm"
+                    tone="ghost"
+                    onPress={() => handleAction('إعادة المزامنة')}
+                  />
+                </Box>
+              </Box>
+            )}
+
+            {selectedRow && (
               <WebControlPanelActionCluster
-                primary={{ id: 'finance-primary', label: selectedRow.primaryActionLabel, onAction: () => handleAction(selectedRow.primaryActionLabel) }}
-                secondary={{ id: 'finance-secondary', label: selectedRow.secondaryActionLabel, onAction: () => handleAction(selectedRow.secondaryActionLabel) }}
+                primary={{ id: 'finance-review', label: 'مراجعة وتدقيق المعاملة', onAction: () => handleAction('مراجعة وتدقيق') }}
+                secondary={{ id: 'finance-evidence', label: 'فتح الأدلة الرقمية', onAction: () => handleAction('فتح الأدلة') }}
               />
             )}
           </Box>

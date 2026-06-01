@@ -38,8 +38,18 @@ function FinanceRecordCard({ record }: { record: WltDshFinancePreviewRecord }) {
       recommendation={`مطابقة المعاملة — ${record.subtitle}`}
       reason={`الجهة: ${record.actor} · المصدر: ${record.sourceOrderId ?? record.sourceStoreId ?? record.sourceCaptainId ?? record.sourceFieldAgentId ?? '—'}`}
       sla={record.timeLabel}
-      primaryAction={{ label: 'مراجعة التسوية', onAction: () => {} }}
-      secondaryAction={{ label: 'فتح الأدلة', onAction: () => {} }}
+      primaryAction={{
+        label: 'مراجعة التسوية',
+        onAction: () => {
+          alert("الإجراء: [BLOCKED_CONTRACT_TBD]\n\nعقد مالي معلّق [FUTURE_MUTATION_REQUIRES_WLT_API]. لا توجد عمليات اعتماد أو تسويات مالية حقيقية داخل DSH. هذه الميزة تتطلب تفعيل WLT API.");
+        }
+      }}
+      secondaryAction={{
+        label: 'فتح الأدلة',
+        onAction: () => {
+          alert("الإجراء: [OPEN_EVIDENCE]\n\nهذه بيئة معاينة رقمية لدفتر أستاذ WLT. المستندات والأدلة متوفرة فقط في بيئة الإنتاج الحقيقية.");
+        }
+      }}
     />
   );
 }
@@ -115,8 +125,18 @@ function CaptainEligibilitySection() {
         recommendation={snapshot.eligibilityBlockReason}
         reason={`النقص: ${snapshot.eligibilityShortfallLabel} · قيد المراجعة`}
         sla="مراجعة فورية"
-        primaryAction={{ label: 'محاكاة شحن الرصيد', onAction: () => {} }}
-        secondaryAction={{ label: 'فتح ملف الكابتن', onAction: () => {} }}
+        primaryAction={{
+          label: 'محاكاة شحن الرصيد',
+          onAction: () => {
+            alert("الإجراء: [FUTURE_MUTATION_REQUIRES_WLT_API]\n\nعملية شحن رصيد الكابتن تتطلب ربطاً حياً وتعديلاً لمستندات محفظة WLT. الإجراء معطّل حالياً.");
+          }
+        }}
+        secondaryAction={{
+          label: 'فتح ملف الكابتن',
+          onAction: () => {
+            alert("الإجراء: [VIEW_DETAIL]\n\nملف الكابتن متوفر فقط عبر لوحة دعم الكباتن الموحدة (Customer/Captain 360).");
+          }
+        }}
       />
     </Box>
   );

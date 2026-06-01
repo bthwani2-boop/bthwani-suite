@@ -392,7 +392,11 @@
     "dsh/frontend/control-panel/operations/GeoHeatmapScreen.tsx",
     "dsh/frontend/control-panel/operations/LiveOrdersScreen.tsx",
     "dsh/frontend/control-panel/operations/operations.types.ts",
-    "dsh/frontend/control-panel/operations/operations.registry.ts"
+    "dsh/frontend/control-panel/operations/operations.registry.ts",
+    "dsh/frontend/control-panel/finance",
+    "dsh/frontend/data/operational-statuses.preview-data.ts",
+    "dsh/frontend/app-captain/screens/DshCaptainOperationsScreen.tsx",
+    "wlt/frontend/control-panel/finance"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

@@ -116,10 +116,18 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
 /**
  * Dynamically build the rows for each control panel surface from WLT seeds.
  */
+let cachedRows: Record<DshFinancePreviewSurface, ReadonlyArray<DshFinancePreviewRow>> | null = null;
+
+/**
+ * Dynamically build the rows for each control panel surface from WLT seeds.
+ */
 export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSurface, ReadonlyArray<DshFinancePreviewRow>> {
+  if (cachedRows) {
+    return cachedRows;
+  }
+
   const wltPreview = getWltControlPanelFinancePreview();
   const capSnap = getWltCaptainFinanceSnapshot();
-  const storeDelivery = getWltDshStoreDeliveryFinancePreview();
   const fieldPreview = getWltFieldFinancePreview();
 
   const overviewRows: DshFinancePreviewRow[] = [];
@@ -198,7 +206,7 @@ export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSur
     sla: 'خلال ٢٤ ساعة',
   });
 
-  return {
+  cachedRows = {
     overview: overviewRows.length > 0 ? overviewRows : [
       { id: 'FIN-EMPTY-1', amount: '٠ ر.ي', owner: 'نظرة عامة', status: 'سليم', risk: 'success', evidence: 'لا توجد فوارق مالية اليوم', nextAction: 'مراقبة مستمرة', recommendation: 'لا توجد إجراءات إضافية مطلوبة', primaryActionLabel: 'معاينة', secondaryActionLabel: 'فتح السجل', sla: 'مباشر' }
     ],
@@ -212,6 +220,19 @@ export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSur
     'captain-finance': captainFinanceRows,
     'store-delivery-finance': storeDeliveryFinanceRows,
   };
+
+  return cachedRows;
 }
 
-export const dshFinanceControlPanelPreviewRows = getAdaptedFinanceControlPanelRows();
+export const dshFinanceControlPanelPreviewRows = {
+  get overview() { return getAdaptedFinanceControlPanelRows().overview; },
+  get settlements() { return getAdaptedFinanceControlPanelRows().settlements; },
+  get 'cod-reconciliation'() { return getAdaptedFinanceControlPanelRows()['cod-reconciliation']; },
+  get refunds() { return getAdaptedFinanceControlPanelRows().refunds; },
+  get 'captain-eligibility'() { return getAdaptedFinanceControlPanelRows()['captain-eligibility']; },
+  get payouts() { return getAdaptedFinanceControlPanelRows().payouts; },
+  get ledger() { return getAdaptedFinanceControlPanelRows().ledger; },
+  get 'risk-audit'() { return getAdaptedFinanceControlPanelRows()['risk-audit']; },
+  get 'captain-finance'() { return getAdaptedFinanceControlPanelRows()['captain-finance']; },
+  get 'store-delivery-finance'() { return getAdaptedFinanceControlPanelRows()['store-delivery-finance']; },
+} as unknown as Record<DshFinancePreviewSurface, ReadonlyArray<DshFinancePreviewRow>>;

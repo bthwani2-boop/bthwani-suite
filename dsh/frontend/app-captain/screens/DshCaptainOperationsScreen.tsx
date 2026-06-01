@@ -74,7 +74,7 @@ const dshCaptainFlowMap: Record<DshCaptainFlowKey, DshCaptainFlowNode> = {
 export type CaptainSupportScreenId =
 	| 'chat-read-ack'
 	| 'chat-send'
-	| 'cod-balance'
+	| 'cod-liability'
 	| 'order-accept'
 	| 'order-deliver'
 	| 'order-details'
@@ -263,7 +263,7 @@ const EXECUTION_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string
 const SUPPORT_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string; subtitle: string; badgeLabel: string }> = [
 	{ id: 'chat-read-ack', title: 'تأكيد قراءة الدردشة', subtitle: 'امسح الرسائل التشغيلية غير المقروءة للمهمة الحالية.', badgeLabel: 'تواصل' },
 	{ id: 'chat-send', title: 'إرسال رسالة', subtitle: 'أرسل تحديثًا موجزًا مرتبطًا بالمسار.', badgeLabel: 'تواصل' },
-	{ id: 'cod-balance', title: 'رصيد الدفع عند الاستلام', subtitle: 'راجع التحصيل عند الحاجة بعد تثبيت الخطوة النشطة.', badgeLabel: 'مالية' },
+	{ id: 'cod-liability', title: 'ذمة الدفع عند الاستلام', subtitle: 'راجع التحصيل عند الحاجة بعد تثبيت الخطوة النشطة.', badgeLabel: 'مالية' },
 	{ id: 'profile-get', title: 'ملف الكابتن', subtitle: 'اقرأ الملف فقط عندما تحتاج مرجع الجاهزية.', badgeLabel: 'ملف' },
 	{ id: 'tier-info', title: 'معلومات الطبقة', subtitle: 'افهم مزايا الطبقة الحالية من دون تعطيل التنفيذ.', badgeLabel: 'طبقة' },
 	{ id: 'tier-evaluate', title: 'تقييم الطبقة', subtitle: 'راجع الجاهزية التالية بعد إغلاق المهمة الحالية.', badgeLabel: 'طبقة' },
@@ -363,7 +363,7 @@ function resolveFlowNodeScreen(flowKey: DshCaptainFlowKey, stage: DshCaptainOrde
 	}
 
 	if (flowKey === 'finance') {
-		return 'cod-balance';
+		return 'cod-liability';
 	}
 
 	return 'profile-get';

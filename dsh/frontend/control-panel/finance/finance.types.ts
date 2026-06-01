@@ -13,7 +13,7 @@ export type CanonicalFinanceGroupId =
 
 export type FinancePanelId = 'detail' | 'evidence';
 
-export type FinanceViewState = 'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'disabled';
+export type FinanceViewState = 'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'disabled' | 'blocked';
 
 export interface FinanceGroupMeta {
   id: CanonicalFinanceGroupId;
@@ -26,11 +26,3 @@ export interface FinanceGroupMeta {
 export type FinanceNormalizationResult =
   | { kind: 'group'; group: CanonicalFinanceGroupId; sourceWorkspace?: string; panel?: FinancePanelId }
   | { kind: 'redirect'; sourceWorkspace: string; section: string; href: string };
-
-export interface StateViewCopy {
-  stateId: string;
-  title: string;
-  description: string;
-  actionLabel: string;
-  kind?: 'warning' | 'danger';
-}
