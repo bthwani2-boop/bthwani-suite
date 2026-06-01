@@ -99,6 +99,7 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
       return baseRows.filter((row) => subGroup === 'mismatch' ? row.risk === 'danger' : row.risk !== 'danger');
     }
     if (surface === 'refunds') {
+      if (subGroup === 'disputes') return baseRows.filter((row) => row.id === 'REF-302');
       return baseRows.filter((row) => subGroup === 'processed' ? row.status.includes('تحت') === false : true);
     }
     if (surface === 'captain-eligibility') {
@@ -112,10 +113,16 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
       if (subGroup === 'field-payouts') return baseRows.filter((row) => row.owner.includes('الميدانيين'));
     }
     if (surface === 'ledger') {
-      return baseRows.filter((row) => subGroup === 'trial-balance' ? row.owner.includes('ميزان') : row.owner.includes('قيد'));
+      if (subGroup === 'trial-balance') return baseRows.filter((row) => row.owner.includes('ميزان'));
+      if (subGroup === 'journal') return baseRows.filter((row) => row.owner.includes('قيد'));
+      if (subGroup === 'audit-trail') return baseRows.filter((row) => row.id === 'LED-603');
+      if (subGroup === 'invoices') return baseRows.filter((row) => row.id === 'LED-604');
+      return baseRows;
     }
     if (surface === 'risk-audit') {
-      return baseRows.filter((row) => subGroup === 'audit' ? row.status.includes('تحت') : row.risk === 'danger');
+      if (subGroup === 'holds') return baseRows.filter((row) => row.id === 'AUD-703');
+      if (subGroup === 'suspicious') return baseRows.filter((row) => row.id === 'AUD-701');
+      return baseRows.filter((row) => subGroup === 'audit-logs' ? row.status.includes('تحت') : row.risk === 'danger');
     }
     if (surface === 'captain-finance') {
       if (subGroup === 'cod-pending') return baseRows.filter((row) => row.id === 'CF-001');

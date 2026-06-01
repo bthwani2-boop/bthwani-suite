@@ -151,14 +151,6 @@ function resolveSupportTabFromWorkspace(workspace?: string | null): SupportTab {
     return 'messaging';
   }
 
-  if (workspace === 'disputes') {
-    return 'disputes';
-  }
-
-  if (workspace === 'feedback') {
-    return 'feedback';
-  }
-
   return 'queue';
 }
 
@@ -234,24 +226,24 @@ function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
 const SUPPORT_ROWS: ReadonlyArray<SupportRow> = DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS.map(buildSupportRow);
 
 function filterRows(tab: SupportTab, lane: string) {
-  if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging' || tab === 'customer-360' || tab === 'call-intake') {
+  if (tab !== 'queue') {
     return [];
   }
 
   return SUPPORT_ROWS.filter((row) => {
-    if (tab === 'queue') {
-      return lane === 'الكل' || row.surface === lane;
+    if (lane === 'الكل') {
+      return true;
     }
 
-    if (tab === 'disputes') {
+    if (lane === 'النزاعات والاعتراضات') {
       return row.status.includes('مراجعة') || row.status.includes('تحتاج');
     }
 
-    if (tab === 'feedback') {
+    if (lane === 'الآراء والتقييمات') {
       return row.surface === 'الطلبات' || row.surface === 'الشركاء';
     }
 
-    return false;
+    return row.surface === lane;
   });
 }
 
