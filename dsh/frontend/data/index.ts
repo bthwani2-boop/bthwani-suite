@@ -20,3 +20,4 @@ export * from './operational-statuses.preview-data';
 export * from './marketing.preview-data';
 export * from './platform.preview-data';
 export * from './partner.preview-data';
+export * from './finance.preview-data';

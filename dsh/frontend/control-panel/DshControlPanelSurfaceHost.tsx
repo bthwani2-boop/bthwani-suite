@@ -10,8 +10,8 @@ import {
 } from './operations';
 import { ControlPanelDshClosureDashboardScreen } from './dashboard';
 import { ControlPanelDshSupportHubScreen } from './support/SupportHubScreens';
-import { ControlPanelDshFinanceHubScreen } from './finance/FinanceHubScreen';
-import type { CanonicalFinanceGroupId, FinancePanelId } from './finance/finance.types';
+import { ControlPanelDshFinanceHubScreen } from './finance';
+import type { CanonicalFinanceGroupId, FinancePanelId } from '../../../wlt/frontend/control-panel/dsh/models/financeRouting.types';
 import { ControlPanelDshCatalogScreen } from './catalogs/catalogs.screen';
 import { ControlPanelDshPartnerApprovalsScreen } from './partners/ControlPanelDshPartnerApprovalsScreen';
 import { ControlPanelDshMarketingScreen } from './marketing/ControlPanelDshMarketingScreen';

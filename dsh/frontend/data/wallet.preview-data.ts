@@ -14,7 +14,7 @@ import {
   getWltFieldFinancePreview,
   type WltDshFinancePreviewRecord,
   type WltDshFinanceEventKind,
-} from '../../../wlt/frontend/control-panel/dsh/dshFinancePreview';
+} from './dshFinancePreview';
 
 export const dshWalletPreviewDataContract = {
   dataKind: 'UI_PREVIEW_ONLY',

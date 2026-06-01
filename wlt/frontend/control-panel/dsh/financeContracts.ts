@@ -1,5 +1,7 @@
-export type { FinanceProvider } from './sharedFinanceProviders';
-export { financeProviders } from './sharedFinanceProviders';
+export type { FinanceProvider } from './models/financeProviders.types';
+export { financeProviders } from './models/financeProviders.types';
+
+// ─── DSH Finance Preview (event kinds, actors, record shapes) ─────
 
 export type {
   WltCaptainFinanceSection,
@@ -21,7 +23,7 @@ export type {
   WltDshPaymentPreviewState,
   WltFieldFinanceSnapshot,
   WltPartnerFinanceSnapshot,
-} from './dshFinancePreview';
+} from '../../../../dsh/frontend/data/dshFinancePreview';
 export {
   formatWltYer,
   getWltCaptainFinancePreview,
@@ -42,9 +44,9 @@ export {
   resolveWltDshPaymentPreviewState,
   WLT_DSH_FINANCE_OWNERSHIP,
   WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
-} from './dshFinancePreview';
+} from '../../../../dsh/frontend/data/dshFinancePreview';
 
-// ─── Accounting Foundation — FIN-CORE-ACCOUNTING-FOUNDATION ──────
+// ─── Chart of Accounts ─────────────────────────────────────────────
 
 export type {
   WltAccountType,
@@ -52,31 +54,37 @@ export type {
   WltAccountCode,
   WltSubledgerId,
   WltAccount,
-} from './chartOfAccounts';
+} from './models/chartOfAccounts.types';
 export {
   WLT_CHART_OF_ACCOUNTS,
   WLT_CHART_OF_ACCOUNTS_CONTRACT,
   getWltAccountByCode,
   getWltControlAccounts,
   getWltAccountsByType,
-} from './chartOfAccounts';
+} from './models/chartOfAccounts.types';
 
-export type { WltSubledgerEntry } from './subledgerMatrix';
+// ─── Subledger Matrix ──────────────────────────────────────────────
+
+export type { WltSubledgerEntry } from './models/subledger.types';
 export {
   WLT_SUBLEDGER_MATRIX,
   WLT_SUBLEDGER_MATRIX_CONTRACT,
   getWltSubledgerById,
   getWltCloseGateSubledgers,
   getWltSubledgerForEventKind,
-} from './subledgerMatrix';
+} from './models/subledger.types';
 
-export type { WltPostingRule } from './postingRules';
+// ─── Posting Rules ─────────────────────────────────────────────────
+
+export type { WltPostingRule } from './models/postingRules.types';
 export {
   WLT_POSTING_RULES,
   WLT_POSTING_RULES_CONTRACT,
   getWltPostingRuleForEvent,
   getWltCloseGateBlockingRules,
-} from './postingRules';
+} from './models/postingRules.types';
+
+// ─── Maker-Checker ─────────────────────────────────────────────────
 
 export type {
   WltMakerCheckerState,
@@ -84,7 +92,7 @@ export type {
   WltMakerCheckerPermission,
   WltMakerCheckerRecord,
   WltRbacPreviewRole,
-} from './makerCheckerContract';
+} from './models/makerChecker.types';
 export {
   WLT_MAKER_CHECKER_STATE_LABELS,
   WLT_MAKER_CHECKER_TRANSITIONS,
@@ -95,7 +103,9 @@ export {
   isWltTerminalState,
   getWltRbacRoleById,
   buildWltMakerCheckerRecord,
-} from './makerCheckerContract';
+} from './models/makerChecker.types';
+
+// ─── Audit Pack ────────────────────────────────────────────────────
 
 export type {
   WltAuditPackStatus,
@@ -105,23 +115,19 @@ export type {
   WltAuditException,
   WltAuditApproval,
   WltAuditPack,
-} from './auditPack';
+} from './models/auditPack.types';
 export {
   WLT_AUDIT_PACK_STATUS_LABELS,
   WLT_AUDIT_PACK_CONTRACT,
   buildWltAuditPackPreview,
-} from './auditPack';
+} from './models/auditPack.types';
 
-export type {
-  WltTrialBalanceLine,
-  WltTrialBalance,
-} from './trialBalance';
-export {
-  WLT_TRIAL_BALANCE_CONTRACT,
-  buildWltTrialBalancePreview,
-} from './trialBalance';
+// ─── Trial Balance ─────────────────────────────────────────────────
 
-// ─── Financial Center — FIN-ACCOUNTING-DETAILS-FIRST ─────────────
+export type { WltTrialBalanceLine, WltTrialBalance } from './models/trialBalance.types';
+export { WLT_TRIAL_BALANCE_CONTRACT, buildWltTrialBalancePreview } from './selectors/buildTrialBalance';
+
+// ─── Financial Center ──────────────────────────────────────────────
 
 export type {
   WltLedgerEntryKind,
@@ -131,26 +137,39 @@ export type {
   WltFinancialCenterSection,
   WltFinancialCenterBlockingVariance,
   WltFinancialCenter,
-} from './financialCenter';
-export {
-  buildWltFinancialCenter,
-  WLT_FINANCIAL_CENTER_CONTRACT,
-} from './financialCenter';
+} from './models/financialCenter.types';
+export { buildWltFinancialCenter, WLT_FINANCIAL_CENTER_CONTRACT } from './selectors/buildFinancialCenter';
+
+// ─── Finance Contract Types ────────────────────────────────────────
+
+export type { WltDshControlPanelPreviewContract } from './models/financeContract.types';
+
+// ─── Store Settlement Types ────────────────────────────────────────
+
+export type { WltDshSettlementOrderRow, WltDshStoreSettlementStatement } from './models/storeSettlement.types';
+
+// ─── Account Statement Types ───────────────────────────────────────
 
 export type {
-  WltDshAccountStatement,
   WltDshAccountStatementActor,
   WltDshAccountStatementLine,
-  WltDshControlPanelPreviewContract,
-  WltDshRefundLedgerCase,
-  WltDshSettlementCalendarCycle,
-  WltDshSettlementOrderRow,
-  WltDshStoreSettlementStatement,
-} from './controlPanelDshFinance';
+  WltDshAccountStatement,
+} from './models/accountStatement.types';
+
+// ─── Settlement Calendar Types ─────────────────────────────────────
+
+export type { WltDshSettlementCalendarCycle } from './models/settlementCalendar.types';
+
+// ─── Refund Ledger Types ───────────────────────────────────────────
+
+export type { WltDshRefundLedgerCase } from './models/refundLedger.types';
+
+// ─── Preview Data (centralized in dsh/frontend/data/) ─────────────
+
 export {
   getWltDshAccountStatementsPreview,
   getWltDshRefundLedgerPreview,
   getWltDshSettlementCalendarPreview,
   getWltDshStoreSettlementStatementsPreview,
   WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT,
-} from './controlPanelDshFinance';
+} from '../../../../dsh/frontend/data/finance.preview-data';

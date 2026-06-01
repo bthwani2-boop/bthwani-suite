@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WltCaptainFinanceSection } from '../../../../wlt/frontend/control-panel/dsh/dshFinancePreview';
+import type { WltCaptainFinanceSection } from '../../data/dshFinancePreview';
 import { WltDshCaptainBridge } from '../../../../wlt/frontend/app-captain/dsh';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainFinanceScreenState } from '../../data/operational-statuses.preview-data';
