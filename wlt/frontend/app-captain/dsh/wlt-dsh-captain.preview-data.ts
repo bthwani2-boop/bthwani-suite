@@ -2,7 +2,7 @@ import {
   getWltCaptainFinanceSnapshot,
   getWltDshFinanceRecordsForActor,
   type WltCaptainFinanceSection,
-} from '../../shared/finance/dshFinancePreview';
+} from '../../control-panel/dsh/dshFinancePreview';
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import type { WltDshCaptainBridgeState } from './wlt-dsh-captain.types';
 

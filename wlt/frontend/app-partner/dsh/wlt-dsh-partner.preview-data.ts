@@ -1,4 +1,4 @@
-import { getWltPartnerFinanceSnapshot } from '../../shared/finance/dshFinancePreview';
+import { getWltPartnerFinanceSnapshot } from '../../control-panel/dsh/dshFinancePreview';
 import { wltDshPartnerBridgeDataContract } from './wlt-dsh-partner.contract';
 import type { WltDshPartnerBridgeState } from './wlt-dsh-partner.types';
 

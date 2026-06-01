@@ -27,7 +27,7 @@ import {
   resolveWltDshPaymentPreviewState,
   type WltDshPaymentMethod,
   type WltDshPaymentPreviewState,
-} from '../../shared/finance/dshFinancePreview';
+} from '../../control-panel/dsh/dshFinancePreview';
 
 const CONTRACT_TBD_NOTICE =
   'هذه الواجهة عرض تجريبي فقط. لا يتم تنفيذ أي دفع حقيقي حتى يُرفع وضع CONTRACT_TBD ويُربط الـ API المالي. العملة: ر.ي (ريال يمني).';

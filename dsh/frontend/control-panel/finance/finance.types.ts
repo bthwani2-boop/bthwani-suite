@@ -1,5 +1,9 @@
 export type CanonicalFinanceGroupId =
   | 'financial-center'
+  | 'account-statements'
+  | 'store-settlements'
+  | 'settlement-calendar'
+  | 'refund-ledger'
   | 'daily-close'
   | 'variances'
   | 'cod-cash'
@@ -29,5 +33,4 @@ export interface FinanceGroupMeta {
 }
 
 export type FinanceNormalizationResult =
-  | { kind: 'group'; group: CanonicalFinanceGroupId; sourceWorkspace?: string; panel?: FinancePanelId }
-  | { kind: 'redirect'; sourceWorkspace: string; section: string; href: string };
+  { kind: 'group'; group: CanonicalFinanceGroupId; sourceWorkspace?: string; panel?: FinancePanelId };

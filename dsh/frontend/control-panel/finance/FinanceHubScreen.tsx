@@ -28,10 +28,14 @@ import {
   ControlPanelDshStoreDeliveryFinanceScreen,
   ControlPanelDshSettlementScreen,
   ControlPanelDshRefundQueueScreen,
-} from './FinanceHubScreens';
-import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
-import { FinancialCenterScreen } from './FinancialCenterScreen';
-import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
+  DailyReconciliationWorkbench,
+  FinancialCenterScreen,
+  WltDshAccountStatement,
+  WltDshRefundLedger,
+  WltDshSettlementCalendar,
+  WltDshStoreSettlementStatement,
+} from '../../../../wlt/frontend/control-panel/dsh';
+import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/control-panel/dsh/dshFinancePreview';
 
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -47,11 +51,31 @@ const DailyCloseBridge = (_: { hubHref: string; subGroup?: string; technicalAudi
   <DailyReconciliationWorkbench />
 );
 
+const AccountStatementBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => (
+  <WltDshAccountStatement />
+);
+
+const StoreSettlementBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => (
+  <WltDshStoreSettlementStatement />
+);
+
+const SettlementCalendarBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => (
+  <WltDshSettlementCalendar />
+);
+
+const RefundLedgerBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => (
+  <WltDshRefundLedger />
+);
+
 const SCREEN_RENDERERS: Record<
   CanonicalFinanceGroupId,
   React.ComponentType<{ hubHref: string; subGroup?: string; technicalAuditMode: boolean }>
 > = {
   'financial-center': FinancialCenterScreen,
+  'account-statements': AccountStatementBridge,
+  'store-settlements': StoreSettlementBridge,
+  'settlement-calendar': SettlementCalendarBridge,
+  'refund-ledger': RefundLedgerBridge,
   'daily-close': DailyCloseBridge,
   variances: ControlPanelDshRiskAuditScreen,
   'cod-cash': ControlPanelDshCodReconciliationScreen,
@@ -235,7 +259,7 @@ export function ControlPanelDshFinanceHubScreen({
       ) : null}
 
       {/* Low-noise Governance Status Strip */}
-      <Box paddingX={4} paddingY={2} style={{ borderBottom: '1px solid var(--bthwani-control-panel-border)', background: 'var(--bthwani-control-panel-surface-raised)' }}>
+      <div style={{ borderBottom: '1px solid var(--bthwani-control-panel-border)', background: 'var(--bthwani-control-panel-surface-raised)', padding: '8px 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 13, color: 'var(--bthwani-control-panel-text-muted)' }}>
@@ -261,7 +285,7 @@ export function ControlPanelDshFinanceHubScreen({
             تفاصيل الحوكمة ↗
           </button>
         </div>
-      </Box>
+      </div>
 
       {/* Pop-up slide-over modal/drawer for Governance Inspector Details */}
       {isGovInspectorOpen && (

@@ -1,4 +1,4 @@
-import { getWltDshClientPaymentPreview } from '../../shared/finance/dshFinancePreview';
+import { getWltDshClientPaymentPreview } from '../../control-panel/dsh/dshFinancePreview';
 import { wltDshClientBridgeDataContract } from './wlt-dsh-client.contract';
 
 export const wltDshClientPaymentPreviewData = {

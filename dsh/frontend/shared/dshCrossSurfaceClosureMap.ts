@@ -622,7 +622,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     evidenceStatus: 'blocked-by-wlt',
     remainingBlocker: 'settlement وrefund وpayout وcommission وledger تبقى WLT-owned؛ DSH لا يملك mutation مالي هنا.',
     crossSurfaceDependencies: [
-      'wlt/frontend/shared/finance preview data',
+      'wlt/frontend/control-panel/dsh preview data',
       'partner/captain/field bridge workspaces',
     ],
     wltBoundary: 'حد WLT كامل: settlement, payout, refund, commission, ledger, reconciliation كلها خارج DSH.',
@@ -631,7 +631,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     routeHint: '/finance',
     routeProof: 'DshControlPanelSurfaceHost.tsx يوجّه /finance إلى ControlPanelDshFinanceHubScreen، وFinanceHubScreen.tsx يبني المسارات الداخلية عبر buildFinanceHref وFINANCE_ACTIVE_GROUPS.',
     screenProof: 'FinanceHubScreen.tsx + WltBoundaryBanner.tsx + PartnerSettlementWorkspace.tsx + CaptainPayoutWorkspace.tsx + RefundQueueWorkspace.tsx + PlatformFeeAuditWorkspace.tsx + FieldCommissionWorkspace.tsx تثبت أن كل workspace مالي يعرض bridge panel أو boundary banner واضحًا.',
-    stateCoverageProof: 'FinanceHubScreen يحمّل getWltControlPanelFinancePreview() من wlt/frontend/shared/finance/dshFinancePreview؛ FinanceHubScreens.tsx يوسم overview/settlements/refunds/payouts/ledger/risk-audit كلها كـ WLT-owned read-only previews؛ WltBoundaryBanner يفرض شارة "WLT — عرض فقط".',
+    stateCoverageProof: 'FinanceHubScreen يحمّل getWltControlPanelFinancePreview() من wlt/frontend/control-panel/dsh/dshFinancePreview؛ FinanceHubScreens.tsx يوسم overview/settlements/refunds/payouts/ledger/risk-audit كلها كـ WLT-owned read-only previews؛ WltBoundaryBanner يفرض شارة "WLT — عرض فقط".',
     crossSurfaceProof: 'العقد عبر الأسطح واضح: DSH control-panel يقرأ من WLT preview، بينما app-client وعمليات DSH لا تملك أي financial mutation. بقاء status = blocked-by-wlt مقصود لأنه يمنع نقل ملكية القرار المالي إلى DSH.',
   },
 ];

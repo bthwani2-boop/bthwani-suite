@@ -8,14 +8,14 @@
  * العملة: YER / ر.ي — تمّت إزالة SAR / ر.س بالكامل.
  *
  * للاستخدام الجديد: استورد مباشرة من:
- *   wlt/frontend/shared/finance/dshFinancePreview
+ *   wlt/frontend/control-panel/dsh/dshFinancePreview
  */
 
 export type {
   WltDshFinanceActor as DshFinanceActor,
   WltDshFinanceEventKind as DshFinanceEventKind,
   WltDshFinancePreviewRecord as DshFinancePreviewRecord,
-} from '../../../wlt/frontend/shared/finance/dshFinancePreview';
+} from '../../../wlt/frontend/control-panel/dsh/dshFinancePreview';
 
 export {
   getWltDshFinanceRecordsForActor as getDshFinanceRecordsForActor,
@@ -24,7 +24,7 @@ export {
   getWltCaptainFinancePreview as getDshCaptainFinancePreview,
   getWltFieldFinancePreview as getDshFieldFinancePreview,
   resolveWltDshFinanceEventKindForPaymentMethod as resolveDshFinanceEventKindForPayment,
-} from '../../../wlt/frontend/shared/finance/dshFinancePreview';
+} from '../../../wlt/frontend/control-panel/dsh/dshFinancePreview';
 
 // --- P0-07: WLT Finance Bridge — DSH Read-Only Boundary Contracts ---
 // All types below describe WHAT DSH DISPLAYS from WLT.

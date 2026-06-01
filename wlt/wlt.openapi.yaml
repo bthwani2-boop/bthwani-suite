@@ -505,6 +505,241 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 
+  /wlt/dsh/control-panel/finance-center:
+    get:
+      operationId: getControlPanelFinanceCenter
+      summary: Get WLT finance center preview for DSH control panel
+      description: >
+        WLT-owned. Returns the account-first finance center read model for DSH control-panel display.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — no backend, no real balances, no ledger runtime.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Finance center preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlPanelFinanceCenter'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/store-settlement-statements:
+    get:
+      operationId: listStoreSettlementStatements
+      summary: List WLT store settlement statements for DSH control panel
+      description: >
+        WLT-owned. Lists store settlement statements with biweekly cycles, linked order rows,
+        fees, commissions, discounts, refunds, holds, paid-to-date, and remaining payable.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY — read-only preview.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Store settlement statement previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StoreSettlementStatement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/account-statements:
+    get:
+      operationId: listControlPanelAccountStatements
+      summary: List WLT account statements for DSH control panel
+      description: >
+        WLT-owned. Returns account statements for store, captain, store courier, field agent,
+        customer wallet, and platform display. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Account statement previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountStatement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/chart-of-accounts:
+    get:
+      operationId: listChartOfAccounts
+      summary: List WLT chart of accounts preview
+      description: >
+        WLT-owned chart of accounts preview. DSH may display account metadata only.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Chart of accounts preview
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChartOfAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/subledger-balances:
+    get:
+      operationId: listSubledgerBalances
+      summary: List WLT subledger balance previews
+      description: >
+        WLT-owned subledger balance preview mapped to control accounts.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Subledger balance previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubledgerBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/posting-rules:
+    get:
+      operationId: listPostingRules
+      summary: List WLT posting rule previews
+      description: >
+        WLT-owned double-entry posting rules preview. DSH displays rules only.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Posting rule previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostingRule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/trial-balance:
+    get:
+      operationId: getTrialBalance
+      summary: Get WLT trial balance preview
+      description: >
+        WLT-owned trial balance preview. Total debit and credit must balance before any future close.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Trial balance preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrialBalance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/settlement-calendar:
+    get:
+      operationId: listSettlementCalendar
+      summary: List WLT settlement calendar previews
+      description: >
+        WLT-owned settlement cycles for store, captain, field, and store courier payout timing.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settlement calendar previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SettlementCalendarCycle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/refund-ledger:
+    get:
+      operationId: listRefundLedger
+      summary: List WLT refund ledger previews
+      description: >
+        WLT-owned refund and dispute ledger preview. DSH may inspect impact only;
+        WLT executes all refund effects in a future runtime.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Refund ledger previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefundLedgerCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/control-panel/audit-pack:
+    get:
+      operationId: getAuditPack
+      summary: Get WLT audit pack preview
+      description: >
+        WLT-owned audit pack preview for finance review evidence.
+        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
+      tags: [control-panel-finance]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Audit pack preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditPack'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -901,6 +1136,388 @@ components:
         resolvedRowCount:
           type: integer
           description: Number of rows with varianceMinorUnits === 0 and evidenceStatus === complete
+
+    ControlPanelFinanceCenter:
+      type: object
+      description: WLT-owned account-first finance center preview for DSH control panel.
+      required: [businessDate, currency, contractState]
+      properties:
+        businessDate:
+          type: string
+          format: date
+        currency:
+          type: string
+          default: YER
+        sections:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        contractState:
+          type: string
+          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
+
+    StoreSettlementOrderRow:
+      type: object
+      description: Order row included in a WLT store settlement statement preview.
+      required: [orderId, orderDate, deliveryDate, paymentMethod, orderGross, netSettlementImpact, settlementStatus]
+      properties:
+        orderId:
+          type: string
+        orderDate:
+          type: string
+          format: date
+        deliveryDate:
+          type: string
+          format: date
+        paymentMethod:
+          type: string
+          enum: [wallet, cod, card, manual]
+        orderGross:
+          $ref: '#/components/schemas/MoneyAmount'
+        deliveryFee:
+          $ref: '#/components/schemas/MoneyAmount'
+        platformCommission:
+          $ref: '#/components/schemas/MoneyAmount'
+        discount:
+          $ref: '#/components/schemas/MoneyAmount'
+        refundAmount:
+          $ref: '#/components/schemas/MoneyAmount'
+        netSettlementImpact:
+          $ref: '#/components/schemas/MoneyAmount'
+        includedInCycle:
+          type: boolean
+        settlementStatus:
+          type: string
+          enum: [included, held, next_cycle, disputed]
+        evidenceRef:
+          type: string
+
+    StoreSettlementStatement:
+      type: object
+      description: WLT-owned store settlement statement preview.
+      required: [statementId, storeId, storeName, settlementCycleId, frequency, periodStart, periodEnd, expectedPayoutDate, netPayable, orders, contractState]
+      properties:
+        statementId:
+          type: string
+        storeId:
+          type: string
+        storeName:
+          type: string
+        settlementCycleId:
+          type: string
+        frequency:
+          type: string
+          enum: [biweekly]
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        cutoffDate:
+          type: string
+          format: date
+        expectedPayoutDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [draft_preview, ready_for_review, held_by_wlt, paid_preview]
+        grossOrdersTotal:
+          $ref: '#/components/schemas/MoneyAmount'
+        deliveryFeesTotal:
+          $ref: '#/components/schemas/MoneyAmount'
+        platformCommissionTotal:
+          $ref: '#/components/schemas/MoneyAmount'
+        discountsTotal:
+          $ref: '#/components/schemas/MoneyAmount'
+        refundsTotal:
+          $ref: '#/components/schemas/MoneyAmount'
+        holdsTotal:
+          $ref: '#/components/schemas/MoneyAmount'
+        netPayable:
+          $ref: '#/components/schemas/MoneyAmount'
+        paidToDate:
+          $ref: '#/components/schemas/MoneyAmount'
+        remainingPayable:
+          $ref: '#/components/schemas/MoneyAmount'
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoreSettlementOrderRow'
+        contractState:
+          type: string
+          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
+
+    AccountStatementLine:
+      type: object
+      description: One WLT account statement line preview.
+      required: [lineId, date, sourceType, sourceId, description, runningBalance, status]
+      properties:
+        lineId:
+          type: string
+        date:
+          type: string
+          format: date
+        sourceType:
+          type: string
+          enum: [order, settlement, refund, payout, commission, wallet, adjustment]
+        sourceId:
+          type: string
+        description:
+          type: string
+        debit:
+          $ref: '#/components/schemas/MoneyAmount'
+        credit:
+          $ref: '#/components/schemas/MoneyAmount'
+        runningBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        status:
+          type: string
+          enum: [posted_preview, pending_wlt, held, disputed]
+        evidenceRef:
+          type: string
+
+    AccountStatement:
+      type: object
+      description: WLT-owned account statement preview for a financial actor.
+      required: [statementId, actor, actorId, periodStart, periodEnd, openingBalance, closingBalance, lines, contractState]
+      properties:
+        statementId:
+          type: string
+        actor:
+          type: string
+          enum: [store, captain, store_courier, field_agent, customer_wallet, platform]
+        actorId:
+          type: string
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        openingBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        periodDebit:
+          $ref: '#/components/schemas/MoneyAmount'
+        periodCredit:
+          $ref: '#/components/schemas/MoneyAmount'
+        adjustments:
+          $ref: '#/components/schemas/MoneyAmount'
+        holds:
+          $ref: '#/components/schemas/MoneyAmount'
+        releases:
+          $ref: '#/components/schemas/MoneyAmount'
+        refunds:
+          $ref: '#/components/schemas/MoneyAmount'
+        payouts:
+          $ref: '#/components/schemas/MoneyAmount'
+        closingBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountStatementLine'
+        contractState:
+          type: string
+          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
+
+    ChartOfAccount:
+      type: object
+      description: WLT chart of accounts preview row.
+      required: [accountCode, accountName, accountType, normalBalance]
+      properties:
+        accountCode:
+          type: string
+        accountName:
+          type: string
+        accountNameEn:
+          type: string
+        accountType:
+          type: string
+          enum: [asset, liability, revenue, expense, clearing, equity]
+        normalBalance:
+          type: string
+          enum: [debit, credit]
+        controlAccount:
+          type: boolean
+        parentAccountId:
+          type: string
+        currency:
+          type: string
+          default: YER
+
+    SubledgerBalance:
+      type: object
+      description: WLT subledger-to-control-account balance preview.
+      required: [subledgerId, controlAccountCode, balance, closeGateImpact]
+      properties:
+        subledgerId:
+          type: string
+        domain:
+          type: string
+        controlAccountCode:
+          type: string
+        actorType:
+          type: string
+        sourceEvents:
+          type: array
+          items:
+            type: string
+        balance:
+          $ref: '#/components/schemas/MoneyAmount'
+        closeGateImpact:
+          type: string
+
+    PostingRule:
+      type: object
+      description: WLT double-entry posting rule preview.
+      required: [eventKind, debitAccountCode, creditAccountCode, statementImpact, settlementImpact]
+      properties:
+        eventKind:
+          type: string
+        debitAccountCode:
+          type: string
+        creditAccountCode:
+          type: string
+        amountSource:
+          type: string
+        actor:
+          type: string
+        statementImpact:
+          type: string
+        settlementImpact:
+          type: string
+        reconciliationImpact:
+          type: string
+
+    TrialBalance:
+      type: object
+      description: WLT trial balance preview.
+      required: [businessDate, totalDebit, totalCredit, isBalanced, contractState]
+      properties:
+        businessDate:
+          type: string
+          format: date
+        totalDebit:
+          $ref: '#/components/schemas/MoneyAmount'
+        totalCredit:
+          $ref: '#/components/schemas/MoneyAmount'
+        isBalanced:
+          type: boolean
+        lines:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        contractState:
+          type: string
+          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
+
+    SettlementCalendarCycle:
+      type: object
+      description: WLT settlement cycle calendar preview.
+      required: [cycleId, ownerKind, frequency, periodStart, periodEnd, cutoffDate, expectedPayoutDate, status, netPayable]
+      properties:
+        cycleId:
+          type: string
+        ownerKind:
+          type: string
+          enum: [store, captain, field_agent, store_courier]
+        frequency:
+          type: string
+          enum: [biweekly, weekly, monthly]
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+        cutoffDate:
+          type: string
+          format: date
+        expectedPayoutDate:
+          type: string
+          format: date
+        actualPayoutDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [open_preview, cutoff_locked, wlt_review, paid_preview, held]
+        includedOrderCount:
+          type: integer
+        excludedOrderCount:
+          type: integer
+        netPayable:
+          $ref: '#/components/schemas/MoneyAmount'
+        holdAmount:
+          $ref: '#/components/schemas/MoneyAmount'
+        releasePolicy:
+          type: string
+
+    RefundLedgerCase:
+      type: object
+      description: WLT refund and dispute ledger preview.
+      required: [refundCaseId, orderId, customerId, storeId, originalAmount, status, ledgerImpact, walletImpact, settlementImpact]
+      properties:
+        refundCaseId:
+          type: string
+        orderId:
+          type: string
+        customerId:
+          type: string
+        storeId:
+          type: string
+        originalAmount:
+          $ref: '#/components/schemas/MoneyAmount'
+        approvedAmount:
+          $ref: '#/components/schemas/MoneyAmount'
+        rejectedAmount:
+          $ref: '#/components/schemas/MoneyAmount'
+        reason:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [pending_wlt_review, approved_preview, rejected_preview, disputed]
+        ledgerImpact:
+          type: string
+        walletImpact:
+          type: string
+        settlementImpact:
+          type: string
+
+    AuditPack:
+      type: object
+      description: WLT finance audit pack preview.
+      required: [auditPackId, status, contractState]
+      properties:
+        auditPackId:
+          type: string
+        status:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+        evidence:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        approvals:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        contractState:
+          type: string
+          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
 
     ErrorResponse:
       type: object

@@ -1,15 +1,17 @@
 import ControlPanelSurfaceHost from '../../../shell/web-entry';
 
-export default function FinancePage({
+export default async function FinancePage({
   searchParams,
 }: {
-  searchParams?: { workspace?: string; panel?: string };
+  searchParams?: Promise<{ workspace?: string; panel?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
+
   return (
     <ControlPanelSurfaceHost
       section="finance"
-      financeWorkspace={searchParams?.workspace}
-      financePanel={searchParams?.panel}
+      financeWorkspace={resolvedSearchParams?.workspace}
+      financePanel={resolvedSearchParams?.panel}
     />
   );
 }

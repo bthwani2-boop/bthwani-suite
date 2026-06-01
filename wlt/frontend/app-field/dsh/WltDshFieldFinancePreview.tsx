@@ -22,7 +22,7 @@ import {
 import {
   type WltDshFinancePreviewRecord,
   type WltFieldFinanceSnapshot,
-} from '../../shared/finance/dshFinancePreview';
+} from '../../control-panel/dsh/dshFinancePreview';
 import { useWltDshFieldFinancePreview } from './useWltDshFieldFinancePreview';
 
 const PREVIEW_NOTICE =

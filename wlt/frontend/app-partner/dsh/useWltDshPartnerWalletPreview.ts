@@ -1,5 +1,5 @@
 import React from 'react';
-import { getWltPartnerFinanceSnapshot } from '../../shared/finance/dshFinancePreview';
+import { getWltPartnerFinanceSnapshot } from '../../control-panel/dsh/dshFinancePreview';
 import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
 export function useWltDshPartnerWalletPreview() {

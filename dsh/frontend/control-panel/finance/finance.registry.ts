@@ -15,13 +15,38 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
       { id: 'position', label: 'المركز المالي' },
       { id: 'ledger', label: 'دفتر الأستاذ' },
       { id: 'variances', label: 'الفوارق' },
+      { id: 'audit-close', label: 'التدقيق والإغلاق' },
     ],
   },
   {
+    id: 'account-statements',
+    label: 'كشوف الحساب',
+    description: 'كشوف حساب WLT لكل طرف: متجر، كابتن، ميداني، محفظة عميل، ومنصة.',
+    badge: 'WLT',
+  },
+  {
+    id: 'store-settlements',
+    label: 'تسويات المتاجر',
+    description: 'كشف تسوية المتجر، الطلبات المرتبطة، الصافي، الحجوزات، والدفعات.',
+    badge: 'WLT',
+  },
+  {
+    id: 'settlement-calendar',
+    label: 'تقويم التسويات',
+    description: 'دورات القطع والدفع والحجز لكل أسبوعين أو حسب سياسة الطرف.',
+    badge: 'WLT',
+  },
+  {
+    id: 'refund-ledger',
+    label: 'سجل الاستردادات',
+    description: 'الاستردادات والنزاعات مع أثر ledger والمحفظة والتسوية كمعاينة.',
+    badge: 'WLT',
+  },
+  {
     id: 'daily-close',
-    label: 'إغلاق اليوم',
-    description: 'مراقبة وإغلاق الدورة المالية اليومية ومطابقة الفوارق والأدلة.',
-    badge: 'Core',
+    label: 'التدقيق والإغلاق',
+    description: 'طبقة رقابة داخل المركز المالي بعد الحسابات والكشوف والقيود، وليست محور النظام.',
+    badge: 'Audit',
     subGroups: [
       { id: 'summary', label: 'ملخص اليوم' },
       { id: 'inflow', label: 'الدخل' },
@@ -92,7 +117,7 @@ export const FINANCE_CANONICAL_GROUP_IDS = FINANCE_CANONICAL_GROUPS.map((group) 
 
 export const FINANCE_ACTIVE_GROUPS = FINANCE_CANONICAL_GROUPS;
 
-export const FINANCE_NAV_GROUPS = FINANCE_CANONICAL_GROUPS;
+export const FINANCE_NAV_GROUPS = FINANCE_CANONICAL_GROUPS.filter((group) => group.id !== 'daily-close');
 
 export function normalizeFinanceLocation(
   workspace?: string,
@@ -102,6 +127,22 @@ export function normalizeFinanceLocation(
 
   if (!workspace || workspace === 'financial-center') {
     return { kind: 'group', group: 'financial-center', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'account-statements') {
+    return { kind: 'group', group: 'account-statements', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'store-settlements') {
+    return { kind: 'group', group: 'store-settlements', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'settlement-calendar') {
+    return { kind: 'group', group: 'settlement-calendar', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'refund-ledger') {
+    return { kind: 'group', group: 'refund-ledger', sourceWorkspace: workspace, panel: resolvedPanel };
   }
 
   if (workspace === 'overview' || workspace === 'daily-close') {
@@ -140,11 +181,11 @@ export function normalizeFinanceLocation(
 }
 
 export function buildFinanceHref(
-  group: CanonicalFinanceGroupId = 'daily-close',
+  group: CanonicalFinanceGroupId = 'financial-center',
   options?: { panel?: FinancePanelId },
 ) {
   const searchParams = new URLSearchParams();
-  if (group !== 'daily-close') searchParams.set('workspace', group);
+  if (group !== 'financial-center') searchParams.set('workspace', group);
   if (options?.panel) searchParams.set('panel', options.panel);
   const query = searchParams.toString();
   return query ? `/finance?${query}` : '/finance';

@@ -2,7 +2,7 @@ import type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,
   WltDshFinancePreviewRecord,
-} from '../../shared/finance/dshFinancePreview';
+} from '../../control-panel/dsh/dshFinancePreview';
 
 export type WltDshCaptainBridgeSection = WltCaptainFinanceSection;
 

@@ -1,7 +1,7 @@
 import {
   getWltFieldFinanceSnapshot,
   type WltDshFinancePreviewRecord,
-} from '../../shared/finance/dshFinancePreview';
+} from '../../control-panel/dsh/dshFinancePreview';
 
 export function getSnapshot(storeIds?: readonly string[]) {
   return getWltFieldFinanceSnapshot(storeIds ? [...storeIds] : undefined);

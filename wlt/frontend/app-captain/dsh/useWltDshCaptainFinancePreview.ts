@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WltCaptainFinanceSection } from '../../shared/finance/dshFinancePreview';
+import type { WltCaptainFinanceSection } from '../../control-panel/dsh/dshFinancePreview';
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import * as WltCaptainAdapter from './wlt-dsh-captain.adapter';
 

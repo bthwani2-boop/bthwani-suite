@@ -21,11 +21,9 @@ export {
   ControlPanelDshRiskAuditScreen,
   ControlPanelDshCaptainFinanceScreen,
   ControlPanelDshStoreDeliveryFinanceScreen,
-} from './FinanceHubScreens';
-
-// WLT bridge workspaces — view-only surfaces; all financial truth owned by WLT
-export { WltBoundaryBanner } from './WltBoundaryBanner';
-export { CaptainPayoutWorkspace } from './CaptainPayoutWorkspace';
-export { CommissionBreakdownWorkspace } from './CommissionBreakdownWorkspace';
-export { PlatformFeeAuditWorkspace } from './PlatformFeeAuditWorkspace';
-export { FieldCommissionWorkspace } from './FieldCommissionWorkspace';
+  WltBoundaryBanner,
+  CaptainPayoutWorkspace,
+  CommissionBreakdownWorkspace,
+  PlatformFeeAuditWorkspace,
+  FieldCommissionWorkspace,
+} from '../../../../wlt/frontend/control-panel/dsh';

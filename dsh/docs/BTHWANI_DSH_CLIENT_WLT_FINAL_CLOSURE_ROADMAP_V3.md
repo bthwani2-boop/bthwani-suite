@@ -56,7 +56,7 @@ app-captain
 app-field
 control-panel
 wlt/frontend/app-client/dsh
-wlt/frontend/shared/finance
+wlt/frontend/control-panel/dsh
 ```
 
 ### 7.6 CLIENT_DSH_FILE_SIZE_RISK_MATRIX.csv

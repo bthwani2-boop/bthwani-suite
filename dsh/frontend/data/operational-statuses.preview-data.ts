@@ -487,7 +487,7 @@ export type DshCaptainFinanceSection = 'cod-liability' | 'earnings' | 'settlemen
 /**
  * PREVIEW_ONLY — local display snapshot for captain finance labels.
  * Financial truth (COD, earnings, eligibility, settlement) is owned by WLT.
- * Authoritative type: WltCaptainFinanceSnapshot (wlt/frontend/shared/finance/dshFinancePreview.ts).
+ * Authoritative type: WltCaptainFinanceSnapshot (wlt/frontend/control-panel/dsh/dshFinancePreview.ts).
  * bthwani_delivery only — partner_delivery (store_courier_mode) is not captain payout.
  */
 export type DshCaptainFinanceSnapshot = {

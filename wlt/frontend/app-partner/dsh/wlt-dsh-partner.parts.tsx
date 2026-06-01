@@ -25,7 +25,7 @@ import {
   getWltDshOrderCommissionBreakdown,
   type WltDshFulfillmentMode,
   type WltDshOrderLineItemApplicability,
-} from '../../shared/finance';
+} from '../../control-panel/dsh/financeContracts';
 
 type PartnerDshWalletViewState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';

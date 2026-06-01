@@ -5,7 +5,7 @@ import type {
   WltDshFinanceEventKind,
   WltDshFinanceStatusTone,
   WltDshFinanceTone,
-} from '../../shared/finance/dshFinancePreview';
+} from '../../control-panel/dsh/dshFinancePreview';
 
 export type WltDshPartnerTransactionTone = 'default' | 'success' | 'warning' | 'danger' | 'info';
 

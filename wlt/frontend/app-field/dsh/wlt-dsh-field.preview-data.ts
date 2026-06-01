@@ -1,4 +1,4 @@
-import { getWltFieldFinanceSnapshot } from '../../shared/finance/dshFinancePreview';
+import { getWltFieldFinanceSnapshot } from '../../control-panel/dsh/dshFinancePreview';
 import { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
 import type { WltDshFieldBridgeState } from './wlt-dsh-field.types';
 

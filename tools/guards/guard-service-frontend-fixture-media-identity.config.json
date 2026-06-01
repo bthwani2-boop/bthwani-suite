@@ -378,6 +378,7 @@
     "dsh/frontend/control-panel/shared/ControlPanelDshWorkspaceFrame.tsx",
     "dsh/frontend/data/offers.preview-data.ts",
     "dsh/frontend/shared/dsh-role-permission.model.ts",
+    "dsh/frontend/shared/dshCrossSurfaceClosureMap.ts",
     "dsh/frontend/control-panel/marketing/banner-target-utils.ts",
     "dsh/frontend/control-panel/platform",
     "dsh/frontend/data/platform.preview-data.ts",
@@ -396,6 +397,11 @@
     "dsh/frontend/control-panel/finance",
     "dsh/frontend/data/operational-statuses.preview-data.ts",
     "dsh/frontend/app-captain/screens/DshCaptainOperationsScreen.tsx",
+    "wlt/frontend/app-captain/dsh",
+    "wlt/frontend/app-client/dsh",
+    "wlt/frontend/app-field/dsh",
+    "wlt/frontend/app-partner/dsh",
+    "wlt/frontend/control-panel/dsh",
     "wlt/frontend/control-panel/finance"
   ],
   "lockfileNames": [

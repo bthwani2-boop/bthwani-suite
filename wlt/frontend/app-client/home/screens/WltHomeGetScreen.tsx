@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../shared/finance/providers';
+import { financeProviders } from '../../../control-panel/dsh/sharedFinanceProviders';
 
 export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { t } = useI18n();

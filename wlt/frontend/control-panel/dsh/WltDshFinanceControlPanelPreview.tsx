@@ -12,7 +12,7 @@ import {
   getWltCaptainFinanceSnapshot,
   getWltDshStoreDeliveryFinancePreview,
   type WltDshFinancePreviewRecord,
-} from '../../shared/finance/dshFinancePreview';
+} from './dshFinancePreview';
 import styles from './wlt-finance-control-panel.module.css';
 
 const PREVIEW_NOTICE =

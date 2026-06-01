@@ -2,7 +2,7 @@
  * DSH Wallet & Finance Preview Data SSoT Adapter.
  *
  * This file dynamically adapts the central WLT-owned preview data from
- * `wlt/frontend/shared/finance/dshFinancePreview.ts` to DSH's control panel views.
+ * `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` to DSH's control panel views.
  *
  * DSH has no independent financial truth.
  */
@@ -14,7 +14,7 @@ import {
   getWltFieldFinancePreview,
   type WltDshFinancePreviewRecord,
   type WltDshFinanceEventKind,
-} from '../../../wlt/frontend/shared/finance/dshFinancePreview';
+} from '../../../wlt/frontend/control-panel/dsh/dshFinancePreview';
 
 export const dshWalletPreviewDataContract = {
   dataKind: 'UI_PREVIEW_ONLY',
