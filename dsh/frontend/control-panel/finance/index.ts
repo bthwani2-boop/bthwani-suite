@@ -25,9 +25,7 @@ export {
 
 // WLT bridge workspaces — view-only surfaces; all financial truth owned by WLT
 export { WltBoundaryBanner } from './WltBoundaryBanner';
-export { PartnerSettlementWorkspace } from './PartnerSettlementWorkspace';
 export { CaptainPayoutWorkspace } from './CaptainPayoutWorkspace';
-export { RefundQueueWorkspace } from './RefundQueueWorkspace';
 export { CommissionBreakdownWorkspace } from './CommissionBreakdownWorkspace';
 export { PlatformFeeAuditWorkspace } from './PlatformFeeAuditWorkspace';
 export { FieldCommissionWorkspace } from './FieldCommissionWorkspace';

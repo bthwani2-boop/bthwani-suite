@@ -32,6 +32,9 @@ import type {
   CanonicalFinanceGroupId,
   FinancePanelId,
 } from "../../dsh/frontend/control-panel/finance/finance.types";
+import {
+  normalizeFinanceLocation,
+} from "../../dsh/frontend/control-panel/finance/finance.registry";
 import { controlPanelRuntimeData } from "./runtime.data";
 import { useControlPanelAppearance } from "./appearance";
 import type { ControlPanelUiGrammar } from "./ui-grammar-contract";
@@ -848,10 +851,15 @@ export function ControlPanelSurfaceHost({
             ) : null}
 
             {activeSectionId === "finance" ? (
-              <ControlPanelDshFinanceHubScreen
-                group={financeWorkspace as CanonicalFinanceGroupId}
-                panel={financePanel as FinancePanelId}
-              />
+              (() => {
+                const normalized = normalizeFinanceLocation(financeWorkspace, financePanel);
+                return (
+                  <ControlPanelDshFinanceHubScreen
+                    group={normalized.group}
+                    panel={normalized.panel}
+                  />
+                );
+              })()
             ) : null}
 
             {isOperationsSection ? (

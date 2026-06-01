@@ -7,78 +7,57 @@ import type {
 
 export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
   {
-    id: 'overview',
-    label: 'النظرة العامة',
-    description: 'نظرة شاملة على التدفقات المالية والسيولة. العملة: ر.ي',
+    id: 'daily-close',
+    label: 'إغلاق اليوم',
+    description: 'مراقبة وإغلاق الدورة المالية اليومية ومطابقة الفوارق والأدلة.',
     badge: 'Core',
     subGroups: [
-      { id: 'all', label: 'الكل' },
+      { id: 'summary', label: 'ملخص اليوم' },
       { id: 'inflow', label: 'الدخل' },
       { id: 'outflow', label: 'الصرف' },
       { id: 'net', label: 'الصافي' },
-      { id: 'daily-close', label: 'إغلاق اليوم' },
     ],
   },
   {
-    id: 'settlements',
-    label: 'التسويات',
-    description: 'إدارة تسويات الشركاء والكباتن والميدانيين.',
-    badge: 'Ops',
+    id: 'variances',
+    label: 'الفروقات',
+    description: 'مراجعة وحل الفوارق المالية والعمليات المشبوهة.',
+    badge: 'Audit',
     subGroups: [
-      { id: 'summary', label: 'ملخص' },
-      { id: 'captains', label: 'كباتن' },
-      { id: 'partners', label: 'متاجر' },
-      { id: 'field', label: 'ميدانيين' },
+      { id: 'all', label: 'الكل' },
+      { id: 'suspicious', label: 'عمليات مشبوهة' },
+      { id: 'audit-logs', label: 'سجلات التدقيق' },
     ],
   },
   {
-    id: 'cod-reconciliation',
-    label: 'تحصيل COD',
-    description: 'مطابقة النقد المحصّل مع الطلبات المنفذة. COD ذمة على الكابتن حتى الإيداع.',
+    id: 'cod-cash',
+    label: 'COD والكاش',
+    description: 'مطابقة النقد المحصل من الكباتن ومراقبة الذمم المالية والأهلية.',
     badge: 'Cash',
     subGroups: [
       { id: 'pending', label: 'قيد التحصيل' },
       { id: 'collected', label: 'تم التحصيل' },
-      { id: 'mismatch', label: 'فوارق' },
+      { id: 'mismatch', label: 'فوارق COD' },
+      { id: 'captain-eligibility', label: 'أهلية الكباتن' },
+      { id: 'captain-finance', label: 'مالية الكباتن' },
     ],
   },
   {
-    id: 'captain-eligibility',
-    label: 'أهلية الكابتن',
-    description: 'مراقبة رصيد الكابتن الضامن — من مؤهل ومن يحتاج شحن رصيد.',
-    badge: 'Cap',
+    id: 'settlements-payouts',
+    label: 'التسويات والمدفوعات',
+    description: 'إدارة دورات تسوية مستحقات الشركاء، الكباتن، الميدانيين وتوصيل المتاجر.',
+    badge: 'Ops',
     subGroups: [
-      { id: 'eligible', label: 'مؤهلون' },
-      { id: 'needs-topup', label: 'يحتاج شحن' },
-      { id: 'blocked', label: 'محظورون' },
-    ],
-  },
-  {
-    id: 'refunds',
-    label: 'الاستردادات',
-    description: 'إدارة طلبات استرجاع المبالغ والنزاعات.',
-    badge: 'Risk',
-    subGroups: [
-      { id: 'pending', label: 'طلبات جديدة' },
-      { id: 'processed', label: 'تمت المعالجة' },
-      { id: 'rejected', label: 'مرفوضة' },
-    ],
-  },
-  {
-    id: 'payouts',
-    label: 'المدفوعات',
-    description: 'تحضير قرارات المدفوعات وتتبع الحوالات البنكية — WLT ينفذ التحويل.',
-    badge: 'Bank',
-    subGroups: [
-      { id: 'partner-payouts', label: 'مستحقات الشركاء' },
-      { id: 'captain-payouts', label: 'مستحقات الكباتن' },
-      { id: 'field-payouts', label: 'مستحقات الميدانيين' },
+      { id: 'partners', label: 'تسويات المتاجر' },
+      { id: 'captains', label: 'تسويات الكباتن' },
+      { id: 'field', label: 'تسويات الميدانيين' },
+      { id: 'store-delivery', label: 'توصيل المتاجر' },
     ],
   },
   {
     id: 'ledger',
-    label: 'السجلات المالية',
-    description: 'دفتر الأستاذ العام وحركات القيود.',
+    label: 'دفتر الأستاذ',
+    description: 'دفتر الأستاذ العام وحركات القيود المعتمدة.',
     badge: 'Book',
     subGroups: [
       { id: 'journal', label: 'قيود اليومية' },
@@ -86,59 +65,23 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
     ],
   },
   {
-    id: 'risk-audit',
-    label: 'المخاطر والتدقيق',
-    description: 'مراجعة العمليات المشبوهة والتدقيق المالي.',
-    badge: 'Audit',
+    id: 'refunds',
+    label: 'الاستردادات',
+    description: 'إدارة طلبات استرجاع المبالغ للعملاء وحل النزاعات.',
+    badge: 'Risk',
     subGroups: [
-      { id: 'suspicious', label: 'عمليات مشبوهة' },
-      { id: 'audit-logs', label: 'سجلات التدقيق' },
+      { id: 'pending', label: 'طلبات جديدة' },
+      { id: 'processed', label: 'تمت المعالجة' },
+      { id: 'rejected', label: 'مرفوضة' },
     ],
   },
-  {
-    id: 'captain-finance',
-    label: 'مالية الكباتن',
-    description: 'مراقبة وتدقيق الحركات والذمم المالية الخاصة بكباتن بثواني.',
-    badge: 'Cap',
-    subGroups: [
-      { id: 'all', label: 'الكل' },
-      { id: 'cod-pending', label: 'COD معلّق' },
-      { id: 'payouts', label: 'مستحقات معتمدة' },
-    ],
-  },
-  {
-    id: 'store-delivery-finance',
-    label: 'مالية توصيل المتجر',
-    description: 'تدقيق ومراقبة حركات وعمولات توصيل المتاجر (توصيل المتجر الداخلي).',
-    badge: 'Store',
-    subGroups: [
-      { id: 'all', label: 'الكل' },
-      { id: 'compensation', label: 'مستحقات الموصلين' },
-      { id: 'retained-fees', label: 'رسوم محتفظة للمتجر' },
-    ],
-  },
-  // tax-compliance مخفي من القيادة النشطة — لا سياسة ضريبية يمنية مثبتة بعد
-  {
-    id: 'tax-compliance',
-    label: 'الضرائب — غير مفعلة',
-    description: 'لا سياسة ضريبية أو زكوية مثبتة في DSH حتى الآن، لذلك يبقى هذا القسم read-only وغير نشط.',
-    badge: 'مؤجل',
-    subGroups: [],
-  },
-] as const;
+];
 
 export const FINANCE_CANONICAL_GROUP_IDS = FINANCE_CANONICAL_GROUPS.map((group) => group.id) as readonly CanonicalFinanceGroupId[];
 
-// القسم النشط فعليًا — يستثني tax-compliance حتى تثبت السياسة
-export const FINANCE_ACTIVE_GROUPS = FINANCE_CANONICAL_GROUPS.filter(
-  (g) => g.id !== 'tax-compliance',
-);
+export const FINANCE_ACTIVE_GROUPS = FINANCE_CANONICAL_GROUPS;
 
-// P1: التبويبات الرئيسية في الشريط العلوي فقط.
-// captain-finance وstore-delivery-finance تُعرض كفلاتر داخلية، لا كتبويبات رئيسية.
-export const FINANCE_NAV_GROUPS = FINANCE_CANONICAL_GROUPS.filter(
-  (g) => g.id !== 'tax-compliance' && g.id !== 'captain-finance' && g.id !== 'store-delivery-finance',
-);
+export const FINANCE_NAV_GROUPS = FINANCE_CANONICAL_GROUPS;
 
 export function normalizeFinanceLocation(
   workspace?: string,
@@ -146,24 +89,47 @@ export function normalizeFinanceLocation(
 ): FinanceNormalizationResult {
   const resolvedPanel = panel as FinancePanelId | undefined;
 
-  if (!workspace || workspace === 'overview') {
-    return { kind: 'group', group: 'overview', sourceWorkspace: workspace, panel: resolvedPanel };
+  if (!workspace || workspace === 'overview' || workspace === 'daily-close') {
+    return { kind: 'group', group: 'daily-close', sourceWorkspace: workspace, panel: resolvedPanel };
   }
 
-  const directCanonical = FINANCE_CANONICAL_GROUP_IDS.find((groupId) => groupId === workspace);
-  if (directCanonical) {
-    return { kind: 'group', group: directCanonical, sourceWorkspace: directCanonical, panel: resolvedPanel };
+  if (workspace === 'risk-audit' || workspace === 'variances') {
+    return { kind: 'group', group: 'variances', sourceWorkspace: workspace, panel: resolvedPanel };
   }
 
-  return { kind: 'group', group: 'overview', sourceWorkspace: workspace, panel: resolvedPanel };
+  if (workspace === 'cod-reconciliation' || workspace === 'cod-cash') {
+    return { kind: 'group', group: 'cod-cash', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'settlements' || workspace === 'payouts' || workspace === 'settlements-payouts') {
+    return { kind: 'group', group: 'settlements-payouts', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'ledger') {
+    return { kind: 'group', group: 'ledger', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'refunds') {
+    return { kind: 'group', group: 'refunds', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'captain-eligibility' || workspace === 'captain-finance') {
+    return { kind: 'group', group: 'cod-cash', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'store-delivery-finance') {
+    return { kind: 'group', group: 'settlements-payouts', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  return { kind: 'group', group: 'daily-close', sourceWorkspace: workspace, panel: resolvedPanel };
 }
 
 export function buildFinanceHref(
-  group: CanonicalFinanceGroupId = 'overview',
+  group: CanonicalFinanceGroupId = 'daily-close',
   options?: { panel?: FinancePanelId },
 ) {
   const searchParams = new URLSearchParams();
-  if (group !== 'overview') searchParams.set('workspace', group);
+  if (group !== 'daily-close') searchParams.set('workspace', group);
   if (options?.panel) searchParams.set('panel', options.panel);
   const query = searchParams.toString();
   return query ? `/finance?${query}` : '/finance';

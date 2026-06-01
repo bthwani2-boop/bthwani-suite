@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Box, Text, Button } from '@bthwani/ui-kit';
-import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../../data/wallet.preview-data';
 
 type DayLifecycleStage =
@@ -17,12 +16,12 @@ type DayLifecycleStage =
 
 const LIFECYCLE_STAGES: ReadonlyArray<{ id: DayLifecycleStage; label: string }> = [
   { id: 'open', label: 'فتح اليوم' },
-  { id: 'expected-registered', label: 'تسجيل Expected' },
-  { id: 'actual-registered', label: 'تسجيل Actual' },
-  { id: 'reconciliation', label: 'المطابقة' },
-  { id: 'variances', label: 'الفوارق' },
-  { id: 'maker-review', label: 'Maker' },
-  { id: 'checker-approval', label: 'Checker' },
+  { id: 'expected-registered', label: 'تسجيل المتوقع' },
+  { id: 'actual-registered', label: 'تسجيل الفعلي' },
+  { id: 'reconciliation', label: 'المطابقة والتدقيق' },
+  { id: 'variances', label: 'حصر الفوارق' },
+  { id: 'maker-review', label: 'اعتماد (Maker)' },
+  { id: 'checker-approval', label: 'موافقة (Checker)' },
   { id: 'day-close', label: 'إغلاق اليوم' },
 ] as const;
 
@@ -37,42 +36,59 @@ function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLife
   return 'checker-approval';
 }
 
+function resolveRowTone(row: DshFinancePreviewRow) {
+  if (row.risk === 'danger') return 'danger' as const;
+  if (row.risk === 'warning') return 'warning' as const;
+  if (row.varianceMinorUnits !== 0 || row.evidenceStatus !== 'complete') return 'warning' as const;
+  return 'success' as const;
+}
+
 const EVIDENCE_LABEL: Record<DshFinancePreviewRow['evidenceStatus'], string> = {
-  complete: 'مكتملة',
-  partial: 'جزئية',
-  missing: 'ناقصة',
+  complete: 'مكتملة ✓',
+  partial: 'جزئية ⚠️',
+  missing: 'ناقصة 🚨',
 };
 
 const RECONCILIATION_LABEL: Record<DshFinancePreviewRow['reconciliationStatus'], string> = {
-  closed: 'مغلق',
-  matched: 'مطابق',
-  disputed: 'نزاع',
+  closed: 'مغلق ومرحل',
+  matched: 'متطابق ✓',
+  disputed: 'قيد النزاع',
   unmatched: 'غير مطابق',
 };
 
-const ALLOWED_ACTION_LABEL: Record<DshFinancePreviewRow['allowedAction'], string> = {
-  review: 'مراجعة',
-  view_evidence: 'عرض أدلة',
-  prepare_decision: 'تحضير قرار',
-  none: 'لا إجراء',
+const EVENT_KIND_LABEL: Record<string, string> = {
+  'client-payment': 'دفع عميل',
+  'wallet-payment': 'دفع محفظة',
+  'cash-on-delivery': 'COD كاش',
+  'partner-settlement': 'تسوية شريك',
+  'store-delivery-fee': 'رسوم توصيل متجر',
+  'store-courier-compensation': 'عمولة موصل',
+  'captain-earning': 'أرباح كابتن',
+  'captain-cod-liability': 'COD كابتن',
+  'captain-eligibility-topup': 'شحن رصيد كابتن',
+  'field-commission': 'عمولة ميدانية',
+  'field-commission-pending': 'عمولة معلقة',
+  'field-commission-rejected': 'عمولة مرفوضة',
+  'field-payout': 'صرف للميداني',
+  'refund-adjustment': 'تعديل استرداد',
+  'platform-commission': 'عمولة المنصة',
+  'reconciliation-export': 'تصدير مطابقة',
 };
 
-const WORKFLOW_LABEL: Record<DshFinancePreviewRow['workflowState'], string> = {
-  draft: 'مسودة',
-  prepared: 'محضّر',
-  reviewed: 'تمت المراجعة',
-  checked: 'تم الفحص',
-  approved: 'معتمد',
-  blocked_wlt: 'محظور WLT',
+const EXPECTED_SOURCE_LABEL: Record<string, string> = {
+  'order-invoice': 'فاتورة الطلب',
+  'settlement-cycle': 'دورة التسوية',
+  'commission-schedule': 'جدول العمولات',
+  'eligibility-calc': 'حسب الأهلية',
+  'preview-seed': 'بيانات معاينة',
 };
 
-const WORKFLOW_TONE: Record<DshFinancePreviewRow['workflowState'], 'neutral' | 'info' | 'success' | 'danger' | 'warning'> = {
-  draft: 'neutral',
-  prepared: 'info',
-  reviewed: 'info',
-  checked: 'warning',
-  approved: 'success',
-  blocked_wlt: 'danger',
+const ACTUAL_SOURCE_LABEL: Record<string, string> = {
+  'bank-deposit': 'إيداع بنكي',
+  'wallet-debit': 'خصم محفظة',
+  'cash-bag-delivery': 'حقيبة نقدية',
+  'pos-receipt': 'إيصال دفع',
+  'preview-seed': 'بيانات معاينة',
 };
 
 export function DailyReconciliationWorkbench() {
@@ -97,6 +113,8 @@ export function DailyReconciliationWorkbench() {
     return combined;
   }, []);
 
+  const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
+
   const currentStage = computeCurrentStage(allRows);
   const stageIndex = LIFECYCLE_STAGES.findIndex((s) => s.id === currentStage);
 
@@ -110,278 +128,271 @@ export function DailyReconciliationWorkbench() {
   const incompleteEvidenceCount = allRows.filter((r) => r.evidenceStatus !== 'complete').length;
 
   return (
-    <Box gap={4} style={{ direction: 'rtl', padding: 16, maxWidth: '100%' }}>
+    <Box gap={4} style={{ direction: 'rtl', padding: 8, maxWidth: '100%' }}>
 
-      {/* Preview warning */}
-      <Box padding={3} background="warningSurface" radiusToken="md" border borderTone="warning" gap={1}>
-        <Text role="bodyStrong" tone="muted" style={{ textAlign: 'right', fontWeight: '700' }}>
-          ⚠️ ورشة مطابقة اليوم المالي — معاينة فقط (PREVIEW_ONLY)
-        </Text>
-        <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-          WLT لم ينفذ بعد. لا إغلاق حقيقي — بيانات scaffold فقط.
-          العملة: ريال يمني (YER) · وصغ = وحدة صغرى · المالك: WLT · DSH: view_only
-        </Text>
-      </Box>
+      {/* 1. Day Close Gate Dashboard Panel */}
+      <div
+        style={{
+          background: 'var(--bthwani-control-panel-surface)',
+          border: '1px solid var(--bthwani-control-panel-border)',
+          borderRadius: 12,
+          padding: '20px 24px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: 24,
+          alignItems: 'center',
+        }}
+      >
+        {/* Visual Vault Status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: gateOpen ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+              border: `2px solid ${gateOpen ? 'rgb(16,185,129)' : 'rgb(239,68,68)'}`,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: gateOpen ? 'rgb(16,185,129)' : 'rgb(239,68,68)',
+              fontSize: 20,
+              fontWeight: '700',
+            }}
+          >
+            {gateOpen ? '✓' : '🔒'}
+          </div>
 
-      {/* Day lifecycle bar */}
-      <Box gap={2}>
-        <Text role="titleSm" style={{ textAlign: 'right', fontWeight: '700' }}>مراحل اليوم المالي</Text>
-        <Box style={{ display: 'flex', flexDirection: 'row-reverse', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
-          {LIFECYCLE_STAGES.map((stage, idx) => {
-            const isPast = idx < stageIndex;
-            const isCurrent = idx === stageIndex;
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: 15, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>
+              بوابة إغلاق اليوم المالي
+            </span>
+            <span style={{ fontSize: 12, color: gateOpen ? 'rgb(16,185,129)' : 'rgb(239,68,68)', fontWeight: '700', marginTop: 2 }}>
+              {gateOpen ? 'مفتوحة للترحيل ✓' : 'مغلقة - بانتظار تسوية البنود'}
+            </span>
+          </div>
+        </div>
+
+        {/* Sleek Integrated Process Progress Bar */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: '800', color: 'var(--bthwani-control-panel-text-muted)' }}>
+            مرحلة المزامنة النشطة:
+          </span>
+          <span style={{ fontSize: 13, fontWeight: '800', color: 'var(--bthwani-brand-primary)' }}>
+            {LIFECYCLE_STAGES[stageIndex]?.label || 'فتح اليوم'} (خطوة {stageIndex + 1} من {LIFECYCLE_STAGES.length})
+          </span>
+          <div style={{ width: '100%', minWidth: 200, height: 4, background: 'var(--bthwani-control-panel-border)', borderRadius: 2, overflow: 'hidden', marginTop: 2 }}>
+            <div style={{ width: `${((stageIndex + 1) / LIFECYCLE_STAGES.length) * 100}%`, height: '100%', background: 'var(--bthwani-brand-primary)', transition: 'width 0.3s ease' }} />
+          </div>
+        </div>
+
+        {/* Status Checklist */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: 12, fontWeight: '700', color: nonZeroVarianceCount === 0 ? 'rgb(16,185,129)' : 'rgb(239,68,68)' }}>
+              {nonZeroVarianceCount === 0 ? 'مطابقة الفوارق (٠ فارق)' : `يوجد فوارق مالية (${nonZeroVarianceCount} معلقة)`}
+            </span>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: nonZeroVarianceCount === 0 ? 'rgb(16,185,129)' : 'rgb(239,68,68)' }} />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: 12, fontWeight: '700', color: allEvidenceComplete ? 'rgb(16,185,129)' : 'rgb(245,158,11)' }}>
+              {allEvidenceComplete ? 'اكتمال المستندات والأدلة' : `أدلة مفقودة أو ناقصة (${incompleteEvidenceCount} بند)`}
+            </span>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: allEvidenceComplete ? 'rgb(16,185,129)' : 'rgb(245,158,11)' }} />
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          {gateOpen ? (
+            <Button
+              label="إرسال طلب إغلاق اليوم لـ WLT"
+              size="sm"
+              tone="brand"
+              onPress={() => {}}
+            />
+          ) : (
+            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'rgba(239,68,68,0.05)', padding: '6px 12px', borderRadius: 6 }}>
+              🔒 ترحيل الإغلاق معلق
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Reconciliation Balance Rows (Noisy table replaced with modern balance cards) */}
+      <Box gap={2} style={{ padding: '0 4px' }}>
+        <Text role="titleSm" style={{ fontWeight: '800' }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+          {allRows.map((row) => {
+            const hasVar = row.varianceMinorUnits !== 0;
+            const isExpanded = expandedRowId === row.id;
+            const rowTone = resolveRowTone(row);
+            const toneColor = rowTone === 'danger' ? 'rgb(239,68,68)' : rowTone === 'warning' ? 'rgb(245,158,11)' : 'rgb(16,185,129)';
+
             return (
-              <WebControlPanelStatusTag
-                key={stage.id}
-                label={`${isPast ? '✓' : isCurrent ? '●' : '○'} ${stage.label}`}
-                tone={isPast ? 'success' : isCurrent ? 'info' : 'neutral'}
-              />
+              <div
+                key={row.id}
+                style={{
+                  background: 'var(--bthwani-control-panel-surface)',
+                  border: '1px solid var(--bthwani-control-panel-border)',
+                  borderRight: `4px solid ${toneColor}`,
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {/* Header block with visual expected vs actual scale */}
+                <div
+                  onClick={() => setExpandedRowId(isExpanded ? null : row.id)}
+                  style={{
+                    padding: '12px 16px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                  }}
+                >
+                  {/* ID & Owner */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 160 }}>
+                    <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontWeight: '700' }}>
+                      {row.id}
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ fontSize: 13, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>
+                        {row.owner}
+                      </span>
+                      <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
+                        {EVENT_KIND_LABEL[row.eventKind] || row.eventKind}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Clean Visual Balance scale */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexGrow: 1, justifyContent: 'center', maxWidth: 460 }}>
+
+                    {/* Expected */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 120 }}>
+                      <span style={{ fontSize: 12, fontWeight: '700', color: 'rgb(59, 130, 246)', fontVariantNumeric: 'tabular-nums' }}>
+                        {row.expectedMinorUnits.toLocaleString()} وصغ
+                      </span>
+                      <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource}</span>
+                    </div>
+
+                    {/* Scale Delta Badging */}
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: '800',
+                        padding: '1px 6px',
+                        borderRadius: 4,
+                        background: hasVar ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)',
+                        color: hasVar ? 'var(--bth-danger-text)' : 'var(--bth-success-text)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {hasVar ? `فارق: ${row.varianceMinorUnits.toLocaleString()}` : 'متطابق ✓'}
+                    </div>
+
+                    {/* Actual */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: 120 }}>
+                      <span style={{ fontSize: 12, fontWeight: '700', color: 'rgb(139, 92, 246)', fontVariantNumeric: 'tabular-nums' }}>
+                        {row.actualMinorUnits.toLocaleString()} وصغ
+                      </span>
+                      <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{ACTUAL_SOURCE_LABEL[row.actualSource] || row.actualSource}</span>
+                    </div>
+
+                  </div>
+
+                  {/* Evidence pill & Chevron */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 120, justifyContent: 'flex-end' }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: '700',
+                        color: row.evidenceStatus === 'complete' ? 'rgb(16,185,129)' : 'rgb(245,158,11)',
+                        background: row.evidenceStatus === 'complete' ? 'rgba(16,185,129,0.05)' : 'rgba(245,158,11,0.05)',
+                        padding: '3px 8px',
+                        borderRadius: 4,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {row.evidenceStatus === 'complete' ? 'مكتملة' : 'ناقصة ⚠️'}
+                    </span>
+                    <span style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.15s', fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
+                      ▼
+                    </span>
+                  </div>
+
+                </div>
+
+                {/* Collapsed Panel details */}
+                {isExpanded && (
+                  <div style={{ padding: '16px 20px', borderTop: '1px solid var(--bthwani-control-panel-border)', background: 'rgba(0,0,0,0.01)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+
+                      {/* Refs */}
+                      <Box padding={2.5} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1.5}>
+                        <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>الأدلة الرقمية</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 4 }}>
+                          <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>مستند المطابقة</span>
+                          <span style={{ fontSize: 10, fontWeight: '700' }}>{EVIDENCE_LABEL[row.evidenceStatus]}</span>
+                        </div>
+                        {row.bankDepositRef && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse' }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>مرجع الإيداع</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.bankDepositRef}</code></div>}
+                        {row.cashBagRef && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 2 }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>حقيبة النقدية</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.cashBagRef}</code></div>}
+                      </Box>
+
+                      {/* Signoffs */}
+                      <Box padding={2.5} background="surfaceRaised" radiusToken="md" border borderTone="line" gap={1.5}>
+                        <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>حالة الاعتماد</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 4 }}>
+                          <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>سير العمل</span>
+                          <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد ومرحل ✓' : 'قيد المراجعة والتدقيق'}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 2 }}>
+                          <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>الإجراء</span>
+                          <span style={{ fontSize: 10, fontWeight: '700' }}>{RECONCILIATION_LABEL[row.reconciliationStatus]}</span>
+                        </div>
+                      </Box>
+
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })}
-        </Box>
+        </div>
       </Box>
 
-      {/* Reconciliation table */}
-      <Box gap={2}>
-        <Text role="titleSm" style={{ textAlign: 'right', fontWeight: '700' }}>
-          جدول المطابقة ({allRows.length} صف)
-        </Text>
-        <Box background="surfaceInset" radiusToken="md" border borderTone="line" style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', direction: 'rtl', minWidth: 780 }}>
-            <thead>
-              <tr style={{ background: 'var(--bthwani-control-panel-border)' }}>
-                {[
-                  'المعرف',
-                  'نوع الحركة',
-                  'المتوقع (وصغ)',
-                  'المصدر المتوقع',
-                  'الفعلي (وصغ)',
-                  'المصدر الفعلي',
-                  'الفارق',
-                  'الأدلة',
-                  'المطابقة',
-                  'سير العمل',
-                  'الإجراء',
-                ].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: '7px 10px',
-                      textAlign: 'right',
-                      fontSize: 11,
-                      fontWeight: '600',
-                      color: 'var(--bthwani-control-panel-text-muted)',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {allRows.map((row) => {
-                const hasVar = row.varianceMinorUnits !== 0;
-                const rowBg = hasVar
-                  ? 'rgba(220,38,38,0.05)'
-                  : row.evidenceStatus !== 'complete'
-                  ? 'rgba(202,138,4,0.05)'
-                  : 'transparent';
-
-                return (
-                  <tr
-                    key={row.id}
-                    style={{
-                      background: rowBg,
-                      borderBottom: '1px solid var(--bthwani-control-panel-border)',
-                    }}
-                  >
-                    <td style={{ padding: '6px 10px', fontSize: 11, whiteSpace: 'nowrap', fontWeight: '600' }}>
-                      {row.id}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)', whiteSpace: 'nowrap' }}>
-                      {row.eventKind}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 12, fontVariantNumeric: 'tabular-nums', textAlign: 'left', direction: 'ltr' }}>
-                      {row.expectedMinorUnits.toLocaleString()}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)', whiteSpace: 'nowrap' }}>
-                      {row.expectedSource}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 12, fontVariantNumeric: 'tabular-nums', textAlign: 'left', direction: 'ltr' }}>
-                      {row.actualMinorUnits.toLocaleString()}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)', whiteSpace: 'nowrap' }}>
-                      {row.actualSource}
-                    </td>
-                    <td style={{
-                      padding: '6px 10px',
-                      fontSize: 12,
-                      fontWeight: '700',
-                      color: hasVar ? 'var(--bth-danger-text)' : 'var(--bth-success-text)',
-                      textAlign: 'left',
-                      direction: 'ltr',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {hasVar ? `${row.varianceMinorUnits.toLocaleString()} ⚠` : '0 ✓'}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, whiteSpace: 'nowrap',
-                      color: row.evidenceStatus === 'complete' ? 'var(--bth-success-text)'
-                        : row.evidenceStatus === 'partial' ? 'var(--bth-warning-text)'
-                        : 'var(--bth-danger-text)',
-                    }}>
-                      {EVIDENCE_LABEL[row.evidenceStatus]}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, whiteSpace: 'nowrap' }}>
-                      {RECONCILIATION_LABEL[row.reconciliationStatus]}
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, whiteSpace: 'nowrap' }}>
-                      <WebControlPanelStatusTag
-                        label={WORKFLOW_LABEL[row.workflowState]}
-                        tone={WORKFLOW_TONE[row.workflowState]}
-                      />
-                    </td>
-                    <td style={{ padding: '6px 10px', fontSize: 11, whiteSpace: 'nowrap', color: 'var(--bthwani-control-panel-text-muted)' }}>
-                      {ALLOWED_ACTION_LABEL[row.allowedAction]}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </Box>
-      </Box>
-
-      {/* Day summary strip */}
+      {/* 4. Sleek Summary Stats Strip */}
       <Box
         padding={3}
         background="surfaceRaised"
-        radiusToken="md"
+        radiusToken="lg"
         border
         borderTone="line"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}
       >
         {[
-          {
-            label: 'إجمالي المتوقع',
-            value: `${totalExpected.toLocaleString()} وصغ`,
-            color: undefined,
-          },
-          {
-            label: 'إجمالي الفعلي',
-            value: `${totalActual.toLocaleString()} وصغ`,
-            color: undefined,
-          },
-          {
-            label: 'إجمالي الفارق',
-            value: totalVariance !== 0 ? `${totalVariance.toLocaleString()} ⚠` : '٠ ✓',
-            color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)',
-          },
-          {
-            label: 'الأدلة المكتملة',
-            value: `${allRows.filter((r) => r.evidenceStatus === 'complete').length}/${allRows.length}`,
-            color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
-          },
+          { label: 'إجمالي المبالغ المتوقعة', value: `${totalExpected.toLocaleString()} وصغ`, color: 'rgb(59, 130, 246)' },
+          { label: 'إجمالي المبالغ الفعلية الموردة', value: `${totalActual.toLocaleString()} وصغ`, color: 'rgb(139, 92, 246)' },
+          { label: 'صافي الفارق المالي الإجمالي', value: totalVariance !== 0 ? `${totalVariance.toLocaleString()} وصغ ⚠` : '٠ وصغ ✓', color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
+          { label: 'اكتمال مستندات المطابقة', value: `${allRows.filter((r) => r.evidenceStatus === 'complete').length}/${allRows.length} بند`, color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' },
         ].map(({ label, value, color }) => (
-          <Box key={label} gap={1}>
+          <Box key={label} gap={1} style={{ borderRight: '3px solid var(--bthwani-control-panel-border)', paddingRight: 10 }}>
             <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{label}</Text>
-            <Text role="titleSm" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '700', color: color ?? undefined }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '800', color, fontSize: 14 }}>
               {value}
             </Text>
           </Box>
         ))}
       </Box>
 
-      {/* Day close gate */}
-      <Box
-        padding={4}
-        background={gateOpen ? 'successSurface' : 'dangerSurface'}
-        radiusToken="lg"
-        border
-        borderTone={gateOpen ? 'success' : 'danger'}
-        gap={2}
-      >
-        <Text
-          role="titleSm"
-          tone={gateOpen ? 'success' : 'danger'}
-          style={{ textAlign: 'right', fontWeight: '700' }}
-        >
-          {gateOpen ? '✓ بوابة الإغلاق: مفتوحة — (معاينة فقط)' : '🔴 بوابة الإغلاق: مغلقة'}
-        </Text>
 
-        {gateOpen ? (
-          <Box gap={2}>
-            <Text role="bodySm" tone="success" style={{ textAlign: 'right' }}>
-              جميع الفوارق صفر · جميع الأدلة مكتملة.
-              يمكن إرسال طلب إغلاق اليوم إلى WLT engine عبر POST /wlt/dsh/control-panel/daily-close.
-            </Text>
-            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-              [CONTRACT_SCAFFOLD_PREVIEW_ONLY] — WLT لم ينفذ endpoint الإغلاق بعد. Idempotency-Key مطلوب.
-            </Text>
-            <Button
-              label="إرسال طلب إغلاق اليوم (معاينة — محظور حقيقيًا)"
-              size="sm"
-              tone="neutral"
-              onPress={() => { /* preview only — no real POST */ }}
-            />
-          </Box>
-        ) : (
-          <Box gap={1}>
-            {nonZeroVarianceCount > 0 ? (
-              <Text role="bodySm" tone="danger" style={{ textAlign: 'right' }}>
-                • {nonZeroVarianceCount} صف بفارق غير صفري — يجب حل جميع الفوارق
-              </Text>
-            ) : null}
-            {incompleteEvidenceCount > 0 ? (
-              <Text role="bodySm" tone="danger" style={{ textAlign: 'right' }}>
-                • {incompleteEvidenceCount} صف بأدلة غير مكتملة — يجب رفع جميع الأدلة
-              </Text>
-            ) : null}
-            <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: 4 }}>
-              WLT endpoint: POST /wlt/dsh/control-panel/daily-close · يرجع 422 عند وجود فوارق أو أدلة ناقصة.
-              [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
-            </Text>
-          </Box>
-        )}
-      </Box>
-
-      {/* Maker-Checker preview workflow */}
-      <Box gap={2}>
-        <Text role="titleSm" style={{ textAlign: 'right', fontWeight: '700' }}>
-          نموذج Maker-Checker (معاينة — four-eyes)
-        </Text>
-        <Box padding={3} background="surfaceInset" radiusToken="md" border borderTone="line" gap={2}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-            أي إغلاق مالي يتطلب four-eyes: Maker يحضّر القرار → Checker يراجع → WLT يعتمد وينفذ.
-            لا تنفيذ مالي من DSH في أي مرحلة. سير العمل مشروط بـ varianceMinorUnits === 0 في جميع الصفوف.
-          </Text>
-          <Box style={{ display: 'flex', flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
-            {[
-              { step: '١', label: 'Maker — تحضير القرار', done: stageIndex >= 5 },
-              { step: '٢', label: 'Checker — مراجعة وفحص', done: stageIndex >= 6 },
-              { step: '٣', label: 'WLT engine — تنفيذ الإغلاق', done: false },
-            ].map(({ step, label, done }) => (
-              <Box
-                key={step}
-                padding={2}
-                background={done ? 'successSurface' : 'surfaceRaised'}
-                radiusToken="sm"
-                border
-                borderTone={done ? 'success' : 'line'}
-                gap={1}
-              >
-                <Text role="caption" tone={done ? 'success' : 'muted'} style={{ textAlign: 'right', whiteSpace: 'nowrap', fontWeight: '600' }}>
-                  {done ? '✓' : '○'} {step}) {label}
-                </Text>
-                <WebControlPanelStatusTag
-                  label={done ? 'مكتمل في المعاينة' : '[معاينة — غير منفذ]'}
-                  tone={done ? 'success' : 'neutral'}
-                />
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      </Box>
     </Box>
   );
 }
