@@ -20,19 +20,22 @@ const LIFECYCLE_STAGES: ReadonlyArray<{ id: DayLifecycleStage; label: string }> 
   { id: 'actual-registered', label: 'تسجيل الفعلي' },
   { id: 'reconciliation', label: 'المطابقة والتدقيق' },
   { id: 'variances', label: 'حصر الفوارق' },
-  { id: 'maker-review', label: 'اعتماد (Maker)' },
+  { id: 'maker-review', label: 'تحضير (Maker)' },
   { id: 'checker-approval', label: 'موافقة (Checker)' },
   { id: 'day-close', label: 'إغلاق اليوم' },
 ] as const;
 
 function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLifecycleStage {
   if (rows.length === 0) return 'open';
-  if (rows.some((r) => r.expectedSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
-  if (rows.some((r) => r.actualSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
-  if (rows.some((r) => r.reconciliationStatus === 'unmatched')) return 'reconciliation';
+  // Critical blocking conditions checked first — blocked_wlt and variances take priority over source quality
+  if (rows.some((r) => r.workflowState === 'blocked_wlt')) return 'variances';
   if (rows.some((r) => r.varianceMinorUnits !== 0)) return 'variances';
+  if (rows.some((r) => r.reconciliationStatus === 'unmatched' || r.reconciliationStatus === 'disputed')) return 'reconciliation';
   if (rows.some((r) => r.evidenceStatus !== 'complete')) return 'maker-review';
   if (rows.some((r) => r.workflowState !== 'checked' && r.workflowState !== 'approved')) return 'maker-review';
+  // Source quality — only a fallback note when no critical issue blocks
+  if (rows.some((r) => r.expectedSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
+  if (rows.some((r) => r.actualSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
   return 'checker-approval';
 }
 
@@ -122,10 +125,14 @@ export function DailyReconciliationWorkbench() {
   const totalActual = allRows.reduce((s, r) => s + r.actualMinorUnits, 0);
   const totalVariance = totalExpected - totalActual;
   const allEvidenceComplete = allRows.every((r) => r.evidenceStatus === 'complete');
-  const gateOpen = totalVariance === 0 && allEvidenceComplete;
+  const allRowsApproved = allRows.every((r) => r.workflowState === 'checked' || r.workflowState === 'approved');
+  const noBlockedWlt = allRows.every((r) => r.workflowState !== 'blocked_wlt');
+  const gateOpen = totalVariance === 0 && allEvidenceComplete && allRowsApproved && noBlockedWlt;
 
   const nonZeroVarianceCount = allRows.filter((r) => r.varianceMinorUnits !== 0).length;
   const incompleteEvidenceCount = allRows.filter((r) => r.evidenceStatus !== 'complete').length;
+  const blockedWltCount = allRows.filter((r) => r.workflowState === 'blocked_wlt').length;
+  const pendingApprovalCount = allRows.filter((r) => r.workflowState !== 'checked' && r.workflowState !== 'approved').length;
 
   return (
     <Box gap={4} style={{ direction: 'rtl', padding: 8, maxWidth: '100%' }}>
@@ -150,12 +157,12 @@ export function DailyReconciliationWorkbench() {
               width: 56,
               height: 56,
               borderRadius: '50%',
-              background: gateOpen ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-              border: `2px solid ${gateOpen ? 'rgb(16,185,129)' : 'rgb(239,68,68)'}`,
+              background: gateOpen ? 'var(--bth-success-surface)' : 'var(--bth-danger-surface)',
+              border: `2px solid ${gateOpen ? 'var(--bth-success-text)' : 'var(--bth-danger-text)'}`,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              color: gateOpen ? 'rgb(16,185,129)' : 'rgb(239,68,68)',
+              color: gateOpen ? 'var(--bth-success-text)' : 'var(--bth-danger-text)',
               fontSize: 20,
               fontWeight: '700',
             }}
@@ -167,8 +174,8 @@ export function DailyReconciliationWorkbench() {
             <span style={{ fontSize: 15, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>
               بوابة إغلاق اليوم المالي
             </span>
-            <span style={{ fontSize: 12, color: gateOpen ? 'rgb(16,185,129)' : 'rgb(239,68,68)', fontWeight: '700', marginTop: 2 }}>
-              {gateOpen ? 'مفتوحة للترحيل ✓' : 'مغلقة - بانتظار تسوية البنود'}
+            <span style={{ fontSize: 12, color: gateOpen ? 'var(--bth-success-text)' : 'var(--bth-danger-text)', fontWeight: '700', marginTop: 2 }}>
+              {gateOpen ? 'جاهزة للمحاكاة ✓ (معاينة فقط)' : 'مغلقة - بانتظار اكتمال الشروط'}
             </span>
           </div>
         </div>
@@ -186,20 +193,34 @@ export function DailyReconciliationWorkbench() {
           </div>
         </div>
 
-        {/* Status Checklist */}
+        {/* Status Checklist — 4 gate conditions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: 12, fontWeight: '700', color: nonZeroVarianceCount === 0 ? 'rgb(16,185,129)' : 'rgb(239,68,68)' }}>
+            <span style={{ fontSize: 12, fontWeight: '700', color: nonZeroVarianceCount === 0 ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }}>
               {nonZeroVarianceCount === 0 ? 'مطابقة الفوارق (٠ فارق)' : `يوجد فوارق مالية (${nonZeroVarianceCount} معلقة)`}
             </span>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: nonZeroVarianceCount === 0 ? 'rgb(16,185,129)' : 'rgb(239,68,68)' }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: nonZeroVarianceCount === 0 ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }} />
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: 12, fontWeight: '700', color: allEvidenceComplete ? 'rgb(16,185,129)' : 'rgb(245,158,11)' }}>
+            <span style={{ fontSize: 12, fontWeight: '700', color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }}>
               {allEvidenceComplete ? 'اكتمال المستندات والأدلة' : `أدلة مفقودة أو ناقصة (${incompleteEvidenceCount} بند)`}
             </span>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: allEvidenceComplete ? 'rgb(16,185,129)' : 'rgb(245,158,11)' }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }} />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: 12, fontWeight: '700', color: allRowsApproved ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }}>
+              {allRowsApproved ? 'اكتمال مسار Maker-Checker' : `بنود تنتظر المراجعة والاعتماد (${pendingApprovalCount})`}
+            </span>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: allRowsApproved ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }} />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: 'row-reverse', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: 12, fontWeight: '700', color: noBlockedWlt ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }}>
+              {noBlockedWlt ? 'لا توجد بنود محجوبة من WLT' : `بنود محجوبة من WLT (${blockedWltCount})`}
+            </span>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: noBlockedWlt ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }} />
           </div>
         </div>
 
@@ -207,13 +228,13 @@ export function DailyReconciliationWorkbench() {
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           {gateOpen ? (
             <Button
-              label="إرسال طلب إغلاق اليوم لـ WLT"
+              label="تحضير محاكاة إغلاق اليوم [معاينة]"
               size="sm"
-              tone="brand"
+              tone="neutral"
               onPress={() => {}}
             />
           ) : (
-            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'rgba(239,68,68,0.05)', padding: '6px 12px', borderRadius: 6 }}>
+            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'var(--bth-danger-surface)', padding: '6px 12px', borderRadius: 6 }}>
               🔒 ترحيل الإغلاق معلق
             </span>
           )}
@@ -229,7 +250,7 @@ export function DailyReconciliationWorkbench() {
             const hasVar = row.varianceMinorUnits !== 0;
             const isExpanded = expandedRowId === row.id;
             const rowTone = resolveRowTone(row);
-            const toneColor = rowTone === 'danger' ? 'rgb(239,68,68)' : rowTone === 'warning' ? 'rgb(245,158,11)' : 'rgb(16,185,129)';
+            const toneColor = rowTone === 'danger' ? 'var(--bth-danger-text)' : rowTone === 'warning' ? 'var(--bth-warning-text)' : 'var(--bth-success-text)';
 
             return (
               <div
@@ -277,7 +298,7 @@ export function DailyReconciliationWorkbench() {
 
                     {/* Expected */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 120 }}>
-                      <span style={{ fontSize: 12, fontWeight: '700', color: 'rgb(59, 130, 246)', fontVariantNumeric: 'tabular-nums' }}>
+                      <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-info-text)', fontVariantNumeric: 'tabular-nums' }}>
                         {row.expectedMinorUnits.toLocaleString()} وصغ
                       </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource}</span>
@@ -290,7 +311,7 @@ export function DailyReconciliationWorkbench() {
                         fontWeight: '800',
                         padding: '1px 6px',
                         borderRadius: 4,
-                        background: hasVar ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)',
+                        background: hasVar ? 'var(--bth-danger-surface)' : 'var(--bth-success-surface)',
                         color: hasVar ? 'var(--bth-danger-text)' : 'var(--bth-success-text)',
                         whiteSpace: 'nowrap',
                       }}
@@ -314,8 +335,8 @@ export function DailyReconciliationWorkbench() {
                       style={{
                         fontSize: 10,
                         fontWeight: '700',
-                        color: row.evidenceStatus === 'complete' ? 'rgb(16,185,129)' : 'rgb(245,158,11)',
-                        background: row.evidenceStatus === 'complete' ? 'rgba(16,185,129,0.05)' : 'rgba(245,158,11,0.05)',
+                        color: row.evidenceStatus === 'complete' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
+                        background: row.evidenceStatus === 'complete' ? 'var(--bth-success-surface)' : 'var(--bth-warning-surface)',
                         padding: '3px 8px',
                         borderRadius: 4,
                         whiteSpace: 'nowrap',
@@ -351,7 +372,7 @@ export function DailyReconciliationWorkbench() {
                         <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>حالة الاعتماد</span>
                         <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 4 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>سير العمل</span>
-                          <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد ومرحل ✓' : 'قيد المراجعة والتدقيق'}</span>
+                          <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد ومرحل ✓' : row.workflowState === 'blocked_wlt' ? 'محجوب من WLT 🚨' : 'قيد المراجعة والتدقيق'}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 2 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>الإجراء</span>
@@ -378,7 +399,7 @@ export function DailyReconciliationWorkbench() {
         style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}
       >
         {[
-          { label: 'إجمالي المبالغ المتوقعة', value: `${totalExpected.toLocaleString()} وصغ`, color: 'rgb(59, 130, 246)' },
+          { label: 'إجمالي المبالغ المتوقعة', value: `${totalExpected.toLocaleString()} وصغ`, color: 'var(--bth-info-text)' },
           { label: 'إجمالي المبالغ الفعلية الموردة', value: `${totalActual.toLocaleString()} وصغ`, color: 'rgb(139, 92, 246)' },
           { label: 'صافي الفارق المالي الإجمالي', value: totalVariance !== 0 ? `${totalVariance.toLocaleString()} وصغ ⚠` : '٠ وصغ ✓', color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
           { label: 'اكتمال مستندات المطابقة', value: `${allRows.filter((r) => r.evidenceStatus === 'complete').length}/${allRows.length} بند`, color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' },
