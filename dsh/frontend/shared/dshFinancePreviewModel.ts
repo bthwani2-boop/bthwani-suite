@@ -48,7 +48,18 @@ export type DshWltBridgeContractStatus =
  * These fields are DISPLAYED — none allow mutation. */
 export type DshWltFinanceBoundaryRecord = {
   /** WLT finance domain this record represents */
-  readonly domain: 'refund' | 'settlement' | 'payout' | 'commission' | 'platform-fee' | 'field-commission';
+  readonly domain:
+    | 'refund'
+    | 'settlement'
+    | 'payout'
+    | 'commission'
+    | 'platform-fee'
+    | 'field-commission'
+    | 'cod-liability'
+    | 'ledger-journal'
+    | 'captain-eligibility'
+    | 'store-delivery-fee'
+    | 'risk-audit';
   /** Source of financial truth — always WLT */
   readonly source: 'WLT';
   /** DSH capability — always view-only */

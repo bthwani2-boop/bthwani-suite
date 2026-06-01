@@ -102,17 +102,17 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
   let primaryActionLabel = 'معاينة التفاصيل';
 
   if (record.kind === 'captain-cod-liability') {
-    nextAction = 'تأكيد إيداع COD في البنك والمطابقة';
-    primaryActionLabel = 'مطابقة الإيداع';
+    nextAction = 'تحضير طلب مطابقة COD — WLT ينفذ التحقق من الإيداع';
+    primaryActionLabel = 'تحضير مطابقة';
   } else if (record.kind === 'refund-adjustment') {
-    nextAction = 'مراجعة مستندات الاسترداد والنزاع';
+    nextAction = 'دراسة مستندات الاسترداد والنزاع — WLT يقرر النتيجة';
     primaryActionLabel = 'معاينة الاسترداد';
   } else if (record.kind === 'partner-settlement') {
-    nextAction = 'مراجعة دورة التسوية وتحويل المستحقات';
+    nextAction = 'دراسة دورة التسوية — WLT ينفذ التحويل';
     primaryActionLabel = 'مراجعة التسوية';
   } else if (record.kind === 'field-commission-pending') {
-    nextAction = 'مراجعة مستندات الاستقطاب والتفعيل الميداني';
-    primaryActionLabel = 'اعتماد العمولات';
+    nextAction = 'دراسة مستندات الاستقطاب والتفعيل الميداني — WLT يعتمد';
+    primaryActionLabel = 'تحضير مراجعة العمولات';
   } else if (record.kind === 'reconciliation-export') {
     nextAction = 'بدء مطابقة دورة اليوم المالي';
     primaryActionLabel = 'معاينة السجل المالي';

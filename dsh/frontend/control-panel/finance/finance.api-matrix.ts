@@ -117,13 +117,13 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['refund_approve', 'refund_reject', 'refund_write'],
-    displayDomain: 'طلبات الاسترداد والنزاعات — WLT يقرر النتيجة',
+    displayDomain: 'طلبات الاسترداد والنزاعات عبر دورات المطابقة — WLT يقرر النتيجة؛ endpoint استرداد مستقل لم يُعرَّف في scaffold بعد',
   },
   {
     screen: 'ledger',
     screenLabel: 'دفتر الأستاذ',
-    wltEndpoint: '/wlt/dsh/captain/earnings',
-    operationId: 'getCaptainEarnings',
+    wltEndpoint: '/wlt/dsh/control-panel/finance/overview',
+    operationId: 'getControlPanelFinanceOverview',
     httpMethod: 'GET',
     dshRole: 'view_only',
     requiresIdempotency: false,
@@ -131,7 +131,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['journal_entry', 'balance_adjust', 'ledger_write'],
-    displayDomain: 'قيود اليومية وميزان المراجعة — debit/credit/amountMinorUnits/sourceEvent',
+    displayDomain: 'قيود اليومية وميزان المراجعة — endpoint دفتر الأستاذ المستقل لم يُعرَّف في WLT scaffold بعد؛ يستخدم overview كبديل مؤقت',
   },
   {
     screen: 'risk-audit',
@@ -173,7 +173,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
     isImplemented: false,
     ownerService: 'wlt',
     forbiddenActions: ['courier_payout', 'fee_adjust', 'compensation_override'],
-    displayDomain: 'عمولات ورسوم موصلي المتاجر (store_courier_mode) — مفصولة عن كباتن بثواني',
+    displayDomain: 'عمولات ورسوم موصلي المتاجر (store_courier_mode) — مفصولة عن كباتن بثواني؛ يستخدم field/commissions كأقرب endpoint متاح في scaffold',
   },
 ] as const;
 

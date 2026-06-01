@@ -26,12 +26,16 @@ type FinanceRow = DshFinancePreviewRow;
 const FINANCE_ROWS = dshFinanceControlPanelPreviewRows;
 
 function resolveSurfaceDomain(surface: FinanceSurface): DshWltFinanceBoundaryRecord['domain'] {
-  if (surface === 'settlements' || surface === 'captain-finance') return 'settlement';
-  if (surface === 'payouts' || surface === 'captain-eligibility') return 'payout';
+  if (surface === 'settlements') return 'settlement';
+  if (surface === 'payouts') return 'payout';
+  if (surface === 'captain-eligibility') return 'captain-eligibility';
   if (surface === 'refunds') return 'refund';
-  if (surface === 'ledger') return 'commission';
-  if (surface === 'risk-audit' || surface === 'overview') return 'platform-fee';
-  if (surface === 'store-delivery-finance') return 'field-commission';
+  if (surface === 'cod-reconciliation') return 'cod-liability';
+  if (surface === 'ledger') return 'ledger-journal';
+  if (surface === 'risk-audit') return 'risk-audit';
+  if (surface === 'overview') return 'platform-fee';
+  if (surface === 'captain-finance') return 'settlement';
+  if (surface === 'store-delivery-finance') return 'store-delivery-fee';
   return 'platform-fee';
 }
 
@@ -54,7 +58,7 @@ function resolveSurfaceDescription(surface: FinanceSurface) {
   if (surface === 'cod-reconciliation') return 'مطابقة الدفع عند الاستلام — الفوارق النقدية والتحقيقات المفتوحة. الكابتن مسؤول عن COD كذمة حتى الإيداع (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'refunds') return 'صف الاستردادات والنزاعات وما يرتبط بها من مراجعات (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'captain-eligibility') return 'مراقبة الرصيد الضامن للكباتن — من مؤهل لاستقبال الطلبات ومن يحتاج شحن رصيد (معاينة فقط — مملوكة لـ WLT).';
-  if (surface === 'payouts') return 'إطلاق المدفوعات ومراقبة التعارضات قبل التحويل (معاينة فقط — مملوكة لـ WLT).';
+  if (surface === 'payouts') return 'تحضير قرارات المدفوعات ومراقبة التعارضات — WLT ينفذ الإطلاق (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'ledger') return 'القيود اليومية وميزان المراجعة في غرفة عمل واحدة (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'captain-finance') return 'مراقبة وتدقيق الحركات والذمم المالية الخاصة بكباتن بثواني (bthwani_captain_mode) حصراً (معاينة فقط — مملوكة لـ WLT).';
   if (surface === 'store-delivery-finance') return 'تدقيق عمولات ورسوم توصيل المتاجر (توصيل المتجر الداخلي - store_courier_mode) المنفصلة عن كباتن بثواني (معاينة فقط — مملوكة لـ WLT).';
@@ -242,7 +246,7 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
           ) : (
             <WebControlPanelQueue
               title={`صف ${resolveSurfaceLabel(surface)}`}
-              meta="كل صف مالي يحتفظ بقرار واحد واضح: مراجعة، اعتماد، أو فتح الأدلة قبل أي حركة لاحقة."
+              meta="كل صف مالي يحتفظ بإجراء واحد: مراجعة الوضع أو فتح الأدلة — لا تنفيذ مالي من DSH."
               pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />}
             >
               {rows.slice(0, 6).map((row) => (
@@ -284,10 +288,10 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
                 <Text role="bodySm" style={{ textAlign: 'right' }}><strong>نوع الحركة:</strong> {selectedRow.eventKind}</Text>
                 <Text role="bodySm" style={{ textAlign: 'right' }}><strong>مالك الخدمة:</strong> {selectedRow.ownerService} · <strong>دور DSH:</strong> {selectedRow.dshRole}</Text>
                 {/* ─── Zero-Variance Model ─── */}
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>المتوقع:</strong> {selectedRow.expectedMinorUnits.toLocaleString('ar-YE')} هللة YER</Text>
-                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الفعلي:</strong> {selectedRow.actualMinorUnits.toLocaleString('ar-YE')} هللة YER</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>المتوقع:</strong> {selectedRow.expectedMinorUnits.toLocaleString('ar-YE')} وحدة صغرى</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الفعلي:</strong> {selectedRow.actualMinorUnits.toLocaleString('ar-YE')} وحدة صغرى</Text>
                 <Text role="bodySm" style={{ textAlign: 'right', color: selectedRow.varianceMinorUnits !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)', fontWeight: '700' }}>
-                  <strong>الفارق:</strong> {selectedRow.varianceMinorUnits.toLocaleString('ar-YE')} هللة YER
+                  <strong>الفارق:</strong> {selectedRow.varianceMinorUnits.toLocaleString('ar-YE')} وحدة صغرى
                   {selectedRow.varianceMinorUnits !== 0 ? ' ⚠️ لا إغلاق' : ' ✓ صفر'}
                 </Text>
                 {/* ─── Evidence & Reconciliation ─── */}
@@ -341,7 +345,7 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
                 })()}
                 <Text role="bodySm" style={{ textAlign: 'right' }}><strong>حالة العقد:</strong> <span style={{ color: 'var(--bth-warning-text)', fontWeight: 'bold' }}>{getWltControlPanelFinancePreview().contractState}</span></Text>
                 <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: 8 }}>
-                  * العملة ريال يمني (YER) — الأرقام بالهللة (minor units). المالك الكامل: WLT.
+                  * العملة ريال يمني (YER) — الأرقام بوحدات صغرى (minor units). المالك الكامل: WLT.
                 </Text>
               </Box>
             ) : (
