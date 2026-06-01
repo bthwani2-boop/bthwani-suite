@@ -17,6 +17,7 @@
 import type { DshOnDemandPolicy, DshSurfaceId } from './dsh-flow-registry';
 
 export const DSH_CONTROL_PANEL_SECTION_IDS = [
+  'dashboard',
   'operations',
   'support',
   'finance',
@@ -25,6 +26,7 @@ export const DSH_CONTROL_PANEL_SECTION_IDS = [
   'marketing',
   'platform',
   'administration',
+  'hr',
 ] as const;
 
 export type DshControlPanelSectionId = (typeof DSH_CONTROL_PANEL_SECTION_IDS)[number];
@@ -48,6 +50,29 @@ export type DshControlPanelGovernanceEntry = {
 };
 
 export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSectionId, DshControlPanelGovernanceEntry>> = {
+  dashboard: {
+    sectionId: 'dashboard',
+    sectionLabel: 'لوحة القيادة',
+    ownerRole: 'DSH Closure Evidence Owner',
+    relatedRegistryFlowIds: [
+      'order-accept',
+      'client-order-tracking',
+      'partner-finance-bridge',
+      'control-sla-policy',
+      'control-escalation-queue',
+    ],
+    relatedMobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
+    policyOwner: 'control-panel',
+    escalationOwner: 'control-panel',
+    financeReference: 'preview-only',
+    varsReference: 'platform',
+    allowedActions: ['عرض ملخص الإغلاق', 'فتح الأدلة عند الطلب', 'توجيه المستخدم إلى القسم المالك'],
+    forbiddenActions: ['اعتماد إغلاق نهائي', 'تنفيذ mutation', 'استبدال أدلة الأقسام المالكة'],
+    onDemandPolicySummary: ['summary-only', 'detail-on-open', 'evidence-on-open'],
+    evidenceRequired: true,
+    screenshotRequired: true,
+    notes: 'لوحة القيادة تعرض ملخص الإغلاق والروابط فقط. كل قرار أو إجراء يبقى داخل القسم المالك ولا يتحول dashboard إلى مالك بديل.',
+  },
   operations: {
     sectionId: 'operations',
     sectionLabel: 'العمليات',
@@ -240,6 +265,26 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     evidenceRequired: false,
     screenshotRequired: true,
     notes: 'administration يحكم الصلاحيات وسلسلة الاعتماد فقط، ولا يجب أن يتحول إلى مستودع logic تشغيلي أو مالي أو تسويقي.',
+  },
+  hr: {
+    sectionId: 'hr',
+    sectionLabel: 'الموارد البشرية',
+    ownerRole: 'Control Panel HR Preview Owner',
+    relatedRegistryFlowIds: [
+      'control-sla-policy',
+      'control-escalation-queue',
+    ],
+    relatedMobileSurfaces: ['control-panel'],
+    policyOwner: 'control-panel',
+    escalationOwner: 'control-panel',
+    financeReference: 'none',
+    varsReference: 'platform',
+    allowedActions: ['عرض حالة HR المحجوبة', 'توضيح سبب تعطيل الأفعال', 'توجيه الربط إلى backend HR لاحقًا'],
+    forbiddenActions: ['إنشاء بيانات موظفين محلية', 'تفعيل إجراء HR بدون API', 'خلط HR مع administration أو operations'],
+    onDemandPolicySummary: ['summary-only', 'detail-on-open'],
+    evidenceRequired: false,
+    screenshotRequired: true,
+    notes: 'HR route موجود في الشل لكنه يبقى preview/blocked حتى يثبت backend HR. لا يملك بيانات موظفين محلية ولا صلاحية تشغيلية حالية.',
   },
 } as const;
 

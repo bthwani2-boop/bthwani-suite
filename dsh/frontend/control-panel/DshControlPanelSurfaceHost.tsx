@@ -8,6 +8,7 @@ import {
   type AnyOperationsWorkspaceId,
   type OperationsPanelId,
 } from './operations';
+import { ControlPanelDshClosureDashboardScreen } from './dashboard';
 import { ControlPanelDshSupportHubScreen } from './support/SupportHubScreens';
 import { ControlPanelDshFinanceHubScreen } from './finance/FinanceHubScreen';
 import type { CanonicalFinanceGroupId, FinancePanelId } from './finance/finance.types';
@@ -16,6 +17,7 @@ import { ControlPanelDshPartnerApprovalsScreen } from './partners/ControlPanelDs
 import { ControlPanelDshMarketingScreen } from './marketing/ControlPanelDshMarketingScreen';
 import { ControlPanelDshPlatformScreen } from './platform/ControlPanelDshPlatformScreen';
 import { ControlPanelDshAdministrationScreen } from './administration/ControlPanelDshAdministrationScreen';
+import { ControlPanelHrScreen } from './hr/ControlPanelHrScreen';
 import type { DshControlPanelSectionId } from './shared/dsh-control-panel-governance.map';
 
 export type DshControlPanelSurfaceHostProps = {
@@ -45,6 +47,10 @@ export function DshControlPanelSurfaceHost({
       router.push(normalizedLocation.href);
     }
   }, [normalizedLocation, router]);
+
+  if (section === 'dashboard') {
+    return <ControlPanelDshClosureDashboardScreen />;
+  }
 
   if (section === 'operations') {
     if (normalizedLocation?.kind === 'redirect') {
@@ -87,6 +93,10 @@ export function DshControlPanelSurfaceHost({
 
   if (section === 'administration') {
     return <ControlPanelDshAdministrationScreen />;
+  }
+
+  if (section === 'hr') {
+    return <ControlPanelHrScreen />;
   }
 
   return null;

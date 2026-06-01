@@ -49,6 +49,7 @@ import type {
 } from '../contracts/dsh-client-binding.contracts';
 import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
+import { DSH_ORDER_JOURNEY_STEPS } from '../../shared/dsh-order-journey.model';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
@@ -122,11 +123,7 @@ type DshTrackingTimelineItem = {
   done: boolean;
 };
 
-type JourneyStep = {
-  id: string;
-  title: string;
-  detail: string;
-};
+type JourneyStep = { id: string; title: string; detail: string };
 
 type JourneyPhase = 'route' | 'arrived' | 'received';
 
@@ -195,21 +192,7 @@ const defaultCreateOrderValues: CreateOrderValues = {
   note: 'لا توجد ملاحظات',
 };
 
-const FULL_JOURNEY_STEPS: JourneyStep[] = [
-  { id: 'order_submitted', title: 'تم تقديم الطلب', detail: 'الطلب بانتظار مراجعة فريق العمليات.' },
-  { id: 'operations_review', title: 'مراجعة العمليات', detail: 'يراجع فريق العمليات الطلب قبل التأكيد.' },
-  { id: 'operations_approved', title: 'اعتماد العمليات', detail: 'تمت الموافقة على الطلب.' },
-  { id: 'order_received', title: 'استلم المتجر', detail: 'استلم المتجر الطلب وبدأ التجهيز.' },
-  { id: 'preparing', title: 'قيد التجهيز', detail: 'يجهّز المتجر الطلب.' },
-  { id: 'ready_for_pickup', title: 'جاهز للاستلام', detail: 'الطلب جاهز في المتجر.' },
-  { id: 'captain_assigned', title: 'تم تعيين الكابتن', detail: 'كابتن مكلّف وهو في طريقه للاستلام.' },
-  { id: 'picked_up', title: 'استلم الكابتن الطلب', detail: 'الطلب مع الكابتن متجهًا نحوك.' },
-  { id: 'enroute_to_customer', title: 'في الطريق إليك', detail: 'الطلب في الطريق. تحديث كل 3 دقائق بدون خريطة حية.' },
-  { id: 'near_customer', title: 'الطلب قريب منك', detail: 'على مقربة من موقعك.' },
-  { id: 'at_door', title: 'وصل إلى موقع التسليم', detail: 'وصل إلى موقع التسليم.' },
-  { id: 'bell_rang', title: 'تم قرع الجرس', detail: 'أُرسل إشعار الوصول. استعد لاستلام طلبك.' },
-  { id: 'delivered', title: 'تم التسليم', detail: 'استلمت طلبك. شكرًا لاستخدام بثواني.' },
-];
+const FULL_JOURNEY_STEPS: JourneyStep[] = DSH_ORDER_JOURNEY_STEPS;
 
 function getStepModeOverride(stepId: string, mode: DshFulfillmentDeliveryMode): { title: string; detail: string } | null {
   if (mode === 'bthwani_delivery') {

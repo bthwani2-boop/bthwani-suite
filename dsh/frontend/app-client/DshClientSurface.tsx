@@ -710,23 +710,23 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     const mode = trackingOrderValues.fulfillmentMode;
     if (mode === 'partner_delivery') {
       return [
-        { id: 'store-prep', title: 'يجهّز المتجر الطلب', detail: 'المتجر يجهّز طلبك ويسلّمه لموصله.', done: true },
-        { id: 'store-courier-pickup', title: 'موصل المتجر في الطريق', detail: 'موصل المتجر يتجه إليك — هذا ليس كابتن بثواني.', done: false },
-        { id: 'delivered', title: 'تم التوصيل', detail: 'استلمت طلبك من موصل المتجر.', done: false },
+        { id: 'track-store-prep', title: 'يجهّز المتجر الطلب', detail: 'المتجر يجهّز طلبك ويسلّمه لموصله.', done: true },
+        { id: 'track-store-courier', title: 'موصل المتجر في الطريق', detail: 'موصل المتجر يتجه إليك — هذا ليس كابتن بثواني.', done: false },
+        { id: 'track-delivered-partner', title: 'تم التوصيل', detail: 'استلمت طلبك من موصل المتجر.', done: false },
       ];
     }
     if (mode === 'pickup') {
       return [
-        { id: 'prep', title: 'يجهّز المتجر الطلب', detail: 'طلبك قيد التجهيز في المتجر.', done: true },
-        { id: 'ready', title: 'الطلب جاهز للاستلام', detail: 'توجّه للمتجر لاستلام طلبك.', done: false },
-        { id: 'picked-up', title: 'استلمت طلبك', detail: 'تم تأكيد استلامك للطلب من المتجر.', done: false },
+        { id: 'track-pickup-prep', title: 'يجهّز المتجر الطلب', detail: 'طلبك قيد التجهيز في المتجر.', done: true },
+        { id: 'track-pickup-ready', title: 'الطلب جاهز للاستلام', detail: 'توجّه للمتجر لاستلام طلبك.', done: false },
+        { id: 'track-pickup-done', title: 'استلمت طلبك', detail: 'تم تأكيد استلامك للطلب من المتجر.', done: false },
       ];
     }
     // bthwani_delivery
     return [
-      { id: 'route', title: 'الكابتن في الطريق', detail: 'كابتن بثواني متجه إليك الآن.', done: true },
-      { id: 'arrived', title: 'وصل الكابتن', detail: 'الكابتن وصل وينتظر تسليم الطلب.', done: false },
-      { id: 'received', title: 'استلمت طلبك', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: false },
+      { id: 'track-captain-route', title: 'الكابتن في الطريق', detail: 'كابتن بثواني متجه إليك الآن.', done: true },
+      { id: 'track-captain-arrived', title: 'وصل الكابتن', detail: 'الكابتن وصل وينتظر تسليم الطلب.', done: false },
+      { id: 'track-client-received', title: 'استلمت طلبك', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: false },
     ];
   }, [trackingOrderValues.fulfillmentMode]);
 

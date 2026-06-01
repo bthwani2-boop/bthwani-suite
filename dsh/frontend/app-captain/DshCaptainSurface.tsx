@@ -630,13 +630,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           onReportIssue={() => setRoute('inbox')}
           onBack={goBack}
           onRingBell={() => {
-            const _bellEvent: DshCaptainBellEvent = {
-              orderId: activeOrderId,
-              captainId: 'captain-demo',
-              timestamp: new Date().toISOString(),
-              proximityState: 'bell_rang',
-            };
-            void _bellEvent;
+            // UI_PREVIEW_ONLY: bell event stub — no runtime dispatch, value is not used
+            void ({ orderId: activeOrderId, captainId: 'CAP-0041', timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
           }}
         />
       );
