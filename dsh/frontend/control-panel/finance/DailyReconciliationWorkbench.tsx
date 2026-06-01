@@ -34,8 +34,8 @@ function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLife
   if (rows.some((r) => r.evidenceStatus !== 'complete')) return 'maker-review';
   if (rows.some((r) => r.workflowState !== 'checked' && r.workflowState !== 'approved')) return 'maker-review';
   // Source quality — only a fallback note when no critical issue blocks
-  if (rows.some((r) => r.expectedSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
-  if (rows.some((r) => r.actualSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
+  if (rows.some((r) => r.expectedSource === 'preview-data' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
+  if (rows.some((r) => r.actualSource === 'preview-data' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
   return 'checker-approval';
 }
 
@@ -83,7 +83,7 @@ const EXPECTED_SOURCE_LABEL: Record<string, string> = {
   'settlement-cycle': 'دورة التسوية',
   'commission-schedule': 'جدول العمولات',
   'eligibility-calc': 'حسب الأهلية',
-  'preview-seed': 'بيانات معاينة',
+  'preview-data': 'بيانات معاينة',
 };
 
 const ACTUAL_SOURCE_LABEL: Record<string, string> = {
@@ -91,7 +91,7 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
   'wallet-debit': 'خصم محفظة',
   'cash-bag-delivery': 'حقيبة نقدية',
   'pos-receipt': 'إيصال دفع',
-  'preview-seed': 'بيانات معاينة',
+  'preview-data': 'بيانات معاينة',
 };
 
 export function DailyReconciliationWorkbench() {
@@ -372,7 +372,7 @@ export function DailyReconciliationWorkbench() {
                         <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>حالة الاعتماد</span>
                         <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 4 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>سير العمل</span>
-                          <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد ومرحل ✓' : row.workflowState === 'blocked_wlt' ? 'محجوب من WLT 🚨' : 'قيد المراجعة والتدقيق'}</span>
+                          <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد في المعاينة [تجريبي]' : row.workflowState === 'blocked_wlt' ? 'محجوب من WLT 🚨' : 'قيد المراجعة والتدقيق'}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 2 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>الإجراء</span>

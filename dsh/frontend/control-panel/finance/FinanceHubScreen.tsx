@@ -30,6 +30,7 @@ import {
   ControlPanelDshRefundQueueScreen,
 } from './FinanceHubScreens';
 import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
+import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
 
 import styles from '../shared/control-panel-surface.module.css';
@@ -50,6 +51,7 @@ const SCREEN_RENDERERS: Record<
   CanonicalFinanceGroupId,
   React.ComponentType<{ hubHref: string; subGroup?: string; technicalAuditMode: boolean }>
 > = {
+  'financial-center': FinancialCenterScreen,
   'daily-close': DailyCloseBridge,
   variances: ControlPanelDshRiskAuditScreen,
   'cod-cash': ControlPanelDshCodReconciliationScreen,
@@ -70,7 +72,7 @@ const SCREEN_RENDERERS: Record<
 };
 
 export function ControlPanelDshFinanceHubScreen({
-  group = 'daily-close',
+  group = 'financial-center',
   subGroup,
   panel,
   state = 'ready',
@@ -96,7 +98,7 @@ export function ControlPanelDshFinanceHubScreen({
 
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { panel });
-  const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS['daily-close'];
+  const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS['financial-center'];
 
   if (state === 'loading') {
     return (

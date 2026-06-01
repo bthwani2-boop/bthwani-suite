@@ -32,7 +32,7 @@ const EXPECTED_SOURCE_AR: Record<string, string> = {
   'settlement-cycle': 'دورة التسوية التشغيلية',
   'commission-schedule': 'جدول العمولات المعتمد',
   'eligibility-calc': 'حسبة أهلية الكابتن',
-  'preview-seed': 'مصدر معاينة تجريبي',
+  'preview-data': 'مصدر معاينة تجريبي',
 };
 
 const ACTUAL_SOURCE_AR: Record<string, string> = {
@@ -40,7 +40,7 @@ const ACTUAL_SOURCE_AR: Record<string, string> = {
   'wallet-debit': 'خصم رصيد المحفظة',
   'cash-bag-delivery': 'حقيبة النقدية الموردة',
   'pos-receipt': 'إيصال دفع رقمي',
-  'preview-seed': 'مصدر معاينة تجريبي',
+  'preview-data': 'مصدر معاينة تجريبي',
 };
 
 const EVIDENCE_SOURCE_AR: Record<string, string> = {
@@ -440,8 +440,8 @@ export function FinanceSurfaceBoard({
                             </p>
 
                             {!technicalAuditMode && (
-                              <div style={{ marginTop: 8, fontSize: 10, color: 'rgb(16,185,129)', fontWeight: '700', background: 'rgba(16,185,129,0.05)', padding: '4px 8px', borderRadius: 4, display: 'inline-block' }}>
-                                ✓ مطابق محاسبياً من WLT
+                              <div style={{ marginTop: 8, fontSize: 10, color: 'rgb(180,110,0)', fontWeight: '700', background: 'rgba(245,158,11,0.07)', padding: '4px 8px', borderRadius: 4, display: 'inline-block' }}>
+                                [معاينة] · محاكاة · يتطلب WLT runtime
                               </div>
                             )}
 
@@ -473,8 +473,8 @@ export function FinanceSurfaceBoard({
                           <span style={{ fontSize: 12, color: 'var(--bthwani-control-panel-text)' }}>
                             💡 <strong>توصية المطابقة والمراجعة:</strong> {row.recommendation}
                           </span>
-                          <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 4, fontWeight: '700' }}>
-                            ثقة المطابقة: عالية ✓
+                          <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 4, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>
+                            CONTRACT_SCAFFOLD_PREVIEW_ONLY
                           </span>
                         </div>
 

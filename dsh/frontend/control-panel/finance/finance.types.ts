@@ -1,4 +1,5 @@
 export type CanonicalFinanceGroupId =
+  | 'financial-center'
   | 'daily-close'
   | 'variances'
   | 'cod-cash'

@@ -7,6 +7,17 @@ import type {
 
 export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
   {
+    id: 'financial-center',
+    label: 'المركز المالي',
+    description: 'المشهد المالي الكامل: الحسابات، الأرصدة، الذمم، المستحقات، دفتر الأستاذ. المطابقة والإغلاق طبقة لاحقة.',
+    badge: 'Main',
+    subGroups: [
+      { id: 'position', label: 'المركز المالي' },
+      { id: 'ledger', label: 'دفتر الأستاذ' },
+      { id: 'variances', label: 'الفوارق' },
+    ],
+  },
+  {
     id: 'daily-close',
     label: 'إغلاق اليوم',
     description: 'مراقبة وإغلاق الدورة المالية اليومية ومطابقة الفوارق والأدلة.',
@@ -89,7 +100,11 @@ export function normalizeFinanceLocation(
 ): FinanceNormalizationResult {
   const resolvedPanel = panel as FinancePanelId | undefined;
 
-  if (!workspace || workspace === 'overview' || workspace === 'daily-close') {
+  if (!workspace || workspace === 'financial-center') {
+    return { kind: 'group', group: 'financial-center', sourceWorkspace: workspace, panel: resolvedPanel };
+  }
+
+  if (workspace === 'overview' || workspace === 'daily-close') {
     return { kind: 'group', group: 'daily-close', sourceWorkspace: workspace, panel: resolvedPanel };
   }
 
@@ -121,7 +136,7 @@ export function normalizeFinanceLocation(
     return { kind: 'group', group: 'settlements-payouts', sourceWorkspace: workspace, panel: resolvedPanel };
   }
 
-  return { kind: 'group', group: 'daily-close', sourceWorkspace: workspace, panel: resolvedPanel };
+  return { kind: 'group', group: 'financial-center', sourceWorkspace: workspace, panel: resolvedPanel };
 }
 
 export function buildFinanceHref(
