@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text, Button } from '@bthwani/ui-kit';
 import {
   WebControlPanelActionCluster,
   WebControlPanelCompactPager,
@@ -84,57 +84,93 @@ function toUnifiedRecommendation(surface: FinanceSurface, row: FinanceRow): DshU
   };
 }
 
+import { getWltControlPanelFinancePreview } from '../../../../wlt/frontend/shared/finance/dshFinancePreview';
+
 function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; subGroup?: string }) {
   const router = useRouter();
   const [selectedId, setSelectedId] = React.useState(FINANCE_ROWS[surface][0]?.id ?? '');
   const rows = React.useMemo(() => {
     const baseRows = FINANCE_ROWS[surface];
+    const wltPreview = getWltControlPanelFinancePreview();
+
     if (!subGroup || subGroup === 'all') return baseRows;
+
+    if (surface === 'overview') {
+      if (subGroup === 'inflow') {
+        return baseRows.filter((row) => {
+          const rec = wltPreview.allRecords.find((r) => r.id === row.id);
+          return rec?.tone === 'positive';
+        });
+      }
+      if (subGroup === 'outflow') {
+        return baseRows.filter((row) => {
+          const rec = wltPreview.allRecords.find((r) => r.id === row.id);
+          return rec?.tone === 'negative';
+        });
+      }
+      if (subGroup === 'net') return baseRows;
+    }
+
     if (surface === 'settlements') {
-      if (subGroup === 'captains') return baseRows.filter((row) => row.owner.includes('الكباتن'));
-      if (subGroup === 'partners') return baseRows.filter((row) => row.owner.includes('الشركاء'));
-      if (subGroup === 'field') return baseRows.filter((row) => row.owner.includes('الميدانيين'));
+      if (subGroup === 'summary') return baseRows;
+      if (subGroup === 'captains') return baseRows.filter((row) => row.owner.includes('كابتن') || row.owner.includes('CAP'));
+      if (subGroup === 'partners') return baseRows.filter((row) => row.owner.includes('متجر') || row.owner.includes('شريك') || row.owner.includes('STORE'));
+      if (subGroup === 'field') return baseRows.filter((row) => row.owner.includes('ميداني') || row.owner.includes('FLD'));
     }
+
     if (surface === 'cod-reconciliation') {
-      return baseRows.filter((row) => subGroup === 'mismatch' ? row.risk === 'danger' : row.risk !== 'danger');
+      if (subGroup === 'mismatch') return baseRows.filter((row) => row.risk === 'danger');
+      if (subGroup === 'collected') return baseRows.filter((row) => row.status.includes('مكتمل') || row.status.includes('تم'));
+      if (subGroup === 'pending') return baseRows.filter((row) => !row.status.includes('مكتمل') && !row.status.includes('تم'));
     }
+
     if (surface === 'refunds') {
-      if (subGroup === 'disputes') return baseRows.filter((row) => row.id === 'REF-302');
-      return baseRows.filter((row) => subGroup === 'processed' ? row.status.includes('تحت') === false : true);
+      if (subGroup === 'disputes') return baseRows.filter((row) => row.id.includes('REF-302') || row.evidence.includes('نزاع') || row.evidence.includes('ادعاء'));
+      if (subGroup === 'pending') return baseRows.filter((row) => row.status.includes('بانتظار'));
+      if (subGroup === 'processed') return baseRows.filter((row) => row.status.includes('تمت') || row.status.includes('معالجة'));
+      if (subGroup === 'rejected') return baseRows.filter((row) => row.status.includes('مرفوض'));
     }
+
     if (surface === 'captain-eligibility') {
       if (subGroup === 'eligible') return baseRows.filter((row) => row.risk === 'success');
-      if (subGroup === 'blocked') return baseRows.filter((row) => row.risk === 'danger');
-      if (subGroup === 'needs-topup') return baseRows.filter((row) => row.risk === 'warning');
+      if (subGroup === 'blocked') return baseRows.filter((row) => row.risk === 'danger' || row.status.includes('محظور'));
+      if (subGroup === 'needs-topup') return baseRows.filter((row) => row.risk === 'warning' || row.status.includes('غير مؤهل'));
     }
+
     if (surface === 'payouts') {
-      if (subGroup === 'captain-payouts') return baseRows.filter((row) => row.owner.includes('الكباتن'));
-      if (subGroup === 'partner-payouts') return baseRows.filter((row) => row.owner.includes('الشركاء'));
-      if (subGroup === 'field-payouts') return baseRows.filter((row) => row.owner.includes('الميدانيين'));
+      if (subGroup === 'captain-payouts') return baseRows.filter((row) => row.owner.includes('كابتن') || row.owner.includes('CAP'));
+      if (subGroup === 'partner-payouts') return baseRows.filter((row) => row.owner.includes('متجر') || row.owner.includes('شريك') || row.owner.includes('STORE'));
+      if (subGroup === 'field-payouts') return baseRows.filter((row) => row.owner.includes('ميداني') || row.owner.includes('FLD'));
     }
+
     if (surface === 'ledger') {
-      if (subGroup === 'trial-balance') return baseRows.filter((row) => row.owner.includes('ميزان'));
-      if (subGroup === 'journal') return baseRows.filter((row) => row.owner.includes('قيد'));
-      if (subGroup === 'audit-trail') return baseRows.filter((row) => row.id === 'LED-603');
-      if (subGroup === 'invoices') return baseRows.filter((row) => row.id === 'LED-604');
+      if (subGroup === 'trial-balance') return baseRows.filter((row) => row.owner.includes('ميزان') || row.id.includes('LED-602'));
+      if (subGroup === 'journal') return baseRows.filter((row) => row.owner.includes('قيد') || row.id.includes('LED-601'));
+      if (subGroup === 'audit-trail') return baseRows.filter((row) => row.id.includes('LED-603'));
+      if (subGroup === 'invoices') return baseRows.filter((row) => row.id.includes('LED-604'));
       return baseRows;
     }
+
     if (surface === 'risk-audit') {
-      if (subGroup === 'holds') return baseRows.filter((row) => row.id === 'AUD-703');
-      if (subGroup === 'suspicious') return baseRows.filter((row) => row.id === 'AUD-701');
-      return baseRows.filter((row) => subGroup === 'audit-logs' ? row.status.includes('تحت') : row.risk === 'danger');
+      if (subGroup === 'holds') return baseRows.filter((row) => row.id.includes('AUD-703') || row.id.includes('CF-002'));
+      if (subGroup === 'suspicious') return baseRows.filter((row) => row.id.includes('AUD-701'));
+      if (subGroup === 'audit-logs') return baseRows.filter((row) => row.id.includes('AUD-702') || row.status.includes('تحت'));
     }
+
     if (surface === 'captain-finance') {
-      if (subGroup === 'cod-pending') return baseRows.filter((row) => row.id === 'CF-001');
-      if (subGroup === 'payouts') return baseRows.filter((row) => row.id === 'CF-002');
+      if (subGroup === 'cod-pending') return baseRows.filter((row) => row.id.includes('CF-001') || row.id.includes('WLT-COD'));
+      if (subGroup === 'payouts') return baseRows.filter((row) => row.id.includes('CF-002') || row.id.includes('WLT-ERN'));
     }
+
     if (surface === 'store-delivery-finance') {
-      if (subGroup === 'compensation') return baseRows.filter((row) => row.id === 'SDF-002');
-      if (subGroup === 'retained-fees') return baseRows.filter((row) => row.id === 'SDF-001');
+      if (subGroup === 'compensation') return baseRows.filter((row) => row.id.includes('SDF-002') || row.id.includes('WLT-SCC'));
+      if (subGroup === 'retained-fees') return baseRows.filter((row) => row.id.includes('SDF-001') || row.id.includes('WLT-SDF'));
     }
+
     return baseRows;
   }, [surface, subGroup]);
 
+  const [blockedAction, setBlockedAction] = React.useState<string | null>(null);
   const selectedRow = resolveFinanceRowSelection(rows, selectedId);
   const selectedRecommendation = selectedRow ? toUnifiedRecommendation(surface, selectedRow) : undefined;
   const criticalCount = rows.filter((row) => row.risk === 'danger').length;
@@ -150,17 +186,15 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
       router.push('/finance?workspace=risk-audit');
     } else if (label.includes('الاسترداد') || label.includes('استرداد')) {
       router.push('/finance?workspace=refunds');
-    } else if (label.includes('الأدلة') || label.includes('أدلة') || label.includes('الملف') || label.includes('مستند')) {
-      alert(`[بوابة الأدلة المالية WLT - UI_PREVIEW_ONLY]: فتح مرجع الأدلة لـ ${selectedRow.id} فقط. لا يتم جلب أو مطابقة مستندات runtime من DSH.`);
-    } else if (label.includes('تحقيق') || label.includes('التحقيق')) {
-      alert(`[إدارة المخاطر WLT - UI_PREVIEW_ONLY]: هذا تصنيف مراجعة وتحقيق لـ ${selectedRow.id} فقط. لا يتم إرسال طلب runtime من DSH.`);
     } else {
-      alert(`[إجراء مالي WLT - UI_PREVIEW_ONLY]: "${label}" للكيان ${selectedRow.id} يحتاج WLT/API لاحقًا. لا توجد حركة مالية منفذة من DSH.`);
+      // For mutations like "اعتماد"، "إطلاق"، "أرشفة" we show a beautiful blocking state inside the inspector drawer instead of silent fail
+      setBlockedAction(label);
     }
   };
 
   React.useEffect(() => {
     setSelectedId(rows[0]?.id ?? '');
+    setBlockedAction(null);
   }, [rows, surface]);
 
   return (
@@ -179,59 +213,92 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
       }
       main={
         <Box gap={3}>
-          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
+          <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap', direction: 'rtl' }}>
             <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
             <WebControlPanelStatusTag label={subGroup ? `الفلتر: ${subGroup}` : 'كل الصفوف'} tone="neutral" />
             <WebControlPanelStatusTag label={selectedRow?.owner ?? 'لا يوجد تحديد'} tone={selectedRow ? resolveRowTone(selectedRow) : 'neutral'} />
             <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('UI_PREVIEW_ONLY')} tone="warning" />
           </Box>
 
-          <WebControlPanelQueue
-            title={`صف ${resolveSurfaceLabel(surface)}`}
-            meta="كل صف مالي يحتفظ بقرار واحد واضح: مراجعة، اعتماد، أو فتح الأدلة قبل أي حركة لاحقة."
-            pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />}
-          >
-            {rows.slice(0, 6).map((row) => (
-              <WebControlPanelDecisionRow
-                key={row.id}
-                entityId={row.id}
-                entityLabel={`${row.owner} · ${row.amount}`}
-                status={row.status}
-                statusTone={resolveRowTone(row)}
-                risk={resolveRisk(row)}
-                recommendation={row.recommendation}
-                reason={row.evidence}
-                sla={`زمن الالتزام: ${row.sla} · الإجراء التالي: ${row.nextAction}`}
-                primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
-                secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
-                onInspect={() => setSelectedId(row.id)}
-              />
-            ))}
-          </WebControlPanelQueue>
+          {rows.length === 0 ? (
+            <Box padding={6} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+              <Text role="titleSm" tone="muted" style={{ fontWeight: '700', textAlign: 'center' }}>لا توجد سجلات حالية</Text>
+              <Text role="bodySm" tone="soft" style={{ textAlign: 'center', lineHeight: 22 }}>
+                لا توجد حركات أو مطالبات مالية مطابقة لهذا الفلتر المحدّد حالياً في بيئة المعاينة.
+              </Text>
+            </Box>
+          ) : (
+            <WebControlPanelQueue
+              title={`صف ${resolveSurfaceLabel(surface)}`}
+              meta="كل صف مالي يحتفظ بقرار واحد واضح: مراجعة، اعتماد، أو فتح الأدلة قبل أي حركة لاحقة."
+              pager={<WebControlPanelCompactPager page={1} totalPages={1} summaryLabel="المشهد الحالي" />}
+            >
+              {rows.slice(0, 6).map((row) => (
+                <WebControlPanelDecisionRow
+                  key={row.id}
+                  entityId={row.id}
+                  entityLabel={`${row.owner} · ${row.amount}`}
+                  status={row.status}
+                  statusTone={resolveRowTone(row)}
+                  risk={resolveRisk(row)}
+                  recommendation={row.recommendation}
+                  reason={row.evidence}
+                  sla={`زمن الالتزام: ${row.sla} · الإجراء التالي: ${row.nextAction}`}
+                  primaryAction={{ id: `${row.id}-primary`, label: row.primaryActionLabel, onAction: () => setSelectedId(row.id) }}
+                  secondaryAction={{ id: `${row.id}-secondary`, label: row.secondaryActionLabel, onAction: () => setSelectedId(row.id) }}
+                  onInspect={() => setSelectedId(row.id)}
+                />
+              ))}
+            </WebControlPanelQueue>
+          )}
         </Box>
       }
       inspector={
         <WebControlPanelInspectorShell title={`تفاصيل ${selectedRow?.id ?? ''}`}>
-          <Box gap={2}>
-            <Text role="bodySm">المالك / الجهة: {selectedRow?.owner}</Text>
-            <Text role="bodySm">القيمة (ر.ي): {selectedRow?.amount}</Text>
-            <Text role="bodySm">الحالة: {selectedRow?.status}</Text>
-            <Text role="bodySm">الدليل: {selectedRow?.evidence}</Text>
-            <Text role="bodySm">الإجراء التالي: {selectedRow?.nextAction}</Text>
+          <Box gap={3}>
+            {selectedRow ? (
+              <Box gap={2} style={{ direction: 'rtl' }}>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الجهة المالكة:</strong> {selectedRow.owner}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>القيمة المرجعية:</strong> {selectedRow.amount}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الحالة الحالية:</strong> {selectedRow.status}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الأدلة والبيانات:</strong> {selectedRow.evidence}</Text>
+                <Text role="bodySm" style={{ textAlign: 'right' }}><strong>الإجراء القادم:</strong> {selectedRow.nextAction}</Text>
+                <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: 8 }}>
+                  * العملة ريال يمني (YER). جميع العمليات هنا تتبع لعقد WLT المالي المعلق.
+                </Text>
+              </Box>
+            ) : (
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>الرجاء اختيار صف مالي لمعاينة تفاصيله.</Text>
+            )}
 
-            <WebControlPanelRecommendation
-              title="توصية مالية"
-              reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}` : 'اختر صفًا.'}
-              confidence={selectedRecommendation?.confidence ?? 'medium'}
-              auditTag="wlt-finance-bridge"
-              primaryAction={selectedRow ? { id: `${selectedRow.id}-rec-primary`, label: selectedRow.primaryActionLabel, onAction: () => handleAction(selectedRow.primaryActionLabel) } : undefined}
-              secondaryAction={selectedRow ? { id: `${selectedRow.id}-rec-secondary`, label: selectedRow.secondaryActionLabel, onAction: () => handleAction(selectedRow.secondaryActionLabel) } : undefined}
-            />
+            {blockedAction && selectedRow ? (
+              <Box padding={3} background="dangerSurface" radiusToken="md" border borderTone="danger" gap={2} style={{ direction: 'rtl', marginTop: 12 }}>
+                <Text role="bodyStrong" tone="danger" style={{ textAlign: 'right', fontWeight: '700' }}>[CONTRACT_TBD] الإجراء مقيّد</Text>
+                <Text role="caption" tone="danger" style={{ textAlign: 'right', lineHeight: 18 }}>
+                  الإجراء "{blockedAction}" للكيان {selectedRow.id} غير متاح في DSH حالياً.
+                  الربط المالي الحقيقي مع WLT API مقفل تشغيلياً بانتظار تفعيل العقد المالي.
+                </Text>
+                <Button label="فهمت" size="sm" tone="ghost" onPress={() => setBlockedAction(null)} />
+              </Box>
+            ) : null}
 
-            <WebControlPanelActionCluster
-              primary={{ id: 'finance-primary', label: selectedRow?.primaryActionLabel ?? 'مراجعة', onAction: () => selectedRow && handleAction(selectedRow.primaryActionLabel) }}
-              secondary={{ id: 'finance-secondary', label: selectedRow?.secondaryActionLabel ?? 'فتح الأدلة', onAction: () => selectedRow && handleAction(selectedRow.secondaryActionLabel) }}
-            />
+            {selectedRow && (
+              <WebControlPanelRecommendation
+                title="توصية مالية"
+                reason={`لماذا؟ ${selectedRow.recommendation} · ما الدليل؟ ${selectedRow.evidence}`}
+                confidence={selectedRecommendation?.confidence ?? 'medium'}
+                auditTag="wlt-finance-bridge"
+                primaryAction={{ id: `${selectedRow.id}-rec-primary`, label: selectedRow.primaryActionLabel, onAction: () => handleAction(selectedRow.primaryActionLabel) }}
+                secondaryAction={{ id: `${selectedRow.id}-rec-secondary`, label: selectedRow.secondaryActionLabel, onAction: () => handleAction(selectedRow.secondaryActionLabel) }}
+              />
+            )}
+
+            {selectedRow && (
+              <WebControlPanelActionCluster
+                primary={{ id: 'finance-primary', label: selectedRow.primaryActionLabel, onAction: () => handleAction(selectedRow.primaryActionLabel) }}
+                secondary={{ id: 'finance-secondary', label: selectedRow.secondaryActionLabel, onAction: () => handleAction(selectedRow.secondaryActionLabel) }}
+              />
+            )}
           </Box>
         </WebControlPanelInspectorShell>
       }

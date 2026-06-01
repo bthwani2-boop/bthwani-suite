@@ -12,7 +12,7 @@ export type DshCaptainFinanceScreenProps = {
 };
 
 export function DshCaptainFinanceScreen({
-	section = 'cod-balance',
+	section = 'cod-liability',
 	state = 'ready',
 	onBack,
 	onRetry,
@@ -32,7 +32,7 @@ export function DshCaptainFinanceScreen({
 }
 
 export function DshCaptainCodBalanceScreen(props: Omit<DshCaptainFinanceScreenProps, 'section'> = {}) {
-	return <DshCaptainFinanceScreen {...props} section="cod-balance" />;
+	return <DshCaptainFinanceScreen {...props} section="cod-liability" />;
 }
 
 export default DshCaptainFinanceScreen;

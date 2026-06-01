@@ -449,8 +449,8 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 | Item | File | Status |
 | --- | --- | --- |
 | Control-panel finance preview enhanced: client wallet/COD breakdown, captain COD/earnings, field commission/payout | `wlt/frontend/control-panel/finance/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
-| WltDshFinanceControlPanelContent exported and bound to /finance route | `control-panel/shell/ControlPanelSurfaceHost.tsx` | `UI_PREVIEW_FOUNDATION` |
-| Finance route confirmed: /finance → section="finance" → WltDshFinanceControlPanelContent | `control-panel/runtime/app/finance/page.tsx` | `ROUTE_CONFIRMED_PREVIEW_ONLY` |
+| ControlPanelDshFinanceHubScreen acts as host to /finance route in DSH, dynamically mapping WLT seeds | `control-panel/shell/ControlPanelSurfaceHost.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Finance route confirmed: /finance → section="finance" → ControlPanelDshFinanceHubScreen | `control-panel/runtime/app/finance/page.tsx` | `ROUTE_CONFIRMED_PREVIEW_ONLY` |
 | TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
 | OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
 | Real finance blocked until | contract / backend / security / audit / idempotency / ledger | `BLOCKED` |

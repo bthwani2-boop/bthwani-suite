@@ -1,3 +1,20 @@
+/**
+ * DSH Wallet & Finance Preview Data SSoT Adapter.
+ *
+ * This file dynamically adapts the central WLT-owned preview data from
+ * `wlt/frontend/shared/finance/dshFinancePreview.ts` to DSH's control panel views.
+ *
+ * DSH has no independent financial truth.
+ */
+
+import {
+  getWltControlPanelFinancePreview,
+  getWltCaptainFinanceSnapshot,
+  getWltDshStoreDeliveryFinancePreview,
+  getWltFieldFinancePreview,
+  type WltDshFinancePreviewRecord,
+} from '../../../wlt/frontend/shared/finance/dshFinancePreview';
+
 export const dshWalletPreviewDataContract = {
   dataKind: 'UI_PREVIEW_ONLY',
   runtimeTruth: false,
@@ -47,51 +64,154 @@ export const dshWalletReferencePreviews: readonly DshWalletReferencePreview[] = 
   { id: 'wallet-partner-preview', ownerId: 'store-101', ownerKind: 'partner', label: 'تسوية الشريك', balanceLabel: 'مرجع WLT فقط', wltOwned: true },
 ];
 
-export const dshFinanceControlPanelPreviewRows: Record<DshFinancePreviewSurface, ReadonlyArray<DshFinancePreviewRow>> = {
-  overview: [
-    { id: 'FIN-001', amount: '١٢٥٬٠٠٠ ر.ي', owner: 'مالية العمليات', status: 'مراجعة', risk: 'warning', evidence: 'مطابقة جزئية بين الكشوف', nextAction: 'افتح التسويات', recommendation: 'أغلق التسويات العالقة أولًا', primaryActionLabel: 'فتح التسويات', secondaryActionLabel: 'فتح الأدلة', sla: 'خلال ٢٤ ساعة' },
-    { id: 'FIN-002', amount: '٣٤٬٨٠٠ ر.ي', owner: 'إدارة المخاطر', status: 'سليم', risk: 'success', evidence: 'لا توجد فوارق', nextAction: 'ابقِ المراقبة نشطة', recommendation: 'لا حاجة للتدخل الآن', primaryActionLabel: 'عرض القيود', secondaryActionLabel: 'فتح التدقيق', sla: 'مباشر' },
-  ],
-  settlements: [
-    { id: 'SET-101', amount: '٤٥٬٠٠٠ ر.ي', owner: 'تسويات الكباتن', status: 'جاهز للصرف', risk: 'success', evidence: 'مطابقة كاملة', nextAction: 'مراجعة التسوية', recommendation: 'توصية باعتماد التسوية بناءً على مطابقة الكشف', primaryActionLabel: 'معاينة التفاصيل', secondaryActionLabel: 'فتح الأدلة', sla: 'خلال ٢٤ ساعة' },
-    { id: 'SET-102', amount: '١٢٣٬٠٠٠ ر.ي', owner: 'تسويات الشركاء', status: 'معلّق', risk: 'warning', evidence: 'فارق في الإجمالي', nextAction: 'مراجعة تفصيلية', recommendation: 'تعليق التسوية حتى التحقق من الفوارق', primaryActionLabel: 'مراجعة الفوارق', secondaryActionLabel: 'معاينة التوصية', sla: 'متأخر ٦ ساعات' },
-    { id: 'SET-103', amount: '١٢٬٠٠٠ ر.ي', owner: 'تسويات الميدانيين', status: 'مجدولة', risk: 'success', evidence: 'عمولات مؤهلة محسوبة', nextAction: 'مراجعة المستندات', recommendation: 'الميدانيون مؤهلون — تجهيز ملف المراجعة للتحويل البنكي', primaryActionLabel: 'معاينة ملف المراجعة', secondaryActionLabel: 'فتح السجل', sla: 'خلال ٤٨ ساعة' },
-  ],
-  'cod-reconciliation': [
-    { id: 'COD-201', amount: '١٢٬٠٠٠ ر.ي', owner: 'كابتن فهد — CAP-77', status: 'مكتمل', risk: 'success', evidence: 'تطابق الإيداع', nextAction: 'أرشفة تدقيقية', recommendation: 'الذمة مطابقة بالكامل للمطالبة المالية اليومية', primaryActionLabel: 'معاينة الأرشيف', secondaryActionLabel: 'فتح السجل', sla: 'مباشر' },
-    { id: 'COD-202', amount: '٨٥٠٠ ر.ي', owner: 'كابتن عمر — CAP-88', status: 'فارق نقدي', risk: 'danger', evidence: 'عجز ١٥٠٠ ر.ي', nextAction: 'فتح تحقيق مالي', recommendation: 'الذمة غير مطابقة وتتطلب فتح تحقيق داخلي فوري', primaryActionLabel: 'معاينة توصية التحقيق', secondaryActionLabel: 'فتح الأدلة', sla: 'عاجل' },
-  ],
-  refunds: [
-    { id: 'REF-301', amount: '٣٤٠٠ ر.ي', owner: 'استرداد طلب #ORD-8821', status: 'بانتظار التأكيد', risk: 'warning', evidence: 'استلام المنتج موثق', nextAction: 'مراجعة مستندات الاسترداد', recommendation: 'توصية بإرجاع القيمة للمحفظة بعد فحص المنتج', primaryActionLabel: 'معاينة طلب الاسترداد', secondaryActionLabel: 'فتح الطلب', sla: 'خلال ١٢ ساعة' },
-    { id: 'REF-302', amount: '٢١٬٠٠٠ ر.ي', owner: 'نزاع مالي #ORD-9012', status: 'تحت التدقيق', risk: 'danger', evidence: 'ادعاء بعدم استلام', nextAction: 'فتح تحقيق النزاع', recommendation: 'توصية بإبقاء النقد معلقاً للتدقيق ومراجعة سجل التتبع', primaryActionLabel: 'معاينة توصية التحقيق', secondaryActionLabel: 'فتح التدقيق', sla: 'عاجل' },
-  ],
-  'captain-eligibility': [
-    { id: 'CEL-401', amount: '٨٠٠٠ ر.ي', owner: 'كابتن سامر — CAP-91', status: 'غير مؤهل', risk: 'warning', evidence: 'رصيد ضامن أقل من الحد (١٠٬٠٠٠ ر.ي)', nextAction: 'فحص رصيد الضامن', recommendation: 'الكابتن يحتاج شحن ٢٬٠٠٠ ر.ي لتجاوز حد الضمان', primaryActionLabel: 'معاينة الحالة', secondaryActionLabel: 'فتح الملف', sla: 'خلال ٢٤ ساعة' },
-    { id: 'CEL-402', amount: '١٥٬٠٠٠ ر.ي', owner: 'كابتن خالد — CAP-55', status: 'مؤهل', risk: 'success', evidence: 'رصيد ضامن كافٍ', nextAction: 'مراقبة مستمرة', recommendation: 'الكابتن مؤهل وتوفر الرصيد الضامن موثق', primaryActionLabel: 'مراجعة النشاط', secondaryActionLabel: 'سجل الحركات', sla: 'مباشر' },
-    { id: 'CEL-403', amount: '٠ ر.ي', owner: 'كابتن ماجد — CAP-33', status: 'محظور ماليًا', risk: 'danger', evidence: 'رصيد سالب — ذمة COD غير مسددة', nextAction: 'متابعة سداد الذمة', recommendation: 'توصية باستمرار إيقاف استقبال الطلبات حتى تسوية ذمة COD', primaryActionLabel: 'معاينة التوصية', secondaryActionLabel: 'فتح الذمة', sla: 'فوري' },
-  ],
-  payouts: [
-    { id: 'PAY-501', amount: '٨٧٬٠٠٠ ر.ي', owner: 'مستحقات الشركاء', status: 'مجدولة', risk: 'success', evidence: 'ملف الإحالة جاهز', nextAction: 'مراجعة كشف التحويل', recommendation: 'مراجعة مسودة كشف التحويل قبل الإحالة للبنك', primaryActionLabel: 'معاينة كشف المدفوعات', secondaryActionLabel: 'فتح الملف', sla: 'خلال ٢٤ ساعة' },
-    { id: 'PAY-502', amount: '٥١٬٠٠٠ ر.ي', owner: 'مستحقات الكباتن', status: 'تحتاج مراجعة', risk: 'warning', evidence: 'تعارض في رقم الحساب', nextAction: 'مطابقة الحسابات', recommendation: 'تعليق عملية التحويل حتى تحديث بيانات البنك', primaryActionLabel: 'مراجعة الحساب', secondaryActionLabel: 'معاينة التوصية', sla: 'خلال ٨ ساعات' },
-    { id: 'PAY-503', amount: '١٢٬٠٠٠ ر.ي', owner: 'مستحقات الميدانيين', status: 'مجدولة', risk: 'success', evidence: 'عمولات مؤهلة مؤكدة', nextAction: 'تأكيد عمولات', recommendation: 'تجهيز كشف العمولات الشهرية للمطابقة النهائية', primaryActionLabel: 'معاينة ملف الصرف', secondaryActionLabel: 'فتح السجل', sla: 'خلال ٤٨ ساعة' },
-  ],
-  ledger: [
-    { id: 'LED-601', amount: '٤٥٠٬٠٠٠ ر.ي', owner: 'قيد يومي', status: 'مغلق', risk: 'success', evidence: 'ميزان متوازن', nextAction: 'أرشفة تدقيقية', recommendation: 'أرشفة القيد المالي لليوم بعد التحقق من المطابقة', primaryActionLabel: 'معاينة الأرشيف', secondaryActionLabel: 'فتح الميزان', sla: 'مباشر' },
-    { id: 'LED-602', amount: '١٩٨٬٠٠٠ ر.ي', owner: 'ميزان المراجعة', status: 'مفتوح', risk: 'warning', evidence: 'تفاوت بسيط', nextAction: 'مراجعة فرق الميزان', recommendation: 'فحص ميزان المراجعة لضبط الفروقات الطفيفة قبل الإغلاق', primaryActionLabel: 'مراجعة', secondaryActionLabel: 'فتح التفاصيل', sla: 'خلال ٤ ساعات' },
-    { id: 'LED-603', amount: '٢٥٬٠٠٠ ر.ي', owner: 'سجل التدقيق المالي اليومي', status: 'مكتمل', risk: 'success', evidence: 'تطابق الحسابات والأرصدة الضامنة', nextAction: 'أرشفة السجل المالي', recommendation: 'الاحتفاظ بسجل المراجعة لليوم للتأكد من انضباط الأرصدة المرجعية', primaryActionLabel: 'معاينة السجل المالي', secondaryActionLabel: 'فتح التفاصيل', sla: 'مباشر' },
-    { id: 'LED-604', amount: '١٢٬٥٠٠ ر.ي', owner: 'فاتورة تسوية المتجر #INV-902', status: 'مرفوعة للمطابقة', risk: 'warning', evidence: 'إيصال شحنة + كشف التحويل', nextAction: 'مطابقة الفاتورة مع المبيعات', recommendation: 'مطابقة الفاتورة مع عمولات المتجر bthwani_delivery قبل التحويل الفعلي', primaryActionLabel: 'معاينة الفاتورة', secondaryActionLabel: 'فتح الأدلة', sla: 'خلال ٢٤ ساعة' },
-  ],
-  'risk-audit': [
-    { id: 'AUD-701', amount: '١٥٠٬٠٠٠ ر.ي', owner: 'شريك X — STORE-55', status: 'اشتباه مرتفع', risk: 'danger', evidence: 'نمط سحب غير معتاد', nextAction: 'فحص نمط السحب', recommendation: 'توصية إيقاف فوري للتسويات لتفادي مخاطر التدفق المالي', primaryActionLabel: 'معاينة التوصية', secondaryActionLabel: 'فتح التحقيق', sla: 'فوري' },
-    { id: 'AUD-702', amount: '٨٤٬٠٠٠ ر.ي', owner: 'سجل تدقيق — مايو 2026', status: 'تحت المراجعة', risk: 'warning', evidence: 'لا يوجد إغلاق كامل', nextAction: 'مراجعة مستندات مايو', recommendation: 'تأكيد اكتمال كشوفات التدقيق قبل التحديث النهائي', primaryActionLabel: 'معاينة كشف التدقيق', secondaryActionLabel: 'فتح السجل', sla: 'خلال ١٢ ساعة' },
-    { id: 'AUD-703', amount: '٤٥٬٠٠٠ ر.ي', owner: 'حجز مالي معلق — كابتن Y', status: 'تحت الحجز المؤقت', risk: 'danger', evidence: 'ذمة COD مرتفعة بلا تسوية', nextAction: 'مراجعة فترات الحجز', recommendation: 'إبقاء الحجز المالي نشطاً حتى سداد كامل مستحقات COD المترتبة', primaryActionLabel: 'مراجعة شروط الحجز', secondaryActionLabel: 'فتح الذمة', sla: 'فوري' },
-  ],
-  'captain-finance': [
-    { id: 'CF-001', amount: '١٥٬٠٠٠ ر.ي', owner: 'ذمة COD - كابتن علي', status: 'تحت المطابقة', risk: 'warning', evidence: 'بانتظار إيداع الكابتن لمبلغ COD المحصّل', nextAction: 'تأكيد الإيداع في البنك', recommendation: 'مراقبة ذمة COD المعلقة ومطابقة إيصال البنك', primaryActionLabel: 'مراجعة الإيداع', secondaryActionLabel: 'فتح الأدلة', sla: 'خلال ٢٤ ساعة' },
-    { id: 'CF-002', amount: '٨٬٥٠٠ ر.ي', owner: 'حافز أداء - كابتن عمر', status: 'مؤهل للتدقيق', risk: 'success', evidence: 'مستند المسافة والتقييم مطابق', nextAction: 'مراجعة الحافز', recommendation: 'توصية باعتماد حوافز كباتن بثواني (bthwani_captain_mode)', primaryActionLabel: 'معاينة التفاصيل', secondaryActionLabel: 'عرض القيود', sla: 'خلال ٤٨ ساعة' },
-  ],
-  'store-delivery-finance': [
-    { id: 'SDF-001', amount: '٢٤٬٠٠٠ ر.ي', owner: 'توصيل شريك - متجر جرين بول', status: 'تدقيق داخلي', risk: 'success', evidence: 'رسوم توصيل مخصصة للمتجر (متجر يوصل بنفسه)', nextAction: 'مراجعة الرسوم', recommendation: 'عمولة توصيل المتجر الداخلي (لا تُدفع كباتن بثواني)', primaryActionLabel: 'مراجعة الرسوم', secondaryActionLabel: 'فتح الأدلة', sla: 'مباشر' },
-    { id: 'SDF-002', amount: '١٢٬٥٠٠ ر.ي', owner: 'مستحقات موصل المتجر - عمر', status: 'مستحق متجر', risk: 'warning', evidence: 'محتسب بناءً على سياسة مستحق لكل توصيلة', nextAction: 'مراجعة كشف موصل المتجر', recommendation: 'يُدفع مباشرة من المتجر لموصله (خارج بثواني)', primaryActionLabel: 'معاينة ملف المراجعة', secondaryActionLabel: 'فتح السجل', sla: 'خلال ٢٤ ساعة' },
-  ],
-};
+/**
+ * Adapter mapping a WLT preview record to the DSH decision row format.
+ */
+function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePreviewRow {
+  let risk: 'danger' | 'warning' | 'success' = 'success';
+  if (record.statusTone === 'error') risk = 'danger';
+  else if (record.statusTone === 'warning') risk = 'warning';
+
+  let nextAction = 'عرض تفاصيل الحركة ودراسة الأدلة المتاحة';
+  let primaryActionLabel = 'معاينة التفاصيل';
+
+  if (record.kind === 'captain-cod-liability') {
+    nextAction = 'تأكيد إيداع COD في البنك والمطابقة';
+    primaryActionLabel = 'مطابقة الإيداع';
+  } else if (record.kind === 'refund-adjustment') {
+    nextAction = 'مراجعة مستندات الاسترداد والنزاع';
+    primaryActionLabel = 'معاينة الاسترداد';
+  } else if (record.kind === 'partner-settlement') {
+    nextAction = 'مراجعة دورة التسوية وتحويل المستحقات';
+    primaryActionLabel = 'مراجعة التسوية';
+  } else if (record.kind === 'field-commission-pending') {
+    nextAction = 'مراجعة مستندات الاستقطاب والتفعيل الميداني';
+    primaryActionLabel = 'اعتماد العمولات';
+  } else if (record.kind === 'reconciliation-export') {
+    nextAction = 'بدء مطابقة دورة اليوم المالي';
+    primaryActionLabel = 'معاينة السجل المالي';
+  }
+
+  // Construct a friendly arabic actor label
+  const owner = record.actor === 'captain' && record.sourceCaptainId ? `كابتن · ${record.sourceCaptainId}`
+    : record.actor === 'partner' && record.sourceStoreId ? `متجر · ${record.sourceStoreId}`
+    : record.actor === 'field' && record.sourceFieldAgentId ? `ميداني · ${record.sourceFieldAgentId}`
+    : record.title;
+
+  return {
+    id: record.id,
+    amount: record.amountLabel,
+    owner,
+    status: record.statusLabel,
+    risk,
+    evidence: record.subtitle,
+    nextAction,
+    recommendation: record.holdReason || 'توصية بمطابقة الحركة الحالية بناءً على سجلات WLT المرجعية والالتزام بالاتفاق المالي.',
+    primaryActionLabel,
+    secondaryActionLabel: 'فتح الأدلة المالية',
+    sla: record.timeLabel,
+  };
+}
+
+/**
+ * Dynamically build the rows for each control panel surface from WLT seeds.
+ */
+export function getAdaptedFinanceControlPanelRows(): Record<DshFinancePreviewSurface, ReadonlyArray<DshFinancePreviewRow>> {
+  const wltPreview = getWltControlPanelFinancePreview();
+  const capSnap = getWltCaptainFinanceSnapshot();
+  const storeDelivery = getWltDshStoreDeliveryFinancePreview();
+  const fieldPreview = getWltFieldFinancePreview();
+
+  const overviewRows: DshFinancePreviewRow[] = [];
+  const settlementsRows: DshFinancePreviewRow[] = [];
+  const codReconciliationRows: DshFinancePreviewRow[] = [];
+  const refundsRows: DshFinancePreviewRow[] = [];
+  const captainEligibilityRows: DshFinancePreviewRow[] = [];
+  const payoutsRows: DshFinancePreviewRow[] = [];
+  const ledgerRows: DshFinancePreviewRow[] = [];
+  const riskAuditRows: DshFinancePreviewRow[] = [];
+  const captainFinanceRows: DshFinancePreviewRow[] = [];
+  const storeDeliveryFinanceRows: DshFinancePreviewRow[] = [];
+
+  // Map each of allRecords
+  wltPreview.allRecords.forEach((record) => {
+    const row = mapWltRecordToDshRow(record);
+
+    // 1. Overview: Platform and critical/warning items
+    if (record.actor === 'control-panel' || record.statusTone === 'error' || record.statusTone === 'warning') {
+      overviewRows.push(row);
+    }
+
+    // 2. Settlements
+    if (record.kind === 'partner-settlement' || record.kind === 'field-payout') {
+      settlementsRows.push(row);
+    }
+
+    // 3. COD Reconciliation
+    if (record.kind === 'captain-cod-liability') {
+      codReconciliationRows.push(row);
+    }
+
+    // 4. Refunds
+    if (record.kind === 'refund-adjustment') {
+      refundsRows.push(row);
+    }
+
+    // 5. Payouts
+    if (record.kind === 'field-payout' || record.kind === 'partner-settlement') {
+      payoutsRows.push(row);
+    }
+
+    // 6. Ledger
+    if (record.kind === 'platform-commission' || record.kind === 'reconciliation-export') {
+      ledgerRows.push(row);
+    }
+
+    // 7. Risk Audit
+    if (record.statusTone === 'error' || record.statusTone === 'warning' || record.holdReason) {
+      riskAuditRows.push(row);
+    }
+
+    // 8. Captain Finance
+    if (record.actor === 'captain') {
+      captainFinanceRows.push(row);
+    }
+
+    // 9. Store Delivery Finance
+    if (record.kind === 'store-delivery-fee' || record.kind === 'store-courier-compensation') {
+      storeDeliveryFinanceRows.push(row);
+    }
+  });
+
+  // Construct Captain Eligibility Row from WLT snapshot
+  captainEligibilityRows.push({
+    id: 'CEL-401',
+    amount: capSnap.eligibilityBalanceLabel,
+    owner: 'كابتن فهد · CAP-77',
+    status: capSnap.isEligible ? 'مؤهل' : 'غير مؤهل',
+    risk: capSnap.isEligible ? 'success' : 'warning',
+    evidence: capSnap.eligibilityBlockReason,
+    nextAction: 'فحص الرصيد الضامن والشحن للتأهل',
+    recommendation: capSnap.eligibilityBlockReason,
+    primaryActionLabel: 'محاكاة شحن الرصيد',
+    secondaryActionLabel: 'فتح ملف الكابتن',
+    sla: 'خلال ٢٤ ساعة',
+  });
+
+  return {
+    overview: overviewRows.length > 0 ? overviewRows : [
+      { id: 'FIN-EMPTY-1', amount: '٠ ر.ي', owner: 'نظرة عامة', status: 'سليم', risk: 'success', evidence: 'لا توجد فوارق مالية اليوم', nextAction: 'مراقبة مستمرة', recommendation: 'لا توجد إجراءات إضافية مطلوبة', primaryActionLabel: 'معاينة', secondaryActionLabel: 'فتح السجل', sla: 'مباشر' }
+    ],
+    settlements: settlementsRows,
+    'cod-reconciliation': codReconciliationRows,
+    refunds: refundsRows,
+    'captain-eligibility': captainEligibilityRows,
+    payouts: payoutsRows,
+    ledger: ledgerRows,
+    'risk-audit': riskAuditRows,
+    'captain-finance': captainFinanceRows,
+    'store-delivery-finance': storeDeliveryFinanceRows,
+  };
+}
+
+export const dshFinanceControlPanelPreviewRows = getAdaptedFinanceControlPanelRows();

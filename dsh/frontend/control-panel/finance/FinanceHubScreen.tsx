@@ -98,12 +98,36 @@ export function ControlPanelDshFinanceHubScreen({
   const ActiveScreen = SCREEN_RENDERERS[activeGroup] || SCREEN_RENDERERS.overview;
 
   if (state !== 'ready') {
+    let title = 'جاري تحميل البيانات المالية';
+    let description = 'يتم تجهيز غرفة القيادة المالية وتدقيق السجلات...';
+    let kind: 'info' | 'warning' | 'danger' = 'info';
+
+    if (state === 'empty') {
+      title = 'لا توجد سجلات مالية';
+      description = 'لا توجد حركات أو قيود معلقة مطابقة لهذا القسم أو الفلتر حاليًا.';
+      kind = 'info';
+    } else if (state === 'error') {
+      title = 'فشل تحميل العقد المالي';
+      description = 'حدث خطأ أثناء الاتصال بمحرك WLT المالي أو استرداد بيانات المعاينة.';
+      kind = 'danger';
+    } else if (state === 'offline') {
+      title = 'غير متصل بالشبكة';
+      description = 'تعذر تحديث المؤشرات المالية. يتم عرض آخر نسخة معاينة محلية مخزنة.';
+      kind = 'warning';
+    } else if (state === 'disabled') {
+      title = 'القسم المالي مقفل';
+      description = 'ليست لديك صلاحية الوصول إلى غرفة القيادة المالية الحالية. يرجى مراجعة الإدارة.';
+      kind = 'danger';
+    }
+
     return (
       <div className={`${styles.surfaceMainPanel} ${styles.surfaceStatePadding}`}>
         <StateView
-          stateId="loading"
-          title="جاري تحميل البيانات المالية"
-          description="يتم تجهيز غرفة القيادة المالية..."
+          stateId={state}
+          title={title}
+          description={description}
+          kind={kind as any}
+          actionLabel="إعادة المحاولة"
           onActionPress={() => router.push(fallbackHref)}
         />
       </div>
@@ -120,13 +144,18 @@ export function ControlPanelDshFinanceHubScreen({
             </div>
           </div>
           <Box gap={0}>
-            <div className={styles.surfaceHeaderTextRow}>
-              <h1 className={styles.surfaceHeaderTitle}>مالية DSH</h1>
-              <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                <span className={styles.surfaceHeaderBadgeText}>غرفة قيادة</span>
+            <div className={styles.surfaceHeaderTextRow} style={{ display: 'flex', flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+              <h1 className={styles.surfaceHeaderTitle}>غرفة القيادة المالية</h1>
+              <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
+                <span className={styles.surfaceHeaderBadgeText} style={{ fontWeight: '700' }}>WLT SSoT Mapped</span>
+              </Box>
+              <Box paddingX={2} paddingY={1} background="warningSurface" radiusToken="xs">
+                <span className={styles.surfaceHeaderBadgeText} style={{ color: 'var(--bth-warning-text)', fontWeight: '700' }}>{financePreview.contractState}</span>
               </Box>
             </div>
-            <p className={styles.surfaceHeaderSubtitle}>WLT — قراءة فقط / معاينة / runtime غير مربوط · التسويات، مطابقة COD، أهلية الكابتن، الاستردادات، والرقابة المالية — ر.ي</p>
+            <p className={styles.surfaceHeaderSubtitle} style={{ marginTop: 4 }}>
+              العملة: <strong>ر.ي (ريال يمني)</strong> · آخر مزامنة: <strong>مباشر (معاينة فقط)</strong> · المالك المالي: <strong>WLT Engine</strong>
+            </p>
           </Box>
         </div>
 
