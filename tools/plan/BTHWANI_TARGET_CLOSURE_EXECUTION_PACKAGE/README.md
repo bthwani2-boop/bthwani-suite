@@ -15,6 +15,7 @@ V7 adds:
 Strict Demo Data Centralization Matrix
 Strict File Boundary Matrix with design preservation columns
 V7 Hardening Layer (V7.1–V7.9) for package integrity
+V7.10 Control Panel Closure Hardening Addendum for unproven closure gates
 3 new package files:
   BTHWANI_VERSION_CHANGELOG.md
   BTHWANI_ARABIC_RTL_CONTRACT.md
