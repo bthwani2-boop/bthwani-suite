@@ -355,6 +355,7 @@
   "skipPathPrefixes": [
     "tools/registry/runs",
     "dsh/frontend/media-fixtures",
+    "wlt/frontend/media-fixtures",
     "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx",
     "dsh/frontend/app-captain/DshCaptainSurface.tsx",
     "dsh/frontend/app-client/DshClientSurface.tsx",
