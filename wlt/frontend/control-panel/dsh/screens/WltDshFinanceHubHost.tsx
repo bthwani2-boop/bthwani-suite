@@ -28,11 +28,14 @@ import { WltDshAccountStatement } from '../components/WltDshAccountStatement';
 import { WltDshRefundLedger } from '../components/WltDshRefundLedger';
 import { WltDshSettlementCalendar } from '../components/WltDshSettlementCalendar';
 import { WltDshStoreSettlementStatement } from '../components/WltDshStoreSettlementStatement';
+import { WltDshPartnerStatement } from '../components/WltDshPartnerStatement';
+import { WltDshFieldCommissionStatement } from '../components/WltDshFieldCommissionStatement';
+import { WltDshCaptainStatement } from '../components/WltDshCaptainStatement';
 
 import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
-export type ControlPanelDshFinanceScreenProps = {
+export type WltDshFinanceHubHostProps = {
   group?: CanonicalFinanceGroupId;
   subGroup?: string;
   panel?: FinancePanelId;
@@ -40,12 +43,98 @@ export type ControlPanelDshFinanceScreenProps = {
   fallbackHref?: string;
 };
 
-export function ControlPanelFinanceHubHost({
+export type ControlPanelDshFinanceScreenProps = WltDshFinanceHubHostProps;
+
+interface OperationalImpactGridProps {
+  risk?: string;
+  affected?: string;
+  action?: string;
+  blocking?: string;
+}
+
+function OperationalImpactGrid({ risk, affected, action, blocking }: OperationalImpactGridProps) {
+  if (!risk && !affected && !action && !blocking) return null;
+  return (
+    <div className={wltStyles.operationalImpactGrid}>
+      {risk && (
+        <div className={wltStyles.operationalImpactCard}>
+          <span className={wltStyles.operationalImpactLabel}>⚠️ الخطر:</span>
+          <span className={`${wltStyles.operationalImpactValue} ${wltStyles.operationalImpactValueDanger}`}>
+            {risk}
+          </span>
+        </div>
+      )}
+      {affected && (
+        <div className={wltStyles.operationalImpactCard}>
+          <span className={wltStyles.operationalImpactLabel}>👥 المتأثر:</span>
+          <span className={wltStyles.operationalImpactValue}>{affected}</span>
+        </div>
+      )}
+      {action && (
+        <div className={wltStyles.operationalImpactCard}>
+          <span className={wltStyles.operationalImpactLabel}>⚙️ الإجراء:</span>
+          <span className={wltStyles.operationalImpactValue}>{action}</span>
+        </div>
+      )}
+      {blocking && (
+        <div className={wltStyles.operationalImpactCard}>
+          <span className={wltStyles.operationalImpactLabel}>🔒 الحظر:</span>
+          <span className={wltStyles.operationalImpactValue}>{blocking}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface StatePrimaryActionProps {
+  label: string;
+  onClick: () => void;
+}
+
+function StatePrimaryAction({ label, onClick }: StatePrimaryActionProps) {
+  return (
+    <button className={wltStyles.statePrimaryAction} onClick={onClick}>
+      {label}
+    </button>
+  );
+}
+
+interface FinanceStateScreenProps {
+  icon: string;
+  title: string;
+  titleDanger?: boolean;
+  desc: string;
+  impact?: OperationalImpactGridProps;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+function FinanceStateScreen({ icon, title, titleDanger, desc, impact, action }: FinanceStateScreenProps) {
+  return (
+    <div className={wltStyles.stateScreen}>
+      <div className={wltStyles.stateIcon} aria-hidden="true">{icon}</div>
+      <h2 className={`${wltStyles.stateTitle} ${titleDanger ? wltStyles.stateTitleDanger : ''}`}>
+        {title}
+      </h2>
+      <p className={wltStyles.stateDesc}>{desc}</p>
+      {impact && <OperationalImpactGrid {...impact} />}
+      {action && (
+        <div className={wltStyles.stateActions}>
+          <StatePrimaryAction label={action.label} onClick={action.onClick} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function WltDshFinanceHubHost({
   group = 'financial-command-center',
   subGroup,
   panel,
   state = 'ready',
-}: ControlPanelDshFinanceScreenProps) {
+}: WltDshFinanceHubHostProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -76,13 +165,13 @@ export function ControlPanelFinanceHubHost({
   }, [financePreview]);
 
   const pendingCount = React.useMemo(
-    () => financePreview.allRecords.filter((r) => r.statusTone === 'warning' || r.isPending).length,
-    [financePreview],
+    () => center.allEntries.filter((e) => e.isPending).length,
+    [center],
   );
 
   const openRisksCount = React.useMemo(
-    () => financePreview.allRecords.filter((r) => r.statusTone === 'error' || r.risk === 'danger').length,
-    [financePreview],
+    () => center.allEntries.filter((e) => e.status === 'blocked' || e.status === 'disputed').length,
+    [center],
   );
 
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
@@ -91,49 +180,49 @@ export function ControlPanelFinanceHubHost({
   // Calculate Operational readiness fields
   const affectedSurfaces = React.useMemo(() => {
     const list = new Set<string>();
-    financePreview.allRecords.forEach((r) => {
-      if (r.isPending || r.statusTone === 'error') {
-        if (r.actorType === 'client') list.add('العملاء');
-        if (r.actorType === 'partner') list.add('الشركاء');
-        if (r.actorType === 'captain') list.add('الكباتن');
-        if (r.actorType === 'field') list.add('الميدانيين');
+    center.allEntries.forEach((e) => {
+      if (e.isPending || e.status === 'blocked' || e.status === 'disputed') {
+        if (e.partyKind === 'client') list.add('العملاء');
+        if (e.partyKind === 'partner') list.add('الشركاء');
+        if (e.partyKind === 'captain') list.add('الكباتن');
+        if (e.partyKind === 'field') list.add('الميدانيين');
       }
     });
     if (list.size === 0) return 'لا يوجد طرف متأثر حالياً';
     return Array.from(list).join(' · ');
-  }, [financePreview]);
+  }, [center]);
 
   const affectedMoney = React.useMemo(() => {
     let disputed = 0;
     let pending = 0;
-    financePreview.allRecords.forEach((r) => {
-      if (r.statusTone === 'error' || r.risk === 'danger') {
-        disputed += r.actualMinorUnits;
-      } else if (r.isPending || r.statusTone === 'warning') {
-        pending += r.expectedMinorUnits;
+    center.allEntries.forEach((e) => {
+      if (e.status === 'blocked' || e.status === 'disputed') {
+        disputed += e.amountMinorUnits;
+      } else if (e.isPending || e.status === 'pending') {
+        pending += e.amountMinorUnits;
       }
     });
     return `نزاع: ${(disputed / 100).toLocaleString('ar-YE')} ر.ي · معلق: ${(pending / 100).toLocaleString('ar-YE')} ر.ي`;
-  }, [financePreview]);
+  }, [center]);
 
   const requiredAction = React.useMemo(() => {
     if (center.blockingVariances.length > 0) return 'تحقيق ومطابقة الفوارق يدوياً';
-    if (financePreview.allRecords.some((r) => r.allowedAction === 'prepare_decision')) return 'اعتماد وصرف المستحقات مع WLT';
+    if (center.allEntries.some((e) => e.status === 'pending')) return 'اعتماد وصرف المستحقات مع WLT';
     return 'مراقبة وتدقيق الأرصدة اليومية';
-  }, [financePreview, center]);
+  }, [center]);
 
   const operationalRisk = React.useMemo(() => {
     if (center.blockingVariances.length > 0) {
       return `يوجد فوارق معلقة (${center.blockingVariances.length} فارق نشط)`;
     }
-    if (financePreview.allRecords.some(r => r.risk === 'danger')) {
+    if (center.allEntries.some((e) => e.status === 'blocked')) {
       return 'مخاطر حرج عالية (High Risk)';
     }
-    if (financePreview.allRecords.some(r => r.risk === 'warning')) {
+    if (center.allEntries.some((e) => e.status === 'disputed' || e.status === 'pending')) {
       return 'تنبيه تدقيق متوسط (Medium Risk)';
     }
     return 'لا توجد مخاطر مالية مكشوفة';
-  }, [center, financePreview]);
+  }, [center]);
 
   const holdsStatus = React.useMemo(() => {
     if (center.blockingVariances.length > 0) {
@@ -172,7 +261,16 @@ export function ControlPanelFinanceHubHost({
 
       case 'settlements-payouts':
         if (activeSub === 'partners') {
+          return <WltDshPartnerStatement technicalAuditMode={techMode} />;
+        }
+        if (activeSub === 'stores') {
           return <WltDshStoreSettlementStatement technicalAuditMode={techMode} />;
+        }
+        if (activeSub === 'captains') {
+          return <WltDshCaptainStatement technicalAuditMode={techMode} />;
+        }
+        if (activeSub === 'field') {
+          return <WltDshFieldCommissionStatement technicalAuditMode={techMode} />;
         }
         if (activeSub === 'bank-transfers') {
           return <WltDshSettlementCalendar />;
@@ -209,201 +307,103 @@ export function ControlPanelFinanceHubHost({
     if (activeState === 'loading') {
       return (
         <div className={`${styles.surfaceCockpit} ${wltStyles.loadingWrapper}`}>
-          <Text role="titleLg" className={wltStyles.loadingText}>جاري تحميل البيانات المالية...</Text>
+          <Text role="titleLg">جاري تحميل البيانات المالية...</Text>
         </div>
       );
     }
 
     if (activeState === 'empty') {
       return (
-        <div className={wltStyles.stateScreen}>
-          <div className={wltStyles.stateIcon} aria-hidden="true">📭</div>
-          <h2 className={wltStyles.stateTitle}>لا توجد سجلات مالية</h2>
-          <p className={wltStyles.stateDesc}>لم يتم العثور على أي قيود أو حركات مالية في هذه الغرفة حالياً.</p>
-          <div className={wltStyles.stateActions}>
-            <button
-              onClick={() => router.refresh()}
-              style={{
-                padding: '8px 16px',
-                background: 'var(--bth-brand-primary)',
-                color: 'var(--bth-text-inverse)',
-                border: 'none',
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              تحديث البيانات
-            </button>
-          </div>
-        </div>
+        <FinanceStateScreen
+          icon="📭"
+          title="لا توجد سجلات مالية"
+          desc="لم يتم العثور على أي قيود أو حركات مالية في هذه الغرفة حالياً."
+          action={{
+            label: "تحديث البيانات",
+            onClick: () => router.refresh(),
+          }}
+        />
       );
     }
 
     if (activeState === 'error') {
       return (
-        <div className={wltStyles.stateScreen}>
-          <div className={wltStyles.stateIcon} aria-hidden="true">🚨</div>
-          <h2 className={wltStyles.stateTitle} style={{ color: 'var(--bth-danger-text)' }}>خطأ في الاتصال بالخادم المالي</h2>
-          <p className={wltStyles.stateDesc}>فشل تحميل البيانات المالية من WLT Engine. يرجى التحقق من اتصال الخادم المالي ومحاولة إعادة التحميل.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, width: '100%', background: 'var(--bth-control-panel-surface-raised)', padding: 12, borderRadius: 8, marginTop: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚠️ الخطر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bth-danger-text)' }}>عطل الاتصال بالخادم الرئيسي</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>👥 المتأثر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>لوحة القيادة بالكامل</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚙️ الإجراء:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>إعادة محاولة الاتصال بالخادم</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>🔒 الحظر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>محجوب بالكامل لعدم توفر البيانات</span>
-            </div>
-          </div>
-          <div className={wltStyles.stateActions}>
-            <button
-              onClick={() => router.refresh()}
-              style={{
-                padding: '8px 16px',
-                background: 'var(--bth-brand-primary)',
-                color: 'var(--bth-text-inverse)',
-                border: 'none',
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              إعادة المحاولة
-            </button>
-          </div>
-        </div>
+        <FinanceStateScreen
+          icon="🚨"
+          title="خطأ في الاتصال بالخادم المالي"
+          titleDanger
+          desc="فشل تحميل البيانات المالية من WLT Engine. يرجى التحقق من اتصال الخادم المالي ومحاولة إعادة التحميل."
+          impact={{
+            risk: "عطل الاتصال بالخادم الرئيسي",
+            affected: "لوحة القيادة بالكامل",
+            action: "إعادة محاولة الاتصال بالخادم",
+            blocking: "محجوب بالكامل لعدم توفر البيانات",
+          }}
+          action={{
+            label: "إعادة المحاولة",
+            onClick: () => router.refresh(),
+          }}
+        />
       );
     }
 
     if (activeState === 'offline') {
       return (
-        <div className={wltStyles.stateScreen}>
-          <div className={wltStyles.stateIcon} aria-hidden="true">🌐</div>
-          <h2 className={wltStyles.stateTitle}>أنت تعمل خارج الاتصال</h2>
-          <p className={wltStyles.stateDesc}>يتعذر تحميل البيانات المالية من WLT Engine لأنك غير متصل بالإنترنت حالياً.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, width: '100%', background: 'var(--bth-control-panel-surface-raised)', padding: 12, borderRadius: 8, marginTop: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚠️ الخطر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bth-danger-text)' }}>عمل دون مزامنة الشبكة</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>👥 المتأثر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>العمليات المالية الفورية</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚙️ الإجراء:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>التحقق من الشبكة وإعادة الاتصال</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>🔒 الحظر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>حظر جزئي للعمليات الحية</span>
-            </div>
-          </div>
-          <div className={wltStyles.stateActions}>
-            <button
-              onClick={() => router.refresh()}
-              style={{
-                padding: '8px 16px',
-                background: 'var(--bth-brand-primary)',
-                color: 'var(--bth-text-inverse)',
-                border: 'none',
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              الاتصال بالخادم
-            </button>
-          </div>
-        </div>
+        <FinanceStateScreen
+          icon="🌐"
+          title="أنت تعمل خارج الاتصال"
+          desc="يتعذر تحميل البيانات المالية من WLT Engine لأنك غير متصل بالإنترنت حالياً."
+          impact={{
+            risk: "عمل دون مزامنة الشبكة",
+            affected: "العمليات المالية الفورية",
+            action: "التحقق من الشبكة وإعادة الاتصال",
+            blocking: "حظر جزئي للعمليات الحية",
+          }}
+          action={{
+            label: "الاتصال بالخادم",
+            onClick: () => router.refresh(),
+          }}
+        />
       );
     }
 
     if (activeState === 'disabled') {
       return (
-        <div className={wltStyles.stateScreen}>
-          <div className={wltStyles.stateIcon} aria-hidden="true">🔒</div>
-          <h2 className={wltStyles.stateTitle}>غرفة القيادة موقوفة</h2>
-          <p className={wltStyles.stateDesc}>تم إيقاف صلاحية الوصول إلى غرفة القيادة المالية لهذه المنصة مؤقتاً بناءً على إعدادات الأمان والسياسات المالية للمنصة.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, width: '100%', background: 'var(--bth-control-panel-surface-raised)', padding: 12, borderRadius: 8, marginTop: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚠️ الخطر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bth-danger-text)' }}>إيقاف أمني للوحة التحكم</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>👥 المتأثر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>كافة أسطح التحكم المالي</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚙️ الإجراء:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>مراجعة مدير النظام (Admin)</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>🔒 الحظر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>محجوب بالكامل بناءً على السياسة</span>
-            </div>
-          </div>
-        </div>
+        <FinanceStateScreen
+          icon="🔒"
+          title="غرفة القيادة موقوفة"
+          desc="تم إيقاف صلاحية الوصول إلى غرفة القيادة المالية لهذه المنصة مؤقتاً بناءً على إعدادات الأمان والسياسات المالية للمنصة."
+          impact={{
+            risk: "إيقاف أمني للوحة التحكم",
+            affected: "كافة أسطح التحكم المالي",
+            action: "مراجعة مدير النظام (Admin)",
+            blocking: "محجوب بالكامل بناءً على السياسة",
+          }}
+        />
       );
     }
 
     if (activeState === 'blocked') {
       return (
-        <div className={wltStyles.stateScreen}>
-          <div className={wltStyles.stateIcon} aria-hidden="true">🚫</div>
-          <h2 className={wltStyles.stateTitle} style={{ color: 'var(--bth-danger-text)' }}>الوصول محجوب لدواعي التدقيق</h2>
-          <p className={wltStyles.stateDesc}>تم حجب لوحة التحكم لوجود فوارق مالية حرجة غير مطابقة تمنع إغلاق اليوم المالي الحالي بشكل آمن.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, width: '100%', background: 'var(--bth-control-panel-surface-raised)', padding: 12, borderRadius: 8, marginTop: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚠️ الخطر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bth-danger-text)' }}>فوارق حادة غير مطابقة</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>👥 المتأثر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>الشركاء والكباتن</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>⚙️ الإجراء:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>مراجعة الفوارق والتدقيق المباشر</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>🔒 الحظر:</span>
-              <span style={{ fontSize: 11, fontWeight: 700 }}>محجوب بالكامل حتى حل الفوارق</span>
-            </div>
-          </div>
-          <div className={wltStyles.stateActions}>
-            <button
-              onClick={() => {
-                setActiveGroup('reconciliation-risk');
-                setActiveSubGroup('reconciliation');
-              }}
-              style={{
-                padding: '8px 16px',
-                background: 'var(--bth-brand-primary)',
-                color: 'var(--bth-text-inverse)',
-                border: 'none',
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              مراجعة الفوارق الحرجة
-            </button>
-          </div>
-        </div>
+        <FinanceStateScreen
+          icon="🚫"
+          title="الوصول محجوب لدواعي التدقيق"
+          titleDanger
+          desc="تم حجب لوحة التحكم لوجود فوارق مالية حرجة غير مطابقة تمنع إغلاق اليوم المالي الحالي بشكل آمن."
+          impact={{
+            risk: "فوارق حادة غير مطابقة",
+            affected: "الشركاء والكباتن",
+            action: "مراجعة الفوارق والتدقيق المباشر",
+            blocking: "محجوب بالكامل حتى حل الفوارق",
+          }}
+          action={{
+            label: "مراجعة الفوارق الحرجة",
+            onClick: () => {
+              setActiveGroup('reconciliation-risk');
+              setActiveSubGroup('reconciliation');
+            },
+          }}
+        />
       );
     }
 
@@ -413,13 +413,15 @@ export function ControlPanelFinanceHubHost({
   return (
     <div className={styles.surfaceCockpit}>
       {/* Header Bar */}
-      <header className={styles.surfaceTopBar} style={{ padding: '8px 16px', borderBottom: '1px solid var(--bth-control-panel-border)' }}>
+      <header className={`${styles.surfaceTopBar} ${wltStyles.hubHeader}`}>
         <div className={styles.surfaceTitleBlock}>
           <Box gap={0}>
             <div className={wltStyles.headerTextRow}>
-              <h1 className={styles.surfaceHeaderTitle} style={{ fontSize: 16, fontWeight: 800 }}>غرفة القيادة المالية</h1>
-              <Box paddingX={2} paddingY={0.5} background="brandSurface" radiusToken="xs">
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--bth-brand-primary)' }}>مصدر الحقيقة: WLT</span>
+              <h1 className={styles.surfaceHeaderTitle}>غرفة القيادة المالية</h1>
+              <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--bth-brand-primary)' }}>
+                  {technicalAuditMode ? 'مصدر الحقيقة: WLT' : 'معاينة تشغيلية'}
+                </span>
               </Box>
             </div>
             <p className={wltStyles.readinessDesc} style={{ margin: 0 }}>
@@ -428,8 +430,8 @@ export function ControlPanelFinanceHubHost({
           </Box>
         </div>
 
-        <div className={wltStyles.headerActionsArea} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <div className={wltStyles.technicalToggleContainer} style={{ margin: 0 }}>
+        <div className={wltStyles.headerActionsRow}>
+          <div className={wltStyles.technicalToggleContainer}>
             <span className={wltStyles.technicalToggleLabel}>التدقيق التقني</span>
             <button
               onClick={() => setTechnicalAuditMode(!technicalAuditMode)}
@@ -442,16 +444,7 @@ export function ControlPanelFinanceHubHost({
           </div>
           <button
             onClick={() => router.refresh()}
-            style={{
-              padding: '6px 12px',
-              background: 'var(--bth-brand-primary)',
-              color: 'var(--bth-text-inverse)',
-              border: 'none',
-              borderRadius: 6,
-              fontSize: 11,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
+            className={wltStyles.refreshButton}
           >
             تحديث فوري
           </button>
@@ -459,7 +452,7 @@ export function ControlPanelFinanceHubHost({
       </header>
 
       {/* Signal Strip */}
-      <section style={{ padding: '12px 16px', borderBottom: '1px solid var(--bth-control-panel-border)' }}>
+      <section className={wltStyles.hubSection}>
         <div className={wltStyles.signalStrip}>
           <div className={`${wltStyles.signalCard} ${wltStyles.signalCardInfo}`}>
             <span className={wltStyles.signalLabel}>صافي المركز المالي</span>
@@ -519,7 +512,7 @@ export function ControlPanelFinanceHubHost({
 
       {/* Operational Readiness Strip */}
       {activeState === 'ready' && (
-        <section style={{ padding: '12px 16px 0 16px' }}>
+        <section className={wltStyles.hubReadinessSection}>
           <div className={wltStyles.readinessPanel}>
             <div className={wltStyles.readinessInfo}>
               <div className={`${wltStyles.readinessIndicator} ${
@@ -539,24 +532,24 @@ export function ControlPanelFinanceHubHost({
               </div>
             </div>
             {/* 4-column Operational readiness layout */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, width: '100%', marginTop: 8 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div className={wltStyles.readinessColumns}>
+              <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>⚠️ <strong>الخطر المالي:</strong></span>
-                <span className={wltStyles.readinessTitle} style={{ fontSize: 12, color: center.blockingVariances.length > 0 ? 'var(--bth-danger-text)' : 'var(--bth-control-panel-text)' }}>
+                <span className={wltStyles.readinessVal} style={{ fontWeight: 700, color: center.blockingVariances.length > 0 ? 'var(--bth-danger-text)' : 'var(--bth-control-panel-text)' }}>
                   {operationalRisk}
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>👥 <strong>الجهة المتأثرة:</strong></span>
-                <span className={wltStyles.readinessTitle} style={{ fontSize: 12 }}>{affectedSurfaces}</span>
+                <span className={wltStyles.readinessVal} style={{ fontWeight: 700 }}>{affectedSurfaces}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>⚙️ <strong>الإجراء المطلوب:</strong></span>
-                <span className={wltStyles.readinessTitle} style={{ fontSize: 12, color: 'var(--bth-brand-primary)' }}>{requiredAction}</span>
+                <span className={wltStyles.readinessVal} style={{ fontWeight: 700, color: 'var(--bth-brand-primary)' }}>{requiredAction}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>🔒 <strong>حظر الصرف/التسوية:</strong></span>
-                <span className={wltStyles.readinessTitle} style={{ fontSize: 12 }}>{holdsStatus}</span>
+                <span className={wltStyles.readinessVal} style={{ fontWeight: 700 }}>{holdsStatus}</span>
               </div>
             </div>
           </div>
@@ -565,7 +558,7 @@ export function ControlPanelFinanceHubHost({
 
       {/* Technical Audit Drawer */}
       {technicalAuditMode && (
-        <section style={{ padding: '12px 16px 0 16px' }}>
+        <section className={wltStyles.hubReadinessSection}>
           <div className={wltStyles.techDrawer}>
             <div className={wltStyles.techDrawerHeader}>
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--bth-info-text)' }}>بوابة التدقيق المالي التقني (WLT/DSH API matrix)</span>
@@ -605,5 +598,8 @@ export function ControlPanelFinanceHubHost({
   );
 }
 
-export { ControlPanelFinanceHubHost as ControlPanelDshFinanceHubScreen };
-export default ControlPanelFinanceHubHost;
+export {
+  WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen,
+  WltDshFinanceHubHost as ControlPanelFinanceHubHost,
+};
+export default WltDshFinanceHubHost;

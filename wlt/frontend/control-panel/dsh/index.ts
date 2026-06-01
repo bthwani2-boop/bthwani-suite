@@ -21,6 +21,9 @@ export { WltDshAccountStatement } from './components/WltDshAccountStatement';
 export { WltDshRefundLedger } from './components/WltDshRefundLedger';
 export { WltDshSettlementCalendar } from './components/WltDshSettlementCalendar';
 export { WltDshStoreSettlementStatement } from './components/WltDshStoreSettlementStatement';
+export { WltDshPartnerStatement } from './components/WltDshPartnerStatement';
+export { WltDshFieldCommissionStatement } from './components/WltDshFieldCommissionStatement';
+export { WltDshCaptainStatement } from './components/WltDshCaptainStatement';
 export { LedgerEntriesTable } from './components/LedgerEntriesTable';
 export { TrialBalancePanel } from './components/TrialBalancePanel';
 export { WltDshFinanceControlPanelContent, WltDshFinanceControlPanelPreview } from './components/WltDshFinanceControlPanelPreview';
@@ -32,8 +35,8 @@ export { FINANCE_API_MATRIX, getFinanceApiBinding } from './adapters/finance.api
 export type { DshFinanceApiBinding } from './adapters/finance.api-matrix';
 
 // hub host screen
-export { ControlPanelFinanceHubHost, ControlPanelDshFinanceHubScreen } from './screens/ControlPanelFinanceHubHost';
-export type { ControlPanelDshFinanceScreenProps } from './screens/ControlPanelFinanceHubHost';
+export { WltDshFinanceHubHost, ControlPanelDshFinanceHubScreen, WltDshFinanceHubHost as ControlPanelFinanceHubHost } from './screens/WltDshFinanceHubHost';
+export type { WltDshFinanceHubHostProps, ControlPanelDshFinanceScreenProps } from './screens/WltDshFinanceHubHost';
 
 // public contracts barrel
 export * as wltDshFinanceContracts from './financeContracts';

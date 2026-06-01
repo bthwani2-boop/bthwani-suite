@@ -148,10 +148,11 @@ function mapWltRecordToDshRow(record: WltDshFinancePreviewRecord): DshFinancePre
     : record.holdReason ? 'partial'
     : 'complete';
 
-  const reconciliationStatus: DshFinancePreviewRow['reconciliationStatus'] =
-    record.statusTone === 'error' ? 'unmatched'
-    : record.statusTone === 'warning' ? 'disputed'
-    : 'matched';
+  const reconciliationStatus = (record.statusTone === 'error'
+    ? 'unmatched'
+    : record.statusTone === 'warning'
+    ? 'disputed'
+    : 'matched') as DshFinancePreviewRow['reconciliationStatus'];
 
   // P4: For preview, expected = record amount; actual = 0 if error (unknown), else same as expected.
   const expectedMinorUnits = record.amountMinorUnits;

@@ -3,11 +3,12 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { getAdaptedFinanceControlPanelRows } from '../adapters/dshFinanceFixture.adapter';
+import { formatWltYer } from '../financeContracts';
 import { buildWltAuditPackPreview } from '../models/auditPack.types';
 import { WLT_MAKER_CHECKER_STATE_LABELS } from '../models/makerChecker.types';
 import { getWltCloseGateSubledgers } from '../models/subledger.types';
 
-export function AuditCloseScreen(_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) {
+export function AuditCloseScreen({ technicalAuditMode }: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
 
   const rows = React.useMemo(() => {
@@ -62,9 +63,9 @@ export function AuditCloseScreen(_: { hubHref: string; subGroup?: string; techni
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
           {[
-            { label: 'الإجمالي المتوقع', value: auditPack.expectedTotalMinorUnits.toLocaleString() + ' وصغ', ok: true },
-            { label: 'الإجمالي الفعلي', value: auditPack.actualTotalMinorUnits.toLocaleString() + ' وصغ', ok: true },
-            { label: 'الفارق', value: auditPack.varianceTotalMinorUnits.toLocaleString() + ' وصغ', ok: auditPack.varianceTotalMinorUnits === 0 },
+            { label: 'الإجمالي المتوقع', value: formatWltYer(auditPack.expectedTotalMinorUnits), ok: true },
+            { label: 'الإجمالي الفعلي', value: formatWltYer(auditPack.actualTotalMinorUnits), ok: true },
+            { label: 'الفارق', value: formatWltYer(auditPack.varianceTotalMinorUnits), ok: auditPack.varianceTotalMinorUnits === 0 },
             { label: 'استثناءات', value: `${auditPack.exceptions.length} بند`, ok: auditPack.exceptions.length === 0 },
           ].map(({ label, value, ok }) => (
             <div key={label} style={{ padding: '10px 12px', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: 7, background: 'var(--bthwani-control-panel-surface)' }}>
@@ -80,9 +81,9 @@ export function AuditCloseScreen(_: { hubHref: string; subGroup?: string; techni
         <Text role="titleSm" style={{ fontWeight: 700 }}>دفاتر الأستاذ المساعدة — شروط الإغلاق</Text>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
           {closeGateSubledgers.map((sub) => (
-            <Box key={sub.id} padding={2.5} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
+            <Box key={sub.id} padding={2} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="labelSm" style={{ fontWeight: 700 }}>{sub.label}</Text>
+                <Text role="label" style={{ fontWeight: 700 }}>{sub.label}</Text>
                 <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 3 }}>{sub.controlAccountCode}</code>
               </div>
               <Text role="caption" tone="muted">{sub.description}</Text>
@@ -129,12 +130,14 @@ export function AuditCloseScreen(_: { hubHref: string; subGroup?: string; techni
         </div>
       </Box>
 
-      <Box padding={3} background="warningSurface" radiusToken="md" gap={1} style={{ direction: 'rtl' }}>
-        <Text role="bodyStrong" style={{ fontWeight: 700 }}>CONTRACT_SCAFFOLD_PREVIEW_ONLY</Text>
-        <Text role="bodySm" tone="soft">
-          لا يُنفَّذ ترحيل فعلي من هذه الشاشة. WLT runtime يُصدر التوقيع الفعلي ويُنفّذ القيود عند اكتمال جميع الشروط.
-        </Text>
-      </Box>
+      {technicalAuditMode && (
+        <Box padding={3} background="warningSurface" radiusToken="md" gap={1} style={{ direction: 'rtl' }}>
+          <Text role="bodyStrong" style={{ fontWeight: 700 }}>CONTRACT_SCAFFOLD_PREVIEW_ONLY</Text>
+          <Text role="bodySm" tone="soft">
+            لا يُنفَّذ ترحيل فعلي من هذه الشاشة. WLT runtime يُصدر التوقيع الفعلي ويُنفّذ القيود عند اكتمال جميع الشروط.
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 }

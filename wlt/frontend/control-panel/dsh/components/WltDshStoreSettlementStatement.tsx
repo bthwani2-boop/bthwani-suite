@@ -4,65 +4,122 @@ import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
   getWltDshStoreSettlementStatementsPreview,
-  type WltDshStoreSettlementStatement,
+  type WltDshStoreSettlementStatement as StoreStatement,
+  getWltPostingRuleForEvent,
+  getWltAccountByCode,
 } from '../financeContracts';
+import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
-const STATUS_LABEL: Record<WltDshStoreSettlementStatement['status'], string> = {
+const STATUS_LABEL: Record<StoreStatement['status'], string> = {
   draft_preview: 'مسودة معاينة',
   ready_for_review: 'جاهزة للمراجعة',
-  held_by_wlt: 'محجوبة من WLT',
-  paid_preview: 'مدفوعة كمعاينة',
+  held_by_wlt: 'محجوبة من WLT 🚨',
+  paid_preview: 'مدفوعة كمعاينة ✓',
 };
 
-const ORDER_STATUS_LABEL: Record<WltDshStoreSettlementStatement['orders'][number]['settlementStatus'], string> = {
+const ORDER_STATUS_LABEL: Record<StoreStatement['orders'][number]['settlementStatus'], string> = {
   included: 'داخل الدورة',
-  held: 'محجوز',
+  held: 'محجوز 🔒',
   next_cycle: 'الدورة القادمة',
-  disputed: 'نزاع',
+  disputed: 'نزاع ⚠️',
+};
+
+const PAYMENT_METHOD_LABEL: Record<string, string> = {
+  wallet: 'محفظة بثواني',
+  cod: 'كاش عند الاستلام (COD)',
+  card: 'بطاقة بنكية',
 };
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '10px 12px', background: 'var(--bth-control-panel-surface-raised)' }}>
-      <div style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--bth-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>{value}</div>
+    <div className={wltStyles.reconciliationSummaryCard}>
+      <div className={wltStyles.kpiLabel}>{label}</div>
+      <div className={wltStyles.kpiValue} style={{ fontSize: 14 }}>{value}</div>
     </div>
   );
 }
 
 export function WltDshStoreSettlementStatement({ technicalAuditMode = false }: { technicalAuditMode?: boolean } = {}) {
   const statements = React.useMemo(() => getWltDshStoreSettlementStatementsPreview(), []);
-  const statement = statements[0];
+
+  const [activeStoreId, setActiveStoreId] = React.useState<string>(statements[0]?.storeId ?? '');
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null);
+
+  const statement = React.useMemo(() => {
+    return statements.find((s) => s.storeId === activeStoreId) || statements[0];
+  }, [statements, activeStoreId]);
+
+  const selectedOrder = React.useMemo(() => {
+    if (!statement) return null;
+    return statement.orders.find((o) => o.orderId === selectedOrderId) || null;
+  }, [statement, selectedOrderId]);
 
   if (!statement) {
     return (
-      <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ direction: 'rtl', textAlign: 'right' }}>
+      <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line">
         <Text role="titleSm">لا توجد تسويات متجر في معاينة WLT.</Text>
       </Box>
     );
   }
 
+  // Fetch Posting Rules for Store Settlements
+  const postingRules = React.useMemo(() => {
+    return [
+      getWltPostingRuleForEvent('partner-settlement'),
+      getWltPostingRuleForEvent('store-delivery-fee'),
+      getWltPostingRuleForEvent('store-courier-compensation'),
+    ].filter(Boolean);
+  }, []);
+
   return (
-    <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
+    <Box gap={4}>
+      {/* Store Selection Switcher */}
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleMd" style={{ fontWeight: 800 }}>كشف تسوية متجر</Text>
-        <Text role="bodySm" tone="soft">
-          {statement.storeName} · دورة {statement.settlementCycleId} · كل أسبوعين · {STATUS_LABEL[statement.status]}
-        </Text>
-        {technicalAuditMode && (
-          <Text role="caption" tone="muted">
-            PREVIEW_ONLY · WLT owns settlement truth · DSH displays only.
-          </Text>
-        )}
+        <div className={wltStyles.storeSelectorHeaderFlex}>
+          <div className={wltStyles.storeSelectorTitleFlex}>
+            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف تسوية متجر</Text>
+            <div className={wltStyles.storeSelectorButtonsFlex}>
+              {statements.map((s) => (
+                <button
+                  key={s.storeId}
+                  onClick={() => {
+                    setActiveStoreId(s.storeId);
+                    setSelectedOrderId(null);
+                  }}
+                  className={`${wltStyles.storeSelectorBtn} ${
+                    s.storeId === activeStoreId ? wltStyles.storeSelectorBtnActive : ''
+                  }`}
+                >
+                  {s.storeName}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={wltStyles.storeSelectorMetaFlex}>
+            <span className={wltStyles.storeSelectorPeriodBadge}>
+              دورة: {statement.periodStart} إلى {statement.periodEnd}
+            </span>
+            <span
+              className={`${wltStyles.storeSelectorStatusBadge} ${
+                statement.status === 'held_by_wlt'
+                  ? wltStyles.storeSelectorStatusDanger
+                  : wltStyles.storeSelectorStatusSuccess
+              }`}
+            >
+              {STATUS_LABEL[statement.status]}
+            </span>
+          </div>
+        </div>
       </Box>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
+      {/* Metrics strip */}
+      <div className={wltStyles.metricsGrid}>
         <Metric label="بداية الدورة" value={statement.periodStart} />
         <Metric label="نهاية الدورة" value={statement.periodEnd} />
         <Metric label="موعد القطع" value={statement.cutoffDate} />
         <Metric label="موعد الدفع المتوقع" value={statement.expectedPayoutDate} />
         <Metric label="إجمالي الطلبات" value={statement.grossOrdersTotalLabel} />
-        <Metric label="عدد الطلبات" value={statement.orderCount.toLocaleString('ar-YE')} />
+        <Metric label="عدد الطلبات" value={`${statement.orderCount} طلبات`} />
         <Metric label="عمولة المنصة" value={statement.platformCommissionTotalLabel} />
         <Metric label="الاستردادات" value={statement.refundsTotalLabel} />
         <Metric label="الحجوزات" value={statement.holdsTotalLabel} />
@@ -71,42 +128,202 @@ export function WltDshStoreSettlementStatement({ technicalAuditMode = false }: {
         <Metric label="المتبقي" value={statement.remainingPayableLabel} />
       </div>
 
-      <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleSm" style={{ fontWeight: 800 }}>الطلبات المرتبطة بالدورة</Text>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 920 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--bth-control-panel-border)' }}>
-                {['الطلب', 'تاريخ الطلب', 'التسليم', 'الدفع', 'قيمة المنتجات', 'التوصيل', 'العمولة', 'الخصم', 'الاسترداد', 'الأثر الصافي', 'الحالة', 'مرجع الأدلة / سبب الاستبعاد'].map((header) => (
-                  <th key={header} style={{ textAlign: 'right', padding: '8px 10px', fontSize: 11, color: 'var(--bth-control-panel-text-muted)' }}>{header}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {statement.orders.map((order) => (
-                <tr key={order.orderId} style={{ borderBottom: '1px solid var(--bth-control-panel-border)' }}>
-                  <td style={{ padding: '8px 10px', fontWeight: 800 }}>{order.orderId}</td>
-                  <td style={{ padding: '8px 10px' }}>{order.orderDate}</td>
-                  <td style={{ padding: '8px 10px' }}>{order.deliveryDate}</td>
-                  <td style={{ padding: '8px 10px' }}>{order.paymentMethod}</td>
-                  <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{order.orderGrossLabel}</td>
-                  <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{order.deliveryFeeLabel}</td>
-                  <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{order.platformCommissionLabel}</td>
-                  <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{order.discountLabel}</td>
-                  <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{order.refundLabel}</td>
-                  <td style={{ padding: '8px 10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{order.netSettlementImpactLabel}</td>
-                  <td style={{ padding: '8px 10px' }}>{ORDER_STATUS_LABEL[order.settlementStatus]}</td>
-                  <td style={{ padding: '8px 10px' }}>
-                    <code style={{ fontSize: 9, background: 'rgba(0, 0, 0, 0.05)', padding: '2px 6px', borderRadius: 4, color: order.settlementStatus === 'held' ? 'var(--bth-danger-text)' : 'var(--bth-control-panel-text)' }}>
-                      {order.evidenceRef || '—'}
-                    </code>
-                  </td>
+      {/* Workbench Layout: Table + Inspector */}
+      <div
+        className={`${wltStyles.workbenchLayout} ${
+          selectedOrder ? wltStyles.workbenchLayoutWithInspector : ''
+        }`}
+      >
+        {/* Orders Table Container */}
+        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
+          <div className={wltStyles.tableHeaderFlex}>
+            <Text role="titleSm" style={{ fontWeight: 800 }}>الطلبات المرتبطة بالدورة الحالية</Text>
+            <span className={wltStyles.readinessDesc}>
+              اضغط على أي صف لعرض تفاصيل العمولات المفرزة وقيود الأستاذ.
+            </span>
+          </div>
+
+          <div className={wltStyles.tableWrap}>
+            <table className={wltStyles.statementTable}>
+              <thead>
+                <tr>
+                  {['الطلب', 'تاريخ الطلب', 'الدفع', 'قيمة المبيعات', 'العمولة', 'الخصم', 'الاسترداد', 'الأثر الصافي', 'الحالة', 'الأدلة'].map((header) => (
+                    <th key={header} className={wltStyles.statementTh}>
+                      {header}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Box>
+              </thead>
+              <tbody>
+                {statement.orders.map((order) => {
+                  const isSelected = selectedOrderId === order.orderId;
+                  const statusColor =
+                    order.settlementStatus === 'included'
+                      ? wltStyles.statusPosted
+                      : order.settlementStatus === 'held'
+                      ? wltStyles.statusBlocked
+                      : wltStyles.statusPending;
+
+                  return (
+                    <tr
+                      key={order.orderId}
+                      onClick={() => setSelectedOrderId(isSelected ? null : order.orderId)}
+                      className={`${wltStyles.statementRow} ${isSelected ? wltStyles.statementRowActive : ''}`}
+                    >
+                      <td className={`${wltStyles.statementTd} ${wltStyles.statementTdBold}`}>{order.orderId}</td>
+                      <td className={wltStyles.statementTd}>{order.orderDate}</td>
+                      <td className={wltStyles.statementTd}>
+                        {PAYMENT_METHOD_LABEL[order.paymentMethod] || order.paymentMethod}
+                      </td>
+                      <td className={`${wltStyles.statementTd} ${wltStyles.statementTdTabular}`}>
+                        {order.orderGrossLabel}
+                      </td>
+                      <td className={`${wltStyles.statementTd} ${wltStyles.statementTdTabular}`}>
+                        {order.platformCommissionLabel}
+                      </td>
+                      <td className={`${wltStyles.statementTd} ${wltStyles.statementTdTabular}`}>
+                        {order.discountLabel}
+                      </td>
+                      <td className={`${wltStyles.statementTd} ${wltStyles.statementTdTabular}`}>
+                        {order.refundLabel}
+                      </td>
+                      <td className={`${wltStyles.statementTd} ${wltStyles.statementTdBold} ${wltStyles.statementTdTabular}`}>
+                        {order.netSettlementImpactLabel}
+                      </td>
+                      <td className={wltStyles.statementTd}>
+                        <span className={`${wltStyles.statusBadge} ${statusColor}`}>
+                          {ORDER_STATUS_LABEL[order.settlementStatus]}
+                        </span>
+                      </td>
+                      <td className={wltStyles.statementTd}>
+                        <code className={wltStyles.evidenceCode}>{order.evidenceRef || '—'}</code>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Box>
+
+        {/* Order Inspector Sidebar */}
+        {selectedOrder && (
+          <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={3}>
+            <div className={wltStyles.inspectorHeader}>
+              <span className={wltStyles.inspectorTitle}>تفاصيل تسوية الطلب</span>
+              <button onClick={() => setSelectedOrderId(null)} className={wltStyles.inspectorCloseBtn}>
+                ✕
+              </button>
+            </div>
+            <hr className={wltStyles.inspectorSeparator} />
+
+            <Box gap={1}>
+              <span className={wltStyles.inspectorMetaKey}>معرّف الطلب</span>
+              <span className={wltStyles.inspectorMetaVal}>
+                {selectedOrder.orderId} ({selectedOrder.orderDate})
+              </span>
+            </Box>
+
+            <Box gap={1}>
+              <span className={wltStyles.inspectorMetaKey}>طريقة الدفع وقناة التوريد</span>
+              <span className={wltStyles.inspectorMetaVal}>
+                {PAYMENT_METHOD_LABEL[selectedOrder.paymentMethod] || selectedOrder.paymentMethod}
+              </span>
+            </Box>
+
+            <div className={wltStyles.inspectorImpactCard}>
+              <span className={wltStyles.inspectorMetaKey} style={{ display: 'block', marginBottom: 4 }}>
+                حسبة الأثر الصافي (Net Impact):
+              </span>
+              <div className={wltStyles.inspectorImpactRow}>
+                <span>قيمة المبيعات:</span>
+                <span className={wltStyles.inspectorImpactRowTabular}>{selectedOrder.orderGrossLabel}</span>
+              </div>
+              <div className={wltStyles.inspectorImpactRow}>
+                <span>رسوم التوصيل:</span>
+                <span className={wltStyles.inspectorImpactRowTabular}>{selectedOrder.deliveryFeeLabel}</span>
+              </div>
+              <div className={`${wltStyles.inspectorImpactRow} ${wltStyles.inspectorImpactRowDanger}`}>
+                <span>عمولة المنصة (8%):</span>
+                <span className={wltStyles.inspectorImpactRowTabular}>- {selectedOrder.platformCommissionLabel}</span>
+              </div>
+              <div className={`${wltStyles.inspectorImpactRow} ${wltStyles.inspectorImpactRowDanger}`}>
+                <span>الخصومات المطبقة:</span>
+                <span className={wltStyles.inspectorImpactRowTabular}>- {selectedOrder.discountLabel}</span>
+              </div>
+              {selectedOrder.refundMinorUnits > 0 && (
+                <div className={`${wltStyles.inspectorImpactRow} ${wltStyles.inspectorImpactRowDanger}`}>
+                  <span>الاسترداد المدفوع:</span>
+                  <span className={wltStyles.inspectorImpactRowTabular}>- {selectedOrder.refundLabel}</span>
+                </div>
+              )}
+              <hr className={wltStyles.inspectorImpactSeparator} />
+              <div className={wltStyles.inspectorImpactTotalRow}>
+                <span>صافي التوريد المعتمد:</span>
+                <span className={wltStyles.inspectorImpactRowTabular}>{selectedOrder.netSettlementImpactLabel}</span>
+              </div>
+            </div>
+
+            <Box gap={1}>
+              <span className={wltStyles.inspectorMetaKey}>حالة التصفية والأدلة الملحقة</span>
+              <span className={wltStyles.inspectorMetaVal}>
+                {ORDER_STATUS_LABEL[selectedOrder.settlementStatus]}
+              </span>
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span className={wltStyles.inspectorMetaKey}>مرجع المستند / الحجز:</span>
+                <code className={wltStyles.inspectorEvidenceCode}>{selectedOrder.evidenceRef || 'HOLD-WLT-UNRESOLVED'}</code>
+              </div>
+            </Box>
+          </Box>
+        )}
+      </div>
+
+      {/* Technical Audit mode (collapsible info panel) */}
+      {technicalAuditMode && (
+        <Box
+          padding={3}
+          background="surfaceRaised"
+          radiusToken="lg"
+          border
+          borderTone="line"
+          gap={2}
+          className={wltStyles.postingRulesAuditPanel}
+        >
+          <span className={wltStyles.postingRulesAuditTitle}>
+            بوابة التدقيق والمطابقة - القيود المحاسبية لقواعد تسوية المتجر (SSoT Posting Rules)
+          </span>
+          <hr className={wltStyles.inspectorSeparator} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span className={wltStyles.readinessDesc}>القيود المالية الموجهة لتسويات المتجر وعمولاته:</span>
+            <div className={wltStyles.techGrid}>
+              {postingRules.map((rule) => {
+                if (!rule) return null;
+                const debitAccount = getWltAccountByCode(rule.debitAccountCode);
+                const creditAccount = getWltAccountByCode(rule.creditAccountCode);
+                return (
+                  <div key={rule.eventKind} className={wltStyles.postingRulesCard}>
+                    <span className={wltStyles.inspectorMetaVal} style={{ display: 'block', marginBottom: 4 }}>
+                      نوع الحركة: {rule.label}
+                    </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                      <span className={wltStyles.kpiValueOutflow}>مدين (Dr): {debitAccount?.code}</span>
+                      <span className={wltStyles.inspectorMetaVal}>{debitAccount?.label}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginTop: 4 }}>
+                      <span className={wltStyles.kpiValueInflow}>دائن (Cr): {creditAccount?.code}</span>
+                      <span className={wltStyles.inspectorMetaVal}>{creditAccount?.label}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, marginTop: 6, color: 'var(--bth-control-panel-text-muted)' }}>
+                      <span className={wltStyles.inspectorMetaKey}>دفتر مساعد: {rule.subledgerId}</span>
+                      <span className={wltStyles.inspectorMetaKey}>maker approval: {rule.requiresMakerApproval ? 'نعم' : 'لا'}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Box>
+      )}
     </Box>
   );
 }

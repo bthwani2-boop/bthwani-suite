@@ -31,6 +31,19 @@ export {
   getWltDshFinancePreviewMetadata,
 } from './models/dshFinance.types';
 
+// ─── Partner Statements ────────────────────────────────────────────
+export type {
+  WltDshPartnerStatement,
+  WltDshPartnerStoreLine,
+} from './models/partnerStatement.types';
+
+// ─── Captain Statements ────────────────────────────────────────────
+export type {
+  WltDshCaptainCodBag,
+  WltDshCaptainEarningLine,
+  WltDshCaptainStatement,
+} from './models/captainStatement.types';
+
 export {
   getWltCaptainFinancePreview,
   getWltCaptainFinanceSnapshot,
@@ -148,9 +161,14 @@ export { buildWltFinancialCenter, WLT_FINANCIAL_CENTER_CONTRACT } from './select
 
 export type { WltDshControlPanelPreviewContract } from './models/financeContract.types';
 
-// ─── Store Settlement Types ────────────────────────────────────────
-
 export type { WltDshSettlementOrderRow, WltDshStoreSettlementStatement } from './models/storeSettlement.types';
+
+// ─── Field Agent Commission Types ──────────────────────────────────
+
+export type {
+  WltDshFieldCommissionStoreLine,
+  WltDshFieldCommissionStatement,
+} from './models/fieldCommission.types';
 
 // ─── Account Statement Types ───────────────────────────────────────
 
@@ -175,5 +193,8 @@ export {
   getWltDshRefundLedgerPreviewAdapter as getWltDshRefundLedgerPreview,
   getWltDshSettlementCalendarPreviewAdapter as getWltDshSettlementCalendarPreview,
   getWltDshStoreSettlementStatementsPreviewAdapter as getWltDshStoreSettlementStatementsPreview,
+  getWltFieldCommissionStatementsPreviewAdapter as getWltFieldCommissionStatementsPreview,
+  getWltDshPartnerSettlementStatementsPreviewAdapter as getWltDshPartnerSettlementStatementsPreview,
+  getWltDshCaptainSettlementStatementsPreviewAdapter as getWltDshCaptainSettlementStatementsPreview,
   WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT,
 } from './adapters/dshFinanceFixture.adapter';

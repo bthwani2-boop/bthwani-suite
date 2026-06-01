@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Text } from '@bthwani/ui-kit';
+import { buildFinanceHref } from '../constants/finance.registry';
 import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
 import type { WltFinancialCenterSection, WltLedgerEntry, WltFinancialCenterBlockingVariance } from '../models/financialCenter.types';
@@ -116,7 +117,7 @@ function PositionCard({ section }: { section: WltFinancialCenterSection }) {
   );
 }
 
-function LedgerTable({ entries }: { entries: readonly WltLedgerEntry[] }) {
+function LedgerTable({ entries, technicalAuditMode }: { entries: readonly WltLedgerEntry[]; technicalAuditMode: boolean }) {
   const [showAll, setShowAll] = React.useState(false);
   const visible = showAll ? entries : entries.slice(0, 8);
 
@@ -125,7 +126,7 @@ function LedgerTable({ entries }: { entries: readonly WltLedgerEntry[] }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Text role="titleSm" style={{ fontWeight: '700' }}>قيود دفتر الأستاذ</Text>
         <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
-          {entries.length} قيد إجمالي · [معاينة] CONTRACT_SCAFFOLD_PREVIEW_ONLY
+          {entries.length} قيد إجمالي · {technicalAuditMode ? '[معاينة] CONTRACT_SCAFFOLD_PREVIEW_ONLY' : 'معاينة تشغيلية'}
         </span>
       </div>
 
@@ -215,12 +216,12 @@ function LedgerTable({ entries }: { entries: readonly WltLedgerEntry[] }) {
   );
 }
 
-function BlockingVariancesList({ variances }: { variances: readonly WltFinancialCenterBlockingVariance[] }) {
+function BlockingVariancesList({ variances, technicalAuditMode }: { variances: readonly WltFinancialCenterBlockingVariance[]; technicalAuditMode: boolean }) {
   if (variances.length === 0) {
     return (
       <div style={{ padding: '10px 14px', background: 'var(--bth-success-surface)', border: '1px solid var(--bth-success-border)', borderRadius: 8, direction: 'rtl' }}>
         <span style={{ fontSize: 12, color: 'var(--bth-success-text)', fontWeight: '700' }}>
-          لا توجد فوارق مالية تمنع الإغلاق [معاينة]
+          لا توجد فوارق مالية تمنع الإغلاق {technicalAuditMode ? '[معاينة]' : ''}
         </span>
       </div>
     );
@@ -246,7 +247,9 @@ function BlockingVariancesList({ variances }: { variances: readonly WltFinancial
             <span style={{ fontSize: 11, fontWeight: '600', color: 'var(--bthwani-control-panel-text)' }}>
               {v.description}
             </span>
-            <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>{v.reason}</span>
+            <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
+              {technicalAuditMode ? v.reason : (v.reason === 'محجوب من WLT' ? 'مبلغ محجوز' : 'قيد المراجعة')}
+            </span>
           </div>
           <span style={{ fontSize: 12, fontWeight: '800', color: 'var(--bth-warning-text)', fontVariantNumeric: 'tabular-nums' }}>
             {v.varianceLabel}
@@ -257,7 +260,7 @@ function BlockingVariancesList({ variances }: { variances: readonly WltFinancial
   );
 }
 
-function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blockingCount: number }) {
+function CloseGatePanel({ canClose, blockingCount, technicalAuditMode }: { canClose: boolean; blockingCount: number; technicalAuditMode: boolean }) {
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
 
@@ -296,7 +299,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
             padding: '2px 8px',
             borderRadius: 4,
           }}>
-            {canClose ? 'جاهز للمراجعة [معاينة]' : `${blockingCount} بند يمنع الإغلاق`}
+            {canClose ? (technicalAuditMode ? 'جاهز للمراجعة [معاينة]' : 'جاهز للمراجعة') : `${blockingCount} بند يمنع الإغلاق`}
           </span>
           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>{open ? '▲' : '▼'}</span>
         </div>
@@ -309,7 +312,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
             <button
-              onClick={() => router.push('/finance?workspace=daily-close')}
+              onClick={() => router.push(buildFinanceHref('reports-policies-approvals', { subGroup: 'approvals' }))}
               style={{
                 background: canClose ? 'var(--bth-success-surface)' : 'var(--bth-warning-surface)',
                 border: `1px solid ${canClose ? 'var(--bth-success-border)' : 'var(--bth-warning-border)'}`,
@@ -324,7 +327,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
               فتح مصنع الإغلاق والمطابقة ←
             </button>
             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)', alignSelf: 'center' }}>
-              [معاينة] · يتطلب WLT runtime لتنفيذ الإغلاق الفعلي
+              {technicalAuditMode ? '[معاينة] · يتطلب WLT runtime لتنفيذ الإغلاق الفعلي' : 'يتطلب ربط WLT لتنفيذ الإغلاق الفعلي'}
             </span>
           </div>
         </div>
@@ -333,7 +336,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
   );
 }
 
-export function FinancialCenterScreen(_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) {
+export function FinancialCenterScreen({ hubHref, subGroup, technicalAuditMode }: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
 
   const center = React.useMemo(
@@ -345,7 +348,9 @@ export function FinancialCenterScreen(_: { hubHref: string; subGroup?: string; t
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <div style={{ padding: '6px 12px', background: 'var(--bth-warning-surface)', border: '1px solid var(--bth-warning-border)', borderRadius: 7, display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 10, color: 'var(--bth-warning-text)', fontWeight: '700' }}>
-          CONTRACT_SCAFFOLD_PREVIEW_ONLY · الأرصدة الافتتاحية والختامية غير متوفرة — يتطلب WLT Ledger Runtime · DSH عرض فقط
+          {technicalAuditMode
+            ? 'CONTRACT_SCAFFOLD_PREVIEW_ONLY · الأرصدة الافتتاحية والختامية غير متوفرة — يتطلب WLT Ledger Runtime · DSH عرض فقط'
+            : 'معاينة تشغيلية · الأرصدة الافتتاحية والختامية غير متوفرة حالياً لعدم اكتمال الربط'}
         </span>
       </div>
 
@@ -387,7 +392,7 @@ export function FinancialCenterScreen(_: { hubHref: string; subGroup?: string; t
       </div>
 
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <LedgerTable entries={center.allEntries} />
+        <LedgerTable entries={center.allEntries} technicalAuditMode={technicalAuditMode} />
       </Box>
 
       <Box gap={2}>
@@ -399,10 +404,10 @@ export function FinancialCenterScreen(_: { hubHref: string; subGroup?: string; t
             </span>
           )}
         </div>
-        <BlockingVariancesList variances={center.blockingVariances} />
+        <BlockingVariancesList variances={center.blockingVariances} technicalAuditMode={technicalAuditMode} />
       </Box>
 
-      <CloseGatePanel canClose={center.canClose} blockingCount={center.blockingVariances.length} />
+      <CloseGatePanel canClose={center.canClose} blockingCount={center.blockingVariances.length} technicalAuditMode={technicalAuditMode} />
     </Box>
   );
 }

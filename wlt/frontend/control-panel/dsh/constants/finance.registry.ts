@@ -47,7 +47,8 @@ export const FINANCE_CANONICAL_GROUPS: readonly FinanceGroupMeta[] = [
     description: 'إدارة وتدقيق تسويات مستحقات المتاجر، الكباتن، الميدانيين، وحوالات الصرف البنكية.',
     badge: 'Payout',
     subGroups: [
-      { id: 'partners', label: 'تسويات المتاجر' },
+      { id: 'partners', label: 'تسويات الشركاء' },
+      { id: 'stores', label: 'تسويات المتاجر' },
       { id: 'captains', label: 'تسويات الكباتن' },
       { id: 'field', label: 'تسويات الميدانيين' },
       { id: 'gateways', label: 'بوابات الدفع' },
@@ -140,15 +141,19 @@ export function normalizeFinanceLocation(workspace?: string, panel?: string): Fi
       return { kind: 'group', group: 'payments-wallets', subGroup: 'captain-wallets', sourceWorkspace: workspace, panel: resolvedPanel };
 
     case 'store-settlements':
-      return { kind: 'group', group: 'settlements-payouts', subGroup: 'partners', sourceWorkspace: workspace, panel: resolvedPanel };
-    case 'settlement-calendar':
-      return { kind: 'group', group: 'settlements-payouts', subGroup: 'bank-transfers', sourceWorkspace: workspace, panel: resolvedPanel };
+    case 'stores':
+    case 'store-delivery-finance':
+      return { kind: 'group', group: 'settlements-payouts', subGroup: 'stores', sourceWorkspace: workspace, panel: resolvedPanel };
+    case 'partner-settlements':
+    case 'partners':
     case 'settlements':
     case 'payouts':
     case 'settlements-payouts':
       return { kind: 'group', group: 'settlements-payouts', subGroup: 'partners', sourceWorkspace: workspace, panel: resolvedPanel };
-    case 'store-delivery-finance':
-      return { kind: 'group', group: 'settlements-payouts', subGroup: 'partners', sourceWorkspace: workspace, panel: resolvedPanel };
+    case 'settlement-calendar':
+      return { kind: 'group', group: 'settlements-payouts', subGroup: 'bank-transfers', sourceWorkspace: workspace, panel: resolvedPanel };
+    case 'tax-compliance':
+      return { kind: 'group', group: 'commissions-fees-promo', subGroup: 'fees', sourceWorkspace: workspace, panel: resolvedPanel };
 
     case 'refund-ledger':
     case 'refunds':

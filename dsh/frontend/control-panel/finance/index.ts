@@ -2,8 +2,8 @@
 // All logic (registry, types, api-matrix, hub rendering) lives in wlt/frontend/control-panel/dsh/.
 
 // Hub screen
-export { ControlPanelFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../../../wlt/frontend/control-panel/dsh/screens/ControlPanelFinanceHubHost';
-export type { ControlPanelDshFinanceScreenProps } from '../../../../wlt/frontend/control-panel/dsh/screens/ControlPanelFinanceHubHost';
+export { WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../../../wlt/frontend/control-panel/dsh/screens/WltDshFinanceHubHost';
+export type { WltDshFinanceHubHostProps as ControlPanelDshFinanceScreenProps } from '../../../../wlt/frontend/control-panel/dsh/screens/WltDshFinanceHubHost';
 
 // Finance routing types
 export type {

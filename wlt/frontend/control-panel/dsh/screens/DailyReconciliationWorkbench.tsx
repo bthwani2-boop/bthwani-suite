@@ -3,6 +3,8 @@
 import React from 'react';
 import { Box, Text, Button } from '@bthwani/ui-kit';
 import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
+import { formatWltYer } from '../financeContracts';
+import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type DayLifecycleStage =
   | 'open'
@@ -214,7 +216,7 @@ export function DailyReconciliationWorkbench() {
         </div>
       </div>
 
-      <Box gap={2} style={{ padding: '0 4px' }}>
+      <Box gap={2}>
         <Text role="titleSm" style={{ fontWeight: '800' }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
           {allRows.map((row) => {
@@ -248,14 +250,18 @@ export function DailyReconciliationWorkbench() {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexGrow: 1, justifyContent: 'center', maxWidth: 460 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 120 }}>
-                      <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-info-text)', fontVariantNumeric: 'tabular-nums' }}>{row.expectedMinorUnits.toLocaleString()} وصغ</span>
+                      <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-info-text)' }}>
+                        <span className={wltStyles.tabularNums}>{formatWltYer(row.expectedMinorUnits)}</span>
+                      </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource}</span>
                     </div>
                     <div style={{ fontSize: 10, fontWeight: '800', padding: '1px 6px', borderRadius: 4, background: hasVar ? 'var(--bth-danger-surface)' : 'var(--bth-success-surface)', color: hasVar ? 'var(--bth-danger-text)' : 'var(--bth-success-text)', whiteSpace: 'nowrap' }}>
-                      {hasVar ? `فارق: ${row.varianceMinorUnits.toLocaleString()}` : 'متطابق ✓'}
+                      {hasVar ? `فارق: ${formatWltYer(row.varianceMinorUnits)}` : 'متطابق ✓'}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: 120 }}>
-                      <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-brand-alt)', fontVariantNumeric: 'tabular-nums' }}>{row.actualMinorUnits.toLocaleString()} وصغ</span>
+                      <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-brand-alt)' }}>
+                        <span className={wltStyles.tabularNums}>{formatWltYer(row.actualMinorUnits)}</span>
+                      </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{ACTUAL_SOURCE_LABEL[row.actualSource] || row.actualSource}</span>
                     </div>
                   </div>
@@ -271,22 +277,22 @@ export function DailyReconciliationWorkbench() {
                 {isExpanded && (
                   <div style={{ padding: '16px 20px', borderTop: '1px solid var(--bthwani-control-panel-border)', background: 'rgba(0,0,0,0.01)' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-                      <Box padding={2.5} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1.5}>
+                      <Box padding={2} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
                         <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>الأدلة الرقمية</span>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 4 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>مستند المطابقة</span>
                           <span style={{ fontSize: 10, fontWeight: '700' }}>{EVIDENCE_LABEL[row.evidenceStatus]}</span>
                         </div>
-                        {row.bankDepositRef && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse' }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>مرجع الإيداع</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.bankDepositRef}</code></div>}
-                        {row.cashBagRef && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 2 }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>حقيبة النقدية</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.cashBagRef}</code></div>}
+                        {row.bankDepositRef && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>مرجع الإيداع</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.bankDepositRef}</code></div>}
+                        {row.cashBagRef && <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>حقيبة النقدية</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.cashBagRef}</code></div>}
                       </Box>
-                      <Box padding={2.5} background="surfaceRaised" radiusToken="md" border borderTone="line" gap={1.5}>
+                      <Box padding={2} background="surfaceRaised" radiusToken="md" border borderTone="line" gap={1}>
                         <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>حالة الاعتماد</span>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 4 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>سير العمل</span>
                           <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد في المعاينة [تجريبي]' : row.workflowState === 'blocked_wlt' ? 'محجوب من WLT 🚨' : 'قيد المراجعة والتدقيق'}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 2 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
                           <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>الإجراء</span>
                           <span style={{ fontSize: 10, fontWeight: '700' }}>{RECONCILIATION_LABEL[row.reconciliationStatus]}</span>
                         </div>
@@ -300,19 +306,21 @@ export function DailyReconciliationWorkbench() {
         </div>
       </Box>
 
-      <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+      <div className={wltStyles.reconciliationSummaryGrid}>
         {[
-          { label: 'إجمالي المبالغ المتوقعة', value: `${totalExpected.toLocaleString()} وصغ`, color: 'var(--bth-info-text)' },
-          { label: 'إجمالي المبالغ الفعلية الموردة', value: `${totalActual.toLocaleString()} وصغ`, color: 'var(--bth-brand-alt)' },
-          { label: 'صافي الفارق المالي الإجمالي', value: totalVariance !== 0 ? `${totalVariance.toLocaleString()} وصغ ⚠` : '٠ وصغ ✓', color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
+          { label: 'إجمالي المبالغ المتوقعة', value: formatWltYer(totalExpected), color: 'var(--bth-info-text)' },
+          { label: 'إجمالي المبالغ الفعلية الموردة', value: formatWltYer(totalActual), color: 'var(--bth-brand-alt)' },
+          { label: 'صافي الفارق المالي الإجمالي', value: totalVariance !== 0 ? `${formatWltYer(totalVariance)} ⚠` : '٠ ر.ي ✓', color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
           { label: 'اكتمال مستندات المطابقة', value: `${allRows.filter((r) => r.evidenceStatus === 'complete').length}/${allRows.length} بند`, color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' },
         ].map(({ label, value, color }) => (
-          <Box key={label} gap={1} style={{ borderRight: '3px solid var(--bthwani-control-panel-border)', paddingRight: 10 }}>
+          <div key={label} className={wltStyles.reconciliationSummaryCard}>
             <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{label}</Text>
-            <Text role="bodyStrong" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '800', color, fontSize: 14 }}>{value}</Text>
-          </Box>
+            <Text role="bodyStrong" style={{ textAlign: 'right', fontWeight: '800', color, fontSize: 14 }}>
+              <span className={wltStyles.tabularNums}>{value}</span>
+            </Text>
+          </div>
         ))}
-      </Box>
+      </div>
     </Box>
   );
 }

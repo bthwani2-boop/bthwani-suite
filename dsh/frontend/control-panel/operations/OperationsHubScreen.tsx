@@ -119,8 +119,8 @@ export function ControlPanelDshOperationsScreen({
   const hubHref = buildOperationsHref(activeGroup, focusParams);
 
   const screenConfig = SCREEN_RENDERERS[activeGroup];
-  const ActiveScreen = (activeSubGroup && screenConfig.bySubGroup?.[activeSubGroup])
-    ?? screenConfig.default;
+  const ActiveScreen = ((activeSubGroup && screenConfig.bySubGroup?.[activeSubGroup])
+    ?? screenConfig.default) as any;
 
   const governance = getDshControlPanelGovernanceEntry('operations');
   const kpiItems = React.useMemo(

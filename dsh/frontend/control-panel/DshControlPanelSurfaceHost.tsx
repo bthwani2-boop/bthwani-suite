@@ -34,7 +34,7 @@ export function DshControlPanelSurfaceHost({
   workspace = 'overview',
   orderId,
   orderOverlayMode,
-  financeGroup = 'overview',
+  financeGroup = 'financial-command-center',
   financePanel,
 }: DshControlPanelSurfaceHostProps) {
   const router = useRouter();

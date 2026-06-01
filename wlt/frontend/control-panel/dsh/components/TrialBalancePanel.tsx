@@ -3,11 +3,13 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { buildWltTrialBalancePreview } from '../selectors/buildTrialBalance';
+import { formatWltYer } from '../models/dshFinance.types';
 import type { WltLedgerEntry } from '../models/financialCenter.types';
 
-export function TrialBalancePanel({ entries, businessDate }: {
+export function TrialBalancePanel({ entries, businessDate, technicalAuditMode = false }: {
   entries: readonly WltLedgerEntry[];
   businessDate: string;
+  technicalAuditMode?: boolean;
 }) {
   const tb = React.useMemo(
     () => buildWltTrialBalancePreview(businessDate, entries.map((e) => ({
@@ -29,7 +31,7 @@ export function TrialBalancePanel({ entries, businessDate }: {
           color: isBalanced ? 'var(--bth-success-text)' : 'var(--bth-danger-text)',
           background: isBalanced ? 'var(--bth-success-surface)' : 'var(--bth-danger-surface)',
         }}>
-          {isBalanced ? 'متوازن ✓' : `فارق: ${tb.imbalanceMinorUnits.toLocaleString()} وصغ`}
+          {isBalanced ? 'متوازن ✓' : `فارق: ${formatWltYer(tb.imbalanceMinorUnits)}`}
         </span>
       </div>
 
@@ -51,13 +53,13 @@ export function TrialBalancePanel({ entries, businessDate }: {
                 </td>
                 <td style={{ padding: '5px 10px', color: 'var(--bthwani-control-panel-text-muted)', fontSize: 10 }}>{line.accountType}</td>
                 <td style={{ padding: '5px 10px', fontVariantNumeric: 'tabular-nums', color: line.debitMinorUnits > 0 ? 'var(--bth-info-text)' : 'var(--bthwani-control-panel-text-muted)' }}>
-                  {line.debitMinorUnits > 0 ? line.debitMinorUnits.toLocaleString() : '—'}
+                  {line.debitMinorUnits > 0 ? formatWltYer(line.debitMinorUnits) : '—'}
                 </td>
                 <td style={{ padding: '5px 10px', fontVariantNumeric: 'tabular-nums', color: line.creditMinorUnits > 0 ? 'var(--bth-success-text)' : 'var(--bthwani-control-panel-text-muted)' }}>
-                  {line.creditMinorUnits > 0 ? line.creditMinorUnits.toLocaleString() : '—'}
+                  {line.creditMinorUnits > 0 ? formatWltYer(line.creditMinorUnits) : '—'}
                 </td>
                 <td style={{ padding: '5px 10px', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: line.netMinorUnits !== 0 ? 'var(--bth-warning-text)' : 'var(--bthwani-control-panel-text-muted)' }}>
-                  {line.netMinorUnits.toLocaleString()}
+                  {formatWltYer(line.netMinorUnits)}
                 </td>
                 <td style={{ padding: '5px 10px' }}>
                   <span style={{ fontSize: 10, color: line.isBalanced ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }}>
@@ -70,17 +72,17 @@ export function TrialBalancePanel({ entries, businessDate }: {
           <tfoot>
             <tr style={{ background: 'var(--bthwani-control-panel-surface-raised)', borderTop: '2px solid var(--bthwani-control-panel-border)', fontWeight: 700 }}>
               <td colSpan={2} style={{ padding: '6px 10px', textAlign: 'right' }}>الإجمالي</td>
-              <td style={{ padding: '6px 10px', fontVariantNumeric: 'tabular-nums', color: 'var(--bth-info-text)' }}>{tb.totalDebitMinorUnits.toLocaleString()}</td>
-              <td style={{ padding: '6px 10px', fontVariantNumeric: 'tabular-nums', color: 'var(--bth-success-text)' }}>{tb.totalCreditMinorUnits.toLocaleString()}</td>
+              <td style={{ padding: '6px 10px', fontVariantNumeric: 'tabular-nums', color: 'var(--bth-info-text)' }}>{formatWltYer(tb.totalDebitMinorUnits)}</td>
+              <td style={{ padding: '6px 10px', fontVariantNumeric: 'tabular-nums', color: 'var(--bth-success-text)' }}>{formatWltYer(tb.totalCreditMinorUnits)}</td>
               <td colSpan={2} style={{ padding: '6px 10px', color: isBalanced ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }}>
-                {isBalanced ? 'متوازن' : `فارق: ${tb.imbalanceMinorUnits.toLocaleString()}`}
+                {isBalanced ? 'متوازن' : `فارق: ${formatWltYer(tb.imbalanceMinorUnits)}`}
               </td>
             </tr>
           </tfoot>
         </table>
       </div>
       <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY · القاعدة: مجموع المدين = مجموع الدائن. أي فارق يوقف إغلاق اليوم.
+        {technicalAuditMode ? 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' : 'معاينة تشغيلية'} · القاعدة: مجموع المدين = مجموع الدائن. أي فارق يوقف إغلاق اليوم.
       </Text>
     </Box>
   );

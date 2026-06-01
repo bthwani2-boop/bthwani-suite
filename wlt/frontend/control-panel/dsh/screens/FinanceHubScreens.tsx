@@ -20,6 +20,12 @@ import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
 import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
 import { getFinanceApiBinding } from '../adapters/finance.api-matrix';
 import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
+import { WltDshFieldCommissionStatement } from '../components/WltDshFieldCommissionStatement';
+import { WltDshStoreSettlementStatement } from '../components/WltDshStoreSettlementStatement';
+import { WltDshPartnerStatement } from '../components/WltDshPartnerStatement';
+import { WltDshAccountStatement } from '../components/WltDshAccountStatement';
+import { WltDshCaptainStatement } from '../components/WltDshCaptainStatement';
+import { normalizeFinanceLocation } from '../constants/finance.registry';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type FinanceSurface = DshFinancePreviewSurface;
@@ -175,6 +181,7 @@ export function FinanceSurfaceBoard({
 
     if (surface === 'settlements') {
       if (subGroup === 'partners') return baseRows.filter((row) => row.actorType === 'partner');
+      if (subGroup === 'stores') return baseRows.filter((row) => row.actorType === 'partner');
       if (subGroup === 'captains') return baseRows.filter((row) => row.actorType === 'captain');
       if (subGroup === 'field') return baseRows.filter((row) => row.actorType === 'field');
     }
@@ -333,123 +340,49 @@ export function FinanceSurfaceBoard({
                           background: 'rgba(255,255,255,0.4)',
                         }}
                       >
-                        {/* 3-Column Grid for Details */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
-
-                          {/* Column 1: Match & Source details */}
-                          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bth-control-panel-text-muted)' }}>المطابقة والحسبة المالية</span>
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '6px 0' }} />
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
-                              <Text role="bodySm" tone="soft">المبلغ المتوقع</Text>
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                <span style={{ fontSize: 12, fontWeight: '700' }}>{row.expectedMinorUnits.toLocaleString('ar-YE')} وصغ</span>
-                                <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>({EXPECTED_SOURCE_AR[row.expectedSource] || row.expectedSource})</span>
-                              </div>
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse', marginTop: 8 }}>
-                              <Text role="bodySm" tone="soft">المبلغ الفعلي</Text>
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                <span style={{ fontSize: 12, fontWeight: '700' }}>{row.actualMinorUnits.toLocaleString('ar-YE')} وصغ</span>
-                                <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>({ACTUAL_SOURCE_AR[row.actualSource] || row.actualSource})</span>
-                              </div>
-                            </div>
-
-                            <hr style={{ border: 'none', borderTop: '1px dashed var(--bth-control-panel-border)', margin: '6px 0' }} />
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
-                              <Text role="bodySm" style={{ fontWeight: '700' }}>الفارق المالي</Text>
-                              <span style={{ fontSize: 11, fontWeight: '800', color: row.varianceMinorUnits !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' }}>
-                                {row.varianceMinorUnits.toLocaleString('ar-YE')} وصغ
-                                {row.varianceMinorUnits !== 0 ? ' ⚠️ غير مطابق' : ' ✓ متطابق'}
-                              </span>
-                            </div>
-
-                            {row.varianceReason && (
-                              <Box padding={2} background="dangerSurface" radiusToken="sm" style={{ marginTop: 6 }}>
-                                <Text role="caption" tone="danger" style={{ fontSize: 10, lineHeight: 1.4 }}>
-                                  <strong>السبب:</strong> {row.varianceReason}
-                                </Text>
-                              </Box>
-                            )}
-                          </Box>
-
-                          {/* Column 2: Evidence & Monospace Refs */}
-                          <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={2}>
-                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bth-control-panel-text-muted)' }}>الأدلة والمراجع الرقمية</span>
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '6px 0' }} />
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
-                              <Text role="bodySm" tone="soft">حالة الأدلة</Text>
-                              <span style={{ fontSize: 11, fontWeight: '700', color: row.evidenceStatus === 'complete' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }}>
-                                {row.evidenceStatus === 'complete' ? 'مكتملة وموثقة ✓' : 'معلقة / ناقصة ⚠️'}
-                              </span>
-                            </div>
-                            <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)', display: 'block', textAlign: 'left', marginTop: -4 }}>
-                              ({EVIDENCE_SOURCE_AR[row.evidenceSource] || row.evidenceSource})
-                            </span>
-
-                            <Box gap={1} style={{ marginTop: 8, borderTop: '1px solid var(--bth-control-panel-border)', paddingTop: 6 }}>
-                              {row.bankDepositRef && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
-                                  <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>مرجع الإيداع</span>
-                                  <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace' }}>{row.bankDepositRef}</code>
-                                </div>
-                              )}
-                              {row.cashBagRef && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse', marginTop: 3 }}>
-                                  <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>حقيبة النقدية</span>
-                                  <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace' }}>{row.cashBagRef}</code>
-                                </div>
-                              )}
-                              {row.ledgerEntryRef && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse', marginTop: 3 }}>
-                                  <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>قيد اليومية</span>
-                                  <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace' }}>{row.ledgerEntryRef}</code>
-                                </div>
-                              )}
-                            </Box>
-                          </Box>
-
-                          {/* Column 3: Handoff & Technical (If Technical Mode Enabled) */}
-                          <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2} style={{ borderRight: '4px solid var(--bth-info-text)' }}>
-                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bth-info-text)' }}>التفويض والإجراء لـ DSH</span>
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '6px 0' }} />
-
-                            <p style={{ fontSize: 11, lineHeight: 1.5, color: 'var(--bth-control-panel-text)' }}>
-                              {row.allowedAction === 'review' ? 'مراجعة وتدقيق مستندات المعاملة ومطابقتها يدوياً.'
-                                : row.allowedAction === 'view_evidence' ? 'التحقق الفوري من أدلة الإيداع والنقدية المرفوعة.'
-                                : row.allowedAction === 'prepare_decision' ? 'تحضير مسودة قرار الصرف (WLT Engine سيتولى تنفيذ الترحيل).'
-                                : 'لا يتطلب هذا الكيان أي إجراء فوري، قراءة مرجعية فقط.'}
-                            </p>
-
-                            {technicalAuditMode && (
-                              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--bth-warning-text)', background: 'var(--bth-warning-surface)', padding: '4px 8px', borderRadius: 4, display: 'inline-block' }}>
-                                [معاينة] · محاكاة · يتطلب WLT runtime
-                              </div>
-                            )}
-
-                            {technicalAuditMode && (
-                              <Box gap={1} style={{ borderTop: '1px dashed var(--bth-control-panel-border)', paddingTop: 6, marginTop: 6 }}>
-                                {row.debitAccountId && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse' }}><span style={{ fontSize: 9 }}>مدين</span><code style={{ fontSize: 8 }}>{row.debitAccountId}</code></div>}
-                                {row.creditAccountId && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 1 }}><span style={{ fontSize: 9 }}>دائن</span><code style={{ fontSize: 8 }}>{row.creditAccountId}</code></div>}
-                                {row.auditTrailId && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 1 }}><span style={{ fontSize: 9 }}>أثر</span><code style={{ fontSize: 8 }}>{row.auditTrailId}</code></div>}
-                              </Box>
-                            )}
-                          </Box>
-
+                        {/* Dynamic Statement / Workbench Detail per Actor Type */}
+                        <div style={{ marginBottom: 16 }}>
+                          {(() => {
+                            if (row.actorType === 'field') {
+                              return (
+                                <WltDshFieldCommissionStatement
+                                  agentId={row.sourceFieldAgentId}
+                                  technicalAuditMode={technicalAuditMode}
+                                />
+                              );
+                            }
+                            if (row.actorType === 'partner') {
+                              return (
+                                <WltDshPartnerStatement
+                                  technicalAuditMode={technicalAuditMode}
+                                />
+                              );
+                            }
+                            if (row.actorType === 'captain') {
+                              return (
+                                <WltDshCaptainStatement
+                                  captainId={row.sourceCaptainId}
+                                  technicalAuditMode={technicalAuditMode}
+                                />
+                              );
+                            }
+                            return (
+                              <WltDshAccountStatement
+                                actorId={row.actorType === 'client' ? 'CUS-553' : 'DSH-PLATFORM'}
+                                technicalAuditMode={technicalAuditMode}
+                              />
+                            );
+                          })()}
                         </div>
 
                         {/* OpenAPI Matrix Bindings (Technical Mode Only) */}
                         {technicalAuditMode && (() => {
-                          const binding = getFinanceApiBinding(surface);
+                          const binding = getFinanceApiBinding(normalizeFinanceLocation(surface).group);
                           if (!binding) return null;
                           return (
-                            <Box padding={2} background="surfaceInset" radiusToken="sm" gap={1} style={{ marginTop: 12, direction: 'rtl', textAlign: 'right' }}>
-                              <Text role="caption" tone="muted" style={{ fontWeight: '700' }}>WLT OpenAPI Binding Matrix [P7]</Text>
-                              <Text role="caption" tone="muted">{binding.httpMethod} {binding.wltEndpoint} · operationId: {binding.operationId} · endpoint: {binding.endpointStatus === 'exact' ? '✓ exact' : '⚠ placeholder'}</Text>
+                            <Box padding={2} background="surfaceInset" radiusToken="sm" gap={1} style={{ marginTop: 12, direction: 'rtl' }}>
+                              <Text role="caption" tone="muted" style={{ fontWeight: '700', textAlign: 'right' }}>WLT OpenAPI Binding Matrix [P7]</Text>
+                              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{binding.httpMethod} {binding.wltEndpoint} · operationId: {binding.operationId} · endpoint: {binding.endpointStatus === 'exact' ? '✓ exact' : '⚠ placeholder'}</Text>
                             </Box>
                           );
                         })()}

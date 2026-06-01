@@ -505,3 +505,635 @@
   gap: 12px;
   margin-top: 8px;
 }
+
+/* FIN-UI-OPS-01 — Unified View States & Impact Grid */
+.operationalImpactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  width: 100%;
+  background: var(--bth-control-panel-surface-raised);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  direction: rtl;
+}
+
+.operationalImpactCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: right;
+  gap: 4px;
+}
+
+.operationalImpactLabel {
+  font-size: 10px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.operationalImpactValue {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+}
+
+.operationalImpactValueDanger {
+  color: var(--bth-danger-text);
+}
+
+.statePrimaryAction {
+  padding: 8px 16px;
+  background: var(--bth-brand-primary);
+  color: var(--bth-text-inverse);
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.statePrimaryAction:hover {
+  opacity: 0.9;
+}
+
+.stateTitleDanger {
+  color: var(--bth-danger-text) !important;
+}
+
+.hubHeader {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--bth-control-panel-border);
+}
+
+.hubSection {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bth-control-panel-border);
+}
+
+.hubReadinessSection {
+  padding: 12px 16px 0 16px;
+}
+
+.headerActionsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.refreshButton {
+  padding: 6px 12px;
+  background: var(--bth-brand-primary);
+  color: var(--bth-text-inverse);
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.refreshButton:hover {
+  opacity: 0.9;
+}
+
+.readinessColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.readinessCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.readinessVal {
+  font-size: 12px;
+}
+
+.hubHeader h1 {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* Store Settlement Switcher */
+.storeSelectorHeaderFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.storeSelectorTitleFlex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.storeSelectorButtonsFlex {
+  display: flex;
+  gap: 6px;
+}
+
+.storeSelectorBtn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--bth-control-panel-border);
+  background: var(--bth-control-panel-surface-raised);
+  color: var(--bth-control-panel-text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.storeSelectorBtn:hover {
+  background: var(--bth-control-panel-border);
+}
+
+.storeSelectorBtnActive {
+  background: var(--bth-brand-primary) !important;
+  color: var(--bth-text-inverse) !important;
+  border-color: var(--bth-brand-primary) !important;
+}
+
+.storeSelectorMetaFlex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.storeSelectorPeriodBadge {
+  font-size: 11px;
+  background: rgba(0,0,0,0.06);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+}
+
+.storeSelectorStatusBadge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.storeSelectorStatusSuccess {
+  background: var(--bth-success-surface);
+  color: var(--bth-success-text);
+}
+
+.storeSelectorStatusDanger {
+  background: var(--bth-danger-surface);
+  color: var(--bth-danger-text);
+}
+
+/* Metrics Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+/* Workbench Layout */
+.workbenchLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+.workbenchLayoutWithInspector {
+  grid-template-columns: 1fr 320px;
+}
+
+@media (max-width: 900px) {
+  .workbenchLayoutWithInspector {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Interactive Table */
+.tableHeaderFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.statementTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.statementTh {
+  text-align: right;
+  padding: 10px 8px;
+  font-size: 11px;
+  color: var(--bth-control-panel-text-muted);
+  border-bottom: 2px solid var(--bth-control-panel-border);
+}
+
+.statementRow {
+  border-bottom: 1px solid var(--bth-control-panel-border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.statementRow:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.statementRowActive {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.statementTd {
+  padding: 10px 8px;
+  font-size: 11px;
+  color: var(--bth-control-panel-text);
+}
+
+.statementTdBold {
+  font-weight: 800;
+}
+
+.statementTdTabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.evidenceCode {
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* Order Inspector Sidebar */
+.inspectorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inspectorTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bth-control-panel-text);
+}
+
+.inspectorCloseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--bth-control-panel-text-muted);
+  padding: 4px;
+}
+
+.inspectorCloseBtn:hover {
+  color: var(--bth-control-panel-text);
+}
+
+.inspectorSeparator {
+  border: none;
+  border-top: 1px solid var(--bth-control-panel-border);
+  margin: 0;
+}
+
+.inspectorMetaKey {
+  font-size: 10px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.inspectorMetaVal {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+}
+
+.inspectorImpactCard {
+  background: var(--bth-control-panel-surface-raised);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.inspectorImpactRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: var(--bth-control-panel-text);
+}
+
+.inspectorImpactRowDanger {
+  color: var(--bth-danger-text);
+}
+
+.inspectorImpactRowTabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.inspectorImpactSeparator {
+  border: none;
+  border-top: 1px dashed var(--bth-control-panel-border);
+  margin: 6px 0;
+}
+
+.inspectorImpactTotalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bth-control-panel-text);
+}
+
+.inspectorEvidenceCode {
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+/* Technical Audit posting rules inside statement */
+.postingRulesAuditPanel {
+  border-right: 4px solid var(--bth-info-text);
+  border-left: none;
+  direction: rtl;
+}
+
+.postingRulesAuditTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bth-info-text);
+}
+
+.postingRulesCard {
+  background: var(--bth-control-panel-surface);
+  border: 1px solid var(--bth-control-panel-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+/* Partner Statements */
+.partnerHeaderFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.partnerTitleFlex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.partnerMetaFlex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.partnerPeriodBadge {
+  font-size: 11px;
+  background: rgba(0,0,0,0.06);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+}
+
+.partnerStatusBadge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.partnerStatusSuccess {
+  background: var(--bth-success-surface);
+  color: var(--bth-success-text);
+}
+
+.partnerStatusWarning {
+  background: var(--bth-warning-surface);
+  color: var(--bth-warning-text);
+}
+
+/* Store breakdown inside partner statement */
+.partnerLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+.partnerLayoutWithDetails {
+  grid-template-columns: 1fr 340px;
+}
+
+@media (max-width: 900px) {
+  .partnerLayoutWithDetails {
+    grid-template-columns: 1fr;
+  }
+}
+
+.partnerStoreRow {
+  border-bottom: 1px solid var(--bth-control-panel-border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.partnerStoreRow:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.partnerStoreRowActive {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+.partnerStoreTd {
+  padding: 10px 8px;
+  font-size: 11px;
+  color: var(--bth-control-panel-text);
+}
+
+.partnerStoreTh {
+  text-align: right;
+  padding: 10px 8px;
+  font-size: 11px;
+  color: var(--bth-control-panel-text-muted);
+  border-bottom: 2px solid var(--bth-control-panel-border);
+}
+
+/* Detail Card inside Partner view */
+.storeDetailsCard {
+  background: var(--bth-control-panel-surface-raised);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.storeDetailsRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: var(--bth-control-panel-text);
+}
+
+.storeDetailsRowTabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.storeDetailsSeparator {
+  border: none;
+  border-top: 1px dashed var(--bth-control-panel-border);
+  margin: 6px 0;
+}
+
+/* Captain Statements */
+.captainProfileFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.captainTitleFlex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.captainMetaFlex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.captainStatusBadge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.captainStatusActive {
+  background: var(--bth-success-surface);
+  color: var(--bth-success-text);
+}
+
+.captainStatusBlocked {
+  background: var(--bth-danger-surface);
+  color: var(--bth-danger-text);
+}
+
+.captainStatusPending {
+  background: var(--bth-warning-surface);
+  color: var(--bth-warning-text);
+}
+
+.captainShortfallBanner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bth-danger-surface);
+  border-right: 4px solid var(--bth-danger-text);
+  border-left: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.captainShortfallText {
+  font-size: 12px;
+  color: var(--bth-danger-text);
+  font-weight: 700;
+}
+
+.captainShortfallBtn {
+  background: var(--bth-danger-text);
+  color: var(--bth-text-inverse);
+  border: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.captainShortfallBtn:hover {
+  opacity: 0.9;
+}
+
+.captainTabContainer {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--bth-control-panel-border);
+  padding-bottom: 8px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.captainTabBtn {
+  background: transparent;
+  border: none;
+  color: var(--bth-control-panel-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.captainTabBtn:hover {
+  color: var(--bth-control-panel-text);
+}
+
+.captainTabBtnActive {
+  color: var(--bth-brand-primary);
+}
+
+.captainTabBtnActive::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--bth-brand-primary);
+}

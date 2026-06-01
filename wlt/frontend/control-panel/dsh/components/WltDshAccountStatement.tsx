@@ -23,15 +23,27 @@ function SummaryCell({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function WltDshAccountStatement() {
+export function WltDshAccountStatement({
+  technicalAuditMode = false,
+  actorId,
+}: {
+  technicalAuditMode?: boolean;
+  actorId?: string;
+} = {}) {
   const statements = React.useMemo(() => getWltDshAccountStatementsPreview(), []);
   const [activeId, setActiveId] = React.useState(statements[0]?.statementId ?? '');
-  const statement = statements.find((item) => item.statementId === activeId) ?? statements[0];
+
+  const statement = React.useMemo(() => {
+    if (actorId) {
+      return statements.find((item) => item.actorId === actorId) ?? statements[0];
+    }
+    return statements.find((item) => item.statementId === activeId) ?? statements[0];
+  }, [statements, activeId, actorId]);
 
   if (!statement) {
     return (
-      <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ direction: 'rtl', textAlign: 'right' }}>
-        <Text role="titleSm">لا توجد كشوف حساب في معاينة WLT.</Text>
+      <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ direction: 'rtl' }}>
+        <Text role="titleSm" style={{ textAlign: 'right' }}>لا توجد كشوف حساب في معاينة WLT.</Text>
       </Box>
     );
   }
@@ -41,7 +53,9 @@ export function WltDshAccountStatement() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <Text role="titleMd" style={{ fontWeight: 800 }}>كشوف الحساب</Text>
         <Text role="bodySm" tone="soft">
-          أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات كـ preview contract مملوك لـ WLT.
+          {technicalAuditMode
+            ? 'أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات كـ preview contract مملوك لـ WLT.'
+            : 'أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات.'}
         </Text>
       </Box>
 
@@ -101,7 +115,11 @@ export function WltDshAccountStatement() {
                   <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{line.debitLabel}</td>
                   <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{line.creditLabel}</td>
                   <td style={{ padding: '8px 10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{line.runningBalanceLabel}</td>
-                  <td style={{ padding: '8px 10px' }}>{STATUS_LABEL[line.status]}</td>
+                  <td style={{ padding: '8px 10px' }}>
+                    {line.status === 'pending_wlt' ? (technicalAuditMode ? 'قيد WLT' : 'قيد المراجعة') :
+                     line.status === 'posted_preview' ? (technicalAuditMode ? 'مرحل كمعاينة' : 'مرحل') :
+                     line.status === 'held' ? 'مبلغ محجوز' : 'نزاع'}
+                  </td>
                   <td style={{ padding: '8px 10px' }}>{line.evidenceRef}</td>
                 </tr>
               ))}

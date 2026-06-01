@@ -5,13 +5,13 @@
  * DSH role: view_only or initiate_only (no ledger write).
  */
 
-import type { CanonicalFinanceGroupId } from '../models/financeRouting.types';
+import type { CanonicalFinanceGroupId, FinanceWorkspaceInput } from '../models/financeRouting.types';
 
 export type WltApiMethod = 'GET' | 'POST';
 export type WltEndpointStatus = 'exact' | 'BLOCKED_BY_MISSING_WLT_CONTRACT';
 
 export type DshFinanceApiBinding = {
-  readonly screen: CanonicalFinanceGroupId;
+  readonly screen: FinanceWorkspaceInput;
   readonly screenLabel: string;
   readonly wltEndpoint: string;
   readonly operationId: string;
@@ -39,7 +39,7 @@ export const FINANCE_API_MATRIX: readonly DshFinanceApiBinding[] = [
   { screen: 'store-delivery-finance', screenLabel: 'مالية توصيل المتجر', wltEndpoint: '/wlt/dsh/store-delivery/finance-summary', operationId: 'getStoreDeliveryFinanceSummary', httpMethod: 'GET', endpointStatus: 'exact', dshRole: 'view_only', requiresIdempotency: false, contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY', isImplemented: false, ownerService: 'wlt', forbiddenActions: ['courier_payout', 'fee_adjust', 'compensation_override'], displayDomain: 'عمولات ورسوم موصلي المتاجر — مفصولة عن كباتن بثواني' },
 ] as const;
 
-export function getFinanceApiBinding(screen: CanonicalFinanceGroupId): DshFinanceApiBinding | undefined {
+export function getFinanceApiBinding(screen: FinanceWorkspaceInput): DshFinanceApiBinding | undefined {
   return FINANCE_API_MATRIX.find((b) => b.screen === screen);
 }
 

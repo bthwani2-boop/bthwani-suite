@@ -1,5 +1,7 @@
 import type { WltDshFinancePreviewRecord, WltDshFinanceEventKind } from '../models/dshFinance.types';
 import { formatWltYer } from '../models/dshFinance.types';
+import { getWltAccountByCode } from '../models/chartOfAccounts.types';
+import { getWltPostingRuleForEvent } from '../models/postingRules.types';
 import type {
   WltLedgerEntryKind,
   WltLedgerEntryStatus,
@@ -9,41 +11,6 @@ import type {
   WltFinancialCenterBlockingVariance,
   WltFinancialCenter,
 } from '../models/financialCenter.types';
-
-type AccountPair = { debitCode: string; debitLabel: string; creditCode: string; creditLabel: string };
-
-function resolveAccountPair(kind: WltDshFinanceEventKind): AccountPair {
-  switch (kind) {
-    case 'cash-on-delivery':
-    case 'captain-cod-liability':
-      return { debitCode: '1020', debitLabel: 'ذمم COD مستحقة (كابتن)', creditCode: '2010', creditLabel: 'مستحقات الكابتن' };
-    case 'client-payment':
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '2001', creditLabel: 'رصيد محفظة العميل' };
-    case 'wallet-payment':
-      return { debitCode: '2001', debitLabel: 'رصيد محفظة العميل', creditCode: '1010', creditLabel: 'رصيد المقاصة البنكية' };
-    case 'partner-settlement':
-      return { debitCode: '1030', debitLabel: 'مقاصة التسوية', creditCode: '2020', creditLabel: 'مستحقات الشريك' };
-    case 'captain-earning':
-    case 'captain-eligibility-topup':
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '2010', creditLabel: 'مستحقات الكابتن' };
-    case 'field-commission':
-    case 'field-commission-pending':
-    case 'field-commission-rejected':
-    case 'field-payout':
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '2030', creditLabel: 'مستحقات الميداني' };
-    case 'store-delivery-fee':
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '4010', creditLabel: 'إيرادات رسوم التوصيل' };
-    case 'store-courier-compensation':
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '2040', creditLabel: 'مستحقات موصل المتجر' };
-    case 'refund-adjustment':
-      return { debitCode: '5001', debitLabel: 'مصروف الاسترداد', creditCode: '2050', creditLabel: 'التزام الاسترداد للعميل' };
-    case 'platform-commission':
-    case 'reconciliation-export':
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '4001', creditLabel: 'إيرادات عمولة المنصة' };
-    default:
-      return { debitCode: '1010', debitLabel: 'رصيد المقاصة البنكية', creditCode: '1001', creditLabel: 'النقدية بالصندوق' };
-  }
-}
 
 function resolveEntryKind(kind: WltDshFinanceEventKind): WltLedgerEntryKind {
   if (kind === 'cash-on-delivery' || kind === 'captain-cod-liability') return 'cod-collection';
@@ -78,36 +45,23 @@ function resolveSourceRef(record: WltDshFinancePreviewRecord): string {
   return `[معاينة] ${record.id}`;
 }
 
-const CODE_TYPE: Record<string, { label: string; type: 'asset' | 'liability' | 'revenue' | 'expense' }> = {
-  '1001': { label: 'النقدية بالصندوق', type: 'asset' },
-  '1010': { label: 'رصيد المقاصة البنكية', type: 'asset' },
-  '1020': { label: 'ذمم COD مستحقة (كابتن)', type: 'asset' },
-  '1030': { label: 'مقاصة التسوية', type: 'asset' },
-  '2001': { label: 'رصيد محفظة العميل (التزام)', type: 'liability' },
-  '2010': { label: 'مستحقات الكابتن', type: 'liability' },
-  '2020': { label: 'مستحقات الشريك', type: 'liability' },
-  '2030': { label: 'مستحقات الميداني', type: 'liability' },
-  '2040': { label: 'مستحقات موصل المتجر', type: 'liability' },
-  '2050': { label: 'التزام الاسترداد للعميل', type: 'liability' },
-  '4001': { label: 'إيرادات عمولة المنصة', type: 'revenue' },
-  '4010': { label: 'إيرادات رسوم التوصيل', type: 'revenue' },
-  '5001': { label: 'مصروف الاسترداد', type: 'expense' },
-  '5010': { label: 'مصروف الترويج والخصومات', type: 'expense' },
-};
-
 export function buildWltFinancialCenter(
   businessDate: string,
   records: ReadonlyArray<WltDshFinancePreviewRecord>,
 ): WltFinancialCenter {
   const allEntries: WltLedgerEntry[] = records.map((record) => {
-    const accounts = resolveAccountPair(record.kind);
+    const rule = getWltPostingRuleForEvent(record.kind);
+    const debitCode = rule?.debitAccountCode || '1010';
+    const debitLabel = rule?.debitAccountLabel || 'رصيد المقاصة البنكية';
+    const creditCode = rule?.creditAccountCode || '1001';
+    const creditLabel = rule?.creditAccountLabel || 'النقدية بالصندوق';
     const status = resolveEntryStatus(record);
     return {
       id: record.id,
-      debitAccountCode: accounts.debitCode,
-      debitAccountLabel: accounts.debitLabel,
-      creditAccountCode: accounts.creditCode,
-      creditAccountLabel: accounts.creditLabel,
+      debitAccountCode: debitCode,
+      debitAccountLabel: debitLabel,
+      creditAccountCode: creditCode,
+      creditAccountLabel: creditLabel,
       amountMinorUnits: record.amountMinorUnits,
       amountLabel: record.amountLabel,
       entryKind: resolveEntryKind(record.kind),
@@ -125,19 +79,22 @@ export function buildWltFinancialCenter(
   const accountTotals = new Map<string, { label: string; type: 'asset' | 'liability' | 'revenue' | 'expense'; total: number; entries: WltLedgerEntry[] }>();
 
   for (const entry of allEntries) {
-    const creditMeta = CODE_TYPE[entry.creditAccountCode];
-    if (creditMeta) {
-      const existing = accountTotals.get(entry.creditAccountCode);
-      if (existing) {
-        existing.total += entry.amountMinorUnits;
-        existing.entries.push(entry);
-      } else {
-        accountTotals.set(entry.creditAccountCode, {
-          label: creditMeta.label,
-          type: creditMeta.type,
-          total: entry.amountMinorUnits,
-          entries: [entry],
-        });
+    const creditAccount = getWltAccountByCode(entry.creditAccountCode);
+    if (creditAccount) {
+      const accType = creditAccount.type;
+      if (accType === 'asset' || accType === 'liability' || accType === 'revenue' || accType === 'expense') {
+        const existing = accountTotals.get(entry.creditAccountCode);
+        if (existing) {
+          existing.total += entry.amountMinorUnits;
+          existing.entries.push(entry);
+        } else {
+          accountTotals.set(entry.creditAccountCode, {
+            label: creditAccount.label,
+            type: accType,
+            total: entry.amountMinorUnits,
+            entries: [entry],
+          });
+        }
       }
     }
   }

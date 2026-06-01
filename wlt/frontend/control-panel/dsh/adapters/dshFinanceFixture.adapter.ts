@@ -31,6 +31,9 @@ import {
   getWltDshSettlementCalendarPreview,
   getWltDshStoreSettlementStatementsPreview,
   WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT,
+  getWltFieldCommissionStatementsPreview,
+  getWltDshPartnerSettlementStatementsPreview,
+  getWltDshCaptainSettlementStatementsPreview,
 } from '@bthwani/dsh/frontend/data/finance.preview-data';
 
 import {
@@ -62,6 +65,18 @@ export function getWltDshStoreSettlementStatementsPreviewAdapter() {
   return getWltDshStoreSettlementStatementsPreview();
 }
 
+export function getWltDshPartnerSettlementStatementsPreviewAdapter() {
+  return getWltDshPartnerSettlementStatementsPreview();
+}
+
+export function getWltDshCaptainSettlementStatementsPreviewAdapter() {
+  return getWltDshCaptainSettlementStatementsPreview();
+}
+
+export function getWltFieldCommissionStatementsPreviewAdapter() {
+  return getWltFieldCommissionStatementsPreview();
+}
+
 export function getAdaptedFinanceControlPanelRowsAdapter() {
   return getAdaptedFinanceControlPanelRows();
 }
@@ -86,4 +101,6 @@ export {
   WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
   WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT,
   getAdaptedFinanceControlPanelRows,
+  getWltDshPartnerSettlementStatementsPreview,
+  getWltDshCaptainSettlementStatementsPreview,
 };
