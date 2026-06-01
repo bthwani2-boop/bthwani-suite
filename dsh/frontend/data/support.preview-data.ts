@@ -571,6 +571,75 @@ export function isOperationsSupportHiddenCompatFlow(
   return DSH_OPERATIONS_SUPPORT_HIDDEN_COMPAT_FLOW_IDS.includes(flowId);
 }
 
+export type DshControlPanelSupportRowSeed = {
+  id: string;
+  flowId: DshOperationsSupportFlowId;
+  surface: string;
+  status: string;
+  slaAge: string;
+  fulfillmentMode: DshFulfillmentDeliveryMode;
+  fulfillmentLabel: string;
+  responsibleActor: string;
+  evidence: string;
+  primaryActionLabel: string;
+  secondaryActionLabel: string;
+};
+
+export const DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS: readonly DshControlPanelSupportRowSeed[] = [
+  {
+    id: 'SUP-401',
+    flowId: 'delivery-failed',
+    surface: 'الطلبات',
+    status: 'نشط',
+    slaAge: '15 دقيقة',
+    fulfillmentMode: 'bthwani_delivery',
+    fulfillmentLabel: 'توصيل بثواني',
+    responsibleActor: 'الكابتن',
+    evidence: 'سجل رنين + صورة الاستلام',
+    primaryActionLabel: 'فتح الطلب',
+    secondaryActionLabel: 'فتح الأدلة',
+  },
+  {
+    id: 'SUP-402',
+    flowId: 'payment-refund-review',
+    surface: 'الشركاء',
+    status: 'تحت المراجعة',
+    slaAge: '32 دقيقة',
+    fulfillmentMode: 'partner_delivery',
+    fulfillmentLabel: 'توصيل المتجر',
+    responsibleActor: 'موصل الشريك / المتجر',
+    evidence: 'نسخة الفاتورة + سجل التحصيل + محضر تسليم موصل الشريك',
+    primaryActionLabel: 'مراجعة الشريك',
+    secondaryActionLabel: 'فتح الأدلة',
+  },
+  {
+    id: 'SUP-403',
+    flowId: 'courier-not-arrived',
+    surface: 'الكباتن',
+    status: 'تحتاج حل',
+    slaAge: '5 دقائق',
+    fulfillmentMode: 'bthwani_delivery',
+    fulfillmentLabel: 'توصيل بثواني',
+    responsibleActor: 'الكابتن',
+    evidence: 'مراسلات الدعم + سجل الجهاز',
+    primaryActionLabel: 'إسناد بديل',
+    secondaryActionLabel: 'فتح التصعيد',
+  },
+  {
+    id: 'SUP-404',
+    flowId: 'branch-readiness-escalation',
+    surface: 'الميدان',
+    status: 'مراقبة',
+    slaAge: '47 دقيقة',
+    fulfillmentMode: 'pickup',
+    fulfillmentLabel: 'استلام بنفسي',
+    responsibleActor: 'العميل / المتجر',
+    evidence: 'إثبات الموعد + سجل الحضور + تأكيد الجاهزية',
+    primaryActionLabel: 'تثبيت الموعد',
+    secondaryActionLabel: 'فتح الأدلة',
+  },
+];
+
 // --- P0-06: Support Ticket Model ---
 // SSoT for message timelines, escalation routing, SLA classification, and status resolution.
 // Authority contract:

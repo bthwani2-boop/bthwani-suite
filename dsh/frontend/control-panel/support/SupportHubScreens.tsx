@@ -14,7 +14,11 @@ import {
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { DSH_CALL_INTAKE_PREVIEW, DSH_CUSTOMER_360_PREVIEW } from '../../data/support.preview-data';
+import {
+  DSH_CALL_INTAKE_PREVIEW,
+  DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS,
+  DSH_CUSTOMER_360_PREVIEW,
+} from '../../data/support.preview-data';
 import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
@@ -26,6 +30,7 @@ import { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
 import {
   getOperationsSupportFlowPreview,
+  type DshControlPanelSupportRowSeed,
   type DshOperationsSupportFlowId,
 } from '../../data/support.preview-data';
 import {
@@ -33,8 +38,13 @@ import {
   getDshControlPanelGovernanceEntry,
   resolveDshControlPanelSectionLabel,
 } from '../shared';
+import {
+  SUPPORT_PRIMARY_TABS,
+  SUPPORT_SECONDARY_TABS,
+  SUPPORT_TAB_WORKSPACE_MAP,
+  type SupportTab,
+} from './support.types';
 
-type SupportTab = 'queue' | 'customer-360' | 'call-intake' | 'disputes' | 'feedback' | 'escalation' | 'sla-risk' | 'messaging';
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
 type SupportRouteContext = {
@@ -68,20 +78,6 @@ type SupportRow = {
   policyLabel: string;
   forbiddenPreview: string;
   financeReference?: string;
-  primaryActionLabel: string;
-  secondaryActionLabel: string;
-};
-
-type SupportRowSeed = {
-  id: string;
-  flowId: DshOperationsSupportFlowId;
-  surface: string;
-  status: string;
-  slaAge: string;
-  fulfillmentMode: SupportFulfillmentMode;
-  fulfillmentLabel: string;
-  responsibleActor: string;
-  evidence: string;
   primaryActionLabel: string;
   secondaryActionLabel: string;
 };
@@ -134,49 +130,6 @@ const SUPPORT_REGISTRY_FLOW_MAP: Partial<Record<DshOperationsSupportFlowId, stri
   'order-rescue': 'order-rescue',
 };
 
-const PRIMARY_TABS: ReadonlyArray<{ id: SupportTab; label: string }> = [
-  { id: 'queue', label: 'صفوف الدعم' },
-  { id: 'customer-360', label: 'ملف العميل المتكامل' },
-  { id: 'call-intake', label: 'استقبال المكالمات' },
-  { id: 'disputes', label: 'النزاعات' },
-  { id: 'feedback', label: 'الآراء' },
-  { id: 'escalation', label: 'التصعيد' },
-  { id: 'sla-risk', label: resolveCommitmentLabel() },
-  { id: 'messaging', label: 'الرسائل' },
-];
-
-const TAB_WORKSPACE_MAP: Readonly<Record<SupportTab, string>> = {
-  queue: 'queue',
-  'customer-360': 'customer-360',
-  'call-intake': 'call-intake',
-  disputes: 'disputes',
-  feedback: 'feedback',
-  escalation: 'escalation',
-  'sla-risk': 'sla-risk',
-  messaging: 'messaging',
-};
-
-const SECONDARY_TABS: Record<SupportTab, ReadonlyArray<{ id: string; label: string }>> = {
-  queue: [
-    { id: 'الكل', label: 'الكل' },
-    { id: 'الطلبات', label: 'الطلبات' },
-    { id: 'الشركاء', label: 'الشركاء' },
-    { id: 'الكباتن', label: 'الكباتن' },
-    { id: 'الميدان', label: 'الميدان' },
-  ],
-  'customer-360': [{ id: 'overview', label: 'نظرة عامة' }],
-  'call-intake': [{ id: 'manual', label: 'المكالمات اليدوية' }],
-  disputes: [{ id: 'الكل', label: 'الكل' }],
-  feedback: [{ id: 'الكل', label: 'الكل' }],
-  escalation: [{ id: 'الكل', label: 'الكل' }],
-  'sla-risk': [{ id: 'الكل', label: 'الكل' }],
-  messaging: [
-    { id: 'client', label: 'العملاء' },
-    { id: 'partner', label: 'الشركاء' },
-    { id: 'captain', label: 'الكباتن' },
-  ],
-};
-
 function resolveSupportTabFromWorkspace(workspace?: string | null): SupportTab {
   if (workspace === 'customer-360') {
     return 'customer-360';
@@ -211,7 +164,7 @@ function resolveSupportTabFromWorkspace(workspace?: string | null): SupportTab {
 
 function buildSupportHref(tab: SupportTab, context?: SupportRouteContext) {
   const searchParams = new globalThis.URLSearchParams();
-  const workspace = TAB_WORKSPACE_MAP[tab];
+  const workspace = SUPPORT_TAB_WORKSPACE_MAP[tab];
 
   if (workspace && workspace !== 'queue') {
     searchParams.set('workspace', workspace);
@@ -238,7 +191,7 @@ function buildSupportHref(tab: SupportTab, context?: SupportRouteContext) {
   return `/support?${searchParams.toString()}`;
 }
 
-function buildSupportRow(rowData: SupportRowSeed): SupportRow {
+function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
   const flowEntry = getOperationsSupportFlowPreview(rowData.flowId);
   const registryFlowId = SUPPORT_REGISTRY_FLOW_MAP[rowData.flowId];
   const flowSummary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
@@ -278,62 +231,7 @@ function buildSupportRow(rowData: SupportRowSeed): SupportRow {
   };
 }
 
-const supportRowSeeds = [
-  {
-    id: 'SUP-401',
-    flowId: 'delivery-failed',
-    surface: 'الطلبات',
-    status: 'نشط',
-    slaAge: '15 دقيقة',
-    fulfillmentMode: 'bthwani_delivery',
-    fulfillmentLabel: 'توصيل بثواني',
-    responsibleActor: 'الكابتن',
-    evidence: 'سجل رنين + صورة الاستلام',
-    primaryActionLabel: 'فتح الطلب',
-    secondaryActionLabel: 'فتح الأدلة',
-  },
-  {
-    id: 'SUP-402',
-    flowId: 'payment-refund-review',
-    surface: 'الشركاء',
-    status: 'تحت المراجعة',
-    slaAge: '32 دقيقة',
-    fulfillmentMode: 'partner_delivery',
-    fulfillmentLabel: 'توصيل المتجر',
-    responsibleActor: 'موصل الشريك / المتجر',
-    evidence: 'نسخة الفاتورة + سجل التحصيل + محضر تسليم موصل الشريك',
-    primaryActionLabel: 'مراجعة الشريك',
-    secondaryActionLabel: 'فتح الأدلة',
-  },
-  {
-    id: 'SUP-403',
-    flowId: 'courier-not-arrived',
-    surface: 'الكباتن',
-    status: 'تحتاج حل',
-    slaAge: '5 دقائق',
-    fulfillmentMode: 'bthwani_delivery',
-    fulfillmentLabel: 'توصيل بثواني',
-    responsibleActor: 'الكابتن',
-    evidence: 'مراسلات الدعم + سجل الجهاز',
-    primaryActionLabel: 'إسناد بديل',
-    secondaryActionLabel: 'فتح التصعيد',
-  },
-  {
-    id: 'SUP-404',
-    flowId: 'branch-readiness-escalation',
-    surface: 'الميدان',
-    status: 'مراقبة',
-    slaAge: '47 دقيقة',
-    fulfillmentMode: 'pickup',
-    fulfillmentLabel: 'استلام بنفسي',
-    responsibleActor: 'العميل / المتجر',
-    evidence: 'إثبات الموعد + سجل الحضور + تأكيد الجاهزية',
-    primaryActionLabel: 'تثبيت الموعد',
-    secondaryActionLabel: 'فتح الأدلة',
-  },
-] satisfies readonly SupportRowSeed[];
-
-const SUPPORT_ROWS: ReadonlyArray<SupportRow> = supportRowSeeds.map(buildSupportRow);
+const SUPPORT_ROWS: ReadonlyArray<SupportRow> = DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS.map(buildSupportRow);
 
 function filterRows(tab: SupportTab, lane: string) {
   if (tab === 'escalation' || tab === 'sla-risk' || tab === 'messaging' || tab === 'customer-360' || tab === 'call-intake') {
@@ -367,7 +265,7 @@ export function ControlPanelDshSupportHubScreen() {
   React.useEffect(() => {
     const resolvedTab = resolveSupportTabFromWorkspace(searchParams.get('workspace'));
     setActiveTab(resolvedTab);
-    setActiveSubTab(SECONDARY_TABS[resolvedTab][0]?.id ?? 'الكل');
+    setActiveSubTab(SUPPORT_SECONDARY_TABS[resolvedTab][0]?.id ?? 'الكل');
 
     const ticketId = searchParams.get('ticketId');
     if (ticketId) {
@@ -376,7 +274,7 @@ export function ControlPanelDshSupportHubScreen() {
   }, [searchParams]);
 
   React.useEffect(() => {
-    setActiveSubTab(SECONDARY_TABS[activeTab][0]?.id ?? 'الكل');
+    setActiveSubTab(SUPPORT_SECONDARY_TABS[activeTab][0]?.id ?? 'الكل');
   }, [activeTab]);
 
   const rows = filterRows(activeTab, activeSubTab);
@@ -438,7 +336,7 @@ export function ControlPanelDshSupportHubScreen() {
 
       <nav className={styles.navigationDock}>
         <WebControlPanelWorkspaceTabs
-          items={PRIMARY_TABS.map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeTab }))}
+          items={SUPPORT_PRIMARY_TABS.map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeTab }))}
           ariaLabel="صفوف الدعم"
           onSelect={(id) => {
             const nextTab = id as SupportTab;
@@ -457,7 +355,7 @@ export function ControlPanelDshSupportHubScreen() {
 
       <div className={`${styles.filterDock} ${styles.filterDockTint}`}>
         <WebControlPanelSubTabs
-          items={SECONDARY_TABS[activeTab].map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeSubTab }))}
+          items={SUPPORT_SECONDARY_TABS[activeTab].map((tab) => ({ id: tab.id, label: tab.label, active: tab.id === activeSubTab }))}
           ariaLabel="فلاتر الدعم"
           onSelect={(id) => setActiveSubTab(id)}
         />

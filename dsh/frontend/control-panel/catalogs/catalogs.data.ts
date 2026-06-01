@@ -154,6 +154,7 @@ function resolveCatalogMediaPolicy(value: string | undefined): CatalogMediaPolic
 }
 
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
+import { dshCommonMediaKeyOptions } from '../../data/media.preview-data';
 import {
   storeItemsByStoreId,
   dshCatalogMetrics,
@@ -251,13 +252,4 @@ Object.entries(storeItemsByStoreId).forEach(([_storeId, items]) => {
 
 export const dshCatalogProducts: CatalogProductMaster[] = Array.from(allProductsMap.values());
 
-export const DSH_COMMON_MEDIA_KEYS = [
-  { value: 'dsh.product.apple.v1', label: '🍎 تفاح' },
-  { value: 'dsh.product.milk.v1', label: '🥛 حليب' },
-  { value: 'dsh.product.bread.v1', label: '🍞 خبز' },
-  { value: 'dsh.product.chicken.v1', label: '🍗 دجاج' },
-  { value: 'dsh.product.pasta.v1', label: '🍝 باستا' },
-  { value: 'dsh.product.choco.v1', label: '🍰 كيكة' },
-  { value: 'dsh.product.roll.v1', label: '🌴 تمر (مؤقت)' },
-  { value: 'dsh.product.lead-5.dates-box.v1', label: '🌴 علبة التمر الفاخرة' },
-];
+export const DSH_COMMON_MEDIA_KEYS = dshCommonMediaKeyOptions;

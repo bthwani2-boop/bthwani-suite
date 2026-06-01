@@ -47,24 +47,13 @@ import {
   updatePartnerActivationStatus,
   getAllPartnerActivationStatuses,
 } from './workflow';
+import {
+  PARTNER_PRIMARY_TABS,
+  PARTNER_SUB_TAB_DEFINITIONS,
+  type PartnerWorkspaceTabId,
+} from './partners.types';
 import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
 import { partnerCoveragePreviewZones } from '../../data/partner.preview-data';
-
-const SUB_TAB_DEFINITIONS: Record<string, { id: string; label: string }[]> = {
-  inbox: [
-    { id: 'registration', label: 'طلبات التسجيل' },
-    { id: 'modifications', label: 'تعديل البيانات' },
-    { id: 'complaints', label: 'شكاوى الشركاء' },
-  ],
-  performance: [
-    { id: 'performance', label: 'الأداء والسعة' },
-    { id: 'disputes', label: 'النزاعات والاستئناف' },
-    { id: 'visibility', label: 'الظهور والإيقاف' },
-  ],
-  eligibility: [
-    { id: 'benefits', label: 'المزايا والعروض' },
-  ],
-};
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
   const activationStatus = mapApprovalStageToPartnerActivationStatus(item.stage);
@@ -242,7 +231,7 @@ export function ControlPanelDshPartnerHubScreen() {
   const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
   const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
   const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
-  const [activeTab, setActiveTab] = React.useState<string>('inbox');
+  const [activeTab, setActiveTab] = React.useState<PartnerWorkspaceTabId>('inbox');
   const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
@@ -307,25 +296,15 @@ export function ControlPanelDshPartnerHubScreen() {
     );
   };
 
-  const PRIMARY_TABS = [
-    { id: 'inbox', label: 'الوارد الجديد', active: activeTab === 'inbox' },
-    { id: 'activation', label: 'تفعيل الشريك', active: activeTab === 'activation' },
-    { id: 'documents', label: 'وثائق الشركاء', active: activeTab === 'documents' },
-    { id: 'overrides', label: 'تجاوزات الكتالوج', active: activeTab === 'overrides' },
-    { id: 'performance', label: 'الأداء والامتثال', active: activeTab === 'performance' },
-    { id: 'eligibility', label: 'أهلية الترويج', active: activeTab === 'eligibility' },
-    { id: 'topology', label: 'مسارات الخدمة', active: activeTab === 'topology' },
-    { id: 'contracts', label: 'إدارة العقود والامتثال', active: activeTab === 'contracts' },
-    { id: 'deactivation', label: 'إلغاء التفعيل', active: activeTab === 'deactivation' },
-  ];
+  const primaryTabs = PARTNER_PRIMARY_TABS.map((tab) => ({ ...tab, active: activeTab === tab.id }));
 
   const activeSubTabs = React.useMemo(
-    () => (SUB_TAB_DEFINITIONS[activeTab] ?? []).map(t => ({ ...t, active: t.id === activeSubTab })),
+    () => (PARTNER_SUB_TAB_DEFINITIONS[activeTab] ?? []).map(t => ({ ...t, active: t.id === activeSubTab })),
     [activeTab, activeSubTab],
   );
 
   React.useEffect(() => {
-    setActiveSubTab(SUB_TAB_DEFINITIONS[activeTab]?.[0]?.id ?? '');
+    setActiveSubTab(PARTNER_SUB_TAB_DEFINITIONS[activeTab]?.[0]?.id ?? '');
   }, [activeTab]);
 
   return (
@@ -367,7 +346,7 @@ export function ControlPanelDshPartnerHubScreen() {
       </header>
 
       <nav className={styles.navigationDock}>
-        <WebControlPanelLaneTabs items={PRIMARY_TABS} onSelect={(id) => setActiveTab(id)} />
+        <WebControlPanelLaneTabs items={primaryTabs} onSelect={(id) => setActiveTab(id as PartnerWorkspaceTabId)} />
       </nav>
 
       <div className={styles.filterDock}>

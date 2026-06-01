@@ -28,6 +28,22 @@ export type DshPreviewMediaAsset = {
   mediaKey: string;
 };
 
+export type DshPreviewMediaOption = {
+  value: string;
+  label: string;
+};
+
+export const dshCommonMediaKeyOptions: readonly DshPreviewMediaOption[] = [
+  { value: 'dsh.product.apple.v1', label: '🍎 تفاح' },
+  { value: 'dsh.product.milk.v1', label: '🥛 حليب' },
+  { value: 'dsh.product.bread.v1', label: '🍞 خبز' },
+  { value: 'dsh.product.chicken.v1', label: '🍗 دجاج' },
+  { value: 'dsh.product.pasta.v1', label: '🍝 باستا' },
+  { value: 'dsh.product.choco.v1', label: '🍰 كيكة' },
+  { value: 'dsh.product.roll.v1', label: '🌴 تمر (مؤقت)' },
+  { value: 'dsh.product.lead-5.dates-box.v1', label: '🌴 علبة التمر الفاخرة' },
+];
+
 function mediaAsset(
   ownerKind: DshPreviewMediaOwnerKind,
   ownerId: string,

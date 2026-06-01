@@ -144,11 +144,11 @@ function FinanceSurfaceBoard({ surface, subGroup }: { surface: FinanceSurface; s
     } else if (label.includes('الاسترداد') || label.includes('استرداد')) {
       router.push('/finance?workspace=refunds');
     } else if (label.includes('الأدلة') || label.includes('أدلة') || label.includes('الملف') || label.includes('مستند')) {
-      alert(`[بوابة الأدلة المالية WLT]: تم جلب ومطابقة المستندات والأدلة لـ ${selectedRow.id} بنجاح. البيانات مطابقة.`);
+      alert(`[بوابة الأدلة المالية WLT - UI_PREVIEW_ONLY]: فتح مرجع الأدلة لـ ${selectedRow.id} فقط. لا يتم جلب أو مطابقة مستندات runtime من DSH.`);
     } else if (label.includes('تحقيق') || label.includes('التحقيق')) {
-      alert(`[إدارة المخاطر WLT]: تم إرسال طلب تدقيق وتحقيق بشأن ${selectedRow.id} إلى فريق العمليات والالتزام.`);
+      alert(`[إدارة المخاطر WLT - UI_PREVIEW_ONLY]: هذا تصنيف مراجعة وتحقيق لـ ${selectedRow.id} فقط. لا يتم إرسال طلب runtime من DSH.`);
     } else {
-      alert(`[إجراء مالي WLT]: تم تنفيذ الإجراء "${label}" للكيان ${selectedRow.id} بنجاح عبر نظام WLT المالي.`);
+      alert(`[إجراء مالي WLT - UI_PREVIEW_ONLY]: "${label}" للكيان ${selectedRow.id} يحتاج WLT/API لاحقًا. لا توجد حركة مالية منفذة من DSH.`);
     }
   };
 

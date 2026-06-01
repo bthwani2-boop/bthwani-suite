@@ -11,6 +11,7 @@ export { ControlPanelDshOperationsScreen, DshOperationsHubSurface, buildOperatio
 export { ControlPanelDshMarketingScreen, ControlPanelDshMarketingApprovalScreen, ControlPanelDshVideoSubmissionsReviewScreen } from './marketing';
 export { ControlPanelDshPlatformScreen, DshPlatformVarsWorkspace, DshPlatformAppearanceWorkspace, DshPlatformServicesWorkspace, DshPlatformProvidersWorkspace, DshPlatformRolloutsWorkspace, DshPlatformHealthWorkspace, DshPlatformAuditWorkspace } from './platform';
 export { ControlPanelDshAdministrationScreen } from './administration';
+export { ControlPanelHrScreen, HR_WORKSPACE_REGISTRY, type HrWorkspaceId, type HrWorkspaceMeta } from './hr';
 export {
   DSH_CROSS_SURFACE_CLOSURE_MAP,
   DSH_CONTROL_PANEL_GOVERNANCE_MAP,

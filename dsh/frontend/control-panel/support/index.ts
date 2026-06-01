@@ -13,3 +13,11 @@ export { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
 export { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 export { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
 export { AuditTrailDetailPanel } from './AuditTrailDetailPanel';
+export {
+  SUPPORT_PRIMARY_TABS,
+  SUPPORT_SECONDARY_TABS,
+  SUPPORT_TAB_WORKSPACE_MAP,
+  type SupportSubTabItem,
+  type SupportTab,
+  type SupportTabItem,
+} from './support.types';
