@@ -22,8 +22,7 @@ import {
   useUiLanguage,
   type BThwaniAppearanceMode,
 } from "@bthwani/ui-kit";
-import { WebCommandCenterFrame } from "@bthwani/ui-kit/web";
-import type { WebSearchItem } from "../../ui-kit/src/web/command-center";
+import { WebCommandCenterFrame, type WebSearchItem } from "@bthwani/ui-kit/web";
 import {
   type AnyOperationsWorkspaceId,
   type OperationsPanelId,
@@ -183,7 +182,12 @@ function resolveRailItems(
     hr: "◐",
   };
 
-  return primarySectionIds.map((sectionId) => {
+  const activeSectionId = activeHref.slice(1) as ControlPanelSectionId;
+  const visibleSections = primarySectionIds.filter(
+    (sectionId) => isPhaseOneSection(sectionId) || sectionId === activeSectionId
+  );
+
+  return visibleSections.map((sectionId) => {
     const href = `/${sectionId}` as PrimarySectionHref;
     const description = isPhaseOneSection(sectionId)
       ? compactSectionDescriptions[sectionId]

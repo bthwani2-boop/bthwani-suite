@@ -23,14 +23,14 @@ const ORDER_STATUS_LABEL: Record<WltDshStoreSettlementStatement['orders'][number
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ border: '1px solid var(--bthwani-control-panel-border)', borderRadius: 8, padding: '10px 12px', background: 'var(--bthwani-control-panel-surface-raised)' }}>
-      <div style={{ fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)', marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--bthwani-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>{value}</div>
+    <div style={{ border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '10px 12px', background: 'var(--bth-control-panel-surface-raised)' }}>
+      <div style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--bth-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>{value}</div>
     </div>
   );
 }
 
-export function WltDshStoreSettlementStatement() {
+export function WltDshStoreSettlementStatement({ technicalAuditMode = false }: { technicalAuditMode?: boolean } = {}) {
   const statements = React.useMemo(() => getWltDshStoreSettlementStatementsPreview(), []);
   const statement = statements[0];
 
@@ -49,9 +49,11 @@ export function WltDshStoreSettlementStatement() {
         <Text role="bodySm" tone="soft">
           {statement.storeName} · دورة {statement.settlementCycleId} · كل أسبوعين · {STATUS_LABEL[statement.status]}
         </Text>
-        <Text role="caption" tone="muted">
-          PREVIEW_ONLY · WLT owns settlement truth · DSH displays only.
-        </Text>
+        {technicalAuditMode && (
+          <Text role="caption" tone="muted">
+            PREVIEW_ONLY · WLT owns settlement truth · DSH displays only.
+          </Text>
+        )}
       </Box>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
@@ -74,15 +76,15 @@ export function WltDshStoreSettlementStatement() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 920 }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--bthwani-control-panel-border)' }}>
+              <tr style={{ borderBottom: '1px solid var(--bth-control-panel-border)' }}>
                 {['الطلب', 'تاريخ الطلب', 'التسليم', 'الدفع', 'قيمة المنتجات', 'التوصيل', 'العمولة', 'الخصم', 'الاسترداد', 'الأثر الصافي', 'الحالة', 'مرجع الأدلة / سبب الاستبعاد'].map((header) => (
-                  <th key={header} style={{ textAlign: 'right', padding: '8px 10px', fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)' }}>{header}</th>
+                  <th key={header} style={{ textAlign: 'right', padding: '8px 10px', fontSize: 11, color: 'var(--bth-control-panel-text-muted)' }}>{header}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {statement.orders.map((order) => (
-                <tr key={order.orderId} style={{ borderBottom: '1px solid var(--bthwani-control-panel-border)' }}>
+                <tr key={order.orderId} style={{ borderBottom: '1px solid var(--bth-control-panel-border)' }}>
                   <td style={{ padding: '8px 10px', fontWeight: 800 }}>{order.orderId}</td>
                   <td style={{ padding: '8px 10px' }}>{order.orderDate}</td>
                   <td style={{ padding: '8px 10px' }}>{order.deliveryDate}</td>
@@ -95,7 +97,7 @@ export function WltDshStoreSettlementStatement() {
                   <td style={{ padding: '8px 10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{order.netSettlementImpactLabel}</td>
                   <td style={{ padding: '8px 10px' }}>{ORDER_STATUS_LABEL[order.settlementStatus]}</td>
                   <td style={{ padding: '8px 10px' }}>
-                    <code style={{ fontSize: 9, background: 'rgba(0, 0, 0, 0.05)', padding: '2px 6px', borderRadius: 4, color: order.settlementStatus === 'held' ? 'var(--bth-danger-text)' : 'var(--bthwani-control-panel-text)' }}>
+                    <code style={{ fontSize: 9, background: 'rgba(0, 0, 0, 0.05)', padding: '2px 6px', borderRadius: 4, color: order.settlementStatus === 'held' ? 'var(--bth-danger-text)' : 'var(--bth-control-panel-text)' }}>
                       {order.evidenceRef || '—'}
                     </code>
                   </td>

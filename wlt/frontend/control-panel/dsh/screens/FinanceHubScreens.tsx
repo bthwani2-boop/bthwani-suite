@@ -20,6 +20,7 @@ import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
 import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
 import { getFinanceApiBinding } from '../adapters/finance.api-matrix';
 import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
+import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type FinanceSurface = DshFinancePreviewSurface;
 type FinanceRow = DshFinancePreviewRow;
@@ -122,7 +123,7 @@ function resolveToneColor(tone: 'success' | 'warning' | 'danger' | 'info' | 'neu
   if (tone === 'warning') return 'var(--bth-warning-text)';
   if (tone === 'success') return 'var(--bth-success-text)';
   if (tone === 'info') return 'var(--bth-info-text)';
-  return 'var(--bthwani-control-panel-text-muted)';
+  return 'var(--bth-control-panel-text-muted)';
 }
 
 export function FinanceSurfaceBoard({
@@ -243,7 +244,7 @@ export function FinanceSurfaceBoard({
           <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap', direction: 'rtl' }}>
             <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
             <WebControlPanelStatusTag label={subGroup ? `الفرعي: ${subGroup}` : 'كافة السجلات'} tone="neutral" />
-            <WebControlPanelStatusTag label="معاينة فقط (WLT)" tone="warning" />
+            {technicalAuditMode && <WebControlPanelStatusTag label="معاينة فقط (WLT)" tone="warning" />}
           </Box>
 
           {rows.length === 0 ? (
@@ -255,11 +256,11 @@ export function FinanceSurfaceBoard({
             </Box>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, direction: 'rtl', width: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px' }}>
-                <span style={{ fontSize: 13, fontWeight: '700', color: 'var(--bthwani-control-panel-text)' }}>
+              <div className={wltStyles.cardTitleRow}>
+                <span style={{ fontSize: 13, fontWeight: '700', color: 'var(--bth-control-panel-text)' }}>
                   قائمة البنود المالية المعلقة ({rows.length} بند)
                 </span>
-                <span style={{ fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)' }}>
+                <span style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)' }}>
                   اضغط على أي بطاقة لتنسدل منها التفاصيل والمطابقة المالية فوراً.
                 </span>
               </div>
@@ -272,52 +273,37 @@ export function FinanceSurfaceBoard({
                 return (
                   <div
                     key={row.id}
+                    className={`${wltStyles.accordionCard} ${isExpanded ? wltStyles.accordionCardExpanded : ''}`}
                     style={{
-                      background: 'var(--bthwani-control-panel-surface)',
-                      border: '1px solid var(--bthwani-control-panel-border)',
                       borderRight: `5px solid ${borderToneColor}`,
-                      borderRadius: 10,
-                      boxShadow: isExpanded ? '0 8px 24px rgba(0,0,0,0.06)' : '0 2px 8px rgba(0,0,0,0.02)',
-                      transition: 'all 0.25s ease-in-out',
-                      overflow: 'hidden',
-                      width: '100%',
                     }}
                   >
                     {/* Header Row (Always Visible) */}
                     <div
                       onClick={() => setExpandedRowId(isExpanded ? null : row.id)}
-                      style={{
-                        padding: '16px 20px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                        background: isExpanded ? 'var(--bthwani-control-panel-surface-raised)' : 'transparent',
-                        transition: 'background 0.2s',
-                      }}
+                      className={`${wltStyles.accordionCardHeader} ${isExpanded ? wltStyles.accordionCardHeaderExpanded : ''}`}
                       onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
                       onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.background = 'transparent'; }}
                     >
                       {/* Right info (Title, Actor, ID) */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div className={wltStyles.infoGroupRight}>
                         <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 4, fontFamily: 'monospace', fontWeight: '700' }}>
                           {row.id}
                         </span>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                          <span style={{ fontSize: 14, fontWeight: '700', color: 'var(--bthwani-control-panel-text)' }}>
+                          <span style={{ fontSize: 14, fontWeight: '700', color: 'var(--bth-control-panel-text)' }}>
                             {row.owner}
                           </span>
-                          <span style={{ fontSize: 11, color: 'var(--bthwani-control-panel-text-muted)', marginTop: 2 }}>
+                          <span style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginTop: 2 }}>
                             {EVENT_KIND_LABEL[row.eventKind] || row.eventKind} · {row.evidence}
                           </span>
                         </div>
                       </div>
 
                       {/* Left info (Amount, Status, Chevron) */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                          <span style={{ fontSize: 15, fontWeight: '800', color: 'var(--bthwani-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>
+                      <div className={wltStyles.infoGroupLeft}>
+                        <div className={wltStyles.amountAndStatus}>
+                          <span className={wltStyles.amountLabel}>
                             {row.amount}
                           </span>
                           <span style={{ fontSize: 11, color: borderToneColor, fontWeight: '700', marginTop: 2 }}>
@@ -328,7 +314,7 @@ export function FinanceSurfaceBoard({
                         <div
                           style={{
                             fontSize: 16,
-                            color: 'var(--bthwani-control-panel-text-muted)',
+                            color: 'var(--bth-control-panel-text-muted)',
                             transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                             transition: 'transform 0.25s',
                           }}
@@ -343,7 +329,7 @@ export function FinanceSurfaceBoard({
                       <div
                         style={{
                           padding: '20px 24px',
-                          borderTop: '1px solid var(--bthwani-control-panel-border)',
+                          borderTop: '1px solid var(--bth-control-panel-border)',
                           background: 'rgba(255,255,255,0.4)',
                         }}
                       >
@@ -352,14 +338,14 @@ export function FinanceSurfaceBoard({
 
                           {/* Column 1: Match & Source details */}
                           <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>المطابقة والحسبة المالية</span>
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--bthwani-control-panel-border)', margin: '6px 0' }} />
+                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bth-control-panel-text-muted)' }}>المطابقة والحسبة المالية</span>
+                            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '6px 0' }} />
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
                               <Text role="bodySm" tone="soft">المبلغ المتوقع</Text>
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: 12, fontWeight: '700' }}>{row.expectedMinorUnits.toLocaleString('ar-YE')} وصغ</span>
-                                <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>({EXPECTED_SOURCE_AR[row.expectedSource] || row.expectedSource})</span>
+                                <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>({EXPECTED_SOURCE_AR[row.expectedSource] || row.expectedSource})</span>
                               </div>
                             </div>
 
@@ -367,11 +353,11 @@ export function FinanceSurfaceBoard({
                               <Text role="bodySm" tone="soft">المبلغ الفعلي</Text>
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                 <span style={{ fontSize: 12, fontWeight: '700' }}>{row.actualMinorUnits.toLocaleString('ar-YE')} وصغ</span>
-                                <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>({ACTUAL_SOURCE_AR[row.actualSource] || row.actualSource})</span>
+                                <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>({ACTUAL_SOURCE_AR[row.actualSource] || row.actualSource})</span>
                               </div>
                             </div>
 
-                            <hr style={{ border: 'none', borderTop: '1px dashed var(--bthwani-control-panel-border)', margin: '6px 0' }} />
+                            <hr style={{ border: 'none', borderTop: '1px dashed var(--bth-control-panel-border)', margin: '6px 0' }} />
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
                               <Text role="bodySm" style={{ fontWeight: '700' }}>الفارق المالي</Text>
@@ -392,8 +378,8 @@ export function FinanceSurfaceBoard({
 
                           {/* Column 2: Evidence & Monospace Refs */}
                           <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={2}>
-                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>الأدلة والمراجع الرقمية</span>
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--bthwani-control-panel-border)', margin: '6px 0' }} />
+                            <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bth-control-panel-text-muted)' }}>الأدلة والمراجع الرقمية</span>
+                            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '6px 0' }} />
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
                               <Text role="bodySm" tone="soft">حالة الأدلة</Text>
@@ -401,26 +387,26 @@ export function FinanceSurfaceBoard({
                                 {row.evidenceStatus === 'complete' ? 'مكتملة وموثقة ✓' : 'معلقة / ناقصة ⚠️'}
                               </span>
                             </div>
-                            <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)', display: 'block', textAlign: 'left', marginTop: -4 }}>
+                            <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)', display: 'block', textAlign: 'left', marginTop: -4 }}>
                               ({EVIDENCE_SOURCE_AR[row.evidenceSource] || row.evidenceSource})
                             </span>
 
-                            <Box gap={1} style={{ marginTop: 8, borderTop: '1px solid var(--bthwani-control-panel-border)', paddingTop: 6 }}>
+                            <Box gap={1} style={{ marginTop: 8, borderTop: '1px solid var(--bth-control-panel-border)', paddingTop: 6 }}>
                               {row.bankDepositRef && (
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
-                                  <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>مرجع الإيداع</span>
+                                  <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>مرجع الإيداع</span>
                                   <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace' }}>{row.bankDepositRef}</code>
                                 </div>
                               )}
                               {row.cashBagRef && (
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse', marginTop: 3 }}>
-                                  <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>حقيبة النقدية</span>
+                                  <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>حقيبة النقدية</span>
                                   <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace' }}>{row.cashBagRef}</code>
                                 </div>
                               )}
                               {row.ledgerEntryRef && (
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse', marginTop: 3 }}>
-                                  <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>قيد اليومية</span>
+                                  <span style={{ fontSize: 9, color: 'var(--bth-control-panel-text-muted)' }}>قيد اليومية</span>
                                   <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace' }}>{row.ledgerEntryRef}</code>
                                 </div>
                               )}
@@ -430,23 +416,23 @@ export function FinanceSurfaceBoard({
                           {/* Column 3: Handoff & Technical (If Technical Mode Enabled) */}
                           <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2} style={{ borderRight: '4px solid var(--bth-info-text)' }}>
                             <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bth-info-text)' }}>التفويض والإجراء لـ DSH</span>
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--bthwani-control-panel-border)', margin: '6px 0' }} />
+                            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '6px 0' }} />
 
-                            <p style={{ fontSize: 11, lineHeight: 1.5, color: 'var(--bthwani-control-panel-text)' }}>
+                            <p style={{ fontSize: 11, lineHeight: 1.5, color: 'var(--bth-control-panel-text)' }}>
                               {row.allowedAction === 'review' ? 'مراجعة وتدقيق مستندات المعاملة ومطابقتها يدوياً.'
                                 : row.allowedAction === 'view_evidence' ? 'التحقق الفوري من أدلة الإيداع والنقدية المرفوعة.'
                                 : row.allowedAction === 'prepare_decision' ? 'تحضير مسودة قرار الصرف (WLT Engine سيتولى تنفيذ الترحيل).'
                                 : 'لا يتطلب هذا الكيان أي إجراء فوري، قراءة مرجعية فقط.'}
                             </p>
 
-                            {!technicalAuditMode && (
-                              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--bth-warning-text)', fontWeight: '700', background: 'var(--bth-warning-surface)', padding: '4px 8px', borderRadius: 4, display: 'inline-block' }}>
+                            {technicalAuditMode && (
+                              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--bth-warning-text)', background: 'var(--bth-warning-surface)', padding: '4px 8px', borderRadius: 4, display: 'inline-block' }}>
                                 [معاينة] · محاكاة · يتطلب WLT runtime
                               </div>
                             )}
 
                             {technicalAuditMode && (
-                              <Box gap={1} style={{ borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: 6, marginTop: 6 }}>
+                              <Box gap={1} style={{ borderTop: '1px dashed var(--bth-control-panel-border)', paddingTop: 6, marginTop: 6 }}>
                                 {row.debitAccountId && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse' }}><span style={{ fontSize: 9 }}>مدين</span><code style={{ fontSize: 8 }}>{row.debitAccountId}</code></div>}
                                 {row.creditAccountId && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 1 }}><span style={{ fontSize: 9 }}>دائن</span><code style={{ fontSize: 8 }}>{row.creditAccountId}</code></div>}
                                 {row.auditTrailId && <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row-reverse', marginTop: 1 }}><span style={{ fontSize: 9 }}>أثر</span><code style={{ fontSize: 8 }}>{row.auditTrailId}</code></div>}
@@ -469,13 +455,15 @@ export function FinanceSurfaceBoard({
                         })()}
 
                         {/* Recommendation Text Block */}
-                        <div style={{ marginTop: 16, background: 'var(--bthwani-control-panel-surface-raised)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: 8, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: 12, color: 'var(--bthwani-control-panel-text)' }}>
+                        <div style={{ marginTop: 16, background: 'var(--bth-control-panel-surface-raised)', border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 12, color: 'var(--bth-control-panel-text)' }}>
                             💡 <strong>توصية المطابقة والمراجعة:</strong> {row.recommendation}
                           </span>
-                          <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 4, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>
-                            CONTRACT_SCAFFOLD_PREVIEW_ONLY
-                          </span>
+                          {technicalAuditMode && (
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 4, fontWeight: '700', color: 'var(--bth-control-panel-text-muted)' }}>
+                              CONTRACT_SCAFFOLD_PREVIEW_ONLY
+                            </span>
+                          )}
                         </div>
 
                         {/* Allowed Action Handoff Feedback Block */}

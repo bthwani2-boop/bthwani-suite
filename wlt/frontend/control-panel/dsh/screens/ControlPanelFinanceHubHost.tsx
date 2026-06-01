@@ -35,7 +35,7 @@ export type ControlPanelDshFinanceScreenProps = {
 
 const DailyCloseBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => <DailyReconciliationWorkbench />;
 const AccountStatementBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => <WltDshAccountStatement />;
-const StoreSettlementBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => <WltDshStoreSettlementStatement />;
+const StoreSettlementBridge = (props: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => <WltDshStoreSettlementStatement technicalAuditMode={props.technicalAuditMode} />;
 const SettlementCalendarBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => <WltDshSettlementCalendar />;
 const RefundLedgerBridge = (_: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) => <WltDshRefundLedger />;
 
@@ -118,7 +118,7 @@ export function ControlPanelFinanceHubHost({
         <div className={`${styles.surfaceHeaderActions} ${wltStyles.headerActionsArea}`}>
           <div className={wltStyles.technicalToggleContainer}>
             <span className={wltStyles.technicalToggleLabel}>وضع التدقيق التقني</span>
-            <button onClick={() => setTechnicalAuditMode(!technicalAuditMode)} aria-label="تغيير وضع العرض" className={wltStyles.technicalToggleButton} style={{ background: technicalAuditMode ? 'var(--bthwani-brand-primary)' : 'var(--bthwani-control-panel-border)' }}>
+            <button onClick={() => setTechnicalAuditMode(!technicalAuditMode)} aria-label="تغيير وضع العرض" className={wltStyles.technicalToggleButton} style={{ background: technicalAuditMode ? 'var(--bth-brand-primary)' : 'var(--bth-control-panel-border)' }}>
               <div className={wltStyles.technicalToggleKnob} style={{ left: technicalAuditMode ? 18 : 2 }} />
             </button>
           </div>
