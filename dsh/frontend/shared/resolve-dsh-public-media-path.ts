@@ -59,3 +59,27 @@ export function getActualPublicMediaPath(key?: string | null): string {
 export function hasDshPublicMediaPath(key?: string | null): boolean {
   return getActualPublicMediaPath(key).length > 0;
 }
+
+export function getMediaKeyFromPublicPath(path: string): string | null {
+  if (!path.startsWith(dshPublicMediaPrefix)) return null;
+  const rel = path.substring(dshPublicMediaPrefix.length);
+
+  for (const [key, value] of Object.entries(explicitPublicMediaPathByKey)) {
+    if (value === rel) return key;
+  }
+
+  if (rel.startsWith('categories/main/dsh-category-main-')) {
+    const id = rel.substring('categories/main/dsh-category-main-'.length).replace('-v1.png', '');
+    return `dsh.category.main.${id}.v1`;
+  }
+  if (rel.startsWith('categories/sub/dsh-category-sub-')) {
+    const id = rel.substring('categories/sub/dsh-category-sub-'.length).replace('-v1.png', '');
+    return `dsh.category.sub.${id}.v1`;
+  }
+  if (rel.startsWith('banners/dsh-banner-home-')) {
+    const slug = rel.substring('banners/dsh-banner-home-'.length).replace('-v1.png', '');
+    return `dsh.banner.home.${slug}.v1`;
+  }
+
+  return null;
+}

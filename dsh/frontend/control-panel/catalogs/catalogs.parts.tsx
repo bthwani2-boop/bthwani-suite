@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import Image from 'next/image';
-import { getActualPublicMediaPath, explicitPublicMediaPathByKey } from '../../shared/resolve-dsh-public-media-path';
+import { getActualPublicMediaPath, explicitPublicMediaPathByKey, getMediaKeyFromPublicPath } from '../../shared/resolve-dsh-public-media-path';
 import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
 import type { CatalogProductMaster, CatalogMainCategory } from './catalogs.data';
 
@@ -112,29 +112,7 @@ export function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
 
 // --- WatermarkedImage.tsx ---
 
-function getMediaKeyFromPublicPath(path: string): string | null {
-  if (!path.startsWith('/dsh/media-fixtures/')) return null;
-  const rel = path.substring('/dsh/media-fixtures/'.length);
 
-  for (const [key, value] of Object.entries(explicitPublicMediaPathByKey)) {
-    if (value === rel) return key;
-  }
-
-  if (rel.startsWith('categories/main/dsh-category-main-')) {
-    const id = rel.substring('categories/main/dsh-category-main-'.length).replace('-v1.png', '');
-    return `dsh.category.main.${id}.v1`;
-  }
-  if (rel.startsWith('categories/sub/dsh-category-sub-')) {
-    const id = rel.substring('categories/sub/dsh-category-sub-'.length).replace('-v1.png', '');
-    return `dsh.category.sub.${id}.v1`;
-  }
-  if (rel.startsWith('banners/dsh-banner-home-')) {
-    const slug = rel.substring('banners/dsh-banner-home-'.length).replace('-v1.png', '');
-    return `dsh.banner.home.${slug}.v1`;
-  }
-
-  return null;
-}
 
 function resolveWebImageSource(keyOrUri?: string | null): any {
   if (!keyOrUri) return null;

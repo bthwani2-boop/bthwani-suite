@@ -182,10 +182,7 @@ function resolveRailItems(
     hr: "◐",
   };
 
-  const activeSectionId = activeHref.slice(1) as ControlPanelSectionId;
-  const visibleSections = primarySectionIds.filter(
-    (sectionId) => isPhaseOneSection(sectionId) || sectionId === activeSectionId
-  );
+  const visibleSections = primarySectionIds;
 
   return visibleSections.map((sectionId) => {
     const href = `/${sectionId}` as PrimarySectionHref;
