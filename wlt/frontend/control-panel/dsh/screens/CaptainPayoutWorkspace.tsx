@@ -32,7 +32,7 @@ export function CaptainPayoutWorkspace({
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>مدفوعات الكابتن</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                <span className={styles.surfaceHeaderBadgeText}>WLT — عرض فقط</span>
+                <span className={styles.surfaceHeaderBadgeText}>عرض فقط</span>
               </Box>
             </div>
             <p className={styles.surfaceHeaderSubtitle}>{captainName} — {captainId}</p>
@@ -52,9 +52,9 @@ export function CaptainPayoutWorkspace({
             <KeyValueList
               items={[
                 { label: 'رقم الكابتن', value: captainId },
-                { label: 'إجمالي المكتسب', value: '— WLT' },
-                { label: 'المسحوب', value: '— WLT' },
-                { label: 'الرصيد المتاح', value: '— WLT' },
+                { label: 'إجمالي المكتسب', value: 'يتطلب ربط مالي' },
+                { label: 'المسحوب', value: 'يتطلب ربط مالي' },
+                { label: 'الرصيد المتاح', value: 'يتطلب ربط مالي' },
               ]}
             />
           </Box>

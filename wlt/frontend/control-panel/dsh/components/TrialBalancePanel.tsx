@@ -6,10 +6,9 @@ import { buildWltTrialBalancePreview } from '../selectors/buildTrialBalance';
 import { formatWltYer } from '../models/dshFinance.types';
 import type { WltLedgerEntry } from '../models/financialCenter.types';
 
-export function TrialBalancePanel({ entries, businessDate, technicalAuditMode = false }: {
+export function TrialBalancePanel({ entries, businessDate }: {
   entries: readonly WltLedgerEntry[];
   businessDate: string;
-  technicalAuditMode?: boolean;
 }) {
   const tb = React.useMemo(
     () => buildWltTrialBalancePreview(businessDate, entries.map((e) => ({
@@ -82,7 +81,7 @@ export function TrialBalancePanel({ entries, businessDate, technicalAuditMode = 
         </table>
       </div>
       <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-        {technicalAuditMode ? 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' : 'معاينة تشغيلية'} · القاعدة: مجموع المدين = مجموع الدائن. أي فارق يوقف إغلاق اليوم.
+        معاينة تشغيلية · القاعدة: مجموع المدين = مجموع الدائن. أي فارق يوقف إغلاق اليوم.
       </Text>
     </Box>
   );

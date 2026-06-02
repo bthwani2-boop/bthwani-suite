@@ -1,3 +1,33 @@
+// ─── Wallet Domain Model ───────────────────────────────────────────
+export type {
+  WalletActorType,
+  WalletTransactionStatus,
+  WalletTransactionEventKind,
+  WalletBalanceBucket,
+  WalletTransactionLine,
+  WalletAccount,
+  WalletStatement,
+  WalletCashBag,
+  WalletDepositProof,
+  WalletRefundImpact,
+  WalletPaymentSplit,
+} from './models/wallet.types';
+
+// ─── Wallet Event Matrix ───────────────────────────────────────────
+export type {
+  DeliveryMode,
+  PaymentMethodMode,
+  WalletImpactDirection,
+  WalletActorImpact,
+  WalletEventMatrixRow,
+} from './models/walletEventMatrix.types';
+export {
+  WALLET_EVENT_MATRIX,
+  getWalletEventMatrixRow,
+  getWalletEventMatrixForDeliveryMode,
+  getWalletEventMatrixForPaymentMethod,
+} from './models/walletEventMatrix.types';
+
 export type { FinanceProvider } from './models/financeProviders.types';
 export { financeProviders } from './models/financeProviders.types';
 

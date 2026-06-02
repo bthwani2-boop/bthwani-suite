@@ -27,7 +27,7 @@ export function PlatformFeeAuditWorkspace({ orderId = '—' }: PlatformFeeAuditW
             <div className={styles.surfaceHeaderTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>تدقيق رسوم المنصة</h1>
               <Box paddingX={1} paddingY={0} background="brandSurface" radiusToken="xs">
-                <span className={styles.surfaceHeaderBadgeText}>WLT — عرض فقط</span>
+                <span className={styles.surfaceHeaderBadgeText}>عرض فقط</span>
               </Box>
             </div>
             <p className={styles.surfaceHeaderSubtitle}>طلب {orderId}</p>
@@ -40,10 +40,10 @@ export function PlatformFeeAuditWorkspace({ orderId = '—' }: PlatformFeeAuditW
             <WltBoundaryBanner record={boundaryRecord} />
             <KeyValueList
               items={[
-                { label: 'رسوم الخدمة', value: '— WLT' },
-                { label: 'رسوم التوصيل', value: '— WLT' },
-                { label: 'رسوم ضريبية', value: '— WLT' },
-                { label: 'الإجمالي', value: '— WLT' },
+                { label: 'رسوم الخدمة', value: 'يتطلب ربط مالي' },
+                { label: 'رسوم التوصيل', value: 'يتطلب ربط مالي' },
+                { label: 'رسوم ضريبية', value: 'يتطلب ربط مالي' },
+                { label: 'الإجمالي', value: 'يتطلب ربط مالي' },
               ]}
             />
           </Box>

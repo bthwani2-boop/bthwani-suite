@@ -5,8 +5,6 @@ import { Box, Text } from '@bthwani/ui-kit';
 import {
   getWltDshPartnerSettlementStatementsPreview,
   type WltDshPartnerStatement as PartnerStatement,
-  getWltPostingRuleForEvent,
-  getWltAccountByCode,
 } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
@@ -32,7 +30,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function WltDshPartnerStatement({ technicalAuditMode = false }: { technicalAuditMode?: boolean } = {}) {
+export function WltDshPartnerStatement() {
   const statements = React.useMemo(() => getWltDshPartnerSettlementStatementsPreview(), []);
 
   const [activePartnerId, setActivePartnerId] = React.useState<string>(statements[0]?.partnerId ?? '');
@@ -54,14 +52,6 @@ export function WltDshPartnerStatement({ technicalAuditMode = false }: { technic
       </Box>
     );
   }
-
-  // Fetch Posting Rules for Partner Settlements
-  const postingRules = React.useMemo(() => {
-    return [
-      getWltPostingRuleForEvent('partner-settlement'),
-      getWltPostingRuleForEvent('store-delivery-fee'),
-    ].filter(Boolean);
-  }, []);
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
@@ -244,7 +234,7 @@ export function WltDshPartnerStatement({ technicalAuditMode = false }: { technic
                 <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <span className={wltStyles.inspectorMetaKey} style={{ color: 'var(--bth-danger-text)' }}>سبب الحظر المالي:</span>
                   <p style={{ fontSize: 11, color: 'var(--bth-danger-text)', margin: 0, lineHeight: '18px' }}>
-                    يوجد حجز احترازي معلق على المتجر من WLT Engine لدواعي تدقيق الفروقات في المدفوعات المسبقة.
+                    يوجد حجز احترازي معلق على المتجر لدواعي تدقيق الفروقات في المدفوعات المسبقة.
                   </p>
                 </div>
               )}
@@ -253,52 +243,6 @@ export function WltDshPartnerStatement({ technicalAuditMode = false }: { technic
         )}
       </div>
 
-      {/* Technical Audit mode (collapsible info panel) */}
-      {technicalAuditMode && (
-        <Box
-          padding={3}
-          background="surfaceRaised"
-          radiusToken="lg"
-          border
-          borderTone="line"
-          gap={2}
-          className={wltStyles.postingRulesAuditPanel}
-        >
-          <span className={wltStyles.postingRulesAuditTitle}>
-            بوابة التدقيق والمطابقة - القيود المحاسبية لقواعد تسوية الشريك (SSoT Posting Rules)
-          </span>
-          <hr className={wltStyles.inspectorSeparator} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span className={wltStyles.readinessDesc}>القيود المالية لترحيل تسوية الشريك والعمولات المرتبطة:</span>
-            <div className={wltStyles.techGrid}>
-              {postingRules.map((rule) => {
-                if (!rule) return null;
-                const debitAccount = getWltAccountByCode(rule.debitAccountCode);
-                const creditAccount = getWltAccountByCode(rule.creditAccountCode);
-                return (
-                  <div key={rule.eventKind} className={wltStyles.postingRulesCard}>
-                    <span className={wltStyles.inspectorMetaVal} style={{ display: 'block', marginBottom: 4 }}>
-                      نوع الحركة: {rule.label}
-                    </span>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
-                      <span className={wltStyles.kpiValueOutflow}>مدين (Dr): {debitAccount?.code}</span>
-                      <span className={wltStyles.inspectorMetaVal}>{debitAccount?.label}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginTop: 4 }}>
-                      <span className={wltStyles.kpiValueInflow}>دائن (Cr): {creditAccount?.code}</span>
-                      <span className={wltStyles.inspectorMetaVal}>{creditAccount?.label}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, marginTop: 6, color: 'var(--bth-control-panel-text-muted)' }}>
-                      <span className={wltStyles.inspectorMetaKey}>دفتر مساعد: {rule.subledgerId}</span>
-                      <span className={wltStyles.inspectorMetaKey}>maker approval: {rule.requiresMakerApproval ? 'نعم' : 'لا'}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </Box>
-      )}
     </Box>
   );
 }

@@ -8,8 +8,6 @@ import {
   type WltDshCaptainStatement as CaptainStatement,
   type WltDshCaptainCodBag as CaptainCodBag,
   type WltDshCaptainEarningLine as CaptainEarningLine,
-  getWltPostingRuleForEvent,
-  getWltAccountByCode,
 } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
@@ -51,7 +49,7 @@ function Metric({ label, value, tone }: { label: string; value: string; tone?: '
   );
 }
 
-export function WltDshCaptainStatement({ technicalAuditMode = false }: { technicalAuditMode?: boolean } = {}) {
+export function WltDshCaptainStatement() {
   const statements = React.useMemo(() => getWltDshCaptainSettlementStatementsPreview(), []);
 
   const [activeCaptainId, setActiveCaptainId] = React.useState<string>(statements[0]?.captainId ?? '');
@@ -90,15 +88,6 @@ export function WltDshCaptainStatement({ technicalAuditMode = false }: { technic
       </Box>
     );
   }
-
-  // SSoT posting rules resolution for technical audit mode
-  const postingRules = React.useMemo(() => {
-    return [
-      getWltPostingRuleForEvent('captain-earning'),
-      getWltPostingRuleForEvent('captain-cod-liability'),
-      getWltPostingRuleForEvent('captain-eligibility-topup'),
-    ].filter(Boolean);
-  }, []);
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
@@ -486,52 +475,6 @@ export function WltDshCaptainStatement({ technicalAuditMode = false }: { technic
         )}
       </div>
 
-      {/* Technical Audit SSoT Posting Rules collapsible panel */}
-      {technicalAuditMode && (
-        <Box
-          padding={3}
-          background="surfaceRaised"
-          radiusToken="lg"
-          border
-          borderTone="line"
-          gap={2}
-          className={wltStyles.postingRulesAuditPanel}
-        >
-          <span className={wltStyles.postingRulesAuditTitle}>
-            بوابة التدقيق والمطابقة - القيود المحاسبية لقواعد الكباتن (SSoT Posting Rules)
-          </span>
-          <hr className={wltStyles.inspectorSeparator} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span className={wltStyles.readinessDesc}>القيود المالية لتسوية أرباح الكباتن، وحركة ذمم الكاش، وشحن رصيد الضمان:</span>
-            <div className={wltStyles.techGrid || wltStyles.metricsGrid} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
-              {postingRules.map((rule) => {
-                if (!rule) return null;
-                const debitAccount = getWltAccountByCode(rule.debitAccountCode);
-                const creditAccount = getWltAccountByCode(rule.creditAccountCode);
-                return (
-                  <div key={rule.eventKind} className={wltStyles.postingRulesCard}>
-                    <span className={wltStyles.inspectorMetaVal} style={{ display: 'block', marginBottom: 4 }}>
-                      نوع الحركة: {rule.label}
-                    </span>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
-                      <span className={wltStyles.kpiValueOutflow}>مدين (Dr): {debitAccount?.code}</span>
-                      <span className={wltStyles.inspectorMetaVal}>{debitAccount?.label}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginTop: 4 }}>
-                      <span className={wltStyles.kpiValueInflow}>دائن (Cr): {creditAccount?.code}</span>
-                      <span className={wltStyles.inspectorMetaVal}>{creditAccount?.label}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, marginTop: 6, color: 'var(--bth-control-panel-text-muted)' }}>
-                      <span className={wltStyles.inspectorMetaKey}>دفتر مساعد: {rule.subledgerId}</span>
-                      <span className={wltStyles.inspectorMetaKey}>maker approval: {rule.requiresMakerApproval ? 'نعم' : 'لا'}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </Box>
-      )}
     </Box>
   );
 }

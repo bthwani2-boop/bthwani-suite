@@ -58,7 +58,7 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
             <Box padding={3} background="warningSurface" radiusToken="md" gap={1}>
-              <Text role="label" style={{ fontWeight: '800', textAlign: 'right' }}>معاينة — WLT عرض فقط</Text>
+              <Text role="label" style={{ fontWeight: '800', textAlign: 'right' }}>نظرة عامة على العمولات</Text>
               <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
                 العمولة الحقيقية هي per-partner + per-mode وتُدار بالكامل عبر WLT. لا تُستخدم هذه الشاشة كمصدر مالي أو محاسبي.
               </Text>
@@ -115,7 +115,7 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
             </Box>
 
             <Box gap={2}>
-              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>جدول العمولة — لكل شريك ولكل وضع (UI_PREVIEW_ONLY):</Text>
+              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>جدول العمولة — لكل شريك ولكل وضع:</Text>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', direction: 'rtl' }}>
                   <thead>

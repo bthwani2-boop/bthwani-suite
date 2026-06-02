@@ -7,8 +7,6 @@ import {
   formatWltYer,
   WltDshFieldCommissionStatement as WltFieldStatement,
   WltDshFieldCommissionStoreLine as WltStoreLine,
-  getWltPostingRuleForEvent,
-  getWltAccountByCode,
 } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
@@ -26,10 +24,8 @@ const ACTIVATION_STATUS_LABEL: Record<WltStoreLine['activationStatus'], string> 
 };
 
 export function WltDshFieldCommissionStatement({
-  technicalAuditMode = false,
   agentId = 'FLD-88',
 }: {
-  technicalAuditMode?: boolean;
   agentId?: string;
 }) {
   const statements = React.useMemo(() => getWltFieldCommissionStatementsPreview(), []);
@@ -52,16 +48,6 @@ export function WltDshFieldCommissionStatement({
       </Box>
     );
   }
-
-  // SSoT posting rules resolution for technical audit mode
-  const postingRules = React.useMemo(() => {
-    const rules = [
-      getWltPostingRuleForEvent('field-commission'),
-      getWltPostingRuleForEvent('field-commission-pending'),
-      getWltPostingRuleForEvent('field-payout'),
-    ].filter(Boolean);
-    return rules;
-  }, []);
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
@@ -220,43 +206,6 @@ export function WltDshFieldCommissionStatement({
         )}
       </div>
 
-      {/* Technical Audit mode (collapsible info panel) */}
-      {technicalAuditMode && (
-        <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={2} style={{ borderRightWidth: 4, borderRightColor: 'var(--bth-info-text)', borderStyle: 'solid' }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--bth-info-text)' }}>بوابة التدقيق والمطابقة - القيود المحاسبية لقواعد الصرف (SSoT Posting Rules)</span>
-          <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: '4px 0' }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)' }}>القيود المالية الموجهة لعمولات الميداني:</span>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
-              {postingRules.map((rule) => {
-                if (!rule) return null;
-                const debitAccount = getWltAccountByCode(rule.debitAccountCode);
-                const creditAccount = getWltAccountByCode(rule.creditAccountCode);
-                return (
-                  <div key={rule.eventKind} style={{ background: 'var(--bth-control-panel-surface)', border: '1px solid var(--bth-control-panel-border)', borderRadius: 6, padding: '8px 12px' }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 4 }}>نوع الحركة: {rule.label}</span>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
-                      <span style={{ color: 'var(--bth-danger-text)' }}>مدين (Dr): {debitAccount?.code}</span>
-                      <span>{debitAccount?.label}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginTop: 4 }}>
-                      <span style={{ color: 'var(--bth-success-text)' }}>دائن (Cr): {creditAccount?.code}</span>
-                      <span>{creditAccount?.label}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, marginTop: 6, color: 'var(--bth-control-panel-text-muted)' }}>
-                      <span>دفتر مساعد: {rule.subledgerId}</span>
-                      <span>maker approval: {rule.requiresMakerApproval ? 'نعم' : 'لا'}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ marginTop: 4, display: 'flex', gap: 16 }}>
-              <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>مراجع الأستاذ: <strong>{statement.ledgerEntryRefs.join(', ')}</strong></span>
-            </div>
-          </div>
-        </Box>
-      )}
     </Box>
   );
 }

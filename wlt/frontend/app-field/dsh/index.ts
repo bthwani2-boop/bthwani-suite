@@ -21,4 +21,4 @@ export {
 export type {
   WltDshFinancePreviewRecord,
   WltFieldFinanceSnapshot,
-} from '../../control-panel/dsh/dshFinancePreview';
+} from '../../control-panel/dsh/financeContracts';

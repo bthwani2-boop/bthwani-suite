@@ -7,8 +7,6 @@ export { CaptainPayoutWorkspace } from './screens/CaptainPayoutWorkspace';
 export type { CaptainPayoutWorkspaceProps } from './screens/CaptainPayoutWorkspace';
 export { CommissionBreakdownWorkspace } from './screens/CommissionBreakdownWorkspace';
 export type { CommissionBreakdownWorkspaceProps } from './screens/CommissionBreakdownWorkspace';
-export { FieldCommissionWorkspace } from './screens/FieldCommissionWorkspace';
-export type { FieldCommissionWorkspaceProps } from './screens/FieldCommissionWorkspace';
 export { PlatformFeeAuditWorkspace } from './screens/PlatformFeeAuditWorkspace';
 export type { PlatformFeeAuditWorkspaceProps } from './screens/PlatformFeeAuditWorkspace';
 

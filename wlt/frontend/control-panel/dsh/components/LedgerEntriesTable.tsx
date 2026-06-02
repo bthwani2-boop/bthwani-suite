@@ -10,7 +10,7 @@ const STATUS_LABELS: Record<string, string> = {
   posted: 'مرحّل',
   pending: 'قيد المراجعة',
   disputed: 'قيد النزاع',
-  blocked: 'محجوب WLT',
+  blocked: 'مبلغ محجوز',
 };
 
 const STATUS_COLOR: Record<string, string> = {
@@ -20,10 +20,9 @@ const STATUS_COLOR: Record<string, string> = {
   blocked: 'var(--bth-danger-text)',
 };
 
-export function LedgerEntriesTable({ entries, pageSize = 10, technicalAuditMode = false }: {
+export function LedgerEntriesTable({ entries, pageSize = 10 }: {
   entries: readonly WltLedgerEntry[];
   pageSize?: number;
-  technicalAuditMode?: boolean;
 }) {
   const router = useRouter();
   const [showAll, setShowAll] = React.useState(false);
@@ -34,7 +33,7 @@ export function LedgerEntriesTable({ entries, pageSize = 10, technicalAuditMode 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Text role="titleSm" style={{ fontWeight: 700 }}>قيود دفتر الأستاذ</Text>
         <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
-          {entries.length} قيد · {technicalAuditMode ? 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' : 'معاينة تشغيلية'}
+          {entries.length} قيد · معاينة تشغيلية
         </span>
       </div>
 
@@ -62,7 +61,7 @@ export function LedgerEntriesTable({ entries, pageSize = 10, technicalAuditMode 
                 } else if (ref.startsWith('REF-') || ref.includes('REF-')) {
                   router.push('/finance?workspace=refund-ledger');
                 } else {
-                  alert(`تفاصيل الحركة المحاسبية:\n\nالمرجع المالي: ${ref}\nالجهة: ${entry.party}\nالحساب المدين: ${entry.debitAccountLabel}\nالحساب الدائن: ${entry.creditAccountLabel}\n\n${technicalAuditMode ? 'الحقيقة المحاسبية تقع 100% تحت حوكمة محرك WLT.' : 'الحقيقة المحاسبية تقع تحت حوكمة محرك المحاسبة WLT.'}`);
+                  alert(`تفاصيل الحركة المحاسبية:\n\nالمرجع المالي: ${ref}\nالجهة: ${entry.party}\nالحساب المدين: ${entry.debitAccountLabel}\nالحساب الدائن: ${entry.creditAccountLabel}`);
                 }
               };
 

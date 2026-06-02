@@ -28,7 +28,10 @@ export type FinanceLegacyWorkspaceAlias =
   | 'captain-finance'
   | 'store-delivery-finance'
   | 'refunds'
-  | 'variances';
+  | 'variances'
+  | 'stores'
+  | 'partners'
+  | 'partner-settlements';
 
 export type FinanceWorkspaceInput =
   | FinanceCanonicalWorkspaceId

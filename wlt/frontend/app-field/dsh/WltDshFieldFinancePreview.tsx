@@ -1,10 +1,4 @@
-/**
- * WLT-owned field agent finance preview component.
- *
- * PREVIEW ONLY — no real commission payout, no real transfer, no API.
- * Currency: YER / ر.ي — no SAR / ر.س
- * Contract state: CONTRACT_TBD — real finance flows blocked.
- */
+'use client';
 
 import React from 'react';
 import { View } from 'react-native';
@@ -19,27 +13,11 @@ import {
   Text,
   TopBar,
 } from '@bthwani/ui-kit';
-import {
-  type WltDshFinancePreviewRecord,
-  type WltFieldFinanceSnapshot,
-} from '../../control-panel/dsh/dshFinancePreview';
+import type {
+  WltDshFinancePreviewRecord,
+  WltFieldFinanceSnapshot,
+} from '../../control-panel/dsh/financeContracts';
 import { useWltDshFieldFinancePreview } from './useWltDshFieldFinancePreview';
-
-const PREVIEW_NOTICE =
-  'هذا عرض تجريبي فقط — لا يوجد صرف عمولة حقيقي ولا تحويل فعلي حتى يُرفع وضع CONTRACT_TBD. العملة: ر.ي (ريال يمني).';
-
-function PreviewBanner() {
-  return (
-    <Surface tone="inset" padding={3}>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 10 }}>
-        <Icon name="information-circle-outline" size={18} tone="muted" />
-        <Text role="bodySm" tone="muted" style={{ flex: 1, textAlign: 'right', lineHeight: 20 }}>
-          {PREVIEW_NOTICE}
-        </Text>
-      </View>
-    </Surface>
-  );
-}
 
 function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
   const amountTone = record.tone === 'positive' ? 'success'
@@ -88,11 +66,10 @@ function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) 
           { label: 'عمولات معتمدة', value: snapshot.totalCommissionLabel, tone: 'success' },
           { label: 'عمولات معلقة', value: snapshot.pendingCommissionsLabel, tone: 'warning' },
           { label: 'عمولات مرفوضة', value: snapshot.rejectedCommissionsLabel, tone: 'error' },
-          { label: 'الملفات المؤهلة', value: String(snapshot.eligibleFilesCount), tone: 'default' as const },
+          { label: 'المتاجر المؤهلة', value: String(snapshot.eligibleFilesCount), tone: 'default' as const },
           { label: 'آخر صرف', value: snapshot.lastPayoutLabel, tone: 'info' },
           { label: 'تاريخ آخر صرف', value: snapshot.lastPayoutDate, tone: 'default' as const },
-          { label: 'الصرف القادم', value: snapshot.nextPayoutDate, tone: 'default' as const },
-          { label: 'العقد', value: snapshot.contractState, tone: 'warning' as const },
+          { label: 'موعد الصرف القادم', value: snapshot.nextPayoutDate, tone: 'default' as const },
         ]}
       />
     </Surface>
@@ -120,7 +97,7 @@ export function WltDshFieldFinancePreview({
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 120 }}>
       <TopBar
         variant="secondary"
-        title="مالية الميداني — WLT Preview"
+        title="مالية الميداني"
         style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={
           onBack
@@ -134,8 +111,6 @@ export function WltDshFieldFinancePreview({
             : undefined
         }
       />
-
-      <PreviewBanner />
 
       <CommissionSummary snapshot={snapshot} />
 
@@ -161,7 +136,7 @@ export function WltDshFieldFinancePreview({
           <StateView
             kind="warning"
             title="في انتظار الاعتماد"
-            description="هذه العمولات مرتبطة بمتاجر لم يكتمل اعتماد عروضها بعد. ستُحتسب عند إتمام الاعتماد."
+            description="هذه العمولات مرتبطة بمتاجر لم يكتمل اعتمادها بعد. ستُحتسب عند إتمام الاعتماد."
           />
         </Surface>
       )}
@@ -190,16 +165,14 @@ export function WltDshFieldFinancePreview({
 
       <Surface tone="inset" padding={3} gap={2}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          الإجراءات المالية للميداني
+          الإجراءات المالية
         </Text>
         <StateView
-          kind="warning"
-          title="الصرف والتحويل مقفلان — CONTRACT_TBD"
-          description="لا يمكن تنفيذ صرف أو تحويل حتى يُربط الـ WLT API المالي المعتمد."
+          kind="info"
+          title="الصرف يتطلب اكتمال الربط"
+          description="يمكن متابعة حالة العمولات هنا. الصرف الفعلي يتم في موعد الدورة المالية."
         />
       </Surface>
-
-      <PreviewBanner />
     </MobileScrollView>
   );
 }

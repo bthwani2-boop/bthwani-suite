@@ -3,7 +3,7 @@ import {
   getWltDshFinanceRecordsForActor,
   type WltCaptainFinanceSection,
   type WltDshFinancePreviewRecord,
-} from '../../control-panel/dsh/dshFinancePreview';
+} from '../../control-panel/dsh/financeContracts';
 
 export function getSnapshot() {
   return getWltCaptainFinanceSnapshot();

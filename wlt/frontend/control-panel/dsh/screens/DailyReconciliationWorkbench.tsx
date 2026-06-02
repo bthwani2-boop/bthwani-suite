@@ -95,7 +95,7 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
 };
 
 export function DailyReconciliationWorkbench() {
-  const allRows = React.useMemo(() => {
+  const [allRows, setAllRows] = React.useState<ReadonlyArray<DshFinancePreviewRow>>(() => {
     const surfaces = getAdaptedFinanceControlPanelRows();
     const seen = new Set<string>();
     const combined: DshFinancePreviewRow[] = [];
@@ -114,9 +114,86 @@ export function DailyReconciliationWorkbench() {
       }
     }
     return combined;
+  });
+
+  const [auditTrails, setAuditTrails] = React.useState<Record<string, Array<{ timestamp: string; actor: string; action: string; note?: string }>>>({});
+  const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
+
+  const getInitialAuditLogs = React.useCallback((row: DshFinancePreviewRow) => {
+    const logs = [];
+    logs.push({
+      timestamp: '09:00 ص',
+      actor: 'نظام WLT الآلي',
+      action: 'تم تسجيل القيد وتوقيع المتوقع ماليًا',
+      note: `المصدر: ${EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource}`,
+    });
+    if (row.evidenceStatus === 'complete') {
+      logs.push({
+        timestamp: '09:15 ص',
+        actor: 'مُعد مالي (Maker)',
+        action: 'ربط وثيقة المطابقة الرقمية وتأكيد سلامة الإيداع',
+        note: row.bankDepositRef || row.cashBagRef,
+      });
+    }
+    if (row.workflowState === 'approved') {
+      logs.push({
+        timestamp: '10:00 ص',
+        actor: 'مدقق مالي (Checker)',
+        action: 'الاعتماد النهائي وترحيل القيد للدفاتر الرسمية للمنصة',
+      });
+    } else if (row.workflowState === 'checked') {
+      logs.push({
+        timestamp: '09:45 ص',
+        actor: 'مدقق مالي (Checker)',
+        action: 'اعتماد مطابقة الأرصدة والموافقة الأولية',
+      });
+    } else if (row.workflowState === 'blocked_wlt') {
+      logs.push({
+        timestamp: '09:20 ص',
+        actor: 'نظام التحكم بمخاطر WLT',
+        action: 'حجب القيد ماليًا وتصنيفه كحالة حرجة معلقة',
+        note: row.blockedReason,
+      });
+    }
+    return logs;
   }, []);
 
-  const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
+  const handleUpdateRow = (
+    rowId: string,
+    updates: Partial<DshFinancePreviewRow>,
+    actionText: string
+  ) => {
+    setAllRows((prev) =>
+      prev.map((r) => {
+        if (r.id === rowId) {
+          const nextRow = { ...r, ...updates };
+          if (updates.actualMinorUnits !== undefined || updates.expectedMinorUnits !== undefined) {
+            nextRow.varianceMinorUnits = nextRow.expectedMinorUnits - nextRow.actualMinorUnits;
+          }
+          return nextRow;
+        }
+        return r;
+      })
+    );
+
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+    setAuditTrails((prev) => {
+      const row = allRows.find((r) => r.id === rowId);
+      const currentLogs = prev[rowId] || (row ? getInitialAuditLogs(row) : []);
+      return {
+        ...prev,
+        [rowId]: [
+          ...currentLogs,
+          {
+            timestamp: timeString,
+            actor: 'محاكي التحكم (DSH Workbench)',
+            action: actionText,
+          },
+        ],
+      };
+    });
+  };
 
   const currentStage = computeCurrentStage(allRows);
   const stageIndex = LIFECYCLE_STAGES.findIndex((s) => s.id === currentStage);
@@ -217,7 +294,46 @@ export function DailyReconciliationWorkbench() {
       </div>
 
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: '800' }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 4 }}>
+          <Text role="titleSm" style={{ fontWeight: '800', margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
+          <button
+            onClick={() => {
+              const surfaces = getAdaptedFinanceControlPanelRows();
+              const seen = new Set<string>();
+              const combined: DshFinancePreviewRow[] = [];
+              for (const surface of [
+                surfaces.overview,
+                surfaces['cod-reconciliation'],
+                surfaces.settlements,
+                surfaces.payouts,
+                surfaces.refunds,
+              ] as const) {
+                for (const row of surface) {
+                  if (!seen.has(row.id)) {
+                    seen.add(row.id);
+                    combined.push(row);
+                  }
+                }
+              }
+              setAllRows(combined);
+              setAuditTrails({});
+            }}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--bthwani-control-panel-border)',
+              borderRadius: 6,
+              padding: '4px 10px',
+              fontSize: 11,
+              cursor: 'pointer',
+              fontWeight: '700',
+              color: 'var(--bthwani-control-panel-text-muted)',
+              transition: 'background 0.2s',
+            }}
+          >
+            🔄 إعادة تعيين المحاكاة
+          </button>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
           {allRows.map((row) => {
             const hasVar = row.varianceMinorUnits !== 0;
@@ -275,31 +391,400 @@ export function DailyReconciliationWorkbench() {
                 </div>
 
                 {isExpanded && (
-                  <div style={{ padding: '16px 20px', borderTop: '1px solid var(--bthwani-control-panel-border)', background: 'rgba(0,0,0,0.01)' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-                      <Box padding={2} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
-                        <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>الأدلة الرقمية</span>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                          <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>مستند المطابقة</span>
-                          <span style={{ fontSize: 10, fontWeight: '700' }}>{EVIDENCE_LABEL[row.evidenceStatus]}</span>
+                  <div style={{
+                    padding: '12px 16px',
+                    borderTop: '1px solid var(--bthwani-control-panel-border)',
+                    background: 'rgba(0,0,0,0.015)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 12,
+                  }}>
+                    <div style={{
+                      background: 'var(--bthwani-control-panel-surface-raised)',
+                      border: '1px solid var(--bthwani-control-panel-border)',
+                      borderRadius: 8,
+                      padding: '12px 16px',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                      gap: 16,
+                    }}>
+                      {/* Column 1: Accounts & Journal Entries */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderBottom: '1px solid var(--bthwani-control-panel-border)', paddingBottom: 6 }}>
+                          <span style={{ fontSize: 13 }}>📊</span>
+                          <span style={{ fontSize: 12, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>تفاصيل قيد الأستاذ والحسابات</span>
                         </div>
-                        {row.bankDepositRef && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>مرجع الإيداع</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.bankDepositRef}</code></div>}
-                        {row.cashBagRef && <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}><span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>حقيبة النقدية</span><code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>{row.cashBagRef}</code></div>}
-                      </Box>
-                      <Box padding={2} background="surfaceRaised" radiusToken="md" border borderTone="line" gap={1}>
-                        <span style={{ fontSize: 11, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)' }}>حالة الاعتماد</span>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                          <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>سير العمل</span>
-                          <span style={{ fontSize: 10, fontWeight: '700' }}>{row.workflowState === 'approved' ? 'معتمد في المعاينة [تجريبي]' : row.workflowState === 'blocked_wlt' ? 'محجوب من WLT 🚨' : 'قيد المراجعة والتدقيق'}</span>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
+                          <div>
+                            <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>الحساب المدين (Debit)</span>
+                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.debitAccountId || 'wlt:escrow'}</code>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>الحساب الدائن (Credit)</span>
+                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.creditAccountId || 'wlt:payout'}</code>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>رقم مرجع قيد اليومية</span>
+                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.ledgerEntryRef || `LED-PRV-${row.id}`}</code>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>سند المصدر المتوقع ➔ الفعلي</span>
+                            <span style={{ fontSize: 10, fontWeight: '700', display: 'block', marginTop: 2 }}>
+                              {EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource} ➔ {ACTUAL_SOURCE_LABEL[row.actualSource] || row.actualSource}
+                            </span>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-                          <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-soft)' }}>الإجراء</span>
-                          <span style={{ fontSize: 10, fontWeight: '700' }}>{RECONCILIATION_LABEL[row.reconciliationStatus]}</span>
+
+                        {hasVar && (
+                          <div style={{ marginTop: 6 }}>
+                            <button
+                              onClick={() => {
+                                handleUpdateRow(
+                                  row.id,
+                                  {
+                                    actualMinorUnits: row.expectedMinorUnits,
+                                    reconciliationStatus: 'matched',
+                                    evidenceStatus: 'complete',
+                                    bankDepositRef: row.bankDepositRef || `[معاينة] DEP-${row.id}`,
+                                  },
+                                  `تسوية الفارق المالي وتحديث الفعلي المورد إلى ${formatWltYer(row.expectedMinorUnits)}`
+                                );
+                              }}
+                              style={{
+                                width: '100%',
+                                background: 'var(--bth-warning-surface)',
+                                border: '1px solid var(--bth-warning-text)',
+                                borderRadius: 6,
+                                padding: '6px 10px',
+                                fontSize: 10,
+                                cursor: 'pointer',
+                                color: 'var(--bth-warning-text)',
+                                fontWeight: '700',
+                                transition: 'all 0.2s',
+                              }}
+                            >
+                              💵 إيداع المبلغ بالكامل لتسوية الفارق
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Column 2: Evidence & Maker-Checker Workflow */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {/* Evidence Document Section */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--bthwani-control-panel-border)', paddingBottom: 6 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontSize: 13 }}>📁</span>
+                              <span style={{ fontSize: 12, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>الأدلة الرقمية والوثائق</span>
+                            </div>
+                            <span style={{
+                              fontSize: 9,
+                              fontWeight: '700',
+                              color: row.evidenceStatus === 'complete' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
+                              background: row.evidenceStatus === 'complete' ? 'var(--bth-success-surface)' : 'var(--bth-warning-surface)',
+                              padding: '1px 6px',
+                              borderRadius: 4,
+                            }}>
+                              {EVIDENCE_LABEL[row.evidenceStatus]}
+                            </span>
+                          </div>
+
+                          {(row.bankDepositRef || row.cashBagRef) ? (
+                            <div style={{
+                              background: 'var(--bthwani-control-panel-surface)',
+                              border: '1px solid var(--bthwani-control-panel-border)',
+                              borderRadius: 6,
+                              padding: '6px 10px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 16 }}>📄</span>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                  <span style={{ fontSize: 10, fontWeight: '700', color: 'var(--bthwani-control-panel-text)' }}>
+                                    {row.bankDepositRef ? `${row.bankDepositRef.replace('[معاينة] ', '')}.pdf` : `${row.cashBagRef?.replace('[معاينة] ', '')}.zip`}
+                                  </span>
+                                  <span style={{ fontSize: 8, color: 'var(--bth-success-text)', fontWeight: '700' }}>
+                                    ✓ مُحقق وموقّع رقميًا
+                                  </span>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => alert(`وثيقة الإثبات المالي: ${row.bankDepositRef || row.cashBagRef}\nحالة التحقق: سليم ومقبول`)}
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid var(--bthwani-control-panel-border)',
+                                  borderRadius: 4,
+                                  padding: '2px 6px',
+                                  fontSize: 9,
+                                  cursor: 'pointer',
+                                  color: 'var(--bthwani-control-panel-text)',
+                                }}
+                              >
+                                معاينة
+                              </button>
+                            </div>
+                          ) : (
+                            <div style={{
+                              background: 'var(--bth-danger-surface)',
+                              border: '1px dashed var(--bth-danger-text)',
+                              borderRadius: 6,
+                              padding: 8,
+                              textAlign: 'center',
+                              color: 'var(--bth-danger-text)',
+                              fontSize: 10,
+                              fontWeight: '700',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}>
+                              <span>🚨 مستند الإثبات مفقود!</span>
+                              <button
+                                onClick={() => {
+                                  handleUpdateRow(
+                                    row.id,
+                                    {
+                                      evidenceStatus: 'complete',
+                                      bankDepositRef: `[معاينة] DEP-${row.id}`,
+                                      reconciliationStatus: row.varianceMinorUnits === 0 ? 'matched' : 'unmatched',
+                                    },
+                                    'تم رفع وثيقة إثبات الإيداع البنكي رقم DEP-' + row.id
+                                  );
+                                }}
+                                style={{
+                                  background: 'var(--bth-danger-text)',
+                                  color: 'var(--bthwani-brand-contrast)',
+                                  border: 'none',
+                                  borderRadius: 4,
+                                  padding: '4px 8px',
+                                  fontSize: 9,
+                                  cursor: 'pointer',
+                                  fontWeight: '700',
+                                }}
+                              >
+                                إرفاق وثيقة إيداع بنكي
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      </Box>
+
+                        {/* Dual Approval Workflow Section */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--bthwani-control-panel-border)', paddingBottom: 6 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ fontSize: 13 }}>👑</span>
+                              <span style={{ fontSize: 12, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>نظام الاعتماد الثنائي (Maker-Checker)</span>
+                            </div>
+                            <span style={{
+                              fontSize: 9,
+                              fontWeight: '700',
+                              color: row.workflowState === 'approved' ? 'var(--bth-success-text)' : row.workflowState === 'blocked_wlt' ? 'var(--bth-danger-text)' : 'var(--bth-warning-text)',
+                              background: row.workflowState === 'approved' ? 'var(--bth-success-surface)' : row.workflowState === 'blocked_wlt' ? 'var(--bth-danger-surface)' : 'var(--bth-warning-surface)',
+                              padding: '1px 6px',
+                              borderRadius: 4,
+                            }}>
+                              {row.workflowState === 'approved' ? 'معتمد ومرحل' : row.workflowState === 'blocked_wlt' ? 'محجوب 🚨' : row.workflowState === 'checked' ? 'مُدقّق' : 'مسودة'}
+                            </span>
+                          </div>
+
+                          {/* Compact Stepper */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '2px 0' }}>
+                            {[
+                              { key: 'draft', label: 'مسودة' },
+                              { key: 'prepared', label: 'مُعدّ' },
+                              { key: 'checked', label: 'مُدقّق' },
+                              { key: 'approved', label: 'معتمد' },
+                            ].map((step, idx, arr) => {
+                              const isDone = (
+                                row.workflowState === 'approved' ||
+                                (row.workflowState === 'checked' && step.key !== 'approved') ||
+                                (row.workflowState === 'reviewed' && step.key !== 'approved' && step.key !== 'checked') ||
+                                (row.workflowState === 'prepared' && step.key !== 'approved' && step.key !== 'checked') ||
+                                step.key === 'draft'
+                              );
+                              const isActive = row.workflowState === step.key || (row.workflowState === 'reviewed' && step.key === 'prepared');
+
+                              return (
+                                <React.Fragment key={step.key}>
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative' }}>
+                                    <div style={{
+                                      width: 14,
+                                      height: 14,
+                                      borderRadius: '50%',
+                                      background: isDone ? 'var(--bthwani-brand-primary)' : 'var(--bthwani-control-panel-border)',
+                                      border: isActive ? '2px solid var(--bth-success-text)' : 'none',
+                                      display: 'flex',
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                      color: 'var(--bthwani-brand-contrast)',
+                                      fontSize: 7,
+                                      fontWeight: '700',
+                                      zIndex: 2,
+                                    }}>
+                                      {isDone ? '✓' : idx + 1}
+                                    </div>
+                                    <span style={{ fontSize: 8, fontWeight: isActive ? '800' : '700', color: isActive ? 'var(--bthwani-control-panel-text)' : 'var(--bthwani-control-panel-text-muted)', marginTop: 2 }}>
+                                      {step.label}
+                                    </span>
+                                  </div>
+                                  {idx < arr.length - 1 && (
+                                    <div style={{
+                                      height: 1,
+                                      background: isDone ? 'var(--bthwani-brand-primary)' : 'var(--bthwani-control-panel-border)',
+                                      flexGrow: 1,
+                                      marginTop: 6,
+                                      zIndex: 1,
+                                    }} />
+                                  )}
+                                </React.Fragment>
+                              );
+                            })}
+                          </div>
+
+                          {row.workflowState === 'blocked_wlt' && (
+                            <div style={{
+                              background: 'var(--bth-danger-surface)',
+                              border: '1px solid var(--bth-danger-text)',
+                              borderRadius: 4,
+                              padding: '4px 6px',
+                              fontSize: 9,
+                              color: 'var(--bth-danger-text)',
+                              fontWeight: '700',
+                              marginTop: 2,
+                            }}>
+                              🚨 محجوب ماليًا: {row.blockedReason || 'يوجد فارق غير مسوّى أو الأدلة غير مكتملة.'}
+                            </div>
+                          )}
+
+                          {/* Action Buttons Row */}
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                            {row.workflowState === 'draft' && (
+                              <button
+                                onClick={() => handleUpdateRow(row.id, { workflowState: 'prepared' }, 'تم تقديم القيد وتجهيزه للمراجعة')}
+                                style={{
+                                  background: 'var(--bthwani-brand-primary)',
+                                  color: 'var(--bthwani-brand-contrast)',
+                                  border: 'none',
+                                  borderRadius: 4,
+                                  padding: '4px 8px',
+                                  fontSize: 9,
+                                  cursor: 'pointer',
+                                  fontWeight: '700',
+                                }}
+                              >
+                                📤 تقديم للمراجعة
+                              </button>
+                            )}
+
+                            {(row.workflowState === 'prepared' || row.workflowState === 'reviewed' || row.workflowState === 'draft') && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    if (row.evidenceStatus !== 'complete') {
+                                      alert('لا يمكن تدقيق القيد قبل إرفاق أو رفع وثيقة المطابقة الرقمية!');
+                                      return;
+                                    }
+                                    handleUpdateRow(row.id, { workflowState: 'checked', reconciliationStatus: 'matched' }, 'تم تدقيق القيد ومطابقة الأرصدة وإقرار صحتها');
+                                  }}
+                                  style={{
+                                    background: 'var(--bth-success-text)',
+                                    color: 'var(--bthwani-brand-contrast)',
+                                    border: 'none',
+                                    borderRadius: 4,
+                                    padding: '4px 8px',
+                                    fontSize: 9,
+                                    cursor: 'pointer',
+                                    fontWeight: '700',
+                                    opacity: row.evidenceStatus === 'complete' ? 1 : 0.5,
+                                  }}
+                                >
+                                  ✓ تدقيق ومطابقة
+                                </button>
+
+                                <button
+                                  onClick={() => handleUpdateRow(row.id, { workflowState: 'blocked_wlt', reconciliationStatus: 'disputed' }, 'تم حجب القيد للتأكد من موازنة الحسابات')}
+                                  style={{
+                                    background: 'var(--bth-danger-text)',
+                                    color: 'var(--bthwani-brand-contrast)',
+                                    border: 'none',
+                                    borderRadius: 4,
+                                    padding: '4px 8px',
+                                    fontSize: 9,
+                                    cursor: 'pointer',
+                                    fontWeight: '700',
+                                  }}
+                                >
+                                  🚨 حجب القيد
+                                </button>
+                              </>
+                            )}
+
+                            {row.workflowState === 'checked' && (
+                              <button
+                                onClick={() => handleUpdateRow(row.id, { workflowState: 'approved', reconciliationStatus: 'closed' }, 'تم الاعتماد النهائي لقيد التسوية وإغلاقه')}
+                                style={{
+                                  background: 'var(--bthwani-brand-primary)',
+                                  color: 'var(--bthwani-brand-contrast)',
+                                  border: 'none',
+                                  borderRadius: 4,
+                                  padding: '4px 8px',
+                                  fontSize: 9,
+                                  cursor: 'pointer',
+                                  fontWeight: '800',
+                                }}
+                              >
+                                👑 اعتماد نهائي وإغلاق
+                              </button>
+                            )}
+
+                            {row.workflowState === 'blocked_wlt' && (
+                              <button
+                                onClick={() => handleUpdateRow(row.id, { workflowState: 'draft', reconciliationStatus: 'unmatched' }, 'تم إلغاء حجب القيد وإعادته للمراجعة والتعديل')}
+                                style={{
+                                  background: 'var(--bthwani-brand-primary)',
+                                  color: 'var(--bthwani-brand-contrast)',
+                                  border: 'none',
+                                  borderRadius: 4,
+                                  padding: '4px 8px',
+                                  fontSize: 9,
+                                  cursor: 'pointer',
+                                  fontWeight: '700',
+                                }}
+                              >
+                                🔓 إلغاء الحجب وإعادة المحاولة
+                              </button>
+                            )}
+
+                            {row.workflowState === 'approved' && (
+                              <span style={{ fontSize: 9, color: 'var(--bth-success-text)', fontWeight: '800', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                ✓ قيد مغلق ومرحل نهائيًا للأستاذ.
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Timeline Log Section */}
+                    <div style={{ marginTop: 10, borderTop: '1px solid var(--bthwani-control-panel-border)', paddingTop: 8 }}>
+                      <span style={{ fontSize: 9, fontWeight: '700', color: 'var(--bthwani-control-panel-text-muted)', display: 'block', marginBottom: 4 }}>سجل أحداث القيد والتدقيق المالي (Audit Trail):</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        {(auditTrails[row.id] || getInitialAuditLogs(row)).map((log, index) => (
+                          <div key={index} style={{ display: 'flex', gap: 6, fontSize: 9, alignItems: 'center' }}>
+                            <span style={{ color: 'var(--bthwani-control-panel-text-muted)', fontFamily: 'monospace' }}>[{log.timestamp}]</span>
+                            <span style={{ fontWeight: '700', color: 'var(--bthwani-brand-primary)' }}>{log.actor}:</span>
+                            <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{log.action}</span>
+                            {log.note && <span style={{ color: 'var(--bthwani-control-panel-text-muted)', fontStyle: 'italic' }}>({log.note})</span>}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
+
               </div>
             );
           })}

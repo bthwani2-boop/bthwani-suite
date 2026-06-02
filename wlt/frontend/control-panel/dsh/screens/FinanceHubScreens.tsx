@@ -17,15 +17,12 @@ import {
 } from '../adapters/dshFinanceFixture.adapter';
 import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
-import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
-import { getFinanceApiBinding } from '../adapters/finance.api-matrix';
 import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
 import { WltDshFieldCommissionStatement } from '../components/WltDshFieldCommissionStatement';
 import { WltDshStoreSettlementStatement } from '../components/WltDshStoreSettlementStatement';
 import { WltDshPartnerStatement } from '../components/WltDshPartnerStatement';
 import { WltDshAccountStatement } from '../components/WltDshAccountStatement';
 import { WltDshCaptainStatement } from '../components/WltDshCaptainStatement';
-import { normalizeFinanceLocation } from '../constants/finance.registry';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type FinanceSurface = DshFinancePreviewSurface;
@@ -135,11 +132,9 @@ function resolveToneColor(tone: 'success' | 'warning' | 'danger' | 'info' | 'neu
 export function FinanceSurfaceBoard({
   surface,
   subGroup,
-  technicalAuditMode = false,
 }: {
   surface: FinanceSurface;
   subGroup?: string;
-  technicalAuditMode?: boolean;
 }) {
   const router = useRouter();
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
@@ -251,7 +246,6 @@ export function FinanceSurfaceBoard({
           <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap', direction: 'rtl' }}>
             <WebControlPanelStatusTag label={resolveSurfaceLabel(surface)} tone="info" />
             <WebControlPanelStatusTag label={subGroup ? `الفرعي: ${subGroup}` : 'كافة السجلات'} tone="neutral" />
-            {technicalAuditMode && <WebControlPanelStatusTag label="معاينة فقط (WLT)" tone="warning" />}
           </Box>
 
           {rows.length === 0 ? (
@@ -347,56 +341,33 @@ export function FinanceSurfaceBoard({
                               return (
                                 <WltDshFieldCommissionStatement
                                   agentId={row.sourceFieldAgentId}
-                                  technicalAuditMode={technicalAuditMode}
                                 />
                               );
                             }
                             if (row.actorType === 'partner') {
                               return (
-                                <WltDshPartnerStatement
-                                  technicalAuditMode={technicalAuditMode}
-                                />
+                                <WltDshPartnerStatement />
                               );
                             }
                             if (row.actorType === 'captain') {
                               return (
-                                <WltDshCaptainStatement
-                                  captainId={row.sourceCaptainId}
-                                  technicalAuditMode={technicalAuditMode}
-                                />
+                                <WltDshCaptainStatement />
                               );
                             }
                             return (
                               <WltDshAccountStatement
                                 actorId={row.actorType === 'client' ? 'CUS-553' : 'DSH-PLATFORM'}
-                                technicalAuditMode={technicalAuditMode}
                               />
                             );
                           })()}
                         </div>
 
-                        {/* OpenAPI Matrix Bindings (Technical Mode Only) */}
-                        {technicalAuditMode && (() => {
-                          const binding = getFinanceApiBinding(normalizeFinanceLocation(surface).group);
-                          if (!binding) return null;
-                          return (
-                            <Box padding={2} background="surfaceInset" radiusToken="sm" gap={1} style={{ marginTop: 12, direction: 'rtl' }}>
-                              <Text role="caption" tone="muted" style={{ fontWeight: '700', textAlign: 'right' }}>WLT OpenAPI Binding Matrix [P7]</Text>
-                              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{binding.httpMethod} {binding.wltEndpoint} · operationId: {binding.operationId} · endpoint: {binding.endpointStatus === 'exact' ? '✓ exact' : '⚠ placeholder'}</Text>
-                            </Box>
-                          );
-                        })()}
 
                         {/* Recommendation Text Block */}
                         <div style={{ marginTop: 16, background: 'var(--bth-control-panel-surface-raised)', border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontSize: 12, color: 'var(--bth-control-panel-text)' }}>
                             💡 <strong>توصية المطابقة والمراجعة:</strong> {row.recommendation}
                           </span>
-                          {technicalAuditMode && (
-                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: 4, fontWeight: '700', color: 'var(--bth-control-panel-text-muted)' }}>
-                              CONTRACT_SCAFFOLD_PREVIEW_ONLY
-                            </span>
-                          )}
                         </div>
 
                         {/* Allowed Action Handoff Feedback Block */}
@@ -448,44 +419,44 @@ export function FinanceSurfaceBoard({
   );
 }
 
-export function ControlPanelDshFinanceScreen({ technicalAuditMode }: { technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="overview" technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshFinanceScreen() {
+  return <FinanceSurfaceBoard surface="overview" />;
 }
 
-export function ControlPanelDshSettlementScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="settlements" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshSettlementScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="settlements" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshCodReconciliationScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="cod-reconciliation" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshCodReconciliationScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="cod-reconciliation" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshRefundQueueScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="refunds" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshRefundQueueScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="refunds" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshCaptainEligibilityScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="captain-eligibility" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshCaptainEligibilityScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="captain-eligibility" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshPayoutsScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="payouts" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshPayoutsScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="payouts" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshRiskAuditScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="risk-audit" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshRiskAuditScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="risk-audit" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshCaptainFinanceScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="captain-finance" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshCaptainFinanceScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="captain-finance" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshStoreDeliveryFinanceScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="store-delivery-finance" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshStoreDeliveryFinanceScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="store-delivery-finance" subGroup={subGroup} />;
 }
 
-export function ControlPanelDshLedgerScreen({ subGroup, technicalAuditMode }: { subGroup?: string; technicalAuditMode: boolean }) {
-  return <FinanceSurfaceBoard surface="ledger" subGroup={subGroup} technicalAuditMode={technicalAuditMode} />;
+export function ControlPanelDshLedgerScreen({ subGroup }: { subGroup?: string }) {
+  return <FinanceSurfaceBoard surface="ledger" subGroup={subGroup} />;
 }
 
 export default ControlPanelDshFinanceScreen;

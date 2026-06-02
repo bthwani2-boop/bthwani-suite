@@ -11,7 +11,6 @@ import {
   normalizeFinanceLocation,
 } from '../constants/finance.registry';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../models/financeRouting.types';
-import { getDshControlPanelGovernanceEntry } from '../../../../../dsh/frontend/control-panel/shared';
 import { getWltControlPanelFinancePreview, buildWltFinancialCenter } from '../financeContracts';
 
 import { FinancialCenterScreen } from './FinancialCenterScreen';
@@ -31,6 +30,7 @@ import { WltDshStoreSettlementStatement } from '../components/WltDshStoreSettlem
 import { WltDshPartnerStatement } from '../components/WltDshPartnerStatement';
 import { WltDshFieldCommissionStatement } from '../components/WltDshFieldCommissionStatement';
 import { WltDshCaptainStatement } from '../components/WltDshCaptainStatement';
+import { WltDshWalletControlCenter } from '../components/WltDshWalletControlCenter';
 
 import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
@@ -148,7 +148,6 @@ export function WltDshFinanceHubHost({
 
   const [activeGroup, setActiveGroup] = React.useState<CanonicalFinanceGroupId>(normalized.group);
   const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(subGroup || normalized.subGroup);
-  const [technicalAuditMode, setTechnicalAuditMode] = React.useState(false);
 
   // Sync state if props change
   React.useEffect(() => {
@@ -234,61 +233,64 @@ export function WltDshFinanceHubHost({
     return '✓ لا يوجد حظر (جاهز للتسوية)';
   }, [center, financePreview]);
 
-  const renderActiveScreen = (groupId: CanonicalFinanceGroupId, subGroupId: string | undefined, techMode: boolean, currentHref: string) => {
+  const renderActiveScreen = (groupId: CanonicalFinanceGroupId, subGroupId: string | undefined, currentHref: string) => {
     const activeSub = subGroupId || getFinanceGroupMeta(groupId).subGroups?.[0]?.id;
 
     switch (groupId) {
       case 'financial-command-center':
         if (activeSub === 'position') {
-          return <FinancialCenterScreen hubHref={currentHref} subGroup={activeSub} technicalAuditMode={techMode} />;
+          return <FinancialCenterScreen hubHref={currentHref} subGroup={activeSub} />;
         }
-        return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} technicalAuditMode={techMode} />;
+        return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} />;
 
       case 'ledger-order-finance':
         if (activeSub === 'order-lifecycle') {
           return <DailyReconciliationWorkbench />;
         }
         if (activeSub === 'audit-trail') {
-          return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} technicalAuditMode={techMode} />;
+          return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} />;
         }
-        return <LedgerScreen hubHref={currentHref} subGroup={activeSub} technicalAuditMode={techMode} />;
+        return <LedgerScreen hubHref={currentHref} subGroup={activeSub} />;
 
       case 'payments-wallets':
+        if (activeSub === 'wallet-control-center') {
+          return <WltDshWalletControlCenter />;
+        }
         if (activeSub === 'payments') {
-          return <ControlPanelDshCodReconciliationScreen subGroup={activeSub} technicalAuditMode={techMode} />;
+          return <ControlPanelDshCodReconciliationScreen subGroup={activeSub} />;
         }
         return <WltDshAccountStatement />;
 
       case 'settlements-payouts':
         if (activeSub === 'partners') {
-          return <WltDshPartnerStatement technicalAuditMode={techMode} />;
+          return <WltDshPartnerStatement />;
         }
         if (activeSub === 'stores') {
-          return <WltDshStoreSettlementStatement technicalAuditMode={techMode} />;
+          return <WltDshStoreSettlementStatement />;
         }
         if (activeSub === 'captains') {
-          return <WltDshCaptainStatement technicalAuditMode={techMode} />;
+          return <WltDshCaptainStatement />;
         }
         if (activeSub === 'field') {
-          return <WltDshFieldCommissionStatement technicalAuditMode={techMode} />;
+          return <WltDshFieldCommissionStatement />;
         }
         if (activeSub === 'bank-transfers') {
           return <WltDshSettlementCalendar />;
         }
-        return <ControlPanelDshSettlementScreen subGroup={activeSub} technicalAuditMode={techMode} />;
+        return <ControlPanelDshSettlementScreen subGroup={activeSub} />;
 
       case 'refunds-disputes-holds':
         if (activeSub === 'cancellations') {
-          return <ControlPanelDshRefundQueueScreen subGroup={activeSub} technicalAuditMode={techMode} />;
+          return <ControlPanelDshRefundQueueScreen subGroup={activeSub} />;
         }
         return <WltDshRefundLedger />;
 
       case 'commissions-fees-promo':
-        return <ControlPanelDshSettlementScreen subGroup={activeSub} technicalAuditMode={techMode} />;
+        return <ControlPanelDshSettlementScreen subGroup={activeSub} />;
 
       case 'reconciliation-risk':
         if (activeSub === 'risk-fraud') {
-          return <ControlPanelDshRiskAuditScreen subGroup={activeSub} technicalAuditMode={techMode} />;
+          return <ControlPanelDshRiskAuditScreen subGroup={activeSub} />;
         }
         return <DailyReconciliationWorkbench />;
 
@@ -296,10 +298,10 @@ export function WltDshFinanceHubHost({
         if (activeSub === 'policies') {
           return <WltDshSettlementCalendar />;
         }
-        return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} technicalAuditMode={techMode} />;
+        return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} />;
 
       default:
-        return <FinancialCenterScreen hubHref={currentHref} subGroup={activeSub} technicalAuditMode={techMode} />;
+        return <FinancialCenterScreen hubHref={currentHref} subGroup={activeSub} />;
     }
   };
 
@@ -332,7 +334,7 @@ export function WltDshFinanceHubHost({
           icon="🚨"
           title="خطأ في الاتصال بالخادم المالي"
           titleDanger
-          desc="فشل تحميل البيانات المالية من WLT Engine. يرجى التحقق من اتصال الخادم المالي ومحاولة إعادة التحميل."
+          desc="فشل تحميل البيانات المالية. يرجى التحقق من اتصال الخادم المالي ومحاولة إعادة التحميل."
           impact={{
             risk: "عطل الاتصال بالخادم الرئيسي",
             affected: "لوحة القيادة بالكامل",
@@ -352,7 +354,7 @@ export function WltDshFinanceHubHost({
         <FinanceStateScreen
           icon="🌐"
           title="أنت تعمل خارج الاتصال"
-          desc="يتعذر تحميل البيانات المالية من WLT Engine لأنك غير متصل بالإنترنت حالياً."
+          desc="يتعذر تحميل البيانات المالية لأنك غير متصل بالإنترنت حالياً."
           impact={{
             risk: "عمل دون مزامنة الشبكة",
             affected: "العمليات المالية الفورية",
@@ -407,7 +409,7 @@ export function WltDshFinanceHubHost({
       );
     }
 
-    return renderActiveScreen(activeGroup, activeSubGroup, technicalAuditMode, hubHref);
+    return renderActiveScreen(activeGroup, activeSubGroup, hubHref);
   };
 
   return (
@@ -420,7 +422,7 @@ export function WltDshFinanceHubHost({
               <h1 className={styles.surfaceHeaderTitle}>غرفة القيادة المالية</h1>
               <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
                 <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--bth-brand-primary)' }}>
-                  {technicalAuditMode ? 'مصدر الحقيقة: WLT' : 'معاينة تشغيلية'}
+                  معاينة تشغيلية
                 </span>
               </Box>
             </div>
@@ -431,17 +433,6 @@ export function WltDshFinanceHubHost({
         </div>
 
         <div className={wltStyles.headerActionsRow}>
-          <div className={wltStyles.technicalToggleContainer}>
-            <span className={wltStyles.technicalToggleLabel}>التدقيق التقني</span>
-            <button
-              onClick={() => setTechnicalAuditMode(!technicalAuditMode)}
-              aria-label="تغيير وضع العرض"
-              className={wltStyles.technicalToggleButton}
-              style={{ background: technicalAuditMode ? 'var(--bth-brand-primary)' : 'var(--bth-control-panel-border)' }}
-            >
-              <div className={wltStyles.technicalToggleKnob} style={{ left: technicalAuditMode ? 18 : 2 }} />
-            </button>
-          </div>
           <button
             onClick={() => router.refresh()}
             className={wltStyles.refreshButton}
@@ -550,38 +541,6 @@ export function WltDshFinanceHubHost({
               <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>🔒 <strong>حظر الصرف/التسوية:</strong></span>
                 <span className={wltStyles.readinessVal} style={{ fontWeight: 700 }}>{holdsStatus}</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Technical Audit Drawer */}
-      {technicalAuditMode && (
-        <section className={wltStyles.hubReadinessSection}>
-          <div className={wltStyles.techDrawer}>
-            <div className={wltStyles.techDrawerHeader}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--bth-info-text)' }}>بوابة التدقيق المالي التقني (WLT/DSH API matrix)</span>
-              <span style={{ fontSize: 10, background: 'var(--bth-warning-surface)', padding: '2px 8px', borderRadius: 4, fontWeight: 700, color: 'var(--bth-warning-text)' }}>
-                وضع معاينة العقد المالي
-              </span>
-            </div>
-            <div className={wltStyles.techGrid}>
-              <div className={wltStyles.techItem}>
-                <span className={wltStyles.techLabel}>مصدر البيانات الأساسي</span>
-                <span className={wltStyles.techValue}>WLT Ledger Engine (SSoT)</span>
-              </div>
-              <div className={wltStyles.techItem}>
-                <span className={wltStyles.techLabel}>حالة العقد المالي</span>
-                <span className={wltStyles.techValue} style={{ color: 'var(--bth-warning-text)' }}>{financePreview.contractState}</span>
-              </div>
-              <div className={wltStyles.techItem}>
-                <span className={wltStyles.techLabel}>طابع تدفق البيانات</span>
-                <span className={wltStyles.techValue}>مستمر ومطابق بالكامل (Real-time Mock)</span>
-              </div>
-              <div className={wltStyles.techItem}>
-                <span className={wltStyles.techLabel}>طبيعة المعاينة</span>
-                <span className={wltStyles.techValue}>DSH UI preview contract scaffold</span>
               </div>
             </div>
           </div>

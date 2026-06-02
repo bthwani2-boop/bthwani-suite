@@ -25,5 +25,5 @@ export {
 	unlink,
 } from './wlt-dsh-client.adapter';
 export type { WalletAccount } from './wlt-dsh-client.adapter';
-export { resolveWltDshFinanceEventKindForPaymentMethod } from '../../control-panel/dsh/dshFinancePreview';
-export type { WltDshFinanceEventKind } from '../../control-panel/dsh/dshFinancePreview';
+export { resolveWltDshFinanceEventKindForPaymentMethod } from '../../control-panel/dsh/financeContracts';
+export type { WltDshFinanceEventKind } from '../../control-panel/dsh/financeContracts';

@@ -5,7 +5,7 @@ import type {
   WltDshFinanceEventKind,
   WltDshFinanceStatusTone,
   WltDshFinanceTone,
-} from '../../control-panel/dsh/dshFinancePreview';
+} from '../../control-panel/dsh/financeContracts';
 
 export type WltDshPartnerTransactionTone = 'default' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -20,21 +20,16 @@ export type WltDshPartnerWalletTransaction = {
   timeLabel: string;
   icon: React.ComponentProps<typeof Icon>['name'];
   hasDetails?: boolean;
-  // PHASE 2 — حقول إضافية لشرح كل حركة مالية بوضوح
   kind?: WltDshFinanceEventKind;
   kindLabel?: string;
   sourceOrderLabel?: string;
   settlementCycleLabel?: string;
   includedInNetSettlementLabel?: string;
-  sourceTruthLabel?: string;
-  runtimeBindingLabel?: string;
-  accountingWarningLabel?: string;
   fulfillmentModeLabel?: string;
   isStoreDeliveryFee?: boolean;
   isStoreCourierCompensation?: boolean;
   isCaptainPayout?: boolean;
   policyLabel?: string;
-  previewNoticeLabel?: string;
 };
 
 function mapAmountTone(tone: WltDshFinanceTone): WltDshPartnerTransactionTone {
@@ -177,7 +172,6 @@ export function mapWltDshPartnerPreviewTransactions(
     timeLabel: sanitizeLabel(record.timeLabel),
     icon: resolveTransactionIcon(record),
     hasDetails: true,
-    // PHASE 2 — حقول الشرح المالي
     kind: record.kind,
     kindLabel: resolveKindLabel(record.kind),
     sourceOrderLabel: record.sourceOrderId
@@ -191,13 +185,9 @@ export function mapWltDshPartnerPreviewTransactions(
       ? `دورة #${record.settlementCycleId}`
       : undefined,
     includedInNetSettlementLabel: resolveSettlementImpact(record.kind),
-    sourceTruthLabel: 'WLT',
-    runtimeBindingLabel: 'runtime غير مربوط',
-    accountingWarningLabel: 'معاينة فقط — لا تمثل تسوية فعلية',
     isStoreDeliveryFee: record.kind === 'store-delivery-fee',
     isStoreCourierCompensation: record.kind === 'store-courier-compensation',
     isCaptainPayout: record.kind === 'captain-earning' || record.kind === 'captain-cod-liability',
     policyLabel: resolvePolicyLabel(record.kind),
-    previewNoticeLabel: 'بيانات تجريبية — لا تمثل تسويات فعلية',
   }));
 }

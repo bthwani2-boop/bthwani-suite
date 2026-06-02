@@ -24,10 +24,8 @@ function SummaryCell({ label, value }: { label: string; value: string }) {
 }
 
 export function WltDshAccountStatement({
-  technicalAuditMode = false,
   actorId,
 }: {
-  technicalAuditMode?: boolean;
   actorId?: string;
 } = {}) {
   const statements = React.useMemo(() => getWltDshAccountStatementsPreview(), []);
@@ -53,9 +51,7 @@ export function WltDshAccountStatement({
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <Text role="titleMd" style={{ fontWeight: 800 }}>كشوف الحساب</Text>
         <Text role="bodySm" tone="soft">
-          {technicalAuditMode
-            ? 'أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات كـ preview contract مملوك لـ WLT.'
-            : 'أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات.'}
+          أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات.
         </Text>
       </Box>
 
@@ -116,8 +112,8 @@ export function WltDshAccountStatement({
                   <td style={{ padding: '8px 10px', fontVariantNumeric: 'tabular-nums' }}>{line.creditLabel}</td>
                   <td style={{ padding: '8px 10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{line.runningBalanceLabel}</td>
                   <td style={{ padding: '8px 10px' }}>
-                    {line.status === 'pending_wlt' ? (technicalAuditMode ? 'قيد WLT' : 'قيد المراجعة') :
-                     line.status === 'posted_preview' ? (technicalAuditMode ? 'مرحل كمعاينة' : 'مرحل') :
+                    {line.status === 'pending_wlt' ? 'قيد المراجعة' :
+                     line.status === 'posted_preview' ? 'مرحل' :
                      line.status === 'held' ? 'مبلغ محجوز' : 'نزاع'}
                   </td>
                   <td style={{ padding: '8px 10px' }}>{line.evidenceRef}</td>

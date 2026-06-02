@@ -1,7 +1,7 @@
 import type {
   WltDshFinancePreviewRecord,
   WltPartnerFinanceSnapshot,
-} from '../../control-panel/dsh/dshFinancePreview';
+} from '../../control-panel/dsh/financeContracts';
 
 export type WltDshPartnerWalletPreview = {
   balanceLabel: string;

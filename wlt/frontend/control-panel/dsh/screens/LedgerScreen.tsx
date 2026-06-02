@@ -7,7 +7,7 @@ import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
 import { LedgerEntriesTable } from '../components/LedgerEntriesTable';
 import { TrialBalancePanel } from '../components/TrialBalancePanel';
 
-export function LedgerScreen({ hubHref, subGroup, technicalAuditMode }: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) {
+export function LedgerScreen({ hubHref, subGroup }: { hubHref: string; subGroup?: string }) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
   const businessDate = new Date().toISOString().split('T')[0]!;
   const center = React.useMemo(() => buildWltFinancialCenter(businessDate, preview.allRecords), [preview, businessDate]);
@@ -19,12 +19,10 @@ export function LedgerScreen({ hubHref, subGroup, technicalAuditMode }: { hubHre
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
         <Text role="titleMd" style={{ fontWeight: 700 }}>دفتر الأستاذ</Text>
         <Text role="bodySm" tone="soft">
-          {technicalAuditMode
-            ? 'قيود اليومية + ميزان المراجعة. مرجع القراءة فقط — WLT يملك runtime الترحيل.'
-            : 'قيود اليومية + ميزان المراجعة. معاينة تشغيلية — يتطلب ربط WLT للترحيل الفعلي.'}
+          قيود اليومية + ميزان المراجعة. معاينة تشغيلية — يتطلب ربط مالي للترحيل الفعلي.
         </Text>
         <Text role="caption" tone="muted">
-          {technicalAuditMode ? `CONTRACT_SCAFFOLD_PREVIEW_ONLY · ${businessDate}` : `معاينة تشغيلية · ${businessDate}`}
+          {`معاينة تشغيلية · ${businessDate}`}
         </Text>
       </Box>
 
@@ -48,11 +46,11 @@ export function LedgerScreen({ hubHref, subGroup, technicalAuditMode }: { hubHre
 
       {activeView === 'journal' ? (
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
-          <LedgerEntriesTable entries={center.allEntries} pageSize={12} technicalAuditMode={technicalAuditMode} />
+          <LedgerEntriesTable entries={center.allEntries} pageSize={12} />
         </Box>
       ) : (
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line">
-          <TrialBalancePanel entries={center.allEntries} businessDate={businessDate} technicalAuditMode={technicalAuditMode} />
+          <TrialBalancePanel entries={center.allEntries} businessDate={businessDate} />
         </Box>
       )}
     </Box>

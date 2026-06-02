@@ -8,7 +8,7 @@ import { buildWltAuditPackPreview } from '../models/auditPack.types';
 import { WLT_MAKER_CHECKER_STATE_LABELS } from '../models/makerChecker.types';
 import { getWltCloseGateSubledgers } from '../models/subledger.types';
 
-export function AuditCloseScreen({ technicalAuditMode }: { hubHref: string; subGroup?: string; technicalAuditMode: boolean }) {
+export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
 
   const rows = React.useMemo(() => {
@@ -130,14 +130,11 @@ export function AuditCloseScreen({ technicalAuditMode }: { hubHref: string; subG
         </div>
       </Box>
 
-      {technicalAuditMode && (
-        <Box padding={3} background="warningSurface" radiusToken="md" gap={1} style={{ direction: 'rtl' }}>
-          <Text role="bodyStrong" style={{ fontWeight: 700 }}>CONTRACT_SCAFFOLD_PREVIEW_ONLY</Text>
-          <Text role="bodySm" tone="soft">
-            لا يُنفَّذ ترحيل فعلي من هذه الشاشة. WLT runtime يُصدر التوقيع الفعلي ويُنفّذ القيود عند اكتمال جميع الشروط.
-          </Text>
-        </Box>
-      )}
+      <Box padding={3} background="surfaceInset" radiusToken="md" gap={1} style={{ direction: 'rtl' }}>
+        <Text role="bodySm" tone="soft">
+          لا يُنفَّذ ترحيل فعلي من هذه الشاشة. الإغلاق الفعلي يُنفّذ من محرك المحاسبة عند اكتمال جميع الشروط.
+        </Text>
+      </Box>
     </Box>
   );
 }

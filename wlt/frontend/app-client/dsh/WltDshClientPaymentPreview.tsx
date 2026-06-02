@@ -1,12 +1,4 @@
-/**
- * WLT-owned client payment preview component.
- *
- * PREVIEW ONLY — no real payment, no API, no backend.
- * Composable: mount inside any DSH checkout surface.
- * Contract state: CONTRACT_TBD — real payment flow blocked.
- *
- * Currency: YER / ر.ي — no SAR / ر.س / ar-SA
- */
+'use client';
 
 import React from 'react';
 import { View } from 'react-native';
@@ -14,7 +6,6 @@ import {
   Badge,
   Box,
   Button,
-  Icon,
   KeyValueList,
   StateView,
   Surface,
@@ -26,24 +17,7 @@ import {
   getWltDshPaymentOptionsPreview,
   resolveWltDshPaymentPreviewState,
   type WltDshPaymentMethod,
-  type WltDshPaymentPreviewState,
-} from '../../control-panel/dsh/dshFinancePreview';
-
-const CONTRACT_TBD_NOTICE =
-  'هذه الواجهة عرض تجريبي فقط. لا يتم تنفيذ أي دفع حقيقي حتى يُرفع وضع CONTRACT_TBD ويُربط الـ API المالي. العملة: ر.ي (ريال يمني).';
-
-function PreviewBanner() {
-  return (
-    <Surface tone="inset" padding={3}>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 10 }}>
-        <Icon name="information-circle-outline" size={18} tone="muted" />
-        <Text role="bodySm" tone="muted" style={{ flex: 1, textAlign: 'right', lineHeight: 20 }}>
-          {CONTRACT_TBD_NOTICE}
-        </Text>
-      </View>
-    </Surface>
-  );
-}
+} from '../../control-panel/dsh/financeContracts';
 
 function PaymentOptionCard({
   id,
@@ -102,46 +76,96 @@ function PaymentOptionCard({
   );
 }
 
-function PaymentStateSummary({ state }: { state: WltDshPaymentPreviewState }) {
-  const statusTone = state.feedbackTone === 'success' ? 'success'
-    : state.feedbackTone === 'warning' ? 'warning'
-    : state.feedbackTone === 'error' ? 'danger'
-    : 'info';
+function WalletBalancePanel({
+  walletLinked,
+  walletBalanceMinorUnits,
+  heldMinorUnits = 0,
+  pendingMinorUnits = 0,
+}: {
+  walletLinked: boolean;
+  walletBalanceMinorUnits: number;
+  heldMinorUnits?: number;
+  pendingMinorUnits?: number;
+}) {
+  const items = walletLinked
+    ? [
+        { label: 'الرصيد المتاح', value: formatWltYer(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' as const },
+        { label: 'محجوز', value: heldMinorUnits > 0 ? formatWltYer(heldMinorUnits) : 'لا يوجد', tone: heldMinorUnits > 0 ? 'warning' : 'default' as const },
+        { label: 'معلق', value: pendingMinorUnits > 0 ? formatWltYer(pendingMinorUnits) : 'لا يوجد', tone: 'default' as const },
+        { label: 'حالة المحفظة', value: 'مرتبطة', tone: 'success' as const },
+      ]
+    : [
+        { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'warning' as const },
+      ];
 
-  const orderTotalLabel = state.orderTotalMinorUnits > 0
-    ? formatWltYer(state.orderTotalMinorUnits)
-    : '— غير محدد —';
+  return (
+    <Surface tone="raised" padding={3} gap={3}>
+      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+        رصيد المحفظة
+      </Text>
+      <KeyValueList dense items={items} />
+      {!walletLinked && (
+        <StateView
+          kind="warning"
+          title="المحفظة غير مرتبطة"
+          description="اربط محفظتك لتفعيل خيارات الدفع من الرصيد."
+        />
+      )}
+      {walletLinked && walletBalanceMinorUnits === 0 && (
+        <StateView
+          kind="warning"
+          title="رصيد المحفظة صفر"
+          description="اشحن المحفظة لتفعيل الدفع منها."
+        />
+      )}
+    </Surface>
+  );
+}
+
+function CheckoutSummaryPanel({
+  orderTotalMinorUnits,
+  walletAmountMinorUnits,
+  codAmountMinorUnits,
+  isSplitPayment,
+  blockingLabel,
+  summaryLabel,
+  walletBalanceAfterMinorUnits,
+}: {
+  orderTotalMinorUnits: number;
+  walletAmountMinorUnits: number;
+  codAmountMinorUnits: number;
+  isSplitPayment: boolean;
+  blockingLabel?: string;
+  summaryLabel: string;
+  walletBalanceAfterMinorUnits: number;
+}) {
+  const items = [
+    { label: 'إجمالي الطلب', value: formatWltYer(orderTotalMinorUnits), tone: 'info' as const },
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'من المحفظة', value: formatWltYer(walletAmountMinorUnits), tone: 'success' as const }] : []),
+    ...(codAmountMinorUnits > 0 ? [{ label: 'نقداً عند الاستلام', value: formatWltYer(codAmountMinorUnits), tone: 'brand' as const }] : []),
+    ...(isSplitPayment ? [{ label: 'نوع الدفع', value: 'مختلط (محفظة + كاش)', tone: 'info' as const }] : []),
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'رصيد المحفظة بعد الدفع', value: formatWltYer(walletBalanceAfterMinorUnits), tone: walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger' as const }] : []),
+  ];
 
   return (
     <Surface tone="inset" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-        ملخص طريقة الدفع
+        ملخص الدفع
       </Text>
-      <KeyValueList
-        dense
-        items={[
-          { label: 'إجمالي الطلب', value: orderTotalLabel, tone: 'info' },
-          { label: 'من المحفظة', value: formatWltYer(state.walletAmountMinorUnits), tone: state.walletAmountMinorUnits > 0 ? 'success' : 'default' },
-          { label: 'عند الاستلام', value: formatWltYer(state.amountDueOnDeliveryMinorUnits), tone: state.amountDueOnDeliveryMinorUnits > 0 ? 'brand' : 'default' },
-          { label: 'حالة الربط', value: state.walletLinked ? 'مرتبطة' : 'غير مرتبطة', tone: state.walletLinked ? 'success' : 'warning' },
-          { label: 'نوع الحدث المالي', value: state.financeEventKind, tone: 'default' as const },
-          { label: 'العقد', value: state.contractState, tone: 'warning' as const },
-        ]}
-      />
-      {state.blockingLabel ? (
+      <KeyValueList dense items={items} />
+      {blockingLabel ? (
         <StateView
           kind="warning"
           title="يتطلب إجراء"
-          description={state.blockingLabel}
+          description={blockingLabel}
         />
       ) : (
         <Surface tone="default" padding={2}>
           <Text role="bodySm" style={{ textAlign: 'right' }}>
-            {state.summaryLabel}
+            {summaryLabel}
           </Text>
         </Surface>
       )}
-      {statusTone ? null : null}
     </Surface>
   );
 }
@@ -177,9 +201,15 @@ export function WltDshClientPaymentPreview({
     [method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked],
   );
 
+  const walletBalanceAfter = walletBalanceMinorUnits - previewState.walletAmountMinorUnits;
+  const isSplit = previewState.walletAmountMinorUnits > 0 && previewState.amountDueOnDeliveryMinorUnits > 0;
+
   return (
     <Box gap={3}>
-      <PreviewBanner />
+      <WalletBalancePanel
+        walletLinked={walletLinked}
+        walletBalanceMinorUnits={walletBalanceMinorUnits}
+      />
 
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
@@ -202,48 +232,15 @@ export function WltDshClientPaymentPreview({
         </Box>
       </Surface>
 
-      <Surface tone="raised" padding={3} gap={3}>
-        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          رصيد المحفظة (WLT Preview)
-        </Text>
-        <KeyValueList
-          dense
-          items={[
-            {
-              label: 'الرصيد الحالي',
-              value: walletLinked
-                ? formatWltYer(walletBalanceMinorUnits)
-                : '— غير مرتبطة —',
-              tone: walletLinked ? 'success' : 'warning',
-            },
-            { label: 'حالة الربط', value: walletLinked ? 'مرتبطة' : 'غير مرتبطة', tone: walletLinked ? 'success' : 'warning' },
-          ]}
-        />
-        {!walletLinked && (
-          <StateView
-            kind="warning"
-            title="المحفظة غير مرتبطة"
-            description="اربط محفظة WLT لتفعيل خيارات الدفع من الرصيد. الربط الحالي تجريبي — CONTRACT_TBD."
-          />
-        )}
-        {walletLinked && walletBalanceMinorUnits === 0 && (
-          <StateView
-            kind="warning"
-            title="رصيد المحفظة صفر"
-            description="اشحن المحفظة لتفعيل خيارات الدفع منها. CONTRACT_TBD."
-          />
-        )}
-      </Surface>
-
-      <PaymentStateSummary state={previewState} />
-
-      <Surface tone="inset" padding={3}>
-        <StateView
-          kind="warning"
-          title="الدفع الحقيقي مقفل — CONTRACT_TBD"
-          description="لن يُنفَّذ أي دفع حقيقي من هذه الواجهة. جميع الأرقام تجريبية حتى يُرفع وضع العقد."
-        />
-      </Surface>
+      <CheckoutSummaryPanel
+        orderTotalMinorUnits={orderTotalMinorUnits}
+        walletAmountMinorUnits={previewState.walletAmountMinorUnits}
+        codAmountMinorUnits={previewState.amountDueOnDeliveryMinorUnits}
+        isSplitPayment={isSplit}
+        blockingLabel={previewState.blockingLabel}
+        summaryLabel={previewState.summaryLabel}
+        walletBalanceAfterMinorUnits={walletBalanceAfter}
+      />
     </Box>
   );
 }

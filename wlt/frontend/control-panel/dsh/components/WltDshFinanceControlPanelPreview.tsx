@@ -41,7 +41,7 @@ function FinanceRecordCard({ record }: { record: WltDshFinancePreviewRecord }) {
       primaryAction={{
         label: 'مراجعة التسوية',
         onAction: () => {
-          alert("الإجراء: [BLOCKED_CONTRACT_TBD]\n\nعقد مالي معلّق [FUTURE_MUTATION_REQUIRES_WLT_API]. لا توجد عمليات اعتماد أو تسويات مالية حقيقية داخل DSH. هذه الميزة تتطلب تفعيل WLT API.");
+          alert("هذا الإجراء يتطلب ربط مالي مكتمل.\n\nلا توجد عمليات اعتماد أو تسويات مالية حقيقية متاحة حالياً. يرجى مراجعة مدير النظام لتفعيل الإجراء.");
         }
       }}
       secondaryAction={{

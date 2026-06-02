@@ -76,39 +76,76 @@ export function buildWltFinancialCenter(
     };
   });
 
-  const accountTotals = new Map<string, { label: string; type: 'asset' | 'liability' | 'revenue' | 'expense'; total: number; entries: WltLedgerEntry[] }>();
+  type AccountAccumulator = {
+    label: string;
+    type: 'asset' | 'liability' | 'revenue' | 'expense';
+    debitTotal: number;
+    creditTotal: number;
+    entries: WltLedgerEntry[];
+  };
+
+  const accountTotals = new Map<string, AccountAccumulator>();
+
+  const upsertAccount = (code: string, label: string, type: AccountAccumulator['type'], isDebit: boolean, amount: number, entry: WltLedgerEntry) => {
+    const existing = accountTotals.get(code);
+    if (existing) {
+      if (isDebit) existing.debitTotal += amount; else existing.creditTotal += amount;
+      existing.entries.push(entry);
+    } else {
+      accountTotals.set(code, {
+        label,
+        type,
+        debitTotal: isDebit ? amount : 0,
+        creditTotal: isDebit ? 0 : amount,
+        entries: [entry],
+      });
+    }
+  };
+
+  const VALID_TYPES = new Set<string>(['asset', 'liability', 'revenue', 'expense']);
 
   for (const entry of allEntries) {
+    const debitAccount = getWltAccountByCode(entry.debitAccountCode);
     const creditAccount = getWltAccountByCode(entry.creditAccountCode);
-    if (creditAccount) {
-      const accType = creditAccount.type;
-      if (accType === 'asset' || accType === 'liability' || accType === 'revenue' || accType === 'expense') {
-        const existing = accountTotals.get(entry.creditAccountCode);
-        if (existing) {
-          existing.total += entry.amountMinorUnits;
-          existing.entries.push(entry);
-        } else {
-          accountTotals.set(entry.creditAccountCode, {
-            label: creditAccount.label,
-            type: accType,
-            total: entry.amountMinorUnits,
-            entries: [entry],
-          });
-        }
-      }
+
+    if (!debitAccount || !creditAccount) {
+      upsertAccount(
+        'MISSING_RULE',
+        'يحتاج قاعدة قيد مالي',
+        'asset',
+        true,
+        entry.amountMinorUnits,
+        entry,
+      );
+      continue;
+    }
+
+    if (VALID_TYPES.has(debitAccount.type)) {
+      upsertAccount(entry.debitAccountCode, debitAccount.label, debitAccount.type as AccountAccumulator['type'], true, entry.amountMinorUnits, entry);
+    }
+    if (VALID_TYPES.has(creditAccount.type)) {
+      upsertAccount(entry.creditAccountCode, creditAccount.label, creditAccount.type as AccountAccumulator['type'], false, entry.amountMinorUnits, entry);
     }
   }
+
+  const netBalanceForAccount = (acc: AccountAccumulator): number => {
+    if (acc.type === 'asset' || acc.type === 'expense') {
+      return acc.debitTotal - acc.creditTotal;
+    }
+    return acc.creditTotal - acc.debitTotal;
+  };
 
   const buildSection = (type: 'asset' | 'liability' | 'revenue' | 'expense', sectionLabel: string): WltFinancialCenterSection => {
     const lines: WltAccountPositionLine[] = [];
     for (const [code, data] of accountTotals) {
       if (data.type !== type) continue;
+      const netBalance = netBalanceForAccount(data);
       lines.push({
         accountCode: code,
         accountLabel: data.label,
         accountType: type,
-        totalMinorUnits: data.total,
-        totalLabel: formatWltYer(data.total),
+        totalMinorUnits: Math.abs(netBalance),
+        totalLabel: formatWltYer(Math.abs(netBalance)),
         entryCount: data.entries.length,
         pendingCount: data.entries.filter((e) => e.isPending).length,
         entries: data.entries,
@@ -134,7 +171,7 @@ export function buildWltFinancialCenter(
       varianceMinorUnits: e.amountMinorUnits,
       varianceLabel: e.amountLabel,
       partyKind: e.partyKind,
-      reason: e.status === 'blocked' ? 'محجوب من WLT' : e.status === 'disputed' ? 'قيد النزاع' : 'قيد المراجعة',
+      reason: e.status === 'blocked' ? 'مبلغ محجوز' : e.status === 'disputed' ? 'قيد النزاع' : 'قيد المراجعة',
     }));
 
   return {

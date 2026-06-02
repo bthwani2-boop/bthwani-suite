@@ -1,7 +1,7 @@
 import type {
   WltDshFinancePreviewRecord,
   WltFieldFinanceSnapshot,
-} from '../../control-panel/dsh/dshFinancePreview';
+} from '../../control-panel/dsh/financeContracts';
 
 export type WltDshFieldFinancePreviewState = {
   storeIds?: readonly string[];

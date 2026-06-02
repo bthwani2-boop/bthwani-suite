@@ -27,7 +27,7 @@ export type WltDshStoreSettlementStatement = {
   readonly storeId: string;
   readonly storeName: string;
   readonly settlementCycleId: string;
-  readonly frequency: 'biweekly';
+  readonly frequency: 'weekly' | 'biweekly' | 'monthly';
   readonly periodStart: string;
   readonly periodEnd: string;
   readonly cutoffDate: string;

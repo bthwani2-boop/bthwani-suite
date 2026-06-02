@@ -80,6 +80,22 @@ import {
 
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
+const getDshWebWindow = (): (Window & typeof globalThis) | null => {
+  if (Platform.OS !== 'web') return null;
+  try {
+    return typeof window !== 'undefined' ? window : null;
+  } catch {
+    return null;
+  }
+};
+
+const CLIENT_BOTTOM_NAV_ITEMS = [
+  { id: 'favorites', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
+  { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
+  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+  { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+] as const;
+
 export function DshClientSurface({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
 
@@ -583,7 +599,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   }, [activeTrackedOrder?.id, openTrackedOrder, trackingOrderOverride, trackingOrderValues.fulfillmentMode]);
 
   const addItemToHostCart = React.useCallback((
-    item: HostCartInputItem,
+    item: HostCartItem & { name?: string },
     _payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string },
   ) => {
     setReorderAlertMessage(undefined);
