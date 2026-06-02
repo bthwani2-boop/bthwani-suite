@@ -18,6 +18,11 @@ import {
   type FieldStoreFile,
 } from '../data/stores.preview-data';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
+import {
+  getFieldRouteForLifecycle,
+  getFieldVisitOutcomeEntry,
+  type DshFieldAgentLifecycleState,
+} from './dsh-field.navigation-bridge';
 
 type DshFieldReadinessEscalationState = NonNullable<React.ComponentProps<typeof DshFieldReadinessEscalationScreen>['state']>;
 
@@ -226,7 +231,9 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
             lastUpdatedLabel: 'الآن',
           }));
 
-          resetToStores();
+          // SSoT: visit_completed → history (via dsh-field.navigation-bridge)
+          const visitCompletedRoute = getFieldRouteForLifecycle('visit_completed').primaryRoute;
+          pushRoute({ kind: visitCompletedRoute as DshFieldRouteState['kind'] });
         }}
       />
     );

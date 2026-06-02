@@ -56,6 +56,15 @@ import type {
   DshCaptainRoute,
   DshCaptainSurfaceProps,
 } from './dsh-captain.types';
+import {
+  getCaptainLifecycleForOrderStage,
+  isCaptainInboxVisibleForMode,
+} from './dsh-captain.navigation-bridge';
+import {
+  isModeVisibleInCaptainInbox,
+  isCaptainPodRequiredForMode,
+  isCaptainCodCollectorForMode,
+} from '../shared/dsh-fulfillment-surface-visibility';
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
 type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof CaptainOrdersInboxScreen>>['state'];
@@ -406,6 +415,12 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const [activeOrderPhase, setActiveOrderPhase] = React.useState<ActiveOrderPhase>('pickup');
   const [captainAppMode, setCaptainAppMode] = React.useState<CaptainAppMode>('bthwani_captain_mode');
   const isStoreCourierMode = captainAppMode === 'store_courier_mode';
+  // SSoT: bthwani_delivery orders are visible in captain inbox; partner_delivery and pickup are not.
+  // SSoT: bthwani_delivery is the only mode visible in captain inbox
+  const bthwaniDeliveryVisibleInInbox = isModeVisibleInCaptainInbox('bthwani_delivery') && isCaptainInboxVisibleForMode('bthwani_delivery');
+  // PoD required only in bthwani_delivery mode; store_courier_mode skips it
+  const captainPodRequired = !isStoreCourierMode && isCaptainPodRequiredForMode('bthwani_delivery');
+  const captainCollectsCod = !isStoreCourierMode && isCaptainCodCollectorForMode('bthwani_delivery');
   const showCaptainBottomNav = isStoreCourierMode
     ? route === 'home' || route === 'account'
     : [
@@ -649,6 +664,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     }
 
     if (route === 'inbox') {
+      // SSoT: only bthwani_delivery orders are visible in captain inbox
+      if (!bthwaniDeliveryVisibleInInbox) {
+        return null;
+      }
       return (
         <CaptainOrdersInboxScreen
           state={inboxState}
@@ -740,7 +759,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       );
     }
 
-    if (route === 'pod-submission') {
+    if (route === 'pod-submission' && captainPodRequired) {
       return (
         <DshCaptainPoDSubmissionScreen
           state={captainPodState}
@@ -1140,8 +1159,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
 
   const openStoreCourierProof = React.useCallback(() => {
     setCaptainPodState('ready');
-    setRoute('pod-submission');
-  }, []);
+    // SSoT: 'proof' order stage → captain route via dsh-captain.navigation-bridge
+    const proofRoute = getCaptainLifecycleForOrderStage('proof', isStoreCourierMode).captainRoute;
+    setRoute(proofRoute);
+  }, [isStoreCourierMode]);
 
   const markStoreCourierDeliveryFailed = React.useCallback(() => {
     setStoreCourierStage('delivery_failed');
@@ -1847,7 +1868,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     const supportScreens: Record<CaptainSupportRoute, React.ReactNode> = {
       'chat-read-ack': <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
       'chat-send': <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,
-      'cod-liability': <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />,
+      // SSoT: COD screen only shown when captain collects COD (bthwani_delivery, not store_courier_mode)
+      'cod-liability': captainCollectsCod ? <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} /> : null,
       'order-accept': <DshCaptainOrderAcceptScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-get')} />,
       'order-deliver': <DshCaptainOrderDeliverScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('proof-upload')} />,
       'order-details': <DshCaptainOrderDetailsScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />,

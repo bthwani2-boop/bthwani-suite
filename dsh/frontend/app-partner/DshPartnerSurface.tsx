@@ -15,6 +15,12 @@ import {
   mapDshPartnerOperationalFlowToSupportRoute,
   mapDshPartnerSupportRouteToOperationalFlow,
 } from './dsh-partner.types';
+import {
+  getSurfaceModeCapability,
+} from '../shared/dsh-fulfillment-surface-visibility';
+import {
+  getActionableHandoffsForSurface,
+} from '../shared/dsh-order-lifecycle-handoffs';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';
 import { InventoryCatalogScreen } from './screens/InventoryCatalogScreen';
 import {
@@ -142,14 +148,19 @@ export function DshPartnerSurface({
     [selectedStoreScope.label, todayHoursLabel],
   );
 
+  const partnerActionableHandoffs = React.useMemo(
+    () => getActionableHandoffsForSurface('app-partner'),
+    [],
+  );
+
   const deliveryOpsSummary = React.useMemo(
     () => ({
       outForDelivery: 8,
-      handoffReady: defaultServiceModes.some((mode) => mode.id === 'partner_delivery' || mode.id === 'bthwani_delivery') ? 5 : 1,
+      handoffReady: (getSurfaceModeCapability('bthwani_delivery').partner.receivesOrder || getSurfaceModeCapability('partner_delivery').partner.receivesOrder) ? 5 : 1,
       deliveredToday: 24,
-      delayedRisk: 2,
+      delayedRisk: partnerActionableHandoffs.filter((h) => h.wltImpact.eventKind !== 'none').length,
     }),
-    [],
+    [partnerActionableHandoffs],
   );
 
   const partnerEntryState = 'ready' as const;

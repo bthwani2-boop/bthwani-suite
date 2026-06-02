@@ -77,6 +77,10 @@ import {
   resolveStorePickupAddress,
   publishedPromoCategoryIds,
 } from './dsh-client.navigation-bridge';
+import {
+  getClientWltIntentForState,
+  type DshClientWltIntentEntry,
+} from './dsh-client-wlt-payment-bridge';
 
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
@@ -198,6 +202,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [trackingOrderOverride, setTrackingOrderOverride] = React.useState<Partial<CreateOrderValues> | null>(null);
   const [selectedFulfillmentMode, setSelectedFulfillmentMode] = React.useState<DshFulfillmentDeliveryMode>(defaultFulfillmentMode);
   const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
+  const trackingWltIntent: DshClientWltIntentEntry | undefined = getClientWltIntentForState(trackingClientState);
   const [ordersQuery, setOrdersQuery] = React.useState('');
   const [itemsQuery, setItemsQuery] = React.useState('');
   const [itemsCategory, setItemsCategory] = React.useState('all');
@@ -1067,7 +1072,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       <DshTrackingScreen
         values={trackingOrderValues}
         clientState={trackingClientState}
-        currentStatusLabel={activeTrackedOrder?.statusLabel}
+        currentStatusLabel={activeTrackedOrder?.statusLabel ?? trackingWltIntent?.clientUiHint}
         fulfillmentMode={trackingOrderValues.fulfillmentMode}
         timeline={trackingTimeline}
         onSupport={openSupportFlow}
