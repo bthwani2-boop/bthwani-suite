@@ -25,6 +25,8 @@ import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePane
 import { getOperationsSupportFlowPreview } from '../../data/support.preview-data';
 import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { DSH_ORDER_LIFECYCLE_HANDOFFS, getHandoffsForSurface, getSurfaceObservation } from '../../shared/dsh-order-lifecycle-handoffs';
+import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 
@@ -507,6 +509,19 @@ function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
           {`ملاحظة: ${item.operationalNote}`}
         </Text>
       </View>
+
+      {/* SSoT handoff lookup */}
+      {item.linkedFlowId ? (() => {
+        const handoff = DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.signalKind === item.linkedFlowId || h.handoffId === item.linkedFlowId || item.linkedFlowId.includes(h.handoffId));
+        if (!handoff) return null;
+        return (
+          <Box padding={2} background="surface" border borderTone="info" radiusToken="sm" style={{ marginVertical: 4 }}>
+            <Text role="caption" tone="info" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
+              {`مسار نقل الصلاحية (SSoT): ${handoff.description}`}
+            </Text>
+          </Box>
+        );
+      })() : null}
 
       <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
         <Text role="caption" tone="muted" style={{ textAlign }}>الأطراف:</Text>

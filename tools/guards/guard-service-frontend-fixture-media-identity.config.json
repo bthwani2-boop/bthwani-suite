@@ -356,6 +356,8 @@
     "tools/registry/runs",
     "dsh/frontend/media-fixtures",
     "wlt/frontend/media-fixtures",
+    "dsh/frontend/app-partner/parts/PartnerOrderActionPanel.tsx",
+    "dsh/frontend/app-partner/screens/OperationScreens.tsx",
     "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx",
     "dsh/frontend/app-partner/DshPartnerSurface.tsx",
     "dsh/frontend/app-partner/dsh-partner.navigation-bridge.ts",

@@ -21,6 +21,12 @@ import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order-pre
 import { AcceptanceTimerSheet } from '../sheets';
 // SSoT: delivery mode labels from dsh-delivery-mode.model.
 import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
+import {
+  getHandoffsForSurface,
+  getActionableHandoffsForSurface,
+  getSurfaceObservation,
+} from '../../shared/dsh-order-lifecycle-handoffs';
+import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
 // ML-021: added captain_assigned / captain_arriving so partner can track handoff event
@@ -271,17 +277,70 @@ const demoOrders: readonly PartnerOrderItem[] = [
   },
 ];
 
+function enrichOrderItemWithSSoT(item: PartnerOrderItem): PartnerOrderItem {
+  const capability = getSurfaceModeCapability(item.orderMode);
+
+  // Rule 4: partner_delivery doesn't involve captain
+  // Rule 5: bthwani_delivery shows to partner, then waits for captain after ready-for-pickup
+  // Rule 6: pickup is self-collect only
+  let nextOwnerLabel = item.nextOwnerLabel;
+  let nextActionLabel = item.nextActionLabel;
+
+  if (item.status === 'ready') {
+    if (capability.partner.manageCourier) {
+      nextOwnerLabel = 'موصل المتجر';
+      nextActionLabel = 'تسليم لموصل المتجر';
+    } else if (item.orderMode === 'pickup') {
+      nextOwnerLabel = 'العميل';
+      nextActionLabel = 'انتظار استلام العميل';
+    } else {
+      nextOwnerLabel = 'كابتن بثواني';
+      nextActionLabel = 'انتظار استلام كابتن بثواني';
+    }
+  } else if (item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving') {
+    if (capability.partner.manageCourier) {
+      nextOwnerLabel = 'موصل المتجر';
+      nextActionLabel = 'تأكيد خروج الموصل';
+    } else if (item.orderMode === 'pickup') {
+      nextOwnerLabel = 'العميل';
+      nextActionLabel = 'تأكيد تسليم العميل';
+    } else {
+      nextOwnerLabel = 'كابتن بثواني';
+      nextActionLabel = 'بانتظار تأكيد الكابتن';
+    }
+  }
+
+  return {
+    ...item,
+    nextOwnerLabel,
+    nextActionLabel,
+  };
+}
+
 function resolveStatusLabel(status: PartnerOrderStatus, orderMode?: DshPartnerOrderConversationMode) {
   if (status === 'new') return 'جديدة';
   if (status === 'needs_accept') return 'تحتاج قبول';
   if (status === 'preparation_started') return 'بدأ التحضير';
   if (status === 'preparing') return 'قيد التحضير';
   if (status === 'items_ready') return 'العناصر جاهزة';
-  if (status === 'ready') return orderMode === 'partner_delivery' ? 'جاهز — تسليم لموصل المتجر' : 'جاهزة';
-  if (status === 'handoff') return orderMode === 'partner_delivery' ? 'سُلّم لموصل المتجر' : 'تسليم للكابتن';
+
+  const capability = orderMode ? getSurfaceModeCapability(orderMode) : null;
+  if (status === 'ready') {
+    if (capability?.partner.manageCourier) return 'جاهز — تسليم لموصل المتجر';
+    if (orderMode === 'pickup') return 'جاهز — بانتظار استلام العميل';
+    return 'جاهز — بانتظار كابتن بثواني';
+  }
+  if (status === 'handoff') {
+    if (capability?.partner.manageCourier) return 'سُلّم لموصل المتجر';
+    if (orderMode === 'pickup') return 'تم الاستلام من العميل';
+    return 'سُلّم لكابتن بثواني';
+  }
   if (status === 'captain_assigned') return 'تم تعيين الكابتن';
-  if (status === 'captain_arriving') return 'الكابتن في الطريق';
-  if (status === 'delivering') return orderMode === 'partner_delivery' ? 'مع موصل المتجر' : 'في الطريق';
+  if (status === 'captain_arriving') return 'الكابتن في الطريق للفرع';
+  if (status === 'delivering') {
+    if (capability?.partner.manageCourier) return 'مع موصل المتجر للتوصيل';
+    return 'في الطريق مع الكابتن';
+  }
   if (status === 'completed') return 'مكتملة';
   return 'مشكلة';
 }
@@ -335,9 +394,18 @@ function renderState(state: Exclude<PartnerOrdersHomeScreenState, 'ready'>, onRe
 }
 
 function resolveOrderHistory(status: PartnerOrderStatus, orderMode: DshPartnerOrderConversationMode) {
+  const capability = getSurfaceModeCapability(orderMode);
   const inPrep = status === 'preparation_started' || status === 'preparing' || status === 'items_ready' || status === 'ready' || status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving' || status === 'delivering' || status === 'completed';
   const isReady = status === 'ready' || status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving' || status === 'delivering' || status === 'completed';
   const isHandedOff = status === 'handoff' || status === 'captain_assigned' || status === 'captain_arriving' || status === 'delivering' || status === 'completed';
+
+  let handoffLabel = 'سُلّم للكابتن';
+  if (capability.partner.manageCourier) {
+    handoffLabel = 'سُلّم لموصل المتجر';
+  } else if (orderMode === 'pickup') {
+    handoffLabel = 'استلام العميل الذاتي';
+  }
+
   return [
     { id: 'placed', label: 'وصل الطلب', done: true },
     { id: 'accepted', label: 'تم القبول', done: status !== 'new' && status !== 'needs_accept' && status !== 'cancelled' },
@@ -345,7 +413,7 @@ function resolveOrderHistory(status: PartnerOrderStatus, orderMode: DshPartnerOr
     { id: 'ready', label: 'جاهز', done: isReady },
     {
       id: 'handoff',
-      label: orderMode === 'partner_delivery' ? 'سُلّم لموصل المتجر' : orderMode === 'pickup' ? 'جاهز للاستلام' : 'سُلّم للكابتن',
+      label: handoffLabel,
       done: isHandedOff,
     },
   ];
@@ -596,13 +664,17 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
+  const enrichedItems = React.useMemo(() => {
+    return items.map(enrichOrderItemWithSSoT);
+  }, [items]);
+
   const [selectedStage, setSelectedStage] = React.useState<OrderStageFilterId>('all');
   const [selectedQuickFilters, setSelectedQuickFilters] = React.useState<readonly QuickFilterId[]>([]);
   const [sortMode, setSortMode] = React.useState<SortMode>('next_action');
   const [query, setQuery] = React.useState('');
   const [showSearch, setShowSearch] = React.useState(searchMode);
 
-  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(items[0]?.id ?? null);
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(enrichedItems[0]?.id ?? null);
   const [expandedOrderId, setExpandedOrderId] = React.useState<string | null>(null);
   const [activeActionOrderId, setActiveActionOrderId] = React.useState<string | null>(null);
 
@@ -614,16 +686,16 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   const normalizedQuery = query.trim().toLowerCase();
 
   const summary = React.useMemo(() => ({
-    active: items.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
-    urgent: items.filter((item) => item.urgent || item.priority === 'high').length,
-    needsAction: items.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready' || item.status === 'ready' || item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving').length,
-    issues: items.filter((item) => item.issueRequired || item.status === 'cancelled').length,
-  }), [items]);
+    active: enrichedItems.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length,
+    urgent: enrichedItems.filter((item) => item.urgent || item.priority === 'high').length,
+    needsAction: enrichedItems.filter((item) => item.status === 'needs_accept' || item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready' || item.status === 'ready' || item.status === 'handoff' || item.status === 'captain_assigned' || item.status === 'captain_arriving').length,
+    issues: enrichedItems.filter((item) => item.issueRequired || item.status === 'cancelled').length,
+  }), [enrichedItems]);
 
   // Per-stage counts for chip labels
   const stageCounts = React.useMemo(() => {
     const counts: Partial<Record<OrderStageFilterId, number>> = {};
-    for (const item of items) {
+    for (const item of enrichedItems) {
       if (item.status === 'new' || item.status === 'needs_accept') counts.acceptance = (counts.acceptance ?? 0) + 1;
       else if (item.status === 'preparation_started' || item.status === 'preparing' || item.status === 'items_ready') counts.preparation = (counts.preparation ?? 0) + 1;
       else if (item.status === 'ready') counts.ready = (counts.ready ?? 0) + 1;
@@ -633,10 +705,10 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
       if (item.issueRequired) counts.issues = (counts.issues ?? 0) + 1;
     }
     return counts;
-  }, [items]);
+  }, [enrichedItems]);
 
   const filteredItems = React.useMemo(() => {
-    const scoped = items.filter((item) => {
+    const scoped = enrichedItems.filter((item) => {
       const stageMatch =
         selectedStage === 'all'
           ? true
@@ -804,7 +876,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   }
 
   const stageTabItems = stageFilters.map((filter) => {
-    const count = filter.id === 'all' ? items.length : (stageCounts[filter.id] ?? 0);
+    const count = filter.id === 'all' ? enrichedItems.length : (stageCounts[filter.id] ?? 0);
     const label = filter.id === 'all' ? `الكل (${count})` : count > 0 ? `${filter.label} (${count})` : filter.label;
     return { value: filter.id, label };
   });
