@@ -23,7 +23,7 @@ import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   resolveWltDshPaymentPreviewState,
   WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
-} from '@bthwani/dsh/frontend/data/dshFinancePreview';
+} from '../../../../../dsh/frontend/data/dshFinancePreview';
 
 import {
   getWltDshAccountStatementsPreview,
@@ -34,13 +34,13 @@ import {
   getWltFieldCommissionStatementsPreview,
   getWltDshPartnerSettlementStatementsPreview,
   getWltDshCaptainSettlementStatementsPreview,
-} from '@bthwani/dsh/frontend/data/finance.preview-data';
+} from '../../../../../dsh/frontend/data/finance.preview-data';
 
 import {
   getAdaptedFinanceControlPanelRows,
   type DshFinancePreviewRow,
   type DshFinancePreviewSurface,
-} from '@bthwani/dsh/frontend/data/wallet.preview-data';
+} from '../../../../../dsh/frontend/data/wallet.preview-data';
 
 export type { DshFinancePreviewRow, DshFinancePreviewSurface };
 

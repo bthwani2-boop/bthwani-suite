@@ -3,7 +3,7 @@ import ControlPanelSurfaceHost from '../../../shell/web-entry';
 export default async function FinancePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ workspace?: string; panel?: string }>;
+  searchParams?: Promise<{ workspace?: string; panel?: string; subGroup?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
 
@@ -12,6 +12,7 @@ export default async function FinancePage({
       section="finance"
       financeWorkspace={resolvedSearchParams?.workspace}
       financePanel={resolvedSearchParams?.panel}
+      financeSubGroup={resolvedSearchParams?.subGroup}
     />
   );
 }

@@ -135,20 +135,25 @@ export function WltDshFinanceHubHost({
   // Get active state from URL parameter (?state=...) or fallback to state prop
   const activeState = (searchParams?.get('state') as FinanceViewState) || state;
 
+  // subGroup can arrive from: URL ?subGroup=... (direct link / refresh), then prop, then normalized default
+  const urlSubGroup = searchParams?.get('subGroup') ?? undefined;
+
   // Normalize group and subGroup from incoming props (ensuring backward compatibility)
   const normalized = React.useMemo(() => {
     return normalizeFinanceLocation(group, panel);
   }, [group, panel]);
 
   const [activeGroup, setActiveGroup] = React.useState<CanonicalFinanceGroupId>(normalized.group);
-  const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(subGroup || normalized.subGroup);
+  const [activeSubGroup, setActiveSubGroup] = React.useState<string | undefined>(
+    urlSubGroup ?? subGroup ?? normalized.subGroup,
+  );
 
-  // Sync state if props change
+  // Sync state if props or URL params change
   React.useEffect(() => {
     const norm = normalizeFinanceLocation(group, panel);
     setActiveGroup(norm.group);
-    setActiveSubGroup(subGroup || norm.subGroup);
-  }, [group, subGroup, panel]);
+    setActiveSubGroup(urlSubGroup ?? subGroup ?? norm.subGroup);
+  }, [group, subGroup, panel, urlSubGroup]);
 
   const financePreview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
 

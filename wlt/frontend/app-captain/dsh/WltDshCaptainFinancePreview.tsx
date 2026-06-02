@@ -85,10 +85,14 @@ function EligibilitySection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot 
             : 'شحن رصيد إضافي'}
           tone={snapshot.hasEligibilityBlock ? 'primary' : 'ghost'}
           fullWidth
-          onPress={() => {}}
+          disabled
+          onPress={() => {
+            // Blocked: requires WLT runtime/API integration (CONTRACT_SCAFFOLD_PREVIEW_ONLY).
+            // Button is disabled; this handler will never fire in preview mode.
+          }}
         />
         <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-          يتطلب ربط مالي لتفعيل الشحن الفعلي.
+          يتطلب ربط WLT runtime لتفعيل الشحن الفعلي — غير متاح في وضع المعاينة.
         </Text>
       </Surface>
     </Surface>

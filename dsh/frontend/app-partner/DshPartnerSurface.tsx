@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
 import { BottomNavBar, Box, Button, ModernPremiumHeader, Surface, Text } from '@bthwani/ui-kit';
 import type {
   DshPartnerOperationalFlowId,
@@ -358,31 +358,33 @@ export function DshPartnerSurface({
   }, [route, accountHubSection]);
 
   const bottomNavBar = showBottomNav ? (
-    <BottomNavBar
-      activeId={bottomActiveId}
-      direction="rtl"
-      launcherLabel="الطلبات"
-      launcherIcon="receipt-outline"
-      launcherActive={bottomActiveId === 'orders'}
-      onLauncherPress={openOrdersBoard}
-      onSelect={(id: string) => {
-        if (id === 'profile') {
-          openAccountHub('hub');
-        } else if (id === 'wallet') {
-          openAccountHub('wallet');
-        } else if (id === 'inventory') {
-          openInventoryManagement();
-        } else if (id === 'operations') {
-          openSupportDirectory({ source: 'operations' });
-        }
-      }}
-      items={[
-        { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
-        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
-        { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
-        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
-      ]}
-    />
+    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+      <BottomNavBar
+        activeId={bottomActiveId}
+        direction="rtl"
+        launcherLabel="الطلبات"
+        launcherIcon="receipt-outline"
+        launcherActive={bottomActiveId === 'orders'}
+        onLauncherPress={openOrdersBoard}
+        onSelect={(id: string) => {
+          if (id === 'profile') {
+            openAccountHub('hub');
+          } else if (id === 'wallet') {
+            openAccountHub('wallet');
+          } else if (id === 'inventory') {
+            openInventoryManagement();
+          } else if (id === 'operations') {
+            openSupportDirectory({ source: 'operations' });
+          }
+        }}
+        items={[
+          { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
+          { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+          { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
+          { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+        ]}
+      />
+    </View>
   ) : null;
 
   const renderMainShell = (content: React.ReactNode) => (

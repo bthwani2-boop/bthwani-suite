@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { AppearanceOptionCard, Badge, BottomNavBar, Box, Button, colorPalette, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Switch, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { AppearanceOptionCard, Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Switch, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
@@ -299,6 +299,92 @@ function CompactOrderChatBubble({ message }: { message: CompactOrderChatMessage 
   );
 }
 
+function CaptainAccountNavRow({
+  title,
+  subtitle,
+  icon,
+  badgeLabel,
+  onPress,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ComponentProps<typeof Icon>['name'];
+  badgeLabel?: string;
+  onPress: () => void;
+}) {
+  const { theme } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        borderRadius: 16,
+        backgroundColor: pressed ? theme.surfaceInset : theme.surfaceRaised,
+        gap: 12,
+        borderWidth: 1,
+        borderColor: theme.line,
+        shadowColor: colorPalette.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+        elevation: 1,
+      })}
+    >
+      <View
+        style={{
+          flexDirection: 'row-reverse',
+          alignItems: 'center',
+          gap: 12,
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: theme.brandSurface,
+            borderWidth: 1,
+            borderColor: theme.brand + '33',
+            flexShrink: 0,
+          }}
+        >
+          <Icon name={icon} size={20} tone="brand" />
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            minWidth: 0,
+            gap: 2,
+            alignItems: 'flex-end',
+          }}
+        >
+          <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+            <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
+              {title}
+            </Text>
+            {badgeLabel ? <Badge label={badgeLabel} tone="brand" /> : null}
+          </Box>
+          <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: 'right' }}>
+            {subtitle}
+          </Text>
+        </View>
+      </View>
+
+      <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
+    </Pressable>
+  );
+}
+
 export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
   const {
@@ -319,6 +405,23 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const [activeOrderExpanded, setActiveOrderExpanded] = React.useState(false);
   const [activeOrderPhase, setActiveOrderPhase] = React.useState<ActiveOrderPhase>('pickup');
   const [captainAppMode, setCaptainAppMode] = React.useState<CaptainAppMode>('bthwani_captain_mode');
+  const isStoreCourierMode = captainAppMode === 'store_courier_mode';
+  const showCaptainBottomNav = isStoreCourierMode
+    ? route === 'home' || route === 'account'
+    : [
+        'home',
+        'map',
+        'inbox',
+        'account',
+        'account-finance',
+        'account-orders',
+        'account-profile',
+        'account-docs',
+        'account-shifts',
+        'account-support',
+        'support-directory',
+        'support-screen',
+      ].includes(route);
   const [activeOrderDraft, setActiveOrderDraft] = React.useState('');
   const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>(compactOrderChatSeed);
   const [storeCourierStage, setStoreCourierStage] = React.useState<StoreCourierStage>('ready_for_pickup');
@@ -662,7 +765,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const renderCaptainAccountShell = (title: string, subtitle: string, content: React.ReactNode) => {
     return (
       <Box style={{ flex: 1 }} background="background">
-        <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
+        <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 32 }}>
           <TopBar
             variant="secondary"
             title={title}
@@ -683,73 +786,116 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   };
 
   const renderCaptainAccountRootScreen = () => {
-    const summaryItems = [
-      { label: 'الاسم', value: <Badge label={captainDisplayName} tone="brand" /> },
-      { label: 'النوع', value: <Badge label="DSH" tone="success" /> },
-      { label: 'الحالة', value: <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} /> },
-      { label: wltDshCaptainUiCopy.summaryLabel, value: <Badge label={wltDshCaptainUiCopy.walletBalanceLabel} tone="success" /> },
-      { label: 'التقييم', value: <Badge label="4.9 / 5" tone="info" /> },
-      { label: 'المستوى', value: <Badge label="Elite 3" tone="brand" /> },
-      { label: 'الطلب النشط', value: <Badge label={inboxState === 'delivered' ? 'لا يوجد' : `#${activeOrderDisplayId}`} tone="default" /> },
-    ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
-
     const accountListItems = [
       {
         title: 'بيانات الكابتن',
         subtitle: 'الهوية، النوع، والحالة الحالية.',
-        meta: 'فتح',
         badgeLabel: 'مباشر',
+        icon: 'person-outline',
         onPress: () => openCaptainAccountSection('account-profile'),
       },
       {
         title: wltDshCaptainUiCopy.financeTitle,
         subtitle: wltDshCaptainUiCopy.financeSubtitle,
-        meta: 'فتح',
         badgeLabel: wltDshCaptainUiCopy.financeBadgeLabel,
+        icon: 'wallet-outline',
         onPress: () => openCaptainAccountSection('account-finance'),
       },
       {
         title: 'الطلبات',
         subtitle: 'الطلب النشط والسجل المختصر.',
-        meta: 'فتح',
         badgeLabel: 'نشط',
+        icon: 'receipt-outline',
         onPress: () => openCaptainAccountSection('account-orders'),
       },
       {
         title: 'الوثائق والتقييم',
         subtitle: 'الملفات، التقييم، والمستوى.',
-        meta: 'فتح',
         badgeLabel: 'جاهز',
+        icon: 'document-text-outline',
         onPress: () => openCaptainAccountSection('account-docs'),
       },
       {
         title: 'الدوام / الإجازات',
         subtitle: 'الحضور وجدول اليوم وخطة الإجازة.',
-        meta: 'فتح',
         badgeLabel: 'اليوم',
+        icon: 'calendar-outline',
         onPress: () => openCaptainAccountSection('account-shifts'),
       },
       {
         title: 'الإعدادات والدعم',
         subtitle: 'اللغة، الإشعارات، والمساعدة.',
-        meta: 'فتح',
         badgeLabel: 'متابعة',
+        icon: 'settings-outline',
         onPress: () => openCaptainAccountSection('account-support'),
       },
     ] as const;
 
     return (
-      <>
-        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-          <KeyValueList items={summaryItems} />
+      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 32 }}>
+        {/* Profile Card & Quick Stats Grid */}
+        <Surface tone="raised" padding={4} gap={4} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
+          {/* User Profile Header */}
+          <Box layoutDirection="row" align="center" gap={3} style={{ flexDirection: 'row-reverse' }}>
+            {/* Avatar Container */}
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                backgroundColor: theme.brandSurface,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 1,
+                borderColor: theme.brand + '44',
+              }}
+            >
+              <Icon name="person" size={28} tone="brand" />
+            </View>
+
+            {/* Name & Title */}
+            <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
+              <Text role="titleSm" style={{ color: theme.text }}>{captainDisplayName}</Text>
+              <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                <Badge label="كابتن DSH" tone="success" />
+                <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
+              </Box>
+            </View>
+          </Box>
+
+          <Divider />
+
+          {/* Quick Stats Grid */}
+          <Box layoutDirection="row" gap={3} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap' }}>
+            <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
+              <Text role="caption" tone="muted">التقييم</Text>
+              <Text role="bodyStrong" tone="info">4.9 ★</Text>
+            </View>
+            <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
+              <Text role="caption" tone="muted">المستوى</Text>
+              <Text role="bodyStrong" tone="brand">Elite 3</Text>
+            </View>
+            <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
+              <Text role="caption" tone="muted">{wltDshCaptainUiCopy.summaryLabel}</Text>
+              <Text role="bodyStrong" tone="success">{wltDshCaptainUiCopy.walletBalanceLabel}</Text>
+            </View>
+          </Box>
         </Surface>
 
-        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
+        {/* Navigation Cards List */}
+        <Box gap={3}>
           {accountListItems.map((item) => (
-            <ListItem key={item.title} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} onPress={item.onPress} />
+            <CaptainAccountNavRow
+              key={item.title}
+              title={item.title}
+              subtitle={item.subtitle}
+              badgeLabel={item.badgeLabel}
+              icon={item.icon}
+              onPress={item.onPress}
+            />
           ))}
-        </Surface>
-      </>
+        </Box>
+      </MobileScrollView>
     );
   };
 
@@ -758,11 +904,11 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       title,
       subtitle,
       <>
-        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+        <Surface tone="raised" padding={4} gap={3} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
           <KeyValueList items={items} />
         </Surface>
         {footerNote ? (
-          <Surface tone="inset" padding={3} gap={2} radiusToken="xl">
+          <Surface tone="inset" padding={3} gap={2} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
             <Text role="bodySm" tone="muted" align="end">
               {footerNote}
             </Text>
@@ -830,7 +976,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       'الإعدادات والدعم',
       'اللغة والإشعارات والمساندة المختصرة',
       <Box gap={3}>
-        <Surface tone="raised" padding={3} gap={3} radiusToken="xl">
+        <Surface tone="raised" padding={3} gap={3} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
           <Text role="label" tone="muted" align="end">
             المظهر
           </Text>
@@ -855,7 +1001,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           </Box>
         </Surface>
         {/* ─── App mode toggle ─────────────────────────────────────────── */}
-        <Surface tone="raised" padding={3} gap={3} radiusToken="xl">
+        <Surface tone="raised" padding={3} gap={3} radiusToken="xl" style={{ borderWidth: 1, borderColor: theme.line }}>
           <Text role="label" tone="muted" align="end">وضع التطبيق</Text>
           <Switch
             label="وضع موصل المتجر"
@@ -872,10 +1018,20 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           />
         </Surface>
 
-        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
-          <ListItem title="الإعدادات" subtitle="اللغة، الإشعارات، والتفضيلات المحلية." meta="جاهز" />
-          <ListItem title="الدعم" subtitle="قنوات المساندة والتصعيد المختصر." meta="جاهز" />
-        </Surface>
+        <Box gap={3}>
+          <CaptainAccountNavRow
+            title="الإعدادات"
+            subtitle="اللغة، الإشعارات، والتفضيلات المحلية."
+            icon="settings-outline"
+            onPress={() => {}}
+          />
+          <CaptainAccountNavRow
+            title="الدعم ومسارات الخدمة"
+            subtitle="قنوات المساندة والتصعيد ودليل مسارات DSH المفتوحة."
+            icon="help-circle-outline"
+            onPress={() => openSupportDirectory()}
+          />
+        </Box>
       </Box>
     );
   };
@@ -922,7 +1078,6 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
                 marquee: false,
               };
 
-  const isStoreCourierMode = captainAppMode === 'store_courier_mode';
   const storeCourierMeta = React.useMemo(() => {
     if (storeCourierStage === 'picked_up') {
       return {
@@ -1338,7 +1493,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   };
 
   const renderStoreCourierHomeScreen = () => (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}>
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: showCaptainBottomNav ? (Platform.OS === 'android' ? 112 : 80) + 16 : insets.bottom + 16 }}>
       {/* ─── Mode badge ───────────────────────────────────────────────── */}
       <Surface tone="raised" padding={3} gap={2} radiusToken="xl">
         <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
@@ -1548,7 +1703,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       </Surface>
 
       {/* Order card pinned overlay keeps the map first while staying clear of the bottom bar. */}
-      <Box style={{ position: 'absolute', left: 12, right: 12, bottom: insets.bottom + (activeOrderExpanded ? 96 : 80) }}>{renderHomeOrderPanel()}</Box>
+      <Box style={{ position: 'absolute', left: 12, right: 12, bottom: showCaptainBottomNav ? (Platform.OS === 'android' ? 112 : 80) + 12 : insets.bottom + 16 }}>{renderHomeOrderPanel()}</Box>
     </Box>
   );
 
@@ -1598,14 +1753,26 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     );
   }
 
-  // Bottom nav visibility: store_courier_mode hides BThwani-specific routes
-  const showCaptainBottomNav = isStoreCourierMode
-    ? route === 'home' || route === 'account'
-    : route === 'home' || route === 'inbox' || route === 'account' || route === 'support-directory';
-
-  const captainBottomActiveId = isStoreCourierMode
-    ? (route === 'home' ? 'my-orders' : route === 'account' ? 'profile' : '')
-    : (route === 'home' ? 'home' : route === 'inbox' ? 'orders' : route === 'support-directory' ? 'support' : route === 'account' ? 'profile' : '');
+  let captainBottomActiveId = '';
+  if (isStoreCourierMode) {
+    captainBottomActiveId = route === 'home' ? 'my-orders' : route === 'account' ? 'profile' : '';
+  } else {
+    if (route === 'inbox' || route === 'account-orders') {
+      captainBottomActiveId = 'orders';
+    } else if (route === 'account-finance') {
+      captainBottomActiveId = 'wallet';
+    } else if (route === 'support-directory' || route === 'support-screen') {
+      captainBottomActiveId = 'support';
+    } else if (
+      route === 'account' ||
+      route === 'account-profile' ||
+      route === 'account-docs' ||
+      route === 'account-shifts' ||
+      route === 'account-support'
+    ) {
+      captainBottomActiveId = 'profile';
+    }
+  }
 
   // store_courier_mode: no wallet launcher, no BThwani orders tab
   const captainBottomNavBar = isStoreCourierMode ? (
@@ -1633,18 +1800,19 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     <BottomNavBar
       activeId={captainBottomActiveId}
       direction="rtl"
-      launcherLabel="المحفظة"
-      launcherIcon="wallet-outline"
-      onLauncherPress={() => openCaptainAccountSection('account-finance')}
+      launcherLabel="الخريطة"
+      launcherIcon="map-outline"
+      launcherActive={route === 'home' || route === 'map'}
+      onLauncherPress={() => setRoute('home')}
       onSelect={(id: string) => {
-        if (id === 'home') setRoute('home');
         if (id === 'orders') setRoute('inbox');
+        if (id === 'wallet') openCaptainAccountSection('account-finance');
         if (id === 'support') openSupportDirectory();
         if (id === 'profile') openCaptainAccount();
       }}
       items={[
-        { id: 'home', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
         { id: 'orders', label: 'الطلبات', icon: 'receipt-outline', activeIcon: 'receipt' },
+        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
         { id: 'support', label: 'الدعم', icon: 'help-circle-outline', activeIcon: 'help-circle' },
         { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
       ]}
@@ -1710,8 +1878,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     return (
       <Box style={{ flex: 1, position: 'relative' }} background="background">
         {renderRouteHeader()}
-        <Surface
-          tone="raised"
+        <Box
+          background="background"
           padding={0}
           gap={0}
           radiusToken="none"
@@ -1722,11 +1890,11 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
             borderTopLeftRadius: 28,
             borderTopRightRadius: 28,
             overflow: 'hidden',
-            paddingBottom: showCaptainBottomNav ? 80 : 0,
+            paddingBottom: showCaptainBottomNav ? (Platform.OS === 'android' ? 112 : 80) : 0,
           }}
         >
           {content}
-        </Surface>
+        </Box>
         {showCaptainBottomNav && (
           <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
             {captainBottomNavBar}
@@ -1739,8 +1907,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   return (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
       {topBar}
-      <Surface
-        tone="raised"
+      <Box
+        background="background"
         padding={0}
         gap={0}
         radiusToken="none"
@@ -1751,14 +1919,16 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           overflow: 'hidden',
-          paddingBottom: 80,
+          paddingBottom: showCaptainBottomNav ? (Platform.OS === 'android' ? 112 : 80) : 0,
         }}
       >
         {isStoreCourierMode ? renderStoreCourierHomeScreen() : renderHomeScreen()}
-      </Surface>
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
-        {captainBottomNavBar}
-      </View>
+      </Box>
+      {showCaptainBottomNav && (
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+          {captainBottomNavBar}
+        </View>
+      )}
     </Box>
   );
 }

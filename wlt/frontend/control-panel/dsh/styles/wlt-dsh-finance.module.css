@@ -1273,3 +1273,45 @@
   height: 2px;
   background: var(--bth-brand-primary);
 }
+
+/* ─── Preview Boundary Notice ──────────────────────────────────────── */
+.previewBoundaryNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--bth-warning-surface, #fffbeb);
+  border: 1px solid var(--bth-warning-border, #fcd34d);
+  max-width: 480px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bth-warning-text, #92400e);
+  direction: rtl;
+}
+
+.previewBoundaryIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.previewBoundaryText {
+  flex: 1;
+  font-weight: 500;
+}
+
+.previewBoundaryDismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 12px;
+  padding: 0 2px;
+  opacity: 0.7;
+  line-height: 1;
+}
+
+.previewBoundaryDismiss:hover {
+  opacity: 1;
+}

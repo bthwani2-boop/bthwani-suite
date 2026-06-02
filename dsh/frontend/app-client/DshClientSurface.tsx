@@ -1103,7 +1103,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
   return (
     <View style={{ flex: 1, position: 'relative' }}>
-      <View style={{ flex: 1, paddingBottom: 80 }}>
+      <View style={{ flex: 1, paddingBottom: Platform.OS === 'android' ? 112 : 80 }}>
         <DshHomeGetScreen
           state={clientDiscoveryStoresBridge.state}
           serviceDialTrigger={serviceDialTrigger}

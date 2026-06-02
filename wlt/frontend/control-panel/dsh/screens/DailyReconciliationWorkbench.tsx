@@ -118,6 +118,7 @@ export function DailyReconciliationWorkbench() {
 
   const [auditTrails, setAuditTrails] = React.useState<Record<string, Array<{ timestamp: string; actor: string; action: string; note?: string }>>>({});
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
+  const [showCloseSimPreview, setShowCloseSimPreview] = React.useState(false);
 
   const getInitialAuditLogs = React.useCallback((row: DshFinancePreviewRow) => {
     const logs = [];
@@ -282,14 +283,36 @@ export function DailyReconciliationWorkbench() {
           ))}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
           {gateOpen ? (
-            <Button label="تحضير محاكاة إغلاق اليوم [معاينة]" size="sm" tone="secondary" onPress={() => {}} />
+            <Button
+              label="تحضير محاكاة إغلاق اليوم [معاينة]"
+              size="sm"
+              tone="secondary"
+              onPress={() => setShowCloseSimPreview((v) => !v)}
+            />
           ) : (
             <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'var(--bth-danger-surface)', padding: '6px 12px', borderRadius: 6 }}>
               🔒 ترحيل الإغلاق معلق
             </span>
           )}
+          {showCloseSimPreview ? (
+            <div className={wltStyles.previewBoundaryNotice} role="status" aria-live="polite">
+              <span className={wltStyles.previewBoundaryIcon}>🔒</span>
+              <span className={wltStyles.previewBoundaryText}>
+                محاكاة الإغلاق — معاينة فقط. التنفيذ الفعلي يتطلب WLT runtime + Maker-Checker API
+                (CONTRACT_SCAFFOLD_PREVIEW_ONLY).
+              </span>
+              <button
+                type="button"
+                className={wltStyles.previewBoundaryDismiss}
+                onClick={() => setShowCloseSimPreview(false)}
+                aria-label="إغلاق الإشعار"
+              >
+                ✕
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
 

@@ -352,7 +352,7 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
 
   return (
     <Box style={{ flex: 1, position: 'relative' }} background="background">
-      <Box style={{ flex: 1, paddingBottom: showFieldBottomNav ? 80 : 0 }}>
+      <Box style={{ flex: 1, paddingBottom: showFieldBottomNav ? (Platform.OS === 'android' ? 112 : 80) : 0 }}>
         {content}
       </Box>
       {showFieldBottomNav && (

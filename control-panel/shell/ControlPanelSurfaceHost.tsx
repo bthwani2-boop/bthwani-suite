@@ -68,6 +68,7 @@ export type ControlPanelSurfaceHostProps = {
   operationsOverlayMode?: OperationsPanelId;
   financeWorkspace?: string;
   financePanel?: string;
+  financeSubGroup?: string;
 };
 
 const allServiceTabId = "all-services";
@@ -207,6 +208,7 @@ export function ControlPanelSurfaceHost({
   operationsOverlayMode,
   financeWorkspace,
   financePanel,
+  financeSubGroup,
 }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
   const { direction } = useDirection();
@@ -858,6 +860,7 @@ export function ControlPanelSurfaceHost({
                   <ControlPanelDshFinanceHubScreen
                     group={normalized.group}
                     panel={normalized.panel}
+                    subGroup={financeSubGroup ?? normalized.subGroup}
                   />
                 );
               })()
