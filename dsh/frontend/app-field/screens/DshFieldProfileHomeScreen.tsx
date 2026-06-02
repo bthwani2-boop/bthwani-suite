@@ -1,25 +1,8 @@
 import React from 'react';
-import { View } from 'react-native';
-import { AppearanceOptionCard, Badge, Box, Button, Icon, ListItem, MobileScrollView, Surface, Text, TopBar } from '@bthwani/ui-kit';
+import { Pressable, View } from 'react-native';
+import { Badge, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { resolveFieldFilterCounts, type FieldStoreFile } from '../../data/stores.preview-data';
-
-const fieldAppearanceOptions: ReadonlyArray<{
-  mode: BThwaniAppearanceMode;
-  title: string;
-  description: string;
-}> = [
-  {
-    mode: 'lightPremium',
-    title: 'فاتح أبيض',
-    description: 'واجهة فاتحة واضحة، والزجاج يظهر فقط فيما يحدده المطور أثناء مراجعة الشاشات',
-  },
-  {
-    mode: 'darkGlass',
-    title: 'داكن زجاجي',
-    description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
-  },
-] as const;
 
 type DshFieldProfileHomeScreenProps = {
   stores: readonly FieldStoreFile[];
@@ -46,73 +29,167 @@ export function DshFieldProfileHomeScreen({
 }: DshFieldProfileHomeScreenProps) {
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
 
+  const { theme } = useTheme();
+
   return (
-    <Box style={{ flex: 1 }} background="background">
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
-        <TopBar
-          variant="secondary"
-          title="ملف الميداني"
-          subtitle="صفحة الهوية والملف التشغيلي للميدان"
-          style={{ marginHorizontal: -16, marginTop: -16 }}
-          trailingAction={{
-            id: 'back',
-            icon: <Icon name="arrow-back" size={24} tone="brand" />,
-            mirrorInRtl: true,
-            accessibilityLabel: 'العودة',
-            onPress: onBack,
-          }}
-        />
-
-        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            <Badge label="DSH" tone="success" />
-            <Badge label="الميداني" tone="brand" />
-          </View>
-          <Text role="titleMd" style={{ textAlign: 'right' }}>ناصر القحطاني</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            الفريق الشمالي · الملف التشغيلي يبقى عند الميداني حتى اكتمال الملف والمراجعة والمالية المرتبطة به.
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            <Badge label={`ملفات اليوم ${counts.today}`} tone="brand" />
-            <Badge label={`مرسل ${counts.submitted}`} tone="info" />
-            <Badge label={`مالية جاهزة ${counts.done}`} tone="success" />
-          </View>
-        </Surface>
-
-        <Surface tone="raised" padding={3} gap={3} radiusToken="xl">
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            المظهر
-          </Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            {appearanceHydrated
-              ? 'يتم حفظ اختيار المظهر محليًا واستعادته عند فتح تطبيق الميدان.'
-              : 'جارٍ استعادة اختيار المظهر المحفوظ...'}
-          </Text>
-          <Box gap={3}>
-            {fieldAppearanceOptions.map((option) => (
-              <AppearanceOptionCard
-                key={option.mode}
-                title={option.title}
-                description={option.description}
-                mode={option.mode}
-                modeLabel={option.mode === 'lightPremium' ? 'Light Premium' : 'Dark Glass'}
-                statusLabel={appearanceMode === option.mode ? 'مفعّل الآن' : 'اضغط للتفعيل'}
-                selected={appearanceMode === option.mode}
-                onPress={() => onAppearanceModeChange(option.mode)}
-              />
-            ))}
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
+      <TopBar
+        variant="surface"
+        title="ملف الميداني"
+        subtitle="صفحة الهوية والملف التشغيلي للميدان"
+        trailingAction={{
+          id: 'back',
+          icon: <Icon name="arrow-back" size={24} tone="brand" />,
+          mirrorInRtl: true,
+          accessibilityLabel: 'العودة',
+          onPress: onBack,
+        }}
+      />
+      <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
+        <Box padding={4} gap={4}>
+          <Box gap={3} paddingVertical={2}>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+              <Badge label="DSH" tone="success" />
+              <Badge label="الميداني" tone="brand" />
+            </View>
+            <Text role="titleMd" style={{ textAlign: 'right' }}>ناصر القحطاني</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+              الفريق الشمالي · الملف التشغيلي يبقى عند الميداني حتى اكتمال الملف والمراجعة والمالية المرتبطة به.
+            </Text>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+              <Badge label={`ملفات اليوم ${counts.today}`} tone="brand" />
+              <Badge label={`مرسل ${counts.submitted}`} tone="info" />
+              <Badge label={`مالية جاهزة ${counts.done}`} tone="success" />
+            </View>
           </Box>
-        </Surface>
 
-        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
-          <ListItem title="بيانات الميداني" subtitle="الهوية، التغطية، والوردية الحالية." onPress={onOpenProfile} />
-          <ListItem title="السجل" subtitle="آخر حالة لكل متجر والتقدم المرتبط به." onPress={onOpenHistory} />
-          <ListItem title="المالية" subtitle="المستحقات والملخص المالي بعد اكتمال الاعتماد." onPress={onOpenFinance} />
-        </Surface>
+          <Divider />
 
-        <Button label="تسجيل الخروج" tone="secondary" onPress={onLogout} />
+          <Box gap={3} paddingVertical={2}>
+            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+              المظهر والتحكم
+            </Text>
+
+            <View
+              style={{
+                flexDirection: 'row-reverse',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 14,
+                backgroundColor: theme.surface,
+              }}
+            >
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+                <View
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: theme.surfaceInset,
+                    borderWidth: 1,
+                    borderColor: theme.line,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon name="color-palette-outline" size={17} tone="default" />
+                </View>
+                <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: 'flex-end' }}>
+                  <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>مظهر التطبيق</Text>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
+                    {appearanceHydrated ? 'فاتح أبيض أو داكن زجاجي' : 'جارٍ الاستعادة...'}
+                  </Text>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row-reverse',
+                  backgroundColor: theme.surfaceInset,
+                  borderRadius: 12,
+                  padding: 3,
+                  borderWidth: 1,
+                  borderColor: theme.line,
+                  gap: 4,
+                }}
+              >
+                <Pressable
+                  onPress={() => onAppearanceModeChange('lightPremium')}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 9,
+                    backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
+                  }}
+                >
+                  <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
+                    فاتح
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => onAppearanceModeChange('darkGlass')}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 9,
+                    backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
+                  }}
+                >
+                  <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
+                    داكن
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </Box>
+
+          <Divider />
+
+          <Box gap={0}>
+            <Pressable onPress={onOpenProfile}>
+              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
+                    <Text role="bodyStrong">بيانات الميداني</Text>
+                    <Text role="bodySm" tone="muted">الهوية، التغطية، والوردية الحالية.</Text>
+                  </View>
+                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                </View>
+              </Box>
+            </Pressable>
+
+            <Pressable onPress={onOpenHistory}>
+              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
+                    <Text role="bodyStrong">السجل</Text>
+                    <Text role="bodySm" tone="muted">آخر حالة لكل متجر والتقدم المرتبط به.</Text>
+                  </View>
+                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                </View>
+              </Box>
+            </Pressable>
+
+            <Pressable onPress={onOpenFinance}>
+              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
+                    <Text role="bodyStrong">المالية</Text>
+                    <Text role="bodySm" tone="muted">المستحقات والملخص المالي بعد اكتمال الاعتماد.</Text>
+                  </View>
+                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                </View>
+              </Box>
+            </Pressable>
+          </Box>
+
+          <Divider />
+
+          <Button label="تسجيل الخروج" tone="secondary" onPress={onLogout} />
+        </Box>
       </MobileScrollView>
-    </Box>
+    </View>
   );
 }
 

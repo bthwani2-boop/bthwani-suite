@@ -1,75 +1,15 @@
 import React from 'react';
-import { Box, KeyValueList, ListItem, SectionHeader, Divider, Text, TextField, Button, MobileScrollView } from '@bthwani/ui-kit';
+import { Pressable, View } from 'react-native';
+import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../../shared/dsh-order-preview.contract';
 import type { DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
-import { getDshCaptainFlowPolicy, type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import {
 	getOperationsSupportFlowsForSurface,
 	type DshOperationsSupportFlowId,
 } from '../../data/support.preview-data';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
 
-function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
-	if (policy === 'detail-on-open') {
-		return 'تفاصيل عند الفتح';
-	}
 
-	if (policy === 'evidence-on-open') {
-		return 'أدلة عند الفتح';
-	}
-
-	if (policy === 'summary-only') {
-		return 'ملخص أولًا';
-	}
-
-	return 'سياسة من السجل';
-}
-
-function resolveCaptainOwnerLabel(flowId?: DshCaptainRegistryFlowId): string {
-	if (flowId === 'captain-proof-of-delivery') {
-		return resolveDshControlPanelSectionLabel('support');
-	}
-
-	return resolveDshControlPanelSectionLabel('operations');
-}
-
-type DshCaptainFlowKey = 'entry' | 'orders' | 'finance' | 'profile' | 'operations';
-
-type DshCaptainFlowNode = {
-	id: DshCaptainFlowKey;
-	label: string;
-	next: readonly DshCaptainFlowKey[];
-};
-
-const dshCaptainFlowMap: Record<DshCaptainFlowKey, DshCaptainFlowNode> = {
-	entry: {
-		id: 'entry',
-		label: 'مدخل الكابتن',
-		next: ['orders', 'operations'],
-	},
-	orders: {
-		id: 'orders',
-		label: 'الطلبات',
-		next: ['finance', 'profile', 'operations'],
-	},
-	finance: {
-		id: 'finance',
-		label: 'المالية',
-		next: ['profile', 'operations'],
-	},
-	profile: {
-		id: 'profile',
-		label: 'الملف',
-		next: ['operations'],
-	},
-	operations: {
-		id: 'operations',
-		label: 'التشغيل',
-		next: ['orders'],
-	},
-} as const;
 
 export type CaptainSupportScreenId =
 	| 'chat-read-ack'
@@ -118,37 +58,49 @@ function SimpleSupportScreen({
 	onBack?: () => void;
 }) {
 	const [draftValue, setDraftValue] = React.useState('');
+	const { theme } = useTheme();
 
 	return (
 		<DshOperationScreen
 			title={title}
 			subtitle={subtitle}
 			content={
-				<Box gap={4} style={{ paddingHorizontal: 4 }}>
-					<Box gap={3}>
-						<SectionHeader title={heroTitle} subtitle={heroDescription} />
+				<Box gap={4}>
+					<Box gap={2}>
+						<Text role="bodyStrong">{heroTitle}</Text>
+						<Text role="bodySm" tone="muted">{heroDescription}</Text>
 					</Box>
 
 					{keyValues?.length ? (
 						<>
 							<Divider />
-							<Box gap={3}>
-								<SectionHeader title="تفاصيل المسار" subtitle="تبقى فقط التفاصيل اللازمة لإجراء الكابتن الفوري ظاهرة." />
-								<KeyValueList items={keyValues} />
-							</Box>
+							<KeyValueList items={keyValues} />
 						</>
 					) : null}
 
 					{listItems?.length ? (
 						<>
 							<Divider />
-							<Box gap={3}>
-								<SectionHeader title="الصف الحالي" subtitle="كل عنصر يحافظ على قرار المسار التالي واضحًا." />
-								<Box gap={2}>
-									{listItems.map((item) => (
-										<ListItem key={`${title}-${item.title}`} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
-									))}
-								</Box>
+							<Box padding={0} gap={0}>
+								{listItems.map((item, index, arr) => (
+									<View
+										key={`${title}-${item.title}`}
+										style={{
+											paddingHorizontal: 0,
+											paddingVertical: 12,
+											borderBottomWidth: index === arr.length - 1 ? 0 : 1,
+											borderBottomColor: theme.line,
+											gap: 4,
+										}}
+									>
+										<Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: 'row-reverse' }}>
+											<Text role="bodyStrong" style={{ textAlign: 'right' }}>{item.title}</Text>
+											{item.badgeLabel ? <Badge label={item.badgeLabel} tone="brand" /> : null}
+										</Box>
+										<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{item.subtitle}</Text>
+										<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{item.meta}</Text>
+									</View>
+								))}
 							</Box>
 						</>
 					) : null}
@@ -156,10 +108,7 @@ function SimpleSupportScreen({
 					{inputLabel ? (
 						<>
 							<Divider />
-							<Box gap={3}>
-								<SectionHeader title="إدخال المسودة" subtitle="إدخال واحد موجز من الكابتن يبقي المسار مركزًا." />
-								<TextField label={inputLabel} value={draftValue} onChangeText={setDraftValue} hint={inputHint} />
-							</Box>
+							<TextField label={inputLabel} value={draftValue} onChangeText={setDraftValue} hint={inputHint} />
 						</>
 					) : null}
 				</Box>
@@ -234,32 +183,6 @@ const ACTIVE_ORDER_PREVIEW: {
 	stage: 'pickup',
 };
 
-const PRIMARY_FLOW_ORDER: readonly DshCaptainFlowKey[] = ['entry', 'orders', 'operations'];
-const SECONDARY_FLOW_ORDER: readonly DshCaptainFlowKey[] = ['finance', 'profile'];
-
-const FLOW_NODE_COPY: Record<DshCaptainFlowKey, { subtitle: string; badgeLabel: string }> = {
-	entry: {
-		subtitle: 'ابدأ من العرض المفتوح ثم ثبّت قرار القبول قبل أي انتقال آخر.',
-		badgeLabel: 'بداية',
-	},
-	orders: {
-		subtitle: 'القبول والتفاصيل والاستلام والتسليم تبقى في خط تنفيذ واحد.',
-		badgeLabel: 'تنفيذ',
-	},
-	operations: {
-		subtitle: 'التشغيل هنا يعني دعم هذه المهمة فقط: تواصل، تأكيد، وإثبات.',
-		badgeLabel: 'تشغيل',
-	},
-	finance: {
-		subtitle: 'التحصيل يبقى ثانويًا بعد تثبيت المهمة الحالية وعدم قطع المسار.',
-		badgeLabel: 'مالية',
-	},
-	profile: {
-		subtitle: 'الملف والطبقة يدعمان الجاهزية، لكنهما لا يقودان الرحلة النشطة.',
-		badgeLabel: 'ملف',
-	},
-};
-
 const EXECUTION_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string; subtitle: string; badgeLabel: string }> = [
 	{ id: 'orders-offers-list', title: 'مراجعة عروض الطلبات', subtitle: 'ابدأ من أول عرض مفتوح قبل الالتزام بمهمة جديدة.', badgeLabel: 'عروض' },
 	{ id: 'orders-list', title: 'الصف النشط', subtitle: 'أبقِ الطلبات المفتوحة في صف واحد واضح.', badgeLabel: 'صف' },
@@ -267,16 +190,6 @@ const EXECUTION_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string
 	{ id: 'order-pickup', title: 'تأكيد الاستلام', subtitle: 'نفّذ خطوة الاستلام عند الوصول إلى الفرع.', badgeLabel: 'استلام' },
 	{ id: 'order-deliver', title: 'تأكيد التسليم', subtitle: 'أغلق الرحلة الحالية بعد الوصول للعميل.', badgeLabel: 'تسليم' },
 	{ id: 'proof-upload', title: 'رفع الإثبات', subtitle: 'اختم المهمة برفع دليل التسليم المختصر.', badgeLabel: 'إثبات' },
-];
-
-const SUPPORT_ITEMS: ReadonlyArray<{ id: CaptainSupportScreenId; title: string; subtitle: string; badgeLabel: string }> = [
-	{ id: 'chat-read-ack', title: 'تأكيد قراءة الدردشة', subtitle: 'امسح الرسائل التشغيلية غير المقروءة للمهمة الحالية.', badgeLabel: 'تواصل' },
-	{ id: 'chat-send', title: 'إرسال رسالة', subtitle: 'أرسل تحديثًا موجزًا مرتبطًا بالمسار.', badgeLabel: 'تواصل' },
-	{ id: 'cod-liability', title: 'ذمة الدفع عند الاستلام', subtitle: 'راجع التحصيل عند الحاجة بعد تثبيت الخطوة النشطة.', badgeLabel: 'مالية' },
-	{ id: 'profile-get', title: 'ملف الكابتن', subtitle: 'اقرأ الملف فقط عندما تحتاج مرجع الجاهزية.', badgeLabel: 'ملف' },
-	{ id: 'tier-info', title: 'معلومات الطبقة', subtitle: 'افهم مزايا الطبقة الحالية من دون تعطيل التنفيذ.', badgeLabel: 'طبقة' },
-	{ id: 'tier-evaluate', title: 'تقييم الطبقة', subtitle: 'راجع الجاهزية التالية بعد إغلاق المهمة الحالية.', badgeLabel: 'طبقة' },
-	{ id: 'map', title: 'خريطة الحرارة', subtitle: 'راجع مناطق الطلب المرتفع لتمركز أفضل.', badgeLabel: 'خريطة' },
 ];
 
 const captainSupportFlowToScreenId: Partial<Record<DshOperationsSupportFlowId, CaptainSupportScreenId>> = {
@@ -297,239 +210,167 @@ const captainSupportFlowToRegistryFlowId: Partial<Record<DshOperationsSupportFlo
 	'store-wait-time': 'captain-order-pickup',
 };
 
-const CAPTAIN_BOUND_REGISTRY_FLOW_IDS: readonly DshCaptainRegistryFlowId[] = [
-	'captain-order-pickup',
-	'captain-proof-of-delivery',
-	'captain-map-navigation',
-];
-
 const CAPTAIN_OPERATIONAL_SUPPORT_ITEMS = getOperationsSupportFlowsForSurface('app-captain').map((flow) => ({
 	flowId: flow.flowId,
 	title: flow.title,
 	subtitle: flow.description,
-	meta: (() => {
-		const registryFlowId = captainSupportFlowToRegistryFlowId[flow.flowId];
-		const summary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
-		const policy = registryFlowId ? getDshCaptainFlowPolicy(registryFlowId) : undefined;
-		const forbiddenPreview = summary?.forbiddenActions[0] ?? 'لا يوجد';
-		return `الواجهة: ${summary?.ownerSurface ?? 'app-captain'} · القرار: ${resolveCaptainOwnerLabel(registryFlowId)} · ${resolveCaptainPolicyLabel(policy)} · الممنوع: ${forbiddenPreview}`;
-	})(),
 	badgeLabel: flow.severity === 'danger' ? 'حرج' : flow.severity === 'warning' ? 'يتطلب قرارًا' : 'متابعة',
 	screenId: captainSupportFlowToScreenId[flow.flowId] ?? 'orders-list',
 }));
 
 function resolvePrimaryActionScreen(stage: DshCaptainOrderStage): CaptainSupportScreenId {
-	if (stage === 'offer') {
-		return 'order-accept';
-	}
-
-	if (stage === 'accepted' || stage === 'pickup') {
-		return 'order-pickup';
-	}
-
-	if (stage === 'delivery') {
-		return 'order-deliver';
-	}
-
-	if (stage === 'proof' || stage === 'closed') {
-		return 'proof-upload';
-	}
-
+	if (stage === 'offer') return 'order-accept';
+	if (stage === 'accepted' || stage === 'pickup') return 'order-pickup';
+	if (stage === 'delivery') return 'order-deliver';
+	if (stage === 'proof' || stage === 'closed') return 'proof-upload';
 	return 'orders-list';
 }
 
 function resolvePrimaryActionLabel(stage: DshCaptainOrderStage) {
-	if (stage === 'offer') {
-		return 'فتح القبول';
-	}
-
-	if (stage === 'accepted' || stage === 'pickup') {
-		return 'فتح الاستلام';
-	}
-
-	if (stage === 'delivery') {
-		return 'فتح التسليم';
-	}
-
-	if (stage === 'proof' || stage === 'closed') {
-		return 'فتح الإثبات';
-	}
-
+	if (stage === 'offer') return 'فتح القبول';
+	if (stage === 'accepted' || stage === 'pickup') return 'فتح الاستلام';
+	if (stage === 'delivery') return 'فتح التسليم';
+	if (stage === 'proof' || stage === 'closed') return 'فتح الإثبات';
 	return 'فتح الصف النشط';
 }
 
-function resolveFlowNodeScreen(flowKey: DshCaptainFlowKey, stage: DshCaptainOrderStage): CaptainSupportScreenId {
-	if (flowKey === 'entry') {
-		return 'orders-offers-list';
-	}
+// ─── Flat row — no cards, no elevation, just borderBottom ─────────────────────
+function FlatRow({
+	title,
+	subtitle,
+	meta,
+	badgeLabel,
+	badgeTone = 'brand',
+	isLast = false,
+	onPress,
+}: {
+	title: string;
+	subtitle?: string;
+	meta?: string;
+	badgeLabel?: string;
+	badgeTone?: React.ComponentProps<typeof Badge>['tone'];
+	isLast?: boolean;
+	onPress?: () => void;
+}) {
+	const { theme } = useTheme();
 
-	if (flowKey === 'orders') {
-		return 'orders-list';
-	}
-
-	if (flowKey === 'operations') {
-		return resolvePrimaryActionScreen(stage);
-	}
-
-	if (flowKey === 'finance') {
-		return 'cod-liability';
-	}
-
-	return 'profile-get';
+	return (
+		<Pressable
+			accessibilityRole="button"
+			accessibilityLabel={title}
+			onPress={onPress}
+			style={({ pressed }) => ({
+				flexDirection: 'row-reverse',
+				alignItems: 'flex-start',
+				justifyContent: 'space-between',
+				paddingVertical: 14,
+				backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+				borderBottomWidth: isLast ? 0 : 1,
+				borderBottomColor: theme.line,
+				gap: 12,
+			})}
+		>
+			<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
+				<Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={2}>{title}</Text>
+				{subtitle ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={2}>{subtitle}</Text> : null}
+				{meta ? <Text role="caption" tone="muted" style={{ textAlign: 'right' }} numberOfLines={2}>{meta}</Text> : null}
+			</View>
+			{badgeLabel ? (
+				<View style={{ paddingTop: 2, flexShrink: 0 }}>
+					<Badge label={badgeLabel} tone={badgeTone} />
+				</View>
+			) : null}
+		</Pressable>
+	);
 }
 
-function resolveNextNodesLabel(flowKey: DshCaptainFlowKey) {
-	const nextLabels = dshCaptainFlowMap[flowKey].next.map((nextKey) => dshCaptainFlowMap[nextKey].label);
-	return nextLabels.length > 0 ? `التالي: ${nextLabels.join(' ثم ')}` : 'لا توجد خطوة لاحقة.';
+// ─── Section group — label + flat rows, no cards ──────────────────────────────
+function FlatSection({
+	label,
+	children,
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
+	const { theme } = useTheme();
+	return (
+		<Box padding={0} gap={0}>
+			<Text
+				role="label"
+				tone="muted"
+				style={{ paddingBottom: 8, textAlign: 'right', color: theme.textMuted }}
+			>
+				{label}
+			</Text>
+			{children}
+		</Box>
+	);
 }
 
 export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScreen?: (screenId: CaptainSupportScreenId) => void }) {
+	const { theme } = useTheme();
 	const currentActionScreenId = resolvePrimaryActionScreen(ACTIVE_ORDER_PREVIEW.stage);
 
 	return (
-		<MobileScrollView padding={4} gap={4}>
-			<Text role="titleLg">غرفة تشغيل الكابتن</Text>
-			<Text role="bodyMd" tone="muted">
-				مسار تشغيل فردي مملوك للكابتن الحالي فقط. لا توجد خريطة أسطول عامة ولا لوحة مراقبة إدارية خارج سياق الطلب النشط.
-			</Text>
+		<MobileScrollView padding={4} gap={6} contentContainerStyle={{ paddingBottom: 40 }}>
 
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader
-					title={`المهمة الحالية · ${CAPTAIN_PROFILE_PREVIEW.displayName}`}
-					subtitle={`${CAPTAIN_PROFILE_PREVIEW.tierLabel} · ${CAPTAIN_PROFILE_PREVIEW.readinessLabel}`}
-				/>
+			{/* ─── Active mission summary ──────────────────────────────── */}
+			<Box gap={3}>
 				<Box gap={1}>
-					<Text role="bodyStrong">{ACTIVE_ORDER_PREVIEW.pickupLabel}</Text>
-					<Text role="bodySm" tone="muted">{ACTIVE_ORDER_PREVIEW.dropoffLabel}</Text>
-					<Text role="caption" tone="soft">{ACTIVE_ORDER_PREVIEW.etaLabel}</Text>
+					<Text role="bodyStrong" style={{ textAlign: 'right' }}>
+						{CAPTAIN_PROFILE_PREVIEW.displayName} · {CAPTAIN_PROFILE_PREVIEW.tierLabel}
+					</Text>
+					<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+						{CAPTAIN_PROFILE_PREVIEW.readinessLabel}
+					</Text>
 				</Box>
-				<Box gap={1}>
-					<Text role="bodySm">المرحلة الحالية: {ACTIVE_ORDER_PREVIEW.currentStageLabel}</Text>
-					<Text role="bodySm">الإجراء التالي: {ACTIVE_ORDER_PREVIEW.nextActionLabel}</Text>
-					<Text role="caption" tone="soft">{ACTIVE_ORDER_PREVIEW.proofLabel}</Text>
-					<Text role="caption" tone="soft">حالة الربط الحالية: معاينة واجهة فقط داخل app-captain.</Text>
-				</Box>
-				<Button label={resolvePrimaryActionLabel(ACTIVE_ORDER_PREVIEW.stage)} onPress={() => onOpenScreen?.(currentActionScreenId)} />
-				<Button label="فتح لقطة الطلب" tone="secondary" onPress={() => onOpenScreen?.('order-get')} />
-			</Box>
-
-			<Divider />
-
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader title="سياسات الربط الحي" subtitle="هذه الشاشات مرتبطة الآن مباشرة بسجل DSH المركزي، وليست وصفًا Preview فقط." />
-				<Box gap={2}>
-					{CAPTAIN_BOUND_REGISTRY_FLOW_IDS.map((flowId) => {
-						const summary = getDshFlowPolicySummary(flowId);
-						const policy = getDshCaptainFlowPolicy(flowId);
-						if (!summary) {
-							return null;
-						}
-
-						return (
-							<ListItem
-								key={flowId}
-								title={summary.flowId}
-								subtitle={summary.nextPolicyActionPreview}
-								meta={`القرار: ${resolveCaptainOwnerLabel(flowId)} · ${resolveCaptainPolicyLabel(policy)}`}
-								badgeLabel={summary.visibility === 'contextual' ? 'سياقي' : summary.visibility}
-							/>
-						);
-					})}
-				</Box>
-			</Box>
-
-			<Divider />
-
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader title="نبض الرحلة" subtitle="الترتيب التالي يشرح رحلة الكابتن من العرض حتى التنفيذ والإثبات فقط." />
-				<Box gap={2}>
-					{PRIMARY_FLOW_ORDER.map((flowKey) => (
-						<ListItem
-							key={flowKey}
-							title={dshCaptainFlowMap[flowKey].label}
-							subtitle={FLOW_NODE_COPY[flowKey].subtitle}
-							meta={resolveNextNodesLabel(flowKey)}
-							badgeLabel={FLOW_NODE_COPY[flowKey].badgeLabel}
-							onPress={() => onOpenScreen?.(resolveFlowNodeScreen(flowKey, ACTIVE_ORDER_PREVIEW.stage))}
-						/>
-					))}
-				</Box>
-			</Box>
-
-			<Divider />
-
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader title="خطوات التنفيذ الفوري" subtitle="هذه هي الشاشات الوحيدة التي يحتاجها الكابتن داخل المهمة الحالية." />
-				<Box gap={2}>
-					{EXECUTION_ITEMS.map((item) => (
-						<ListItem
-							key={item.id}
-							title={item.title}
-							subtitle={item.subtitle}
-							meta="افتح الخطوة التالية من خط التنفيذ المملوك للكابتن"
-							badgeLabel={item.badgeLabel}
-							onPress={() => onOpenScreen?.(item.id)}
-						/>
-					))}
-				</Box>
-			</Box>
-
-			<Divider />
-
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader title="الدعم المسموح بعد تثبيت المهمة" subtitle="التواصل والمالية والملف تبقى ثانوية بعد قرار التنفيذ الحالي." />
-				<Box gap={2}>
-					{SUPPORT_ITEMS.map((item) => (
-						<ListItem
-							key={item.id}
-							title={item.title}
-							subtitle={item.subtitle}
-							meta="افتح أداة دعم مرتبطة بالمهمة الحالية فقط"
-							badgeLabel={item.badgeLabel}
-							onPress={() => onOpenScreen?.(item.id)}
-						/>
-					))}
-				</Box>
-			</Box>
-
-			<Divider />
-
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader
-					title="حالات التنفيذ والدعم"
-					subtitle="الكابتن يرى فقط handoff والتسليم والإثبات وما يمنع إغلاق الرحلة، وليس مشاكل الشريك الداخلية."
+				<KeyValueList
+					items={[
+						{ label: 'الاستلام', value: ACTIVE_ORDER_PREVIEW.pickupLabel },
+						{ label: 'التسليم', value: ACTIVE_ORDER_PREVIEW.dropoffLabel },
+						{ label: 'ETA', value: ACTIVE_ORDER_PREVIEW.etaLabel, tone: 'info' },
+						{ label: 'المرحلة', value: ACTIVE_ORDER_PREVIEW.currentStageLabel, tone: 'brand' },
+					]}
 				/>
 				<Box gap={2}>
-					{CAPTAIN_OPERATIONAL_SUPPORT_ITEMS.map((item) => (
-						<ListItem
-							key={item.flowId}
-							title={item.title}
-							subtitle={item.subtitle}
-							meta={item.meta}
-							badgeLabel={item.badgeLabel}
-							onPress={() => onOpenScreen?.(item.screenId)}
-						/>
-					))}
+					<Button label={resolvePrimaryActionLabel(ACTIVE_ORDER_PREVIEW.stage)} onPress={() => onOpenScreen?.(currentActionScreenId)} />
+					<Button label="لقطة الطلب" tone="secondary" onPress={() => onOpenScreen?.('order-get')} />
 				</Box>
 			</Box>
 
 			<Divider />
 
-			<Box gap={3} style={{ paddingVertical: 4 }}>
-				<SectionHeader title="مسارات مساندة" subtitle="تظل هذه المسارات مرئية لكن خارج قلب التنفيذ حتى لا يضيع تركيز الكابتن." />
-				<Box gap={2}>
-					{SECONDARY_FLOW_ORDER.map((flowKey) => (
-						<ListItem
-							key={flowKey}
-							title={dshCaptainFlowMap[flowKey].label}
-							subtitle={FLOW_NODE_COPY[flowKey].subtitle}
-							meta={resolveNextNodesLabel(flowKey)}
-							badgeLabel={FLOW_NODE_COPY[flowKey].badgeLabel}
-							onPress={() => onOpenScreen?.(resolveFlowNodeScreen(flowKey, ACTIVE_ORDER_PREVIEW.stage))}
-						/>
-					))}
-				</Box>
-			</Box>
+			{/* ─── خطوات التنفيذ الفوري ──────────────────────────────── */}
+			<FlatSection label="خطوات التنفيذ الفوري">
+				{EXECUTION_ITEMS.map((item, index, arr) => (
+					<FlatRow
+						key={item.id}
+						title={item.title}
+						subtitle={item.subtitle}
+						badgeLabel={item.badgeLabel}
+						isLast={index === arr.length - 1}
+						onPress={() => onOpenScreen?.(item.id)}
+					/>
+				))}
+			</FlatSection>
+
+			<Divider />
+
+			{/* ─── مشاكل شائعة في الميدان ──────────────────────────────── */}
+			<FlatSection label="مشاكل شائعة">
+				{CAPTAIN_OPERATIONAL_SUPPORT_ITEMS.map((item, index, arr) => (
+					<FlatRow
+						key={item.flowId}
+						title={item.title}
+						subtitle={item.subtitle}
+						badgeLabel={item.badgeLabel}
+						badgeTone={item.badgeLabel === 'حرج' ? 'danger' : item.badgeLabel === 'يتطلب قرارًا' ? 'warning' : 'default'}
+						isLast={index === arr.length - 1}
+						onPress={() => onOpenScreen?.(item.screenId)}
+					/>
+				))}
+			</FlatSection>
+
 		</MobileScrollView>
 	);
 }

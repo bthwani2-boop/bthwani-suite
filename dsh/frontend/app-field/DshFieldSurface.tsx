@@ -1,7 +1,7 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { useAppFieldAppearance } from '../../../app-field/shell/appearance';
-import { BottomNavBar, Box } from '@bthwani/ui-kit';
+import { BottomNavBar, useTheme } from '@bthwani/ui-kit';
 import { DshFieldFinanceScreen } from './screens/DshFieldFinanceScreen';
 import { DshFieldProfileHomeScreen } from './screens/DshFieldProfileHomeScreen';
 import { DshFieldProfileScreen } from './screens/DshFieldProfileScreen';
@@ -57,6 +57,7 @@ function resolveCommandRoute(command?: DshFieldNavigationCommand): DshFieldRoute
 }
 
 export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) {
+  const { theme } = useTheme();
   const {
     hydrated: appearanceHydrated,
     mode: appearanceMode,
@@ -329,11 +330,24 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
     );
   }
 
-  const showFieldBottomNav = route.kind === 'stores' || route.kind === 'account';
+  const showFieldBottomNav = true;
 
-  const fieldBottomActiveId =
-    route.kind === 'stores' ? 'tasks' :
-    route.kind === 'account' ? 'profile' : '';
+  let fieldBottomActiveId = '';
+  if (route.kind === 'stores') {
+    fieldBottomActiveId = 'tasks';
+  } else if (route.kind === 'history') {
+    fieldBottomActiveId = 'history';
+  } else if (route.kind === 'finance') {
+    fieldBottomActiveId = 'finance';
+  } else if (
+    route.kind === 'account' ||
+    route.kind === 'profile' ||
+    route.kind === 'onboarding' ||
+    route.kind === 'visit' ||
+    route.kind === 'readiness-escalation'
+  ) {
+    fieldBottomActiveId = 'profile';
+  }
 
   const fieldBottomNavBar = (
     <BottomNavBar
@@ -358,16 +372,14 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
   );
 
   return (
-    <Box style={{ flex: 1, position: 'relative' }} background="background">
-      <Box style={{ flex: 1, paddingBottom: showFieldBottomNav ? (Platform.OS === 'android' ? 112 : 80) : 0 }}>
+    <View style={{ flex: 1, backgroundColor: theme.surface, position: 'relative' }}>
+      <View style={{ flex: 1, paddingBottom: 80 }}>
         {content}
-      </Box>
-      {showFieldBottomNav && (
-        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
-          {fieldBottomNavBar}
-        </View>
-      )}
-    </Box>
+      </View>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+        {fieldBottomNavBar}
+      </View>
+    </View>
   );
 }
 

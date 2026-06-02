@@ -5,13 +5,14 @@ import { View } from 'react-native';
 import {
   Badge,
   Box,
+  Divider,
   Icon,
   KeyValueList,
   MobileScrollView,
   StateView,
-  Surface,
   Text,
   TopBar,
+  useTheme,
 } from '@bthwani/ui-kit';
 import type {
   WltDshFinancePreviewRecord,
@@ -20,12 +21,13 @@ import type {
 import { useWltDshFieldFinancePreview } from './useWltDshFieldFinancePreview';
 
 function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
+  const { theme } = useTheme();
   const amountTone = record.tone === 'positive' ? 'success'
     : record.tone === 'negative' ? 'error'
     : 'info';
 
   return (
-    <Surface tone="raised" padding={3} gap={2}>
+    <Box gap={2} paddingVertical={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
         <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>
@@ -50,13 +52,13 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
           <Badge label={record.statusLabel} tone={record.statusTone} />
         </View>
       </View>
-    </Surface>
+    </Box>
   );
 }
 
 function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) {
   return (
-    <Surface tone="raised" padding={3} gap={3}>
+    <Box gap={3} paddingVertical={2}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
         ملخص العمولات المالية
       </Text>
@@ -72,7 +74,7 @@ function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) 
           { label: 'موعد الصرف القادم', value: snapshot.nextPayoutDate, tone: 'default' as const },
         ]}
       />
-    </Surface>
+    </Box>
   );
 }
 
@@ -93,12 +95,13 @@ export function WltDshFieldFinancePreview({
     payoutRecords,
   } = useWltDshFieldFinancePreview(storeIds);
 
+  const { theme } = useTheme();
+
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 120 }}>
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
-        variant="secondary"
+        variant="surface"
         title="مالية الميداني"
-        style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={
           onBack
             ? {
@@ -111,69 +114,74 @@ export function WltDshFieldFinancePreview({
             : undefined
         }
       />
+      <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 120 }}>
+        <Box padding={4} gap={4}>
+          <CommissionSummary snapshot={snapshot} />
 
-      <CommissionSummary snapshot={snapshot} />
+          {commissionRecords.length > 0 && (
+            <Box gap={3} paddingVertical={2}>
+              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+                عمولات الاستقطاب المعتمدة
+              </Text>
+              <Box gap={0}>
+                {commissionRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+              </Box>
+            </Box>
+          )}
 
-      {commissionRecords.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            عمولات الاستقطاب المعتمدة
-          </Text>
-          <Box gap={2}>
-            {commissionRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+          {pendingRecords.length > 0 && (
+            <Box gap={3} paddingVertical={2}>
+              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+                عمولات قيد المراجعة
+              </Text>
+              <Box gap={0}>
+                {pendingRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+              </Box>
+              <StateView
+                kind="warning"
+                title="في انتظار الاعتماد"
+                description="هذه العمولات مرتبطة بمتاجر لم يكتمل اعتمادها بعد. ستُحتسب عند إتمام الاعتماد."
+              />
+            </Box>
+          )}
+
+          {rejectedRecords.length > 0 && (
+            <Box gap={3} paddingVertical={2}>
+              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+                عمولات مرفوضة / موقوفة
+              </Text>
+              <Box gap={0}>
+                {rejectedRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+              </Box>
+            </Box>
+          )}
+
+          {payoutRecords.length > 0 && (
+            <Box gap={3} paddingVertical={2}>
+              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+                سجل الصرف
+              </Text>
+              <Box gap={0}>
+                {payoutRecords.map((r) => <RecordRow key={r.id} record={r} />)}
+              </Box>
+            </Box>
+          )}
+
+          <Divider />
+
+          <Box gap={2} paddingVertical={2}>
+            <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+              الإجراءات المالية
+            </Text>
+            <StateView
+              kind="info"
+              title="الصرف يتطلب اكتمال الربط"
+              description="يمكن متابعة حالة العمولات هنا. الصرف الفعلي يتم في موعد الدورة المالية."
+            />
           </Box>
-        </Surface>
-      )}
-
-      {pendingRecords.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            عمولات قيد المراجعة
-          </Text>
-          <Box gap={2}>
-            {pendingRecords.map((r) => <RecordRow key={r.id} record={r} />)}
-          </Box>
-          <StateView
-            kind="warning"
-            title="في انتظار الاعتماد"
-            description="هذه العمولات مرتبطة بمتاجر لم يكتمل اعتمادها بعد. ستُحتسب عند إتمام الاعتماد."
-          />
-        </Surface>
-      )}
-
-      {rejectedRecords.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            عمولات مرفوضة / موقوفة
-          </Text>
-          <Box gap={2}>
-            {rejectedRecords.map((r) => <RecordRow key={r.id} record={r} />)}
-          </Box>
-        </Surface>
-      )}
-
-      {payoutRecords.length > 0 && (
-        <Surface tone="raised" padding={3} gap={3}>
-          <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-            سجل الصرف
-          </Text>
-          <Box gap={2}>
-            {payoutRecords.map((r) => <RecordRow key={r.id} record={r} />)}
-          </Box>
-        </Surface>
-      )}
-
-      <Surface tone="inset" padding={3} gap={2}>
-        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          الإجراءات المالية
-        </Text>
-        <StateView
-          kind="info"
-          title="الصرف يتطلب اكتمال الربط"
-          description="يمكن متابعة حالة العمولات هنا. الصرف الفعلي يتم في موعد الدورة المالية."
-        />
-      </Surface>
-    </MobileScrollView>
+        </Box>
+      </MobileScrollView>
+    </View>
   );
 }
 

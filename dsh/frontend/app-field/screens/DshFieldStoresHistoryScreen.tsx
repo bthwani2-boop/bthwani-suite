@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Icon, ListItem, MobileScrollView, Surface, TopBar } from '@bthwani/ui-kit';
+import { View } from 'react-native';
+import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../data/stores.preview-data';
 
 type DshFieldStoresHistoryScreenProps = {
@@ -8,30 +9,44 @@ type DshFieldStoresHistoryScreenProps = {
 };
 
 export function DshFieldStoresHistoryScreen({ stores, onBack }: DshFieldStoresHistoryScreenProps) {
-  return (
-    <Box style={{ flex: 1 }} background="background">
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
-        <TopBar
-          variant="secondary"
-          title="سجل المتاجر"
-          subtitle="آخر حالة لكل متجر مرتبط بالميدان"
-          style={{ marginHorizontal: -16, marginTop: -16 }}
-          trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
-        />
+  const { theme } = useTheme();
 
-        <Surface tone="raised" padding={0} gap={0} radiusToken="xl">
-          {stores.map((store) => (
-            <ListItem
-              key={store.id}
-              title={store.name}
-              subtitle={resolveFieldStoreLifecycleLabel(store)}
-              meta={`${resolveFieldStoreStatusLabel(store)} · ${store.lastUpdatedLabel}`}
-              badgeLabel={store.financeLabel}
-            />
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
+      <TopBar
+        variant="surface"
+        title="سجل المتاجر"
+        subtitle="آخر حالة لكل متجر مرتبط بالميدان"
+        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
+      />
+      <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
+        <Box padding={4} gap={0}>
+          {stores.map((store, index) => (
+            <View key={store.id}>
+              {index > 0 && <Divider style={{ marginVertical: 8 }} />}
+              <Box gap={2} paddingVertical={2}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                  <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
+                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>
+                      {store.name}
+                    </Text>
+                    <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                      {resolveFieldStoreLifecycleLabel(store)}
+                    </Text>
+                    <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+                      {`${resolveFieldStoreStatusLabel(store)} · ${store.lastUpdatedLabel}`}
+                    </Text>
+                  </View>
+                  {store.financeLabel ? (
+                    <Badge label={store.financeLabel} tone="brand" />
+                  ) : null}
+                </View>
+              </Box>
+            </View>
           ))}
-        </Surface>
+        </Box>
       </MobileScrollView>
-    </Box>
+    </View>
   );
 }
 

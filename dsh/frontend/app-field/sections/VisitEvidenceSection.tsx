@@ -6,6 +6,8 @@ import {
   SectionHeader,
   StateView,
   Text,
+  useTheme,
+  useDirection,
 } from '@bthwani/ui-kit';
 
 type EvidenceItemState = 'pending' | 'captured' | 'uploading' | 'confirmed';
@@ -45,6 +47,10 @@ export function VisitEvidenceSection({
   onConfirmEvidence,
   onRetry,
 }: VisitEvidenceSectionProps) {
+  const { theme } = useTheme();
+  const { direction } = useDirection();
+  const isRtl = direction === 'rtl';
+
   if (sectionState === 'uploading') {
     return <StateView stateId="loading" title="جاري رفع الأدلة..." description="يُرجى الانتظار حتى اكتمال رفع صور الزيارة." />;
   }
@@ -76,18 +82,22 @@ export function VisitEvidenceSection({
   return (
     <Box gap={4}>
       <SectionHeader title="أدلة الزيارة الميدانية" />
-      <Box gap={2}>
+      <Box gap={0}>
         {items.map((item) => (
           <Box
             key={item.id}
-            padding={3}
-            background="surfaceRaised"
-            radiusToken="md"
-            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+            paddingVertical={3}
+            style={{
+              flexDirection: isRtl ? 'row-reverse' : 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottomWidth: 1,
+              borderBottomColor: theme.line,
+            }}
           >
-            <Box gap={0}>
-              <Text role="bodyMd">{item.label}</Text>
-              <Text role="bodySm" tone={item.required ? 'danger' : 'muted'}>
+            <Box gap={0} style={{ alignItems: isRtl ? 'flex-end' : 'flex-start' }}>
+              <Text role="bodyMd" style={{ textAlign: isRtl ? 'right' : 'left' }}>{item.label}</Text>
+              <Text role="bodySm" tone={item.required ? 'danger' : 'muted'} style={{ textAlign: isRtl ? 'right' : 'left' }}>
                 {item.required ? 'مطلوب' : 'اختياري'} · {stateLabel[item.state]}
               </Text>
             </Box>

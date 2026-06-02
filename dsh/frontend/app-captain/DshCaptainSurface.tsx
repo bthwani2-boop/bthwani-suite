@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { AppearanceOptionCard, Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Switch, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/app-captain/dsh/wlt-dsh-captain.ui-copy';
@@ -829,19 +829,27 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       onPress: () => openCaptainAccountSection('account-shifts'),
     },
     {
-      title: 'الإعدادات والدعم',
-      subtitle: 'اللغة، الإشعارات، والمساعدة.',
-      badgeLabel: 'متابعة',
+      title: 'الإعدادات',
+      subtitle: 'المظهر، وضع التطبيق، والتفضيلات.',
+      badgeLabel: 'محلي',
       icon: 'settings-outline' as const,
       onPress: () => openCaptainAccountSection('account-support'),
     },
-  ], [openCaptainAccountSection]);
+    {
+      title: 'الدعم',
+      subtitle: 'دليل مسارات DSH وقنوات المساندة.',
+      badgeLabel: 'مفتوح',
+      icon: 'help-circle-outline' as const,
+      onPress: () => openSupportDirectory(),
+    },
+  ], [openCaptainAccountSection, openSupportDirectory]);
+
 
   const renderCaptainAccountRootScreen = () => {
     return (
-      <Box gap={4} style={{ paddingHorizontal: 4 }}>
+      <Box gap={4}>
         {/* Profile Card & Quick Stats Grid */}
-        <Box gap={4} style={{ paddingHorizontal: 4 }}>
+        <Box gap={4}>
           {/* User Profile Header */}
           <Box layoutDirection="row" align="center" gap={3} style={{ flexDirection: 'row-reverse' }}>
             {/* Avatar Container */}
@@ -891,8 +899,8 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
 
         <Divider />
 
-        {/* Navigation Cards List */}
-        <Box gap={3}>
+        {/* Navigation List — flush rows, no gap between items */}
+        <Box gap={0}>
           {captainAccountNavItems.map((item) => (
             <CaptainAccountNavRow
               key={item.title}
@@ -912,7 +920,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     return renderCaptainAccountShell(
       title,
       subtitle,
-      <Box gap={4} style={{ paddingHorizontal: 4 }}>
+      <Box gap={4}>
         <KeyValueList items={items} />
         {footerNote ? (
           <>
@@ -990,71 +998,149 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة الحقيقي ينتظر ربط إدارة الأسطول ويظهر هنا كمعاينة حالة فقط.');
   };
 
+
   const renderCaptainAccountSupportScreen = () => {
-    return renderCaptainAccountShell(
-      'الإعدادات والدعم',
-      'اللغة والإشعارات والمساندة المختصرة',
-      <Box gap={4} style={{ paddingHorizontal: 4 }}>
-        <Box gap={3}>
-          <Text role="label" tone="muted" align="end">
-            المظهر
-          </Text>
-          <Text role="bodySm" tone="muted" align="end">
-            {appearanceHydrated
-              ? 'يتم حفظ اختيار المظهر محليًا واستعادته عند فتح تطبيق الكابتن.'
-              : 'جارٍ استعادة اختيار المظهر المحفوظ...'}
-          </Text>
-          <Box gap={3}>
-            {captainAppearanceOptions.map((option) => (
-              <AppearanceOptionCard
-                key={option.mode}
-                title={option.title}
-                description={option.description}
-                mode={option.mode}
-                modeLabel={option.mode === 'lightPremium' ? 'Light Premium' : 'Dark Glass'}
-                statusLabel={appearanceMode === option.mode ? 'مفعّل الآن' : 'اضغط للتفعيل'}
-                selected={appearanceMode === option.mode}
-                onPress={() => setAppearanceMode(option.mode)}
-              />
-            ))}
-          </Box>
-        </Box>
+    const rowDirection = 'row-reverse' as const;
 
-        <Divider />
-
-        {/* ─── App mode toggle ─────────────────────────────────────────── */}
-        <Box gap={3}>
-          <Text role="label" tone="muted" align="end">وضع التطبيق</Text>
-          <Switch
-            label="وضع موصل المتجر"
-            description={
-              captainAppMode === 'store_courier_mode'
-                ? 'مفعّل: طلبات المتجر فقط — لا طلبات بثواني ولا محفظة كابتن.'
-                : 'غير مفعّل: الوضع الافتراضي لكابتن بثواني.'
-            }
-            value={captainAppMode === 'store_courier_mode'}
-            onValueChange={(next) => {
-              setCaptainAppMode(next ? 'store_courier_mode' : 'bthwani_captain_mode');
-              setRoute('home');
+    // Appearance row — inline segmented toggle identical to Partner settings
+    const appearanceRow = (
+      <View
+        style={{
+          flexDirection: rowDirection,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+          backgroundColor: theme.surface,
+        }}
+      >
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+          <View
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.surfaceInset,
+              borderWidth: 1,
+              borderColor: theme.line,
+              flexShrink: 0,
             }}
-          />
-        </Box>
+          >
+            <Icon name="color-palette-outline" size={17} tone="default" />
+          </View>
+          <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: 'flex-end' }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>المظهر</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
+              {appearanceHydrated ? 'فاتح أبيض أو داكن زجاجي' : 'جارٍ الاستعادة...'}
+            </Text>
+          </View>
+        </View>
 
-        <Divider />
+        {/* Segmented pill toggle */}
+        <View
+          style={{
+            flexDirection: rowDirection,
+            backgroundColor: theme.surfaceInset,
+            borderRadius: 12,
+            padding: 3,
+            borderWidth: 1,
+            borderColor: theme.line,
+            gap: 4,
+          }}
+        >
+          <Pressable
+            onPress={() => setAppearanceMode('lightPremium')}
+            style={{
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 9,
+              backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
+            }}
+          >
+            <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
+              فاتح
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setAppearanceMode('darkGlass')}
+            style={{
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 9,
+              backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
+            }}
+          >
+            <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
+              داكن
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
 
-        <Box gap={3}>
-          <CaptainAccountNavRow
-            title="الإعدادات"
-            subtitle="اللغة، الإشعارات، والتفضيلات المحلية."
-            icon="settings-outline"
-            onPress={() => {}}
-          />
-          <CaptainAccountNavRow
-            title="الدعم ومسارات الخدمة"
-            subtitle="قنوات المساندة والتصعيد ودليل مسارات DSH المفتوحة."
-            icon="help-circle-outline"
-            onPress={() => openSupportDirectory()}
-          />
+    // App mode row — flat pressable with switch
+    const appModeRow = (
+      <View
+        style={{
+          flexDirection: rowDirection,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+          backgroundColor: theme.surface,
+          borderTopWidth: 1,
+          borderTopColor: theme.line,
+        }}
+      >
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+          <View
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: theme.surfaceInset,
+              borderWidth: 1,
+              borderColor: theme.line,
+              flexShrink: 0,
+            }}
+          >
+            <Icon name="storefront-outline" size={17} tone="default" />
+          </View>
+          <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: 'flex-end' }}>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>وضع موصل المتجر</Text>
+            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={2}>
+              {captainAppMode === 'store_courier_mode'
+                ? 'مفعّل — طلبات المتجر فقط'
+                : 'غير مفعّل — الوضع الافتراضي'}
+            </Text>
+          </View>
+        </View>
+        <RNSwitch
+          value={captainAppMode === 'store_courier_mode'}
+          onValueChange={(next) => {
+            setCaptainAppMode(next ? 'store_courier_mode' : 'bthwani_captain_mode');
+            setRoute('home');
+          }}
+          thumbColor={captainAppMode === 'store_courier_mode' ? theme.brandContrast : theme.surfaceRaised}
+          trackColor={{ false: theme.lineStrong, true: theme.brand }}
+          ios_backgroundColor={theme.lineStrong}
+        />
+      </View>
+    );
+
+    // Quick access rows removed — الدعم is now a standalone account nav item
+    return renderCaptainAccountShell(
+      'الإعدادات',
+      'المظهر، وضع التطبيق، والتفضيلات المحلية',
+      <Box gap={4}>
+        {/* Appearance + App mode — flat rows */}
+        <Box padding={0} gap={0}>
+          {appearanceRow}
+          {appModeRow}
         </Box>
       </Box>
     );
@@ -1236,36 +1322,14 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     />
   );
 
-  const renderRouteHeader = () => {
-    if (route === 'entry') {
-      return <TopBar variant="secondary" title="بوابة التنفيذ" subtitle="ابدأ من الفرز والقبول قبل الخروج للميدان." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    if (route === 'inbox') {
-      return <TopBar variant="secondary" title="صندوق الطلبات" subtitle="الطلب النشط أولًا ثم بقية الصف." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    if (route === 'detail') {
-      return <TopBar variant="secondary" title="تفاصيل الطلب" subtitle="راجع الطلب قبل التنفيذ أو التسليم." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    if (route === 'orderchat') {
-      return <TopBar variant="secondary" title="تواصل الطلب" subtitle="مراسلات قصيرة مرتبطة بالطلب النشط." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    if (route === 'map') {
-      return <TopBar variant="secondary" title="خريطة المهمة" subtitle="عرض المسار وتبديل المراحل." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    if (route === 'pickup-dropoff') {
-      return <TopBar variant="secondary" title="الاستلام والتسليم" subtitle="مراحل التسليم من الاستلام حتى إثبات التسليم." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    if (route === 'pod-submission') {
-      return <TopBar variant="secondary" title="إثبات التسليم" subtitle="التقاط صورة الإثبات وإرسالها لإغلاق الطلب." style={{ marginHorizontal: -16, marginTop: -16 }} />;
-    }
-
-    return null;
+  const routeHeaderMeta: Record<string, { title: string; subtitle: string }> = {
+    entry: { title: 'بوابة التنفيذ', subtitle: 'ابدأ من الفرز والقبول قبل الخروج للميدان.' },
+    inbox: { title: 'صندوق الطلبات', subtitle: 'الطلب النشط أولًا ثم بقية الصف.' },
+    detail: { title: 'تفاصيل الطلب', subtitle: 'راجع الطلب قبل التنفيذ أو التسليم.' },
+    orderchat: { title: 'تواصل الطلب', subtitle: 'مراسلات قصيرة مرتبطة بالطلب النشط.' },
+    map: { title: 'خريطة المهمة', subtitle: 'عرض المسار وتبديل المراحل.' },
+    'pickup-dropoff': { title: 'الاستلام والتسليم', subtitle: 'مراحل التسليم من الاستلام حتى إثبات التسليم.' },
+    'pod-submission': { title: 'إثبات التسليم', subtitle: 'التقاط صورة الإثبات وإرسالها لإغلاق الطلب.' },
   };
 
   const renderHomeOrderPanel = () => {
@@ -1930,34 +1994,32 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       );
     }
 
-    let content: React.ReactNode = renderCaptainFlow();
+    const meta = routeHeaderMeta[route];
+    const content: React.ReactNode = renderCaptainFlow();
 
+    // Flat layout — identical to renderCaptainAccountShell, no rounded container
     return (
-      <Box style={{ flex: 1, position: 'relative' }} background="background">
-        {renderRouteHeader()}
-        <Box
-          background="background"
-          padding={0}
-          gap={0}
-          radiusToken="none"
-          border={false}
-          style={{
-            flex: 1,
-            marginTop: -2,
-            borderTopLeftRadius: 28,
-            borderTopRightRadius: 28,
-            overflow: 'hidden',
-            paddingBottom: showCaptainBottomNav ? (Platform.OS === 'android' ? 112 : 80) : 0,
-          }}
-        >
-          {content}
-        </Box>
+      <View style={{ flex: 1, backgroundColor: theme.surface }}>
+        {meta && (
+          <TopBar
+            variant="surface"
+            title={meta.title}
+            subtitle={meta.subtitle}
+          />
+        )}
+        <View style={{ flex: 1, paddingBottom: showCaptainBottomNav ? 80 : 0 }}>
+          <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 32 }}>
+            <Box padding={4} gap={4}>
+              {content}
+            </Box>
+          </MobileScrollView>
+        </View>
         {showCaptainBottomNav && (
           <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
             {captainBottomNavBar}
           </View>
         )}
-      </Box>
+      </View>
     );
   }
 
