@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, KeyValueList, SectionHeader, Surface } from '@bthwani/ui-kit';
+import { Box, KeyValueList, SectionHeader, Divider } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
 
@@ -19,7 +19,7 @@ const demoSnapshot: DshCaptainProfileSnapshot = {
 
 function ProfileSummarySection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainProfileSnapshot }) {
 	return (
-		<Surface tone="brand" gap={3}>
+		<Box gap={3} style={{ paddingVertical: 4 }}>
 			<SectionHeader title="ملف الكابتن" subtitle="اقرأ ملف الكابتن الحالي وحالة الجاهزية للمسار." />
 			<KeyValueList
 				items={[
@@ -28,14 +28,14 @@ function ProfileSummarySection({ snapshot = demoSnapshot }: { snapshot?: DshCapt
 					{ label: 'الجاهزية', value: snapshot.readinessLabel, tone: 'success' },
 				]}
 			/>
-		</Surface>
+		</Box>
 	);
 }
 
 function TierSection({ snapshot = demoSnapshot, mode }: { snapshot?: DshCaptainProfileSnapshot; mode: 'tier-info' | 'tier-evaluate' }) {
 	if (mode === 'tier-info') {
 		return (
-			<Surface tone="raised" gap={3}>
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader title="معلومات الطبقة" subtitle="اقرأ مزايا ومتطلبات الطبقة الحالية." />
 				<KeyValueList
 					items={[
@@ -44,12 +44,12 @@ function TierSection({ snapshot = demoSnapshot, mode }: { snapshot?: DshCaptainP
 						{ label: 'عتبة الطبقة التالية', value: '120 مسارًا مكتملًا' },
 					]}
 				/>
-			</Surface>
+			</Box>
 		);
 	}
 
 	return (
-		<Surface tone="raised" gap={3}>
+		<Box gap={3} style={{ paddingVertical: 4 }}>
 			<SectionHeader title="تقييم الطبقة" subtitle="راجع ما إذا كان الكابتن جاهزًا للطبقة التالية." />
 			<KeyValueList
 				items={[
@@ -58,7 +58,7 @@ function TierSection({ snapshot = demoSnapshot, mode }: { snapshot?: DshCaptainP
 					{ label: 'الحوادث', value: '0', tone: 'success' },
 				]}
 			/>
-		</Surface>
+		</Box>
 	);
 }
 
@@ -75,8 +75,9 @@ export function DshCaptainProfileScreen({
 			title="ملف الكابتن"
 			subtitle="لقطة موحدة للملف والطبقة والجاهزية بنفس أسلوب العرض المعتمد في تطبيق العميل."
 			content={
-				<Box gap={3}>
+				<Box gap={4}>
 					<ProfileSummarySection snapshot={snapshot} />
+					<Divider />
 					{section === 'tier-info' ? <TierSection snapshot={snapshot} mode="tier-info" /> : null}
 					{section === 'tier-evaluate' ? <TierSection snapshot={snapshot} mode="tier-evaluate" /> : null}
 					{section === 'profile-get' ? <TierSection snapshot={snapshot} mode="tier-info" /> : null}

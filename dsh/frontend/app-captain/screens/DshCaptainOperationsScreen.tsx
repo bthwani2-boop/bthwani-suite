@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, KeyValueList, ListItem, SectionHeader, Surface, Text, TextField, Button, MobileScrollView } from '@bthwani/ui-kit';
+import { Box, KeyValueList, ListItem, SectionHeader, Divider, Text, TextField, Button, MobileScrollView } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../../shared/dsh-order-preview.contract';
 import type { DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
@@ -124,34 +124,43 @@ function SimpleSupportScreen({
 			title={title}
 			subtitle={subtitle}
 			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
+				<Box gap={4} style={{ paddingHorizontal: 4 }}>
+					<Box gap={3}>
 						<SectionHeader title={heroTitle} subtitle={heroDescription} />
-					</Surface>
+					</Box>
 
 					{keyValues?.length ? (
-						<Surface tone="raised" gap={3}>
-							<SectionHeader title="تفاصيل المسار" subtitle="تبقى فقط التفاصيل اللازمة لإجراء الكابتن الفوري ظاهرة." />
-							<KeyValueList items={keyValues} />
-						</Surface>
+						<>
+							<Divider />
+							<Box gap={3}>
+								<SectionHeader title="تفاصيل المسار" subtitle="تبقى فقط التفاصيل اللازمة لإجراء الكابتن الفوري ظاهرة." />
+								<KeyValueList items={keyValues} />
+							</Box>
+						</>
 					) : null}
 
 					{listItems?.length ? (
-						<Surface tone="default" gap={3}>
-							<SectionHeader title="الصف الحالي" subtitle="كل عنصر يحافظ على قرار المسار التالي واضحًا." />
-							<Box gap={2}>
-								{listItems.map((item) => (
-									<ListItem key={`${title}-${item.title}`} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
-								))}
+						<>
+							<Divider />
+							<Box gap={3}>
+								<SectionHeader title="الصف الحالي" subtitle="كل عنصر يحافظ على قرار المسار التالي واضحًا." />
+								<Box gap={2}>
+									{listItems.map((item) => (
+										<ListItem key={`${title}-${item.title}`} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+									))}
+								</Box>
 							</Box>
-						</Surface>
+						</>
 					) : null}
 
 					{inputLabel ? (
-						<Surface tone="raised" gap={3}>
-							<SectionHeader title="إدخال المسودة" subtitle="إدخال واحد موجز من الكابتن يبقي المسار مركزًا." />
-							<TextField label={inputLabel} value={draftValue} onChangeText={setDraftValue} hint={inputHint} />
-						</Surface>
+						<>
+							<Divider />
+							<Box gap={3}>
+								<SectionHeader title="إدخال المسودة" subtitle="إدخال واحد موجز من الكابتن يبقي المسار مركزًا." />
+								<TextField label={inputLabel} value={draftValue} onChangeText={setDraftValue} hint={inputHint} />
+							</Box>
+						</>
 					) : null}
 				</Box>
 			}
@@ -384,7 +393,7 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 				مسار تشغيل فردي مملوك للكابتن الحالي فقط. لا توجد خريطة أسطول عامة ولا لوحة مراقبة إدارية خارج سياق الطلب النشط.
 			</Text>
 
-			<Surface tone="brand" gap={3}>
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader
 					title={`المهمة الحالية · ${CAPTAIN_PROFILE_PREVIEW.displayName}`}
 					subtitle={`${CAPTAIN_PROFILE_PREVIEW.tierLabel} · ${CAPTAIN_PROFILE_PREVIEW.readinessLabel}`}
@@ -402,9 +411,11 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 				</Box>
 				<Button label={resolvePrimaryActionLabel(ACTIVE_ORDER_PREVIEW.stage)} onPress={() => onOpenScreen?.(currentActionScreenId)} />
 				<Button label="فتح لقطة الطلب" tone="secondary" onPress={() => onOpenScreen?.('order-get')} />
-			</Surface>
+			</Box>
 
-			<Surface tone="inset" gap={3}>
+			<Divider />
+
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader title="سياسات الربط الحي" subtitle="هذه الشاشات مرتبطة الآن مباشرة بسجل DSH المركزي، وليست وصفًا Preview فقط." />
 				<Box gap={2}>
 					{CAPTAIN_BOUND_REGISTRY_FLOW_IDS.map((flowId) => {
@@ -425,9 +436,11 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 						);
 					})}
 				</Box>
-			</Surface>
+			</Box>
 
-			<Surface tone="raised" gap={3}>
+			<Divider />
+
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader title="نبض الرحلة" subtitle="الترتيب التالي يشرح رحلة الكابتن من العرض حتى التنفيذ والإثبات فقط." />
 				<Box gap={2}>
 					{PRIMARY_FLOW_ORDER.map((flowKey) => (
@@ -441,9 +454,11 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 						/>
 					))}
 				</Box>
-			</Surface>
+			</Box>
 
-			<Surface tone="raised" gap={3}>
+			<Divider />
+
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader title="خطوات التنفيذ الفوري" subtitle="هذه هي الشاشات الوحيدة التي يحتاجها الكابتن داخل المهمة الحالية." />
 				<Box gap={2}>
 					{EXECUTION_ITEMS.map((item) => (
@@ -457,9 +472,11 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 						/>
 					))}
 				</Box>
-			</Surface>
+			</Box>
 
-			<Surface tone="default" gap={3}>
+			<Divider />
+
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader title="الدعم المسموح بعد تثبيت المهمة" subtitle="التواصل والمالية والملف تبقى ثانوية بعد قرار التنفيذ الحالي." />
 				<Box gap={2}>
 					{SUPPORT_ITEMS.map((item) => (
@@ -473,9 +490,11 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 						/>
 					))}
 				</Box>
-			</Surface>
+			</Box>
 
-			<Surface tone="raised" gap={3}>
+			<Divider />
+
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader
 					title="حالات التنفيذ والدعم"
 					subtitle="الكابتن يرى فقط handoff والتسليم والإثبات وما يمنع إغلاق الرحلة، وليس مشاكل الشريك الداخلية."
@@ -492,9 +511,11 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 						/>
 					))}
 				</Box>
-			</Surface>
+			</Box>
 
-			<Surface tone="raised" gap={3}>
+			<Divider />
+
+			<Box gap={3} style={{ paddingVertical: 4 }}>
 				<SectionHeader title="مسارات مساندة" subtitle="تظل هذه المسارات مرئية لكن خارج قلب التنفيذ حتى لا يضيع تركيز الكابتن." />
 				<Box gap={2}>
 					{SECONDARY_FLOW_ORDER.map((flowKey) => (
@@ -508,7 +529,7 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 						/>
 					))}
 				</Box>
-			</Surface>
+			</Box>
 		</MobileScrollView>
 	);
 }

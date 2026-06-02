@@ -381,7 +381,7 @@ function normalizeClientFacingOrderState(clientState: DshClientState): DshClient
   return clientState;
 }
 
-function StageRail({ activeStepId, steps }: { activeStepId: string; steps: JourneyStep[] }) {
+const StageRail = React.memo(function StageRail({ activeStepId, steps }: { activeStepId: string; steps: JourneyStep[] }) {
   const { theme } = useTheme();
   const activeIndex = Math.max(0, steps.findIndex((step) => step.id === activeStepId));
 
@@ -479,7 +479,7 @@ function StageRail({ activeStepId, steps }: { activeStepId: string; steps: Journ
       })}
     </Box>
   );
-}
+});
 
 function formatOrderTime(isoString: string) {
   try {
@@ -517,7 +517,7 @@ function formatRelativeTime(isoString: string): string {
   }
 }
 
-function OrderRow({
+const OrderRow = React.memo(function OrderRow({
   item,
   onOpenOrder,
   onReorder,
@@ -597,9 +597,9 @@ function OrderRow({
       </View>
     </ActionStrip>
   );
-}
+});
 
-function RatingStars({ value, disabled, onChange }: { value: number; disabled?: boolean; onChange: (nextValue: number) => void }) {
+const RatingStars = React.memo(function RatingStars({ value, disabled, onChange }: { value: number; disabled?: boolean; onChange: (nextValue: number) => void }) {
   const { theme } = useTheme();
 
   return (
@@ -625,9 +625,9 @@ function RatingStars({ value, disabled, onChange }: { value: number; disabled?: 
       })}
     </Box>
   );
-}
+});
 
-function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن المكلّف' }: { phase: 'route' | 'received'; captainLabel?: string; }) {
+const OrderCaptainChatSection = React.memo(function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن المكلّف' }: { phase: 'route' | 'received'; captainLabel?: string; }) {
   const { theme } = useTheme();
   const isClosed = phase === 'received';
   const [draftMessage, setDraftMessage] = React.useState('');
@@ -813,7 +813,7 @@ function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن الم�
       )}
     </Surface>
   );
-}
+});
 
 function getClientWalletVisibilityCopy(clientStateMeta: ReturnType<typeof getDshClientStateMeta>) {
   if (clientStateMeta.visibility.walletRefundVisible) {
@@ -1214,7 +1214,7 @@ function useSmartTrackingHeartbeat(phase: JourneyPhase): DshSmartTrackingSnapsho
   return state;
 }
 
-function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: DshSmartTrackingSnapshot }) {
+const SmartTrackingCard = React.memo(function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: DshSmartTrackingSnapshot }) {
   const { theme } = useTheme();
 
   const proximityAlert = smartTracking.proximityState === 'bell_rang'
@@ -1267,7 +1267,7 @@ function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smar
       />
     </Surface>
   );
-}
+});
 
 function getMilestoneIndex(stepId: string): number {
   switch (stepId) {
@@ -1293,7 +1293,7 @@ function getMilestoneIndex(stepId: string): number {
   }
 }
 
-function HorizontalMilestones({ activeStepId }: { activeStepId: string }) {
+const HorizontalMilestones = React.memo(function HorizontalMilestones({ activeStepId }: { activeStepId: string }) {
   const { theme } = useTheme();
   const currentMilestone = getMilestoneIndex(activeStepId);
 
@@ -1362,7 +1362,7 @@ function HorizontalMilestones({ activeStepId }: { activeStepId: string }) {
       })}
     </View>
   );
-}
+});
 
 type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;

@@ -19,6 +19,8 @@ import {
 } from '@bthwani/ui-kit';
 import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order-preview.contract';
 import { AcceptanceTimerSheet } from '../sheets';
+// SSoT: delivery mode labels from dsh-delivery-mode.model.
+import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
 // ML-021: added captain_assigned / captain_arriving so partner can track handoff event
@@ -109,8 +111,8 @@ const quickFilters: ReadonlyArray<{ id: QuickFilterId; label: string }> = [
   { id: 'sla_risk', label: 'SLA قريب' },
   { id: 'unread', label: 'غير مقروء' },
   { id: 'pickup', label: 'استلم بنفسك' },
-  { id: 'partner_delivery', label: 'توصيل المتجر' },
-  { id: 'bthwani_delivery', label: 'توصيل بثواني' },
+  { id: 'partner_delivery', label: getDshDeliveryModeDefinition('partner_delivery').label },
+  { id: 'bthwani_delivery', label: getDshDeliveryModeDefinition('bthwani_delivery').label },
   { id: 'completed', label: 'مكتملة' },
   { id: 'cancelled', label: 'ملغاة/مشكلة' },
 ];

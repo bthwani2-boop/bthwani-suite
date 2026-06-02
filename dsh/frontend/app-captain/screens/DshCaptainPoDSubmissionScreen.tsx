@@ -6,7 +6,7 @@ import {
   Button,
   Icon,
   SectionHeader,
-  Surface,
+  Divider,
   Text,
   useTheme,
   colorPalette,
@@ -52,7 +52,7 @@ export function DshCaptainPoDSubmissionScreen({
   onBack,
   photoUri,
 }: DshCaptainPoDSubmissionScreenProps) {
-  const { theme } = useTheme();
+  const theme = useTheme();
   const podFlowPolicy = getDshCaptainFlowPolicy('captain-proof-of-delivery');
   const podFlowSummary = getDshFlowPolicySummary('captain-proof-of-delivery');
   const [proofGuideVisible, setProofGuideVisible] = React.useState(false);
@@ -60,7 +60,7 @@ export function DshCaptainPoDSubmissionScreen({
 
   if (state === 'success') {
     return (
-      <Surface style={styles.root}>
+      <View style={styles.root}>
         <StateView
           kind="success"
           title="تم رفع الإثبات بنجاح"
@@ -68,13 +68,13 @@ export function DshCaptainPoDSubmissionScreen({
           actionLabel="العودة لصندوق الطلبات"
           onActionPress={onBack}
         />
-      </Surface>
+      </View>
     );
   }
 
   if (state === 'rejected') {
     return (
-      <Surface style={styles.root}>
+      <View style={styles.root}>
         <StateView
           stateId="blocked"
           title="فشل إثبات التسليم"
@@ -82,14 +82,14 @@ export function DshCaptainPoDSubmissionScreen({
           actionLabel="إعادة المحاولة"
           onActionPress={onCapturePhoto}
         />
-      </Surface>
+      </View>
     );
   }
 
   // ML-031: retry-required — ops explicitly requires new proof capture
   if (state === 'retry-required') {
     return (
-      <Surface style={styles.root}>
+      <View style={styles.root}>
         <StateView
           stateId="blocked"
           title="مطلوب إعادة التقاط الإثبات"
@@ -97,7 +97,7 @@ export function DshCaptainPoDSubmissionScreen({
           actionLabel="التقاط صورة جديدة"
           onActionPress={onCapturePhoto}
         />
-      </Surface>
+      </View>
     );
   }
 
@@ -107,8 +107,8 @@ export function DshCaptainPoDSubmissionScreen({
       subtitle="يجب التقاط صورة واضحة للطلب عند باب العميل أو مع المستلم."
       onBack={onBack}
       content={
-        <Box gap={3}>
-          <Surface tone="brand" gap={2}>
+        <Box gap={4} style={{ paddingHorizontal: 4 }}>
+          <Box gap={3}>
             <Box layoutDirection="row" justify="space-between" align="center">
               <Badge label="إثبات مطلوب" tone="warning" />
               <Text role="caption" tone="soft">#{orderId}</Text>
@@ -116,7 +116,10 @@ export function DshCaptainPoDSubmissionScreen({
             <Text role="bodySm" tone="muted">
               هذا الإثبات ضروري لإغلاق الطلب وضمان حقوق الكابتن والعميل.
             </Text>
-            <Surface tone="inset" padding={3} radiusToken="lg" gap={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+
+            <Divider />
+
+            <Box gap={2} paddingVertical={2}>
               <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
                 <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
                   <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة الإثبات من السجل المركزي</Text>
@@ -129,10 +132,12 @@ export function DshCaptainPoDSubmissionScreen({
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
                 {`المراجعة التشغيلية النهائية يملكها ${resolveDshControlPanelSectionLabel('support')}.`}
               </Text>
-            </Surface>
-          </Surface>
+            </Box>
+          </Box>
 
-          <Surface tone="raised" padding={0} overflow="hidden">
+          <Divider />
+
+          <Box overflow="hidden" style={{ paddingVertical: 4 }}>
             <Pressable onPress={onCapturePhoto} style={styles.photoContainer}>
               {photoUri && proofPreviewVisible ? (
                 <View style={styles.previewWrapper}>
@@ -156,7 +161,7 @@ export function DshCaptainPoDSubmissionScreen({
                 </View>
               )}
             </Pressable>
-          </Surface>
+          </Box>
 
           {photoUri ? (
             <Button
@@ -168,7 +173,9 @@ export function DshCaptainPoDSubmissionScreen({
             />
           ) : null}
 
-          <Surface tone="inset" gap={2}>
+          <Divider />
+
+          <Box gap={2} paddingVertical={2}>
             <SectionHeader title="شروط الإثبات الصحيح" subtitle="تأكد من النقاط التالية لتجنب رفض الإثبات." />
             <Button
               label={proofGuideVisible ? 'إخفاء الشروط' : 'فتح الشروط'}
@@ -188,7 +195,7 @@ export function DshCaptainPoDSubmissionScreen({
                 افتح هذا الجزء فقط عند مراجعة معايير الإثبات قبل الإرسال.
               </Text>
             )}
-          </Surface>
+          </Box>
 
           <Box paddingVertical={spacing[2]}>
             <Button

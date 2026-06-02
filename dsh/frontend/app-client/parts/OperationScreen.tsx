@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
+import { Box, Button, Divider, MobileScrollView, SectionHeader, StateView, Surface, Text } from '@bthwani/ui-kit';
 
 export type DshOperationScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 
@@ -66,14 +66,15 @@ export function DshOperationScreen({
       {content}
 
       {hasActions ? (
-        <Surface tone="inset" gap={3}>
+        <Box gap={3} style={{ marginTop: 12 }}>
+          <Divider />
           <SectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
           <Box gap={2}>
             {primaryActionLabel ? <Button label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
             {secondaryActionLabel ? <Button label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}
             {tertiaryActionLabel ? <Button label={tertiaryActionLabel} tone="ghost" onPress={onTertiaryAction} /> : null}
           </Box>
-        </Surface>
+        </Box>
       ) : null}
     </MobileScrollView>
   );

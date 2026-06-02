@@ -42,6 +42,8 @@ import {
   getDshFulfillmentDeliveryModeMeta,
   getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
+// SSoT: COD availability per delivery mode — bthwani_delivery only.
+import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
@@ -1063,6 +1065,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     () => props.fulfillmentMode ?? 'bthwani_delivery',
   );
   const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(selectedFulfillmentMode);
+  // SSoT: COD is only available for bthwani_delivery — gated by dsh-client-wlt-payment-bridge.
+  const codAllowedForMode = isCodAllowedForMode(selectedFulfillmentMode);
   // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY — real fee from WLT).
   const deliveryAmount = selectedFulfillmentMode === 'pickup' ? 0 : 950;
   const [clientAddress, setClientAddress] = useState('جوار الجبل الجديد');
@@ -1476,19 +1480,27 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       summary: 'ستدفع كامل المبلغ عند الاستلام.',
       feedbackTone: 'info',
     };
-  }, [formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
+  }, [codAllowedForMode, formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
 
   React.useEffect(() => {
     if (EXPERIMENTAL_PAYMENT_ENABLED) return;
 
+    // SSoT: fall back to wallet when COD is not available for this mode.
+    const fallbackMethod = codAllowedForMode ? 'cod' : 'wallet';
+
     if (paymentMethod === 'wallet' && !canUseWalletFull) {
-      setPaymentMethod(canUseMixedPayment ? 'mixed' : 'cod');
+      setPaymentMethod(canUseMixedPayment ? 'mixed' : fallbackMethod);
     }
 
     if (paymentMethod === 'mixed' && !canUseMixedPayment) {
-      setPaymentMethod(canUseWalletFull ? 'wallet' : 'cod');
+      setPaymentMethod(canUseWalletFull ? 'wallet' : fallbackMethod);
     }
-  }, [canUseMixedPayment, canUseWalletFull, paymentMethod]);
+
+    // If currently on COD but mode doesn't support it, switch to wallet.
+    if (paymentMethod === 'cod' && !codAllowedForMode) {
+      setPaymentMethod('wallet');
+    }
+  }, [canUseMixedPayment, canUseWalletFull, codAllowedForMode, paymentMethod]);
 
   useEffect(() => {
     if (quickActionKey === 'extra' && selectedFulfillmentMode !== 'bthwani_delivery') {
@@ -1505,7 +1517,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     const walletPending = !walletHydrated || walletRefreshing;
 
     return [
-      {
+      // SSoT: COD only available for bthwani_delivery — gated by codAllowedForMode.
+      ...(codAllowedForMode ? [{
         id: 'cod',
         title: 'عند الاستلام',
         description: 'ادفع كامل الطلب عند الاستلام.',
@@ -1517,9 +1530,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
         ],
         helperText: paymentMethod === 'cod' ? 'لا يستخدم رصيد المحفظة.' : undefined,
-        helperTone: 'info',
+        helperTone: 'info' as const,
         onSelect: () => setPaymentMethod('cod'),
-      },
+      } satisfies PaymentDecisionOption] : []),
       {
         id: 'wallet',
         title: 'من رصيد المحفظة',

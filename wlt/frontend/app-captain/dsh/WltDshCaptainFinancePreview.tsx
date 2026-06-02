@@ -6,6 +6,7 @@ import {
   Badge,
   Box,
   Button,
+  Divider,
   Icon,
   KeyValueList,
   MobileScrollView,
@@ -13,6 +14,10 @@ import {
   Surface,
   Text,
   TopBar,
+  useTheme,
+  useDirection,
+  spacing,
+  ActionStrip,
 } from '@bthwani/ui-kit';
 import type {
   WltCaptainFinanceSection,
@@ -22,44 +27,57 @@ import type {
 import { useWltDshCaptainFinancePreview } from './useWltDshCaptainFinancePreview';
 
 function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+
   const amountTone = record.tone === 'positive' ? 'success'
     : record.tone === 'negative' ? 'error'
     : 'info';
 
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
+  const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const alignSide = direction === 'rtl' ? 'flex-end' : 'flex-start';
+  const oppositeAlignSide = direction === 'rtl' ? 'flex-start' : 'flex-end';
+  const oppositeTextAlign = direction === 'rtl' ? 'left' : 'right';
+
   return (
-    <Surface tone="raised" padding={3} gap={2}>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
-        <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>
+    <Box gap={2} paddingVertical={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+      <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12 }}>
+        <View style={{ flex: 1, gap: 3, alignItems: alignSide }}>
+          <Text role="bodyStrong" style={{ textAlign }} numberOfLines={1}>
             {record.title}
           </Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
+          <Text role="bodySm" tone="muted" style={{ textAlign }} numberOfLines={1}>
             {record.subtitle}
           </Text>
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
+          <Text role="caption" tone="soft" style={{ textAlign }}>
             {record.timeLabel}
           </Text>
           {record.holdReason ? (
-            <Text role="caption" tone="warning" style={{ textAlign: 'right' }}>
+            <Text role="caption" tone="warning" style={{ textAlign }}>
               {record.holdReason}
             </Text>
           ) : null}
         </View>
-        <View style={{ alignItems: 'flex-start', gap: 5, flexShrink: 0 }}>
-          <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left' }}>
+        <View style={{ alignItems: oppositeAlignSide, gap: 5, flexShrink: 0 }}>
+          <Text role="bodyStrong" tone={amountTone} style={{ textAlign: oppositeTextAlign }}>
             {record.amountLabel}
           </Text>
           <Badge label={record.statusLabel} tone={record.statusTone} />
         </View>
       </View>
-    </Surface>
+    </Box>
   );
 }
 
 function EligibilitySection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const isRtl = direction === 'rtl';
+
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Box gap={3} paddingVertical={2}>
+      <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         أهلية استقبال الطلبات
       </Text>
       <KeyValueList
@@ -72,13 +90,24 @@ function EligibilitySection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot 
         ]}
       />
       {snapshot.hasEligibilityBlock ? (
-        <StateView
-          kind="warning"
-          title="غير مؤهل لاستقبال الطلبات"
-          description={snapshot.eligibilityBlockReason}
-        />
+        <Box
+          gap={1}
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 12,
+            borderRightWidth: isRtl ? 4 : 0,
+            borderLeftWidth: isRtl ? 0 : 4,
+            borderRightColor: isRtl ? theme.warning : undefined,
+            borderLeftColor: isRtl ? undefined : theme.warning,
+          }}
+        >
+          <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>غير مؤهل لاستقبال الطلبات</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
+            {snapshot.eligibilityBlockReason}
+          </Text>
+        </Box>
       ) : null}
-      <Surface tone="inset" padding={3} gap={2}>
+      <Box gap={2} paddingVertical={1}>
         <Button
           label={snapshot.hasEligibilityBlock
             ? `اشحن ${snapshot.eligibilityShortfallLabel} للتأهل`
@@ -88,21 +117,24 @@ function EligibilitySection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot 
           disabled
           onPress={() => {
             // Blocked: requires WLT runtime/API integration (CONTRACT_SCAFFOLD_PREVIEW_ONLY).
-            // Button is disabled; this handler will never fire in preview mode.
           }}
         />
-        <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
+        <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
           يتطلب ربط WLT runtime لتفعيل الشحن الفعلي — غير متاح في وضع المعاينة.
         </Text>
-      </Surface>
-    </Surface>
+      </Box>
+    </Box>
   );
 }
 
 function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanceSnapshot; records: readonly WltDshFinancePreviewRecord[] }) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const isRtl = direction === 'rtl';
+
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Box gap={3} paddingVertical={2}>
+      <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         تحصيل الدفع عند الاستلام — ذمة مستحقة
       </Text>
       <KeyValueList
@@ -119,19 +151,33 @@ function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanc
           {records.map((r) => <RecordRow key={r.id} record={r} />)}
         </Box>
       ) : null}
-      <StateView
-        kind="warning"
-        title="إيداع COD مطلوب"
-        description="المبلغ المحصّل ذمة مستحقة على الكابتن حتى يتم الإيداع والمطابقة."
-      />
-    </Surface>
+      <Box
+        gap={1}
+        style={{
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          borderRightWidth: isRtl ? 4 : 0,
+          borderLeftWidth: isRtl ? 0 : 4,
+          borderRightColor: isRtl ? theme.warning : undefined,
+          borderLeftColor: isRtl ? undefined : theme.warning,
+        }}
+      >
+        <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>إيداع COD مطلوب</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
+          المبلغ المحصّل ذمة مستحقة على الكابتن حتى يتم الإيداع والمطابقة.
+        </Text>
+      </Box>
+    </Box>
   );
 }
 
 function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSnapshot; records: readonly WltDshFinancePreviewRecord[] }) {
+  const { direction } = useDirection();
+  const isRtl = direction === 'rtl';
+
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Box gap={3} paddingVertical={2}>
+      <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         الأرباح والمكاسب التشغيلية
       </Text>
       <KeyValueList
@@ -148,14 +194,18 @@ function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSna
           {records.map((r) => <RecordRow key={r.id} record={r} />)}
         </Box>
       ) : null}
-    </Surface>
+    </Box>
   );
 }
 
 function SettlementSection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+  const isRtl = direction === 'rtl';
+
   return (
-    <Surface tone="raised" padding={3} gap={3}>
-      <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+    <Box gap={3} paddingVertical={2}>
+      <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         التسوية والدورة المالية
       </Text>
       <KeyValueList
@@ -166,12 +216,23 @@ function SettlementSection({ snapshot }: { snapshot: WltCaptainFinanceSnapshot }
           { label: 'الإجراء التالي', value: 'إيداع COD + مراجعة الأرباح قبل الإغلاق', tone: 'info' as const },
         ]}
       />
-      <StateView
-        kind="info"
-        title="التسوية يتطلب اكتمال الإيداع"
-        description="يجب إيداع جميع ذمم COD قبل إغلاق دورة التسوية وصرف المستحقات."
-      />
-    </Surface>
+      <Box
+        gap={1}
+        style={{
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          borderRightWidth: isRtl ? 4 : 0,
+          borderLeftWidth: isRtl ? 0 : 4,
+          borderRightColor: isRtl ? theme.brand : undefined,
+          borderLeftColor: isRtl ? undefined : theme.brand,
+        }}
+      >
+        <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>التسوية يتطلب اكتمال الإيداع</Text>
+        <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
+          يجب إيداع جميع ذمم COD قبل إغلاق دورة التسوية وصرف المستحقات.
+        </Text>
+      </Box>
+    </Box>
   );
 }
 
@@ -180,67 +241,90 @@ export type WltDshCaptainFinancePreviewProps = {
   onBack?: () => void;
 };
 
-const SECTION_LABELS: Record<WltCaptainFinanceSection, string> = {
-  eligibility: 'الأهلية والشحن',
-  'cod-liability': 'ذمة COD',
-  earnings: 'الأرباح',
-  settlement: 'التسوية',
-};
-
 export function WltDshCaptainFinancePreview({
   section = 'eligibility',
   onBack,
 }: WltDshCaptainFinancePreviewProps) {
+  const { direction } = useDirection();
+  const { theme } = useTheme();
+
   const {
     snapshot,
-    records,
-    activeSection,
-    setActiveSection,
-    availableSections,
+    allRecords,
   } = useWltDshCaptainFinancePreview(section);
 
+  const [expandedSection, setExpandedSection] = React.useState<WltCaptainFinanceSection | null>('eligibility');
+
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 120 }}>
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
-        variant="secondary"
+        variant="surface"
         title="مالية الكابتن"
-        style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
       />
+      <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 120 }}>
+        <Box padding={0} gap={0}>
+          {/* 1. الأهلية والشحن */}
+          <ActionStrip
+            icon="shield-checkmark-outline"
+            title="الأهلية والشحن"
+            subtitle={snapshot.isEligible ? `مؤهل لاستقبال الطلبات · الرصيد: ${snapshot.eligibilityBalanceLabel}` : `غير مؤهل — الرصيد: ${snapshot.eligibilityBalanceLabel}`}
+            expanded={expandedSection === 'eligibility'}
+            onPress={() => setExpandedSection(expandedSection === 'eligibility' ? null : 'eligibility')}
+            hideDivider={false}
+            trailingAction={
+              <Icon name={expandedSection === 'eligibility' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+            }
+          >
+            <EligibilitySection snapshot={snapshot} />
+          </ActionStrip>
 
-      <Surface tone="raised" padding={3} gap={2}>
-        <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          القسم الحالي
-        </Text>
-        <View style={{ flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
-          {availableSections.map((s) => (
-            <Button
-              key={s}
-              label={SECTION_LABELS[s]}
-              tone={activeSection === s ? 'primary' : 'ghost'}
-              size="sm"
-              fullWidth={false}
-              onPress={() => setActiveSection(s)}
-            />
-          ))}
-        </View>
-      </Surface>
+          {/* 2. ذمة COD */}
+          <ActionStrip
+            icon="wallet-outline"
+            title="ذمة COD"
+            subtitle={`الذمة القائمة: ${snapshot.codLiabilityLabel}`}
+            expanded={expandedSection === 'cod-liability'}
+            onPress={() => setExpandedSection(expandedSection === 'cod-liability' ? null : 'cod-liability')}
+            hideDivider={false}
+            trailingAction={
+              <Icon name={expandedSection === 'cod-liability' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+            }
+          >
+            <CodLiabilitySection snapshot={snapshot} records={allRecords.filter((r) => r.kind === 'captain-cod-liability')} />
+          </ActionStrip>
 
-      {activeSection === 'eligibility' && <EligibilitySection snapshot={snapshot} />}
-      {activeSection === 'cod-liability' && <CodLiabilitySection snapshot={snapshot} records={records} />}
-      {activeSection === 'earnings' && <EarningsSection snapshot={snapshot} records={records} />}
-      {activeSection === 'settlement' && <SettlementSection snapshot={snapshot} />}
-    </MobileScrollView>
+          {/* 3. الأرباح */}
+          <ActionStrip
+            icon="trending-up-outline"
+            title="الأرباح"
+            subtitle={`إجمالي الأرباح: ${snapshot.earningsLabel}`}
+            expanded={expandedSection === 'earnings'}
+            onPress={() => setExpandedSection(expandedSection === 'earnings' ? null : 'earnings')}
+            hideDivider={false}
+            trailingAction={
+              <Icon name={expandedSection === 'earnings' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+            }
+          >
+            <EarningsSection snapshot={snapshot} records={allRecords.filter((r) => r.kind === 'captain-earning')} />
+          </ActionStrip>
+
+          {/* 4. التسوية */}
+          <ActionStrip
+            icon="sync-outline"
+            title="التسوية"
+            subtitle={`دورة التسوية الحالية: ${snapshot.cycleLabel} · المبلغ: ${snapshot.settlementLabel}`}
+            expanded={expandedSection === 'settlement'}
+            onPress={() => setExpandedSection(expandedSection === 'settlement' ? null : 'settlement')}
+            hideDivider={true}
+            trailingAction={
+              <Icon name={expandedSection === 'settlement' ? 'chevron-up' : 'chevron-down'} tone="muted" size={18} />
+            }
+          >
+            <SettlementSection snapshot={snapshot} />
+          </ActionStrip>
+        </Box>
+      </MobileScrollView>
+    </View>
   );
 }
 

@@ -15,11 +15,14 @@ import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.con
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
-// Delivery mode boundary: dispatch applies to bthwani_delivery only.
-// partner_delivery and pickup orders do not enter the captain dispatch queue.
-// Reference: dsh/frontend/shared/dsh-delivery-mode.model.ts → requiresDispatch
-import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
 import { getDshLifecycleStateMetadata } from '../../shared/dsh-order-journey.model';
+// SSoT: dispatch queue visibility is owned by dsh-fulfillment-surface-visibility.
+// Do not duplicate delivery-mode dispatch logic inline — use these helpers.
+import {
+  shouldEnterDispatchQueueForMode,
+  shouldShowCaptainAssignmentInCP,
+  getSurfaceRoleSummaryForMode,
+} from '../../shared/dsh-fulfillment-surface-visibility';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
 
@@ -30,8 +33,11 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-// Resolved once at module level — no runtime cost.
-const BTHWANI_DELIVERY_META = getDshDeliveryModeDefinition('bthwani_delivery');
+// SSoT: resolved once at module level — bthwani_delivery is the only mode
+// that enters the captain dispatch queue.
+const DISPATCH_QUEUE_APPLIES_TO_BTHWANI = shouldEnterDispatchQueueForMode('bthwani_delivery');
+const SHOW_CAPTAIN_ASSIGNMENT_IN_CP = shouldShowCaptainAssignmentInCP('bthwani_delivery');
+const DISPATCH_SCOPE_LABEL = getSurfaceRoleSummaryForMode('control-panel', 'bthwani_delivery');
 
 const alternativesMap: Record<string, Array<{ name: string; distance: string; status: string }>> = {
   'DA-2001': [
@@ -221,12 +227,14 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
 
   return (
     <Box gap={3}>
-      {/* Delivery mode scope boundary — explicit, not implied */}
-      <Box paddingX={3} paddingY={1}>
-        <Text role="bodySm" tone="muted">
-          {`نطاق الإسناد: ${BTHWANI_DELIVERY_META.label} — توصيل المتجر والاستلام الذاتي لا يحتاجان تعيين كابتن.`}
-        </Text>
-      </Box>
+      {/* SSoT: dispatch queue scope — derived from dsh-fulfillment-surface-visibility */}
+      {DISPATCH_QUEUE_APPLIES_TO_BTHWANI && SHOW_CAPTAIN_ASSIGNMENT_IN_CP && (
+        <Box paddingX={3} paddingY={1}>
+          <Text role="bodySm" tone="muted">
+            {`نطاق الإسناد: ${DISPATCH_SCOPE_LABEL} — توصيل المتجر والاستلام الذاتي لا يحتاجان تعيين كابتن.`}
+          </Text>
+        </Box>
+      )}
 
       {/* KPI summary strip */}
       <WebControlPanelKpiStrip items={summaryKpi} />

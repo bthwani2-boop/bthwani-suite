@@ -11,6 +11,9 @@ import {
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
+// SSoT: rescue triggers are derived from the lifecycle handoffs table.
+// The control-panel sees rescue_required observations from partner_rejected and delivery_failed handoffs.
+import { getHandoffsForSurface } from '../../shared/dsh-order-lifecycle-handoffs';
 
 export type OrderRescueScreenProps = {
   hubHref: string;
@@ -65,6 +68,12 @@ const WLT_FIELD_LABELS: Record<string, string> = {
 function resolveLabel(map: Record<string, string>, key: string): string {
   return map[key] ?? key;
 }
+
+// SSoT: handoffs that require rescue action from control-panel (rescue_required state).
+// Derived from dsh-order-lifecycle-handoffs — do not hardcode rescue triggers inline.
+const CP_RESCUE_REQUIRED_HANDOFFS = getHandoffsForSurface('control-panel').filter((h) =>
+  h.surfaceObservations.some((o) => o.surfaceId === 'control-panel' && o.uiStateHint === 'rescue_required'),
+);
 
 /** Count how many of the 3 decision steps are "filled" */
 function getCompletedSteps(item: RescueCase): number {
@@ -582,6 +591,20 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
       </div>
 
       <WebControlPanelKpiStrip items={kpis} />
+
+      {/* SSoT: rescue triggers from lifecycle handoffs (partner_rejected + delivery_failed) */}
+      {CP_RESCUE_REQUIRED_HANDOFFS.length > 0 && (
+        <div className={styles.surfaceCompactPanel} style={{ padding: '10px 16px', direction: 'rtl', textAlign: 'right' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--bthwani-control-panel-text-muted)', marginBottom: '6px' }}>
+            محفزات الإنقاذ من lifecycle SSoT
+          </div>
+          {CP_RESCUE_REQUIRED_HANDOFFS.map((h) => (
+            <div key={h.handoffId} style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)', marginBottom: '2px' }}>
+              {`${h.handoffId} — ${h.description}`}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Playbook hint — only when nothing is open */}
       {playbook && !openRescueId && (

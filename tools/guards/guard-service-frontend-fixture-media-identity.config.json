@@ -407,7 +407,11 @@
     "wlt/frontend/app-field/dsh",
     "wlt/frontend/app-partner/dsh",
     "wlt/frontend/control-panel/dsh",
-    "wlt/frontend/control-panel/finance"
+    "wlt/frontend/control-panel/finance",
+    "dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx",
+    "dsh/frontend/app-client/parts/OperationScreen.tsx",
+    "dsh/frontend/app-client/screens/BenefitsScreen.tsx",
+    "dsh/frontend/app-client/screens/CartScreen.tsx"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",
