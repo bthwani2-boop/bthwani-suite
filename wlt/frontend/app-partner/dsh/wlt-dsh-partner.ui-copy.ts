@@ -38,6 +38,6 @@ export function getWltDshPartnerOperationalModeCommission(modeId: WltDshPartnerO
 }
 
 export function getWltDshPartnerCommissionLabel(commission: string): string {
-  if (commission === 'PREVIEW') return 'عمولة — WLT';
+  if (commission === 'PREVIEW') return 'عمولة قيد التحديد';
   return `عمولة ${commission}`;
 }

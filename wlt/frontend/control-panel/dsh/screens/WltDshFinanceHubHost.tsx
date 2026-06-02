@@ -17,12 +17,6 @@ import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { LedgerScreen } from './LedgerScreen';
 import { AuditCloseScreen } from './AuditCloseScreen';
 import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
-import {
-  ControlPanelDshCodReconciliationScreen,
-  ControlPanelDshSettlementScreen,
-  ControlPanelDshRefundQueueScreen,
-  ControlPanelDshRiskAuditScreen,
-} from './FinanceHubScreens';
 import { WltDshAccountStatement } from '../components/WltDshAccountStatement';
 import { WltDshRefundLedger } from '../components/WltDshRefundLedger';
 import { WltDshSettlementCalendar } from '../components/WltDshSettlementCalendar';
@@ -257,7 +251,7 @@ export function WltDshFinanceHubHost({
           return <WltDshWalletControlCenter />;
         }
         if (activeSub === 'payments') {
-          return <ControlPanelDshCodReconciliationScreen subGroup={activeSub} />;
+          return <WltDshWalletControlCenter />;
         }
         return <WltDshAccountStatement />;
 
@@ -277,20 +271,17 @@ export function WltDshFinanceHubHost({
         if (activeSub === 'bank-transfers') {
           return <WltDshSettlementCalendar />;
         }
-        return <ControlPanelDshSettlementScreen subGroup={activeSub} />;
+        return <WltDshSettlementCalendar />;
 
       case 'refunds-disputes-holds':
-        if (activeSub === 'cancellations') {
-          return <ControlPanelDshRefundQueueScreen subGroup={activeSub} />;
-        }
         return <WltDshRefundLedger />;
 
       case 'commissions-fees-promo':
-        return <ControlPanelDshSettlementScreen subGroup={activeSub} />;
+        return <WltDshFieldCommissionStatement />;
 
       case 'reconciliation-risk':
         if (activeSub === 'risk-fraud') {
-          return <ControlPanelDshRiskAuditScreen subGroup={activeSub} />;
+          return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} />;
         }
         return <DailyReconciliationWorkbench />;
 
@@ -421,12 +412,12 @@ export function WltDshFinanceHubHost({
             <div className={wltStyles.headerTextRow}>
               <h1 className={styles.surfaceHeaderTitle}>غرفة القيادة المالية</h1>
               <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--bth-brand-primary)' }}>
+                <span className={wltStyles.headerBadgeLabel}>
                   معاينة تشغيلية
                 </span>
               </Box>
             </div>
-            <p className={wltStyles.readinessDesc} style={{ margin: 0 }}>
+            <p className={wltStyles.readinessDesc}>
               العملة: <strong>ر.ي (ريال يمني)</strong> · نظام الرقابة المركزي
             </p>
           </Box>
@@ -447,7 +438,7 @@ export function WltDshFinanceHubHost({
         <div className={wltStyles.signalStrip}>
           <div className={`${wltStyles.signalCard} ${wltStyles.signalCardInfo}`}>
             <span className={wltStyles.signalLabel}>صافي المركز المالي</span>
-            <span className={wltStyles.signalValue} style={{ color: center.netPosition >= 0 ? 'var(--bth-success-text)' : 'var(--bth-danger-text)' }}>
+            <span className={`${wltStyles.signalValue} ${center.netPosition >= 0 ? wltStyles.signalValuePositive : wltStyles.signalValueNegative}`}>
               {center.netPositionLabel}
             </span>
           </div>
@@ -459,13 +450,13 @@ export function WltDshFinanceHubHost({
           </div>
           <div className={`${wltStyles.signalCard} ${center.blockingVariances.length > 0 ? wltStyles.signalCardDanger : wltStyles.signalCardSuccess}`}>
             <span className={wltStyles.signalLabel}>فوارق مطابقة</span>
-            <span className={wltStyles.signalValue} style={{ color: center.blockingVariances.length > 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' }}>
+            <span className={`${wltStyles.signalValue} ${center.blockingVariances.length > 0 ? wltStyles.signalValueDanger : wltStyles.signalValuePositive}`}>
               {center.blockingVariances.length.toLocaleString('ar-YE')} فوارق
             </span>
           </div>
           <div className={`${wltStyles.signalCard} ${openRisksCount > 0 ? wltStyles.signalCardDanger : wltStyles.signalCardSuccess}`}>
             <span className={wltStyles.signalLabel}>مخاطر مفتوحة</span>
-            <span className={wltStyles.signalValue} style={{ color: openRisksCount > 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' }}>
+            <span className={`${wltStyles.signalValue} ${openRisksCount > 0 ? wltStyles.signalValueDanger : wltStyles.signalValuePositive}`}>
               {openRisksCount.toLocaleString('ar-YE')} مخاطر
             </span>
           </div>
@@ -526,21 +517,21 @@ export function WltDshFinanceHubHost({
             <div className={wltStyles.readinessColumns}>
               <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>⚠️ <strong>الخطر المالي:</strong></span>
-                <span className={wltStyles.readinessVal} style={{ fontWeight: 700, color: center.blockingVariances.length > 0 ? 'var(--bth-danger-text)' : 'var(--bth-control-panel-text)' }}>
+                <span className={`${wltStyles.readinessVal} ${wltStyles.readinessValBold} ${center.blockingVariances.length > 0 ? wltStyles.readinessValDanger : ''}`}>
                   {operationalRisk}
                 </span>
               </div>
               <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>👥 <strong>الجهة المتأثرة:</strong></span>
-                <span className={wltStyles.readinessVal} style={{ fontWeight: 700 }}>{affectedSurfaces}</span>
+                <span className={`${wltStyles.readinessVal} ${wltStyles.readinessValBold}`}>{affectedSurfaces}</span>
               </div>
               <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>⚙️ <strong>الإجراء المطلوب:</strong></span>
-                <span className={wltStyles.readinessVal} style={{ fontWeight: 700, color: 'var(--bth-brand-primary)' }}>{requiredAction}</span>
+                <span className={`${wltStyles.readinessVal} ${wltStyles.readinessValBold} ${wltStyles.readinessValBrand}`}>{requiredAction}</span>
               </div>
               <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>🔒 <strong>حظر الصرف/التسوية:</strong></span>
-                <span className={wltStyles.readinessVal} style={{ fontWeight: 700 }}>{holdsStatus}</span>
+                <span className={`${wltStyles.readinessVal} ${wltStyles.readinessValBold}`}>{holdsStatus}</span>
               </div>
             </div>
           </div>

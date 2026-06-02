@@ -176,7 +176,7 @@ function FinancialStreamCard({
     { label: 'المصدر', value: item.sourceOrderLabel ?? item.settlementCycleLabel ?? '—' },
     { label: 'أثر التسوية', value: item.includedInNetSettlementLabel ?? '—' },
     ...(item.sourceTruthLabel
-      ? [{ label: 'مصدر الحقيقة', value: `${item.sourceTruthLabel} / ${item.runtimeBindingLabel ?? 'runtime غير مربوط'}` }]
+      ? [{ label: 'مصدر الحقيقة', value: `${item.sourceTruthLabel} / ${item.runtimeBindingLabel ?? 'غير مربوط بعد'}` }]
       : []),
     { label: 'السياسة', value: item.policyLabel ?? '—' },
     ...(item.isStoreCourierCompensation

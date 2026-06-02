@@ -84,56 +84,57 @@ function buildFieldWalletRows(): WalletSummaryRow[] {
   }));
 }
 
+function resolveStatusClass(status: WalletSummaryRow['status']): string {
+  if (status === 'blocked') return wltStyles.walletRowStatusBlocked;
+  if (status === 'needs_action') return wltStyles.walletRowStatusAction;
+  return wltStyles.walletRowStatusReady;
+}
+
+function resolveCardClass(status: WalletSummaryRow['status']): string {
+  if (status === 'blocked') return wltStyles.walletCardBlocked;
+  if (status === 'needs_action') return wltStyles.walletCardAction;
+  return wltStyles.walletCardReady;
+}
+
 function WalletRowCard({ row, onSelect }: { row: WalletSummaryRow; onSelect: (row: WalletSummaryRow) => void }) {
-  const statusColor =
-    row.status === 'blocked' ? 'var(--bth-danger-text)' :
-    row.status === 'needs_action' ? 'var(--bth-warning-text)' :
-    'var(--bth-success-text)';
-
-  const borderColor =
-    row.status === 'blocked' ? 'var(--bth-danger-text)' :
-    row.status === 'needs_action' ? 'var(--bth-warning-text)' :
-    'var(--bth-control-panel-border)';
-
   return (
     <div
       onClick={() => onSelect(row)}
-      className={wltStyles.accordionCard}
-      style={{ borderRight: `4px solid ${borderColor}`, cursor: 'pointer' }}
+      className={`${wltStyles.accordionCard} ${resolveCardClass(row.status)}`}
     >
-      <div className={wltStyles.accordionCardHeader} style={{ padding: '12px 16px' }}>
+      <div className={wltStyles.accordionCardHeader}>
         <div className={wltStyles.infoGroupRight}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--bth-control-panel-text)' }}>
+          <div className={wltStyles.walletRowCardInfo}>
+            <span className={wltStyles.walletRowCardTitle}>
               {row.actorLabel}
             </span>
-            <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>
+            <span className={wltStyles.walletRowCardSubtitle}>
               {row.actorType} · {row.actorId}
             </span>
           </div>
         </div>
         <div className={wltStyles.infoGroupLeft}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
-            <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--bth-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>
+          <div className={wltStyles.walletRowAmountGroup}>
+            <span className={wltStyles.walletRowAmount}>
               {row.availableLabel}
             </span>
-            <span style={{ fontSize: 10, color: statusColor, fontWeight: 700 }}>
+            <span className={`${wltStyles.walletRowStatus} ${resolveStatusClass(row.status)}`}>
               {row.statusLabel}
             </span>
             {row.nextAction && (
-              <span style={{ fontSize: 10, color: 'var(--bth-brand-primary)', fontWeight: 600 }}>
+              <span className={wltStyles.walletRowNextAction}>
                 {row.nextAction} ←
               </span>
             )}
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 16, padding: '6px 16px 10px', direction: 'rtl' }}>
-        <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>
-          معلق: <strong style={{ color: 'var(--bth-warning-text)' }}>{row.pendingLabel}</strong>
+      <div className={wltStyles.walletRowMeta}>
+        <span className={wltStyles.walletRowMetaLabel}>
+          معلق: <strong className={wltStyles.walletRowMetaPending}>{row.pendingLabel}</strong>
         </span>
-        <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>
-          محجوز: <strong style={{ color: 'var(--bth-danger-text)' }}>{row.heldLabel}</strong>
+        <span className={wltStyles.walletRowMetaLabel}>
+          محجوز: <strong className={wltStyles.walletRowMetaHeld}>{row.heldLabel}</strong>
         </span>
       </div>
     </div>
@@ -171,21 +172,21 @@ export function WltDshWalletControlCenter() {
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div className={wltStyles.walletCenterHeader}>
           <div>
             <Text role="titleMd" style={{ fontWeight: 800 }}>مركز تحكم المحافظ</Text>
             <Text role="bodySm" tone="soft" style={{ marginTop: 4 }}>
               نظرة موحدة على جميع محافظ العملاء والشركاء والكباتن والميدانيين
             </Text>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className={wltStyles.walletCenterBadges}>
             {blockedCount > 0 && (
-              <span style={{ fontSize: 11, background: 'var(--bth-danger-surface)', color: 'var(--bth-danger-text)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+              <span className={wltStyles.walletBadgeBlocked}>
                 {blockedCount} محجوب
               </span>
             )}
             {needsActionCount > 0 && (
-              <span style={{ fontSize: 11, background: 'var(--bth-warning-surface)', color: 'var(--bth-warning-text)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+              <span className={wltStyles.walletBadgeNeedsAction}>
                 {needsActionCount} يحتاج إجراء
               </span>
             )}
@@ -193,29 +194,20 @@ export function WltDshWalletControlCenter() {
         </div>
       </Box>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div className={wltStyles.walletFilterBar}>
         {filterLabels.map((f) => (
           <button
             key={f.id}
             type="button"
             onClick={() => setActiveFilter(f.id)}
-            style={{
-              padding: '5px 12px',
-              borderRadius: 6,
-              border: '1px solid var(--bth-control-panel-border)',
-              background: activeFilter === f.id ? 'var(--bth-brand-primary)' : 'var(--bth-control-panel-surface)',
-              color: activeFilter === f.id ? 'var(--bth-text-inverse)' : 'var(--bth-control-panel-text)',
-              fontWeight: 700,
-              fontSize: 12,
-              cursor: 'pointer',
-            }}
+            className={`${wltStyles.walletFilterBtn} ${activeFilter === f.id ? wltStyles.walletFilterBtnActive : ''}`}
           >
             {f.label}
           </button>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: selectedRow ? '1fr 300px' : '1fr', gap: 16, alignItems: 'start' }}>
+      <div className={selectedRow ? `${wltStyles.walletGrid} ${wltStyles.walletGridWithDetail}` : wltStyles.walletGrid}>
         <Box gap={2}>
           {filteredRows.length === 0 ? (
             <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line">
@@ -236,20 +228,20 @@ export function WltDshWalletControlCenter() {
 
         {selectedRow && (
           <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={3}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--bth-control-panel-text)' }}>
+            <div className={wltStyles.walletDetailHeader}>
+              <span className={wltStyles.walletDetailTitle}>
                 تفاصيل المحفظة
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedRow(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: 'var(--bth-control-panel-text-muted)' }}
+                className={wltStyles.walletDetailCloseBtn}
               >
                 ✕
               </button>
             </div>
-            <hr style={{ border: 'none', borderTop: '1px solid var(--bth-control-panel-border)', margin: 0 }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <hr className={wltStyles.walletDetailSeparator} />
+            <div className={wltStyles.walletDetailPanel}>
               {[
                 { label: 'الطرف', value: `${selectedRow.actorLabel} (${selectedRow.actorType})` },
                 { label: 'المعرّف', value: selectedRow.actorId },
@@ -259,9 +251,9 @@ export function WltDshWalletControlCenter() {
                 { label: 'الحالة', value: selectedRow.statusLabel },
                 ...(selectedRow.nextAction ? [{ label: 'الإجراء التالي', value: selectedRow.nextAction }] : []),
               ].map(({ label, value }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                  <span style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', flexShrink: 0 }}>{label}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--bth-control-panel-text)', textAlign: 'left' }}>{value}</span>
+                <div key={label} className={wltStyles.walletDetailRow}>
+                  <span className={wltStyles.walletDetailKey}>{label}</span>
+                  <span className={wltStyles.walletDetailVal}>{value}</span>
                 </div>
               ))}
             </div>

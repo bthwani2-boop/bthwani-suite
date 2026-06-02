@@ -10,9 +10,6 @@ export type { CommissionBreakdownWorkspaceProps } from './screens/CommissionBrea
 export { PlatformFeeAuditWorkspace } from './screens/PlatformFeeAuditWorkspace';
 export type { PlatformFeeAuditWorkspaceProps } from './screens/PlatformFeeAuditWorkspace';
 
-// legacy aliases only
-export { ControlPanelDshCodReconciliationScreen, ControlPanelDshSettlementScreen } from './screens/FinanceHubScreens';
-
 // components
 export { WltBoundaryBanner } from './components/WltBoundaryBanner';
 export { WltDshAccountStatement } from './components/WltDshAccountStatement';

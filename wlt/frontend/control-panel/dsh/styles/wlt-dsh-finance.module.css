@@ -137,42 +137,6 @@
   align-items: flex-end;
 }
 
-/* Technical Audit Toggle */
-.technicalToggleContainer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-direction: row-reverse;
-  background: var(--bth-control-panel-border);
-  padding: 4px 10px;
-  border-radius: 8px;
-}
-
-.technicalToggleLabel {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--bth-control-panel-text-muted);
-}
-
-.technicalToggleButton {
-  border: none;
-  width: 36px;
-  height: 20px;
-  border-radius: 10px;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.25s;
-}
-
-.technicalToggleKnob {
-  background: var(--bth-text-inverse);
-  width: 16px;
-  height: 16px;
-  border-radius: 8px;
-  position: absolute;
-  top: 2px;
-  transition: left 0.25s;
-}
 
 /* Governance Banner */
 .govBannerWrap {
@@ -367,6 +331,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.signalValuePositive { color: var(--bth-success-text); }
+.signalValueNegative { color: var(--bth-danger-text); }
+.signalValueDanger { color: var(--bth-danger-text); }
+
 /* Operational Readiness Panel */
 .readinessPanel {
   background: var(--bth-control-panel-surface-raised);
@@ -415,53 +383,6 @@
   color: var(--bth-control-panel-text-muted);
 }
 
-/* Technical Audit Context Drawer */
-.techDrawer {
-  background: var(--bth-control-panel-surface-raised);
-  border: 1px solid var(--bth-control-panel-border);
-  border-radius: 10px;
-  padding: 16px;
-  direction: rtl;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.techDrawerHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--bth-control-panel-border);
-  padding-bottom: 8px;
-}
-
-.techGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.techItem {
-  background: var(--bth-control-panel-surface);
-  border: 1px solid var(--bth-control-panel-border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.techLabel {
-  font-size: 10px;
-  color: var(--bth-control-panel-text-muted);
-}
-
-.techValue {
-  font-size: 11px;
-  font-family: monospace;
-  color: var(--bth-control-panel-text);
-}
 
 /* State Screens (empty, error, offline, disabled, blocked) */
 .stateScreen {
@@ -617,10 +538,225 @@
   font-size: 12px;
 }
 
+.readinessValBold { font-weight: 700; }
+.readinessValDanger { color: var(--bth-danger-text); }
+.readinessValBrand { color: var(--bth-brand-primary); }
+
 .hubHeader h1 {
   font-size: 16px;
   font-weight: 800;
   margin: 0;
+}
+
+.headerBadgeLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bth-brand-primary);
+}
+
+/* Wallet Control Center */
+.walletCenterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.walletCenterBadges {
+  display: flex;
+  gap: 8px;
+}
+
+.walletBadgeBlocked {
+  font-size: 11px;
+  background: var(--bth-danger-surface);
+  color: var(--bth-danger-text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.walletBadgeNeedsAction {
+  font-size: 11px;
+  background: var(--bth-warning-surface);
+  color: var(--bth-warning-text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.walletFilterBar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.walletFilterBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--bth-control-panel-border);
+  background: var(--bth-control-panel-surface);
+  color: var(--bth-control-panel-text);
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.walletFilterBtnActive {
+  background: var(--bth-brand-primary);
+  color: var(--bth-text-inverse);
+  border-color: var(--bth-brand-primary);
+}
+
+.walletGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.walletGridWithDetail {
+  grid-template-columns: 1fr 300px;
+}
+
+@media (max-width: 900px) {
+  .walletGridWithDetail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.walletRowCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+}
+
+.walletRowCardSubtitle {
+  font-size: 10px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.walletRowAmount {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--bth-control-panel-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.walletRowStatus {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.walletRowStatusBlocked { color: var(--bth-danger-text); }
+.walletRowStatusAction { color: var(--bth-warning-text); }
+.walletRowStatusReady { color: var(--bth-success-text); }
+
+.walletRowNextAction {
+  font-size: 10px;
+  color: var(--bth-brand-primary);
+  font-weight: 600;
+}
+
+.walletRowMeta {
+  display: flex;
+  gap: 16px;
+  padding: 6px 16px 10px;
+  direction: rtl;
+}
+
+.walletRowMetaLabel {
+  font-size: 10px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.walletRowMetaPending {
+  color: var(--bth-warning-text);
+}
+
+.walletRowMetaHeld {
+  color: var(--bth-danger-text);
+}
+
+.walletDetailPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.walletDetailRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.walletDetailKey {
+  font-size: 11px;
+  color: var(--bth-control-panel-text-muted);
+  flex-shrink: 0;
+}
+
+.walletDetailVal {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bth-control-panel-text);
+  text-align: left;
+}
+
+.walletDetailCloseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--bth-control-panel-text-muted);
+}
+
+.walletDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.walletDetailTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--bth-control-panel-text);
+}
+
+.walletDetailSeparator {
+  border: none;
+  border-top: 1px solid var(--bth-control-panel-border);
+  margin: 0;
+}
+
+.walletCardBlocked {
+  border-right: 4px solid var(--bth-danger-text) !important;
+  cursor: pointer;
+}
+
+.walletCardAction {
+  border-right: 4px solid var(--bth-warning-text) !important;
+  cursor: pointer;
+}
+
+.walletCardReady {
+  border-right: 4px solid var(--bth-control-panel-border) !important;
+  cursor: pointer;
+}
+
+.walletRowCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.walletRowAmountGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
 }
 
 /* Store Settlement Switcher */
