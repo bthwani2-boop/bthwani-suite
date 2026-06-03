@@ -2,13 +2,13 @@
 
 #Slice: DSH-SLICE-001
 Domain: dsh/client-discovery-and-visibility
-Historical Status: L7_CLOSED for app-client discovery edge only.
+Historical Status: app-client / GET /stores edge proof only; not full cross-surface Slice 001 closure.
 Current Cross-Surface Decision: DSH-SLICE-001 UI_UX_VISUAL_LOCKED.
 
 > [!IMPORTANT]
 > **DSH-SLICE-001 UI_UX_VISUAL_LOCKED**
 > - DSH-SLICE-001 UI/UX + Visual evidence is locked.
-> - Runtime/API/L7 closure is deferred until API binding and E2E runtime proof are approved and proven.
+> - Runtime/API/L7 closure remains deferred until API binding and E2E cross-surface runtime proof are approved and proven.
 > - Required runtime chain remains:
 >   partner readiness → catalog approval → marketing visibility → shared visibility/serviceability model → app-client discovery result.
 
@@ -19,10 +19,10 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 
 | Surface/System | Classification | Role in Slice 001 | Required Proof | Current Proof Status | Missing Proof | Owner | Decision |
 |---|---|---|---|---|---|---|---|
-| `app-client` | primary | Owns the visible discovery journey anchor | Visual & Runtime proof | `PASS` (DSH-RUN-P014-01) | none | client | `PASS` |
-| `app-partner` | dependency | Partner inventory/catalog readiness | Visual & Publishing-gate proof | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | Publishing-gate runtime proof (visual captured; runtime deferred) | partner | `DEFERRED_WITH_REASON` |
-| `control-panel` (catalog governance) | dependency | Catalog approval & visibility governance | Catalog governance visual/runtime proof | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | Runtime proof only (visual captured; runtime deferred) | operations | `DEFERRED_WITH_REASON` |
-| `control-panel` (marketing visibility) | dependency | Marketing publish controls & visibility | Marketing visibility visual/runtime proof | `VR-L2-012 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | Runtime proof only (visual captured; runtime deferred) | operations | `DEFERRED_WITH_REASON` |
+| `app-client` | primary | Owns the visible discovery journey anchor | Visual & Runtime proof | app-client / GET /stores edge proof only; not full cross-surface Slice 001 closure | none | client | `PASS` |
+| `app-partner` | dependency | Partner inventory/catalog readiness | Visual & Publishing-gate proof | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | visual captured / VISUAL_PASS; runtime proof deferred | partner | `DEFERRED_WITH_REASON` |
+| `control-panel` (catalog governance) | dependency | Catalog approval & visibility governance | Catalog governance visual/runtime proof | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | visual captured / VISUAL_PASS; runtime proof deferred | operations | `DEFERRED_WITH_REASON` |
+| `control-panel` (marketing visibility) | dependency | Marketing publish controls & visibility | Marketing visibility visual/runtime proof | `VR-L2-012 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | visual captured / VISUAL_PASS; runtime proof deferred | operations | `DEFERRED_WITH_REASON` |
 | shared DSH visibility/serviceability model | dependency | Direct shared logic for store exposure | Source & Runtime proof | `PASS` (bridge) | E2E Cross-surface runtime logic | domain | `DEFERRED_WITH_REASON` |
 
 ## 2. Operation Chain Matrix
@@ -38,12 +38,12 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 
 | Surface | Screen | Route | CTA | Target | Required States | Current Evidence | Missing Evidence | Decision |
 |---|---|---|---|---|---|---|---|---|
-| `app-client` | `HomeScreen.tsx` | `dsh-home` | Open store | `dsh-store` | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-001` | none | `PASS` |
-| `app-client` | `HomeScreen.tsx` | `dsh-home:inline-search` | Search inline | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-023` | none | `PASS` |
-| `app-client` | `StoreScreen.tsx` | `dsh-store` | View store details | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-005` | none | `PASS` |
-| `app-partner` | `InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | Update readiness and publishing visibility | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | Runtime proof only (visual captured; publishing-gate runtime deferred) | `DEFERRED_WITH_REASON` |
-| `control-panel` | `catalogs.screen.tsx` | `/catalogs?tab=approvals&subTab=quality` + `/catalogs?tab=approvals&subTab=pricing` | Approve catalog quality / pricing | same page | `success`, `error`, `loading` | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03)` | Runtime proof only (visual captured) | `DEFERRED_WITH_REASON` |
-| `control-panel` | `VisibilityCommandDeckScreen.tsx` | `/marketing?workspace=visibility` | Set marketing visibility gates | same page | `success`, `error`, `loading` | `VR-L2-012 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | Runtime proof only (visual captured) | `DEFERRED_WITH_REASON` |
+| `app-client` | `HomeScreen.tsx` | `dsh-home` | Open store | `dsh-store` | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-001` | visual captured / VISUAL_PASS; runtime proof deferred | `PASS` |
+| `app-client` | `HomeScreen.tsx` | `dsh-home:inline-search` | Search inline | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-023` | visual captured / VISUAL_PASS; runtime proof deferred | `PASS` |
+| `app-client` | `StoreScreen.tsx` | `dsh-store` | View store details | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-005` | visual captured / VISUAL_PASS; runtime proof deferred | `PASS` |
+| `app-partner` | `InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | Update readiness and publishing visibility | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | visual captured / VISUAL_PASS; runtime proof deferred | `DEFERRED_WITH_REASON` |
+| `control-panel` | `catalogs.screen.tsx` | `/catalogs?tab=approvals&subTab=quality` + `/catalogs?tab=approvals&subTab=pricing` | Approve catalog quality / pricing | same page | `success`, `error`, `loading` | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03)` | visual captured / VISUAL_PASS; runtime proof deferred | `DEFERRED_WITH_REASON` |
+| `control-panel` | `VisibilityCommandDeckScreen.tsx` | `/marketing?workspace=visibility` | Set marketing visibility gates | same page | `success`, `error`, `loading` | `VR-L2-012 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | visual captured / VISUAL_PASS; runtime proof deferred | `DEFERRED_WITH_REASON` |
 
 ## 4. Data Ownership Matrix
 

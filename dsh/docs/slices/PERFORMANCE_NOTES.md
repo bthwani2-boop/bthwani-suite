@@ -1,6 +1,6 @@
 # Performance Notes: DSH-SLICE-001 Phase 2.5 (Mandatory Gate)
 
-This document serves as the formal evidence for resolving the performance and render-tree issues across `HomeScreen` and `StoreScreen` during the final L7_CLOSED phase.
+This document serves as the formal evidence for resolving the performance and render-tree issues across `HomeScreen` and `StoreScreen` during the UI_UX_VISUAL_LOCKED and scoped app-client GET /stores edge proof phase.
 
 ## 1. Issue Addressed
 The previous architecture exhibited sluggish performance and unwarranted re-renders in the discovery and store surfaces (`HomeScreenContent.tsx`, `StoreScreenContent.tsx`). The primary causes were:
@@ -34,4 +34,4 @@ The previous architecture exhibited sluggish performance and unwarranted re-rend
 ## 3. Status
 - The thin-screen architecture of `HomeScreen.tsx` and `StoreScreen.tsx` has been strictly maintained.
 - Zero bloat was added to the entry screens, keeping all changes localized to `parts/`, `DshClientSurface.tsx`, and `hooks/`.
-- All Phase 2.5 conditions have been satisfied. The `DSH-SLICE-001` is now functionally verified and holds strong for the final `L7_CLOSED` execution.
+- All Phase 2.5 conditions have been satisfied. The `DSH-SLICE-001` is now functionally verified for the UI_UX_VISUAL_LOCKED status; runtime/API/L7 closure remains deferred until E2E cross-surface runtime proof is approved and proven.

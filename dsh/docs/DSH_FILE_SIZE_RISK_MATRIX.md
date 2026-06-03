@@ -1,15 +1,18 @@
 # DSH File Size and Complexity Risk Matrix
 
-Status: L7_CLOSED | POST_L7_FRONTEND_HARDENING_PASS
-Decision: L7_CLOSED
+Status: DSH-SLICE-001 UI_UX_VISUAL_LOCKED | POST_L7_FRONTEND_HARDENING_PASS
+Decision: DSH-SLICE-001 UI_UX_VISUAL_LOCKED
 
-> **[CURRENT TRUTH]** DSH-SLICE-001 is L7_CLOSED. Both `HomeScreen.tsx` and `StoreScreen.tsx` are now Screen Orchestrators (not God Objects). `HomeScreenContent.tsx` and `StoreScreenContent.tsx` have been deleted and have zero references. The sections below under `## DSH-SLICE-001 Safe Decomposition Plan` are **Historical Batch Records** preserved for audit. The live current state is documented in `FINAL_POST_L7_FRONTEND_HARDENING_REALITY_SYNC` and the Post-L7 sections below.
+> **[CURRENT TRUTH]** DSH-SLICE-001 is UI_UX_VISUAL_LOCKED. Both `HomeScreen.tsx` and `StoreScreen.tsx` are now Screen Orchestrators (not God Objects). `HomeScreenContent.tsx` and `StoreScreenContent.tsx` have been deleted and have zero references.
+> Runtime/API/L7 closure remains deferred until API binding and E2E cross-surface runtime proof are approved and proven.
+> Prior app-client / GET /stores L7 evidence does not equal full cross-surface Slice 001 L7 closure.
+> The sections below under `## DSH-SLICE-001 Safe Decomposition Plan` are **Historical Batch Records** preserved for audit. The live current state is documented in `FINAL_POST_L7_FRONTEND_HARDENING_REALITY_SYNC` and the Post-L7 sections below.
 
 ## DSH-SLICE-001 Safe Decomposition Plan
 
-> **[HISTORICAL — Superseded post-L7]** The original planning description below described the pre-decomposition state. As of L7_CLOSED: `HomeScreen.tsx` is 222 lines (Orchestrator), `StoreScreen.tsx` is 44 lines (Orchestrator). Neither is a God Object. This section is preserved as audit history only.
+> **[HISTORICAL — Superseded post-L7]** The original planning description below described the pre-decomposition state. As of UI_UX_VISUAL_LOCKED: `HomeScreen.tsx` is 222 lines (Orchestrator), `StoreScreen.tsx` is 44 lines (Orchestrator). Neither is a God Object. This section is preserved as audit history only.
 
-*Original planning context (historical):* Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) were "God Objects". Before any Typed Client or OpenAPI binding could happen, these screens required structural decomposition following a strict, zero-behavior-change execution plan. **Decomposition is complete as of L7_CLOSED.**
+*Original planning context (historical):* Both `HomeScreen.tsx` (2180 lines) and `StoreScreen.tsx` (2343 lines) were "God Objects". Before any Typed Client or OpenAPI binding could happen, these screens required structural decomposition following a strict, zero-behavior-change execution plan. **Decomposition is complete as of UI_UX_VISUAL_LOCK.**
 
 ### Owner Map
 
