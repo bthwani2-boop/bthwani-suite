@@ -81,13 +81,13 @@ func (handler *StoresHandler) ListStores(writer http.ResponseWriter, request *ht
 }
 
 func (handler *StoresHandler) UpdatePartnerReadiness(writer http.ResponseWriter, request *http.Request) {
-	log.Printf("dsh-api: received PATCH /stores/{id}/partner-readiness request")
+	id := request.PathValue("id")
+	log.Printf("dsh-api: received PATCH %s/partner-readiness request (ID: %s)", request.URL.Path, id)
 	if request.Method != http.MethodPatch {
 		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
 		return
 	}
 
-	id := request.PathValue("id")
 	if id == "" {
 		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store id")
 		return
