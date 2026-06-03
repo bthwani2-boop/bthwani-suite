@@ -20,7 +20,28 @@ export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
 import { PARTNER_STORES_PREVIEW } from '../../data';
 
-const STORES = PARTNER_STORES_PREVIEW;
+const STORES = [
+  ...PARTNER_STORES_PREVIEW,
+  {
+    id: 'store-1001',
+    name: 'Haddah Central Market',
+    branch: 'Sanaa',
+    status: 'مفتوح',
+    deliveryMode: 'bthwani_delivery' as const,
+    prepTime: '15 دقيقة',
+    readyOrders: 2,
+    issue: '',
+    suggestion: {
+      label: 'لا تدخل مطلوب',
+      reason: 'وضع المتجر مستقر',
+      confidence: 'high' as const,
+      action: 'عرض التفاصيل',
+      secondary: null,
+      auditRequired: false,
+    },
+    statusTone: 'success' as const,
+  },
+];
 
 export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: PartnerStoresScreenProps) {
   const router = useRouter();

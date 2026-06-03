@@ -1115,7 +1115,7 @@ function InventoryCatalogContent({
   branchLabel,
   activeZoneLabel: _activeZoneLabel,
   todayHoursLabel: _todayHoursLabel,
-  canonicalStoreId,
+  canonicalStoreId = 'store-1001',
 }: InventoryCatalogContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
@@ -1468,7 +1468,7 @@ function InventoryCatalogContent({
 
 // ── Screen shell ──────────────────────────────────────────────────────
 
-export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScreenProps) {
+export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001', ...props }: InventoryCatalogScreenProps) {
   return (
     <MobileScrollView fill padding={2} gap={2} contentContainerStyle={{ paddingBottom: 120 }}>
       <TopBar
@@ -1495,7 +1495,7 @@ export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScr
           المالك المركزي هو {resolveDshControlPanelSectionLabel('catalogs')}. يعدل الشريك السعر والمخزون والتوفر محليًا فقط، بينما الهوية والباركود والنشر وتعارضات الميديا تُراجع on-demand داخل لوحة التحكم.
         </Text>
       </Surface>
-      <InventoryCatalogContent {...props} />
+      <InventoryCatalogContent canonicalStoreId={canonicalStoreId} {...props} />
     </MobileScrollView>
   );
 }
