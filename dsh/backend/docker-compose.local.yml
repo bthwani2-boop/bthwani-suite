@@ -11,7 +11,8 @@ services:
     volumes:
       - dsh-postgres-data:/var/lib/postgresql/data
       - ./migrations/001_store_discovery.sql:/docker-entrypoint-initdb.d/001_store_discovery.sql:ro
-      - ./seed/002_store_discovery_seed.sql:/docker-entrypoint-initdb.d/002_store_discovery_seed.sql:ro
+      - ./migrations/002_store_visibility_gates.sql:/docker-entrypoint-initdb.d/002_store_visibility_gates.sql:ro
+      - ./seed/003_store_discovery_seed.sql:/docker-entrypoint-initdb.d/003_store_discovery_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dsh_local -d dsh_local"]
       interval: 5s

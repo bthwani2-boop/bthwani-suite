@@ -12,12 +12,18 @@
         "dsh/backend/internal/http/stores_handler.go"
       ],
       "repositoryRequiredMethods": [
-        "ListStores"
+        "ListStores",
+        "UpdatePartnerReadiness",
+        "UpdateCatalogApproval",
+        "UpdateMarketingVisibility"
       ],
       "postgresRequiredPatterns": [
         "pgx",
         "NewPostgresRepository",
-        "ListStores"
+        "ListStores",
+        "UpdatePartnerReadiness",
+        "UpdateCatalogApproval",
+        "UpdateMarketingVisibility"
       ],
       "composePath": "dsh/backend/docker-compose.local.yml",
       "allowedComposeServices": [
@@ -32,10 +38,11 @@
         "kubernetes"
       ],
       "migrationFiles": [
-        "dsh/backend/migrations/001_store_discovery.sql"
+        "dsh/backend/migrations/001_store_discovery.sql",
+        "dsh/backend/migrations/002_store_visibility_gates.sql"
       ],
       "seedFiles": [
-        "dsh/backend/seed/002_store_discovery_seed.sql"
+        "dsh/backend/seed/003_store_discovery_seed.sql"
       ],
       "allowedTables": [
         "dsh_store_discovery_stores"
@@ -51,14 +58,22 @@
         "status_label",
         "status_tone",
         "has_offer",
-        "publish_stage"
+        "publish_stage",
+        "partner_readiness_status",
+        "catalog_quality_status",
+        "catalog_pricing_status",
+        "marketing_visibility_status",
+        "visibility_updated_at"
       ],
       "slices": {
         "DSH-SLICE-001": {
           "docPath": "dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md",
           "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
-            "/stores"
+            "/stores",
+            "/stores/{id}/partner-readiness",
+            "/stores/{id}/catalog-approval",
+            "/stores/{id}/marketing-visibility"
           ],
           "evidenceFolderPrefix": "DSH_SLICE_001_L7_RUNTIME-",
           "requiredEvidenceFiles": [
