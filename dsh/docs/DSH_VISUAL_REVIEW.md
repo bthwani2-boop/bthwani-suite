@@ -19,11 +19,11 @@ Active docs-side queue and capture ledger for DSH visual evidence. No screenshot
 
 ## Summary Snapshot
 
-- `queue_total`: `34`
+- `queue_total`: `35`
 - `queue_p1_ready_now`: `23`
-- `queue_p2_disabled_preview`: `11`
-- `active_ledger_rows`: `13`
-- `visual_pass_rows`: `13`
+- `queue_p2_disabled_preview`: `12`
+- `active_ledger_rows`: `16`
+- `visual_pass_rows`: `16`
 - `fail_rows`: `0`
 - `blocked_rows`: `0`
 - `deferred_rows`: `0`
@@ -98,6 +98,7 @@ tools/registry/runs/DSH_VISUAL_SWEEP-20260524-010000/screenshots/app-client/P1__
 | `VR-L2-009` | `control-panel` | `ops.dsh.catalog.approvals.pricing` | `dsh/frontend/control-panel/catalogs/catalogs.screen.tsx` | `/catalogs?tab=approvals&subTab=pricing` | `LIST_2_DISABLED_PREVIEW` | `P2` | `needs screenshot (Required for Slice 001)` |
 | `VR-L2-010` | `app-captain` | `captain.wlt.dsh.finance.bridge` | `wlt/frontend/app-captain/dsh/WltDshCaptainBridge.tsx` | `wlt-dsh-captain-finance-bridge` | `LIST_2_DISABLED_PREVIEW` | `P2` | `read-only WLT bridge; visual review allowed, finance semantics blocked` |
 | `VR-L2-011` | `app-partner` | `partner.wlt.dsh.wallet.bridge` | `wlt/frontend/app-partner/dsh/WltDshPartnerBridge.tsx` | `wlt-dsh-partner-wallet-bridge` | `LIST_2_DISABLED_PREVIEW` | `P2` | `read-only WLT bridge; visual review allowed, finance semantics blocked` |
+| `VR-L2-012` | `control-panel` | `ops.dsh.marketing.visibility` | `dsh/frontend/control-panel/marketing/VisibilityCommandDeckScreen.tsx` | `/marketing?workspace=visibility` | `LIST_2_DISABLED_PREVIEW` | `P2` | `needs screenshot (Required for Slice 001 marketing visibility proof)` |
 
 ## Active Ledger
 
@@ -118,6 +119,9 @@ VR-L1-010,app-partner,partner.dsh.order.rejection,dsh/frontend/app-partner/scree
 VR-L1-011,app-partner,partner.dsh.entry.status,dsh/frontend/app-partner/screens/PartnerEntryScreen.tsx,dsh-partner-entry,success,Pixel8,720x1600,ar,rtl,tools/registry/runs/DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602/screenshots/app-partner/P1__app-partner__partner.dsh.orders.inbox__partner_delivery__Pixel8__rtl__VISUAL_PASS.png,observed,not_observed,observed,observed,PASS,"Partner entry and service activation status verified with bthwani_delivery vs partner_delivery options.",2026-06-02T21:35:00+03:00,VISUAL_PASS,none; visual review complete
 VR-L1-012,app-partner,partner.dsh.home.dashboard,dsh/frontend/app-partner/screens/PartnerHubScreen.tsx,dsh-partner-home,success,Pixel8,720x1600,ar,rtl,tools/registry/runs/DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602/screenshots/app-partner/P1__app-partner__partner.dsh.orders.inbox__pickup__Pixel8__rtl__VISUAL_PASS.png,observed,not_observed,observed,observed,PASS,"Partner home hub and operational summaries verified with pickup options.",2026-06-02T21:35:00+03:00,VISUAL_PASS,none; visual review complete
 VR-L2-011,app-partner,partner.wlt.dsh.wallet.bridge,wlt/frontend/app-partner/dsh/WltDshPartnerBridge.tsx,wlt-dsh-partner-wallet-bridge,success,Pixel8,720x1600,ar,rtl,tools/registry/runs/DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602/screenshots/app-partner/P1__app-partner__partner.wlt.dsh.wallet.bridge__wallet_settlement_read_only__Pixel8__rtl__VISUAL_PASS.png,observed,not_observed,observed,observed,PASS,"Wallet and settlement read-only WLT preview bridge verified.",2026-06-02T21:35:00+03:00,VISUAL_PASS,none; visual review complete
+VR-L2-008,control-panel,ops.dsh.catalog.approvals.quality,dsh/frontend/control-panel/catalogs/catalogs.screen.tsx,/catalogs?tab=approvals&subTab=quality,success,web-Chrome149,1440x900,ar,rtl,tools/registry/runs/DSH_SLICE001_REALITY_SYNC-20260603/screenshots/control-panel/P2__control-panel__ops.dsh.catalog.approvals.quality__success__web__rtl__VISUAL_REVIEW.png,observed,not_observed,observed,observed,PASS,"Approvals tab active; جودة subtab highlighted; 5 pending items; approve/edit/reject CTAs; pipeline flow indicator visible; RTL layout confirmed; no error overlay; UI_PREVIEW_ONLY label shown on actions.",2026-06-03T00:00:00+03:00,VISUAL_PASS,none; visual review complete
+VR-L2-009,control-panel,ops.dsh.catalog.approvals.pricing,dsh/frontend/control-panel/catalogs/catalogs.screen.tsx,/catalogs?tab=approvals&subTab=pricing,success,web-Chrome149,1440x900,ar,rtl,tools/registry/runs/DSH_SLICE001_REALITY_SYNC-20260603/screenshots/control-panel/P2__control-panel__ops.dsh.catalog.approvals.pricing__success__web__rtl__VISUAL_REVIEW.png,observed,not_observed,observed,observed,PASS,"Approvals tab active; تعارض أسعار subtab highlighted; 2 pending pricing conflict items (partner 32 SAR vs reference 18 SAR); approve/edit/reject CTAs; RTL layout confirmed; no error overlay.",2026-06-03T00:00:00+03:00,VISUAL_PASS,none; visual review complete
+VR-L2-012,control-panel,ops.dsh.marketing.visibility,dsh/frontend/control-panel/marketing/VisibilityCommandDeckScreen.tsx,/marketing?workspace=visibility,success,web-Chrome149,1440x900,ar,rtl,tools/registry/runs/DSH_SLICE001_REALITY_SYNC-20260603/screenshots/control-panel/P2__control-panel__ops.dsh.marketing.visibility.hub__success__web__rtl__VISUAL_REVIEW.png,observed,not_observed,observed,observed,PASS,"Marketing visibility hub: بوابات الظهور tab active; cross-surface governance bridge (Partners/Catalogs/Support) visible; partner eligibility controls; 3 active partner gateways; visibility policy summary; UI_PREVIEW_ONLY; RTL confirmed; no error overlay.",2026-06-03T00:00:00+03:00,VISUAL_PASS,none; visual review complete
 ```
 
 ## Failure Tracking
@@ -148,6 +152,9 @@ VR-L1-010,partner.dsh.order.rejection,app-partner,tools/registry/runs/DSH_PARTNE
 VR-L1-011,partner.dsh.entry.status,app-partner,tools/registry/runs/DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602/screenshots/app-partner/P1__app-partner__partner.dsh.orders.inbox__partner_delivery__Pixel8__rtl__VISUAL_PASS.png,Antigravity,2026-06-02T21:35:00+03:00,VISUAL_PASS,"Partner entry and service activation status verified"
 VR-L1-012,partner.dsh.home.dashboard,app-partner,tools/registry/runs/DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602/screenshots/app-partner/P1__app-partner__partner.dsh.orders.inbox__pickup__Pixel8__rtl__VISUAL_PASS.png,Antigravity,2026-06-02T21:35:00+03:00,VISUAL_PASS,"Partner home hub and operational summaries verified"
 VR-L2-011,partner.wlt.dsh.wallet.bridge,app-partner,tools/registry/runs/DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602/screenshots/app-partner/P1__app-partner__partner.wlt.dsh.wallet.bridge__wallet_settlement_read_only__Pixel8__rtl__VISUAL_PASS.png,Antigravity,2026-06-02T21:35:00+03:00,VISUAL_PASS,"Wallet and settlement read-only WLT preview bridge verified"
+VR-L2-008,ops.dsh.catalog.approvals.quality,control-panel,tools/registry/runs/DSH_SLICE001_REALITY_SYNC-20260603/screenshots/control-panel/P2__control-panel__ops.dsh.catalog.approvals.quality__success__web__rtl__VISUAL_REVIEW.png,Claude,2026-06-03T00:00:00+03:00,VISUAL_PASS,"Catalog approvals quality subtab: approvals tab active, جودة subtab active, 5 pending items, approve/edit/reject CTAs, pipeline flow indicator, RTL confirmed"
+VR-L2-009,ops.dsh.catalog.approvals.pricing,control-panel,tools/registry/runs/DSH_SLICE001_REALITY_SYNC-20260603/screenshots/control-panel/P2__control-panel__ops.dsh.catalog.approvals.pricing__success__web__rtl__VISUAL_REVIEW.png,Claude,2026-06-03T00:00:00+03:00,VISUAL_PASS,"Catalog approvals pricing subtab: تعارض أسعار subtab active, 2 pricing conflict items (partner 32 SAR vs reference 18 SAR), approve/edit/reject CTAs, RTL confirmed"
+VR-L2-012,ops.dsh.marketing.visibility,control-panel,tools/registry/runs/DSH_SLICE001_REALITY_SYNC-20260603/screenshots/control-panel/P2__control-panel__ops.dsh.marketing.visibility.hub__success__web__rtl__VISUAL_REVIEW.png,Claude,2026-06-03T00:00:00+03:00,VISUAL_PASS,"Marketing visibility hub: بوابات الظهور active, cross-surface governance bridge visible, partner eligibility controls, 3 active gateways, RTL confirmed"
 ```
 
 ## Git Evidence Checklist

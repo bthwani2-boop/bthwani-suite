@@ -13,16 +13,16 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 | Surface/System | Classification | Role in Slice 001 | Required Proof | Current Proof Status | Missing Proof | Owner | Decision |
 |---|---|---|---|---|---|---|---|
 | `app-client` | primary | Owns the visible discovery journey anchor | Visual & Runtime proof | `PASS` (DSH-RUN-P014-01) | none | client | `PASS` |
-| `app-partner` | dependency | Partner inventory/catalog readiness | Visual & Publishing-gate proof | `needs-visual-evidence` | Partner UI & Runtime evidence | partner | `DEFERRED_WITH_REASON` |
-| `control-panel` (catalog governance) | dependency | Catalog approval & visibility governance | Catalog governance visual/runtime proof | `needs-visual-evidence` | Governance UI & Runtime evidence | operations | `DEFERRED_WITH_REASON` |
-| `control-panel` (marketing visibility) | dependency | Marketing publish controls & visibility | Marketing visibility visual/runtime proof | `needs-visual-evidence` | Marketing UI & Runtime evidence | operations | `DEFERRED_WITH_REASON` |
+| `app-partner` | dependency | Partner inventory/catalog readiness | Visual & Publishing-gate proof | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | Publishing-gate runtime proof (visual captured; runtime deferred) | partner | `DEFERRED_WITH_REASON` |
+| `control-panel` (catalog governance) | dependency | Catalog approval & visibility governance | Catalog governance visual/runtime proof | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | Runtime proof only (visual captured; runtime deferred) | operations | `DEFERRED_WITH_REASON` |
+| `control-panel` (marketing visibility) | dependency | Marketing publish controls & visibility | Marketing visibility visual/runtime proof | `VR-L2-012 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | Runtime proof only (visual captured; runtime deferred) | operations | `DEFERRED_WITH_REASON` |
 | shared DSH visibility/serviceability model | dependency | Direct shared logic for store exposure | Source & Runtime proof | `PASS` (bridge) | E2E Cross-surface runtime logic | domain | `DEFERRED_WITH_REASON` |
 
 ## 2. Operation Chain Matrix
 
 | Step | Actor | Surface | Operation | Input | Output | Data Owner | Required State | Required CTA | Evidence Required | Decision |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | partner | `app-partner` | Update inventory readiness & visibility | Store/Catalog state | Store marked ready | partner | `success`, `offline` | update readiness | Visual & runtime handoff | `DEFERRED_WITH_REASON` |
+| 1 | partner | `app-partner` | Update inventory readiness & visibility | Store/Catalog state | Store marked ready | partner | `success`, `offline` | update readiness | VR-L1-009 VISUAL_PASS captured 2026-06-02 (DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602); runtime handoff deferred | `DEFERRED_WITH_REASON` |
 | 2 | operator | `control-panel` | Approve catalog & set marketing visibility | Governance action | Store approved & visible | domain | `success` | approve catalog, set marketing | Visual & runtime handoff | `DEFERRED_WITH_REASON` |
 | 3 | system | `shared model` | Evaluate visibility & serviceability | Rules + Store state | Visible to client | domain | N/A | N/A | Logic evaluation logs | `DEFERRED_WITH_REASON` |
 | 4 | client | `app-client` | Open discovery feed & store | - | Store Details | preview | `loading`, `empty`, `error`, `success`, `offline` | open store, search inline | Visual & runtime (DSH-RUN-P014-01) | `PASS` |
@@ -34,8 +34,8 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 | `app-client` | `HomeScreen.tsx` | `dsh-home` | Open store | `dsh-store` | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-001` | none | `PASS` |
 | `app-client` | `HomeScreen.tsx` | `dsh-home:inline-search` | Search inline | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-023` | none | `PASS` |
 | `app-client` | `StoreScreen.tsx` | `dsh-store` | View store details | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-005` | none | `PASS` |
-| `app-partner` | `InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | Update readiness and publishing visibility | same page | `loading`, `empty`, `error`, `success`, `offline` | none | Visual & runtime proof | `DEFERRED_WITH_REASON` |
-| `control-panel` | `catalogs.screen.tsx` | `/catalogs` | Approve catalog / marketing | same page | `success`, `error`, `loading` | none | Visual & runtime proof | `DEFERRED_WITH_REASON` |
+| `app-partner` | `InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | Update readiness and publishing visibility | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | Runtime proof only (visual captured; publishing-gate runtime deferred) | `DEFERRED_WITH_REASON` |
+| `control-panel` | `catalogs.screen.tsx` | `/catalogs?tab=approvals&subTab=quality` + `/catalogs?tab=approvals&subTab=pricing` | Approve catalog quality / pricing | same page | `success`, `error`, `loading` | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03)` | Runtime proof only (visual captured) | `DEFERRED_WITH_REASON` |
 
 ## 4. Data Ownership Matrix
 
@@ -66,6 +66,6 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 
 | Gap ID | Gap Type | Related Surface | Description | Required Addition | Blocker Reason | Target Phase | Human Approval Needed | Decision |
 |---|---|---|---|---|---|---|---|---|
-| GAP-001 | UI/Flow & Runtime | `app-partner` | Missing UI and flow evidence for catalog publishing readiness | Implement/capture visual evidence for partner catalog | Proof not yet captured | Phase 4/5 | Yes | `REQUIRED_ADDITION` |
-| GAP-002 | UI/Flow & Runtime | `control-panel` | Missing UI and flow evidence for catalog governance | Implement/capture visual evidence for catalog governance | Proof not yet captured | Phase 4/5 | Yes | `REQUIRED_ADDITION` |
-| GAP-003 | UI/Flow & Runtime | `control-panel` | Missing UI and flow evidence for marketing visibility | Implement/capture visual evidence for marketing visibility | Proof not yet captured | Phase 4/5 | Yes | `REQUIRED_ADDITION` |
+| GAP-001 | UI/Flow & Runtime | `app-partner` | Partner catalog visual evidence resolved (VR-L1-009 VISUAL_PASS 2026-06-02); publishing-gate runtime proof still required | Capture runtime proof for partner catalog publishing gate | Runtime/API not ready — blocked until API binding approved | Phase 4/5 | Yes | `BLOCKED_WITH_REASON` |
+| GAP-002 | UI/Flow & Runtime | `control-panel` | Catalog governance visual evidence resolved (VR-L2-008 quality VISUAL_PASS + VR-L2-009 pricing VISUAL_PASS, 2026-06-03); catalog runtime proof still required | Capture runtime proof for catalog approval governance | Runtime/API not ready — blocked until API binding approved | Phase 4/5 | Yes | `BLOCKED_WITH_REASON` |
+| GAP-003 | UI/Flow & Runtime | `control-panel` | Marketing visibility visual evidence resolved (VR-L2-012 VISUAL_PASS 2026-06-03; بوابات الظهور + cross-surface governance bridge confirmed); marketing runtime proof still required | Capture runtime proof for marketing visibility publish controls | Runtime/API not ready — blocked until API binding approved | Phase 4/5 | Yes | `BLOCKED_WITH_REASON` |
