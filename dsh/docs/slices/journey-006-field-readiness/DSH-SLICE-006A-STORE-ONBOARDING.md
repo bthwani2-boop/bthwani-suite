@@ -10,7 +10,7 @@
 | Primary Surface | app-partner / StoreOnboardingScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | No slice manifest yet; J-006 not yet started; no onboarding API designed |
+| Blocking Reason | Manifest exists as planning stub; J-006 not yet started; no onboarding API designed |
 
 ## Scope
 ### Included
@@ -59,6 +59,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No slice manifest; J-006 not started |
+| **Reason** | Manifest stub created; J-006 not started; no API contract |
 | **Dependency** | J-006 roadmap prioritization; onboarding API design |
 | **Next Action** | Create J-006 slice manifest; design POST /stores onboarding endpoint |

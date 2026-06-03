@@ -10,7 +10,7 @@
 | Primary Surface | app-partner / ProductEditScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | No slice manifest; no API endpoint designed for product CRUD |
+| Blocking Reason | Manifest exists as planning stub; implementation/runtime/API/visual proof not started |
 
 ## Scope
 ### Included
@@ -60,6 +60,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No API contract; no slice manifest; J-002 not yet started |
+| **Reason** | Manifest stub created; no API contract; J-002 not yet started |
 | **Dependency** | API design for product CRUD |
 | **Next Action** | Design POST /products + PATCH /products/{id} contract |

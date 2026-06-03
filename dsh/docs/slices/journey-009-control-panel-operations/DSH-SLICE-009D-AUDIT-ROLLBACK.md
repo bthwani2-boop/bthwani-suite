@@ -10,7 +10,7 @@
 | Primary Surface | control-panel / AuditLogScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | No slice manifest yet; audit infrastructure not designed; depends on operations history from 009A |
+| Blocking Reason | Manifest exists as planning stub; audit infrastructure not designed; depends on operations history from 009A |
 
 ## Scope
 ### Included
@@ -58,6 +58,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No slice manifest; audit infrastructure not designed; no operations history yet |
+| **Reason** | Manifest stub created; audit infrastructure not designed; no operations history yet |
 | **Dependency** | DSH-SLICE-009A; audit infrastructure design |
 | **Next Action** | Create audit infrastructure spec; design GET /audit-log + rollback endpoint |

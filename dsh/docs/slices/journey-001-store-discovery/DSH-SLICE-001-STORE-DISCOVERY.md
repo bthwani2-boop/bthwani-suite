@@ -128,7 +128,7 @@ The closure of `DSH-SLICE-001` relies on the following evidence ledger entries:
 ## Decision
 
 - **UI/UX_VISUAL_LOCKED** = مثبت
-- **Runtime/API/L7** = FRONTEND_TRANSPORT_BOUND__SCREEN_PROOF_PENDING
+- **Runtime/API/L7** = `DSH_SLICE001_SCREEN_RUNTIME_PROVEN`
 - **partner readiness endpoint** = Live E2E proven (DSH_SLICE001_LIVE_E2E-20260603-173059)
 - **catalog approval endpoint** = Live E2E proven (DSH_SLICE001_LIVE_E2E-20260603-173059)
 - **marketing visibility endpoint** = Live E2E proven (DSH_SLICE001_LIVE_E2E-20260603-173059)

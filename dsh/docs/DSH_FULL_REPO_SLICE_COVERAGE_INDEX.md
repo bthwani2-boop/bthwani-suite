@@ -48,7 +48,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
 | Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001–J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING | GET /stores + 3 PATCH gates proven in DSH_SLICE001_LIVE_E2E-20260603-173059; future endpoints not designed |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_SCREEN_RUNTIME_PROVEN | GET /stores + 3 PATCH gates E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); future endpoints not designed |
 | Go backend migrations | `dsh/backend/migrations/001_store_discovery.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Used in live E2E |
 | Go backend migrations | `dsh/backend/migrations/002_store_visibility_gates.sql` | J-001 | DSH-SLICE-001C/D/E | BACKEND_PROVEN | Visibility gates proven |
 | Go backend seed | `dsh/backend/seed/003_store_discovery_seed.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Seed data for E2E |
@@ -69,8 +69,8 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 |---|---|---|---|---|---|
 | Cross-surface closure map | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` | J-001–J-006 | All business slices | ACTIVE_RUNTIME_SOURCE | Live closure truth; read before any closure claim |
 | DSH flow registry | `dsh/frontend/shared/dsh-flow-registry.ts` | J-001–J-006 | All business slices | ACTIVE_RUNTIME_SOURCE | Cross-surface flow definitions |
-| Store visibility client | `dsh/frontend/shared/dsh-store-visibility-client.ts` | J-001 | DSH-SLICE-001C,001D,001E | FRONTEND_TRANSPORT_BOUND__SCREEN_PROOF_PENDING | Typed client for 3 PATCH gates; screen proof pending |
-| Store visibility transport | `dsh/frontend/shared/dsh-store-visibility-transport.ts` | J-001 | DSH-SLICE-001C,001D,001E | FRONTEND_TRANSPORT_BOUND__SCREEN_PROOF_PENDING | HTTP transport for PATCH gates; screen proof pending |
+| Store visibility client | `dsh/frontend/shared/dsh-store-visibility-client.ts` | J-001 | DSH-SLICE-001C,001D,001E | DSH_SLICE001_SCREEN_RUNTIME_PROVEN | Typed client for 3 PATCH gates; screen proof captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 |
+| Store visibility transport | `dsh/frontend/shared/dsh-store-visibility-transport.ts` | J-001 | DSH-SLICE-001C,001D,001E | DSH_SLICE001_SCREEN_RUNTIME_PROVEN | HTTP transport for PATCH gates; screen proof captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 |
 | Discovery contract | `dsh/frontend/shared/dsh-discovery.contract.ts` | J-001 | DSH-SLICE-001A,001B | ACTIVE | Client-facing discovery contract |
 | Client visibility model | `dsh/frontend/shared/dsh-client-visibility.model.ts` | J-001,J-002 | DSH-SLICE-001A,002F | ACTIVE | Visibility gate logic |
 | Marketing visibility contract | `dsh/frontend/shared/marketing-visibility.contract.ts` | J-001,J-002 | DSH-SLICE-001E,002F | ACTIVE | Marketing publish gate |
@@ -317,8 +317,8 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Runtime Evidence Matrix | `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` | EVIDENCE_REFERENCE | Runtime proof rows |
 | Closure Decision Log | `dsh/docs/CLOSURE_DECISION_LOG.md` | EVIDENCE_REFERENCE | Append-only log |
 | Visual Review Ledger | `dsh/docs/DSH_VISUAL_REVIEW.md` | EVIDENCE_REFERENCE | Visual evidence queue |
-| DSH-SLICE-001 Store Discovery | `dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md` | SLICE_MANIFEST | Parent slice for J-001; linked to 001A–001F |
-| Slices Performance Notes | `dsh/docs/slices/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints |
+| DSH-SLICE-001 Store Discovery | `dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md` | SLICE_MANIFEST | Parent slice for J-001; linked to 001A–001F |
+| Slices Performance Notes | `dsh/docs/slices/journey-007-data-media-fixture-governance/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints |
 | Control Panel Owner Decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | GOVERNANCE_REFERENCE | CP ownership policy |
 | Migration doc | `dsh/docs/MIGRATION.md` | HISTORICAL_REFERENCE | Migration history |
 | Command doc | `dsh/docs/command.md` | HISTORICAL_REFERENCE | Deprecated; no branch-specific instructions allowed |
@@ -339,10 +339,10 @@ Areas found without a slice mapping or with evidence of missing classification:
 | GAP-IDX-002 | `dsh/docs/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | Planning doc exists but not linked to specific execution slices in manifest | Map each plan section to a slice ID or mark OUT_OF_SCOPE_WITH_REASON |
 | GAP-IDX-003 | `control-panel/runtime/app/community-services/page.tsx` | Community services CP route exists but no DSH journey owns it | Define owner journey or classify OUT_OF_SCOPE with reason |
 | GAP-IDX-004 | `dsh/docs/DSH_FILE_SIZE_RISK_MATRIX.md` | Giant-screen refactor candidates exist but no execution slice owns the refactoring work | Add as DEFERRED_WITH_REASON items inside the relevant slice manifests |
-| GAP-IDX-005 | `dsh/docs/slices/PERFORMANCE_NOTES.md` | Performance notes exist but no slice links to them as a dependency gate | Link to relevant execution slices as dependency evidence or classify GOVERNANCE_REFERENCE |
+| GAP-IDX-005 | `dsh/docs/slices/journey-007-data-media-fixture-governance/PERFORMANCE_NOTES.md` | Performance notes exist but no slice links to them as a dependency gate | Link to relevant execution slices as dependency evidence or classify GOVERNANCE_REFERENCE |
 | GAP-IDX-006 | `dsh/frontend/control-panel/finance/finance.registry.ts` — `FinanceHubScreen.tsx`, `FinanceHubScreens.tsx` | Control-panel finance screens exist in code but no execution slice covers their DSH-side governance | DSH-SLICE-010A must classify these screens explicitly |
-| GAP-IDX-007 | app-partner catalog readiness frontend binding | `InventoryCatalogScreen.tsx` — StoreReadinessGate wired but screen proof not yet captured; SCREEN_API_MATRIX still shows `FRONTEND_BINDING_PENDING` | Must be closed by DSH-SLICE-001C or 001F before slice 001 PASS is confirmed |
-| GAP-IDX-008 | control-panel PATCH gate frontend binding | `PartnerStoresScreen.tsx` — catalog-approval and marketing-visibility buttons wired but screen proof not yet captured | Must be closed by DSH-SLICE-001D/E or 001F before slice 001 PASS is confirmed |
+| GAP-IDX-007 | app-partner catalog readiness frontend binding | **RESOLVED 2026-06-04** — StoreReadinessGate button press E2E proven on physical device; PATCH /stores/{id}/partner-readiness and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
+| GAP-IDX-008 | control-panel PATCH gate frontend binding | **RESOLVED 2026-06-04** — catalog-approval and marketing-visibility buttons proven in browser; PATCH endpoints and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
 
 ---
 
@@ -378,9 +378,11 @@ These contradictions exist between source files and must be resolved in the appr
 | Total source areas mapped | 120+ |
 | Total journeys | 10 |
 | Total execution slices (see manifest) | 44 |
-| GAP rows | 8 |
+| GAP rows (open) | 6 |
+| GAP rows (resolved) | 2 (GAP-IDX-007, GAP-IDX-008) |
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
-| Known contradictions (FIX_REQUIRED) | 4 |
+| Known contradictions open | 0 |
+| Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
 | BLOCKED_WITH_REASON areas | 2 (finance/WLT) |
 
 ---
@@ -389,6 +391,8 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. However, 4 known contradictions exist between the CLOSURE_DECISION_LOG, RUNTIME_EVIDENCE_MATRIX, SCREEN_API_MATRIX, and DSH-SLICE-001 manifest PASS status. These are documented as FIX_REQUIRED and must be resolved before DSH-SLICE-001 can be considered fully closed. No CLOSED or 100% claimed.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved as of 2026-06-04. DSH-SLICE-001 is `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` and J-001 is ready for transition to J-002. No CLOSED or 100% claimed for production.
 
-Next action: Resolve CONTRA-001 through CONTRA-004 by either updating the matrices with the specific evidence path from DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700, or correcting the CLOSURE_DECISION_LOG entry.
+Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
+
+Next action: Classify GAP-IDX-001 through GAP-IDX-006; then begin DSH-SLICE-002A (Catalog Management — Product Identity).

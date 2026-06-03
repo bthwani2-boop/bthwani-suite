@@ -17,8 +17,8 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `DSH_UIUX_FLOW_LOGICALLY_READY_FOR_VISUAL_REVIEW` |
-| Current Status | `DSH_VISUAL_REVIEW_PENDING_HUMAN_REVIEW` |
+| Current Decision | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` |
+| Current Status | `J-001 SCREEN_RUNTIME_PROVEN; J-002+ pending/deferred/blocked per slice manifests` |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -26,11 +26,11 @@ API contract: `dsh/dsh.openapi.yaml`.
 
 | Surface | Status | Note |
 |---|---|---|
-| `app-client` | `needs-visual-evidence` | discovery, cart/checkout, and tracking/support are logically wired and now wait on human visual review |
-| `app-partner` | `needs-visual-evidence` | intake and catalog readiness are logically wired and now wait on human visual review |
-| `app-captain` | `needs-visual-evidence` | pickup, delivery, and PoD surfaces are logically wired and now wait on human visual review |
-| `app-field` | `needs-visual-evidence` | onboarding and visit/readiness surfaces are logically wired and now wait on human visual review |
-| `control-panel operations` | `needs-visual-evidence` | operations routing and screens are live; screenshots and runtime intervention proof are still missing |
+| `app-client` | `J-001: SCREEN_RUNTIME_PROVEN; J-002+: DEFERRED_WITH_REASON` | discovery feed (J-001) E2E proven on physical device (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); cart/checkout/tracking (J-002+) deferred |
+| `app-partner` | `J-001: SCREEN_RUNTIME_PROVEN; J-002+: DEFERRED_WITH_REASON` | partner-readiness gate (J-001) E2E proven on physical device; catalog management (J-002+) deferred |
+| `app-captain` | `needs-visual-evidence` | pickup, delivery, and PoD surfaces are logically wired; J-005 not yet started |
+| `app-field` | `needs-visual-evidence` | onboarding and visit/readiness surfaces are logically wired; J-006 not yet started |
+| `control-panel operations` | `J-001: SCREEN_RUNTIME_PROVEN; J-002+: DEFERRED_WITH_REASON` | catalog-approval and marketing-visibility (J-001) E2E proven in browser; operations room (J-009) deferred |
 | `control-panel finance` | `blocked-by-wlt` | finance remains a read-only WLT bridge and not a DSH-owned money surface |
 
 ### Map / Heatmap Boundary
@@ -125,19 +125,35 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 
 ## 6. Binding, Runtime, Backend State
 
+### J-001 — Store Discovery (DSH-SLICE-001)
+
 | Gate | Status |
 |---|---|
-| UI / UX / Flow | `DSH_UIUX_FLOW_LOGICALLY_READY_FOR_VISUAL_REVIEW` |
-| Visual Review | `PENDING_HUMAN_REVIEW` |
-| Binding | `NEEDS_BINDING_LATER` |
-| Runtime | `RUNTIME_UNPROVEN` |
-| Backend / OpenAPI | `OUT_OF_SCOPE / NOT_CLAIMED` |
+| UI / UX / Flow | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` |
+| Visual Review | `DSH_SLICE001_VISUAL_PASS_CONFIRMED` — VR-L1-001/005/023 (app-client) + VR-L1-009 (app-partner) + VR-L2-008/009/012 (control-panel) |
+| Binding | `DSH_SLICE001_FRONTEND_TRANSPORT_PROVEN` |
+| Runtime | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` |
+| Backend / OpenAPI | `DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN` — GET /stores + 3 PATCH gates proven in DSH_SLICE001_LIVE_E2E-20260603-173059 |
 | WLT Finance Ownership | `WLT_ONLY` |
-| TypeScript | `TARGETED_REVALIDATION_PENDING` |
+| TypeScript | `ZERO_ERRORS` — pnpm exec tsc --noEmit verified 2026-06-03 |
 | Production Readiness | `NOT_CLAIMED` |
 
+### J-002+ — Remaining Journeys
+
+| Journey | Status |
+|---|---|
+| J-002 Catalog Management | `DEFERRED` — no API contract; no runtime proof |
+| J-003 Checkout / Payment | `BLOCKED_WITH_REASON` — WLT/auth proof required |
+| J-004 Order Lifecycle | `DEFERRED` — no runtime proof |
+| J-005 Delivery Execution | `DEFERRED` — no runtime proof |
+| J-006 Field Readiness | `DEFERRED` — no onboarding API designed |
+| J-007 Data / Media Governance | `FOUNDATION_ACTIVE` — preview data governed; no runtime proof required |
+| J-008 Platform / Vars / Provider | `DEFERRED` — provider policy not enforced |
+| J-009 Control Panel Operations | `DEFERRED` — ops room visual/runtime proof pending |
+| J-010 WLT Finance Boundary | `BLOCKED_WITH_REASON` — WLT-owned; DSH read-only bridge only |
+
 Single next action:
-attach trusted current-branch screenshots for all five DSH surfaces without inflating runtime or backend claims.
+begin DSH-SLICE-002A (Catalog Management — Product Identity) after Reality Sync is complete.
 
 ---
 

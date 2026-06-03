@@ -10,7 +10,7 @@
 | Primary Surface | platform route / PlatformVarsProvider |
 | WLT Boundary | N/A |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | No slice manifest yet; platform route exists but provider policy not formally documented or enforced |
+| Blocking Reason | Manifest exists as planning stub; platform route exists but provider policy not formally documented or enforced |
 
 ## Scope
 ### Included
@@ -57,6 +57,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No slice manifest; provider policy not formally documented; platform route exists but policy unenforced |
+| **Reason** | Manifest stub created; provider policy not formally documented; platform route exists but policy unenforced |
 | **Dependency** | J-008 roadmap prioritization |
 | **Next Action** | Document provider policy; add guard for direct env-var reads in UI code |
