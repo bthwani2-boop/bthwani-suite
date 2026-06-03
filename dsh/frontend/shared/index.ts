@@ -195,6 +195,131 @@ export {
 } from './dsh-flow-registry';
 
 export type {
+  DshAnyOperationalRecord,
+  DshCaptainAssignment,
+  DshCaptainAssignmentStatus,
+  DshCatalogOperationalItem,
+  DshCatalogReadinessStatus,
+  DshCodCollectionEvent,
+  DshCodCollectionStatus,
+  DshControlPanelOperationRecord,
+  DshControlPanelOperationalWorkspace,
+  DshControlPanelSideEffectClassification,
+  DshDeliveryProof,
+  DshDeliveryProofStatus,
+  DshDeliveryTrip,
+  DshDeliveryTripStatus,
+  DshOperationalActionPolicy,
+  DshOperationalAuditPolicy,
+  DshOperationalAuditState,
+  DshOperationalBaseRecord,
+  DshOperationalBoundaryPolicy,
+  DshOperationalClosureStatus,
+  DshOperationalDataClassification,
+  DshOperationalEntityId,
+  DshOperationalEntityKind,
+  DshOperationalException,
+  DshOperationalExceptionStatus,
+  DshOperationalExceptionType,
+  DshOperationalProofRequirement,
+  DshOperationalRollbackHint,
+  DshOperationalWltImpact,
+  DshOrderOperationalRecord,
+  DshOrderOperationalStatus,
+  DshPartnerStoreOnboardingStatus,
+  DshPartnerStoreOperationalRecord,
+  DshPickupHandoffProof,
+  DshPickupHandoffStatus,
+  DshSettlementInputEvent,
+  DshSettlementInputEventType,
+  DshSettlementInputStatus,
+  DshStorePreparationRecord,
+  DshStorePreparationStatus,
+  DshSupportEscalationLink,
+  DshSupportEscalationStatus,
+  DshWltOwnershipBoundary,
+} from './dsh-operational.contract';
+export { dshOperationalContractMeta } from './dsh-operational.contract';
+
+export type {
+  DshOperationalLifecycleSource,
+  DshOperationalRegistryEntry,
+} from './dsh-operational-registry';
+export {
+  DSH_OPERATIONAL_REGISTRY,
+  assertDshDoesNotOwnFinancialMutation,
+  dshOperationalRegistryMeta,
+  getDshOperationalEntriesBySurface,
+  getDshOperationalEntriesByWorkspace,
+  getDshOperationalEntriesWithWltImpact,
+  getDshOperationalEntryById,
+  getDshOperationalRegistry,
+} from './dsh-operational-registry';
+
+export type {
+  DshControlPanelOperationsPreview,
+  DshOperationalSurfaceSummary,
+} from './dsh-operational-preview-adapter';
+export {
+  buildDshCodQueuePreview,
+  buildDshControlPanelOperationsPreview,
+  buildDshExceptionQueuePreview,
+  buildDshOperationalSummaryForSurface,
+  buildDshPodReviewPreview,
+  buildDshSettlementInputPreview,
+  buildDshTripPreviewForOrder,
+  dshOperationalPreviewAdapterMeta,
+  getDshOperationalPreviewRegistryEntry,
+} from './dsh-operational-preview-adapter';
+
+export type {
+  DshOperationalRuntimeBindingStatus,
+  DshOperationalScreenBinding,
+} from './dsh-operational-surface-binding';
+export {
+  DSH_OPERATIONAL_SCREEN_BINDINGS,
+  dshOperationalSurfaceBindingMeta,
+  getDshOperationalPreviewSummariesForScreen,
+  getDshOperationalScreenBindingByScreenId,
+  getDshOperationalScreenBindings,
+  getDshOperationalScreenBindingsByRegistryEntry,
+  getDshOperationalScreenBindingsBySurface,
+} from './dsh-operational-surface-binding';
+
+export type {
+  DshOperationsRoomWorkspace,
+  DshOperationsRoomWorkspaceStatus,
+} from './dsh-control-panel-operations-room';
+export {
+  DSH_CONTROL_PANEL_OPERATIONS_ROOM,
+  dshControlPanelOperationsRoomMeta,
+  getDshControlPanelOperationsRoom,
+  getDshOperationsRoomWorkspaceById,
+  getDshOperationsRoomWorkspacesByGroup,
+  getDshOperationsRoomWorkspacesForRegistryEntry,
+} from './dsh-control-panel-operations-room';
+
+export type {
+  DshWltSettlementBridgeRule,
+  DshWltSettlementInputCandidate,
+  DshWltSettlementInputReadiness,
+  DshWltSettlementInputValidationResult,
+  DshWltSettlementSourceEntity,
+  DshWltTargetCapability,
+} from './dsh-wlt-settlement-bridge.contract';
+export {
+  DSH_WLT_SETTLEMENT_BRIDGE_RULES,
+  assertNoDshFinancialSettlementOwnership,
+  buildWltSettlementInputCandidate,
+  buildWltSettlementInputCandidateFromEvent,
+  classifyWltTargetCapability,
+  dshWltSettlementBridgeContractMeta,
+  getDshWltSettlementBridgeRule,
+  getDshWltSettlementBridgeRules,
+  validateDshSettlementInputReadiness,
+} from './dsh-wlt-settlement-bridge.contract';
+
+export type {
   AwnakStage,
   CartItem,
   DshAssistedOrderCartItem,

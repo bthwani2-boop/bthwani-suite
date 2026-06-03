@@ -369,6 +369,8 @@
     "dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx",
     "dsh/frontend/shared/index.ts",
     "dsh/frontend/shared/catalog.ts",
+    "dsh/frontend/shared/dsh-operational.contract.ts",
+    "dsh/frontend/shared/dsh-operational-registry.ts",
     "dsh/frontend/control-panel/catalogs",
     "dsh/frontend/data/partner.preview-data.ts",
     "dsh/frontend/data/stores.preview-data.ts",
