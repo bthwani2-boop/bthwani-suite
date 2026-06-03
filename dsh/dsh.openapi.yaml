@@ -78,6 +78,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /stores/{id}:
+    get:
+      tags:
+        - Store Discovery
+      summary: Get discovery store details
+      description: Retrieve detailed information for a single store, including contact info, hours, and catalog summary.
+      operationId: getDiscoveryStore
+      security:
+        - BearerAuth: []
+        - {} # Guest-safe / Optional authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryStoreDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /stores/{id}/partner-readiness:
     patch:
       tags:
@@ -295,6 +338,74 @@ components:
           type: string
         publish_stage:
           type: string
+
+    DiscoveryStoreDetail:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - distance_label
+        - delivery_label
+        - service_label
+        - status_label
+        - status_tone
+        - has_offer
+        - publish_stage
+        - partner_readiness_status
+        - catalog_quality_status
+        - catalog_pricing_status
+        - marketing_visibility_status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        category_id:
+          type: string
+        image_url:
+          type: string
+        logo_image_url:
+          type: string
+        rating:
+          type: number
+        distance_label:
+          type: string
+        delivery_label:
+          type: string
+        service_label:
+          type: string
+        status_label:
+          type: string
+        status_tone:
+          type: string
+          enum: [open, closed]
+        has_offer:
+          type: boolean
+        offer_label:
+          type: string
+        publish_stage:
+          type: string
+        contact_number:
+          type: string
+        opening_hours:
+          type: string
+        catalog_summary:
+          type: string
+        partner_readiness_status:
+          type: string
+          enum: [ready, not_ready, paused]
+        catalog_quality_status:
+          type: string
+          enum: [approved, pending, rejected]
+        catalog_pricing_status:
+          type: string
+          enum: [approved, pending, rejected]
+        marketing_visibility_status:
+          type: string
+          enum: [active, inactive, paused]
 
     PartnerReadinessUpdateRequest:
       type: object

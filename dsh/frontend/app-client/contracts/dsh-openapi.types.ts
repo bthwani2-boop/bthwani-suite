@@ -24,6 +24,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get discovery store details
+         * @description Retrieve detailed information for a single store, including contact info, hours, and catalog summary.
+         */
+        get: operations["getDiscoveryStore"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/partner-readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update store partner readiness
+         * @description Update the partner readiness status gate for a store.
+         */
+        patch: operations["updatePartnerReadiness"];
+        trace?: never;
+    };
+    "/stores/{id}/catalog-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update store catalog approval status
+         * @description Update the catalog quality and catalog pricing status gates for a store.
+         */
+        patch: operations["updateCatalogApproval"];
+        trace?: never;
+    };
+    "/stores/{id}/marketing-visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update store marketing visibility status
+         * @description Update the marketing visibility status gate for a store.
+         */
+        patch: operations["updateMarketingVisibility"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -53,6 +133,75 @@ export interface components {
             has_offer: boolean;
             offer_label?: string;
             publish_stage: string;
+        };
+        DiscoveryStoreDetail: {
+            id: string;
+            name: string;
+            address: string;
+            category_id?: string;
+            image_url?: string;
+            logo_image_url?: string;
+            rating?: number;
+            distance_label: string;
+            delivery_label: string;
+            service_label: string;
+            status_label: string;
+            /** @enum {string} */
+            status_tone: "open" | "closed";
+            has_offer: boolean;
+            offer_label?: string;
+            publish_stage: string;
+            contact_number?: string;
+            opening_hours?: string;
+            catalog_summary?: string;
+            /** @enum {string} */
+            partner_readiness_status: "ready" | "not_ready" | "paused";
+            /** @enum {string} */
+            catalog_quality_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            catalog_pricing_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            marketing_visibility_status: "active" | "inactive" | "paused";
+        };
+        PartnerReadinessUpdateRequest: {
+            /**
+             * @description The readiness status of the store partner.
+             * @enum {string}
+             */
+            status: "ready" | "not_ready" | "paused";
+        };
+        CatalogApprovalUpdateRequest: {
+            /**
+             * @description The quality approval status of the store catalog.
+             * @enum {string}
+             */
+            quality_status: "approved" | "pending" | "rejected";
+            /**
+             * @description The pricing approval status of the store catalog.
+             * @enum {string}
+             */
+            pricing_status: "approved" | "pending" | "rejected";
+        };
+        MarketingVisibilityUpdateRequest: {
+            /**
+             * @description The marketing visibility status of the store.
+             * @enum {string}
+             */
+            status: "active" | "inactive" | "paused";
+        };
+        StoreVisibilityGateResponse: {
+            store_id: string;
+            /** @enum {string} */
+            partner_readiness_status: "ready" | "not_ready" | "paused";
+            /** @enum {string} */
+            catalog_quality_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            catalog_pricing_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            marketing_visibility_status: "active" | "inactive" | "paused";
+            client_visible: boolean;
+            /** Format: date-time */
+            updated_at: string;
         };
         ErrorResponse: {
             code: string;
@@ -106,6 +255,218 @@ export interface operations {
                 };
             };
             /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getDiscoveryStore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscoveryStoreDetail"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updatePartnerReadiness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerReadinessUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreVisibilityGateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCatalogApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CatalogApprovalUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreVisibilityGateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateMarketingVisibility: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarketingVisibilityUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreVisibilityGateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
             500: {
                 headers: {
                     [name: string]: unknown;

@@ -255,3 +255,45 @@ func decodeBody(t *testing.T, response *httptest.ResponseRecorder, body any) {
 		t.Fatalf("decode response body: %v. Body was: %s", err, response.Body.String())
 	}
 }
+
+func TestGetStoreDetail(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	// Case 1: Get store-1001 details successfully
+	request := httptest.NewRequest(http.MethodGet, "/stores/store-1001", nil)
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+	}
+
+	var body domain.StoreDetail
+	decodeBody(t, response, &body)
+
+	if body.ID != "store-1001" {
+		t.Fatalf("expected store ID store-1001, got %s", body.ID)
+	}
+	if body.ContactNumber != "+967-1-444333" {
+		t.Fatalf("expected contact number +967-1-444333, got %s", body.ContactNumber)
+	}
+	if body.OpeningHours != "08:00 - 23:00" {
+		t.Fatalf("expected opening hours 08:00 - 23:00, got %s", body.OpeningHours)
+	}
+	if body.CatalogSummary != "Over 1,200 fresh groceries and daily essentials" {
+		t.Fatalf("expected catalog summary, got %s", body.CatalogSummary)
+	}
+	if body.PartnerReadinessStatus != "ready" || body.CatalogQualityStatus != "approved" {
+		t.Fatalf("unexpected visibility statuses: %+v", body)
+	}
+
+	// Case 2: Store not found (returns 404)
+	requestNotFound := httptest.NewRequest(http.MethodGet, "/stores/store-9999", nil)
+	responseNotFound := httptest.NewRecorder()
+	handler.ServeHTTP(responseNotFound, requestNotFound)
+
+	if responseNotFound.Code != http.StatusNotFound {
+		t.Fatalf("expected status 404, got %d", responseNotFound.Code)
+	}
+}

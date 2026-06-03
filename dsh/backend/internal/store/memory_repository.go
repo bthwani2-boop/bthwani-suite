@@ -24,6 +24,9 @@ type memoryStore struct {
 	catalogPricingStatus      string
 	marketingVisibilityStatus string
 	visibilityUpdatedAt       time.Time
+	contactNumber             string
+	openingHours              string
+	catalogSummary            string
 }
 
 func NewMemoryRepository() *MemoryRepository {
@@ -62,6 +65,9 @@ func NewMemoryRepository() *MemoryRepository {
 				catalogPricingStatus:      "approved",
 				marketingVisibilityStatus: "active",
 				visibilityUpdatedAt:       now,
+				contactNumber:             "+967-1-444333",
+				openingHours:              "08:00 - 23:00",
+				catalogSummary:            "Over 1,200 fresh groceries and daily essentials",
 			},
 			{
 				summary: domain.StoreSummary{
@@ -88,6 +94,9 @@ func NewMemoryRepository() *MemoryRepository {
 				catalogPricingStatus:      "approved",
 				marketingVisibilityStatus: "active",
 				visibilityUpdatedAt:       now,
+				contactNumber:             "+967-1-555666",
+				openingHours:              "06:00 - 22:00",
+				catalogSummary:            "Fresh bread, cakes, and pastries baked daily",
 			},
 			{
 				summary: domain.StoreSummary{
@@ -115,6 +124,9 @@ func NewMemoryRepository() *MemoryRepository {
 				catalogPricingStatus:      "approved",
 				marketingVisibilityStatus: "active",
 				visibilityUpdatedAt:       now,
+				contactNumber:             "+967-1-777888",
+				openingHours:              "09:00 - 21:00",
+				catalogSummary:            "Convenient local grocery staples and snacks",
 			},
 			{
 				summary: domain.StoreSummary{
@@ -141,9 +153,37 @@ func NewMemoryRepository() *MemoryRepository {
 				catalogPricingStatus:      "approved",
 				marketingVisibilityStatus: "active",
 				visibilityUpdatedAt:       now,
+				contactNumber:             "+967-1-999000",
+				openingHours:              "16:00 - 02:00",
+				catalogSummary:            "Late-night snacks, soft drinks, and convenience items",
 			},
 		},
 	}
+}
+
+func (repo *MemoryRepository) GetStore(ctx context.Context, id string) (domain.StoreDetail, error) {
+	select {
+	case <-ctx.Done():
+		return domain.StoreDetail{}, ctx.Err()
+	default:
+	}
+
+	for _, store := range repo.stores {
+		if store.summary.ID == id {
+			return domain.StoreDetail{
+				StoreSummary:              store.summary,
+				ContactNumber:             store.contactNumber,
+				OpeningHours:              store.openingHours,
+				CatalogSummary:            store.catalogSummary,
+				PartnerReadinessStatus:    store.partnerReadinessStatus,
+				CatalogQualityStatus:      store.catalogQualityStatus,
+				CatalogPricingStatus:      store.catalogPricingStatus,
+				MarketingVisibilityStatus: store.marketingVisibilityStatus,
+			}, nil
+		}
+	}
+
+	return domain.StoreDetail{}, errors.New("store not found")
 }
 
 func (repo *MemoryRepository) ListStores(ctx context.Context, query domain.StoreDiscoveryQuery) (domain.DiscoveryStoresResponse, error) {

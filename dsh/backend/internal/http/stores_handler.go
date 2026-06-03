@@ -30,6 +30,7 @@ func NewStoresHandler(repository store.Repository) *StoresHandler {
 
 	// Register internal routes for dispatching
 	handler.mux.HandleFunc("GET /stores", handler.ListStores)
+	handler.mux.HandleFunc("GET /stores/{id}", handler.GetStore)
 	handler.mux.HandleFunc("PATCH /stores/{id}/partner-readiness", handler.UpdatePartnerReadiness)
 	handler.mux.HandleFunc("PATCH /stores/{id}/catalog-approval", handler.UpdateCatalogApproval)
 	handler.mux.HandleFunc("PATCH /stores/{id}/marketing-visibility", handler.UpdateMarketingVisibility)
@@ -40,6 +41,7 @@ func NewStoresHandler(repository store.Repository) *StoresHandler {
 func RegisterRoutes(mux *http.ServeMux, repository store.Repository) {
 	handler := NewStoresHandler(repository)
 	mux.Handle("GET /stores", handler)
+	mux.Handle("GET /stores/{id}", handler)
 	mux.Handle("PATCH /stores/{id}/partner-readiness", handler)
 	mux.Handle("PATCH /stores/{id}/catalog-approval", handler)
 	mux.Handle("PATCH /stores/{id}/marketing-visibility", handler)
@@ -74,6 +76,32 @@ func (handler *StoresHandler) ListStores(writer http.ResponseWriter, request *ht
 	response, err := handler.repository.ListStores(request.Context(), query)
 	if err != nil {
 		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list stores")
+		return
+	}
+
+	writeJSON(writer, http.StatusOK, response)
+}
+
+func (handler *StoresHandler) GetStore(writer http.ResponseWriter, request *http.Request) {
+	id := request.PathValue("id")
+	log.Printf("dsh-api: received GET /stores/%s request from app-client", id)
+	if request.Method != http.MethodGet {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	if id == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store id")
+		return
+	}
+
+	response, err := handler.repository.GetStore(request.Context(), id)
+	if err != nil {
+		if err.Error() == "store not found" {
+			writeError(writer, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "store not found")
+			return
+		}
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
 		return
 	}
 

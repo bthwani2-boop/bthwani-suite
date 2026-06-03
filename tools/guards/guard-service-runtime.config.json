@@ -15,7 +15,8 @@
         "ListStores",
         "UpdatePartnerReadiness",
         "UpdateCatalogApproval",
-        "UpdateMarketingVisibility"
+        "UpdateMarketingVisibility",
+        "GetStore"
       ],
       "postgresRequiredPatterns": [
         "pgx",
@@ -23,7 +24,8 @@
         "ListStores",
         "UpdatePartnerReadiness",
         "UpdateCatalogApproval",
-        "UpdateMarketingVisibility"
+        "UpdateMarketingVisibility",
+        "GetStore"
       ],
       "composePath": "dsh/backend/docker-compose.local.yml",
       "allowedComposeServices": [
@@ -63,7 +65,10 @@
         "catalog_quality_status",
         "catalog_pricing_status",
         "marketing_visibility_status",
-        "visibility_updated_at"
+        "visibility_updated_at",
+        "contact_number",
+        "opening_hours",
+        "catalog_summary"
       ],
       "slices": {
         "DSH-SLICE-001": {
@@ -71,6 +76,7 @@
           "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
             "/stores",
+            "/stores/{id}",
             "/stores/{id}/partner-readiness",
             "/stores/{id}/catalog-approval",
             "/stores/{id}/marketing-visibility"

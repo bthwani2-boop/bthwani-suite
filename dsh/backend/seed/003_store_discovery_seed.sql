@@ -20,7 +20,10 @@ INSERT INTO dsh_store_discovery_stores (
   partner_readiness_status,
   catalog_quality_status,
   catalog_pricing_status,
-  marketing_visibility_status
+  marketing_visibility_status,
+  contact_number,
+  opening_hours,
+  catalog_summary
 ) VALUES
   (
     'store-1001',
@@ -44,7 +47,10 @@ INSERT INTO dsh_store_discovery_stores (
     'ready',
     'approved',
     'approved',
-    'active'
+    'active',
+    '+967-1-444333',
+    '08:00 - 23:00',
+    'Over 1,200 fresh groceries and daily essentials'
   ),
   (
     'store-1002',
@@ -68,7 +74,10 @@ INSERT INTO dsh_store_discovery_stores (
     'ready',
     'approved',
     'approved',
-    'active'
+    'active',
+    '+967-1-555666',
+    '06:00 - 22:00',
+    'Fresh bread, cakes, and pastries baked daily'
   ),
   (
     'store-1003',
@@ -92,7 +101,10 @@ INSERT INTO dsh_store_discovery_stores (
     'ready',
     'approved',
     'approved',
-    'active'
+    'active',
+    '+967-1-777888',
+    '09:00 - 21:00',
+    'Convenient local grocery staples and snacks'
   ),
   (
     'store-1004',
@@ -116,7 +128,10 @@ INSERT INTO dsh_store_discovery_stores (
     'ready',
     'approved',
     'approved',
-    'active'
+    'active',
+    '+967-1-999000',
+    '16:00 - 02:00',
+    'Late-night snacks, soft drinks, and convenience items'
   )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
@@ -140,5 +155,8 @@ ON CONFLICT (id) DO UPDATE SET
   catalog_quality_status = EXCLUDED.catalog_quality_status,
   catalog_pricing_status = EXCLUDED.catalog_pricing_status,
   marketing_visibility_status = EXCLUDED.marketing_visibility_status,
+  contact_number = EXCLUDED.contact_number,
+  opening_hours = EXCLUDED.opening_hours,
+  catalog_summary = EXCLUDED.catalog_summary,
   visibility_updated_at = NOW(),
   updated_at = NOW();

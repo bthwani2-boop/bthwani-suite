@@ -208,6 +208,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [itemsCategory, setItemsCategory] = React.useState('all');
   const [homeSearchAutoOpenToken, setHomeSearchAutoOpenToken] = React.useState(0);
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
+  const [activeStoreDetail, setActiveStoreDetail] = React.useState<any | null>(null);
+  const [storeDetailState, setStoreDetailState] = React.useState<'loading' | 'ready' | 'empty' | 'error' | 'offline'>('loading');
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [, setSelectedItemId] = React.useState<string>('');
@@ -569,28 +571,122 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     [activeStoreId, clientVisibleDiscoveryStores],
   );
 
+  React.useEffect(() => {
+    if (route !== 'store-get') return undefined;
+    if (!activeStoreId) return undefined;
+
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (!config) {
+      setActiveStoreDetail({
+        id: activeStore.id,
+        name: activeStore.name,
+        address: activeStore.subtitle,
+        category_id: undefined,
+        image_url: activeStore.imageUri,
+        logo_image_url: activeStore.logoImageUri,
+        rating: activeStore.rating,
+        distance_label: activeStore.distanceKm ? `${activeStore.distanceKm} كم` : '0 كم',
+        delivery_label: activeStore.deliveryLabel,
+        service_label: activeStore.serviceLabel,
+        status_label: activeStore.statusLabel,
+        status_tone: activeStore.statusLabel?.includes('مغلق') ? 'closed' : 'open',
+        has_offer: activeStore.isOffer,
+        offer_label: activeStore.offerLabel,
+        publish_stage: activeStore.publishStage || 'published-preview',
+        contact_number: activeStore.id === 'store-1001' ? '+967-1-444333' : activeStore.id === 'store-1002' ? '+967-1-555666' : activeStore.id === 'store-1003' ? '+967-1-777888' : '+967-1-999000',
+        opening_hours: activeStore.id === 'store-1001' ? '08:00 - 23:00' : activeStore.id === 'store-1002' ? '06:00 - 22:00' : activeStore.id === 'store-1003' ? '09:00 - 21:00' : '16:00 - 02:00',
+        catalog_summary: activeStore.id === 'store-1001' ? 'Over 1,200 fresh groceries and daily essentials' : activeStore.id === 'store-1002' ? 'Fresh bread, cakes, and pastries baked daily' : activeStore.id === 'store-1003' ? 'Convenient local grocery staples and snacks' : 'Late-night snacks, soft drinks, and convenience items',
+        partner_readiness_status: 'ready',
+        catalog_quality_status: 'approved',
+        catalog_pricing_status: 'approved',
+        marketing_visibility_status: 'active',
+      });
+      setStoreDetailState('ready');
+      return undefined;
+    }
+
+    setStoreDetailState('loading');
+    let cancelled = false;
+
+    const client = createDshDiscoveryStoresClient(config);
+    client.getDiscoveryStore(activeStoreId).then((response) => {
+      if (cancelled) return;
+      setActiveStoreDetail(response);
+      setStoreDetailState('ready');
+    }).catch((err) => {
+      if (cancelled) return;
+      const detailErrorState = isDshDiscoveryStoresOfflineError(err) ? 'offline' : 'error';
+      setStoreDetailState(detailErrorState);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeStoreId, route, activeStore]);
+
   const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
   const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
   const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
-  const activeStoreScreenStore = React.useMemo(() => ({
-    id: activeStore.id,
-    name: activeStore.name,
-    subtitle: activeStore.subtitle,
-    statusLabel: activeStore.statusLabel,
-    etaLabel: activeStore.meta,
-    deliveryFeeLabel: activeStore.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
-    followersCount: activeStore.followerCount,
-    priceMatchLabel: activeStore.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
-    imageUri: activeStore.imageUri,
-    deliveryLabel: activeStore.deliveryLabel,
-    serviceLabel: activeStore.serviceLabel,
-    subscriptionPackageChips: activeStore.subscriptionPackageChips,
-    hasBthwaniPro: activeStore.hasBthwaniPro,
-    tags: activeStoreTags,
-    categories: activeStoreCategories,
-    deliveryModes: activeStoreDeliveryModes,
-  }), [activeStore, activeStoreCategories, activeStoreDeliveryModes, activeStoreTags]);
+
+  const activeStoreScreenStore = React.useMemo(() => {
+    const s = activeStoreDetail || activeStore;
+    const tags = activeStoreDetail ? buildStoreTags({
+      id: s.id,
+      name: s.name,
+      subtitle: s.address || '',
+      statusLabel: s.status_label || '',
+      meta: s.delivery_label || '',
+      etaMinutes: 0,
+      distanceKm: Number.parseFloat(s.distance_label) || 0,
+      rating: s.rating ?? 0,
+      isOffer: s.has_offer || false,
+      isFavorite: false,
+      isFollowing: false,
+      imageUri: s.image_url || '',
+      deliveryLabel: s.delivery_label || '',
+      serviceLabel: s.service_label || '',
+      followerCount: 0,
+      multiplierLabel: 'x1',
+      subscriptionPackageChips: [],
+      offerLabel: s.offer_label || '',
+      hasBthwaniPro: false,
+      hasNewProducts: false,
+      hasCouponAvailable: false,
+      supportsPickup: s.supports_pickup || false,
+      supportsPartnerDelivery: s.supports_partner_delivery || false,
+      publishStage: s.publish_stage || '',
+      logoImageUri: s.logo_image_url || '',
+    } as any) : activeStoreTags;
+
+    const deliveryModes = activeStoreDetail ? buildStoreDeliveryModes({
+      meta: s.delivery_label || '',
+      supportsPickup: s.supports_pickup || false,
+      supportsPartnerDelivery: s.supports_partner_delivery || false,
+    }) : activeStoreDeliveryModes;
+
+    return {
+      id: s.id,
+      name: s.name,
+      subtitle: s.address || s.subtitle || '',
+      statusLabel: s.status_label || s.statusLabel || '',
+      etaLabel: s.delivery_label || s.meta || s.etaLabel || '',
+      deliveryFeeLabel: s.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
+      followersCount: s.followerCount || 0,
+      priceMatchLabel: s.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
+      imageUri: s.image_url || s.imageUri || '',
+      deliveryLabel: s.delivery_label || s.deliveryLabel || '',
+      serviceLabel: s.service_label || s.serviceLabel || '',
+      subscriptionPackageChips: s.subscriptionPackageChips || [],
+      hasBthwaniPro: s.hasBthwaniPro || false,
+      tags: tags,
+      categories: activeStoreCategories,
+      deliveryModes: deliveryModes,
+      contactNumber: s.contact_number || s.contactNumber || '',
+      openingHours: s.opening_hours || s.openingHours || '',
+      catalogSummary: s.catalog_summary || s.catalogSummary || '',
+    };
+  }, [activeStoreDetail, activeStore, activeStoreTags, activeStoreDeliveryModes, activeStoreCategories]);
   const reopenTracking = React.useCallback(() => {
     openTrackedOrder(
       trackingOrderOverride ? undefined : activeTrackedOrder?.id,
@@ -882,6 +978,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return (
       <DshStoreGetScreen
         appearanceMode={appearanceMode}
+        state={storeDetailState}
         store={activeStoreScreenStore}
         menuItems={activeStoreItems}
         onAddItemToCart={addItemToHostCart}
@@ -892,7 +989,22 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           setRoute('benefits');
         }}
         onBack={() => setRoute('home')}
-        onRetry={() => setRoute('store-get')}
+        onRetry={() => {
+          const config = resolveDshDiscoveryStoresRuntimeConfig();
+          if (config && activeStoreId) {
+            setStoreDetailState('loading');
+            const client = createDshDiscoveryStoresClient(config);
+            client.getDiscoveryStore(activeStoreId).then((response) => {
+              setActiveStoreDetail(response);
+              setStoreDetailState('ready');
+            }).catch((err) => {
+              const errState = isDshDiscoveryStoresOfflineError(err) ? 'offline' : 'error';
+              setStoreDetailState(errState);
+            });
+          } else {
+            setStoreDetailState('ready');
+          }
+        }}
         onSupport={openSupportFlow}
       />
     );

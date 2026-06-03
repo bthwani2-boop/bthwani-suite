@@ -417,7 +417,9 @@
     "dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx",
     "dsh/frontend/app-client/parts/OperationScreen.tsx",
     "dsh/frontend/app-client/screens/BenefitsScreen.tsx",
-    "dsh/frontend/app-client/screens/CartScreen.tsx"
+    "dsh/frontend/app-client/screens/CartScreen.tsx",
+    "dsh/frontend/app-client/contracts/dsh-openapi.types.ts",
+    "dsh/frontend/app-client/contracts/dsh-store-screen-props.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

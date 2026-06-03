@@ -118,3 +118,14 @@ type StoreVisibilityGateResponse struct {
 	ClientVisible             bool      `json:"client_visible"`
 	UpdatedAt                 time.Time `json:"updated_at"`
 }
+
+type StoreDetail struct {
+	StoreSummary
+	ContactNumber             string `json:"contact_number,omitempty"`
+	OpeningHours              string `json:"opening_hours,omitempty"`
+	CatalogSummary            string `json:"catalog_summary,omitempty"`
+	PartnerReadinessStatus    string `json:"partner_readiness_status"`
+	CatalogQualityStatus      string `json:"catalog_quality_status"`
+	CatalogPricingStatus      string `json:"catalog_pricing_status"`
+	MarketingVisibilityStatus string `json:"marketing_visibility_status"`
+}

@@ -417,3 +417,88 @@ RETURNING
 		UpdatedAt:                 visibilityUpdatedAt,
 	}, nil
 }
+
+func (repo *PostgresRepository) GetStore(ctx context.Context, id string) (domain.StoreDetail, error) {
+	statement := `
+SELECT
+  id,
+  name,
+  address,
+  category_id,
+  image_url,
+  logo_image_url,
+  rating,
+  distance_label,
+  delivery_label,
+  service_label,
+  status_label,
+  status_tone,
+  has_offer,
+  offer_label,
+  publish_stage,
+  partner_readiness_status,
+  catalog_quality_status,
+  catalog_pricing_status,
+  marketing_visibility_status,
+  contact_number,
+  opening_hours,
+  catalog_summary
+FROM dsh_store_discovery_stores
+WHERE id = $1
+`
+	var store domain.StoreDetail
+	var categoryID sql.NullString
+	var imageURL sql.NullString
+	var logoImageURL sql.NullString
+	var rating sql.NullFloat64
+	var statusTone string
+	var offerLabel sql.NullString
+	var contactNumber sql.NullString
+	var openingHours sql.NullString
+	var catalogSummary sql.NullString
+
+	err := repo.db.QueryRowContext(ctx, statement, id).Scan(
+		&store.ID,
+		&store.Name,
+		&store.Address,
+		&categoryID,
+		&imageURL,
+		&logoImageURL,
+		&rating,
+		&store.DistanceLabel,
+		&store.DeliveryLabel,
+		&store.ServiceLabel,
+		&store.StatusLabel,
+		&statusTone,
+		&store.HasOffer,
+		&offerLabel,
+		&store.PublishStage,
+		&store.PartnerReadinessStatus,
+		&store.CatalogQualityStatus,
+		&store.CatalogPricingStatus,
+		&store.MarketingVisibilityStatus,
+		&contactNumber,
+		&openingHours,
+		&catalogSummary,
+	)
+	if err == sql.ErrNoRows {
+		return domain.StoreDetail{}, fmt.Errorf("store not found")
+	}
+	if err != nil {
+		return domain.StoreDetail{}, err
+	}
+
+	store.CategoryID = nullableString(categoryID)
+	store.ImageURL = nullableString(imageURL)
+	store.LogoImageURL = nullableString(logoImageURL)
+	if rating.Valid {
+		store.Rating = &rating.Float64
+	}
+	store.StatusTone = domain.StoreStatusTone(statusTone)
+	store.OfferLabel = nullableString(offerLabel)
+	store.ContactNumber = nullableString(contactNumber)
+	store.OpeningHours = nullableString(openingHours)
+	store.CatalogSummary = nullableString(catalogSummary)
+
+	return store, nil
+}
