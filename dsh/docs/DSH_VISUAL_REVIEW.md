@@ -64,16 +64,16 @@ tools/registry/runs/DSH_VISUAL_SWEEP-20260524-010000/screenshots/app-client/P1__
 
 | review_id | surface | screen_id | file_path | route | queue_list | priority | current_blocker |
 |---|---|---|---|---|---|---|---|
-| `VR-L1-001` | `app-client` | `client.dsh.home.feed` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | `dsh-home` | `LIST_1_READY_NOW` | `P1` | `needs screenshot` |
-| `VR-L1-023` | `app-client` | `client.dsh.discovery.search` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | `dsh-home:inline-search` | `LIST_1_READY_NOW` | `P1` | `same-page search required; standalone SearchScreen is not accepted for DSH-SLICE-001` |
+| `VR-L1-001` | `app-client` | `client.dsh.home.feed` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | `dsh-home` | `LIST_1_READY_NOW` | `P1` | `none; screenshots captured in DSH_VISUAL_STATE_SWEEP-20260524-050100` |
+| `VR-L1-023` | `app-client` | `client.dsh.discovery.search` | `dsh/frontend/app-client/screens/HomeScreen.tsx` | `dsh-home:inline-search` | `LIST_1_READY_NOW` | `P1` | `none; screenshots captured in DSH_VISUAL_STATE_SWEEP-20260524-050100 (search stays inline)` |
 | `VR-L1-002` | `app-client` | `client.dsh.cart.review` | `dsh/frontend/app-client/screens/CartScreen.tsx` | `dsh-cart` | `LIST_1_READY_NOW` | `P1` | `needs screenshot; WLT boundary after visual proof` |
 | `VR-L1-003` | `app-client` | `client.dsh.order.tracking.live` | `dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx` | `dsh-tracking` | `LIST_1_READY_NOW` | `P1` | `needs screenshot and runtime proof` |
 | `VR-L1-004` | `app-client` | `client.dsh.orders.history` | `dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx` | `dsh-orders` | `LIST_1_READY_NOW` | `P1` | `needs screenshot and runtime proof` |
-| `VR-L1-005` | `app-client` | `client.dsh.store.details` | `dsh/frontend/app-client/screens/StoreScreen.tsx` | `dsh-store` | `LIST_1_READY_NOW` | `P1` | `needs screenshot` |
+| `VR-L1-005` | `app-client` | `client.dsh.store.details` | `dsh/frontend/app-client/screens/StoreScreen.tsx` | `dsh-store` | `LIST_1_READY_NOW` | `P1` | `none; screenshots captured in DSH_VISUAL_STATE_SWEEP-20260524-050100` |
 | `VR-L1-006` | `app-client` | `client.dsh.order.issue.workspace` | `dsh/frontend/app-client/screens/OperationScreens.tsx` | `dsh-order-issue-workspace` | `LIST_1_READY_NOW` | `P1` | `needs screenshot and runtime proof` |
 | `VR-L1-007` | `app-partner` | `partner.dsh.orders.inbox` | `dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx` | `dsh-partner-orders` | `LIST_1_READY_NOW` | `P1` | `needs screenshot and runtime proof` |
 | `VR-L1-008` | `app-partner` | `partner.dsh.order.detail` | `dsh/frontend/app-partner/screens/OrdersInboxScreen.tsx` | `dsh-partner-orders` | `LIST_1_READY_NOW` | `P1` | `needs screenshot and runtime proof` |
-| `VR-L1-009` | `app-partner` | `partner.dsh.inventory.catalog` | `dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | `LIST_1_READY_NOW` | `P1` | `needs screenshot (Required for Slice 001)` |
+| `VR-L1-009` | `app-partner` | `partner.dsh.inventory.catalog` | `dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | `LIST_1_READY_NOW` | `P1` | `none; screenshots captured in DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602` |
 | `VR-L1-010` | `app-partner` | `partner.dsh.order.rejection` | `dsh/frontend/app-partner/screens/DshPartnerOrderRejectionScreen.tsx` | `dsh-partner-order-rejection` | `LIST_1_READY_NOW` | `P1` | `needs screenshot and runtime proof` |
 | `VR-L1-011` | `app-partner` | `partner.dsh.entry.status` | `dsh/frontend/app-partner/screens/PartnerEntryScreen.tsx` | `dsh-partner-entry` | `LIST_1_READY_NOW` | `P1` | `needs screenshot` |
 | `VR-L1-012` | `app-partner` | `partner.dsh.home.dashboard` | `dsh/frontend/app-partner/screens/PartnerHubScreen.tsx` | `dsh-partner-home` | `LIST_1_READY_NOW` | `P1` | `needs screenshot` |

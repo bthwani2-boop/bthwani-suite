@@ -181,7 +181,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     primaryAction: 'فتح وجهة أو متجر أو فئة من سطح الاكتشاف.',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline'],
     evidenceStatus: 'captured',
-    remainingBlocker: 'none; app-client visual evidence captured under DSH_VISUAL_STATE_SWEEP-20260524-050100 (VR-L1-001, VR-L1-023, VR-L1-005) and regression-confirmed at DSH_BATCH7_ADB_VISUAL_SWEEP-20260524-082321. Control-panel catalog (VR-L2-008, VR-L2-009) and marketing visibility evidence still missing for full Slice 001 cross-surface closure.',
+    remainingBlocker: 'none; app-client (VR-L1-001, VR-L1-023, VR-L1-005), partner catalog (VR-L1-009), control-panel catalogs (VR-L2-008, VR-L2-009), and control-panel marketing visibility (VR-L2-012) visual evidence are captured and locked. E2E runtime and API binding proof for all surfaces remains deferred.',
     crossSurfaceDependencies: [
       'control-panel marketing publish controls',
       'app-partner inventory and availability readiness',

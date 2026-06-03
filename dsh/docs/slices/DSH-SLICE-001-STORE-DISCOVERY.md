@@ -3,7 +3,14 @@
 #Slice: DSH-SLICE-001
 Domain: dsh/client-discovery-and-visibility
 Historical Status: L7_CLOSED for app-client discovery edge only.
-Current Cross-Surface Decision: FULL_CROSS_SURFACE_REOPENED_FOR_PROOF.
+Current Cross-Surface Decision: DSH-SLICE-001 UI_UX_VISUAL_LOCKED.
+
+> [!IMPORTANT]
+> **DSH-SLICE-001 UI_UX_VISUAL_LOCKED**
+> - DSH-SLICE-001 UI/UX + Visual evidence is locked.
+> - Runtime/API/L7 closure is deferred until API binding and E2E runtime proof are approved and proven.
+> - Required runtime chain remains:
+>   partner readiness → catalog approval → marketing visibility → shared visibility/serviceability model → app-client discovery result.
 
 Business outcome:
 Client can discover only stores/catalogs that are ready, governed, visible, serviceable, and allowed by platform/provider policy.
@@ -36,6 +43,7 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 | `app-client` | `StoreScreen.tsx` | `dsh-store` | View store details | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-005` | none | `PASS` |
 | `app-partner` | `InventoryCatalogScreen.tsx` | `dsh-partner-inventory` | Update readiness and publishing visibility | same page | `loading`, `empty`, `error`, `success`, `offline` | `VR-L1-009 VISUAL_PASS (2026-06-02, DSH_PARTNER_SSOT_EVIDENCE_SWEEP-20260602)` | Runtime proof only (visual captured; publishing-gate runtime deferred) | `DEFERRED_WITH_REASON` |
 | `control-panel` | `catalogs.screen.tsx` | `/catalogs?tab=approvals&subTab=quality` + `/catalogs?tab=approvals&subTab=pricing` | Approve catalog quality / pricing | same page | `success`, `error`, `loading` | `VR-L2-008 VISUAL_PASS; VR-L2-009 VISUAL_PASS (2026-06-03)` | Runtime proof only (visual captured) | `DEFERRED_WITH_REASON` |
+| `control-panel` | `VisibilityCommandDeckScreen.tsx` | `/marketing?workspace=visibility` | Set marketing visibility gates | same page | `success`, `error`, `loading` | `VR-L2-012 VISUAL_PASS (2026-06-03, DSH_SLICE001_REALITY_SYNC-20260603)` | Runtime proof only (visual captured) | `DEFERRED_WITH_REASON` |
 
 ## 4. Data Ownership Matrix
 
@@ -60,6 +68,7 @@ Client can discover only stores/catalogs that are ready, governed, visible, serv
 | Captain Delivery | `NOT_APPLICABLE_WITH_REASON` | No delivery action in discovery | none | none | `PASS` |
 | Field Readiness | `NOT_APPLICABLE_WITH_REASON` | No field operation in discovery | none | none | `PASS` |
 | Control Panel Operations | `DEFERRED_WITH_REASON` | Catalog/marketing governance required for visibility | Governance visual/runtime proof | none | `DEFERRED_WITH_REASON` |
+| Control Panel Partners | `OPTIONAL_SUPPORTING` | Referenced as supporting partner eligibility source only; not a required visibility gate blocker for Slice 001 | none | none | `PASS` |
 | Control Panel Finance | `NOT_APPLICABLE_WITH_REASON` | No finance commands in discovery | none | none | `PASS` |
 
 ## 6. Missing Logic/Screen/Process Proposal Matrix
