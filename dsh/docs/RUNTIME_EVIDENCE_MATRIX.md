@@ -1,7 +1,7 @@
 # DSH Runtime Evidence Matrix
 
 Status: MIXED_RUNTIME_MATRIX
-Decision: BACKEND_CONTRACT_AND_REPOSITORY_PROVEN__LIVE_E2E_PENDING
+Decision: DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN__FRONTEND_BINDING_PENDING
 
 ## Matrix Evidence Requirement
 Purpose:
@@ -35,12 +35,12 @@ P0-14 note:
 | `DSH-RUN-P014-01` | app-client discovery + storefront | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx`; `DshClientSurface.tsx`; typed client bridge; `dsh-discovery-stores-transport.ts`; `dsh-discovery-stores-runtime-config.ts` | `runtime-proven` | app-client / GET /stores edge proof only; not full cross-surface Slice 001 closure | app-client / GET /stores E2E runtime screenshot captured | `api-db-runtime-proven__transport-bound__screen-runtime-proven` | pending partner & CP cross-surface proof for Slice 001 | DSH-SLICE-001 UI_UX_VISUAL_LOCKED; runtime proof deferred |
 | `DSH-RUN-P014-02` | app-client cart + checkout intent | `CartScreen.tsx`; `DshCheckoutIntentScreen.tsx` | `preview`, `local-state`, `WLT-adjacent` | `needs-visual-evidence` | `NEEDS_BINDING_LATER` | `needs-visual-evidence` | payment lifecycle and order-create failure states are wired; screenshots and trusted WLT runtime proof are still missing | screenshots plus trusted WLT/auth runtime proof |
 | `DSH-RUN-P014-03` | app-client tracking + support | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | `preview`, `local-state` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | `needs-visual-evidence` | cancellation/refund/support-exception/rating handoff are wired; screenshots and lifecycle runtime proof are still missing | cross-surface screenshots plus lifecycle event proof |
-| `DSH-RUN-P014-04` | app-partner intake + catalog | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `InventoryCatalogScreen.tsx`; `DshPartnerOrderRejectionScreen.tsx` | `preview`, `local-state` | `BACKEND_CONTRACT_AND_REPOSITORY_PROVEN__LIVE_E2E_PENDING` | `FRONTEND_TRANSPORT_BOUND_PENDING` | `partner-screenshots-observed__backend-verified` | screenshots captured (SM-A125F) for visual; backend PATCH /stores/{id}/partner-readiness endpoint and memory/postgres storage logic implemented and verified via unit tests | frontend UI screen not yet connected to the backend API | update matrix after E2E live DB curl or frontend connection |
+| `DSH-RUN-P014-04` | app-partner intake + catalog | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `InventoryCatalogScreen.tsx`; `DshPartnerOrderRejectionScreen.tsx` | `preview`, `local-state` | `BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING` | `FRONTEND_TRANSPORT_BOUND_PENDING` | `partner-screenshots-observed__backend-live-e2e-proven` | screenshots captured (SM-A125F) for visual; backend PATCH /stores/{id}/partner-readiness endpoint proven via Live E2E (DSH_SLICE001_LIVE_E2E-20260603-173059): paused→client_visible:false, ready→client_visible:true, GET /stores diff confirmed | frontend UI screen not yet connected to the backend API | wire app-partner UI actions to PATCH endpoints and capture screen/runtime proof |
 | `DSH-RUN-P014-05` | app-captain pickup + delivery + PoD | `DshCaptainOrdersScreen.tsx`; `DshCaptainPickupDropoffScreen.tsx`; `DshCaptainPoDSubmissionScreen.tsx`; `DshCaptainMapScreen.tsx` | `preview`, `fixture`, `local-state` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | `needs-visual-evidence` | pickup/delivery-failure/PoD logic is wired; screenshots and milestone proof are still missing | captain screenshots plus delivery milestone proof |
 | `DSH-RUN-P014-06` | app-field onboarding + visit + readiness | `DshFieldStoresScreen.tsx`; `DshFieldStoreOnboardingScreen.tsx`; `DshFieldStoreVisitScreen.tsx`; `DshFieldReadinessEscalationScreen.tsx` | `preview`, `local-state` | `needs-visual-evidence` | `NEEDS_RUNTIME_EVIDENCE` | `needs-visual-evidence` | document states, revisit states, and readiness outcomes are wired; screenshots and handoff proof are still missing | field screenshots plus readiness handoff proof |
-| `DSH-RUN-P014-07` | control-panel operations | `operations.registry.ts`; `CommandCenterScreen.tsx`; `DispatchAssignmentScreen.tsx`; `ExceptionsEscalationsScreen.tsx`; `AuditSupportSlaScreen.tsx`; `GeoHeatmapScreen.tsx` | `preview`, `local governance state` | `BACKEND_CONTRACT_AND_REPOSITORY_PROVEN__LIVE_E2E_PENDING` | `FRONTEND_TRANSPORT_BOUND_PENDING` | `cp-screenshots-observed__backend-verified` | screenshots captured for visual; backend PATCH /stores/{id}/catalog-approval and /stores/{id}/marketing-visibility endpoints implemented and verified via unit tests | frontend UI screen not yet connected to the backend API | update matrix after E2E live DB curl or frontend connection |
+| `DSH-RUN-P014-07` | control-panel operations | `operations.registry.ts`; `CommandCenterScreen.tsx`; `DispatchAssignmentScreen.tsx`; `ExceptionsEscalationsScreen.tsx`; `AuditSupportSlaScreen.tsx`; `GeoHeatmapScreen.tsx` | `preview`, `local governance state` | `BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING` | `FRONTEND_TRANSPORT_BOUND_PENDING` | `cp-screenshots-observed__backend-live-e2e-proven` | screenshots captured for visual; backend PATCH /stores/{id}/catalog-approval and /stores/{id}/marketing-visibility proven via Live E2E (DSH_SLICE001_LIVE_E2E-20260603-173059): rejected→client_visible:false, approved→client_visible:true, inactive→client_visible:false, active→client_visible:true, GET /stores diff confirmed | frontend UI screen not yet connected to the backend API | wire control-panel UI actions to PATCH endpoints and capture screen/runtime proof |
 | `DSH-RUN-P014-08` | control-panel finance bridge | `FinanceHubScreen.tsx`; `FinanceHubScreens.tsx`; `WltBoundaryBanner.tsx` | `preview`, `read-only bridge` | `blocked-by-wlt` | `BLOCKED_BY_WLT` | `blocked-by-wlt` | settlement, payout, refund, commission, and ledger remain WLT-owned | WLT-owned runtime proof only; no DSH finance mutation |
-| `DSH-RUN-P014-09` | backend + domain + OpenAPI | dsh/backend; dsh/domain; dsh/dsh.openapi.yaml | go-skeleton, postgres-repository, docker-compose-postgres, migration-seed, openapi-aligned | BACKEND_CONTRACT_AND_REPOSITORY_PROVEN__LIVE_E2E_PENDING | LOCAL_GO_API_TESTS_PASS | api-db-runtime-proven | E2E Live DB curl validation and frontend UI integration verify proof | update matrix after E2E live DB curl or frontend connection |
+| `DSH-RUN-P014-09` | backend + domain + OpenAPI | dsh/backend; dsh/domain; dsh/dsh.openapi.yaml | go-skeleton, postgres-repository, docker-compose-postgres, migration-seed, openapi-aligned | DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN | LOCAL_GO_API_TESTS_PASS__LIVE_E2E_PROVEN | api-db-runtime-proven__live-e2e-zip-captured | Live E2E proven: DSH_SLICE001_LIVE_E2E-20260603-173059; all 3 PATCH gates and GET /stores response diff captured against live Postgres; go test pass | wire frontend UI actions to PATCH endpoints |
 
 Closure rule:
 `RUNTIME_UNPROVEN` remains the frontend/screen runtime decision until trusted runtime proof exists for the active frontend slices above. Batch 9B proves the local Go -> PostgreSQL API boundary for `GET /stores`, but a visual pass, typed client boundary, or backend-only response does not promote preview screen data to end-to-end runtime truth.
@@ -77,3 +77,25 @@ What was observed: Screenshots captured under `DSH_SLICE001_REALITY_SYNC-2026060
 What was NOT proven: (1) partner accept/prepare/ready button press produces a backend API call. (2) catalog approve/reject in CP writes to a Go endpoint. (3) marketing visibility toggle changes shared serviceability state. (4) any of the above actions changes the `GET /stores` response. No API binding, no Go endpoint for these actions, no DB write traced, no GET /stores response diff captured.
 Status: `APP_PARTNER_RUNTIME_VISUAL_OBSERVED` + `CONTROL_PANEL_RUNTIME_VISUAL_OBSERVED`. Rows DSH-RUN-P014-04 and DSH-RUN-P014-07 corrected from false PROVEN labels to VISUAL_OBSERVED + HANDOFF_BLOCKED.
 Remaining blocker: partner catalog/readiness endpoint + catalog-approval endpoint + marketing-visibility endpoint must be implemented, wired, and proven to affect GET /stores before this gate can be promoted.
+
+DSH-SLICE-001 Backend Live E2E Proven (2026-06-03):
+Decision: `DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING`
+Evidence: `tools/registry/runs/DSH_SLICE001_LIVE_E2E-20260603-173059/`
+Summary:
+
+- 01-get-before.json: 3 stores (store-1001, store-1002, store-1003); store-1004 filtered correctly as closed
+- 02 PATCH partner-readiness paused → client_visible: false
+- 03 GET /stores after readiness paused → store-1001 removed (2 stores)
+- 04 PATCH partner-readiness ready → client_visible: true (restored)
+- 05 PATCH catalog quality rejected → client_visible: false
+- 06 GET /stores after catalog rejected → store-1001 removed (2 stores)
+- 07 PATCH catalog approved → client_visible: true (restored)
+- 08 PATCH marketing inactive → client_visible: false
+- 09 GET /stores after marketing inactive → store-1001 removed (2 stores)
+- 10 PATCH marketing active → client_visible: true (restored)
+- 11 GET /stores final → 3 stores restored
+- go test -count=1 ./...: ok bthwani.local/dsh/backend/internal/http (0.041s)
+- Server: dsh-api using postgres repository (live Postgres on port 55432)
+
+Rows updated: DSH-RUN-P014-04 → BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING; DSH-RUN-P014-07 → BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING; DSH-RUN-P014-09 → DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN
+Remaining blocker: app-partner frontend endpoint binding + control-panel frontend endpoint binding + screen evidence after wiring.
