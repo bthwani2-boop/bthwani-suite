@@ -16,7 +16,11 @@ INSERT INTO dsh_store_discovery_stores (
   publish_stage,
   supports_pickup,
   supports_partner_delivery,
-  search_text
+  search_text,
+  partner_readiness_status,
+  catalog_quality_status,
+  catalog_pricing_status,
+  marketing_visibility_status
 ) VALUES
   (
     'store-1001',
@@ -36,7 +40,11 @@ INSERT INTO dsh_store_discovery_stores (
     'published',
     TRUE,
     TRUE,
-    'grocery fresh market haddah offer'
+    'grocery fresh market haddah offer',
+    'ready',
+    'approved',
+    'approved',
+    'active'
   ),
   (
     'store-1002',
@@ -56,7 +64,11 @@ INSERT INTO dsh_store_discovery_stores (
     'published',
     TRUE,
     TRUE,
-    'bakery bread sabeen'
+    'bakery bread sabeen',
+    'ready',
+    'approved',
+    'approved',
+    'active'
   ),
   (
     'store-1003',
@@ -76,7 +88,11 @@ INSERT INTO dsh_store_discovery_stores (
     'published',
     TRUE,
     FALSE,
-    'grocery pickup tahrir offer'
+    'grocery pickup tahrir offer',
+    'ready',
+    'approved',
+    'approved',
+    'active'
   ),
   (
     'store-1004',
@@ -96,7 +112,11 @@ INSERT INTO dsh_store_discovery_stores (
     'published',
     TRUE,
     TRUE,
-    'convenience shumaila evening'
+    'convenience shumaila evening',
+    'ready',
+    'approved',
+    'approved',
+    'active'
   )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
@@ -116,4 +136,9 @@ ON CONFLICT (id) DO UPDATE SET
   supports_pickup = EXCLUDED.supports_pickup,
   supports_partner_delivery = EXCLUDED.supports_partner_delivery,
   search_text = EXCLUDED.search_text,
+  partner_readiness_status = EXCLUDED.partner_readiness_status,
+  catalog_quality_status = EXCLUDED.catalog_quality_status,
+  catalog_pricing_status = EXCLUDED.catalog_pricing_status,
+  marketing_visibility_status = EXCLUDED.marketing_visibility_status,
+  visibility_updated_at = NOW(),
   updated_at = NOW();

@@ -1,6 +1,9 @@
 package domain
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 type StoreStatusTone string
 
@@ -69,12 +72,16 @@ type ErrorResponse struct {
 }
 
 type VisibilityServiceabilityInput struct {
-	PublishStage            string
-	StoreOpen               bool
-	SupportsPickup          bool
-	SupportsPartnerDelivery bool
-	ServiceLabel            string
-	DeliveryLabel           string
+	PublishStage              string
+	StoreOpen                 bool
+	SupportsPickup            bool
+	SupportsPartnerDelivery   bool
+	ServiceLabel              string
+	DeliveryLabel             string
+	PartnerReadinessStatus    string
+	CatalogQualityStatus      string
+	CatalogPricingStatus      string
+	MarketingVisibilityStatus string
 }
 
 func (input VisibilityServiceabilityInput) ClientVisible() bool {
@@ -82,5 +89,32 @@ func (input VisibilityServiceabilityInput) ClientVisible() bool {
 		input.StoreOpen &&
 		(input.SupportsPickup || input.SupportsPartnerDelivery) &&
 		strings.TrimSpace(input.ServiceLabel) != "" &&
-		strings.TrimSpace(input.DeliveryLabel) != ""
+		strings.TrimSpace(input.DeliveryLabel) != "" &&
+		input.PartnerReadinessStatus == "ready" &&
+		input.CatalogQualityStatus == "approved" &&
+		input.CatalogPricingStatus == "approved" &&
+		input.MarketingVisibilityStatus == "active"
+}
+
+type PartnerReadinessUpdateRequest struct {
+	Status string `json:"status"`
+}
+
+type CatalogApprovalUpdateRequest struct {
+	QualityStatus string `json:"quality_status"`
+	PricingStatus string `json:"pricing_status"`
+}
+
+type MarketingVisibilityUpdateRequest struct {
+	Status string `json:"status"`
+}
+
+type StoreVisibilityGateResponse struct {
+	StoreID                   string    `json:"store_id"`
+	PartnerReadinessStatus    string    `json:"partner_readiness_status"`
+	CatalogQualityStatus      string    `json:"catalog_quality_status"`
+	CatalogPricingStatus      string    `json:"catalog_pricing_status"`
+	MarketingVisibilityStatus string    `json:"marketing_visibility_status"`
+	ClientVisible             bool      `json:"client_visible"`
+	UpdatedAt                 time.Time `json:"updated_at"`
 }

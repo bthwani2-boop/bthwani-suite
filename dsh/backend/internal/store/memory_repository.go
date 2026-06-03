@@ -2,8 +2,10 @@ package store
 
 import (
 	"context"
+	"errors"
 	"sort"
 	"strings"
+	"time"
 
 	"bthwani.local/dsh/domain"
 )
@@ -13,10 +15,15 @@ type MemoryRepository struct {
 }
 
 type memoryStore struct {
-	summary                 domain.StoreSummary
-	supportsPickup          bool
-	supportsPartnerDelivery bool
-	searchTerms             []string
+	summary                   domain.StoreSummary
+	supportsPickup            bool
+	supportsPartnerDelivery   bool
+	searchTerms               []string
+	partnerReadinessStatus    string
+	catalogQualityStatus      string
+	catalogPricingStatus      string
+	marketingVisibilityStatus string
+	visibilityUpdatedAt       time.Time
 }
 
 func NewMemoryRepository() *MemoryRepository {
@@ -24,6 +31,8 @@ func NewMemoryRepository() *MemoryRepository {
 	ratingBakery := 4.6
 	ratingGrocer := 4.4
 	ratingClosed := 4.2
+
+	now := time.Now()
 
 	return &MemoryRepository{
 		stores: []memoryStore{
@@ -45,9 +54,14 @@ func NewMemoryRepository() *MemoryRepository {
 					OfferLabel:    "Fresh produce offer",
 					PublishStage:  "published",
 				},
-				supportsPickup:          true,
-				supportsPartnerDelivery: true,
-				searchTerms:             []string{"grocery", "fresh", "market", "haddah"},
+				supportsPickup:            true,
+				supportsPartnerDelivery:   true,
+				searchTerms:               []string{"grocery", "fresh", "market", "haddah"},
+				partnerReadinessStatus:    "ready",
+				catalogQualityStatus:      "approved",
+				catalogPricingStatus:      "approved",
+				marketingVisibilityStatus: "active",
+				visibilityUpdatedAt:       now,
 			},
 			{
 				summary: domain.StoreSummary{
@@ -66,9 +80,14 @@ func NewMemoryRepository() *MemoryRepository {
 					HasOffer:      false,
 					PublishStage:  "published",
 				},
-				supportsPickup:          true,
-				supportsPartnerDelivery: true,
-				searchTerms:             []string{"bakery", "bread", "sabeen"},
+				supportsPickup:            true,
+				supportsPartnerDelivery:   true,
+				searchTerms:               []string{"bakery", "bread", "sabeen"},
+				partnerReadinessStatus:    "ready",
+				catalogQualityStatus:      "approved",
+				catalogPricingStatus:      "approved",
+				marketingVisibilityStatus: "active",
+				visibilityUpdatedAt:       now,
 			},
 			{
 				summary: domain.StoreSummary{
@@ -88,9 +107,14 @@ func NewMemoryRepository() *MemoryRepository {
 					OfferLabel:    "Pickup discount",
 					PublishStage:  "published",
 				},
-				supportsPickup:          true,
-				supportsPartnerDelivery: false,
-				searchTerms:             []string{"grocery", "pickup", "tahrir"},
+				supportsPickup:            true,
+				supportsPartnerDelivery:   false,
+				searchTerms:               []string{"grocery", "pickup", "tahrir"},
+				partnerReadinessStatus:    "ready",
+				catalogQualityStatus:      "approved",
+				catalogPricingStatus:      "approved",
+				marketingVisibilityStatus: "active",
+				visibilityUpdatedAt:       now,
 			},
 			{
 				summary: domain.StoreSummary{
@@ -109,9 +133,14 @@ func NewMemoryRepository() *MemoryRepository {
 					HasOffer:      false,
 					PublishStage:  "published",
 				},
-				supportsPickup:          true,
-				supportsPartnerDelivery: true,
-				searchTerms:             []string{"convenience", "shumaila", "evening"},
+				supportsPickup:            true,
+				supportsPartnerDelivery:   true,
+				searchTerms:               []string{"convenience", "shumaila", "evening"},
+				partnerReadinessStatus:    "ready",
+				catalogQualityStatus:      "approved",
+				catalogPricingStatus:      "approved",
+				marketingVisibilityStatus: "active",
+				visibilityUpdatedAt:       now,
 			},
 		},
 	}
@@ -169,13 +198,78 @@ func (repo *MemoryRepository) ListStores(ctx context.Context, query domain.Store
 
 func clientVisible(store memoryStore) bool {
 	return domain.VisibilityServiceabilityInput{
-		PublishStage:            store.summary.PublishStage,
-		StoreOpen:               store.summary.StatusTone == domain.StoreStatusOpen,
-		SupportsPickup:          store.supportsPickup,
-		SupportsPartnerDelivery: store.supportsPartnerDelivery,
-		ServiceLabel:            store.summary.ServiceLabel,
-		DeliveryLabel:           store.summary.DeliveryLabel,
+		PublishStage:              store.summary.PublishStage,
+		StoreOpen:                 store.summary.StatusTone == domain.StoreStatusOpen,
+		SupportsPickup:            store.supportsPickup,
+		SupportsPartnerDelivery:   store.supportsPartnerDelivery,
+		ServiceLabel:              store.summary.ServiceLabel,
+		DeliveryLabel:             store.summary.DeliveryLabel,
+		PartnerReadinessStatus:    store.partnerReadinessStatus,
+		CatalogQualityStatus:      store.catalogQualityStatus,
+		CatalogPricingStatus:      store.catalogPricingStatus,
+		MarketingVisibilityStatus: store.marketingVisibilityStatus,
 	}.ClientVisible()
+}
+
+func (repo *MemoryRepository) UpdatePartnerReadiness(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error) {
+	for i, store := range repo.stores {
+		if store.summary.ID == id {
+			repo.stores[i].partnerReadinessStatus = status
+			repo.stores[i].visibilityUpdatedAt = time.Now()
+
+			return domain.StoreVisibilityGateResponse{
+				StoreID:                   repo.stores[i].summary.ID,
+				PartnerReadinessStatus:    repo.stores[i].partnerReadinessStatus,
+				CatalogQualityStatus:      repo.stores[i].catalogQualityStatus,
+				CatalogPricingStatus:      repo.stores[i].catalogPricingStatus,
+				MarketingVisibilityStatus: repo.stores[i].marketingVisibilityStatus,
+				ClientVisible:             clientVisible(repo.stores[i]),
+				UpdatedAt:                 repo.stores[i].visibilityUpdatedAt,
+			}, nil
+		}
+	}
+	return domain.StoreVisibilityGateResponse{}, errors.New("store not found")
+}
+
+func (repo *MemoryRepository) UpdateCatalogApproval(ctx context.Context, id string, qualityStatus string, pricingStatus string) (domain.StoreVisibilityGateResponse, error) {
+	for i, store := range repo.stores {
+		if store.summary.ID == id {
+			repo.stores[i].catalogQualityStatus = qualityStatus
+			repo.stores[i].catalogPricingStatus = pricingStatus
+			repo.stores[i].visibilityUpdatedAt = time.Now()
+
+			return domain.StoreVisibilityGateResponse{
+				StoreID:                   repo.stores[i].summary.ID,
+				PartnerReadinessStatus:    repo.stores[i].partnerReadinessStatus,
+				CatalogQualityStatus:      repo.stores[i].catalogQualityStatus,
+				CatalogPricingStatus:      repo.stores[i].catalogPricingStatus,
+				MarketingVisibilityStatus: repo.stores[i].marketingVisibilityStatus,
+				ClientVisible:             clientVisible(repo.stores[i]),
+				UpdatedAt:                 repo.stores[i].visibilityUpdatedAt,
+			}, nil
+		}
+	}
+	return domain.StoreVisibilityGateResponse{}, errors.New("store not found")
+}
+
+func (repo *MemoryRepository) UpdateMarketingVisibility(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error) {
+	for i, store := range repo.stores {
+		if store.summary.ID == id {
+			repo.stores[i].marketingVisibilityStatus = status
+			repo.stores[i].visibilityUpdatedAt = time.Now()
+
+			return domain.StoreVisibilityGateResponse{
+				StoreID:                   repo.stores[i].summary.ID,
+				PartnerReadinessStatus:    repo.stores[i].partnerReadinessStatus,
+				CatalogQualityStatus:      repo.stores[i].catalogQualityStatus,
+				CatalogPricingStatus:      repo.stores[i].catalogPricingStatus,
+				MarketingVisibilityStatus: repo.stores[i].marketingVisibilityStatus,
+				ClientVisible:             clientVisible(repo.stores[i]),
+				UpdatedAt:                 repo.stores[i].visibilityUpdatedAt,
+			}, nil
+		}
+	}
+	return domain.StoreVisibilityGateResponse{}, errors.New("store not found")
 }
 
 func matchesCategory(store domain.StoreSummary, categoryID string) bool {

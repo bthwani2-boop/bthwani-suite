@@ -19,17 +19,37 @@ const (
 
 type StoresHandler struct {
 	repository store.Repository
+	mux        *http.ServeMux
 }
 
 func NewStoresHandler(repository store.Repository) *StoresHandler {
-	return &StoresHandler{repository: repository}
+	handler := &StoresHandler{
+		repository: repository,
+		mux:        http.NewServeMux(),
+	}
+
+	// Register internal routes for dispatching
+	handler.mux.HandleFunc("GET /stores", handler.ListStores)
+	handler.mux.HandleFunc("PATCH /stores/{id}/partner-readiness", handler.UpdatePartnerReadiness)
+	handler.mux.HandleFunc("PATCH /stores/{id}/catalog-approval", handler.UpdateCatalogApproval)
+	handler.mux.HandleFunc("PATCH /stores/{id}/marketing-visibility", handler.UpdateMarketingVisibility)
+
+	return handler
 }
 
 func RegisterRoutes(mux *http.ServeMux, repository store.Repository) {
-	mux.Handle("/stores", NewStoresHandler(repository))
+	handler := NewStoresHandler(repository)
+	mux.Handle("GET /stores", handler)
+	mux.Handle("PATCH /stores/{id}/partner-readiness", handler)
+	mux.Handle("PATCH /stores/{id}/catalog-approval", handler)
+	mux.Handle("PATCH /stores/{id}/marketing-visibility", handler)
 }
 
 func (handler *StoresHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	handler.mux.ServeHTTP(writer, request)
+}
+
+func (handler *StoresHandler) ListStores(writer http.ResponseWriter, request *http.Request) {
 	log.Printf("dsh-api: received GET /stores request from app-client")
 	if request.Method != http.MethodGet {
 		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
@@ -45,6 +65,126 @@ func (handler *StoresHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 	response, err := handler.repository.ListStores(request.Context(), query)
 	if err != nil {
 		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list stores")
+		return
+	}
+
+	writeJSON(writer, http.StatusOK, response)
+}
+
+func (handler *StoresHandler) UpdatePartnerReadiness(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("dsh-api: received PATCH /stores/{id}/partner-readiness request")
+	if request.Method != http.MethodPatch {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	id := request.PathValue("id")
+	if id == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store id")
+		return
+	}
+
+	var req domain.PartnerReadinessUpdateRequest
+	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		return
+	}
+
+	status := strings.ToLower(strings.TrimSpace(req.Status))
+	if status != "ready" && status != "not_ready" && status != "paused" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "status must be ready, not_ready, or paused")
+		return
+	}
+
+	response, err := handler.repository.UpdatePartnerReadiness(request.Context(), id, status)
+	if err != nil {
+		if err.Error() == "store not found" {
+			writeError(writer, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "store not found")
+			return
+		}
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	writeJSON(writer, http.StatusOK, response)
+}
+
+func (handler *StoresHandler) UpdateCatalogApproval(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("dsh-api: received PATCH /stores/{id}/catalog-approval request")
+	if request.Method != http.MethodPatch {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	id := request.PathValue("id")
+	if id == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store id")
+		return
+	}
+
+	var req domain.CatalogApprovalUpdateRequest
+	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		return
+	}
+
+	qualityStatus := strings.ToLower(strings.TrimSpace(req.QualityStatus))
+	if qualityStatus != "approved" && qualityStatus != "pending" && qualityStatus != "rejected" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "quality_status must be approved, pending, or rejected")
+		return
+	}
+
+	pricingStatus := strings.ToLower(strings.TrimSpace(req.PricingStatus))
+	if pricingStatus != "approved" && pricingStatus != "pending" && pricingStatus != "rejected" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "pricing_status must be approved, pending, or rejected")
+		return
+	}
+
+	response, err := handler.repository.UpdateCatalogApproval(request.Context(), id, qualityStatus, pricingStatus)
+	if err != nil {
+		if err.Error() == "store not found" {
+			writeError(writer, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "store not found")
+			return
+		}
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	writeJSON(writer, http.StatusOK, response)
+}
+
+func (handler *StoresHandler) UpdateMarketingVisibility(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("dsh-api: received PATCH /stores/{id}/marketing-visibility request")
+	if request.Method != http.MethodPatch {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	id := request.PathValue("id")
+	if id == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store id")
+		return
+	}
+
+	var req domain.MarketingVisibilityUpdateRequest
+	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		return
+	}
+
+	status := strings.ToLower(strings.TrimSpace(req.Status))
+	if status != "active" && status != "inactive" && status != "paused" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "status must be active, inactive, or paused")
+		return
+	}
+
+	response, err := handler.repository.UpdateMarketingVisibility(request.Context(), id, status)
+	if err != nil {
+		if err.Error() == "store not found" {
+			writeError(writer, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "store not found")
+			return
+		}
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
 		return
 	}
 

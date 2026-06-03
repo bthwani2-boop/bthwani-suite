@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	"bthwani.local/dsh/domain"
 
@@ -45,6 +46,10 @@ func (repo *PostgresRepository) ListStores(ctx context.Context, query domain.Sto
 		"(supports_pickup OR supports_partner_delivery)",
 		"NULLIF(TRIM(service_label), '') IS NOT NULL",
 		"NULLIF(TRIM(delivery_label), '') IS NOT NULL",
+		"partner_readiness_status = 'ready'",
+		"catalog_quality_status = 'approved'",
+		"catalog_pricing_status = 'approved'",
+		"marketing_visibility_status = 'active'",
 	}
 	args := []any{}
 
@@ -173,4 +178,242 @@ func nullableString(value sql.NullString) string {
 		return ""
 	}
 	return value.String
+}
+
+func (repo *PostgresRepository) UpdatePartnerReadiness(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error) {
+	statement := `
+UPDATE dsh_store_discovery_stores
+SET partner_readiness_status = $1,
+    visibility_updated_at = NOW(),
+    updated_at = NOW()
+WHERE id = $2
+RETURNING
+  id,
+  partner_readiness_status,
+  catalog_quality_status,
+  catalog_pricing_status,
+  marketing_visibility_status,
+  publish_stage,
+  status_tone,
+  supports_pickup,
+  supports_partner_delivery,
+  service_label,
+  delivery_label,
+  visibility_updated_at
+`
+	var storeID string
+	var partnerReadiness string
+	var catalogQuality string
+	var catalogPricing string
+	var marketingVisibility string
+	var publishStage string
+	var statusTone string
+	var supportsPickup bool
+	var supportsPartnerDelivery bool
+	var serviceLabel string
+	var deliveryLabel string
+	var visibilityUpdatedAt time.Time
+
+	err := repo.db.QueryRowContext(ctx, statement, status, id).Scan(
+		&storeID,
+		&partnerReadiness,
+		&catalogQuality,
+		&catalogPricing,
+		&marketingVisibility,
+		&publishStage,
+		&statusTone,
+		&supportsPickup,
+		&supportsPartnerDelivery,
+		&serviceLabel,
+		&deliveryLabel,
+		&visibilityUpdatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return domain.StoreVisibilityGateResponse{}, fmt.Errorf("store not found")
+	}
+	if err != nil {
+		return domain.StoreVisibilityGateResponse{}, err
+	}
+
+	clientVisible := domain.VisibilityServiceabilityInput{
+		PublishStage:              publishStage,
+		StoreOpen:                 statusTone == "open",
+		SupportsPickup:            supportsPickup,
+		SupportsPartnerDelivery:   supportsPartnerDelivery,
+		ServiceLabel:              serviceLabel,
+		DeliveryLabel:             deliveryLabel,
+		PartnerReadinessStatus:    partnerReadiness,
+		CatalogQualityStatus:      catalogQuality,
+		CatalogPricingStatus:      catalogPricing,
+		MarketingVisibilityStatus: marketingVisibility,
+	}.ClientVisible()
+
+	return domain.StoreVisibilityGateResponse{
+		StoreID:                   storeID,
+		PartnerReadinessStatus:    partnerReadiness,
+		CatalogQualityStatus:      catalogQuality,
+		CatalogPricingStatus:      catalogPricing,
+		MarketingVisibilityStatus: marketingVisibility,
+		ClientVisible:             clientVisible,
+		UpdatedAt:                 visibilityUpdatedAt,
+	}, nil
+}
+
+func (repo *PostgresRepository) UpdateCatalogApproval(ctx context.Context, id string, qualityStatus string, pricingStatus string) (domain.StoreVisibilityGateResponse, error) {
+	statement := `
+UPDATE dsh_store_discovery_stores
+SET catalog_quality_status = $1,
+    catalog_pricing_status = $2,
+    visibility_updated_at = NOW(),
+    updated_at = NOW()
+WHERE id = $3
+RETURNING
+  id,
+  partner_readiness_status,
+  catalog_quality_status,
+  catalog_pricing_status,
+  marketing_visibility_status,
+  publish_stage,
+  status_tone,
+  supports_pickup,
+  supports_partner_delivery,
+  service_label,
+  delivery_label,
+  visibility_updated_at
+`
+	var storeID string
+	var partnerReadiness string
+	var catalogQuality string
+	var catalogPricing string
+	var marketingVisibility string
+	var publishStage string
+	var statusTone string
+	var supportsPickup bool
+	var supportsPartnerDelivery bool
+	var serviceLabel string
+	var deliveryLabel string
+	var visibilityUpdatedAt time.Time
+
+	err := repo.db.QueryRowContext(ctx, statement, qualityStatus, pricingStatus, id).Scan(
+		&storeID,
+		&partnerReadiness,
+		&catalogQuality,
+		&catalogPricing,
+		&marketingVisibility,
+		&publishStage,
+		&statusTone,
+		&supportsPickup,
+		&supportsPartnerDelivery,
+		&serviceLabel,
+		&deliveryLabel,
+		&visibilityUpdatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return domain.StoreVisibilityGateResponse{}, fmt.Errorf("store not found")
+	}
+	if err != nil {
+		return domain.StoreVisibilityGateResponse{}, err
+	}
+
+	clientVisible := domain.VisibilityServiceabilityInput{
+		PublishStage:              publishStage,
+		StoreOpen:                 statusTone == "open",
+		SupportsPickup:            supportsPickup,
+		SupportsPartnerDelivery:   supportsPartnerDelivery,
+		ServiceLabel:              serviceLabel,
+		DeliveryLabel:             deliveryLabel,
+		PartnerReadinessStatus:    partnerReadiness,
+		CatalogQualityStatus:      catalogQuality,
+		CatalogPricingStatus:      catalogPricing,
+		MarketingVisibilityStatus: marketingVisibility,
+	}.ClientVisible()
+
+	return domain.StoreVisibilityGateResponse{
+		StoreID:                   storeID,
+		PartnerReadinessStatus:    partnerReadiness,
+		CatalogQualityStatus:      catalogQuality,
+		CatalogPricingStatus:      catalogPricing,
+		MarketingVisibilityStatus: marketingVisibility,
+		ClientVisible:             clientVisible,
+		UpdatedAt:                 visibilityUpdatedAt,
+	}, nil
+}
+
+func (repo *PostgresRepository) UpdateMarketingVisibility(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error) {
+	statement := `
+UPDATE dsh_store_discovery_stores
+SET marketing_visibility_status = $1,
+    visibility_updated_at = NOW(),
+    updated_at = NOW()
+WHERE id = $2
+RETURNING
+  id,
+  partner_readiness_status,
+  catalog_quality_status,
+  catalog_pricing_status,
+  marketing_visibility_status,
+  publish_stage,
+  status_tone,
+  supports_pickup,
+  supports_partner_delivery,
+  service_label,
+  delivery_label,
+  visibility_updated_at
+`
+	var storeID string
+	var partnerReadiness string
+	var catalogQuality string
+	var catalogPricing string
+	var marketingVisibility string
+	var publishStage string
+	var statusTone string
+	var supportsPickup bool
+	var supportsPartnerDelivery bool
+	var serviceLabel string
+	var deliveryLabel string
+	var visibilityUpdatedAt time.Time
+
+	err := repo.db.QueryRowContext(ctx, statement, status, id).Scan(
+		&storeID,
+		&partnerReadiness,
+		&catalogQuality,
+		&catalogPricing,
+		&marketingVisibility,
+		&publishStage,
+		&statusTone,
+		&supportsPickup,
+		&supportsPartnerDelivery,
+		&serviceLabel,
+		&deliveryLabel,
+		&visibilityUpdatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return domain.StoreVisibilityGateResponse{}, fmt.Errorf("store not found")
+	}
+	if err != nil {
+		return domain.StoreVisibilityGateResponse{}, err
+	}
+
+	clientVisible := domain.VisibilityServiceabilityInput{
+		PublishStage:              publishStage,
+		StoreOpen:                 statusTone == "open",
+		SupportsPickup:            supportsPickup,
+		SupportsPartnerDelivery:   supportsPartnerDelivery,
+		ServiceLabel:              serviceLabel,
+		DeliveryLabel:             deliveryLabel,
+		PartnerReadinessStatus:    partnerReadiness,
+		CatalogQualityStatus:      catalogQuality,
+		CatalogPricingStatus:      catalogPricing,
+		MarketingVisibilityStatus: marketingVisibility,
+	}.ClientVisible()
+
+	return domain.StoreVisibilityGateResponse{
+		StoreID:                   storeID,
+		PartnerReadinessStatus:    partnerReadiness,
+		CatalogQualityStatus:      catalogQuality,
+		CatalogPricingStatus:      catalogPricing,
+		MarketingVisibilityStatus: marketingVisibility,
+		ClientVisible:             clientVisible,
+		UpdatedAt:                 visibilityUpdatedAt,
+	}, nil
 }

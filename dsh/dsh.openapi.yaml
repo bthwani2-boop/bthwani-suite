@@ -77,6 +77,145 @@ paths:
              application/json:
                schema:
                  $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/partner-readiness:
+    patch:
+      tags:
+        - Store Visibility
+      summary: Update store partner readiness
+      description: Update the partner readiness status gate for a store.
+      operationId: updatePartnerReadiness
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerReadinessUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreVisibilityGateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/catalog-approval:
+    patch:
+      tags:
+        - Store Visibility
+      summary: Update store catalog approval status
+      description: Update the catalog quality and catalog pricing status gates for a store.
+      operationId: updateCatalogApproval
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogApprovalUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreVisibilityGateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/marketing-visibility:
+    patch:
+      tags:
+        - Store Visibility
+      summary: Update store marketing visibility status
+      description: Update the marketing visibility status gate for a store.
+      operationId: updateMarketingVisibility
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketingVisibilityUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreVisibilityGateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -153,6 +292,73 @@ components:
           type: string
         publish_stage:
           type: string
+
+    PartnerReadinessUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready, paused]
+          description: The readiness status of the store partner.
+
+    CatalogApprovalUpdateRequest:
+      type: object
+      required:
+        - quality_status
+        - pricing_status
+      properties:
+        quality_status:
+          type: string
+          enum: [approved, pending, rejected]
+          description: The quality approval status of the store catalog.
+        pricing_status:
+          type: string
+          enum: [approved, pending, rejected]
+          description: The pricing approval status of the store catalog.
+
+    MarketingVisibilityUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [active, inactive, paused]
+          description: The marketing visibility status of the store.
+
+    StoreVisibilityGateResponse:
+      type: object
+      required:
+        - store_id
+        - partner_readiness_status
+        - catalog_quality_status
+        - catalog_pricing_status
+        - marketing_visibility_status
+        - client_visible
+        - updated_at
+      properties:
+        store_id:
+          type: string
+        partner_readiness_status:
+          type: string
+          enum: [ready, not_ready, paused]
+        catalog_quality_status:
+          type: string
+          enum: [approved, pending, rejected]
+        catalog_pricing_status:
+          type: string
+          enum: [approved, pending, rejected]
+        marketing_visibility_status:
+          type: string
+          enum: [active, inactive, paused]
+        client_visible:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+
     ErrorResponse:
       type: object
       required:
