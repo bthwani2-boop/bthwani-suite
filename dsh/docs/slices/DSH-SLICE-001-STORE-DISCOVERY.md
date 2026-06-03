@@ -128,15 +128,13 @@ The closure of `DSH-SLICE-001` relies on the following evidence ledger entries:
 ## Decision
 
 - **UI/UX_VISUAL_LOCKED** = مثبت
-- **Runtime/API/L7** = BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING
+- **Runtime/API/L7** = FRONTEND_TRANSPORT_BOUND__SCREEN_PROOF_PENDING
 - **partner readiness endpoint** = Live E2E proven (DSH_SLICE001_LIVE_E2E-20260603-173059)
 - **catalog approval endpoint** = Live E2E proven (DSH_SLICE001_LIVE_E2E-20260603-173059)
 - **marketing visibility endpoint** = Live E2E proven (DSH_SLICE001_LIVE_E2E-20260603-173059)
 
 - **Final Slice Decision**: `DEFERRED_WITH_REASON`.
 - **Core Remaining Risks (Blockers)**:
-  1. **app-partner frontend endpoint binding**: UI actions not yet wired to PATCH /stores/{id}/partner-readiness.
-  2. **control-panel frontend endpoint binding**: UI actions not yet wired to PATCH /stores/{id}/catalog-approval and /stores/{id}/marketing-visibility.
-  3. **Screen runtime evidence**: Screen-level proof after frontend wiring required before slice promotion.
+  1. **Screen runtime evidence**: Frontend wiring is complete; screen-level proof must be captured with Go API running — press StoreReadinessGate in InventoryCatalogScreen, press catalog/marketing buttons in PartnerStoresScreen inspector, confirm client_visible response.
 - **Next Action**:
-  Wire app-partner and control-panel UI actions to the PATCH endpoints, then capture screen/runtime proof.
+  Start Go API, open wired screens with valid store IDs, capture screenshots showing client_visible true/false response from live backend.

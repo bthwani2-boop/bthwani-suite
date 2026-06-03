@@ -31,6 +31,12 @@ import {
   buildCentralPartnerInventoryItems,
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
 } from '../../shared/catalog-central-adapter';
+import {
+  createDshStoreVisibilityHttpClient,
+  resolveDshStoreVisibilityBaseUrl,
+  type DshStoreVisibilityTransportError,
+} from '../../shared/dsh-store-visibility-transport';
+import type { PartnerReadinessStatus } from '../../shared/dsh-store-visibility-client';
 
 import {
   BThwaniFilterRail,
@@ -383,6 +389,106 @@ function getAvailableProductFacets(items: InventoryCatalogListItem[]): DshProduc
   const seen = new Set<DshProductFacetId>();
   items.forEach((item) => { item.facetTags?.forEach((f) => seen.add(f)); });
   return Array.from(seen);
+}
+
+// ── Store Readiness Gate ──────────────────────────────────────────────
+// Wires PATCH /stores/{id}/partner-readiness to the partner surface.
+// Only rendered when canonicalStoreId is present.
+
+type ReadinessGateState =
+  | { kind: 'idle'; status: PartnerReadinessStatus }
+  | { kind: 'loading' }
+  | { kind: 'success'; clientVisible: boolean; status: PartnerReadinessStatus }
+  | { kind: 'error'; message: string };
+
+function StoreReadinessGate({ storeId }: { storeId: string }) {
+  const { direction } = useDirection();
+  const [gate, setGate] = React.useState<ReadinessGateState>({
+    kind: 'idle',
+    status: 'ready',
+  });
+
+  const handleToggle = React.useCallback(
+    async (nextStatus: PartnerReadinessStatus) => {
+      const baseUrl = resolveDshStoreVisibilityBaseUrl();
+      if (!baseUrl) {
+        setGate({ kind: 'error', message: 'لم يُعثر على عنوان API — تحقق من EXPO_PUBLIC_DSH_API_BASE_URL.' });
+        return;
+      }
+      setGate({ kind: 'loading' });
+      try {
+        const client = createDshStoreVisibilityHttpClient(baseUrl);
+        const res = await client.updatePartnerReadiness(storeId, nextStatus);
+        setGate({ kind: 'success', clientVisible: res.client_visible, status: res.partner_readiness_status });
+      } catch (err: unknown) {
+        const typedErr = err as Partial<DshStoreVisibilityTransportError>;
+        if (typedErr.kind === 'offline') {
+          setGate({ kind: 'error', message: 'لا يوجد اتصال بالشبكة.' });
+        } else if (typedErr.kind === 'http') {
+          setGate({ kind: 'error', message: `خطأ من الخادم (${(typedErr as { status: number }).status}).` });
+        } else {
+          setGate({ kind: 'error', message: 'حدث خطأ غير متوقع.' });
+        }
+      }
+    },
+    [storeId],
+  );
+
+  const currentStatus =
+    gate.kind === 'idle' || gate.kind === 'error'
+      ? gate.kind === 'idle' ? gate.status : 'ready'
+      : gate.kind === 'success' ? gate.status : 'ready';
+
+  const isReady = currentStatus === 'ready';
+
+  return (
+    <Surface tone={isReady ? 'default' : 'warning'} padding={2} gap={2} border>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+        <Box style={{ flex: 1, gap: 2 }}>
+          <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
+            جاهزية المتجر للعميل
+          </Text>
+          {gate.kind === 'success' ? (
+            <Text role="caption" tone={gate.clientVisible ? 'success' : 'warning'} align={direction === 'rtl' ? 'end' : 'start'}>
+              {gate.clientVisible ? 'المتجر ظاهر للعميل' : 'المتجر مخفي عن العميل'}
+              {' · client_visible: '}
+              {gate.clientVisible ? 'true' : 'false'}
+            </Text>
+          ) : gate.kind === 'error' ? (
+            <Text role="caption" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
+              {gate.message}
+            </Text>
+          ) : gate.kind === 'loading' ? (
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              جاري التحديث...
+            </Text>
+          ) : (
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              {isReady ? 'الوضع الحالي: جاهز' : 'الوضع الحالي: موقوف'}
+            </Text>
+          )}
+        </Box>
+        <Box style={{ flexDirection: resolveRowDirection(direction), gap: 6 }}>
+          <Button
+            label="جاهز"
+            size="sm"
+            tone={isReady ? 'success' : 'secondary'}
+            fullWidth={false}
+            disabled={gate.kind === 'loading' || isReady}
+            onPress={() => handleToggle('ready')}
+          />
+          <Button
+            label="إيقاف مؤقت"
+            size="sm"
+            tone={!isReady ? 'warning' : 'secondary'}
+            fullWidth={false}
+            disabled={gate.kind === 'loading' || !isReady}
+            onPress={() => handleToggle('paused')}
+          />
+        </Box>
+      </Box>
+    </Surface>
+  );
 }
 
 // ── Props ─────────────────────────────────────────────────────────────
@@ -1134,6 +1240,9 @@ function InventoryCatalogContent({
 
   return (
     <Box gap={2} dir="rtl">
+
+      {/* Store readiness gate — wires PATCH /stores/{id}/partner-readiness */}
+      {canonicalStoreId ? <StoreReadinessGate storeId={canonicalStoreId} /> : null}
 
       {/* Summary tiles */}
       <Surface tone="raised" padding={1} gap={0} border={false}>
