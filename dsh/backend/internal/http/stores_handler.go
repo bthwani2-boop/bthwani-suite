@@ -3,6 +3,7 @@ package httpapi
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -29,6 +30,7 @@ func RegisterRoutes(mux *http.ServeMux, repository store.Repository) {
 }
 
 func (handler *StoresHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("dsh-api: received GET /stores request from app-client")
 	if request.Method != http.MethodGet {
 		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
 		return
