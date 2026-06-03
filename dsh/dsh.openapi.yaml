@@ -3,7 +3,7 @@ info:
   title: BThwani DSH API
   version: 0.1.0
   description: API contract for client-facing store discovery and storefront visibility.
-x-bthwani-status: READY_FOR_ONE_OPENAPI_ENDPOINT
+x-bthwani-status: DSH_SLICE001_SCREEN_RUNTIME_PROVEN
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
@@ -68,15 +68,15 @@ paths:
         '400':
           description: Bad Request
           content:
-             application/json:
-               schema:
-                 $ref: '#/components/schemas/ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal Server Error
           content:
-             application/json:
-               schema:
-                 $ref: '#/components/schemas/ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /stores/{id}/partner-readiness:
     patch:
@@ -85,6 +85,7 @@ paths:
       summary: Update store partner readiness
       description: Update the partner readiness status gate for a store.
       operationId: updatePartnerReadiness
+      security: []
       parameters:
         - name: id
           in: path
@@ -131,6 +132,7 @@ paths:
       summary: Update store catalog approval status
       description: Update the catalog quality and catalog pricing status gates for a store.
       operationId: updateCatalogApproval
+      security: []
       parameters:
         - name: id
           in: path
@@ -177,6 +179,7 @@ paths:
       summary: Update store marketing visibility status
       description: Update the marketing visibility status gate for a store.
       operationId: updateMarketingVisibility
+      security: []
       parameters:
         - name: id
           in: path

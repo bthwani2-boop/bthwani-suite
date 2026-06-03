@@ -26,9 +26,19 @@ Lean index for the current DSH docs baseline. Service-state truth lives in the l
 
 - `dsh/docs/MIGRATION.md`
 - `dsh/docs/DSH_VISUAL_REVIEW.md`
-- `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md`
-- `dsh/docs/slices/`
-- `dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md`
+- `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` — journey and execution slice authority (10 journeys, 44 slices)
+- `dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md` — full repo source area → journey/slice coverage map; GAPs and contradictions
+- `dsh/docs/slices/` — one folder per journey, one file per slice:
+  - `journey-001-store-discovery/` — 7 files (001 parent + 001A–001F)
+  - `journey-002-catalog-management/` — 7 files (002A–002G)
+  - `journey-003-checkout-payment/` — 5 files (003A–003E)
+  - `journey-004-order-lifecycle/` — 6 files (004A–004F)
+  - `journey-005-delivery-execution/` — 6 files (005A–005F)
+  - `journey-006-field-readiness/` — 5 files (006A–006E)
+  - `journey-007-data-media-fixture-governance/` — 5 files (007A–007D + PERFORMANCE_NOTES)
+  - `journey-008-platform-vars-provider/` — 4 files (008A–008D)
+  - `journey-009-control-panel-operations/` — 4 files (009A–009D)
+  - `journey-010-wlt-finance-boundary/` — 4 files (010A–010D)
 - `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md`
 - `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`
 - `dsh/docs/SCREEN_API_MATRIX.md`
