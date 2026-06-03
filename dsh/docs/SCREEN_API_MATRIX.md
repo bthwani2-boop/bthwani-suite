@@ -1,7 +1,7 @@
 # DSH Screen/API Matrix
 
 Status: MIXED_SERVICE_MATRIX
-Decision: DSH_SLICE_001_L7_CLOSED__OTHER_ROWS_PENDING_OR_BLOCKED
+Decision: DSH_SLICE_001_UI_UX_VISUAL_LOCKED__RUNTIME_DEFERRED__OTHER_ROWS_PENDING
 
 Purpose:
 Freeze the frontend-facing API needs after P0-14 without inflating runtime or backend closure.
