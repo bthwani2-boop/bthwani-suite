@@ -18,7 +18,7 @@ API contract: `dsh/dsh.openapi.yaml`.
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
 | Current Decision | `DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE` |
-| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = IMPLEMENTATION_STARTED / auth.openapi.yaml + wlt.openapi.yaml + dsh.openapi.yaml contracts ready; Go handlers 003A/003B/003C/003E implemented; callback-primary flow documented; auth DEV_ONLY (X-Client-Id); BearerAuth + WLT runtime pending before PASS; J-004 = FUTURE_NEEDS_CROSS_SURFACE_PROOF / DEFERRED pending J-003 closure; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
+| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = IMPLEMENTATION_STARTED / auth.openapi.yaml + wlt.openapi.yaml + dsh.openapi.yaml contracts ready; Go handlers 003A/003B/003C/003E implemented; callback-primary flow documented; production BearerAuth backend path + app-client Bearer checkout transport implemented; live auth-service runtime proof + WLT runtime/security proof + visual proof pending before PASS; J-004 = FUTURE_NEEDS_CROSS_SURFACE_PROOF / DEFERRED pending J-003 closure; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -119,7 +119,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | Client + WLT roadmap | `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md` | app-client + WLT boundary plan |
 | Control-panel owner decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | section and shared ownership |
 | Visual review system | `dsh/docs/DSH_VISUAL_REVIEW.md` | screenshot-led visual evidence only |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001 + J-002 endpoints E2E proven; J-003 contracts designed (GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, POST /checkout/payment-callback); auth DEV_ONLY (X-Client-Id); BearerAuth + WLT runtime pending before J-003 PASS |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001 + J-002 endpoints E2E proven; J-003 contracts designed (GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, POST /checkout/payment-callback); production BearerAuth backend path + app-client Bearer checkout transport implemented; DEV X-Client-Id fallback remains; live auth-service runtime proof + WLT runtime pending before J-003 PASS |
 
 ---
 
@@ -143,7 +143,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | Journey | Status |
 |---|---|
 | J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
-| J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` — contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; auth DEV_ONLY (X-Client-Id); callback-primary flow; BearerAuth + WLT E2E runtime pending before PASS |
+| J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` — contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; production BearerAuth backend path + app-client Bearer checkout transport implemented; callback-primary flow; live auth-service runtime proof + WLT E2E runtime pending before PASS |
 | J-004 Order Lifecycle | `FUTURE_NEEDS_CROSS_SURFACE_PROOF` — DEFERRED pending J-003 closure; 004A–004F all DEFERRED_WITH_REASON in slice manifest |
 | J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
 | J-006 Field Readiness | `DEFERRED` — no onboarding API designed |

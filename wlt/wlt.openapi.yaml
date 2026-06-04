@@ -45,6 +45,7 @@ paths:
 
         PRIMARY FLOW — callback:
           WLT sends payment decision to DSH via POST /checkout/payment-callback on the DSH backend.
+          WLT must include X-WLT-Callback-Token, X-WLT-Event-Id, and Idempotency-Key.
           DSH MUST NOT create the order until it receives a confirmed callback from WLT.
           DSH stores sessionId as wlt_payment_ref_id (operational reference only).
 

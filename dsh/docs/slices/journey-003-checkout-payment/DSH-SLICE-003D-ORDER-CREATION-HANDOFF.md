@@ -5,10 +5,10 @@
 |---|---|
 | Slice ID | `DSH-SLICE-003D` |
 | Parent Journey | J-003 — Checkout & Payment |
-| Business Outcome | Upon WLT payment confirmation, DSH creates order record, assigns status CREATED, and hands off to J-004 order lifecycle |
-| Primary Actor | DSH backend (automated — triggered by WLT payment callback) |
+| Business Outcome | After WLT payment confirmation is stored, DSH creates an order record, assigns status CREATED, and hands off to J-004 order lifecycle |
+| Primary Actor | DSH backend / order service (separate post-callback step) |
 | Actor Chain | DSH backend (automated) → app-partner (intake receiver) → control-panel (ops monitor) |
-| Operation Chain | WLT sends payment-confirmed callback (003C) → DSH backend creates order record → pushes notification to partner → control-panel ops monitor receives new order event → J-004 lifecycle begins |
+| Operation Chain | WLT sends payment-confirmed callback (003C) → DSH stores confirmed payment reference → separate order creation step creates order record → pushes notification to partner → control-panel ops monitor receives new order event → J-004 lifecycle begins |
 | Primary Surface | DSH backend / order service |
 | Supporting Surfaces | app-partner (order intake receiver); control-panel / operations (ops monitor) |
 | Dependency Surfaces | DSH-SLICE-003B (upstream — checkout session); DSH-SLICE-003C (upstream — WLT payment confirmation required); DSH-SLICE-004B (downstream — partner order lifecycle) |
@@ -20,7 +20,7 @@
 | Notification Boundary | Order creation triggers partner notification; client receives order confirmation; owned by DSH notification service |
 | Account/Profile Boundary | Client account (order owner); partner account (order assignee) |
 | Data Ownership | DSH backend domain (order record); WLT provides payment reference ID (read-only) |
-| API/Runtime Boundary | `POST /orders` (DSH backend — created on payment callback) — NOT YET DESIGNED (blocked by 003B + 003C); `GET /orders/{id}` (client order confirmation) — NOT YET DESIGNED |
+| API/Runtime Boundary | `POST /orders` and `GET /orders/{id}` — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_POSTGRES_REQUIRED in `dsh/dsh.openapi.yaml`; order creation is a separate post-callback step and is not executed inside `POST /checkout/payment-callback`; PASS remains blocked by 003B/003C runtime proof and cross-surface visual/runtime proof |
 | Visual Evidence Required | yes — app-client order confirmation screen; app-partner new order notification; control-panel ops monitor |
 | Runtime Evidence Required | yes — POST /orders runtime proof triggered by WLT callback + partner notification proven |
 | Current Status | `OPEN_BLOCKED_BY_003C_RUNTIME` |
@@ -29,7 +29,7 @@
 ## Scope
 
 ### Included
-- `POST /orders` — created on WLT payment confirmation
+- `POST /orders` — separate post-callback order creation step after WLT payment confirmation is stored
 - Order record with status `CREATED`, linked to payment reference ID (read-only)
 - Notification to partner (new order)
 - Client order confirmation screen (order confirmation view)
@@ -46,8 +46,8 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen / Endpoint | Classification | Status |
 |---|---|---|---|---|
-| CM-003D-01 | DSH backend | POST /orders (triggered by WLT callback) | primary | BLOCKED_WITH_REASON |
-| CM-003D-02 | app-client | Order confirmation screen (GET /orders/{id}) | supporting | BLOCKED_WITH_REASON |
+| CM-003D-01 | DSH backend | POST /orders (separate post-callback step) | primary | BLOCKED_WITH_REASON — contract/backend implemented; WLT runtime proof pending |
+| CM-003D-02 | app-client | Order confirmation screen (GET /orders/{id}) | supporting | BLOCKED_WITH_REASON — contract/backend implemented; visual/runtime proof pending |
 | CM-003D-03 | app-partner | New order notification + intake screen | supporting | BLOCKED_WITH_REASON |
 | CM-003D-04 | control-panel (operations) | Ops monitor — new order event | supporting | BLOCKED_WITH_REASON |
 | CM-003D-05 | app-captain | — | excluded | NOT_APPLICABLE — captain assigned in J-005 |
@@ -57,7 +57,7 @@
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Precondition | Status |
 |---|---|---|---|---|---|
-| (Automatic) Create order | DSH backend | — | POST /orders | WLT payment-confirmed callback received | BLOCKED_WITH_REASON |
+| (Automatic) Create order | DSH backend | — | POST /orders | confirmed `wlt_payment_ref_id` stored from 003C | BLOCKED_WITH_REASON |
 | View order | app-client | Order confirmation screen | GET /orders/{id} | order CREATED | BLOCKED_WITH_REASON |
 | View new order | app-partner | Partner order intake screen | GET /orders/{id} (partner view) | partner notification received | BLOCKED_WITH_REASON |
 
@@ -84,7 +84,7 @@
 ### Missing Logic / Screen / Process Proposals
 | ID | Item | Classification | Reason |
 |---|---|---|---|
-| GAP-003D-01 | Order ID generation strategy | BLOCKED_WITH_REASON | Requires backend design; blocked by upstream |
+| GAP-003D-01 | Idempotent order creation from confirmed checkout intent | BLOCKED_WITH_REASON | Backend order creation exists, but the confirmed-intent handoff and replay-safe order creation proof remain blocked by 003C runtime |
 | GAP-003D-02 | Notification channel for partner (push vs in-app) | BLOCKED_WITH_REASON | Notification service ownership TBD |
 | GAP-003D-03 | Order confirmation screen design | BLOCKED_WITH_REASON | Requires order API + auth; blocked |
 
@@ -96,9 +96,9 @@
 ### Exit Gates (all must be proven before PASS)
 1. DSH-SLICE-003B PASS
 2. DSH-SLICE-003C PASS (WLT payment confirmation available)
-3. `POST /orders` designed in `dsh/dsh.openapi.yaml`
-4. Go backend handler + order domain model implemented + unit-tested
-5. DB migration for orders table applied
+3. `POST /orders` and `GET /orders/{id}` contracts remain aligned with backend implementation
+4. Go backend handler + order domain model remain covered by targeted tests
+5. DB migration for orders table applied in the target runtime
 6. Partner notification proven (new order event delivered)
 7. Runtime proof: order CREATED record in DB after WLT callback
 8. Visual proof: app-client confirmation screen + app-partner intake screen
@@ -109,8 +109,8 @@
 - Financial reversal (if needed) is WLT-owned via DSH-SLICE-004E
 
 | **Slice Decision** | `OPEN_BLOCKED_BY_003C_RUNTIME` |
-| **Reason** | `POST /orders` contract exists in `dsh/dsh.openapi.yaml`. Cannot create real orders until DSH-SLICE-003C WLT payment callback is proven at runtime. `POST /orders` must only be triggered by a confirmed `wlt_payment_ref_id` from the callback. |
+| **Reason** | `POST /orders` and `GET /orders/{id}` contracts exist in `dsh/dsh.openapi.yaml` and backend implementation exists for the Postgres runtime. Cannot prove real order handoff until DSH-SLICE-003C WLT payment callback is proven at runtime. `POST /orders` must only run after a confirmed `wlt_payment_ref_id` is stored from the callback. |
 | **Dependency** | DSH-SLICE-003B pass + DSH-SLICE-003C WLT runtime proof |
-| **Next Action** | Await 003C WLT runtime proof; then implement order creation handler triggered by payment-confirmed callback |
+| **Next Action** | Await 003C WLT runtime proof; then prove the separate post-callback order creation handoff across backend, app-client confirmation, app-partner intake, and control-panel ops |
 | **Forward-Only Gate** | All 8 exit gates must pass before PASS |
-| **Evidence Folder** | pending |
+| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_001_002_003_FINAL_TRUTH_CLOSURE-20260604/` |

@@ -68,6 +68,7 @@ import {
   type DshOrderItemInput,
   createDshCheckoutHttpClient,
   type DshCheckoutClient,
+  type DshCheckoutAuthContext,
 } from '../shared';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
@@ -104,6 +105,23 @@ const getDshWebWindow = (): (Window & typeof globalThis) | null => {
   }
 };
 
+const readDshEnv = (key: string): string | undefined => {
+  if (typeof process === 'undefined') return undefined;
+  return (
+    process as {
+      env?: Record<string, string | undefined>;
+    }
+  ).env?.[key];
+};
+
+function resolveCheckoutAuthContext(authToken?: string, devClientId?: string): DshCheckoutAuthContext {
+  const bearerToken = (authToken ?? readDshEnv('EXPO_PUBLIC_DSH_AUTH_BEARER_TOKEN'))?.trim();
+  if (bearerToken) return { bearerToken };
+
+  const clientId = (devClientId ?? readDshEnv('EXPO_PUBLIC_DSH_CLIENT_ID') ?? 'client-101').trim();
+  return { clientId };
+}
+
 const CLIENT_BOTTOM_NAV_ITEMS = [
   { id: 'favorites', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
   { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
@@ -111,7 +129,7 @@ const CLIENT_BOTTOM_NAV_ITEMS = [
   { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
 ] as const;
 
-export function DshClientSurface({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
+export function DshClientSurface({ command, onExit, onOpenService, authToken, devClientId, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
 
   // ── Runtime bridge state ────────────────────────────────────────────────────
@@ -207,6 +225,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
   const [route, setRoute] = React.useState<DshRoute>('home');
   const walletPreview = useWltDshWalletPreview();
+  const checkoutAuth = React.useMemo(
+    () => resolveCheckoutAuthContext(authToken, devClientId),
+    [authToken, devClientId],
+  );
   const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<string>('wallet');
   const [checkoutState, setCheckoutState] = React.useState<'ready' | 'loading' | 'payment-failed'>('ready');
   const [paymentErrorMessage, setPaymentErrorMessage] = React.useState<string>('');
@@ -709,7 +731,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     let resolvedIntentId: string | null = checkoutIntentId;
     if (apiConfig && !resolvedIntentId) {
       try {
-        const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl);
+        const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
         const intentItems = cartItems.map((item) => ({
           product_id: item.id,
           quantity: item.qty,
@@ -720,12 +742,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
             items: intentItems,
             delivery_address: createOrderValues.dropoffAddress || 'جوار الجبل الجديد',
           },
-          'client-101',
+          checkoutAuth.clientId ?? '',
         );
         resolvedIntentId = intentResp.intent_id;
         setCheckoutIntentId(resolvedIntentId);
-      } catch {
-        // Non-fatal — proceed without intent (preview mode)
+      } catch (err) {
+        console.warn("Failed to create checkout intent:", err);
+        setCheckoutState('payment-failed');
+        setPaymentErrorMessage('تعذر إنشاء جلسة الدفع. تحقق من تسجيل الدخول وحاول مرة أخرى.');
+        return;
       }
     }
 
@@ -760,7 +785,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       setCheckoutState('ready');
       setCheckoutIntentId(null);
     }
-  }, [selectedPaymentMethod, cartItems, selectedFulfillmentMode, walletPreview, handleConfirmedOrderExecution, checkoutIntentId, activeStore, createOrderValues.dropoffAddress]);
+  }, [selectedPaymentMethod, cartItems, selectedFulfillmentMode, walletPreview, handleConfirmedOrderExecution, checkoutIntentId, activeStore, createOrderValues.dropoffAddress, checkoutAuth]);
 
   const activeStore = React.useMemo(
     () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
@@ -1373,15 +1398,18 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           if (apiConfig && cartItems.length > 0) {
             setServiceabilityLoading(true);
             try {
-              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl);
+              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
               const itemIds = cartItems.map((item) => item.id);
-              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, 'client-101');
+              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, checkoutAuth.clientId ?? '');
               if (!result.serviceable) {
                 setServiceabilityLoading(false);
+                setReorderAlertMessage('هذا المتجر أو بعض العناصر غير متاحة للتوصيل الآن.');
                 return;
               }
             } catch {
-              // Network/API error — proceed anyway (preview fallback)
+              setServiceabilityLoading(false);
+              setReorderAlertMessage('تعذر التحقق من قابلية التوصيل عبر الخادم. حاول مرة أخرى.');
+              return;
             }
             setServiceabilityLoading(false);
           }
@@ -1393,15 +1421,18 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           if (apiConfig && cartItems.length > 0) {
             setServiceabilityLoading(true);
             try {
-              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl);
+              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
               const itemIds = cartItems.map((item) => item.id);
-              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, 'client-101');
+              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, checkoutAuth.clientId ?? '');
               if (!result.serviceable) {
                 setServiceabilityLoading(false);
+                setReorderAlertMessage('هذا المتجر أو بعض العناصر غير متاحة للتوصيل الآن.');
                 return;
               }
             } catch {
-              // Network/API error — proceed anyway (preview fallback)
+              setServiceabilityLoading(false);
+              setReorderAlertMessage('تعذر التحقق من قابلية التوصيل عبر الخادم. حاول مرة أخرى.');
+              return;
             }
             setServiceabilityLoading(false);
           }

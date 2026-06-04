@@ -36,6 +36,8 @@ export type DshClientSurfaceProps = {
   command: DshNavigationCommand;
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
+  authToken?: string;
+  devClientId?: string;
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
 };
 

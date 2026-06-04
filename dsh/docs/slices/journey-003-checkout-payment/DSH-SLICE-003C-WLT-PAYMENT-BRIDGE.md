@@ -20,11 +20,11 @@
 | Notification Boundary | Payment success/failure notification — emitted after this step; owner TBD (WLT or DSH notification service) |
 | Account/Profile Boundary | WLT wallet account — WLT owned; DSH reads only |
 | Data Ownership | WLT-owned (payment execution); DSH stores payment reference ID only in backend database |
-| API/Runtime Boundary | `POST /checkout/payment-callback` — CONTRACT_DESIGNED in dsh.openapi.yaml v0.3.0; backend handler implemented with X-WLT-Callback-Token + X-WLT-Event-Id validation; ARCHITECTURAL_DECISION: callback-primary flow (WLT calls DSH) is documented as PRIMARY; polling fallback is SECONDARY; WLT team must publish callback spec before PASS — WLT payment execution API is WLT-owned |
+| API/Runtime Boundary | `POST /checkout/payment-callback` — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED in dsh.openapi.yaml v0.3.0; backend handler validates X-WLT-Callback-Token, X-WLT-Event-Id, and Idempotency-Key; repository persists `wlt_callback_event_id` for replay protection; ARCHITECTURAL_DECISION: callback-primary flow (WLT calls DSH) is PRIMARY; polling fallback is SECONDARY; WLT runtime/security proof remains required before PASS — WLT payment execution API is WLT-owned |
 | Visual Evidence Required | yes — WltBoundaryBanner.tsx displayed; payment awaiting state; confirmed state |
 | Runtime Evidence Required | yes — WLT payment E2E proof + DSH callback endpoint receiving confirmation |
 | Current Status | `BLOCKED_WITH_REASON — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_WLT_RUNTIME_PENDING` |
-| Blocking Reason | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0 and backend handler implemented (X-WLT-Callback-Token + X-WLT-Event-Id validation, idempotency enforced, 003C/003D separation enforced). WLT bridge contract published in `wlt/wlt.openapi.yaml`. Remaining: WLT team must publish final callback security spec + prove E2E payment runtime. 003B PASS required. |
+| Blocking Reason | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0 and backend handler implemented (X-WLT-Callback-Token + X-WLT-Event-Id + Idempotency-Key validation, `wlt_callback_event_id` persistence, 003C/003D separation enforced). WLT bridge contract published in `wlt/wlt.openapi.yaml`. Remaining: WLT team must publish final callback security/runtime proof and prove E2E payment. 003B PASS required. |
 
 ## Scope
 
@@ -47,7 +47,7 @@
 |---|---|---|---|---|
 | CM-003C-01 | WLT | Payment execution (WLT-owned screens) | primary | BLOCKED_WITH_REASON — WLT team must prove |
 | CM-003C-02 | app-client | WltBoundaryBanner.tsx (payment step) | supporting | BLOCKED_WITH_REASON |
-| CM-003C-03 | DSH backend | POST /checkout/payment-callback | dependency | CONTRACT_DESIGNED |
+| CM-003C-03 | DSH backend | POST /checkout/payment-callback | dependency | CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_HEADERS_ENFORCED |
 | CM-003C-04 | control-panel (finance) | Read-only payment reference view | supporting | BLOCKED_WITH_REASON — read-only only |
 | CM-003C-05 | app-captain | — | excluded | NOT_APPLICABLE — not assigned at payment step |
 | CM-003C-06 | app-partner | — | excluded | NOT_APPLICABLE — partner intake is 003D |
@@ -58,15 +58,15 @@
 | CTA | Surface | Screen | Target | Precondition | Status |
 |---|---|---|---|---|---|
 | Pay via WLT | WLT surface | WLT-owned payment screen | WLT payment API | 003B checkout session token | BLOCKED_WITH_REASON — WLT owned |
-| (Automatic) Receive callback | DSH backend | — | POST /checkout/payment-callback | WLT payment confirmation | BLOCKED_WITH_REASON |
+| (Automatic) Receive callback | DSH backend | — | POST /checkout/payment-callback | WLT payment confirmation | BLOCKED_WITH_REASON — DSH receiver implemented; WLT runtime proof pending |
 | Retry (on WLT failure) | WLT surface | WLT-owned failure screen | Re-enter WLT payment | Previous payment failed | BLOCKED_WITH_REASON — WLT owned |
 
 ## State Matrix
 | State | Required | Surface | Status |
 |---|---|---|---|
 | awaiting_wlt_confirmation | yes | app-client WltBoundaryBanner | BLOCKED |
-| payment_confirmed | yes | app-client / DSH backend | BLOCKED |
-| payment_failed | yes | app-client (triggers 003E) | BLOCKED |
+| payment_confirmed | yes | app-client / DSH backend | BLOCKED — backend state path implemented; WLT runtime + app-client visual proof pending |
+| payment_failed | yes | app-client (triggers 003E) | BLOCKED — backend state path implemented; WLT runtime + app-client visual proof pending |
 | loading | yes | app-client WltBoundaryBanner | BLOCKED |
 | error (callback failure) | yes | DSH backend | BLOCKED |
 
@@ -82,8 +82,8 @@
 ### Missing Logic / Screen / Process Proposals
 | ID | Item | Classification | Reason |
 |---|---|---|---|
-| GAP-003C-01 | WLT callback contract spec (event format, auth header, retry) | BLOCKED_WITH_REASON | WLT team must publish; DSH cannot design callback without it |
-| GAP-003C-02 | Callback idempotency strategy (duplicate payment events) | BLOCKED_WITH_REASON | Requires WLT contract + DSH backend design; blocked |
+| GAP-003C-01 | WLT final callback runtime/security proof (event format, auth header, retry) | BLOCKED_WITH_REASON | WLT OpenAPI bridge exists, but WLT team must prove the final runtime/security behavior before PASS |
+| GAP-003C-02 | WLT retry/idempotency semantics beyond DSH event persistence | BLOCKED_WITH_REASON | DSH stores `wlt_callback_event_id` and returns idempotent acknowledgement for repeated events; WLT final retry/security runtime proof remains pending |
 | GAP-003C-03 | Notification trigger ownership (payment success/failure) | BLOCKED_WITH_REASON | Owner TBD — WLT or DSH notification service |
 
 ## Evidence and Gates
@@ -92,10 +92,10 @@
 - Evidence path: `tools/registry/runs/DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700/`
 
 ### Exit Gates (all must be proven before PASS)
-1. WLT team publishes payment callback contract spec
+1. WLT team publishes/proves final payment callback runtime/security behavior
 2. DSH-SLICE-003B PASS (checkout session token available)
-3. `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml`
-4. Go backend handler implemented + unit-tested
+3. `POST /checkout/payment-callback` contract, Go handler, and idempotency header requirements remain aligned with tests
+4. `wlt_callback_event_id` persistence/replay behavior remains proven in targeted checkout tests
 5. WLT payment E2E runtime proof captured by WLT team
 6. DSH callback endpoint proven to receive and store WLT confirmation
 7. Visual proof: WltBoundaryBanner.tsx states (awaiting, confirmed, failed)
@@ -105,9 +105,9 @@
 - No DSH finance mutation exists; rollback means clearing checkout session (no financial reversal in DSH)
 - Financial reversal (refund) is WLT-owned via DSH-SLICE-004E
 
-| **Slice Decision** | `OPEN_CONTRACT_DESIGNED_WLT_RUNTIME_PENDING` |
-| **Reason** | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0. WLT payment bridge contract published in `wlt/wlt.openapi.yaml`. WLT team must prove E2E runtime; DSH Go handler + idempotency strategy pending. |
-| **Dependency** | WLT team E2E runtime proof; DSH-SLICE-003B pass; Go backend callback handler |
-| **Next Action** | WLT team publishes runtime proof; implement DSH Go callback handler with idempotency; wire WltBoundaryBanner.tsx |
+| **Slice Decision** | `OPEN_CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_WLT_RUNTIME_PENDING` |
+| **Reason** | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0 and implemented in Go with required callback headers plus `wlt_callback_event_id` replay protection. WLT payment bridge contract is published in `wlt/wlt.openapi.yaml`. WLT team must still prove E2E runtime/security before PASS. |
+| **Dependency** | WLT team E2E runtime/security proof; DSH-SLICE-003B pass; WltBoundaryBanner visual/runtime proof |
+| **Next Action** | WLT team publishes runtime/security proof; wire/prove WltBoundaryBanner states; capture DSH callback runtime evidence with WLT confirmation/failure |
 | **Forward-Only Gate** | All 7 exit gates must pass before PASS |
-| **Evidence Folder** | pending |
+| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_001_002_003_FINAL_TRUTH_CLOSURE-20260604/` |

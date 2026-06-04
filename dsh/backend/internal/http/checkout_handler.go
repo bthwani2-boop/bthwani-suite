@@ -39,7 +39,7 @@ func RegisterCheckoutRoutes(mux *http.ServeMux, repository store.Repository) {
 func (h *CheckoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id, X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key")
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -195,6 +195,12 @@ func (h *CheckoutHandler) ReceivePaymentCallback(w http.ResponseWriter, r *http.
 	eventID := strings.TrimSpace(r.Header.Get("X-WLT-Event-Id"))
 	if eventID == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "X-WLT-Event-Id header required for idempotency")
+		return
+	}
+
+	idempotencyKey := strings.TrimSpace(r.Header.Get("Idempotency-Key"))
+	if idempotencyKey == "" {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "Idempotency-Key header required for callback/payment-session correlation")
 		return
 	}
 

@@ -61,7 +61,7 @@
 |---|---|---|---|---|---|
 | Retry payment | app-client | CheckoutFailureScreen | Re-enter DSH-SLICE-003C flow | Previous payment failed + cart still valid | BLOCKED_WITH_REASON |
 | Cancel checkout | app-client | CheckoutFailureScreen | DELETE /checkout/intent/{id} → CartScreen | Payment failed | BLOCKED_WITH_REASON |
-| Contact support | app-client | CheckoutFailureScreen | J-004 DSH-SLICE-004C (support escalation) | Persistent failure | BLOCKED_WITH_REASON — 004C not yet designed |
+| Contact support | app-client | CheckoutFailureScreen | J-004 DSH-SLICE-004C (support escalation) | Persistent failure | DEFERRED_WITH_REASON — support escalation belongs to J-004 |
 
 ## State Matrix
 | State | Required | Surface | Status |
@@ -85,36 +85,32 @@
 | ID | Item | Classification | Reason |
 |---|---|---|---|
 | GAP-003E-01 | WLT failure reason code vocabulary | BLOCKED_WITH_REASON | WLT team must publish error spec; DSH cannot design UI without it |
-| GAP-003E-02 | Cart expiry policy during retry window | BLOCKED_WITH_REASON | Requires checkout session design; blocked by upstream |
+| GAP-003E-02 | Cart expiry policy during retry window | BLOCKED_WITH_REASON | Checkout session contract/backend path exists; retry-window policy still needs 003C runtime proof, WLT failure semantics, and live screen evidence |
 | GAP-003E-03 | Failure notification ownership (WLT vs DSH) | BLOCKED_WITH_REASON | Notification owner TBD; deferred to design phase |
 
 ## Evidence and Gates
 - Runtime evidence: none — blocked
-- Visual evidence: none — CheckoutFailureScreen does not yet exist as a registered screen
+- Visual evidence: none — CheckoutFailureScreen exists and is registered, but visual proof is not captured
 - Evidence path: `tools/registry/runs/DSH_SLICE_003E_FULL_UNIVERSAL_CLOSURE-20260604-182000/`
 
 ### Exit Gates (all must be proven before PASS)
 1. DSH-SLICE-003C PASS (WLT payment bridge proven)
 2. WLT team publishes failure error spec (reason codes, callback format)
 3. `DELETE /checkout/intent/{id}` designed in `dsh/dsh.openapi.yaml`
-4. Go backend handler for failure callback + cancel implemented + unit-tested
-5. CheckoutFailureScreen built and registered in screen registry
+4. Go backend failure callback path + cancel handler remain aligned with targeted tests
+5. CheckoutFailureScreen remains registered and is wired to failure/retry/cancel states
 6. Runtime proof: WLT failure callback → failure screen shown with reason; cancel → cart preserved
 7. Visual proof: all 6 required states captured
-
-### Screen Registry Gap
-CheckoutFailureScreen is NOT yet registered in `dsh/frontend/app-client/dsh-client.screen-registry.ts`.
-This is a `REQUIRED_ADDITION` that must be resolved before this slice may PASS.
 
 ## Rollback / Disable Path
 - On payment failure, cart is preserved (no financial mutation in DSH)
 - Cancel checkout deletes the intent session only; no DB financial records created
 - Retry re-enters 003C; no rollback mechanism needed for failure screen itself
 
-| **Slice Decision** | `OPEN_BLOCKED_BY_003C_RUNTIME` |
-| **Reason** | `DELETE /checkout/intent/{id}` contract designed in `dsh/dsh.openapi.yaml` v0.3.0. Failure UI requires WLT failure_reason codes from 003C callback contract. `CheckoutFailureScreen` not yet registered in screen registry. Blocked on 003C runtime proof. |
-| **Dependency** | DSH-SLICE-003C WLT runtime proof; CheckoutFailureScreen registration; Go backend failure handler |
-| **Next Action** | Await 003C; register CheckoutFailureScreen; implement failure handler; wire retry + cancel CTAs |
-| **Required Additions Before PASS** | CheckoutFailureScreen must be registered in `dsh/frontend/app-client/dsh-client.screen-registry.ts` |
+| **Slice Decision** | `BLOCKED_WITH_REASON — SCREEN_REGISTERED_CONTRACT_DESIGNED_003C_RUNTIME_PENDING` |
+| **Reason** | `DELETE /checkout/intent/{id}` contract designed in `dsh/dsh.openapi.yaml` v0.3.0 and backend cancel handler implemented. Failure callback processing is part of 003C. `DshCheckoutFailureScreen` is registered, but WLT failure_reason codes, 003C runtime proof, screen wiring proof, and visual proof remain pending. |
+| **Dependency** | DSH-SLICE-003C WLT runtime proof; WLT failure reason spec; CheckoutFailureScreen runtime/visual proof |
+| **Next Action** | Await 003C; wire/prove CheckoutFailureScreen retry + cancel CTAs; capture runtime + visual proof |
+| **Required Additions Before PASS** | WLT failure error spec + CheckoutFailureScreen runtime/visual evidence |
 | **Forward-Only Gate** | All 7 exit gates must pass before PASS |
-| **Evidence Folder** | pending |
+| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_001_002_003_FINAL_TRUTH_CLOSURE-20260604/` |

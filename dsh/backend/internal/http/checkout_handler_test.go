@@ -321,6 +321,26 @@ func TestReceivePaymentCallback_MissingEventID(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/checkout/payment-callback", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
+	req.Header.Set("Idempotency-Key", "idem-missing-event")
+	resp := httptest.NewRecorder()
+	h.ServeHTTP(resp, req)
+
+	if resp.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", resp.Code)
+	}
+}
+
+func TestReceivePaymentCallback_MissingIdempotencyKey(t *testing.T) {
+	h := NewCheckoutHandler(store.NewMemoryRepository())
+	body, _ := json.Marshal(domain.PaymentCallbackRequest{
+		IntentID:        "intent-1",
+		WltPaymentRefID: "wlt-ref-1",
+		Status:          "confirmed",
+	})
+	req := httptest.NewRequest(http.MethodPost, "/checkout/payment-callback", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
+	req.Header.Set("X-WLT-Event-Id", "evt-missing-idem")
 	resp := httptest.NewRecorder()
 	h.ServeHTTP(resp, req)
 
@@ -340,6 +360,7 @@ func TestReceivePaymentCallback_InvalidStatus(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	req.Header.Set("X-WLT-Event-Id", "evt-001")
+	req.Header.Set("Idempotency-Key", "idem-invalid-status")
 	resp := httptest.NewRecorder()
 	h.ServeHTTP(resp, req)
 
@@ -359,6 +380,7 @@ func TestReceivePaymentCallback_IntentNotFound(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	req.Header.Set("X-WLT-Event-Id", "evt-001")
+	req.Header.Set("Idempotency-Key", "idem-intent-not-found")
 	resp := httptest.NewRecorder()
 	h.ServeHTTP(resp, req)
 
@@ -398,6 +420,7 @@ func TestReceivePaymentCallback_ConfirmedFlow(t *testing.T) {
 	cbReq.Header.Set("Content-Type", "application/json")
 	cbReq.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	cbReq.Header.Set("X-WLT-Event-Id", "evt-confirmed-001")
+	cbReq.Header.Set("Idempotency-Key", "idem-confirmed-001")
 	cbResp := httptest.NewRecorder()
 	h.ServeHTTP(cbResp, cbReq)
 
@@ -413,6 +436,53 @@ func TestReceivePaymentCallback_ConfirmedFlow(t *testing.T) {
 	}
 	if result.NextAction != "create_order" {
 		t.Fatalf("expected next_action=create_order, got %s", result.NextAction)
+	}
+}
+
+func TestReceivePaymentCallback_DuplicateEventIDReturnsIdempotentAck(t *testing.T) {
+	repo := store.NewMemoryRepository()
+	h := NewCheckoutHandler(repo)
+
+	createBody, _ := json.Marshal(domain.CheckoutIntentRequest{
+		StoreID:         "store-1001",
+		Items:           []domain.CheckoutIntentItem{{ProductID: "prod-1", Quantity: 1}},
+		DeliveryAddress: "شارع الجمهورية",
+	})
+	createReq := httptest.NewRequest(http.MethodPost, "/checkout/intent", bytes.NewBuffer(createBody))
+	createReq.Header.Set("Content-Type", "application/json")
+	createReq.Header.Set("X-Client-Id", "client-cb-replay-test")
+	createResp := httptest.NewRecorder()
+	h.ServeHTTP(createResp, createReq)
+	if createResp.Code != http.StatusCreated {
+		t.Fatalf("create intent: expected 201, got %d", createResp.Code)
+	}
+	var created domain.CheckoutIntentResponse
+	json.Unmarshal(createResp.Body.Bytes(), &created)
+
+	cbBody, _ := json.Marshal(domain.PaymentCallbackRequest{
+		IntentID:        created.IntentID,
+		WltPaymentRefID: "wlt-sess-replay-001",
+		Status:          "confirmed",
+	})
+	for i := 0; i < 2; i++ {
+		cbReq := httptest.NewRequest(http.MethodPost, "/checkout/payment-callback", bytes.NewBuffer(cbBody))
+		cbReq.Header.Set("Content-Type", "application/json")
+		cbReq.Header.Set("X-WLT-Callback-Token", "dev-secret")
+		cbReq.Header.Set("X-WLT-Event-Id", "evt-replay-001")
+		cbReq.Header.Set("Idempotency-Key", "idem-replay-001")
+		cbResp := httptest.NewRecorder()
+		h.ServeHTTP(cbResp, cbReq)
+
+		if cbResp.Code != http.StatusOK {
+			t.Fatalf("callback attempt %d: expected 200, got %d body=%s", i+1, cbResp.Code, cbResp.Body.String())
+		}
+		var result domain.PaymentCallbackResponse
+		if err := json.Unmarshal(cbResp.Body.Bytes(), &result); err != nil {
+			t.Fatalf("decode callback attempt %d: %v", i+1, err)
+		}
+		if !result.Acknowledged || result.NextAction != "create_order" {
+			t.Fatalf("callback attempt %d: unexpected response %+v", i+1, result)
+		}
 	}
 }
 
@@ -446,6 +516,7 @@ func TestReceivePaymentCallback_FailedFlow(t *testing.T) {
 	cbReq.Header.Set("Content-Type", "application/json")
 	cbReq.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	cbReq.Header.Set("X-WLT-Event-Id", "evt-failed-001")
+	cbReq.Header.Set("Idempotency-Key", "idem-failed-001")
 	cbResp := httptest.NewRecorder()
 	h.ServeHTTP(cbResp, cbReq)
 

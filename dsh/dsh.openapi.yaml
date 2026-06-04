@@ -1024,7 +1024,7 @@ paths:
         Polling GET /wlt/dsh/client/payment-sessions/{sessionId} is the FALLBACK only.
 
         DSH responsibilities (only):
-          - Validate X-WLT-Event-Id (idempotency — reject duplicate event IDs)
+          - Validate X-WLT-Event-Id (idempotency — persist event ID and acknowledge repeated events)
           - Validate X-WLT-Callback-Token against configured WLT_CALLBACK_SECRET
           - Store wlt_payment_ref_id as operational reference (no financial mutation)
           - Update intent status (payment_confirmed or payment_failed)
@@ -1033,7 +1033,7 @@ paths:
         Boundary contract: DSH_PAYMENT_INPUT_ONLY — WLT_OWNS_FINAL_FINANCIAL_TRUTH.
 
         Security headers required from WLT:
-          X-WLT-Callback-Token: configured shared secret (HMAC in production)
+          X-WLT-Callback-Token: configured shared secret; final production HMAC/signature hardening remains WLT security proof before PASS
           X-WLT-Event-Id: unique event UUID for idempotency
           Idempotency-Key: same as the payment session Idempotency-Key
       operationId: receivePaymentCallback
@@ -1044,7 +1044,7 @@ paths:
           - X-WLT-Event-Id
           - Idempotency-Key
         dev_mode: X-WLT-Callback-Token=dev-secret accepted in DEV_ONLY mode
-        prod_mode: HMAC-SHA256 signature verification required
+        prod_mode: WLT_CALLBACK_SECRET shared-token validation implemented; HMAC-SHA256/signature hardening pending final WLT security spec before PASS
       parameters:
         - in: header
           name: X-WLT-Callback-Token
@@ -1052,8 +1052,9 @@ paths:
           schema:
             type: string
           description: |
-            WLT shared callback secret. DEV: "dev-secret". Production: HMAC-SHA256 of payload
-            signed with WLT_CALLBACK_SECRET. Validated by DSH backend before processing.
+            WLT shared callback secret. DEV: "dev-secret". Current backend validates against
+            WLT_CALLBACK_SECRET before processing; final production HMAC/signature semantics remain
+            pending WLT security proof before PASS.
         - in: header
           name: X-WLT-Event-Id
           required: true
@@ -1061,8 +1062,8 @@ paths:
             type: string
             format: uuid
           description: |
-            Unique event UUID issued by WLT for idempotency. DSH rejects duplicate event IDs.
-            Must match the event_id in the callback payload.
+            Unique event UUID issued by WLT for idempotency. DSH persists the event ID on the
+            checkout intent and acknowledges repeated delivery of the same event.
         - in: header
           name: Idempotency-Key
           required: true

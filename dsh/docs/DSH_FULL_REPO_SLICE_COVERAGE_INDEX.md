@@ -48,7 +48,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
 | Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001–J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_SCREEN_RUNTIME_PROVEN + J003_CONTRACT_DESIGNED | GET /stores + 3 PATCH gates + all J-002 catalog management endpoints E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700, DSH_SLICE_002*_FINAL_CLOSURE-*); J-003 contracts designed (GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, POST /checkout/payment-callback); BearerAuth + WLT runtime pending before J-003 PASS; J-004+ endpoints not yet designed |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_SCREEN_RUNTIME_PROVEN + J003_CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_WLT_BLOCKED | GET /stores + 3 PATCH gates + all J-002 catalog management endpoints E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700, DSH_SLICE_002*_FINAL_CLOSURE-*); J-003 contracts designed and Go handlers implemented for GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, and POST /checkout/payment-callback; callback requires X-WLT-Callback-Token + X-WLT-Event-Id + Idempotency-Key; backend BearerAuth path and app-client Bearer checkout transport implemented; live auth-service proof + WLT runtime pending before J-003 PASS; J-004+ endpoints not yet designed |
 | Go backend migrations | `dsh/backend/migrations/001_store_discovery.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Used in live E2E |
 | Go backend migrations | `dsh/backend/migrations/002_store_visibility_gates.sql` | J-001 | DSH-SLICE-001C/D/E | BACKEND_PROVEN | Visibility gates proven |
 | Go backend seed | `dsh/backend/seed/003_store_discovery_seed.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Seed data for E2E |
@@ -387,9 +387,9 @@ These contradictions exist between source files and must be resolved in the appr
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
 | Known contradictions open | 0 |
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
-| IMPLEMENTATION_STARTED areas | 1 (J-003: contracts designed, Go handlers implemented, auth DEV_ONLY, WLT E2E pending) |
+| IMPLEMENTATION_STARTED areas | 1 (J-003: contracts designed, Go handlers implemented, backend BearerAuth path + app-client Bearer checkout transport implemented, live auth-service proof + WLT E2E pending) |
 | BLOCKED_WITH_REASON areas | 1 (finance/WLT — DSH-SLICE-010A–010D: full WLT ownership, DSH read-only bridge) |
-| J-003 implementation status | 003A/003B: OPEN_IMPL_STARTED_AUTH_DEV_ONLY; 003C: OPEN_CONTRACT_DESIGNED_WLT_RUNTIME_PENDING; 003D/003E: OPEN_BLOCKED_BY_003C_RUNTIME |
+| J-003 implementation status | 003A/003B: CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING; 003C: OPEN_CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_WLT_RUNTIME_PENDING; 003D: OPEN_BLOCKED_BY_003C_RUNTIME; 003E: SCREEN_REGISTERED_CONTRACT_DESIGNED_003C_RUNTIME_PENDING |
 | Full universal protocol closures (DEFERRED) | 4 (DSH-SLICE-004A — DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500; DSH-SLICE-004B — DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400; DSH-SLICE-004C — DSH_SLICE_004C_SUPPORT_ESCALATION_FINAL_CLOSURE-20260604-184000; DSH-SLICE-004D — DSH_SLICE_004D_CANCELLATION_FINAL_CLOSURE-20260604-185000) |
 
 ---
@@ -402,4 +402,4 @@ The coverage index is structurally complete for all major DSH source areas. All 
 
 Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
 
-Next action: (1) Wire BearerAuth to auth.openapi.yaml GET /auth/session runtime (replaces DEV_ONLY X-Client-Id); (2) WLT team E2E runtime proof for payment session; (3) Replace dev-secret with HMAC signature for callback security; (4) Classify GAP-IDX-001 through GAP-IDX-006.
+Next action: (1) Prove DSH_AUTH_MODE=production against live auth service GET /auth/session and capture 003A/003B screen runtime + visual proof; (2) WLT team E2E runtime proof for payment session; (3) Replace dev-secret with HMAC signature for callback security; (4) Classify GAP-IDX-001 through GAP-IDX-006.

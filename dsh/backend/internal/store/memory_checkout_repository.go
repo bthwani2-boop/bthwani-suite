@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"bthwani.local/dsh/domain"
@@ -14,14 +15,15 @@ import (
 var (
 	memCheckoutMu      sync.Mutex
 	memCheckoutIntents []domain.CheckoutIntentRecord
+	memCheckoutSeq     atomic.Uint64
 )
 
 func generateIntentID() string {
-	return fmt.Sprintf("intent-%d", time.Now().UnixNano())
+	return fmt.Sprintf("intent-%d-%d", time.Now().UnixNano(), memCheckoutSeq.Add(1))
 }
 
 func generateSessionToken() string {
-	return fmt.Sprintf("sess-%d", time.Now().UnixNano())
+	return fmt.Sprintf("sess-%d-%d", time.Now().UnixNano(), memCheckoutSeq.Add(1))
 }
 
 func (repo *MemoryRepository) CheckCartServiceability(_ context.Context, query domain.CartServiceabilityQuery) (domain.CartServiceabilityResponse, error) {

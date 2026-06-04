@@ -5,6 +5,11 @@
 
 export type DshCheckoutFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
+export type DshCheckoutAuthContext = {
+  readonly bearerToken?: string;
+  readonly clientId?: string;
+};
+
 // ─── error shapes ─────────────────────────────────────────────────────────────
 
 export type DshCheckoutOfflineError = { readonly kind: 'offline' };
@@ -76,6 +81,14 @@ export interface DshCheckoutClient {
 
 // ─── HTTP transport ───────────────────────────────────────────────────────────
 
+function checkoutAuthHeaders(auth: DshCheckoutAuthContext, clientId = ''): Record<string, string> {
+  const bearerToken = auth.bearerToken?.trim();
+  if (bearerToken) return { Authorization: `Bearer ${bearerToken}` };
+
+  const resolvedClientId = clientId.trim() || auth.clientId?.trim();
+  return resolvedClientId ? { 'X-Client-Id': resolvedClientId } : {};
+}
+
 async function doFetch<T>(
   baseUrl: string,
   fetchFn: DshCheckoutFetchFn,
@@ -114,6 +127,7 @@ async function doFetch<T>(
 export function createDshCheckoutHttpClient(
   baseUrl: string | null,
   fetchFn: DshCheckoutFetchFn = globalThis.fetch,
+  auth: DshCheckoutAuthContext = {},
 ): DshCheckoutClient {
   return {
     checkServiceability: async (storeId, itemIds = [], clientId = '') => {
@@ -126,7 +140,7 @@ export function createDshCheckoutHttpClient(
         'GET',
         `/cart/serviceability?${params.toString()}`,
         undefined,
-        clientId ? { 'X-Client-Id': clientId } : {},
+        checkoutAuthHeaders(auth, clientId),
       );
     },
 
@@ -138,7 +152,7 @@ export function createDshCheckoutHttpClient(
         'POST',
         '/checkout/intent',
         req,
-        { 'X-Client-Id': clientId },
+        checkoutAuthHeaders(auth, clientId),
       );
     },
 
@@ -150,7 +164,7 @@ export function createDshCheckoutHttpClient(
         'DELETE',
         `/checkout/intent/${intentId}`,
         undefined,
-        { 'X-Client-Id': clientId },
+        checkoutAuthHeaders(auth, clientId),
       );
     },
   };

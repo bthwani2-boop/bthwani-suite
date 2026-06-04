@@ -19,18 +19,18 @@
 | Vars/Provider Boundary | No provider policy in scope at this step |
 | Notification Boundary | None — serviceability check is synchronous; no notification emitted |
 | Account/Profile Boundary | Client account (identity) must exist and be authenticated |
-| Data Ownership | preview/local-state (no API data yet); serviceability logic → domain |
-| API/Runtime Boundary | GET /cart/serviceability — NOT YET DESIGNED (blocked by auth proof); requires client auth token |
+| Data Ownership | DSH backend/domain owns serviceability response; app-client remains preview/local-state until live API wiring is proven |
+| API/Runtime Boundary | GET /cart/serviceability — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING; backend production BearerAuth path exists and app-client checkout transport can send Bearer token; requires auth-service runtime proof before PASS |
 | Visual Evidence Required | yes — CartScreen serviceability states: serviceable / not-serviceable / loading / blocked |
 | Runtime Evidence Required | yes — GET /cart/serviceability runtime proof with auth token |
-| Current Status | `OPEN_IMPL_STARTED_AUTH_DEV_ONLY` |
-| Blocking Reason | Go handler implemented. API contract in `dsh/dsh.openapi.yaml` v0.3.0. Auth uses DEV_ONLY `X-Client-Id` header — BearerAuth verification against `auth.openapi.yaml GET /auth/session` not yet wired. Screen not yet wired to live API. Cannot be PASS until auth is production-grade. |
+| Current Status | `CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING — BLOCKED_WITH_REASON` |
+| Blocking Reason | Go handler implemented. API contract in `dsh/dsh.openapi.yaml` v0.3.0. Backend production BearerAuth path exists (`DSH_AUTH_MODE=production` validates Bearer token against auth service) and app-client checkout transport can send Bearer token via `authToken` or `EXPO_PUBLIC_DSH_AUTH_BEARER_TOKEN`; DEV fallback remains `X-Client-Id`. Missing proof: live auth service session runtime, CartScreen visual/runtime proof, and WLT-adjacent checkout flow evidence. |
 
 ## Scope
 
 ### Included
 - Cart serviceability check: store open, items available, delivery zone valid
-- `GET /cart/serviceability` endpoint (design blocked — auth dependency)
+- `GET /cart/serviceability` endpoint (contract designed and Go handler implemented; production BearerAuth backend path and app-client Bearer transport implemented; runtime proof pending)
 - Client auth token required for cart association
 - CartScreen states: serviceable, not-serviceable (with reason), loading, blocked, retry
 - Proceed to checkout CTA (gated by serviceability PASS)
@@ -49,7 +49,7 @@
 | Row ID | Surface | Screen / Endpoint | Classification | Status |
 |---|---|---|---|---|
 | CM-003A-01 | app-client | CartScreen (`dsh/frontend/app-client/screens/CartScreen.tsx`) | primary | BLOCKED_WITH_REASON |
-| CM-003A-02 | DSH backend | GET /cart/serviceability | dependency | CONTRACT_DESIGNED |
+| CM-003A-02 | DSH backend | GET /cart/serviceability | dependency | CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING |
 | CM-003A-03 | shared | serviceability model (logic/domain) | dependency | BLOCKED_WITH_REASON |
 | CM-003A-04 | app-client | DshCheckoutIntentScreen (downstream) | supporting | BLOCKED_WITH_REASON (depends on 003A) |
 | CM-003A-05 | app-captain | — | excluded | NOT_APPLICABLE — not assigned at cart stage |
@@ -62,19 +62,19 @@
 | CTA | Surface | Screen | Target | Precondition | Status |
 |---|---|---|---|---|---|
 | Proceed to checkout | app-client | CartScreen | GET /cart/serviceability → DshCheckoutIntentScreen | client auth + serviceability PASS | BLOCKED_WITH_REASON |
-| Remove item | app-client | CartScreen | local cart state mutation | none (preview-only until auth proven) | BLOCKED_WITH_REASON (no API yet) |
+| Remove item | app-client | CartScreen | local cart state mutation | none (preview-only until auth proven) | BLOCKED_WITH_REASON — local cart behavior only until live API/auth wiring is proven |
 | Retry serviceability | app-client | CartScreen | re-invoke GET /cart/serviceability | previous check failed | BLOCKED_WITH_REASON |
 
 ## State Matrix
 | State | Required | Surface | Status |
 |---|---|---|---|
-| loading | yes | app-client CartScreen | BLOCKED — no API yet |
-| serviceable | yes | app-client CartScreen | BLOCKED — no API yet |
-| not_serviceable (with reason code) | yes | app-client CartScreen | BLOCKED — no API yet |
-| retry | yes | app-client CartScreen | BLOCKED — no API yet |
+| loading | yes | app-client CartScreen | BLOCKED — live API wiring not proven |
+| serviceable | yes | app-client CartScreen | BLOCKED — live API wiring not proven |
+| not_serviceable (with reason code) | yes | app-client CartScreen | BLOCKED — live API wiring not proven |
+| retry | yes | app-client CartScreen | BLOCKED — live API wiring not proven |
 | blocked (auth required) | yes | app-client CartScreen | BLOCKED — primary blocker |
 | empty (cart empty) | yes | app-client CartScreen | BLOCKED — no auth session yet |
-| error (network/API failure) | yes | app-client CartScreen | BLOCKED — no API yet |
+| error (network/API failure) | yes | app-client CartScreen | BLOCKED — live API wiring not proven |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Slice | Impact |
@@ -88,35 +88,35 @@
 ### Missing Logic / Screen / Process Proposals
 | ID | Item | Classification | Reason |
 |---|---|---|---|
-| GAP-003A-01 | Not-serviceability reason codes | BLOCKED_WITH_REASON | Reason schema requires serviceability API design; blocked by auth |
+| GAP-003A-01 | Not-serviceability reason codes | BLOCKED_WITH_REASON | Reason schema exists at API boundary but needs live runtime proof and screen mapping before PASS |
 | GAP-003A-02 | Cart persistence model (server-side vs client-side) | BLOCKED_WITH_REASON | Cannot decide without auth proof — server-side cart requires client identity |
-| GAP-003A-03 | Delivery zone validation logic | BLOCKED_WITH_REASON | Zone validation is part of serviceability check; requires API design |
+| GAP-003A-03 | Delivery zone validation logic | BLOCKED_WITH_REASON | Zone validation is part of serviceability check; contract/backend path exists but needs production auth, live runtime proof, and screen evidence before PASS |
 
 ## Evidence and Gates
-- Runtime evidence: none — blocked by WLT/auth proof
+- Runtime evidence: handler tests exist; backend production BearerAuth test coverage exists; app-client Bearer transport exists; no live auth service + live screen runtime proof yet
 - Visual evidence: none — preview/local-state only; CartScreen exists but shows fixture data
 - Existing screen: `CartScreen.tsx` registered as `client.dsh.cart.review` (routeId: `dsh-cart`), status: `VERIFIED` in screen registry (preview-only)
 - Evidence path: `tools/registry/runs/DSH_SLICE_003A_CART_SERVICEABILITY_BLOCKED_CLOSURE-20260604-174100/`
 
 ### Exit Gates (all must be proven before PASS)
-1. WLT/auth runtime proof — client identity proven at runtime (external dependency)
-2. GET /cart/serviceability API designed in `dsh/dsh.openapi.yaml`
-3. Go backend handler implemented and unit-tested
-4. CartScreen wired to live API (not preview state)
-5. Runtime proof: serviceable response → proceeds to checkout; not-serviceable response → blocks with reason
-6. Visual proof: all 5 required states captured
+1. BearerAuth runtime proof — client identity proven against live auth service at runtime
+2. GET /cart/serviceability contract and backend handler remain aligned with tests
+3. CartScreen wired to live API (not preview state)
+4. Runtime proof: serviceable response → proceeds to checkout; not-serviceable response → blocks with reason
+5. Visual proof: all required states captured
+6. No DSH financial mutation introduced at serviceability stage
 
 ## Rollback / Disable Path
 - CartScreen defaults to preview/local-state when serviceability API unavailable
 - `blocked` state in screen registry ensures UI cannot proceed without API response
-- No backend changes in scope yet; rollback is N/A at this stage
+- Backend contract/handler remain available; rollback is limited to keeping CartScreen on blocked/preview state until live auth and API wiring are proven
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `OPEN_CONTRACT_DESIGNED` |
-| **Reason** | Auth contract ready (`auth.openapi.yaml` AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT). API endpoint `GET /cart/serviceability` designed in `dsh/dsh.openapi.yaml` v0.3.0 with `CartServiceabilityResponse` schema. Backend implementation and screen wiring remain pending. |
-| **Dependency** | Go backend handler + CartScreen wiring + runtime proof |
-| **Next Action** | Implement Go backend handler for GET /cart/serviceability; wire CartScreen to live API; capture runtime + visual proof |
+| **Slice Decision** | `CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING — BLOCKED_WITH_REASON` |
+| **Reason** | Auth contract ready (`auth.openapi.yaml` AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT). API endpoint `GET /cart/serviceability` is designed in `dsh/dsh.openapi.yaml` v0.3.0 and implemented in Go. Backend production BearerAuth path and app-client Bearer transport are implemented; DEV `X-Client-Id` remains only as fallback. Live auth service proof, CartScreen live runtime proof, and visual proof remain pending. |
+| **Dependency** | Live auth service BearerAuth proof + CartScreen runtime/visual proof |
+| **Next Action** | Run DSH_AUTH_MODE=production against live auth service; capture CartScreen serviceable/not-serviceable runtime + visual proof |
 | **Forward-Only Gate** | All 6 exit gates must pass before PASS |
-| **Evidence Folder** | pending |
+| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |

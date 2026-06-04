@@ -19,12 +19,12 @@
 | Vars/Provider Boundary | Delivery zone / provider policy may affect available delivery time slots — deferred to design phase |
 | Notification Boundary | None at checkout intent; notifications start at order confirmation (003D) |
 | Account/Profile Boundary | Client delivery address required; account/profile dependency for address selection |
-| Data Ownership | preview/local-state (no API data yet); delivery address → client profile; checkout session → DSH backend |
-| API/Runtime Boundary | POST /checkout/intent — NOT YET DESIGNED (blocked by auth proof + 003A dependency); returns session token |
+| Data Ownership | DSH backend owns checkout session; app-client delivery/address state remains preview/local-state until live API wiring is proven |
+| API/Runtime Boundary | POST /checkout/intent — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING; returns session token; backend production BearerAuth path exists and app-client checkout transport can send Bearer token; requires 003A runtime proof and auth-service runtime proof before PASS |
 | Visual Evidence Required | yes — DshCheckoutIntentScreen states: address entry, intent created, intent failed, loading, blocked |
 | Runtime Evidence Required | yes — POST /checkout/intent runtime proof with auth token + 003A serviceability PASS |
-| Current Status | `OPEN_IMPL_STARTED_AUTH_DEV_ONLY` |
-| Blocking Reason | Go handler implemented. API contract in `dsh/dsh.openapi.yaml` v0.3.0. Auth uses DEV_ONLY `X-Client-Id` header — BearerAuth verification against `auth.openapi.yaml GET /auth/session` not yet wired. Screen not yet wired to live API. Upstream: 003A must pass at runtime. Cannot be PASS until auth is production-grade. |
+| Current Status | `CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING — BLOCKED_WITH_REASON` |
+| Blocking Reason | Go handler implemented. API contract in `dsh/dsh.openapi.yaml` v0.3.0. Backend production BearerAuth path exists (`DSH_AUTH_MODE=production` validates Bearer token against auth service) and app-client checkout transport can send Bearer token via `authToken` or `EXPO_PUBLIC_DSH_AUTH_BEARER_TOKEN`; DEV fallback remains `X-Client-Id`. Missing proof: 003A live serviceability runtime, live auth service session runtime, DshCheckoutIntentScreen visual/runtime proof, and WLT runtime proof. |
 
 ## Scope
 
@@ -46,8 +46,8 @@
 | Row ID | Surface | Screen / Endpoint | Classification | Status |
 |---|---|---|---|---|
 | CM-003B-01 | app-client | DshCheckoutIntentScreen (`dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx`) | primary | BLOCKED_WITH_REASON |
-| CM-003B-02 | DSH backend | POST /checkout/intent | dependency | CONTRACT_DESIGNED |
-| CM-003B-03 | DSH backend | Checkout session model / reservation logic | dependency | BLOCKED_WITH_REASON |
+| CM-003B-02 | DSH backend | POST /checkout/intent | dependency | CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING |
+| CM-003B-03 | DSH backend | Checkout session model / reservation logic | dependency | CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING |
 | CM-003B-04 | app-captain | — | excluded | NOT_APPLICABLE — not yet assigned |
 | CM-003B-05 | app-partner | — | excluded | NOT_APPLICABLE — partner intake is 003D |
 | CM-003B-06 | app-field | — | excluded | NOT_APPLICABLE — J-006 scope |
@@ -82,31 +82,31 @@
 ### Missing Logic / Screen / Process Proposals
 | ID | Item | Classification | Reason |
 |---|---|---|---|
-| GAP-003B-01 | Item reservation strategy (optimistic vs confirmed hold) | BLOCKED_WITH_REASON | Requires checkout session API design; blocked by auth |
+| GAP-003B-01 | Item reservation strategy (optimistic vs confirmed hold) | BLOCKED_WITH_REASON | Checkout session API exists; final reservation semantics still need production auth/runtime proof before PASS |
 | GAP-003B-02 | Delivery time slot availability | BLOCKED_WITH_REASON | Requires provider vars integration; deferred to design phase |
 | GAP-003B-03 | Session token expiry + re-entry flow | BLOCKED_WITH_REASON | Requires auth + API design; blocked |
 
 ## Evidence and Gates
-- Runtime evidence: none — blocked
+- Runtime evidence: handler tests exist; backend production BearerAuth test coverage exists; app-client Bearer transport exists; no live auth service + live screen runtime proof yet
 - Visual evidence: none — preview/local-state only; DshCheckoutIntentScreen exists (status: READY_FOR_REVIEW in screen registry)
 - Evidence path: `tools/registry/runs/DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700/`
 
 ### Exit Gates (all must be proven before PASS)
 1. WLT/auth runtime proof (external — from 003A)
 2. DSH-SLICE-003A PASS
-3. POST /checkout/intent API designed in `dsh/dsh.openapi.yaml`
-4. Go backend handler + session model implemented and unit-tested
-5. DshCheckoutIntentScreen wired to live API
-6. Runtime proof: intent created → session token returned; intent failed → error state
-7. Visual proof: all 6 required states captured
+3. POST /checkout/intent contract and backend handler remain aligned with tests
+4. DshCheckoutIntentScreen wired to live API
+5. Runtime proof: intent created → session token returned; intent failed → error state
+6. Visual proof: all required states captured
+7. No DSH financial mutation introduced before WLT payment step
 
 ## Rollback / Disable Path
 - DshCheckoutIntentScreen defaults to blocked state when serviceability or auth unavailable
-- No backend changes in scope yet; rollback N/A at this stage
+- Backend contract/handler remain available; rollback is limited to keeping DshCheckoutIntentScreen blocked until 003A, auth, and live API wiring are proven
 
-| **Slice Decision** | `OPEN_CONTRACT_DESIGNED` |
-| **Reason** | API endpoint `POST /checkout/intent` designed in `dsh/dsh.openapi.yaml` v0.3.0 with `CheckoutIntentRequest/Response` schemas. Auth contract ready (003A). Backend implementation, DshCheckoutIntentScreen wiring, and runtime proof remain pending. |
-| **Dependency** | DSH-SLICE-003A runtime pass; Go backend handler; screen wiring |
-| **Next Action** | Implement Go backend handler for POST /checkout/intent; wire DshCheckoutIntentScreen; capture runtime + visual proof |
+| **Slice Decision** | `CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING — BLOCKED_WITH_REASON` |
+| **Reason** | API endpoint `POST /checkout/intent` is designed in `dsh/dsh.openapi.yaml` v0.3.0 and implemented in Go. Backend production BearerAuth path and app-client Bearer transport are implemented; DEV `X-Client-Id` remains only as fallback. DSH-SLICE-003A runtime proof, live auth service proof, DshCheckoutIntentScreen runtime proof, WLT runtime proof, and visual proof remain pending. |
+| **Dependency** | DSH-SLICE-003A runtime pass + live auth service BearerAuth proof + screen runtime/visual proof |
+| **Next Action** | Run DSH_AUTH_MODE=production against live auth service; capture DshCheckoutIntentScreen intent-created/intent-failed runtime + visual proof after 003A proof |
 | **Forward-Only Gate** | All 7 exit gates must pass before PASS |
-| **Evidence Folder** | pending |
+| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |
