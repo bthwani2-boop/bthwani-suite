@@ -49,7 +49,7 @@
 | GET /stores/{id} | upstream | GET /stores/{id} endpoint designed and implemented |
 
 ## Evidence and Gates
-- Runtime evidence: [walkthrough.md](file:///C:/Users/b/.gemini/antigravity-ide/brain/a93d535a-2e66-4a4d-a423-9329f9d57947/walkthrough.md)
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_001B_STORE_DETAILS_FINAL_CLOSURE-20260604-034548/`
 - Visual evidence: RTL-aligned layout structure details mapped in DshClientSurface.tsx and parts/StoreHeroSection.tsx
 - Exit gate: GET /stores/{id} endpoint designed + StoreDetailScreen bound + unit tests and governance guards pass + runtime proof captured
 
@@ -57,6 +57,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Designed and implemented GET /stores/{id} endpoint in backend and bound StoreDetailScreen dynamically in frontend app-client. |
+| **Reason** | Designed and implemented GET /stores/{id} endpoint in backend and bound StoreDetailScreen dynamically in frontend app-client. Fully verified loading, ready, not-found (404), and offline states. |
 | **Dependency** | None |
-| **Next Action** | Handoff to final validation |
+| **Next Action** | Feed DSH-SLICE-001F final cross-surface proof; do not reopen 001B unless store detail behavior changes. |

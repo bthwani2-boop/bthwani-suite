@@ -209,7 +209,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [homeSearchAutoOpenToken, setHomeSearchAutoOpenToken] = React.useState(0);
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [activeStoreDetail, setActiveStoreDetail] = React.useState<any | null>(null);
-  const [storeDetailState, setStoreDetailState] = React.useState<'loading' | 'ready' | 'empty' | 'error' | 'offline'>('loading');
+  const [storeDetailState, setStoreDetailState] = React.useState<'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'not-found'>('loading');
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [, setSelectedItemId] = React.useState<string>('');
@@ -615,7 +615,12 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       setStoreDetailState('ready');
     }).catch((err) => {
       if (cancelled) return;
-      const detailErrorState = isDshDiscoveryStoresOfflineError(err) ? 'offline' : 'error';
+      let detailErrorState: 'offline' | 'not-found' | 'error' = 'error';
+      if (isDshDiscoveryStoresOfflineError(err)) {
+        detailErrorState = 'offline';
+      } else if (typeof err === 'object' && err !== null && (err as any).kind === 'http' && (err as any).status === 404) {
+        detailErrorState = 'not-found';
+      }
       setStoreDetailState(detailErrorState);
     });
 
@@ -998,7 +1003,12 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
               setActiveStoreDetail(response);
               setStoreDetailState('ready');
             }).catch((err) => {
-              const errState = isDshDiscoveryStoresOfflineError(err) ? 'offline' : 'error';
+              let errState: 'offline' | 'not-found' | 'error' = 'error';
+              if (isDshDiscoveryStoresOfflineError(err)) {
+                errState = 'offline';
+              } else if (typeof err === 'object' && err !== null && (err as any).kind === 'http' && (err as any).status === 404) {
+                errState = 'not-found';
+              }
               setStoreDetailState(errState);
             });
           } else {

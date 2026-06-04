@@ -29,6 +29,32 @@ export function StoreNonReadyState({
     );
   }
 
+  if (state === 'not-found') {
+    return (
+      <View style={[styles.blockingState, { backgroundColor: screenBackground }]}>
+        <StateView
+          stateId="blockingError"
+          title="المتجر غير موجود"
+          description="عذراً، لم نتمكن من العثور على المتجر المطلوب في نظام الاستكشاف."
+        />
+      </View>
+    );
+  }
+
+  if (state === 'offline') {
+    return (
+      <View style={[styles.blockingState, { backgroundColor: screenBackground }]}>
+        <StateView
+          stateId="recoverableError"
+          title="أنت غير متصل بالشبكة"
+          description="يرجى التحقق من اتصال الإنترنت ثم إعادة المحاولة."
+          actionLabel={storeText.states.retry}
+          onActionPress={onRetry}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.blockingState, { backgroundColor: screenBackground }]}>
       <StateView

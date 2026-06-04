@@ -5,7 +5,7 @@ import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/ds
 
 export type DshStoreGetScreenProps = {
   appearanceMode?: BThwaniAppearanceMode;
-  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'not-found';
   store?: {
     id: string;
     name: string;
