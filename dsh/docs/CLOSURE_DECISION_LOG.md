@@ -38,6 +38,7 @@ Current forward-only phase decisions:
 
 | Date | Session ID | Scope | Evidence Path | Decision | Remaining Risks | Next Action |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-06-04 | DSH_SLICE_001C_PARTNER_READINESS_FINAL_CLOSURE | DSH-SLICE-001C Partner Readiness Gate | `tools/registry/runs/DSH_SLICE_001C_PARTNER_READINESS_FINAL_CLOSURE-20260604-043800/` | PASS | none | Feed DSH-SLICE-001F final cross-surface proof; do not reopen 001C unless readiness gate behavior changes. |
 | 2026-06-04 | DSH_SLICE_001B_STORE_DETAILS_FINAL_CLOSURE | DSH-SLICE-001B Store Details Gate | `tools/registry/runs/DSH_SLICE_001B_STORE_DETAILS_FINAL_CLOSURE-20260604-034548/` | PASS | none | Feed DSH-SLICE-001F final cross-surface proof; do not reopen 001B unless store detail behavior changes. |
 | 2026-06-04 | DSH_SLICE_001E_MARKETING_VISIBILITY_FINAL_CLOSURE | DSH-SLICE-001E Marketing Visibility Gate | RUNTIME_EVIDENCE_MATRIX DSH-RUN-P014-07 + SCREEN_API_MATRIX DSH-SAPI-P014-10 + `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/` | PASS | none | continue to 001F according to manifest state |
 | 2026-06-04 | DSH_SLICE_001D_CATALOG_APPROVAL_FINAL_CLOSURE | DSH-SLICE-001D Catalog Approval Gate | RUNTIME_EVIDENCE_MATRIX DSH-RUN-P014-07 + SCREEN_API_MATRIX DSH-SAPI-P014-10 + `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/` | PASS | none | continue to 001E/001F according to manifest state |

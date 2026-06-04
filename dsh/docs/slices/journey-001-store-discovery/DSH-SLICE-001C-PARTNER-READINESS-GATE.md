@@ -50,7 +50,7 @@
 | DSH-SLICE-001F | downstream | 001F blocked until 001C/D/E all PASS |
 
 ## Evidence and Gates
-- Runtime evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 + DSH-RUN-P014-04
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_001C_PARTNER_READINESS_FINAL_CLOSURE-20260604-043800/`
 - API evidence: DSH-SAPI-P014-05
 - Backend evidence: DSH_SLICE001_LIVE_E2E-20260603-173059
 - Exit gate: PASS
