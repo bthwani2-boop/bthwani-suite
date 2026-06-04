@@ -394,3 +394,16 @@ func (repo *MemoryRepository) ListCategories(_ context.Context, _ string, _ int,
 func (repo *MemoryRepository) DeleteCategory(_ context.Context, _ string) error {
 	return errors.New("category delete requires postgres backend (set DATABASE_URL)")
 }
+
+// Product media stubs (J-002 / DSH-SLICE-002C)
+func (repo *MemoryRepository) CreateProductMedia(_ context.Context, _ domain.UploadProductMediaRequest) (domain.ProductMediaRecord, error) {
+	return domain.ProductMediaRecord{}, errors.New("media upload/create requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) DeleteProductMedia(_ context.Context, _ string) error {
+	return errors.New("media delete requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListProductMedia(_ context.Context, _ string) ([]domain.ProductMediaRecord, error) {
+	return nil, errors.New("media list requires postgres backend (set DATABASE_URL)")
+}

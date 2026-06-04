@@ -23,4 +23,9 @@ type Repository interface {
 	GetCategory(ctx context.Context, categoryID string) (domain.CategoryRecord, error)
 	ListCategories(ctx context.Context, storeID string, limit int, offset int) (domain.ListCategoriesResponse, error)
 	DeleteCategory(ctx context.Context, categoryID string) error
+
+	// Product media (J-002 / DSH-SLICE-002C)
+	CreateProductMedia(ctx context.Context, req domain.UploadProductMediaRequest) (domain.ProductMediaRecord, error)
+	DeleteProductMedia(ctx context.Context, id string) error
+	ListProductMedia(ctx context.Context, productID string) ([]domain.ProductMediaRecord, error)
 }

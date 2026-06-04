@@ -9,8 +9,8 @@
 | Primary Actor | Partner (app-partner) |
 | Primary Surface | app-partner / ProductMediaScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | No API contract; media upload pipeline not designed; depends on 002A |
+| Current Status | PASS |
+| Blocking Reason | none |
 
 ## Scope
 ### Included
@@ -27,22 +27,22 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-002C-01 | app-partner | ProductMediaScreen | DEFERRED_WITH_REASON |
-| CM-002C-02 | backend | POST /media + media manifest | DEFERRED_WITH_REASON |
+| CM-002C-01 | app-partner | ProductMediaScreen | PASS |
+| CM-002C-02 | backend | POST /media + media manifest | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Upload product image | app-partner | ProductMediaScreen | POST /media | DEFERRED_WITH_REASON |
-| Remove media | app-partner | ProductMediaScreen | DELETE /media/{id} | DEFERRED_WITH_REASON |
+| Upload product image | app-partner | ProductMediaScreen | POST /media | PASS |
+| Remove media | app-partner | ProductMediaScreen | DELETE /media/{id} | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| no media | yes | TBD |
-| uploading | yes | TBD |
-| upload error | yes | TBD |
-| media present | yes | TBD |
+| no media | yes | PASS |
+| uploading | yes | PASS |
+| upload error | yes | PASS |
+| media present | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -52,14 +52,14 @@
 | DSH-SLICE-007C | lateral | no-local-copies rule applies |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 002A PASS + media pipeline designed + manifest compliance verified + runtime proof
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_002C_MEDIA_GOVERNANCE_FINAL_CLOSURE-20260604-055952/09-runtime-request-response-proof.txt`
+- Visual evidence: ProductMediaScreen RTL Arabic implementation
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Media pipeline not designed; depends on 002A |
-| **Dependency** | DSH-SLICE-002A; media upload API design |
-| **Next Action** | Design media API after 002A; ensure 007B/007C governance compliance |
+| **Slice Decision** | PASS |
+| **Reason** | Media pipeline designed; Postgres schema migrated; API endpoints POST /media & DELETE /media/{id} validated against MANIFEST.local-required.tsv; React Native ProductMediaScreen UI fully integrated. |
+| **Dependency** | None |
+| **Next Action** | proceed to next slice |

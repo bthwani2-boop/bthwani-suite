@@ -41,6 +41,7 @@ import { PartnerEntryScreen } from './screens/PartnerEntryScreen';
 import { PartnerSupportScreen } from './screens/PartnerSupportScreen';
 import { ProductEditScreen } from './screens/ProductEditScreen';
 import { CategoryManagementScreen } from './screens/CategoryManagementScreen';
+import { ProductMediaScreen } from './screens/ProductMediaScreen';
 
 import {
   type PartnerStoreScopeOption,
@@ -519,6 +520,10 @@ export function DshPartnerSurface({
         onNavigateToCategoryManagement={() => {
           setRoute('category-management');
         }}
+        onNavigateToProductMedia={(prodId) => {
+          setEditingProductId(prodId);
+          setRoute('product-media');
+        }}
         storeName={maintenanceProfile.storeName}
         branchLabel={selectedStoreScope.label}
         activeZoneLabel={maintenanceProfile.activeZoneLabel}
@@ -545,6 +550,15 @@ export function DshPartnerSurface({
     return renderSurfaceShell(
       <CategoryManagementScreen
         storeId="store-1001"
+        onBack={() => setRoute('inventory-management')}
+      />,
+    );
+  }
+
+  if (route === 'product-media') {
+    return renderSurfaceShell(
+      <ProductMediaScreen
+        productId={editingProductId ?? ''}
         onBack={() => setRoute('inventory-management')}
       />,
     );

@@ -17,6 +17,19 @@ export type DshProductApprovalStatus =
   | 'needs_fix'
   | 'rejected';
 
+export type DshProductMediaRecord = {
+  readonly id: string;
+  readonly product_id: string;
+  readonly media_key: string;
+  readonly url: string;
+  readonly created_at: string;
+};
+
+export type DshUploadProductMediaRequest = {
+  readonly product_id: string;
+  readonly media_key: string;
+};
+
 export type DshProductRecord = {
   readonly id: string;
   readonly store_id: string;
@@ -28,6 +41,7 @@ export type DshProductRecord = {
   readonly base_price_label: string;
   readonly category_id?: string;
   readonly approval_status: DshProductApprovalStatus;
+  readonly media?: readonly DshProductMediaRecord[];
   readonly created_at: string;
   readonly updated_at: string;
 };
@@ -141,6 +155,9 @@ export type DshProductApiClient = {
   ): Promise<DshListCategoriesResponse>;
 
   deleteCategory(categoryId: string): Promise<void>;
+
+  uploadProductMedia(req: DshUploadProductMediaRequest): Promise<DshProductMediaRecord>;
+  deleteProductMedia(mediaId: string): Promise<void>;
 };
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
@@ -187,5 +204,11 @@ export function createDshProductApiClient(
 
     deleteCategory: (categoryId) =>
       transport.delete(`/categories/${categoryId}`),
+
+    uploadProductMedia: (req) =>
+      transport.post('/media', req),
+
+    deleteProductMedia: (mediaId) =>
+      transport.delete(`/media/${mediaId}`),
   };
 }

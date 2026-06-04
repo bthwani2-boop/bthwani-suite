@@ -501,6 +501,7 @@ type InventoryCatalogContentProps = {
   canonicalStoreId?: string;
   onNavigateToProductEdit?: (productId?: string) => void;
   onNavigateToCategoryManagement?: () => void;
+  onNavigateToProductMedia?: (productId: string) => void;
 };
 
 export type InventoryCatalogScreenProps = InventoryCatalogContentProps & {
@@ -970,6 +971,7 @@ function InventoryCatalogCardPanel({
   onSendForReview,
   onMatchCatalog,
   onEditIdentity,
+  onEditMedia,
 }: {
   item: InventoryCatalogListItem;
   detail?: InventoryCatalogItemDetail;
@@ -983,6 +985,7 @@ function InventoryCatalogCardPanel({
   onSendForReview: () => void;
   onMatchCatalog: () => void;
   onEditIdentity?: () => void;
+  onEditMedia?: () => void;
 }) {
   const { direction } = useDirection();
   const isRejected = item.publishStage === 'rejected';
@@ -1082,6 +1085,15 @@ function InventoryCatalogCardPanel({
                 onPress={onEditIdentity}
               />
             ) : null}
+            {onEditMedia ? (
+              <Button
+                label="إدارة الوسائط"
+                size="sm"
+                tone="secondary"
+                fullWidth={false}
+                onPress={onEditMedia}
+              />
+            ) : null}
             {!item.catalogLinked ? (
               <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
             ) : null}
@@ -1130,6 +1142,7 @@ function InventoryCatalogContent({
   todayHoursLabel: _todayHoursLabel,
   canonicalStoreId = 'store-1001',
   onNavigateToProductEdit,
+  onNavigateToProductMedia,
 }: InventoryCatalogContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
@@ -1379,6 +1392,7 @@ function InventoryCatalogContent({
                 onSendForReview={() => handleSendForReview(item)}
                 onMatchCatalog={() => handleMatchCatalog(item)}
                 onEditIdentity={onNavigateToProductEdit ? () => onNavigateToProductEdit(item.id) : undefined}
+                onEditMedia={onNavigateToProductMedia ? () => onNavigateToProductMedia(item.id) : undefined}
               />
             );
           })

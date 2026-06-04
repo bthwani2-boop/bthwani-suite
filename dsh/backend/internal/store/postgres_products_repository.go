@@ -1,9 +1,11 @@
 package store
 
 import (
+	"bufio"
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -105,7 +107,14 @@ WHERE id = $1`
 	if err == sql.ErrNoRows {
 		return domain.ProductRecord{}, fmt.Errorf("product not found")
 	}
-	return record, err
+	if err != nil {
+		return domain.ProductRecord{}, err
+	}
+	media, err := repo.ListProductMedia(ctx, productID)
+	if err == nil {
+		record.Media = media
+	}
+	return record, nil
 }
 
 func (repo *PostgresRepository) ListProducts(ctx context.Context, storeID string, limit int, offset int) (domain.ListProductsResponse, error) {
@@ -133,6 +142,10 @@ LIMIT $2 OFFSET $3`
 		record, err := scanProductRowColumns(rows)
 		if err != nil {
 			return domain.ListProductsResponse{}, err
+		}
+		media, err := repo.ListProductMedia(ctx, record.ID)
+		if err == nil {
+			record.Media = media
 		}
 		products = append(products, record)
 	}
@@ -212,4 +225,112 @@ func scanProductRowColumns(rows *sql.Rows) (domain.ProductRecord, error) {
 		r.CategoryID = &categoryID.String
 	}
 	return r, nil
+}
+
+var manifestMap map[string]string
+
+func loadManifest() map[string]string {
+	if manifestMap != nil {
+		return manifestMap
+	}
+	paths := []string{
+		"../frontend/media-fixtures/MANIFEST.local-required.tsv",
+		"../../frontend/media-fixtures/MANIFEST.local-required.tsv",
+		"dsh/frontend/media-fixtures/MANIFEST.local-required.tsv",
+		"frontend/media-fixtures/MANIFEST.local-required.tsv",
+		"media-fixtures/MANIFEST.local-required.tsv",
+	}
+	var file *os.File
+	var err error
+	for _, p := range paths {
+		file, err = os.Open(p)
+		if err == nil {
+			break
+		}
+	}
+	if err != nil {
+		return make(map[string]string)
+	}
+	defer file.Close()
+
+	m := make(map[string]string)
+	scanner := bufio.NewScanner(file)
+	if scanner.Scan() {
+		for scanner.Scan() {
+			line := scanner.Text()
+			parts := strings.Split(line, "\t")
+			if len(parts) >= 2 {
+				m[parts[0]] = parts[1]
+			}
+		}
+	}
+	manifestMap = m
+	return manifestMap
+}
+
+func GetMediaURL(mediaKey string) string {
+	m := loadManifest()
+	relPath, exists := m[mediaKey]
+	if !exists {
+		return ""
+	}
+	return "/media-fixtures/" + relPath
+}
+
+func (repo *PostgresRepository) CreateProductMedia(ctx context.Context, req domain.UploadProductMediaRequest) (domain.ProductMediaRecord, error) {
+	id := fmt.Sprintf("med-%d", time.Now().UnixNano())
+	url := GetMediaURL(req.MediaKey)
+	if url == "" {
+		return domain.ProductMediaRecord{}, fmt.Errorf("invalid or unregistered media key: %s", req.MediaKey)
+	}
+
+	query := `
+INSERT INTO dsh_catalog_product_media (id, product_id, media_key, url, created_at)
+VALUES ($1, $2, $3, $4, NOW())
+RETURNING id, product_id, media_key, url, created_at`
+
+	row := repo.db.QueryRowContext(ctx, query, id, req.ProductID, req.MediaKey, url)
+	var rec domain.ProductMediaRecord
+	err := row.Scan(&rec.ID, &rec.ProductID, &rec.MediaKey, &rec.URL, &rec.CreatedAt)
+	return rec, err
+}
+
+func (repo *PostgresRepository) DeleteProductMedia(ctx context.Context, id string) error {
+	query := `DELETE FROM dsh_catalog_product_media WHERE id = $1`
+	res, err := repo.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return fmt.Errorf("media record not found")
+	}
+	return nil
+}
+
+func (repo *PostgresRepository) ListProductMedia(ctx context.Context, productID string) ([]domain.ProductMediaRecord, error) {
+	query := `
+SELECT id, product_id, media_key, url, created_at
+FROM dsh_catalog_product_media
+WHERE product_id = $1
+ORDER BY created_at ASC`
+
+	rows, err := repo.db.QueryContext(ctx, query, productID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []domain.ProductMediaRecord
+	for rows.Next() {
+		var rec domain.ProductMediaRecord
+		if err := rows.Scan(&rec.ID, &rec.ProductID, &rec.MediaKey, &rec.URL, &rec.CreatedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, rec)
+	}
+	return list, rows.Err()
 }

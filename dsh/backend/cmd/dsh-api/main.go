@@ -38,6 +38,14 @@ func main() {
 	httpapi.RegisterRoutes(mux, repository)
 	httpapi.RegisterProductRoutes(mux, repository)
 	httpapi.RegisterCategoryRoutes(mux, repository)
+	httpapi.RegisterMediaRoutes(mux, repository)
+
+	// Serve static media fixtures under /media-fixtures/
+	mediaFixturesDir := "../frontend/media-fixtures"
+	if _, err := os.Stat(mediaFixturesDir); os.IsNotExist(err) {
+		mediaFixturesDir = "dsh/frontend/media-fixtures"
+	}
+	mux.Handle("GET /media-fixtures/", http.StripPrefix("/media-fixtures/", http.FileServer(http.Dir(mediaFixturesDir))))
 
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

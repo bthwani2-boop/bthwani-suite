@@ -30,6 +30,7 @@ type ProductRecord struct {
 	BasePriceLabel   string                `json:"base_price_label"`
 	CategoryID       *string               `json:"category_id,omitempty"`
 	ApprovalStatus   ProductApprovalStatus `json:"approval_status"`
+	Media            []ProductMediaRecord  `json:"media,omitempty"`
 	CreatedAt        time.Time             `json:"created_at"`
 	UpdatedAt        time.Time             `json:"updated_at"`
 }

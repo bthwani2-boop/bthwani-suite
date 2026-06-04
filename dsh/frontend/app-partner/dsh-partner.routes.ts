@@ -14,7 +14,8 @@ export type DshPartnerRouteId =
   | 'dsh-partner-support'
   | 'dsh-partner-order-rejection'
   | 'dsh-partner-product-edit' // J-002 / DSH-SLICE-002A
-  | 'dsh-partner-category-management'; // J-002 / DSH-SLICE-002B
+  | 'dsh-partner-category-management' // J-002 / DSH-SLICE-002B
+  | 'dsh-partner-product-media'; // J-002 / DSH-SLICE-002C
 
 export type DshPartnerLegacyRoute = DshPartnerRoute;
 
@@ -42,4 +43,6 @@ export const dshPartnerRoutes = [
   { routeId: 'dsh-partner-product-edit', legacyRoute: 'inventory-management', screenId: 'partner.dsh.product.edit', ownerPath: 'dsh/frontend/app-partner/screens/ProductEditScreen.tsx' },
   // J-002 / DSH-SLICE-002B — Category Structure
   { routeId: 'dsh-partner-category-management', legacyRoute: 'category-management', screenId: 'partner.dsh.category.management', ownerPath: 'dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx' },
+  // J-002 / DSH-SLICE-002C — Product Media
+  { routeId: 'dsh-partner-product-media', legacyRoute: 'product-media', screenId: 'partner.dsh.product.media', ownerPath: 'dsh/frontend/app-partner/screens/ProductMediaScreen.tsx' },
 ] as const satisfies readonly DshPartnerRouteRecord[];
