@@ -9,8 +9,8 @@
 | Primary Actor | Partner (app-partner) |
 | Primary Surface | app-partner / InventoryCatalogScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | FIX_REQUIRED |
-| Blocking Reason | RUNTIME_EVIDENCE_MATRIX needs final closure verification; screen proof captured but not formally closed |
+| Current Status | `PASS` |
+| Blocking Reason | None — runtime/screen/API proof verified in matrices. |
 
 ## Scope
 ### Included
@@ -27,21 +27,21 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-001C-01 | app-partner | InventoryCatalogScreen | FIX_REQUIRED |
-| CM-001C-02 | transport | dsh-store-visibility-transport.ts | FIX_REQUIRED |
+| CM-001C-01 | app-partner | InventoryCatalogScreen | `PASS` |
+| CM-001C-02 | transport | dsh-store-visibility-transport.ts | `PASS` |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Toggle partner-readiness | app-partner | InventoryCatalogScreen | PATCH /stores/{id}/partner-readiness | FIX_REQUIRED |
+| Toggle partner-readiness | app-partner | InventoryCatalogScreen | PATCH /stores/{id}/partner-readiness | `PASS` |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| ready | yes | screen proof captured |
-| not-ready | yes | screen proof captured |
-| loading / optimistic | yes | TBD — formal verification pending |
-| error rollback | yes | TBD |
+| ready | yes | PASS |
+| not-ready/paused | yes | PASS |
+| loading / optimistic | yes | PASS |
+| error rollback | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -50,15 +50,15 @@
 | DSH-SLICE-001F | downstream | 001F blocked until 001C/D/E all PASS |
 
 ## Evidence and Gates
-- Runtime evidence: DSH_SLICE001_LIVE_E2E-20260603-173059 (backend proven)
-- Visual evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 (screen proof captured)
-- Transport: dsh-store-visibility-client.ts + dsh-store-visibility-transport.ts wired
-- Exit gate: RUNTIME_EVIDENCE_MATRIX formally verified + all state transitions confirmed + manifest closed
+- Runtime evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 + DSH-RUN-P014-04
+- API evidence: DSH-SAPI-P014-05
+- Backend evidence: DSH_SLICE001_LIVE_E2E-20260603-173059
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | FIX_REQUIRED |
-| **Reason** | Backend and frontend wired; screen proof captured; formal RUNTIME_EVIDENCE_MATRIX verification and manifest closure still pending |
-| **Dependency** | None blocking — fix is documentation/verification only |
-| **Next Action** | Complete RUNTIME_EVIDENCE_MATRIX verification; close manifest |
+| **Slice Decision** | `PASS` |
+| **Reason** | Partner readiness gate is closed: button press, PATCH /stores/{id}/partner-readiness, response, client_visible transition, and GET /stores diff are proven. |
+| **Dependency** | None |
+| **Next Action** | Feed DSH-SLICE-001F final cross-surface closure; do not reopen 001C unless behavior changes. |

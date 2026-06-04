@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / PartnerStoresScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | FIX_REQUIRED |
-| Blocking Reason | RUNTIME_EVIDENCE_MATRIX needs final closure verification; screen proof captured but not formally closed |
+| Current Status | `PASS` |
+| Blocking Reason | None — runtime/screen/API proof verified in matrices. |
 
 ## Scope
 ### Included
@@ -27,22 +27,22 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-001E-01 | control-panel | PartnerStoresScreen | FIX_REQUIRED |
-| CM-001E-02 | transport | dsh-store-visibility-transport.ts | FIX_REQUIRED |
+| CM-001E-01 | control-panel | PartnerStoresScreen | `PASS` |
+| CM-001E-02 | transport | dsh-store-visibility-transport.ts | `PASS` |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Enable marketing visibility | control-panel | PartnerStoresScreen | PATCH /stores/{id}/marketing-visibility | FIX_REQUIRED |
-| Disable marketing visibility | control-panel | PartnerStoresScreen | PATCH /stores/{id}/marketing-visibility | FIX_REQUIRED |
+| Enable marketing visibility | control-panel | PartnerStoresScreen | PATCH /stores/{id}/marketing-visibility | `PASS` |
+| Disable marketing visibility | control-panel | PartnerStoresScreen | PATCH /stores/{id}/marketing-visibility | `PASS` |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| visible | yes | screen proof captured |
-| hidden | yes | screen proof captured |
-| loading / optimistic | yes | TBD — formal verification pending |
-| error rollback | yes | TBD |
+| visible | yes | PASS |
+| hidden | yes | PASS |
+| loading / optimistic | yes | PASS |
+| error rollback | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -52,15 +52,15 @@
 | DSH-SLICE-001F | downstream | blocked until 001C/D/E PASS |
 
 ## Evidence and Gates
-- Runtime evidence: DSH_SLICE001_LIVE_E2E-20260603-173059 (backend proven)
-- Visual evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 (screen proof captured)
-- SCREEN_API_MATRIX: updated to DSH_SLICE001_SCREEN_RUNTIME_PROVEN
-- Exit gate: RUNTIME_EVIDENCE_MATRIX formally verified + all state transitions confirmed + manifest closed
+- Runtime evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 + DSH-RUN-P014-07
+- API evidence: DSH-SAPI-P014-10
+- Backend evidence: DSH_SLICE001_LIVE_E2E-20260603-173059
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | FIX_REQUIRED |
-| **Reason** | Backend and frontend wired; screen proof captured; formal verification and manifest closure still pending |
-| **Dependency** | None blocking — fix is documentation/verification only |
-| **Next Action** | Complete RUNTIME_EVIDENCE_MATRIX verification; close manifest alongside 001C and 001D |
+| **Slice Decision** | `PASS` |
+| **Reason** | Marketing visibility gate is closed: button press, PATCH /stores/{id}/marketing-visibility, response, client_visible transition, and GET /stores diff are proven. |
+| **Dependency** | None |
+| **Next Action** | Feed DSH-SLICE-001F final cross-surface closure; do not reopen 001E unless behavior changes. |
