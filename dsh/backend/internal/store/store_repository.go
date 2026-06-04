@@ -28,4 +28,8 @@ type Repository interface {
 	CreateProductMedia(ctx context.Context, req domain.UploadProductMediaRequest) (domain.ProductMediaRecord, error)
 	DeleteProductMedia(ctx context.Context, id string) error
 	ListProductMedia(ctx context.Context, productID string) ([]domain.ProductMediaRecord, error)
+
+	// Partner local overrides (J-002 / DSH-SLICE-002D)
+	UpdateCatalogOverrides(ctx context.Context, storeID string, req domain.UpdateCatalogOverridesRequest) (domain.UpdateCatalogOverridesResponse, error)
+	GetCatalogOverrides(ctx context.Context, storeID string) ([]domain.CatalogOverrideRecord, error)
 }

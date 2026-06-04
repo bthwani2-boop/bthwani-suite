@@ -42,6 +42,9 @@ export type DshProductRecord = {
   readonly category_id?: string;
   readonly approval_status: DshProductApprovalStatus;
   readonly media?: readonly DshProductMediaRecord[];
+  readonly price_override?: string;
+  readonly stock_override?: number;
+  readonly available_override?: boolean;
   readonly created_at: string;
   readonly updated_at: string;
 };
@@ -108,6 +111,34 @@ export type DshListCategoriesResponse = {
   };
 };
 
+// ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
+
+export type DshCatalogOverrideInput = {
+  readonly product_id: string;
+  readonly price_override?: string;
+  readonly stock_override?: number;
+  readonly available_override?: boolean;
+};
+
+export type DshUpdateCatalogOverridesRequest = {
+  readonly overrides: readonly DshCatalogOverrideInput[];
+};
+
+export type DshCatalogOverrideRecord = {
+  readonly store_id: string;
+  readonly product_id: string;
+  readonly price_override?: string;
+  readonly stock_override?: number;
+  readonly available_override?: boolean;
+  readonly updated_at: string;
+};
+
+export type DshUpdateCatalogOverridesResponse = {
+  readonly store_id: string;
+  readonly updated_count: number;
+  readonly overrides: readonly DshCatalogOverrideRecord[];
+};
+
 // ─── Transport contract ────────────────────────────────────────────────────────
 
 export type DshProductApiTransport = {
@@ -158,6 +189,10 @@ export type DshProductApiClient = {
 
   uploadProductMedia(req: DshUploadProductMediaRequest): Promise<DshProductMediaRecord>;
   deleteProductMedia(mediaId: string): Promise<void>;
+  updateCatalogOverrides(
+    storeId: string,
+    req: DshUpdateCatalogOverridesRequest,
+  ): Promise<DshUpdateCatalogOverridesResponse>;
 };
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
@@ -210,5 +245,8 @@ export function createDshProductApiClient(
 
     deleteProductMedia: (mediaId) =>
       transport.delete(`/media/${mediaId}`),
+
+    updateCatalogOverrides: (storeId, req) =>
+      transport.patch(`/stores/${storeId}/catalog-overrides`, req),
   };
 }

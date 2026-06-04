@@ -1,0 +1,65 @@
+================================================================================
+DSH-SLICE-002D — Partner Local Overrides Manual Verification Log
+Date: 2026-06-04
+================================================================================
+
+1. API Server Check
+Request: GET http://localhost:8080/stores
+Response:
+{
+  "stores": [
+    {
+      "id": "canonical-store-field-lead-5",
+      "name": "Haddah Central Market",
+      "address": "Haddah Street, Sanaa",
+      "category_id": "grocery"
+    }
+  ]
+}
+
+2. Listing Products in store-1001 before overrides
+Request: GET http://localhost:8080/stores/store-1001/products
+Response excerpt (id, name, base_price_label):
+prod-1780542550353006200  خضار طازج بقدونس  3.00 ر.ي
+prod-1780542535684705300  خضار طازج كزبرة   3.00 ر.ي
+prod-1780539231574881800  مياه معدنية حدة 500 مل كرتون 2.75 ر.ي
+
+3. Applying Partner Local Overrides via API
+Request: PATCH http://localhost:8080/stores/store-1001/catalog-overrides
+Body:
+{
+  "overrides": [
+    {
+      "product_id": "prod-1780539231574881800",
+      "price_override": "3.50 ر.ي",
+      "stock_override": 77,
+      "available_override": false
+    }
+  ]
+}
+
+Response:
+{
+  "store_id": "store-1001",
+  "updated_count": 1,
+  "overrides": [
+    {
+      "store_id": "store-1001",
+      "product_id": "prod-1780539231574881800",
+      "price_override": "3.50 ر.ي",
+      "stock_override": 77,
+      "available_override": false,
+      "updated_at": "2026-06-04T15:15:37.336662+03:00"
+    }
+  ]
+}
+
+4. Verifying overrides are successfully stored and left-joined:
+Request: GET http://localhost:8080/stores/store-1001/products
+Response output showing fields:
+prod-1780542550353006200  خضار طازج بقدونس  3.00 ر.ي  (nil price_override)
+prod-1780542535684705300  خضار طازج كزبرة   3.00 ر.ي  (nil price_override)
+prod-1780539231574881800  مياه معدنية حدة 500 مل كرتون 2.75 ر.ي  PriceOverride: 3.50 ر.ي, StockOverride: 77, AvailableOverride: False
+
+Status: PASS 100%
+All endpoints behave correctly, DB joins work properly, and the values update successfully.

@@ -98,12 +98,14 @@ RETURNING id, store_id, name, sku, gtin, barcode, description, base_price_label,
 
 func (repo *PostgresRepository) GetProduct(ctx context.Context, productID string) (domain.ProductRecord, error) {
 	query := `
-SELECT id, store_id, name, sku, gtin, barcode, description, base_price_label, category_id, approval_status, created_at, updated_at
-FROM dsh_catalog_products
-WHERE id = $1`
+SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.category_id, p.approval_status, p.created_at, p.updated_at,
+       o.price_override, o.stock_override, o.available_override
+FROM dsh_catalog_products p
+LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
+WHERE p.id = $1`
 
 	row := repo.db.QueryRowContext(ctx, query, productID)
-	record, err := scanProductRow(row)
+	record, err := scanProductRowWithOverrides(row)
 	if err == sql.ErrNoRows {
 		return domain.ProductRecord{}, fmt.Errorf("product not found")
 	}
@@ -125,10 +127,12 @@ func (repo *PostgresRepository) ListProducts(ctx context.Context, storeID string
 	}
 
 	query := `
-SELECT id, store_id, name, sku, gtin, barcode, description, base_price_label, category_id, approval_status, created_at, updated_at
-FROM dsh_catalog_products
-WHERE store_id = $1
-ORDER BY created_at DESC
+SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.category_id, p.approval_status, p.created_at, p.updated_at,
+       o.price_override, o.stock_override, o.available_override
+FROM dsh_catalog_products p
+LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
+WHERE p.store_id = $1
+ORDER BY p.created_at DESC
 LIMIT $2 OFFSET $3`
 
 	rows, err := repo.db.QueryContext(ctx, query, storeID, limit, offset)
@@ -139,7 +143,7 @@ LIMIT $2 OFFSET $3`
 
 	products := []domain.ProductRecord{}
 	for rows.Next() {
-		record, err := scanProductRowColumns(rows)
+		record, err := scanProductRowColumnsWithOverrides(rows)
 		if err != nil {
 			return domain.ListProductsResponse{}, err
 		}
@@ -333,4 +337,196 @@ ORDER BY created_at ASC`
 		list = append(list, rec)
 	}
 	return list, rows.Err()
+}
+
+func (repo *PostgresRepository) UpdateCatalogOverrides(ctx context.Context, storeID string, req domain.UpdateCatalogOverridesRequest) (domain.UpdateCatalogOverridesResponse, error) {
+	tx, err := repo.db.BeginTx(ctx, nil)
+	if err != nil {
+		return domain.UpdateCatalogOverridesResponse{}, err
+	}
+	defer tx.Rollback()
+
+	var records []domain.CatalogOverrideRecord
+	updatedCount := 0
+
+	for _, item := range req.Overrides {
+		query := `
+INSERT INTO dsh_catalog_overrides (store_id, product_id, price_override, stock_override, available_override, updated_at)
+VALUES ($1, $2, $3, $4, $5, NOW())
+ON CONFLICT (store_id, product_id)
+DO UPDATE SET
+  price_override = COALESCE(EXCLUDED.price_override, dsh_catalog_overrides.price_override),
+  stock_override = COALESCE(EXCLUDED.stock_override, dsh_catalog_overrides.stock_override),
+  available_override = COALESCE(EXCLUDED.available_override, dsh_catalog_overrides.available_override),
+  updated_at = NOW()
+RETURNING store_id, product_id, price_override, stock_override, available_override, updated_at`
+
+		row := tx.QueryRowContext(ctx, query,
+			storeID, item.ProductID,
+			item.PriceOverride, item.StockOverride, item.AvailableOverride,
+		)
+
+		var rec domain.CatalogOverrideRecord
+		var price sql.NullString
+		var stock sql.NullInt64
+		var avail sql.NullBool
+		if err := row.Scan(&rec.StoreID, &rec.ProductID, &price, &stock, &avail, &rec.UpdatedAt); err != nil {
+			return domain.UpdateCatalogOverridesResponse{}, err
+		}
+
+		if price.Valid {
+			rec.PriceOverride = &price.String
+		}
+		if stock.Valid {
+			val := int(stock.Int64)
+			rec.StockOverride = &val
+		}
+		if avail.Valid {
+			val := avail.Bool
+			rec.AvailableOverride = &val
+		}
+
+		records = append(records, rec)
+		updatedCount++
+	}
+
+	if err := tx.Commit(); err != nil {
+		return domain.UpdateCatalogOverridesResponse{}, err
+	}
+
+	return domain.UpdateCatalogOverridesResponse{
+		StoreID:      storeID,
+		UpdatedCount: updatedCount,
+		Overrides:    records,
+	}, nil
+}
+
+func (repo *PostgresRepository) GetCatalogOverrides(ctx context.Context, storeID string) ([]domain.CatalogOverrideRecord, error) {
+	query := `
+SELECT store_id, product_id, price_override, stock_override, available_override, updated_at
+FROM dsh_catalog_overrides
+WHERE store_id = $1`
+
+	rows, err := repo.db.QueryContext(ctx, query, storeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []domain.CatalogOverrideRecord
+	for rows.Next() {
+		var rec domain.CatalogOverrideRecord
+		var price sql.NullString
+		var stock sql.NullInt64
+		var avail sql.NullBool
+		if err := rows.Scan(&rec.StoreID, &rec.ProductID, &price, &stock, &avail, &rec.UpdatedAt); err != nil {
+			return nil, err
+		}
+
+		if price.Valid {
+			rec.PriceOverride = &price.String
+		}
+		if stock.Valid {
+			val := int(stock.Int64)
+			rec.StockOverride = &val
+		}
+		if avail.Valid {
+			val := avail.Bool
+			rec.AvailableOverride = &val
+		}
+		list = append(list, rec)
+	}
+	return list, rows.Err()
+}
+
+func scanProductRowWithOverrides(row *sql.Row) (domain.ProductRecord, error) {
+	var r domain.ProductRecord
+	var sku, gtin, barcode, description, categoryID sql.NullString
+	var priceOverride sql.NullString
+	var stockOverride sql.NullInt64
+	var availableOverride sql.NullBool
+	err := row.Scan(
+		&r.ID, &r.StoreID, &r.Name,
+		&sku, &gtin, &barcode, &description,
+		&r.BasePriceLabel, &categoryID,
+		&r.ApprovalStatus,
+		&r.CreatedAt, &r.UpdatedAt,
+		&priceOverride, &stockOverride, &availableOverride,
+	)
+	if err != nil {
+		return domain.ProductRecord{}, err
+	}
+	if sku.Valid {
+		r.SKU = &sku.String
+	}
+	if gtin.Valid {
+		r.GTIN = &gtin.String
+	}
+	if barcode.Valid {
+		r.Barcode = &barcode.String
+	}
+	if description.Valid {
+		r.Description = &description.String
+	}
+	if categoryID.Valid {
+		r.CategoryID = &categoryID.String
+	}
+	if priceOverride.Valid {
+		r.PriceOverride = &priceOverride.String
+	}
+	if stockOverride.Valid {
+		val := int(stockOverride.Int64)
+		r.StockOverride = &val
+	}
+	if availableOverride.Valid {
+		val := availableOverride.Bool
+		r.AvailableOverride = &val
+	}
+	return r, nil
+}
+
+func scanProductRowColumnsWithOverrides(rows *sql.Rows) (domain.ProductRecord, error) {
+	var r domain.ProductRecord
+	var sku, gtin, barcode, description, categoryID sql.NullString
+	var priceOverride sql.NullString
+	var stockOverride sql.NullInt64
+	var availableOverride sql.NullBool
+	err := rows.Scan(
+		&r.ID, &r.StoreID, &r.Name,
+		&sku, &gtin, &barcode, &description,
+		&r.BasePriceLabel, &categoryID,
+		&r.ApprovalStatus,
+		&r.CreatedAt, &r.UpdatedAt,
+		&priceOverride, &stockOverride, &availableOverride,
+	)
+	if err != nil {
+		return domain.ProductRecord{}, err
+	}
+	if sku.Valid {
+		r.SKU = &sku.String
+	}
+	if gtin.Valid {
+		r.GTIN = &gtin.String
+	}
+	if barcode.Valid {
+		r.Barcode = &barcode.String
+	}
+	if description.Valid {
+		r.Description = &description.String
+	}
+	if categoryID.Valid {
+		r.CategoryID = &categoryID.String
+	}
+	if priceOverride.Valid {
+		r.PriceOverride = &priceOverride.String
+	}
+	if stockOverride.Valid {
+		val := int(stockOverride.Int64)
+		r.StockOverride = &val
+	}
+	if availableOverride.Valid {
+		val := availableOverride.Bool
+		r.AvailableOverride = &val
+	}
+	return r, nil
 }

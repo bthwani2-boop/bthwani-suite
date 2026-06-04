@@ -502,6 +502,7 @@ type InventoryCatalogContentProps = {
   onNavigateToProductEdit?: (productId?: string) => void;
   onNavigateToCategoryManagement?: () => void;
   onNavigateToProductMedia?: (productId: string) => void;
+  onNavigateToProductOverrides?: (productId: string) => void;
 };
 
 export type InventoryCatalogScreenProps = InventoryCatalogContentProps & {
@@ -972,6 +973,7 @@ function InventoryCatalogCardPanel({
   onMatchCatalog,
   onEditIdentity,
   onEditMedia,
+  onEditOverrides,
 }: {
   item: InventoryCatalogListItem;
   detail?: InventoryCatalogItemDetail;
@@ -986,6 +988,7 @@ function InventoryCatalogCardPanel({
   onMatchCatalog: () => void;
   onEditIdentity?: () => void;
   onEditMedia?: () => void;
+  onEditOverrides?: () => void;
 }) {
   const { direction } = useDirection();
   const isRejected = item.publishStage === 'rejected';
@@ -1094,6 +1097,15 @@ function InventoryCatalogCardPanel({
                 onPress={onEditMedia}
               />
             ) : null}
+            {onEditOverrides ? (
+              <Button
+                label="تعديل الأسعار والتوفر"
+                size="sm"
+                tone="secondary"
+                fullWidth={false}
+                onPress={onEditOverrides}
+              />
+            ) : null}
             {!item.catalogLinked ? (
               <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
             ) : null}
@@ -1143,6 +1155,7 @@ function InventoryCatalogContent({
   canonicalStoreId = 'store-1001',
   onNavigateToProductEdit,
   onNavigateToProductMedia,
+  onNavigateToProductOverrides,
 }: InventoryCatalogContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
@@ -1393,6 +1406,7 @@ function InventoryCatalogContent({
                 onMatchCatalog={() => handleMatchCatalog(item)}
                 onEditIdentity={onNavigateToProductEdit ? () => onNavigateToProductEdit(item.id) : undefined}
                 onEditMedia={onNavigateToProductMedia ? () => onNavigateToProductMedia(item.id) : undefined}
+                onEditOverrides={onNavigateToProductOverrides ? () => onNavigateToProductOverrides(item.id) : undefined}
               />
             );
           })

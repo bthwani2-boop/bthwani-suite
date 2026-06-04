@@ -42,6 +42,7 @@ import { PartnerSupportScreen } from './screens/PartnerSupportScreen';
 import { ProductEditScreen } from './screens/ProductEditScreen';
 import { CategoryManagementScreen } from './screens/CategoryManagementScreen';
 import { ProductMediaScreen } from './screens/ProductMediaScreen';
+import { ProductOverridesScreen } from './screens/ProductOverridesScreen';
 
 import {
   type PartnerStoreScopeOption,
@@ -524,6 +525,10 @@ export function DshPartnerSurface({
           setEditingProductId(prodId);
           setRoute('product-media');
         }}
+        onNavigateToProductOverrides={(prodId) => {
+          setEditingProductId(prodId);
+          setRoute('product-overrides');
+        }}
         storeName={maintenanceProfile.storeName}
         branchLabel={selectedStoreScope.label}
         activeZoneLabel={maintenanceProfile.activeZoneLabel}
@@ -558,6 +563,15 @@ export function DshPartnerSurface({
   if (route === 'product-media') {
     return renderSurfaceShell(
       <ProductMediaScreen
+        productId={editingProductId ?? ''}
+        onBack={() => setRoute('inventory-management')}
+      />,
+    );
+  }
+
+  if (route === 'product-overrides') {
+    return renderSurfaceShell(
+      <ProductOverridesScreen
         productId={editingProductId ?? ''}
         onBack={() => setRoute('inventory-management')}
       />,

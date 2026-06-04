@@ -407,3 +407,12 @@ func (repo *MemoryRepository) DeleteProductMedia(_ context.Context, _ string) er
 func (repo *MemoryRepository) ListProductMedia(_ context.Context, _ string) ([]domain.ProductMediaRecord, error) {
 	return nil, errors.New("media list requires postgres backend (set DATABASE_URL)")
 }
+
+// Partner local overrides stubs (J-002 / DSH-SLICE-002D)
+func (repo *MemoryRepository) UpdateCatalogOverrides(_ context.Context, _ string, _ domain.UpdateCatalogOverridesRequest) (domain.UpdateCatalogOverridesResponse, error) {
+	return domain.UpdateCatalogOverridesResponse{}, errors.New("overrides update requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) GetCatalogOverrides(_ context.Context, _ string) ([]domain.CatalogOverrideRecord, error) {
+	return nil, errors.New("overrides get requires postgres backend (set DATABASE_URL)")
+}

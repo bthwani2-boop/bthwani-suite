@@ -15,7 +15,8 @@ export type DshPartnerRouteId =
   | 'dsh-partner-order-rejection'
   | 'dsh-partner-product-edit' // J-002 / DSH-SLICE-002A
   | 'dsh-partner-category-management' // J-002 / DSH-SLICE-002B
-  | 'dsh-partner-product-media'; // J-002 / DSH-SLICE-002C
+  | 'dsh-partner-product-media' // J-002 / DSH-SLICE-002C
+  | 'dsh-partner-product-overrides'; // J-002 / DSH-SLICE-002D
 
 export type DshPartnerLegacyRoute = DshPartnerRoute;
 
@@ -45,4 +46,6 @@ export const dshPartnerRoutes = [
   { routeId: 'dsh-partner-category-management', legacyRoute: 'category-management', screenId: 'partner.dsh.category.management', ownerPath: 'dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx' },
   // J-002 / DSH-SLICE-002C — Product Media
   { routeId: 'dsh-partner-product-media', legacyRoute: 'product-media', screenId: 'partner.dsh.product.media', ownerPath: 'dsh/frontend/app-partner/screens/ProductMediaScreen.tsx' },
+  // J-002 / DSH-SLICE-002D — Partner Local Overrides
+  { routeId: 'dsh-partner-product-overrides', legacyRoute: 'product-overrides', screenId: 'partner.dsh.product.overrides', ownerPath: 'dsh/frontend/app-partner/screens/ProductOverridesScreen.tsx' },
 ] as const satisfies readonly DshPartnerRouteRecord[];

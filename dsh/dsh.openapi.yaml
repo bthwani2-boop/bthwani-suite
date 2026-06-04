@@ -399,6 +399,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  # ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
+  /stores/{store_id}/catalog-overrides:
+    patch:
+      tags:
+        - Partner Local Overrides
+      summary: Apply catalog overrides for a store
+      description: >
+        Applies local overrides (price, stock, availability) for products in the given store's catalog.
+        These local overrides do not mutate the central product definitions.
+      operationId: updateCatalogOverrides
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCatalogOverridesRequest'
+      responses:
+        '200':
+          description: Overrides updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCatalogOverridesResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   # ─── J-001 / Store Discovery ───────────────────────────────────────────────
   /stores:
     get:
@@ -930,6 +972,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductMediaRecord'
+        price_override:
+          type: string
+          description: Display-only local price override.
+        stock_override:
+          type: integer
+          description: Local stock count override.
+        available_override:
+          type: boolean
+          description: Local availability override.
 
     CreateProductRequest:
       type: object
@@ -1079,3 +1130,68 @@ components:
           type: string
         media_key:
           type: string
+
+    # ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
+    UpdateCatalogOverridesRequest:
+      type: object
+      required:
+        - overrides
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogOverrideInput'
+
+    CatalogOverrideInput:
+      type: object
+      required:
+        - product_id
+      properties:
+        product_id:
+          type: string
+        price_override:
+          type: string
+          description: Partner-specific price override label (display-only, WLT boundary).
+        stock_override:
+          type: integer
+          description: Partner-specific inventory stock override count.
+        available_override:
+          type: boolean
+          description: Toggle availability override for the product.
+
+    UpdateCatalogOverridesResponse:
+      type: object
+      required:
+        - store_id
+        - updated_count
+        - overrides
+      properties:
+        store_id:
+          type: string
+        updated_count:
+          type: integer
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogOverrideRecord'
+
+    CatalogOverrideRecord:
+      type: object
+      required:
+        - store_id
+        - product_id
+        - updated_at
+      properties:
+        store_id:
+          type: string
+        product_id:
+          type: string
+        price_override:
+          type: string
+        stock_override:
+          type: integer
+        available_override:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
