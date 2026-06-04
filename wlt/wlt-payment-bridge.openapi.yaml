@@ -1,0 +1,282 @@
+openapi: 3.1.0
+info:
+  title: WLT Payment Bridge — DSH Minimal Contract
+  version: "0.1.0"
+  description: |
+    Minimal WLT payment bridge contract for DSH checkout handoff.
+
+    This is NOT the full WLT service spec.
+    This contract defines ONLY the surface that DSH touches
+    to hand off payment intent candidates and read payment status.
+
+    Boundary rule:
+      DSH produces operational proof (orderId, amount candidate, clientId).
+      WLT decides financial outcome (approve, reject, hold).
+      DSH stores WLT sessionId as operational reference only.
+      DSH does NOT mutate wallet balance, ledger, or settlement records.
+
+    noFinancialMutationInDsh: true
+    dshBoundary: DSH_PAYMENT_INPUT_ONLY
+    wltBoundary: WLT_OWNS_FINAL_FINANCIAL_TRUTH
+
+servers:
+  - url: "{wltBaseUrl}"
+    variables:
+      wltBaseUrl:
+        default: https://wlt.bthwani.local
+        description: WLT service base URL (separate from DSH API)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PaymentSessionRequest:
+      type: object
+      required: [orderId, amountMinorUnits, currency, clientId]
+      properties:
+        orderId:
+          type: string
+          description: DSH operational order identifier
+          example: "ord-20260604-9f3a"
+        amountMinorUnits:
+          type: integer
+          description: Payment amount in minor units (e.g. halalas for SAR, fils for YER)
+          example: 15000
+        currency:
+          type: string
+          example: "YER"
+        clientId:
+          type: string
+          description: Authenticated client identity from DSH auth check
+          example: "client-9f3a1b"
+
+    PaymentSessionResponse:
+      type: object
+      required: [sessionId, status]
+      properties:
+        sessionId:
+          type: string
+          description: WLT session reference — DSH stores this as operational reference only
+          example: "wlt-sess-2026abc"
+        status:
+          type: string
+          enum: [pending, confirmed, failed, expired]
+          description: |
+            pending: WLT is processing the payment decision.
+            confirmed: WLT approved and executed the payment.
+            failed: WLT rejected (insufficient balance, policy, etc.)
+            expired: Session timed out before confirmation.
+        expiresAt:
+          type: string
+          format: date-time
+          description: When this session expires
+
+    PaymentSessionStatus:
+      type: object
+      required: [sessionId, status]
+      properties:
+        sessionId:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, failed, expired]
+        confirmedAt:
+          type: string
+          format: date-time
+          description: Present only when status=confirmed
+        failureReason:
+          type: string
+          enum: [insufficient_balance, policy_block, fraud_hold, expired]
+          description: Present only when status=failed
+
+    TopUpSessionRequest:
+      type: object
+      required: [amountMinorUnits, currency, clientId]
+      properties:
+        amountMinorUnits:
+          type: integer
+          example: 10000
+        currency:
+          type: string
+          example: "YER"
+        clientId:
+          type: string
+          example: "client-9f3a1b"
+
+    TopUpSessionResponse:
+      type: object
+      required: [sessionId, status]
+      properties:
+        sessionId:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, failed]
+        redirectUrl:
+          type: string
+          description: WLT-hosted top-up flow URL (DSH displays, does not own)
+
+    WltError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [insufficient_balance, policy_block, session_not_found, invalid_request]
+        message:
+          type: string
+
+security:
+  - BearerAuth: []
+
+paths:
+  /wlt/client/payment-sessions:
+    post:
+      operationId: createClientPaymentSession
+      summary: طلب جلسة دفع من DSH
+      description: |
+        DSH submits a payment session candidate to WLT.
+        WLT validates client balance and policy, then returns a sessionId.
+        DSH polls /wlt/client/payment-sessions/{sessionId} for the outcome.
+
+        DSH MUST NOT proceed with order creation until status=confirmed.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentSessionRequest"
+      responses:
+        "201":
+          description: Payment session created — poll for status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSessionResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WltError"
+        "402":
+          description: Insufficient balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WltError"
+              example:
+                code: insufficient_balance
+                message: "Client wallet balance insufficient for this order"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WltError"
+
+  /wlt/client/payment-sessions/{sessionId}:
+    get:
+      operationId: getClientPaymentSessionStatus
+      summary: حالة جلسة الدفع
+      description: |
+        DSH polls this to determine if WLT confirmed or rejected payment.
+        DSH creates the order only when status=confirmed.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment session status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentSessionStatus"
+        "404":
+          description: Session not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WltError"
+
+  /wlt/client/top-up-sessions:
+    post:
+      operationId: createClientTopUpSession
+      summary: طلب شحن محفظة
+      description: |
+        Client initiates a top-up request.
+        WLT returns a redirectUrl for the hosted top-up flow.
+        DSH displays the redirect — does not process the top-up itself.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopUpSessionRequest"
+      responses:
+        "201":
+          description: Top-up session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopUpSessionResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WltError"
+
+  /wlt/client/wallet/summary:
+    get:
+      operationId: getClientWalletSummary
+      summary: ملخص المحفظة (قراءة فقط)
+      description: |
+        Read-only wallet balance for display in DSH client surfaces.
+        DSH displays balance as visibility only.
+        DSH MUST NOT use this to authorize or execute payments.
+        Financial truth lives in WLT ledger — this is a display snapshot.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Wallet summary
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [balanceMinorUnits, currency, linked]
+                properties:
+                  balanceMinorUnits:
+                    type: integer
+                    example: 50000
+                  currency:
+                    type: string
+                    example: "YER"
+                  linked:
+                    type: boolean
+                  frozenMinorUnits:
+                    type: integer
+                    default: 0
+                  updatedAt:
+                    type: string
+                    format: date-time
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WltError"

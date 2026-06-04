@@ -1,33 +1,51 @@
-import { WalletBalance, PaymentIntent, TopUpIntent } from './contracts';
+// WLT Backend Client — Payment Bridge Stub
+// BOUNDARY: This client is a stub for the future WLT payment bridge SDK.
+// It does NOT call DSH API. It does NOT mutate financial state.
+// When WLT runtime is available, replace with the real WLT SDK client.
+//
+// DSH produces operational proof → WLT client forwards to WLT service.
+// DSH stores only the returned reference ID (sessionId / txId).
+import {
+	WalletBalance,
+	PaymentIntentRequest,
+	PaymentIntentResponse,
+	TopUpIntentRequest,
+	TopUpIntentResponse,
+} from './contracts';
 
 export interface WltBackendClient {
-	getClientWalletSummary(baseUrl: string): Promise<WalletBalance>;
-	createClientPaymentIntent(baseUrl: string, intent: PaymentIntent): Promise<PaymentIntent>;
-	createClientTopUpIntent(baseUrl: string, intent: TopUpIntent): Promise<TopUpIntent>;
+	// Read-only wallet summary for display in DSH surfaces (not financial truth).
+	getClientWalletSummary(wltBaseUrl: string): Promise<WalletBalance>;
+	// Payment session handoff: DSH provides orderId + amount → WLT decides.
+	createClientPaymentIntent(wltBaseUrl: string, req: PaymentIntentRequest): Promise<PaymentIntentResponse>;
+	// Top-up session handoff: initiated by client, executed by WLT.
+	createClientTopUpIntent(wltBaseUrl: string, req: TopUpIntentRequest): Promise<TopUpIntentResponse>;
 }
 
+// NOTE: wltBaseUrl must be the WLT service base URL — NOT the DSH API URL.
+// DSH does not serve wallet endpoints.
 export const wltBackendClient: WltBackendClient = {
-	getClientWalletSummary: async (baseUrl: string): Promise<WalletBalance> => {
-		const response = await fetch(`${baseUrl.replace(/\/$/, '')}/wlt/dsh/client/wallet/summary`);
-		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+	getClientWalletSummary: async (wltBaseUrl: string): Promise<WalletBalance> => {
+		const response = await fetch(`${wltBaseUrl.replace(/\/$/, '')}/wlt/client/wallet/summary`);
+		if (!response.ok) throw new Error(`WLT wallet summary error: ${response.status}`);
 		return response.json();
 	},
-	createClientPaymentIntent: async (baseUrl: string, intent: PaymentIntent): Promise<PaymentIntent> => {
-		const response = await fetch(`${baseUrl.replace(/\/$/, '')}/wlt/dsh/client/payment-intents`, {
+	createClientPaymentIntent: async (wltBaseUrl: string, req: PaymentIntentRequest): Promise<PaymentIntentResponse> => {
+		const response = await fetch(`${wltBaseUrl.replace(/\/$/, '')}/wlt/client/payment-intents`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(intent),
+			body: JSON.stringify(req),
 		});
-		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		if (!response.ok) throw new Error(`WLT payment intent error: ${response.status}`);
 		return response.json();
 	},
-	createClientTopUpIntent: async (baseUrl: string, intent: TopUpIntent): Promise<TopUpIntent> => {
-		const response = await fetch(`${baseUrl.replace(/\/$/, '')}/wlt/dsh/client/top-up-intents`, {
+	createClientTopUpIntent: async (wltBaseUrl: string, req: TopUpIntentRequest): Promise<TopUpIntentResponse> => {
+		const response = await fetch(`${wltBaseUrl.replace(/\/$/, '')}/wlt/client/top-up-intents`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(intent),
+			body: JSON.stringify(req),
 		});
-		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		if (!response.ok) throw new Error(`WLT top-up intent error: ${response.status}`);
 		return response.json();
 	},
 };

@@ -3,7 +3,10 @@
 // runtimeTruth=false / backendSource=false — see wlt-dsh-client.contract.ts for the full boundary contract.
 // No real ledger entry, no real WLT API call, no real payment mutation from this adapter.
 // When a real WLT payment runtime is available, replace this file with the actual SDK bridge.
-import { wltBackendClient } from '../../../backend/src/client';
+//
+// BOUNDARY: DSH does not own wallet state.
+// DSH adapter is localStorage preview only until WLT payment session contract is live.
+// Financial truth lives in WLT — not in DSH backend.
 
 export type WalletAccount = { id: string; name: string };
 
@@ -94,34 +97,13 @@ function ensureBalanceLocal() {
 	readBalanceLocal();
 }
 
-function getBaseUrl(): string | null {
-	if (typeof process !== 'undefined') {
-		const env = process.env;
-		const raw = env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-		return raw?.trim() || null;
-	}
-	return null;
-}
-
 export const isLinked = async (): Promise<boolean> => {
-	const baseUrl = getBaseUrl();
-	if (baseUrl) {
-		try {
-			const summary = await wltBackendClient.getClientWalletSummary(baseUrl);
-			return summary.linked;
-		} catch {
-			return false;
-		}
-	}
+	// PREVIEW: localStorage-only. WLT runtime not yet available.
 	return Boolean(readAccountLocal());
 };
 
 export const getBalance = async (): Promise<number> => {
-	const baseUrl = getBaseUrl();
-	if (baseUrl) {
-		const summary = await wltBackendClient.getClientWalletSummary(baseUrl);
-		return summary.balanceMinorUnits;
-	}
+	// PREVIEW: localStorage-only. WLT runtime not yet available.
 	ensureBalanceLocal();
 	return readBalanceLocal();
 };
@@ -140,22 +122,8 @@ export const unlink = async (): Promise<void> => {
 };
 
 export const requestPayment = async (amountMinorUnits: number): Promise<{ success: boolean; txId?: string; error?: string }> => {
-	const baseUrl = getBaseUrl();
-	if (baseUrl) {
-		try {
-			const intent = await wltBackendClient.createClientPaymentIntent(baseUrl, {
-				orderId: `ord-gen-${Date.now()}`,
-				amountMinorUnits,
-				currency: 'YER',
-			});
-			if (intent.status === 'failed') {
-				return { success: false, error: 'insufficient_balance' };
-			}
-			return { success: true, txId: intent.id };
-		} catch {
-			return { success: false, error: 'payment_failed' };
-		}
-	}
+	// PREVIEW: localStorage-only simulation.
+	// Real implementation: POST to WLT payment session endpoint, receive sessionId, poll status.
 	ensureBalanceLocal();
 	const balance = readBalanceLocal();
 	if (balance < amountMinorUnits) return { success: false, error: 'insufficient_balance' };
@@ -165,19 +133,8 @@ export const requestPayment = async (amountMinorUnits: number): Promise<{ succes
 };
 
 export const topUp = async (amountMinorUnits: number): Promise<{ success: boolean; balance: number }> => {
-	const baseUrl = getBaseUrl();
-	if (baseUrl) {
-		try {
-			await wltBackendClient.createClientTopUpIntent(baseUrl, {
-				amountMinorUnits,
-				currency: 'YER',
-			});
-			const summary = await wltBackendClient.getClientWalletSummary(baseUrl);
-			return { success: true, balance: summary.balanceMinorUnits };
-		} catch {
-			return { success: false, balance: 0 };
-		}
-	}
+	// PREVIEW: localStorage-only simulation.
+	// Real implementation: POST to WLT top-up session endpoint.
 	ensureBalanceLocal();
 	const balance = readBalanceLocal();
 	const newBalance = balance + amountMinorUnits;

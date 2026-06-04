@@ -44,7 +44,8 @@ func main() {
 	httpapi.RegisterConflictsRoutes(mux, repository)
 	httpapi.RegisterOrderRoutes(mux, repository)
 	httpapi.RegisterSupportRoutes(mux, repository)
-	httpapi.RegisterWltRoutes(mux)
+	// WLT routes are NOT registered here — DSH backend does not own wallet state.
+	// Financial operations are delegated to WLT service via payment session handoff.
 
 	// Serve static media fixtures under /media-fixtures/
 	mediaFixturesDir := "../frontend/media-fixtures"
