@@ -430,3 +430,28 @@ func (repo *MemoryRepository) ListConflicts(_ context.Context, _ string, _ strin
 func (repo *MemoryRepository) ResolveConflict(_ context.Context, _ string, _ domain.ResolveConflictRequest) (domain.ResolveConflictResponse, error) {
 	return domain.ResolveConflictResponse{}, errors.New("conflict resolution requires postgres backend (set DATABASE_URL)")
 }
+
+// Order lifecycle stubs (J-003D / J-004)
+func (repo *MemoryRepository) CreateOrder(_ context.Context, _ string, _ domain.CreateOrderRequest) (domain.OrderRecord, []domain.OrderItemRecord, error) {
+	return domain.OrderRecord{}, nil, errors.New("order creation requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) GetOrder(_ context.Context, _ string) (domain.OrderRecord, []domain.OrderItemRecord, error) {
+	return domain.OrderRecord{}, nil, errors.New("order get requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) UpdateOrderStatus(_ context.Context, _ string, _ string, _ string, _ *string) (domain.OrderRecord, error) {
+	return domain.OrderRecord{}, errors.New("order status update requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) CreateSupportEscalation(_ context.Context, _ domain.CreateSupportEscalationRequest) (domain.SupportEscalationRecord, error) {
+	return domain.SupportEscalationRecord{}, errors.New("support escalation requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListOrderStatusEvents(_ context.Context, _ string) ([]domain.OrderStatusEventRecord, error) {
+	return nil, errors.New("order status events list requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListSupportEscalations(_ context.Context, _ string) ([]domain.SupportEscalationRecord, error) {
+	return nil, errors.New("support escalations list requires postgres backend (set DATABASE_URL)")
+}

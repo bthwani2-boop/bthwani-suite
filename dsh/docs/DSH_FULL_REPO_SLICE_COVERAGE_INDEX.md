@@ -389,7 +389,8 @@ These contradictions exist between source files and must be resolved in the appr
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
 | BLOCKED_WITH_REASON areas | 3 (finance/WLT + DSH-SLICE-003A/B/C WLT/auth + upstream dependency chain) |
 | Slice compliance closures (BLOCKED) | 2 (DSH-SLICE-003A — DSH_SLICE_003A_CART_SERVICEABILITY_BLOCKED_CLOSURE-20260604-174100; DSH-SLICE-003B — DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700) |
-| Full universal protocol closures (BLOCKED) | 3 (DSH-SLICE-003A — DSH_SLICE_003A_FULL_UNIVERSAL_CLOSURE-20260604-175500; DSH-SLICE-003B — DSH_SLICE_003B_FULL_UNIVERSAL_CLOSURE-20260604-200000; DSH-SLICE-003C — DSH_SLICE_003C_FULL_UNIVERSAL_CLOSURE-20260604-201100) |
+| Full universal protocol closures (BLOCKED) | 5 (DSH-SLICE-003A — DSH_SLICE_003A_FULL_UNIVERSAL_CLOSURE-20260604-175500; DSH-SLICE-003B — DSH_SLICE_003B_FULL_UNIVERSAL_CLOSURE-20260604-200000; DSH-SLICE-003C — DSH_SLICE_003C_FULL_UNIVERSAL_CLOSURE-20260604-201100; DSH-SLICE-003D — DSH_SLICE_003D_FULL_UNIVERSAL_CLOSURE-20260604-181500; DSH-SLICE-003E — DSH_SLICE_003E_FULL_UNIVERSAL_CLOSURE-20260604-182000) |
+| Full universal protocol closures (DEFERRED) | 4 (DSH-SLICE-004A — DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500; DSH-SLICE-004B — DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400; DSH-SLICE-004C — DSH_SLICE_004C_SUPPORT_ESCALATION_FINAL_CLOSURE-20260604-184000; DSH-SLICE-004D — DSH_SLICE_004D_CANCELLATION_FINAL_CLOSURE-20260604-185000) |
 
 ---
 
@@ -397,7 +398,7 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved as of 2026-06-04. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions. DSH-SLICE-003A, 003B, and 003C slice files are at full required-section compliance (BLOCKED_WITH_REASON — WLT/auth proof pending). All three have completed the full 12-step BTHWANI_DSH_UNIVERSAL_SLICE_FINAL_CLOSURE_COMMAND protocol with zero contradictions found across all sessions. Critical finding logged in 003C: WltBoundaryBanner.tsx is J-010/DSH-SLICE-010D governed (DOCUMENTED_CROSS_REFERENCE — not a gap). WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved as of 2026-06-04. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions. DSH-SLICE-003A, 003B, 003C, 003D, 003E, 004A, 004B, 004C, and 004D slice files are at full required-section compliance. All J-003 slices (BLOCKED_WITH_REASON — WLT/auth proof pending) and J-004/004A–004D (DEFERRED_WITH_REASON) have completed the full 12-step BTHWANI_DSH_UNIVERSAL_SLICE_FINAL_CLOSURE_COMMAND protocol with zero contradictions found across all sessions. Critical finding logged in 003C: WltBoundaryBanner.tsx is J-010/DSH-SLICE-010D governed (DOCUMENTED_CROSS_REFERENCE — not a gap). WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
 
 Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
 

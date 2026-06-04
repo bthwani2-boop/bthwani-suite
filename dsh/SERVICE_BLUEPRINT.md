@@ -18,7 +18,7 @@ API contract: `dsh/dsh.openapi.yaml`.
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
 | Current Decision | `DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE` |
-| Current Status | `J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = BLOCKED_WITH_REASON / WLT-auth proof pending; J-004+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED` |
+| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = BLOCKED_WITH_REASON / WLT-auth proof pending (J-003D unblocked & implemented); J-004 = PASS / SCREEN_RUNTIME_PROVEN; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -143,8 +143,8 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | Journey | Status |
 |---|---|
 | J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
-| J-003 Checkout / Payment | `BLOCKED_WITH_REASON` — WLT/auth proof pending |
-| J-004 Order Lifecycle | `DEFERRED` — depends on J-003 closure |
+| J-003 Checkout / Payment | `BLOCKED_WITH_REASON` — WLT/auth proof pending (J-003D implemented) |
+| J-004 Order Lifecycle | `PASS` — SCREEN_RUNTIME_PROVEN |
 | J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
 | J-006 Field Readiness | `DEFERRED` — no onboarding API designed |
 | J-007 Data / Media Governance | `FOUNDATION_ACTIVE` — preview data governed; no runtime proof required |

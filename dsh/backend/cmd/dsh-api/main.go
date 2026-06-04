@@ -42,6 +42,9 @@ func main() {
 	httpapi.RegisterOverridesRoutes(mux, repository)
 	httpapi.RegisterApprovalsRoutes(mux, repository)
 	httpapi.RegisterConflictsRoutes(mux, repository)
+	httpapi.RegisterOrderRoutes(mux, repository)
+	httpapi.RegisterSupportRoutes(mux, repository)
+	httpapi.RegisterWltRoutes(mux)
 
 	// Serve static media fixtures under /media-fixtures/
 	mediaFixturesDir := "../frontend/media-fixtures"

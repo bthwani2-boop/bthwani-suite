@@ -170,6 +170,7 @@ export type DshTrackingScreenProps = {
   onNextAction?: () => void;
   onReorder?: () => void;
   onCancelOrder?: () => void;
+  onCreateSupportEscalation?: (issueType: string, description: string) => Promise<void>;
 };
 
 type DshFlowHubScreenProps = {
@@ -1375,11 +1376,12 @@ type CreateOrderJourneyScreenProps = {
   onNextAction?: () => void;
   onReorder?: () => void;
   onCancelOrder?: () => void;
+  onCreateSupportEscalation?: (issueType: string, description: string) => Promise<void>;
   initialPhase?: JourneyPhase;
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, onCancelOrder, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, onCancelOrder, onCreateSupportEscalation, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const resolvedMode: DshFulfillmentDeliveryMode = fulfillmentMode ?? values.fulfillmentMode ?? 'bthwani_delivery';
@@ -1986,7 +1988,18 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
                 <Button
                   label={selectedIssue ? 'إرسال البلاغ' : 'اختر نوع المشكلة أولاً'}
                   disabled={!selectedIssue}
-                  onPress={() => setIsSupportSubmitted(true)}
+                  onPress={async () => {
+                    if (onCreateSupportEscalation && selectedIssue) {
+                      try {
+                        await onCreateSupportEscalation(selectedIssue, supportDetailsText);
+                        setIsSupportSubmitted(true);
+                      } catch (err) {
+                        console.error("Failed to submit support escalation:", err);
+                      }
+                    } else {
+                      setIsSupportSubmitted(true);
+                    }
+                  }}
                   style={{ marginTop: 8 }}
                 />
               </Box>
@@ -2290,7 +2303,7 @@ export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspa
   );
 }
 
-export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, fulfillmentMode, timeline = [], onSupport, onRetry, onNextAction, onReorder, onCancelOrder }: DshTrackingScreenProps) {
+export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, fulfillmentMode, timeline = [], onSupport, onRetry, onNextAction, onReorder, onCancelOrder, onCreateSupportEscalation }: DshTrackingScreenProps) {
   const [cancelSheetVisible, setCancelSheetVisible] = React.useState(false);
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
@@ -2311,6 +2324,7 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
         onSupport={onSupport}
         onNextAction={onNextAction}
         onReorder={onReorder}
+        onCreateSupportEscalation={onCreateSupportEscalation}
         onBack={onNextAction ?? onRetry}
       />
     );
@@ -2333,6 +2347,7 @@ export function DshTrackingScreen({ values = defaultCreateOrderValues, clientSta
         onNextAction={onNextAction}
         onReorder={onReorder}
         onCancelOrder={onCancelOrder ? () => setCancelSheetVisible(true) : undefined}
+        onCreateSupportEscalation={onCreateSupportEscalation}
         onBack={onSupport ?? onNextAction ?? onRetry}
       />
       <CancelOrderSheet

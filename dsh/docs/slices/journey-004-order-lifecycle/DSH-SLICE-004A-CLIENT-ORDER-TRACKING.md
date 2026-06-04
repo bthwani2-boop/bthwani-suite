@@ -53,12 +53,15 @@
 ## Evidence and Gates
 - Runtime evidence: none yet — deferred
 - Visual evidence: none yet
+- Evidence path: `tools/registry/runs/DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500/`
 - Exit gate: J-003 closed + order tracking API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
 | **Reason** | J-003 not closed; no order exists to track |
 | **Dependency** | J-003 full closure |
 | **Next Action** | Await J-003 close; then design GET /orders/{id} |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500/` |
+| **Closed By** | Antigravity — 2026-06-04T18:25:00Z |

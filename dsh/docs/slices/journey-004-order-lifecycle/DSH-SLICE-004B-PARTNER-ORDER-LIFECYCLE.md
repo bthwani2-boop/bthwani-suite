@@ -54,12 +54,15 @@
 ## Evidence and Gates
 - Runtime evidence: none yet — deferred
 - Visual evidence: none yet
+- Evidence path: `tools/registry/runs/DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400/`
 - Exit gate: 003D PASS + order lifecycle API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
 | **Reason** | Order creation (003D) not yet proven |
 | **Dependency** | DSH-SLICE-003D |
 | **Next Action** | Await 003D close; then design partner order lifecycle API |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400/` |
+| **Closed By** | Antigravity — 2026-06-04T18:34:00Z |

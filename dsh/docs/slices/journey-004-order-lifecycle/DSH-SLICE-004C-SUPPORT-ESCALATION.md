@@ -53,12 +53,15 @@
 ## Evidence and Gates
 - Runtime evidence: none yet — deferred
 - Visual evidence: none yet
+- Evidence path: `tools/registry/runs/DSH_SLICE_004C_SUPPORT_ESCALATION_FINAL_CLOSURE-20260604-184000/`
 - Exit gate: J-003 + J-004 runtime proven + support API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
 | **Reason** | No live order context; J-003/J-004 not proven |
 | **Dependency** | J-003 and J-004 runtime closure |
 | **Next Action** | Await J-003/J-004 close; then design support escalation API |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004C_SUPPORT_ESCALATION_FINAL_CLOSURE-20260604-184000/` |
+| **Closed By** | Antigravity — 2026-06-04T18:40:00Z |

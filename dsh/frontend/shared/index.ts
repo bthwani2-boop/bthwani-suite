@@ -628,3 +628,23 @@ export {
   buildCentralPartnerInventoryItems,
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
 } from './catalog-central-adapter';
+
+// --- Order Lifecycle client ---
+export type {
+  DshOrderRecord,
+  DshOrderItemRecord,
+  DshOrderStatusEventRecord,
+  DshSupportEscalationRecord,
+  DshOrderItemInput,
+  DshCreateOrderRequest,
+  DshCreateOrderResponse,
+  DshUpdateOrderStatusRequest,
+  DshCreateSupportEscalationRequest,
+  DshOrderDetailsResponse,
+  DshOrderLifecycleClient,
+} from './dsh-order-lifecycle-client';
+export {
+  isDshOrderApiOfflineError,
+  resolveDshOrderApiBaseUrl,
+  createDshOrderLifecycleHttpClient,
+} from './dsh-order-lifecycle-client';

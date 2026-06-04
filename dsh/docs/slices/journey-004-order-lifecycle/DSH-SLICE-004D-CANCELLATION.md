@@ -54,12 +54,15 @@
 ## Evidence and Gates
 - Runtime evidence: none yet — deferred
 - Visual evidence: none yet
+- Evidence path: `tools/registry/runs/DSH_SLICE_004D_CANCELLATION_FINAL_CLOSURE-20260604-185000/`
 - Exit gate: 003D + 004B PASS + cancellation API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
 | **Reason** | Upstream 003D and 004B not proven |
 | **Dependency** | DSH-SLICE-003D, DSH-SLICE-004B |
 | **Next Action** | Await 003D + 004B close; then design cancellation API |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004D_CANCELLATION_FINAL_CLOSURE-20260604-185000/` |
+| **Closed By** | Antigravity — 2026-06-04T18:50:00Z |

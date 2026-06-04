@@ -16,6 +16,8 @@ import { DshOrdersListScreen, DshTrackingScreen } from './screens/OrdersTracking
 import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
+import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
+import { useWltDshWalletPreview } from '../../../wlt/frontend/app-client/dsh';
 import {
   type ClientOperationScreenId,
   DshConversationHubScreen,
@@ -59,6 +61,12 @@ import { resolveDshDiscoveryStoresRuntimeConfig } from './shared/dsh-discovery-s
 import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from './shared/dsh-discovery-stores-transport';
 import { resolveDshStoreClientVisibility } from '../shared/dsh-client-visibility.model';
 import { createDshProductApiHttpClient } from '../shared/dsh-product-api.transport';
+import {
+  createDshOrderLifecycleHttpClient,
+  resolveDshOrderApiBaseUrl,
+  type DshOrderDetailsResponse,
+  type DshOrderItemInput,
+} from '../shared';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
@@ -196,6 +204,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
   const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
   const [route, setRoute] = React.useState<DshRoute>('home');
+  const walletPreview = useWltDshWalletPreview();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<string>('wallet');
+  const [checkoutState, setCheckoutState] = React.useState<'ready' | 'loading' | 'payment-failed'>('ready');
+  const [paymentErrorMessage, setPaymentErrorMessage] = React.useState<string>('');
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
@@ -216,6 +228,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [, setSelectedItemId] = React.useState<string>('');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string>(defaultTrackingOrderId);
+  const [ordersListState, setOrdersListState] = React.useState<HostOrderSummary[]>(initialOrders);
+  const [liveOrderDetails, setLiveOrderDetails] = React.useState<DshOrderDetailsResponse | null>(null);
+  const [liveOrderLoading, setLiveOrderLoading] = React.useState<boolean>(false);
   const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
   const [reorderAlertMessage, setReorderAlertMessage] = React.useState<string | undefined>(undefined);
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
@@ -401,23 +416,59 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return () => {
       cancelled = true;
     };
-  }, []); // Run once on mount; preview seeds are module-level constants.
+  }, []);
+
+  React.useEffect(() => {
+    if (route !== 'tracking' || !selectedOrderId) {
+      setLiveOrderDetails(null);
+      return undefined;
+    }
+
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (!config) {
+      setLiveOrderDetails(null);
+      return undefined;
+    }
+
+    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+    let cancelled = false;
+
+    const fetchOrder = () => {
+      orderClient.getOrder(selectedOrderId)
+        .then((details) => {
+          if (cancelled) return;
+          setLiveOrderDetails(details);
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          console.warn("Failed to fetch live order details:", err);
+        });
+    };
+
+    fetchOrder();
+    const interval = setInterval(fetchOrder, 4000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [route, selectedOrderId]);
 
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();
     if (!query) {
-      return initialOrders;
+      return ordersListState;
     }
 
-    return initialOrders.filter((order) => {
+    return ordersListState.filter((order) => {
       const haystack = `${order.title} ${order.orderNumber || ''} ${order.summary || ''} ${order.subtitle} ${order.statusLabel} ${order.meta}`.toLowerCase();
       return haystack.includes(query);
     });
-  }, [ordersQuery]);
+  }, [ordersQuery, ordersListState]);
 
   const activeTrackedOrder = React.useMemo(
-    () => initialOrders.find((order) => order.id === selectedOrderId) ?? initialOrders[0],
-    [selectedOrderId],
+    () => ordersListState.find((order) => order.id === selectedOrderId) ?? ordersListState[0],
+    [selectedOrderId, ordersListState],
   );
 
   const trackingOrderValues = React.useMemo<CreateOrderValues>(() => ({
@@ -561,12 +612,123 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const handleConfirmedOrderExecution = React.useCallback((payload?: {
     fulfillmentMode?: DshFulfillmentDeliveryMode;
     orderDraft?: Partial<CreateOrderValues>;
+    wltPaymentRefId?: string;
   }) => {
-    openTrackedOrder(undefined, {
-      fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
-      orderDraft: payload?.orderDraft,
-    });
-  }, [openTrackedOrder, selectedFulfillmentMode]);
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (config && cartItems.length > 0) {
+      const parsePrice = (priceLabel?: string): number => {
+        if (!priceLabel) return 10.0;
+        const match = priceLabel.match(/\d+(\.\d+)?/);
+        return match ? parseFloat(match[0]) : 10.0;
+      };
+
+      const totalPrice = cartItems.reduce(
+        (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+        0
+      );
+
+      const items: DshOrderItemInput[] = cartItems.map((item) => ({
+        product_id: item.id,
+        quantity: item.qty,
+        price: parsePrice(item.priceLabel),
+      }));
+
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      orderClient.createOrder({
+        store_id: activeStore.id,
+        client_id: 'client-101',
+        total_price: totalPrice,
+        wlt_payment_ref_id: payload?.wltPaymentRefId,
+        items,
+      }).then((resp) => {
+        const liveOrder = resp.order;
+        const nextOrderSummary: HostOrderSummary = {
+          id: liveOrder.id,
+          title: activeStore.name,
+          subtitle: activeStore.subtitle || activeStore.name,
+          statusLabel: 'مباشر',
+          meta: `التوصيل · ${totalPrice} ر.ي`,
+          clientState: hostClientStates.trackingActive,
+          fulfillmentMode: (payload?.fulfillmentMode ?? selectedFulfillmentMode) as DshFulfillmentDeliveryMode,
+          pickupAddress: activeStore.name,
+          dropoffAddress: payload?.orderDraft?.dropoffAddress || '',
+          note: payload?.orderDraft?.note || 'تم الإنشاء برمجياً',
+          orderNumber: liveOrder.id.replace('ord-', '').slice(0, 8),
+          summary: cartItems.map(item => `${item.qty}x ${item.title}`).join(' ، '),
+          total: `${totalPrice} ر.ي`,
+        };
+
+        setOrdersListState((current) => [nextOrderSummary, ...current]);
+        setSelectedOrderId(liveOrder.id);
+        setTrackingClientState(hostClientStates.trackingActive);
+        setTrackingOrderOverride(null);
+        setCreateOrderValues((current) => ({
+          ...current,
+          fulfillmentMode: nextOrderSummary.fulfillmentMode,
+          dropoffAddress: nextOrderSummary.dropoffAddress,
+          note: nextOrderSummary.note,
+        }));
+        setSelectedFulfillmentMode(nextOrderSummary.fulfillmentMode);
+        setCartItems([]);
+        setRoute('tracking');
+      }).catch((err) => {
+        console.error("Failed to place live order:", err);
+        openTrackedOrder(undefined, {
+          fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
+          orderDraft: payload?.orderDraft,
+        });
+      });
+    } else {
+      openTrackedOrder(undefined, {
+        fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
+        orderDraft: payload?.orderDraft,
+      });
+    }
+  }, [openTrackedOrder, selectedFulfillmentMode, cartItems, activeStore]);
+
+  const handleConfirmCheckout = React.useCallback(async () => {
+    setCheckoutState('loading');
+    const parsePrice = (priceLabel?: string): number => {
+      if (!priceLabel) return 10.0;
+      const match = priceLabel.match(/\d+(\.\d+)?/);
+      return match ? parseFloat(match[0]) : 10.0;
+    };
+    const cartSubtotal = cartItems.reduce(
+      (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+      0
+    );
+    const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
+    const cartTotal = cartSubtotal + deliveryFeeNum;
+
+    if (selectedPaymentMethod === 'wallet') {
+      try {
+        const result = await walletPreview.requestPayment(cartTotal);
+        if (result.success && result.txId) {
+          handleConfirmedOrderExecution({
+            wltPaymentRefId: result.txId,
+            fulfillmentMode: selectedFulfillmentMode,
+          });
+          setCheckoutState('ready');
+        } else {
+          setCheckoutState('payment-failed');
+          setPaymentErrorMessage(
+            result.error === 'insufficient_balance'
+              ? 'عذراً، رصيد المحفظة غير كافٍ لإتمام عملية الشراء.'
+              : 'فشلت عملية الدفع. يُرجى التحقق من المحفظة والمحاولة مرة أخرى.'
+          );
+        }
+      } catch (err) {
+        setCheckoutState('payment-failed');
+        setPaymentErrorMessage('حدث خطأ أثناء الاتصال بمحفظتك. يُرجى المحاولة لاحقاً.');
+      }
+    } else {
+      // For COD or other payment methods, complete directly
+      handleConfirmedOrderExecution({
+        fulfillmentMode: selectedFulfillmentMode,
+      });
+      setCheckoutState('ready');
+    }
+  }, [selectedPaymentMethod, cartItems, selectedFulfillmentMode, walletPreview, handleConfirmedOrderExecution]);
 
   const activeStore = React.useMemo(
     () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
@@ -956,6 +1118,45 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return <WltHomeGetScreen onBack={() => setRoute('home')} />;
   }
 
+  if (route === 'checkout-intent') {
+    const parsePrice = (priceLabel?: string): number => {
+      if (!priceLabel) return 10.0;
+      const match = priceLabel.match(/\d+(\.\d+)?/);
+      return match ? parseFloat(match[0]) : 10.0;
+    };
+    const cartSubtotal = cartItems.reduce(
+      (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+      0
+    );
+    const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
+    const cartTotal = cartSubtotal + deliveryFeeNum;
+
+    const formattedBalance = walletPreview.balance !== null ? `${walletPreview.balance} ر.ي` : '...';
+
+    const paymentMethods = [
+      { id: 'wallet', label: `المحفظة (الرصيد: ${formattedBalance})`, icon: 'wallet-outline', isSelected: selectedPaymentMethod === 'wallet' },
+      { id: 'cod', label: 'الدفع عند الاستلام (COD)', icon: 'cash-outline', isSelected: selectedPaymentMethod === 'cod' },
+    ];
+
+    return (
+      <DshCheckoutIntentScreen
+        state={checkoutState}
+        address={createOrderValues.dropoffAddress || 'مسقط، الخوير، شارع المها، بناية رقم 123'}
+        subtotal={`${cartSubtotal} ر.ي`}
+        deliveryFee={`${deliveryFeeNum} ر.ي`}
+        total={`${cartTotal} ر.ي`}
+        eta={selectedFulfillmentMode === 'pickup' ? '15 - 20 دقيقة' : '30 - 45 دقيقة'}
+        paymentMethods={paymentMethods}
+        paymentErrorMessage={paymentErrorMessage}
+        onBack={() => setRoute('cart-get')}
+        onConfirm={handleConfirmCheckout}
+        onSelectPaymentMethod={(id) => setSelectedPaymentMethod(id)}
+        onChangeAddress={() => setRoute('addresses-location')}
+        onRetry={() => setCheckoutState('ready')}
+      />
+    );
+  }
+
   if (route === 'entry') {
     return (
       <DshEntryScreen
@@ -1135,8 +1336,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         statusDescription={cartClientStateMeta.description}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={handleConfirmedOrderExecution}
-        onContinue={handleConfirmedOrderExecution}
+        onOpenOrder={() => setRoute('checkout-intent')}
+        onContinue={() => setRoute('checkout-intent')}
         onRetry={() => setRoute('cart-get')}
       />
       );
@@ -1254,18 +1455,105 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     );
   }
 
+  const handleCancelOrder = React.useCallback(() => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (config && selectedOrderId) {
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      orderClient.cancelOrder(selectedOrderId, { actor: 'client', note: 'إلغاء الطلب من قبل العميل' })
+        .then(() => {
+          return orderClient.getOrder(selectedOrderId);
+        })
+        .then((details) => {
+          setLiveOrderDetails(details);
+          setOrdersListState((current) => current.map((item) => {
+            if (item.id === selectedOrderId) {
+              return { ...item, statusLabel: 'تم الإلغاء', clientState: hostClientStates.cancelled };
+            }
+            return item;
+          }));
+        })
+        .catch((err) => {
+          console.error("Failed to cancel live order:", err);
+        });
+    }
+  }, [selectedOrderId]);
+
+  const handleSupportEscalation = React.useCallback(async (issueType: string, description: string) => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (config && selectedOrderId) {
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      await orderClient.createSupportEscalation({
+        order_id: selectedOrderId,
+        actor: 'client',
+        issue_type: issueType as any,
+        description,
+      });
+      const details = await orderClient.getOrder(selectedOrderId);
+      setLiveOrderDetails(details);
+    }
+  }, [selectedOrderId]);
+
   if (route === 'tracking') {
+    let liveClientState = trackingClientState;
+    let liveStatusLabel = activeTrackedOrder?.statusLabel ?? trackingWltIntent?.clientUiHint;
+    let liveTimeline = trackingTimeline;
+
+    if (liveOrderDetails) {
+      const order = liveOrderDetails.order;
+      if (order.status === 'CREATED') {
+        liveClientState = hostClientStates.orderCreated;
+        liveStatusLabel = 'قيد المراجعة';
+      } else if (order.status === 'ACCEPTED') {
+        liveClientState = hostClientStates.orderConfirmed;
+        liveStatusLabel = 'تم القبول';
+      } else if (order.status === 'READY_FOR_PICKUP') {
+        liveClientState = hostClientStates.trackingActive;
+        liveStatusLabel = 'جاهز للاستلام';
+      } else if (order.status === 'DELIVERED') {
+        liveClientState = hostClientStates.delivered;
+        liveStatusLabel = 'تم التوصيل';
+      } else if (order.status === 'CANCELLED') {
+        liveClientState = hostClientStates.cancelled;
+        liveStatusLabel = 'تم الإلغاء';
+      }
+
+      const isPickup = trackingOrderValues.fulfillmentMode === 'pickup';
+      const isPartnerDelivery = trackingOrderValues.fulfillmentMode === 'partner_delivery';
+
+      if (isPartnerDelivery) {
+        liveTimeline = [
+          { id: 'track-store-prep', title: 'يجهّز المتجر الطلب', detail: 'المتجر يجهّز طلبك ويسلّمه لموصله.', done: order.status !== 'CREATED' },
+          { id: 'track-store-courier', title: 'موصل المتجر في الطريق', detail: 'موصل المتجر يتجه إليك — هذا ليس كابتن بثواني.', done: order.status === 'DELIVERED' },
+          { id: 'track-delivered-partner', title: 'تم التوصيل', detail: 'استلمت طلبك من موصل المتجر.', done: order.status === 'DELIVERED' },
+        ];
+      } else if (isPickup) {
+        liveTimeline = [
+          { id: 'track-pickup-prep', title: 'يجهّز المتجر الطلب', detail: 'طلبك قيد التجهيز في المتجر.', done: order.status !== 'CREATED' },
+          { id: 'track-pickup-ready', title: 'الطلب جاهز للاستلام', detail: 'توجّه للمتجر لاستلام طلبك.', done: order.status === 'READY_FOR_PICKUP' || order.status === 'DELIVERED' },
+          { id: 'track-pickup-done', title: 'استلمت طلبك', detail: 'تم تأكيد استلامك للطلب من المتجر.', done: order.status === 'DELIVERED' },
+        ];
+      } else {
+        liveTimeline = [
+          { id: 'track-captain-route', title: 'الكابتن في الطريق', detail: 'كابتن بثواني متجه إليك الآن.', done: order.status !== 'CREATED' },
+          { id: 'track-captain-arrived', title: 'وصل الكابتن', detail: 'الكابتن وصل وينتظر تسليم الطلب.', done: order.status === 'READY_FOR_PICKUP' || order.status === 'DELIVERED' },
+          { id: 'track-client-received', title: 'استلمت طلبك', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: order.status === 'DELIVERED' },
+        ];
+      }
+    }
+
     return (
       <DshTrackingScreen
         values={trackingOrderValues}
-        clientState={trackingClientState}
-        currentStatusLabel={activeTrackedOrder?.statusLabel ?? trackingWltIntent?.clientUiHint}
+        clientState={liveClientState}
+        currentStatusLabel={liveStatusLabel}
         fulfillmentMode={trackingOrderValues.fulfillmentMode}
-        timeline={trackingTimeline}
+        timeline={liveTimeline}
         onSupport={openSupportFlow}
         onRetry={reopenTracking}
         onNextAction={() => setRoute('orders-list')}
         onReorder={openCreateOrderJourney}
+        onCancelOrder={handleCancelOrder}
+        onCreateSupportEscalation={handleSupportEscalation}
       />
     );
   }
