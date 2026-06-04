@@ -13,6 +13,7 @@ import {
   type ApprovalRecord,
   type ApprovalStage,
 } from '../../shared/workflow';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -87,6 +88,7 @@ export function ItemApprovalScreen({
   onRequestRevision: propsOnRequestRevision,
 }: ItemApprovalScreenProps) {
   const { theme } = useTheme();
+  const client = React.useMemo(() => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()), []);
 
   // Connect to the shared global store if no props are provided
   const [records, setRecords] = React.useState<ApprovalRecord[]>([]);
@@ -154,7 +156,17 @@ export function ItemApprovalScreen({
     apiBoundary: string;
   } | null>(null);
 
-  const onApprove = React.useCallback((id: string) => {
+  const onApprove = React.useCallback(async (id: string) => {
+    try {
+      await client.updateCatalogApproval({
+        item_id: id,
+        action: 'approve',
+        note: 'Approved via control-panel UI',
+      });
+    } catch (err) {
+      console.error('Failed to approve catalog item:', err);
+    }
+
     if (propsOnApprove) {
       propsOnApprove(id);
       return;
@@ -166,11 +178,21 @@ export function ItemApprovalScreen({
     setCrossSurfaceNotification({
       itemCaption: record?.title ?? id,
       targetSurface: 'control-panel/catalogs → طابور الاعتماد الموحد',
-      apiBoundary: 'PATCH /catalog/products/:id/stage → catalog-adopted',
+      apiBoundary: 'POST /catalog-approvals',
     });
-  }, [propsOnApprove, records, refresh]);
+  }, [propsOnApprove, records, refresh, client]);
 
-  const onReject = React.useCallback((id: string, evidenceNote: string) => {
+  const onReject = React.useCallback(async (id: string, evidenceNote: string) => {
+    try {
+      await client.updateCatalogApproval({
+        item_id: id,
+        action: 'reject',
+        note: evidenceNote,
+      });
+    } catch (err) {
+      console.error('Failed to reject catalog item:', err);
+    }
+
     if (propsOnReject) {
       propsOnReject(id, evidenceNote);
       return;
@@ -178,9 +200,19 @@ export function ItemApprovalScreen({
     moveApprovalRecordToStage(id, 'rejected', 'control-panel-catalog', 'رفض الكتالوج');
     upsertApprovalRecord({ id, metadata: { rejectionReason: evidenceNote } });
     refresh();
-  }, [propsOnReject, refresh]);
+  }, [propsOnReject, refresh, client]);
 
-  const onRequestRevision = React.useCallback((id: string, evidenceNote: string) => {
+  const onRequestRevision = React.useCallback(async (id: string, evidenceNote: string) => {
+    try {
+      await client.updateCatalogApproval({
+        item_id: id,
+        action: 'needs-fix',
+        note: evidenceNote,
+      });
+    } catch (err) {
+      console.error('Failed to request revision for catalog item:', err);
+    }
+
     if (propsOnRequestRevision) {
       propsOnRequestRevision(id, evidenceNote);
       return;
@@ -188,7 +220,7 @@ export function ItemApprovalScreen({
     moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-catalog', 'طلب تعديل الكتالوج');
     upsertApprovalRecord({ id, metadata: { requiredFix: evidenceNote } });
     refresh();
-  }, [propsOnRequestRevision, refresh]);
+  }, [propsOnRequestRevision, refresh, client]);
 
   const pendingCount = items.filter((i) => i.status === 'pending').length;
 

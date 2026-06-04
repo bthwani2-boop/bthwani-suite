@@ -441,6 +441,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  # ─── J-002 / DSH-SLICE-002E: Approval Workflow ──────────────────────────────
+  /catalog-approvals:
+    post:
+      tags:
+        - Catalog Approval
+      summary: Approve, reject, or request fix for a catalog item
+      description: >
+        Performs an approval action (approve, reject, needs-fix) on a catalog product, category suggestion, or media upload.
+        Updates the approval_status of the referenced item.
+        WLT boundary: displays and logs approval outcome only — no financial mutation.
+      operationId: updateCatalogApproval
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCatalogApprovalRequest'
+      responses:
+        '200':
+          description: Approval action recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogApprovalRecord'
+        '400':
+          description: Validation or parameter error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Catalog item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   # ─── J-001 / Store Discovery ───────────────────────────────────────────────
   /stores:
     get:
@@ -1193,5 +1236,45 @@ components:
         available_override:
           type: boolean
         updated_at:
+          type: string
+          format: date-time
+
+    UpdateCatalogApprovalRequest:
+      type: object
+      required:
+        - item_id
+        - action
+      properties:
+        item_id:
+          type: string
+          description: ID of the product, category, or media to act upon.
+        action:
+          type: string
+          enum: [approve, reject, needs-fix]
+          description: The approval action to apply.
+        note:
+          type: string
+          description: Reviewer note/evidence (required if action is reject or needs-fix).
+
+    CatalogApprovalRecord:
+      type: object
+      required:
+        - id
+        - item_id
+        - action
+        - operator_id
+        - created_at
+      properties:
+        id:
+          type: string
+        item_id:
+          type: string
+        action:
+          type: string
+        note:
+          type: string
+        operator_id:
+          type: string
+        created_at:
           type: string
           format: date-time

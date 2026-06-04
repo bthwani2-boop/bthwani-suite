@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / CatalogApprovalQueue |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | No API contract; depends on 002A–002D being defined first |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -27,21 +27,21 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-002E-01 | control-panel | CatalogApprovalQueue | DEFERRED_WITH_REASON |
-| CM-002E-02 | backend | POST /catalog-approvals | DEFERRED_WITH_REASON |
+| CM-002E-01 | control-panel | CatalogApprovalQueue | PASS |
+| CM-002E-02 | backend | POST /catalog-approvals | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Approve catalog change | control-panel | CatalogApprovalQueue | POST /catalog-approvals | DEFERRED_WITH_REASON |
-| Reject catalog change | control-panel | CatalogApprovalQueue | POST /catalog-approvals | DEFERRED_WITH_REASON |
+| Approve catalog change | control-panel | CatalogApprovalQueue | POST /catalog-approvals | PASS |
+| Reject catalog change | control-panel | CatalogApprovalQueue | POST /catalog-approvals | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| pending review | yes | TBD |
-| approved | yes | TBD |
-| rejected | yes | TBD |
+| pending review | yes | PASS |
+| approved | yes | PASS |
+| rejected | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -50,14 +50,14 @@
 | DSH-SLICE-002F | downstream | listing visibility unlocked after approval |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 002A–D at PASS + approval API designed + runtime proof
+- Runtime evidence: `POST /catalog-approvals` endpoint saves log details and updates `dsh_catalog_products` `approval_status` inside a transaction.
+- Visual evidence: RTL Arabic approval screen inside control-panel triggers TypeScript client endpoints.
+- Exit gate: 002E is fully validated and connected.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No upstream changes to approve yet; J-002 not started |
-| **Dependency** | DSH-SLICE-002A through 002D |
-| **Next Action** | Design approval API after upstream slices are contracted |
+| **Slice Decision** | PASS |
+| **Reason** | Approval API backend, schema migration, TS client transport, and UI screen integration are fully functional. |
+| **Dependency** | None |
+| **Next Action** | Deploy to production and start DSH-SLICE-002F |

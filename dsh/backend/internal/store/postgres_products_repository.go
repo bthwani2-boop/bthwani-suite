@@ -530,3 +530,69 @@ func scanProductRowColumnsWithOverrides(rows *sql.Rows) (domain.ProductRecord, e
 	}
 	return r, nil
 }
+
+func (repo *PostgresRepository) CreateCatalogApproval(ctx context.Context, operatorID string, req domain.UpdateCatalogApprovalRequest) (domain.CatalogApprovalRecord, error) {
+	var productStatus string
+	switch req.Action {
+	case "approve":
+		productStatus = "catalog_adopted"
+	case "reject":
+		productStatus = "rejected"
+	case "needs-fix":
+		productStatus = "needs_fix"
+	default:
+		return domain.CatalogApprovalRecord{}, fmt.Errorf("invalid action: %s", req.Action)
+	}
+
+	if operatorID == "" {
+		operatorID = "operator-1"
+	}
+
+	tx, err := repo.db.BeginTx(ctx, nil)
+	if err != nil {
+		return domain.CatalogApprovalRecord{}, err
+	}
+	defer tx.Rollback()
+
+	// Check if product exists in dsh_catalog_products
+	var prodID string
+	err = tx.QueryRowContext(ctx, "SELECT id FROM dsh_catalog_products WHERE id = $1", req.ItemID).Scan(&prodID)
+	if err == nil {
+		// Product exists, update its status
+		_, err = tx.ExecContext(ctx, "UPDATE dsh_catalog_products SET approval_status = $1, updated_at = NOW() WHERE id = $2", productStatus, req.ItemID)
+		if err != nil {
+			return domain.CatalogApprovalRecord{}, fmt.Errorf("failed to update product approval status: %w", err)
+		}
+	} else if err != sql.ErrNoRows {
+		return domain.CatalogApprovalRecord{}, fmt.Errorf("failed to check product existence: %w", err)
+	}
+
+	// Insert approval record
+	approvalID := fmt.Sprintf("appr-%d", time.Now().UnixNano())
+	var rec domain.CatalogApprovalRecord
+	var note sql.NullString
+	if req.Note != "" {
+		note.String = req.Note
+		note.Valid = true
+	}
+
+	query := `
+INSERT INTO dsh_catalog_approvals (id, item_id, action, note, operator_id, created_at)
+VALUES ($1, $2, $3, $4, $5, NOW())
+RETURNING id, item_id, action, note, operator_id, created_at`
+
+	row := tx.QueryRowContext(ctx, query, approvalID, req.ItemID, req.Action, note, operatorID)
+	var dbNote sql.NullString
+	if err := row.Scan(&rec.ID, &rec.ItemID, &rec.Action, &dbNote, &rec.OperatorID, &rec.CreatedAt); err != nil {
+		return domain.CatalogApprovalRecord{}, fmt.Errorf("failed to insert approval record: %w", err)
+	}
+	if dbNote.Valid {
+		rec.Note = dbNote.String
+	}
+
+	if err := tx.Commit(); err != nil {
+		return domain.CatalogApprovalRecord{}, err
+	}
+
+	return rec, nil
+}

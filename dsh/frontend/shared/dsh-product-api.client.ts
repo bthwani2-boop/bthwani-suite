@@ -139,6 +139,23 @@ export type DshUpdateCatalogOverridesResponse = {
   readonly overrides: readonly DshCatalogOverrideRecord[];
 };
 
+// ─── J-002 / DSH-SLICE-002E: Approval Workflow ──────────────────────────────
+
+export type DshUpdateCatalogApprovalRequest = {
+  readonly item_id: string;
+  readonly action: 'approve' | 'reject' | 'needs-fix';
+  readonly note?: string;
+};
+
+export type DshCatalogApprovalRecord = {
+  readonly id: string;
+  readonly item_id: string;
+  readonly action: string;
+  readonly note?: string;
+  readonly operator_id: string;
+  readonly created_at: string;
+};
+
 // ─── Transport contract ────────────────────────────────────────────────────────
 
 export type DshProductApiTransport = {
@@ -193,6 +210,9 @@ export type DshProductApiClient = {
     storeId: string,
     req: DshUpdateCatalogOverridesRequest,
   ): Promise<DshUpdateCatalogOverridesResponse>;
+  updateCatalogApproval(
+    req: DshUpdateCatalogApprovalRequest,
+  ): Promise<DshCatalogApprovalRecord>;
 };
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
@@ -248,5 +268,8 @@ export function createDshProductApiClient(
 
     updateCatalogOverrides: (storeId, req) =>
       transport.patch(`/stores/${storeId}/catalog-overrides`, req),
+
+    updateCatalogApproval: (req) =>
+      transport.post('/catalog-approvals', req),
   };
 }

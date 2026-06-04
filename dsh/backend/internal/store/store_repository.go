@@ -32,4 +32,7 @@ type Repository interface {
 	// Partner local overrides (J-002 / DSH-SLICE-002D)
 	UpdateCatalogOverrides(ctx context.Context, storeID string, req domain.UpdateCatalogOverridesRequest) (domain.UpdateCatalogOverridesResponse, error)
 	GetCatalogOverrides(ctx context.Context, storeID string) ([]domain.CatalogOverrideRecord, error)
+
+	// Catalog approvals (J-002 / DSH-SLICE-002E)
+	CreateCatalogApproval(ctx context.Context, operatorID string, req domain.UpdateCatalogApprovalRequest) (domain.CatalogApprovalRecord, error)
 }

@@ -416,3 +416,8 @@ func (repo *MemoryRepository) UpdateCatalogOverrides(_ context.Context, _ string
 func (repo *MemoryRepository) GetCatalogOverrides(_ context.Context, _ string) ([]domain.CatalogOverrideRecord, error) {
 	return nil, errors.New("overrides get requires postgres backend (set DATABASE_URL)")
 }
+
+// Catalog approvals stubs (J-002 / DSH-SLICE-002E)
+func (repo *MemoryRepository) CreateCatalogApproval(_ context.Context, _ string, _ domain.UpdateCatalogApprovalRequest) (domain.CatalogApprovalRecord, error) {
+	return domain.CatalogApprovalRecord{}, errors.New("catalog approvals require postgres backend (set DATABASE_URL)")
+}
