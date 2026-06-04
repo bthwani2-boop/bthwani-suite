@@ -35,18 +35,14 @@ export function isDshProductApiOfflineError(
 /**
  * Resolves the DSH API base URL from environment variables.
  * Tries EXPO_PUBLIC_DSH_API_BASE_URL first, then NEXT_PUBLIC_DSH_API_BASE_URL.
+ * Returns null when neither is set — callers must fall back to preview.
  */
-export function resolveDshProductApiBaseUrl(): string {
-  const scheme = 'http';
-  const host = ['127', '0', '0', '1'].join('.');
-  const port = '8080';
-  const fallback = `${scheme}://${host}:${port}`;
-
-  if (typeof process === 'undefined') return fallback;
+export function resolveDshProductApiBaseUrl(): string | null {
+  if (typeof process === 'undefined') return null;
   const env = (process as { env?: Record<string, string | undefined> }).env;
   const raw =
     env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-  return raw?.trim() || fallback;
+  return raw?.trim() || null;
 }
 
 async function doFetch<T>(
@@ -91,14 +87,26 @@ async function doFetch<T>(
 }
 
 function buildHttpTransport(
-  baseUrl: string,
+  baseUrl: string | null,
   fetchFn: DshProductFetchFn,
 ): DshProductApiTransport {
   return {
-    post: (path, body) => doFetch<any>(baseUrl, fetchFn, 'POST', path, body),
-    patch: (path, body) => doFetch<any>(baseUrl, fetchFn, 'PATCH', path, body),
-    get: (path) => doFetch<unknown>(baseUrl, fetchFn, 'GET', path),
-    delete: (path) => doFetch<void>(baseUrl, fetchFn, 'DELETE', path),
+    post: (path, body) => {
+      if (!baseUrl) return Promise.reject({ kind: 'offline' });
+      return doFetch<any>(baseUrl, fetchFn, 'POST', path, body);
+    },
+    patch: (path, body) => {
+      if (!baseUrl) return Promise.reject({ kind: 'offline' });
+      return doFetch<any>(baseUrl, fetchFn, 'PATCH', path, body);
+    },
+    get: (path) => {
+      if (!baseUrl) return Promise.reject({ kind: 'offline' });
+      return doFetch<unknown>(baseUrl, fetchFn, 'GET', path);
+    },
+    delete: (path) => {
+      if (!baseUrl) return Promise.reject({ kind: 'offline' });
+      return doFetch<void>(baseUrl, fetchFn, 'DELETE', path);
+    },
   };
 }
 
@@ -107,7 +115,7 @@ function buildHttpTransport(
  * `fetchFn` defaults to `globalThis.fetch`.
  */
 export function createDshProductApiHttpClient(
-  baseUrl: string,
+  baseUrl: string | null,
   fetchFn: DshProductFetchFn = globalThis.fetch,
 ): DshProductApiClient {
   const transport = buildHttpTransport(baseUrl, fetchFn);

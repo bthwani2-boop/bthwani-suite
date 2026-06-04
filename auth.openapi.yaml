@@ -2,5 +2,69 @@ openapi: 3.1.0
 info:
   title: Auth API
   version: 0.1.0
-x-bthwani-contract-state: CONTRACT_TBD
-paths: {}
+  description: Minimal Auth API contract to prove current authenticated client identity for DSH checkout.
+x-bthwani-contract-state: AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT
+paths:
+  /auth/session:
+    get:
+      summary: Get current authenticated client identity
+      description: Returns the authenticated client identity details for the session Bearer token.
+      operationId: getAuthSession
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Client identity successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - subject
+                  - authState
+                properties:
+                  subject:
+                    type: string
+                    description: Unique client identity (subject/clientId)
+                  authState:
+                    type: string
+                    enum: [authenticated, guest, unauthenticated]
+                    description: Current authentication state
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                    description: Roles or scopes associated with the identity
+                  verifiedIdentifier:
+                    type: string
+                    description: Verified identifier (phone number or email) if present
+        '401':
+          description: Unauthenticated — Invalid, missing, or expired Bearer token
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    enum: [unauthenticated, token_expired, token_invalid]
+        '403':
+          description: Forbidden — Token lacks permissions to access this identity
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: forbidden
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

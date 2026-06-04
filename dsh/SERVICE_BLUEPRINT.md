@@ -17,8 +17,8 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` |
-| Current Status | `J-001 SCREEN_RUNTIME_PROVEN; J-002+ pending/deferred/blocked per slice manifests` |
+| Current Decision | `DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE` |
+| Current Status | `J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = BLOCKED_WITH_REASON / WLT-auth proof pending; J-004+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED` |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -142,10 +142,10 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 
 | Journey | Status |
 |---|---|
-| J-002 Catalog Management | `DEFERRED` — no API contract; no runtime proof |
-| J-003 Checkout / Payment | `BLOCKED_WITH_REASON` — WLT/auth proof required |
-| J-004 Order Lifecycle | `DEFERRED` — no runtime proof |
-| J-005 Delivery Execution | `DEFERRED` — no runtime proof |
+| J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
+| J-003 Checkout / Payment | `BLOCKED_WITH_REASON` — WLT/auth proof pending |
+| J-004 Order Lifecycle | `DEFERRED` — depends on J-003 closure |
+| J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
 | J-006 Field Readiness | `DEFERRED` — no onboarding API designed |
 | J-007 Data / Media Governance | `FOUNDATION_ACTIVE` — preview data governed; no runtime proof required |
 | J-008 Platform / Vars / Provider | `DEFERRED` — provider policy not enforced |
@@ -153,7 +153,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | J-010 WLT Finance Boundary | `BLOCKED_WITH_REASON` — WLT-owned; DSH read-only bridge only |
 
 Single next action:
-begin DSH-SLICE-002A (Catalog Management — Product Identity) after Reality Sync is complete.
+DSH_REALITY_SYNC_AND_AUTH_CONTRACT_PREP_BEFORE_J003 (minimal auth contract defined in auth.openapi.yaml).
 
 ---
 

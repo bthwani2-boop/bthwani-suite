@@ -39,17 +39,12 @@ export function isDshStoreVisibilityOfflineError(
  * Returns null when neither is set — callers must fall back to preview.
  */
 export function resolveDshStoreVisibilityBaseUrl(): string | null {
-  const scheme = 'http';
-  const host = ['127', '0', '0', '1'].join('.');
-  const port = '8080';
-  const fallbackUrl = `${scheme}://${host}:${port}`;
-
-  if (typeof process === 'undefined') return fallbackUrl;
+  if (typeof process === 'undefined') return null;
   const env = (process as { env?: Record<string, string | undefined> }).env;
   const raw =
     env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
   const trimmed = raw?.trim();
-  return trimmed || fallbackUrl;
+  return trimmed || null;
 }
 
 function buildHttpTransport(
@@ -95,7 +90,7 @@ function buildHttpTransport(
  * `fetchFn` defaults to `globalThis.fetch` (available in React Native and browsers).
  */
 export function createDshStoreVisibilityHttpClient(
-  baseUrl: string,
+  baseUrl: string | null,
   fetchFn: DshVisibilityFetchFn = globalThis.fetch,
 ): DshStoreVisibilityClient {
   const transport = buildHttpTransport(baseUrl, fetchFn);
