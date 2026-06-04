@@ -373,3 +373,24 @@ func (repo *MemoryRepository) GetProduct(_ context.Context, _ string) (domain.Pr
 func (repo *MemoryRepository) ListProducts(_ context.Context, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
 	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
 }
+
+// Category structure stubs (J-002 / DSH-SLICE-002B)
+func (repo *MemoryRepository) CreateCategory(_ context.Context, _ string, _ domain.CreateCategoryRequest) (domain.CategoryRecord, error) {
+	return domain.CategoryRecord{}, errors.New("category create requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) UpdateCategory(_ context.Context, _ string, _ domain.UpdateCategoryRequest) (domain.CategoryRecord, error) {
+	return domain.CategoryRecord{}, errors.New("category update requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) GetCategory(_ context.Context, _ string) (domain.CategoryRecord, error) {
+	return domain.CategoryRecord{}, errors.New("category get requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListCategories(_ context.Context, _ string, _ int, _ int) (domain.ListCategoriesResponse, error) {
+	return domain.ListCategoriesResponse{}, errors.New("category list requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) DeleteCategory(_ context.Context, _ string) error {
+	return errors.New("category delete requires postgres backend (set DATABASE_URL)")
+}

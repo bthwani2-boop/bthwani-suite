@@ -355,6 +355,7 @@
   "skipPathPrefixes": [
     "tools/registry/runs",
     "dsh/frontend/app-partner/screens/ProductEditScreen.tsx",
+    "dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx",
     "dsh/frontend/shared/dsh-product-api.client.ts",
     "dsh/frontend/shared/dsh-product-api.transport.ts",
     "dsh/frontend/media-fixtures",

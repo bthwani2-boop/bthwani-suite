@@ -83,6 +83,10 @@ async function doFetch<T>(
     throw err;
   }
 
+  if (response.status === 204) {
+    return undefined as unknown as T;
+  }
+
   return response.json() as Promise<T>;
 }
 
@@ -91,9 +95,10 @@ function buildHttpTransport(
   fetchFn: DshProductFetchFn,
 ): DshProductApiTransport {
   return {
-    post: (path, body) => doFetch<DshProductRecord>(baseUrl, fetchFn, 'POST', path, body),
-    patch: (path, body) => doFetch<DshProductRecord>(baseUrl, fetchFn, 'PATCH', path, body),
+    post: (path, body) => doFetch<any>(baseUrl, fetchFn, 'POST', path, body),
+    patch: (path, body) => doFetch<any>(baseUrl, fetchFn, 'PATCH', path, body),
     get: (path) => doFetch<unknown>(baseUrl, fetchFn, 'GET', path),
+    delete: (path) => doFetch<void>(baseUrl, fetchFn, 'DELETE', path),
   };
 }
 

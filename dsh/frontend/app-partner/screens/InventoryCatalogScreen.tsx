@@ -499,6 +499,8 @@ type InventoryCatalogContentProps = {
   activeZoneLabel: string;
   todayHoursLabel: string;
   canonicalStoreId?: string;
+  onNavigateToProductEdit?: (productId?: string) => void;
+  onNavigateToCategoryManagement?: () => void;
 };
 
 export type InventoryCatalogScreenProps = InventoryCatalogContentProps & {
@@ -967,6 +969,7 @@ function InventoryCatalogCardPanel({
   onApplyOverride,
   onSendForReview,
   onMatchCatalog,
+  onEditIdentity,
 }: {
   item: InventoryCatalogListItem;
   detail?: InventoryCatalogItemDetail;
@@ -979,6 +982,7 @@ function InventoryCatalogCardPanel({
   onApplyOverride: () => void;
   onSendForReview: () => void;
   onMatchCatalog: () => void;
+  onEditIdentity?: () => void;
 }) {
   const { direction } = useDirection();
   const isRejected = item.publishStage === 'rejected';
@@ -1069,6 +1073,15 @@ function InventoryCatalogCardPanel({
               fullWidth={false}
               onPress={onToggleDetails}
             />
+            {onEditIdentity ? (
+              <Button
+                label="تعديل الهوية"
+                size="sm"
+                tone="secondary"
+                fullWidth={false}
+                onPress={onEditIdentity}
+              />
+            ) : null}
             {!item.catalogLinked ? (
               <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
             ) : null}
@@ -1116,6 +1129,7 @@ function InventoryCatalogContent({
   activeZoneLabel: _activeZoneLabel,
   todayHoursLabel: _todayHoursLabel,
   canonicalStoreId = 'store-1001',
+  onNavigateToProductEdit,
 }: InventoryCatalogContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
@@ -1364,6 +1378,7 @@ function InventoryCatalogContent({
                 onApplyOverride={() => handleApplyOverride(item)}
                 onSendForReview={() => handleSendForReview(item)}
                 onMatchCatalog={() => handleMatchCatalog(item)}
+                onEditIdentity={onNavigateToProductEdit ? () => onNavigateToProductEdit(item.id) : undefined}
               />
             );
           })
@@ -1469,6 +1484,7 @@ function InventoryCatalogContent({
 // ── Screen shell ──────────────────────────────────────────────────────
 
 export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001', ...props }: InventoryCatalogScreenProps) {
+  const { direction } = useDirection();
   return (
     <MobileScrollView fill padding={2} gap={2} contentContainerStyle={{ paddingBottom: 120 }}>
       <TopBar
@@ -1495,6 +1511,28 @@ export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001'
           المالك المركزي هو {resolveDshControlPanelSectionLabel('catalogs')}. يعدل الشريك السعر والمخزون والتوفر محليًا فقط، بينما الهوية والباركود والنشر وتعارضات الميديا تُراجع on-demand داخل لوحة التحكم.
         </Text>
       </Surface>
+
+      <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8, justifyContent: 'flex-start', marginVertical: 4 }}>
+        {props.onNavigateToCategoryManagement ? (
+          <Button
+            label="إدارة هيكلية الفئات"
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            onPress={props.onNavigateToCategoryManagement}
+          />
+        ) : null}
+        {props.onNavigateToProductEdit ? (
+          <Button
+            label="إضافة منتج جديد"
+            tone="primary"
+            size="sm"
+            fullWidth={false}
+            onPress={() => props.onNavigateToProductEdit?.()}
+          />
+        ) : null}
+      </Box>
+
       <InventoryCatalogContent canonicalStoreId={canonicalStoreId} {...props} />
     </MobileScrollView>
   );

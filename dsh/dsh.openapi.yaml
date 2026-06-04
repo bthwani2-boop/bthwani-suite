@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
   title: BThwani DSH API
-  version: 0.1.0
+  version: 0.2.0
   description: API contract for client-facing store discovery and storefront visibility.
-x-bthwani-status: DSH_SLICE002A_PRODUCT_IDENTITY_IMPL
+x-bthwani-status: DSH_SLICE002B_CATEGORY_STRUCTURE_IMPL
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
@@ -157,6 +157,174 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Product not found
+          content:
+            application/json:
+               schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002B: Category Structure ─────────────────────────────
+
+  /stores/{store_id}/categories:
+    post:
+      tags:
+        - Category Structure
+      summary: Create category for a store
+      description: Creates a new category (and optional subcategory via parent_id) for the given store.
+      operationId: createCategory
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Category Structure
+      summary: List categories for a store
+      description: Returns all categories for the given store.
+      operationId: listCategories
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Categories list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCategoriesResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{id}:
+    get:
+      tags:
+        - Category Structure
+      summary: Get a single category
+      operationId: getCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRecord'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Category Structure
+      summary: Update category
+      description: Updates category details (name, parent_id, description).
+      operationId: updateCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: Updated category record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Category Structure
+      summary: Delete category
+      description: Deletes the category. Products assigned to this category will have their category_id set to null.
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Category deleted
+        '404':
+          description: Category not found
           content:
             application/json:
               schema:
@@ -739,5 +907,68 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductRecord'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── J-002 / DSH-SLICE-002B: Category Structure ─────────────────────────────
+
+    CategoryRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - name
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        parent_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        parent_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        parent_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    ListCategoriesResponse:
+      type: object
+      required:
+        - categories
+        - pagination
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryRecord'
         pagination:
           $ref: '#/components/schemas/Pagination'

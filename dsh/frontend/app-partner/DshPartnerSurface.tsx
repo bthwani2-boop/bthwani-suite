@@ -39,6 +39,8 @@ import {
 import { DshPartnerStoreCourierScreen } from './screens/DshPartnerStoreCourierScreen';
 import { PartnerEntryScreen } from './screens/PartnerEntryScreen';
 import { PartnerSupportScreen } from './screens/PartnerSupportScreen';
+import { ProductEditScreen } from './screens/ProductEditScreen';
+import { CategoryManagementScreen } from './screens/CategoryManagementScreen';
 
 import {
   type PartnerStoreScopeOption,
@@ -100,6 +102,7 @@ export function DshPartnerSurface({
   const [ordersSearchMode, setOrdersSearchMode] = React.useState(false);
   const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
   const [route, setRoute] = React.useState<DshPartnerRoute>(initialRoute);
+  const [editingProductId, setEditingProductId] = React.useState<string | undefined>(undefined);
   const [activeOrderId, setActiveOrderId] = React.useState(initialOrderId);
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<DshPartnerSupportRouteId>(
     initialRoute === 'order-rejection' ? 'order-reject' : 'order-issue-queue'
@@ -509,10 +512,40 @@ export function DshPartnerSurface({
     return renderSurfaceShell(
       <InventoryCatalogScreen
         onBack={() => openAccountHub('hub')}
+        onNavigateToProductEdit={(prodId) => {
+          setEditingProductId(prodId);
+          setRoute('product-edit');
+        }}
+        onNavigateToCategoryManagement={() => {
+          setRoute('category-management');
+        }}
         storeName={maintenanceProfile.storeName}
         branchLabel={selectedStoreScope.label}
         activeZoneLabel={maintenanceProfile.activeZoneLabel}
         todayHoursLabel={maintenanceProfile.todayHoursLabel}
+      />,
+    );
+  }
+
+  if (route === 'product-edit') {
+    return renderSurfaceShell(
+      <ProductEditScreen
+        storeId="store-1001"
+        productId={editingProductId}
+        onBack={() => setRoute('inventory-management')}
+        onSaved={() => {
+          setEditingProductId(undefined);
+          setRoute('inventory-management');
+        }}
+      />,
+    );
+  }
+
+  if (route === 'category-management') {
+    return renderSurfaceShell(
+      <CategoryManagementScreen
+        storeId="store-1001"
+        onBack={() => setRoute('inventory-management')}
       />,
     );
   }

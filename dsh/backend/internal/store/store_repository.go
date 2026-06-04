@@ -17,4 +17,10 @@ type Repository interface {
 	UpdateProduct(ctx context.Context, productID string, req domain.UpdateProductRequest) (domain.ProductRecord, error)
 	GetProduct(ctx context.Context, productID string) (domain.ProductRecord, error)
 	ListProducts(ctx context.Context, storeID string, limit int, offset int) (domain.ListProductsResponse, error)
+	// Category structure (J-002 / DSH-SLICE-002B)
+	CreateCategory(ctx context.Context, storeID string, req domain.CreateCategoryRequest) (domain.CategoryRecord, error)
+	UpdateCategory(ctx context.Context, categoryID string, req domain.UpdateCategoryRequest) (domain.CategoryRecord, error)
+	GetCategory(ctx context.Context, categoryID string) (domain.CategoryRecord, error)
+	ListCategories(ctx context.Context, storeID string, limit int, offset int) (domain.ListCategoriesResponse, error)
+	DeleteCategory(ctx context.Context, categoryID string) error
 }
