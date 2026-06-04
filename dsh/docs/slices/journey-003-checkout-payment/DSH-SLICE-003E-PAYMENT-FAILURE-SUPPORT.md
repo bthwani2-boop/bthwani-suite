@@ -20,11 +20,11 @@
 | Notification Boundary | Failure notification to client — ownership TBD (WLT or DSH notification service); deferred to design phase |
 | Account/Profile Boundary | Client account (session + cart preservation); no account mutation |
 | Data Ownership | WLT-owned (failure reason code); DSH backend stores failure event on checkout session; cart preserved in DSH |
-| API/Runtime Boundary | `DELETE /checkout/intent/{id}` (cancel checkout on failure) — NOT YET DESIGNED; failure callback from WLT — requires WLT error spec |
+| API/Runtime Boundary | `DELETE /checkout/intent/{id}` — CONTRACT_DESIGNED in dsh.openapi.yaml v0.3.0 + backend handler implemented; failure callback from WLT via 003C — requires WLT error spec (failure_reason codes) before PASS |
 | Visual Evidence Required | yes — CheckoutFailureScreen states: payment_failed (with reason), retry_in_progress, cancelled; cart preserved state |
 | Runtime Evidence Required | yes — WLT failure callback + CheckoutFailureScreen proof + cart preserved after failure |
-| Current Status | `OPEN_BLOCKED_BY_003C_RUNTIME` |
-| Blocking Reason | `DELETE /checkout/intent/{id}` designed in `dsh/dsh.openapi.yaml` v0.3.0. Failure flow requires WLT failure_reason codes from 003C callback. Screen `CheckoutFailureScreen` not yet registered. Blocked on 003C runtime. |
+| Current Status | `BLOCKED_WITH_REASON — SCREEN_REGISTERED_CONTRACT_DESIGNED_003C_RUNTIME_PENDING` |
+| Blocking Reason | `DELETE /checkout/intent/{id}` designed + backend implemented. `DshCheckoutFailureScreen` created and registered in screen registry (route: dsh-checkout-failure, status: READY_FOR_REVIEW). Failure_reason codes driven by WLT 003C callback — blocked on 003C PASS + WLT error spec. |
 
 ## Scope
 

@@ -8,7 +8,7 @@
 | Business Outcome | Payment executed through WLT wallet; DSH receives payment-confirmed callback and stores payment reference ID (read-only) |
 | Primary Actor | Client (`app-client`) via WLT |
 | Actor Chain | client → WLT (external) → DSH backend (callback receiver) |
-| Operation Chain | client taps "Pay via WLT" → WLT executes payment → WLT sends payment-confirmed callback → DSH stores payment reference → triggers 003D order creation |
+| Operation Chain | client taps "Pay via WLT" → WLT executes payment → WLT sends payment-confirmed/failed callback → DSH stores payment reference + updates intent status → 003D order creation is a SEPARATE subsequent step NOT triggered here |
 | Primary Surface | WLT (external boundary — WLT team owns) |
 | Supporting Surfaces | app-client (WltBoundaryBanner.tsx displayed during payment step); DSH backend (callback endpoint) |
 | Dependency Surfaces | DSH-SLICE-003B (upstream — checkout session token required); WLT runtime proof (upstream — WLT team must prove payment E2E) |
@@ -20,11 +20,11 @@
 | Notification Boundary | Payment success/failure notification — emitted after this step; owner TBD (WLT or DSH notification service) |
 | Account/Profile Boundary | WLT wallet account — WLT owned; DSH reads only |
 | Data Ownership | WLT-owned (payment execution); DSH stores payment reference ID only in backend database |
-| API/Runtime Boundary | `POST /checkout/payment-callback` (DSH backend — receives WLT callback) — NOT YET DESIGNED; WLT payment execution API — WLT owned |
+| API/Runtime Boundary | `POST /checkout/payment-callback` — CONTRACT_DESIGNED in dsh.openapi.yaml v0.3.0; backend handler implemented with X-WLT-Callback-Token + X-WLT-Event-Id validation; ARCHITECTURAL_DECISION: callback-primary flow (WLT calls DSH) is documented as PRIMARY; polling fallback is SECONDARY; WLT team must publish callback spec before PASS — WLT payment execution API is WLT-owned |
 | Visual Evidence Required | yes — WltBoundaryBanner.tsx displayed; payment awaiting state; confirmed state |
 | Runtime Evidence Required | yes — WLT payment E2E proof + DSH callback endpoint receiving confirmation |
-| Current Status | `OPEN_CONTRACT_DESIGNED_WLT_RUNTIME_PENDING` |
-| Blocking Reason | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0. WLT bridge contract published in `wlt/wlt.openapi.yaml`. Remaining: WLT team must prove payment E2E runtime; DSH backend handler + idempotency implementation pending. |
+| Current Status | `BLOCKED_WITH_REASON — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_WLT_RUNTIME_PENDING` |
+| Blocking Reason | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0 and backend handler implemented (X-WLT-Callback-Token + X-WLT-Event-Id validation, idempotency enforced, 003C/003D separation enforced). WLT bridge contract published in `wlt/wlt.openapi.yaml`. Remaining: WLT team must publish final callback security spec + prove E2E payment runtime. 003B PASS required. |
 
 ## Scope
 

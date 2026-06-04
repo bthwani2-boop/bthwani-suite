@@ -1045,6 +1045,30 @@ paths:
           - Idempotency-Key
         dev_mode: X-WLT-Callback-Token=dev-secret accepted in DEV_ONLY mode
         prod_mode: HMAC-SHA256 signature verification required
+      parameters:
+        - in: header
+          name: X-WLT-Callback-Token
+          required: true
+          schema:
+            type: string
+          description: |
+            WLT shared callback secret. DEV: "dev-secret". Production: HMAC-SHA256 of payload
+            signed with WLT_CALLBACK_SECRET. Validated by DSH backend before processing.
+        - in: header
+          name: X-WLT-Event-Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: |
+            Unique event UUID issued by WLT for idempotency. DSH rejects duplicate event IDs.
+            Must match the event_id in the callback payload.
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema:
+            type: string
+          description: Same Idempotency-Key used in the originating WLT payment session.
       requestBody:
         required: true
         content:

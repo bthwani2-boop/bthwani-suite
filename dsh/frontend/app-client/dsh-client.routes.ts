@@ -19,6 +19,7 @@ export type DshClientRouteId =
   | 'dsh-tracking'
   | 'dsh-order-rating'
   | 'dsh-checkout-intent'
+  | 'dsh-checkout-failure'
   | 'dsh-wallet'
   | 'dsh-loyalty'
   | 'dsh-subscriptions'
@@ -49,6 +50,7 @@ export type DshClientLegacyRoute =
   | 'tracking'
   | 'order-rating'
   | 'checkout-intent'
+  | 'checkout-failure'
   | 'wallet'
   | 'loyalty'
   | 'subscriptions'
@@ -86,6 +88,7 @@ export const dshClientRoutes = [
   { routeId: 'dsh-tracking', legacyRoute: 'tracking', screenId: 'client.dsh.order.smart-followup', ownerPath: 'dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx' },
   { routeId: 'dsh-order-rating', legacyRoute: 'order-rating', screenId: 'client.dsh.order.rating', ownerPath: 'dsh/frontend/app-client/screens/DshRatingScreen.tsx' },
   { routeId: 'dsh-checkout-intent', legacyRoute: 'checkout-intent', screenId: 'client.dsh.checkout.intent', ownerPath: 'dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx' },
+  { routeId: 'dsh-checkout-failure', legacyRoute: 'checkout-failure', screenId: 'client.dsh.checkout.failure', ownerPath: 'dsh/frontend/app-client/screens/DshCheckoutFailureScreen.tsx' },
   { routeId: 'dsh-wallet', legacyRoute: 'wallet', screenId: 'client.dsh.wallet.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
   { routeId: 'dsh-loyalty', legacyRoute: 'loyalty', screenId: 'client.dsh.loyalty.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },
   { routeId: 'dsh-subscriptions', legacyRoute: 'subscriptions', screenId: 'client.dsh.subscriptions.hub', ownerPath: 'dsh/frontend/app-client/screens/MySpaceSubScreens.tsx' },

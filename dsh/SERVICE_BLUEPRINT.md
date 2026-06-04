@@ -119,7 +119,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | Client + WLT roadmap | `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md` | app-client + WLT boundary plan |
 | Control-panel owner decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | section and shared ownership |
 | Visual review system | `dsh/docs/DSH_VISUAL_REVIEW.md` | screenshot-led visual evidence only |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | contract remains blocked for implementation |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001 + J-002 endpoints E2E proven; J-003 contracts designed (GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, POST /checkout/payment-callback); auth DEV_ONLY (X-Client-Id); BearerAuth + WLT runtime pending before J-003 PASS |
 
 ---
 
@@ -144,7 +144,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 |---|---|
 | J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
 | J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` — contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; auth DEV_ONLY (X-Client-Id); callback-primary flow; BearerAuth + WLT E2E runtime pending before PASS |
-| J-004 Order Lifecycle | `PASS` — SCREEN_RUNTIME_PROVEN |
+| J-004 Order Lifecycle | `FUTURE_NEEDS_CROSS_SURFACE_PROOF` — DEFERRED pending J-003 closure; 004A–004F all DEFERRED_WITH_REASON in slice manifest |
 | J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
 | J-006 Field Readiness | `DEFERRED` — no onboarding API designed |
 | J-007 Data / Media Governance | `FOUNDATION_ACTIVE` — preview data governed; no runtime proof required |

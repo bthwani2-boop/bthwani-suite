@@ -1,5 +1,8 @@
 # Performance Notes: DSH-SLICE-001 Phase 2.5 (Mandatory Gate)
 
+<!-- GOVERNANCE_REFERENCE: This is NOT a slice manifest. It does not require slice sections (Identity/Scope/Coverage Matrix etc.). Classified as GOVERNANCE_REFERENCE in DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md § N, GAP-IDX-005. -->
+
+
 This document serves as the formal evidence for resolving the performance and render-tree issues across `HomeScreen` and `StoreScreen` during the UI_UX_VISUAL_LOCKED and scoped app-client GET /stores edge proof phase.
 
 ## 1. Issue Addressed

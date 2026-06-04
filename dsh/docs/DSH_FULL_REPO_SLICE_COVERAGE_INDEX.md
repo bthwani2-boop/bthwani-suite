@@ -48,7 +48,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
 | Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001–J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_SCREEN_RUNTIME_PROVEN | GET /stores + 3 PATCH gates + all J-002 catalog management endpoints E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700, DSH_SLICE_002*_FINAL_CLOSURE-*); future endpoints not designed |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_SCREEN_RUNTIME_PROVEN + J003_CONTRACT_DESIGNED | GET /stores + 3 PATCH gates + all J-002 catalog management endpoints E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700, DSH_SLICE_002*_FINAL_CLOSURE-*); J-003 contracts designed (GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, POST /checkout/payment-callback); BearerAuth + WLT runtime pending before J-003 PASS; J-004+ endpoints not yet designed |
 | Go backend migrations | `dsh/backend/migrations/001_store_discovery.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Used in live E2E |
 | Go backend migrations | `dsh/backend/migrations/002_store_visibility_gates.sql` | J-001 | DSH-SLICE-001C/D/E | BACKEND_PROVEN | Visibility gates proven |
 | Go backend seed | `dsh/backend/seed/003_store_discovery_seed.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Seed data for E2E |

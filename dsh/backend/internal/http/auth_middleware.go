@@ -1,9 +1,13 @@
 package httpapi
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"bthwani.local/dsh/domain"
 )
@@ -16,6 +20,68 @@ func authMode() string {
 		return "production"
 	}
 	return "dev"
+}
+
+// authServiceURL returns the auth service base URL.
+// Set DSH_AUTH_SERVICE_URL to the auth service base (e.g. https://auth.bthwani.local).
+// Defaults to http://localhost:8081 for local development.
+func authServiceURL() string {
+	if u := strings.TrimRight(strings.TrimSpace(os.Getenv("DSH_AUTH_SERVICE_URL")), "/"); u != "" {
+		return u
+	}
+	return "http://localhost:8081"
+}
+
+// authSessionResponse mirrors auth.openapi.yaml GET /auth/session response.
+type authSessionResponse struct {
+	Subject             string   `json:"subject"`
+	AuthState           string   `json:"authState"`
+	Roles               []string `json:"roles"`
+	VerifiedIdentifier  string   `json:"verifiedIdentifier"`
+}
+
+// verifyBearerToken calls auth service GET /auth/session with the provided token.
+// Returns the subject (clientId) on success, or empty string on any auth failure.
+// Contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+func verifyBearerToken(ctx context.Context, token string) string {
+	reqURL := authServiceURL() + "/auth/session"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
+	if err != nil {
+		return ""
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	if resp.StatusCode != http.StatusOK {
+		return ""
+	}
+
+	var session authSessionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&session); err != nil {
+		return ""
+	}
+	if session.AuthState != "authenticated" {
+		return ""
+	}
+	subject := strings.TrimSpace(session.Subject)
+	if subject == "" {
+		subject = fmt.Sprintf("sub:%s", token[:min(16, len(token))])
+	}
+	return subject
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // resolveClientIdentity extracts the client identity from the request.
@@ -41,10 +107,7 @@ func resolveClientIdentity(r *http.Request) string {
 		if token == "" {
 			return ""
 		}
-		// TODO (production): call GET /auth/session with this token,
-		// return session.subject as clientId.
-		// For now: use token value directly as DEV stand-in.
-		return token
+		return verifyBearerToken(r.Context(), token)
 	}
 	// DEV_ONLY fallback
 	return strings.TrimSpace(r.Header.Get("X-Client-Id"))
