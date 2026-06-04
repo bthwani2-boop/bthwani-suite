@@ -387,9 +387,9 @@ These contradictions exist between source files and must be resolved in the appr
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
 | Known contradictions open | 0 |
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
-| BLOCKED_WITH_REASON areas | 3 (finance/WLT + DSH-SLICE-003A/B/C WLT/auth + upstream dependency chain) |
-| Slice compliance closures (BLOCKED) | 2 (DSH-SLICE-003A — DSH_SLICE_003A_CART_SERVICEABILITY_BLOCKED_CLOSURE-20260604-174100; DSH-SLICE-003B — DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700) |
-| Full universal protocol closures (BLOCKED) | 5 (DSH-SLICE-003A — DSH_SLICE_003A_FULL_UNIVERSAL_CLOSURE-20260604-175500; DSH-SLICE-003B — DSH_SLICE_003B_FULL_UNIVERSAL_CLOSURE-20260604-200000; DSH-SLICE-003C — DSH_SLICE_003C_FULL_UNIVERSAL_CLOSURE-20260604-201100; DSH-SLICE-003D — DSH_SLICE_003D_FULL_UNIVERSAL_CLOSURE-20260604-181500; DSH-SLICE-003E — DSH_SLICE_003E_FULL_UNIVERSAL_CLOSURE-20260604-182000) |
+| IMPLEMENTATION_STARTED areas | 1 (J-003: contracts designed, Go handlers implemented, auth DEV_ONLY, WLT E2E pending) |
+| BLOCKED_WITH_REASON areas | 1 (finance/WLT — DSH-SLICE-010A–010D: full WLT ownership, DSH read-only bridge) |
+| J-003 implementation status | 003A/003B: OPEN_IMPL_STARTED_AUTH_DEV_ONLY; 003C: OPEN_CONTRACT_DESIGNED_WLT_RUNTIME_PENDING; 003D/003E: OPEN_BLOCKED_BY_003C_RUNTIME |
 | Full universal protocol closures (DEFERRED) | 4 (DSH-SLICE-004A — DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500; DSH-SLICE-004B — DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400; DSH-SLICE-004C — DSH_SLICE_004C_SUPPORT_ESCALATION_FINAL_CLOSURE-20260604-184000; DSH-SLICE-004D — DSH_SLICE_004D_CANCELLATION_FINAL_CLOSURE-20260604-185000) |
 
 ---
@@ -402,4 +402,4 @@ The coverage index is structurally complete for all major DSH source areas. All 
 
 Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
 
-Next action: Await WLT/auth runtime proof to unblock J-003 (DSH-SLICE-003A → 003B → 003C → 003D → 003E). While blocked: classify GAP-IDX-001 through GAP-IDX-006.
+Next action: (1) Wire BearerAuth to auth.openapi.yaml GET /auth/session runtime (replaces DEV_ONLY X-Client-Id); (2) WLT team E2E runtime proof for payment session; (3) Replace dev-secret with HMAC signature for callback security; (4) Classify GAP-IDX-001 through GAP-IDX-006.

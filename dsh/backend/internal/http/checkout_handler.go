@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"bthwani.local/dsh/backend/internal/store"
@@ -46,18 +47,20 @@ func (h *CheckoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }
 
-// clientIDFromRequest extracts client identity from X-Client-Id header.
-// In production this will be replaced by auth.openapi.yaml GET /auth/session verification.
-func clientIDFromRequest(r *http.Request) string {
-	return strings.TrimSpace(r.Header.Get("X-Client-Id"))
+// wltCallbackSecret is the shared secret for WLT callback authentication.
+// DEV_ONLY: accepts "dev-secret". Production: must be set via WLT_CALLBACK_SECRET env var.
+func wltCallbackSecret() string {
+	if s := strings.TrimSpace(os.Getenv("WLT_CALLBACK_SECRET")); s != "" {
+		return s
+	}
+	return "dev-secret"
 }
 
 // GetCartServiceability — DSH-SLICE-003A
 // GET /cart/serviceability?store_id=...&item_ids=...
 func (h *CheckoutHandler) GetCartServiceability(w http.ResponseWriter, r *http.Request) {
-	clientID := clientIDFromRequest(r)
+	clientID := requireClientIdentity(w, r)
 	if clientID == "" {
-		writeError(w, http.StatusUnauthorized, domain.ErrorCodeInvalidParameter, "X-Client-Id header required")
 		return
 	}
 
@@ -91,9 +94,8 @@ func (h *CheckoutHandler) GetCartServiceability(w http.ResponseWriter, r *http.R
 // CreateCheckoutIntent — DSH-SLICE-003B
 // POST /checkout/intent
 func (h *CheckoutHandler) CreateCheckoutIntent(w http.ResponseWriter, r *http.Request) {
-	clientID := clientIDFromRequest(r)
+	clientID := requireClientIdentity(w, r)
 	if clientID == "" {
-		writeError(w, http.StatusUnauthorized, domain.ErrorCodeInvalidParameter, "X-Client-Id header required")
 		return
 	}
 
@@ -145,9 +147,8 @@ func (h *CheckoutHandler) CreateCheckoutIntent(w http.ResponseWriter, r *http.Re
 // CancelCheckoutIntent — DSH-SLICE-003E
 // DELETE /checkout/intent/{id}
 func (h *CheckoutHandler) CancelCheckoutIntent(w http.ResponseWriter, r *http.Request) {
-	clientID := clientIDFromRequest(r)
+	clientID := requireClientIdentity(w, r)
 	if clientID == "" {
-		writeError(w, http.StatusUnauthorized, domain.ErrorCodeInvalidParameter, "X-Client-Id header required")
 		return
 	}
 
@@ -178,9 +179,25 @@ func (h *CheckoutHandler) CancelCheckoutIntent(w http.ResponseWriter, r *http.Re
 
 // ReceivePaymentCallback — DSH-SLICE-003C
 // POST /checkout/payment-callback
-// Called by WLT service after payment decision.
-// DSH stores wlt_payment_ref_id as reference only — no financial mutation.
+// Called by WLT service after payment decision (primary flow; polling is fallback only).
+// DSH stores wlt_payment_ref_id as reference only — no financial mutation in DSH.
+// 003D (order creation) is a SEPARATE subsequent step, not triggered here.
 func (h *CheckoutHandler) ReceivePaymentCallback(w http.ResponseWriter, r *http.Request) {
+	// Security: validate WLT callback token
+	// DEV_ONLY: accepts "dev-secret". Production: WLT_CALLBACK_SECRET env var.
+	callbackToken := strings.TrimSpace(r.Header.Get("X-WLT-Callback-Token"))
+	if callbackToken == "" || callbackToken != wltCallbackSecret() {
+		writeError(w, http.StatusUnauthorized, domain.ErrorCodeInvalidParameter, "missing or invalid X-WLT-Callback-Token")
+		return
+	}
+
+	// Idempotency: X-WLT-Event-Id must be present (replay protection)
+	eventID := strings.TrimSpace(r.Header.Get("X-WLT-Event-Id"))
+	if eventID == "" {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "X-WLT-Event-Id header required for idempotency")
+		return
+	}
+
 	var req domain.PaymentCallbackRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid callback payload")
@@ -200,8 +217,8 @@ func (h *CheckoutHandler) ReceivePaymentCallback(w http.ResponseWriter, r *http.
 		return
 	}
 
-	log.Printf("dsh-api: POST /checkout/payment-callback intent=%s status=%s wlt_ref=%s",
-		req.IntentID, req.Status, req.WltPaymentRefID)
+	log.Printf("dsh-api: POST /checkout/payment-callback intent=%s status=%s event=%s",
+		req.IntentID, req.Status, eventID)
 
 	resp, err := h.repository.ProcessPaymentCallback(r.Context(), req)
 	if err != nil {
@@ -214,5 +231,9 @@ func (h *CheckoutHandler) ReceivePaymentCallback(w http.ResponseWriter, r *http.
 		return
 	}
 
+	// 003C completes here: intent status updated, wlt_payment_ref_id stored.
+	// 003D (order creation via POST /orders) is a separate step owned by a
+	// separate trigger — DSH does NOT create the order inside this callback.
+	// next_action in the response signals what the caller should do next.
 	writeJSON(w, http.StatusOK, resp)
 }

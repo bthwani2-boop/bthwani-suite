@@ -55,7 +55,8 @@ type CheckoutIntentRecord struct {
 	StoreID                  string     `json:"store_id"`
 	Status                   string     `json:"status"`
 	SessionToken             string     `json:"session_token"`
-	RequestedAmountMinorUnits int64     `json:"requested_amount_minor_units"`
+	// Non-authoritative display snapshot. WLT owns final amount, ledger, settlement.
+	RequestedAmountSnapshotMinorUnits int64 `json:"requested_amount_snapshot_minor_units"`
 	WltPaymentRefID          *string    `json:"wlt_payment_ref_id,omitempty"`
 	FailureReason            *string    `json:"failure_reason,omitempty"`
 	ExpiresAt                time.Time  `json:"expires_at"`

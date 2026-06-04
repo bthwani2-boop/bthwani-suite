@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS dsh_checkout_intents (
                               'expired'
                             )),
   session_token             TEXT NOT NULL UNIQUE,
-  requested_amount_minor_units BIGINT NOT NULL DEFAULT 0,
+  -- Non-authoritative display snapshot only. WLT owns final amount, ledger, settlement.
+  requested_amount_snapshot_minor_units BIGINT NOT NULL DEFAULT 0,
   wlt_payment_ref_id        TEXT,
   failure_reason            TEXT CHECK (failure_reason IN (
                               'insufficient_balance',

@@ -851,10 +851,15 @@ paths:
         Checks whether the client's cart items and store are serviceable before checkout.
         Client auth required — cart must be associated with authenticated client identity.
         WLT boundary: no financial data. Serviceability is operational only.
-        Auth dependency: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+
+        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+        Production: BearerAuth token verified against auth service GET /auth/session.
+        DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
+        x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
       operationId: getCartServiceability
       security:
         - BearerAuth: []
+      x-bthwani-auth-dev-note: DEV_ONLY — backend currently accepts X-Client-Id header; BearerAuth enforcement pending auth runtime
       parameters:
         - name: store_id
           in: query
@@ -904,13 +909,19 @@ paths:
       summary: Create checkout intent
       description: |
         Creates a checkout session for the authenticated client's cart.
-        Returns a sessionToken to be passed to WLT payment bridge (DSH-SLICE-003C).
+        Returns a session_token to be passed to WLT payment bridge (DSH-SLICE-003C).
         Requires: client auth (003A dependency) + serviceability confirmed (003A passed).
         WLT boundary: no financial mutation at this step. Creates operational session only.
-        DSH stores the intent; WLT receives sessionToken to associate payment.
+        DSH stores the intent; WLT receives session_token to associate the payment.
+
+        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+        Production: BearerAuth token verified against auth service GET /auth/session.
+        DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
+        x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
       operationId: createCheckoutIntent
       security:
         - BearerAuth: []
+      x-bthwani-auth-dev-note: DEV_ONLY — backend currently accepts X-Client-Id header; BearerAuth enforcement pending auth runtime
       requestBody:
         required: true
         content:
@@ -1006,17 +1017,34 @@ paths:
     post:
       tags:
         - Checkout
-      summary: Receive WLT payment confirmation callback
+      summary: Receive WLT payment decision callback
       description: |
-        DSH backend endpoint that receives WLT payment decision callback.
-        WLT calls this after executing payment (confirmed) or rejecting it (failed).
-        DSH stores wlt_payment_ref_id as operational reference only — no financial mutation.
-        On confirmed: DSH triggers order creation internally (DSH-SLICE-003D).
-        On failed: DSH stores failure reason for client display (DSH-SLICE-003E).
+        DSH backend endpoint that receives WLT payment decision.
+        This is the PRIMARY flow — WLT calls this after financial decision (confirmed or failed).
+        Polling GET /wlt/dsh/client/payment-sessions/{sessionId} is the FALLBACK only.
+
+        DSH responsibilities (only):
+          - Validate X-WLT-Event-Id (idempotency — reject duplicate event IDs)
+          - Validate X-WLT-Callback-Token against configured WLT_CALLBACK_SECRET
+          - Store wlt_payment_ref_id as operational reference (no financial mutation)
+          - Update intent status (payment_confirmed or payment_failed)
+          - DSH-SLICE-003D (order creation) is a SEPARATE subsequent step, not triggered here
+
         Boundary contract: DSH_PAYMENT_INPUT_ONLY — WLT_OWNS_FINAL_FINANCIAL_TRUTH.
-        Security: WLT-to-DSH internal callback — auth header format to be confirmed with WLT team.
+
+        Security headers required from WLT:
+          X-WLT-Callback-Token: configured shared secret (HMAC in production)
+          X-WLT-Event-Id: unique event UUID for idempotency
+          Idempotency-Key: same as the payment session Idempotency-Key
       operationId: receivePaymentCallback
       security: []
+      x-bthwani-callback-security:
+        required_headers:
+          - X-WLT-Callback-Token
+          - X-WLT-Event-Id
+          - Idempotency-Key
+        dev_mode: X-WLT-Callback-Token=dev-secret accepted in DEV_ONLY mode
+        prod_mode: HMAC-SHA256 signature verification required
       requestBody:
         required: true
         content:

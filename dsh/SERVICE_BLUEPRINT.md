@@ -18,7 +18,7 @@ API contract: `dsh/dsh.openapi.yaml`.
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
 | Current Decision | `DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE` |
-| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = BLOCKED_WITH_REASON / WLT-auth proof pending (J-003D unblocked & implemented); J-004 = PASS / SCREEN_RUNTIME_PROVEN; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
+| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = IMPLEMENTATION_STARTED / auth.openapi.yaml + wlt.openapi.yaml + dsh.openapi.yaml contracts ready; Go handlers 003A/003B/003C/003E implemented; callback-primary flow documented; auth DEV_ONLY (X-Client-Id); BearerAuth + WLT runtime pending before PASS; J-004 = PASS / SCREEN_RUNTIME_PROVEN; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -143,7 +143,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | Journey | Status |
 |---|---|
 | J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
-| J-003 Checkout / Payment | `BLOCKED_WITH_REASON` — WLT/auth proof pending (J-003D implemented) |
+| J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` — contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; auth DEV_ONLY (X-Client-Id); callback-primary flow; BearerAuth + WLT E2E runtime pending before PASS |
 | J-004 Order Lifecycle | `PASS` — SCREEN_RUNTIME_PROVEN |
 | J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
 | J-006 Field Readiness | `DEFERRED` — no onboarding API designed |

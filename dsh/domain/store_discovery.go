@@ -27,6 +27,7 @@ type ErrorCode string
 const (
 	ErrorCodeInvalidParameter ErrorCode = "INVALID_PARAMETER"
 	ErrorCodeInternalError    ErrorCode = "INTERNAL_ERROR"
+	ErrorCodeUnauthenticated  ErrorCode = "UNAUTHENTICATED"
 )
 
 type StoreSummary struct {

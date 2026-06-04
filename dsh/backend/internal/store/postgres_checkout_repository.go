@@ -115,10 +115,10 @@ WHERE client_id = $1 AND store_id = $2
 	err = tx.QueryRowContext(ctx, `
 INSERT INTO dsh_checkout_intents
   (id, client_id, store_id, delivery_address, delivery_time_slot, client_note,
-   status, session_token, expires_at, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, 'pending_payment', $7, $8, NOW(), NOW())
+   status, session_token, requested_amount_snapshot_minor_units, expires_at, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, 'pending_payment', $7, 0, $8, NOW(), NOW())
 RETURNING id, session_token, status, expires_at`,
-		intentID, clientID, req.StoreID, req.DeliveryAddress,
+			intentID, clientID, req.StoreID, req.DeliveryAddress,
 		toNullString(req.DeliveryTimeSlot), toNullString(req.ClientNote),
 		sessionToken, expiresAt,
 	).Scan(&intent.ID, &intent.SessionToken, &intent.Status, &intent.ExpiresAt)

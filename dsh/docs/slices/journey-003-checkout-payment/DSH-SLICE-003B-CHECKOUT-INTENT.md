@@ -23,8 +23,8 @@
 | API/Runtime Boundary | POST /checkout/intent — NOT YET DESIGNED (blocked by auth proof + 003A dependency); returns session token |
 | Visual Evidence Required | yes — DshCheckoutIntentScreen states: address entry, intent created, intent failed, loading, blocked |
 | Runtime Evidence Required | yes — POST /checkout/intent runtime proof with auth token + 003A serviceability PASS |
-| Current Status | `OPEN_CONTRACT_DESIGNED` |
-| Blocking Reason | API contract designed in `dsh/dsh.openapi.yaml` v0.3.0. Backend implementation pending. Screen wiring pending. Upstream: 003A serviceability must pass at runtime. |
+| Current Status | `OPEN_IMPL_STARTED_AUTH_DEV_ONLY` |
+| Blocking Reason | Go handler implemented. API contract in `dsh/dsh.openapi.yaml` v0.3.0. Auth uses DEV_ONLY `X-Client-Id` header — BearerAuth verification against `auth.openapi.yaml GET /auth/session` not yet wired. Screen not yet wired to live API. Upstream: 003A must pass at runtime. Cannot be PASS until auth is production-grade. |
 
 ## Scope
 

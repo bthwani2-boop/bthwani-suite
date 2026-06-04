@@ -23,8 +23,8 @@
 | API/Runtime Boundary | GET /cart/serviceability — NOT YET DESIGNED (blocked by auth proof); requires client auth token |
 | Visual Evidence Required | yes — CartScreen serviceability states: serviceable / not-serviceable / loading / blocked |
 | Runtime Evidence Required | yes — GET /cart/serviceability runtime proof with auth token |
-| Current Status | `OPEN_CONTRACT_DESIGNED` |
-| Blocking Reason | API contract designed in `dsh/dsh.openapi.yaml` v0.3.0. Backend implementation pending. Screen wiring pending. |
+| Current Status | `OPEN_IMPL_STARTED_AUTH_DEV_ONLY` |
+| Blocking Reason | Go handler implemented. API contract in `dsh/dsh.openapi.yaml` v0.3.0. Auth uses DEV_ONLY `X-Client-Id` header — BearerAuth verification against `auth.openapi.yaml GET /auth/session` not yet wired. Screen not yet wired to live API. Cannot be PASS until auth is production-grade. |
 
 ## Scope
 

@@ -42,8 +42,17 @@ paths:
       description: >
         WLT-owned. DSH submits a payment session candidate from its checkout intent.
         WLT validates client balance and policy, then returns a sessionId.
-        DSH polls GET /wlt/dsh/client/payment-sessions/{sessionId} for the outcome.
-        DSH MUST NOT create the order until status=confirmed.
+
+        PRIMARY FLOW — callback:
+          WLT sends payment decision to DSH via POST /checkout/payment-callback on the DSH backend.
+          DSH MUST NOT create the order until it receives a confirmed callback from WLT.
+          DSH stores sessionId as wlt_payment_ref_id (operational reference only).
+
+        FALLBACK — polling:
+          DSH MAY poll GET /wlt/dsh/client/payment-sessions/{sessionId} as a fallback
+          to verify status if the callback was not received (network failure, retry window).
+          Polling is secondary and MUST NOT replace the callback as the primary trigger.
+
         Idempotency-Key header is required to prevent duplicate charges.
         Execution is WLT-owned — DSH is input-only (DSH_PAYMENT_INPUT_ONLY).
       tags: [client-payment]
@@ -80,10 +89,11 @@ paths:
   /wlt/dsh/client/payment-sessions/{sessionId}:
     get:
       operationId: getClientPaymentSessionStatus
-      summary: Poll payment session status
+      summary: Poll payment session status (fallback only)
       description: >
-        WLT-owned. DSH polls this to determine if WLT confirmed or rejected the payment.
-        DSH creates the order only when status=confirmed.
+        WLT-owned. FALLBACK verification endpoint — use only if primary callback was not received.
+        Primary flow: WLT sends POST /checkout/payment-callback to DSH after payment decision.
+        DSH uses this endpoint as a retry/reconciliation probe only, not as the primary order trigger.
         Execution is WLT-owned — DSH reads result only.
       tags: [client-payment]
       security:
