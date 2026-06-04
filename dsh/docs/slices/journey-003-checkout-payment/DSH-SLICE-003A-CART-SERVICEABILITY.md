@@ -23,8 +23,8 @@
 | API/Runtime Boundary | GET /cart/serviceability — NOT YET DESIGNED (blocked by auth proof); requires client auth token |
 | Visual Evidence Required | yes — CartScreen serviceability states: serviceable / not-serviceable / loading / blocked |
 | Runtime Evidence Required | yes — GET /cart/serviceability runtime proof with auth token |
-| Current Status | `PASS` |
-| Blocking Reason | None. Resolved via simulated mock wallet and serviceability endpoints in Go backend. |
+| Current Status | `OPEN_CONTRACT_DESIGNED` |
+| Blocking Reason | API contract designed in `dsh/dsh.openapi.yaml` v0.3.0. Backend implementation pending. Screen wiring pending. |
 
 ## Scope
 
@@ -49,7 +49,7 @@
 | Row ID | Surface | Screen / Endpoint | Classification | Status |
 |---|---|---|---|---|
 | CM-003A-01 | app-client | CartScreen (`dsh/frontend/app-client/screens/CartScreen.tsx`) | primary | BLOCKED_WITH_REASON |
-| CM-003A-02 | DSH backend | GET /cart/serviceability | dependency | BLOCKED_WITH_REASON |
+| CM-003A-02 | DSH backend | GET /cart/serviceability | dependency | CONTRACT_DESIGNED |
 | CM-003A-03 | shared | serviceability model (logic/domain) | dependency | BLOCKED_WITH_REASON |
 | CM-003A-04 | app-client | DshCheckoutIntentScreen (downstream) | supporting | BLOCKED_WITH_REASON (depends on 003A) |
 | CM-003A-05 | app-captain | — | excluded | NOT_APPLICABLE — not assigned at cart stage |
@@ -114,10 +114,9 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `PASS` |
-| **Reason** | Resolved via simulated mock wallet and serviceability endpoints in Go backend. |
-| **Dependency** | None |
-| **Next Action** | None |
-| **Forward-Only Gate** | None |
-| **Evidence Folder** | `tools/registry/runs/WLT_INTEGRATION/` |
-| **Closed By** | Antigravity — 2026-06-04 |
+| **Slice Decision** | `OPEN_CONTRACT_DESIGNED` |
+| **Reason** | Auth contract ready (`auth.openapi.yaml` AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT). API endpoint `GET /cart/serviceability` designed in `dsh/dsh.openapi.yaml` v0.3.0 with `CartServiceabilityResponse` schema. Backend implementation and screen wiring remain pending. |
+| **Dependency** | Go backend handler + CartScreen wiring + runtime proof |
+| **Next Action** | Implement Go backend handler for GET /cart/serviceability; wire CartScreen to live API; capture runtime + visual proof |
+| **Forward-Only Gate** | All 6 exit gates must pass before PASS |
+| **Evidence Folder** | pending |

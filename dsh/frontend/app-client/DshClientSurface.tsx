@@ -66,6 +66,8 @@ import {
   resolveDshOrderApiBaseUrl,
   type DshOrderDetailsResponse,
   type DshOrderItemInput,
+  createDshCheckoutHttpClient,
+  type DshCheckoutClient,
 } from '../shared';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
@@ -208,6 +210,8 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<string>('wallet');
   const [checkoutState, setCheckoutState] = React.useState<'ready' | 'loading' | 'payment-failed'>('ready');
   const [paymentErrorMessage, setPaymentErrorMessage] = React.useState<string>('');
+  const [checkoutIntentId, setCheckoutIntentId] = React.useState<string | null>(null);
+  const [serviceabilityLoading, setServiceabilityLoading] = React.useState(false);
   const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
   const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
@@ -700,6 +704,31 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
     const cartTotal = cartSubtotal + deliveryFeeNum;
 
+    // 003B: Create checkout intent before payment (if API is available)
+    const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
+    let resolvedIntentId: string | null = checkoutIntentId;
+    if (apiConfig && !resolvedIntentId) {
+      try {
+        const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl);
+        const intentItems = cartItems.map((item) => ({
+          product_id: item.id,
+          quantity: item.qty,
+        }));
+        const intentResp = await checkoutClient.createCheckoutIntent(
+          {
+            store_id: activeStore.id,
+            items: intentItems,
+            delivery_address: createOrderValues.dropoffAddress || 'جوار الجبل الجديد',
+          },
+          'client-101',
+        );
+        resolvedIntentId = intentResp.intent_id;
+        setCheckoutIntentId(resolvedIntentId);
+      } catch {
+        // Non-fatal — proceed without intent (preview mode)
+      }
+    }
+
     if (selectedPaymentMethod === 'wallet') {
       try {
         const result = await walletPreview.requestPayment(cartTotal);
@@ -709,6 +738,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
             fulfillmentMode: selectedFulfillmentMode,
           });
           setCheckoutState('ready');
+          setCheckoutIntentId(null);
         } else {
           setCheckoutState('payment-failed');
           setPaymentErrorMessage(
@@ -717,18 +747,20 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
               : 'فشلت عملية الدفع. يُرجى التحقق من المحفظة والمحاولة مرة أخرى.'
           );
         }
-      } catch (err) {
+      } catch {
         setCheckoutState('payment-failed');
         setPaymentErrorMessage('حدث خطأ أثناء الاتصال بمحفظتك. يُرجى المحاولة لاحقاً.');
       }
     } else {
-      // For COD or other payment methods, complete directly
+      // COD or other: complete directly, use intentId as operational reference
       handleConfirmedOrderExecution({
+        wltPaymentRefId: resolvedIntentId ?? undefined,
         fulfillmentMode: selectedFulfillmentMode,
       });
       setCheckoutState('ready');
+      setCheckoutIntentId(null);
     }
-  }, [selectedPaymentMethod, cartItems, selectedFulfillmentMode, walletPreview, handleConfirmedOrderExecution]);
+  }, [selectedPaymentMethod, cartItems, selectedFulfillmentMode, walletPreview, handleConfirmedOrderExecution, checkoutIntentId, activeStore, createOrderValues.dropoffAddress]);
 
   const activeStore = React.useMemo(
     () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
@@ -1336,8 +1368,46 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         statusDescription={cartClientStateMeta.description}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={() => setRoute('checkout-intent')}
-        onContinue={() => setRoute('checkout-intent')}
+        onOpenOrder={async () => {
+          const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
+          if (apiConfig && cartItems.length > 0) {
+            setServiceabilityLoading(true);
+            try {
+              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl);
+              const itemIds = cartItems.map((item) => item.id);
+              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, 'client-101');
+              if (!result.serviceable) {
+                setServiceabilityLoading(false);
+                return;
+              }
+            } catch {
+              // Network/API error — proceed anyway (preview fallback)
+            }
+            setServiceabilityLoading(false);
+          }
+          setCheckoutIntentId(null);
+          setRoute('checkout-intent');
+        }}
+        onContinue={async () => {
+          const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
+          if (apiConfig && cartItems.length > 0) {
+            setServiceabilityLoading(true);
+            try {
+              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl);
+              const itemIds = cartItems.map((item) => item.id);
+              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, 'client-101');
+              if (!result.serviceable) {
+                setServiceabilityLoading(false);
+                return;
+              }
+            } catch {
+              // Network/API error — proceed anyway (preview fallback)
+            }
+            setServiceabilityLoading(false);
+          }
+          setCheckoutIntentId(null);
+          setRoute('checkout-intent');
+        }}
         onRetry={() => setRoute('cart-get')}
       />
       );

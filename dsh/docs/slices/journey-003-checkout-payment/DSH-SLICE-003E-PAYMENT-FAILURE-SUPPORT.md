@@ -23,8 +23,8 @@
 | API/Runtime Boundary | `DELETE /checkout/intent/{id}` (cancel checkout on failure) — NOT YET DESIGNED; failure callback from WLT — requires WLT error spec |
 | Visual Evidence Required | yes — CheckoutFailureScreen states: payment_failed (with reason), retry_in_progress, cancelled; cart preserved state |
 | Runtime Evidence Required | yes — WLT failure callback + CheckoutFailureScreen proof + cart preserved after failure |
-| Current Status | `PASS` |
-| Blocking Reason | None. Resolved via simulated mock wallet and payment intent endpoints in Go backend. |
+| Current Status | `OPEN_BLOCKED_BY_003C_RUNTIME` |
+| Blocking Reason | `DELETE /checkout/intent/{id}` designed in `dsh/dsh.openapi.yaml` v0.3.0. Failure flow requires WLT failure_reason codes from 003C callback. Screen `CheckoutFailureScreen` not yet registered. Blocked on 003C runtime. |
 
 ## Scope
 
@@ -48,7 +48,7 @@
 |---|---|---|---|---|
 | CM-003E-01 | app-client | CheckoutFailureScreen | primary | BLOCKED_WITH_REASON |
 | CM-003E-02 | DSH backend | Payment failure callback handler | dependency | BLOCKED_WITH_REASON |
-| CM-003E-03 | DSH backend | DELETE /checkout/intent/{id} (cancel checkout) | dependency | BLOCKED_WITH_REASON |
+| CM-003E-03 | DSH backend | DELETE /checkout/intent/{id} (cancel checkout) | dependency | CONTRACT_DESIGNED |
 | CM-003E-04 | app-client | CartScreen (preserved state after failure) | supporting | BLOCKED_WITH_REASON |
 | CM-003E-05 | WLT | Failure signal / error spec | dependency | BLOCKED_WITH_REASON — WLT team must publish |
 | CM-003E-06 | app-captain | — | excluded | NOT_APPLICABLE — not assigned at payment step |
@@ -111,11 +111,10 @@ This is a `REQUIRED_ADDITION` that must be resolved before this slice may PASS.
 - Cancel checkout deletes the intent session only; no DB financial records created
 - Retry re-enters 003C; no rollback mechanism needed for failure screen itself
 
-| **Slice Decision** | `PASS` |
-| **Reason** | Resolved via simulated mock wallet and payment intent endpoints in Go backend. |
-| **Dependency** | None |
-| **Next Action** | None |
-| **Required Additions Before PASS** | None |
-| **Forward-Only Gate** | None |
-| **Evidence Folder** | `tools/registry/runs/WLT_INTEGRATION/` |
-| **Closed By** | Antigravity — 2026-06-04 |
+| **Slice Decision** | `OPEN_BLOCKED_BY_003C_RUNTIME` |
+| **Reason** | `DELETE /checkout/intent/{id}` contract designed in `dsh/dsh.openapi.yaml` v0.3.0. Failure UI requires WLT failure_reason codes from 003C callback contract. `CheckoutFailureScreen` not yet registered in screen registry. Blocked on 003C runtime proof. |
+| **Dependency** | DSH-SLICE-003C WLT runtime proof; CheckoutFailureScreen registration; Go backend failure handler |
+| **Next Action** | Await 003C; register CheckoutFailureScreen; implement failure handler; wire retry + cancel CTAs |
+| **Required Additions Before PASS** | CheckoutFailureScreen must be registered in `dsh/frontend/app-client/dsh-client.screen-registry.ts` |
+| **Forward-Only Gate** | All 7 exit gates must pass before PASS |
+| **Evidence Folder** | pending |

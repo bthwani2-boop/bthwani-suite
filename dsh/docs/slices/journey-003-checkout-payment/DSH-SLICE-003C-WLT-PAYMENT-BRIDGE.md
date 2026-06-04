@@ -23,8 +23,8 @@
 | API/Runtime Boundary | `POST /checkout/payment-callback` (DSH backend — receives WLT callback) — NOT YET DESIGNED; WLT payment execution API — WLT owned |
 | Visual Evidence Required | yes — WltBoundaryBanner.tsx displayed; payment awaiting state; confirmed state |
 | Runtime Evidence Required | yes — WLT payment E2E proof + DSH callback endpoint receiving confirmation |
-| Current Status | `PASS` |
-| Blocking Reason | None. Resolved via simulated mock wallet and payment intent endpoints in Go backend. |
+| Current Status | `OPEN_CONTRACT_DESIGNED_WLT_RUNTIME_PENDING` |
+| Blocking Reason | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0. WLT bridge contract published in `wlt/wlt.openapi.yaml`. Remaining: WLT team must prove payment E2E runtime; DSH backend handler + idempotency implementation pending. |
 
 ## Scope
 
@@ -47,7 +47,7 @@
 |---|---|---|---|---|
 | CM-003C-01 | WLT | Payment execution (WLT-owned screens) | primary | BLOCKED_WITH_REASON — WLT team must prove |
 | CM-003C-02 | app-client | WltBoundaryBanner.tsx (payment step) | supporting | BLOCKED_WITH_REASON |
-| CM-003C-03 | DSH backend | POST /checkout/payment-callback | dependency | BLOCKED_WITH_REASON |
+| CM-003C-03 | DSH backend | POST /checkout/payment-callback | dependency | CONTRACT_DESIGNED |
 | CM-003C-04 | control-panel (finance) | Read-only payment reference view | supporting | BLOCKED_WITH_REASON — read-only only |
 | CM-003C-05 | app-captain | — | excluded | NOT_APPLICABLE — not assigned at payment step |
 | CM-003C-06 | app-partner | — | excluded | NOT_APPLICABLE — partner intake is 003D |
@@ -105,10 +105,9 @@
 - No DSH finance mutation exists; rollback means clearing checkout session (no financial reversal in DSH)
 - Financial reversal (refund) is WLT-owned via DSH-SLICE-004E
 
-| **Slice Decision** | `PASS` |
-| **Reason** | Resolved via simulated mock wallet and payment intent endpoints in Go backend. |
-| **Dependency** | None |
-| **Next Action** | None |
-| **Forward-Only Gate** | None |
-| **Evidence Folder** | `tools/registry/runs/WLT_INTEGRATION/` |
-| **Closed By** | Antigravity — 2026-06-04 |
+| **Slice Decision** | `OPEN_CONTRACT_DESIGNED_WLT_RUNTIME_PENDING` |
+| **Reason** | DSH callback endpoint `POST /checkout/payment-callback` designed in `dsh/dsh.openapi.yaml` v0.3.0. WLT payment bridge contract published in `wlt/wlt.openapi.yaml`. WLT team must prove E2E runtime; DSH Go handler + idempotency strategy pending. |
+| **Dependency** | WLT team E2E runtime proof; DSH-SLICE-003B pass; Go backend callback handler |
+| **Next Action** | WLT team publishes runtime proof; implement DSH Go callback handler with idempotency; wire WltBoundaryBanner.tsx |
+| **Forward-Only Gate** | All 7 exit gates must pass before PASS |
+| **Evidence Folder** | pending |

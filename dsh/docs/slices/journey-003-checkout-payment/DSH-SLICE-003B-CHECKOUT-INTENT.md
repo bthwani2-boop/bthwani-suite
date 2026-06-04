@@ -23,8 +23,8 @@
 | API/Runtime Boundary | POST /checkout/intent — NOT YET DESIGNED (blocked by auth proof + 003A dependency); returns session token |
 | Visual Evidence Required | yes — DshCheckoutIntentScreen states: address entry, intent created, intent failed, loading, blocked |
 | Runtime Evidence Required | yes — POST /checkout/intent runtime proof with auth token + 003A serviceability PASS |
-| Current Status | `PASS` |
-| Blocking Reason | None. Resolved via simulated mock wallet and payment intent endpoints in Go backend. |
+| Current Status | `OPEN_CONTRACT_DESIGNED` |
+| Blocking Reason | API contract designed in `dsh/dsh.openapi.yaml` v0.3.0. Backend implementation pending. Screen wiring pending. Upstream: 003A serviceability must pass at runtime. |
 
 ## Scope
 
@@ -46,7 +46,7 @@
 | Row ID | Surface | Screen / Endpoint | Classification | Status |
 |---|---|---|---|---|
 | CM-003B-01 | app-client | DshCheckoutIntentScreen (`dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx`) | primary | BLOCKED_WITH_REASON |
-| CM-003B-02 | DSH backend | POST /checkout/intent | dependency | BLOCKED_WITH_REASON |
+| CM-003B-02 | DSH backend | POST /checkout/intent | dependency | CONTRACT_DESIGNED |
 | CM-003B-03 | DSH backend | Checkout session model / reservation logic | dependency | BLOCKED_WITH_REASON |
 | CM-003B-04 | app-captain | — | excluded | NOT_APPLICABLE — not yet assigned |
 | CM-003B-05 | app-partner | — | excluded | NOT_APPLICABLE — partner intake is 003D |
@@ -104,10 +104,9 @@
 - DshCheckoutIntentScreen defaults to blocked state when serviceability or auth unavailable
 - No backend changes in scope yet; rollback N/A at this stage
 
-| **Slice Decision** | `PASS` |
-| **Reason** | Resolved via simulated mock wallet and payment intent endpoints in Go backend. |
-| **Dependency** | None |
-| **Next Action** | None |
-| **Forward-Only Gate** | None |
-| **Evidence Folder** | `tools/registry/runs/WLT_INTEGRATION/` |
-| **Closed By** | Antigravity — 2026-06-04 |
+| **Slice Decision** | `OPEN_CONTRACT_DESIGNED` |
+| **Reason** | API endpoint `POST /checkout/intent` designed in `dsh/dsh.openapi.yaml` v0.3.0 with `CheckoutIntentRequest/Response` schemas. Auth contract ready (003A). Backend implementation, DshCheckoutIntentScreen wiring, and runtime proof remain pending. |
+| **Dependency** | DSH-SLICE-003A runtime pass; Go backend handler; screen wiring |
+| **Next Action** | Implement Go backend handler for POST /checkout/intent; wire DshCheckoutIntentScreen; capture runtime + visual proof |
+| **Forward-Only Gate** | All 7 exit gates must pass before PASS |
+| **Evidence Folder** | pending |

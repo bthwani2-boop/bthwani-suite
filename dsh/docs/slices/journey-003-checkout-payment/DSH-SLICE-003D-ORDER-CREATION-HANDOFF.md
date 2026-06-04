@@ -23,8 +23,8 @@
 | API/Runtime Boundary | `POST /orders` (DSH backend — created on payment callback) — NOT YET DESIGNED (blocked by 003B + 003C); `GET /orders/{id}` (client order confirmation) — NOT YET DESIGNED |
 | Visual Evidence Required | yes — app-client order confirmation screen; app-partner new order notification; control-panel ops monitor |
 | Runtime Evidence Required | yes — POST /orders runtime proof triggered by WLT callback + partner notification proven |
-| Current Status | `PASS` |
-| Blocking Reason | None. Resolved via order creation implementation in Go backend. |
+| Current Status | `OPEN_BLOCKED_BY_003C_RUNTIME` |
+| Blocking Reason | Blocked on DSH-SLICE-003C (WLT payment confirmation runtime proof). `POST /orders` contract exists in `dsh/dsh.openapi.yaml`. Cannot proceed to PASS without confirmed WLT payment callback. |
 
 ## Scope
 
@@ -108,10 +108,9 @@
 - Retry is possible via re-invocation of POST /orders
 - Financial reversal (if needed) is WLT-owned via DSH-SLICE-004E
 
-| **Slice Decision** | `PASS` |
-| **Reason** | Resolved via order creation implementation in Go backend. |
-| **Dependency** | None |
-| **Next Action** | None |
-| **Forward-Only Gate** | None |
-| **Evidence Folder** | `tools/registry/runs/WLT_INTEGRATION/` |
-| **Closed By** | Antigravity — 2026-06-04 |
+| **Slice Decision** | `OPEN_BLOCKED_BY_003C_RUNTIME` |
+| **Reason** | `POST /orders` contract exists in `dsh/dsh.openapi.yaml`. Cannot create real orders until DSH-SLICE-003C WLT payment callback is proven at runtime. `POST /orders` must only be triggered by a confirmed `wlt_payment_ref_id` from the callback. |
+| **Dependency** | DSH-SLICE-003B pass + DSH-SLICE-003C WLT runtime proof |
+| **Next Action** | Await 003C WLT runtime proof; then implement order creation handler triggered by payment-confirmed callback |
+| **Forward-Only Gate** | All 8 exit gates must pass before PASS |
+| **Evidence Folder** | pending |

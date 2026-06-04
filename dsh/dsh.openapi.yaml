@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
   title: BThwani DSH API
-  version: 0.2.0
-  description: API contract for client-facing store discovery and storefront visibility.
-x-bthwani-status: DSH_SLICE002B_CATEGORY_STRUCTURE_IMPL
+  version: 0.3.0
+  description: API contract for client-facing store discovery, catalog management, and checkout flow.
+x-bthwani-status: DSH_SLICE003_CHECKOUT_CONTRACT_DESIGNED
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
@@ -836,6 +836,214 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003A: Cart Serviceability ───────────────────────────
+  /cart/serviceability:
+    get:
+      tags:
+        - Checkout
+      summary: Check cart serviceability
+      description: |
+        Checks whether the client's cart items and store are serviceable before checkout.
+        Client auth required — cart must be associated with authenticated client identity.
+        WLT boundary: no financial data. Serviceability is operational only.
+        Auth dependency: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+      operationId: getCartServiceability
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: store_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: item_ids
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Serviceability result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartServiceabilityResponse'
+        '401':
+          description: Unauthenticated — client identity required for cart association
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003B: Checkout Intent ─────────────────────────────
+  /checkout/intent:
+    post:
+      tags:
+        - Checkout
+      summary: Create checkout intent
+      description: |
+        Creates a checkout session for the authenticated client's cart.
+        Returns a sessionToken to be passed to WLT payment bridge (DSH-SLICE-003C).
+        Requires: client auth (003A dependency) + serviceability confirmed (003A passed).
+        WLT boundary: no financial mutation at this step. Creates operational session only.
+        DSH stores the intent; WLT receives sessionToken to associate payment.
+      operationId: createCheckoutIntent
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutIntentRequest'
+      responses:
+        '201':
+          description: Checkout intent created — pass session_token to WLT payment bridge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutIntentResponse'
+        '400':
+          description: Validation error or serviceability not confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthenticated — client identity required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Active checkout session already exists for this client+store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003E: Cancel Checkout Intent ─────────────────────
+  /checkout/intent/{id}:
+    delete:
+      tags:
+        - Checkout
+      summary: Cancel checkout intent
+      description: |
+        Cancels a checkout intent and preserves the client's cart.
+        Used when payment fails (DSH-SLICE-003E) or client cancels before payment.
+        WLT boundary: no financial mutation. Cart is preserved in DSH state.
+        If payment was already confirmed before cancellation, refund is WLT-owned (DSH-SLICE-004E).
+      operationId: cancelCheckoutIntent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Intent cancelled — cart preserved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelCheckoutIntentResponse'
+        '400':
+          description: Invalid request or intent already confirmed (cannot cancel after payment)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Intent not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003C: WLT Payment Callback ───────────────────────
+  /checkout/payment-callback:
+    post:
+      tags:
+        - Checkout
+      summary: Receive WLT payment confirmation callback
+      description: |
+        DSH backend endpoint that receives WLT payment decision callback.
+        WLT calls this after executing payment (confirmed) or rejecting it (failed).
+        DSH stores wlt_payment_ref_id as operational reference only — no financial mutation.
+        On confirmed: DSH triggers order creation internally (DSH-SLICE-003D).
+        On failed: DSH stores failure reason for client display (DSH-SLICE-003E).
+        Boundary contract: DSH_PAYMENT_INPUT_ONLY — WLT_OWNS_FINAL_FINANCIAL_TRUTH.
+        Security: WLT-to-DSH internal callback — auth header format to be confirmed with WLT team.
+      operationId: receivePaymentCallback
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCallbackRequest'
+      responses:
+        '200':
+          description: Callback acknowledged — DSH will process asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCallbackResponse'
+        '400':
+          description: Invalid callback payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Intent not found — may have expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
           content:
             application/json:
               schema:
@@ -1907,3 +2115,146 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SupportEscalationRecord'
+
+    Pagination:
+      type: object
+      required:
+        - limit
+        - offset
+        - total
+      properties:
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+
+    # ─── J-003 / Checkout Schemas ─────────────────────────────────────────────
+    CartServiceabilityResponse:
+      type: object
+      required:
+        - serviceable
+        - store_id
+      properties:
+        serviceable:
+          type: boolean
+        store_id:
+          type: string
+        reason_code:
+          type: string
+          enum: [store_closed, delivery_zone_unavailable, items_unavailable, partner_not_ready]
+          description: Present only when serviceable=false
+        unavailable_item_ids:
+          type: array
+          items:
+            type: string
+          description: Item IDs that are unavailable — present when reason_code=items_unavailable
+
+    CheckoutIntentItem:
+      type: object
+      required:
+        - product_id
+        - quantity
+      properties:
+        product_id:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+
+    CheckoutIntentRequest:
+      type: object
+      required:
+        - store_id
+        - items
+        - delivery_address
+      properties:
+        store_id:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckoutIntentItem'
+        delivery_address:
+          type: string
+        delivery_time_slot:
+          type: string
+          description: Optional requested delivery time slot identifier
+        client_note:
+          type: string
+
+    CheckoutIntentResponse:
+      type: object
+      required:
+        - intent_id
+        - session_token
+        - status
+        - expires_at
+      properties:
+        intent_id:
+          type: string
+          description: DSH checkout session identifier
+        session_token:
+          type: string
+          description: Token passed to WLT payment bridge to associate payment with this intent
+        status:
+          type: string
+          enum: [pending_payment, payment_confirmed, payment_failed, cancelled, expired]
+        expires_at:
+          type: string
+          format: date-time
+
+    CancelCheckoutIntentResponse:
+      type: object
+      required:
+        - intent_id
+        - status
+        - cart_preserved
+      properties:
+        intent_id:
+          type: string
+        status:
+          type: string
+          enum: [cancelled]
+        cart_preserved:
+          type: boolean
+          description: Always true — DSH preserves cart items on intent cancellation
+
+    PaymentCallbackRequest:
+      type: object
+      required:
+        - intent_id
+        - wlt_payment_ref_id
+        - status
+      properties:
+        intent_id:
+          type: string
+          description: DSH checkout intent ID matching the session_token issued in createCheckoutIntent
+        wlt_payment_ref_id:
+          type: string
+          description: WLT payment reference ID — DSH stores as operational reference only; no financial mutation
+        status:
+          type: string
+          enum: [confirmed, failed]
+        failure_reason:
+          type: string
+          enum: [insufficient_balance, policy_block, fraud_hold, expired]
+          description: Present only when status=failed
+
+    PaymentCallbackResponse:
+      type: object
+      required:
+        - acknowledged
+        - intent_id
+      properties:
+        acknowledged:
+          type: boolean
+        intent_id:
+          type: string
+        next_action:
+          type: string
+          enum: [create_order, show_failure]
+          description: |
+            create_order: payment confirmed — DSH will trigger POST /orders internally.
+            show_failure: payment failed — DSH surfaces failure_reason to client via 003E flow.

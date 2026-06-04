@@ -629,6 +629,24 @@ export {
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
 } from './catalog-central-adapter';
 
+// --- Checkout client (J-003A / 003B / 003E) ---
+export type {
+  DshCheckoutFetchFn,
+  DshCheckoutOfflineError,
+  DshCheckoutHttpError,
+  DshCheckoutError,
+  DshCartServiceabilityResponse,
+  DshCheckoutIntentItem,
+  DshCheckoutIntentRequest,
+  DshCheckoutIntentResponse,
+  DshCancelCheckoutIntentResponse,
+  DshCheckoutClient,
+} from './dsh-checkout-client';
+export {
+  isDshCheckoutOfflineError,
+  createDshCheckoutHttpClient,
+} from './dsh-checkout-client';
+
 // --- Order Lifecycle client ---
 export type {
   DshOrderRecord,

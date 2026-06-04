@@ -35,14 +35,17 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 
-  /wlt/dsh/client/payment-intents:
+  /wlt/dsh/client/payment-sessions:
     post:
-      operationId: createClientPaymentIntent
-      summary: Create a payment intent for a client order
+      operationId: createClientPaymentSession
+      summary: Create a payment session for a client checkout
       description: >
-        WLT-owned. Creates a payment intent authorizing wallet deduction for an order.
+        WLT-owned. DSH submits a payment session candidate from its checkout intent.
+        WLT validates client balance and policy, then returns a sessionId.
+        DSH polls GET /wlt/dsh/client/payment-sessions/{sessionId} for the outcome.
+        DSH MUST NOT create the order until status=confirmed.
         Idempotency-Key header is required to prevent duplicate charges.
-        Execution is WLT-owned — DSH client surface is a read-only consumer.
+        Execution is WLT-owned — DSH is input-only (DSH_PAYMENT_INPUT_ONLY).
       tags: [client-payment]
       security:
         - bearerAuth: []
@@ -53,14 +56,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentIntent'
+              $ref: '#/components/schemas/PaymentSession'
       responses:
         '201':
-          description: Payment intent created
+          description: Payment session created — poll for status
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentIntent'
+                $ref: '#/components/schemas/PaymentSession'
+        '402':
+          description: Insufficient balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Duplicate idempotency key
         '401':
@@ -68,12 +77,49 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 
-  /wlt/dsh/client/top-up-intents:
+  /wlt/dsh/client/payment-sessions/{sessionId}:
+    get:
+      operationId: getClientPaymentSessionStatus
+      summary: Poll payment session status
+      description: >
+        WLT-owned. DSH polls this to determine if WLT confirmed or rejected the payment.
+        DSH creates the order only when status=confirmed.
+        Execution is WLT-owned — DSH reads result only.
+      tags: [client-payment]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment session status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentSession'
+        '404':
+          description: Session not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /wlt/dsh/client/top-up-sessions:
     post:
-      operationId: createClientTopUpIntent
-      summary: Create a top-up intent for client wallet
+      operationId: createClientTopUpSession
+      summary: Create a top-up session for client wallet
       description: >
         WLT-owned. Initiates a wallet top-up flow for the client.
+        WLT returns a redirectUrl for the hosted top-up flow.
+        DSH displays the redirect — does not process the top-up itself.
         Idempotency-Key header is required to prevent duplicate top-ups.
         Execution is WLT-owned — DSH client surface is a read-only consumer.
       tags: [client-wallet]
@@ -86,14 +132,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopUpIntent'
+              $ref: '#/components/schemas/TopUpSession'
       responses:
         '201':
-          description: Top-up intent created
+          description: Top-up session created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TopUpIntent'
+                $ref: '#/components/schemas/TopUpSession'
         '409':
           description: Duplicate idempotency key
         '401':
@@ -123,10 +169,10 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 
-  /wlt/dsh/captain/top-up-intents:
+  /wlt/dsh/captain/top-up-sessions:
     post:
-      operationId: createCaptainTopUpIntent
-      summary: Create a top-up intent for captain wallet
+      operationId: createCaptainTopUpSession
+      summary: Create a top-up session for captain wallet
       description: >
         WLT-owned. Initiates a wallet top-up flow for the captain.
         Idempotency-Key header is required to prevent duplicate top-ups.
@@ -141,10 +187,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopUpIntent'
+              $ref: '#/components/schemas/TopUpSession'
       responses:
         '201':
-          description: Top-up intent created
+          description: Top-up session created
         '409':
           description: Duplicate idempotency key
         '401':
@@ -835,18 +881,22 @@ components:
           type: string
           format: date-time
 
-    PaymentIntent:
+    PaymentSession:
       type: object
       description: >
-        WLT-owned payment intent. Authorizes a wallet deduction for an order.
+        WLT-owned payment session. DSH submits checkout candidate; WLT decides financial outcome.
+        DSH polls GET /wlt/dsh/client/payment-sessions/{sessionId} until status=confirmed or failed.
+        DSH stores sessionId as wlt_payment_ref_id (operational reference only — no financial mutation in DSH).
         Requires Idempotency-Key on creation.
       required: [orderId, amountMinorUnits, currency]
       properties:
-        id:
+        sessionId:
           type: string
           format: uuid
+          description: WLT session reference — DSH stores as wlt_payment_ref_id
         orderId:
           type: string
+          description: DSH operational order/intent identifier
         amountMinorUnits:
           type: integer
         currency:
@@ -854,16 +904,33 @@ components:
           default: YER
         status:
           type: string
-          enum: [pending, authorized, captured, failed, cancelled]
+          enum: [pending, confirmed, failed, expired]
+          description: >
+            pending: WLT is processing.
+            confirmed: WLT approved and executed the payment.
+            failed: WLT rejected (insufficient balance, policy, etc).
+            expired: Session timed out.
+        confirmedAt:
+          type: string
+          format: date-time
+          description: Present only when status=confirmed
+        failureReason:
+          type: string
+          enum: [insufficient_balance, policy_block, fraud_hold, expired]
+          description: Present only when status=failed
+        expiresAt:
+          type: string
+          format: date-time
 
-    TopUpIntent:
+    TopUpSession:
       type: object
       description: >
-        WLT-owned top-up intent. Initiates a wallet funding flow.
+        WLT-owned top-up session. Initiates a wallet funding flow.
+        WLT returns redirectUrl for the hosted top-up flow; DSH displays it only.
         Requires Idempotency-Key on creation.
       required: [amountMinorUnits, currency]
       properties:
-        id:
+        sessionId:
           type: string
           format: uuid
         amountMinorUnits:
@@ -877,6 +944,7 @@ components:
         redirectUrl:
           type: string
           format: uri
+          description: WLT-hosted top-up flow URL — DSH displays, does not own
 
     CaptainEligibilityBalance:
       type: object
