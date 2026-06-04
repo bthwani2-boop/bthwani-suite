@@ -53,15 +53,15 @@
 ## Evidence and Gates
 - Runtime evidence: none yet — deferred
 - Visual evidence: none yet
-- Evidence path: `tools/registry/runs/DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500/`
+- Evidence path: `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-001200/`
 - Exit gate: J-003 closed + order tracking API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
 | **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | J-003 not closed; no order exists to track |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await J-003 close; then design GET /orders/{id} |
-| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004A_FULL_UNIVERSAL_CLOSURE-20260604-182500/` |
-| **Closed By** | Antigravity — 2026-06-04T18:25:00Z |
+| **Reason** | J-003 checkout/payment is not fully closed (remains BLOCKED_WITH_REASON due to pending auth/WLT runtime proofs); no live order exists to track at runtime |
+| **Dependency** | J-003 checkout/payment full closure |
+| **Next Action** | Await J-003 full closure; then wire/activate OrderTrackingScreen and capture E2E API runtime + visual proof. |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-001200/` |
+| **Closed By** | Antigravity — 2026-06-05T00:12:00Z |
