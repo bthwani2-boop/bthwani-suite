@@ -89,7 +89,7 @@
 ## Evidence and Gates
 - Runtime evidence: none — blocked on WLT side
 - Visual evidence: none — WltBoundaryBanner.tsx exists but payment flow not proven
-- Evidence path: `tools/registry/runs/DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700/`
+- Evidence path: `tools/registry/runs/DSH_JOURNEY_001_002_003_FINAL_TRUTH_CLOSURE-20260604/`
 
 ### Exit Gates (all must be proven before PASS)
 1. WLT team publishes/proves final payment callback runtime/security behavior

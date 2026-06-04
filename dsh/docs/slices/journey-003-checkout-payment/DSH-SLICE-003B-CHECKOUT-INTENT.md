@@ -89,7 +89,7 @@
 ## Evidence and Gates
 - Runtime evidence: handler tests exist; backend production BearerAuth test coverage exists; app-client Bearer transport exists; no live auth service + live screen runtime proof yet
 - Visual evidence: none — preview/local-state only; DshCheckoutIntentScreen exists (status: READY_FOR_REVIEW in screen registry)
-- Evidence path: `tools/registry/runs/DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700/`
+- Evidence path: `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/`
 
 ### Exit Gates (all must be proven before PASS)
 1. WLT/auth runtime proof (external — from 003A)

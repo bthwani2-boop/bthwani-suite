@@ -96,7 +96,7 @@
 - Runtime evidence: handler tests exist; backend production BearerAuth test coverage exists; app-client Bearer transport exists; no live auth service + live screen runtime proof yet
 - Visual evidence: none — preview/local-state only; CartScreen exists but shows fixture data
 - Existing screen: `CartScreen.tsx` registered as `client.dsh.cart.review` (routeId: `dsh-cart`), status: `VERIFIED` in screen registry (preview-only)
-- Evidence path: `tools/registry/runs/DSH_SLICE_003A_CART_SERVICEABILITY_BLOCKED_CLOSURE-20260604-174100/`
+- Evidence path: `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/`
 
 ### Exit Gates (all must be proven before PASS)
 1. BearerAuth runtime proof — client identity proven against live auth service at runtime

@@ -91,7 +91,7 @@
 ## Evidence and Gates
 - Runtime evidence: none — blocked
 - Visual evidence: none
-- Evidence path: `tools/registry/runs/DSH_SLICE_003D_FULL_UNIVERSAL_CLOSURE-20260604-181500/`
+- Evidence path: `tools/registry/runs/DSH_JOURNEY_001_002_003_FINAL_TRUTH_CLOSURE-20260604/`
 
 ### Exit Gates (all must be proven before PASS)
 1. DSH-SLICE-003B PASS
