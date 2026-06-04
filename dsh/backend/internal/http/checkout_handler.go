@@ -203,6 +203,7 @@ func (h *CheckoutHandler) ReceivePaymentCallback(w http.ResponseWriter, r *http.
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid callback payload")
 		return
 	}
+	req.CallbackEventID = eventID
 
 	if req.IntentID == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "intent_id is required")

@@ -18,7 +18,7 @@ API contract: `dsh/dsh.openapi.yaml`.
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
 | Current Decision | `DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE` |
-| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = IMPLEMENTATION_STARTED / auth.openapi.yaml + wlt.openapi.yaml + dsh.openapi.yaml contracts ready; Go handlers 003A/003B/003C/003E implemented; callback-primary flow documented; auth DEV_ONLY (X-Client-Id); BearerAuth + WLT runtime pending before PASS; J-004 = PASS / SCREEN_RUNTIME_PROVEN; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
+| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE; J-003 = IMPLEMENTATION_STARTED / auth.openapi.yaml + wlt.openapi.yaml + dsh.openapi.yaml contracts ready; Go handlers 003A/003B/003C/003E implemented; callback-primary flow documented; auth DEV_ONLY (X-Client-Id); BearerAuth + WLT runtime pending before PASS; J-004 = FUTURE_NEEDS_CROSS_SURFACE_PROOF / DEFERRED pending J-003 closure; J-005+ = DEFERRED per slice files; Production readiness = NOT_CLAIMED |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -26,11 +26,11 @@ API contract: `dsh/dsh.openapi.yaml`.
 
 | Surface | Status | Note |
 |---|---|---|
-| `app-client` | `J-001: SCREEN_RUNTIME_PROVEN; J-002+: DEFERRED_WITH_REASON` | discovery feed (J-001) E2E proven on physical device (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); cart/checkout/tracking (J-002+) deferred |
-| `app-partner` | `J-001: SCREEN_RUNTIME_PROVEN; J-002+: DEFERRED_WITH_REASON` | partner-readiness gate (J-001) E2E proven on physical device; catalog management (J-002+) deferred |
+| `app-client` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | discovery feed (J-001) E2E proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); J-002 catalog proven (DSH_SLICE_002*_FINAL_CLOSURE-*); cart/checkout/tracking (J-003+) deferred |
+| `app-partner` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | partner-readiness gate (J-001) E2E proven on physical device; catalog management (J-002) proven (DSH_SLICE_002*_FINAL_CLOSURE-*); J-003+ deferred |
 | `app-captain` | `needs-visual-evidence` | pickup, delivery, and PoD surfaces are logically wired; J-005 not yet started |
 | `app-field` | `needs-visual-evidence` | onboarding and visit/readiness surfaces are logically wired; J-006 not yet started |
-| `control-panel operations` | `J-001: SCREEN_RUNTIME_PROVEN; J-002+: DEFERRED_WITH_REASON` | catalog-approval and marketing-visibility (J-001) E2E proven in browser; operations room (J-009) deferred |
+| `control-panel operations` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | catalog-approval and marketing-visibility (J-001) E2E proven in browser; catalog governance (J-002) proven; operations room (J-009) deferred |
 | `control-panel finance` | `blocked-by-wlt` | finance remains a read-only WLT bridge and not a DSH-owned money surface |
 
 ### Map / Heatmap Boundary

@@ -1065,7 +1065,7 @@ paths:
             Must match the event_id in the callback payload.
         - in: header
           name: Idempotency-Key
-          required: false
+          required: true
           schema:
             type: string
           description: Same Idempotency-Key used in the originating WLT payment session.

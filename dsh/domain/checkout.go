@@ -58,6 +58,7 @@ type CheckoutIntentRecord struct {
 	// Non-authoritative display snapshot. WLT owns final amount, ledger, settlement.
 	RequestedAmountSnapshotMinorUnits int64 `json:"requested_amount_snapshot_minor_units"`
 	WltPaymentRefID          *string    `json:"wlt_payment_ref_id,omitempty"`
+	WltCallbackEventID       string     `json:"wlt_callback_event_id,omitempty"`
 	FailureReason            *string    `json:"failure_reason,omitempty"`
 	ExpiresAt                time.Time  `json:"expires_at"`
 	CreatedAt                time.Time  `json:"created_at"`
@@ -81,10 +82,13 @@ type CancelCheckoutIntentResponse struct {
 
 // PaymentCallbackRequest — 003C (from WLT)
 type PaymentCallbackRequest struct {
-	IntentID         string  `json:"intent_id"`
-	WltPaymentRefID  string  `json:"wlt_payment_ref_id"`
-	Status           string  `json:"status"`
-	FailureReason    *string `json:"failure_reason,omitempty"`
+	IntentID        string  `json:"intent_id"`
+	WltPaymentRefID string  `json:"wlt_payment_ref_id"`
+	Status          string  `json:"status"`
+	FailureReason   *string `json:"failure_reason,omitempty"`
+	// CallbackEventID is the value of X-WLT-Event-Id header; used for replay protection.
+	// Repository MUST reject a request if the same event_id was already processed.
+	CallbackEventID string `json:"-"`
 }
 
 // PaymentCallbackResponse — 003C

@@ -322,7 +322,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Closure Decision Log | `dsh/docs/CLOSURE_DECISION_LOG.md` | EVIDENCE_REFERENCE | Append-only log |
 | Visual Review Ledger | `dsh/docs/DSH_VISUAL_REVIEW.md` | EVIDENCE_REFERENCE | Visual evidence queue |
 | DSH-SLICE-001 Store Discovery | `dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md` | SLICE_MANIFEST | Parent slice for J-001; linked to 001A–001F |
-| Slices Performance Notes | `dsh/docs/slices/journey-007-data-media-fixture-governance/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints |
+| Performance Notes | `dsh/docs/references/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints; moved from slices/ — reference files must not live under slices/ |
 | Control Panel Owner Decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | GOVERNANCE_REFERENCE | CP ownership policy |
 | Migration doc | `dsh/docs/MIGRATION.md` | HISTORICAL_REFERENCE | Migration history |
 | Command doc | `dsh/docs/command.md` | HISTORICAL_REFERENCE | Deprecated; no branch-specific instructions allowed |
@@ -343,7 +343,7 @@ Areas found without a slice mapping or with evidence of missing classification:
 | GAP-IDX-002 | `dsh/docs/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | Planning doc exists but not linked to specific execution slices in manifest | Map each plan section to a slice ID or mark OUT_OF_SCOPE_WITH_REASON |
 | GAP-IDX-003 | `control-panel/runtime/app/community-services/page.tsx` | Community services CP route exists but no DSH journey owns it | Define owner journey or classify OUT_OF_SCOPE with reason |
 | GAP-IDX-004 | `dsh/docs/DSH_FILE_SIZE_RISK_MATRIX.md` | Giant-screen refactor candidates exist but no execution slice owns the refactoring work | Add as DEFERRED_WITH_REASON items inside the relevant slice manifests |
-| GAP-IDX-005 | `dsh/docs/slices/journey-007-data-media-fixture-governance/PERFORMANCE_NOTES.md` | Performance notes exist but no slice links to them as a dependency gate | Link to relevant execution slices as dependency evidence or classify GOVERNANCE_REFERENCE |
+| GAP-IDX-005 | `dsh/docs/references/PERFORMANCE_NOTES.md` | **RESOLVED 2026-06-04** — file moved from slices/ to dsh/docs/references/; classified GOVERNANCE_REFERENCE in § N; no slice action required | No further action required |
 | GAP-IDX-006 | `dsh/frontend/control-panel/finance/finance.registry.ts` — `FinanceHubScreen.tsx`, `FinanceHubScreens.tsx` | Control-panel finance screens exist in code but no execution slice covers their DSH-side governance | DSH-SLICE-010A must classify these screens explicitly |
 | GAP-IDX-007 | app-partner catalog readiness frontend binding | **RESOLVED 2026-06-04** — StoreReadinessGate button press E2E proven on physical device; PATCH /stores/{id}/partner-readiness and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
 | GAP-IDX-008 | control-panel PATCH gate frontend binding | **RESOLVED 2026-06-04** — catalog-approval and marketing-visibility buttons proven in browser; PATCH endpoints and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
@@ -382,8 +382,8 @@ These contradictions exist between source files and must be resolved in the appr
 | Total source areas mapped | 120+ |
 | Total journeys | 10 |
 | Total execution slices (see manifest) | 44 |
-| GAP rows (open) | 6 |
-| GAP rows (resolved) | 2 (GAP-IDX-007, GAP-IDX-008) |
+| GAP rows (open) | 5 |
+| GAP rows (resolved) | 3 (GAP-IDX-005, GAP-IDX-007, GAP-IDX-008) |
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
 | Known contradictions open | 0 |
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |

@@ -118,9 +118,22 @@ func (repo *MemoryRepository) ProcessPaymentCallback(_ context.Context, req doma
 		if intent.ID != req.IntentID {
 			continue
 		}
+		// Replay protection: same event_id already processed — return idempotent ack.
+		if intent.WltCallbackEventID != "" && intent.WltCallbackEventID == req.CallbackEventID {
+			nextAction := "create_order"
+			if intent.Status == domain.CheckoutStatusPaymentFailed {
+				nextAction = "show_failure"
+			}
+			return domain.PaymentCallbackResponse{
+				Acknowledged: true,
+				IntentID:     req.IntentID,
+				NextAction:   nextAction,
+			}, nil
+		}
 		if req.Status == "confirmed" {
 			memCheckoutIntents[i].Status = domain.CheckoutStatusPaymentConfirmed
 			memCheckoutIntents[i].WltPaymentRefID = &req.WltPaymentRefID
+			memCheckoutIntents[i].WltCallbackEventID = req.CallbackEventID
 			memCheckoutIntents[i].UpdatedAt = time.Now()
 			return domain.PaymentCallbackResponse{
 				Acknowledged: true,
@@ -130,6 +143,7 @@ func (repo *MemoryRepository) ProcessPaymentCallback(_ context.Context, req doma
 		}
 		memCheckoutIntents[i].Status = domain.CheckoutStatusPaymentFailed
 		memCheckoutIntents[i].FailureReason = req.FailureReason
+		memCheckoutIntents[i].WltCallbackEventID = req.CallbackEventID
 		memCheckoutIntents[i].UpdatedAt = time.Now()
 		return domain.PaymentCallbackResponse{
 			Acknowledged: true,

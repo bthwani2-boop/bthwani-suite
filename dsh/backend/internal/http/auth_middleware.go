@@ -24,10 +24,16 @@ func authMode() string {
 
 // authServiceURL returns the auth service base URL.
 // Set DSH_AUTH_SERVICE_URL to the auth service base (e.g. https://auth.bthwani.local).
-// Defaults to http://localhost:8081 for local development.
+// In production mode DSH_AUTH_SERVICE_URL MUST be set; returns empty string if missing
+// so that verifyBearerToken rejects all requests rather than accidentally hitting a
+// local process (e.g. Metro bundler) that may happen to be on the fallback port.
 func authServiceURL() string {
 	if u := strings.TrimRight(strings.TrimSpace(os.Getenv("DSH_AUTH_SERVICE_URL")), "/"); u != "" {
 		return u
+	}
+	// DEV_ONLY fallback — never used when DSH_AUTH_MODE=production
+	if authMode() == "production" {
+		return ""
 	}
 	return "http://localhost:8081"
 }
@@ -44,7 +50,13 @@ type authSessionResponse struct {
 // Returns the subject (clientId) on success, or empty string on any auth failure.
 // Contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
 func verifyBearerToken(ctx context.Context, token string) string {
-	reqURL := authServiceURL() + "/auth/session"
+	base := authServiceURL()
+	if base == "" {
+		// Production mode with no DSH_AUTH_SERVICE_URL set — deny all rather than
+		// accidentally forwarding tokens to a local process on the default port.
+		return ""
+	}
+	reqURL := base + "/auth/session"
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
 		return ""
@@ -95,8 +107,9 @@ func min(a, b int) int {
 //   Token format: "Bearer <token>" where <token> is a JWT or opaque session token.
 //   In production this should call auth.openapi.yaml GET /auth/session to validate
 //   the token and return the subject/clientId from the session response.
-//   Current implementation: extracts the token value as-is (not verified).
-//   TODO: wire to actual auth service before 003A/003B PASS.
+//   Calls verifyBearerToken → DSH_AUTH_SERVICE_URL/auth/session.
+//   DSH_AUTH_SERVICE_URL MUST be set in production; if unset all requests denied.
+//   REMAINING GATE before 003A/003B PASS: real auth service + runtime proof.
 func resolveClientIdentity(r *http.Request) string {
 	if authMode() == "production" {
 		authHeader := strings.TrimSpace(r.Header.Get("Authorization"))

@@ -183,13 +183,28 @@ WHERE id = $1 AND client_id = $2`, intentID, clientID)
 func (repo *PostgresRepository) ProcessPaymentCallback(ctx context.Context, req domain.PaymentCallbackRequest) (domain.PaymentCallbackResponse, error) {
 	var currentStatus string
 	var storedIntentID string
+	var existingEventID sql.NullString
 	err := repo.db.QueryRowContext(ctx, `
-SELECT id, status FROM dsh_checkout_intents WHERE id = $1`, req.IntentID).Scan(&storedIntentID, &currentStatus)
+SELECT id, status, wlt_callback_event_id FROM dsh_checkout_intents WHERE id = $1`,
+		req.IntentID).Scan(&storedIntentID, &currentStatus, &existingEventID)
 	if err == sql.ErrNoRows {
 		return domain.PaymentCallbackResponse{}, fmt.Errorf("intent not found")
 	}
 	if err != nil {
 		return domain.PaymentCallbackResponse{}, err
+	}
+
+	// Replay protection: if this event_id was already processed, return idempotent ack.
+	if existingEventID.Valid && existingEventID.String == req.CallbackEventID {
+		nextAction := "create_order"
+		if currentStatus == domain.CheckoutStatusPaymentFailed {
+			nextAction = "show_failure"
+		}
+		return domain.PaymentCallbackResponse{
+			Acknowledged: true,
+			IntentID:     req.IntentID,
+			NextAction:   nextAction,
+		}, nil
 	}
 
 	var newStatus, nextAction string
@@ -198,8 +213,8 @@ SELECT id, status FROM dsh_checkout_intents WHERE id = $1`, req.IntentID).Scan(&
 		nextAction = "create_order"
 		_, err = repo.db.ExecContext(ctx, `
 UPDATE dsh_checkout_intents
-SET status = $1, wlt_payment_ref_id = $2, updated_at = NOW()
-WHERE id = $3`, newStatus, req.WltPaymentRefID, req.IntentID)
+SET status = $1, wlt_payment_ref_id = $2, wlt_callback_event_id = $3, updated_at = NOW()
+WHERE id = $4`, newStatus, req.WltPaymentRefID, req.CallbackEventID, req.IntentID)
 	} else {
 		newStatus = domain.CheckoutStatusPaymentFailed
 		nextAction = "show_failure"
@@ -210,8 +225,8 @@ WHERE id = $3`, newStatus, req.WltPaymentRefID, req.IntentID)
 		}
 		_, err = repo.db.ExecContext(ctx, `
 UPDATE dsh_checkout_intents
-SET status = $1, failure_reason = $2, updated_at = NOW()
-WHERE id = $3`, newStatus, fr, req.IntentID)
+SET status = $1, failure_reason = $2, wlt_callback_event_id = $3, updated_at = NOW()
+WHERE id = $4`, newStatus, fr, req.CallbackEventID, req.IntentID)
 	}
 	if err != nil {
 		return domain.PaymentCallbackResponse{}, fmt.Errorf("failed to update intent: %w", err)
