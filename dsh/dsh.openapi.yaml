@@ -3,15 +3,169 @@ info:
   title: BThwani DSH API
   version: 0.1.0
   description: API contract for client-facing store discovery and storefront visibility.
-x-bthwani-status: DSH_SLICE001_SCREEN_RUNTIME_PROVEN
+x-bthwani-status: DSH_SLICE002A_PRODUCT_IDENTITY_IMPL
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
   currentImplementationRoot: dsh
   targetRoot: dsh
 paths:
+  # ─── J-002 / DSH-SLICE-002A: Product Identity ─────────────────────────────
+
+  /stores/{store_id}/products:
+    post:
+      tags:
+        - Product Identity
+      summary: Create product for a store
+      description: >
+        Creates a new product identity record for the given store.
+        The product starts in `partner_submitted` approval status and enters the catalog review pipeline.
+        WLT boundary: base_price_label is a display label only — no financial mutation occurs inside DSH.
+      operationId: createProduct
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Product Identity
+      summary: List products for a store
+      description: Returns all product records for the given store, ordered by creation date descending.
+      operationId: listProducts
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Products list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProductsResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}:
+    get:
+      tags:
+        - Product Identity
+      summary: Get a single product
+      operationId: getProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRecord'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Product Identity
+      summary: Update product identity
+      description: >
+        Updates product name, SKU, GTIN, barcode, description, base_price_label, or category_id.
+        All fields are optional — only provided fields are updated.
+        WLT boundary: base_price_label is a display label only.
+      operationId: updateProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Updated product record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-001 / Store Discovery ───────────────────────────────────────────────
   /stores:
     get:
+
       tags:
         - Store Discovery
       summary: List discovery stores
@@ -483,3 +637,107 @@ components:
           type: string
         message:
           type: string
+
+    # ─── J-002 / DSH-SLICE-002A: Product Identity ─────────────────────────────
+
+    ProductRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - name
+        - base_price_label
+        - approval_status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        name:
+          type: string
+        sku:
+          type: string
+        gtin:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        base_price_label:
+          type: string
+          description: Display label only — no financial mutation. WLT owns price semantics.
+        category_id:
+          type: string
+        approval_status:
+          type: string
+          enum:
+            - field_draft
+            - partner_submitted
+            - partner_review
+            - partner_approved
+            - marketing_review
+            - marketing_approved
+            - catalog_adopted
+            - client_visible
+            - needs_fix
+            - rejected
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - base_price_label
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        gtin:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        base_price_label:
+          type: string
+        category_id:
+          type: string
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        gtin:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        base_price_label:
+          type: string
+        category_id:
+          type: string
+
+    ListProductsResponse:
+      type: object
+      required:
+        - products
+        - pagination
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRecord'
+        pagination:
+          $ref: '#/components/schemas/Pagination'

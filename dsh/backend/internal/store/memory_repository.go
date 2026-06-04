@@ -354,3 +354,22 @@ func matchesSearch(store memoryStore, query string) bool {
 
 	return false
 }
+
+// Product identity stubs — MemoryRepository is local-dev only.
+// Product CRUD requires the Postgres backend (DATABASE_URL must be set).
+
+func (repo *MemoryRepository) CreateProduct(_ context.Context, _ string, _ domain.CreateProductRequest) (domain.ProductRecord, error) {
+	return domain.ProductRecord{}, errors.New("product create requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) UpdateProduct(_ context.Context, _ string, _ domain.UpdateProductRequest) (domain.ProductRecord, error) {
+	return domain.ProductRecord{}, errors.New("product update requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) GetProduct(_ context.Context, _ string) (domain.ProductRecord, error) {
+	return domain.ProductRecord{}, errors.New("product get requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListProducts(_ context.Context, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
+	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
+}

@@ -12,7 +12,8 @@ export type DshPartnerRouteId =
   | 'dsh-partner-notifications'
   | 'dsh-partner-settings'
   | 'dsh-partner-support'
-  | 'dsh-partner-order-rejection';
+  | 'dsh-partner-order-rejection'
+  | 'dsh-partner-product-edit'; // J-002 / DSH-SLICE-002A
 
 export type DshPartnerLegacyRoute = DshPartnerRoute;
 
@@ -36,4 +37,6 @@ export const dshPartnerRoutes = [
   { routeId: 'dsh-partner-settings', legacyRoute: 'home', screenId: 'partner.dsh.settings.preferences', ownerPath: 'dsh/frontend/app-partner/screens/PartnerHubScreen.tsx' },
   { routeId: 'dsh-partner-support', legacyRoute: 'support-directory', screenId: 'partner.dsh.support.center', ownerPath: 'dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx' },
   { routeId: 'dsh-partner-order-rejection', legacyRoute: 'order-rejection', screenId: 'partner.dsh.order.rejection', ownerPath: 'dsh/frontend/app-partner/screens/DshPartnerOrderRejectionScreen.tsx' },
+  // J-002 / DSH-SLICE-002A — Product Identity
+  { routeId: 'dsh-partner-product-edit', legacyRoute: 'inventory-management', screenId: 'partner.dsh.product.edit', ownerPath: 'dsh/frontend/app-partner/screens/ProductEditScreen.tsx' },
 ] as const satisfies readonly DshPartnerRouteRecord[];
