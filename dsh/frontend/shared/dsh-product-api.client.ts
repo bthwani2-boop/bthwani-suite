@@ -156,6 +156,37 @@ export type DshCatalogApprovalRecord = {
   readonly created_at: string;
 };
 
+// ─── J-002 / DSH-SLICE-002G: Catalog Conflict Audit ─────────────────────────
+
+export type DshCatalogConflict = {
+  readonly id: string;
+  readonly store_id: string;
+  readonly product_id: string;
+  readonly product_name: string;
+  readonly conflict_type: 'price_divergence' | 'availability_divergence';
+  readonly central_value: string;
+  readonly override_value: string;
+  readonly status: 'pending' | 'resolved_accept_local' | 'resolved_reverted';
+  readonly resolved_at?: string;
+  readonly created_at: string;
+};
+
+export type DshResolveConflictRequest = {
+  readonly resolution: 'accept_local' | 'revert_to_central';
+};
+
+export type DshResolveConflictResponse = {
+  readonly conflict_id: string;
+  readonly status: 'resolved_accept_local' | 'resolved_reverted';
+};
+
+export type DshListConflictsResponse = {
+  readonly conflicts: readonly DshCatalogConflict[];
+  readonly limit: number;
+  readonly offset: number;
+  readonly total: number;
+};
+
 // ─── Transport contract ────────────────────────────────────────────────────────
 
 export type DshProductApiTransport = {
@@ -213,6 +244,16 @@ export type DshProductApiClient = {
   updateCatalogApproval(
     req: DshUpdateCatalogApprovalRequest,
   ): Promise<DshCatalogApprovalRecord>;
+  listConflicts(options?: {
+    storeId?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<DshListConflictsResponse>;
+  resolveConflict(
+    conflictId: string,
+    req: DshResolveConflictRequest,
+  ): Promise<DshResolveConflictResponse>;
 };
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
@@ -271,5 +312,19 @@ export function createDshProductApiClient(
 
     updateCatalogApproval: (req) =>
       transport.post('/catalog-approvals', req),
+
+    listConflicts: (options = {}) => {
+      const params = new URLSearchParams();
+      if (options.storeId !== undefined) params.set('store_id', options.storeId);
+      if (options.status !== undefined) params.set('status', options.status);
+      if (options.limit !== undefined) params.set('limit', String(options.limit));
+      if (options.offset !== undefined) params.set('offset', String(options.offset));
+      const qs = params.toString();
+      const path = qs ? `/catalog-conflicts?${qs}` : '/catalog-conflicts';
+      return transport.get(path) as Promise<DshListConflictsResponse>;
+    },
+
+    resolveConflict: (conflictId, req) =>
+      transport.post(`/catalog-conflicts/${conflictId}/resolve`, req),
   };
 }

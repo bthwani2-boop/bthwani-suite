@@ -243,26 +243,15 @@ C:\bthwani-suite
 أنشئ evidence folder:
 tools/registry/runs/[SESSION_ID]/
 
-ويجب أن يحتوي قدر الإمكان:
-- 00-session-info.txt
-- 01-git-status-before.txt
-- 02-scope-map.txt
-- 03-files-inspected.txt
-- 04-before-state.txt
-- 05-implementation-summary.txt
-- 06-api-openapi-proof.txt عند وجود API
-- 07-backend-proof.txt عند وجود backend
-- 08-frontend-screen-proof.txt عند وجود UI/screen
-- 09-runtime-request-response-proof.txt عند وجود runtime
-- 10-db-log-proof.txt عند وجود DB/log
-- 11-state-proof.txt
-- 12-cross-surface-proof.txt
-- 13-visual-proof.txt أو screenshots/ عند الإمكان
-- 14-guards.txt
-- 15-tsc.txt
-- 16-go-test.txt عند لمس backend Go
-- 17-git-diff-check.txt
-- 18-final-decision.txt
+أربعة ملفات فقط:
+
+**01-context.txt** — معلومات الجلسة + git status قبل + scope map + ملفات مفحوصة + حالة ما قبل التنفيذ.
+
+**02-implementation.txt** — ملخص التنفيذ + أدلة كل طبقة لمستها الشريحة (API/OpenAPI، backend، frontend/screen، runtime request-response، DB/log، states، cross-surface). اكتب "N/A" لأي طبقة لم تُلمس.
+
+**03-verification.txt** — نتائج التحقق: git diff --check، tsc --noEmit، go test عند لمس Go، نتائج guards، visual proof أو مسار screenshots.
+
+**04-final-decision.txt** — القرار النهائي (PASS / FIX_REQUIRED / BLOCKED_WITH_REASON / ...) مع السبب الدقيق والخطوة التالية إن لم يكن PASS.
 
 عند الحاجة لتشغيل runtime محلي، استخدم أوامر التشغيل المعتمدة للمشروع كما هي، ولا تغيّرها أو تعيد اختراعها. إذا لم تكن البيئة المحلية متاحة أو كان جهاز/خادم مطلوب غير شغال، سجّل BLOCKED_WITH_REASON ولا تكتب PASS.
 

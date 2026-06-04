@@ -48,7 +48,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
 | Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001–J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_SCREEN_RUNTIME_PROVEN | GET /stores + 3 PATCH gates E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); future endpoints not designed |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_SCREEN_RUNTIME_PROVEN | GET /stores + 3 PATCH gates + all J-002 catalog management endpoints E2E screen proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700, DSH_SLICE_002*_FINAL_CLOSURE-*); future endpoints not designed |
 | Go backend migrations | `dsh/backend/migrations/001_store_discovery.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Used in live E2E |
 | Go backend migrations | `dsh/backend/migrations/002_store_visibility_gates.sql` | J-001 | DSH-SLICE-001C/D/E | BACKEND_PROVEN | Visibility gates proven |
 | Go backend seed | `dsh/backend/seed/003_store_discovery_seed.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Seed data for E2E |
@@ -62,6 +62,9 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Go backend contracts TS | `dsh/backend/contracts.ts`, `dsh/backend/src/contracts.ts` | J-001 | DSH-SLICE-001A | CANDIDATE | TS contract types |
 | Backend docker compose | `dsh/backend/docker-compose.local.yml` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Local Postgres for E2E |
 | Backend README | `dsh/backend/README.md` | J-001 | DSH-SLICE-001A | OUT_OF_SCOPE_WITH_REASON: reference doc only, no slice action required |
+| Go backend migrations | `dsh/backend/migrations/008_catalog_conflicts.sql` | J-002 | DSH-SLICE-002G | BACKEND_PROVEN | Catalog override conflicts schema |
+| Go backend domain conflict | `dsh/domain/conflict.go` | J-002 | DSH-SLICE-002G | BACKEND_PROVEN | Domain definitions for catalog conflicts |
+| Go backend conflicts handler | `dsh/backend/internal/http/conflicts_handler.go` | J-002 | DSH-SLICE-002G | BACKEND_PROVEN | HTTP endpoint handlers for list and resolve conflict |
 
 ### B. Frontend Shared Layer
 
@@ -241,6 +244,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Operations flow meta | `dsh/frontend/control-panel/operations/flow-meta.ts` | J-009 | DSH-SLICE-009A | ACTIVE | Operations flow metadata |
 | Finance registry | `dsh/frontend/control-panel/finance/finance.registry.ts` | J-010 | DSH-SLICE-010A–010D | ACTIVE_RUNTIME_SOURCE | Finance registry (WLT bridge) |
 | CP surface catalog | `dsh/frontend/control-panel/surface-catalog.ts` | J-001,J-002,J-009,J-010 | 001D,001E,002E,009A,010A | ACTIVE | CP surface catalog |
+| Audit trail drawer | `dsh/frontend/control-panel/catalogs/drawers/audit-trail.drawer.tsx` | J-002 | DSH-SLICE-002G | ACTIVE | Audit log and live conflicts resolution UI |
 | CP surface meta | `dsh/frontend/control-panel/surface-meta.ts` | J-008,J-009 | DSH-SLICE-008A,009A | ACTIVE | CP surface metadata |
 | CP governance map | `dsh/frontend/control-panel/shared/dsh-control-panel-governance.map.ts` | J-008,J-009 | DSH-SLICE-008A,009A | ACTIVE | Governance map |
 | CP shared index | `dsh/frontend/control-panel/shared/index.ts` | J-008,J-009 | All CP slices | ACTIVE | CP shared export |
@@ -383,7 +387,9 @@ These contradictions exist between source files and must be resolved in the appr
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
 | Known contradictions open | 0 |
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
-| BLOCKED_WITH_REASON areas | 2 (finance/WLT) |
+| BLOCKED_WITH_REASON areas | 3 (finance/WLT + DSH-SLICE-003A/B/C WLT/auth + upstream dependency chain) |
+| Slice compliance closures (BLOCKED) | 2 (DSH-SLICE-003A — DSH_SLICE_003A_CART_SERVICEABILITY_BLOCKED_CLOSURE-20260604-174100; DSH-SLICE-003B — DSH_SLICE_003B_003E_BLOCKED_COMPLIANCE_CLOSURE-20260604-174700) |
+| Full universal protocol closures (BLOCKED) | 3 (DSH-SLICE-003A — DSH_SLICE_003A_FULL_UNIVERSAL_CLOSURE-20260604-175500; DSH-SLICE-003B — DSH_SLICE_003B_FULL_UNIVERSAL_CLOSURE-20260604-200000; DSH-SLICE-003C — DSH_SLICE_003C_FULL_UNIVERSAL_CLOSURE-20260604-201100) |
 
 ---
 
@@ -391,8 +397,8 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved as of 2026-06-04. DSH-SLICE-001 is `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` and J-001 is ready for transition to J-002. No CLOSED or 100% claimed for production.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved as of 2026-06-04. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions. DSH-SLICE-003A, 003B, and 003C slice files are at full required-section compliance (BLOCKED_WITH_REASON — WLT/auth proof pending). All three have completed the full 12-step BTHWANI_DSH_UNIVERSAL_SLICE_FINAL_CLOSURE_COMMAND protocol with zero contradictions found across all sessions. Critical finding logged in 003C: WltBoundaryBanner.tsx is J-010/DSH-SLICE-010D governed (DOCUMENTED_CROSS_REFERENCE — not a gap). WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
 
 Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
 
-Next action: Classify GAP-IDX-001 through GAP-IDX-006; then begin DSH-SLICE-002A (Catalog Management — Product Identity).
+Next action: Await WLT/auth runtime proof to unblock J-003 (DSH-SLICE-003A → 003B → 003C → 003D → 003E). While blocked: classify GAP-IDX-001 through GAP-IDX-006.

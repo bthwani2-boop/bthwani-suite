@@ -370,7 +370,7 @@ func (repo *MemoryRepository) GetProduct(_ context.Context, _ string) (domain.Pr
 	return domain.ProductRecord{}, errors.New("product get requires postgres backend (set DATABASE_URL)")
 }
 
-func (repo *MemoryRepository) ListProducts(_ context.Context, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
+func (repo *MemoryRepository) ListProducts(_ context.Context, _ string, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
 	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
 }
 
@@ -420,4 +420,13 @@ func (repo *MemoryRepository) GetCatalogOverrides(_ context.Context, _ string) (
 // Catalog approvals stubs (J-002 / DSH-SLICE-002E)
 func (repo *MemoryRepository) CreateCatalogApproval(_ context.Context, _ string, _ domain.UpdateCatalogApprovalRequest) (domain.CatalogApprovalRecord, error) {
 	return domain.CatalogApprovalRecord{}, errors.New("catalog approvals require postgres backend (set DATABASE_URL)")
+}
+
+// Catalog conflict audit stubs (J-002 / DSH-SLICE-002G)
+func (repo *MemoryRepository) ListConflicts(_ context.Context, _ string, _ string, _ int, _ int) (domain.ListConflictsResponse, error) {
+	return domain.ListConflictsResponse{}, errors.New("conflict listing requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ResolveConflict(_ context.Context, _ string, _ domain.ResolveConflictRequest) (domain.ResolveConflictResponse, error) {
+	return domain.ResolveConflictResponse{}, errors.New("conflict resolution requires postgres backend (set DATABASE_URL)")
 }

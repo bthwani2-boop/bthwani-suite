@@ -66,6 +66,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: approval_status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter products by approval status (e.g. catalog_adopted)
         - name: limit
           in: query
           required: false
@@ -473,6 +479,103 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Catalog item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002G: Catalog Conflict Audit ─────────────────────────
+  /catalog-conflicts:
+    get:
+      tags:
+        - Catalog Conflict Audit
+      summary: List catalog overrides conflicts
+      description: Returns a list of pending or resolved conflicts between central catalog and partner local overrides.
+      operationId: listConflicts
+      parameters:
+        - name: store_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, resolved_accept_local, resolved_reverted]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Conflicts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListConflictsResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /catalog-conflicts/{id}/resolve:
+    post:
+      tags:
+        - Catalog Conflict Audit
+      summary: Resolve a catalog override conflict
+      description: Resolves a catalog override conflict by either accepting the partner local override or reverting it to central.
+      operationId: resolveConflict
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveConflictRequest'
+      responses:
+        '200':
+          description: Conflict resolved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveConflictResponse'
+        '400':
+          description: Validation or parameter error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Conflict not found
           content:
             application/json:
               schema:
@@ -1278,3 +1381,83 @@ components:
         created_at:
           type: string
           format: date-time
+
+    # ─── J-002 / DSH-SLICE-002G: Catalog Conflict Audit ─────────────────────────
+    CatalogConflict:
+      type: object
+      required:
+        - id
+        - store_id
+        - product_id
+        - product_name
+        - conflict_type
+        - central_value
+        - override_value
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        product_id:
+          type: string
+        product_name:
+          type: string
+        conflict_type:
+          type: string
+          enum: [price_divergence, availability_divergence]
+        central_value:
+          type: string
+        override_value:
+          type: string
+        status:
+          type: string
+          enum: [pending, resolved_accept_local, resolved_reverted]
+        resolved_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    ResolveConflictRequest:
+      type: object
+      required:
+        - resolution
+      properties:
+        resolution:
+          type: string
+          enum: [accept_local, revert_to_central]
+          description: How to resolve the conflict.
+
+    ResolveConflictResponse:
+      type: object
+      required:
+        - conflict_id
+        - status
+      properties:
+        conflict_id:
+          type: string
+        status:
+          type: string
+          enum: [resolved_accept_local, resolved_reverted]
+
+    ListConflictsResponse:
+      type: object
+      required:
+        - conflicts
+        - limit
+        - offset
+        - total
+      properties:
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogConflict'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer

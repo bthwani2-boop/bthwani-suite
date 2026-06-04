@@ -119,23 +119,36 @@ WHERE p.id = $1`
 	return record, nil
 }
 
-func (repo *PostgresRepository) ListProducts(ctx context.Context, storeID string, limit int, offset int) (domain.ListProductsResponse, error) {
-	countQuery := `SELECT COUNT(*) FROM dsh_catalog_products WHERE store_id = $1`
+func (repo *PostgresRepository) ListProducts(ctx context.Context, storeID string, approvalStatus string, limit int, offset int) (domain.ListProductsResponse, error) {
+	where := []string{"store_id = $1"}
+	args := []any{storeID}
+
+	if approvalStatus != "" {
+		args = append(args, approvalStatus)
+		where = append(where, fmt.Sprintf("approval_status = $%d", len(args)))
+	}
+
+	countQuery := fmt.Sprintf(`SELECT COUNT(*) FROM dsh_catalog_products WHERE %s`, strings.Join(where, " AND "))
 	var total int
-	if err := repo.db.QueryRowContext(ctx, countQuery, storeID).Scan(&total); err != nil {
+	if err := repo.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
 		return domain.ListProductsResponse{}, err
 	}
 
-	query := `
+	args = append(args, limit)
+	limitPlaceholder := len(args)
+	args = append(args, offset)
+	offsetPlaceholder := len(args)
+
+	query := fmt.Sprintf(`
 SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.category_id, p.approval_status, p.created_at, p.updated_at,
        o.price_override, o.stock_override, o.available_override
 FROM dsh_catalog_products p
 LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
-WHERE p.store_id = $1
+WHERE p.%s
 ORDER BY p.created_at DESC
-LIMIT $2 OFFSET $3`
+LIMIT $%d OFFSET $%d`, strings.Join(where, " AND p."), limitPlaceholder, offsetPlaceholder)
 
-	rows, err := repo.db.QueryContext(ctx, query, storeID, limit, offset)
+	rows, err := repo.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return domain.ListProductsResponse{}, err
 	}
@@ -386,6 +399,70 @@ RETURNING store_id, product_id, price_override, stock_override, available_overri
 			rec.AvailableOverride = &val
 		}
 
+		// Conflict Detection and Generation
+		var prodName string
+		var basePrice string
+		err = tx.QueryRowContext(ctx, "SELECT name, base_price_label FROM dsh_catalog_products WHERE id = $1", item.ProductID).Scan(&prodName, &basePrice)
+		if err != nil {
+			return domain.UpdateCatalogOverridesResponse{}, err
+		}
+
+		// Handle Price Override Conflict
+		if item.PriceOverride != nil {
+			pOverride := *item.PriceOverride
+			if pOverride != basePrice {
+				conflictID := fmt.Sprintf("conflict-%s-%s-price", storeID, item.ProductID)
+				conflictQuery := `
+INSERT INTO dsh_catalog_conflicts (id, store_id, product_id, conflict_type, central_value, override_value, status, created_at)
+VALUES ($1, $2, $3, 'price_divergence', $4, $5, 'pending', NOW())
+ON CONFLICT (id) DO UPDATE SET
+  override_value = EXCLUDED.override_value,
+  status = 'pending',
+  resolved_at = NULL`
+				_, err = tx.ExecContext(ctx, conflictQuery, conflictID, storeID, item.ProductID, basePrice, pOverride)
+				if err != nil {
+					return domain.UpdateCatalogOverridesResponse{}, err
+				}
+			} else {
+				_, err = tx.ExecContext(ctx, `
+UPDATE dsh_catalog_conflicts
+SET status = 'resolved_reverted', resolved_at = NOW()
+WHERE store_id = $1 AND product_id = $2 AND conflict_type = 'price_divergence' AND status = 'pending'`,
+					storeID, item.ProductID)
+				if err != nil {
+					return domain.UpdateCatalogOverridesResponse{}, err
+				}
+			}
+		}
+
+		// Handle Availability Override Conflict
+		if item.AvailableOverride != nil {
+			availOverride := *item.AvailableOverride
+			if !availOverride {
+				conflictID := fmt.Sprintf("conflict-%s-%s-availability", storeID, item.ProductID)
+				conflictQuery := `
+INSERT INTO dsh_catalog_conflicts (id, store_id, product_id, conflict_type, central_value, override_value, status, created_at)
+VALUES ($1, $2, $3, 'availability_divergence', 'true', 'false', 'pending', NOW())
+ON CONFLICT (id) DO UPDATE SET
+  override_value = EXCLUDED.override_value,
+  status = 'pending',
+  resolved_at = NULL`
+				_, err = tx.ExecContext(ctx, conflictQuery, conflictID, storeID, item.ProductID)
+				if err != nil {
+					return domain.UpdateCatalogOverridesResponse{}, err
+				}
+			} else {
+				_, err = tx.ExecContext(ctx, `
+UPDATE dsh_catalog_conflicts
+SET status = 'resolved_reverted', resolved_at = NOW()
+WHERE store_id = $1 AND product_id = $2 AND conflict_type = 'availability_divergence' AND status = 'pending'`,
+					storeID, item.ProductID)
+				if err != nil {
+					return domain.UpdateCatalogOverridesResponse{}, err
+				}
+			}
+		}
+
 		records = append(records, rec)
 		updatedCount++
 	}
@@ -595,4 +672,134 @@ RETURNING id, item_id, action, note, operator_id, created_at`
 	}
 
 	return rec, nil
+}
+
+func (repo *PostgresRepository) ListConflicts(ctx context.Context, storeID string, status string, limit int, offset int) (domain.ListConflictsResponse, error) {
+	where := []string{"1 = 1"}
+	args := []any{}
+
+	if storeID != "" {
+		args = append(args, storeID)
+		where = append(where, fmt.Sprintf("c.store_id = $%d", len(args)))
+	}
+
+	if status != "" {
+		args = append(args, status)
+		where = append(where, fmt.Sprintf("c.status = $%d", len(args)))
+	}
+
+	countQuery := fmt.Sprintf(`
+SELECT COUNT(*) FROM dsh_catalog_conflicts c
+WHERE %s`, strings.Join(where, " AND "))
+
+	var total int
+	if err := repo.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
+		return domain.ListConflictsResponse{}, err
+	}
+
+	args = append(args, limit)
+	limitPlaceholder := len(args)
+	args = append(args, offset)
+	offsetPlaceholder := len(args)
+
+	query := fmt.Sprintf(`
+SELECT c.id, c.store_id, c.product_id, p.name, c.conflict_type, c.central_value, c.override_value, c.status, c.resolved_at, c.created_at
+FROM dsh_catalog_conflicts c
+JOIN dsh_catalog_products p ON c.product_id = p.id
+WHERE %s
+ORDER BY c.created_at DESC
+LIMIT $%d OFFSET $%d`, strings.Join(where, " AND "), limitPlaceholder, offsetPlaceholder)
+
+	rows, err := repo.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return domain.ListConflictsResponse{}, err
+	}
+	defer rows.Close()
+
+	var conflicts []domain.CatalogConflict
+	for rows.Next() {
+		var c domain.CatalogConflict
+		var resolvedAt sql.NullTime
+		if err := rows.Scan(&c.ID, &c.StoreID, &c.ProductID, &c.ProductName, &c.ConflictType, &c.CentralValue, &c.OverrideValue, &c.Status, &resolvedAt, &c.CreatedAt); err != nil {
+			return domain.ListConflictsResponse{}, err
+		}
+		if resolvedAt.Valid {
+			c.ResolvedAt = &resolvedAt.Time
+		}
+		conflicts = append(conflicts, c)
+	}
+
+	return domain.ListConflictsResponse{
+		Conflicts: conflicts,
+		Limit:     limit,
+		Offset:    offset,
+		Total:     total,
+	}, nil
+}
+
+func (repo *PostgresRepository) ResolveConflict(ctx context.Context, id string, req domain.ResolveConflictRequest) (domain.ResolveConflictResponse, error) {
+	tx, err := repo.db.BeginTx(ctx, nil)
+	if err != nil {
+		return domain.ResolveConflictResponse{}, err
+	}
+	defer tx.Rollback()
+
+	var storeID string
+	var productID string
+	var conflictType string
+	var status string
+	err = tx.QueryRowContext(ctx, `
+SELECT store_id, product_id, conflict_type, status
+FROM dsh_catalog_conflicts
+WHERE id = $1`, id).Scan(&storeID, &productID, &conflictType, &status)
+	if err == sql.ErrNoRows {
+		return domain.ResolveConflictResponse{}, fmt.Errorf("conflict not found")
+	}
+	if err != nil {
+		return domain.ResolveConflictResponse{}, err
+	}
+
+	if status != "pending" {
+		return domain.ResolveConflictResponse{}, fmt.Errorf("conflict is already resolved")
+	}
+
+	dbStatus := ""
+	if req.Resolution == "accept_local" {
+		dbStatus = "resolved_accept_local"
+	} else if req.Resolution == "revert_to_central" {
+		dbStatus = "resolved_reverted"
+		if conflictType == "price_divergence" {
+			_, err = tx.ExecContext(ctx, `
+UPDATE dsh_catalog_overrides
+SET price_override = NULL, updated_at = NOW()
+WHERE store_id = $1 AND product_id = $2`, storeID, productID)
+		} else if conflictType == "availability_divergence" {
+			_, err = tx.ExecContext(ctx, `
+UPDATE dsh_catalog_overrides
+SET available_override = NULL, updated_at = NOW()
+WHERE store_id = $1 AND product_id = $2`, storeID, productID)
+		}
+		if err != nil {
+			return domain.ResolveConflictResponse{}, err
+		}
+	} else {
+		return domain.ResolveConflictResponse{}, fmt.Errorf("invalid resolution")
+	}
+
+	_, err = tx.ExecContext(ctx, `
+UPDATE dsh_catalog_conflicts
+SET status = $1, resolved_at = NOW()
+WHERE id = $2`, dbStatus, id)
+	if err != nil {
+		return domain.ResolveConflictResponse{}, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return domain.ResolveConflictResponse{}, err
+	}
+
+	return domain.ResolveConflictResponse{
+		ConflictID: id,
+		Status:     dbStatus,
+	}, nil
 }

@@ -58,6 +58,7 @@ import { resolveDshDiscoveryStoresBridge, type DshDiscoveryStoresBridgeResult } 
 import { resolveDshDiscoveryStoresRuntimeConfig } from './shared/dsh-discovery-stores-runtime-config';
 import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from './shared/dsh-discovery-stores-transport';
 import { resolveDshStoreClientVisibility } from '../shared/dsh-client-visibility.model';
+import { createDshProductApiHttpClient } from '../shared/dsh-product-api.transport';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
@@ -210,6 +211,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
   const [activeStoreDetail, setActiveStoreDetail] = React.useState<any | null>(null);
   const [storeDetailState, setStoreDetailState] = React.useState<'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'not-found'>('loading');
+  const [activeStoreItemsState, setActiveStoreItemsState] = React.useState<any[]>([]);
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [, setSelectedItemId] = React.useState<string>('');
@@ -601,6 +603,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         catalog_pricing_status: 'approved',
         marketing_visibility_status: 'active',
       });
+      setActiveStoreItemsState([]);
       setStoreDetailState('ready');
       return undefined;
     }
@@ -609,14 +612,45 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     let cancelled = false;
 
     const client = createDshDiscoveryStoresClient(config);
-    client.getDiscoveryStore(activeStoreId).then((response) => {
+    const prodClient = createDshProductApiHttpClient(config.baseUrl);
+
+    Promise.all([
+      client.getDiscoveryStore(activeStoreId),
+      prodClient.listProducts(activeStoreId, { limit: 100 })
+    ]).then(([storeResp, productsResp]) => {
       if (cancelled) return;
-      setActiveStoreDetail(response);
+      setActiveStoreDetail(storeResp);
+
+      const mappedItems = (productsResp.products || []).map((p: any) => {
+        const isAvailable = p.available_override !== false;
+        let clientVisibilityStatus: 'visible' | 'unavailable' | 'hidden' | 'removed' = 'hidden';
+        if (p.approval_status === 'catalog_adopted' || p.approval_status === 'client_visible') {
+          clientVisibilityStatus = isAvailable ? 'visible' : 'unavailable';
+        } else if (p.approval_status === 'rejected') {
+          clientVisibilityStatus = 'removed';
+        } else {
+          clientVisibilityStatus = 'hidden';
+        }
+
+        return {
+          id: p.id,
+          name: p.name,
+          subtitle: p.description || '',
+          priceLabel: p.price_override || p.base_price_label,
+          categoryId: p.category_id || 'general',
+          categoryLabel: p.category_id === 'grocery' || p.category_id === 'fresh' ? 'بقالة' : p.category_id === 'bakery' ? 'مخبوزات' : 'عام',
+          isAvailable,
+          clientVisibilityStatus,
+          publishStage: p.approval_status,
+        };
+      });
+
+      setActiveStoreItemsState(mappedItems);
       setStoreDetailState('ready');
     }).catch((err) => {
       if (cancelled) return;
       let detailErrorState: 'offline' | 'not-found' | 'error' = 'error';
-      if (isDshDiscoveryStoresOfflineError(err)) {
+      if (isDshDiscoveryStoresOfflineError(err) || (typeof err === 'object' && err !== null && (err as any).kind === 'offline')) {
         detailErrorState = 'offline';
       } else if (typeof err === 'object' && err !== null && (err as any).kind === 'http' && (err as any).status === 404) {
         detailErrorState = 'not-found';
@@ -629,7 +663,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     };
   }, [activeStoreId, route, activeStore]);
 
-  const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
+  const activeStoreItems = React.useMemo(() => activeStoreItemsState.length > 0 ? activeStoreItemsState : (storeItemsByStoreId[activeStore.id] ?? []), [activeStoreItemsState, activeStore.id]);
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
   const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
   const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
@@ -999,12 +1033,42 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           if (config && activeStoreId) {
             setStoreDetailState('loading');
             const client = createDshDiscoveryStoresClient(config);
-            client.getDiscoveryStore(activeStoreId).then((response) => {
-              setActiveStoreDetail(response);
+            const prodClient = createDshProductApiHttpClient(config.baseUrl);
+            Promise.all([
+              client.getDiscoveryStore(activeStoreId),
+              prodClient.listProducts(activeStoreId, { limit: 100 })
+            ]).then(([storeResp, productsResp]) => {
+              setActiveStoreDetail(storeResp);
+
+              const mappedItems = (productsResp.products || []).map((p: any) => {
+                const isAvailable = p.available_override !== false;
+                let clientVisibilityStatus: 'visible' | 'unavailable' | 'hidden' | 'removed' = 'hidden';
+                if (p.approval_status === 'catalog_adopted' || p.approval_status === 'client_visible') {
+                  clientVisibilityStatus = isAvailable ? 'visible' : 'unavailable';
+                } else if (p.approval_status === 'rejected') {
+                  clientVisibilityStatus = 'removed';
+                } else {
+                  clientVisibilityStatus = 'hidden';
+                }
+
+                return {
+                  id: p.id,
+                  name: p.name,
+                  subtitle: p.description || '',
+                  priceLabel: p.price_override || p.base_price_label,
+                  categoryId: p.category_id || 'general',
+                  categoryLabel: p.category_id === 'grocery' || p.category_id === 'fresh' ? 'بقالة' : p.category_id === 'bakery' ? 'مخبوزات' : 'عام',
+                  isAvailable,
+                  clientVisibilityStatus,
+                  publishStage: p.approval_status,
+                };
+              });
+
+              setActiveStoreItemsState(mappedItems);
               setStoreDetailState('ready');
             }).catch((err) => {
               let errState: 'offline' | 'not-found' | 'error' = 'error';
-              if (isDshDiscoveryStoresOfflineError(err)) {
+              if (isDshDiscoveryStoresOfflineError(err) || (typeof err === 'object' && err !== null && (err as any).kind === 'offline')) {
                 errState = 'offline';
               } else if (typeof err === 'object' && err !== null && (err as any).kind === 'http' && (err as any).status === 404) {
                 errState = 'not-found';
@@ -1012,6 +1076,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
               setStoreDetailState(errState);
             });
           } else {
+            setActiveStoreItemsState([]);
             setStoreDetailState('ready');
           }
         }}

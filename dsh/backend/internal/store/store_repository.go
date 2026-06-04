@@ -16,7 +16,7 @@ type Repository interface {
 	CreateProduct(ctx context.Context, storeID string, req domain.CreateProductRequest) (domain.ProductRecord, error)
 	UpdateProduct(ctx context.Context, productID string, req domain.UpdateProductRequest) (domain.ProductRecord, error)
 	GetProduct(ctx context.Context, productID string) (domain.ProductRecord, error)
-	ListProducts(ctx context.Context, storeID string, limit int, offset int) (domain.ListProductsResponse, error)
+	ListProducts(ctx context.Context, storeID string, approvalStatus string, limit int, offset int) (domain.ListProductsResponse, error)
 	// Category structure (J-002 / DSH-SLICE-002B)
 	CreateCategory(ctx context.Context, storeID string, req domain.CreateCategoryRequest) (domain.CategoryRecord, error)
 	UpdateCategory(ctx context.Context, categoryID string, req domain.UpdateCategoryRequest) (domain.CategoryRecord, error)
@@ -35,4 +35,8 @@ type Repository interface {
 
 	// Catalog approvals (J-002 / DSH-SLICE-002E)
 	CreateCatalogApproval(ctx context.Context, operatorID string, req domain.UpdateCatalogApprovalRequest) (domain.CatalogApprovalRecord, error)
+
+	// Catalog conflict audit (J-002 / DSH-SLICE-002G)
+	ListConflicts(ctx context.Context, storeID string, status string, limit int, offset int) (domain.ListConflictsResponse, error)
+	ResolveConflict(ctx context.Context, id string, req domain.ResolveConflictRequest) (domain.ResolveConflictResponse, error)
 }

@@ -9,8 +9,8 @@
 | Primary Actor | Client (app-client) |
 | Primary Surface | app-client / StoreDetailScreen / ProductListScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on 002E approval workflow and 001A store visibility; neither closed yet |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -27,20 +27,20 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-002F-01 | app-client | ProductListScreen | DEFERRED_WITH_REASON |
-| CM-002F-02 | backend | GET /stores/{id}/products (filtered) | DEFERRED_WITH_REASON |
+| CM-002F-01 | app-client | ProductListScreen | PASS |
+| CM-002F-02 | backend | GET /stores/{id}/products (filtered) | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| View product list | app-client | StoreDetailScreen | GET /stores/{id}/products | DEFERRED_WITH_REASON |
+| View product list | app-client | StoreDetailScreen | GET /stores/{id}/products | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| no approved products | yes | TBD |
-| products listed | yes | TBD |
-| loading | yes | TBD |
+| no approved products | yes | PASS |
+| products listed | yes | PASS |
+| loading | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -49,14 +49,14 @@
 | DSH-SLICE-001A | upstream | store must be discoverable |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 002E PASS + 001A PASS + listing endpoint designed + runtime proof
+- Runtime evidence: `GET /stores/{store_id}/products?approval_status=catalog_adopted` endpoint implemented in Go backend repository (`postgres_products_repository.go`) and handler (`products_handler.go`). Client application (`DshClientSurface.tsx`) queries the products from the live API in parallel with store details using `createDshProductApiHttpClient` when configured. Evidence captured in: `tools/registry/runs/DSH_SLICE_002F_LISTING_VISIBILITY_FINAL_CLOSURE-20260604-154100/`
+- Visual evidence: RTL Arabic store items screen renders approved/visible products and filters out unapproved ones (hidden/removed).
+- Exit gate: 002F PASS.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Upstream approval workflow (002E) not yet built |
-| **Dependency** | DSH-SLICE-002E; DSH-SLICE-001A |
-| **Next Action** | Close 002E; then design filtered listing endpoint |
+| **Slice Decision** | PASS |
+| **Reason** | Filtering parameter `approval_status` is fully supported by the Go backend, documented in OpenAPI schema, mapped in TypeScript client, and integrated in parallel in `app-client` StoreScreen / StoreItemsScreen. |
+| **Dependency** | None |
+| **Next Action** | Proceed to DSH-SLICE-002G catalog conflict / duplicate handling |

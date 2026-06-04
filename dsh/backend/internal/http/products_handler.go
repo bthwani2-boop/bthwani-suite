@@ -113,7 +113,9 @@ func (h *ProductsHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 		offset = parsed
 	}
 
-	resp, err := h.repository.ListProducts(r.Context(), storeID, limit, offset)
+	approvalStatus := strings.TrimSpace(r.URL.Query().Get("approval_status"))
+
+	resp, err := h.repository.ListProducts(r.Context(), storeID, approvalStatus, limit, offset)
 	if err != nil {
 		log.Printf("dsh-api: list products error: %v", err)
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list products")

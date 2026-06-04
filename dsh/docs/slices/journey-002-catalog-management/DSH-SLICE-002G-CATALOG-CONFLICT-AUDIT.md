@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / CatalogConflictAuditScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on 002D (partner overrides) and 002E (approval workflow) existing first |
+| Current Status | PASS |
+| Blocking Reason | none |
 
 ## Scope
 ### Included
@@ -27,37 +27,37 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-002G-01 | control-panel | CatalogConflictAuditScreen | DEFERRED_WITH_REASON |
-| CM-002G-02 | backend | GET /catalog-conflicts | DEFERRED_WITH_REASON |
+| CM-002G-01 | control-panel | CatalogConflictAuditScreen | PASS |
+| CM-002G-02 | backend | GET /catalog-conflicts | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Resolve conflict (accept local) | control-panel | CatalogConflictAuditScreen | POST /catalog-conflicts/{id}/resolve | DEFERRED_WITH_REASON |
-| Revert to central | control-panel | CatalogConflictAuditScreen | POST /catalog-conflicts/{id}/resolve | DEFERRED_WITH_REASON |
+| Resolve conflict (accept local) | control-panel | CatalogConflictAuditScreen | POST /catalog-conflicts/{id}/resolve | PASS |
+| Revert to central | control-panel | CatalogConflictAuditScreen | POST /catalog-conflicts/{id}/resolve | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| no conflicts | yes | TBD |
-| conflicts present | yes | TBD |
-| resolving | yes | TBD |
+| no conflicts | yes | PASS |
+| conflicts present | yes | PASS |
+| resolving | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
 |---|---|---|
-| DSH-SLICE-002D | upstream | overrides must exist before conflicts arise |
-| DSH-SLICE-002E | upstream | approval state affects conflict scope |
+| DSH-SLICE-002D | upstream | overrides must exist before conflicts arise | PASS |
+| DSH-SLICE-002E | upstream | approval state affects conflict scope | PASS |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_002G_CATALOG_CONFLICT_AUDIT_FINAL_CLOSURE-20260604-155900/`
+- Visual evidence: control-panel drawer UI wired and visually verified
 - Exit gate: 002D + 002E PASS + conflict API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No upstream overrides or approval workflow yet built |
-| **Dependency** | DSH-SLICE-002D, DSH-SLICE-002E |
-| **Next Action** | Design conflict resolution API after 002D/E are contracted |
+| **Slice Decision** | PASS |
+| **Reason** | Database migration applied; Go backend domain, repository, handler, HTTP routing; OpenAPI specifications; TypeScript API client extension; control-panel conflicts audit drawer UI wired with live resolutions. All tests and type checks pass. |
+| **Dependency** | none |
+| **Next Action** | none |
