@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / TaskScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on DSH-SLICE-005A (captain assignment) being proven |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -27,22 +27,22 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-005B-01 | app-captain | TaskScreen | DEFERRED_WITH_REASON |
-| CM-005B-02 | backend | POST /tasks/{id}/accept + /decline | DEFERRED_WITH_REASON |
+| CM-005B-01 | app-captain | TaskScreen | PASS |
+| CM-005B-02 | backend | POST /orders/{id}/accept-task + /decline-task | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Accept task | app-captain | TaskScreen | POST /tasks/{id}/accept | DEFERRED_WITH_REASON |
-| Decline task | app-captain | TaskScreen | POST /tasks/{id}/decline | DEFERRED_WITH_REASON |
+| Accept task | app-captain | TaskScreen | POST /orders/{id}/accept-task | PASS |
+| Decline task | app-captain | TaskScreen | POST /orders/{id}/decline-task | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| task pending | yes | TBD |
-| accepted | yes | TBD |
-| declined | yes | TBD |
-| timeout / auto-decline | yes | TBD |
+| task pending | yes | PASS |
+| accepted | yes | PASS |
+| declined | yes | PASS |
+| timeout / auto-decline | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -51,14 +51,14 @@
 | DSH-SLICE-005C | downstream | pickup handoff starts after accept |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 005A PASS + task accept/decline API designed + runtime proof
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005B_CAPTAIN_ACCEPT_DECLINE_FINAL_CLOSURE-20260605-043000/005B_api_results.json`
+- Visual evidence: DshCaptainOrderAcceptScreen & OfferDeclineSheet wired to live callbacks in DshCaptainSurface.tsx.
+- Exit gate: 005A PASS + task accept/decline API designed + runtime proof verified E2E.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Captain assignment (005A) not proven |
-| **Dependency** | DSH-SLICE-005A |
-| **Next Action** | Await 005A PASS; then design captain accept/decline API |
+| **Slice Decision** | PASS |
+| **Reason** | Backend API, TS bindings, and Captain UI wired and verified successfully. |
+| **Dependency** | None |
+| **Next Action** | none |

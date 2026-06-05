@@ -156,70 +156,78 @@ export function ItemApprovalScreen({
     apiBoundary: string;
   } | null>(null);
 
+  /** API error to surface to the user — cleared on next successful action */
+  const [actionError, setActionError] = React.useState<string | null>(null);
+
   const onApprove = React.useCallback(async (id: string) => {
+    setActionError(null);
     try {
       await client.updateCatalogApproval({
         item_id: id,
         action: 'approve',
         note: 'Approved via control-panel UI',
       });
+      // Only update local state after confirmed API success
+      if (propsOnApprove) {
+        propsOnApprove(id);
+        return;
+      }
+      const record = records.find((r) => r.id === id);
+      moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-catalog', 'اعتماد الكتالوج');
+      refresh();
+      setCrossSurfaceNotification({
+        itemCaption: record?.title ?? id,
+        targetSurface: 'control-panel/catalogs → طابور الاعتماد الموحد',
+        apiBoundary: 'POST /catalog-approvals',
+      });
     } catch (err) {
       console.error('Failed to approve catalog item:', err);
+      setActionError(`فشل الاعتماد — ${err instanceof Error ? err.message : 'خطأ غير متوقع'}`);
     }
-
-    if (propsOnApprove) {
-      propsOnApprove(id);
-      return;
-    }
-    const record = records.find((r) => r.id === id);
-    moveApprovalRecordToStage(id, 'catalog-adopted', 'control-panel-catalog', 'اعتماد الكتالوج');
-    refresh();
-    // GAP-L06 fix: show cross-surface notification so user knows where the item went
-    setCrossSurfaceNotification({
-      itemCaption: record?.title ?? id,
-      targetSurface: 'control-panel/catalogs → طابور الاعتماد الموحد',
-      apiBoundary: 'POST /catalog-approvals',
-    });
   }, [propsOnApprove, records, refresh, client]);
 
   const onReject = React.useCallback(async (id: string, evidenceNote: string) => {
+    setActionError(null);
     try {
       await client.updateCatalogApproval({
         item_id: id,
         action: 'reject',
         note: evidenceNote,
       });
+      // Only update local state after confirmed API success
+      if (propsOnReject) {
+        propsOnReject(id, evidenceNote);
+        return;
+      }
+      moveApprovalRecordToStage(id, 'rejected', 'control-panel-catalog', 'رفض الكتالوج');
+      upsertApprovalRecord({ id, metadata: { rejectionReason: evidenceNote } });
+      refresh();
     } catch (err) {
       console.error('Failed to reject catalog item:', err);
+      setActionError(`فشل الرفض — ${err instanceof Error ? err.message : 'خطأ غير متوقع'}`);
     }
-
-    if (propsOnReject) {
-      propsOnReject(id, evidenceNote);
-      return;
-    }
-    moveApprovalRecordToStage(id, 'rejected', 'control-panel-catalog', 'رفض الكتالوج');
-    upsertApprovalRecord({ id, metadata: { rejectionReason: evidenceNote } });
-    refresh();
   }, [propsOnReject, refresh, client]);
 
   const onRequestRevision = React.useCallback(async (id: string, evidenceNote: string) => {
+    setActionError(null);
     try {
       await client.updateCatalogApproval({
         item_id: id,
         action: 'needs-fix',
         note: evidenceNote,
       });
+      // Only update local state after confirmed API success
+      if (propsOnRequestRevision) {
+        propsOnRequestRevision(id, evidenceNote);
+        return;
+      }
+      moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-catalog', 'طلب تعديل الكتالوج');
+      upsertApprovalRecord({ id, metadata: { requiredFix: evidenceNote } });
+      refresh();
     } catch (err) {
       console.error('Failed to request revision for catalog item:', err);
+      setActionError(`فشل طلب التعديل — ${err instanceof Error ? err.message : 'خطأ غير متوقع'}`);
     }
-
-    if (propsOnRequestRevision) {
-      propsOnRequestRevision(id, evidenceNote);
-      return;
-    }
-    moveApprovalRecordToStage(id, 'needs-fix', 'control-panel-catalog', 'طلب تعديل الكتالوج');
-    upsertApprovalRecord({ id, metadata: { requiredFix: evidenceNote } });
-    refresh();
   }, [propsOnRequestRevision, refresh, client]);
 
   const pendingCount = items.filter((i) => i.status === 'pending').length;
@@ -257,6 +265,41 @@ export function ItemApprovalScreen({
         description="مراجعة واعتماد العناصر المقدَّمة من الشركاء قبل نشرها. الرفض والتعديل يتطلبان ملاحظة إثبات."
         metrics={[{ id: 'pending', title: 'بانتظار الاعتماد', value: String(pendingCount) }]}
       />
+
+      {/* API error banner — shown when any action fails, user must be aware */}
+      {actionError && (
+        <div
+          role="alert"
+          style={{
+            margin: '0 16px 10px',
+            padding: '10px 14px',
+            borderRadius: 8,
+            backgroundColor: `${theme.danger as string}10`,
+            border: `1px solid ${theme.danger as string}40`,
+            borderRight: `4px solid ${theme.danger as string}`,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 10,
+          }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 700, color: theme.danger as string, flex: 1 }}>
+            ✗ {actionError}
+          </div>
+          <button
+            type="button"
+            onClick={() => setActionError(null)}
+            style={{
+              appearance: 'none', border: 'none', background: 'transparent',
+              cursor: 'pointer', fontSize: 14, color: theme.textMuted,
+              padding: '0 2px', lineHeight: 1, flexShrink: 0,
+            }}
+            aria-label="إغلاق رسالة الخطأ"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* GAP-L06: Cross-surface notification — appears after approve action */}
       {crossSurfaceNotification && (
@@ -545,7 +588,12 @@ export function ItemApprovalScreen({
                         />
                       </Box>
                     ) : (
-                      <Text role="caption" tone="success">✓ معتمد</Text>
+                      <Text
+                        role="caption"
+                        tone={statusTone[item.status] === 'success' ? 'success' : statusTone[item.status] === 'danger' ? 'danger' : 'warning'}
+                      >
+                        {item.status === 'approved' ? '✓ ' : ''}{statusLabel[item.status]}
+                      </Text>
                     )}
                   </td>
                 </tr>

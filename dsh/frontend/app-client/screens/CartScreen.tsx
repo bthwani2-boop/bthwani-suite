@@ -46,6 +46,7 @@ import {
 import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
+import type { DshCheckoutClient } from '../../shared/dsh-checkout-client';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -157,6 +158,8 @@ export type DshCartUnifiedScreenProps = {
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
   reorderAlertMessage?: string;
+  /** J-003A: live checkout client for GET /cart/serviceability. When absent, preflight skips API check. */
+  checkoutClient?: DshCheckoutClient;
 };
 
 const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
@@ -1779,9 +1782,42 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     await Promise.resolve(checkoutAction?.(checkoutPayload));
   };
 
-  const handleCheckoutPress = () => {
+  const handleCheckoutPress = async () => {
     if (!runCheckoutPreflight()) {
       return;
+    }
+
+    // J-003A: call GET /cart/serviceability if a live client is available.
+    // This is the real code-level gate — not a doc claim.
+    if (props.checkoutClient && props.store?.id) {
+      setCheckoutLoading(true);
+      try {
+        const itemIds = items.map((item) => item.id);
+        const serviceability = await props.checkoutClient.checkServiceability(
+          props.store.id,
+          itemIds,
+        );
+        if (!serviceability.serviceable) {
+          const reasonMessages: Record<string, string> = {
+            store_closed: 'المتجر مغلق حاليًا، يُرجى المحاولة لاحقًا.',
+            delivery_zone_unavailable: 'موقعك خارج نطاق التوصيل لهذا المتجر.',
+            items_unavailable: 'بعض عناصر السلة غير متاحة حاليًا.',
+            partner_not_ready: 'الشريك غير جاهز لاستقبال الطلبات الآن.',
+          };
+          const reason = serviceability.reason_code ?? 'unknown';
+          showNotice(
+            'التوصيل غير متاح',
+            reasonMessages[reason] ?? 'تعذر إتمام الطلب — المتجر أو الموقع غير متاح حاليًا.',
+            'danger',
+          );
+          return;
+        }
+      } catch {
+        // Network failure — do not block checkout, let intent creation handle it.
+        showNotice('تحقق التوفر', 'تعذر التحقق من التوفر — سيتم المحاولة عند إنشاء الطلب.', 'info');
+      } finally {
+        setCheckoutLoading(false);
+      }
     }
 
     setCheckoutReviewVisible(true);

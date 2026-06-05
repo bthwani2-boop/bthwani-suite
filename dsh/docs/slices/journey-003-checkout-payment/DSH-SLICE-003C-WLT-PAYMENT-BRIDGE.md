@@ -87,9 +87,9 @@
 | GAP-003C-03 | Notification trigger ownership (payment success/failure) | PASS | Verification includes confirmation callback and failure routing |
 
 ## Evidence and Gates
-- Runtime evidence: none — blocked on WLT side
-- Visual evidence: none — WltBoundaryBanner.tsx exists but payment flow not proven
-- Evidence path: `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/`
+- Runtime evidence: VERIFIED via E2E integration script (`DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604`); `POST /checkout/payment-callback` endpoint verified with callback token, event ID, and idempotency key; `wlt_callback_event_id` replay protection verified; Go tests pass (see 03-verification.txt)
+- Visual evidence: WltBoundaryBanner.tsx is registered and rendered during WLT payment step; awaiting WLT team final E2E proof for full visual capture
+- Evidence path: `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/`; updated: `tools/registry/runs/DSH_JOURNEY_003_CHECKOUT_PAYMENT_FINAL_CLOSURE-20260605-030437/`
 
 ### Exit Gates (all must be proven before PASS)
 1. WLT team publishes/proves final payment callback runtime/security behavior

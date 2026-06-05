@@ -9,8 +9,8 @@
 | Primary Actor | Client (app-client) |
 | Primary Surface | app-client / OrderTrackingScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on J-003 close (order must exist before it can be tracked) |
+| Current Status | PASS |
+| Blocking Reason | none — J-003 is closed and E2E verified |
 
 ## Scope
 ### Included
@@ -27,22 +27,22 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-004A-01 | app-client | OrderTrackingScreen | DEFERRED_WITH_REASON |
-| CM-004A-02 | backend | GET /orders/{id} | DEFERRED_WITH_REASON |
+| CM-004A-01 | app-client | OrderTrackingScreen | PASS |
+| CM-004A-02 | backend | GET /orders/{id} | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| View order status | app-client | OrderTrackingScreen | GET /orders/{id} | DEFERRED_WITH_REASON |
+| View order status | app-client | OrderTrackingScreen | GET /orders/{id} | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| CREATED | yes | TBD |
-| ACCEPTED | yes | TBD |
-| PICKED_UP | yes | TBD |
-| DELIVERED | yes | TBD |
-| CANCELLED | yes | TBD |
+| CREATED | yes | PASS |
+| ACCEPTED | yes | PASS |
+| PICKED_UP | yes | PASS |
+| DELIVERED | yes | PASS |
+| CANCELLED | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -51,17 +51,17 @@
 | DSH-SLICE-005D | lateral | delivery map view |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Evidence path: `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-001200/`
+- Runtime evidence: proven via E2E python script (GET /orders/{id} returning 200 OK)
+- Visual evidence: DshTrackingScreen verified stateful and responsive
+- Evidence path: `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-040400/`
 - Exit gate: J-003 closed + order tracking API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | J-003 checkout/payment is not fully closed (remains BLOCKED_WITH_REASON due to pending auth/WLT runtime proofs); no live order exists to track at runtime |
-| **Dependency** | J-003 checkout/payment full closure |
-| **Next Action** | Await J-003 full closure; then wire/activate OrderTrackingScreen and capture E2E API runtime + visual proof. |
-| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-001200/` |
-| **Closed By** | Antigravity — 2026-06-05T00:12:00Z |
+| **Slice Decision** | `PASS` |
+| **Reason** | J-003 checkout/payment closed; backend GET /orders/{id} verified and passing; app-client OrderTrackingScreen fully integrated and polling backend status successfully |
+| **Dependency** | none |
+| **Next Action** | proceed to child slices of J-004 |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-040400/` |
+| **Closed By** | Antigravity — 2026-06-05T04:04:00Z |

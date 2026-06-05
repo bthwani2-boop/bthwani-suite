@@ -12,6 +12,10 @@ import {
   DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
 } from '../../data/orders.preview-data';
 import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
+import {
+  resolveDshOrderApiBaseUrl,
+  createDshOrderLifecycleHttpClient,
+} from '../../shared';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
@@ -91,26 +95,57 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const handleConfirmAssignment = React.useCallback((orderId: string, captainName: string) => {
     setActionStatus('pending');
 
-    setTimeout(() => {
-      setActionStatus('success');
+    const baseUrl = resolveDshOrderApiBaseUrl();
+    if (baseUrl) {
+      const client = createDshOrderLifecycleHttpClient(baseUrl);
+      client.assignCaptain(orderId, { captain_id: captainName })
+        .then(() => {
+          setActionStatus('success');
+          setTimeout(() => {
+            setRows((prevRows) =>
+              prevRows.map((r) =>
+                r.id === orderId
+                  ? {
+                      ...r,
+                      assignedCaptain: captainName,
+                      customStatus: 'تم الإسناد للكابتن',
+                      customStatusTone: 'success',
+                    }
+                  : r
+              )
+            );
+            setActionStatus('idle');
+            setSelectedRowId(null);
+            router.push(buildOperationsHref('dispatch-assignment'));
+          }, 1000);
+        })
+        .catch((err) => {
+          console.error('Failed to assign captain via API:', err);
+          setActionStatus('idle');
+        });
+    } else {
+      // Fallback for preview/local dev without active API
       setTimeout(() => {
-        setRows((prevRows) =>
-          prevRows.map((r) =>
-            r.id === orderId
-              ? {
-                  ...r,
-                  assignedCaptain: captainName,
-                  customStatus: 'تم الإسناد للكابتن',
-                  customStatusTone: 'success',
-                }
-              : r
-          )
-        );
-        setActionStatus('idle');
-        setSelectedRowId(null);
-        router.push(buildOperationsHref('dispatch-assignment'));
-      }, 1000);
-    }, 1200);
+        setActionStatus('success');
+        setTimeout(() => {
+          setRows((prevRows) =>
+            prevRows.map((r) =>
+              r.id === orderId
+                ? {
+                    ...r,
+                    assignedCaptain: captainName,
+                    customStatus: 'تم الإسناد للكابتن',
+                    customStatusTone: 'success',
+                  }
+                : r
+            )
+          );
+          setActionStatus('idle');
+          setSelectedRowId(null);
+          router.push(buildOperationsHref('dispatch-assignment'));
+        }, 1000);
+      }, 1200);
+    }
   }, [router]);
 
   const summaryKpi = [

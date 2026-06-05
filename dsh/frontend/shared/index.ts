@@ -632,6 +632,7 @@ export {
 // --- Checkout client (J-003A / 003B / 003E) ---
 export type {
   DshCheckoutFetchFn,
+  DshCheckoutAuthContext,
   DshCheckoutOfflineError,
   DshCheckoutHttpError,
   DshCheckoutError,

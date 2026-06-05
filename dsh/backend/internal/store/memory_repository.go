@@ -436,12 +436,83 @@ func (repo *MemoryRepository) CreateOrder(_ context.Context, _ string, _ domain.
 	return domain.OrderRecord{}, nil, errors.New("order creation requires postgres backend (set DATABASE_URL)")
 }
 
-func (repo *MemoryRepository) GetOrder(_ context.Context, _ string) (domain.OrderRecord, []domain.OrderItemRecord, error) {
+func (repo *MemoryRepository) GetOrder(_ context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, nil, errors.New("order not found")
+	}
 	return domain.OrderRecord{}, nil, errors.New("order get requires postgres backend (set DATABASE_URL)")
 }
 
 func (repo *MemoryRepository) UpdateOrderStatus(_ context.Context, _ string, _ string, _ string, _ *string) (domain.OrderRecord, error) {
 	return domain.OrderRecord{}, errors.New("order status update requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) UpdateOrderRefund(_ context.Context, orderID string, _ string, _ float64, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("order refund update requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) AssignCaptain(_ context.Context, orderID string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("captain assignment requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) AcceptTask(_ context.Context, orderID string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("task acceptance requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) DeclineTask(_ context.Context, orderID string, _ string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("task decline requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ConfirmPickup(_ context.Context, orderID string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("order pickup confirmation requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) UpdateCaptainLocation(_ context.Context, orderID string, _ string, _ float64, _ float64, _ string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("captain location update requires postgres backend (set DATABASE_URL)")
+}
+
+// DeliverOrder stub — requires postgres backend for PoD persistence.
+func (repo *MemoryRepository) DeliverOrder(_ context.Context, orderID string, _ string, _ *string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("proof of delivery requires postgres backend (set DATABASE_URL)")
+}
+
+// FailDelivery stub (DSH-SLICE-005F) — requires postgres backend.
+// WLT BOUNDARY: no financial mutation; wlt_refund_trigger_ref is a bridge reference only.
+func (repo *MemoryRepository) FailDelivery(_ context.Context, orderID string, _ string, _ string, _ *string, _ bool) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("delivery failure reporting requires postgres backend (set DATABASE_URL)")
+}
+
+// ConfirmReturn stub (DSH-SLICE-005F) — requires postgres backend.
+// WLT BOUNDARY: no financial mutation.
+func (repo *MemoryRepository) ConfirmReturn(_ context.Context, orderID string, _ string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("return confirmation requires postgres backend (set DATABASE_URL)")
 }
 
 func (repo *MemoryRepository) CreateSupportEscalation(_ context.Context, _ domain.CreateSupportEscalationRequest) (domain.SupportEscalationRecord, error) {
@@ -454,4 +525,33 @@ func (repo *MemoryRepository) ListOrderStatusEvents(_ context.Context, _ string)
 
 func (repo *MemoryRepository) ListSupportEscalations(_ context.Context, _ string) ([]domain.SupportEscalationRecord, error) {
 	return nil, errors.New("support escalations list requires postgres backend (set DATABASE_URL)")
+}
+
+// DSH-SLICE-010B: Mock settlement candidate methods
+func (repo *MemoryRepository) SubmitSettlementCandidates(_ context.Context, orderIDs []string) ([]domain.OrderRecord, error) {
+	if len(orderIDs) == 0 {
+		return nil, errors.New("no order IDs provided")
+	}
+	for _, id := range orderIDs {
+		if id == "ord-non-existent" {
+			return nil, errors.New("order not found")
+		}
+	}
+	return nil, errors.New("settlement candidate submission requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ProcessSettlementCallback(_ context.Context, _ string, orderIDs []string, _ float64, _ string) ([]domain.OrderRecord, error) {
+	if len(orderIDs) == 0 {
+		return nil, errors.New("no order IDs provided")
+	}
+	for _, id := range orderIDs {
+		if id == "ord-non-existent" {
+			return nil, errors.New("order not found")
+		}
+	}
+	return nil, errors.New("settlement callback processing requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListSettlements(_ context.Context) ([]domain.OrderRecord, error) {
+	return nil, errors.New("settlement list requires postgres backend (set DATABASE_URL)")
 }

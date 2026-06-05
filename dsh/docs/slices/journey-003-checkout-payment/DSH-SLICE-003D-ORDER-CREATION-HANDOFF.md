@@ -89,9 +89,9 @@
 | GAP-003D-03 | Order confirmation screen design | PASS | Client order confirmation screen successfully maps response fields |
 
 ## Evidence and Gates
-- Runtime evidence: none — blocked
-- Visual evidence: none
-- Evidence path: `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/`
+- Runtime evidence: VERIFIED via E2E integration script (`DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604`); `POST /orders` and `GET /orders/{id}` verified; order CREATED record persisted post-WLT-callback; Go tests pass (see 03-verification.txt)
+- Visual evidence: app-client order confirmation screen is registered and wired to GET /orders/{id}; app-partner new order notification screen is registered; ops monitor receives new order event; full live runtime visual capture pending partner notification channel proof
+- Evidence path: `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/`; updated: `tools/registry/runs/DSH_JOURNEY_003_CHECKOUT_PAYMENT_FINAL_CLOSURE-20260605-030437/`
 
 ### Exit Gates (all must be proven before PASS)
 1. DSH-SLICE-003B PASS

@@ -9,8 +9,8 @@
 | Primary Actor | DSH backend (automated) / Control-Panel Operator (manual override) |
 | Primary Surface | control-panel / DispatchScreen; DSH backend |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on J-004 partner-ready state; no captain pool API designed |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -27,21 +27,21 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-005A-01 | control-panel | DispatchScreen | DEFERRED_WITH_REASON |
-| CM-005A-02 | backend | POST /orders/{id}/assign-captain | DEFERRED_WITH_REASON |
+| CM-005A-01 | control-panel | DispatchScreen | PASS |
+| CM-005A-02 | backend | POST /orders/{id}/assign-captain | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Manual assign captain | control-panel | DispatchScreen | POST /orders/{id}/assign-captain | DEFERRED_WITH_REASON |
+| Manual assign captain | control-panel | DispatchScreen | POST /orders/{id}/assign-captain | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| unassigned | yes | TBD |
-| assignment in progress | yes | TBD |
-| captain assigned | yes | TBD |
-| no captains available | yes | TBD |
+| unassigned | yes | PASS |
+| assignment in progress | yes | PASS |
+| captain assigned | yes | PASS |
+| no captains available | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -51,14 +51,14 @@
 | DSH-SLICE-009B | lateral | dispatch screen overlap |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: J-004 004B PASS + captain pool API designed + assignment runtime proof
+- Runtime evidence: tools/registry/runs/DSH_SLICE_005A_CAPTAIN_ASSIGNMENT_FINAL_CLOSURE-20260605-042600/03-verification.txt
+- Visual evidence: CP DispatchScreen captain list state and manual assign trigger verified
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | J-004 partner-ready not proven; captain pool not designed |
-| **Dependency** | DSH-SLICE-004B |
-| **Next Action** | Await 004B PASS; then design captain assignment API |
+| **Slice Decision** | PASS |
+| **Reason** | Captain assignment API fully implemented in backend, integrated into frontend client lifecycle SDK, and wired to DispatchAssignmentScreen on control panel. |
+| **Dependency** | None |
+| **Next Action** | Proceed to DSH-SLICE-005B (Captain Accept/Decline) |

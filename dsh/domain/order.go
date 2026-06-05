@@ -3,22 +3,53 @@ package domain
 import "time"
 
 const (
-	StatusCreated        = "CREATED"
-	StatusAccepted       = "ACCEPTED"
-	StatusReadyForPickup = "READY_FOR_PICKUP"
-	StatusDelivered      = "DELIVERED"
-	StatusCancelled      = "CANCELLED"
+	StatusCreated            = "CREATED"
+	StatusAccepted           = "ACCEPTED"
+	StatusReadyForPickup     = "READY_FOR_PICKUP"
+	StatusDelivered          = "DELIVERED"
+	StatusCancelled          = "CANCELLED"
+	StatusRefunded           = "REFUNDED"
+	StatusAcceptedByCaptain  = "ACCEPTED_BY_CAPTAIN"
+	StatusPickedUp           = "PICKED_UP"
+	StatusEnRoute            = "EN_ROUTE"
+	StatusArrived            = "ARRIVED"
+	// DSH-SLICE-005F: delivery failure states.
+	// WLT BOUNDARY: refund execution is WLT responsibility (004E). DSH records reference only.
+	StatusFailedDelivery     = "FAILED_DELIVERY"
+	StatusReturningToStore   = "RETURNING_TO_STORE"
+	StatusReturned           = "RETURNED"
+
+	// DSH-SLICE-010B: Settlement Candidate status constants
+	SettlementStatusNotSettled = "NOT_SETTLED"
+	SettlementStatusPending    = "SETTLEMENT_PENDING"
+	SettlementStatusSettled    = "SETTLED"
+	SettlementStatusFailed     = "SETTLEMENT_FAILED"
 )
 
 type OrderRecord struct {
-	ID               string    `json:"id"`
-	StoreID          string    `json:"store_id"`
-	ClientID         string    `json:"client_id"`
-	Status           string    `json:"status"`
-	TotalPrice       float64   `json:"total_price"`
-	WltPaymentRefID  *string   `json:"wlt_payment_ref_id,omitempty"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID                     string    `json:"id"`
+	StoreID                string    `json:"store_id"`
+	ClientID               string    `json:"client_id"`
+	Status                 string    `json:"status"`
+	TotalPrice             float64   `json:"total_price"`
+	WltPaymentRefID        *string   `json:"wlt_payment_ref_id,omitempty"`
+	WltRefundRefID         *string   `json:"wlt_refund_ref_id,omitempty"`
+	RefundAmount           *float64  `json:"refund_amount,omitempty"`
+	CaptainID              *string   `json:"captain_id,omitempty"`
+	CaptainLatitude        *float64  `json:"captain_latitude,omitempty"`
+	CaptainLongitude       *float64  `json:"captain_longitude,omitempty"`
+	CaptainLifecycleStatus *string   `json:"captain_lifecycle_status,omitempty"`
+	PodMediaKey            *string   `json:"pod_media_key,omitempty"`
+	// DSH-SLICE-005F: delivery failure fields.
+	// WltRefundTriggerRef is a bridge reference for WLT to execute refund — DSH does NOT mutate finances.
+	DeliveryFailureReason *string  `json:"delivery_failure_reason,omitempty"`
+	WltRefundTriggerRef   *string  `json:"wlt_refund_trigger_ref,omitempty"`
+	// DSH-SLICE-010B: order settlements fields.
+	WltSettlementRefID *string  `json:"wlt_settlement_ref_id,omitempty"`
+	SettlementStatus   string   `json:"settlement_status"`
+	SettlementAmount   *float64 `json:"settlement_amount,omitempty"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
 }
 
 type OrderItemRecord struct {
@@ -65,9 +96,36 @@ type CreateOrderRequest struct {
 }
 
 type UpdateOrderStatusRequest struct {
-	Actor string  `json:"actor"`
-	Status string `json:"status"`
-	Note  *string `json:"note,omitempty"`
+	Actor  string  `json:"actor"`
+	Status string  `json:"status"`
+	Note   *string `json:"note,omitempty"`
+}
+
+// DeliverOrderRequest — PoD submission (DSH-SLICE-005E).
+// PodMediaKey is a reference to the media-fixtures key; DSH never stores raw binaries.
+// WLT payout is NOT triggered here; payout is WLT responsibility after DELIVERED event.
+type DeliverOrderRequest struct {
+	CaptainID   string  `json:"captain_id"`
+	PodMediaKey *string `json:"pod_media_key,omitempty"`
+}
+
+// FailDeliveryRequest — delivery failure reporting (DSH-SLICE-005F).
+// Captain reports why delivery failed (client unreachable, wrong address, refused, etc.).
+// DSH transitions ARRIVED → FAILED_DELIVERY and records the reason.
+// WLT BOUNDARY: refund execution belongs to WLT (004E). DSH sends WltRefundTriggerRef
+// as a reference ID for WLT to act on — DSH does NOT mutate wallet/ledger/refund amounts.
+// ReturnRequired indicates captain must return item to the store (RETURNING_TO_STORE path).
+type FailDeliveryRequest struct {
+	CaptainID           string  `json:"captain_id"`
+	FailureReason       string  `json:"failure_reason"` // required: reason for failure
+	WltRefundTriggerRef *string `json:"wlt_refund_trigger_ref,omitempty"` // WLT bridge ref; DSH stores only
+	ReturnRequired      bool    `json:"return_required"`
+}
+
+// ConfirmReturnRequest — captain confirms item returned to store (RETURNING_TO_STORE → RETURNED).
+type ConfirmReturnRequest struct {
+	CaptainID string `json:"captain_id"`
+	Note      string `json:"note,omitempty"`
 }
 
 type CreateSupportEscalationRequest struct {

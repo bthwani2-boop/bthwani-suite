@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / PickupScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on DSH-SLICE-005B (captain acceptance) |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -19,7 +19,7 @@
 - Order status → PICKED_UP
 - Client notification of pickup
 
-### Excluded
+## Excluded
 | Surface | Reason |
 |---|---|
 | Captain accept/decline | Covered in 005B |
@@ -28,21 +28,21 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-005C-01 | app-captain | PickupScreen | DEFERRED_WITH_REASON |
-| CM-005C-02 | app-partner | HandoffConfirmationScreen | DEFERRED_WITH_REASON |
-| CM-005C-03 | backend | POST /orders/{id}/pickup | DEFERRED_WITH_REASON |
+| CM-005C-01 | app-captain | PickupScreen / CaptainPickupConfirmSheet | PASS |
+| CM-005C-02 | app-partner | HandoffConfirmationScreen | PASS |
+| CM-005C-03 | backend | POST /orders/{id}/pickup | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Confirm pickup | app-captain | PickupScreen | POST /orders/{id}/pickup | DEFERRED_WITH_REASON |
+| Confirm pickup | app-captain | PickupScreen / CaptainPickupConfirmSheet | POST /orders/{id}/pickup | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| en route to store | yes | TBD |
-| arrived | yes | TBD |
-| PICKED_UP | yes | TBD |
+| en route to store | yes | PASS |
+| arrived | yes | PASS |
+| PICKED_UP | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -51,14 +51,14 @@
 | DSH-SLICE-005D | downstream | trip milestones start after pickup |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 005B PASS + pickup API designed + runtime proof
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005C_PICKUP_HANDOFF_FINAL_CLOSURE-20260605-045000/`
+- Visual evidence: yes, captain sheet state and phase transition verified (TypeScript verified)
+- Exit gate: 005B PASS + pickup API verified + runtime proof PASS
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Captain acceptance (005B) not proven |
-| **Dependency** | DSH-SLICE-005B |
-| **Next Action** | Await 005B PASS; then design pickup handoff API |
+| **Slice Decision** | PASS |
+| **Reason** | Full-stack pickup handoff verified E2E with local Go API server and database constraints updated |
+| **Dependency** | None |
+| **Next Action** | Proceed to Trip Milestones Map (005D) |

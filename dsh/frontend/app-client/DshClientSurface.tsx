@@ -229,6 +229,12 @@ export function DshClientSurface({ command, onExit, onOpenService, authToken, de
     () => resolveCheckoutAuthContext(authToken, devClientId),
     [authToken, devClientId],
   );
+  // J-003A: stable client instance — recreated only when base URL or auth changes.
+  const checkoutClientMemo = React.useMemo(() => {
+    const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
+    return apiConfig ? createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth) : undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutAuth]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<string>('wallet');
   const [checkoutState, setCheckoutState] = React.useState<'ready' | 'loading' | 'payment-failed'>('ready');
   const [paymentErrorMessage, setPaymentErrorMessage] = React.useState<string>('');
@@ -1391,51 +1397,14 @@ export function DshClientSurface({ command, onExit, onOpenService, authToken, de
         }}
         statusTitle={cartClientStateMeta.label}
         statusDescription={cartClientStateMeta.description}
+        checkoutClient={checkoutClientMemo}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
         onOpenOrder={async () => {
-          const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
-          if (apiConfig && cartItems.length > 0) {
-            setServiceabilityLoading(true);
-            try {
-              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
-              const itemIds = cartItems.map((item) => item.id);
-              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, checkoutAuth.clientId ?? '');
-              if (!result.serviceable) {
-                setServiceabilityLoading(false);
-                setReorderAlertMessage('هذا المتجر أو بعض العناصر غير متاحة للتوصيل الآن.');
-                return;
-              }
-            } catch {
-              setServiceabilityLoading(false);
-              setReorderAlertMessage('تعذر التحقق من قابلية التوصيل عبر الخادم. حاول مرة أخرى.');
-              return;
-            }
-            setServiceabilityLoading(false);
-          }
           setCheckoutIntentId(null);
           setRoute('checkout-intent');
         }}
         onContinue={async () => {
-          const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
-          if (apiConfig && cartItems.length > 0) {
-            setServiceabilityLoading(true);
-            try {
-              const checkoutClient: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
-              const itemIds = cartItems.map((item) => item.id);
-              const result = await checkoutClient.checkServiceability(activeStore.id, itemIds, checkoutAuth.clientId ?? '');
-              if (!result.serviceable) {
-                setServiceabilityLoading(false);
-                setReorderAlertMessage('هذا المتجر أو بعض العناصر غير متاحة للتوصيل الآن.');
-                return;
-              }
-            } catch {
-              setServiceabilityLoading(false);
-              setReorderAlertMessage('تعذر التحقق من قابلية التوصيل عبر الخادم. حاول مرة أخرى.');
-              return;
-            }
-            setServiceabilityLoading(false);
-          }
           setCheckoutIntentId(null);
           setRoute('checkout-intent');
         }}

@@ -50,7 +50,26 @@ type Repository interface {
 	CreateOrder(ctx context.Context, storeID string, req domain.CreateOrderRequest) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	GetOrder(ctx context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, actor string, status string, note *string) (domain.OrderRecord, error)
+	UpdateOrderRefund(ctx context.Context, orderID string, refundRefID string, amount float64, status string) (domain.OrderRecord, error)
+	AssignCaptain(ctx context.Context, orderID string, captainID string) (domain.OrderRecord, error)
+	AcceptTask(ctx context.Context, orderID string, captainID string) (domain.OrderRecord, error)
+	DeclineTask(ctx context.Context, orderID string, captainID string, reason string) (domain.OrderRecord, error)
+	ConfirmPickup(ctx context.Context, orderID string, captainID string) (domain.OrderRecord, error)
+	UpdateCaptainLocation(ctx context.Context, orderID string, captainID string, lat float64, lng float64, lifecycleStatus string, orderStatus string) (domain.OrderRecord, error)
+	// DeliverOrder (J-005 / DSH-SLICE-005E) — marks order DELIVERED, stores PoD media key. WLT payout is external.
+	DeliverOrder(ctx context.Context, orderID string, captainID string, podMediaKey *string) (domain.OrderRecord, error)
+	// FailDelivery (J-005 / DSH-SLICE-005F) — reports delivery failure (ARRIVED → FAILED_DELIVERY or RETURNING_TO_STORE).
+	// WLT BOUNDARY: wltRefundTriggerRef is a bridge reference only; DSH does NOT execute refunds.
+	FailDelivery(ctx context.Context, orderID string, captainID string, failureReason string, wltRefundTriggerRef *string, returnRequired bool) (domain.OrderRecord, error)
+	// ConfirmReturn (J-005 / DSH-SLICE-005F) — confirms item returned to store (RETURNING_TO_STORE → RETURNED).
+	// WLT BOUNDARY: no financial mutation.
+	ConfirmReturn(ctx context.Context, orderID string, captainID string, note string) (domain.OrderRecord, error)
 	CreateSupportEscalation(ctx context.Context, req domain.CreateSupportEscalationRequest) (domain.SupportEscalationRecord, error)
 	ListOrderStatusEvents(ctx context.Context, orderID string) ([]domain.OrderStatusEventRecord, error)
 	ListSupportEscalations(ctx context.Context, orderID string) ([]domain.SupportEscalationRecord, error)
+
+	// DSH-SLICE-010B: Settlement Candidate repository methods
+	SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error)
+	ProcessSettlementCallback(ctx context.Context, settlementRefID string, orderIDs []string, amount float64, status string) ([]domain.OrderRecord, error)
+	ListSettlements(ctx context.Context) ([]domain.OrderRecord, error)
 }

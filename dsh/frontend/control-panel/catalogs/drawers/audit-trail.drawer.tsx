@@ -19,8 +19,8 @@ import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
-import type { DshCatalogConflict } from '../../shared/dsh-product-api.client';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../../shared/dsh-product-api.transport';
+import type { DshCatalogConflict } from '../../../shared/dsh-product-api.client';
 
 export type CatalogAuditTrailWorkspaceProps = {
   productId?: string;
@@ -306,7 +306,7 @@ export function CatalogAuditTrailWorkspace({
       )}
 
       {/* Catalog Conflicts (LIVE_API_BOUND) */}
-      <Box gap={3} style={{ borderTop: `1px solid ${theme.lineStrong}`, paddingTop: 16 }}>
+      <Box gap={3} style={{ borderTopWidth: 1, borderTopColor: theme.lineStrong, paddingTop: 16 }}>
         <Box layoutDirection="row" justify="space-between" align="center">
           <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
             ⚠️ تعارضات الكتالوج (قاعدة البيانات الحية)

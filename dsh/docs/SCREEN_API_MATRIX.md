@@ -1,7 +1,7 @@
 # DSH Screen/API Matrix
 
 Status: MIXED_SERVICE_MATRIX
-Decision: DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN__FRONTEND_BINDING_PENDING
+Decision: DSH_SLICE_005A_CAPTAIN_ASSIGNMENT_PASS
 
 Purpose:
 Freeze the frontend-facing API needs after P0-14 without inflating runtime or backend closure.
@@ -20,8 +20,8 @@ Current rule:
 |---|---|---|---|---|---|---|---|---|---|
 | `DSH-SAPI-P014-01` | `app-client` | `/app-client/discovery` | `HomeScreen.tsx`; `SearchScreen.tsx`; `StoreScreen.tsx` | open a destination, store, or category | `loading`, `empty`, `error`, `success`, `offline` | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` | no WLT boundary | none — all 3 visibility gates proven; store details (001B) proven in `tools/registry/runs/DSH_SLICE_001B_STORE_DETAILS_FINAL_CLOSURE-20260604-034548/` | none — DSH-SLICE-001 closed; transition to DSH-SLICE-002 |
 | `DSH-SAPI-P014-02` | `app-client` | `/app-client/cart` | `CartScreen.tsx`; `DshCheckoutIntentScreen.tsx`; `DshCheckoutFailureScreen.tsx` | review cart and hand off payment choice | `loading`, `error`, `blocked`, `retry` | `PASS` | WLT owns payment decision; backend auth middleware supports production mode (`DSH_AUTH_MODE=production` + Bearer token + auth service validation); app-client checkout transport can send Bearer token via `authToken` or `EXPO_PUBLIC_DSH_AUTH_BEARER_TOKEN` | none — verified via E2E integration script (DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604) | none — closed |
-| `DSH-SAPI-P014-03` | `app-client` | `/app-client/orders` | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | open timeline or issue workspace | `loading`, `error`, `success`, `offline`, `retry`, `blocked`, `cancelled` | `NOT_READY_FOR_API` | WLT owns refund execution only | lifecycle events, cancellation, and support-exception states are not runtime-proven | capture cross-surface proof before freezing event contracts |
-| `DSH-SAPI-P014-04` | `app-partner` | `/app-partner/orders` | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `DshPartnerOrderRejectionScreen.tsx` | accept, reject, or prepare an order | `loading`, `empty`, `error`, `success`, `offline`, `blocked`, `retry` | `CANDIDATE_AFTER_VISUAL_AND_RUNTIME_PROOF` | WLT only enters if later financial reversal is needed | acceptance timer, delay, ready, and handoff semantics are still preview-only | capture partner proof before any action contract is designed |
+| `DSH-SAPI-P014-03` | `app-client` | `/app-client/orders` | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | open timeline or issue workspace | `loading`, `error`, `success`, `offline`, `retry`, `blocked`, `cancelled` | `PASS` | WLT owns refund execution only | none — verified via E2E integration script (DSH_J004_ORDER_LIFECYCLE_FINAL_CLOSURE-20260605-034900) | none — J-004 child slices closed |
+| `DSH-SAPI-P014-04` | `app-partner` | `/app-partner/orders` | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `DshPartnerOrderRejectionScreen.tsx` | accept, reject, or prepare an order | `loading`, `empty`, `error`, `success`, `offline`, `blocked`, `retry` | `PASS` | WLT only enters if later financial reversal is needed | none — verified via E2E integration script (DSH_J004_ORDER_LIFECYCLE_FINAL_CLOSURE-20260605-034900) | none — J-004 child slices closed |
 | `DSH-SAPI-P014-05` | `app-partner` | `/app-partner/inventory` | `InventoryCatalogScreen.tsx` | update readiness and publishing visibility | `loading`, `empty`, `error`, `success`, `offline` | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` | no WLT boundary | none — screen proof captured in `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/`; partner readiness (001C) proven in `tools/registry/runs/DSH_SLICE_001C_PARTNER_READINESS_FINAL_CLOSURE-20260604-043800/` | none — DSH-SLICE-001 partner surface closed |
 | `DSH-SAPI-P014-06` | `app-captain` | `/app-captain/orders` | `DshCaptainOrdersScreen.tsx`; `DshCaptainPickupDropoffScreen.tsx`; `DshCaptainMapScreen.tsx` | accept assignment and complete pickup | `loading`, `empty`, `error`, `success`, `retry` | `NOT_READY_FOR_API` | WLT payout effects stay outside this slice | pickup, arrival, and failure milestones are still preview-only | capture captain proof before delivery action modeling |
 | `DSH-SAPI-P014-07` | `app-captain` | `/app-captain/map` | `DshCaptainPoDSubmissionScreen.tsx`; `DshCaptainMapScreen.tsx` | submit proof of delivery or failure | `loading`, `success`, `error`, `retry` | `NOT_READY_FOR_API` | WLT only appears if a later complaint becomes financial | proof-policy and delivery-failure semantics are not runtime-proven | capture PoD proof before any contract design |
@@ -41,3 +41,12 @@ Exit gate:
 Contradictions resolved: CONTRA-001, CONTRA-002, CONTRA-003, CONTRA-004 (see `dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md`).
 DSH-SLICE-001 matrix decision: `DSH_SLICE001_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE`.
 Next: transition to DSH-SLICE-002 (Catalog Management).
+
+### DSH-SLICE-005A Captain Assignment Screen/API Proof (2026-06-05)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_005A_CAPTAIN_ASSIGNMENT_FINAL_CLOSURE-20260605-042600/`
+Summary:
+- Endpoint `POST /orders/{id}/assign-captain` documented in `dsh.openapi.yaml`.
+- SDK client method `assignCaptain` implemented in `dsh-order-lifecycle-client.ts`.
+- DispatchAssignmentScreen wired to make live call to `assignCaptain` SDK endpoint.
+- Validated manually using `run_j005_e2e.py` simulation script against Go API server.

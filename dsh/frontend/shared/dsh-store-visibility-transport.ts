@@ -48,11 +48,15 @@ export function resolveDshStoreVisibilityBaseUrl(): string | null {
 }
 
 function buildHttpTransport(
-  baseUrl: string,
+  baseUrl: string | null,
   fetchFn: DshVisibilityFetchFn,
 ): DshStoreVisibilityTransport {
   return {
     async patch(path, body): Promise<StoreVisibilityGateResponse> {
+      if (!baseUrl) {
+        const err: DshStoreVisibilityOfflineError = { kind: 'offline' };
+        throw err;
+      }
       const url = new URL(path, baseUrl).toString();
       let response: Response;
 

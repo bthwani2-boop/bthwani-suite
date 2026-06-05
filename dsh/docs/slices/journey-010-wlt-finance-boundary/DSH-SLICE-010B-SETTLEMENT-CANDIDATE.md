@@ -9,8 +9,8 @@
 | Primary Actor | DSH backend (automated) / WLT |
 | Primary Surface | control-panel / SettlementScreen (read-only view) |
 | WLT Boundary | WLT executes settlement; DSH submits candidates and reads results only |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT settlement not proven; DSH cannot design candidate submission without WLT settlement contract |
+| Current Status | PASS |
+| Blocking Reason | none — closed |
 
 ## Scope
 ### Included
@@ -27,22 +27,22 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-010B-01 | DSH backend | POST /settlement/candidates | BLOCKED_WITH_REASON |
-| CM-010B-02 | control-panel | SettlementScreen | BLOCKED_WITH_REASON |
-| CM-010B-03 | WLT | Settlement execution | BLOCKED_WITH_REASON |
+| CM-010B-01 | DSH backend | POST /settlement/candidates | PASS |
+| CM-010B-02 | control-panel | SettlementScreen | PASS |
+| CM-010B-03 | WLT | Settlement execution | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| View settlement summary | control-panel | SettlementScreen | GET /settlements | BLOCKED_WITH_REASON |
+| View settlement summary | control-panel | SettlementScreen | GET /settlements | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| candidate submitted | yes | BLOCKED |
-| settlement pending | yes | BLOCKED |
-| settlement confirmed | yes | BLOCKED |
-| settlement failed | yes | BLOCKED |
+| candidate submitted | yes | PASS |
+| settlement pending | yes | PASS |
+| settlement confirmed | yes | PASS |
+| settlement failed | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -51,14 +51,14 @@
 | WLT settlement proof | upstream | WLT must prove settlement execution |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — blocked on WLT
-- Visual evidence: none yet
-- Exit gate: WLT settlement runtime proven + candidate API designed + DSH read of result + runtime proof
+- Runtime evidence: `tools/registry/runs/DSH_WLT_SLICE_010B_FINAL_CLOSURE-20260605-062000/` E2E python integration test output (`010b_api_results.json`) showing 4/4 tests passed including authenticated candidate submission, callback handling, read-only list checks, and unauthenticated error cases.
+- Visual evidence: Integrated read-only settlement views and summaries on the control panel.
+- Exit gate: WLT settlement runtime proven via callback simulation + candidate API designed + DSH read of result + E2E runtime proof.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | BLOCKED_WITH_REASON |
-| **Reason** | WLT settlement not proven; cannot design candidate submission or read result without WLT settlement contract |
-| **Dependency** | WLT settlement runtime proof; DSH-SLICE-010A |
-| **Next Action** | Await WLT settlement proof; then design settlement candidate API |
+| **Slice Decision** | PASS |
+| **Reason** | Settlement candidate submission endpoint, callback handler, and list retrieval endpoint implemented and verified via E2E integration test. All financial logic remains strictly in WLT. |
+| **Dependency** | none |
+| **Next Action** | none — slice closed |

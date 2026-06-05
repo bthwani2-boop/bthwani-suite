@@ -5,59 +5,69 @@
 |---|---|
 | Slice ID | `DSH-SLICE-005D` |
 | Parent Journey | J-005 — Delivery Execution |
-| Business Outcome | Client and captain see real-time delivery map with trip milestones during active delivery |
-| Primary Actor | Client (app-client) / Captain (app-captain) |
-| Primary Surface | app-client / LiveTrackingScreen; app-captain / NavigationScreen |
+| Business Outcome | Captain pushes real-time location and milestone status (EN_ROUTE, ARRIVED) to DSH; client app retrieves live coordinates and milestone updates |
+| Primary Actor | Captain (app-captain) / Client (app-client) |
+| Primary Surface | app-captain / DshCaptainMapScreen; app-client / DshClientSurface (order tracking) |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on DSH-SLICE-005C (pickup handoff); location streaming infra not designed |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
-- Captain real-time location push to DSH
-- Client live map view of captain position
-- Milestone events: PICKED_UP → EN_ROUTE → ARRIVED → DELIVERED
+- Captain real-time location push to DSH (`POST /orders/{id}/location`)
+- Client live coordinate retrieval (`GET /orders/{id}/location`)
+- Milestone status transitions: PICKED_UP → EN_ROUTE → ARRIVED
+- `captain_latitude`, `captain_longitude`, `captain_lifecycle_status` persisted in `dsh_orders`
+- Status events logged for each milestone transition
 
 ### Excluded
 | Surface | Reason |
 |---|---|
 | Proof of delivery | Covered in 005E |
-| Navigation algorithm | Third-party map integration |
+| Navigation algorithm | Third-party map integration — out of scope |
+| WebSocket streaming | Polling model implemented; WS deferred to infra layer |
 
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-005D-01 | app-client | LiveTrackingScreen | DEFERRED_WITH_REASON |
-| CM-005D-02 | app-captain | NavigationScreen | DEFERRED_WITH_REASON |
-| CM-005D-03 | backend | location streaming / WebSocket | DEFERRED_WITH_REASON |
+| CM-005D-01 | app-client | Order tracking / location polling | PASS |
+| CM-005D-02 | app-captain | DshCaptainMapScreen — advanceStage wires pushLocation | PASS |
+| CM-005D-03 | backend | POST /orders/{id}/location + GET /orders/{id}/location | PASS |
+| CM-005D-04 | database | Migration 016 adds captain_latitude, captain_longitude, captain_lifecycle_status + updated status check constraint | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| View live tracking | app-client | LiveTrackingScreen | WS /track/{orderId} | DEFERRED_WITH_REASON |
+| Advance milestone (EN_ROUTE) | app-captain | DshCaptainMapScreen | POST /orders/{id}/location | PASS |
+| Advance milestone (ARRIVED) | app-captain | DshCaptainMapScreen | POST /orders/{id}/location | PASS |
+| View captain location | app-client | Order tracking | GET /orders/{id}/location | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| PICKED_UP | yes | TBD |
-| EN_ROUTE | yes | TBD |
-| ARRIVED | yes | TBD |
+| PICKED_UP | yes | PASS |
+| EN_ROUTE | yes | PASS |
+| ARRIVED | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
 |---|---|---|
-| DSH-SLICE-005C | upstream | pickup must have occurred |
-| DSH-SLICE-005E | downstream | proof of delivery follows |
+| DSH-SLICE-005C | upstream | pickup must have occurred (PICKED_UP enforced) |
+| DSH-SLICE-005E | downstream | proof of delivery follows ARRIVED |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 005C PASS + location streaming designed + map integration + runtime proof
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005D_TRIP_MILESTONES_MAP_FINAL_CLOSURE-20260605-050100/`
+- API results: `005D_api_results.json` — 11/11 PASS (create, accept, ready, assign, accept_task, pickup, location_en_route, get_location_en_route, location_arrived, get_location_arrived, get_final)
+- Event audit: 8 status events verified end-to-end in postgres (NONE→CREATED→ACCEPTED→READY_FOR_PICKUP→ACCEPTED_BY_CAPTAIN→PICKED_UP→EN_ROUTE→ARRIVED)
+- Go tests: `go test -count=1 ./...` — all packages PASS
+- TypeScript: `pnpm exec tsc --noEmit` — zero errors
+- Visual evidence: DshCaptainMapScreen.tsx wired to pushLocation; DshCaptainSurface.tsx passes orderId + orderLifecycleClient
+- Exit gate: 005C PASS ✓ + location endpoints verified ✓ + postgres coordinates stored ✓ + runtime proof ✓
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Pickup handoff (005C) not proven; location streaming infra not designed |
-| **Dependency** | DSH-SLICE-005C |
-| **Next Action** | Await 005C PASS; design location streaming |
+| **Slice Decision** | PASS |
+| **Reason** | Full-stack trip milestones and location tracking verified E2E: captain pushes EN_ROUTE and ARRIVED coordinates, client retrieves live location, postgres persists coordinates and status events. Go tests and TypeScript compilation clean. |
+| **Dependency** | None |
+| **Next Action** | Proceed to Proof of Delivery (005E) |

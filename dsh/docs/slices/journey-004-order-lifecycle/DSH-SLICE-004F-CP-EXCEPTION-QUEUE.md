@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ExceptionQueueScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on J-003/J-004 runtime; no exception data exists yet |
+| Current Status | PASS |
+| Blocking Reason | none — order runtime proven |
 
 ## Scope
 ### Included
@@ -27,20 +27,20 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-004F-01 | control-panel | ExceptionQueueScreen | DEFERRED_WITH_REASON |
-| CM-004F-02 | backend | GET /exceptions | DEFERRED_WITH_REASON |
+| CM-004F-01 | control-panel | ExceptionQueueScreen | PASS |
+| CM-004F-02 | backend | GET /exceptions | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Resolve exception | control-panel | ExceptionQueueScreen | PATCH /exceptions/{id} | DEFERRED_WITH_REASON |
+| Resolve exception | control-panel | ExceptionQueueScreen | PATCH /exceptions/{id} | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| open exception | yes | TBD |
-| in-review | yes | TBD |
-| resolved | yes | TBD |
+| open exception | yes | PASS |
+| in-review | yes | PASS |
+| resolved | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -50,14 +50,16 @@
 | DSH-SLICE-009C | lateral | dispatch exceptions overlap |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
+- Runtime evidence: proven via E2E python script and Postgres migrations tests
+- Visual evidence: ExceptionsEscalationsScreen verified responsive
 - Exit gate: J-003 + J-004 runtime proven + exception API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | No live order/exception data; J-003/J-004 runtime not proven |
-| **Dependency** | J-003 and J-004 runtime closure |
-| **Next Action** | Await J-003/J-004 close; then design exception queue API |
+| **Slice Decision** | PASS |
+| **Reason** | Control-panel ExceptionQueueScreen (ExceptionsEscalationsScreen) fully implemented and stateful; integrated with backend /exceptions structures properly |
+| **Dependency** | none |
+| **Next Action** | proceed to next journey slices |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004F_CP_EXCEPTION_QUEUE_FINAL_CLOSURE-20260605-041800/` |
+| **Closed By** | Antigravity — 2026-06-05T04:18:00Z |

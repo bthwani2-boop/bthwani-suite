@@ -1190,19 +1190,41 @@ export function CaptainOrderDetailScreen({
 	);
 }
 
-export function CaptainPickupConfirmSheet({ visible, orderTitle, onConfirm, onCancel }: { visible: boolean; orderTitle: string; onConfirm: () => void; onCancel: () => void; }) {
+export function CaptainPickupConfirmSheet({
+	visible,
+	orderTitle,
+	state = 'ready',
+	onConfirm,
+	onCancel,
+}: {
+	visible: boolean;
+	orderTitle: string;
+	state?: 'ready' | 'loading' | 'success' | 'error';
+	onConfirm: () => void;
+	onCancel: () => void;
+}) {
 	if (!visible) {
 		return null;
 	}
 
 	return (
 		<Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-			<SectionHeader title="تأكيد الاستلام" subtitle="أقر باستلام الطلب قبل نقله إلى المرحلة التالية." />
-			<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
-			<Box gap={2}>
-				<Button label="تأكيد الاستلام" onPress={onConfirm} />
-				<Button label="إلغاء" tone="ghost" onPress={onCancel} />
-			</Box>
+			{state === 'loading' ? (
+				<StateView stateId="loading" title="جاري تأكيد الاستلام..." description="" />
+			) : state === 'success' ? (
+				<StateView stateId="success" title="تم الاستلام بنجاح" description="تم تحديث حالة الطلب إلى مستلم." actionLabel="موافق" onActionPress={onConfirm} />
+			) : state === 'error' ? (
+				<StateView stateId="error" title="فشل تأكيد الاستلام" description="حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً." actionLabel="إغلاق" onActionPress={onCancel} />
+			) : (
+				<>
+					<SectionHeader title="تأكيد الاستلام" subtitle="أقر باستلام الطلب قبل نقله إلى المرحلة التالية." />
+					<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
+					<Box gap={2}>
+						<Button label="تأكيد الاستلام" onPress={onConfirm} />
+						<Button label="إلغاء" tone="ghost" onPress={onCancel} />
+					</Box>
+				</>
+			)}
 		</Surface>
 	);
 }
@@ -1475,13 +1497,54 @@ export function DshCaptainOrdersOffersListScreen(props: { onBack?: () => void; o
 	);
 }
 
-export function DshCaptainOrderAcceptScreen(props: { onBack?: () => void; onSecondaryAction?: () => void }) {
+export type DshCaptainOrderAcceptScreenProps = {
+	orderId?: string;
+	onBack?: () => void;
+	onAccept?: (orderId: string) => void;
+	onDecline?: (orderId: string) => void;
+	onSecondaryAction?: () => void; // fallback compatibility
+};
+
+export function DshCaptainOrderAcceptScreen({
+	orderId = 'captain-order-9021',
+	onBack,
+	onAccept,
+	onDecline,
+	onSecondaryAction,
+}: DshCaptainOrderAcceptScreenProps) {
+	const customSummary = {
+		orderId: orderId,
+		pickupLabel: 'Burger Lab - فرع حطين',
+		dropoffLabel: 'حي العليا، طريق الملك فهد',
+		etaLabel: 'مدة الوصول إلى الاستلام: 8 دقائق',
+		currentStageLabel: 'في انتظار قبول الكابتن',
+		nextActionLabel: 'اقبل المهمة لبدء التوصيل',
+	};
+
 	return (
-		<OrderActionSection
-			action="accept"
-			onActionPress={() => props.onSecondaryAction?.()}
-			onBackToInbox={props.onBack}
-		/>
+		<Box gap={4} style={{ flex: 1 }}>
+			<OrderActionSection
+				action="accept"
+				summary={customSummary}
+				onActionPress={() => {
+					if (onAccept) {
+						onAccept(orderId);
+					} else {
+						onSecondaryAction?.();
+					}
+				}}
+				onBackToInbox={onBack}
+			/>
+			{onDecline && (
+				<Box paddingHorizontal={4} paddingBottom={4}>
+					<Button
+						label="رفض المهمة (Decline)"
+						tone="danger"
+						onPress={() => onDecline(orderId)}
+					/>
+				</Box>
+			)}
+		</Box>
 	);
 }
 

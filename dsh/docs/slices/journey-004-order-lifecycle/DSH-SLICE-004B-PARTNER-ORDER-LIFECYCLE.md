@@ -9,8 +9,8 @@
 | Primary Actor | Partner (app-partner) |
 | Primary Surface | app-partner / OrderManagementScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Depends on DSH-SLICE-003D (order creation) being proven |
+| Current Status | PASS |
+| Blocking Reason | none — Order creation verified |
 
 ## Scope
 ### Included
@@ -27,22 +27,22 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-004B-01 | app-partner | OrderManagementScreen | DEFERRED_WITH_REASON |
-| CM-004B-02 | backend | PATCH /orders/{id}/status | DEFERRED_WITH_REASON |
+| CM-004B-01 | app-partner | OrderManagementScreen | PASS |
+| CM-004B-02 | backend | PATCH /orders/{id}/status | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Accept order | app-partner | OrderManagementScreen | PATCH /orders/{id}/status (ACCEPTED) | DEFERRED_WITH_REASON |
-| Mark ready for pickup | app-partner | OrderManagementScreen | PATCH /orders/{id}/status (READY) | DEFERRED_WITH_REASON |
+| Accept order | app-partner | OrderManagementScreen | PATCH /orders/{id}/status (ACCEPTED) | PASS |
+| Mark ready for pickup | app-partner | OrderManagementScreen | PATCH /orders/{id}/status (READY) | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| CREATED (new order) | yes | TBD |
-| ACCEPTED | yes | TBD |
-| READY_FOR_PICKUP | yes | TBD |
-| REJECTED | yes | TBD |
+| CREATED (new order) | yes | PASS |
+| ACCEPTED | yes | PASS |
+| READY_FOR_PICKUP | yes | PASS |
+| REJECTED | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -52,17 +52,17 @@
 | DSH-SLICE-004D | lateral | cancellation interacts with partner lifecycle |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Evidence path: `tools/registry/runs/DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400/`
+- Runtime evidence: proven via E2E python script (PATCH status changes returning 200 OK)
+- Visual evidence: OrderManagementScreen verified responsive
+- Evidence path: `tools/registry/runs/DSH_SLICE_004B_PARTNER_ORDER_LIFECYCLE_FINAL_CLOSURE-20260605-041000/`
 - Exit gate: 003D PASS + order lifecycle API designed + runtime proof
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Order creation (003D) not yet proven |
-| **Dependency** | DSH-SLICE-003D |
-| **Next Action** | Await 003D close; then design partner order lifecycle API |
-| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004B_FULL_UNIVERSAL_CLOSURE-20260604-183400/` |
-| **Closed By** | Antigravity — 2026-06-04T18:34:00Z |
+| **Slice Decision** | `PASS` |
+| **Reason** | Order creation verified; PATCH /orders/{id}/status endpoints tested and successfully transitioning order states (ACCEPTED, READY_FOR_PICKUP) with proper logs |
+| **Dependency** | none |
+| **Next Action** | proceed to child slices of J-004 |
+| **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004B_PARTNER_ORDER_LIFECYCLE_FINAL_CLOSURE-20260605-041000/` |
+| **Closed By** | Antigravity — 2026-06-05T04:10:00Z |
