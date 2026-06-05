@@ -136,6 +136,17 @@ export type DshOrderDetailsResponse = {
   readonly support_tickets: readonly DshSupportEscalationRecord[];
 };
 
+export type DshListOrdersQuery = {
+  readonly status?: string;
+  readonly limit?: number;
+  readonly offset?: number;
+};
+
+export type DshListOrdersResponse = {
+  readonly orders: readonly DshOrderRecord[];
+  readonly total: number;
+};
+
 export type DshOrderFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
 export type DshOrderApiOfflineError = { readonly kind: 'offline' };
@@ -158,6 +169,7 @@ export function resolveDshOrderApiBaseUrl(): string | null {
 }
 
 export interface DshOrderLifecycleClient {
+  listOrders(query?: DshListOrdersQuery): Promise<DshListOrdersResponse>;
   createOrder(req: DshCreateOrderRequest): Promise<DshCreateOrderResponse>;
   getOrder(orderId: string): Promise<DshOrderDetailsResponse>;
   updateOrderStatus(orderId: string, req: DshUpdateOrderStatusRequest): Promise<DshOrderRecord>;
@@ -257,6 +269,15 @@ export function createDshOrderLifecycleHttpClient(
   fetchFn: DshOrderFetchFn = globalThis.fetch,
 ): DshOrderLifecycleClient {
   return {
+    listOrders: async (query = {}) => {
+      if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
+      const params = new URLSearchParams();
+      if (query.status) params.set('status', query.status);
+      if (query.limit != null) params.set('limit', String(query.limit));
+      if (query.offset != null) params.set('offset', String(query.offset));
+      const qs = params.toString();
+      return doFetch<DshListOrdersResponse>(baseUrl, fetchFn, 'GET', `/orders${qs ? `?${qs}` : ''}`);
+    },
     createOrder: async (req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
       return doFetch<DshCreateOrderResponse>(baseUrl, fetchFn, 'POST', '/orders', req);

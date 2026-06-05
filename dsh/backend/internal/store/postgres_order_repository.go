@@ -182,6 +182,66 @@ VALUES ($1, $2, 'system', 'NONE', $3, 'Order initialized', NOW())`
 	return order, items, nil
 }
 
+func (repo *PostgresRepository) ListOrders(ctx context.Context, query domain.ListOrdersQuery) (domain.ListOrdersResponse, error) {
+	limit := query.Limit
+	if limit <= 0 {
+		limit = 50
+	}
+	if limit > 200 {
+		limit = 200
+	}
+	offset := query.Offset
+	if offset < 0 {
+		offset = 0
+	}
+
+	var countRow *sql.Row
+	var rows *sql.Rows
+	var err error
+
+	const selectCols = `id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+
+	if query.Status != "" {
+		countRow = repo.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM dsh_orders WHERE status = $1`, query.Status)
+		rows, err = repo.db.QueryContext(ctx,
+			`SELECT `+selectCols+` FROM dsh_orders WHERE status = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
+			query.Status, limit, offset,
+		)
+	} else {
+		countRow = repo.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM dsh_orders`)
+		rows, err = repo.db.QueryContext(ctx,
+			`SELECT `+selectCols+` FROM dsh_orders ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+			limit, offset,
+		)
+	}
+
+	var total int
+	if scanErr := countRow.Scan(&total); scanErr != nil {
+		return domain.ListOrdersResponse{}, fmt.Errorf("failed to count orders: %w", scanErr)
+	}
+
+	if err != nil {
+		return domain.ListOrdersResponse{}, fmt.Errorf("failed to list orders: %w", err)
+	}
+	defer rows.Close()
+
+	var orders []domain.OrderRecord
+	for rows.Next() {
+		var o domain.OrderRecord
+		if scanErr := scanOrderRecord(rows, &o); scanErr != nil {
+			return domain.ListOrdersResponse{}, fmt.Errorf("failed to scan order: %w", scanErr)
+		}
+		orders = append(orders, o)
+	}
+	if err := rows.Err(); err != nil {
+		return domain.ListOrdersResponse{}, err
+	}
+	if orders == nil {
+		orders = []domain.OrderRecord{}
+	}
+	return domain.ListOrdersResponse{Orders: orders, Total: total}, nil
+}
+
 func (repo *PostgresRepository) GetOrder(ctx context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error) {
 	orderQuery := `
 SELECT id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at

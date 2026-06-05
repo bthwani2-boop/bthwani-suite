@@ -432,6 +432,10 @@ func (repo *MemoryRepository) ResolveConflict(_ context.Context, _ string, _ dom
 }
 
 // Order lifecycle stubs (J-003D / J-004)
+func (repo *MemoryRepository) ListOrders(_ context.Context, _ domain.ListOrdersQuery) (domain.ListOrdersResponse, error) {
+	return domain.ListOrdersResponse{Orders: []domain.OrderRecord{}, Total: 0}, errors.New("order list requires postgres backend (set DATABASE_URL)")
+}
+
 func (repo *MemoryRepository) CreateOrder(_ context.Context, _ string, _ domain.CreateOrderRequest) (domain.OrderRecord, []domain.OrderItemRecord, error) {
 	return domain.OrderRecord{}, nil, errors.New("order creation requires postgres backend (set DATABASE_URL)")
 }

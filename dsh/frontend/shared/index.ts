@@ -660,6 +660,8 @@ export type {
   DshUpdateOrderStatusRequest,
   DshCreateSupportEscalationRequest,
   DshOrderDetailsResponse,
+  DshListOrdersQuery,
+  DshListOrdersResponse,
   DshOrderLifecycleClient,
 } from './dsh-order-lifecycle-client';
 export {
@@ -667,3 +669,14 @@ export {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,
 } from './dsh-order-lifecycle-client';
+
+// --- Operations Runtime Adapter ---
+export type {
+  DshRuntimeOrderRow,
+  DshRuntimeOrdersResult,
+} from './dsh-operational-runtime-adapter';
+export {
+  dshOperationalRuntimeAdapterMeta,
+  fetchDshRuntimeOrders,
+  isDshRuntimeAvailable,
+} from './dsh-operational-runtime-adapter';

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"bthwani.local/dsh/backend/internal/store"
@@ -20,6 +21,7 @@ func NewOrdersHandler(repository store.Repository) *OrdersHandler {
 		repository: repository,
 		mux:        http.NewServeMux(),
 	}
+	h.mux.HandleFunc("GET /orders", h.ListOrders)
 	h.mux.HandleFunc("POST /orders", h.CreateOrder)
 	h.mux.HandleFunc("GET /orders/{id}", h.GetOrder)
 	h.mux.HandleFunc("PATCH /orders/{id}/status", h.UpdateOrderStatus)
@@ -43,6 +45,7 @@ func NewOrdersHandler(repository store.Repository) *OrdersHandler {
 
 func RegisterOrderRoutes(mux *http.ServeMux, repository store.Repository) {
 	h := NewOrdersHandler(repository)
+	mux.Handle("GET /orders", h)
 	mux.Handle("POST /orders", h)
 	mux.Handle("GET /orders/{id}", h)
 	mux.Handle("PATCH /orders/{id}/status", h)
@@ -72,6 +75,42 @@ func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.mux.ServeHTTP(w, r)
+}
+
+// ListOrders handles GET /orders — operations queue for control-panel.
+// Supports ?status=CREATED&limit=50&offset=0. Limit capped at 200.
+func (h *OrdersHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
+	log.Println("dsh-api: GET /orders")
+
+	q := r.URL.Query()
+	status := strings.ToUpper(strings.TrimSpace(q.Get("status")))
+
+	limit := 50
+	if raw := q.Get("limit"); raw != "" {
+		if v, err := strconv.Atoi(raw); err == nil && v > 0 {
+			limit = v
+		}
+	}
+
+	offset := 0
+	if raw := q.Get("offset"); raw != "" {
+		if v, err := strconv.Atoi(raw); err == nil && v >= 0 {
+			offset = v
+		}
+	}
+
+	resp, err := h.repository.ListOrders(r.Context(), domain.ListOrdersQuery{
+		Status: status,
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		log.Printf("dsh-api: list orders error: %v", err)
+		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, resp)
 }
 
 func (h *OrdersHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {

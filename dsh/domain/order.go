@@ -141,3 +141,16 @@ type OrderDetailsResponse struct {
 	StatusEvents   []OrderStatusEventRecord  `json:"status_events"`
 	SupportTickets []SupportEscalationRecord `json:"support_tickets"`
 }
+
+// ListOrdersQuery — operations queue filter (control-panel, dispatch, exceptions).
+// Limit is capped at 200 in the handler; default 50.
+type ListOrdersQuery struct {
+	Status string
+	Limit  int
+	Offset int
+}
+
+type ListOrdersResponse struct {
+	Orders []OrderRecord `json:"orders"`
+	Total  int           `json:"total"`
+}

@@ -11,6 +11,7 @@ import {
 import {
   DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
 } from '../../data/orders.preview-data';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
 import {
   resolveDshOrderApiBaseUrl,
@@ -60,13 +61,51 @@ const alternativesMap: Record<string, Array<{ name: string; distance: string; st
   ],
 };
 
+type DispatchRowState = {
+  id: string;
+  captain: string;
+  distance: string;
+  confidence: string;
+  statusTone: string;
+  status: string;
+  recommendation: string;
+  note: string;
+  blocker: string;
+  pickupEta: string;
+  dropoffEta: string;
+  assignedCaptain: string | null;
+  customStatus: string | null;
+  customStatusTone: 'warning' | 'success' | 'danger' | 'neutral' | null;
+  [key: string]: unknown;
+};
+
+function buildRuntimeDispatchRow(o: DshRuntimeOrderRow): DispatchRowState {
+  return {
+    id: o.id,
+    captain: o.captainId ?? 'لا يوجد',
+    distance: '—',
+    confidence: '—',
+    statusTone: o.status === 'CREATED' ? 'warning' : 'brand',
+    status: o.status,
+    recommendation: o.status === 'CREATED' ? 'يحتاج إسناد كابتن' : `الحالة: ${o.status}`,
+    note: `متجر: ${o.storeId} | عميل: ${o.clientId}`,
+    blocker: 'لا يوجد',
+    pickupEta: '—',
+    dropoffEta: '—',
+    assignedCaptain: o.captainId ?? null,
+    customStatus: null,
+    customStatusTone: null,
+  };
+}
+
 export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlOrderId = searchParams.get('orderId') ?? null;
   const [selectedRowId, setSelectedRowId] = React.useState<string | null>(null);
+  const [runtimeLoaded, setRuntimeLoaded] = React.useState(false);
 
-  const [rows, setRows] = React.useState(() =>
+  const [rows, setRows] = React.useState<DispatchRowState[]>(() =>
     DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows.map((row) => ({
       ...row,
       assignedCaptain: null as string | null,
@@ -74,6 +113,18 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
       customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
     }))
   );
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchDshRuntimeOrders({ status: 'CREATED', limit: 100 }).then((result) => {
+      if (cancelled) return;
+      if (result.kind === 'ok' && result.orders.length > 0) {
+        setRows(result.orders.map(buildRuntimeDispatchRow));
+        setRuntimeLoaded(true);
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   React.useEffect(() => {
     if (urlOrderId) {
@@ -150,8 +201,8 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
 
   const summaryKpi = [
     { id: 'waiting', label: 'بانتظار الإسناد', value: String(rows.filter(r => !r.assignedCaptain && r.statusTone !== 'danger').length), tone: 'danger' as const },
-    { id: 'captains', label: 'كباتن متاحون', value: String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.availableCaptains), tone: 'success' as const },
-    { id: 'ready', label: 'جاهزون للاستلام', value: String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.readyForPickup), tone: 'neutral' as const },
+    { id: 'captains', label: 'كباتن متاحون', value: runtimeLoaded ? '—' : String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.availableCaptains), tone: 'success' as const },
+    { id: 'source', label: 'مصدر البيانات', value: runtimeLoaded ? 'DSH Runtime' : 'Preview', tone: runtimeLoaded ? 'success' as const : 'warning' as const },
     { id: 'blockers', label: 'معوقات الإسناد', value: String(rows.filter(r => r.statusTone === 'danger').length), tone: 'warning' as const },
   ];
 

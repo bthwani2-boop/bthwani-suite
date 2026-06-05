@@ -14,6 +14,7 @@ import {
   EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
   DSH_ORDER_RESCUE_PREVIEW,
 } from '../../data/orders.preview-data';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
@@ -152,6 +153,21 @@ export function ExceptionsEscalationsScreen({
   const [activeForm, setActiveForm] = React.useState<null | 'escalate' | 'resolve'>(null);
   const [actionStatus, setActionStatus] = React.useState<'idle' | 'pending' | 'success'>('idle');
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+  const [runtimeExcState, setRuntimeExcState] = React.useState<{
+    orders: readonly DshRuntimeOrderRow[];
+    loaded: boolean;
+  }>({ orders: [], loaded: false });
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchDshRuntimeOrders({ status: 'FAILED_DELIVERY', limit: 50 }).then((result) => {
+      if (cancelled) return;
+      if (result.kind === 'ok') {
+        setRuntimeExcState({ orders: result.orders, loaded: true });
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   // Form input states
   const [selectedEscalationQueue, setSelectedEscalationQueue] = React.useState('customer-support');
@@ -293,10 +309,10 @@ export function ExceptionsEscalationsScreen({
 
 
   const summaryKpi = [
-    { id: 'open', label: 'مفتوحة', value: String(kpis.open), tone: 'danger' as const },
-    { id: 'escalate', label: 'تصعيد', value: String(kpis.escalate), tone: 'warning' as const },
+    { id: 'runtime-exc', label: 'استثناءات Runtime', value: runtimeExcState.loaded ? String(runtimeExcState.orders.length) : '—', tone: 'danger' as const },
+    { id: 'open', label: 'مفتوحة (Preview)', value: String(kpis.open), tone: 'warning' as const },
     { id: 'resolve', label: 'حل', value: String(kpis.resolve), tone: 'neutral' as const },
-    { id: 'close', label: 'إغلاق', value: String(kpis.close), tone: 'success' as const },
+    { id: 'source', label: 'مصدر البيانات', value: runtimeExcState.loaded ? 'DSH Runtime' : 'Preview', tone: runtimeExcState.loaded ? 'success' as const : 'warning' as const },
   ];
 
   // Selected details lookup
@@ -795,9 +811,34 @@ export function ExceptionsEscalationsScreen({
 
       <div className={styles.surfaceSplitGrid}>
         <Box gap={3}>
+          {/* 0. Runtime Exceptions (FAILED_DELIVERY orders from DSH backend) */}
+          {runtimeExcState.loaded && runtimeExcState.orders.length > 0 && (
+            <WebControlPanelQueue
+              title="استثناءات Runtime — فشل التسليم"
+              meta={`${runtimeExcState.orders.length} طلب من DSH`}
+            >
+              {runtimeExcState.orders.map((order) => (
+                <WebControlPanelDecisionRow
+                  key={order.id}
+                  entityId={order.id}
+                  entityLabel={`متجر: ${order.storeId} | كابتن: ${order.captainId ?? '—'}`}
+                  status="FAILED_DELIVERY"
+                  statusTone="danger"
+                  sla={`تحديث: ${new Date(order.updatedAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })}`}
+                  onInspect={() => router.push(`/operations?group=exceptions&orderId=${order.id}`)}
+                  primaryAction={{
+                    id: `${order.id}-exc`,
+                    label: 'فتح تفاصيل الطلب',
+                    onAction: () => router.push(`/operations?group=exceptions&orderId=${order.id}`),
+                  }}
+                />
+              ))}
+            </WebControlPanelQueue>
+          )}
+
           {/* 1. Active Exceptions & Escalations Queue */}
           <WebControlPanelQueue
-            title="الاستثناءات النشطة"
+            title={runtimeExcState.loaded ? 'الاستثناءات النشطة (Preview)' : 'الاستثناءات النشطة'}
             meta={`${exceptions.filter((e) => e.customSlaState !== 'محلول').length} استثناءات مفتوحة`}
           >
             {exceptions.map((exc) => {

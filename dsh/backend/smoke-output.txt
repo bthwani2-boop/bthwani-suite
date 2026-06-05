@@ -1,0 +1,25 @@
+DSH BACKEND SMOKE TEST — 2026-06-06
+=====================================
+GET /stores          → 200 OK (stores list returned)
+POST /orders         → 201 CREATED (ord-1780693909278853100)
+GET /orders          → 200 OK (total=4, count=4)
+GET /orders?status=CREATED → 200 OK (total=1)
+GET /orders?limit=10 → 200 OK (total=4)
+POST assign-captain  → 200 OK (status=CREATED, captain=cap-smoke-001)
+POST accept-task     → 200 OK (status=ACCEPTED_BY_CAPTAIN)
+POST pickup          → 200 OK (status=PICKED_UP)
+POST location/EN_ROUTE → 200 OK (status=EN_ROUTE)
+POST location/ARRIVED  → 200 OK (status=ARRIVED)
+POST deliver         → 200 OK (status=DELIVERED)
+
+Second order (fail+return path):
+POST /orders         → 201 CREATED (ord-1780694040908882000)
+POST assign-captain  → 200 OK
+POST accept-task     → 200 OK
+POST pickup          → 200 OK
+POST location/ARRIVED → 200 OK
+POST fail-delivery   → 200 OK (status=RETURNING_TO_STORE)
+POST confirm-return  → 200 OK (status=RETURNED)
+GET /orders?status=RETURNED → 200 OK (total=1)
+
+ALL SMOKE PATHS: PASS

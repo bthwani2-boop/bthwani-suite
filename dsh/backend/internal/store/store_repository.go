@@ -47,6 +47,7 @@ type Repository interface {
 	ProcessPaymentCallback(ctx context.Context, req domain.PaymentCallbackRequest) (domain.PaymentCallbackResponse, error)
 
 	// Order lifecycle (J-003D / J-004)
+	ListOrders(ctx context.Context, query domain.ListOrdersQuery) (domain.ListOrdersResponse, error)
 	CreateOrder(ctx context.Context, storeID string, req domain.CreateOrderRequest) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	GetOrder(ctx context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, actor string, status string, note *string) (domain.OrderRecord, error)

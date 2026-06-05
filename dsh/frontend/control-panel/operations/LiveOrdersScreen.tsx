@@ -19,6 +19,7 @@ import { OpsOrderDetailPanel, PENDING_APPROVAL_ORDERS } from './OpsOrderDetailPa
 import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -33,6 +34,13 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   best: 'success',
   brand: 'neutral',
 };
+
+function resolveRuntimeOrderTone(status: string): 'neutral' | 'success' | 'warning' | 'danger' {
+  if (status === 'FAILED_DELIVERY' || status === 'CANCELLED') return 'danger';
+  if (status === 'CREATED' || status === 'RETURNING_TO_STORE') return 'warning';
+  if (status === 'DELIVERED' || status === 'RETURNED') return 'success';
+  return 'neutral';
+}
 
 type OpsDecision = DshOperationsDecisionKind;
 type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshOrderLifecycleStatus }>;
@@ -52,6 +60,22 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
   const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+  const [runtimeState, setRuntimeState] = React.useState<{
+    orders: readonly DshRuntimeOrderRow[];
+    total: number;
+    loaded: boolean;
+  }>({ orders: [], total: 0, loaded: false });
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchDshRuntimeOrders({ limit: 100 }).then((result) => {
+      if (cancelled) return;
+      if (result.kind === 'ok') {
+        setRuntimeState({ orders: result.orders, total: result.total, loaded: true });
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleDecision = React.useCallback((orderId: string, decision: OpsDecision, note: string) => {
     const nextStatus = mapOperationsDecisionToLifecycle(decision);
@@ -98,11 +122,16 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
     );
   }
 
+  const runtimeActive = runtimeState.loaded;
+  const liveOrderCount = runtimeActive ? runtimeState.total : preview.rows.length;
+  const dataSourceLabel = runtimeActive ? 'DSH Runtime' : 'Preview';
+  const dataSourceTone: 'success' | 'warning' = runtimeActive ? 'success' : 'warning';
+
   const summaryKpi = [
-    { id: 'awaiting', label: 'بانتظار التأكيد', value: String(preview.summary.awaitingAcknowledgement), tone: 'neutral' as const },
+    { id: 'live', label: 'الطلبات النشطة', value: String(liveOrderCount), tone: 'neutral' as const },
     { id: 'pending-approval', label: 'قيد الموافقة', value: String(PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length), tone: 'warning' as const },
-    { id: 'blocked', label: 'رنينات محجوبة', value: String(preview.summary.blockedRings), tone: 'danger' as const },
-    { id: 'hint', label: preview.summary.ringLabel, value: preview.summary.actionHint, tone: 'neutral' as const },
+    { id: 'source', label: 'مصدر البيانات', value: dataSourceLabel, tone: dataSourceTone },
+    { id: 'blocked', label: 'رنينات محجوبة', value: runtimeActive ? '—' : String(preview.summary.blockedRings), tone: 'danger' as const },
   ];
 
   const pendingApprovalsCount = PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length;
@@ -350,32 +379,53 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
             })}
           </WebControlPanelQueue>
 
-          {/* 2. Live Orders Queue */}
-          <WebControlPanelQueue title="الطلبات المباشرة" meta={`${preview.rows.length} طلبات نشطة`}>
-            {preview.rows.map((order) => (
-              <WebControlPanelDecisionRow
-                key={order.id}
-                entityId={order.id}
-                entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
-                status={order.status}
-                statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
-                risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
-                recommendation={order.suggestion.label}
-                reason={order.suggestion.reason}
-                sla={`ETA: ${order.eta} | ${order.ringLabel}`}
-                onInspect={() => setSelectedItemId({ type: 'live', id: order.id })}
-                primaryAction={{
-                  id: `${order.id}-primary`,
-                  label: order.suggestion.action,
-                  onAction: () => handlePrimaryAction(order.id, order.suggestion.action),
-                }}
-                secondaryAction={order.suggestion.secondary ? {
-                  id: `${order.id}-secondary`,
-                  label: order.suggestion.secondary,
-                  onAction: () => handleSecondaryAction(order.id, order.suggestion.secondary),
-                } : undefined}
-              />
-            ))}
+          {/* 2. Live Orders Queue — runtime when available, preview fallback */}
+          <WebControlPanelQueue
+            title={runtimeActive ? 'الطلبات المباشرة (Runtime)' : 'الطلبات المباشرة (Preview)'}
+            meta={`${liveOrderCount} طلبات نشطة`}
+          >
+            {runtimeActive
+              ? runtimeState.orders.map((order) => (
+                  <WebControlPanelDecisionRow
+                    key={order.id}
+                    entityId={order.id}
+                    entityLabel={`متجر: ${order.storeId} — عميل: ${order.clientId}${order.captainId ? ` — كابتن: ${order.captainId}` : ''}`}
+                    status={order.status}
+                    statusTone={resolveRuntimeOrderTone(order.status)}
+                    sla={`تاريخ الإنشاء: ${new Date(order.createdAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })}`}
+                    onInspect={() => router.push(`/operations?group=exceptions&orderId=${order.id}`)}
+                    primaryAction={order.status === 'CREATED' ? {
+                      id: `${order.id}-dispatch`,
+                      label: 'إسناد كابتن',
+                      onAction: () => router.push(`/operations?group=dispatch-capacity&orderId=${order.id}`),
+                    } : undefined}
+                  />
+                ))
+              : preview.rows.map((order) => (
+                  <WebControlPanelDecisionRow
+                    key={order.id}
+                    entityId={order.id}
+                    entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
+                    status={order.status}
+                    statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
+                    risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
+                    recommendation={order.suggestion.label}
+                    reason={order.suggestion.reason}
+                    sla={`ETA: ${order.eta} | ${order.ringLabel}`}
+                    onInspect={() => setSelectedItemId({ type: 'live', id: order.id })}
+                    primaryAction={{
+                      id: `${order.id}-primary`,
+                      label: order.suggestion.action,
+                      onAction: () => handlePrimaryAction(order.id, order.suggestion.action),
+                    }}
+                    secondaryAction={order.suggestion.secondary ? {
+                      id: `${order.id}-secondary`,
+                      label: order.suggestion.secondary,
+                      onAction: () => handleSecondaryAction(order.id, order.suggestion.secondary),
+                    } : undefined}
+                  />
+                ))
+            }
           </WebControlPanelQueue>
 
           {/* 3. Fulfillment Mode subGroup Queue (if active) */}
