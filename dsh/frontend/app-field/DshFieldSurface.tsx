@@ -10,7 +10,7 @@ import { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboarding
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
 import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
-import { readFieldStoresLocal, writeFieldStoresLocal, fetchAndMergeFieldStoresFromApi } from './storage/field-onboarding.storage';
+import { readFieldStoresLocal, writeFieldStoresLocal } from './storage/field-onboarding.storage';
 import {
   createManualFieldStore,
   submitFieldStoreForReview,
@@ -75,13 +75,6 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
   React.useEffect(() => {
     writeFieldStoresLocal(stores);
   }, [stores]);
-
-  // Hydrate store list from DSH backend on mount; fall back to local cache silently.
-  React.useEffect(() => {
-    fetchAndMergeFieldStoresFromApi().then(setStores).catch(() => {
-      // API unavailable — local cache remains active
-    });
-  }, []);
 
   React.useEffect(() => {
     if (typeof command?.token !== 'number') {
