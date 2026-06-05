@@ -1,16 +1,41 @@
 openapi: 3.1.0
 info:
   title: WLT DSH Finance API
-  version: 0.3.0-scaffold
+  version: 0.4.0-dsh-runtime-core
   description: >
     WLT contract scaffold for DSH finance surfaces.
-    CONTRACT_SCAFFOLD_PREVIEW_ONLY — no backend implemented.
+    WLT_DSH_RUNTIME_CORE is implemented for the DSH-scoped payment, wallet summary,
+    refund queue, settlement, payout, COD, ledger, reconciliation, and close handlers.
+    Platform-wide WLT remains outside this DSH bridge closure.
     All financial ownership belongs to WLT.
     DSH surfaces are consumers only; no direct ledger write from DSH.
-x-bthwani-contract-state: CONTRACT_SCAFFOLD_PREVIEW_ONLY
+  contact:
+    name: BThwani WLT Finance Governance
+    url: https://bthwani.internal/governance/wlt
+servers:
+  - url: https://api.bthwani.internal
+    description: Production WLT API boundary
+  - url: http://localhost:8081
+    description: Local WLT runtime boundary
+x-bthwani-contract-state: WLT_DSH_RUNTIME_CORE
 x-bthwani-currency-default: YER
 x-bthwani-ownership: WLT owns all wallet, balance, payment, ledger, reconciliation, settlement, payout, COD liability, and captain eligibility operations. DSH surfaces are read-only consumers.
-x-bthwani-runtime-status: NOT_IMPLEMENTED — backend/ledger/idempotency/security/reconciliation not built
+x-bthwani-runtime-status: DSH_SCOPED_RUNTIME_CORE_IMPLEMENTED — platform-wide WLT remains OUT_OF_SCOPE_DSH_FINANCE_NOW
+tags:
+  - name: client-wallet
+    description: DSH-scoped client wallet summary and checkout-linked top-up visibility.
+  - name: client-payment
+    description: DSH checkout payment session authorization and callback-owned status.
+  - name: captain-finance
+    description: DSH captain eligibility, COD liabilities, and earnings visibility.
+  - name: partner-finance
+    description: DSH partner settlement cycle visibility.
+  - name: field-finance
+    description: DSH field commission visibility.
+  - name: control-panel-finance
+    description: DSH finance control-panel runtime, ledger, reconciliation, refund, payout, and close visibility.
+  - name: store-delivery-finance
+    description: DSH store-delivery finance visibility owned by WLT.
 
 paths:
   /wlt/dsh/client/wallet/summary:
@@ -128,7 +153,7 @@ paths:
       operationId: createClientTopUpSession
       summary: Create a top-up session for client wallet
       description: >
-        WLT-owned. Initiates a wallet top-up flow for the client.
+        WLT-owned. Initiates a wallet top-up flow for the client when tied to a DSH checkout/wallet recovery flow.
         WLT returns a redirectUrl for the hosted top-up flow.
         DSH displays the redirect — does not process the top-up itself.
         Idempotency-Key header is required to prevent duplicate top-ups.
@@ -756,8 +781,8 @@ paths:
       operationId: listRefundLedger
       summary: List WLT refund ledger previews
       description: >
-        WLT-owned refund and dispute ledger preview. DSH may inspect impact only;
-        WLT executes all refund effects in a future runtime.
+        WLT-owned refund and dispute ledger. DSH may inspect impact only;
+        WLT executes all DSH refund effects in the WLT-DSH runtime core.
       tags: [control-panel-finance]
       security:
         - bearerAuth: []

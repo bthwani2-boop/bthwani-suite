@@ -10,6 +10,8 @@
     "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
     "openapi:lint:dsh": "spectral lint dsh/dsh.openapi.yaml --ruleset .spectral.yaml",
     "openapi:types:dsh": "openapi-typescript dsh/dsh.openapi.yaml -o dsh/frontend/app-client/contracts/dsh-openapi.types.ts",
+    "openapi:lint:wlt": "spectral lint wlt/wlt.openapi.yaml --ruleset .spectral.yaml",
+    "openapi:types:wlt": "openapi-typescript wlt/wlt.openapi.yaml -o wlt/frontend/contracts/wlt-dsh-openapi.types.ts",
     "guard:i18n-direction": "node tools/scripts/guard-central-i18n-direction.mjs",
     "guard:i18n-direction:mobile-control-panel": "node tools/scripts/guard-central-i18n-direction.mjs app-client app-partner app-captain app-field control-panel webapp website",
     "guard:service-blueprint": "node tools/guards/guard-service-contract-matrix.mjs",

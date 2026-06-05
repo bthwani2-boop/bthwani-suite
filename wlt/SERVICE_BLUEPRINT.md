@@ -32,7 +32,7 @@ wlt/wlt.openapi.yaml
 | OpenAPI Contract | `wlt/wlt.openapi.yaml` |
 | Public Export Path | `wlt/index.ts` |
 | Current Decision | `NOT CLOSED` |
-| Current Status | `ACCOUNTING_PREVIEW_FOUNDATION / NEEDS_RUNTIME` |
+| Current Status | `WLT_DSH_RUNTIME_CORE / FULL_WLT_NOT_CLOSED` |
 | Phase F1 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
 | Phase F2 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
 | Phase F3 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
@@ -327,11 +327,11 @@ A gap does not automatically mean a new screen. It may close through:
 
 | Area | Status | Source | Evidence | Notes |
 |---|---|---|---|---|
-| OpenAPI | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/wlt.openapi.yaml` | N/A | Preview-only WLT finance contracts exist; backend/runtime is not implemented. |
-| API Types | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/control-panel/dsh/models/*` | N/A | TypeScript interfaces define structural preview contract. |
-| API Client / Typed Boundary | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/control-panel/dsh/adapters/*` | N/A | Scaffolds bridge and type bindings in the frontend. |
-| Backend Handler | `NOT_IMPLEMENTED` | TBD | N/A | No backend claim without implementation evidence. |
-| Persistence Model | `NOT_IMPLEMENTED` | TBD | N/A | No data claim without evidence. |
+| OpenAPI | `WLT_DSH_RUNTIME_CORE` | `wlt/wlt.openapi.yaml` | local verification required | DSH-scoped WLT contract is marked runtime-core; platform-wide WLT remains outside this closure. |
+| API Types | `WLT_DSH_TYPED_CLIENT_GENERATED` | `wlt/frontend/contracts/wlt-dsh-openapi.types.ts` | local verification required | Generated from `wlt/wlt.openapi.yaml`; DSH-scoped only. |
+| API Client / Typed Boundary | `WLT_DSH_TYPED_CLIENT_BOUNDARY` | `wlt/frontend/contracts/wlt-dsh-client.ts` | local verification required | Typed client covers DSH wallet summary, payment session, finance overview, reconciliation, and payout decision. |
+| Backend Handler | `WLT_DSH_RUNTIME_CORE` | `wlt/backend/src/runtime.ts` | local verification required | In-service WLT handler owns payment, refund, settlement, COD, payout, ledger, reconciliation, and close state for DSH orders. |
+| Persistence Model | `IN_MEMORY_RUNTIME_CORE_ONLY` | `wlt/backend/src/runtime.ts` | local verification required | No database claim yet; durable ledger persistence remains required before production closure. |
 | Domain Model | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/control-panel/dsh/*` | N/A | Service-owned preview read models only. |
 | Mutable Policy / VAR | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/control-panel/dsh/constants/*` | N/A | Predefined static config registers. |
 

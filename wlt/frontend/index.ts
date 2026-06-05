@@ -5,6 +5,7 @@
 // duplicate type conflicts (WltDshFinancePreviewRecord is re-exported in both).
 export * from './app-client';
 export * from './app-partner';
+export * from './contracts';
 export * as wltCaptainDsh from './app-captain/dsh';
 export * as wltFieldDsh from './app-field/dsh';
 export * from './control-panel/dsh';
