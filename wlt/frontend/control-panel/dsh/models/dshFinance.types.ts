@@ -68,7 +68,7 @@ export interface WltDshFinancePreviewRecord {
   sourceFieldAgentId?: string;
   settlementCycleId?: string;
   holdReason?: string;
-  isPreview: true;
+  isPreview: boolean;
 }
 
 export type WltDshFinancePreviewMetadata = {
@@ -123,7 +123,7 @@ export type WltCaptainFinanceSnapshot = {
   hasEligibilityBlock: boolean;
   eligibilityBlockReason: string;
   contractState: 'CONTRACT_TBD';
-  isPreview: true;
+  isPreview: boolean;
 };
 
 export type WltPartnerFinanceSnapshot = {
@@ -151,7 +151,7 @@ export type WltPartnerFinanceSnapshot = {
   moneySemantics: 'display_only — no_accounting_effect';
   sourceLabel: string;
   warnings: readonly string[];
-  isPreview: true;
+  isPreview: boolean;
 };
 
 export type WltFieldFinanceSnapshot = {
@@ -172,7 +172,7 @@ export type WltFieldFinanceSnapshot = {
   lastPayoutDate: string;
   nextPayoutDate: string;
   contractState: 'CONTRACT_TBD';
-  isPreview: true;
+  isPreview: boolean;
 };
 
 // ─── Payment types ─────────────────────────────────────────────────

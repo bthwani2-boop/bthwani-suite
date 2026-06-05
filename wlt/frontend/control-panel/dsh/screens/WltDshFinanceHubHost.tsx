@@ -12,6 +12,11 @@ import {
 } from '../constants/finance.registry';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../models/financeRouting.types';
 import { getWltControlPanelFinancePreview, buildWltFinancialCenter } from '../financeContracts';
+import {
+  buildWltRuntimeFinancialCenter,
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../adapters/wltDshFinanceRuntime.adapter';
 
 import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { LedgerScreen } from './LedgerScreen';
@@ -156,11 +161,33 @@ export function WltDshFinanceHubHost({
   }, [group, subGroup, panel, urlSubGroup]);
 
   const financePreview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (!cancelled) setRuntimeFinance(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Daily center metrics calculation
   const center = React.useMemo(() => {
-    return buildWltFinancialCenter(new Date().toISOString().split('T')[0]!, financePreview.allRecords);
-  }, [financePreview]);
+    const businessDate = new Date().toISOString().split('T')[0]!;
+    if (runtimeFinance?.state === 'runtime') {
+      return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
+    }
+
+    return buildWltFinancialCenter(businessDate, financePreview.allRecords);
+  }, [financePreview, runtimeFinance]);
+
+  const runtimeSourceLabel = React.useMemo(() => {
+    if (!runtimeFinance) return 'WLT runtime: loading';
+    if (runtimeFinance.state === 'runtime') return `WLT runtime: ${runtimeFinance.data.baseUrl}`;
+    return `WLT runtime blocked: ${runtimeFinance.baseUrl}`;
+  }, [runtimeFinance]);
 
   const pendingCount = React.useMemo(
     () => center.allEntries.filter((e) => e.isPending).length,
@@ -405,12 +432,12 @@ export function WltDshFinanceHubHost({
               <h1 className={styles.surfaceHeaderTitle}>غرفة القيادة المالية</h1>
               <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
                 <span className={wltStyles.headerBadgeLabel}>
-                  معاينة تشغيلية
+                  {runtimeFinance?.state === 'runtime' ? 'WLT runtime' : 'معاينة عند تعذر runtime'}
                 </span>
               </Box>
             </div>
             <p className={wltStyles.readinessDesc}>
-              العملة: <strong>ر.ي (ريال يمني)</strong> · نظام الرقابة المركزي
+              العملة: <strong>ر.ي (ريال يمني)</strong> · {runtimeSourceLabel}
             </p>
           </Box>
         </div>

@@ -1,146 +1,84 @@
-// PREVIEW_ONLY — WLT DSH Client Adapter (localStorage simulation, not a real payment runtime).
-// All operations (requestPayment, topUp, link, getBalance) use in-memory / localStorage only.
-// runtimeTruth=false / backendSource=false — see wlt-dsh-client.contract.ts for the full boundary contract.
-// No real ledger entry, no real WLT API call, no real payment mutation from this adapter.
-// When a real WLT payment runtime is available, replace this file with the actual SDK bridge.
-//
-// BOUNDARY: DSH does not own wallet state.
-// DSH adapter is localStorage preview only until WLT payment session contract is live.
-// Financial truth lives in WLT — not in DSH backend.
+// WLT DSH Client Adapter — runtime-bound HTTP bridge.
+// DSH stores WLT references/status only; WLT owns wallet balance and payment outcome.
+
+import { createWltDshTypedClient } from '../../contracts';
 
 export type WalletAccount = { id: string; name: string };
 
-const STORAGE_KEY_ACCOUNT = 'dsh_bth_wallet_account';
-const STORAGE_KEY_BALANCE = 'dsh_bth_wallet_balance';
+const DEFAULT_CLIENT_ID = 'client-demo';
+const DEFAULT_ORDER_ID = 'dsh-client-runtime-payment';
+const DEFAULT_CURRENCY = 'YER';
 
-let walletAccountMemory: WalletAccount | null = null;
-let walletBalanceMemory = 10000;
-
-function getStorageHandle() {
-	try {
-		return typeof globalThis !== 'undefined' && 'localStorage' in globalThis ? globalThis.localStorage : null;
-	} catch {
-		return null;
-	}
+function getClient() {
+	return createWltDshTypedClient({});
 }
 
-function readAccountLocal(): WalletAccount | null {
-	const storage = getStorageHandle();
-	if (storage) {
-		try {
-			const raw = storage.getItem(STORAGE_KEY_ACCOUNT);
-			if (!raw) return walletAccountMemory;
-			const parsed = JSON.parse(raw) as WalletAccount;
-			walletAccountMemory = parsed;
-			return parsed;
-		} catch {
-			return walletAccountMemory;
-		}
-	}
-
-	return walletAccountMemory;
+function paymentIdempotencyKey(amountMinorUnits: number): string {
+	return `dsh-client-payment-${DEFAULT_CLIENT_ID}-${DEFAULT_ORDER_ID}-${amountMinorUnits}`;
 }
 
-function writeAccountLocal(account: WalletAccount | null) {
-	walletAccountMemory = account;
-	const storage = getStorageHandle();
-	if (!storage) {
-		return;
-	}
-
-	try {
-		if (account) {
-			storage.setItem(STORAGE_KEY_ACCOUNT, JSON.stringify(account));
-		} else {
-			storage.removeItem(STORAGE_KEY_ACCOUNT);
-		}
-	} catch {
-		// ignore
-	}
-}
-
-function readBalanceLocal() {
-	const storage = getStorageHandle();
-	if (storage) {
-		try {
-			const raw = storage.getItem(STORAGE_KEY_BALANCE);
-			if (raw == null) {
-				storage.setItem(STORAGE_KEY_BALANCE, String(walletBalanceMemory));
-				return walletBalanceMemory;
-			}
-			const parsed = Number(raw);
-			walletBalanceMemory = Number.isFinite(parsed) ? parsed : walletBalanceMemory;
-			return walletBalanceMemory;
-		} catch {
-			return walletBalanceMemory;
-		}
-	}
-
-	return walletBalanceMemory;
-}
-
-function writeBalanceLocal(nextBalance: number) {
-	walletBalanceMemory = nextBalance;
-	const storage = getStorageHandle();
-	if (!storage) {
-		return;
-	}
-
-	try {
-		storage.setItem(STORAGE_KEY_BALANCE, String(nextBalance));
-	} catch {
-		// ignore
-	}
-}
-
-function ensureBalanceLocal() {
-	readBalanceLocal();
+function normalizeError(error: unknown): string {
+	if (error instanceof Error && error.message) return error.message;
+	return 'wlt_runtime_unavailable';
 }
 
 export const isLinked = async (): Promise<boolean> => {
-	// PREVIEW: localStorage-only. WLT runtime not yet available.
-	return Boolean(readAccountLocal());
+	const summary = await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
+	return Boolean(summary.linked);
 };
 
 export const getBalance = async (): Promise<number> => {
-	// PREVIEW: localStorage-only. WLT runtime not yet available.
-	ensureBalanceLocal();
-	return readBalanceLocal();
+	const summary = await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
+	return summary.balanceMinorUnits;
 };
 
-export const link = async (): Promise<{ success: boolean; account?: WalletAccount }> => {
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	const account = { id: `wallet-${Date.now()}`, name: 'محفظة بثواني' };
-	writeAccountLocal(account);
-	ensureBalanceLocal();
-	return { success: true, account };
+export const link = async (): Promise<{ success: boolean; account?: WalletAccount; error?: string }> => {
+	try {
+		const summary = await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
+		if (!summary.linked) {
+			return { success: false, error: 'wallet_unlinked_by_wlt_runtime' };
+		}
+
+		return {
+			success: true,
+			account: { id: DEFAULT_CLIENT_ID, name: 'محفظة WLT' },
+		};
+	} catch (error) {
+		return { success: false, error: normalizeError(error) };
+	}
 };
 
 export const unlink = async (): Promise<void> => {
-	await new Promise((resolve) => setTimeout(resolve, 100));
-	writeAccountLocal(null);
+	throw new Error('wlt_runtime_link_state_is_read_only_for_dsh');
 };
 
-export const requestPayment = async (amountMinorUnits: number): Promise<{ success: boolean; txId?: string; error?: string }> => {
-	// PREVIEW: localStorage-only simulation.
-	// Real implementation: POST to WLT payment session endpoint, receive sessionId, poll status.
-	ensureBalanceLocal();
-	const balance = readBalanceLocal();
-	if (balance < amountMinorUnits) return { success: false, error: 'insufficient_balance' };
-	writeBalanceLocal(balance - amountMinorUnits);
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	return { success: true, txId: `tx-${Date.now()}` };
+export const requestPayment = async (
+	amountMinorUnits: number,
+): Promise<{ success: boolean; txId?: string; error?: string }> => {
+	try {
+		const session = await getClient().createClientPaymentSession(
+			{
+				orderId: DEFAULT_ORDER_ID,
+				clientId: DEFAULT_CLIENT_ID,
+				amountMinorUnits,
+				currency: DEFAULT_CURRENCY,
+				paymentMethod: 'wallet',
+			},
+			paymentIdempotencyKey(amountMinorUnits),
+		);
+
+		if (session.status !== 'captured') {
+			return { success: false, txId: session.id, error: `wlt_payment_${session.status}` };
+		}
+
+		return { success: true, txId: session.wltPaymentRefId ?? session.id };
+	} catch (error) {
+		return { success: false, error: normalizeError(error) };
+	}
 };
 
-export const topUp = async (amountMinorUnits: number): Promise<{ success: boolean; balance: number }> => {
-	// PREVIEW: localStorage-only simulation.
-	// Real implementation: POST to WLT top-up session endpoint.
-	ensureBalanceLocal();
-	const balance = readBalanceLocal();
-	const newBalance = balance + amountMinorUnits;
-	writeBalanceLocal(newBalance);
-	await new Promise((resolve) => setTimeout(resolve, 200));
-	return { success: true, balance: newBalance };
+export const topUp = async (): Promise<{ success: boolean; balance?: number; error?: string }> => {
+	return { success: false, error: 'wlt_top_up_out_of_scope_for_dsh_runtime_slice' };
 };
 
 export const createDeepLink = (orderId: string, amountMinorUnits: number): string => {

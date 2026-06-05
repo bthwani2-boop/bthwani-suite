@@ -151,7 +151,6 @@ function sanitizeLabel(text: string | undefined): string {
   result = result.replace(/partner_delivery/g, 'توصيل المتجر');
   result = result.replace(/bthwani_delivery/g, 'توصيل بثواني');
   result = result.replace(/pickup/g, 'استلام ذاتي');
-  result = result.replace(/UI_PREVIEW_ONLY/g, 'خاضع لسياسة المحفظة');
   result = result.replace(/CONTRACT_TBD/g, 'قيد المراجعة');
   result = result.replace(/store_courier_mode/g, 'توصيل المتجر');
   result = result.replace(/bthwani_captain_mode/g, 'كابتن بثواني');

@@ -6,6 +6,11 @@ import { Box, Text } from '@bthwani/ui-kit';
 import { buildFinanceHref } from '../constants/finance.registry';
 import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
+import {
+  buildWltRuntimeFinancialCenter,
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../adapters/wltDshFinanceRuntime.adapter';
 import type { WltFinancialCenterSection, WltLedgerEntry, WltFinancialCenterBlockingVariance } from '../models/financialCenter.types';
 
 const SECTION_COLOR: Record<string, string> = {
@@ -338,17 +343,36 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
 
 export function FinancialCenterScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHref: string; subGroup?: string }) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (!cancelled) setRuntimeFinance(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const center = React.useMemo(
-    () => buildWltFinancialCenter(new Date().toISOString().split('T')[0]!, preview.allRecords),
-    [preview],
+    () => {
+      const businessDate = new Date().toISOString().split('T')[0]!;
+      if (runtimeFinance?.state === 'runtime') {
+        return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
+      }
+      return buildWltFinancialCenter(businessDate, preview.allRecords);
+    },
+    [preview, runtimeFinance],
   );
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <div style={{ padding: '6px 12px', background: 'var(--bth-warning-surface)', border: '1px solid var(--bth-warning-border)', borderRadius: 7, display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 10, color: 'var(--bth-warning-text)', fontWeight: '700' }}>
-          معاينة تشغيلية · الأرصدة الافتتاحية والختامية غير متوفرة حالياً — يتطلب اكتمال الربط المالي
+          {runtimeFinance?.state === 'runtime'
+            ? `WLT runtime · ${runtimeFinance.data.baseUrl} · ${runtimeFinance.data.closeStatus.status}`
+            : `Fallback preview · ${runtimeFinance?.state === 'blocked' ? runtimeFinance.error : 'loading runtime'}`}
         </span>
       </div>
 

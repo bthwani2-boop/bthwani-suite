@@ -4,13 +4,35 @@ import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
+import {
+  buildWltRuntimeFinancialCenter,
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../adapters/wltDshFinanceRuntime.adapter';
 import { LedgerEntriesTable } from '../components/LedgerEntriesTable';
 import { TrialBalancePanel } from '../components/TrialBalancePanel';
 
 export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHref: string; subGroup?: string }) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
   const businessDate = new Date().toISOString().split('T')[0]!;
-  const center = React.useMemo(() => buildWltFinancialCenter(businessDate, preview.allRecords), [preview, businessDate]);
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (!cancelled) setRuntimeFinance(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const center = React.useMemo(() => {
+    if (runtimeFinance?.state === 'runtime') {
+      return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
+    }
+    return buildWltFinancialCenter(businessDate, preview.allRecords);
+  }, [preview, businessDate, runtimeFinance]);
 
   const [activeView, setActiveView] = React.useState<'journal' | 'trial-balance'>('journal');
 
@@ -19,10 +41,12 @@ export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHr
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
         <Text role="titleMd" style={{ fontWeight: 700 }}>دفتر الأستاذ</Text>
         <Text role="bodySm" tone="soft">
-          قيود اليومية + ميزان المراجعة. معاينة تشغيلية — يتطلب ربط مالي للترحيل الفعلي.
+          قيود اليومية + ميزان المراجعة. {runtimeFinance?.state === 'runtime' ? 'مرتبطة بـ WLT runtime read model.' : 'Fallback preview عند تعذر WLT runtime.'}
         </Text>
         <Text role="caption" tone="muted">
-          {`معاينة تشغيلية · ${businessDate}`}
+          {runtimeFinance?.state === 'runtime'
+            ? `WLT runtime · ${runtimeFinance.data.baseUrl} · ${businessDate}`
+            : `preview fallback · ${businessDate}`}
         </Text>
       </Box>
 

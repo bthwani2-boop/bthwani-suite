@@ -28,7 +28,7 @@ export type WltLedgerEntry = {
   readonly status: WltLedgerEntryStatus;
   readonly isPending: boolean;
   readonly needsReconciliation: boolean;
-  readonly isPreview: true;
+  readonly isPreview: boolean;
 };
 
 export type WltAccountPositionLine = {
@@ -40,7 +40,7 @@ export type WltAccountPositionLine = {
   readonly entryCount: number;
   readonly pendingCount: number;
   readonly entries: readonly WltLedgerEntry[];
-  readonly isPreview: true;
+  readonly isPreview: boolean;
 };
 
 export type WltFinancialCenterSection = {
@@ -76,8 +76,8 @@ export type WltFinancialCenter = {
   readonly netPositionLabel: string;
   readonly blockingVariances: readonly WltFinancialCenterBlockingVariance[];
   readonly canClose: boolean;
-  readonly contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY';
-  readonly openingBalanceSource: 'none — no real ledger in preview';
-  readonly closingBalanceSource: 'none — no real ledger in preview';
-  readonly isPreview: true;
+  readonly contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' | 'WLT_DSH_RUNTIME_BOUND';
+  readonly openingBalanceSource: string;
+  readonly closingBalanceSource: string;
+  readonly isPreview: boolean;
 };

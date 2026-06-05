@@ -146,9 +146,9 @@ function resolveServiceModeEnabled(
 
 function formatApplicability(app: WltDshOrderLineItemApplicability) {
   if (app.applies) {
-    if (app.label === 'UI_PREVIEW_ONLY — WLT') return 'تُحدد بواسطة WLT (قيد المعاينة)';
-    if (app.label === 'UI_PREVIEW_ONLY — حسب سياسة المتجر') return 'حسب سياسة المتجر';
-    if (app.label === 'UI_PREVIEW_ONLY — حسب اتفاق المتجر') return 'حسب اتفاق المتجر';
+    if (app.label.endsWith('— WLT')) return 'تُحدد بواسطة WLT runtime';
+    if (app.label.endsWith('— حسب سياسة المتجر')) return 'حسب سياسة المتجر';
+    if (app.label.endsWith('— حسب اتفاق المتجر')) return 'حسب اتفاق المتجر';
     return app.label;
   }
   return app.reason;
