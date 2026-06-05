@@ -10,7 +10,7 @@ export type WltDshCaptainUiCopy = {
   walletAccessibilityLabel: string;
 };
 
-const walletBalanceLabel = wltDshCaptainPreviewData.finance.snapshot.codBalanceLabel;
+const walletBalanceLabel = wltDshCaptainPreviewData.finance.snapshot.codLiabilityLabel;
 
 export const wltDshCaptainUiCopy = {
   summaryLabel: 'المحفظة',

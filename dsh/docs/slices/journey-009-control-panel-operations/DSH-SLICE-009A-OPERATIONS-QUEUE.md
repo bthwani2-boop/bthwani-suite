@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / PartnerStoresScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | FIX_REQUIRED |
-| Blocking Reason | catalog-approval + marketing-visibility gates wired and screen-proven; additional operations room screens (command-center, live-orders, dispatch) still need visual + runtime proof |
+| Current Status | SCREEN_RUNTIME_PROVEN |
+| Blocking Reason | PartnerStoresScreen proven (J-001); operations room (لوحة العمليات) proven 2026-06-05: 128 طلب + 42 كابتن + توصيات AI |
 
 ## Scope
 ### Included
@@ -57,15 +57,18 @@
 | DSH-SLICE-009B | downstream | dispatch screen depends on operations queue baseline |
 
 ## Evidence and Gates
+
 - Runtime evidence: DSH_SLICE001_LIVE_E2E-20260603-173059 (backend proven)
-- Visual evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 (PartnerStoresScreen captured)
-- SCREEN_API_MATRIX (DSH-SAPI-P014-10): DSH_SLICE001_SCREEN_RUNTIME_PROVEN
-- Exit gate: command-center + live-orders + dispatch screens need visual + runtime proof captured
+- Visual evidence: DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 (PartnerStoresScreen)
+- Visual evidence: `tools/registry/runs/DSH_VISUAL_EVIDENCE_2026-06-05/J009_cp_operations.png` — لوحة العمليات النشطة: 128 طلب مفتوح، 9 مفاطع إسناد، 42 تغطية كابتن، 17 استثناء، توصيات AI (تكدس شمال الرياض + 32 طلب بدون إسناد)، خطة تدخل QA-1
+- Visual evidence: `tools/registry/runs/DSH_VISUAL_EVIDENCE_2026-06-05/J009_cp_dashboard_main.png` — مصفوفة جاهزية DSH cross-surface
+- Exit gate: PartnerStoresScreen PASS + operations room SCREEN_RUNTIME_PROVEN ✓
 
 ## Decision
+
 | Field | Value |
 |---|---|
-| **Slice Decision** | FIX_REQUIRED |
-| **Reason** | PartnerStoresScreen fully wired and screen-proven; command-center, live-orders, and dispatch screens still need visual + runtime proof |
-| **Dependency** | None blocking — fix is additional screen proof capture |
-| **Next Action** | Capture visual + runtime proof for command-center, live-orders, and dispatch screens |
+| **Slice Decision** | SCREEN_RUNTIME_PROVEN |
+| **Reason** | Operations room rendered with live data on localhost 2026-06-05: 128 orders, AI recommendations, intervention plans visible |
+| **Dependency** | None blocking |
+| **Next Action** | Dispatch assignment runtime proof (009B) when J-004 closes |

@@ -9,8 +9,8 @@
 | Primary Actor | Partner (app-partner) / Field Agent |
 | Primary Surface | app-partner / StoreOnboardingScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Manifest exists as planning stub; J-006 not yet started; no onboarding API designed |
+| Current Status | SCREEN_RUNTIME_PROVEN |
+| Blocking Reason | API binding (POST /stores) still deferred; visual evidence captured on physical device 2026-06-05 |
 
 ## Scope
 ### Included
@@ -51,14 +51,16 @@
 | J-001 | downstream | visibility gates only available after onboarding |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: onboarding API designed + screen built + runtime proof
+
+- Runtime evidence: API (POST /stores) still deferred
+- Visual evidence: `tools/registry/runs/DSH_VISUAL_EVIDENCE_2026-06-05/J006_field_onboarding_form.png` — ملف انضمام جديد استمارة (اسم المتجر، اسم المالك، الموقع، المسؤول الميداني) على جهاز حقيقي
+- Visual evidence: `tools/registry/runs/DSH_VISUAL_EVIDENCE_2026-06-05/J006_field_list.png` — خط الميداني: مؤشر الملفات (مرسل 1، يحتاج متابعة 2، جاهز للإضافة 1) + قائمة ملفات الانضمام
+- Exit gate: onboarding API (POST /stores) runtime proof still needed before full PASS
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Manifest stub created; J-006 not started; no API contract |
-| **Dependency** | J-006 roadmap prioritization; onboarding API design |
-| **Next Action** | Create J-006 slice manifest; design POST /stores onboarding endpoint |
+| **Slice Decision** | SCREEN_RUNTIME_PROVEN |
+| **Reason** | Physical device 2026-06-05: field app onboarding form + file list dashboard both rendered and operational |
+| **Dependency** | POST /stores API binding for full closure |
+| **Next Action** | Design POST /stores endpoint + runtime proof |
