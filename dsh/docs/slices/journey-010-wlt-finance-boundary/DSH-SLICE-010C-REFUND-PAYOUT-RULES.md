@@ -9,8 +9,8 @@
 | Primary Actor | N/A — governance rule |
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns all financial mutations; DSH trigger-only via callback |
-| Current Status | PASS |
-| Blocking Reason | none — closed |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | WLT-owned; DSH is read-only bridge only |
 
 ## Scope
 ### Included
@@ -55,7 +55,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Governance rule validated and verified. No direct WLT financial mutation API calls exist in DSH. Enforced via automated platform vars and repo boundaries guards. |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | WLT-owned read-only bridge; DSH contains zero financial mutation |
 | **Dependency | none |
-| **Next Action** | none — slice closed |
+| **Next Action** | Enforce via service boundaries |

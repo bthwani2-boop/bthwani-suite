@@ -23,8 +23,8 @@
 | API/Runtime Boundary | `DELETE /checkout/intent/{id}` — PASS; verified with local E2E integration script; cancel checkout and callback handling are fully implemented and verified |
 | Visual Evidence Required | yes — CheckoutFailureScreen states: payment_failed (with reason), retry_in_progress, cancelled; cart preserved state |
 | Runtime Evidence Required | yes — WLT failure callback + CheckoutFailureScreen proof + cart preserved after failure |
-| Current Status | `PASS` |
-| Blocking Reason | none — resolved via E2E integration script verification |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | live auth-service runtime proof + WLT runtime/security proof + visual proof pending |
 
 ## Scope
 
@@ -124,10 +124,10 @@
 - Cancel checkout deletes the intent session only; no DB financial records created
 - Retry re-enters 003C; no rollback mechanism needed for failure screen itself
 
-| **Slice Decision** | `PASS` |
-| **Reason** | `DELETE /checkout/intent/{id}` is implemented in Go (3/3 cancel tests PASS). `DshCheckoutFailureScreen` is registered, wired to all 4 required states, and all failure reason codes are mapped. Visual evidence captured from live device and control panel. |
-| **Dependency** | none — verified |
-| **Next Action** | none — closed |
-| **Required Additions Before PASS** | none — verified |
-| **Forward-Only Gate** | All 7 exit gates closed with evidence |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | `DELETE /checkout/intent/{id}` is implemented in Go, and `DshCheckoutFailureScreen` is registered and wired, but live auth-service runtime proof + WLT runtime/security proof + visual proof are pending. |
+| **Dependency** | live auth-service runtime proof + WLT runtime/security proof |
+| **Next Action** | obtain live auth-service runtime proof and WLT E2E runtime proof |
+| **Required Additions Before PASS** | live auth-service runtime proof + WLT runtime/security proof + visual proof |
+| **Forward-Only Gate** | Keep blocked until auth/WLT runtime evidence is captured |
 | **Evidence Folder** | `tools/registry/runs/DSH_J003_VISUAL_EVIDENCE-20260605/` |

@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) / Client (app-client) |
 | Primary Surface | app-captain / DshCaptainMapScreen; app-client / DshClientSurface (order tracking) |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
-| Blocking Reason | None |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -67,7 +67,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Full-stack trip milestones and location tracking verified E2E: captain pushes EN_ROUTE and ARRIVED coordinates, client retrieves live location, postgres persists coordinates and status events. Go tests and TypeScript compilation clean. |
-| **Dependency** | None |
-| **Next Action** | Proceed to Proof of Delivery (005E) |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |

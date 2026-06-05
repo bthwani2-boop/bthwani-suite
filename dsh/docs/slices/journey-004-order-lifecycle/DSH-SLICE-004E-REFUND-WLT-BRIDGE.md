@@ -9,8 +9,8 @@
 | Primary Actor | WLT (automated) |
 | Primary Surface | WLT (external boundary) |
 | WLT Boundary | WLT owns refund execution entirely; DSH is read-only |
-| Current Status | PASS |
-| Blocking Reason | None |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-003 is not closed |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Refund callback implemented in DSH backend and verified via E2E test script with mock WLT calls. |
-| **Dependency** | None |
-| **Next Action** | Proceed to subsequent slices |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-003 checkout/payment full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |

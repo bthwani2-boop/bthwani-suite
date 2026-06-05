@@ -9,8 +9,8 @@
 | Primary Actor | Client (app-client) / Partner (app-partner) |
 | Primary Surface | app-client / OrderTrackingScreen; app-partner / OrderManagementScreen |
 | WLT Boundary | Refund execution owned by WLT (004E); DSH sends cancellation signal only |
-| Current Status | PASS |
-| Blocking Reason | none — J-003 and partner lifecycle proven |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-003 is not closed |
 
 ## Scope
 ### Included
@@ -60,9 +60,9 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `PASS` |
-| **Reason** | POST /orders/{id}/cancel API implemented and successfully transitioning states to CANCELLED; app-client OrderTrackingScreen integrates cancellation drawer action properly |
-| **Dependency** | none |
-| **Next Action** | proceed to child slices of J-004 |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-003 checkout/payment full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |
 | **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004D_CANCELLATION_FINAL_CLOSURE-20260605-041800/` |
 | **Closed By** | Antigravity — 2026-06-05T04:18:00Z |

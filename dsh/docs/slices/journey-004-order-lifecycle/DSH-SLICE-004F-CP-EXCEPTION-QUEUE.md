@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ExceptionQueueScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
-| Blocking Reason | none — order runtime proven |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-003 is not closed |
 
 ## Scope
 ### Included
@@ -57,9 +57,9 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Control-panel ExceptionQueueScreen (ExceptionsEscalationsScreen) fully implemented and stateful; integrated with backend /exceptions structures properly |
-| **Dependency** | none |
-| **Next Action** | proceed to next journey slices |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-003 checkout/payment full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |
 | **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004F_CP_EXCEPTION_QUEUE_FINAL_CLOSURE-20260605-041800/` |
 | **Closed By** | Antigravity — 2026-06-05T04:18:00Z |

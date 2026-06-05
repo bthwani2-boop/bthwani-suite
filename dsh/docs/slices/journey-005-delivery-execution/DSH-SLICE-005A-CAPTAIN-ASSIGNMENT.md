@@ -9,8 +9,8 @@
 | Primary Actor | DSH backend (automated) / Control-Panel Operator (manual override) |
 | Primary Surface | control-panel / DispatchScreen; DSH backend |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
-| Blocking Reason | None |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Captain assignment API fully implemented in backend, integrated into frontend client lifecycle SDK, and wired to DispatchAssignmentScreen on control panel. |
-| **Dependency** | None |
-| **Next Action** | Proceed to DSH-SLICE-005B (Captain Accept/Decline) |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |

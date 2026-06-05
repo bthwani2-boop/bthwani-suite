@@ -23,8 +23,8 @@
 | API/Runtime Boundary | `POST /orders` and `GET /orders/{id}` — PASS; verified with local E2E integration script; order creation is a separate post-callback step and is validated by the endpoint handlers |
 | Visual Evidence Required | yes — app-client order confirmation screen; app-partner new order notification; control-panel ops monitor |
 | Runtime Evidence Required | yes — POST /orders runtime proof triggered by WLT callback + partner notification proven |
-| Current Status | `PASS` |
-| Blocking Reason | none — resolved via E2E integration script verification |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | live auth-service runtime proof + WLT runtime/security proof + visual proof pending |
 
 ## Scope
 
@@ -108,9 +108,9 @@
 - Retry is possible via re-invocation of POST /orders
 - Financial reversal (if needed) is WLT-owned via DSH-SLICE-004E
 
-| **Slice Decision** | `PASS` |
-| **Reason** | `POST /orders` and `GET /orders/{id}` contracts and handlers are implemented in Go and verified to receive checkout payment references post-callback using E2E integration script. |
-| **Dependency** | none — verified |
-| **Next Action** | none — closed |
-| **Forward-Only Gate** | All exit gates verified |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | `POST /orders` and `GET /orders/{id}` contracts and handlers are implemented in Go, but live auth-service runtime proof + WLT runtime/security proof + visual proof are pending. |
+| **Dependency** | live auth-service runtime proof + WLT runtime/security proof |
+| **Next Action** | obtain live auth-service runtime proof and WLT E2E runtime proof |
+| **Forward-Only Gate** | Keep blocked until auth/WLT runtime evidence is captured |
 | **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |

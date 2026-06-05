@@ -23,8 +23,8 @@
 | API/Runtime Boundary | GET /cart/serviceability — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING; backend production BearerAuth path exists and app-client checkout transport can send Bearer token; requires auth-service runtime proof before PASS |
 | Visual Evidence Required | yes — CartScreen serviceability states: serviceable / not-serviceable / loading / blocked |
 | Runtime Evidence Required | yes — GET /cart/serviceability runtime proof with auth token |
-| Current Status | `PASS` |
-| Blocking Reason | none — resolved via E2E integration script verification |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | live auth-service runtime proof + WLT runtime/security proof + visual proof pending |
 
 ## Scope
 
@@ -129,9 +129,9 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `PASS` |
-| **Reason** | `GET /cart/serviceability` is implemented in Go (7/7 tests PASS), wired in CartScreen.tsx via `handleCheckoutPress` → `props.checkoutClient.checkServiceability()`, and visually confirmed on live device (SM-A125F) and control panel. |
-| **Dependency** | none — verified |
-| **Next Action** | none — closed |
-| **Forward-Only Gate** | All 6 exit gates closed with evidence |
-| **Evidence Folder** | `tools/registry/runs/DSH_J003_VISUAL_EVIDENCE-20260605/` |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | `GET /cart/serviceability` is designed and implemented in Go with passing unit tests, but live auth-service runtime proof + WLT runtime/security proof + visual proof are pending. |
+| **Dependency** | live auth-service runtime proof + WLT runtime/security proof |
+| **Next Action** | obtain live auth-service runtime proof and WLT E2E runtime proof |
+| **Forward-Only Gate** | Keep blocked until auth/WLT runtime evidence is captured |
+| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |

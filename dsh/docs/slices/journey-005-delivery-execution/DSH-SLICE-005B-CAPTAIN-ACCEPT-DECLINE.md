@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / TaskScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
-| Blocking Reason | None |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Backend API, TS bindings, and Captain UI wired and verified successfully. |
-| **Dependency** | None |
-| **Next Action** | none |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |

@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / PickupScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
-| Blocking Reason | None |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Full-stack pickup handoff verified E2E with local Go API server and database constraints updated |
-| **Dependency** | None |
-| **Next Action** | Proceed to Trip Milestones Map (005D) |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
+| **Dependency** | J-003 full closure |
+| **Next Action** | Await upstream closure |

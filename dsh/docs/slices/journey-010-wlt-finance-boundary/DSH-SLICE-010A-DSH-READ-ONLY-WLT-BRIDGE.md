@@ -9,8 +9,8 @@
 | Primary Actor | Client (app-client) / Control-Panel Operator |
 | Primary Surface | app-client / WalletSummaryBanner; WltBoundaryBanner.tsx |
 | WLT Boundary | DSH is read-only; WLT owns all finance data and mutations |
-| Current Status | PASS |
-| Blocking Reason | none — closed |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | WLT-owned; DSH is read-only bridge only |
 
 ## Scope
 ### Included
@@ -57,7 +57,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Read-only WLT bridge endpoint implemented, TypeScript client wired, and E2E simulation verification passes successfully. |
-| **Dependency** | none |
-| **Next Action** | none — slice closed |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | WLT-owned read-only bridge; DSH contains zero financial mutation |
+| **Dependency** | WLT-owned read-only bridge |
+| **Next Action** | Enforce via service boundaries |

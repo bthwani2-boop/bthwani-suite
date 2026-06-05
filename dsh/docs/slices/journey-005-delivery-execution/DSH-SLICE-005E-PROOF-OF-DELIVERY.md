@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen |
 | WLT Boundary | No finance mutation — payout is WLT responsibility after DELIVERED event |
-| Current Status | **PASS** |
-| Blocking Reason | None — DSH-SLICE-005D is PASS |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -64,7 +64,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | **PASS** |
-| **Reason** | All gates satisfied: migration, backend, API, TypeScript client, frontend wiring, E2E 13/13 |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
 | **WLT Boundary** | Confirmed — no financial mutation in DSH. Payout is WLT responsibility after DELIVERED. |
-| **Next Action** | Proceed to DSH-SLICE-005F (Delivery Failure / Return) |
+| **Next Action** | Await upstream closure |

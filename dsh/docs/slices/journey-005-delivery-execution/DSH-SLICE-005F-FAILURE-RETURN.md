@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen (reportPodFailure CTA) |
 | WLT Boundary | Refund execution owned by WLT (004E). DSH stores wlt_refund_trigger_ref as bridge reference only. Zero financial mutation in DSH. |
-| Current Status | **PASS** |
-| Blocking Reason | None — DSH-SLICE-005E is PASS |
+| Current Status | DEFERRED_WITH_REASON |
+| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -71,7 +71,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | **PASS** |
-| **Reason** | All gates satisfied: migration 018, 2 backend endpoints, OpenAPI, TS client, frontend wiring, E2E 14/14 |
+| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
 | **WLT Boundary** | Confirmed — wlt_refund_trigger_ref is bridge reference only. DSH does NOT execute refunds. WLT (004E) owns refund. |
-| **Next Action** | J-005 COMPLETE. All slices 005A-005F = PASS. |
+| **Next Action** | Await upstream closure |

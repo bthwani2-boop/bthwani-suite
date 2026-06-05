@@ -23,8 +23,8 @@
 | API/Runtime Boundary | POST /checkout/intent — PASS; returns session token; backend production BearerAuth path exists and app-client checkout transport can send Bearer token; verified via E2E integration script |
 | Visual Evidence Required | yes — DshCheckoutIntentScreen states: address entry, intent created, intent failed, loading, blocked |
 | Runtime Evidence Required | yes — POST /checkout/intent runtime proof with auth token + 003A serviceability PASS |
-| Current Status | `PASS` |
-| Blocking Reason | none — resolved via E2E integration script verification |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | live auth-service runtime proof + WLT runtime/security proof + visual proof pending |
 
 ## Scope
 
@@ -104,9 +104,9 @@
 - DshCheckoutIntentScreen defaults to blocked state when serviceability or auth unavailable
 - Backend contract/handler remain available; rollback is limited to keeping DshCheckoutIntentScreen blocked until 003A, auth, and live API wiring are proven
 
-| **Slice Decision** | `PASS` |
-| **Reason** | API endpoint `POST /checkout/intent` is designed, implemented in Go, and verified at runtime with client BearerAuth using E2E integration verification script. |
-| **Dependency** | none — verified |
-| **Next Action** | none — closed |
-| **Forward-Only Gate** | All exit gates verified |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | `POST /checkout/intent` is designed and implemented in Go with passing unit tests, but live auth-service runtime proof + WLT runtime/security proof + visual proof are pending. |
+| **Dependency** | live auth-service runtime proof + WLT runtime/security proof |
+| **Next Action** | obtain live auth-service runtime proof and WLT E2E runtime proof |
+| **Forward-Only Gate** | Keep blocked until auth/WLT runtime evidence is captured |
 | **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |
