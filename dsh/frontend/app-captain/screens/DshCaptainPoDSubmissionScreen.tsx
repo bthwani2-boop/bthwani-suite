@@ -40,6 +40,7 @@ export type DshCaptainPoDSubmissionScreenProps = {
   onConfirm: () => void;
   onReportFailure: () => void;
   onBack?: () => void;
+  onRetry?: () => void;
   photoUri?: string;
 };
 
@@ -50,6 +51,7 @@ export function DshCaptainPoDSubmissionScreen({
   onConfirm,
   onReportFailure,
   onBack,
+  onRetry,
   photoUri,
 }: DshCaptainPoDSubmissionScreenProps) {
   const theme = useTheme();
@@ -96,6 +98,20 @@ export function DshCaptainPoDSubmissionScreen({
           description="رفضت العمليات الإثبات المرفوع. يُرجى التقاط صورة جديدة واضحة وإعادة الإرسال."
           actionLabel="التقاط صورة جديدة"
           onActionPress={onCapturePhoto}
+        />
+      </View>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <View style={styles.root}>
+        <StateView
+          stateId="recoverableError"
+          title="فشل الاتصال بالخادم"
+          description="تعذر إكمال العملية المطلوبة حالياً. يرجى التحقق من اتصال الشبكة وإعادة المحاولة."
+          actionLabel="إعادة المحاولة"
+          onActionPress={onRetry}
         />
       </View>
     );

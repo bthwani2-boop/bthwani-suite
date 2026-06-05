@@ -618,14 +618,9 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
         setStoreCourierStage('delivered');
         setInboxState('delivered');
       }
-    } catch {
-      // If API is unavailable (preview/offline), still advance to success locally
-      setCaptainPodState('success');
-
-      if (captainAppMode === 'store_courier_mode') {
-        setStoreCourierStage('delivered');
-        setInboxState('delivered');
-      }
+    } catch (err) {
+      console.error("Failed to confirm delivery API call:", err);
+      setCaptainPodState('error');
     }
   }, [activeOrderId, captainAppMode, captainPodPhotoUri, orderLifecycleClient]);
 
@@ -642,14 +637,15 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
         failure_reason: 'CLIENT_UNREACHABLE',
         return_required: true,
       });
-    } catch {
-      // If API is unavailable (preview/offline), advance locally
-    }
 
-    setCaptainPodState('retry-required');
+      setCaptainPodState('retry-required');
 
-    if (captainAppMode === 'store_courier_mode') {
-      setStoreCourierStage('delivery_failed');
+      if (captainAppMode === 'store_courier_mode') {
+        setStoreCourierStage('delivery_failed');
+      }
+    } catch (err) {
+      console.error("Failed to report delivery failure API call:", err);
+      setCaptainPodState('error');
     }
   }, [activeOrderId, captainAppMode, orderLifecycleClient]);
 
@@ -870,6 +866,9 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           onCapturePhoto={capturePodPhotoPreview}
           onConfirm={confirmPodSubmission}
           onReportFailure={reportPodFailure}
+          onRetry={() => {
+            setCaptainPodState('ready');
+          }}
           onBack={captainPodState === 'success'
             ? () => {
                 setCaptainPodState('ready');
