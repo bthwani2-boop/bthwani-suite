@@ -780,3 +780,4 @@ For a full journey:
 - It keeps DSH data/media centralized.
 - It supports both slice-level and journey-level closure.
 - It supports backend, frontend, API, binding, integration, runtime, documentation, evidence, and cross-surface consistency.
+- The local environment assumes a real device is connected via ADB (with Scrcpy active) for all mobile applications, and localhost is running for the control panel.
