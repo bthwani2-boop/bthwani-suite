@@ -1,11 +1,13 @@
 openapi: 3.1.0
 info:
   title: WLT DSH Finance API
-  version: 0.4.0-dsh-runtime-core
+  version: 0.4.0-dsh-in-memory-core
   description: >
     WLT contract scaffold for DSH finance surfaces.
-    WLT_DSH_RUNTIME_CORE is implemented for the DSH-scoped payment, wallet summary,
-    refund queue, settlement, payout, COD, ledger, reconciliation, and close handlers.
+    WLT_DSH_IN_MEMORY_CORE_ONLY exists for the DSH-scoped payment, wallet summary,
+    refund queue, settlement, payout, COD, ledger, reconciliation, and close logic.
+    It is not durable runtime closure: HTTP handlers, persistence, operational security,
+    E2E DSH callbacks, and visual/runtime evidence are still required.
     Platform-wide WLT remains outside this DSH bridge closure.
     All financial ownership belongs to WLT.
     DSH surfaces are consumers only; no direct ledger write from DSH.
@@ -17,10 +19,10 @@ servers:
     description: Production WLT API boundary
   - url: http://localhost:8081
     description: Local WLT runtime boundary
-x-bthwani-contract-state: WLT_DSH_RUNTIME_CORE
+x-bthwani-contract-state: WLT_DSH_IN_MEMORY_CORE_ONLY / NEEDS_HTTP_PERSISTENCE_E2E
 x-bthwani-currency-default: YER
 x-bthwani-ownership: WLT owns all wallet, balance, payment, ledger, reconciliation, settlement, payout, COD liability, and captain eligibility operations. DSH surfaces are read-only consumers.
-x-bthwani-runtime-status: DSH_SCOPED_RUNTIME_CORE_IMPLEMENTED — platform-wide WLT remains OUT_OF_SCOPE_DSH_FINANCE_NOW
+x-bthwani-runtime-status: NOT_CLOSED — in-memory DSH finance core exists; backend HTTP handlers, persistence, typed-client runtime binding, and E2E evidence are still missing
 tags:
   - name: client-wallet
     description: DSH-scoped client wallet summary and checkout-linked top-up visibility.
@@ -782,7 +784,7 @@ paths:
       summary: List WLT refund ledger previews
       description: >
         WLT-owned refund and dispute ledger. DSH may inspect impact only;
-        WLT executes all DSH refund effects in the WLT-DSH runtime core.
+        current implementation is in-memory core only until durable WLT runtime is proven.
       tags: [control-panel-finance]
       security:
         - bearerAuth: []

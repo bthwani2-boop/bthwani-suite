@@ -271,7 +271,7 @@ export class WltDshFinanceRuntime {
 			reconciliationRuns: this.listReconciliationRuns(),
 			closeStatus: this.closeStatus,
 			callbackEvents: [...this.callbackEvents],
-			runtimeTruth: 'wlt_dsh_runtime_core',
+			runtimeTruth: 'wlt_dsh_in_memory_core_only',
 		};
 	}
 

@@ -46,7 +46,7 @@ const close = runtime.submitDailyClose('2026-06-05');
 assert(close.status === 'closed', 'finance close should close after passing reconciliation');
 
 const snapshot = runtime.getSnapshot();
-assert(snapshot.runtimeTruth === 'wlt_dsh_runtime_core', 'snapshot should declare WLT DSH runtime core');
+assert(snapshot.runtimeTruth === 'wlt_dsh_in_memory_core_only', 'snapshot should declare WLT DSH in-memory core only');
 assert(snapshot.callbackEvents.length >= 2, 'snapshot should include DSH callback events');
 
 console.log('WLT_DSH_RUNTIME_SMOKE: PASS');

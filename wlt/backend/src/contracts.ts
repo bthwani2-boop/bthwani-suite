@@ -191,5 +191,5 @@ export interface WltDshFinanceSnapshot {
 	reconciliationRuns: readonly WltDshReconciliationRun[];
 	closeStatus: WltDshFinanceClose;
 	callbackEvents: readonly WltDshCallbackEvent[];
-	runtimeTruth: 'wlt_dsh_runtime_core';
+	runtimeTruth: 'wlt_dsh_in_memory_core_only';
 }

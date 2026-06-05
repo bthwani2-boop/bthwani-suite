@@ -569,7 +569,7 @@ export interface paths {
         };
         /**
          * List WLT refund ledger previews
-         * @description WLT-owned refund and dispute ledger. DSH may inspect impact only; WLT executes all DSH refund effects in the WLT-DSH runtime core.
+         * @description WLT-owned refund and dispute ledger. DSH may inspect impact only; current implementation is in-memory core only until durable WLT runtime is proven.
          */
         get: operations["listRefundLedger"];
         put?: never;
