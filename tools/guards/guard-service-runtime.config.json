@@ -75,11 +75,11 @@
           "docPath": "dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md",
           "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
-            "/stores",
-            "/stores/{id}",
-            "/stores/{id}/partner-readiness",
-            "/stores/{id}/catalog-approval",
-            "/stores/{id}/marketing-visibility"
+            "GET /stores",
+            "GET /stores/{id}",
+            "PATCH /stores/{id}/partner-readiness",
+            "PATCH /stores/{id}/catalog-approval",
+            "PATCH /stores/{id}/marketing-visibility"
           ],
           "evidenceFolderPrefix": "DSH_SLICE_001_L7_RUNTIME-",
           "requiredEvidenceFiles": [

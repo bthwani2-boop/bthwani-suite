@@ -23,10 +23,13 @@ yarn-error.log*
 # Environment files
 .env
 .env.*
+!.env.example
 .expo/
 # OS/editor noise
 .DS_Store
 Thumbs.db
+# WLT backend runtime data (SQLite database files)
+wlt/backend/.data/
 # Local-only donor/service intelligence outputs
 docs/services/surfaces-legacy-trash/
 # Local registry run artifacts

@@ -10,7 +10,7 @@ import { DshFieldStoreOnboardingScreen } from './screens/DshFieldStoreOnboarding
 import { DshFieldStoreVisitScreen, type DshFieldStoreVisitValues } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
 import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
-import { readFieldStoresLocal, writeFieldStoresLocal } from './storage/field-onboarding.storage';
+import { readFieldStoresLocal, writeFieldStoresLocal, fetchAndMergeFieldStoresFromApi } from './storage/field-onboarding.storage';
 import {
   createManualFieldStore,
   submitFieldStoreForReview,
@@ -20,8 +20,6 @@ import {
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 import {
   getFieldRouteForLifecycle,
-  getFieldVisitOutcomeEntry,
-  type DshFieldAgentLifecycleState,
 } from './dsh-field.navigation-bridge';
 
 type DshFieldReadinessEscalationState = NonNullable<React.ComponentProps<typeof DshFieldReadinessEscalationScreen>['state']>;
@@ -77,6 +75,13 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
   React.useEffect(() => {
     writeFieldStoresLocal(stores);
   }, [stores]);
+
+  // Hydrate store list from DSH backend on mount; fall back to local cache silently.
+  React.useEffect(() => {
+    fetchAndMergeFieldStoresFromApi().then(setStores).catch(() => {
+      // API unavailable — local cache remains active
+    });
+  }, []);
 
   React.useEffect(() => {
     if (typeof command?.token !== 'number') {
@@ -329,8 +334,6 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
       />
     );
   }
-
-  const showFieldBottomNav = true;
 
   let fieldBottomActiveId = '';
   if (route.kind === 'stores') {

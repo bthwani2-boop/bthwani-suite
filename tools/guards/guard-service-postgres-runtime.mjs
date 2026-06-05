@@ -107,21 +107,28 @@ if (service) {
 
   const allowedTables = new Set(service.allowedTables ?? []);
   const requiredColumns = service.requiredTableColumns ?? [];
+  const migrationSqlTexts = [];
   for (const rel of service.migrationFiles ?? []) {
     if (!exists(args.root, rel)) {
       report.fail(rel, 'Required migration file is missing.', 'Restore the registered migration file.');
       continue;
     }
     const sql = readText(path.join(args.root, rel));
+    migrationSqlTexts.push(sql);
     const tables = extractCreatedTables(sql);
-    if (tables.length === 0) report.fail(rel, 'No CREATE TABLE statement found.', 'Migration must define the slice table.');
+    const isAlterOnly = tables.length === 0 && /ALTER\s+TABLE/i.test(sql);
+    if (tables.length === 0 && !isAlterOnly) {
+      report.fail(rel, 'No CREATE TABLE or ALTER TABLE statement found.', 'Migration must define or extend the slice table.');
+    }
     for (const table of tables) {
       if (!allowedTables.has(table)) report.fail(rel, `Unexpected table "${table}" created.`, `Allowed tables: ${[...allowedTables].join(', ')}`);
     }
-    for (const column of requiredColumns) {
-      if (!new RegExp(`\\b${column}\\b`, 'i').test(sql)) {
-        report.fail(rel, `Required store discovery summary column "${column}" is missing.`, 'Keep the table scoped to store discovery summary data.');
-      }
+  }
+  // Check required columns across all migration files combined (columns may be added across CREATE + ALTER TABLE migrations)
+  const combinedSql = migrationSqlTexts.join('\n');
+  for (const column of requiredColumns) {
+    if (!new RegExp(`\\b${column}\\b`, 'i').test(combinedSql)) {
+      report.fail('(migrations combined)', `Required column "${column}" is missing across all migration files.`, 'Keep the table scoped to store discovery summary data.');
     }
   }
 

@@ -336,7 +336,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
   );
 }
 
-export function FinancialCenterScreen({ hubHref, subGroup }: { hubHref: string; subGroup?: string }) {
+export function FinancialCenterScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHref: string; subGroup?: string }) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
 
   const center = React.useMemo(

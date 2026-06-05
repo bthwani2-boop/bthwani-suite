@@ -4,7 +4,6 @@ import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import {
   getWltDshCaptainSettlementStatementsPreview,
-  formatWltYer,
   type WltDshCaptainStatement as CaptainStatement,
   type WltDshCaptainCodBag as CaptainCodBag,
   type WltDshCaptainEarningLine as CaptainEarningLine,
@@ -137,7 +136,7 @@ export function WltDshCaptainStatement() {
             ⚠️ {statement.eligibilityBlockReason} (الرصيد الحالي: {statement.eligibilityBalanceLabel} · الحد الأدنى: {statement.minimumEligibilityLabel})
           </span>
           <button
-            onClick={() => alert(`تم إصدار طلب إيداع Top-up للكابتن بقيمة ${statement.eligibilityShortfallLabel}`)}
+            onClick={() => console.warn('[WLT-PREVIEW] Top-up للكابتن:', statement.eligibilityShortfallLabel)}
             className={wltStyles.captainShortfallBtn}
           >
             طلب شحن الضمان
@@ -368,7 +367,7 @@ export function WltDshCaptainStatement() {
 
             <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
               <button
-                onClick={() => alert(`تم توجيه أمر إعادة مطابقة فوري للحقيبة ${selectedBag.bagId}`)}
+                onClick={() => console.warn('[WLT-PREVIEW] إعادة مطابقة الحقيبة:', selectedBag.bagId)}
                 style={{
                   flex: 1,
                   padding: '6px 12px',
@@ -384,7 +383,7 @@ export function WltDshCaptainStatement() {
               </button>
               {selectedBag.status !== 'cleared' && (
                 <button
-                  onClick={() => alert(`تم تسوية الحقيبة ${selectedBag.bagId} يدوياً وتحديث الأرصدة`)}
+                  onClick={() => console.warn('[WLT-PREVIEW] تسوية الحقيبة يدوياً:', selectedBag.bagId)}
                   style={{
                     flex: 1,
                     padding: '6px 12px',

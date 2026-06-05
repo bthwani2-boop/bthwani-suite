@@ -190,19 +190,6 @@ export function WltDshFinanceHubHost({
     return Array.from(list).join(' · ');
   }, [center]);
 
-  const affectedMoney = React.useMemo(() => {
-    let disputed = 0;
-    let pending = 0;
-    center.allEntries.forEach((e) => {
-      if (e.status === 'blocked' || e.status === 'disputed') {
-        disputed += e.amountMinorUnits;
-      } else if (e.isPending || e.status === 'pending') {
-        pending += e.amountMinorUnits;
-      }
-    });
-    return `نزاع: ${(disputed / 100).toLocaleString('ar-YE')} ر.ي · معلق: ${(pending / 100).toLocaleString('ar-YE')} ر.ي`;
-  }, [center]);
-
   const requiredAction = React.useMemo(() => {
     if (center.blockingVariances.length > 0) return 'تحقيق ومطابقة الفوارق يدوياً';
     if (center.allEntries.some((e) => e.status === 'pending')) return 'اعتماد وصرف المستحقات مع WLT';

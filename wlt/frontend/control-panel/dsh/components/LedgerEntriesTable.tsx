@@ -61,7 +61,7 @@ export function LedgerEntriesTable({ entries, pageSize = 10 }: {
                 } else if (ref.startsWith('REF-') || ref.includes('REF-')) {
                   router.push('/finance?workspace=refund-ledger');
                 } else {
-                  alert(`تفاصيل الحركة المحاسبية:\n\nالمرجع المالي: ${ref}\nالجهة: ${entry.party}\nالحساب المدين: ${entry.debitAccountLabel}\nالحساب الدائن: ${entry.creditAccountLabel}`);
+                  console.warn('[WLT-LEDGER] تفاصيل الحركة:', { ref, party: entry.party, debit: entry.debitAccountLabel, credit: entry.creditAccountLabel });
                 }
               };
 

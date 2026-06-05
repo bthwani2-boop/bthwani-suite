@@ -63,6 +63,9 @@ importers:
       expo:
         specifier: ~54.0.0
         version: 54.0.33(@babel/core@7.29.0)(react-native@0.81.0)(react@19.1.0)
+      globals:
+        specifier: ^16.0.0
+        version: 16.4.0
       next:
         specifier: 16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0)(react@19.1.0)

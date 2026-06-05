@@ -52,12 +52,6 @@ const EVIDENCE_LABEL: Record<DshFinancePreviewRow['evidenceStatus'], string> = {
   missing: 'ناقصة 🚨',
 };
 
-const RECONCILIATION_LABEL: Record<DshFinancePreviewRow['reconciliationStatus'], string> = {
-  closed: 'مغلق ومرحل',
-  matched: 'متطابق ✓',
-  disputed: 'قيد النزاع',
-  unmatched: 'غير مطابق',
-};
 
 const EVENT_KIND_LABEL: Record<string, string> = {
   'client-payment': 'دفع عميل',
@@ -536,7 +530,7 @@ export function DailyReconciliationWorkbench() {
                                 </div>
                               </div>
                               <button
-                                onClick={() => alert(`وثيقة الإثبات المالي: ${row.bankDepositRef || row.cashBagRef}\nحالة التحقق: سليم ومقبول`)}
+                                onClick={() => console.warn('[WLT-PREVIEW] معاينة وثيقة:', row.bankDepositRef || row.cashBagRef)}
                                 style={{
                                   background: 'transparent',
                                   border: '1px solid var(--bthwani-control-panel-border)',
@@ -707,7 +701,7 @@ export function DailyReconciliationWorkbench() {
                                 <button
                                   onClick={() => {
                                     if (row.evidenceStatus !== 'complete') {
-                                      alert('لا يمكن تدقيق القيد قبل إرفاق أو رفع وثيقة المطابقة الرقمية!');
+                                      console.warn('[WLT-PREVIEW] تدقيق مرفوض: وثيقة المطابقة مطلوبة أولاً');
                                       return;
                                     }
                                     handleUpdateRow(row.id, { workflowState: 'checked', reconciliationStatus: 'matched' }, 'تم تدقيق القيد ومطابقة الأرصدة وإقرار صحتها');

@@ -41,13 +41,13 @@ function FinanceRecordCard({ record }: { record: WltDshFinancePreviewRecord }) {
       primaryAction={{
         label: 'مراجعة التسوية',
         onAction: () => {
-          alert("هذا الإجراء يتطلب ربط مالي مكتمل.\n\nلا توجد عمليات اعتماد أو تسويات مالية حقيقية متاحة حالياً. يرجى مراجعة مدير النظام لتفعيل الإجراء.");
+          console.warn('[WLT-PREVIEW] مراجعة التسوية: يتطلب ربط مالي مكتمل مع WLT API');
         }
       }}
       secondaryAction={{
         label: 'فتح الأدلة',
         onAction: () => {
-          alert("الإجراء: [OPEN_EVIDENCE]\n\nهذه بيئة معاينة رقمية لدفتر أستاذ WLT. المستندات والأدلة متوفرة فقط في بيئة الإنتاج الحقيقية.");
+          console.warn('[WLT-PREVIEW] فتح الأدلة: متوفر فقط في بيئة الإنتاج الحقيقية');
         }
       }}
     />
@@ -128,13 +128,13 @@ function CaptainEligibilitySection() {
         primaryAction={{
           label: 'محاكاة شحن الرصيد',
           onAction: () => {
-            alert("الإجراء: [FUTURE_MUTATION_REQUIRES_WLT_API]\n\nعملية شحن رصيد الكابتن تتطلب ربطاً حياً وتعديلاً لمستندات محفظة WLT. الإجراء معطّل حالياً.");
+            console.warn('[WLT-PREVIEW] شحن رصيد الكابتن: يتطلب ربط WLT API حياً');
           }
         }}
         secondaryAction={{
           label: 'فتح ملف الكابتن',
           onAction: () => {
-            alert("الإجراء: [VIEW_DETAIL]\n\nملف الكابتن متوفر فقط عبر لوحة دعم الكباتن الموحدة (Customer/Captain 360).");
+            console.warn('[WLT-PREVIEW] ملف الكابتن: متوفر فقط عبر لوحة دعم الكباتن (Captain 360)');
           }
         }}
       />
@@ -170,7 +170,7 @@ function FinanceKpiBar({
 }
 
 export function WltDshFinanceControlPanelContent({
-  hideHeader = false,
+  hideHeader: _hideHeader = false,
 }: {
   hideHeader?: boolean;
 } = {}) {

@@ -7,7 +7,7 @@ import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
 import { LedgerEntriesTable } from '../components/LedgerEntriesTable';
 import { TrialBalancePanel } from '../components/TrialBalancePanel';
 
-export function LedgerScreen({ hubHref, subGroup }: { hubHref: string; subGroup?: string }) {
+export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHref: string; subGroup?: string }) {
   const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
   const businessDate = new Date().toISOString().split('T')[0]!;
   const center = React.useMemo(() => buildWltFinancialCenter(businessDate, preview.allRecords), [preview, businessDate]);
