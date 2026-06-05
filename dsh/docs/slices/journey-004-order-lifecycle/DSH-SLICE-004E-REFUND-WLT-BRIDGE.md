@@ -9,8 +9,8 @@
 | Primary Actor | WLT (automated) |
 | Primary Surface | WLT (external boundary) |
 | WLT Boundary | WLT owns refund execution entirely; DSH is read-only |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | J-003 is not closed |
+| Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | WLT-owned; DSH read-only bridge only |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Deferred pending J-003 checkout/payment full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Slice Decision** | `BLOCKED_WITH_REASON` |
+| **Reason** | WLT-owned; DSH read-only bridge only |
+| **Dependency** | WLT refund execution |
+| **Next Action** | WLT-owned; DSH read-only bridge only |

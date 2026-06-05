@@ -35,7 +35,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a single product */
+        /**
+         * Get a single product
+         * @description Returns one product identity record by ID, including DSH catalog status and display-only price label.
+         */
         get: operations["getProduct"];
         put?: never;
         post?: never;
@@ -80,7 +83,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a single category */
+        /**
+         * Get a single category
+         * @description Returns one store category by ID, including hierarchy metadata used by DSH catalog surfaces.
+         */
         get: operations["getCategory"];
         put?: never;
         post?: never;
@@ -171,7 +177,7 @@ export interface paths {
          * Approve, reject, or request fix for a catalog item
          * @description Performs an approval action (approve, reject, needs-fix) on a catalog product, category suggestion, or media upload. Updates the approval_status of the referenced item. WLT boundary: displays and logs approval outcome only — no financial mutation.
          */
-        post: operations["updateCatalogApproval"];
+        post: operations["recordCatalogApprovalAction"];
         delete?: never;
         options?: never;
         head?: never;
@@ -295,7 +301,7 @@ export interface paths {
          * Update store catalog approval status
          * @description Update the catalog quality and catalog pricing status gates for a store.
          */
-        patch: operations["updateCatalogApproval"];
+        patch: operations["updateStoreCatalogApproval"];
         trace?: never;
     };
     "/stores/{id}/marketing-visibility": {
@@ -514,6 +520,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders/{id}/refund-callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Handle refund callback from WLT
+         * @description Incoming webhook triggered by WLT to notify DSH of a refund status.
+         *     WLT boundary: WLT owns refund execution. DSH stores reference ID only.
+         */
+        post: operations["refundOrderCallback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/orders/{id}/assign-captain": {
         parameters: {
             query?: never;
@@ -618,6 +645,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders/{id}/deliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit proof of delivery (DSH-SLICE-005E)
+         * @description Captain submits proof-of-delivery media key and transitions order status from ARRIVED to DELIVERED.
+         *     Precondition: order must be in ARRIVED state and assigned to the calling captain.
+         *     WLT BOUNDARY: this endpoint does NOT trigger payout or any financial mutation.
+         *     Payout is WLT responsibility, triggered externally when WLT observes the DELIVERED event.
+         */
+        post: operations["deliverOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/fail-delivery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report delivery failure (DSH-SLICE-005F)
+         * @description Captain reports that delivery could not be completed (client unreachable, wrong address, refused, etc.).
+         *     Precondition: order must be in ARRIVED state and assigned to the calling captain.
+         *     failure_reason is mandatory.
+         *     If return_required is true: transitions ARRIVED → RETURNING_TO_STORE.
+         *     If return_required is false: transitions ARRIVED → FAILED_DELIVERY.
+         *     WLT BOUNDARY: wlt_refund_trigger_ref is a bridge reference ID stored by DSH only.
+         *     DSH does NOT execute refunds. WLT (004E) owns refund execution after observing this event.
+         */
+        post: operations["failDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/confirm-return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm item returned to store (DSH-SLICE-005F)
+         * @description Captain confirms item has been returned to the store.
+         *     Precondition: order must be in RETURNING_TO_STORE state.
+         *     Transitions RETURNING_TO_STORE → RETURNED.
+         *     WLT BOUNDARY: no financial mutation. Refund bridge reference was already set in fail-delivery.
+         */
+        post: operations["confirmReturn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/support/escalations": {
         parameters: {
             query?: never;
@@ -632,6 +731,89 @@ export interface paths {
          * @description Creates a support escalation ticket for a specific order.
          */
         post: operations["createSupportEscalation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wlt/wallet-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get client wallet summary from WLT
+         * @description DSH backend endpoint acting as a read-only proxy/bridge to WLT's client wallet summary. Returns wallet balance and sync status. All financial ownership belongs to WLT. DSH is read-only.
+         */
+        get: operations["getWltWalletSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlement/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit eligible delivered orders as settlement candidates
+         * @description Transition eligible orders to SETTLEMENT_PENDING and submit them to WLT.
+         *     All financial mutations are executed by WLT. DSH performs state tracking only.
+         */
+        post: operations["submitSettlementCandidates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wlt/settlement-callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Settlement status update callback from WLT
+         * @description Called by WLT to notify DSH of the final settlement outcome (CONFIRMED or FAILED).
+         *     Updates settlement status and stores transaction reference inside DSH.
+         */
+        post: operations["postWltSettlementCallback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get list of settlements and candidates (read-only view)
+         * @description Returns a read-only list of orders currently pending, settled, or failed settlement.
+         *     Acts as a read-only visibility summary bridged from WLT.
+         */
+        get: operations["getSettlements"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -919,6 +1101,20 @@ export interface components {
             captain_latitude?: number;
             captain_longitude?: number;
             captain_lifecycle_status?: string;
+            /** @description Proof-of-delivery media key reference (set on DELIVERED). DSH stores reference only, not the raw binary. */
+            pod_media_key?: string | null;
+            /** @description Reason delivery failed (set on FAILED_DELIVERY or RETURNING_TO_STORE). */
+            delivery_failure_reason?: string | null;
+            /** @description WLT bridge reference ID. DSH stores only — WLT (004E) owns refund execution independently. */
+            wlt_refund_trigger_ref?: string | null;
+            /** @description WLT settlement transaction reference. */
+            wlt_settlement_ref_id?: string | null;
+            /**
+             * @default NOT_SETTLED
+             * @enum {string}
+             */
+            settlement_status: "NOT_SETTLED" | "SETTLEMENT_PENDING" | "SETTLED" | "SETTLEMENT_FAILED";
+            settlement_amount?: number | null;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
@@ -1075,6 +1271,47 @@ export interface components {
              * @enum {string}
              */
             next_action?: "create_order" | "show_failure";
+        };
+        RefundCallbackRequest: {
+            /** @description WLT refund reference ID - DSH stores as reference only; no local financial mutation. */
+            refund_ref_id: string;
+            /** @description Amount refunded. Must match the refund request. */
+            amount: number;
+            /**
+             * @description CONFIRMED triggers order status transition to REFUNDED. FAILED logs the failure event but keeps the status unchanged.
+             * @enum {string}
+             */
+            status: "CONFIRMED" | "FAILED";
+        };
+        /** @description WLT-owned wallet balance snapshot. */
+        WalletBalance: {
+            /** @description Current wallet balance in minor units */
+            balanceMinorUnits: number;
+            /** @default YER */
+            currency: string;
+            /** @description Whether the wallet is linked to an active account */
+            linked: boolean;
+            /** @description Amount currently on hold */
+            frozenMinorUnits?: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        SettlementCandidateRequest: {
+            /** @description List of delivered orders to be settled by WLT. */
+            order_ids: string[];
+        };
+        SettlementCallbackRequest: {
+            /** @description WLT settlement transaction reference. */
+            settlement_ref_id: string;
+            /** @description Order IDs settled. */
+            order_ids: string[];
+            /** @description Total settled amount. */
+            amount: number;
+            /**
+             * @description CONFIRMED transitions settlement status to SETTLED. FAILED sets it to SETTLEMENT_FAILED.
+             * @enum {string}
+             */
+            status: "CONFIRMED" | "FAILED";
         };
     };
     responses: never;
@@ -1555,7 +1792,7 @@ export interface operations {
             };
         };
     };
-    updateCatalogApproval: {
+    recordCatalogApprovalAction: {
         parameters: {
             query?: never;
             header?: never;
@@ -1855,7 +2092,7 @@ export interface operations {
             };
         };
     };
-    updateCatalogApproval: {
+    updateStoreCatalogApproval: {
         parameters: {
             query?: never;
             header?: never;
@@ -2391,6 +2628,59 @@ export interface operations {
             };
         };
     };
+    refundOrderCallback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefundCallbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Refund callback processed successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     assignCaptain: {
         parameters: {
             query?: never;
@@ -2715,6 +3005,239 @@ export interface operations {
             };
         };
     };
+    deliverOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description ID of the assigned captain submitting the proof. */
+                    captain_id: string;
+                    /** @description Media-fixtures key referencing the proof-of-delivery photo. DSH stores only the key reference, never the raw binary. */
+                    pod_media_key?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order marked as DELIVERED; pod_media_key recorded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Missing or invalid captain_id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not assigned to this captain. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order is not in ARRIVED state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    failDelivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                    /** @description Reason for failure: CLIENT_UNREACHABLE, WRONG_ADDRESS, REFUSED, OTHER */
+                    failure_reason: string;
+                    /** @description WLT bridge reference ID. DSH stores only — WLT executes refund independently. */
+                    wlt_refund_trigger_ref?: string | null;
+                    /**
+                     * @description If true, captain must return item to store (transitions to RETURNING_TO_STORE).
+                     * @default false
+                     */
+                    return_required?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Delivery failure recorded. Status is FAILED_DELIVERY or RETURNING_TO_STORE. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Missing required fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not assigned to this captain. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order is not in ARRIVED state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    confirmReturn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                    /** @description Optional note about the return. */
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Return confirmed. Status is RETURNED. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Missing captain_id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not assigned to this captain. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order is not in RETURNING_TO_STORE state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     createSupportEscalation: {
         parameters: {
             query?: never;
@@ -2748,6 +3271,175 @@ export interface operations {
             };
             /** @description Order not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getWltWalletSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Wallet summary balance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletBalance"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    submitSettlementCandidates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettlementCandidateRequest"];
+            };
+        };
+        responses: {
+            /** @description Settlement candidates registered successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"][];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    postWltSettlementCallback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettlementCallbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Settlement status updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"][];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSettlements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of settlements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

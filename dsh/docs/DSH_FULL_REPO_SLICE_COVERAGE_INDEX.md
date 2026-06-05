@@ -48,7 +48,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
 | Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001–J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
-| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_AND_003_PASS | GET /stores + 3 PATCH gates + J-002 catalog management + J-003 checkout/payment E2E verified at runtime with client BearerAuth (DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604) |
+| OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_PASS | GET /stores + 3 PATCH gates + J-002 catalog management (J-003 checkout/payment demoted to IMPLEMENTATION_STARTED) |
 | Go backend migrations | `dsh/backend/migrations/001_store_discovery.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Used in live E2E |
 | Go backend migrations | `dsh/backend/migrations/002_store_visibility_gates.sql` | J-001 | DSH-SLICE-001C/D/E | BACKEND_PROVEN | Visibility gates proven |
 | Go backend seed | `dsh/backend/seed/003_store_discovery_seed.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Seed data for E2E |
@@ -387,12 +387,12 @@ These contradictions exist between source files and must be resolved in the appr
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
 | Known contradictions open | 0 |
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
-| IMPLEMENTATION_STARTED areas | 0 |
-| BLOCKED_WITH_REASON areas | 1 (finance/WLT — DSH-SLICE-004E: full WLT ownership, DSH read-only bridge) |
-| J-003 implementation status | all slices (003A–003E) PASS (verified via E2E integration script and truth-synced under run session DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604) |
-| J-004 implementation status | all slices (004A, 004B, 004C, 004D, 004F) PASS (verified E2E under run session DSH_J004_ORDER_LIFECYCLE_FINAL_CLOSURE-20260605-034900; 004E is WLT-owned and correctly remains BLOCKED_WITH_REASON) |
-| J-005 implementation status | all slices (005A–005F) PASS (verified E2E; 005E proof of delivery verified under run session DSH_SLICE_005E_PROOF_OF_DELIVERY_FINAL_CLOSURE-20260605-052100, 005F delivery failure and return verified under run session DSH_SLICE_005F_FAILURE_RETURN_FINAL_CLOSURE-20260605-053600) |
-| J-010 implementation status | all slices (010A–010D) PASS (010A verified under run session DSH_WLT_SLICE_010A_FINAL_CLOSURE-20260605-061000; 010B verified under run session DSH_WLT_SLICE_010B_FINAL_CLOSURE-20260605-062000; 010C verified under run session DSH_WLT_SLICE_010C_FINAL_CLOSURE-20260605-063000; 010D verified under run session DSH_WLT_SLICE_010D_FINAL_CLOSURE-20260605-064000) |
+| IMPLEMENTATION_STARTED areas | 5 (J-003 checkout/payment slices) |
+| BLOCKED_WITH_REASON areas | 10 (J-003, DSH-SLICE-004E, J-010 finance/WLT boundary) |
+| J-003 implementation status | IMPLEMENTATION_STARTED — all slices (003A–003E) demoted to BLOCKED_WITH_REASON (live auth-service runtime proof + WLT runtime/security proof + visual proof pending) |
+| J-004 implementation status | DEFERRED_WITH_REASON — deferred pending J-003 checkout/payment full closure |
+| J-005 implementation status | DEFERRED_WITH_REASON — deferred pending J-004/J-009 closure |
+| J-010 implementation status | BLOCKED_WITH_REASON — all slices (010A–010D) WLT-owned; DSH is read-only bridge only |
 | Full universal protocol closures (DEFERRED) | 0 |
 
 ---
@@ -401,8 +401,8 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001, DSH-SLICE-002, DSH-SLICE-003, J-004 child slices (004A, 004B, 004C, 004D, 004F), J-005 child slices (005A–005F), and all J-010 slices (010A–010D) are closed with PASS decisions. WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions, while J-003 is demoted to IMPLEMENTATION_STARTED, J-004 and J-005 to DEFERRED_WITH_REASON, and J-010 to BLOCKED_WITH_REASON (WLT-owned). WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
 
 Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
 
-Next action: (1) Classify GAP-IDX-001 through GAP-IDX-006; (2) Proceed to J-009 (Control Panel Operations Room) or remaining deferred field-readiness (J-006) slices.
+Next action: (1) Classify GAP-IDX-001 through GAP-IDX-006; (2) Resolve blockers for J-003 checkout/payment full closure and align with WLT.

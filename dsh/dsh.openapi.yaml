@@ -3,12 +3,45 @@ info:
   title: BThwani DSH API
   version: 0.3.0
   description: API contract for client-facing store discovery, catalog management, and checkout flow.
+  contact:
+    name: BThwani DSH API Governance
+    url: https://bthwani.internal/governance/dsh
+servers:
+  - url: https://api.bthwani.internal/dsh
+    description: Production DSH API boundary
+  - url: http://localhost:8080
+    description: Local DSH backend runtime
 x-bthwani-status: DSH_SLICE003_CHECKOUT_CONTRACT_DESIGNED
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
   currentImplementationRoot: dsh
   targetRoot: dsh
+tags:
+  - name: Product Identity
+    description: Product identity, catalog records, and non-financial display labels.
+  - name: Category Structure
+    description: Store category hierarchy and category assignment contract.
+  - name: Product Media
+    description: Product media upload and catalog media references.
+  - name: Partner Local Overrides
+    description: Partner-scoped local catalog overrides and approval flow inputs.
+  - name: Catalog Approval
+    description: Catalog approval actions and operator audit contract.
+  - name: Catalog Conflict Audit
+    description: Conflict detection and resolution audit entries for catalog governance.
+  - name: Store Discovery
+    description: Client-facing store list and store details discovery endpoints.
+  - name: Store Visibility
+    description: Store publication, visibility, and client exposure controls.
+  - name: Checkout
+    description: Checkout intent lifecycle, WLT bridge callbacks, and non-financial DSH order handoff.
+  - name: Order Lifecycle
+    description: Order status, captain assignment, delivery progress, and support transitions.
+  - name: Support Escalation
+    description: Support ticket creation and escalation references.
+  - name: WLT Finance
+    description: WLT-owned read-only finance references, callbacks, and settlement candidate signals.
 paths:
   # ─── J-002 / DSH-SLICE-002A: Product Identity ─────────────────────────────
 
@@ -106,6 +139,7 @@ paths:
       tags:
         - Product Identity
       summary: Get a single product
+      description: Returns one product identity record by ID, including DSH catalog status and display-only price label.
       operationId: getProduct
       parameters:
         - name: id
@@ -255,6 +289,7 @@ paths:
       tags:
         - Category Structure
       summary: Get a single category
+      description: Returns one store category by ID, including hierarchy metadata used by DSH catalog surfaces.
       operationId: getCategory
       parameters:
         - name: id
@@ -457,7 +492,7 @@ paths:
         Performs an approval action (approve, reject, needs-fix) on a catalog product, category suggestion, or media upload.
         Updates the approval_status of the referenced item.
         WLT boundary: displays and logs approval outcome only — no financial mutation.
-      operationId: updateCatalogApproval
+      operationId: recordCatalogApprovalAction
       requestBody:
         required: true
         content:
@@ -753,7 +788,7 @@ paths:
         - Store Visibility
       summary: Update store catalog approval status
       description: Update the catalog quality and catalog pricing status gates for a store.
-      operationId: updateCatalogApproval
+      operationId: updateStoreCatalogApproval
       security: []
       parameters:
         - name: id

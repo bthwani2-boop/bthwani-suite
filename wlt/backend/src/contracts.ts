@@ -12,6 +12,21 @@ export interface WalletBalance {
 	updatedAt: string;
 }
 
+export type WltErrorCode =
+	| 'WALLET_UNLINKED'
+	| 'INSUFFICIENT_BALANCE'
+	| 'POLICY_BLOCK'
+	| 'FRAUD_HOLD'
+	| 'INVALID_AMOUNT'
+	| 'WLT_RUNTIME_UNAVAILABLE';
+
+// Error response schema for WLT-owned payment/wallet bridge failures.
+export interface WltErrorResponse {
+	code: WltErrorCode;
+	message: string;
+	referenceId?: string;
+}
+
 // Payment intent request: DSH provides orderId + amount candidate.
 // WLT decides if payment proceeds, fails, or is held.
 export interface PaymentIntentRequest {

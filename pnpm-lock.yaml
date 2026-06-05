@@ -231,34 +231,6 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
-  webapp:
-    dependencies:
-      '@bthwani/ui-kit':
-        specifier: workspace:*
-        version: link:../ui-kit
-      next:
-        specifier: 16.2.2
-        version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0)(react@19.1.0)
-      react:
-        specifier: 19.1.0
-        version: 19.1.0
-      react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
-      react-native-web:
-        specifier: 0.21.2
-        version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.2.2
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.2.2
-        version: 19.2.3(@types/react@19.2.14)
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-
   webapp/runtime:
     dependencies:
       '@bthwani/ui-kit':
@@ -283,43 +255,6 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.2
         version: 19.2.3(@types/react@19.2.14)
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-
-  website:
-    dependencies:
-      '@bthwani/ui-kit':
-        specifier: workspace:*
-        version: link:../ui-kit
-      next:
-        specifier: 16.2.2
-        version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0)(react@19.1.0)
-      react:
-        specifier: 19.1.0
-        version: 19.1.0
-      react-dom:
-        specifier: 19.1.0
-        version: 19.1.0(react@19.1.0)
-      react-native-web:
-        specifier: 0.21.2
-        version: 0.21.2(react-dom@19.1.0)(react@19.1.0)
-    devDependencies:
-      '@axe-core/playwright':
-        specifier: 4.11.1
-        version: 4.11.1(playwright-core@1.58.2)
-      '@playwright/test':
-        specifier: 1.58.2
-        version: 1.58.2
-      '@types/react':
-        specifier: ^19.2.2
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.2.2
-        version: 19.2.3(@types/react@19.2.14)
-      axe-core:
-        specifier: 4.11.2
-        version: 4.11.2
       typescript:
         specifier: 5.9.3
         version: 5.9.3
