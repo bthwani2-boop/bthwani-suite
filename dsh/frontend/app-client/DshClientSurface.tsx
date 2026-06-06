@@ -69,6 +69,10 @@ import {
   createDshCheckoutHttpClient,
   type DshCheckoutClient,
   type DshCheckoutAuthContext,
+  PlatformVarsProvider,
+  usePlatformVars,
+  FeatureFlagProvider,
+  useFeatureFlag,
 } from '../shared';
 import { dshPartnerIntakeItems } from '../shared/workflow';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
@@ -105,20 +109,16 @@ const getDshWebWindow = (): (Window & typeof globalThis) | null => {
   }
 };
 
-const readDshEnv = (key: string): string | undefined => {
-  if (typeof process === 'undefined') return undefined;
-  return (
-    process as {
-      env?: Record<string, string | undefined>;
-    }
-  ).env?.[key];
-};
-
-function resolveCheckoutAuthContext(authToken?: string, devClientId?: string): DshCheckoutAuthContext {
-  const bearerToken = (authToken ?? readDshEnv('EXPO_PUBLIC_DSH_AUTH_BEARER_TOKEN'))?.trim();
+function resolveCheckoutAuthContext(
+  authToken?: string,
+  devClientId?: string,
+  dshAuthBearerToken?: string | null,
+  dshClientId?: string | null,
+): DshCheckoutAuthContext {
+  const bearerToken = (authToken ?? dshAuthBearerToken ?? undefined)?.trim();
   if (bearerToken) return { bearerToken };
 
-  const clientId = (devClientId ?? readDshEnv('EXPO_PUBLIC_DSH_CLIENT_ID') ?? 'client-101').trim();
+  const clientId = (devClientId ?? dshClientId ?? 'client-101').trim();
   return { clientId };
 }
 
@@ -129,7 +129,19 @@ const CLIENT_BOTTOM_NAV_ITEMS = [
   { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
 ] as const;
 
-export function DshClientSurface({ command, onExit, onOpenService, authToken, devClientId, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
+export function DshClientSurface(props: DshClientSurfaceProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshClientSurfaceInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devClientId, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
+  const { dshAuthBearerToken, dshClientId } = usePlatformVars();
+  const isAwnakEnabled = useFeatureFlag('DSH:capability:awnak');
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
 
   // ── Runtime bridge state ────────────────────────────────────────────────────
@@ -226,8 +238,8 @@ export function DshClientSurface({ command, onExit, onOpenService, authToken, de
   const [route, setRoute] = React.useState<DshRoute>('home');
   const walletPreview = useWltDshWalletPreview();
   const checkoutAuth = React.useMemo(
-    () => resolveCheckoutAuthContext(authToken, devClientId),
-    [authToken, devClientId],
+    () => resolveCheckoutAuthContext(authToken, devClientId, dshAuthBearerToken, dshClientId),
+    [authToken, devClientId, dshAuthBearerToken, dshClientId],
   );
   // J-003A: stable client instance — recreated only when base URL or auth changes.
   const checkoutClientMemo = React.useMemo(() => {
@@ -1111,12 +1123,13 @@ export function DshClientSurface({ command, onExit, onOpenService, authToken, de
       return;
     }
     if (categoryId === 'awnak') {
+      if (!isAwnakEnabled) return;
       setAwnakInlineOpen(true);
       setRoute('home');
       return;
     }
     setRoute('home');
-  }, []);
+  }, [isAwnakEnabled]);
 
   const handleOpenHomeStoreCategory = React.useCallback((storeId: string, categoryId: string) => {
     const nextStoreMetadata = getStoreCanonicalMetadata(storeId);

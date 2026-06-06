@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-005F — Failure & Return
+# DSH-SLICE-005F — Failure & Return
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,6 @@
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen (reportPodFailure CTA) |
 | WLT Boundary | Refund execution owned by WLT (004E). DSH stores wlt_refund_trigger_ref as bridge reference only. Zero financial mutation in DSH. |
 | Current Status | PASS |
-| Blocking Reason | none — failure/return API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -60,13 +59,13 @@
 | DSH-SLICE-004F | lateral | exception created in CP queue |
 
 ## Evidence and Gates
-- Runtime evidence: **E2E 14/14 PASS** — `005F_api_results.json`
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005F_FAILURE_RETURN_FINAL_CLOSURE-20260606-LOCAL/005F_api_results.json`
 - Migration 018 applied: `018_delivery_failure_return.sql` — status constraint extended + 2 new columns
 - Flow A: ARRIVED → FAILED_DELIVERY (no return) — wlt_refund_trigger_ref stored
 - Flow B: ARRIVED → RETURNING_TO_STORE → RETURNED — full return chain verified
 - Guard evidence: wrong captain → 403, missing reason → 400, idempotency → 409, double return → 409
 - WLT boundary: zero financial mutation confirmed in E2E
-- Session: `DSH_SLICE_005F_FAILURE_RETURN_FINAL_CLOSURE-20260605-053600`
+- Session: `DSH_SLICE_005F_FAILURE_RETURN_FINAL_CLOSURE-20260606-LOCAL`
 - Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_order_detail.png`
 - Current-session code evidence: app-captain uses injectable `captainId` for failure reporting through the typed lifecycle client; `wlt_refund_trigger_ref` remains a bridge reference only.
 
@@ -74,6 +73,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Existing E2E evidence covers failure/return guards and transitions; current session removed hardcoded captain identity from failure callbacks and captured real app-captain device evidence. |
+| **Reason** | J-004 closed. `POST /orders/{id}/fail-delivery` and `POST /orders/{id}/confirm-return` confirmed in production handler. Migration 018 applied (delivery_failure_reason + wlt_refund_trigger_ref). Flow A (FAILED_DELIVERY) and Flow B (RETURNING_TO_STORE→RETURNED) verified. Guards: wrong captain→403, missing reason→400, idempotency→409, double return→409. WLT boundary confirmed — wlt_refund_trigger_ref is bridge reference only; DSH does NOT execute refunds. |
 | **WLT Boundary** | Confirmed — wlt_refund_trigger_ref is bridge reference only. DSH does NOT execute refunds. WLT (004E) owns refund. |
-| **Next Action** | none — any refund execution proof remains WLT scope only |
+| **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

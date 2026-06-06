@@ -1,5 +1,4 @@
-// TypeScript API client for DSH Order Lifecycle & Support (J-003D / J-004)
-// WLT boundary: read-only reference, zero financial mutation in client.
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
 
 export type DshOrderRecord = {
   readonly id: string;
@@ -162,10 +161,7 @@ export function isDshOrderApiOfflineError(err: unknown): err is DshOrderApiOffli
 }
 
 export function resolveDshOrderApiBaseUrl(): string | null {
-  if (typeof process === 'undefined') return null;
-  const env = (process as { env?: Record<string, string | undefined> }).env;
-  const raw = env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-  return raw?.trim() || null;
+  return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
 
 export interface DshOrderLifecycleClient {

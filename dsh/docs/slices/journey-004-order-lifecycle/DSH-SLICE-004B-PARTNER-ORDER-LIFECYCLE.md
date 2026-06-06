@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-004B — Partner Order Lifecycle
+# DSH-SLICE-004B — Partner Order Lifecycle
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,7 @@
 | Primary Surface | app-partner / OrderManagementScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | J-003 is not closed |
+| Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
 ### Included
@@ -61,8 +61,8 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Deferred pending J-003 checkout/payment full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Reason** | Partner order acceptance and preparation workflow verified; PATCH /orders/{id}/status proven at runtime; upstream J-003 is PASS. |
+| **Dependency** | None |
+| **Next Action** | none — runtime proof complete |
 | **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004B_PARTNER_ORDER_LIFECYCLE_FINAL_CLOSURE-20260605-041000/` |
 | **Closed By** | Antigravity — 2026-06-05T04:10:00Z |

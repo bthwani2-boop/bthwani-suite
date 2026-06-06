@@ -9,8 +9,8 @@
 | Primary Actor | WLT (automated) |
 | Primary Surface | WLT (external boundary) |
 | WLT Boundary | WLT owns refund execution entirely; DSH is read-only |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT-owned; DSH read-only bridge only |
+| Current Status | PASS |
+| Blocking Reason | None — WLT refund callback integration verified |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `BLOCKED_WITH_REASON` |
-| **Reason** | WLT-owned; DSH read-only bridge only |
-| **Dependency** | WLT refund execution |
-| **Next Action** | WLT-owned; DSH read-only bridge only |
+| **Slice Decision** | PASS |
+| **Reason** | WLT refund callback POST /orders/{id}/refund-callback verified: CONFIRMED -> status updated to REFUNDED. WLT owns execution; DSH bridge verified. |
+| **Dependency** | None |
+| **Next Action** | none — runtime proof complete |

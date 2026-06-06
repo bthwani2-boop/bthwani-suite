@@ -9,8 +9,8 @@
 | Primary Actor | All surfaces (enforced via architecture rule) |
 | Primary Surface | N/A — perpetual architecture governance |
 | WLT Boundary | N/A |
-| Current Status | NOT_APPLICABLE_WITH_REASON |
-| Blocking Reason | Perpetual architecture governance rule; no runtime closure possible or intended |
+| Current Status | ACTIVE_GOVERNANCE__GUARD_PROVEN |
+| Blocking Reason | None for current closure. Perpetual architecture governance rule; no standalone runtime closure is possible or intended. |
 
 ## Scope
 ### Included
@@ -47,12 +47,14 @@
 ## Evidence and Gates
 - Runtime evidence: not applicable — perpetual governance
 - Visual evidence: not applicable
+- Guard evidence: J-007 data/media guard pair PASS (`guard-dsh-shared-foundations-final` fail=0/warn=0; `guard-dsh-media-manifest` fail=0/warn=0)
+- Evidence path: `tools/registry/runs/DSH_ALL_SLICES_REALITY_LOCK_AND_J007_GUARDS-20260606-LOCAL/`
 - Exit gate: no closure; perpetual — adapter pattern enforced in all transport bindings
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | NOT_APPLICABLE_WITH_REASON |
-| **Reason** | Perpetual architecture governance rule; no runtime closure possible or required |
+| **Slice Decision** | ACTIVE_GOVERNANCE__GUARD_PROVEN |
+| **Reason** | Perpetual adapter/view-model rule. Current J-007 guard pair proves shared-foundation and media ownership integrity; runtime closure is not applicable. |
 | **Dependency** | Architecture review process |
 | **Next Action** | Enforce adapter pattern in all new transport bindings; include in slice review checklist |

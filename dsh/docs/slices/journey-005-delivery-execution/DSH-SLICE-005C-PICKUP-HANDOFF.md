@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-005C — Pickup Handoff
+# DSH-SLICE-005C — Pickup Handoff
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,6 @@
 | Primary Surface | app-captain / PickupScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | none — pickup API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -47,19 +46,19 @@
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
 |---|---|---|
-| DSH-SLICE-005B | upstream | captain must have accepted |
+| DSH-SLICE-005B | upstream | captain must have accepted — 005B PASS |
 | DSH-SLICE-005D | downstream | trip milestones start after pickup |
 
 ## Evidence and Gates
-- Runtime evidence: `tools/registry/runs/DSH_SLICE_005C_PICKUP_HANDOFF_FINAL_CLOSURE-20260605-045000/`
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005C_PICKUP_HANDOFF_FINAL_CLOSURE-20260606-LOCAL/`
+- Backend confirmation: `POST /orders/{id}/pickup` registered in orders_handler.go
 - Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_order_detail.png`
-- Current-session code evidence: app-captain uses injectable `captainId` for pickup and normalizes preview order ids before calling the typed lifecycle client.
-- Exit gate: 005B PASS + pickup API verified + runtime proof PASS + app-captain device proof captured.
+- Code evidence: app-captain uses injectable `captainId` for pickup; normalizes preview order ids before calling typed lifecycle client
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Existing E2E evidence covers pickup; current session removed hardcoded captain identity from pickup flow and captured real app-captain device evidence. |
-| **Dependency** | 005B accept runtime state |
-| **Next Action** | none — monitor only for real partner handoff code integration |
+| **Reason** | J-004 closed. `POST /orders/{id}/pickup` confirmed in production handler. E2E evidence covers pickup flow. App-captain identity injectable. Partner handoff confirmation scoped: optional scan/code deferred to infra layer; core pickup endpoint proven. |
+| **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

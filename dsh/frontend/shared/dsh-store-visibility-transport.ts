@@ -10,6 +10,8 @@ import {
   type StoreVisibilityGateResponse,
 } from './dsh-store-visibility-client';
 
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+
 export type DshVisibilityFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
 export type DshStoreVisibilityOfflineError = { readonly kind: 'offline' };
@@ -33,19 +35,12 @@ export function isDshStoreVisibilityOfflineError(
 }
 
 /**
- * Resolves the DSH API base URL from environment variables.
- * Tries EXPO_PUBLIC_DSH_API_BASE_URL first (mobile / Expo surfaces),
- * then NEXT_PUBLIC_DSH_API_BASE_URL (Next.js control-panel).
- * Returns null when neither is set — callers must fall back to preview.
+ * Resolves the DSH API base URL from PlatformVarsRegistry.
  */
 export function resolveDshStoreVisibilityBaseUrl(): string | null {
-  if (typeof process === 'undefined') return null;
-  const env = (process as { env?: Record<string, string | undefined> }).env;
-  const raw =
-    env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-  const trimmed = raw?.trim();
-  return trimmed || null;
+  return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
+
 
 function buildHttpTransport(
   baseUrl: string | null,

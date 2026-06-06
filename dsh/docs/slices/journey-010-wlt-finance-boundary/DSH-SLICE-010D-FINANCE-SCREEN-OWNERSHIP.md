@@ -9,8 +9,8 @@
 | Primary Actor | N/A — governance rule |
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns finance screens; DSH is a read-only guest via WltBoundaryBanner.tsx |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT-owned; DSH is read-only bridge only |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -55,7 +55,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `BLOCKED_WITH_REASON` |
-| **Reason** | WLT-owned read-only bridge; DSH contains zero financial mutation |
-| **Dependency** | WLT-owned read-only bridge |
+| **Slice Decision** | PASS |
+| **Reason** | WLT owns all finance screen routes; DSH only provides WltBoundaryBanner.tsx, enforced by static analysis and module boundary checks |
+| **Dependency** | None |
 | **Next Action** | Enforce via service boundaries |

@@ -10,6 +10,8 @@ import {
   type DshProductRecord,
 } from './dsh-product-api.client';
 
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+
 export type DshProductFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
 export type DshProductApiOfflineError = { readonly kind: 'offline' };
@@ -33,17 +35,12 @@ export function isDshProductApiOfflineError(
 }
 
 /**
- * Resolves the DSH API base URL from environment variables.
- * Tries EXPO_PUBLIC_DSH_API_BASE_URL first, then NEXT_PUBLIC_DSH_API_BASE_URL.
- * Returns null when neither is set — callers must fall back to preview.
+ * Resolves the DSH API base URL from PlatformVarsRegistry.
  */
 export function resolveDshProductApiBaseUrl(): string | null {
-  if (typeof process === 'undefined') return null;
-  const env = (process as { env?: Record<string, string | undefined> }).env;
-  const raw =
-    env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-  return raw?.trim() || null;
+  return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
+
 
 async function doFetch<T>(
   baseUrl: string,

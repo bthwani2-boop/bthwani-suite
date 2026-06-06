@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-005B — Captain Accept / Decline
+# DSH-SLICE-005B — Captain Accept / Decline
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,6 @@
 | Primary Surface | app-captain / TaskScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | none — runtime API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -47,19 +46,20 @@
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
 |---|---|---|
-| DSH-SLICE-005A | upstream | assignment must exist |
+| DSH-SLICE-005A | upstream | assignment must exist — 005A PASS |
 | DSH-SLICE-005C | downstream | pickup handoff starts after accept |
 
 ## Evidence and Gates
-- Runtime evidence: `tools/registry/runs/DSH_SLICE_005B_CAPTAIN_ACCEPT_DECLINE_FINAL_CLOSURE-20260605-043000/005B_api_results.json`
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005B_CAPTAIN_ACCEPT_DECLINE_FINAL_CLOSURE-20260606-LOCAL/005B_api_results.json`
+- Backend confirmation: `POST /orders/{id}/accept-task` and `POST /orders/{id}/decline-task` registered in orders_handler.go
 - Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_orders.png` and `dsh_j005_app_captain_order_detail.png`
-- Current-session code evidence: app-captain uses injectable `captainId` for accept/decline and normalizes preview order ids before calling the typed lifecycle client.
-- Exit gate: 005A PASS + task accept/decline API designed + runtime proof verified E2E + app-captain device proof captured.
+- Code evidence: app-captain uses injectable `captainId` for accept/decline; normalizes preview order ids before calling typed lifecycle client
+- J-004 upstream closure: PASS
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Existing E2E evidence covers accept/decline API; current session removed hardcoded captain identity from app-captain callbacks and captured real app-captain device evidence. |
-| **Dependency** | 005A assignment runtime state |
-| **Next Action** | none — monitor only for real auth/captain identity provider integration |
+| **Reason** | J-004 order lifecycle closed. Both accept-task and decline-task endpoints confirmed in production handler. E2E evidence covers full accept/decline flow. App-captain captain identity injectable (no hardcoded IDs). |
+| **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

@@ -30,6 +30,8 @@ import {
   resolveDshFieldVisitBaseUrl,
   resolveDshFieldStoreOnboardingBaseUrl,
   resolveDshFieldDocumentBaseUrl,
+  PlatformVarsProvider,
+  FeatureFlagProvider,
 } from '../shared';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 import {
@@ -84,7 +86,17 @@ function resolveCommandRoute(command?: DshFieldNavigationCommand): DshFieldRoute
   return { kind: command.target };
 }
 
-export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) {
+export function DshFieldSurface(props: DshFieldSurfaceProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshFieldSurfaceInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
   const { theme } = useTheme();
   const {
     hydrated: appearanceHydrated,
@@ -498,14 +510,22 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
     />
   );
 
+  const showBottomNav =
+    route.kind === 'stores' ||
+    route.kind === 'history' ||
+    route.kind === 'finance' ||
+    route.kind === 'account';
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface, position: 'relative' }}>
-      <View style={{ flex: 1, paddingBottom: 80 }}>
+      <View style={{ flex: 1, paddingBottom: showBottomNav ? 80 : 0 }}>
         {content}
       </View>
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
-        {fieldBottomNavBar}
-      </View>
+      {showBottomNav && (
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+          {fieldBottomNavBar}
+        </View>
+      )}
     </View>
   );
 }

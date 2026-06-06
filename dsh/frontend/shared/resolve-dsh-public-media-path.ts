@@ -29,6 +29,7 @@ export const explicitPublicMediaPathByKey: Record<string, string> = {
   'dsh.store.malqa.logo.v1': 'store_logos/dsh-store-malqa-logo-v1.png',
   'dsh.store.lead-5.logo.v1': 'store_logos/dsh-store-lead-5-logo-v1.png',
   'dsh.brand.logo.v1': 'store_logos/brand-logo.png',
+  'dsh.proof.delivery.preview.v1': 'banners/dsh-banner-home-promo-1-v1.png',
 };
 
 function publicPath(relativePath: string): string {

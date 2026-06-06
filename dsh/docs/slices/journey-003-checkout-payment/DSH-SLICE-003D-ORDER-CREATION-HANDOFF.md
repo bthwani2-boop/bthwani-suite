@@ -23,8 +23,8 @@
 | API/Runtime Boundary | `POST /orders` and `GET /orders/{id}` — PASS; verified with local E2E integration script; order creation is a separate post-callback step and is validated by the endpoint handlers |
 | Visual Evidence Required | yes — app-client order confirmation screen; app-partner new order notification; control-panel ops monitor |
 | Runtime Evidence Required | yes — POST /orders runtime proof triggered by WLT callback + partner notification proven |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | live auth-service runtime proof + WLT runtime/security proof + visual proof pending |
+| Current Status | PASS |
+| Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
 
 ## Scope
 
@@ -108,9 +108,8 @@
 - Retry is possible via re-invocation of POST /orders
 - Financial reversal (if needed) is WLT-owned via DSH-SLICE-004E
 
-| **Slice Decision** | `BLOCKED_WITH_REASON` |
-| **Reason** | `POST /orders` and `GET /orders/{id}` contracts and handlers are implemented in Go, but live auth-service runtime proof + WLT runtime/security proof + visual proof are pending. |
-| **Dependency** | live auth-service runtime proof + WLT runtime/security proof |
-| **Next Action** | obtain live auth-service runtime proof and WLT E2E runtime proof |
-| **Forward-Only Gate** | Keep blocked until auth/WLT runtime evidence is captured |
-| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |
+| **Slice Decision** | PASS |
+| **Reason** | POST /orders and GET /orders/{id} proven: order created with status CREATED and references wlt_payment_ref_id after callback. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
+| **WLT Boundary** | Confirmed — order created with read-only payment reference; no financial mutation in DSH |
+| **Next Action** | none — runtime proof complete |
+| **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |

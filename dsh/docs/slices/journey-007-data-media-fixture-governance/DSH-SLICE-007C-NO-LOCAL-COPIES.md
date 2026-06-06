@@ -9,8 +9,8 @@
 | Primary Actor | All surfaces (enforced via build guard) |
 | Primary Surface | N/A — perpetual build-time governance |
 | WLT Boundary | N/A |
-| Current Status | NOT_APPLICABLE_WITH_REASON |
-| Blocking Reason | Perpetual governance rule; no runtime closure possible or intended |
+| Current Status | ACTIVE_GOVERNANCE__GUARD_PROVEN |
+| Blocking Reason | None for current closure. Perpetual governance rule; no runtime closure is possible or intended. |
 
 ## Scope
 ### Included
@@ -48,12 +48,14 @@
 ## Evidence and Gates
 - Runtime evidence: not applicable — perpetual governance
 - Visual evidence: not applicable
+- Guard evidence: `guard-dsh-shared-foundations-final` PASS (fail=0, warn=0, info=54)
+- Evidence path: `tools/registry/runs/DSH_ALL_SLICES_REALITY_LOCK_AND_J007_GUARDS-20260606-LOCAL/`
 - Exit gate: no closure; perpetual — guard must always pass
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | NOT_APPLICABLE_WITH_REASON |
-| **Reason** | Perpetual governance rule; no runtime closure possible or required; enforced by CI guard |
+| **Slice Decision** | ACTIVE_GOVERNANCE__GUARD_PROVEN |
+| **Reason** | Perpetual governance rule enforced by `guard-dsh-shared-foundations-final.mjs`; guard PASS proves current no-local-divergent-copy constraints without requiring runtime closure. |
 | **Dependency** | CI guard enforcement |
 | **Next Action** | Maintain guard; remove any local copies detected by violations |

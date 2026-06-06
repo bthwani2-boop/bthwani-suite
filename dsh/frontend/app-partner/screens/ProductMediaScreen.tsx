@@ -12,6 +12,11 @@ import {
 } from '@bthwani/ui-kit';
 import { type DshProductRecord, type DshProductMediaRecord } from '../../shared/dsh-product-api.client';
 import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+import {
+	DSH_PRODUCT_MEDIA_FIXTURE_KEYS,
+	resolveDshImageSource,
+	type DshProductMediaFixtureKey,
+} from '../../shared/resolve-dsh-image-source';
 
 export type ProductMediaScreenProps = {
 	productId: string;
@@ -20,19 +25,25 @@ export type ProductMediaScreenProps = {
 
 export type ProductMediaScreenState = 'loading' | 'idle' | 'saving' | 'error' | 'offline';
 
-const PRODUCT_MEDIA_MANIFEST_KEYS = [
-	{ key: 'dsh.product.apple.v1', path: 'products/dsh-product-apple-v1.png', label: 'تفاحة (Apple)' },
-	{ key: 'dsh.product.bread.v1', path: 'products/dsh-product-bread-v1.png', label: 'خبز (Bread)' },
-	{ key: 'dsh.product.chicken.v1', path: 'products/dsh-product-chicken-v1.png', label: 'دجاج (Chicken)' },
-	{ key: 'dsh.product.choco.v1', path: 'products/dsh-product-choco-v1.png', label: 'شوكولاتة (Choco)' },
-	{ key: 'dsh.product.croissant.v1', path: 'products/dsh-product-croissant-v1.png', label: 'كرواسون (Croissant)' },
-	{ key: 'dsh.product.milk.v1', path: 'products/dsh-product-milk-v1.png', label: 'حليب (Milk)' },
-	{ key: 'dsh.product.pasta.v1', path: 'products/dsh-product-pasta-v1.png', label: 'معكرونة (Pasta)' },
-	{ key: 'dsh.product.roll.v1', path: 'products/dsh-product-roll-v1.png', label: 'رول خبز (Roll)' },
-	{ key: 'dsh.product.lead-5.dates-box.v1', path: 'products/dsh-product-lead-5-dates-box-v1.png', label: 'صندوق تمور (Dates Box)' },
-	{ key: 'dsh.product.salad.v1', path: 'products/dsh-product-salad-v1.png', label: 'سلطة (Salad)' },
-	{ key: 'dsh.product.yogurt.v1', path: 'products/dsh-product-yogurt-v1.png', label: 'زبادي (Yogurt)' },
-];
+const PRODUCT_MEDIA_LABEL_BY_KEY: Record<DshProductMediaFixtureKey, string> = {
+	'dsh.product.apple.v1': 'تفاحة (Apple)',
+	'dsh.product.bread.v1': 'خبز (Bread)',
+	'dsh.product.chicken.v1': 'دجاج (Chicken)',
+	'dsh.product.choco.v1': 'شوكولاتة (Choco)',
+	'dsh.product.croissant.v1': 'كرواسون (Croissant)',
+	'dsh.product.milk.v1': 'حليب (Milk)',
+	'dsh.product.pasta.v1': 'معكرونة (Pasta)',
+	'dsh.product.roll.v1': 'رول خبز (Roll)',
+	'dsh.product.lead-5.dates-box.v1': 'صندوق تمور (Dates Box)',
+	'dsh.product.salad.v1': 'سلطة (Salad)',
+	'dsh.product.yogurt.v1': 'زبادي (Yogurt)',
+};
+
+const PRODUCT_MEDIA_MANIFEST_KEYS = DSH_PRODUCT_MEDIA_FIXTURE_KEYS.map((key) => ({
+	key,
+	label: PRODUCT_MEDIA_LABEL_BY_KEY[key],
+	source: resolveDshImageSource(key),
+}));
 
 export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProps) {
 	const { direction } = useDirection();
@@ -299,7 +310,7 @@ export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProp
 									}}
 								>
 									<Image
-										source={{ uri: `${baseUrl}/media-fixtures/${item.path}` }}
+										source={item.source}
 										style={{ width: 70, height: 70, borderRadius: 4, backgroundColor: theme.line + '10' }}
 										resizeMode="cover"
 									/>

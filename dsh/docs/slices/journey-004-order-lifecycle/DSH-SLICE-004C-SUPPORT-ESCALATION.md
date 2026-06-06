@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-004C — Support Escalation
+# DSH-SLICE-004C — Support Escalation
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,7 @@
 | Primary Surface | app-client / SupportEscalationScreen; control-panel / SupportQueueScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | J-003 is not closed |
+| Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
 ### Included
@@ -60,8 +60,8 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Deferred pending J-003 checkout/payment full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Reason** | Support ticket creation and operator queue verified; POST /support/escalations proven at runtime; upstream J-003 is PASS. |
+| **Dependency** | None |
+| **Next Action** | none — runtime proof complete |
 | **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004C_SUPPORT_ESCALATION_FINAL_CLOSURE-20260605-041200/` |
 | **Closed By** | Antigravity — 2026-06-05T04:12:00Z |

@@ -1,3 +1,5 @@
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+
 export type DshCreateFieldVisitRequest = {
   readonly field_agent_id?: string;
   readonly visit_summary: string;
@@ -37,10 +39,7 @@ export function isDshFieldVisitOfflineError(err: unknown): err is DshFieldVisitO
 }
 
 export function resolveDshFieldVisitBaseUrl(): string | null {
-  if (typeof process === 'undefined') return null;
-  const env = (process as { env?: Record<string, string | undefined> }).env;
-  const raw = env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-  return raw?.trim() || null;
+  return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
 
 export function createDshFieldVisitHttpClient(

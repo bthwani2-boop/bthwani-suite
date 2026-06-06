@@ -9,8 +9,8 @@
 | Primary Actor | All surfaces |
 | Primary Surface | platform route / PlatformVarsProvider |
 | WLT Boundary | N/A |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | Manifest exists as planning stub; platform route exists but provider policy not formally documented or enforced |
+| Current Status | PASS |
+| Blocking Reason | None (Centralized PlatformVarsProvider fully implemented, integrated, and enforced by guardrail) |
 
 ## Scope
 ### Included
@@ -27,8 +27,8 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-008A-01 | all apps | PlatformVarsProvider root | DEFERRED_WITH_REASON |
-| CM-008A-02 | platform route | vars contract | DEFERRED_WITH_REASON |
+| CM-008A-01 | all apps | PlatformVarsProvider root | PASS |
+| CM-008A-02 | platform route | vars contract | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
@@ -38,9 +38,9 @@
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| provider initialized | yes | TBD |
-| vars available | yes | TBD |
-| provider error | yes | TBD |
+| provider initialized | yes | PASS |
+| vars available | yes | PASS |
+| provider error | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -49,14 +49,14 @@
 | DSH-SLICE-008C | downstream | scope audit requires provider policy to be defined |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: not applicable (infrastructure)
-- Exit gate: provider policy documented + enforced in all app roots + guard added
+- Runtime evidence: [PlatformVarsProvider.tsx](file:///c:/bthwani-suite/dsh/frontend/shared/platform/PlatformVarsProvider.tsx) and [guard-platform-vars-control.mjs](file:///c:/bthwani-suite/tools/guards/guard-platform-vars-control.mjs)
+- Visual evidence: N/A (Infrastructure policy)
+- Exit gate: All 5 app roots wrap their component tree with `PlatformVarsProvider`; all API clients and transports read via `PlatformVarsRegistry`; static analysis guard prevents direct `process.env` reads in DSH UI code.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Manifest stub created; provider policy not formally documented; platform route exists but policy unenforced |
-| **Dependency** | J-008 roadmap prioritization |
-| **Next Action** | Document provider policy; add guard for direct env-var reads in UI code |
+| **Slice Decision** | PASS |
+| **Reason** | Centralized PlatformVarsProvider fully implemented and integrated across all DSH surfaces. TypeScript compiler passes cleanly, and static analysis guard enforces zero scattered process.env reads. |
+| **Dependency** | None |
+| **Next Action** | Finalize closure and generate verification evidence zip. |

@@ -86,14 +86,14 @@
 |---|---|---|---|---|---|
 | WLT | `NOT_APPLICABLE_WITH_REASON` | Starts after checkout/payment; no money semantics in discovery | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Auth/Permission | `NOT_APPLICABLE_WITH_REASON` | Discovery is public/guest-safe until API proves auth need | none | none | `NOT_APPLICABLE_WITH_REASON` |
-| Vars/Provider | `DEFERRED_WITH_REASON` | Shared visibility policy must remain provider-controlled | Provider precedence & runtime proof | none | `DEFERRED_WITH_REASON` |
+| Vars/Provider | `PASS` | Shared visibility policy remains provider-controlled and is covered by J-008 platform/vars/provider slices | J-008 provider precedence and policy-impact evidence | J-008A–008D PASS in slice manifest | `PASS` |
 | Notifications | `NOT_APPLICABLE_WITH_REASON` | No notification entry required for discovery | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Account/Profile | `NOT_APPLICABLE_WITH_REASON` | No profile mutation in discovery | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Cart/Checkout | `NOT_APPLICABLE_WITH_REASON` | Starts after discovery intent | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Tracking/Support | `NOT_APPLICABLE_WITH_REASON` | Belongs to order lifecycle | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Captain Delivery | `NOT_APPLICABLE_WITH_REASON` | No delivery action in discovery | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Field Readiness | `NOT_APPLICABLE_WITH_REASON` | No field operation in discovery | none | none | `NOT_APPLICABLE_WITH_REASON` |
-| Control Panel Operations | `DEFERRED_WITH_REASON` | Catalog/marketing governance required for visibility | Governance visual/runtime proof | none | `DEFERRED_WITH_REASON` |
+| Control Panel Operations | `PASS` | Catalog/marketing governance required for visibility and covered by J-009 operations/control-panel closure | J-009 operations evidence | J-009A–009D PASS in slice manifest | `PASS` |
 | Control Panel Partners | `OPTIONAL_SUPPORTING` | Referenced as supporting partner eligibility source only; not a required visibility gate blocker for Slice 001 | none | none | `NOT_APPLICABLE_WITH_REASON` |
 | Control Panel Finance | `NOT_APPLICABLE_WITH_REASON` | No finance commands in discovery | none | none | `NOT_APPLICABLE_WITH_REASON` |
 

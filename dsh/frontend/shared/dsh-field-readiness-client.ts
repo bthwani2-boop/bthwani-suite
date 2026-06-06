@@ -1,3 +1,5 @@
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+
 export type CreateFieldReadinessEscalationRequest = {
   readonly field_agent_id?: string;
   readonly reason: string;
@@ -54,12 +56,7 @@ export interface DshFieldReadinessClient {
 }
 
 export function resolveDshFieldReadinessBaseUrl(): string | null {
-  if (typeof process !== 'undefined') {
-    const env = (process as { env?: Record<string, string | undefined> }).env;
-    const raw = env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-    if (raw?.trim()) return raw.trim();
-  }
-  return null;
+  return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
 
 export function createDshFieldReadinessHttpClient(

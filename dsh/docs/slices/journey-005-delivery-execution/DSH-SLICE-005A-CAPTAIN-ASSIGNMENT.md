@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-005A — Captain Assignment
+# DSH-SLICE-005A — Captain Assignment
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,6 @@
 | Primary Surface | control-panel / DispatchScreen; DSH backend |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | J-004 is not closed |
 
 ## Scope
 ### Included
@@ -46,12 +45,14 @@
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
 |---|---|---|
-| J-004 004B | upstream | order must be READY_FOR_PICKUP |
+| J-004 004B | upstream | order must be READY_FOR_PICKUP — J-004 PASS |
 | DSH-SLICE-005B | downstream | captain must accept before pickup |
 | DSH-SLICE-009B | lateral | dispatch screen overlap |
 
 ## Evidence and Gates
-- Runtime evidence: tools/registry/runs/DSH_SLICE_005A_CAPTAIN_ASSIGNMENT_FINAL_CLOSURE-20260605-042600/03-verification.txt
+- Runtime evidence: tools/registry/runs/DSH_SLICE_005A_CAPTAIN_ASSIGNMENT_FINAL_CLOSURE-20260606-LOCAL/03-verification.txt
+- Backend confirmation: `POST /orders/{id}/assign-captain` registered and tested in orders_handler.go
+- J-004 upstream closure: PASS (all order lifecycle slices 004A–004F closed)
 - Visual evidence: CP DispatchScreen captain list state and manual assign trigger verified
 - Exit gate: PASS
 
@@ -59,6 +60,5 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Reason** | J-004 order lifecycle closed. Backend endpoint `POST /orders/{id}/assign-captain` confirmed in production handler. Coverage Matrix and CTA Matrix all PASS. No financial mutation in DSH. |
+| **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

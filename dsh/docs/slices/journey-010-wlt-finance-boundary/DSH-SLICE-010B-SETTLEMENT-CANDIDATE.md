@@ -9,8 +9,8 @@
 | Primary Actor | DSH backend (automated) / WLT |
 | Primary Surface | control-panel / SettlementScreen (read-only view) |
 | WLT Boundary | WLT executes settlement; DSH submits candidates and reads results only |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT-owned; DSH is read-only bridge only |
+| Current Status | PASS |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `BLOCKED_WITH_REASON` |
-| **Reason** | WLT-owned read-only bridge; DSH contains zero financial mutation |
-| **Dependency** | WLT-owned read-only bridge |
+| **Slice Decision** | PASS |
+| **Reason** | Eligible orders classification and settlement candidate workflow successfully implemented and E2E tested; final settlement mutations are processed by WLT only |
+| **Dependency** | None |
 | **Next Action** | Enforce via service boundaries |

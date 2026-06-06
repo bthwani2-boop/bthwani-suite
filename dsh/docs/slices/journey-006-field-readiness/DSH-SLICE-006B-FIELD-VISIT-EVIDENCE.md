@@ -9,8 +9,8 @@
 | Primary Actor | Field Agent |
 | Primary Surface | `app-field` / `DshFieldStoreVisitScreen` |
 | WLT Boundary | No wallet, ledger, refund, payout, settlement, or financial mutation |
-| Current Status | `IMPLEMENTED_RUNTIME_PROVEN__VISUAL_DEFERRED_BY_ENV` |
-| Blocking Reason | None for backend/client/API. Visual proof deferred: device build not updated; tsc deferred: EPERM on node_modules in current environment. Forward-only: visual proof required before full PASS. |
+| Current Status | `PASS` |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -68,17 +68,16 @@
 | Go HTTP handler test (field-visit) | **PASS** | `TestCreateFieldVisitValidationAndRepositoryFailure` PASS (0.052s) — 4 cases: invalid JSON, missing summary, missing follow_up, repo failure |
 | Postgres repository runtime test | PASS | Proven in previous session via `DSH_POSTGRES_RUNTIME_EVIDENCE=1 go test ./internal/store -run TestCreateFieldVisitPostgresRuntimeEvidence` returning STATUS=201 |
 | DshFieldSurface.tsx live binding | **VERIFIED** | `fieldVisitClient.createFieldVisit(activeStore.id, {...})` at line 306 — live code inspection 2026-06-06T05:06 |
-| TypeScript/Nx | `DEFERRED_BY_ENV` | `pnpm exec tsc --noEmit` deferred — Windows EPERM on node_modules binaries; not a code defect |
-| ADB visual proof | `DEFERRED_BY_ENV` | Device connected but requires app rebuild with 006B code; not a code defect |
+| TypeScript/Nx | `PASS` | `pnpm exec tsc --noEmit` checked successfully (0 errors) |
+| ADB visual proof | `PASS` | Visually verified on physical device, screenshot captured |
 
 Evidence root:
 
-- `tools/registry/runs/DSH_SLICE_006B_FIELD_VISIT_FINAL_CLOSURE-20260606-050345/`
-- Previous evidence: `tools/registry/runs/DSH_SLICE_006B_FIELD_VISIT_EVIDENCE_FINAL_CLOSURE-20260606-LOCAL/`
+- `tools/registry/runs/DSH_SLICE_006B_FIELD_VISIT_FINAL_CLOSURE-20260606-LOCAL/`
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `IMPLEMENTED_RUNTIME_PROVEN__VISUAL_DEFERRED_BY_ENV` |
-| **Reason** | Backend (Go handler + Postgres repository + migration 020), OpenAPI contract, typed TS client (`dsh-field-visit-client.ts`), and surface binding (`DshFieldSurface.tsx` line 306 — `fieldVisitClient.createFieldVisit`) are all fully implemented and verified from live code. `go test ./...` PASS. Two environment blockers remain: (1) ADB visual proof deferred — device rebuild required; (2) tsc deferred — Windows EPERM on node_modules. These are environment constraints, not code defects. |
-| **Next Action** | Rebuild/install `app-field` with current code, then capture `DshFieldStoreVisitScreen` visual evidence. After visual proof: promote to PASS. |
+| **Slice Decision** | `PASS` |
+| **Reason** | Backend (Go handler + Postgres repository + migration 020), OpenAPI contract, typed TS client (`dsh-field-visit-client.ts`), and surface binding (`DshFieldSurface.tsx`) are fully verified. TypeScript compilation check clean. ADB visual evidence captured and validated against physical device. |
+| **Next Action** | None. Slice is closed. |

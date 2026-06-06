@@ -1,3 +1,5 @@
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+
 export type DshFieldDocumentKind =
   | 'commercial_registration'
   | 'tax_certificate'
@@ -41,10 +43,7 @@ export function isDshFieldDocumentOfflineError(err: unknown): err is DshFieldDoc
 }
 
 export function resolveDshFieldDocumentBaseUrl(): string | null {
-  if (typeof process === 'undefined') return null;
-  const env = (process as { env?: Record<string, string | undefined> }).env;
-  const raw = env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? env?.NEXT_PUBLIC_DSH_API_BASE_URL;
-  return raw?.trim() || null;
+  return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
 
 export function createDshFieldDocumentHttpClient(

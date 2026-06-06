@@ -608,9 +608,22 @@ func (h *OrdersHandler) DeliverOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req.CaptainID = strings.TrimSpace(req.CaptainID)
 	if req.CaptainID == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "captain_id is required")
 		return
+	}
+	if req.PodMediaKey != nil {
+		podMediaKey := strings.TrimSpace(*req.PodMediaKey)
+		if podMediaKey == "" {
+			req.PodMediaKey = nil
+		} else {
+			if store.GetMediaURL(podMediaKey) == "" {
+				writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "pod_media_key is not registered in manifest")
+				return
+			}
+			req.PodMediaKey = &podMediaKey
+		}
 	}
 
 	order, err := h.repository.DeliverOrder(r.Context(), id, req.CaptainID, req.PodMediaKey)

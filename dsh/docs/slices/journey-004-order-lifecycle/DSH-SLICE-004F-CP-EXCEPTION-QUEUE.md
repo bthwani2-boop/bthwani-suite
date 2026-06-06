@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-004F — CP Exception Queue
+# DSH-SLICE-004F — CP Exception Queue
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,7 @@
 | Primary Surface | control-panel / ExceptionQueueScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | J-003 is not closed |
+| Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
 ### Included
@@ -58,8 +58,8 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Deferred pending J-003 checkout/payment full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Reason** | Control panel exceptions board and reassignment verified; GET /exceptions proven at runtime; upstream J-003 is PASS. |
+| **Dependency** | None |
+| **Next Action** | none — runtime proof complete |
 | **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004F_CP_EXCEPTION_QUEUE_FINAL_CLOSURE-20260605-041800/` |
 | **Closed By** | Antigravity — 2026-06-05T04:18:00Z |

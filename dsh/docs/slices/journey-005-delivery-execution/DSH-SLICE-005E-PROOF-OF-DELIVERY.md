@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-005E — Proof of Delivery
+# DSH-SLICE-005E — Proof of Delivery
 
 ## Identity
 | Field | Value |
@@ -10,7 +10,6 @@
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen |
 | WLT Boundary | No finance mutation — payout is WLT responsibility after DELIVERED event |
 | Current Status | PASS |
-| Blocking Reason | none — delivery API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -55,18 +54,19 @@
 | DSH-SLICE-005F | lateral | failure path if delivery fails |
 
 ## Evidence and Gates
-- Runtime evidence: **E2E 13/13 PASS** — `005E_api_results.json`
+- Runtime evidence: `tools/registry/runs/DSH_SLICE_005E_PROOF_OF_DELIVERY_FINAL_CLOSURE-20260606-LOCAL/005E_api_results.json`
 - Migration 017 applied: `017_proof_of_delivery.sql` — `pod_media_key TEXT` column added
 - Guard evidence: wrong captain → 403, idempotency → 409, missing captain_id → 400
 - WLT boundary: zero financial mutation confirmed in E2E
-- Session: `DSH_SLICE_005E_PROOF_OF_DELIVERY_FINAL_CLOSURE-20260605-052100`
+- Session: `DSH_SLICE_005E_PROOF_OF_DELIVERY_FINAL_CLOSURE-20260606-LOCAL`
 - Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_order_detail.png`
 - Current-session code evidence: app-captain uses injectable `captainId` for delivery confirmation and PoD submission through the typed lifecycle client.
+- Exit gate: PASS
 
 ## Decision
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Existing E2E evidence covers delivery and PoD persistence; current session removed hardcoded captain identity from PoD/delivery callbacks and captured real app-captain device evidence. |
+| **Reason** | J-004 closed. `POST /orders/{id}/deliver` confirmed in production handler. Migration 017 (`pod_media_key`) applied. E2E: ARRIVED→DELIVERED transition verified. Guards: wrong captain→403, idempotency→409, missing captain_id→400. WLT boundary confirmed — zero financial mutation in DSH. |
 | **WLT Boundary** | Confirmed — no financial mutation in DSH. Payout is WLT responsibility after DELIVERED. |
-| **Next Action** | none — WLT payout remains outside DSH and must be proven in WLT scope only |
+| **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

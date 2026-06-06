@@ -68,6 +68,8 @@ import {
 import {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,
+  PlatformVarsProvider,
+  FeatureFlagProvider,
 } from '../shared';
 import { OfferDeclineSheet } from './sheets';
 
@@ -98,6 +100,7 @@ type CaptainAppMode = 'bthwani_captain_mode' | 'store_courier_mode';
 type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivery_failed' | 'delivered';
 type DshCaptainPodState = NonNullable<React.ComponentProps<typeof DshCaptainPoDSubmissionScreen>['state']>;
 
+const CAPTAIN_POD_PREVIEW_MEDIA_KEY = 'dsh.proof.delivery.preview.v1';
 const CAPTAIN_POD_PLACEHOLDER_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+kG7wAAAAASUVORK5CYII=';
 const DSH_CAPTAIN_PREVIEW_ID = 'CAP-0041';
 
@@ -404,7 +407,17 @@ function resolveRuntimeOrderId(orderId: string): string {
   return orderId.startsWith('captain-order-') ? orderId.replace('captain-order-', '') : orderId;
 }
 
-export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }: DshCaptainSurfaceProps) {
+export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshCaptainSurfaceInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
   const {
     hydrated: appearanceHydrated,
@@ -439,6 +452,7 @@ export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID 
   const [storeCourierStage, setStoreCourierStage] = React.useState<StoreCourierStage>('ready_for_pickup');
   const [captainPodState, setCaptainPodState] = React.useState<DshCaptainPodState>('ready');
   const [captainPodPhotoUri, setCaptainPodPhotoUri] = React.useState<string | undefined>();
+  const [captainPodMediaKey, setCaptainPodMediaKey] = React.useState<string | undefined>();
   const [isDeclineSheetVisible, setIsDeclineSheetVisible] = React.useState(false);
   const [declineSheetState, setDeclineSheetState] = React.useState<'ready' | 'loading' | 'success' | 'error'>('ready');
   const [declineOrderId, setDeclineOrderId] = React.useState<string>('');
@@ -565,6 +579,7 @@ export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID 
   React.useEffect(() => {
     setCaptainPodState('ready');
     setCaptainPodPhotoUri(undefined);
+    setCaptainPodMediaKey(undefined);
   }, [activeOrderId]);
 
   React.useEffect(() => {
@@ -572,6 +587,7 @@ export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID 
       setStoreCourierStage('ready_for_pickup');
       setCaptainPodState('ready');
       setCaptainPodPhotoUri(undefined);
+      setCaptainPodMediaKey(undefined);
     }
   }, [captainAppMode]);
 
@@ -594,11 +610,12 @@ export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID 
 
   const capturePodPhotoPreview = React.useCallback(() => {
     setCaptainPodPhotoUri(CAPTAIN_POD_PLACEHOLDER_URI);
+    setCaptainPodMediaKey(CAPTAIN_POD_PREVIEW_MEDIA_KEY);
     setCaptainPodState('ready');
   }, []);
 
   const confirmPodSubmission = React.useCallback(async () => {
-    if (!captainPodPhotoUri) {
+    if (!captainPodPhotoUri || !captainPodMediaKey) {
       return;
     }
 
@@ -611,7 +628,7 @@ export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID 
       // WLT BOUNDARY: no payout mutation here. Payout is WLT responsibility post-DELIVERED.
       await orderLifecycleClient.deliverOrder(rawOrderId, {
         captain_id: captainId,
-        pod_media_key: captainPodPhotoUri,
+        pod_media_key: captainPodMediaKey,
       });
 
       setCaptainPodState('success');
@@ -624,7 +641,7 @@ export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID 
       console.error("Failed to confirm delivery API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, captainId, captainPodPhotoUri, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainId, captainPodMediaKey, captainPodPhotoUri, orderLifecycleClient]);
 
   const reportPodFailure = React.useCallback(async () => {
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);

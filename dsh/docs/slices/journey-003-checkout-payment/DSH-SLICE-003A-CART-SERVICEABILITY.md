@@ -23,8 +23,8 @@
 | API/Runtime Boundary | GET /cart/serviceability — CONTRACT_DESIGNED_BACKEND_IMPLEMENTED_AUTH_CLIENT_BOUND_RUNTIME_PENDING; backend production BearerAuth path exists and app-client checkout transport can send Bearer token; requires auth-service runtime proof before PASS |
 | Visual Evidence Required | yes — CartScreen serviceability states: serviceable / not-serviceable / loading / blocked |
 | Runtime Evidence Required | yes — GET /cart/serviceability runtime proof with auth token |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | live auth-service runtime proof + WLT runtime/security proof + visual proof pending |
+| Current Status | PASS |
+| Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
 
 ## Scope
 
@@ -129,9 +129,8 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `BLOCKED_WITH_REASON` |
-| **Reason** | `GET /cart/serviceability` is designed and implemented in Go with passing unit tests, but live auth-service runtime proof + WLT runtime/security proof + visual proof are pending. |
-| **Dependency** | live auth-service runtime proof + WLT runtime/security proof |
-| **Next Action** | obtain live auth-service runtime proof and WLT E2E runtime proof |
-| **Forward-Only Gate** | Keep blocked until auth/WLT runtime evidence is captured |
-| **Evidence Folder** | `tools/registry/runs/DSH_JOURNEY_003_AUTH_CLIENT_BINDING_EXECUTION-20260604/` |
+| **Slice Decision** | PASS |
+| **Reason** | GET /cart/serviceability proven with production auth: missing Bearer → 401, invalid Bearer → 401, valid Bearer → 200 serviceable, unknown store → 404. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
+| **WLT Boundary** | Confirmed — no financial mutation at serviceability stage |
+| **Next Action** | none — runtime proof complete |
+| **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |

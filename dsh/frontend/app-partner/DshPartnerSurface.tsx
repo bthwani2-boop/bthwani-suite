@@ -26,6 +26,8 @@ import {
   createDshOrderLifecycleHttpClient,
   fetchDshRuntimeOrders,
   type DshRuntimeOrderRow,
+  PlatformVarsProvider,
+  FeatureFlagProvider,
 } from '../shared';
 import type { PartnerOrderItem, PartnerOrdersInboxScreenState } from './screens/OrdersInboxScreen';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';
@@ -150,7 +152,17 @@ function mapRuntimeRowToPartnerItem(row: DshRuntimeOrderRow): PartnerOrderItem {
   };
 }
 
-export function DshPartnerSurface({
+export function DshPartnerSurface(props: DshPartnerSurfaceProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshPartnerSurfaceInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshPartnerSurfaceInner({
   initialRoute = 'inbox',
   initialOrderId = 'partner-order-1042',
 }: DshPartnerSurfaceProps = {}) {

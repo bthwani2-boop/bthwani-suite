@@ -20,6 +20,8 @@ import { ControlPanelDshAdministrationScreen } from './administration/ControlPan
 import { ControlPanelHrScreen } from './hr/ControlPanelHrScreen';
 import type { DshControlPanelSectionId } from './shared/dsh-control-panel-governance.map';
 
+import { PlatformVarsProvider, FeatureFlagProvider } from '../shared';
+
 export type DshControlPanelSurfaceHostProps = {
   section?: DshControlPanelSectionId;
   workspace?: AnyOperationsWorkspaceId;
@@ -29,7 +31,17 @@ export type DshControlPanelSurfaceHostProps = {
   financePanel?: FinancePanelId;
 };
 
-export function DshControlPanelSurfaceHost({
+export function DshControlPanelSurfaceHost(props: DshControlPanelSurfaceHostProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshControlPanelSurfaceHostInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshControlPanelSurfaceHostInner({
   section = 'operations',
   workspace = 'overview',
   orderId,

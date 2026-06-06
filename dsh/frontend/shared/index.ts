@@ -732,3 +732,19 @@ export {
   fetchDshRuntimeOrders,
   isDshRuntimeAvailable,
 } from './dsh-operational-runtime-adapter';
+
+// --- Platform Vars Infrastructure (DSH-SLICE-008A) ---
+export type { PlatformVarsConfig } from './platform/PlatformVarsProvider';
+export {
+  PlatformVarsProvider,
+  usePlatformVars,
+  PlatformVarsRegistry,
+} from './platform/PlatformVarsProvider';
+
+// --- Feature Flags & Rollout (DSH-SLICE-008B) ---
+export type { FeatureFlagsConfig } from './platform/FeatureFlagProvider';
+export {
+  FeatureFlagProvider,
+  useFeatureFlag,
+  FeatureFlagsRegistry,
+} from './platform/FeatureFlagProvider';
