@@ -62,7 +62,7 @@ export class FeatureFlagsRegistry {
   }
 
   public static override(newFlags: Partial<FeatureFlagsConfig>): void {
-    this.flags = { ...this.flags, ...newFlags };
+    this.flags = { ...this.flags, ...newFlags } as FeatureFlagsConfig;
   }
 }
 

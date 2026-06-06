@@ -409,11 +409,11 @@ These contradictions exist between source files and must be resolved in the appr
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
 | IMPLEMENTATION_STARTED areas | 1 (J-003 checkout/payment) |
 | WLT-owned read-only boundary areas | 4 (J-010 finance/WLT boundary) |
-| DSH-SLICE-006C status | **DEFERRED_WITH_REASON** — Documents & Media Proof; ready for local testing, pending onboarding API design / field readiness validation |
+| DSH-SLICE-006C status | **PASS** — Documents & Media Proof; E2E verified locally |
 | J-003 implementation status | **BLOCKED_WITH_REASON** — ready for controlled local testing, pending production auth validation and WLT E2E callback proof; evidence under `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |
 | J-004 implementation status | **DEFERRED_WITH_REASON** — deferred pending J-003 checkout/payment closure; ready for local smoke testing |
 | J-005 implementation status | **DEFERRED_WITH_REASON** — deferred pending J-004/J-009 runtime; ready for local smoke testing; evidence under `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/` |
-| J-006 implementation status | **DEFERRED_WITH_REASON** — deferred pending onboarding API design and field readiness verification; ready for local smoke testing |
+| J-006 implementation status | **SLICE_GROUP_CLOSED** — field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all E2E closed (evidence under tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/) |
 | J-007 implementation status | ACTIVE_GOVERNANCE — no runtime slice; guard-proven 2026-06-06 with `guard-dsh-shared-foundations-final` PASS and `guard-dsh-media-manifest` PASS |
 | J-010 implementation status | **BLOCKED_WITH_REASON** — full WLT finance ownership; DSH reads only (settlements/payouts bridge ready for local testing) |
 | Full universal protocol closures (DEFERRED) | 0 |
@@ -430,7 +430,7 @@ DSH-SLICE-003 (A-E) blocked 2026-06-06: Checkout & payment flow E2E verified loc
 DSH-SLICE-004 (A-F) deferred 2026-06-06: Order lifecycle, tracking, cancellation, support escalation, and WLT refund callback integration verified locally. Production release deferred pending J-003.
 DSH-SLICE-005 (A-F) deferred 2026-06-06: Delivery execution chain verified locally; deferred pending J-004/J-009. Evidence: `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/`.
 DSH-SLICE-006C deferred 2026-06-06: Documents & media proof verified locally; deferred pending onboarding API design and field readiness verification. Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`.
-DSH-SLICE-006 (A-E) deferred: field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all verified locally.
+DSH-SLICE-006 (A-E) PASS: field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all E2E verified and closed.
 DSH-SLICE-007 governance proven 2026-06-06: `guard-dsh-shared-foundations-final` PASS (fail=0, warn=0, info=54) and `guard-dsh-media-manifest` PASS (fail=0, warn=0, info=50). Evidence: `tools/registry/runs/DSH_ALL_SLICES_REALITY_LOCK_AND_J007_GUARDS-20260606-LOCAL/`.
 
 Remaining warnings: no open GAP-IDX rows remain after classification. Production readiness: NOT_CLAIMED.

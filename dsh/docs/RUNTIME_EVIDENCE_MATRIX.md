@@ -37,7 +37,7 @@ P0-14 note:
 | `DSH-RUN-P014-03` | app-client tracking + support | `OrdersTrackingScreens.tsx`; `OperationScreens.tsx` | `runtime-proven` | `DEFERRED_WITH_REASON` | `API_CLIENT_BOUND__NEEDS_RUNTIME_EVIDENCE` | `DEFERRED_WITH_REASON` | deferred pending J-003 checkout/payment full closure | run local smoke test and trace order updates |
 | `DSH-RUN-P014-04` | app-partner intake + catalog | `OrdersInboxScreen.tsx`; `OperationScreens.tsx`; `InventoryCatalogScreen.tsx`; `DshPartnerOrderRejectionScreen.tsx` | `runtime-proven` | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` | `SCREEN_RUNTIME_PROVEN` | `api-db-runtime-proven__transport-bound__screen-runtime-proven` | none — screen proof captured in `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/`; partner readiness (001C) proven in `tools/registry/runs/DSH_SLICE_001C_PARTNER_READINESS_FINAL_CLOSURE-20260604-043800/` | none — DSH-SLICE-001 partner surface closed; transition to DSH-SLICE-002 |
 | `DSH-RUN-P014-05` | app-captain pickup + delivery + PoD | `DshCaptainOrdersScreen.tsx`; `DshCaptainPickupDropoffScreen.tsx`; `DshCaptainPoDSubmissionScreen.tsx`; `DshCaptainMapScreen.tsx` | `typed-client-bound`, `device-runtime-observed`, `preview-fallback` | `device-visual-evidence-captured` | `API_CLIENT_BOUND__E2E_EVIDENCE_PRESENT` | `device-visual-evidence-captured` | current app-captain screenshots captured in `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/`; existing 005B-005F E2E evidence remains linked from slice files; WLT financial mutation remains out of DSH | monitor real auth/captain identity provider and live GPS substitution |
-| `DSH-RUN-P014-06` | app-field onboarding + visit + readiness | `DshFieldStoresScreen.tsx`; `DshFieldStoreOnboardingScreen.tsx`; `DshFieldStoreVisitScreen.tsx`; `DshFieldReadinessEscalationScreen.tsx`; `dsh-field-visit-client.ts`; `POST /stores/{id}/field-visits` | `006A runtime-proven`; `006B postgres/http-runtime-proven`; `readiness local-state` | `DEFERRED_WITH_REASON` | `006A_POST_STORES_RUNTIME_PROVEN`; `006B_POST_FIELD_VISITS_RUNTIME_PROVEN` | `DEFERRED_WITH_REASON` | deferred pending onboarding API design and field readiness verification | run local smoke test and verify field onboarding flow |
+| `DSH-RUN-P014-06` | app-field onboarding + visit + readiness | `DshFieldStoresScreen.tsx`; `DshFieldStoreOnboardingScreen.tsx`; `DshFieldStoreVisitScreen.tsx`; `DshFieldReadinessEscalationScreen.tsx`; `dsh-field-visit-client.ts`; `POST /stores/{id}/field-visits` | `006A-E all runtime-proven` | `PASS` | `PASS` | `PASS` | none | field onboarding, visit, documents, escalation, and approvals closed |
 | `DSH-RUN-P014-07` | control-panel operations | `operations.registry.ts`; `CommandCenterScreen.tsx`; `DispatchAssignmentScreen.tsx`; `ExceptionsEscalationsScreen.tsx`; `AuditSupportSlaScreen.tsx`; `GeoHeatmapScreen.tsx` | `runtime-proven` | `DEFERRED_WITH_REASON` | `NEEDS_RUNTIME_EVIDENCE` | `DEFERRED_WITH_REASON` | deferred pending operations room visual and runtime E2E proof | verify live orders screen in controlled local test |
 | `DSH-RUN-P014-08` | control-panel finance bridge | `FinanceHubScreen.tsx`; `FinanceHubScreens.tsx`; `WltBoundaryBanner.tsx` | `read-only bridge`, `postgres` | `BLOCKED_WITH_REASON` | `API_CLIENT_BOUND__NEEDS_RUNTIME_EVIDENCE` | `BLOCKED_WITH_REASON` | full WLT finance ownership; DSH reads only | verify read-only wallet summary rendering |
 | `DSH-RUN-P014-09` | backend + domain + OpenAPI | dsh/backend; dsh/domain; dsh/dsh.openapi.yaml | go-skeleton, postgres-repository, docker-compose-postgres, migration-seed, openapi-aligned | DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN | LOCAL_GO_API_TESTS_PASS__LIVE_E2E_PROVEN | api-db-runtime-proven__live-e2e-zip-captured | Live E2E proven: DSH_SLICE001_LIVE_E2E-20260603-173059; all 3 PATCH gates and GET /stores response diff captured against live Postgres; go test pass | wire frontend UI actions to PATCH endpoints |
@@ -136,10 +136,28 @@ Summary:
 - All blockers resolved. No remaining proof pending.
 
 ### DSH-SLICE-006C Documents & Media Proof Runtime Proof (2026-06-06)
-Decision: `DEFERRED_WITH_REASON`
+Decision: `PASS`
 Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`
 Summary:
 - Implemented and verified `POST /stores/{id}/documents` endpoint in Go backend.
 - Verified document persistence (document ID, store ID, document kind, media key, status pending) in PostgreSQL database at runtime.
 - Verified app-field `DshFieldDocumentUploadScreen` UI correctly resolves base URL and triggers the endpoint.
 - Validated via automated tests `go test ./...` including `postgres_field_document_runtime_test.go` integration test and TypeScript typecheck.
+
+### DSH-SLICE-006D Readiness Escalation Runtime Proof (2026-06-07)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/`
+Summary:
+- Endpoints `POST /stores/{id}/readiness-escalations`, `GET /readiness-escalations`, and `PATCH /readiness-escalations/{id}` implemented in Go backend.
+- Verified escalation persistence, queue listing, and operator status update to `resolved` in PostgreSQL database.
+- Verified control-panel `ReadinessEscalationsWorkspace` UI integration.
+- Validated via automated test `postgres_field_readiness_runtime_test.go` and TypeScript typecheck.
+
+### DSH-SLICE-006E CP Approval & Partner Readiness Runtime Proof (2026-06-07)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/`
+Summary:
+- Endpoints `POST /stores/{id}/readiness-approvals` and `GET /stores/{id}/readiness-approvals/latest` implemented in Go backend.
+- Verified approval persistence and automatic `partner_readiness_status` promotion to `ready` in stores table.
+- Verified control-panel `ReadinessApprovalsWorkspace` UI integration.
+- Validated via automated test `postgres_field_readiness_runtime_test.go` and TypeScript typecheck.

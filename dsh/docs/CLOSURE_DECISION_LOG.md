@@ -1,4 +1,4 @@
-﻿# DSH Closure Decision Log
+# DSH Closure Decision Log
 
 Status: ACTIVE_CLOSURE_CONTROL
 Decision: ACTIVE_LOG_NO_SERVICE_STATE_OVERRIDE
@@ -172,3 +172,4 @@ Lean append-only decision log for DSH closure. No DSH decision is valid without 
 | 2026-06-06 | DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL | DSH-SLICE-009C Exception Escalation — PASS (supersedes DEFERRED above) | `tools/registry/runs/DSH_SLICE_009C_EXCEPTION_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/` | **PASS** | J-004 and J-005 closed. GET/POST/PATCH /support/escalations confirmed. | None — slice closed. |
 | 2026-06-06 | DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL | DSH-SLICE-009D Audit & Rollback — PASS (supersedes DEFERRED above) | `tools/registry/runs/DSH_SLICE_009D_AUDIT_ROLLBACK_FINAL_CLOSURE-20260606-LOCAL/` | **PASS** | dsh_order_status_events (migration 009) is proven audit infrastructure across J-003/J-004/J-005 E2E. Reversible mutations handled by per-domain endpoints. J-009 SLICE_GROUP_CLOSED. | None — slice closed. |
 | 2026-06-06 | DSH_ALL_SLICES_REALITY_LOCK_AND_J007_GUARDS-20260606-LOCAL | DSH-SLICE-007A/007B/007C/007D Data, Media & Fixture Governance | `tools/registry/runs/DSH_ALL_SLICES_REALITY_LOCK_AND_J007_GUARDS-20260606-LOCAL/` | **ACTIVE_GOVERNANCE__GUARD_PROVEN** | no runtime blocker — J-007 is perpetual governance, not a runtime slice. `guard-dsh-shared-foundations-final` PASS (fail=0, warn=0, info=54) and `guard-dsh-media-manifest` PASS (fail=0, warn=0, info=50). | Maintain guards; open a new scoped slice only if a guard later finds a violation. |
+| 2026-06-07 | DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL | DSH-SLICE-006A/B/C/D/E Field Readiness — PASS | `tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/` | **PASS** | none — field onboarding, visit evidence, document upload, readiness escalation, and CP approval are fully implemented, typed client wired, backend integration and unit tests pass successfully. | None — slice group closed. J-006 SLICE_GROUP_CLOSED. |

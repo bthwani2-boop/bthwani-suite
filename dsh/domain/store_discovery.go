@@ -44,8 +44,10 @@ type StoreSummary struct {
 	StatusLabel   string          `json:"status_label"`
 	StatusTone    StoreStatusTone `json:"status_tone"`
 	HasOffer      bool            `json:"has_offer"`
-	OfferLabel    string          `json:"offer_label,omitempty"`
-	PublishStage  string          `json:"publish_stage"`
+	OfferLabel              string          `json:"offer_label,omitempty"`
+	PublishStage            string          `json:"publish_stage"`
+	SupportsPickup          bool            `json:"supports_pickup"`
+	SupportsPartnerDelivery bool            `json:"supports_partner_delivery"`
 }
 
 type StoreDiscoveryQuery struct {

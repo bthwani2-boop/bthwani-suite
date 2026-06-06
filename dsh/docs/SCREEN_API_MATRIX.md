@@ -1,7 +1,7 @@
 # DSH Screen/API Matrix
 
 Status: MIXED_SERVICE_MATRIX
-Decision: DSH_SLICE_006A_STORE_ONBOARDING_PASS
+Decision: PASS
 
 Purpose:
 Freeze the frontend-facing API needs after P0-14 without inflating runtime or backend closure.
@@ -25,8 +25,8 @@ Current rule:
 | `DSH-SAPI-P014-05` | `app-partner` | `/app-partner/inventory` | `InventoryCatalogScreen.tsx` | update readiness and publishing visibility | `loading`, `empty`, `error`, `success`, `offline` | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` | no WLT boundary | none — screen proof captured in `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/`; partner readiness (001C) proven in `tools/registry/runs/DSH_SLICE_001C_PARTNER_READINESS_FINAL_CLOSURE-20260604-043800/` | none — DSH-SLICE-001 partner surface closed |
 | `DSH-SAPI-P014-06` | `app-captain` | `/app-captain/orders` | `DshCaptainOrdersScreen.tsx`; `DshCaptainPickupDropoffScreen.tsx`; `DshCaptainMapScreen.tsx` | accept assignment and complete pickup | `loading`, `empty`, `error`, `success`, `retry` | `API_CLIENT_BOUND__DEVICE_VISUAL_PROVEN` | WLT payout effects stay outside this slice | typed lifecycle client is wired for accept/decline/pickup with injectable captain identity; current app-captain screenshots captured | monitor real auth/captain identity provider integration |
 | `DSH-SAPI-P014-07` | `app-captain` | `/app-captain/map` | `DshCaptainPoDSubmissionScreen.tsx`; `DshCaptainMapScreen.tsx` | submit proof of delivery or failure | `loading`, `success`, `error`, `retry` | `API_CLIENT_BOUND__DEVICE_VISUAL_PROVEN` | WLT only owns downstream financial complaint/refund/payout execution | typed lifecycle client is wired for location/PoD/failure with injectable captain identity; current app-captain map/detail screenshots captured | monitor live GPS/provider substitution and WLT-only financial follow-up |
-| `DSH-SAPI-P014-08` | `app-field` | `/app-field/stores` | `DshFieldStoresScreen.tsx`; `DshFieldStoreOnboardingScreen.tsx` | open candidate store and submit onboarding readiness | `loading`, `empty`, `error`, `success`, `offline`, `disabled` | `API_CLIENT_BOUND__RUNTIME_PROVEN` | no WLT boundary | none for onboarding; visit/readiness approval remain downstream | proceed to DSH-SLICE-006B field visit evidence |
-| `DSH-SAPI-P014-09` | `app-field` | `/app-field/visits` | `DshFieldStoreVisitScreen.tsx`; `DshFieldReadinessEscalationScreen.tsx`; `dsh-field-visit-client.ts` | capture visit evidence and escalate readiness blockers | `loading`, `empty`, `error`, `success`, `offline`, `disabled`, `blocked`, `retry` | `API_CLIENT_BOUND__POST_FIELD_VISITS_RUNTIME_PROVEN__VISUAL_REBUILD_PENDING` | WLT finance remains outside visit flow | raw photo upload, readiness approval, and updated-device visual proof remain downstream/blocking | rebuild/install updated app-field and capture field visit visual proof |
+| `DSH-SAPI-P014-08` | `app-field` | `/app-field/stores` | `DshFieldStoresScreen.tsx`; `DshFieldStoreOnboardingScreen.tsx` | open candidate store and submit onboarding readiness | `loading`, `empty`, `error`, `success`, `offline`, `disabled` | `PASS` | no WLT boundary | none | none — onboarding slice closed |
+| `DSH-SAPI-P014-09` | `app-field` | `/app-field/visits` | `DshFieldStoreVisitScreen.tsx`; `DshFieldReadinessEscalationScreen.tsx`; `dsh-field-visit-client.ts` | capture visit evidence and escalate readiness blockers | `loading`, `empty`, `error`, `success`, `offline`, `disabled`, `blocked`, `retry` | `PASS` | WLT finance remains outside visit flow | none | none — visit and escalation slices closed |
 | `DSH-SAPI-P014-10` | `control-panel` | `/operations` (5 canonical groups: command-center, live-orders, dispatch-capacity, exceptions, special-ops — each via `?workspace=<group>&subGroup=<sub>`) | `operations.registry.ts`; `OperationsHubScreen.tsx`; `CommandCenterScreen.tsx`; `LiveOrdersScreen.tsx`; `DispatchAssignmentScreen.tsx`; `ExceptionsEscalationsScreen.tsx`; `AuditSupportSlaScreen.tsx`; `GeoHeatmapScreen.tsx` | inspect multi-surface risk and route intervention | `success`, `error`, `retry`, `blocked` | `DEFERRED_WITH_REASON` | no WLT boundary in operations | deferred pending operations room visual and runtime E2E proof | verify live orders screen in controlled local test |
 | `DSH-SAPI-P014-11` | `control-panel` | `/finance` | `FinanceHubScreen.tsx`; `FinanceHubScreens.tsx`; `WltBoundaryBanner.tsx` | inspect read-only finance visibility | `loading`, `error`, `success`, `blocked` | `BLOCKED_WITH_REASON` | WLT owns settlement, payout, refund, commission, and ledger semantics; read-only bridge (GET /wlt/wallet-summary) and settlement classification (POST /settlement/candidates) E2E verified | full WLT finance ownership; DSH reads only | verify read-only wallet summary rendering |
 | `DSH-SAPI-P014-12` | `backend/domain/openapi` | `dsh/backend`; `dsh/domain`; `dsh/dsh.openapi.yaml` | service scaffold only | none accepted yet | N/A — backend only | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` | no WLT boundary | none — all 3 PATCH gates + GET /stores proven via DSH_SLICE001_LIVE_E2E-20260603-173059; frontend binding + screen proof captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700; go test pass | none — backend + frontend surface closed; transition to DSH-SLICE-002 |
@@ -52,10 +52,28 @@ Summary:
 - Validated manually using `run_j005_e2e.py` simulation script against Go API server.
 
 ### DSH-SLICE-006C Documents & Media Proof Screen/API Proof (2026-06-06)
-Decision: `DEFERRED_WITH_REASON`
+Decision: `PASS`
 Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`
 Summary:
 - Endpoint `POST /stores/{id}/documents` documented in `dsh.openapi.yaml`.
 - Shared client method `createFieldDocument` implemented in `dsh-field-document-client.ts`.
 - `DshFieldDocumentUploadScreen` wired to make live call to `createFieldDocument` client.
 - Validated via automated test `postgres_field_document_runtime_test.go` and TypeScript typecheck.
+
+### DSH-SLICE-006D Readiness Escalation Screen/API Proof (2026-06-07)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/`
+Summary:
+- Endpoints `POST /stores/{id}/readiness-escalations`, `GET /readiness-escalations`, and `PATCH /readiness-escalations/{id}` documented in `dsh.openapi.yaml`.
+- SDK client methods implemented in `dsh-field-readiness-client.ts`.
+- `ReadinessEscalationsWorkspace` in control panel wired to the API client.
+- Validated via automated test `postgres_field_readiness_runtime_test.go` and TypeScript typecheck.
+
+### DSH-SLICE-006E CP Approval & Partner Readiness Screen/API Proof (2026-06-07)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/`
+Summary:
+- Endpoints `POST /stores/{id}/readiness-approvals` and `GET /stores/{id}/readiness-approvals/latest` documented in `dsh.openapi.yaml`.
+- SDK client methods implemented in `dsh-field-readiness-client.ts`.
+- `ReadinessApprovalsWorkspace` in control panel wired to the API client; approval triggers `partner_readiness_status` promotion.
+- Validated via automated test `postgres_field_readiness_runtime_test.go` and TypeScript typecheck.

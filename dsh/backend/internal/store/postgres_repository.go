@@ -92,6 +92,8 @@ SELECT
   has_offer,
   offer_label,
   publish_stage,
+  supports_pickup,
+  supports_partner_delivery,
   COUNT(*) OVER() AS total
 FROM dsh_store_discovery_stores
 WHERE %s
@@ -155,6 +157,8 @@ func scanStoreSummary(rows *sql.Rows) (domain.StoreSummary, int, error) {
 		&store.HasOffer,
 		&offerLabel,
 		&store.PublishStage,
+		&store.SupportsPickup,
+		&store.SupportsPartnerDelivery,
 		&total,
 	)
 	if err != nil {

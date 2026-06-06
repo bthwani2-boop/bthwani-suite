@@ -155,6 +155,8 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     }),
   );
 
+  const [homeRetryToken, setHomeRetryToken] = React.useState(0);
+
   // Aliases that match the previous module-level names so all downstream code
   // reads from the live bridge state instead of static preview constants.
   const clientDiscoveryStoresBridge = runtimeBridge;
@@ -460,7 +462,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [homeRetryToken]);
 
   React.useEffect(() => {
     if (route !== 'tracking' || !selectedOrderId) {
@@ -878,7 +880,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           categoryLabel: p.category_id === 'grocery' || p.category_id === 'fresh' ? 'بقالة' : p.category_id === 'bakery' ? 'مخبوزات' : 'عام',
           isAvailable,
           clientVisibilityStatus,
-          publishStage: p.approval_status,
+          publishStage: (p.approval_status || '').replace(/_/g, '-') as any,
         };
       });
 
@@ -1180,6 +1182,44 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     setServiceDialTrigger((token) => token + 1);
   }, []);
 
+  const handleCancelOrder = React.useCallback(() => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (config && selectedOrderId) {
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      orderClient.cancelOrder(selectedOrderId, { actor: 'client', note: 'إلغاء الطلب من قبل العميل' })
+        .then(() => {
+          return orderClient.getOrder(selectedOrderId);
+        })
+        .then((details) => {
+          setLiveOrderDetails(details);
+          setOrdersListState((current) => current.map((item) => {
+            if (item.id === selectedOrderId) {
+              return { ...item, statusLabel: 'تم الإلغاء', clientState: hostClientStates.cancelled };
+            }
+            return item;
+          }));
+        })
+        .catch((err) => {
+          console.error("Failed to cancel live order:", err);
+        });
+    }
+  }, [selectedOrderId]);
+
+  const handleSupportEscalation = React.useCallback(async (issueType: string, description: string) => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (config && selectedOrderId) {
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      await orderClient.createSupportEscalation({
+        order_id: selectedOrderId,
+        actor: 'client',
+        issue_type: issueType as any,
+        description,
+      });
+      const details = await orderClient.getOrder(selectedOrderId);
+      setLiveOrderDetails(details);
+    }
+  }, [selectedOrderId]);
+
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {
     return (
@@ -1337,7 +1377,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
                   categoryLabel: p.category_id === 'grocery' || p.category_id === 'fresh' ? 'بقالة' : p.category_id === 'bakery' ? 'مخبوزات' : 'عام',
                   isAvailable,
                   clientVisibilityStatus,
-                  publishStage: p.approval_status,
+                  publishStage: (p.approval_status || '').replace(/_/g, '-') as any,
                 };
               });
 
@@ -1538,43 +1578,6 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     );
   }
 
-  const handleCancelOrder = React.useCallback(() => {
-    const config = resolveDshDiscoveryStoresRuntimeConfig();
-    if (config && selectedOrderId) {
-      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
-      orderClient.cancelOrder(selectedOrderId, { actor: 'client', note: 'إلغاء الطلب من قبل العميل' })
-        .then(() => {
-          return orderClient.getOrder(selectedOrderId);
-        })
-        .then((details) => {
-          setLiveOrderDetails(details);
-          setOrdersListState((current) => current.map((item) => {
-            if (item.id === selectedOrderId) {
-              return { ...item, statusLabel: 'تم الإلغاء', clientState: hostClientStates.cancelled };
-            }
-            return item;
-          }));
-        })
-        .catch((err) => {
-          console.error("Failed to cancel live order:", err);
-        });
-    }
-  }, [selectedOrderId]);
-
-  const handleSupportEscalation = React.useCallback(async (issueType: string, description: string) => {
-    const config = resolveDshDiscoveryStoresRuntimeConfig();
-    if (config && selectedOrderId) {
-      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
-      await orderClient.createSupportEscalation({
-        order_id: selectedOrderId,
-        actor: 'client',
-        issue_type: issueType as any,
-        description,
-      });
-      const details = await orderClient.getOrder(selectedOrderId);
-      setLiveOrderDetails(details);
-    }
-  }, [selectedOrderId]);
 
   if (route === 'tracking') {
     let liveClientState = trackingClientState;
@@ -1711,7 +1714,10 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       onCloseAwnakInline={() => setAwnakInlineOpen(false)}
       onRegisterBackHandler={handleRegisterBackHandler}
       renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
-      onRetry={() => setRoute('home')}
+      onRetry={() => {
+        setRoute('home');
+        setHomeRetryToken((t) => t + 1);
+      }}
     />
       </View>
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
