@@ -693,6 +693,35 @@ export {
   resolveDshFieldStoreOnboardingBaseUrl,
 } from './dsh-field-store-onboarding-client';
 
+export type {
+  DshFieldDocumentKind,
+  DshFieldDocumentStatus,
+  DshCreateFieldDocumentRequest,
+  DshFieldDocumentRecord,
+  DshFieldDocumentClient,
+  DshFieldDocumentError,
+} from './dsh-field-document-client';
+export {
+  createDshFieldDocumentHttpClient,
+  isDshFieldDocumentOfflineError,
+  resolveDshFieldDocumentBaseUrl,
+} from './dsh-field-document-client';
+
+
+export type {
+  CreateFieldReadinessEscalationRequest,
+  FieldReadinessEscalationRecord,
+  UpdateFieldReadinessEscalationRequest,
+  ListFieldReadinessEscalationsResponse,
+  CreateFieldReadinessApprovalRequest,
+  FieldReadinessApprovalRecord,
+  DshFieldReadinessClient,
+} from './dsh-field-readiness-client';
+export {
+  resolveDshFieldReadinessBaseUrl,
+  createDshFieldReadinessHttpClient,
+} from './dsh-field-readiness-client';
+
 // --- Operations Runtime Adapter ---
 export type {
   DshRuntimeOrderRow,

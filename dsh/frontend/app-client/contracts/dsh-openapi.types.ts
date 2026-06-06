@@ -237,7 +237,11 @@ export interface paths {
          */
         get: operations["listDiscoveryStores"];
         put?: never;
-        post?: never;
+        /**
+         * Create field store onboarding file
+         * @description Create a new field-collected store file and place it in pending review without financial mutation.
+         */
+        post: operations["createFieldStore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -256,6 +260,146 @@ export interface paths {
          * @description Retrieve detailed information for a single store, including contact info, hours, and catalog summary.
          */
         get: operations["getDiscoveryStore"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/field-visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit field visit evidence references
+         * @description Submit field visit notes and evidence media key references for an onboarded store. Raw media upload and document proof stay in the downstream media slice.
+         */
+        post: operations["createFieldVisit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload field document reference
+         * @description Upload field agent document or photo proof reference for a store.
+         */
+        post: operations["createFieldDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/readiness-escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Escalates incomplete readiness submission
+         * @description Escalate store readiness to a target team for resolution.
+         */
+        post: operations["createFieldReadinessEscalation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readiness-escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List readiness escalations
+         * @description Returns a list of escalations for control-panel operator queue.
+         */
+        get: operations["listFieldReadinessEscalations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readiness-escalations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update readiness escalation status
+         * @description Updates the status of a readiness escalation.
+         */
+        patch: operations["updateFieldReadinessEscalation"];
+        trace?: never;
+    };
+    "/stores/{id}/readiness-approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject store readiness
+         * @description Performs a formal readiness approval or rejection.
+         */
+        post: operations["createFieldReadinessApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/readiness-approvals/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get latest readiness approval decision
+         * @description Returns the latest approval or rejection record for a store.
+         */
+        get: operations["getLatestFieldReadinessApproval"];
         put?: never;
         post?: never;
         delete?: never;
@@ -831,6 +975,109 @@ export interface components {
                 offset: number;
                 total: number;
             };
+        };
+        CreateFieldStoreRequest: {
+            name: string;
+            address: string;
+            category_id?: string;
+            supports_pickup: boolean;
+            supports_partner_delivery: boolean;
+        };
+        CreateFieldStoreResponse: {
+            id: string;
+            name: string;
+            address: string;
+            category_id?: string;
+            /** @example pending_review */
+            publish_stage: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CreateFieldVisitRequest: {
+            field_agent_id?: string;
+            visit_summary: string;
+            follow_up_action: string;
+            /** @description Media key references only; raw uploads are governed by the downstream media/documents slice. */
+            evidence_media_keys?: string[];
+            location_confidence?: string;
+        };
+        CreateFieldVisitResponse: {
+            id: string;
+            store_id: string;
+            field_agent_id?: string;
+            visit_summary: string;
+            follow_up_action: string;
+            evidence_media_keys?: string[];
+            location_confidence?: string;
+            /** @enum {string} */
+            status: "submitted";
+            /** Format: date-time */
+            created_at: string;
+        };
+        CreateFieldDocumentRequest: {
+            /** @enum {string} */
+            document_kind: "commercial_registration" | "tax_certificate" | "identity_proof" | "storefront_photo" | "interior_photo";
+            /** @description Media key of the uploaded document in S3 or local media storage. */
+            media_key: string;
+        };
+        FieldDocumentRecord: {
+            id: string;
+            store_id: string;
+            /** @enum {string} */
+            document_kind: "commercial_registration" | "tax_certificate" | "identity_proof" | "storefront_photo" | "interior_photo";
+            media_key: string;
+            /** @enum {string} */
+            status: "pending" | "approved" | "rejected";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        CreateFieldReadinessEscalationRequest: {
+            field_agent_id?: string;
+            reason: string;
+            /** @enum {string} */
+            target_team: "partner-management" | "control-panel" | "marketing";
+        };
+        FieldReadinessEscalationRecord: {
+            id: string;
+            store_id: string;
+            field_agent_id?: string;
+            reason: string;
+            /** @enum {string} */
+            target_team: "partner-management" | "control-panel" | "marketing";
+            /** @enum {string} */
+            status: "escalated" | "info_requested" | "resolved" | "rejected";
+            operator_note?: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        UpdateFieldReadinessEscalationRequest: {
+            /** @enum {string} */
+            status: "info_requested" | "resolved" | "rejected";
+            operator_note?: string;
+        };
+        ListFieldReadinessEscalationsResponse: {
+            escalations: components["schemas"]["FieldReadinessEscalationRecord"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        CreateFieldReadinessApprovalRequest: {
+            operator_id?: string;
+            /** @enum {string} */
+            decision: "approved" | "rejected";
+            reason?: string;
+        };
+        FieldReadinessApprovalRecord: {
+            id: string;
+            store_id: string;
+            operator_id?: string;
+            /** @enum {string} */
+            decision: "approved" | "rejected";
+            reason?: string;
+            /** Format: date-time */
+            created_at: string;
         };
         DiscoveryStore: {
             id: string;
@@ -1988,6 +2235,48 @@ export interface operations {
             };
         };
     };
+    createFieldStore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldStoreRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateFieldStoreResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getDiscoveryStore: {
         parameters: {
             query?: never;
@@ -2028,6 +2317,350 @@ export interface operations {
                 };
             };
             /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldVisit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldVisitRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateFieldVisitResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldDocumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldDocumentRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldReadinessEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldReadinessEscalationRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessEscalationRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listFieldReadinessEscalations: {
+        parameters: {
+            query?: {
+                status?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListFieldReadinessEscalationsResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateFieldReadinessEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The escalation ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFieldReadinessEscalationRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessEscalationRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Escalation Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldReadinessApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldReadinessApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessApprovalRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getLatestFieldReadinessApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessApprovalRecord"];
+                };
+            };
+            /** @description No approval record found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
             500: {
                 headers: {
                     [name: string]: unknown;

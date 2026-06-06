@@ -409,3 +409,62 @@ func TestGetStoreDetail(t *testing.T) {
 		t.Fatalf("expected status 404, got %d", responseNotFound.Code)
 	}
 }
+
+func TestCreateFieldDocumentValidationAndRepositoryFailure(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores/store-1001/documents", bytes.NewReader([]byte("{")))
+	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSONResp := httptest.NewRecorder()
+	handler.ServeHTTP(invalidJSONResp, invalidJSON)
+	if invalidJSONResp.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid JSON to return 400, got %d", invalidJSONResp.Code)
+	}
+
+	missingKind := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		MediaKey: "field.doc.registration.v1",
+	})
+	if missingKind.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing document_kind to return 400, got %d", missingKind.Code)
+	}
+
+	missingMediaKey := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		DocumentKind: "commercial_registration",
+	})
+	if missingMediaKey.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing media_key to return 400, got %d", missingMediaKey.Code)
+	}
+
+	invalidKind := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		DocumentKind: "invalid_document_type",
+		MediaKey:     "field.doc.registration.v1",
+	})
+	if invalidKind.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid document_kind to return 400, got %d", invalidKind.Code)
+	}
+
+	validMemoryFallback := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		DocumentKind: "commercial_registration",
+		MediaKey:     "field.doc.registration.v1",
+	})
+	if validMemoryFallback.Code != http.StatusInternalServerError {
+		t.Fatalf("expected memory repository fallback to return 500, got %d", validMemoryFallback.Code)
+	}
+}
+
+func createFieldDocument(t *testing.T, handler *StoresHandler, storeID string, body domain.CreateFieldDocumentRequest) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/stores/"+storeID+"/documents", bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+	return response
+}

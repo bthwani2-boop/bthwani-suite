@@ -36,6 +36,7 @@ func main() {
 	}
 
 	httpapi.RegisterRoutes(mux, repository)
+	httpapi.RegisterReadinessRoutes(mux, repository)
 	httpapi.RegisterProductRoutes(mux, repository)
 	httpapi.RegisterCategoryRoutes(mux, repository)
 	httpapi.RegisterMediaRoutes(mux, repository)

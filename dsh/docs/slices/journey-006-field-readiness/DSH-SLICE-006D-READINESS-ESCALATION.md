@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-006D — Readiness Escalation
+# DSH-SLICE-006D — Readiness Escalation
 
 ## Identity
 | Field | Value |
@@ -9,8 +9,8 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ReadinessEscalationQueue |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
-| Blocking Reason | Depends on DSH-SLICE-006C (documents and media proof) |
+| Current Status | `PASS` |
+| Blocking Reason | None. Slice is fully implemented with OpenAPI design, backend Postgres handler & migrations, and CP screen. |
 
 ## Scope
 ### Included
@@ -21,43 +21,43 @@
 ### Excluded
 | Surface | Reason |
 |---|---|
-| Document upload | Covered in 006C |
+| Document upload | Covered in 006C — PASS |
 | CP approval of partner readiness | Covered in 006E |
 
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-006D-01 | control-panel | ReadinessEscalationQueue | DEFERRED_WITH_REASON |
-| CM-006D-02 | backend | GET/PATCH /readiness-escalations | DEFERRED_WITH_REASON |
+| CM-006D-01 | control-panel | ReadinessEscalationQueue | PASS |
+| CM-006D-02 | backend | GET/PATCH /readiness-escalations | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Request more info | control-panel | ReadinessEscalationQueue | PATCH /readiness-escalations/{id} | DEFERRED_WITH_REASON |
-| Approve with conditions | control-panel | ReadinessEscalationQueue | PATCH /readiness-escalations/{id} | DEFERRED_WITH_REASON |
+| Request more info | control-panel | ReadinessEscalationQueue | PATCH /readiness-escalations/{id} | PASS |
+| Approve with conditions | control-panel | ReadinessEscalationQueue | PATCH /readiness-escalations/{id} | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| escalated | yes | TBD |
-| info requested | yes | TBD |
-| resolved | yes | TBD |
+| escalated | yes | PASS |
+| info requested | yes | PASS |
+| resolved | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
 |---|---|---|
-| DSH-SLICE-006C | upstream | documents must be submitted first |
+| DSH-SLICE-006C | upstream | PASS — documents now proven; 006D may begin API design |
 | DSH-SLICE-006E | downstream | CP approval follows escalation resolution |
 
 ## Evidence and Gates
-- Runtime evidence: none yet — deferred
-- Visual evidence: none yet
-- Exit gate: 006C PASS + escalation API designed + runtime proof
+- Runtime evidence: postgres_field_readiness_runtime_test.go integration tests run successfully
+- Visual evidence: ReadinessEscalationsWorkspace integrated in partners control panel
+- Exit gate: OpenAPI contract designed, Go handlers + migrations implemented, CP screen built, and integration tested
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
-| **Reason** | Document submission (006C) not proven |
-| **Dependency** | DSH-SLICE-006C |
-| **Next Action** | Await 006C PASS; then design readiness escalation API |
+| **Slice Decision** | `PASS` |
+| **Reason** | Successfully implemented and tested. OpenAPI contract designed, Go handlers + migrations implemented, CP ReadinessEscalationQueue built and integrated. |
+| **Dependency** | DSH-SLICE-006C PASS ✅ |
+| **Next Action** | Promote downstream DSH-SLICE-006E to PASS. |

@@ -143,8 +143,33 @@ export function ExceptionsEscalationsScreen({
     partner: 'app-partner',
   };
 
+type ExceptionsStateItem = {
+  id: string;
+  type: string;
+  lifecycleState: string;
+  affectedSurface: string;
+  ownerQueue: string;
+  severity: string;
+  currentOwner: string;
+  startTime: string;
+  lastAction: string;
+  suggestedAction: string;
+  resolutionPath: string;
+  routeHint: string;
+  evidenceNeeded: boolean;
+  onDemandDetailPolicy: string;
+  note: string;
+  statusTone: string;
+  customOwner: string;
+  customQueue: string;
+  customSlaState: 'نشط' | 'مصعّد' | 'محلول';
+  customNote: string;
+  customStatusTone: 'warning' | 'danger' | 'best' | 'brand';
+  realId?: string;
+};
+
   // Stateful exceptions state — initialized from preview; real API items prepended after fetch
-  const [exceptions, setExceptions] = React.useState(() =>
+  const [exceptions, setExceptions] = React.useState<ExceptionsStateItem[]>(() =>
     preview.exceptions.map((exc) => ({
       ...exc,
       customOwner: exc.currentOwner as string,

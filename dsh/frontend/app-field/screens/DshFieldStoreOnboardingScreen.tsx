@@ -72,6 +72,7 @@ type DshFieldStoreOnboardingScreenProps = {
   onSubmitReview: () => void;
   onActivationComplete?: () => void;
   onEscalate?: () => void;
+  onUploadDocument?: (storeId: string) => void;
 };
 
 function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOnboardingDraft, key: T, value: FieldOnboardingDraft[T]) {
@@ -81,7 +82,7 @@ function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOn
   };
 }
 
-export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding', onBack, onStoreChange, onSaveDraft, onSubmitReview, onActivationComplete, onEscalate }: DshFieldStoreOnboardingScreenProps) {
+export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding', onBack, onStoreChange, onSaveDraft, onSubmitReview, onActivationComplete, onEscalate, onUploadDocument }: DshFieldStoreOnboardingScreenProps) {
   const { theme } = useTheme();
 
   if (screenState === 'activated') {
@@ -262,9 +263,13 @@ export function DshFieldStoreOnboardingScreen({ store, screenState = 'onboarding
       return (
         <Box gap={3} paddingVertical={2}>
           <SectionHeader title="التحقق من المستندات" subtitle="الحالات هنا تعكس الملف الفعلي: مفقود، مرفوع، معتمد، يحتاج إعادة رفع، أو مرفوض." />
-          <DocumentVerificationSection state="ready" documents={documentItems} />
+          <DocumentVerificationSection
+            state="ready"
+            documents={documentItems}
+            onUploadDocument={() => onUploadDocument?.(store.id)}
+          />
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            الرفع والتحوير الفعليان ما زالا محجوبين بعقد upload API، لكن الجاهزية لم تعد تتجاوز هذا القسم كأنه مكتمل تلقائيًا.
+            تم ربط رفع الوثائق وتحديث جاهزية المتجر مباشرة عبر خادم API للوثائق.
           </Text>
         </Box>
       );

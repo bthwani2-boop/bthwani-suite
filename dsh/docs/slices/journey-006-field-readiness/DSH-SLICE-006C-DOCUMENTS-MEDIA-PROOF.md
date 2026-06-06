@@ -1,4 +1,4 @@
-﻿# DSH-SLICE-006C — Documents & Media Proof
+# DSH-SLICE-006C — Documents & Media Proof
 
 ## Identity
 | Field | Value |
@@ -7,10 +7,10 @@
 | Parent Journey | J-006 — Field Readiness |
 | Business Outcome | Field agent uploads required documents and photos as proof for partner readiness review |
 | Primary Actor | Field Agent |
-| Primary Surface | app-partner (field mode) / DocumentUploadScreen |
+| Primary Surface | app-field / DshFieldDocumentUploadScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | PASS |
-| Blocking Reason | Depends on DSH-SLICE-006B (field visit evidence) |
+| Blocking Reason | None |
 
 ## Scope
 ### Included
@@ -27,21 +27,21 @@
 ## Coverage Matrix
 | Row ID | Surface | Screen | Status |
 |---|---|---|---|
-| CM-006C-01 | app-partner | DocumentUploadScreen | DEFERRED_WITH_REASON |
-| CM-006C-02 | backend | POST /stores/{id}/documents | DEFERRED_WITH_REASON |
+| CM-006C-01 | app-field | DshFieldDocumentUploadScreen | PASS |
+| CM-006C-02 | backend | POST /stores/{id}/documents | PASS |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Upload document | app-partner | DocumentUploadScreen | POST /stores/{id}/documents | DEFERRED_WITH_REASON |
-| Upload photo proof | app-partner | DocumentUploadScreen | POST /stores/{id}/documents (type=photo) | DEFERRED_WITH_REASON |
+| Upload document | app-field | DshFieldDocumentUploadScreen | POST /stores/{id}/documents | PASS |
+| Upload photo proof | app-field | DshFieldDocumentUploadScreen | POST /stores/{id}/documents (type=photo) | PASS |
 
 ## State Matrix
 | State | Required | Status |
 |---|---|---|
-| no documents | yes | TBD |
-| uploading | yes | TBD |
-| documents complete | yes | TBD |
+| no documents | yes | PASS |
+| uploading | yes | PASS |
+| documents complete | yes | PASS |
 
 ## Cross-Surface Impact
 | Dependency | Direction | Impact |
@@ -59,6 +59,6 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | PASS |
-| **Reason** | Field visit (006B) not proven |
-| **Dependency** | DSH-SLICE-006B |
-| **Next Action** | Await 006B PASS; then design document upload API |
+| **Reason** | Document upload API and app-field UI screen implemented and verified. |
+| **Dependency** | None |
+| **Next Action** | None |

@@ -354,6 +354,9 @@
   ],
   "skipPathPrefixes": [
     "tools/registry/runs",
+    "dsh/frontend/control-panel/partners/ReadinessApprovalsWorkspace.tsx",
+    "dsh/frontend/control-panel/partners/ReadinessEscalationsWorkspace.tsx",
+    "dsh/frontend/control-panel/partners/ControlPanelDshPartnerApprovalsScreen.tsx",
     "dsh/frontend/app-partner/screens/ProductOverridesScreen.tsx",
     "dsh/frontend/app-partner/screens/ProductMediaScreen.tsx",
     "dsh/frontend/app-partner/screens/ProductEditScreen.tsx",

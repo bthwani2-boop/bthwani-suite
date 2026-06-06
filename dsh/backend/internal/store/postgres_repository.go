@@ -655,3 +655,122 @@ func splitEvidenceMediaKeys(value string) []string {
 	parts := strings.Split(value, ",")
 	return normalizeEvidenceMediaKeys(parts)
 }
+
+func generateFieldDocumentID() string {
+	return fmt.Sprintf("field-doc-%d", time.Now().UnixNano())
+}
+
+// CreateFieldDocument (J-006C): field agent uploads a document reference for a store.
+func (repo *PostgresRepository) CreateFieldDocument(ctx context.Context, storeID string, req domain.CreateFieldDocumentRequest) (domain.FieldDocumentRecord, error) {
+	storeID = strings.TrimSpace(storeID)
+	if storeID == "" {
+		return domain.FieldDocumentRecord{}, fmt.Errorf("store id is required")
+	}
+	kind := strings.TrimSpace(req.DocumentKind)
+	if kind == "" {
+		return domain.FieldDocumentRecord{}, fmt.Errorf("document_kind is required")
+	}
+	mediaKey := strings.TrimSpace(req.MediaKey)
+	if mediaKey == "" {
+		return domain.FieldDocumentRecord{}, fmt.Errorf("media_key is required")
+	}
+
+	validKinds := map[string]bool{
+		"commercial_registration": true,
+		"tax_certificate":         true,
+		"identity_proof":          true,
+		"storefront_photo":        true,
+		"interior_photo":          true,
+	}
+	if !validKinds[kind] {
+		return domain.FieldDocumentRecord{}, fmt.Errorf("invalid document_kind: %s", kind)
+	}
+
+	var storeExists bool
+	if err := repo.db.QueryRowContext(ctx, `SELECT EXISTS (SELECT 1 FROM dsh_store_discovery_stores WHERE id = $1)`, storeID).Scan(&storeExists); err != nil {
+		return domain.FieldDocumentRecord{}, err
+	}
+	if !storeExists {
+		return domain.FieldDocumentRecord{}, fmt.Errorf("store not found")
+	}
+
+	id := generateFieldDocumentID()
+
+	query := `
+INSERT INTO dsh_field_store_documents (
+  id, store_id, document_kind, media_key, status, created_at, updated_at
+) VALUES (
+  $1, $2, $3, $4, 'pending', NOW(), NOW()
+)
+RETURNING id, store_id, document_kind, media_key, status, created_at, updated_at`
+
+	var res domain.FieldDocumentRecord
+	err := repo.db.QueryRowContext(ctx, query,
+		id,
+		storeID,
+		kind,
+		mediaKey,
+	).Scan(
+		&res.ID,
+		&res.StoreID,
+		&res.DocumentKind,
+		&res.MediaKey,
+		&res.Status,
+		&res.CreatedAt,
+		&res.UpdatedAt,
+	)
+	if err != nil {
+		return domain.FieldDocumentRecord{}, err
+	}
+	return res, nil
+}
+
+// ListFieldDocuments (J-006C): lists documents associated with a store.
+func (repo *PostgresRepository) ListFieldDocuments(ctx context.Context, storeID string) ([]domain.FieldDocumentRecord, error) {
+	storeID = strings.TrimSpace(storeID)
+	if storeID == "" {
+		return nil, fmt.Errorf("store id is required")
+	}
+
+	var storeExists bool
+	if err := repo.db.QueryRowContext(ctx, `SELECT EXISTS (SELECT 1 FROM dsh_store_discovery_stores WHERE id = $1)`, storeID).Scan(&storeExists); err != nil {
+		return nil, err
+	}
+	if !storeExists {
+		return nil, fmt.Errorf("store not found")
+	}
+
+	query := `
+SELECT id, store_id, document_kind, media_key, status, created_at, updated_at
+FROM dsh_field_store_documents
+WHERE store_id = $1
+ORDER BY created_at DESC`
+
+	rows, err := repo.db.QueryContext(ctx, query, storeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var docs []domain.FieldDocumentRecord
+	for rows.Next() {
+		var doc domain.FieldDocumentRecord
+		err := rows.Scan(
+			&doc.ID,
+			&doc.StoreID,
+			&doc.DocumentKind,
+			&doc.MediaKey,
+			&doc.Status,
+			&doc.CreatedAt,
+			&doc.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		docs = append(docs, doc)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return docs, nil
+}

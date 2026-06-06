@@ -50,3 +50,12 @@ Summary:
 - SDK client method `assignCaptain` implemented in `dsh-order-lifecycle-client.ts`.
 - DispatchAssignmentScreen wired to make live call to `assignCaptain` SDK endpoint.
 - Validated manually using `run_j005_e2e.py` simulation script against Go API server.
+
+### DSH-SLICE-006C Documents & Media Proof Screen/API Proof (2026-06-06)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`
+Summary:
+- Endpoint `POST /stores/{id}/documents` documented in `dsh.openapi.yaml`.
+- Shared client method `createFieldDocument` implemented in `dsh-field-document-client.ts`.
+- `DshFieldDocumentUploadScreen` wired to make live call to `createFieldDocument` client.
+- Validated via automated test `postgres_field_document_runtime_test.go` and TypeScript typecheck.

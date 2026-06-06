@@ -58,11 +58,17 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Go backend postgres repo | `dsh/backend/internal/store/postgres_repository.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | PostgreSQL implementation |
 | Go backend memory repo | `dsh/backend/internal/store/memory_repository.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | In-memory fallback for tests |
 | Field visit OpenAPI contract | `dsh/dsh.openapi.yaml` | J-006 | DSH-SLICE-006B | API_CONTRACT_ADDED__RUNTIME_PROVEN | `POST /stores/{id}/field-visits` request/response schemas |
+| Field document OpenAPI contract | `dsh/dsh.openapi.yaml` | J-006 | DSH-SLICE-006C | **PASS** | `POST /stores/{id}/documents` + `CreateFieldDocumentRequest` + `FieldDocumentRecord` schemas |
 | Field visit domain model | `dsh/domain/store_discovery.go` | J-006 | DSH-SLICE-006B | ACTIVE_RUNTIME_BOUND | `CreateFieldVisitRequest` and `CreateFieldVisitResponse` |
+| Field document domain model | `dsh/domain/store_discovery.go` | J-006 | DSH-SLICE-006C | **PASS** | `CreateFieldDocumentRequest` and `FieldDocumentRecord` structs |
 | Field visit backend route | `dsh/backend/internal/http/stores_handler.go`; `dsh/backend/internal/http/stores_handler_test.go` | J-006 | DSH-SLICE-006B | BACKEND_TESTED | Handler validation covers invalid JSON, missing summary, missing follow-up, and repository failure |
+| Field document backend route | `dsh/backend/internal/http/stores_handler.go`; `dsh/backend/internal/http/stores_handler_test.go` | J-006 | DSH-SLICE-006C | **PASS** | `POST /stores/{id}/documents` handler; validates kind, media_key; 400/500 tests pass |
 | Field visit repository | `dsh/backend/internal/store/store_repository.go`; `dsh/backend/internal/store/postgres_repository.go`; `dsh/backend/internal/store/memory_repository.go` | J-006 | DSH-SLICE-006B | POSTGRES_RUNTIME_PROVEN | Postgres persists submitted visit; memory repo fails explicitly until DATABASE_URL is set |
+| Field document repository | `dsh/backend/internal/store/store_repository.go`; `dsh/backend/internal/store/postgres_repository.go`; `dsh/backend/internal/store/memory_repository.go` | J-006 | DSH-SLICE-006C | **PASS** | `CreateFieldDocument` + `ListFieldDocuments`; memory stub errors; postgres persists and queries |
 | Field visit migration | `dsh/backend/migrations/020_field_store_visits.sql` | J-006 | DSH-SLICE-006B | POSTGRES_RUNTIME_PROVEN | Non-destructive runtime test applies the visit table and proves insert |
+| Field document migration | `dsh/backend/migrations/021_field_store_documents.sql` | J-006 | DSH-SLICE-006C | **PASS** | `dsh_field_store_documents` table; FK to stores; index on (store_id, created_at DESC) |
 | Field visit runtime evidence test | `dsh/backend/internal/store/postgres_field_visit_runtime_test.go` | J-006 | DSH-SLICE-006B | OPTIONAL_RUNTIME_EVIDENCE | Skips by default; runs with `DSH_POSTGRES_RUNTIME_EVIDENCE=1` |
+| Field document runtime evidence test | `dsh/backend/internal/store/postgres_field_document_runtime_test.go` | J-006 | DSH-SLICE-006C | **PASS** | Skips by default; runs with `DSH_POSTGRES_RUNTIME_EVIDENCE=1`; proves insert + select |
 | Go backend main | `dsh/backend/cmd/dsh-api/main.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | API entry point |
 | Go backend client TS | `dsh/backend/client.ts`, `dsh/backend/src/client.ts` | J-001 | DSH-SLICE-001A | CANDIDATE | Typed client contract |
 | Go backend contracts TS | `dsh/backend/contracts.ts`, `dsh/backend/src/contracts.ts` | J-001 | DSH-SLICE-001A | CANDIDATE | TS contract types |
@@ -98,6 +104,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Partner activation model | `dsh/frontend/shared/dsh-partner-activation.model.ts` | J-006 | DSH-SLICE-006C,006E | ACTIVE | Partner activation state |
 | Field visit contract | `dsh/frontend/shared/dsh-field-visit.contract.ts` | J-006 | DSH-SLICE-006B,006C | ACTIVE | Field visit contract |
 | Field visit API client | `dsh/frontend/shared/dsh-field-visit-client.ts` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__RUNTIME_PROVEN | Typed client for `POST /stores/{id}/field-visits`; stores evidence references only |
+| Field document API client | `dsh/frontend/shared/dsh-field-document-client.ts` | J-006 | DSH-SLICE-006C | **PASS** | Typed client for `POST /stores/{id}/documents`; request/response types; offline/http error handling |
 | CP operations contract | `dsh/frontend/shared/dsh-cp-operations.contract.ts` | J-009 | DSH-SLICE-009A–009D | ACTIVE | Control-panel ops contract |
 | CP operations room | `dsh/frontend/shared/dsh-control-panel-operations-room.ts` | J-009 | DSH-SLICE-009A,009B | ACTIVE | Ops room model |
 | CP platform contract | `dsh/frontend/shared/dsh-cp-platform.contract.ts` | J-008 | DSH-SLICE-008A–008D | ACTIVE | Platform/vars contract |
@@ -239,7 +246,9 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Visit types | `dsh/frontend/app-field/types/DshFieldStoreVisitTypes.ts` | J-006 | DSH-SLICE-006B | ACTIVE | Visit evidence types |
 | Field binding contracts | `dsh/frontend/app-field/contracts/dsh-field-binding.contracts.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field binding contracts |
 | Field surface onboarding API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-store-onboarding-client.ts` | J-006 | DSH-SLICE-006A | ACTIVE_RUNTIME_BOUND | Store onboarding submit is bound to typed `POST /stores` client |
-| Field surface visit API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-visit-client.ts`; `dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx`; `dsh/frontend/app-field/sections/VisitEvidenceSection.tsx` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__VISUAL_REBUILD_PENDING | Visit submit is bound to typed `POST /stores/{id}/field-visits`; raw photo capture is disabled until 006C handler exists |
+| Field surface visit API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-visit-client.ts`; `dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx`; `dsh/frontend/app-field/sections/VisitEvidenceSection.tsx` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__RUNTIME_PROVEN | Visit submit is bound to typed `POST /stores/{id}/field-visits` |
+| Field surface document API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-document-client.ts`; `dsh/frontend/app-field/screens/DshFieldDocumentUploadScreen.tsx` | J-006 | DSH-SLICE-006C | **PASS** | Document upload is bound to typed `POST /stores/{id}/documents`; RTL Arabic screen; loading/error/success states |
+| Field document route registration | `dsh/frontend/app-field/dsh-field.routes.ts`; `dsh/frontend/app-field/dsh-field.screen-registry.ts`; `dsh/frontend/app-field/dsh-field.types.ts` | J-006 | DSH-SLICE-006C | **PASS** | Route `dsh-field-document-upload` registered; `document-upload` kind in route state union |
 | Field onboarding storage | `dsh/frontend/app-field/storage/field-onboarding.storage.ts` | J-006 | DSH-SLICE-006A | ACTIVE | Local onboarding storage |
 | Sections index | `dsh/frontend/app-field/sections/index.ts` | J-006 | DSH-SLICE-006A,006B | ACTIVE | Field sections |
 | Index export | `dsh/frontend/app-field/index.ts` | J-006 | All field slices | ACTIVE | Public field export |
@@ -388,7 +397,7 @@ These contradictions exist between source files and must be resolved in the appr
 
 | Metric | Count |
 |---|---|
-| Total source areas mapped | 120+ |
+| Total source areas mapped | 130+ |
 | Total journeys | 10 |
 | Total execution slices (see manifest) | 44 |
 | GAP rows (open) | 5 |
@@ -398,6 +407,7 @@ These contradictions exist between source files and must be resolved in the appr
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
 | IMPLEMENTATION_STARTED areas | 5 (J-003 checkout/payment slices) |
 | BLOCKED_WITH_REASON areas | 10 (J-003, DSH-SLICE-004E, J-010 finance/WLT boundary) |
+| DSH-SLICE-006C status | **PASS** — Documents & Media Proof (2026-06-06); evidence DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000 |
 | J-003 implementation status | IMPLEMENTATION_STARTED — all slices (003A–003E) demoted to BLOCKED_WITH_REASON (live auth-service runtime proof + WLT runtime/security proof + visual proof pending) |
 | J-004 implementation status | DEFERRED_WITH_REASON — deferred pending J-003 checkout/payment full closure |
 | J-005 implementation status | DEFERRED_WITH_REASON — deferred pending J-004/J-009 closure |
@@ -410,7 +420,9 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions, while J-003 is demoted to IMPLEMENTATION_STARTED, J-004 and J-005 to DEFERRED_WITH_REASON, and J-010 to BLOCKED_WITH_REASON (WLT-owned). WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001, DSH-SLICE-002, and DSH-SLICE-006C are closed with PASS decisions. J-003 is demoted to IMPLEMENTATION_STARTED, J-004 and J-005 to DEFERRED_WITH_REASON, and J-010 to BLOCKED_WITH_REASON (WLT-owned). WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
+
+DSH-SLICE-006C closed 2026-06-06: `POST /stores/{id}/documents` API + migration 021 + Go backend (handler, repository, postgres) + TS client + RTL Arabic screen + go test PASS + tsc PASS. Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`.
 
 Remaining warnings: 6 open GAP-IDX rows (GAP-IDX-001 through GAP-IDX-006) require validation, mapping, or classification before the relevant slices can close. Production readiness: NOT_CLAIMED.
 

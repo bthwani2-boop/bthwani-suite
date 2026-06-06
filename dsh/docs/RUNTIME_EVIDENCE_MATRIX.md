@@ -135,6 +135,11 @@ Summary:
 - control-panel: marketing-visibility section buttons pressed in browser; PATCH /stores/{id}/marketing-visibility produced inactive→client_visible:false and active→client_visible:true; GET /stores diff captured.
 - All blockers resolved. No remaining proof pending.
 
-Rows updated: DSH-RUN-P014-01 → `DSH_SLICE001_SCREEN_RUNTIME_PROVEN`; DSH-RUN-P014-04 → `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` / `SCREEN_RUNTIME_PROVEN`; DSH-RUN-P014-07 → `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` / `SCREEN_RUNTIME_PROVEN`
-Contradictions resolved: CONTRA-001 (coverage index), CONTRA-004 (slice manifest).
-Next action: Update SCREEN_API_MATRIX rows DSH-SAPI-P014-05 and DSH-SAPI-P014-10; then transition to DSH-SLICE-002.
+### DSH-SLICE-006C Documents & Media Proof Runtime Proof (2026-06-06)
+Decision: `PASS`
+Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`
+Summary:
+- Implemented and verified `POST /stores/{id}/documents` endpoint in Go backend.
+- Verified document persistence (document ID, store ID, document kind, media key, status pending) in PostgreSQL database at runtime.
+- Verified app-field `DshFieldDocumentUploadScreen` UI correctly resolves base URL and triggers the endpoint.
+- Validated via automated tests `go test ./...` including `postgres_field_document_runtime_test.go` integration test and TypeScript typecheck.

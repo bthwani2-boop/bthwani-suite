@@ -79,9 +79,27 @@ type Repository interface {
 	// CreateFieldVisit (J-006B): field agent submits visit notes and evidence media references.
 	// Raw media upload and document governance remain J-006C.
 	CreateFieldVisit(ctx context.Context, storeID string, req domain.CreateFieldVisitRequest) (domain.CreateFieldVisitResponse, error)
+	// CreateFieldDocument (J-006C): field agent uploads a document reference for a store.
+	CreateFieldDocument(ctx context.Context, storeID string, req domain.CreateFieldDocumentRequest) (domain.FieldDocumentRecord, error)
+	// ListFieldDocuments (J-006C): lists documents associated with a store.
+	ListFieldDocuments(ctx context.Context, storeID string) ([]domain.FieldDocumentRecord, error)
 
 	// DSH-SLICE-010B: Settlement Candidate repository methods
 	SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error)
 	ProcessSettlementCallback(ctx context.Context, settlementRefID string, orderIDs []string, amount float64, status string) ([]domain.OrderRecord, error)
 	ListSettlements(ctx context.Context) ([]domain.OrderRecord, error)
+
+	// CreateFieldReadinessEscalation (J-006D): field agent escalates incomplete readiness to a team.
+	// No financial mutation (WLT boundary). status starts as 'escalated'.
+	CreateFieldReadinessEscalation(ctx context.Context, storeID string, req domain.CreateFieldReadinessEscalationRequest) (domain.FieldReadinessEscalationRecord, error)
+	// ListFieldReadinessEscalations (J-006D): CP operator view of all escalations, filterable by status.
+	ListFieldReadinessEscalations(ctx context.Context, query domain.ListFieldReadinessEscalationsQuery) (domain.ListFieldReadinessEscalationsResponse, error)
+	// UpdateFieldReadinessEscalation (J-006D): CP operator updates escalation status (info_requested / resolved / rejected).
+	UpdateFieldReadinessEscalation(ctx context.Context, id string, req domain.UpdateFieldReadinessEscalationRequest) (domain.FieldReadinessEscalationRecord, error)
+
+	// CreateFieldReadinessApproval (J-006E): CP operator formally approves or rejects store readiness package.
+	// Approval makes the store eligible for partner-readiness gate toggle (J-001C). No financial mutation.
+	CreateFieldReadinessApproval(ctx context.Context, storeID string, req domain.CreateFieldReadinessApprovalRequest) (domain.FieldReadinessApprovalRecord, error)
+	// GetLatestFieldReadinessApproval (J-006E): returns the latest approval record for a store (for CP review).
+	GetLatestFieldReadinessApproval(ctx context.Context, storeID string) (domain.FieldReadinessApprovalRecord, error)
 }

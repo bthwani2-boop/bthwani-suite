@@ -15,6 +15,7 @@ import {
 } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
 import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
+import { DshFieldDocumentUploadScreen } from './screens/DshFieldDocumentUploadScreen';
 import { readFieldStoresLocal, writeFieldStoresLocal } from './storage/field-onboarding.storage';
 import {
   createManualFieldStore,
@@ -25,8 +26,10 @@ import {
 import {
   createDshFieldVisitHttpClient,
   createDshFieldStoreOnboardingHttpClient,
+  createDshFieldDocumentHttpClient,
   resolveDshFieldVisitBaseUrl,
   resolveDshFieldStoreOnboardingBaseUrl,
+  resolveDshFieldDocumentBaseUrl,
 } from '../shared';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 import {
@@ -100,6 +103,10 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
   );
   const fieldVisitClient = React.useMemo(
     () => createDshFieldVisitHttpClient(resolveDshFieldVisitBaseUrl()),
+    [],
+  );
+  const fieldDocumentClient = React.useMemo(
+    () => createDshFieldDocumentHttpClient(resolveDshFieldDocumentBaseUrl()),
     [],
   );
 
@@ -217,6 +224,7 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
       <DshFieldStoreOnboardingScreen
         store={activeStore}
         onBack={popRoute}
+        onUploadDocument={(storeId) => pushRoute({ kind: 'document-upload', storeId })}
         onStoreChange={(updater) => updateStore(activeStore.id, updater)}
         onSaveDraft={() =>
           updateStore(activeStore.id, (store) => ({
@@ -345,6 +353,48 @@ export function DshFieldSurface({ command, onExit }: DshFieldSurfaceProps = {}) 
 
   if (route.kind === 'finance') {
     content = <DshFieldFinanceScreen stores={stores} onBack={popRoute} />;
+  }
+
+  if (route.kind === 'document-upload' && activeStore) {
+    content = (
+      <DshFieldDocumentUploadScreen
+        storeId={activeStore.id}
+        onBack={popRoute}
+        onSubmit={async (kind, mediaKey) => {
+          await fieldDocumentClient.createFieldDocument(activeStore.id, {
+            document_kind: kind,
+            media_key: mediaKey,
+          });
+
+          // Update store draft documents status to 'uploaded'
+          updateStore(activeStore.id, (store) => {
+            const docs = { ...store.draft.documents };
+            if (kind === 'commercial_registration') {
+              docs.commercialRegistrationStatus = 'uploaded';
+              docs.commercialRegistrationRef = mediaKey;
+            } else if (kind === 'identity_proof') {
+              docs.ownerIdStatus = 'uploaded';
+              docs.ownerIdRef = mediaKey;
+            } else if (kind === 'tax_certificate') {
+              docs.tradeLicenseStatus = 'uploaded';
+              docs.tradeLicenseRef = mediaKey;
+            } else if (kind === 'storefront_photo') {
+              store.draft.photos.storefrontPhotoRef = mediaKey;
+            } else if (kind === 'interior_photo') {
+              store.draft.photos.interiorPhotoRef = mediaKey;
+            }
+            return {
+              ...store,
+              lastUpdatedLabel: 'الآن',
+              draft: {
+                ...store.draft,
+                documents: docs,
+              },
+            };
+          });
+        }}
+      />
+    );
   }
 
   if (route.kind === 'readiness-escalation' && activeStore) {

@@ -570,6 +570,15 @@ func (repo *MemoryRepository) CreateFieldVisit(_ context.Context, _ string, _ do
 	return domain.CreateFieldVisitResponse{}, errors.New("field visit submission requires postgres backend (set DATABASE_URL)")
 }
 
+// J-006C stubs
+func (repo *MemoryRepository) CreateFieldDocument(_ context.Context, _ string, _ domain.CreateFieldDocumentRequest) (domain.FieldDocumentRecord, error) {
+	return domain.FieldDocumentRecord{}, errors.New("field document upload requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListFieldDocuments(_ context.Context, _ string) ([]domain.FieldDocumentRecord, error) {
+	return nil, errors.New("field document listing requires postgres backend (set DATABASE_URL)")
+}
+
 // J-009C stubs
 func (repo *MemoryRepository) ListAllSupportEscalations(_ context.Context, _ domain.ListAllSupportEscalationsQuery) (domain.ListAllSupportEscalationsResponse, error) {
 	return domain.ListAllSupportEscalationsResponse{Tickets: []domain.SupportEscalationRecord{}, Total: 0}, nil
@@ -577,4 +586,26 @@ func (repo *MemoryRepository) ListAllSupportEscalations(_ context.Context, _ dom
 
 func (repo *MemoryRepository) UpdateSupportEscalation(_ context.Context, _ string, _ string) (domain.SupportEscalationRecord, error) {
 	return domain.SupportEscalationRecord{}, errors.New("escalation update requires postgres backend (set DATABASE_URL)")
+}
+
+// J-006D stubs
+func (repo *MemoryRepository) CreateFieldReadinessEscalation(_ context.Context, _ string, _ domain.CreateFieldReadinessEscalationRequest) (domain.FieldReadinessEscalationRecord, error) {
+	return domain.FieldReadinessEscalationRecord{}, errors.New("readiness escalation requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListFieldReadinessEscalations(_ context.Context, _ domain.ListFieldReadinessEscalationsQuery) (domain.ListFieldReadinessEscalationsResponse, error) {
+	return domain.ListFieldReadinessEscalationsResponse{}, errors.New("readiness escalation listing requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) UpdateFieldReadinessEscalation(_ context.Context, _ string, _ domain.UpdateFieldReadinessEscalationRequest) (domain.FieldReadinessEscalationRecord, error) {
+	return domain.FieldReadinessEscalationRecord{}, errors.New("readiness escalation update requires postgres backend (set DATABASE_URL)")
+}
+
+// J-006E stubs
+func (repo *MemoryRepository) CreateFieldReadinessApproval(_ context.Context, _ string, _ domain.CreateFieldReadinessApprovalRequest) (domain.FieldReadinessApprovalRecord, error) {
+	return domain.FieldReadinessApprovalRecord{}, errors.New("readiness approval requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) GetLatestFieldReadinessApproval(_ context.Context, _ string) (domain.FieldReadinessApprovalRecord, error) {
+	return domain.FieldReadinessApprovalRecord{}, errors.New("readiness approval retrieval requires postgres backend (set DATABASE_URL)")
 }

@@ -174,3 +174,83 @@ type CreateFieldVisitResponse struct {
 	Status             string    `json:"status"`
 	CreatedAt          time.Time `json:"created_at"`
 }
+
+// CreateFieldDocumentRequest — field agent uploads a document reference for a store (J-006C).
+type CreateFieldDocumentRequest struct {
+	DocumentKind string `json:"document_kind"`
+	MediaKey     string `json:"media_key"`
+}
+
+// FieldDocumentRecord — represents a persistent document record.
+type FieldDocumentRecord struct {
+	ID           string    `json:"id"`
+	StoreID      string    `json:"store_id"`
+	DocumentKind string    `json:"document_kind"`
+	MediaKey     string    `json:"media_key"`
+	Status       string    `json:"status"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// ─── J-006D: Field Readiness Escalation ──────────────────────────────────────
+
+// CreateFieldReadinessEscalationRequest — field agent escalates an incomplete readiness
+// submission to a specific team for review. No financial mutation (WLT boundary).
+type CreateFieldReadinessEscalationRequest struct {
+	FieldAgentID string `json:"field_agent_id,omitempty"`
+	Reason       string `json:"reason"`
+	TargetTeam   string `json:"target_team"` // partner-management | control-panel | marketing
+}
+
+// FieldReadinessEscalationRecord — persisted escalation record.
+type FieldReadinessEscalationRecord struct {
+	ID           string    `json:"id"`
+	StoreID      string    `json:"store_id"`
+	FieldAgentID string    `json:"field_agent_id,omitempty"`
+	Reason       string    `json:"reason"`
+	TargetTeam   string    `json:"target_team"`
+	Status       string    `json:"status"` // escalated | info_requested | resolved | rejected
+	OperatorNote string    `json:"operator_note,omitempty"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// UpdateFieldReadinessEscalationRequest — CP operator updates escalation status.
+type UpdateFieldReadinessEscalationRequest struct {
+	Status       string `json:"status"`        // info_requested | resolved | rejected
+	OperatorNote string `json:"operator_note,omitempty"`
+}
+
+// ListFieldReadinessEscalationsResponse — paginated list for CP operator view.
+type ListFieldReadinessEscalationsResponse struct {
+	Escalations []FieldReadinessEscalationRecord `json:"escalations"`
+	Pagination  Pagination                        `json:"pagination"`
+}
+
+// ListFieldReadinessEscalationsQuery — filter params for CP queue.
+type ListFieldReadinessEscalationsQuery struct {
+	Status string
+	Limit  int
+	Offset int
+}
+
+// ─── J-006E: Field Readiness Approval ────────────────────────────────────────
+
+// CreateFieldReadinessApprovalRequest — CP operator formally approves or rejects
+// a store's readiness package. Approval makes partner-readiness gate eligible (J-001C).
+// No financial mutation (WLT boundary).
+type CreateFieldReadinessApprovalRequest struct {
+	OperatorID string `json:"operator_id,omitempty"`
+	Decision   string `json:"decision"` // approved | rejected
+	Reason     string `json:"reason,omitempty"`
+}
+
+// FieldReadinessApprovalRecord — persisted approval record.
+type FieldReadinessApprovalRecord struct {
+	ID         string    `json:"id"`
+	StoreID    string    `json:"store_id"`
+	OperatorID string    `json:"operator_id,omitempty"`
+	Decision   string    `json:"decision"` // approved | rejected
+	Reason     string    `json:"reason,omitempty"`
+	CreatedAt  time.Time `json:"created_at"`
+}

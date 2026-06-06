@@ -8,7 +8,8 @@ export type DshFieldRouteId =
   | 'dsh-field-profile'
   | 'dsh-field-history'
   | 'dsh-field-finance'
-  | 'dsh-field-readiness-escalation';
+  | 'dsh-field-readiness-escalation'
+  | 'dsh-field-document-upload';
 
 export type DshFieldLegacyRoute = DshFieldRoute;
 
@@ -67,5 +68,11 @@ export const dshFieldRoutes = [
     legacyRoute: 'readiness-escalation',
     screenId: 'field.dsh.store.readiness-escalation',
     ownerPath: 'dsh/frontend/app-field/screens/DshFieldReadinessEscalationScreen.tsx',
+  },
+  {
+    routeId: 'dsh-field-document-upload',
+    legacyRoute: 'document-upload',
+    screenId: 'field.dsh.store.document-upload',
+    ownerPath: 'dsh/frontend/app-field/screens/DshFieldDocumentUploadScreen.tsx',
   },
 ] as const satisfies readonly DshFieldRouteRecord[];

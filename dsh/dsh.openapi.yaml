@@ -819,6 +819,267 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /stores/{id}/documents:
+    post:
+      tags:
+        - Field Readiness
+      summary: Upload field document reference
+      description: Upload field agent document or photo proof reference for a store.
+      operationId: createFieldDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldDocumentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDocumentRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/readiness-escalations:
+    post:
+      tags:
+        - Field Readiness
+      summary: Escalates incomplete readiness submission
+      description: Escalate store readiness to a target team for resolution.
+      operationId: createFieldReadinessEscalation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldReadinessEscalationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessEscalationRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /readiness-escalations:
+    get:
+      tags:
+        - Field Readiness
+      summary: List readiness escalations
+      description: Returns a list of escalations for control-panel operator queue.
+      operationId: listFieldReadinessEscalations
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFieldReadinessEscalationsResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /readiness-escalations/{id}:
+    patch:
+      tags:
+        - Field Readiness
+      summary: Update readiness escalation status
+      description: Updates the status of a readiness escalation.
+      operationId: updateFieldReadinessEscalation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The escalation ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldReadinessEscalationRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessEscalationRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Escalation Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/readiness-approvals:
+    post:
+      tags:
+        - Field Readiness
+      summary: Approve or reject store readiness
+      description: Performs a formal readiness approval or rejection.
+      operationId: createFieldReadinessApproval
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldReadinessApprovalRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessApprovalRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/readiness-approvals/latest:
+    get:
+      tags:
+        - Field Readiness
+      summary: Get latest readiness approval decision
+      description: Returns the latest approval or rejection record for a store.
+      operationId: getLatestFieldReadinessApproval
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessApprovalRecord'
+        '404':
+          description: No approval record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /stores/{id}/partner-readiness:
     patch:
       tags:
@@ -2279,6 +2540,159 @@ components:
         created_at:
           type: string
           format: date-time
+
+    CreateFieldDocumentRequest:
+      type: object
+      required:
+        - document_kind
+        - media_key
+      properties:
+        document_kind:
+          type: string
+          enum: [commercial_registration, tax_certificate, identity_proof, storefront_photo, interior_photo]
+        media_key:
+          type: string
+          description: Media key of the uploaded document in S3 or local media storage.
+
+    FieldDocumentRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - document_kind
+        - media_key
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        document_kind:
+          type: string
+          enum: [commercial_registration, tax_certificate, identity_proof, storefront_photo, interior_photo]
+        media_key:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+
+    CreateFieldReadinessEscalationRequest:
+      type: object
+      required:
+        - reason
+        - target_team
+      properties:
+        field_agent_id:
+          type: string
+        reason:
+          type: string
+        target_team:
+          type: string
+          enum: [partner-management, control-panel, marketing]
+
+    FieldReadinessEscalationRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - reason
+        - target_team
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        field_agent_id:
+          type: string
+        reason:
+          type: string
+        target_team:
+          type: string
+          enum: [partner-management, control-panel, marketing]
+        status:
+          type: string
+          enum: [escalated, info_requested, resolved, rejected]
+        operator_note:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UpdateFieldReadinessEscalationRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [info_requested, resolved, rejected]
+        operator_note:
+          type: string
+
+    ListFieldReadinessEscalationsResponse:
+      type: object
+      required:
+        - escalations
+        - pagination
+      properties:
+        escalations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldReadinessEscalationRecord'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CreateFieldReadinessApprovalRequest:
+      type: object
+      required:
+        - decision
+      properties:
+        operator_id:
+          type: string
+        decision:
+          type: string
+          enum: [approved, rejected]
+        reason:
+          type: string
+
+    FieldReadinessApprovalRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - decision
+        - created_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        operator_id:
+          type: string
+        decision:
+          type: string
+          enum: [approved, rejected]
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
 
     DiscoveryStore:
       type: object
