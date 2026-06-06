@@ -4,11 +4,11 @@ Status: ACTIVE_VISUAL_LEDGER_COMMAND
 Decision: BRANCH_NEUTRAL_EVIDENCE_ONLY
 
 Purpose:
-Update one review item in `dsh/docs/DSH_VISUAL_REVIEW.md` without touching source code, API, backend, ui-kit, or WLT ownership.
+Update one review item in the Visual Review Ledger section of `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md` without touching source code, API, backend, ui-kit, or WLT ownership.
 
 Scope:
 
-- allowed: `dsh/docs/DSH_VISUAL_REVIEW.md`
+- allowed: `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md`
 - forbidden: `dsh/frontend/**`, `dsh/dsh.openapi.yaml`, `dsh/backend/**`, `dsh/domain/**`, `ui-kit/**`, `wlt/**`
 
 Target repo:
@@ -34,8 +34,8 @@ Inputs:
 
 Required checks before updating:
 
-1. Confirm `dsh/docs/DSH_VISUAL_REVIEW.md` exists.
-2. Confirm the `review_id` exists in the Review Queue section of that file.
+1. Confirm `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md` exists.
+2. Confirm the `review_id` exists in the Visual Review Ledger (Section 8) of that file.
 3. If no Active Ledger row exists yet for that `review_id`, append the first row using the queue metadata already documented in the Review Queue.
 4. Confirm `screenshot_path` is not empty if `human_result` is `PASS` or `FAIL`.
 5. Confirm the screenshot file exists on disk if `human_result` is `PASS` or `FAIL`.
@@ -44,7 +44,7 @@ Required checks before updating:
 
 Update:
 
-1. In the Active Ledger section of `dsh/docs/DSH_VISUAL_REVIEW.md`, add or update:
+1. In the Active Ledger portion of the Visual Review Ledger in `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md`, add or update:
    - `state`
    - `device`
    - `viewport`
@@ -60,7 +60,7 @@ Update:
    - `next_action`
 2. If `human_result = FAIL` or `human_result = BLOCKED`, append or update the Failure Tracking section.
 3. If `decision = VISUAL_PASS`, append or update the Signoff section.
-4. Update the Summary Snapshot counts in `dsh/docs/DSH_VISUAL_REVIEW.md`.
+4. Update the Summary Snapshot counts in the Visual Review Ledger section of `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md`.
 5. Do not change queue metadata unless you are fixing a proven docs drift:
    - `review_id`
    - `surface`
@@ -88,7 +88,7 @@ Do not claim `PASS`, `CLOSED`, `FINAL`, or `100%`.
 Do not claim that the whole DSH service is complete.
 
 Available `review_id` values:
-Use the Review Queue in `dsh/docs/DSH_VISUAL_REVIEW.md`.
+Use the Review Queue in the Visual Review Ledger section of `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md`.
 
 Screenshot path convention:
 

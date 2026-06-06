@@ -292,11 +292,10 @@ If the domain includes DSH, read if present:
 - dsh/docs/README.md
 - dsh/SERVICE_BLUEPRINT.md
 - dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md
-- dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md
 - dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md
 - dsh/docs/SCREEN_API_MATRIX.md
+- dsh/docs/DSH_VISUAL_REVIEW.md
 - dsh/docs/RUNTIME_EVIDENCE_MATRIX.md
-- dsh/docs/CLOSURE_DECISION_LOG.md
 
 If the domain includes WLT, read if present:
 
@@ -596,11 +595,10 @@ If the domain includes DSH, update as needed:
 
 - [WORK_ITEM_FILE_PATH]
 - dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md
-- dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md
 - dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md
 - dsh/docs/SCREEN_API_MATRIX.md
+- dsh/docs/DSH_VISUAL_REVIEW.md
 - dsh/docs/RUNTIME_EVIDENCE_MATRIX.md
-- dsh/docs/CLOSURE_DECISION_LOG.md as append-only
 - dsh/SERVICE_BLUEPRINT.md if service-level truth changed
 
 If the domain includes WLT, update the corresponding WLT truth files if present:

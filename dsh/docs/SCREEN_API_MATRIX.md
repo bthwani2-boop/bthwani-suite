@@ -38,7 +38,7 @@ Exit gate:
 - Frontend transport binding: StoreReadinessGate (app-partner) + catalog-approval / marketing-visibility sections (control-panel) wired via dsh-store-visibility-transport.ts (DSH_SLICE001_FRONTEND_BIND-20260603).
 - Final screen runtime proof: all buttons pressed on physical device and browser; GET /stores response diff captured per gate (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700).
 
-Contradictions resolved: CONTRA-001, CONTRA-002, CONTRA-003, CONTRA-004 (see `dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md`).
+Contradictions resolved: CONTRA-001, CONTRA-002, CONTRA-003, CONTRA-004 (see `dsh/docs/DSH_MASTER_CLOSURE_MATRIX.md`).
 DSH-SLICE-001 matrix decision: `DSH_SLICE001_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE`.
 Next: transition to DSH-SLICE-002 (Catalog Management).
 

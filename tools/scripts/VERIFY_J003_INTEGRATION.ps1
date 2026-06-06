@@ -26,6 +26,23 @@ if (Test-Path -LiteralPath $LogPath) {
 
 Log-Msg "Starting J-003 E2E Integration Verification..."
 
+# Cleanup existing processes to free ports 8080 and 8081
+Log-Msg "Checking for existing dsh-api or auth-service processes..."
+Get-Process -Name "dsh-api" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name "auth-service" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+try {
+    $Conn8080 = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue
+    if ($Conn8080) {
+        Log-Msg "Killing process $($Conn8080.OwningProcess) listening on port 8080..."
+        Stop-Process -Id $Conn8080.OwningProcess -Force -ErrorAction SilentlyContinue
+    }
+    $Conn8081 = Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue
+    if ($Conn8081) {
+        Log-Msg "Killing process $($Conn8081.OwningProcess) listening on port 8081..."
+        Stop-Process -Id $Conn8081.OwningProcess -Force -ErrorAction SilentlyContinue
+    }
+} catch {}
+
 # 1. Start Mock Auth HTTP Server (port 8081)
 Log-Msg "Launching Mock Auth Service on http://localhost:8081 as a child process..."
 
@@ -70,14 +87,21 @@ try {
 $Encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($AuthScript))
 $AuthProcess = Start-Process -FilePath "powershell" -ArgumentList "-NoProfile", "-EncodedCommand", $Encoded -NoNewWindow -PassThru
 
+# # Run Postgres migrations and seeds
+Log-Msg "Applying migrations and seeds to Postgres..."
+Push-Location -Path "C:\bthwani-suite\dsh\backend"
+go test -count=1 -run TestApplyMigrations ./internal/store
+Pop-Location
+
 # 2. Start DSH API Server in Production Auth Mode (port 8080)
-Log-Msg "Launching DSH Go API Server on http://localhost:8080 (DSH_AUTH_MODE=production)..."
+Log-Msg "Launching DSH Go API Server on http://localhost:8080 (DSH_AUTH_MODE=production with Postgres)..."
 
 # Set environment variables for the new process
 $Env:PORT = "8080"
 $Env:DSH_AUTH_MODE = "production"
 $Env:DSH_AUTH_SERVICE_URL = "http://localhost:8081"
 $Env:WLT_CALLBACK_SECRET = "dev-secret"
+$Env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
 
 # Spawn Go DSH backend process
 $DshProcess = Start-Process -FilePath "go" -ArgumentList "run", "cmd/dsh-api/main.go" -NoNewWindow -PassThru -WorkingDirectory "C:\bthwani-suite\dsh\backend"
@@ -141,7 +165,7 @@ try {
     $IntentBody = @{
         store_id = "store-1001"
         items = @(
-            @{ product_id = "prod-1001"; quantity = 2 }
+            @{ product_id = "item-apple-1"; quantity = 2 }
         )
         delivery_address = "Oman, Muscat, Al Khuwair"
     } | ConvertTo-Json
@@ -150,34 +174,35 @@ try {
 
     # ─── GATE 3: POST /checkout/payment-callback (Slice 003C / 003E) ───
     Log-Msg "Test: POST /checkout/payment-callback (WLT confirm callback) -> expecting 200 OK"
+    $UniqueId = [Guid]::NewGuid().ToString()
     $CallbackHeaders = @{
         "X-WLT-Callback-Token" = "dev-secret"
-        "X-WLT-Event-Id" = "evt-integration-confirmed-123"
-        "Idempotency-Key" = "idem-integration-confirmed-123"
+        "X-WLT-Event-Id" = "evt-integration-confirmed-$UniqueId"
+        "Idempotency-Key" = "idem-integration-confirmed-$UniqueId"
     }
     $CallbackBody = @{
         intent_id = $Intent.intent_id
-        wlt_payment_ref_id = "wlt-sess-confirmed-123"
+        wlt_payment_ref_id = "wlt-sess-confirmed-$UniqueId"
         status = "confirmed"
     } | ConvertTo-Json
     $Callback = Invoke-RestMethod -Uri "http://localhost:8080/checkout/payment-callback" -Method Post -Headers $CallbackHeaders -Body $CallbackBody -ContentType "application/json"
     Log-Msg "PASS: Callback accepted: Acknowledged=$($Callback.acknowledged), NextAction=$($Callback.next_action)"
 
     # ─── GATE 4: POST /orders (Slice 003D) ───
-    Log-Msg "Test: POST /orders (Create order after confirmation) -> expecting 500 Internal Server Error (memory repository limit)"
+    Log-Msg "Test: POST /orders (Create order after confirmation) -> expecting 201 Created"
     $OrderBody = @{
         store_id = "store-1001"
         client_id = "client-prod-123"
-        total_price = 20.0
-        wlt_payment_ref_id = "wlt-sess-confirmed-123"
+        total_price = 36.0
+        wlt_payment_ref_id = "wlt-sess-confirmed-$UniqueId"
         items = @(
-            @{ product_id = "prod-1001"; quantity = 2; price = 10.0 }
+            @{ product_id = "item-apple-1"; quantity = 2; price = 18.0 }
+        )
     } | ConvertTo-Json
 
     try {
-        Invoke-RestMethod -Uri "http://localhost:8080/orders" -Method Post -Headers $Headers -Body $OrderBody -ContentType "application/json" -UseBasicParsing
-        Log-Msg "ERROR: Order creation succeeded unexpectedly without postgres backend!"
-        exit 1
+        $Order = Invoke-RestMethod -Uri "http://localhost:8080/orders" -Method Post -Headers $Headers -Body $OrderBody -ContentType "application/json" -UseBasicParsing
+        Log-Msg "PASS: Order created successfully: OrderID=$($Order.order.id), Status=$($Order.order.status)"
     } catch {
         $Content = ""
         if ($_.ErrorDetails -and $_.ErrorDetails.Message) {
@@ -192,13 +217,8 @@ try {
         if (-not $Content) {
             $Content = $_.ToString()
         }
-
-        if ($Content -match "order creation requires postgres backend") {
-            Log-Msg "PASS: Order creation reached memory repository and returned expected error: $Content"
-        } else {
-            Log-Msg "ERROR: Unexpected error response: $Content"
-            exit 1
-        }
+        Log-Msg "ERROR: Order creation failed: $Content"
+        exit 1
     }
 
     Log-Msg "E2E Checkout Integration Test completed successfully! All gates verified!"

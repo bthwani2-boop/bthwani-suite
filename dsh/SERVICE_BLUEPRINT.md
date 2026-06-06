@@ -56,13 +56,14 @@ API contract: `dsh/dsh.openapi.yaml`.
 
 ### Lean docs
 
-- `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md`
-- `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md`
+- `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md`
+- `dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md`
 - `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`
 - `dsh/docs/SCREEN_API_MATRIX.md`
 - `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`
-- `dsh/docs/CLOSURE_DECISION_LOG.md`
 - `dsh/docs/DSH_VISUAL_REVIEW.md`
+- `dsh/docs/CLOSURE_DECISION_LOG.md`
+- `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md`
 
 ### Retired doc trees
 
@@ -112,13 +113,13 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 |---|---|---|
 | Cross-surface closure truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` | live frontend closure status |
 | Flow ownership truth | `dsh/frontend/shared/dsh-flow-registry.ts` | flow ownership, visibility, escalation, on-demand rules |
-| UI/UX flow matrix | `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` | human-readable closure summary |
-| Screen/API matrix | `dsh/docs/SCREEN_API_MATRIX.md` | API-readiness freeze |
+| Slice coverage manifest | `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` | journey and slice closure authority |
+| UI/UX flow matrix | `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` | UI/UX flow evidence rows |
+| Screen/API matrix | `dsh/docs/SCREEN_API_MATRIX.md` | API-readiness and binding rows |
 | Runtime evidence matrix | `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` | runtime blocker summary |
-| Closure decision log | `dsh/docs/CLOSURE_DECISION_LOG.md` | append-only closure decisions |
-| Client + WLT roadmap | `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md` | app-client + WLT boundary plan |
-| Control-panel owner decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | section and shared ownership |
-| Visual review system | `dsh/docs/DSH_VISUAL_REVIEW.md` | screenshot-led visual evidence only |
+| Visual review ledger | `dsh/docs/DSH_VISUAL_REVIEW.md` | visual evidence ledger |
+| Closure decision log | `dsh/docs/CLOSURE_DECISION_LOG.md` | append-only historical decision log |
+| Control panel shared owner decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | section and shared ownership |
 | OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001 + J-002 endpoints E2E proven; J-003 contracts designed (GET /cart/serviceability, POST /checkout/intent, DELETE /checkout/intent/{id}, POST /checkout/payment-callback); production BearerAuth backend path + app-client Bearer checkout transport implemented; DEV X-Client-Id fallback remains; live auth-service runtime proof + WLT runtime pending before J-003 PASS |
 
 ---

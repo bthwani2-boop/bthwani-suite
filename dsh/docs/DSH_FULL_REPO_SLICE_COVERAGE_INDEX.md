@@ -15,7 +15,7 @@ Governance:
 - `dsh/SERVICE_BLUEPRINT.md` — service boundaries and lifecycle truth
 - `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` — journey and slice planning authority
 - `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` — surface evidence rows
-- `dsh/docs/SCREEN_API_MATRIX.md` — API candidate rows
+- `dsh/docs/SCREEN_API_MATRIX.md` — API candidate and binding readiness rows
 - `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` — runtime proof rows
 - `dsh/docs/CLOSURE_DECISION_LOG.md` — append-only decision log
 - `dsh/docs/DSH_VISUAL_REVIEW.md` — visual evidence ledger
@@ -335,19 +335,21 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Coverage Manifest | `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` | GOVERNANCE_REFERENCE | Journey/slice authority |
 | This Index | `dsh/docs/DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md` | GOVERNANCE_REFERENCE | Full repo coverage map |
 | UI/UX Flow Closure Matrix | `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` | EVIDENCE_REFERENCE | Surface evidence rows |
-| Screen/API Matrix | `dsh/docs/SCREEN_API_MATRIX.md` | EVIDENCE_REFERENCE | API candidate rows |
+| Screen/API Matrix | `dsh/docs/SCREEN_API_MATRIX.md` | EVIDENCE_REFERENCE | API candidate and binding readiness rows |
 | Runtime Evidence Matrix | `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` | EVIDENCE_REFERENCE | Runtime proof rows |
 | Closure Decision Log | `dsh/docs/CLOSURE_DECISION_LOG.md` | EVIDENCE_REFERENCE | Append-only log |
 | Visual Review Ledger | `dsh/docs/DSH_VISUAL_REVIEW.md` | EVIDENCE_REFERENCE | Visual evidence queue |
 | DSH-SLICE-001 Store Discovery | `dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md` | SLICE_MANIFEST | Parent slice for J-001; linked to 001A–001F |
 | Performance Notes | `dsh/docs/references/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints; moved from slices/ — reference files must not live under slices/ |
 | Control Panel Owner Decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | GOVERNANCE_REFERENCE | CP ownership policy |
-| Migration doc | `dsh/docs/MIGRATION.md` | HISTORICAL_REFERENCE | Migration history |
-| Command doc | `dsh/docs/command.md` | HISTORICAL_REFERENCE | Deprecated; no branch-specific instructions allowed |
-| WLT Roadmap V3 | `dsh/docs/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md` | HISTORICAL_REFERENCE | App-client + WLT boundary history |
-| Operational Model Gap Map | `dsh/docs/DSH_OPERATIONAL_OPERATING_MODEL_GAP_MAP.md` | GAP_REFERENCE | Operational model gap tracking |
-| Operational Runtime API Slices Plan | `dsh/docs/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | PLANNING_REFERENCE | Future slice planning; not yet active |
-| File Size Risk Matrix | `dsh/docs/DSH_FILE_SIZE_RISK_MATRIX.md` | GOVERNANCE_REFERENCE | Screen refactoring risk matrix |
+| Migration doc | `dsh/docs/archive/MIGRATION.md` | HISTORICAL_REFERENCE | Migration history |
+| Command doc | `dsh/docs/archive/command.md` | HISTORICAL_REFERENCE | Deprecated; no branch-specific instructions allowed |
+| WLT Roadmap V3 | `dsh/docs/archive/BTHWANI_DSH_CLIENT_WLT_FINAL_CLOSURE_ROADMAP_V3.md` | HISTORICAL_REFERENCE | App-client + WLT boundary history |
+| Master Closure Matrix | `dsh/docs/archive/DSH_MASTER_CLOSURE_MATRIX.md` | HISTORICAL_REFERENCE | Retired consolidated closure matrix |
+| Unified Closure Matrix | `dsh/docs/archive/DSH_UNIFIED_CLOSURE_MATRIX.md` | HISTORICAL_REFERENCE | Retired consolidated UI/UX and screen/API matrix |
+| Operational Model Gap Map | `dsh/docs/archive/DSH_OPERATIONAL_OPERATING_MODEL_GAP_MAP.md` | GAP_REFERENCE | Operational model gap tracking |
+| Operational Runtime API Slices Plan | `dsh/docs/archive/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | PLANNING_REFERENCE | Future slice planning; not yet active |
+| File Size Risk Matrix | `dsh/docs/archive/DSH_FILE_SIZE_RISK_MATRIX.md` | GOVERNANCE_REFERENCE | Screen refactoring risk matrix |
 
 ---
 
@@ -357,10 +359,10 @@ Areas found without a slice mapping or with evidence of missing classification:
 
 | GAP ID | Area | Description | Required Action |
 |---|---|---|---|
-| GAP-IDX-001 | `dsh/docs/DSH_OPERATIONAL_OPERATING_MODEL_GAP_MAP.md` | **RESOLVED 2026-06-06** — classified as GAP_REFERENCE / future operational contract planning. J-009A–009D are already PASS in the slice manifest; this reference does not reopen closed runtime slices. | No current slice action required; use only as future operational-contract input |
-| GAP-IDX-002 | `dsh/docs/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | **RESOLVED 2026-06-06** — classified as PLANNING_REFERENCE. It maps future runtime/API candidates by operational slice and explicitly states that it does not add backend, OpenAPI, generated clients, local demo data, or UI routes. | No current slice action required; future API work must open a dedicated slice |
+| GAP-IDX-001 | `dsh/docs/archive/DSH_OPERATIONAL_OPERATING_MODEL_GAP_MAP.md` | **RESOLVED 2026-06-06** — classified as GAP_REFERENCE / future operational contract planning. J-009A–009D are already PASS in the slice manifest; this reference does not reopen closed runtime slices. | No current slice action required; use only as future operational-contract input |
+| GAP-IDX-002 | `dsh/docs/archive/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | **RESOLVED 2026-06-06** — classified as PLANNING_REFERENCE. It maps future runtime/API candidates by operational slice and explicitly states that it does not add backend, OpenAPI, generated clients, local demo data, or UI routes. | No current slice action required; future API work must open a dedicated slice |
 | GAP-IDX-003 | `control-panel/runtime/app/community-services/page.tsx` | **RESOLVED 2026-06-06** — classified OUT_OF_SCOPE_WITH_REASON. Community services route is not a DSH primary domain and remains governed by community-service ownership, not DSH slice closure. | No DSH slice action required |
-| GAP-IDX-004 | `dsh/docs/DSH_FILE_SIZE_RISK_MATRIX.md` | **RESOLVED 2026-06-06** — classified GOVERNANCE_REFERENCE / historical decomposition audit. Current truth states the DSH-SLICE-001 Home/Store decomposition is complete and no execution slice remains open. | No current slice action required |
+| GAP-IDX-004 | `dsh/docs/archive/DSH_FILE_SIZE_RISK_MATRIX.md` | **RESOLVED 2026-06-06** — classified GOVERNANCE_REFERENCE / historical decomposition audit. Current truth states the DSH-SLICE-001 Home/Store decomposition is complete and no execution slice remains open. | No current slice action required |
 | GAP-IDX-005 | `dsh/docs/references/PERFORMANCE_NOTES.md` | **RESOLVED 2026-06-04** — file moved from slices/ to dsh/docs/references/; classified GOVERNANCE_REFERENCE in § N; no slice action required | No further action required |
 | GAP-IDX-006 | `dsh/frontend/control-panel/finance/finance.registry.ts` — `FinanceHubScreen.tsx`, `FinanceHubScreens.tsx` | **RESOLVED 2026-06-06** — finance registry and screens are mapped to J-010 / DSH-SLICE-010A–010D in this index and manifest. WLT remains the financial source of truth; DSH displays read-only bridge state only. | No current DSH finance mutation or new slice action required |
 | GAP-IDX-007 | app-partner catalog readiness frontend binding | **RESOLVED 2026-06-04** — StoreReadinessGate button press E2E proven on physical device; PATCH /stores/{id}/partner-readiness and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |

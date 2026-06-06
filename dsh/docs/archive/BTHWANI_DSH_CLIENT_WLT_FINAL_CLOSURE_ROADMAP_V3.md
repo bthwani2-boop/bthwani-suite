@@ -6,7 +6,7 @@ Current use:
 
 - historical app-client + WLT boundary context only
 - not the master DSH closure sequence
-- current service decisions come from `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md`, `dsh/docs/SCREEN_API_MATRIX.md`, `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`, `dsh/docs/DSH_VISUAL_REVIEW.md`, and `tools/plan/BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE_20260523/**`
+- current service decisions come from `dsh/docs/DSH_UNIFIED_CLOSURE_MATRIX.md`, `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`, `dsh/docs/DSH_VISUAL_REVIEW.md`, and `tools/plan/BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE_20260523/**`
 
 Status: ACTIVE_LIVING_ROADMAP / P0_14_TRUTH_REFRESHED
 Repo: C:\bthwani-suite

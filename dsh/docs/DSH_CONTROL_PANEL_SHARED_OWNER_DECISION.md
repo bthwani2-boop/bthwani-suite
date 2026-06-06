@@ -1,14 +1,22 @@
-# DSH Control Panel + Shared Owner Decision
+# DSH Applications and Control Panel Shared Owner Decision
 
 status: CURRENT_FRONTEND_OWNER_DECISION
 mode: LIVE_FRONTEND_TRUTH
 repo: C:\bthwani-suite
-updated_at: 2026-05-21
+updated_at: 2026-06-06
 
 ## Decision
 
-No move, delete, or rename is approved for `dsh/frontend/control-panel` or `dsh/frontend/shared` in P0-14.
+No move, delete, or rename is approved for `dsh/frontend/control-panel`, `dsh/frontend/app-client`, `dsh/frontend/app-partner`, `dsh/frontend/app-captain`, `dsh/frontend/app-field`, or `dsh/frontend/shared`.
 This phase closes frontend truth drift only.
+
+## Applications Ownership
+
+- `app-client` owns client-facing discovery, checkout, and tracking/support screens via `dsh-client.screen-registry.ts`.
+- `app-partner` owns partner-facing orders, inventory, and catalog screens via `dsh-partner.screen-registry.ts`.
+- `app-captain` owns captain-facing active order management, map navigation, and pickup/dropoff screens via `dsh-captain.screen-registry.ts`.
+- `app-field` owns field agent store onboarding, visit evidence, and document upload screens via `dsh-field.screen-registry.ts`.
+- All application screens must remain isolated within their respective surface directories under `dsh/frontend/`.
 
 ## Control-Panel Ownership
 
@@ -27,7 +35,7 @@ This phase closes frontend truth drift only.
 ## Financial Boundary
 
 - WLT owns settlement, payout, refund, commission, ledger, wallet, and payment semantics.
-- DSH control-panel finance remains view-only.
+- DSH control-panel finance and application-side checkout intent modules remain view-only/delegation-only.
 - No DSH finance mutation is approved here.
 
 ## Not Approved In This Decision
@@ -39,6 +47,6 @@ This phase closes frontend truth drift only.
 
 ## Next Valid Work
 
-1. Capture visual evidence for operations, finance bridge, and cross-surface flows.
-2. Capture runtime proof only when a real multi-surface session is available.
+1. Maintain isolated screen registries for each of the four mobile applications and the control panel.
+2. Ensure cross-surface flows are documented in `dsh-flow-registry.ts`.
 3. Revisit owner boundaries only if a live consumer conflict appears.
