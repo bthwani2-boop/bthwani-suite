@@ -1,5 +1,0 @@
-UI-ARCH-BOUNDARY: PASS (fail=0, warn=0)
-
-Command: pnpm run guard:tamagui-import-boundary
-Output: UI-ARCH-BOUNDARY: PASS (fail=0, warn=0)
-Captured: 2026-05-21T06:44:27

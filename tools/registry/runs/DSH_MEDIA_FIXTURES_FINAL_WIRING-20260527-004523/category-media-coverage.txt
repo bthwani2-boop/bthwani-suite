@@ -1,4 +1,0 @@
-All 13 main categories defined in categories.preview-data.ts have mediaKey and imageUri correctly populated and resolved.
-All 14 subcategories defined in categories.preview-data.ts have mediaKey and imageUri correctly populated and resolved.
-No missing or fallback emoji-only main or subcategories in preview data.
-Emoji is preserved as a clean fallback only.

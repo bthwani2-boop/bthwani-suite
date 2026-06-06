@@ -1,5 +1,0 @@
-All stores have covers resolving to dsh/frontend/media-fixtures/stores/
-All stores have logos resolving to dsh/frontend/media-fixtures/store_logos/
-The legacy folder 'logos/' is completely decommissioned.
-The central brand logo uses dsh.brand.logo.v1 -> dsh/frontend/media-fixtures/store_logos/brand-logo.png
-100% compliant.

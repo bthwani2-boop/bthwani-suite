@@ -1,2 +1,0 @@
-EMPTY — no staged changes.
-(git diff --cached --stat produced no output)

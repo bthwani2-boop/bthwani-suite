@@ -1,4 +1,0 @@
-All 7 banners in dshHomeGetFixturePromos map correctly to:
-dsh.banner.home.promo-1.v1 to dsh.banner.home.promo-7.v1
-All resolve cleanly through resolveDshImageSource.
-No raw banner paths exist inside app-client screens.

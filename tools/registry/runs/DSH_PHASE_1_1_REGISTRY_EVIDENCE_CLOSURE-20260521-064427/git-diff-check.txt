@@ -1,2 +1,0 @@
-PASS — no whitespace/conflict-marker errors in working tree.
-(git diff --check produced no output)

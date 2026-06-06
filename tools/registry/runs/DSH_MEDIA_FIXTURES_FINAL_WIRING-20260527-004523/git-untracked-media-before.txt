@@ -1,2 +1,0 @@
-No untracked DSH media fixtures or images found in the repository or working tree.
-All images under dsh/frontend/media-fixtures are fully tracked.
