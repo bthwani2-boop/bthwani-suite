@@ -17,8 +17,8 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `DSH_J005_J006_J009_SCREEN_RUNTIME_PROVEN_2026-06-05` |
-| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / SCREEN_RUNTIME_PROVEN; J-003 = IMPLEMENTATION_STARTED / BearerAuth backend + contracts ready / WLT E2E pending; J-004 = DEFERRED / cross-surface proof pending J-003; J-005 = SCREEN_RUNTIME_PROVEN / physical device 2026-06-05 (captain map + active order + pickup detail); J-006 = SCREEN_RUNTIME_PROVEN / physical device 2026-06-05 (field onboarding list + form); J-009 = SCREEN_RUNTIME_PROVEN / localhost 2026-06-05 (operations room 128 orders); Production readiness = NOT_CLAIMED |
+| Current Decision | `START_CONTROLLED_LOCAL_SMOKE_TEST_2026-06-06` |
+| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / SCREEN_RUNTIME_PROVEN; J-003 = IMPLEMENTATION_STARTED / BearerAuth backend + contracts ready / WLT E2E pending / local testing ready; J-004 = DEFERRED / cross-surface proof pending J-003 / local testing ready; J-005 = DEFERRED / depends on J-004/J-009 runtime / local testing ready; J-006 = DEFERRED / no onboarding API designed / local testing ready; J-009 = DEFERRED / ops room visual/runtime proof pending / local testing ready; J-010 = BLOCKED_WITH_REASON / WLT-owned read-only bridge / local testing ready; Production readiness = NOT_CLAIMED |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -28,9 +28,9 @@ API contract: `dsh/dsh.openapi.yaml`.
 |---|---|---|
 | `app-client` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | discovery feed (J-001) E2E proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); J-002 catalog proven (DSH_SLICE_002*_FINAL_CLOSURE-*); cart/checkout/tracking (J-003+) deferred |
 | `app-partner` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | partner-readiness gate (J-001) E2E proven on physical device; catalog management (J-002) proven (DSH_SLICE_002*_FINAL_CLOSURE-*); J-003+ deferred |
-| `app-captain` | `J-005: SCREEN_RUNTIME_PROVEN` | map + GPS ON + طلب رقم 9021 نشط (Burger Lab فرع حطين → حي العليا، مرحلة الاستلام، محادثة عميل)؛ header: المحفظة 21٬000 ري (codLiabilityLabel fix 2026-06-05); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J005_captain_*.png |
-| `app-field` | `J-006: SCREEN_RUNTIME_PROVEN` | خط الميداني: مؤشر الملفات (مرسل+متابعة+جاهز)؛ استمارة ملف انضمام جديد كاملة (اسم+مالك+موقع+مسؤول)؛ evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J006_field_*.png |
-| `control-panel operations` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-009: SCREEN_RUNTIME_PROVEN` | catalog-approval (J-001) + catalog governance (J-002) proven; operations room (J-009): 128 طلب مفتوح + 42 تغطية كابتن + توصيات AI + خطط تدخل؛ evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J009_cp_operations.png |
+| `app-captain` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | map + GPS ON + active order (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J005_captain_*.png |
+| `app-field` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | field onboarding and visit forms implemented (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J006_field_*.png |
+| `control-panel operations` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | operations room with CommandCenter and LiveOrdersScreen (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J009_cp_operations.png |
 | `control-panel finance` | `blocked-by-wlt` | finance remains a read-only WLT bridge and not a DSH-owned money surface |
 
 ### Map / Heatmap Boundary

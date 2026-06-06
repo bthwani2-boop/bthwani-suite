@@ -407,15 +407,15 @@ These contradictions exist between source files and must be resolved in the appr
 | OUT_OF_SCOPE_WITH_REASON rows | 5 |
 | Known contradictions open | 0 |
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
-| IMPLEMENTATION_STARTED areas | 0 |
+| IMPLEMENTATION_STARTED areas | 1 (J-003 checkout/payment) |
 | WLT-owned read-only boundary areas | 4 (J-010 finance/WLT boundary) |
-| DSH-SLICE-006C status | **PASS** — Documents & Media Proof (2026-06-06); evidence DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000 |
-| J-003 implementation status | **PASS** — all slices (003A–003E) closed 2026-06-06; evidence under `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |
-| J-004 implementation status | **PASS** — all slices (004A–004F) closed 2026-06-06; evidence under each slice's evidence run directory |
-| J-005 implementation status | **PASS** — all slices (005A–005F) closed 2026-06-06; evidence under `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/` |
-| J-006 implementation status | **PASS** — all slices (006A–006E) closed; evidence paths recorded per slice |
+| DSH-SLICE-006C status | **DEFERRED_WITH_REASON** — Documents & Media Proof; ready for local testing, pending onboarding API design / field readiness validation |
+| J-003 implementation status | **BLOCKED_WITH_REASON** — ready for controlled local testing, pending production auth validation and WLT E2E callback proof; evidence under `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |
+| J-004 implementation status | **DEFERRED_WITH_REASON** — deferred pending J-003 checkout/payment closure; ready for local smoke testing |
+| J-005 implementation status | **DEFERRED_WITH_REASON** — deferred pending J-004/J-009 runtime; ready for local smoke testing; evidence under `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/` |
+| J-006 implementation status | **DEFERRED_WITH_REASON** — deferred pending onboarding API design and field readiness verification; ready for local smoke testing |
 | J-007 implementation status | ACTIVE_GOVERNANCE — no runtime slice; guard-proven 2026-06-06 with `guard-dsh-shared-foundations-final` PASS and `guard-dsh-media-manifest` PASS |
-| J-010 implementation status | **PASS** — all slices (010A–010D) closed as WLT-owned/read-only DSH bridge; no DSH money mutation |
+| J-010 implementation status | **BLOCKED_WITH_REASON** — full WLT finance ownership; DSH reads only (settlements/payouts bridge ready for local testing) |
 | Full universal protocol closures (DEFERRED) | 0 |
 
 ---
@@ -424,15 +424,15 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001, DSH-SLICE-002, DSH-SLICE-003 (A-E), DSH-SLICE-004 (A-F), DSH-SLICE-005 (A-F), DSH-SLICE-006 (A-E), DSH-SLICE-008 (A-D), DSH-SLICE-009 (A-D), and J-010 are closed with PASS decisions where they are runtime/business slices. J-007 is active perpetual governance and is guard-proven, not a runtime closure slice. WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions. Slices for J-003, J-004, J-005, J-006, J-008, J-009, and J-010 are deferred/blocked at production-ready level, but ready for controlled local smoke testing. J-007 is active perpetual governance and is guard-proven, not a runtime closure slice. WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
 
-DSH-SLICE-003 (A-E) closed 2026-06-06: Checkout & payment flow E2E verified with live auth-service running on port 8091 and WLT callback simulation. Evidence: `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/`.
-DSH-SLICE-004 (A-F) closed 2026-06-06: Order lifecycle, tracking, cancellation, support escalation, and WLT refund callback integration verified. Evidence paths documented in slice files.
-DSH-SLICE-005 (A-F) closed 2026-06-06: Delivery execution chain closed after J-004/J-009 blockers were resolved. Evidence: `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/`.
-DSH-SLICE-006C closed 2026-06-06: `POST /stores/{id}/documents` API + migration 021 + Go backend (handler, repository, postgres) + TS client + RTL Arabic screen + go test PASS + tsc PASS. Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`.
-DSH-SLICE-006 (A-E) closed: field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all record PASS in the slice manifest with per-slice evidence.
+DSH-SLICE-003 (A-E) blocked 2026-06-06: Checkout & payment flow E2E verified locally with live auth-service running on port 8091 and WLT callback simulation. Production release blocked. Evidence: `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/`.
+DSH-SLICE-004 (A-F) deferred 2026-06-06: Order lifecycle, tracking, cancellation, support escalation, and WLT refund callback integration verified locally. Production release deferred pending J-003.
+DSH-SLICE-005 (A-F) deferred 2026-06-06: Delivery execution chain verified locally; deferred pending J-004/J-009. Evidence: `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/`.
+DSH-SLICE-006C deferred 2026-06-06: Documents & media proof verified locally; deferred pending onboarding API design and field readiness verification. Evidence: `tools/registry/runs/DSH_SLICE_006C_DOCUMENTS_MEDIA_PROOF_FINAL_CLOSURE-20260606-044000/`.
+DSH-SLICE-006 (A-E) deferred: field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all verified locally.
 DSH-SLICE-007 governance proven 2026-06-06: `guard-dsh-shared-foundations-final` PASS (fail=0, warn=0, info=54) and `guard-dsh-media-manifest` PASS (fail=0, warn=0, info=50). Evidence: `tools/registry/runs/DSH_ALL_SLICES_REALITY_LOCK_AND_J007_GUARDS-20260606-LOCAL/`.
 
 Remaining warnings: no open GAP-IDX rows remain after classification. Production readiness: NOT_CLAIMED.
 
-Next action: continue sequential closure verification only when new evidence breaks an existing slice decision, or when a future runtime/API slice is explicitly opened.
+Next action: start controlled local smoke test; no production-ready claim.
