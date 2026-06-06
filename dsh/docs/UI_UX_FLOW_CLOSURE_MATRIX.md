@@ -1,7 +1,7 @@
 # DSH UI/UX Flow Closure Matrix
 
 Status: ACTIVE_FRONTEND_CLOSURE_TRUTH
-Decision: PASS
+Decision: FIX_REQUIRED
 
 Canonical sources:
 
@@ -17,6 +17,8 @@ Current summary:
 - `needs-visual-evidence`: 3
 - `blocked-by-wlt`: 1
 - `verified-ui-flow`: 9
+
+Service-wide decision remains `FIX_REQUIRED`: verified UI rows stay valid, but deferred runtime/WLT/control-panel proof for later journeys cannot be promoted by this matrix alone.
 
 ## Surface Row Classification
 

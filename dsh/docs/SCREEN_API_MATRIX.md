@@ -1,7 +1,7 @@
 # DSH Screen/API Matrix
 
 Status: MIXED_SERVICE_MATRIX
-Decision: PASS
+Decision: FIX_REQUIRED
 
 Purpose:
 Freeze the frontend-facing API needs after P0-14 without inflating runtime or backend closure.
@@ -15,6 +15,7 @@ Current rule:
 - No endpoint may be designed until the cross-surface slice proves screen/flow/readiness and all related surfaces are classified.
 - If an API row reveals missing operation/state/auth boundary/WLT boundary/provider variable/control-panel owner, it must be added as REQUIRED_ADDITION or BLOCKED_WITH_REASON to the related slice before closure.
 - No API PASS can override missing screen/flow/ops/data ownership proof.
+- Service-wide runtime closure remains `FIX_REQUIRED` until J-003/J-004/J-005/J-009 runtime proof and WLT-owned boundaries are proven together.
 
 | Matrix ID | Surface | Route hint | Screen owner | Primary action | Required states | API readiness | Auth/WLT boundary | Remaining blocker | Next allowed work |
 |---|---|---|---|---|---|---|---|---|---|
