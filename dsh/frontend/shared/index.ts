@@ -556,6 +556,17 @@ export type {
   DshFieldVisitEvidenceItem,
 } from './dsh-field-visit.contract';
 export { dshFieldVisitContractMeta } from './dsh-field-visit.contract';
+export type {
+  DshCreateFieldVisitRequest,
+  DshCreateFieldVisitResponse,
+  DshFieldVisitClient,
+  DshFieldVisitError,
+} from './dsh-field-visit-client';
+export {
+  createDshFieldVisitHttpClient,
+  isDshFieldVisitOfflineError,
+  resolveDshFieldVisitBaseUrl,
+} from './dsh-field-visit-client';
 
 export type {
   AppearanceStatus,
@@ -669,6 +680,18 @@ export {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,
 } from './dsh-order-lifecycle-client';
+
+export type {
+  DshCreateFieldStoreRequest,
+  DshCreateFieldStoreResponse,
+  DshFieldStoreOnboardingClient,
+  DshFieldStoreOnboardingError,
+} from './dsh-field-store-onboarding-client';
+export {
+  createDshFieldStoreOnboardingHttpClient,
+  isDshFieldStoreOnboardingOfflineError,
+  resolveDshFieldStoreOnboardingBaseUrl,
+} from './dsh-field-store-onboarding-client';
 
 // --- Operations Runtime Adapter ---
 export type {

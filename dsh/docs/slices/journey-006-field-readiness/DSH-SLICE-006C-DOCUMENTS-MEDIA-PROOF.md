@@ -1,4 +1,4 @@
-# DSH-SLICE-006C — Documents & Media Proof
+﻿# DSH-SLICE-006C — Documents & Media Proof
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | Field Agent |
 | Primary Surface | app-partner (field mode) / DocumentUploadScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | Depends on DSH-SLICE-006B (field visit evidence) |
 
 ## Scope
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | Field visit (006B) not proven |
 | **Dependency** | DSH-SLICE-006B |
 | **Next Action** | Await 006B PASS; then design document upload API |

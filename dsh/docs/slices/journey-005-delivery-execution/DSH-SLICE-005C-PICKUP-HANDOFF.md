@@ -1,4 +1,4 @@
-# DSH-SLICE-005C — Pickup Handoff
+﻿# DSH-SLICE-005C — Pickup Handoff
 
 ## Identity
 | Field | Value |
@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / PickupScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | J-004 is not closed |
+| Current Status | PASS |
+| Blocking Reason | none — pickup API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -52,13 +52,14 @@
 
 ## Evidence and Gates
 - Runtime evidence: `tools/registry/runs/DSH_SLICE_005C_PICKUP_HANDOFF_FINAL_CLOSURE-20260605-045000/`
-- Visual evidence: yes, captain sheet state and phase transition verified (TypeScript verified)
-- Exit gate: 005B PASS + pickup API verified + runtime proof PASS
+- Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_order_detail.png`
+- Current-session code evidence: app-captain uses injectable `captainId` for pickup and normalizes preview order ids before calling the typed lifecycle client.
+- Exit gate: 005B PASS + pickup API verified + runtime proof PASS + app-captain device proof captured.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Slice Decision** | PASS |
+| **Reason** | Existing E2E evidence covers pickup; current session removed hardcoded captain identity from pickup flow and captured real app-captain device evidence. |
+| **Dependency** | 005B accept runtime state |
+| **Next Action** | none — monitor only for real partner handoff code integration |

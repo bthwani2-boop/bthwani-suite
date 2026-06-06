@@ -99,6 +99,7 @@ type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' |
 type DshCaptainPodState = NonNullable<React.ComponentProps<typeof DshCaptainPoDSubmissionScreen>['state']>;
 
 const CAPTAIN_POD_PLACEHOLDER_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+kG7wAAAAASUVORK5CYII=';
+const DSH_CAPTAIN_PREVIEW_ID = 'CAP-0041';
 
 const CAPTAIN_BOTTOM_NAV_ROUTES = new Set<DshCaptainRoute>([
   'home', 'map', 'inbox', 'account', 'account-finance', 'account-orders',
@@ -399,7 +400,11 @@ function CaptainAccountNavRow({
   );
 }
 
-export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
+function resolveRuntimeOrderId(orderId: string): string {
+  return orderId.startsWith('captain-order-') ? orderId.replace('captain-order-', '') : orderId;
+}
+
+export function DshCaptainSurface({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
   const {
     hydrated: appearanceHydrated,
@@ -443,10 +448,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   const orderLifecycleClient = React.useMemo(() => createDshOrderLifecycleHttpClient(apiBaseUrl), [apiBaseUrl]);
 
   const handleAcceptTask = React.useCallback(async (orderId: string) => {
-    const rawOrderId = orderId.replace('captain-order-', '');
+    const rawOrderId = resolveRuntimeOrderId(orderId);
     try {
       setInboxState('offer-accepting');
-      await orderLifecycleClient.acceptTask(rawOrderId, { captain_id: 'CAP-0041' });
+      await orderLifecycleClient.acceptTask(rawOrderId, { captain_id: captainId });
       setInboxState('offer-accepted');
       setActiveOrderId(orderId);
       setRoute('detail');
@@ -455,13 +460,13 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       console.error("Failed to accept task", err);
       setInboxState('error');
     }
-  }, [orderLifecycleClient]);
+  }, [captainId, orderLifecycleClient]);
 
   const handleDeclineConfirm = React.useCallback(async (orderId: string, reason: string) => {
-    const rawOrderId = orderId.replace('captain-order-', '');
+    const rawOrderId = resolveRuntimeOrderId(orderId);
     try {
       setDeclineSheetState('loading');
-      await orderLifecycleClient.declineTask(rawOrderId, { captain_id: 'CAP-0041', reason });
+      await orderLifecycleClient.declineTask(rawOrderId, { captain_id: captainId, reason });
       setDeclineSheetState('success');
       setTimeout(() => {
         setIsDeclineSheetVisible(false);
@@ -472,12 +477,12 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       console.error("Failed to decline task", err);
       setDeclineSheetState('error');
     }
-  }, [orderLifecycleClient]);
+  }, [captainId, orderLifecycleClient]);
   const routeHistoryRef = React.useRef<DshCaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
   const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021']!;
-  const activeOrderDisplayId = activeSummary.orderId.replace('captain-order-', '');
+  const activeOrderDisplayId = resolveRuntimeOrderId(activeSummary.orderId);
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
   const isCaptainAvailable = captainAvailabilityStatus === 'available';
   const isGpsEnabled = gpsStatus !== 'disabled';
@@ -600,15 +605,12 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
     setCaptainPodState('loading');
 
     try {
-      // Extract raw order ID (strip 'captain-order-' prefix used in preview mode)
-      const rawOrderId = activeOrderId.startsWith('captain-order-')
-        ? activeOrderId.replace('captain-order-', '')
-        : activeOrderId;
+      const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
       // DSH-SLICE-005E: submit proof-of-delivery. Transitions ARRIVED → DELIVERED.
       // WLT BOUNDARY: no payout mutation here. Payout is WLT responsibility post-DELIVERED.
       await orderLifecycleClient.deliverOrder(rawOrderId, {
-        captain_id: 'CAP-0041',
+        captain_id: captainId,
         pod_media_key: captainPodPhotoUri,
       });
 
@@ -622,18 +624,16 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       console.error("Failed to confirm delivery API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, captainPodPhotoUri, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainId, captainPodPhotoUri, orderLifecycleClient]);
 
   const reportPodFailure = React.useCallback(async () => {
-    const rawOrderId = activeOrderId.startsWith('captain-order-')
-      ? activeOrderId.replace('captain-order-', '')
-      : activeOrderId;
+    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
     try {
       // DSH-SLICE-005F: report delivery failure. Transitions ARRIVED → RETURNING_TO_STORE.
       // WLT BOUNDARY: no financial mutation. wlt_refund_trigger_ref (if any) is bridge ref only.
       await orderLifecycleClient.failDelivery(rawOrderId, {
-        captain_id: 'CAP-0041',
+        captain_id: captainId,
         failure_reason: 'CLIENT_UNREACHABLE',
         return_required: true,
       });
@@ -647,7 +647,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       console.error("Failed to report delivery failure API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainId, orderLifecycleClient]);
 
   const openCaptainSupportScreen = React.useCallback((screenId: CaptainSupportRoute) => {
     setSelectedSupportScreen(screenId);
@@ -663,10 +663,10 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
   }, []);
 
   const confirmPickup = React.useCallback(async () => {
-    const rawOrderId = activeOrderId.replace('captain-order-', '');
+    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
     try {
       setPickupSheetState('loading');
-      await orderLifecycleClient.confirmPickup(rawOrderId, { captain_id: 'CAP-0041' });
+      await orderLifecycleClient.confirmPickup(rawOrderId, { captain_id: captainId });
       setPickupSheetState('success');
       setTimeout(() => {
         setIsPickupSheetVisible(false);
@@ -687,12 +687,20 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       console.error("Failed to confirm pickup", err);
       setPickupSheetState('error');
     }
-  }, [activeOrderId, orderLifecycleClient]);
+  }, [activeOrderId, captainId, orderLifecycleClient]);
 
-  const confirmDelivery = React.useCallback(() => {
-    setInboxState('delivered');
-    setActiveOrderExpanded(false);
-  }, []);
+  const confirmDelivery = React.useCallback(async () => {
+    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
+
+    try {
+      await orderLifecycleClient.deliverOrder(rawOrderId, { captain_id: captainId });
+      setInboxState('delivered');
+      setActiveOrderExpanded(false);
+    } catch (err) {
+      console.error("Failed to confirm delivery", err);
+      setCaptainPodState('error');
+    }
+  }, [activeOrderId, captainId, orderLifecycleClient]);
 
   const sendQuickMessage = React.useCallback(() => {
     const text = activeOrderDraft.trim();
@@ -831,7 +839,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
       return (
         <DshCaptainMapScreen
           orderId={activeOrderId}
-          captainId="CAP-0041"
+          captainId={captainId}
           onBack={() => setRoute('detail')}
           orderLifecycleClient={orderLifecycleClient}
         />
@@ -852,7 +860,7 @@ export function DshCaptainSurface({ command }: DshCaptainSurfaceProps) {
           onBack={goBack}
           onRingBell={() => {
             // UI_PREVIEW_ONLY: bell event stub — no runtime dispatch, value is not used
-            void ({ orderId: activeOrderId, captainId: 'CAP-0041', timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
+            void ({ orderId: activeOrderId, captainId, timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
           }}
         />
       );

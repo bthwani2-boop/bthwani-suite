@@ -502,3 +502,156 @@ WHERE id = $1
 
 	return store, nil
 }
+
+// generateStoreID produces a time-based store ID consistent with the repo pattern.
+func generateStoreID() string {
+	return fmt.Sprintf("store-%d", time.Now().UnixNano())
+}
+
+func generateFieldVisitID() string {
+	return fmt.Sprintf("field-visit-%d", time.Now().UnixNano())
+}
+
+// CreateFieldStore — field agent submits a new store for review (J-006A).
+// The store is created with publish_stage='pending_review' and status_tone='closed'
+// so it is not visible to clients until the CP operator approves it (J-006E).
+func (repo *PostgresRepository) CreateFieldStore(ctx context.Context, req domain.CreateFieldStoreRequest) (domain.CreateFieldStoreResponse, error) {
+	if strings.TrimSpace(req.Name) == "" {
+		return domain.CreateFieldStoreResponse{}, fmt.Errorf("name is required")
+	}
+	if strings.TrimSpace(req.Address) == "" {
+		return domain.CreateFieldStoreResponse{}, fmt.Errorf("address is required")
+	}
+
+	id := generateStoreID()
+	var categoryID sql.NullString
+	if req.CategoryID != "" {
+		categoryID = sql.NullString{String: req.CategoryID, Valid: true}
+	}
+
+	query := `
+INSERT INTO dsh_store_discovery_stores (
+  id, name, address, category_id,
+  distance_label, delivery_label, service_label, status_label,
+  status_tone, has_offer, publish_stage,
+  supports_pickup, supports_partner_delivery,
+  search_text, created_at, updated_at
+) VALUES (
+  $1, $2, $3, $4,
+  '—', '—', '—', 'قيد المراجعة',
+  'closed', FALSE, 'pending_review',
+  $5, $6,
+  $7, NOW(), NOW()
+)
+RETURNING id, name, address, category_id, publish_stage, created_at`
+
+	searchText := strings.ToLower(req.Name + " " + req.Address)
+	var res domain.CreateFieldStoreResponse
+	var catIDResult sql.NullString
+	err := repo.db.QueryRowContext(ctx, query,
+		id, req.Name, req.Address, categoryID,
+		req.SupportsPickup, req.SupportsPartnerDelivery,
+		searchText,
+	).Scan(&res.ID, &res.Name, &res.Address, &catIDResult, &res.PublishStage, &res.CreatedAt)
+	if err != nil {
+		return domain.CreateFieldStoreResponse{}, err
+	}
+	if catIDResult.Valid {
+		res.CategoryID = catIDResult.String
+	}
+	return res, nil
+}
+
+// CreateFieldVisit — field agent submits visit notes and evidence media references (J-006B).
+// Raw media upload/document handling remains J-006C; this stores references only.
+func (repo *PostgresRepository) CreateFieldVisit(ctx context.Context, storeID string, req domain.CreateFieldVisitRequest) (domain.CreateFieldVisitResponse, error) {
+	storeID = strings.TrimSpace(storeID)
+	if storeID == "" {
+		return domain.CreateFieldVisitResponse{}, fmt.Errorf("store id is required")
+	}
+	if strings.TrimSpace(req.VisitSummary) == "" {
+		return domain.CreateFieldVisitResponse{}, fmt.Errorf("visit_summary is required")
+	}
+	if strings.TrimSpace(req.FollowUpAction) == "" {
+		return domain.CreateFieldVisitResponse{}, fmt.Errorf("follow_up_action is required")
+	}
+
+	var storeExists bool
+	if err := repo.db.QueryRowContext(ctx, `SELECT EXISTS (SELECT 1 FROM dsh_store_discovery_stores WHERE id = $1)`, storeID).Scan(&storeExists); err != nil {
+		return domain.CreateFieldVisitResponse{}, err
+	}
+	if !storeExists {
+		return domain.CreateFieldVisitResponse{}, fmt.Errorf("store not found")
+	}
+
+	id := generateFieldVisitID()
+	fieldAgentID := strings.TrimSpace(req.FieldAgentID)
+	evidenceMediaKeys := strings.Join(normalizeEvidenceMediaKeys(req.EvidenceMediaKeys), ",")
+	locationConfidence := strings.TrimSpace(req.LocationConfidence)
+
+	query := `
+INSERT INTO dsh_field_store_visits (
+  id, store_id, field_agent_id, visit_summary, follow_up_action,
+  evidence_media_keys, location_confidence, status, created_at, updated_at
+) VALUES (
+  $1, $2, NULLIF($3, ''), $4, $5,
+  $6, NULLIF($7, ''), 'submitted', NOW(), NOW()
+)
+RETURNING id, store_id, field_agent_id, visit_summary, follow_up_action, evidence_media_keys, location_confidence, status, created_at`
+
+	var res domain.CreateFieldVisitResponse
+	var resFieldAgentID sql.NullString
+	var resEvidenceMediaKeys string
+	var resLocationConfidence sql.NullString
+	err := repo.db.QueryRowContext(ctx, query,
+		id,
+		storeID,
+		fieldAgentID,
+		strings.TrimSpace(req.VisitSummary),
+		strings.TrimSpace(req.FollowUpAction),
+		evidenceMediaKeys,
+		locationConfidence,
+	).Scan(
+		&res.ID,
+		&res.StoreID,
+		&resFieldAgentID,
+		&res.VisitSummary,
+		&res.FollowUpAction,
+		&resEvidenceMediaKeys,
+		&resLocationConfidence,
+		&res.Status,
+		&res.CreatedAt,
+	)
+	if err != nil {
+		return domain.CreateFieldVisitResponse{}, err
+	}
+	res.FieldAgentID = nullableString(resFieldAgentID)
+	res.EvidenceMediaKeys = splitEvidenceMediaKeys(resEvidenceMediaKeys)
+	res.LocationConfidence = nullableString(resLocationConfidence)
+	return res, nil
+}
+
+func normalizeEvidenceMediaKeys(values []string) []string {
+	seen := map[string]struct{}{}
+	keys := []string{}
+	for _, value := range values {
+		key := strings.TrimSpace(value)
+		if key == "" {
+			continue
+		}
+		if _, exists := seen[key]; exists {
+			continue
+		}
+		seen[key] = struct{}{}
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+func splitEvidenceMediaKeys(value string) []string {
+	if strings.TrimSpace(value) == "" {
+		return nil
+	}
+	parts := strings.Split(value, ",")
+	return normalizeEvidenceMediaKeys(parts)
+}

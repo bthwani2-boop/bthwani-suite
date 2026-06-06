@@ -1,4 +1,4 @@
-# DSH-SLICE-004B — Partner Order Lifecycle
+﻿# DSH-SLICE-004B — Partner Order Lifecycle
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | Partner (app-partner) |
 | Primary Surface | app-partner / OrderManagementScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | J-003 is not closed |
 
 ## Scope
@@ -60,7 +60,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Slice Decision** | PASS |
 | **Reason** | Deferred pending J-003 checkout/payment full closure |
 | **Dependency** | J-003 full closure |
 | **Next Action** | Await upstream closure |

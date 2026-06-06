@@ -32,6 +32,8 @@ tags:
     description: Conflict detection and resolution audit entries for catalog governance.
   - name: Store Discovery
     description: Client-facing store list and store details discovery endpoints.
+  - name: Field Readiness
+    description: Field onboarding, visit evidence references, and readiness handoff endpoints.
   - name: Store Visibility
     description: Store publication, visibility, and client exposure controls.
   - name: Checkout
@@ -624,6 +626,40 @@ paths:
 
   # ─── J-001 / Store Discovery ───────────────────────────────────────────────
   /stores:
+    post:
+      tags:
+        - Store Discovery
+      summary: Create field store onboarding file
+      description: Create a new field-collected store file and place it in pending review without financial mutation.
+      operationId: createFieldStore
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldStoreRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFieldStoreResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
     get:
 
       tags:
@@ -716,6 +752,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscoveryStoreDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/field-visits:
+    post:
+      tags:
+        - Field Readiness
+      summary: Submit field visit evidence references
+      description: Submit field visit notes and evidence media key references for an onboarded store. Raw media upload and document proof stay in the downstream media slice.
+      operationId: createFieldVisit
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldVisitRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFieldVisitResponse'
         '400':
           description: Bad Request
           content:
@@ -2096,6 +2180,106 @@ components:
               type: integer
             total:
               type: integer
+    CreateFieldStoreRequest:
+      type: object
+      required:
+        - name
+        - address
+        - supports_pickup
+        - supports_partner_delivery
+      properties:
+        name:
+          type: string
+          minLength: 1
+        address:
+          type: string
+          minLength: 1
+        category_id:
+          type: string
+        supports_pickup:
+          type: boolean
+        supports_partner_delivery:
+          type: boolean
+
+    CreateFieldStoreResponse:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - publish_stage
+        - created_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        category_id:
+          type: string
+        publish_stage:
+          type: string
+          example: pending_review
+        created_at:
+          type: string
+          format: date-time
+
+    CreateFieldVisitRequest:
+      type: object
+      required:
+        - visit_summary
+        - follow_up_action
+      properties:
+        field_agent_id:
+          type: string
+        visit_summary:
+          type: string
+          minLength: 1
+        follow_up_action:
+          type: string
+          minLength: 1
+        evidence_media_keys:
+          type: array
+          description: Media key references only; raw uploads are governed by the downstream media/documents slice.
+          items:
+            type: string
+        location_confidence:
+          type: string
+
+    CreateFieldVisitResponse:
+      type: object
+      required:
+        - id
+        - store_id
+        - visit_summary
+        - follow_up_action
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        field_agent_id:
+          type: string
+        visit_summary:
+          type: string
+        follow_up_action:
+          type: string
+        evidence_media_keys:
+          type: array
+          items:
+            type: string
+        location_confidence:
+          type: string
+        status:
+          type: string
+          enum: [submitted]
+        created_at:
+          type: string
+          format: date-time
+
     DiscoveryStore:
       type: object
       required:

@@ -285,7 +285,7 @@ export function DshFieldStoreVisitScreen({
           <Box gap={3} paddingVertical={2}>
             <SectionHeader
               title="التقاط أدلة الزيارة"
-              subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقف."
+              subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
             />
             <VisitEvidenceSection sectionState="ready" />
           </Box>

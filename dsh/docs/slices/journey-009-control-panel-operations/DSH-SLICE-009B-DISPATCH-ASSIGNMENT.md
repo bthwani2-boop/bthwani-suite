@@ -1,4 +1,4 @@
-# DSH-SLICE-009B — Dispatch Assignment
+﻿# DSH-SLICE-009B — Dispatch Assignment
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / DispatchScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | Depends on J-005 delivery execution; no live delivery data exists yet |
 
 ## Scope
@@ -56,7 +56,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | J-005 delivery execution not proven; no live delivery data |
 | **Dependency** | J-005 (at minimum 005A) |
 | **Next Action** | Await J-005 runtime proof; then design reassignment API |

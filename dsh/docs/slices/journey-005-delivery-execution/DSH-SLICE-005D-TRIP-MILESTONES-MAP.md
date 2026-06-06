@@ -1,4 +1,4 @@
-# DSH-SLICE-005D — Trip Milestones & Map
+﻿# DSH-SLICE-005D — Trip Milestones & Map
 
 ## Identity
 | Field | Value |
@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) / Client (app-client) |
 | Primary Surface | app-captain / DshCaptainMapScreen; app-client / DshClientSurface (order tracking) |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | J-004 is not closed |
+| Current Status | PASS |
+| Blocking Reason | none — location API/client binding and app-captain map device evidence captured |
 
 ## Scope
 ### Included
@@ -61,13 +61,14 @@
 - Event audit: 8 status events verified end-to-end in postgres (NONE→CREATED→ACCEPTED→READY_FOR_PICKUP→ACCEPTED_BY_CAPTAIN→PICKED_UP→EN_ROUTE→ARRIVED)
 - Go tests: `go test -count=1 ./...` — all packages PASS
 - TypeScript: `pnpm exec tsc --noEmit` — zero errors
-- Visual evidence: DshCaptainMapScreen.tsx wired to pushLocation; DshCaptainSurface.tsx passes orderId + orderLifecycleClient
+- Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_launch.png`
+- Current-session code evidence: DshCaptainSurface passes injectable `captainId` and typed order lifecycle client to DshCaptainMapScreen.
 - Exit gate: 005C PASS ✓ + location endpoints verified ✓ + postgres coordinates stored ✓ + runtime proof ✓
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Slice Decision** | PASS |
+| **Reason** | Existing E2E evidence covers location milestones; current session confirmed app-captain map runtime on a connected Android device. |
+| **Dependency** | 005C pickup runtime state |
+| **Next Action** | none — monitor only for live GPS provider substitution |

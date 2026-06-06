@@ -1251,3 +1251,102 @@ ORDER BY updated_at DESC`
 	}
 	return orders, nil
 }
+
+// ListAllSupportEscalations — global escalation list for CP operator view (J-009C).
+func (repo *PostgresRepository) ListAllSupportEscalations(ctx context.Context, query domain.ListAllSupportEscalationsQuery) (domain.ListAllSupportEscalationsResponse, error) {
+	args := []any{}
+	where := []string{}
+
+	if query.Status != "" {
+		args = append(args, query.Status)
+		where = append(where, fmt.Sprintf("status = $%d", len(args)))
+	}
+
+	whereClause := ""
+	if len(where) > 0 {
+		whereClause = "WHERE " + where[0]
+	}
+
+	limit := query.Limit
+	if limit <= 0 || limit > 100 {
+		limit = 50
+	}
+	offset := query.Offset
+	if offset < 0 {
+		offset = 0
+	}
+
+	countArgs := append([]any{}, args...)
+	var total int
+	countQ := fmt.Sprintf("SELECT COUNT(*) FROM dsh_support_escalations %s", whereClause)
+	if err := repo.db.QueryRowContext(ctx, countQ, countArgs...).Scan(&total); err != nil {
+		return domain.ListAllSupportEscalationsResponse{}, err
+	}
+
+	args = append(args, limit, offset)
+	listQ := fmt.Sprintf(`
+SELECT id, order_id, actor, issue_type, description, status, created_at, resolved_at
+FROM dsh_support_escalations %s
+ORDER BY created_at DESC
+LIMIT $%d OFFSET $%d`, whereClause, len(args)-1, len(args))
+
+	rows, err := repo.db.QueryContext(ctx, listQ, args...)
+	if err != nil {
+		return domain.ListAllSupportEscalationsResponse{}, err
+	}
+	defer rows.Close()
+
+	var tickets []domain.SupportEscalationRecord
+	for rows.Next() {
+		var esc domain.SupportEscalationRecord
+		var resolvedAt sql.NullTime
+		if err := rows.Scan(&esc.ID, &esc.OrderID, &esc.Actor, &esc.IssueType, &esc.Description, &esc.Status, &esc.CreatedAt, &resolvedAt); err != nil {
+			return domain.ListAllSupportEscalationsResponse{}, err
+		}
+		if resolvedAt.Valid {
+			esc.ResolvedAt = &resolvedAt.Time
+		}
+		tickets = append(tickets, esc)
+	}
+	if err := rows.Err(); err != nil {
+		return domain.ListAllSupportEscalationsResponse{}, err
+	}
+	if tickets == nil {
+		tickets = []domain.SupportEscalationRecord{}
+	}
+	return domain.ListAllSupportEscalationsResponse{Tickets: tickets, Total: total}, nil
+}
+
+// UpdateSupportEscalation — operator updates escalation status (J-009C).
+func (repo *PostgresRepository) UpdateSupportEscalation(ctx context.Context, id string, status string) (domain.SupportEscalationRecord, error) {
+	if status != "in-review" && status != "resolved" {
+		return domain.SupportEscalationRecord{}, fmt.Errorf("status must be 'in-review' or 'resolved'")
+	}
+
+	var resolvedAt sql.NullTime
+	if status == "resolved" {
+		resolvedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	}
+
+	query := `
+UPDATE dsh_support_escalations
+SET status = $1, resolved_at = $2
+WHERE id = $3
+RETURNING id, order_id, actor, issue_type, description, status, created_at, resolved_at`
+
+	var rec domain.SupportEscalationRecord
+	var ra sql.NullTime
+	err := repo.db.QueryRowContext(ctx, query, status, resolvedAt, id).Scan(
+		&rec.ID, &rec.OrderID, &rec.Actor, &rec.IssueType, &rec.Description, &rec.Status, &rec.CreatedAt, &ra,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return domain.SupportEscalationRecord{}, fmt.Errorf("escalation %s not found", id)
+		}
+		return domain.SupportEscalationRecord{}, err
+	}
+	if ra.Valid {
+		rec.ResolvedAt = &ra.Time
+	}
+	return rec, nil
+}

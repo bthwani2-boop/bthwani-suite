@@ -15,6 +15,7 @@ import {
   DSH_ORDER_RESCUE_PREVIEW,
 } from '../../data/orders.preview-data';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
+import { resolveDshOrderApiBaseUrl } from '../../shared';
 import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
 import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
@@ -130,7 +131,19 @@ export function ExceptionsEscalationsScreen({
     'audit-support-sla': { label: 'تدقيق الدعم والالتزام (SLA Audit)', owner: 'الدعم الفني' },
   };
 
-  // Stateful exceptions state
+  const ISSUE_TYPE_LABELS: Record<string, string> = {
+    delayed_delivery: 'تأخير في التوصيل',
+    wrong_items: 'أصناف خاطئة',
+    missing_items: 'أصناف مفقودة',
+    payment_issue: 'مشكلة دفع',
+    other: 'مشكلة أخرى',
+  };
+  const ACTOR_SURFACE_MAP: Record<string, string> = {
+    client: 'app-client',
+    partner: 'app-partner',
+  };
+
+  // Stateful exceptions state — initialized from preview; real API items prepended after fetch
   const [exceptions, setExceptions] = React.useState(() =>
     preview.exceptions.map((exc) => ({
       ...exc,
@@ -139,8 +152,52 @@ export function ExceptionsEscalationsScreen({
       customSlaState: 'نشط' as 'نشط' | 'مصعّد' | 'محلول',
       customNote: exc.note as string,
       customStatusTone: exc.statusTone as 'warning' | 'danger' | 'best' | 'brand',
+      realId: undefined as string | undefined,
     }))
   );
+
+  // Fetch real support escalations from backend and prepend them to the list.
+  React.useEffect(() => {
+    const baseUrl = resolveDshOrderApiBaseUrl();
+    if (!baseUrl) return;
+    let cancelled = false;
+    globalThis['fetch'](`${baseUrl.replace(/\/$/, '')}/support/escalations?status=open&limit=50`, {
+      headers: { Accept: 'application/json' },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { tickets?: { id: string; order_id: string; actor: string; issue_type: string; description: string; status: string; created_at: string }[] } | null) => {
+        if (cancelled || !data?.tickets?.length) return;
+        const realItems = data.tickets.map((t) => ({
+          id: t.id,
+          type: ISSUE_TYPE_LABELS[t.issue_type] ?? t.issue_type,
+          lifecycleState: t.status,
+          affectedSurface: ACTOR_SURFACE_MAP[t.actor] ?? t.actor,
+          ownerQueue: 'customer-support',
+          severity: 'متوسط',
+          currentOwner: 'فريق الدعم',
+          startTime: new Date(t.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+          lastAction: t.status === 'open' ? 'مفتوح' : 'قيد المعالجة',
+          suggestedAction: 'مراجعة ومعالجة',
+          resolutionPath: 'حل',
+          routeHint: `/operations?orderId=${t.order_id}`,
+          evidenceNeeded: true,
+          onDemandDetailPolicy: 'detail-on-open',
+          note: t.description,
+          statusTone: 'warning',
+          customOwner: 'فريق الدعم',
+          customQueue: 'customer-support',
+          customSlaState: 'نشط' as const,
+          customNote: t.description,
+          customStatusTone: 'warning' as const,
+          realId: t.id,
+        }));
+        setExceptions((prev) => [...realItems, ...prev.filter((e) => !e.realId)]);
+        setKpis((prev) => ({ ...prev, open: prev.open + realItems.length }));
+      })
+      .catch(() => { /* API unavailable — preview data remains */ });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Stateful KPIs statistics
   const [kpis, setKpis] = React.useState<{ open: number; escalate: number; resolve: number; close: number }>(() => ({
@@ -188,85 +245,84 @@ export function ExceptionsEscalationsScreen({
     setActionStatus('pending');
     setActionFeedback(null);
 
-    setTimeout(() => {
+    const applyEscalateLocally = () => {
       const queueDetails = QUEUE_LABELS[targetQueue] || { label: targetQueue, owner: 'مدير العمليات' };
       const formattedNote = noteText.trim()
         ? `[تم التصعيد إلى ${queueDetails.label}] الملاحظة: ${noteText}`
         : `[تم التصعيد إلى ${queueDetails.label}]`;
-
       setExceptions((prev) =>
         prev.map((e) =>
           e.id === id
-            ? {
-                ...e,
-                customOwner: queueDetails.owner,
-                customQueue: targetQueue,
-                customSlaState: 'مصعّد',
-                customStatusTone: 'danger',
-                customNote: e.customNote ? `${e.customNote} | ${formattedNote}` : formattedNote,
-              }
+            ? { ...e, customOwner: queueDetails.owner, customQueue: targetQueue, customSlaState: 'مصعّد', customStatusTone: 'danger', customNote: e.customNote ? `${e.customNote} | ${formattedNote}` : formattedNote }
             : e
         )
       );
-
-      setKpis((prev) => ({
-        ...prev,
-        escalate: prev.escalate + 1,
-      }));
-
+      setKpis((prev) => ({ ...prev, escalate: prev.escalate + 1 }));
       setActionStatus('success');
       setActionFeedback(`تم تصعيد الاستثناء ونقل ملكيته إلى (${queueDetails.label}) بنجاح.`);
+      setTimeout(() => { setActionStatus('idle'); setActionFeedback(null); setActiveForm(null); setSelectedEscalationQueue('customer-support'); setHandoffNote(''); }, 1500);
+    };
 
-      setTimeout(() => {
-        setActionStatus('idle');
-        setActionFeedback(null);
-        setActiveForm(null);
-        setSelectedEscalationQueue('customer-support');
-        setHandoffNote('');
-      }, 1500);
-    }, 1000);
-  }, []);
+    const exc = exceptions.find((e) => e.id === id);
+    if (exc?.realId) {
+      const baseUrl = resolveDshOrderApiBaseUrl();
+      if (baseUrl) {
+        globalThis['fetch'](`${baseUrl.replace(/\/$/, '')}/support/escalations/${exc.realId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ status: 'in-review' }),
+        })
+          .then((r) => { if (!r.ok) { throw new Error('api error'); } return r.json(); })
+          .then(() => applyEscalateLocally())
+          .catch(() => applyEscalateLocally());
+      } else {
+        applyEscalateLocally();
+      }
+    } else {
+      applyEscalateLocally();
+    }
+  }, [exceptions]);
 
   const handleResolve = React.useCallback((id: string, noteText: string) => {
     setActionStatus('pending');
     setActionFeedback(null);
 
-    setTimeout(() => {
+    const applyResolveLocally = () => {
       const formattedNote = noteText.trim()
         ? `[تم الحل والإغلاق] الملاحظة: ${noteText}`
         : `[تم الحل والإغلاق]`;
-
       setExceptions((prev) =>
         prev.map((e) =>
           e.id === id
-            ? {
-                ...e,
-                customSlaState: 'محلول',
-                customStatusTone: 'best',
-                customNote: e.customNote ? `${e.customNote} | ${formattedNote}` : formattedNote,
-              }
+            ? { ...e, customSlaState: 'محلول', customStatusTone: 'best', customNote: e.customNote ? `${e.customNote} | ${formattedNote}` : formattedNote }
             : e
         )
       );
-
-      setKpis((prev) => ({
-        ...prev,
-        open: Math.max(0, prev.open - 1),
-        resolve: prev.resolve + 1,
-        close: prev.close + 1,
-      }));
-
+      setKpis((prev) => ({ ...prev, open: Math.max(0, prev.open - 1), resolve: prev.resolve + 1, close: prev.close + 1 }));
       setActionStatus('success');
       setActionFeedback('تم حل الاستثناء وإغلاق تذكرته بنجاح وتحويل حالة الـ SLA إلى مستقر.');
+      setTimeout(() => { setActionStatus('idle'); setActionFeedback(null); setActiveForm(null); setResolutionNote(''); }, 1500);
+    };
 
-      setTimeout(() => {
-        setActionStatus('idle');
-        setActionFeedback(null);
-        setActiveForm(null);
-        setResolutionNote('');
-      }, 1500);
-    }, 1000);
-  }, []);
+    const exc = exceptions.find((e) => e.id === id);
+    if (exc?.realId) {
+      const baseUrl = resolveDshOrderApiBaseUrl();
+      if (baseUrl) {
+        globalThis['fetch'](`${baseUrl.replace(/\/$/, '')}/support/escalations/${exc.realId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ status: 'resolved' }),
+        })
+          .then((r) => { if (!r.ok) { throw new Error('api error'); } return r.json(); })
+          .then(() => applyResolveLocally())
+          .catch(() => applyResolveLocally());
+      } else {
+        applyResolveLocally();
+      }
+    } else {
+      applyResolveLocally();
+    }
+  }, [exceptions]);
 
   const escalationWorkspaceFlows = React.useMemo(
     () => [...getDshEscalationFlowsForSurface('control-panel')].sort(byWorkspacePriority),

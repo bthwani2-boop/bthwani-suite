@@ -1,4 +1,4 @@
-# DSH-SLICE-005E — Proof of Delivery
+﻿# DSH-SLICE-005E — Proof of Delivery
 
 ## Identity
 | Field | Value |
@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen |
 | WLT Boundary | No finance mutation — payout is WLT responsibility after DELIVERED event |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | J-004 is not closed |
+| Current Status | PASS |
+| Blocking Reason | none — delivery API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -60,11 +60,13 @@
 - Guard evidence: wrong captain → 403, idempotency → 409, missing captain_id → 400
 - WLT boundary: zero financial mutation confirmed in E2E
 - Session: `DSH_SLICE_005E_PROOF_OF_DELIVERY_FINAL_CLOSURE-20260605-052100`
+- Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_order_detail.png`
+- Current-session code evidence: app-captain uses injectable `captainId` for delivery confirmation and PoD submission through the typed lifecycle client.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
+| **Slice Decision** | PASS |
+| **Reason** | Existing E2E evidence covers delivery and PoD persistence; current session removed hardcoded captain identity from PoD/delivery callbacks and captured real app-captain device evidence. |
 | **WLT Boundary** | Confirmed — no financial mutation in DSH. Payout is WLT responsibility after DELIVERED. |
-| **Next Action** | Await upstream closure |
+| **Next Action** | none — WLT payout remains outside DSH and must be proven in WLT scope only |

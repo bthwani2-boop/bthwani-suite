@@ -37,6 +37,7 @@ export type DshCaptainNavigationCommand = {
 
 export type DshCaptainSurfaceProps = {
   command: DshCaptainNavigationCommand;
+  captainId?: string;
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
 };

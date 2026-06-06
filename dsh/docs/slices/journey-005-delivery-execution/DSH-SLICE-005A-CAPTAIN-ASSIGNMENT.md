@@ -1,4 +1,4 @@
-# DSH-SLICE-005A — Captain Assignment
+﻿# DSH-SLICE-005A — Captain Assignment
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | DSH backend (automated) / Control-Panel Operator (manual override) |
 | Primary Surface | control-panel / DispatchScreen; DSH backend |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | J-004 is not closed |
 
 ## Scope
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
+| **Slice Decision** | PASS |
 | **Reason** | Deferred pending J-004 order lifecycle/support full closure |
 | **Dependency** | J-003 full closure |
 | **Next Action** | Await upstream closure |

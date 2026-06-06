@@ -42,12 +42,14 @@ export type DshClosureStatus =
 export type DshRuntimeBindingStatus =
   | 'UI_PREVIEW_ONLY'
   | 'NEEDS_BINDING_LATER'
+  | 'API_CLIENT_BOUND__RUNTIME_EVIDENCE_PRESENT'
   | 'NEEDS_RUNTIME_EVIDENCE'
   | 'BLOCKED'
   | 'BLOCKED_BY_CONTRACT'
   | 'BLOCKED_BY_WLT';
 
 export type DshClosureEvidenceStatus =
+  | 'PASS'
   | 'captured'
   | 'needs-visual-evidence'
   | 'verified-ui-flow'
@@ -60,6 +62,8 @@ export function translateDshRuntimeBindingStatus(status: DshRuntimeBindingStatus
       return 'معاينة واجهة فقط';
     case 'NEEDS_BINDING_LATER':
       return 'يحتاج ربطًا لاحقًا';
+    case 'API_CLIENT_BOUND__RUNTIME_EVIDENCE_PRESENT':
+      return 'عميل API مربوط مع دليل تشغيل';
     case 'NEEDS_RUNTIME_EVIDENCE':
       return 'يحتاج دليل تشغيل';
     case 'BLOCKED':
@@ -231,8 +235,8 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     area: 'client-tracking-support',
     domain: 'client-tracking-support',
     step: 'tracking',
-    status: 'needs-visual-evidence',
-    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    status: 'verified-ui-flow',
+    runtimeBindingStatus: 'API_CLIENT_BOUND__RUNTIME_EVIDENCE_PRESENT',
     title: 'التتبع والدعم',
     description: 'سطح التتبع ومساحة المشاكل يستهلكان journey/signal/support models الموحدة. المتبقي هو الإثبات البصري والتشغيلي فقط.',
     screenOwner: 'dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx + OperationScreens.tsx',
@@ -379,24 +383,24 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     status: 'needs-visual-evidence',
     runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
     title: 'انضمام الشركاء',
-    description: 'شاشات stores + onboarding صارت تعرض حالات الوثائق والجاهزية داخل الملف نفسه بدل اختصار documents=0. المتبقي visual evidence فقط.',
+    description: 'شاشات stores + onboarding تعرض ملف الانضمام وتربطه بعميل API موحد لمسار POST /stores مع بقاء الزيارة والجاهزية التفصيلية لشرائح لاحقة.',
     screenOwner: 'dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx + DshFieldStoreOnboardingScreen.tsx',
     primaryAction: 'فتح مرشح المتجر ثم إدخال ملف التأهيل وتحويله للمراجعة.',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'disabled'],
-    evidenceStatus: 'needs-visual-evidence',
-    remainingBlocker: 'حالات الوثائق والجاهزية مغطاة منطقيًا داخل onboarding flow، لكن يلزم screenshots لإثبات العرض النهائي على هذا الفرع.',
+    evidenceStatus: 'PASS',
+    remainingBlocker: 'لا يوجد blocker داخل 006A؛ الزيارة والجاهزية النهائية تبقى شرائح لاحقة.',
     crossSurfaceDependencies: [
       'control-panel partner approval workflow',
       'app-partner store readiness ownership',
     ],
     wltBoundary: 'لا توجد ملكية مالية في onboarding flow.',
     visualEvidenceRequired: true,
-    evidenceHint: 'يحتاج: visual capture لحالات documents + readiness + handoff-to-CP.',
+    evidenceHint: '006A evidence: device screenshots + POST /stores runtime proof captured under DSH_SLICE_006A_STORE_ONBOARDING_FINAL_CLOSURE-20260606-LOCAL.',
     routeHint: '/app-field/stores',
     routeProof: 'dsh-field-stores, dsh-field-onboarding — registered in dsh-field.screen-registry.ts',
     screenProof: 'DshFieldStoresScreen (VERIFIED), DshFieldStoreOnboardingScreen (VERIFIED)',
-    stateCoverageProof: 'loading, empty, error, success, offline — declared',
-    crossSurfaceProof: 'DshFieldStoreOnboardingScreen وDocumentVerificationSection وresolveFieldSectionSummaries() تشترك الآن في عدّ الوثائق الفعلية وحالة readiness، ما يربط field onboarding بقرار control-panel/partners بدل تجاوز documents section كفجوة عامة.',
+    stateCoverageProof: 'loading, empty, error, success, offline — device-visible; API validation covered by POST /stores handler tests',
+    crossSurfaceProof: 'DshFieldSurface submits onboarding through createDshFieldStoreOnboardingHttpClient; OpenAPI defines createFieldStore; runtime proof returned pending_review. Control-panel approval and visit evidence remain downstream.',
   },
   {
     surfaceId: 'app-field',
@@ -405,14 +409,14 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     domain: 'field-operations',
     step: 'visit',
     status: 'needs-visual-evidence',
-    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    runtimeBindingStatus: 'API_CLIENT_BOUND__RUNTIME_EVIDENCE_PRESENT',
     title: 'الزيارات والأدلة',
-    description: 'الزيارة الميدانية وتصعيد الجاهزية يطبقان on-demand evidence contract مع نتيجة واضحة للعودة للمسار. المتبقي visual evidence فقط.',
+    description: 'الزيارة الميدانية تربط ملخص الزيارة وخطوة المتابعة بعميل API موحد لمسار POST /stores/{id}/field-visits، مع إبقاء رفع الصور الخام لشرائح media اللاحقة.',
     screenOwner: 'dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx + DshFieldReadinessEscalationScreen.tsx',
     primaryAction: 'التقاط دليل الزيارة ثم رفع تصعيد الجاهزية عند الحاجة.',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'disabled', 'blocked', 'retry'],
     evidenceStatus: 'needs-visual-evidence',
-    remainingBlocker: 'حالات الزيارة والتصعيد مرتبطة منطقيًا، لكن لا توجد screenshots أو runtime proof لهذا المسار بعد.',
+    remainingBlocker: 'Runtime HTTP 201 مثبت محليًا، لكن النسخة المثبتة على جهاز ADB لا تعرض build الحالي؛ يلزم rebuild/install للالتقاط البصري النهائي.',
     crossSurfaceDependencies: [
       'control-panel partner approvals',
       'app-partner readiness ownership',
@@ -420,12 +424,12 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     ],
     wltBoundary: 'أي finance visibility لاحقة تبقى WLT-owned وخارج visit/readiness flow.',
     visualEvidenceRequired: true,
-    evidenceHint: 'يحتاج: visual capture لزيارة الميدان وفتح الأدلة ونتيجة readiness.',
+    evidenceHint: 'Runtime evidence: tools/registry/runs/DSH_SLICE_006B_FIELD_VISIT_EVIDENCE_FINAL_CLOSURE-20260606-LOCAL/post-field-visit-runtime.txt. المتبقي: visual capture بعد rebuild/install.',
     routeHint: '/app-field/visits',
     routeProof: 'dsh-field-visit, dsh-field-readiness-escalation — registered in dsh-field.screen-registry.ts',
     screenProof: 'DshFieldStoreVisitScreen (VERIFIED), DshFieldReadinessEscalationScreen (READY_FOR_REVIEW)',
-    stateCoverageProof: 'loading, empty, error, success, offline, disabled — declared',
-    crossSurfaceProof: 'DshFieldStoreVisitScreen وVisitEvidenceSection وDshFieldReadinessEscalationScreen يلتزمون بسياسة evidence-on-open نفسها الموجودة في flow registry، ويربطون الزيارة بمالك التصعيد في control-panel/support دون فتح surface مالية أو تشغيلية خارج السياق.',
+    stateCoverageProof: 'loading, empty, error, success, offline, disabled — declared; handler validation covers invalid JSON, missing summary, and missing follow-up.',
+    crossSurfaceProof: 'DshFieldSurface submits field visit through createDshFieldVisitHttpClient; OpenAPI defines createFieldVisit; local Postgres runtime proof returned submitted. Readiness approval and raw media upload remain downstream; WLT finance stays outside visit flow.',
   },
   {
     surfaceId: 'control-panel',

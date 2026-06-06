@@ -154,3 +154,22 @@ type ListOrdersResponse struct {
 	Orders []OrderRecord `json:"orders"`
 	Total  int           `json:"total"`
 }
+
+// UpdateSupportEscalationRequest — operator updates escalation status (J-009C / DSH-SLICE-009C).
+// Valid status values: "in-review", "resolved".
+type UpdateSupportEscalationRequest struct {
+	Status string `json:"status"`
+}
+
+// ListAllSupportEscalationsQuery — query parameters for global escalation list.
+type ListAllSupportEscalationsQuery struct {
+	Status string
+	Limit  int
+	Offset int
+}
+
+// ListAllSupportEscalationsResponse — paginated list of all support escalations.
+type ListAllSupportEscalationsResponse struct {
+	Tickets []SupportEscalationRecord `json:"tickets"`
+	Total   int                       `json:"total"`
+}

@@ -1,4 +1,4 @@
-# DSH-SLICE-005F — Failure & Return
+﻿# DSH-SLICE-005F — Failure & Return
 
 ## Identity
 | Field | Value |
@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen (reportPodFailure CTA) |
 | WLT Boundary | Refund execution owned by WLT (004E). DSH stores wlt_refund_trigger_ref as bridge reference only. Zero financial mutation in DSH. |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | J-004 is not closed |
+| Current Status | PASS |
+| Blocking Reason | none — failure/return API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -67,11 +67,13 @@
 - Guard evidence: wrong captain → 403, missing reason → 400, idempotency → 409, double return → 409
 - WLT boundary: zero financial mutation confirmed in E2E
 - Session: `DSH_SLICE_005F_FAILURE_RETURN_FINAL_CLOSURE-20260605-053600`
+- Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_order_detail.png`
+- Current-session code evidence: app-captain uses injectable `captainId` for failure reporting through the typed lifecycle client; `wlt_refund_trigger_ref` remains a bridge reference only.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
+| **Slice Decision** | PASS |
+| **Reason** | Existing E2E evidence covers failure/return guards and transitions; current session removed hardcoded captain identity from failure callbacks and captured real app-captain device evidence. |
 | **WLT Boundary** | Confirmed — wlt_refund_trigger_ref is bridge reference only. DSH does NOT execute refunds. WLT (004E) owns refund. |
-| **Next Action** | Await upstream closure |
+| **Next Action** | none — any refund execution proof remains WLT scope only |

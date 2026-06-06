@@ -219,6 +219,86 @@ func TestStoresHandlerValidationAndErrorCases(t *testing.T) {
 	}
 }
 
+func TestCreateFieldStoreValidationAndRepositoryFailure(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores", bytes.NewReader([]byte("{")))
+	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSONResp := httptest.NewRecorder()
+	handler.ServeHTTP(invalidJSONResp, invalidJSON)
+	if invalidJSONResp.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid JSON to return 400, got %d", invalidJSONResp.Code)
+	}
+
+	missingName := createFieldStore(t, handler, domain.CreateFieldStoreRequest{
+		Address:                 "Haddah Street",
+		SupportsPickup:          false,
+		SupportsPartnerDelivery: true,
+	})
+	if missingName.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing name to return 400, got %d", missingName.Code)
+	}
+
+	missingAddress := createFieldStore(t, handler, domain.CreateFieldStoreRequest{
+		Name:                    "Field Intake Store",
+		SupportsPickup:          false,
+		SupportsPartnerDelivery: true,
+	})
+	if missingAddress.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing address to return 400, got %d", missingAddress.Code)
+	}
+
+	validMemoryFallback := createFieldStore(t, handler, domain.CreateFieldStoreRequest{
+		Name:                    "Field Intake Store",
+		Address:                 "Haddah Street",
+		CategoryID:              "grocery",
+		SupportsPickup:          false,
+		SupportsPartnerDelivery: true,
+	})
+	if validMemoryFallback.Code != http.StatusInternalServerError {
+		t.Fatalf("expected memory repository fallback to return 500, got %d", validMemoryFallback.Code)
+	}
+}
+
+func TestCreateFieldVisitValidationAndRepositoryFailure(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores/store-1001/field-visits", bytes.NewReader([]byte("{")))
+	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSONResp := httptest.NewRecorder()
+	handler.ServeHTTP(invalidJSONResp, invalidJSON)
+	if invalidJSONResp.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid JSON to return 400, got %d", invalidJSONResp.Code)
+	}
+
+	missingSummary := createFieldVisit(t, handler, "store-1001", domain.CreateFieldVisitRequest{
+		FollowUpAction: "Confirm owner approval",
+	})
+	if missingSummary.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing visit_summary to return 400, got %d", missingSummary.Code)
+	}
+
+	missingFollowUp := createFieldVisit(t, handler, "store-1001", domain.CreateFieldVisitRequest{
+		VisitSummary: "Store front and owner availability confirmed",
+	})
+	if missingFollowUp.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing follow_up_action to return 400, got %d", missingFollowUp.Code)
+	}
+
+	validMemoryFallback := createFieldVisit(t, handler, "store-1001", domain.CreateFieldVisitRequest{
+		FieldAgentID:       "field-local",
+		VisitSummary:       "Store front and owner availability confirmed",
+		FollowUpAction:     "Confirm owner approval",
+		EvidenceMediaKeys:  []string{"field.visit.front.v1", "field.visit.owner-note.v1"},
+		LocationConfidence: "manual_confirmed",
+	})
+	if validMemoryFallback.Code != http.StatusInternalServerError {
+		t.Fatalf("expected memory repository fallback to return 500, got %d", validMemoryFallback.Code)
+	}
+}
+
 func getStores(t *testing.T, target string) *httptest.ResponseRecorder {
 	t.Helper()
 
@@ -229,6 +309,38 @@ func getStores(t *testing.T, target string) *httptest.ResponseRecorder {
 
 	handler.ServeHTTP(response, request)
 
+	return response
+}
+
+func createFieldVisit(t *testing.T, handler *StoresHandler, storeID string, body domain.CreateFieldVisitRequest) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/stores/"+storeID+"/field-visits", bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+	return response
+}
+
+func createFieldStore(t *testing.T, handler *StoresHandler, body domain.CreateFieldStoreRequest) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/stores", bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
 	return response
 }
 

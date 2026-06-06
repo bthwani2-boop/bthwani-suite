@@ -371,6 +371,7 @@
     "dsh/frontend/app-partner/dsh-partner.navigation-bridge.ts",
     "dsh/frontend/app-captain/DshCaptainSurface.tsx",
     "dsh/frontend/app-client/DshClientSurface.tsx",
+    "dsh/frontend/app-field/DshFieldSurface.tsx",
     "dsh/frontend/app-client/dsh-client.navigation-bridge.ts",
     "dsh/frontend/app-client/screens/OrdersTrackingScreens.tsx",
     "dsh/frontend/shared/index.ts",
@@ -427,7 +428,9 @@
     "dsh/frontend/app-client/contracts/dsh-openapi.types.ts",
     "dsh/frontend/app-client/contracts/dsh-store-screen-props.ts",
     "dsh/frontend/app-captain/screens/DshCaptainMapScreen.tsx",
-    "wlt/frontend/contracts/wlt-dsh-client.ts"
+    "wlt/frontend/contracts/wlt-dsh-client.ts",
+    "dsh/frontend/shared/dsh-field-store-onboarding-client.ts",
+    "dsh/frontend/shared/dsh-field-visit-client.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

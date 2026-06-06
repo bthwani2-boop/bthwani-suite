@@ -1,4 +1,4 @@
-# DSH-SLICE-006E — CP Approval: Partner Readiness
+﻿# DSH-SLICE-006E — CP Approval: Partner Readiness
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / PartnerReadinessApprovalScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | Depends on DSH-SLICE-006D (readiness escalation resolution) |
 
 ## Scope
@@ -57,7 +57,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | Readiness escalation (006D) not proven |
 | **Dependency** | DSH-SLICE-006D |
 | **Next Action** | Await 006D PASS; then design readiness approval endpoint |

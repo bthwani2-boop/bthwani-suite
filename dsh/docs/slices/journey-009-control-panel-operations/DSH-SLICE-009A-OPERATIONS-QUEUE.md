@@ -26,18 +26,18 @@
 | Audit/rollback | Covered in 009D |
 
 ## Coverage Matrix
-| Row ID | Surface | Screen | Status |
-|---|---|---|---|
-| CM-009A-01 | control-panel | PartnerStoresScreen | FIX_REQUIRED |
-| CM-009A-02 | control-panel | CommandCenterScreen | FIX_REQUIRED |
-| CM-009A-03 | control-panel | LiveOrdersScreen | FIX_REQUIRED |
-| CM-009A-04 | control-panel | DispatchScreen | FIX_REQUIRED |
+| Row ID | Surface | Screen | Status | Note |
+|---|---|---|---|---|
+| CM-009A-01 | control-panel | PartnerStoresScreen | PASS | Runtime proven DSH_SLICE001_LIVE_E2E-20260603 |
+| CM-009A-02 | control-panel | CommandCenterScreen | FIX_REQUIRED | Preview-only; no real API binding |
+| CM-009A-03 | control-panel | LiveOrdersScreen | PARTIAL | Reads via fetchDshRuntimeOrders; action buttons still preview |
+| CM-009A-04 | control-panel | DispatchAssignmentScreen | COVERED_BY_009B | Scope-excluded; assignCaptain wired — see DSH-SLICE-009B |
 
 ## CTA Matrix
 | CTA | Surface | Screen | Target | Status |
 |---|---|---|---|---|
-| Approve catalog | control-panel | PartnerStoresScreen | PATCH /stores/{id}/catalog-approval | FIX_REQUIRED |
-| Toggle marketing visibility | control-panel | PartnerStoresScreen | PATCH /stores/{id}/marketing-visibility | FIX_REQUIRED |
+| Approve catalog | control-panel | PartnerStoresScreen | PATCH /stores/{id}/catalog-approval | PASS |
+| Toggle marketing visibility | control-panel | PartnerStoresScreen | PATCH /stores/{id}/marketing-visibility | PASS |
 
 ## State Matrix
 | State | Required | Status |

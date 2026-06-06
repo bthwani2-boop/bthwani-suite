@@ -78,6 +78,8 @@ export function VisitEvidenceSection({
   }
 
   const allRequiredCaptured = items.filter((i) => i.required).every((i) => i.state === 'captured' || i.state === 'confirmed');
+  const canCapturePhoto = typeof onCapturePhoto === 'function';
+  const canConfirmEvidence = typeof onConfirmEvidence === 'function';
 
   return (
     <Box gap={4}>
@@ -107,6 +109,7 @@ export function VisitEvidenceSection({
                 size="sm"
                 tone={item.state === 'captured' ? 'secondary' : 'primary'}
                 fullWidth={false}
+                disabled={!canCapturePhoto}
                 onPress={() => onCapturePhoto?.(item.id)}
               />
             )}
@@ -115,7 +118,7 @@ export function VisitEvidenceSection({
       </Box>
       <Button
         label="تأكيد الأدلة"
-        disabled={!allRequiredCaptured}
+        disabled={!allRequiredCaptured || !canConfirmEvidence}
         onPress={onConfirmEvidence}
       />
     </Box>

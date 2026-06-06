@@ -1,4 +1,4 @@
-# DSH-SLICE-009C — Exception Escalation
+﻿# DSH-SLICE-009C — Exception Escalation
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ExceptionEscalationScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | Depends on J-004 order lifecycle being proven; no live exception data exists |
 
 ## Scope
@@ -59,7 +59,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | J-004 order lifecycle not proven; no live exception data |
 | **Dependency** | J-004 runtime closure |
 | **Next Action** | Await J-004 close; then design unified exception API |

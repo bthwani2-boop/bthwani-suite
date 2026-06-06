@@ -130,3 +130,47 @@ type StoreDetail struct {
 	CatalogPricingStatus      string `json:"catalog_pricing_status"`
 	MarketingVisibilityStatus string `json:"marketing_visibility_status"`
 }
+
+// CreateFieldStoreRequest — field agent submits a new store for review (J-006A / DSH-SLICE-006A).
+// After creation the store is in publish_stage='pending_review' and status_tone='closed'.
+// CP approval (J-006E) is required before the store becomes visible to clients.
+type CreateFieldStoreRequest struct {
+	Name                    string `json:"name"`
+	Address                 string `json:"address"`
+	CategoryID              string `json:"category_id,omitempty"`
+	SupportsPickup          bool   `json:"supports_pickup"`
+	SupportsPartnerDelivery bool   `json:"supports_partner_delivery"`
+}
+
+// CreateFieldStoreResponse — returned after a successful POST /stores.
+type CreateFieldStoreResponse struct {
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Address      string    `json:"address"`
+	CategoryID   string    `json:"category_id,omitempty"`
+	PublishStage string    `json:"publish_stage"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+// CreateFieldVisitRequest — field agent submits visit evidence references for an onboarded store (J-006B).
+// Evidence media keys are references only; raw media upload and document governance stay in J-006C.
+type CreateFieldVisitRequest struct {
+	FieldAgentID       string   `json:"field_agent_id,omitempty"`
+	VisitSummary       string   `json:"visit_summary"`
+	FollowUpAction     string   `json:"follow_up_action"`
+	EvidenceMediaKeys  []string `json:"evidence_media_keys,omitempty"`
+	LocationConfidence string   `json:"location_confidence,omitempty"`
+}
+
+// CreateFieldVisitResponse — returned after a successful POST /stores/{id}/field-visits.
+type CreateFieldVisitResponse struct {
+	ID                 string    `json:"id"`
+	StoreID            string    `json:"store_id"`
+	FieldAgentID       string    `json:"field_agent_id,omitempty"`
+	VisitSummary       string    `json:"visit_summary"`
+	FollowUpAction     string    `json:"follow_up_action"`
+	EvidenceMediaKeys  []string  `json:"evidence_media_keys,omitempty"`
+	LocationConfidence string    `json:"location_confidence,omitempty"`
+	Status             string    `json:"status"`
+	CreatedAt          time.Time `json:"created_at"`
+}

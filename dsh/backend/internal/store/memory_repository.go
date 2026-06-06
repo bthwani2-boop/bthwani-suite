@@ -559,3 +559,22 @@ func (repo *MemoryRepository) ProcessSettlementCallback(_ context.Context, _ str
 func (repo *MemoryRepository) ListSettlements(_ context.Context) ([]domain.OrderRecord, error) {
 	return nil, errors.New("settlement list requires postgres backend (set DATABASE_URL)")
 }
+
+// J-006A stub
+func (repo *MemoryRepository) CreateFieldStore(_ context.Context, _ domain.CreateFieldStoreRequest) (domain.CreateFieldStoreResponse, error) {
+	return domain.CreateFieldStoreResponse{}, errors.New("field store creation requires postgres backend (set DATABASE_URL)")
+}
+
+// J-006B stub
+func (repo *MemoryRepository) CreateFieldVisit(_ context.Context, _ string, _ domain.CreateFieldVisitRequest) (domain.CreateFieldVisitResponse, error) {
+	return domain.CreateFieldVisitResponse{}, errors.New("field visit submission requires postgres backend (set DATABASE_URL)")
+}
+
+// J-009C stubs
+func (repo *MemoryRepository) ListAllSupportEscalations(_ context.Context, _ domain.ListAllSupportEscalationsQuery) (domain.ListAllSupportEscalationsResponse, error) {
+	return domain.ListAllSupportEscalationsResponse{Tickets: []domain.SupportEscalationRecord{}, Total: 0}, nil
+}
+
+func (repo *MemoryRepository) UpdateSupportEscalation(_ context.Context, _ string, _ string) (domain.SupportEscalationRecord, error) {
+	return domain.SupportEscalationRecord{}, errors.New("escalation update requires postgres backend (set DATABASE_URL)")
+}

@@ -1,4 +1,4 @@
-# DSH-SLICE-005B — Captain Accept / Decline
+﻿# DSH-SLICE-005B — Captain Accept / Decline
 
 ## Identity
 | Field | Value |
@@ -9,8 +9,8 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / TaskScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | J-004 is not closed |
+| Current Status | PASS |
+| Blocking Reason | none — runtime API/client binding and app-captain device evidence captured |
 
 ## Scope
 ### Included
@@ -52,13 +52,14 @@
 
 ## Evidence and Gates
 - Runtime evidence: `tools/registry/runs/DSH_SLICE_005B_CAPTAIN_ACCEPT_DECLINE_FINAL_CLOSURE-20260605-043000/005B_api_results.json`
-- Visual evidence: DshCaptainOrderAcceptScreen & OfferDeclineSheet wired to live callbacks in DshCaptainSurface.tsx.
-- Exit gate: 005A PASS + task accept/decline API designed + runtime proof verified E2E.
+- Visual evidence: `tools/registry/runs/DSH_J005_CAPTAIN_RUNTIME_IDENTITY_CLOSURE-20260606-LOCAL/dsh_j005_app_captain_orders.png` and `dsh_j005_app_captain_order_detail.png`
+- Current-session code evidence: app-captain uses injectable `captainId` for accept/decline and normalizes preview order ids before calling the typed lifecycle client.
+- Exit gate: 005A PASS + task accept/decline API designed + runtime proof verified E2E + app-captain device proof captured.
 
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `DEFERRED_WITH_REASON` |
-| **Reason** | Deferred pending J-004 order lifecycle/support full closure |
-| **Dependency** | J-003 full closure |
-| **Next Action** | Await upstream closure |
+| **Slice Decision** | PASS |
+| **Reason** | Existing E2E evidence covers accept/decline API; current session removed hardcoded captain identity from app-captain callbacks and captured real app-captain device evidence. |
+| **Dependency** | 005A assignment runtime state |
+| **Next Action** | none — monitor only for real auth/captain identity provider integration |

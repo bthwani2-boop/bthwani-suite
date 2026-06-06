@@ -57,6 +57,12 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Go backend store repository | `dsh/backend/internal/store/store_repository.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Interface |
 | Go backend postgres repo | `dsh/backend/internal/store/postgres_repository.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | PostgreSQL implementation |
 | Go backend memory repo | `dsh/backend/internal/store/memory_repository.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | In-memory fallback for tests |
+| Field visit OpenAPI contract | `dsh/dsh.openapi.yaml` | J-006 | DSH-SLICE-006B | API_CONTRACT_ADDED__RUNTIME_PROVEN | `POST /stores/{id}/field-visits` request/response schemas |
+| Field visit domain model | `dsh/domain/store_discovery.go` | J-006 | DSH-SLICE-006B | ACTIVE_RUNTIME_BOUND | `CreateFieldVisitRequest` and `CreateFieldVisitResponse` |
+| Field visit backend route | `dsh/backend/internal/http/stores_handler.go`; `dsh/backend/internal/http/stores_handler_test.go` | J-006 | DSH-SLICE-006B | BACKEND_TESTED | Handler validation covers invalid JSON, missing summary, missing follow-up, and repository failure |
+| Field visit repository | `dsh/backend/internal/store/store_repository.go`; `dsh/backend/internal/store/postgres_repository.go`; `dsh/backend/internal/store/memory_repository.go` | J-006 | DSH-SLICE-006B | POSTGRES_RUNTIME_PROVEN | Postgres persists submitted visit; memory repo fails explicitly until DATABASE_URL is set |
+| Field visit migration | `dsh/backend/migrations/020_field_store_visits.sql` | J-006 | DSH-SLICE-006B | POSTGRES_RUNTIME_PROVEN | Non-destructive runtime test applies the visit table and proves insert |
+| Field visit runtime evidence test | `dsh/backend/internal/store/postgres_field_visit_runtime_test.go` | J-006 | DSH-SLICE-006B | OPTIONAL_RUNTIME_EVIDENCE | Skips by default; runs with `DSH_POSTGRES_RUNTIME_EVIDENCE=1` |
 | Go backend main | `dsh/backend/cmd/dsh-api/main.go` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | API entry point |
 | Go backend client TS | `dsh/backend/client.ts`, `dsh/backend/src/client.ts` | J-001 | DSH-SLICE-001A | CANDIDATE | Typed client contract |
 | Go backend contracts TS | `dsh/backend/contracts.ts`, `dsh/backend/src/contracts.ts` | J-001 | DSH-SLICE-001A | CANDIDATE | TS contract types |
@@ -91,6 +97,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Partner onboarding journey | `dsh/frontend/shared/dsh-partner-onboarding-journey.map.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field/partner onboarding map |
 | Partner activation model | `dsh/frontend/shared/dsh-partner-activation.model.ts` | J-006 | DSH-SLICE-006C,006E | ACTIVE | Partner activation state |
 | Field visit contract | `dsh/frontend/shared/dsh-field-visit.contract.ts` | J-006 | DSH-SLICE-006B,006C | ACTIVE | Field visit contract |
+| Field visit API client | `dsh/frontend/shared/dsh-field-visit-client.ts` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__RUNTIME_PROVEN | Typed client for `POST /stores/{id}/field-visits`; stores evidence references only |
 | CP operations contract | `dsh/frontend/shared/dsh-cp-operations.contract.ts` | J-009 | DSH-SLICE-009A–009D | ACTIVE | Control-panel ops contract |
 | CP operations room | `dsh/frontend/shared/dsh-control-panel-operations-room.ts` | J-009 | DSH-SLICE-009A,009B | ACTIVE | Ops room model |
 | CP platform contract | `dsh/frontend/shared/dsh-cp-platform.contract.ts` | J-008 | DSH-SLICE-008A–008D | ACTIVE | Platform/vars contract |
@@ -231,6 +238,8 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Field types | `dsh/frontend/app-field/dsh-field.types.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field types |
 | Visit types | `dsh/frontend/app-field/types/DshFieldStoreVisitTypes.ts` | J-006 | DSH-SLICE-006B | ACTIVE | Visit evidence types |
 | Field binding contracts | `dsh/frontend/app-field/contracts/dsh-field-binding.contracts.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field binding contracts |
+| Field surface onboarding API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-store-onboarding-client.ts` | J-006 | DSH-SLICE-006A | ACTIVE_RUNTIME_BOUND | Store onboarding submit is bound to typed `POST /stores` client |
+| Field surface visit API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-visit-client.ts`; `dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx`; `dsh/frontend/app-field/sections/VisitEvidenceSection.tsx` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__VISUAL_REBUILD_PENDING | Visit submit is bound to typed `POST /stores/{id}/field-visits`; raw photo capture is disabled until 006C handler exists |
 | Field onboarding storage | `dsh/frontend/app-field/storage/field-onboarding.storage.ts` | J-006 | DSH-SLICE-006A | ACTIVE | Local onboarding storage |
 | Sections index | `dsh/frontend/app-field/sections/index.ts` | J-006 | DSH-SLICE-006A,006B | ACTIVE | Field sections |
 | Index export | `dsh/frontend/app-field/index.ts` | J-006 | All field slices | ACTIVE | Public field export |

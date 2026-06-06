@@ -31,6 +31,8 @@ func NewStoresHandler(repository store.Repository) *StoresHandler {
 	// Register internal routes for dispatching
 	handler.mux.HandleFunc("GET /stores", handler.ListStores)
 	handler.mux.HandleFunc("GET /stores/{id}", handler.GetStore)
+	handler.mux.HandleFunc("POST /stores", handler.CreateFieldStore)
+	handler.mux.HandleFunc("POST /stores/{id}/field-visits", handler.CreateFieldVisit)
 	handler.mux.HandleFunc("PATCH /stores/{id}/partner-readiness", handler.UpdatePartnerReadiness)
 	handler.mux.HandleFunc("PATCH /stores/{id}/catalog-approval", handler.UpdateCatalogApproval)
 	handler.mux.HandleFunc("PATCH /stores/{id}/marketing-visibility", handler.UpdateMarketingVisibility)
@@ -42,6 +44,8 @@ func RegisterRoutes(mux *http.ServeMux, repository store.Repository) {
 	handler := NewStoresHandler(repository)
 	mux.Handle("GET /stores", handler)
 	mux.Handle("GET /stores/{id}", handler)
+	mux.Handle("POST /stores", handler)
+	mux.Handle("POST /stores/{id}/field-visits", handler)
 	mux.Handle("PATCH /stores/{id}/partner-readiness", handler)
 	mux.Handle("PATCH /stores/{id}/catalog-approval", handler)
 	mux.Handle("PATCH /stores/{id}/marketing-visibility", handler)
@@ -49,7 +53,7 @@ func RegisterRoutes(mux *http.ServeMux, repository store.Repository) {
 
 func (handler *StoresHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Access-Control-Allow-Methods", "GET, PATCH, OPTIONS")
+	writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
 	writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
 
 	if request.Method == http.MethodOptions {
@@ -278,6 +282,81 @@ func validFilter(filter domain.StoreDiscoveryFilter) bool {
 	default:
 		return false
 	}
+}
+
+// CreateFieldStore handles POST /stores — field agent submits a new store for review (J-006A).
+func (handler *StoresHandler) CreateFieldStore(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("dsh-api: received POST /stores from app-field")
+	if request.Method != http.MethodPost {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	var req domain.CreateFieldStoreRequest
+	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		return
+	}
+
+	if strings.TrimSpace(req.Name) == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "name is required")
+		return
+	}
+	if strings.TrimSpace(req.Address) == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "address is required")
+		return
+	}
+
+	res, err := handler.repository.CreateFieldStore(request.Context(), req)
+	if err != nil {
+		log.Printf("dsh-api: create field store error: %v", err)
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, "failed to create store")
+		return
+	}
+
+	writeJSON(writer, http.StatusCreated, res)
+}
+
+func (handler *StoresHandler) CreateFieldVisit(writer http.ResponseWriter, request *http.Request) {
+	id := request.PathValue("id")
+	log.Printf("dsh-api: received POST /stores/%s/field-visits from app-field", id)
+	if request.Method != http.MethodPost {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	if strings.TrimSpace(id) == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store id")
+		return
+	}
+
+	var req domain.CreateFieldVisitRequest
+	if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		return
+	}
+
+	if strings.TrimSpace(req.VisitSummary) == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "visit_summary is required")
+		return
+	}
+	if strings.TrimSpace(req.FollowUpAction) == "" {
+		writeError(writer, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "follow_up_action is required")
+		return
+	}
+
+	res, err := handler.repository.CreateFieldVisit(request.Context(), id, req)
+	if err != nil {
+		if err.Error() == "store not found" {
+			writeError(writer, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "store not found")
+			return
+		}
+		log.Printf("dsh-api: create field visit error: %v", err)
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, "failed to create field visit")
+		return
+	}
+
+	writeJSON(writer, http.StatusCreated, res)
 }
 
 func writeError(writer http.ResponseWriter, status int, code domain.ErrorCode, message string) {

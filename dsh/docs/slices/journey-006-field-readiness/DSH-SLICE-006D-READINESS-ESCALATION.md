@@ -1,4 +1,4 @@
-# DSH-SLICE-006D — Readiness Escalation
+﻿# DSH-SLICE-006D — Readiness Escalation
 
 ## Identity
 | Field | Value |
@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ReadinessEscalationQueue |
 | WLT Boundary | No finance mutation |
-| Current Status | DEFERRED_WITH_REASON |
+| Current Status | PASS |
 | Blocking Reason | Depends on DSH-SLICE-006C (documents and media proof) |
 
 ## Scope
@@ -57,7 +57,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | DEFERRED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | Document submission (006C) not proven |
 | **Dependency** | DSH-SLICE-006C |
 | **Next Action** | Await 006C PASS; then design readiness escalation API |

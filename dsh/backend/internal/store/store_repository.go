@@ -68,6 +68,17 @@ type Repository interface {
 	CreateSupportEscalation(ctx context.Context, req domain.CreateSupportEscalationRequest) (domain.SupportEscalationRecord, error)
 	ListOrderStatusEvents(ctx context.Context, orderID string) ([]domain.OrderStatusEventRecord, error)
 	ListSupportEscalations(ctx context.Context, orderID string) ([]domain.SupportEscalationRecord, error)
+	// ListAllSupportEscalations (J-009C): returns escalations across all orders for CP operator view.
+	ListAllSupportEscalations(ctx context.Context, query domain.ListAllSupportEscalationsQuery) (domain.ListAllSupportEscalationsResponse, error)
+	// UpdateSupportEscalation (J-009C): operator updates status to "in-review" or "resolved".
+	UpdateSupportEscalation(ctx context.Context, id string, status string) (domain.SupportEscalationRecord, error)
+
+	// CreateFieldStore (J-006A): field agent submits a new store for review.
+	// publish_stage is set to 'pending_review'; CP approval required before client visibility.
+	CreateFieldStore(ctx context.Context, req domain.CreateFieldStoreRequest) (domain.CreateFieldStoreResponse, error)
+	// CreateFieldVisit (J-006B): field agent submits visit notes and evidence media references.
+	// Raw media upload and document governance remain J-006C.
+	CreateFieldVisit(ctx context.Context, storeID string, req domain.CreateFieldVisitRequest) (domain.CreateFieldVisitResponse, error)
 
 	// DSH-SLICE-010B: Settlement Candidate repository methods
 	SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error)
