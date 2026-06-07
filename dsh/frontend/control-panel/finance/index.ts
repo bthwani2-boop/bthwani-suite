@@ -1,9 +1,9 @@
-// DSH finance — barrel re-export only.
-// All logic (registry, types, api-matrix, hub rendering) lives in wlt/frontend/control-panel/dsh/.
+// DSH finance â€” barrel re-export only.
+// All logic (registry, types, api-matrix, hub rendering) lives in wlt/frontend/dsh/control-panel/.
 
 // Hub screen
-export { WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../../../wlt/frontend/control-panel/dsh/screens/WltDshFinanceHubHost';
-export type { WltDshFinanceHubHostProps as ControlPanelDshFinanceScreenProps } from '../../../../wlt/frontend/control-panel/dsh/screens/WltDshFinanceHubHost';
+export { WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../../../wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost';
+export type { WltDshFinanceHubHostProps as ControlPanelDshFinanceScreenProps } from '../../../../wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost';
 
 // Finance routing types
 export type {
@@ -12,7 +12,7 @@ export type {
   FinanceViewState,
   FinanceGroupMeta,
   FinanceNormalizationResult,
-} from '../../../../wlt/frontend/control-panel/dsh/models/financeRouting.types';
+} from '../../../../wlt/frontend/dsh/control-panel/models/financeRouting.types';
 
 // Finance routing helpers
 export {
@@ -22,4 +22,4 @@ export {
   buildFinanceHref,
   getFinanceGroupMeta,
   normalizeFinanceLocation,
-} from '../../../../wlt/frontend/control-panel/dsh/constants/finance.registry';
+} from '../../../../wlt/frontend/dsh/control-panel/constants/finance.registry';

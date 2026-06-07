@@ -1,6 +1,6 @@
 import React from 'react';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
-import { WltHomeGetScreen } from '../../../../wlt/frontend/app-client/home/screens/WltHomeGetScreen';
+import { WltHomeGetScreen } from '../../../../wlt/frontend/app-client-wlt/home/screens/WltHomeGetScreen';
 
 export type DshMySpaceSubScreenProps = {
   state?: DshOperationScreenState;

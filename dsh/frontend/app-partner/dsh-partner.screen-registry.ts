@@ -253,7 +253,7 @@ export const dshPartnerScreenRegistry = [
     ownerId: 'wlt.dsh',
     serviceId: 'wlt',
     linkedServiceId: 'dsh',
-    ownerPath: 'wlt/frontend/app-partner/dsh/WltDshPartnerBridge.tsx',
+    ownerPath: 'wlt/frontend/dsh/app-partner/WltDshPartnerBridge.tsx',
     componentName: 'WltDshPartnerBridge',
     screenKind: 'FLOW_STEP',
     flowId: 'dsh.partner.finance',

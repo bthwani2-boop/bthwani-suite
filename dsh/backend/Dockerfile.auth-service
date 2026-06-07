@@ -2,11 +2,13 @@
 # Multi-stage build: compiles Go binary then runs on alpine.
 # Context: dsh/backend/ (docker-compose build context is the backend dir).
 
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /src
-COPY go.mod go.sum ./
+COPY domain/ ./domain/
+COPY backend/go.mod backend/go.sum ./backend/
+WORKDIR /src/backend
 RUN go mod download
-COPY . .
+COPY backend/ ./
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /out/auth-service ./cmd/auth-service/
 
 FROM alpine:3.20

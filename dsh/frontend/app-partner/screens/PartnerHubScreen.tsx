@@ -29,12 +29,12 @@ import {
   getWltDshPartnerCommissionLabel,
   getWltDshPartnerOperationalModeCommission,
   wltDshPartnerUiCopy,
-} from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
+} from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../data/canonical.preview-data';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
-import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/app-partner/dsh';
+import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/dsh/app-partner';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
@@ -119,17 +119,17 @@ function resolveZoneStatusTone(status: PartnerCoverageZoneStatus): 'success' | '
 }
 
 function resolveMemberActionLabel(member: PartnerTeamMember): string {
-  if (member.status === 'active') return member.role === 'supervisor' ? 'تعطيل' : 'عرض الدور';
-  if (member.status === 'paused') return 'إعادة تفعيل';
-  if (member.status === 'invited') return 'إعادة إرسال الدعوة';
-  if (member.status === 'blocked') return 'طلب مراجعة';
-  return 'إرسال للمراجعة';
+  if (member.status === 'active') return member.role === 'supervisor' ? 'ØªØ¹Ø·ÙŠÙ„' : 'Ø¹Ø±Ø¶ Ø§Ù„Ø¯ÙˆØ±';
+  if (member.status === 'paused') return 'Ø¥Ø¹Ø§Ø¯Ø© ØªÙØ¹ÙŠÙ„';
+  if (member.status === 'invited') return 'Ø¥Ø¹Ø§Ø¯Ø© Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¯Ø¹ÙˆØ©';
+  if (member.status === 'blocked') return 'Ø·Ù„Ø¨ Ù…Ø±Ø§Ø¬Ø¹Ø©';
+  return 'Ø¥Ø±Ø³Ø§Ù„ Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©';
 }
 
 const defaultOperationalModes: readonly PartnerOperationalMode[] = [
-  { id: 'pickup', title: 'استلم بنفسك', subtitle: 'استلام من الفرع مباشرة.', commission: getWltDshPartnerOperationalModeCommission('pickup'), enabled: true },
-  { id: 'partner_delivery', title: 'توصيل المتجر', subtitle: 'قناة توصيل داخلية بموصل الشريك.', commission: getWltDshPartnerOperationalModeCommission('partner_delivery'), enabled: true },
-  { id: 'bthwani_delivery', title: 'توصيل بثواني', subtitle: 'توصيل عبر كابتن بثواني.', commission: getWltDshPartnerOperationalModeCommission('bthwani_delivery'), enabled: false },
+  { id: 'pickup', title: 'Ø§Ø³ØªÙ„Ù… Ø¨Ù†ÙØ³Ùƒ', subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… Ù…Ù† Ø§Ù„ÙØ±Ø¹ Ù…Ø¨Ø§Ø´Ø±Ø©.', commission: getWltDshPartnerOperationalModeCommission('pickup'), enabled: true },
+  { id: 'partner_delivery', title: 'ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±', subtitle: 'Ù‚Ù†Ø§Ø© ØªÙˆØµÙŠÙ„ Ø¯Ø§Ø®Ù„ÙŠØ© Ø¨Ù…ÙˆØµÙ„ Ø§Ù„Ø´Ø±ÙŠÙƒ.', commission: getWltDshPartnerOperationalModeCommission('partner_delivery'), enabled: true },
+  { id: 'bthwani_delivery', title: 'ØªÙˆØµÙŠÙ„ Ø¨Ø«ÙˆØ§Ù†ÙŠ', subtitle: 'ØªÙˆØµÙŠÙ„ Ø¹Ø¨Ø± ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ.', commission: getWltDshPartnerOperationalModeCommission('bthwani_delivery'), enabled: false },
 ] as const;
 
 const partnerHubBottomInset = 144;
@@ -153,21 +153,21 @@ const partnerAppearanceOptions: ReadonlyArray<{
 }> = [
   {
     mode: 'lightPremium',
-    title: 'فاتح أبيض',
-    description: 'واجهة فاتحة واضحة، والزجاج يظهر فقط فيما يحدده المطور أثناء مراجعة الشاشات',
+    title: 'ÙØ§ØªØ­ Ø£Ø¨ÙŠØ¶',
+    description: 'ÙˆØ§Ø¬Ù‡Ø© ÙØ§ØªØ­Ø© ÙˆØ§Ø¶Ø­Ø©ØŒ ÙˆØ§Ù„Ø²Ø¬Ø§Ø¬ ÙŠØ¸Ù‡Ø± ÙÙ‚Ø· ÙÙŠÙ…Ø§ ÙŠØ­Ø¯Ø¯Ù‡ Ø§Ù„Ù…Ø·ÙˆØ± Ø£Ø«Ù†Ø§Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø´Ø§Ø´Ø§Øª',
   },
   {
     mode: 'darkGlass',
-    title: 'داكن زجاجي',
-    description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
+    title: 'Ø¯Ø§ÙƒÙ† Ø²Ø¬Ø§Ø¬ÙŠ',
+    description: 'Ù…Ø¸Ù‡Ø± Ø¯Ø§ÙƒÙ† ÙØ§Ø®Ø± Ù…Ø¹ Ø­ÙˆØ§Ù Ø²Ø¬Ø§Ø¬ÙŠØ© ÙˆØ·Ø¨Ù‚Ø§Øª ÙˆØ§Ø¶Ø­Ø© Ø¨Ø¯ÙˆÙ† Ø¥Ø²Ø¹Ø§Ø¬ Ø¨ØµØ±ÙŠ',
   },
 ] as const;
 
 const hubNavigationItems: readonly HubNavigationItem[] = [
   {
     id: 'profile',
-    title: 'ملف المتجر',
-    description: 'بيانات المتجر، الهوية، الظهور، الفرع، والنطاق في مساحة واحدة.',
+    title: 'Ù…Ù„Ù Ø§Ù„Ù…ØªØ¬Ø±',
+    description: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±ØŒ Ø§Ù„Ù‡ÙˆÙŠØ©ØŒ Ø§Ù„Ø¸Ù‡ÙˆØ±ØŒ Ø§Ù„ÙØ±Ø¹ØŒ ÙˆØ§Ù„Ù†Ø·Ø§Ù‚ ÙÙŠ Ù…Ø³Ø§Ø­Ø© ÙˆØ§Ø­Ø¯Ø©.',
     icon: 'storefront-outline',
     section: 'profile',
   },
@@ -180,29 +180,29 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
   },
   {
     id: 'operations',
-    title: 'المتجر والفريق',
-    description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
+    title: 'Ø§Ù„Ù…ØªØ¬Ø± ÙˆØ§Ù„ÙØ±ÙŠÙ‚',
+    description: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØªØ¬Ø±ØŒ Ø§Ù„ØªÙˆØµÙŠÙ„ØŒ Ø§Ù„ÙØ±ÙŠÙ‚ØŒ ÙˆÙ…Ù†Ø§Ø·Ù‚ Ø§Ù„ØªØºØ·ÙŠØ©.',
     icon: 'people-outline',
     section: 'operations',
   },
   {
     id: 'inventory',
-    title: 'المخزون والكتالوج',
-    description: 'بحث أولًا، إضافة ذكية، أسعار ومخزون بدون تكرار.',
+    title: 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ† ÙˆØ§Ù„ÙƒØªØ§Ù„ÙˆØ¬',
+    description: 'Ø¨Ø­Ø« Ø£ÙˆÙ„Ù‹Ø§ØŒ Ø¥Ø¶Ø§ÙØ© Ø°ÙƒÙŠØ©ØŒ Ø£Ø³Ø¹Ø§Ø± ÙˆÙ…Ø®Ø²ÙˆÙ† Ø¨Ø¯ÙˆÙ† ØªÙƒØ±Ø§Ø±.',
     icon: 'cube-outline',
     section: 'inventory',
   },
   {
     id: 'analytics',
-    title: 'التحليلات والنمو والتسويق',
-    description: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
+    title: 'Ø§Ù„ØªØ­Ù„ÙŠÙ„Ø§Øª ÙˆØ§Ù„Ù†Ù…Ùˆ ÙˆØ§Ù„ØªØ³ÙˆÙŠÙ‚',
+    description: 'Ø§Ù„Ø£Ø¯Ø§Ø¡ØŒ Ø§Ù„ÙØ±ØµØŒ Ø§Ù„Ø¹Ø±ÙˆØ¶ØŒ Ø§Ù„Ø§Ø´ØªØ±Ø§ÙƒØŒ ÙˆØ§Ù„ØªÙˆØµÙŠØ§Øª Ø§Ù„Ø¹Ù…Ù„ÙŠØ©.',
     icon: 'trending-up-outline',
     section: 'analytics',
   },
   {
     id: 'settings',
-    title: 'الإعدادات',
-    description: 'التنبيهات، اللغة، التفضيلات، وإعدادات المتجر.',
+    title: 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
+    description: 'Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§ØªØŒ Ø§Ù„Ù„ØºØ©ØŒ Ø§Ù„ØªÙØ¶ÙŠÙ„Ø§ØªØŒ ÙˆØ¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±.',
     icon: 'settings-outline',
     section: 'settings',
   },
@@ -210,18 +210,18 @@ const hubNavigationItems: readonly HubNavigationItem[] = [
 
 const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; description: string; icon: React.ComponentProps<typeof Icon>['name'] }> = {
   profile: {
-    title: 'ملف المتجر',
-    description: 'بيانات المتجر، الهوية، الظهور، الفرع، والنطاق في مساحة واحدة.',
+    title: 'Ù…Ù„Ù Ø§Ù„Ù…ØªØ¬Ø±',
+    description: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±ØŒ Ø§Ù„Ù‡ÙˆÙŠØ©ØŒ Ø§Ù„Ø¸Ù‡ÙˆØ±ØŒ Ø§Ù„ÙØ±Ø¹ØŒ ÙˆØ§Ù„Ù†Ø·Ø§Ù‚ ÙÙŠ Ù…Ø³Ø§Ø­Ø© ÙˆØ§Ø­Ø¯Ø©.',
     icon: 'storefront-outline',
   },
   operations: {
-    title: 'المتجر والفريق',
-    description: 'حالة المتجر، التوصيل، الفريق، ومناطق التغطية.',
+    title: 'Ø§Ù„Ù…ØªØ¬Ø± ÙˆØ§Ù„ÙØ±ÙŠÙ‚',
+    description: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØªØ¬Ø±ØŒ Ø§Ù„ØªÙˆØµÙŠÙ„ØŒ Ø§Ù„ÙØ±ÙŠÙ‚ØŒ ÙˆÙ…Ù†Ø§Ø·Ù‚ Ø§Ù„ØªØºØ·ÙŠØ©.',
     icon: 'people-outline',
   },
   inventory: {
-    title: 'المخزون والكتالوج',
-    description: 'بحث أولًا، إضافة ذكية، أسعار ومخزون بدون تكرار.',
+    title: 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ† ÙˆØ§Ù„ÙƒØªØ§Ù„ÙˆØ¬',
+    description: 'Ø¨Ø­Ø« Ø£ÙˆÙ„Ù‹Ø§ØŒ Ø¥Ø¶Ø§ÙØ© Ø°ÙƒÙŠØ©ØŒ Ø£Ø³Ø¹Ø§Ø± ÙˆÙ…Ø®Ø²ÙˆÙ† Ø¨Ø¯ÙˆÙ† ØªÙƒØ±Ø§Ø±.',
     icon: 'cube-outline',
   },
   wallet: {
@@ -230,13 +230,13 @@ const sectionCopy: Record<Exclude<PartnerHubSection, 'hub'>, { title: string; de
     icon: 'wallet-outline',
   },
   analytics: {
-    title: 'التحليلات والنمو والتسويق',
-    description: 'الأداء، الفرص، العروض، الاشتراك، والتوصيات العملية.',
+    title: 'Ø§Ù„ØªØ­Ù„ÙŠÙ„Ø§Øª ÙˆØ§Ù„Ù†Ù…Ùˆ ÙˆØ§Ù„ØªØ³ÙˆÙŠÙ‚',
+    description: 'Ø§Ù„Ø£Ø¯Ø§Ø¡ØŒ Ø§Ù„ÙØ±ØµØŒ Ø§Ù„Ø¹Ø±ÙˆØ¶ØŒ Ø§Ù„Ø§Ø´ØªØ±Ø§ÙƒØŒ ÙˆØ§Ù„ØªÙˆØµÙŠØ§Øª Ø§Ù„Ø¹Ù…Ù„ÙŠØ©.',
     icon: 'trending-up-outline',
   },
   settings: {
-    title: 'الإعدادات',
-    description: 'التنبيهات، اللغة، التفضيلات، وإعدادات المتجر.',
+    title: 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
+    description: 'Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§ØªØŒ Ø§Ù„Ù„ØºØ©ØŒ Ø§Ù„ØªÙØ¶ÙŠÙ„Ø§ØªØŒ ÙˆØ¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±.',
     icon: 'settings-outline',
   },
 };
@@ -247,35 +247,35 @@ function resolvePromotionIntentStateMeta(state: PromotionIntentState) {
   if (state === 'pending') {
     return {
       stateId: 'empty' as const,
-      title: 'طلب الترويج قيد المراجعة',
-      description: 'النية الترويجية مسجلة محليًا وتنتظر مواءمة التسويق أو الشريك.',
-      actionLabel: 'تحديث النية',
+      title: 'Ø·Ù„Ø¨ Ø§Ù„ØªØ±ÙˆÙŠØ¬ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©',
+      description: 'Ø§Ù„Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬ÙŠØ© Ù…Ø³Ø¬Ù„Ø© Ù…Ø­Ù„ÙŠÙ‹Ø§ ÙˆØªÙ†ØªØ¸Ø± Ù…ÙˆØ§Ø¡Ù…Ø© Ø§Ù„ØªØ³ÙˆÙŠÙ‚ Ø£Ùˆ Ø§Ù„Ø´Ø±ÙŠÙƒ.',
+      actionLabel: 'ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù†ÙŠØ©',
     };
   }
 
   if (state === 'blocked') {
     return {
       stateId: 'blockingError' as const,
-      title: 'لا يمكن إعداد النية الآن',
-      description: 'العنصر المختار غير جاهز للترويج أو يحتاج معالجة قبل الإرسال.',
-      actionLabel: 'مراجعة الجاهزية',
+      title: 'Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø¥Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù†ÙŠØ© Ø§Ù„Ø¢Ù†',
+      description: 'Ø§Ù„Ø¹Ù†ØµØ± Ø§Ù„Ù…Ø®ØªØ§Ø± ØºÙŠØ± Ø¬Ø§Ù‡Ø² Ù„Ù„ØªØ±ÙˆÙŠØ¬ Ø£Ùˆ ÙŠØ­ØªØ§Ø¬ Ù…Ø¹Ø§Ù„Ø¬Ø© Ù‚Ø¨Ù„ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„.',
+      actionLabel: 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø¬Ø§Ù‡Ø²ÙŠØ©',
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty' as const,
-      title: 'لا توجد عناصر قابلة للترويج',
-      description: 'أضف منتجًا أو متجرًا مناسبًا ثم أعد فتح المسار الترويجي.',
-      actionLabel: 'اختيار عنصر',
+      title: 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¹Ù†Ø§ØµØ± Ù‚Ø§Ø¨Ù„Ø© Ù„Ù„ØªØ±ÙˆÙŠØ¬',
+      description: 'Ø£Ø¶Ù Ù…Ù†ØªØ¬Ù‹Ø§ Ø£Ùˆ Ù…ØªØ¬Ø±Ù‹Ø§ Ù…Ù†Ø§Ø³Ø¨Ù‹Ø§ Ø«Ù… Ø£Ø¹Ø¯ ÙØªØ­ Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ±ÙˆÙŠØ¬ÙŠ.',
+      actionLabel: 'Ø§Ø®ØªÙŠØ§Ø± Ø¹Ù†ØµØ±',
     };
   }
 
   return {
     stateId: 'loading' as const,
-    title: 'مسار الترويج قيد التحضير',
-    description: 'نجهز مساحة الشريك لالتقاط نية الترويج قبل تسليمها للتسويق.',
-    actionLabel: 'فتح المسار',
+    title: 'Ù…Ø³Ø§Ø± Ø§Ù„ØªØ±ÙˆÙŠØ¬ Ù‚ÙŠØ¯ Ø§Ù„ØªØ­Ø¶ÙŠØ±',
+    description: 'Ù†Ø¬Ù‡Ø² Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø´Ø±ÙŠÙƒ Ù„Ø§Ù„ØªÙ‚Ø§Ø· Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬ Ù‚Ø¨Ù„ ØªØ³Ù„ÙŠÙ…Ù‡Ø§ Ù„Ù„ØªØ³ÙˆÙŠÙ‚.',
+    actionLabel: 'ÙØªØ­ Ø§Ù„Ù…Ø³Ø§Ø±',
   };
 }
 
@@ -291,10 +291,10 @@ function PromotionCandidateRow({
   const tone = item.eligibility === 'eligible' ? 'success' : item.eligibility === 'review' ? 'warning' : 'danger';
 
   const statusLabel =
-    item.status === 'draft' ? 'مسودة' :
-    item.status === 'partner-review' ? 'قيد الإرسال' :
-    item.status === 'marketing-ready' ? 'معتمد ومؤهل' :
-    'مرفوض';
+    item.status === 'draft' ? 'Ù…Ø³ÙˆØ¯Ø©' :
+    item.status === 'partner-review' ? 'Ù‚ÙŠØ¯ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„' :
+    item.status === 'marketing-ready' ? 'Ù…Ø¹ØªÙ…Ø¯ ÙˆÙ…Ø¤Ù‡Ù„' :
+    'Ù…Ø±ÙÙˆØ¶';
 
   const statusTone =
     item.status === 'marketing-ready' ? 'success' :
@@ -315,12 +315,12 @@ function PromotionCandidateRow({
       </Box>
 
       <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
-        <Chip label={item.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" selected />
-        <Chip label={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب'} tone={tone} />
+        <Chip label={item.kind === 'product' ? 'Ù…Ù†ØªØ¬' : 'Ù…ØªØ¬Ø±'} tone="brand" selected />
+        <Chip label={item.eligibility === 'eligible' ? 'Ù…Ø¤Ù‡Ù„' : item.eligibility === 'review' ? 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Ù…Ø­Ø¬ÙˆØ¨'} tone={tone} />
         <Chip label={statusLabel} tone={statusTone} />
       </Box>
 
-      <Button label={selected ? 'العنصر مفتوح' : 'اختيار العنصر'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
+      <Button label={selected ? 'Ø§Ù„Ø¹Ù†ØµØ± Ù…ÙØªÙˆØ­' : 'Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¹Ù†ØµØ±'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
     </Surface>
   );
 }
@@ -338,17 +338,17 @@ function PromotionIntentPanel({
 }) {
   const { direction } = useDirection();
   const [selectedId, setSelectedId] = React.useState<string>(dshPromotionCandidates[0]?.id ?? '');
-  const [offerTitle, setOfferTitle] = React.useState('عرض نهاية الأسبوع');
-  const [offerNote, setOfferNote] = React.useState('خصم قصير على المنتجات الأعلى طلبًا مع إبراز واضح.');
-  const [actionMessage, setActionMessage] = React.useState('النية الترويجية محلية حتى يتم تسليمها للتسويق.');
+  const [offerTitle, setOfferTitle] = React.useState('Ø¹Ø±Ø¶ Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹');
+  const [offerNote, setOfferNote] = React.useState('Ø®ØµÙ… Ù‚ØµÙŠØ± Ø¹Ù„Ù‰ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ø§Ù„Ø£Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ù‹Ø§ Ù…Ø¹ Ø¥Ø¨Ø±Ø§Ø² ÙˆØ§Ø¶Ø­.');
+  const [actionMessage, setActionMessage] = React.useState('Ø§Ù„Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬ÙŠØ© Ù…Ø­Ù„ÙŠØ© Ø­ØªÙ‰ ÙŠØªÙ… ØªØ³Ù„ÙŠÙ…Ù‡Ø§ Ù„Ù„ØªØ³ÙˆÙŠÙ‚.');
 
   const selectedItem = dshPromotionCandidates.find((item) => item.id === selectedId) ?? dshPromotionCandidates[0];
 
   const statusLabel =
-    selectedItem?.status === 'draft' ? 'مسودة' :
-    selectedItem?.status === 'partner-review' ? 'قيد الإرسال' :
-    selectedItem?.status === 'marketing-ready' ? 'معتمد ومؤهل' :
-    'مرفوض';
+    selectedItem?.status === 'draft' ? 'Ù…Ø³ÙˆØ¯Ø©' :
+    selectedItem?.status === 'partner-review' ? 'Ù‚ÙŠØ¯ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„' :
+    selectedItem?.status === 'marketing-ready' ? 'Ù…Ø¹ØªÙ…Ø¯ ÙˆÙ…Ø¤Ù‡Ù„' :
+    'Ù…Ø±ÙÙˆØ¶';
   const statusTone =
     selectedItem?.status === 'marketing-ready' ? 'success' :
     selectedItem?.status === 'partner-review' ? 'warning' :
@@ -358,10 +358,10 @@ function PromotionIntentPanel({
   return (
     <Box gap={4}>
       <Box gap={3} paddingY={2}>
-        <Text role="label" tone="muted">نية الترويج من الشريك</Text>
-        <Text role="titleSm">اختر منتجًا أو متجرًا قابلًا للترويج ثم جهّز الطلب للتسويق</Text>
+        <Text role="label" tone="muted">Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬ Ù…Ù† Ø§Ù„Ø´Ø±ÙŠÙƒ</Text>
+        <Text role="titleSm">Ø§Ø®ØªØ± Ù…Ù†ØªØ¬Ù‹Ø§ Ø£Ùˆ Ù…ØªØ¬Ø±Ù‹Ø§ Ù‚Ø§Ø¨Ù„Ù‹Ø§ Ù„Ù„ØªØ±ÙˆÙŠØ¬ Ø«Ù… Ø¬Ù‡Ù‘Ø² Ø§Ù„Ø·Ù„Ø¨ Ù„Ù„ØªØ³ÙˆÙŠÙ‚</Text>
         <Text role="bodySm" tone="muted">
-          هذه الشاشة تلتقط نية الترويج فقط: اختيار العنصر، وصف العرض، وتحديد حالة الإرسال.
+          Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø§Ø´Ø© ØªÙ„ØªÙ‚Ø· Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬ ÙÙ‚Ø·: Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¹Ù†ØµØ±ØŒ ÙˆØµÙ Ø§Ù„Ø¹Ø±Ø¶ØŒ ÙˆØªØ­Ø¯ÙŠØ¯ Ø­Ø§Ù„Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„.
         </Text>
 
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
@@ -375,7 +375,7 @@ function PromotionIntentPanel({
       <Divider />
 
       <Box gap={3} paddingY={2}>
-        <Text role="titleSm">العناصر القابلة للترويج</Text>
+        <Text role="titleSm">Ø§Ù„Ø¹Ù†Ø§ØµØ± Ø§Ù„Ù‚Ø§Ø¨Ù„Ø© Ù„Ù„ØªØ±ÙˆÙŠØ¬</Text>
         <Box gap={2}>
           {dshPromotionCandidates.map((item) => (
             <PromotionCandidateRow key={item.id} item={item} selected={item.id === selectedItem?.id} onPress={() => setSelectedId(item.id)} />
@@ -386,38 +386,38 @@ function PromotionIntentPanel({
       <Divider />
 
       <Box gap={3} paddingY={2}>
-        <Text role="titleSm">تفاصيل نية الترويج</Text>
+        <Text role="titleSm">ØªÙØ§ØµÙŠÙ„ Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬</Text>
         <KeyValueList
           dense
           items={[
-            { label: 'العنصر المختار', value: selectedItem?.title ?? 'غير محدد' },
-            { label: 'النوع', value: selectedItem?.kind === 'store' ? 'متجر' : 'منتج', tone: 'brand' },
-            { label: 'الأهلية', value: selectedItem?.eligibility === 'eligible' ? 'مؤهل' : selectedItem?.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب', tone: selectedItem?.eligibility === 'eligible' ? 'success' : selectedItem?.eligibility === 'review' ? 'warning' : 'danger' },
-            { label: 'الحالة', value: statusLabel, tone: statusTone },
+            { label: 'Ø§Ù„Ø¹Ù†ØµØ± Ø§Ù„Ù…Ø®ØªØ§Ø±', value: selectedItem?.title ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯' },
+            { label: 'Ø§Ù„Ù†ÙˆØ¹', value: selectedItem?.kind === 'store' ? 'Ù…ØªØ¬Ø±' : 'Ù…Ù†ØªØ¬', tone: 'brand' },
+            { label: 'Ø§Ù„Ø£Ù‡Ù„ÙŠØ©', value: selectedItem?.eligibility === 'eligible' ? 'Ù…Ø¤Ù‡Ù„' : selectedItem?.eligibility === 'review' ? 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Ù…Ø­Ø¬ÙˆØ¨', tone: selectedItem?.eligibility === 'eligible' ? 'success' : selectedItem?.eligibility === 'review' ? 'warning' : 'danger' },
+            { label: 'Ø§Ù„Ø­Ø§Ù„Ø©', value: statusLabel, tone: statusTone },
           ]}
         />
 
         <Box gap={2}>
-          <TextField label="عنوان العرض" value={offerTitle} onChangeText={setOfferTitle} placeholder="عنوان العرض" />
-          <TextField label="ملاحظات النية" value={offerNote} onChangeText={setOfferNote} placeholder="وصف مختصر للعرض أو سبب الترويج" multiline />
+          <TextField label="Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø¹Ø±Ø¶" value={offerTitle} onChangeText={setOfferTitle} placeholder="Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø¹Ø±Ø¶" />
+          <TextField label="Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ù†ÙŠØ©" value={offerNote} onChangeText={setOfferNote} placeholder="ÙˆØµÙ Ù…Ø®ØªØµØ± Ù„Ù„Ø¹Ø±Ø¶ Ø£Ùˆ Ø³Ø¨Ø¨ Ø§Ù„ØªØ±ÙˆÙŠØ¬" multiline />
         </Box>
 
         <Box padding={3} gap={2} style={{ backgroundColor: colorPalette.line + '11', borderRadius: 12 }}>
-          <Text role="bodyStrong">آخر رسالة</Text>
+          <Text role="bodyStrong">Ø¢Ø®Ø± Ø±Ø³Ø§Ù„Ø©</Text>
           <Text role="bodySm" tone="muted">{actionMessage}</Text>
         </Box>
 
         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-          <Button label="تأكيد نية الترويج" tone="primary" fullWidth={false} onPress={() => setActionMessage(`تم إرسال النية: ${offerTitle}`)} />
-          <Button label="طلب إبراز في الرئيسية" tone="secondary" fullWidth={false} onPress={() => setActionMessage(`طلب إبراز: ${selectedItem?.title ?? 'غير محدد'}`)} />
-          <Button label="تمييز المنتج" tone="ghost" fullWidth={false} onPress={() => setActionMessage(`تم وضع العنصر ضمن قائمة الترويج: ${selectedItem?.title ?? 'غير محدد'}`)} />
+          <Button label="ØªØ£ÙƒÙŠØ¯ Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬" tone="primary" fullWidth={false} onPress={() => setActionMessage(`ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ù†ÙŠØ©: ${offerTitle}`)} />
+          <Button label="Ø·Ù„Ø¨ Ø¥Ø¨Ø±Ø§Ø² ÙÙŠ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©" tone="secondary" fullWidth={false} onPress={() => setActionMessage(`Ø·Ù„Ø¨ Ø¥Ø¨Ø±Ø§Ø²: ${selectedItem?.title ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯'}`)} />
+          <Button label="ØªÙ…ÙŠÙŠØ² Ø§Ù„Ù…Ù†ØªØ¬" tone="ghost" fullWidth={false} onPress={() => setActionMessage(`ØªÙ… ÙˆØ¶Ø¹ Ø§Ù„Ø¹Ù†ØµØ± Ø¶Ù…Ù† Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„ØªØ±ÙˆÙŠØ¬: ${selectedItem?.title ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯'}`)} />
         </Box>
       </Box>
 
       <MobileStickyPrimaryAction
-        label="إرسال طلب الترويج"
-        helperText="النية الترويجية محلية وتذهب للمراجعة فور إرسالها."
-        onPress={() => setActionMessage(`تم إرسال النية: ${offerTitle}`)}
+        label="Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªØ±ÙˆÙŠØ¬"
+        helperText="Ø§Ù„Ù†ÙŠØ© Ø§Ù„ØªØ±ÙˆÙŠØ¬ÙŠØ© Ù…Ø­Ù„ÙŠØ© ÙˆØªØ°Ù‡Ø¨ Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙÙˆØ± Ø¥Ø±Ø³Ø§Ù„Ù‡Ø§."
+        onPress={() => setActionMessage(`ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ù†ÙŠØ©: ${offerTitle}`)}
       />
     </Box>
   );
@@ -548,7 +548,7 @@ function SettingsOptionRow({
   );
 }
 
-/** Section shell — no TopBar/back button; hardware back handles navigation.
+/** Section shell â€” no TopBar/back button; hardware back handles navigation.
  * Section title is displayed inline as a visual header inside the content. */
 function HubSectionShell({
   title,
@@ -577,7 +577,7 @@ function HubSectionShell({
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
-      {/* Visual section title — no back button, hardware back handles it */}
+      {/* Visual section title â€” no back button, hardware back handles it */}
       <View
         style={{
           flexDirection: rowDirection,
@@ -651,7 +651,7 @@ function HubNavRow({
         borderColor: theme.line,
       })}
     >
-      {/* Icon + Text cluster — stays together on the content side */}
+      {/* Icon + Text cluster â€” stays together on the content side */}
       <View
         style={{
           flexDirection: rowDirection,
@@ -703,7 +703,7 @@ function HubNavRow({
         </View>
       </View>
 
-      {/* Chevron — always on the action/opposite side */}
+      {/* Chevron â€” always on the action/opposite side */}
       <Icon name="chevron-forward-outline" mirrored tone="muted" size={18} />
     </Pressable>
   );
@@ -714,7 +714,7 @@ function resolveServiceModeEnabled(serviceModes: readonly { id: string; enabled:
   const matched = serviceModes?.find((mode) => {
     if (modeId === 'pickup') return mode.id === 'pickup';
     // transitional aliases: legacy `delivery` plus textual `store delivery` / `partner delivery`
-    // all map to canonical `partner_delivery` which is displayed as "توصيل المتجر".
+    // all map to canonical `partner_delivery` which is displayed as "ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±".
     if (modeId === 'partner_delivery') {
       return mode.id === 'partner_delivery'
         || mode.id === 'partner delivery'
@@ -799,7 +799,7 @@ function OperationsModeRow({
         </View>
 
         <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 10 }}>
-          <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
+          <Chip label={mode.enabled ? 'Ù…ÙØ¹Ù‘Ù„' : 'ØºÙŠØ± Ù…ÙØ¹Ù‘Ù„'} tone={mode.enabled ? 'success' : 'warning'} />
           <Text role="caption" tone="muted">
             {getWltDshPartnerCommissionLabel(mode.commission)}
           </Text>
@@ -870,22 +870,22 @@ function OperationsPanel({
       const activeZoneCount = coverageZones.filter((zone) => zone.status === 'active').length;
       const pendingZoneCount = coverageZones.filter((zone) => zone.status === 'pending').length;
       const blockedZoneCount = coverageZones.filter((zone) => zone.status === 'blocked').length;
-      const teamRoleSummary = `مالك ${teamMembers.filter((member) => member.role === 'owner').length} · مشرف ${teamMembers.filter((member) => member.role === 'supervisor').length} · موظف ${teamMembers.filter((member) => member.role === 'staff').length} · موصل ${teamMembers.filter((member) => member.role === 'courier').length}`;
-      const teamStatusSummary = `نشط ${activeTeamCount} · موقوف ${pausedTeamCount} · مدعو ${invitedTeamCount} · محظور ${blockedTeamCount} · قيد المراجعة ${reviewTeamCount}`;
-      const zoneStatusSummary = `نشطة ${activeZoneCount} · قيد المراجعة ${pendingZoneCount} · محجوبة ${blockedZoneCount}`;
+      const teamRoleSummary = `Ù…Ø§Ù„Ùƒ ${teamMembers.filter((member) => member.role === 'owner').length} Â· Ù…Ø´Ø±Ù ${teamMembers.filter((member) => member.role === 'supervisor').length} Â· Ù…ÙˆØ¸Ù ${teamMembers.filter((member) => member.role === 'staff').length} Â· Ù…ÙˆØµÙ„ ${teamMembers.filter((member) => member.role === 'courier').length}`;
+      const teamStatusSummary = `Ù†Ø´Ø· ${activeTeamCount} Â· Ù…ÙˆÙ‚ÙˆÙ ${pausedTeamCount} Â· Ù…Ø¯Ø¹Ùˆ ${invitedTeamCount} Â· Ù…Ø­Ø¸ÙˆØ± ${blockedTeamCount} Â· Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ${reviewTeamCount}`;
+      const zoneStatusSummary = `Ù†Ø´Ø·Ø© ${activeZoneCount} Â· Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ${pendingZoneCount} Â· Ù…Ø­Ø¬ÙˆØ¨Ø© ${blockedZoneCount}`;
 
   return (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 160 }}>
       <TopBar
         variant="secondary"
-        title="المتجر والفريق"
-        subtitle={`${storeName} · ${branchLabel}`}
+        title="Ø§Ù„Ù…ØªØ¬Ø± ÙˆØ§Ù„ÙØ±ÙŠÙ‚"
+        subtitle={`${storeName} Â· ${branchLabel}`}
         style={{ marginHorizontal: -16, marginTop: -16 }}
         trailingAction={{
           id: 'back',
           icon: <Icon name="arrow-back" size={24} tone="brand" />,
           mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
+          accessibilityLabel: 'Ø±Ø¬ÙˆØ¹',
           onPress: onBack,
         }}
       />
@@ -894,47 +894,47 @@ function OperationsPanel({
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <Box style={{ gap: 2, flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
             <Text role="label" tone="muted" align="start">
-              الحالة التشغيلية
+              Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©
             </Text>
             <Text role="titleSm" align="start">
               {storeName}
             </Text>
             <Text role="bodySm" tone="muted" align="start">
-              {branchLabel} · {cityLabel}
+              {branchLabel} Â· {cityLabel}
             </Text>
           </Box>
-          <Badge label={storeOpen ? 'مفتوح الآن' : 'مغلق الآن'} tone={storeOpen ? 'success' : 'warning'} />
+          <Badge label={storeOpen ? 'Ù…ÙØªÙˆØ­ Ø§Ù„Ø¢Ù†' : 'Ù…ØºÙ„Ù‚ Ø§Ù„Ø¢Ù†'} tone={storeOpen ? 'success' : 'warning'} />
         </Box>
 
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-          <SummaryCell label="الحالة" value={storeOpen ? 'مفتوح' : 'مغلق'} tone={storeOpen ? 'success' : 'warning'} />
-          <SummaryCell label="الظهور" value={visibilityLabel} tone={listingEnabled ? 'brand' : 'warning'} />
-          <SummaryCell label="الأوضاع" value={`${activeModesCount}/3`} tone={activeModesCount > 0 ? 'info' : 'warning'} />
+          <SummaryCell label="Ø§Ù„Ø­Ø§Ù„Ø©" value={storeOpen ? 'Ù…ÙØªÙˆØ­' : 'Ù…ØºÙ„Ù‚'} tone={storeOpen ? 'success' : 'warning'} />
+          <SummaryCell label="Ø§Ù„Ø¸Ù‡ÙˆØ±" value={visibilityLabel} tone={listingEnabled ? 'brand' : 'warning'} />
+          <SummaryCell label="Ø§Ù„Ø£ÙˆØ¶Ø§Ø¹" value={`${activeModesCount}/3`} tone={activeModesCount > 0 ? 'info' : 'warning'} />
         </Box>
 
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="default" selected />
-          <Chip label={`التغطية: ${zoneStatusSummary}`} tone="default" selected />
+          <Chip label={`Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„: ${todayHoursLabel}`} tone="default" selected />
+          <Chip label={`Ø§Ù„ØªØºØ·ÙŠØ©: ${zoneStatusSummary}`} tone="default" selected />
           {onOpenStoreCourierSetup ? (
-            <Button label="إعداد موصل المتجر" tone="brand" size="sm" fullWidth={false} onPress={onOpenStoreCourierSetup} />
+            <Button label="Ø¥Ø¹Ø¯Ø§Ø¯ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±" tone="brand" size="sm" fullWidth={false} onPress={onOpenStoreCourierSetup} />
           ) : null}
         </Box>
 
         <Text role="caption" tone="muted" align="start">
-          UI_PREVIEW_ONLY · التنفيذ المحلي هنا. التسعير والتسويات مركزيًا في WLT/Finance.
+          UI_PREVIEW_ONLY Â· Ø§Ù„ØªÙ†ÙÙŠØ° Ø§Ù„Ù…Ø­Ù„ÙŠ Ù‡Ù†Ø§. Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„ØªØ³ÙˆÙŠØ§Øª Ù…Ø±ÙƒØ²ÙŠÙ‹Ø§ ÙÙŠ WLT/Finance.
         </Text>
       </Box>
 
       <Divider />
 
       <Box gap={3} paddingY={2}>
-        <Text role="bodyStrong" align="start">الظهور ونقاط الخدمة</Text>
+        <Text role="bodyStrong" align="start">Ø§Ù„Ø¸Ù‡ÙˆØ± ÙˆÙ†Ù‚Ø§Ø· Ø§Ù„Ø®Ø¯Ù…Ø©</Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} />
-          <Chip label={`النطاق: ${branchLabel}`} tone="default" />
-          <Chip label={`المنطقة: ${activeZoneLabel}`} tone="default" />
-          <Chip label={`للعملاء: ${storeVisibility.visible ? 'ظاهر' : 'محجوب'}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
-          <Chip label={`الحالة: ${getDshPartnerActivationStatusLabel(storeVisibility.activationStatus)}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
+          <Chip label={`Ø§Ù„Ø¸Ù‡ÙˆØ±: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} />
+          <Chip label={`Ø§Ù„Ù†Ø·Ø§Ù‚: ${branchLabel}`} tone="default" />
+          <Chip label={`Ø§Ù„Ù…Ù†Ø·Ù‚Ø©: ${activeZoneLabel}`} tone="default" />
+          <Chip label={`Ù„Ù„Ø¹Ù…Ù„Ø§Ø¡: ${storeVisibility.visible ? 'Ø¸Ø§Ù‡Ø±' : 'Ù…Ø­Ø¬ÙˆØ¨'}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
+          <Chip label={`Ø§Ù„Ø­Ø§Ù„Ø©: ${getDshPartnerActivationStatusLabel(storeVisibility.activationStatus)}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
         </Box>
 
         <Box gap={1} style={{ marginTop: 4 }}>
@@ -947,9 +947,9 @@ function OperationsPanel({
               />
               <Text role="bodySm" tone={check.satisfied ? 'default' : 'danger'} align="start" style={{ flex: 1 }}>
                 {check.label}
-                {!check.satisfied && check.blockedReason ? ` — ${check.blockedReason}` : ''}
+                {!check.satisfied && check.blockedReason ? ` â€” ${check.blockedReason}` : ''}
               </Text>
-              <Badge label={check.satisfied ? 'مكتمل' : 'غير مكتمل'} tone={check.satisfied ? 'success' : 'danger'} />
+              <Badge label={check.satisfied ? 'Ù…ÙƒØªÙ…Ù„' : 'ØºÙŠØ± Ù…ÙƒØªÙ…Ù„'} tone={check.satisfied ? 'success' : 'danger'} />
             </Box>
           ))}
         </Box>
@@ -960,7 +960,7 @@ function OperationsPanel({
       {/* 4) Flat Operational Modes Row List with inline expansion */}
       <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">
-          أوضاع الخدمة
+          Ø£ÙˆØ¶Ø§Ø¹ Ø§Ù„Ø®Ø¯Ù…Ø©
         </Text>
         <Box gap={0}>
           {resolvedModes.map((mode) => {
@@ -990,7 +990,7 @@ function OperationsPanel({
                   </Box>
                   <Box style={{ alignItems: 'center', flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, marginEnd: 8 }}>
                     <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2 }}>
-                      <Badge label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
+                      <Badge label={mode.enabled ? 'Ù…ÙØ¹Ù‘Ù„' : 'ØºÙŠØ± Ù…ÙØ¹Ù‘Ù„'} tone={mode.enabled ? 'success' : 'warning'} />
                       <Text role="caption" tone="muted">
                         {getWltDshPartnerCommissionLabel(mode.commission)}
                       </Text>
@@ -1002,11 +1002,11 @@ function OperationsPanel({
                 {isSelected && (
                   <Box paddingHorizontal={4} paddingBottom={3} gap={2} style={{ paddingTop: 2 }}>
                     <Text role="caption" tone="muted" align="start">
-                      حالة الوضع: {mode.enabled ? 'نشط ويستقبل الطلبات' : 'موقف مؤقتًا'}.
+                      Ø­Ø§Ù„Ø© Ø§Ù„ÙˆØ¶Ø¹: {mode.enabled ? 'Ù†Ø´Ø· ÙˆÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª' : 'Ù…ÙˆÙ‚Ù Ù…Ø¤Ù‚ØªÙ‹Ø§'}.
                     </Text>
                     <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8 }}>
                       <Button
-                        label={mode.enabled ? 'إيقاف الوضع' : 'تفعيل الوضع'}
+                        label={mode.enabled ? 'Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„ÙˆØ¶Ø¹' : 'ØªÙØ¹ÙŠÙ„ Ø§Ù„ÙˆØ¶Ø¹'}
                         tone="secondary"
                         size="sm"
                         fullWidth={false}
@@ -1019,7 +1019,7 @@ function OperationsPanel({
                       />
                       {mode.id === 'partner_delivery' && onOpenStoreCourierSetup ? (
                         <Button
-                          label="إعداد موصل المتجر"
+                          label="Ø¥Ø¹Ø¯Ø§Ø¯ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±"
                           tone="brand"
                           size="sm"
                           fullWidth={false}
@@ -1041,11 +1041,11 @@ function OperationsPanel({
       <Box gap={3} paddingY={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
-            <Text role="bodyStrong" align="start">الفريق</Text>
-            <Text role="caption" tone="muted" align="start">{teamRoleSummary} · {teamStatusSummary}</Text>
+            <Text role="bodyStrong" align="start">Ø§Ù„ÙØ±ÙŠÙ‚</Text>
+            <Text role="caption" tone="muted" align="start">{teamRoleSummary} Â· {teamStatusSummary}</Text>
           </Box>
           <Button
-            label={teamPanelOpen ? 'إخفاء الأعضاء' : 'إدارة الفريق'}
+            label={teamPanelOpen ? 'Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡' : 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ÙØ±ÙŠÙ‚'}
             tone="secondary"
             size="sm"
             fullWidth={false}
@@ -1054,9 +1054,9 @@ function OperationsPanel({
         </Box>
 
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-          <SummaryCell label="نشط" value={String(activeTeamCount)} tone="success" />
-          <SummaryCell label="موقوف" value={String(pausedTeamCount)} tone="warning" />
-          <SummaryCell label="قيد المراجعة" value={String(reviewTeamCount)} tone="info" />
+          <SummaryCell label="Ù†Ø´Ø·" value={String(activeTeamCount)} tone="success" />
+          <SummaryCell label="Ù…ÙˆÙ‚ÙˆÙ" value={String(pausedTeamCount)} tone="warning" />
+          <SummaryCell label="Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©" value={String(reviewTeamCount)} tone="info" />
         </Box>
 
         {teamPanelOpen && (
@@ -1064,7 +1064,7 @@ function OperationsPanel({
             <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="muted" />
               <Text role="caption" tone="muted" align="start" style={{ flex: 1 }}>
-                UI_PREVIEW_ONLY · الأدوار والدعوات هنا محلية حتى يتصل Control Panel.
+                UI_PREVIEW_ONLY Â· Ø§Ù„Ø£Ø¯ÙˆØ§Ø± ÙˆØ§Ù„Ø¯Ø¹ÙˆØ§Øª Ù‡Ù†Ø§ Ù…Ø­Ù„ÙŠØ© Ø­ØªÙ‰ ÙŠØªØµÙ„ Control Panel.
               </Text>
             </Box>
 
@@ -1111,12 +1111,12 @@ function OperationsPanel({
                         <KeyValueList
                           dense
                           items={[
-                            { label: 'الحالة', value: member.statusLabel, tone: statusTone },
-                            { label: 'تعيين الفرع', value: member.branchAssignment },
-                            { label: 'ملخص الصلاحيات', value: member.permissionsSummary },
-                            { label: 'إسناد التوصيل', value: member.deliveryAssignment },
-                            { label: 'دورة الدعوة', value: member.inviteLifecycle },
-                            { label: 'المراجعة/الأثر', value: member.operationalImpact },
+                            { label: 'Ø§Ù„Ø­Ø§Ù„Ø©', value: member.statusLabel, tone: statusTone },
+                            { label: 'ØªØ¹ÙŠÙŠÙ† Ø§Ù„ÙØ±Ø¹', value: member.branchAssignment },
+                            { label: 'Ù…Ù„Ø®Øµ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª', value: member.permissionsSummary },
+                            { label: 'Ø¥Ø³Ù†Ø§Ø¯ Ø§Ù„ØªÙˆØµÙŠÙ„', value: member.deliveryAssignment },
+                            { label: 'Ø¯ÙˆØ±Ø© Ø§Ù„Ø¯Ø¹ÙˆØ©', value: member.inviteLifecycle },
+                            { label: 'Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©/Ø§Ù„Ø£Ø«Ø±', value: member.operationalImpact },
                           ]}
                         />
                         <Text role="bodySm" tone="muted" align="start">
@@ -1124,7 +1124,7 @@ function OperationsPanel({
                         </Text>
                         {isLastSupervisor ? (
                           <Text role="caption" tone="warning" align="start">
-                            لا يمكن تعطيل آخر مشرف.
+                            Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ¹Ø·ÙŠÙ„ Ø¢Ø®Ø± Ù…Ø´Ø±Ù.
                           </Text>
                         ) : null}
                         <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
@@ -1136,7 +1136,7 @@ function OperationsPanel({
                             disabled={isLastSupervisor}
                             onPress={() => {
                               if (isLastSupervisor) {
-                                setLastSaveLabel('لا يمكن تعطيل آخر مشرف.');
+                                setLastSaveLabel('Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ¹Ø·ÙŠÙ„ Ø¢Ø®Ø± Ù…Ø´Ø±Ù.');
                                 return;
                               }
 
@@ -1144,7 +1144,7 @@ function OperationsPanel({
                             }}
                           />
                           <Button
-                            label={member.status === 'invited' ? 'إعادة إرسال الدعوة' : member.status === 'blocked' ? 'طلب مراجعة' : 'مراجعة الصلاحيات'}
+                            label={member.status === 'invited' ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¯Ø¹ÙˆØ©' : member.status === 'blocked' ? 'Ø·Ù„Ø¨ Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª'}
                             tone="secondary"
                             size="sm"
                             fullWidth={false}
@@ -1162,14 +1162,14 @@ function OperationsPanel({
 
             <Box gap={3} style={{ marginTop: 8 }}>
               <TextField
-                label="اسم العضو أو البريد"
-                placeholder="مثال: staff@bthwani.sa"
+                label="Ø§Ø³Ù… Ø§Ù„Ø¹Ø¶Ùˆ Ø£Ùˆ Ø§Ù„Ø¨Ø±ÙŠØ¯"
+                placeholder="Ù…Ø«Ø§Ù„: staff@bthwani.sa"
                 value={inviteDraft}
                 onChangeText={setInviteDraft}
-                hint="UI_PREVIEW_ONLY · إنشاء دعوة محلية حتى يتصل مسار العضوية المركزي."
+                hint="UI_PREVIEW_ONLY Â· Ø¥Ù†Ø´Ø§Ø¡ Ø¯Ø¹ÙˆØ© Ù…Ø­Ù„ÙŠØ© Ø­ØªÙ‰ ÙŠØªØµÙ„ Ù…Ø³Ø§Ø± Ø§Ù„Ø¹Ø¶ÙˆÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ."
               />
               <Button
-                label="إضافة عضو"
+                label="Ø¥Ø¶Ø§ÙØ© Ø¹Ø¶Ùˆ"
                 tone="secondary"
                 size="sm"
                 fullWidth={false}
@@ -1178,7 +1178,7 @@ function OperationsPanel({
                     return;
                   }
 
-                  setLastSaveLabel(`دعوة محلية: ${inviteDraft.trim()}`);
+                  setLastSaveLabel(`Ø¯Ø¹ÙˆØ© Ù…Ø­Ù„ÙŠØ©: ${inviteDraft.trim()}`);
                   setInviteDraft('');
                 }}
               />
@@ -1198,11 +1198,11 @@ function OperationsPanel({
       <Box gap={3} paddingY={2}>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
-            <Text role="bodyStrong" align="start">مناطق التغطية</Text>
+            <Text role="bodyStrong" align="start">Ù…Ù†Ø§Ø·Ù‚ Ø§Ù„ØªØºØ·ÙŠØ©</Text>
             <Text role="caption" tone="muted" align="start">{zoneStatusSummary}</Text>
           </Box>
           <Button
-            label={coveragePanelOpen ? 'إخفاء المناطق' : 'إدارة المناطق'}
+            label={coveragePanelOpen ? 'Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ù…Ù†Ø§Ø·Ù‚' : 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù†Ø§Ø·Ù‚'}
             tone="secondary"
             size="sm"
             fullWidth={false}
@@ -1211,9 +1211,9 @@ function OperationsPanel({
         </Box>
 
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-          <SummaryCell label="نشطة" value={String(activeZoneCount)} tone="success" />
-          <SummaryCell label="قيد المراجعة" value={String(pendingZoneCount)} tone="warning" />
-          <SummaryCell label="محجوبة" value={String(blockedZoneCount)} tone="danger" />
+          <SummaryCell label="Ù†Ø´Ø·Ø©" value={String(activeZoneCount)} tone="success" />
+          <SummaryCell label="Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©" value={String(pendingZoneCount)} tone="warning" />
+          <SummaryCell label="Ù…Ø­Ø¬ÙˆØ¨Ø©" value={String(blockedZoneCount)} tone="danger" />
         </Box>
 
         {coveragePanelOpen && (
@@ -1221,12 +1221,12 @@ function OperationsPanel({
             <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="warning" />
               <Text role="caption" tone="warning" align="start" style={{ flex: 1 }}>
-                المناطق تُدار مركزيًا من لوحة التحكم وWLT/Finance. الشريك يطلب مراجعة فقط ولا يبدل السياسة محليًا.
+                Ø§Ù„Ù…Ù†Ø§Ø·Ù‚ ØªÙØ¯Ø§Ø± Ù…Ø±ÙƒØ²ÙŠÙ‹Ø§ Ù…Ù† Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ… ÙˆWLT/Finance. Ø§Ù„Ø´Ø±ÙŠÙƒ ÙŠØ·Ù„Ø¨ Ù…Ø±Ø§Ø¬Ø¹Ø© ÙÙ‚Ø· ÙˆÙ„Ø§ ÙŠØ¨Ø¯Ù„ Ø§Ù„Ø³ÙŠØ§Ø³Ø© Ù…Ø­Ù„ÙŠÙ‹Ø§.
               </Text>
             </Box>
 
             <Text role="bodySm" tone="muted" align="start">
-              {`النطاق الحالي: ${activeZoneLabel}`}
+              {`Ø§Ù„Ù†Ø·Ø§Ù‚ Ø§Ù„Ø­Ø§Ù„ÙŠ: ${activeZoneLabel}`}
             </Text>
 
             <Box gap={0}>
@@ -1264,12 +1264,12 @@ function OperationsPanel({
                         <KeyValueList
                           dense
                           items={[
-                            { label: 'الحالة', value: zone.statusLabel, tone: statusTone },
-                            { label: 'الفرع المرتبط', value: zone.branchRelation },
-                            { label: 'وضع الخدمة', value: zone.serviceModeRelation },
-                            { label: 'مرجع التسعير', value: zone.pricingReference },
-                            { label: 'مرجع العمولة', value: zone.commissionReference },
-                            { label: 'مرجع التسوية', value: zone.payoutReference },
+                            { label: 'Ø§Ù„Ø­Ø§Ù„Ø©', value: zone.statusLabel, tone: statusTone },
+                            { label: 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ù…Ø±ØªØ¨Ø·', value: zone.branchRelation },
+                            { label: 'ÙˆØ¶Ø¹ Ø§Ù„Ø®Ø¯Ù…Ø©', value: zone.serviceModeRelation },
+                            { label: 'Ù…Ø±Ø¬Ø¹ Ø§Ù„ØªØ³Ø¹ÙŠØ±', value: zone.pricingReference },
+                            { label: 'Ù…Ø±Ø¬Ø¹ Ø§Ù„Ø¹Ù…ÙˆÙ„Ø©', value: zone.commissionReference },
+                            { label: 'Ù…Ø±Ø¬Ø¹ Ø§Ù„ØªØ³ÙˆÙŠØ©', value: zone.payoutReference },
                           ]}
                         />
                         <Text role="bodySm" tone="muted" align="start">
@@ -1290,10 +1290,10 @@ function OperationsPanel({
                             tone="primary"
                             size="sm"
                             fullWidth={false}
-                            onPress={() => setLastSaveLabel(`طلب مراجعة المنطقة: ${zone.name}`)}
+                            onPress={() => setLastSaveLabel(`Ø·Ù„Ø¨ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù…Ù†Ø·Ù‚Ø©: ${zone.name}`)}
                           />
                           <Button
-                            label="فتح الأثر التشغيلي"
+                            label="ÙØªØ­ Ø§Ù„Ø£Ø«Ø± Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ"
                             tone="secondary"
                             size="sm"
                             fullWidth={false}
@@ -1311,15 +1311,15 @@ function OperationsPanel({
       </Box>
 
       <MobileStickyPrimaryAction
-        label="حفظ إعدادات العمليات"
-        helperText={lastSaveLabel ? `آخر حفظ: ${lastSaveLabel}` : 'التعديلات تحفظ من نفس الصفحة.'}
+        label="Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª"
+        helperText={lastSaveLabel ? `Ø¢Ø®Ø± Ø­ÙØ¸: ${lastSaveLabel}` : 'Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª ØªØ­ÙØ¸ Ù…Ù† Ù†ÙØ³ Ø§Ù„ØµÙØ­Ø©.'}
         onPress={() => setLastSaveLabel(new Date().toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' }))}
       />
     </MobileScrollView>
   );
 }
 
-/** Analytics view-model — preview/seed data only.
+/** Analytics view-model â€” preview/seed data only.
  * No customer PII. Summary metrics only per on-demand retrieval contract.
  * Designed for later real-data binding without layout changes. */
 
@@ -1358,10 +1358,10 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Summary headline */}
       <Box gap={2} paddingY={2}>
         <Text role="label" tone="muted" align="start">
-          ملخص الأداء — {storeName}
+          Ù…Ù„Ø®Øµ Ø§Ù„Ø£Ø¯Ø§Ø¡ â€” {storeName}
         </Text>
         <Text role="bodySm" tone="muted" align="start">
-          مؤشرات موجزة للتفاعل والنمو. لا تتضمن بيانات عملاء تفصيلية.
+          Ù…Ø¤Ø´Ø±Ø§Øª Ù…ÙˆØ¬Ø²Ø© Ù„Ù„ØªÙØ§Ø¹Ù„ ÙˆØ§Ù„Ù†Ù…Ùˆ. Ù„Ø§ ØªØªØ¶Ù…Ù† Ø¨ÙŠØ§Ù†Ø§Øª Ø¹Ù…Ù„Ø§Ø¡ ØªÙØµÙŠÙ„ÙŠØ©.
         </Text>
       </Box>
 
@@ -1369,17 +1369,17 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
 
       {/* Engagement metrics grid */}
       <Box gap={3} paddingY={2}>
-        <Text role="bodyStrong" align="start">مؤشرات التفاعل</Text>
+        <Text role="bodyStrong" align="start">Ù…Ø¤Ø´Ø±Ø§Øª Ø§Ù„ØªÙØ§Ø¹Ù„</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
-          <AnalyticsInsightMetric label="متابعو المتجر" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
+          <AnalyticsInsightMetric label="Ø­ÙØ¸ Ø§Ù„Ù…ØªØ¬Ø± ÙÙŠ Ø§Ù„Ù…ÙØ¶Ù„Ø©" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
+          <AnalyticsInsightMetric label="Ù…ØªØ§Ø¨Ø¹Ùˆ Ø§Ù„Ù…ØªØ¬Ø±" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <AnalyticsInsightMetric label="حفظ المنتجات في المفضلة" value={d.productFavoritesCount.toLocaleString('ar')} tone="success" icon="bookmark-outline" />
-          <AnalyticsInsightMetric label="عدد التقييمات" value={d.totalRatings.toLocaleString('ar')} tone="default" icon="star-half-outline" />
+          <AnalyticsInsightMetric label="Ø­ÙØ¸ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª ÙÙŠ Ø§Ù„Ù…ÙØ¶Ù„Ø©" value={d.productFavoritesCount.toLocaleString('ar')} tone="success" icon="bookmark-outline" />
+          <AnalyticsInsightMetric label="Ø¹Ø¯Ø¯ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª" value={d.totalRatings.toLocaleString('ar')} tone="default" icon="star-half-outline" />
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <AnalyticsInsightMetric label="متوسط التقييم" value={`${d.averageRating} ⭐`} tone="brand" icon="star" />
+          <AnalyticsInsightMetric label="Ù…ØªÙˆØ³Ø· Ø§Ù„ØªÙ‚ÙŠÙŠÙ…" value={`${d.averageRating} â­`} tone="brand" icon="star" />
         </View>
       </Box>
 
@@ -1387,13 +1387,13 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
 
       {/* Top products */}
       <Box gap={3} paddingY={2}>
-        <Text role="bodyStrong" align="start">أبرز المنتجات</Text>
+        <Text role="bodyStrong" align="start">Ø£Ø¨Ø±Ø² Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª</Text>
         <KeyValueList
           dense
           items={[
-            { label: 'الأكثر طلبًا', value: `${d.topOrderedProduct.name} (${d.topOrderedProduct.ordersCount} طلب)`, tone: 'brand' },
-            { label: 'الأكثر تفضيلًا', value: `${d.topFavoritedProduct.name} (${d.topFavoritedProduct.favoritesCount} حفظ)`, tone: 'success' },
-            { label: 'الأعلى مشاهدة', value: `${d.topViewedProduct.name} (${d.topViewedProduct.viewsCount} مشاهدة)`, tone: 'info' },
+            { label: 'Ø§Ù„Ø£ÙƒØ«Ø± Ø·Ù„Ø¨Ù‹Ø§', value: `${d.topOrderedProduct.name} (${d.topOrderedProduct.ordersCount} Ø·Ù„Ø¨)`, tone: 'brand' },
+            { label: 'Ø§Ù„Ø£ÙƒØ«Ø± ØªÙØ¶ÙŠÙ„Ù‹Ø§', value: `${d.topFavoritedProduct.name} (${d.topFavoritedProduct.favoritesCount} Ø­ÙØ¸)`, tone: 'success' },
+            { label: 'Ø§Ù„Ø£Ø¹Ù„Ù‰ Ù…Ø´Ø§Ù‡Ø¯Ø©', value: `${d.topViewedProduct.name} (${d.topViewedProduct.viewsCount} Ù…Ø´Ø§Ù‡Ø¯Ø©)`, tone: 'info' },
           ]}
         />
       </Box>
@@ -1408,7 +1408,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
           <Icon name="bulb-outline" size={18} tone="warning" />
-          <Text role="bodyStrong" tone="warning">فرصة تسويقية</Text>
+          <Text role="bodyStrong" tone="warning">ÙØ±ØµØ© ØªØ³ÙˆÙŠÙ‚ÙŠØ©</Text>
         </View>
         <Text role="bodySm" align="start">
           <Text role="bodySm" tone="default">{d.opportunityProduct.name}: </Text>
@@ -1417,8 +1417,8 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
         <KeyValueList
           dense
           items={[
-            { label: 'المفضلات', value: String(d.opportunityProduct.favoritesCount), tone: 'success' },
-            { label: 'الطلبات الفعلية', value: String(d.opportunityProduct.ordersCount), tone: 'warning' },
+            { label: 'Ø§Ù„Ù…ÙØ¶Ù„Ø§Øª', value: String(d.opportunityProduct.favoritesCount), tone: 'success' },
+            { label: 'Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„ÙØ¹Ù„ÙŠØ©', value: String(d.opportunityProduct.ordersCount), tone: 'warning' },
           ]}
         />
       </Box>
@@ -1433,22 +1433,22 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
           <Icon name="trending-up-outline" size={18} tone="brand" />
-          <Text role="bodyStrong" tone="brand">توصية ذكية</Text>
+          <Text role="bodyStrong" tone="brand">ØªÙˆØµÙŠØ© Ø°ÙƒÙŠØ©</Text>
         </View>
         <Text role="bodySm" align="start">{d.smartRecommendation}</Text>
         <Button
-          label="فعّل العرض"
+          label="ÙØ¹Ù‘Ù„ Ø§Ù„Ø¹Ø±Ø¶"
           tone="primary"
           fullWidth={false}
-          onPress={() => {/* promotion intent — UI only, no backend */}}
+          onPress={() => {/* promotion intent â€” UI only, no backend */}}
         />
       </Box>
 
       {/* Promotion intent panel below */}
       <PromotionIntentPanel
         storeName={storeName}
-        branchLabel="اليرموك · الرياض"
-        activeZoneLabel="اليرموك"
+        branchLabel="Ø§Ù„ÙŠØ±Ù…ÙˆÙƒ Â· Ø§Ù„Ø±ÙŠØ§Ø¶"
+        activeZoneLabel="Ø§Ù„ÙŠØ±Ù…ÙˆÙƒ"
         todayHoursLabel="09:00 - 23:00"
       />
     </Box>
@@ -1461,14 +1461,14 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     state = 'ready',
     section,
     onSectionChange,
-    storeName = 'متجر الفخامة',
-    branchLabel = 'الرياض، فرع الياسمين',
-    cityLabel = 'الرياض',
-    managerLabel = 'خالد',
+    storeName = 'Ù…ØªØ¬Ø± Ø§Ù„ÙØ®Ø§Ù…Ø©',
+    branchLabel = 'Ø§Ù„Ø±ÙŠØ§Ø¶ØŒ ÙØ±Ø¹ Ø§Ù„ÙŠØ§Ø³Ù…ÙŠÙ†',
+    cityLabel = 'Ø§Ù„Ø±ÙŠØ§Ø¶',
+    managerLabel = 'Ø®Ø§Ù„Ø¯',
     todayHoursLabel = '09:00 - 23:00',
     storeOpen = true,
     listingEnabled = true,
-    activeZoneLabel = 'الياسمين / الندى',
+    activeZoneLabel = 'Ø§Ù„ÙŠØ§Ø³Ù…ÙŠÙ† / Ø§Ù„Ù†Ø¯Ù‰',
     activeOrdersCount = 13,
     serviceModes = [],
     onOpenOrdersBoard,
@@ -1496,7 +1496,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const catalogsGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('catalogs'), []);
   const marketingGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('marketing'), []);
   const financeGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('finance'), []);
-  // ML-T1: journey map reference — summary-only; details on-demand per on-demand contract
+  // ML-T1: journey map reference â€” summary-only; details on-demand per on-demand contract
   const partnerStatusStep = React.useMemo(() => getDshPartnerJourneyStep('partner-status-visibility'), []);
   const {
     hydrated: appearanceHydrated,
@@ -1537,7 +1537,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     });
   }, [listingEnabled, activeCanonicalStore?.publishStage, serviceModes, isAvailable]);
 
-  const visibilityLabel = listingEnabled ? 'مفعّل' : 'موقوف';
+  const visibilityLabel = listingEnabled ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…ÙˆÙ‚ÙˆÙ';
 
   const enabledNotificationChannelsCount = React.useMemo(
     () => ['orders', 'operations', 'inventory', 'finance', 'marketing', 'system'].filter((key) => notificationPreferences[key as NotificationPreferenceId]).length,
@@ -1573,9 +1573,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const summaryItems = React.useMemo<readonly SummaryItem[]>(
     () => [
-      { id: 'store-status', label: 'حالة المتجر', value: isAvailable ? 'مفتوح الآن' : 'مغلق الآن', tone: isAvailable ? 'success' : 'warning' },
-      { id: 'active-orders', label: 'الطلبات النشطة', value: String(activeOrdersCount), tone: 'brand' },
-      { id: 'hours', label: 'ساعات العمل', value: resolvedTodayHoursLabel, tone: 'info' },
+      { id: 'store-status', label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØªØ¬Ø±', value: isAvailable ? 'Ù…ÙØªÙˆØ­ Ø§Ù„Ø¢Ù†' : 'Ù…ØºÙ„Ù‚ Ø§Ù„Ø¢Ù†', tone: isAvailable ? 'success' : 'warning' },
+      { id: 'active-orders', label: 'Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù†Ø´Ø·Ø©', value: String(activeOrdersCount), tone: 'brand' },
+      { id: 'hours', label: 'Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„', value: resolvedTodayHoursLabel, tone: 'info' },
     ],
     [activeOrdersCount, resolvedTodayHoursLabel, isAvailable],
   );
@@ -1586,9 +1586,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     return (
       <StateView
         stateId={stateId}
-        title="مركز حساب الشريك"
-        description="نجهز الآن نموذج التنقل الخاص بالحساب. سيبقى المسار واضحًا ومضغوطًا حتى يكتمل التحميل."
-        actionLabel={onOpenOrdersBoard ? 'فتح الطلبات' : undefined}
+        title="Ù…Ø±ÙƒØ² Ø­Ø³Ø§Ø¨ Ø§Ù„Ø´Ø±ÙŠÙƒ"
+        description="Ù†Ø¬Ù‡Ø² Ø§Ù„Ø¢Ù† Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„ØªÙ†Ù‚Ù„ Ø§Ù„Ø®Ø§Øµ Ø¨Ø§Ù„Ø­Ø³Ø§Ø¨. Ø³ÙŠØ¨Ù‚Ù‰ Ø§Ù„Ù…Ø³Ø§Ø± ÙˆØ§Ø¶Ø­Ù‹Ø§ ÙˆÙ…Ø¶ØºÙˆØ·Ù‹Ø§ Ø­ØªÙ‰ ÙŠÙƒØªÙ…Ù„ Ø§Ù„ØªØ­Ù…ÙŠÙ„."
+        actionLabel={onOpenOrdersBoard ? 'ÙØªØ­ Ø§Ù„Ø·Ù„Ø¨Ø§Øª' : undefined}
         onActionPress={onOpenOrdersBoard}
       />
     );
@@ -1648,22 +1648,22 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
       const primaryNotificationRows = [
         {
           id: 'orders' as const,
-          title: 'تنبيهات الطلبات',
-          subtitle: 'الطلبات الجديدة، التأخير، وحالات الموافقة والإفراج.',
+          title: 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ø·Ù„Ø¨Ø§Øª',
+          subtitle: 'Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©ØŒ Ø§Ù„ØªØ£Ø®ÙŠØ±ØŒ ÙˆØ­Ø§Ù„Ø§Øª Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© ÙˆØ§Ù„Ø¥ÙØ±Ø§Ø¬.',
           icon: 'receipt-outline' as const,
           value: notificationPreferences.orders,
         },
         {
           id: 'operations' as const,
-          title: 'تنبيهات التشغيل',
-          subtitle: 'الفرع، الفريق، ساعات العمل، والتوصيات السريعة للورديات.',
+          title: 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„',
+          subtitle: 'Ø§Ù„ÙØ±Ø¹ØŒ Ø§Ù„ÙØ±ÙŠÙ‚ØŒ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ØŒ ÙˆØ§Ù„ØªÙˆØµÙŠØ§Øª Ø§Ù„Ø³Ø±ÙŠØ¹Ø© Ù„Ù„ÙˆØ±Ø¯ÙŠØ§Øª.',
           icon: 'people-outline' as const,
           value: notificationPreferences.operations,
         },
         {
           id: 'inventory' as const,
-          title: 'تنبيهات المخزون',
-          subtitle: 'النواقص، المنتجات منخفضة الكمية، وتغييرات الجاهزية.',
+          title: 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ù…Ø®Ø²ÙˆÙ†',
+          subtitle: 'Ø§Ù„Ù†ÙˆØ§Ù‚ØµØŒ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ù…Ù†Ø®ÙØ¶Ø© Ø§Ù„ÙƒÙ…ÙŠØ©ØŒ ÙˆØªØºÙŠÙŠØ±Ø§Øª Ø§Ù„Ø¬Ø§Ù‡Ø²ÙŠØ©.',
           icon: 'cube-outline' as const,
           value: notificationPreferences.inventory,
         },
@@ -1679,36 +1679,36 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
       const secondaryNotificationRows = [
         {
           id: 'marketing' as const,
-          title: 'التسويق والنمو',
-          subtitle: 'العروض والتوصيات الموسمية والفرص المقترحة للنمو.',
+          title: 'Ø§Ù„ØªØ³ÙˆÙŠÙ‚ ÙˆØ§Ù„Ù†Ù…Ùˆ',
+          subtitle: 'Ø§Ù„Ø¹Ø±ÙˆØ¶ ÙˆØ§Ù„ØªÙˆØµÙŠØ§Øª Ø§Ù„Ù…ÙˆØ³Ù…ÙŠØ© ÙˆØ§Ù„ÙØ±Øµ Ø§Ù„Ù…Ù‚ØªØ±Ø­Ø© Ù„Ù„Ù†Ù…Ùˆ.',
           icon: 'megaphone-outline' as const,
           value: notificationPreferences.marketing,
         },
         {
           id: 'system' as const,
-          title: 'تنبيهات النظام',
-          subtitle: 'الهوية، الإعدادات، وحالة الربط العام للحساب.',
+          title: 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ù†Ø¸Ø§Ù…',
+          subtitle: 'Ø§Ù„Ù‡ÙˆÙŠØ©ØŒ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§ØªØŒ ÙˆØ­Ø§Ù„Ø© Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ø¹Ø§Ù… Ù„Ù„Ø­Ø³Ø§Ø¨.',
           icon: 'shield-checkmark-outline' as const,
           value: notificationPreferences.system,
         },
         {
           id: 'sound' as const,
-          title: 'الصوت والاهتزاز',
-          subtitle: 'تفعيل التنبيه السمعي والاهتزازي عند وجود حدث مهم.',
+          title: 'Ø§Ù„ØµÙˆØª ÙˆØ§Ù„Ø§Ù‡ØªØ²Ø§Ø²',
+          subtitle: 'ØªÙØ¹ÙŠÙ„ Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡ Ø§Ù„Ø³Ù…Ø¹ÙŠ ÙˆØ§Ù„Ø§Ù‡ØªØ²Ø§Ø²ÙŠ Ø¹Ù†Ø¯ ÙˆØ¬ÙˆØ¯ Ø­Ø¯Ø« Ù…Ù‡Ù….',
           icon: 'volume-high-outline' as const,
           value: notificationPreferences.sound,
         },
         {
           id: 'dailyDigest' as const,
-          title: 'ملخص يومي مختصر',
-          subtitle: 'استلام ملخص يومي موحّد بدل فتح أكثر من شاشة منفصلة.',
+          title: 'Ù…Ù„Ø®Øµ ÙŠÙˆÙ…ÙŠ Ù…Ø®ØªØµØ±',
+          subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… Ù…Ù„Ø®Øµ ÙŠÙˆÙ…ÙŠ Ù…ÙˆØ­Ù‘Ø¯ Ø¨Ø¯Ù„ ÙØªØ­ Ø£ÙƒØ«Ø± Ù…Ù† Ø´Ø§Ø´Ø© Ù…Ù†ÙØµÙ„Ø©.',
           icon: 'calendar-outline' as const,
           value: notificationPreferences.dailyDigest,
         },
         {
           id: 'priorityOnly' as const,
-          title: 'العاجلة فقط',
-          subtitle: 'تقليل التشويش وإبراز الحالات ذات الأولوية العالية فقط.',
+          title: 'Ø§Ù„Ø¹Ø§Ø¬Ù„Ø© ÙÙ‚Ø·',
+          subtitle: 'ØªÙ‚Ù„ÙŠÙ„ Ø§Ù„ØªØ´ÙˆÙŠØ´ ÙˆØ¥Ø¨Ø±Ø§Ø² Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø°Ø§Øª Ø§Ù„Ø£ÙˆÙ„ÙˆÙŠØ© Ø§Ù„Ø¹Ø§Ù„ÙŠØ© ÙÙ‚Ø·.',
           icon: 'flash-outline' as const,
           value: notificationPreferences.priorityOnly,
         },
@@ -1749,10 +1749,10 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   </View>
                   <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                     <Text role="bodyStrong" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-                      المظهر
+                      Ø§Ù„Ù…Ø¸Ù‡Ø±
                     </Text>
                     <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-                      فاتح أبيض أو داكن زجاجي
+                      ÙØ§ØªØ­ Ø£Ø¨ÙŠØ¶ Ø£Ùˆ Ø¯Ø§ÙƒÙ† Ø²Ø¬Ø§Ø¬ÙŠ
                   </Text>
                   </View>
                 </View>
@@ -1784,7 +1784,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                         color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text,
                       }}
                     >
-                      فاتح
+                      ÙØ§ØªØ­
                     </Text>
                   </Pressable>
                   <Pressable
@@ -1803,7 +1803,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                         color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text,
                       }}
                     >
-                      داكن
+                      Ø¯Ø§ÙƒÙ†
                     </Text>
                   </Pressable>
                 </View>
@@ -1815,15 +1815,15 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             {/* Current Preferences */}
             <Box padding={0} gap={0}>
               <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
-                التفضيلات الحالية
+                Ø§Ù„ØªÙØ¶ÙŠÙ„Ø§Øª Ø§Ù„Ø­Ø§Ù„ÙŠØ©
               </Text>
               {[
-                { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: (notificationPreferences.priorityOnly ? 'warning' : 'success') as const },
-                { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.sound ? 'success' : 'warning') as const },
-                { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.dailyDigest ? 'info' : 'default') as const },
-                { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: (listingEnabled ? 'success' : 'warning') as const },
-                { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: (storeOpen ? 'success' : 'warning') as const },
-                { label: 'ساعات العمل', value: todayHoursLabel, tone: 'default' as const },
+                { label: 'Ù…Ø³ØªÙˆÙ‰ Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡', value: notificationPreferences.priorityOnly ? 'Ø§Ù„Ø¹Ø§Ø¬Ù„Ø© ÙÙ‚Ø·' : 'ÙƒÙ„ Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§Øª', tone: (notificationPreferences.priorityOnly ? 'warning' : 'success') as const },
+                { label: 'Ø§Ù„ØµÙˆØª ÙˆØ§Ù„Ø§Ù‡ØªØ²Ø§Ø²', value: notificationPreferences.sound ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…ÙˆÙ‚ÙˆÙ', tone: (notificationPreferences.sound ? 'success' : 'warning') as const },
+                { label: 'Ø§Ù„Ù…Ù„Ø®Øµ Ø§Ù„ÙŠÙˆÙ…ÙŠ', value: notificationPreferences.dailyDigest ? 'Ù…ÙØ¹Ù‘Ù„' : 'Ù…ÙˆÙ‚ÙˆÙ', tone: (notificationPreferences.dailyDigest ? 'info' : 'default') as const },
+                { label: 'Ø§Ù„Ø¸Ù‡ÙˆØ± ÙÙŠ Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©', value: listingEnabled ? 'Ù…ÙØ¹Ù„' : 'Ù…ÙˆÙ‚ÙˆÙ', tone: (listingEnabled ? 'success' : 'warning') as const },
+                { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…ØªØ¬Ø±', value: storeOpen ? 'Ù…ÙØªÙˆØ­ Ø§Ù„Ø¢Ù†' : 'Ù…ØºÙ„Ù‚ Ø§Ù„Ø¢Ù†', tone: (storeOpen ? 'success' : 'warning') as const },
+                { label: 'Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„', value: todayHoursLabel, tone: 'default' as const },
               ].map((item, index, arr) => (
                 <View
                   key={item.label}
@@ -1851,7 +1851,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             {/* Notification Preferences */}
             <Box padding={0} gap={0}>
               <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
-                إعدادات الإشعارات
+                Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª
               </Text>
               {primaryNotificationRows.map((item) => (
                 <SettingsOptionRow
@@ -1883,10 +1883,10 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   <Icon name="options-outline" size={18} tone="default" style={{ flexShrink: 0 }} />
                   <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                     <Text role="bodyStrong" style={{ color: theme.brand, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
-                      إعدادات متقدمة
+                      Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ù…ØªÙ‚Ø¯Ù…Ø©
                     </Text>
                     <Text role="bodySm" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }}>
-                      إدارة إعدادات الصوت، الملخصات والتسويق
+                      Ø¥Ø¯Ø§Ø±Ø© Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ØµÙˆØªØŒ Ø§Ù„Ù…Ù„Ø®ØµØ§Øª ÙˆØ§Ù„ØªØ³ÙˆÙŠÙ‚
                     </Text>
                   </View>
                 </View>
@@ -1912,24 +1912,24 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             {/* Quick Access */}
             <Box padding={0} gap={0}>
               <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
-                الوصول السريع
+                Ø§Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ø³Ø±ÙŠØ¹
               </Text>
               {[
                 {
                   id: 'order-alerts',
-                  title: 'فتح تنبيهات الطلب',
+                  title: 'ÙØªØ­ ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ø·Ù„Ø¨',
                   icon: 'notifications-outline' as const,
                   onPress: openOrderAlerts,
                 },
                 {
                   id: 'branch-scope',
-                  title: 'اختيار الفرع',
+                  title: 'Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„ÙØ±Ø¹',
                   icon: 'git-branch-outline' as const,
                   onPress: onOpenStoreScope,
                 },
                 {
                   id: 'operations-directory',
-                  title: 'دليل العمليات',
+                  title: 'Ø¯Ù„ÙŠÙ„ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª',
                   icon: 'headset-outline' as const,
                   onPress: openOperationsDirectory,
                 },
@@ -2018,10 +2018,10 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           coverImage={resolveDshImageSource(activeCanonicalStore?.imageUri || 'dsh.store.malqa.cover.v1')}
           logoImage={resolveDshImageSource(activeCanonicalStore?.logoImageUri || 'dsh.store.malqa.logo.v1')}
           name={resolvedStoreName}
-          locationLabel={`${resolvedBranchLabel} · ${resolvedActiveZoneLabel}`}
+          locationLabel={`${resolvedBranchLabel} Â· ${resolvedActiveZoneLabel}`}
           isOpen={isAvailable}
           hasBthwaniPro={activeCanonicalStore?.hasBthwaniPro ?? true}
-          distanceLabel={activeCanonicalStore?.distanceLabel || '1.8 كم'}
+          distanceLabel={activeCanonicalStore?.distanceLabel || '1.8 ÙƒÙ…'}
           deliveryTimeLabel={activeCanonicalStore?.deliveryLabel || resolvedTodayHoursLabel}
           rating={activeCanonicalStore?.rating || 4.9}
           contactNumber={branchContact}
@@ -2051,11 +2051,11 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                 },
               ]}
               accessibilityRole="button"
-              accessibilityLabel="اختيار الفرع"
+              accessibilityLabel="Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„ÙØ±Ø¹"
             >
               <Icon name="git-branch-outline" size={14} color={theme.textInverse} />
               <Text style={{ fontSize: 12, fontWeight: '700', color: theme.textInverse, fontFamily: 'Outfit-Bold' }}>
-                اختيار الفرع
+                Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„ÙØ±Ø¹
               </Text>
             </Pressable>
           }
@@ -2066,11 +2066,11 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           <Box gap={2} paddingY={2}>
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-                <Text role="caption" tone="muted">رصيد المتجر الحالي</Text>
+                <Text role="caption" tone="muted">Ø±ØµÙŠØ¯ Ø§Ù„Ù…ØªØ¬Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ</Text>
                 <Text role="titleLg" tone="brand">{wltDshPartnerPreviewData.wallet.balanceLabel}</Text>
               </View>
               <Button
-                label="عرض المحفظة"
+                label="Ø¹Ø±Ø¶ Ø§Ù„Ù…Ø­ÙØ¸Ø©"
                 tone="secondary"
                 fullWidth={false}
                 onPress={() => updateSection('wallet')}
@@ -2079,7 +2079,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           </Box>
 
           <Divider />
-          {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
+          {/* 4) Main Sections Nav â€” icon + title + subtitle + chevron, RTL-correct */}
           <View style={{ gap: 8 }}>
             {activeHubNavigationItems.map((item) => (
               <HubNavRow

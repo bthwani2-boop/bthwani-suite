@@ -12,13 +12,13 @@ On-demand retrieval: no bulk content copy, no duplication of matrix rows. Cross-
 
 Governance:
 
-- `dsh/SERVICE_BLUEPRINT.md` — service boundaries and lifecycle truth
-- `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` — journey and slice planning authority
-- `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` — surface evidence rows
-- `dsh/docs/SCREEN_API_MATRIX.md` — API candidate and binding readiness rows
-- `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` — runtime proof rows
-- `dsh/docs/CLOSURE_DECISION_LOG.md` — append-only decision log
-- `dsh/docs/DSH_VISUAL_REVIEW.md` — visual evidence ledger
+- `dsh/SERVICE_BLUEPRINT.md` â€” service boundaries and lifecycle truth
+- `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` â€” journey and slice planning authority
+- `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` â€” surface evidence rows
+- `dsh/docs/SCREEN_API_MATRIX.md` â€” API candidate and binding readiness rows
+- `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` â€” runtime proof rows
+- `dsh/docs/CLOSURE_DECISION_LOG.md` â€” append-only decision log
+- `dsh/docs/DSH_VISUAL_REVIEW.md` â€” visual evidence ledger
 
 ---
 
@@ -37,7 +37,7 @@ Governance:
 | J-009 | Control Panel Operations Room | Foundation |
 | J-010 | WLT Finance / Settlement Boundary | Foundation |
 
-Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Execution Slice Table.
+Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` Â§ Execution Slice Table.
 
 ---
 
@@ -47,7 +47,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001–J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
+| Service blueprint | `dsh/SERVICE_BLUEPRINT.md` | J-001â€“J-010 | All slices | ACTIVE_REFERENCE | Master truth; read before any slice edit |
 | OpenAPI contract | `dsh/dsh.openapi.yaml` | J-001, J-002, J-003, J-004, J-005 | 001A,001C,002*,003*,004* | DSH_SLICE001_AND_002_PASS | GET /stores + 3 PATCH gates + J-002 catalog management (J-003 checkout/payment demoted to IMPLEMENTATION_STARTED) |
 | Go backend migrations | `dsh/backend/migrations/001_store_discovery.sql` | J-001 | DSH-SLICE-001A | BACKEND_PROVEN | Used in live E2E |
 | Go backend migrations | `dsh/backend/migrations/002_store_visibility_gates.sql` | J-001 | DSH-SLICE-001C/D/E | BACKEND_PROVEN | Visibility gates proven |
@@ -82,8 +82,8 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Cross-surface closure map | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` | J-001–J-006 | All business slices | ACTIVE_RUNTIME_SOURCE | Live closure truth; read before any closure claim |
-| DSH flow registry | `dsh/frontend/shared/dsh-flow-registry.ts` | J-001–J-006 | All business slices | ACTIVE_RUNTIME_SOURCE | Cross-surface flow definitions |
+| Cross-surface closure map | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` | J-001â€“J-006 | All business slices | ACTIVE_RUNTIME_SOURCE | Live closure truth; read before any closure claim |
+| DSH flow registry | `dsh/frontend/shared/dsh-flow-registry.ts` | J-001â€“J-006 | All business slices | ACTIVE_RUNTIME_SOURCE | Cross-surface flow definitions |
 | Store visibility client | `dsh/frontend/shared/dsh-store-visibility-client.ts` | J-001 | DSH-SLICE-001C,001D,001E | DSH_SLICE001_SCREEN_RUNTIME_PROVEN | Typed client for 3 PATCH gates; screen proof captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 |
 | Store visibility transport | `dsh/frontend/shared/dsh-store-visibility-transport.ts` | J-001 | DSH-SLICE-001C,001D,001E | DSH_SLICE001_SCREEN_RUNTIME_PROVEN | HTTP transport for PATCH gates; screen proof captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 |
 | Discovery contract | `dsh/frontend/shared/dsh-discovery.contract.ts` | J-001 | DSH-SLICE-001A,001B | ACTIVE | Client-facing discovery contract |
@@ -92,22 +92,22 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Store card commercial map | `dsh/frontend/shared/store-card-commercial-map.ts` | J-001,J-002 | DSH-SLICE-001B,002A | ACTIVE | Store card display mapping |
 | DSH store builders | `dsh/frontend/shared/dsh-store-builders.ts` | J-001,J-002 | DSH-SLICE-001A,001B | ACTIVE | Store object builders |
 | Catalog central adapter | `dsh/frontend/shared/catalog-central-adapter.ts` | J-002 | DSH-SLICE-002A,002B | ACTIVE | Catalog adapter |
-| Catalog shared | `dsh/frontend/shared/catalog.ts` | J-002 | DSH-SLICE-002A–002G | ACTIVE | Catalog types and helpers |
+| Catalog shared | `dsh/frontend/shared/catalog.ts` | J-002 | DSH-SLICE-002Aâ€“002G | ACTIVE | Catalog types and helpers |
 | Product identity model | `dsh/frontend/shared/dsh-product-identity.model.ts` | J-002 | DSH-SLICE-002A | ACTIVE | SKU/GTIN/barcode identity |
 | DSH store product card model | `dsh/frontend/shared/dshStoreProductCardModel.ts` | J-002 | DSH-SLICE-002A,002B | ACTIVE | Product card model |
-| Order journey model | `dsh/frontend/shared/dsh-order-journey.model.ts` | J-004 | DSH-SLICE-004A–004F | ACTIVE | Order lifecycle model |
+| Order journey model | `dsh/frontend/shared/dsh-order-journey.model.ts` | J-004 | DSH-SLICE-004Aâ€“004F | ACTIVE | Order lifecycle model |
 | Order preview contract | `dsh/frontend/shared/dsh-order-preview.contract.ts` | J-004 | DSH-SLICE-004A | ACTIVE | Order preview contract |
 | Order lifecycle handoffs | `dsh/frontend/shared/dsh-order-lifecycle-handoffs.ts` | J-004 | DSH-SLICE-004B | ACTIVE | Handoff state machine |
 | Delivery mode model | `dsh/frontend/shared/dsh-delivery-mode.model.ts` | J-005 | DSH-SLICE-005A | ACTIVE | Delivery mode types |
-| Fulfillment surface visibility | `dsh/frontend/shared/dsh-fulfillment-surface-visibility.ts` | J-005 | DSH-SLICE-005A–005F | ACTIVE | Fulfillment visibility rules |
-| Partner onboarding journey | `dsh/frontend/shared/dsh-partner-onboarding-journey.map.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field/partner onboarding map |
+| Fulfillment surface visibility | `dsh/frontend/shared/dsh-fulfillment-surface-visibility.ts` | J-005 | DSH-SLICE-005Aâ€“005F | ACTIVE | Fulfillment visibility rules |
+| Partner onboarding journey | `dsh/frontend/shared/dsh-partner-onboarding-journey.map.ts` | J-006 | DSH-SLICE-006Aâ€“006E | ACTIVE | Field/partner onboarding map |
 | Partner activation model | `dsh/frontend/shared/dsh-partner-activation.model.ts` | J-006 | DSH-SLICE-006C,006E | ACTIVE | Partner activation state |
 | Field visit contract | `dsh/frontend/shared/dsh-field-visit.contract.ts` | J-006 | DSH-SLICE-006B,006C | ACTIVE | Field visit contract |
 | Field visit API client | `dsh/frontend/shared/dsh-field-visit-client.ts` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__RUNTIME_PROVEN | Typed client for `POST /stores/{id}/field-visits`; stores evidence references only |
 | Field document API client | `dsh/frontend/shared/dsh-field-document-client.ts` | J-006 | DSH-SLICE-006C | **PASS** | Typed client for `POST /stores/{id}/documents`; request/response types; offline/http error handling |
-| CP operations contract | `dsh/frontend/shared/dsh-cp-operations.contract.ts` | J-009 | DSH-SLICE-009A–009D | ACTIVE | Control-panel ops contract |
+| CP operations contract | `dsh/frontend/shared/dsh-cp-operations.contract.ts` | J-009 | DSH-SLICE-009Aâ€“009D | ACTIVE | Control-panel ops contract |
 | CP operations room | `dsh/frontend/shared/dsh-control-panel-operations-room.ts` | J-009 | DSH-SLICE-009A,009B | ACTIVE | Ops room model |
-| CP platform contract | `dsh/frontend/shared/dsh-cp-platform.contract.ts` | J-008 | DSH-SLICE-008A–008D | ACTIVE | Platform/vars contract |
+| CP platform contract | `dsh/frontend/shared/dsh-cp-platform.contract.ts` | J-008 | DSH-SLICE-008Aâ€“008D | ACTIVE | Platform/vars contract |
 | CP administration contract | `dsh/frontend/shared/dsh-cp-administration.contract.ts` | J-008,J-009 | DSH-SLICE-008A,009D | ACTIVE | Admin contract |
 | Operational contract | `dsh/frontend/shared/dsh-operational.contract.ts` | J-004,J-009 | DSH-SLICE-004F,009A | ACTIVE | Operational contract |
 | Operational registry | `dsh/frontend/shared/dsh-operational-registry.ts` | J-009 | DSH-SLICE-009A | ACTIVE | Operational event registry |
@@ -123,7 +123,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Resolve DSH image source | `dsh/frontend/shared/resolve-dsh-image-source.ts` | J-007 | DSH-SLICE-007A,007B | ACTIVE | Media source resolution |
 | Resolve DSH public media path | `dsh/frontend/shared/resolve-dsh-public-media-path.ts` | J-007 | DSH-SLICE-007B | ACTIVE | Public media path resolver |
 | DSH preview color | `dsh/frontend/shared/dsh-preview-color.ts` | J-007 | DSH-SLICE-007A | ACTIVE_PREVIEW | Preview color tokens |
-| Index export | `dsh/frontend/shared/index.ts` | J-001–J-010 | All | ACTIVE | Public shared export |
+| Index export | `dsh/frontend/shared/index.ts` | J-001â€“J-010 | All | ACTIVE | Public shared export |
 
 ### C. Frontend Data Layer
 
@@ -171,21 +171,21 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Screen registry | `dsh/frontend/app-client/dsh-client.screen-registry.ts` | J-001–J-004 | 001A,003A–003E,004A | ACTIVE_RUNTIME_SOURCE | Live closure truth |
-| Route definitions | `dsh/frontend/app-client/dsh-client.routes.ts` | J-001–J-004 | 001A,001B,003A,004A | ACTIVE | Route ownership |
+| Screen registry | `dsh/frontend/app-client/dsh-client.screen-registry.ts` | J-001â€“J-004 | 001A,003Aâ€“003E,004A | ACTIVE_RUNTIME_SOURCE | Live closure truth |
+| Route definitions | `dsh/frontend/app-client/dsh-client.routes.ts` | J-001â€“J-004 | 001A,001B,003A,004A | ACTIVE | Route ownership |
 | Client types | `dsh/frontend/app-client/dsh-client.types.ts` | J-001,J-003,J-004 | 001A,003A,004A | ACTIVE | Typed surface models |
-| Index export | `dsh/frontend/app-client/index.ts` | J-001–J-004 | All client slices | ACTIVE | Public client export |
+| Index export | `dsh/frontend/app-client/index.ts` | J-001â€“J-004 | All client slices | ACTIVE | Public client export |
 | Discovery stores client | `dsh/frontend/app-client/shared/dsh-discovery-stores-client.ts` | J-001 | DSH-SLICE-001A | ACTIVE | Typed discovery client |
 | Discovery stores transport | `dsh/frontend/app-client/shared/dsh-discovery-stores-transport.ts` | J-001 | DSH-SLICE-001A | ACTIVE_RUNTIME_PROVEN | GET /stores transport; E2E proven |
 | Discovery stores runtime config | `dsh/frontend/app-client/shared/dsh-discovery-stores-runtime-config.ts` | J-001 | DSH-SLICE-001A | ACTIVE_RUNTIME_PROVEN | Runtime config for API base URL |
 | Discovery stores mappers | `dsh/frontend/app-client/shared/dsh-discovery-stores-mappers.ts` | J-001 | DSH-SLICE-001A | ACTIVE | Store data mappers |
-| Discovery stores bridge | `dsh/frontend/app-client/shared/dsh-discovery-stores-bridge.ts` | J-001 | DSH-SLICE-001A | ACTIVE_RUNTIME_PROVEN | Bridge for runtime ↔ preview |
+| Discovery stores bridge | `dsh/frontend/app-client/shared/dsh-discovery-stores-bridge.ts` | J-001 | DSH-SLICE-001A | ACTIVE_RUNTIME_PROVEN | Bridge for runtime â†” preview |
 | Store types | `dsh/frontend/app-client/contracts/dsh-store-types.ts` | J-001,J-002 | DSH-SLICE-001A,001B,002A | ACTIVE | Store type contracts |
 | Store screen props | `dsh/frontend/app-client/contracts/dsh-store-screen-props.ts` | J-001 | DSH-SLICE-001B | ACTIVE | Store screen prop types |
 | Home screen props | `dsh/frontend/app-client/contracts/dsh-home-screen-props.ts` | J-001 | DSH-SLICE-001A | ACTIVE | Home screen prop types |
 | Home types | `dsh/frontend/app-client/contracts/dsh-home-types.ts` | J-001 | DSH-SLICE-001A | ACTIVE | Home type definitions |
 | OpenAPI types | `dsh/frontend/app-client/contracts/dsh-openapi.types.ts` | J-001 | DSH-SLICE-001A | ACTIVE | Generated OpenAPI types |
-| Client binding contracts | `dsh/frontend/app-client/contracts/dsh-client-binding.contracts.ts` | J-001–J-004 | All client slices | ACTIVE | Surface binding contracts |
+| Client binding contracts | `dsh/frontend/app-client/contracts/dsh-client-binding.contracts.ts` | J-001â€“J-004 | All client slices | ACTIVE | Surface binding contracts |
 | Store profile helper | `dsh/frontend/app-client/shared/store-profile.ts` | J-001 | DSH-SLICE-001B | ACTIVE | Store profile display helper |
 | Store formatting helper | `dsh/frontend/app-client/shared/store-formatting.ts` | J-001 | DSH-SLICE-001B | ACTIVE | Store display formatting |
 | Store search helpers | `dsh/frontend/app-client/shared/store-search-helpers.ts` | J-001 | DSH-SLICE-001A | ACTIVE | Inline search helpers |
@@ -218,20 +218,20 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Screen registry | `dsh/frontend/app-partner/dsh-partner.screen-registry.ts` | J-001–J-002,J-004,J-006 | 001C,002*,004B,006E | ACTIVE_RUNTIME_SOURCE | Live closure truth |
-| Route definitions | `dsh/frontend/app-partner/dsh-partner.routes.ts` | J-001–J-002,J-004 | 001C,002A,004B | ACTIVE | Route ownership |
-| Partner types | `dsh/frontend/app-partner/dsh-partner.types.ts` | J-001–J-002,J-004 | 001C,002A,004B | ACTIVE | Partner surface types |
-| Partner binding contracts | `dsh/frontend/app-partner/contracts/dsh-partner-binding.contracts.ts` | J-001–J-002,J-004 | 001C,002*,004B | ACTIVE | Binding contracts |
-| Index export | `dsh/frontend/app-partner/index.ts` | J-001–J-002,J-004,J-006 | All partner slices | ACTIVE | Public partner export |
+| Screen registry | `dsh/frontend/app-partner/dsh-partner.screen-registry.ts` | J-001â€“J-002,J-004,J-006 | 001C,002*,004B,006E | ACTIVE_RUNTIME_SOURCE | Live closure truth |
+| Route definitions | `dsh/frontend/app-partner/dsh-partner.routes.ts` | J-001â€“J-002,J-004 | 001C,002A,004B | ACTIVE | Route ownership |
+| Partner types | `dsh/frontend/app-partner/dsh-partner.types.ts` | J-001â€“J-002,J-004 | 001C,002A,004B | ACTIVE | Partner surface types |
+| Partner binding contracts | `dsh/frontend/app-partner/contracts/dsh-partner-binding.contracts.ts` | J-001â€“J-002,J-004 | 001C,002*,004B | ACTIVE | Binding contracts |
+| Index export | `dsh/frontend/app-partner/index.ts` | J-001â€“J-002,J-004,J-006 | All partner slices | ACTIVE | Public partner export |
 
 ### G. Frontend app-captain
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Screen registry | `dsh/frontend/app-captain/dsh-captain.screen-registry.ts` | J-004,J-005 | 004A,005A–005F | ACTIVE_RUNTIME_SOURCE | Live closure truth |
-| Route definitions | `dsh/frontend/app-captain/dsh-captain.routes.ts` | J-005 | DSH-SLICE-005A–005F | ACTIVE | Captain routes |
-| Captain types | `dsh/frontend/app-captain/dsh-captain.types.ts` | J-005 | DSH-SLICE-005A–005F | ACTIVE | Captain types |
-| Captain binding contracts | `dsh/frontend/app-captain/contracts/dshCaptainBinding.contracts.ts` | J-005 | DSH-SLICE-005A–005F | ACTIVE | Captain binding contracts |
+| Screen registry | `dsh/frontend/app-captain/dsh-captain.screen-registry.ts` | J-004,J-005 | 004A,005Aâ€“005F | ACTIVE_RUNTIME_SOURCE | Live closure truth |
+| Route definitions | `dsh/frontend/app-captain/dsh-captain.routes.ts` | J-005 | DSH-SLICE-005Aâ€“005F | ACTIVE | Captain routes |
+| Captain types | `dsh/frontend/app-captain/dsh-captain.types.ts` | J-005 | DSH-SLICE-005Aâ€“005F | ACTIVE | Captain types |
+| Captain binding contracts | `dsh/frontend/app-captain/contracts/dshCaptainBinding.contracts.ts` | J-005 | DSH-SLICE-005Aâ€“005F | ACTIVE | Captain binding contracts |
 | Operation screen parts | `dsh/frontend/app-captain/parts/OperationScreen.ts` | J-005 | DSH-SLICE-005D | ACTIVE | Captain operation screen part |
 | Sheets index | `dsh/frontend/app-captain/sheets/index.ts` | J-005 | DSH-SLICE-005B,005C | ACTIVE | Captain sheets |
 | Index export | `dsh/frontend/app-captain/index.ts` | J-004,J-005 | All captain slices | ACTIVE | Public captain export |
@@ -240,11 +240,11 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Screen registry | `dsh/frontend/app-field/dsh-field.screen-registry.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE_RUNTIME_SOURCE | Live closure truth |
-| Route definitions | `dsh/frontend/app-field/dsh-field.routes.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field routes |
-| Field types | `dsh/frontend/app-field/dsh-field.types.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field types |
+| Screen registry | `dsh/frontend/app-field/dsh-field.screen-registry.ts` | J-006 | DSH-SLICE-006Aâ€“006E | ACTIVE_RUNTIME_SOURCE | Live closure truth |
+| Route definitions | `dsh/frontend/app-field/dsh-field.routes.ts` | J-006 | DSH-SLICE-006Aâ€“006E | ACTIVE | Field routes |
+| Field types | `dsh/frontend/app-field/dsh-field.types.ts` | J-006 | DSH-SLICE-006Aâ€“006E | ACTIVE | Field types |
 | Visit types | `dsh/frontend/app-field/types/DshFieldStoreVisitTypes.ts` | J-006 | DSH-SLICE-006B | ACTIVE | Visit evidence types |
-| Field binding contracts | `dsh/frontend/app-field/contracts/dsh-field-binding.contracts.ts` | J-006 | DSH-SLICE-006A–006E | ACTIVE | Field binding contracts |
+| Field binding contracts | `dsh/frontend/app-field/contracts/dsh-field-binding.contracts.ts` | J-006 | DSH-SLICE-006Aâ€“006E | ACTIVE | Field binding contracts |
 | Field surface onboarding API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-store-onboarding-client.ts` | J-006 | DSH-SLICE-006A | ACTIVE_RUNTIME_BOUND | Store onboarding submit is bound to typed `POST /stores` client |
 | Field surface visit API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-visit-client.ts`; `dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx`; `dsh/frontend/app-field/sections/VisitEvidenceSection.tsx` | J-006 | DSH-SLICE-006B | API_CLIENT_BOUND__RUNTIME_PROVEN | Visit submit is bound to typed `POST /stores/{id}/field-visits` |
 | Field surface document API binding | `dsh/frontend/app-field/DshFieldSurface.tsx`; `dsh/frontend/shared/dsh-field-document-client.ts`; `dsh/frontend/app-field/screens/DshFieldDocumentUploadScreen.tsx` | J-006 | DSH-SLICE-006C | **PASS** | Document upload is bound to typed `POST /stores/{id}/documents`; RTL Arabic screen; loading/error/success states |
@@ -257,16 +257,16 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Operations registry | `dsh/frontend/control-panel/operations/operations.registry.ts` | J-009 | DSH-SLICE-009A–009D | ACTIVE_RUNTIME_SOURCE | Operations room registry |
-| Operations index | `dsh/frontend/control-panel/operations/index.ts` | J-009 | DSH-SLICE-009A–009D | ACTIVE | Operations module export |
+| Operations registry | `dsh/frontend/control-panel/operations/operations.registry.ts` | J-009 | DSH-SLICE-009Aâ€“009D | ACTIVE_RUNTIME_SOURCE | Operations room registry |
+| Operations index | `dsh/frontend/control-panel/operations/index.ts` | J-009 | DSH-SLICE-009Aâ€“009D | ACTIVE | Operations module export |
 | Operations flow meta | `dsh/frontend/control-panel/operations/flow-meta.ts` | J-009 | DSH-SLICE-009A | ACTIVE | Operations flow metadata |
-| Finance registry | `dsh/frontend/control-panel/finance/finance.registry.ts` | J-010 | DSH-SLICE-010A–010D | ACTIVE_RUNTIME_SOURCE | Finance registry (WLT bridge) |
+| Finance registry | `dsh/frontend/control-panel/finance/finance.registry.ts` | J-010 | DSH-SLICE-010Aâ€“010D | ACTIVE_RUNTIME_SOURCE | Finance registry (WLT bridge) |
 | CP surface catalog | `dsh/frontend/control-panel/surface-catalog.ts` | J-001,J-002,J-009,J-010 | 001D,001E,002E,009A,010A | ACTIVE | CP surface catalog |
 | Audit trail drawer | `dsh/frontend/control-panel/catalogs/drawers/audit-trail.drawer.tsx` | J-002 | DSH-SLICE-002G | ACTIVE | Audit log and live conflicts resolution UI |
 | CP surface meta | `dsh/frontend/control-panel/surface-meta.ts` | J-008,J-009 | DSH-SLICE-008A,009A | ACTIVE | CP surface metadata |
 | CP governance map | `dsh/frontend/control-panel/shared/dsh-control-panel-governance.map.ts` | J-008,J-009 | DSH-SLICE-008A,009A | ACTIVE | Governance map |
 | CP shared index | `dsh/frontend/control-panel/shared/index.ts` | J-008,J-009 | All CP slices | ACTIVE | CP shared export |
-| Platform index | `dsh/frontend/control-panel/platform/index.ts` | J-008 | DSH-SLICE-008A–008D | ACTIVE | Platform module export |
+| Platform index | `dsh/frontend/control-panel/platform/index.ts` | J-008 | DSH-SLICE-008Aâ€“008D | ACTIVE | Platform module export |
 | Platform Vars | `dsh/frontend/control-panel/platform/Vars/index.ts` | J-008 | DSH-SLICE-008C | ACTIVE | Vars platform module |
 | Platform Audit | `dsh/frontend/control-panel/platform/Audit/index.ts` | J-008,J-009 | DSH-SLICE-008A,009D | ACTIVE | Audit platform module |
 | Platform Health | `dsh/frontend/control-panel/platform/Health/index.ts` | J-008 | DSH-SLICE-008A | ACTIVE | Health platform module |
@@ -279,7 +279,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Platform Appearance types | `dsh/frontend/control-panel/platform/Appearance/appearance.types.ts` | J-008 | DSH-SLICE-008A | ACTIVE | Appearance types |
 | Administration index | `dsh/frontend/control-panel/administration/index.ts` | J-009 | DSH-SLICE-009D | ACTIVE | Admin module |
 | Administration types | `dsh/frontend/control-panel/administration/administration.types.ts` | J-009 | DSH-SLICE-009D | ACTIVE | Admin types |
-| Frontend index | `dsh/frontend/index.ts` | J-001–J-010 | All | ACTIVE | DSH frontend root export |
+| Frontend index | `dsh/frontend/index.ts` | J-001â€“J-010 | All | ACTIVE | DSH frontend root export |
 
 ### J. Control Panel Runtime App (Next.js routes)
 
@@ -287,12 +287,12 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 |---|---|---|---|---|---|
 | Root page | `control-panel/runtime/app/page.tsx` | J-009 | DSH-SLICE-009A | ACTIVE | CP root page |
 | Dashboard page | `control-panel/runtime/app/dashboard/page.tsx` | J-009 | DSH-SLICE-009A | ACTIVE | Dashboard route |
-| Operations page | `control-panel/runtime/app/operations/page.tsx` | J-001,J-009 | DSH-SLICE-001D/E,009A–009D | ACTIVE | Operations route; catalog/marketing gates live here |
+| Operations page | `control-panel/runtime/app/operations/page.tsx` | J-001,J-009 | DSH-SLICE-001D/E,009Aâ€“009D | ACTIVE | Operations route; catalog/marketing gates live here |
 | Catalogs page | `control-panel/runtime/app/catalogs/page.tsx` | J-001,J-002 | DSH-SLICE-001D,002E,002F | ACTIVE | Catalogs governance route |
 | Partners page | `control-panel/runtime/app/partners/page.tsx` | J-001,J-006 | DSH-SLICE-001C,006E | ACTIVE | Partners route |
-| Finance page | `control-panel/runtime/app/finance/page.tsx` | J-010 | DSH-SLICE-010A–010D | BLOCKED_BY_WLT | Finance is WLT-owned read-only bridge |
+| Finance page | `control-panel/runtime/app/finance/page.tsx` | J-010 | DSH-SLICE-010Aâ€“010D | BLOCKED_BY_WLT | Finance is WLT-owned read-only bridge |
 | Marketing page | `control-panel/runtime/app/marketing/page.tsx` | J-001,J-002 | DSH-SLICE-001E,002F | ACTIVE | Marketing visibility route |
-| Platform page | `control-panel/runtime/app/platform/page.tsx` | J-008 | DSH-SLICE-008A–008D | ACTIVE | Platform/vars/policy route |
+| Platform page | `control-panel/runtime/app/platform/page.tsx` | J-008 | DSH-SLICE-008Aâ€“008D | ACTIVE | Platform/vars/policy route |
 | Administration page | `control-panel/runtime/app/administration/page.tsx` | J-009 | DSH-SLICE-009D | ACTIVE | Administration route |
 | Support page | `control-panel/runtime/app/support/page.tsx` | J-004,J-009 | DSH-SLICE-004F,009C | ACTIVE | Support/escalation route |
 | Community services page | `control-panel/runtime/app/community-services/page.tsx` | J-008 | DSH-SLICE-008A | OUT_OF_SCOPE_WITH_REASON: community services is not a DSH primary domain; classification pending community service journey definition |
@@ -303,20 +303,20 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| WLT-DSH client bridge | `wlt/frontend/app-client/dsh/**` | J-003,J-010 | DSH-SLICE-003C,010A | ACTIVE_PREVIEW | WLT payment bridge for app-client; preview only |
-| WLT-DSH partner bridge | `wlt/frontend/app-partner/dsh/**` | J-004,J-010 | DSH-SLICE-004E,010A | ACTIVE_PREVIEW | WLT partner wallet bridge; preview only |
-| WLT-DSH captain bridge | `wlt/frontend/app-captain/dsh/**` | J-005,J-010 | DSH-SLICE-005F,010A | ACTIVE_PREVIEW | WLT captain payout bridge; preview only |
-| WLT-DSH field bridge | `wlt/frontend/app-field/dsh/**` | J-006,J-010 | DSH-SLICE-006E,010A | ACTIVE_PREVIEW | WLT field commission bridge; preview only |
-| WLT-DSH control-panel finance | `wlt/frontend/control-panel/dsh/**` | J-010 | DSH-SLICE-010A–010D | BLOCKED_BY_WLT | Full WLT finance ownership; DSH reads only |
+| WLT-DSH client bridge | `wlt/frontend/dsh/app-client/**` | J-003,J-010 | DSH-SLICE-003C,010A | ACTIVE_PREVIEW | WLT payment bridge for app-client; preview only |
+| WLT-DSH partner bridge | `wlt/frontend/dsh/app-partner/**` | J-004,J-010 | DSH-SLICE-004E,010A | ACTIVE_PREVIEW | WLT partner wallet bridge; preview only |
+| WLT-DSH captain bridge | `wlt/frontend/dsh/app-captain/**` | J-005,J-010 | DSH-SLICE-005F,010A | ACTIVE_PREVIEW | WLT captain payout bridge; preview only |
+| WLT-DSH field bridge | `wlt/frontend/dsh/app-field/**` | J-006,J-010 | DSH-SLICE-006E,010A | ACTIVE_PREVIEW | WLT field commission bridge; preview only |
+| WLT-DSH control-panel finance | `wlt/frontend/dsh/control-panel/**` | J-010 | DSH-SLICE-010Aâ€“010D | BLOCKED_BY_WLT | Full WLT finance ownership; DSH reads only |
 
-### L. Tools — Guards
+### L. Tools â€” Guards
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
 | DSH media manifest guard | `tools/guards/guard-dsh-media-manifest.mjs` | J-007 | DSH-SLICE-007B | ACTIVE | Enforces media manifest integrity |
 | DSH shared foundations guard | `tools/guards/guard-dsh-shared-foundations-final.mjs` | J-007,J-008 | DSH-SLICE-007A,008A | ACTIVE | Enforces shared foundation rules |
 
-### M. Tools — Scripts
+### M. Tools â€” Scripts
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
@@ -326,7 +326,7 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Catalog debug tabs | `tools/scripts/dsh-catalog-debug-tabs.mjs` | J-002 | DSH-SLICE-002E | ACTIVE | Catalog tab debug |
 | Marketing screenshot | `tools/scripts/dsh-marketing-screenshot.mjs` | J-001,J-002 | DSH-SLICE-001E,002F | ACTIVE | Marketing visibility capture |
 
-### N. DSH Docs (Reference/Governance — Not Journey-Mapped as Source Areas)
+### N. DSH Docs (Reference/Governance â€” Not Journey-Mapped as Source Areas)
 
 | Source Area | Path | Classification | Notes |
 |---|---|---|---|
@@ -339,8 +339,8 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` § Executio
 | Runtime Evidence Matrix | `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` | EVIDENCE_REFERENCE | Runtime proof rows |
 | Closure Decision Log | `dsh/docs/CLOSURE_DECISION_LOG.md` | EVIDENCE_REFERENCE | Append-only log |
 | Visual Review Ledger | `dsh/docs/DSH_VISUAL_REVIEW.md` | EVIDENCE_REFERENCE | Visual evidence queue |
-| DSH-SLICE-001 Store Discovery | `dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md` | SLICE_MANIFEST | Parent slice for J-001; linked to 001A–001F |
-| Performance Notes | `dsh/docs/references/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints; moved from slices/ — reference files must not live under slices/ |
+| DSH-SLICE-001 Store Discovery | `dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md` | SLICE_MANIFEST | Parent slice for J-001; linked to 001Aâ€“001F |
+| Performance Notes | `dsh/docs/references/PERFORMANCE_NOTES.md` | GOVERNANCE_REFERENCE | Performance constraints; moved from slices/ â€” reference files must not live under slices/ |
 | Control Panel Owner Decision | `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` | GOVERNANCE_REFERENCE | CP ownership policy |
 | Migration doc | `dsh/docs/archive/MIGRATION.md` | HISTORICAL_REFERENCE | Migration history |
 | Command doc | `dsh/docs/archive/command.md` | HISTORICAL_REFERENCE | Deprecated; no branch-specific instructions allowed |
@@ -359,14 +359,14 @@ Areas found without a slice mapping or with evidence of missing classification:
 
 | GAP ID | Area | Description | Required Action |
 |---|---|---|---|
-| GAP-IDX-001 | `dsh/docs/archive/DSH_OPERATIONAL_OPERATING_MODEL_GAP_MAP.md` | **RESOLVED 2026-06-06** — classified as GAP_REFERENCE / future operational contract planning. J-009A–009D are already PASS in the slice manifest; this reference does not reopen closed runtime slices. | No current slice action required; use only as future operational-contract input |
-| GAP-IDX-002 | `dsh/docs/archive/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | **RESOLVED 2026-06-06** — classified as PLANNING_REFERENCE. It maps future runtime/API candidates by operational slice and explicitly states that it does not add backend, OpenAPI, generated clients, local demo data, or UI routes. | No current slice action required; future API work must open a dedicated slice |
-| GAP-IDX-003 | `control-panel/runtime/app/community-services/page.tsx` | **RESOLVED 2026-06-06** — classified OUT_OF_SCOPE_WITH_REASON. Community services route is not a DSH primary domain and remains governed by community-service ownership, not DSH slice closure. | No DSH slice action required |
-| GAP-IDX-004 | `dsh/docs/archive/DSH_FILE_SIZE_RISK_MATRIX.md` | **RESOLVED 2026-06-06** — classified GOVERNANCE_REFERENCE / historical decomposition audit. Current truth states the DSH-SLICE-001 Home/Store decomposition is complete and no execution slice remains open. | No current slice action required |
-| GAP-IDX-005 | `dsh/docs/references/PERFORMANCE_NOTES.md` | **RESOLVED 2026-06-04** — file moved from slices/ to dsh/docs/references/; classified GOVERNANCE_REFERENCE in § N; no slice action required | No further action required |
-| GAP-IDX-006 | `dsh/frontend/control-panel/finance/finance.registry.ts` — `FinanceHubScreen.tsx`, `FinanceHubScreens.tsx` | **RESOLVED 2026-06-06** — finance registry and screens are mapped to J-010 / DSH-SLICE-010A–010D in this index and manifest. WLT remains the financial source of truth; DSH displays read-only bridge state only. | No current DSH finance mutation or new slice action required |
-| GAP-IDX-007 | app-partner catalog readiness frontend binding | **RESOLVED 2026-06-04** — StoreReadinessGate button press E2E proven on physical device; PATCH /stores/{id}/partner-readiness and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
-| GAP-IDX-008 | control-panel PATCH gate frontend binding | **RESOLVED 2026-06-04** — catalog-approval and marketing-visibility buttons proven in browser; PATCH endpoints and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
+| GAP-IDX-001 | `dsh/docs/archive/DSH_OPERATIONAL_OPERATING_MODEL_GAP_MAP.md` | **RESOLVED 2026-06-06** â€” classified as GAP_REFERENCE / future operational contract planning. J-009Aâ€“009D are already PASS in the slice manifest; this reference does not reopen closed runtime slices. | No current slice action required; use only as future operational-contract input |
+| GAP-IDX-002 | `dsh/docs/archive/DSH_OPERATIONAL_RUNTIME_API_SLICES_PLAN.md` | **RESOLVED 2026-06-06** â€” classified as PLANNING_REFERENCE. It maps future runtime/API candidates by operational slice and explicitly states that it does not add backend, OpenAPI, generated clients, local demo data, or UI routes. | No current slice action required; future API work must open a dedicated slice |
+| GAP-IDX-003 | `control-panel/runtime/app/community-services/page.tsx` | **RESOLVED 2026-06-06** â€” classified OUT_OF_SCOPE_WITH_REASON. Community services route is not a DSH primary domain and remains governed by community-service ownership, not DSH slice closure. | No DSH slice action required |
+| GAP-IDX-004 | `dsh/docs/archive/DSH_FILE_SIZE_RISK_MATRIX.md` | **RESOLVED 2026-06-06** â€” classified GOVERNANCE_REFERENCE / historical decomposition audit. Current truth states the DSH-SLICE-001 Home/Store decomposition is complete and no execution slice remains open. | No current slice action required |
+| GAP-IDX-005 | `dsh/docs/references/PERFORMANCE_NOTES.md` | **RESOLVED 2026-06-04** â€” file moved from slices/ to dsh/docs/references/; classified GOVERNANCE_REFERENCE in Â§ N; no slice action required | No further action required |
+| GAP-IDX-006 | `dsh/frontend/control-panel/finance/finance.registry.ts` â€” `FinanceHubScreen.tsx`, `FinanceHubScreens.tsx` | **RESOLVED 2026-06-06** â€” finance registry and screens are mapped to J-010 / DSH-SLICE-010Aâ€“010D in this index and manifest. WLT remains the financial source of truth; DSH displays read-only bridge state only. | No current DSH finance mutation or new slice action required |
+| GAP-IDX-007 | app-partner catalog readiness frontend binding | **RESOLVED 2026-06-04** â€” StoreReadinessGate button press E2E proven on physical device; PATCH /stores/{id}/partner-readiness and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
+| GAP-IDX-008 | control-panel PATCH gate frontend binding | **RESOLVED 2026-06-04** â€” catalog-approval and marketing-visibility buttons proven in browser; PATCH endpoints and GET /stores diff captured in DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700 | No further action required |
 
 ---
 
@@ -384,14 +384,14 @@ Areas found without a slice mapping or with evidence of missing classification:
 
 ## Known Contradictions / FIX_REQUIRED
 
-These contradictions exist between source files and must be resolved in the appropriate matrix/manifest — not in this index.
+These contradictions exist between source files and must be resolved in the appropriate matrix/manifest â€” not in this index.
 
 | Contradiction ID | Files Involved | Description | Required Action |
 |---|---|---|---|
-| CONTRA-001 | `dsh/docs/CLOSURE_DECISION_LOG.md` vs `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` (DSH-RUN-P014-04, DSH-RUN-P014-07) | **RESOLVED 2026-06-04** — RUNTIME_EVIDENCE_MATRIX updated: DSH-RUN-P014-01, DSH-RUN-P014-04, DSH-RUN-P014-07 all promoted to `DSH_SLICE001_SCREEN_RUNTIME_PROVEN`; evidence path `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/` recorded; final decision entry added to matrix. | No further action required. |
-| CONTRA-002 | `dsh/docs/SCREEN_API_MATRIX.md` (DSH-SAPI-P014-05, DSH-SAPI-P014-10) vs `dsh/docs/CLOSURE_DECISION_LOG.md` | **RESOLVED 2026-06-04** — SCREEN_API_MATRIX updated: DSH-SAPI-P014-01, DSH-SAPI-P014-05, DSH-SAPI-P014-10, DSH-SAPI-P014-12 all promoted to `DSH_SLICE001_SCREEN_RUNTIME_PROVEN`; Exit gate section updated. | No further action required. |
-| CONTRA-003 | `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` (DSH-SLICE-001 `PASS`) vs matrices | **RESOLVED 2026-06-04** — Both matrices now agree with the PASS decision in CLOSURE_DECISION_LOG and the slice manifest. DSH-SLICE-001 `PASS` is consistent across all four sources. | No further action required. |
-| CONTRA-004 | `dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md` (all surfaces PASS) vs RUNTIME_EVIDENCE_MATRIX | **RESOLVED 2026-06-04** — RUNTIME_EVIDENCE_MATRIX now agrees with the slice manifest PASS for all dependency surfaces. Evidence path confirmed. | No further action required. |
+| CONTRA-001 | `dsh/docs/CLOSURE_DECISION_LOG.md` vs `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md` (DSH-RUN-P014-04, DSH-RUN-P014-07) | **RESOLVED 2026-06-04** â€” RUNTIME_EVIDENCE_MATRIX updated: DSH-RUN-P014-01, DSH-RUN-P014-04, DSH-RUN-P014-07 all promoted to `DSH_SLICE001_SCREEN_RUNTIME_PROVEN`; evidence path `tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/` recorded; final decision entry added to matrix. | No further action required. |
+| CONTRA-002 | `dsh/docs/SCREEN_API_MATRIX.md` (DSH-SAPI-P014-05, DSH-SAPI-P014-10) vs `dsh/docs/CLOSURE_DECISION_LOG.md` | **RESOLVED 2026-06-04** â€” SCREEN_API_MATRIX updated: DSH-SAPI-P014-01, DSH-SAPI-P014-05, DSH-SAPI-P014-10, DSH-SAPI-P014-12 all promoted to `DSH_SLICE001_SCREEN_RUNTIME_PROVEN`; Exit gate section updated. | No further action required. |
+| CONTRA-003 | `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` (DSH-SLICE-001 `PASS`) vs matrices | **RESOLVED 2026-06-04** â€” Both matrices now agree with the PASS decision in CLOSURE_DECISION_LOG and the slice manifest. DSH-SLICE-001 `PASS` is consistent across all four sources. | No further action required. |
+| CONTRA-004 | `dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md` (all surfaces PASS) vs RUNTIME_EVIDENCE_MATRIX | **RESOLVED 2026-06-04** â€” RUNTIME_EVIDENCE_MATRIX now agrees with the slice manifest PASS for all dependency surfaces. Evidence path confirmed. | No further action required. |
 
 ---
 
@@ -409,13 +409,13 @@ These contradictions exist between source files and must be resolved in the appr
 | Resolved contradictions | 4 (CONTRA-001 through CONTRA-004) |
 | IMPLEMENTATION_STARTED areas | 1 (J-003 checkout/payment) |
 | WLT-owned read-only boundary areas | 4 (J-010 finance/WLT boundary) |
-| DSH-SLICE-006C status | **PASS** — Documents & Media Proof; E2E verified locally |
-| J-003 implementation status | **BLOCKED_WITH_REASON** — ready for controlled local testing, pending production auth validation and WLT E2E callback proof; evidence under `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |
-| J-004 implementation status | **DEFERRED_WITH_REASON** — deferred pending J-003 checkout/payment closure; ready for local smoke testing |
-| J-005 implementation status | **DEFERRED_WITH_REASON** — deferred pending J-004/J-009 runtime; ready for local smoke testing; evidence under `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/` |
-| J-006 implementation status | **SLICE_GROUP_CLOSED** — field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all E2E closed (evidence under tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/) |
-| J-007 implementation status | ACTIVE_GOVERNANCE — no runtime slice; guard-proven 2026-06-06 with `guard-dsh-shared-foundations-final` PASS and `guard-dsh-media-manifest` PASS |
-| J-010 implementation status | **BLOCKED_WITH_REASON** — full WLT finance ownership; DSH reads only (settlements/payouts bridge ready for local testing) |
+| DSH-SLICE-006C status | **PASS** â€” Documents & Media Proof; E2E verified locally |
+| J-003 implementation status | **BLOCKED_WITH_REASON** â€” ready for controlled local testing, pending production auth validation and WLT E2E callback proof; evidence under `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |
+| J-004 implementation status | **DEFERRED_WITH_REASON** â€” deferred pending J-003 checkout/payment closure; ready for local smoke testing |
+| J-005 implementation status | **DEFERRED_WITH_REASON** â€” deferred pending J-004/J-009 runtime; ready for local smoke testing; evidence under `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/` |
+| J-006 implementation status | **SLICE_GROUP_CLOSED** â€” field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness all E2E closed (evidence under tools/registry/runs/DSH_SLICE_006D_READINESS_ESCALATION_FINAL_CLOSURE-20260606-LOCAL/) |
+| J-007 implementation status | ACTIVE_GOVERNANCE â€” no runtime slice; guard-proven 2026-06-06 with `guard-dsh-shared-foundations-final` PASS and `guard-dsh-media-manifest` PASS |
+| J-010 implementation status | **BLOCKED_WITH_REASON** â€” full WLT finance ownership; DSH reads only (settlements/payouts bridge ready for local testing) |
 | Full universal protocol closures (DEFERRED) | 0 |
 
 ---

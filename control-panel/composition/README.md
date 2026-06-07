@@ -8,7 +8,7 @@ Allowed future role:
 
 ```text
 compose dsh/frontend/control-panel
-compose wlt/frontend/control-panel
+compose wlt/frontend/control-panel-wlt
 compose knz/frontend/control-panel
 compose arb/frontend/control-panel
 compose amn/frontend/control-panel

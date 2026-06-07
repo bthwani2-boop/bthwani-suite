@@ -10,7 +10,7 @@ Current use:
 
 Status: ACTIVE_LIVING_ROADMAP / P0_14_TRUTH_REFRESHED
 Repo: C:\bthwani-suite
-Primary scope: `dsh/frontend/app-client/**` + `wlt/frontend/app-client/dsh/**`
+Primary scope: `dsh/frontend/app-client/**` + `wlt/frontend/dsh/app-client/**`
 Related scope: `dsh/frontend/shared/**` + control-panel finance visibility
 
 ## Current Reality After P0-02 Through P0-14
@@ -33,7 +33,7 @@ Related scope: `dsh/frontend/shared/**` + control-panel finance visibility
 
 - trusted current-branch screenshots across all five DSH surfaces
 
-الأعمدة:
+Ø§Ù„Ø£Ø¹Ù…Ø¯Ø©:
 
 ```text
 surface
@@ -47,7 +47,7 @@ risk_if_not_aligned
 next_action
 ```
 
-الأسطح الإلزامية:
+Ø§Ù„Ø£Ø³Ø·Ø­ Ø§Ù„Ø¥Ù„Ø²Ø§Ù…ÙŠØ©:
 
 ```text
 app-client
@@ -55,13 +55,13 @@ app-partner
 app-captain
 app-field
 control-panel
-wlt/frontend/app-client/dsh
-wlt/frontend/control-panel/dsh
+wlt/frontend/dsh/app-client
+wlt/frontend/dsh/control-panel
 ```
 
 ### 7.6 CLIENT_DSH_FILE_SIZE_RISK_MATRIX.csv
 
-الأعمدة:
+Ø§Ù„Ø£Ø¹Ù…Ø¯Ø©:
 
 ```text
 file
@@ -74,7 +74,7 @@ can_split_without_visual_change_true_false
 recommended_next
 ```
 
-القيم:
+Ø§Ù„Ù‚ÙŠÙ…:
 
 ```text
 NO_SPLIT_NOW
@@ -85,7 +85,7 @@ NEEDS_MANUAL_REVIEW
 
 ### 7.7 CLIENT_DSH_VISUAL_REVIEW_QUEUE.csv
 
-الأعمدة:
+Ø§Ù„Ø£Ø¹Ù…Ø¯Ø©:
 
 ```text
 priority
@@ -100,7 +100,7 @@ human_next_action
 
 ### 7.8 CLIENT_HUMAN_DIRECTION_BOARD.md
 
-يجب أن يحتوي جدولًا مثل:
+ÙŠØ¬Ø¨ Ø£Ù† ÙŠØ­ØªÙˆÙŠ Ø¬Ø¯ÙˆÙ„Ù‹Ø§ Ù…Ø«Ù„:
 
 | Capability | Current Evidence | Proposed Classification | Risk | Human Decision |
 |---|---|---|---|---|
@@ -117,10 +117,10 @@ human_next_action
 
 ## 8. Phased Closure Plan
 
-### Phase 0 — Freeze + Baseline
+### Phase 0 â€” Freeze + Baseline
 
 **Mode:** Read-only
-**Goal:** تثبيت نقطة البداية.
+**Goal:** ØªØ«Ø¨ÙŠØª Ù†Ù‚Ø·Ø© Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©.
 
 Tasks:
 
@@ -140,10 +140,10 @@ BASELINE_READY
 
 ---
 
-### Phase 1 — Deep App-client DSH/WLT Map
+### Phase 1 â€” Deep App-client DSH/WLT Map
 
 **Mode:** Read-only
-**Goal:** فهم كل ما في app-client مرتبط بـ DSH/WLT.
+**Goal:** ÙÙ‡Ù… ÙƒÙ„ Ù…Ø§ ÙÙŠ app-client Ù…Ø±ØªØ¨Ø· Ø¨Ù€ DSH/WLT.
 
 Tasks:
 
@@ -164,10 +164,10 @@ CAPABILITY_MAP_READY
 
 ---
 
-### Phase 2 — Related Surfaces + Control Panel Impact Map
+### Phase 2 â€” Related Surfaces + Control Panel Impact Map
 
 **Mode:** Read-only
-**Goal:** لا نغلق العميل بمعزل عن بقية الأسطح.
+**Goal:** Ù„Ø§ Ù†ØºÙ„Ù‚ Ø§Ù„Ø¹Ù…ÙŠÙ„ Ø¨Ù…Ø¹Ø²Ù„ Ø¹Ù† Ø¨Ù‚ÙŠØ© Ø§Ù„Ø£Ø³Ø·Ø­.
 
 Tasks:
 
@@ -187,10 +187,10 @@ RELATED_SURFACES_MAP_READY
 
 ---
 
-### Phase 3 — Human Direction Board Review
+### Phase 3 â€” Human Direction Board Review
 
 **Mode:** Human decision only
-**Goal:** الإنسان يقرر التصنيف قبل أي تعديل.
+**Goal:** Ø§Ù„Ø¥Ù†Ø³Ø§Ù† ÙŠÙ‚Ø±Ø± Ø§Ù„ØªØµÙ†ÙŠÙ Ù‚Ø¨Ù„ Ø£ÙŠ ØªØ¹Ø¯ÙŠÙ„.
 
 Allowed decisions per capability:
 
@@ -213,10 +213,10 @@ HUMAN_DIRECTION_APPROVED
 
 ---
 
-### Phase 4 — Small APPLY 1: Truth Consistency Only
+### Phase 4 â€” Small APPLY 1: Truth Consistency Only
 
 **Mode:** Small apply if approved
-**Goal:** تصحيح التناقضات الصغيرة بدون تغيير تصميم.
+**Goal:** ØªØµØ­ÙŠØ­ Ø§Ù„ØªÙ†Ø§Ù‚Ø¶Ø§Øª Ø§Ù„ØµØºÙŠØ±Ø© Ø¨Ø¯ÙˆÙ† ØªØºÙŠÙŠØ± ØªØµÙ…ÙŠÙ….
 
 Allowed:
 
@@ -242,10 +242,10 @@ TRUTH_CONSISTENCY_FIXED
 
 ---
 
-### Phase 5 — Human Visual Review: Current Design
+### Phase 5 â€” Human Visual Review: Current Design
 
 **Mode:** Human-led
-**Goal:** مراجعة التصميم الحالي قبل refactor.
+**Goal:** Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØµÙ…ÙŠÙ… Ø§Ù„Ø­Ø§Ù„ÙŠ Ù‚Ø¨Ù„ refactor.
 
 Review list:
 
@@ -275,10 +275,10 @@ NEEDS_SCREENSHOT_EVIDENCE
 
 ---
 
-### Phase 6 — Small APPLY 2: Visual Fixes Only
+### Phase 6 â€” Small APPLY 2: Visual Fixes Only
 
 **Mode:** One flow/screen at a time
-**Goal:** إصلاح تصميمي بدون إعادة تنظيم.
+**Goal:** Ø¥ØµÙ„Ø§Ø­ ØªØµÙ…ÙŠÙ…ÙŠ Ø¨Ø¯ÙˆÙ† Ø¥Ø¹Ø§Ø¯Ø© ØªÙ†Ø¸ÙŠÙ….
 
 Rules:
 
@@ -297,10 +297,10 @@ VISUAL_FIX_COMMITTED
 
 ---
 
-### Phase 7 — Decomposition Plan Only
+### Phase 7 â€” Decomposition Plan Only
 
 **Mode:** Planning only
-**Goal:** إذا بقيت ملفات ضخمة تعيق الإغلاق، نخطط لاستخراج داخلي.
+**Goal:** Ø¥Ø°Ø§ Ø¨Ù‚ÙŠØª Ù…Ù„ÙØ§Øª Ø¶Ø®Ù…Ø© ØªØ¹ÙŠÙ‚ Ø§Ù„Ø¥ØºÙ„Ø§Ù‚ØŒ Ù†Ø®Ø·Ø· Ù„Ø§Ø³ØªØ®Ø±Ø§Ø¬ Ø¯Ø§Ø®Ù„ÙŠ.
 
 For each overgrown file:
 
@@ -323,10 +323,10 @@ DECOMPOSITION_PLAN_READY
 
 ---
 
-### Phase 8 — Small APPLY 3: Internal Extraction Only
+### Phase 8 â€” Small APPLY 3: Internal Extraction Only
 
 **Mode:** One extraction per commit
-**Goal:** تفكيك داخلي بلا تغيير UX.
+**Goal:** ØªÙÙƒÙŠÙƒ Ø¯Ø§Ø®Ù„ÙŠ Ø¨Ù„Ø§ ØªØºÙŠÙŠØ± UX.
 
 Allowed:
 
@@ -346,10 +346,10 @@ INTERNAL_EXTRACTION_PASS
 
 ---
 
-### Phase 9 — Surface Alignment
+### Phase 9 â€” Surface Alignment
 
 **Mode:** Review/apply per surface
-**Goal:** ضمان أن قرارات العميل لا تكسر بقية DSH.
+**Goal:** Ø¶Ù…Ø§Ù† Ø£Ù† Ù‚Ø±Ø§Ø±Ø§Øª Ø§Ù„Ø¹Ù…ÙŠÙ„ Ù„Ø§ ØªÙƒØ³Ø± Ø¨Ù‚ÙŠØ© DSH.
 
 Tasks:
 
@@ -368,10 +368,10 @@ SURFACES_ALIGNED
 
 ---
 
-### Phase 10 — Final Closure Gate
+### Phase 10 â€” Final Closure Gate
 
 **Mode:** Final verification
-**Goal:** إغلاق نهائي بالأدلة.
+**Goal:** Ø¥ØºÙ„Ø§Ù‚ Ù†Ù‡Ø§Ø¦ÙŠ Ø¨Ø§Ù„Ø£Ø¯Ù„Ø©.
 
 Required:
 
@@ -496,12 +496,12 @@ Append after every phase:
 ## 12. Final Direction
 
 ```text
-ابدأ بالتشخيص، لا التنظيم.
-ابدأ بالملكية والربط والوصول، لا بإضافة شاشات.
-احمِ التصميم الحالي قبل أي refactor.
-افصل DSH عن WLT ownership.
-صنّف Awnak/Shein كأنماط طلب خاصة.
-راجع الأسطح الأخرى ولوحة التحكم.
-نفذ خطوة واحدة فقط عند كل طلب بشري.
-أغلق نهائيًا بالأدلة فقط.
+Ø§Ø¨Ø¯Ø£ Ø¨Ø§Ù„ØªØ´Ø®ÙŠØµØŒ Ù„Ø§ Ø§Ù„ØªÙ†Ø¸ÙŠÙ….
+Ø§Ø¨Ø¯Ø£ Ø¨Ø§Ù„Ù…Ù„ÙƒÙŠØ© ÙˆØ§Ù„Ø±Ø¨Ø· ÙˆØ§Ù„ÙˆØµÙˆÙ„ØŒ Ù„Ø§ Ø¨Ø¥Ø¶Ø§ÙØ© Ø´Ø§Ø´Ø§Øª.
+Ø§Ø­Ù…Ù Ø§Ù„ØªØµÙ…ÙŠÙ… Ø§Ù„Ø­Ø§Ù„ÙŠ Ù‚Ø¨Ù„ Ø£ÙŠ refactor.
+Ø§ÙØµÙ„ DSH Ø¹Ù† WLT ownership.
+ØµÙ†Ù‘Ù Awnak/Shein ÙƒØ£Ù†Ù…Ø§Ø· Ø·Ù„Ø¨ Ø®Ø§ØµØ©.
+Ø±Ø§Ø¬Ø¹ Ø§Ù„Ø£Ø³Ø·Ø­ Ø§Ù„Ø£Ø®Ø±Ù‰ ÙˆÙ„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ….
+Ù†ÙØ° Ø®Ø·ÙˆØ© ÙˆØ§Ø­Ø¯Ø© ÙÙ‚Ø· Ø¹Ù†Ø¯ ÙƒÙ„ Ø·Ù„Ø¨ Ø¨Ø´Ø±ÙŠ.
+Ø£ØºÙ„Ù‚ Ù†Ù‡Ø§Ø¦ÙŠÙ‹Ø§ Ø¨Ø§Ù„Ø£Ø¯Ù„Ø© ÙÙ‚Ø·.
 ```

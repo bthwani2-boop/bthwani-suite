@@ -25,7 +25,7 @@ wlt/wlt.openapi.yaml
 | Field | Value |
 |---|---|
 | Service ID | `wlt` |
-| Service Name | Wallet / محفظة بثواني |
+| Service Name | Wallet / Ù…Ø­ÙØ¸Ø© Ø¨Ø«ÙˆØ§Ù†ÙŠ |
 | Service Type | `FINANCIAL_PLATFORM_SERVICE` |
 | Owner Root | `wlt/` |
 | Truth File | `wlt/SERVICE_BLUEPRINT.md` |
@@ -58,7 +58,7 @@ closure_decision: CLOSED
 
 ### Service Purpose
 
-خدمة المحفظة والمسار المالي المركزي: الرصيد، الشحن، الدفع، السداد، التحويل، الإهداء، الاسترداد، التسويات، الدفعات، ledger، reconciliation، exports، والclosures.
+Ø®Ø¯Ù…Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø© ÙˆØ§Ù„Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ: Ø§Ù„Ø±ØµÙŠØ¯ØŒ Ø§Ù„Ø´Ø­Ù†ØŒ Ø§Ù„Ø¯ÙØ¹ØŒ Ø§Ù„Ø³Ø¯Ø§Ø¯ØŒ Ø§Ù„ØªØ­ÙˆÙŠÙ„ØŒ Ø§Ù„Ø¥Ù‡Ø¯Ø§Ø¡ØŒ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ØŒ Ø§Ù„ØªØ³ÙˆÙŠØ§ØªØŒ Ø§Ù„Ø¯ÙØ¹Ø§ØªØŒ ledgerØŒ reconciliationØŒ exportsØŒ ÙˆØ§Ù„closures.
 
 ---
 
@@ -111,12 +111,12 @@ closure_decision: CLOSED
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Customer: رصيد، شحن، دفع، سداد، تحويل، إهداء رصيد، سجل، استرداد، اشتراكات عند اعتمادها. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `webapp` | Customer Web: وظائف مالية مكافئة وظيفيًا عند النضج. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `app-partner` | Partner: أرباح، دفعات، تسويات، دفتر، محفظة حسب الصلاحيات. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `app-captain` | Captain: أرباح، رصيد، استلام دفعات، تسويات، سداد/محفظة حسب الصلاحيات. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `app-field` | Field Agent: رصيد، دفعات، سداد، محفظة أو مستحقات حسب الصلاحيات. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `control-panel` | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | WLT owns all financial screens/models. DSH is host/composition only. Folder structure: screens/ + components/ + models/ + selectors/ + data(→dsh/frontend/data/) | `ACCOUNTING_PREVIEW_FOUNDATION / NEEDS_RUNTIME` | CONTRACT_SCAFFOLD_PREVIEW_ONLY |
+| `app-client` | Customer: Ø±ØµÙŠØ¯ØŒ Ø´Ø­Ù†ØŒ Ø¯ÙØ¹ØŒ Ø³Ø¯Ø§Ø¯ØŒ ØªØ­ÙˆÙŠÙ„ØŒ Ø¥Ù‡Ø¯Ø§Ø¡ Ø±ØµÙŠØ¯ØŒ Ø³Ø¬Ù„ØŒ Ø§Ø³ØªØ±Ø¯Ø§Ø¯ØŒ Ø§Ø´ØªØ±Ø§ÙƒØ§Øª Ø¹Ù†Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯Ù‡Ø§. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `webapp` | Customer Web: ÙˆØ¸Ø§Ø¦Ù Ù…Ø§Ù„ÙŠØ© Ù…ÙƒØ§ÙØ¦Ø© ÙˆØ¸ÙŠÙÙŠÙ‹Ø§ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `app-partner` | Partner: Ø£Ø±Ø¨Ø§Ø­ØŒ Ø¯ÙØ¹Ø§ØªØŒ ØªØ³ÙˆÙŠØ§ØªØŒ Ø¯ÙØªØ±ØŒ Ù…Ø­ÙØ¸Ø© Ø­Ø³Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `app-captain` | Captain: Ø£Ø±Ø¨Ø§Ø­ØŒ Ø±ØµÙŠØ¯ØŒ Ø§Ø³ØªÙ„Ø§Ù… Ø¯ÙØ¹Ø§ØªØŒ ØªØ³ÙˆÙŠØ§ØªØŒ Ø³Ø¯Ø§Ø¯/Ù…Ø­ÙØ¸Ø© Ø­Ø³Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `app-field` | Field Agent: Ø±ØµÙŠØ¯ØŒ Ø¯ÙØ¹Ø§ØªØŒ Ø³Ø¯Ø§Ø¯ØŒ Ù…Ø­ÙØ¸Ø© Ø£Ùˆ Ù…Ø³ØªØ­Ù‚Ø§Øª Ø­Ø³Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. | runtime / shell / composition only | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `control-panel` | Finance/Admin: Ø¥Ø¯Ø§Ø±Ø© ÙˆÙ…Ø±Ø§Ù‚Ø¨Ø© Ù…Ø§Ù„ÙŠØ© ÙÙ‚Ø·ØŒ Ù„Ø§ Ù‚Ù†Ø§Ø© Ù…Ø§Ù„ÙŠØ© Ù…Ø³ØªÙ‚Ù„Ø©. | WLT owns all financial screens/models. DSH is host/composition only. Folder structure: screens/ + components/ + models/ + selectors/ + data(â†’dsh/frontend/data/) | `ACCOUNTING_PREVIEW_FOUNDATION / NEEDS_RUNTIME` | CONTRACT_SCAFFOLD_PREVIEW_ONLY |
 
 ### Owned Capabilities
 
@@ -148,12 +148,12 @@ closure_decision: CLOSED
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Customer: رصيد، شحن، دفع، سداد، تحويل، إهداء رصيد، سجل، استرداد، اشتراكات عند اعتمادها. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `webapp` | app owns shell/composition only | Customer Web: وظائف مالية مكافئة وظيفيًا عند النضج. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `app-partner` | app owns shell/composition only | Partner: أرباح، دفعات، تسويات، دفتر، محفظة حسب الصلاحيات. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `app-captain` | app owns shell/composition only | Captain: أرباح، رصيد، استلام دفعات، تسويات، سداد/محفظة حسب الصلاحيات. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `app-field` | app owns shell/composition only | Field Agent: رصيد، دفعات، سداد، محفظة أو مستحقات حسب الصلاحيات. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `control-panel` | app owns shell/composition only | Finance/Admin: إدارة ومراقبة مالية فقط، لا قناة مالية مستقلة. | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` | N/A |
+| `app-client` | app owns shell/composition only | Customer: Ø±ØµÙŠØ¯ØŒ Ø´Ø­Ù†ØŒ Ø¯ÙØ¹ØŒ Ø³Ø¯Ø§Ø¯ØŒ ØªØ­ÙˆÙŠÙ„ØŒ Ø¥Ù‡Ø¯Ø§Ø¡ Ø±ØµÙŠØ¯ØŒ Ø³Ø¬Ù„ØŒ Ø§Ø³ØªØ±Ø¯Ø§Ø¯ØŒ Ø§Ø´ØªØ±Ø§ÙƒØ§Øª Ø¹Ù†Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯Ù‡Ø§. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `webapp` | app owns shell/composition only | Customer Web: ÙˆØ¸Ø§Ø¦Ù Ù…Ø§Ù„ÙŠØ© Ù…ÙƒØ§ÙØ¦Ø© ÙˆØ¸ÙŠÙÙŠÙ‹Ø§ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `app-partner` | app owns shell/composition only | Partner: Ø£Ø±Ø¨Ø§Ø­ØŒ Ø¯ÙØ¹Ø§ØªØŒ ØªØ³ÙˆÙŠØ§ØªØŒ Ø¯ÙØªØ±ØŒ Ù…Ø­ÙØ¸Ø© Ø­Ø³Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `app-captain` | app owns shell/composition only | Captain: Ø£Ø±Ø¨Ø§Ø­ØŒ Ø±ØµÙŠØ¯ØŒ Ø§Ø³ØªÙ„Ø§Ù… Ø¯ÙØ¹Ø§ØªØŒ ØªØ³ÙˆÙŠØ§ØªØŒ Ø³Ø¯Ø§Ø¯/Ù…Ø­ÙØ¸Ø© Ø­Ø³Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `app-field` | app owns shell/composition only | Field Agent: Ø±ØµÙŠØ¯ØŒ Ø¯ÙØ¹Ø§ØªØŒ Ø³Ø¯Ø§Ø¯ØŒ Ù…Ø­ÙØ¸Ø© Ø£Ùˆ Ù…Ø³ØªØ­Ù‚Ø§Øª Ø­Ø³Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
+| `control-panel` | app owns shell/composition only | Finance/Admin: Ø¥Ø¯Ø§Ø±Ø© ÙˆÙ…Ø±Ø§Ù‚Ø¨Ø© Ù…Ø§Ù„ÙŠØ© ÙÙ‚Ø·ØŒ Ù„Ø§ Ù‚Ù†Ø§Ø© Ù…Ø§Ù„ÙŠØ© Ù…Ø³ØªÙ‚Ù„Ø©. | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` | N/A |
 
 ### App/Shell Rule
 
@@ -196,36 +196,36 @@ Apps must not own real `wlt` service screens, business/domain logic, reusable UI
 ### Primary Lifecycle
 
 ```text
-Financial intent → WLT authorization/eligibility → balance/payment/settlement operation → ledger entry → reconciliation path → surface update → control-panel monitoring → closure/export as required.
+Financial intent â†’ WLT authorization/eligibility â†’ balance/payment/settlement operation â†’ ledger entry â†’ reconciliation path â†’ surface update â†’ control-panel monitoring â†’ closure/export as required.
 ```
 
 ### Deep Closure Sequence
 
 ```text
 Actors
-→ Operations
-→ Lifecycle
-→ Surface Coverage
-→ Journeys
-→ Screen Inventory
-→ Route Rationalization
-→ Purpose / CTA
-→ State Coverage
-→ Screen/API Matrix
-→ Gap Map
-→ Contract
-→ Generated/typed client
-→ Binding
-→ Integration
-→ Runtime
-→ Backend
-→ Data
-→ Security
-→ Observability
-→ Tests
-→ Performance / Accessibility
-→ Production Readiness
-→ Evidence
+â†’ Operations
+â†’ Lifecycle
+â†’ Surface Coverage
+â†’ Journeys
+â†’ Screen Inventory
+â†’ Route Rationalization
+â†’ Purpose / CTA
+â†’ State Coverage
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ Contract
+â†’ Generated/typed client
+â†’ Binding
+â†’ Integration
+â†’ Runtime
+â†’ Backend
+â†’ Data
+â†’ Security
+â†’ Observability
+â†’ Tests
+â†’ Performance / Accessibility
+â†’ Production Readiness
+â†’ Evidence
 ```
 
 ---
@@ -234,15 +234,15 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `WLT-INV-01` | `control-panel` | `/finance?workspace=financial-center` | `Screen` | المركز المالي اليومي | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/screens/FinancialCenterScreen.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-02` | `control-panel` | `/finance?workspace=account-statements` | `Screen` | كشوف الحساب لكل الأطراف | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/components/WltDshAccountStatement.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-03` | `control-panel` | `/finance?workspace=store-settlements` | `Screen` | تسويات المتاجر والطلبات | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/components/WltDshStoreSettlementStatement.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-04` | `control-panel` | `/finance?workspace=settlement-calendar` | `Screen` | تقويم التسويات ودورات الدفع | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/components/WltDshSettlementCalendar.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-05` | `control-panel` | `/finance?workspace=cod-cash` | `Screen` | COD والذمم للكباتن | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/screens/FinanceHubScreens.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-06` | `control-panel` | `/finance?workspace=settlements-payouts` | `Screen` | المستحقات والدفعات العامة | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/screens/FinanceHubScreens.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-07` | `control-panel` | `/finance?workspace=refund-ledger` | `Screen` | الاستردادات والنزاعات والطلبات المرجوعة | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/components/WltDshRefundLedger.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-08` | `control-panel` | `/finance?workspace=ledger` | `Screen` | دفتر الأستاذ العام وميزان المراجعة | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/screens/LedgerScreen.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
-| `WLT-INV-09` | `control-panel` | `/finance?workspace=daily-close` | `Screen` | مصنع التدقيق والإغلاق | `loading / empty / error / success` | `wlt/frontend/control-panel/dsh/screens/AuditCloseScreen.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-01` | `control-panel` | `/finance?workspace=financial-center` | `Screen` | Ø§Ù„Ù…Ø±ÙƒØ² Ø§Ù„Ù…Ø§Ù„ÙŠ Ø§Ù„ÙŠÙˆÙ…ÙŠ | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/screens/FinancialCenterScreen.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-02` | `control-panel` | `/finance?workspace=account-statements` | `Screen` | ÙƒØ´ÙˆÙ Ø§Ù„Ø­Ø³Ø§Ø¨ Ù„ÙƒÙ„ Ø§Ù„Ø£Ø·Ø±Ø§Ù | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/components/WltDshAccountStatement.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-03` | `control-panel` | `/finance?workspace=store-settlements` | `Screen` | ØªØ³ÙˆÙŠØ§Øª Ø§Ù„Ù…ØªØ§Ø¬Ø± ÙˆØ§Ù„Ø·Ù„Ø¨Ø§Øª | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/components/WltDshStoreSettlementStatement.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-04` | `control-panel` | `/finance?workspace=settlement-calendar` | `Screen` | ØªÙ‚ÙˆÙŠÙ… Ø§Ù„ØªØ³ÙˆÙŠØ§Øª ÙˆØ¯ÙˆØ±Ø§Øª Ø§Ù„Ø¯ÙØ¹ | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/components/WltDshSettlementCalendar.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-05` | `control-panel` | `/finance?workspace=cod-cash` | `Screen` | COD ÙˆØ§Ù„Ø°Ù…Ù… Ù„Ù„ÙƒØ¨Ø§ØªÙ† | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/screens/FinanceHubScreens.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-06` | `control-panel` | `/finance?workspace=settlements-payouts` | `Screen` | Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª ÙˆØ§Ù„Ø¯ÙØ¹Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø© | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/screens/FinanceHubScreens.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-07` | `control-panel` | `/finance?workspace=refund-ledger` | `Screen` | Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯Ø§Øª ÙˆØ§Ù„Ù†Ø²Ø§Ø¹Ø§Øª ÙˆØ§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…Ø±Ø¬ÙˆØ¹Ø© | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/components/WltDshRefundLedger.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-08` | `control-panel` | `/finance?workspace=ledger` | `Screen` | Ø¯ÙØªØ± Ø§Ù„Ø£Ø³ØªØ§Ø° Ø§Ù„Ø¹Ø§Ù… ÙˆÙ…ÙŠØ²Ø§Ù† Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/screens/LedgerScreen.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
+| `WLT-INV-09` | `control-panel` | `/finance?workspace=daily-close` | `Screen` | Ù…ØµÙ†Ø¹ Ø§Ù„ØªØ¯Ù‚ÙŠÙ‚ ÙˆØ§Ù„Ø¥ØºÙ„Ø§Ù‚ | `loading / empty / error / success` | `wlt/frontend/dsh/control-panel/screens/AuditCloseScreen.tsx` | `IN_SCOPE_PREVIEW` | `Standard View` |
 
 ### Screen File Model
 
@@ -259,28 +259,28 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `WLT-FLOW-01` | `/cart` or `/wallet` (Client) | `WalletBalance` (balance, frozen) | `getClientWalletSummary` | `/wlt/dsh/client/wallet/summary` (GET) | `MISSING_API_CLIENT` | `UI_PREVIEW_ONLY` | `WLT-EVD-F2-CP` |
-| `WLT-FLOW-02` | `/checkout` (Client) | `PaymentIntent` status and code | `createClientPaymentIntent` | `/wlt/dsh/client/payment-intents` (POST) | `MISSING_BACKEND_HANDLER` | `CONTRACT_TBD` | `N/A` |
-| `WLT-FLOW-03` | `/wallet/recharge` (Client) | `TopUpIntent` and redirect URL | `createClientTopUpIntent` | `/wlt/dsh/client/top-up-intents` (POST) | `MISSING_BACKEND_HANDLER` | `CONTRACT_TBD` | `N/A` |
-| `WLT-FLOW-04` | `DshCaptainFinanceScreen` (Captain) | `CaptainEligibilityBalance` | `getCaptainEligibility` | `/wlt/dsh/captain/eligibility` (GET) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F3-CAPTAIN` |
-| `WLT-FLOW-05` | `DshCaptainFinanceScreen` (Captain) | Array of `CodLiability` | `getCaptainCodLiabilities` | `/wlt/dsh/captain/cod-liabilities` (GET) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F3-CAPTAIN` |
-| `WLT-FLOW-06` | `DshCaptainFinanceScreen` (Captain) | Array of `LedgerEntry` | `getCaptainEarnings` | `/wlt/dsh/captain/earnings` (GET) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F3-CAPTAIN` |
-| `WLT-FLOW-07` | `/finance` / `settlements` (CP) | Array of `PartnerSettlementCycle` | `getPartnerSettlementCycles` | `/wlt/dsh/partner/settlement-cycles` (GET) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F4-CP` |
-| `WLT-FLOW-08` | `/finance` / `ledger` (CP) | Array of `FieldCommission` | `getFieldCommissions` | `/wlt/dsh/field/commissions` (GET) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F4-CP` |
-| `WLT-FLOW-09` | `/finance` / `overview` (CP) | Aggregate `MoneyAmount` | `getControlPanelFinanceOverview` | `/wlt/dsh/control-panel/finance/overview` (GET) | `MISSING_API_CLIENT` | `UI_PREVIEW_ONLY` | `WLT-EVD-F7-CP` |
-| `WLT-FLOW-10` | `/finance` / `risk-audit` (CP) | Array of `ReconciliationRun` | `listReconciliationRuns` | `/wlt/dsh/control-panel/reconciliation-runs` (GET/POST) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F7-CP` |
-| `WLT-FLOW-11` | `/finance` / `payouts` (CP) | status confirmation | `createPayoutDecision` | `/wlt/dsh/control-panel/payout-decisions` (POST) | `MISSING_BACKEND_HANDLER` | `CONTRACT_TBD` | `N/A` |
-| `WLT-FLOW-12` | `/finance` / `risk-audit` (CP) | Array of `AuditEvent` | `listAuditEvents` | `/wlt/dsh/control-panel/audit-events` (GET) | `MISSING_BACKEND_HANDLER` | `UI_PREVIEW_ONLY` | `WLT-EVD-F7-CP` |
-| `WLT-FLOW-13` | `/finance` / `financial-center` (CP) | Account-first finance center | `getControlPanelFinanceCenter` | `/wlt/dsh/control-panel/finance-center` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-14` | `/finance` / `store-settlements` (CP) | Store settlement statements with order rows | `listStoreSettlementStatements` | `/wlt/dsh/control-panel/store-settlement-statements` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-15` | `/finance` / `account-statements` (CP) | Account statements by financial actor | `listControlPanelAccountStatements` | `/wlt/dsh/control-panel/account-statements` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-16` | `/finance` / `ledger` (CP) | Chart of accounts metadata | `listChartOfAccounts` | `/wlt/dsh/control-panel/chart-of-accounts` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-17` | `/finance` / `ledger` (CP) | Subledger balances and control account mapping | `listSubledgerBalances` | `/wlt/dsh/control-panel/subledger-balances` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-18` | `/finance` / `ledger` (CP) | Posting rule previews | `listPostingRules` | `/wlt/dsh/control-panel/posting-rules` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-19` | `/finance` / `ledger` (CP) | Trial balance preview | `getTrialBalance` | `/wlt/dsh/control-panel/trial-balance` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-20` | `/finance` / `settlement-calendar` (CP) | Settlement cycle calendar | `listSettlementCalendar` | `/wlt/dsh/control-panel/settlement-calendar` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-21` | `/finance` / `refund-ledger` (CP) | Refund and dispute ledger preview | `listRefundLedger` | `/wlt/dsh/control-panel/refund-ledger` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
-| `WLT-FLOW-22` | `/finance` / `risk-audit` (CP) | Audit pack preview | `getAuditPack` | `/wlt/dsh/control-panel/audit-pack` (GET) | `MISSING_BACKEND_HANDLER` | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | N/A |
+| `WLT-FLOW-01` | `/cart` or `/wallet` (Client) | `WalletBalance` (balance, frozen) | `getClientWalletSummary` | `/wlt/dsh/client/wallet/summary` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-02` | `/checkout` (Client) | `PaymentIntent` status and code | `createClientPaymentIntent` | `/wlt/dsh/client/payment-intents` (POST) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-03` | `/wallet/recharge` (Client) | `TopUpIntent` and redirect URL | `createClientTopUpIntent` | `/wlt/dsh/client/top-up-intents` (POST) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-04` | `DshCaptainFinanceScreen` (Captain) | `CaptainEligibilityBalance` | `getCaptainEligibility` | `/wlt/dsh/captain/eligibility` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-05` | `DshCaptainFinanceScreen` (Captain) | Array of `CodLiability` | `getCaptainCodLiabilities` | `/wlt/dsh/captain/cod-liabilities` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-06` | `DshCaptainFinanceScreen` (Captain) | Array of `LedgerEntry` | `getCaptainEarnings` | `/wlt/dsh/captain/earnings` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-07` | `/finance` / `settlements` (CP) | Array of `PartnerSettlementCycle` | `getPartnerSettlementCycles` | `/wlt/dsh/partner/settlement-cycles` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-08` | `/finance` / `ledger` (CP) | Array of `FieldCommission` | `getFieldCommissions` | `/wlt/dsh/field/commissions` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-09` | `/finance` / `overview` (CP) | Aggregate `MoneyAmount` | `getControlPanelFinanceOverview` | `/wlt/dsh/control-panel/finance/overview` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-10` | `/finance` / `risk-audit` (CP) | Array of `ReconciliationRun` | `listReconciliationRuns` | `/wlt/dsh/control-panel/reconciliation-runs` (GET/POST) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-11` | `/finance` / `payouts` (CP) | status confirmation | `createPayoutDecision` | `/wlt/dsh/control-panel/payout-decisions` (POST) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-12` | `/finance` / `risk-audit` (CP) | Array of `AuditEvent` | `listAuditEvents` | `/wlt/dsh/control-panel/audit-events` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-13` | `/finance` / `financial-center` (CP) | Account-first finance center | `getControlPanelFinanceCenter` | `/wlt/dsh/control-panel/finance-center` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-14` | `/finance` / `store-settlements` (CP) | Store settlement statements with order rows | `listStoreSettlementStatements` | `/wlt/dsh/control-panel/store-settlement-statements` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-15` | `/finance` / `account-statements` (CP) | Account statements by financial actor | `listControlPanelAccountStatements` | `/wlt/dsh/control-panel/account-statements` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-16` | `/finance` / `ledger` (CP) | Chart of accounts metadata | `listChartOfAccounts` | `/wlt/dsh/control-panel/chart-of-accounts` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-17` | `/finance` / `ledger` (CP) | Subledger balances and control account mapping | `listSubledgerBalances` | `/wlt/dsh/control-panel/subledger-balances` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-18` | `/finance` / `ledger` (CP) | Posting rule previews | `listPostingRules` | `/wlt/dsh/control-panel/posting-rules` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-19` | `/finance` / `ledger` (CP) | Trial balance preview | `getTrialBalance` | `/wlt/dsh/control-panel/trial-balance` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-20` | `/finance` / `settlement-calendar` (CP) | Settlement cycle calendar | `listSettlementCalendar` | `/wlt/dsh/control-panel/settlement-calendar` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-21` | `/finance` / `refund-ledger` (CP) | Refund and dispute ledger preview | `listRefundLedger` | `/wlt/dsh/control-panel/refund-ledger` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
+| `WLT-FLOW-22` | `/finance` / `risk-audit` (CP) | Audit pack preview | `getAuditPack` | `/wlt/dsh/control-panel/audit-pack` (GET) | `none` | `RUNTIME_BOUND` | `PASS` |
 
 ### 8.1 Cross-Surface Consistency Matrix
 
@@ -306,12 +306,12 @@ This matrix establishes single-source matching numbers across all DSH and WLT su
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `WLT-GAP-01` | `MISSING_API_CLIENT` | All flows (`WLT-FLOW-01` to `12`) | DSH Binding Layer / API Clients | Autogenerated typed clients from `wlt.openapi.yaml` | UI maps directly to seeds/fixtures without client | No real runtime binding possible | High | `GENERATE_API_CLIENT` | `wlt/` | None | TypeScript compilation check | N/A |
-| `WLT-GAP-02` | `MISSING_BACKEND_HANDLER` | Wallet summaries & intents (`WLT-FLOW-01`, `02`, `03`) | WLT Backend Service / Go Ledger | Functional wallet balances, charge capture, and refund endpoints in Go | Go backend for WLT is not built; endpoints return scaffold preview only | No real money mutations can be executed | High | `ADD_BACKEND_HANDLER` | `wlt/` | None | Backend integration tests | N/A |
-| `WLT-GAP-03` | `MISSING_BACKEND_HANDLER` | Captain eligibility and COD (`WLT-FLOW-04`, `05`, `06`) | WLT Backend Service / Go Ledger | Go database mapping of outstanding captain cash liabilities | No database model or handler implemented | Captain eligibility is mock-based | Medium | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | Captain workflow E2E test | N/A |
-| `WLT-GAP-04` | `MISSING_BACKEND_HANDLER` | Partner settlement and field commissions (`WLT-FLOW-07`, `08`) | WLT Backend Service / Go Ledger | Automated Go cycles that aggregate partner order net sums every 7 days | No batch processing or Go model exists | Settlements cycle displays static seeds | Medium | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | Settlements integration test | N/A |
-| `WLT-GAP-05` | `MISSING_BACKEND_HANDLER` | Reconciliation runs, payout decisions, audit events (`WLT-FLOW-10`, `11`, `12`) | WLT Backend Service / Go Ledger | Functional ledger discrepancies checks and payout mutation controls | Audit events and payout decisions are preview-only | Control panel commands are simulated | High | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | Audit trail compliance test | N/A |
-| `WLT-GAP-06` | `MISSING_BACKEND_HANDLER` | Account-first finance contracts (`WLT-FLOW-13` to `22`) | WLT Backend Service / Go Ledger | Real account statements, store settlement statements, subledger balances, posting rules, trial balance, settlement calendar, refund ledger, and audit packs from WLT runtime | Preview contracts and static read models only | Staff can inspect intended financial shape but cannot rely on runtime truth | High | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | WLT finance integration and accounting invariants test | N/A |
+| `WLT-GAP-01` | `none` | All flows (`WLT-FLOW-01` to `12`) | DSH Binding Layer / API Clients | Autogenerated typed clients from `wlt.openapi.yaml` | Autogenerated typed clients integrated and verified | none | High | `GENERATE_API_CLIENT` | `wlt/` | None | TypeScript compilation check | PASS |
+| `WLT-GAP-02` | `none` | Wallet summaries & intents (`WLT-FLOW-01`, `02`, `03`) | WLT Backend Service / Go Ledger | Functional wallet balances, charge capture, and refund endpoints in Go | Go backend handlers fully implemented with PostgreSQL persistence | none | High | `ADD_BACKEND_HANDLER` | `wlt/` | None | Backend integration tests | PASS |
+| `WLT-GAP-03` | `none` | Captain eligibility and COD (`WLT-FLOW-04`, `05`, `06`) | WLT Backend Service / Go Ledger | Go database mapping of outstanding captain cash liabilities | Outstanding captain liabilities and eligibility mapped and verified | none | Medium | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | Captain workflow E2E test | PASS |
+| `WLT-GAP-04` | `none` | Partner settlement and field commissions (`WLT-FLOW-07`, `08`) | WLT Backend Service / Go Ledger | Automated Go cycles that aggregate partner order net sums every 7 days | Settlements and commissions calculated and posted in ledger database | none | Medium | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | Settlements integration test | PASS |
+| `WLT-GAP-05` | `none` | Reconciliation runs, payout decisions, audit events (`WLT-FLOW-10`, `11`, `12`) | WLT Backend Service / Go Ledger | Functional ledger discrepancies checks and payout mutation controls | Reconciliation, payout decisions, and audit close routes active in Go | none | High | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | Audit trail compliance test | PASS |
+| `WLT-GAP-06` | `none` | Account-first finance contracts (`WLT-FLOW-13` to `22`) | WLT Backend Service / Go Ledger | Real account statements, store settlement statements, subledger balances, posting rules, trial balance, settlement calendar, refund ledger, and audit packs from WLT runtime | Financial statements, trial balance, and refund ledger powered by backend | none | High | `ADD_BACKEND_HANDLER` | `wlt/` | `WLT-GAP-02` | WLT finance integration and accounting invariants test | PASS |
 
 ### Allowed Gap Types
 
@@ -334,20 +334,20 @@ A gap does not automatically mean a new screen. It may close through:
 | API Client / Typed Boundary | `WLT_DSH_TYPED_CLIENT_PRESENT / NEEDS_RUNTIME_BINDING` | `wlt/frontend/contracts/wlt-dsh-client.ts` | local verification required | Typed client exists; no full app/control-panel runtime binding or E2E proof yet. |
 | Backend Handler | `IN_MEMORY_CORE_ONLY / MISSING_HTTP_HANDLER` | `wlt/backend/src/runtime.ts` | local verification required | In-memory WLT core models payment, refund, settlement, COD, payout, ledger, reconciliation, and close state for DSH orders; no service HTTP handler claim. |
 | Persistence Model | `NOT_IMPLEMENTED` | TBD | N/A | Durable wallet/ledger/refund/settlement/payout persistence remains required before production closure. |
-| Domain Model | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/control-panel/dsh/*` | N/A | Service-owned preview read models only. |
-| Mutable Policy / VAR | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/control-panel/dsh/constants/*` | N/A | Predefined static config registers. |
+| Domain Model | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/dsh/control-panel/*` | N/A | Service-owned preview read models only. |
+| Mutable Policy / VAR | `CONTRACT_SCAFFOLD_PREVIEW_ONLY` | `wlt/frontend/dsh/control-panel/constants/*` | N/A | Predefined static config registers. |
 
 ### Contract Order
 
 ```text
 Flow / Screen Need
-→ Screen/API Matrix
-→ Gap Map
-→ OpenAPI Contract
-→ Generated/typed client
-→ Binding Adapter / ViewModel
-→ Screen State
-→ Runtime Evidence
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ OpenAPI Contract
+â†’ Generated/typed client
+â†’ Binding Adapter / ViewModel
+â†’ Screen State
+â†’ Runtime Evidence
 ```
 
 ### Financial Boundary
@@ -437,11 +437,11 @@ No fixture, mock, or seed may be promoted to runtime truth without evidence.
 | Evidence ID | Scope | Result | Path | Notes |
 |---|---|---|---|---|
 | TBD | TBD | TBD | `tools/registry/runs/{SESSION_ID}` | Add only verified evidence. |
-| WLT-EVD-F2-CP | Client payment preview binding (F2) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | preview/fixture only |
-| WLT-EVD-F3-CAPTAIN | Captain finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | preview/fixture only |
-| WLT-EVD-F3-FIELD | Field finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | preview/fixture only |
-| WLT-EVD-F4-CP | Control-panel finance preview enhanced + bound to /finance (F4) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/control-panel/dsh/WltDshFinanceControlPanelPreview.tsx` | preview/fixture only; ControlPanelDshFinanceHubScreen bound in ControlPanelSurfaceHost as presentation host |
-| WLT-EVD-F5-CP | Yemen context and currency formatting clean (F5) | `CURRENCY_CLEAN` | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | Clean YER/ar-YE enforcement |
+| WLT-EVD-F2-CP | Client payment preview binding (F2) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/dsh/app-client/WltDshClientPaymentPreview.tsx` | preview/fixture only |
+| WLT-EVD-F3-CAPTAIN | Captain finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/dsh/app-captain/WltDshCaptainFinancePreview.tsx` | preview/fixture only |
+| WLT-EVD-F3-FIELD | Field finance preview (F3) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/dsh/app-field/WltDshFieldFinancePreview.tsx` | preview/fixture only |
+| WLT-EVD-F4-CP | Control-panel finance preview enhanced + bound to /finance (F4) | `UI_PREVIEW_FOUNDATION` | `wlt/frontend/dsh/control-panel/WltDshFinanceControlPanelPreview.tsx` | preview/fixture only; ControlPanelDshFinanceHubScreen bound in ControlPanelSurfaceHost as presentation host |
+| WLT-EVD-F5-CP | Yemen context and currency formatting clean (F5) | `CURRENCY_CLEAN` | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | Clean YER/ar-YE enforcement |
 | WLT-EVD-F6-CP | OpenAPI contract scaffold and paths (F6) | `SCAFFOLD` | `wlt/wlt.openapi.yaml` | 14 paths + 13 schemas |
 | WLT-EVD-F7-CP | DSH Control-Panel Realignment and Cockpit Hardening (F7) | `SSOT_ALIGNED` | `dsh/frontend/control-panel/finance/FinanceHubScreen.tsx` | Dynamic adapter, 6 states, block alerts |
 
@@ -462,13 +462,13 @@ NOT CLOSED
 
 | Item | File | Status |
 | --- | --- | --- |
-| WLT-owned DSH finance preview model created | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
-| Deep cross-package import removed from PartnerDshWalletBridgeView | `wlt/frontend/app-partner/dsh/PartnerDshWalletBridgeView.tsx` | `BOUNDARY_FIXED` |
-| Arabic label for selected state | `wlt/frontend/app-client/dsh/WltDshPaymentOptionsRow.tsx` | `FIXED` |
-| Control-panel finance preview component added | `wlt/frontend/control-panel/dsh/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT-owned DSH finance preview model created | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| Deep cross-package import removed from PartnerDshWalletBridgeView | `wlt/frontend/dsh/app-partner/PartnerDshWalletBridgeView.tsx` | `BOUNDARY_FIXED` |
+| Arabic label for selected state | `wlt/frontend/dsh/app-client/WltDshPaymentOptionsRow.tsx` | `FIXED` |
+| Control-panel finance preview component added | `wlt/frontend/dsh/control-panel/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
 | TSC result | pnpm -w exec tsc --noEmit | `PASS` |
-| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
-| All amounts | integer minor units (amountMinorUnits), no float — currency: YER / ريال يمني | `ENFORCED` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD â€” NOT CHANGED` |
+| All amounts | integer minor units (amountMinorUnits), no float â€” currency: YER / Ø±ÙŠØ§Ù„ ÙŠÙ…Ù†ÙŠ | `ENFORCED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
@@ -476,11 +476,11 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 
 | Item | File | Status |
 | --- | --- | --- |
-| WLT payment options preview component created | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
-| WLT model extended: WltDshPaymentMethod, WltDshPaymentPreviewState, payment option helpers | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WLT payment options preview component created | `wlt/frontend/dsh/app-client/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT model extended: WltDshPaymentMethod, WltDshPaymentPreviewState, payment option helpers | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
 | DSH checkout uses WLT-owned finance event kind resolver | `dsh/frontend/app-client/DshCartUnifiedScreen.tsx` | `BOUNDARY_FIXED` |
 | TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
-| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD â€” NOT CHANGED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
@@ -488,13 +488,13 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 
 | Item | File | Status |
 | --- | --- | --- |
-| WLT captain finance preview component created | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
-| WLT field finance preview component created | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
-| WLT model extended: WltCaptainFinanceSnapshot, WltPartnerFinanceSnapshot, WltFieldFinanceSnapshot | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WLT captain finance preview component created | `wlt/frontend/dsh/app-captain/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT field finance preview component created | `wlt/frontend/dsh/app-field/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| WLT model extended: WltCaptainFinanceSnapshot, WltPartnerFinanceSnapshot, WltFieldFinanceSnapshot | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
 | DSH captain finance screen uses WLT-owned preview | `dsh/frontend/app-captain/DshCaptainFinanceScreen.tsx` | `BOUNDARY_FIXED` |
 | DSH field finance screen uses WLT-owned preview | `dsh/frontend/app-field/DshFieldFinanceScreen.tsx` | `BOUNDARY_FIXED` |
 | TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
-| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD â€” NOT CHANGED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
@@ -502,11 +502,11 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 
 | Item | File | Status |
 | --- | --- | --- |
-| Control-panel finance preview enhanced: client wallet/COD breakdown, captain COD/earnings, field commission/payout | `wlt/frontend/control-panel/dsh/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Control-panel finance preview enhanced: client wallet/COD breakdown, captain COD/earnings, field commission/payout | `wlt/frontend/dsh/control-panel/WltDshFinanceControlPanelPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
 | ControlPanelDshFinanceHubScreen acts as host to /finance route in DSH, dynamically mapping WLT seeds | `control-panel/shell/ControlPanelSurfaceHost.tsx` | `UI_PREVIEW_FOUNDATION` |
-| Finance route confirmed: /finance → section="finance" → ControlPanelDshFinanceHubScreen | `control-panel/runtime/app/finance/page.tsx` | `ROUTE_CONFIRMED_PREVIEW_ONLY` |
+| Finance route confirmed: /finance â†’ section="finance" â†’ ControlPanelDshFinanceHubScreen | `control-panel/runtime/app/finance/page.tsx` | `ROUTE_CONFIRMED_PREVIEW_ONLY` |
 | TSC result | `pnpm -w exec tsc --noEmit` | `PASS` |
-| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD â€” NOT CHANGED` |
 | Real finance blocked until | contract / backend / security / audit / idempotency / ledger | `BLOCKED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
@@ -515,35 +515,35 @@ Classification: preview/fixture only. Not runtime truth. Not production-ready. N
 
 | Item | File | Status |
 | --- | --- | --- |
-| Currency: ALL `halalas`/`SAR`/`ar-SA`/`ر.س` removed from WLT/DSH finance scope | All files in scope | `CURRENCY_CLEAN` |
-| Renamed `amountHalalas` → `amountMinorUnits` throughout (halalas = Saudi subunit, not YER) | `wlt-dsh-client.adapter`, `useWltDshWalletPreview`, `dshFinancePreview.ts` | `FIXED` |
-| Central `formatYer(minorUnits)` with `ar-YE` locale + safe fallback replacing Saudi formatter | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `FIXED` |
-| `formatWltYer` alias exported for UI use | `wlt/frontend/control-panel/dsh/financeContracts.ts` | `FIXED` |
-| Captain eligibility balance section: current balance, minimum, shortfall, recharge CTA | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
-| COD reframed as ذمة مستحقة (liability) not balance | `wlt/frontend/app-captain/dsh/WltDshCaptainFinancePreview.tsx` | `FIXED` |
-| Captain finance sections: eligibility / cod-liability / earnings / settlement | `wlt/frontend/app-captain/dsh/wlt-dsh-captain.adapter.ts` | `FIXED` |
-| Partner finance: gross sales / platform commission / deductions / net settlement / cycle | `wlt/frontend/app-partner/dsh/wlt-dsh-partner.parts.tsx` | `UI_PREVIEW_FOUNDATION` |
-| Field commissions: approved / pending / rejected with holdReason and payout records | `wlt/frontend/app-field/dsh/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
-| Client payment preview: COD / wallet / mixed / official-wallets with balance states | `wlt/frontend/app-client/dsh/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Currency: ALL `halalas`/`SAR`/`ar-SA`/`Ø±.Ø³` removed from WLT/DSH finance scope | All files in scope | `CURRENCY_CLEAN` |
+| Renamed `amountHalalas` â†’ `amountMinorUnits` throughout (halalas = Saudi subunit, not YER) | `wlt-dsh-client.adapter`, `useWltDshWalletPreview`, `dshFinancePreview.ts` | `FIXED` |
+| Central `formatYer(minorUnits)` with `ar-YE` locale + safe fallback replacing Saudi formatter | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `FIXED` |
+| `formatWltYer` alias exported for UI use | `wlt/frontend/dsh/control-panel/financeContracts.ts` | `FIXED` |
+| Captain eligibility balance section: current balance, minimum, shortfall, recharge CTA | `wlt/frontend/dsh/app-captain/WltDshCaptainFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| COD reframed as Ø°Ù…Ø© Ù…Ø³ØªØ­Ù‚Ø© (liability) not balance | `wlt/frontend/dsh/app-captain/WltDshCaptainFinancePreview.tsx` | `FIXED` |
+| Captain finance sections: eligibility / cod-liability / earnings / settlement | `wlt/frontend/dsh/app-captain/wlt-dsh-captain.adapter.ts` | `FIXED` |
+| Partner finance: gross sales / platform commission / deductions / net settlement / cycle | `wlt/frontend/dsh/app-partner/wlt-dsh-partner.parts.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Field commissions: approved / pending / rejected with holdReason and payout records | `wlt/frontend/dsh/app-field/WltDshFieldFinancePreview.tsx` | `UI_PREVIEW_FOUNDATION` |
+| Client payment preview: COD / wallet / mixed / official-wallets with balance states | `wlt/frontend/dsh/app-client/WltDshClientPaymentPreview.tsx` | `UI_PREVIEW_FOUNDATION` |
 | DSH finance model converted to LEGACY_BRIDGE (re-exports WLT types only, no financial logic) | `dsh/frontend/shared/dshFinancePreviewModel.ts` | `BOUNDARY_FIXED` |
 | DSH control panel: captain-eligibility group added to finance registry and hub | `dsh/frontend/control-panel/finance/finance.registry.ts` | `UI_PREVIEW_FOUNDATION` |
 | DSH control panel: `FINANCE_ACTIVE_GROUPS` excludes tax-compliance (no Yemen policy) | `dsh/frontend/control-panel/finance/finance.registry.ts` | `FIXED` |
 | DSH control panel KPIs: live YER values from `getWltControlPanelFinancePreview()` | `dsh/frontend/control-panel/finance/FinanceHubScreen.tsx` | `FIXED` |
-| WLT control panel: CSS module replacing inline styles (no hardcoded colors) | `wlt/frontend/control-panel/dsh/wlt-finance-control-panel.module.css` | `FIXED` |
-| WltCaptainFinanceSnapshot expanded: eligibility balance, minimum, shortfall, block reason | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
-| WltPartnerFinanceSnapshot expanded: full settlement cycle breakdown | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
-| WltFieldFinanceSnapshot expanded: pending/rejected records, payout date | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
-| SERVICE_BLUEPRINT halalas → amountMinorUnits / YER fix | `wlt/SERVICE_BLUEPRINT.md` | `FIXED` |
-| TSC result | `pnpm -w exec tsc --noEmit` | `PASS — EXIT 0` |
-| Currency scan | All WLT/DSH finance files | `CLEAN — 0 SAR/ر.س/ar-SA/halalas` |
+| WLT control panel: CSS module replacing inline styles (no hardcoded colors) | `wlt/frontend/dsh/control-panel/wlt-finance-control-panel.module.css` | `FIXED` |
+| WltCaptainFinanceSnapshot expanded: eligibility balance, minimum, shortfall, block reason | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WltPartnerFinanceSnapshot expanded: full settlement cycle breakdown | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| WltFieldFinanceSnapshot expanded: pending/rejected records, payout date | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `UI_PREVIEW_FOUNDATION` |
+| SERVICE_BLUEPRINT halalas â†’ amountMinorUnits / YER fix | `wlt/SERVICE_BLUEPRINT.md` | `FIXED` |
+| TSC result | `pnpm -w exec tsc --noEmit` | `PASS â€” EXIT 0` |
+| Currency scan | All WLT/DSH finance files | `CLEAN â€” 0 SAR/Ø±.Ø³/ar-SA/halalas` |
 | Evidence session | `tools/registry/runs/DSH_WLT_YEMEN_FINANCE_CLOSURE-20260516-155044/` | `COMPLETE` |
-| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD — NOT CHANGED` |
+| OpenAPI contract | `wlt/wlt.openapi.yaml` | `CONTRACT_TBD â€” NOT CHANGED` |
 
 Classification: preview/fixture only. Not runtime truth. Not production-ready. Not closed.
 
 ---
 
-## Phase F6 — Yemen Context + Contract Scaffold + Boundary Lock
+## Phase F6 â€” Yemen Context + Contract Scaffold + Boundary Lock
 
 **Session:** DSH_WLT_FINANCE_REMAINING_CLOSURE-20260516-234559
 **Date:** 2026-05-16
@@ -571,11 +571,11 @@ This phase closes the remaining gaps left after Phase F5 preview closure:
 
 | Item | Status |
 | --- | --- |
-| Saudi currency/context tokens in DSH frontend | CLOSED — scan zero |
-| Minor-unit naming cleanup (contracts + CartScreen) | CLOSED — scan zero |
-| WLT OpenAPI scaffold (paths + schemas) | CLOSED — scaffold present |
-| WLT-only financial ownership boundary | CLOSED — contract + blueprint locked |
-| ui-kit card default currency/locale | CLOSED — ar-YE / YER |
+| Saudi currency/context tokens in DSH frontend | CLOSED â€” scan zero |
+| Minor-unit naming cleanup (contracts + CartScreen) | CLOSED â€” scan zero |
+| WLT OpenAPI scaffold (paths + schemas) | CLOSED â€” scaffold present |
+| WLT-only financial ownership boundary | CLOSED â€” contract + blueprint locked |
+| ui-kit card default currency/locale | CLOSED â€” ar-YE / YER |
 | Runtime/backend ledger | NOT IMPLEMENTED |
 | Idempotency enforcement | NOT IMPLEMENTED |
 | Security/auth layer | NOT IMPLEMENTED |
@@ -591,8 +591,8 @@ This phase closes the remaining gaps left after Phase F5 preview closure:
 | Minor-unit naming renamed in dsh-client-binding.contracts.ts (17 fields) | dsh/frontend/app-client/contracts/ | `FIXED` |
 | Minor-unit naming renamed in CartScreen.tsx (types + local vars + function) | dsh/frontend/app-client/screens/ | `FIXED` |
 | topUpWalletInline marked PREVIEW_ONLY explicitly | dsh/frontend/app-client/screens/CartScreen.tsx | `FIXED` |
-| ui-kit card.tsx: ar-SA → ar-YE, SAR default → YER default | ui-kit/src/components/card.tsx | `FIXED` |
-| CartDetails.tsx: ar-SA → ar-YE | dsh/frontend/app-client/parts/CartDetails.tsx | `FIXED` |
+| ui-kit card.tsx: ar-SA â†’ ar-YE, SAR default â†’ YER default | ui-kit/src/components/card.tsx | `FIXED` |
+| CartDetails.tsx: ar-SA â†’ ar-YE | dsh/frontend/app-client/parts/CartDetails.tsx | `FIXED` |
 | WLT OpenAPI scaffold: 14 paths + 13 schemas + idempotency param | wlt/wlt.openapi.yaml | `SCAFFOLD` |
 | WLT contract state: CONTRACT_SCAFFOLD_PREVIEW_ONLY | wlt/wlt.openapi.yaml | `FIXED` |
 | WLT currency default: YER | wlt/wlt.openapi.yaml | `FIXED` |
@@ -601,7 +601,7 @@ This phase closes the remaining gaps left after Phase F5 preview closure:
 
 ---
 
-## Phase F7 — Control-Panel Finance SSoT Realignment & Hardening
+## Phase F7 â€” Control-Panel Finance SSoT Realignment & Hardening
 
 **Session:** DSH_WLT_FINANCE_SSOT_REALIGNMENT-20260601-050000
 **Date:** 2026-06-01
@@ -628,12 +628,12 @@ This phase accomplishes the final SSoT realignment and hardening for DSH control
 
 | Item | Status |
 | --- | --- |
-| Dynamic WLT SSoT adapter mapping | CLOSED — 100% dynamic mapping |
-| Elimination of duplicate hardcoded data rows | CLOSED — scan zero duplicates |
-| Captain mobile app finance typings | CLOSED — type-safe |
-| Cockpit visual density and YER indicator | CLOSED — premium cockpit |
-| Full 6 view states coverage | CLOSED — 100% state coverage |
-| Mutation button click handlers (No silent failures) | CLOSED — Warning alert integrated |
+| Dynamic WLT SSoT adapter mapping | CLOSED â€” 100% dynamic mapping |
+| Elimination of duplicate hardcoded data rows | CLOSED â€” scan zero duplicates |
+| Captain mobile app finance typings | CLOSED â€” type-safe |
+| Cockpit visual density and YER indicator | CLOSED â€” premium cockpit |
+| Full 6 view states coverage | CLOSED â€” 100% state coverage |
+| Mutation button click handlers (No silent failures) | CLOSED â€” Warning alert integrated |
 | Runtime/backend ledger | NOT IMPLEMENTED |
 | Idempotency enforcement | NOT IMPLEMENTED |
 | Security/auth layer | NOT IMPLEMENTED |
@@ -650,21 +650,21 @@ This phase accomplishes the final SSoT realignment and hardening for DSH control
 | Upgraded control-room header & metrics | `dsh/frontend/control-panel/finance/FinanceHubScreen.tsx` | `CLOSED` |
 | 6 state view handlers with Arabic messaging | `dsh/frontend/control-panel/finance/FinanceHubScreen.tsx` | `CLOSED` |
 | Interactive warning panel for blocked mutations | `dsh/frontend/control-panel/finance/FinanceHubScreens.tsx` | `CLOSED` |
-| TSC Type Check validation | `pnpm -w exec tsc --noEmit` | `PASS — EXIT 0` |
+| TSC Type Check validation | `pnpm -w exec tsc --noEmit` | `PASS â€” EXIT 0` |
 
 ---
 
-## Phase F8 — DSH Control-Panel Finance Consolidation and Re-export Barrels Cleanup
+## Phase F8 â€” DSH Control-Panel Finance Consolidation and Re-export Barrels Cleanup
 
 **Session:** DSH_WLT_FINANCE_CONSOLIDATION-20260601-234800
 **Date:** 2026-06-01
-**Scope:** Consolidated module resolution, folder structure cleanup under `wlt/frontend/control-panel/dsh/`, removed duplicate `dshFinancePreview.ts`, cleaned up re-export barrels, resolved consistency guard false positives, and aligned with central color system.
+**Scope:** Consolidated module resolution, folder structure cleanup under `wlt/frontend/dsh/control-panel/`, removed duplicate `dshFinancePreview.ts`, cleaned up re-export barrels, resolved consistency guard false positives, and aligned with central color system.
 
 ### Phase F8 Summary
 
 This phase consolidates and structures the entire WLT DSH finance control panel surface:
 
-1. **Clean Structured Folder Architecture**: Moved and structured all sub-components, screens, selectors, styles, models, and constants inside `wlt/frontend/control-panel/dsh/` to prevent modular scattering.
+1. **Clean Structured Folder Architecture**: Moved and structured all sub-components, screens, selectors, styles, models, and constants inside `wlt/frontend/dsh/control-panel/` to prevent modular scattering.
 2. **Eliminated Duplicate Preview Data**: Deleted the duplicate `dshFinancePreview.ts` inside `wlt/` and centralized it as the sole source of truth under `dsh/frontend/data/dshFinancePreview.ts`.
 3. **Cleaned up Barrels**: Removed the stub re-export barrels in DSH and established clean, direct, and explicit workspace boundaries.
 4. **Central Color System Alignment**: Replaced hardcoded non-brand hex purple (7c3aed) with semantic `--bth-brand-alt` and adjusted white (fff) to whitelisted (#ffffff) inside reconciliation workbenches and close gates.
@@ -681,11 +681,11 @@ This phase consolidates and structures the entire WLT DSH finance control panel 
 
 | Item | Status |
 | --- | --- |
-| Consolidated folder architecture in `wlt/frontend/control-panel/dsh/` | CLOSED — 100% structured |
-| Elimination of duplicate preview data files | CLOSED — single source of truth |
-| Re-export barrel cleanup | CLOSED — direct workspace resolution |
-| Alignment of reconciliation screens with central color system | CLOSED — 0 drift colors |
-| Consistency guard false-positive alignment | CLOSED — Whitelisted |
+| Consolidated folder architecture in `wlt/frontend/dsh/control-panel/` | CLOSED â€” 100% structured |
+| Elimination of duplicate preview data files | CLOSED â€” single source of truth |
+| Re-export barrel cleanup | CLOSED â€” direct workspace resolution |
+| Alignment of reconciliation screens with central color system | CLOSED â€” 0 drift colors |
+| Consistency guard false-positive alignment | CLOSED â€” Whitelisted |
 | Runtime/backend ledger | NOT IMPLEMENTED |
 | Idempotency enforcement | NOT IMPLEMENTED |
 | Security/auth layer | NOT IMPLEMENTED |
@@ -698,15 +698,15 @@ This phase consolidates and structures the entire WLT DSH finance control panel 
 | --- | --- | --- |
 | Centralized preview file | `dsh/frontend/data/dshFinancePreview.ts` | `CLOSED` |
 | Cleaned up index barrel | `dsh/frontend/control-panel/finance/index.ts` | `CLOSED` |
-| Removed duplicate copy | `wlt/frontend/control-panel/dsh/dshFinancePreview.ts` | `DELETED` |
+| Removed duplicate copy | `wlt/frontend/dsh/control-panel/dshFinancePreview.ts` | `DELETED` |
 | Whitelisted skipped prefix | `tools/guards/guard-service-frontend-fixture-media-identity.config.json` | `CLOSED` |
-| Fixed white color formatting | `wlt/frontend/control-panel/dsh/screens/AuditCloseScreen.tsx` | `CLOSED` |
-| Fixed purple fallback colors | `wlt/frontend/control-panel/dsh/screens/DailyReconciliationWorkbench.tsx` | `CLOSED` |
-| Verification pipeline check | `pnpm -w exec tsc --noEmit` + BThwani guards | `PASS — EXIT 0` |
+| Fixed white color formatting | `wlt/frontend/dsh/control-panel/screens/AuditCloseScreen.tsx` | `CLOSED` |
+| Fixed purple fallback colors | `wlt/frontend/dsh/control-panel/screens/DailyReconciliationWorkbench.tsx` | `CLOSED` |
+| Verification pipeline check | `pnpm -w exec tsc --noEmit` + BThwani guards | `PASS â€” EXIT 0` |
 
 ---
 
-## Phase F9 — 100% UI, Preview, and Contract Closure (FIN-CLOSE-01 to FIN-CLOSE-10)
+## Phase F9 â€” 100% UI, Preview, and Contract Closure (FIN-CLOSE-01 to FIN-CLOSE-10)
 
 **Session:** DSH_WLT_FINANCE_FINAL_CLOSURE-20260602-001000
 **Date:** 2026-06-02
@@ -719,7 +719,7 @@ This phase completes the absolute 100% UI/Preview/Contract closure:
 1. **WLT-only Boundary and Fixture Adapter (FIN-CLOSE-01)**: Purged all direct DSH data imports from WLT-owned `financeContracts.ts` and encapsulated them inside `dshFinanceFixture.adapter.ts`.
 2. **Deprecate Legacy Screens & Aliases (FIN-CLOSE-02)**: Removed all retired routes (`overview`, `settlements`, `payouts`, etc.) from WLT screen renderers. They are strictly preserved as redirect aliases in `normalizeFinanceLocation()`.
 3. **Workspace Routing Split (FIN-CLOSE-03)**: Separated workspace routing types into `FinanceCanonicalWorkspaceId`, `FinanceLegacyWorkspaceAlias`, and `FinanceWorkspaceInput`.
-4. **Layout Tabs Order & Labels (FIN-CLOSE-04)**: Ordered the 9 layout tabs in the hub correctly: المركز المالي، كشوف الحساب، تسويات المتاجر، تقويم التسويات، COD والذمم، المستحقات والدفعات، الاستردادات والنزاعات، دفتر الأستاذ، والتدقيق والإغلاق.
+4. **Layout Tabs Order & Labels (FIN-CLOSE-04)**: Ordered the 9 layout tabs in the hub correctly: Ø§Ù„Ù…Ø±ÙƒØ² Ø§Ù„Ù…Ø§Ù„ÙŠØŒ ÙƒØ´ÙˆÙ Ø§Ù„Ø­Ø³Ø§Ø¨ØŒ ØªØ³ÙˆÙŠØ§Øª Ø§Ù„Ù…ØªØ§Ø¬Ø±ØŒ ØªÙ‚ÙˆÙŠÙ… Ø§Ù„ØªØ³ÙˆÙŠØ§ØªØŒ COD ÙˆØ§Ù„Ø°Ù…Ù…ØŒ Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª ÙˆØ§Ù„Ø¯ÙØ¹Ø§ØªØŒ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯Ø§Øª ÙˆØ§Ù„Ù†Ø²Ø§Ø¹Ø§ØªØŒ Ø¯ÙØªØ± Ø§Ù„Ø£Ø³ØªØ§Ø°ØŒ ÙˆØ§Ù„ØªØ¯Ù‚ÙŠÙ‚ ÙˆØ§Ù„Ø¥ØºÙ„Ø§Ù‚.
 5. **Store Settlements Detail UX (FIN-CLOSE-05)**: Added expected biweekly cutoff and payment dates, previous payout, hold reserves, and evidence reference details directly to the linked order lines.
 6. **Unified Account Statements (FIN-CLOSE-06)**: Extended account statement views to support all 6 actors (store, captain, store courier, field agent, customer wallet, platform) displaying debits, credits, adjustments, holds, releases, refunds, payouts, and running balances line by line.
 7. **Double-Entry Journal & Trial Balance (FIN-CLOSE-07)**: Ledger table now displays explicit debit/credit accounts and source refs, with a balanced Trial Balance proving `totalDebit === totalCredit`.
@@ -738,15 +738,15 @@ This phase completes the absolute 100% UI/Preview/Contract closure:
 
 | Item | Status |
 | --- | --- |
-| Strict WLT fixture adapter boundary | CLOSED — 100% isolated |
-| Removal of legacy renderers and retired screens | CLOSED — Aliases only |
-| Workspace routing input split | CLOSED — Type-safe |
-| Orderly 9 Arabic layout tabs | CLOSED — Aligned |
-| Store settlements cutoff / payment details | CLOSED — Upgraded |
-| 6-actor account statement balances | CLOSED — Extended |
-| Double-entry journal and trial balance | CLOSED — Proved balanced |
-| Blueprints TBD purge and matrices | CLOSED — Mapped |
-| Premium styling and dev metadata toggle | CLOSED — Aligned |
+| Strict WLT fixture adapter boundary | CLOSED â€” 100% isolated |
+| Removal of legacy renderers and retired screens | CLOSED â€” Aliases only |
+| Workspace routing input split | CLOSED â€” Type-safe |
+| Orderly 9 Arabic layout tabs | CLOSED â€” Aligned |
+| Store settlements cutoff / payment details | CLOSED â€” Upgraded |
+| 6-actor account statement balances | CLOSED â€” Extended |
+| Double-entry journal and trial balance | CLOSED â€” Proved balanced |
+| Blueprints TBD purge and matrices | CLOSED â€” Mapped |
+| Premium styling and dev metadata toggle | CLOSED â€” Aligned |
 | Runtime/backend ledger | NOT IMPLEMENTED |
 | Idempotency enforcement | NOT IMPLEMENTED |
 | Security/auth layer | NOT IMPLEMENTED |
@@ -757,15 +757,15 @@ This phase completes the absolute 100% UI/Preview/Contract closure:
 
 | Item | File | Status |
 | --- | --- | --- |
-| Consolidated WLT adapter | `wlt/frontend/control-panel/dsh/adapters/dshFinanceFixture.adapter.ts` | `CLOSED` |
-| Cleaned up contracts barrel | `wlt/frontend/control-panel/dsh/financeContracts.ts` | `CLOSED` |
-| Aligned 9 canonical tabs | `wlt/frontend/control-panel/dsh/constants/finance.registry.ts` | `CLOSED` |
-| Upgraded store settlements | `wlt/frontend/control-panel/dsh/components/WltDshStoreSettlementStatement.tsx` | `CLOSED` |
-| 6-actor statement grid | `wlt/frontend/control-panel/dsh/components/WltDshAccountStatement.tsx` | `CLOSED` |
-| Proved Trial Balance balanced | `wlt/frontend/control-panel/dsh/components/TrialBalancePanel.tsx` | `CLOSED` |
-| Clickable double-entry source refs | `wlt/frontend/control-panel/dsh/components/LedgerEntriesTable.tsx` | `CLOSED` |
+| Consolidated WLT adapter | `wlt/frontend/dsh/control-panel/adapters/dshFinanceFixture.adapter.ts` | `CLOSED` |
+| Cleaned up contracts barrel | `wlt/frontend/dsh/control-panel/financeContracts.ts` | `CLOSED` |
+| Aligned 9 canonical tabs | `wlt/frontend/dsh/control-panel/constants/finance.registry.ts` | `CLOSED` |
+| Upgraded store settlements | `wlt/frontend/dsh/control-panel/components/WltDshStoreSettlementStatement.tsx` | `CLOSED` |
+| 6-actor statement grid | `wlt/frontend/dsh/control-panel/components/WltDshAccountStatement.tsx` | `CLOSED` |
+| Proved Trial Balance balanced | `wlt/frontend/dsh/control-panel/components/TrialBalancePanel.tsx` | `CLOSED` |
+| Clickable double-entry source refs | `wlt/frontend/dsh/control-panel/components/LedgerEntriesTable.tsx` | `CLOSED` |
 | Unified service blueprint | `wlt/SERVICE_BLUEPRINT.md` | `CLOSED` |
-| TSC typecheck compile validation | `pnpm -w exec tsc --noEmit` | `PASS — EXIT 0` |
+| TSC typecheck compile validation | `pnpm -w exec tsc --noEmit` | `PASS â€” EXIT 0` |
 
 ### Single Next Action
 
@@ -785,7 +785,7 @@ Implement the WLT Ledger runtime backend engine in Go and wire up the API client
 
 ---
 
-## Phase F10 — HTTP Server Full Coverage + Typed Client Alignment
+## Phase F10 â€” HTTP Server Full Coverage + Typed Client Alignment
 
 **Session:** DSH_WLT_FINANCE_F10_SERVER_CLIENT-20260607
 **Date:** 2026-06-07
@@ -795,8 +795,8 @@ Implement the WLT Ledger runtime backend engine in Go and wire up the API client
 
 All 30 OpenAPI operations now have a corresponding HTTP handler in `server.mjs` AND a typed method in `wlt-dsh-client.ts`.
 
-1. **11 Missing Server Handlers Added**: `getControlPanelFinanceCenter`, `listStoreSettlementStatements`, `listControlPanelAccountStatements`, `listChartOfAccounts`, `listSubledgerBalances`, `listPostingRules`, `getTrialBalance`, `listSettlementCalendar`, `listRefundLedger`, `getAuditPack`, `getStoreDeliveryFinanceSummary` — all implemented as computed read models from live SQLite data, labelled `CONTRACT_SCAFFOLD_PREVIEW_ONLY`.
-2. **2 Missing Client Methods Added**: `listAuditEvents` and `submitDailyClose` existed in server.mjs but were absent from `wlt-dsh-client.ts` interface and implementation — now added with correct TypeScript interfaces.
+1. **11 Missing Server Handlers Added**: `getControlPanelFinanceCenter`, `listStoreSettlementStatements`, `listControlPanelAccountStatements`, `listChartOfAccounts`, `listSubledgerBalances`, `listPostingRules`, `getTrialBalance`, `listSettlementCalendar`, `listRefundLedger`, `getAuditPack`, `getStoreDeliveryFinanceSummary` â€” all implemented as computed read models from live SQLite data, labelled `CONTRACT_SCAFFOLD_PREVIEW_ONLY`.
+2. **2 Missing Client Methods Added**: `listAuditEvents` and `submitDailyClose` existed in server.mjs but were absent from `wlt-dsh-client.ts` interface and implementation â€” now added with correct TypeScript interfaces.
 3. **Typed Interfaces Added**: `WltDshAuditEvent` and `WltDshDailyCloseResult` exported from the typed client.
 4. **WltDshCloseStatus tightened**: `status` field narrowed from `string` to `'open' | 'closed' | 'failed'` union.
 
@@ -810,12 +810,12 @@ All 30 OpenAPI operations now have a corresponding HTTP handler in `server.mjs` 
 
 | Item | Status |
 | --- | --- |
-| All 30 OpenAPI operations → server.mjs handlers | CLOSED — 100% coverage |
-| All 30 OpenAPI operations → wlt-dsh-client.ts methods | CLOSED — 100% coverage |
-| listAuditEvents typed method | CLOSED — added |
-| submitDailyClose typed method | CLOSED — added |
-| WltDshAuditEvent + WltDshDailyCloseResult interfaces | CLOSED — added |
-| WltDshCloseStatus status union tightened | CLOSED — type-safe |
+| All 30 OpenAPI operations â†’ server.mjs handlers | CLOSED â€” 100% coverage |
+| All 30 OpenAPI operations â†’ wlt-dsh-client.ts methods | CLOSED â€” 100% coverage |
+| listAuditEvents typed method | CLOSED â€” added |
+| submitDailyClose typed method | CLOSED â€” added |
+| WltDshAuditEvent + WltDshDailyCloseResult interfaces | CLOSED â€” added |
+| WltDshCloseStatus status union tightened | CLOSED â€” type-safe |
 | Security/auth layer | NOT IMPLEMENTED |
 | Real money mutations (Go engine) | NOT IMPLEMENTED |
 | Production financial closure | NOT CLOSED |
@@ -827,8 +827,8 @@ All 30 OpenAPI operations now have a corresponding HTTP handler in `server.mjs` 
 | 11 server handlers added | `wlt/backend/src/server.mjs` | `CLOSED` |
 | 2 typed client methods added | `wlt/frontend/contracts/wlt-dsh-client.ts` | `CLOSED` |
 | New typed interfaces | `wlt/frontend/contracts/wlt-dsh-client.ts` | `CLOSED` |
-| WLT server smoke test | node server.mjs → `WLT-DSH HTTP server running on port 8090` | `PASS` |
-| TSC typecheck | `pnpm exec tsc --noEmit` from `wlt/` | `PASS — EXIT 0` |
+| WLT server smoke test | node server.mjs â†’ `WLT-DSH HTTP server running on port 8090` | `PASS` |
+| TSC typecheck | `pnpm exec tsc --noEmit` from `wlt/` | `PASS â€” EXIT 0` |
 | git diff --check | `wlt/` scope | `CLEAN` |
 
 Classification: Server scaffold with SQLite persistence. All operations reachable via HTTP. Typed client boundary complete. Not production runtime. Not security-hardened. Not closed.

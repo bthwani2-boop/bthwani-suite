@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: dsh_local
       POSTGRES_PASSWORD: dsh_local_password
     ports:
-      - "55432:5432"
+      - "${POSTGRES_PORT:-55432}:5432"
     volumes:
       - dsh-postgres-data:/var/lib/postgresql/data
       - ./docker/initdb/001_apply_dsh_sql.sh:/docker-entrypoint-initdb.d/001_apply_dsh_sql.sh:ro
@@ -25,15 +25,15 @@ services:
     # Port 8082 — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.
     # DEV_ONLY: password_hash seed in 027_auth_sessions.sql accepts username==password fallback.
     build:
-      context: .
-      dockerfile: Dockerfile.auth-service
+      context: ..
+      dockerfile: backend/Dockerfile.auth-service
     container_name: bthwani-auth-service-local
     restart: unless-stopped
     environment:
       AUTH_PORT: "8082"
       DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
     ports:
-      - "8082:8082"
+      - "${DSH_AUTH_SERVICE_HOST_PORT:-8092}:8082"
     depends_on:
       dsh-postgres:
         condition: service_healthy

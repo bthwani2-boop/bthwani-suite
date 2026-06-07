@@ -1,6 +1,6 @@
 import React from 'react';
 import type { WltCaptainFinanceSection } from '../../data/dshFinancePreview';
-import { WltDshCaptainBridge } from '../../../../wlt/frontend/app-captain/dsh';
+import { WltDshCaptainBridge } from '../../../../wlt/frontend/dsh/app-captain';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainFinanceScreenState } from '../../data/operational-statuses.preview-data';
 
@@ -25,8 +25,8 @@ export function DshCaptainFinanceScreen({
 		return (
 			<DshOperationScreen
 				state={state}
-				title="المالية"
-				subtitle="المالية مربوطة الآن بجسر WLT موحد لعرض COD والأرباح والتسوية في وضع preview فقط."
+				title="Ø§Ù„Ù…Ø§Ù„ÙŠØ©"
+				subtitle="Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ù…Ø±Ø¨ÙˆØ·Ø© Ø§Ù„Ø¢Ù† Ø¨Ø¬Ø³Ø± WLT Ù…ÙˆØ­Ø¯ Ù„Ø¹Ø±Ø¶ COD ÙˆØ§Ù„Ø£Ø±Ø¨Ø§Ø­ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ© ÙÙŠ ÙˆØ¶Ø¹ preview ÙÙ‚Ø·."
 				onRetry={onRetry}
 			/>
 		);

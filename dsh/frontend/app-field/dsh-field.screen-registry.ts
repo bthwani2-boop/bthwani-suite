@@ -165,7 +165,7 @@ export const dshFieldScreenRegistry = [
     ownerId: 'wlt.dsh',
     serviceId: 'wlt',
     linkedServiceId: 'dsh',
-    ownerPath: 'wlt/frontend/app-field/dsh/WltDshFieldBridge.tsx',
+    ownerPath: 'wlt/frontend/dsh/app-field/WltDshFieldBridge.tsx',
     componentName: 'WltDshFieldBridge',
     screenKind: 'FLOW_STEP',
     flowId: 'dsh.field.finance',

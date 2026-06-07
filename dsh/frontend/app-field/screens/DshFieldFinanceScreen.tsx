@@ -1,6 +1,6 @@
 import React from 'react';
 import { StateView } from '@bthwani/ui-kit';
-import { WltDshFieldBridge } from '../../../../wlt/frontend/app-field/dsh';
+import { WltDshFieldBridge } from '../../../../wlt/frontend/dsh/app-field';
 import { resolveFieldStoreStatus, type FieldStoreFile } from '../../data/stores.preview-data';
 
 type DshFieldFinanceScreenProps = {
@@ -12,16 +12,16 @@ type DshFieldFinanceScreenProps = {
 
 export function DshFieldFinanceScreen({ state = 'ready', stores, onBack, onRetry }: DshFieldFinanceScreenProps) {
   if (state === 'loading') {
-    return <StateView stateId="loading" title="جارٍ تحميل البيانات المالية" description="نحسب المستحقات والعمولات للملفات المعتمدة." />;
+    return <StateView stateId="loading" title="Ø¬Ø§Ø±Ù ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©" description="Ù†Ø­Ø³Ø¨ Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª ÙˆØ§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª Ù„Ù„Ù…Ù„ÙØ§Øª Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø©." />;
   }
 
   if (state === 'error' || state === 'offline') {
     return (
       <StateView
         stateId={state === 'offline' ? 'offline' : 'recoverableError'}
-        title="تعذر الوصول للبيانات المالية"
-        description="تحقق من الاتصال بالخادم لمراجعة المستحقات الميدانية."
-        actionLabel="إعادة المحاولة"
+        title="ØªØ¹Ø°Ø± Ø§Ù„ÙˆØµÙˆÙ„ Ù„Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©"
+        description="ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø®Ø§Ø¯Ù… Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠØ©."
+        actionLabel="Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©"
         onActionPress={onRetry}
       />
     );

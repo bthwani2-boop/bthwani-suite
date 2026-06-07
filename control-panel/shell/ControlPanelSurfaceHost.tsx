@@ -30,10 +30,10 @@ import {
 import type {
   CanonicalFinanceGroupId,
   FinancePanelId,
-} from "../../wlt/frontend/control-panel/dsh/models/financeRouting.types";
+} from "../../wlt/frontend/dsh/control-panel/models/financeRouting.types";
 import {
   normalizeFinanceLocation,
-} from "../../wlt/frontend/control-panel/dsh/constants/finance.registry";
+} from "../../wlt/frontend/dsh/control-panel/constants/finance.registry";
 import { controlPanelRuntimeData } from "./runtime.data";
 import { useControlPanelAppearance } from "./appearance";
 import type { ControlPanelUiGrammar } from "./ui-grammar-contract";

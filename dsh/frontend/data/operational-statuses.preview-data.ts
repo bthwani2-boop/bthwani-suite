@@ -79,9 +79,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	quote: {
 		state: 'quote',
 		group: 'quote',
-		label: 'تجهيز التسعير',
-		title: 'تجهيز التسعير',
-		description: 'يتم التحقق من الرسوم والوقت المتوقع وأثر العروض قبل متابعة الدفع.',
+		label: 'ØªØ¬Ù‡ÙŠØ² Ø§Ù„ØªØ³Ø¹ÙŠØ±',
+		title: 'ØªØ¬Ù‡ÙŠØ² Ø§Ù„ØªØ³Ø¹ÙŠØ±',
+		description: 'ÙŠØªÙ… Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø±Ø³ÙˆÙ… ÙˆØ§Ù„ÙˆÙ‚Øª Ø§Ù„Ù…ØªÙˆÙ‚Ø¹ ÙˆØ£Ø«Ø± Ø§Ù„Ø¹Ø±ÙˆØ¶ Ù‚Ø¨Ù„ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¯ÙØ¹.',
 		visibility: {
 			...hiddenVisibility,
 			quoteVisible: true,
@@ -93,9 +93,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	serviceability: {
 		state: 'serviceability',
 		group: 'serviceability',
-		label: 'فحص قابلية التوصيل',
-		title: 'فحص قابلية التوصيل',
-		description: 'يتم التأكد من أن عنوان العميل داخل نطاق الخدمة قبل المتابعة.',
+		label: 'ÙØ­Øµ Ù‚Ø§Ø¨Ù„ÙŠØ© Ø§Ù„ØªÙˆØµÙŠÙ„',
+		title: 'ÙØ­Øµ Ù‚Ø§Ø¨Ù„ÙŠØ© Ø§Ù„ØªÙˆØµÙŠÙ„',
+		description: 'ÙŠØªÙ… Ø§Ù„ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„ Ø¯Ø§Ø®Ù„ Ù†Ø·Ø§Ù‚ Ø§Ù„Ø®Ø¯Ù…Ø© Ù‚Ø¨Ù„ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©.',
 		visibility: {
 			...hiddenVisibility,
 			serviceabilityVisible: true,
@@ -107,9 +107,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	store_open: {
 		state: 'store_open',
 		group: 'store',
-		label: 'المتجر متاح',
-		title: 'المتجر متاح',
-		description: 'المتجر يستقبل الطلبات ويمكن للعميل المتابعة إلى السلة والدفع.',
+		label: 'Ø§Ù„Ù…ØªØ¬Ø± Ù…ØªØ§Ø­',
+		title: 'Ø§Ù„Ù…ØªØ¬Ø± Ù…ØªØ§Ø­',
+		description: 'Ø§Ù„Ù…ØªØ¬Ø± ÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙˆÙŠÙ…ÙƒÙ† Ù„Ù„Ø¹Ù…ÙŠÙ„ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø³Ù„Ø© ÙˆØ§Ù„Ø¯ÙØ¹.',
 		visibility: {
 			...hiddenVisibility,
 			storeStatusVisible: true,
@@ -121,9 +121,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	store_closed: {
 		state: 'store_closed',
 		group: 'store',
-		label: 'المتجر غير متاح',
-		title: 'المتجر غير متاح',
-		description: 'المتجر لا يستقبل الطلبات الآن ويجب إظهار بديل أو مسار دعم واضح.',
+		label: 'Ø§Ù„Ù…ØªØ¬Ø± ØºÙŠØ± Ù…ØªØ§Ø­',
+		title: 'Ø§Ù„Ù…ØªØ¬Ø± ØºÙŠØ± Ù…ØªØ§Ø­',
+		description: 'Ø§Ù„Ù…ØªØ¬Ø± Ù„Ø§ ÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¢Ù† ÙˆÙŠØ¬Ø¨ Ø¥Ø¸Ù‡Ø§Ø± Ø¨Ø¯ÙŠÙ„ Ø£Ùˆ Ù…Ø³Ø§Ø± Ø¯Ø¹Ù… ÙˆØ§Ø¶Ø­.',
 		visibility: {
 			...hiddenVisibility,
 			storeStatusVisible: true,
@@ -136,9 +136,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	area_unserviceable: {
 		state: 'area_unserviceable',
 		group: 'serviceability',
-		label: 'العنوان خارج التغطية',
-		title: 'العنوان خارج التغطية',
-		description: 'الوجهة الحالية خارج نطاق الخدمة ويجب تعديل العنوان أو اختيار بديل.',
+		label: 'Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø®Ø§Ø±Ø¬ Ø§Ù„ØªØºØ·ÙŠØ©',
+		title: 'Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø®Ø§Ø±Ø¬ Ø§Ù„ØªØºØ·ÙŠØ©',
+		description: 'Ø§Ù„ÙˆØ¬Ù‡Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ© Ø®Ø§Ø±Ø¬ Ù†Ø·Ø§Ù‚ Ø§Ù„Ø®Ø¯Ù…Ø© ÙˆÙŠØ¬Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø£Ùˆ Ø§Ø®ØªÙŠØ§Ø± Ø¨Ø¯ÙŠÙ„.',
 		visibility: {
 			...hiddenVisibility,
 			serviceabilityVisible: true,
@@ -151,9 +151,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	item_unavailable: {
 		state: 'item_unavailable',
 		group: 'exception',
-		label: 'العناصر غير متاحة',
-		title: 'العناصر غير متاحة',
-		description: 'بعض العناصر المطلوبة غير متاحة الآن ويجب إظهار بديل واضح أو إعادة ضبط السلة قبل المتابعة.',
+		label: 'Ø§Ù„Ø¹Ù†Ø§ØµØ± ØºÙŠØ± Ù…ØªØ§Ø­Ø©',
+		title: 'Ø§Ù„Ø¹Ù†Ø§ØµØ± ØºÙŠØ± Ù…ØªØ§Ø­Ø©',
+		description: 'Ø¨Ø¹Ø¶ Ø§Ù„Ø¹Ù†Ø§ØµØ± Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø© Ø§Ù„Ø¢Ù† ÙˆÙŠØ¬Ø¨ Ø¥Ø¸Ù‡Ø§Ø± Ø¨Ø¯ÙŠÙ„ ÙˆØ§Ø¶Ø­ Ø£Ùˆ Ø¥Ø¹Ø§Ø¯Ø© Ø¶Ø¨Ø· Ø§Ù„Ø³Ù„Ø© Ù‚Ø¨Ù„ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©.',
 		visibility: {
 			...hiddenVisibility,
 			cartVisible: true,
@@ -167,9 +167,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	cart_empty: {
 		state: 'cart_empty',
 		group: 'cart',
-		label: 'السلة فارغة',
-		title: 'السلة فارغة',
-		description: 'أضف منتجًا واحدًا على الأقل قبل متابعة الدفع.',
+		label: 'Ø§Ù„Ø³Ù„Ø© ÙØ§Ø±ØºØ©',
+		title: 'Ø§Ù„Ø³Ù„Ø© ÙØ§Ø±ØºØ©',
+		description: 'Ø£Ø¶Ù Ù…Ù†ØªØ¬Ù‹Ø§ ÙˆØ§Ø­Ø¯Ù‹Ø§ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ Ù‚Ø¨Ù„ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¯ÙØ¹.',
 		visibility: {
 			...hiddenVisibility,
 			cartVisible: true,
@@ -181,9 +181,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	cart_ready: {
 		state: 'cart_ready',
 		group: 'cart',
-		label: 'السلة جاهزة',
-		title: 'السلة جاهزة',
-		description: 'السلة تحتوي عناصر ويمكن للعميل مراجعتها قبل الدفع.',
+		label: 'Ø§Ù„Ø³Ù„Ø© Ø¬Ø§Ù‡Ø²Ø©',
+		title: 'Ø§Ù„Ø³Ù„Ø© Ø¬Ø§Ù‡Ø²Ø©',
+		description: 'Ø§Ù„Ø³Ù„Ø© ØªØ­ØªÙˆÙŠ Ø¹Ù†Ø§ØµØ± ÙˆÙŠÙ…ÙƒÙ† Ù„Ù„Ø¹Ù…ÙŠÙ„ Ù…Ø±Ø§Ø¬Ø¹ØªÙ‡Ø§ Ù‚Ø¨Ù„ Ø§Ù„Ø¯ÙØ¹.',
 		visibility: {
 			...hiddenVisibility,
 			cartVisible: true,
@@ -196,9 +196,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	checkout_ready: {
 		state: 'checkout_ready',
 		group: 'checkout',
-		label: 'الدفع جاهز',
-		title: 'الدفع جاهز',
-		description: 'بيانات العنوان والرسوم وطريقة الدفع جاهزة للمراجعة النهائية.',
+		label: 'Ø§Ù„Ø¯ÙØ¹ Ø¬Ø§Ù‡Ø²',
+		title: 'Ø§Ù„Ø¯ÙØ¹ Ø¬Ø§Ù‡Ø²',
+		description: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ÙˆØ§Ù„Ø±Ø³ÙˆÙ… ÙˆØ·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹ Ø¬Ø§Ù‡Ø²Ø© Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©.',
 		visibility: {
 			...hiddenVisibility,
 			cartVisible: true,
@@ -211,9 +211,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	payment_pending: {
 		state: 'payment_pending',
 		group: 'payment',
-		label: 'الدفع قيد المعالجة',
-		title: 'الدفع قيد المعالجة',
-		description: 'يتم التحقق من قرار الدفع قبل إنشاء الطلب النهائي.',
+		label: 'Ø§Ù„Ø¯ÙØ¹ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©',
+		title: 'Ø§Ù„Ø¯ÙØ¹ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©',
+		description: 'ÙŠØªÙ… Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù‚Ø±Ø§Ø± Ø§Ù„Ø¯ÙØ¹ Ù‚Ø¨Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ.',
 		visibility: {
 			...hiddenVisibility,
 			checkoutVisible: true,
@@ -225,9 +225,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	payment_failed: {
 		state: 'payment_failed',
 		group: 'payment',
-		label: 'فشل الدفع',
-		title: 'فشل الدفع',
-		description: 'تعذر تثبيت قرار الدفع ويجب توضيح سبب الفشل مع إبقاء مسار المراجعة والدعم واضحًا.',
+		label: 'ÙØ´Ù„ Ø§Ù„Ø¯ÙØ¹',
+		title: 'ÙØ´Ù„ Ø§Ù„Ø¯ÙØ¹',
+		description: 'ØªØ¹Ø°Ø± ØªØ«Ø¨ÙŠØª Ù‚Ø±Ø§Ø± Ø§Ù„Ø¯ÙØ¹ ÙˆÙŠØ¬Ø¨ ØªÙˆØ¶ÙŠØ­ Ø³Ø¨Ø¨ Ø§Ù„ÙØ´Ù„ Ù…Ø¹ Ø¥Ø¨Ù‚Ø§Ø¡ Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„Ø¯Ø¹Ù… ÙˆØ§Ø¶Ø­Ù‹Ø§.',
 		visibility: {
 			...hiddenVisibility,
 			checkoutVisible: true,
@@ -240,9 +240,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	order_created: {
 		state: 'order_created',
 		group: 'order',
-		label: 'تم إنشاء الطلب',
-		title: 'تم إنشاء الطلب',
-		description: 'تم إنشاء الطلب وهو بانتظار التأكيد التشغيلي.',
+		label: 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨',
+		title: 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨',
+		description: 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨ ÙˆÙ‡Ùˆ Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ.',
 		visibility: {
 			...hiddenVisibility,
 			checkoutVisible: true,
@@ -255,9 +255,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	order_confirmed: {
 		state: 'order_confirmed',
 		group: 'order',
-		label: 'تم تأكيد الطلب',
-		title: 'تم تأكيد الطلب',
-		description: 'تم قبول الطلب ويمكن متابعة حالته من صفحة التتبع.',
+		label: 'ØªÙ… ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø·Ù„Ø¨',
+		title: 'ØªÙ… ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø·Ù„Ø¨',
+		description: 'ØªÙ… Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø·Ù„Ø¨ ÙˆÙŠÙ…ÙƒÙ† Ù…ØªØ§Ø¨Ø¹Ø© Ø­Ø§Ù„ØªÙ‡ Ù…Ù† ØµÙØ­Ø© Ø§Ù„ØªØªØ¨Ø¹.',
 		visibility: {
 			...hiddenVisibility,
 			trackingVisible: true,
@@ -269,9 +269,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	tracking_active: {
 		state: 'tracking_active',
 		group: 'tracking',
-		label: 'التتبع نشط',
-		title: 'التتبع نشط',
-		description: 'الطلب قيد التنفيذ ويمكن للعميل متابعة الحالة والوقت المتوقع والدعم.',
+		label: 'Ø§Ù„ØªØªØ¨Ø¹ Ù†Ø´Ø·',
+		title: 'Ø§Ù„ØªØªØ¨Ø¹ Ù†Ø´Ø·',
+		description: 'Ø§Ù„Ø·Ù„Ø¨ Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ° ÙˆÙŠÙ…ÙƒÙ† Ù„Ù„Ø¹Ù…ÙŠÙ„ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø© ÙˆØ§Ù„ÙˆÙ‚Øª Ø§Ù„Ù…ØªÙˆÙ‚Ø¹ ÙˆØ§Ù„Ø¯Ø¹Ù….',
 		visibility: {
 			...hiddenVisibility,
 			trackingVisible: true,
@@ -284,9 +284,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	delivered: {
 		state: 'delivered',
 		group: 'completion',
-		label: 'تم التسليم',
-		title: 'تم التسليم',
-		description: 'وصل الطلب للعميل ويمكنه تقييم التجربة أو طلب الدعم عند الحاجة.',
+		label: 'ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ…',
+		title: 'ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ…',
+		description: 'ÙˆØµÙ„ Ø§Ù„Ø·Ù„Ø¨ Ù„Ù„Ø¹Ù…ÙŠÙ„ ÙˆÙŠÙ…ÙƒÙ†Ù‡ ØªÙ‚ÙŠÙŠÙ… Ø§Ù„ØªØ¬Ø±Ø¨Ø© Ø£Ùˆ Ø·Ù„Ø¨ Ø§Ù„Ø¯Ø¹Ù… Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø©.',
 		visibility: {
 			...hiddenVisibility,
 			trackingVisible: true,
@@ -298,9 +298,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	cancelled: {
 		state: 'cancelled',
 		group: 'exception',
-		label: 'تم إلغاء الطلب',
-		title: 'تم إلغاء الطلب',
-		description: 'تم إلغاء الطلب ويجب توضيح السبب وحالة أي استرداد للعميل.',
+		label: 'ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø·Ù„Ø¨',
+		title: 'ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø·Ù„Ø¨',
+		description: 'ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø·Ù„Ø¨ ÙˆÙŠØ¬Ø¨ ØªÙˆØ¶ÙŠØ­ Ø§Ù„Ø³Ø¨Ø¨ ÙˆØ­Ø§Ù„Ø© Ø£ÙŠ Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ù„Ù„Ø¹Ù…ÙŠÙ„.',
 		visibility: {
 			...hiddenVisibility,
 			supportVisible: true,
@@ -313,9 +313,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	failed: {
 		state: 'failed',
 		group: 'exception',
-		label: 'فشل تنفيذ الطلب',
-		title: 'فشل تنفيذ الطلب',
-		description: 'تعذر تنفيذ الطلب ويجب إظهار مسار تعافٍ أو دعم واضح للعميل.',
+		label: 'ÙØ´Ù„ ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨',
+		title: 'ÙØ´Ù„ ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨',
+		description: 'ØªØ¹Ø°Ø± ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨ ÙˆÙŠØ¬Ø¨ Ø¥Ø¸Ù‡Ø§Ø± Ù…Ø³Ø§Ø± ØªØ¹Ø§ÙÙ Ø£Ùˆ Ø¯Ø¹Ù… ÙˆØ§Ø¶Ø­ Ù„Ù„Ø¹Ù…ÙŠÙ„.',
 		visibility: {
 			...hiddenVisibility,
 			supportVisible: true,
@@ -328,9 +328,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	refund_pending: {
 		state: 'refund_pending',
 		group: 'wallet',
-		label: 'الاسترداد قيد المعالجة',
-		title: 'الاسترداد قيد المعالجة',
-		description: 'يوجد استرداد قيد المعالجة ويجب إظهار حالته المالية للعميل.',
+		label: 'Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©',
+		title: 'Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©',
+		description: 'ÙŠÙˆØ¬Ø¯ Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø© ÙˆÙŠØ¬Ø¨ Ø¥Ø¸Ù‡Ø§Ø± Ø­Ø§Ù„ØªÙ‡ Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ù„Ù„Ø¹Ù…ÙŠÙ„.',
 		visibility: {
 			...hiddenVisibility,
 			supportVisible: true,
@@ -343,9 +343,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	refunded: {
 		state: 'refunded',
 		group: 'wallet',
-		label: 'تم الاسترداد',
-		title: 'تم الاسترداد',
-		description: 'اكتملت عملية الاسترداد ويمكن عرض الأثر المالي النهائي للعميل.',
+		label: 'ØªÙ… Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯',
+		title: 'ØªÙ… Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯',
+		description: 'Ø§ÙƒØªÙ…Ù„Øª Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ ÙˆÙŠÙ…ÙƒÙ† Ø¹Ø±Ø¶ Ø§Ù„Ø£Ø«Ø± Ø§Ù„Ù…Ø§Ù„ÙŠ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ø¹Ù…ÙŠÙ„.',
 		visibility: {
 			...hiddenVisibility,
 			walletRefundVisible: true,
@@ -357,9 +357,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	support_required: {
 		state: 'support_required',
 		group: 'support',
-		label: 'الدعم مطلوب',
-		title: 'الدعم مطلوب',
-		description: 'لا يمكن المتابعة بأمان بدون تدخل الدعم أو توضيح سبب المشكلة.',
+		label: 'Ø§Ù„Ø¯Ø¹Ù… Ù…Ø·Ù„ÙˆØ¨',
+		title: 'Ø§Ù„Ø¯Ø¹Ù… Ù…Ø·Ù„ÙˆØ¨',
+		description: 'Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø¨Ø£Ù…Ø§Ù† Ø¨Ø¯ÙˆÙ† ØªØ¯Ø®Ù„ Ø§Ù„Ø¯Ø¹Ù… Ø£Ùˆ ØªÙˆØ¶ÙŠØ­ Ø³Ø¨Ø¨ Ø§Ù„Ù…Ø´ÙƒÙ„Ø©.',
 		visibility: {
 			...hiddenVisibility,
 			supportVisible: true,
@@ -371,9 +371,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	wallet_credit_visible: {
 		state: 'wallet_credit_visible',
 		group: 'wallet',
-		label: 'رصيد المحفظة ظاهر',
-		title: 'رصيد المحفظة ظاهر',
-		description: 'يوجد رصيد أو تعويض ظاهر للعميل داخل المحفظة.',
+		label: 'Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¸Ø§Ù‡Ø±',
+		title: 'Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¸Ø§Ù‡Ø±',
+		description: 'ÙŠÙˆØ¬Ø¯ Ø±ØµÙŠØ¯ Ø£Ùˆ ØªØ¹ÙˆÙŠØ¶ Ø¸Ø§Ù‡Ø± Ù„Ù„Ø¹Ù…ÙŠÙ„ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø­ÙØ¸Ø©.',
 		visibility: {
 			...hiddenVisibility,
 			walletCreditVisible: true,
@@ -385,9 +385,9 @@ const clientStateMeta: Record<DshClientState, DshClientStateMeta> = {
 	wallet_refund_visible: {
 		state: 'wallet_refund_visible',
 		group: 'wallet',
-		label: 'استرداد المحفظة ظاهر',
-		title: 'استرداد المحفظة ظاهر',
-		description: 'تظهر معلومات الاسترداد المرتبطة بالمحفظة ضمن مسار العميل.',
+		label: 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¸Ø§Ù‡Ø±',
+		title: 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¸Ø§Ù‡Ø±',
+		description: 'ØªØ¸Ù‡Ø± Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¶Ù…Ù† Ù…Ø³Ø§Ø± Ø§Ù„Ø¹Ù…ÙŠÙ„.',
 		visibility: {
 			...hiddenVisibility,
 			walletRefundVisible: true,
@@ -445,21 +445,21 @@ export type DshCaptainStateMeta = {
 };
 
 const stateMetaMap: Record<DshCaptainState, DshCaptainStateMeta> = {
-	entry: { id: 'entry', label: 'مدخل الكابتن', description: 'نقطة البداية المختصرة.', group: 'entry', terminal: false },
-	orders: { id: 'orders', label: 'الطلبات', description: 'مسار الطلبات الأساسي.', group: 'orders', terminal: false },
-	finance: { id: 'finance', label: 'المالية', description: 'سطح الرصيد والتسوية.', group: 'finance', terminal: false },
-	profile: { id: 'profile', label: 'الملف', description: 'ملف الكابتن ومعلومات الطبقة.', group: 'profile', terminal: false },
-	operations: { id: 'operations', label: 'التشغيل', description: 'الجاهزية والمسار والسلامة.', group: 'operations', terminal: false },
-	'order-accept': { id: 'order-accept', label: 'قبول الطلب', description: 'حالة قبول العرض.', group: 'orders', terminal: false },
-	'order-offer-reject': { id: 'order-offer-reject', label: 'رفض العرض', description: 'حالة رفض عرض الطلب.', group: 'orders', terminal: false },
-	'order-pickup': { id: 'order-pickup', label: 'الاستلام', description: 'مرحلة الاستلام.', group: 'orders', terminal: false },
-	'order-deliver': { id: 'order-deliver', label: 'التسليم', description: 'مرحلة التسليم.', group: 'orders', terminal: false },
-	'proof-upload': { id: 'proof-upload', label: 'رفع الإثبات', description: 'مرحلة إثبات التسليم.', group: 'orders', terminal: false },
-	'cod-liability': { id: 'cod-liability', label: 'ذمة COD', description: 'مسار الذمة النقدية المستحقة.', group: 'finance', terminal: false },
-	'profile-get': { id: 'profile-get', label: 'ملف الكابتن', description: 'لقطة الملف.', group: 'profile', terminal: false },
-	'tier-info': { id: 'tier-info', label: 'معلومات الطبقة', description: 'بيانات الطبقة الحالية.', group: 'profile', terminal: false },
-	'tier-evaluate': { id: 'tier-evaluate', label: 'تقييم الطبقة', description: 'فحص أهلية الطبقة.', group: 'profile', terminal: false },
-	terminal: { id: 'terminal', label: 'نهائي', description: 'حالة ختامية.', group: 'terminal', terminal: true },
+	entry: { id: 'entry', label: 'Ù…Ø¯Ø®Ù„ Ø§Ù„ÙƒØ§Ø¨ØªÙ†', description: 'Ù†Ù‚Ø·Ø© Ø§Ù„Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ù…Ø®ØªØµØ±Ø©.', group: 'entry', terminal: false },
+	orders: { id: 'orders', label: 'Ø§Ù„Ø·Ù„Ø¨Ø§Øª', description: 'Ù…Ø³Ø§Ø± Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ.', group: 'orders', terminal: false },
+	finance: { id: 'finance', label: 'Ø§Ù„Ù…Ø§Ù„ÙŠØ©', description: 'Ø³Ø·Ø­ Ø§Ù„Ø±ØµÙŠØ¯ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ©.', group: 'finance', terminal: false },
+	profile: { id: 'profile', label: 'Ø§Ù„Ù…Ù„Ù', description: 'Ù…Ù„Ù Ø§Ù„ÙƒØ§Ø¨ØªÙ† ÙˆÙ…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø·Ø¨Ù‚Ø©.', group: 'profile', terminal: false },
+	operations: { id: 'operations', label: 'Ø§Ù„ØªØ´ØºÙŠÙ„', description: 'Ø§Ù„Ø¬Ø§Ù‡Ø²ÙŠØ© ÙˆØ§Ù„Ù…Ø³Ø§Ø± ÙˆØ§Ù„Ø³Ù„Ø§Ù…Ø©.', group: 'operations', terminal: false },
+	'order-accept': { id: 'order-accept', label: 'Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø·Ù„Ø¨', description: 'Ø­Ø§Ù„Ø© Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø¹Ø±Ø¶.', group: 'orders', terminal: false },
+	'order-offer-reject': { id: 'order-offer-reject', label: 'Ø±ÙØ¶ Ø§Ù„Ø¹Ø±Ø¶', description: 'Ø­Ø§Ù„Ø© Ø±ÙØ¶ Ø¹Ø±Ø¶ Ø§Ù„Ø·Ù„Ø¨.', group: 'orders', terminal: false },
+	'order-pickup': { id: 'order-pickup', label: 'Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', description: 'Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù….', group: 'orders', terminal: false },
+	'order-deliver': { id: 'order-deliver', label: 'Ø§Ù„ØªØ³Ù„ÙŠÙ…', description: 'Ù…Ø±Ø­Ù„Ø© Ø§Ù„ØªØ³Ù„ÙŠÙ….', group: 'orders', terminal: false },
+	'proof-upload': { id: 'proof-upload', label: 'Ø±ÙØ¹ Ø§Ù„Ø¥Ø«Ø¨Ø§Øª', description: 'Ù…Ø±Ø­Ù„Ø© Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ³Ù„ÙŠÙ….', group: 'orders', terminal: false },
+	'cod-liability': { id: 'cod-liability', label: 'Ø°Ù…Ø© COD', description: 'Ù…Ø³Ø§Ø± Ø§Ù„Ø°Ù…Ø© Ø§Ù„Ù†Ù‚Ø¯ÙŠØ© Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø©.', group: 'finance', terminal: false },
+	'profile-get': { id: 'profile-get', label: 'Ù…Ù„Ù Ø§Ù„ÙƒØ§Ø¨ØªÙ†', description: 'Ù„Ù‚Ø·Ø© Ø§Ù„Ù…Ù„Ù.', group: 'profile', terminal: false },
+	'tier-info': { id: 'tier-info', label: 'Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø·Ø¨Ù‚Ø©', description: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø·Ø¨Ù‚Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©.', group: 'profile', terminal: false },
+	'tier-evaluate': { id: 'tier-evaluate', label: 'ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø·Ø¨Ù‚Ø©', description: 'ÙØ­Øµ Ø£Ù‡Ù„ÙŠØ© Ø§Ù„Ø·Ø¨Ù‚Ø©.', group: 'profile', terminal: false },
+	terminal: { id: 'terminal', label: 'Ù†Ù‡Ø§Ø¦ÙŠ', description: 'Ø­Ø§Ù„Ø© Ø®ØªØ§Ù…ÙŠØ©.', group: 'terminal', terminal: true },
 };
 
 export function getDshCaptainStateMeta(state: DshCaptainState): DshCaptainStateMeta {
@@ -485,10 +485,10 @@ export type DshCaptainFinanceScreenState = 'ready' | 'loading' | 'empty' | 'erro
 export type DshCaptainFinanceSection = 'cod-liability' | 'earnings' | 'settlement';
 
 /**
- * PREVIEW_ONLY — local display snapshot for captain finance labels.
+ * PREVIEW_ONLY â€” local display snapshot for captain finance labels.
  * Financial truth (COD, earnings, eligibility, settlement) is owned by WLT.
- * Authoritative type: WltCaptainFinanceSnapshot (wlt/frontend/control-panel/dsh/dshFinancePreview.ts).
- * bthwani_delivery only — partner_delivery (store_courier_mode) is not captain payout.
+ * Authoritative type: WltCaptainFinanceSnapshot (wlt/frontend/dsh/control-panel/dshFinancePreview.ts).
+ * bthwani_delivery only â€” partner_delivery (store_courier_mode) is not captain payout.
  */
 export type DshCaptainFinanceSnapshot = {
 	readonly isPreview: true;

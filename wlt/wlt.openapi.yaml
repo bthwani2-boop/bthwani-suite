@@ -12,7 +12,7 @@ info:
 
     Boundary: governance/22_DSH_GOLDEN_SLICE.md — "DSH must not own".
 
-x-bthwani-contract-state: WLT_SERVICE_V0_SCAFFOLD
+x-bthwani-contract-state: WLT_SERVICE_V1_LIVE
 
 servers:
   - url: http://localhost:8083

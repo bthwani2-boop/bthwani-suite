@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -129,6 +130,74 @@ func (r *MemoryRepository) ConfirmPaymentSession(_ context.Context, id string, r
 		ps.ProviderRef = &req.ProviderRef
 	}
 	r.payments[id] = ps
+
+	isTopup := strings.HasPrefix(strings.ToLower(ps.CheckoutIntentID), "topup") || strings.HasPrefix(strings.ToLower(ps.CheckoutIntentID), "dsh-client-topup")
+
+	if isTopup {
+		wallet, ok := r.wallets[ps.ClientID]
+		if !ok {
+			wallet = domain.Wallet{
+				ID:        newID("wal"),
+				Subject:   ps.ClientID,
+				ActorType: "client",
+				Balance:   0,
+				Currency:  "YER",
+				CreatedAt: n,
+				UpdatedAt: n,
+			}
+		}
+		wallet.Balance += ps.Amount
+		wallet.UpdatedAt = n
+		r.wallets[ps.ClientID] = wallet
+
+		ledgerID := newID("led")
+		r.ledger = append(r.ledger, domain.LedgerEntry{
+			ID:              ledgerID,
+			WalletID:        wallet.ID,
+			Subject:         ps.ClientID,
+			TransactionType: domain.TxTypeCredit,
+			Amount:          ps.Amount,
+			Currency:        ps.Currency,
+			ReferenceType:   "payment_session",
+			ReferenceID:     ps.ID,
+			OrderID:         &ps.CheckoutIntentID,
+			Description:     "Wallet top-up via " + ps.PaymentMethod,
+			Status:          domain.TxStatusCompleted,
+			CreatedAt:       n,
+			CompletedAt:     &n,
+		})
+	} else {
+		if ps.PaymentMethod == "wallet" {
+			wallet, ok := r.wallets[ps.ClientID]
+			if !ok {
+				return domain.PaymentSession{}, fmt.Errorf("wallet not found for client: %s", ps.ClientID)
+			}
+			if wallet.Balance < ps.Amount {
+				return domain.PaymentSession{}, fmt.Errorf("insufficient balance: current=%.2f required=%.2f", wallet.Balance, ps.Amount)
+			}
+			wallet.Balance -= ps.Amount
+			wallet.UpdatedAt = n
+			r.wallets[ps.ClientID] = wallet
+
+			ledgerID := newID("led")
+			r.ledger = append(r.ledger, domain.LedgerEntry{
+				ID:              ledgerID,
+				WalletID:        wallet.ID,
+				Subject:         ps.ClientID,
+				TransactionType: domain.TxTypeDebit,
+				Amount:          ps.Amount,
+				Currency:        ps.Currency,
+				ReferenceType:   "payment_session",
+				ReferenceID:     ps.ID,
+				OrderID:         &ps.CheckoutIntentID,
+				Description:     "Payment for order checkout",
+				Status:          domain.TxStatusCompleted,
+				CreatedAt:       n,
+				CompletedAt:     &n,
+			})
+		}
+	}
+
 	return ps, nil
 }
 
@@ -280,6 +349,40 @@ func (r *MemoryRepository) ConfirmRefund(_ context.Context, id string) (domain.R
 	ref.UpdatedAt = n
 	ref.CompletedAt = &n
 	r.refunds[id] = ref
+
+	wallet, ok := r.wallets[ref.ClientID]
+	if !ok {
+		wallet = domain.Wallet{
+			ID:        newID("wal"),
+			Subject:   ref.ClientID,
+			ActorType: "client",
+			Balance:   0,
+			Currency:  "YER",
+			CreatedAt: n,
+			UpdatedAt: n,
+		}
+	}
+	wallet.Balance += ref.Amount
+	wallet.UpdatedAt = n
+	r.wallets[ref.ClientID] = wallet
+
+	ledgerID := newID("led")
+	r.ledger = append(r.ledger, domain.LedgerEntry{
+		ID:              ledgerID,
+		WalletID:        wallet.ID,
+		Subject:         ref.ClientID,
+		TransactionType: domain.TxTypeCredit,
+		Amount:          ref.Amount,
+		Currency:        ref.Currency,
+		ReferenceType:   "refund",
+		ReferenceID:     ref.ID,
+		OrderID:         &ref.OrderID,
+		Description:     "Refund for order: " + ref.OrderID,
+		Status:          domain.TxStatusCompleted,
+		CreatedAt:       n,
+		CompletedAt:     &n,
+	})
+
 	return ref, nil
 }
 
@@ -452,6 +555,77 @@ func (r *MemoryRepository) CompleteSettlement(_ context.Context, id string) (dom
 	s.UpdatedAt = n
 	s.CompletedAt = &n
 	r.settlements[id] = s
+
+	if s.PartnerPayout > 0 {
+		wallet, ok := r.wallets[s.PartnerID]
+		if !ok {
+			wallet = domain.Wallet{
+				ID:        newID("wal"),
+				Subject:   s.PartnerID,
+				ActorType: "partner",
+				Balance:   0,
+				Currency:  "YER",
+				CreatedAt: n,
+				UpdatedAt: n,
+			}
+		}
+		wallet.Balance += s.PartnerPayout
+		wallet.UpdatedAt = n
+		r.wallets[s.PartnerID] = wallet
+
+		ledgerID := newID("led")
+		r.ledger = append(r.ledger, domain.LedgerEntry{
+			ID:              ledgerID,
+			WalletID:        wallet.ID,
+			Subject:         s.PartnerID,
+			TransactionType: domain.TxTypeCredit,
+			Amount:          s.PartnerPayout,
+			Currency:        s.Currency,
+			ReferenceType:   "settlement",
+			ReferenceID:     s.ID,
+			OrderID:         &s.OrderID,
+			Description:     "Partner settlement payout for order: " + s.OrderID,
+			Status:          domain.TxStatusCompleted,
+			CreatedAt:       n,
+			CompletedAt:     &n,
+		})
+	}
+
+	if s.CaptainID != nil && *s.CaptainID != "" && s.CaptainPayout > 0 {
+		wallet, ok := r.wallets[*s.CaptainID]
+		if !ok {
+			wallet = domain.Wallet{
+				ID:        newID("wal"),
+				Subject:   *s.CaptainID,
+				ActorType: "captain",
+				Balance:   0,
+				Currency:  "YER",
+				CreatedAt: n,
+				UpdatedAt: n,
+			}
+		}
+		wallet.Balance += s.CaptainPayout
+		wallet.UpdatedAt = n
+		r.wallets[*s.CaptainID] = wallet
+
+		ledgerID := newID("led")
+		r.ledger = append(r.ledger, domain.LedgerEntry{
+			ID:              ledgerID,
+			WalletID:        wallet.ID,
+			Subject:         *s.CaptainID,
+			TransactionType: domain.TxTypeCredit,
+			Amount:          s.CaptainPayout,
+			Currency:        s.Currency,
+			ReferenceType:   "settlement",
+			ReferenceID:     s.ID,
+			OrderID:         &s.OrderID,
+			Description:     "Captain settlement payout for order: " + s.OrderID,
+			Status:          domain.TxStatusCompleted,
+			CreatedAt:       n,
+			CompletedAt:     &n,
+		})
+	}
+
 	return s, nil
 }
 
