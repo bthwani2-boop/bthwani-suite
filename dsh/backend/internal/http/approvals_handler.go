@@ -43,6 +43,15 @@ func (h *ApprovalsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *ApprovalsHandler) CreateApproval(w http.ResponseWriter, r *http.Request) {
 	log.Println("dsh-api: POST /catalog-approvals")
 
+	operatorID := requireClientIdentity(w, r)
+	if operatorID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	var req domain.UpdateCatalogApprovalRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
@@ -73,8 +82,7 @@ func (h *ApprovalsHandler) CreateApproval(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Always default operator_id to operator-1 for this request
-	rec, err := h.repository.CreateCatalogApproval(r.Context(), "operator-1", req)
+	rec, err := h.repository.CreateCatalogApproval(r.Context(), operatorID, req)
 	if err != nil {
 		log.Printf("dsh-api: create catalog approval error: %v", err)
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to record catalog approval")

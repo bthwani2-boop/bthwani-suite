@@ -5,7 +5,7 @@ $ErrorActionPreference = "Continue"
 $IssueCode = "CHECK_ANALYZE_APP_CLIENT_METRO_BUNDLE_500_FORENSICS"
 $SessionId = "{0}-{1:yyyyMMdd-HHmmss}" -f $IssueCode, (Get-Date)
 $RepoRoot = "C:\bthwani-suite"
-$AppDir = Join-Path $RepoRoot "apps\mobile\app-client"
+$AppDir = Join-Path $RepoRoot "app-client\runtime"
 $RunRoot = Join-Path $RepoRoot ("tools\registry\runs\" + $SessionId)
 $PackageName = "com.bthwani.client.dev"
 
@@ -242,7 +242,7 @@ $ExpoConfigOutput = ""
 $ExpoConfigExitCode = $null
 try {
   $env:CI = "1"
-  $ExpoConfigOutput = (& pnpm --dir apps/mobile/app-client exec expo config --type public 2>&1 | Out-String).Trim()
+  $ExpoConfigOutput = (& pnpm --dir app-client/runtime exec expo config --type public 2>&1 | Out-String).Trim()
   $ExpoConfigExitCode = $LASTEXITCODE
 } catch {
   $ExpoConfigOutput = $_.Exception.Message
@@ -265,7 +265,7 @@ try {
       '$env:CI="1"',
       '$env:EXPO_NO_INTERACTIVE="1"',
       '$env:NO_COLOR="1"',
-      ('pnpm --dir apps/mobile/app-client exec expo start --dev-client --port {0} --clear' -f $TempPort)
+      ('pnpm --dir app-client/runtime exec expo start --dev-client --port {0} --clear' -f $TempPort)
     )
 
     [System.IO.File]::WriteAllText($MetroStarterPath, ($MetroStarterLines -join [Environment]::NewLine), [System.Text.UTF8Encoding]::new($false))
@@ -313,7 +313,7 @@ try {
     }
 
     if ($MetroStatus -and $MetroStatus.ok) {
-      $BundleUrl = "http://127.0.0.1:$TempPort/apps/mobile/app-client/index.bundle?platform=android&dev=true&minify=false"
+      $BundleUrl = "http://127.0.0.1:$TempPort/app-client/runtime/index.bundle?platform=android&dev=true&minify=false"
 
       try {
         $BundleResponse = Invoke-WebRequest -Uri $BundleUrl -UseBasicParsing -TimeoutSec 60

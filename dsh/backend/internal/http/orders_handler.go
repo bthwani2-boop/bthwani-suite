@@ -389,9 +389,8 @@ func (h *OrdersHandler) RefundOrderCallback(w http.ResponseWriter, r *http.Reque
 	}
 
 	var req struct {
-		RefundRefID string  `json:"refund_ref_id"`
-		Amount      float64 `json:"amount"`
-		Status      string  `json:"status"`
+		RefundRefID string `json:"refund_ref_id"`
+		Status      string `json:"status"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
@@ -402,17 +401,13 @@ func (h *OrdersHandler) RefundOrderCallback(w http.ResponseWriter, r *http.Reque
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "refund_ref_id is required")
 		return
 	}
-	if req.Amount <= 0 {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "amount must be greater than zero")
-		return
-	}
 	status := strings.ToUpper(strings.TrimSpace(req.Status))
 	if status != "CONFIRMED" && status != "FAILED" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "status must be CONFIRMED or FAILED")
 		return
 	}
 
-	order, err := h.repository.UpdateOrderRefund(r.Context(), id, req.RefundRefID, req.Amount, status)
+	order, err := h.repository.UpdateOrderRefund(r.Context(), id, req.RefundRefID, status)
 	if err != nil {
 		if err.Error() == "order not found" {
 			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "order not found")

@@ -87,9 +87,26 @@ export interface WltDshSettlementCycle {
 }
 
 export interface WltDshCloseStatus {
-	readonly id: string;
-	readonly businessDate?: string;
-	readonly status: string;
+	id: string;
+	businessDate?: string;
+	status: 'open' | 'closed' | 'failed';
+	reconciliationRunId?: string;
+	closedAt?: string;
+}
+
+export interface WltDshAuditEvent {
+	eventId: string;
+	target: 'dsh.payment-callback' | 'dsh.refund-callback' | 'dsh.settlement-callback';
+	payload: Record<string, unknown>;
+	createdAt: string;
+}
+
+export interface WltDshDailyCloseResult {
+	id: string;
+	businessDate: string;
+	status: 'closed' | 'failed';
+	reconciliationRunId?: string;
+	closedAt?: string;
 }
 
 export interface WltDshTypedClientOptions {
@@ -116,6 +133,8 @@ export interface WltDshTypedClient {
 	createPayoutDecision(input: PayoutDecisionRequest, idempotencyKey: string): Promise<PayoutDecision>;
 	listLedgerEntries(): Promise<WltDshLedgerEntry[]>;
 	getReconciliationCloseStatus(): Promise<WltDshCloseStatus>;
+	listAuditEvents(): Promise<WltDshAuditEvent[]>;
+	submitDailyClose(businessDate?: string): Promise<WltDshDailyCloseResult>;
 }
 
 function trimBaseUrl(baseUrl: string): string {
@@ -269,6 +288,23 @@ export function createWltDshTypedClient(options: WltDshTypedClientOptions): WltD
 			return readJson<WltDshCloseStatus>(
 				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/reconciliation-close-status`, { headers: authHeaders }),
 				'WLT reconciliation close status',
+			);
+		},
+		async listAuditEvents() {
+			return readJson<WltDshAuditEvent[]>(
+				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/audit-events`, { headers: authHeaders }),
+				'WLT audit events',
+			);
+		},
+		async submitDailyClose(businessDate?: string) {
+			const date = businessDate ?? new Date().toISOString().slice(0, 10);
+			return readJson<WltDshDailyCloseResult>(
+				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/daily-close`, {
+					method: 'POST',
+					headers: { ...authHeaders, 'Content-Type': 'application/json' },
+					body: JSON.stringify({ businessDate: date }),
+				}),
+				'WLT daily close',
 			);
 		},
 	};

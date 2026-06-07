@@ -25,10 +25,10 @@ function Write-Line {
 
 function Get-ProjectSourceFiles {
   $Roots = @(
-    "apps\mobile\app-client",
-    "packages\app-shells",
-    "packages\surfaces",
-    "packages\ui-kit"
+    "app-client\runtime",
+    "app-client\shell",
+    "app-client\composition",
+    "ui-kit"
   )
 
   $All = @()
@@ -93,7 +93,7 @@ function Resolve-BthwaniImport {
   if ($Parts.Count -lt 2) { return $null }
 
   $Pkg = $Parts[1]
-  $PkgRoot = Join-Path $RepoRoot ("packages\" + $Pkg)
+  $PkgRoot = Join-Path $RepoRoot $Pkg
 
   if (-not (Test-Path -LiteralPath $PkgRoot)) { return $null }
 
@@ -342,7 +342,7 @@ $TscExitCode = $null
 try {
   Write-Line ""
   Write-Line "RUNNING TYPECHECK..." Cyan
-  $TscOutput = & pnpm --dir apps/mobile/app-client exec tsc --noEmit --pretty false 2>&1
+  $TscOutput = & pnpm --dir app-client/runtime exec tsc --noEmit --pretty false 2>&1
   $TscExitCode = $LASTEXITCODE
   $TscOutput | Set-Content -LiteralPath $TscPath -Encoding UTF8
 } catch {

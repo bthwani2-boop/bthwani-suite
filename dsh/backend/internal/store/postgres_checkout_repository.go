@@ -39,19 +39,39 @@ WHERE id = $1`, query.StoreID).Scan(&statusTone, &partnerReadiness)
 
 	// Check item availability if provided
 	if len(query.ItemIDs) > 0 {
-		var unavailable []string
+		uniqueIDsMap := make(map[string]bool)
+		var uniqueIDs []string
 		for _, itemID := range query.ItemIDs {
-			var exists bool
-			err := repo.db.QueryRowContext(ctx, `
-SELECT EXISTS(
-  SELECT 1 FROM dsh_catalog_products
-  WHERE id = $1 AND store_id = $2
-  AND (available_override IS NULL OR available_override = TRUE)
-)`, itemID, query.StoreID).Scan(&exists)
-			if err != nil {
+			if !uniqueIDsMap[itemID] {
+				uniqueIDsMap[itemID] = true
+				uniqueIDs = append(uniqueIDs, itemID)
+			}
+		}
+
+		rows, err := repo.db.QueryContext(ctx, `
+SELECT id FROM dsh_catalog_products
+WHERE store_id = $1 AND id = ANY($2)
+AND (available_override IS NULL OR available_override = TRUE)`, query.StoreID, uniqueIDs)
+		if err != nil {
+			return domain.CartServiceabilityResponse{}, err
+		}
+		defer rows.Close()
+
+		available := make(map[string]bool)
+		for rows.Next() {
+			var id string
+			if err := rows.Scan(&id); err != nil {
 				return domain.CartServiceabilityResponse{}, err
 			}
-			if !exists {
+			available[id] = true
+		}
+		if err := rows.Err(); err != nil {
+			return domain.CartServiceabilityResponse{}, err
+		}
+
+		var unavailable []string
+		for _, itemID := range query.ItemIDs {
+			if !available[itemID] {
 				unavailable = append(unavailable, itemID)
 			}
 		}

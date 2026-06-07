@@ -58,7 +58,11 @@ type OrderRepository interface {
 	CreateOrder(ctx context.Context, storeID string, req domain.CreateOrderRequest) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	GetOrder(ctx context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, actor string, status string, note *string) (domain.OrderRecord, error)
-	UpdateOrderRefund(ctx context.Context, orderID string, refundRefID string, amount float64, status string) (domain.OrderRecord, error)
+	UpdateOrderRefund(ctx context.Context, orderID string, refundRefID string, status string) (domain.OrderRecord, error)
+	ListOrderStatusEvents(ctx context.Context, orderID string) ([]domain.OrderStatusEventRecord, error)
+}
+
+type DeliveryRepository interface {
 	AssignCaptain(ctx context.Context, orderID string, captainID string) (domain.OrderRecord, error)
 	AcceptTask(ctx context.Context, orderID string, captainID string) (domain.OrderRecord, error)
 	DeclineTask(ctx context.Context, orderID string, captainID string, reason string) (domain.OrderRecord, error)
@@ -72,7 +76,6 @@ type OrderRepository interface {
 	// ConfirmReturn (J-005 / DSH-SLICE-005F) — confirms item returned to store (RETURNING_TO_STORE → RETURNED).
 	// WLT BOUNDARY: no financial mutation.
 	ConfirmReturn(ctx context.Context, orderID string, captainID string, note string) (domain.OrderRecord, error)
-	ListOrderStatusEvents(ctx context.Context, orderID string) ([]domain.OrderStatusEventRecord, error)
 }
 
 type SupportRepository interface {
@@ -116,6 +119,7 @@ type Repository interface {
 	CatalogRepository
 	CheckoutRepository
 	OrderRepository
+	DeliveryRepository
 	SupportRepository
 	FieldRepository
 }

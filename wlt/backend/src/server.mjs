@@ -605,7 +605,6 @@ const server = createServer(async (req, res) => {
     // Settlement candidates callback (for DSH backend to push financial refs)
     if (method === 'POST' && path === '/wlt/dsh/settlement-callback') {
       const body = await readBody(req);
-      // Record settlement from DSH operational event
       if (body.orderId && body.partnerId) {
         upsertSettlement(body.partnerId, 'partner', body.orderId, body.partnerShareMinorUnits ?? 0, body.currency ?? DEFAULT_CURRENCY);
       }
@@ -613,6 +612,168 @@ const server = createServer(async (req, res) => {
         upsertSettlement(body.captainId, 'captain', body.orderId, body.captainShareMinorUnits ?? 0, body.currency ?? DEFAULT_CURRENCY);
       }
       return json(res, 200, { status: 'received' });
+    }
+
+    // ── Finance-Center (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ──────────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/finance-center') {
+      const snapshot = getSnapshot();
+      const settlements = listSettlements();
+      const totalSettled = settlements.reduce((s, r) => s + r.netPayableMinorUnits, 0);
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        totalPaymentsMinorUnits: snapshot.payments,
+        totalRefundsMinorUnits: snapshot.refunds,
+        totalSettledMinorUnits: totalSettled,
+        openSettlements: settlements.filter(s => s.status === 'ready_for_payout').length,
+        currency: DEFAULT_CURRENCY,
+        lastUpdated: now(),
+      });
+    }
+
+    // ── Store Settlement Statements (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ─────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/store-settlement-statements') {
+      const rows = listSettlements(query.partnerId, 'partner');
+      return json(res, 200, rows.map(r => ({
+        ...r,
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        storeId: r.ownerId,
+        statementRows: [],
+      })));
+    }
+
+    // ── Account Statements (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ──────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/account-statements') {
+      const entries = listLedgerEntries(query.actorKind);
+      const grouped = {};
+      for (const e of entries) {
+        if (!grouped[e.actorId]) grouped[e.actorId] = { actorId: e.actorId, actorKind: e.actorKind, debitTotal: 0, creditTotal: 0, entries: [] };
+        grouped[e.actorId].debitTotal += e.debitMinorUnits;
+        grouped[e.actorId].creditTotal += e.creditMinorUnits;
+        grouped[e.actorId].entries.push(e);
+      }
+      return json(res, 200, { contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY', accounts: Object.values(grouped), currency: DEFAULT_CURRENCY });
+    }
+
+    // ── Chart of Accounts (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ───────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/chart-of-accounts') {
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        accounts: [
+          { code: '1100', name: 'محافظ العملاء', kind: 'asset', currency: DEFAULT_CURRENCY },
+          { code: '2100', name: 'مستحقات الكباتن (COD)', kind: 'liability', currency: DEFAULT_CURRENCY },
+          { code: '2200', name: 'مستحقات الشركاء', kind: 'liability', currency: DEFAULT_CURRENCY },
+          { code: '2300', name: 'مستحقات المناديب', kind: 'liability', currency: DEFAULT_CURRENCY },
+          { code: '3100', name: 'إيرادات المنصة', kind: 'revenue', currency: DEFAULT_CURRENCY },
+          { code: '4100', name: 'استردادات العملاء', kind: 'expense', currency: DEFAULT_CURRENCY },
+        ],
+      });
+    }
+
+    // ── Subledger Balances (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ──────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/subledger-balances') {
+      const entries = listLedgerEntries();
+      const byKind = {};
+      for (const e of entries) {
+        if (!byKind[e.kind]) byKind[e.kind] = { kind: e.kind, debitTotal: 0, creditTotal: 0, entryCount: 0 };
+        byKind[e.kind].debitTotal += e.debitMinorUnits;
+        byKind[e.kind].creditTotal += e.creditMinorUnits;
+        byKind[e.kind].entryCount++;
+      }
+      return json(res, 200, { contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY', subledgers: Object.values(byKind), currency: DEFAULT_CURRENCY });
+    }
+
+    // ── Posting Rules (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ───────────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/posting-rules') {
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        rules: [
+          { trigger: 'payment_captured', debitAccount: '1100', creditAccount: '3100', description: 'تحصيل دفعة عميل' },
+          { trigger: 'refund_confirmed', debitAccount: '4100', creditAccount: '1100', description: 'استرداد لعميل' },
+          { trigger: 'partner_settlement', debitAccount: '3100', creditAccount: '2200', description: 'تسوية شريك' },
+          { trigger: 'captain_payout', debitAccount: '3100', creditAccount: '2100', description: 'دفعة كابتن' },
+          { trigger: 'field_commission', debitAccount: '3100', creditAccount: '2300', description: 'عمولة مندوب' },
+          { trigger: 'cod_liability', debitAccount: '2100', creditAccount: '1100', description: 'ذمة COD كابتن' },
+        ],
+      });
+    }
+
+    // ── Trial Balance (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ───────────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/trial-balance') {
+      const entries = listLedgerEntries();
+      const totalDebit = entries.reduce((s, e) => s + e.debitMinorUnits, 0);
+      const totalCredit = entries.reduce((s, e) => s + e.creditMinorUnits, 0);
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        totalDebitMinorUnits: totalDebit,
+        totalCreditMinorUnits: totalCredit,
+        balanced: totalDebit === totalCredit,
+        entryCount: entries.length,
+        currency: DEFAULT_CURRENCY,
+        asOf: now(),
+      });
+    }
+
+    // ── Settlement Calendar (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ─────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/settlement-calendar') {
+      const settlements = listSettlements();
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        cycles: settlements.map(s => ({
+          cycleId: s.id,
+          ownerId: s.ownerId,
+          ownerKind: s.ownerKind,
+          netPayableMinorUnits: s.netPayableMinorUnits,
+          status: s.status,
+          currency: s.currency,
+          scheduledPayoutDate: null,
+          createdAt: s.createdAt,
+        })),
+      });
+    }
+
+    // ── Refund Ledger (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ───────────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/refund-ledger') {
+      const refunds = listRefunds();
+      const entries = listLedgerEntries().filter(e => e.kind === 'refund');
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        refunds,
+        ledgerEntries: entries,
+        totalRefundedMinorUnits: refunds.reduce((s, r) => s + r.amountMinorUnits, 0),
+        currency: DEFAULT_CURRENCY,
+      });
+    }
+
+    // ── Audit Pack (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ───────────────────────
+    if (method === 'GET' && path === '/wlt/dsh/control-panel/audit-pack') {
+      const entries = listLedgerEntries();
+      const reconciliations = listReconciliationRuns();
+      const totalDebit = entries.reduce((s, e) => s + e.debitMinorUnits, 0);
+      const totalCredit = entries.reduce((s, e) => s + e.creditMinorUnits, 0);
+      const last = db.prepare('SELECT * FROM wlt_finance_close ORDER BY created_at DESC LIMIT 1').get();
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        trialBalance: { totalDebit, totalCredit, balanced: totalDebit === totalCredit },
+        reconciliationRuns: reconciliations,
+        closeStatus: last ? { id: last.id, businessDate: last.business_date, status: last.status } : { status: 'open' },
+        entryCount: entries.length,
+        currency: DEFAULT_CURRENCY,
+        auditTimestamp: now(),
+      });
+    }
+
+    // ── Store-Delivery Finance Summary (CONTRACT_SCAFFOLD_PREVIEW_ONLY) ──
+    if (method === 'GET' && path === '/wlt/dsh/store-delivery/finance-summary') {
+      const captainSettlements = listSettlements(query.captainId, 'captain');
+      const codLiabilities = listCodLiabilities(query.captainId);
+      return json(res, 200, {
+        contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
+        captainId: query.captainId ?? null,
+        earnedMinorUnits: captainSettlements.reduce((s, r) => s + r.netPayableMinorUnits, 0),
+        codOutstandingMinorUnits: codLiabilities.filter(l => l.status === 'outstanding').reduce((s, l) => s + l.amountMinorUnits, 0),
+        currency: DEFAULT_CURRENCY,
+        updatedAt: now(),
+      });
     }
 
     // Health check

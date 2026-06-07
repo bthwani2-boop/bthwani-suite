@@ -195,6 +195,7 @@ try {
         client_id = "client-prod-123"
         total_price = 36.0
         wlt_payment_ref_id = "wlt-sess-confirmed-$UniqueId"
+        checkout_intent_id = $Intent.intent_id
         items = @(
             @{ product_id = "item-apple-1"; quantity = 2; price = 18.0 }
         )

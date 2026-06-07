@@ -410,12 +410,10 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 
 	// Case 1: Missing refund_ref_id
 	body, _ := json.Marshal(struct {
-		RefundRefID string  `json:"refund_ref_id"`
-		Amount      float64 `json:"amount"`
-		Status      string  `json:"status"`
+		RefundRefID string `json:"refund_ref_id"`
+		Status      string `json:"status"`
 	}{
 		RefundRefID: "",
-		Amount:      10.0,
 		Status:      "CONFIRMED",
 	})
 	req := httptest.NewRequest(http.MethodPost, "/orders/ord-123/refund-callback", bytes.NewBuffer(body))
@@ -428,34 +426,12 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 		t.Fatalf("expected code %d, got %d", http.StatusBadRequest, resp.Code)
 	}
 
-	// Case 2: Invalid amount (<=0)
-	body, _ = json.Marshal(struct {
-		RefundRefID string  `json:"refund_ref_id"`
-		Amount      float64 `json:"amount"`
-		Status      string  `json:"status"`
-	}{
-		RefundRefID: "ref-123",
-		Amount:      0.0,
-		Status:      "CONFIRMED",
-	})
-	req = httptest.NewRequest(http.MethodPost, "/orders/ord-123/refund-callback", bytes.NewBuffer(body))
-	req.SetPathValue("id", "ord-123")
-	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
-	resp = httptest.NewRecorder()
-	handler.ServeHTTP(resp, req)
-
-	if resp.Code != http.StatusBadRequest {
-		t.Fatalf("expected code %d, got %d", http.StatusBadRequest, resp.Code)
-	}
-
 	// Case 3: Invalid status
 	body, _ = json.Marshal(struct {
-		RefundRefID string  `json:"refund_ref_id"`
-		Amount      float64 `json:"amount"`
-		Status      string  `json:"status"`
+		RefundRefID string `json:"refund_ref_id"`
+		Status      string `json:"status"`
 	}{
 		RefundRefID: "ref-123",
-		Amount:      10.0,
 		Status:      "INVALID",
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders/ord-123/refund-callback", bytes.NewBuffer(body))
@@ -470,12 +446,10 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 
 	// Case 4: Order not found (ord-non-existent)
 	body, _ = json.Marshal(struct {
-		RefundRefID string  `json:"refund_ref_id"`
-		Amount      float64 `json:"amount"`
-		Status      string  `json:"status"`
+		RefundRefID string `json:"refund_ref_id"`
+		Status      string `json:"status"`
 	}{
 		RefundRefID: "ref-123",
-		Amount:      10.0,
 		Status:      "CONFIRMED",
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders/ord-non-existent/refund-callback", bytes.NewBuffer(body))

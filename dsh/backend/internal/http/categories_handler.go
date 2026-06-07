@@ -49,7 +49,7 @@ func RegisterCategoryRoutes(mux *http.ServeMux, repository store.Repository) {
 func (h *CategoriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id, X-Actor-Type")
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -60,6 +60,15 @@ func (h *CategoriesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *CategoriesHandler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	storeID := r.PathValue("store_id")
 	log.Printf("dsh-api: POST /stores/%s/categories", storeID)
+
+	operatorID := requireClientIdentity(w, r)
+	if operatorID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
 
 	if storeID == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store_id")
@@ -86,6 +95,7 @@ func (h *CategoriesHandler) CreateCategory(w http.ResponseWriter, r *http.Reques
 
 	writeJSON(w, http.StatusCreated, record)
 }
+
 
 func (h *CategoriesHandler) ListCategories(w http.ResponseWriter, r *http.Request) {
 	storeID := r.PathValue("store_id")
@@ -152,6 +162,15 @@ func (h *CategoriesHandler) UpdateCategory(w http.ResponseWriter, r *http.Reques
 	id := r.PathValue("id")
 	log.Printf("dsh-api: PATCH /categories/%s", id)
 
+	operatorID := requireClientIdentity(w, r)
+	if operatorID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	if id == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing category id")
 		return
@@ -184,6 +203,15 @@ func (h *CategoriesHandler) UpdateCategory(w http.ResponseWriter, r *http.Reques
 func (h *CategoriesHandler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	log.Printf("dsh-api: DELETE /categories/%s", id)
+
+	operatorID := requireClientIdentity(w, r)
+	if operatorID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
 
 	if id == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing category id")

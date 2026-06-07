@@ -167,7 +167,7 @@ function Resolve-FileCandidate {
 function Build-PackageMap {
   $Map = @{}
 
-  foreach ($Root in @("packages","apps\web","apps\mobile")) {
+  foreach ($Root in @("webapp/runtime", "website/runtime", "app-client/runtime", "app-partner/runtime", "app-captain/runtime", "app-field/runtime", "control-panel/runtime", "ui-kit", "dsh", "wlt", "knz", "arb", "amn", "esf", "mrf", "snd", "kwd")) {
     if (-not (Test-Path -LiteralPath $Root)) { continue }
 
     Get-ChildItem -LiteralPath $Root -Recurse -File -Filter "package.json" -ErrorAction SilentlyContinue |
@@ -303,7 +303,11 @@ function Is-MobilePath {
   return (
     $N -match '/packages/app-shells/mobile/' -or
     $N -match '/packages/.*/mobile/' -or
-    $N -match '/apps/mobile/'
+    $N -match '/apps/mobile/' -or
+    $N -match '/app-client/' -or
+    $N -match '/app-partner/' -or
+    $N -match '/app-captain/' -or
+    $N -match '/app-field/'
   )
 }
 
@@ -352,12 +356,14 @@ function Export-CsvSafe {
 }
 function Build-ControlPanelGraph {
   $EntryRoots = @(
-    "apps\web\control-panel\app",
-    "apps\web\control-panel\pages",
-    "apps\web\control-panel\src",
-    "apps\web\control-panel\components",
-    "apps\web\control-panel\lib",
-    "apps\web\control-panel"
+    "control-panel\runtime\app",
+    "control-panel\runtime\pages",
+    "control-panel\runtime\src",
+    "control-panel\runtime\components",
+    "control-panel\runtime\lib",
+    "control-panel\runtime",
+    "control-panel\shell",
+    "control-panel\composition"
   )
 
   $EntryFiles = Get-CodeFiles -Roots $EntryRoots
@@ -428,10 +434,10 @@ function Build-ControlPanelGraph {
 
 function Scan-ForbiddenTokens {
   $Roots = @(
-    "apps\web\control-panel",
-    "packages\ui-kit",
-    "packages\app-shells",
-    "packages\surfaces"
+    "control-panel\runtime",
+    "control-panel\shell",
+    "control-panel\composition",
+    "ui-kit"
   )
 
   $Patterns = @(

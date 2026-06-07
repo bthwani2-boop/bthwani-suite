@@ -108,7 +108,7 @@ Finish "PASS" "التطبيق مثبت وتمت محاولة فتحه. اختب�
 Write-Host ""
 Write-Host "NEXT METRO COMMAND:" -ForegroundColor Cyan
 Write-Host 'Set-Location -LiteralPath "C:\bthwani-suite"'
-Write-Host 'pnpm --dir apps/mobile/app-client exec expo start --dev-client --host lan --port 8081 --clear'
+Write-Host 'pnpm --dir app-client/runtime exec expo start --dev-client --host lan --port 8081 --clear'
 Write-Host ""
 Write-Host "اختبار RTL المطلوب: الهاتف Arabic + التطبيق الجديد + Metro جديد." -ForegroundColor Yellow
 

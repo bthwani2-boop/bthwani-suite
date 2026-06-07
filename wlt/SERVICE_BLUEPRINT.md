@@ -32,7 +32,7 @@ wlt/wlt.openapi.yaml
 | OpenAPI Contract | `wlt/wlt.openapi.yaml` |
 | Public Export Path | `wlt/index.ts` |
 | Current Decision | `NOT CLOSED` |
-| Current Status | `NOT CLOSED / WLT_DSH_IN_MEMORY_CORE_ONLY / NEEDS_HTTP_PERSISTENCE_E2E` |
+| Current Status | `NOT CLOSED / WLT_DSH_HTTP_SQLITE_FULL_COVERAGE / NEEDS_SECURITY_E2E_RUNTIME` |
 | Phase F1 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
 | Phase F2 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
 | Phase F3 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
@@ -41,6 +41,8 @@ wlt/wlt.openapi.yaml
 | Phase F6 Status | `CONTRACT_SCAFFOLD / BOUNDARY_LOCKED` |
 | Phase F7 Status | `SSOT_ALIGNED / COCKPIT_HARDENED` |
 | Phase F8 Status | `ACCOUNTING_PREVIEW_FOUNDATION / STRUCTURE_CLEAN` |
+| Phase F9 Status | `UI_PREVIEW_FULLY_CLOSED / CONTRACT_SCAFFOLD_COMPLETE` |
+| Phase F10 Status | `HTTP_SERVER_FULL_COVERAGE / TYPED_CLIENT_COMPLETE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
@@ -780,3 +782,53 @@ Implement the WLT Ledger runtime backend engine in Go and wire up the API client
 7. Update this file only with verified service-specific truth.
 8. Do not duplicate platform-wide rules here.
 9. Do not claim `CLOSED` unless all applicable gates pass.
+
+---
+
+## Phase F10 — HTTP Server Full Coverage + Typed Client Alignment
+
+**Session:** DSH_WLT_FINANCE_F10_SERVER_CLIENT-20260607
+**Date:** 2026-06-07
+**Scope:** Closed the gap between wlt.openapi.yaml (30 operations) and server.mjs + wlt-dsh-client.ts.
+
+### Phase F10 Summary
+
+All 30 OpenAPI operations now have a corresponding HTTP handler in `server.mjs` AND a typed method in `wlt-dsh-client.ts`.
+
+1. **11 Missing Server Handlers Added**: `getControlPanelFinanceCenter`, `listStoreSettlementStatements`, `listControlPanelAccountStatements`, `listChartOfAccounts`, `listSubledgerBalances`, `listPostingRules`, `getTrialBalance`, `listSettlementCalendar`, `listRefundLedger`, `getAuditPack`, `getStoreDeliveryFinanceSummary` — all implemented as computed read models from live SQLite data, labelled `CONTRACT_SCAFFOLD_PREVIEW_ONLY`.
+2. **2 Missing Client Methods Added**: `listAuditEvents` and `submitDailyClose` existed in server.mjs but were absent from `wlt-dsh-client.ts` interface and implementation — now added with correct TypeScript interfaces.
+3. **Typed Interfaces Added**: `WltDshAuditEvent` and `WltDshDailyCloseResult` exported from the typed client.
+4. **WltDshCloseStatus tightened**: `status` field narrowed from `string` to `'open' | 'closed' | 'failed'` union.
+
+**NOT CLOSED in this phase (same as F9):**
+- Security/auth layer: NOT IMPLEMENTED
+- Real money mutations (Go ledger engine): NOT IMPLEMENTED
+- Idempotency enforcement at scale: NOT IMPLEMENTED
+- Production financial closure: NOT CLOSED
+
+### Phase F10 Classification
+
+| Item | Status |
+| --- | --- |
+| All 30 OpenAPI operations → server.mjs handlers | CLOSED — 100% coverage |
+| All 30 OpenAPI operations → wlt-dsh-client.ts methods | CLOSED — 100% coverage |
+| listAuditEvents typed method | CLOSED — added |
+| submitDailyClose typed method | CLOSED — added |
+| WltDshAuditEvent + WltDshDailyCloseResult interfaces | CLOSED — added |
+| WltDshCloseStatus status union tightened | CLOSED — type-safe |
+| Security/auth layer | NOT IMPLEMENTED |
+| Real money mutations (Go engine) | NOT IMPLEMENTED |
+| Production financial closure | NOT CLOSED |
+
+### Phase F10 Evidence Record
+
+| Item | File | Status |
+| --- | --- | --- |
+| 11 server handlers added | `wlt/backend/src/server.mjs` | `CLOSED` |
+| 2 typed client methods added | `wlt/frontend/contracts/wlt-dsh-client.ts` | `CLOSED` |
+| New typed interfaces | `wlt/frontend/contracts/wlt-dsh-client.ts` | `CLOSED` |
+| WLT server smoke test | node server.mjs → `WLT-DSH HTTP server running on port 8090` | `PASS` |
+| TSC typecheck | `pnpm exec tsc --noEmit` from `wlt/` | `PASS — EXIT 0` |
+| git diff --check | `wlt/` scope | `CLEAN` |
+
+Classification: Server scaffold with SQLite persistence. All operations reachable via HTTP. Typed client boundary complete. Not production runtime. Not security-hardened. Not closed.

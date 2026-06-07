@@ -22,6 +22,7 @@ import {
   type DshBenefitsInitialSection,
 } from './BenefitsScreen';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
+import { WltHomeGetScreen } from '../../../../wlt/frontend/app-client/home/screens/WltHomeGetScreen';
 
 export type DshMySpaceSubScreenProps = {
   state?: DshOperationScreenState;
@@ -30,16 +31,21 @@ export type DshMySpaceSubScreenProps = {
 };
 
 export function DshWalletHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="المحفظة"
-      subtitle="الرصيد، الاسترداد، وطرق الدفع"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
-      onRetry={onRetry}
-    />
-  );
+  if (state !== 'ready') {
+    return (
+      <DshOperationScreen
+        state={state}
+        title="المحفظة"
+        subtitle="الرصيد، الاسترداد، وطرق الدفع"
+        primaryActionLabel="العودة لمساحتي"
+        onPrimaryAction={onBack}
+        onRetry={onRetry}
+      />
+    );
+  }
+
+  // Finance display is owned by WLT. DSH renders WltHomeGetScreen (read-only view).
+  return <WltHomeGetScreen onBack={onBack} />;
 }
 
 export function DshLoyaltyHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {

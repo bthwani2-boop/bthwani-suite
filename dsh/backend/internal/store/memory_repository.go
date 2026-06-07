@@ -451,7 +451,7 @@ func (repo *MemoryRepository) UpdateOrderStatus(_ context.Context, _ string, _ s
 	return domain.OrderRecord{}, errors.New("order status update requires postgres backend (set DATABASE_URL)")
 }
 
-func (repo *MemoryRepository) UpdateOrderRefund(_ context.Context, orderID string, _ string, _ float64, _ string) (domain.OrderRecord, error) {
+func (repo *MemoryRepository) UpdateOrderRefund(_ context.Context, orderID string, _ string, _ string) (domain.OrderRecord, error) {
 	if orderID == "ord-non-existent" {
 		return domain.OrderRecord{}, errors.New("order not found")
 	}

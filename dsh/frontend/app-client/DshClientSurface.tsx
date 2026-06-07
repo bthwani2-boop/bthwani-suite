@@ -481,6 +481,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let nextDelayMs = 4000;
+    let lastStatus = "";
 
     const fetchOrder = () => {
       const webWindow = getDshWebWindow();
@@ -496,7 +497,12 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           if (TERMINAL_TRACKING_ORDER_STATUSES.has(details.order.status)) {
             return;
           }
-          nextDelayMs = 4000;
+          if (details.order.status === lastStatus) {
+            nextDelayMs = Math.min(nextDelayMs + 4000, 16000);
+          } else {
+            nextDelayMs = 4000;
+            lastStatus = details.order.status;
+          }
           timeout = setTimeout(fetchOrder, nextDelayMs);
         })
         .catch((err) => {

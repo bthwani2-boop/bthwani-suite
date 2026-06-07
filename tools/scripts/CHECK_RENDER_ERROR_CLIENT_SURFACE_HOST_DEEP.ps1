@@ -36,10 +36,10 @@ function Write-Step {
 
 function Get-SourceFiles {
   $roots = @(
-    "apps\mobile\app-client",
-    "packages\app-shells",
-    "packages\surfaces",
-    "packages\ui-kit"
+    "app-client\runtime",
+    "app-client\shell",
+    "app-client\composition",
+    "ui-kit"
   )
 
   $files = New-Object System.Collections.Generic.List[object]
@@ -107,7 +107,7 @@ function Resolve-BthwaniModule {
   if ($parts.Count -lt 2) { return $null }
 
   $pkgShort = $parts[1]
-  $packageRoot = Join-Path $RepoRoot ("packages\" + $pkgShort)
+  $packageRoot = Join-Path $RepoRoot $pkgShort
 
   if (-not (Test-Path -LiteralPath $packageRoot)) {
     return $null
@@ -393,10 +393,10 @@ Write-Step "=== CHECK RENDER ERROR: ClientSurfaceHost Deep Diagnosis ===" Cyan
 $allFiles = Get-SourceFiles
 
 $AppFileCandidates = @(
-  (Join-Path $RepoRoot "apps\mobile\app-client\App.tsx"),
-  (Join-Path $RepoRoot "apps\mobile\app-client\App.ts"),
-  (Join-Path $RepoRoot "apps\mobile\app-client\index.js"),
-  (Join-Path $RepoRoot "apps\mobile\app-client\index.tsx")
+  (Join-Path $RepoRoot "app-client\runtime\App.tsx"),
+  (Join-Path $RepoRoot "app-client\runtime\App.ts"),
+  (Join-Path $RepoRoot "app-client\runtime\index.js"),
+  (Join-Path $RepoRoot "app-client\runtime\index.tsx")
 )
 
 $AppFile = $AppFileCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
@@ -630,7 +630,7 @@ try {
 
     Push-Location $RepoRoot
     try {
-      $output = & pnpm --dir apps/mobile/app-client exec tsc --noEmit --pretty false 2>&1
+      $output = & pnpm --dir app-client/runtime exec tsc --noEmit --pretty false 2>&1
       $tscExitCode = $LASTEXITCODE
       $output | Set-Content -LiteralPath $tscOutputPath -Encoding UTF8
     } finally {

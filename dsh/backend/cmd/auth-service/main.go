@@ -33,13 +33,23 @@ type errorResponse struct {
 	Error string `json:"error"`
 }
 
-// tokenMap builds a map[token]subject from AUTH_TOKENS env var.
-// Format: "subject1:token1,subject2:token2"
-// Default: "client-dev-001:dev-client-token-001"
-func buildTokenMap() map[string]string {
-	m := map[string]string{
-		"dev-client-token-001": "client-dev-001",
-		"dev-client-token-002": "client-dev-002",
+type tokenEntry struct {
+	subject string
+	roles   []string
+}
+
+// buildTokenMap builds a map[token]tokenEntry from AUTH_TOKENS env var.
+// Format: "subject1:token1:role1+role2,subject2:token2:role3"
+// Role segment is optional; defaults to ["client"].
+// Default dev tokens cover all actor types for local integration testing.
+func buildTokenMap() map[string]tokenEntry {
+	m := map[string]tokenEntry{
+		"dev-client-token-001":   {subject: "client-dev-001", roles: []string{"client"}},
+		"dev-client-token-002":   {subject: "client-dev-002", roles: []string{"client"}},
+		"dev-captain-token-001":  {subject: "captain-dev-001", roles: []string{"captain"}},
+		"dev-partner-token-001":  {subject: "partner-dev-001", roles: []string{"partner"}},
+		"dev-operator-token-001": {subject: "operator-dev-001", roles: []string{"operator"}},
+		"dev-field-token-001":    {subject: "field-dev-001", roles: []string{"field"}},
 	}
 	raw := strings.TrimSpace(os.Getenv("AUTH_TOKENS"))
 	if raw == "" {
@@ -47,14 +57,27 @@ func buildTokenMap() map[string]string {
 	}
 	pairs := strings.Split(raw, ",")
 	for _, p := range pairs {
-		parts := strings.SplitN(strings.TrimSpace(p), ":", 2)
-		if len(parts) == 2 {
-			subject := strings.TrimSpace(parts[0])
-			token := strings.TrimSpace(parts[1])
-			if subject != "" && token != "" {
-				m[token] = subject
+		parts := strings.SplitN(strings.TrimSpace(p), ":", 3)
+		if len(parts) < 2 {
+			continue
+		}
+		subject := strings.TrimSpace(parts[0])
+		token := strings.TrimSpace(parts[1])
+		if subject == "" || token == "" {
+			continue
+		}
+		roles := []string{"client"}
+		if len(parts) == 3 && strings.TrimSpace(parts[2]) != "" {
+			rawRoles := strings.Split(strings.TrimSpace(parts[2]), "+")
+			roles = make([]string, 0, len(rawRoles))
+			for _, rr := range rawRoles {
+				rr = strings.TrimSpace(rr)
+				if rr != "" {
+					roles = append(roles, rr)
+				}
 			}
 		}
+		m[token] = tokenEntry{subject: subject, roles: roles}
 	}
 	return m
 }
@@ -88,20 +111,21 @@ func main() {
 		}
 
 		token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
-		subject, ok := tokens[token]
+		entry, ok := tokens[token]
 		if !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(errorResponse{Error: "token_invalid"}) //nolint:errcheck
 			return
 		}
 
-		log.Printf("[auth-service] GET /auth/session → subject=%s", subject)
+		log.Printf("[auth-service] GET /auth/session → subject=%s roles=%v", entry.subject, entry.roles)
 		json.NewEncoder(w).Encode(sessionResponse{ //nolint:errcheck
-			Subject:   subject,
+			Subject:   entry.subject,
 			AuthState: "authenticated",
-			Roles:     []string{"client"},
+			Roles:     entry.roles,
 		})
 	})
+
 
 	// GET /health — service liveness probe
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,6 @@
 # app-captain Migration
 
-Status: MIGRATION_SCAFFOLD
+Status: MIGRATION_COMPLETED
 
 Canonical root:
 
@@ -14,10 +14,6 @@ Runtime now lives under:
 app-captain/runtime
 ```
 
-Compatibility bridge remains at:
+Compatibility bridge:
 
-```text
-apps/mobile/app-captain
-```
-
-The bridge stays in place until a later verified phase confirms old-path retirement.
+The compatibility bridge at `apps/mobile/app-captain` has been retired. All references now point to the canonical flat active root.
