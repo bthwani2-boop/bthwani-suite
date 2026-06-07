@@ -318,19 +318,18 @@ export function createWltDshTypedClient(options: WltDshTypedClientOptions): WltD
 	const base = trimBaseUrl(options.baseUrl ?? resolveWltDshApiBaseUrl());
 	const hdrs = authHeaders(options.bearerToken, options.devClientId);
 
-	function get<T>(path: string, label: string): Promise<T> {
-		return readJson<T>(fetchImpl(`${base}${path}`, { headers: hdrs }), label);
+	async function get<T>(path: string, label: string): Promise<T> {
+		const res = await fetchImpl(`${base}${path}`, { headers: hdrs });
+		return readJson<T>(res, label);
 	}
 
-	function post<T>(path: string, body: unknown, label: string, idempKey?: string): Promise<T> {
-		return readJson<T>(
-			fetchImpl(`${base}${path}`, {
-				method: 'POST',
-				headers: { ...hdrs, ...idempotencyHeader(idempKey), 'Content-Type': 'application/json' },
-				body: JSON.stringify(body),
-			}),
-			label,
-		);
+	async function post<T>(path: string, body: unknown, label: string, idempKey?: string): Promise<T> {
+		const res = await fetchImpl(`${base}${path}`, {
+			method: 'POST',
+			headers: { ...hdrs, ...idempotencyHeader(idempKey), 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+		});
+		return readJson<T>(res, label);
 	}
 
 	return {

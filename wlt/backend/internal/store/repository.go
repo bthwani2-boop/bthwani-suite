@@ -69,6 +69,19 @@ type OperatorRepository interface {
 	UpsertFinanceClose(ctx context.Context, close domain.FinanceClose) error
 	ListAuditEvents(ctx context.Context) ([]domain.CallbackEvent, error)
 	CreateCallbackEvent(ctx context.Context, event domain.CallbackEvent) error
+
+	// New reporting and accounting methods
+	GetControlPanelFinanceCenter(ctx context.Context) (domain.ControlPanelFinanceCenter, error)
+	ListStoreSettlementStatements(ctx context.Context, partnerID string) ([]domain.StoreSettlementStatement, error)
+	ListControlPanelAccountStatements(ctx context.Context, actorKind string) ([]domain.AccountStatement, error)
+	ListChartOfAccounts(ctx context.Context) ([]domain.ChartOfAccount, error)
+	ListSubledgerBalances(ctx context.Context) ([]domain.SubledgerBalance, error)
+	ListPostingRules(ctx context.Context) ([]domain.PostingRule, error)
+	GetTrialBalance(ctx context.Context) (domain.TrialBalance, error)
+	ListSettlementCalendar(ctx context.Context) ([]domain.SettlementCalendarCycle, error)
+	ListRefundLedger(ctx context.Context) ([]domain.RefundLedgerCase, error)
+	GetAuditPack(ctx context.Context) (domain.AuditPack, error)
+	GetStoreDeliveryFinanceSummary(ctx context.Context, captainID string) (domain.StoreDeliveryFinanceSummary, error)
 }
 
 // Repository is the composed WLT data access interface.

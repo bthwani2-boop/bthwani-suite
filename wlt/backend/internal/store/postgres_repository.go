@@ -1099,3 +1099,378 @@ func (r *PostgresRepository) CreateCallbackEvent(ctx context.Context, event doma
 	}
 	return nil
 }
+
+// ─── Reporting and Accounting Methods ─────────────────────────────────────────
+
+func (r *PostgresRepository) GetControlPanelFinanceCenter(ctx context.Context) (domain.ControlPanelFinanceCenter, error) {
+	var totalPayments, totalRefunds float64
+	var totalSettled float64
+	var openSettlements int
+
+	// Sum payment sessions (confirmed only)
+	_ = r.pool.QueryRow(ctx, `SELECT COALESCE(SUM(amount), 0) FROM wlt_payment_sessions WHERE status = 'CONFIRMED'`).Scan(&totalPayments)
+	// Sum refunds (confirmed only)
+	_ = r.pool.QueryRow(ctx, `SELECT COALESCE(SUM(amount), 0) FROM wlt_refunds WHERE status = 'CONFIRMED'`).Scan(&totalRefunds)
+	// Sum settlements (completed only)
+	_ = r.pool.QueryRow(ctx, `SELECT COALESCE(SUM(partner_payout + captain_payout), 0) FROM wlt_settlements WHERE status = 'COMPLETED'`).Scan(&totalSettled)
+	// Count open settlements
+	_ = r.pool.QueryRow(ctx, `SELECT COUNT(*) FROM wlt_settlements WHERE status = 'PENDING' OR status = 'PROCESSING'`).Scan(&openSettlements)
+
+	return domain.ControlPanelFinanceCenter{
+		BusinessDate:  time.Now().UTC().Format("2006-01-02"),
+		Currency:      "YER",
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+		Sections: []map[string]any{
+			{
+				"name":                    "ملخص اليوم المالي",
+				"totalPaymentsMinorUnits": totalPayments,
+				"totalRefundsMinorUnits":  totalRefunds,
+				"totalSettledMinorUnits":  totalSettled,
+				"openSettlements":         openSettlements,
+			},
+		},
+	}, nil
+}
+
+func (r *PostgresRepository) ListStoreSettlementStatements(ctx context.Context, partnerID string) ([]domain.StoreSettlementStatement, error) {
+	var q string
+	var rows pgx.Rows
+	var err error
+
+	if partnerID != "" {
+		q = `SELECT id, order_id, partner_id, gross_amount, platform_fee, partner_payout, status, created_at FROM wlt_settlements WHERE partner_id = $1 ORDER BY created_at DESC`
+		rows, err = r.pool.Query(ctx, q, partnerID)
+	} else {
+		q = `SELECT id, order_id, partner_id, gross_amount, platform_fee, partner_payout, status, created_at FROM wlt_settlements ORDER BY created_at DESC`
+		rows, err = r.pool.Query(ctx, q)
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []domain.StoreSettlementStatement
+	for rows.Next() {
+		var id, orderID, partID, status string
+		var grossAmount, platformFee, partnerPayout float64
+		var createdAt time.Time
+		if err := rows.Scan(&id, &orderID, &partID, &grossAmount, &platformFee, &partnerPayout, &status, &createdAt); err != nil {
+			return nil, err
+		}
+
+		list = append(list, domain.StoreSettlementStatement{
+			StatementID:        id,
+			StoreID:            partID,
+			StoreName:          "متجر " + partID,
+			SettlementCycleID:  id,
+			Frequency:          "biweekly",
+			PeriodStart:        createdAt.Format("2006-01-02"),
+			PeriodEnd:          createdAt.Format("2006-01-02"),
+			ExpectedPayoutDate: createdAt.Add(7 * 24 * time.Hour).Format("2006-01-02"),
+			NetPayable: domain.MoneyAmount{
+				AmountMinorUnits: partnerPayout,
+				Currency:         "YER",
+			},
+			Orders:        []domain.StoreSettlementOrderRow{},
+			ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+		})
+	}
+	return list, nil
+}
+
+func (r *PostgresRepository) ListControlPanelAccountStatements(ctx context.Context, actorKind string) ([]domain.AccountStatement, error) {
+	q := `SELECT id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id, description, status, created_at FROM wlt_ledger ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	grouped := make(map[string]*domain.AccountStatement)
+	for rows.Next() {
+		var id, walletID, subject, txType, currency, refType, refID, desc, status string
+		var amount float64
+		var createdAt time.Time
+		if err := rows.Scan(&id, &walletID, &subject, &txType, &amount, &currency, &refType, &refID, &desc, &status, &createdAt); err != nil {
+			return nil, err
+		}
+
+		actorType := ""
+		if strings.HasPrefix(subject, "partner") {
+			actorType = "partner"
+		} else if strings.HasPrefix(subject, "captain") {
+			actorType = "captain"
+		} else if strings.HasPrefix(subject, "field") {
+			actorType = "field_agent"
+		} else {
+			actorType = "customer_wallet"
+		}
+
+		if actorKind != "" && actorType != actorKind {
+			continue
+		}
+
+		stmt, ok := grouped[subject]
+		if !ok {
+			stmt = &domain.AccountStatement{
+				StatementID: "stmt-" + subject,
+				Actor:       actorType,
+				ActorID:     subject,
+				PeriodStart: time.Now().Add(-30 * 24 * time.Hour).Format("2006-01-02"),
+				PeriodEnd:   time.Now().Format("2006-01-02"),
+				OpeningBalance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         currency,
+				},
+				ClosingBalance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         currency,
+				},
+				Lines:         []domain.AccountStatementLine{},
+				ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+			}
+			grouped[subject] = stmt
+		}
+
+		line := domain.AccountStatementLine{
+			LineID:      id,
+			Date:        createdAt.Format("2006-01-02"),
+			SourceType:  refType,
+			SourceID:    refID,
+			Description: desc,
+			RunningBalance: domain.MoneyAmount{
+				AmountMinorUnits: 0,
+				Currency:         currency,
+			},
+			Status: "posted_preview",
+		}
+
+		amt := domain.MoneyAmount{
+			AmountMinorUnits: amount,
+			Currency:         currency,
+		}
+
+		if txType == "DEBIT" {
+			line.Debit = &amt
+			if stmt.PeriodDebit != nil {
+				stmt.PeriodDebit.AmountMinorUnits += amount
+			} else {
+				stmt.PeriodDebit = &domain.MoneyAmount{AmountMinorUnits: amount, Currency: currency}
+			}
+		} else {
+			line.Credit = &amt
+			if stmt.PeriodCredit != nil {
+				stmt.PeriodCredit.AmountMinorUnits += amount
+			} else {
+				stmt.PeriodCredit = &domain.MoneyAmount{AmountMinorUnits: amount, Currency: currency}
+			}
+		}
+		stmt.Lines = append(stmt.Lines, line)
+	}
+
+	var list []domain.AccountStatement
+	for _, stmt := range grouped {
+		list = append(list, *stmt)
+	}
+	return list, nil
+}
+
+func (r *PostgresRepository) ListChartOfAccounts(ctx context.Context) ([]domain.ChartOfAccount, error) {
+	return []domain.ChartOfAccount{
+		{AccountCode: "1100", AccountName: "محافظ العملاء", AccountType: "asset", NormalBalance: "debit", Currency: "YER"},
+		{AccountCode: "2100", AccountName: "مستحقات الكباتن (COD)", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "2200", AccountName: "مستحقات الشركاء", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "2300", AccountName: "مستحقات المناديب", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "3100", AccountName: "إيرادات المنصة", AccountType: "revenue", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "4100", AccountName: "استردادات العملاء", AccountType: "expense", NormalBalance: "debit", Currency: "YER"},
+	}, nil
+}
+
+func (r *PostgresRepository) ListSubledgerBalances(ctx context.Context) ([]domain.SubledgerBalance, error) {
+	const q = `
+		SELECT reference_type, currency,
+		       COALESCE(SUM(CASE WHEN transaction_type = 'CREDIT' THEN amount ELSE 0 END), 0) as credit_sum,
+		       COALESCE(SUM(CASE WHEN transaction_type = 'DEBIT' THEN amount ELSE 0 END), 0) as debit_sum
+		FROM wlt_ledger
+		GROUP BY reference_type, currency`
+
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []domain.SubledgerBalance
+	for rows.Next() {
+		var refType, currency string
+		var creditSum, debitSum float64
+		if err := rows.Scan(&refType, &currency, &creditSum, &debitSum); err != nil {
+			return nil, err
+		}
+
+		balance := creditSum - debitSum
+		list = append(list, domain.SubledgerBalance{
+			SubledgerID:        "sub-" + refType,
+			ControlAccountCode: "1100",
+			Balance: domain.MoneyAmount{
+				AmountMinorUnits: balance,
+				Currency:         currency,
+			},
+			CloseGateImpact: "none",
+		})
+	}
+	return list, nil
+}
+
+func (r *PostgresRepository) ListPostingRules(ctx context.Context) ([]domain.PostingRule, error) {
+	return []domain.PostingRule{
+		{EventKind: "payment_captured", DebitAccountCode: "1100", CreditAccountCode: "3100", StatementImpact: "debit customer, credit platform", SettlementImpact: "none"},
+		{EventKind: "refund_confirmed", DebitAccountCode: "4100", CreditAccountCode: "1100", StatementImpact: "debit refunds, credit customer", SettlementImpact: "none"},
+		{EventKind: "partner_settlement", DebitAccountCode: "3100", CreditAccountCode: "2200", StatementImpact: "debit platform, credit partner", SettlementImpact: "payout"},
+		{EventKind: "captain_payout", DebitAccountCode: "3100", CreditAccountCode: "2100", StatementImpact: "debit platform, credit captain", SettlementImpact: "payout"},
+	}, nil
+}
+
+func (r *PostgresRepository) GetTrialBalance(ctx context.Context) (domain.TrialBalance, error) {
+	const q = `
+		SELECT
+			COALESCE(SUM(CASE WHEN transaction_type = 'DEBIT' THEN amount ELSE 0 END), 0) as debit_sum,
+			COALESCE(SUM(CASE WHEN transaction_type = 'CREDIT' THEN amount ELSE 0 END), 0) as credit_sum
+		FROM wlt_ledger`
+
+	var debitSum, creditSum float64
+	err := r.pool.QueryRow(ctx, q).Scan(&debitSum, &creditSum)
+	if err != nil {
+		return domain.TrialBalance{}, err
+	}
+
+	return domain.TrialBalance{
+		BusinessDate: time.Now().UTC().Format("2006-01-02"),
+		TotalDebit: domain.MoneyAmount{
+			AmountMinorUnits: debitSum,
+			Currency:         "YER",
+		},
+		TotalCredit: domain.MoneyAmount{
+			AmountMinorUnits: creditSum,
+			Currency:         "YER",
+		},
+		IsBalanced:    debitSum == creditSum,
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+	}, nil
+}
+
+func (r *PostgresRepository) ListSettlementCalendar(ctx context.Context) ([]domain.SettlementCalendarCycle, error) {
+	const q = `SELECT id, gross_amount, platform_fee, partner_payout, status, created_at FROM wlt_settlements ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []domain.SettlementCalendarCycle
+	for rows.Next() {
+		var id, status string
+		var grossAmount, platformFee, partnerPayout float64
+		var createdAt time.Time
+		if err := rows.Scan(&id, &grossAmount, &platformFee, &partnerPayout, &status, &createdAt); err != nil {
+			return nil, err
+		}
+
+		list = append(list, domain.SettlementCalendarCycle{
+			CycleID:            id,
+			OwnerKind:          "partner",
+			Frequency:          "biweekly",
+			PeriodStart:        createdAt.Format("2006-01-02"),
+			PeriodEnd:          createdAt.Format("2006-01-02"),
+			CutoffDate:         createdAt.Format("2006-01-02"),
+			ExpectedPayoutDate: createdAt.Add(7 * 24 * time.Hour).Format("2006-01-02"),
+			Status:             "open_preview",
+			NetPayable: domain.MoneyAmount{
+				AmountMinorUnits: partnerPayout,
+				Currency:         "YER",
+			},
+		})
+	}
+	return list, nil
+}
+
+func (r *PostgresRepository) ListRefundLedger(ctx context.Context) ([]domain.RefundLedgerCase, error) {
+	const q = `SELECT id, order_id, client_id, amount, status FROM wlt_refunds ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []domain.RefundLedgerCase
+	for rows.Next() {
+		var id, orderID, clientID, status string
+		var amount float64
+		if err := rows.Scan(&id, &orderID, &clientID, &amount, &status); err != nil {
+			return nil, err
+		}
+
+		list = append(list, domain.RefundLedgerCase{
+			RefundCaseID: id,
+			OrderID:      orderID,
+			CustomerID:   clientID,
+			StoreID:      "store-demo",
+			OriginalAmount: domain.MoneyAmount{
+				AmountMinorUnits: amount,
+				Currency:         "YER",
+			},
+			Status:           "approved_preview",
+			LedgerImpact:     "debit",
+			WalletImpact:     "credit",
+			SettlementImpact: "hold",
+		})
+	}
+	return list, nil
+}
+
+func (r *PostgresRepository) GetAuditPack(ctx context.Context) (domain.AuditPack, error) {
+	const q = `SELECT id, target, created_at FROM wlt_callback_events ORDER BY created_at DESC LIMIT 50`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return domain.AuditPack{}, err
+	}
+	defer rows.Close()
+
+	var events []domain.AuditEvent
+	for rows.Next() {
+		var id, target string
+		var createdAt time.Time
+		if err := rows.Scan(&id, &target, &createdAt); err != nil {
+			return domain.AuditPack{}, err
+		}
+		events = append(events, domain.AuditEvent{
+			ID:        id,
+			EventType: target,
+			ActorID:   "system",
+			CreatedAt: createdAt,
+		})
+	}
+
+	return domain.AuditPack{
+		AuditPackID:   pgNewID("audit"),
+		Status:        "passed",
+		Events:        events,
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+	}, nil
+}
+
+func (r *PostgresRepository) GetStoreDeliveryFinanceSummary(ctx context.Context, captainID string) (domain.StoreDeliveryFinanceSummary, error) {
+	const q = `SELECT COALESCE(SUM(captain_payout), 0) FROM wlt_settlements WHERE captain_id = $1`
+	var earned float64
+	err := r.pool.QueryRow(ctx, q, captainID).Scan(&earned)
+	if err != nil {
+		return domain.StoreDeliveryFinanceSummary{}, err
+	}
+
+	return domain.StoreDeliveryFinanceSummary{
+		TotalEarningsMinorUnits: earned,
+		Currency:                "YER",
+		PeriodDate:              time.Now().UTC().Format("2006-01-02"),
+		Deliveries:              []domain.FieldCommission{},
+	}, nil
+}

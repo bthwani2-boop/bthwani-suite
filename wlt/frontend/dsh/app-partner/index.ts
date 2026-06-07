@@ -1,4 +1,6 @@
 export { WltDshPartnerBridge } from './WltDshPartnerBridge';
+export { PartnerSettlementScreen } from './PartnerSettlementScreen';
+export type { PartnerSettlementScreenProps } from './PartnerSettlementScreen';
 export {
 	getWltDshPartnerCommissionLabel,
 	getWltDshPartnerOperationalModeCommission,

@@ -955,3 +955,331 @@ func (r *MemoryRepository) CreateCallbackEvent(_ context.Context, event domain.C
 	r.callbackEvents = append(r.callbackEvents, event)
 	return nil
 }
+
+// ─── Reporting and Accounting Methods ─────────────────────────────────────────
+
+func (r *MemoryRepository) GetControlPanelFinanceCenter(ctx context.Context) (domain.ControlPanelFinanceCenter, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var totalSettled float64
+	for _, s := range r.settlements {
+		totalSettled += s.PartnerPayout + s.CaptainPayout
+	}
+
+	var openSettlements int
+	for _, s := range r.settlements {
+		if s.Status == "ready_for_payout" || s.Status == "PENDING" {
+			openSettlements++
+		}
+	}
+
+	return domain.ControlPanelFinanceCenter{
+		BusinessDate:  time.Now().Format("2006-01-02"),
+		Currency:      "YER",
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+		Sections: []map[string]any{
+			{
+				"name":                    "ملخص اليوم المالي",
+				"totalPaymentsMinorUnits": float64(len(r.payments)),
+				"totalRefundsMinorUnits":  float64(len(r.refunds)),
+				"totalSettledMinorUnits":  totalSettled,
+				"openSettlements":         openSettlements,
+			},
+		},
+	}, nil
+}
+
+func (r *MemoryRepository) ListStoreSettlementStatements(ctx context.Context, partnerID string) ([]domain.StoreSettlementStatement, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var list []domain.StoreSettlementStatement
+	for _, s := range r.settlements {
+		if partnerID != "" && s.PartnerID != partnerID {
+			continue
+		}
+		list = append(list, domain.StoreSettlementStatement{
+			StatementID:        s.ID,
+			StoreID:            s.PartnerID,
+			StoreName:          "متجر تجريبي",
+			SettlementCycleID:  s.ID,
+			Frequency:          "biweekly",
+			PeriodStart:        s.CreatedAt.Format("2006-01-02"),
+			PeriodEnd:          s.CreatedAt.Format("2006-01-02"),
+			ExpectedPayoutDate: s.CreatedAt.Add(7 * 24 * time.Hour).Format("2006-01-02"),
+			NetPayable: domain.MoneyAmount{
+				AmountMinorUnits: s.PartnerPayout,
+				Currency:         s.Currency,
+			},
+			Orders:        []domain.StoreSettlementOrderRow{},
+			ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+		})
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListControlPanelAccountStatements(ctx context.Context, actorKind string) ([]domain.AccountStatement, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	grouped := make(map[string]*domain.AccountStatement)
+	for _, e := range r.ledger {
+		actorType := ""
+		if strings.Contains(e.Subject, "partner") {
+			actorType = "partner"
+		} else if strings.Contains(e.Subject, "captain") {
+			actorType = "captain"
+		} else {
+			actorType = "client"
+		}
+
+		if actorKind != "" && actorType != actorKind {
+			continue
+		}
+
+		stmt, ok := grouped[e.Subject]
+		if !ok {
+			stmt = &domain.AccountStatement{
+				StatementID: "stmt-" + e.Subject,
+				Actor:       actorType,
+				ActorID:     e.Subject,
+				PeriodStart: time.Now().Add(-30 * 24 * time.Hour).Format("2006-01-02"),
+				PeriodEnd:   time.Now().Format("2006-01-02"),
+				OpeningBalance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         e.Currency,
+				},
+				ClosingBalance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         e.Currency,
+				},
+				Lines:         []domain.AccountStatementLine{},
+				ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+			}
+			grouped[e.Subject] = stmt
+		}
+
+		line := domain.AccountStatementLine{
+			LineID:      e.ID,
+			Date:        e.CreatedAt.Format("2006-01-02"),
+			SourceType:  e.ReferenceType,
+			SourceID:    e.ReferenceID,
+			Description: e.Description,
+			RunningBalance: domain.MoneyAmount{
+				AmountMinorUnits: 0,
+				Currency:         e.Currency,
+			},
+			Status: "posted_preview",
+		}
+
+		amt := domain.MoneyAmount{
+			AmountMinorUnits: e.Amount,
+			Currency:         e.Currency,
+		}
+
+		if e.TransactionType == domain.TxTypeDebit {
+			line.Debit = &amt
+			stmt.PeriodDebit = &domain.MoneyAmount{
+				AmountMinorUnits: func() float64 {
+					if stmt.PeriodDebit != nil {
+						return stmt.PeriodDebit.AmountMinorUnits + e.Amount
+					}
+					return e.Amount
+				}(),
+				Currency: e.Currency,
+			}
+		} else {
+			line.Credit = &amt
+			stmt.PeriodCredit = &domain.MoneyAmount{
+				AmountMinorUnits: func() float64 {
+					if stmt.PeriodCredit != nil {
+						return stmt.PeriodCredit.AmountMinorUnits + e.Amount
+					}
+					return e.Amount
+				}(),
+				Currency: e.Currency,
+			}
+		}
+		stmt.Lines = append(stmt.Lines, line)
+	}
+
+	var list []domain.AccountStatement
+	for _, stmt := range grouped {
+		list = append(list, *stmt)
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListChartOfAccounts(ctx context.Context) ([]domain.ChartOfAccount, error) {
+	return []domain.ChartOfAccount{
+		{AccountCode: "1100", AccountName: "محافظ العملاء", AccountType: "asset", NormalBalance: "debit", Currency: "YER"},
+		{AccountCode: "2100", AccountName: "مستحقات الكباتن (COD)", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "2200", AccountName: "مستحقات الشركاء", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "2300", AccountName: "مستحقات المناديب", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "3100", AccountName: "إيرادات المنصة", AccountType: "revenue", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "4100", AccountName: "استردادات العملاء", AccountType: "expense", NormalBalance: "debit", Currency: "YER"},
+	}, nil
+}
+
+func (r *MemoryRepository) ListSubledgerBalances(ctx context.Context) ([]domain.SubledgerBalance, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	byKind := make(map[string]*domain.SubledgerBalance)
+	for _, e := range r.ledger {
+		sub, ok := byKind[e.ReferenceType]
+		if !ok {
+			sub = &domain.SubledgerBalance{
+				SubledgerID:        "sub-" + e.ReferenceType,
+				ControlAccountCode: "1100",
+				Balance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         e.Currency,
+				},
+				CloseGateImpact: "none",
+			}
+			byKind[e.ReferenceType] = sub
+		}
+		if e.TransactionType == domain.TxTypeCredit {
+			sub.Balance.AmountMinorUnits += e.Amount
+		} else {
+			sub.Balance.AmountMinorUnits -= e.Amount
+		}
+	}
+
+	var list []domain.SubledgerBalance
+	for _, sub := range byKind {
+		list = append(list, *sub)
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListPostingRules(ctx context.Context) ([]domain.PostingRule, error) {
+	return []domain.PostingRule{
+		{EventKind: "payment_captured", DebitAccountCode: "1100", CreditAccountCode: "3100", StatementImpact: "debit customer, credit platform", SettlementImpact: "none"},
+		{EventKind: "refund_confirmed", DebitAccountCode: "4100", CreditAccountCode: "1100", StatementImpact: "debit refunds, credit customer", SettlementImpact: "none"},
+		{EventKind: "partner_settlement", DebitAccountCode: "3100", CreditAccountCode: "2200", StatementImpact: "debit platform, credit partner", SettlementImpact: "payout"},
+		{EventKind: "captain_payout", DebitAccountCode: "3100", CreditAccountCode: "2100", StatementImpact: "debit platform, credit captain", SettlementImpact: "payout"},
+	}, nil
+}
+
+func (r *MemoryRepository) GetTrialBalance(ctx context.Context) (domain.TrialBalance, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var totalDebit, totalCredit float64
+	for _, e := range r.ledger {
+		if e.TransactionType == domain.TxTypeDebit {
+			totalDebit += e.Amount
+		} else {
+			totalCredit += e.Amount
+		}
+	}
+
+	return domain.TrialBalance{
+		BusinessDate: time.Now().Format("2006-01-02"),
+		TotalDebit: domain.MoneyAmount{
+			AmountMinorUnits: totalDebit,
+			Currency:         "YER",
+		},
+		TotalCredit: domain.MoneyAmount{
+			AmountMinorUnits: totalCredit,
+			Currency:         "YER",
+		},
+		IsBalanced:    totalDebit == totalCredit,
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+	}, nil
+}
+
+func (r *MemoryRepository) ListSettlementCalendar(ctx context.Context) ([]domain.SettlementCalendarCycle, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var list []domain.SettlementCalendarCycle
+	for _, s := range r.settlements {
+		list = append(list, domain.SettlementCalendarCycle{
+			CycleID:            s.ID,
+			OwnerKind:          "partner",
+			Frequency:          "biweekly",
+			PeriodStart:        s.CreatedAt.Format("2006-01-02"),
+			PeriodEnd:          s.CreatedAt.Format("2006-01-02"),
+			CutoffDate:         s.CreatedAt.Format("2006-01-02"),
+			ExpectedPayoutDate: s.CreatedAt.Add(7 * 24 * time.Hour).Format("2006-01-02"),
+			Status:             "open_preview",
+			NetPayable: domain.MoneyAmount{
+				AmountMinorUnits: s.PartnerPayout,
+				Currency:         s.Currency,
+			},
+		})
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListRefundLedger(ctx context.Context) ([]domain.RefundLedgerCase, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var list []domain.RefundLedgerCase
+	for _, ref := range r.refunds {
+		list = append(list, domain.RefundLedgerCase{
+			RefundCaseID: ref.ID,
+			OrderID:      ref.OrderID,
+			CustomerID:   ref.ClientID,
+			StoreID:      "store-demo",
+			OriginalAmount: domain.MoneyAmount{
+				AmountMinorUnits: ref.Amount,
+				Currency:         ref.Currency,
+			},
+			Status:           "approved_preview",
+			LedgerImpact:     "debit",
+			WalletImpact:     "credit",
+			SettlementImpact: "hold",
+		})
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) GetAuditPack(ctx context.Context) (domain.AuditPack, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var events []domain.AuditEvent
+	for i, ev := range r.callbackEvents {
+		events = append(events, domain.AuditEvent{
+			ID:        ev.EventID,
+			EventType: "callback_sent",
+			ActorID:   "system",
+			CreatedAt: ev.CreatedAt,
+		})
+		if i >= 50 {
+			break
+		}
+	}
+
+	return domain.AuditPack{
+		AuditPackID:   newID("audit"),
+		Status:        "passed",
+		Events:        events,
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+	}, nil
+}
+
+func (r *MemoryRepository) GetStoreDeliveryFinanceSummary(ctx context.Context, captainID string) (domain.StoreDeliveryFinanceSummary, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var earned float64
+	for _, s := range r.settlements {
+		if s.CaptainID != nil && *s.CaptainID == captainID {
+			earned += s.CaptainPayout
+		}
+	}
+
+	return domain.StoreDeliveryFinanceSummary{
+		TotalEarningsMinorUnits: earned,
+		Currency:                "YER",
+		PeriodDate:              time.Now().Format("2006-01-02"),
+		Deliveries:              []domain.FieldCommission{},
+	}, nil
+}

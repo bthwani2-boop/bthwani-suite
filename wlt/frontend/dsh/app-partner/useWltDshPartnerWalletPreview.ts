@@ -1,5 +1,5 @@
 import React from 'react';
-import { createWltDshTypedClient, type WltSettlement } from '../../contracts';
+import { createWltDshTypedClient, type WltSettlement } from '../contracts';
 import {
   formatWltYer,
   getWltPartnerFinanceSnapshot,

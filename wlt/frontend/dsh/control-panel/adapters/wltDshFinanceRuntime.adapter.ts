@@ -6,7 +6,7 @@ import {
 	type WltListSettlementsResponse,
 	type WltRefund,
 	type WltDshTypedClient,
-} from '../../../contracts';
+} from '../../contracts';
 import { formatWltYer } from '../models/dshFinance.types';
 import type {
 	WltAccountPositionLine,
@@ -229,7 +229,7 @@ export function buildWltRuntimeFinancialCenter(
 		netPosition,
 		netPositionLabel: formatWltYer(Math.abs(netPosition)),
 		blockingVariances,
-		canClose: blockingVariances.length === 0 && runtime.closeStatus.status !== 'blocked',
+		canClose: blockingVariances.length === 0 && runtime.closeStatus.status !== 'closed',
 		contractState: 'WLT_DSH_RUNTIME_BOUND',
 		openingBalanceSource: runtime.baseUrl,
 		closingBalanceSource: runtime.closeStatus.id ?? '',

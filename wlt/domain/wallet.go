@@ -323,3 +323,200 @@ const (
 	ErrorCodeUnauthorized     = "unauthorized"
 	ErrorCodeUnauthenticated  = "unauthenticated"
 )
+
+// ─── Reporting and Accounting Models ─────────────────────────────────────────
+
+type MoneyAmount struct {
+	AmountMinorUnits float64 `json:"amountMinorUnits"`
+	Currency         string  `json:"currency"`
+	DisplayLabel     string  `json:"displayLabel,omitempty"`
+}
+
+type ControlPanelFinanceCenter struct {
+	BusinessDate  string           `json:"businessDate"`
+	Currency      string           `json:"currency"`
+	Sections      []map[string]any `json:"sections,omitempty"`
+	ContractState string           `json:"contractState"` // "CONTRACT_SCAFFOLD_PREVIEW_ONLY"
+}
+
+type StoreSettlementOrderRow struct {
+	OrderID             string       `json:"orderId"`
+	OrderDate           string       `json:"orderDate"`
+	DeliveryDate        string       `json:"deliveryDate"`
+	PaymentMethod       string       `json:"paymentMethod"` // "wallet" | "cod" | "card" | "manual"
+	OrderGross          MoneyAmount  `json:"orderGross"`
+	DeliveryFee         *MoneyAmount `json:"deliveryFee,omitempty"`
+	PlatformCommission  *MoneyAmount `json:"platformCommission,omitempty"`
+	Discount            *MoneyAmount `json:"discount,omitempty"`
+	RefundAmount        *MoneyAmount `json:"refundAmount,omitempty"`
+	NetSettlementImpact MoneyAmount  `json:"netSettlementImpact"`
+	IncludedInCycle     *bool        `json:"includedInCycle,omitempty"`
+	SettlementStatus    string       `json:"settlementStatus"` // "included" | "held" | "next_cycle" | "disputed"
+	EvidenceRef         *string      `json:"evidenceRef,omitempty"`
+}
+
+type StoreSettlementStatement struct {
+	StatementID             string                    `json:"statementId"`
+	StoreID                 string                    `json:"storeId"`
+	StoreName               string                    `json:"storeName"`
+	SettlementCycleID       string                    `json:"settlementCycleId"`
+	Frequency               string                    `json:"frequency"` // "biweekly"
+	PeriodStart             string                    `json:"periodStart"`
+	PeriodEnd               string                    `json:"periodEnd"`
+	CutoffDate              *string                   `json:"cutoffDate,omitempty"`
+	ExpectedPayoutDate      string                    `json:"expectedPayoutDate"`
+	Status                  *string                   `json:"status,omitempty"` // "draft_preview" | "ready_for_review" | "held_by_wlt" | "paid_preview"
+	GrossOrdersTotal        *MoneyAmount              `json:"grossOrdersTotal,omitempty"`
+	DeliveryFeesTotal       *MoneyAmount              `json:"deliveryFeesTotal,omitempty"`
+	PlatformCommissionTotal *MoneyAmount              `json:"platformCommissionTotal,omitempty"`
+	DiscountsTotal          *MoneyAmount              `json:"discountsTotal,omitempty"`
+	RefundsTotal            *MoneyAmount              `json:"refundsTotal,omitempty"`
+	HoldsTotal              *MoneyAmount              `json:"holdsTotal,omitempty"`
+	NetPayable              MoneyAmount               `json:"netPayable"`
+	PaidToDate              *MoneyAmount              `json:"paidToDate,omitempty"`
+	RemainingPayable        *MoneyAmount              `json:"remainingPayable,omitempty"`
+	Orders                  []StoreSettlementOrderRow `json:"orders"`
+	ContractState           string                    `json:"contractState"` // "CONTRACT_SCAFFOLD_PREVIEW_ONLY"
+}
+
+type AccountStatementLine struct {
+	LineID         string       `json:"lineId"`
+	Date           string       `json:"date"`
+	SourceType     string       `json:"sourceType"` // "order" | "settlement" | "refund" | "payout" | "commission" | "wallet" | "adjustment"
+	SourceID       string       `json:"sourceId"`
+	Description    string       `json:"description"`
+	Debit          *MoneyAmount `json:"debit,omitempty"`
+	Credit         *MoneyAmount `json:"credit,omitempty"`
+	RunningBalance MoneyAmount  `json:"runningBalance"`
+	Status         string       `json:"status"` // "posted_preview" | "pending_wlt" | "held" | "disputed"
+	EvidenceRef    *string      `json:"evidenceRef,omitempty"`
+}
+
+type AccountStatement struct {
+	StatementID    string                 `json:"statementId"`
+	Actor          string                 `json:"actor"` // "store" | "captain" | "store_courier" | "field_agent" | "customer_wallet" | "platform"
+	ActorID        string                 `json:"actorId"`
+	PeriodStart    string                 `json:"periodStart"`
+	PeriodEnd      string                 `json:"periodEnd"`
+	OpeningBalance MoneyAmount            `json:"openingBalance"`
+	PeriodDebit    *MoneyAmount           `json:"periodDebit,omitempty"`
+	PeriodCredit   *MoneyAmount           `json:"periodCredit,omitempty"`
+	Adjustments    *MoneyAmount           `json:"adjustments,omitempty"`
+	Holds          *MoneyAmount           `json:"holds,omitempty"`
+	Releases       *MoneyAmount           `json:"releases,omitempty"`
+	Refunds        *MoneyAmount           `json:"refunds,omitempty"`
+	Payouts        *MoneyAmount           `json:"payouts,omitempty"`
+	ClosingBalance MoneyAmount            `json:"closingBalance"`
+	Lines          []AccountStatementLine `json:"lines"`
+	ContractState  string                 `json:"contractState"` // "CONTRACT_SCAFFOLD_PREVIEW_ONLY"
+}
+
+type ChartOfAccount struct {
+	AccountCode     string  `json:"accountCode"`
+	AccountName     string  `json:"accountName"`
+	AccountNameEn   *string `json:"accountNameEn,omitempty"`
+	AccountType     string  `json:"accountType"`     // "asset" | "liability" | "revenue" | "expense" | "clearing" | "equity"
+	NormalBalance   string  `json:"normalBalance"`   // "debit" | "credit"
+	ControlAccount  *bool   `json:"controlAccount,omitempty"`
+	ParentAccountId *string `json:"parentAccountId,omitempty"`
+	Currency        string  `json:"currency"`
+}
+
+type SubledgerBalance struct {
+	SubledgerID        string      `json:"subledgerId"`
+	Domain             *string     `json:"domain,omitempty"`
+	ControlAccountCode string      `json:"controlAccountCode"`
+	ActorType          *string     `json:"actorType,omitempty"`
+	SourceEvents       []string    `json:"sourceEvents,omitempty"`
+	Balance            MoneyAmount `json:"balance"`
+	CloseGateImpact    string      `json:"closeGateImpact"`
+}
+
+type PostingRule struct {
+	EventKind            string  `json:"eventKind"`
+	DebitAccountCode     string  `json:"debitAccountCode"`
+	CreditAccountCode    string  `json:"creditAccountCode"`
+	AmountSource         *string `json:"amountSource,omitempty"`
+	Actor                *string `json:"actor,omitempty"`
+	StatementImpact      string  `json:"statementImpact"`
+	SettlementImpact     string  `json:"settlementImpact"`
+	ReconciliationImpact *string `json:"reconciliationImpact,omitempty"`
+}
+
+type TrialBalance struct {
+	BusinessDate  string           `json:"businessDate"`
+	TotalDebit    MoneyAmount      `json:"totalDebit"`
+	TotalCredit   MoneyAmount      `json:"totalCredit"`
+	IsBalanced    bool             `json:"isBalanced"`
+	Lines         []map[string]any `json:"lines,omitempty"`
+	ContractState string           `json:"contractState"` // "CONTRACT_SCAFFOLD_PREVIEW_ONLY"
+}
+
+type SettlementCalendarCycle struct {
+	CycleID            string       `json:"cycleId"`
+	OwnerKind          string       `json:"ownerKind"` // "store" | "captain" | "field_agent" | "store_courier"
+	Frequency          string       `json:"frequency"` // "biweekly" | "weekly" | "monthly"
+	PeriodStart        string       `json:"periodStart"`
+	PeriodEnd          string       `json:"periodEnd"`
+	CutoffDate         string       `json:"cutoffDate"`
+	ExpectedPayoutDate string       `json:"expectedPayoutDate"`
+	ActualPayoutDate   *string      `json:"actualPayoutDate,omitempty"`
+	Status             string       `json:"status"` // "open_preview" | "cutoff_locked" | "wlt_review" | "paid_preview" | "held"
+	IncludedOrderCount *int         `json:"includedOrderCount,omitempty"`
+	ExcludedOrderCount *int         `json:"excludedOrderCount,omitempty"`
+	NetPayable         MoneyAmount  `json:"netPayable"`
+	HoldAmount         *MoneyAmount `json:"holdAmount,omitempty"`
+	ReleasePolicy      *string      `json:"releasePolicy,omitempty"`
+}
+
+type RefundLedgerCase struct {
+	RefundCaseID     string       `json:"refundCaseId"`
+	OrderID          string       `json:"orderId"`
+	CustomerID       string       `json:"customerId"`
+	StoreID          string       `json:"storeId"`
+	OriginalAmount   MoneyAmount  `json:"originalAmount"`
+	ApprovedAmount   *MoneyAmount `json:"approvedAmount,omitempty"`
+	RejectedAmount   *MoneyAmount `json:"rejectedAmount,omitempty"`
+	Reason           *string      `json:"reason,omitempty"`
+	Evidence         []string     `json:"evidence,omitempty"`
+	Status           string       `json:"status"` // "pending_wlt_review" | "approved_preview" | "rejected_preview" | "disputed"
+	LedgerImpact     string       `json:"ledgerImpact"`
+	WalletImpact     string       `json:"walletImpact"`
+	SettlementImpact string       `json:"settlementImpact"`
+}
+
+type AuditEvent struct {
+	ID          string         `json:"id"`
+	EventType   string         `json:"eventType"`
+	ActorID     string         `json:"actorId"`
+	ActorRole   *string        `json:"actorRole,omitempty"`
+	ReferenceID *string        `json:"referenceId,omitempty"`
+	Payload     map[string]any `json:"payload,omitempty"`
+	CreatedAt   time.Time      `json:"createdAt"`
+}
+
+type AuditPack struct {
+	AuditPackID   string           `json:"auditPackId"`
+	Status        string           `json:"status"`
+	Events        []AuditEvent     `json:"events,omitempty"`
+	Evidence      []map[string]any `json:"evidence,omitempty"`
+	Approvals     []map[string]any `json:"approvals,omitempty"`
+	ContractState string           `json:"contractState"` // "CONTRACT_SCAFFOLD_PREVIEW_ONLY"
+}
+
+type FieldCommission struct {
+	ID               string     `json:"id"`
+	StoreID          *string    `json:"storeId,omitempty"`
+	AmountMinorUnits float64    `json:"amountMinorUnits"`
+	Currency         string     `json:"currency"`
+	Status           string     `json:"status"` // "pending" | "approved" | "paid"
+	EarnedAt         *time.Time `json:"earnedAt,omitempty"`
+}
+
+type StoreDeliveryFinanceSummary struct {
+	TotalEarningsMinorUnits float64           `json:"totalEarningsMinorUnits"`
+	Currency                string            `json:"currency"`
+	PendingCount            *int              `json:"pendingCount,omitempty"`
+	PeriodDate              string            `json:"periodDate"`
+	Deliveries              []FieldCommission `json:"deliveries,omitempty"`
+}

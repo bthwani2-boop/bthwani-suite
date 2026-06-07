@@ -1,6 +1,8 @@
 export { WltDshClientBridge } from './WltDshClientBridge';
 export type { WltDshClientBridgeProps } from './WltDshClientBridge';
 export { WltDshClientPaymentPreview } from './WltDshClientPaymentPreview';
+export { CustomerWalletScreen } from './CustomerWalletScreen';
+export type { CustomerWalletScreenProps } from './CustomerWalletScreen';
 export {
 	WltDshBalancePreview,
 	WltDshConnectorPanel,
@@ -23,6 +25,7 @@ export {
 	requestPayment,
 	topUp,
 	unlink,
+	listLedgerEntries,
 } from './wlt-dsh-client.adapter';
 export type { WalletAccount } from './wlt-dsh-client.adapter';
 export { resolveWltDshFinanceEventKindForPaymentMethod } from '../control-panel/financeContracts';

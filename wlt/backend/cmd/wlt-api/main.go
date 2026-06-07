@@ -49,6 +49,7 @@ func main() {
 	httpapi.RegisterWalletRoutes(mux, repo)
 	httpapi.RegisterHealthRoutes(mux, repo)
 	httpapi.RegisterOperatorRoutes(mux, repo)
+	httpapi.RegisterReportingRoutes(mux, repo)
 
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

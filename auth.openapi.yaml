@@ -255,6 +255,60 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthenticated'
 
+  /auth/register:
+    post:
+      summary: Register a new user and create an actor identity
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, roles]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum: [client, partner, captain, field, operator]
+                verified_identifier:
+                  type: string
+                  description: Optional phone/email identifier
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, username, roles]
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  verified_identifier:
+                    type: string
+        '400':
+          description: Missing or invalid request parameters
+        '409':
+          description: Username already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+              example:
+                error: username_taken
+
   /auth/login:
     post:
       summary: Authenticate user credentials and issue token

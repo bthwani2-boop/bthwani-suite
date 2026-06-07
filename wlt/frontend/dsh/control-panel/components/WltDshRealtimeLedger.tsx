@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { resolveWltDshApiBaseUrl, type WltLedgerEntry } from '../../../contracts';
+import { resolveWltDshApiBaseUrl, type WltLedgerEntry } from '../../contracts';
 import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
 import { formatWltYer } from '../models/dshFinance.types';
 

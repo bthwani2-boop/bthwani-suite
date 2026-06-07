@@ -76,6 +76,101 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	// POST /auth/register — registers a new user and creates an actor identity
+	mux.HandleFunc("/auth/register", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			json.NewEncoder(w).Encode(errorResponse{Error: "method_not_allowed"}) //nolint:errcheck
+			return
+		}
+
+		var req struct {
+			Username           string   `json:"username"`
+			Password           string   `json:"password"`
+			Roles              []string `json:"roles"`
+			VerifiedIdentifier string   `json:"verified_identifier"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "invalid_request_body"}) //nolint:errcheck
+			return
+		}
+
+		username := strings.TrimSpace(req.Username)
+		password := strings.TrimSpace(req.Password)
+		if username == "" || password == "" || len(req.Roles) == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "missing_required_fields"}) //nolint:errcheck
+			return
+		}
+
+		// Validate role names
+		validRoles := map[string]bool{"client": true, "partner": true, "captain": true, "field": true, "operator": true}
+		for _, role := range req.Roles {
+			if !validRoles[strings.ToLower(role)] {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(errorResponse{Error: "invalid_role"}) //nolint:errcheck
+				return
+			}
+		}
+
+		// Ensure username is not taken
+		var exists bool
+		err := db.QueryRowContext(r.Context(), "SELECT EXISTS(SELECT 1 FROM auth_users WHERE username = $1)", username).Scan(&exists)
+		if err != nil {
+			log.Printf("[auth-service] SELECT exists error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if exists {
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(errorResponse{Error: "username_taken"}) //nolint:errcheck
+			return
+		}
+
+		// Hashing password
+		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			log.Printf("[auth-service] bcrypt error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Generate a unique subject ID
+		primaryRole := strings.ToLower(req.Roles[0])
+		randomSuffix := generateSessionToken()[:8]
+		subjectID := fmt.Sprintf("%s-%s", primaryRole, randomSuffix)
+
+		rolesStr := strings.Join(req.Roles, ",")
+
+		_, err = db.ExecContext(r.Context(), `
+			INSERT INTO auth_users (id, username, password_hash, roles, verified_identifier)
+			VALUES ($1, $2, $3, $4, $5)`,
+			subjectID, username, string(hash), rolesStr, req.VerifiedIdentifier)
+		if err != nil {
+			log.Printf("[auth-service] INSERT user error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("[auth-service] registered user username=%s subject=%s roles=%v", username, subjectID, req.Roles)
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]any{ //nolint:errcheck
+			"id":                  subjectID,
+			"username":            username,
+			"roles":               req.Roles,
+			"verified_identifier": req.VerifiedIdentifier,
+		})
+	})
+
 	// POST /auth/login — authenticates user and returns a session token
 	mux.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

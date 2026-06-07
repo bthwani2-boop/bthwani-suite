@@ -1,4 +1,4 @@
-import { createWltDshTypedClient, type WltLedgerEntry } from '../../contracts';
+import { createWltDshTypedClient, type WltLedgerEntry } from '../contracts';
 import {
 	formatWltYer,
 	getWltCaptainFinanceSnapshot,
