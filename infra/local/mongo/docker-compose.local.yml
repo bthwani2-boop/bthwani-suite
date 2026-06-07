@@ -1,0 +1,25 @@
+# BTHWANI_MANAGED_LOCAL_COMPOSE: MONGO_SHARED_LOCAL_ADDON
+# Purpose: optional local MongoDB addon.
+# Boundary: not owned by DSH or WLT unless a future slice assigns ownership with evidence.
+# Activation: root compose with profile `mongo` only.
+
+services:
+  mongo:
+    profiles: ["mongo"]
+    image: mongo:7
+    container_name: bthwani-mongo-local
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-bthwani_local}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-bthwani_mongo_local_password}
+    volumes:
+      - bthwani-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  bthwani-mongo-data:
