@@ -409,6 +409,8 @@ if ([string]::IsNullOrWhiteSpace($Addons)) { $Addons = Get-LocalEnv "BTHWANI_ADD
 $DshPort = [int](Get-LocalEnv "DSH_API_PORT" "8080")
 $DshBaseUrl = Get-LocalEnv "DSH_API_BASE_URL" "http://localhost:8080"
 $DatabaseUrl = Get-LocalEnv "DATABASE_URL" "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+$AuthPort = [int](Get-LocalEnv "AUTH_PORT" "8092")
+$AuthServiceUrl = Get-LocalEnv "AUTH_SERVICE_URL" "http://localhost:8092"
 
 $AppClientPort = [int](Get-LocalEnv "APP_CLIENT_PORT" "8081")
 $AppPartnerPort = [int](Get-LocalEnv "APP_PARTNER_PORT" "8082")
@@ -438,6 +440,7 @@ git --no-pager diff --check 2>&1 | Out-File -Encoding utf8 (Join-Path $RunRoot "
 netstat -ano | Out-File -Encoding utf8 (Join-Path $RunRoot "ports-before.txt")
 
 if (-not $NoKillPorts) {
+  Stop-PortOwner -Port $AuthPort -Label "Auth Service"
   Stop-PortOwner -Port $DshPort -Label "DSH Go API"
   Stop-PortOwner -Port $WltPort -Label "WLT Go API"
   Stop-PortOwner -Port $AppClientPort -Label "app-client Expo"
@@ -449,11 +452,25 @@ if (-not $NoKillPorts) {
 
 Invoke-DockerComposeUp -StackMode $Stack -AddonsMode $Addons | Out-Null
 
+# Auth service — must start before DSH (production mode) and WLT (always production mode).
+# Uses DSH Postgres (same DATABASE_URL). Migration 027 seeds dev tokens (valid 10 years).
+if (Test-Path -LiteralPath '.\dsh\backend\cmd\auth-service\main.go') {
+  $goAuthLog = SafeLogPath "auth-service.log"
+  Start-LiveWindow "BThwani Auth Service :$AuthPort" $Root @"
+`$env:AUTH_PORT = '$AuthPort'
+`$env:DATABASE_URL = '$DatabaseUrl'
+go -C .\dsh\backend run .\cmd\auth-service 2>&1 | Tee-Object -FilePath '$goAuthLog' -Append
+"@
+  Wait-TcpPort -Port $AuthPort -Label "Auth Service" -TimeoutSeconds 120
+} else {
+  Write-Host 'AUTH_SERVICE=NOT_AVAILABLE_IN_THIS_BRANCH'
+}
+
 $goLog = SafeLogPath "go-api.log"
 Start-LiveWindow "BThwani DSH Go API :$DshPort" $Root @"
 `$env:PORT = '$DshPort'
 `$env:DATABASE_URL = '$DatabaseUrl'
-`$env:DSH_AUTH_SERVICE_URL = 'http://localhost:8092'
+`$env:DSH_AUTH_SERVICE_URL = '$AuthServiceUrl'
 go -C .\dsh\backend run .\cmd\dsh-api 2>&1 | Tee-Object -FilePath '$goLog' -Append
 "@
 Wait-TcpPort -Port $DshPort -Label "DSH Go API" -TimeoutSeconds 120
@@ -464,7 +481,7 @@ if (Test-Path -LiteralPath '.\wlt\backend\cmd\wlt-api\main.go') {
 `$env:PORT = '$WltPort'
 `$env:DATABASE_URL = '$WltDatabaseUrl'
 `$env:WLT_AUTH_MODE = 'production'
-`$env:WLT_AUTH_SERVICE_URL = 'http://localhost:8092'
+`$env:WLT_AUTH_SERVICE_URL = '$AuthServiceUrl'
 `$env:WLT_CALLBACK_SECRET = 'dev-secret'
 `$env:WLT_DSH_BASE_URL = '$DshBaseUrl'
 go -C .\wlt\backend run .\cmd\wlt-api 2>&1 | Tee-Object -FilePath '$goWltLog' -Append
@@ -534,17 +551,26 @@ stack_mode: $Stack
 addons_mode: $Addons
 adb_runtime_serial: $AdbRuntimeSerial
 expo_host: $ExpoHost
+auth_service_url: $AuthServiceUrl
+dev_tokens:
+  client:   dev-client-token-001  (subject: client-dev-001)
+  captain:  dev-captain-token-001 (subject: captain-dev-001)
+  partner:  dev-partner-token-001 (subject: partner-dev-001)
+  field:    dev-field-token-001   (subject: field-dev-001)
+  operator: dev-operator-token-001 (subject: operator-dev-001)
 excluded_services:
 - webapp
 - website
 next_manual_steps:
 1. Open Scrcpy.
-2. Open control-panel on http://localhost:$ControlPanelPort
-3. Create one real order from app-client.
-4. Record orderId.
-5. Verify the same order in app-partner/app-captain/app-field/control-panel.
-6. Capture screenshots and logs.
-7. Do not claim PASS without evidence.
+2. Verify auth service: GET http://localhost:$AuthPort/health
+3. Test dev token: GET http://localhost:$AuthPort/auth/session -H 'Authorization: Bearer dev-client-token-001'
+4. Open control-panel on http://localhost:$ControlPanelPort
+5. Create one real order from app-client.
+6. Record orderId.
+7. Verify the same order in app-partner/app-captain/app-field/control-panel.
+8. Capture screenshots and logs.
+9. Do not claim PASS without evidence.
 "@
 $SummaryText | Out-File -Encoding utf8 (Join-Path $RunRoot "SUMMARY.md")
 

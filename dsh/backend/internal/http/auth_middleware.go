@@ -35,7 +35,7 @@ func authServiceURL() string {
 	if authMode() == "production" {
 		return ""
 	}
-	return "http://localhost:8081"
+	return "http://localhost:8092"
 }
 
 // authSessionResponse mirrors auth.openapi.yaml GET /auth/session response.
