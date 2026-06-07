@@ -162,47 +162,47 @@ type CompactOrderChatMessage = {
 const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
   'captain-order-9021': {
     orderId: 'captain-order-9021',
-    pickupLabel: 'Burger Lab - ÙØ±Ø¹ Ø­Ø·ÙŠÙ†',
-    dropoffLabel: 'Ø­ÙŠ Ø§Ù„Ø¹Ù„ÙŠØ§ØŒ Ø·Ø±ÙŠÙ‚ Ø§Ù„Ù…Ù„Ùƒ ÙÙ‡Ø¯',
-    etaLabel: 'Ù…Ø¯Ø© Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…: 8 Ø¯Ù‚Ø§Ø¦Ù‚',
-    currentStageLabel: 'ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚ Ø¥Ù„Ù‰ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…',
-    nextActionLabel: 'Ø£ÙƒØ¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… Ø¨Ø¹Ø¯ Ø§Ù„ØªÙ‚Ø§Ø· Ø§Ù„Ø·Ù„Ø¨',
+    pickupLabel: 'Burger Lab - فرع حطين',
+    dropoffLabel: 'حي العليا، طريق الملك فهد',
+    etaLabel: 'مدة الوصول إلى الاستلام: 8 دقائق',
+    currentStageLabel: 'في الطريق إلى الاستلام',
+    nextActionLabel: 'أكد الاستلام بعد التقاط الطلب',
   },
   'captain-order-9024': {
     orderId: 'captain-order-9024',
-    pickupLabel: 'Green Bowl - ÙØ±Ø¹ Ø§Ù„ÙŠØ§Ø³Ù…ÙŠÙ†',
-    dropoffLabel: 'Ø·Ø±ÙŠÙ‚ Ø§Ù„Ù…Ù„Ùƒ ÙÙ‡Ø¯ØŒ Ø§Ù„Ø­ÙŠ Ø§Ù„Ø´Ù…Ø§Ù„ÙŠ',
-    etaLabel: 'Ù…Ø¯Ø© Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…: 15 Ø¯Ù‚ÙŠÙ‚Ø©',
-    currentStageLabel: 'ÙÙŠ Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„',
-    nextActionLabel: 'Ø§Ø¨Ø¯Ø£ Ø§Ù„Ù…Ø³Ø§Ø± ÙˆØ£ÙƒØ¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… Ø¹Ù†Ø¯ Ø§Ù„ÙˆØµÙˆÙ„',
+    pickupLabel: 'Green Bowl - فرع الياسمين',
+    dropoffLabel: 'طريق الملك فهد، الحي الشمالي',
+    etaLabel: 'مدة الوصول إلى الاستلام: 15 دقيقة',
+    currentStageLabel: 'في قائمة الإرسال',
+    nextActionLabel: 'ابدأ المسار وأكد الاستلام عند الوصول',
   },
 };
 
 const compactOrderChatSeed: CompactOrderChatMessage[] = [
   {
     id: 'compact-msg-1',
-    sender: 'Ø§Ù„Ø¹Ù…ÙŠÙ„',
-    text: 'Ø£Ø¨Ù‚ÙŠ Ø§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª Ù‚ØµÙŠØ±Ø© Ù„Ùˆ Ø³Ù…Ø­ØªØŒ ÙˆØ£Ù†Ø§ Ø¬Ø§Ù‡Ø² Ø¹Ù†Ø¯ Ø§Ù„ÙˆØµÙˆÙ„.',
+    sender: 'العميل',
+    text: 'أبقي التحديثات قصيرة لو سمحت، وأنا جاهز عند الوصول.',
     time: '09:12',
     side: 'start',
   },
   {
     id: 'compact-msg-2',
-    sender: 'Ø§Ù„ÙƒØ§Ø¨ØªÙ†',
-    text: 'ØªÙ…. Ø£Ù†Ø§ Ø§Ù„Ø¢Ù† ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚ Ø¥Ù„Ù‰ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù….',
+    sender: 'الكابتن',
+    text: 'تم. أنا الآن في الطريق إلى الاستلام.',
     time: '09:13',
     side: 'end',
   },
   {
     id: 'compact-msg-3',
-    sender: 'Ø§Ù„Ø¹Ù…ÙŠÙ„',
-    text: 'Ø£Ø®Ø¨Ø±Ù†ÙŠ Ù‚Ø¨Ù„ Ø¯Ù‚ÙŠÙ‚Ø© Ù…Ù† Ø§Ù„ÙˆØµÙˆÙ„.',
+    sender: 'العميل',
+    text: 'أخبرني قبل دقيقة من الوصول.',
     time: '09:14',
     side: 'start',
   },
 ];
 
-const captainDisplayName = 'Ø§Ù„ÙƒØ§Ø¨ØªÙ† Ø¹Ø¨Ø¯Ø§Ù„Ù„Ù‡ Ø§Ù„Ø³Ø¨ÙŠØ¹ÙŠ';
+const captainDisplayName = 'الكابتن عبدالله السبيعي';
 
 const captainAppearanceOptions: ReadonlyArray<{
   mode: BThwaniAppearanceMode;
@@ -211,13 +211,13 @@ const captainAppearanceOptions: ReadonlyArray<{
 }> = [
   {
     mode: 'lightPremium',
-    title: 'ÙØ§ØªØ­ Ø£Ø¨ÙŠØ¶',
-    description: 'ÙˆØ§Ø¬Ù‡Ø© ÙØ§ØªØ­Ø© ÙˆØ§Ø¶Ø­Ø©ØŒ ÙˆØ§Ù„Ø²Ø¬Ø§Ø¬ ÙŠØ¸Ù‡Ø± ÙÙ‚Ø· ÙÙŠÙ…Ø§ ÙŠØ­Ø¯Ø¯Ù‡ Ø§Ù„Ù…Ø·ÙˆØ± Ø£Ø«Ù†Ø§Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø´Ø§Ø´Ø§Øª',
+    title: 'فاتح أبيض',
+    description: 'واجهة فاتحة واضحة، والزجاج يظهر فقط فيما يحدده المطور أثناء مراجعة الشاشات',
   },
   {
     mode: 'darkGlass',
-    title: 'Ø¯Ø§ÙƒÙ† Ø²Ø¬Ø§Ø¬ÙŠ',
-    description: 'Ù…Ø¸Ù‡Ø± Ø¯Ø§ÙƒÙ† ÙØ§Ø®Ø± Ù…Ø¹ Ø­ÙˆØ§Ù Ø²Ø¬Ø§Ø¬ÙŠØ© ÙˆØ·Ø¨Ù‚Ø§Øª ÙˆØ§Ø¶Ø­Ø© Ø¨Ø¯ÙˆÙ† Ø¥Ø²Ø¹Ø§Ø¬ Ø¨ØµØ±ÙŠ',
+    title: 'داكن زجاجي',
+    description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
   },
 ] as const;
 
@@ -231,28 +231,28 @@ const availabilityStatusMeta: Record<
   }
 > = {
   available: {
-    label: 'Ù…ØªØ§Ø­',
-    description: 'Ø¬Ø§Ù‡Ø² Ø§Ù„Ø¢Ù† Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙˆØ§Ù„ØªÙ†Ù‚Ù„ Ù…Ø¨Ø§Ø´Ø±Ø© Ø¥Ù„Ù‰ Ù…Ù†Ø§Ø·Ù‚ Ø§Ù„Ø·Ù„Ø¨.',
+    label: 'متاح',
+    description: 'جاهز الآن لاستقبال الطلبات والتنقل مباشرة إلى مناطق الطلب.',
     chipTone: 'success',
-    orderBadgeLabel: 'Ù†Ø´Ø·',
+    orderBadgeLabel: 'نشط',
   },
   unavailable: {
-    label: 'ØºÙŠØ± Ù…ØªØ§Ø­',
-    description: 'ØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ù…Ø¤Ù‚ØªÙ‹Ø§ Ø­ØªÙ‰ Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„ØªÙØ¹ÙŠÙ„.',
+    label: 'غير متاح',
+    description: 'تم إيقاف استقبال الطلبات مؤقتًا حتى إعادة التفعيل.',
     chipTone: 'warning',
-    orderBadgeLabel: 'Ù…ÙˆÙ‚ÙˆÙ',
+    orderBadgeLabel: 'موقوف',
   },
   break: {
-    label: 'Ø§Ø³ØªØ±Ø§Ø­Ø©',
-    description: 'Ø§Ø³ØªØ±Ø§Ø­Ø© Ù‚ØµÙŠØ±Ø© Ù…Ø­Ù„ÙŠØ© Ø¨Ù„Ø§ Ø£ÙŠ Ø±Ø¨Ø· ØªØ´ØºÙŠÙ„ÙŠ Ø®Ø§Ø±Ø¬ÙŠ.',
+    label: 'استراحة',
+    description: 'استراحة قصيرة محلية بلا أي ربط تشغيلي خارجي.',
     chipTone: 'warning',
-    orderBadgeLabel: 'Ø§Ø³ØªØ±Ø§Ø­Ø©',
+    orderBadgeLabel: 'استراحة',
   },
   'planned-leave': {
-    label: 'Ø¥Ø¬Ø§Ø²Ø© Ù…Ø®Ø·Ø·Ø©',
-    description: 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø§Øª ÙˆØ§Ù„ØºÙŠØ§Ø¨ Ù…Ø§ Ø²Ø§Ù„Øª Ù‚ÙŠØ¯ Ø§Ù„Ø±Ø¨Ø· Ù…Ø¹ Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ø£Ø³Ø·ÙˆÙ„ ÙˆØªØ¸Ù‡Ø± Ù‡Ù†Ø§ ÙƒÙ…ØªØ§Ø¨Ø¹Ø© Ù…Ø­Ù„ÙŠØ© ÙÙ‚Ø·.',
+    label: 'إجازة مخططة',
+    description: 'إدارة الإجازات والغياب ما زالت قيد الربط مع عمليات الأسطول وتظهر هنا كمتابعة محلية فقط.',
     chipTone: 'default',
-    orderBadgeLabel: 'Ø¥Ø¬Ø§Ø²Ø©',
+    orderBadgeLabel: 'إجازة',
   },
 };
 
@@ -265,23 +265,23 @@ const gpsStatusMeta: Record<
   }
 > = {
   ready: {
-    label: 'GPS Ø¬Ø§Ù‡Ø²',
-    description: 'Ø¥Ø´Ø§Ø±Ø© Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ù…Ø³ØªÙ‚Ø±Ø© Ù…Ø­Ù„ÙŠÙ‹Ø§ ÙˆÙŠÙ…ÙƒÙ† Ø¹Ø±Ø¶ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ø¨Ø«Ù‚Ø©.',
+    label: 'GPS جاهز',
+    description: 'إشارة الموقع مستقرة محليًا ويمكن عرض الخريطة التجريبية بثقة.',
     chipTone: 'success',
   },
   limited: {
-    label: 'GPS Ù…Ø­Ø¯ÙˆØ¯',
-    description: 'Ø§Ù„Ø¥Ø´Ø§Ø±Ø© Ù…ØªØ§Ø­Ø© Ø¬Ø²Ø¦ÙŠÙ‹Ø§ ÙˆÙŠØ¬Ø¨ Ø§Ù„ØªØ¹Ø§Ù…Ù„ Ù…Ø¹Ù‡Ø§ ÙƒØ¥Ø±Ø´Ø§Ø¯ ØªÙ‚Ø±ÙŠØ¨ÙŠ ÙÙ‚Ø·.',
+    label: 'GPS محدود',
+    description: 'الإشارة متاحة جزئيًا ويجب التعامل معها كإرشاد تقريبي فقط.',
     chipTone: 'warning',
   },
   offline: {
-    label: 'GPS Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„',
-    description: 'ØªØ¹Ø°Ø± ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¢Ù†. Ø§Ù„Ù…Ø³Ø§Ø± ÙŠØ¹Ù…Ù„ ÙƒÙ…Ø¹Ø§ÙŠÙ†Ø© Ù…Ø­Ù„ÙŠØ© Ø­ØªÙ‰ ØªØ¹ÙˆØ¯ Ø§Ù„Ø¥Ø´Ø§Ø±Ø©.',
+    label: 'GPS دون اتصال',
+    description: 'تعذر تحديث الموقع الآن. المسار يعمل كمعاينة محلية حتى تعود الإشارة.',
     chipTone: 'warning',
   },
   disabled: {
-    label: 'GPS Ù…Ø¹Ø·Ù„',
-    description: 'Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ù…ØºÙ„Ù‚ Ù…Ù† Ø§Ù„Ø¬Ù‡Ø§Ø² ÙˆÙŠØ­ØªØ§Ø¬ ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø¥Ø°Ù† Ù…Ù† Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù‡Ø§ØªÙ Ù‚Ø¨Ù„ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ø®Ø±ÙŠØ·Ø©.',
+    label: 'GPS معطل',
+    description: 'الموقع مغلق من الجهاز ويحتاج تفعيل الإذن من إعدادات الهاتف قبل استخدام الخريطة.',
     chipTone: 'default',
   },
 };
@@ -298,14 +298,14 @@ type MapHeatZone = {
 };
 
 const demandHeatZones: readonly MapHeatZone[] = [
-  { id: 'demand-1', top: 58, right: 34, size: 164, color: withAlpha(colorPalette.brand, 0.20), label: 'Ø·Ù„Ø¨ Ù…Ø±ØªÙØ¹' },
-  { id: 'demand-2', top: 188, left: 26, size: 118, color: withAlpha(colorPalette.brand, 0.14), label: 'Ø°Ø±ÙˆØ© Ù‚Ø±ÙŠØ¨Ø©' },
-  { id: 'demand-3', bottom: 108, right: 96, size: 146, color: 'rgba(255, 133, 75, 0.16)', label: 'Ù…ØªØ§Ø¬Ø± Ù†Ø´Ø·Ø©' },
+  { id: 'demand-1', top: 58, right: 34, size: 164, color: withAlpha(colorPalette.brand, 0.20), label: 'طلب مرتفع' },
+  { id: 'demand-2', top: 188, left: 26, size: 118, color: withAlpha(colorPalette.brand, 0.14), label: 'ذروة قريبة' },
+  { id: 'demand-3', bottom: 108, right: 96, size: 146, color: 'rgba(255, 133, 75, 0.16)', label: 'متاجر نشطة' },
 ] satisfies readonly MapHeatZone[];
 
 const captainHeatZones: readonly MapHeatZone[] = [
-  { id: 'captain-1', top: 128, left: 112, size: 132, color: withAlpha(colorPalette.brandStrong, 0.14), label: 'ÙƒØ¨Ø§ØªÙ† Ø£ÙƒØ«Ø±' },
-  { id: 'captain-2', bottom: 138, left: 154, size: 104, color: withAlpha(colorPalette.brandStrong, 0.10), label: 'ØªØºØ·ÙŠØ© Ù‚Ø±ÙŠØ¨Ø©' },
+  { id: 'captain-1', top: 128, left: 112, size: 132, color: withAlpha(colorPalette.brandStrong, 0.14), label: 'كباتن أكثر' },
+  { id: 'captain-2', bottom: 138, left: 154, size: 104, color: withAlpha(colorPalette.brandStrong, 0.10), label: 'تغطية قريبة' },
 ] satisfies readonly MapHeatZone[];
 
 function CompactOrderChatBubble({ message }: { message: CompactOrderChatMessage }) {
@@ -626,7 +626,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     try {
       const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
-      // DSH-SLICE-005E: submit proof-of-delivery. Transitions ARRIVED â†’ DELIVERED.
+      // DSH-SLICE-005E: submit proof-of-delivery. Transitions ARRIVED → DELIVERED.
       // WLT BOUNDARY: no payout mutation here. Payout is WLT responsibility post-DELIVERED.
       await orderLifecycleClient.deliverOrder(rawOrderId, {
         captain_id: captainId,
@@ -649,7 +649,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
     try {
-      // DSH-SLICE-005F: report delivery failure. Transitions ARRIVED â†’ RETURNING_TO_STORE.
+      // DSH-SLICE-005F: report delivery failure. Transitions ARRIVED → RETURNING_TO_STORE.
       // WLT BOUNDARY: no financial mutation. wlt_refund_trigger_ref (if any) is bridge ref only.
       await orderLifecycleClient.failDelivery(rawOrderId, {
         captain_id: captainId,
@@ -695,9 +695,9 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           ...current,
           {
             id: `compact-msg-${current.length + 1}`,
-            sender: 'Ø§Ù„Ù†Ø¸Ø§Ù…',
-            text: 'ØªÙ… ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…. Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„ØªØ§Ù„ÙŠØ© Ù‡ÙŠ Ø§Ù„ØªØ³Ù„ÙŠÙ….',
-            time: 'Ø§Ù„Ø¢Ù†',
+            sender: 'النظام',
+            text: 'تم تأكيد الاستلام. المرحلة التالية هي التسليم.',
+            time: 'الآن',
             side: 'start',
           },
         ]);
@@ -732,9 +732,9 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
       ...current,
       {
         id: `compact-msg-${current.length + 1}`,
-        sender: 'Ø§Ù„ÙƒØ§Ø¨ØªÙ†',
+        sender: 'الكابتن',
         text,
-        time: 'Ø§Ù„Ø¢Ù†',
+        time: 'الآن',
         side: 'end',
       },
     ]);
@@ -796,8 +796,8 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
               onOpenNextOrder={() => setRoute('inbox')}
               onRetry={() => setRoute('detail')}
             />
-            <Button label="ÙØªØ­ ØªÙˆØ§ØµÙ„ Ø§Ù„Ø·Ù„Ø¨" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
-            <Button label="Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… ÙˆØ§Ù„ØªØ³Ù„ÙŠÙ…" tone="secondary" fullWidth={false} onPress={() => setRoute('pickup-dropoff')} />
+            <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => setRoute('orderchat')} />
+            <Button label="مرحلة الاستلام والتسليم" tone="secondary" fullWidth={false} onPress={() => setRoute('pickup-dropoff')} />
           </Box>
 
           <CaptainPickupConfirmSheet
@@ -871,14 +871,14 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           mode="pickup"
           orderId={activeOrderId}
           storeName={activeSummary.pickupLabel}
-          customerName="Ø§Ù„Ø¹Ù…ÙŠÙ„"
+          customerName="العميل"
           address={activeSummary.dropoffLabel}
           itemsCount={3}
           onConfirm={() => setRoute('pod-submission')}
           onReportIssue={() => setRoute('inbox')}
           onBack={goBack}
           onRingBell={() => {
-            // UI_PREVIEW_ONLY: bell event stub â€” no runtime dispatch, value is not used
+            // UI_PREVIEW_ONLY: bell event stub — no runtime dispatch, value is not used
             void ({ orderId: activeOrderId, captainId, timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
           }}
         />
@@ -936,9 +936,9 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
   const captainAccountNavItems = React.useMemo(() => [
     {
-      title: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙƒØ§Ø¨ØªÙ†',
-      subtitle: 'Ø§Ù„Ù‡ÙˆÙŠØ©ØŒ Ø§Ù„Ù†ÙˆØ¹ØŒ ÙˆØ§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©.',
-      badgeLabel: 'Ù…Ø¨Ø§Ø´Ø±',
+      title: 'بيانات الكابتن',
+      subtitle: 'الهوية، النوع، والحالة الحالية.',
+      badgeLabel: 'مباشر',
       icon: 'person-outline' as const,
       onPress: () => openCaptainAccountSection('account-profile'),
     },
@@ -950,37 +950,37 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
       onPress: () => openCaptainAccountSection('account-finance'),
     },
     {
-      title: 'Ø§Ù„Ø·Ù„Ø¨Ø§Øª',
-      subtitle: 'Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø· ÙˆØ§Ù„Ø³Ø¬Ù„ Ø§Ù„Ù…Ø®ØªØµØ±.',
-      badgeLabel: 'Ù†Ø´Ø·',
+      title: 'الطلبات',
+      subtitle: 'الطلب النشط والسجل المختصر.',
+      badgeLabel: 'نشط',
       icon: 'receipt-outline' as const,
       onPress: () => openCaptainAccountSection('account-orders'),
     },
     {
-      title: 'Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ ÙˆØ§Ù„ØªÙ‚ÙŠÙŠÙ…',
-      subtitle: 'Ø§Ù„Ù…Ù„ÙØ§ØªØŒ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…ØŒ ÙˆØ§Ù„Ù…Ø³ØªÙˆÙ‰.',
-      badgeLabel: 'Ø¬Ø§Ù‡Ø²',
+      title: 'الوثائق والتقييم',
+      subtitle: 'الملفات، التقييم، والمستوى.',
+      badgeLabel: 'جاهز',
       icon: 'document-text-outline' as const,
       onPress: () => openCaptainAccountSection('account-docs'),
     },
     {
-      title: 'Ø§Ù„Ø¯ÙˆØ§Ù… / Ø§Ù„Ø¥Ø¬Ø§Ø²Ø§Øª',
-      subtitle: 'Ø§Ù„Ø­Ø¶ÙˆØ± ÙˆØ¬Ø¯ÙˆÙ„ Ø§Ù„ÙŠÙˆÙ… ÙˆØ®Ø·Ø© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø©.',
-      badgeLabel: 'Ø§Ù„ÙŠÙˆÙ…',
+      title: 'الدوام / الإجازات',
+      subtitle: 'الحضور وجدول اليوم وخطة الإجازة.',
+      badgeLabel: 'اليوم',
       icon: 'calendar-outline' as const,
       onPress: () => openCaptainAccountSection('account-shifts'),
     },
     {
-      title: 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
-      subtitle: 'Ø§Ù„Ù…Ø¸Ù‡Ø±ØŒ ÙˆØ¶Ø¹ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ØŒ ÙˆØ§Ù„ØªÙØ¶ÙŠÙ„Ø§Øª.',
-      badgeLabel: 'Ù…Ø­Ù„ÙŠ',
+      title: 'الإعدادات',
+      subtitle: 'المظهر، وضع التطبيق، والتفضيلات.',
+      badgeLabel: 'محلي',
       icon: 'settings-outline' as const,
       onPress: () => openCaptainAccountSection('account-support'),
     },
     {
-      title: 'Ø§Ù„Ø¯Ø¹Ù…',
-      subtitle: 'Ø¯Ù„ÙŠÙ„ Ù…Ø³Ø§Ø±Ø§Øª DSH ÙˆÙ‚Ù†ÙˆØ§Øª Ø§Ù„Ù…Ø³Ø§Ù†Ø¯Ø©.',
-      badgeLabel: 'Ù…ÙØªÙˆØ­',
+      title: 'الدعم',
+      subtitle: 'دليل مسارات DSH وقنوات المساندة.',
+      badgeLabel: 'مفتوح',
       icon: 'help-circle-outline' as const,
       onPress: () => openSupportDirectory(),
     },
@@ -1014,7 +1014,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
               <Text role="titleSm" style={{ color: theme.text }}>{captainDisplayName}</Text>
               <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-                <Badge label="ÙƒØ§Ø¨ØªÙ† DSH" tone="success" />
+                <Badge label="كابتن DSH" tone="success" />
                 <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
               </Box>
             </View>
@@ -1025,11 +1025,11 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           {/* Quick Stats Grid */}
           <Box layoutDirection="row" gap={3} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap' }}>
             <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
-              <Text role="caption" tone="muted">Ø§Ù„ØªÙ‚ÙŠÙŠÙ…</Text>
-              <Text role="bodyStrong" tone="info">4.9 â˜…</Text>
+              <Text role="caption" tone="muted">التقييم</Text>
+              <Text role="bodyStrong" tone="info">4.9 ★</Text>
             </View>
             <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
-              <Text role="caption" tone="muted">Ø§Ù„Ù…Ø³ØªÙˆÙ‰</Text>
+              <Text role="caption" tone="muted">المستوى</Text>
               <Text role="bodyStrong" tone="brand">Elite 3</Text>
             </View>
             <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
@@ -1041,7 +1041,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
         <Divider />
 
-        {/* Navigation List â€” flush rows, no gap between items */}
+        {/* Navigation List — flush rows, no gap between items */}
         <Box gap={0}>
           {captainAccountNavItems.map((item) => (
             <CaptainAccountNavRow
@@ -1097,58 +1097,58 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
   const renderCaptainAccountProfileScreen = () => {
     const items = [
-      { label: 'Ø§Ù„Ø§Ø³Ù…', value: captainDisplayName },
-      { label: 'Ø§Ù„Ù†ÙˆØ¹', value: 'DSH', tone: 'success' },
-      { label: 'Ø§Ù„Ø­Ø§Ù„Ø©', value: currentAvailabilityMeta.label, tone: currentAvailabilityMeta.chipTone === 'success' ? 'success' : 'warning' },
-      { label: 'Ø§Ù„Ù…Ù†Ø·Ù‚Ø©', value: 'Ø§Ù„Ù…Ù†Ø·Ù‚Ø© Ø§Ù„ÙˆØ³Ø·Ù‰' },
-      { label: 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…', value: '4.9 / 5', tone: 'info' },
-      { label: 'Ø§Ù„Ù…Ø³ØªÙˆÙ‰', value: 'Elite 3', tone: 'brand' },
+      { label: 'الاسم', value: captainDisplayName },
+      { label: 'النوع', value: 'DSH', tone: 'success' },
+      { label: 'الحالة', value: currentAvailabilityMeta.label, tone: currentAvailabilityMeta.chipTone === 'success' ? 'success' : 'warning' },
+      { label: 'المنطقة', value: 'المنطقة الوسطى' },
+      { label: 'التقييم', value: '4.9 / 5', tone: 'info' },
+      { label: 'المستوى', value: 'Elite 3', tone: 'brand' },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙƒØ§Ø¨ØªÙ†', 'Ø§Ù„Ù‡ÙˆÙŠØ© ÙˆØ§Ù„Ø­Ø§Ù„Ø© ÙˆØ§Ù„Ù…Ù„Ù Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ', items);
+    return renderCaptainAccountSectionPage('بيانات الكابتن', 'الهوية والحالة والملف التشغيلي', items);
   };
 
   const renderCaptainAccountOrdersScreen = () => {
     const items = [
-      { label: 'Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·', value: `#${activeOrderDisplayId}`, tone: 'success' },
-      { label: 'Ø§Ù„Ù…ØªØ¬Ø±', value: 'Burger Lab', tone: 'brand' },
-      { label: 'Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©', value: activeSummary.currentStageLabel, tone: 'info' },
-      { label: 'Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: activeSummary.pickupLabel },
-      { label: 'Ø§Ù„ØªØ³Ù„ÙŠÙ…', value: activeSummary.dropoffLabel },
-      { label: 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„ØªØ§Ù„ÙŠØ©', value: activeSummary.nextActionLabel, tone: 'warning' },
+      { label: 'الطلب النشط', value: `#${activeOrderDisplayId}`, tone: 'success' },
+      { label: 'المتجر', value: 'Burger Lab', tone: 'brand' },
+      { label: 'المرحلة الحالية', value: activeSummary.currentStageLabel, tone: 'info' },
+      { label: 'الاستلام', value: activeSummary.pickupLabel },
+      { label: 'التسليم', value: activeSummary.dropoffLabel },
+      { label: 'الخطوة التالية', value: activeSummary.nextActionLabel, tone: 'warning' },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('Ø§Ù„Ø·Ù„Ø¨Ø§Øª', 'Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø· ÙˆØ§Ù„Ø³Ø¬Ù„ Ø§Ù„Ù…Ø®ØªØµØ±', items, 'Ø§Ù„Ø³Ø¬Ù„ Ø§Ù„ØªØ§Ø±ÙŠØ®ÙŠ Ø§Ù„ÙƒØ§Ù…Ù„ ÙŠØ¨Ù‚Ù‰ read-only Ø¥Ù„Ù‰ Ø£Ù† ÙŠØ«Ø¨Øª Ù…ØµØ¯Ø± Ø§Ù„Ø£Ø±Ø´ÙØ© Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ.');
+    return renderCaptainAccountSectionPage('الطلبات', 'الطلب النشط والسجل المختصر', items, 'السجل التاريخي الكامل يبقى read-only إلى أن يثبت مصدر الأرشفة التشغيلي.');
   };
 
   const renderCaptainAccountDocsScreen = () => {
     const items = [
-      { label: 'Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚', value: '3 Ù…Ù„ÙØ§Øª Ù…Ø­Ù„ÙŠØ©', tone: 'success' },
-      { label: 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…', value: '4.9 / 5', tone: 'info' },
-      { label: 'Ø§Ù„Ù…Ø³ØªÙˆÙ‰', value: 'Elite 3', tone: 'brand' },
-      { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©', value: 'Ø¬Ø§Ù‡Ø² Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' },
-      { label: 'Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠ', value: 'Ù‚ÙŠØ¯ Ø§Ù„Ø±Ø¨Ø·', tone: 'warning' },
+      { label: 'الوثائق', value: '3 ملفات محلية', tone: 'success' },
+      { label: 'التقييم', value: '4.9 / 5', tone: 'info' },
+      { label: 'المستوى', value: 'Elite 3', tone: 'brand' },
+      { label: 'حالة المراجعة', value: 'جاهز للمراجعة' },
+      { label: 'الاعتماد الحقيقي', value: 'قيد الربط', tone: 'warning' },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ ÙˆØ§Ù„ØªÙ‚ÙŠÙŠÙ…', 'Ø§Ù„Ù…Ù„ÙØ§Øª ÙˆØ§Ù„Ù…Ø³ØªÙˆÙ‰ ÙˆØ¬Ø§Ù‡Ø²ÙŠØ© Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯', items, 'Ø±Ø¨Ø· Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠ ÙŠÙ†ØªØ¸Ø± Ù…ØµØ¯Ø± Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ ÙˆÙŠØ¸Ù‡Ø± Ù‡Ù†Ø§ ÙƒÙ…ØªØ§Ø¨Ø¹Ø© Ø¬Ø§Ù‡Ø²ÙŠØ© ÙÙ‚Ø·.');
+    return renderCaptainAccountSectionPage('الوثائق والتقييم', 'الملفات والمستوى وجاهزية الاعتماد', items, 'ربط الوثائق الحقيقي ينتظر مصدر الاعتماد المركزي ويظهر هنا كمتابعة جاهزية فقط.');
   };
 
   const renderCaptainAccountShiftsScreen = () => {
     const items = [
-      { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ø¯ÙˆØ§Ù…', value: isCaptainAvailable ? 'Ù…ØªØ§Ø­ Ø§Ù„ÙŠÙˆÙ…' : 'ØºÙŠØ± Ù…ØªØ§Ø­ Ø§Ù„ÙŠÙˆÙ…', tone: isCaptainAvailable ? 'success' : 'warning' },
-      { label: 'Ø¬Ø¯ÙˆÙ„ Ø§Ù„ÙŠÙˆÙ…', value: 'ØµØ¨Ø§Ø­ÙŠ', tone: 'brand' },
-      { label: 'Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ø§Ù„Ù‚Ø§Ø¯Ù…Ø©', value: 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' },
-      { label: 'Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ«', value: 'Ø§Ù„Ø¢Ù†', tone: 'info' },
+      { label: 'حالة الدوام', value: isCaptainAvailable ? 'متاح اليوم' : 'غير متاح اليوم', tone: isCaptainAvailable ? 'success' : 'warning' },
+      { label: 'جدول اليوم', value: 'صباحي', tone: 'brand' },
+      { label: 'الإجازة القادمة', value: 'قيد المراجعة' },
+      { label: 'آخر تحديث', value: 'الآن', tone: 'info' },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('Ø§Ù„Ø¯ÙˆØ§Ù… / Ø§Ù„Ø¥Ø¬Ø§Ø²Ø§Øª', 'Ø§Ù„Ø­Ø¶ÙˆØ± ÙˆØ¬Ø¯ÙˆÙ„ Ø§Ù„ÙŠÙˆÙ… ÙˆØ®Ø·Ø© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø©', items, 'Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠ ÙŠÙ†ØªØ¸Ø± Ø±Ø¨Ø· Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø£Ø³Ø·ÙˆÙ„ ÙˆÙŠØ¸Ù‡Ø± Ù‡Ù†Ø§ ÙƒÙ…Ø¹Ø§ÙŠÙ†Ø© Ø­Ø§Ù„Ø© ÙÙ‚Ø·.');
+    return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة الحقيقي ينتظر ربط إدارة الأسطول ويظهر هنا كمعاينة حالة فقط.');
   };
 
 
   const renderCaptainAccountSupportScreen = () => {
     const rowDirection = 'row-reverse' as const;
 
-    // Appearance row â€” inline segmented toggle identical to Partner settings
+    // Appearance row — inline segmented toggle identical to Partner settings
     const appearanceRow = (
       <View
         style={{
@@ -1177,9 +1177,9 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             <Icon name="color-palette-outline" size={17} tone="default" />
           </View>
           <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: 'flex-end' }}>
-            <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>Ø§Ù„Ù…Ø¸Ù‡Ø±</Text>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>المظهر</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>
-              {appearanceHydrated ? 'ÙØ§ØªØ­ Ø£Ø¨ÙŠØ¶ Ø£Ùˆ Ø¯Ø§ÙƒÙ† Ø²Ø¬Ø§Ø¬ÙŠ' : 'Ø¬Ø§Ø±Ù Ø§Ù„Ø§Ø³ØªØ¹Ø§Ø¯Ø©...'}
+              {appearanceHydrated ? 'فاتح أبيض أو داكن زجاجي' : 'جارٍ الاستعادة...'}
             </Text>
           </View>
         </View>
@@ -1206,7 +1206,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             }}
           >
             <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
-              ÙØ§ØªØ­
+              فاتح
             </Text>
           </Pressable>
           <Pressable
@@ -1219,14 +1219,14 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             }}
           >
             <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
-              Ø¯Ø§ÙƒÙ†
+              داكن
             </Text>
           </Pressable>
         </View>
       </View>
     );
 
-    // App mode row â€” flat pressable with switch
+    // App mode row — flat pressable with switch
     const appModeRow = (
       <View
         style={{
@@ -1257,11 +1257,11 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             <Icon name="storefront-outline" size={17} tone="default" />
           </View>
           <View style={{ flexShrink: 1, minWidth: 0, gap: 2, alignItems: 'flex-end' }}>
-            <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>ÙˆØ¶Ø¹ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±</Text>
+            <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>وضع موصل المتجر</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={2}>
               {captainAppMode === 'store_courier_mode'
-                ? 'Ù…ÙØ¹Ù‘Ù„ â€” Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…ØªØ¬Ø± ÙÙ‚Ø·'
-                : 'ØºÙŠØ± Ù…ÙØ¹Ù‘Ù„ â€” Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ'}
+                ? 'مفعّل — طلبات المتجر فقط'
+                : 'غير مفعّل — الوضع الافتراضي'}
             </Text>
           </View>
         </View>
@@ -1278,12 +1278,12 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
       </View>
     );
 
-    // Quick access rows removed â€” Ø§Ù„Ø¯Ø¹Ù… is now a standalone account nav item
+    // Quick access rows removed — الدعم is now a standalone account nav item
     return renderCaptainAccountShell(
-      'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
-      'Ø§Ù„Ù…Ø¸Ù‡Ø±ØŒ ÙˆØ¶Ø¹ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ØŒ ÙˆØ§Ù„ØªÙØ¶ÙŠÙ„Ø§Øª Ø§Ù„Ù…Ø­Ù„ÙŠØ©',
+      'الإعدادات',
+      'المظهر، وضع التطبيق، والتفضيلات المحلية',
       <Box gap={4}>
-        {/* Appearance + App mode â€” flat rows */}
+        {/* Appearance + App mode — flat rows */}
         <Box padding={0} gap={0}>
           {appearanceRow}
           {appModeRow}
@@ -1307,39 +1307,39 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     }
     if (inboxState === 'loading') {
       return {
-        statusLabel: 'ØªØ­Ù…ÙŠÙ„',
-        message: 'Ø¬Ø§Ø±Ù ØªØ¬Ù‡ÙŠØ² Ø­Ø±ÙƒØ© Ø§Ù„ÙƒØ§Ø¨ØªÙ† ÙˆØ·Ø¨Ù‚Ø© Ø§Ù„Ø­Ø±Ø§Ø±Ø© Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ø¹Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø©.',
+        statusLabel: 'تحميل',
+        message: 'جارٍ تجهيز حركة الكابتن وطبقة الحرارة التجريبية على الخريطة.',
         onPress: goToInbox,
         marquee: false,
       };
     }
     if (inboxState === 'error') {
       return {
-        statusLabel: 'ØªÙ†Ø¨ÙŠÙ‡',
-        message: 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·. Ø£Ø¹Ø¯ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ø£Ùˆ Ø§ÙØªØ­ ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø·Ù„Ø¨Ø§Øª.',
+        statusLabel: 'تنبيه',
+        message: 'تعذر تحميل الطلب النشط. أعد المحاولة أو افتح صندوق الطلبات.',
         onPress: resetInboxState,
         marquee: false,
       };
     }
     if (inboxState === 'empty') {
       return {
-        statusLabel: 'Ø§Ù†ØªØ¸Ø§Ø±',
-        message: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨ Ù†Ø´Ø· Ø§Ù„Ø¢Ù†. Ø§Ø¨Ù‚ÙŽ Ø¹Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø© ÙˆØ§Ù†ØªØ¸Ø± Ø§Ù„Ø­Ø±ÙƒØ© Ø§Ù„ØªØ§Ù„ÙŠØ©.',
+        statusLabel: 'انتظار',
+        message: 'لا يوجد طلب نشط الآن. ابقَ على الخريطة وانتظر الحركة التالية.',
         onPress: goToInbox,
         marquee: false,
       };
     }
     if (inboxState === 'delivered') {
       return {
-        statusLabel: 'Ù…ØºÙ„Ù‚',
-        message: 'ØªÙ… ØªØ³Ù„ÙŠÙ… Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ø£Ø®ÙŠØ±. Ø§ÙØªØ­ ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ù„Ø§Ù„ØªÙ‚Ø§Ø· Ø§Ù„Ø­Ø±ÙƒØ© Ø§Ù„ØªØ§Ù„ÙŠØ©.',
+        statusLabel: 'مغلق',
+        message: 'تم تسليم الطلب الأخير. افتح صندوق الطلبات لالتقاط الحركة التالية.',
         onPress: goToInbox,
         marquee: false,
       };
     }
     return {
       statusLabel: `#${activeOrderDisplayId}`,
-      message: `${activeSummary.currentStageLabel} Â· ${activeSummary.etaLabel}`,
+      message: `${activeSummary.currentStageLabel} · ${activeSummary.etaLabel}`,
       onPress: toggleActiveOrderExpandedCb,
       marquee: false,
     };
@@ -1358,50 +1358,50 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
   const storeCourierMeta = React.useMemo(() => {
     if (storeCourierStage === 'picked_up') {
       return {
-        badgeLabel: 'ØªÙ… Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…',
+        badgeLabel: 'تم الاستلام',
         badgeTone: 'brand' as const,
-        stageLabel: 'Ø§Ù„Ø·Ù„Ø¨ Ù…Ø¹Ùƒ ÙˆÙŠØ­ØªØ§Ø¬ Ø¨Ø¯Ø¡ Ø§Ù„ØªÙˆØµÙŠÙ„',
-        distanceLabel: '1.6 ÙƒÙ…',
-        helperText: 'Ø£ÙƒÙ‘Ø¯ Ø¨Ø¯Ø¡ Ø§Ù„ØªÙˆØµÙŠÙ„ Ù‚Ø¨Ù„ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ù…ÙŠÙ„.',
+        stageLabel: 'الطلب معك ويحتاج بدء التوصيل',
+        distanceLabel: '1.6 كم',
+        helperText: 'أكّد بدء التوصيل قبل الوصول إلى العميل.',
       };
     }
 
     if (storeCourierStage === 'out_for_delivery') {
       return {
-        badgeLabel: 'ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚',
+        badgeLabel: 'في الطريق',
         badgeTone: 'warning' as const,
-        stageLabel: 'Ø§Ù„Ø·Ù„Ø¨ ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚ Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ù…ÙŠÙ„',
-        distanceLabel: '0.9 ÙƒÙ…',
-        helperText: 'Ø¨Ø¹Ø¯ Ø§Ù„ÙˆØµÙˆÙ„ Ø§ÙØªØ­ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ³Ù„ÙŠÙ… Ø£Ùˆ ØµÙ†Ù‘Ù Ø§Ù„Ø­Ø§Ù„Ø© ÙƒØªØ¹Ø°Ø± ØªÙˆØµÙŠÙ„.',
+        stageLabel: 'الطلب في الطريق إلى العميل',
+        distanceLabel: '0.9 كم',
+        helperText: 'بعد الوصول افتح إثبات التسليم أو صنّف الحالة كتعذر توصيل.',
       };
     }
 
     if (storeCourierStage === 'delivery_failed') {
       return {
-        badgeLabel: 'ØªØ¹Ø°Ø± Ø§Ù„ØªÙˆØµÙŠÙ„',
+        badgeLabel: 'تعذر التوصيل',
         badgeTone: 'danger' as const,
-        stageLabel: 'Ø§Ù„Ø­Ø§Ù„Ø© ØªØ­ØªØ§Ø¬ Ø¯Ø¹Ù…Ù‹Ø§ Ø£Ùˆ Ø¥Ø¹Ø§Ø¯Ø© Ù…Ø­Ø§ÙˆÙ„Ø©',
-        distanceLabel: 'â€”',
-        helperText: 'Ø§ÙØªØ­ Ø§Ù„Ø¯Ø¹Ù… Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø§Ø³ØªØ«Ù†Ø§Ø¡ Ø£Ùˆ Ø£Ø¹Ø¯ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ø¨Ø¹Ø¯ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ø¹Ù…ÙŠÙ„.',
+        stageLabel: 'الحالة تحتاج دعمًا أو إعادة محاولة',
+        distanceLabel: '—',
+        helperText: 'افتح الدعم لتسجيل الاستثناء أو أعد المحاولة بعد التواصل مع العميل.',
       };
     }
 
     if (storeCourierStage === 'delivered') {
       return {
-        badgeLabel: 'Ù…Ø³Ù„Ù‘Ù…',
+        badgeLabel: 'مسلّم',
         badgeTone: 'success' as const,
-        stageLabel: 'ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ… ÙˆØªÙˆØ«ÙŠÙ‚ Ø§Ù„Ø¥Ø«Ø¨Ø§Øª',
-        distanceLabel: 'â€”',
-        helperText: 'ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ø³Ø¬Ù„ Ø£Ùˆ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ³Ù„ÙŠÙ… Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø©.',
+        stageLabel: 'تم التسليم وتوثيق الإثبات',
+        distanceLabel: '—',
+        helperText: 'يمكنك العودة للسجل أو مراجعة إثبات التسليم عند الحاجة.',
       };
     }
 
     return {
-      badgeLabel: 'Ø¬Ø§Ù‡Ø² Ù„Ù„Ø§Ø³ØªÙ„Ø§Ù…',
+      badgeLabel: 'جاهز للاستلام',
       badgeTone: 'success' as const,
-      stageLabel: 'Ø¬Ø§Ù‡Ø² Ù„Ù„Ø§Ø³ØªÙ„Ø§Ù… Ù…Ù† Ø§Ù„ÙØ±Ø¹',
-      distanceLabel: '2.3 ÙƒÙ…',
-      helperText: 'Ù‡Ø°Ø§ Ø§Ù„Ø·Ù„Ø¨ ÙŠØ®Øµ ÙˆØ¶Ø¹ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± ÙÙ‚Ø· ÙˆÙ„Ø§ ÙŠØ´Ø§Ø±Ùƒ Ø·Ø§Ø¨ÙˆØ± ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ.',
+      stageLabel: 'جاهز للاستلام من الفرع',
+      distanceLabel: '2.3 كم',
+      helperText: 'هذا الطلب يخص وضع موصل المتجر فقط ولا يشارك طابور كابتن بثواني.',
     };
   }, [storeCourierStage]);
 
@@ -1417,7 +1417,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
   const openStoreCourierProof = React.useCallback(() => {
     setCaptainPodState('ready');
-    // SSoT: 'proof' order stage â†’ captain route via dsh-captain.navigation-bridge
+    // SSoT: 'proof' order stage → captain route via dsh-captain.navigation-bridge
     const proofRoute = getCaptainLifecycleForOrderStage('proof', isStoreCourierMode).captainRoute;
     setRoute(proofRoute);
   }, [isStoreCourierMode]);
@@ -1429,8 +1429,8 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
   const topBar = (
     <ModernPremiumHeader
-      title={isStoreCourierMode ? 'Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±' : captainDisplayName}
-      locationLabel={isStoreCourierMode ? 'ÙˆØ¶Ø¹ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± â€” Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…ØªØ¬Ø± ÙÙ‚Ø·' : wltDshCaptainUiCopy.topBarLocationLabel}
+      title={isStoreCourierMode ? 'موصل المتجر' : captainDisplayName}
+      locationLabel={isStoreCourierMode ? 'وضع موصل المتجر — طلبات المتجر فقط' : wltDshCaptainUiCopy.topBarLocationLabel}
       locationIcon={
         isStoreCourierMode
           ? <Icon name="storefront-outline" size={14} color={colorPalette.white} />
@@ -1440,18 +1440,18 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         {
           id: 'account',
           icon: <Icon name="person-outline" size={20} color={colorPalette.white} />,
-          accessibilityLabel: 'Ø§Ù„Ø­Ø³Ø§Ø¨',
+          accessibilityLabel: 'الحساب',
           onPress: openCaptainAccount,
         },
-        { id: 'search', icon: <Icon name="search-outline" size={20} color={colorPalette.white} />, accessibilityLabel: 'Ø§Ù„Ø¨Ø­Ø«', onPress: openSupportDirectory },
+        { id: 'search', icon: <Icon name="search-outline" size={20} color={colorPalette.white} />, accessibilityLabel: 'البحث', onPress: openSupportDirectory },
         {
           id: 'notifications',
           icon: <Icon name="notifications-outline" size={20} color={colorPalette.white} />,
           badgeCount: 2,
-          accessibilityLabel: 'Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª',
+          accessibilityLabel: 'الإشعارات',
           onPress: () => setRoute('bell'),
         },
-        // Wallet action is BThwani-captain-only â€” hidden in store_courier_mode
+        // Wallet action is BThwani-captain-only — hidden in store_courier_mode
         ...(isStoreCourierMode ? [] : [{
           id: 'wallet',
           icon: <Icon name="wallet-outline" size={20} color={colorPalette.white} />,
@@ -1461,7 +1461,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
       ]}
       ticker={
         isStoreCourierMode
-          ? { statusLabel: 'Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±', message: 'Ø§Ù†ØªØ¸Ø± ØªØ¹ÙŠÙŠÙ† Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„ØªØ§Ù„ÙŠ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±.', marquee: false }
+          ? { statusLabel: 'موصل المتجر', message: 'انتظر تعيين الطلب التالي من المتجر.', marquee: false }
           : homeTicker
       }
       direction="rtl"
@@ -1469,21 +1469,21 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
   );
 
   const routeHeaderMeta: Record<string, { title: string; subtitle: string }> = {
-    entry: { title: 'Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„ØªÙ†ÙÙŠØ°', subtitle: 'Ø§Ø¨Ø¯Ø£ Ù…Ù† Ø§Ù„ÙØ±Ø² ÙˆØ§Ù„Ù‚Ø¨ÙˆÙ„ Ù‚Ø¨Ù„ Ø§Ù„Ø®Ø±ÙˆØ¬ Ù„Ù„Ù…ÙŠØ¯Ø§Ù†.' },
-    inbox: { title: 'ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø·Ù„Ø¨Ø§Øª', subtitle: 'Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø· Ø£ÙˆÙ„Ù‹Ø§ Ø«Ù… Ø¨Ù‚ÙŠØ© Ø§Ù„ØµÙ.' },
-    detail: { title: 'ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨', subtitle: 'Ø±Ø§Ø¬Ø¹ Ø§Ù„Ø·Ù„Ø¨ Ù‚Ø¨Ù„ Ø§Ù„ØªÙ†ÙÙŠØ° Ø£Ùˆ Ø§Ù„ØªØ³Ù„ÙŠÙ….' },
-    orderchat: { title: 'ØªÙˆØ§ØµÙ„ Ø§Ù„Ø·Ù„Ø¨', subtitle: 'Ù…Ø±Ø§Ø³Ù„Ø§Øª Ù‚ØµÙŠØ±Ø© Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·.' },
-    map: { title: 'Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ù…Ù‡Ù…Ø©', subtitle: 'Ø¹Ø±Ø¶ Ø§Ù„Ù…Ø³Ø§Ø± ÙˆØªØ¨Ø¯ÙŠÙ„ Ø§Ù„Ù…Ø±Ø§Ø­Ù„.' },
-    'pickup-dropoff': { title: 'Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… ÙˆØ§Ù„ØªØ³Ù„ÙŠÙ…', subtitle: 'Ù…Ø±Ø§Ø­Ù„ Ø§Ù„ØªØ³Ù„ÙŠÙ… Ù…Ù† Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… Ø­ØªÙ‰ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ³Ù„ÙŠÙ….' },
-    'pod-submission': { title: 'Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ³Ù„ÙŠÙ…', subtitle: 'Ø§Ù„ØªÙ‚Ø§Ø· ØµÙˆØ±Ø© Ø§Ù„Ø¥Ø«Ø¨Ø§Øª ÙˆØ¥Ø±Ø³Ø§Ù„Ù‡Ø§ Ù„Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø·Ù„Ø¨.' },
+    entry: { title: 'بوابة التنفيذ', subtitle: 'ابدأ من الفرز والقبول قبل الخروج للميدان.' },
+    inbox: { title: 'صندوق الطلبات', subtitle: 'الطلب النشط أولًا ثم بقية الصف.' },
+    detail: { title: 'تفاصيل الطلب', subtitle: 'راجع الطلب قبل التنفيذ أو التسليم.' },
+    orderchat: { title: 'تواصل الطلب', subtitle: 'مراسلات قصيرة مرتبطة بالطلب النشط.' },
+    map: { title: 'خريطة المهمة', subtitle: 'عرض المسار وتبديل المراحل.' },
+    'pickup-dropoff': { title: 'الاستلام والتسليم', subtitle: 'مراحل التسليم من الاستلام حتى إثبات التسليم.' },
+    'pod-submission': { title: 'إثبات التسليم', subtitle: 'التقاط صورة الإثبات وإرسالها لإغلاق الطلب.' },
   };
 
   const renderHomeOrderPanel = () => {
     const panelPadding = activeOrderExpanded ? 3 : 2;
     const panelMinHeightStyle = !activeOrderExpanded ? { minHeight: 72 } : {};
-    const activeOrderCompactRouteLabel = 'Burger Lab â†’ Ø§Ù„Ø¹Ù…ÙŠÙ„';
-    const activeOrderStageLabel = activeOrderPhase === 'pickup' ? activeSummary.currentStageLabel : 'ÙÙŠ Ø§Ù„Ø·Ø±ÙŠÙ‚ Ø¥Ù„Ù‰ Ø§Ù„ØªØ³Ù„ÙŠÙ…';
-    const activeOrderNextActionLabel = activeOrderPhase === 'pickup' ? activeSummary.nextActionLabel : 'Ø£ÙƒØ¯ Ø§Ù„ØªØ³Ù„ÙŠÙ… Ø¨Ø¹Ø¯ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ù…ÙŠÙ„';
+    const activeOrderCompactRouteLabel = 'Burger Lab → العميل';
+    const activeOrderStageLabel = activeOrderPhase === 'pickup' ? activeSummary.currentStageLabel : 'في الطريق إلى التسليم';
+    const activeOrderNextActionLabel = activeOrderPhase === 'pickup' ? activeSummary.nextActionLabel : 'أكد التسليم بعد الوصول إلى العميل';
 
     if (!isCaptainAvailable) {
       return (
@@ -1496,14 +1496,14 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         >
           <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
           <Box gap={1}>
-            <Text role="bodyStrong">Ø§Ù„ÙˆØ§Ø¬Ù‡Ø© Ù…ØªÙˆÙ‚ÙØ© Ø­ØªÙ‰ ÙŠØ¹ÙˆØ¯ Ø§Ù„ÙƒØ§Ø¨ØªÙ† Ù„Ù„ØªÙˆÙØ±</Text>
+            <Text role="bodyStrong">الواجهة متوقفة حتى يعود الكابتن للتوفر</Text>
             <Text role="bodySm" tone="muted">
               {currentAvailabilityMeta.description}
             </Text>
           </Box>
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button size="sm" fullWidth={false} tone="success" label="ØªØ¨Ø¯ÙŠÙ„ Ø§Ù„Ø­Ø§Ù„Ø©" onPress={cycleAvailabilityStatus} />
-            <Button size="sm" fullWidth={false} tone="ghost" label="ÙØªØ­ Ø§Ù„Ø·Ù„Ø¨Ø§Øª" onPress={() => setRoute('inbox')} />
+            <Button size="sm" fullWidth={false} tone="success" label="تبديل الحالة" onPress={cycleAvailabilityStatus} />
+            <Button size="sm" fullWidth={false} tone="ghost" label="فتح الطلبات" onPress={() => setRoute('inbox')} />
           </Box>
         </Surface>
       );
@@ -1518,11 +1518,11 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           radiusToken="xl"
           style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
-          <Badge label="ØªØ­Ù…ÙŠÙ„" tone="info" />
+          <Badge label="تحميل" tone="info" />
           <Box gap={1}>
-            <Text role="bodyStrong">Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù‚ÙŠØ¯ Ø§Ù„ØªØ­Ø¶ÙŠØ±</Text>
+            <Text role="bodyStrong">الخريطة قيد التحضير</Text>
             <Text role="bodySm" tone="muted">
-              Ø³ÙŠØ¸Ù‡Ø± Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø· Ù‡Ù†Ø§ Ø¹Ù†Ø¯Ù…Ø§ ØªÙƒØªÙ…Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ Ø§Ù„Ù…Ø­Ù„ÙŠØ©.
+              سيظهر الطلب النشط هنا عندما تكتمل بيانات التشغيل المحلية.
             </Text>
           </Box>
         </Surface>
@@ -1538,16 +1538,16 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           radiusToken="xl"
           style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
-          <Badge label="ØªÙ†Ø¨ÙŠÙ‡" tone="danger" />
+          <Badge label="تنبيه" tone="danger" />
           <Box gap={1}>
-            <Text role="bodyStrong">ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·</Text>
+            <Text role="bodyStrong">تعذر تحميل الطلب النشط</Text>
             <Text role="bodySm" tone="muted">
-              Ø£Ø¹Ø¯ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ù† Ù†ÙØ³ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø£Ùˆ Ø§ÙØªØ­ ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØµÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.
+              أعد المحاولة من نفس البطاقة أو افتح صندوق الطلبات لمراجعة الصف الحالي.
             </Text>
           </Box>
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-            <Button size="sm" fullWidth={false} label="Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©" onPress={() => setInboxState('ready')} />
-            <Button size="sm" fullWidth={false} tone="ghost" label="ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø·Ù„Ø¨Ø§Øª" onPress={() => setRoute('inbox')} />
+            <Button size="sm" fullWidth={false} label="إعادة المحاولة" onPress={() => setInboxState('ready')} />
+            <Button size="sm" fullWidth={false} tone="ghost" label="صندوق الطلبات" onPress={() => setRoute('inbox')} />
           </Box>
         </Surface>
       );
@@ -1562,17 +1562,17 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           radiusToken="xl"
           style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
-          <Badge label="Ø§Ù†ØªØ¸Ø§Ø±" tone="warning" />
+          <Badge label="انتظار" tone="warning" />
           <Box gap={1}>
-            <Text role="bodyStrong">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨ Ù†Ø´Ø·</Text>
+            <Text role="bodyStrong">لا يوجد طلب نشط</Text>
             <Text role="bodySm" tone="muted">
-              Ø§Ø¨Ù‚ÙŽ Ø¹Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø­ØªÙ‰ ØªØµÙ„ Ø§Ù„Ø­Ø±ÙƒØ© Ø§Ù„ØªØ§Ù„ÙŠØ©. Ø§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„Ø­Ø³Ø§Ø¨ ÙŠØ¸Ù‡Ø±Ø§Ù† ÙƒÙ…Ù„Ø®Øµ read-only Ø¥Ù„Ù‰ Ø£Ù† ÙŠØµÙ„ Ø§Ù„Ù…ØµØ¯Ø± Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ.
+              ابقَ على الخريطة حتى تصل الحركة التالية. التاريخ والحساب يظهران كملخص read-only إلى أن يصل المصدر المركزي.
             </Text>
             <Text role="caption" tone="muted">
-              Ø§Ù„ØªÙˆØ§ØµÙ„ Ø¨Ø¹Ø¯ Ø§Ù„Ø¥ØºÙ„Ø§Ù‚ ÙŠØ¨Ù‚Ù‰ read-only Ù…Ø¤Ù‚ØªÙ‹Ø§ Ø­ØªÙ‰ ÙŠØ­Ø¯Ø¯ Ø§Ù„ØªØ­ÙƒÙ… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ Ù†Ø§ÙØ°Ø© Ø§Ù„Ø§Ø­ØªÙØ§Ø¸ Ø¨Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©.
+              التواصل بعد الإغلاق يبقى read-only مؤقتًا حتى يحدد التحكم المركزي نافذة الاحتفاظ بالمحادثة.
             </Text>
           </Box>
-          <Button size="sm" fullWidth={false} label="ÙØªØ­ Ø§Ù„Ø·Ù„Ø¨Ø§Øª" onPress={() => setRoute('inbox')} />
+          <Button size="sm" fullWidth={false} label="فتح الطلبات" onPress={() => setRoute('inbox')} />
         </Surface>
       );
     }
@@ -1586,17 +1586,17 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           radiusToken="xl"
           style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
         >
-          <Badge label="Ù…ØºÙ„Ù‚" tone="default" />
+          <Badge label="مغلق" tone="default" />
           <Box gap={1}>
-            <Text role="bodyStrong">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨ Ù†Ø´Ø·</Text>
+            <Text role="bodyStrong">لا يوجد طلب نشط</Text>
             <Text role="bodySm" tone="muted">
-              ØªÙ… Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø·Ù„Ø¨. Ø§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„Ø­Ø³Ø§Ø¨ ÙŠØ¸Ù‡Ø±Ø§Ù† ÙƒÙ…Ù„Ø®Øµ read-only Ø¥Ù„Ù‰ Ø£Ù† ÙŠØµÙ„ Ù…ØµØ¯Ø± Ø§Ù„Ø£Ø±Ø´ÙØ© Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ.
+              تم إغلاق الطلب. التاريخ والحساب يظهران كملخص read-only إلى أن يصل مصدر الأرشفة المركزي.
             </Text>
             <Text role="caption" tone="muted">
-              Ø§Ù„ØªÙˆØ§ØµÙ„ Ù‡Ù†Ø§ Ø£ØµØ¨Ø­ read-only Ø¨Ø¹Ø¯ Ù…Ø¯Ø© Ø§Ø­ØªÙØ§Ø¸ ÙŠØ­Ø¯Ø¯Ù‡Ø§ Ø§Ù„ØªØ­ÙƒÙ… Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ.
+              التواصل هنا أصبح read-only بعد مدة احتفاظ يحددها التحكم المركزي.
             </Text>
           </Box>
-          <Button size="sm" fullWidth={false} tone="ghost" label="Ø¹Ø±Ø¶ ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„Ø·Ù„Ø¨Ø§Øª" onPress={() => setRoute('inbox')} />
+          <Button size="sm" fullWidth={false} tone="ghost" label="عرض صندوق الطلبات" onPress={() => setRoute('inbox')} />
         </Surface>
       );
     }
@@ -1613,20 +1613,20 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
             <Box gap={1} style={{ flex: 1 }}>
               <Text role="caption" tone="muted">
-                Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·
+                الطلب النشط
               </Text>
               <Box layoutDirection="row" align="center" gap={2}>
                 <Badge label={currentAvailabilityMeta.orderBadgeLabel} tone={currentAvailabilityMeta.chipTone} />
                 <Text role="bodyStrong">#{activeOrderDisplayId}</Text>
               </Box>
             </Box>
-            <Button size="sm" fullWidth={false} tone="ghost" label="Ø·ÙŠ" onPress={collapseActiveOrder} />
+            <Button size="sm" fullWidth={false} tone="ghost" label="طي" onPress={collapseActiveOrder} />
           </Box>
 
           <Box gap={2}>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Text role="caption" tone="muted">
-                Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…
+                الاستلام
               </Text>
               <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
                 {activeSummary.pickupLabel}
@@ -1634,7 +1634,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Text role="caption" tone="muted">
-                Ø§Ù„ØªØ³Ù„ÙŠÙ…
+                التسليم
               </Text>
               <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
                 {activeSummary.dropoffLabel}
@@ -1642,7 +1642,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             </Box>
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Text role="caption" tone="muted">
-                Ø§Ù„Ù…Ø±Ø­Ù„Ø©
+                المرحلة
               </Text>
               <Text role="bodySm" align="end" numberOfLines={1} style={{ flex: 1 }}>
                 {activeOrderStageLabel}
@@ -1655,20 +1655,20 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
           <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
             {activeOrderPhase === 'pickup' ? (
-              <Button size="sm" fullWidth={false} tone="success" label="ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…" onPress={confirmPickup} />
+              <Button size="sm" fullWidth={false} tone="success" label="تأكيد الاستلام" onPress={confirmPickup} />
             ) : (
-              <Button size="sm" fullWidth={false} tone="primary" label="ØªØ£ÙƒÙŠØ¯ Ø§Ù„ØªØ³Ù„ÙŠÙ…" onPress={confirmDelivery} />
+              <Button size="sm" fullWidth={false} tone="primary" label="تأكيد التسليم" onPress={confirmDelivery} />
             )}
-            <Button size="sm" fullWidth={false} tone="ghost" label="Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ù…Ù‡Ù…Ø©" onPress={() => setRoute('map')} />
+            <Button size="sm" fullWidth={false} tone="ghost" label="خريطة المهمة" onPress={() => setRoute('map')} />
           </Box>
 
           <Surface tone="inset" padding={2} gap={2} radiusToken="lg">
             <Box gap={1}>
               <Text role="caption" tone="muted">
-                Ù…Ø±Ø§Ø³Ù„Ø© Ù…Ø®ØªØµØ±Ø©
+                مراسلة مختصرة
               </Text>
               <Text role="bodySm" tone="muted">
-                Ø±Ø³Ø§Ø¦Ù„ Ù‚ØµÙŠØ±Ø© ÙÙ‚Ø·ØŒ Ù…Ø¨Ø§Ø´Ø±Ø© Ø¯Ø§Ø®Ù„ Ù†ÙØ³ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø©ØŒ Ù…Ù† Ø¯ÙˆÙ† scroll Ø¥Ø¶Ø§ÙÙŠ.
+                رسائل قصيرة فقط، مباشرة داخل نفس البطاقة، من دون scroll إضافي.
               </Text>
             </Box>
 
@@ -1682,22 +1682,22 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
               <TextField
                 value={activeOrderDraft}
                 onChangeText={setActiveOrderDraft}
-                placeholder="Ø§ÙƒØªØ¨ Ø±Ø³Ø§Ù„Ø© Ù…Ø®ØªØµØ±Ø©..."
+                placeholder="اكتب رسالة مختصرة..."
                 multiline
                 numberOfLines={2}
                 style={{ minHeight: 68, textAlignVertical: 'top' }}
               />
               <Box layoutDirection="row" justify="space-between" align="center" gap={2} style={{ flexWrap: 'wrap' }}>
                 <Text role="caption" tone="muted">
-                  Ø§Ù„Ø­ÙˆØ§Ø± ÙŠØ¨Ù‚Ù‰ compact Ø¯Ø§Ø®Ù„ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø©.
+                  الحوار يبقى compact داخل البطاقة.
                 </Text>
-                <Button size="sm" fullWidth={false} label="Ø¥Ø±Ø³Ø§Ù„" onPress={sendQuickMessage} disabled={!activeOrderDraft.trim()} />
+                <Button size="sm" fullWidth={false} label="إرسال" onPress={sendQuickMessage} disabled={!activeOrderDraft.trim()} />
               </Box>
             </Box>
           </Surface>
         </Surface>
       ) : (
-        <Pressable accessibilityRole="button" accessibilityLabel="ØªÙˆØ³ÙŠØ¹ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·" onPress={expandActiveOrder} style={({ pressed }) => ({ opacity: pressed ? 0.95 : 1 })}>
+        <Pressable accessibilityRole="button" accessibilityLabel="توسيع الطلب النشط" onPress={expandActiveOrder} style={({ pressed }) => ({ opacity: pressed ? 0.95 : 1 })}>
           <Surface
             tone="raised"
             padding={panelPadding}
@@ -1708,14 +1708,14 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Box gap={1} style={{ flex: 1 }}>
                 <Text role="caption" tone="muted">
-                  Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·
+                  الطلب النشط
                 </Text>
                 <Box layoutDirection="row" align="center" gap={2}>
-                  <Badge label="Ù†Ø´Ø·" tone="success" />
+                  <Badge label="نشط" tone="success" />
                   <Text role="bodyStrong">#{activeOrderDisplayId}</Text>
                 </Box>
               </Box>
-              <Button size="sm" fullWidth={false} tone="secondary" label="ØªÙˆØ³ÙŠØ¹" onPress={expandActiveOrder} />
+              <Button size="sm" fullWidth={false} tone="secondary" label="توسيع" onPress={expandActiveOrder} />
             </Box>
 
             <Text role="bodySm" numberOfLines={1} tone="muted">
@@ -1735,29 +1735,29 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
   const renderStoreCourierHomeScreen = () => (
     <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: showCaptainBottomNav ? (Platform.OS === 'android' ? 112 : 80) + 16 : insets.bottom + 16 }}>
-      {/* â”€â”€â”€ Mode badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Mode badge ───────────────────────────────────────────────── */}
       <Surface tone="raised" padding={3} gap={2} radiusToken="xl">
         <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
           <Box gap={1}>
-            <Text role="bodyStrong">ÙˆØ¶Ø¹ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±</Text>
-            <Text role="bodySm" tone="muted">ØªÙØ¹Ø±Ø¶ ÙÙ‚Ø· Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…Ø³Ù†Ø¯Ø© Ø¥Ù„ÙŠÙƒ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±.</Text>
+            <Text role="bodyStrong">وضع موصل المتجر</Text>
+            <Text role="bodySm" tone="muted">تُعرض فقط الطلبات المسندة إليك من المتجر.</Text>
           </Box>
-          <Badge label="Ù†Ø´Ø·" tone="success" />
+          <Badge label="نشط" tone="success" />
         </Box>
       </Surface>
 
-      {/* â”€â”€â”€ Assigned store order + simple actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ─── Assigned store order + simple actions ────────────────────── */}
       <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-        <Text role="label" tone="muted">Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù…Ø³Ù†Ø¯</Text>
+        <Text role="label" tone="muted">الطلب المسند</Text>
         <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
           <Text role="bodyStrong">ORD-4401</Text>
           <Badge label={storeCourierMeta.badgeLabel} tone={storeCourierMeta.badgeTone} />
         </Box>
         <KeyValueList
           items={[
-            { label: 'Ø§Ù„Ù…ØªØ¬Ø±', value: 'ÙØ±Ø¹ Ø§Ù„ÙŠØ§Ø³Ù…ÙŠÙ†' },
-            { label: 'Ø§Ù„Ù…Ø±Ø­Ù„Ø©', value: storeCourierMeta.stageLabel },
-            { label: 'Ø§Ù„Ù…Ø³Ø§ÙØ©', value: storeCourierMeta.distanceLabel },
+            { label: 'المتجر', value: 'فرع الياسمين' },
+            { label: 'المرحلة', value: storeCourierMeta.stageLabel },
+            { label: 'المسافة', value: storeCourierMeta.distanceLabel },
           ]}
         />
         <Surface tone="inset" padding={2} gap={1} radiusToken="lg">
@@ -1766,61 +1766,61 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         <Box gap={2}>
           {storeCourierStage === 'ready_for_pickup' ? (
             <>
-              <Button label="Ø§Ø³ØªÙ„Ø§Ù… Ù…Ù† Ø§Ù„ÙØ±Ø¹" tone="success" onPress={markStoreCourierPickedUp} />
-              <Button label="ÙØªØ­ Ø§Ù„Ø¯Ø¹Ù…" tone="secondary" onPress={openSupportDirectory} />
+              <Button label="استلام من الفرع" tone="success" onPress={markStoreCourierPickedUp} />
+              <Button label="فتح الدعم" tone="secondary" onPress={openSupportDirectory} />
             </>
           ) : null}
           {storeCourierStage === 'picked_up' ? (
             <>
-              <Button label="Ø¨Ø¯Ø£ Ø§Ù„ØªÙˆØµÙŠÙ„" tone="primary" onPress={markStoreCourierOutForDelivery} />
-              <Button label="Ø§Ù„Ø±Ø¬ÙˆØ¹ Ø¥Ù„Ù‰ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…" tone="secondary" onPress={() => setStoreCourierStage('ready_for_pickup')} />
+              <Button label="بدأ التوصيل" tone="primary" onPress={markStoreCourierOutForDelivery} />
+              <Button label="الرجوع إلى الاستلام" tone="secondary" onPress={() => setStoreCourierStage('ready_for_pickup')} />
             </>
           ) : null}
           {storeCourierStage === 'out_for_delivery' ? (
             <Box layoutDirection="row" gap={2}>
               <Box style={{ flex: 1 }}>
-                <Button label="ØªÙ… Ø§Ù„ØªÙˆØµÙŠÙ„" tone="ghost" onPress={openStoreCourierProof} />
+                <Button label="تم التوصيل" tone="ghost" onPress={openStoreCourierProof} />
               </Box>
               <Box style={{ flex: 1 }}>
-                <Button label="ØªØ¹Ø°Ø± Ø§Ù„ØªÙˆØµÙŠÙ„" tone="danger" onPress={markStoreCourierDeliveryFailed} />
+                <Button label="تعذر التوصيل" tone="danger" onPress={markStoreCourierDeliveryFailed} />
               </Box>
             </Box>
           ) : null}
           {storeCourierStage === 'delivery_failed' ? (
             <Box layoutDirection="row" gap={2}>
               <Box style={{ flex: 1 }}>
-                <Button label="Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©" tone="secondary" onPress={() => setStoreCourierStage('out_for_delivery')} />
+                <Button label="إعادة المحاولة" tone="secondary" onPress={() => setStoreCourierStage('out_for_delivery')} />
               </Box>
               <Box style={{ flex: 1 }}>
-                <Button label="Ø§Ù„Ø¯Ø¹Ù…" tone="danger" onPress={openSupportDirectory} />
+                <Button label="الدعم" tone="danger" onPress={openSupportDirectory} />
               </Box>
             </Box>
           ) : null}
           {storeCourierStage === 'delivered' ? (
             <Box layoutDirection="row" gap={2}>
               <Box style={{ flex: 1 }}>
-                <Button label="Ø¹Ø±Ø¶ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ³Ù„ÙŠÙ…" tone="secondary" onPress={openStoreCourierProof} />
+                <Button label="عرض إثبات التسليم" tone="secondary" onPress={openStoreCourierProof} />
               </Box>
               <Box style={{ flex: 1 }}>
-                <Button label="ÙØªØ­ Ø§Ù„Ø³Ø¬Ù„" tone="ghost" onPress={() => openCaptainAccountSection('account-orders')} />
+                <Button label="فتح السجل" tone="ghost" onPress={() => openCaptainAccountSection('account-orders')} />
               </Box>
             </Box>
           ) : null}
         </Box>
       </Surface>
 
-      {/* â”€â”€â”€ Store earnings (policy-conditional â€” shown when compensation applies) â”€â”€ */}
+      {/* ─── Store earnings (policy-conditional — shown when compensation applies) ── */}
       <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-        <Text role="label" tone="muted">Ù…Ø³ØªØ­Ù‚Ø§ØªÙŠ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±</Text>
+        <Text role="label" tone="muted">مستحقاتي من المتجر</Text>
         <KeyValueList
           items={[
-            { label: 'Ø§Ù„ÙŠÙˆÙ…', value: '45 Ø±ÙŠØ§Ù„' },
-            { label: 'Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹', value: '210 Ø±ÙŠØ§Ù„' },
-            { label: 'Ù†ÙˆØ¹ Ø§Ù„Ø§Ø³ØªØ­Ù‚Ø§Ù‚', value: 'Ù…Ø¨Ù„Øº Ø«Ø§Ø¨Øª Ù„ÙƒÙ„ ØªÙˆØµÙŠÙ„Ø©' },
+            { label: 'اليوم', value: '45 ريال' },
+            { label: 'هذا الأسبوع', value: '210 ريال' },
+            { label: 'نوع الاستحقاق', value: 'مبلغ ثابت لكل توصيلة' },
           ]}
         />
         <Surface tone="inset" padding={2} gap={1} radiusToken="lg">
-          <Text role="caption" tone="muted">Ù‡Ø°Ø§ Ø§Ù„Ù…Ø¨Ù„Øº Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø± Ù…Ø¨Ø§Ø´Ø±Ø©Ù‹ â€” Ù„ÙŠØ³ ØªØ³ÙˆÙŠØ© ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ.</Text>
+          <Text role="caption" tone="muted">هذا المبلغ من المتجر مباشرةً — ليس تسوية كابتن بثواني.</Text>
         </Surface>
       </Surface>
     </MobileScrollView>
@@ -1927,13 +1927,13 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
                   <Box layoutDirection="row" align="center" gap={1}>
                     <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brand, 0.95) }} />
                     <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
-                      ÙØ±Øµ Ø·Ù„Ø¨Ø§Øª
+                      فرص طلبات
                     </Text>
                   </Box>
                   <Box layoutDirection="row" align="center" gap={1}>
                     <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.95) }} />
                     <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
-                      ØªØ¬Ù…Ø¹ ÙƒØ¨Ø§ØªÙ†
+                      تجمع كباتن
                     </Text>
                   </Box>
                 </Box>
@@ -1954,10 +1954,10 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     return (
       <Box style={{ flex: 1 }} background="background">
         <MobileWorkspaceHeader
-          title="AMN â€” Ù‚ÙŠØ¯ Ø§Ù„Ø±Ø¨Ø·"
-          description="Ù‡Ø°Ø§ Ø§Ù„Ù…Ø³Ø§Ø± ØºÙŠØ± Ù†Ø´Ø· Ø¯Ø§Ø®Ù„ DSH Ø­Ø§Ù„ÙŠÙ‹Ø§ ÙˆÙ„Ø§ ÙŠÙ†Ø§ÙØ³ Ø§Ù„Ø³ÙŠØ§Ù‚ Ø§Ù„ØªÙ†ÙÙŠØ°ÙŠ Ø§Ù„Ø­Ø§Ù„ÙŠ."
+          title="AMN — قيد الربط"
+          description="هذا المسار غير نشط داخل DSH حاليًا ولا ينافس السياق التنفيذي الحالي."
           icon="alert-circle-outline"
-          backLabel="Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ DSH"
+          backLabel="العودة إلى DSH"
           onBack={() => handleSelectServiceType('dsh')}
         />
         <Surface
@@ -1977,15 +1977,15 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           <MobileScrollView fill padding={4} gap={4}>
             <StateView
               stateId="warning"
-              title="AMN ØºÙŠØ± Ù†Ø´Ø· Ø¯Ø§Ø®Ù„ Ù‡Ø°Ø§ Ø§Ù„Ø³Ø·Ø­"
-              description="DSH Ù‡Ùˆ Ø§Ù„Ø³ÙŠØ§Ù‚ Ø§Ù„ØªÙ†ÙÙŠØ°ÙŠ Ø§Ù„Ù†Ø´Ø·ØŒ Ø¨ÙŠÙ†Ù…Ø§ ÙŠØ¸Ù‡Ø± AMN Ù‡Ù†Ø§ ÙƒÙ…Ø±Ø¬Ø¹ read-only Ø­ØªÙ‰ ÙŠÙƒØªÙ…Ù„ Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ù…Ø¹ØªÙ…Ø¯."
-              actionLabel="Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ DSH"
+              title="AMN غير نشط داخل هذا السطح"
+              description="DSH هو السياق التنفيذي النشط، بينما يظهر AMN هنا كمرجع read-only حتى يكتمل الربط المعتمد."
+              actionLabel="العودة إلى DSH"
               onActionPress={() => handleSelectServiceType('dsh')}
             />
             <Surface tone="inset" padding={4} gap={2} radiusToken="xl">
-              <Text role="bodyStrong">Ù„Ø§ Ù†Ø¶ÙŠÙ Ø£ÙŠ binding Ø¬Ø¯ÙŠØ¯ Ù‡Ù†Ø§.</Text>
+              <Text role="bodyStrong">لا نضيف أي binding جديد هنا.</Text>
               <Text role="bodySm" tone="muted">
-                AMN Ø­Ø§Ø¶Ø± Ù‡Ù†Ø§ ÙƒÙ…Ø±Ø¬Ø¹ read-only ØºÙŠØ± Ù†Ø´Ø·ØŒ ÙˆÙ„Ø§ ÙŠÙ†Ø¨ØºÙŠ Ø£Ù† ÙŠØ²Ø§Ø­Ù… DSH ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ø³Ø·Ø­.
+                AMN حاضر هنا كمرجع read-only غير نشط، ولا ينبغي أن يزاحم DSH في هذا السطح.
               </Text>
             </Surface>
           </MobileScrollView>
@@ -2020,7 +2020,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     <BottomNavBar
       activeId={captainBottomActiveId}
       direction="rtl"
-      launcherLabel="Ø·Ù„Ø¨Ø§ØªÙŠ"
+      launcherLabel="طلباتي"
       launcherIcon="receipt-outline"
       launcherActive={route === 'home'}
       onLauncherPress={() => setRoute('home')}
@@ -2031,17 +2031,17 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         if (id === 'profile') openCaptainAccount();
       }}
       items={[
-        { id: 'history', label: 'Ø§Ù„Ø³Ø¬Ù„', icon: 'time-outline', activeIcon: 'time' },
-        { id: 'support', label: 'Ø§Ù„Ø¯Ø¹Ù…', icon: 'help-circle-outline', activeIcon: 'help-circle' },
-        { id: 'earnings', label: 'Ù…Ø³ØªØ­Ù‚Ø§ØªÙŠ', icon: 'cash-outline', activeIcon: 'cash' },
-        { id: 'profile', label: 'Ø­Ø³Ø§Ø¨ÙŠ', icon: 'person-outline', activeIcon: 'person' },
+        { id: 'history', label: 'السجل', icon: 'time-outline', activeIcon: 'time' },
+        { id: 'support', label: 'الدعم', icon: 'help-circle-outline', activeIcon: 'help-circle' },
+        { id: 'earnings', label: 'مستحقاتي', icon: 'cash-outline', activeIcon: 'cash' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
       ]}
     />
   ) : (
     <BottomNavBar
       activeId={captainBottomActiveId}
       direction="rtl"
-      launcherLabel="Ø§Ù„Ø®Ø±ÙŠØ·Ø©"
+      launcherLabel="الخريطة"
       launcherIcon="map-outline"
       launcherActive={route === 'home' || route === 'map'}
       onLauncherPress={() => setRoute('home')}
@@ -2052,10 +2052,10 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         if (id === 'profile') openCaptainAccount();
       }}
       items={[
-        { id: 'orders', label: 'Ø§Ù„Ø·Ù„Ø¨Ø§Øª', icon: 'receipt-outline', activeIcon: 'receipt' },
-        { id: 'wallet', label: 'Ø§Ù„Ù…Ø­ÙØ¸Ø©', icon: 'wallet-outline', activeIcon: 'wallet' },
-        { id: 'support', label: 'Ø§Ù„Ø¯Ø¹Ù…', icon: 'help-circle-outline', activeIcon: 'help-circle' },
-        { id: 'profile', label: 'Ø­Ø³Ø§Ø¨ÙŠ', icon: 'person-outline', activeIcon: 'person' },
+        { id: 'orders', label: 'الطلبات', icon: 'receipt-outline', activeIcon: 'receipt' },
+        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+        { id: 'support', label: 'الدعم', icon: 'help-circle-outline', activeIcon: 'help-circle' },
+        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
       ]}
     />
   );
@@ -2087,16 +2087,16 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
     if (route === 'account') {
       return renderCaptainAccountShell(
-        'Ø­Ø³Ø§Ø¨ Ø§Ù„ÙƒØ§Ø¨ØªÙ†',
-        'Ù…Ù„Ù Ø§Ù„ØªØ´ØºÙŠÙ„ ÙˆØ§Ù„Ù…Ø§Ù„ÙŠØ© ÙˆØ§Ù„Ø¯ÙˆØ§Ù…',
+        'حساب الكابتن',
+        'ملف التشغيل والمالية والدوام',
         renderCaptainAccountRootScreen()
       );
     }
 
     if (route === 'support-directory') {
       return renderCaptainAccountShell(
-        'Ø¯Ù„ÙŠÙ„ Ø§Ù„Ø¯Ø¹Ù…',
-        'ÙƒÙ„ Ù…Ø³Ø§Ø±Ø§Øª DSH Ø§Ù„Ù…ØªØ¨Ù‚ÙŠØ© ÙÙŠ Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯',
+        'دليل الدعم',
+        'كل مسارات DSH المتبقية في مكان واحد',
         <DshCaptainSupportDirectoryScreen onOpenScreen={(screenId) => openCaptainSupportScreen(screenId as CaptainSupportRoute)} />
       );
     }
@@ -2143,16 +2143,16 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         default: supportScreenContent = null;
       }
       return renderCaptainAccountShell(
-        selectedSupportScreen === 'cod-liability' ? 'Ø°Ù…Ø© Ø§Ù„Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…' : 'Ø§Ù„Ø¯Ø¹Ù…',
-        'Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„Ù…ÙØªÙˆØ­ Ù…Ù† Ø§Ù„Ø¯Ù„ÙŠÙ„',
+        selectedSupportScreen === 'cod-liability' ? 'ذمة الدفع عند الاستلام' : 'الدعم',
+        'المسار المفتوح من الدليل',
         supportScreenContent
       );
     }
 
     if (route === 'bell') {
       return renderCaptainAccountShell(
-        'Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª',
-        'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© Ø¯ÙˆÙ† Ø¶Ø¬ÙŠØ¬',
+        'الإشعارات',
+        'تنبيهات الطلبات الجديدة دون ضجيج',
         <DshCaptainBellScreen
           onOpenInbox={goToInbox}
           onOpenNextOrder={() => openOrderDetail(activeOrderId)}
@@ -2164,7 +2164,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     const meta = routeHeaderMeta[route];
     const content: React.ReactNode = renderCaptainFlow();
 
-    // Flat layout â€” identical to renderCaptainAccountShell, no rounded container
+    // Flat layout — identical to renderCaptainAccountShell, no rounded container
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
         {meta && (

@@ -1,6 +1,6 @@
 /**
- * WLT DSH Finance â€” Centralized Preview Data.
- * UI_PREVIEW_ONLY â€” not runtime truth, not API source, not a real ledger.
+ * WLT DSH Finance — Centralized Preview Data.
+ * UI_PREVIEW_ONLY — not runtime truth, not API source, not a real ledger.
  * WLT owns all financial artifacts. DSH displays only.
  * Centralised here per DSH preview data ownership rules.
  */
@@ -30,7 +30,7 @@ import type {
   WltDshCaptainEarningLine,
 } from '../../../wlt/frontend/dsh/control-panel/models/captainStatement.types';
 
-// â”€â”€â”€ Contract â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Contract ──────────────────────────────────────────────────────
 
 const PREVIEW_CONTRACT: WltDshControlPanelPreviewContract = {
   contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
@@ -43,23 +43,23 @@ const PREVIEW_CONTRACT: WltDshControlPanelPreviewContract = {
 
 export const WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT = PREVIEW_CONTRACT;
 
-// â”€â”€â”€ Formatter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Formatter ─────────────────────────────────────────────────────
 
 function amount(minorUnits: number): string {
   try {
-    return new Intl.NumberFormat('ar-YE', { style: 'decimal', maximumFractionDigits: 0 }).format(minorUnits) + ' Ø±.ÙŠ';
+    return new Intl.NumberFormat('ar-YE', { style: 'decimal', maximumFractionDigits: 0 }).format(minorUnits) + ' ر.ي';
   } catch {
-    return minorUnits.toLocaleString() + ' Ø±.ÙŠ';
+    return minorUnits.toLocaleString() + ' ر.ي';
   }
 }
 
-// â”€â”€â”€ Store Settlement Statements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Store Settlement Statements ──────────────────────────────────
 
 const STORE_SETTLEMENT_STATEMENTS: readonly WltDshStoreSettlementStatement[] = [
   {
     statementId: 'WLT-DOSH-STMT-STORE-99-CYC-05-02',
     storeId: 'STORE-99',
-    storeName: 'Ù…ØªØ¬Ø± ØµÙ†Ø¹Ø§Ø¡ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ',
+    storeName: 'متجر صنعاء المركزي',
     settlementCycleId: 'CYC-05-02',
     frequency: 'biweekly',
     periodStart: '2026-05-16',
@@ -177,7 +177,7 @@ const STORE_SETTLEMENT_STATEMENTS: readonly WltDshStoreSettlementStatement[] = [
   {
     statementId: 'WLT-DOSH-STMT-STORE-102-CYC-05-02',
     storeId: 'STORE-102',
-    storeName: 'Ù…Ø­Ù…ØµØ© Ø§Ù„Ø³Ø§Ø­Ø©',
+    storeName: 'محمصة الساحة',
     settlementCycleId: 'CYC-05-02',
     frequency: 'biweekly',
     periodStart: '2026-05-16',
@@ -253,7 +253,7 @@ const STORE_SETTLEMENT_STATEMENTS: readonly WltDshStoreSettlementStatement[] = [
   {
     statementId: 'WLT-DOSH-STMT-STORE-108-CYC-05-02',
     storeId: 'STORE-108',
-    storeName: 'Ø¨ÙˆÙÙŠÙ‡ Ø§Ù„Ø´Ø±ÙˆÙ‚',
+    storeName: 'بوفيه الشروق',
     settlementCycleId: 'CYC-05-02',
     frequency: 'weekly',
     periodStart: '2026-05-24',
@@ -311,18 +311,18 @@ export function getWltDshStoreSettlementStatementsPreview(): readonly WltDshStor
   return STORE_SETTLEMENT_STATEMENTS;
 }
 
-// â”€â”€â”€ Partner Settlement Statements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Partner Settlement Statements ─────────────────────────────────
 
 const PARTNER_SETTLEMENT_STATEMENTS: readonly WltDshPartnerStatement[] = [
   {
     partnerId: 'PARTNER-77',
-    partnerName: 'Ù…Ø¬Ù…ÙˆØ¹Ø© Ù…Ø·Ø§Ø¹Ù… Ø§Ù„Ø¨Ø±ÙƒØ©',
+    partnerName: 'مجموعة مطاعم البركة',
     settlementCycleId: 'CYC-05-02',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
     expectedPayoutDate: '2026-06-03',
     status: 'ready_for_payout',
-    statusLabel: 'Ø¬Ø§Ù‡Ø² Ù„Ù„ØµØ±Ù',
+    statusLabel: 'جاهز للصرف',
     grossSalesMinorUnits: 86500000,
     grossSalesLabel: amount(86500000),
     platformCommissionMinorUnits: 6920000,
@@ -338,7 +338,7 @@ const PARTNER_SETTLEMENT_STATEMENTS: readonly WltDshPartnerStatement[] = [
     storeBreakdown: [
       {
         storeId: 'STORE-99',
-        storeName: 'Ù…ØªØ¬Ø± ØµÙ†Ø¹Ø§Ø¡ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ',
+        storeName: 'متجر صنعاء المركزي',
         grossSalesMinorUnits: 58800000,
         grossSalesLabel: amount(58800000),
         platformCommissionMinorUnits: 4704000,
@@ -348,12 +348,12 @@ const PARTNER_SETTLEMENT_STATEMENTS: readonly WltDshPartnerStatement[] = [
         netSettlementMinorUnits: 53596000,
         netSettlementLabel: amount(53596000),
         payoutStatus: 'included',
-        payoutStatusLabel: 'Ù…Ø´Ù…ÙˆÙ„ ÙÙŠ Ø§Ù„Ø¯ÙØ¹Ø© Ø§Ù„Ø¬Ø§Ø±ÙŠØ©',
+        payoutStatusLabel: 'مشمول في الدفعة الجارية',
         expectedPayoutDate: '2026-06-03',
       },
       {
         storeId: 'STORE-102',
-        storeName: 'Ù…Ø­Ù…ØµØ© Ø§Ù„Ø³Ø§Ø­Ø©',
+        storeName: 'محمصة الساحة',
         grossSalesMinorUnits: 18500000,
         grossSalesLabel: amount(18500000),
         platformCommissionMinorUnits: 1480000,
@@ -363,12 +363,12 @@ const PARTNER_SETTLEMENT_STATEMENTS: readonly WltDshPartnerStatement[] = [
         netSettlementMinorUnits: 18020000,
         netSettlementLabel: amount(18020000),
         payoutStatus: 'paid',
-        payoutStatusLabel: 'ØªÙ… ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø¯ÙØ¹Ø© Ù…Ø³Ø¨Ù‚Ø§Ù‹',
+        payoutStatusLabel: 'تم تحويل الدفعة مسبقاً',
         expectedPayoutDate: '2026-06-03',
       },
       {
         storeId: 'STORE-108',
-        storeName: 'Ø¨ÙˆÙÙŠÙ‡ Ø§Ù„Ø´Ø±ÙˆÙ‚',
+        storeName: 'بوفيه الشروق',
         grossSalesMinorUnits: 9200000,
         grossSalesLabel: amount(9200000),
         platformCommissionMinorUnits: 736000,
@@ -378,8 +378,8 @@ const PARTNER_SETTLEMENT_STATEMENTS: readonly WltDshPartnerStatement[] = [
         netSettlementMinorUnits: 8764000,
         netSettlementLabel: amount(8764000),
         payoutStatus: 'held',
-        payoutStatusLabel: 'Ù…Ø­Ø¬ÙˆØ² Ù…Ø¤Ù‚ØªØ§Ù‹ Ù„Ø¯ÙˆØ§Ø¹ÙŠ Ø§Ù„Ù…Ø·Ø§Ø¨Ù‚Ø©',
-        expectedPayoutDate: 'â€”',
+        payoutStatusLabel: 'محجوز مؤقتاً لدواعي المطابقة',
+        expectedPayoutDate: '—',
       },
     ],
     contract: PREVIEW_CONTRACT,
@@ -390,14 +390,14 @@ export function getWltDshPartnerSettlementStatementsPreview(): readonly WltDshPa
   return PARTNER_SETTLEMENT_STATEMENTS;
 }
 
-// â”€â”€â”€ Captain Settlement Statements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Captain Settlement Statements ─────────────────────────────────
 
 const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
   {
     captainId: 'CAP-42',
-    captainName: 'Ø¬Ù…Ø§Ù„ Ø§Ù„ÙŠÙ…Ø§Ù†ÙŠ',
+    captainName: 'جمال اليماني',
     status: 'blocked',
-    statusLabel: 'Ù…ÙˆÙ‚ÙˆÙ Ù…Ø¤Ù‚ØªØ§Ù‹',
+    statusLabel: 'موقوف مؤقتاً',
     eligibilityBalanceMinorUnits: 800000,
     eligibilityBalanceLabel: amount(800000),
     minimumEligibilityMinorUnits: 1000000,
@@ -406,7 +406,7 @@ const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
     eligibilityShortfallMinorUnits: 200000,
     eligibilityShortfallLabel: amount(200000),
     hasEligibilityBlock: true,
-    eligibilityBlockReason: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¶Ø§Ù…Ù† Ø£Ù‚Ù„ Ù…Ù† Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨ â€” Ø´Ø­Ù† 2,000 Ø±.ÙŠ Ø¥Ø¶Ø§ÙÙŠØ© Ù„Ù„ØªØ£Ù‡Ù„',
+    eligibilityBlockReason: 'الرصيد الضامن أقل من الحد الأدنى المطلوب — شحن 2,000 ر.ي إضافية للتأهل',
     grossEarningsMinorUnits: 11100000,
     grossEarningsLabel: amount(11100000),
     paidToDateMinorUnits: 6200000,
@@ -423,9 +423,9 @@ const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
         amountMinorUnits: 18600000,
         amountLabel: amount(18600000),
         status: 'pending_wlt_clearance',
-        statusLabel: 'Ù‚ÙŠØ¯ Ù…Ø±Ø§Ø¬Ø¹Ø© WLT',
+        statusLabel: 'قيد مراجعة WLT',
         evidenceRef: 'BANK-DEP-9922',
-        notes: 'ØªÙ… ØªÙ‚Ø¯ÙŠÙ… Ø¥ÙŠØµØ§Ù„ Ø§Ù„Ø¥ÙŠØ¯Ø§Ø¹ Ø§Ù„Ø¨Ù†ÙƒÙŠ Ù„Ù„Ø­Ù‚ÙŠØ¨Ø© ÙˆÙ‚ÙŠØ¯ Ø§Ù„Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©.',
+        notes: 'تم تقديم إيصال الإيداع البنكي للحقيبة وقيد المطابقة النهائية.',
       },
     ],
     earnings: [
@@ -442,7 +442,7 @@ const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
         netMinorUnits: 800000,
         netLabel: amount(800000),
         status: 'paid',
-        statusLabel: 'Ù…Ø¯ÙÙˆØ¹',
+        statusLabel: 'مدفوع',
         payoutDate: '2026-05-25',
         evidenceRef: 'PY-WLT-CAP-42-01',
       },
@@ -451,9 +451,9 @@ const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
   },
   {
     captainId: 'CAP-88',
-    captainName: 'ÙŠØ§Ø³Ø± Ø§Ù„ØµÙ†Ø¹Ø§Ù†ÙŠ',
+    captainName: 'ياسر الصنعاني',
     status: 'active',
-    statusLabel: 'Ù†Ø´Ø· ÙˆÙ…Ø¤Ù‡Ù„',
+    statusLabel: 'نشط ومؤهل',
     eligibilityBalanceMinorUnits: 1500000,
     eligibilityBalanceLabel: amount(1500000),
     minimumEligibilityMinorUnits: 1000000,
@@ -462,7 +462,7 @@ const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
     eligibilityShortfallMinorUnits: 0,
     eligibilityShortfallLabel: amount(0),
     hasEligibilityBlock: false,
-    eligibilityBlockReason: 'â€”',
+    eligibilityBlockReason: '—',
     grossEarningsMinorUnits: 8500000,
     grossEarningsLabel: amount(8500000),
     paidToDateMinorUnits: 8500000,
@@ -486,7 +486,7 @@ const CAPTAIN_SETTLEMENT_STATEMENTS: readonly WltDshCaptainStatement[] = [
         netMinorUnits: 600000,
         netLabel: amount(600000),
         status: 'paid',
-        statusLabel: 'Ù…Ø¯ÙÙˆØ¹',
+        statusLabel: 'مدفوع',
         payoutDate: '2026-05-28',
         evidenceRef: 'DEP-WLT-9912',
       },
@@ -499,13 +499,13 @@ export function getWltDshCaptainSettlementStatementsPreview(): readonly WltDshCa
   return CAPTAIN_SETTLEMENT_STATEMENTS;
 }
 
-// â”€â”€â”€ Account Statements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Account Statements ────────────────────────────────────────────
 
 const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
   {
     statementId: 'WLT-ACCT-STORE-99-202605',
     actor: 'store',
-    actorLabel: 'ÙƒØ´Ù Ø­Ø³Ø§Ø¨ Ù…ØªØ¬Ø±',
+    actorLabel: 'كشف حساب متجر',
     actorId: 'STORE-99',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -533,7 +533,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-17',
         sourceType: 'order',
         sourceId: 'ORD-2026-SD1',
-        description: 'Ø£Ø«Ø± Ø·Ù„Ø¨ Ù…Ø­ÙØ¸Ø© Ø¶Ù…Ù† Ø¯ÙˆØ±Ø© Ø§Ù„ØªØ³ÙˆÙŠØ©',
+        description: 'أثر طلب محفظة ضمن دورة التسوية',
         debitMinorUnits: 0,
         debitLabel: amount(0),
         creditMinorUnits: 13264000,
@@ -548,7 +548,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-25',
         sourceType: 'refund',
         sourceId: 'REF-WLT-905',
-        description: 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¬Ø²Ø¦ÙŠ Ù…Ø¤Ø«Ø± Ø¹Ù„Ù‰ ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ©',
+        description: 'استرداد جزئي مؤثر على صافي التسوية',
         debitMinorUnits: 900000,
         debitLabel: amount(900000),
         creditMinorUnits: 0,
@@ -563,7 +563,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-31',
         sourceType: 'payout',
         sourceId: 'PY-WLT-STORE-99-01',
-        description: 'Ø¯ÙØ¹Ø© Ø³Ø§Ø¨Ù‚Ø© Ø¶Ù…Ù† Ù†ÙØ³ Ø§Ù„Ø¯ÙˆØ±Ø©',
+        description: 'دفعة سابقة ضمن نفس الدورة',
         debitMinorUnits: 18000000,
         debitLabel: amount(18000000),
         creditMinorUnits: 0,
@@ -579,7 +579,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
   {
     statementId: 'WLT-ACCT-CAP-42-202605',
     actor: 'captain',
-    actorLabel: 'ÙƒØ´Ù Ø­Ø³Ø§Ø¨ ÙƒØ§Ø¨ØªÙ†',
+    actorLabel: 'كشف حساب كابتن',
     actorId: 'CAP-42',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -607,7 +607,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-21',
         sourceType: 'commission',
         sourceId: 'CAP-EARN-421',
-        description: 'Ø£Ø±Ø¨Ø§Ø­ ØªÙˆØµÙŠÙ„ Ù…Ø±Ø­Ù„Ø© ÙƒØ§Ù„ØªØ²Ø§Ù… Ù…Ø³ØªØ­Ù‚',
+        description: 'أرباح توصيل مرحلة كالتزام مستحق',
         debitMinorUnits: 0,
         debitLabel: amount(0),
         creditMinorUnits: 11100000,
@@ -622,7 +622,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-29',
         sourceType: 'payout',
         sourceId: 'CAP-PY-42-05',
-        description: 'Ø¯ÙØ¹Ø© ÙƒØ§Ø¨ØªÙ† Ù‚ÙŠØ¯ Ù…Ø±Ø§Ø¬Ø¹Ø© WLT',
+        description: 'دفعة كابتن قيد مراجعة WLT',
         debitMinorUnits: 6200000,
         debitLabel: amount(6200000),
         creditMinorUnits: 0,
@@ -638,7 +638,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
   {
     statementId: 'WLT-ACCT-FIELD-7-202605',
     actor: 'field_agent',
-    actorLabel: 'ÙƒØ´Ù Ø­Ø³Ø§Ø¨ Ù…ÙŠØ¯Ø§Ù†ÙŠ',
+    actorLabel: 'كشف حساب ميداني',
     actorId: 'FIELD-7',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -666,7 +666,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-22',
         sourceType: 'commission',
         sourceId: 'FIELD-COM-77',
-        description: 'Ø¹Ù…ÙˆÙ„Ø© Ø§Ø³ØªÙ‚Ø·Ø§Ø¨ Ù…Ø¹ØªÙ…Ø¯Ø© ÙƒÙ…Ø¹Ø§ÙŠÙ†Ø©',
+        description: 'عمولة استقطاب معتمدة كمعاينة',
         debitMinorUnits: 0,
         debitLabel: amount(0),
         creditMinorUnits: 2400000,
@@ -682,7 +682,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
   {
     statementId: 'WLT-ACCT-PLATFORM-202605',
     actor: 'platform',
-    actorLabel: 'ÙƒØ´Ù Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ù†ØµØ©',
+    actorLabel: 'كشف حساب المنصة',
     actorId: 'DSH-PLATFORM',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -710,7 +710,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-31',
         sourceType: 'commission',
         sourceId: 'CYC-05-02',
-        description: 'Ø¹Ù…ÙˆÙ„Ø© Ù…Ù†ØµØ© Ù…Ù† Ø¯ÙˆØ±Ø© ØªØ³ÙˆÙŠØ© Ø§Ù„Ù…ØªØ¬Ø±',
+        description: 'عمولة منصة من دورة تسوية المتجر',
         debitMinorUnits: 0,
         debitLabel: amount(0),
         creditMinorUnits: 4704000,
@@ -726,7 +726,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
   {
     statementId: 'WLT-ACCT-SC-17-202605',
     actor: 'store_courier',
-    actorLabel: 'ÙƒØ´Ù Ø­Ø³Ø§Ø¨ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±',
+    actorLabel: 'كشف حساب موصل المتجر',
     actorId: 'SC-17',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -754,7 +754,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-28',
         sourceType: 'commission',
         sourceId: 'SC-COMP-17',
-        description: 'ØªØ¹ÙˆÙŠØ¶ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ â€” Ø³Ø¯Ø§Ø¯ Ø§Ù„Ù…ØªØ¬Ø± Ù…Ø¨Ø§Ø´Ø±Ø©',
+        description: 'تعويض موصل المتجر الداخلي — سداد المتجر مباشرة',
         debitMinorUnits: 0,
         debitLabel: amount(0),
         creditMinorUnits: 1800000,
@@ -770,7 +770,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
   {
     statementId: 'WLT-ACCT-CUST-553-202605',
     actor: 'customer_wallet',
-    actorLabel: 'ÙƒØ´Ù Ø­Ø³Ø§Ø¨ Ù…Ø­ÙØ¸Ø© Ø§Ù„Ø¹Ù…ÙŠÙ„',
+    actorLabel: 'كشف حساب محفظة العميل',
     actorId: 'CUS-553',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -798,7 +798,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-17',
         sourceType: 'order',
         sourceId: 'ORD-2026-SD1',
-        description: 'Ø¯ÙØ¹ Ù‚ÙŠÙ…Ø© Ø·Ù„Ø¨ Ø±Ù‚Ù… ORD-2026-SD1 Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©',
+        description: 'دفع قيمة طلب رقم ORD-2026-SD1 من المحفظة',
         debitMinorUnits: 1500000,
         debitLabel: amount(1500000),
         creditMinorUnits: 0,
@@ -813,7 +813,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-25',
         sourceType: 'refund',
         sourceId: 'REF-WLT-905',
-        description: 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ù‚ÙŠÙ…Ø© Ù†Ù‚Øµ Ø·Ù„Ø¨ Ø±Ù‚Ù… ORD-2026-SD9',
+        description: 'استرداد قيمة نقص طلب رقم ORD-2026-SD9',
         debitMinorUnits: 0,
         debitLabel: amount(0),
         creditMinorUnits: 900000,
@@ -828,7 +828,7 @@ const ACCOUNT_STATEMENTS: readonly WltDshAccountStatement[] = [
         date: '2026-05-30',
         sourceType: 'order',
         sourceId: 'ORD-2026-SD12',
-        description: 'Ø¯ÙØ¹ Ù‚ÙŠÙ…Ø© Ø·Ù„Ø¨ Ø±Ù‚Ù… ORD-2026-SD12 Ø¬Ø²Ø¦ÙŠÙ‹Ø§',
+        description: 'دفع قيمة طلب رقم ORD-2026-SD12 جزئيًا',
         debitMinorUnits: 850000,
         debitLabel: amount(850000),
         creditMinorUnits: 0,
@@ -847,13 +847,13 @@ export function getWltDshAccountStatementsPreview(): readonly WltDshAccountState
   return ACCOUNT_STATEMENTS;
 }
 
-// â”€â”€â”€ Settlement Calendar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Settlement Calendar ───────────────────────────────────────────
 
 const SETTLEMENT_CALENDAR: readonly WltDshSettlementCalendarCycle[] = [
   {
     cycleId: 'CYC-05-02',
     ownerKind: 'store',
-    ownerLabel: 'Ù…ØªØ§Ø¬Ø± DSH',
+    ownerLabel: 'متاجر DSH',
     frequency: 'biweekly',
     periodStart: '2026-05-16',
     periodEnd: '2026-05-31',
@@ -866,13 +866,13 @@ const SETTLEMENT_CALENDAR: readonly WltDshSettlementCalendarCycle[] = [
     netPayableLabel: amount(53596000),
     holdAmountMinorUnits: 1200000,
     holdAmountLabel: amount(1200000),
-    releasePolicy: 'ØªÙØ±Ø¬ WLT Ø§Ù„Ø­Ø¬Ø² Ø¨Ø¹Ø¯ Ø§ÙƒØªÙ…Ø§Ù„ Ø¯Ù„ÙŠÙ„ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ ÙˆØ§Ù„Ù†Ø²Ø§Ø¹.',
+    releasePolicy: 'تفرج WLT الحجز بعد اكتمال دليل الاسترداد والنزاع.',
     contract: PREVIEW_CONTRACT,
   },
   {
     cycleId: 'CYC-CAP-05-W4',
     ownerKind: 'captain',
-    ownerLabel: 'Ø§Ù„ÙƒØ¨Ø§ØªÙ†',
+    ownerLabel: 'الكباتن',
     frequency: 'weekly',
     periodStart: '2026-05-25',
     periodEnd: '2026-05-31',
@@ -885,13 +885,13 @@ const SETTLEMENT_CALENDAR: readonly WltDshSettlementCalendarCycle[] = [
     netPayableLabel: amount(42200000),
     holdAmountMinorUnits: 3100000,
     holdAmountLabel: amount(3100000),
-    releasePolicy: 'Ø£ÙŠ COD ØºÙŠØ± Ù…ÙˆØ¯Ø¹ ÙŠØ¨Ù‚Ù‰ Ù…Ø­Ø¬ÙˆØ²Ù‹Ø§ Ø­ØªÙ‰ Ø¯Ù„ÙŠÙ„ Ø§Ù„Ø¥ÙŠØ¯Ø§Ø¹.',
+    releasePolicy: 'أي COD غير مودع يبقى محجوزًا حتى دليل الإيداع.',
     contract: PREVIEW_CONTRACT,
   },
   {
     cycleId: 'CYC-FIELD-05',
     ownerKind: 'field_agent',
-    ownerLabel: 'Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠÙˆÙ†',
+    ownerLabel: 'الميدانيون',
     frequency: 'monthly',
     periodStart: '2026-05-01',
     periodEnd: '2026-05-31',
@@ -904,7 +904,7 @@ const SETTLEMENT_CALENDAR: readonly WltDshSettlementCalendarCycle[] = [
     netPayableLabel: amount(18800000),
     holdAmountMinorUnits: 0,
     holdAmountLabel: amount(0),
-    releasePolicy: 'ØªØµØ±Ù Ø§Ù„Ø¹Ù…ÙˆÙ„Ø© Ø¨Ø¹Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯ Ù…ØµØ¯Ø± Ø§Ù„Ø§Ø³ØªÙ‚Ø·Ø§Ø¨ ÙˆØ¹Ø¯Ù… ÙˆØ¬ÙˆØ¯ Ø±ÙØ¶.',
+    releasePolicy: 'تصرف العمولة بعد اعتماد مصدر الاستقطاب وعدم وجود رفض.',
     contract: PREVIEW_CONTRACT,
   },
 ];
@@ -913,7 +913,7 @@ export function getWltDshSettlementCalendarPreview(): readonly WltDshSettlementC
   return SETTLEMENT_CALENDAR;
 }
 
-// â”€â”€â”€ Refund Ledger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Refund Ledger ─────────────────────────────────────────────────
 
 const REFUND_LEDGER: readonly WltDshRefundLedgerCase[] = [
   {
@@ -927,12 +927,12 @@ const REFUND_LEDGER: readonly WltDshRefundLedgerCase[] = [
     approvedAmountLabel: amount(900000),
     rejectedAmountMinorUnits: 0,
     rejectedAmountLabel: amount(0),
-    reason: 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¬Ø²Ø¦ÙŠ Ø¨Ø³Ø¨Ø¨ Ù†Ù‚Øµ ØµÙ†Ù ÙÙŠ Ø§Ù„Ø·Ù„Ø¨.',
-    evidence: ['ØµÙˆØ±Ø© Ø§Ù„ÙØ§ØªÙˆØ±Ø©', 'ØªÙ‚Ø±ÙŠØ± Ø§Ù„Ø¯Ø¹Ù…', 'Ù…ÙˆØ§ÙÙ‚Ø© WLT preview'],
+    reason: 'استرداد جزئي بسبب نقص صنف في الطلب.',
+    evidence: ['صورة الفاتورة', 'تقرير الدعم', 'موافقة WLT preview'],
     status: 'pending_wlt_review',
     ledgerImpact: 'Dr Refund Expense / Cr Refund Liability',
-    walletImpact: 'Ø¥Ø¶Ø§ÙØ© Ø±ØµÙŠØ¯ Ù„Ù„Ø¹Ù…ÙŠÙ„ Ø¨Ø¹Ø¯ ØªÙ†ÙÙŠØ° WLT runtime ÙÙ‚Ø·.',
-    settlementImpact: 'Ø®ØµÙ… Ù…Ù† ØµØ§ÙÙŠ ØªØ³ÙˆÙŠØ© STORE-99 Ø¶Ù…Ù† CYC-05-02.',
+    walletImpact: 'إضافة رصيد للعميل بعد تنفيذ WLT runtime فقط.',
+    settlementImpact: 'خصم من صافي تسوية STORE-99 ضمن CYC-05-02.',
     contract: PREVIEW_CONTRACT,
   },
   {
@@ -946,12 +946,12 @@ const REFUND_LEDGER: readonly WltDshRefundLedgerCase[] = [
     approvedAmountLabel: amount(300000),
     rejectedAmountMinorUnits: 200000,
     rejectedAmountLabel: amount(200000),
-    reason: 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ù†Ø²Ø§Ø¹ Ø¬ÙˆØ¯Ø© Ø¬Ø²Ø¦ÙŠ.',
-    evidence: ['ØªØ°ÙƒØ±Ø© Ø§Ù„Ø¯Ø¹Ù…', 'ØµÙˆØ±Ø© Ø§Ù„Ù…Ù†ØªØ¬'],
+    reason: 'مراجعة نزاع جودة جزئي.',
+    evidence: ['تذكرة الدعم', 'صورة المنتج'],
     status: 'disputed',
     ledgerImpact: 'Pending WLT review; no runtime posting in preview.',
-    walletImpact: 'Ù„Ø§ Ø£Ø«Ø± Ù…Ø­ÙØ¸Ø© Ø­Ù‚ÙŠÙ‚ÙŠ Ù‚Ø¨Ù„ API runtime.',
-    settlementImpact: 'ÙŠØ¸Ù‡Ø± ÙƒØ­Ø¬Ø² Ù…Ø±Ø§Ø¬Ø¹Ø© Ù„Ø§ ÙƒØ®ØµÙ… Ù†Ù‡Ø§Ø¦ÙŠ.',
+    walletImpact: 'لا أثر محفظة حقيقي قبل API runtime.',
+    settlementImpact: 'يظهر كحجز مراجعة لا كخصم نهائي.',
     contract: PREVIEW_CONTRACT,
   },
 ];
@@ -960,12 +960,12 @@ export function getWltDshRefundLedgerPreview(): readonly WltDshRefundLedgerCase[
   return REFUND_LEDGER;
 }
 
-// â”€â”€â”€ Field Commission Statements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Field Commission Statements ───────────────────────────────────
 
 const FIELD_COMMISSION_STATEMENTS: readonly WltDshFieldCommissionStatement[] = [
   {
     fieldAgentId: 'FLD-88',
-    fieldAgentName: 'Ø£Ø­Ù…Ø¯ Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ',
+    fieldAgentName: 'أحمد الميداني',
     commissionCycleId: 'CYC-FIELD-05',
     cycleStart: '2026-05-01',
     cycleEnd: '2026-05-31',
@@ -984,7 +984,7 @@ const FIELD_COMMISSION_STATEMENTS: readonly WltDshFieldCommissionStatement[] = [
     storeLines: [
       {
         storeId: 'STORE-102',
-        storeName: 'Ù…Ø­Ù…ØµØ© Ø§Ù„Ø³Ø§Ø­Ø©',
+        storeName: 'محمصة الساحة',
         joinedAt: '2026-05-05',
         activatedAt: '2026-05-10',
         activationStatus: 'active',
@@ -994,14 +994,14 @@ const FIELD_COMMISSION_STATEMENTS: readonly WltDshFieldCommissionStatement[] = [
         commissionMinorUnits: 500000,
         paidMinorUnits: 120000,
         remainingMinorUnits: 380000,
-        holdReason: 'â€”',
+        holdReason: '—',
         settlementStatus: 'included',
         evidenceRef: 'EVID-FLD-102',
         sourceOrderRefs: ['ORD-2026-FLD1'],
       },
       {
         storeId: 'STORE-108',
-        storeName: 'Ø¨ÙˆÙÙŠÙ‡ Ø§Ù„Ø´Ø±ÙˆÙ‚',
+        storeName: 'بوفيه الشروق',
         joinedAt: '2026-05-12',
         activatedAt: '2026-05-18',
         activationStatus: 'pending_review',
@@ -1011,16 +1011,16 @@ const FIELD_COMMISSION_STATEMENTS: readonly WltDshFieldCommissionStatement[] = [
         commissionMinorUnits: 350000,
         paidMinorUnits: 0,
         remainingMinorUnits: 350000,
-        holdReason: 'Ù‚ÙŠØ¯ Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø³ØªÙ†Ø¯Ø§Øª Ø§Ù„ØªÙØ¹ÙŠÙ„ Ù„Ù„Ø£Ù‡Ù„ÙŠØ©',
+        holdReason: 'قيد مراجعة مستندات التفعيل للأهلية',
         settlementStatus: 'held',
         evidenceRef: 'EVID-FLD-108',
         sourceOrderRefs: ['ORD-2026-FLD2'],
       },
       {
         storeId: 'STORE-110',
-        storeName: 'Ù…Ø®Ø¨Ø² Ø§Ù„Ø²Ø§ÙˆÙŠØ©',
+        storeName: 'مخبز الزاوية',
         joinedAt: '2026-05-20',
-        activatedAt: 'â€”',
+        activatedAt: '—',
         activationStatus: 'rejected',
         qualifiedOrderCount: 0,
         qualifiedOrderValueMinorUnits: 0,
@@ -1028,7 +1028,7 @@ const FIELD_COMMISSION_STATEMENTS: readonly WltDshFieldCommissionStatement[] = [
         commissionMinorUnits: 200000,
         paidMinorUnits: 0,
         remainingMinorUnits: 200000,
-        holdReason: 'Ø§Ù„Ù…ØªØ¬Ø± Ù„Ù… ÙŠÙƒÙ…Ù„ Ø´Ø±ÙˆØ· Ø§Ù„ØªÙØ¹ÙŠÙ„ Ø®Ù„Ø§Ù„ Ø§Ù„Ù…Ù‡Ù„Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø©',
+        holdReason: 'المتجر لم يكمل شروط التفعيل خلال المهلة المحددة',
         settlementStatus: 'disputed',
         evidenceRef: 'EVID-FLD-110',
         sourceOrderRefs: [],

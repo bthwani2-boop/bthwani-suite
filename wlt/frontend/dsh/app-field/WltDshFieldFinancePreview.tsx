@@ -60,18 +60,18 @@ function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) 
   return (
     <Box gap={3} paddingVertical={2}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-        Ù…Ù„Ø®Øµ Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+        ملخص العمولات المالية
       </Text>
       <KeyValueList
         dense
         items={[
-          { label: 'Ø¹Ù…ÙˆÙ„Ø§Øª Ù…Ø¹ØªÙ…Ø¯Ø©', value: snapshot.totalCommissionLabel, tone: 'success' },
-          { label: 'Ø¹Ù…ÙˆÙ„Ø§Øª Ù…Ø¹Ù„Ù‚Ø©', value: snapshot.pendingCommissionsLabel, tone: 'warning' },
-          { label: 'Ø¹Ù…ÙˆÙ„Ø§Øª Ù…Ø±ÙÙˆØ¶Ø©', value: snapshot.rejectedCommissionsLabel, tone: 'error' },
-          { label: 'Ø§Ù„Ù…ØªØ§Ø¬Ø± Ø§Ù„Ù…Ø¤Ù‡Ù„Ø©', value: String(snapshot.eligibleFilesCount), tone: 'default' as const },
-          { label: 'Ø¢Ø®Ø± ØµØ±Ù', value: snapshot.lastPayoutLabel, tone: 'info' },
-          { label: 'ØªØ§Ø±ÙŠØ® Ø¢Ø®Ø± ØµØ±Ù', value: snapshot.lastPayoutDate, tone: 'default' as const },
-          { label: 'Ù…ÙˆØ¹Ø¯ Ø§Ù„ØµØ±Ù Ø§Ù„Ù‚Ø§Ø¯Ù…', value: snapshot.nextPayoutDate, tone: 'default' as const },
+          { label: 'عمولات معتمدة', value: snapshot.totalCommissionLabel, tone: 'success' },
+          { label: 'عمولات معلقة', value: snapshot.pendingCommissionsLabel, tone: 'warning' },
+          { label: 'عمولات مرفوضة', value: snapshot.rejectedCommissionsLabel, tone: 'error' },
+          { label: 'المتاجر المؤهلة', value: String(snapshot.eligibleFilesCount), tone: 'default' as const },
+          { label: 'آخر صرف', value: snapshot.lastPayoutLabel, tone: 'info' },
+          { label: 'تاريخ آخر صرف', value: snapshot.lastPayoutDate, tone: 'default' as const },
+          { label: 'موعد الصرف القادم', value: snapshot.nextPayoutDate, tone: 'default' as const },
         ]}
       />
     </Box>
@@ -101,14 +101,14 @@ export function WltDshFieldFinancePreview({
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
         variant="surface"
-        title="Ù…Ø§Ù„ÙŠØ© Ø§Ù„Ù…ÙŠØ¯Ø§Ù†ÙŠ"
+        title="مالية الميداني"
         trailingAction={
           onBack
             ? {
                 id: 'back',
                 icon: <Icon name="arrow-back" size={24} tone="brand" />,
                 mirrorInRtl: true,
-                accessibilityLabel: 'Ø±Ø¬ÙˆØ¹',
+                accessibilityLabel: 'رجوع',
                 onPress: onBack,
               }
             : undefined
@@ -121,7 +121,7 @@ export function WltDshFieldFinancePreview({
           {commissionRecords.length > 0 && (
             <Box gap={3} paddingVertical={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-                Ø¹Ù…ÙˆÙ„Ø§Øª Ø§Ù„Ø§Ø³ØªÙ‚Ø·Ø§Ø¨ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø©
+                عمولات الاستقطاب المعتمدة
               </Text>
               <Box gap={0}>
                 {commissionRecords.map((r) => <RecordRow key={r.id} record={r} />)}
@@ -132,15 +132,15 @@ export function WltDshFieldFinancePreview({
           {pendingRecords.length > 0 && (
             <Box gap={3} paddingVertical={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-                Ø¹Ù…ÙˆÙ„Ø§Øª Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©
+                عمولات قيد المراجعة
               </Text>
               <Box gap={0}>
                 {pendingRecords.map((r) => <RecordRow key={r.id} record={r} />)}
               </Box>
               <StateView
                 kind="warning"
-                title="ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯"
-                description="Ù‡Ø°Ù‡ Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ù…ØªØ§Ø¬Ø± Ù„Ù… ÙŠÙƒØªÙ…Ù„ Ø§Ø¹ØªÙ…Ø§Ø¯Ù‡Ø§ Ø¨Ø¹Ø¯. Ø³ØªÙØ­ØªØ³Ø¨ Ø¹Ù†Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯."
+                title="في انتظار الاعتماد"
+                description="هذه العمولات مرتبطة بمتاجر لم يكتمل اعتمادها بعد. ستُحتسب عند إتمام الاعتماد."
               />
             </Box>
           )}
@@ -148,7 +148,7 @@ export function WltDshFieldFinancePreview({
           {rejectedRecords.length > 0 && (
             <Box gap={3} paddingVertical={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-                Ø¹Ù…ÙˆÙ„Ø§Øª Ù…Ø±ÙÙˆØ¶Ø© / Ù…ÙˆÙ‚ÙˆÙØ©
+                عمولات مرفوضة / موقوفة
               </Text>
               <Box gap={0}>
                 {rejectedRecords.map((r) => <RecordRow key={r.id} record={r} />)}
@@ -159,7 +159,7 @@ export function WltDshFieldFinancePreview({
           {payoutRecords.length > 0 && (
             <Box gap={3} paddingVertical={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-                Ø³Ø¬Ù„ Ø§Ù„ØµØ±Ù
+                سجل الصرف
               </Text>
               <Box gap={0}>
                 {payoutRecords.map((r) => <RecordRow key={r.id} record={r} />)}
@@ -171,12 +171,12 @@ export function WltDshFieldFinancePreview({
 
           <Box gap={2} paddingVertical={2}>
             <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-              Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+              الإجراءات المالية
             </Text>
             <StateView
               kind="info"
-              title="Ø§Ù„ØµØ±Ù ÙŠØªØ·Ù„Ø¨ Ø§ÙƒØªÙ…Ø§Ù„ Ø§Ù„Ø±Ø¨Ø·"
-              description="ÙŠÙ…ÙƒÙ† Ù…ØªØ§Ø¨Ø¹Ø© Ø­Ø§Ù„Ø© Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª Ù‡Ù†Ø§. Ø§Ù„ØµØ±Ù Ø§Ù„ÙØ¹Ù„ÙŠ ÙŠØªÙ… ÙÙŠ Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ©."
+              title="الصرف يتطلب اكتمال الربط"
+              description="يمكن متابعة حالة العمولات هنا. الصرف الفعلي يتم في موعد الدورة المالية."
             />
           </Box>
         </Box>

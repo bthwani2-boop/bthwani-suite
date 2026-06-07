@@ -116,10 +116,10 @@ function resolveCheckoutAuthContext(
 }
 
 const CLIENT_BOTTOM_NAV_ITEMS = [
-  { id: 'favorites', label: 'Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©', icon: 'home-outline', activeIcon: 'home' },
-  { id: 'orders', label: 'Ø·Ù„Ø¨Ø§ØªÙŠ', icon: 'receipt-outline', activeIcon: 'receipt' },
-  { id: 'wallet', label: 'Ø§Ù„Ù…Ø­ÙØ¸Ø©', icon: 'wallet-outline', activeIcon: 'wallet' },
-  { id: 'profile', label: 'Ø­Ø³Ø§Ø¨ÙŠ', icon: 'person-outline', activeIcon: 'person' },
+  { id: 'favorites', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
+  { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
+  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+  { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
 ] as const;
 
 export function DshClientSurface(props: DshClientSurfaceProps) {
@@ -403,12 +403,12 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       fulfillmentMode: order.fulfillmentMode ?? 'bthwani_delivery',
       pickupAddress: order.pickupAddress || matchedStore.name,
       dropoffAddress: order.dropoffAddress || '',
-      note: order.note || 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª',
+      note: order.note || 'لا توجد ملاحظات',
     }));
     setSelectedFulfillmentMode(order.fulfillmentMode ?? 'bthwani_delivery');
 
     // 6. Set reorder alert message to notify user
-    setReorderAlertMessage('ØªÙ†Ø¨ÙŠÙ‡: ØªÙ… Ù†Ø³Ø® Ø§Ù„Ø³Ù„Ø© Ù…Ù† Ø·Ù„Ø¨Ùƒ Ø§Ù„Ø³Ø§Ø¨Ù‚ ÙˆØªØ­Ø¯ÙŠØ« Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ÙˆÙ…Ø·Ø§Ø¨Ù‚ØªÙ‡Ø§ Ù…Ø¨Ø§Ø´Ø±Ø© Ù…Ø¹ Ø§Ù„Ù…ØªØ¬Ø± Ø¨Ù†Ø¬Ø§Ø­.');
+    setReorderAlertMessage('تنبيه: تم نسخ السلة من طلبك السابق وتحديث الأسعار ومطابقتها مباشرة مع المتجر بنجاح.');
 
     // 7. Route to cart-get
     setRoute('cart-get');
@@ -446,16 +446,16 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           id: liveOrder.id,
           title: activeStore.name,
           subtitle: activeStore.subtitle || activeStore.name,
-          statusLabel: 'Ù…Ø¨Ø§Ø´Ø±',
-          meta: `Ø§Ù„ØªÙˆØµÙŠÙ„ Â· ${totalPrice} Ø±.ÙŠ`,
+          statusLabel: 'مباشر',
+          meta: `التوصيل Â· ${totalPrice} ر.ي`,
           clientState: hostClientStates.trackingActive,
           fulfillmentMode: (payload?.fulfillmentMode ?? selectedFulfillmentMode) as DshFulfillmentDeliveryMode,
           pickupAddress: activeStore.name,
           dropoffAddress: payload?.orderDraft?.dropoffAddress || '',
-          note: payload?.orderDraft?.note || 'ØªÙ… Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡ Ø¨Ø±Ù…Ø¬ÙŠØ§Ù‹',
+          note: payload?.orderDraft?.note || 'تم الإنشاء برمجياً',
           orderNumber: liveOrder.id.replace('ord-', '').slice(0, 8),
-          summary: cartItems.map(item => `${item.qty}x ${item.title}`).join(' ØŒ '),
-          total: `${totalPrice} Ø±.ÙŠ`,
+          summary: cartItems.map(item => `${item.qty}x ${item.title}`).join(' ، '),
+          total: `${totalPrice} ر.ي`,
         };
 
         setOrdersListState((current) => [nextOrderSummary, ...current]);
@@ -638,9 +638,9 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       subtitle: s.address || s.subtitle || '',
       statusLabel: s.status_label || s.statusLabel || '',
       etaLabel: s.delivery_label || s.meta || s.etaLabel || '',
-      deliveryFeeLabel: s.deliveryFeeLabel ?? 'Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„ 12 Ø±.ÙŠ',
+      deliveryFeeLabel: s.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
       followersCount: s.followerCount || 0,
-      priceMatchLabel: s.priceMatchLabel ?? 'Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ù„Ù…Ø·Ø¹Ù…',
+      priceMatchLabel: s.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
       imageUri: s.image_url || s.imageUri || '',
       deliveryLabel: s.delivery_label || s.deliveryLabel || '',
       serviceLabel: s.service_label || s.serviceLabel || '',
@@ -731,18 +731,18 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     {
       id: 'home-recent-order-1',
       storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001',
-      title: 'Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù†Ø´Ø·',
-      subtitle: clientVisibleHomeStores[0]?.name ?? 'Ù…Ø·Ø¹Ù… Ø§Ù„Ù‚Ù„Ø¹Ø©',
-      meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 ÙƒÙ…'} Â· ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'ØªÙˆØµÙŠÙ„ Ù…Ø¬Ø§Ù†ÙŠ'}`,
-      statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'Ù…Ø¨Ø§Ø´Ø±' : 'Ù…ØºÙ„Ù‚',
+      title: 'الطلب النشط',
+      subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة',
+      meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} Â· ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
+      statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
     },
     {
       id: 'home-recent-order-2',
       storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002',
-      title: 'Ø¢Ø®Ø± Ø·Ù„Ø¨',
-      subtitle: clientVisibleHomeStores[1]?.name ?? 'Ù…Ø·Ø§Ø¹Ù… Ø§Ù„Ø£Ø±Ø¶ Ø§Ù„Ø®Ø¶Ø±Ø§Ø¡',
-      meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 ÙƒÙ…'} Â· ${clientVisibleHomeStores[1]?.serviceLabel ?? 'ØªÙˆØµÙŠÙ„ Ø¨Ø±Ùˆ'}`,
-      statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'Ù…Ø¨Ø§Ø´Ø±' : 'Ù…ØºÙ„Ù‚',
+      title: 'آخر طلب',
+      subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء',
+      meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} Â· ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`,
+      statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
     },
   ], [clientVisibleHomeStores]);
 
@@ -865,7 +865,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   if (missing.length > 0) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: colorPalette.brandStrong, fontSize: 18, fontWeight: '700', marginBottom: 12 }}>Ù…ÙƒÙˆÙ‘Ù†Ø§Øª Ù…ÙÙ‚ÙˆØ¯Ø©</Text>
+        <Text style={{ color: colorPalette.brandStrong, fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
         <Text style={{ color: colorPalette.brandStrong }}>{missing.join(', ')}</Text>
       </View>
     );
@@ -889,21 +889,21 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
     const cartTotal = cartSubtotal + deliveryFeeNum;
 
-    const formattedBalance = walletPreview.balance !== null ? `${walletPreview.balance} Ø±.ÙŠ` : '...';
+    const formattedBalance = walletPreview.balance !== null ? `${walletPreview.balance} ر.ي` : '...';
 
     const paymentMethods = [
-      { id: 'wallet', label: `Ø§Ù„Ù…Ø­ÙØ¸Ø© (Ø§Ù„Ø±ØµÙŠØ¯: ${formattedBalance})`, icon: 'wallet-outline', isSelected: selectedPaymentMethod === 'wallet' },
-      { id: 'cod', label: 'Ø§Ù„Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… (COD)', icon: 'cash-outline', isSelected: selectedPaymentMethod === 'cod' },
+      { id: 'wallet', label: `المحفظة (الرصيد: ${formattedBalance})`, icon: 'wallet-outline', isSelected: selectedPaymentMethod === 'wallet' },
+      { id: 'cod', label: 'الدفع عند الاستلام (COD)', icon: 'cash-outline', isSelected: selectedPaymentMethod === 'cod' },
     ];
 
     return (
       <DshCheckoutIntentScreen
         state={checkoutState}
-        address={createOrderValues.dropoffAddress || 'Ù…Ø³Ù‚Ø·ØŒ Ø§Ù„Ø®ÙˆÙŠØ±ØŒ Ø´Ø§Ø±Ø¹ Ø§Ù„Ù…Ù‡Ø§ØŒ Ø¨Ù†Ø§ÙŠØ© Ø±Ù‚Ù… 123'}
-        subtotal={`${cartSubtotal} Ø±.ÙŠ`}
-        deliveryFee={`${deliveryFeeNum} Ø±.ÙŠ`}
-        total={`${cartTotal} Ø±.ÙŠ`}
-        eta={selectedFulfillmentMode === 'pickup' ? '15 - 20 Ø¯Ù‚ÙŠÙ‚Ø©' : '30 - 45 Ø¯Ù‚ÙŠÙ‚Ø©'}
+        address={createOrderValues.dropoffAddress || 'مسقط، الخوير، شارع المها، بناية رقم 123'}
+        subtotal={`${cartSubtotal} ر.ي`}
+        deliveryFee={`${deliveryFeeNum} ر.ي`}
+        total={`${cartTotal} ر.ي`}
+        eta={selectedFulfillmentMode === 'pickup' ? '15 - 20 دقيقة' : '30 - 45 دقيقة'}
         paymentMethods={paymentMethods}
         paymentErrorMessage={paymentErrorMessage}
         onBack={() => setRoute('cart-get')}
@@ -936,7 +936,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           title: item.title,
           subtitle: item.subtitle,
           meta: item.routeTarget,
-          badgeLabel: item.family === 'subscription' ? 'Ø§Ø´ØªØ±Ø§Ùƒ' : item.family === 'promotion' ? 'Ø¨Ø±ÙˆÙ…Ùˆ' : item.family === 'shorts' ? 'Ø´ÙˆØ±ØªØ§Øª' : 'Ø­Ù…Ù„Ø©',
+          badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
         onAppearanceModeChange={setAppearanceMode}
         onOpenOrders={() => setRoute('orders-list')}
@@ -1027,17 +1027,17 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           name: activeStore.name,
           subtitle: activeStore.subtitle,
           statusLabel: activeStore.statusLabel,
-          ratingLabel: '4.8 / 5 Ø¬ÙˆØ¯Ø© Ø§Ù„Ù…ØªØ¬Ø±',
+          ratingLabel: '4.8 / 5 جودة المتجر',
         }}
         items={cartItems}
         activeOrder={{
           id: cartItems[0]?.id ?? 'cart-preview',
-          title: cartItems[0] ? `ØªØªØ¶Ù…Ù† Ø§Ù„Ø³Ù„Ø© ${cartItems[0].title}` : 'Ø§Ù„Ø³Ù„Ø© Ø¬Ø§Ù‡Ø²Ø© Ù„Ù„Ø¯ÙØ¹',
+          title: cartItems[0] ? `تتضمن السلة ${cartItems[0].title}` : 'السلة جاهزة للدفع',
           subtitle: cartItems[0]
-            ? `Ø¹Ù†Ø§ØµØ± Ù…Ù† ${cartItems[0].storeName}`
-            : `Ø¹Ù†Ø§ØµØ± Ù…Ù† ${activeStore.name}`,
-          meta: cartItems[0]?.priceLabel ?? 'Ø±Ø§Ø¬Ø¹ Ø§Ù„Ø¹Ù†Ø§ØµØ± ÙˆØªØ§Ø¨Ø¹',
-          statusLabel: 'Ø¬Ø§Ù‡Ø²',
+            ? `عناصر من ${cartItems[0].storeName}`
+            : `عناصر من ${activeStore.name}`,
+          meta: cartItems[0]?.priceLabel ?? 'راجع العناصر وتابع',
+          statusLabel: 'جاهز',
         }}
         statusTitle={cartClientStateMeta.label}
         statusDescription={cartClientStateMeta.description}
@@ -1180,19 +1180,19 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       const order = liveOrderDetails.order;
       if (order.status === 'CREATED') {
         liveClientState = hostClientStates.orderCreated;
-        liveStatusLabel = 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©';
+        liveStatusLabel = 'قيد المراجعة';
       } else if (order.status === 'ACCEPTED') {
         liveClientState = hostClientStates.orderConfirmed;
-        liveStatusLabel = 'ØªÙ… Ø§Ù„Ù‚Ø¨ÙˆÙ„';
+        liveStatusLabel = 'تم القبول';
       } else if (order.status === 'READY_FOR_PICKUP') {
         liveClientState = hostClientStates.trackingActive;
-        liveStatusLabel = 'Ø¬Ø§Ù‡Ø² Ù„Ù„Ø§Ø³ØªÙ„Ø§Ù…';
+        liveStatusLabel = 'جاهز للاستلام';
       } else if (order.status === 'DELIVERED') {
         liveClientState = hostClientStates.delivered;
-        liveStatusLabel = 'ØªÙ… Ø§Ù„ØªÙˆØµÙŠÙ„';
+        liveStatusLabel = 'تم التوصيل';
       } else if (order.status === 'CANCELLED') {
         liveClientState = hostClientStates.cancelled;
-        liveStatusLabel = 'ØªÙ… Ø§Ù„Ø¥Ù„ØºØ§Ø¡';
+        liveStatusLabel = 'تم الإلغاء';
       }
     }
 
@@ -1234,7 +1234,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     <BottomNavBar
       activeId={bottomNavActiveId}
       direction="rtl"
-      launcherLabel="Ø§Ù„Ø®Ø¯Ù…Ø§Øª"
+      launcherLabel="الخدمات"
       launcherIcon="grid"
       onLauncherPress={handleServiceLauncherPress}
       onSelect={handleClientBottomNavSelect}

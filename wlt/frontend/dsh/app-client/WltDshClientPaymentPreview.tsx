@@ -60,7 +60,7 @@ function PaymentOptionCard({
           <Badge label={availabilityLabel} tone={availabilityTone} />
           {!isSelected && (
             <Button
-              label="Ø§Ø®ØªÙŠØ§Ø±"
+              label="اختيار"
               size="sm"
               tone={isAvailable ? 'primary' : 'ghost'}
               fullWidth={false}
@@ -68,7 +68,7 @@ function PaymentOptionCard({
             />
           )}
           {isSelected && (
-            <Badge label="Ù…Ø­Ø¯Ø¯" tone="brand" />
+            <Badge label="محدد" tone="brand" />
           )}
         </View>
       </View>
@@ -89,33 +89,33 @@ function WalletBalancePanel({
 }) {
   const items = walletLinked
     ? [
-        { label: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ù…ØªØ§Ø­', value: formatWltYer(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' as const },
-        { label: 'Ù…Ø­Ø¬ÙˆØ²', value: heldMinorUnits > 0 ? formatWltYer(heldMinorUnits) : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯', tone: heldMinorUnits > 0 ? 'warning' : 'default' as const },
-        { label: 'Ù…Ø¹Ù„Ù‚', value: pendingMinorUnits > 0 ? formatWltYer(pendingMinorUnits) : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯', tone: 'default' as const },
-        { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: 'Ù…Ø±ØªØ¨Ø·Ø©', tone: 'success' as const },
+        { label: 'الرصيد المتاح', value: formatWltYer(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' as const },
+        { label: 'محجوز', value: heldMinorUnits > 0 ? formatWltYer(heldMinorUnits) : 'لا يوجد', tone: heldMinorUnits > 0 ? 'warning' : 'default' as const },
+        { label: 'معلق', value: pendingMinorUnits > 0 ? formatWltYer(pendingMinorUnits) : 'لا يوجد', tone: 'default' as const },
+        { label: 'حالة المحفظة', value: 'مرتبطة', tone: 'success' as const },
       ]
     : [
-        { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: 'ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø©', tone: 'warning' as const },
+        { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'warning' as const },
       ];
 
   return (
     <Surface tone="raised" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-        Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø©
+        رصيد المحفظة
       </Text>
       <KeyValueList dense items={items} />
       {!walletLinked && (
         <StateView
           kind="warning"
-          title="Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø©"
-          description="Ø§Ø±Ø¨Ø· Ù…Ø­ÙØ¸ØªÙƒ Ù„ØªÙØ¹ÙŠÙ„ Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ø¯ÙØ¹ Ù…Ù† Ø§Ù„Ø±ØµÙŠØ¯."
+          title="المحفظة غير مرتبطة"
+          description="اربط محفظتك لتفعيل خيارات الدفع من الرصيد."
         />
       )}
       {walletLinked && walletBalanceMinorUnits === 0 && (
         <StateView
           kind="warning"
-          title="Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© ØµÙØ±"
-          description="Ø§Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© Ù„ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø¯ÙØ¹ Ù…Ù†Ù‡Ø§."
+          title="رصيد المحفظة صفر"
+          description="اشحن المحفظة لتفعيل الدفع منها."
         />
       )}
     </Surface>
@@ -140,23 +140,23 @@ function CheckoutSummaryPanel({
   walletBalanceAfterMinorUnits: number;
 }) {
   const items = [
-    { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨', value: formatWltYer(orderTotalMinorUnits), tone: 'info' as const },
-    ...(walletAmountMinorUnits > 0 ? [{ label: 'Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: formatWltYer(walletAmountMinorUnits), tone: 'success' as const }] : []),
-    ...(codAmountMinorUnits > 0 ? [{ label: 'Ù†Ù‚Ø¯Ø§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: formatWltYer(codAmountMinorUnits), tone: 'brand' as const }] : []),
-    ...(isSplitPayment ? [{ label: 'Ù†ÙˆØ¹ Ø§Ù„Ø¯ÙØ¹', value: 'Ù…Ø®ØªÙ„Ø· (Ù…Ø­ÙØ¸Ø© + ÙƒØ§Ø´)', tone: 'info' as const }] : []),
-    ...(walletAmountMinorUnits > 0 ? [{ label: 'Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¨Ø¹Ø¯ Ø§Ù„Ø¯ÙØ¹', value: formatWltYer(walletBalanceAfterMinorUnits), tone: walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger' as const }] : []),
+    { label: 'إجمالي الطلب', value: formatWltYer(orderTotalMinorUnits), tone: 'info' as const },
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'من المحفظة', value: formatWltYer(walletAmountMinorUnits), tone: 'success' as const }] : []),
+    ...(codAmountMinorUnits > 0 ? [{ label: 'نقداً عند الاستلام', value: formatWltYer(codAmountMinorUnits), tone: 'brand' as const }] : []),
+    ...(isSplitPayment ? [{ label: 'نوع الدفع', value: 'مختلط (محفظة + كاش)', tone: 'info' as const }] : []),
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'رصيد المحفظة بعد الدفع', value: formatWltYer(walletBalanceAfterMinorUnits), tone: walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger' as const }] : []),
   ];
 
   return (
     <Surface tone="inset" padding={3} gap={3}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-        Ù…Ù„Ø®Øµ Ø§Ù„Ø¯ÙØ¹
+        ملخص الدفع
       </Text>
       <KeyValueList dense items={items} />
       {blockingLabel ? (
         <StateView
           kind="warning"
-          title="ÙŠØªØ·Ù„Ø¨ Ø¥Ø¬Ø±Ø§Ø¡"
+          title="يتطلب إجراء"
           description={blockingLabel}
         />
       ) : (
@@ -213,7 +213,7 @@ export function WltDshClientPaymentPreview({
 
       <Surface tone="raised" padding={3} gap={3}>
         <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
-          Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…ØªØ§Ø­Ø©
+          طرق الدفع المتاحة
         </Text>
         <Box gap={2}>
           {options.map((opt) => (

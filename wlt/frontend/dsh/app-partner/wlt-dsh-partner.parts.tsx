@@ -69,35 +69,35 @@ function resolveStateCopy(state: Exclude<PartnerDshWalletViewState, 'ready' | 'n
   if (state === 'loading') {
     return {
       stateId: 'loading',
-      title: 'Ø¬Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ©',
-      description: 'Ù†Ø±ØªØ¨ Ø§Ù„Ø±ØµÙŠØ¯ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ§Øª ÙˆØ¢Ø®Ø± Ø§Ù„Ø­Ø±ÙƒØ§Øª Ø¯Ø§Ø®Ù„ Ù…Ø³Ø§Ø­Ø© ÙˆØ§Ø­Ø¯Ø© Ù„Ù„Ø´Ø±ÙŠÙƒ.',
-      actionLabel: 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©',
+      title: 'جار تجهيز مساحة المالية',
+      description: 'نرتب الرصيد والتسويات وآخر الحركات داخل مساحة واحدة للشريك.',
+      actionLabel: 'إعادة المحاولة',
     };
   }
 
   if (state === 'empty') {
     return {
       stateId: 'empty',
-      title: 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ø§Ù„ÙŠØ© Ø§Ù„Ø¢Ù†',
-      description: 'Ø³ØªØ¸Ù‡Ø± Ù‡Ù†Ø§ Ø­Ø±ÙƒØ© Ø§Ù„Ø±ØµÙŠØ¯ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ§Øª ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø¹Ù†Ø¯ ØªÙˆÙØ±Ù‡Ø§ Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØ±Ø¹.',
-      actionLabel: 'Ø§Ù„Ø¹ÙˆØ¯Ø©',
+      title: 'لا توجد بيانات مالية الآن',
+      description: 'ستظهر هنا حركة الرصيد والتسويات والحسابات عند توفرها لهذا الفرع.',
+      actionLabel: 'العودة',
     };
   }
 
   if (state === 'offline') {
     return {
       stateId: 'offline',
-      title: 'Ø§Ù„Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ© ØºÙŠØ± Ù…ØªØµÙ„Ø©',
-      description: 'Ø£Ø¹Ø¯ Ø§Ù„Ø§ØªØµØ§Ù„ Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø±ØµÙŠØ¯ ÙˆØ§Ù„ØªØ­ØµÙŠÙ„ ÙˆØ¢Ø®Ø± Ø§Ù„Ø­Ø±ÙƒØ§Øª Ø¨Ø¯ÙˆÙ† Ù…ØºØ§Ø¯Ø±Ø© Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø´Ø±ÙŠÙƒ.',
-      actionLabel: 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©',
+      title: 'المساحة المالية غير متصلة',
+      description: 'أعد الاتصال لمتابعة الرصيد والتحصيل وآخر الحركات بدون مغادرة مساحة الشريك.',
+      actionLabel: 'إعادة المحاولة',
     };
   }
 
   return {
     stateId: 'recoverableError',
-    title: 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ©',
-    description: 'Ø£Ø¹Ø¯ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù„Ø§Ø³ØªØ±Ø¬Ø§Ø¹ Ø§Ù„Ù…Ù„Ø®Øµ ÙˆØ§Ù„Ø­Ø±ÙƒØ§Øª Ù…Ù† Ù†ÙØ³ Ø§Ù„Ù…Ø³Ø§Ø±.',
-    actionLabel: 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©',
+    title: 'تعذر تحميل الصفحة المالية',
+    description: 'أعد المحاولة لاسترجاع الملخص والحركات من نفس المسار.',
+    actionLabel: 'إعادة المحاولة',
   };
 }
 
@@ -113,8 +113,8 @@ function resolveToneColor(
 }
 
 function resolveBranchShortLabel(branchLabel?: string) {
-  if (!branchLabel) return 'Ø§Ù„ÙØ±Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠ';
-  const segments = branchLabel.split('ØŒ').map((s) => s.trim()).filter(Boolean);
+  if (!branchLabel) return 'الفرع الحالي';
+  const segments = branchLabel.split('،').map((s) => s.trim()).filter(Boolean);
   return segments.at(-1) ?? branchLabel;
 }
 
@@ -148,9 +148,9 @@ function resolveServiceModeEnabled(
 
 function formatApplicability(app: WltDshOrderLineItemApplicability) {
   if (app.applies) {
-    if (app.label.endsWith('â€” WLT')) return 'ØªÙØ­Ø¯Ø¯ Ø¨ÙˆØ§Ø³Ø·Ø© WLT runtime';
-    if (app.label.endsWith('â€” Ø­Ø³Ø¨ Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ù…ØªØ¬Ø±')) return 'Ø­Ø³Ø¨ Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ù…ØªØ¬Ø±';
-    if (app.label.endsWith('â€” Ø­Ø³Ø¨ Ø§ØªÙØ§Ù‚ Ø§Ù„Ù…ØªØ¬Ø±')) return 'Ø­Ø³Ø¨ Ø§ØªÙØ§Ù‚ Ø§Ù„Ù…ØªØ¬Ø±';
+    if (app.label.endsWith('— WLT')) return 'تُحدد بواسطة WLT runtime';
+    if (app.label.endsWith('— حسب سياسة المتجر')) return 'حسب سياسة المتجر';
+    if (app.label.endsWith('— حسب اتفاق المتجر')) return 'حسب اتفاق المتجر';
     return app.label;
   }
   return app.reason;
@@ -160,7 +160,7 @@ function formatApplicability(app: WltDshOrderLineItemApplicability) {
 
 
 
-// â”€â”€â”€ Financial stream card â€” Ø¨Ø·Ø§Ù‚Ø© Ø­Ø±ÙƒØ© Ù…Ø§Ù„ÙŠØ© Ù…Ø¹ ØªÙØ§ØµÙŠÙ„ inline â”€â”€
+// ─── Financial stream card — بطاقة حركة مالية مع تفاصيل inline ──
 function FinancialStreamCard({
   item,
   isExpanded,
@@ -174,27 +174,27 @@ function FinancialStreamCard({
   const { direction } = useDirection();
 
   const detailItems = [
-    { label: 'Ù†ÙˆØ¹ Ø§Ù„Ø­Ø±ÙƒØ©', value: item.kindLabel ?? item.kind ?? 'â€”' },
-    { label: 'Ø§Ù„Ù…ØµØ¯Ø±', value: item.sourceOrderLabel ?? item.settlementCycleLabel ?? 'â€”' },
-    { label: 'Ø£Ø«Ø± Ø§Ù„ØªØ³ÙˆÙŠØ©', value: item.includedInNetSettlementLabel ?? 'â€”' },
+    { label: 'نوع الحركة', value: item.kindLabel ?? item.kind ?? '—' },
+    { label: 'المصدر', value: item.sourceOrderLabel ?? item.settlementCycleLabel ?? '—' },
+    { label: 'أثر التسوية', value: item.includedInNetSettlementLabel ?? '—' },
     ...(item.sourceTruthLabel
-      ? [{ label: 'Ù…ØµØ¯Ø± Ø§Ù„Ø­Ù‚ÙŠÙ‚Ø©', value: `${item.sourceTruthLabel} / ${item.runtimeBindingLabel ?? 'ØºÙŠØ± Ù…Ø±Ø¨ÙˆØ· Ø¨Ø¹Ø¯'}` }]
+      ? [{ label: 'مصدر الحقيقة', value: `${item.sourceTruthLabel} / ${item.runtimeBindingLabel ?? 'غير مربوط بعد'}` }]
       : []),
-    { label: 'Ø§Ù„Ø³ÙŠØ§Ø³Ø©', value: item.policyLabel ?? 'â€”' },
+    { label: 'السياسة', value: item.policyLabel ?? '—' },
     ...(item.isStoreCourierCompensation
-      ? [{ label: 'Ù…Ù„Ø§Ø­Ø¸Ø©', value: 'ØªØ¹ÙˆÙŠØ¶ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± Ø¯Ø§Ø®Ù„ÙŠ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±ØŒ ÙˆÙ„ÙŠØ³ ØªØ³ÙˆÙŠØ© ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ.' }]
+      ? [{ label: 'ملاحظة', value: 'تعويض موصل المتجر داخلي من المتجر، وليس تسوية كابتن بثواني.' }]
       : []),
     ...(item.isCaptainPayout
-      ? [{ label: 'Ù…Ù„Ø§Ø­Ø¸Ø©', value: 'Ù‡Ø°Ø§ Ø§Ù„Ø¨Ù†Ø¯ ÙŠØ®Øµ ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ ÙÙ‚Ø· â€” Ù„Ø§ ÙŠØªØ¹Ù„Ù‚ Ø¨Ø§Ù„Ø´Ø±ÙŠÙƒ Ù…Ø¨Ø§Ø´Ø±Ø©.' }]
+      ? [{ label: 'ملاحظة', value: 'هذا البند يخص كابتن بثواني فقط — لا يتعلق بالشريك مباشرة.' }]
       : []),
-    { label: 'Ø§Ù„Ø­Ø§Ù„Ø©', value: item.statusLabel ?? 'Ù…ÙƒØªÙ…Ù„' },
-    { label: 'Ø±Ù‚Ù… Ø§Ù„Ù…Ø±Ø¬Ø¹ÙŠØ©', value: item.id },
-    { label: 'Ø§Ù„ØªÙˆÙ‚ÙŠØª', value: item.timeLabel },
-  ].filter((d) => d.value && d.value !== 'â€”');
+    { label: 'الحالة', value: item.statusLabel ?? 'مكتمل' },
+    { label: 'رقم المرجعية', value: item.id },
+    { label: 'التوقيت', value: item.timeLabel },
+  ].filter((d) => d.value && d.value !== '—');
 
   return (
     <View style={{ overflow: 'hidden' }}>
-      {/* Ø±Ø£Ø³ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© */}
+      {/* رأس البطاقة */}
       <Pressable onPress={onToggle} accessibilityRole="button">
         <View
           style={{
@@ -204,7 +204,7 @@ function FinancialStreamCard({
             gap: 10,
           }}
         >
-          {/* Ø£ÙŠÙ‚ÙˆÙ†Ø© + Ù†Øµ (ÙƒØªÙ„Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„ÙŠÙ…ÙŠÙ† RTL) */}
+          {/* أيقونة + نص (كتلة واحدة على اليمين RTL) */}
           <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, flex: 1 }}>
             <Icon name={item.icon} size={20} tone="brand" />
             <View style={{ flex: 1, gap: 3 }}>
@@ -220,7 +220,7 @@ function FinancialStreamCard({
             </View>
           </View>
 
-          {/* Ø§Ù„Ù…Ø¨Ù„Øº + Ø§Ù„Ø­Ø§Ù„Ø© + chevron (Ø¹Ù„Ù‰ Ø§Ù„ÙŠØ³Ø§Ø± ÙÙŠ RTL) */}
+          {/* المبلغ + الحالة + chevron (على اليسار في RTL) */}
           <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, minWidth: 80 }}>
             <Text
               role="bodyStrong"
@@ -240,7 +240,7 @@ function FinancialStreamCard({
         </View>
       </Pressable>
 
-      {/* Ø§Ù„ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ù†Ø³Ø¯Ù„Ø© Ø¯Ø§Ø®Ù„ Ù†ÙØ³ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© */}
+      {/* التفاصيل المنسدلة داخل نفس البطاقة */}
       {isExpanded ? (
         <Box paddingY={2} gap={2}>
           <Divider />
@@ -256,7 +256,7 @@ function FinancialStreamCard({
   );
 }
 
-// â”€â”€â”€ ØªØ¨ÙˆÙŠØ¨ Ø§Ù„Ù…Ù„Ø®Øµ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── تبويب الملخص ─────────────────────────────────────────────────
 function SummaryTab({
   partnerPreview,
   storeDeliveryPreview,
@@ -286,10 +286,10 @@ function SummaryTab({
             paddingVertical: 6,
           }}
         >
-          {/* Column 1: ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ© */}
+          {/* Column 1: صافي التسوية */}
           <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
             <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-              ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ©
+              صافي التسوية
             </Text>
             <Text role="titleSm" style={{ color: theme.success, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
               {partnerPreview.netSettlementLabel}
@@ -299,10 +299,10 @@ function SummaryTab({
           {/* Divider */}
           <View style={{ width: 1, height: 32, backgroundColor: theme.line }} />
 
-          {/* Column 2: Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª */}
+          {/* Column 2: إجمالي المبيعات */}
           <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
             <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-              Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª
+              إجمالي المبيعات
             </Text>
             <Text role="titleSm" style={{ color: theme.info, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
               {partnerPreview.grossSalesLabel}
@@ -312,10 +312,10 @@ function SummaryTab({
           {/* Divider */}
           <View style={{ width: 1, height: 32, backgroundColor: theme.line }} />
 
-          {/* Column 3: Ø§Ù„ØªØ³ÙˆÙŠØ© Ø§Ù„Ù‚Ø§Ø¯Ù…Ø© */}
+          {/* Column 3: التسوية القادمة */}
           <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
             <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-              Ø§Ù„ØªØ³ÙˆÙŠØ© Ø§Ù„Ù‚Ø§Ø¯Ù…Ø©
+              التسوية القادمة
             </Text>
             <Text role="titleSm" style={{ color: theme.warning, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
               {partnerPreview.nextSettlementLabel}
@@ -324,7 +324,7 @@ function SummaryTab({
         </View>
       </Surface>
 
-      {/* Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ© - Notice Compact */}
+      {/* ملاحظة البيانات التجريبية - Notice Compact */}
       <Surface
         tone="warning"
         padding={2}
@@ -334,15 +334,15 @@ function SummaryTab({
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }}>
           <Icon name="warning" tone="warning" size={14} />
           <Text role="caption" tone="warning" style={{ flex: 1, textAlign: direction === 'rtl' ? 'right' : 'left' }}>
-            Ù…Ø¹Ø§ÙŠÙ†Ø© Ù…Ø§Ù„ÙŠØ© â€” Ù„ÙŠØ³Øª ØªØ³ÙˆÙŠØ© Ù…Ù†ÙØ°Ø©
+            معاينة مالية — ليست تسوية منفذة
           </Text>
         </View>
       </Surface>
 
-      {/* Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ù…Ø¶ØºÙˆØ·Ø© - Ø£Ø²Ø±Ø§Ø± Ø¹Ù…Ù„ÙŠØ© Ø£Ù†ÙŠÙ‚Ø© Ø¨Ø¬Ø§Ù†Ø¨ Ø¨Ø¹Ø¶Ù‡Ø§ */}
+      {/* إجراءات مضغوطة - أزرار عملية أنيقة بجانب بعضها */}
       <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 12, marginTop: 4 }}>
         <Button
-          label="ØªÙ†Ø²ÙŠÙ„ Ù…Ù„Ø®Øµ Ù…Ø§Ù„ÙŠ"
+          label="تنزيل ملخص مالي"
           tone="secondary"
           icon={<Icon name="download-outline" size={16} tone="brand" />}
           size="sm"
@@ -351,7 +351,7 @@ function SummaryTab({
           onPress={() => openAction('report')}
         />
         <Button
-          label="ÙØªØ­ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ù…ÙˆØ³Ø¹Ø©"
+          label="فتح المحفظة الموسعة"
           tone="secondary"
           icon={<Icon name="wallet-outline" size={16} tone="brand" />}
           size="sm"
@@ -364,7 +364,7 @@ function SummaryTab({
   );
 }
 
-// â”€â”€â”€ ØªØ¨ÙˆÙŠØ¨ Ø§Ù„ØªØ³ÙˆÙŠØ© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── تبويب التسوية ────────────────────────────────────────────────
 function CycleTab({
   partnerPreview,
   storeDeliveryPreview,
@@ -377,29 +377,29 @@ function CycleTab({
       <KeyValueList
         dense
         items={[
-          { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª', value: partnerPreview.grossSalesLabel, tone: 'info' },
-          { label: 'Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ©', value: `-${partnerPreview.platformCommissionLabel}`, tone: 'warning' },
-          { label: 'Ø®ØµÙˆÙ…Ø§Øª ÙˆØ§Ø³ØªØ±Ø¯Ø§Ø¯Ø§Øª', value: `-${partnerPreview.deductionsLabel}`, tone: 'warning' },
-          { label: 'Ø±Ø³ÙˆÙ… ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±', value: `+${storeDeliveryPreview.totalFeeLabel}`, tone: 'success' },
-          { label: 'ØªØ¹ÙˆÙŠØ¶ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±', value: `-${storeDeliveryPreview.totalCompensationLabel}`, tone: 'warning' },
-          { label: 'ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ©', value: partnerPreview.netSettlementLabel, tone: 'success' },
+          { label: 'إجمالي المبيعات', value: partnerPreview.grossSalesLabel, tone: 'info' },
+          { label: 'عمولة المنصة', value: `-${partnerPreview.platformCommissionLabel}`, tone: 'warning' },
+          { label: 'خصومات واستردادات', value: `-${partnerPreview.deductionsLabel}`, tone: 'warning' },
+          { label: 'رسوم توصيل المتجر', value: `+${storeDeliveryPreview.totalFeeLabel}`, tone: 'success' },
+          { label: 'تعويض موصل المتجر', value: `-${storeDeliveryPreview.totalCompensationLabel}`, tone: 'warning' },
+          { label: 'صافي التسوية', value: partnerPreview.netSettlementLabel, tone: 'success' },
         ]}
       />
       <Divider />
       <KeyValueList
         dense
         items={[
-          { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©', value: partnerPreview.cycleStatus, tone: 'success' },
-          { label: 'ØªØ§Ø±ÙŠØ® Ø¨Ø¯Ø¡ Ø§Ù„Ø¯ÙˆØ±Ø©', value: partnerPreview.cycleStartDate },
-          { label: 'ØªØ§Ø±ÙŠØ® Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø¯ÙˆØ±Ø©', value: partnerPreview.cycleEndDate },
-          { label: 'Ù…ÙˆØ¹Ø¯ Ø§Ù„ØµØ±Ù Ø§Ù„Ù‚Ø§Ø¯Ù…', value: partnerPreview.nextPayoutDate, tone: 'info' },
+          { label: 'حالة الدورة الحالية', value: partnerPreview.cycleStatus, tone: 'success' },
+          { label: 'تاريخ بدء الدورة', value: partnerPreview.cycleStartDate },
+          { label: 'تاريخ نهاية الدورة', value: partnerPreview.cycleEndDate },
+          { label: 'موعد الصرف القادم', value: partnerPreview.nextPayoutDate, tone: 'info' },
         ]}
       />
     </Box>
   );
 }
 
-// â”€â”€â”€ ØªØ¨ÙˆÙŠØ¨ Ø§Ù„Ø­Ø±ÙƒØ§Øª â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── تبويب الحركات ────────────────────────────────────────────────
 function TransactionsTab({
   visibleTransactions,
   selectedTransactionId,
@@ -414,8 +414,8 @@ function TransactionsTab({
       <Box padding={4}>
         <StateView
           stateId="empty"
-          title="Ù„Ø§ ØªÙˆØ¬Ø¯ Ø­Ø±ÙƒØ§Øª Ù…Ø§Ù„ÙŠØ© Ø¨Ø¹Ø¯"
-          description="Ø¹Ù†Ø¯ ÙˆØµÙˆÙ„ Ø£ÙˆÙ„ ØªØ³ÙˆÙŠØ© Ø£Ùˆ Ø¹Ù…ÙˆÙ„Ø© Ø³ØªØ¸Ù‡Ø± Ù‡Ù†Ø§."
+          title="لا توجد حركات مالية بعد"
+          description="عند وصول أول تسوية أو عمولة ستظهر هنا."
         />
       </Box>
     );
@@ -437,7 +437,7 @@ function TransactionsTab({
   );
 }
 
-// â”€â”€â”€ ØªØ¨ÙˆÙŠØ¨ Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª â€” ÙƒÙ„ mode Ø¨Ø·Ø§Ù‚Ø© Ù…Ø§Ù„ÙŠØ© Ù…Ø³ØªÙ‚Ù„Ø© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── تبويب العمولات — كل mode بطاقة مالية مستقلة ───────────────
 type CommissionModeId = 'pickup' | 'partner_delivery' | 'bthwani_delivery';
 
 function CommissionModeCard({
@@ -469,34 +469,34 @@ function CommissionModeCard({
   const modeDetails = (() => {
     if (id === 'pickup') {
       return {
-        deliveryFeeNote: 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø³ÙˆÙ… ØªÙˆØµÙŠÙ„ â€” Ø§Ø³ØªÙ„Ø§Ù… Ù…Ø¨Ø§Ø´Ø± Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±',
-        courierNote: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…ÙˆØµÙ„',
-        captainNote: 'Ù„Ø§ ÙŠÙ†Ø·Ø¨Ù‚ â€” Ù„Ø§ ÙŠÙˆØ¬Ø¯ ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„ÙˆØ¶Ø¹',
-        netImpact: 'Ø§Ù„Ø´Ø±ÙŠÙƒ ÙŠØ³ØªÙ„Ù… ÙƒØ§Ù…Ù„ Ù‚ÙŠÙ…Ø© Ø§Ù„Ø·Ù„Ø¨ Ù…Ø·Ø±ÙˆØ­Ù‹Ø§ Ù…Ù†Ù‡Ø§ Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ©',
+        deliveryFeeNote: 'لا توجد رسوم توصيل — استلام مباشر من المتجر',
+        courierNote: 'لا يوجد موصل',
+        captainNote: 'لا ينطبق — لا يوجد كابتن بثواني في هذا الوضع',
+        netImpact: 'الشريك يستلم كامل قيمة الطلب مطروحًا منها عمولة المنصة',
         captainPayoutApplies: false,
       };
     }
     if (id === 'partner_delivery') {
       return {
-        deliveryFeeNote: 'Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„: ÙŠØ¯ÙØ¹Ù‡Ø§ Ø§Ù„Ø¹Ù…ÙŠÙ„ â€” ØªØ°Ù‡Ø¨ Ù„Ù„Ù…ØªØ¬Ø± Ø­Ø³Ø¨ Ø§Ù„Ø³ÙŠØ§Ø³Ø©',
-        courierNote: 'Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± â€” ÙŠÙØ¯ÙØ¹ Ø¯Ø§Ø®Ù„ÙŠÙ‹Ø§ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±',
-        captainNote: 'Ù„Ø§ ÙŠÙ†Ø·Ø¨Ù‚ â€” Ø§Ù„Ù…ÙˆØµÙ„ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø± ÙˆÙ„ÙŠØ³ Ù…Ù† Ø¨Ø«ÙˆØ§Ù†ÙŠ',
-        netImpact: 'Ø§Ù„Ø´Ø±ÙŠÙƒ: Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨ + Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„ âˆ’ Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ©. Ø§Ù„ØªØ¹ÙˆÙŠØ¶ Ø¯Ø§Ø®Ù„ÙŠ Ù„Ù„Ù…ÙˆØµÙ„.',
+        deliveryFeeNote: 'رسوم التوصيل: يدفعها العميل — تذهب للمتجر حسب السياسة',
+        courierNote: 'موصل المتجر — يُدفع داخليًا من المتجر',
+        captainNote: 'لا ينطبق — الموصل من المتجر وليس من بثواني',
+        netImpact: 'الشريك: إجمالي الطلب + رسوم التوصيل − عمولة المنصة. التعويض داخلي للموصل.',
         captainPayoutApplies: false,
       };
     }
     return {
-      deliveryFeeNote: 'Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„: ÙŠØ¯ÙØ¹Ù‡Ø§ Ø§Ù„Ø¹Ù…ÙŠÙ„ â€” Ø­Ø³Ø¨ ØªØ³Ø¹ÙŠØ± Ø¨Ø«ÙˆØ§Ù†ÙŠ',
-      courierNote: 'ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ â€” ØªØ³ÙˆÙŠØ© WLT captain payout',
-      captainNote: 'ÙŠÙ†Ø·Ø¨Ù‚ â€” Ø§Ù„ÙƒØ§Ø¨ØªÙ† ÙŠØ­ØµÙ„ Ø¹Ù„Ù‰ WLT payout Ù…Ø³ØªÙ‚Ù„ Ø¹Ù† ØªØ³ÙˆÙŠØ© Ø§Ù„Ø´Ø±ÙŠÙƒ',
-      netImpact: 'Ø§Ù„Ø´Ø±ÙŠÙƒ: Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨ âˆ’ Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ© âˆ’ Ø±Ø³ÙˆÙ… ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ (Ø­Ø³Ø¨ Ø¹Ù‚Ø¯ WLT)',
+      deliveryFeeNote: 'رسوم التوصيل: يدفعها العميل — حسب تسعير بثواني',
+      courierNote: 'كابتن بثواني — تسوية WLT captain payout',
+      captainNote: 'ينطبق — الكابتن يحصل على WLT payout مستقل عن تسوية الشريك',
+      netImpact: 'الشريك: إجمالي الطلب − عمولة المنصة − رسوم كابتن بثواني (حسب عقد WLT)',
       captainPayoutApplies: true,
     };
   })();
 
   return (
     <View style={{ overflow: 'hidden', opacity: enabled ? 1 : 0.65 }}>
-      {/* Ø±Ø£Ø³ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© */}
+      {/* رأس البطاقة */}
       <Pressable onPress={onToggle} accessibilityRole="button">
         <View
           style={{
@@ -514,10 +514,10 @@ function CommissionModeCard({
               </Text>
               <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
                 <Badge
-                  label={enabled ? 'Ù…ÙØ¹Ù‘Ù„' : 'ØºÙŠØ± Ù†Ø´Ø·'}
+                  label={enabled ? 'مفعّل' : 'غير نشط'}
                   tone={enabled ? 'success' : 'warning'}
                 />
-                <Text role="caption" tone="muted">â€¢ {percentage}</Text>
+                <Text role="caption" tone="muted">• {percentage}</Text>
               </View>
             </View>
           </View>
@@ -525,29 +525,29 @@ function CommissionModeCard({
         </View>
       </Pressable>
 
-      {/* Ø§Ù„ØªÙØ§ØµÙŠÙ„ */}
+      {/* التفاصيل */}
       {isExpanded ? (
         <Box paddingY={2} gap={3}>
           <Divider />
           <KeyValueList
             dense
             items={[
-              { label: 'Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„', value: modeDetails.deliveryFeeNote },
-              { label: 'Ø¹Ø¨Ø¡ Ø§Ù„Ù…ÙˆØµÙ„', value: modeDetails.courierNote },
-              { label: 'ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ', value: modeDetails.captainNote },
-              { label: 'Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ©', value: formatApplicability(breakdown.platformCommission) },
-              { label: 'Ù…Ø³ØªØ­Ù‚Ø§Øª Ø§Ù„ÙƒØ§Ø¨ØªÙ† (WLT)', value: modeDetails.captainPayoutApplies ? formatApplicability(breakdown.captainPayout) : 'Ù„Ø§ ÙŠÙ†Ø·Ø¨Ù‚' },
-              { label: 'Ø£Ø«Ø± ØµØ§ÙÙŠ Ø§Ù„Ø´Ø±ÙŠÙƒ', value: modeDetails.netImpact },
-              { label: 'ØµØ§ÙÙŠ Ù…Ø³ØªØ­Ù‚Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±', value: formatApplicability(breakdown.partnerNet) },
+              { label: 'رسوم التوصيل', value: modeDetails.deliveryFeeNote },
+              { label: 'عبء الموصل', value: modeDetails.courierNote },
+              { label: 'كابتن بثواني', value: modeDetails.captainNote },
+              { label: 'عمولة المنصة', value: formatApplicability(breakdown.platformCommission) },
+              { label: 'مستحقات الكابتن (WLT)', value: modeDetails.captainPayoutApplies ? formatApplicability(breakdown.captainPayout) : 'لا ينطبق' },
+              { label: 'أثر صافي الشريك', value: modeDetails.netImpact },
+              { label: 'صافي مستحقات المتجر', value: formatApplicability(breakdown.partnerNet) },
             ]}
           />
           {/* CTA */}
           {id === 'partner_delivery' ? (
-            <Button label="Ø¥Ø¹Ø¯Ø§Ø¯ ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±" tone="secondary" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
+            <Button label="إعداد توصيل المتجر" tone="secondary" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
           ) : id === 'bthwani_delivery' && !enabled ? (
-            <Button label="Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø³ÙŠØ§Ø³Ø©" tone="ghost" size="sm" icon={<Icon name="document-text-outline" size={16} tone="brand" />} />
+            <Button label="مراجعة السياسة" tone="ghost" size="sm" icon={<Icon name="document-text-outline" size={16} tone="brand" />} />
           ) : (
-            <Button label="Ø¹Ø±Ø¶ Ø§Ù„Ø­Ø±ÙƒØ§Øª Ø§Ù„Ù…Ø±ØªØ¨Ø·Ø©" tone="ghost" size="sm" icon={<Icon name="swap-horizontal-outline" size={16} tone="brand" />} />
+            <Button label="عرض الحركات المرتبطة" tone="ghost" size="sm" icon={<Icon name="swap-horizontal-outline" size={16} tone="brand" />} />
           )}
         </Box>
       ) : null}
@@ -563,15 +563,15 @@ function ModesTab({
   const [expandedModeId, setExpandedModeId] = React.useState<CommissionModeId | null>(null);
 
   const modes: { id: CommissionModeId; title: string; icon: React.ComponentProps<typeof Icon>['name']; defaultEnabled: boolean }[] = [
-    { id: 'pickup', title: 'Ø§Ø³ØªÙ„Ø§Ù… Ø¨Ù†ÙØ³ÙŠ', icon: 'hand-left-outline', defaultEnabled: true },
-    { id: 'partner_delivery', title: 'ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±', icon: 'storefront-outline', defaultEnabled: true },
-    { id: 'bthwani_delivery', title: 'ØªÙˆØµÙŠÙ„ Ø¨Ø«ÙˆØ§Ù†ÙŠ', icon: 'bicycle-outline', defaultEnabled: false },
+    { id: 'pickup', title: 'استلام بنفسي', icon: 'hand-left-outline', defaultEnabled: true },
+    { id: 'partner_delivery', title: 'توصيل المتجر', icon: 'storefront-outline', defaultEnabled: true },
+    { id: 'bthwani_delivery', title: 'توصيل بثواني', icon: 'bicycle-outline', defaultEnabled: false },
   ];
 
   return (
     <Box gap={2}>
       <Text role="caption" tone="muted" style={{ textAlign: 'right', marginBottom: 4 }}>
-        ÙƒÙ„ ÙˆØ¶Ø¹ ØªØ´ØºÙŠÙ„ ÙŠØ­Ù…Ù„ Ø£Ø«Ø±Ù‹Ø§ Ù…Ø§Ù„ÙŠÙ‹Ø§ Ù…Ø®ØªÙ„ÙÙ‹Ø§. Ø§Ø¶ØºØ· Ù„Ø±Ø¤ÙŠØ© ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù…ÙˆÙ„Ø© ÙˆØ£Ø«Ø± Ø§Ù„ØªØ³ÙˆÙŠØ©.
+        كل وضع تشغيل يحمل أثرًا ماليًا مختلفًا. اضغط لرؤية تفاصيل العمولة وأثر التسوية.
       </Text>
       {modes.map((mode, index) => {
         const enabled = resolveServiceModeEnabled(serviceModes, mode.id, mode.defaultEnabled);
@@ -596,7 +596,7 @@ function ModesTab({
   );
 }
 
-// â”€â”€â”€ ØªØ¨ÙˆÙŠØ¨ ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── تبويب توصيل المتجر ──────────────────────────────────────────
 function CourierTab({
   storeDeliveryPreview,
   direction,
@@ -604,57 +604,57 @@ function CourierTab({
   storeDeliveryPreview: ReturnType<typeof getWltDshStoreDeliveryFinancePreview>;
   direction: 'rtl' | 'ltr';
 }) {
-  const hasPolicy = storeDeliveryPreview.totalFeeLabel !== 'Ù  Ø±.ÙŠ';
+  const hasPolicy = storeDeliveryPreview.totalFeeLabel !== '٠ ر.ي';
 
   if (!hasPolicy) {
     return (
       <Box gap={4}>
         <StateView
           stateId="empty"
-          title="Ù„Ù… ÙŠØªÙ… ØªØ­Ø¯ÙŠØ¯ Ø³ÙŠØ§Ø³Ø© ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø± Ø¨Ø¹Ø¯"
-          description="Ø­Ø¯Ø¯ Ø§Ù„Ø³ÙŠØ§Ø³Ø© Ù„ØªÙØ¹ÙŠÙ„ ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø± ÙˆØªØªØ¨Ø¹ Ø§Ù„Ø±Ø³ÙˆÙ… ÙˆØ§Ù„ØªØ¹ÙˆÙŠØ¶Ø§Øª."
+          title="لم يتم تحديد سياسة توصيل المتجر بعد"
+          description="حدد السياسة لتفعيل توصيل المتجر وتتبع الرسوم والتعويضات."
         />
-        <Button label="Ø¥Ø¹Ø¯Ø§Ø¯ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±" tone="primary" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
+        <Button label="إعداد موصل المتجر" tone="primary" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
       </Box>
     );
   }
 
   return (
     <Box gap={4}>
-      {/* Ø§Ù„Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ© */}
+      {/* السياسة الحالية */}
       <KeyValueList
         dense
         items={[
-          { label: 'Ø§Ù„Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ© Ø§Ù„Ù†Ø´Ø·Ø©', value: 'ØªÙˆØµÙŠÙ„ Ù…Ø¬Ø§Ù†ÙŠ Ù„Ù„Ø¹Ù…ÙŠÙ„', tone: 'success' },
-          { label: 'Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„', value: 'Ù…Ø³ØªØ­Ù‚Ø© Ù…Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„ â€” ØªØ°Ù‡Ø¨ Ù„Ù„Ù…ØªØ¬Ø± Ø­Ø³Ø¨ Ø§Ù„Ø³ÙŠØ§Ø³Ø©' },
-          { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…Ø­ØµÙ„Ø©', value: storeDeliveryPreview.totalFeeLabel, tone: 'success' },
-          { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ù…Ø³ØªØ­Ù‚Ø§Øª Ù…ÙˆØµÙ„ÙŠ Ø§Ù„Ù…ØªØ¬Ø±', value: storeDeliveryPreview.totalCompensationLabel, tone: 'warning' },
-          { label: 'ØªØ³ÙˆÙŠØ© Ø§Ù„ÙƒØ§Ø¨ØªÙ† ØªÙ†Ø·Ø¨Ù‚ØŸ', value: 'Ù„Ø§ â€” Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± ÙŠÙØ³ÙˆÙŽÙ‘Ù‰ Ø¯Ø§Ø®Ù„ÙŠØ§Ù‹' },
+          { label: 'السياسة الحالية النشطة', value: 'توصيل مجاني للعميل', tone: 'success' },
+          { label: 'رسوم التوصيل', value: 'مستحقة من العميل — تذهب للمتجر حسب السياسة' },
+          { label: 'إجمالي رسوم التوصيل المحصلة', value: storeDeliveryPreview.totalFeeLabel, tone: 'success' },
+          { label: 'إجمالي مستحقات موصلي المتجر', value: storeDeliveryPreview.totalCompensationLabel, tone: 'warning' },
+          { label: 'تسوية الكابتن تنطبق؟', value: 'لا — موصل المتجر يُسوَّى داخلياً' },
         ]}
       />
 
-      {/* ØªÙ†Ø¨ÙŠÙ‡ Ø§Ù„ÙØµÙ„ Ø§Ù„Ù…Ø§Ù„ÙŠ */}
+      {/* تنبيه الفصل المالي */}
       <Surface tone="warning" padding={3} gap={2} style={{ borderRadius: 10 }}>
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, alignItems: 'flex-start' }}>
           <Icon name="warning" tone="warning" size={16} />
           <Text role="bodySm" tone="warning" style={{ flex: 1, textAlign: 'right' }}>
-            ØªØ¹ÙˆÙŠØ¶ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± Ø¯Ø§Ø®Ù„ÙŠ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±ØŒ ÙˆÙ„ÙŠØ³ ØªØ³ÙˆÙŠØ© ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ. Ù„Ø§ ØªØ®Ù„Ø· Ø¨ÙŠÙ† Ø§Ù„Ø§Ø«Ù†ÙŠÙ†.
+            تعويض موصل المتجر داخلي من المتجر، وليس تسوية كابتن بثواني. لا تخلط بين الاثنين.
           </Text>
         </View>
       </Surface>
 
       {/* CTA */}
-      <Button label="Ø¥Ø¹Ø¯Ø§Ø¯ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±" tone="ghost" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
+      <Button label="إعداد موصل المتجر" tone="ghost" size="sm" icon={<Icon name="settings-outline" size={16} tone="brand" />} />
     </Box>
   );
 }
 
-// â”€â”€â”€ Ø§Ù„Ø´Ø§Ø´Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── الشاشة الرئيسية ─────────────────────────────────────────────
 export function PartnerDshWalletBridgeView({
   state = 'ready',
   financialActionsDisabled = false,
-  branchLabel = 'ÙØ±Ø¹ Ø§Ù„ÙŠØ§Ø³Ù…ÙŠÙ†',
-  activeZoneLabel = 'Ø§Ù„ÙŠØ§Ø³Ù…ÙŠÙ† / Ø§Ù„Ù†Ø¯Ù‰',
+  branchLabel = 'فرع الياسمين',
+  activeZoneLabel = 'الياسمين / الندى',
   serviceModes,
   transactions,
   onBack,
@@ -688,14 +688,14 @@ export function PartnerDshWalletBridgeView({
     }
   }
 
-  // Ø­Ø§Ù„Ø© Ø§Ù„Ø®Ø·Ø£ / Ø§Ù„ØªØ­Ù…ÙŠÙ„ / Ø§Ù„ÙØ±Ø§Øº
+  // حالة الخطأ / التحميل / الفراغ
   if (state !== 'ready' && state !== 'no-transactions') {
     const stateCopy = resolveStateCopy(state);
     return (
       <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: screenBottomInset }}>
         <TopBar
           variant="secondary"
-          title="Ø§Ù„Ù…Ø­ÙØ¸Ø© ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©"
+          title="المحفظة والحسابات المالية"
           style={{ marginHorizontal: -16, marginTop: -16 }}
           trailingAction={
             onBack
@@ -703,7 +703,7 @@ export function PartnerDshWalletBridgeView({
                   id: 'back',
                   icon: <Icon name="arrow-back" size={24} tone="brand" />,
                   mirrorInRtl: true,
-                  accessibilityLabel: 'Ø±Ø¬ÙˆØ¹',
+                  accessibilityLabel: 'رجوع',
                   onPress: onBack,
                 }
               : undefined
@@ -720,24 +720,24 @@ export function PartnerDshWalletBridgeView({
       gap={0}
       contentContainerStyle={{ paddingBottom: screenBottomInset }}
     >
-      {/* Header Ù…Ø®ØªØµØ± */}
+      {/* Header مختصر */}
       <TopBar
         variant="secondary"
-        title="Ø§Ù„Ù…Ø­ÙØ¸Ø© ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©"
+        title="المحفظة والحسابات المالية"
         trailingAction={
           onBack
             ? {
                 id: 'back',
                 icon: <Icon name="arrow-back" size={24} tone="brand" />,
                 mirrorInRtl: true,
-                accessibilityLabel: 'Ø±Ø¬ÙˆØ¹',
+                accessibilityLabel: 'رجوع',
                 onPress: onBack,
               }
             : undefined
         }
       />
 
-      {/* Ø§Ù„ÙØ±Ø¹ / Ø§Ù„Ù†Ø·Ø§Ù‚ */}
+      {/* الفرع / النطاق */}
       <View
         style={{
           flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
@@ -753,20 +753,20 @@ export function PartnerDshWalletBridgeView({
         </Text>
       </View>
 
-      {/* Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø£Ù‚Ø³Ø§Ù… Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ø§Ù„Ù‚Ø§Ø¨Ù„Ø© Ù„Ù„Ø·ÙŠ â€” Ø¨Ù†Ù…Ø· ØµÙØ­Ø© Ø·Ù„Ø¨Ø§ØªÙŠ */}
+      {/* قائمة الأقسام المالية القابلة للطي — بنمط صفحة طلباتي */}
       <Box padding={4}>
-        {/* 1. Ø§Ù„Ù…Ù„Ø®Øµ Ø§Ù„Ù…Ø§Ù„ÙŠ */}
+        {/* 1. الملخص المالي */}
         <ActionStrip
           icon="receipt-outline"
-          title="Ø§Ù„Ù…Ù„Ø®Øµ Ø§Ù„Ù…Ø§Ù„ÙŠ"
+          title="الملخص المالي"
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {`${partnerPreview.netSettlementLabel} â€¢ ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ© â€¢ Ø±ÙŠØ§Ù„ ÙŠÙ…Ù†ÙŠ`}
+                {`${partnerPreview.netSettlementLabel} • صافي التسوية • ريال يمني`}
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Badge label="Ù†Ø´Ø·" tone="success" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#Ø§Ù„Ù…Ø­ÙØ¸Ø©</Text>
+                <Badge label="نشط" tone="success" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#المحفظة</Text>
               </View>
             </View>
           }
@@ -784,18 +784,18 @@ export function PartnerDshWalletBridgeView({
           />
         </ActionStrip>
 
-        {/* 2. Ø¯ÙˆØ±Ø© Ø§Ù„ØªØ³ÙˆÙŠØ© */}
+        {/* 2. دورة التسوية */}
         <ActionStrip
           icon="receipt-outline"
-          title="Ø¯ÙˆØ±Ø© Ø§Ù„ØªØ³ÙˆÙŠØ©"
+          title="دورة التسوية"
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {`${partnerPreview.cycleStartDate} Ø¥Ù„Ù‰ ${partnerPreview.cycleEndDate}`}
+                {`${partnerPreview.cycleStartDate} إلى ${partnerPreview.cycleEndDate}`}
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label={partnerPreview.cycleStatus} tone="success" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#Ø§Ù„ØªØ³ÙˆÙŠØ©</Text>
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#التسوية</Text>
               </View>
             </View>
           }
@@ -812,18 +812,18 @@ export function PartnerDshWalletBridgeView({
           />
         </ActionStrip>
 
-        {/* 3. Ø§Ù„Ø­Ø±ÙƒØ§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© */}
+        {/* 3. الحركات المالية */}
         <ActionStrip
           icon="receipt-outline"
-          title="Ø¢Ø®Ø± Ø§Ù„Ø­Ø±ÙƒØ§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©"
+          title="آخر الحركات المالية"
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {visibleTransactions.length === 1 ? 'Ø­Ø±ÙƒØ© Ù…Ø§Ù„ÙŠØ© ÙˆØ§Ø­Ø¯Ø© Ù…Ø³Ø¬Ù„Ø©' : `${visibleTransactions.length} Ø­Ø±ÙƒØ§Øª Ù…Ø§Ù„ÙŠØ© Ù…Ø³Ø¬Ù„Ø©`}
+                {visibleTransactions.length === 1 ? 'حركة مالية واحدة مسجلة' : `${visibleTransactions.length} حركات مالية مسجلة`}
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Badge label="Ù…Ø­Ø¯Ø«" tone="default" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#Ø³Ø¬Ù„_Ø§Ù„Ø­Ø±ÙƒØ§Øª</Text>
+                <Badge label="محدث" tone="default" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#سجل_الحركات</Text>
               </View>
             </View>
           }
@@ -841,18 +841,18 @@ export function PartnerDshWalletBridgeView({
           />
         </ActionStrip>
 
-        {/* 4. Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ© */}
+        {/* 4. العمولات التشغيلية */}
         <ActionStrip
           icon="receipt-outline"
-          title="Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©"
+          title="العمولات التشغيلية"
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ© Ø­Ø³Ø¨ Ø£ÙˆØ¶Ø§Ø¹ Ø§Ù„ØªÙˆØµÙŠÙ„ ÙˆØ§Ù„Ø§Ø³ØªÙ„Ø§Ù…
+                عمولة المنصة حسب أوضاع التوصيل والاستلام
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Badge label="Ù£ Ø£ÙˆØ¶Ø§Ø¹ ØªØ´ØºÙŠÙ„" tone="default" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#Ø§Ù„Ø¹Ù…ÙˆÙ„Ø§Øª</Text>
+                <Badge label="٣ أوضاع تشغيل" tone="default" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#العمولات</Text>
               </View>
             </View>
           }
@@ -866,18 +866,18 @@ export function PartnerDshWalletBridgeView({
           <ModesTab serviceModes={serviceModes} />
         </ActionStrip>
 
-        {/* 5. ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø± */}
+        {/* 5. توصيل المتجر */}
         <ActionStrip
           icon="receipt-outline"
-          title="ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±"
+          title="توصيل المتجر"
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {`${storeDeliveryPreview.totalFeeLabel} Ø±Ø³ÙˆÙ… Ù…Ø­ØµÙ„Ø© â€¢ ${storeDeliveryPreview.totalCompensationLabel} ØªØ¹ÙˆÙŠØ¶Ø§Øª`}
+                {`${storeDeliveryPreview.totalFeeLabel} رسوم محصلة • ${storeDeliveryPreview.totalCompensationLabel} تعويضات`}
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Badge label="Ø³ÙŠØ§Ø³Ø© Ù†Ø´Ø·Ø©" tone="success" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#ØªÙˆØµÙŠÙ„_Ø§Ù„Ù…ØªØ¬Ø±</Text>
+                <Badge label="سياسة نشطة" tone="success" />
+                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#توصيل_المتجر</Text>
               </View>
             </View>
           }

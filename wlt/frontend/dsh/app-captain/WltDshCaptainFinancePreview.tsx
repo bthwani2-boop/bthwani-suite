@@ -95,10 +95,10 @@ function EligibilitySection({
   const [success, setSuccess] = React.useState(false);
 
   const paymentMethods = [
-    { id: 'card' as const, label: 'Ø¨Ø·Ø§Ù‚Ø© Ø§Ø¦ØªÙ…Ø§Ù†ÙŠØ©' },
-    { id: 'karimi' as const, label: 'Ø¨Ù†Ùƒ Ø§Ù„ÙƒØ±ÙŠÙ…ÙŠ' },
-    { id: 'one_cash' as const, label: 'ONE ÙƒØ§Ø´' },
-    { id: 'saba' as const, label: 'Ø³Ø¨Ø§ÙƒØ§Ø´' },
+    { id: 'card' as const, label: 'بطاقة ائتمانية' },
+    { id: 'karimi' as const, label: 'بنك الكريمي' },
+    { id: 'one_cash' as const, label: 'ONE كاش' },
+    { id: 'saba' as const, label: 'سباكاش' },
   ];
 
   const handleConfirmTopUp = async () => {
@@ -130,15 +130,15 @@ function EligibilitySection({
   return (
     <Box gap={3} paddingVertical={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-        Ø£Ù‡Ù„ÙŠØ© Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª
+        أهلية استقبال الطلبات
       </Text>
       <KeyValueList
         dense
         items={[
-          { label: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¶Ø§Ù…Ù† Ø§Ù„Ø­Ø§Ù„ÙŠ', value: snapshot.eligibilityBalanceLabel, tone: snapshot.isEligible ? 'success' : 'warning' },
-          { label: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨', value: snapshot.minimumEligibilityLabel, tone: 'info' },
-          { label: 'Ø§Ù„Ø­Ø§Ù„Ø©', value: snapshot.isEligible ? 'Ù…Ø¤Ù‡Ù„ Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª' : 'ØºÙŠØ± Ù…Ø¤Ù‡Ù„ â€” Ø±ØµÙŠØ¯ ØºÙŠØ± ÙƒØ§ÙÙ', tone: snapshot.isEligible ? 'success' : 'warning' },
-          ...(snapshot.eligibilityShortfallMinorUnits > 0 ? [{ label: 'Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø·Ù„ÙˆØ¨ Ù„Ù„ØªØ£Ù‡Ù„', value: snapshot.eligibilityShortfallLabel, tone: 'warning' as const }] : []),
+          { label: 'الرصيد الضامن الحالي', value: snapshot.eligibilityBalanceLabel, tone: snapshot.isEligible ? 'success' : 'warning' },
+          { label: 'الحد الأدنى المطلوب', value: snapshot.minimumEligibilityLabel, tone: 'info' },
+          { label: 'الحالة', value: snapshot.isEligible ? 'مؤهل لاستقبال الطلبات' : 'غير مؤهل — رصيد غير كافٍ', tone: snapshot.isEligible ? 'success' : 'warning' },
+          ...(snapshot.eligibilityShortfallMinorUnits > 0 ? [{ label: 'المبلغ المطلوب للتأهل', value: snapshot.eligibilityShortfallLabel, tone: 'warning' as const }] : []),
         ]}
       />
 
@@ -154,7 +154,7 @@ function EligibilitySection({
             borderLeftColor: isRtl ? undefined : theme.warning,
           }}
         >
-          <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>ØºÙŠØ± Ù…Ø¤Ù‡Ù„ Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª</Text>
+          <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>غير مؤهل لاستقبال الطلبات</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
             {snapshot.eligibilityBlockReason}
           </Text>
@@ -164,26 +164,26 @@ function EligibilitySection({
       {success && (
         <StateView
           kind="success"
-          title="ØªÙ… Ø´Ø­Ù† Ø§Ù„Ø±ØµÙŠØ¯ Ø¨Ù†Ø¬Ø§Ø­!"
-          description="ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø¶Ø§Ù…Ù† Ø§Ù„Ø®Ø§Øµ Ø¨Ùƒ ÙˆØ£ØµØ¨Ø­Øª Ø¬Ø§Ù‡Ø²Ø§Ù‹ Ù„Ù„Ø¹Ù…Ù„."
+          title="تم شحن الرصيد بنجاح!"
+          description="تم تحديث الرصيد الضامن الخاص بك وأصبحت جاهزاً للعمل."
         />
       )}
 
       {showTopUpForm ? (
         <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12, borderWidth: 1, borderColor: theme.line }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }}>Ø¥Ø¬Ø±Ø§Ø¡ Ø´Ø­Ù† Ø±ØµÙŠØ¯ Ø§Ù„Ø¶Ø§Ù…Ù†</Text>
+          <Text role="bodyStrong" style={{ textAlign: 'right' }}>إجراء شحن رصيد الضامن</Text>
 
           <TextField
-            label="Ù…Ø¨Ù„Øº Ø§Ù„Ø´Ø­Ù† (Ø±.ÙŠ)"
+            label="مبلغ الشحن (ر.ي)"
             value={topUpAmountText}
             onChangeText={setTopUpAmountText}
-            placeholder="Ø£Ø¯Ø®Ù„ Ù…Ø¨Ù„Øº Ø§Ù„Ø´Ø­Ù†..."
+            placeholder="أدخل مبلغ الشحن..."
             keyboardType="numeric"
             style={{ textAlign: 'right' }}
           />
 
           <Box gap={1}>
-            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>ÙˆØ³ÙŠÙ„Ø© Ø§Ù„Ø´Ø­Ù†</Text>
+            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>وسيلة الشحن</Text>
             <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', flexDirection: 'row-reverse' }}>
               {paymentMethods.map((m) => (
                 <Pressable
@@ -208,7 +208,7 @@ function EligibilitySection({
 
           <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row-reverse', marginTop: 8 }}>
             <Button
-              label="ØªØ£ÙƒÙŠØ¯ Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø´Ø­Ù†"
+              label="تأكيد عملية الشحن"
               tone="primary"
               loading={loading}
               disabled={loading || !topUpAmountText}
@@ -217,7 +217,7 @@ function EligibilitySection({
               onPress={handleConfirmTopUp}
             />
             <Button
-              label="Ø¥Ù„ØºØ§Ø¡"
+              label="إلغاء"
               tone="secondary"
               disabled={loading}
               fullWidth={false}
@@ -231,8 +231,8 @@ function EligibilitySection({
           <Box gap={2} paddingVertical={1}>
             <Button
               label={snapshot.eligibilityShortfallMinorUnits > 0
-                ? `Ø§Ø´Ø­Ù† ${snapshot.eligibilityShortfallLabel} Ù„Ù„ØªØ£Ù‡Ù„`
-                : 'Ø´Ø­Ù† Ø±ØµÙŠØ¯ Ø¥Ø¶Ø§ÙÙŠ'}
+                ? `اشحن ${snapshot.eligibilityShortfallLabel} للتأهل`
+                : 'شحن رصيد إضافي'}
               tone={snapshot.eligibilityShortfallMinorUnits > 0 ? 'primary' : 'ghost'}
               fullWidth
               onPress={() => {
@@ -250,7 +250,7 @@ function EligibilitySection({
 
       {records.length > 0 && (
         <Box gap={2} style={{ marginTop: 8 }}>
-          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>Ø³Ø¬Ù„ Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ø´Ø­Ù† Ø§Ù„Ø£Ø®ÙŠØ±Ø©</Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>سجل عمليات الشحن الأخيرة</Text>
           {records.map((r) => <RecordRow key={r.id} record={r} />)}
         </Box>
       )}
@@ -266,15 +266,15 @@ function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanc
   return (
     <Box gap={3} paddingVertical={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-        ØªØ­ØµÙŠÙ„ Ø§Ù„Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… â€” Ø°Ù…Ø© Ù…Ø³ØªØ­Ù‚Ø©
+        تحصيل الدفع عند الاستلام — ذمة مستحقة
       </Text>
       <KeyValueList
         dense
         items={[
-          { label: 'Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø­ØµÙ‘Ù„ â€” Ø°Ù…Ø© Ù‚Ø§Ø¦Ù…Ø©', value: snapshot.codLiabilityLabel, tone: 'warning' },
-          { label: 'Ø§Ù„Ø¥ÙŠØ¯Ø§Ø¹ Ø§Ù„Ù…Ø¹Ù„Ù‘Ù‚', value: snapshot.settlementLabel, tone: 'warning' },
-          { label: 'Ø¯ÙˆØ±Ø© Ø§Ù„ØªØ³ÙˆÙŠØ©', value: snapshot.cycleLabel, tone: 'default' as const },
-          { label: 'Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ù„ØªØ§Ù„ÙŠ', value: 'Ø¥ÙŠØ¯Ø§Ø¹ Ø§Ù„Ù…Ø¨Ù„Øº Ø¨Ø§Ù„Ø¨Ù†Ùƒ Ù‚Ø¨Ù„ Ù…ÙˆØ¹Ø¯ Ø§Ù„ØªØ³ÙˆÙŠØ©', tone: 'info' as const },
+          { label: 'المبلغ المحصّل — ذمة قائمة', value: snapshot.codLiabilityLabel, tone: 'warning' },
+          { label: 'الإيداع المعلّق', value: snapshot.settlementLabel, tone: 'warning' },
+          { label: 'دورة التسوية', value: snapshot.cycleLabel, tone: 'default' as const },
+          { label: 'الإجراء التالي', value: 'إيداع المبلغ بالبنك قبل موعد التسوية', tone: 'info' as const },
         ]}
       />
       {records.length > 0 ? (
@@ -293,9 +293,9 @@ function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanc
           borderLeftColor: isRtl ? undefined : theme.warning,
         }}
       >
-        <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>Ø¥ÙŠØ¯Ø§Ø¹ COD Ù…Ø·Ù„ÙˆØ¨</Text>
+        <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>إيداع COD مطلوب</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-          Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø­ØµÙ‘Ù„ Ø°Ù…Ø© Ù…Ø³ØªØ­Ù‚Ø© Ø¹Ù„Ù‰ Ø§Ù„ÙƒØ§Ø¨ØªÙ† Ø­ØªÙ‰ ÙŠØªÙ… Ø§Ù„Ø¥ÙŠØ¯Ø§Ø¹ ÙˆØ§Ù„Ù…Ø·Ø§Ø¨Ù‚Ø©.
+          المبلغ المحصّل ذمة مستحقة على الكابتن حتى يتم الإيداع والمطابقة.
         </Text>
       </Box>
     </Box>
@@ -309,15 +309,15 @@ function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSna
   return (
     <Box gap={3} paddingVertical={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-        Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ ÙˆØ§Ù„Ù…ÙƒØ§Ø³Ø¨ Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©
+        الأرباح والمكاسب التشغيلية
       </Text>
       <KeyValueList
         dense
         items={[
-          { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø£Ø±Ø¨Ø§Ø­', value: snapshot.earningsLabel, tone: 'success' },
-          { label: 'Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª Ø§Ù„Ù…ØªÙˆÙ‚Ø¹Ø©', value: snapshot.pendingPayoutLabel, tone: 'warning' },
-          { label: 'Ø¯ÙˆØ±Ø© Ø§Ù„Ø£Ø±Ø¨Ø§Ø­', value: snapshot.cycleLabel, tone: 'default' as const },
-          { label: 'Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¯ÙØ¹', value: snapshot.cycleLabel, tone: 'info' as const },
+          { label: 'إجمالي الأرباح', value: snapshot.earningsLabel, tone: 'success' },
+          { label: 'المدفوعات المتوقعة', value: snapshot.pendingPayoutLabel, tone: 'warning' },
+          { label: 'دورة الأرباح', value: snapshot.cycleLabel, tone: 'default' as const },
+          { label: 'موعد الدفع', value: snapshot.cycleLabel, tone: 'info' as const },
         ]}
       />
       {records.length > 0 ? (
@@ -367,22 +367,22 @@ function SettlementSection({
   return (
     <Box gap={3} paddingVertical={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-        Ø§Ù„ØªØ³ÙˆÙŠØ© ÙˆØ§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+        التسوية والدورة المالية
       </Text>
       <KeyValueList
         dense
         items={[
-          { label: 'Ø£Ø±Ø¨Ø§Ø­ Ù…Ø¹Ù„Ù‚Ø© Ù„Ù„ØªØ³ÙˆÙŠØ©', value: snapshot.pendingPayoutLabel, tone: snapshot.pendingPayoutMinorUnits > 0 ? 'warning' : 'default' },
-          { label: 'Ù…Ø¨Ù„Øº Ø§Ù„ØªØ³ÙˆÙŠØ© Ø§Ù„Ù…Ø¯ÙÙˆØ¹', value: snapshot.settlementLabel, tone: 'success' },
-          { label: 'Ø§Ù„Ø¯ÙˆØ±Ø©', value: snapshot.cycleLabel, tone: 'default' as const },
+          { label: 'أرباح معلقة للتسوية', value: snapshot.pendingPayoutLabel, tone: snapshot.pendingPayoutMinorUnits > 0 ? 'warning' : 'default' },
+          { label: 'مبلغ التسوية المدفوع', value: snapshot.settlementLabel, tone: 'success' },
+          { label: 'الدورة', value: snapshot.cycleLabel, tone: 'default' as const },
         ]}
       />
 
       {success && (
         <StateView
           kind="success"
-          title="ØªÙ… Ø·Ù„Ø¨ Ø§Ù„ØªØ³ÙˆÙŠØ© Ø¨Ù†Ø¬Ø§Ø­!"
-          description="ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØµØ±Ù ÙˆØ¬Ø§Ø±ÙŠ ØªØ­ÙˆÙŠÙ„ Ø£Ø±Ø¨Ø§Ø­Ùƒ Ø¥Ù„Ù‰ Ø­Ø³Ø§Ø¨Ùƒ Ø§Ù„Ø¨Ù†ÙƒÙŠ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯."
+          title="تم طلب التسوية بنجاح!"
+          description="تم إرسال طلب الصرف وجاري تحويل أرباحك إلى حسابك البنكي المعتمد."
         />
       )}
 
@@ -390,7 +390,7 @@ function SettlementSection({
         !success && (
           <Box gap={2} paddingVertical={1}>
             <Button
-              label={`Ø·Ù„Ø¨ ØªØ³ÙˆÙŠØ© Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª (${snapshot.pendingPayoutLabel})`}
+              label={`طلب تسوية المستحقات (${snapshot.pendingPayoutLabel})`}
               tone="primary"
               loading={loading}
               disabled={loading}
@@ -398,7 +398,7 @@ function SettlementSection({
               onPress={handleRequestSettlement}
             />
             <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-              Ø³ÙŠØªÙ… Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ø·Ù„Ø¨ ÙˆØµØ±Ù Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ Ù„Ø­Ø³Ø§Ø¨Ùƒ Ø§Ù„Ø¨Ù†ÙƒÙŠ Ù…Ø¨Ø§Ø´Ø±Ø©.
+              سيتم معالجة الطلب وصرف الأرباح لحسابك البنكي مباشرة.
             </Text>
           </Box>
         )
@@ -415,9 +415,9 @@ function SettlementSection({
               borderLeftColor: isRtl ? undefined : theme.success,
             }}
           >
-            <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø³ØªØ­Ù‚Ø§Øª Ù…Ø¹Ù„Ù‚Ø©</Text>
+            <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>لا يوجد مستحقات معلقة</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-              ØªÙ… ØªØ³ÙˆÙŠØ© ÙˆØµØ±Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ Ø§Ù„Ù…Ø­ØªØ³Ø¨Ø© Ù„Ù„Ø£Ø³Ø¨ÙˆØ¹ Ø§Ù„Ø­Ø§Ù„ÙŠ.
+              تم تسوية وصرف جميع الأرباح المحتسبة للأسبوع الحالي.
             </Text>
           </Box>
         )
@@ -435,9 +435,9 @@ function SettlementSection({
           marginTop: 4,
         }}
       >
-        <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>Ø°Ù…Ø© COD ÙˆØ§Ù„ØªØ³ÙˆÙŠØ©</Text>
+        <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>ذمة COD والتسوية</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
-          ÙŠØ¬Ø¨ Ù…Ø·Ø§Ø¨Ù‚Ø© ÙˆØ¥ÙŠØ¯Ø§Ø¹ Ø¬Ù…ÙŠØ¹ Ø°Ù…Ù… COD Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø© Ù„ØªØ¬Ù†Ø¨ ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ø§Ù„Ù‚Ø§Ø¯Ù…Ø©.
+          يجب مطابقة وإيداع جميع ذمم COD المستحقة لتجنب تعليق الدورة المالية القادمة.
         </Text>
       </Box>
     </Box>
@@ -474,15 +474,15 @@ export function WltDshCaptainFinancePreview({
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
         variant="surface"
-        title="Ù…Ø§Ù„ÙŠØ© Ø§Ù„ÙƒØ§Ø¨ØªÙ†"
+        title="مالية الكابتن"
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 120 }}>
         <Box padding={0} gap={0}>
-          {/* 1. Ø§Ù„Ø£Ù‡Ù„ÙŠØ© ÙˆØ§Ù„Ø´Ø­Ù† */}
+          {/* 1. الأهلية والشحن */}
           <ActionStrip
             icon="shield-checkmark-outline"
-            title="Ø§Ù„Ø£Ù‡Ù„ÙŠØ© ÙˆØ§Ù„Ø´Ø­Ù†"
-            subtitle={snapshot.isEligible ? `Ù…Ø¤Ù‡Ù„ Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Â· Ø§Ù„Ø±ØµÙŠØ¯: ${snapshot.eligibilityBalanceLabel}` : `ØºÙŠØ± Ù…Ø¤Ù‡Ù„ â€” Ø§Ù„Ø±ØµÙŠØ¯: ${snapshot.eligibilityBalanceLabel}`}
+            title="الأهلية والشحن"
+            subtitle={snapshot.isEligible ? `مؤهل لاستقبال الطلبات · الرصيد: ${snapshot.eligibilityBalanceLabel}` : `غير مؤهل — الرصيد: ${snapshot.eligibilityBalanceLabel}`}
             expanded={expandedSection === 'eligibility'}
             onPress={() => setExpandedSection(expandedSection === 'eligibility' ? null : 'eligibility')}
             hideDivider={false}
@@ -497,11 +497,11 @@ export function WltDshCaptainFinancePreview({
             />
           </ActionStrip>
 
-          {/* 2. Ø°Ù…Ø© COD */}
+          {/* 2. ذمة COD */}
           <ActionStrip
             icon="wallet-outline"
-            title="Ø°Ù…Ø© COD"
-            subtitle={`Ø§Ù„Ø°Ù…Ø© Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©: ${snapshot.codLiabilityLabel}`}
+            title="ذمة COD"
+            subtitle={`الذمة القائمة: ${snapshot.codLiabilityLabel}`}
             expanded={expandedSection === 'cod-liability'}
             onPress={() => setExpandedSection(expandedSection === 'cod-liability' ? null : 'cod-liability')}
             hideDivider={false}
@@ -512,11 +512,11 @@ export function WltDshCaptainFinancePreview({
             <CodLiabilitySection snapshot={snapshot} records={allRecords.filter((r) => r.kind === 'captain-cod-liability')} />
           </ActionStrip>
 
-          {/* 3. Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ */}
+          {/* 3. الأرباح */}
           <ActionStrip
             icon="trending-up-outline"
-            title="Ø§Ù„Ø£Ø±Ø¨Ø§Ø­"
-            subtitle={`Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø£Ø±Ø¨Ø§Ø­: ${snapshot.earningsLabel}`}
+            title="الأرباح"
+            subtitle={`إجمالي الأرباح: ${snapshot.earningsLabel}`}
             expanded={expandedSection === 'earnings'}
             onPress={() => setExpandedSection(expandedSection === 'earnings' ? null : 'earnings')}
             hideDivider={false}
@@ -527,11 +527,11 @@ export function WltDshCaptainFinancePreview({
             <EarningsSection snapshot={snapshot} records={allRecords.filter((r) => r.kind === 'captain-earning')} />
           </ActionStrip>
 
-          {/* 4. Ø§Ù„ØªØ³ÙˆÙŠØ© */}
+          {/* 4. التسوية */}
           <ActionStrip
             icon="sync-outline"
-            title="Ø§Ù„ØªØ³ÙˆÙŠØ©"
-            subtitle={`Ø¯ÙˆØ±Ø© Ø§Ù„ØªØ³ÙˆÙŠØ© Ø§Ù„Ø­Ø§Ù„ÙŠØ©: ${snapshot.cycleLabel} Â· Ø§Ù„Ù…Ø¨Ù„Øº: ${snapshot.settlementLabel}`}
+            title="التسوية"
+            subtitle={`دورة التسوية الحالية: ${snapshot.cycleLabel} · المبلغ: ${snapshot.settlementLabel}`}
             expanded={expandedSection === 'settlement'}
             onPress={() => setExpandedSection(expandedSection === 'settlement' ? null : 'settlement')}
             hideDivider={true}
@@ -548,7 +548,7 @@ export function WltDshCaptainFinancePreview({
           {/* Developer Reset Section */}
           <Box padding={4} style={{ marginTop: 24, paddingHorizontal: 16 }}>
             <Button
-              label="Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¹Ø§ÙŠÙ†Ø©"
+              label="إعادة تعيين بيانات المعاينة"
               tone="ghost"
               size="sm"
               onPress={async () => {

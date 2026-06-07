@@ -25,8 +25,8 @@ export function DshCaptainFinanceScreen({
 		return (
 			<DshOperationScreen
 				state={state}
-				title="Ø§Ù„Ù…Ø§Ù„ÙŠØ©"
-				subtitle="Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ù…Ø±Ø¨ÙˆØ·Ø© Ø§Ù„Ø¢Ù† Ø¨Ø¬Ø³Ø± WLT Ù…ÙˆØ­Ø¯ Ù„Ø¹Ø±Ø¶ COD ÙˆØ§Ù„Ø£Ø±Ø¨Ø§Ø­ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ© ÙÙŠ ÙˆØ¶Ø¹ preview ÙÙ‚Ø·."
+				title="المالية"
+				subtitle="المالية مربوطة الآن بجسر WLT موحد لعرض COD والأرباح والتسوية في وضع preview فقط."
 				onRetry={onRetry}
 			/>
 		);

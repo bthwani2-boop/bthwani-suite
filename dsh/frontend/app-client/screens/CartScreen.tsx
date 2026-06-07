@@ -42,7 +42,7 @@ import {
   getDshFulfillmentDeliveryModeMeta,
   getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
-// SSoT: COD availability per delivery mode â€” bthwani_delivery only.
+// SSoT: COD availability per delivery mode — bthwani_delivery only.
 import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
@@ -64,18 +64,18 @@ const EXPERIMENTAL_PAYMENT_ENABLED = false;
 
 function resolveCheckoutPolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'detail-on-open') {
-    return 'ØªÙØ§ØµÙŠÙ„ Ø¹Ù†Ø¯ Ø§Ù„ÙØªØ­';
+    return 'تفاصيل عند الفتح';
   }
 
   if (policy === 'summary-only') {
-    return 'Ù…Ù„Ø®Øµ Ø£ÙˆÙ„Ù‹Ø§';
+    return 'ملخص أولًا';
   }
 
   if (policy === 'finance-preview-only') {
-    return 'Ù…Ø§Ù„ÙŠ Ù„Ù„Ù‚Ø±Ø§Ø¡Ø© ÙÙ‚Ø·';
+    return 'مالي للقراءة فقط';
   }
 
-  return 'Ø³ÙŠØ§Ø³Ø© Ù…Ù† Ø§Ù„Ø³Ø¬Ù„';
+  return 'سياسة من السجل';
 }
 
 type ScreenNotice = {
@@ -166,33 +166,33 @@ export type DshCartUnifiedScreenProps = {
 
 const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
   coupon: {
-    title: 'Ø¥Ø¶Ø§ÙØ© Ù‚Ø³ÙŠÙ…Ø©',
-    placeholder: 'Ø£Ø¯Ø®Ù„ Ø±Ù…Ø² Ø§Ù„ØªØ®ÙÙŠØ¶',
-    helper: 'Ø³ÙŠØªÙ… Ø­ÙØ¸ Ø§Ù„Ù‚Ø³ÙŠÙ…Ø© Ø¯Ø§Ø®Ù„ Ù‡Ø°Ù‡ Ø§Ù„Ø¬Ù„Ø³Ø© ÙÙ‚Ø· Ø­ØªÙ‰ ÙŠÙƒØªÙ…Ù„ Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ø®Ù„ÙÙŠ.',
-    saveLabel: 'Ø­ÙØ¸ Ø§Ù„Ù‚Ø³ÙŠÙ…Ø©',
+    title: 'إضافة قسيمة',
+    placeholder: 'أدخل رمز التخفيض',
+    helper: 'سيتم حفظ القسيمة داخل هذه الجلسة فقط حتى يكتمل الربط الخلفي.',
+    saveLabel: 'حفظ القسيمة',
     icon: 'pricetag-outline',
   },
   address: {
-    title: 'Ù…ÙˆÙ‚Ø¹ Ø§Ù„ØªÙˆØµÙŠÙ„',
-    placeholder: 'Ø§ÙƒØªØ¨ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø£Ùˆ Ø­Ø¯Ø¯Ù‡ Ù…Ù† Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù„Ø§Ø­Ù‚Ù‹Ø§',
-    helper: 'Ø³ÙŠØªÙ… Ù„Ø§Ø­Ù‚Ù‹Ø§ Ø¯Ø¹Ù… ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø¨Ø¯Ø¨ÙˆØ³ Ø¹Ø¨Ø± Google Maps.',
-    saveLabel: 'Ø­ÙØ¸ Ø§Ù„Ù…ÙˆÙ‚Ø¹',
+    title: 'موقع التوصيل',
+    placeholder: 'اكتب العنوان أو حدده من الخريطة لاحقًا',
+    helper: 'سيتم لاحقًا دعم تحديد الموقع بدبوس عبر Google Maps.',
+    saveLabel: 'حفظ الموقع',
     multiline: true,
     icon: 'location-outline',
   },
   note: {
-    title: 'Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø·Ù„Ø¨',
-    placeholder: 'Ø£Ø¶Ù Ù…Ù„Ø§Ø­Ø¸Ø© Ù‚ØµÙŠØ±Ø© Ù„Ù„ÙƒØ§Ø¨ØªÙ† Ø£Ùˆ Ø§Ù„Ù…ØªØ¬Ø±',
-    helper: 'ÙŠÙ…ÙƒÙ† ØªØ±Ùƒ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø© ÙØ§Ø±ØºØ© Ø¥Ø°Ø§ Ù„Ù… ØªÙƒÙ† Ù‡Ù†Ø§Ùƒ ØªØ¹Ù„ÙŠÙ…Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©.',
-    saveLabel: 'Ø­ÙØ¸ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø©',
+    title: 'ملاحظات الطلب',
+    placeholder: 'أضف ملاحظة قصيرة للكابتن أو المتجر',
+    helper: 'يمكن ترك الملاحظة فارغة إذا لم تكن هناك تعليمات إضافية.',
+    saveLabel: 'حفظ الملاحظة',
     multiline: true,
     icon: 'document-text-outline',
   },
   extra: {
-    title: 'Ø¹Ù„Ù‰ Ø·Ø±ÙŠÙ‚ÙŠ',
-    placeholder: 'Ù…Ø«Ø§Ù„: Ù…Ø§Ø¡ØŒ Ø¨Ø³Ø¨Ø³ØŒ Ù…Ù†Ø§Ø¯ÙŠÙ„...',
-    helper: 'Ø£Ø¶Ù Ø´ÙŠØ¦Ù‹Ø§ Ø¨Ø³ÙŠØ·Ù‹Ø§ Ù…Ù† Ø·Ø±ÙŠÙ‚ Ø§Ù„ÙƒØ§Ø¨ØªÙ†.',
-    saveLabel: 'Ø­ÙØ¸',
+    title: 'على طريقي',
+    placeholder: 'مثال: ماء، بسبس، مناديل...',
+    helper: 'أضف شيئًا بسيطًا من طريق الكابتن.',
+    saveLabel: 'حفظ',
     multiline: true,
     icon: 'add-circle-outline',
   },
@@ -203,24 +203,24 @@ const FULFILLMENT_MODE_ORDER = ['bthwani_delivery', 'partner_delivery', 'pickup'
 function getDeliveryModeSelectionSummary(mode: DshFulfillmentDeliveryMode) {
   switch (mode) {
     case 'partner_delivery':
-      return 'ØªÙ… Ø§Ø®ØªÙŠØ§Ø± ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±';
+      return 'تم اختيار توصيل المتجر';
     case 'pickup':
-      return 'ØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±';
+      return 'تم اختيار الاستلام من المتجر';
     case 'bthwani_delivery':
     default:
-      return 'ØªÙ… Ø§Ø®ØªÙŠØ§Ø± ØªÙˆØµÙŠÙ„ Ø¨Ø«ÙˆØ§Ù†ÙŠ';
+      return 'تم اختيار توصيل بثواني';
   }
 }
 
 function getDeliveryModePickerDescription(mode: DshFulfillmentDeliveryMode) {
   switch (mode) {
     case 'partner_delivery':
-      return 'Ø§Ù„ØªÙˆØµÙŠÙ„ ÙŠØªÙ… Ø¹Ø¨Ø± Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± Ø¥Ù„Ù‰ Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¹Ù…ÙŠÙ„.';
+      return 'التوصيل يتم عبر موصل المتجر إلى موقع العميل.';
     case 'pickup':
-      return 'ØªØ³ØªÙ„Ù… Ø§Ù„Ø·Ù„Ø¨ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø± Ø¨Ù†ÙØ³Ùƒ Ø¨Ø¯ÙˆÙ† Ø±Ø³ÙˆÙ… ØªÙˆØµÙŠÙ„.';
+      return 'تستلم الطلب من المتجر بنفسك بدون رسوم توصيل.';
     case 'bthwani_delivery':
     default:
-      return 'Ø§Ù„ØªÙˆØµÙŠÙ„ ÙŠØªÙ… Ø¹Ø¨Ø± ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ Ø¥Ù„Ù‰ Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø¹Ù…ÙŠÙ„.';
+      return 'التوصيل يتم عبر كابتن بثواني إلى موقع العميل.';
   }
 }
 
@@ -228,16 +228,16 @@ function getDeliveryModePickerDescription(mode: DshFulfillmentDeliveryMode) {
 
 function toEnglishDigits(str: string): string {
   return str
-    .replace(/[Ù -Ù©]/g, (d) => String(d.charCodeAt(0) - 1632))
-    .replace(/[Û°-Û¹]/g, (d) => String(d.charCodeAt(0) - 1776));
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776));
 }
 
 function formatAmount(value: number) {
   try {
     const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
-    return `${formatted} Ø±.ÙŠ.`;
+    return `${formatted} ر.ي.`;
   } catch {
-    return `${value} Ø±.ÙŠ.`;
+    return `${value} ر.ي.`;
   }
 }
 
@@ -300,7 +300,7 @@ function createExecutionScheduleOptions(referenceDate = new Date()): ExecutionSc
 
     return {
       value: `${date.getFullYear()}-${padSchedulePart(date.getMonth() + 1)}-${padSchedulePart(date.getDate())}`,
-      label: index === 0 ? 'ØºØ¯Ù‹Ø§' : index === 1 ? 'Ø¨Ø¹Ø¯ ØºØ¯' : toEnglishDigits(dateChipFormatter.format(date)).replace('ØŒ', '').trim(),
+      label: index === 0 ? 'غدًا' : index === 1 ? 'بعد غد' : toEnglishDigits(dateChipFormatter.format(date)).replace('،', '').trim(),
       fullLabel: toEnglishDigits(dateSummaryFormatter.format(date)),
     };
   });
@@ -340,7 +340,7 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
             </View>
             <Box style={{ flex: 1 }} gap={0.5}>
               <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{dateLabel}</Text>
-              <Text role="caption" style={{ color: TEXT_SECONDARY }}>Ø§Ù„Ø³Ø§Ø¹Ø© {timeLabel}</Text>
+              <Text role="caption" style={{ color: TEXT_SECONDARY }}>الساعة {timeLabel}</Text>
             </Box>
             <Icon name="chevron-forward" size={18} color={colorPalette.textMuted} />
           </Box>
@@ -382,7 +382,7 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
       <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', minHeight: 36 }}>
         <View style={{ width: 96, alignItems: 'center' }}>
           <Button
-            label="Ø§Ø´ØªØ±Ùƒ Ø§Ù„Ø¢Ù†"
+            label="اشترك الآن"
             size="sm"
             fullWidth={false}
             onPress={onPress}
@@ -392,7 +392,7 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
 
         <View style={{ flex: 1, paddingHorizontal: spacing[2], alignItems: 'center', justifyContent: 'center' }}>
           <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center', lineHeight: 18 }}>
-            Ø§Ø´ØªØ±Ùƒ Ø¨Ø®Ø¯Ù…Ø© Ø¨Ø«ÙˆØ§Ù†ÙŠ Ø¨Ø±Ùˆ Ù„Ù„Ø§Ø³ØªÙØ§Ø¯Ø© Ù…Ù† Ø£ÙØ¶Ù„ Ø§Ù„Ø¹Ø±ÙˆØ¶
+            اشترك بخدمة بثواني برو للاستفادة من أفضل العروض
           </Text>
         </View>
 
@@ -441,7 +441,7 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
             zIndex: 2,
           }}>
             <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
-              {`Ù…Ø¶Ø§Ù (${cartQty})`}
+              {`مضاف (${cartQty})`}
             </Text>
           </View>
         )}
@@ -466,7 +466,7 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
         </View>
 
         <Button
-          label="Ø¹Ø±Ø¶ Ø§Ù„Ù…Ù†ØªØ¬"
+          label="عرض المنتج"
           tone="secondary"
           size="sm"
           fullWidth
@@ -500,15 +500,15 @@ function RecommendedSection({
       <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[1], gap: spacing[1] }}>
         <View style={{ flex: 1, gap: 2, alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
           <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
-            Ù‚Ø¯ ØªØ¹Ø¬Ø¨Ùƒ Ù‡Ø°Ù‡ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ø£ÙŠØ¶Ø§Ù‹
+            قد تعجبك هذه المنتجات أيضاً
           </Text>
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
-            Ø§Ù„Ù…Ø¹Ø§ÙŠÙ†Ø© Ù‡Ù†Ø§ ÙÙ‚Ø·ØŒ ÙˆØ§Ù„Ø¥Ø¶Ø§ÙØ© Ù…Ù† Ø¯Ø§Ø®Ù„ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ù…ÙØªÙˆØ­Ø©.
+            المعاينة هنا فقط، والإضافة من داخل البطاقة المفتوحة.
           </Text>
         </View>
         {onOpenStore && (
           <Button
-            label="Ø¥Ø¶Ø§ÙØ© Ù…Ù†ØªØ¬Ø§Øª Ø£Ø®Ø±Ù‰"
+            label="إضافة منتجات أخرى"
             tone="secondary"
             size="sm"
             fullWidth={false}
@@ -574,7 +574,7 @@ function ProductPreviewModal({
   const imageSource = product ? resolveDshImageSource(product.imageUri) : undefined;
   const priceLabel = product ? formatAmount(product.priceValue) : '';
   const hasCartQty = cartQty > 0;
-  const actionLabel = hasCartQty ? 'Ø²ÙŠØ§Ø¯Ø© Ø§Ù„ÙƒÙ…ÙŠØ©' : 'Ø¥Ø¶Ø§ÙØ© Ù„Ù„Ø³Ù„Ø©';
+  const actionLabel = hasCartQty ? 'زيادة الكمية' : 'إضافة للسلة';
   const sheetBottomInset = Math.max(bottomInset, safeArea.comfortable) + spacing[2];
   const sheetTopInset = safeArea.comfortable + spacing[2];
 
@@ -596,7 +596,7 @@ function ProductPreviewModal({
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Ø¥ØºÙ„Ø§Ù‚ Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„Ù…Ù†ØªØ¬"
+          accessibilityLabel="إغلاق معاينة المنتج"
           onPress={onClose}
           style={{
             position: 'absolute',
@@ -636,16 +636,16 @@ function ProductPreviewModal({
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[2] }}>
               <View style={{ flex: 1, gap: spacing[0.5] }}>
                 <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
-                  Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„Ù…Ù†ØªØ¬
+                  معاينة المنتج
                 </Text>
                 <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
-                  Ø§Ù„ÙØªØ­ Ù‡Ù†Ø§ ÙÙ‚Ø·ØŒ ÙˆØ§Ù„Ø¥Ø¶Ø§ÙØ© Ù…Ù† Ø²Ø± Ø¯Ø§Ø®Ù„ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø©
+                  الفتح هنا فقط، والإضافة من زر داخل البطاقة
                 </Text>
               </View>
 
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù…Ø¹Ø§ÙŠÙ†Ø©"
+                accessibilityLabel="إغلاق المعاينة"
                 onPress={onClose}
                 style={({ pressed }) => ({
                   width: 36,
@@ -676,7 +676,7 @@ function ProductPreviewModal({
                 <View style={{ position: 'absolute', top: spacing[2], right: spacing[2], flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 999, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: colorPalette.white, paddingHorizontal: spacing[2], paddingVertical: spacing[1] }}>
                   <Icon name="cart-outline" size={14} color={ACCENT_ORANGE} />
                   <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
-                    {hasCartQty ? `Ù…ÙˆØ¬ÙˆØ¯ ÙÙŠ Ø§Ù„Ø³Ù„Ø© Â· ${cartQty}` : 'ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯ ÙÙŠ Ø§Ù„Ø³Ù„Ø©'}
+                    {hasCartQty ? `موجود في السلة · ${cartQty}` : 'غير موجود في السلة'}
                   </Text>
                 </View>
               </View>
@@ -699,10 +699,10 @@ function ProductPreviewModal({
 
                 <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2], borderRadius: 14, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: hasCartQty ? colorPalette.successSoft : colorPalette.surfaceSecondary, paddingHorizontal: spacing[2], paddingVertical: spacing[1.5] }}>
                   <Text role="bodySm" style={{ flex: 1, color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
-                    {hasCartQty ? 'Ù…ÙˆØ¬ÙˆØ¯ ÙÙŠ Ø§Ù„Ø³Ù„Ø©' : 'ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯ ÙÙŠ Ø§Ù„Ø³Ù„Ø©'}
+                    {hasCartQty ? 'موجود في السلة' : 'غير موجود في السلة'}
                   </Text>
                   <Text role="bodySm" style={{ color: hasCartQty ? colorPalette.success : TEXT_SECONDARY, fontWeight: '700' }}>
-                    {hasCartQty ? `Ã— ${cartQty}` : '0'}
+                    {hasCartQty ? `× ${cartQty}` : '0'}
                   </Text>
                 </View>
 
@@ -724,7 +724,7 @@ function ProductPreviewModal({
                     style={{ flex: 1, minHeight: 48, borderRadius: 16, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
                   />
                   <Button
-                    label="Ø¥ØºÙ„Ø§Ù‚"
+                    label="إغلاق"
                     tone="secondary"
                     fullWidth={false}
                     onPress={onClose}
@@ -775,7 +775,7 @@ function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
           {displayIndex}{item.title}
         </Text>
         <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
-          Ø³Ø¹Ø± Ø§Ù„ÙˆØ­Ø¯Ø©: {formatAmount(price)}
+          سعر الوحدة: {formatAmount(price)}
         </Text>
       </View>
 
@@ -884,12 +884,12 @@ function CartItemEditor({
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
           <Icon name="cart-outline" size={18} color={TEXT_PRIMARY} />
           <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 16 }}>
-            Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø³Ù„Ø©
+            مراجعة السلة
           </Text>
           {items.length > 0 && (
             <View style={{ backgroundColor: SURFACE_SOFT, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 }}>
               <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
-                {items.length} Ø¹Ù†Ø§ØµØ±
+                {items.length} عناصر
               </Text>
             </View>
           )}
@@ -898,7 +898,7 @@ function CartItemEditor({
         {items.length > 0 && onClearCart && (
           <Pressable onPress={onClearCart} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1, paddingVertical: 4, paddingHorizontal: 8 }]}>
             <Text role="bodyStrong" style={{ color: DANGER, fontSize: 14 }}>
-              Ø­Ø°Ù Ø§Ù„ÙƒÙ„
+              حذف الكل
             </Text>
           </Pressable>
         )}
@@ -922,14 +922,14 @@ function CartItemEditor({
         >
           <Icon name="basket-outline" size={32} color={colorPalette.textMuted} />
           <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
-            Ø§Ù„Ø³Ù„Ø© ÙØ§Ø±ØºØ© Ø§Ù„Ø¢Ù†
+            السلة فارغة الآن
           </Text>
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center', maxWidth: '80%', lineHeight: 18 }}>
-            Ø£Ø¶Ù Ù…Ù†ØªØ¬Ø§Øª Ù…Ù† Ø§Ù„Ù…Ù‚ØªØ±Ø­Ø§Øª Ø£Ø¯Ù†Ø§Ù‡ Ù„Ù„Ø¨Ø¯Ø¡ ÙÙŠ ØªØ¬Ù‡ÙŠØ² Ø·Ù„Ø¨Ùƒ.
+            أضف منتجات من المقترحات أدناه للبدء في تجهيز طلبك.
           </Text>
           {onScrollToRecommendations && (
             <Button
-              label="Ø¥Ø¶Ø§ÙØ© Ù…Ù†ØªØ¬Ø§Øª"
+              label="إضافة منتجات"
               tone="brand"
               size="sm"
               fullWidth={false}
@@ -958,18 +958,18 @@ function CartItemEditor({
           {/* Integrated Live Pricing Summary */}
           <View style={{ gap: spacing[1.5], paddingHorizontal: spacing[1] }}>
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª</Text>
+              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>إجمالي المنتجات</Text>
               <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(subtotal)}</Text>
             </View>
 
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>Ø³Ø¹Ø± Ø§Ù„ØªÙˆØµÙŠÙ„</Text>
+              <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>سعر التوصيل</Text>
               <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(deliveryFee)}</Text>
             </View>
 
             {discount > 0 && (
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="bodySm" style={{ color: colorPalette.success, textAlign: isRTL ? 'right' : 'left' }}>Ø§Ù„Ø®ØµÙ… (Ù‚Ø³ÙŠÙ…Ø©: {couponCode})</Text>
+                <Text role="bodySm" style={{ color: colorPalette.success, textAlign: isRTL ? 'right' : 'left' }}>الخصم (قسيمة: {couponCode})</Text>
                 <Text role="bodyStrong" style={{ color: colorPalette.success }}>-{formatAmount(discount)}</Text>
               </View>
             )}
@@ -978,7 +978,7 @@ function CartItemEditor({
             <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[0.5] }} />
 
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 15, textAlign: isRTL ? 'right' : 'left' }}>Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ</Text>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 15, textAlign: isRTL ? 'right' : 'left' }}>الإجمالي النهائي</Text>
               <Text role="titleMd" style={{ color: ACCENT_BLUE, fontWeight: '900' }}>{formatAmount(grandTotal)}</Text>
             </View>
           </View>
@@ -1040,7 +1040,7 @@ function InlineActionEditor({ meta, value, onChangeValue, onSubmit, onClose, sub
           style={{ flex: 1, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE }}
         />
         <Button
-          label="Ø¥Ù„ØºØ§Ø¡"
+          label="إلغاء"
           tone="secondary"
           fullWidth={false}
           onPress={onClose}
@@ -1070,12 +1070,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     () => props.fulfillmentMode ?? 'bthwani_delivery',
   );
   const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(selectedFulfillmentMode);
-  // SSoT: COD is only available for bthwani_delivery â€” gated by dsh-client-wlt-payment-bridge.
+  // SSoT: COD is only available for bthwani_delivery — gated by dsh-client-wlt-payment-bridge.
   const codAllowedForMode = isCodAllowedForMode(selectedFulfillmentMode);
-  // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY â€” real fee from WLT).
+  // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY — real fee from WLT).
   const deliveryAmount = selectedFulfillmentMode === 'pickup' ? 0 : 950;
-  const [clientAddress, setClientAddress] = useState('Ø¬ÙˆØ§Ø± Ø§Ù„Ø¬Ø¨Ù„ Ø§Ù„Ø¬Ø¯ÙŠØ¯');
-  const [note, setNote] = useState('Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø©');
+  const [clientAddress, setClientAddress] = useState('جوار الجبل الجديد');
+  const [note, setNote] = useState('لا يوجد ملاحظة');
   const [extraRequest, setExtraRequest] = useState('');
   const [scheduling, setScheduling] = useState<'now' | 'later'>('now');
   const executionScheduleOptions = useMemo(() => createExecutionScheduleOptions(), []);
@@ -1117,17 +1117,17 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       return storeName;
     }
 
-    return 'Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…ØªØ¬Ø± ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
+    return 'موقع المتجر غير محدد';
   }, [props.store?.name, props.store?.subtitle]);
-  const hasStorePickupLocation = storePickupLocationLabel !== 'Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…ØªØ¬Ø± ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
-  const locationTitle = isPickupMode ? 'Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…' : 'Ù…ÙˆÙ‚Ø¹ Ø§Ù„ØªÙˆØµÙŠÙ„';
+  const hasStorePickupLocation = storePickupLocationLabel !== 'موقع المتجر غير محدد';
+  const locationTitle = isPickupMode ? 'موقع الاستلام' : 'موقع التوصيل';
   const locationSubtitle = isPickupMode ? storePickupLocationLabel : clientAddress;
   const deliveryModeSelectionSummary = getDeliveryModeSelectionSummary(selectedFulfillmentMode);
   const deliveryNotice = selectedFulfillmentMode === 'pickup'
-    ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø³ÙˆÙ… ØªÙˆØµÙŠÙ„ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… Ø¨Ù†ÙØ³Ùƒ.'
+    ? 'لا توجد رسوم توصيل عند الاستلام بنفسك.'
     : selectedFulfillmentMode === 'partner_delivery'
-      ? 'Ù‚Ø¯ ÙŠØ­Ø¯Ø¯ Ø§Ù„Ù…ØªØ¬Ø± Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ© Ø¨Ø¹Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø·Ù„Ø¨.'
-      : 'Ù‚Ø¯ ØªØªØºÙŠØ± Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„ Ø¨Ø¹Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ù…ÙˆÙ‚Ø¹.';
+      ? 'قد يحدد المتجر رسوم التوصيل النهائية بعد اعتماد الطلب.'
+      : 'قد تتغير رسوم التوصيل بعد اعتماد الموقع.';
   const quickActionMeta = useMemo(() => {
     if (!quickActionKey) {
       return null;
@@ -1213,15 +1213,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       setItems(updated);
 
       showNotice(
-        `ØªÙ… Ø­Ø°Ù "${targetItem.title}" Ù…Ù† Ø§Ù„Ø³Ù„Ø©`,
+        `تم حذف "${targetItem.title}" من السلة`,
         undefined,
         'warning',
-        'ØªØ±Ø§Ø¬Ø¹',
+        'تراجع',
         () => {
           const restored = [...updated];
           restored.splice(index, 0, targetItem);
           setItems(restored);
-          showNotice(`ØªÙ…Øª Ø§Ø³ØªØ¹Ø§Ø¯Ø© "${targetItem.title}"`, undefined, 'success');
+          showNotice(`تمت استعادة "${targetItem.title}"`, undefined, 'success');
         }
       );
       return;
@@ -1239,15 +1239,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     setItems(updated);
 
     showNotice(
-      `ØªÙ… Ø­Ø°Ù "${targetItem.title}" Ù…Ù† Ø§Ù„Ø³Ù„Ø©`,
+      `تم حذف "${targetItem.title}" من السلة`,
       undefined,
       'warning',
-      'ØªØ±Ø§Ø¬Ø¹',
+      'تراجع',
       () => {
         const restored = [...updated];
         restored.splice(index, 0, targetItem);
         setItems(restored);
-        showNotice(`ØªÙ…Øª Ø§Ø³ØªØ¹Ø§Ø¯Ø© "${targetItem.title}"`, undefined, 'success');
+        showNotice(`تمت استعادة "${targetItem.title}"`, undefined, 'success');
       }
     );
   };
@@ -1278,10 +1278,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
 
     showNotice(
-      mode === 'official-wallets' ? 'Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ø­Ø§ÙØ¸ Ø§Ù„Ø±Ø³Ù…ÙŠØ© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯' : 'Ù…Ø³Ø§Ø± Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯',
+      mode === 'official-wallets' ? 'مسار المحافظ الرسمية غير موصول بعد' : 'مسار شحن المحفظة غير موصول بعد',
       mode === 'official-wallets'
-        ? 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø³Ø§Ø± Ù…Ø«Ø¨Øª Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ Ù„ÙØªØ­ Ø§Ù„Ù…Ø­Ø§ÙØ¸ Ø§Ù„Ø±Ø³Ù…ÙŠØ© Ø¹Ø¨Ø± WLT.'
-        : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø³Ø§Ø± Ù…Ø«Ø¨Øª Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ Ù„ÙØªØ­ Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø¹Ø¨Ø± WLT.',
+        ? 'لا يوجد مسار مثبت داخل المضيف الحالي لفتح المحافظ الرسمية عبر WLT.'
+        : 'لا يوجد مسار مثبت داخل المضيف الحالي لفتح شحن المحفظة عبر WLT.',
       'info',
     );
   };
@@ -1290,31 +1290,31 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     try {
       const result = await linkWallet();
       if (!result.success) {
-        showNotice('ØªØ¹Ø°Ø± Ø±Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø©', 'Ù„Ù… ÙŠÙƒØªÙ…Ù„ Ø§Ù„Ø±Ø¨Ø·ØŒ Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.', 'danger');
+        showNotice('تعذر ربط المحفظة', 'لم يكتمل الربط، حاول مرة أخرى.', 'danger');
         return;
       }
 
       await refreshWallet();
-      showNotice('ØªÙ… Ø±Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø©', 'Ø£ØµØ¨Ø­ Ø®ÙŠØ§Ø± Ø§Ù„Ø¯ÙØ¹ Ù…Ù† Ø§Ù„Ø±ØµÙŠØ¯ Ù…ØªØ§Ø­Ù‹Ø§ Ø¹Ù†Ø¯ ÙƒÙØ§ÙŠØ© Ø§Ù„Ø±ØµÙŠØ¯.', 'success');
+      showNotice('تم ربط المحفظة', 'أصبح خيار الدفع من الرصيد متاحًا عند كفاية الرصيد.', 'success');
     } catch {
-      showNotice('ØªØ¹Ø°Ø± Ø±Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø©', 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ù…Ø­Ù„ÙŠ Ù„Ù„Ù…Ø­ÙØ¸Ø©.', 'danger');
+      showNotice('تعذر ربط المحفظة', 'حدث خطأ أثناء الربط المحلي للمحفظة.', 'danger');
     }
   };
 
-  // PREVIEW_ONLY: in-memory simulation â€” no real ledger write
+  // PREVIEW_ONLY: in-memory simulation — no real ledger write
   const topUpWalletInline = async (amountMinorUnits: number) => {
     try {
       const normalizedAmount = Math.max(amountMinorUnits, 0);
       if (!normalizedAmount) {
-        showNotice('Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø¨Ù„Øº Ù…Ø·Ù„ÙˆØ¨ Ù„Ù„Ø´Ø­Ù†', 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ ÙŠØºØ·ÙŠ Ø§Ù„Ø·Ù„Ø¨ Ø£Ùˆ Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª ÙƒØ§ÙÙŠØ©.', 'info');
+        showNotice('لا يوجد مبلغ مطلوب للشحن', 'الرصيد الحالي يغطي الطلب أو لا توجد بيانات كافية.', 'info');
         return;
       }
 
       await topUpWallet(normalizedAmount);
       await refreshWallet();
-      showNotice('ØªÙ… Ø´Ø­Ù† Ø§Ù„Ø±ØµÙŠØ¯', `ØªÙ… Ø´Ø­Ù† ${formatMinorUnitsAmount(normalizedAmount)} ÙÙŠ Ø§Ù„Ù…Ø­ÙØ¸Ø©.`, 'success');
+      showNotice('تم شحن الرصيد', `تم شحن ${formatMinorUnitsAmount(normalizedAmount)} في المحفظة.`, 'success');
     } catch {
-      showNotice('ØªØ¹Ø°Ø± Ø´Ø­Ù† Ø§Ù„Ø±ØµÙŠØ¯', 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ø¯ÙŠØ« Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø©.', 'danger');
+      showNotice('تعذر شحن الرصيد', 'حدث خطأ أثناء تحديث رصيد المحفظة.', 'danger');
     }
   };
 
@@ -1326,8 +1326,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           walletAmountMinorUnits: 0,
           amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
-          summary: 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø©.',
-          blockingReason: 'Ø§Ù†ØªØ¸Ø± Ø§ÙƒØªÙ…Ø§Ù„ Ù…Ø²Ø§Ù…Ù†Ø© Ø­Ø§Ù„Ø© Ø§Ù„Ø±Ø¨Ø· ÙˆØ§Ù„Ø±ØµÙŠØ¯ Ø«Ù… Ø£Ø¹Ø¯ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©.',
+          summary: 'جاري التحقق من حالة المحفظة.',
+          blockingReason: 'انتظر اكتمال مزامنة حالة الربط والرصيد ثم أعد المحاولة.',
           feedbackTone: 'info',
         };
       }
@@ -1340,7 +1340,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             amountDueOnDeliveryMinorUnits: 0,
             valid: true,
             isExperimental: true,
-            summary: 'Ø¯ÙØ¹ ØªØ¬Ø±ÙŠØ¨ÙŠ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© â€” Ø³ÙŠÙØ³Ø¬ÙŽÙ‘Ù„ Ù…Ø­Ù„ÙŠÙ‹Ø§ ÙÙ‚Ø·',
+            summary: 'دفع تجريبي من المحفظة — سيُسجَّل محليًا فقط',
             feedbackTone: 'info',
           };
         }
@@ -1350,8 +1350,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           walletAmountMinorUnits: 0,
           amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
-          summary: 'Ø§Ø¯ÙØ¹ ÙƒØ§Ù…Ù„ Ø§Ù„Ø·Ù„Ø¨ Ù…Ù† Ø±ØµÙŠØ¯ WLT Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ.',
-          blockingReason: hasWltServiceRoute ? 'Ø§Ø±Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø£Ùˆ Ø§Ø´Ø­Ù†Ù‡Ø§ Ø¹Ø¨Ø± WLT Ø£ÙˆÙ„Ù‹Ø§ Ø«Ù… Ø£Ø¹Ø¯ Ø§Ù„Ø§Ø®ØªÙŠØ§Ø±.' : 'Ù…Ø³Ø§Ø± Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.',
+          summary: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
+          blockingReason: hasWltServiceRoute ? 'اربط المحفظة أو اشحنها عبر WLT أولًا ثم أعد الاختيار.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.',
           feedbackTone: 'info',
         };
       }
@@ -1364,7 +1364,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
             valid: true,
             isExperimental: true,
-            summary: 'Ø¯ÙØ¹ ØªØ¬Ø±ÙŠØ¨ÙŠ Ø¬Ø²Ø¦ÙŠ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© â€” Ø³ÙŠÙØ³Ø¬ÙŽÙ‘Ù„ Ù…Ø­Ù„ÙŠÙ‹Ø§ ÙÙ‚Ø·',
+            summary: 'دفع تجريبي جزئي من المحفظة — سيُسجَّل محليًا فقط',
             feedbackTone: 'info',
           };
         }
@@ -1374,8 +1374,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           walletAmountMinorUnits: walletBalance,
           amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
           valid: false,
-          summary: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ Ø£Ù‚Ù„ Ù…Ù† Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨.',
-          blockingReason: `ØªØ­ØªØ§Ø¬ Ø´Ø­Ù† ${formattedWalletShortfall} Ù‚Ø¨Ù„ Ø§Ø¹ØªÙ…Ø§Ø¯ Ù‡Ø°Ø§ Ø§Ù„Ø®ÙŠØ§Ø±.`,
+          summary: 'الرصيد الحالي أقل من إجمالي الطلب.',
+          blockingReason: `تحتاج شحن ${formattedWalletShortfall} قبل اعتماد هذا الخيار.`,
           feedbackTone: 'info',
         };
       }
@@ -1385,7 +1385,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         walletAmountMinorUnits: grandTotalMinorUnits,
         amountDueOnDeliveryMinorUnits: 0,
         valid: true,
-        summary: 'Ø§Ù„Ø±ØµÙŠØ¯ ÙŠÙƒÙÙŠØŒ Ø³ÙŠØªÙ… Ø§Ù„Ø¯ÙØ¹ ÙƒØ§Ù…Ù„Ù‹Ø§ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©.',
+        summary: 'الرصيد يكفي، سيتم الدفع كاملًا من المحفظة.',
         feedbackTone: 'success',
       };
     }
@@ -1397,8 +1397,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           walletAmountMinorUnits: 0,
           amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
-          summary: 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø©.',
-          blockingReason: 'Ø§Ù†ØªØ¸Ø± Ø§ÙƒØªÙ…Ø§Ù„ Ø§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ù‚Ø¨Ù„ ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ù…Ø¬.',
+          summary: 'جاري التحقق من حالة المحفظة.',
+          blockingReason: 'انتظر اكتمال المزامنة قبل تفعيل الدفع المدمج.',
           feedbackTone: 'info',
         };
       }
@@ -1411,7 +1411,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
             valid: true,
             isExperimental: true,
-            summary: 'Ø¯ÙØ¹ Ù…Ø¯Ù…Ø¬ ØªØ¬Ø±ÙŠØ¨ÙŠ â€” Ø³ÙŠÙØ³Ø¬ÙŽÙ‘Ù„ Ù…Ø­Ù„ÙŠÙ‹Ø§ ÙÙ‚Ø·',
+            summary: 'دفع مدمج تجريبي — سيُسجَّل محليًا فقط',
             feedbackTone: 'info',
           };
         }
@@ -1421,8 +1421,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           walletAmountMinorUnits: 0,
           amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
           valid: false,
-          summary: 'Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ù…Ø¬ ÙŠØ­ØªØ§Ø¬ Ø±ØµÙŠØ¯Ù‹Ø§ ÙØ¹Ù„ÙŠÙ‹Ø§ ÙÙŠ WLT.',
-          blockingReason: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø±ØµÙŠØ¯ Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ù…Ø¬ Ø§Ù„Ø¢Ù†.',
+          summary: 'الدفع المدمج يحتاج رصيدًا فعليًا في WLT.',
+          blockingReason: 'لا يوجد رصيد لاستخدام الدفع المدمج الآن.',
           feedbackTone: 'info',
         };
       }
@@ -1433,8 +1433,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           walletAmountMinorUnits: grandTotalMinorUnits,
           amountDueOnDeliveryMinorUnits: 0,
           valid: false,
-          summary: 'Ø§Ù„Ø±ØµÙŠØ¯ ÙŠÙƒÙÙŠ Ù„Ù„Ø¯ÙØ¹ Ø§Ù„ÙƒØ§Ù…Ù„ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©.',
-          blockingReason: 'Ø§Ù„Ø±ØµÙŠØ¯ ÙŠÙƒÙÙŠ Ù„Ù„Ø¯ÙØ¹ Ø§Ù„ÙƒØ§Ù…Ù„ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©ØŒ Ù„Ø°Ù„Ùƒ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ù…Ø¬ ØºÙŠØ± Ø¶Ø±ÙˆØ±ÙŠ.',
+          summary: 'الرصيد يكفي للدفع الكامل من المحفظة.',
+          blockingReason: 'الرصيد يكفي للدفع الكامل من المحفظة، لذلك الدفع المدمج غير ضروري.',
           feedbackTone: 'info',
         };
       }
@@ -1444,7 +1444,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         walletAmountMinorUnits: walletBalance,
         amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
         valid: true,
-        summary: `Ø³ÙŠÙØ®ØµÙ… ${formattedWalletBalance} Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ÙˆÙŠÙØ¯ÙØ¹ ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)} Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù….`,
+        summary: `سيُخصم ${formattedWalletBalance} من المحفظة ويُدفع ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)} عند الاستلام.`,
         feedbackTone: 'info',
       };
     }
@@ -1457,7 +1457,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           amountDueOnDeliveryMinorUnits: 0,
           valid: true,
           isExperimental: true,
-          summary: 'Ø¯ÙØ¹ ØªØ¬Ø±ÙŠØ¨ÙŠ Ø¹Ø¨Ø± Ù…Ø­Ø§ÙØ¸ Ø±Ø³Ù…ÙŠØ© â€” Ø³ÙŠÙØ³Ø¬ÙŽÙ‘Ù„ Ù…Ø­Ù„ÙŠÙ‹Ø§ ÙÙ‚Ø·',
+          summary: 'دفع تجريبي عبر محافظ رسمية — سيُسجَّل محليًا فقط',
           feedbackTone: 'info',
         };
       }
@@ -1468,11 +1468,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         amountDueOnDeliveryMinorUnits: 0,
         valid: false,
         summary: hasWltServiceRoute
-          ? 'Ø³ÙŠØªÙ… ØªØ­ÙˆÙŠÙ„Ùƒ Ø¥Ù„Ù‰ WLT Ù„Ø§Ø®ØªÙŠØ§Ø± Ù…Ø­ÙØ¸Ø© Ø±Ø³Ù…ÙŠØ© ÙˆØ¥ÙƒÙ…Ø§Ù„ Ø§Ù„Ø¯ÙØ¹ Ø£Ùˆ Ø§Ù„Ø´Ø­Ù† Ø®Ø§Ø±Ø¬ Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø§Ø´Ø©.'
-          : 'Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ø­Ø§ÙØ¸ Ø§Ù„Ø±Ø³Ù…ÙŠØ© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.',
+          ? 'سيتم تحويلك إلى WLT لاختيار محفظة رسمية وإكمال الدفع أو الشحن خارج هذه الشاشة.'
+          : 'مسار المحافظ الرسمية غير موصول بعد داخل المضيف الحالي.',
         blockingReason: hasWltServiceRoute
-          ? 'Ø£ÙƒÙ…Ù„ Ø§Ù„Ø¯ÙØ¹ Ø£Ùˆ Ø§Ù„Ø´Ø­Ù† Ø¹Ø¨Ø± WLT Ø£ÙˆÙ„Ù‹Ø§ Ø«Ù… Ø¹Ø¯ Ù„Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø·Ù„Ø¨.'
-          : 'Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ø­Ø§ÙØ¸ Ø§Ù„Ø±Ø³Ù…ÙŠØ© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.',
+          ? 'أكمل الدفع أو الشحن عبر WLT أولًا ثم عد لإتمام الطلب.'
+          : 'مسار المحافظ الرسمية غير موصول بعد داخل المضيف الحالي.',
         feedbackTone: 'info',
       };
     }
@@ -1482,7 +1482,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       walletAmountMinorUnits: 0,
       amountDueOnDeliveryMinorUnits: grandTotalMinorUnits,
       valid: true,
-      summary: 'Ø³ØªØ¯ÙØ¹ ÙƒØ§Ù…Ù„ Ø§Ù„Ù…Ø¨Ù„Øº Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù….',
+      summary: 'ستدفع كامل المبلغ عند الاستلام.',
       feedbackTone: 'info',
     };
   }, [codAllowedForMode, formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
@@ -1522,58 +1522,58 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     const walletPending = !walletHydrated || walletRefreshing;
 
     return [
-      // SSoT: COD only available for bthwani_delivery â€” gated by codAllowedForMode.
+      // SSoT: COD only available for bthwani_delivery — gated by codAllowedForMode.
       ...(codAllowedForMode ? [{
         id: 'cod',
-        title: 'Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…',
-        description: 'Ø§Ø¯ÙØ¹ ÙƒØ§Ù…Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù….',
+        title: 'عند الاستلام',
+        description: 'ادفع كامل الطلب عند الاستلام.',
         selected: paymentMethod === 'cod',
-        statusLabel: paymentMethod === 'cod' ? 'Ù…Ø­Ø¯Ø¯' : 'Ø¬Ø§Ù‡Ø² Ø§Ù„Ø¢Ù†',
+        statusLabel: paymentMethod === 'cod' ? 'محدد' : 'جاهز الآن',
         statusTone: paymentMethod === 'cod' ? 'brand' : 'info',
         amountRows: [
-          { label: 'Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: formatMinorUnitsAmount(0), tone: 'muted' },
-          { label: 'Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
+          { label: 'من المحفظة', value: formatMinorUnitsAmount(0), tone: 'muted' },
+          { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
         ],
-        helperText: paymentMethod === 'cod' ? 'Ù„Ø§ ÙŠØ³ØªØ®Ø¯Ù… Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø©.' : undefined,
+        helperText: paymentMethod === 'cod' ? 'لا يستخدم رصيد المحفظة.' : undefined,
         helperTone: 'info' as const,
         onSelect: () => setPaymentMethod('cod'),
       } satisfies PaymentDecisionOption] : []),
       {
         id: 'wallet',
-        title: 'Ù…Ù† Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø©',
-        description: 'Ø§Ø¯ÙØ¹ ÙƒØ§Ù…Ù„ Ø§Ù„Ø·Ù„Ø¨ Ù…Ù† Ø±ØµÙŠØ¯ WLT Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ.',
+        title: 'من رصيد المحفظة',
+        description: 'ادفع كامل الطلب من رصيد WLT الداخلي.',
         selected: paymentMethod === 'wallet',
         disabled: walletPending || (!canUseWalletFull && !EXPERIMENTAL_PAYMENT_ENABLED),
-        statusLabel: paymentMethod === 'wallet' ? 'Ù…Ø­Ø¯Ø¯' : walletPending ? 'Ù‚ÙŠØ¯ Ø§Ù„ØªØ­Ù‚Ù‚' : canUseWalletFull ? 'Ø¬Ø§Ù‡Ø² Ø§Ù„Ø¢Ù†' : EXPERIMENTAL_PAYMENT_ENABLED ? 'ØªØ¬Ø±ÙŠØ¨ÙŠ' : !walletLinked ? 'ÙŠØªØ·Ù„Ø¨ Ø¥Ø¬Ø±Ø§Ø¡' : walletBalance <= 0 ? 'ÙŠØªØ·Ù„Ø¨ Ø¥Ø¬Ø±Ø§Ø¡' : 'ÙŠØªØ·Ù„Ø¨ Ø¥Ø¬Ø±Ø§Ø¡',
+        statusLabel: paymentMethod === 'wallet' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseWalletFull ? 'جاهز الآن' : EXPERIMENTAL_PAYMENT_ENABLED ? 'تجريبي' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'يتطلب إجراء',
         statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : canUseWalletFull ? 'success' : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : !walletLinked || walletBalance <= 0 ? 'warning' : 'warning',
         amountRows: canUseWalletFull
           ? [
-              { label: 'Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
-              { label: 'Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: formatMinorUnitsAmount(0), tone: 'muted' },
+              { label: 'من المحفظة', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
+              { label: 'عند الاستلام', value: formatMinorUnitsAmount(0), tone: 'muted' },
             ]
           : walletLinked
             ? [
-                { label: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ', value: formattedWalletBalance, tone: 'brand' },
-                { label: 'Ø§Ù„Ù…Ø·Ù„ÙˆØ¨ Ø´Ø­Ù†Ù‡', value: formattedWalletShortfall, tone: 'muted' },
+                { label: 'الرصيد الحالي', value: formattedWalletBalance, tone: 'brand' },
+                { label: 'المطلوب شحنه', value: formattedWalletShortfall, tone: 'muted' },
               ]
             : [
-                { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨', value: formattedGrandTotal, tone: 'brand' },
-                { label: 'Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: 'ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø©', tone: 'muted' },
+                { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
+                { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'muted' },
               ],
         helperText: canUseWalletFull
-          ? 'Ø§Ù„Ø±ØµÙŠØ¯ ÙŠÙƒÙÙŠ Ù„Ù„Ø¯ÙØ¹ Ø§Ù„ÙƒØ§Ù…Ù„.'
+          ? 'الرصيد يكفي للدفع الكامل.'
           : walletPending
-            ? 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø­Ø§Ù„Ø© Ø§Ù„Ø±Ø¨Ø· ÙˆØ§Ù„Ø±ØµÙŠØ¯...'
+            ? 'جاري التحقق من حالة الربط والرصيد...'
           : !walletLinked
-            ? (hasWltServiceRoute ? 'Ø§Ø±Ø¨Ø· Ù…Ø­ÙØ¸ØªÙƒ Ø£ÙˆÙ„Ù‹Ø§ Ø¹Ø¨Ø± WLT.' : 'Ù…Ø³Ø§Ø± Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.')
+            ? (hasWltServiceRoute ? 'اربط محفظتك أولًا عبر WLT.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.')
             : walletBalance <= 0
-              ? 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø±ØµÙŠØ¯ Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù†.'
-              : `Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ Ù„Ù„Ø´Ø­Ù† ${formattedWalletShortfall}.`,
+              ? 'لا يوجد رصيد متاح الآن.'
+              : `المتبقي للشحن ${formattedWalletShortfall}.`,
         helperTone: canUseWalletFull ? 'success' : 'info',
         action: canUseWalletFull
           ? undefined
           : {
-              label: walletLinked ? 'Ø´Ø­Ù† Ø§Ù„Ø±ØµÙŠØ¯' : 'Ø±Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø©',
+              label: walletLinked ? 'شحن الرصيد' : 'ربط المحفظة',
               tone: 'warning',
               onPress: walletLinked
                 ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void topUpWalletInline(walletShortfallMinorUnits))
@@ -1584,35 +1584,35 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       },
       {
         id: 'mixed',
-        title: 'Ù…Ø­ÙØ¸Ø© + Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…',
-        description: 'Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ù…ØªØ§Ø­ ÙˆØ§Ø¯ÙØ¹ Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù….',
+        title: 'محفظة + عند الاستلام',
+        description: 'استخدم الرصيد المتاح وادفع المتبقي عند الاستلام.',
         selected: paymentMethod === 'mixed',
         disabled: walletPending || (!canUseMixedPayment && !EXPERIMENTAL_PAYMENT_ENABLED),
-        statusLabel: paymentMethod === 'mixed' ? 'Ù…Ø­Ø¯Ø¯' : walletPending ? 'Ù‚ÙŠØ¯ Ø§Ù„ØªØ­Ù‚Ù‚' : canUseMixedPayment ? 'Ø¬Ø§Ù‡Ø² Ø§Ù„Ø¢Ù†' : EXPERIMENTAL_PAYMENT_ENABLED ? 'ØªØ¬Ø±ÙŠØ¨ÙŠ' : !walletLinked ? 'ÙŠØªØ·Ù„Ø¨ Ø¥Ø¬Ø±Ø§Ø¡' : walletBalance <= 0 ? 'ÙŠØªØ·Ù„Ø¨ Ø¥Ø¬Ø±Ø§Ø¡' : 'ØºÙŠØ± Ø¶Ø±ÙˆØ±ÙŠ',
+        statusLabel: paymentMethod === 'mixed' ? 'محدد' : walletPending ? 'قيد التحقق' : canUseMixedPayment ? 'جاهز الآن' : EXPERIMENTAL_PAYMENT_ENABLED ? 'تجريبي' : !walletLinked ? 'يتطلب إجراء' : walletBalance <= 0 ? 'يتطلب إجراء' : 'غير ضروري',
         statusTone: walletPending ? 'info' : canUseMixedPayment ? (paymentMethod === 'mixed' ? 'brand' : 'info') : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : !walletLinked || walletBalance <= 0 ? 'warning' : 'info',
         amountRows: canUseMixedPayment
           ? [
-              { label: 'Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: formattedWalletBalance, tone: 'brand' },
-              { label: 'Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance), tone: 'brand' },
+              { label: 'من المحفظة', value: formattedWalletBalance, tone: 'brand' },
+              { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance), tone: 'brand' },
             ]
           : [
-              { label: 'Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: walletLinked ? formattedWalletBalance : formatMinorUnitsAmount(0), tone: 'muted' },
-              { label: 'Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: formattedGrandTotal, tone: 'brand' },
+              { label: 'من المحفظة', value: walletLinked ? formattedWalletBalance : formatMinorUnitsAmount(0), tone: 'muted' },
+              { label: 'عند الاستلام', value: formattedGrandTotal, tone: 'brand' },
             ],
         helperText: canUseMixedPayment
-          ? `Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ${formattedWalletBalance}ØŒ ÙˆØ¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)}.`
+          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)}.`
           : walletPending
-            ? 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø©...'
+            ? 'جاري التحقق من رصيد المحفظة...'
           : !walletLinked
-            ? (hasWltServiceRoute ? 'Ø§ÙØªØ­ WLT Ù„Ø±Ø¨Ø· Ø§Ù„Ù…Ø­ÙØ¸Ø©.' : 'Ù…Ø³Ø§Ø± Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¨Ø¹Ø¯ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.')
+            ? (hasWltServiceRoute ? 'افتح WLT لربط المحفظة.' : 'مسار شحن المحفظة غير موصول بعد داخل المضيف الحالي.')
             : walletBalance <= 0
-              ? 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø±ØµÙŠØ¯ Ù„Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ù…Ø¬.'
-              : 'Ø§Ù„Ø±ØµÙŠØ¯ ÙŠÙƒÙÙŠ Ù„Ù„Ø¯ÙØ¹ Ø§Ù„ÙƒØ§Ù…Ù„ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©.',
+              ? 'لا يوجد رصيد للدفع المدمج.'
+              : 'الرصيد يكفي للدفع الكامل من المحفظة.',
         helperTone: 'info',
         action: canUseMixedPayment || walletBalance >= grandTotalMinorUnits
           ? undefined
           : {
-              label: !walletLinked ? 'ÙØªØ­ WLT' : 'Ø´Ø­Ù† Ø§Ù„Ø±ØµÙŠØ¯',
+              label: !walletLinked ? 'فتح WLT' : 'شحن الرصيد',
               tone: 'warning',
               onPress: !walletLinked
                 ? (hasWltServiceRoute ? () => openWltService('wallet-topup') : () => void linkWalletInline())
@@ -1623,21 +1623,21 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       },
       {
         id: 'official-wallets',
-        title: 'Ø§Ù„Ø¯ÙØ¹ Ø¹Ø¨Ø± Ø§Ù„Ù…Ø­Ø§ÙØ¸ Ø§Ù„Ø±Ø³Ù…ÙŠØ©',
-        description: 'Ø§Ø®ØªØ± Ù…Ø­ÙØ¸Ø© Ø±Ø³Ù…ÙŠØ© ÙˆØ£ÙƒÙ…Ù„ Ø¹Ø¨Ø± WLT.',
+        title: 'الدفع عبر المحافظ الرسمية',
+        description: 'اختر محفظة رسمية وأكمل عبر WLT.',
         selected: paymentMethod === 'official-wallets',
         disabled: !hasWltServiceRoute && !EXPERIMENTAL_PAYMENT_ENABLED,
-        statusLabel: paymentMethod === 'official-wallets' ? 'Ù…Ø­Ø¯Ø¯' : hasWltServiceRoute ? 'Ù…Ø³Ø§Ø± Ø®Ø§Ø±Ø¬ÙŠ' : EXPERIMENTAL_PAYMENT_ENABLED ? 'ØªØ¬Ø±ÙŠØ¨ÙŠ' : 'ØºÙŠØ± Ù…ÙˆØµÙˆÙ„',
+        statusLabel: paymentMethod === 'official-wallets' ? 'محدد' : hasWltServiceRoute ? 'مسار خارجي' : EXPERIMENTAL_PAYMENT_ENABLED ? 'تجريبي' : 'غير موصول',
         statusTone: paymentMethod === 'official-wallets' ? 'brand' : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : 'info',
         amountRows: [
-          { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨', value: formattedGrandTotal, tone: 'brand' },
+          { label: 'إجمالي الطلب', value: formattedGrandTotal, tone: 'brand' },
         ],
         helperText: hasWltServiceRoute
-          ? 'Ø®ÙŠØ§Ø± Ù…Ø³ØªÙ‚Ù„ Ø¹Ù† Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ.'
-          : 'Ù‡Ø°Ø§ Ø§Ù„Ø®ÙŠØ§Ø± ÙŠØ­ØªØ§Ø¬ Ø±Ø¨Ø· Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ø­Ø§ÙØ¸ Ø§Ù„Ø±Ø³Ù…ÙŠØ© Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ Ø§Ù„Ø­Ø§Ù„ÙŠ.',
+          ? 'خيار مستقل عن رصيد المحفظة الداخلي.'
+          : 'هذا الخيار يحتاج ربط مسار المحافظ الرسمية داخل المضيف الحالي.',
         helperTone: 'info',
         action: {
-          label: hasWltServiceRoute ? (walletLinked ? 'Ø§Ø®ØªÙŠØ§Ø± Ù…Ø­ÙØ¸Ø© Ø±Ø³Ù…ÙŠØ©' : 'ÙØªØ­ WLT') : 'Ø§Ù„Ù…Ø³Ø§Ø± ØºÙŠØ± Ù…ÙˆØµÙˆÙ„',
+          label: hasWltServiceRoute ? (walletLinked ? 'اختيار محفظة رسمية' : 'فتح WLT') : 'المسار غير موصول',
           tone: 'secondary',
           onPress: hasWltServiceRoute ? () => openWltService('official-wallets') : undefined,
           disabled: !hasWltServiceRoute,
@@ -1649,7 +1649,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const executionTimingSummary = useMemo(() => {
     if (scheduling === 'now') {
-      return 'Ø§Ù„Ø¢Ù†';
+      return 'الآن';
     }
 
     const selectedDateOption = executionScheduleOptions.dateOptions.find((option) => option.value === scheduledDate);
@@ -1667,31 +1667,31 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const checkoutReviewItems = useMemo(() => {
     const items = [
-      { label: 'Ø¹Ø¯Ø¯ Ø§Ù„Ø¹Ù†Ø§ØµØ±', value: `${totalItemsCount} Ø¹Ù†Ø§ØµØ±` },
-      { label: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª', value: formattedSubtotal },
-      { label: 'Ø±Ø³ÙˆÙ… Ø§Ù„ØªÙˆØµÙŠÙ„', value: formattedDelivery },
-      { label: 'Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹', value: paymentMethodLabel, helper: paymentSelection.summary },
-      { label: 'Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©', value: formatMinorUnitsAmount(paymentSelection.walletAmountMinorUnits) },
-      { label: 'Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…', value: formatMinorUnitsAmount(paymentSelection.amountDueOnDeliveryMinorUnits) },
-      { label: 'Ø®ÙŠØ§Ø± Ø§Ù„ØªÙˆØµÙŠÙ„', value: fulfillmentModeMeta.label },
+      { label: 'عدد العناصر', value: `${totalItemsCount} عناصر` },
+      { label: 'إجمالي المنتجات', value: formattedSubtotal },
+      { label: 'رسوم التوصيل', value: formattedDelivery },
+      { label: 'طريقة الدفع', value: paymentMethodLabel, helper: paymentSelection.summary },
+      { label: 'من المحفظة', value: formatMinorUnitsAmount(paymentSelection.walletAmountMinorUnits) },
+      { label: 'عند الاستلام', value: formatMinorUnitsAmount(paymentSelection.amountDueOnDeliveryMinorUnits) },
+      { label: 'خيار التوصيل', value: fulfillmentModeMeta.label },
       { label: locationTitle, value: locationSubtitle },
-      { label: 'ÙˆÙ‚Øª Ø§Ù„ØªÙ†ÙÙŠØ°', value: executionTimingSummary },
+      { label: 'وقت التنفيذ', value: executionTimingSummary },
     ];
 
     if (formattedDiscount) {
-      items.splice(3, 0, { label: 'Ø§Ù„Ø®ØµÙ…', value: formattedDiscount });
+      items.splice(3, 0, { label: 'الخصم', value: formattedDiscount });
     }
 
     if (couponCode) {
-      items.push({ label: 'Ø§Ù„Ù‚Ø³ÙŠÙ…Ø©', value: couponCode });
+      items.push({ label: 'القسيمة', value: couponCode });
     }
 
-    if (note !== 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø©') {
-      items.push({ label: 'Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø·Ù„Ø¨', value: note });
+    if (note !== 'لا يوجد ملاحظة') {
+      items.push({ label: 'ملاحظات الطلب', value: note });
     }
 
     if (selectedFulfillmentMode === 'bthwani_delivery' && extraRequest) {
-      items.push({ label: 'Ø¹Ù„Ù‰ Ø·Ø±ÙŠÙ‚ÙŠ', value: extraRequest });
+      items.push({ label: 'على طريقي', value: extraRequest });
     }
 
     return items;
@@ -1732,7 +1732,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const runCheckoutPreflight = () => {
     if (isOrderSubmitted) {
-      showNotice('Ø§Ù„Ø·Ù„Ø¨ Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°', 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø¨Ø§Ù„ÙØ¹Ù„. Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ ÙŠØªÙ… Ø¹Ø¨Ø± ÙØ±ÙŠÙ‚ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª ÙÙ‚Ø·.', 'info');
+      showNotice('الطلب قيد التنفيذ', 'تم إرسال الطلب بالفعل. التعديل يتم عبر فريق العمليات فقط.', 'info');
       return false;
     }
 
@@ -1742,7 +1742,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
 
     if (!checkoutAction) {
-      showNotice('ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨ Ù…Ø­Ø¬ÙˆØ¨', 'Ø²Ø± Ø§Ù„ØªÙ†ÙÙŠØ° Ø¬Ø§Ù‡Ø² UI Ù„ÙƒÙ† Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ§Ù„ÙŠ ØºÙŠØ± Ù…ÙˆØµÙˆÙ„ ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ø¹Ø±Ø¶.', 'info');
+      showNotice('تنفيذ الطلب محجوب', 'زر التنفيذ جاهز UI لكن المسار التالي غير موصول في هذا العرض.', 'info');
       return false;
     }
 
@@ -1759,7 +1759,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     const checkoutPayload = buildCheckoutPayload();
 
     if (paymentSelection.isExperimental) {
-      showNotice('ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠ', paymentSelection.summary, 'success');
+      showNotice('تم تسجيل الدفع التجريبي', paymentSelection.summary, 'success');
       await Promise.resolve(checkoutAction?.(checkoutPayload));
       return;
     }
@@ -1770,7 +1770,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         const paymentResult = await requestWalletPayment(paymentSelection.walletAmountMinorUnits);
         await refreshWallet();
         if (!paymentResult.success) {
-          showNotice('ØªØ¹Ø°Ø± Ø®ØµÙ… Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø­ÙØ¸Ø©', paymentResult.error === 'insufficient_balance' ? 'Ø§Ù„Ø±ØµÙŠØ¯ Ù„Ù… ÙŠØ¹Ø¯ ÙƒØ§ÙÙŠÙ‹Ø§ Ø¨Ø¹Ø¯ Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ«.' : 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªÙ‡ÙŠØ¦Ø© Ø§Ù„Ø¯ÙØ¹ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø©.', 'danger');
+          showNotice('تعذر خصم مبلغ المحفظة', paymentResult.error === 'insufficient_balance' ? 'الرصيد لم يعد كافيًا بعد آخر تحديث.' : 'حدث خطأ أثناء تهيئة الدفع من المحفظة.', 'danger');
           return;
         }
 
@@ -1790,7 +1790,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     }
 
     // J-003A: call GET /cart/serviceability if a live client is available.
-    // This is the real code-level gate â€” not a doc claim.
+    // This is the real code-level gate — not a doc claim.
     if (props.checkoutClient && props.store?.id) {
       setCheckoutLoading(true);
       try {
@@ -1801,22 +1801,22 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         );
         if (!serviceability.serviceable) {
           const reasonMessages: Record<string, string> = {
-            store_closed: 'Ø§Ù„Ù…ØªØ¬Ø± Ù…ØºÙ„Ù‚ Ø­Ø§Ù„ÙŠÙ‹Ø§ØŒ ÙŠÙØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù„Ø§Ø­Ù‚Ù‹Ø§.',
-            delivery_zone_unavailable: 'Ù…ÙˆÙ‚Ø¹Ùƒ Ø®Ø§Ø±Ø¬ Ù†Ø·Ø§Ù‚ Ø§Ù„ØªÙˆØµÙŠÙ„ Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…ØªØ¬Ø±.',
-            items_unavailable: 'Ø¨Ø¹Ø¶ Ø¹Ù†Ø§ØµØ± Ø§Ù„Ø³Ù„Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠÙ‹Ø§.',
-            partner_not_ready: 'Ø§Ù„Ø´Ø±ÙŠÙƒ ØºÙŠØ± Ø¬Ø§Ù‡Ø² Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¢Ù†.',
+            store_closed: 'المتجر مغلق حاليًا، يُرجى المحاولة لاحقًا.',
+            delivery_zone_unavailable: 'موقعك خارج نطاق التوصيل لهذا المتجر.',
+            items_unavailable: 'بعض عناصر السلة غير متاحة حاليًا.',
+            partner_not_ready: 'الشريك غير جاهز لاستقبال الطلبات الآن.',
           };
           const reason = serviceability.reason_code ?? 'unknown';
           showNotice(
-            'Ø§Ù„ØªÙˆØµÙŠÙ„ ØºÙŠØ± Ù…ØªØ§Ø­',
-            reasonMessages[reason] ?? 'ØªØ¹Ø°Ø± Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø·Ù„Ø¨ â€” Ø§Ù„Ù…ØªØ¬Ø± Ø£Ùˆ Ø§Ù„Ù…ÙˆÙ‚Ø¹ ØºÙŠØ± Ù…ØªØ§Ø­ Ø­Ø§Ù„ÙŠÙ‹Ø§.',
+            'التوصيل غير متاح',
+            reasonMessages[reason] ?? 'تعذر إتمام الطلب — المتجر أو الموقع غير متاح حاليًا.',
             'danger',
           );
           return;
         }
       } catch {
-        // Network failure â€” do not block checkout, let intent creation handle it.
-        showNotice('ØªØ­Ù‚Ù‚ Ø§Ù„ØªÙˆÙØ±', 'ØªØ¹Ø°Ø± Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØªÙˆÙØ± â€” Ø³ÙŠØªÙ… Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ø¹Ù†Ø¯ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨.', 'info');
+        // Network failure — do not block checkout, let intent creation handle it.
+        showNotice('تحقق التوفر', 'تعذر التحقق من التوفر — سيتم المحاولة عند إنشاء الطلب.', 'info');
       } finally {
         setCheckoutLoading(false);
       }
@@ -1832,7 +1832,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   const handleEditPress = () => {
     if (!canEditOrder) {
-      showNotice('ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ ØºÙŠØ± Ù…ØªØ§Ø­ Ø§Ù„Ø¢Ù†', 'Ø²Ø± Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ ÙŠØ­ØªØ§Ø¬ Ù…Ø³Ø§Ø± Ø±Ø¬ÙˆØ¹ Ø£Ùˆ ØªØ­Ø±ÙŠØ± Ù…ÙˆØµÙˆÙ„ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø¶ÙŠÙ.', 'info');
+      showNotice('تعديل الطلب غير متاح الآن', 'زر التعديل يحتاج مسار رجوع أو تحرير موصول داخل المضيف.', 'info');
       return;
     }
 
@@ -1861,12 +1861,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const handleDeliveryModeSelection = (mode: DshFulfillmentDeliveryMode) => {
     setSelectedFulfillmentMode(mode);
     setDeliveryModePickerOpen(false);
-    showNotice('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø®ÙŠØ§Ø± Ø§Ù„ØªÙˆØµÙŠÙ„', getDeliveryModeSelectionSummary(mode), 'success');
+    showNotice('تم تحديث خيار التوصيل', getDeliveryModeSelectionSummary(mode), 'success');
   };
 
   const handlePickupLocationPreview = () => {
     if (!hasStorePickupLocation) {
-      showNotice('Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…ØªØ¬Ø± ØºÙŠØ± Ù…Ø­Ø¯Ø¯', 'Ù„Ù… ÙŠØ±Ø³Ù„ Ø§Ù„Ù…ØªØ¬Ø± Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… Ø¨Ø¹Ø¯.', 'info');
+      showNotice('موقع المتجر غير محدد', 'لم يرسل المتجر موقع الاستلام بعد.', 'info');
       return;
     }
 
@@ -1892,8 +1892,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     const initialValue = {
       coupon: couponCode,
-      address: clientAddress === 'Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ØºÙŠØ± Ù…Ø­Ø¯Ø¯ Ø¨Ø¹Ø¯' ? '' : clientAddress,
-      note: note === 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø©' ? '' : note,
+      address: clientAddress === 'العنوان غير محدد بعد' ? '' : clientAddress,
+      note: note === 'لا يوجد ملاحظة' ? '' : note,
       extra: extraRequest,
     }[actionKey];
 
@@ -1918,39 +1918,39 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           e => isClientVisibleStatus(e.status as CommercialLifecycleStatus),
         );
         if (activeCouponOffers.length === 0 && !hasCouponEntitlement) {
-          showNotice('Ù„Ø§ ØªÙˆØ¬Ø¯ Ù‚Ø³Ø§Ø¦Ù… Ù†Ø´Ø·Ø©', 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¹Ø±Ø¶ Ù‚Ø³ÙŠÙ…Ø© Ù†Ø´Ø· Ø­Ø§Ù„ÙŠØ§Ù‹ Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…ØªØ¬Ø±.', 'warning');
+          showNotice('لا توجد قسائم نشطة', 'لا يوجد عرض قسيمة نشط حالياً لهذا المتجر.', 'warning');
           return;
         }
       }
       setCouponCode(trimmedValue);
       showNotice(
-        trimmedValue ? 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù‚Ø³ÙŠÙ…Ø©' : 'Ø£Ø²Ù„Øª Ø§Ù„Ù‚Ø³ÙŠÙ…Ø© Ø§Ù„Ù…Ø­Ù„ÙŠØ©',
-        trimmedValue ? `Ø§Ù„Ù‚Ø³ÙŠÙ…Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©: ${trimmedValue}` : 'Ù„Ù† ÙŠØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø£ÙŠ Ù‚Ø³ÙŠÙ…Ø© Ù…Ø¹ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ø­Ø§Ù„ÙŠ.',
+        trimmedValue ? 'تم حفظ القسيمة' : 'أزلت القسيمة المحلية',
+        trimmedValue ? `القسيمة الحالية: ${trimmedValue}` : 'لن يتم إرسال أي قسيمة مع الطلب الحالي.',
         'success',
       );
     }
 
     if (quickActionKey === 'address') {
-      const nextLocation = trimmedValue || 'Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ØºÙŠØ± Ù…Ø­Ø¯Ø¯ Ø¨Ø¹Ø¯';
+      const nextLocation = trimmedValue || 'العنوان غير محدد بعد';
       setClientAddress(nextLocation);
       showNotice(
-        `ØªÙ… ØªØ­Ø¯ÙŠØ« ${locationTitle}`,
-        trimmedValue || 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙƒØ­Ø§Ù„Ø© ØºÙŠØ± Ù…Ø­Ø¯Ø¯Ø© Ø­ØªÙ‰ ÙŠØªÙ… Ø¥Ø¯Ø®Ø§Ù„Ù‡ Ù„Ø§Ø­Ù‚Ù‹Ø§.',
+        `تم تحديث ${locationTitle}`,
+        trimmedValue || 'تم حفظ الموقع كحالة غير محددة حتى يتم إدخاله لاحقًا.',
         'success',
       );
     }
 
     if (quickActionKey === 'note') {
-      const nextNote = trimmedValue || 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø©';
+      const nextNote = trimmedValue || 'لا يوجد ملاحظة';
       setNote(nextNote);
-      showNotice('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø©', nextNote, 'success');
+      showNotice('تم تحديث الملاحظة', nextNote, 'success');
     }
 
     if (quickActionKey === 'extra') {
       setExtraRequest(trimmedValue);
       showNotice(
-        trimmedValue ? 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¶Ø§ÙÙŠ' : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨ Ø¥Ø¶Ø§ÙÙŠ Ù…Ø­ÙÙˆØ¸',
-        trimmedValue || 'ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø¶Ø§ÙØ© Ø·Ù„Ø¨ Ø¥Ø¶Ø§ÙÙŠ Ù„Ø§Ø­Ù‚Ù‹Ø§ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø©.',
+        trimmedValue ? 'تم حفظ الطلب الإضافي' : 'لا يوجد طلب إضافي محفوظ',
+        trimmedValue || 'يمكنك إضافة طلب إضافي لاحقًا عند الحاجة.',
         'success',
       );
     }
@@ -1980,7 +1980,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           ? { ...item, qty: (item.qty ?? 1) + 1 }
           : item
       )));
-      setPreviewFeedback({ message: 'Ø²Ø§Ø¯Øª Ø§Ù„ÙƒÙ…ÙŠØ©', tone: 'success' });
+      setPreviewFeedback({ message: 'زادت الكمية', tone: 'success' });
       return;
     }
 
@@ -1994,7 +1994,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         qty: 1,
       },
     ]);
-    setPreviewFeedback({ message: 'ØªÙ…Øª Ø§Ù„Ø¥Ø¶Ø§ÙØ©', tone: 'success' });
+    setPreviewFeedback({ message: 'تمت الإضافة', tone: 'success' });
   };
 
   const handleOpenFirstRecommendationPreview = () => {
@@ -2005,14 +2005,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const handleSubscribePress = () => {
-    showNotice('Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ Ø¬Ø§Ù‡Ø² UI ÙÙ‚Ø·', 'Ø²Ø± Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ ÙˆØ§Ø¶Ø­ ÙˆÙØ¹Ø§Ù„ØŒ Ù„ÙƒÙ† ØªÙØ¹ÙŠÙ„ Ø§Ù„Ù…ÙŠØ²Ø© ÙŠØ­ØªØ§Ø¬ Ø±Ø¨Ø·Ù‹Ø§ Ù„Ø§Ø­Ù‚Ù‹Ø§ Ø®Ø§Ø±Ø¬ Ù‡Ø°Ø§ Ø§Ù„Ù†Ø·Ø§Ù‚.', 'info');
+    showNotice('الاشتراك جاهز UI فقط', 'زر الاشتراك واضح وفعال، لكن تفعيل الميزة يحتاج ربطًا لاحقًا خارج هذا النطاق.', 'info');
   };
 
   const handleOpenStore = () => {
     if (props.onOpenStore) {
       props.onOpenStore();
     } else {
-      showNotice('ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„Ù…ØªØ¬Ø± ØºÙŠØ± Ù…ÙˆØµÙˆÙ„Ø©', 'Ø²Ø± Ø¥Ø¶Ø§ÙØ© Ù…Ù†ØªØ¬Ø§Øª Ø£Ø®Ø±Ù‰ Ø¬Ø§Ù‡Ø²ØŒ ÙˆÙ„ÙƒÙ† Ù„Ù… ÙŠØªÙ… ØªÙ…Ø±ÙŠØ± Ù…Ø³Ø§Ø± ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„Ù…ØªØ¬Ø± ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠ.', 'info');
+      showNotice('واجهة المتجر غير موصولة', 'زر إضافة منتجات أخرى جاهز، ولكن لم يتم تمرير مسار واجهة المتجر في هذا العرض التجريبي.', 'info');
     }
   };
 
@@ -2020,10 +2020,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     <View style={{ flex: 1, backgroundColor: PAGE_BG }}>
       <TopBar
         variant="secondary"
-        title="ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø·Ù„Ø¨"
+        title="تأكيد الطلب"
         titleSlot={(
           <Text style={{ color: TEXT_PRIMARY, fontSize: 17, fontWeight: '900', lineHeight: 20, maxWidth: '100%', flexShrink: 1, minWidth: 0, textAlign: 'center' }} numberOfLines={1}>
-            ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø·Ù„Ø¨
+            تأكيد الطلب
           </Text>
         )}
         actions={[]}
@@ -2063,13 +2063,13 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5] }}>
             <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
               <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
-                Ø³ÙŠØ§Ø³Ø© ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø·Ù„Ø¨
+                سياسة تأكيد الطلب
               </Text>
               <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-                {checkoutFlowSummary?.nextPolicyActionPreview ?? 'Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø§Ø´Ø© ØªØ¹Ø±Ø¶ Ø§Ù„Ù…Ù„Ø®Øµ Ø£ÙˆÙ„Ù‹Ø§ØŒ ÙˆØªÙØªØ­ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªÙØµÙŠÙ„ÙŠØ© Ø¹Ù†Ø¯ Ø§Ù„Ø·Ù„Ø¨ ÙÙ‚Ø·.'}
+                {checkoutFlowSummary?.nextPolicyActionPreview ?? 'هذه الشاشة تعرض الملخص أولًا، وتفتح المراجعة التفصيلية عند الطلب فقط.'}
               </Text>
               <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-                {`Ø§Ù„Ø£Ø«Ø± Ø§Ù„Ù…Ø§Ù„ÙŠ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ§Øª Ø§Ù„Ù…Ø±Ø¬Ø¹ÙŠØ© ÙŠØªØ¨Ø¹Ø§Ù† ${resolveDshControlPanelSectionLabel('finance')} ÙˆWLTØŒ Ø¨ÙŠÙ†Ù…Ø§ Ø§Ù„Ø³ÙŠØ§Ø³Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ²ÙŠØ© ØªØªØ¨Ø¹ ${resolveDshControlPanelSectionLabel('platform')}.`}
+                {`الأثر المالي والتسويات المرجعية يتبعان ${resolveDshControlPanelSectionLabel('finance')} وWLT، بينما السياسة التشغيلية المركزية تتبع ${resolveDshControlPanelSectionLabel('platform')}.`}
               </Text>
             </View>
             <Text role="caption" style={{ color: ACCENT_ORANGE, fontWeight: '800', textAlign: 'right' }}>
@@ -2086,18 +2086,18 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                   <Icon name={fulfillmentModeMeta.icon} size={18} color={TEXT_PRIMARY} />
                   <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
                     <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
-                      Ø®ÙŠØ§Ø± Ø§Ù„ØªÙˆØµÙŠÙ„
+                      خيار التوصيل
                     </Text>
                     <Text role="caption" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
                       {deliveryModeSelectionSummary}
                     </Text>
                     <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-                      Ø¥Ø°Ø§ Ø£Ø±Ø¯Øª ØªØºÙŠÙŠØ±Ù‡ Ø§Ø¶ØºØ· Ù‡Ù†Ø§
+                      إذا أردت تغييره اضغط هنا
                     </Text>
                   </View>
                 </View>
                 <Button
-                  label="ØªØºÙŠÙŠØ±"
+                  label="تغيير"
                   tone="secondary"
                   size="sm"
                   fullWidth={false}
@@ -2133,7 +2133,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                             </Text>
                             {isSelected && (
                               <Text role="caption" style={{ color: ACCENT_ORANGE, textAlign: 'right' }}>
-                                Ù…Ø­Ø¯Ø¯
+                                محدد
                               </Text>
                             )}
                           </View>
@@ -2149,9 +2149,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             )}
           </View>
           <OptionRow
-            title="Ù‡Ù„ Ù„Ø¯ÙŠÙƒ Ù‚Ø³ÙŠÙ…Ø© ØªØ®ÙÙŠØ¶ØŸ"
-            subtitle={couponCode ? `Ø§Ù„Ù‚Ø³ÙŠÙ…Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©: ${couponCode}` : 'Ø£Ø¯Ø®Ù„ Ø±Ù…Ø² Ø§Ù„ØªØ®ÙÙŠØ¶ Ø¥Ù† ÙˆØ¬Ø¯'}
-            actionLabel={couponCode ? 'ØªØ¹Ø¯ÙŠÙ„' : 'Ø¥Ø¶Ø§ÙØ©'}
+            title="هل لديك قسيمة تخفيض؟"
+            subtitle={couponCode ? `القسيمة الحالية: ${couponCode}` : 'أدخل رمز التخفيض إن وجد'}
+            actionLabel={couponCode ? 'تعديل' : 'إضافة'}
             onAction={() => openQuickAction('coupon')}
             style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
           />
@@ -2179,7 +2179,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                   </Text>
                 </View>
                 <Button
-                  label={isPickupMode ? 'Ø¹Ø±Ø¶ Ø§Ù„Ù…ÙˆÙ‚Ø¹' : 'ØªØºÙŠÙŠØ±'}
+                  label={isPickupMode ? 'عرض الموقع' : 'تغيير'}
                   tone="secondary"
                   size="sm"
                   fullWidth={false}
@@ -2206,9 +2206,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             </Text>
           </View>
           <OptionRow
-            title="Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø·Ù„Ø¨"
+            title="ملاحظات الطلب"
             subtitle={note}
-            actionLabel={note === 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø©' ? 'Ø¥Ø¶Ø§ÙØ©' : 'ØªØ¹Ø¯ÙŠÙ„'}
+            actionLabel={note === 'لا يوجد ملاحظة' ? 'إضافة' : 'تعديل'}
             onAction={() => openQuickAction('note')}
             style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
           />
@@ -2225,9 +2225,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           )}
           {selectedFulfillmentMode === 'bthwani_delivery' && (
             <OptionRow
-              title="Ø¹Ù„Ù‰ Ø·Ø±ÙŠÙ‚ÙŠ"
-              subtitle={extraRequest || 'Ø£Ø¶Ù Ø´ÙŠØ¦Ù‹Ø§ Ø¨Ø³ÙŠØ·Ù‹Ø§ Ù…Ù† Ø·Ø±ÙŠÙ‚ Ø§Ù„ÙƒØ§Ø¨ØªÙ†'}
-              actionLabel={extraRequest ? 'ØªØ¹Ø¯ÙŠÙ„' : 'Ø¥Ø¶Ø§ÙØ©'}
+              title="على طريقي"
+              subtitle={extraRequest || 'أضف شيئًا بسيطًا من طريق الكابتن'}
+              actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
               onAction={() => openQuickAction('extra')}
               style={{ paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
             />
@@ -2245,12 +2245,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           )}
         </Surface>
 
-        <Card title="ÙˆÙ‚Øª Ø§Ù„ØªÙ†ÙÙŠØ°" subtitle="Ø§Ø®ØªØ± ÙˆÙ‚Øª ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨" padding={2} gap={1}>
+        <Card title="وقت التنفيذ" subtitle="اختر وقت تنفيذ الطلب" padding={2} gap={1}>
           <View style={{ gap: spacing[1] }}>
             <SegmentedControl
               options={[
-                { value: 'now', label: 'Ø§Ù„Ø¢Ù†' },
-                { value: 'later', label: 'ÙÙŠ ÙˆÙ‚Øª Ù„Ø§Ø­Ù‚' },
+                { value: 'now', label: 'الآن' },
+                { value: 'later', label: 'في وقت لاحق' },
               ]}
               value={scheduling}
               onValueChange={(nextValue) => {
@@ -2265,7 +2265,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             />
             {scheduling === 'now' ? (
               <Text role="caption" style={{ color: TEXT_SECONDARY }}>
-                Ø³ÙŠØªÙ… ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨ Ù…Ø¨Ø§Ø´Ø±Ø© Ø¨Ø¹Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ù„Ø©.
+                سيتم تنفيذ الطلب مباشرة بعد اعتماد السلة.
               </Text>
             ) : (
               <ExecutionSchedulePicker
@@ -2283,16 +2283,16 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         <View style={{ gap: spacing[2] }}>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[1] }}>
-            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', flex: 1, textAlign: 'right' }}>Ù‚Ø±Ø§Ø± Ø§Ù„Ø¯ÙØ¹</Text>
+            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', flex: 1, textAlign: 'right' }}>قرار الدفع</Text>
             {EXPERIMENTAL_PAYMENT_ENABLED ? (
               <View style={{ backgroundColor: colorPalette.warningSoft, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
-                <Text role="caption" style={{ color: colorPalette.warning, fontWeight: '700' }}>ØªØ¬Ø±ÙŠØ¨ÙŠ</Text>
+                <Text role="caption" style={{ color: colorPalette.warning, fontWeight: '700' }}>تجريبي</Text>
               </View>
             ) : null}
           </View>
-          {/* WLT finance preview notice â€” payment display is preview-only, not a real executed payment */}
+          {/* WLT finance preview notice — payment display is preview-only, not a real executed payment */}
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right', paddingHorizontal: spacing[1] }}>
-            Ù…Ø¹Ø§ÙŠÙ†Ø© Ø¯ÙØ¹ â€” ØºÙŠØ± Ù…Ù†ÙØ°Ø© Ù…Ø§Ù„ÙŠÙ‹Ø§ Â· WLT ÙŠÙ…Ù„Ùƒ Ù…Ù†Ø·Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„ÙØ¹Ù„ÙŠ
+            معاينة دفع — غير منفذة ماليًا · WLT يملك منطق الدفع الفعلي
           </Text>
           <PaymentDecisionList items={paymentDecisionOptions} />
         </View>
@@ -2309,7 +2309,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           onRemove={removeItem}
           onClearCart={() => {
             setItems([]);
-            showNotice('ØªÙ… ØªÙØ±ÙŠØº Ø§Ù„Ø³Ù„Ø©', 'ÙŠÙ…ÙƒÙ†Ùƒ ÙØªØ­ Ø£ÙˆÙ„ Ù…Ù†ØªØ¬ Ù…Ù‚ØªØ±Ø­ Ø£Ùˆ Ø§Ø®ØªÙŠØ§Ø± Ø£ÙŠ Ø¨Ø·Ø§Ù‚Ø© Ù…Ù† Ø§Ù„Ù…Ù‚ØªØ±Ø­Ø§Øª Ø£Ø¯Ù†Ø§Ù‡.', 'success');
+            showNotice('تم تفريغ السلة', 'يمكنك فتح أول منتج مقترح أو اختيار أي بطاقة من المقترحات أدناه.', 'success');
           }}
           onScrollToRecommendations={handleOpenFirstRecommendationPreview}
           subtotal={subtotalAmount}
@@ -2349,7 +2349,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         ) : null}
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: spacing[2] }}>
           <Button
-            label={isOrderSubmitted ? 'Ø§Ù„Ø·Ù„Ø¨ Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°' : canCheckout ? 'ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨' : 'Ø£Ø¶Ù Ø¹Ù†Ø§ØµØ± Ø£ÙˆÙ„Ø§Ù‹'}
+            label={isOrderSubmitted ? 'الطلب قيد التنفيذ' : canCheckout ? 'تنفيذ الطلب' : 'أضف عناصر أولاً'}
             tone="brand"
             size="md"
             fullWidth={false}
@@ -2359,7 +2359,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             style={{ flex: 2, minHeight: 52, borderRadius: 18, opacity: isOrderSubmitted ? 0.6 : 1 }}
           />
           <Button
-            label={isOrderSubmitted ? 'Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø¹Ø¨Ø± Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª' : 'ØªØ¹Ø¯ÙŠÙ„'}
+            label={isOrderSubmitted ? 'طلب تعديل عبر العمليات' : 'تعديل'}
             tone="secondary"
             size="md"
             fullWidth={false}
@@ -2370,27 +2370,27 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         </View>
       </View>
 
-      <SheetFrame visible={checkoutReviewVisible} title="Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø·Ù„Ø¨" onClose={() => setCheckoutReviewVisible(false)}>
+      <SheetFrame visible={checkoutReviewVisible} title="مراجعة الطلب" onClose={() => setCheckoutReviewVisible(false)}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ gap: spacing[3], paddingBottom: Math.max(androidSystemBottomInset, safeArea.comfortable) }}
         >
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-            Ø±Ø§Ø¬Ø¹ ÙƒÙ„ ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ù‚Ø¨Ù„ ØªØ£ÙƒÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ° Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ.
+            راجع كل تفاصيل الطلب قبل تأكيد التنفيذ النهائي.
           </Text>
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-            {`Ù‡Ø°Ø§ Ù‡Ùˆ Ù…Ø³Ø§Ø± Ø§Ù„ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯ Ù…Ù† Ø§Ù„Ø³Ø¬Ù„ Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ: ${resolveCheckoutPolicyLabel(checkoutFlowPolicy)}.`}
+            {`هذا هو مسار التفاصيل المعتمد من السجل المركزي: ${resolveCheckoutPolicyLabel(checkoutFlowPolicy)}.`}
           </Text>
           <SummaryCard
             items={checkoutReviewItems}
-            totalLabel="Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ"
+            totalLabel="الإجمالي النهائي"
             totalValue={formattedGrandTotal}
             padding={2}
             gap={2}
           />
           <View style={{ flexDirection: 'row-reverse', gap: spacing[2] }}>
             <Button
-              label="ØªØ£ÙƒÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°"
+              label="تأكيد التنفيذ"
               tone="brand"
               fullWidth={false}
               disabled={checkoutLoading}
@@ -2399,7 +2399,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               style={{ flex: 1, minHeight: 50, borderRadius: 16, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
             />
             <Button
-              label="Ø±Ø¬ÙˆØ¹ Ù„Ù„ØªØ¹Ø¯ÙŠÙ„"
+              label="رجوع للتعديل"
               tone="secondary"
               fullWidth={false}
               disabled={checkoutLoading}

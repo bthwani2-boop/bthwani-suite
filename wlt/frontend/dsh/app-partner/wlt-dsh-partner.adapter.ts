@@ -93,67 +93,67 @@ function resolveTransactionIcon(record: WltDshFinancePreviewRecord): React.Compo
 }
 
 /**
- * ÙŠØ­ÙˆÙ‘Ù„ WltDshFinanceEventKind Ø¥Ù„Ù‰ ØªØ³Ù…ÙŠØ© Ø¹Ø±Ø¨ÙŠØ© ÙˆØ§Ø¶Ø­Ø© Ø¨Ø¯ÙˆÙ† raw labels.
- * Ù„Ø§ ØªØ¹Ø±Ø¶ kind Ø®Ø§Ù…Ù‹Ø§ Ø£Ø¨Ø¯Ù‹Ø§.
+ * يحوّل WltDshFinanceEventKind إلى تسمية عربية واضحة بدون raw labels.
+ * لا تعرض kind خامًا أبدًا.
  */
 function resolveKindLabel(kind: WltDshFinanceEventKind): string {
   const map: Record<WltDshFinanceEventKind, string> = {
-    'client-payment': 'Ø¯ÙØ¹ Ø§Ù„Ø¹Ù…ÙŠÙ„',
-    'wallet-payment': 'Ø¯ÙØ¹ Ø¨Ø§Ù„Ù…Ø­ÙØ¸Ø©',
-    'cash-on-delivery': 'Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…',
-    'partner-settlement': 'ØªØ³ÙˆÙŠØ© Ø§Ù„Ø´Ø±ÙŠÙƒ',
-    'store-delivery-fee': 'Ø±Ø³ÙˆÙ… ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±',
-    'store-courier-compensation': 'ØªØ¹ÙˆÙŠØ¶ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø±',
-    'captain-earning': 'Ø£Ø±Ø¨Ø§Ø­ ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ',
-    'captain-cod-liability': 'Ø°Ù…Ø© COD Ø¹Ù„Ù‰ Ø§Ù„ÙƒØ§Ø¨ØªÙ†',
-    'captain-eligibility-topup': 'Ø´Ø­Ù† Ø±ØµÙŠØ¯ Ø§Ù„Ø¶Ø§Ù…Ù†',
-    'field-commission': 'Ø¹Ù…ÙˆÙ„Ø© Ù…ÙŠØ¯Ø§Ù†ÙŠ',
-    'field-commission-pending': 'Ø¹Ù…ÙˆÙ„Ø© Ù…ÙŠØ¯Ø§Ù†ÙŠ â€” Ù…Ø¹Ù„Ù‚Ø©',
-    'field-commission-rejected': 'Ø¹Ù…ÙˆÙ„Ø© Ù…ÙŠØ¯Ø§Ù†ÙŠ â€” Ù…Ø±ÙÙˆØ¶Ø©',
-    'field-payout': 'ØµØ±Ù Ù…ÙŠØ¯Ø§Ù†ÙŠ',
-    'refund-adjustment': 'Ø®ØµÙ… / Ø§Ø³ØªØ±Ø¯Ø§Ø¯',
-    'platform-commission': 'Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ©',
-    'reconciliation-export': 'Ù…Ø·Ø§Ø¨Ù‚Ø© / ØªØµØ¯ÙŠØ±',
+    'client-payment': 'دفع العميل',
+    'wallet-payment': 'دفع بالمحفظة',
+    'cash-on-delivery': 'دفع عند الاستلام',
+    'partner-settlement': 'تسوية الشريك',
+    'store-delivery-fee': 'رسوم توصيل المتجر',
+    'store-courier-compensation': 'تعويض موصل المتجر',
+    'captain-earning': 'أرباح كابتن بثواني',
+    'captain-cod-liability': 'ذمة COD على الكابتن',
+    'captain-eligibility-topup': 'شحن رصيد الضامن',
+    'field-commission': 'عمولة ميداني',
+    'field-commission-pending': 'عمولة ميداني — معلقة',
+    'field-commission-rejected': 'عمولة ميداني — مرفوضة',
+    'field-payout': 'صرف ميداني',
+    'refund-adjustment': 'خصم / استرداد',
+    'platform-commission': 'عمولة المنصة',
+    'reconciliation-export': 'مطابقة / تصدير',
   };
-  return map[kind] ?? 'Ø­Ø±ÙƒØ© Ù…Ø§Ù„ÙŠØ©';
+  return map[kind] ?? 'حركة مالية';
 }
 
 /**
- * ÙŠØ­Ø¯Ø¯ Ù…Ø§ Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ø§Ù„Ø­Ø±ÙƒØ© ØªØ¯Ø®Ù„ ÙÙŠ ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ©.
+ * يحدد ما إذا كانت الحركة تدخل في صافي التسوية.
  */
 function resolveSettlementImpact(kind: WltDshFinanceEventKind): string {
-  if (kind === 'partner-settlement') return 'ØªØ¯Ø®Ù„ ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ© â€” ØµØ±Ù Ù…Ø¨Ø§Ø´Ø±';
-  if (kind === 'store-delivery-fee') return 'ØªØ¯Ø®Ù„ ÙÙŠ ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ© â€” Ø­Ø³Ø¨ Ø§Ù„Ø³ÙŠØ§Ø³Ø©';
-  if (kind === 'store-courier-compensation') return 'Ù„Ø§ ØªØ¯Ø®Ù„ â€” Ø¯ÙØ¹ Ø¯Ø§Ø®Ù„ÙŠ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø±';
-  if (kind === 'platform-commission') return 'ØªÙØ®ØµÙ… Ù…Ù† ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ©';
-  if (kind === 'refund-adjustment') return 'ØªÙØ®ØµÙ… Ù…Ù† ØµØ§ÙÙŠ Ø§Ù„ØªØ³ÙˆÙŠØ©';
-  if (kind === 'captain-earning') return 'Ù„Ø§ ØªÙ†Ø·Ø¨Ù‚ â€” ÙŠØ®Øµ ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ ÙÙ‚Ø·';
-  if (kind === 'captain-cod-liability') return 'Ù„Ø§ ØªÙ†Ø·Ø¨Ù‚ â€” Ø°Ù…Ø© ÙƒØ§Ø¨ØªÙ† ÙÙ‚Ø·';
-  if (kind === 'reconciliation-export') return 'Ù„Ù„Ù…Ø·Ø§Ø¨Ù‚Ø© ÙÙ‚Ø· â€” Ù„ÙŠØ³Øª Ø¯ÙØ¹Ø©';
-  return 'Ø­Ø³Ø¨ Ø¹Ù‚Ø¯ WLT';
+  if (kind === 'partner-settlement') return 'تدخل في التسوية — صرف مباشر';
+  if (kind === 'store-delivery-fee') return 'تدخل في صافي التسوية — حسب السياسة';
+  if (kind === 'store-courier-compensation') return 'لا تدخل — دفع داخلي من المتجر';
+  if (kind === 'platform-commission') return 'تُخصم من صافي التسوية';
+  if (kind === 'refund-adjustment') return 'تُخصم من صافي التسوية';
+  if (kind === 'captain-earning') return 'لا تنطبق — يخص كابتن بثواني فقط';
+  if (kind === 'captain-cod-liability') return 'لا تنطبق — ذمة كابتن فقط';
+  if (kind === 'reconciliation-export') return 'للمطابقة فقط — ليست دفعة';
+  return 'حسب عقد WLT';
 }
 
 function resolvePolicyLabel(kind: WltDshFinanceEventKind): string {
-  if (kind === 'store-delivery-fee') return 'Ø±Ø³ÙˆÙ… ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø± â€” ØªØ°Ù‡Ø¨ Ù„Ù„Ø´Ø±ÙŠÙƒ Ø­Ø³Ø¨ Ø§Ù„Ø³ÙŠØ§Ø³Ø©';
+  if (kind === 'store-delivery-fee') return 'رسوم توصيل المتجر — تذهب للشريك حسب السياسة';
   if (kind === 'store-courier-compensation') {
-    return 'ØªØ¹ÙˆÙŠØ¶ Ù…ÙˆØµÙ„ Ø§Ù„Ù…ØªØ¬Ø± â€” ÙŠÙØ¯ÙØ¹ Ù…Ù† Ø§Ù„Ù…ØªØ¬Ø± Ù„Ù…ÙˆØµÙ„Ù‡ Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ. Ù„ÙŠØ³ ØªØ³ÙˆÙŠØ© ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ.';
+    return 'تعويض موصل المتجر — يُدفع من المتجر لموصله الداخلي. ليس تسوية كابتن بثواني.';
   }
-  if (kind === 'captain-earning') return 'Ø£Ø±Ø¨Ø§Ø­ ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ â€” Ø¶Ù…Ù† WLT captain payout. Ù„Ø§ ØªÙØ®Ù„Ø· Ù…Ø¹ ØªØ³ÙˆÙŠØ§Øª Ø§Ù„Ù…ØªØ¬Ø±.';
-  if (kind === 'captain-cod-liability') return 'Ø°Ù…Ø© COD â€” Ø§Ù„ÙƒØ§Ø¨ØªÙ† Ù…Ø³Ø¤ÙˆÙ„ Ø¹Ù† Ø¥ÙŠØ¯Ø§Ø¹Ù‡Ø§. Ù„Ø§ ØªØªØ¹Ù„Ù‚ Ø¨Ø§Ù„Ø´Ø±ÙŠÙƒ.';
-  if (kind === 'partner-settlement') return 'ØªØ³ÙˆÙŠØ© Ø§Ù„Ø´Ø±ÙŠÙƒ â€” ØµØ§ÙÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª Ù…Ø·Ø±ÙˆØ­Ù‹Ø§ Ù…Ù†Ù‡Ø§ Ø§Ù„Ø¹Ù…ÙˆÙ„Ø© ÙˆØ§Ù„Ø®ØµÙˆÙ…Ø§Øª.';
-  if (kind === 'platform-commission') return 'Ø¹Ù…ÙˆÙ„Ø© Ø§Ù„Ù…Ù†ØµØ© â€” ØªÙØ®ØµÙ… ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§ Ù…Ù† ØªØ³ÙˆÙŠØ© Ø§Ù„Ø´Ø±ÙŠÙƒ.';
-  return 'Ø­Ø³Ø¨ Ø³ÙŠØ§Ø³Ø© WLT';
+  if (kind === 'captain-earning') return 'أرباح كابتن بثواني — ضمن WLT captain payout. لا تُخلط مع تسويات المتجر.';
+  if (kind === 'captain-cod-liability') return 'ذمة COD — الكابتن مسؤول عن إيداعها. لا تتعلق بالشريك.';
+  if (kind === 'partner-settlement') return 'تسوية الشريك — صافي المبيعات مطروحًا منها العمولة والخصومات.';
+  if (kind === 'platform-commission') return 'عمولة المنصة — تُخصم تلقائيًا من تسوية الشريك.';
+  return 'حسب سياسة WLT';
 }
 
 function sanitizeLabel(text: string | undefined): string {
   if (!text) return '';
   let result = text;
-  result = result.replace(/partner_delivery/g, 'ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±');
-  result = result.replace(/bthwani_delivery/g, 'ØªÙˆØµÙŠÙ„ Ø¨Ø«ÙˆØ§Ù†ÙŠ');
-  result = result.replace(/pickup/g, 'Ø§Ø³ØªÙ„Ø§Ù… Ø°Ø§ØªÙŠ');
-  result = result.replace(/CONTRACT_TBD/g, 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©');
-  result = result.replace(/store_courier_mode/g, 'ØªÙˆØµÙŠÙ„ Ø§Ù„Ù…ØªØ¬Ø±');
-  result = result.replace(/bthwani_captain_mode/g, 'ÙƒØ§Ø¨ØªÙ† Ø¨Ø«ÙˆØ§Ù†ÙŠ');
+  result = result.replace(/partner_delivery/g, 'توصيل المتجر');
+  result = result.replace(/bthwani_delivery/g, 'توصيل بثواني');
+  result = result.replace(/pickup/g, 'استلام ذاتي');
+  result = result.replace(/CONTRACT_TBD/g, 'قيد المراجعة');
+  result = result.replace(/store_courier_mode/g, 'توصيل المتجر');
+  result = result.replace(/bthwani_captain_mode/g, 'كابتن بثواني');
   return result;
 }
 
@@ -174,14 +174,14 @@ export function mapWltDshPartnerPreviewTransactions(
     kind: record.kind,
     kindLabel: resolveKindLabel(record.kind),
     sourceOrderLabel: record.sourceOrderId
-      ? `Ø·Ù„Ø¨ #${record.sourceOrderId}`
+      ? `طلب #${record.sourceOrderId}`
       : record.settlementCycleId
-      ? `Ø¯ÙˆØ±Ø© #${record.settlementCycleId}`
+      ? `دورة #${record.settlementCycleId}`
       : record.sourceStoreId
-      ? `Ù…ØªØ¬Ø± #${record.sourceStoreId}`
+      ? `متجر #${record.sourceStoreId}`
       : undefined,
     settlementCycleLabel: record.settlementCycleId
-      ? `Ø¯ÙˆØ±Ø© #${record.settlementCycleId}`
+      ? `دورة #${record.settlementCycleId}`
       : undefined,
     includedInNetSettlementLabel: resolveSettlementImpact(record.kind),
     isStoreDeliveryFee: record.kind === 'store-delivery-fee',
