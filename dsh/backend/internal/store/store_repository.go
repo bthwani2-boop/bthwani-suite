@@ -6,12 +6,15 @@ import (
 	"bthwani.local/dsh/domain"
 )
 
-type Repository interface {
+type StoreRepository interface {
 	ListStores(ctx context.Context, query domain.StoreDiscoveryQuery) (domain.DiscoveryStoresResponse, error)
 	UpdatePartnerReadiness(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error)
 	UpdateCatalogApproval(ctx context.Context, id string, qualityStatus string, pricingStatus string) (domain.StoreVisibilityGateResponse, error)
 	UpdateMarketingVisibility(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error)
 	GetStore(ctx context.Context, id string) (domain.StoreDetail, error)
+}
+
+type CatalogRepository interface {
 	// Product identity (J-002 / DSH-SLICE-002A)
 	CreateProduct(ctx context.Context, storeID string, req domain.CreateProductRequest) (domain.ProductRecord, error)
 	UpdateProduct(ctx context.Context, productID string, req domain.UpdateProductRequest) (domain.ProductRecord, error)
@@ -39,13 +42,17 @@ type Repository interface {
 	// Catalog conflict audit (J-002 / DSH-SLICE-002G)
 	ListConflicts(ctx context.Context, storeID string, status string, limit int, offset int) (domain.ListConflictsResponse, error)
 	ResolveConflict(ctx context.Context, id string, req domain.ResolveConflictRequest) (domain.ResolveConflictResponse, error)
+}
 
+type CheckoutRepository interface {
 	// Checkout (J-003A / 003B / 003C / 003E)
 	CheckCartServiceability(ctx context.Context, query domain.CartServiceabilityQuery) (domain.CartServiceabilityResponse, error)
 	CreateCheckoutIntent(ctx context.Context, clientID string, req domain.CheckoutIntentRequest) (domain.CheckoutIntentResponse, error)
 	CancelCheckoutIntent(ctx context.Context, intentID string, clientID string) (domain.CancelCheckoutIntentResponse, error)
 	ProcessPaymentCallback(ctx context.Context, req domain.PaymentCallbackRequest) (domain.PaymentCallbackResponse, error)
+}
 
+type OrderRepository interface {
 	// Order lifecycle (J-003D / J-004)
 	ListOrders(ctx context.Context, query domain.ListOrdersQuery) (domain.ListOrdersResponse, error)
 	CreateOrder(ctx context.Context, storeID string, req domain.CreateOrderRequest) (domain.OrderRecord, []domain.OrderItemRecord, error)
@@ -65,14 +72,19 @@ type Repository interface {
 	// ConfirmReturn (J-005 / DSH-SLICE-005F) — confirms item returned to store (RETURNING_TO_STORE → RETURNED).
 	// WLT BOUNDARY: no financial mutation.
 	ConfirmReturn(ctx context.Context, orderID string, captainID string, note string) (domain.OrderRecord, error)
-	CreateSupportEscalation(ctx context.Context, req domain.CreateSupportEscalationRequest) (domain.SupportEscalationRecord, error)
 	ListOrderStatusEvents(ctx context.Context, orderID string) ([]domain.OrderStatusEventRecord, error)
+}
+
+type SupportRepository interface {
+	CreateSupportEscalation(ctx context.Context, req domain.CreateSupportEscalationRequest) (domain.SupportEscalationRecord, error)
 	ListSupportEscalations(ctx context.Context, orderID string) ([]domain.SupportEscalationRecord, error)
 	// ListAllSupportEscalations (J-009C): returns escalations across all orders for CP operator view.
 	ListAllSupportEscalations(ctx context.Context, query domain.ListAllSupportEscalationsQuery) (domain.ListAllSupportEscalationsResponse, error)
 	// UpdateSupportEscalation (J-009C): operator updates status to "in-review" or "resolved".
 	UpdateSupportEscalation(ctx context.Context, id string, status string) (domain.SupportEscalationRecord, error)
+}
 
+type FieldRepository interface {
 	// CreateFieldStore (J-006A): field agent submits a new store for review.
 	// publish_stage is set to 'pending_review'; CP approval required before client visibility.
 	CreateFieldStore(ctx context.Context, req domain.CreateFieldStoreRequest) (domain.CreateFieldStoreResponse, error)
@@ -83,11 +95,6 @@ type Repository interface {
 	CreateFieldDocument(ctx context.Context, storeID string, req domain.CreateFieldDocumentRequest) (domain.FieldDocumentRecord, error)
 	// ListFieldDocuments (J-006C): lists documents associated with a store.
 	ListFieldDocuments(ctx context.Context, storeID string) ([]domain.FieldDocumentRecord, error)
-
-	// DSH-SLICE-010B: Settlement Candidate repository methods
-	SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error)
-	ProcessSettlementCallback(ctx context.Context, settlementRefID string, orderIDs []string, amount float64, status string) ([]domain.OrderRecord, error)
-	ListSettlements(ctx context.Context) ([]domain.OrderRecord, error)
 
 	// CreateFieldReadinessEscalation (J-006D): field agent escalates incomplete readiness to a team.
 	// No financial mutation (WLT boundary). status starts as 'escalated'.
@@ -102,4 +109,22 @@ type Repository interface {
 	CreateFieldReadinessApproval(ctx context.Context, storeID string, req domain.CreateFieldReadinessApprovalRequest) (domain.FieldReadinessApprovalRecord, error)
 	// GetLatestFieldReadinessApproval (J-006E): returns the latest approval record for a store (for CP review).
 	GetLatestFieldReadinessApproval(ctx context.Context, storeID string) (domain.FieldReadinessApprovalRecord, error)
+}
+
+type WltBridgeRepository interface {
+	// DSH-SLICE-010B: Settlement Candidate repository methods.
+	// WLT owns wallet, ledger, payout, refund execution, and final settlement accounting.
+	SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error)
+	ProcessSettlementCallback(ctx context.Context, settlementRefID string, orderIDs []string, amount float64, status string) ([]domain.OrderRecord, error)
+	ListSettlements(ctx context.Context) ([]domain.OrderRecord, error)
+}
+
+type Repository interface {
+	StoreRepository
+	CatalogRepository
+	CheckoutRepository
+	OrderRepository
+	SupportRepository
+	FieldRepository
+	WltBridgeRepository
 }

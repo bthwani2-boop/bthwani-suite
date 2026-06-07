@@ -95,7 +95,7 @@ export type DshConfirmReturnRequest = {
 
 export type DshCreateOrderRequest = {
   readonly store_id: string;
-  readonly client_id: string;
+  readonly client_id?: string;
   readonly total_price: number;
   readonly wlt_payment_ref_id?: string;
   readonly items: readonly DshOrderItemInput[];
@@ -147,6 +147,11 @@ export type DshListOrdersResponse = {
 };
 
 export type DshOrderFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
+
+export type DshOrderAuthContext = {
+  readonly bearerToken?: string;
+  readonly clientId?: string;
+};
 
 export type DshOrderApiOfflineError = { readonly kind: 'offline' };
 export type DshOrderApiHttpError = {
@@ -229,6 +234,7 @@ async function doFetch<T>(
   method: string,
   path: string,
   body?: unknown,
+  headers?: Record<string, string>,
 ): Promise<T> {
   const url = `${baseUrl.replace(/\/$/, '')}${path}`;
   let response: Response;
@@ -239,6 +245,7 @@ async function doFetch<T>(
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        ...headers,
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -260,9 +267,22 @@ async function doFetch<T>(
   return response.json() as Promise<T>;
 }
 
+function orderAuthHeaders(auth: DshOrderAuthContext, clientId = ''): Record<string, string> {
+  const bearerToken = auth.bearerToken?.trim();
+  if (bearerToken) return { Authorization: `Bearer ${bearerToken}` };
+
+  const resolvedClientId = clientId.trim() || auth.clientId?.trim() || PlatformVarsRegistry.get('dshClientId')?.trim() || 'client-101';
+  return resolvedClientId ? { 'X-Client-Id': resolvedClientId } : {};
+}
+
+function wltCallbackHeaders(): Record<string, string> {
+  return { 'X-WLT-Callback-Token': 'dev-secret' };
+}
+
 export function createDshOrderLifecycleHttpClient(
   baseUrl: string | null,
   fetchFn: DshOrderFetchFn = globalThis.fetch,
+  auth: DshOrderAuthContext = {},
 ): DshOrderLifecycleClient {
   return {
     listOrders: async (query = {}) => {
@@ -272,23 +292,23 @@ export function createDshOrderLifecycleHttpClient(
       if (query.limit != null) params.set('limit', String(query.limit));
       if (query.offset != null) params.set('offset', String(query.offset));
       const qs = params.toString();
-      return doFetch<DshListOrdersResponse>(baseUrl, fetchFn, 'GET', `/orders${qs ? `?${qs}` : ''}`);
+      return doFetch<DshListOrdersResponse>(baseUrl, fetchFn, 'GET', `/orders${qs ? `?${qs}` : ''}`, undefined, orderAuthHeaders(auth));
     },
     createOrder: async (req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshCreateOrderResponse>(baseUrl, fetchFn, 'POST', '/orders', req);
+      return doFetch<DshCreateOrderResponse>(baseUrl, fetchFn, 'POST', '/orders', req, orderAuthHeaders(auth, req.client_id));
     },
     getOrder: async (orderId) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderDetailsResponse>(baseUrl, fetchFn, 'GET', `/orders/${orderId}`);
+      return doFetch<DshOrderDetailsResponse>(baseUrl, fetchFn, 'GET', `/orders/${orderId}`, undefined, orderAuthHeaders(auth));
     },
     updateOrderStatus: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'PATCH', `/orders/${orderId}/status`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'PATCH', `/orders/${orderId}/status`, req, orderAuthHeaders(auth));
     },
     cancelOrder: async (orderId, req = {}) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/cancel`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/cancel`, req, orderAuthHeaders(auth));
     },
     createSupportEscalation: async (req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
@@ -296,23 +316,23 @@ export function createDshOrderLifecycleHttpClient(
     },
     assignCaptain: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/assign-captain`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/assign-captain`, req, orderAuthHeaders(auth));
     },
     acceptTask: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/accept-task`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/accept-task`, req, orderAuthHeaders(auth, req.captain_id));
     },
     declineTask: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/decline-task`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/decline-task`, req, orderAuthHeaders(auth, req.captain_id));
     },
     confirmPickup: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/pickup`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/pickup`, req, orderAuthHeaders(auth, req.captain_id));
     },
     pushLocation: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/location`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/location`, req, orderAuthHeaders(auth, req.captain_id));
     },
     getCaptainLocation: async (orderId) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
@@ -321,39 +341,39 @@ export function createDshOrderLifecycleHttpClient(
         longitude: number;
         lifecycle_status: string;
         order_status: string;
-      }>(baseUrl, fetchFn, 'GET', `/orders/${orderId}/location`);
+      }>(baseUrl, fetchFn, 'GET', `/orders/${orderId}/location`, undefined, orderAuthHeaders(auth));
     },
     deliverOrder: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/deliver`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/deliver`, req, orderAuthHeaders(auth, req.captain_id));
     },
     failDelivery: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/fail-delivery`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/fail-delivery`, req, orderAuthHeaders(auth, req.captain_id));
     },
     confirmReturn: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/confirm-return`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/confirm-return`, req, orderAuthHeaders(auth, req.captain_id));
     },
     refundCallback: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/refund-callback`, req);
+      return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/refund-callback`, req, wltCallbackHeaders());
     },
     getWltWalletSummary: async () => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<WalletBalance>(baseUrl, fetchFn, 'GET', '/wlt/wallet-summary');
+      return doFetch<WalletBalance>(baseUrl, fetchFn, 'GET', '/wlt/wallet-summary', undefined, orderAuthHeaders(auth));
     },
     submitSettlementCandidates: async (orderIds) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'POST', '/settlement/candidates', { order_ids: orderIds });
+      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'POST', '/settlement/candidates', { order_ids: orderIds }, orderAuthHeaders(auth));
     },
     postWltSettlementCallback: async (req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'POST', '/wlt/settlement-callback', req);
+      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'POST', '/wlt/settlement-callback', req, wltCallbackHeaders());
     },
     getSettlements: async () => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'GET', '/settlements');
+      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'GET', '/settlements', undefined, orderAuthHeaders(auth));
     },
   };
 }

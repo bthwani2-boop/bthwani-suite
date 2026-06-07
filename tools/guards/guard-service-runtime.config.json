@@ -206,7 +206,7 @@
           "requiresScreenshot": false
         },
         "DSH-SLICE-001": {
-          "docPath": "dsh/docs/slices/DSH-SLICE-001-STORE-DISCOVERY.md",
+          "docPath": "dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md",
           "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
             "GET /stores",

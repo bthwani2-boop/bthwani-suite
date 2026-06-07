@@ -22,6 +22,7 @@ func TestCreateOrderValidation(t *testing.T) {
 		Items:    []domain.OrderItemInput{{ProductID: "prod-1", Quantity: 1, Price: 10.0}},
 	})
 	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-1")
 	resp := httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -29,17 +30,19 @@ func TestCreateOrderValidation(t *testing.T) {
 		t.Fatalf("expected code %d, got %d", http.StatusBadRequest, resp.Code)
 	}
 
-	// Case 2: Missing client_id
+	// Case 2: client_id body mismatch with authenticated identity
 	body, _ = json.Marshal(domain.CreateOrderRequest{
-		StoreID: "store-1",
-		Items:   []domain.OrderItemInput{{ProductID: "prod-1", Quantity: 1, Price: 10.0}},
+		StoreID:  "store-1",
+		ClientID: "client-from-body",
+		Items:    []domain.OrderItemInput{{ProductID: "prod-1", Quantity: 1, Price: 10.0}},
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-from-header")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
-	if resp.Code != http.StatusBadRequest {
-		t.Fatalf("expected code %d, got %d", http.StatusBadRequest, resp.Code)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected code %d, got %d", http.StatusForbidden, resp.Code)
 	}
 
 	// Case 3: Empty items
@@ -49,6 +52,7 @@ func TestCreateOrderValidation(t *testing.T) {
 		Items:    []domain.OrderItemInput{},
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-1")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -355,6 +359,7 @@ func TestGetCaptainLocationValidation(t *testing.T) {
 	// Case 1: Order not found
 	req := httptest.NewRequest(http.MethodGet, "/orders/ord-non-existent/location", nil)
 	req.SetPathValue("id", "ord-non-existent")
+	req.Header.Set("X-Client-Id", "client-1")
 	resp := httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -379,6 +384,7 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 	})
 	req := httptest.NewRequest(http.MethodPost, "/orders/ord-123/refund-callback", bytes.NewBuffer(body))
 	req.SetPathValue("id", "ord-123")
+	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	resp := httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -398,6 +404,7 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders/ord-123/refund-callback", bytes.NewBuffer(body))
 	req.SetPathValue("id", "ord-123")
+	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -417,6 +424,7 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders/ord-123/refund-callback", bytes.NewBuffer(body))
 	req.SetPathValue("id", "ord-123")
+	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -436,6 +444,7 @@ func TestRefundOrderCallbackValidation(t *testing.T) {
 	})
 	req = httptest.NewRequest(http.MethodPost, "/orders/ord-non-existent/refund-callback", bytes.NewBuffer(body))
 	req.SetPathValue("id", "ord-non-existent")
+	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -530,6 +539,7 @@ func TestGetWltSettlementValidation(t *testing.T) {
 
 	// Case 5: POST /wlt/settlement-callback with missing parameters -> 400
 	req = httptest.NewRequest(http.MethodPost, "/wlt/settlement-callback", strings.NewReader(`{"status": "CONFIRMED"}`))
+	req.Header.Set("X-WLT-Callback-Token", "dev-secret")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 	if resp.Code != http.StatusBadRequest {

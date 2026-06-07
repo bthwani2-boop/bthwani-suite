@@ -3,21 +3,21 @@ package domain
 import "time"
 
 const (
-	StatusCreated            = "CREATED"
-	StatusAccepted           = "ACCEPTED"
-	StatusReadyForPickup     = "READY_FOR_PICKUP"
-	StatusDelivered          = "DELIVERED"
-	StatusCancelled          = "CANCELLED"
-	StatusRefunded           = "REFUNDED"
-	StatusAcceptedByCaptain  = "ACCEPTED_BY_CAPTAIN"
-	StatusPickedUp           = "PICKED_UP"
-	StatusEnRoute            = "EN_ROUTE"
-	StatusArrived            = "ARRIVED"
+	StatusCreated           = "CREATED"
+	StatusAccepted          = "ACCEPTED"
+	StatusReadyForPickup    = "READY_FOR_PICKUP"
+	StatusDelivered         = "DELIVERED"
+	StatusCancelled         = "CANCELLED"
+	StatusRefunded          = "REFUNDED"
+	StatusAcceptedByCaptain = "ACCEPTED_BY_CAPTAIN"
+	StatusPickedUp          = "PICKED_UP"
+	StatusEnRoute           = "EN_ROUTE"
+	StatusArrived           = "ARRIVED"
 	// DSH-SLICE-005F: delivery failure states.
 	// WLT BOUNDARY: refund execution is WLT responsibility (004E). DSH records reference only.
-	StatusFailedDelivery     = "FAILED_DELIVERY"
-	StatusReturningToStore   = "RETURNING_TO_STORE"
-	StatusReturned           = "RETURNED"
+	StatusFailedDelivery   = "FAILED_DELIVERY"
+	StatusReturningToStore = "RETURNING_TO_STORE"
+	StatusReturned         = "RETURNED"
 
 	// DSH-SLICE-010B: Settlement Candidate status constants
 	SettlementStatusNotSettled = "NOT_SETTLED"
@@ -27,29 +27,29 @@ const (
 )
 
 type OrderRecord struct {
-	ID                     string    `json:"id"`
-	StoreID                string    `json:"store_id"`
-	ClientID               string    `json:"client_id"`
-	Status                 string    `json:"status"`
-	TotalPrice             float64   `json:"total_price"`
-	WltPaymentRefID        *string   `json:"wlt_payment_ref_id,omitempty"`
-	WltRefundRefID         *string   `json:"wlt_refund_ref_id,omitempty"`
-	RefundAmount           *float64  `json:"refund_amount,omitempty"`
-	CaptainID              *string   `json:"captain_id,omitempty"`
-	CaptainLatitude        *float64  `json:"captain_latitude,omitempty"`
-	CaptainLongitude       *float64  `json:"captain_longitude,omitempty"`
-	CaptainLifecycleStatus *string   `json:"captain_lifecycle_status,omitempty"`
-	PodMediaKey            *string   `json:"pod_media_key,omitempty"`
+	ID                     string   `json:"id"`
+	StoreID                string   `json:"store_id"`
+	ClientID               string   `json:"client_id"`
+	Status                 string   `json:"status"`
+	TotalPrice             float64  `json:"total_price"`
+	WltPaymentRefID        *string  `json:"wlt_payment_ref_id,omitempty"`
+	WltRefundRefID         *string  `json:"wlt_refund_ref_id,omitempty"`
+	RefundAmount           *float64 `json:"refund_amount,omitempty"`
+	CaptainID              *string  `json:"captain_id,omitempty"`
+	CaptainLatitude        *float64 `json:"captain_latitude,omitempty"`
+	CaptainLongitude       *float64 `json:"captain_longitude,omitempty"`
+	CaptainLifecycleStatus *string  `json:"captain_lifecycle_status,omitempty"`
+	PodMediaKey            *string  `json:"pod_media_key,omitempty"`
 	// DSH-SLICE-005F: delivery failure fields.
 	// WltRefundTriggerRef is a bridge reference for WLT to execute refund — DSH does NOT mutate finances.
-	DeliveryFailureReason *string  `json:"delivery_failure_reason,omitempty"`
-	WltRefundTriggerRef   *string  `json:"wlt_refund_trigger_ref,omitempty"`
+	DeliveryFailureReason *string `json:"delivery_failure_reason,omitempty"`
+	WltRefundTriggerRef   *string `json:"wlt_refund_trigger_ref,omitempty"`
 	// DSH-SLICE-010B: order settlements fields.
-	WltSettlementRefID *string  `json:"wlt_settlement_ref_id,omitempty"`
-	SettlementStatus   string   `json:"settlement_status"`
-	SettlementAmount   *float64 `json:"settlement_amount,omitempty"`
-	CreatedAt              time.Time `json:"created_at"`
-	UpdatedAt              time.Time `json:"updated_at"`
+	WltSettlementRefID *string   `json:"wlt_settlement_ref_id,omitempty"`
+	SettlementStatus   string    `json:"settlement_status"`
+	SettlementAmount   *float64  `json:"settlement_amount,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
 }
 
 type OrderItemRecord struct {
@@ -117,7 +117,7 @@ type DeliverOrderRequest struct {
 // ReturnRequired indicates captain must return item to the store (RETURNING_TO_STORE path).
 type FailDeliveryRequest struct {
 	CaptainID           string  `json:"captain_id"`
-	FailureReason       string  `json:"failure_reason"` // required: reason for failure
+	FailureReason       string  `json:"failure_reason"`                   // required: reason for failure
 	WltRefundTriggerRef *string `json:"wlt_refund_trigger_ref,omitempty"` // WLT bridge ref; DSH stores only
 	ReturnRequired      bool    `json:"return_required"`
 }
@@ -145,9 +145,10 @@ type OrderDetailsResponse struct {
 // ListOrdersQuery — operations queue filter (control-panel, dispatch, exceptions).
 // Limit is capped at 200 in the handler; default 50.
 type ListOrdersQuery struct {
-	Status string
-	Limit  int
-	Offset int
+	ClientID string
+	Status   string
+	Limit    int
+	Offset   int
 }
 
 type ListOrdersResponse struct {

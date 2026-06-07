@@ -397,3 +397,9 @@ Lock partner_type and field_type for ARB, then prove booking lifecycle gaps befo
 7. Update this file only with verified service-specific truth.
 8. Do not duplicate platform-wide rules here.
 9. Do not claim `CLOSED` unless all applicable gates pass.
+
+## Cross-Surface Effects: Notifications
+
+| Surface | Required Effect | Status | Reason |
+|---|---|---|---|
+| notifications | notification_chain | N/A_WITH_REASON | arb is a reservations service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

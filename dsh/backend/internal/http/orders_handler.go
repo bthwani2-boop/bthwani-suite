@@ -69,7 +69,7 @@ func RegisterOrderRoutes(mux *http.ServeMux, repository store.Repository) {
 func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id, X-Actor-Type, X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key")
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -82,8 +82,22 @@ func (h *OrdersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *OrdersHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 	log.Println("dsh-api: GET /orders")
 
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	actor := orderActorType(r)
+
 	q := r.URL.Query()
 	status := strings.ToUpper(strings.TrimSpace(q.Get("status")))
+	queryClientID := strings.TrimSpace(q.Get("client_id"))
+	if actor == "client" {
+		if queryClientID != "" && queryClientID != clientID {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeInvalidParameter, "client_id must match authenticated identity")
+			return
+		}
+		queryClientID = clientID
+	}
 
 	limit := 50
 	if raw := q.Get("limit"); raw != "" {
@@ -100,9 +114,10 @@ func (h *OrdersHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp, err := h.repository.ListOrders(r.Context(), domain.ListOrdersQuery{
-		Status: status,
-		Limit:  limit,
-		Offset: offset,
+		ClientID: queryClientID,
+		Status:   status,
+		Limit:    limit,
+		Offset:   offset,
 	})
 	if err != nil {
 		log.Printf("dsh-api: list orders error: %v", err)
@@ -116,6 +131,11 @@ func (h *OrdersHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 func (h *OrdersHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	log.Println("dsh-api: POST /orders")
 
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+
 	var req domain.CreateOrderRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
@@ -126,10 +146,11 @@ func (h *OrdersHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "store_id is required")
 		return
 	}
-	if req.ClientID == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "client_id is required")
+	if req.ClientID != "" && req.ClientID != clientID {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeInvalidParameter, "client_id must match authenticated identity")
 		return
 	}
+	req.ClientID = clientID
 	if len(req.Items) == 0 {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "order items are required")
 		return
@@ -163,6 +184,12 @@ func (h *OrdersHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	log.Printf("dsh-api: GET /orders/%s", id)
 
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	actor := orderActorType(r)
+
 	if id == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing order id")
 		return
@@ -176,6 +203,10 @@ func (h *OrdersHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("dsh-api: get order error: %v", err)
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+	if !canAccessOrder(actor, clientID, order) {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeInvalidParameter, "order is not visible to authenticated identity")
 		return
 	}
 
@@ -230,7 +261,14 @@ func (h *OrdersHandler) UpdateOrderStatus(w http.ResponseWriter, r *http.Request
 		status != domain.StatusReadyForPickup &&
 		status != domain.StatusDelivered &&
 		status != domain.StatusCancelled &&
-		status != domain.StatusRefunded {
+		status != domain.StatusRefunded &&
+		status != domain.StatusAcceptedByCaptain &&
+		status != domain.StatusPickedUp &&
+		status != domain.StatusEnRoute &&
+		status != domain.StatusArrived &&
+		status != domain.StatusFailedDelivery &&
+		status != domain.StatusReturningToStore &&
+		status != domain.StatusReturned {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid status")
 		return
 	}
@@ -257,6 +295,10 @@ func (h *OrdersHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing order id")
 		return
 	}
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
 
 	// Read optional details from body
 	var req struct {
@@ -272,6 +314,21 @@ func (h *OrdersHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
 	if actor != "client" && actor != "partner" && actor != "operator" && actor != "system" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "actor must be client, partner, operator, or system")
 		return
+	}
+	if actor == "client" {
+		order, _, err := h.repository.GetOrder(r.Context(), id)
+		if err != nil {
+			if err.Error() == "order not found" {
+				writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "order not found")
+				return
+			}
+			writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+			return
+		}
+		if !canAccessOrder(actor, clientID, order) {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeInvalidParameter, "order is not visible to authenticated identity")
+			return
+		}
 	}
 
 	order, err := h.repository.UpdateOrderStatus(r.Context(), id, actor, domain.StatusCancelled, req.Note)
@@ -291,6 +348,10 @@ func (h *OrdersHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
 func (h *OrdersHandler) RefundOrderCallback(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	log.Printf("dsh-api: POST /orders/%s/refund-callback", id)
+
+	if !requireWltCallbackToken(w, r) {
+		return
+	}
 
 	if id == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing order id")
@@ -557,6 +618,11 @@ func (h *OrdersHandler) GetCaptainLocation(w http.ResponseWriter, r *http.Reques
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing order id")
 		return
 	}
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	actor := orderActorType(r)
 
 	order, _, err := h.repository.GetOrder(r.Context(), id)
 	if err != nil {
@@ -566,6 +632,10 @@ func (h *OrdersHandler) GetCaptainLocation(w http.ResponseWriter, r *http.Reques
 		}
 		log.Printf("dsh-api: get order location error: %v", err)
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+	if !canAccessOrder(actor, clientID, order) {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeInvalidParameter, "order is not visible to authenticated identity")
 		return
 	}
 
@@ -587,6 +657,31 @@ func (h *OrdersHandler) GetCaptainLocation(w http.ResponseWriter, r *http.Reques
 	}
 
 	writeJSON(w, http.StatusOK, response)
+}
+
+func orderActorType(r *http.Request) string {
+	actor := strings.ToLower(strings.TrimSpace(r.Header.Get("X-Actor-Type")))
+	switch actor {
+	case "operator", "partner", "captain", "system":
+		return actor
+	default:
+		return "client"
+	}
+}
+
+func canAccessOrder(actor, subject string, order domain.OrderRecord) bool {
+	switch actor {
+	case "operator", "system":
+		return true
+	case "captain":
+		return order.CaptainID != nil && *order.CaptainID == subject
+	case "partner":
+		// Store ownership is not exposed by auth.openapi.yaml yet. Keep partner
+		// access explicit by actor while WLT and client identity paths are scoped.
+		return true
+	default:
+		return order.ClientID == subject
+	}
 }
 
 // DeliverOrder handles POST /orders/{id}/deliver (DSH-SLICE-005E).
@@ -733,120 +828,4 @@ func (h *OrdersHandler) ConfirmReturn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, order)
-}
-
-// GetWltWalletSummary handles GET /wlt/wallet-summary.
-// WLT BOUNDARY: DSH reads only; returns a mocked WLT wallet balance snapshot.
-// No DB mutation or financial status updates are performed.
-func (h *OrdersHandler) GetWltWalletSummary(w http.ResponseWriter, r *http.Request) {
-	log.Println("dsh-api: GET /wlt/wallet-summary")
-
-	clientID := requireClientIdentity(w, r)
-	if clientID == "" {
-		// requireClientIdentity already wrote 401 Unauthorized via writeError
-		return
-	}
-
-	// WLT-owned wallet balance snapshot mock.
-	response := struct {
-		BalanceMinorUnits int64  `json:"balanceMinorUnits"`
-		Currency          string `json:"currency"`
-		Linked            bool   `json:"linked"`
-		FrozenMinorUnits  int64  `json:"frozenMinorUnits"`
-		UpdatedAt         string `json:"updatedAt"`
-	}{
-		BalanceMinorUnits: 1000000, // 10,000 YER in minor units
-		Currency:          "YER",
-		Linked:            true,
-		FrozenMinorUnits:  0,
-		UpdatedAt:         "2026-06-05T06:00:00Z",
-	}
-
-	writeJSON(w, http.StatusOK, response)
-}
-
-// SubmitSettlementCandidates handles POST /settlement/candidates.
-func (h *OrdersHandler) SubmitSettlementCandidates(w http.ResponseWriter, r *http.Request) {
-	log.Println("dsh-api: POST /settlement/candidates")
-
-	clientID := requireClientIdentity(w, r)
-	if clientID == "" {
-		return
-	}
-
-	var req struct {
-		OrderIDs []string `json:"order_ids"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
-		return
-	}
-
-	if len(req.OrderIDs) == 0 {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "order_ids is required and cannot be empty")
-		return
-	}
-
-	orders, err := h.repository.SubmitSettlementCandidates(r.Context(), req.OrderIDs)
-	if err != nil {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, err.Error())
-		return
-	}
-
-	writeJSON(w, http.StatusOK, orders)
-}
-
-// PostWltSettlementCallback handles POST /wlt/settlement-callback.
-func (h *OrdersHandler) PostWltSettlementCallback(w http.ResponseWriter, r *http.Request) {
-	log.Println("dsh-api: POST /wlt/settlement-callback")
-
-	var req struct {
-		SettlementRefID string   `json:"settlement_ref_id"`
-		OrderIDs        []string `json:"order_ids"`
-		Amount          float64  `json:"amount"`
-		Status          string   `json:"status"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
-		return
-	}
-
-	if req.SettlementRefID == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "settlement_ref_id is required")
-		return
-	}
-	if len(req.OrderIDs) == 0 {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "order_ids is required and cannot be empty")
-		return
-	}
-	if req.Status != "CONFIRMED" && req.Status != "FAILED" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "status must be CONFIRMED or FAILED")
-		return
-	}
-
-	orders, err := h.repository.ProcessSettlementCallback(r.Context(), req.SettlementRefID, req.OrderIDs, req.Amount, req.Status)
-	if err != nil {
-		writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, err.Error())
-		return
-	}
-
-	writeJSON(w, http.StatusOK, orders)
-}
-
-// GetSettlements handles GET /settlements.
-func (h *OrdersHandler) GetSettlements(w http.ResponseWriter, r *http.Request) {
-	log.Println("dsh-api: GET /settlements")
-
-	clientID := requireClientIdentity(w, r)
-	if clientID == "" {
-		return
-	}
-
-	orders, err := h.repository.ListSettlements(r.Context())
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
-		return
-	}
-
-	writeJSON(w, http.StatusOK, orders)
 }

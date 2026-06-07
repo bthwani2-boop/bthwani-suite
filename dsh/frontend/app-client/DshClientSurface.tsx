@@ -99,6 +99,7 @@ import {
 } from './dsh-client-wlt-payment-bridge';
 
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
+const TERMINAL_TRACKING_ORDER_STATUSES = new Set(['DELIVERED', 'CANCELLED', 'REFUNDED', 'FAILED_DELIVERY', 'RETURNED']);
 
 const getDshWebWindow = (): (Window & typeof globalThis) | null => {
   if (Platform.OS !== 'web') return null;
@@ -476,29 +477,45 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       return undefined;
     }
 
-    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
     let cancelled = false;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let nextDelayMs = 4000;
 
     const fetchOrder = () => {
+      const webWindow = getDshWebWindow();
+      if (webWindow?.document?.hidden) {
+        timeout = setTimeout(fetchOrder, Math.max(nextDelayMs, 15000));
+        return;
+      }
+
       orderClient.getOrder(selectedOrderId)
         .then((details) => {
           if (cancelled) return;
           setLiveOrderDetails(details);
+          if (TERMINAL_TRACKING_ORDER_STATUSES.has(details.order.status)) {
+            return;
+          }
+          nextDelayMs = 4000;
+          timeout = setTimeout(fetchOrder, nextDelayMs);
         })
         .catch((err) => {
           if (cancelled) return;
           console.warn("Failed to fetch live order details:", err);
+          nextDelayMs = Math.min(nextDelayMs * 2, 30000);
+          timeout = setTimeout(fetchOrder, nextDelayMs);
         });
     };
 
     fetchOrder();
-    const interval = setInterval(fetchOrder, 4000);
 
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
     };
-  }, [route, selectedOrderId]);
+  }, [checkoutAuth, route, selectedOrderId]);
 
   const filteredOrders = React.useMemo(() => {
     const query = ordersQuery.trim().toLowerCase();
@@ -679,10 +696,10 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
         price: parsePrice(item.priceLabel),
       }));
 
-      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
       orderClient.createOrder({
         store_id: activeStore.id,
-        client_id: 'client-101',
+        client_id: checkoutAuth.clientId ?? 'client-101',
         total_price: totalPrice,
         wlt_payment_ref_id: payload?.wltPaymentRefId,
         items,
@@ -730,7 +747,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
         orderDraft: payload?.orderDraft,
       });
     }
-  }, [openTrackedOrder, selectedFulfillmentMode, cartItems, activeStore]);
+  }, [checkoutAuth, openTrackedOrder, selectedFulfillmentMode, cartItems, activeStore]);
 
   const handleConfirmCheckout = React.useCallback(async () => {
     setCheckoutState('loading');
@@ -1185,7 +1202,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   const handleCancelOrder = React.useCallback(() => {
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (config && selectedOrderId) {
-      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
       orderClient.cancelOrder(selectedOrderId, { actor: 'client', note: 'إلغاء الطلب من قبل العميل' })
         .then(() => {
           return orderClient.getOrder(selectedOrderId);
@@ -1203,12 +1220,12 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           console.error("Failed to cancel live order:", err);
         });
     }
-  }, [selectedOrderId]);
+  }, [checkoutAuth, selectedOrderId]);
 
   const handleSupportEscalation = React.useCallback(async (issueType: string, description: string) => {
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (config && selectedOrderId) {
-      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl);
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
       await orderClient.createSupportEscalation({
         order_id: selectedOrderId,
         actor: 'client',
@@ -1218,7 +1235,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       const details = await orderClient.getOrder(selectedOrderId);
       setLiveOrderDetails(details);
     }
-  }, [selectedOrderId]);
+  }, [checkoutAuth, selectedOrderId]);
 
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {

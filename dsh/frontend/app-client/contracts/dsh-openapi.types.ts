@@ -595,6 +595,9 @@ export interface paths {
         /**
          * Create a new order
          * @description Creates a new order in CREATED status.
+         *     Production: BearerAuth token supplies the client identity.
+         *     DEV_ONLY: X-Client-Id header supplies temporary client identity until auth runtime is live.
+         *     The request body's client_id is optional compatibility input and is never the trusted identity source.
          *     WLT boundary: local order creation is enabled to unblock testing order states and cancellations, but does NOT perform any external financial callback/WLT balance deduction.
          */
         post: operations["createOrder"];
@@ -677,6 +680,7 @@ export interface paths {
          * Handle refund callback from WLT
          * @description Incoming webhook triggered by WLT to notify DSH of a refund status.
          *     WLT boundary: WLT owns refund execution. DSH stores reference ID only.
+         *     Requires X-WLT-Callback-Token matching WLT_CALLBACK_SECRET; DEV_ONLY accepts dev-secret.
          */
         post: operations["refundOrderCallback"];
         delete?: never;
@@ -935,6 +939,7 @@ export interface paths {
          * Settlement status update callback from WLT
          * @description Called by WLT to notify DSH of the final settlement outcome (CONFIRMED or FAILED).
          *     Updates settlement status and stores transaction reference inside DSH.
+         *     Requires X-WLT-Callback-Token matching WLT_CALLBACK_SECRET; DEV_ONLY accepts dev-secret.
          */
         post: operations["postWltSettlementCallback"];
         delete?: never;
@@ -1407,7 +1412,8 @@ export interface components {
         };
         CreateOrderRequest: {
             store_id: string;
-            client_id: string;
+            /** @description Optional DEV compatibility value only. Backend derives trusted client identity from BearerAuth or DEV_ONLY X-Client-Id. */
+            client_id?: string;
             total_price: number;
             wlt_payment_ref_id?: string;
             items: components["schemas"]["OrderItemInput"][];
@@ -3097,6 +3103,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Missing or invalid client identity */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Internal error */
             500: {
                 headers: {
@@ -3126,6 +3141,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderDetailsResponse"];
+                };
+            };
+            /** @description Missing or invalid client identity */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Order not found */
@@ -3264,7 +3288,9 @@ export interface operations {
     refundOrderCallback: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-WLT-Callback-Token": string;
+            };
             path: {
                 id: string;
             };
@@ -3287,6 +3313,15 @@ export interface operations {
             };
             /** @description Invalid request parameters */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Missing or invalid WLT callback token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4014,7 +4049,9 @@ export interface operations {
     postWltSettlementCallback: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-WLT-Callback-Token": string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -4035,6 +4072,15 @@ export interface operations {
             };
             /** @description Bad request */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Missing or invalid WLT callback token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"bthwani.local/dsh/domain"
@@ -195,25 +196,34 @@ func (repo *PostgresRepository) ListOrders(ctx context.Context, query domain.Lis
 		offset = 0
 	}
 
-	var countRow *sql.Row
-	var rows *sql.Rows
-	var err error
-
 	const selectCols = `id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
 
+	where := []string{}
+	args := []any{}
 	if query.Status != "" {
-		countRow = repo.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM dsh_orders WHERE status = $1`, query.Status)
-		rows, err = repo.db.QueryContext(ctx,
-			`SELECT `+selectCols+` FROM dsh_orders WHERE status = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
-			query.Status, limit, offset,
-		)
-	} else {
-		countRow = repo.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM dsh_orders`)
-		rows, err = repo.db.QueryContext(ctx,
-			`SELECT `+selectCols+` FROM dsh_orders ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
-			limit, offset,
-		)
+		args = append(args, query.Status)
+		where = append(where, fmt.Sprintf("status = $%d", len(args)))
 	}
+	if query.ClientID != "" {
+		args = append(args, query.ClientID)
+		where = append(where, fmt.Sprintf("client_id = $%d", len(args)))
+	}
+
+	whereSQL := ""
+	if len(where) > 0 {
+		whereSQL = " WHERE " + strings.Join(where, " AND ")
+	}
+
+	countRow := repo.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM dsh_orders`+whereSQL, args...)
+
+	queryArgs := append([]any{}, args...)
+	queryArgs = append(queryArgs, limit, offset)
+	limitPlaceholder := fmt.Sprintf("$%d", len(queryArgs)-1)
+	offsetPlaceholder := fmt.Sprintf("$%d", len(queryArgs))
+	rows, err := repo.db.QueryContext(ctx,
+		`SELECT `+selectCols+` FROM dsh_orders`+whereSQL+` ORDER BY created_at DESC LIMIT `+limitPlaceholder+` OFFSET `+offsetPlaceholder,
+		queryArgs...,
+	)
 
 	var total int
 	if scanErr := countRow.Scan(&total); scanErr != nil {
@@ -888,6 +898,7 @@ VALUES ($1, $2, 'captain', $3, $4, $5, NOW())`
 // Validates that:
 //   - the order exists and is owned by the given captainID
 //   - current status is ARRIVED (captain must have reached client before submitting PoD)
+//
 // Updates status to DELIVERED, records pod_media_key, logs status event.
 // WLT BOUNDARY: no financial mutation here. Payout is WLT responsibility triggered externally.
 func (repo *PostgresRepository) DeliverOrder(ctx context.Context, orderID string, captainID string, podMediaKey *string) (domain.OrderRecord, error) {

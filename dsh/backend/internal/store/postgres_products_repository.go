@@ -155,19 +155,22 @@ LIMIT $%d OFFSET $%d`, strings.Join(where, " AND p."), limitPlaceholder, offsetP
 	defer rows.Close()
 
 	products := []domain.ProductRecord{}
+	productIDs := []string{}
 	for rows.Next() {
 		record, err := scanProductRowColumnsWithOverrides(rows)
 		if err != nil {
 			return domain.ListProductsResponse{}, err
 		}
-		media, err := repo.ListProductMedia(ctx, record.ID)
-		if err == nil {
-			record.Media = media
-		}
 		products = append(products, record)
+		productIDs = append(productIDs, record.ID)
 	}
 	if err := rows.Err(); err != nil {
 		return domain.ListProductsResponse{}, err
+	}
+	if mediaByProductID, err := repo.listProductMediaByProductIDs(ctx, productIDs); err == nil {
+		for i := range products {
+			products[i].Media = mediaByProductID[products[i].ID]
+		}
 	}
 
 	return domain.ListProductsResponse{
@@ -350,6 +353,41 @@ ORDER BY created_at ASC`
 		list = append(list, rec)
 	}
 	return list, rows.Err()
+}
+
+func (repo *PostgresRepository) listProductMediaByProductIDs(ctx context.Context, productIDs []string) (map[string][]domain.ProductMediaRecord, error) {
+	result := make(map[string][]domain.ProductMediaRecord, len(productIDs))
+	if len(productIDs) == 0 {
+		return result, nil
+	}
+
+	args := make([]any, 0, len(productIDs))
+	placeholders := make([]string, 0, len(productIDs))
+	for i, id := range productIDs {
+		args = append(args, id)
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+	}
+
+	query := fmt.Sprintf(`
+SELECT id, product_id, media_key, url, created_at
+FROM dsh_catalog_product_media
+WHERE product_id IN (%s)
+ORDER BY product_id ASC, created_at ASC`, strings.Join(placeholders, ", "))
+
+	rows, err := repo.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return result, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var rec domain.ProductMediaRecord
+		if err := rows.Scan(&rec.ID, &rec.ProductID, &rec.MediaKey, &rec.URL, &rec.CreatedAt); err != nil {
+			return result, err
+		}
+		result[rec.ProductID] = append(result[rec.ProductID], rec)
+	}
+	return result, rows.Err()
 }
 
 func (repo *PostgresRepository) UpdateCatalogOverrides(ctx context.Context, storeID string, req domain.UpdateCatalogOverridesRequest) (domain.UpdateCatalogOverridesResponse, error) {
