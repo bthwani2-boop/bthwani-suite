@@ -44,6 +44,28 @@ BThwani is a multi-surface delivery/marketplace platform with service-owned vert
 | webapp | Web product app | مستخدم/زائر | تجارب ويب لخدمات مختارة حسب نضج الخدمة. |
 | website | Marketing website | عام | تعريف، تسويق، وثائق عامة، لا يملك منطق تشغيل حي. |
 
+## Current Active Root Mapping
+
+The platform surfaces are mapped to the following active root directories:
+* **app-client** -> [app-client/runtime](file:///c:/bthwani-suite/app-client/runtime)
+* **app-partner** -> [app-partner/runtime](file:///c:/bthwani-suite/app-partner/runtime)
+* **app-captain** -> [app-captain/runtime](file:///c:/bthwani-suite/app-captain/runtime)
+* **app-field** -> [app-field/runtime](file:///c:/bthwani-suite/app-field/runtime)
+* **control-panel** -> [control-panel/runtime](file:///c:/bthwani-suite/control-panel/runtime)
+* **webapp** -> [webapp/runtime](file:///c:/bthwani-suite/webapp/runtime)
+* **website** -> [website/runtime](file:///c:/bthwani-suite/website/runtime)
+
+The platform services are mapped to the following active directories:
+* **dsh** -> [dsh/](file:///c:/bthwani-suite/dsh)
+* **wlt** -> [wlt/](file:///c:/bthwani-suite/wlt)
+* **knz** -> [knz/](file:///c:/bthwani-suite/knz)
+* **arb** -> [arb/](file:///c:/bthwani-suite/arb)
+* **amn** -> [amn/](file:///c:/bthwani-suite/amn)
+* **esf** -> [esf/](file:///c:/bthwani-suite/esf)
+* **mrf** -> [mrf/](file:///c:/bthwani-suite/mrf)
+* **snd** -> [snd/](file:///c:/bthwani-suite/snd)
+* **kwd** -> [kwd/](file:///c:/bthwani-suite/kwd)
+
 ## Service ownership laws
 
 ### DSH
@@ -89,7 +111,7 @@ VAR_ZONE_SURGE_MULTIPLIER
 
 1. Repo evidence on the active branch.
 2. Governance folder.
-3. Contracts under `contracts/master/`.
+3. Approved OpenAPI contract location/registry.
 4. Package public APIs and tests.
 5. Runtime logs and evidence packs.
 6. Historical accounting and superseded source notes only through `99_LEGACY_MERGE_LEDGER.md`.

@@ -9,7 +9,7 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen (reportPodFailure CTA) |
 | WLT Boundary | Refund execution owned by WLT (004E). DSH stores wlt_refund_trigger_ref as bridge reference only. Zero financial mutation in DSH. |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 
 ## Scope
 ### Included
@@ -72,7 +72,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | J-004 closed. `POST /orders/{id}/fail-delivery` and `POST /orders/{id}/confirm-return` confirmed in production handler. Migration 018 applied (delivery_failure_reason + wlt_refund_trigger_ref). Flow A (FAILED_DELIVERY) and Flow B (RETURNING_TO_STORE→RETURNED) verified. Guards: wrong captain→403, missing reason→400, idempotency→409, double return→409. WLT boundary confirmed — wlt_refund_trigger_ref is bridge reference only; DSH does NOT execute refunds. |
 | **WLT Boundary** | Confirmed — wlt_refund_trigger_ref is bridge reference only. DSH does NOT execute refunds. WLT (004E) owns refund. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

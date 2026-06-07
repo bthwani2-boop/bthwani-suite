@@ -9,7 +9,7 @@
 | Primary Actor | Client (app-client) / Partner (app-partner) |
 | Primary Surface | app-client / SupportEscalationScreen; control-panel / SupportQueueScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 | Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
@@ -59,7 +59,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | Support ticket creation and operator queue verified; POST /support/escalations proven at runtime; upstream J-003 is PASS. |
 | **Dependency** | None |
 | **Next Action** | none — runtime proof complete |

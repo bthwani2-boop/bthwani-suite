@@ -9,7 +9,7 @@
 | Primary Actor | Client (app-client) |
 | Primary Surface | app-client / OrderTrackingScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 | Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
@@ -59,7 +59,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | Order tracking timeline screen verified; GET /orders/{id} proven at runtime; upstream J-003 checkout is PASS. |
 | **Dependency** | None |
 | **Next Action** | none — runtime proof complete |

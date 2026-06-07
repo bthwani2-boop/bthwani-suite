@@ -9,7 +9,7 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / TaskScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 
 ## Scope
 ### Included
@@ -60,6 +60,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | J-004 order lifecycle closed. Both accept-task and decline-task endpoints confirmed in production handler. E2E evidence covers full accept/decline flow. App-captain captain identity injectable (no hardcoded IDs). |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

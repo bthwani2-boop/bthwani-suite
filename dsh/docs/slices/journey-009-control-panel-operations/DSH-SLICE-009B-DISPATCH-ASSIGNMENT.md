@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / DispatchScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 
 ## Scope
 ### Included
@@ -59,6 +59,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 | **Reason** | J-005 fully closed. Backend `POST /orders/{id}/assign-captain` is idempotent and serves both initial assignment and CP manual override/reassignment. Live delivery data now proven through J-005 E2E chain. Distinct `/reassign-captain` endpoint is a future infra-layer enhancement — not a blocker for CP dispatch operations. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

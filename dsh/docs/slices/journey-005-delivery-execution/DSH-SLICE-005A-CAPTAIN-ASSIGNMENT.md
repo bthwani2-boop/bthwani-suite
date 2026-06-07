@@ -9,7 +9,7 @@
 | Primary Actor | DSH backend (automated) / Control-Panel Operator (manual override) |
 | Primary Surface | control-panel / DispatchScreen; DSH backend |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 
 ## Scope
 ### Included
@@ -59,6 +59,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | J-004 order lifecycle closed. Backend endpoint `POST /orders/{id}/assign-captain` confirmed in production handler. Coverage Matrix and CTA Matrix all PASS. No financial mutation in DSH. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

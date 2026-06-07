@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / PartnerStoresScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 | Blocking Reason | None |
 
 ## Scope
@@ -68,7 +68,7 @@
 
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 | **Reason** | Operations room rendered with live data on localhost: 128 orders, AI recommendations, intervention plans visible; LiveOrdersScreen fetches live orders from backend; CommandCenterScreen preview-only by design |
 | **Dependency** | None |
 | **Next Action** | None — slice closed |

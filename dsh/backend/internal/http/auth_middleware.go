@@ -96,6 +96,75 @@ func min(a, b int) int {
 	return b
 }
 
+type authContextKey string
+const authSessionKey authContextKey = "auth_session"
+
+type AuthSession struct {
+	Subject string
+	Roles   []string
+}
+
+func GetAuthSession(r *http.Request) *AuthSession {
+	if sess, ok := r.Context().Value(authSessionKey).(*AuthSession); ok {
+		return sess
+	}
+	return nil
+}
+
+func HasRole(r *http.Request, role string) bool {
+	sess := GetAuthSession(r)
+	if sess == nil {
+		return false
+	}
+	for _, rld := range sess.Roles {
+		if strings.ToLower(rld) == strings.ToLower(role) {
+			return true
+		}
+	}
+	return false
+}
+
+func verifyBearerTokenSession(ctx context.Context, token string) *AuthSession {
+	base := authServiceURL()
+	if base == "" {
+		return nil
+	}
+	reqURL := base + "/auth/session"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
+	if err != nil {
+		return nil
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	if resp.StatusCode != http.StatusOK {
+		return nil
+	}
+
+	var session authSessionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&session); err != nil {
+		return nil
+	}
+	if session.AuthState != "authenticated" {
+		return nil
+	}
+	subject := strings.TrimSpace(session.Subject)
+	if subject == "" {
+		subject = fmt.Sprintf("sub:%s", token[:min(16, len(token))])
+	}
+	return &AuthSession{
+		Subject: subject,
+		Roles:   session.Roles,
+	}
+}
+
 // resolveClientIdentity extracts the client identity from the request.
 //
 // DEV mode (DSH_AUTH_MODE not set or != production):
@@ -111,6 +180,8 @@ func min(a, b int) int {
 //   DSH_AUTH_SERVICE_URL MUST be set in production; if unset all requests denied.
 //   REMAINING GATE before 003A/003B PASS: real auth service + runtime proof.
 func resolveClientIdentity(r *http.Request) string {
+	var session *AuthSession
+
 	if authMode() == "production" {
 		authHeader := strings.TrimSpace(r.Header.Get("Authorization"))
 		if !strings.HasPrefix(authHeader, "Bearer ") {
@@ -120,10 +191,32 @@ func resolveClientIdentity(r *http.Request) string {
 		if token == "" {
 			return ""
 		}
-		return verifyBearerToken(r.Context(), token)
+		session = verifyBearerTokenSession(r.Context(), token)
+	} else {
+		// DEV_ONLY fallback
+		subject := strings.TrimSpace(r.Header.Get("X-Client-Id"))
+		if subject != "" {
+			actorType := strings.ToLower(strings.TrimSpace(r.Header.Get("X-Actor-Type")))
+			roles := []string{}
+			if actorType != "" {
+				roles = append(roles, actorType)
+			} else {
+				// Default dev roles
+				roles = []string{"client", "partner", "captain", "operator", "field"}
+			}
+			session = &AuthSession{
+				Subject: subject,
+				Roles:   roles,
+			}
+		}
 	}
-	// DEV_ONLY fallback
-	return strings.TrimSpace(r.Header.Get("X-Client-Id"))
+
+	if session != nil {
+		ctx := context.WithValue(r.Context(), authSessionKey, session)
+		*r = *r.WithContext(ctx)
+		return session.Subject
+	}
+	return ""
 }
 
 // requireClientIdentity is a guard that returns the client identity or writes

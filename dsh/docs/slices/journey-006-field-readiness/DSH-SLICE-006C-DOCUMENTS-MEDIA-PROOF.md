@@ -9,7 +9,7 @@
 | Primary Actor | Field Agent |
 | Primary Surface | app-field / DshFieldDocumentUploadScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None |
 
 ## Scope
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | Document upload API and app-field UI screen implemented and verified. |
 | **Dependency** | None |
 | **Next Action** | None |

@@ -28,6 +28,7 @@ const (
 	ErrorCodeInvalidParameter ErrorCode = "INVALID_PARAMETER"
 	ErrorCodeInternalError    ErrorCode = "INTERNAL_ERROR"
 	ErrorCodeUnauthenticated  ErrorCode = "UNAUTHENTICATED"
+	ErrorCodeForbidden        ErrorCode = "FORBIDDEN"
 )
 
 type StoreSummary struct {

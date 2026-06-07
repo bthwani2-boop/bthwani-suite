@@ -9,7 +9,7 @@
 | Primary Actor | Partner (app-partner) |
 | Primary Surface | app-partner / OrderManagementScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 | Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
@@ -60,7 +60,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | Partner order acceptance and preparation workflow verified; PATCH /orders/{id}/status proven at runtime; upstream J-003 is PASS. |
 | **Dependency** | None |
 | **Next Action** | none — runtime proof complete |

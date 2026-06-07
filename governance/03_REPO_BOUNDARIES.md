@@ -39,7 +39,7 @@
 
 - No policy duplication outside `governance/`.
 - No app-local design system that competes with `@bthwani/ui-kit`.
-- No surface-local API contract that competes with `contracts/master`.
+- No surface-local API contract that competes with the approved OpenAPI contract location/registry.
 - No generated evidence treated as policy.
 - No `.github` workflow introducing governance rules not defined here.
 - No retired GitHub-side agent roots as active agent sources.

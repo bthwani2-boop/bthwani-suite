@@ -68,6 +68,8 @@ func TestStoresHandlerVisibilityGates(t *testing.T) {
 
 	// Step 1: Initial list returns store-1001 (Haddah Central Market)
 	getReq := httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
 	getResp := httptest.NewRecorder()
 	handler.ServeHTTP(getResp, getReq)
 
@@ -103,6 +105,8 @@ func TestStoresHandlerVisibilityGates(t *testing.T) {
 
 	// Step 3: Verify store-1001 is now hidden
 	getReq = httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
 	getResp = httptest.NewRecorder()
 	handler.ServeHTTP(getResp, getReq)
 	var hiddenStores domain.DiscoveryStoresResponse
@@ -138,6 +142,8 @@ func TestStoresHandlerVisibilityGates(t *testing.T) {
 
 	// Verify hidden again
 	getReq = httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
 	getResp = httptest.NewRecorder()
 	handler.ServeHTTP(getResp, getReq)
 	decodeBody(t, getResp, &hiddenStores)
@@ -167,6 +173,8 @@ func TestStoresHandlerVisibilityGates(t *testing.T) {
 
 	// Verify hidden again
 	getReq = httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
 	getResp = httptest.NewRecorder()
 	handler.ServeHTTP(getResp, getReq)
 	decodeBody(t, getResp, &hiddenStores)
@@ -225,6 +233,8 @@ func TestCreateFieldStoreValidationAndRepositoryFailure(t *testing.T) {
 
 	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores", bytes.NewReader([]byte("{")))
 	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSON.Header.Set("X-Client-Id", "field-123")
+	invalidJSON.Header.Set("X-Actor-Type", "field")
 	invalidJSONResp := httptest.NewRecorder()
 	handler.ServeHTTP(invalidJSONResp, invalidJSON)
 	if invalidJSONResp.Code != http.StatusBadRequest {
@@ -267,6 +277,8 @@ func TestCreateFieldVisitValidationAndRepositoryFailure(t *testing.T) {
 
 	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores/store-1001/field-visits", bytes.NewReader([]byte("{")))
 	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSON.Header.Set("X-Client-Id", "field-123")
+	invalidJSON.Header.Set("X-Actor-Type", "field")
 	invalidJSONResp := httptest.NewRecorder()
 	handler.ServeHTTP(invalidJSONResp, invalidJSON)
 	if invalidJSONResp.Code != http.StatusBadRequest {
@@ -305,6 +317,8 @@ func getStores(t *testing.T, target string) *httptest.ResponseRecorder {
 	repository := store.NewMemoryRepository()
 	handler := NewStoresHandler(repository)
 	request := httptest.NewRequest(http.MethodGet, target, nil)
+	request.Header.Set("X-Client-Id", "client-123")
+	request.Header.Set("X-Actor-Type", "client")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)
@@ -322,6 +336,8 @@ func createFieldVisit(t *testing.T, handler *StoresHandler, storeID string, body
 
 	request := httptest.NewRequest(http.MethodPost, "/stores/"+storeID+"/field-visits", bytes.NewReader(bodyBytes))
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "field-123")
+	request.Header.Set("X-Actor-Type", "field")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)
@@ -338,6 +354,8 @@ func createFieldStore(t *testing.T, handler *StoresHandler, body domain.CreateFi
 
 	request := httptest.NewRequest(http.MethodPost, "/stores", bytes.NewReader(bodyBytes))
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "field-123")
+	request.Header.Set("X-Actor-Type", "field")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)
@@ -354,6 +372,8 @@ func patchStore(t *testing.T, handler *StoresHandler, method string, path string
 
 	request := httptest.NewRequest(method, path, bytes.NewReader(bodyBytes))
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "operator-123")
+	request.Header.Set("X-Actor-Type", "operator")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)
@@ -416,6 +436,8 @@ func TestCreateFieldDocumentValidationAndRepositoryFailure(t *testing.T) {
 
 	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores/store-1001/documents", bytes.NewReader([]byte("{")))
 	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSON.Header.Set("X-Client-Id", "field-123")
+	invalidJSON.Header.Set("X-Actor-Type", "field")
 	invalidJSONResp := httptest.NewRecorder()
 	handler.ServeHTTP(invalidJSONResp, invalidJSON)
 	if invalidJSONResp.Code != http.StatusBadRequest {
@@ -463,6 +485,8 @@ func createFieldDocument(t *testing.T, handler *StoresHandler, storeID string, b
 
 	request := httptest.NewRequest(http.MethodPost, "/stores/"+storeID+"/documents", bytes.NewReader(bodyBytes))
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "field-123")
+	request.Header.Set("X-Actor-Type", "field")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)

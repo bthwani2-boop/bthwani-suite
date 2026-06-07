@@ -40,12 +40,14 @@ func scanOrderRecord(row interface{ Scan(dest ...any) error }, order *domain.Ord
 	var wltSettlement sql.NullString
 	var setStatus sql.NullString
 	var setAmt sql.NullFloat64
+	var checkoutIntentID sql.NullString
 
 	err := row.Scan(
 		&order.ID, &order.StoreID, &order.ClientID, &order.Status, &order.TotalPrice,
 		&wltPay, &wltRef, &refAmt, &capID, &lat, &lng, &lifeStatus, &podKey,
 		&failReason, &wltRefundTrigger,
 		&wltSettlement, &setStatus, &setAmt,
+		&checkoutIntentID,
 		&order.CreatedAt, &order.UpdatedAt,
 	)
 	if err != nil {
@@ -57,9 +59,6 @@ func scanOrderRecord(row interface{ Scan(dest ...any) error }, order *domain.Ord
 	}
 	if wltRef.Valid {
 		order.WltRefundRefID = &wltRef.String
-	}
-	if refAmt.Valid {
-		order.RefundAmount = &refAmt.Float64
 	}
 	if capID.Valid {
 		order.CaptainID = &capID.String
@@ -85,11 +84,8 @@ func scanOrderRecord(row interface{ Scan(dest ...any) error }, order *domain.Ord
 	if wltSettlement.Valid {
 		order.WltSettlementRefID = &wltSettlement.String
 	}
-	if setStatus.Valid {
-		order.SettlementStatus = setStatus.String
-	}
-	if setAmt.Valid {
-		order.SettlementAmount = &setAmt.Float64
+	if checkoutIntentID.Valid {
+		order.CheckoutIntentID = &checkoutIntentID.String
 	}
 	return nil
 }
@@ -100,6 +96,9 @@ func (repo *PostgresRepository) CreateOrder(ctx context.Context, storeID string,
 	}
 	if req.ClientID == "" {
 		return domain.OrderRecord{}, nil, fmt.Errorf("client ID is required")
+	}
+	if req.CheckoutIntentID == "" {
+		return domain.OrderRecord{}, nil, fmt.Errorf("checkout intent ID is required")
 	}
 	if len(req.Items) == 0 {
 		return domain.OrderRecord{}, nil, fmt.Errorf("order must have at least one item")
@@ -121,15 +120,51 @@ func (repo *PostgresRepository) CreateOrder(ctx context.Context, storeID string,
 		return domain.OrderRecord{}, nil, fmt.Errorf("store with ID %s not found", storeID)
 	}
 
+	// Verify checkout intent exists, belongs to user, matches store ID, status is payment_confirmed
+	var intentClientID, intentStoreID, intentStatus string
+	var wltPaymentRef sql.NullString
+	err = tx.QueryRowContext(ctx, "SELECT client_id, store_id, status, wlt_payment_ref_id FROM dsh_checkout_intents WHERE id = $1", req.CheckoutIntentID).Scan(&intentClientID, &intentStoreID, &intentStatus, &wltPaymentRef)
+	if err == sql.ErrNoRows {
+		return domain.OrderRecord{}, nil, fmt.Errorf("checkout intent %s not found", req.CheckoutIntentID)
+	}
+	if err != nil {
+		return domain.OrderRecord{}, nil, fmt.Errorf("failed to fetch checkout intent: %w", err)
+	}
+
+	if intentClientID != req.ClientID {
+		return domain.OrderRecord{}, nil, fmt.Errorf("checkout intent client ID mismatch")
+	}
+	if intentStoreID != storeID {
+		return domain.OrderRecord{}, nil, fmt.Errorf("checkout intent store ID mismatch")
+	}
+	if intentStatus != "payment_confirmed" {
+		return domain.OrderRecord{}, nil, fmt.Errorf("checkout intent is not payment_confirmed (status: %s)", intentStatus)
+	}
+
+	// Enforce idempotency: check if order already exists for this checkout intent
+	var existingOrderID string
+	err = tx.QueryRowContext(ctx, "SELECT id FROM dsh_orders WHERE checkout_intent_id = $1", req.CheckoutIntentID).Scan(&existingOrderID)
+	if err == nil {
+		tx.Rollback()
+		return repo.GetOrder(ctx, existingOrderID)
+	} else if err != sql.ErrNoRows {
+		return domain.OrderRecord{}, nil, fmt.Errorf("failed to check existing order: %w", err)
+	}
+
+	var wltPayRef *string
+	if wltPaymentRef.Valid {
+		wltPayRef = &wltPaymentRef.String
+	}
+
 	orderID := generateOrderID()
 	orderQuery := `
-INSERT INTO dsh_orders (id, store_id, client_id, status, total_price, wlt_payment_ref_id, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+INSERT INTO dsh_orders (id, store_id, client_id, status, total_price, wlt_payment_ref_id, checkout_intent_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	var order domain.OrderRecord
 	row := tx.QueryRowContext(ctx, orderQuery,
-		orderID, storeID, req.ClientID, domain.StatusCreated, req.TotalPrice, req.WltPaymentRefID,
+		orderID, storeID, req.ClientID, domain.StatusCreated, req.TotalPrice, wltPayRef, req.CheckoutIntentID,
 	)
 	err = scanOrderRecord(row, &order)
 	if err != nil {
@@ -196,7 +231,7 @@ func (repo *PostgresRepository) ListOrders(ctx context.Context, query domain.Lis
 		offset = 0
 	}
 
-	const selectCols = `id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+	const selectCols = `id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	where := []string{}
 	args := []any{}
@@ -254,7 +289,7 @@ func (repo *PostgresRepository) ListOrders(ctx context.Context, query domain.Lis
 
 func (repo *PostgresRepository) GetOrder(ctx context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error) {
 	orderQuery := `
-SELECT id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at
+SELECT id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at
 FROM dsh_orders
 WHERE id = $1`
 
@@ -329,7 +364,7 @@ func (repo *PostgresRepository) UpdateOrderStatus(ctx context.Context, orderID s
 		// No transition needed, return order as is
 		var order domain.OrderRecord
 		row := tx.QueryRowContext(ctx, `
-SELECT id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at
+SELECT id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at
 FROM dsh_orders WHERE id = $1`, orderID)
 		err = scanOrderRecord(row, &order)
 		if err != nil {
@@ -344,7 +379,7 @@ FROM dsh_orders WHERE id = $1`, orderID)
 UPDATE dsh_orders
 SET status = $1, updated_at = NOW()
 WHERE id = $2
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	row := tx.QueryRowContext(ctx, updateQuery, status, orderID)
 	err = scanOrderRecord(row, &order)
@@ -535,22 +570,22 @@ func (repo *PostgresRepository) UpdateOrderRefund(ctx context.Context, orderID s
 		toStatus = "REFUNDED"
 		updateQuery = `
 UPDATE dsh_orders
-SET status = 'REFUNDED', wlt_refund_ref_id = $1, refund_amount = $2, updated_at = NOW()
-WHERE id = $3
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
-		row := tx.QueryRowContext(ctx, updateQuery, refundRefID, amount, orderID)
+SET status = 'REFUNDED', wlt_refund_ref_id = $1, refund_amount = NULL, updated_at = NOW()
+WHERE id = $2
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
+		row := tx.QueryRowContext(ctx, updateQuery, refundRefID, orderID)
 		err = scanOrderRecord(row, &order)
-		note = fmt.Sprintf("Refund of %.2f processed, ref: %s", amount, refundRefID)
+		note = fmt.Sprintf("Refund (WLT ref: %s) processed; amount ignored at DSH boundary", refundRefID)
 	} else {
 		toStatus = currentStatus
 		updateQuery = `
 UPDATE dsh_orders
-SET wlt_refund_ref_id = $1, refund_amount = $2, updated_at = NOW()
-WHERE id = $3
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
-		row := tx.QueryRowContext(ctx, updateQuery, refundRefID, amount, orderID)
+SET wlt_refund_ref_id = $1, refund_amount = NULL, updated_at = NOW()
+WHERE id = $2
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
+		row := tx.QueryRowContext(ctx, updateQuery, refundRefID, orderID)
 		err = scanOrderRecord(row, &order)
-		note = fmt.Sprintf("Refund of %.2f failed, ref: %s", amount, refundRefID)
+		note = fmt.Sprintf("Refund (WLT ref: %s) failed; amount ignored at DSH boundary", refundRefID)
 	}
 
 	if err != nil {
@@ -605,7 +640,7 @@ func (repo *PostgresRepository) AssignCaptain(ctx context.Context, orderID strin
 UPDATE dsh_orders
 SET captain_id = $1, updated_at = NOW()
 WHERE id = $2
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	row := tx.QueryRowContext(ctx, updateQuery, captainID, orderID)
 	err = scanOrderRecord(row, &order)
@@ -666,7 +701,7 @@ func (repo *PostgresRepository) AcceptTask(ctx context.Context, orderID string, 
 UPDATE dsh_orders
 SET status = $1, updated_at = NOW()
 WHERE id = $2
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	row := tx.QueryRowContext(ctx, updateQuery, domain.StatusAcceptedByCaptain, orderID)
 	err = scanOrderRecord(row, &order)
@@ -727,7 +762,7 @@ func (repo *PostgresRepository) DeclineTask(ctx context.Context, orderID string,
 UPDATE dsh_orders
 SET captain_id = NULL, status = $1, updated_at = NOW()
 WHERE id = $2
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	row := tx.QueryRowContext(ctx, updateQuery, domain.StatusReadyForPickup, orderID)
 	err = scanOrderRecord(row, &order)
@@ -791,7 +826,7 @@ func (repo *PostgresRepository) ConfirmPickup(ctx context.Context, orderID strin
 UPDATE dsh_orders
 SET status = $1, updated_at = NOW()
 WHERE id = $2
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 
 	row := tx.QueryRowContext(ctx, updateQuery, domain.StatusPickedUp, orderID)
 	err = scanOrderRecord(row, &order)
@@ -857,14 +892,14 @@ func (repo *PostgresRepository) UpdateCaptainLocation(ctx context.Context, order
 UPDATE dsh_orders
 SET status = $1, captain_latitude = $2, captain_longitude = $3, captain_lifecycle_status = $4, updated_at = NOW()
 WHERE id = $5
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 		row = tx.QueryRowContext(ctx, updateQuery, orderStatus, lat, lng, lifecycleStatus, orderID)
 	} else {
 		updateQuery = `
 UPDATE dsh_orders
 SET captain_latitude = $1, captain_longitude = $2, captain_lifecycle_status = $3, updated_at = NOW()
 WHERE id = $4
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`
 		row = tx.QueryRowContext(ctx, updateQuery, lat, lng, lifecycleStatus, orderID)
 	}
 
@@ -934,7 +969,7 @@ func (repo *PostgresRepository) DeliverOrder(ctx context.Context, orderID string
 UPDATE dsh_orders
 SET status = $1, pod_media_key = $2, updated_at = NOW()
 WHERE id = $3
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`,
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`,
 		domain.StatusDelivered, podMediaKey, orderID)
 
 	err = scanOrderRecord(row, &order)
@@ -1011,7 +1046,7 @@ func (repo *PostgresRepository) FailDelivery(ctx context.Context, orderID string
 UPDATE dsh_orders
 SET status = $1, delivery_failure_reason = $2, wlt_refund_trigger_ref = $3, updated_at = NOW()
 WHERE id = $4
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`,
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`,
 		newStatus, failureReason, wltRefundTriggerRef, orderID)
 
 	err = scanOrderRecord(row, &order)
@@ -1075,7 +1110,7 @@ func (repo *PostgresRepository) ConfirmReturn(ctx context.Context, orderID strin
 UPDATE dsh_orders
 SET status = $1, updated_at = NOW()
 WHERE id = $2
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`,
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, checkout_intent_id, created_at, updated_at`,
 		domain.StatusReturned, orderID)
 
 	err = scanOrderRecord(row, &order)
@@ -1103,165 +1138,6 @@ VALUES ($1, $2, 'captain', $3, $4, $5, NOW())`,
 	return order, nil
 }
 
-// SubmitSettlementCandidates — DSH-SLICE-010B: submits eligible delivered orders as candidates.
-func (repo *PostgresRepository) SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error) {
-	if len(orderIDs) == 0 {
-		return nil, fmt.Errorf("no order IDs provided")
-	}
-	tx, err := repo.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
-	var orders []domain.OrderRecord
-	for _, id := range orderIDs {
-		var currentStatus string
-		var currentSetStatus string
-		err = tx.QueryRowContext(ctx, "SELECT status, settlement_status FROM dsh_orders WHERE id = $1 FOR UPDATE", id).Scan(&currentStatus, &currentSetStatus)
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("order not found: %s", id)
-		}
-		if err != nil {
-			return nil, err
-		}
-		if currentStatus != domain.StatusDelivered && currentStatus != domain.StatusReturned {
-			return nil, fmt.Errorf("order %s is not in DELIVERED or RETURNED status (current: %s)", id, currentStatus)
-		}
-		if currentSetStatus == domain.SettlementStatusPending || currentSetStatus == domain.SettlementStatusSettled {
-			return nil, fmt.Errorf("order %s settlement is already %s", id, currentSetStatus)
-		}
-
-		var order domain.OrderRecord
-		query := `
-UPDATE dsh_orders
-SET settlement_status = 'SETTLEMENT_PENDING', updated_at = NOW()
-WHERE id = $1
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
-		row := tx.QueryRowContext(ctx, query, id)
-		err = scanOrderRecord(row, &order)
-		if err != nil {
-			return nil, err
-		}
-
-		// Log status event
-		eventID := generateStatusEventID()
-		eventQuery := `
-INSERT INTO dsh_order_status_events (id, order_id, actor, from_status, to_status, note, created_at)
-VALUES ($1, $2, 'system', $3, $3, 'Submitted as WLT settlement candidate', NOW())`
-		_, err = tx.ExecContext(ctx, eventQuery, eventID, id, currentStatus)
-		if err != nil {
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-	return orders, nil
-}
-
-// ProcessSettlementCallback — DSH-SLICE-010B: processes callback from WLT settlement.
-func (repo *PostgresRepository) ProcessSettlementCallback(ctx context.Context, settlementRefID string, orderIDs []string, amount float64, status string) ([]domain.OrderRecord, error) {
-	if len(orderIDs) == 0 {
-		return nil, fmt.Errorf("no order IDs provided")
-	}
-	if status != "CONFIRMED" && status != "FAILED" {
-		return nil, fmt.Errorf("invalid settlement callback status: %s", status)
-	}
-
-	tx, err := repo.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
-	var orders []domain.OrderRecord
-	for _, id := range orderIDs {
-		var currentStatus string
-		var currentSetStatus string
-		err = tx.QueryRowContext(ctx, "SELECT status, settlement_status FROM dsh_orders WHERE id = $1 FOR UPDATE", id).Scan(&currentStatus, &currentSetStatus)
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("order not found: %s", id)
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		var targetSetStatus string
-		var note string
-		if status == "CONFIRMED" {
-			targetSetStatus = domain.SettlementStatusSettled
-			note = fmt.Sprintf("WLT Settlement confirmed (ref: %s, amount: %.2f)", settlementRefID, amount)
-		} else {
-			targetSetStatus = domain.SettlementStatusFailed
-			note = fmt.Sprintf("WLT Settlement failed (ref: %s)", settlementRefID)
-		}
-
-		var order domain.OrderRecord
-		query := `
-UPDATE dsh_orders
-SET settlement_status = $1, wlt_settlement_ref_id = $2, settlement_amount = $3, updated_at = NOW()
-WHERE id = $4
-RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at`
-
-		var amtVal *float64
-		if status == "CONFIRMED" {
-			amtVal = &amount
-		}
-		row := tx.QueryRowContext(ctx, query, targetSetStatus, settlementRefID, amtVal, id)
-		err = scanOrderRecord(row, &order)
-		if err != nil {
-			return nil, err
-		}
-
-		// Log status event
-		eventID := generateStatusEventID()
-		eventQuery := `
-INSERT INTO dsh_order_status_events (id, order_id, actor, from_status, to_status, note, created_at)
-VALUES ($1, $2, 'system', $3, $3, $4, NOW())`
-		_, err = tx.ExecContext(ctx, eventQuery, eventID, id, currentStatus, note)
-		if err != nil {
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-	return orders, nil
-}
-
-// ListSettlements — DSH-SLICE-010B: returns read-only settlements bridged from WLT.
-func (repo *PostgresRepository) ListSettlements(ctx context.Context) ([]domain.OrderRecord, error) {
-	query := `
-SELECT id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, refund_amount, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, settlement_amount, created_at, updated_at
-FROM dsh_orders
-WHERE settlement_status IN ('SETTLEMENT_PENDING', 'SETTLED', 'SETTLEMENT_FAILED')
-ORDER BY updated_at DESC`
-
-	rows, err := repo.db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var orders []domain.OrderRecord
-	for rows.Next() {
-		var order domain.OrderRecord
-		err := scanOrderRecord(rows, &order)
-		if err != nil {
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return orders, nil
-}
 
 // ListAllSupportEscalations — global escalation list for CP operator view (J-009C).
 func (repo *PostgresRepository) ListAllSupportEscalations(ctx context.Context, query domain.ListAllSupportEscalationsQuery) (domain.ListAllSupportEscalationsResponse, error) {

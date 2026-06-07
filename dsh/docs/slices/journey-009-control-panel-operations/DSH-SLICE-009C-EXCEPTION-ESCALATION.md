@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ExceptionEscalationScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 
 ## Scope
 ### Included
@@ -64,6 +64,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 | **Reason** | J-004 and J-005 fully closed. Support escalation API (`GET/POST/PATCH /support/escalations`) confirmed in support_handler.go. All upstream exception data sources (004C order support, 004F CP exception queue, 005F delivery failures) are PASS. Unified `/exceptions` aggregator endpoint deferred to future infra layer — not a blocker for core CP exception escalation operations. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

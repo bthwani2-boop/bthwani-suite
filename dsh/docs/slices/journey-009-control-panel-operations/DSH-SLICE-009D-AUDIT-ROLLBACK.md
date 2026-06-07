@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / AuditLogScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 
 ## Scope
 ### Included
@@ -65,6 +65,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
 | **Reason** | `dsh_order_status_events` (migration 009) is the proven audit infrastructure. All status transitions across J-003, J-004, J-005 are logged with actor, from/to status, and timestamp. Reversible mutations (visibility, catalog approval) are handled by existing per-domain endpoints (001C/D/E PASS, 002E PASS). Dedicated `GET /audit-log` aggregator and global rollback endpoint are future infra enhancements — the underlying audit data is available now. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

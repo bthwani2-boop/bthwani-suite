@@ -1,13 +1,12 @@
 {
   "graph": {
     "nodes": {
-      "app-captain": {
-        "name": "app-captain",
+      "@bthwani/control-panel": {
+        "name": "@bthwani/control-panel",
         "type": "app",
         "data": {
-          "root": "apps/mobile/app-captain",
-          "name": "app-captain",
-          "projectType": "application",
+          "root": "control-panel/runtime",
+          "name": "@bthwani/control-panel",
           "tags": [
             "npm:private"
           ],
@@ -15,7 +14,73 @@
             "targetGroups": {
               "NPM Scripts": [
                 "dev",
-                "go"
+                "build",
+                "start"
+              ]
+            },
+            "js": {
+              "packageName": "@bthwani/control-panel",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "next dev --webpack -p 3000",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "next build --webpack",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "next start -p 3000",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@bthwani/app-captain": {
+        "name": "@bthwani/app-captain",
+        "type": "lib",
+        "data": {
+          "root": "app-captain/runtime",
+          "name": "@bthwani/app-captain",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "dev",
+                "go",
+                "android",
+                "config",
+                "ios"
               ]
             },
             "js": {
@@ -50,42 +115,38 @@
               "configurations": {},
               "parallelism": true
             },
-            "serve": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir apps/mobile/app-captain exec expo start --dev-client --clear"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "build": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir apps/mobile/app-captain exec expo export --platform android"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "serve-go": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir apps/mobile/app-captain exec expo start --go --clear"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
             "android": {
-              "executor": "nx:run-commands",
+              "executor": "nx:run-script",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-captain exec expo run:android"
+                "script": "android"
+              },
+              "metadata": {
+                "scriptContent": "expo run:android",
+                "runCommand": "pnpm run android"
               },
               "configurations": {},
               "parallelism": true
             },
             "config": {
-              "executor": "nx:run-commands",
+              "executor": "nx:run-script",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-captain exec expo config --json"
+                "script": "config"
+              },
+              "metadata": {
+                "scriptContent": "expo config --json",
+                "runCommand": "pnpm run config"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "ios": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "ios"
+              },
+              "metadata": {
+                "scriptContent": "expo run:ios",
+                "runCommand": "pnpm run ios"
               },
               "configurations": {},
               "parallelism": true
@@ -94,13 +155,12 @@
           "implicitDependencies": []
         }
       },
-      "app-partner": {
-        "name": "app-partner",
-        "type": "app",
+      "@bthwani/app-partner": {
+        "name": "@bthwani/app-partner",
+        "type": "lib",
         "data": {
-          "root": "apps/mobile/app-partner",
-          "name": "app-partner",
-          "projectType": "application",
+          "root": "app-partner/runtime",
+          "name": "@bthwani/app-partner",
           "tags": [
             "npm:private"
           ],
@@ -108,7 +168,9 @@
             "targetGroups": {
               "NPM Scripts": [
                 "dev",
-                "go"
+                "go",
+                "android",
+                "config"
               ]
             },
             "js": {
@@ -143,42 +205,26 @@
               "configurations": {},
               "parallelism": true
             },
-            "serve": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir apps/mobile/app-partner exec expo start --dev-client --clear"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "build": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir apps/mobile/app-partner exec expo export --platform android"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "serve-go": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir apps/mobile/app-partner exec expo start --go --clear"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
             "android": {
-              "executor": "nx:run-commands",
+              "executor": "nx:run-script",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-partner exec expo run:android"
+                "script": "android"
+              },
+              "metadata": {
+                "scriptContent": "expo run:android",
+                "runCommand": "pnpm run android"
               },
               "configurations": {},
               "parallelism": true
             },
             "config": {
-              "executor": "nx:run-commands",
+              "executor": "nx:run-script",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-partner exec expo config --json"
+                "script": "config"
+              },
+              "metadata": {
+                "scriptContent": "expo config --json",
+                "runCommand": "pnpm run config"
               },
               "configurations": {},
               "parallelism": true
@@ -187,13 +233,12 @@
           "implicitDependencies": []
         }
       },
-      "app-client": {
-        "name": "app-client",
-        "type": "app",
+      "@bthwani/app-client": {
+        "name": "@bthwani/app-client",
+        "type": "lib",
         "data": {
-          "root": "app-client",
-          "name": "app-client",
-          "projectType": "application",
+          "root": "app-client/runtime",
+          "name": "@bthwani/app-client",
           "tags": [
             "npm:private"
           ],
@@ -202,6 +247,8 @@
               "NPM Scripts": [
                 "dev",
                 "go",
+                "android",
+                "config",
                 "ios"
               ]
             },
@@ -237,6 +284,30 @@
               "configurations": {},
               "parallelism": true
             },
+            "android": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "android"
+              },
+              "metadata": {
+                "scriptContent": "expo run:android",
+                "runCommand": "pnpm run android"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "config": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "config"
+              },
+              "metadata": {
+                "scriptContent": "expo config --json",
+                "runCommand": "pnpm run config"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
             "ios": {
               "executor": "nx:run-script",
               "options": {
@@ -248,7 +319,388 @@
               },
               "configurations": {},
               "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@bthwani/app-field": {
+        "name": "@bthwani/app-field",
+        "type": "lib",
+        "data": {
+          "root": "app-field/runtime",
+          "name": "@bthwani/app-field",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "dev",
+                "go",
+                "android",
+                "config"
+              ]
             },
+            "js": {
+              "packageName": "@bthwani/app-field",
+              "packageVersion": "0.0.0",
+              "packageMain": "./index.js",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "TOKEN=__BTHWANI_PLACEHOLDER__ expo start --dev-client --clear",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "go": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "go"
+              },
+              "metadata": {
+                "scriptContent": "expo start --go --clear",
+                "runCommand": "pnpm run go"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "android": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "android"
+              },
+              "metadata": {
+                "scriptContent": "expo run:android",
+                "runCommand": "pnpm run android"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "config": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "config"
+              },
+              "metadata": {
+                "scriptContent": "expo config --json",
+                "runCommand": "pnpm run config"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@bthwani/website": {
+        "name": "@bthwani/website",
+        "type": "app",
+        "data": {
+          "root": "website/runtime",
+          "name": "@bthwani/website",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "dev",
+                "build",
+                "start",
+                "proof:ui-kit",
+                "proof:ui-kit:update"
+              ]
+            },
+            "js": {
+              "packageName": "@bthwani/website",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "next dev --webpack -p 3002",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "next build --webpack",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "next start -p 3002",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "proof:ui-kit": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "proof:ui-kit"
+              },
+              "metadata": {
+                "scriptContent": "playwright test --config playwright.config.ts",
+                "runCommand": "pnpm run proof:ui-kit"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "proof:ui-kit:update": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "proof:ui-kit:update"
+              },
+              "metadata": {
+                "scriptContent": "playwright test --config playwright.config.ts --update-snapshots",
+                "runCommand": "pnpm run proof:ui-kit:update"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@bthwani/webapp": {
+        "name": "@bthwani/webapp",
+        "type": "app",
+        "data": {
+          "root": "webapp/runtime",
+          "name": "@bthwani/webapp",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "dev",
+                "build",
+                "start"
+              ]
+            },
+            "js": {
+              "packageName": "@bthwani/webapp",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "next dev --webpack -p 3001",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "next build --webpack",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "next start -p 3001",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "control-panel": {
+        "name": "control-panel",
+        "type": "app",
+        "data": {
+          "root": "control-panel",
+          "name": "control-panel",
+          "sourceRoot": "control-panel",
+          "projectType": "application",
+          "targets": {
+            "serve": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir control-panel/runtime dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir control-panel/runtime build"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": [],
+          "tags": []
+        }
+      },
+      "app-captain": {
+        "name": "app-captain",
+        "type": "app",
+        "data": {
+          "root": "app-captain",
+          "name": "app-captain",
+          "sourceRoot": "app-captain",
+          "projectType": "application",
+          "targets": {
+            "serve": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-captain/runtime exec expo start --dev-client --clear"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-captain/runtime exec expo export --platform android"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "serve-go": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-captain/runtime exec expo start --go --clear"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "android": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-captain/runtime exec expo run:android"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-captain/runtime exec expo config --json"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": [],
+          "tags": []
+        }
+      },
+      "app-partner": {
+        "name": "app-partner",
+        "type": "app",
+        "data": {
+          "root": "app-partner",
+          "name": "app-partner",
+          "sourceRoot": "app-partner",
+          "projectType": "application",
+          "targets": {
+            "serve": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-partner/runtime exec expo start --dev-client --clear"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-partner/runtime exec expo export --platform android"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "serve-go": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-partner/runtime exec expo start --go --clear"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "android": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-partner/runtime exec expo run:android"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir app-partner/runtime exec expo config --json"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": [],
+          "tags": []
+        }
+      },
+      "app-client": {
+        "name": "app-client",
+        "type": "app",
+        "data": {
+          "root": "app-client",
+          "name": "app-client",
+          "sourceRoot": "app-client",
+          "projectType": "application",
+          "targets": {
             "serve": {
               "executor": "nx:run-commands",
               "options": {
@@ -290,129 +742,23 @@
               "parallelism": true
             }
           },
-          "implicitDependencies": []
-        }
-      },
-      "control-panel": {
-        "name": "control-panel",
-        "type": "app",
-        "data": {
-          "root": "control-panel",
-          "name": "control-panel",
-          "projectType": "application",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {
-              "NPM Scripts": [
-                "dev",
-                "start"
-              ]
-            },
-            "js": {
-              "packageName": "@bthwani/control-panel",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
-          "targets": {
-            "dev": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "dev"
-              },
-              "metadata": {
-                "scriptContent": "next dev -p 3000",
-                "runCommand": "pnpm run dev"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "start": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "start"
-              },
-              "metadata": {
-                "scriptContent": "next start -p 3000",
-                "runCommand": "pnpm run start"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "serve": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir control-panel/runtime dev"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "build": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm --dir control-panel/runtime build"
-              },
-              "configurations": {},
-              "parallelism": true
-            }
-          },
-          "implicitDependencies": []
+          "implicitDependencies": [],
+          "tags": []
         }
       },
       "app-field": {
         "name": "app-field",
         "type": "app",
         "data": {
-          "root": "apps/mobile/app-field",
+          "root": "app-field",
           "name": "app-field",
+          "sourceRoot": "app-field",
           "projectType": "application",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {
-              "NPM Scripts": [
-                "dev",
-                "go"
-              ]
-            },
-            "js": {
-              "packageName": "@bthwani/app-field",
-              "packageVersion": "0.0.0",
-              "packageMain": "./index.js",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
           "targets": {
-            "dev": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "dev"
-              },
-              "metadata": {
-                "scriptContent": "expo start --dev-client --clear",
-                "runCommand": "pnpm run dev"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "go": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "go"
-              },
-              "metadata": {
-                "scriptContent": "expo start --go --clear",
-                "runCommand": "pnpm run go"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
             "serve": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-field exec expo start --dev-client --clear"
+                "command": "pnpm --dir app-field/runtime exec expo start --dev-client --clear"
               },
               "configurations": {},
               "parallelism": true
@@ -420,7 +766,7 @@
             "build": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-field exec expo export --platform android"
+                "command": "pnpm --dir app-field/runtime exec expo export --platform android"
               },
               "configurations": {},
               "parallelism": true
@@ -428,7 +774,7 @@
             "serve-go": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-field exec expo start --go --clear"
+                "command": "pnpm --dir app-field/runtime exec expo start --go --clear"
               },
               "configurations": {},
               "parallelism": true
@@ -436,7 +782,7 @@
             "android": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-field exec expo run:android"
+                "command": "pnpm --dir app-field/runtime exec expo run:android"
               },
               "configurations": {},
               "parallelism": true
@@ -444,92 +790,29 @@
             "config": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/mobile/app-field exec expo config --json"
+                "command": "pnpm --dir app-field/runtime exec expo config --json"
               },
               "configurations": {},
               "parallelism": true
             }
           },
-          "implicitDependencies": []
+          "implicitDependencies": [],
+          "tags": []
         }
       },
       "website": {
         "name": "website",
         "type": "app",
         "data": {
-          "root": "apps/web/website",
+          "root": "website",
           "name": "website",
+          "sourceRoot": "website",
           "projectType": "application",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {
-              "NPM Scripts": [
-                "dev",
-                "start",
-                "proof:ui-kit",
-                "proof:ui-kit:update"
-              ]
-            },
-            "js": {
-              "packageName": "@bthwani/website",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
           "targets": {
-            "dev": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "dev"
-              },
-              "metadata": {
-                "scriptContent": "next dev --webpack -p 3002",
-                "runCommand": "pnpm run dev"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "start": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "start"
-              },
-              "metadata": {
-                "scriptContent": "next start -p 3002",
-                "runCommand": "pnpm run start"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "proof:ui-kit": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "proof:ui-kit"
-              },
-              "metadata": {
-                "scriptContent": "playwright test --config playwright.config.ts",
-                "runCommand": "pnpm run proof:ui-kit"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "proof:ui-kit:update": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "proof:ui-kit:update"
-              },
-              "metadata": {
-                "scriptContent": "playwright test --config playwright.config.ts --update-snapshots",
-                "runCommand": "pnpm run proof:ui-kit:update"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
             "serve": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/web/website dev"
+                "command": "pnpm --dir website/runtime dev"
               },
               "configurations": {},
               "parallelism": true
@@ -537,13 +820,30 @@
             "build": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/web/website build"
+                "command": "pnpm --dir website/runtime build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "proof:ui-kit": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir website/runtime proof:ui-kit"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "proof:ui-kit:update": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "pnpm --dir website/runtime proof:ui-kit:update"
               },
               "configurations": {},
               "parallelism": true
             }
           },
-          "implicitDependencies": []
+          "implicitDependencies": [],
+          "tags": []
         }
       },
       "ui-kit": {
@@ -552,12 +852,8 @@
         "data": {
           "root": "ui-kit",
           "name": "ui-kit",
-          "projectType": "library",
           "tags": [
-            "npm:private",
-            "scope:shared",
-            "type:ui",
-            "owner:design-system"
+            "npm:private"
           ],
           "metadata": {
             "targetGroups": {},
@@ -567,49 +863,16 @@
               "packageExports": {
                 ".": "./src/index.ts",
                 "./web": "./src/web.ts",
-                "./mobile": "./src/mobile.ts",
+                "./mobile": "./src/mobile.tsx",
                 "./next": "./src/next.ts"
               },
               "packageMain": "./src/index.ts",
               "isInPackageManagerWorkspaces": true
             }
           },
-          "targets": {
-            "typecheck": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pnpm exec tsc -p ui-kit/tsconfig.json --noEmit"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "build-outputs": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pwsh -NoProfile -File tools/scripts/WRITE_UI_KIT_OUTPUTS.ps1"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "proof-visual": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pwsh -NoProfile -File tools/scripts/VERIFY_UI_KIT_VISUAL_PROOF.ps1"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "proof": {
-              "executor": "nx:run-commands",
-              "options": {
-                "command": "pwsh -NoProfile -File tools/scripts/VERIFY_UI_KIT_PROOF.ps1"
-              },
-              "configurations": {},
-              "parallelism": true
-            }
-          },
-          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "targets": {},
           "sourceRoot": "ui-kit/src",
+          "projectType": "library",
           "implicitDependencies": []
         }
       },
@@ -617,53 +880,15 @@
         "name": "webapp",
         "type": "app",
         "data": {
-          "root": "apps/web/webapp",
+          "root": "webapp",
           "name": "webapp",
+          "sourceRoot": "webapp",
           "projectType": "application",
-          "tags": [
-            "npm:private"
-          ],
-          "metadata": {
-            "targetGroups": {
-              "NPM Scripts": [
-                "dev",
-                "start"
-              ]
-            },
-            "js": {
-              "packageName": "@bthwani/webapp",
-              "isInPackageManagerWorkspaces": true
-            }
-          },
           "targets": {
-            "dev": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "dev"
-              },
-              "metadata": {
-                "scriptContent": "next dev -p 3001",
-                "runCommand": "pnpm run dev"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
-            "start": {
-              "executor": "nx:run-script",
-              "options": {
-                "script": "start"
-              },
-              "metadata": {
-                "scriptContent": "next start -p 3001",
-                "runCommand": "pnpm run start"
-              },
-              "configurations": {},
-              "parallelism": true
-            },
             "serve": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/web/webapp dev"
+                "command": "pnpm --dir webapp/runtime dev"
               },
               "configurations": {},
               "parallelism": true
@@ -671,74 +896,75 @@
             "build": {
               "executor": "nx:run-commands",
               "options": {
-                "command": "pnpm --dir apps/web/webapp build"
+                "command": "pnpm --dir webapp/runtime build"
               },
               "configurations": {},
               "parallelism": true
             }
           },
-          "implicitDependencies": []
+          "implicitDependencies": [],
+          "tags": []
         }
       }
     },
     "dependencies": {
-      "app-captain": [
+      "@bthwani/control-panel": [
         {
-          "source": "app-captain",
+          "source": "@bthwani/control-panel",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "app-partner": [
+      "@bthwani/app-captain": [
         {
-          "source": "app-partner",
+          "source": "@bthwani/app-captain",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "app-client": [
+      "@bthwani/app-partner": [
         {
-          "source": "app-client",
+          "source": "@bthwani/app-partner",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "control-panel": [
+      "@bthwani/app-client": [
         {
-          "source": "control-panel",
+          "source": "@bthwani/app-client",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "app-field": [
+      "@bthwani/app-field": [
         {
-          "source": "app-field",
+          "source": "@bthwani/app-field",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "surfaces": [
+      "@bthwani/website": [
         {
-          "source": "surfaces",
+          "source": "@bthwani/website",
           "target": "ui-kit",
           "type": "static"
         }
       ],
-      "website": [
+      "@bthwani/webapp": [
         {
-          "source": "website",
+          "source": "@bthwani/webapp",
           "target": "ui-kit",
           "type": "static"
         }
       ],
+      "control-panel": [],
+      "app-captain": [],
+      "app-partner": [],
+      "app-client": [],
+      "app-field": [],
+      "website": [],
       "ui-kit": [],
-      "webapp": [
-        {
-          "source": "webapp",
-          "target": "ui-kit",
-          "type": "static"
-        }
-      ]
+      "webapp": []
     }
   }
 }

@@ -9,7 +9,7 @@
 | Primary Actor | Client (app-client) / Partner (app-partner) |
 | Primary Surface | app-client / OrderTrackingScreen; app-partner / OrderManagementScreen |
 | WLT Boundary | Refund execution owned by WLT (004E); DSH sends cancellation signal only |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 | Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
@@ -60,7 +60,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | Client order cancellation and refund request flow verified; POST /orders/{id}/cancel proven at runtime; upstream J-003 is PASS. |
 | **Dependency** | None |
 | **Next Action** | none — runtime proof complete |

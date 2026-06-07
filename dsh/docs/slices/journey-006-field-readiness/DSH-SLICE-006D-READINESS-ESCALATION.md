@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ReadinessEscalationQueue |
 | WLT Boundary | No finance mutation |
-| Current Status | `PASS` |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None. Slice is fully implemented with OpenAPI design, backend Postgres handler & migrations, and CP screen. |
 
 ## Scope
@@ -57,7 +57,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `PASS` |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | Successfully implemented and tested. OpenAPI contract designed, Go handlers + migrations implemented, CP ReadinessEscalationQueue built and integrated. |
 | **Dependency** | DSH-SLICE-006C PASS ✅ |
 | **Next Action** | Promote downstream DSH-SLICE-006E to PASS. |

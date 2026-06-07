@@ -23,7 +23,7 @@
 | API/Runtime Boundary | POST /checkout/intent — PASS; returns session token; backend production BearerAuth path exists and app-client checkout transport can send Bearer token; verified via E2E integration script |
 | Visual Evidence Required | yes — DshCheckoutIntentScreen states: address entry, intent created, intent failed, loading, blocked |
 | Runtime Evidence Required | yes — POST /checkout/intent runtime proof with auth token + 003A serviceability PASS |
-| Current Status | PASS |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None — production auth runtime proof captured: POST /checkout/intent → 201 with Bearer token |
 
 ## Scope
@@ -105,7 +105,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | POST /checkout/intent proven: valid Bearer → 201 {intent_id, session_token, pending_payment}; no Bearer → 401. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — no financial mutation; session token passed to WLT in 003C |
 | **Next Action** | none — runtime proof complete |

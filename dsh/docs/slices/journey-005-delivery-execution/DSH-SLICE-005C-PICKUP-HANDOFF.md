@@ -9,7 +9,7 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / PickupScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 
 ## Scope
 ### Included
@@ -59,6 +59,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | J-004 closed. `POST /orders/{id}/pickup` confirmed in production handler. E2E evidence covers pickup flow. App-captain identity injectable. Partner handoff confirmation scoped: optional scan/code deferred to infra layer; core pickup endpoint proven. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

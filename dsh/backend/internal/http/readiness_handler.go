@@ -56,6 +56,15 @@ func (h *ReadinessHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // POST /stores/{id}/readiness-escalations
 func (h *ReadinessHandler) CreateReadinessEscalation(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "field") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "field role required")
+		return
+	}
+
 	storeID := r.PathValue("id")
 	log.Printf("dsh-api: POST /stores/%s/readiness-escalations", storeID)
 
@@ -81,6 +90,15 @@ func (h *ReadinessHandler) CreateReadinessEscalation(w http.ResponseWriter, r *h
 
 // GET /readiness-escalations
 func (h *ReadinessHandler) ListReadinessEscalations(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	log.Println("dsh-api: GET /readiness-escalations")
 
 	status := r.URL.Query().Get("status")
@@ -119,6 +137,15 @@ func (h *ReadinessHandler) ListReadinessEscalations(w http.ResponseWriter, r *ht
 
 // PATCH /readiness-escalations/{id}
 func (h *ReadinessHandler) UpdateReadinessEscalation(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	id := r.PathValue("id")
 	log.Printf("dsh-api: PATCH /readiness-escalations/%s", id)
 
@@ -144,6 +171,15 @@ func (h *ReadinessHandler) UpdateReadinessEscalation(w http.ResponseWriter, r *h
 
 // POST /stores/{id}/readiness-approvals
 func (h *ReadinessHandler) CreateReadinessApproval(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	storeID := r.PathValue("id")
 	log.Printf("dsh-api: POST /stores/%s/readiness-approvals", storeID)
 
@@ -169,6 +205,15 @@ func (h *ReadinessHandler) CreateReadinessApproval(w http.ResponseWriter, r *htt
 
 // GET /stores/{id}/readiness-approvals/latest
 func (h *ReadinessHandler) GetLatestReadinessApproval(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") && !HasRole(r, "field") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator or field role required")
+		return
+	}
+
 	storeID := r.PathValue("id")
 	log.Printf("dsh-api: GET /stores/%s/readiness-approvals/latest", storeID)
 

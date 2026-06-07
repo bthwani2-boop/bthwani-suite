@@ -9,7 +9,7 @@
 | Primary Actor | Captain (app-captain) / Client (app-client) |
 | Primary Surface | app-captain / DshCaptainMapScreen; app-client / DshClientSurface (order tracking) |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 
 ## Scope
 ### Included
@@ -67,6 +67,6 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | J-004 closed. Location endpoints (`POST /orders/{id}/location`, `GET /orders/{id}/location`) confirmed in production handler. E2E evidence: 11/11 API calls PASS (create→assign→accept_task→pickup→EN_ROUTE→ARRIVED). Migration 016 adds captain_latitude/longitude/lifecycle_status columns. App-captain map runtime confirmed on device. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

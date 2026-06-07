@@ -531,35 +531,6 @@ func (repo *MemoryRepository) ListSupportEscalations(_ context.Context, _ string
 	return nil, errors.New("support escalations list requires postgres backend (set DATABASE_URL)")
 }
 
-// DSH-SLICE-010B: Mock settlement candidate methods
-func (repo *MemoryRepository) SubmitSettlementCandidates(_ context.Context, orderIDs []string) ([]domain.OrderRecord, error) {
-	if len(orderIDs) == 0 {
-		return nil, errors.New("no order IDs provided")
-	}
-	for _, id := range orderIDs {
-		if id == "ord-non-existent" {
-			return nil, errors.New("order not found")
-		}
-	}
-	return nil, errors.New("settlement candidate submission requires postgres backend (set DATABASE_URL)")
-}
-
-func (repo *MemoryRepository) ProcessSettlementCallback(_ context.Context, _ string, orderIDs []string, _ float64, _ string) ([]domain.OrderRecord, error) {
-	if len(orderIDs) == 0 {
-		return nil, errors.New("no order IDs provided")
-	}
-	for _, id := range orderIDs {
-		if id == "ord-non-existent" {
-			return nil, errors.New("order not found")
-		}
-	}
-	return nil, errors.New("settlement callback processing requires postgres backend (set DATABASE_URL)")
-}
-
-func (repo *MemoryRepository) ListSettlements(_ context.Context) ([]domain.OrderRecord, error) {
-	return nil, errors.New("settlement list requires postgres backend (set DATABASE_URL)")
-}
-
 // J-006A stub
 func (repo *MemoryRepository) CreateFieldStore(_ context.Context, _ domain.CreateFieldStoreRequest) (domain.CreateFieldStoreResponse, error) {
 	return domain.CreateFieldStoreResponse{}, errors.New("field store creation requires postgres backend (set DATABASE_URL)")

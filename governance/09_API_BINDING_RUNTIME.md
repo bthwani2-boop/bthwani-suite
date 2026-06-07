@@ -5,11 +5,9 @@
 
 ## Contract source
 
-Public HTTP APIs must be represented by OpenAPI under:
-
-```text
-contracts/master/
-```
+Public HTTP APIs must be represented by OpenAPI in the approved current contract location/registry.
+Current root-level OpenAPI placeholders are allowed only while marked CONTRACT_TBD.
+No API contract is CLOSED until owner, path, endpoints, generated types, client binding, runtime implementation, and evidence are proven.
 
 During bootstrap, forensics may begin from UI/runtime evidence, but no public contract is closed until OpenAPI exists.
 

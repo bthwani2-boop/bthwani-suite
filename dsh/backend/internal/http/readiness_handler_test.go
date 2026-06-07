@@ -25,8 +25,9 @@ func TestReadinessHandlerValidation(t *testing.T) {
 			TargetTeam: "partner-management",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/stores/store-1/readiness-escalations", bytes.NewBuffer(body))
-		// Set path value since http.NewRequest doesn't populate path value wildcard matching automatically in unit test routing
 		req.SetPathValue("id", "store-1")
+		req.Header.Set("X-Client-Id", "field-1")
+		req.Header.Set("X-Actor-Type", "field")
 		resp := httptest.NewRecorder()
 		handler.ServeHTTP(resp, req)
 
@@ -46,6 +47,8 @@ func TestReadinessHandlerValidation(t *testing.T) {
 
 	t.Run("GET /readiness-escalations validation", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/readiness-escalations?status=escalated", nil)
+		req.Header.Set("X-Client-Id", "operator-1")
+		req.Header.Set("X-Actor-Type", "operator")
 		resp := httptest.NewRecorder()
 		handler.ServeHTTP(resp, req)
 
@@ -61,6 +64,8 @@ func TestReadinessHandlerValidation(t *testing.T) {
 		})
 		req := httptest.NewRequest(http.MethodPatch, "/readiness-escalations/esc-1", bytes.NewBuffer(body))
 		req.SetPathValue("id", "esc-1")
+		req.Header.Set("X-Client-Id", "operator-1")
+		req.Header.Set("X-Actor-Type", "operator")
 		resp := httptest.NewRecorder()
 		handler.ServeHTTP(resp, req)
 
@@ -76,6 +81,8 @@ func TestReadinessHandlerValidation(t *testing.T) {
 		})
 		req := httptest.NewRequest(http.MethodPost, "/stores/store-1/readiness-approvals", bytes.NewBuffer(body))
 		req.SetPathValue("id", "store-1")
+		req.Header.Set("X-Client-Id", "operator-1")
+		req.Header.Set("X-Actor-Type", "operator")
 		resp := httptest.NewRecorder()
 		handler.ServeHTTP(resp, req)
 
@@ -87,6 +94,8 @@ func TestReadinessHandlerValidation(t *testing.T) {
 	t.Run("GET /stores/{id}/readiness-approvals/latest validation", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/stores/store-1/readiness-approvals/latest", nil)
 		req.SetPathValue("id", "store-1")
+		req.Header.Set("X-Client-Id", "operator-1")
+		req.Header.Set("X-Actor-Type", "operator")
 		resp := httptest.NewRecorder()
 		handler.ServeHTTP(resp, req)
 

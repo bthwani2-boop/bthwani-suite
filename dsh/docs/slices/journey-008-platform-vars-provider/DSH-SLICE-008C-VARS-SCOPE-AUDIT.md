@@ -12,7 +12,7 @@
 | Supporting Surfaces | All DSH surfaces (consumers via PlatformVarsRegistry / FeatureFlagsRegistry) |
 | Excluded Surfaces | WLT (owns its own env boundary); production secrets infrastructure (out of scope) |
 | WLT Boundary | N/A — no money semantics |
-| Current Status | **PASS** |
+| Current Status | BLOCKED_WITH_REASON |
 | Closed At | 2026-06-06 |
 | Evidence Run | `DSH_SLICE_008C_VARS_SCOPE_AUDIT_FINAL_CLOSURE-20260606-072400` |
 
@@ -149,7 +149,7 @@
 
 | Field | Value |
 |---|---|
-| **Slice Decision** | **PASS** |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Closed By** | Agent execution 2026-06-06 |
 | **Evidence Run** | `DSH_SLICE_008C_VARS_SCOPE_AUDIT_FINAL_CLOSURE-20260606-072400` |
 | **Blockers** | None |

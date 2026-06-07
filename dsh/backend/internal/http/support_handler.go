@@ -46,23 +46,51 @@ func (h *SupportHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SupportHandler) CreateSupportEscalation(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+
 	log.Println("dsh-api: POST /support/escalations")
 
 	var req domain.CreateSupportEscalationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
 		return
 	}
 
 	if req.OrderID == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "order_id is required")
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "order_id is required")
 		return
 	}
 
 	actor := strings.ToLower(strings.TrimSpace(req.Actor))
 	if actor != "client" && actor != "partner" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "actor must be client or partner")
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "actor must be client or partner")
 		return
+	}
+
+	if !HasRole(r, "client") && !HasRole(r, "partner") {
+		writeSupportError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "client or partner role required")
+		return
+	}
+
+	// Verify client ownership of order if client
+	if HasRole(r, "client") {
+		order, _, err := h.repository.GetOrder(r.Context(), req.OrderID)
+		if err != nil {
+			if err.Error() == "order not found" || strings.Contains(err.Error(), "not found") {
+				writeSupportError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, err.Error())
+				return
+			}
+			log.Printf("dsh-api: fetch order error: %v", err)
+			writeSupportError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "failed to verify order ownership")
+			return
+		}
+		if order.ClientID != clientID {
+			writeSupportError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "cannot escalate support for another client's order")
+			return
+		}
 	}
 
 	issueType := strings.ToLower(strings.TrimSpace(req.IssueType))
@@ -71,23 +99,23 @@ func (h *SupportHandler) CreateSupportEscalation(w http.ResponseWriter, r *http.
 		issueType != "missing_items" &&
 		issueType != "payment_issue" &&
 		issueType != "other" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid issue_type")
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid issue_type")
 		return
 	}
 
 	if strings.TrimSpace(req.Description) == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "description is required")
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "description is required")
 		return
 	}
 
 	record, err := h.repository.CreateSupportEscalation(r.Context(), req)
 	if err != nil {
 		if err.Error() == "order not found" || strings.Contains(err.Error(), "not found") {
-			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, err.Error())
+			writeSupportError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, err.Error())
 			return
 		}
 		log.Printf("dsh-api: create support escalation error: %v", err)
-		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		writeSupportError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
 		return
 	}
 
@@ -96,6 +124,15 @@ func (h *SupportHandler) CreateSupportEscalation(w http.ResponseWriter, r *http.
 
 // ListAllSupportEscalations handles GET /support/escalations — CP operator view (J-009C).
 func (h *SupportHandler) ListAllSupportEscalations(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeSupportError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	log.Println("dsh-api: GET /support/escalations")
 	if r.Method != http.MethodGet {
 		writeSupportError(w, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
@@ -134,6 +171,15 @@ func (h *SupportHandler) ListAllSupportEscalations(w http.ResponseWriter, r *htt
 
 // UpdateSupportEscalation handles PATCH /support/escalations/{id} — operator updates status (J-009C).
 func (h *SupportHandler) UpdateSupportEscalation(w http.ResponseWriter, r *http.Request) {
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") {
+		writeSupportError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	id := r.PathValue("id")
 	log.Printf("dsh-api: PATCH /support/escalations/%s", id)
 	if r.Method != http.MethodPatch {

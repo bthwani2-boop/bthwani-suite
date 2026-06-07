@@ -22,6 +22,8 @@ func TestCreateSupportEscalationValidation(t *testing.T) {
 		Description: "Order delayed",
 	})
 	req := httptest.NewRequest(http.MethodPost, "/support/escalations", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-1")
+	req.Header.Set("X-Actor-Type", "partner")
 	resp := httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -37,6 +39,8 @@ func TestCreateSupportEscalationValidation(t *testing.T) {
 		Description: "Order delayed",
 	})
 	req = httptest.NewRequest(http.MethodPost, "/support/escalations", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-1")
+	req.Header.Set("X-Actor-Type", "partner")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -52,6 +56,8 @@ func TestCreateSupportEscalationValidation(t *testing.T) {
 		Description: "Order delayed",
 	})
 	req = httptest.NewRequest(http.MethodPost, "/support/escalations", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-1")
+	req.Header.Set("X-Actor-Type", "partner")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 
@@ -67,6 +73,8 @@ func TestCreateSupportEscalationValidation(t *testing.T) {
 		Description: "",
 	})
 	req = httptest.NewRequest(http.MethodPost, "/support/escalations", bytes.NewBuffer(body))
+	req.Header.Set("X-Client-Id", "client-1")
+	req.Header.Set("X-Actor-Type", "partner")
 	resp = httptest.NewRecorder()
 	handler.ServeHTTP(resp, req)
 

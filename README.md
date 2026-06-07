@@ -6,10 +6,10 @@
 
 - bootstrap phases `00` through `07` are complete and retained as historical law and evidence
 - the current governed first service is `dsh`
-- approved app shells already exist under `apps/mobile/` and `apps/web/`
-- `packages/ui-kit/` exists as shared foundation and `packages/surfaces/` exists as a preview-stage package
+- approved app shells and runtimes exist as flat root directories (e.g. `app-client/runtime`, `app-partner/runtime`, etc.)
+- `ui-kit/` exists as the central shared UI/design system foundation
 - the current approved architecture lock is recorded in `governance/ARCHITECTURE_LOCK.md`
-- `runtime/` does not exist yet
+- surface-specific runtimes exist under their respective `<surface>/runtime/` directories
 - the current execution band is the service-truth and screen-law band, with Phase `13` complete and Phase `14` next allowed
 
 ## Repo Role

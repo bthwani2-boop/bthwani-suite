@@ -9,7 +9,7 @@
 | Primary Actor | N/A — governance rule |
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns all financial mutations; DSH trigger-only via callback |
-| Current Status | PASS |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None |
 
 ## Scope
@@ -55,7 +55,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | Governance rules enforced successfully by automated static analysis check; zero direct WLT mutation calls exist in DSH codebase |
 | **Dependency** | None |
 | **Next Action** | Enforce via service boundaries |

@@ -9,7 +9,7 @@
 | Primary Actor | Engineering / Control-Panel Operator |
 | Primary Surface | All surfaces |
 | WLT Boundary | N/A — no money semantics; WLT preserves its own runtime boundary |
-| Current Status | **PASS** |
+| Current Status | BLOCKED_WITH_REASON |
 | Closed At | 2026-06-06 |
 | Evidence Run | `DSH_SLICE_008D_POLICY_IMPACT_FINAL_CLOSURE-20260606-LOCAL` |
 
@@ -99,7 +99,7 @@ To prevent regression, unauthorized environment variable leakage, and operationa
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | **PASS** |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Closed By** | Agent execution 2026-06-06 |
 | **Evidence Run** | `DSH_SLICE_008D_POLICY_IMPACT_FINAL_CLOSURE-20260606-LOCAL` |
 | **Blockers** | None |

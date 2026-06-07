@@ -18,38 +18,29 @@ const (
 	StatusFailedDelivery   = "FAILED_DELIVERY"
 	StatusReturningToStore = "RETURNING_TO_STORE"
 	StatusReturned         = "RETURNED"
-
-	// DSH-SLICE-010B: Settlement Candidate status constants
-	SettlementStatusNotSettled = "NOT_SETTLED"
-	SettlementStatusPending    = "SETTLEMENT_PENDING"
-	SettlementStatusSettled    = "SETTLED"
-	SettlementStatusFailed     = "SETTLEMENT_FAILED"
 )
 
 type OrderRecord struct {
-	ID                     string   `json:"id"`
-	StoreID                string   `json:"store_id"`
-	ClientID               string   `json:"client_id"`
-	Status                 string   `json:"status"`
-	TotalPrice             float64  `json:"total_price"`
-	WltPaymentRefID        *string  `json:"wlt_payment_ref_id,omitempty"`
-	WltRefundRefID         *string  `json:"wlt_refund_ref_id,omitempty"`
-	RefundAmount           *float64 `json:"refund_amount,omitempty"`
-	CaptainID              *string  `json:"captain_id,omitempty"`
-	CaptainLatitude        *float64 `json:"captain_latitude,omitempty"`
-	CaptainLongitude       *float64 `json:"captain_longitude,omitempty"`
-	CaptainLifecycleStatus *string  `json:"captain_lifecycle_status,omitempty"`
-	PodMediaKey            *string  `json:"pod_media_key,omitempty"`
+	ID                     string    `json:"id"`
+	StoreID                string    `json:"store_id"`
+	ClientID               string    `json:"client_id"`
+	Status                 string    `json:"status"`
+	TotalPrice             float64   `json:"total_price"`
+	WltPaymentRefID        *string   `json:"wlt_payment_ref_id,omitempty"`
+	WltRefundRefID         *string   `json:"wlt_refund_ref_id,omitempty"`
+	CheckoutIntentID       *string   `json:"checkout_intent_id,omitempty"`
+	CaptainID              *string   `json:"captain_id,omitempty"`
+	CaptainLatitude        *float64  `json:"captain_latitude,omitempty"`
+	CaptainLongitude       *float64  `json:"captain_longitude,omitempty"`
+	CaptainLifecycleStatus *string   `json:"captain_lifecycle_status,omitempty"`
+	PodMediaKey            *string   `json:"pod_media_key,omitempty"`
 	// DSH-SLICE-005F: delivery failure fields.
 	// WltRefundTriggerRef is a bridge reference for WLT to execute refund — DSH does NOT mutate finances.
-	DeliveryFailureReason *string `json:"delivery_failure_reason,omitempty"`
-	WltRefundTriggerRef   *string `json:"wlt_refund_trigger_ref,omitempty"`
-	// DSH-SLICE-010B: order settlements fields.
-	WltSettlementRefID *string   `json:"wlt_settlement_ref_id,omitempty"`
-	SettlementStatus   string    `json:"settlement_status"`
-	SettlementAmount   *float64  `json:"settlement_amount,omitempty"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	DeliveryFailureReason *string   `json:"delivery_failure_reason,omitempty"`
+	WltRefundTriggerRef   *string   `json:"wlt_refund_trigger_ref,omitempty"`
+	WltSettlementRefID     *string   `json:"wlt_settlement_ref_id,omitempty"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
 }
 
 type OrderItemRecord struct {
@@ -88,11 +79,12 @@ type OrderItemInput struct {
 }
 
 type CreateOrderRequest struct {
-	StoreID         string           `json:"store_id"`
-	ClientID        string           `json:"client_id"`
-	TotalPrice      float64          `json:"total_price"`
-	WltPaymentRefID *string          `json:"wlt_payment_ref_id,omitempty"`
-	Items           []OrderItemInput `json:"items"`
+	StoreID          string           `json:"store_id"`
+	ClientID         string           `json:"client_id"`
+	TotalPrice       float64          `json:"total_price"`
+	WltPaymentRefID  *string          `json:"wlt_payment_ref_id,omitempty"`
+	CheckoutIntentID string           `json:"checkout_intent_id"`
+	Items            []OrderItemInput `json:"items"`
 }
 
 type UpdateOrderStatusRequest struct {

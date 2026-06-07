@@ -23,7 +23,7 @@
 | API/Runtime Boundary | `DELETE /checkout/intent/{id}` — PASS; verified with local E2E integration script; cancel checkout and callback handling are fully implemented and verified |
 | Visual Evidence Required | yes — CheckoutFailureScreen states: payment_failed (with reason), retry_in_progress, cancelled; cart preserved state |
 | Runtime Evidence Required | yes — WLT failure callback + CheckoutFailureScreen proof + cart preserved after failure |
-| Current Status | PASS |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
 
 ## Scope
@@ -124,7 +124,7 @@
 - Cancel checkout deletes the intent session only; no DB financial records created
 - Retry re-enters 003C; no rollback mechanism needed for failure screen itself
 
-| **Slice Decision** | PASS |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | DELETE /checkout/intent/{id} proven: cart preserved and intent cancelled successfully. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — payment failure handled; no financial mutation in DSH |
 | **Next Action** | none — runtime proof complete |

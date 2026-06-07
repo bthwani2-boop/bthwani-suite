@@ -23,7 +23,7 @@
 | API/Runtime Boundary | `POST /checkout/payment-callback` — PASS; verified with local E2E integration script; backend handler validates X-WLT-Callback-Token, X-WLT-Event-Id, and Idempotency-Key; repository persists `wlt_callback_event_id` for replay protection |
 | Visual Evidence Required | yes — WltBoundaryBanner.tsx displayed; payment awaiting state; confirmed state |
 | Runtime Evidence Required | yes — WLT payment E2E proof + DSH callback endpoint receiving confirmation |
-| Current Status | PASS |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
 
 ## Scope
@@ -105,7 +105,7 @@
 - No DSH finance mutation exists; rollback means clearing checkout session (no financial reversal in DSH)
 - Financial reversal (refund) is WLT-owned via DSH-SLICE-004E
 
-| **Slice Decision** | PASS |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | POST /checkout/payment-callback proven: valid dev-secret token -> 200 acknowledged, invalid token -> 401. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — read-only callback stored; no financial mutation in DSH |
 | **Next Action** | none — runtime proof complete |

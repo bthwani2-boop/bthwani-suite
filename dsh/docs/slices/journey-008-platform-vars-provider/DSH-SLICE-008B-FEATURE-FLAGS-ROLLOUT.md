@@ -12,7 +12,7 @@
 | Supporting Surfaces | `app-client`, `app-partner`, `app-captain`, `app-field` (flag consumers) |
 | Excluded Surfaces | WLT (N/A — no financial gating in this slice) |
 | WLT Boundary | N/A — no money semantics; WLT preserves its own runtime boundary |
-| Current Status | **PASS** |
+| Current Status | BLOCKED_WITH_REASON |
 | Closed At | 2026-06-06 |
 | Evidence Run | `DSH_SLICE_008B_FEATURE_FLAGS_ROLLOUT_FINAL_CLOSURE-20260606-LOCAL` |
 
@@ -111,7 +111,7 @@
 
 | Field | Value |
 |---|---|
-| **Slice Decision** | **PASS** |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Closed By** | Agent execution 2026-06-06 |
 | **Evidence Run** | `DSH_SLICE_008B_FEATURE_FLAGS_ROLLOUT_FINAL_CLOSURE-20260606-LOCAL` |
 | **Blockers** | None |

@@ -9,7 +9,7 @@
 | Primary Actor | Control-Panel Operator |
 | Primary Surface | control-panel / ExceptionQueueScreen |
 | WLT Boundary | No finance mutation |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 | Blocking Reason | None — upstream J-003 checkout is PASS |
 
 ## Scope
@@ -57,7 +57,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | Control panel exceptions board and reassignment verified; GET /exceptions proven at runtime; upstream J-003 is PASS. |
 | **Dependency** | None |
 | **Next Action** | none — runtime proof complete |

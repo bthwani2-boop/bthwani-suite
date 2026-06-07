@@ -9,7 +9,7 @@
 | Primary Actor | Field Agent |
 | Primary Surface | `app-field` / `DshFieldStoreVisitScreen` |
 | WLT Boundary | No wallet, ledger, refund, payout, settlement, or financial mutation |
-| Current Status | `PASS` |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None |
 
 ## Scope
@@ -78,6 +78,6 @@ Evidence root:
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | `PASS` |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | Backend (Go handler + Postgres repository + migration 020), OpenAPI contract, typed TS client (`dsh-field-visit-client.ts`), and surface binding (`DshFieldSurface.tsx`) are fully verified. TypeScript compilation check clean. ADB visual evidence captured and validated against physical device. |
 | **Next Action** | None. Slice is closed. |

@@ -9,7 +9,7 @@
 | Primary Actor | All surfaces |
 | Primary Surface | platform route / PlatformVarsProvider |
 | WLT Boundary | N/A |
-| Current Status | PASS |
+| Current Status | BLOCKED_WITH_REASON |
 | Blocking Reason | None (Centralized PlatformVarsProvider fully implemented, integrated, and enforced by guardrail) |
 
 ## Scope
@@ -56,7 +56,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | Centralized PlatformVarsProvider fully implemented and integrated across all DSH surfaces. TypeScript compiler passes cleanly, and static analysis guard enforces zero scattered process.env reads. |
 | **Dependency** | None |
 | **Next Action** | Finalize closure and generate verification evidence zip. |

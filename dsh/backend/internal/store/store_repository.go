@@ -111,14 +111,6 @@ type FieldRepository interface {
 	GetLatestFieldReadinessApproval(ctx context.Context, storeID string) (domain.FieldReadinessApprovalRecord, error)
 }
 
-type WltBridgeRepository interface {
-	// DSH-SLICE-010B: Settlement Candidate repository methods.
-	// WLT owns wallet, ledger, payout, refund execution, and final settlement accounting.
-	SubmitSettlementCandidates(ctx context.Context, orderIDs []string) ([]domain.OrderRecord, error)
-	ProcessSettlementCallback(ctx context.Context, settlementRefID string, orderIDs []string, amount float64, status string) ([]domain.OrderRecord, error)
-	ListSettlements(ctx context.Context) ([]domain.OrderRecord, error)
-}
-
 type Repository interface {
 	StoreRepository
 	CatalogRepository
@@ -126,5 +118,4 @@ type Repository interface {
 	OrderRepository
 	SupportRepository
 	FieldRepository
-	WltBridgeRepository
 }

@@ -115,6 +115,15 @@ func (handler *StoresHandler) GetStore(writer http.ResponseWriter, request *http
 }
 
 func (handler *StoresHandler) UpdatePartnerReadiness(writer http.ResponseWriter, request *http.Request) {
+	clientID := requireClientIdentity(writer, request)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(request, "operator") {
+		writeError(writer, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	id := request.PathValue("id")
 	log.Printf("dsh-api: received PATCH %s/partner-readiness request (ID: %s)", request.URL.Path, id)
 	if request.Method != http.MethodPatch {
@@ -153,6 +162,15 @@ func (handler *StoresHandler) UpdatePartnerReadiness(writer http.ResponseWriter,
 }
 
 func (handler *StoresHandler) UpdateCatalogApproval(writer http.ResponseWriter, request *http.Request) {
+	clientID := requireClientIdentity(writer, request)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(request, "operator") {
+		writeError(writer, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	log.Printf("dsh-api: received PATCH /stores/{id}/catalog-approval request")
 	if request.Method != http.MethodPatch {
 		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
@@ -197,6 +215,15 @@ func (handler *StoresHandler) UpdateCatalogApproval(writer http.ResponseWriter, 
 }
 
 func (handler *StoresHandler) UpdateMarketingVisibility(writer http.ResponseWriter, request *http.Request) {
+	clientID := requireClientIdentity(writer, request)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(request, "operator") {
+		writeError(writer, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
 	log.Printf("dsh-api: received PATCH /stores/{id}/marketing-visibility request")
 	if request.Method != http.MethodPatch {
 		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
@@ -288,6 +315,15 @@ func validFilter(filter domain.StoreDiscoveryFilter) bool {
 
 // CreateFieldStore handles POST /stores — field agent submits a new store for review (J-006A).
 func (handler *StoresHandler) CreateFieldStore(writer http.ResponseWriter, request *http.Request) {
+	clientID := requireClientIdentity(writer, request)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(request, "field") {
+		writeError(writer, http.StatusForbidden, domain.ErrorCodeForbidden, "field role required")
+		return
+	}
+
 	log.Printf("dsh-api: received POST /stores from app-field")
 	if request.Method != http.MethodPost {
 		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
@@ -320,6 +356,15 @@ func (handler *StoresHandler) CreateFieldStore(writer http.ResponseWriter, reque
 }
 
 func (handler *StoresHandler) CreateFieldVisit(writer http.ResponseWriter, request *http.Request) {
+	clientID := requireClientIdentity(writer, request)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(request, "field") {
+		writeError(writer, http.StatusForbidden, domain.ErrorCodeForbidden, "field role required")
+		return
+	}
+
 	id := request.PathValue("id")
 	log.Printf("dsh-api: received POST /stores/%s/field-visits from app-field", id)
 	if request.Method != http.MethodPost {
@@ -362,6 +407,15 @@ func (handler *StoresHandler) CreateFieldVisit(writer http.ResponseWriter, reque
 }
 
 func (handler *StoresHandler) CreateFieldDocument(writer http.ResponseWriter, request *http.Request) {
+	clientID := requireClientIdentity(writer, request)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(request, "field") {
+		writeError(writer, http.StatusForbidden, domain.ErrorCodeForbidden, "field role required")
+		return
+	}
+
 	id := request.PathValue("id")
 	log.Printf("dsh-api: received POST /stores/%s/documents from app-field", id)
 	if request.Method != http.MethodPost {

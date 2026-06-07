@@ -9,7 +9,7 @@
 | Primary Actor | Captain (app-captain) |
 | Primary Surface | app-captain / DshCaptainPoDSubmissionScreen |
 | WLT Boundary | No finance mutation — payout is WLT responsibility after DELIVERED event |
-| Current Status | PASS |
+| Current Status | DEFERRED_WITH_REASON |
 
 ## Scope
 ### Included
@@ -66,7 +66,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | PASS |
+| **Slice Decision** | DEFERRED_WITH_REASON |
 | **Reason** | J-004 closed. `POST /orders/{id}/deliver` confirmed in production handler. Migration 017 (`pod_media_key`) applied. E2E: ARRIVED→DELIVERED transition verified. Guards: wrong captain→403, idempotency→409, missing captain_id→400. WLT boundary confirmed — zero financial mutation in DSH. |
 | **WLT Boundary** | Confirmed — no financial mutation in DSH. Payout is WLT responsibility after DELIVERED. |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |
