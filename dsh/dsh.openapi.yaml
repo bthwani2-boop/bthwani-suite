@@ -2297,167 +2297,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /wlt/wallet-summary:
-    get:
-      tags:
-        - WLT Finance
-      summary: Get client wallet summary from WLT
-      description: >
-        DSH backend endpoint acting as a read-only proxy/bridge to WLT's client wallet summary.
-        Returns wallet balance and sync status.
-        All financial ownership belongs to WLT. DSH is read-only.
-      operationId: getWltWalletSummary
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Wallet summary balance
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletBalance'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /settlement/candidates:
-    post:
-      tags:
-        - WLT Finance
-      summary: Submit eligible delivered orders as settlement candidates
-      description: |
-        Transition eligible orders to SETTLEMENT_PENDING and submit them to WLT.
-        All financial mutations are executed by WLT. DSH performs state tracking only.
-      operationId: submitSettlementCandidates
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SettlementCandidateRequest'
-      responses:
-        '200':
-          description: Settlement candidates registered successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderRecord'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /wlt/settlement-callback:
-    post:
-      tags:
-        - WLT Finance
-      summary: Settlement status update callback from WLT
-      description: |
-        Called by WLT to notify DSH of the final settlement outcome (CONFIRMED or FAILED).
-        Updates settlement status and stores transaction reference inside DSH.
-        Requires X-WLT-Callback-Token matching WLT_CALLBACK_SECRET; DEV_ONLY accepts dev-secret.
-      operationId: postWltSettlementCallback
-      security: []
-      parameters:
-        - name: X-WLT-Callback-Token
-          in: header
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SettlementCallbackRequest'
-      responses:
-        '200':
-          description: Settlement status updated successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderRecord'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Missing or invalid WLT callback token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /settlements:
-    get:
-      tags:
-        - WLT Finance
-      summary: Get list of settlements and candidates (read-only view)
-      description: |
-        Returns a read-only list of orders currently pending, settled, or failed settlement.
-        Acts as a read-only visibility summary bridged from WLT.
-      operationId: getSettlements
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: List of settlements
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderRecord'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
 components:
   securitySchemes:
     BearerAuth:
@@ -3358,8 +3197,6 @@ components:
           type: string
         wlt_refund_ref_id:
           type: string
-        refund_amount:
-          type: number
         captain_id:
           type: string
         captain_latitude:
@@ -3388,9 +3225,6 @@ components:
           type: string
           enum: [NOT_SETTLED, SETTLEMENT_PENDING, SETTLED, SETTLEMENT_FAILED]
           default: NOT_SETTLED
-        settlement_amount:
-          type: number
-          nullable: true
         created_at:
           type: string
           format: date-time
@@ -3776,59 +3610,3 @@ components:
           type: string
           enum: [CONFIRMED, FAILED]
           description: CONFIRMED triggers order status transition to REFUNDED. FAILED logs the failure event but keeps the status unchanged.
-
-    WalletBalance:
-      type: object
-      description: WLT-owned wallet balance snapshot.
-      required: [balanceMinorUnits, currency, linked, updatedAt]
-      properties:
-        balanceMinorUnits:
-          type: integer
-          description: Current wallet balance in minor units
-        currency:
-          type: string
-          default: YER
-        linked:
-          type: boolean
-          description: Whether the wallet is linked to an active account
-        frozenMinorUnits:
-          type: integer
-          description: Amount currently on hold
-        updatedAt:
-          type: string
-          format: date-time
-
-    SettlementCandidateRequest:
-      type: object
-      required:
-        - order_ids
-      properties:
-        order_ids:
-          type: array
-          items:
-            type: string
-          description: List of delivered orders to be settled by WLT.
-
-    SettlementCallbackRequest:
-      type: object
-      required:
-        - settlement_ref_id
-        - order_ids
-        - amount
-        - status
-      properties:
-        settlement_ref_id:
-          type: string
-          description: WLT settlement transaction reference.
-        order_ids:
-          type: array
-          items:
-            type: string
-          description: Order IDs settled.
-        amount:
-          type: number
-          description: Total settled amount.
-        status:
-          type: string
-          enum: [CONFIRMED, FAILED]
-          description: CONFIRMED transitions settlement status to SETTLED. FAILED sets it to SETTLEMENT_FAILED.

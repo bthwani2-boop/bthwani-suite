@@ -12,11 +12,11 @@ import (
 )
 
 type ReadinessHandler struct {
-	repository store.Repository
+	repository store.FieldRepository
 	mux        *http.ServeMux
 }
 
-func NewReadinessHandler(repository store.Repository) *ReadinessHandler {
+func NewReadinessHandler(repository store.FieldRepository) *ReadinessHandler {
 	h := &ReadinessHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -34,7 +34,7 @@ func NewReadinessHandler(repository store.Repository) *ReadinessHandler {
 	return h
 }
 
-func RegisterReadinessRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterReadinessRoutes(mux *http.ServeMux, repository store.FieldRepository) {
 	h := NewReadinessHandler(repository)
 	mux.Handle("POST /stores/{id}/readiness-escalations", h)
 	mux.Handle("GET /readiness-escalations", h)

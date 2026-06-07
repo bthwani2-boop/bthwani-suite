@@ -8,7 +8,6 @@ export type DshOrderRecord = {
   readonly total_price: number;
   readonly wlt_payment_ref_id?: string;
   readonly wlt_refund_ref_id?: string;
-  readonly refund_amount?: number;
   readonly captain_id?: string;
   readonly captain_latitude?: number;
   readonly captain_longitude?: number;
@@ -217,15 +216,6 @@ export interface DshOrderLifecycleClient {
       status: 'CONFIRMED' | 'FAILED';
     }
   ): Promise<DshOrderRecord>;
-  getWltWalletSummary(): Promise<WalletBalance>;
-  submitSettlementCandidates(orderIds: string[]): Promise<DshOrderRecord[]>;
-  postWltSettlementCallback(req: {
-    settlement_ref_id: string;
-    order_ids: string[];
-    amount: number;
-    status: 'CONFIRMED' | 'FAILED';
-  }): Promise<DshOrderRecord[]>;
-  getSettlements(): Promise<DshOrderRecord[]>;
 }
 
 async function doFetch<T>(
@@ -358,22 +348,6 @@ export function createDshOrderLifecycleHttpClient(
     refundCallback: async (orderId, req) => {
       if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
       return doFetch<DshOrderRecord>(baseUrl, fetchFn, 'POST', `/orders/${orderId}/refund-callback`, req, wltCallbackHeaders());
-    },
-    getWltWalletSummary: async () => {
-      if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<WalletBalance>(baseUrl, fetchFn, 'GET', '/wlt/wallet-summary', undefined, orderAuthHeaders(auth));
-    },
-    submitSettlementCandidates: async (orderIds) => {
-      if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'POST', '/settlement/candidates', { order_ids: orderIds }, orderAuthHeaders(auth));
-    },
-    postWltSettlementCallback: async (req) => {
-      if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'POST', '/wlt/settlement-callback', req, wltCallbackHeaders());
-    },
-    getSettlements: async () => {
-      if (!baseUrl) throw { kind: 'offline' } as DshOrderApiOfflineError;
-      return doFetch<DshOrderRecord[]>(baseUrl, fetchFn, 'GET', '/settlements', undefined, orderAuthHeaders(auth));
     },
   };
 }

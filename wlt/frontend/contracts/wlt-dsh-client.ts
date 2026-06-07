@@ -417,33 +417,30 @@ export function createWltDshTypedClient(options: WltDshTypedClientOptions): WltD
 			return get<WltListLedgerResponse>(`/wallets/${encodeURIComponent(fieldAgentId)}/transactions?${q}`, 'WLT field earnings');
 		},
 
-		// ── Operator control-panel stubs (WLT backend endpoints not yet built) ──
+		// ── Operator control-panel endpoints ────────────────────────
 
 		listReconciliationRuns() {
-			// NOT_IMPLEMENTED: WLT backend reconciliation endpoint pending
-			return Promise.resolve([]);
+			return get<WltReconciliationRun[]>('/control-panel/reconciliation-runs', 'WLT reconciliation runs list');
 		},
 
-		triggerReconciliationRun(_idempotencyKey) {
-			return Promise.reject(new Error('WLT reconciliation run: not yet implemented in WLT backend'));
+		triggerReconciliationRun(idempotencyKey) {
+			return post<WltReconciliationRun>('/control-panel/reconciliation-runs', {}, 'WLT reconciliation run trigger', idempotencyKey);
 		},
 
-		createPayoutDecision(_input, _idempotencyKey) {
-			return Promise.reject(new Error('WLT payout decision: not yet implemented in WLT backend'));
+		createPayoutDecision(input, idempotencyKey) {
+			return post<WltPayoutDecision>('/control-panel/payout-decisions', input, 'WLT payout decision create', idempotencyKey);
 		},
 
 		getReconciliationCloseStatus() {
-			// NOT_IMPLEMENTED: returns open stub
-			return Promise.resolve({ id: 'stub', status: 'open' as const });
+			return get<WltCloseStatus>('/control-panel/reconciliation-close-status', 'WLT close status');
 		},
 
 		listAuditEvents() {
-			// NOT_IMPLEMENTED: WLT backend audit log endpoint pending
-			return Promise.resolve([]);
+			return get<WltAuditEvent[]>('/control-panel/audit-events', 'WLT audit events');
 		},
 
-		submitDailyClose(_businessDate) {
-			return Promise.reject(new Error('WLT daily close: not yet implemented in WLT backend'));
+		submitDailyClose(businessDate) {
+			return post<WltDailyCloseResult>('/control-panel/daily-close', { businessDate }, 'WLT daily close submit');
 		},
 	};
 }

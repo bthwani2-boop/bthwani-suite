@@ -262,6 +262,56 @@ type ListSettlementsResponse struct {
 	Total       int          `json:"total"`
 }
 
+// ─── Operator Features ────────────────────────────────────────────────────────
+
+type ReconciliationRun struct {
+	ID             string    `json:"id"`
+	IdempotencyKey *string   `json:"idempotency_key,omitempty"`
+	Status         string    `json:"status"` // passed | failed
+	EntryCount     int       `json:"entry_count"`
+	TotalDebit     float64   `json:"total_debit"`
+	TotalCredit    float64   `json:"total_credit"`
+	CreatedAt      time.Time `json:"created_at"`
+}
+
+type PayoutDecision struct {
+	ID                string    `json:"id"`
+	OwnerID           string    `json:"owner_id"`
+	OwnerKind         string    `json:"owner_kind"`
+	SettlementCycleID string    `json:"settlement_cycle_id"`
+	Amount            float64   `json:"amount"`
+	Currency          string    `json:"currency"`
+	Status            string    `json:"status"` // approved
+	IdempotencyKey    *string   `json:"idempotency_key,omitempty"`
+	CreatedAt         time.Time `json:"created_at"`
+}
+
+type CreatePayoutDecisionRequest struct {
+	OwnerID           string  `json:"owner_id"`
+	OwnerKind         string  `json:"owner_kind"`
+	SettlementCycleID string  `json:"settlement_cycle_id"`
+	Amount            float64 `json:"amount"`
+	Currency          string  `json:"currency"`
+	IdempotencyKey    string  `json:"idempotency_key"`
+}
+
+type FinanceClose struct {
+	ID                  string     `json:"id"`
+	BusinessDate        string     `json:"business_date"`
+	Status              string     `json:"status"` // open | closed | failed
+	ReconciliationRunID *string    `json:"reconciliation_run_id,omitempty"`
+	ClosedAt            *time.Time `json:"closed_at,omitempty"`
+	CreatedAt           time.Time  `json:"created_at"`
+}
+
+type CallbackEvent struct {
+	EventID        string    `json:"eventId"`
+	IdempotencyKey *string   `json:"idempotency_key,omitempty"`
+	Target         string    `json:"target"`
+	Payload        string    `json:"payload"` // raw JSON string
+	CreatedAt      time.Time `json:"createdAt"`
+}
+
 // ─── Error codes ─────────────────────────────────────────────────────────────
 
 const (

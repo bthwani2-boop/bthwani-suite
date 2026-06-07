@@ -11,11 +11,11 @@ import (
 )
 
 type OverridesHandler struct {
-	repository store.Repository
+	repository store.CatalogRepository
 	mux        *http.ServeMux
 }
 
-func NewOverridesHandler(repository store.Repository) *OverridesHandler {
+func NewOverridesHandler(repository store.CatalogRepository) *OverridesHandler {
 	h := &OverridesHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -24,7 +24,7 @@ func NewOverridesHandler(repository store.Repository) *OverridesHandler {
 	return h
 }
 
-func RegisterOverridesRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterOverridesRoutes(mux *http.ServeMux, repository store.CatalogRepository) {
 	h := NewOverridesHandler(repository)
 	mux.Handle("PATCH /stores/{store_id}/catalog-overrides", h)
 }

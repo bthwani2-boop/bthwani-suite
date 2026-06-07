@@ -12,11 +12,11 @@ import (
 )
 
 type ConflictsHandler struct {
-	repository store.Repository
+	repository store.CatalogRepository
 	mux        *http.ServeMux
 }
 
-func NewConflictsHandler(repository store.Repository) *ConflictsHandler {
+func NewConflictsHandler(repository store.CatalogRepository) *ConflictsHandler {
 	h := &ConflictsHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -26,7 +26,7 @@ func NewConflictsHandler(repository store.Repository) *ConflictsHandler {
 	return h
 }
 
-func RegisterConflictsRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterConflictsRoutes(mux *http.ServeMux, repository store.CatalogRepository) {
 	h := NewConflictsHandler(repository)
 	mux.Handle("GET /catalog-conflicts", h)
 	mux.Handle("POST /catalog-conflicts/{id}/resolve", h)

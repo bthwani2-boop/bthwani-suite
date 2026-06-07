@@ -11,12 +11,17 @@ import (
 	"bthwani.local/dsh/domain"
 )
 
+type SupportOrderRepository interface {
+	store.SupportRepository
+	store.OrderRepository
+}
+
 type SupportHandler struct {
-	repository store.Repository
+	repository SupportOrderRepository
 	mux        *http.ServeMux
 }
 
-func NewSupportHandler(repository store.Repository) *SupportHandler {
+func NewSupportHandler(repository SupportOrderRepository) *SupportHandler {
 	h := &SupportHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -27,7 +32,7 @@ func NewSupportHandler(repository store.Repository) *SupportHandler {
 	return h
 }
 
-func RegisterSupportRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterSupportRoutes(mux *http.ServeMux, repository SupportOrderRepository) {
 	h := NewSupportHandler(repository)
 	mux.Handle("POST /support/escalations", h)
 	mux.Handle("GET /support/escalations", h)

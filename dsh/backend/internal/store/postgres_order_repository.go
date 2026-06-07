@@ -271,6 +271,10 @@ func (repo *PostgresRepository) ListOrders(ctx context.Context, query domain.Lis
 		args = append(args, query.ClientID)
 		where = append(where, fmt.Sprintf("client_id = $%d", len(args)))
 	}
+	if query.StoreID != "" {
+		args = append(args, query.StoreID)
+		where = append(where, fmt.Sprintf("store_id = $%d", len(args)))
+	}
 
 	whereSQL := ""
 	if len(where) > 0 {

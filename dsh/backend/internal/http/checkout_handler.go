@@ -12,11 +12,11 @@ import (
 )
 
 type CheckoutHandler struct {
-	repository store.Repository
+	repository store.CheckoutRepository
 	mux        *http.ServeMux
 }
 
-func NewCheckoutHandler(repository store.Repository) *CheckoutHandler {
+func NewCheckoutHandler(repository store.CheckoutRepository) *CheckoutHandler {
 	h := &CheckoutHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -28,7 +28,7 @@ func NewCheckoutHandler(repository store.Repository) *CheckoutHandler {
 	return h
 }
 
-func RegisterCheckoutRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterCheckoutRoutes(mux *http.ServeMux, repository store.CheckoutRepository) {
 	h := NewCheckoutHandler(repository)
 	mux.Handle("GET /cart/serviceability", h)
 	mux.Handle("POST /checkout/intent", h)

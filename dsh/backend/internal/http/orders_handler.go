@@ -11,12 +11,18 @@ import (
 	"bthwani.local/dsh/domain"
 )
 
+type OrderDeliveryRepository interface {
+	store.OrderRepository
+	store.DeliveryRepository
+	store.SupportRepository
+}
+
 type OrdersHandler struct {
-	repository store.Repository
+	repository OrderDeliveryRepository
 	mux        *http.ServeMux
 }
 
-func NewOrdersHandler(repository store.Repository) *OrdersHandler {
+func NewOrdersHandler(repository OrderDeliveryRepository) *OrdersHandler {
 	h := &OrdersHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -40,7 +46,7 @@ func NewOrdersHandler(repository store.Repository) *OrdersHandler {
 	return h
 }
 
-func RegisterOrderRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterOrderRoutes(mux *http.ServeMux, repository OrderDeliveryRepository) {
 	h := NewOrdersHandler(repository)
 	mux.Handle("GET /orders", h)
 	mux.Handle("POST /orders", h)
@@ -91,12 +97,25 @@ func (h *OrdersHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	status := strings.ToUpper(strings.TrimSpace(q.Get("status")))
 	queryClientID := strings.TrimSpace(q.Get("client_id"))
+	queryStoreID := strings.TrimSpace(q.Get("store_id"))
+
 	if actor == "client" {
 		if queryClientID != "" && queryClientID != clientID {
 			writeError(w, http.StatusForbidden, domain.ErrorCodeInvalidParameter, "client_id must match authenticated identity")
 			return
 		}
 		queryClientID = clientID
+	} else if actor == "partner" {
+		partnerStore := getPartnerStoreID(clientID)
+		if partnerStore == "" {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "partner has no assigned store")
+			return
+		}
+		if queryStoreID != "" && queryStoreID != partnerStore {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized store access")
+			return
+		}
+		queryStoreID = partnerStore
 	}
 
 	limit := 50
@@ -115,6 +134,7 @@ func (h *OrdersHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.repository.ListOrders(r.Context(), domain.ListOrdersQuery{
 		ClientID: queryClientID,
+		StoreID:  queryStoreID,
 		Status:   status,
 		Limit:    limit,
 		Offset:   offset,
@@ -762,6 +782,19 @@ func orderActorType(r *http.Request) string {
 	return "client"
 }
 
+func getPartnerStoreID(subject string) string {
+	if subject == "partner-dev-001" {
+		return "store-1001"
+	}
+	if strings.HasPrefix(subject, "partner-dev-") {
+		return "store-" + strings.TrimPrefix(subject, "partner-dev-")
+	}
+	if subject == "partner_001" {
+		return "store-1001"
+	}
+	return ""
+}
+
 func canAccessOrder(actor, subject string, order domain.OrderRecord) bool {
 	switch actor {
 	case "operator", "system":
@@ -769,7 +802,8 @@ func canAccessOrder(actor, subject string, order domain.OrderRecord) bool {
 	case "captain":
 		return order.CaptainID != nil && *order.CaptainID == subject
 	case "partner":
-		return true
+		storeID := getPartnerStoreID(subject)
+		return storeID != "" && order.StoreID == storeID
 	default:
 		return order.ClientID == subject
 	}

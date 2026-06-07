@@ -11,11 +11,11 @@ import (
 )
 
 type ApprovalsHandler struct {
-	repository store.Repository
+	repository store.CatalogRepository
 	mux        *http.ServeMux
 }
 
-func NewApprovalsHandler(repository store.Repository) *ApprovalsHandler {
+func NewApprovalsHandler(repository store.CatalogRepository) *ApprovalsHandler {
 	h := &ApprovalsHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -24,7 +24,7 @@ func NewApprovalsHandler(repository store.Repository) *ApprovalsHandler {
 	return h
 }
 
-func RegisterApprovalsRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterApprovalsRoutes(mux *http.ServeMux, repository store.CatalogRepository) {
 	h := NewApprovalsHandler(repository)
 	mux.Handle("POST /catalog-approvals", h)
 }

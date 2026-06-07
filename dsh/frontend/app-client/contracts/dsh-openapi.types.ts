@@ -885,90 +885,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wlt/wallet-summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get client wallet summary from WLT
-         * @description DSH backend endpoint acting as a read-only proxy/bridge to WLT's client wallet summary. Returns wallet balance and sync status. All financial ownership belongs to WLT. DSH is read-only.
-         */
-        get: operations["getWltWalletSummary"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/settlement/candidates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Submit eligible delivered orders as settlement candidates
-         * @description Transition eligible orders to SETTLEMENT_PENDING and submit them to WLT.
-         *     All financial mutations are executed by WLT. DSH performs state tracking only.
-         */
-        post: operations["submitSettlementCandidates"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/settlement-callback": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Settlement status update callback from WLT
-         * @description Called by WLT to notify DSH of the final settlement outcome (CONFIRMED or FAILED).
-         *     Updates settlement status and stores transaction reference inside DSH.
-         *     Requires X-WLT-Callback-Token matching WLT_CALLBACK_SECRET; DEV_ONLY accepts dev-secret.
-         */
-        post: operations["postWltSettlementCallback"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/settlements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get list of settlements and candidates (read-only view)
-         * @description Returns a read-only list of orders currently pending, settled, or failed settlement.
-         *     Acts as a read-only visibility summary bridged from WLT.
-         */
-        get: operations["getSettlements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1348,7 +1264,6 @@ export interface components {
             total_price: number;
             wlt_payment_ref_id?: string;
             wlt_refund_ref_id?: string;
-            refund_amount?: number;
             captain_id?: string;
             captain_latitude?: number;
             captain_longitude?: number;
@@ -1366,7 +1281,6 @@ export interface components {
              * @enum {string}
              */
             settlement_status: "NOT_SETTLED" | "SETTLEMENT_PENDING" | "SETTLED" | "SETTLEMENT_FAILED";
-            settlement_amount?: number | null;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
@@ -1532,36 +1446,6 @@ export interface components {
             amount: number;
             /**
              * @description CONFIRMED triggers order status transition to REFUNDED. FAILED logs the failure event but keeps the status unchanged.
-             * @enum {string}
-             */
-            status: "CONFIRMED" | "FAILED";
-        };
-        /** @description WLT-owned wallet balance snapshot. */
-        WalletBalance: {
-            /** @description Current wallet balance in minor units */
-            balanceMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @description Whether the wallet is linked to an active account */
-            linked: boolean;
-            /** @description Amount currently on hold */
-            frozenMinorUnits?: number;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        SettlementCandidateRequest: {
-            /** @description List of delivered orders to be settled by WLT. */
-            order_ids: string[];
-        };
-        SettlementCallbackRequest: {
-            /** @description WLT settlement transaction reference. */
-            settlement_ref_id: string;
-            /** @description Order IDs settled. */
-            order_ids: string[];
-            /** @description Total settled amount. */
-            amount: number;
-            /**
-             * @description CONFIRMED transitions settlement status to SETTLED. FAILED sets it to SETTLEMENT_FAILED.
              * @enum {string}
              */
             status: "CONFIRMED" | "FAILED";
@@ -3939,186 +3823,6 @@ export interface operations {
             };
             /** @description Order not found */
             404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Internal error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getWltWalletSummary: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Wallet summary balance */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WalletBalance"];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Internal error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    submitSettlementCandidates: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SettlementCandidateRequest"];
-            };
-        };
-        responses: {
-            /** @description Settlement candidates registered successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderRecord"][];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Internal error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    postWltSettlementCallback: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-WLT-Callback-Token": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SettlementCallbackRequest"];
-            };
-        };
-        responses: {
-            /** @description Settlement status updated successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderRecord"][];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Missing or invalid WLT callback token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Internal error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getSettlements: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description List of settlements */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderRecord"][];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
                 headers: {
                     [name: string]: unknown;
                 };

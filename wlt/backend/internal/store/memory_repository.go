@@ -13,27 +13,37 @@ import (
 // MemoryRepository is the in-memory WLT store for dev/test.
 // All state is lost on restart. Thread-safe.
 type MemoryRepository struct {
-	mu              sync.RWMutex
-	payments        map[string]domain.PaymentSession  // id → session
-	paymentByIdem   map[string]string                 // idempotency_key → id
-	refunds         map[string]domain.Refund          // id → refund
-	refundByIdem    map[string]string                 // idempotency_key → id
-	settlements     map[string]domain.Settlement      // id → settlement
-	settlementByIdem map[string]string                // idempotency_key → id
-	wallets         map[string]domain.Wallet          // subject → wallet
-	ledger          []domain.LedgerEntry
+	mu                   sync.RWMutex
+	payments             map[string]domain.PaymentSession  // id → session
+	paymentByIdem        map[string]string                 // idempotency_key → id
+	refunds              map[string]domain.Refund          // id → refund
+	refundByIdem         map[string]string                 // idempotency_key → id
+	settlements          map[string]domain.Settlement      // id → settlement
+	settlementByIdem     map[string]string                 // idempotency_key → id
+	wallets              map[string]domain.Wallet          // subject → wallet
+	ledger               []domain.LedgerEntry
+	reconciliations      []domain.ReconciliationRun
+	reconciliationByIdem map[string]domain.ReconciliationRun
+	payoutDecisions      map[string]domain.PayoutDecision
+	payoutByIdem         map[string]string
+	financeCloses        map[string]domain.FinanceClose
+	callbackEvents       []domain.CallbackEvent
 }
 
 func NewMemoryRepository() *MemoryRepository {
 	return &MemoryRepository{
-		payments:         make(map[string]domain.PaymentSession),
-		paymentByIdem:    make(map[string]string),
-		refunds:          make(map[string]domain.Refund),
-		refundByIdem:     make(map[string]string),
-		settlements:      make(map[string]domain.Settlement),
-		settlementByIdem: make(map[string]string),
-		wallets:          make(map[string]domain.Wallet),
-		ledger:           nil,
+		payments:             make(map[string]domain.PaymentSession),
+		paymentByIdem:        make(map[string]string),
+		refunds:              make(map[string]domain.Refund),
+		refundByIdem:         make(map[string]string),
+		settlements:          make(map[string]domain.Settlement),
+		settlementByIdem:     make(map[string]string),
+		wallets:              make(map[string]domain.Wallet),
+		ledger:               nil,
+		reconciliationByIdem: make(map[string]domain.ReconciliationRun),
+		payoutDecisions:      make(map[string]domain.PayoutDecision),
+		payoutByIdem:         make(map[string]string),
+		financeCloses:        make(map[string]domain.FinanceClose),
 	}
 }
 
@@ -593,3 +603,181 @@ func (r *MemoryRepository) ListLedger(_ context.Context, q domain.ListLedgerQuer
 // ─── Health ──────────────────────────────────────────────────────────────────
 
 func (r *MemoryRepository) Ping(_ context.Context) error { return nil }
+
+// ─── Operator Features ───────────────────────────────────────────────────
+
+func (r *MemoryRepository) RunReconciliation(ctx context.Context, idempotencyKey string) (domain.ReconciliationRun, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if idempotencyKey != "" {
+		if run, ok := r.reconciliationByIdem[idempotencyKey]; ok {
+			return run, nil
+		}
+	}
+
+	var totalDebit, totalCredit float64
+	var count int
+	for _, e := range r.ledger {
+		if e.Status == domain.TxStatusCompleted {
+			count++
+			if e.TransactionType == domain.TxTypeDebit {
+				totalDebit += e.Amount
+			} else if e.TransactionType == domain.TxTypeCredit {
+				totalCredit += e.Amount
+			}
+		}
+	}
+
+	status := "failed"
+	if totalDebit == totalCredit {
+		status = "passed"
+	}
+
+	run := domain.ReconciliationRun{
+		ID:          newID("rec"),
+		Status:      status,
+		EntryCount:  count,
+		TotalDebit:  totalDebit,
+		TotalCredit: totalCredit,
+		CreatedAt:   now(),
+	}
+	if idempotencyKey != "" {
+		run.IdempotencyKey = &idempotencyKey
+	}
+
+	r.reconciliations = append(r.reconciliations, run)
+	if idempotencyKey != "" {
+		r.reconciliationByIdem[idempotencyKey] = run
+	}
+	return run, nil
+}
+
+func (r *MemoryRepository) ListReconciliationRuns(_ context.Context) ([]domain.ReconciliationRun, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	runs := make([]domain.ReconciliationRun, len(r.reconciliations))
+	copy(runs, r.reconciliations)
+	return runs, nil
+}
+
+func (r *MemoryRepository) CreateReconciliationRun(_ context.Context, run domain.ReconciliationRun) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if run.ID == "" {
+		run.ID = newID("rec")
+	}
+	if run.CreatedAt.IsZero() {
+		run.CreatedAt = now()
+	}
+	r.reconciliations = append(r.reconciliations, run)
+	if run.IdempotencyKey != nil && *run.IdempotencyKey != "" {
+		r.reconciliationByIdem[*run.IdempotencyKey] = run
+	}
+	return nil
+}
+
+func (r *MemoryRepository) GetReconciliationRunByIdempotency(_ context.Context, key string) (domain.ReconciliationRun, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	run, ok := r.reconciliationByIdem[key]
+	return run, ok, nil
+}
+
+func (r *MemoryRepository) CreatePayoutDecision(_ context.Context, req domain.CreatePayoutDecisionRequest) (domain.PayoutDecision, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if req.OwnerID == "" || req.SettlementCycleID == "" || req.Amount <= 0 {
+		return domain.PayoutDecision{}, fmt.Errorf("owner_id, settlement_cycle_id, and amount are required")
+	}
+
+	if id, ok := r.payoutByIdem[req.IdempotencyKey]; ok {
+		return r.payoutDecisions[id], nil
+	}
+
+	pd := domain.PayoutDecision{
+		ID:                newID("po"),
+		OwnerID:           req.OwnerID,
+		OwnerKind:         req.OwnerKind,
+		SettlementCycleID: req.SettlementCycleID,
+		Amount:            req.Amount,
+		Currency:          "YER",
+		Status:            "approved",
+		CreatedAt:         now(),
+	}
+	if req.IdempotencyKey != "" {
+		pd.IdempotencyKey = &req.IdempotencyKey
+	}
+
+	r.payoutDecisions[pd.ID] = pd
+	if req.IdempotencyKey != "" {
+		r.payoutByIdem[req.IdempotencyKey] = pd.ID
+	}
+	return pd, nil
+}
+
+func (r *MemoryRepository) GetPayoutDecisionByIdempotency(_ context.Context, key string) (domain.PayoutDecision, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	id, ok := r.payoutByIdem[key]
+	if !ok {
+		return domain.PayoutDecision{}, false, nil
+	}
+	return r.payoutDecisions[id], true, nil
+}
+
+func (r *MemoryRepository) GetFinanceClose(_ context.Context, businessDate string) (domain.FinanceClose, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	fc, ok := r.financeCloses[businessDate]
+	return fc, ok, nil
+}
+
+func (r *MemoryRepository) GetLatestFinanceClose(_ context.Context) (domain.FinanceClose, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var latest domain.FinanceClose
+	var found bool
+	for _, fc := range r.financeCloses {
+		if !found || fc.CreatedAt.After(latest.CreatedAt) {
+			latest = fc
+			found = true
+		}
+	}
+	return latest, found, nil
+}
+
+func (r *MemoryRepository) UpsertFinanceClose(_ context.Context, fc domain.FinanceClose) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if fc.ID == "" {
+		fc.ID = newID("close")
+	}
+	if fc.CreatedAt.IsZero() {
+		fc.CreatedAt = now()
+	}
+	r.financeCloses[fc.BusinessDate] = fc
+	return nil
+}
+
+func (r *MemoryRepository) ListAuditEvents(_ context.Context) ([]domain.CallbackEvent, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	events := make([]domain.CallbackEvent, len(r.callbackEvents))
+	copy(events, r.callbackEvents)
+	return events, nil
+}
+
+func (r *MemoryRepository) CreateCallbackEvent(_ context.Context, event domain.CallbackEvent) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if event.EventID == "" {
+		event.EventID = newID("evt")
+	}
+	if event.CreatedAt.IsZero() {
+		event.CreatedAt = now()
+	}
+	r.callbackEvents = append(r.callbackEvents, event)
+	return nil
+}

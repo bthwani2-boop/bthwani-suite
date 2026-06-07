@@ -11,11 +11,11 @@ import (
 )
 
 type MediaHandler struct {
-	repository store.Repository
+	repository store.CatalogRepository
 	mux        *http.ServeMux
 }
 
-func NewMediaHandler(repository store.Repository) *MediaHandler {
+func NewMediaHandler(repository store.CatalogRepository) *MediaHandler {
 	h := &MediaHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -25,7 +25,7 @@ func NewMediaHandler(repository store.Repository) *MediaHandler {
 	return h
 }
 
-func RegisterMediaRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterMediaRoutes(mux *http.ServeMux, repository store.CatalogRepository) {
 	h := NewMediaHandler(repository)
 	mux.Handle("POST /media", h)
 	mux.Handle("DELETE /media/{id}", h)

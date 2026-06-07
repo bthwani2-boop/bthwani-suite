@@ -151,6 +151,7 @@ type OrderDetailsResponse struct {
 // Limit is capped at 200 in the handler; default 50.
 type ListOrdersQuery struct {
 	ClientID string
+	StoreID  string
 	Status   string
 	Limit    int
 	Offset   int

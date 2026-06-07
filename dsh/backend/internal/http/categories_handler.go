@@ -20,11 +20,11 @@ import (
 //   DELETE /categories/{id}                    — delete category
 
 type CategoriesHandler struct {
-	repository store.Repository
+	repository store.CatalogRepository
 	mux        *http.ServeMux
 }
 
-func NewCategoriesHandler(repository store.Repository) *CategoriesHandler {
+func NewCategoriesHandler(repository store.CatalogRepository) *CategoriesHandler {
 	h := &CategoriesHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -37,7 +37,7 @@ func NewCategoriesHandler(repository store.Repository) *CategoriesHandler {
 	return h
 }
 
-func RegisterCategoryRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterCategoryRoutes(mux *http.ServeMux, repository store.CatalogRepository) {
 	h := NewCategoriesHandler(repository)
 	mux.Handle("POST /stores/{store_id}/categories", h)
 	mux.Handle("GET /stores/{store_id}/categories", h)
@@ -65,9 +65,16 @@ func (h *CategoriesHandler) CreateCategory(w http.ResponseWriter, r *http.Reques
 	if operatorID == "" {
 		return
 	}
-	if !HasRole(r, "operator") {
-		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+	if !HasRole(r, "partner") && !HasRole(r, "operator") && !HasRole(r, "system") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized role")
 		return
+	}
+	if HasRole(r, "partner") {
+		partnerStore := getPartnerStoreID(operatorID)
+		if partnerStore == "" || partnerStore != storeID {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized store access")
+			return
+		}
 	}
 
 	if storeID == "" {
@@ -166,14 +173,33 @@ func (h *CategoriesHandler) UpdateCategory(w http.ResponseWriter, r *http.Reques
 	if operatorID == "" {
 		return
 	}
-	if !HasRole(r, "operator") {
-		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+	if !HasRole(r, "partner") && !HasRole(r, "operator") && !HasRole(r, "system") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized role")
 		return
 	}
 
 	if id == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing category id")
 		return
+	}
+
+	// Fetch category first to verify store ownership for partner
+	record, err := h.repository.GetCategory(r.Context(), id)
+	if err != nil {
+		if err.Error() == "category not found" {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "category not found")
+			return
+		}
+		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	if HasRole(r, "partner") {
+		partnerStore := getPartnerStoreID(operatorID)
+		if partnerStore == "" || partnerStore != record.StoreID {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized store access")
+			return
+		}
 	}
 
 	var req domain.UpdateCategoryRequest
@@ -187,7 +213,7 @@ func (h *CategoriesHandler) UpdateCategory(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	record, err := h.repository.UpdateCategory(r.Context(), id, req)
+	record, err = h.repository.UpdateCategory(r.Context(), id, req)
 	if err != nil {
 		if err.Error() == "category not found" {
 			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "category not found")
@@ -208,8 +234,8 @@ func (h *CategoriesHandler) DeleteCategory(w http.ResponseWriter, r *http.Reques
 	if operatorID == "" {
 		return
 	}
-	if !HasRole(r, "operator") {
-		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+	if !HasRole(r, "partner") && !HasRole(r, "operator") && !HasRole(r, "system") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized role")
 		return
 	}
 
@@ -218,7 +244,26 @@ func (h *CategoriesHandler) DeleteCategory(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err := h.repository.DeleteCategory(r.Context(), id)
+	// Fetch category first to verify store ownership for partner
+	record, err := h.repository.GetCategory(r.Context(), id)
+	if err != nil {
+		if err.Error() == "category not found" {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "category not found")
+			return
+		}
+		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	if HasRole(r, "partner") {
+		partnerStore := getPartnerStoreID(operatorID)
+		if partnerStore == "" || partnerStore != record.StoreID {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized store access")
+			return
+		}
+	}
+
+	err = h.repository.DeleteCategory(r.Context(), id)
 	if err != nil {
 		if err.Error() == "category not found" {
 			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "category not found")

@@ -19,11 +19,11 @@ import (
 //   PATCH  /products/{id}                      — update product identity
 
 type ProductsHandler struct {
-	repository store.Repository
+	repository store.CatalogRepository
 	mux        *http.ServeMux
 }
 
-func NewProductsHandler(repository store.Repository) *ProductsHandler {
+func NewProductsHandler(repository store.CatalogRepository) *ProductsHandler {
 	h := &ProductsHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -35,7 +35,7 @@ func NewProductsHandler(repository store.Repository) *ProductsHandler {
 	return h
 }
 
-func RegisterProductRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterProductRoutes(mux *http.ServeMux, repository store.CatalogRepository) {
 	h := NewProductsHandler(repository)
 	mux.Handle("POST /stores/{store_id}/products", h)
 	mux.Handle("GET /stores/{store_id}/products", h)
@@ -57,6 +57,22 @@ func (h *ProductsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *ProductsHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	storeID := r.PathValue("store_id")
 	log.Printf("dsh-api: POST /stores/%s/products", storeID)
+
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "partner") && !HasRole(r, "operator") && !HasRole(r, "system") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized role")
+		return
+	}
+	if HasRole(r, "partner") {
+		partnerStore := getPartnerStoreID(clientID)
+		if partnerStore == "" || partnerStore != storeID {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized store access")
+			return
+		}
+	}
 
 	if storeID == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing store_id")
@@ -151,9 +167,37 @@ func (h *ProductsHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) 
 	id := r.PathValue("id")
 	log.Printf("dsh-api: PATCH /products/%s", id)
 
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "partner") && !HasRole(r, "operator") && !HasRole(r, "system") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized role")
+		return
+	}
+
 	if id == "" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing product id")
 		return
+	}
+
+	// Fetch product first to verify store ownership for partner
+	record, err := h.repository.GetProduct(r.Context(), id)
+	if err != nil {
+		if err.Error() == "product not found" {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "product not found")
+			return
+		}
+		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	if HasRole(r, "partner") {
+		partnerStore := getPartnerStoreID(clientID)
+		if partnerStore == "" || partnerStore != record.StoreID {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "unauthorized store access")
+			return
+		}
 	}
 
 	var req domain.UpdateProductRequest
@@ -168,15 +212,11 @@ func (h *ProductsHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	record, err := h.repository.UpdateProduct(r.Context(), id, req)
+	updatedRecord, err := h.repository.UpdateProduct(r.Context(), id, req)
 	if err != nil {
-		if err.Error() == "product not found" {
-			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "product not found")
-			return
-		}
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
 		return
 	}
 
-	writeJSON(w, http.StatusOK, record)
+	writeJSON(w, http.StatusOK, updatedRecord)
 }

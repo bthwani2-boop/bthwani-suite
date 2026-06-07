@@ -54,4 +54,18 @@ type Repository interface {
 	// ─── Health ──────────────────────────────────────────────────────────────
 
 	Ping(ctx context.Context) error
+
+	// ─── Operator Features ───────────────────────────────────────────────────
+
+	RunReconciliation(ctx context.Context, idempotencyKey string) (domain.ReconciliationRun, error)
+	ListReconciliationRuns(ctx context.Context) ([]domain.ReconciliationRun, error)
+	CreateReconciliationRun(ctx context.Context, run domain.ReconciliationRun) error
+	GetReconciliationRunByIdempotency(ctx context.Context, key string) (domain.ReconciliationRun, bool, error)
+	CreatePayoutDecision(ctx context.Context, req domain.CreatePayoutDecisionRequest) (domain.PayoutDecision, error)
+	GetPayoutDecisionByIdempotency(ctx context.Context, key string) (domain.PayoutDecision, bool, error)
+	GetFinanceClose(ctx context.Context, businessDate string) (domain.FinanceClose, bool, error)
+	GetLatestFinanceClose(ctx context.Context) (domain.FinanceClose, bool, error)
+	UpsertFinanceClose(ctx context.Context, close domain.FinanceClose) error
+	ListAuditEvents(ctx context.Context) ([]domain.CallbackEvent, error)
+	CreateCallbackEvent(ctx context.Context, event domain.CallbackEvent) error
 }

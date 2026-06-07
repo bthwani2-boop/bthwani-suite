@@ -688,3 +688,227 @@ LIMIT $2 OFFSET $3`
 func (r *PostgresRepository) Ping(ctx context.Context) error {
 	return r.pool.Ping(ctx)
 }
+
+// ─── Operator Features ───────────────────────────────────────────────────
+
+func (r *PostgresRepository) RunReconciliation(ctx context.Context, idempotencyKey string) (domain.ReconciliationRun, error) {
+	if idempotencyKey != "" {
+		existing, ok, err := r.GetReconciliationRunByIdempotency(ctx, idempotencyKey)
+		if err != nil {
+			return domain.ReconciliationRun{}, err
+		}
+		if ok {
+			return existing, nil
+		}
+	}
+
+	const calcQ = `
+		SELECT
+			COUNT(*),
+			COALESCE(SUM(CASE WHEN transaction_type = 'DEBIT' THEN amount ELSE 0 END), 0),
+			COALESCE(SUM(CASE WHEN transaction_type = 'CREDIT' THEN amount ELSE 0 END), 0)
+		FROM wlt_ledger
+		WHERE status = 'COMPLETED'`
+
+	var entryCount int
+	var totalDebit, totalCredit float64
+	err := r.pool.QueryRow(ctx, calcQ).Scan(&entryCount, &totalDebit, &totalCredit)
+	if err != nil {
+		return domain.ReconciliationRun{}, fmt.Errorf("wlt postgres: calculate reconciliation totals: %w", err)
+	}
+
+	status := "failed"
+	if totalDebit == totalCredit {
+		status = "passed"
+	}
+
+	run := domain.ReconciliationRun{
+		ID:          pgNewID("rec"),
+		Status:      status,
+		EntryCount:  entryCount,
+		TotalDebit:  totalDebit,
+		TotalCredit: totalCredit,
+		CreatedAt:   time.Now().UTC(),
+	}
+	if idempotencyKey != "" {
+		run.IdempotencyKey = &idempotencyKey
+	}
+
+	err = r.CreateReconciliationRun(ctx, run)
+	if err != nil {
+		return domain.ReconciliationRun{}, err
+	}
+	return run, nil
+}
+
+func (r *PostgresRepository) ListReconciliationRuns(ctx context.Context) ([]domain.ReconciliationRun, error) {
+	const q = `SELECT id, idempotency_key, status, entry_count, total_debit, total_credit, created_at FROM wlt_reconciliation_runs ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, fmt.Errorf("wlt postgres: list reconciliation runs: %w", err)
+	}
+	defer rows.Close()
+
+	var runs []domain.ReconciliationRun
+	for rows.Next() {
+		var run domain.ReconciliationRun
+		if err := rows.Scan(&run.ID, &run.IdempotencyKey, &run.Status, &run.EntryCount, &run.TotalDebit, &run.TotalCredit, &run.CreatedAt); err != nil {
+			return nil, fmt.Errorf("wlt postgres: reconciliation run scan: %w", err)
+		}
+		runs = append(runs, run)
+	}
+	return runs, nil
+}
+
+func (r *PostgresRepository) CreateReconciliationRun(ctx context.Context, run domain.ReconciliationRun) error {
+	if run.ID == "" {
+		run.ID = pgNewID("rec")
+	}
+	if run.CreatedAt.IsZero() {
+		run.CreatedAt = time.Now().UTC()
+	}
+	const q = `INSERT INTO wlt_reconciliation_runs (id, idempotency_key, status, entry_count, total_debit, total_credit, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	_, err := r.pool.Exec(ctx, q, run.ID, run.IdempotencyKey, run.Status, run.EntryCount, run.TotalDebit, run.TotalCredit, run.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("wlt postgres: create reconciliation run: %w", err)
+	}
+	return nil
+}
+
+func (r *PostgresRepository) GetReconciliationRunByIdempotency(ctx context.Context, key string) (domain.ReconciliationRun, bool, error) {
+	const q = `SELECT id, idempotency_key, status, entry_count, total_debit, total_credit, created_at FROM wlt_reconciliation_runs WHERE idempotency_key = $1`
+	var run domain.ReconciliationRun
+	err := r.pool.QueryRow(ctx, q, key).Scan(&run.ID, &run.IdempotencyKey, &run.Status, &run.EntryCount, &run.TotalDebit, &run.TotalCredit, &run.CreatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return domain.ReconciliationRun{}, false, nil
+		}
+		return domain.ReconciliationRun{}, false, fmt.Errorf("wlt postgres: get reconciliation run by idem: %w", err)
+	}
+	return run, true, nil
+}
+
+func (r *PostgresRepository) CreatePayoutDecision(ctx context.Context, req domain.CreatePayoutDecisionRequest) (domain.PayoutDecision, error) {
+	existing, ok, err := r.GetPayoutDecisionByIdempotency(ctx, req.IdempotencyKey)
+	if err != nil {
+		return domain.PayoutDecision{}, err
+	}
+	if ok {
+		return existing, nil
+	}
+
+	id := pgNewID("po")
+	n := time.Now().UTC()
+	const q = `
+INSERT INTO wlt_payout_decisions (id, owner_id, owner_kind, settlement_cycle_id, amount, currency, status, idempotency_key, created_at)
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+RETURNING id, owner_id, owner_kind, settlement_cycle_id, amount, currency, status, idempotency_key, created_at`
+
+	var pd domain.PayoutDecision
+	var idemKey *string
+	if req.IdempotencyKey != "" {
+		idemKey = &req.IdempotencyKey
+	}
+	err = r.pool.QueryRow(ctx, q, id, req.OwnerID, req.OwnerKind, req.SettlementCycleID, req.Amount, "YER", "approved", idemKey, n).Scan(
+		&pd.ID, &pd.OwnerID, &pd.OwnerKind, &pd.SettlementCycleID, &pd.Amount, &pd.Currency, &pd.Status, &pd.IdempotencyKey, &pd.CreatedAt,
+	)
+	if err != nil {
+		return domain.PayoutDecision{}, fmt.Errorf("wlt postgres: create payout decision: %w", err)
+	}
+	return pd, nil
+}
+
+func (r *PostgresRepository) GetPayoutDecisionByIdempotency(ctx context.Context, key string) (domain.PayoutDecision, bool, error) {
+	if key == "" {
+		return domain.PayoutDecision{}, false, nil
+	}
+	const q = `SELECT id, owner_id, owner_kind, settlement_cycle_id, amount, currency, status, idempotency_key, created_at FROM wlt_payout_decisions WHERE idempotency_key = $1`
+	var pd domain.PayoutDecision
+	err := r.pool.QueryRow(ctx, q, key).Scan(&pd.ID, &pd.OwnerID, &pd.OwnerKind, &pd.SettlementCycleID, &pd.Amount, &pd.Currency, &pd.Status, &pd.IdempotencyKey, &pd.CreatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return domain.PayoutDecision{}, false, nil
+		}
+		return domain.PayoutDecision{}, false, fmt.Errorf("wlt postgres: get payout decision by idem: %w", err)
+	}
+	return pd, true, nil
+}
+
+func (r *PostgresRepository) GetFinanceClose(ctx context.Context, businessDate string) (domain.FinanceClose, bool, error) {
+	const q = `SELECT id, business_date, status, reconciliation_run_id, closed_at, created_at FROM wlt_finance_close WHERE business_date = $1`
+	var fc domain.FinanceClose
+	err := r.pool.QueryRow(ctx, q, businessDate).Scan(&fc.ID, &fc.BusinessDate, &fc.Status, &fc.ReconciliationRunID, &fc.ClosedAt, &fc.CreatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return domain.FinanceClose{}, false, nil
+		}
+		return domain.FinanceClose{}, false, fmt.Errorf("wlt postgres: get finance close: %w", err)
+	}
+	return fc, true, nil
+}
+
+func (r *PostgresRepository) GetLatestFinanceClose(ctx context.Context) (domain.FinanceClose, bool, error) {
+	const q = `SELECT id, business_date, status, reconciliation_run_id, closed_at, created_at FROM wlt_finance_close ORDER BY created_at DESC LIMIT 1`
+	var fc domain.FinanceClose
+	err := r.pool.QueryRow(ctx, q).Scan(&fc.ID, &fc.BusinessDate, &fc.Status, &fc.ReconciliationRunID, &fc.ClosedAt, &fc.CreatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return domain.FinanceClose{}, false, nil
+		}
+		return domain.FinanceClose{}, false, fmt.Errorf("wlt postgres: get latest finance close: %w", err)
+	}
+	return fc, true, nil
+}
+
+func (r *PostgresRepository) UpsertFinanceClose(ctx context.Context, fc domain.FinanceClose) error {
+	if fc.ID == "" {
+		fc.ID = pgNewID("close")
+	}
+	if fc.CreatedAt.IsZero() {
+		fc.CreatedAt = time.Now().UTC()
+	}
+	const q = `
+INSERT INTO wlt_finance_close (id, business_date, status, reconciliation_run_id, closed_at, created_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT (business_date) DO UPDATE
+SET status = EXCLUDED.status, reconciliation_run_id = EXCLUDED.reconciliation_run_id, closed_at = EXCLUDED.closed_at`
+	_, err := r.pool.Exec(ctx, q, fc.ID, fc.BusinessDate, fc.Status, fc.ReconciliationRunID, fc.ClosedAt, fc.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("wlt postgres: upsert finance close: %w", err)
+	}
+	return nil
+}
+
+func (r *PostgresRepository) ListAuditEvents(ctx context.Context) ([]domain.CallbackEvent, error) {
+	const q = `SELECT id, idempotency_key, target, payload, created_at FROM wlt_callback_events ORDER BY created_at DESC`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, fmt.Errorf("wlt postgres: list callback events: %w", err)
+	}
+	defer rows.Close()
+
+	var events []domain.CallbackEvent
+	for rows.Next() {
+		var ev domain.CallbackEvent
+		if err := rows.Scan(&ev.EventID, &ev.IdempotencyKey, &ev.Target, &ev.Payload, &ev.CreatedAt); err != nil {
+			return nil, fmt.Errorf("wlt postgres: callback event scan: %w", err)
+		}
+		events = append(events, ev)
+	}
+	return events, nil
+}
+
+func (r *PostgresRepository) CreateCallbackEvent(ctx context.Context, event domain.CallbackEvent) error {
+	if event.EventID == "" {
+		event.EventID = pgNewID("evt")
+	}
+	if event.CreatedAt.IsZero() {
+		event.CreatedAt = time.Now().UTC()
+	}
+	const q = `INSERT INTO wlt_callback_events (id, idempotency_key, target, payload, created_at) VALUES ($1, $2, $3, $4, $5)`
+	_, err := r.pool.Exec(ctx, q, event.EventID, event.IdempotencyKey, event.Target, event.Payload, event.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("wlt postgres: create callback event: %w", err)
+	}
+	return nil
+}

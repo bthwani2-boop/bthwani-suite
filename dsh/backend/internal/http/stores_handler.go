@@ -17,12 +17,17 @@ const (
 	maxLimit     = 100
 )
 
+type StoreFieldRepository interface {
+	store.StoreRepository
+	store.FieldRepository
+}
+
 type StoresHandler struct {
-	repository store.Repository
+	repository StoreFieldRepository
 	mux        *http.ServeMux
 }
 
-func NewStoresHandler(repository store.Repository) *StoresHandler {
+func NewStoresHandler(repository StoreFieldRepository) *StoresHandler {
 	handler := &StoresHandler{
 		repository: repository,
 		mux:        http.NewServeMux(),
@@ -41,7 +46,7 @@ func NewStoresHandler(repository store.Repository) *StoresHandler {
 	return handler
 }
 
-func RegisterRoutes(mux *http.ServeMux, repository store.Repository) {
+func RegisterRoutes(mux *http.ServeMux, repository StoreFieldRepository) {
 	handler := NewStoresHandler(repository)
 	mux.Handle("GET /stores", handler)
 	mux.Handle("GET /stores/{id}", handler)
