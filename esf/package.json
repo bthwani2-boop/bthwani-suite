@@ -1,0 +1,10 @@
+{
+  "name": "@bthwani/esf",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "echo \"@bthwani/esf orchestration package\"",
+    "openapi:lint": "spectral lint esf.openapi.yaml --ruleset ../.spectral.yaml"
+  }
+}

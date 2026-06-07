@@ -1,0 +1,10 @@
+{
+  "name": "@bthwani/amn",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "echo \"@bthwani/amn orchestration package\"",
+    "openapi:lint": "spectral lint amn.openapi.yaml --ruleset ../.spectral.yaml"
+  }
+}

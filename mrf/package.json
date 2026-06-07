@@ -1,0 +1,10 @@
+{
+  "name": "@bthwani/mrf",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "echo \"@bthwani/mrf orchestration package\"",
+    "openapi:lint": "spectral lint mrf.openapi.yaml --ruleset ../.spectral.yaml"
+  }
+}

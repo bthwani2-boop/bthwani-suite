@@ -1,0 +1,10 @@
+{
+  "name": "@bthwani/dsh",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "echo \"@bthwani/dsh orchestration package\"",
+    "openapi:lint": "spectral lint dsh.openapi.yaml --ruleset ../.spectral.yaml"
+  }
+}
