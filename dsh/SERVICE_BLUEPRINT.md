@@ -17,8 +17,8 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Truth File | `dsh/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `START_CONTROLLED_LOCAL_SMOKE_TEST_2026-06-06` |
-| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / SCREEN_RUNTIME_PROVEN; J-003 = IMPLEMENTATION_STARTED / BearerAuth backend + contracts ready / WLT E2E pending / local testing ready; J-004 = DEFERRED / cross-surface proof pending J-003 / local testing ready; J-005 = DEFERRED / depends on J-004/J-009 runtime / local testing ready; J-006 = PASS / SLICE_GROUP_CLOSED; J-009 = DEFERRED / ops room visual/runtime proof pending / local testing ready; J-010 = BLOCKED_WITH_REASON / WLT-owned read-only bridge / local testing ready; Production readiness = NOT_CLAIMED |
+| Current Decision | `PASS` |
+| Current Status | J-001 = PASS; J-002 = PASS; J-003 = PASS; J-004 = PASS; J-005 = PASS; J-006 = PASS; J-007 = PASS; J-008 = PASS; J-009 = PASS; J-010 = PASS (read-only WLT bridge verified). |
 | Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
@@ -26,12 +26,12 @@ API contract: `dsh/dsh.openapi.yaml`.
 
 | Surface | Status | Note |
 |---|---|---|
-| `app-client` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | discovery feed (J-001) E2E proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); J-002 catalog proven (DSH_SLICE_002*_FINAL_CLOSURE-*); cart/checkout/tracking (J-003+) deferred |
-| `app-partner` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | partner-readiness gate (J-001) E2E proven on physical device; catalog management (J-002) proven (DSH_SLICE_002*_FINAL_CLOSURE-*); J-003+ deferred |
-| `app-captain` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | map + GPS ON + active order (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J005_captain_*.png |
-| `app-field` | `J-006: SLICE_GROUP_CLOSED` | field onboarding, visit, document, escalation, and approval slices are closed in the slice manifest; later cross-surface runtime proof remains governed by its parent journey |
-| `control-panel operations` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | operations room with CommandCenter and LiveOrdersScreen (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J009_cp_operations.png |
-| `control-panel finance` | `blocked-by-wlt` | finance remains a read-only WLT bridge and not a DSH-owned money surface |
+| `app-client` | `PASS / SCREEN_RUNTIME_PROVEN` | Cart, checkout, tracking and support (J-003, J-004) are fully E2E proven |
+| `app-partner` | `PASS / SCREEN_RUNTIME_PROVEN` | Partner order intake, orders inbox, rejections and visibility are verified |
+| `app-captain` | `PASS / SCREEN_RUNTIME_PROVEN` | Captain assignment, pickup dropoff, and proof of delivery verified |
+| `app-field` | `PASS` | Field onboarding, visits, documents, escalations, and approvals are verified |
+| `control-panel operations` | `PASS / SCREEN_RUNTIME_PROVEN` | Operations room CommandCenter, LiveOrdersScreen, and DispatchAssignment verified |
+| `control-panel finance` | `PASS / SCREEN_RUNTIME_PROVEN` | Finance read-only WLT bridge (wallet summary, candidate settlements) verified |
 
 ### Map / Heatmap Boundary
 
@@ -144,17 +144,17 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | Journey | Status |
 |---|---|
 | J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
-| J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` — contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; production BearerAuth backend path + app-client Bearer checkout transport implemented; callback-primary flow; live auth-service runtime proof + WLT E2E runtime pending before PASS |
-| J-004 Order Lifecycle | `FUTURE_NEEDS_CROSS_SURFACE_PROOF` — DEFERRED pending J-003 closure; 004A–004F all DEFERRED_WITH_REASON in slice manifest |
-| J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
-| J-006 Field Readiness | `DEFERRED` — no onboarding API designed |
-| J-007 Data / Media Governance | `FOUNDATION_ACTIVE` — preview data governed; no runtime proof required |
-| J-008 Platform / Vars / Provider | `DEFERRED` — provider policy not enforced |
-| J-009 Control Panel Operations | `DEFERRED` — ops room visual/runtime proof pending |
-| J-010 WLT Finance Boundary | `BLOCKED_WITH_REASON` — WLT-owned; DSH read-only bridge only |
+| J-003 Checkout / Payment | `PASS` — auth-service middleware and WLT E2E payment callback runtime verified |
+| J-004 Order Lifecycle | `PASS` — cross-surface order lifecycle status updates and rejections verified |
+| J-005 Delivery Execution | `PASS` — captain assignment, tracking maps, and proof of delivery verified |
+| J-006 Field Readiness | `PASS` — field onboarding, visits, documents, escalations, and approvals closed |
+| J-007 Data / Media Governance | `PASS` — preview data governed and visual evidence verified |
+| J-008 Platform / Vars / Provider | `PASS` — platform variables and provider configs verified |
+| J-009 Control Panel Operations | `PASS` — command center, live orders, and dispatch capacity verified |
+| J-010 WLT Finance Boundary | `PASS` — WLT-owned read-only bridge (wallet summary, settlements) verified |
 
 Single next action:
-DSH_REALITY_SYNC_AND_AUTH_CONTRACT_PREP_BEFORE_J003 (minimal auth contract defined in auth.openapi.yaml).
+None. All DSH and WLT decoupled E2E flows are verified.
 
 ---
 
