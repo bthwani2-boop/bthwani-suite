@@ -12,23 +12,23 @@ import {
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
-import { DshOrdersListScreen, DshTrackingScreen } from './screens/OrdersTrackingScreens';
+import { DshOrdersListScreen } from './screens/DshOrdersListScreen';
+import { DshTrackingScreen } from './screens/DshTrackingScreen';
 import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
 import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
 import { useWltDshWalletPreview } from '../../../wlt/frontend/app-client/dsh';
-import {
-  type ClientOperationScreenId,
-  DshConversationHubScreen,
-  DshOrderIssueHubScreen,
-  DshProxyHubScreen,
-  DshServiceSettingsHubScreen,
-  DshZoneSetScreen,
-  DshListingStatusUpdateScreen,
-} from './screens/OperationScreens';
+import type { ClientOperationScreenId } from './screens/parts/OperationScreenView';
+import { DshConversationHubScreen } from './screens/DshConversationHubScreen';
+import { DshOrderIssueHubScreen } from './screens/DshOrderIssueHubScreen';
+import { DshProxyHubScreen } from './screens/DshProxyHubScreen';
+import { DshServiceSettingsHubScreen } from './screens/DshServiceSettingsHubScreen';
+import { DshZoneSetScreen } from './screens/DshZoneSetScreen';
+import { DshListingStatusUpdateScreen } from './screens/DshListingStatusUpdateScreen';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
-import { DshIdentityHubScreen, DshPreferencesHubScreen } from './screens/MySpaceSubScreens';
+import { DshIdentityHubScreen } from './screens/DshIdentityHubScreen';
+import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { dshHomeGetFixtureStores } from '../data/stores.preview-data';
 import {
   buildStoreCategories,

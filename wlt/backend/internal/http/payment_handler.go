@@ -27,6 +27,7 @@ func NewPaymentHandler(repo store.Repository) *PaymentHandler {
 	h := &PaymentHandler{repo: repo, mux: http.NewServeMux()}
 	h.mux.HandleFunc("POST /payment/sessions", h.Create)
 	h.mux.HandleFunc("GET /payment/sessions/{id}", h.Get)
+	h.mux.HandleFunc("GET /payment/sessions/{id}/ws", h.HandleWS)
 	h.mux.HandleFunc("POST /payment/sessions/{id}/confirm", h.Confirm)
 	h.mux.HandleFunc("POST /payment/sessions/{id}/fail", h.Fail)
 	return h
@@ -36,6 +37,7 @@ func RegisterPaymentRoutes(mux *http.ServeMux, repo store.Repository) {
 	h := NewPaymentHandler(repo)
 	mux.Handle("POST /payment/sessions", h)
 	mux.Handle("GET /payment/sessions/{id}", h)
+	mux.Handle("GET /payment/sessions/{id}/ws", h)
 	mux.Handle("POST /payment/sessions/{id}/confirm", h)
 	mux.Handle("POST /payment/sessions/{id}/fail", h)
 }
@@ -47,6 +49,50 @@ func (h *PaymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.mux.ServeHTTP(w, r)
+}
+
+// HandleWS — GET /payment/sessions/{id}/ws
+func (h *PaymentHandler) HandleWS(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		http.Error(w, "missing payment session id", http.StatusBadRequest)
+		return
+	}
+
+	// Verify session exists
+	ps, err := h.repo.GetPaymentSession(r.Context(), id)
+	if err != nil {
+		if err.Error() == "payment session not found" {
+			http.Error(w, "payment session not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	conn, _, err := Upgrade(w, r)
+	if err != nil {
+		log.Printf("wlt-api: WS upgrade failed for session=%s: %v", id, err)
+		return
+	}
+	defer conn.Close()
+
+	log.Printf("wlt-api: WS client connected to session=%s", id)
+	WsHub.Register(id, conn)
+	defer WsHub.Unregister(id, conn)
+
+	// Send current status immediately on connect
+	_ = writeTextMessage(conn, fmt.Sprintf(`{"status":"%s"}`, ps.Status))
+
+	// Keep connection open and monitor client disconnects
+	buf := make([]byte, 1024)
+	for {
+		_, err := conn.Read(buf)
+		if err != nil {
+			break
+		}
+	}
+	log.Printf("wlt-api: WS client disconnected from session=%s", id)
 }
 
 // Create — POST /payment/sessions
@@ -170,6 +216,9 @@ func (h *PaymentHandler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Broadcast status update to WebSocket clients
+	WsHub.Broadcast(ps.ID, fmt.Sprintf(`{"status":"%s"}`, ps.Status))
+
 	// Send callback to DSH asynchronously so we respond to the provider quickly.
 	go func() {
 		if err := sendPaymentCallbackToDSH(ps); err != nil {
@@ -219,6 +268,9 @@ func (h *PaymentHandler) Fail(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusUnprocessableEntity, domain.ErrorCodeInvalidParameter, err.Error())
 		return
 	}
+
+	// Broadcast status update to WebSocket clients
+	WsHub.Broadcast(ps.ID, fmt.Sprintf(`{"status":"%s"}`, ps.Status))
 
 	go func() {
 		if err := sendPaymentCallbackToDSH(ps); err != nil {

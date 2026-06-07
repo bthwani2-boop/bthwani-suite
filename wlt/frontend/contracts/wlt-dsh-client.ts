@@ -243,6 +243,7 @@ export interface WltDshTypedClient {
 	createClientPaymentSession(input: WltCreatePaymentSessionRequest): Promise<WltPaymentSession>;
 	getClientPaymentSession(id: string): Promise<WltPaymentSession>;
 	confirmPaymentSession(id: string, providerRef: string): Promise<WltPaymentSession>;
+	subscribePaymentSession(id: string, onUpdate: (status: string) => void): () => void;
 
 	// Refunds (operator: full list; client: own only)
 	listRefundQueue(clientId?: string, status?: string): Promise<WltListRefundsResponse>;
@@ -362,6 +363,44 @@ export function createWltDshTypedClient(options: WltDshTypedClientOptions): WltD
 
 		confirmPaymentSession(id, providerRef) {
 			return post<WltPaymentSession>(`/payment/sessions/${encodeURIComponent(id)}/confirm`, { provider_ref: providerRef }, 'WLT payment session confirm');
+		},
+
+		subscribePaymentSession(id, onUpdate) {
+			const wsUrl = base.replace(/^http/, 'ws') + `/payment/sessions/${encodeURIComponent(id)}/ws`;
+			let closed = false;
+			let ws: WebSocket | null = null;
+			let reconnectTimer: any = null;
+
+			function connect() {
+				if (closed) return;
+				ws = new WebSocket(wsUrl);
+				ws.onmessage = (event) => {
+					try {
+						const data = JSON.parse(event.data);
+						if (data && typeof data.status === 'string') {
+							onUpdate(data.status);
+						}
+					} catch (err) {
+						console.error('Failed to parse WebSocket message:', err);
+					}
+				};
+				ws.onclose = () => {
+					if (!closed) {
+						reconnectTimer = setTimeout(connect, 2000);
+					}
+				};
+				ws.onerror = (err) => {
+					console.error('WebSocket error for session:', id, err);
+				};
+			}
+
+			connect();
+
+			return () => {
+				closed = true;
+				if (reconnectTimer) clearTimeout(reconnectTimer);
+				if (ws) ws.close();
+			};
 		},
 
 		listRefundQueue(clientId, status) {

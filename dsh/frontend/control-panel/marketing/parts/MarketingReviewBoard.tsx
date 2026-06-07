@@ -1,56 +1,21 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
-import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../shared';
+import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../../shared';
 import {
   getCampaignItems,
   upsertCampaignItem,
   getMarketingVideoItems,
   upsertMarketingVideoItem,
-} from '../../data/marketing.preview-data';
-import { getPartnerOfferItems, approvePartnerOfferItem, rejectPartnerOfferItem } from '../../data/offers.preview-data';
-import { useMarketingPermissions } from './marketing-permissions.contract';
+} from '../../../data/marketing.preview-data';
+import { getPartnerOfferItems, approvePartnerOfferItem, rejectPartnerOfferItem } from '../../../data/offers.preview-data';
+import { useMarketingPermissions } from '../marketing-permissions.contract';
 
+export type MarketingReviewKind = 'approval' | 'video';
 
-
-/**
- * Audit / History / Rollback Preview:
- * - publish / approval / toggle / visibility actions:
- *   - audit? API-later (via signal layer/events)
- *   - history? API-later (history log)
- *   - rollback? UI-only (pause/draft toggle)
- *   - reason/comment? UI-only now
- *   - before/after preview? UI-only (local visual grid/preview)
- *   - UI-only? Yes (currently simulated/preview states)
- *   - API-later? Yes (backend mutation boundary)
- *
- * Error Handling Closure:
- * - network: API-later (currently simulated/preview)
- * - validation: Top-level error messages (e.g. required fields, conflict targets)
- * - permission: UI disabled state via hasPermission contract
- * - not found: Auto-fallback or disabled action
- * - conflict: Toast/Alert blocker on duplicate/position conflict
- * - stale data: Handled via refresh() after every mutation
- * - blocked action: Handled via permission/validation state
- * - partial failure: API-later
- * - retry: API-later
- * - (No silent catch, success updates state and refreshes data)
- *
- * Empty / Loading / Blocked / Disabled Closure:
- * - loading: API-later (بيانات محاكاة حالياً، لا يوجد async fetch)
- * - empty: HANDLED — empty state واضح عند غياب العناصر
- * - error: HANDLED — رسالة خطأ صريحة عند فشل الإجراء
- * - blocked: HANDLED — الإجراء محجوب عند غياب الصلاحية أو البيانات
- * - disabled: HANDLED — الزر disabled عند عدم استيفاء الشروط
- * - success: HANDLED — الحالة تتحدث فور نجاح الإجراء
- * - retry: API-later
- * - guidance: HANDLED — توجيه نصي يظهر عند كل حالة فارغة أو محجوبة
- */
-type MarketingReviewKind = 'approval' | 'video';
-
-type MarketingReviewRow = Record<'id' | 'title', string> & {
+export type MarketingReviewRow = Record<'id' | 'title', string> & {
   status: string;
   ownerSurface: string;
   blocker: string;
@@ -61,7 +26,7 @@ type MarketingReviewRow = Record<'id' | 'title', string> & {
   tone: 'brand' | 'best' | 'warning' | 'danger';
 };
 
-function buildMarketingRows(kind: MarketingReviewKind): MarketingReviewRow[] {
+export function buildMarketingRows(kind: MarketingReviewKind): MarketingReviewRow[] {
   if (kind === 'approval') {
     const pendingCampaigns = getCampaignItems().filter(c => c.status === 'pending');
     const reviewOffers = getPartnerOfferItems().filter(o => o.status === 'review');
@@ -115,12 +80,12 @@ function buildMarketingRows(kind: MarketingReviewKind): MarketingReviewRow[] {
   return rows;
 }
 
-type MarketingReviewBoardProps = Record<'title', string> & {
+export type MarketingReviewBoardProps = Record<'title', string> & {
   purpose: string;
   kind: MarketingReviewKind;
 };
 
-function MarketingReviewBoard({
+export function MarketingReviewBoard({
   title,
   purpose,
   kind,
@@ -257,25 +222,3 @@ function MarketingReviewBoard({
     </Box>
   );
 }
-
-export function ControlPanelDshMarketingApprovalScreen() {
-  return (
-    <MarketingReviewBoard
-      kind="approval"
-      title="اعتماد الحملات والعروض"
-      purpose="إبقاء الاعتماد ومراجعة الفيديو وبوابة الإصدار مرئية في مساحة مضغوطة."
-    />
-  );
-}
-
-export function ControlPanelDshVideoSubmissionsReviewScreen() {
-  return (
-    <MarketingReviewBoard
-      kind="video"
-      title="مراجعة تقديمات فيديو الشركاء"
-      purpose="إبقاء مراجعة الفيديو مرتبطة بقرار الإصدار بدلاً من ملخص عام."
-    />
-  );
-}
-
-export default ControlPanelDshMarketingApprovalScreen;

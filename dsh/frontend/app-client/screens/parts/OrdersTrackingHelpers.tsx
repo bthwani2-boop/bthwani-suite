@@ -1,38 +1,26 @@
 import React from 'react';
-import { Dimensions, Platform, Pressable, View } from 'react-native';
-// Removed Ionicons import
+import { Pressable, View } from 'react-native';
 import {
   Badge,
   Box,
   Button,
-  CompactStatusStepper,
   Icon,
-  Card,
-  Chip,
-  DeferredReviewBlock,
   Divider,
-  KeyValueDetails,
   KeyValueList,
   ListItem,
   MobileScrollView,
-  OperationalStatusHero,
   OrderLinkedChat,
-  SearchTopBar,
   SectionHeader,
   StatCard,
-  StickyActionBar,
   TextField,
   Surface,
   Text,
-  TopBar,
   radius,
-  safeArea,
   spacing,
   ActionStrip,
   useTheme,
 } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
-import { CancelOrderSheet } from '../sheets/CancelOrderSheet';
+import { DshOperationScreenState } from '../../parts/OperationScreen';
 import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
 import type {
   DshClientAddressSnapshot,
@@ -53,7 +41,7 @@ import { DSH_ORDER_JOURNEY_STEPS } from '../../shared/dsh-order-journey.model';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
-function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
+export function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'summary-only') {
     return 'ملخص أولًا';
   }
@@ -77,7 +65,7 @@ function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlow
   return 'سياسة غير محددة';
 }
 
-function resolveEscalationOwnerLabel(ownerSurface?: string): string {
+export function resolveEscalationOwnerLabel(ownerSurface?: string): string {
   if (ownerSurface === 'control-panel') {
     return resolveDshControlPanelSectionLabel('support');
   }
@@ -97,12 +85,12 @@ function resolveEscalationOwnerLabel(ownerSurface?: string): string {
   return ownerSurface ?? 'غير محدد';
 }
 
-type CreateOrderValues = Pick<
+export type CreateOrderValues = Pick<
   DshClientCreateOrderRequest,
   'fulfillmentMode' | 'pickupAddress' | 'dropoffAddress' | 'contactName' | 'contactPhone' | 'note'
 >;
 
-type DshOrderListItem = {
+export type DshOrderListItem = {
   id: string;
   orderNumber: string;
   title: string;
@@ -116,20 +104,20 @@ type DshOrderListItem = {
   location?: string;
 };
 
-type DshTrackingTimelineItem = {
+export type DshTrackingTimelineItem = {
   id: string;
   title: string;
   detail: string;
   done: boolean;
 };
 
-type JourneyStep = { id: string; title: string; detail: string };
+export type JourneyStep = { id: string; title: string; detail: string };
 
-type JourneyPhase = 'route' | 'arrived' | 'received';
+export type JourneyPhase = 'route' | 'arrived' | 'received';
 
-type OrderChatAttachmentKind = 'voice' | 'camera' | 'video' | 'attachment';
+export type OrderChatAttachmentKind = 'voice' | 'camera' | 'video' | 'attachment';
 
-type OrderChatAttachment = {
+export type OrderChatAttachment = {
   kind: OrderChatAttachmentKind;
   label: string;
   selectedLabel: string;
@@ -138,7 +126,7 @@ type OrderChatAttachment = {
   iconName: string;
 };
 
-type OrderChatMessage = {
+export type OrderChatMessage = {
   id: string;
   senderLabel: string;
   body: string;
@@ -173,7 +161,7 @@ export type DshTrackingScreenProps = {
   onCreateSupportEscalation?: (issueType: string, description: string) => Promise<void>;
 };
 
-type DshFlowHubScreenProps = {
+export type DshFlowHubScreenProps = {
   screenId?: string;
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
@@ -183,8 +171,7 @@ type DshFlowHubScreenProps = {
 
 export type DshIntakeHubScreenProps = DshFlowHubScreenProps;
 
-
-const defaultCreateOrderValues: CreateOrderValues = {
+export const defaultCreateOrderValues: CreateOrderValues = {
   fulfillmentMode: 'bthwani_delivery',
   pickupAddress: 'رياض بارك، البوابة 2',
   dropoffAddress: 'العليا، طريق الملك فهد',
@@ -193,9 +180,9 @@ const defaultCreateOrderValues: CreateOrderValues = {
   note: 'لا توجد ملاحظات',
 };
 
-const FULL_JOURNEY_STEPS: JourneyStep[] = DSH_ORDER_JOURNEY_STEPS;
+export const FULL_JOURNEY_STEPS: JourneyStep[] = DSH_ORDER_JOURNEY_STEPS;
 
-function getStepModeOverride(stepId: string, mode: DshFulfillmentDeliveryMode): { title: string; detail: string } | null {
+export function getStepModeOverride(stepId: string, mode: DshFulfillmentDeliveryMode): { title: string; detail: string } | null {
   if (mode === 'bthwani_delivery') {
     const overrides: Partial<Record<string, { title: string; detail: string }>> = {
       ready_for_pickup: { title: 'جاهز للاستلام', detail: 'الطلب جاهز، الكابتن في الطريق.' },
@@ -235,7 +222,7 @@ function getStepModeOverride(stepId: string, mode: DshFulfillmentDeliveryMode): 
   return null;
 }
 
-function lifecycleToStepId(status: DshClientDeliveryLifecycleStatus): string {
+export function lifecycleToStepId(status: DshClientDeliveryLifecycleStatus): string {
   switch (status) {
     case 'quote':
     case 'created': return 'order_submitted';
@@ -259,7 +246,7 @@ function lifecycleToStepId(status: DshClientDeliveryLifecycleStatus): string {
   }
 }
 
-const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttachment> = {
+export const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttachment> = {
   camera: {
     kind: 'camera',
     label: 'كاميرا',
@@ -294,7 +281,7 @@ const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderChatAttac
   },
 };
 
-const fallbackOrderListItems: DshOrderListItem[] = [
+export const fallbackOrderListItems: DshOrderListItem[] = [
   {
     id: 'order-active',
     orderNumber: '3770281',
@@ -362,11 +349,11 @@ const fallbackOrderListItems: DshOrderListItem[] = [
   },
 ];
 
-function normalizeText(value: string) {
+export function normalizeText(value: string) {
   return value.trim().toLowerCase();
 }
 
-function normalizeClientFacingOrderState(clientState: DshClientState): DshClientState {
+export function normalizeClientFacingOrderState(clientState: DshClientState): DshClientState {
   if (
     clientState === 'quote'
     || clientState === 'serviceability'
@@ -382,7 +369,7 @@ function normalizeClientFacingOrderState(clientState: DshClientState): DshClient
   return clientState;
 }
 
-const StageRail = React.memo(function StageRail({ activeStepId, steps }: { activeStepId: string; steps: JourneyStep[] }) {
+export const StageRail = React.memo(function StageRail({ activeStepId, steps }: { activeStepId: string; steps: JourneyStep[] }) {
   const { theme } = useTheme();
   const activeIndex = Math.max(0, steps.findIndex((step) => step.id === activeStepId));
 
@@ -397,7 +384,7 @@ const StageRail = React.memo(function StageRail({ activeStepId, steps }: { activ
           <Box key={step.id} layoutDirection="row" gap={3} align="center" style={{ flexDirection: 'row-reverse' }}>
             <Box style={{ width: 32, alignItems: 'center' }}>
               <Surface
-                tone={isActive ? 'brand' : isDone ? 'success' : 'default'}
+                tone={isActive ? 'brand' : 'success' ? (isDone ? 'success' : 'default') : 'default'}
                 padding={0}
                 style={{
                   width: 28,
@@ -482,7 +469,7 @@ const StageRail = React.memo(function StageRail({ activeStepId, steps }: { activ
   );
 });
 
-function formatOrderTime(isoString: string) {
+export function formatOrderTime(isoString: string) {
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
@@ -492,7 +479,7 @@ function formatOrderTime(isoString: string) {
   }
 }
 
-function formatRelativeTime(isoString: string): string {
+export function formatRelativeTime(isoString: string): string {
   try {
     const now = new Date('2026-05-17T22:26:43+03:00');
     const d = new Date(isoString);
@@ -518,7 +505,7 @@ function formatRelativeTime(isoString: string): string {
   }
 }
 
-const OrderRow = React.memo(function OrderRow({
+export const OrderRow = React.memo(function OrderRow({
   item,
   onOpenOrder,
   onReorder,
@@ -559,18 +546,6 @@ const OrderRow = React.memo(function OrderRow({
     item.location?.trim() || null,
   ].filter(Boolean).join(' • ');
 
-  const actionBtnStyle = ({ pressed }: { pressed: boolean }) => ({
-    flexDirection: 'row-reverse' as const,
-    alignItems: 'center' as const,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: theme.brand,
-    backgroundColor: pressed ? theme.brand : theme.brandSurface,
-    borderRadius: radius.pill,
-    height: 34,
-    paddingHorizontal: spacing[3],
-  });
-
   return (
     <ActionStrip
       icon={item.isActive ? 'bicycle-outline' : 'receipt-outline'}
@@ -600,7 +575,7 @@ const OrderRow = React.memo(function OrderRow({
   );
 });
 
-const RatingStars = React.memo(function RatingStars({ value, disabled, onChange }: { value: number; disabled?: boolean; onChange: (nextValue: number) => void }) {
+export const RatingStars = React.memo(function RatingStars({ value, disabled, onChange }: { value: number; disabled?: boolean; onChange: (nextValue: number) => void }) {
   const { theme } = useTheme();
 
   return (
@@ -628,7 +603,7 @@ const RatingStars = React.memo(function RatingStars({ value, disabled, onChange 
   );
 });
 
-const OrderCaptainChatSection = React.memo(function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن المكلّف' }: { phase: 'route' | 'received'; captainLabel?: string; }) {
+export const OrderCaptainChatSection = React.memo(function OrderCaptainChatSection({ phase, captainLabel = 'الكابتن المكلّف' }: { phase: 'route' | 'received'; captainLabel?: string; }) {
   const { theme } = useTheme();
   const isClosed = phase === 'received';
   const [draftMessage, setDraftMessage] = React.useState('');
@@ -816,7 +791,7 @@ const OrderCaptainChatSection = React.memo(function OrderCaptainChatSection({ ph
   );
 });
 
-function getClientWalletVisibilityCopy(clientStateMeta: ReturnType<typeof getDshClientStateMeta>) {
+export function getClientWalletVisibilityCopy(clientStateMeta: ReturnType<typeof getDshClientStateMeta>) {
   if (clientStateMeta.visibility.walletRefundVisible) {
     return {
       title: 'وضع الاسترداد',
@@ -838,7 +813,7 @@ function getClientWalletVisibilityCopy(clientStateMeta: ReturnType<typeof getDsh
   return null;
 }
 
-function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus): string {
+export function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus): string {
   const labels: Record<DshClientDeliveryLifecycleStatus, string> = {
     quote: 'التسعير والجاهزية',
     created: 'تم إنشاء الطلب',
@@ -868,7 +843,7 @@ function formatDeliveryLifecycleStatus(status: DshClientDeliveryLifecycleStatus)
   return labels[status];
 }
 
-function formatExceptionReason(reason: DshClientExceptionReason): string {
+export function formatExceptionReason(reason: DshClientExceptionReason): string {
   const labels: Record<DshClientExceptionReason, string> = {
     store_closed: 'المتجر مغلق',
     item_unavailable: 'العنصر غير متاح',
@@ -888,7 +863,7 @@ function formatExceptionReason(reason: DshClientExceptionReason): string {
   return labels[reason];
 }
 
-function formatProofType(proofType: DshClientProofOfDeliveryVisibility['proof_type']): string {
+export function formatProofType(proofType: DshClientProofOfDeliveryVisibility['proof_type']): string {
   const labels: Record<DshClientProofOfDeliveryVisibility['proof_type'], string> = {
     none: 'لا يوجد',
     photo: 'صورة',
@@ -902,7 +877,7 @@ function formatProofType(proofType: DshClientProofOfDeliveryVisibility['proof_ty
   return labels[proofType];
 }
 
-function formatVerificationResult(result: DshClientProofOfDeliveryVisibility['verification_result']): string {
+export function formatVerificationResult(result: DshClientProofOfDeliveryVisibility['verification_result']): string {
   const labels: Record<DshClientProofOfDeliveryVisibility['verification_result'], string> = {
     not_required: 'غير مطلوب',
     pending: 'قيد الانتظار',
@@ -913,7 +888,7 @@ function formatVerificationResult(result: DshClientProofOfDeliveryVisibility['ve
   return labels[result];
 }
 
-function formatFulfillmentMode(mode: DshClientFulfillmentModeSnapshot['mode']): string {
+export function formatFulfillmentMode(mode: DshClientFulfillmentModeSnapshot['mode']): string {
   const labels: Record<DshClientFulfillmentModeSnapshot['mode'], string> = {
     instant: 'فوري',
     scheduled: 'مجدول',
@@ -925,7 +900,7 @@ function formatFulfillmentMode(mode: DshClientFulfillmentModeSnapshot['mode']): 
   return labels[mode];
 }
 
-function formatCapacityState(state: DshClientFulfillmentModeSnapshot['capacity_state']): string {
+export function formatCapacityState(state: DshClientFulfillmentModeSnapshot['capacity_state']): string {
   const labels: Record<DshClientFulfillmentModeSnapshot['capacity_state'], string> = {
     available: 'متاح',
     limited: 'محدود',
@@ -936,7 +911,7 @@ function formatCapacityState(state: DshClientFulfillmentModeSnapshot['capacity_s
   return labels[state];
 }
 
-function getDefaultExceptionReason(clientState: DshClientState): DshClientExceptionReason | null {
+export function getDefaultExceptionReason(clientState: DshClientState): DshClientExceptionReason | null {
   if (clientState === 'store_closed') return 'store_closed';
   if (clientState === 'area_unserviceable') return 'area_unserviceable';
   if (clientState === 'item_unavailable') return 'item_unavailable';
@@ -947,7 +922,7 @@ function getDefaultExceptionReason(clientState: DshClientState): DshClientExcept
   return null;
 }
 
-function buildDefaultServiceabilityQuote(clientState: DshClientState): DshClientServiceabilityQuote {
+export function buildDefaultServiceabilityQuote(clientState: DshClientState): DshClientServiceabilityQuote {
   const unavailableReason = getDefaultExceptionReason(clientState);
   const insideCoverage = clientState !== 'area_unserviceable';
   const itemsAvailable = clientState !== 'item_unavailable';
@@ -967,7 +942,7 @@ function buildDefaultServiceabilityQuote(clientState: DshClientState): DshClient
   };
 }
 
-function buildDefaultAddressSnapshot(values: CreateOrderValues): DshClientAddressSnapshot {
+export function buildDefaultAddressSnapshot(values: CreateOrderValues): DshClientAddressSnapshot {
   return {
     address_label: values.dropoffAddress || 'غير محدد',
     pin_adjustment: null,
@@ -982,7 +957,7 @@ function buildDefaultAddressSnapshot(values: CreateOrderValues): DshClientAddres
   };
 }
 
-function buildDefaultFulfillmentModeSnapshot(clientState: DshClientState): DshClientFulfillmentModeSnapshot {
+export function buildDefaultFulfillmentModeSnapshot(clientState: DshClientState): DshClientFulfillmentModeSnapshot {
   return {
     mode: clientState === 'area_unserviceable' ? 'scheduled' : 'bthwani_delivery',
     available_windows: [
@@ -997,7 +972,7 @@ function buildDefaultFulfillmentModeSnapshot(clientState: DshClientState): DshCl
   };
 }
 
-function buildDefaultLifecycleStatus(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientDeliveryLifecycleStatus {
+export function buildDefaultLifecycleStatus(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientDeliveryLifecycleStatus {
   if (clientState === 'quote' || clientState === 'serviceability' || clientState === 'area_unserviceable' || clientState === 'item_unavailable' || clientState === 'payment_failed' || clientState === 'checkout_ready' || clientState === 'payment_pending') {
     return 'quote';
   }
@@ -1015,7 +990,7 @@ function buildDefaultLifecycleStatus(clientState: DshClientState, phase: Journey
   return 'enroute_to_dropoff';
 }
 
-function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTrackingTimelineItem[], phase: JourneyPhase = 'route'): DshClientEventTimelineItem[] {
+export function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTrackingTimelineItem[], phase: JourneyPhase = 'route'): DshClientEventTimelineItem[] {
   const fallbackLifecycle = buildDefaultLifecycleStatus(clientState, phase);
   const exceptionReason = getDefaultExceptionReason(clientState);
 
@@ -1073,7 +1048,7 @@ function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTra
   });
 }
 
-function buildDefaultProofOfDelivery(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientProofOfDeliveryVisibility {
+export function buildDefaultProofOfDelivery(clientState: DshClientState, phase: JourneyPhase = 'route'): DshClientProofOfDeliveryVisibility {
   if (clientState === 'delivered' || phase === 'received') {
     return {
       proof_type: 'none',
@@ -1112,7 +1087,7 @@ function buildDefaultProofOfDelivery(clientState: DshClientState, phase: Journey
   };
 }
 
-function buildDefaultHandoffVerification(): DshClientHandoffVerification {
+export function buildDefaultHandoffVerification(): DshClientHandoffVerification {
   return {
     pickup_reference: 'PK-DSH-2201',
     pickup_code_or_barcode: 'PICK-2201',
@@ -1124,7 +1099,7 @@ function buildDefaultHandoffVerification(): DshClientHandoffVerification {
   };
 }
 
-function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletImpactVisibility | null {
+export function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletImpactVisibility | null {
   if (clientState === 'refund_pending') {
     return {
       paid_amount: 148,
@@ -1170,9 +1145,9 @@ function buildDefaultWalletImpact(clientState: DshClientState): DshClientWalletI
   return null;
 }
 
-const SMART_TRACKING_SEQUENCE: DshSmartProximityState[] = ['enroute', 'near_customer', 'at_door', 'bell_rang'];
+export const SMART_TRACKING_SEQUENCE: DshSmartProximityState[] = ['enroute', 'near_customer', 'at_door', 'bell_rang'];
 
-function useSmartTrackingHeartbeat(phase: JourneyPhase): DshSmartTrackingSnapshot {
+export function useSmartTrackingHeartbeat(phase: JourneyPhase): DshSmartTrackingSnapshot {
   const [state, setState] = React.useState<DshSmartTrackingSnapshot>({
     source: 'captain_heartbeat_demo',
     cadenceMinutes: 3,
@@ -1215,7 +1190,7 @@ function useSmartTrackingHeartbeat(phase: JourneyPhase): DshSmartTrackingSnapsho
   return state;
 }
 
-const SmartTrackingCard = React.memo(function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: DshSmartTrackingSnapshot }) {
+export const SmartTrackingCard = React.memo(function SmartTrackingCard({ phase, smartTracking }: { phase: JourneyPhase; smartTracking: DshSmartTrackingSnapshot }) {
   const { theme } = useTheme();
 
   const proximityAlert = smartTracking.proximityState === 'bell_rang'
@@ -1270,7 +1245,7 @@ const SmartTrackingCard = React.memo(function SmartTrackingCard({ phase, smartTr
   );
 });
 
-function getMilestoneIndex(stepId: string): number {
+export function getMilestoneIndex(stepId: string): number {
   switch (stepId) {
     case 'order_submitted':
     case 'operations_review':
@@ -1294,7 +1269,7 @@ function getMilestoneIndex(stepId: string): number {
   }
 }
 
-const HorizontalMilestones = React.memo(function HorizontalMilestones({ activeStepId }: { activeStepId: string }) {
+export const HorizontalMilestones = React.memo(function HorizontalMilestones({ activeStepId }: { activeStepId: string }) {
   const { theme } = useTheme();
   const currentMilestone = getMilestoneIndex(activeStepId);
 
@@ -1365,7 +1340,7 @@ const HorizontalMilestones = React.memo(function HorizontalMilestones({ activeSt
   );
 });
 
-type CreateOrderJourneyScreenProps = {
+export type CreateOrderJourneyScreenProps = {
   values: CreateOrderValues;
   timeline: DshTrackingTimelineItem[];
   clientState?: DshClientState;
@@ -1381,7 +1356,7 @@ type CreateOrderJourneyScreenProps = {
   currentStatusLabel?: string;
 };
 
-function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, onCancelOrder, onCreateSupportEscalation, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
+export function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_active', fulfillmentMode, onPrimaryAction, onBack, onSupport, onNextAction, onReorder, onCancelOrder, onCreateSupportEscalation, initialPhase = 'route', currentStatusLabel }: CreateOrderJourneyScreenProps) {
   const { theme } = useTheme();
   const [phase, setPhase] = React.useState<JourneyPhase>(initialPhase);
   const resolvedMode: DshFulfillmentDeliveryMode = fulfillmentMode ?? values.fulfillmentMode ?? 'bthwani_delivery';
@@ -1493,7 +1468,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     ? FULL_JOURNEY_STEPS.map((step, index) => ({
         id: step.id,
         title: step.title,
-        state: index < activeStepIndex ? 'done' : index === activeStepIndex ? 'current' : 'next',
+        state: index < activeStepIndex ? 'done' as const : index === activeStepIndex ? 'current' as const : 'next' as const,
       }))
     : [
         { id: 'order-created', title: orderCreatedMeta.label, state: effectiveClientState === 'order_created' ? 'current' as const : 'done' as const },
@@ -1528,9 +1503,6 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   const trackingFlowSummary = getDshFlowPolicySummary('client-order-tracking');
   const issueFlowPolicy = getDshClientFlowPolicy('client-order-issue');
   const issueFlowSummary = getDshFlowPolicySummary('client-order-issue');
-  const proofPreviewLabel = proofVisibility.customer_visible && proofVisibility.proof_type !== 'none'
-    ? 'متاح من داخل الطلب عند فتحه'
-    : 'غير ظاهر تلقائيًا';
 
   const canSendMessage = phase !== 'received' && (draftMessage.trim().length > 0 || draftAttachments.length > 0);
   const chatSendLabel = draftMessage.trim().length > 0 ? 'إرسال الرسالة' : draftAttachments.length > 0 ? 'إرسال المرفقات' : 'أضف نصًا أو مرفقًا';
@@ -1568,7 +1540,6 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     : isPartnerDelivery
       ? 'يمكنك متابعة حالة التوصيل أو مراسلة موصل المتجر أو طلب الدعم عند وجود مشكلة.'
       : 'توجه إلى المتجر لاستلام طلبك، ويمكنك طلب الدعم أو الإبلاغ عن مشكلة عند الحاجة.';
-  const chatActionLabel = isBthwaniDelivery ? 'مراسلة الكابتن' : 'مراسلة موصل المتجر';
   const chatTitle = isBthwaniDelivery ? 'الدردشة مع الكابتن' : 'الدردشة مع موصل المتجر';
   const chatInputLabel = isBthwaniDelivery ? 'رسالة إلى الكابتن' : 'رسالة إلى موصل المتجر';
   const heroDetailItems = [
@@ -1607,194 +1578,121 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
     }
   };
 
-  const handlePrimaryAction = () => {
-    if (isOrderCreationState) {
-      onPrimaryAction?.();
-      return;
-    }
-
-    if (hasClientReceived) {
-      if (ratingsSubmitted) {
-        return;
-      }
-      if (productRating > 0 || captainRating > 0) {
-        setRatingsSubmitted(true);
-      } else {
-        if (onNextAction) onNextAction();
-        else if (onBack) onBack();
-      }
-      return;
-    }
-  };
-
   const handleSendMessage = () => {
-    if (!canSendMessage) {
-      return;
-    }
-
-    const body = draftMessage.trim().length
-      ? draftMessage.trim()
-      : draftAttachments.map((kind) => orderChatAttachmentOptions[kind].selectedLabel).join(' • ');
+    if (!canSendMessage) return;
 
     setLastChatMessage({
       id: `chat-client-${Date.now()}`,
       senderLabel: 'العميل',
-      body,
+      body: draftMessage.trim() || 'أرسل مرفقات سريعة للمنتج',
       time: 'الآن',
       tone: 'brand',
       align: 'end',
-      attachments: draftAttachments,
+      attachments: draftAttachments.slice(),
     });
+
     setDraftMessage('');
     setDraftAttachments([]);
   };
 
-  let primaryAction: { label: string; onPress: () => void; disabled?: boolean } | undefined = undefined;
-  let secondaryAction: { label: string; onPress: () => void; tone?: 'secondary' | 'ghost' | 'primary' } | undefined = undefined;
-  let stickyNote = '';
+  const reviewStateLabel = ratingsSubmitted
+    ? 'مكتمل ومثبّت'
+    : hasClientReceived
+      ? 'جاهز للاستلام والتقييم'
+      : 'مؤجل حتى اكتمال الطلب';
 
-  if (isOrderCreationState) {
-    primaryAction = {
-      label: effectiveClientState === 'order_created' ? 'عرض نجاح الطلب' : 'فتح التتبع',
-      onPress: () => {
-        onPrimaryAction?.();
-      },
-    };
-    secondaryAction = onBack ? { label: 'العودة إلى السلة', onPress: onBack, tone: 'secondary' } : undefined;
-    stickyNote = effectiveClientState === 'order_created'
-      ? 'تم إنشاء الطلب. هذه الشاشة مختصرة للتأكيد قبل النجاح ثم التتبع.'
-      : 'تم تأكيد الطلب. الإجراء الرئيسي ينقلك إلى التتبع مباشرة.';
-  } else if (phase === 'route') {
-    primaryAction = undefined;
-    secondaryAction = onCancelOrder ? { label: 'إلغاء الطلب', onPress: onCancelOrder, tone: 'secondary' as const } : undefined;
-    stickyNote = '';
-  } else if (phase === 'arrived') {
-    primaryAction = undefined;
-    secondaryAction = undefined;
-    stickyNote = '';
-  } else if (phase === 'received') {
-    if (ratingsSubmitted) {
-      primaryAction = {
-        label: 'تم إرسال التقييم',
-        onPress: () => {},
-        disabled: true,
-      };
-    } else if (productRating > 0 || captainRating > 0) {
-      primaryAction = {
-        label: 'إرسال التقييم',
-        onPress: handlePrimaryAction,
-      };
-    } else {
-      primaryAction = {
-        label: 'تقييم لاحقًا',
-        onPress: handlePrimaryAction,
-      };
-    }
+  const stickyNote = hasClientReceived
+    ? undefined
+    : isOrderCreationState
+      ? 'الطلب قيد المعالجة الإدارية. يمكنك الرجوع للطلبات لمتابعة المراجعة.'
+      : isPickup
+        ? 'بانتظار استلام العميل للطلب في المتجر.'
+        : isBthwaniDelivery
+          ? 'الكابتن مكلّف حالياً بتوصيل طلبك.'
+          : 'موصل المتجر مكلّف بتوصيل طلبك.';
 
-    secondaryAction = onReorder
-      ? { label: 'إعادة الطلب', onPress: onReorder, tone: 'secondary' }
-      : {
-          label: isSupportExpanded ? 'إغلاق الدعم' : 'الدعم أو الإبلاغ عن مشكلة',
-          onPress: () => setIsSupportExpanded(!isSupportExpanded),
-          tone: 'secondary',
-        };
+  const primaryAction = isTrackingJourneyState
+    ? phase === 'route'
+      ? isPickup
+        ? { label: 'استلمت الطلب', onPress: () => setPhase('received') }
+        : isBthwaniDelivery
+          ? { label: 'تنبيه الكابتن بالاقتراب', onPress: () => setHasAlertedCaptain(true) }
+          : undefined
+      : phase === 'arrived'
+        ? { label: 'تأكيد استلام الطلب', onPress: () => setPhase('received') }
+        : undefined
+    : undefined;
 
-    stickyNote = ratingsSubmitted
-      ? 'تم حفظ التقييم بنجاح. شكراً لك!'
-      : `يمكنك تقييم المنتج و${deliveryActorRatingLabel} أو التخطي بالضغط على تقييم لاحقاً.`;
-  }
+  const secondaryAction = isTrackingJourneyState
+    ? phase !== 'received'
+      ? { label: 'العودة للطلبات', onPress: onNextAction }
+      : undefined
+    : { label: 'العودة للطلبات', onPress: onNextAction };
 
-  const reviewStateLabel = phase === 'received' ? (ratingsSubmitted ? 'تم الإرسال' : 'جاهز الآن') : 'مؤجل حتى الاستلام';
-  const runtimeBottomInset = Platform.OS === 'android'
-    ? safeArea.compact
-    : safeArea.comfortable;
-  const hasStickyBar = !!(primaryAction || secondaryAction || stickyNote);
-  const contentBottomPadding = (hasStickyBar && actionBarHeight > 0 ? actionBarHeight : (hasStickyBar ? spacing[16] : spacing[4])) + runtimeBottomInset + safeArea.comfortable;
+  const hasStickyBar = !!stickyNote || !!primaryAction || !!secondaryAction;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
         variant="surface"
         title={journeyTopBarTitle}
+        actions={onBack ? [{
+          id: 'back',
+          icon: <Icon name="chevron-back" mirrored size={18} />,
+          accessibilityLabel: 'العودة',
+          onPress: onBack,
+        }] : []}
       />
 
-      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: contentBottomPadding }}>
+      <MobileScrollView
+        fill
+        padding={4}
+        gap={4}
+        contentContainerStyle={{
+          paddingBottom: safeArea.comfortable + (hasStickyBar ? actionBarHeight + spacing[6] : spacing[12]),
+        }}
+      >
+        {/* Operational Status Hero Banner */}
+        <OperationalStatusHero
+          title={heroTitle}
+          description={heroSummary}
+          items={heroDetailItems}
+          statusTone={isDeliveredState || phase === 'received' ? 'success' : 'brand'}
+        />
 
-        {/* 1. Single Main Status Card */}
-        <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-          <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
-            <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
-              <Text role="titleLg" style={{ textAlign: 'right', fontWeight: '700', color: theme.brand }}>
-                {heroTitle}
-              </Text>
-              <Text role="bodyMd" style={{ textAlign: 'right', color: theme.textSoft }}>
-                {heroSummary}
-              </Text>
-            </Box>
-          </Box>
-
-          {isTrackingJourneyState && phase !== 'received' && !isPickup && (
-            <Box layoutDirection="row" justify="flex-end" gap={2} style={{ flexDirection: 'row-reverse' }}>
-              {smartTracking.proximityState === 'near_customer' && (
-                <Chip label={`${deliveryActorLabel} قريب`} tone="warning" />
-              )}
-              {(smartTracking.proximityState === 'at_door' || smartTracking.proximityState === 'bell_rang' || phase === 'arrived') && (
-                <Chip label={`${deliveryActorLabel} وصل`} tone="success" />
-              )}
-            </Box>
-          )}
-
-          <View style={{ height: 1, backgroundColor: theme.line }} />
-
-          <KeyValueList
-            items={heroDetailItems}
-          />
-        </Surface>
-
-        <Surface tone="inset" padding={3} radiusToken="xl" gap={2}>
-            <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
-              <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
-                <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة المتابعة داخل الطلب</Text>
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  {trackingFlowSummary?.nextPolicyActionPreview ?? 'هذا العرض يبدأ بملخص التنفيذ، ويفتح التفصيل فقط عند الحاجة.'}
-                </Text>
-              </Box>
-              <Chip label={resolveClientPolicyChipLabel(trackingFlowPolicy)} tone="info" />
-            </Box>
-            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-              {`إثبات التسليم: ${proofPreviewLabel}`}
-            </Text>
-          </Surface>
-
-        {/* 2. 4-Stage Progress Bar */}
-        <Surface tone="raised" padding={3} radiusToken="xl">
+        {/* Horizontal Status Rail */}
+        <Surface tone="raised" radiusToken="xl" gap={2} padding={3}>
+          <SectionHeader title="خطوات تقدم الطلب" subtitle="مراحل رحلتك حتى وصول الطلب النهائي." />
           <HorizontalMilestones activeStepId={activeStepId} />
         </Surface>
 
-        {/* 3. Quick Actions Card */}
+        {/* Live Tracking Timeline Rail */}
+        <Surface tone="raised" radiusToken="xl" gap={3} padding={3}>
+          <SectionHeader
+            title="جدول التتبع المرئي"
+            subtitle="جدول الخطوات التي تم إكمالها والمتبقية للتوصيل."
+          />
+          <StageRail activeStepId={activeStepId} steps={timeline} />
+        </Surface>
+
+        {/* Smart Tracking card */}
+        {isTrackingJourneyState && (
+          <SmartTrackingCard phase={phase} smartTracking={smartTracking} />
+        )}
+
+        {/* 2. Communication Section */}
         <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-          <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>التواصل والمساعدة</Text>
+          <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>متابعة الطلب والدعم</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {communicationSummary}
           </Text>
 
-          <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', flexDirection: 'row-reverse' }}>
+          <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row-reverse' }}>
             {!isPickup && (
               <Button
-                label={isChatExpanded ? 'إغلاق المراسلة' : chatActionLabel}
-                tone={isChatExpanded ? 'brand' : 'secondary'}
-                leadingAccessory={<Icon name="chatbox-ellipses-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
+                label={isChatExpanded ? 'إغلاق الدردشة' : chatActionLabel}
+                leadingAccessory={<Icon name="chatbubbles-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
                 onPress={() => setIsChatExpanded(!isChatExpanded)}
-                style={{ flex: 1, minWidth: 120 }}
-              />
-            )}
-            {isBthwaniDelivery && !hasClientReceived && (
-              <Button
-                label={hasAlertedCaptain ? 'تم تنبيه الكابتن' : 'تنبيه الكابتن'}
-                tone={hasAlertedCaptain ? 'ghost' : 'secondary'}
-                disabled={hasAlertedCaptain}
-                leadingAccessory={<Icon name="notifications-outline" size={18} color={hasAlertedCaptain ? theme.textSoft : theme.brand} />}
-                onPress={() => setHasAlertedCaptain(true)}
                 style={{ flex: 1, minWidth: 120 }}
               />
             )}
@@ -2112,7 +2010,7 @@ function CreateOrderJourneyScreen({ values, timeline, clientState = 'tracking_ac
   );
 }
 
-function renderTracking(
+export function renderTracking(
   clientState: DshClientState,
   currentStatusLabel: string,
   timeline: DshTrackingTimelineItem[],
@@ -2120,7 +2018,6 @@ function renderTracking(
   onNextAction?: () => void,
   onReorder?: () => void,
 ) {
-  const { theme } = useTheme();
   const trackingStateMeta = getDshClientStateMeta(clientState);
   const activeTimelineIndex = Math.max(0, timeline.findIndex((item) => !item.done));
   const activeItem = timeline[activeTimelineIndex] ?? timeline[timeline.length - 1];
@@ -2161,7 +2058,7 @@ function renderTracking(
       <Surface tone="inset" gap={2} padding={2}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة العرض داخل الطلب</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          {trackingFlowSummary?.nextPolicyActionPreview ?? 'يبدأ هذا المسار بملخص الحالة، ويفتح التفصيل فقط عند الطلب.'}
+          {trackingFlowSummary?.nextPolicyActionPreview ?? 'يبدأ this المسار بملخص الحالة، ويفتح التفصيل فقط عند الطلب.'}
         </Text>
         <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
           {`النمط الحالي: ${resolveClientPolicyChipLabel(trackingFlowPolicy)}`}
@@ -2208,155 +2105,3 @@ function renderTracking(
     </MobileScrollView>
   );
 }
-
-
-export function DshOrdersListScreen({ items = fallbackOrderListItems, query = '', onQueryChange, onOpenOrder, onReorder, onBack, onRetry, onNextAction }: DshOrdersListScreenProps) {
-  const { theme } = useTheme();
-  const [isSearchVisible, setIsSearchVisible] = React.useState(false);
-  const normalizedQuery = normalizeText(query);
-  const visibleItems = normalizedQuery
-    ? items.filter((item) => normalizeText(`${item.title} ${item.orderNumber} ${item.statusLabel} ${item.summary || ''}`).includes(normalizedQuery))
-    : items;
-
-  const sortedItems = [...visibleItems].sort((a, b) => {
-    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-  });
-
-  return (
-    <View style={{ flex: 1, backgroundColor: theme.surface }}>
-      {isSearchVisible && onQueryChange ? (
-        <SearchTopBar
-          variant="surface"
-          value={query}
-          onChangeText={onQueryChange}
-          onClose={() => {
-            setIsSearchVisible(false);
-            onQueryChange('');
-          }}
-          placeholder="ابحث برقم الطلب أو المتجر..."
-          autoFocus
-        />
-      ) : (
-        <TopBar
-          variant="surface"
-          title="طلباتي"
-          layoutMode="balanced-secondary"
-          actions={[
-            onBack
-              ? {
-                  id: 'back',
-                  icon: <Icon name="chevron-back" mirrored size={18} color={theme.text} />,
-                  onPress: onBack,
-                  accessibilityLabel: 'العودة',
-                }
-              : null,
-            onQueryChange
-              ? {
-                  id: 'search',
-                  icon: <Icon name="search-outline" size={20} color={theme.text} />,
-                  onPress: () => setIsSearchVisible(true),
-                  accessibilityLabel: 'البحث',
-                }
-              : null,
-          ].filter(Boolean) as any}
-        />
-      )}
-      <MobileScrollView fill contentContainerStyle={{ paddingBottom: spacing[8] }}>
-        {sortedItems.length > 0 ? (
-          <View style={{ paddingTop: spacing[2] }}>
-            <Divider />
-            {sortedItems.map((item, index) => <OrderRow key={item.id} item={item} onOpenOrder={onOpenOrder} onReorder={onReorder} isLast={index === sortedItems.length - 1} />)}
-          </View>
-        ) : (
-          <View style={{ padding: spacing[4] }}>
-            <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>
-              <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>لا توجد طلبات</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>لم نعثر على أي طلب يطابق بحثك.</Text>
-              {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} style={{ marginTop: spacing[2] }} /> : null}
-              {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
-            </Surface>
-          </View>
-        )}
-      </MobileScrollView>
-    </View>
-  );
-}
-
-export function DshIntakeHubScreen({ state = 'ready', screenId = 'intake-workspace', onPrimaryAction, onSecondaryAction, onRetry }: DshIntakeHubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="قدرة مدمجة داخل تأكيد الطلب"
-      subtitle="التجهيز والتقدير ومراجعة الجاهزية تظهر داخل شاشة تأكيد الطلب أو إنشاء الطلب، وليست صفحة عميل مستقلة."
-      content={
-        <Surface tone="inset" gap={2}>
-          <Text role="bodyStrong">{screenId}</Text>
-          <Text role="bodySm" tone="muted">أي تفاصيل تخص التقدير أو بوابة الإكمال أو العروض الترويجية يجب أن تظهر داخل رحلة تأكيد الطلب القانونية فقط.</Text>
-        </Surface>
-      }
-      primaryActionLabel="فتح تأكيد الطلب"
-      secondaryActionLabel="العودة"
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction ?? onRetry}
-      onRetry={onRetry}
-    />
-  );
-}
-
-export function DshTrackingScreen({ values = defaultCreateOrderValues, clientState = 'tracking_active', currentStatusLabel, fulfillmentMode, timeline = [], onSupport, onRetry, onNextAction, onReorder, onCancelOrder, onCreateSupportEscalation }: DshTrackingScreenProps) {
-  const [cancelSheetVisible, setCancelSheetVisible] = React.useState(false);
-  const trackingStateMeta = getDshClientStateMeta(clientState);
-  const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
-    ? timeline
-    : clientState === 'tracking_active'
-      ? FULL_JOURNEY_STEPS.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }))
-      : [{ id: clientState, title: trackingStateMeta.title, detail: trackingStateMeta.description, done: false }];
-
-  if (clientState === 'delivered') {
-    return (
-      <CreateOrderJourneyScreen
-        values={values}
-        timeline={fallbackTimeline}
-        clientState={clientState}
-        fulfillmentMode={fulfillmentMode}
-        initialPhase="received"
-        currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
-        onSupport={onSupport}
-        onNextAction={onNextAction}
-        onReorder={onReorder}
-        onCreateSupportEscalation={onCreateSupportEscalation}
-        onBack={onNextAction ?? onRetry}
-      />
-    );
-  }
-
-  if (clientState !== 'tracking_active') {
-    return renderTracking(clientState, currentStatusLabel ?? trackingStateMeta.label, fallbackTimeline, onSupport, onNextAction, onReorder);
-  }
-
-  return (
-    <View style={{ flex: 1 }}>
-      <CreateOrderJourneyScreen
-        values={values}
-        timeline={fallbackTimeline}
-        clientState={clientState}
-        fulfillmentMode={fulfillmentMode}
-        initialPhase="route"
-        currentStatusLabel={currentStatusLabel ?? trackingStateMeta.label}
-        onSupport={onSupport}
-        onNextAction={onNextAction}
-        onReorder={onReorder}
-        onCancelOrder={onCancelOrder ? () => setCancelSheetVisible(true) : undefined}
-        onCreateSupportEscalation={onCreateSupportEscalation}
-        onBack={onSupport ?? onNextAction ?? onRetry}
-      />
-      <CancelOrderSheet
-        visible={cancelSheetVisible}
-        onConfirm={() => { setCancelSheetVisible(false); onCancelOrder?.(); }}
-        onCancel={() => setCancelSheetVisible(false)}
-      />
-    </View>
-  );
-}
-
-export default {};

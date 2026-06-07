@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Box,
   KeyValueList,
@@ -8,48 +8,11 @@ import {
   Surface,
   Text,
   TextField,
-  Button,
-  Chip,
-  MobileScrollView,
-  Icon,
-  useTheme,
-  spacing,
 } from '@bthwani/ui-kit';
-import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
-import {
-  getOperationsSupportFlowsForSurface,
-  getOperationsSupportSurfaceEntry,
-  type DshOperationsSupportFlowId,
-} from '../../data/support.preview-data';
-import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { DshOperationScreen, type DshOperationScreenState } from '../../parts/OperationScreen';
+import { resolveDshControlPanelSectionLabel } from '../../../shared';
 
-function resolveClientIssuePolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return 'سياسة مرتبطة بالسجل';
-}
-
-function resolveClientIssueOwnerLabel(ownerSurface?: string): string {
-  if (ownerSurface === 'control-panel') {
-    return resolveDshControlPanelSectionLabel('support');
-  }
-
-  return ownerSurface ?? 'support';
-}
-
-const clientOperationScreenIds = [
+export const clientOperationScreenIds = [
   'awnak-order-create',
   'booking-create',
   'chat-read-ack',
@@ -108,16 +71,16 @@ const clientOperationScreenIds = [
 
 export type ClientOperationScreenId = (typeof clientOperationScreenIds)[number];
 
-type ClientGeneratedOperationScreenProps = {
+export type ClientGeneratedOperationScreenProps = {
   state?: DshOperationScreenState;
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
   onRetry?: () => void;
 };
 
-type ClientOperationKind = 'create' | 'order' | 'delivery' | 'loyalty' | 'subscription' | 'proxy' | 'chat' | 'settings' | 'review';
+export type ClientOperationKind = 'create' | 'order' | 'delivery' | 'loyalty' | 'subscription' | 'proxy' | 'chat' | 'settings' | 'review';
 
-type ClientOperationCanonicalDestination =
+export type ClientOperationCanonicalDestination =
   | 'cart-get'
   | 'tracking'
   | 'benefits'
@@ -127,14 +90,14 @@ type ClientOperationCanonicalDestination =
   | 'proxy-workspace'
   | 'service-settings';
 
-type ClientOperationGroupId =
+export type ClientOperationGroupId =
   | 'create-checkout'
   | 'order-delivery'
   | 'messaging-reviews'
   | 'subscription-loyalty'
   | 'proxy-controls';
 
-type ClientOperationDefinition = {
+export type ClientOperationDefinition = {
   title: string;
   subtitle: string;
   badgeLabel: string;
@@ -203,15 +166,6 @@ const subscriptionLoyaltyIds: ClientOperationScreenId[] = [
   'subscription-sync',
   'subscription-tier-get',
   'subscription-upgrade-post',
-];
-
-const proxyControlIds: ClientOperationScreenId[] = [
-  'proxy-request-create',
-  'proxy-request-review',
-  'proxy-request-tracking',
-  'service-modes-resolve',
-  'listing-status-update',
-  'zone-set',
 ];
 
 const consolidatedCheckoutScreenIds: ClientOperationScreenId[] = [
@@ -292,14 +246,14 @@ const subtitleByKind: Record<ClientOperationKind, string> = {
   review: 'التقييم يبقى قريبًا من الطلب ليكتمل بسرعة.',
 };
 
-function humanizeScreenId(screenId: ClientOperationScreenId) {
+export function humanizeScreenId(screenId: ClientOperationScreenId) {
   return screenId
     .split('-')
     .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
     .join(' ');
 }
 
-function getOperationKind(screenId: ClientOperationScreenId): ClientOperationKind {
+export function getOperationKind(screenId: ClientOperationScreenId): ClientOperationKind {
   if (screenId === 'chat-read-ack' || screenId === 'chat-send') {
     return 'chat';
   }
@@ -335,7 +289,7 @@ function getOperationKind(screenId: ClientOperationScreenId): ClientOperationKin
   return 'order';
 }
 
-function getOperationGroup(screenId: ClientOperationScreenId): ClientOperationGroupId {
+export function getOperationGroup(screenId: ClientOperationScreenId): ClientOperationGroupId {
   if (createCheckoutIds.includes(screenId)) {
     return 'create-checkout';
   }
@@ -355,7 +309,7 @@ function getOperationGroup(screenId: ClientOperationScreenId): ClientOperationGr
   return 'proxy-controls';
 }
 
-function getOperationDefinition(screenId: ClientOperationScreenId): ClientOperationDefinition {
+export function getOperationDefinition(screenId: ClientOperationScreenId): ClientOperationDefinition {
   const kind = getOperationKind(screenId);
   const group = getOperationGroup(screenId);
   const audience = internalDiagnosticOperationIds.includes(screenId) ? 'internal' : 'client';
@@ -475,7 +429,7 @@ function primaryLabelByCanonicalDestination(destination: ClientOperationCanonica
   return 'فتح الطلبات';
 }
 
-const clientOperationDefinitions: Record<ClientOperationScreenId, ClientOperationDefinition> = Object.fromEntries(
+export const clientOperationDefinitions: Record<ClientOperationScreenId, ClientOperationDefinition> = Object.fromEntries(
   clientOperationScreenIds.map((screenId) => [screenId, getOperationDefinition(screenId)]),
 ) as Record<ClientOperationScreenId, ClientOperationDefinition>;
 
@@ -630,13 +584,13 @@ function buildOperationContent(definition: ClientOperationDefinition, draftValue
   );
 }
 
-type OperationScreenViewProps = ClientGeneratedOperationScreenProps & {
+export type OperationScreenViewProps = ClientGeneratedOperationScreenProps & {
   screenId: ClientOperationScreenId;
   primaryActionLabel?: string;
   secondaryActionLabel?: string;
 };
 
-function OperationScreenView({
+export function OperationScreenView({
   screenId,
   state = 'ready',
   onPrimaryAction,
@@ -697,309 +651,6 @@ function OperationScreenView({
       onPrimaryAction={onPrimaryAction}
       onSecondaryAction={onSecondaryAction}
       onRetry={onRetry}
-    />
-  );
-}
-
-type ConversationScreenId = 'chat-read-ack' | 'chat-send';
-
-type DshConversationHubScreenProps = {
-  screenId: ConversationScreenId;
-  // ML-011: distinguishes captain-thread vs support-thread for label clarity;
-  // does not change visual design — affects secondaryActionLabel only.
-  threadType?: 'captain-thread' | 'support-thread';
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshConversationHubScreen({ screenId, threadType, state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshConversationHubScreenProps) {
-  const threadLabel = threadType === 'captain-thread'
-    ? 'محادثة الكابتن'
-    : threadType === 'support-thread'
-    ? 'محادثة الدعم'
-    : 'المحادثة';
-
-  return (
-    <OperationScreenView
-      screenId={screenId}
-      state={state}
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      primaryActionLabel={screenId === 'chat-send' ? `إرسال رسالة · ${threadLabel}` : `تأكيد ${threadLabel}`}
-      secondaryActionLabel="العودة إلى الطلبات"
-    />
-  );
-}
-
-type DshOrderIssueHubScreenProps = {
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshOrderIssueHubScreenProps) {
-  const [selectedIssue, setSelectedIssue] = React.useState<DshOperationsSupportFlowId | null>(null);
-  const [detailsText, setDetailsText] = React.useState('');
-  const [isSubmitted, setIsSubmitted] = React.useState(false);
-  const { theme } = useTheme();
-  const issueFlowPolicy = getDshClientFlowPolicy('client-order-issue');
-  const issueFlowSummary = getDshFlowPolicySummary('client-order-issue');
-  const issueTypes = React.useMemo(
-    () =>
-      getOperationsSupportFlowsForSurface('app-client').filter((item) => {
-        const visibility = getOperationsSupportSurfaceEntry(item.flowId, 'app-client');
-        return visibility?.routeHint === 'order-issue-workspace';
-      }),
-    [],
-  );
-  const selectedFlow = selectedIssue ? issueTypes.find((item) => item.flowId === selectedIssue) ?? null : null;
-
-  if (isSubmitted) {
-    return (
-      <MobileScrollView padding={4} gap={3} style={{ backgroundColor: theme.surface }}>
-        <Box gap={3} align="center" style={{ marginTop: 40, paddingVertical: 20 }}>
-          <Box
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 36,
-              backgroundColor: theme.brandSurface,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 12,
-            }}
-          >
-            <Icon name="checkmark-circle" size={48} color={theme.brand} />
-          </Box>
-          <Text role="titleLg" style={{ textAlign: 'center' }}>تم إرسال بلاغك بنجاح</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'center', paddingHorizontal: 20 }}>
-            تلقينا تفاصيل مشكلتك وسيقوم فريق الدعم والمساعدة بمراجعة طلبك والتواصل معك في أقرب وقت ممكن.
-          </Text>
-        </Box>
-
-        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 16 }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }}>تفاصيل البلاغ:</Text>
-          <KeyValueList
-            dense
-            items={[
-              { label: 'نوع المشكلة', value: selectedFlow?.title ?? '' },
-              { label: 'الإجراء التالي', value: selectedFlow?.nextAction ?? 'بانتظار المراجعة', tone: 'brand' },
-              ...(selectedFlow?.financialImpactPreview
-                ? [{ label: 'الأثر المالي Preview', value: selectedFlow.financialImpactPreview, tone: 'info' as const }]
-                : []),
-              { label: 'تفاصيل إضافية', value: detailsText.trim() || 'لا يوجد تفاصيل إضافية' },
-            ]}
-          />
-        </Surface>
-
-        <Box gap={2} style={{ marginTop: 20 }}>
-          <Button
-            label="العودة إلى الطلبات"
-            onPress={() => {
-              onSecondaryAction?.();
-            }}
-          />
-        </Box>
-      </MobileScrollView>
-    );
-  }
-
-  const handleIssuePress = (id: DshOperationsSupportFlowId) => {
-    setSelectedIssue(selectedIssue === id ? null : id);
-  };
-
-  const handleSubmit = () => {
-    if (!selectedIssue) return;
-    setIsSubmitted(true);
-  };
-
-  return (
-    <MobileScrollView padding={4} gap={3} style={{ backgroundColor: theme.surface }}>
-      {/* Header */}
-      <Box gap={1} style={{ alignItems: 'flex-end', marginBottom: 8 }}>
-        <Text role="titleLg" style={{ textAlign: 'right' }}>الدعم والمساعدة</Text>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-          دعم العميل يبقى داخل الطلب الحالي فقط. اختر نوع المشكلة ثم أضف ملاحظة مختصرة عند الحاجة.
-        </Text>
-      </Box>
-
-      <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 20 }}>
-        <Box layoutDirection="row" justify="space-between" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-          <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة البلاغ من السجل المركزي</Text>
-            <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-              {issueFlowSummary?.nextPolicyActionPreview ?? 'الأدلة والملفات لا تُفتح إلا عند طلبها من داخل هذا البلاغ.'}
-            </Text>
-          </Box>
-          <Chip label={resolveClientIssuePolicyLabel(issueFlowPolicy)} tone="warning" />
-        </Box>
-        <KeyValueList
-          dense
-          items={[
-            { label: 'الظهور', value: issueFlowSummary?.visibility ?? 'contextual' },
-            { label: 'مالك التصعيد', value: resolveClientIssueOwnerLabel(issueFlowSummary?.escalationOwner), tone: 'brand' },
-            { label: 'الممنوع', value: issueFlowSummary?.forbiddenActions.join('، ') ?? 'لا يوجد' },
-          ]}
-        />
-      </Surface>
-
-      {/* Interactive Chips list */}
-      <Surface tone="raised" padding={3} gap={3} style={{ borderRadius: 20 }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما هي المشكلة التي تواجهها؟</Text>
-
-        <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {issueTypes.map((issue) => {
-            const isSelected = selectedIssue === issue.flowId;
-            return (
-              <Chip
-                key={issue.flowId}
-                label={issue.title}
-                tone={isSelected ? 'brand' : 'default'}
-                onPress={() => handleIssuePress(issue.flowId)}
-              />
-            );
-          })}
-        </Box>
-      </Surface>
-
-      {selectedFlow ? (
-        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 20 }}>
-          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{selectedFlow.title}</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-            {selectedFlow.description}
-          </Text>
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            {`الإجراء التالي: ${selectedFlow.nextAction}`}
-          </Text>
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            {`يفتح هذا السياق الأدلة أو المرفقات عند الطلب فقط، ولا يفتح مركز عمليات مستقل للعميل.`}
-          </Text>
-          {selectedFlow.financialImpactPreview ? (
-            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-              {`Preview only: ${selectedFlow.financialImpactPreview}`}
-            </Text>
-          ) : null}
-        </Surface>
-      ) : null}
-
-      {/* Details field */}
-      <Surface tone="raised" padding={3} gap={2} style={{ borderRadius: 20 }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right' }}>تفاصيل إضافية</Text>
-        <TextField
-          value={detailsText}
-          onChangeText={setDetailsText}
-          placeholder="اكتب ملاحظة قصيرة تساعد فريق الدعم"
-          style={{ textAlign: 'right' }}
-        />
-      </Surface>
-
-      {/* CTA Buttons */}
-      <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 20 }}>
-        <Box gap={2}>
-          <Button
-            label={selectedIssue ? 'إرسال البلاغ' : 'اختر نوع المشكلة أولاً'}
-            disabled={!selectedIssue}
-            onPress={handleSubmit}
-          />
-          <Button
-            label="العودة إلى الطلبات"
-            tone="ghost"
-            onPress={() => {
-              onSecondaryAction?.();
-            }}
-          />
-        </Box>
-      </Surface>
-    </MobileScrollView>
-  );
-}
-
-type DshProxyHubScreenProps = {
-  screenId: 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking';
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshProxyHubScreen({ screenId, state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshProxyHubScreenProps) {
-  return (
-    <OperationScreenView
-      screenId={screenId}
-      state={state}
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      primaryActionLabel={screenId === 'proxy-request-tracking' ? 'فتح التتبع' : screenId === 'proxy-request-reject' ? 'رفض الطلب' : screenId === 'proxy-request-approve' ? 'اعتماد الطلب' : screenId === 'proxy-request-review' ? 'مراجعة الطلب' : 'إنشاء طلب'}
-      secondaryActionLabel="العودة إلى الطلبات"
-    />
-  );
-}
-
-type DshServiceSettingsHubScreenProps = {
-  screenId: 'listing-status-update' | 'service-modes-resolve' | 'zone-set';
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshServiceSettingsHubScreen({ screenId, state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshServiceSettingsHubScreenProps) {
-  return (
-    <OperationScreenView
-      screenId={screenId}
-      state={state}
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      primaryActionLabel="تأكيد الإعدادات"
-      secondaryActionLabel="العودة للرئيسية"
-    />
-  );
-}
-
-type DshZoneSetScreenProps = {
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshZoneSetScreen({ state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshZoneSetScreenProps) {
-  return (
-    <OperationScreenView
-      screenId="zone-set"
-      state={state}
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      primaryActionLabel="تأكيد النطاق"
-      secondaryActionLabel="العودة للرئيسية"
-    />
-  );
-}
-
-type DshListingStatusUpdateScreenProps = {
-  state?: DshOperationScreenState;
-  onPrimaryAction?: () => void;
-  onSecondaryAction?: () => void;
-  onRetry?: () => void;
-};
-
-export function DshListingStatusUpdateScreen({ state = 'ready', onPrimaryAction, onSecondaryAction, onRetry }: DshListingStatusUpdateScreenProps) {
-  return (
-    <OperationScreenView
-      screenId="listing-status-update"
-      state={state}
-      onPrimaryAction={onPrimaryAction}
-      onSecondaryAction={onSecondaryAction}
-      onRetry={onRetry}
-      primaryActionLabel="تأكيد حالة الإدراج"
-      secondaryActionLabel="العودة للرئيسية"
     />
   );
 }

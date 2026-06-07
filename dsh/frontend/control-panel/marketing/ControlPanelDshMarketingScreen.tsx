@@ -16,8 +16,8 @@ const MarketingMediaReviewCommandDeckScreen = React.lazy(() => import('./Marketi
 const VisibilityCommandDeckScreen = React.lazy(() => import('./VisibilityCommandDeckScreen').then(m => ({ default: m.VisibilityCommandDeckScreen })));
 const TickerCommandDeckScreen = React.lazy(() => import('./TickerCommandDeckScreen').then(m => ({ default: m.TickerCommandDeckScreen })));
 const MarketingReviewQueueScreen = React.lazy(() => import('./MarketingReviewQueue').then(m => ({ default: m.MarketingReviewQueue })));
-const MarketingApprovalScreen = React.lazy(() => import('./MarketingReviewScreens').then(m => ({ default: m.ControlPanelDshMarketingApprovalScreen })));
-const VideoReviewScreen = React.lazy(() => import('./MarketingReviewScreens').then(m => ({ default: m.ControlPanelDshVideoSubmissionsReviewScreen })));
+const MarketingApprovalScreen = React.lazy(() => import('./ControlPanelDshMarketingApprovalScreen').then(m => ({ default: m.ControlPanelDshMarketingApprovalScreen })));
+const VideoReviewScreen = React.lazy(() => import('./ControlPanelDshVideoSubmissionsReviewScreen').then(m => ({ default: m.ControlPanelDshVideoSubmissionsReviewScreen })));
 
 function WorkspaceSkeleton() {
   return (
