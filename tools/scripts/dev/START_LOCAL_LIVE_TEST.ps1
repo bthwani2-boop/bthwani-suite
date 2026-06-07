@@ -1,4 +1,4 @@
-﻿param(
+param(
   [ValidateSet("dsh", "wlt", "all", "none")]
   [string]$Stack = "",
 
@@ -118,33 +118,38 @@ function Invoke-LoggedCommand {
   }
 }
 
+function Get-PortOwnerPid {
+  param([int]$Port)
+  $netstat = netstat -ano 2>$null
+  foreach ($line in $netstat) {
+    if ($line -match "LISTENING\s+(\d+)$" -and $line -match ":$Port\s+") {
+      return [int]$Matches[1]
+    }
+  }
+  return $null
+}
+
 function Stop-PortOwner {
   param([int]$Port, [string]$Label)
 
   $logFile = Join-Path $Logs "port-kill-$Port.log"
   "Checking port $Port for $Label" | Tee-Object -FilePath $logFile -Append | Out-Host
 
-  $connections = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-  if (-not $connections) {
-    "PASS: Port $Port is free for $Label" | Tee-Object -FilePath $logFile -Append | Out-Host
-    return
+  $portOwnerPid = Get-PortOwnerPid -Port $Port
+  if ($portOwnerPid -and $portOwnerPid -ne $PID) {
+    $proc = Get-Process -Id $portOwnerPid -ErrorAction SilentlyContinue
+    if ($proc) {
+      "KILL: Port $Port / $Label is used by PID=$portOwnerPid Name=$($proc.ProcessName)" |
+        Tee-Object -FilePath $logFile -Append | Out-Host
+      Stop-Process -Id $portOwnerPid -Force -ErrorAction SilentlyContinue
+      Start-Sleep -Milliseconds 500
+    }
   }
 
-  $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique | Where-Object { $_ -and $_ -ne $PID }
-
-  foreach ($processId in $pids) {
-    $proc = Get-Process -Id $processId -ErrorAction SilentlyContinue
-    if (-not $proc) { continue }
-
-    "KILL: Port $Port / $Label is used by PID=$processId Name=$($proc.ProcessName)" |
-      Tee-Object -FilePath $logFile -Append | Out-Host
-
-    Stop-Process -Id $processId -Force -ErrorAction Stop
-    Start-Sleep -Milliseconds 800
+  $portOwnerPid = Get-PortOwnerPid -Port $Port
+  if ($portOwnerPid -and $portOwnerPid -ne $PID) {
+    throw "Port $Port is still in use for $Label by PID $portOwnerPid."
   }
-
-  $stillUsed = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-  if ($stillUsed) { throw "Port $Port is still in use for $Label." }
 
   "PASS: Port $Port is now free for $Label" | Tee-Object -FilePath $logFile -Append | Out-Host
 }
@@ -156,8 +161,17 @@ function Wait-TcpPort {
   Write-RunLog "Waiting for $Label on port $Port..."
 
   while ((Get-Date) -lt $deadline) {
-    $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-    if ($conn) {
+    $client = New-Object System.Net.Sockets.TcpClient
+    $connected = $false
+    try {
+      $client.Connect("127.0.0.1", $Port) | Out-Null
+      $connected = $true
+    } catch {}
+    finally {
+      if ($client) { $client.Close() }
+    }
+
+    if ($connected) {
       Write-RunLog "READY: $Label is listening on port $Port"
       return
     }
@@ -234,65 +248,127 @@ expected_containers=$($plan.Expected -join ',')
   return $plan
 }
 
+function Invoke-AdbReverseWithTimeout {
+  param(
+    [string]$Serial,
+    [int]$Port,
+    [int]$TimeoutSeconds = 2
+  )
+
+  $adbArgs = @()
+  if (-not [string]::IsNullOrWhiteSpace($Serial)) { $adbArgs = @("-s", $Serial) }
+  $adbArgs += @("reverse", "tcp:$Port", "tcp:$Port")
+
+  Write-Host "Reversing port $Port..."
+
+  $proc = Start-Process adb -ArgumentList $adbArgs -NoNewWindow -PassThru -ErrorAction SilentlyContinue
+  if (-not $proc) {
+    Write-Warning "Failed to start adb process for port $Port."
+    return
+  }
+
+  $proc | Wait-Process -Timeout $TimeoutSeconds -ErrorAction SilentlyContinue | Out-Null
+  if (-not $proc.HasExited) {
+    Write-Warning "ADB reverse for port $Port timed out. Terminating process."
+    $proc | Stop-Process -Force -ErrorAction SilentlyContinue | Out-Null
+  }
+}
+
 function Invoke-AdbSetup {
-  param([int]$DshPort, [int]$AppClientPort, [int]$AppPartnerPort, [int]$AppCaptainPort, [int]$AppFieldPort, [int]$ControlPanelPort)
+  param([int]$DshPort, [int]$WltPort, [int]$AppClientPort, [int]$AppPartnerPort, [int]$AppCaptainPort, [int]$AppFieldPort, [int]$ControlPanelPort)
 
-  $adbMode = (Get-LocalEnv "ADB_MODE" "usb").ToLowerInvariant()
-  $usbSerial = Get-LocalEnv "ADB_SERIAL" ""
-  $wifiPort = Get-LocalEnv "ADB_WIFI_PORT" "5555"
+  if (-not (Get-Command adb -ErrorAction SilentlyContinue)) {
+    Write-Warning "adb not found in PATH. Skipping ADB setup."
+    return ""
+  }
 
-  if (-not (Get-Command adb -ErrorAction SilentlyContinue)) { throw "adb not found in PATH." }
+  $devices = & adb devices 2>$null
+  $hasDevices = $false
+  foreach ($line in $devices) {
+    if ($line -match "\b(device|unauthorized|authorizing|offline)\b") {
+      $hasDevices = $true
+      break
+    }
+  }
 
-  $runtimeSerial = $usbSerial
-  Write-RunLog "ADB mode: $adbMode"
+  if (-not $hasDevices) {
+    Write-RunLog "WARNING: No active ADB devices connected. Skipping ADB port forwarding."
+    return ""
+  }
 
-  if ($adbMode -eq "wifi") {
-    if ([string]::IsNullOrWhiteSpace($usbSerial)) { throw "ADB_MODE=wifi requires ADB_SERIAL." }
+  $adbTarget = Get-LocalEnv "ADB_TARGET" ""
+  $runtimeSerial = ""
 
-    Invoke-LoggedCommand "adb-wifi-connect.log" {
-      adb -s $usbSerial devices
-      $a4 = & adb -s $usbSerial shell "ip -4 addr show wlan0 2>/dev/null || true" 2>$null
-      $ip = ([regex]::Match(($a4 | Out-String), "inet\s+(\d{1,3}(?:\.\d{1,3}){3})\/")).Groups[1].Value
-      if (-not $ip) { throw "No IPv4 on wlan0." }
+  if (-not [string]::IsNullOrWhiteSpace($adbTarget)) {
+    Write-RunLog "Using ADB_TARGET override: $adbTarget"
+    $runtimeSerial = $adbTarget
+    if ($adbTarget -match ":\d+") {
+      Invoke-LoggedCommand "adb-wifi-connect.log" {
+        adb connect $adbTarget
+        Start-Sleep -Milliseconds 500
+      }
+    }
+  } else {
+    $adbMode = (Get-LocalEnv "ADB_MODE" "usb").ToLowerInvariant()
+    $usbSerial = Get-LocalEnv "ADB_SERIAL" ""
+    $wifiPort = Get-LocalEnv "ADB_WIFI_PORT" "5555"
 
-      adb -s $usbSerial tcpip $wifiPort
-      Start-Sleep -Milliseconds 900
-      $wifiSerial = "$ip`:$wifiPort"
-      adb connect $wifiSerial
-      Start-Sleep -Milliseconds 500
+    $runtimeSerial = $usbSerial
+    Write-RunLog "ADB mode: $adbMode"
 
-      $dev = (adb devices) -join "`n"
-      if ($dev -notmatch [regex]::Escape($wifiSerial)) { throw "Wi-Fi endpoint not listed: $wifiSerial" }
+    if ($adbMode -eq "wifi") {
+      if ([string]::IsNullOrWhiteSpace($usbSerial)) { throw "ADB_MODE=wifi requires ADB_SERIAL." }
 
-      $script:AdbRuntimeSerial = $wifiSerial
-      Write-Host "ADB Wi-Fi connected: $wifiSerial"
+      Invoke-LoggedCommand "adb-wifi-connect.log" {
+        adb -s $usbSerial devices
+        $a4 = & adb -s $usbSerial shell "ip -4 addr show wlan0 2>/dev/null || true" 2>$null
+        $ip = ([regex]::Match(($a4 | Out-String), "inet\s+(\d{1,3}(?:\.\d{1,3}){3})\/")).Groups[1].Value
+        if (-not $ip) { throw "No IPv4 on wlan0." }
+
+        adb -s $usbSerial tcpip $wifiPort
+        Start-Sleep -Milliseconds 900
+        $wifiSerial = "$ip`:$wifiPort"
+        adb connect $wifiSerial
+        Start-Sleep -Milliseconds 500
+
+        $dev = (adb devices) -join "`n"
+        if ($dev -notmatch [regex]::Escape($wifiSerial)) { throw "Wi-Fi endpoint not listed: $wifiSerial" }
+
+        $script:AdbRuntimeSerial = $wifiSerial
+        Write-Host "ADB Wi-Fi connected: $wifiSerial"
+      }
+
+      $runtimeSerial = $script:AdbRuntimeSerial
+    } elseif ($adbMode -eq "usb") {
+      Invoke-LoggedCommand "adb-usb-check.log" { adb devices }
+    } else {
+      throw "Unsupported ADB_MODE: $adbMode. Use usb or wifi."
     }
 
-    $runtimeSerial = $script:AdbRuntimeSerial
-  } elseif ($adbMode -eq "usb") {
-    Invoke-LoggedCommand "adb-usb-check.log" { adb devices }
-  } else {
-    throw "Unsupported ADB_MODE: $adbMode. Use usb or wifi."
+    if ([string]::IsNullOrWhiteSpace($runtimeSerial)) { $runtimeSerial = $usbSerial }
   }
 
   Invoke-LoggedCommand "adb-reverse.log" {
-    if ([string]::IsNullOrWhiteSpace($runtimeSerial)) {
-      adb reverse tcp:$DshPort tcp:$DshPort
-      adb reverse tcp:$AppClientPort tcp:$AppClientPort
-      adb reverse tcp:$AppPartnerPort tcp:$AppPartnerPort
-      adb reverse tcp:$AppCaptainPort tcp:$AppCaptainPort
-      adb reverse tcp:$AppFieldPort tcp:$AppFieldPort
-      adb reverse tcp:$ControlPanelPort tcp:$ControlPanelPort
-      adb reverse --list
-    } else {
-      adb -s $runtimeSerial reverse tcp:$DshPort tcp:$DshPort
-      adb -s $runtimeSerial reverse tcp:$AppClientPort tcp:$AppClientPort
-      adb -s $runtimeSerial reverse tcp:$AppPartnerPort tcp:$AppPartnerPort
-      adb -s $runtimeSerial reverse tcp:$AppCaptainPort tcp:$AppCaptainPort
-      adb -s $runtimeSerial reverse tcp:$AppFieldPort tcp:$AppFieldPort
-      adb -s $runtimeSerial reverse tcp:$ControlPanelPort tcp:$ControlPanelPort
-      adb -s $runtimeSerial reverse --list
-    }
+    Write-Host "Applying ADB reverse for serial: $runtimeSerial"
+    $adbArgs = @()
+    if (-not [string]::IsNullOrWhiteSpace($runtimeSerial)) { $adbArgs = @("-s", $runtimeSerial) }
+
+    & adb @adbArgs devices 2>&1 | Out-Host
+
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $DshPort
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $WltPort
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port 8092 # Auth Service
+
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $AppClientPort
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $AppPartnerPort
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $AppCaptainPort
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $AppFieldPort
+    Invoke-AdbReverseWithTimeout -Serial $runtimeSerial -Port $ControlPanelPort
+
+    & adb @adbArgs reverse --list 2>&1 | Out-Host
+
+    # Prevent temporary ADB handshake exit codes from throwing and aborting the launcher
+    $global:LASTEXITCODE = 0
   }
 
   return $runtimeSerial
@@ -339,16 +415,18 @@ $AppPartnerPort = [int](Get-LocalEnv "APP_PARTNER_PORT" "8082")
 $AppCaptainPort = [int](Get-LocalEnv "APP_CAPTAIN_PORT" "8083")
 $AppFieldPort = [int](Get-LocalEnv "APP_FIELD_PORT" "8084")
 $ControlPanelPort = [int](Get-LocalEnv "CONTROL_PANEL_PORT" "3000")
+$WltPort = [int](Get-LocalEnv "WLT_API_PORT" "8090")
+$WltPostgresPort = Get-LocalEnv "WLT_POSTGRES_PORT" "56433"
+$WltDatabaseUrl = Get-LocalEnv "WLT_DATABASE_URL" "postgres://wlt_local:wlt_local_password@localhost:$WltPostgresPort/wlt_local?sslmode=disable"
 $ExpoHost = Get-LocalEnv "EXPO_HOST" "localhost"
 $ExpoClear = (Get-LocalEnv "EXPO_CLEAR" "0") -eq "1"
 
 Assert-LocalPath "docker-compose.local.yml" "root compose" | Out-Null
-Assert-LocalPath "dsh\backend" "DSH backend" | Out-Null
-Assert-LocalPath "app-client\runtime" "app-client runtime" | Out-Null
-Assert-LocalPath "app-partner\runtime" "app-partner runtime" | Out-Null
-Assert-LocalPath "app-captain\runtime" "app-captain runtime" | Out-Null
-Assert-LocalPath "app-field\runtime" "app-field runtime" | Out-Null
-Assert-LocalPath "control-panel\runtime" "control-panel runtime" | Out-Null
+$AppClientRuntime = Assert-LocalPath "app-client\runtime" "app-client runtime"
+$AppPartnerRuntime = Assert-LocalPath "app-partner\runtime" "app-partner runtime"
+$AppCaptainRuntime = Assert-LocalPath "app-captain\runtime" "app-captain runtime"
+$AppFieldRuntime = Assert-LocalPath "app-field\runtime" "app-field runtime"
+$ControlPanelRuntime = Assert-LocalPath "control-panel\runtime" "control-panel runtime"
 
 Write-RunLog "Session started: $SessionId"
 Write-RunLog "Evidence root: $RunRoot"
@@ -357,14 +435,11 @@ Write-RunLog "Stack=$Stack Addons=$Addons"
 git --no-pager status --short | Out-File -Encoding utf8 (Join-Path $RunRoot "git-status-before.txt")
 git --no-pager diff --check 2>&1 | Out-File -Encoding utf8 (Join-Path $RunRoot "git-diff-check-before.txt")
 
-$devPorts = @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort)
-Get-NetTCPConnection -ErrorAction SilentlyContinue |
-  Where-Object { $_.LocalPort -in $devPorts } |
-  Select-Object LocalAddress, LocalPort, State, OwningProcess |
-  Out-File -Encoding utf8 (Join-Path $RunRoot "ports-before.txt")
+netstat -ano | Out-File -Encoding utf8 (Join-Path $RunRoot "ports-before.txt")
 
 if (-not $NoKillPorts) {
   Stop-PortOwner -Port $DshPort -Label "DSH Go API"
+  Stop-PortOwner -Port $WltPort -Label "WLT Go API"
   Stop-PortOwner -Port $AppClientPort -Label "app-client Expo"
   Stop-PortOwner -Port $AppPartnerPort -Label "app-partner Expo"
   Stop-PortOwner -Port $AppCaptainPort -Label "app-captain Expo"
@@ -375,16 +450,33 @@ if (-not $NoKillPorts) {
 Invoke-DockerComposeUp -StackMode $Stack -AddonsMode $Addons | Out-Null
 
 $goLog = SafeLogPath "go-api.log"
-Start-LiveWindow "BThwani DSH Go API :$DshPort" (Join-Path $Root "dsh\backend") @"
+Start-LiveWindow "BThwani DSH Go API :$DshPort" $Root @"
 `$env:PORT = '$DshPort'
 `$env:DATABASE_URL = '$DatabaseUrl'
-go run ./cmd/dsh-api 2>&1 | Tee-Object -FilePath '$goLog' -Append
+`$env:DSH_AUTH_SERVICE_URL = 'http://localhost:8092'
+go -C .\dsh\backend run .\cmd\dsh-api 2>&1 | Tee-Object -FilePath '$goLog' -Append
 "@
 Wait-TcpPort -Port $DshPort -Label "DSH Go API" -TimeoutSeconds 120
 
+if (Test-Path -LiteralPath '.\wlt\backend\cmd\wlt-api\main.go') {
+  $goWltLog = SafeLogPath "wlt-api.log"
+  Start-LiveWindow "BThwani WLT Go API :$WltPort" $Root @"
+`$env:PORT = '$WltPort'
+`$env:DATABASE_URL = '$WltDatabaseUrl'
+`$env:WLT_AUTH_MODE = 'production'
+`$env:WLT_AUTH_SERVICE_URL = 'http://localhost:8092'
+`$env:WLT_CALLBACK_SECRET = 'dev-secret'
+`$env:WLT_DSH_BASE_URL = '$DshBaseUrl'
+go -C .\wlt\backend run .\cmd\wlt-api 2>&1 | Tee-Object -FilePath '$goWltLog' -Append
+"@
+  Wait-TcpPort -Port $WltPort -Label "WLT Go API" -TimeoutSeconds 120
+} else {
+  Write-Host 'WLT_API=NOT_AVAILABLE_IN_THIS_BRANCH'
+}
+
 Invoke-LoggedCommand "api-smoke-stores.log" { Invoke-WebRequest "http://127.0.0.1:$DshPort/stores" -UseBasicParsing }
 
-$AdbRuntimeSerial = Invoke-AdbSetup -DshPort $DshPort -AppClientPort $AppClientPort -AppPartnerPort $AppPartnerPort -AppCaptainPort $AppCaptainPort -AppFieldPort $AppFieldPort -ControlPanelPort $ControlPanelPort
+$AdbRuntimeSerial = Invoke-AdbSetup -DshPort $DshPort -WltPort $WltPort -AppClientPort $AppClientPort -AppPartnerPort $AppPartnerPort -AppCaptainPort $AppCaptainPort -AppFieldPort $AppFieldPort -ControlPanelPort $ControlPanelPort
 Start-ScrcpyIfEnabled -RuntimeSerial $AdbRuntimeSerial
 
 if ($ClearMetroOnce) {
@@ -402,27 +494,27 @@ $appCaptainLog = SafeLogPath "app-captain.log"
 $appFieldLog = SafeLogPath "app-field.log"
 $controlPanelLog = SafeLogPath "control-panel.log"
 
-Start-LiveWindow "BThwani app-client :$AppClientPort" $Root @"
+Start-LiveWindow "BThwani app-client :$AppClientPort" $AppClientRuntime @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
-pnpm --dir app-client/runtime exec expo start --dev-client --host $ExpoHost --port $AppClientPort$clearArg 2>&1 | Tee-Object -FilePath '$appClientLog' -Append
+pnpm exec expo start --dev-client --host $ExpoHost --port $AppClientPort$clearArg 2>&1 | Tee-Object -FilePath '$appClientLog' -Append
 "@
 Wait-TcpPort -Port $AppClientPort -Label "app-client Metro" -TimeoutSeconds 180
 
-Start-LiveWindow "BThwani app-partner :$AppPartnerPort" $Root @"
+Start-LiveWindow "BThwani app-partner :$AppPartnerPort" $AppPartnerRuntime @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
-pnpm --dir app-partner/runtime exec expo start --dev-client --host $ExpoHost --port $AppPartnerPort$clearArg 2>&1 | Tee-Object -FilePath '$appPartnerLog' -Append
+pnpm exec expo start --dev-client --host $ExpoHost --port $AppPartnerPort$clearArg 2>&1 | Tee-Object -FilePath '$appPartnerLog' -Append
 "@
 Wait-TcpPort -Port $AppPartnerPort -Label "app-partner Metro" -TimeoutSeconds 180
 
-Start-LiveWindow "BThwani app-captain :$AppCaptainPort" $Root @"
+Start-LiveWindow "BThwani app-captain :$AppCaptainPort" $AppCaptainRuntime @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
-pnpm --dir app-captain/runtime exec expo start --dev-client --host $ExpoHost --port $AppCaptainPort$clearArg 2>&1 | Tee-Object -FilePath '$appCaptainLog' -Append
+pnpm exec expo start --dev-client --host $ExpoHost --port $AppCaptainPort$clearArg 2>&1 | Tee-Object -FilePath '$appCaptainLog' -Append
 "@
 Wait-TcpPort -Port $AppCaptainPort -Label "app-captain Metro" -TimeoutSeconds 180
 
-Start-LiveWindow "BThwani app-field :$AppFieldPort" $Root @"
+Start-LiveWindow "BThwani app-field :$AppFieldPort" $AppFieldRuntime @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
-pnpm --dir app-field/runtime exec expo start --dev-client --host $ExpoHost --port $AppFieldPort$clearArg 2>&1 | Tee-Object -FilePath '$appFieldLog' -Append
+pnpm exec expo start --dev-client --host $ExpoHost --port $AppFieldPort$clearArg 2>&1 | Tee-Object -FilePath '$appFieldLog' -Append
 "@
 Wait-TcpPort -Port $AppFieldPort -Label "app-field Metro" -TimeoutSeconds 180
 
@@ -467,4 +559,4 @@ Write-Host "Evidence: $RunRoot"
 Write-Host "ZIP: $ZipPath"
 Write-Host "ADB Runtime Serial: $AdbRuntimeSerial"
 Write-Host ""
-Write-Host "ابدأ الآن تجربة طلب حقيقي واحد من app-client وتتبع نفس orderId في بقية الأسطح."
+Write-Host "Start a real trial order from app-client and trace the same orderId across other surfaces."
