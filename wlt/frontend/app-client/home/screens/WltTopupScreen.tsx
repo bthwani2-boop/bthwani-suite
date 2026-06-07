@@ -3,6 +3,7 @@ import { ScrollView } from 'react-native';
 import { ScreenWrapper, ScreenState, Text, useI18n, Dialog } from '@bthwani/ui-kit';
 import { AmountInput, PaymentMethodList, SummaryCard, QuickAmountGrid, Button, TextField, amountToArabicText } from '@bthwani/ui-kit';
 import { financeProviders } from '../../../control-panel/dsh/financeContracts';
+import { createWltDshTypedClient } from '../../../contracts';
 
 export const WltTopupScreen: React.FC = () => {
   const { t } = useI18n();
@@ -15,6 +16,8 @@ export const WltTopupScreen: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<string | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(false);
 
+  const client = useMemo(() => createWltDshTypedClient({ devClientId: 'client-demo' }), []);
+
   const methods = useMemo(() => (
     financeProviders.map((p) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
@@ -22,11 +25,28 @@ export const WltTopupScreen: React.FC = () => {
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);
   const canSubmit = topupAmount > 0 && !!paymentMethod;
 
-  const handleTopup = () => {
+  const handleTopup = async () => {
     if (!canSubmit) return setDialogVisible(true);
-    // short mocked flow: show loading then success
     setState('loading');
-    setTimeout(() => setState('success'), 1000);
+    try {
+      const session = await client.createClientPaymentSession({
+        checkout_intent_id: `topup-${Date.now()}`,
+        client_id: 'client-demo',
+        amount: topupAmount,
+        currency: 'YER',
+        payment_method: paymentMethod ?? 'wallet',
+        idempotency_key: `topup-idem-${Date.now()}-${topupAmount}`,
+      });
+
+      await client.confirmPaymentSession(session.id, `ref-topup-${Date.now()}`);
+
+      setState('success');
+      setAmount('');
+      setPaymentMethod(undefined);
+    } catch (err) {
+      console.error('Failed to top up:', err);
+      setState('error');
+    }
   };
 
   const summaryItems = [

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"bthwani.local/wlt/domain"
@@ -115,6 +116,12 @@ FROM wlt_payment_sessions WHERE idempotency_key = $1`
 }
 
 func (r *PostgresRepository) ConfirmPaymentSession(ctx context.Context, id string, req domain.ConfirmPaymentRequest) (domain.PaymentSession, error) {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return domain.PaymentSession{}, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+
 	n := time.Now().UTC()
 	const q = `
 UPDATE wlt_payment_sessions
@@ -125,12 +132,81 @@ RETURNING id, checkout_intent_id, client_id, amount, currency, status, payment_m
           created_at, expires_at, confirmed_at, failed_at`
 
 	var ps domain.PaymentSession
-	if err := scanPaymentSession(r.pool.QueryRow(ctx, q, domain.PaymentStatusConfirmed, n, req.ProviderRef, id), &ps); err != nil {
+	if err := scanPaymentSession(tx.QueryRow(ctx, q, domain.PaymentStatusConfirmed, n, req.ProviderRef, id), &ps); err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.PaymentSession{}, fmt.Errorf("payment session not found or not in PENDING state")
 		}
 		return domain.PaymentSession{}, fmt.Errorf("wlt postgres: confirm payment session: %w", err)
 	}
+
+	isTopup := strings.HasPrefix(strings.ToLower(ps.CheckoutIntentID), "topup") || strings.HasPrefix(strings.ToLower(ps.CheckoutIntentID), "dsh-client-topup")
+
+	if isTopup {
+		var walletID string
+		var currentBalance float64
+		err := tx.QueryRow(ctx, `
+			INSERT INTO wlt_wallets (id, subject, actor_type, balance, currency, created_at, updated_at)
+			VALUES ($1, $2, 'client', 0, 'YER', $3, $3)
+			ON CONFLICT (subject) DO UPDATE SET updated_at = EXCLUDED.updated_at
+			RETURNING id, balance`, pgNewID("wal"), ps.ClientID, n).Scan(&walletID, &currentBalance)
+		if err != nil {
+			return domain.PaymentSession{}, fmt.Errorf("get/create wallet for topup: %w", err)
+		}
+
+		newBalance := currentBalance + ps.Amount
+		_, err = tx.Exec(ctx, `UPDATE wlt_wallets SET balance = $1, updated_at = $2 WHERE id = $3`, newBalance, n, walletID)
+		if err != nil {
+			return domain.PaymentSession{}, fmt.Errorf("update wallet balance: %w", err)
+		}
+
+		ledgerID := pgNewID("led")
+		_, err = tx.Exec(ctx, `
+			INSERT INTO wlt_ledger
+			  (id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id,
+			   order_id, description, status, created_at, completed_at)
+			VALUES ($1, $2, $3, 'CREDIT', $4, $5, 'payment_session', $6, $7, $8, 'COMPLETED', $9, $9)`,
+			ledgerID, walletID, ps.ClientID, ps.Amount, ps.Currency, ps.ID, ps.CheckoutIntentID, "Wallet top-up via "+ps.PaymentMethod, n)
+		if err != nil {
+			return domain.PaymentSession{}, fmt.Errorf("create topup ledger entry: %w", err)
+		}
+	} else {
+		if ps.PaymentMethod == "wallet" {
+			var walletID string
+			var currentBalance float64
+			err := tx.QueryRow(ctx, `SELECT id, balance FROM wlt_wallets WHERE subject = $1`, ps.ClientID).Scan(&walletID, &currentBalance)
+			if err == pgx.ErrNoRows {
+				return domain.PaymentSession{}, fmt.Errorf("wallet not found for client: %s", ps.ClientID)
+			} else if err != nil {
+				return domain.PaymentSession{}, fmt.Errorf("get wallet: %w", err)
+			}
+
+			if currentBalance < ps.Amount {
+				return domain.PaymentSession{}, fmt.Errorf("insufficient balance: current=%.2f required=%.2f", currentBalance, ps.Amount)
+			}
+
+			newBalance := currentBalance - ps.Amount
+			_, err = tx.Exec(ctx, `UPDATE wlt_wallets SET balance = $1, updated_at = $2 WHERE id = $3`, newBalance, n, walletID)
+			if err != nil {
+				return domain.PaymentSession{}, fmt.Errorf("update wallet balance: %w", err)
+			}
+
+			ledgerID := pgNewID("led")
+			_, err = tx.Exec(ctx, `
+				INSERT INTO wlt_ledger
+				  (id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id,
+				   order_id, description, status, created_at, completed_at)
+				VALUES ($1, $2, $3, 'DEBIT', $4, $5, 'payment_session', $6, $7, $8, 'COMPLETED', $9, $9)`,
+				ledgerID, walletID, ps.ClientID, ps.Amount, ps.Currency, ps.ID, ps.CheckoutIntentID, "Payment for order checkout", n)
+			if err != nil {
+				return domain.PaymentSession{}, fmt.Errorf("create payment ledger entry: %w", err)
+			}
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return domain.PaymentSession{}, fmt.Errorf("commit confirm transaction: %w", err)
+	}
+
 	return ps, nil
 }
 
@@ -254,6 +330,12 @@ RETURNING id, order_id, payment_session_id, client_id, amount, currency, reason,
 }
 
 func (r *PostgresRepository) ConfirmRefund(ctx context.Context, id string) (domain.Refund, error) {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return domain.Refund{}, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+
 	n := time.Now().UTC()
 	const q = `
 UPDATE wlt_refunds SET status = $1, updated_at = $2, completed_at = $2
@@ -262,12 +344,45 @@ RETURNING id, order_id, payment_session_id, client_id, amount, currency, reason,
           status, trigger_ref, dsh_base_url, dsh_callback_sent_at, idempotency_key,
           failure_reason, created_at, updated_at, completed_at`
 	var ref domain.Refund
-	if err := scanRefund(r.pool.QueryRow(ctx, q, domain.RefundStatusConfirmed, n, id), &ref); err != nil {
+	if err := scanRefund(tx.QueryRow(ctx, q, domain.RefundStatusConfirmed, n, id), &ref); err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.Refund{}, fmt.Errorf("refund not found or not in PROCESSING state")
 		}
 		return domain.Refund{}, fmt.Errorf("wlt postgres: confirm refund: %w", err)
 	}
+
+	var walletID string
+	var currentBalance float64
+	err = tx.QueryRow(ctx, `
+		INSERT INTO wlt_wallets (id, subject, actor_type, balance, currency, created_at, updated_at)
+		VALUES ($1, $2, 'client', 0, 'YER', $3, $3)
+		ON CONFLICT (subject) DO UPDATE SET updated_at = EXCLUDED.updated_at
+		RETURNING id, balance`, pgNewID("wal"), ref.ClientID, n).Scan(&walletID, &currentBalance)
+	if err != nil {
+		return domain.Refund{}, fmt.Errorf("get/create wallet for refund: %w", err)
+	}
+
+	newBalance := currentBalance + ref.Amount
+	_, err = tx.Exec(ctx, `UPDATE wlt_wallets SET balance = $1, updated_at = $2 WHERE id = $3`, newBalance, n, walletID)
+	if err != nil {
+		return domain.Refund{}, fmt.Errorf("update wallet balance: %w", err)
+	}
+
+	ledgerID := pgNewID("led")
+	_, err = tx.Exec(ctx, `
+		INSERT INTO wlt_ledger
+		  (id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id,
+		   order_id, description, status, created_at, completed_at)
+		VALUES ($1, $2, $3, 'CREDIT', $4, $5, 'refund', $6, $7, $8, 'COMPLETED', $9, $9)`,
+		ledgerID, walletID, ref.ClientID, ref.Amount, ref.Currency, ref.ID, ref.OrderID, "Refund for order: "+ref.OrderID, n)
+	if err != nil {
+		return domain.Refund{}, fmt.Errorf("create refund ledger entry: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Refund{}, fmt.Errorf("commit refund transaction: %w", err)
+	}
+
 	return ref, nil
 }
 
@@ -487,6 +602,12 @@ RETURNING id, order_id, partner_id, captain_id, gross_amount, platform_fee, part
 }
 
 func (r *PostgresRepository) CompleteSettlement(ctx context.Context, id string) (domain.Settlement, error) {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return domain.Settlement{}, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+
 	n := time.Now().UTC()
 	const q = `
 UPDATE wlt_settlements SET status = $1, updated_at = $2, completed_at = $2
@@ -494,13 +615,79 @@ WHERE id = $3 AND status = 'PROCESSING'
 RETURNING id, order_id, partner_id, captain_id, gross_amount, platform_fee, partner_payout,
           captain_payout, currency, status, idempotency_key, dsh_base_url, dsh_callback_sent_at,
           failure_reason, created_at, updated_at, completed_at`
+
 	var s domain.Settlement
-	if err := scanSettlement(r.pool.QueryRow(ctx, q, domain.SettlementStatusCompleted, n, id), &s); err != nil {
+	if err := scanSettlement(tx.QueryRow(ctx, q, domain.SettlementStatusCompleted, n, id), &s); err != nil {
 		if err == pgx.ErrNoRows {
 			return domain.Settlement{}, fmt.Errorf("settlement not found or not in PROCESSING state")
 		}
 		return domain.Settlement{}, fmt.Errorf("wlt postgres: complete settlement: %w", err)
 	}
+
+	if s.PartnerPayout > 0 {
+		var walletID string
+		var currentBalance float64
+		err = tx.QueryRow(ctx, `
+			INSERT INTO wlt_wallets (id, subject, actor_type, balance, currency, created_at, updated_at)
+			VALUES ($1, $2, 'partner', 0, 'YER', $3, $3)
+			ON CONFLICT (subject) DO UPDATE SET updated_at = EXCLUDED.updated_at
+			RETURNING id, balance`, pgNewID("wal"), s.PartnerID, n).Scan(&walletID, &currentBalance)
+		if err != nil {
+			return domain.Settlement{}, fmt.Errorf("get/create partner wallet: %w", err)
+		}
+
+		newBalance := currentBalance + s.PartnerPayout
+		_, err = tx.Exec(ctx, `UPDATE wlt_wallets SET balance = $1, updated_at = $2 WHERE id = $3`, newBalance, n, walletID)
+		if err != nil {
+			return domain.Settlement{}, fmt.Errorf("update partner wallet balance: %w", err)
+		}
+
+		ledgerID := pgNewID("led")
+		_, err = tx.Exec(ctx, `
+			INSERT INTO wlt_ledger
+			  (id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id,
+			   order_id, description, status, created_at, completed_at)
+			VALUES ($1, $2, $3, 'CREDIT', $4, $5, 'settlement', $6, $7, $8, 'COMPLETED', $9, $9)`,
+			ledgerID, walletID, s.PartnerID, s.PartnerPayout, s.Currency, s.ID, s.OrderID, "Partner settlement payout for order: "+s.OrderID, n)
+		if err != nil {
+			return domain.Settlement{}, fmt.Errorf("create partner settlement ledger entry: %w", err)
+		}
+	}
+
+	if s.CaptainID != nil && *s.CaptainID != "" && s.CaptainPayout > 0 {
+		var walletID string
+		var currentBalance float64
+		err = tx.QueryRow(ctx, `
+			INSERT INTO wlt_wallets (id, subject, actor_type, balance, currency, created_at, updated_at)
+			VALUES ($1, $2, 'captain', 0, 'YER', $3, $3)
+			ON CONFLICT (subject) DO UPDATE SET updated_at = EXCLUDED.updated_at
+			RETURNING id, balance`, pgNewID("wal"), *s.CaptainID, n).Scan(&walletID, &currentBalance)
+		if err != nil {
+			return domain.Settlement{}, fmt.Errorf("get/create captain wallet: %w", err)
+		}
+
+		newBalance := currentBalance + s.CaptainPayout
+		_, err = tx.Exec(ctx, `UPDATE wlt_wallets SET balance = $1, updated_at = $2 WHERE id = $3`, newBalance, n, walletID)
+		if err != nil {
+			return domain.Settlement{}, fmt.Errorf("update captain wallet balance: %w", err)
+		}
+
+		ledgerID := pgNewID("led")
+		_, err = tx.Exec(ctx, `
+			INSERT INTO wlt_ledger
+			  (id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id,
+			   order_id, description, status, created_at, completed_at)
+			VALUES ($1, $2, $3, 'CREDIT', $4, $5, 'settlement', $6, $7, $8, 'COMPLETED', $9, $9)`,
+			ledgerID, walletID, *s.CaptainID, s.CaptainPayout, s.Currency, s.ID, s.OrderID, "Captain settlement payout for order: "+s.OrderID, n)
+		if err != nil {
+			return domain.Settlement{}, fmt.Errorf("create captain settlement ledger entry: %w", err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Settlement{}, fmt.Errorf("commit settlement transaction: %w", err)
+	}
+
 	return s, nil
 }
 

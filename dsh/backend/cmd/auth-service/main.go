@@ -226,6 +226,189 @@ func main() {
 		})
 	})
 
+	// POST /auth/refresh — refreshes session/refresh token
+	mux.HandleFunc("/auth/refresh", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			json.NewEncoder(w).Encode(errorResponse{Error: "method_not_allowed"}) //nolint:errcheck
+			return
+		}
+
+		var req struct {
+			RefreshToken      string `json:"refresh_token"`
+			DeviceFingerprint string `json:"device_fingerprint"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "invalid_request_body"}) //nolint:errcheck
+			return
+		}
+
+		if strings.TrimSpace(req.RefreshToken) == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "missing_refresh_token"}) //nolint:errcheck
+			return
+		}
+
+		var subject sql.NullString
+		var isRevoked bool
+		var expiresAt time.Time
+		err := db.QueryRowContext(r.Context(), `
+			SELECT subject, is_revoked, expires_at
+			FROM auth_sessions
+			WHERE id = $1`, req.RefreshToken).Scan(&subject, &isRevoked, &expiresAt)
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "token_invalid"}) //nolint:errcheck
+			return
+		} else if err != nil {
+			log.Printf("[auth-service] refresh DB error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if isRevoked {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "token_revoked"}) //nolint:errcheck
+			return
+		}
+
+		if time.Now().After(expiresAt) {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "token_expired"}) //nolint:errcheck
+			return
+		}
+
+		// Revoke the old token
+		_, err = db.ExecContext(r.Context(), "UPDATE auth_sessions SET is_revoked = TRUE WHERE id = $1", req.RefreshToken)
+		if err != nil {
+			log.Printf("[auth-service] revoke old session error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Issue a new token
+		token := generateSessionToken()
+		newExpiresAt := time.Now().Add(24 * time.Hour)
+		_, err = db.ExecContext(r.Context(), "INSERT INTO auth_sessions (id, subject, device_fingerprint, ip_address, is_revoked, expires_at) VALUES ($1, $2, $3, $4, FALSE, $5)", token, subject.String, req.DeviceFingerprint, r.RemoteAddr, newExpiresAt)
+		if err != nil {
+			log.Printf("[auth-service] INSERT refresh session error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("[auth-service] token refreshed successfully, new token issued")
+		json.NewEncoder(w).Encode(map[string]any{ //nolint:errcheck
+			"token":      token,
+			"expires_at": newExpiresAt.Format(time.RFC3339),
+		})
+	})
+
+	// POST /auth/revoke — revokes active token or token in body
+	mux.HandleFunc("/auth/revoke", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req struct {
+			Token string `json:"token"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&req)
+
+		targetToken := strings.TrimSpace(req.Token)
+		if targetToken == "" {
+			// fallback to bearer
+			authHeader := strings.TrimSpace(r.Header.Get("Authorization"))
+			if strings.HasPrefix(authHeader, "Bearer ") {
+				targetToken = strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+			}
+		}
+
+		if targetToken == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "missing_token"}) //nolint:errcheck
+			return
+		}
+
+		_, err := db.ExecContext(r.Context(), "UPDATE auth_sessions SET is_revoked = TRUE WHERE id = $1", targetToken)
+		if err != nil {
+			log.Printf("[auth-service] revoke error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("[auth-service] token revoked successfully")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"status": "success"}) //nolint:errcheck
+	})
+
+	// POST /auth/introspect — introspects token status (body token parameter)
+	mux.HandleFunc("/auth/introspect", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req struct {
+			Token string `json:"token"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "invalid_request_body"}) //nolint:errcheck
+			return
+		}
+
+		token := strings.TrimSpace(req.Token)
+		if token == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(errorResponse{Error: "missing_token"}) //nolint:errcheck
+			return
+		}
+
+		var subject, rolesStr, verifiedIdentifier sql.NullString
+		var isRevoked bool
+		var expiresAt time.Time
+		err := db.QueryRowContext(r.Context(), `
+			SELECT u.id, u.roles, u.verified_identifier, s.is_revoked, s.expires_at
+			FROM auth_sessions s
+			JOIN auth_users u ON s.subject = u.id
+			WHERE s.id = $1`, token).Scan(&subject, &rolesStr, &verifiedIdentifier, &isRevoked, &expiresAt)
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "token_invalid"}) //nolint:errcheck
+			return
+		} else if err != nil {
+			log.Printf("[auth-service] introspect DB error: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if isRevoked {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "token_revoked"}) //nolint:errcheck
+			return
+		}
+
+		if time.Now().After(expiresAt) {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "token_expired"}) //nolint:errcheck
+			return
+		}
+
+		roles := strings.Split(rolesStr.String, ",")
+		log.Printf("[auth-service] introspected session subject=%s roles=%v", subject.String, roles)
+		json.NewEncoder(w).Encode(sessionResponse{ //nolint:errcheck
+			Subject:            subject.String,
+			AuthState:          "authenticated",
+			Roles:              roles,
+			VerifiedIdentifier: verifiedIdentifier.String,
+		})
+	})
+
 	// GET /auth/permissions — returns per-surface permission flags for the session
 	mux.HandleFunc("/auth/permissions", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

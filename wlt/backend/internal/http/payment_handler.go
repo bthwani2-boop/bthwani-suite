@@ -120,6 +120,13 @@ func (h *PaymentHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !HasRole(r, domain.ActorOperator) && !HasRole(r, domain.ActorSystem) {
+		if ps.ClientID != sess.Subject {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "cannot view another subject's payment session")
+			return
+		}
+	}
+
 	writeJSON(w, http.StatusOK, ps)
 }
 

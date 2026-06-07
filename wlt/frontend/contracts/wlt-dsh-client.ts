@@ -242,6 +242,7 @@ export interface WltDshTypedClient {
 	// Payment sessions
 	createClientPaymentSession(input: WltCreatePaymentSessionRequest): Promise<WltPaymentSession>;
 	getClientPaymentSession(id: string): Promise<WltPaymentSession>;
+	confirmPaymentSession(id: string, providerRef: string): Promise<WltPaymentSession>;
 
 	// Refunds (operator: full list; client: own only)
 	listRefundQueue(clientId?: string, status?: string): Promise<WltListRefundsResponse>;
@@ -357,6 +358,10 @@ export function createWltDshTypedClient(options: WltDshTypedClientOptions): WltD
 
 		getClientPaymentSession(id) {
 			return get<WltPaymentSession>(`/payment/sessions/${encodeURIComponent(id)}`, 'WLT payment session lookup');
+		},
+
+		confirmPaymentSession(id, providerRef) {
+			return post<WltPaymentSession>(`/payment/sessions/${encodeURIComponent(id)}/confirm`, { provider_ref: providerRef }, 'WLT payment session confirm');
 		},
 
 		listRefundQueue(clientId, status) {

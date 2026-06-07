@@ -178,6 +178,13 @@ func (h *RefundHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !HasRole(r, domain.ActorOperator) && !HasRole(r, domain.ActorSystem) {
+		if ref.ClientID != sess.Subject {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "cannot view another subject's refund")
+			return
+		}
+	}
+
 	writeJSON(w, http.StatusOK, ref)
 }
 

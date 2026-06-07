@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
 import { financeProviders } from '../../../control-panel/dsh/financeContracts';
+import { createWltDshTypedClient } from '../../../contracts';
 
 export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { t } = useI18n();
@@ -13,10 +14,26 @@ export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) 
   };
 
   const [amount, setAmount] = useState('');
-  // Temporary local balance until we wire real account data
-  const [balance] = useState<number>(0.0);
+  const [balance, setBalance] = useState<number>(0.0);
   const [method, setMethod] = useState<string | undefined>(undefined);
   const [state, setState] = useState<'content' | 'loading' | 'success' | 'error'>('content');
+  const [trigger, setTrigger] = useState(0);
+
+  const client = useMemo(() => createWltDshTypedClient({ devClientId: 'client-demo' }), []);
+
+  React.useEffect(() => {
+    let active = true;
+    client.getClientWalletSummary('client-demo')
+      .then((summary) => {
+        if (active) {
+          setBalance(summary.balance);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch balance:', err);
+      });
+    return () => { active = false; };
+  }, [client, trigger]);
 
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);
   const canSubmit = topupAmount > 0 && !!method;
@@ -25,10 +42,29 @@ export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) 
     financeProviders.map((p) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
 
-  const handleTopup = () => {
+  const handleTopup = async () => {
     if (!canSubmit) return setState('error');
     setState('loading');
-    setTimeout(() => setState('success'), 800);
+    try {
+      const session = await client.createClientPaymentSession({
+        checkout_intent_id: `topup-${Date.now()}`,
+        client_id: 'client-demo',
+        amount: topupAmount,
+        currency: 'YER',
+        payment_method: method ?? 'wallet',
+        idempotency_key: `topup-idem-${Date.now()}-${topupAmount}`,
+      });
+
+      await client.confirmPaymentSession(session.id, `ref-topup-${Date.now()}`);
+
+      setState('success');
+      setTrigger((t) => t + 1);
+      setAmount('');
+      setMethod(undefined);
+    } catch (err) {
+      console.error('Failed to top up:', err);
+      setState('error');
+    }
   };
 
   const scrollRef = useRef<ScrollView | null>(null);

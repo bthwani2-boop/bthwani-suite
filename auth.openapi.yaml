@@ -255,6 +255,128 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthenticated'
 
+  /auth/login:
+    post:
+      summary: Authenticate user credentials and issue token
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                device_fingerprint:
+                  type: string
+      responses:
+        '200':
+          description: Login successful — token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expires_at]
+                properties:
+                  token:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+              example:
+                error: invalid_credentials
+
+  /auth/refresh:
+    post:
+      summary: Refresh active session token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+                device_fingerprint:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expires_at]
+                properties:
+                  token:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+
+  /auth/revoke:
+    post:
+      summary: Revoke session/refresh token
+      operationId: revokeToken
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Optional token to revoke; defaults to active Bearer token
+      responses:
+        '200':
+          description: Token revoked successfully
+
+  /auth/introspect:
+    post:
+      summary: Introspect session token status (alternative to GET /auth/session)
+      operationId: introspectToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Token details returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
   /health:
     get:
       summary: Auth service liveness probe

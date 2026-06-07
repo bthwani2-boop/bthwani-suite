@@ -175,6 +175,15 @@ func (h *SettlementHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !HasRole(r, domain.ActorOperator) && !HasRole(r, domain.ActorSystem) {
+		isPartner := s.PartnerID == sess.Subject
+		isCaptain := s.CaptainID != nil && *s.CaptainID == sess.Subject
+		if !isPartner && !isCaptain {
+			writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "cannot view another subject's settlement")
+			return
+		}
+	}
+
 	writeJSON(w, http.StatusOK, s)
 }
 

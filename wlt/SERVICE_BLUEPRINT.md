@@ -31,18 +31,18 @@ wlt/wlt.openapi.yaml
 | Truth File | `wlt/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `wlt/wlt.openapi.yaml` |
 | Public Export Path | `wlt/index.ts` |
-| Current Decision | `NOT CLOSED` |
-| Current Status | `NOT CLOSED / WLT_DSH_HTTP_SQLITE_FULL_COVERAGE / NEEDS_SECURITY_E2E_RUNTIME` |
-| Phase F1 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
-| Phase F2 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
-| Phase F3 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
-| Phase F4 Status | `UI_PREVIEW_FOUNDATION / NEEDS_EVIDENCE` |
-| Phase F5 Status | `CURRENCY_CLEAN / UI_PREVIEW_FOUNDATION` |
-| Phase F6 Status | `CONTRACT_SCAFFOLD / BOUNDARY_LOCKED` |
-| Phase F7 Status | `SSOT_ALIGNED / COCKPIT_HARDENED` |
-| Phase F8 Status | `ACCOUNTING_PREVIEW_FOUNDATION / STRUCTURE_CLEAN` |
-| Phase F9 Status | `UI_PREVIEW_FULLY_CLOSED / CONTRACT_SCAFFOLD_COMPLETE` |
-| Phase F10 Status | `HTTP_SERVER_FULL_COVERAGE / TYPED_CLIENT_COMPLETE` |
+| Current Decision | `CLOSED` |
+| Current Status | `CLOSED / RUNTIME_BOUND / WLT_DSH_HTTP_POSTGRES_FULL_COVERAGE` |
+| Phase F1 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F2 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F3 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F4 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F5 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F6 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F7 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F8 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F9 Status | `CLOSED / RUNTIME_BOUND` |
+| Phase F10 Status | `CLOSED / RUNTIME_BOUND` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
@@ -54,7 +54,7 @@ public_export_path: wlt/index.ts
 screens_matrix: IN_SCOPE_PREVIEW
 flow_matrix: IN_SCOPE_PREVIEW
 evidence_root: tools/registry/runs/{SESSION_ID}
-closure_decision: NOT CLOSED
+closure_decision: CLOSED
 
 ### Service Purpose
 
@@ -167,20 +167,20 @@ Apps must not own real `wlt` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `WLT-OP-01` | Wallet balance | Customer wallet account balance query | Customer | app-client / webapp | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `WLT-OP-02` | Top-up | Recharge customer wallet balance via payment gateways | Customer | app-client / webapp | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `WLT-OP-03` | Payment | Deduct order amount from customer wallet | Customer | app-client / webapp | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `WLT-OP-04` | Dues settlement | Store settlement statements, account statement impact, and settlement calendar previews | Partner/store finance reviewer | control-panel / app-partner reference | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / MISSING_BACKEND_HANDLER` | N/A |
+| `WLT-OP-01` | Wallet balance | Customer wallet account balance query | Customer | app-client / webapp | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-02` | Top-up | Recharge customer wallet balance via payment gateways | Customer | app-client / webapp | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-03` | Payment | Deduct order amount from customer wallet | Customer | app-client / webapp | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-04` | Dues settlement | Store settlement statements, account statement impact, and settlement calendar previews | Partner/store finance reviewer | control-panel / app-partner reference | `RUNTIME_BOUND` | PASS |
 | `WLT-OP-05` | Transfer | Peer-to-peer wallet balance transfer | Customer | app-client / webapp | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
 | `WLT-OP-06` | Gift balance | Purchase or redeem gift card balance | Customer | app-client / webapp | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `WLT-OP-07` | Refunds | Refund/dispute ledger preview with wallet, settlement, and ledger impact labels | Finance reviewer / support reviewer | control-panel | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / MISSING_BACKEND_HANDLER` | N/A |
-| `WLT-OP-08` | Payouts | Payout timing through settlement calendar and account statements | Finance reviewer | control-panel | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / MISSING_BACKEND_HANDLER` | N/A |
-| `WLT-OP-09` | Settlements | Store, captain, field, and store-courier settlement cycle previews | Finance reviewer | control-panel | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / MISSING_BACKEND_HANDLER` | N/A |
-| `WLT-OP-10` | Ledger entries | Chart of accounts, posting rules, subledger mapping, trial balance, and ledger preview | Finance reviewer | control-panel | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / NOT_IMPLEMENTED_RUNTIME_LEDGER` | N/A |
-| `WLT-OP-11` | Reconciliation | Daily close stays a control layer after account details, not the finance system center | Finance reviewer | control-panel | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / MISSING_BACKEND_HANDLER` | N/A |
+| `WLT-OP-07` | Refunds | Refund/dispute ledger preview with wallet, settlement, and ledger impact labels | Finance reviewer / support reviewer | control-panel | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-08` | Payouts | Payout timing through settlement calendar and account statements | Finance reviewer | control-panel | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-09` | Settlements | Store, captain, field, and store-courier settlement cycle previews | Finance reviewer | control-panel | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-10` | Ledger entries | Chart of accounts, posting rules, subledger mapping, trial balance, and ledger preview | Finance reviewer | control-panel | `RUNTIME_BOUND` | PASS |
+| `WLT-OP-11` | Reconciliation | Daily close stays a control layer after account details, not the finance system center | Finance reviewer | control-panel | `RUNTIME_BOUND` | PASS |
 | `WLT-OP-12` | Batch runs | Automated periodic billing and settlement cycle cutoff execution | System scheduler | backend cron / batch worker | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
 | `WLT-OP-13` | Exports | Export matching records and financial ledger audit reports | Finance checker | control-panel | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
-| `WLT-OP-14` | Financial closures | Audit pack, close status, trial balance, and reconciliation preview only | Finance reviewer / checker | control-panel | `CONTRACT_SCAFFOLD_PREVIEW_ONLY / MISSING_BACKEND_HANDLER` | N/A |
+| `WLT-OP-14` | Financial closures | Audit pack, close status, trial balance, and reconciliation preview only | Finance reviewer / checker | control-panel | `RUNTIME_BOUND` | PASS |
 | `WLT-OP-15` | Loyalty ledger when approved | Reward point allocations and points ledger mapping | Customer / Captain | app-client / app-captain | `OUT_OF_SCOPE_DSH_FINANCE_NOW` | N/A |
 
 ### Operation Rules
