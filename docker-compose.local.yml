@@ -1,0 +1,13 @@
+# BTHWANI_MANAGED_LOCAL_COMPOSE: ROOT_ORCHESTRATOR
+# Purpose: root local orchestration only.
+# Scope: include service-owned local dependency stacks.
+# Boundary: do not move service-owned dependencies into this file.
+# DSH compose remains owned by dsh/backend.
+# WLT compose remains owned by wlt/backend.
+# Requires Docker Compose 2.20.3+ for include.
+
+name: bthwani-suite-local
+
+include:
+  - ./dsh/backend/docker-compose.local.yml
+  - ./wlt/backend/docker-compose.local.yml

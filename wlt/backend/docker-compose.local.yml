@@ -1,0 +1,26 @@
+# BTHWANI_MANAGED_LOCAL_COMPOSE: WLT_SERVICE_LOCAL
+# Purpose: WLT service-local dependencies only.
+# Scope: local infrastructure for WLT backend/runtime development.
+# Boundary: WLT owns wallet/ledger/payment/refund/settlement financial truth.
+# Safety: this file does NOT claim financial business truth by itself.
+
+services:
+  wlt-postgres:
+    image: postgres:16-alpine
+    container_name: bthwani-wlt-postgres-local
+    environment:
+      POSTGRES_DB: ${WLT_POSTGRES_DB:-wlt_local}
+      POSTGRES_USER: ${WLT_POSTGRES_USER:-wlt_local}
+      POSTGRES_PASSWORD: ${WLT_POSTGRES_PASSWORD:-wlt_local_password}
+    ports:
+      - "${WLT_POSTGRES_PORT:-55433}:5432"
+    volumes:
+      - wlt-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${WLT_POSTGRES_USER:-wlt_local} -d ${WLT_POSTGRES_DB:-wlt_local}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  wlt-postgres-data:
