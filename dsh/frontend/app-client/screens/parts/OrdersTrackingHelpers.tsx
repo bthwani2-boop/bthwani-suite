@@ -21,7 +21,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
-import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
+import { getDshClientStateMeta, type DshClientState } from '../../../data/operational-statuses.preview-data';
 import type {
   DshClientAddressSnapshot,
   DshClientCreateOrderRequest,
@@ -34,12 +34,12 @@ import type {
   DshClientServiceabilityQuote,
   DshClientWalletImpactVisibility,
   DshFulfillmentDeliveryMode,
-} from '../contracts/dsh-client-binding.contracts';
-import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
-import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../shared/dsh-order-journey.model';
-import { DSH_ORDER_JOURNEY_STEPS } from '../../shared/dsh-order-journey.model';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+} from '../../contracts/dsh-client-binding.contracts';
+import { getDshClientFlowPolicy } from '../../contracts/dsh-client-binding.contracts';
+import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../../shared/dsh-order-journey.model';
+import { DSH_ORDER_JOURNEY_STEPS } from '../../../shared/dsh-order-journey.model';
+import { getDshFlowPolicySummary } from '../../../shared/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../../shared';
 
 export function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'summary-only') {
@@ -481,7 +481,7 @@ export function formatOrderTime(isoString: string) {
 
 export function formatRelativeTime(isoString: string): string {
   try {
-    const now = new Date('2026-05-17T22:26:43+03:00');
+    const now = new Date();
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return isoString;
 

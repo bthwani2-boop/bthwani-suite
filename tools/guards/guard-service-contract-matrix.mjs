@@ -13,8 +13,8 @@ for (const service of canonicalServices) {
     report.warn(base, 'Canonical service folder is missing. This may be acceptable before service implementation, but cannot be CLOSED.');
     continue;
   }
-  if (!exists(root, `${base}/SERVICE_BLUEPRINT.md`)) {
-    report.warn(`${base}/SERVICE_BLUEPRINT.md`, 'Service blueprint missing. Required before service closure.');
+  if (!exists(root, `${base}/docs/SERVICE_BLUEPRINT.md`)) {
+    report.warn(`${base}/docs/SERVICE_BLUEPRINT.md`, 'Service blueprint missing. Required before service closure.');
   }
   if (!exists(root, `${base}/${base}.openapi.yaml`)) {
     report.warn(`${base}/${base}.openapi.yaml`, 'Canonical OpenAPI contract placeholder missing for the root service.');

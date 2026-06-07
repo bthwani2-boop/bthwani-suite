@@ -1,6 +1,6 @@
-# ESF Service Blueprint
+# AMN Service Blueprint
 
-This file is the single truth file for the `esf` service only.
+This file is the single truth file for the `amn` service only.
 
 It must apply the rules from `governance/PLATFORM_BLUEPRINT.md` without duplicating platform-wide policy.
 
@@ -15,7 +15,7 @@ governance/PLATFORM_BLUEPRINT.md
 For API contract truth, read:
 
 ```text
-esf/esf.openapi.yaml
+amn/amn.openapi.yaml
 ```
 
 ---
@@ -24,23 +24,23 @@ esf/esf.openapi.yaml
 
 | Field | Value |
 |---|---|
-| Service ID | `esf` |
-| Service Name | Blood Donation / تبرع بالدم |
-| Service Type | `FREE_HUMANITARIAN_SERVICE` |
-| Owner Root | `esf/` |
-| Truth File | `esf/SERVICE_BLUEPRINT.md` |
-| OpenAPI Contract | `esf/esf.openapi.yaml` |
-| Public Export Path | `esf/index.ts` |
+| Service ID | `amn` |
+| Service Name | Taxi / Passenger Transport / ØªØ§ÙƒØ³ÙŠ ÙˆÙ†Ù‚Ù„ Ø±ÙƒØ§Ø¨ |
+| Service Type | `PAID_SERVICE` |
+| Owner Root | `amn/` |
+| Truth File | `amn/docs/SERVICE_BLUEPRINT.md` |
+| OpenAPI Contract | `amn/amn.openapi.yaml` |
+| Public Export Path | `amn/index.ts` |
 | Current Decision | `NOT CLOSED` |
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
 
-id: esf
-name: Blood Donation
-owner: esf/
-public_export_path: esf/index.ts
+id: amn
+name: Taxi / Passenger Transport
+owner: amn/
+public_export_path: amn/index.ts
 screens_matrix: TBD
 flow_matrix: TBD
 evidence_root: tools/registry/runs/{SESSION_ID}
@@ -48,7 +48,7 @@ closure_decision: NOT CLOSED
 
 ### Service Purpose
 
-خدمة إنسانية لطلب الدم، تسجيل المتبرعين، المطابقة حسب الفصيلة/الموقع/الحالة، المتابعة، الإشراف، والبلاغات.
+Ø®Ø¯Ù…Ø© ØªØ§ÙƒØ³ÙŠ ÙˆÙ†Ù‚Ù„ Ø±ÙƒØ§Ø¨: Ø·Ù„Ø¨ Ù…Ø´ÙˆØ§Ø±ØŒ ØªØ­Ø¯ÙŠØ¯ ÙˆØ¬Ù‡Ø©ØŒ ØªÙƒÙ„ÙŠÙ ÙƒØ§Ø¨ØªÙ† AMNØŒ ØªØªØ¨Ø¹ØŒ Ø³Ù„Ø§Ù…Ø©ØŒ Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø±Ø­Ù„Ø©ØŒ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…ØŒ ÙˆØ§Ù„Ø£Ø«Ø± Ø§Ù„Ù…Ø§Ù„ÙŠ Ø¹Ø¨Ø± WLT.
 
 ---
 
@@ -60,7 +60,7 @@ closure_decision: NOT CLOSED
 - Service-specific frontend surfaces when present under this service root.
 - Service-specific backend scope when present under this service root.
 - Service-specific domain rules and models.
-- `esf/esf.openapi.yaml` contract truth.
+- `amn/amn.openapi.yaml` contract truth.
 - Service-specific evidence and closure status.
 - Service-specific flow, gap, Screen/API Matrix, and runtime state records inside this file.
 
@@ -77,7 +77,7 @@ closure_decision: NOT CLOSED
 ### Allowed Dependencies
 
 - `governance/PLATFORM_BLUEPRINT.md` for platform method.
-- `esf/esf.openapi.yaml` for this service contract.
+- `amn/amn.openapi.yaml` for this service contract.
 - `auth.openapi.yaml` for platform authentication/authorization when applicable.
 - WLT contracts for any financial effect.
 - `@bthwani/ui-kit` public exports for shared UI.
@@ -101,18 +101,22 @@ closure_decision: NOT CLOSED
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Requester/Donor: طلب دم أو التسجيل كمتبرع ومتابعة الحالة. | runtime / shell / composition only | TBD | N/A |
-| `webapp` | Web Requester/Donor: طلب/تسجيل عبر الويب عند النضج. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Admin/Moderation: مراجعة، إشراف، إدارة الحالات، بلاغات، دعم. | runtime / shell / composition only | TBD | N/A |
+| `app-client` | Rider: Ø·Ù„Ø¨ Ù…Ø´ÙˆØ§Ø±ØŒ ÙˆØ¬Ù‡Ø©ØŒ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø±Ø­Ù„Ø©ØŒ Ø§Ù„Ø¯ÙØ¹ØŒ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…. | runtime / shell / composition only | TBD | N/A |
+| `webapp` | Rider Web: ÙˆØ¸Ø§Ø¦Ù Ø¹Ù…ÙŠÙ„ AMN Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | runtime / shell / composition only | TBD | N/A |
+| `app-captain` | AMN Captain: Ù‚Ø¨ÙˆÙ„ ÙˆØªÙ†ÙÙŠØ° Ø§Ù„Ø±Ø­Ù„Ø©ØŒ Ø§Ù„Ù…Ù„Ø§Ø­Ø©ØŒ Ø§Ù„Ø­Ø§Ù„Ø©ØŒ Ø§Ù„Ø¨Ù„Ø§ØºØ§ØªØŒ Ø§Ù„Ø¥ØºÙ„Ø§Ù‚. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Admin/Ops: Ù…Ù†Ø§Ø·Ù‚ØŒ ØªØ³Ø¹ÙŠØ±ØŒ Ù…Ø±Ø§Ù‚Ø¨Ø©ØŒ Ø³ÙŠØ§Ø³Ø§Øª Ø³Ù„Ø§Ù…Ø©ØŒ ØªØ´ØºÙŠÙ„ØŒ ØªØ¯Ø®Ù„. | runtime / shell / composition only | TBD | N/A |
 
 ### Owned Capabilities
 
-- Donation request
-- Donor registration
-- Blood type/location matching
-- Urgency/status tracking
-- Case follow-up
-- Moderation/support
+- Ride request
+- Pickup/dropoff intent
+- Captain matching/assignment
+- Trip tracking
+- Safety status
+- Trip completion
+- Rating
+- WLT payment/settlement relation
+- Control-panel operations
 
 ### Capability Lock Notes
 
@@ -126,15 +130,16 @@ closure_decision: NOT CLOSED
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Requester/Donor: طلب دم أو التسجيل كمتبرع ومتابعة الحالة. | TBD | N/A |
-| `webapp` | app owns shell/composition only | Web Requester/Donor: طلب/تسجيل عبر الويب عند النضج. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Moderation: مراجعة، إشراف، إدارة الحالات، بلاغات، دعم. | TBD | N/A |
+| `app-client` | app owns shell/composition only | Rider: Ø·Ù„Ø¨ Ù…Ø´ÙˆØ§Ø±ØŒ ÙˆØ¬Ù‡Ø©ØŒ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø±Ø­Ù„Ø©ØŒ Ø§Ù„Ø¯ÙØ¹ØŒ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…. | TBD | N/A |
+| `webapp` | app owns shell/composition only | Rider Web: ÙˆØ¸Ø§Ø¦Ù Ø¹Ù…ÙŠÙ„ AMN Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | TBD | N/A |
+| `app-captain` | app owns shell/composition only | AMN Captain: Ù‚Ø¨ÙˆÙ„ ÙˆØªÙ†ÙÙŠØ° Ø§Ù„Ø±Ø­Ù„Ø©ØŒ Ø§Ù„Ù…Ù„Ø§Ø­Ø©ØŒ Ø§Ù„Ø­Ø§Ù„Ø©ØŒ Ø§Ù„Ø¨Ù„Ø§ØºØ§ØªØŒ Ø§Ù„Ø¥ØºÙ„Ø§Ù‚. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Admin/Ops: Ù…Ù†Ø§Ø·Ù‚ØŒ ØªØ³Ø¹ÙŠØ±ØŒ Ù…Ø±Ø§Ù‚Ø¨Ø©ØŒ Ø³ÙŠØ§Ø³Ø§Øª Ø³Ù„Ø§Ù…Ø©ØŒ ØªØ´ØºÙŠÙ„ØŒ ØªØ¯Ø®Ù„. | TBD | N/A |
 
 ### App/Shell Rule
 
 Apps may own entry, bootstrap, routing mount, providers, platform config, metadata, and minimal environment wiring.
 
-Apps must not own real `esf` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
+Apps must not own real `amn` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
 
 ---
 
@@ -142,12 +147,15 @@ Apps must not own real `esf` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `ESF-OP-01` | Donation request | TBD | TBD | TBD | TBD | N/A |
-| `ESF-OP-02` | Donor registration | TBD | TBD | TBD | TBD | N/A |
-| `ESF-OP-03` | Blood type/location matching | TBD | TBD | TBD | TBD | N/A |
-| `ESF-OP-04` | Urgency/status tracking | TBD | TBD | TBD | TBD | N/A |
-| `ESF-OP-05` | Case follow-up | TBD | TBD | TBD | TBD | N/A |
-| `ESF-OP-06` | Moderation/support | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-01` | Ride request | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-02` | Pickup/dropoff intent | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-03` | Captain matching/assignment | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-04` | Trip tracking | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-05` | Safety status | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-06` | Trip completion | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-07` | Rating | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-08` | WLT payment/settlement relation | TBD | TBD | TBD | TBD | N/A |
+| `AMN-OP-09` | Control-panel operations | TBD | TBD | TBD | TBD | N/A |
 
 ### Operation Rules
 
@@ -162,36 +170,36 @@ Apps must not own real `esf` service screens, business/domain logic, reusable UI
 ### Primary Lifecycle
 
 ```text
-Requester creates blood need → eligibility/classification → donor discovery/matching → contact/action path → status follow-up → closure/report → control-panel supervision.
+Ride intent â†’ pickup/dropoff â†’ price/eligibility decision â†’ WLT payment path if required â†’ captain assignment â†’ captain accept â†’ pickup â†’ in-trip tracking â†’ completion â†’ rating â†’ WLT settlement/refund/support path â†’ control-panel monitoring.
 ```
 
 ### Deep Closure Sequence
 
 ```text
 Actors
-→ Operations
-→ Lifecycle
-→ Surface Coverage
-→ Journeys
-→ Screen Inventory
-→ Route Rationalization
-→ Purpose / CTA
-→ State Coverage
-→ Screen/API Matrix
-→ Gap Map
-→ Contract
-→ Generated/typed client
-→ Binding
-→ Integration
-→ Runtime
-→ Backend
-→ Data
-→ Security
-→ Observability
-→ Tests
-→ Performance / Accessibility
-→ Production Readiness
-→ Evidence
+â†’ Operations
+â†’ Lifecycle
+â†’ Surface Coverage
+â†’ Journeys
+â†’ Screen Inventory
+â†’ Route Rationalization
+â†’ Purpose / CTA
+â†’ State Coverage
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ Contract
+â†’ Generated/typed client
+â†’ Binding
+â†’ Integration
+â†’ Runtime
+â†’ Backend
+â†’ Data
+â†’ Security
+â†’ Observability
+â†’ Tests
+â†’ Performance / Accessibility
+â†’ Production Readiness
+â†’ Evidence
 ```
 
 ---
@@ -200,7 +208,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `ESF-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
+| `AMN-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
 
 ### Screen File Model
 
@@ -217,7 +225,7 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `ESF-MATRIX-TBD` | TBD | TBD | TBD | `esf/esf.openapi.yaml` | TBD | TBD | N/A |
+| `AMN-MATRIX-TBD` | TBD | TBD | TBD | `amn/amn.openapi.yaml` | TBD | TBD | N/A |
 
 ### Screen/API Rules
 
@@ -232,7 +240,7 @@ Actors
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `ESF-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `esf/` | TBD | TBD | N/A |
+| `AMN-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `amn/` | TBD | TBD | N/A |
 
 ### Allowed Gap Types
 
@@ -250,7 +258,7 @@ A gap does not automatically mean a new screen. It may close through:
 
 | Area | Status | Source | Evidence | Notes |
 |---|---|---|---|---|
-| OpenAPI | `CONTRACT_TBD` | `esf/esf.openapi.yaml` | N/A | Do not add fake endpoints. |
+| OpenAPI | `CONTRACT_TBD` | `amn/amn.openapi.yaml` | N/A | Do not add fake endpoints. |
 | API Types | `TBD` | TBD | N/A | Must follow contract generate/verify. |
 | API Client / Typed Boundary | `TBD` | TBD | N/A | Required before Binding PASS. |
 | Backend Handler | `TBD` | TBD | N/A | No backend claim without implementation evidence. |
@@ -262,18 +270,18 @@ A gap does not automatically mean a new screen. It may close through:
 
 ```text
 Flow / Screen Need
-→ Screen/API Matrix
-→ Gap Map
-→ OpenAPI Contract
-→ Generated/typed client
-→ Binding Adapter / ViewModel
-→ Screen State
-→ Runtime Evidence
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ OpenAPI Contract
+â†’ Generated/typed client
+â†’ Binding Adapter / ViewModel
+â†’ Screen State
+â†’ Runtime Evidence
 ```
 
 ### Financial Boundary
 
-ESF has no independent payment channel. Any future support/donation financial feature must pass through WLT after explicit approval and contract evidence.
+Every payment, settlement, commission, refund, or AMN financial closure must pass through WLT only.
 
 ---
 
@@ -374,7 +382,7 @@ NOT CLOSED
 
 ### Single Next Action
 
-Prove humanitarian journey and privacy/safety requirements before adding endpoints or financial features.
+Lock actor capability: app-captain captain_type must be DSH or AMN only; AMN trip flows must not mix with DSH delivery flows.
 
 ### Update Protocol
 
@@ -387,3 +395,9 @@ Prove humanitarian journey and privacy/safety requirements before adding endpoin
 7. Update this file only with verified service-specific truth.
 8. Do not duplicate platform-wide rules here.
 9. Do not claim `CLOSED` unless all applicable gates pass.
+
+## Cross-Surface Effects: Notifications
+
+| Surface | Required Effect | Status | Reason |
+|---|---|---|---|
+| notifications | notification_chain | N/A_WITH_REASON | amn is a passenger transport service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

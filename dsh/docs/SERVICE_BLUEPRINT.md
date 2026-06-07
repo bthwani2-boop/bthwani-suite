@@ -11,10 +11,10 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Field | Value |
 |---|---|
 | Service ID | `dsh` |
-| Service Name | Delivery & Shopping / تسوق وتوصيل |
+| Service Name | Delivery & Shopping / ØªØ³ÙˆÙ‚ ÙˆØªÙˆØµÙŠÙ„ |
 | Service Type | `PAID_SERVICE` |
 | Owner Root | `dsh/` |
-| Truth File | `dsh/SERVICE_BLUEPRINT.md` |
+| Truth File | `dsh/docs/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
 | Current Decision | `START_CONTROLLED_LOCAL_SMOKE_TEST_2026-06-06` |
@@ -126,32 +126,32 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 
 ## 6. Binding, Runtime, Backend State
 
-### J-001 — Store Discovery (DSH-SLICE-001)
+### J-001 â€” Store Discovery (DSH-SLICE-001)
 
 | Gate | Status |
 |---|---|
 | UI / UX / Flow | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` |
-| Visual Review | `DSH_SLICE001_VISUAL_PASS_CONFIRMED` — VR-L1-001/005/023 (app-client) + VR-L1-009 (app-partner) + VR-L2-008/009/012 (control-panel) |
+| Visual Review | `DSH_SLICE001_VISUAL_PASS_CONFIRMED` â€” VR-L1-001/005/023 (app-client) + VR-L1-009 (app-partner) + VR-L2-008/009/012 (control-panel) |
 | Binding | `DSH_SLICE001_FRONTEND_TRANSPORT_PROVEN` |
 | Runtime | `DSH_SLICE001_SCREEN_RUNTIME_PROVEN` |
-| Backend / OpenAPI | `DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN` — GET /stores + 3 PATCH gates proven in DSH_SLICE001_LIVE_E2E-20260603-173059 |
+| Backend / OpenAPI | `DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN` â€” GET /stores + 3 PATCH gates proven in DSH_SLICE001_LIVE_E2E-20260603-173059 |
 | WLT Finance Ownership | `WLT_ONLY` |
-| TypeScript | `ZERO_ERRORS` — pnpm exec tsc --noEmit verified 2026-06-03 |
+| TypeScript | `ZERO_ERRORS` â€” pnpm exec tsc --noEmit verified 2026-06-03 |
 | Production Readiness | `NOT_CLAIMED` |
 
-### J-002+ — Remaining Journeys
+### J-002+ â€” Remaining Journeys
 
 | Journey | Status |
 |---|---|
-| J-002 Catalog Management | `PASS` — DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
-| J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` — contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; production BearerAuth backend path + app-client Bearer checkout transport implemented; callback-primary flow; live auth-service runtime proof + WLT E2E runtime pending before PASS |
-| J-004 Order Lifecycle | `FUTURE_NEEDS_CROSS_SURFACE_PROOF` — DEFERRED pending J-003 closure; 004A–004F all DEFERRED_WITH_REASON in slice manifest |
-| J-005 Delivery Execution | `DEFERRED` — depends on J-004/J-009 runtime |
-| J-006 Field Readiness | `DEFERRED` — no onboarding API designed |
-| J-007 Data / Media Governance | `FOUNDATION_ACTIVE` — preview data governed; no runtime proof required |
-| J-008 Platform / Vars / Provider | `DEFERRED` — provider policy not enforced |
-| J-009 Control Panel Operations | `DEFERRED` — ops room visual/runtime proof pending |
-| J-010 WLT Finance Boundary | `BLOCKED_WITH_REASON` — WLT-owned; DSH read-only bridge only |
+| J-002 Catalog Management | `PASS` â€” DSH_SLICE002_FINAL_SCREEN_RUNTIME_PROVEN_READY_FOR_CLOSURE |
+| J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` â€” contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; production BearerAuth backend path + app-client Bearer checkout transport implemented; callback-primary flow; live auth-service runtime proof + WLT E2E runtime pending before PASS |
+| J-004 Order Lifecycle | `FUTURE_NEEDS_CROSS_SURFACE_PROOF` â€” DEFERRED pending J-003 closure; 004Aâ€“004F all DEFERRED_WITH_REASON in slice manifest |
+| J-005 Delivery Execution | `DEFERRED` â€” depends on J-004/J-009 runtime |
+| J-006 Field Readiness | `DEFERRED` â€” no onboarding API designed |
+| J-007 Data / Media Governance | `FOUNDATION_ACTIVE` â€” preview data governed; no runtime proof required |
+| J-008 Platform / Vars / Provider | `DEFERRED` â€” provider policy not enforced |
+| J-009 Control Panel Operations | `DEFERRED` â€” ops room visual/runtime proof pending |
+| J-010 WLT Finance Boundary | `BLOCKED_WITH_REASON` â€” WLT-owned; DSH read-only bridge only |
 
 Single next action:
 DSH_REALITY_SYNC_AND_AUTH_CONTRACT_PREP_BEFORE_J003 (minimal auth contract defined in auth.openapi.yaml).

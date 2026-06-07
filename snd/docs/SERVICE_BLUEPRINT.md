@@ -1,6 +1,6 @@
-# AMN Service Blueprint
+# SND Service Blueprint
 
-This file is the single truth file for the `amn` service only.
+This file is the single truth file for the `snd` service only.
 
 It must apply the rules from `governance/PLATFORM_BLUEPRINT.md` without duplicating platform-wide policy.
 
@@ -15,7 +15,7 @@ governance/PLATFORM_BLUEPRINT.md
 For API contract truth, read:
 
 ```text
-amn/amn.openapi.yaml
+snd/snd.openapi.yaml
 ```
 
 ---
@@ -24,23 +24,23 @@ amn/amn.openapi.yaml
 
 | Field | Value |
 |---|---|
-| Service ID | `amn` |
-| Service Name | Taxi / Passenger Transport / تاكسي ونقل ركاب |
-| Service Type | `PAID_SERVICE` |
-| Owner Root | `amn/` |
-| Truth File | `amn/SERVICE_BLUEPRINT.md` |
-| OpenAPI Contract | `amn/amn.openapi.yaml` |
-| Public Export Path | `amn/index.ts` |
+| Service ID | `snd` |
+| Service Name | Specialized Services / خدمات متخصصة |
+| Service Type | `FREE_DEFAULT_SERVICE_WITH_FUTURE_PAID_OPTIONS` |
+| Owner Root | `snd/` |
+| Truth File | `snd/docs/SERVICE_BLUEPRINT.md` |
+| OpenAPI Contract | `snd/snd.openapi.yaml` |
+| Public Export Path | `snd/index.ts` |
 | Current Decision | `NOT CLOSED` |
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
 
-id: amn
-name: Taxi / Passenger Transport
-owner: amn/
-public_export_path: amn/index.ts
+id: snd
+name: Specialized Services
+owner: snd/
+public_export_path: snd/index.ts
 screens_matrix: TBD
 flow_matrix: TBD
 evidence_root: tools/registry/runs/{SESSION_ID}
@@ -48,7 +48,7 @@ closure_decision: NOT CLOSED
 
 ### Service Purpose
 
-خدمة تاكسي ونقل ركاب: طلب مشوار، تحديد وجهة، تكليف كابتن AMN، تتبع، سلامة، إغلاق الرحلة، التقييم، والأثر المالي عبر WLT.
+خدمة طلب خدمات متخصصة وربط العميل بمزود مناسب: إنشاء طلب، اختيار تخصص، مطابقة مزود، متابعة، تواصل، إغلاق، وإدارة التخصصات.
 
 ---
 
@@ -60,7 +60,7 @@ closure_decision: NOT CLOSED
 - Service-specific frontend surfaces when present under this service root.
 - Service-specific backend scope when present under this service root.
 - Service-specific domain rules and models.
-- `amn/amn.openapi.yaml` contract truth.
+- `snd/snd.openapi.yaml` contract truth.
 - Service-specific evidence and closure status.
 - Service-specific flow, gap, Screen/API Matrix, and runtime state records inside this file.
 
@@ -77,7 +77,7 @@ closure_decision: NOT CLOSED
 ### Allowed Dependencies
 
 - `governance/PLATFORM_BLUEPRINT.md` for platform method.
-- `amn/amn.openapi.yaml` for this service contract.
+- `snd/snd.openapi.yaml` for this service contract.
 - `auth.openapi.yaml` for platform authentication/authorization when applicable.
 - WLT contracts for any financial effect.
 - `@bthwani/ui-kit` public exports for shared UI.
@@ -101,22 +101,20 @@ closure_decision: NOT CLOSED
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Rider: طلب مشوار، وجهة، متابعة الرحلة، الدفع، التقييم. | runtime / shell / composition only | TBD | N/A |
-| `webapp` | Rider Web: وظائف عميل AMN عند النضج. | runtime / shell / composition only | TBD | N/A |
-| `app-captain` | AMN Captain: قبول وتنفيذ الرحلة، الملاحة، الحالة، البلاغات، الإغلاق. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Admin/Ops: مناطق، تسعير، مراقبة، سياسات سلامة، تشغيل، تدخل. | runtime / shell / composition only | TBD | N/A |
+| `app-client` | Customer: طلب خدمة متخصصة، متابعة، تواصل، إغلاق. | runtime / shell / composition only | TBD | N/A |
+| `webapp` | Web Customer: طلب خدمات عبر الويب عند النضج. | runtime / shell / composition only | TBD | N/A |
+| `app-partner` | Service Provider: مزود خدمة عند الحاجة المثبتة. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Admin/Ops: إدارة التخصصات، المزودين، البلاغات، التشغيل. | runtime / shell / composition only | TBD | N/A |
 
 ### Owned Capabilities
 
-- Ride request
-- Pickup/dropoff intent
-- Captain matching/assignment
-- Trip tracking
-- Safety status
-- Trip completion
-- Rating
-- WLT payment/settlement relation
-- Control-panel operations
+- Service request
+- Specialty selection
+- Provider matching
+- Request tracking
+- Safe communication
+- Closure/support
+- Provider/category governance
 
 ### Capability Lock Notes
 
@@ -130,16 +128,16 @@ closure_decision: NOT CLOSED
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Rider: طلب مشوار، وجهة، متابعة الرحلة، الدفع، التقييم. | TBD | N/A |
-| `webapp` | app owns shell/composition only | Rider Web: وظائف عميل AMN عند النضج. | TBD | N/A |
-| `app-captain` | app owns shell/composition only | AMN Captain: قبول وتنفيذ الرحلة، الملاحة، الحالة، البلاغات، الإغلاق. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Ops: مناطق، تسعير، مراقبة، سياسات سلامة، تشغيل، تدخل. | TBD | N/A |
+| `app-client` | app owns shell/composition only | Customer: طلب خدمة متخصصة، متابعة، تواصل، إغلاق. | TBD | N/A |
+| `webapp` | app owns shell/composition only | Web Customer: طلب خدمات عبر الويب عند النضج. | TBD | N/A |
+| `app-partner` | app owns shell/composition only | Service Provider: مزود خدمة عند الحاجة المثبتة. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Admin/Ops: إدارة التخصصات، المزودين، البلاغات، التشغيل. | TBD | N/A |
 
 ### App/Shell Rule
 
 Apps may own entry, bootstrap, routing mount, providers, platform config, metadata, and minimal environment wiring.
 
-Apps must not own real `amn` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
+Apps must not own real `snd` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
 
 ---
 
@@ -147,15 +145,13 @@ Apps must not own real `amn` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `AMN-OP-01` | Ride request | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-02` | Pickup/dropoff intent | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-03` | Captain matching/assignment | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-04` | Trip tracking | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-05` | Safety status | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-06` | Trip completion | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-07` | Rating | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-08` | WLT payment/settlement relation | TBD | TBD | TBD | TBD | N/A |
-| `AMN-OP-09` | Control-panel operations | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-01` | Service request | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-02` | Specialty selection | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-03` | Provider matching | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-04` | Request tracking | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-05` | Safe communication | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-06` | Closure/support | TBD | TBD | TBD | TBD | N/A |
+| `SND-OP-07` | Provider/category governance | TBD | TBD | TBD | TBD | N/A |
 
 ### Operation Rules
 
@@ -170,7 +166,7 @@ Apps must not own real `amn` service screens, business/domain logic, reusable UI
 ### Primary Lifecycle
 
 ```text
-Ride intent → pickup/dropoff → price/eligibility decision → WLT payment path if required → captain assignment → captain accept → pickup → in-trip tracking → completion → rating → WLT settlement/refund/support path → control-panel monitoring.
+Customer creates service request → specialty/category selection → provider matching or control-panel routing → communication/follow-up → completion/support/closure → moderation/operations.
 ```
 
 ### Deep Closure Sequence
@@ -208,7 +204,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `AMN-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
+| `SND-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
 
 ### Screen File Model
 
@@ -225,7 +221,7 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `AMN-MATRIX-TBD` | TBD | TBD | TBD | `amn/amn.openapi.yaml` | TBD | TBD | N/A |
+| `SND-MATRIX-TBD` | TBD | TBD | TBD | `snd/snd.openapi.yaml` | TBD | TBD | N/A |
 
 ### Screen/API Rules
 
@@ -240,7 +236,7 @@ Actors
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `AMN-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `amn/` | TBD | TBD | N/A |
+| `SND-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `snd/` | TBD | TBD | N/A |
 
 ### Allowed Gap Types
 
@@ -258,7 +254,7 @@ A gap does not automatically mean a new screen. It may close through:
 
 | Area | Status | Source | Evidence | Notes |
 |---|---|---|---|---|
-| OpenAPI | `CONTRACT_TBD` | `amn/amn.openapi.yaml` | N/A | Do not add fake endpoints. |
+| OpenAPI | `CONTRACT_TBD` | `snd/snd.openapi.yaml` | N/A | Do not add fake endpoints. |
 | API Types | `TBD` | TBD | N/A | Must follow contract generate/verify. |
 | API Client / Typed Boundary | `TBD` | TBD | N/A | Required before Binding PASS. |
 | Backend Handler | `TBD` | TBD | N/A | No backend claim without implementation evidence. |
@@ -281,7 +277,7 @@ Flow / Screen Need
 
 ### Financial Boundary
 
-Every payment, settlement, commission, refund, or AMN financial closure must pass through WLT only.
+SND is free by default. Any future payment, commission, subscription, or provider fee must pass through WLT after documented gap and contract decision.
 
 ---
 
@@ -382,7 +378,7 @@ NOT CLOSED
 
 ### Single Next Action
 
-Lock actor capability: app-captain captain_type must be DSH or AMN only; AMN trip flows must not mix with DSH delivery flows.
+Classify provider model and decide whether app-partner is required per flow before introducing paid behavior.
 
 ### Update Protocol
 
@@ -400,4 +396,4 @@ Lock actor capability: app-captain captain_type must be DSH or AMN only; AMN tri
 
 | Surface | Required Effect | Status | Reason |
 |---|---|---|---|
-| notifications | notification_chain | N/A_WITH_REASON | amn is a passenger transport service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |
+| notifications | notification_chain | N/A_WITH_REASON | snd is a backend/operational service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

@@ -28,6 +28,7 @@ import {
   type DshRuntimeOrderRow,
   PlatformVarsProvider,
   FeatureFlagProvider,
+  usePlatformVars,
 } from '../shared';
 import type { PartnerOrderItem, PartnerOrdersInboxScreenState } from './screens/OrdersInboxScreen';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';

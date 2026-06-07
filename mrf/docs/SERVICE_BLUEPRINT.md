@@ -1,6 +1,6 @@
-﻿# KWD Service Blueprint
+# MRF Service Blueprint
 
-This file is the single truth file for the `kwd` service only.
+This file is the single truth file for the `mrf` service only.
 
 It must apply the rules from `governance/PLATFORM_BLUEPRINT.md` without duplicating platform-wide policy.
 
@@ -15,7 +15,7 @@ governance/PLATFORM_BLUEPRINT.md
 For API contract truth, read:
 
 ```text
-kwd/kwd.openapi.yaml
+mrf/mrf.openapi.yaml
 ```
 
 ---
@@ -24,23 +24,23 @@ kwd/kwd.openapi.yaml
 
 | Field | Value |
 |---|---|
-| Service ID | `kwd` |
-| Service Name | Jobs / وظائف |
+| Service ID | `mrf` |
+| Service Name | Lost and Found / مفقودات ومعثورات |
 | Service Type | `FREE_DEFAULT_SERVICE` |
-| Owner Root | `kwd/` |
-| Truth File | `kwd/SERVICE_BLUEPRINT.md` |
-| OpenAPI Contract | `kwd/kwd.openapi.yaml` |
-| Public Export Path | `kwd/index.ts` |
+| Owner Root | `mrf/` |
+| Truth File | `mrf/docs/SERVICE_BLUEPRINT.md` |
+| OpenAPI Contract | `mrf/mrf.openapi.yaml` |
+| Public Export Path | `mrf/index.ts` |
 | Current Decision | `NOT CLOSED` |
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
 
-id: kwd
-name: Jobs
-owner: kwd/
-public_export_path: kwd/index.ts
+id: mrf
+name: Lost and Found
+owner: mrf/
+public_export_path: mrf/index.ts
 screens_matrix: TBD
 flow_matrix: TBD
 evidence_root: tools/registry/runs/{SESSION_ID}
@@ -48,7 +48,7 @@ closure_decision: NOT CLOSED
 
 ### Service Purpose
 
-خدمة وظائف وفرص عمل: نشر وظائف، بحث وتصفح، تفاصيل، تقديم، متابعة، إدارة طلبات، ومراجعة/إشراف.
+خدمة مفقودات ومعثورات: نشر بلاغ مفقود أو معثور، بحث، مطابقة، تواصل آمن، متابعة الحالة، والإشراف.
 
 ---
 
@@ -60,7 +60,7 @@ closure_decision: NOT CLOSED
 - Service-specific frontend surfaces when present under this service root.
 - Service-specific backend scope when present under this service root.
 - Service-specific domain rules and models.
-- `kwd/kwd.openapi.yaml` contract truth.
+- `mrf/mrf.openapi.yaml` contract truth.
 - Service-specific evidence and closure status.
 - Service-specific flow, gap, Screen/API Matrix, and runtime state records inside this file.
 
@@ -77,7 +77,7 @@ closure_decision: NOT CLOSED
 ### Allowed Dependencies
 
 - `governance/PLATFORM_BLUEPRINT.md` for platform method.
-- `kwd/kwd.openapi.yaml` for this service contract.
+- `mrf/mrf.openapi.yaml` for this service contract.
 - `auth.openapi.yaml` for platform authentication/authorization when applicable.
 - WLT contracts for any financial effect.
 - `@bthwani/ui-kit` public exports for shared UI.
@@ -101,19 +101,18 @@ closure_decision: NOT CLOSED
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Job Seeker/Poster: تصفح الوظائف، التفاصيل، التقديم، متابعة الطلب. | runtime / shell / composition only | TBD | N/A |
-| `webapp` | Web Job User: بوابة وظائف على الويب عند النضج. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Admin/Moderation: مراجعة الوظائف، التصنيفات، البلاغات، الإشراف. | runtime / shell / composition only | TBD | N/A |
+| `app-client` | Reporter/Finder/Owner: نشر بلاغ، بحث، مطابقة، تواصل آمن، متابعة. | runtime / shell / composition only | TBD | N/A |
+| `webapp` | Web User: مفقودات ومعثورات عبر الويب عند النضج. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Admin/Moderation: مراجعة، إشراف، بلاغات، دعم. | runtime / shell / composition only | TBD | N/A |
 
 ### Owned Capabilities
 
-- Job listing
-- Job discovery
-- Job detail
-- Application intent
-- Application tracking
-- Moderation/reporting
-- Category governance
+- Lost report
+- Found report
+- Search/matching
+- Safe contact
+- Status follow-up
+- Reports/moderation
 
 ### Capability Lock Notes
 
@@ -127,15 +126,15 @@ closure_decision: NOT CLOSED
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Job Seeker/Poster: تصفح الوظائف، التفاصيل، التقديم، متابعة الطلب. | TBD | N/A |
-| `webapp` | app owns shell/composition only | Web Job User: بوابة وظائف على الويب عند النضج. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Moderation: مراجعة الوظائف، التصنيفات، البلاغات، الإشراف. | TBD | N/A |
+| `app-client` | app owns shell/composition only | Reporter/Finder/Owner: نشر بلاغ، بحث، مطابقة، تواصل آمن، متابعة. | TBD | N/A |
+| `webapp` | app owns shell/composition only | Web User: مفقودات ومعثورات عبر الويب عند النضج. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Admin/Moderation: مراجعة، إشراف، بلاغات، دعم. | TBD | N/A |
 
 ### App/Shell Rule
 
 Apps may own entry, bootstrap, routing mount, providers, platform config, metadata, and minimal environment wiring.
 
-Apps must not own real `kwd` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
+Apps must not own real `mrf` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
 
 ---
 
@@ -143,13 +142,12 @@ Apps must not own real `kwd` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `KWD-OP-01` | Job listing | TBD | TBD | TBD | TBD | N/A |
-| `KWD-OP-02` | Job discovery | TBD | TBD | TBD | TBD | N/A |
-| `KWD-OP-03` | Job detail | TBD | TBD | TBD | TBD | N/A |
-| `KWD-OP-04` | Application intent | TBD | TBD | TBD | TBD | N/A |
-| `KWD-OP-05` | Application tracking | TBD | TBD | TBD | TBD | N/A |
-| `KWD-OP-06` | Moderation/reporting | TBD | TBD | TBD | TBD | N/A |
-| `KWD-OP-07` | Category governance | TBD | TBD | TBD | TBD | N/A |
+| `MRF-OP-01` | Lost report | TBD | TBD | TBD | TBD | N/A |
+| `MRF-OP-02` | Found report | TBD | TBD | TBD | TBD | N/A |
+| `MRF-OP-03` | Search/matching | TBD | TBD | TBD | TBD | N/A |
+| `MRF-OP-04` | Safe contact | TBD | TBD | TBD | TBD | N/A |
+| `MRF-OP-05` | Status follow-up | TBD | TBD | TBD | TBD | N/A |
+| `MRF-OP-06` | Reports/moderation | TBD | TBD | TBD | TBD | N/A |
 
 ### Operation Rules
 
@@ -164,7 +162,7 @@ Apps must not own real `kwd` service screens, business/domain logic, reusable UI
 ### Primary Lifecycle
 
 ```text
-Job posted → moderation/classification if required → seeker discovers job → job detail → application intent → application follow-up → moderation/support/closure.
+Lost/found report → classification → discovery/matching → safe contact/action → status update → closure/report → control-panel supervision.
 ```
 
 ### Deep Closure Sequence
@@ -202,7 +200,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `KWD-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
+| `MRF-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
 
 ### Screen File Model
 
@@ -219,7 +217,7 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `KWD-MATRIX-TBD` | TBD | TBD | TBD | `kwd/kwd.openapi.yaml` | TBD | TBD | N/A |
+| `MRF-MATRIX-TBD` | TBD | TBD | TBD | `mrf/mrf.openapi.yaml` | TBD | TBD | N/A |
 
 ### Screen/API Rules
 
@@ -234,7 +232,7 @@ Actors
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `KWD-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `kwd/` | TBD | TBD | N/A |
+| `MRF-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `mrf/` | TBD | TBD | N/A |
 
 ### Allowed Gap Types
 
@@ -252,7 +250,7 @@ A gap does not automatically mean a new screen. It may close through:
 
 | Area | Status | Source | Evidence | Notes |
 |---|---|---|---|---|
-| OpenAPI | `CONTRACT_TBD` | `kwd/kwd.openapi.yaml` | N/A | Do not add fake endpoints. |
+| OpenAPI | `CONTRACT_TBD` | `mrf/mrf.openapi.yaml` | N/A | Do not add fake endpoints. |
 | API Types | `TBD` | TBD | N/A | Must follow contract generate/verify. |
 | API Client / Typed Boundary | `TBD` | TBD | N/A | Required before Binding PASS. |
 | Backend Handler | `TBD` | TBD | N/A | No backend claim without implementation evidence. |
@@ -275,7 +273,7 @@ Flow / Screen Need
 
 ### Financial Boundary
 
-KWD is free by default. Any future subscription, paid listing, or advertisement must pass through WLT after documented gap and contract decision.
+MRF has no independent payment channel. Any reward, deposit, or financial feature must pass through WLT after explicit contract evidence.
 
 ---
 
@@ -376,7 +374,7 @@ NOT CLOSED
 
 ### Single Next Action
 
-Classify job posting/application flows and prove whether partner/provider roles are required before adding paid features.
+Define privacy/safe-contact boundaries and proof of moderation needs before changing contracts.
 
 ### Update Protocol
 
@@ -394,4 +392,4 @@ Classify job posting/application flows and prove whether partner/provider roles 
 
 | Surface | Required Effect | Status | Reason |
 |---|---|---|---|
-| notifications | notification_chain | N/A_WITH_REASON | kwd is a backend/operational service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |
+| notifications | notification_chain | N/A_WITH_REASON | mrf is a backend/operational service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

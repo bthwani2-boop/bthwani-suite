@@ -1,6 +1,6 @@
-﻿# SND Service Blueprint
+# ARB Service Blueprint
 
-This file is the single truth file for the `snd` service only.
+This file is the single truth file for the `arb` service only.
 
 It must apply the rules from `governance/PLATFORM_BLUEPRINT.md` without duplicating platform-wide policy.
 
@@ -15,7 +15,7 @@ governance/PLATFORM_BLUEPRINT.md
 For API contract truth, read:
 
 ```text
-snd/snd.openapi.yaml
+arb/arb.openapi.yaml
 ```
 
 ---
@@ -24,23 +24,23 @@ snd/snd.openapi.yaml
 
 | Field | Value |
 |---|---|
-| Service ID | `snd` |
-| Service Name | Specialized Services / خدمات متخصصة |
-| Service Type | `FREE_DEFAULT_SERVICE_WITH_FUTURE_PAID_OPTIONS` |
-| Owner Root | `snd/` |
-| Truth File | `snd/SERVICE_BLUEPRINT.md` |
-| OpenAPI Contract | `snd/snd.openapi.yaml` |
-| Public Export Path | `snd/index.ts` |
+| Service ID | `arb` |
+| Service Name | Reservations / Ø­Ø¬ÙˆØ²Ø§Øª |
+| Service Type | `PAID_SERVICE` |
+| Owner Root | `arb/` |
+| Truth File | `arb/docs/SERVICE_BLUEPRINT.md` |
+| OpenAPI Contract | `arb/arb.openapi.yaml` |
+| Public Export Path | `arb/index.ts` |
 | Current Decision | `NOT CLOSED` |
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
 
-id: snd
-name: Specialized Services
-owner: snd/
-public_export_path: snd/index.ts
+id: arb
+name: Reservations
+owner: arb/
+public_export_path: arb/index.ts
 screens_matrix: TBD
 flow_matrix: TBD
 evidence_root: tools/registry/runs/{SESSION_ID}
@@ -48,7 +48,7 @@ closure_decision: NOT CLOSED
 
 ### Service Purpose
 
-خدمة طلب خدمات متخصصة وربط العميل بمزود مناسب: إنشاء طلب، اختيار تخصص، مطابقة مزود، متابعة، تواصل، إغلاق، وإدارة التخصصات.
+Ø®Ø¯Ù…Ø© Ø­Ø¬ÙˆØ²Ø§Øª Ù…Ø«Ù„ Ø§Ù„ÙÙ†Ø§Ø¯Ù‚ ÙˆØ§Ù„ØµØ§Ù„Ø§Øª ÙˆØ§Ù„Ù…Ø±Ø§ÙÙ‚ ÙˆÙ…Ø²ÙˆØ¯ÙŠ Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø­Ø¬Ø²: Ø§Ù„Ø¨Ø­Ø«ØŒ Ø§Ù„ØªÙˆØ§ÙØ±ØŒ Ø§Ù„Ø­Ø¬Ø²ØŒ Ø§Ù„Ø¹Ø±Ø¨ÙˆÙ†/Ø§Ù„Ø¶Ù…Ø§Ù†ØŒ Ø§Ù„ØªØ£ÙƒÙŠØ¯ØŒ Ø§Ù„Ø¥Ù„ØºØ§Ø¡ØŒ Ø§Ù„Ù†Ø²Ø§Ø¹Ø§ØªØŒ ÙˆØ§Ù„ØªØ³ÙˆÙŠØ§Øª.
 
 ---
 
@@ -60,7 +60,7 @@ closure_decision: NOT CLOSED
 - Service-specific frontend surfaces when present under this service root.
 - Service-specific backend scope when present under this service root.
 - Service-specific domain rules and models.
-- `snd/snd.openapi.yaml` contract truth.
+- `arb/arb.openapi.yaml` contract truth.
 - Service-specific evidence and closure status.
 - Service-specific flow, gap, Screen/API Matrix, and runtime state records inside this file.
 
@@ -77,7 +77,7 @@ closure_decision: NOT CLOSED
 ### Allowed Dependencies
 
 - `governance/PLATFORM_BLUEPRINT.md` for platform method.
-- `snd/snd.openapi.yaml` for this service contract.
+- `arb/arb.openapi.yaml` for this service contract.
 - `auth.openapi.yaml` for platform authentication/authorization when applicable.
 - WLT contracts for any financial effect.
 - `@bthwani/ui-kit` public exports for shared UI.
@@ -101,20 +101,23 @@ closure_decision: NOT CLOSED
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Customer: طلب خدمة متخصصة، متابعة، تواصل، إغلاق. | runtime / shell / composition only | TBD | N/A |
-| `webapp` | Web Customer: طلب خدمات عبر الويب عند النضج. | runtime / shell / composition only | TBD | N/A |
-| `app-partner` | Service Provider: مزود خدمة عند الحاجة المثبتة. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Admin/Ops: إدارة التخصصات، المزودين، البلاغات، التشغيل. | runtime / shell / composition only | TBD | N/A |
+| `app-client` | Customer: Ø§Ù„Ø¨Ø­Ø«ØŒ Ø§Ù„Ø­Ø¬Ø²ØŒ Ø¯ÙØ¹/Ø¹Ø±Ø¨ÙˆÙ† Ø¹Ù†Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯Ù‡ØŒ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŒ Ø§Ù„Ø¥Ù„ØºØ§Ø¡/Ø§Ù„Ø¯Ø¹Ù…. | runtime / shell / composition only | TBD | N/A |
+| `webapp` | Customer Web: Ø­Ø¬ÙˆØ²Ø§Øª Ø¹Ø¨Ø± Ø§Ù„ÙˆÙŠØ¨ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | runtime / shell / composition only | TBD | N/A |
+| `app-partner` | Provider/Partner: Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø­Ø¬ÙˆØ²Ø§ØªØŒ Ø§Ù„ØªÙˆØ§ÙØ±ØŒ Ø§Ù„Ø¹Ø±ÙˆØ¶ØŒ Ø§Ù„ØªØ£ÙƒÙŠØ¯ØŒ Ø§Ù„Ø¥Ù„ØºØ§Ø¡. | runtime / shell / composition only | TBD | N/A |
+| `app-field` | Field Agent: ØªÙØ¹ÙŠÙ„ Ù…Ø²ÙˆØ¯ÙŠÙ† Ø£Ùˆ Ø¯Ø¹Ù… Ù…ÙŠØ¯Ø§Ù†ÙŠ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© Ø§Ù„Ù…Ø«Ø¨ØªØ©. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Admin/Ops: Ù†Ø²Ø§Ø¹Ø§ØªØŒ Ø³ÙŠØ§Ø³Ø§ØªØŒ ØªØ¯Ù‚ÙŠÙ‚ØŒ Ø¥Ø´Ø±Ø§ÙØŒ ØªØ´ØºÙŠÙ„. | runtime / shell / composition only | TBD | N/A |
 
 ### Owned Capabilities
 
-- Service request
-- Specialty selection
-- Provider matching
-- Request tracking
-- Safe communication
-- Closure/support
-- Provider/category governance
+- Reservation discovery
+- Availability
+- Offer detail
+- Booking intent
+- Deposit/guarantee relation
+- Confirmation/cancellation
+- Dispute/support
+- Partner availability management
+- WLT payment/refund/settlement relation
 
 ### Capability Lock Notes
 
@@ -128,16 +131,17 @@ closure_decision: NOT CLOSED
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Customer: طلب خدمة متخصصة، متابعة، تواصل، إغلاق. | TBD | N/A |
-| `webapp` | app owns shell/composition only | Web Customer: طلب خدمات عبر الويب عند النضج. | TBD | N/A |
-| `app-partner` | app owns shell/composition only | Service Provider: مزود خدمة عند الحاجة المثبتة. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Ops: إدارة التخصصات، المزودين، البلاغات، التشغيل. | TBD | N/A |
+| `app-client` | app owns shell/composition only | Customer: Ø§Ù„Ø¨Ø­Ø«ØŒ Ø§Ù„Ø­Ø¬Ø²ØŒ Ø¯ÙØ¹/Ø¹Ø±Ø¨ÙˆÙ† Ø¹Ù†Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯Ù‡ØŒ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŒ Ø§Ù„Ø¥Ù„ØºØ§Ø¡/Ø§Ù„Ø¯Ø¹Ù…. | TBD | N/A |
+| `webapp` | app owns shell/composition only | Customer Web: Ø­Ø¬ÙˆØ²Ø§Øª Ø¹Ø¨Ø± Ø§Ù„ÙˆÙŠØ¨ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | TBD | N/A |
+| `app-partner` | app owns shell/composition only | Provider/Partner: Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø­Ø¬ÙˆØ²Ø§ØªØŒ Ø§Ù„ØªÙˆØ§ÙØ±ØŒ Ø§Ù„Ø¹Ø±ÙˆØ¶ØŒ Ø§Ù„ØªØ£ÙƒÙŠØ¯ØŒ Ø§Ù„Ø¥Ù„ØºØ§Ø¡. | TBD | N/A |
+| `app-field` | app owns shell/composition only | Field Agent: ØªÙØ¹ÙŠÙ„ Ù…Ø²ÙˆØ¯ÙŠÙ† Ø£Ùˆ Ø¯Ø¹Ù… Ù…ÙŠØ¯Ø§Ù†ÙŠ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© Ø§Ù„Ù…Ø«Ø¨ØªØ©. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Admin/Ops: Ù†Ø²Ø§Ø¹Ø§ØªØŒ Ø³ÙŠØ§Ø³Ø§ØªØŒ ØªØ¯Ù‚ÙŠÙ‚ØŒ Ø¥Ø´Ø±Ø§ÙØŒ ØªØ´ØºÙŠÙ„. | TBD | N/A |
 
 ### App/Shell Rule
 
 Apps may own entry, bootstrap, routing mount, providers, platform config, metadata, and minimal environment wiring.
 
-Apps must not own real `snd` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
+Apps must not own real `arb` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
 
 ---
 
@@ -145,13 +149,15 @@ Apps must not own real `snd` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `SND-OP-01` | Service request | TBD | TBD | TBD | TBD | N/A |
-| `SND-OP-02` | Specialty selection | TBD | TBD | TBD | TBD | N/A |
-| `SND-OP-03` | Provider matching | TBD | TBD | TBD | TBD | N/A |
-| `SND-OP-04` | Request tracking | TBD | TBD | TBD | TBD | N/A |
-| `SND-OP-05` | Safe communication | TBD | TBD | TBD | TBD | N/A |
-| `SND-OP-06` | Closure/support | TBD | TBD | TBD | TBD | N/A |
-| `SND-OP-07` | Provider/category governance | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-01` | Reservation discovery | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-02` | Availability | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-03` | Offer detail | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-04` | Booking intent | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-05` | Deposit/guarantee relation | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-06` | Confirmation/cancellation | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-07` | Dispute/support | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-08` | Partner availability management | TBD | TBD | TBD | TBD | N/A |
+| `ARB-OP-09` | WLT payment/refund/settlement relation | TBD | TBD | TBD | TBD | N/A |
 
 ### Operation Rules
 
@@ -166,36 +172,36 @@ Apps must not own real `snd` service screens, business/domain logic, reusable UI
 ### Primary Lifecycle
 
 ```text
-Customer creates service request → specialty/category selection → provider matching or control-panel routing → communication/follow-up → completion/support/closure → moderation/operations.
+Search reservation â†’ view offer/detail â†’ choose time/option â†’ booking intent â†’ WLT deposit/payment path if required â†’ partner confirmation â†’ customer follow-up â†’ completion/cancel/dispute â†’ WLT refund/settlement if required â†’ control-panel supervision.
 ```
 
 ### Deep Closure Sequence
 
 ```text
 Actors
-→ Operations
-→ Lifecycle
-→ Surface Coverage
-→ Journeys
-→ Screen Inventory
-→ Route Rationalization
-→ Purpose / CTA
-→ State Coverage
-→ Screen/API Matrix
-→ Gap Map
-→ Contract
-→ Generated/typed client
-→ Binding
-→ Integration
-→ Runtime
-→ Backend
-→ Data
-→ Security
-→ Observability
-→ Tests
-→ Performance / Accessibility
-→ Production Readiness
-→ Evidence
+â†’ Operations
+â†’ Lifecycle
+â†’ Surface Coverage
+â†’ Journeys
+â†’ Screen Inventory
+â†’ Route Rationalization
+â†’ Purpose / CTA
+â†’ State Coverage
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ Contract
+â†’ Generated/typed client
+â†’ Binding
+â†’ Integration
+â†’ Runtime
+â†’ Backend
+â†’ Data
+â†’ Security
+â†’ Observability
+â†’ Tests
+â†’ Performance / Accessibility
+â†’ Production Readiness
+â†’ Evidence
 ```
 
 ---
@@ -204,7 +210,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `SND-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
+| `ARB-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
 
 ### Screen File Model
 
@@ -221,7 +227,7 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `SND-MATRIX-TBD` | TBD | TBD | TBD | `snd/snd.openapi.yaml` | TBD | TBD | N/A |
+| `ARB-MATRIX-TBD` | TBD | TBD | TBD | `arb/arb.openapi.yaml` | TBD | TBD | N/A |
 
 ### Screen/API Rules
 
@@ -236,7 +242,7 @@ Actors
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `SND-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `snd/` | TBD | TBD | N/A |
+| `ARB-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `arb/` | TBD | TBD | N/A |
 
 ### Allowed Gap Types
 
@@ -254,7 +260,7 @@ A gap does not automatically mean a new screen. It may close through:
 
 | Area | Status | Source | Evidence | Notes |
 |---|---|---|---|---|
-| OpenAPI | `CONTRACT_TBD` | `snd/snd.openapi.yaml` | N/A | Do not add fake endpoints. |
+| OpenAPI | `CONTRACT_TBD` | `arb/arb.openapi.yaml` | N/A | Do not add fake endpoints. |
 | API Types | `TBD` | TBD | N/A | Must follow contract generate/verify. |
 | API Client / Typed Boundary | `TBD` | TBD | N/A | Required before Binding PASS. |
 | Backend Handler | `TBD` | TBD | N/A | No backend claim without implementation evidence. |
@@ -266,18 +272,18 @@ A gap does not automatically mean a new screen. It may close through:
 
 ```text
 Flow / Screen Need
-→ Screen/API Matrix
-→ Gap Map
-→ OpenAPI Contract
-→ Generated/typed client
-→ Binding Adapter / ViewModel
-→ Screen State
-→ Runtime Evidence
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ OpenAPI Contract
+â†’ Generated/typed client
+â†’ Binding Adapter / ViewModel
+â†’ Screen State
+â†’ Runtime Evidence
 ```
 
 ### Financial Boundary
 
-SND is free by default. Any future payment, commission, subscription, or provider fee must pass through WLT after documented gap and contract decision.
+Deposits, fees, refunds, settlements, commissions, or any ARB financial effect must pass through WLT only.
 
 ---
 
@@ -378,7 +384,7 @@ NOT CLOSED
 
 ### Single Next Action
 
-Classify provider model and decide whether app-partner is required per flow before introducing paid behavior.
+Lock partner_type and field_type for ARB, then prove booking lifecycle gaps before changing OpenAPI.
 
 ### Update Protocol
 
@@ -396,4 +402,4 @@ Classify provider model and decide whether app-partner is required per flow befo
 
 | Surface | Required Effect | Status | Reason |
 |---|---|---|---|
-| notifications | notification_chain | N/A_WITH_REASON | snd is a backend/operational service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |
+| notifications | notification_chain | N/A_WITH_REASON | arb is a reservations service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

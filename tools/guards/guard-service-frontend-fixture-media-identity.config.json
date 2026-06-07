@@ -452,7 +452,9 @@
     "dsh/frontend/app-captain/screens/DshCaptainMapScreen.tsx",
     "wlt/frontend/contracts/wlt-dsh-client.ts",
     "dsh/frontend/shared/dsh-field-store-onboarding-client.ts",
-    "dsh/frontend/shared/dsh-field-visit-client.ts"
+    "dsh/frontend/shared/dsh-field-visit-client.ts",
+    "dsh/frontend/app-client/hooks/useDshCheckout.ts",
+    "dsh/frontend/app-client/hooks/useDshOrderTracking.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

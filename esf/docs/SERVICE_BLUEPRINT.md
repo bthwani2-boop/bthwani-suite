@@ -1,6 +1,6 @@
-# ARB Service Blueprint
+# ESF Service Blueprint
 
-This file is the single truth file for the `arb` service only.
+This file is the single truth file for the `esf` service only.
 
 It must apply the rules from `governance/PLATFORM_BLUEPRINT.md` without duplicating platform-wide policy.
 
@@ -15,7 +15,7 @@ governance/PLATFORM_BLUEPRINT.md
 For API contract truth, read:
 
 ```text
-arb/arb.openapi.yaml
+esf/esf.openapi.yaml
 ```
 
 ---
@@ -24,23 +24,23 @@ arb/arb.openapi.yaml
 
 | Field | Value |
 |---|---|
-| Service ID | `arb` |
-| Service Name | Reservations / حجوزات |
-| Service Type | `PAID_SERVICE` |
-| Owner Root | `arb/` |
-| Truth File | `arb/SERVICE_BLUEPRINT.md` |
-| OpenAPI Contract | `arb/arb.openapi.yaml` |
-| Public Export Path | `arb/index.ts` |
+| Service ID | `esf` |
+| Service Name | Blood Donation / ØªØ¨Ø±Ø¹ Ø¨Ø§Ù„Ø¯Ù… |
+| Service Type | `FREE_HUMANITARIAN_SERVICE` |
+| Owner Root | `esf/` |
+| Truth File | `esf/docs/SERVICE_BLUEPRINT.md` |
+| OpenAPI Contract | `esf/esf.openapi.yaml` |
+| Public Export Path | `esf/index.ts` |
 | Current Decision | `NOT CLOSED` |
 | Current Status | `ROOTED_UNPROVEN / SERVICE_BLUEPRINT_BASELINE` |
 | Evidence Root | `tools/registry/runs/{SESSION_ID}` |
 
 ### Blueprint Metadata
 
-id: arb
-name: Reservations
-owner: arb/
-public_export_path: arb/index.ts
+id: esf
+name: Blood Donation
+owner: esf/
+public_export_path: esf/index.ts
 screens_matrix: TBD
 flow_matrix: TBD
 evidence_root: tools/registry/runs/{SESSION_ID}
@@ -48,7 +48,7 @@ closure_decision: NOT CLOSED
 
 ### Service Purpose
 
-خدمة حجوزات مثل الفنادق والصالات والمرافق ومزودي خدمات الحجز: البحث، التوافر، الحجز، العربون/الضمان، التأكيد، الإلغاء، النزاعات، والتسويات.
+Ø®Ø¯Ù…Ø© Ø¥Ù†Ø³Ø§Ù†ÙŠØ© Ù„Ø·Ù„Ø¨ Ø§Ù„Ø¯Ù…ØŒ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ†ØŒ Ø§Ù„Ù…Ø·Ø§Ø¨Ù‚Ø© Ø­Ø³Ø¨ Ø§Ù„ÙØµÙŠÙ„Ø©/Ø§Ù„Ù…ÙˆÙ‚Ø¹/Ø§Ù„Ø­Ø§Ù„Ø©ØŒ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŒ Ø§Ù„Ø¥Ø´Ø±Ø§ÙØŒ ÙˆØ§Ù„Ø¨Ù„Ø§ØºØ§Øª.
 
 ---
 
@@ -60,7 +60,7 @@ closure_decision: NOT CLOSED
 - Service-specific frontend surfaces when present under this service root.
 - Service-specific backend scope when present under this service root.
 - Service-specific domain rules and models.
-- `arb/arb.openapi.yaml` contract truth.
+- `esf/esf.openapi.yaml` contract truth.
 - Service-specific evidence and closure status.
 - Service-specific flow, gap, Screen/API Matrix, and runtime state records inside this file.
 
@@ -77,7 +77,7 @@ closure_decision: NOT CLOSED
 ### Allowed Dependencies
 
 - `governance/PLATFORM_BLUEPRINT.md` for platform method.
-- `arb/arb.openapi.yaml` for this service contract.
+- `esf/esf.openapi.yaml` for this service contract.
 - `auth.openapi.yaml` for platform authentication/authorization when applicable.
 - WLT contracts for any financial effect.
 - `@bthwani/ui-kit` public exports for shared UI.
@@ -101,23 +101,18 @@ closure_decision: NOT CLOSED
 
 | Surface | Role / Scope | What Surface Provides | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| `app-client` | Customer: البحث، الحجز، دفع/عربون عند اعتماده، المتابعة، الإلغاء/الدعم. | runtime / shell / composition only | TBD | N/A |
-| `webapp` | Customer Web: حجوزات عبر الويب عند النضج. | runtime / shell / composition only | TBD | N/A |
-| `app-partner` | Provider/Partner: إدارة الحجوزات، التوافر، العروض، التأكيد، الإلغاء. | runtime / shell / composition only | TBD | N/A |
-| `app-field` | Field Agent: تفعيل مزودين أو دعم ميداني عند الحاجة المثبتة. | runtime / shell / composition only | TBD | N/A |
-| `control-panel` | Admin/Ops: نزاعات، سياسات، تدقيق، إشراف، تشغيل. | runtime / shell / composition only | TBD | N/A |
+| `app-client` | Requester/Donor: Ø·Ù„Ø¨ Ø¯Ù… Ø£Ùˆ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙƒÙ…ØªØ¨Ø±Ø¹ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø©. | runtime / shell / composition only | TBD | N/A |
+| `webapp` | Web Requester/Donor: Ø·Ù„Ø¨/ØªØ³Ø¬ÙŠÙ„ Ø¹Ø¨Ø± Ø§Ù„ÙˆÙŠØ¨ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | runtime / shell / composition only | TBD | N/A |
+| `control-panel` | Admin/Moderation: Ù…Ø±Ø§Ø¬Ø¹Ø©ØŒ Ø¥Ø´Ø±Ø§ÙØŒ Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø­Ø§Ù„Ø§ØªØŒ Ø¨Ù„Ø§ØºØ§ØªØŒ Ø¯Ø¹Ù…. | runtime / shell / composition only | TBD | N/A |
 
 ### Owned Capabilities
 
-- Reservation discovery
-- Availability
-- Offer detail
-- Booking intent
-- Deposit/guarantee relation
-- Confirmation/cancellation
-- Dispute/support
-- Partner availability management
-- WLT payment/refund/settlement relation
+- Donation request
+- Donor registration
+- Blood type/location matching
+- Urgency/status tracking
+- Case follow-up
+- Moderation/support
 
 ### Capability Lock Notes
 
@@ -131,17 +126,15 @@ closure_decision: NOT CLOSED
 
 | Surface | Ownership Rule | Service Scope | Status | Evidence |
 |---|---|---|---|---|
-| `app-client` | app owns shell/composition only | Customer: البحث، الحجز، دفع/عربون عند اعتماده، المتابعة، الإلغاء/الدعم. | TBD | N/A |
-| `webapp` | app owns shell/composition only | Customer Web: حجوزات عبر الويب عند النضج. | TBD | N/A |
-| `app-partner` | app owns shell/composition only | Provider/Partner: إدارة الحجوزات، التوافر، العروض، التأكيد، الإلغاء. | TBD | N/A |
-| `app-field` | app owns shell/composition only | Field Agent: تفعيل مزودين أو دعم ميداني عند الحاجة المثبتة. | TBD | N/A |
-| `control-panel` | app owns shell/composition only | Admin/Ops: نزاعات، سياسات، تدقيق، إشراف، تشغيل. | TBD | N/A |
+| `app-client` | app owns shell/composition only | Requester/Donor: Ø·Ù„Ø¨ Ø¯Ù… Ø£Ùˆ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙƒÙ…ØªØ¨Ø±Ø¹ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø©. | TBD | N/A |
+| `webapp` | app owns shell/composition only | Web Requester/Donor: Ø·Ù„Ø¨/ØªØ³Ø¬ÙŠÙ„ Ø¹Ø¨Ø± Ø§Ù„ÙˆÙŠØ¨ Ø¹Ù†Ø¯ Ø§Ù„Ù†Ø¶Ø¬. | TBD | N/A |
+| `control-panel` | app owns shell/composition only | Admin/Moderation: Ù…Ø±Ø§Ø¬Ø¹Ø©ØŒ Ø¥Ø´Ø±Ø§ÙØŒ Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø­Ø§Ù„Ø§ØªØŒ Ø¨Ù„Ø§ØºØ§ØªØŒ Ø¯Ø¹Ù…. | TBD | N/A |
 
 ### App/Shell Rule
 
 Apps may own entry, bootstrap, routing mount, providers, platform config, metadata, and minimal environment wiring.
 
-Apps must not own real `arb` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
+Apps must not own real `esf` service screens, business/domain logic, reusable UI families, local design tokens, mock service content, independent i18n/direction ownership, direct backend/API ownership, or deep/private imports.
 
 ---
 
@@ -149,15 +142,12 @@ Apps must not own real `arb` service screens, business/domain logic, reusable UI
 
 | Operation ID | Operation | Business Meaning | Actor | Surface | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `ARB-OP-01` | Reservation discovery | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-02` | Availability | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-03` | Offer detail | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-04` | Booking intent | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-05` | Deposit/guarantee relation | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-06` | Confirmation/cancellation | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-07` | Dispute/support | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-08` | Partner availability management | TBD | TBD | TBD | TBD | N/A |
-| `ARB-OP-09` | WLT payment/refund/settlement relation | TBD | TBD | TBD | TBD | N/A |
+| `ESF-OP-01` | Donation request | TBD | TBD | TBD | TBD | N/A |
+| `ESF-OP-02` | Donor registration | TBD | TBD | TBD | TBD | N/A |
+| `ESF-OP-03` | Blood type/location matching | TBD | TBD | TBD | TBD | N/A |
+| `ESF-OP-04` | Urgency/status tracking | TBD | TBD | TBD | TBD | N/A |
+| `ESF-OP-05` | Case follow-up | TBD | TBD | TBD | TBD | N/A |
+| `ESF-OP-06` | Moderation/support | TBD | TBD | TBD | TBD | N/A |
 
 ### Operation Rules
 
@@ -172,36 +162,36 @@ Apps must not own real `arb` service screens, business/domain logic, reusable UI
 ### Primary Lifecycle
 
 ```text
-Search reservation → view offer/detail → choose time/option → booking intent → WLT deposit/payment path if required → partner confirmation → customer follow-up → completion/cancel/dispute → WLT refund/settlement if required → control-panel supervision.
+Requester creates blood need â†’ eligibility/classification â†’ donor discovery/matching â†’ contact/action path â†’ status follow-up â†’ closure/report â†’ control-panel supervision.
 ```
 
 ### Deep Closure Sequence
 
 ```text
 Actors
-→ Operations
-→ Lifecycle
-→ Surface Coverage
-→ Journeys
-→ Screen Inventory
-→ Route Rationalization
-→ Purpose / CTA
-→ State Coverage
-→ Screen/API Matrix
-→ Gap Map
-→ Contract
-→ Generated/typed client
-→ Binding
-→ Integration
-→ Runtime
-→ Backend
-→ Data
-→ Security
-→ Observability
-→ Tests
-→ Performance / Accessibility
-→ Production Readiness
-→ Evidence
+â†’ Operations
+â†’ Lifecycle
+â†’ Surface Coverage
+â†’ Journeys
+â†’ Screen Inventory
+â†’ Route Rationalization
+â†’ Purpose / CTA
+â†’ State Coverage
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ Contract
+â†’ Generated/typed client
+â†’ Binding
+â†’ Integration
+â†’ Runtime
+â†’ Backend
+â†’ Data
+â†’ Security
+â†’ Observability
+â†’ Tests
+â†’ Performance / Accessibility
+â†’ Production Readiness
+â†’ Evidence
 ```
 
 ---
@@ -210,7 +200,7 @@ Actors
 
 | ID | Surface | Screen / Route / Sheet / State | Type | Purpose / CTA | Required States | Owner Path | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
-| `ARB-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
+| `ESF-INV-TBD` | TBD | TBD | TBD | TBD | loading / empty / error / success / offline / disabled / pending / retry / blocked | TBD | TBD | N/A |
 
 ### Screen File Model
 
@@ -227,7 +217,7 @@ Actors
 
 | Flow ID | Screen / Route / State | Needed Data | Needed Action | Existing Contract | Required Contract Gap | Status | Evidence |
 |---|---|---|---|---|---|---|---|
-| `ARB-MATRIX-TBD` | TBD | TBD | TBD | `arb/arb.openapi.yaml` | TBD | TBD | N/A |
+| `ESF-MATRIX-TBD` | TBD | TBD | TBD | `esf/esf.openapi.yaml` | TBD | TBD | N/A |
 
 ### Screen/API Rules
 
@@ -242,7 +232,7 @@ Actors
 
 | Gap ID | Gap Type | Affected Flow | Surface / Layer | Expected | Current | Impact | Priority | Closure Type | Target Owner Path | Blocked By | Verification Gate | Evidence |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `ARB-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `arb/` | TBD | TBD | N/A |
+| `ESF-GAP-TBD` | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | `esf/` | TBD | TBD | N/A |
 
 ### Allowed Gap Types
 
@@ -260,7 +250,7 @@ A gap does not automatically mean a new screen. It may close through:
 
 | Area | Status | Source | Evidence | Notes |
 |---|---|---|---|---|
-| OpenAPI | `CONTRACT_TBD` | `arb/arb.openapi.yaml` | N/A | Do not add fake endpoints. |
+| OpenAPI | `CONTRACT_TBD` | `esf/esf.openapi.yaml` | N/A | Do not add fake endpoints. |
 | API Types | `TBD` | TBD | N/A | Must follow contract generate/verify. |
 | API Client / Typed Boundary | `TBD` | TBD | N/A | Required before Binding PASS. |
 | Backend Handler | `TBD` | TBD | N/A | No backend claim without implementation evidence. |
@@ -272,18 +262,18 @@ A gap does not automatically mean a new screen. It may close through:
 
 ```text
 Flow / Screen Need
-→ Screen/API Matrix
-→ Gap Map
-→ OpenAPI Contract
-→ Generated/typed client
-→ Binding Adapter / ViewModel
-→ Screen State
-→ Runtime Evidence
+â†’ Screen/API Matrix
+â†’ Gap Map
+â†’ OpenAPI Contract
+â†’ Generated/typed client
+â†’ Binding Adapter / ViewModel
+â†’ Screen State
+â†’ Runtime Evidence
 ```
 
 ### Financial Boundary
 
-Deposits, fees, refunds, settlements, commissions, or any ARB financial effect must pass through WLT only.
+ESF has no independent payment channel. Any future support/donation financial feature must pass through WLT after explicit approval and contract evidence.
 
 ---
 
@@ -384,7 +374,7 @@ NOT CLOSED
 
 ### Single Next Action
 
-Lock partner_type and field_type for ARB, then prove booking lifecycle gaps before changing OpenAPI.
+Prove humanitarian journey and privacy/safety requirements before adding endpoints or financial features.
 
 ### Update Protocol
 
@@ -397,9 +387,3 @@ Lock partner_type and field_type for ARB, then prove booking lifecycle gaps befo
 7. Update this file only with verified service-specific truth.
 8. Do not duplicate platform-wide rules here.
 9. Do not claim `CLOSED` unless all applicable gates pass.
-
-## Cross-Surface Effects: Notifications
-
-| Surface | Required Effect | Status | Reason |
-|---|---|---|---|
-| notifications | notification_chain | N/A_WITH_REASON | arb is a reservations service; direct push/SMS/email notification delivery is owned by the notification service layer (knz for the notification domain). This service emits events consumed by the notification layer rather than owning the notification_chain surface directly. Owner: notification-service boundary. Expiry: re-evaluate when direct notification ownership is assigned. |

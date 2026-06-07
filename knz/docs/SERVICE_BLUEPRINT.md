@@ -1,4 +1,4 @@
-﻿# KNZ Service Blueprint
+# KNZ Service Blueprint
 
 This file is the single truth file for the `knz` service only.
 
@@ -28,7 +28,7 @@ knz/knz.openapi.yaml
 | Service Name | Open Marketplace / السوق المفتوح |
 | Service Type | `MARKETPLACE_SERVICE` |
 | Owner Root | `knz/` |
-| Truth File | `knz/SERVICE_BLUEPRINT.md` |
+| Truth File | `knz/docs/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `knz/knz.openapi.yaml` |
 | Public Export Path | `knz/index.ts` |
 | Current Decision | `NOT CLOSED` |

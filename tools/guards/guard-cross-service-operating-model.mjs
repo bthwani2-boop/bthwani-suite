@@ -133,7 +133,7 @@ function analyzeService(service) {
     declaredStatus: 'UNPROVEN',
     progressLevel: 'L0_UNKNOWN',
     files: [],
-    blueprintPath: `${service.id}/SERVICE_BLUEPRINT.md`,
+    blueprintPath: `${service.id}/docs/SERVICE_BLUEPRINT.md`,
     openapiPath: `${service.id}/${service.id}.openapi.yaml`,
     discoveredSurfaces: [],
     discoveredJourneys: [],
@@ -162,7 +162,7 @@ function analyzeService(service) {
   const blueprintExists = fs.existsSync(path.join(root, serviceResult.blueprintPath));
   const openapiExists = fs.existsSync(path.join(root, serviceResult.openapiPath));
   if (!blueprintExists) {
-    add('WARN', service.id, 'blueprint_missing', `${service.id}/SERVICE_BLUEPRINT.md is missing.`, serviceResult.blueprintPath, 'Add a living blueprint before service closure.');
+    add('WARN', service.id, 'blueprint_missing', `${service.id}/docs/SERVICE_BLUEPRINT.md is missing.`, serviceResult.blueprintPath, 'Add a living blueprint before service closure.');
   }
   if (!openapiExists) {
     add('WARN', service.id, 'openapi_missing', `${service.id}/${service.id}.openapi.yaml is missing.`, serviceResult.openapiPath, 'Add OpenAPI placeholder/contract before binding closure.');
