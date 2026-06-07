@@ -27,15 +27,16 @@ func (repo *PostgresRepository) CreateProduct(ctx context.Context, storeID strin
 
 	query := `
 INSERT INTO dsh_catalog_products
-  (id, store_id, name, sku, gtin, barcode, description, base_price_label, category_id, approval_status, created_at, updated_at)
+  (id, store_id, name, sku, gtin, barcode, description, base_price_label, base_price_minor_units, category_id, approval_status, created_at, updated_at)
 VALUES
-  ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'partner_submitted', NOW(), NOW())
-RETURNING id, store_id, name, sku, gtin, barcode, description, base_price_label, category_id, approval_status, created_at, updated_at`
+  ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'partner_submitted', NOW(), NOW())
+RETURNING id, store_id, name, sku, gtin, barcode, description, base_price_label, base_price_minor_units, category_id, approval_status, created_at, updated_at`
 
 	row := repo.db.QueryRowContext(ctx, query,
 		id, storeID, name,
 		req.SKU, req.GTIN, req.Barcode, req.Description,
 		strings.TrimSpace(req.BasePriceLabel),
+		req.BasePriceMinorUnits,
 		req.CategoryID,
 	)
 
@@ -74,6 +75,10 @@ func (repo *PostgresRepository) UpdateProduct(ctx context.Context, productID str
 		args = append(args, strings.TrimSpace(*req.BasePriceLabel))
 		sets = append(sets, fmt.Sprintf("base_price_label = $%d", len(args)))
 	}
+	if req.BasePriceMinorUnits != nil {
+		args = append(args, *req.BasePriceMinorUnits)
+		sets = append(sets, fmt.Sprintf("base_price_minor_units = $%d", len(args)))
+	}
 	if req.CategoryID != nil {
 		args = append(args, req.CategoryID)
 		sets = append(sets, fmt.Sprintf("category_id = $%d", len(args)))
@@ -85,7 +90,7 @@ func (repo *PostgresRepository) UpdateProduct(ctx context.Context, productID str
 	query := fmt.Sprintf(`
 UPDATE dsh_catalog_products SET %s
 WHERE id = $%d
-RETURNING id, store_id, name, sku, gtin, barcode, description, base_price_label, category_id, approval_status, created_at, updated_at`,
+RETURNING id, store_id, name, sku, gtin, barcode, description, base_price_label, base_price_minor_units, category_id, approval_status, created_at, updated_at`,
 		strings.Join(sets, ", "), idPlaceholder)
 
 	row := repo.db.QueryRowContext(ctx, query, args...)
@@ -98,8 +103,8 @@ RETURNING id, store_id, name, sku, gtin, barcode, description, base_price_label,
 
 func (repo *PostgresRepository) GetProduct(ctx context.Context, productID string) (domain.ProductRecord, error) {
 	query := `
-SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.category_id, p.approval_status, p.created_at, p.updated_at,
-       o.price_override, o.stock_override, o.available_override
+SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.base_price_minor_units, p.category_id, p.approval_status, p.created_at, p.updated_at,
+       o.price_override, o.price_override_minor_units, o.stock_override, o.available_override
 FROM dsh_catalog_products p
 LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
 WHERE p.id = $1`
@@ -140,8 +145,8 @@ func (repo *PostgresRepository) ListProducts(ctx context.Context, storeID string
 	offsetPlaceholder := len(args)
 
 	query := fmt.Sprintf(`
-SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.category_id, p.approval_status, p.created_at, p.updated_at,
-       o.price_override, o.stock_override, o.available_override
+SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.base_price_minor_units, p.category_id, p.approval_status, p.created_at, p.updated_at,
+       o.price_override, o.price_override_minor_units, o.stock_override, o.available_override
 FROM dsh_catalog_products p
 LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
 WHERE p.%s
@@ -183,14 +188,14 @@ LIMIT $%d OFFSET $%d`, strings.Join(where, " AND p."), limitPlaceholder, offsetP
 	}, nil
 }
 
-// scanProductRow scans a *sql.Row into a ProductRecord.
+// scanProductRow scans a *sql.Row into a ProductRecord (no overrides).
 func scanProductRow(row *sql.Row) (domain.ProductRecord, error) {
 	var r domain.ProductRecord
 	var sku, gtin, barcode, description, categoryID sql.NullString
 	err := row.Scan(
 		&r.ID, &r.StoreID, &r.Name,
 		&sku, &gtin, &barcode, &description,
-		&r.BasePriceLabel, &categoryID,
+		&r.BasePriceLabel, &r.BasePriceMinorUnits, &categoryID,
 		&r.ApprovalStatus,
 		&r.CreatedAt, &r.UpdatedAt,
 	)
@@ -215,14 +220,14 @@ func scanProductRow(row *sql.Row) (domain.ProductRecord, error) {
 	return r, nil
 }
 
-// scanProductRowColumns scans a *sql.Rows into a ProductRecord.
+// scanProductRowColumns scans a *sql.Rows into a ProductRecord (no overrides).
 func scanProductRowColumns(rows *sql.Rows) (domain.ProductRecord, error) {
 	var r domain.ProductRecord
 	var sku, gtin, barcode, description, categoryID sql.NullString
 	err := rows.Scan(
 		&r.ID, &r.StoreID, &r.Name,
 		&sku, &gtin, &barcode, &description,
-		&r.BasePriceLabel, &categoryID,
+		&r.BasePriceLabel, &r.BasePriceMinorUnits, &categoryID,
 		&r.ApprovalStatus,
 		&r.CreatedAt, &r.UpdatedAt,
 	)
@@ -558,15 +563,16 @@ func scanProductRowWithOverrides(row *sql.Row) (domain.ProductRecord, error) {
 	var r domain.ProductRecord
 	var sku, gtin, barcode, description, categoryID sql.NullString
 	var priceOverride sql.NullString
+	var priceOverrideMinorUnits sql.NullInt64
 	var stockOverride sql.NullInt64
 	var availableOverride sql.NullBool
 	err := row.Scan(
 		&r.ID, &r.StoreID, &r.Name,
 		&sku, &gtin, &barcode, &description,
-		&r.BasePriceLabel, &categoryID,
+		&r.BasePriceLabel, &r.BasePriceMinorUnits, &categoryID,
 		&r.ApprovalStatus,
 		&r.CreatedAt, &r.UpdatedAt,
-		&priceOverride, &stockOverride, &availableOverride,
+		&priceOverride, &priceOverrideMinorUnits, &stockOverride, &availableOverride,
 	)
 	if err != nil {
 		return domain.ProductRecord{}, err
@@ -588,6 +594,9 @@ func scanProductRowWithOverrides(row *sql.Row) (domain.ProductRecord, error) {
 	}
 	if priceOverride.Valid {
 		r.PriceOverride = &priceOverride.String
+	}
+	if priceOverrideMinorUnits.Valid {
+		r.PriceOverrideMinorUnits = &priceOverrideMinorUnits.Int64
 	}
 	if stockOverride.Valid {
 		val := int(stockOverride.Int64)
@@ -604,15 +613,16 @@ func scanProductRowColumnsWithOverrides(rows *sql.Rows) (domain.ProductRecord, e
 	var r domain.ProductRecord
 	var sku, gtin, barcode, description, categoryID sql.NullString
 	var priceOverride sql.NullString
+	var priceOverrideMinorUnits sql.NullInt64
 	var stockOverride sql.NullInt64
 	var availableOverride sql.NullBool
 	err := rows.Scan(
 		&r.ID, &r.StoreID, &r.Name,
 		&sku, &gtin, &barcode, &description,
-		&r.BasePriceLabel, &categoryID,
+		&r.BasePriceLabel, &r.BasePriceMinorUnits, &categoryID,
 		&r.ApprovalStatus,
 		&r.CreatedAt, &r.UpdatedAt,
-		&priceOverride, &stockOverride, &availableOverride,
+		&priceOverride, &priceOverrideMinorUnits, &stockOverride, &availableOverride,
 	)
 	if err != nil {
 		return domain.ProductRecord{}, err
@@ -634,6 +644,9 @@ func scanProductRowColumnsWithOverrides(rows *sql.Rows) (domain.ProductRecord, e
 	}
 	if priceOverride.Valid {
 		r.PriceOverride = &priceOverride.String
+	}
+	if priceOverrideMinorUnits.Valid {
+		r.PriceOverrideMinorUnits = &priceOverrideMinorUnits.Int64
 	}
 	if stockOverride.Valid {
 		val := int(stockOverride.Int64)

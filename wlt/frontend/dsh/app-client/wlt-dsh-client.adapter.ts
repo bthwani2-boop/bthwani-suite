@@ -13,8 +13,8 @@ function getClient(bearerToken?: string, devClientId?: string) {
 	return createWltDshTypedClient({ bearerToken, devClientId });
 }
 
-function paymentIdempotencyKey(clientId: string, orderId: string, amountMinorUnits: number): string {
-	return `dsh-client-payment-${clientId}-${orderId}-${amountMinorUnits}`;
+function paymentIdempotencyKey(clientId: string, orderId: string, amountYer: number): string {
+	return `dsh-client-payment-${clientId}-${orderId}-${amountYer}`;
 }
 
 function normalizeError(error: unknown): string {
@@ -35,8 +35,8 @@ export const isLinked = async (clientId?: string, bearerToken?: string): Promise
 export const getBalance = async (clientId?: string, bearerToken?: string): Promise<number> => {
 	const cid = clientId || DEFAULT_CLIENT_ID;
 	const summary = await getClient(bearerToken, cid).getClientWalletSummary(cid);
-	// WLT returns float YER; convert to minor units for display layer.
-	return Math.round(summary.balance * 100);
+	// YER has no sub-units (ISO 4217 exponent 0). Return balance as integer YER units.
+	return Math.round(summary.balance);
 };
 
 export const link = async (clientId?: string, bearerToken?: string): Promise<{ success: boolean; account?: WalletAccount; error?: string }> => {
@@ -57,7 +57,7 @@ export const unlink = async (): Promise<void> => {
 };
 
 export const requestPayment = async (
-	amountMinorUnits: number,
+	amountYer: number,
 	clientId?: string,
 	bearerToken?: string,
 	orderId?: string,
@@ -65,13 +65,14 @@ export const requestPayment = async (
 	try {
 		const cid = clientId || DEFAULT_CLIENT_ID;
 		const oid = orderId || DEFAULT_ORDER_ID;
+		// YER has no sub-units — amount is passed directly as integer YER to WLT.
 		const session = await getClient(bearerToken, cid).createClientPaymentSession({
 			checkout_intent_id: oid,
 			client_id: cid,
-			amount: amountMinorUnits / 100,
+			amount: amountYer,
 			currency: DEFAULT_CURRENCY,
 			payment_method: 'wallet',
-			idempotency_key: paymentIdempotencyKey(cid, oid, amountMinorUnits),
+			idempotency_key: paymentIdempotencyKey(cid, oid, amountYer),
 		});
 
 		if (session.status !== 'CONFIRMED') {
@@ -95,17 +96,17 @@ export const listLedgerEntries = async (
 };
 
 export const topUp = async (
-	amountMinorUnits: number,
+	amountYer: number,
 	clientId?: string,
 	bearerToken?: string,
 ): Promise<{ success: boolean; balance?: number; error?: string }> => {
 	try {
 		const cid = clientId || DEFAULT_CLIENT_ID;
-		// Send top up via a mock session confirm or trigger topup logic
+		// YER has no sub-units — amount is passed directly as integer YER.
 		const session = await getClient(bearerToken, cid).createClientPaymentSession({
 			checkout_intent_id: `topup-${Date.now()}`,
 			client_id: cid,
-			amount: amountMinorUnits / 100,
+			amount: amountYer,
 			currency: DEFAULT_CURRENCY,
 			payment_method: 'wallet',
 			idempotency_key: `topup-idemp-${cid}-${Date.now()}`,
@@ -119,8 +120,8 @@ export const topUp = async (
 	}
 };
 
-export const createDeepLink = (orderId: string, amountMinorUnits: number): string => {
-	return `wlt://pay?order=${encodeURIComponent(orderId)}&amount=${amountMinorUnits}`;
+export const createDeepLink = (orderId: string, amountYer: number): string => {
+	return `wlt://pay?order=${encodeURIComponent(orderId)}&amount=${amountYer}`;
 };
 
 const WltDshClientAdapter = { isLinked, getBalance, link, unlink, requestPayment, topUp, createDeepLink, listLedgerEntries };

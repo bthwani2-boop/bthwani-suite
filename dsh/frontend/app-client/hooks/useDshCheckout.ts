@@ -10,8 +10,11 @@ import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { hostClientStates } from '../dsh-client.navigation-bridge';
+import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
 
-function parsePrice(priceLabel?: string): number {
+// Dev fallback: parse display label when backend returns no numeric price.
+// Used only when total_amount_minor_units === 0 (memory mode / legacy backend).
+function parsePriceFallback(priceLabel?: string): number {
   if (!priceLabel) return 10.0;
   const match = priceLabel.match(/\d+(\.\d+)?/);
   return match ? parseFloat(match[0]) : 10.0;
@@ -20,6 +23,7 @@ function parsePrice(priceLabel?: string): number {
 type WalletPreview = {
   balance: number | null;
   requestPayment: (amount: number, intentId?: string) => Promise<{ success: boolean; txId?: string; error?: string }>;
+  refresh: () => Promise<void>;
 };
 
 type ActiveStore = { id: string; name: string; subtitle?: string };
@@ -75,13 +79,11 @@ export function useDshCheckout({
   const handleConfirmCheckout = React.useCallback(async () => {
     setCheckoutState('loading');
 
-    const cartSubtotal = cartItems.reduce((sum, item) => sum + parsePrice(item.priceLabel) * item.qty, 0);
-    const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
-    const cartTotal = cartSubtotal + deliveryFeeNum;
-
-    // Create checkout intent if API is available and not already created
+    // Create checkout intent if API is available and not already created.
+    // The intent response carries the backend-computed total (non-authoritative snapshot).
     const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
     let resolvedIntentId: string | null = checkoutIntentId;
+    let cartTotal: number;
 
     if (apiConfig && !resolvedIntentId) {
       try {
@@ -96,11 +98,21 @@ export function useDshCheckout({
         );
         resolvedIntentId = intentResp.intent_id;
         setCheckoutIntentId(resolvedIntentId);
+        // Use backend-computed total when available (Postgres mode).
+        // Fall back to parsed display labels when backend returns 0 (in-memory dev mode).
+        cartTotal = intentResp.total_amount_minor_units > 0
+          ? intentResp.total_amount_minor_units
+          : cartItems.reduce((sum, item) => sum + parsePriceFallback(item.priceLabel) * item.qty, 0)
+            + (selectedFulfillmentMode === 'pickup' ? 0 : 1500);
       } catch {
         setCheckoutState('payment-failed');
         setPaymentErrorMessage('تعذر إنشاء جلسة الدفع. تحقق من تسجيل الدخول وحاول مرة أخرى.');
         return;
       }
+    } else {
+      // Intent already created in a previous attempt — use parsed fallback (no re-fetch).
+      cartTotal = cartItems.reduce((sum, item) => sum + parsePriceFallback(item.priceLabel) * item.qty, 0)
+        + (selectedFulfillmentMode === 'pickup' ? 0 : 1500);
     }
 
     if (selectedPaymentMethod === 'wallet') {
@@ -110,6 +122,7 @@ export function useDshCheckout({
           onOrderExecute({ wltPaymentRefId: result.txId, fulfillmentMode: selectedFulfillmentMode });
           setCheckoutState('ready');
           setCheckoutIntentId(null);
+          void walletPreview.refresh();
         } else {
           setCheckoutState('payment-failed');
           setPaymentErrorMessage(
@@ -123,7 +136,11 @@ export function useDshCheckout({
         setPaymentErrorMessage('حدث خطأ أثناء الاتصال بمحفظتك. يُرجى المحاولة لاحقاً.');
       }
     } else {
-      // COD or other payment method — execute directly using intentId as reference
+      if (selectedPaymentMethod === 'cod' && !isCodAllowedForMode(selectedFulfillmentMode)) {
+        setCheckoutState('payment-failed');
+        setPaymentErrorMessage('الدفع عند الاستلام غير متاح لهذا النوع من التوصيل.');
+        return;
+      }
       onOrderExecute({ wltPaymentRefId: resolvedIntentId ?? undefined, fulfillmentMode: selectedFulfillmentMode });
       setCheckoutState('ready');
       setCheckoutIntentId(null);

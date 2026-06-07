@@ -22,3 +22,4 @@ Rules:
 - Do not claim completion without evidence.
 - Use PowerShell and `pnpm` conventions for `C:\bthwani-suite`.
 - If a tool's generic skill conflicts with BThwani rules, BThwani rules win.
+- Use `.agents/GRAPHIFY.md` for Graphify before broad repository-structure search.

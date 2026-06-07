@@ -24,9 +24,11 @@ export type AssistedOrderDeskScreenProps = {
 
 const translateDesc = (text: string) => {
   const descTranslations: Record<string, string> = {
-    'Paid via WLT wallet snapshot — controllable directly.': 'تم الدفع عبر لقطة محفظة WLT — قابلة للتحكم المباشر.',
-    'Refund mutation allowed and managed from DSH.': 'تعديل الاسترداد مسموح به وتتم إدارته من DSH.',
-    'Partner settlement mutable and managed directly.': 'تسوية الشريك قابلة للتعديل وتتم إدارتها مباشرة.',
+    'Payment snapshot is read-only from WLT.': 'حالة الدفع من WLT للعرض فقط.',
+    'Paid via WLT wallet snapshot — read-only visibility.': 'الدفع عبر محفظة WLT للعرض فقط.',
+    'Refund execution remains WLT-owned; DSH displays status only.': 'تنفيذ الاسترداد مملوك لـ WLT؛ DSH يعرض الحالة فقط.',
+    'Settlement remains WLT-owned; DSH displays status only.': 'التسوية مملوكة لـ WLT؛ DSH يعرض الحالة فقط.',
+    'Partner settlement remains WLT-owned; DSH displays status only.': 'تسوية الشريك مملوكة لـ WLT؛ DSH يعرض الحالة فقط.',
     'Assisted order rebuild after manual call confirmation.': 'إعادة بناء الطلب المساعد بعد التأكيد الهاتفي اليدوي.',
     'DSH & WLT': 'نظام DSH والمحفظة WLT',
     'Riyadh / Al Yasmin': 'الرياض / الياسمين',

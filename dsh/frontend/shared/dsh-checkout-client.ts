@@ -51,6 +51,11 @@ export type DshCheckoutIntentResponse = {
   readonly session_token: string;
   readonly status: 'pending_payment' | 'payment_confirmed' | 'payment_failed' | 'cancelled' | 'expired';
   readonly expires_at: string;
+  // Non-authoritative price snapshots. WLT owns financial truth.
+  // 0 = backend could not compute (in-memory dev mode or legacy). Frontend must fall back.
+  readonly items_subtotal_minor_units: number;
+  readonly delivery_fee_minor_units: number;
+  readonly total_amount_minor_units: number;
 };
 
 export type DshCancelCheckoutIntentResponse = {

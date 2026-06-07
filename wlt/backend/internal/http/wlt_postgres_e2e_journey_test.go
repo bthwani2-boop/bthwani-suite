@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"bthwani.local/wlt/backend/internal/store"
 	"bthwani.local/wlt/domain"
@@ -34,7 +35,10 @@ func TestWltPostgresE2EJourney(t *testing.T) {
 		for _, u := range urls {
 			d, errOpen := sql.Open("pgx", u)
 			if errOpen == nil {
-				if d.PingContext(context.Background()) == nil {
+				pingCtx, cancelPing := context.WithTimeout(context.Background(), 2*time.Second)
+				pingErr := d.PingContext(pingCtx)
+				cancelPing()
+				if pingErr == nil {
 					db = d
 					dbURL = u
 					break
@@ -55,12 +59,17 @@ func TestWltPostgresE2EJourney(t *testing.T) {
 	}
 	defer db.Close()
 
-	// Clean tables
-	_, err = db.ExecContext(context.Background(),
-		`DROP TABLE IF EXISTS wlt_reconciliation_runs, wlt_payout_decisions, wlt_finance_close, wlt_callback_events, wlt_ledger, wlt_refunds, wlt_settlements, wlt_payment_sessions, wlt_wallets CASCADE;`,
-	)
-	if err != nil {
-		t.Fatalf("failed to clean database tables: %v", err)
+	// Full schema reset — clears all tables AND any orphaned pg_type entries that
+	// DROP TABLE CASCADE sometimes leaves behind, causing "duplicate key" failures
+	// on re-migration.
+	for _, stmt := range []string{
+		`DROP SCHEMA public CASCADE`,
+		`CREATE SCHEMA public`,
+		`GRANT ALL ON SCHEMA public TO PUBLIC`,
+	} {
+		if _, err = db.ExecContext(context.Background(), stmt); err != nil {
+			t.Fatalf("schema reset (%s): %v", stmt, err)
+		}
 	}
 
 	// Apply migrations

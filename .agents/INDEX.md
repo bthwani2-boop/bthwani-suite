@@ -4,10 +4,11 @@
 
 1. `AGENTS.md`
 2. `.agents/AUTHORITY_BOUNDARY.md`
-3. Relevant adapter under `.agents/adapters/`
-4. Relevant governance source under `governance/`
-5. One or two relevant skills under `.agents/skills/`
-6. Open `.agents/README.md` or `.agents/SKILL_CATALOG.md` only if skill selection is unclear or direct evidence requires more context
+3. `.agents/GRAPHIFY.md` when the task is about repository structure, relationships, ownership, routing, imports, or cross-surface impact
+4. Relevant adapter under `.agents/adapters/`
+5. Relevant governance source under `governance/`
+6. One or two relevant skills under `.agents/skills/`
+7. Open `.agents/README.md` or `.agents/SKILL_CATALOG.md` only if skill selection is unclear or direct evidence requires more context
 
 ## Execution budget
 

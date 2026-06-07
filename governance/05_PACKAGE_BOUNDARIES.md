@@ -61,6 +61,47 @@ compat alias
 typed adapter
 ```
 
+## Workspace model — monorepo with central installation
+
+BThwani is a single monorepo with central installation from the root. This model is non-negotiable.
+
+| Rule | Canonical behavior |
+|---|---|
+| Installation root | `C:\bthwani-suite` only — run `pnpm install` from root |
+| Lockfile | One `pnpm-lock.yaml` at the monorepo root; no lockfile inside any service |
+| Workspace definition | `pnpm-workspace.yaml` at root is the single workspace roots source |
+| Service isolation | Each service is logically independent but not a separate repo or install target |
+| Filtered execution | Run service scripts via `pnpm --filter @bthwani/<service> run <script>` from root |
+| `node_modules` | Only at root; never inside a service directory |
+
+### Active workspace packages (now)
+
+| Package name | Path | Status |
+|---|---|---|
+| `@bthwani/dsh` | `dsh/` | ACTIVE — has `package.json` with verifiable scripts |
+| `@bthwani/wlt` | `wlt/` | ACTIVE — has `package.json` with verifiable scripts |
+
+### Reserved service slots (future)
+
+The following services are reserved service slots. They have code structure but are NOT active workspace packages:
+
+`knz`, `arb`, `amn`, `esf`, `mrf`, `snd`, `kwd`
+
+These must NOT have a `package.json` until real implementation begins. Activation requires:
+1. A real `package.json` with a verifiable `check` script (not an echo placeholder).
+2. A `SERVICE_BLUEPRINT.md` in `<service>/docs/`.
+3. An approved OpenAPI contract file.
+4. The service added to `pnpm-workspace.yaml` (uncommented).
+
+### Orchestration package rules
+
+Active service packages (`dsh`, `wlt`) are orchestration packages — not standalone Node projects:
+- No independent `dependencies` or `devDependencies` unless directly required by a verifiable script.
+- All shared tooling (spectral, typescript, etc.) installs at the monorepo root.
+- Scripts must be verifiable (real command output, not echo-only) to count as a check.
+
+Guard enforcement: `tools/guards/guard-service-workspace-model.mjs` (ID: `GUARD_SERVICE_WORKSPACE_MODEL`)
+
 ## Package boundary evidence
 
 Minimum package boundary change evidence:

@@ -1053,7 +1053,7 @@ type ExceptionsStateItem = {
               title="سياسة وتوجيه الاستثناء"
               reason="اختر استثناءً نشطاً أو دليل تدخل أو سياسة تصعيد لمعاينة تفاصيل التوجيه والسياسة المعتمدة."
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_RUNTIME_EVIDENCE"
             />
           )}
         </Box>

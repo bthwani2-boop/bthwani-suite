@@ -251,7 +251,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
               title="تفاصيل سجل التدقيق"
               reason="اختر أحد التدقيقات التشغيلية من سجل التدقيق لمعاينة تفاصيل الإثبات ومراجعة SLA."
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_RUNTIME_EVIDENCE"
             />
           )}
         </Box>

@@ -82,6 +82,12 @@ This file coordinates those owners. It must not silently override them.
 
 ## Current workspace truth
 
+### Workspace model
+
+BThwani is a single monorepo. All installation must run from the root (`C:\bthwani-suite`). One `pnpm-lock.yaml` at root only. Service scripts run via `pnpm --filter @bthwani/<service> run <script>`. No lockfile or `node_modules` inside any service. See `governance/05_PACKAGE_BOUNDARIES.md` for the full workspace model specification.
+
+Guard enforcement: `pnpm run guard:service-workspace-model`
+
 ### Active roots from `pnpm-workspace.yaml`
 
 ```text
@@ -95,14 +101,10 @@ control-panel/runtime
 ui-kit
 dsh
 wlt
-knz
-arb
-amn
-esf
-mrf
-snd
-kwd
 ```
+
+Reserved service slots (not active workspace packages — no package.json):
+`knz`, `arb`, `amn`, `esf`, `mrf`, `snd`, `kwd`
 
 ### Active surface fleet
 
@@ -116,19 +118,26 @@ webapp/runtime
 website/runtime
 ```
 
-### Active service fleet
+### Active service fleet (now)
 
 ```text
-dsh
-wlt
-knz
-arb
-amn
-esf
-mrf
-snd
-kwd
+dsh  (@bthwani/dsh — orchestration package, active)
+wlt  (@bthwani/wlt — orchestration package, active)
 ```
+
+### Reserved service slots (future — activate when implementation begins)
+
+```text
+knz  — reserved; no package.json; no workspace registration
+arb  — reserved; no package.json; no workspace registration
+amn  — reserved; no package.json; no workspace registration
+esf  — reserved; no package.json; no workspace registration
+mrf  — reserved; no package.json; no workspace registration
+snd  — reserved; no package.json; no workspace registration
+kwd  — reserved; no package.json; no workspace registration
+```
+
+Activation requires: real package.json + verifiable check script + SERVICE_BLUEPRINT.md + approved OpenAPI contract.
 
 ### Retired or non-canonical patterns
 

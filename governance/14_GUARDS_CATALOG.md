@@ -41,6 +41,7 @@ id | domain | purpose | severity | mode | owner file | evidence | remediation | 
 | GUARD_24_TRACEABILITY_ROADMAP | roadmap | traceability and phase discipline | REPORT/BLOCK | No task without phase/evidence | 24 |
 | GUARD_25_SERVICE_BLUEPRINT | services | blueprint and operation catalog | BLOCKING for service closure | Blueprint exists and complete | 10 |
 | GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY | fixtures/media/data-integrity | prevent demo fixture and media identity drift across service frontends | REPORT/BLOCKING_ON_CHANGED_FILES | JSON/MD guard outputs classify legacy debt vs changed-file fixes | 14 |
+| GUARD_SERVICE_WORKSPACE_MODEL | workspace/packages | enforce monorepo model: central install, single lockfile, active vs reserved service slots, no node_modules or lockfile inside services | BLOCKING | No future service package.json; no service-level lockfile; dsh/wlt correctly named; pnpm-workspace.yaml does not activate future services | 05,PLATFORM_BLUEPRINT |
 
 ## Guard severity
 
@@ -88,6 +89,16 @@ Promotion rule: advisory while first inventory is being classified. Blocking for
 Purpose: detect ambiguous scatter/common/utils buckets with multiple files, detect old/temp/copy file naming, detect large files that may carry mixed responsibilities, detect tiny-file over-fragmentation, and detect exported symbols inside ambiguous directories.
 
 Promotion rule: advisory while baseline inventory is being reviewed. Blocking for newly introduced violations after baseline classification.
+
+## Implemented guard mapping: Service workspace model
+
+`GUARD_SERVICE_WORKSPACE_MODEL` maps to `GUARD_03_PACKAGE_BOUNDARY` (workspace dimension).
+
+| id | domain | purpose | severity | mode | owner file | evidence | remediation | false-positive policy |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| GUARD_SERVICE_WORKSPACE_MODEL | workspace/packages | Enforce the BThwani monorepo model: single root install, single root lockfile, dsh/wlt as active orchestration packages with correct name, future services as reserved slots with no package.json, no node_modules or lockfile inside any service, pnpm-workspace.yaml does not activate future services. | BLOCKING | blocking | governance/05_PACKAGE_BOUNDARIES.md, governance/PLATFORM_BLUEPRINT.md | Guard exits with PASS/FAIL and violation list | Remove future service package.json; remove from pnpm-workspace.yaml; run pnpm install from root only; fix package name mismatches. | A future service being listed in pnpm-workspace.yaml as a comment is not a violation. Only active (uncommented) entries trigger the check. |
+
+Script: `pnpm run guard:service-workspace-model` → `node tools/guards/guard-service-workspace-model.mjs`
 
 ## Implemented guard mapping: Service frontend fixture and media identity
 

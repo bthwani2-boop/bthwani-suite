@@ -8,6 +8,7 @@
     "serve:surfaces": "pnpm nx run-many --target=serve --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:surfaces": "pnpm nx run-many --target=build --projects=control-panel,webapp,website,app-client,app-partner,app-captain,app-field --parallel=7",
     "build:mobile-control-panel": "pnpm nx run-many --target=build --projects=control-panel,app-client,app-partner,app-captain,app-field --parallel=5",
+    "openapi:lint:auth": "spectral lint auth.openapi.yaml --ruleset .spectral.yaml",
     "openapi:lint:dsh": "spectral lint dsh/dsh.openapi.yaml --ruleset .spectral.yaml",
     "openapi:types:dsh": "openapi-typescript dsh/dsh.openapi.yaml -o dsh/frontend/app-client/contracts/dsh-openapi.types.ts",
     "openapi:lint:wlt": "spectral lint wlt/wlt.openapi.yaml --ruleset .spectral.yaml",
@@ -44,7 +45,8 @@
     "guard:operating-model": "node tools/guards/guard-cross-service-operating-model.mjs",
     "guard:operating-model:strict": "node tools/guards/guard-cross-service-operating-model.mjs --strict",
     "guard:operating-model:research": "node tools/guards/guard-cross-service-operating-model.mjs --research-plan",
-    "guard:service-runtime:dsh": "node tools/guards/guard-service-runtime.mjs --service dsh"
+    "guard:service-runtime:dsh": "node tools/guards/guard-service-runtime.mjs --service dsh",
+    "guard:service-workspace-model": "node tools/guards/guard-service-workspace-model.mjs"
   },
   "packageManager": "pnpm@8.15.0+sha512.ea45517d5285d123eac02c3793505fa1fd6da90a2fc60d1e8d9e0c1e9292886ecfaff513f062b9d1cc8021bb8615033b1ac5bea3b2ee3fc165a6d7034bbe6b03",
   "pnpm": {
@@ -57,6 +59,7 @@
   },
   "devDependencies": {
     "@stoplight/spectral-cli": "6.16.0",
+    "@tamagui/cli": "2.0.0-rc.41",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.24.1",

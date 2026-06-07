@@ -43,5 +43,56 @@ services:
       timeout: 5s
       retries: 6
 
+  wlt-postgres:
+    # WLT owns all wallet/payment/refund/settlement state.
+    # Separate DB from DSH — never share schemas between services.
+    image: postgres:16-alpine
+    container_name: bthwani-wlt-postgres-local
+    environment:
+      POSTGRES_DB: ${WLT_POSTGRES_DB:-wlt_local}
+      POSTGRES_USER: ${WLT_POSTGRES_USER:-wlt_local}
+      POSTGRES_PASSWORD: ${WLT_POSTGRES_PASSWORD:-wlt_local_password}
+    ports:
+      - "${WLT_POSTGRES_PORT:-55433}:5432"
+    volumes:
+      - wlt-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${WLT_POSTGRES_USER:-wlt_local} -d ${WLT_POSTGRES_DB:-wlt_local}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  wlt-api:
+    # WLT API service — port 8083. Owns wallet/payment/refund/settlement/ledger.
+    # DSH calls WLT for payment sessions; WLT calls DSH back via payment-callback.
+    # Context: ../../wlt (relative to dsh/backend/ compose location).
+    build:
+      context: ../../wlt
+      dockerfile: backend/Dockerfile.wlt-api
+    container_name: bthwani-wlt-api-local
+    restart: unless-stopped
+    environment:
+      PORT: "8083"
+      DATABASE_URL: "postgres://${WLT_POSTGRES_USER:-wlt_local}:${WLT_POSTGRES_PASSWORD:-wlt_local_password}@wlt-postgres:5432/${WLT_POSTGRES_DB:-wlt_local}?sslmode=disable"
+      WLT_AUTH_MODE: "${WLT_AUTH_MODE:-dev}"
+      WLT_AUTH_SERVICE_URL: "http://auth-service:8082"
+      WLT_CALLBACK_SECRET: "${WLT_CALLBACK_SECRET:-dev-secret}"
+      # DSH API runs on host during local dev. host.docker.internal resolves to host on Docker Desktop (Win/Mac).
+      # When DSH API is also containerised, change to http://dsh-api:8080.
+      WLT_DSH_BASE_URL: "${WLT_DSH_BASE_URL:-http://host.docker.internal:8080}"
+    ports:
+      - "${WLT_HOST_PORT:-8083}:8083"
+    depends_on:
+      wlt-postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8083/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
 volumes:
   dsh-postgres-data:
+  wlt-postgres-data:

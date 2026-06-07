@@ -79,11 +79,16 @@ func (repo *MemoryRepository) CreateCheckoutIntent(_ context.Context, clientID s
 	}
 	memCheckoutIntents = append(memCheckoutIntents, intent)
 
+	// In-memory mode has no product catalog — amounts are zero.
+	// When connected to Postgres, CreateCheckoutIntent computes amounts from real product prices.
 	return domain.CheckoutIntentResponse{
-		IntentID:     intent.ID,
-		SessionToken: intent.SessionToken,
-		Status:       intent.Status,
-		ExpiresAt:    intent.ExpiresAt,
+		IntentID:                intent.ID,
+		SessionToken:            intent.SessionToken,
+		Status:                  intent.Status,
+		ExpiresAt:               intent.ExpiresAt,
+		ItemsSubtotalMinorUnits: 0,
+		DeliveryFeeMinorUnits:   0,
+		TotalAmountMinorUnits:   0,
 	}, nil
 }
 

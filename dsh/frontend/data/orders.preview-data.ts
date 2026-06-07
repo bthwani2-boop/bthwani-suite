@@ -85,9 +85,9 @@ export const DSH_ASSISTED_ORDER_PREVIEW: readonly DshAssistedOrderPreview[] = [
     activeStage: 'partner-confirmation',
     basketSummary: '3 عناصر منشورة مع بديل واحد مثبت قبل الإرسال.',
     auditFlags: ['identity-verified', 'reason-required', 'audit-required', 'replacement-confirmed'],
-    allowedActions: ['إضافة عنصر منشور', 'حذف عنصر', 'استبدال عنصر غير متاح', 'فتح WLT visibility والتحكم المالي'],
+    allowedActions: ['إضافة عنصر منشور', 'حذف عنصر', 'استبدال عنصر غير متاح', 'فتح WLT visibility للعرض فقط'],
     forbiddenActions: ['تجاوز التحقق من الهوية', 'تنفيذ refund محلي', 'اعتماد حقيقة حسابية داخل DSH'],
-    wltBoundary: 'WLT والتحكم المالي متاحان بالكامل: الدفع والاسترداد والتسوية قابلة للتعديل والتحكم المباشر.',
+    wltBoundary: 'WLT يملك الدفع والاسترداد والتسوية؛ DSH يعرض الحالة فقط ولا ينفذ أي تعديل مالي.',
     nextAction: 'ثبّت موافقة البديل ثم حرّك الحالة إلى submit draft preview من دون claim إنشاء طلب.',
     crossSurfaceLinks: [
       {

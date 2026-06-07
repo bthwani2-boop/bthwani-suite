@@ -122,6 +122,57 @@ WHERE client_id = $1 AND store_id = $2
 		return domain.CheckoutIntentResponse{}, fmt.Errorf("store not found")
 	}
 
+	// Compute non-authoritative price snapshot.
+	// Collect product IDs from the request to batch-fetch prices.
+	productIDs := make([]string, 0, len(req.Items))
+	for _, item := range req.Items {
+		productIDs = append(productIDs, item.ProductID)
+	}
+
+	// Fetch effective price per product: use price_override_minor_units if set, else base_price_minor_units.
+	type productPrice struct{ baseUnits, overrideUnits sql.NullInt64 }
+	priceRows, err := tx.QueryContext(ctx, `
+SELECT p.id,
+       p.base_price_minor_units,
+       o.price_override_minor_units
+FROM dsh_catalog_products p
+LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
+WHERE p.id = ANY($1)`, productIDs)
+	if err != nil {
+		return domain.CheckoutIntentResponse{}, fmt.Errorf("failed to fetch product prices: %w", err)
+	}
+	priceMap := make(map[string]int64)
+	for priceRows.Next() {
+		var id string
+		var pp productPrice
+		if err := priceRows.Scan(&id, &pp.baseUnits, &pp.overrideUnits); err != nil {
+			priceRows.Close()
+			return domain.CheckoutIntentResponse{}, fmt.Errorf("failed to scan product price: %w", err)
+		}
+		if pp.overrideUnits.Valid {
+			priceMap[id] = pp.overrideUnits.Int64
+		} else if pp.baseUnits.Valid {
+			priceMap[id] = pp.baseUnits.Int64
+		}
+	}
+	priceRows.Close()
+	if err := priceRows.Err(); err != nil {
+		return domain.CheckoutIntentResponse{}, fmt.Errorf("failed to iterate product prices: %w", err)
+	}
+
+	var itemsSubtotal int64
+	for _, item := range req.Items {
+		itemsSubtotal += priceMap[item.ProductID] * int64(item.Quantity)
+	}
+
+	// Fetch store delivery fee (0 if column absent on older schema).
+	var deliveryFee int64
+	_ = tx.QueryRowContext(ctx,
+		`SELECT COALESCE(delivery_fee_minor_units, 1500) FROM dsh_store_discovery_stores WHERE id = $1`,
+		req.StoreID,
+	).Scan(&deliveryFee)
+	totalAmount := itemsSubtotal + deliveryFee
+
 	intentID := fmt.Sprintf("intent-%d", time.Now().UnixNano())
 	sessionToken := fmt.Sprintf("sess-%d", time.Now().UnixNano())
 	expiresAt := time.Now().Add(15 * time.Minute)
@@ -136,11 +187,11 @@ WHERE client_id = $1 AND store_id = $2
 INSERT INTO dsh_checkout_intents
   (id, client_id, store_id, delivery_address, delivery_time_slot, client_note,
    status, session_token, requested_amount_snapshot_minor_units, expires_at, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, 'pending_payment', $7, 0, $8, NOW(), NOW())
+VALUES ($1, $2, $3, $4, $5, $6, 'pending_payment', $7, $8, $9, NOW(), NOW())
 RETURNING id, session_token, status, expires_at`,
-			intentID, clientID, req.StoreID, req.DeliveryAddress,
+		intentID, clientID, req.StoreID, req.DeliveryAddress,
 		toNullString(req.DeliveryTimeSlot), toNullString(req.ClientNote),
-		sessionToken, expiresAt,
+		sessionToken, totalAmount, expiresAt,
 	).Scan(&intent.ID, &intent.SessionToken, &intent.Status, &intent.ExpiresAt)
 	if err != nil {
 		return domain.CheckoutIntentResponse{}, fmt.Errorf("failed to create checkout intent: %w", err)
@@ -163,10 +214,13 @@ VALUES ($1, $2, $3, $4, NOW())`,
 	}
 
 	return domain.CheckoutIntentResponse{
-		IntentID:     intent.ID,
-		SessionToken: intent.SessionToken,
-		Status:       intent.Status,
-		ExpiresAt:    intent.ExpiresAt,
+		IntentID:                intent.ID,
+		SessionToken:            intent.SessionToken,
+		Status:                  intent.Status,
+		ExpiresAt:               intent.ExpiresAt,
+		ItemsSubtotalMinorUnits: itemsSubtotal,
+		DeliveryFeeMinorUnits:   deliveryFee,
+		TotalAmountMinorUnits:   totalAmount,
 	}, nil
 }
 

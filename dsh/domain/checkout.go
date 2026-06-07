@@ -71,6 +71,10 @@ type CheckoutIntentResponse struct {
 	SessionToken string    `json:"session_token"`
 	Status       string    `json:"status"`
 	ExpiresAt    time.Time `json:"expires_at"`
+	// Non-authoritative display snapshots. WLT owns final amounts.
+	ItemsSubtotalMinorUnits int64 `json:"items_subtotal_minor_units"`
+	DeliveryFeeMinorUnits   int64 `json:"delivery_fee_minor_units"`
+	TotalAmountMinorUnits   int64 `json:"total_amount_minor_units"`
 }
 
 // CancelCheckoutIntentResponse — 003E
