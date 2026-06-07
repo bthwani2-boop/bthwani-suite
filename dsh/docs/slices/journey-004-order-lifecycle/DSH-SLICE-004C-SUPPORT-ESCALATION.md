@@ -10,7 +10,7 @@
 | Primary Surface | app-client / SupportEscalationScreen; control-panel / SupportQueueScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | None — upstream J-003 checkout is PASS |
+| Blocking Reason | Upstream J-003 is BLOCKED_WITH_REASON (not PASS); unblocked when J-003 WLT E2E + device evidence captured |
 
 ## Scope
 ### Included

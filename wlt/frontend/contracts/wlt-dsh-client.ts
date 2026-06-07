@@ -1,144 +1,282 @@
-import type { paths } from './wlt-dsh-openapi.types';
+/**
+ * WLT typed client — calls the real WLT backend (port 8083).
+ *
+ * Route mapping (WLT backend, wlt/backend/internal/http/):
+ *   GET  /health
+ *   GET  /wallets/{subject}/summary
+ *   GET  /wallets/{subject}/transactions
+ *   POST /payment/sessions
+ *   GET  /payment/sessions/{id}
+ *   GET  /refunds
+ *   POST /refunds
+ *   GET  /refunds/{id}
+ *   GET  /settlements
+ *   POST /settlements
+ *   GET  /settlements/{id}
+ */
 
-type JsonBody<T> = T extends { content: { 'application/json': infer Body } } ? Body : never;
-type JsonResponse<T, Status extends number> = T extends { responses: Record<Status, { content: { 'application/json': infer Body } }> } ? Body : never;
+// ─── Domain types (mirror wlt/domain/wallet.go JSON tags) ────────────────────
 
-type WalletSummary = JsonResponse<paths['/wlt/dsh/client/wallet/summary']['get'], 200>;
-type PaymentSessionRequest = JsonBody<NonNullable<paths['/wlt/dsh/client/payment-sessions']['post']['requestBody']>>;
-type PaymentSession = JsonResponse<paths['/wlt/dsh/client/payment-sessions']['post'], 201>;
-type FinanceOverview = JsonResponse<paths['/wlt/dsh/control-panel/finance/overview']['get'], 200>;
-type ReconciliationRun = JsonResponse<paths['/wlt/dsh/control-panel/reconciliation-runs']['post'], 201>;
-type PayoutDecisionRequest = JsonBody<NonNullable<paths['/wlt/dsh/control-panel/payout-decisions']['post']['requestBody']>>;
-type PayoutDecision = JsonResponse<paths['/wlt/dsh/control-panel/payout-decisions']['post'], 201>;
+export interface WltWalletSummary {
+	readonly subject: string;
+	readonly actor_type: string;
+	readonly balance: number;
+	readonly currency: string;
+	readonly total_credit: number;
+	readonly total_debit: number;
+	readonly pending_credit: number;
+	readonly pending_debit: number;
+	readonly transaction_count: number;
+}
 
-export type WltDshFetch = typeof fetch;
+export interface WltLedgerEntry {
+	readonly id: string;
+	readonly wallet_id: string;
+	readonly subject: string;
+	readonly transaction_type: 'CREDIT' | 'DEBIT';
+	readonly amount: number;
+	readonly currency: string;
+	readonly reference_type: string;
+	readonly reference_id: string;
+	readonly order_id?: string;
+	readonly description: string;
+	readonly status: string;
+	readonly created_at: string;
+	readonly completed_at?: string;
+}
 
-export interface WltDshHealth {
-	readonly status: 'ok' | string;
+export interface WltListLedgerResponse {
+	readonly entries: WltLedgerEntry[];
+	readonly total: number;
+}
+
+export interface WltPaymentSession {
+	readonly id: string;
+	readonly checkout_intent_id: string;
+	readonly client_id: string;
+	readonly amount: number;
+	readonly currency: string;
+	readonly status: 'PENDING' | 'CONFIRMED' | 'FAILED' | 'EXPIRED' | 'CANCELLED';
+	readonly payment_method: string;
+	readonly provider_ref?: string;
+	readonly dsh_base_url: string;
+	readonly idempotency_key: string;
+	readonly failure_reason?: string;
+	readonly created_at: string;
+	readonly expires_at: string;
+	readonly confirmed_at?: string;
+	readonly failed_at?: string;
+}
+
+export interface WltCreatePaymentSessionRequest {
+	readonly checkout_intent_id: string;
+	readonly client_id: string;
+	readonly amount: number;
+	readonly currency?: string;
+	readonly payment_method?: string;
+	readonly dsh_base_url?: string;
+	readonly idempotency_key: string;
+}
+
+export interface WltRefund {
+	readonly id: string;
+	readonly order_id: string;
+	readonly payment_session_id: string;
+	readonly client_id: string;
+	readonly amount: number;
+	readonly currency: string;
+	readonly reason: string;
+	readonly status: 'PENDING' | 'PROCESSING' | 'CONFIRMED' | 'FAILED';
+	readonly trigger_ref?: string;
+	readonly dsh_base_url: string;
+	readonly dsh_callback_sent_at?: string;
+	readonly idempotency_key: string;
+	readonly failure_reason?: string;
+	readonly created_at: string;
+	readonly updated_at: string;
+	readonly completed_at?: string;
+}
+
+export interface WltCreateRefundRequest {
+	readonly order_id: string;
+	readonly payment_session_id?: string;
+	readonly client_id: string;
+	readonly amount: number;
+	readonly currency?: string;
+	readonly reason: string;
+	readonly trigger_ref?: string;
+	readonly dsh_base_url?: string;
+	readonly idempotency_key: string;
+}
+
+export interface WltListRefundsResponse {
+	readonly refunds: WltRefund[];
+	readonly total: number;
+}
+
+export interface WltSettlement {
+	readonly id: string;
+	readonly order_id: string;
+	readonly partner_id: string;
+	readonly captain_id?: string;
+	readonly gross_amount: number;
+	readonly platform_fee: number;
+	readonly partner_payout: number;
+	readonly captain_payout: number;
+	readonly currency: string;
+	readonly status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+	readonly idempotency_key: string;
+	readonly failure_reason?: string;
+	readonly created_at: string;
+	readonly updated_at: string;
+	readonly completed_at?: string;
+}
+
+export interface WltListSettlementsResponse {
+	readonly settlements: WltSettlement[];
+	readonly total: number;
+}
+
+export interface WltHealth {
+	readonly status: string;
 	readonly service: string;
 	readonly persistence?: string;
 	readonly db?: string;
-	readonly runtimeTruth: string;
 }
 
-export interface WltDshLedgerEntry {
+// ─── Legacy aliases kept for backward compat with existing screen consumers ──
+
+/** @deprecated Use WltWalletSummary */
+export type WltDshWalletSummary = WltWalletSummary;
+/** @deprecated Use WltPaymentSession */
+export type WltDshPaymentSession = WltPaymentSession;
+/** @deprecated Use WltCreatePaymentSessionRequest */
+export type WltDshPaymentSessionRequest = WltCreatePaymentSessionRequest;
+/** @deprecated Use WltRefund */
+export type WltDshRefundCase = WltRefund;
+/** @deprecated Use WltCreateRefundRequest */
+export type WltDshRefundRequest = WltCreateRefundRequest;
+/** @deprecated Use WltSettlement */
+export type WltDshSettlementCycle = WltSettlement;
+/** @deprecated Use WltHealth */
+export type WltDshHealth = WltHealth;
+/** @deprecated Use WltLedgerEntry */
+export type WltDshLedgerEntry = WltLedgerEntry;
+/** @deprecated Use WltPayoutDecision */
+export type WltDshPayoutDecisionResponse = WltPayoutDecision;
+/** @deprecated Use WltReconciliationRun */
+export type WltDshReconciliationRunResponse = WltReconciliationRun;
+/** @deprecated Replaced by WltCloseStatus */
+export type WltDshCloseStatus = WltCloseStatus;
+/** @deprecated No direct equivalent — WLT finance overview is now listSettlements + wallets */
+export type WltDshFinanceOverview = WltListSettlementsResponse;
+
+// ─── Stubs for operator-only control-panel features not yet in WLT backend ───
+
+export interface WltReconciliationRun {
 	readonly id: string;
-	readonly kind: string;
-	readonly orderId?: string;
-	readonly actorId: string;
-	readonly actorKind: 'client' | 'partner' | 'captain' | 'field' | 'platform' | string;
-	readonly debitMinorUnits: number;
-	readonly creditMinorUnits: number;
-	readonly currency: string;
 	readonly status: string;
-	readonly createdAt: string;
-	readonly referenceId?: string;
+	readonly created_at: string;
 }
 
-export interface WltDshRefundRequest {
-	readonly orderId: string;
-	readonly clientId: string;
-	readonly storeId: string;
-	readonly amountMinorUnits: number;
+export interface WltPayoutDecisionRequest {
+	readonly subject: string;
+	readonly amount: number;
 	readonly currency?: string;
-	readonly reason: string;
+	readonly reference?: string;
 }
 
-export interface WltDshRefundCase {
-	readonly refundRefId: string;
-	readonly orderId: string;
-	readonly clientId: string;
-	readonly storeId: string;
-	readonly amountMinorUnits: number;
-	readonly currency: string;
-	readonly status: string;
-	readonly reason: string;
-	readonly createdAt: string;
-	readonly callbackEvent?: unknown;
-}
-
-export interface WltDshCodLiability {
+export interface WltPayoutDecision {
 	readonly id: string;
-	readonly captainId: string;
-	readonly orderId: string;
-	readonly amountMinorUnits: number;
+	readonly subject: string;
+	readonly amount: number;
 	readonly currency: string;
 	readonly status: string;
-	readonly createdAt: string;
+	readonly created_at: string;
 }
 
-export interface WltDshCaptainEligibility {
-	readonly captainId: string;
-	readonly eligible: boolean;
-	readonly heldMinorUnits: number;
-	readonly currency: string;
-	readonly updatedAt: string;
-}
-
-export interface WltDshSettlementCycle {
+export interface WltCloseStatus {
 	readonly id: string;
-	readonly ownerId: string;
-	readonly ownerKind: 'partner' | 'captain' | 'field' | string;
-	readonly orderIds: readonly string[];
-	readonly netPayableMinorUnits: number;
-	readonly currency: string;
-	readonly status: string;
-	readonly createdAt: string;
+	readonly business_date?: string;
+	readonly status: 'open' | 'closed' | 'failed';
+	readonly reconciliation_run_id?: string;
+	readonly closed_at?: string;
 }
 
-export interface WltDshCloseStatus {
-	id: string;
-	businessDate?: string;
-	status: 'open' | 'closed' | 'failed';
-	reconciliationRunId?: string;
-	closedAt?: string;
+export interface WltAuditEvent {
+	readonly event_id: string;
+	readonly target: string;
+	readonly payload: Record<string, unknown>;
+	readonly created_at: string;
 }
 
-export interface WltDshAuditEvent {
-	eventId: string;
-	target: 'dsh.payment-callback' | 'dsh.refund-callback' | 'dsh.settlement-callback';
-	payload: Record<string, unknown>;
-	createdAt: string;
+export interface WltDailyCloseResult {
+	readonly id: string;
+	readonly business_date: string;
+	readonly status: 'closed' | 'failed';
+	readonly reconciliation_run_id?: string;
+	readonly closed_at?: string;
 }
 
-export interface WltDshDailyCloseResult {
-	id: string;
-	businessDate: string;
-	status: 'closed' | 'failed';
-	reconciliationRunId?: string;
-	closedAt?: string;
-}
+// ─── Client interface ─────────────────────────────────────────────────────────
+
+export type WltDshFetch = typeof fetch;
 
 export interface WltDshTypedClientOptions {
 	readonly baseUrl?: string;
 	readonly bearerToken?: string;
+	readonly devClientId?: string;
 	readonly fetchImpl?: WltDshFetch;
 }
 
 export interface WltDshTypedClient {
-	getHealth(): Promise<WltDshHealth>;
-	getClientWalletSummary(clientId?: string): Promise<WalletSummary>;
-	createClientPaymentSession(input: PaymentSessionRequest, idempotencyKey?: string): Promise<PaymentSession>;
-	getClientPaymentSession(id: string): Promise<PaymentSession>;
-	getFinanceOverview(): Promise<FinanceOverview>;
-	listRefundQueue(): Promise<WltDshRefundCase[]>;
-	createRefund(input: WltDshRefundRequest, idempotencyKey?: string): Promise<WltDshRefundCase>;
-	listCaptainCodLiabilities(captainId?: string): Promise<WltDshCodLiability[]>;
-	getCaptainEligibility(captainId?: string): Promise<WltDshCaptainEligibility>;
-	listCaptainEarnings(captainId?: string): Promise<WltDshLedgerEntry[]>;
-	listPartnerSettlementCycles(partnerId?: string): Promise<WltDshSettlementCycle[]>;
-	listFieldCommissions(fieldAgentId?: string): Promise<WltDshSettlementCycle[]>;
-	listReconciliationRuns(): Promise<ReconciliationRun[]>;
-	triggerReconciliationRun(idempotencyKey: string): Promise<ReconciliationRun>;
-	createPayoutDecision(input: PayoutDecisionRequest, idempotencyKey: string): Promise<PayoutDecision>;
-	listLedgerEntries(): Promise<WltDshLedgerEntry[]>;
-	getReconciliationCloseStatus(): Promise<WltDshCloseStatus>;
-	listAuditEvents(): Promise<WltDshAuditEvent[]>;
-	submitDailyClose(businessDate?: string): Promise<WltDshDailyCloseResult>;
+	// Health
+	getHealth(): Promise<WltHealth>;
+
+	// Wallet (own subject or operator any subject)
+	getClientWalletSummary(subject?: string): Promise<WltWalletSummary>;
+	listLedgerEntries(subject?: string, limit?: number, offset?: number): Promise<WltListLedgerResponse>;
+	// Operator-only: all ledger entries across all subjects (GET /ledger)
+	listAllLedgerEntries(subject?: string, limit?: number, offset?: number): Promise<WltListLedgerResponse>;
+
+	// Payment sessions
+	createClientPaymentSession(input: WltCreatePaymentSessionRequest): Promise<WltPaymentSession>;
+	getClientPaymentSession(id: string): Promise<WltPaymentSession>;
+
+	// Refunds (operator: full list; client: own only)
+	listRefundQueue(clientId?: string, status?: string): Promise<WltListRefundsResponse>;
+	createRefund(input: WltCreateRefundRequest): Promise<WltRefund>;
+	getRefund(id: string): Promise<WltRefund>;
+
+	// Settlements (operator only)
+	listSettlements(partnerId?: string, captainId?: string, status?: string): Promise<WltListSettlementsResponse>;
+	getSettlement(id: string): Promise<WltSettlement>;
+
+	// Captain convenience (reads from wallet + transactions)
+	getCaptainWalletSummary(captainId?: string): Promise<WltWalletSummary>;
+	listCaptainEarnings(captainId?: string, limit?: number): Promise<WltListLedgerResponse>;
+
+	// Partner convenience
+	getPartnerWalletSummary(partnerId?: string): Promise<WltWalletSummary>;
+	listPartnerSettlements(partnerId?: string): Promise<WltListSettlementsResponse>;
+
+	// Field agent convenience
+	getFieldWalletSummary(fieldAgentId?: string): Promise<WltWalletSummary>;
+	listFieldEarnings(fieldAgentId?: string, limit?: number): Promise<WltListLedgerResponse>;
+
+	// Operator control-panel stubs (not yet implemented in WLT backend)
+	listReconciliationRuns(): Promise<WltReconciliationRun[]>;
+	triggerReconciliationRun(idempotencyKey: string): Promise<WltReconciliationRun>;
+	createPayoutDecision(input: WltPayoutDecisionRequest, idempotencyKey: string): Promise<WltPayoutDecision>;
+	getReconciliationCloseStatus(): Promise<WltCloseStatus>;
+	listAuditEvents(): Promise<WltAuditEvent[]>;
+	submitDailyClose(businessDate?: string): Promise<WltDailyCloseResult>;
 }
 
-function trimBaseUrl(baseUrl: string): string {
-	return baseUrl.replace(/\/$/, '');
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function trimBaseUrl(url: string): string {
+	return url.replace(/\/$/, '');
 }
 
 export function resolveWltDshApiBaseUrl(): string {
@@ -150,172 +288,162 @@ export function resolveWltDshApiBaseUrl(): string {
 		const trimmed = raw?.trim();
 		if (trimmed) return trimBaseUrl(trimmed);
 	}
-
-	return 'http://localhost:8090';
-}
-
-function idempotencyHeaders(idempotencyKey?: string): Record<string, string> {
-	return idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {};
+	return 'http://localhost:8083';
 }
 
 async function readJson<T>(response: Response, label: string): Promise<T> {
 	if (!response.ok) {
 		const body = await response.text().catch(() => '');
-		throw new Error(`${label}: ${response.status}${body ? ` ${body}` : ''}`);
+		throw new Error(`${label}: ${response.status}${body ? ` — ${body}` : ''}`);
 	}
 	return response.json() as Promise<T>;
 }
 
+function authHeaders(bearerToken?: string, devClientId?: string): Record<string, string> {
+	if (bearerToken) return { Authorization: `Bearer ${bearerToken}` };
+	if (devClientId) return { 'X-Client-Id': devClientId };
+	return {};
+}
+
+function idempotencyHeader(key?: string): Record<string, string> {
+	return key ? { 'Idempotency-Key': key } : {};
+}
+
+// ─── Factory ──────────────────────────────────────────────────────────────────
+
 export function createWltDshTypedClient(options: WltDshTypedClientOptions): WltDshTypedClient {
 	const fetchImpl = options.fetchImpl ?? fetch;
-	const baseUrl = trimBaseUrl(options.baseUrl ?? resolveWltDshApiBaseUrl());
-	const authHeaders: Record<string, string> = options.bearerToken
-		? { Authorization: `Bearer ${options.bearerToken}` }
-		: {};
+	const base = trimBaseUrl(options.baseUrl ?? resolveWltDshApiBaseUrl());
+	const hdrs = authHeaders(options.bearerToken, options.devClientId);
+
+	function get<T>(path: string, label: string): Promise<T> {
+		return readJson<T>(fetchImpl(`${base}${path}`, { headers: hdrs }), label);
+	}
+
+	function post<T>(path: string, body: unknown, label: string, idempKey?: string): Promise<T> {
+		return readJson<T>(
+			fetchImpl(`${base}${path}`, {
+				method: 'POST',
+				headers: { ...hdrs, ...idempotencyHeader(idempKey), 'Content-Type': 'application/json' },
+				body: JSON.stringify(body),
+			}),
+			label,
+		);
+	}
 
 	return {
-		async getHealth() {
-			return readJson<WltDshHealth>(
-				await fetchImpl(`${baseUrl}/wlt/health`, { headers: authHeaders }),
-				'WLT health',
-			);
+		getHealth() {
+			return get<WltHealth>('/health', 'WLT health');
 		},
-		async getClientWalletSummary(clientId = 'client-demo') {
-			const url = `${baseUrl}/wlt/dsh/client/wallet/summary?clientId=${encodeURIComponent(clientId)}`;
-			return readJson<WalletSummary>(await fetchImpl(url, { headers: authHeaders }), 'WLT wallet summary');
+
+		getClientWalletSummary(subject = 'me') {
+			return get<WltWalletSummary>(`/wallets/${encodeURIComponent(subject)}/summary`, 'WLT wallet summary');
 		},
-		async createClientPaymentSession(input, idempotencyKey) {
-			return readJson<PaymentSession>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/client/payment-sessions`, {
-					method: 'POST',
-					headers: { ...authHeaders, ...idempotencyHeaders(idempotencyKey), 'Content-Type': 'application/json' },
-					body: JSON.stringify(input),
-				}),
-				'WLT payment session',
-			);
+
+		listLedgerEntries(subject = 'me', limit = 50, offset = 0) {
+			const q = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+			return get<WltListLedgerResponse>(`/wallets/${encodeURIComponent(subject)}/transactions?${q}`, 'WLT ledger entries');
 		},
-		async getClientPaymentSession(id) {
-			return readJson<PaymentSession>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/client/payment-sessions/${encodeURIComponent(id)}`, { headers: authHeaders }),
-				'WLT payment session lookup',
-			);
+
+		listAllLedgerEntries(subject, limit = 100, offset = 0) {
+			const q = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+			if (subject) q.set('subject', subject);
+			return get<WltListLedgerResponse>('/ledger?' + q.toString(), 'WLT ledger all');
 		},
-		async getFinanceOverview() {
-			return readJson<FinanceOverview>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/finance/overview`, { headers: authHeaders }),
-				'WLT DSH finance overview',
-			);
+
+		createClientPaymentSession(input) {
+			return post<WltPaymentSession>('/payment/sessions', input, 'WLT payment session', input.idempotency_key);
 		},
-		async listRefundQueue() {
-			return readJson<WltDshRefundCase[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/refund-queue`, { headers: authHeaders }),
-				'WLT refund queue',
-			);
+
+		getClientPaymentSession(id) {
+			return get<WltPaymentSession>(`/payment/sessions/${encodeURIComponent(id)}`, 'WLT payment session lookup');
 		},
-		async createRefund(input, idempotencyKey) {
-			return readJson<WltDshRefundCase>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/refund-queue`, {
-					method: 'POST',
-					headers: { ...authHeaders, ...idempotencyHeaders(idempotencyKey), 'Content-Type': 'application/json' },
-					body: JSON.stringify(input),
-				}),
-				'WLT refund request',
-			);
+
+		listRefundQueue(clientId, status) {
+			const q = new URLSearchParams();
+			if (clientId) q.set('client_id', clientId);
+			if (status) q.set('status', status);
+			const qs = q.toString();
+			return get<WltListRefundsResponse>('/refunds' + (qs ? '?' + qs : ''), 'WLT refund queue');
 		},
-		async listCaptainCodLiabilities(captainId = 'captain-demo') {
-			return readJson<WltDshCodLiability[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/captain/cod-liabilities?captainId=${encodeURIComponent(captainId)}`, { headers: authHeaders }),
-				'WLT captain COD liabilities',
-			);
+
+		createRefund(input) {
+			return post<WltRefund>('/refunds', input, 'WLT refund create', input.idempotency_key);
 		},
-		async getCaptainEligibility(captainId = 'captain-demo') {
-			return readJson<WltDshCaptainEligibility>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/captain/eligibility?captainId=${encodeURIComponent(captainId)}`, { headers: authHeaders }),
-				'WLT captain eligibility',
-			);
+
+		getRefund(id) {
+			return get<WltRefund>(`/refunds/${encodeURIComponent(id)}`, 'WLT refund lookup');
 		},
-		async listCaptainEarnings(captainId = 'captain-demo') {
-			return readJson<WltDshLedgerEntry[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/captain/earnings?captainId=${encodeURIComponent(captainId)}`, { headers: authHeaders }),
-				'WLT captain earnings',
-			);
+
+		listSettlements(partnerId, captainId, status) {
+			const q = new URLSearchParams();
+			if (partnerId) q.set('partner_id', partnerId);
+			if (captainId) q.set('captain_id', captainId);
+			if (status) q.set('status', status);
+			const qs = q.toString();
+			return get<WltListSettlementsResponse>('/settlements' + (qs ? '?' + qs : ''), 'WLT settlements');
 		},
-		async listPartnerSettlementCycles(partnerId = 'partner-demo') {
-			return readJson<WltDshSettlementCycle[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/partner/settlement-cycles?partnerId=${encodeURIComponent(partnerId)}`, { headers: authHeaders }),
-				'WLT partner settlement cycles',
-			);
+
+		getSettlement(id) {
+			return get<WltSettlement>(`/settlements/${encodeURIComponent(id)}`, 'WLT settlement lookup');
 		},
-		async listFieldCommissions(fieldAgentId = 'field-demo') {
-			return readJson<WltDshSettlementCycle[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/field/commissions?fieldAgentId=${encodeURIComponent(fieldAgentId)}`, { headers: authHeaders }),
-				'WLT field commissions',
-			);
+
+		getCaptainWalletSummary(captainId = 'me') {
+			return get<WltWalletSummary>(`/wallets/${encodeURIComponent(captainId)}/summary`, 'WLT captain wallet');
 		},
-		async listReconciliationRuns() {
-			return readJson<ReconciliationRun[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/reconciliation-runs`, { headers: authHeaders }),
-				'WLT reconciliation runs',
-			);
+
+		listCaptainEarnings(captainId = 'me', limit = 50) {
+			const q = new URLSearchParams({ limit: String(limit) });
+			return get<WltListLedgerResponse>(`/wallets/${encodeURIComponent(captainId)}/transactions?${q}`, 'WLT captain earnings');
 		},
-		async triggerReconciliationRun(idempotencyKey) {
-			return readJson<ReconciliationRun>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/reconciliation-runs`, {
-					method: 'POST',
-					headers: { ...authHeaders, ...idempotencyHeaders(idempotencyKey), 'Content-Type': 'application/json' },
-					body: JSON.stringify({}),
-				}),
-				'WLT reconciliation run',
-			);
+
+		getPartnerWalletSummary(partnerId = 'me') {
+			return get<WltWalletSummary>(`/wallets/${encodeURIComponent(partnerId)}/summary`, 'WLT partner wallet');
 		},
-		async createPayoutDecision(input, idempotencyKey) {
-			return readJson<PayoutDecision>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/payout-decisions`, {
-					method: 'POST',
-					headers: { ...authHeaders, 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
-					body: JSON.stringify(input),
-				}),
-				'WLT payout decision',
-			);
+
+		listPartnerSettlements(partnerId) {
+			const q = new URLSearchParams();
+			if (partnerId) q.set('partner_id', partnerId);
+			const qs = q.toString();
+			return get<WltListSettlementsResponse>('/settlements' + (qs ? '?' + qs : ''), 'WLT partner settlements');
 		},
-		async listLedgerEntries() {
-			return readJson<WltDshLedgerEntry[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/ledger-entries`, { headers: authHeaders }),
-				'WLT ledger entries',
-			);
+
+		getFieldWalletSummary(fieldAgentId = 'me') {
+			return get<WltWalletSummary>(`/wallets/${encodeURIComponent(fieldAgentId)}/summary`, 'WLT field wallet');
 		},
-		async getReconciliationCloseStatus() {
-			return readJson<WltDshCloseStatus>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/reconciliation-close-status`, { headers: authHeaders }),
-				'WLT reconciliation close status',
-			);
+
+		listFieldEarnings(fieldAgentId = 'me', limit = 50) {
+			const q = new URLSearchParams({ limit: String(limit) });
+			return get<WltListLedgerResponse>(`/wallets/${encodeURIComponent(fieldAgentId)}/transactions?${q}`, 'WLT field earnings');
 		},
-		async listAuditEvents() {
-			return readJson<WltDshAuditEvent[]>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/audit-events`, { headers: authHeaders }),
-				'WLT audit events',
-			);
+
+		// ── Operator control-panel stubs (WLT backend endpoints not yet built) ──
+
+		listReconciliationRuns() {
+			// NOT_IMPLEMENTED: WLT backend reconciliation endpoint pending
+			return Promise.resolve([]);
 		},
-		async submitDailyClose(businessDate?: string) {
-			const date = businessDate ?? new Date().toISOString().slice(0, 10);
-			return readJson<WltDshDailyCloseResult>(
-				await fetchImpl(`${baseUrl}/wlt/dsh/control-panel/daily-close`, {
-					method: 'POST',
-					headers: { ...authHeaders, 'Content-Type': 'application/json' },
-					body: JSON.stringify({ businessDate: date }),
-				}),
-				'WLT daily close',
-			);
+
+		triggerReconciliationRun(_idempotencyKey) {
+			return Promise.reject(new Error('WLT reconciliation run: not yet implemented in WLT backend'));
+		},
+
+		createPayoutDecision(_input, _idempotencyKey) {
+			return Promise.reject(new Error('WLT payout decision: not yet implemented in WLT backend'));
+		},
+
+		getReconciliationCloseStatus() {
+			// NOT_IMPLEMENTED: returns open stub
+			return Promise.resolve({ id: 'stub', status: 'open' as const });
+		},
+
+		listAuditEvents() {
+			// NOT_IMPLEMENTED: WLT backend audit log endpoint pending
+			return Promise.resolve([]);
+		},
+
+		submitDailyClose(_businessDate) {
+			return Promise.reject(new Error('WLT daily close: not yet implemented in WLT backend'));
 		},
 	};
 }
-
-export type {
-	FinanceOverview as WltDshFinanceOverview,
-	PaymentSession as WltDshPaymentSession,
-	PaymentSessionRequest as WltDshPaymentSessionRequest,
-	PayoutDecision as WltDshPayoutDecisionResponse,
-	PayoutDecisionRequest as WltDshPayoutDecisionRequest,
-	ReconciliationRun as WltDshReconciliationRunResponse,
-	WalletSummary as WltDshWalletSummary,
-};

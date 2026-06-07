@@ -10,7 +10,7 @@
 | Primary Surface | platform route / PlatformVarsProvider |
 | WLT Boundary | N/A |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None (Centralized PlatformVarsProvider fully implemented, integrated, and enforced by guardrail) |
+| Blocking Reason | PlatformVarsProvider + guardrail enforcement proven via static analysis (exit 0); production runtime device test for env-var leak not conducted |
 
 ## Scope
 ### Included

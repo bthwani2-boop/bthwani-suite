@@ -10,6 +10,7 @@
 | Primary Surface | All surfaces |
 | WLT Boundary | N/A — no money semantics; WLT preserves its own runtime boundary |
 | Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | Policy impact checklist implemented; depends on 008B real-time toggle wiring; guards proven statically |
 | Closed At | 2026-06-06 |
 | Evidence Run | `DSH_SLICE_008D_POLICY_IMPACT_FINAL_CLOSURE-20260606-LOCAL` |
 

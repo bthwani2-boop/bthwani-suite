@@ -24,7 +24,7 @@
 | Visual Evidence Required | yes — CheckoutFailureScreen states: payment_failed (with reason), retry_in_progress, cancelled; cart preserved state |
 | Runtime Evidence Required | yes — WLT failure callback + CheckoutFailureScreen proof + cart preserved after failure |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
+| Blocking Reason | Upstream 003C (WLT payment bridge) BLOCKED; WLT failure callback + CheckoutFailureScreen visual evidence not yet captured on real device |
 
 ## Scope
 
@@ -127,5 +127,5 @@
 | **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | DELETE /checkout/intent/{id} proven: cart preserved and intent cancelled successfully. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — payment failure handled; no financial mutation in DSH |
-| **Next Action** | none — runtime proof complete |
+| **Next Action** | Capture CheckoutFailureScreen visual states on real device; unblocked when 003C WLT E2E proof is captured |
 | **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |

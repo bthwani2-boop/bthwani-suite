@@ -10,6 +10,7 @@
 | Primary Surface | control-panel / ExceptionEscalationScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
+| Blocking Reason | CP exception-escalation screen renders preview; needs operator Bearer auth + live exception mutation recording on real device |
 
 ## Scope
 ### Included

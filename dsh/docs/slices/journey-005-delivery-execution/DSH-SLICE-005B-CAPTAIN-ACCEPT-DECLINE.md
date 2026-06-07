@@ -61,5 +61,5 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | J-004 order lifecycle closed. Both accept-task and decline-task endpoints confirmed in production handler. E2E evidence covers full accept/decline flow. App-captain captain identity injectable (no hardcoded IDs). |
+| **Reason** | J-004 is DEFERRED_WITH_REASON (not closed/PASS); accept-task + decline-task endpoints confirmed in handler; deferred until J-003 + J-004 device E2E captured |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

@@ -10,7 +10,7 @@
 | Primary Surface | control-panel / PartnerStoresScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
-| Blocking Reason | None |
+| Blocking Reason | CP operations-queue screen rendered with fixture/preview data; needs operator Bearer auth token + browser-level recording of live queue interactions on real device |
 
 ## Scope
 ### Included

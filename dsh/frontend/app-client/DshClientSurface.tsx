@@ -480,7 +480,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
-    let nextDelayMs = 4000;
+    let nextDelayMs = 2000;
     let lastStatus = "";
 
     const fetchOrder = () => {
@@ -498,9 +498,9 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
             return;
           }
           if (details.order.status === lastStatus) {
-            nextDelayMs = Math.min(nextDelayMs + 4000, 16000);
+            nextDelayMs = Math.min(Math.round(nextDelayMs * 1.5), 30000);
           } else {
-            nextDelayMs = 4000;
+            nextDelayMs = 2000;
             lastStatus = details.order.status;
           }
           timeout = setTimeout(fetchOrder, nextDelayMs);
@@ -508,7 +508,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
         .catch((err) => {
           if (cancelled) return;
           console.warn("Failed to fetch live order details:", err);
-          nextDelayMs = Math.min(nextDelayMs * 2, 30000);
+          nextDelayMs = Math.min(nextDelayMs * 2, 60000);
           timeout = setTimeout(fetchOrder, nextDelayMs);
         });
     };

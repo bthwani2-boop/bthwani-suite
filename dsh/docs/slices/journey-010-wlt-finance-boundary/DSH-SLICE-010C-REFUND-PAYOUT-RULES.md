@@ -10,7 +10,7 @@
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns all financial mutations; DSH trigger-only via callback |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None |
+| Blocking Reason | WLT refund backend live (GET/POST /refunds); DSH refund-callback handler proven locally; needs real device E2E proof with operator Bearer auth executing full refund payout cycle |
 
 ## Scope
 ### Included

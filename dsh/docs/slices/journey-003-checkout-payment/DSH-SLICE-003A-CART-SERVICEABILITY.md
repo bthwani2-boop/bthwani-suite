@@ -24,7 +24,7 @@
 | Visual Evidence Required | yes — CartScreen serviceability states: serviceable / not-serviceable / loading / blocked |
 | Runtime Evidence Required | yes — GET /cart/serviceability runtime proof with auth token |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
+| Blocking Reason | Local integration + unit tests PASS (2026-06-06); device-level E2E and visual evidence on real device not yet captured |
 
 ## Scope
 
@@ -132,5 +132,5 @@
 | **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | GET /cart/serviceability proven with production auth: missing Bearer → 401, invalid Bearer → 401, valid Bearer → 200 serviceable, unknown store → 404. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — no financial mutation at serviceability stage |
-| **Next Action** | none — runtime proof complete |
+| **Next Action** | Capture device-level E2E proof and CartScreen visual screenshots (serviceable/not-serviceable/blocked states) on real device |
 | **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |

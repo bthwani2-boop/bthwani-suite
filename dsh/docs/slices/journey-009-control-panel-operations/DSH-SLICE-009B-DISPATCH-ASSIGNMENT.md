@@ -10,6 +10,7 @@
 | Primary Surface | control-panel / DispatchScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
+| Blocking Reason | CP dispatch/assignment screen renders preview; needs operator Bearer auth + live captain assignment E2E recording on real device |
 
 ## Scope
 ### Included

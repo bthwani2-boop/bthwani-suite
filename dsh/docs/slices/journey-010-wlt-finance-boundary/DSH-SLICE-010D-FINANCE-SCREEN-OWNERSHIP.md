@@ -10,7 +10,7 @@
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns finance screens; DSH is a read-only guest via WltBoundaryBanner.tsx |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None |
+| Blocking Reason | Finance screen ownership enforced by static guards + WltBoundaryBanner.tsx integrated; WLT typed clients updated 2026-06-07; needs visual device evidence of WLT finance screens rendering in each surface (app-client, app-captain, app-partner, app-field, control-panel) |
 
 ## Scope
 ### Included

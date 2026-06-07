@@ -1,5 +1,5 @@
 import React from 'react';
-import { createWltDshTypedClient, type WltDshSettlementCycle } from '../../contracts';
+import { createWltDshTypedClient, type WltSettlement } from '../../contracts';
 import {
   formatWltYer,
   getWltPartnerFinanceSnapshot,
@@ -8,22 +8,25 @@ import {
 } from '../../control-panel/dsh/financeContracts';
 import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
-function settlementRecord(cycle: WltDshSettlementCycle): WltDshFinancePreviewRecord {
+function settlementRecord(s: WltSettlement): WltDshFinancePreviewRecord {
+  const amount = Math.round(s.partner_payout * 100);
+  const isDone = s.status === 'COMPLETED';
   return {
-    id: cycle.id,
+    id: s.id,
     actor: 'partner',
     kind: 'partner-settlement',
-    currencyCode: cycle.currency,
-    amountMinorUnits: cycle.netPayableMinorUnits,
-    amountLabel: formatWltYer(cycle.netPayableMinorUnits),
-    tone: cycle.netPayableMinorUnits >= 0 ? 'positive' : 'negative',
-    title: `تسوية شريك · ${cycle.ownerId}`,
-    subtitle: `WLT runtime · ${cycle.status}`,
-    statusLabel: cycle.status,
-    statusTone: cycle.status === 'ready_for_payout' || cycle.status === 'paid' ? 'success' : 'warning',
-    timeLabel: cycle.createdAt,
-    sourceStoreId: cycle.ownerId,
-    settlementCycleId: cycle.id,
+    currencyCode: s.currency,
+    amountMinorUnits: amount,
+    amountLabel: formatWltYer(amount),
+    tone: amount >= 0 ? 'positive' : 'negative',
+    title: `تسوية شريك · ${s.partner_id}`,
+    subtitle: `WLT runtime · ${s.status}`,
+    statusLabel: s.status,
+    statusTone: isDone ? 'success' : 'warning',
+    timeLabel: s.created_at,
+    sourceStoreId: s.partner_id,
+    sourceOrderId: s.order_id,
+    settlementCycleId: s.id,
     isPreview: false,
   };
 }
@@ -34,12 +37,12 @@ export function useWltDshPartnerWalletPreview() {
 
   React.useEffect(() => {
     let cancelled = false;
-    void createWltDshTypedClient({}).listPartnerSettlementCycles('partner-demo')
-      .then((cycles) => {
+    void createWltDshTypedClient({}).listPartnerSettlements('partner-demo')
+      .then(({ settlements }) => {
         if (cancelled) return;
         const fallback = getWltPartnerFinanceSnapshot();
-        const settlementRecords = cycles.map(settlementRecord);
-        const netSettlementMinorUnits = cycles.reduce((sum, cycle) => sum + cycle.netPayableMinorUnits, 0);
+        const settlementRecords = settlements.map(settlementRecord);
+        const netSettlementMinorUnits = settlements.reduce((sum, s) => sum + Math.round(s.partner_payout * 100), 0);
         setPartnerPreview({
           ...fallback,
           settlementRecords,
@@ -50,9 +53,9 @@ export function useWltDshPartnerWalletPreview() {
           nextSettlementMinorUnits: netSettlementMinorUnits,
           nextSettlementLabel: formatWltYer(netSettlementMinorUnits),
           totalLabel: formatWltYer(netSettlementMinorUnits),
-          cycleStatus: cycles[0]?.status ?? 'empty',
-          cycleStartDate: cycles[0]?.createdAt ?? fallback.cycleStartDate,
-          cycleEndDate: cycles[0]?.createdAt ?? fallback.cycleEndDate,
+          cycleStatus: settlements[0]?.status ?? 'empty',
+          cycleStartDate: settlements[0]?.created_at ?? fallback.cycleStartDate,
+          cycleEndDate: settlements[0]?.created_at ?? fallback.cycleEndDate,
           sourceLabel: 'WLT runtime',
           warnings: [],
           isPreview: false,

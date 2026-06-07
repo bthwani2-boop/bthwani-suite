@@ -1,1639 +1,824 @@
 openapi: 3.1.0
 info:
-  title: WLT DSH Finance API
-  version: 0.4.0-dsh-in-memory-core
-  description: >
-    WLT contract scaffold for DSH finance surfaces.
-    WLT_DSH_IN_MEMORY_CORE_ONLY exists for the DSH-scoped payment, wallet summary,
-    refund queue, settlement, payout, COD, ledger, reconciliation, and close logic.
-    It is not durable runtime closure: HTTP handlers, persistence, operational security,
-    E2E DSH callbacks, and visual/runtime evidence are still required.
-    Platform-wide WLT remains outside this DSH bridge closure.
-    All financial ownership belongs to WLT.
-    DSH surfaces are consumers only; no direct ledger write from DSH.
-  contact:
-    name: BThwani WLT Finance Governance
-    url: https://bthwani.internal/governance/wlt
+  title: WLT API — Wallet & Ledger Transaction
+  version: 0.1.0
+  description: |
+    BThwani financial service. WLT owns all wallet state, payment sessions,
+    refunds, settlements, and ledger entries.
+
+    DSH records WLT reference IDs only (wlt_payment_ref_id, wlt_refund_ref_id,
+    wlt_settlement_ref_id). DSH MUST NOT compute amounts, execute payments,
+    or mutate financial state.
+
+    Boundary: governance/22_DSH_GOLDEN_SLICE.md — "DSH must not own".
+
+x-bthwani-contract-state: WLT_SERVICE_V0_SCAFFOLD
+
 servers:
-  - url: https://api.bthwani.internal
-    description: Production WLT API boundary
-  - url: http://localhost:8081
-    description: Local WLT runtime boundary
-x-bthwani-contract-state: WLT_DSH_IN_MEMORY_CORE_ONLY / NEEDS_HTTP_PERSISTENCE_E2E
-x-bthwani-currency-default: YER
-x-bthwani-ownership: WLT owns all wallet, balance, payment, ledger, reconciliation, settlement, payout, COD liability, and captain eligibility operations. DSH surfaces are read-only consumers.
-x-bthwani-runtime-status: NOT_CLOSED — in-memory DSH finance core exists; backend HTTP handlers, persistence, typed-client runtime binding, and E2E evidence are still missing
-tags:
-  - name: client-wallet
-    description: DSH-scoped client wallet summary and checkout-linked top-up visibility.
-  - name: client-payment
-    description: DSH checkout payment session authorization and callback-owned status.
-  - name: captain-finance
-    description: DSH captain eligibility, COD liabilities, and earnings visibility.
-  - name: partner-finance
-    description: DSH partner settlement cycle visibility.
-  - name: field-finance
-    description: DSH field commission visibility.
-  - name: control-panel-finance
-    description: DSH finance control-panel runtime, ledger, reconciliation, refund, payout, and close visibility.
-  - name: store-delivery-finance
-    description: DSH store-delivery finance visibility owned by WLT.
+  - url: http://localhost:8083
+    description: Local dev (WLT service port 8083)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    DevClientId:
+      type: apiKey
+      in: header
+      name: X-Client-Id
+      description: DEV_ONLY — replaced by BearerAuth in production
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: invalid_parameter
+        message:
+          type: string
+
+    PaymentSession:
+      type: object
+      required: [id, checkout_intent_id, client_id, amount, currency, status, payment_method, idempotency_key, created_at, expires_at]
+      properties:
+        id:
+          type: string
+          description: WLT payment session ID — stored as wlt_payment_ref_id in DSH
+        checkout_intent_id:
+          type: string
+        client_id:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+          example: YER
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, FAILED, EXPIRED, CANCELLED]
+        payment_method:
+          type: string
+          example: wallet
+        provider_ref:
+          type: ["string", "null"]
+        failure_reason:
+          oneOf:
+            - type: string
+              enum: [insufficient_balance, policy_block, fraud_hold, expired, provider_error]
+            - type: "null"
+        idempotency_key:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        confirmed_at:
+          type: ["string", "null"]
+          format: date-time
+        failed_at:
+          type: ["string", "null"]
+          format: date-time
+
+    Refund:
+      type: object
+      required: [id, order_id, client_id, amount, currency, reason, status, idempotency_key, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          description: WLT refund ID — stored as wlt_refund_ref_id in DSH
+        order_id:
+          type: string
+        payment_session_id:
+          type: string
+        client_id:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+          example: YER
+        reason:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, CONFIRMED, FAILED]
+        trigger_ref:
+          type: ["string", "null"]
+          description: WltRefundTriggerRef from DSH delivery-failure event
+        failure_reason:
+          type: ["string", "null"]
+        dsh_callback_sent_at:
+          type: ["string", "null"]
+          format: date-time
+        idempotency_key:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: ["string", "null"]
+          format: date-time
+
+    Settlement:
+      type: object
+      required: [id, order_id, partner_id, gross_amount, platform_fee, partner_payout, captain_payout, currency, status, idempotency_key, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          description: WLT settlement ID — stored as wlt_settlement_ref_id in DSH
+        order_id:
+          type: string
+        partner_id:
+          type: string
+        captain_id:
+          type: ["string", "null"]
+        gross_amount:
+          type: number
+          format: double
+        platform_fee:
+          type: number
+          format: double
+        partner_payout:
+          type: number
+          format: double
+        captain_payout:
+          type: number
+          format: double
+        currency:
+          type: string
+          example: YER
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+        failure_reason:
+          type: ["string", "null"]
+        idempotency_key:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: ["string", "null"]
+          format: date-time
+
+    WalletSummary:
+      type: object
+      required: [subject, actor_type, balance, currency, total_credit, total_debit, pending_credit, pending_debit, transaction_count]
+      properties:
+        subject:
+          type: string
+        actor_type:
+          type: string
+          enum: [client, captain, partner, field, operator]
+        balance:
+          type: number
+          format: double
+        currency:
+          type: string
+          example: YER
+        total_credit:
+          type: number
+          format: double
+        total_debit:
+          type: number
+          format: double
+        pending_credit:
+          type: number
+          format: double
+        pending_debit:
+          type: number
+          format: double
+        transaction_count:
+          type: integer
+
+    LedgerEntry:
+      type: object
+      required: [id, wallet_id, subject, transaction_type, amount, currency, reference_type, reference_id, description, status, created_at]
+      properties:
+        id:
+          type: string
+        wallet_id:
+          type: string
+        subject:
+          type: string
+        transaction_type:
+          type: string
+          enum: [CREDIT, DEBIT]
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        reference_type:
+          type: string
+          enum: [payment_session, refund, settlement]
+        reference_id:
+          type: string
+        order_id:
+          type: ["string", "null"]
+        description:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED, REVERSED]
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: ["string", "null"]
+          format: date-time
 
 paths:
-  /wlt/dsh/client/wallet/summary:
+  /health:
     get:
-      operationId: getClientWalletSummary
-      summary: Get client wallet summary
-      description: >
-        WLT-owned. Returns wallet balance and linked state for the authenticated client.
-        Execution is WLT-owned — DSH client surface is a read-only consumer.
-      tags: [client-wallet]
-      security:
-        - bearerAuth: []
+      summary: Service health probe
+      operationId: getHealth
       responses:
         '200':
-          description: Wallet summary
+          description: Healthy
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WalletBalance'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: wlt-api
 
-  /wlt/dsh/client/payment-sessions:
+  /payment/sessions:
     post:
-      operationId: createClientPaymentSession
-      summary: Create a payment session for a client checkout
-      description: >
-        WLT-owned. DSH submits a payment session candidate from its checkout intent.
-        WLT validates client balance and policy, then returns a sessionId.
-
-        PRIMARY FLOW — callback:
-          WLT sends payment decision to DSH via POST /checkout/payment-callback on the DSH backend.
-          WLT must include X-WLT-Callback-Token, X-WLT-Event-Id, and Idempotency-Key.
-          DSH MUST NOT create the order until it receives a confirmed callback from WLT.
-          DSH stores sessionId as wlt_payment_ref_id (operational reference only).
-
-        FALLBACK — polling:
-          DSH MAY poll GET /wlt/dsh/client/payment-sessions/{sessionId} as a fallback
-          to verify status if the callback was not received (network failure, retry window).
-          Polling is secondary and MUST NOT replace the callback as the primary trigger.
-
-        Idempotency-Key header is required to prevent duplicate charges.
-        Execution is WLT-owned — DSH is input-only (DSH_PAYMENT_INPUT_ONLY).
-      tags: [client-payment]
+      summary: Create payment session (DSH checkout handoff to WLT)
+      operationId: createPaymentSession
       security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - BearerAuth: []
+        - DevClientId: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentSession'
+              type: object
+              required: [checkout_intent_id, client_id, amount, idempotency_key]
+              properties:
+                checkout_intent_id:
+                  type: string
+                client_id:
+                  type: string
+                amount:
+                  type: number
+                  format: double
+                currency:
+                  type: string
+                  default: YER
+                payment_method:
+                  type: string
+                  default: wallet
+                dsh_base_url:
+                  type: string
+                  description: DSH base URL for callback; uses WLT_DSH_BASE_URL env if omitted
+                idempotency_key:
+                  type: string
       responses:
         '201':
-          description: Payment session created — poll for status
+          description: Payment session created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentSession'
-        '402':
-          description: Insufficient balance
+        '400':
+          description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Duplicate idempotency key
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                $ref: '#/components/schemas/Error'
 
-  /wlt/dsh/client/payment-sessions/{sessionId}:
+  /payment/sessions/{id}:
     get:
-      operationId: getClientPaymentSessionStatus
-      summary: Poll payment session status (fallback only)
-      description: >
-        WLT-owned. FALLBACK verification endpoint — use only if primary callback was not received.
-        Primary flow: WLT sends POST /checkout/payment-callback to DSH after payment decision.
-        DSH uses this endpoint as a retry/reconciliation probe only, not as the primary order trigger.
-        Execution is WLT-owned — DSH reads result only.
-      tags: [client-payment]
+      summary: Get payment session status
+      operationId: getPaymentSession
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
       parameters:
-        - name: sessionId
+        - name: id
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Payment session status
+          description: Payment session
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentSession'
         '404':
-          description: Session not found or expired
+          description: Not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                $ref: '#/components/schemas/Error'
 
-  /wlt/dsh/client/top-up-sessions:
+  /payment/sessions/{id}/confirm:
     post:
-      operationId: createClientTopUpSession
-      summary: Create a top-up session for client wallet
-      description: >
-        WLT-owned. Initiates a wallet top-up flow for the client when tied to a DSH checkout/wallet recovery flow.
-        WLT returns a redirectUrl for the hosted top-up flow.
-        DSH displays the redirect — does not process the top-up itself.
-        Idempotency-Key header is required to prevent duplicate top-ups.
-        Execution is WLT-owned — DSH client surface is a read-only consumer.
-      tags: [client-wallet]
+      summary: Confirm payment — provider webhook or operator test-confirm
+      description: |
+        WLT confirms payment and calls DSH POST /checkout/payment-callback:
+          X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key headers
+          Body: {intent_id, wlt_payment_ref_id, status: "confirmed"}
+      operationId: confirmPaymentSession
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
       parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider_ref:
+                  type: string
+      responses:
+        '200':
+          description: Confirmed; DSH payment callback dispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentSession'
+        '403':
+          description: Forbidden — operator or system role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Session not in PENDING state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /payment/sessions/{id}/fail:
+    post:
+      summary: Fail payment — provider webhook or operator
+      operationId: failPaymentSession
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                failure_reason:
+                  type: string
+                  enum: [insufficient_balance, policy_block, fraud_hold, expired, provider_error]
+      responses:
+        '200':
+          description: Failed; DSH payment callback dispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentSession'
+
+  /refunds:
+    post:
+      summary: Initiate refund (operator — WLT financial decision)
+      operationId: createRefund
+      security:
+        - BearerAuth: []
+        - DevClientId: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopUpSession'
+              type: object
+              required: [order_id, client_id, amount, idempotency_key]
+              properties:
+                order_id:
+                  type: string
+                payment_session_id:
+                  type: string
+                client_id:
+                  type: string
+                amount:
+                  type: number
+                  format: double
+                currency:
+                  type: string
+                  default: YER
+                reason:
+                  type: string
+                trigger_ref:
+                  type: ["string", "null"]
+                  description: WltRefundTriggerRef bridged from DSH delivery-failure
+                dsh_base_url:
+                  type: string
+                idempotency_key:
+                  type: string
       responses:
         '201':
-          description: Top-up session created
+          description: Refund created in PENDING state
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TopUpSession'
-        '409':
-          description: Duplicate idempotency key
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                $ref: '#/components/schemas/Refund'
 
-  /wlt/dsh/captain/eligibility:
+  /refunds/{id}:
     get:
-      operationId: getCaptainEligibility
-      summary: Get captain eligibility balance
-      description: >
-        WLT-owned. Returns captain wallet eligibility state for order acceptance.
-        Execution is WLT-owned — DSH captain surface is a read-only consumer.
-      tags: [captain-finance]
+      summary: Get refund status
+      operationId: getRefund
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Captain eligibility balance
+          description: Refund
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CaptainEligibilityBalance'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                $ref: '#/components/schemas/Refund'
 
-  /wlt/dsh/captain/top-up-sessions:
+  /refunds/{id}/process:
     post:
-      operationId: createCaptainTopUpSession
-      summary: Create a top-up session for captain wallet
-      description: >
-        WLT-owned. Initiates a wallet top-up flow for the captain.
-        Idempotency-Key header is required to prevent duplicate top-ups.
-        Execution is WLT-owned — DSH captain surface is a read-only consumer.
-      tags: [captain-finance]
+      summary: Operator approves refund (PENDING → PROCESSING)
+      operationId: processRefund
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
       parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Refund now PROCESSING
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+
+  /refunds/{id}/confirm:
+    post:
+      summary: Confirm refund (PROCESSING → CONFIRMED) + notify DSH
+      description: |
+        WLT confirms refund and calls DSH POST /orders/{order_id}/refund-callback:
+          X-WLT-Callback-Token header
+          Body: {refund_ref_id: refund.id, status: "CONFIRMED"}
+      operationId: confirmRefund
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Refund confirmed; DSH callback dispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+
+  /refunds/{id}/fail:
+    post:
+      summary: Fail refund + notify DSH
+      operationId: failRefund
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Refund failed; DSH callback dispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+
+  /settlements:
+    post:
+      summary: Create settlement for a delivered order (operator)
+      operationId: createSettlement
+      security:
+        - BearerAuth: []
+        - DevClientId: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TopUpSession'
+              type: object
+              required: [order_id, partner_id, gross_amount, idempotency_key]
+              properties:
+                order_id:
+                  type: string
+                partner_id:
+                  type: string
+                captain_id:
+                  type: ["string", "null"]
+                gross_amount:
+                  type: number
+                  format: double
+                platform_fee_rate:
+                  type: number
+                  format: double
+                  default: 0.10
+                captain_fee_rate:
+                  type: number
+                  format: double
+                  default: 0.15
+                currency:
+                  type: string
+                  default: YER
+                idempotency_key:
+                  type: string
       responses:
         '201':
-          description: Top-up session created
-        '409':
-          description: Duplicate idempotency key
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/captain/cod-liabilities:
-    get:
-      operationId: getCaptainCodLiabilities
-      summary: Get captain COD liability summary
-      description: >
-        WLT-owned. Returns outstanding COD liability for the captain.
-        Execution is WLT-owned — DSH captain surface is a read-only consumer.
-      tags: [captain-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: COD liability list
+          description: Settlement created in PENDING state
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CodLiability'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                $ref: '#/components/schemas/Settlement'
 
-  /wlt/dsh/captain/earnings:
     get:
-      operationId: getCaptainEarnings
-      summary: Get captain earnings ledger
-      description: >
-        WLT-owned. Returns captain earnings ledger entries.
-        Execution is WLT-owned — DSH captain surface is a read-only consumer.
-      tags: [captain-finance]
+      summary: List settlements (operator)
+      operationId: listSettlements
       security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Earnings ledger entries
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LedgerEntry'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/partner/settlement-cycles:
-    get:
-      operationId: getPartnerSettlementCycles
-      summary: Get partner settlement cycles
-      description: >
-        WLT-owned. Returns partner settlement cycle history and pending amounts.
-        Execution is WLT-owned — DSH partner surface is a read-only consumer.
-      tags: [partner-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Settlement cycles
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PartnerSettlementCycle'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/field/commissions:
-    get:
-      operationId: getFieldCommissions
-      summary: Get field agent commission ledger
-      description: >
-        WLT-owned. Returns field agent commission entries.
-        Execution is WLT-owned — DSH field surface is a read-only consumer.
-      tags: [field-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Commission entries
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FieldCommission'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/finance/overview:
-    get:
-      operationId: getControlPanelFinanceOverview
-      summary: Get finance overview for control panel
-      description: >
-        WLT-owned. Returns aggregate finance metrics for control panel display.
-        Control panel may view and approve; no direct ledger write.
-        Execution is WLT-owned.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Finance overview
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MoneyAmount'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/reconciliation-runs:
-    get:
-      operationId: listReconciliationRuns
-      summary: List reconciliation runs
-      description: >
-        WLT-owned. Lists reconciliation run history for control panel review.
-        Execution is WLT-owned.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Reconciliation runs
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ReconciliationRun'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-    post:
-      operationId: triggerReconciliationRun
-      summary: Trigger a new reconciliation run
-      description: >
-        WLT-owned. Triggers a new reconciliation run.
-        Idempotency-Key header is required.
-        Execution is WLT-owned — control panel initiates only.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
       parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Settlements list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settlements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Settlement'
+                  total:
+                    type: integer
+
+  /settlements/{id}:
+    get:
+      summary: Get settlement detail
+      operationId: getSettlement
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settlement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settlement'
+
+  /settlements/{id}/process:
+    post:
+      summary: Move settlement PENDING → PROCESSING
+      operationId: processSettlement
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settlement now PROCESSING
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settlement'
+
+  /settlements/{id}/complete:
+    post:
+      summary: Complete settlement PROCESSING → COMPLETED
+      operationId: completeSettlement
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settlement completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settlement'
+
+  /settlements/{id}/fail:
+    post:
+      summary: Fail settlement
+      operationId: failSettlement
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReconciliationRun'
+              type: object
+              properties:
+                reason:
+                  type: string
       responses:
-        '201':
-          description: Reconciliation run triggered
-        '409':
-          description: Duplicate idempotency key
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+        '200':
+          description: Settlement failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settlement'
 
-  /wlt/dsh/control-panel/payout-decisions:
-    post:
-      operationId: createPayoutDecision
-      summary: Create a payout decision
-      description: >
-        WLT-owned. Records a control panel payout approval or rejection.
-        Idempotency-Key header is required.
-        Execution is WLT-owned — control panel approves/rejects only.
-      tags: [control-panel-finance]
+  /wallets/{subject}/summary:
+    get:
+      summary: Wallet balance and aggregate stats for a subject
+      description: |
+        Operators can query any subject.
+        Clients/captains/partners can only query their own subject.
+      operationId: getWalletSummary
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
       parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PayoutDecision'
-      responses:
-        '201':
-          description: Payout decision recorded
-        '409':
-          description: Duplicate idempotency key
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/audit-events:
-    get:
-      operationId: listAuditEvents
-      summary: List finance audit events
-      description: >
-        WLT-owned. Returns audit event log for finance operations.
-        Execution is WLT-owned — control panel is read-only.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
+        - name: subject
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Audit events
+          description: Wallet summary
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AuditEvent'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/refund-queue:
-    get:
-      operationId: listControlPanelRefundQueue
-      summary: List refund cases in control panel review queue
-      description: >
-        WLT-owned. Lists pending and processed refund cases for control panel review.
-        Control panel prepares decisions; WLT executes all refund outcomes.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Refund case queue
+                $ref: '#/components/schemas/WalletSummary'
+        '403':
+          description: Cannot view another subject's wallet
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RefundCase'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                $ref: '#/components/schemas/Error'
 
-  /wlt/dsh/control-panel/ledger-entries:
+  /wallets/{subject}/transactions:
     get:
-      operationId: listControlPanelLedgerEntries
-      summary: List general ledger entries for control panel
-      description: >
-        WLT-owned. Returns general ledger entries — journal entries, debit/credit records.
-        Control panel is read-only. No ledger write from DSH.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-      tags: [control-panel-finance]
+      summary: Paginated ledger entries for a subject
+      operationId: getWalletTransactions
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: subject
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
       responses:
         '200':
           description: Ledger entries
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LedgerEntry'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LedgerEntry'
+                  total:
+                    type: integer
 
-  /wlt/dsh/store-delivery/finance-summary:
-    get:
-      operationId: getStoreDeliveryFinanceSummary
-      summary: Get store delivery courier finance summary
-      description: >
-        WLT-owned. Returns finance summary for store delivery couriers (store_courier_mode).
-        Separated from bthwani captain finance. Control panel is read-only consumer.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-      tags: [store-delivery-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Store delivery finance summary
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StoreDeliveryFinanceSummary'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+x-wlt-dsh-callbacks:
+  description: |
+    Outbound callbacks WLT sends TO DSH. These are DSH endpoints, not WLT endpoints.
 
-  /wlt/dsh/control-panel/daily-close:
-    post:
-      operationId: submitDailyClose
-      summary: Submit daily financial close request to WLT
-      description: >
-        WLT-owned. Control panel submits daily close initiation after verifying
-        zero total variance and complete evidence. WLT engine performs the close.
-        Idempotency-Key required. Maker-Checker workflow enforced server-side by WLT.
-        422 returned if varianceTotalMinorUnits !== 0 or evidence incomplete.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DailyCloseRequest'
-      responses:
-        '201':
-          description: Daily close submitted — WLT engine will process
-        '409':
-          description: Duplicate idempotency key
-        '422':
-          description: Unresolved variance or incomplete evidence — close blocked by WLT
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
+  payment_callback:
+    dsh_endpoint: POST /checkout/payment-callback
+    headers:
+      X-WLT-Callback-Token: "{WLT_CALLBACK_SECRET}"
+      X-WLT-Event-Id: "{unique-per-event}"
+      Idempotency-Key: "{payment_session.idempotency_key}"
+    body:
+      intent_id: "{payment_session.checkout_intent_id}"
+      wlt_payment_ref_id: "{payment_session.id}"
+      status: "confirmed | failed"
+      failure_reason: "{nullable}"
+    triggered_by: confirm or fail of payment session
 
-  /wlt/dsh/control-panel/reconciliation-close-status:
-    get:
-      operationId: getReconciliationCloseStatus
-      summary: Get daily reconciliation close gate status
-      description: >
-        WLT-owned. Returns current daily close status: total variance, evidence completeness,
-        and whether close gate is open. gateOpen is true only when varianceTotalMinorUnits === 0
-        AND evidenceComplete === true. Any non-zero variance blocks the gate.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Reconciliation close status
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ReconciliationCloseStatus'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/finance-center:
-    get:
-      operationId: getControlPanelFinanceCenter
-      summary: Get WLT finance center preview for DSH control panel
-      description: >
-        WLT-owned. Returns the account-first finance center read model for DSH control-panel display.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — no backend, no real balances, no ledger runtime.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Finance center preview
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ControlPanelFinanceCenter'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/store-settlement-statements:
-    get:
-      operationId: listStoreSettlementStatements
-      summary: List WLT store settlement statements for DSH control panel
-      description: >
-        WLT-owned. Lists store settlement statements with biweekly cycles, linked order rows,
-        fees, commissions, discounts, refunds, holds, paid-to-date, and remaining payable.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY — read-only preview.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Store settlement statement previews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StoreSettlementStatement'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/account-statements:
-    get:
-      operationId: listControlPanelAccountStatements
-      summary: List WLT account statements for DSH control panel
-      description: >
-        WLT-owned. Returns account statements for store, captain, store courier, field agent,
-        customer wallet, and platform display. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Account statement previews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AccountStatement'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/chart-of-accounts:
-    get:
-      operationId: listChartOfAccounts
-      summary: List WLT chart of accounts preview
-      description: >
-        WLT-owned chart of accounts preview. DSH may display account metadata only.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Chart of accounts preview
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ChartOfAccount'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/subledger-balances:
-    get:
-      operationId: listSubledgerBalances
-      summary: List WLT subledger balance previews
-      description: >
-        WLT-owned subledger balance preview mapped to control accounts.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Subledger balance previews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SubledgerBalance'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/posting-rules:
-    get:
-      operationId: listPostingRules
-      summary: List WLT posting rule previews
-      description: >
-        WLT-owned double-entry posting rules preview. DSH displays rules only.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Posting rule previews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostingRule'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/trial-balance:
-    get:
-      operationId: getTrialBalance
-      summary: Get WLT trial balance preview
-      description: >
-        WLT-owned trial balance preview. Total debit and credit must balance before any future close.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Trial balance preview
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TrialBalance'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/settlement-calendar:
-    get:
-      operationId: listSettlementCalendar
-      summary: List WLT settlement calendar previews
-      description: >
-        WLT-owned settlement cycles for store, captain, field, and store courier payout timing.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Settlement calendar previews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SettlementCalendarCycle'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/refund-ledger:
-    get:
-      operationId: listRefundLedger
-      summary: List WLT refund ledger previews
-      description: >
-        WLT-owned refund and dispute ledger. DSH may inspect impact only;
-        current implementation is in-memory core only until durable WLT runtime is proven.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Refund ledger previews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RefundLedgerCase'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-  /wlt/dsh/control-panel/audit-pack:
-    get:
-      operationId: getAuditPack
-      summary: Get WLT audit pack preview
-      description: >
-        WLT-owned audit pack preview for finance review evidence.
-        CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-      tags: [control-panel-finance]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Audit pack preview
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuditPack'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        default:
-          $ref: '#/components/responses/Error'
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-  parameters:
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: true
-      description: >
-        Client-generated unique key (UUID v4 recommended) to prevent duplicate
-        mutations. Required on all POST endpoints that mutate financial state.
-      schema:
-        type: string
-        format: uuid
-
-  responses:
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error:
-      description: Unexpected error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-
-  schemas:
-    MoneyAmount:
-      type: object
-      description: >
-        Monetary amount in minor units (YER minor units — use amountMinorUnits as the canonical field).
-        Currency defaults to YER per x-bthwani-currency-default.
-      required: [amountMinorUnits, currency]
-      properties:
-        amountMinorUnits:
-          type: integer
-          description: Amount in minor currency units (YER minor units — not fils/halala; use amountMinorUnits as the canonical field name)
-        currency:
-          type: string
-          default: YER
-          description: ISO 4217 currency code. Default is YER (Yemeni Rial).
-        displayLabel:
-          type: string
-          description: Pre-formatted display string for UI use only
-
-    LedgerEntry:
-      type: object
-      description: WLT-owned ledger entry. Immutable after creation.
-      required: [id, type, amount, createdAt]
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-          enum: [credit, debit, hold, release, refund, commission, settlement]
-        amount:
-          $ref: '#/components/schemas/MoneyAmount'
-        referenceId:
-          type: string
-          description: Order or transaction reference
-        note:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-
-    WalletBalance:
-      type: object
-      description: WLT-owned wallet balance snapshot.
-      required: [balanceMinorUnits, currency, linked, updatedAt]
-      properties:
-        balanceMinorUnits:
-          type: integer
-          description: Current wallet balance in minor units
-        currency:
-          type: string
-          default: YER
-        linked:
-          type: boolean
-          description: Whether the wallet is linked to an active account
-        frozenMinorUnits:
-          type: integer
-          description: Amount currently on hold
-        updatedAt:
-          type: string
-          format: date-time
-
-    PaymentSession:
-      type: object
-      description: >
-        WLT-owned payment session. DSH submits checkout candidate; WLT decides financial outcome.
-        DSH polls GET /wlt/dsh/client/payment-sessions/{sessionId} until status=confirmed or failed.
-        DSH stores sessionId as wlt_payment_ref_id (operational reference only — no financial mutation in DSH).
-        Requires Idempotency-Key on creation.
-      required: [orderId, amountMinorUnits, currency]
-      properties:
-        sessionId:
-          type: string
-          format: uuid
-          description: WLT session reference — DSH stores as wlt_payment_ref_id
-        orderId:
-          type: string
-          description: DSH operational order/intent identifier
-        amountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        status:
-          type: string
-          enum: [pending, confirmed, failed, expired]
-          description: >
-            pending: WLT is processing.
-            confirmed: WLT approved and executed the payment.
-            failed: WLT rejected (insufficient balance, policy, etc).
-            expired: Session timed out.
-        confirmedAt:
-          type: string
-          format: date-time
-          description: Present only when status=confirmed
-        failureReason:
-          type: string
-          enum: [insufficient_balance, policy_block, fraud_hold, expired]
-          description: Present only when status=failed
-        expiresAt:
-          type: string
-          format: date-time
-
-    TopUpSession:
-      type: object
-      description: >
-        WLT-owned top-up session. Initiates a wallet funding flow.
-        WLT returns redirectUrl for the hosted top-up flow; DSH displays it only.
-        Requires Idempotency-Key on creation.
-      required: [amountMinorUnits, currency]
-      properties:
-        sessionId:
-          type: string
-          format: uuid
-        amountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        status:
-          type: string
-          enum: [pending, processing, completed, failed]
-        redirectUrl:
-          type: string
-          format: uri
-          description: WLT-hosted top-up flow URL — DSH displays, does not own
-
-    CaptainEligibilityBalance:
-      type: object
-      description: WLT-owned captain eligibility balance for order acceptance.
-      required: [eligible, balanceMinorUnits, currency]
-      properties:
-        eligible:
-          type: boolean
-        balanceMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        minimumRequiredMinorUnits:
-          type: integer
-        note:
-          type: string
-
-    CodLiability:
-      type: object
-      description: WLT-owned COD liability record for a captain.
-      required: [id, amountMinorUnits, currency, status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        orderId:
-          type: string
-        amountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        status:
-          type: string
-          enum: [outstanding, settled, disputed]
-        dueAt:
-          type: string
-          format: date-time
-
-    PartnerSettlementCycle:
-      type: object
-      description: WLT-owned partner settlement cycle record.
-      required: [id, periodStart, periodEnd, netAmountMinorUnits, currency, status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        periodStart:
-          type: string
-          format: date
-        periodEnd:
-          type: string
-          format: date
-        netAmountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        status:
-          type: string
-          enum: [pending, processing, paid, disputed]
-
-    FieldCommission:
-      type: object
-      description: WLT-owned field agent commission entry.
-      required: [id, amountMinorUnits, currency, status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        storeId:
-          type: string
-        amountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        status:
-          type: string
-          enum: [pending, approved, paid]
-        earnedAt:
-          type: string
-          format: date-time
-
-    RefundCase:
-      type: object
-      description: WLT-owned refund case.
-      required: [id, orderId, amountMinorUnits, currency, status]
-      properties:
-        id:
-          type: string
-          format: uuid
-        orderId:
-          type: string
-        amountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        status:
-          type: string
-          enum: [pending, approved, processed, rejected]
-        reason:
-          type: string
-
-    ReconciliationRun:
-      type: object
-      description: >
-        WLT-owned reconciliation run record.
-        Requires Idempotency-Key when triggering.
-      required: [id, status, createdAt]
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          type: string
-          enum: [pending, running, completed, failed]
-        periodStart:
-          type: string
-          format: date
-        periodEnd:
-          type: string
-          format: date
-        discrepancyCount:
-          type: integer
-        createdAt:
-          type: string
-          format: date-time
-        completedAt:
-          type: string
-          format: date-time
-
-    PayoutDecision:
-      type: object
-      description: >
-        WLT-owned payout decision created by control panel.
-        Requires Idempotency-Key on creation.
-      required: [id, recipientId, recipientType, amountMinorUnits, currency, decision]
-      properties:
-        id:
-          type: string
-          format: uuid
-        recipientId:
-          type: string
-        recipientType:
-          type: string
-          enum: [captain, partner, field]
-        amountMinorUnits:
-          type: integer
-        currency:
-          type: string
-          default: YER
-        decision:
-          type: string
-          enum: [approved, rejected, held]
-        note:
-          type: string
-
-    AuditEvent:
-      type: object
-      description: WLT-owned immutable audit event.
-      required: [id, eventType, actorId, createdAt]
-      properties:
-        id:
-          type: string
-          format: uuid
-        eventType:
-          type: string
-        actorId:
-          type: string
-        actorRole:
-          type: string
-          enum: [system, control-panel, wlt-service]
-        referenceId:
-          type: string
-        payload:
-          type: object
-          additionalProperties: true
-        createdAt:
-          type: string
-          format: date-time
-
-    StoreDeliveryFinanceSummary:
-      type: object
-      description: WLT-owned store delivery courier finance summary (store_courier_mode).
-      required: [totalEarningsMinorUnits, currency, periodDate]
-      properties:
-        totalEarningsMinorUnits:
-          type: integer
-          description: Total courier earnings in minor units
-        currency:
-          type: string
-          default: YER
-        pendingCount:
-          type: integer
-        periodDate:
-          type: string
-          format: date
-        deliveries:
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldCommission'
-
-    DailyCloseRequest:
-      type: object
-      description: >
-        Daily close initiation payload sent from DSH control panel to WLT.
-        WLT engine verifies zero total variance and complete evidence before executing close.
-        DSH initiates only — WLT owns all close logic.
-      required: [periodDate, makerUserId, checkerUserId]
-      properties:
-        periodDate:
-          type: string
-          format: date
-        makerUserId:
-          type: string
-          description: ID of the maker who prepared the close decision
-        checkerUserId:
-          type: string
-          description: ID of the checker who reviewed and approved the close
-        note:
-          type: string
-
-    ReconciliationCloseStatus:
-      type: object
-      description: >
-        WLT-computed daily reconciliation close gate status.
-        gateOpen is true ONLY when varianceTotalMinorUnits === 0 AND evidenceComplete === true.
-        Any non-zero variance or incomplete evidence keeps the gate closed.
-      required: [periodDate, varianceTotalMinorUnits, evidenceComplete, gateOpen, currency]
-      properties:
-        periodDate:
-          type: string
-          format: date
-        varianceTotalMinorUnits:
-          type: integer
-          description: Sum of all unresolved variances across all rows. Must be 0 for gate to open.
-        evidenceComplete:
-          type: boolean
-          description: True only when every row has evidenceStatus === complete.
-        gateOpen:
-          type: boolean
-          description: True only when varianceTotalMinorUnits === 0 AND evidenceComplete === true.
-        currency:
-          type: string
-          default: YER
-        blockedReasons:
-          type: array
-          items:
-            type: string
-          description: Human-readable list of reasons preventing daily close
-        rowCount:
-          type: integer
-          description: Total number of financial rows in the reconciliation set
-        resolvedRowCount:
-          type: integer
-          description: Number of rows with varianceMinorUnits === 0 and evidenceStatus === complete
-
-    ControlPanelFinanceCenter:
-      type: object
-      description: WLT-owned account-first finance center preview for DSH control panel.
-      required: [businessDate, currency, contractState]
-      properties:
-        businessDate:
-          type: string
-          format: date
-        currency:
-          type: string
-          default: YER
-        sections:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        contractState:
-          type: string
-          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
-
-    StoreSettlementOrderRow:
-      type: object
-      description: Order row included in a WLT store settlement statement preview.
-      required: [orderId, orderDate, deliveryDate, paymentMethod, orderGross, netSettlementImpact, settlementStatus]
-      properties:
-        orderId:
-          type: string
-        orderDate:
-          type: string
-          format: date
-        deliveryDate:
-          type: string
-          format: date
-        paymentMethod:
-          type: string
-          enum: [wallet, cod, card, manual]
-        orderGross:
-          $ref: '#/components/schemas/MoneyAmount'
-        deliveryFee:
-          $ref: '#/components/schemas/MoneyAmount'
-        platformCommission:
-          $ref: '#/components/schemas/MoneyAmount'
-        discount:
-          $ref: '#/components/schemas/MoneyAmount'
-        refundAmount:
-          $ref: '#/components/schemas/MoneyAmount'
-        netSettlementImpact:
-          $ref: '#/components/schemas/MoneyAmount'
-        includedInCycle:
-          type: boolean
-        settlementStatus:
-          type: string
-          enum: [included, held, next_cycle, disputed]
-        evidenceRef:
-          type: string
-
-    StoreSettlementStatement:
-      type: object
-      description: WLT-owned store settlement statement preview.
-      required: [statementId, storeId, storeName, settlementCycleId, frequency, periodStart, periodEnd, expectedPayoutDate, netPayable, orders, contractState]
-      properties:
-        statementId:
-          type: string
-        storeId:
-          type: string
-        storeName:
-          type: string
-        settlementCycleId:
-          type: string
-        frequency:
-          type: string
-          enum: [biweekly]
-        periodStart:
-          type: string
-          format: date
-        periodEnd:
-          type: string
-          format: date
-        cutoffDate:
-          type: string
-          format: date
-        expectedPayoutDate:
-          type: string
-          format: date
-        status:
-          type: string
-          enum: [draft_preview, ready_for_review, held_by_wlt, paid_preview]
-        grossOrdersTotal:
-          $ref: '#/components/schemas/MoneyAmount'
-        deliveryFeesTotal:
-          $ref: '#/components/schemas/MoneyAmount'
-        platformCommissionTotal:
-          $ref: '#/components/schemas/MoneyAmount'
-        discountsTotal:
-          $ref: '#/components/schemas/MoneyAmount'
-        refundsTotal:
-          $ref: '#/components/schemas/MoneyAmount'
-        holdsTotal:
-          $ref: '#/components/schemas/MoneyAmount'
-        netPayable:
-          $ref: '#/components/schemas/MoneyAmount'
-        paidToDate:
-          $ref: '#/components/schemas/MoneyAmount'
-        remainingPayable:
-          $ref: '#/components/schemas/MoneyAmount'
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/StoreSettlementOrderRow'
-        contractState:
-          type: string
-          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
-
-    AccountStatementLine:
-      type: object
-      description: One WLT account statement line preview.
-      required: [lineId, date, sourceType, sourceId, description, runningBalance, status]
-      properties:
-        lineId:
-          type: string
-        date:
-          type: string
-          format: date
-        sourceType:
-          type: string
-          enum: [order, settlement, refund, payout, commission, wallet, adjustment]
-        sourceId:
-          type: string
-        description:
-          type: string
-        debit:
-          $ref: '#/components/schemas/MoneyAmount'
-        credit:
-          $ref: '#/components/schemas/MoneyAmount'
-        runningBalance:
-          $ref: '#/components/schemas/MoneyAmount'
-        status:
-          type: string
-          enum: [posted_preview, pending_wlt, held, disputed]
-        evidenceRef:
-          type: string
-
-    AccountStatement:
-      type: object
-      description: WLT-owned account statement preview for a financial actor.
-      required: [statementId, actor, actorId, periodStart, periodEnd, openingBalance, closingBalance, lines, contractState]
-      properties:
-        statementId:
-          type: string
-        actor:
-          type: string
-          enum: [store, captain, store_courier, field_agent, customer_wallet, platform]
-        actorId:
-          type: string
-        periodStart:
-          type: string
-          format: date
-        periodEnd:
-          type: string
-          format: date
-        openingBalance:
-          $ref: '#/components/schemas/MoneyAmount'
-        periodDebit:
-          $ref: '#/components/schemas/MoneyAmount'
-        periodCredit:
-          $ref: '#/components/schemas/MoneyAmount'
-        adjustments:
-          $ref: '#/components/schemas/MoneyAmount'
-        holds:
-          $ref: '#/components/schemas/MoneyAmount'
-        releases:
-          $ref: '#/components/schemas/MoneyAmount'
-        refunds:
-          $ref: '#/components/schemas/MoneyAmount'
-        payouts:
-          $ref: '#/components/schemas/MoneyAmount'
-        closingBalance:
-          $ref: '#/components/schemas/MoneyAmount'
-        lines:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountStatementLine'
-        contractState:
-          type: string
-          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
-
-    ChartOfAccount:
-      type: object
-      description: WLT chart of accounts preview row.
-      required: [accountCode, accountName, accountType, normalBalance]
-      properties:
-        accountCode:
-          type: string
-        accountName:
-          type: string
-        accountNameEn:
-          type: string
-        accountType:
-          type: string
-          enum: [asset, liability, revenue, expense, clearing, equity]
-        normalBalance:
-          type: string
-          enum: [debit, credit]
-        controlAccount:
-          type: boolean
-        parentAccountId:
-          type: string
-        currency:
-          type: string
-          default: YER
-
-    SubledgerBalance:
-      type: object
-      description: WLT subledger-to-control-account balance preview.
-      required: [subledgerId, controlAccountCode, balance, closeGateImpact]
-      properties:
-        subledgerId:
-          type: string
-        domain:
-          type: string
-        controlAccountCode:
-          type: string
-        actorType:
-          type: string
-        sourceEvents:
-          type: array
-          items:
-            type: string
-        balance:
-          $ref: '#/components/schemas/MoneyAmount'
-        closeGateImpact:
-          type: string
-
-    PostingRule:
-      type: object
-      description: WLT double-entry posting rule preview.
-      required: [eventKind, debitAccountCode, creditAccountCode, statementImpact, settlementImpact]
-      properties:
-        eventKind:
-          type: string
-        debitAccountCode:
-          type: string
-        creditAccountCode:
-          type: string
-        amountSource:
-          type: string
-        actor:
-          type: string
-        statementImpact:
-          type: string
-        settlementImpact:
-          type: string
-        reconciliationImpact:
-          type: string
-
-    TrialBalance:
-      type: object
-      description: WLT trial balance preview.
-      required: [businessDate, totalDebit, totalCredit, isBalanced, contractState]
-      properties:
-        businessDate:
-          type: string
-          format: date
-        totalDebit:
-          $ref: '#/components/schemas/MoneyAmount'
-        totalCredit:
-          $ref: '#/components/schemas/MoneyAmount'
-        isBalanced:
-          type: boolean
-        lines:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        contractState:
-          type: string
-          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
-
-    SettlementCalendarCycle:
-      type: object
-      description: WLT settlement cycle calendar preview.
-      required: [cycleId, ownerKind, frequency, periodStart, periodEnd, cutoffDate, expectedPayoutDate, status, netPayable]
-      properties:
-        cycleId:
-          type: string
-        ownerKind:
-          type: string
-          enum: [store, captain, field_agent, store_courier]
-        frequency:
-          type: string
-          enum: [biweekly, weekly, monthly]
-        periodStart:
-          type: string
-          format: date
-        periodEnd:
-          type: string
-          format: date
-        cutoffDate:
-          type: string
-          format: date
-        expectedPayoutDate:
-          type: string
-          format: date
-        actualPayoutDate:
-          type: string
-          format: date
-        status:
-          type: string
-          enum: [open_preview, cutoff_locked, wlt_review, paid_preview, held]
-        includedOrderCount:
-          type: integer
-        excludedOrderCount:
-          type: integer
-        netPayable:
-          $ref: '#/components/schemas/MoneyAmount'
-        holdAmount:
-          $ref: '#/components/schemas/MoneyAmount'
-        releasePolicy:
-          type: string
-
-    RefundLedgerCase:
-      type: object
-      description: WLT refund and dispute ledger preview.
-      required: [refundCaseId, orderId, customerId, storeId, originalAmount, status, ledgerImpact, walletImpact, settlementImpact]
-      properties:
-        refundCaseId:
-          type: string
-        orderId:
-          type: string
-        customerId:
-          type: string
-        storeId:
-          type: string
-        originalAmount:
-          $ref: '#/components/schemas/MoneyAmount'
-        approvedAmount:
-          $ref: '#/components/schemas/MoneyAmount'
-        rejectedAmount:
-          $ref: '#/components/schemas/MoneyAmount'
-        reason:
-          type: string
-        evidence:
-          type: array
-          items:
-            type: string
-        status:
-          type: string
-          enum: [pending_wlt_review, approved_preview, rejected_preview, disputed]
-        ledgerImpact:
-          type: string
-        walletImpact:
-          type: string
-        settlementImpact:
-          type: string
-
-    AuditPack:
-      type: object
-      description: WLT finance audit pack preview.
-      required: [auditPackId, status, contractState]
-      properties:
-        auditPackId:
-          type: string
-        status:
-          type: string
-        events:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditEvent'
-        evidence:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        approvals:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        contractState:
-          type: string
-          enum: [CONTRACT_SCAFFOLD_PREVIEW_ONLY]
-
-    ErrorResponse:
-      type: object
-      required: [code, message]
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        retryable:
-          type: boolean
-        field:
-          type: string
+  refund_callback:
+    dsh_endpoint: POST /orders/{order_id}/refund-callback
+    headers:
+      X-WLT-Callback-Token: "{WLT_CALLBACK_SECRET}"
+    body:
+      refund_ref_id: "{refund.id}"
+      status: "CONFIRMED | FAILED"
+    triggered_by: confirm or fail of a refund

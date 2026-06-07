@@ -82,6 +82,11 @@ func scanOrderRecord(row interface{ Scan(dest ...any) error }, order *domain.Ord
 	if wltSettlement.Valid {
 		order.WltSettlementRefID = &wltSettlement.String
 	}
+	if setStatus.Valid {
+		order.SettlementStatus = setStatus.String
+	} else {
+		order.SettlementStatus = domain.SettlementStatusNotSettled
+	}
 	if checkoutIntentID.Valid {
 		order.CheckoutIntentID = &checkoutIntentID.String
 	}
@@ -630,6 +635,54 @@ VALUES ($1, $2, 'system', $3, $4, $5, NOW())`
 		return domain.OrderRecord{}, err
 	}
 
+	return order, nil
+}
+
+// UpdateOrderSettlement records the WLT settlement ref and updates settlement_status.
+// Called exclusively from POST /orders/{id}/settlement-callback (WLT → DSH bridge).
+// WLT BOUNDARY: DSH stores the reference only — no financial mutation here.
+func (repo *PostgresRepository) UpdateOrderSettlement(ctx context.Context, orderID string, settlementRefID string, settlementStatus string) (domain.OrderRecord, error) {
+	tx, err := repo.db.BeginTx(ctx, nil)
+	if err != nil {
+		return domain.OrderRecord{}, err
+	}
+	defer tx.Rollback() //nolint:errcheck
+
+	var currentStatus string
+	err = tx.QueryRowContext(ctx, "SELECT status FROM dsh_orders WHERE id = $1 FOR UPDATE", orderID).Scan(&currentStatus)
+	if err == sql.ErrNoRows {
+		return domain.OrderRecord{}, fmt.Errorf("order not found")
+	}
+	if err != nil {
+		return domain.OrderRecord{}, err
+	}
+
+	const updateQ = `
+UPDATE dsh_orders
+SET wlt_settlement_ref_id = $1, settlement_status = $2, updated_at = NOW()
+WHERE id = $3
+RETURNING id, store_id, client_id, status, total_price, wlt_payment_ref_id, wlt_refund_ref_id, captain_id, captain_latitude, captain_longitude, captain_lifecycle_status, pod_media_key, delivery_failure_reason, wlt_refund_trigger_ref, wlt_settlement_ref_id, settlement_status, checkout_intent_id, created_at, updated_at`
+
+	var order domain.OrderRecord
+	row := tx.QueryRowContext(ctx, updateQ, settlementRefID, settlementStatus, orderID)
+	if err = scanOrderRecord(row, &order); err != nil {
+		return domain.OrderRecord{}, fmt.Errorf("failed to update order settlement: %w", err)
+	}
+
+	note := fmt.Sprintf("Settlement (WLT ref: %s) status: %s", settlementRefID, settlementStatus)
+	eventID := generateStatusEventID()
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO dsh_order_status_events (id, order_id, actor, from_status, to_status, note, created_at)
+		 VALUES ($1, $2, 'system', $3, $3, $4, NOW())`,
+		eventID, orderID, currentStatus, note,
+	)
+	if err != nil {
+		return domain.OrderRecord{}, fmt.Errorf("failed to log settlement event: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return domain.OrderRecord{}, err
+	}
 	return order, nil
 }
 

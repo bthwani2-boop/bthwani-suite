@@ -10,7 +10,7 @@
 | Primary Surface | control-panel / ReadinessEscalationQueue |
 | WLT Boundary | No finance mutation |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None. Slice is fully implemented with OpenAPI design, backend Postgres handler & migrations, and CP screen. |
+| Blocking Reason | Implementation complete (backend + CP screen); needs operator CP action recording + visual evidence on real device |
 
 ## Scope
 ### Included

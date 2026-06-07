@@ -13,6 +13,7 @@
 | Excluded Surfaces | WLT (owns its own env boundary); production secrets infrastructure (out of scope) |
 | WLT Boundary | N/A — no money semantics |
 | Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | Static guard (guard-platform-vars-control.mjs) enforced with exit 0; production device-level var-leak test not conducted |
 | Closed At | 2026-06-06 |
 | Evidence Run | `DSH_SLICE_008C_VARS_SCOPE_AUDIT_FINAL_CLOSURE-20260606-072400` |
 

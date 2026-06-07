@@ -127,6 +127,97 @@ func main() {
 	})
 
 
+	// GET /auth/permissions — returns per-surface permission flags for the session
+	mux.HandleFunc("/auth/permissions", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+
+		var entry tokenEntry
+		var found bool
+		authHeader := strings.TrimSpace(r.Header.Get("Authorization"))
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+			entry, found = tokens[token]
+		} else {
+			// dev mode: X-Client-Id header
+			clientID := strings.TrimSpace(r.Header.Get("X-Client-Id"))
+			if clientID != "" {
+				actorType := strings.ToLower(strings.TrimSpace(r.Header.Get("X-Actor-Type")))
+				if actorType == "" {
+					actorType = "client"
+				}
+				entry = tokenEntry{subject: clientID, roles: []string{actorType}}
+				found = true
+			}
+		}
+		if !found {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "unauthenticated"}) //nolint:errcheck
+			return
+		}
+
+		hasRole := func(role string) bool {
+			for _, r := range entry.roles {
+				if strings.EqualFold(r, role) {
+					return true
+				}
+			}
+			return false
+		}
+
+		isClient := hasRole("client")
+		isCaptain := hasRole("captain")
+		isPartner := hasRole("partner")
+		isField := hasRole("field")
+		isOperator := hasRole("operator")
+
+		perms := map[string]any{
+			"subject": entry.subject,
+			"roles":   entry.roles,
+			"surfaces": map[string]any{
+				"app-client": map[string]bool{
+					"canViewCatalog":       isClient || isOperator,
+					"canCheckout":          isClient,
+					"canViewOwnOrders":     isClient,
+					"canCancelOwnOrder":    isClient,
+					"canViewOwnWallet":     isClient,
+					"canInitiatePayment":   isClient,
+					"canRequestRefund":     false,
+					"canAccessControlPanel": isOperator,
+				},
+				"app-captain": map[string]bool{
+					"canViewAssignedOrders":  isCaptain || isOperator,
+					"canAcceptOrder":         isCaptain,
+					"canUpdateDeliveryStatus": isCaptain || isOperator,
+					"canViewOwnWallet":        isCaptain,
+					"canViewOwnEarnings":      isCaptain || isOperator,
+				},
+				"app-partner": map[string]bool{
+					"canManageCatalog":    isPartner || isOperator,
+					"canViewStoreOrders": isPartner || isOperator,
+					"canViewSettlements": isPartner || isOperator,
+				},
+				"app-field": map[string]bool{
+					"canUploadFieldEvidence": isField || isOperator,
+					"canViewOnboardingStatus": isField || isOperator,
+				},
+				"control-panel": map[string]bool{
+					"canViewOperationsQueue":  isOperator,
+					"canViewFinanceOverview":  isOperator,
+					"canManageExceptions":     isOperator,
+					"canApproveSettlements":   isOperator,
+					"canProcessRefunds":       isOperator,
+				},
+			},
+		}
+
+		log.Printf("[auth-service] GET /auth/permissions → subject=%s roles=%v", entry.subject, entry.roles)
+		json.NewEncoder(w).Encode(perms) //nolint:errcheck
+	})
+
 	// GET /health — service liveness probe
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

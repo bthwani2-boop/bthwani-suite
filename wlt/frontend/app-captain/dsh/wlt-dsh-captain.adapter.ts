@@ -1,8 +1,4 @@
-import {
-	createWltDshTypedClient,
-	type WltDshCodLiability,
-	type WltDshLedgerEntry,
-} from '../../contracts';
+import { createWltDshTypedClient, type WltLedgerEntry } from '../../contracts';
 import {
 	formatWltYer,
 	getWltCaptainFinanceSnapshot,
@@ -17,83 +13,62 @@ function getClient() {
 	return createWltDshTypedClient({});
 }
 
-function liabilityRecord(item: WltDshCodLiability): WltDshFinancePreviewRecord {
+function earningRecord(entry: WltLedgerEntry): WltDshFinancePreviewRecord {
+	const amount = Math.round(entry.amount * 100);
 	return {
-		id: item.id,
-		actor: 'captain',
-		kind: 'captain-cod-liability',
-		currencyCode: item.currency,
-		amountMinorUnits: item.amountMinorUnits,
-		amountLabel: formatWltYer(item.amountMinorUnits),
-		tone: 'negative',
-		title: `ذمة COD · ${item.orderId}`,
-		subtitle: `WLT runtime · ${item.status}`,
-		statusLabel: item.status,
-		statusTone: item.status === 'outstanding' ? 'warning' : 'success',
-		timeLabel: item.createdAt,
-		sourceOrderId: item.orderId,
-		sourceCaptainId: item.captainId,
-		isPreview: false,
-	};
-}
-
-function earningRecord(item: WltDshLedgerEntry): WltDshFinancePreviewRecord {
-	const amount = Math.max(item.debitMinorUnits, item.creditMinorUnits);
-	return {
-		id: item.id,
+		id: entry.id,
 		actor: 'captain',
 		kind: 'captain-earning',
-		currencyCode: item.currency,
+		currencyCode: entry.currency,
 		amountMinorUnits: amount,
 		amountLabel: formatWltYer(amount),
-		tone: 'positive',
-		title: `أرباح كابتن · ${item.actorId}`,
-		subtitle: `WLT runtime · ${item.kind}`,
-		statusLabel: item.status,
-		statusTone: item.status === 'posted' ? 'success' : 'warning',
-		timeLabel: item.createdAt,
-		sourceOrderId: item.orderId,
-		sourceCaptainId: item.actorId,
+		tone: entry.transaction_type === 'CREDIT' ? 'positive' : 'negative',
+		title: `أرباح كابتن · ${entry.subject}`,
+		subtitle: `WLT runtime · ${entry.reference_type}`,
+		statusLabel: entry.status,
+		statusTone: entry.status === 'COMPLETED' ? 'success' : 'warning',
+		timeLabel: entry.created_at,
+		sourceOrderId: entry.order_id,
+		sourceCaptainId: entry.subject,
 		isPreview: false,
 	};
 }
 
 export async function getSnapshot(captainId = DEFAULT_CAPTAIN_ID): Promise<WltCaptainFinanceSnapshot> {
-	const [eligibility, liabilities, earnings] = await Promise.all([
-		getClient().getCaptainEligibility(captainId),
-		getClient().listCaptainCodLiabilities(captainId),
+	const [walletSummary, earningsResponse] = await Promise.all([
+		getClient().getCaptainWalletSummary(captainId),
 		getClient().listCaptainEarnings(captainId),
 	]);
 	const previewFallback = getWltCaptainFinanceSnapshot();
-	const codMinorUnits = liabilities.reduce((sum, item) => sum + item.amountMinorUnits, 0);
-	const earningsMinorUnits = earnings.reduce((sum, item) => sum + Math.max(item.debitMinorUnits, item.creditMinorUnits), 0);
+	const earningsMinorUnits = earningsResponse.entries
+		.filter((e) => e.transaction_type === 'CREDIT')
+		.reduce((sum, e) => sum + Math.round(e.amount * 100), 0);
+	const balanceMinorUnits = Math.round(walletSummary.balance * 100);
 
 	return {
 		...previewFallback,
-		codLiabilityMinorUnits: codMinorUnits,
-		codLiabilityLabel: formatWltYer(codMinorUnits),
+		// COD liability concept is tracked by WLT internally; captain surface shows balance instead.
+		codLiabilityMinorUnits: 0,
+		codLiabilityLabel: formatWltYer(0),
 		earningsMinorUnits,
 		earningsLabel: formatWltYer(earningsMinorUnits),
-		pendingPayoutMinorUnits: earningsMinorUnits,
-		pendingPayoutLabel: formatWltYer(earningsMinorUnits),
-		eligibilityBalanceMinorUnits: Math.max(previewFallback.minimumEligibilityMinorUnits - eligibility.heldMinorUnits, 0),
-		eligibilityBalanceLabel: formatWltYer(Math.max(previewFallback.minimumEligibilityMinorUnits - eligibility.heldMinorUnits, 0)),
-		isEligible: eligibility.eligible,
-		eligibilityShortfallMinorUnits: eligibility.eligible ? 0 : eligibility.heldMinorUnits,
-		eligibilityShortfallLabel: formatWltYer(eligibility.eligible ? 0 : eligibility.heldMinorUnits),
-		hasEligibilityBlock: !eligibility.eligible,
-		eligibilityBlockReason: eligibility.eligible ? '' : 'WLT runtime حجب الأهلية بسبب ذمم COD معلقة.',
+		pendingPayoutMinorUnits: balanceMinorUnits,
+		pendingPayoutLabel: formatWltYer(balanceMinorUnits),
+		eligibilityBalanceMinorUnits: balanceMinorUnits,
+		eligibilityBalanceLabel: formatWltYer(balanceMinorUnits),
+		isEligible: walletSummary.balance >= 0,
+		eligibilityShortfallMinorUnits: 0,
+		eligibilityShortfallLabel: formatWltYer(0),
+		hasEligibilityBlock: false,
+		eligibilityBlockReason: '',
 		contractState: 'CONTRACT_TBD',
 		isPreview: false,
 	};
 }
 
 export async function getRecords(captainId = DEFAULT_CAPTAIN_ID): Promise<WltDshFinancePreviewRecord[]> {
-	const [liabilities, earnings] = await Promise.all([
-		getClient().listCaptainCodLiabilities(captainId),
-		getClient().listCaptainEarnings(captainId),
-	]);
-	return [...liabilities.map(liabilityRecord), ...earnings.map(earningRecord)];
+	const { entries } = await getClient().listCaptainEarnings(captainId);
+	return entries.map(earningRecord);
 }
 
 export function getSections() {
@@ -102,8 +77,8 @@ export function getSections() {
 
 export async function getRecordsForSection(section: WltCaptainFinanceSection): Promise<WltDshFinancePreviewRecord[]> {
 	const records = await getRecords();
-	if (section === 'cod-liability') return records.filter((record) => record.kind === 'captain-cod-liability');
-	if (section === 'earnings') return records.filter((record) => record.kind === 'captain-earning');
+	if (section === 'earnings') return records.filter((r) => r.kind === 'captain-earning');
+	// cod-liability and settlement stubs — WLT COD tracking not yet surfaced via captain endpoint
 	return [];
 }
 

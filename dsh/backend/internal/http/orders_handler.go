@@ -27,6 +27,7 @@ func NewOrdersHandler(repository store.Repository) *OrdersHandler {
 	h.mux.HandleFunc("PATCH /orders/{id}/status", h.UpdateOrderStatus)
 	h.mux.HandleFunc("POST /orders/{id}/cancel", h.CancelOrder)
 	h.mux.HandleFunc("POST /orders/{id}/refund-callback", h.RefundOrderCallback)
+	h.mux.HandleFunc("POST /orders/{id}/settlement-callback", h.SettlementCallback)
 	h.mux.HandleFunc("POST /orders/{id}/assign-captain", h.AssignCaptain)
 	h.mux.HandleFunc("POST /orders/{id}/accept-task", h.AcceptTask)
 	h.mux.HandleFunc("POST /orders/{id}/decline-task", h.DeclineTask)
@@ -47,6 +48,7 @@ func RegisterOrderRoutes(mux *http.ServeMux, repository store.Repository) {
 	mux.Handle("PATCH /orders/{id}/status", h)
 	mux.Handle("POST /orders/{id}/cancel", h)
 	mux.Handle("POST /orders/{id}/refund-callback", h)
+	mux.Handle("POST /orders/{id}/settlement-callback", h)
 	mux.Handle("POST /orders/{id}/assign-captain", h)
 	mux.Handle("POST /orders/{id}/accept-task", h)
 	mux.Handle("POST /orders/{id}/decline-task", h)
@@ -962,6 +964,62 @@ func (h *OrdersHandler) ConfirmReturn(w http.ResponseWriter, r *http.Request) {
 			log.Printf("dsh-api: confirm return error: %v", err)
 			writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
 		}
+		return
+	}
+
+	writeJSON(w, http.StatusOK, order)
+}
+
+// SettlementCallback handles POST /orders/{id}/settlement-callback (J-010 / DSH-SLICE-010B).
+// Called exclusively by WLT after a settlement transitions to COMPLETED or FAILED.
+// WLT BOUNDARY: DSH records the settlement ref and status bridge values only.
+// No financial amounts are processed or stored here.
+func (h *OrdersHandler) SettlementCallback(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	log.Printf("dsh-api: POST /orders/%s/settlement-callback", id)
+
+	if !requireWltCallbackToken(w, r) {
+		return
+	}
+
+	if id == "" {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "missing order id")
+		return
+	}
+
+	var req struct {
+		SettlementRefID string `json:"settlement_ref_id"`
+		Status          string `json:"status"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid request body")
+		return
+	}
+
+	if req.SettlementRefID == "" {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "settlement_ref_id is required")
+		return
+	}
+
+	var settlementStatus string
+	switch strings.ToUpper(strings.TrimSpace(req.Status)) {
+	case "COMPLETED":
+		settlementStatus = domain.SettlementStatusSettled
+	case "FAILED":
+		settlementStatus = domain.SettlementStatusSettlementFailed
+	default:
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "status must be COMPLETED or FAILED")
+		return
+	}
+
+	order, err := h.repository.UpdateOrderSettlement(r.Context(), id, req.SettlementRefID, settlementStatus)
+	if err != nil {
+		if err.Error() == "order not found" {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "order not found")
+			return
+		}
+		log.Printf("dsh-api: settlement callback error: %v", err)
+		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, err.Error())
 		return
 	}
 

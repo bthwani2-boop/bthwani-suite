@@ -10,7 +10,7 @@
 | Primary Surface | app-field / DshFieldDocumentUploadScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None |
+| Blocking Reason | Implementation verified via unit tests; needs real device document/media upload E2E proof with field-agent Bearer auth |
 
 ## Scope
 ### Included

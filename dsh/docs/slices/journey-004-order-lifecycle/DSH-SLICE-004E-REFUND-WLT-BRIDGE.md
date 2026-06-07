@@ -10,7 +10,7 @@
 | Primary Surface | WLT (external boundary) |
 | WLT Boundary | WLT owns refund execution entirely; DSH is read-only |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | None — WLT refund callback integration verified |
+| Blocking Reason | WLT refund backend built 2026-06-07 (port 8083); DSH POST /orders/{id}/refund-callback verified locally; needs real device + production auth E2E proof; upstream J-003 BLOCKED_WITH_REASON |
 
 ## Scope
 ### Included

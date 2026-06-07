@@ -59,6 +59,10 @@ type OrderRepository interface {
 	GetOrder(ctx context.Context, orderID string) (domain.OrderRecord, []domain.OrderItemRecord, error)
 	UpdateOrderStatus(ctx context.Context, orderID string, actor string, status string, note *string) (domain.OrderRecord, error)
 	UpdateOrderRefund(ctx context.Context, orderID string, refundRefID string, status string) (domain.OrderRecord, error)
+	// UpdateOrderSettlement records the WLT settlement ref and updates settlement_status on the order.
+	// WLT BOUNDARY: called only via POST /orders/{id}/settlement-callback from WLT service.
+	// DSH does NOT compute settlement amounts; it records the bridge reference only.
+	UpdateOrderSettlement(ctx context.Context, orderID string, settlementRefID string, settlementStatus string) (domain.OrderRecord, error)
 	ListOrderStatusEvents(ctx context.Context, orderID string) ([]domain.OrderStatusEventRecord, error)
 }
 

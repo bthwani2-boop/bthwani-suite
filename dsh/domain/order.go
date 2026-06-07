@@ -20,6 +20,16 @@ const (
 	StatusReturned         = "RETURNED"
 )
 
+// Settlement status values for OrderRecord.SettlementStatus.
+// WLT BOUNDARY: DSH records the status as a read-only bridge value.
+// All settlement computation and ledger mutation belong to WLT (J-010).
+const (
+	SettlementStatusNotSettled        = "NOT_SETTLED"
+	SettlementStatusSettlementPending = "SETTLEMENT_PENDING"
+	SettlementStatusSettled           = "SETTLED"
+	SettlementStatusSettlementFailed  = "SETTLEMENT_FAILED"
+)
+
 type OrderRecord struct {
 	ID                     string    `json:"id"`
 	StoreID                string    `json:"store_id"`
@@ -36,11 +46,14 @@ type OrderRecord struct {
 	PodMediaKey            *string   `json:"pod_media_key,omitempty"`
 	// DSH-SLICE-005F: delivery failure fields.
 	// WltRefundTriggerRef is a bridge reference for WLT to execute refund — DSH does NOT mutate finances.
-	DeliveryFailureReason *string   `json:"delivery_failure_reason,omitempty"`
-	WltRefundTriggerRef   *string   `json:"wlt_refund_trigger_ref,omitempty"`
-	WltSettlementRefID     *string   `json:"wlt_settlement_ref_id,omitempty"`
-	CreatedAt              time.Time `json:"created_at"`
-	UpdatedAt              time.Time `json:"updated_at"`
+	DeliveryFailureReason *string `json:"delivery_failure_reason,omitempty"`
+	WltRefundTriggerRef   *string `json:"wlt_refund_trigger_ref,omitempty"`
+	// Settlement bridge fields (J-010). WLT owns all settlement computation.
+	// DSH records the WLT settlement ID and the current settlement status as read-only bridge values.
+	WltSettlementRefID *string `json:"wlt_settlement_ref_id,omitempty"`
+	SettlementStatus   string  `json:"settlement_status,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
 }
 
 type OrderItemRecord struct {

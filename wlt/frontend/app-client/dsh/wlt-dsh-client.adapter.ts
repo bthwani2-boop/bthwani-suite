@@ -23,22 +23,24 @@ function normalizeError(error: unknown): string {
 }
 
 export const isLinked = async (): Promise<boolean> => {
-	const summary = await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
-	return Boolean(summary.linked);
+	// Wallet is considered linked if WLT returns a summary (200) — no explicit linked field.
+	try {
+		await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
+		return true;
+	} catch {
+		return false;
+	}
 };
 
 export const getBalance = async (): Promise<number> => {
 	const summary = await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
-	return summary.balanceMinorUnits;
+	// WLT returns float YER; convert to minor units for display layer.
+	return Math.round(summary.balance * 100);
 };
 
 export const link = async (): Promise<{ success: boolean; account?: WalletAccount; error?: string }> => {
 	try {
-		const summary = await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
-		if (!summary.linked) {
-			return { success: false, error: 'wallet_unlinked_by_wlt_runtime' };
-		}
-
+		await getClient().getClientWalletSummary(DEFAULT_CLIENT_ID);
 		return {
 			success: true,
 			account: { id: DEFAULT_CLIENT_ID, name: 'محفظة WLT' },
@@ -56,22 +58,20 @@ export const requestPayment = async (
 	amountMinorUnits: number,
 ): Promise<{ success: boolean; txId?: string; error?: string }> => {
 	try {
-		const session = await getClient().createClientPaymentSession(
-			{
-				orderId: DEFAULT_ORDER_ID,
-				clientId: DEFAULT_CLIENT_ID,
-				amountMinorUnits,
-				currency: DEFAULT_CURRENCY,
-				paymentMethod: 'wallet',
-			},
-			paymentIdempotencyKey(amountMinorUnits),
-		);
+		const session = await getClient().createClientPaymentSession({
+			checkout_intent_id: DEFAULT_ORDER_ID,
+			client_id: DEFAULT_CLIENT_ID,
+			amount: amountMinorUnits / 100,
+			currency: DEFAULT_CURRENCY,
+			payment_method: 'wallet',
+			idempotency_key: paymentIdempotencyKey(amountMinorUnits),
+		});
 
-		if (session.status !== 'captured') {
-			return { success: false, txId: session.id, error: `wlt_payment_${session.status}` };
+		if (session.status !== 'CONFIRMED') {
+			return { success: false, txId: session.id, error: `wlt_payment_${session.status.toLowerCase()}` };
 		}
 
-		return { success: true, txId: session.wltPaymentRefId ?? session.id };
+		return { success: true, txId: session.id };
 	} catch (error) {
 		return { success: false, error: normalizeError(error) };
 	}

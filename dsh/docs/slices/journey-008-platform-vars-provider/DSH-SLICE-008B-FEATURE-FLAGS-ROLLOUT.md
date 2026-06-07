@@ -13,6 +13,7 @@
 | Excluded Surfaces | WLT (N/A — no financial gating in this slice) |
 | WLT Boundary | N/A — no money semantics; WLT preserves its own runtime boundary |
 | Current Status | BLOCKED_WITH_REASON |
+| Blocking Reason | Feature flags consumed from PlatformVarsProvider; real-time CP operator toggle wiring not yet connected to backend; real device E2E rollout not conducted |
 | Closed At | 2026-06-06 |
 | Evidence Run | `DSH_SLICE_008B_FEATURE_FLAGS_ROLLOUT_FINAL_CLOSURE-20260606-LOCAL` |
 

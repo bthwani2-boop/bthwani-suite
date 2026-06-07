@@ -458,6 +458,13 @@ func (repo *MemoryRepository) UpdateOrderRefund(_ context.Context, orderID strin
 	return domain.OrderRecord{}, errors.New("order refund update requires postgres backend (set DATABASE_URL)")
 }
 
+func (repo *MemoryRepository) UpdateOrderSettlement(_ context.Context, orderID string, _ string, _ string) (domain.OrderRecord, error) {
+	if orderID == "ord-non-existent" {
+		return domain.OrderRecord{}, errors.New("order not found")
+	}
+	return domain.OrderRecord{}, errors.New("order settlement update requires postgres backend (set DATABASE_URL)")
+}
+
 func (repo *MemoryRepository) AssignCaptain(_ context.Context, orderID string, _ string) (domain.OrderRecord, error) {
 	if orderID == "ord-non-existent" {
 		return domain.OrderRecord{}, errors.New("order not found")

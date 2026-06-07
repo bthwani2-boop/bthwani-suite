@@ -24,7 +24,7 @@
 | Visual Evidence Required | yes — WltBoundaryBanner.tsx displayed; payment awaiting state; confirmed state |
 | Runtime Evidence Required | yes — WLT payment E2E proof + DSH callback endpoint receiving confirmation |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
+| Blocking Reason | WLT team payment E2E device proof not yet captured (exit gate 5); DSH POST /checkout/payment-callback proven locally; WltBoundaryBanner visual states not yet captured on real device |
 
 ## Scope
 
@@ -108,5 +108,5 @@
 | **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | POST /checkout/payment-callback proven: valid dev-secret token -> 200 acknowledged, invalid token -> 401. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — read-only callback stored; no financial mutation in DSH |
-| **Next Action** | none — runtime proof complete |
+| **Next Action** | WLT team: capture payment E2E device proof; DSH: capture WltBoundaryBanner visual states (awaiting/confirmed/failed) on real device |
 | **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |

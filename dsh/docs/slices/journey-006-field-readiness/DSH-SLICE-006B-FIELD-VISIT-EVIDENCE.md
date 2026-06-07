@@ -10,7 +10,7 @@
 | Primary Surface | `app-field` / `DshFieldStoreVisitScreen` |
 | WLT Boundary | No wallet, ledger, refund, payout, settlement, or financial mutation |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None |
+| Blocking Reason | Backend Go handler + Postgres repository + unit tests PASS (2026-06-06); needs field-agent Bearer auth + real device file-upload E2E proof on physical device |
 
 ## Scope
 ### Included

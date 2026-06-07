@@ -1,10 +1,10 @@
 import {
 	createWltDshTypedClient,
 	resolveWltDshApiBaseUrl,
-	type WltDshCloseStatus,
-	type WltDshFinanceOverview,
-	type WltDshLedgerEntry as RuntimeLedgerEntry,
-	type WltDshRefundCase,
+	type WltCloseStatus,
+	type WltLedgerEntry as RuntimeLedgerEntry,
+	type WltListSettlementsResponse,
+	type WltRefund,
 	type WltDshTypedClient,
 } from '../../../contracts';
 import { formatWltYer } from '../models/dshFinance.types';
@@ -19,10 +19,10 @@ import type {
 
 export type WltDshFinanceRuntimeReadModel = {
 	readonly baseUrl: string;
-	readonly overview: WltDshFinanceOverview;
+	readonly overview: WltListSettlementsResponse;
 	readonly ledgerEntries: readonly RuntimeLedgerEntry[];
-	readonly refunds: readonly WltDshRefundCase[];
-	readonly closeStatus: WltDshCloseStatus;
+	readonly refunds: readonly WltRefund[];
+	readonly closeStatus: WltCloseStatus;
 	readonly fetchedAt: string;
 };
 
@@ -39,9 +39,9 @@ export async function loadWltDshFinanceRuntimeReadModel(): Promise<WltDshFinance
 	const client = getClient();
 
 	try {
-		const [overview, ledgerEntries, refunds, closeStatus] = await Promise.all([
-			client.getFinanceOverview(),
-			client.listLedgerEntries(),
+		const [overview, ledgerResp, refundsResp, closeStatus] = await Promise.all([
+			client.listSettlements(),
+			client.listAllLedgerEntries(),
 			client.listRefundQueue(),
 			client.getReconciliationCloseStatus(),
 		]);
@@ -51,8 +51,8 @@ export async function loadWltDshFinanceRuntimeReadModel(): Promise<WltDshFinance
 			data: {
 				baseUrl,
 				overview,
-				ledgerEntries,
-				refunds,
+				ledgerEntries: ledgerResp.entries,
+				refunds: refundsResp.refunds,
 				closeStatus,
 				fetchedAt: new Date().toISOString(),
 			},
@@ -66,38 +66,30 @@ export async function loadWltDshFinanceRuntimeReadModel(): Promise<WltDshFinance
 	}
 }
 
-function mapEntryKind(kind: string): WltLedgerEntryKind {
-	if (kind === 'wallet_payment') return 'wallet-movement';
-	if (kind === 'cod_liability') return 'cod-collection';
-	if (kind === 'partner_settlement') return 'partner-settlement';
-	if (kind === 'captain_payout') return 'captain-earning';
-	if (kind === 'field_commission') return 'field-commission';
-	if (kind === 'refund') return 'refund';
-	if (kind === 'reconciliation') return 'platform-commission';
+function mapEntryKind(referenceType: string): WltLedgerEntryKind {
+	if (referenceType === 'payment_session') return 'wallet-movement';
+	if (referenceType === 'refund') return 'refund';
+	if (referenceType === 'settlement') return 'partner-settlement';
 	return 'other';
 }
 
 function mapEntryStatus(status: string): WltLedgerEntryStatus {
-	if (status === 'posted') return 'posted';
-	if (status === 'pending') return 'pending';
-	if (status === 'failed') return 'blocked';
-	if (status === 'reversed') return 'disputed';
+	if (status === 'COMPLETED') return 'posted';
+	if (status === 'FAILED') return 'blocked';
+	if (status === 'REVERSED') return 'disputed';
 	return 'pending';
 }
 
-function accountForDebit(kind: string): { code: string; label: string; type: WltFinancialCenterSection['sectionType'] } {
-	if (kind === 'refund') return { code: '5001', label: 'مصروف الاسترداد', type: 'expense' };
-	if (kind === 'captain_payout' || kind === 'field_commission') return { code: '2010', label: 'مستحقات تشغيلية', type: 'liability' };
-	if (kind === 'partner_settlement') return { code: '1030', label: 'مقاصة التسوية', type: 'asset' };
+function accountForDebit(referenceType: string): { code: string; label: string; type: WltFinancialCenterSection['sectionType'] } {
+	if (referenceType === 'refund') return { code: '5001', label: 'مصروف الاسترداد', type: 'expense' };
+	if (referenceType === 'settlement') return { code: '1030', label: 'مقاصة التسوية', type: 'asset' };
 	return { code: '1010', label: 'رصيد المقاصة البنكية', type: 'asset' };
 }
 
-function accountForCredit(kind: string): { code: string; label: string; type: WltFinancialCenterSection['sectionType'] } {
-	if (kind === 'wallet_payment') return { code: '2001', label: 'رصيد محفظة العميل', type: 'liability' };
-	if (kind === 'partner_settlement') return { code: '2020', label: 'مستحقات الشريك', type: 'liability' };
-	if (kind === 'captain_payout') return { code: '1010', label: 'رصيد المقاصة البنكية', type: 'asset' };
-	if (kind === 'field_commission') return { code: '2030', label: 'مستحقات الميداني', type: 'liability' };
-	if (kind === 'refund') return { code: '2050', label: 'التزام الاسترداد للعميل', type: 'liability' };
+function accountForCredit(referenceType: string): { code: string; label: string; type: WltFinancialCenterSection['sectionType'] } {
+	if (referenceType === 'payment_session') return { code: '2001', label: 'رصيد محفظة العميل', type: 'liability' };
+	if (referenceType === 'settlement') return { code: '2020', label: 'مستحقات الشريك', type: 'liability' };
+	if (referenceType === 'refund') return { code: '2050', label: 'التزام الاسترداد للعميل', type: 'liability' };
 	return { code: '4001', label: 'إيرادات WLT', type: 'revenue' };
 }
 
@@ -110,17 +102,27 @@ function accountTypeByCode(code: string): WltFinancialCenterSection['sectionType
 }
 
 function partyLabel(entry: RuntimeLedgerEntry): string {
-	if (entry.actorKind === 'captain') return `كابتن · ${entry.actorId}`;
-	if (entry.actorKind === 'partner') return `شريك · ${entry.actorId}`;
-	if (entry.actorKind === 'field') return `ميداني · ${entry.actorId}`;
-	if (entry.actorKind === 'client') return `عميل · ${entry.actorId}`;
+	// subject encodes actor identity (e.g. "client-001", "captain-demo")
+	if (entry.subject.startsWith('captain')) return `كابتن · ${entry.subject}`;
+	if (entry.subject.startsWith('partner')) return `شريك · ${entry.subject}`;
+	if (entry.subject.startsWith('field')) return `ميداني · ${entry.subject}`;
+	if (entry.subject.startsWith('client')) return `عميل · ${entry.subject}`;
 	return 'WLT';
 }
 
+function partyKind(entry: RuntimeLedgerEntry): WltLedgerEntry['partyKind'] {
+	if (entry.subject.startsWith('captain')) return 'captain';
+	if (entry.subject.startsWith('partner')) return 'partner';
+	if (entry.subject.startsWith('field')) return 'field';
+	if (entry.subject.startsWith('client')) return 'client';
+	return 'platform';
+}
+
 function toFinancialCenterEntry(entry: RuntimeLedgerEntry): WltLedgerEntry {
-	const debit = accountForDebit(entry.kind);
-	const credit = accountForCredit(entry.kind);
-	const amount = Math.max(entry.debitMinorUnits, entry.creditMinorUnits);
+	const debit = accountForDebit(entry.reference_type);
+	const credit = accountForCredit(entry.reference_type);
+	// WLT amounts are float YER; convert to minor units for display layer
+	const amount = Math.round(entry.amount * 100);
 	const status = mapEntryStatus(entry.status);
 
 	return {
@@ -131,10 +133,10 @@ function toFinancialCenterEntry(entry: RuntimeLedgerEntry): WltLedgerEntry {
 		creditAccountLabel: credit.label,
 		amountMinorUnits: amount,
 		amountLabel: formatWltYer(amount),
-		entryKind: mapEntryKind(entry.kind),
+		entryKind: mapEntryKind(entry.reference_type),
 		party: partyLabel(entry),
-		partyKind: entry.actorKind === 'control-panel' ? 'platform' : (entry.actorKind as WltLedgerEntry['partyKind']),
-		sourceRef: entry.referenceId ?? entry.orderId ?? entry.id,
+		partyKind: partyKind(entry),
+		sourceRef: entry.reference_id ?? entry.order_id ?? entry.id,
 		statusLabel: status === 'posted' ? 'مرحّل من WLT' : 'يتطلب مراجعة WLT',
 		status,
 		isPending: status !== 'posted',
@@ -186,7 +188,7 @@ export function buildWltRuntimeFinancialCenter(
 				totalMinorUnits: account.total,
 				totalLabel: formatWltYer(account.total),
 				entryCount: account.entries.length,
-				pendingCount: account.entries.filter((entry) => entry.isPending).length,
+				pendingCount: account.entries.filter((e) => e.isPending).length,
 				entries: account.entries,
 				isPreview: false,
 			});
@@ -230,7 +232,7 @@ export function buildWltRuntimeFinancialCenter(
 		canClose: blockingVariances.length === 0 && runtime.closeStatus.status !== 'blocked',
 		contractState: 'WLT_DSH_RUNTIME_BOUND',
 		openingBalanceSource: runtime.baseUrl,
-		closingBalanceSource: runtime.closeStatus.id,
+		closingBalanceSource: runtime.closeStatus.id ?? '',
 		isPreview: false,
 	};
 }

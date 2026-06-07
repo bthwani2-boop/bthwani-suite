@@ -42,20 +42,20 @@ export function WltDshRefundLedger() {
 
       <div style={{ display: 'grid', gap: 12 }}>
         {runtimeCases ? runtimeCases.map((item) => (
-          <Box key={item.refundRefId} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
+          <Box key={item.id} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div>
-                <Text role="titleSm" style={{ fontWeight: 800 }}>{item.refundRefId} · {item.orderId}</Text>
-                <Text role="caption" tone="muted">العميل {item.clientId} · المتجر {item.storeId} · {item.status}</Text>
+                <Text role="titleSm" style={{ fontWeight: 800 }}>{item.id} · {item.order_id}</Text>
+                <Text role="caption" tone="muted">العميل {item.client_id} · {item.status}</Text>
               </div>
               <div style={{ textAlign: 'left', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                {(item.amountMinorUnits / 100).toLocaleString('ar-YE')} ر.ي
+                {item.amount.toLocaleString('ar-YE')} ر.ي
               </div>
             </div>
             <Text role="bodySm" tone="soft">{item.reason}</Text>
             <Box gap={1}>
               <Text role="caption" tone="muted">WLT status: {item.status}</Text>
-              <Text role="caption" tone="muted">Created: {item.createdAt}</Text>
+              <Text role="caption" tone="muted">Created: {item.created_at}</Text>
             </Box>
           </Box>
         )) : previewCases.map((item) => (

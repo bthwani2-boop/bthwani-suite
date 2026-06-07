@@ -60,5 +60,5 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | J-004 order lifecycle closed. Backend endpoint `POST /orders/{id}/assign-captain` confirmed in production handler. Coverage Matrix and CTA Matrix all PASS. No financial mutation in DSH. |
+| **Reason** | J-004 is DEFERRED_WITH_REASON (not closed/PASS); backend endpoint POST /orders/{id}/assign-captain confirmed in production handler; deferred until J-003 + J-004 device E2E captured |
 | **Closed By** | Session DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL |

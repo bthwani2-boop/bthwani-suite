@@ -10,6 +10,7 @@
 | Primary Surface | control-panel / AuditLogScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | NEEDS_VISUAL_AND_RUNTIME_EVIDENCE |
+| Blocking Reason | CP audit + rollback screen renders preview; needs operator Bearer auth + audit trail browser recording on real device |
 
 ## Scope
 ### Included

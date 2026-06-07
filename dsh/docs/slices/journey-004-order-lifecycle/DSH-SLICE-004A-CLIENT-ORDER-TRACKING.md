@@ -10,7 +10,7 @@
 | Primary Surface | app-client / OrderTrackingScreen |
 | WLT Boundary | No finance mutation |
 | Current Status | DEFERRED_WITH_REASON |
-| Blocking Reason | None — upstream J-003 checkout is PASS |
+| Blocking Reason | Upstream J-003 is BLOCKED_WITH_REASON (not PASS); unblocked when J-003 WLT E2E + device evidence captured |
 
 ## Scope
 ### Included
@@ -60,7 +60,7 @@
 | Field | Value |
 |---|---|
 | **Slice Decision** | DEFERRED_WITH_REASON |
-| **Reason** | Order tracking timeline screen verified; GET /orders/{id} proven at runtime; upstream J-003 checkout is PASS. |
+| **Reason** | Order tracking timeline screen verified; GET /orders/{id} proven at runtime; deferred until upstream J-003 (BLOCKED_WITH_REASON) reaches PASS |
 | **Dependency** | None |
 | **Next Action** | none — runtime proof complete |
 | **Evidence Folder** | `tools/registry/runs/DSH_SLICE_004A_CLIENT_ORDER_TRACKING_FINAL_CLOSURE-20260605-040400/` |

@@ -24,7 +24,7 @@
 | Visual Evidence Required | yes — DshCheckoutIntentScreen states: address entry, intent created, intent failed, loading, blocked |
 | Runtime Evidence Required | yes — POST /checkout/intent runtime proof with auth token + 003A serviceability PASS |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None — production auth runtime proof captured: POST /checkout/intent → 201 with Bearer token |
+| Blocking Reason | Local integration + unit tests PASS (2026-06-06); device-level E2E and visual evidence on real device not yet captured |
 
 ## Scope
 
@@ -108,5 +108,5 @@
 | **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | POST /checkout/intent proven: valid Bearer → 201 {intent_id, session_token, pending_payment}; no Bearer → 401. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — no financial mutation; session token passed to WLT in 003C |
-| **Next Action** | none — runtime proof complete |
+| **Next Action** | Capture device-level E2E proof and DshCheckoutIntentScreen visual screenshots on real device |
 | **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |

@@ -24,7 +24,7 @@
 | Visual Evidence Required | yes — app-client order confirmation screen; app-partner new order notification; control-panel ops monitor |
 | Runtime Evidence Required | yes — POST /orders runtime proof triggered by WLT callback + partner notification proven |
 | Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | None — production auth runtime proof captured (auth-service localhost:8091 + DSH_AUTH_MODE=production) |
+| Blocking Reason | Upstream 003C (WLT payment bridge) BLOCKED; device-level order confirmation + partner notification visual evidence not yet captured |
 
 ## Scope
 
@@ -111,5 +111,5 @@
 | **Slice Decision** | BLOCKED_WITH_REASON |
 | **Reason** | POST /orders and GET /orders/{id} proven: order created with status CREATED and references wlt_payment_ref_id after callback. auth-service (dsh/backend/cmd/auth-service/main.go) implements auth.openapi.yaml. Unit tests 8/8 PASS. |
 | **WLT Boundary** | Confirmed — order created with read-only payment reference; no financial mutation in DSH |
-| **Next Action** | none — runtime proof complete |
+| **Next Action** | Capture device-level order confirmation + partner notification visual evidence on real device; unblocked when 003C WLT E2E proof is captured |
 | **Evidence Folder** | `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/` |
