@@ -1,9 +1,9 @@
 ﻿param(
   [ValidateSet("dsh", "wlt", "all", "none")]
-  [string]$Stack = "all",
+  [string]$Stack = "",
 
   [ValidateSet("none", "mongo", "redis", "all")]
-  [string]$Addons = "none",
+  [string]$Addons = "",
 
   [switch]$ClearMetroOnce,
   [switch]$NoKillPorts,
@@ -12,15 +12,12 @@
 )
 
 Set-Location -LiteralPath "C:\bthwani-suite"
-
 $ErrorActionPreference = "Stop"
-$PSNativeCommandUseErrorActionPreference = $false
 
 $Root = (Get-Location).Path
 $SessionId = "LOCAL_LIVE_TEST-" + (Get-Date -Format "yyyyMMdd-HHmmss")
 $RunRoot = Join-Path $Root "tools\registry\runs\$SessionId"
 $Logs = Join-Path $RunRoot "logs"
-
 New-Item -ItemType Directory -Force -Path $RunRoot, $Logs | Out-Null
 
 function Write-RunLog {
@@ -46,7 +43,7 @@ function Import-RootEnv {
     $name = $parts[0].Trim()
     $value = $parts[1].Trim()
 
-    if ((($value.StartsWith('"') -and $value.EndsWith('"'))) -or (($value.StartsWith("'") -and $value.EndsWith("'")))) {
+    if ((($value.StartsWith('"')) -and ($value.EndsWith('"'))) -or (($value.StartsWith("'")) -and ($value.EndsWith("'")))) {
       $value = $value.Substring(1, $value.Length - 2)
     }
 
@@ -66,9 +63,7 @@ function Get-LocalEnv {
 function Assert-LocalPath {
   param([string]$RelativePath, [string]$Label)
   $path = Join-Path $Root $RelativePath
-  if (-not (Test-Path -LiteralPath $path)) {
-    throw "Missing required path for ${Label}: $path"
-  }
+  if (-not (Test-Path -LiteralPath $path)) { throw "Missing required path for ${Label}: $path" }
   return $path
 }
 
@@ -98,8 +93,10 @@ $Command
 
   $wtPath = "$env:LOCALAPPDATA\Microsoft\WindowsApps\wt.exe"
   if (Test-Path -LiteralPath $wtPath) {
+    # Open as a new tab in the active Windows Terminal window
     Start-Process $wtPath -ArgumentList "-w 0 new-tab -d `"$safeDir`" --title `"$safeTitle`" powershell.exe -NoExit -ExecutionPolicy Bypass -EncodedCommand $encoded"
   } else {
+    # Fallback to separate legacy powershell console window
     Start-Process powershell.exe -ArgumentList @("-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $encoded)
   }
 }
@@ -134,10 +131,14 @@ function Stop-PortOwner {
   }
 
   $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique | Where-Object { $_ -and $_ -ne $PID }
+
   foreach ($processId in $pids) {
     $proc = Get-Process -Id $processId -ErrorAction SilentlyContinue
     if (-not $proc) { continue }
-    "KILL: Port $Port / $Label is used by PID=$processId Name=$($proc.ProcessName)" | Tee-Object -FilePath $logFile -Append | Out-Host
+
+    "KILL: Port $Port / $Label is used by PID=$processId Name=$($proc.ProcessName)" |
+      Tee-Object -FilePath $logFile -Append | Out-Host
+
     Stop-Process -Id $processId -Force -ErrorAction Stop
     Start-Sleep -Milliseconds 800
   }
@@ -166,17 +167,75 @@ function Wait-TcpPort {
   throw "Timeout waiting for $Label on port $Port"
 }
 
+function Build-ComposePlan {
+  param([string]$StackMode, [string]$AddonsMode)
+
+  $profiles = @()
+  $targets = @()
+  $expected = @()
+
+  switch ($StackMode) {
+    "dsh"  { $targets += "dsh-postgres"; $expected += "bthwani-dsh-postgres-local" }
+    "wlt"  { $targets += "wlt-postgres"; $expected += "bthwani-wlt-postgres-local" }
+    "all"  { $targets += "dsh-postgres", "wlt-postgres"; $expected += "bthwani-dsh-postgres-local", "bthwani-wlt-postgres-local" }
+    "none" { }
+    default { throw "Unsupported Stack mode: $StackMode" }
+  }
+
+  switch ($AddonsMode) {
+    "none"  { }
+    "mongo" { $profiles += "mongo"; $targets += "mongo"; $expected += "bthwani-mongo-local" }
+    "redis" { $profiles += "redis"; $targets += "redis"; $expected += "bthwani-redis-local" }
+    "all"   { $profiles += "mongo", "redis"; $targets += "mongo", "redis"; $expected += "bthwani-mongo-local", "bthwani-redis-local" }
+    default  { throw "Unsupported Addons mode: $AddonsMode" }
+  }
+
+  return [pscustomobject]@{
+    Profiles = $profiles
+    Targets = $targets
+    Expected = $expected
+  }
+}
+
+function Invoke-DockerComposeUp {
+  param([string]$StackMode, [string]$AddonsMode)
+
+  $plan = Build-ComposePlan -StackMode $StackMode -AddonsMode $AddonsMode
+
+  if ($plan.Targets.Count -eq 0) {
+    Write-RunLog "Docker compose skipped: Stack=$StackMode Addons=$AddonsMode"
+    return $plan
+  }
+
+  $profileArgs = @()
+  foreach ($profile in $plan.Profiles) {
+    $profileArgs += @("--profile", $profile)
+  }
+
+  $baseArgs = @("compose", "--env-file", ".\.env.local", "-f", ".\docker-compose.local.yml") + $profileArgs
+  $upArgs = $baseArgs + @("up", "-d") + $plan.Targets
+  $psArgs = $baseArgs + @("ps")
+
+  Invoke-LoggedCommand "docker-compose-up.log" { docker @upArgs }
+  Invoke-LoggedCommand "docker-compose-ps.log" { docker @psArgs }
+
+  docker @psArgs | Out-File -Encoding utf8 (Join-Path $RunRoot "docker-compose-ps.txt")
+  docker volume ls | Out-File -Encoding utf8 (Join-Path $RunRoot "docker-volumes.txt")
+
+  @"
+stack_mode=$StackMode
+addons_mode=$AddonsMode
+compose_entrypoint=C:\bthwani-suite\docker-compose.local.yml
+compose_profiles=$($plan.Profiles -join ',')
+compose_targets=$($plan.Targets -join ',')
+expected_containers=$($plan.Expected -join ',')
+"@ | Out-File -Encoding utf8 (Join-Path $RunRoot "docker-plan.txt")
+
+  return $plan
+}
+
 function Invoke-AdbSetup {
-  param(
-    [int]$DshPort,
-    [int]$AppClientPort,
-    [int]$AppPartnerPort,
-    [int]$AppCaptainPort,
-    [int]$AppFieldPort,
-    [int]$ControlPanelPort,
-    [int]$WebappPort,
-    [int]$WebsitePort
-  )
+  param([int]$DshPort, [int]$AppClientPort, [int]$AppPartnerPort, [int]$AppCaptainPort, [int]$AppFieldPort, [int]$ControlPanelPort)
 
   $adbMode = (Get-LocalEnv "ADB_MODE" "usb").ToLowerInvariant()
   $usbSerial = Get-LocalEnv "ADB_SERIAL" ""
@@ -188,28 +247,22 @@ function Invoke-AdbSetup {
   Write-RunLog "ADB mode: $adbMode"
 
   if ($adbMode -eq "wifi") {
-    if ([string]::IsNullOrWhiteSpace($usbSerial)) { throw "ADB_MODE=wifi requires ADB_SERIAL in .env.local." }
+    if ([string]::IsNullOrWhiteSpace($usbSerial)) { throw "ADB_MODE=wifi requires ADB_SERIAL." }
 
     Invoke-LoggedCommand "adb-wifi-connect.log" {
-      Write-Host "Checking USB device: $usbSerial"
       adb -s $usbSerial devices
-
       $a4 = & adb -s $usbSerial shell "ip -4 addr show wlan0 2>/dev/null || true" 2>$null
       $ip = ([regex]::Match(($a4 | Out-String), "inet\s+(\d{1,3}(?:\.\d{1,3}){3})\/")).Groups[1].Value
-      if (-not $ip) { throw "No IPv4 on wlan0. تأكد أن الهاتف متصل بالواي فاي وأن USB debugging يعمل." }
+      if (-not $ip) { throw "No IPv4 on wlan0." }
 
-      Write-Host "Phone Wi-Fi IP: $ip"
-      Write-Host "Switching ADB to TCP port $wifiPort..."
       adb -s $usbSerial tcpip $wifiPort
       Start-Sleep -Milliseconds 900
-
       $wifiSerial = "$ip`:$wifiPort"
-      Write-Host "Connecting to $wifiSerial..."
       adb connect $wifiSerial
       Start-Sleep -Milliseconds 500
 
       $dev = (adb devices) -join "`n"
-      if ($dev -notmatch [regex]::Escape($wifiSerial)) { throw "Wi-Fi endpoint not listed in adb devices: $wifiSerial" }
+      if ($dev -notmatch [regex]::Escape($wifiSerial)) { throw "Wi-Fi endpoint not listed: $wifiSerial" }
 
       $script:AdbRuntimeSerial = $wifiSerial
       Write-Host "ADB Wi-Fi connected: $wifiSerial"
@@ -222,22 +275,24 @@ function Invoke-AdbSetup {
     throw "Unsupported ADB_MODE: $adbMode. Use usb or wifi."
   }
 
-  if ([string]::IsNullOrWhiteSpace($runtimeSerial)) { $runtimeSerial = $usbSerial }
-
   Invoke-LoggedCommand "adb-reverse.log" {
-    Write-Host "Applying ADB reverse for serial: $runtimeSerial"
-    $adbArgs = @()
-    if (-not [string]::IsNullOrWhiteSpace($runtimeSerial)) { $adbArgs = @("-s", $runtimeSerial) }
-
-    & adb @adbArgs reverse tcp:$DshPort tcp:$DshPort
-    & adb @adbArgs reverse tcp:$AppClientPort tcp:$AppClientPort
-    & adb @adbArgs reverse tcp:$AppPartnerPort tcp:$AppPartnerPort
-    & adb @adbArgs reverse tcp:$AppCaptainPort tcp:$AppCaptainPort
-    & adb @adbArgs reverse tcp:$AppFieldPort tcp:$AppFieldPort
-    & adb @adbArgs reverse tcp:$ControlPanelPort tcp:$ControlPanelPort
-    & adb @adbArgs reverse tcp:$WebappPort tcp:$WebappPort
-    & adb @adbArgs reverse tcp:$WebsitePort tcp:$WebsitePort
-    & adb @adbArgs reverse --list
+    if ([string]::IsNullOrWhiteSpace($runtimeSerial)) {
+      adb reverse tcp:$DshPort tcp:$DshPort
+      adb reverse tcp:$AppClientPort tcp:$AppClientPort
+      adb reverse tcp:$AppPartnerPort tcp:$AppPartnerPort
+      adb reverse tcp:$AppCaptainPort tcp:$AppCaptainPort
+      adb reverse tcp:$AppFieldPort tcp:$AppFieldPort
+      adb reverse tcp:$ControlPanelPort tcp:$ControlPanelPort
+      adb reverse --list
+    } else {
+      adb -s $runtimeSerial reverse tcp:$DshPort tcp:$DshPort
+      adb -s $runtimeSerial reverse tcp:$AppClientPort tcp:$AppClientPort
+      adb -s $runtimeSerial reverse tcp:$AppPartnerPort tcp:$AppPartnerPort
+      adb -s $runtimeSerial reverse tcp:$AppCaptainPort tcp:$AppCaptainPort
+      adb -s $runtimeSerial reverse tcp:$AppFieldPort tcp:$AppFieldPort
+      adb -s $runtimeSerial reverse tcp:$ControlPanelPort tcp:$ControlPanelPort
+      adb -s $runtimeSerial reverse --list
+    }
   }
 
   return $runtimeSerial
@@ -247,11 +302,8 @@ function Start-ScrcpyIfEnabled {
   param([string]$RuntimeSerial)
 
   $scrcpyEnabledFromEnv = (Get-LocalEnv "SCRCPY_ENABLED" "0") -eq "1"
-  $useScrcpy = $WithScrcpy -or $scrcpyEnabledFromEnv
-  if ($NoScrcpy -or -not $useScrcpy) {
-    Write-RunLog "Scrcpy skipped."
-    return
-  }
+  $useScrcpy = ($WithScrcpy -or $scrcpyEnabledFromEnv) -and (-not $NoScrcpy)
+  if (-not $useScrcpy) { Write-RunLog "Scrcpy skipped."; return }
 
   $scrcpyPath = Get-LocalEnv "SCRCPY_PATH" "scrcpy"
   $bitRate = Get-LocalEnv "SCRCPY_BIT_RATE" "8M"
@@ -264,47 +316,19 @@ function Start-ScrcpyIfEnabled {
     return
   }
 
-  $serialPart = ""
-  if (-not [string]::IsNullOrWhiteSpace($RuntimeSerial)) { $serialPart = "-s '$RuntimeSerial'" }
-
-  Start-LiveWindow "BThwani Scrcpy Device Mirror" $Root @"
-& '$scrcpyPath' $serialPart --video-bit-rate $bitRate --max-fps $maxFps --max-size $maxSize 2>&1 | Tee-Object -FilePath '$scrcpyLog' -Append
-"@
-}
-
-function Resolve-ComposeSelection {
-  param([string]$Stack, [string]$Addons)
-
-  $profiles = @()
-  $targets = @()
-  $expected = @()
-
-  switch ($Stack) {
-    "dsh"  { $targets += "dsh-postgres"; $expected += "bthwani-dsh-postgres-local" }
-    "wlt"  { $targets += "wlt-postgres"; $expected += "bthwani-wlt-postgres-local" }
-    "all"  { $targets += "dsh-postgres"; $targets += "wlt-postgres"; $expected += "bthwani-dsh-postgres-local"; $expected += "bthwani-wlt-postgres-local" }
-    "none" { }
-    default { throw "Unsupported Stack: $Stack" }
-  }
-
-  switch ($Addons) {
-    "none"  { }
-    "mongo" { $profiles += "mongo"; $targets += "mongo"; $expected += "bthwani-mongo-local" }
-    "redis" { $profiles += "redis"; $targets += "redis"; $expected += "bthwani-redis-local" }
-    "all"   { $profiles += "mongo"; $profiles += "redis"; $targets += "mongo"; $targets += "redis"; $expected += "bthwani-mongo-local"; $expected += "bthwani-redis-local" }
-    default { throw "Unsupported Addons: $Addons" }
-  }
-
-  return [pscustomobject]@{
-    Profiles = $profiles
-    Targets = $targets
-    ExpectedContainers = $expected
+  if ([string]::IsNullOrWhiteSpace($RuntimeSerial)) {
+    Start-LiveWindow "BThwani Scrcpy Device Mirror" $Root "& '$scrcpyPath' --video-bit-rate $bitRate --max-fps $maxFps --max-size $maxSize 2>&1 | Tee-Object -FilePath '$scrcpyLog' -Append"
+  } else {
+    Start-LiveWindow "BThwani Scrcpy Device Mirror" $Root "& '$scrcpyPath' -s '$RuntimeSerial' --video-bit-rate $bitRate --max-fps $maxFps --max-size $maxSize 2>&1 | Tee-Object -FilePath '$scrcpyLog' -Append"
   }
 }
 
+# Load env
 $EnvFile = Join-Path $Root ".env.local"
-$script:AdbRuntimeSerial = ""
 Import-RootEnv -Path $EnvFile
+
+if ([string]::IsNullOrWhiteSpace($Stack)) { $Stack = Get-LocalEnv "BTHWANI_STACK" "all" }
+if ([string]::IsNullOrWhiteSpace($Addons)) { $Addons = Get-LocalEnv "BTHWANI_ADDONS" "none" }
 
 $DshPort = [int](Get-LocalEnv "DSH_API_PORT" "8080")
 $DshBaseUrl = Get-LocalEnv "DSH_API_BASE_URL" "http://localhost:8080"
@@ -315,43 +339,27 @@ $AppPartnerPort = [int](Get-LocalEnv "APP_PARTNER_PORT" "8082")
 $AppCaptainPort = [int](Get-LocalEnv "APP_CAPTAIN_PORT" "8083")
 $AppFieldPort = [int](Get-LocalEnv "APP_FIELD_PORT" "8084")
 $ControlPanelPort = [int](Get-LocalEnv "CONTROL_PANEL_PORT" "3000")
-$WebappPort = [int](Get-LocalEnv "WEBAPP_PORT" "3001")
-$WebsitePort = [int](Get-LocalEnv "WEBSITE_PORT" "3002")
-
-$ExpoHost = Get-LocalEnv "EXPO_HOST" "lan"
+$ExpoHost = Get-LocalEnv "EXPO_HOST" "localhost"
 $ExpoClear = (Get-LocalEnv "EXPO_CLEAR" "0") -eq "1"
-$clearArg = ""
-if ($ExpoClear) { $clearArg = " --clear" }
 
-$DshBackend = Assert-LocalPath "dsh\backend" "DSH backend"
-$AppClientRuntime = Assert-LocalPath "app-client\runtime" "app-client runtime"
-$AppPartnerRuntime = Assert-LocalPath "app-partner\runtime" "app-partner runtime"
-$AppCaptainRuntime = Assert-LocalPath "app-captain\runtime" "app-captain runtime"
-$AppFieldRuntime = Assert-LocalPath "app-field\runtime" "app-field runtime"
-$ControlPanelRuntime = Assert-LocalPath "control-panel\runtime" "control-panel runtime"
-$WebappRuntime = Assert-LocalPath "webapp\runtime" "webapp runtime"
-$WebsiteRuntime = Assert-LocalPath "website\runtime" "website runtime"
-
-$RootCompose = Assert-LocalPath "docker-compose.local.yml" "root local compose"
-$ComposeSelection = Resolve-ComposeSelection -Stack $Stack -Addons $Addons
+Assert-LocalPath "docker-compose.local.yml" "root compose" | Out-Null
+Assert-LocalPath "dsh\backend" "DSH backend" | Out-Null
+Assert-LocalPath "app-client\runtime" "app-client runtime" | Out-Null
+Assert-LocalPath "app-partner\runtime" "app-partner runtime" | Out-Null
+Assert-LocalPath "app-captain\runtime" "app-captain runtime" | Out-Null
+Assert-LocalPath "app-field\runtime" "app-field runtime" | Out-Null
+Assert-LocalPath "control-panel\runtime" "control-panel runtime" | Out-Null
 
 Write-RunLog "Session started: $SessionId"
 Write-RunLog "Evidence root: $RunRoot"
-Write-RunLog "Stack: $Stack"
-Write-RunLog "Addons: $Addons"
-
-$forbiddenAutoKillPorts = @(55432, 55433, 27017, 6379)
-$devKillPorts = @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort, $WebappPort, $WebsitePort)
-
-if ($devKillPorts | Where-Object { $forbiddenAutoKillPorts -contains $_ }) {
-  throw "Dev kill ports overlap with protected Docker ports. Review .env.local."
-}
+Write-RunLog "Stack=$Stack Addons=$Addons"
 
 git --no-pager status --short | Out-File -Encoding utf8 (Join-Path $RunRoot "git-status-before.txt")
 git --no-pager diff --check 2>&1 | Out-File -Encoding utf8 (Join-Path $RunRoot "git-diff-check-before.txt")
 
+$devPorts = @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort)
 Get-NetTCPConnection -ErrorAction SilentlyContinue |
-  Where-Object { $_.LocalPort -in $devKillPorts } |
+  Where-Object { $_.LocalPort -in $devPorts } |
   Select-Object LocalAddress, LocalPort, State, OwningProcess |
   Out-File -Encoding utf8 (Join-Path $RunRoot "ports-before.txt")
 
@@ -362,78 +370,31 @@ if (-not $NoKillPorts) {
   Stop-PortOwner -Port $AppCaptainPort -Label "app-captain Expo"
   Stop-PortOwner -Port $AppFieldPort -Label "app-field Expo"
   Stop-PortOwner -Port $ControlPanelPort -Label "control-panel Next"
-  Stop-PortOwner -Port $WebappPort -Label "webapp Next"
-  Stop-PortOwner -Port $WebsitePort -Label "website Next"
-} else {
-  Write-RunLog "NoKillPorts enabled. Skipping port killing."
 }
 
-Get-NetTCPConnection -ErrorAction SilentlyContinue |
-  Where-Object { $_.LocalPort -in $devKillPorts } |
-  Select-Object LocalAddress, LocalPort, State, OwningProcess |
-  Out-File -Encoding utf8 (Join-Path $RunRoot "ports-after-kill.txt")
-
-@"
-SESSION_ID=$SessionId
-STACK_MODE=$Stack
-ADDONS_MODE=$Addons
-COMPOSE_ENTRYPOINT=$RootCompose
-COMPOSE_PROFILES=$($ComposeSelection.Profiles -join ',')
-COMPOSE_TARGETS=$($ComposeSelection.Targets -join ',')
-EXPECTED_CONTAINERS=$($ComposeSelection.ExpectedContainers -join ',')
-DSH_API_PORT=$DshPort
-DSH_API_BASE_URL=$DshBaseUrl
-APP_CLIENT_PORT=$AppClientPort
-APP_PARTNER_PORT=$AppPartnerPort
-APP_CAPTAIN_PORT=$AppCaptainPort
-APP_FIELD_PORT=$AppFieldPort
-CONTROL_PANEL_PORT=$ControlPanelPort
-EXPO_HOST=$ExpoHost
-EXPO_CLEAR=$ExpoClear
-NO_KILL_PORTS=$NoKillPorts
-ADB_MODE=$(Get-LocalEnv "ADB_MODE" "usb")
-SCRCPY_ENABLED=$(Get-LocalEnv "SCRCPY_ENABLED" "0")
-"@ | Out-File -Encoding utf8 (Join-Path $RunRoot "effective-runtime-config.txt")
-
-$dockerLog = SafeLogPath "docker-compose.log"
-$dockerPsLog = SafeLogPath "docker-compose-ps.log"
-
-if ($ComposeSelection.Targets.Count -gt 0) {
-  $profileArgsText = ""
-  foreach ($profile in $ComposeSelection.Profiles) { $profileArgsText += " --profile $profile" }
-  $targetText = ($ComposeSelection.Targets -join " ")
-
-  Start-LiveWindow "BThwani Docker / Local Stack" $Root @"
-docker compose --env-file .\.env.local -f .\docker-compose.local.yml$profileArgsText up -d $targetText 2>&1 | Tee-Object -FilePath '$dockerLog' -Append
-docker compose --env-file .\.env.local -f .\docker-compose.local.yml$profileArgsText ps 2>&1 | Tee-Object -FilePath '$dockerPsLog' -Append
-"@
-
-  Start-Sleep -Seconds 5
-} else {
-  Write-RunLog "Stack/Addons selected no Docker targets. Skipping docker compose."
-}
+Invoke-DockerComposeUp -StackMode $Stack -AddonsMode $Addons | Out-Null
 
 $goLog = SafeLogPath "go-api.log"
-Start-LiveWindow "BThwani DSH Go API :$DshPort" $DshBackend @"
+Start-LiveWindow "BThwani DSH Go API :$DshPort" (Join-Path $Root "dsh\backend") @"
 `$env:PORT = '$DshPort'
 `$env:DATABASE_URL = '$DatabaseUrl'
 go run ./cmd/dsh-api 2>&1 | Tee-Object -FilePath '$goLog' -Append
 "@
+Wait-TcpPort -Port $DshPort -Label "DSH Go API" -TimeoutSeconds 120
 
-Start-Sleep -Seconds 4
-$AdbRuntimeSerial = Invoke-AdbSetup -DshPort $DshPort -AppClientPort $AppClientPort -AppPartnerPort $AppPartnerPort -AppCaptainPort $AppCaptainPort -AppFieldPort $AppFieldPort -ControlPanelPort $ControlPanelPort -WebappPort $WebappPort -WebsitePort $WebsitePort
+Invoke-LoggedCommand "api-smoke-stores.log" { Invoke-WebRequest "http://127.0.0.1:$DshPort/stores" -UseBasicParsing }
+
+$AdbRuntimeSerial = Invoke-AdbSetup -DshPort $DshPort -AppClientPort $AppClientPort -AppPartnerPort $AppPartnerPort -AppCaptainPort $AppCaptainPort -AppFieldPort $AppFieldPort -ControlPanelPort $ControlPanelPort
 Start-ScrcpyIfEnabled -RuntimeSerial $AdbRuntimeSerial
 
 if ($ClearMetroOnce) {
   $metroCache = Join-Path $env:TEMP "metro-cache"
   Write-RunLog "ClearMetroOnce enabled. Cleaning Metro cache: $metroCache"
-  if (Test-Path -LiteralPath $metroCache) {
-    Remove-Item -LiteralPath $metroCache -Recurse -Force -ErrorAction SilentlyContinue
-    Write-RunLog "Metro cache removed."
-  } else {
-    Write-RunLog "Metro cache not found — nothing to clean."
-  }
+  if (Test-Path -LiteralPath $metroCache) { Remove-Item -LiteralPath $metroCache -Recurse -Force -ErrorAction SilentlyContinue }
 }
+
+$clearArg = ""
+if ($ExpoClear -or $ClearMetroOnce) { $clearArg = " --clear" }
 
 $appClientLog = SafeLogPath "app-client.log"
 $appPartnerLog = SafeLogPath "app-partner.log"
@@ -445,42 +406,31 @@ Start-LiveWindow "BThwani app-client :$AppClientPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
 pnpm --dir app-client/runtime exec expo start --dev-client --host $ExpoHost --port $AppClientPort$clearArg 2>&1 | Tee-Object -FilePath '$appClientLog' -Append
 "@
-Wait-TcpPort -Port $AppClientPort -Label "app-client Metro"
+Wait-TcpPort -Port $AppClientPort -Label "app-client Metro" -TimeoutSeconds 180
 
 Start-LiveWindow "BThwani app-partner :$AppPartnerPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
 pnpm --dir app-partner/runtime exec expo start --dev-client --host $ExpoHost --port $AppPartnerPort$clearArg 2>&1 | Tee-Object -FilePath '$appPartnerLog' -Append
 "@
-Wait-TcpPort -Port $AppPartnerPort -Label "app-partner Metro"
+Wait-TcpPort -Port $AppPartnerPort -Label "app-partner Metro" -TimeoutSeconds 180
 
 Start-LiveWindow "BThwani app-captain :$AppCaptainPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
 pnpm --dir app-captain/runtime exec expo start --dev-client --host $ExpoHost --port $AppCaptainPort$clearArg 2>&1 | Tee-Object -FilePath '$appCaptainLog' -Append
 "@
-Wait-TcpPort -Port $AppCaptainPort -Label "app-captain Metro"
+Wait-TcpPort -Port $AppCaptainPort -Label "app-captain Metro" -TimeoutSeconds 180
 
 Start-LiveWindow "BThwani app-field :$AppFieldPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
 pnpm --dir app-field/runtime exec expo start --dev-client --host $ExpoHost --port $AppFieldPort$clearArg 2>&1 | Tee-Object -FilePath '$appFieldLog' -Append
 "@
-Wait-TcpPort -Port $AppFieldPort -Label "app-field Metro"
+Wait-TcpPort -Port $AppFieldPort -Label "app-field Metro" -TimeoutSeconds 180
 
 Start-LiveWindow "BThwani control-panel :$ControlPanelPort" $Root @"
 `$env:NEXT_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
 pnpm --dir control-panel/runtime dev 2>&1 | Tee-Object -FilePath '$controlPanelLog' -Append
 "@
-
-$webappLog = SafeLogPath "webapp.log"
-Start-LiveWindow "BThwani webapp :$WebappPort" $Root @"
-`$env:NEXT_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
-pnpm --dir webapp/runtime dev --port $WebappPort 2>&1 | Tee-Object -FilePath '$webappLog' -Append
-"@
-
-$websiteLog = SafeLogPath "website.log"
-Start-LiveWindow "BThwani website :$WebsitePort" $Root @"
-`$env:NEXT_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
-pnpm --dir website/runtime dev --port $WebsitePort 2>&1 | Tee-Object -FilePath '$websiteLog' -Append
-"@
+Wait-TcpPort -Port $ControlPanelPort -Label "control-panel Next" -TimeoutSeconds 180
 
 $SummaryText = @"
 status: STARTED
@@ -490,33 +440,19 @@ evidence_root: $RunRoot
 handoff_zip: $RunRoot\$SessionId.zip
 stack_mode: $Stack
 addons_mode: $Addons
-compose_entrypoint: $RootCompose
-compose_profiles: $($ComposeSelection.Profiles -join ',')
-compose_targets: $($ComposeSelection.Targets -join ',')
-expected_containers: $($ComposeSelection.ExpectedContainers -join ',')
 adb_runtime_serial: $AdbRuntimeSerial
-
-started_runtime:
-- Docker via root compose according to Stack/Addons selection
-- DSH Go API
-- ADB setup + reverse
-- Scrcpy if enabled
-- app-client
-- app-partner
-- app-captain
-- app-field
-- control-panel
+expo_host: $ExpoHost
+excluded_services:
 - webapp
 - website
-
 next_manual_steps:
-1. افتح الهاتف عبر Scrcpy.
-2. افتح control-panel على http://localhost:$ControlPanelPort
-3. نفذ طلبًا حقيقيًا من app-client.
-4. سجّل orderId.
-5. تحقق من ظهوره في app-partner/app-captain/app-field/control-panel.
-6. خذ screenshots.
-7. لا تعتبر التجربة PASS بدون evidence/logs/screenshots.
+1. Open Scrcpy.
+2. Open control-panel on http://localhost:$ControlPanelPort
+3. Create one real order from app-client.
+4. Record orderId.
+5. Verify the same order in app-partner/app-captain/app-field/control-panel.
+6. Capture screenshots and logs.
+7. Do not claim PASS without evidence.
 "@
 $SummaryText | Out-File -Encoding utf8 (Join-Path $RunRoot "SUMMARY.md")
 
@@ -530,7 +466,5 @@ Write-Host "Session: $SessionId"
 Write-Host "Evidence: $RunRoot"
 Write-Host "ZIP: $ZipPath"
 Write-Host "ADB Runtime Serial: $AdbRuntimeSerial"
-Write-Host "Stack: $Stack"
-Write-Host "Addons: $Addons"
 Write-Host ""
 Write-Host "ابدأ الآن تجربة طلب حقيقي واحد من app-client وتتبع نفس orderId في بقية الأسطح."
