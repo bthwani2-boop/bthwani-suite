@@ -1254,7 +1254,13 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   }
 
   if (route === 'wlt-home') {
-    return <WltHomeGetScreen onBack={() => setRoute('home')} />;
+    return (
+      <WltHomeGetScreen
+        onBack={() => setRoute('home')}
+        dshAuthBearerToken={dshAuthBearerToken}
+        dshClientId={dshClientId}
+      />
+    );
   }
 
   if (route === 'checkout-intent') {

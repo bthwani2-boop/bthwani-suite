@@ -166,6 +166,7 @@ function DshPartnerSurfaceInner({
   initialRoute = 'inbox',
   initialOrderId = 'partner-order-1042',
 }: DshPartnerSurfaceProps = {}) {
+  const { dshAuthBearerToken, dshClientId } = usePlatformVars();
   // walletHubVisible state removed in favor of self-contained WltDshPartnerBridge cockpit tabs.
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
   const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('hub');
@@ -579,6 +580,8 @@ function DshPartnerSurfaceInner({
         onOpenOperationalFlow={(flowId) => openSupportCommandFromOperationalFlow(flowId, 'hub')}
         onOpenSupportScreen={(screenId) => openSupportScreen(screenId, 'hub')}
         onOpenStoreCourierSetup={openStoreCourier}
+        dshAuthBearerToken={dshAuthBearerToken}
+        dshClientId={dshClientId}
       />,
     );
   }

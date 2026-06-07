@@ -447,11 +447,15 @@ function SettlementSection({
 export type WltDshCaptainFinancePreviewProps = {
   section?: WltCaptainFinanceSection;
   onBack?: () => void;
+  dshAuthBearerToken?: string | null;
+  dshClientId?: string | null;
 };
 
 export function WltDshCaptainFinancePreview({
   section = 'eligibility',
   onBack,
+  dshAuthBearerToken,
+  dshClientId,
 }: WltDshCaptainFinancePreviewProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
@@ -462,7 +466,7 @@ export function WltDshCaptainFinancePreview({
     topUp,
     requestSettlement,
     resetFinance,
-  } = useWltDshCaptainFinancePreview(section);
+  } = useWltDshCaptainFinancePreview(section, dshClientId, dshAuthBearerToken);
 
   const [expandedSection, setExpandedSection] = React.useState<WltCaptainFinanceSection | null>('eligibility');
 

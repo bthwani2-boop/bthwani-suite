@@ -9,8 +9,11 @@ import {
 
 const DEFAULT_CAPTAIN_ID = 'captain-demo';
 
-function getClient() {
-	return createWltDshTypedClient({});
+function getClient(bearerToken?: string | null, devClientId?: string | null) {
+	return createWltDshTypedClient({
+		bearerToken: bearerToken || undefined,
+		devClientId: devClientId || undefined,
+	});
 }
 
 function earningRecord(entry: WltLedgerEntry): WltDshFinancePreviewRecord {
@@ -34,10 +37,11 @@ function earningRecord(entry: WltLedgerEntry): WltDshFinancePreviewRecord {
 	};
 }
 
-export async function getSnapshot(captainId = DEFAULT_CAPTAIN_ID): Promise<WltCaptainFinanceSnapshot> {
+export async function getSnapshot(captainId?: string | null, bearerToken?: string | null): Promise<WltCaptainFinanceSnapshot> {
+	const activeCaptainId = captainId || DEFAULT_CAPTAIN_ID;
 	const [walletSummary, earningsResponse] = await Promise.all([
-		getClient().getCaptainWalletSummary(captainId),
-		getClient().listCaptainEarnings(captainId),
+		getClient(bearerToken, activeCaptainId).getCaptainWalletSummary(activeCaptainId),
+		getClient(bearerToken, activeCaptainId).listCaptainEarnings(activeCaptainId),
 	]);
 	const previewFallback = getWltCaptainFinanceSnapshot();
 	const earningsMinorUnits = earningsResponse.entries
@@ -66,8 +70,9 @@ export async function getSnapshot(captainId = DEFAULT_CAPTAIN_ID): Promise<WltCa
 	};
 }
 
-export async function getRecords(captainId = DEFAULT_CAPTAIN_ID): Promise<WltDshFinancePreviewRecord[]> {
-	const { entries } = await getClient().listCaptainEarnings(captainId);
+export async function getRecords(captainId?: string | null, bearerToken?: string | null): Promise<WltDshFinancePreviewRecord[]> {
+	const activeCaptainId = captainId || DEFAULT_CAPTAIN_ID;
+	const { entries } = await getClient(bearerToken, activeCaptainId).listCaptainEarnings(activeCaptainId);
 	return entries.map(earningRecord);
 }
 
@@ -75,31 +80,31 @@ export function getSections() {
 	return ['eligibility', 'cod-liability', 'earnings', 'settlement'] as const satisfies readonly WltCaptainFinanceSection[];
 }
 
-export async function getRecordsForSection(section: WltCaptainFinanceSection): Promise<WltDshFinancePreviewRecord[]> {
-	const records = await getRecords();
+export async function getRecordsForSection(section: WltCaptainFinanceSection, captainId?: string | null, bearerToken?: string | null): Promise<WltDshFinancePreviewRecord[]> {
+	const records = await getRecords(captainId, bearerToken);
 	if (section === 'earnings') return records.filter((r) => r.kind === 'captain-earning');
 	// cod-liability and settlement stubs — WLT COD tracking not yet surfaced via captain endpoint
 	return [];
 }
 
-export async function topUp(): Promise<{ success: boolean; error: string; snapshot: WltCaptainFinanceSnapshot }> {
+export async function topUp(amountMinorUnits?: number, captainId?: string | null, bearerToken?: string | null): Promise<{ success: boolean; error: string; snapshot: WltCaptainFinanceSnapshot }> {
 	return {
 		success: false,
 		error: 'wlt_captain_top_up_out_of_scope_for_dsh_runtime_slice',
-		snapshot: await getSnapshot(),
+		snapshot: await getSnapshot(captainId, bearerToken),
 	};
 }
 
-export async function requestSettlement(): Promise<{ success: boolean; error: string; snapshot: WltCaptainFinanceSnapshot }> {
+export async function requestSettlement(captainId?: string | null, bearerToken?: string | null): Promise<{ success: boolean; error: string; snapshot: WltCaptainFinanceSnapshot }> {
 	return {
 		success: false,
 		error: 'wlt_payout_decision_requires_control_panel_wlt_operation',
-		snapshot: await getSnapshot(),
+		snapshot: await getSnapshot(captainId, bearerToken),
 	};
 }
 
-export async function resetFinance(): Promise<{ snapshot: WltCaptainFinanceSnapshot }> {
-	return { snapshot: await getSnapshot() };
+export async function resetFinance(captainId?: string | null, bearerToken?: string | null): Promise<{ snapshot: WltCaptainFinanceSnapshot }> {
+	return { snapshot: await getSnapshot(captainId, bearerToken) };
 }
 
 const WltDshCaptainAdapter = {

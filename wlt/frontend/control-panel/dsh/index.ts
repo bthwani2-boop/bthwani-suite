@@ -22,6 +22,7 @@ export { WltDshCaptainStatement } from './components/WltDshCaptainStatement';
 export { LedgerEntriesTable } from './components/LedgerEntriesTable';
 export { TrialBalancePanel } from './components/TrialBalancePanel';
 export { WltDshFinanceControlPanelContent, WltDshFinanceControlPanelPreview } from './components/WltDshFinanceControlPanelPreview';
+export { WltDshRealtimeLedger } from './components/WltDshRealtimeLedger';
 
 // finance routing (types + registry + api-matrix)
 export type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState, FinanceGroupMeta, FinanceNormalizationResult } from './models/financeRouting.types';

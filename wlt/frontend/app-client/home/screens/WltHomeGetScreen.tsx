@@ -4,7 +4,11 @@ import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon
 import { financeProviders } from '../../../control-panel/dsh/financeContracts';
 import { createWltDshTypedClient } from '../../../contracts';
 
-export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
+export const WltHomeGetScreen: React.FC<{
+  onBack?: () => void;
+  dshAuthBearerToken?: string | null;
+  dshClientId?: string | null;
+}> = ({ onBack, dshAuthBearerToken, dshClientId }) => {
   const { t } = useI18n();
   const { tokens } = useBThwaniAppearance();
 
@@ -19,11 +23,16 @@ export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) 
   const [state, setState] = useState<'content' | 'loading' | 'success' | 'error'>('content');
   const [trigger, setTrigger] = useState(0);
 
-  const client = useMemo(() => createWltDshTypedClient({ devClientId: 'client-demo' }), []);
+  const activeClientId = dshClientId || 'client-demo';
+
+  const client = useMemo(() => createWltDshTypedClient({
+    bearerToken: dshAuthBearerToken || undefined,
+    devClientId: activeClientId,
+  }), [dshAuthBearerToken, activeClientId]);
 
   React.useEffect(() => {
     let active = true;
-    client.getClientWalletSummary('client-demo')
+    client.getClientWalletSummary(activeClientId)
       .then((summary) => {
         if (active) {
           setBalance(summary.balance);
@@ -33,7 +42,7 @@ export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) 
         console.error('Failed to fetch balance:', err);
       });
     return () => { active = false; };
-  }, [client, trigger]);
+  }, [client, activeClientId, trigger]);
 
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);
   const canSubmit = topupAmount > 0 && !!method;
@@ -48,7 +57,7 @@ export const WltHomeGetScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) 
     try {
       const session = await client.createClientPaymentSession({
         checkout_intent_id: `topup-${Date.now()}`,
-        client_id: 'client-demo',
+        client_id: activeClientId,
         amount: topupAmount,
         currency: 'YER',
         payment_method: method ?? 'wallet',

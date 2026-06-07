@@ -19,5 +19,29 @@ services:
       timeout: 3s
       retries: 10
 
+  auth-service:
+    # BTHWANI_AUTH_SERVICE: Real DB-backed auth (login/session/refresh/revoke/permissions).
+    # Contract: dsh/backend/cmd/auth-service/main.go — auth.openapi.yaml routes.
+    # Port 8082 — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.
+    # DEV_ONLY: password_hash seed in 027_auth_sessions.sql accepts username==password fallback.
+    build:
+      context: .
+      dockerfile: Dockerfile.auth-service
+    container_name: bthwani-auth-service-local
+    restart: unless-stopped
+    environment:
+      AUTH_PORT: "8082"
+      DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
+    ports:
+      - "8082:8082"
+    depends_on:
+      dsh-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
 volumes:
   dsh-postgres-data:

@@ -31,13 +31,21 @@ function settlementRecord(s: WltSettlement): WltDshFinancePreviewRecord {
   };
 }
 
-export function useWltDshPartnerWalletPreview() {
+export function useWltDshPartnerWalletPreview(partnerId?: string, dshAuthBearerToken?: string | null) {
   const [partnerPreview, setPartnerPreview] = React.useState<WltPartnerFinanceSnapshot>(() => getWltPartnerFinanceSnapshot());
   const [lastError, setLastError] = React.useState<string | null>(null);
 
+  const activePartnerId = partnerId || 'partner-demo';
+  const client = React.useMemo(() => {
+    return createWltDshTypedClient({
+      bearerToken: dshAuthBearerToken || undefined,
+      devClientId: activePartnerId,
+    });
+  }, [dshAuthBearerToken, activePartnerId]);
+
   React.useEffect(() => {
     let cancelled = false;
-    void createWltDshTypedClient({}).listPartnerSettlements('partner-demo')
+    void client.listPartnerSettlements(activePartnerId)
       .then(({ settlements }) => {
         if (cancelled) return;
         const fallback = getWltPartnerFinanceSnapshot();
@@ -69,7 +77,7 @@ export function useWltDshPartnerWalletPreview() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [client, activePartnerId]);
 
   const previewTransactions = React.useMemo(
     () => mapWltDshPartnerPreviewTransactions(partnerPreview.settlementRecords),

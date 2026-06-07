@@ -70,6 +70,7 @@ import {
   createDshOrderLifecycleHttpClient,
   PlatformVarsProvider,
   FeatureFlagProvider,
+  usePlatformVars,
 } from '../shared';
 import { OfferDeclineSheet } from './sheets';
 
@@ -419,6 +420,7 @@ export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
 
 function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
+  const { dshAuthBearerToken, dshClientId } = usePlatformVars();
   const {
     hydrated: appearanceHydrated,
     mode: appearanceMode,
@@ -1078,7 +1080,11 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
         <View style={{ flex: 1, paddingBottom: showCaptainBottomNav ? 80 : 0 }}>
-          <DshCaptainFinanceScreen onBack={() => setRoute('account')} />
+          <DshCaptainFinanceScreen
+            onBack={() => setRoute('account')}
+            dshAuthBearerToken={dshAuthBearerToken}
+            dshClientId={dshClientId}
+          />
         </View>
         {showCaptainBottomNav && (
           <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
@@ -2101,7 +2107,16 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
         case 'chat-read-ack': supportScreenContent = <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
         case 'chat-send': supportScreenContent = <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
         // SSoT: COD screen only shown when captain collects COD (bthwani_delivery, not store_courier_mode)
-        case 'cod-liability': supportScreenContent = captainCollectsCod ? <DshCaptainCodBalanceScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} /> : null; break;
+        case 'cod-liability':
+          supportScreenContent = captainCollectsCod ? (
+            <DshCaptainCodBalanceScreen
+              onBack={openSupportDirectory}
+              onRetry={openSupportDirectory}
+              dshAuthBearerToken={dshAuthBearerToken}
+              dshClientId={dshClientId}
+            />
+          ) : null;
+          break;
         case 'order-accept':
           supportScreenContent = (
             <DshCaptainOrderAcceptScreen

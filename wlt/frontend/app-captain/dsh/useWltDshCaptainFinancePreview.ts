@@ -9,7 +9,11 @@ import {
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import * as WltCaptainAdapter from './wlt-dsh-captain.adapter';
 
-export function useWltDshCaptainFinancePreview(initialSection: WltCaptainFinanceSection = 'eligibility') {
+export function useWltDshCaptainFinancePreview(
+  initialSection: WltCaptainFinanceSection = 'eligibility',
+  captainId?: string | null,
+  dshAuthBearerToken?: string | null
+) {
   const [activeSection, setActiveSection] = React.useState<WltCaptainFinanceSection>(initialSection);
   const [trigger, setTrigger] = React.useState(0);
   const [snapshot, setSnapshot] = React.useState<WltCaptainFinanceSnapshot>(() => getWltCaptainFinanceSnapshot());
@@ -26,7 +30,10 @@ export function useWltDshCaptainFinancePreview(initialSection: WltCaptainFinance
 
   React.useEffect(() => {
     let cancelled = false;
-    void Promise.all([WltCaptainAdapter.getSnapshot(), WltCaptainAdapter.getRecords()])
+    void Promise.all([
+      WltCaptainAdapter.getSnapshot(captainId, dshAuthBearerToken),
+      WltCaptainAdapter.getRecords(captainId, dshAuthBearerToken)
+    ])
       .then(([nextSnapshot, nextRecords]) => {
         if (cancelled) return;
         setSnapshot(nextSnapshot);
@@ -40,7 +47,7 @@ export function useWltDshCaptainFinancePreview(initialSection: WltCaptainFinance
     return () => {
       cancelled = true;
     };
-  }, [trigger]);
+  }, [trigger, captainId, dshAuthBearerToken]);
 
   const availableSections = React.useMemo(() => WltCaptainAdapter.getSections(), []);
   const records = React.useMemo(
@@ -54,22 +61,22 @@ export function useWltDshCaptainFinancePreview(initialSection: WltCaptainFinance
   );
 
   const topUp = React.useCallback(async (amountMinorUnits: number) => {
-    const res = await WltCaptainAdapter.topUp(amountMinorUnits);
+    const res = await WltCaptainAdapter.topUp(amountMinorUnits, captainId || undefined, dshAuthBearerToken);
     refresh();
     return res;
-  }, [refresh]);
+  }, [refresh, captainId, dshAuthBearerToken]);
 
   const requestSettlement = React.useCallback(async () => {
-    const res = await WltCaptainAdapter.requestSettlement();
+    const res = await WltCaptainAdapter.requestSettlement(captainId || undefined, dshAuthBearerToken);
     refresh();
     return res;
-  }, [refresh]);
+  }, [refresh, captainId, dshAuthBearerToken]);
 
   const resetFinance = React.useCallback(async () => {
-    const res = await WltCaptainAdapter.resetFinance();
+    const res = await WltCaptainAdapter.resetFinance(captainId || undefined, dshAuthBearerToken);
     refresh();
     return res;
-  }, [refresh]);
+  }, [refresh, captainId, dshAuthBearerToken]);
 
   return {
     contract: wltDshCaptainBridgeDataContract,

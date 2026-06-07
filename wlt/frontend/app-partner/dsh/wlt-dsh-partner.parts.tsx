@@ -50,6 +50,8 @@ export type PartnerDshWalletBridgeProps = {
   onOpenExpandedWallet?: () => void;
   onOpenSettlementReview?: () => void;
   onOpenFinancialReport?: () => void;
+  dshAuthBearerToken?: string | null;
+  dshClientId?: string | null;
 };
 
 type WalletStateCopy = {
@@ -659,9 +661,11 @@ export function PartnerDshWalletBridgeView({
   onOpenExpandedWallet,
   onOpenSettlementReview,
   onOpenFinancialReport,
+  dshAuthBearerToken,
+  dshClientId,
 }: PartnerDshWalletBridgeProps) {
   const { direction } = useDirection();
-  const { partnerPreview, previewTransactions } = useWltDshPartnerWalletPreview();
+  const { partnerPreview, previewTransactions } = useWltDshPartnerWalletPreview(dshClientId || undefined, dshAuthBearerToken);
   const [selectedTransactionId, setSelectedTransactionId] = React.useState<string | null>(null);
   const [expandedSection, setExpandedSection] = React.useState<WalletTabId | null>('summary');
 

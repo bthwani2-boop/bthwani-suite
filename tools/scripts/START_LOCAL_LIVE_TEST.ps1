@@ -1,4 +1,4 @@
-﻿Set-Location -LiteralPath "C:\bthwani-suite"
+Set-Location -LiteralPath "C:\bthwani-suite"
 
 $ErrorActionPreference = "Stop"
 
@@ -362,6 +362,10 @@ $AppCaptainPort = [int](Get-LocalEnv "APP_CAPTAIN_PORT" "8083")
 $AppFieldPort = [int](Get-LocalEnv "APP_FIELD_PORT" "8084")
 $ControlPanelPort = [int](Get-LocalEnv "CONTROL_PANEL_PORT" "3000")
 
+$AuthPort = [int](Get-LocalEnv "AUTH_API_PORT" "8085")
+$WltPort = [int](Get-LocalEnv "WLT_API_PORT" "8090")
+$WltDatabaseUrl = Get-LocalEnv "WLT_DATABASE_URL" "postgres://wlt_local:wlt_local_password@localhost:55433/wlt_local?sslmode=disable"
+
 $MongoEnabledFromEnv = (Get-LocalEnv "MONGO_ENABLED" "0") -eq "1"
 $WithMongo = ($args -contains "-WithMongo") -or $MongoEnabledFromEnv
 $NoKillPorts = $args -contains "-NoKillPorts"
@@ -382,7 +386,7 @@ git --no-pager diff --check 2>&1 | Out-File -Encoding utf8 (Join-Path $RunRoot "
 
 Get-NetTCPConnection -ErrorAction SilentlyContinue |
   Where-Object {
-    $_.LocalPort -in @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort)
+    $_.LocalPort -in @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort, $AuthPort, $WltPort)
   } |
   Select-Object LocalAddress, LocalPort, State, OwningProcess |
   Out-File -Encoding utf8 (Join-Path $RunRoot "ports-before.txt")
@@ -394,13 +398,15 @@ if (-not $NoKillPorts) {
   Stop-PortOwner -Port $AppCaptainPort -Label "app-captain Expo"
   Stop-PortOwner -Port $AppFieldPort -Label "app-field Expo"
   Stop-PortOwner -Port $ControlPanelPort -Label "control-panel Next"
+  Stop-PortOwner -Port $AuthPort -Label "Auth Go API"
+  Stop-PortOwner -Port $WltPort -Label "WLT Go API"
 } else {
   Write-RunLog "NoKillPorts enabled. Skipping port killing."
 }
 
 Get-NetTCPConnection -ErrorAction SilentlyContinue |
   Where-Object {
-    $_.LocalPort -in @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort)
+    $_.LocalPort -in @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort, $AuthPort, $WltPort)
   } |
   Select-Object LocalAddress, LocalPort, State, OwningProcess |
   Out-File -Encoding utf8 (Join-Path $RunRoot "ports-after-kill.txt")
@@ -414,6 +420,8 @@ APP_PARTNER_PORT=$AppPartnerPort
 APP_CAPTAIN_PORT=$AppCaptainPort
 APP_FIELD_PORT=$AppFieldPort
 CONTROL_PANEL_PORT=$ControlPanelPort
+AUTH_API_PORT=$AuthPort
+WLT_API_PORT=$WltPort
 WITH_MONGO=$WithMongo
 NO_KILL_PORTS=$NoKillPorts
 NO_CLEAR=$NoClear
@@ -424,7 +432,7 @@ SCRCPY_ENABLED=$(Get-LocalEnv "SCRCPY_ENABLED" "0")
 $dockerLog = SafeLogPath "docker-postgres.log"
 $dockerPsLog = SafeLogPath "docker-postgres-ps.log"
 
-Start-LiveWindow "BThwani Docker / Postgres" $DshBackend @"
+Start-LiveWindow "BThwani Docker / Postgres" $Root @"
 docker compose -f .\docker-compose.local.yml up -d 2>&1 | Tee-Object -FilePath '$dockerLog' -Append
 docker compose -f .\docker-compose.local.yml ps 2>&1 | Tee-Object -FilePath '$dockerPsLog' -Append
 "@
@@ -450,15 +458,38 @@ docker ps --filter "name=$mongoContainer" 2>&1 | Tee-Object -FilePath '$mongoLog
 "@
 }
 
-$goLog = SafeLogPath "go-api.log"
+$authLog = SafeLogPath "auth-service.log"
+Start-LiveWindow "BThwani Auth Go API :$AuthPort" $DshBackend @"
+`$env:AUTH_PORT = '$AuthPort'
+`$env:DATABASE_URL = '$DatabaseUrl'
+go run ./cmd/auth-service 2>&1 | Tee-Object -FilePath '$authLog' -Append
+"@
 
+Start-Sleep -Seconds 3
+
+$goWltLog = SafeLogPath "wlt-api.log"
+Start-LiveWindow "BThwani WLT Go API :$WltPort" "$Root\wlt\backend" @"
+`$env:PORT = '$WltPort'
+`$env:DATABASE_URL = '$WltDatabaseUrl'
+`$env:WLT_AUTH_MODE = 'production'
+`$env:WLT_AUTH_SERVICE_URL = 'http://localhost:$AuthPort'
+`$env:WLT_CALLBACK_SECRET = 'dev-secret'
+`$env:WLT_DSH_BASE_URL = '$DshBaseUrl'
+go run ./cmd/wlt-api 2>&1 | Tee-Object -FilePath '$goWltLog' -Append
+"@
+
+Start-Sleep -Seconds 3
+
+$goLog = SafeLogPath "go-api.log"
 Start-LiveWindow "BThwani DSH Go API :$DshPort" $DshBackend @"
 `$env:PORT = '$DshPort'
 `$env:DATABASE_URL = '$DatabaseUrl'
+`$env:DSH_AUTH_MODE = 'production'
+`$env:DSH_AUTH_SERVICE_URL = 'http://localhost:$AuthPort'
 go run ./cmd/dsh-api 2>&1 | Tee-Object -FilePath '$goLog' -Append
 "@
 
-Start-Sleep -Seconds 4
+Start-Sleep -Seconds 6
 
 $AdbRuntimeSerial = Invoke-AdbSetup `
   -DshPort $DshPort `
@@ -490,6 +521,7 @@ $controlPanelLog = SafeLogPath "control-panel.log"
 
 Start-LiveWindow "BThwani app-client :$AppClientPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
+`$env:EXPO_PUBLIC_WLT_DSH_API_BASE_URL = 'http://localhost:$WltPort'
 pnpm --dir app-client/runtime exec expo start --dev-client --host localhost --port $AppClientPort 2>&1 | Tee-Object -FilePath '$appClientLog' -Append
 "@
 
@@ -497,6 +529,7 @@ Wait-TcpPort -Port $AppClientPort -Label "app-client Metro"
 
 Start-LiveWindow "BThwani app-partner :$AppPartnerPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
+`$env:EXPO_PUBLIC_WLT_DSH_API_BASE_URL = 'http://localhost:$WltPort'
 pnpm --dir app-partner/runtime exec expo start --dev-client --host localhost --port $AppPartnerPort 2>&1 | Tee-Object -FilePath '$appPartnerLog' -Append
 "@
 
@@ -504,6 +537,7 @@ Wait-TcpPort -Port $AppPartnerPort -Label "app-partner Metro"
 
 Start-LiveWindow "BThwani app-captain :$AppCaptainPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
+`$env:EXPO_PUBLIC_WLT_DSH_API_BASE_URL = 'http://localhost:$WltPort'
 pnpm --dir app-captain/runtime exec expo start --dev-client --host localhost --port $AppCaptainPort 2>&1 | Tee-Object -FilePath '$appCaptainLog' -Append
 "@
 
@@ -511,6 +545,7 @@ Wait-TcpPort -Port $AppCaptainPort -Label "app-captain Metro"
 
 Start-LiveWindow "BThwani app-field :$AppFieldPort" $Root @"
 `$env:EXPO_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
+`$env:EXPO_PUBLIC_WLT_DSH_API_BASE_URL = 'http://localhost:$WltPort'
 pnpm --dir app-field/runtime exec expo start --dev-client --host localhost --port $AppFieldPort 2>&1 | Tee-Object -FilePath '$appFieldLog' -Append
 "@
 
@@ -518,6 +553,7 @@ Wait-TcpPort -Port $AppFieldPort -Label "app-field Metro"
 
 Start-LiveWindow "BThwani control-panel :$ControlPanelPort" $Root @"
 `$env:NEXT_PUBLIC_DSH_API_BASE_URL = '$DshBaseUrl'
+`$env:NEXT_PUBLIC_WLT_DSH_API_BASE_URL = 'http://localhost:$WltPort'
 pnpm --dir control-panel/runtime dev 2>&1 | Tee-Object -FilePath '$controlPanelLog' -Append
 "@
 
@@ -530,6 +566,8 @@ handoff_zip: $RunRoot\$SessionId.zip
 
 started_services:
 - Docker / Postgres
+- Auth Go API
+- WLT Go API
 - DSH Go API
 - ADB setup + reverse
 - Scrcpy if enabled
