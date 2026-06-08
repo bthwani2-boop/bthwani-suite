@@ -65,6 +65,15 @@ services:
       PORT: "8080"
       DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
       DSH_AUTH_SERVICE_URL: "http://auth-service:18082"
+      DSH_MEDIA_STORAGE_PROVIDER: "minio"
+      DSH_MEDIA_S3_ENDPOINT: "http://minio:9000"
+      DSH_MEDIA_PRESIGN_HOST: "http://127.0.0.1:9000"
+      DSH_MEDIA_PUBLIC_BASE_URL: "http://127.0.0.1:9000/bthwani-media-local"
+      DSH_MEDIA_BUCKET: "bthwani-media-local"
+      DSH_MEDIA_ACCESS_KEY: "${DSH_MEDIA_ACCESS_KEY:-dev-minio-access-key}"
+      DSH_MEDIA_SECRET_KEY: "${DSH_MEDIA_SECRET_KEY:-dev-minio-secret-key-min-8}"
+      DSH_MEDIA_REGION: "us-east-1"
+      DSH_MEDIA_PRESIGN_TTL_SECONDS: "900"
     ports:
       - "${DSH_API_HOST_PORT:-8080}:8080"
     depends_on:
@@ -72,6 +81,9 @@ services:
         condition: service_healthy
       auth-service:
         condition: service_healthy
+      # minio dependency is intentionally omitted here — MinIO is optional infrastructure.
+      # dsh-api starts without MinIO; upload-intent URLs will be empty until MinIO is running.
+      # Start MinIO separately: docker compose -f docker-compose.local.yml up minio minio-init -d
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/stores || exit 1"]
       interval: 10s
@@ -80,8 +92,57 @@ services:
     networks:
       - bthwani-local
 
+  minio:
+    # BTHWANI_MEDIA_STORAGE: MinIO S3-compatible local object storage.
+    # Owns all DSH product/store/banner/order/field media files.
+    # WLT stores media_id references only — never copies files here.
+    # Ports: 9000 = MinIO S3 API, 9001 = MinIO Console (web UI).
+    # DEV credentials only — never use in production.
+    image: minio/minio:latest
+    container_name: bthwani-minio-local
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${DSH_MEDIA_ACCESS_KEY:-dev-minio-access-key}
+      MINIO_ROOT_PASSWORD: ${DSH_MEDIA_SECRET_KEY:-dev-minio-secret-key-min-8}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - bthwani-minio-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local 2>/dev/null || curl -sf http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - bthwani-local
+
+  minio-init:
+    # BTHWANI_MEDIA_INIT: Creates bucket and dev policy on first run.
+    # Runs once then exits — does not stay alive.
+    image: minio/mc:latest
+    container_name: bthwani-minio-init-local
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-dev-minio-access-key} $${MINIO_ROOT_PASSWORD:-dev-minio-secret-key-min-8};
+        mc mb --ignore-existing local/bthwani-media-local;
+        mc anonymous set download local/bthwani-media-local;
+        echo 'MinIO bucket bthwani-media-local ready';
+      "
+    environment:
+      MINIO_ROOT_USER: ${DSH_MEDIA_ACCESS_KEY:-dev-minio-access-key}
+      MINIO_ROOT_PASSWORD: ${DSH_MEDIA_SECRET_KEY:-dev-minio-secret-key-min-8}
+    networks:
+      - bthwani-local
+
 volumes:
   dsh-postgres-data:
+  bthwani-minio-data:
 
 networks:
   bthwani-local:

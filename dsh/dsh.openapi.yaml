@@ -442,6 +442,151 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  # ─── DSH_MEDIA_RUNTIME: MinIO/S3 upload-intent flow ────────────────────────
+  # POST /media is the DEV_FIXTURE_ADAPTER (manifest key only). Use /media/upload-intents for runtime.
+
+  /media/upload-intents:
+    post:
+      tags:
+        - Product Media
+      summary: Create media upload intent (runtime)
+      description: >
+        Creates a dsh_media_assets record in pending_upload status and returns a
+        presigned PUT URL for direct-to-MinIO upload. No binary is stored in PostgreSQL.
+        WLT boundary: WLT does not call this endpoint; it stores media_id references only.
+      operationId: createMediaUploadIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMediaUploadIntentRequest'
+      responses:
+        '201':
+          description: Upload intent created — presigned URL returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaUploadIntentResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Scope not allowed for actor role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /media/{media_id}/complete:
+    post:
+      tags:
+        - Product Media
+      summary: Complete media upload
+      description: >
+        Call after successfully uploading to the presigned URL.
+        Transitions dsh_media_assets status from pending_upload → uploaded and sets public_url.
+      operationId: completeMediaUpload
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Media upload completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaAsset'
+        '404':
+          description: Media asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot complete media in current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /media/{media_id}:
+    get:
+      tags:
+        - Product Media
+      summary: Get media asset by ID
+      operationId: getMediaAsset
+      parameters:
+        - name: media_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Media asset record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaAsset'
+        '404':
+          description: Media asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /media:
+    get:
+      tags:
+        - Product Media
+      summary: List media assets
+      description: Filter by owner_type, owner_id, purpose, status. Max 100 per page.
+      operationId: listMediaAssets
+      parameters:
+        - name: owner_type
+          in: query
+          schema:
+            type: string
+        - name: owner_id
+          in: query
+          schema:
+            type: string
+        - name: purpose
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of media assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaAsset'
+                  total:
+                    type: integer
+
   # ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
   /stores/{store_id}/catalog-overrides:
     patch:
@@ -3610,3 +3755,121 @@ components:
           type: string
           enum: [CONFIRMED, FAILED]
           description: CONFIRMED triggers order status transition to REFUNDED. FAILED logs the failure event but keeps the status unchanged.
+
+    # ─── DSH_MEDIA_RUNTIME schemas ───────────────────────────────────────────
+
+    MediaAsset:
+      type: object
+      description: >
+        Canonical runtime media record from dsh_media_assets.
+        Binary files live in MinIO/S3 — only metadata + object reference stored in PostgreSQL.
+        WLT boundary: WLT stores media_id references only, never copies this record.
+      properties:
+        id:
+          type: string
+        owner_service:
+          type: string
+        owner_type:
+          type: string
+          enum: [product, store, banner, campaign, order, field_visit, support_ticket, dispute]
+        owner_id:
+          type: string
+        media_type:
+          type: string
+          enum: [image, video, document]
+        purpose:
+          type: string
+        storage_provider:
+          type: string
+        bucket:
+          type: string
+        storage_key:
+          type: string
+        public_url:
+          type: string
+        thumbnail_url:
+          type: string
+        mime_type:
+          type: string
+        file_size_bytes:
+          type: integer
+          format: int64
+        width:
+          type: integer
+        height:
+          type: integer
+        duration_seconds:
+          type: number
+        checksum_sha256:
+          type: string
+        status:
+          type: string
+          enum: [pending_upload, uploaded, processing, active, rejected, deleted]
+        uploaded_by:
+          type: string
+        approved_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateMediaUploadIntentRequest:
+      type: object
+      required:
+        - owner_type
+        - owner_id
+        - media_type
+        - purpose
+        - filename
+      properties:
+        owner_service:
+          type: string
+          default: dsh
+        owner_type:
+          type: string
+          enum: [product, store, banner, campaign, order, field_visit, support_ticket, dispute]
+        owner_id:
+          type: string
+        media_type:
+          type: string
+          enum: [image, video, document]
+        purpose:
+          type: string
+        filename:
+          type: string
+        mime_type:
+          type: string
+        file_size_bytes:
+          type: integer
+          format: int64
+        checksum_sha256:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+        duration_seconds:
+          type: number
+        actor_id:
+          type: string
+
+    MediaUploadIntentResponse:
+      type: object
+      properties:
+        asset:
+          $ref: '#/components/schemas/MediaAsset'
+        intent:
+          type: object
+          properties:
+            media_id:
+              type: string
+            upload_url:
+              type: string
+              description: Presigned S3 PUT URL — client uploads binary directly here.
+            storage_key:
+              type: string
+            expires_in_seconds:
+              type: integer
