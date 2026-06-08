@@ -64,6 +64,8 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
   const { clientVisibleItems, categories, deliveryModes } = derivedItems;
   const appearanceChrome = useStoreAppearanceChrome({ isDarkGlass, tokens });
 
+  const { previewAnim, openImagePreview, closeImagePreview } = useStorePreviewState({ setPreviewItem, setPreviewActiveIndex, previewItems });
+
   // Derived store display values, operational/visibility state, and share/preview/toggle handlers owned by hook
   const {
     storeCoverImageSource,
@@ -98,7 +100,6 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
   const previewScrollY = React.useRef(new Animated.Value(0)).current;
 
   const { openInlineSearch, closeInlineSearch } = useStoreInlineSearch({ headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery });
-  const { previewAnim, openImagePreview, closeImagePreview } = useStorePreviewState({ setPreviewItem, setPreviewActiveIndex, previewItems });
   const {
     openMeasurementPicker,
     closeMeasurementPicker,

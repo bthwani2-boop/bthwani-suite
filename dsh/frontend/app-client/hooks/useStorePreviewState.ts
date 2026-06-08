@@ -9,7 +9,8 @@ export function useStorePreviewState({
   const previewAnim = React.useRef(new Animated.Value(0)).current;
 
   const openImagePreview = React.useCallback((item: any) => {
-    const activeIdx = previewItems.findIndex((i: any) => i.id === item.id);
+    const items: any[] = Array.isArray(previewItems) ? previewItems : [];
+    const activeIdx = items.findIndex((i: any) => i.id === item.id);
     setPreviewActiveIndex(Math.max(0, activeIdx));
     setPreviewItem(item);
     Animated.spring(previewAnim, {
