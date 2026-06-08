@@ -118,7 +118,7 @@ func HasRole(r *http.Request, role string) bool {
 		return false
 	}
 	for _, rld := range sess.Roles {
-		if strings.ToLower(rld) == strings.ToLower(role) {
+		if strings.EqualFold(rld, role) {
 			return true
 		}
 	}
