@@ -53,7 +53,7 @@
 | DSH-SLICE-001E | upstream | PASS — marketing-visibility gate proven |
 
 ## Runtime Proof Summary
-All evidence collected live against Go API `:8080` + Postgres `:55432`.
+All evidence collected live against Go API `:8080` + Postgres `:55432` (standardized to `:15432` on 2026-06-08; historical evidence port preserved for traceability).
 
 | Step | Action | Result |
 |---|---|---|

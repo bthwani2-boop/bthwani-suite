@@ -1,4 +1,4 @@
-Set-Location -LiteralPath "C:\bthwani-suite"
+﻿Set-Location -LiteralPath "C:\bthwani-suite"
 
 $ErrorActionPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
@@ -376,7 +376,7 @@ Invoke-NativeCapture -Name "WLT postgres pg_isready" -FileName "wlt-postgres-pg-
 
 # Port and endpoint probes
 Invoke-PSCapture -Name "local listening ports target set" -FileName "local-listening-ports-target-set.txt" -Command {
-  $ports = @(3000,5432,55432,55433,6379,8080,8081,8082,8083,8084,27017)
+  $ports = @(3000,5432,15432,15433,6379,8080,8081,8082,8083,8084,27017)
   Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
     Where-Object { $ports -contains $_.LocalPort } |
     Sort-Object LocalPort, OwningProcess |
@@ -384,10 +384,10 @@ Invoke-PSCapture -Name "local listening ports target set" -FileName "local-liste
       @{Name='ProcessName';Expression={ try { (Get-Process -Id $_.OwningProcess -ErrorAction Stop).ProcessName } catch { "" } }}
 } -AllowFail | Out-Null
 
-Invoke-NativeCapture -Name "netstat target ports" -FileName "netstat-target-ports.txt" -Exe "cmd.exe" -ArgumentList @("/c",'netstat -ano | findstr /R ":3000 :5432 :55432 :55433 :6379 :8080 :8081 :8082 :8083 :8084 :27017"') -AllowFail | Out-Null
+Invoke-NativeCapture -Name "netstat target ports" -FileName "netstat-target-ports.txt" -Exe "cmd.exe" -ArgumentList @("/c",'netstat -ano | findstr /R ":3000 :5432 :15432 :15433 :6379 :8080 :8081 :8082 :8083 :8084 :27017"') -AllowFail | Out-Null
 
 Invoke-PSCapture -Name "Test-NetConnection target ports" -FileName "test-netconnection-target-ports.txt" -Command {
-  $ports = @(3000,5432,55432,55433,6379,8080,8081,8082,8083,8084,27017)
+  $ports = @(3000,5432,15432,15433,6379,8080,8081,8082,8083,8084,27017)
   foreach ($p in $ports) {
     Test-NetConnection -ComputerName 127.0.0.1 -Port $p -InformationLevel Detailed |
       Select-Object ComputerName, RemoteAddress, RemotePort, TcpTestSucceeded
@@ -482,7 +482,7 @@ $evidence = [pscustomobject]@{
   }
   key_targets = [pscustomobject]@{
     dsh_postgres_container = "bthwani-dsh-postgres-local"
-    dsh_postgres_port = 55432
+    dsh_postgres_port = 15432
     wlt_postgres_container = "bthwani-wlt-postgres-local"
     expected_api_port = 8080
     expected_control_panel_port = 3000
@@ -523,7 +523,7 @@ Docker mutation performed: false
 - Expected local compose files under root, DSH, WLT, Mongo, Redis.
 - DSH PostgreSQL readiness, identity, table inventory, index inventory.
 - WLT PostgreSQL quick readiness if container exists.
-- Ports: 3000, 5432, 55432, 55433, 6379, 8080, 8081, 8082, 8083, 8084, 27017.
+- Ports: 3000, 5432, 15432, 15433, 6379, 8080, 8081, 8082, 8083, 8084, 27017.
 - HTTP probes for API/control-panel/Metro ports.
 - Docker events for the last 3 hours.
 

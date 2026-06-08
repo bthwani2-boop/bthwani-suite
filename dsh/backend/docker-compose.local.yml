@@ -22,6 +22,8 @@ services:
       - bthwani-local
 
   auth-service:
+    # BOUNDARY: auth-service is temporarily owned here because implementation lives under dsh/backend;
+    # extract to auth-owned compose only in a dedicated Auth extraction phase.
     # BTHWANI_AUTH_SERVICE: Real DB-backed auth (login/session/refresh/revoke/permissions).
     # Contract: dsh/backend/cmd/auth-service/main.go — auth.openapi.yaml routes.
     # Port 8082 internal — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.

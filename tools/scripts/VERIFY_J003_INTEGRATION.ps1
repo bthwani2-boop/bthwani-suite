@@ -92,7 +92,7 @@ $Env:PORT = "8080"
 $Env:DSH_AUTH_MODE = "production"
 $Env:DSH_AUTH_SERVICE_URL = "http://localhost:8081"
 $Env:WLT_CALLBACK_SECRET = "dev-secret"
-$Env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:56432/dsh_local?sslmode=disable"
+$Env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 
 # Run Postgres migrations and seeds
 Log-Msg "Applying migrations and seeds to Postgres..."

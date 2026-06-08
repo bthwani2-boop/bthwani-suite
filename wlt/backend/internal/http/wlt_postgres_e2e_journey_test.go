@@ -29,8 +29,7 @@ func TestWltPostgresE2EJourney(t *testing.T) {
 	// Probe ports if DATABASE_URL is not set
 	if dbURL == "" {
 		urls := []string{
-			"postgres://wlt_local:wlt_local_password@localhost:56433/wlt_local?sslmode=disable",
-			"postgres://wlt_local:wlt_local_password@localhost:55433/wlt_local?sslmode=disable",
+			"postgres://wlt_local:wlt_local_password@localhost:15433/wlt_local?sslmode=disable",
 		}
 		for _, u := range urls {
 			d, errOpen := sql.Open("pgx", u)
@@ -54,7 +53,7 @@ func TestWltPostgresE2EJourney(t *testing.T) {
 	}
 
 	if db == nil {
-		t.Skip("Postgres is not running or not accessible on port 56433/55433; skipping postgres e2e test")
+		t.Skip("Postgres is not running or not accessible on port 15433; skipping postgres e2e test")
 		return
 	}
 	defer db.Close()

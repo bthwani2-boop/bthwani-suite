@@ -20,7 +20,7 @@ func TestCreateFieldVisitPostgresRuntimeEvidence(t *testing.T) {
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+		dbURL = "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 	}
 
 	db, err := sql.Open("pgx", dbURL)

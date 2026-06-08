@@ -19,7 +19,7 @@ import (
 func TestApplyMigrations(t *testing.T) {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://wlt_local:wlt_local_password@localhost:55433/wlt_local?sslmode=disable"
+		dbURL = "postgres://wlt_local:wlt_local_password@localhost:15433/wlt_local?sslmode=disable"
 	}
 
 	db, err := sql.Open("pgx", dbURL)

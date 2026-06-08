@@ -137,7 +137,7 @@ services:
       POSTGRES_USER: `${WLT_POSTGRES_USER:-wlt_local}
       POSTGRES_PASSWORD: `${WLT_POSTGRES_PASSWORD:-wlt_local_password}
     ports:
-      - "`${WLT_POSTGRES_PORT:-55433}:5432"
+      - "`${WLT_POSTGRES_PORT:-15433}:5432"
     volumes:
       - wlt-postgres-data:/var/lib/postgresql/data
     healthcheck:

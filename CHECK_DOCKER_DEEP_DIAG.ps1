@@ -1,4 +1,4 @@
-Set-Location -LiteralPath "C:\bthwani-suite"
+﻿Set-Location -LiteralPath "C:\bthwani-suite"
 
 $ErrorActionPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
@@ -383,7 +383,7 @@ Invoke-NativeCapture -Name "DSH postgres SQL index inventory" -FileName "dsh-pos
 
 # 10) Port and endpoint probes
 Invoke-PSCapture -Name "local listening ports target set" -FileName "local-listening-ports-target-set.txt" -Command {
-  $ports = @(3000,5432,55432,8080,8081,8082,8083,8084)
+  $ports = @(3000,5432,15432,8080,8081,8082,8083,8084)
   Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
     Where-Object { $ports -contains $_.LocalPort } |
     Sort-Object LocalPort, OwningProcess |
@@ -391,10 +391,10 @@ Invoke-PSCapture -Name "local listening ports target set" -FileName "local-liste
       @{Name='ProcessName';Expression={ try { (Get-Process -Id $_.OwningProcess -ErrorAction Stop).ProcessName } catch { "" } }}
 } -AllowFail | Out-Null
 
-Invoke-NativeCapture -Name "netstat target ports" -FileName "netstat-target-ports.txt" -Exe "cmd.exe" -Args @("/c",'netstat -ano | findstr /R ":3000 :5432 :55432 :8080 :8081 :8082 :8083 :8084"') -AllowFail | Out-Null
+Invoke-NativeCapture -Name "netstat target ports" -FileName "netstat-target-ports.txt" -Exe "cmd.exe" -Args @("/c",'netstat -ano | findstr /R ":3000 :5432 :15432 :8080 :8081 :8082 :8083 :8084"') -AllowFail | Out-Null
 
 Invoke-PSCapture -Name "Test-NetConnection target ports" -FileName "test-netconnection-target-ports.txt" -Command {
-  $ports = @(3000,5432,55432,8080,8081,8082,8083,8084)
+  $ports = @(3000,5432,15432,8080,8081,8082,8083,8084)
   foreach ($p in $ports) {
     Test-NetConnection -ComputerName 127.0.0.1 -Port $p -InformationLevel Detailed |
       Select-Object ComputerName, RemoteAddress, RemotePort, TcpTestSucceeded
@@ -490,7 +490,7 @@ $evidence = [pscustomobject]@{
   key_targets = [pscustomobject]@{
     dsh_compose = $dshCompose
     expected_postgres_container = $expectedPgContainer
-    expected_postgres_port = 55432
+    expected_postgres_port = 15432
     expected_api_port = 8080
     expected_control_panel_port = 3000
     expected_mobile_ports = @(8081,8082,8083,8084)
@@ -524,7 +524,7 @@ Docker mutation performed: false
 - DSH canonical compose file: `dsh\backend\docker-compose.local.yml`.
 - Expected DSH PostgreSQL container: `$expectedPgContainer`.
 - PostgreSQL readiness, identity, table inventory, index inventory.
-- Local ports: 3000, 5432, 55432, 8080, 8081, 8082, 8083, 8084.
+- Local ports: 3000, 5432, 15432, 8080, 8081, 8082, 8083, 8084.
 - HTTP probes for API/control-panel/Metro ports when reachable.
 - Docker events from last 6 hours.
 

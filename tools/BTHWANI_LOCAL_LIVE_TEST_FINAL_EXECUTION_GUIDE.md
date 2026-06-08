@@ -1,4 +1,4 @@
-# BThwani Local Live Testing — Final Execution Guide
+﻿# BThwani Local Live Testing — Final Execution Guide
 
 **Version:** 2026-06-07.1
 **Target repo:** `C:\bthwani-suite`
@@ -97,19 +97,19 @@ BTHWANI_LOCAL_LIVE_TEST=1
 # DSH Go API
 DSH_API_PORT=8080
 DSH_API_BASE_URL=http://localhost:8080
-DATABASE_URL=postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable
+DATABASE_URL=postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable
 
 # Docker / DSH Postgres
 POSTGRES_DB=dsh_local
 POSTGRES_USER=dsh_local
 POSTGRES_PASSWORD=dsh_local_password
-POSTGRES_PORT=55432
+POSTGRES_PORT=15432
 
 # Docker / WLT Postgres
 WLT_POSTGRES_DB=wlt_local
 WLT_POSTGRES_USER=wlt_local
 WLT_POSTGRES_PASSWORD=wlt_local_password
-WLT_POSTGRES_PORT=55433
+WLT_POSTGRES_PORT=15433
 
 # Optional Mongo local addon
 MONGO_PORT=27017
@@ -570,7 +570,7 @@ Import-RootEnv -Path $EnvFile
 
 $DshPort = [int](Get-LocalEnv "DSH_API_PORT" "8080")
 $DshBaseUrl = Get-LocalEnv "DSH_API_BASE_URL" "http://localhost:8080"
-$DatabaseUrl = Get-LocalEnv "DATABASE_URL" "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+$DatabaseUrl = Get-LocalEnv "DATABASE_URL" "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 
 $AppClientPort = [int](Get-LocalEnv "APP_CLIENT_PORT" "8081")
 $AppPartnerPort = [int](Get-LocalEnv "APP_PARTNER_PORT" "8082")
@@ -598,7 +598,7 @@ Write-RunLog "Evidence root: $RunRoot"
 Write-RunLog "Stack: $Stack"
 Write-RunLog "Addons: $Addons"
 
-$forbiddenAutoKillPorts = @(55432, 55433, 27017, 6379)
+$forbiddenAutoKillPorts = @(15432, 15433, 27017, 6379)
 $devKillPorts = @($DshPort, $AppClientPort, $AppPartnerPort, $AppCaptainPort, $AppFieldPort, $ControlPanelPort)
 
 if ($devKillPorts | Where-Object { $forbiddenAutoKillPorts -contains $_ }) {

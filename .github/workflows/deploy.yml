@@ -1,0 +1,42 @@
+# BTHWANI_DEPLOY_POLICY: manual workflow_dispatch only.
+# No automatic deploy on push.
+# Requires: DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, DOCKERHUB_NAMESPACE, VPS_HOST, VPS_SSH_KEY secrets.
+# Local Docker runtime: see docs/local-runtime/DOCKER_LOCAL_RUNTIME.md
+# Deploy is NOT wired. This stub enforces policy — add deploy steps only after:
+#   1. VPS/server provisioned and SSH secrets added.
+#   2. Docker Hub credentials configured.
+#   3. Explicit human approval.
+
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Policy gate — no automatic deploy
+        run: |
+          echo "Deploy is manual-only and gated."
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo ""
+          echo "BLOCKED: VPS SSH secrets and Docker Hub credentials are not configured."
+          echo "Add secrets before enabling real deploy steps."
+          exit 1
