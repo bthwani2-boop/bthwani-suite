@@ -56,6 +56,7 @@ type DshClientRouteRendererProps = {
   setSelectedPaymentMethod: (method: string) => void;
   paymentErrorMessage: string | undefined;
   checkoutState: any;
+  setCheckoutState: (state: 'ready' | 'loading' | 'payment-failed') => void;
   createOrderValues: CreateOrderValues;
   setCreateOrderValues: React.Dispatch<React.SetStateAction<CreateOrderValues>>;
   handleConfirmCheckout: () => void;
@@ -143,6 +144,7 @@ export function DshClientRouteRenderer({
   setSelectedPaymentMethod,
   paymentErrorMessage,
   checkoutState,
+  setCheckoutState,
   createOrderValues,
   setCreateOrderValues,
   handleConfirmCheckout,

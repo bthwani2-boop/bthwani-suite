@@ -378,6 +378,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           setSelectedPaymentMethod={setSelectedPaymentMethod}
           paymentErrorMessage={paymentErrorMessage}
           checkoutState={checkoutState}
+          setCheckoutState={setCheckoutState}
           createOrderValues={createOrderValues}
           setCreateOrderValues={setCreateOrderValues}
           handleConfirmCheckout={handleConfirmCheckout}
