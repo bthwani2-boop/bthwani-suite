@@ -62,30 +62,50 @@ switch ($Command) {
         docker compose -f $ComposeFile up -d $Service
     }
     "smoke" {
+        $Failures = @()
+
         Write-Host "--- Smoke: DSH API /stores ---"
         try {
             $r = Invoke-WebRequest "http://127.0.0.1:8080/stores" -UseBasicParsing -TimeoutSec 10
             Write-Host "DSH /stores: $($r.StatusCode) OK"
-        } catch { Write-Warning "DSH /stores FAILED: $_" }
+        } catch {
+            Write-Host "DSH /stores FAILED: $_"
+            $Failures += "DSH /stores"
+        }
 
         Write-Host "--- Smoke: Auth /health ---"
         try {
             $r = Invoke-WebRequest "http://127.0.0.1:18082/health" -UseBasicParsing -TimeoutSec 10
             Write-Host "Auth /health: $($r.StatusCode) OK"
-        } catch { Write-Warning "Auth /health FAILED: $_" }
+        } catch {
+            Write-Host "Auth /health FAILED: $_"
+            $Failures += "Auth /health"
+        }
 
         Write-Host "--- Smoke: WLT /health ---"
         try {
             $r = Invoke-WebRequest "http://127.0.0.1:18083/health" -UseBasicParsing -TimeoutSec 10
             Write-Host "WLT /health: $($r.StatusCode) OK"
-        } catch { Write-Warning "WLT /health FAILED: $_" }
+        } catch {
+            Write-Host "WLT /health FAILED: $_"
+            $Failures += "WLT /health"
+        }
 
         Write-Host "--- Port reachability ---"
         foreach ($port in @(15432, 15433, 8080, 18082, 18083)) {
             $conn = Test-NetConnection 127.0.0.1 -Port $port -WarningAction SilentlyContinue
-            $status = if ($conn.TcpTestSucceeded) { "OPEN" } else { "CLOSED" }
+            $status = if ($conn.TcpTestSucceeded) { "OPEN" } else { "CLOSED"; $Failures += ":$port unreachable" }
             Write-Host "  :$port -> $status"
         }
+
+        if ($Failures.Count -gt 0) {
+            Write-Host ""
+            Write-Host "SMOKE: FAIL — $($Failures.Count) check(s) failed: $($Failures -join ', ')"
+            exit 1
+        }
+        Write-Host ""
+        Write-Host "SMOKE: PASS"
+        exit 0
     }
     default {
         # Pass all args through to docker compose

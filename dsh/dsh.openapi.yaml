@@ -375,6 +375,43 @@ paths:
 
   # ─── J-002 / DSH-SLICE-002C: Product Media ──────────────────────────────────
   /media:
+    get:
+      tags:
+        - Product Media
+      summary: List media assets
+      description: Filter by owner_type, owner_id, purpose, status. Max 100 per page.
+      operationId: listMediaAssets
+      parameters:
+        - name: owner_type
+          in: query
+          schema:
+            type: string
+        - name: owner_id
+          in: query
+          schema:
+            type: string
+        - name: purpose
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of media assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaAsset'
+                  total:
+                    type: integer
     post:
       tags:
         - Product Media
@@ -547,45 +584,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  /media:
-    get:
-      tags:
-        - Product Media
-      summary: List media assets
-      description: Filter by owner_type, owner_id, purpose, status. Max 100 per page.
-      operationId: listMediaAssets
-      parameters:
-        - name: owner_type
-          in: query
-          schema:
-            type: string
-        - name: owner_id
-          in: query
-          schema:
-            type: string
-        - name: purpose
-          in: query
-          schema:
-            type: string
-        - name: status
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: List of media assets
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/MediaAsset'
-                  total:
-                    type: integer
 
   # ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
   /stores/{store_id}/catalog-overrides:
@@ -1377,7 +1375,7 @@ paths:
         Client auth required — cart must be associated with authenticated client identity.
         WLT boundary: no financial data. Serviceability is operational only.
 
-        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
         Production: BearerAuth token verified against auth service GET /auth/session.
         DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
         x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
@@ -1439,7 +1437,7 @@ paths:
         WLT boundary: no financial mutation at this step. Creates operational session only.
         DSH stores the intent; WLT receives session_token to associate the payment.
 
-        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
         Production: BearerAuth token verified against auth service GET /auth/session.
         DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
         x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
@@ -2448,7 +2446,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Optional bearer token for personalized store discovery (e.g. retrieving user's favorite stores).
+      description: |
+        Production token. Issued at /auth/login. Introspected via GET /auth/session.
+        Required when DSH_AUTH_MODE=production.
+    DevClientId:
+      type: apiKey
+      in: header
+      name: X-Client-Id
+      description: DEV_ONLY — accepted only when DSH_AUTH_MODE=dev (default). Value is the actor subject (e.g. client-dev-001). NEVER accepted in production mode.
   schemas:
     DiscoveryStoresResponse:
       type: object

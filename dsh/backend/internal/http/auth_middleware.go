@@ -35,7 +35,7 @@ func authServiceURL() string {
 	if authMode() == "production" {
 		return ""
 	}
-	return "http://localhost:8092"
+	return "http://localhost:18082"
 }
 
 // authSessionResponse mirrors auth.openapi.yaml GET /auth/session response.
@@ -48,7 +48,7 @@ type authSessionResponse struct {
 
 // verifyBearerToken calls auth service GET /auth/session with the provided token.
 // Returns the subject (clientId) on success, or empty string on any auth failure.
-// Contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+// Contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
 func verifyBearerToken(ctx context.Context, token string) string {
 	base := authServiceURL()
 	if base == "" {

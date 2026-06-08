@@ -169,3 +169,21 @@ func TestWltAuthRbacMatrix(t *testing.T) {
 		}
 	})
 }
+
+func TestWltAuthServiceURL_DevFallbackIs18082(t *testing.T) {
+	t.Setenv("WLT_AUTH_MODE", "")
+	t.Setenv("WLT_AUTH_SERVICE_URL", "")
+	got := authServiceURL()
+	if got != "http://localhost:18082" {
+		t.Fatalf("expected http://localhost:18082, got %q", got)
+	}
+}
+
+func TestWltAuthServiceURL_ProductionWithNoURLReturnsEmpty(t *testing.T) {
+	t.Setenv("WLT_AUTH_MODE", "production")
+	t.Setenv("WLT_AUTH_SERVICE_URL", "")
+	got := authServiceURL()
+	if got != "" {
+		t.Fatalf("expected empty URL in production mode with no env, got %q", got)
+	}
+}

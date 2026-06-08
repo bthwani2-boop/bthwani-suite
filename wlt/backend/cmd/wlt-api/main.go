@@ -19,7 +19,7 @@ import (
 //   PORT                  HTTP listen port (default 8083)
 //   DATABASE_URL          Postgres DSN; omit to use in-memory store
 //   WLT_AUTH_MODE         "production" to require Bearer tokens (default: dev)
-//   WLT_AUTH_SERVICE_URL  Auth service base URL (default http://localhost:8082)
+//   WLT_AUTH_SERVICE_URL  Auth service base URL (default http://localhost:18082)
 //   WLT_CALLBACK_SECRET   Shared secret for DSH callbacks (default "dev-secret")
 //   WLT_DSH_BASE_URL      DSH base URL for outbound callbacks (default http://localhost:8080)
 func main() {
