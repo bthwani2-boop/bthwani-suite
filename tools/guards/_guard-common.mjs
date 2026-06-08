@@ -268,6 +268,37 @@ CHECK-only. Warning-first. No files were modified by this guard.
     issueFileName: result.issueFileName,
   });
 
+  // Write json-out and md-out if supplied in CLI args to satisfy runner script
+  const argv = process.argv;
+  let jsonOut = '';
+  let mdOut = '';
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--json-out') jsonOut = argv[i+1];
+    else if (argv[i].startsWith('--json-out=')) jsonOut = argv[i].slice('--json-out='.length);
+    else if (argv[i] === '--md-out') mdOut = argv[i+1];
+    else if (argv[i].startsWith('--md-out=')) mdOut = argv[i].slice('--md-out='.length);
+  }
+
+  if (jsonOut) {
+    const status = errors.length > 0 ? 'FAIL' : (warnings.length > 0 ? 'WARN' : 'PASS');
+    const jsonOutput = {
+      guardId,
+      status,
+      failCount: errors.length,
+      warnCount: warnings.length,
+      infoCount: 0,
+      generatedAt: new Date().toISOString(),
+      decision
+    };
+    fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
+    fs.writeFileSync(jsonOut, JSON.stringify(jsonOutput, null, 2), 'utf8');
+  }
+
+  if (mdOut) {
+    fs.mkdirSync(path.dirname(mdOut), { recursive: true });
+    fs.writeFileSync(mdOut, summary, 'utf8');
+  }
+
   console.log('');
   console.log(`${guardId} ${guardName} complete.`);
   console.log(`Decision: ${decision}`);

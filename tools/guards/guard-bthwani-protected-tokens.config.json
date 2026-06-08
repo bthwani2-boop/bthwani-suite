@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "roots": [
+    "app-client",
+    "app-partner",
+    "app-captain",
+    "app-field",
+    "control-panel",
+    "webapp",
+    "website",
+    "ui-kit",
+    "dsh",
+    "wlt",
+    "governance",
+    ".github"
+  ],
+  "extensions": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".json",
+    ".md",
+    ".mdc",
+    ".yaml",
+    ".yml",
+    ".css",
+    ".scss",
+    ".ps1"
+  ]
+}

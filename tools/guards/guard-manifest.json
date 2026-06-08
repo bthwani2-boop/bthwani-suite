@@ -1000,6 +1000,53 @@
         ".yaml",
         ".md"
       ]
+    },
+    {
+      "id": "GUARD_BTHWANI_PROTECTED_TOKENS",
+      "file": "tools/guards/guard-bthwani-protected-tokens.mjs",
+      "config": "tools/guards/guard-bthwani-protected-tokens.config.json",
+      "ownerPolicy": [
+        "governance/16_SECURITY_AND_SECRETS.md"
+      ],
+      "purpose": "validate BThwani protected tokens against a permanent allowlist to prevent naming leaks",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": true,
+      "selectionTier": "core",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "app-client/**",
+        "app-partner/**",
+        "app-captain/**",
+        "app-field/**",
+        "control-panel/**",
+        "webapp/**",
+        "website/**",
+        "ui-kit/**",
+        "dsh/**",
+        "wlt/**",
+        "governance/**",
+        ".github/**"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".json",
+        ".md",
+        ".yaml",
+        ".yml",
+        ".css",
+        ".scss",
+        ".ps1"
+      ]
     }
   ]
 }
