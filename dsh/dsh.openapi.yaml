@@ -1376,13 +1376,10 @@ paths:
         WLT boundary: no financial data. Serviceability is operational only.
 
         Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
-        Production: BearerAuth token verified against auth service GET /auth/session.
-        DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
-        x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+        BearerAuth token verified against auth service GET /auth/session.
       operationId: getCartServiceability
       security:
         - BearerAuth: []
-      x-bthwani-auth-dev-note: DEV_ONLY — backend currently accepts X-Client-Id header; BearerAuth enforcement pending auth runtime
       parameters:
         - name: store_id
           in: query
@@ -1438,13 +1435,10 @@ paths:
         DSH stores the intent; WLT receives session_token to associate the payment.
 
         Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
-        Production: BearerAuth token verified against auth service GET /auth/session.
-        DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
-        x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+        BearerAuth token verified against auth service GET /auth/session.
       operationId: createCheckoutIntent
       security:
         - BearerAuth: []
-      x-bthwani-auth-dev-note: DEV_ONLY — backend currently accepts X-Client-Id header; BearerAuth enforcement pending auth runtime
       requestBody:
         required: true
         content:
@@ -1633,13 +1627,11 @@ paths:
       summary: Create a new order
       description: |
         Creates a new order in CREATED status.
-        Production: BearerAuth token supplies the client identity.
-        DEV_ONLY: X-Client-Id header supplies temporary client identity until auth runtime is live.
+        BearerAuth token supplies the client identity.
         The request body's client_id is optional compatibility input and is never the trusted identity source.
         WLT boundary: local order creation is enabled to unblock testing order states and cancellations, but does NOT perform any external financial callback/WLT balance deduction.
       security:
         - BearerAuth: []
-      x-bthwani-auth-dev-note: DEV_ONLY — backend accepts X-Client-Id header; BearerAuth runtime proof remains required before production closure
       operationId: createOrder
       requestBody:
         required: true
@@ -1681,7 +1673,6 @@ paths:
       description: Returns the order record, items, status history events, and support tickets.
       security:
         - BearerAuth: []
-      x-bthwani-auth-dev-note: DEV_ONLY — backend accepts X-Client-Id header; actor scoping remains blocked on production auth roles
       operationId: getOrder
       parameters:
         - name: id
@@ -2408,6 +2399,8 @@ paths:
       summary: Create a support escalation ticket
       description: Creates a support escalation ticket for a specific order.
       operationId: createSupportEscalation
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
