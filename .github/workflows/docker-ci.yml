@@ -97,6 +97,20 @@ jobs:
           fi
           echo "OK: Mongo profile=mongo, Redis profile=redis."
 
+      - name: Port policy — Auth service must not use port 8082 (reserved for app-partner/Expo)
+        run: |
+          echo "Scanning Auth Dockerfile and Compose for forbidden port 8082..."
+          FOUND=$(grep -En 'EXPOSE 8082|AUTH_PORT.*8082|auth-service.*:8082' \
+            dsh/backend/Dockerfile.auth-service \
+            dsh/backend/docker-compose.local.yml \
+            wlt/backend/docker-compose.local.yml 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "POLICY VIOLATION: Auth service must not use port 8082 (reserved for app-partner/Expo):"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "OK: Auth service not using port 8082."
+
       - name: Dockerfile hardening — non-root user present
         run: |
           echo "Checking non-root user in runtime stages..."

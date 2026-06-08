@@ -44,7 +44,7 @@ services:
       PORT: "8083"
       DATABASE_URL: "postgres://${WLT_POSTGRES_USER:-wlt_local}:${WLT_POSTGRES_PASSWORD:-wlt_local_password}@wlt-postgres:5432/${WLT_POSTGRES_DB:-wlt_local}?sslmode=disable"
       WLT_AUTH_MODE: "${WLT_AUTH_MODE:-dev}"
-      WLT_AUTH_SERVICE_URL: "http://auth-service:8082"
+      WLT_AUTH_SERVICE_URL: "http://auth-service:18082"
       WLT_CALLBACK_SECRET: "${WLT_CALLBACK_SECRET:-dev-secret}"
       WLT_DSH_BASE_URL: "${WLT_DSH_BASE_URL:-http://dsh-api:8080}"
     ports:

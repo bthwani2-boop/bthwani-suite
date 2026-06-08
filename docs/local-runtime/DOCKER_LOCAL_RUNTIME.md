@@ -20,7 +20,7 @@ No service is defined in more than one Compose file. Resource name conflicts sur
 | DSH Postgres | `15432` | `5432` | DSH-owned DB |
 | WLT Postgres | `15433` | `5432` | WLT-owned DB — never share schemas with DSH |
 | DSH API | `8080` | `8080` | Reserved for DSH only — not Expo/Metro |
-| Auth Service | `18082` | `8082` | Avoids Expo app-partner port 8082 |
+| Auth Service | `18082` | `18082` | 8082 reserved for app-partner/Expo — Auth Docker uses 18082 host+container |
 | WLT API | `18083` | `8083` | Avoids Expo app-captain port 8083 |
 | MongoDB | `27017` | `27017` | Optional — profile: `mongo` |
 | Redis | `6379` | `6379` | Optional — profile: `redis` |

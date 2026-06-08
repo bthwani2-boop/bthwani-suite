@@ -71,7 +71,7 @@ info:
     | POST /settlements | ✗ | ✗ | ✗ | ✗ | ✓ |
 
 x-bthwani-contract-state: AUTH_CONTRACT_ROLE_MATRIX_V3
-x-bthwani-auth-service-port: 8082
+x-bthwani-auth-service-port: 18082
 x-bthwani-dev-tokens:
   - token: dev-client-token-001
     subject: client-dev-001

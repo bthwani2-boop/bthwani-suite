@@ -26,7 +26,8 @@ services:
     # extract to auth-owned compose only in a dedicated Auth extraction phase.
     # BTHWANI_AUTH_SERVICE: Real DB-backed auth (login/session/refresh/revoke/permissions).
     # Contract: dsh/backend/cmd/auth-service/main.go — auth.openapi.yaml routes.
-    # Port 8082 internal — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.
+    # Port 18082 internal — set DSH_AUTH_SERVICE_URL=http://auth-service:18082 in dsh-api env.
+    # Port 8082 is reserved for app-partner/Expo — NOT used by Auth Docker runtime.
     # DEV_ONLY: password_hash seed in 027_auth_sessions.sql accepts username==password fallback.
     build:
       context: ..
@@ -34,15 +35,15 @@ services:
     container_name: bthwani-auth-service-local
     restart: unless-stopped
     environment:
-      AUTH_PORT: "8082"
+      AUTH_PORT: "18082"
       DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
     ports:
-      - "${DSH_AUTH_SERVICE_HOST_PORT:-18082}:8082"
+      - "${DSH_AUTH_SERVICE_HOST_PORT:-18082}:18082"
     depends_on:
       dsh-postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:18082/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 6
@@ -63,7 +64,7 @@ services:
     environment:
       PORT: "8080"
       DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
-      DSH_AUTH_SERVICE_URL: "http://auth-service:8082"
+      DSH_AUTH_SERVICE_URL: "http://auth-service:18082"
     ports:
       - "${DSH_API_HOST_PORT:-8080}:8080"
     depends_on:
