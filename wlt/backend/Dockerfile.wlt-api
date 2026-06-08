@@ -12,8 +12,14 @@ COPY backend/ ./
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /out/wlt-api ./cmd/wlt-api/
 
 FROM alpine:3.20
-RUN apk add --no-cache wget ca-certificates
+LABEL org.opencontainers.image.title="bthwani-wlt-api" \
+      org.opencontainers.image.description="BThwani WLT wallet/finance backend" \
+      org.opencontainers.image.source="https://github.com/bthwani2-boop/bthwani-suite"
+RUN apk add --no-cache wget ca-certificates \
+ && addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 COPY --from=builder /out/wlt-api ./wlt-api
+RUN chown appuser:appgroup ./wlt-api
+USER appuser
 EXPOSE 8083
 ENTRYPOINT ["./wlt-api"]
