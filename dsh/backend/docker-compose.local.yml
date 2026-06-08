@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: dsh_local
       POSTGRES_PASSWORD: dsh_local_password
     ports:
-      - "${POSTGRES_PORT:-55432}:5432"
+      - "${POSTGRES_PORT:-15432}:5432"
     volumes:
       - dsh-postgres-data:/var/lib/postgresql/data
       - ./docker/initdb/001_apply_dsh_sql.sh:/docker-entrypoint-initdb.d/001_apply_dsh_sql.sh:ro
@@ -18,11 +18,13 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - bthwani-local
 
   auth-service:
     # BTHWANI_AUTH_SERVICE: Real DB-backed auth (login/session/refresh/revoke/permissions).
     # Contract: dsh/backend/cmd/auth-service/main.go — auth.openapi.yaml routes.
-    # Port 8082 — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.
+    # Port 8082 internal — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.
     # DEV_ONLY: password_hash seed in 027_auth_sessions.sql accepts username==password fallback.
     build:
       context: ..
@@ -33,7 +35,7 @@ services:
       AUTH_PORT: "8082"
       DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
     ports:
-      - "${DSH_AUTH_SERVICE_HOST_PORT:-8092}:8082"
+      - "${DSH_AUTH_SERVICE_HOST_PORT:-18082}:8082"
     depends_on:
       dsh-postgres:
         condition: service_healthy
@@ -42,57 +44,42 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+    networks:
+      - bthwani-local
 
-  wlt-postgres:
-    # WLT owns all wallet/payment/refund/settlement state.
-    # Separate DB from DSH — never share schemas between services.
-    image: postgres:16-alpine
-    container_name: bthwani-wlt-postgres-local
-    environment:
-      POSTGRES_DB: ${WLT_POSTGRES_DB:-wlt_local}
-      POSTGRES_USER: ${WLT_POSTGRES_USER:-wlt_local}
-      POSTGRES_PASSWORD: ${WLT_POSTGRES_PASSWORD:-wlt_local_password}
-    ports:
-      - "${WLT_POSTGRES_PORT:-55433}:5432"
-    volumes:
-      - wlt-postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${WLT_POSTGRES_USER:-wlt_local} -d ${WLT_POSTGRES_DB:-wlt_local}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-  wlt-api:
-    # WLT API service — port 8083. Owns wallet/payment/refund/settlement/ledger.
-    # DSH calls WLT for payment sessions; WLT calls DSH back via payment-callback.
-    # Context: ../../wlt (relative to dsh/backend/ compose location).
+  dsh-api:
+    # BTHWANI_DSH_API: Operations/dispatch backend. Stores, orders, products, checkout.
+    # Port 8080 internal — host port default 8080. Reserved exclusively for DSH (not Expo).
+    # media-fixtures endpoint (/media-fixtures/) is NOT served inside Docker (dev-only path).
+    # To run DSH from host instead: comment out this service and set
+    #   WLT_DSH_BASE_URL=http://host.docker.internal:8080 in wlt/backend/docker-compose.local.yml
     build:
-      context: ../../wlt
-      dockerfile: backend/Dockerfile.wlt-api
-    container_name: bthwani-wlt-api-local
+      context: ..
+      dockerfile: backend/Dockerfile.dsh-api
+    container_name: bthwani-dsh-api-local
     restart: unless-stopped
     environment:
-      PORT: "8083"
-      DATABASE_URL: "postgres://${WLT_POSTGRES_USER:-wlt_local}:${WLT_POSTGRES_PASSWORD:-wlt_local_password}@wlt-postgres:5432/${WLT_POSTGRES_DB:-wlt_local}?sslmode=disable"
-      WLT_AUTH_MODE: "${WLT_AUTH_MODE:-dev}"
-      WLT_AUTH_SERVICE_URL: "http://auth-service:8082"
-      WLT_CALLBACK_SECRET: "${WLT_CALLBACK_SECRET:-dev-secret}"
-      # DSH API runs on host during local dev. host.docker.internal resolves to host on Docker Desktop (Win/Mac).
-      # When DSH API is also containerised, change to http://dsh-api:8080.
-      WLT_DSH_BASE_URL: "${WLT_DSH_BASE_URL:-http://host.docker.internal:8080}"
+      PORT: "8080"
+      DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
+      DSH_AUTH_SERVICE_URL: "http://auth-service:8082"
     ports:
-      - "${WLT_HOST_PORT:-8083}:8083"
+      - "${DSH_API_HOST_PORT:-8080}:8080"
     depends_on:
-      wlt-postgres:
+      dsh-postgres:
         condition: service_healthy
       auth-service:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8083/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/stores || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 6
+    networks:
+      - bthwani-local
 
 volumes:
   dsh-postgres-data:
-  wlt-postgres-data:
+
+networks:
+  bthwani-local:
+    name: bthwani-local

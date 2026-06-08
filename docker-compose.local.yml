@@ -11,3 +11,5 @@ name: bthwani-suite-local
 include:
   - ./dsh/backend/docker-compose.local.yml
   - ./wlt/backend/docker-compose.local.yml
+  - ./infra/local/mongo/docker-compose.local.yml
+  - ./infra/local/redis/docker-compose.local.yml

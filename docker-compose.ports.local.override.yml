@@ -1,8 +1,0 @@
-services:
-  dsh-postgres:
-    ports:
-      - "56432:5432"
-
-  wlt-postgres:
-    ports:
-      - "56433:5432"
