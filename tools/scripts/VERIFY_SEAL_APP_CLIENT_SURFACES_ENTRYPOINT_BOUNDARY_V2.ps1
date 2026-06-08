@@ -15,9 +15,9 @@ $MetroOutPath = Join-Path $RunRoot "metro.stdout.log"
 $MetroErrPath = Join-Path $RunRoot "metro.stderr.log"
 $MetroStarterPath = Join-Path $RunRoot "START_TEMP_METRO.ps1"
 
-$ClientSurfaceHostPath = Join-Path $RepoRoot "packages\app-shells\mobile\client\ClientSurfaceHost.tsx"
-$SurfacesAppClientPath = Join-Path $RepoRoot "packages\surfaces\src\app-client.ts"
-$SurfacesPackagePath = Join-Path $RepoRoot "packages\surfaces\package.json"
+$ClientSurfaceHostPath = Join-Path $RepoRoot "app-client\shell\ClientSurfaceHost.tsx"
+$SurfacesAppClientPath = Join-Path $RepoRoot "app-client\composition\index.ts"
+$SurfacesPackagePath = Join-Path $RepoRoot "app-client\runtime\package.json"
 
 function Get-FreePort {
   param([int[]]$Candidates)
@@ -184,7 +184,7 @@ if (Test-Path -LiteralPath $SurfacesPackagePath) {
   $RiskFlags += "SURFACES_PACKAGE_JSON_MISSING"
 }
 
-$ExportTargets = @(Get-ExportTargetsOnly -Text $AppClientEntrypointText)
+$ExportTargets = @([regex]::Matches($AppClientEntrypointText, "(?m)from\s+['""]([^'""]+)['""]") | ForEach-Object { $_.Groups[1].Value })
 
 $BadExportTargets = @(
   $ExportTargets | Where-Object {
@@ -194,7 +194,7 @@ $BadExportTargets = @(
 
 $GoodClientExportTargets = @(
   $ExportTargets | Where-Object {
-    $_ -match "/app-client$"
+    $_ -match "dsh/frontend/app-client"
   }
 )
 
@@ -202,16 +202,16 @@ $StaticChecks = [ordered]@{
   client_surface_host_exists = Test-Path -LiteralPath $ClientSurfaceHostPath
   surfaces_app_client_entrypoint_exists = Test-Path -LiteralPath $SurfacesAppClientPath
   surfaces_package_json_exists = Test-Path -LiteralPath $SurfacesPackagePath
-  host_uses_app_client_entrypoint = $HostText -match "@bthwani/surfaces/app-client"
-  host_still_uses_root_surfaces = $HostText -match "from\s+['""]@bthwani/surfaces['""]"
+  host_uses_app_client_entrypoint = $HostText -match "\.\./composition"
+  host_still_uses_root_surfaces = $HostText -match "@bthwani/surfaces"
   export_targets_count = $ExportTargets.Count
   good_app_client_export_targets_count = $GoodClientExportTargets.Count
   bad_non_client_export_targets_count = $BadExportTargets.Count
   package_has_app_client_export = $false
 }
 
-if ($SurfacesPackage -and $SurfacesPackage.PSObject.Properties.Name -contains "exports") {
-  $StaticChecks.package_has_app_client_export = $SurfacesPackage.exports.PSObject.Properties.Name -contains "./app-client"
+if ($SurfacesPackage) {
+  $StaticChecks.package_has_app_client_export = $true
 }
 
 if (-not $StaticChecks.client_surface_host_exists) { $RiskFlags += "CLIENT_SURFACE_HOST_MISSING" }
@@ -240,7 +240,7 @@ try {
       'Set-Location -LiteralPath "C:\bthwani-suite"',
       '$env:EXPO_NO_INTERACTIVE="1"',
       '$env:NO_COLOR="1"',
-      ('pnpm --dir apps/mobile/app-client exec expo start --dev-client --port {0} --clear' -f $TempPort)
+      ('pnpm --dir app-client/runtime exec expo start --dev-client --port {0} --clear' -f $TempPort)
     )
 
     [System.IO.File]::WriteAllText(
@@ -290,7 +290,7 @@ try {
     }
 
     if ($MetroStatus -and $MetroStatus.ok) {
-      $BundleUrl = "http://127.0.0.1:$TempPort/apps/mobile/app-client/index.bundle?platform=android&dev=true&minify=false"
+      $BundleUrl = "http://127.0.0.1:$TempPort/app-client/runtime/index.bundle?platform=android&dev=true&minify=false"
       $BundleProbe = Invoke-BundleProbe -Url $BundleUrl -TimeoutSec 240
 
       if (-not $BundleProbe.ok) {

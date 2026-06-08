@@ -22,8 +22,7 @@ import {
   useUiLanguage,
   type BThwaniAppearanceMode,
 } from "@bthwani/ui-kit";
-import { WebCommandCenterFrame } from "@bthwani/ui-kit/web";
-import type { WebSearchItem } from "../../ui-kit/src/web/command-center";
+import { WebCommandCenterFrame, type WebSearchItem } from "@bthwani/ui-kit/web";
 import {
   type AnyOperationsWorkspaceId,
   type OperationsPanelId,
@@ -31,7 +30,10 @@ import {
 import type {
   CanonicalFinanceGroupId,
   FinancePanelId,
-} from "../../dsh/frontend/control-panel/finance/finance.types";
+} from "../../wlt/frontend/dsh/control-panel/models/financeRouting.types";
+import {
+  normalizeFinanceLocation,
+} from "../../wlt/frontend/dsh/control-panel/constants/finance.registry";
 import { controlPanelRuntimeData } from "./runtime.data";
 import { useControlPanelAppearance } from "./appearance";
 import type { ControlPanelUiGrammar } from "./ui-grammar-contract";
@@ -66,6 +68,7 @@ export type ControlPanelSurfaceHostProps = {
   operationsOverlayMode?: OperationsPanelId;
   financeWorkspace?: string;
   financePanel?: string;
+  financeSubGroup?: string;
 };
 
 const allServiceTabId = "all-services";
@@ -180,7 +183,9 @@ function resolveRailItems(
     hr: "◐",
   };
 
-  return primarySectionIds.map((sectionId) => {
+  const visibleSections = primarySectionIds;
+
+  return visibleSections.map((sectionId) => {
     const href = `/${sectionId}` as PrimarySectionHref;
     const description = isPhaseOneSection(sectionId)
       ? compactSectionDescriptions[sectionId]
@@ -203,6 +208,7 @@ export function ControlPanelSurfaceHost({
   operationsOverlayMode,
   financeWorkspace,
   financePanel,
+  financeSubGroup,
 }: ControlPanelSurfaceHostProps) {
   const router = useRouter();
   const { direction } = useDirection();
@@ -848,10 +854,16 @@ export function ControlPanelSurfaceHost({
             ) : null}
 
             {activeSectionId === "finance" ? (
-              <ControlPanelDshFinanceHubScreen
-                group={financeWorkspace as CanonicalFinanceGroupId}
-                panel={financePanel as FinancePanelId}
-              />
+              (() => {
+                const normalized = normalizeFinanceLocation(financeWorkspace, financePanel);
+                return (
+                  <ControlPanelDshFinanceHubScreen
+                    group={normalized.group}
+                    panel={normalized.panel}
+                    subGroup={financeSubGroup ?? normalized.subGroup}
+                  />
+                );
+              })()
             ) : null}
 
             {isOperationsSection ? (

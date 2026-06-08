@@ -19,6 +19,8 @@ import React, { useState } from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../../shared/dsh-product-api.transport';
+import type { DshCatalogConflict } from '../../../shared/dsh-product-api.client';
 
 export type CatalogAuditTrailWorkspaceProps = {
   productId?: string;
@@ -167,6 +169,44 @@ export function CatalogAuditTrailWorkspace({
   const selectedProduct = products.find((p) => p.id === selectedProductId) ?? (productId ? undefined : products[0]);
   const auditEvents = selectedProduct ? derivePreviewAuditEvents(selectedProduct) : [];
 
+  const client = React.useMemo(() => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()), []);
+  const [conflicts, setConflicts] = useState<readonly DshCatalogConflict[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+
+  const fetchConflicts = React.useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await client.listConflicts();
+      setConflicts(res.conflicts);
+    } catch (err) {
+      console.error('Failed to fetch conflicts:', err);
+      setError('فشل تحميل تعارضات الكتالوج من الخادم');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [client]);
+
+  React.useEffect(() => {
+    fetchConflicts();
+  }, [fetchConflicts]);
+
+  const handleResolve = React.useCallback(async (id: string, resolution: 'accept_local' | 'revert_to_central') => {
+    setResolvingId(id);
+    setError(null);
+    try {
+      await client.resolveConflict(id, { resolution });
+      await fetchConflicts();
+    } catch (err) {
+      console.error('Failed to resolve conflict:', err);
+      setError('فشل في معالجة قرار التعارض. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setResolvingId(null);
+    }
+  }, [client, fetchConflicts]);
+
   return (
     <Surface
       tone="raised"
@@ -264,6 +304,134 @@ export function CatalogAuditTrailWorkspace({
           </Box>
         </Surface>
       )}
+
+      {/* Catalog Conflicts (LIVE_API_BOUND) */}
+      <Box gap={3} style={{ borderTopWidth: 1, borderTopColor: theme.lineStrong, paddingTop: 16 }}>
+        <Box layoutDirection="row" justify="space-between" align="center">
+          <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+            ⚠️ تعارضات الكتالوج (قاعدة البيانات الحية)
+          </Text>
+          <Button
+            label="تحديث"
+            tone="secondary"
+            size="sm"
+            onPress={fetchConflicts}
+            disabled={isLoading}
+          />
+        </Box>
+
+        {error && (
+          <Surface tone="inset" padding={2} style={{ borderRadius: 6, borderColor: theme.danger, borderWidth: 1 }}>
+            <Text role="caption" style={{ color: theme.danger, fontSize: 12 }}>
+              {error}
+            </Text>
+          </Surface>
+        )}
+
+        {isLoading ? (
+          <Text role="caption" tone="muted" style={{ textAlign: 'center' }}>
+            جاري تحميل التعارضات الحية...
+          </Text>
+        ) : (
+          <Box gap={2}>
+            {(() => {
+              const activeConflicts = selectedProduct
+                ? conflicts.filter((c) => c.product_id === selectedProduct.id)
+                : conflicts;
+
+              if (activeConflicts.length === 0) {
+                return (
+                  <Surface tone="inset" padding={3} style={{ borderRadius: 8 }}>
+                    <Text role="caption" tone="muted" style={{ textAlign: 'center', fontSize: 12 }}>
+                      {selectedProduct
+                        ? `لا توجد تعارضات معلقة للمنتج: ${selectedProduct.name}`
+                        : 'لا توجد تعارضات معلقة في النظام حالياً.'}
+                    </Text>
+                  </Surface>
+                );
+              }
+
+              return activeConflicts.map((conflict) => (
+                <Box
+                  key={conflict.id}
+                  gap={2}
+                  style={{
+                    padding: 12,
+                    backgroundColor: conflict.status === 'pending' ? `${theme.warning as string}08` : theme.surfaceInset,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: conflict.status === 'pending' ? theme.warning : theme.line,
+                    borderStyle: 'solid',
+                  }}
+                >
+                  <Box layoutDirection="row" justify="space-between" align="center">
+                    <Text role="caption" style={{ fontWeight: '700', fontSize: 13 }}>
+                      {conflict.conflict_type === 'price_divergence' ? '⚖️ تعارض في السعر' : '⚠️ تعارض في التوفر'}
+                    </Text>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        padding: '2px 6px',
+                        borderRadius: 4,
+                        fontWeight: '800',
+                        backgroundColor:
+                          conflict.status === 'pending'
+                            ? `${theme.warning as string}20`
+                            : `${theme.success as string}20`,
+                        color: conflict.status === 'pending' ? theme.warning : theme.success,
+                      }}
+                    >
+                      {conflict.status === 'pending'
+                        ? 'معلق'
+                        : conflict.status === 'resolved_accept_local'
+                        ? 'تم قبول المحلي'
+                        : 'تم الإرجاع للمركزي'}
+                    </span>
+                  </Box>
+
+                  <Text role="caption" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>
+                    المنتج: {conflict.product_name} ({conflict.product_id})
+                  </Text>
+
+                  <Box layoutDirection="row" gap={4} style={{ backgroundColor: theme.surface, padding: 8, borderRadius: 6 }}>
+                    <Box style={{ flex: 1 }}>
+                      <Text role="caption" tone="muted" style={{ fontSize: 10 }}>القيمة المركزية</Text>
+                      <Text role="caption" style={{ fontWeight: '700', fontSize: 12, color: theme.brandHeaderBackground }}>
+                        {conflict.central_value}
+                      </Text>
+                    </Box>
+                    <Box style={{ flex: 1 }}>
+                      <Text role="caption" tone="muted" style={{ fontSize: 10 }}>القيمة المحلية المقترحة</Text>
+                      <Text role="caption" style={{ fontWeight: '700', fontSize: 12, color: theme.brandHeaderBackground }}>
+                        {conflict.override_value}
+                      </Text>
+                    </Box>
+                  </Box>
+
+                  {conflict.status === 'pending' && (
+                    <Box layoutDirection="row" gap={2} style={{ marginTop: 4 }}>
+                      <Button
+                        label="اعتماد التعديل المحلي"
+                        tone="primary"
+                        size="sm"
+                        disabled={resolvingId !== null}
+                        onPress={() => handleResolve(conflict.id, 'accept_local')}
+                      />
+                      <Button
+                        label="إرجاع للأصل المركزي"
+                        tone="danger"
+                        size="sm"
+                        disabled={resolvingId !== null}
+                        onPress={() => handleResolve(conflict.id, 'revert_to_central')}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              ));
+            })()}
+          </Box>
+        )}
+      </Box>
 
       {/* Audit timeline */}
       {auditEvents.length > 0 && (

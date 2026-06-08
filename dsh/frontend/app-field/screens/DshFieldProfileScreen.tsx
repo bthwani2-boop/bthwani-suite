@@ -1,23 +1,24 @@
 import React from 'react';
-import { Box, Icon, KeyValueList, MobileScrollView, Surface, TopBar } from '@bthwani/ui-kit';
+import { View } from 'react-native';
+import { Icon, KeyValueList, MobileScrollView, TopBar, useTheme, Box } from '@bthwani/ui-kit';
 
 type DshFieldProfileScreenProps = {
   onBack: () => void;
 };
 
 export function DshFieldProfileScreen({ onBack }: DshFieldProfileScreenProps) {
-  return (
-    <Box style={{ flex: 1 }} background="background">
-      <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 96 }}>
-        <TopBar
-          variant="secondary"
-          title="بيانات الميداني"
-          subtitle="بيانات عملية يحتاجها الحساب فقط"
-          style={{ marginHorizontal: -16, marginTop: -16 }}
-          trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
-        />
+  const { theme } = useTheme();
 
-        <Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.surface }}>
+      <TopBar
+        variant="surface"
+        title="بيانات الميداني"
+        subtitle="بيانات عملية يحتاجها الحساب فقط"
+        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
+      />
+      <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
+        <Box padding={4} gap={4}>
           <KeyValueList
             items={[
               { label: 'الاسم', value: 'ناصر القحطاني' },
@@ -27,9 +28,9 @@ export function DshFieldProfileScreen({ onBack }: DshFieldProfileScreenProps) {
               { label: 'الملفات النشطة', value: '4', tone: 'brand' },
             ]}
           />
-        </Surface>
+        </Box>
       </MobileScrollView>
-    </Box>
+    </View>
   );
 }
 

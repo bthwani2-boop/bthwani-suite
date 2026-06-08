@@ -14,11 +14,12 @@ import {
   HOME_MODE_FILTER_PREFIX,
 } from '../shared/home-search-helpers';
 import type { DiscoveryFilter, DshHomeCategory } from '../contracts/dsh-home-types';
+import { useFeatureFlag } from '../../shared';
 
 export function useHomeFilterRail({
   theme,
   styles,
-  categoryItems,
+  categoryItems: rawCategoryItems,
   activeFilter,
   setActiveFilter,
   activeCategoryId,
@@ -40,6 +41,13 @@ export function useHomeFilterRail({
   onOpenCategory?: (id: string) => void;
   onOpenSheinInfo?: () => void;
 }) {
+  const isAwnakEnabled = useFeatureFlag('DSH:capability:awnak');
+
+  const categoryItems = React.useMemo(() => {
+    if (isAwnakEnabled) return rawCategoryItems;
+    return rawCategoryItems.filter((cat) => cat.id !== 'awnak');
+  }, [rawCategoryItems, isAwnakEnabled]);
+
   const selectedCategoryFixture = React.useMemo(
     () =>
       activeCategoryId && activeCategoryId !== 'all'

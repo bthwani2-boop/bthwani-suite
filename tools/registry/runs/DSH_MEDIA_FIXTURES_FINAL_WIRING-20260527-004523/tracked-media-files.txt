@@ -1,3 +1,0 @@
-All 48 files listed in media-fixtures-tree.txt are actively tracked by Git.
-No untracked files are present inside dsh/frontend/media-fixtures.
-All files are PNG format.

@@ -1,0 +1,19 @@
+# BTHWANI_AUTH_SERVICE Dockerfile
+# Multi-stage build: compiles Go binary then runs on alpine.
+# Context: dsh/backend/ (docker-compose build context is the backend dir).
+
+FROM golang:1.24-alpine AS builder
+WORKDIR /src
+COPY domain/ ./domain/
+COPY backend/go.mod backend/go.sum ./backend/
+WORKDIR /src/backend
+RUN go mod download
+COPY backend/ ./
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /out/auth-service ./cmd/auth-service/
+
+FROM alpine:3.20
+RUN apk add --no-cache wget ca-certificates
+WORKDIR /app
+COPY --from=builder /out/auth-service ./auth-service
+EXPOSE 8082
+ENTRYPOINT ["./auth-service"]

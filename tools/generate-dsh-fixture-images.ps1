@@ -32,6 +32,7 @@ function New-SeedImage {
         $graphics.FillRectangle($gradient, $rect)
         $gradient.Dispose()
 
+        # Add a nice semi-transparent circle/ellipse overlays for a modern abstract shape!
         $overlay = New-Object System.Drawing.Drawing2D.LinearGradientBrush(
             $rect,
             [System.Drawing.Color]::FromArgb(36, 255, 255, 255),
@@ -44,88 +45,184 @@ function New-SeedImage {
 
         $whiteBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::White)
         $softWhiteBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(180, 255, 255, 255))
-        $darkBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(112, 0, 0, 0))
 
-        $titleFont = New-Object System.Drawing.Font('Segoe UI', [Math]::Max(26, [int]($Height * 0.12)), [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Pixel)
-        $subtitleFont = New-Object System.Drawing.Font('Segoe UI', [Math]::Max(14, [int]($Height * 0.05)), [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)
-        $labelFont = New-Object System.Drawing.Font('Segoe UI', [Math]::Max(12, [int]($Height * 0.035)), [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Pixel)
+        $titleFont = New-Object System.Drawing.Font('Segoe UI', [Math]::Max(16, [int]($Height * 0.11)), [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Pixel)
+        $subtitleFont = New-Object System.Drawing.Font('Segoe UI', [Math]::Max(10, [int]($Height * 0.045)), [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Pixel)
+        $labelFont = New-Object System.Drawing.Font('Segoe UI', [Math]::Max(9, [int]($Height * 0.035)), [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Pixel)
 
         $format = New-Object System.Drawing.StringFormat
         $format.Alignment = [System.Drawing.StringAlignment]::Near
         $format.LineAlignment = [System.Drawing.StringAlignment]::Near
 
-        $chipRect = New-Object System.Drawing.Rectangle([int]($Width * 0.06), [int]($Height * 0.08), [int]($Width * 0.28), [int]($Height * 0.1))
-        $graphics.FillEllipse($softWhiteBrush, $chipRect)
-
-        $titleRect = New-Object System.Drawing.RectangleF([float]($Width * 0.08), [float]($Height * 0.14), [float]($Width * 0.84), [float]($Height * 0.26))
-        $subtitleRect = New-Object System.Drawing.RectangleF([float]($Width * 0.08), [float]($Height * 0.41), [float]($Width * 0.84), [float]($Height * 0.16))
+        $titleRect = New-Object System.Drawing.RectangleF([float]($Width * 0.08), [float]($Height * 0.14), [float]($Width * 0.84), [float]($Height * 0.32))
+        $subtitleRect = New-Object System.Drawing.RectangleF([float]($Width * 0.08), [float]($Height * 0.48), [float]($Width * 0.84), [float]($Height * 0.16))
         $footerRect = New-Object System.Drawing.RectangleF([float]($Width * 0.08), [float]($Height * 0.78), [float]($Width * 0.84), [float]($Height * 0.12))
 
         $graphics.DrawString($Title, $titleFont, $whiteBrush, $titleRect, $format)
         $graphics.DrawString($Subtitle, $subtitleFont, $whiteBrush, $subtitleRect, $format)
-        $graphics.FillRectangle($softWhiteBrush, [int]($Width * 0.08), [int]($Height * 0.65), [int]($Width * 0.44), 6)
-        $graphics.FillRectangle($softWhiteBrush, [int]($Width * 0.08), [int]($Height * 0.71), [int]($Width * 0.34), 6)
+
+        # Draw some decorative glassmorphic bars
+        $graphics.FillRectangle($softWhiteBrush, [int]($Width * 0.08), [int]($Height * 0.68), [int]($Width * 0.44), [Math]::Max(2, [int]($Height * 0.01)))
+        $graphics.FillRectangle($softWhiteBrush, [int]($Width * 0.08), [int]($Height * 0.73), [int]($Width * 0.34), [Math]::Max(2, [int]($Height * 0.01)))
         $graphics.DrawString('DSH MEDIA FIXTURE', $labelFont, $whiteBrush, $footerRect, $format)
 
-        $badgeRect = New-Object System.Drawing.Rectangle([int]($Width * 0.72), [int]($Height * 0.67), [int]($Width * 0.18), [int]($Height * 0.18))
+        $badgeRect = New-Object System.Drawing.Rectangle([int]($Width * 0.75), [int]($Height * 0.70), [int]($Width * 0.16), [int]($Height * 0.16))
         $graphics.FillEllipse($whiteBrush, $badgeRect)
     }
     finally {
         $graphics.Dispose()
+
+        # Ensure parent directory exists!
+        $parentDir = [System.IO.Path]::GetDirectoryName($Path)
+        if (-not (Test-Path $parentDir)) {
+            New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+        }
+
         $bitmap.Save($Path, [System.Drawing.Imaging.ImageFormat]::Png)
         $bitmap.Dispose()
     }
 }
 
+function Get-Colors {
+    param([string]$Key)
+
+    # Specific color mappings for various items
+    if ($Key -like "*apple*") { return "#ef4444", "#dc2626" } # Apple Red
+    if ($Key -like "*bread*" -or $Key -like "*croissant*") { return "#d97706", "#f59e0b" } # Bakery Orange
+    if ($Key -like "*chicken*") { return "#7c2d12", "#dc2626" } # Meat Red/Brown
+    if ($Key -like "*milk*" -or $Key -like "*yogurt*") { return "#2563eb", "#38bdf8" } # Dairy Blue
+    if ($Key -like "*choco*") { return "#5b21b6", "#ec4899" } # Choco Purple/Pink
+    if ($Key -like "*pasta*") { return "#0f766e", "#22c55e" } # Pasta Green/Teal
+    if ($Key -like "*salad*") { return "#16a34a", "#86efac" } # Salad Green
+    if ($Key -like "*dates*") { return "#d97706", "#f59e0b" } # Dates Gold
+
+    # Categories specific colors
+    if ($Key -like "*restaurants*") { return "#ff6b6b", "#ee5253" } # Warm Red
+    if ($Key -like "*grocery*") { return "#1dd1a1", "#10ac84" } # Emerald
+    if ($Key -like "*sweets*") { return "#ff9ff3", "#f368e0" } # Sweet Pink
+    if ($Key -like "*anaqati*") { return "#a29bfe", "#6c5ce7" } # Purple
+    if ($Key -like "*wani*") { return "#0A2F5C", "#FF500D" } # Brand colors
+    if ($Key -like "*home_projects*") { return "#ffeaa7", "#d63031" } # Orange-Red
+    if ($Key -like "*cloud_kitchens*") { return "#ff7675", "#d63031" } # Deep Red
+    if ($Key -like "*awnak*") { return "#00dec9", "#00a896" } # Teal
+    if ($Key -like "*gas*") { return "#57606f", "#2f3542" } # Slate
+    if ($Key -like "*shein*") { return "#ff9ff3", "#f368e0" } # Shein Pink
+    if ($Key -like "*spare*") { return "#95afc0", "#535c68" } # Grey
+    if ($Key -like "*honey*") { return "#f1c40f", "#f39c12" } # Honey Gold
+    if ($Key -like "*electronics*") { return "#70a1ff", "#1e90ff" } # Blue
+
+    # Brand/Cohesive default palette selection based on Hash
+    $palettes = @(
+        @("#0A2F5C", "#FF500D"), # Brand Blue & Orange
+        @("#0A2F5C", "#00cec9"), # Deep Blue & Teal
+        @("#6c5ce7", "#a29bfe"), # Indigo & Lavender
+        @("#00b894", "#55efc4"), # Mint & Teal
+        @("#e84393", "#fd79a8"), # Pink & Rose
+        @("#d63031", "#ff7675"), # Red & Coral
+        @("#e17055", "#fab1a0"), # Orange & Peach
+        @("#0984e3", "#74b9ff"), # Sky Blue & Blue
+        @("#2d3436", "#636e72")  # Charcoal & Slate
+    )
+
+    $hash = [Math]::Abs($Key.GetHashCode())
+    $index = $hash % $palettes.Count
+    return $palettes[$index][0], $palettes[$index][1]
+}
+
+function Get-TitleAndSubtitle {
+    param(
+        [string]$Key,
+        [string]$RelPath
+    )
+
+    $fileName = [System.IO.Path]::GetFileNameWithoutExtension($RelPath)
+
+    # Clean up name: remove common prefix/suffix
+    $clean = $fileName
+    $clean = $clean -replace '^dsh-product-', ''
+    $clean = $clean -replace '^dsh-category-main-', ''
+    $clean = $clean -replace '^dsh-category-sub-', ''
+    $clean = $clean -replace '^dsh-store-', ''
+    $clean = $clean -replace '-v\d+$', ''
+    $clean = $clean -replace '-cover$', ''
+    $clean = $clean -replace '-logo$', ''
+    $clean = $clean -replace '_', ' '
+    $clean = $clean -replace '-', ' '
+
+    # Capitalize first letter of each word
+    $textInfo = (Get-Culture).TextInfo
+    $title = $textInfo.ToTitleCase($clean.ToLower())
+
+    # Determine Subtitle based on directory/key
+    $subtitle = "DSH FIXTURE"
+    if ($RelPath -like "products/*") { $subtitle = "PRODUCT" }
+    elseif ($RelPath -like "banners/*") { $subtitle = "PROMO BANNER" }
+    elseif ($RelPath -like "stores/*") { $subtitle = "STORE COVER" }
+    elseif ($RelPath -like "store_logos/*") { $subtitle = "STORE LOGO" }
+    elseif ($RelPath -like "categories/main/*") { $subtitle = "CATEGORY" }
+    elseif ($RelPath -like "categories/sub/*") { $subtitle = "SUBCATEGORY" }
+
+    # Specific adjustments
+    if ($fileName -eq "brand-logo") {
+        $title = "BThwani"
+        $subtitle = "BRAND LOGO"
+    }
+
+    return $title, $subtitle
+}
+
 $root = 'C:\bthwani-suite\dsh\frontend\media-fixtures'
+$manifestPath = Join-Path $root 'MANIFEST.local-required.tsv'
 
-$bannerMap = @(
-    @{ Name = 'dsh-banner-home-promo-1-v1.png'; Title = 'PROMO 1'; Subtitle = 'First order discount'; Accent = '#f97316'; Accent2 = '#1d4ed8'; Width = 1200; Height = 680 },
-    @{ Name = 'dsh-banner-home-promo-2-v1.png'; Title = 'PROMO 2'; Subtitle = 'Live order tracking'; Accent = '#1d4ed8'; Accent2 = '#0f172a'; Width = 1200; Height = 680 },
-    @{ Name = 'dsh-banner-home-promo-3-v1.png'; Title = 'PROMO 3'; Subtitle = 'Curated categories'; Accent = '#dc2626'; Accent2 = '#7c3aed'; Width = 1200; Height = 680 },
-    @{ Name = 'dsh-banner-home-promo-4-v1.png'; Title = 'PROMO 4'; Subtitle = 'Open the store now'; Accent = '#0f766e'; Accent2 = '#f59e0b'; Width = 1200; Height = 680 },
-    @{ Name = 'dsh-banner-home-promo-5-v1.png'; Title = 'PROMO 5'; Subtitle = 'Open the product now'; Accent = '#b91c1c'; Accent2 = '#2563eb'; Width = 1200; Height = 680 },
-    @{ Name = 'dsh-banner-home-promo-6-v1.png'; Title = 'PROMO 6'; Subtitle = 'All nearby stores'; Accent = '#16a34a'; Accent2 = '#0f766e'; Width = 1200; Height = 680 },
-    @{ Name = 'dsh-banner-home-promo-7-v1.png'; Title = 'PROMO 7'; Subtitle = 'Premium subscription'; Accent = '#7c3aed'; Accent2 = '#f59e0b'; Width = 1200; Height = 680 }
-)
-
-$productMap = @(
-    @{ Name = 'dsh-product-apple-v1.png'; Title = 'APPLE'; Subtitle = 'Fresh'; Accent = '#ef4444'; Accent2 = '#f97316'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-bread-v1.png'; Title = 'BREAD'; Subtitle = 'Baked today'; Accent = '#d97706'; Accent2 = '#f59e0b'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-chicken-v1.png'; Title = 'CHICKEN'; Subtitle = 'Ready to order'; Accent = '#7c2d12'; Accent2 = '#dc2626'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-choco-v1.png'; Title = 'CHOCO'; Subtitle = 'Sweet pick'; Accent = '#5b21b6'; Accent2 = '#ec4899'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-croissant-v1.png'; Title = 'CROISSANT'; Subtitle = 'Crispy'; Accent = '#f59e0b'; Accent2 = '#fb7185'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-milk-v1.png'; Title = 'MILK'; Subtitle = 'Daily staple'; Accent = '#2563eb'; Accent2 = '#38bdf8'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-pasta-v1.png'; Title = 'PASTA'; Subtitle = 'Hot plate'; Accent = '#0f766e'; Accent2 = '#22c55e'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-roll-v1.png'; Title = 'ROLL'; Subtitle = 'Quick bite'; Accent = '#be185d'; Accent2 = '#f97316'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-salad-v1.png'; Title = 'SALAD'; Subtitle = 'Healthy choice'; Accent = '#16a34a'; Accent2 = '#86efac'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-yogurt-v1.png'; Title = 'YOGURT'; Subtitle = 'Cold and fresh'; Accent = '#1d4ed8'; Accent2 = '#a5f3fc'; Width = 800; Height = 600 },
-    @{ Name = 'dsh-product-lead-5-dates-box-v1.png'; Title = 'DATES BOX'; Subtitle = 'Premium Box'; Accent = '#d97706'; Accent2 = '#f59e0b'; Width = 800; Height = 600 }
-)
-
-$storeMap = @(
-    @{ Name = 'dsh-store-hadda-cover-v1.png'; Title = 'STORE A'; Subtitle = 'Neighborhood store'; Accent = '#dc2626'; Accent2 = '#f97316'; Width = 900; Height = 700 },
-    @{ Name = 'dsh-store-hittin-cover-v1.png'; Title = 'STORE B'; Subtitle = 'Visible cover'; Accent = '#1d4ed8'; Accent2 = '#38bdf8'; Width = 900; Height = 700 },
-    @{ Name = 'dsh-store-malqa-cover-v1.png'; Title = 'STORE C'; Subtitle = 'Store identity'; Accent = '#7c3aed'; Accent2 = '#f59e0b'; Width = 900; Height = 700 },
-    @{ Name = 'dsh-store-lead-5-cover-v1.png'; Title = 'STORE LEAD-5'; Subtitle = 'Canonical Store Cover'; Accent = '#7c3aed'; Accent2 = '#f59e0b'; Width = 900; Height = 700 }
-)
-
-$logoMap = @(
-    @{ Name = 'dsh-store-lead-5-logo-v1.png'; Title = 'L5'; Subtitle = 'Logo'; Accent = '#7c3aed'; Accent2 = '#0f172a'; Width = 400; Height = 400 }
-)
-
-foreach ($item in $bannerMap) {
-    New-SeedImage -Path (Join-Path (Join-Path $root 'banners') $item.Name) -Width $item.Width -Height $item.Height -Title $item.Title -Subtitle $item.Subtitle -Accent $item.Accent -Accent2 $item.Accent2
+if (-not (Test-Path $manifestPath)) {
+    Write-Error "Could not find manifest at $manifestPath"
+    exit 1
 }
 
-foreach ($item in $productMap) {
-    New-SeedImage -Path (Join-Path (Join-Path $root 'products') $item.Name) -Width $item.Width -Height $item.Height -Title $item.Title -Subtitle $item.Subtitle -Accent $item.Accent -Accent2 $item.Accent2
+$lines = Get-Content $manifestPath
+Write-Host "Starting seed image generation from manifest..." -ForegroundColor Cyan
+Write-Host "Total entries: $($lines.Count - 1)" -ForegroundColor Cyan
+
+$count = 0
+for ($i = 1; $i -lt $lines.Count; $i++) {
+    if ([string]::IsNullOrWhiteSpace($lines[$i])) { continue }
+    $parts = $lines[$i].Split("`t")
+    if ($parts.Count -lt 2) { continue }
+
+    $key = $parts[0].Trim()
+    $relPath = $parts[1].Trim()
+    $fullPath = Join-Path $root $relPath
+
+    # 1. Determine width and height
+    $width = 400
+    $height = 400
+    if ($relPath -like "banners/*") {
+        $width = 1200
+        $height = 680
+    } elseif ($relPath -like "products/*") {
+        $width = 800
+        $height = 600
+    } elseif ($relPath -like "stores/*") {
+        $width = 900
+        $height = 700
+    } elseif ($relPath -like "store_logos/*") {
+        $width = 400
+        $height = 400
+    } elseif ($relPath -like "categories/*") {
+        $width = 200
+        $height = 200
+    }
+
+    # 2. Get beautiful colors
+    $accent, $accent2 = Get-Colors -Key $key
+
+    # 3. Get title and subtitle
+    $title, $subtitle = Get-TitleAndSubtitle -Key $key -RelPath $relPath
+
+    # 4. Generate the image
+    Write-Host "Generating: [$key] -> $relPath ($title | $subtitle)" -ForegroundColor Gray
+    New-SeedImage -Path $fullPath -Width $width -Height $height -Title $title -Subtitle $subtitle -Accent $accent -Accent2 $accent2
+    $count++
 }
 
-foreach ($item in $storeMap) {
-    New-SeedImage -Path (Join-Path (Join-Path $root 'stores') $item.Name) -Width $item.Width -Height $item.Height -Title $item.Title -Subtitle $item.Subtitle -Accent $item.Accent -Accent2 $item.Accent2
-}
-
-foreach ($item in $logoMap) {
-    New-SeedImage -Path (Join-Path (Join-Path $root 'logos') $item.Name) -Width $item.Width -Height $item.Height -Title $item.Title -Subtitle $item.Subtitle -Accent $item.Accent -Accent2 $item.Accent2
-}
+Write-Host "Success: $count seed images generated and saved to media-fixtures!" -ForegroundColor Green

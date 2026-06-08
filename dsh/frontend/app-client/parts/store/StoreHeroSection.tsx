@@ -188,6 +188,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
         distanceLabel={store.distanceLabel || '2.1 كم'}
         deliveryTimeLabel={store.deliveryTimeLabel || normalizedEtaLabel}
         rating={store.rating}
+        contactNumber={store.contactNumber}
         onSearchPress={openInlineSearch}
         onCartPress={() => {
           if (onOpenCart) onOpenCart(selectedMode);
@@ -200,6 +201,42 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
         selectedMode={selectedMode}
         onModeChange={setSelectedMode}
       />
+
+      {store && (store.openingHours || store.catalogSummary) ? (
+        <View
+          style={[
+            styles.storeStateNotice,
+            {
+              backgroundColor: appearanceChrome.subtleSurface,
+              borderColor: appearanceChrome.cardBorder,
+              marginHorizontal: 16,
+              marginTop: 12,
+              marginBottom: 4,
+              padding: 12,
+              borderRadius: 12,
+              flexDirection: 'column',
+              gap: 8,
+            },
+          ]}
+        >
+          {store.openingHours ? (
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+              <Icon name="time-outline" size={16} color={appearanceChrome.secondaryText} />
+              <Text style={{ color: appearanceChrome.primaryText, fontSize: 13, fontFamily: 'Outfit-Medium' }}>
+                {isRTL ? `أوقات العمل: ${store.openingHours}` : `Opening Hours: ${store.openingHours}`}
+              </Text>
+            </View>
+          ) : null}
+          {store.catalogSummary ? (
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+              <Icon name="basket-outline" size={16} color={appearanceChrome.secondaryText} />
+              <Text style={{ color: appearanceChrome.primaryText, fontSize: 13, fontFamily: 'Outfit-Medium' }}>
+                {isRTL ? `ملخص المتجر: ${store.catalogSummary}` : `Store Summary: ${store.catalogSummary}`}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
 
       <Animated.View
         pointerEvents="box-none"

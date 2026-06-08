@@ -5,7 +5,7 @@ import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/ds
 
 export type DshStoreGetScreenProps = {
   appearanceMode?: BThwaniAppearanceMode;
-  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+  state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'not-found';
   store?: {
     id: string;
     name: string;
@@ -22,7 +22,7 @@ export type DshStoreGetScreenProps = {
     subscriptionPackageChips?: string[];
     hasBthwaniPro?: boolean;
     publishStage?: string;
-    commercialSourceMap?: import('../shared/store-card-commercial-map').CommercialSourceMap;
+    commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
     deliveryModes?: Array<{ id: DshFulfillmentDeliveryMode; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;
@@ -37,6 +37,9 @@ export type DshStoreGetScreenProps = {
     deliveryTimeLabel?: string;
     isPopular?: boolean;
     logoImageUri?: string;
+    contactNumber?: string;
+    openingHours?: string;
+    catalogSummary?: string;
   };
   menuItems?: DshStoreGetMenuItem[];
   onOpenItems?: () => void;

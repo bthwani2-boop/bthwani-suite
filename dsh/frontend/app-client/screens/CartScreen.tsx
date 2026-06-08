@@ -34,7 +34,7 @@ import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletPreview,
   type WltDshFinanceEventKind,
-} from '../../../../wlt/frontend/app-client/dsh';
+} from '../../../../wlt/frontend/dsh/app-client';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import {
   type DshClientCreateOrderRequest,
@@ -42,8 +42,11 @@ import {
   getDshFulfillmentDeliveryModeMeta,
   getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
+// SSoT: COD availability per delivery mode — bthwani_delivery only.
+import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
+import type { DshCheckoutClient } from '../../shared/dsh-checkout-client';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -57,7 +60,7 @@ const SURFACE_WARM = colorPalette.brandSoft;
 const SURFACE_WARM_BORDER = colorPalette.brandSurface;
 const DANGER = colorPalette.danger;
 const DANGER_SOFT = colorPalette.dangerSoft;
-const EXPERIMENTAL_PAYMENT_ENABLED = true;
+const EXPERIMENTAL_PAYMENT_ENABLED = false;
 
 function resolveCheckoutPolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
   if (policy === 'detail-on-open') {
@@ -155,6 +158,10 @@ export type DshCartUnifiedScreenProps = {
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
   reorderAlertMessage?: string;
+  /** J-003A: live checkout client for GET /cart/serviceability. When absent, preflight skips API check. */
+  checkoutClient?: DshCheckoutClient;
+  clientId?: string;
+  bearerToken?: string;
 };
 
 const QUICK_ACTION_META: Record<QuickActionKey, QuickActionMeta> = {
@@ -1063,6 +1070,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     () => props.fulfillmentMode ?? 'bthwani_delivery',
   );
   const fulfillmentModeMeta = getDshFulfillmentDeliveryModeMeta(selectedFulfillmentMode);
+  // SSoT: COD is only available for bthwani_delivery — gated by dsh-client-wlt-payment-bridge.
+  const codAllowedForMode = isCodAllowedForMode(selectedFulfillmentMode);
   // pickup carries no delivery fee; partner_delivery and bthwani_delivery carry a preview fee (PREVIEW_ONLY — real fee from WLT).
   const deliveryAmount = selectedFulfillmentMode === 'pickup' ? 0 : 950;
   const [clientAddress, setClientAddress] = useState('جوار الجبل الجديد');
@@ -1091,7 +1100,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     requestPayment: requestWalletPayment,
     link: linkWallet,
     topUp: topUpWallet,
-  } = useWltDshWalletPreview();
+  } = useWltDshWalletPreview(props.clientId, props.bearerToken);
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const { direction } = useDirection();
@@ -1476,19 +1485,27 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       summary: 'ستدفع كامل المبلغ عند الاستلام.',
       feedbackTone: 'info',
     };
-  }, [formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
+  }, [codAllowedForMode, formattedWalletBalance, formattedWalletShortfall, grandTotalMinorUnits, hasWltServiceRoute, paymentMethod, walletBalance, walletHydrated, walletLinked, walletRefreshing]);
 
   React.useEffect(() => {
     if (EXPERIMENTAL_PAYMENT_ENABLED) return;
 
+    // SSoT: fall back to wallet when COD is not available for this mode.
+    const fallbackMethod = codAllowedForMode ? 'cod' : 'wallet';
+
     if (paymentMethod === 'wallet' && !canUseWalletFull) {
-      setPaymentMethod(canUseMixedPayment ? 'mixed' : 'cod');
+      setPaymentMethod(canUseMixedPayment ? 'mixed' : fallbackMethod);
     }
 
     if (paymentMethod === 'mixed' && !canUseMixedPayment) {
-      setPaymentMethod(canUseWalletFull ? 'wallet' : 'cod');
+      setPaymentMethod(canUseWalletFull ? 'wallet' : fallbackMethod);
     }
-  }, [canUseMixedPayment, canUseWalletFull, paymentMethod]);
+
+    // If currently on COD but mode doesn't support it, switch to wallet.
+    if (paymentMethod === 'cod' && !codAllowedForMode) {
+      setPaymentMethod('wallet');
+    }
+  }, [canUseMixedPayment, canUseWalletFull, codAllowedForMode, paymentMethod]);
 
   useEffect(() => {
     if (quickActionKey === 'extra' && selectedFulfillmentMode !== 'bthwani_delivery') {
@@ -1505,7 +1522,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     const walletPending = !walletHydrated || walletRefreshing;
 
     return [
-      {
+      // SSoT: COD only available for bthwani_delivery — gated by codAllowedForMode.
+      ...(codAllowedForMode ? [{
         id: 'cod',
         title: 'عند الاستلام',
         description: 'ادفع كامل الطلب عند الاستلام.',
@@ -1517,9 +1535,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
         ],
         helperText: paymentMethod === 'cod' ? 'لا يستخدم رصيد المحفظة.' : undefined,
-        helperTone: 'info',
+        helperTone: 'info' as const,
         onSelect: () => setPaymentMethod('cod'),
-      },
+      } satisfies PaymentDecisionOption] : []),
       {
         id: 'wallet',
         title: 'من رصيد المحفظة',
@@ -1766,9 +1784,42 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     await Promise.resolve(checkoutAction?.(checkoutPayload));
   };
 
-  const handleCheckoutPress = () => {
+  const handleCheckoutPress = async () => {
     if (!runCheckoutPreflight()) {
       return;
+    }
+
+    // J-003A: call GET /cart/serviceability if a live client is available.
+    // This is the real code-level gate — not a doc claim.
+    if (props.checkoutClient && props.store?.id) {
+      setCheckoutLoading(true);
+      try {
+        const itemIds = items.map((item) => item.id);
+        const serviceability = await props.checkoutClient.checkServiceability(
+          props.store.id,
+          itemIds,
+        );
+        if (!serviceability.serviceable) {
+          const reasonMessages: Record<string, string> = {
+            store_closed: 'المتجر مغلق حاليًا، يُرجى المحاولة لاحقًا.',
+            delivery_zone_unavailable: 'موقعك خارج نطاق التوصيل لهذا المتجر.',
+            items_unavailable: 'بعض عناصر السلة غير متاحة حاليًا.',
+            partner_not_ready: 'الشريك غير جاهز لاستقبال الطلبات الآن.',
+          };
+          const reason = serviceability.reason_code ?? 'unknown';
+          showNotice(
+            'التوصيل غير متاح',
+            reasonMessages[reason] ?? 'تعذر إتمام الطلب — المتجر أو الموقع غير متاح حاليًا.',
+            'danger',
+          );
+          return;
+        }
+      } catch {
+        // Network failure — do not block checkout, let intent creation handle it.
+        showNotice('تحقق التوفر', 'تعذر التحقق من التوفر — سيتم المحاولة عند إنشاء الطلب.', 'info');
+      } finally {
+        setCheckoutLoading(false);
+      }
     }
 
     setCheckoutReviewVisible(true);

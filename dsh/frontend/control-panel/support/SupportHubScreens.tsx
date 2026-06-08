@@ -14,6 +14,8 @@ import {
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+// SSoT: delivery mode labels come from dsh-delivery-mode.model, not inline strings.
+import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
 import {
   DSH_CALL_INTAKE_PREVIEW,
   DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS,
@@ -82,10 +84,9 @@ type SupportRow = {
   secondaryActionLabel: string;
 };
 
+// SSoT: mode labels from dsh-delivery-mode.model — no inline strings.
 function resolveSupportModeBadge(mode: SupportFulfillmentMode) {
-  if (mode === 'bthwani_delivery') return 'توصيل بثواني';
-  if (mode === 'partner_delivery') return 'توصيل المتجر';
-  return 'استلام بنفسي';
+  return getDshDeliveryModeDefinition(mode as DshFulfillmentDeliveryMode).label;
 }
 
 function resolveCommitmentLabel() {

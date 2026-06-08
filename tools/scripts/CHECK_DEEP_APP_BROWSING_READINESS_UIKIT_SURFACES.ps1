@@ -195,15 +195,15 @@ try {
   Write-Host ("Evidence Pack: {0}" -f $RunRoot) -ForegroundColor Cyan
   Write-Host ""
 
-  $UiKitRoot = Join-Path $RepoRoot "packages\ui-kit"
+  $UiKitRoot = Join-Path $RepoRoot "ui-kit"
   $UiKitSrc = Join-Path $UiKitRoot "src"
   $UiKitCompat = Join-Path $UiKitRoot "_compat"
   $UiKitPackageJson = Join-Path $UiKitRoot "package.json"
   $UiKitTsconfig = Join-Path $UiKitRoot "tsconfig.json"
-  $AppClientRoot = Join-Path $RepoRoot "apps\mobile\app-client"
+  $AppClientRoot = Join-Path $RepoRoot "app-client\runtime"
   $AppClientPackageJson = Join-Path $AppClientRoot "package.json"
   $AppClientTsconfig = Join-Path $AppClientRoot "tsconfig.json"
-  $ClientSurfaceHost = Join-Path $RepoRoot "packages\app-shells\mobile\client\ClientSurfaceHost.tsx"
+  $ClientSurfaceHost = Join-Path $RepoRoot "app-client\shell\ClientSurfaceHost.tsx"
   $AppClientApp = Join-Path $AppClientRoot "App.tsx"
   $AppClientIndex = Join-Path $AppClientRoot "index.js"
 
@@ -216,9 +216,9 @@ try {
   }
 
   if (Test-Path -LiteralPath $UiKitCompat) {
-    Add-Finding -Code "UIKIT_COMPAT_EXISTS" -Severity "FAIL" -Path "packages/ui-kit/_compat" -Evidence "_compat exists." -Action "Remove _compat; final ui-kit closure requires it absent."
+    Add-Finding -Code "UIKIT_COMPAT_EXISTS" -Severity "FAIL" -Path "ui-kit/_compat" -Evidence "_compat exists." -Action "Remove _compat; final ui-kit closure requires it absent."
   } else {
-    Add-Finding -Code "UIKIT_COMPAT_ABSENT" -Severity "PASS" -Path "packages/ui-kit/_compat" -Evidence "_compat is absent." -Action "Continue."
+    Add-Finding -Code "UIKIT_COMPAT_ABSENT" -Severity "PASS" -Path "ui-kit/_compat" -Evidence "_compat is absent." -Action "Continue."
   }
 
   $ActualUiKitSrc = @(Get-ChildItem -LiteralPath $UiKitSrc -Force | Select-Object -ExpandProperty Name | Sort-Object)
@@ -228,22 +228,22 @@ try {
   $Missing = @($ExpectedUiKitSrc | Where-Object { $ActualUiKitSrc -notcontains $_ })
 
   if ($Extra.Count -gt 0 -or $Missing.Count -gt 0) {
-    Add-Finding -Code "UIKIT_SRC_SHAPE_INVALID" -Severity "FAIL" -Path "packages/ui-kit/src" -Evidence ("Extra=[{0}] Missing=[{1}]" -f ($Extra -join ","), ($Missing -join ",")) -Action "Restore exact 12-file lean ui-kit src."
+    Add-Finding -Code "UIKIT_SRC_SHAPE_INVALID" -Severity "FAIL" -Path "ui-kit/src" -Evidence ("Extra=[{0}] Missing=[{1}]" -f ($Extra -join ","), ($Missing -join ",")) -Action "Restore exact 12-file lean ui-kit src."
   } else {
-    Add-Finding -Code "UIKIT_SRC_SHAPE_EXACT" -Severity "PASS" -Path "packages/ui-kit/src" -Evidence "Exact 12-file shape confirmed." -Action "Continue."
+    Add-Finding -Code "UIKIT_SRC_SHAPE_EXACT" -Severity "PASS" -Path "ui-kit/src" -Evidence "Exact 12-file shape confirmed." -Action "Continue."
   }
 
   $UiKitPackageText = Read-Text $UiKitPackageJson
   if ($UiKitPackageText -match "_compat") {
-    Add-Finding -Code "UIKIT_PACKAGE_EXPORTS_COMPAT_REFERENCE" -Severity "FAIL" -Path "packages/ui-kit/package.json" -Evidence "package.json still references _compat." -Action "Point exports only to src files."
+    Add-Finding -Code "UIKIT_PACKAGE_EXPORTS_COMPAT_REFERENCE" -Severity "FAIL" -Path "ui-kit/package.json" -Evidence "package.json still references _compat." -Action "Point exports only to src files."
   } else {
-    Add-Finding -Code "UIKIT_PACKAGE_EXPORTS_NO_COMPAT" -Severity "PASS" -Path "packages/ui-kit/package.json" -Evidence "No _compat reference in package exports." -Action "Continue."
+    Add-Finding -Code "UIKIT_PACKAGE_EXPORTS_NO_COMPAT" -Severity "PASS" -Path "ui-kit/package.json" -Evidence "No _compat reference in package exports." -Action "Continue."
   }
 
   if ($UiKitPackageText -match "\./src/index\.ts") {
-    Add-Finding -Code "UIKIT_PACKAGE_ROOT_EXPORT_POINTS_TO_SRC" -Severity "PASS" -Path "packages/ui-kit/package.json" -Evidence "Root export points to src/index.ts." -Action "Continue."
+    Add-Finding -Code "UIKIT_PACKAGE_ROOT_EXPORT_POINTS_TO_SRC" -Severity "PASS" -Path "ui-kit/package.json" -Evidence "Root export points to src/index.ts." -Action "Continue."
   } else {
-    Add-Finding -Code "UIKIT_PACKAGE_ROOT_EXPORT_REVIEW" -Severity "WARN" -Path "packages/ui-kit/package.json" -Evidence "Could not confirm ./src/index.ts export." -Action "Review package exports if resolver problems appear."
+    Add-Finding -Code "UIKIT_PACKAGE_ROOT_EXPORT_REVIEW" -Severity "WARN" -Path "ui-kit/package.json" -Evidence "Could not confirm ./src/index.ts export." -Action "Review package exports if resolver problems appear."
   }
 
   $UiKitTexts = @(Get-ChildItem -LiteralPath $UiKitRoot -Recurse -File -Include *.ts,*.tsx,*.js,*.jsx,*.json |
@@ -258,51 +258,51 @@ try {
   }
 
   if ($CompatRefs.Count -gt 0) {
-    Add-Finding -Code "UIKIT_COMPAT_REFERENCES_REMAIN" -Severity "FAIL" -Path "packages/ui-kit" -Evidence ("Refs={0}" -f ($CompatRefs -join ";")) -Action "Remove all _compat references."
+    Add-Finding -Code "UIKIT_COMPAT_REFERENCES_REMAIN" -Severity "FAIL" -Path "ui-kit" -Evidence ("Refs={0}" -f ($CompatRefs -join ";")) -Action "Remove all _compat references."
   } else {
-    Add-Finding -Code "UIKIT_NO_COMPAT_REFERENCES" -Severity "PASS" -Path "packages/ui-kit" -Evidence "No _compat refs found in ui-kit files." -Action "Continue."
+    Add-Finding -Code "UIKIT_NO_COMPAT_REFERENCES" -Severity "PASS" -Path "ui-kit" -Evidence "No _compat refs found in ui-kit files." -Action "Continue."
   }
 
-  $UiKitTsc = Invoke-CapturedCommand -Name "ui-kit-tsc" -Command "pnpm --dir packages/ui-kit exec tsc --noEmit -p tsconfig.json" -OutputPath $UiKitTscPath -WorkingDirectory $RepoRoot
+  $UiKitTsc = Invoke-CapturedCommand -Name "ui-kit-tsc" -Command "pnpm --dir ui-kit exec tsc --noEmit -p tsconfig.json" -OutputPath $UiKitTscPath -WorkingDirectory $RepoRoot
   if ($UiKitTsc.exit_code -eq 0) {
-    Add-Finding -Code "UIKIT_TYPESCRIPT_PASS" -Severity "PASS" -Path "packages/ui-kit" -Evidence ("tsc passed in {0}ms." -f $UiKitTsc.elapsed_ms) -Action "Continue."
+    Add-Finding -Code "UIKIT_TYPESCRIPT_PASS" -Severity "PASS" -Path "ui-kit" -Evidence ("tsc passed in {0}ms." -f $UiKitTsc.elapsed_ms) -Action "Continue."
   } else {
-    Add-Finding -Code "UIKIT_TYPESCRIPT_FAIL" -Severity "FAIL" -Path "packages/ui-kit" -Evidence ("exit={0}; error_lines={1}" -f $UiKitTsc.exit_code, $UiKitTsc.error_lines.Count) -Action "Fix ui-kit TypeScript errors first."
+    Add-Finding -Code "UIKIT_TYPESCRIPT_FAIL" -Severity "FAIL" -Path "ui-kit" -Evidence ("exit={0}; error_lines={1}" -f $UiKitTsc.exit_code, $UiKitTsc.error_lines.Count) -Action "Fix ui-kit TypeScript errors first."
   }
 
   if (Test-Path -LiteralPath $AppClientTsconfig) {
-    $AppTsc = Invoke-CapturedCommand -Name "app-client-tsc" -Command "pnpm --dir apps/mobile/app-client exec tsc --noEmit -p tsconfig.json" -OutputPath $AppClientTscPath -WorkingDirectory $RepoRoot
+    $AppTsc = Invoke-CapturedCommand -Name "app-client-tsc" -Command "pnpm --dir app-client/runtime exec tsc --noEmit -p tsconfig.json" -OutputPath $AppClientTscPath -WorkingDirectory $RepoRoot
     if ($AppTsc.exit_code -eq 0) {
-      Add-Finding -Code "APP_CLIENT_TYPESCRIPT_PASS" -Severity "PASS" -Path "apps/mobile/app-client" -Evidence ("tsc passed in {0}ms." -f $AppTsc.elapsed_ms) -Action "Continue."
+      Add-Finding -Code "APP_CLIENT_TYPESCRIPT_PASS" -Severity "PASS" -Path "app-client/runtime" -Evidence ("tsc passed in {0}ms." -f $AppTsc.elapsed_ms) -Action "Continue."
     } else {
-      Add-Finding -Code "APP_CLIENT_TYPESCRIPT_FAIL" -Severity "FAIL" -Path "apps/mobile/app-client" -Evidence ("exit={0}; error_lines={1}" -f $AppTsc.exit_code, $AppTsc.error_lines.Count) -Action "Fix app-client TypeScript/runtime contract before browsing."
+      Add-Finding -Code "APP_CLIENT_TYPESCRIPT_FAIL" -Severity "FAIL" -Path "app-client/runtime" -Evidence ("exit={0}; error_lines={1}" -f $AppTsc.exit_code, $AppTsc.error_lines.Count) -Action "Fix app-client TypeScript/runtime contract before browsing."
     }
   } else {
-    Add-Finding -Code "APP_CLIENT_TSCONFIG_MISSING" -Severity "WARN" -Path "apps/mobile/app-client/tsconfig.json" -Evidence "No app-client tsconfig found." -Action "Skip app-client tsc; rely on Metro runtime."
+    Add-Finding -Code "APP_CLIENT_TSCONFIG_MISSING" -Severity "WARN" -Path "app-client/runtime/tsconfig.json" -Evidence "No app-client tsconfig found." -Action "Skip app-client tsc; rely on Metro runtime."
   }
 
   if (-not (Test-Path -LiteralPath $ClientSurfaceHost)) {
-    Add-Finding -Code "CLIENT_SURFACE_HOST_MISSING" -Severity "FAIL" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "ClientSurfaceHost missing." -Action "Restore app-shell host."
+    Add-Finding -Code "CLIENT_SURFACE_HOST_MISSING" -Severity "FAIL" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "ClientSurfaceHost missing." -Action "Restore app-shell host."
   } else {
     $HostText = Read-Text $ClientSurfaceHost
 
     if ($HostText -match "function\s+bthSafeBrandName\b") {
-      Add-Finding -Code "CLIENT_SURFACE_BRAND_GUARD_PRESENT" -Severity "PASS" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "bthSafeBrandName exists." -Action "Continue."
+      Add-Finding -Code "CLIENT_SURFACE_BRAND_GUARD_PRESENT" -Severity "PASS" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "bthSafeBrandName exists." -Action "Continue."
     } else {
-      Add-Finding -Code "CLIENT_SURFACE_BRAND_GUARD_MISSING" -Severity "FAIL" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "bthSafeBrandName missing." -Action "Patch brandName runtime guard."
+      Add-Finding -Code "CLIENT_SURFACE_BRAND_GUARD_MISSING" -Severity "FAIL" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "bthSafeBrandName missing." -Action "Patch brandName runtime guard."
     }
 
     $UnsafeBrand = ([regex]::Matches($HostText, '(?<![\?\w$])([A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)*)\.brandName\b')).Count
     if ($UnsafeBrand -gt 0) {
-      Add-Finding -Code "CLIENT_SURFACE_UNSAFE_BRANDNAME_REMAINS" -Severity "FAIL" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence ("Unsafe direct .brandName count={0}" -f $UnsafeBrand) -Action "Patch remaining direct .brandName access."
+      Add-Finding -Code "CLIENT_SURFACE_UNSAFE_BRANDNAME_REMAINS" -Severity "FAIL" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence ("Unsafe direct .brandName count={0}" -f $UnsafeBrand) -Action "Patch remaining direct .brandName access."
     } else {
-      Add-Finding -Code "CLIENT_SURFACE_NO_UNSAFE_BRANDNAME" -Severity "PASS" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "No direct unsafe .brandName." -Action "Continue."
+      Add-Finding -Code "CLIENT_SURFACE_NO_UNSAFE_BRANDNAME" -Severity "PASS" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "No direct unsafe .brandName." -Action "Continue."
     }
 
     if ($HostText -match "BTH_CLIENT_SURFACE_VISIBLE_FALLBACK") {
-      Add-Finding -Code "CLIENT_SURFACE_VISIBLE_FALLBACK_PRESENT" -Severity "PASS" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "Visible fallback marker present." -Action "Continue."
+      Add-Finding -Code "CLIENT_SURFACE_VISIBLE_FALLBACK_PRESENT" -Severity "PASS" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "Visible fallback marker present." -Action "Continue."
     } else {
-      Add-Finding -Code "CLIENT_SURFACE_VISIBLE_FALLBACK_MISSING" -Severity "WARN" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "Visible fallback marker missing." -Action "If blank screen persists, patch visible bootstrap fallback."
+      Add-Finding -Code "CLIENT_SURFACE_VISIBLE_FALLBACK_MISSING" -Severity "WARN" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "Visible fallback marker missing." -Action "If blank screen persists, patch visible bootstrap fallback."
     }
 
     $NullReturns = ([regex]::Matches($HostText, "\breturn\s+null\s*;")).Count
@@ -321,17 +321,17 @@ try {
     }) | Out-Null
 
     if (($NullReturns + $FalseReturns + $UndefinedReturns) -gt 0) {
-      Add-Finding -Code "CLIENT_SURFACE_EMPTY_RETURNS_EXIST" -Severity "WARN" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence ("null={0}; false={1}; undefined={2}" -f $NullReturns, $FalseReturns, $UndefinedReturns) -Action "Blank screen can happen if these paths are hit."
+      Add-Finding -Code "CLIENT_SURFACE_EMPTY_RETURNS_EXIST" -Severity "WARN" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence ("null={0}; false={1}; undefined={2}" -f $NullReturns, $FalseReturns, $UndefinedReturns) -Action "Blank screen can happen if these paths are hit."
     } else {
-      Add-Finding -Code "CLIENT_SURFACE_NO_EXPLICIT_EMPTY_RETURNS" -Severity "PASS" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "No explicit null/false/undefined returns." -Action "Continue."
+      Add-Finding -Code "CLIENT_SURFACE_NO_EXPLICIT_EMPTY_RETURNS" -Severity "PASS" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "No explicit null/false/undefined returns." -Action "Continue."
     }
 
     if ($RenderSubSurface -gt 0 -and $EnsureVisible -eq 0) {
-      Add-Finding -Code "RENDER_SUBSURFACE_NOT_VISIBILITY_GUARDED" -Severity "WARN" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "renderSubSurface exists without bthEnsureVisibleSurface usage." -Action "If blank screen persists, wrap renderSubSurface output."
+      Add-Finding -Code "RENDER_SUBSURFACE_NOT_VISIBILITY_GUARDED" -Severity "WARN" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "renderSubSurface exists without bthEnsureVisibleSurface usage." -Action "If blank screen persists, wrap renderSubSurface output."
     } elseif ($RenderSubSurface -gt 0) {
-      Add-Finding -Code "RENDER_SUBSURFACE_VISIBILITY_GUARDED" -Severity "PASS" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "renderSubSurface and visibility guard found." -Action "Continue."
+      Add-Finding -Code "RENDER_SUBSURFACE_VISIBILITY_GUARDED" -Severity "PASS" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "renderSubSurface and visibility guard found." -Action "Continue."
     } else {
-      Add-Finding -Code "RENDER_SUBSURFACE_NOT_FOUND" -Severity "INFO" -Path "packages/app-shells/mobile/client/ClientSurfaceHost.tsx" -Evidence "No renderSubSurface function/call detected." -Action "Host may use another render path."
+      Add-Finding -Code "RENDER_SUBSURFACE_NOT_FOUND" -Severity "INFO" -Path "app-client/shell/ClientSurfaceHost.tsx" -Evidence "No renderSubSurface function/call detected." -Action "Host may use another render path."
     }
   }
 
@@ -348,7 +348,7 @@ try {
   }
 
   if ($GitAvailable) {
-    $GrepOutput = @(& git grep -n -I "@bthwani/ui-kit" -- ':*.ts' ':*.tsx' ':*.js' ':*.jsx' ':!packages/ui-kit/**' ':!tools/**' 2>$null)
+    $GrepOutput = @(& git grep -n -I "@bthwani/ui-kit" -- ':*.ts' ':*.tsx' ':*.js' ':*.jsx' ':!ui-kit/**' ':!tools/**' 2>$null)
 
     foreach ($Line in $GrepOutput) {
       if ([string]::IsNullOrWhiteSpace($Line)) {
@@ -386,10 +386,10 @@ try {
 
   if (Test-Path -LiteralPath $AppClientApp) {
     $AppText = Read-Text $AppClientApp
-    if ($AppText -match "ClientSurfaceHost|ApprovedVideoReelsViewer|app-shells|@bthwani") {
-      Add-Finding -Code "APP_CLIENT_ENTRY_HAS_SURFACE_REFERENCE" -Severity "PASS" -Path "apps/mobile/app-client/App.tsx" -Evidence "App entry references known surface/bootstrap path." -Action "Continue."
+    if ($AppText -match "ClientSurfaceHost|ApprovedVideoReelsViewer|composition|@bthwani") {
+      Add-Finding -Code "APP_CLIENT_ENTRY_HAS_SURFACE_REFERENCE" -Severity "PASS" -Path "app-client/runtime/App.tsx" -Evidence "App entry references known surface/bootstrap path." -Action "Continue."
     } else {
-      Add-Finding -Code "APP_CLIENT_ENTRY_SURFACE_REFERENCE_NOT_PROVEN" -Severity "WARN" -Path "apps/mobile/app-client/App.tsx" -Evidence "Could not detect ClientSurfaceHost/app-shells/@bthwani in App.tsx." -Action "Inspect app bootstrap if blank screen remains."
+      Add-Finding -Code "APP_CLIENT_ENTRY_SURFACE_REFERENCE_NOT_PROVEN" -Severity "WARN" -Path "app-client/runtime/App.tsx" -Evidence "Could not detect ClientSurfaceHost/composition/@bthwani in App.tsx." -Action "Inspect app bootstrap if blank screen remains."
     }
   }
 

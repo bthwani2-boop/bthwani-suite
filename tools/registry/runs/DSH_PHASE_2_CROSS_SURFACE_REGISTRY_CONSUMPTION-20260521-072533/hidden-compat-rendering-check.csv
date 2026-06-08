@@ -1,9 +1,0 @@
-flow_id,visibility,hiddenCompat,owner_surface,renders_as_primary_anywhere,check_result,notes
-partner-finance-bridge,hidden-compat,true,app-partner,NO,SAFE,Only in control-panel escalation catalog as read-only reference row
-partner-settlement-summary,hidden-compat,true,wlt-finance,NO,SAFE,Only in control-panel escalation catalog as read-only reference row
-partner-commission-summary,hidden-compat,true,wlt-finance,NO,SAFE,Only in control-panel escalation catalog as read-only reference row
-partner-order-support,primary,false,app-partner,YES (app-partner only),SAFE,primary in its owner surface only — correct
-partner-issue-escalation,primary,false,app-partner,YES (app-partner only),SAFE,primary in its owner surface only — correct
-partner-ops-command-center,internal,false,app-partner,NO,SAFE,internal — not shown in nav
-control-escalation-queue,primary,false,control-panel,YES (control-panel only),SAFE,primary in its owner surface only — correct
-isDshHiddenCompatFlow guard,N/A,N/A,app-partner (PartnerSupportScreen),ACTIVE,SAFE,guard blocks hidden-compat from primary rendering in app-partner

@@ -105,85 +105,61 @@ function MySpacePrimaryRow({
 }: MySpacePrimaryRowProps) {
   const { theme } = useTheme();
 
-  const content = (
-    <View
-      style={{
+  return (
+    <Pressable
+      accessibilityRole={actionElement ? undefined : 'button'}
+      onPress={actionElement ? undefined : onPress}
+      disabled={!!actionElement}
+      style={({ pressed }): StyleProp<ViewStyle> => ({
         width: '100%',
-        paddingHorizontal: spacing[3],
-        paddingVertical: spacing[3],
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        gap: spacing[3],
-      }}
+        backgroundColor: pressed ? theme.surfaceInset : 'transparent',
+        borderBottomWidth: 1,
+        borderBottomColor: theme.line,
+      })}
     >
       <View
         style={{
-          width: 44,
-          height: 44,
-          borderRadius: 15,
-          borderWidth: 1,
-          borderColor: theme.line,
-          backgroundColor: theme.brandSurface,
+          width: '100%',
+          paddingHorizontal: spacing[1],
+          paddingVertical: spacing[3],
+          flexDirection: 'row-reverse',
           alignItems: 'center',
-          justifyContent: 'center',
+          gap: spacing[3],
         }}
       >
-        <Icon name={iconName} size={21} color={theme.brand} />
-      </View>
-
-      <View style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}>
-        <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>{title}</Text>
-        <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 2 }}>
-          {subtitle}
-        </Text>
-      </View>
-
-      {actionElement ? (
-        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          {actionElement}
-        </View>
-      ) : (
-        <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={theme.textSoft} />
-        </View>
-      )}
-    </View>
-  );
-
-  return (
-    <Surface
-      tone="raised"
-      padding={0}
-      gap={0}
-      style={{
-        width: '100%',
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: theme.line,
-        backgroundColor: theme.surfaceRaised,
-        shadowColor: colorPalette.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 1,
-        overflow: 'hidden',
-      }}
-    >
-      {actionElement ? (
-        content
-      ) : (
-        <Pressable
-          accessibilityRole="button"
-          onPress={onPress}
-          style={({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => ({
-            width: '100%',
-            backgroundColor: pressed ? theme.line : 'transparent',
-          })}
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 15,
+            borderWidth: 1,
+            borderColor: theme.line,
+            backgroundColor: theme.brandSurface,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-          {content}
-        </Pressable>
-      )}
-    </Surface>
+          <Icon name={iconName} size={21} color={theme.brand} />
+        </View>
+
+        <View style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }}>
+          <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>{title}</Text>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 2 }}>
+            {subtitle}
+          </Text>
+        </View>
+
+        {actionElement ? (
+          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            {actionElement}
+          </View>
+        ) : (
+          <View style={{ width: 28, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name={isExpanded ? 'chevron-down' : 'chevron-back'} size={20} color={theme.textSoft} />
+          </View>
+        )}
+      </View>
+    </Pressable>
   );
 }
 
@@ -268,7 +244,7 @@ export function DshMySpaceScreen({
         gap={3}
         contentContainerStyle={{ paddingBottom: safeArea.comfortable + spacing[12] }}
       >
-        <Box gap={3}>
+        <Box gap={0}>
           {primaryTabs.map((section) => {
             let actionElement: React.ReactNode = undefined;
 

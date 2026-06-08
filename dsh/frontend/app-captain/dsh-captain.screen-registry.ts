@@ -306,7 +306,7 @@ export const dshCaptainScreenRegistry = [
     ownerId: 'wlt.dsh',
     serviceId: 'wlt',
     linkedServiceId: 'dsh',
-    ownerPath: 'wlt/frontend/app-captain/dsh/WltDshCaptainBridge.tsx',
+    ownerPath: 'wlt/frontend/dsh/app-captain/WltDshCaptainBridge.tsx',
     componentName: 'WltDshCaptainBridge',
     screenKind: 'FLOW_STEP',
     flowId: 'captain.dsh.finance',

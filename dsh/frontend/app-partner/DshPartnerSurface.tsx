@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
 import { BottomNavBar, Box, Button, ModernPremiumHeader, Surface, Text } from '@bthwani/ui-kit';
 import type {
   DshPartnerOperationalFlowId,
@@ -15,6 +15,22 @@ import {
   mapDshPartnerOperationalFlowToSupportRoute,
   mapDshPartnerSupportRouteToOperationalFlow,
 } from './dsh-partner.types';
+import {
+  getSurfaceModeCapability,
+} from '../shared/dsh-fulfillment-surface-visibility';
+import {
+  getActionableHandoffsForSurface,
+} from '../shared/dsh-order-lifecycle-handoffs';
+import {
+  resolveDshOrderApiBaseUrl,
+  createDshOrderLifecycleHttpClient,
+  fetchDshRuntimeOrders,
+  type DshRuntimeOrderRow,
+  PlatformVarsProvider,
+  FeatureFlagProvider,
+  usePlatformVars,
+} from '../shared';
+import type { PartnerOrderItem, PartnerOrdersInboxScreenState } from './screens/OrdersInboxScreen';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';
 import { InventoryCatalogScreen } from './screens/InventoryCatalogScreen';
 import {
@@ -33,230 +49,27 @@ import {
 import { DshPartnerStoreCourierScreen } from './screens/DshPartnerStoreCourierScreen';
 import { PartnerEntryScreen } from './screens/PartnerEntryScreen';
 import { PartnerSupportScreen } from './screens/PartnerSupportScreen';
+import { ProductEditScreen } from './screens/ProductEditScreen';
+import { CategoryManagementScreen } from './screens/CategoryManagementScreen';
+import { ProductMediaScreen } from './screens/ProductMediaScreen';
+import { ProductOverridesScreen } from './screens/ProductOverridesScreen';
 
-type PartnerStoreScopeOption = {
-  id: string;
-  label: string;
-  description: string;
-};
-
-type PartnerStoreHoursDay = {
-  id: string;
-  label: string;
-  isOpen: boolean;
-  openTime: string;
-  closeTime: string;
-};
-
-const defaultStoreHours: readonly PartnerStoreHoursDay[] = [
-  { id: 'sun', label: 'Sunday', isOpen: true, openTime: '09:00', closeTime: '23:00' },
-  { id: 'mon', label: 'Monday', isOpen: true, openTime: '09:00', closeTime: '23:00' },
-  { id: 'tue', label: 'Tuesday', isOpen: true, openTime: '09:00', closeTime: '23:00' },
-  { id: 'wed', label: 'Wednesday', isOpen: true, openTime: '09:00', closeTime: '23:30' },
-  { id: 'thu', label: 'Thursday', isOpen: true, openTime: '09:00', closeTime: '23:30' },
-  { id: 'fri', label: 'Friday', isOpen: false, openTime: '14:00', closeTime: '23:30' },
-  { id: 'sat', label: 'Saturday', isOpen: true, openTime: '10:00', closeTime: '23:30' },
-] as const;
-
-const defaultServiceModes = [
-  {
-    id: 'partner_delivery',
-    label: 'توصيل المتجر',
-    description: 'تفعيل توصيل المتجر عبر موصل الشريك عند الجاهزية التشغيلية.',
-    enabled: true,
-  },
-  {
-    id: 'pickup',
-    label: 'استلام بنفسي',
-    description: 'إظهار الاستلام الذاتي عندما يكون المتجر جاهزًا لتسليم العميل مباشرة.',
-    enabled: true,
-  },
-  {
-    id: 'bthwani_delivery',
-    label: 'توصيل بثواني',
-    description: 'فتح توصيل بثواني فقط عند توفر تغطية الكباتن والإسناد.',
-    enabled: false,
-  },
-] as const;
-
-const defaultZone = {
-  title: 'Yasmin',
-} as const;
-
-const storeScopeOptions: readonly PartnerStoreScopeOption[] = [
-  {
-    id: 'all',
-    label: 'كل الفروع',
-    description: 'عرض موحّد لكل فروع الشريك.',
-  },
-  {
-    id: 'fakhama-1',
-    label: 'الفخامة 1',
-    description: 'الفرع الأساسي الحالي.',
-  },
-  {
-    id: 'fakhama-2',
-    label: 'الفخامة 2',
-    description: 'فرع المدينة الثاني للتشغيل.',
-  },
-  {
-    id: 'fakhama-3',
-    label: 'الفخامة 3',
-    description: 'فرع داعم لنطاق الطلبات الممتد.',
-  },
-] as const;
-
-const defaultSupportCommandContext: DshPartnerSupportCommandContext = {
-  filterId: 'all',
-  highlightedCaseId: null,
-  highlightedIssueCategoryId: null,
-  preferredOperationalFlowId: null,
-  preferredSupportRouteId: null,
-  source: 'operations',
-};
-
-function resolveSupportFilterFromOperationalFlow(
-  flowId: DshPartnerOperationalFlowId
-): DshPartnerSupportCommandFilterId {
-  if (flowId === 'order-alerts' || flowId === 'order-sla-risk') {
-    return 'active-orders';
-  }
-
-  if (
-    flowId === 'order-chat-read-ack'
-    || flowId === 'order-chat-send'
-    || flowId === 'order-quick-reply-config'
-    || flowId === 'order-quick-reply-settings'
-    || flowId === 'order-quick-reply-setup'
-  ) {
-    return 'conversations';
-  }
-
-  if (
-    flowId === 'inventory-adjust'
-    || flowId === 'inventory-update'
-    || flowId === 'items-upsert'
-    || flowId === 'doc-upload'
-    || flowId === 'intake-start'
-    || flowId === 'store-nomination'
-  ) {
-    return 'inventory-branch';
-  }
-
-  if (
-    flowId === 'partner-finance-bridge'
-    || flowId === 'partner-settlement-summary'
-    || flowId === 'partner-commission-summary'
-  ) {
-    return 'escalation';
-  }
-
-  if (
-    flowId === 'order-issue-queue'
-    || flowId === 'order-issue-required'
-    || flowId === 'order-reject'
-  ) {
-    return 'order-issues';
-  }
-
-  return 'active-orders';
-}
-
-function resolveSupportFilterFromRoute(
-  routeId: DshPartnerSupportRouteId
-): DshPartnerSupportCommandFilterId {
-  if (
-    routeId === 'chat-read-ack'
-    || routeId === 'chat-send'
-    || routeId === 'quick-reply-config'
-    || routeId === 'quick-reply-settings'
-    || routeId === 'quick-reply-setup'
-  ) {
-    return 'conversations';
-  }
-
-  if (
-    routeId === 'inventory-adjust'
-    || routeId === 'inventory-update'
-    || routeId === 'items-upsert'
-    || routeId === 'doc-upload'
-    || routeId === 'intake-start'
-    || routeId === 'store-nomination'
-    || routeId === 'video-upload'
-  ) {
-    return 'inventory-branch';
-  }
-
-  if (routeId === 'order-issue-queue' || routeId === 'order-reject') {
-    return 'order-issues';
-  }
-
-  return 'active-orders';
-}
-
-function resolveIssueCategoryFromOperationalFlow(
-  flowId: DshPartnerOperationalFlowId
-): DshPartnerSupportIssueCategoryId | null {
-  if (flowId === 'order-sla-risk') return 'delayed-preparation';
-  if (flowId === 'order-reject') return 'partner-reject-request';
-  if (flowId === 'order-handoff') return 'handoff-mismatch';
-  if (flowId === 'order-chat-read-ack' || flowId === 'order-chat-send') return 'customer-not-responding';
-  if (flowId === 'inventory-adjust' || flowId === 'inventory-update' || flowId === 'items-upsert') return 'item-unavailable';
-  if (flowId === 'partner-finance-bridge' || flowId === 'partner-settlement-summary' || flowId === 'partner-commission-summary') {
-    return 'payment-refund-review';
-  }
-
-  return null;
-}
-
-function resolveIssueCategoryFromRoute(
-  routeId: DshPartnerSupportRouteId
-): DshPartnerSupportIssueCategoryId | null {
-  if (routeId === 'order-reject') return 'partner-reject-request';
-  if (routeId === 'order-handoff') return 'handoff-mismatch';
-  if (routeId === 'chat-read-ack' || routeId === 'chat-send' || routeId === 'quick-reply-config' || routeId === 'quick-reply-settings' || routeId === 'quick-reply-setup') {
-    return 'customer-not-responding';
-  }
-  if (routeId === 'inventory-adjust' || routeId === 'inventory-update' || routeId === 'items-upsert') {
-    return 'item-unavailable';
-  }
-
-  return null;
-}
-
-function isCommandCenterInlineManagedRoute(routeId: DshPartnerSupportRouteId): boolean {
-  return routeId === 'order-issue-queue' || routeId === 'order-reject';
-}
-
-function buildSupportCommandContextFromOperationalFlow(
-  flowId: DshPartnerOperationalFlowId,
-  source: DshPartnerSupportCommandContext['source'] = 'operations'
-): DshPartnerSupportCommandContext {
-  return {
-    filterId: resolveSupportFilterFromOperationalFlow(flowId),
-    highlightedCaseId: null,
-    highlightedIssueCategoryId: resolveIssueCategoryFromOperationalFlow(flowId),
-    preferredOperationalFlowId: flowId,
-    preferredSupportRouteId: mapDshPartnerOperationalFlowToSupportRoute(flowId),
-    source,
-  };
-}
-
-function buildSupportCommandContextFromSupportRoute(
-  routeId: DshPartnerSupportRouteId,
-  source: DshPartnerSupportCommandContext['source'] = 'operations'
-): DshPartnerSupportCommandContext {
-  return {
-    filterId: resolveSupportFilterFromRoute(routeId),
-    highlightedCaseId: null,
-    highlightedIssueCategoryId: resolveIssueCategoryFromRoute(routeId),
-    preferredOperationalFlowId: mapDshPartnerSupportRouteToOperationalFlow(routeId),
-    preferredSupportRouteId: routeId,
-    source,
-  };
-}
-
-// Removed PartnerWalletHubSheet in favor of self-contained WltDshPartnerBridge cockpit tabs.
+import {
+  type PartnerStoreScopeOption,
+  type PartnerStoreHoursDay,
+  defaultStoreHours,
+  defaultServiceModes,
+  defaultZone,
+  storeScopeOptions,
+  defaultSupportCommandContext,
+  resolveSupportFilterFromOperationalFlow,
+  resolveSupportFilterFromRoute,
+  resolveIssueCategoryFromOperationalFlow,
+  resolveIssueCategoryFromRoute,
+  isCommandCenterInlineManagedRoute,
+  buildSupportCommandContextFromOperationalFlow,
+  buildSupportCommandContextFromSupportRoute,
+} from './dsh-partner.navigation-bridge';
 
 function PartnerStoreScopeSheet({
   visible,
@@ -291,16 +104,77 @@ function PartnerStoreScopeSheet({
   );
 }
 
-export function DshPartnerSurface({
+function mapRuntimeRowToPartnerItem(row: DshRuntimeOrderRow): PartnerOrderItem {
+  const statusMap: Record<string, PartnerOrderItem['status']> = {
+    CREATED: 'needs_accept',
+    ACCEPTED: 'preparation_started',
+    READY_FOR_PICKUP: 'ready',
+    ACCEPTED_BY_CAPTAIN: 'captain_assigned',
+    PICKED_UP: 'handoff',
+    EN_ROUTE: 'delivering',
+    ARRIVED: 'delivering',
+    DELIVERED: 'completed',
+    CANCELLED: 'cancelled',
+    REFUNDED: 'cancelled',
+    FAILED_DELIVERY: 'cancelled',
+    RETURNING_TO_STORE: 'cancelled',
+    RETURNED: 'cancelled',
+  };
+  const partnerStatus: PartnerOrderItem['status'] = statusMap[row.status] ?? 'needs_accept';
+  const nextActionMap: Record<PartnerOrderItem['status'], string> = {
+    new: 'قبول الطلب',
+    needs_accept: 'قبول الطلب',
+    preparation_started: 'بدء التحضير',
+    preparing: 'جاري التحضير',
+    items_ready: 'جاهز',
+    ready: 'جاهز للاستلام',
+    handoff: 'تم التسليم للكابتن',
+    captain_assigned: 'الكابتن في الطريق',
+    captain_arriving: 'الكابتن يقترب',
+    delivering: 'قيد التوصيل',
+    completed: 'مكتمل',
+    cancelled: 'ملغي',
+  };
+  const created = new Date(row.createdAt);
+  const elapsed = Math.max(0, Math.floor((Date.now() - created.getTime()) / 60000));
+  return {
+    id: row.id,
+    orderCode: `#${row.id.slice(-6).toUpperCase()}`,
+    branchLabel: row.storeId,
+    status: partnerStatus,
+    priority: 'normal',
+    orderTypeLabel: 'توصيل بثواني',
+    orderMode: 'bthwani_delivery',
+    itemsCountLabel: '—',
+    amountLabel: `${row.totalPrice.toFixed(2)} ر.س`,
+    createdAtLabel: created.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+    elapsedLabel: elapsed < 60 ? `${elapsed} د` : `${Math.floor(elapsed / 60)} س`,
+    nextActionLabel: nextActionMap[partnerStatus],
+  };
+}
+
+export function DshPartnerSurface(props: DshPartnerSurfaceProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshPartnerSurfaceInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshPartnerSurfaceInner({
   initialRoute = 'inbox',
   initialOrderId = 'partner-order-1042',
 }: DshPartnerSurfaceProps = {}) {
+  const { dshAuthBearerToken, dshClientId } = usePlatformVars();
   // walletHubVisible state removed in favor of self-contained WltDshPartnerBridge cockpit tabs.
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
   const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('hub');
   const [ordersSearchMode, setOrdersSearchMode] = React.useState(false);
   const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
   const [route, setRoute] = React.useState<DshPartnerRoute>(initialRoute);
+  const [editingProductId, setEditingProductId] = React.useState<string | undefined>(undefined);
   const [activeOrderId, setActiveOrderId] = React.useState(initialOrderId);
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<DshPartnerSupportRouteId>(
     initialRoute === 'order-rejection' ? 'order-reject' : 'order-issue-queue'
@@ -313,6 +187,49 @@ export function DshPartnerSurface({
   const routeHistoryRef = React.useRef<DshPartnerRoute[]>([initialRoute]);
   const routeTransitionFromBackRef = React.useRef(false);
   const supportDirectoryIntentRef = React.useRef(false);
+
+  const [partnerOrders, setPartnerOrders] = React.useState<readonly PartnerOrderItem[]>([]);
+  const [partnerOrdersState, setPartnerOrdersState] = React.useState<PartnerOrdersInboxScreenState>('loading');
+
+  const apiBaseUrl = React.useMemo(() => resolveDshOrderApiBaseUrl(), []);
+  const orderLifecycleClient = React.useMemo(
+    () => createDshOrderLifecycleHttpClient(apiBaseUrl),
+    [apiBaseUrl],
+  );
+
+  React.useEffect(() => {
+    if (route !== 'inbox') return;
+    setPartnerOrdersState('loading');
+    fetchDshRuntimeOrders({ limit: 100 }).then((result) => {
+      if (result.kind === 'ok') {
+        const items = result.orders.map(mapRuntimeRowToPartnerItem);
+        setPartnerOrders(items);
+        setPartnerOrdersState(items.length === 0 ? 'empty' : 'ready');
+      } else if (result.kind === 'offline') {
+        setPartnerOrdersState('offline');
+      } else {
+        setPartnerOrdersState('error');
+      }
+    }).catch(() => setPartnerOrdersState('error'));
+  }, [route]);
+
+  const handleMarkReady = React.useCallback(
+    (orderId: string) => {
+      orderLifecycleClient
+        .updateOrderStatus(orderId, { actor: 'partner', status: 'READY_FOR_PICKUP' })
+        .then(() => {
+          setPartnerOrders((prev) =>
+            prev.map((item) =>
+              item.id === orderId ? { ...item, status: 'ready' as const } : item,
+            ),
+          );
+        })
+        .catch(() => {
+          // status mutation failed — leave item as-is so user can retry
+        });
+    },
+    [orderLifecycleClient],
+  );
 
   React.useEffect(() => {
     if (route !== 'inbox' && ordersSearchMode) {
@@ -349,14 +266,19 @@ export function DshPartnerSurface({
     [selectedStoreScope.label, todayHoursLabel],
   );
 
+  const partnerActionableHandoffs = React.useMemo(
+    () => getActionableHandoffsForSurface('app-partner'),
+    [],
+  );
+
   const deliveryOpsSummary = React.useMemo(
     () => ({
       outForDelivery: 8,
-      handoffReady: defaultServiceModes.some((mode) => mode.id === 'partner_delivery' || mode.id === 'bthwani_delivery') ? 5 : 1,
+      handoffReady: (getSurfaceModeCapability('bthwani_delivery').partner.receivesOrder || getSurfaceModeCapability('partner_delivery').partner.receivesOrder) ? 5 : 1,
       deliveredToday: 24,
-      delayedRisk: 2,
+      delayedRisk: partnerActionableHandoffs.filter((h) => h.wltImpact.eventKind !== 'none').length,
     }),
-    [],
+    [partnerActionableHandoffs],
   );
 
   const partnerEntryState = 'ready' as const;
@@ -565,31 +487,33 @@ export function DshPartnerSurface({
   }, [route, accountHubSection]);
 
   const bottomNavBar = showBottomNav ? (
-    <BottomNavBar
-      activeId={bottomActiveId}
-      direction="rtl"
-      launcherLabel="الطلبات"
-      launcherIcon="receipt-outline"
-      launcherActive={bottomActiveId === 'orders'}
-      onLauncherPress={openOrdersBoard}
-      onSelect={(id: string) => {
-        if (id === 'profile') {
-          openAccountHub('hub');
-        } else if (id === 'wallet') {
-          openAccountHub('wallet');
-        } else if (id === 'inventory') {
-          openInventoryManagement();
-        } else if (id === 'operations') {
-          openSupportDirectory({ source: 'operations' });
-        }
-      }}
-      items={[
-        { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
-        { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
-        { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
-        { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
-      ]}
-    />
+    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+      <BottomNavBar
+        activeId={bottomActiveId}
+        direction="rtl"
+        launcherLabel="الطلبات"
+        launcherIcon="receipt-outline"
+        launcherActive={bottomActiveId === 'orders'}
+        onLauncherPress={openOrdersBoard}
+        onSelect={(id: string) => {
+          if (id === 'profile') {
+            openAccountHub('hub');
+          } else if (id === 'wallet') {
+            openAccountHub('wallet');
+          } else if (id === 'inventory') {
+            openInventoryManagement();
+          } else if (id === 'operations') {
+            openSupportDirectory({ source: 'operations' });
+          }
+        }}
+        items={[
+          { id: 'operations', label: 'العمليات', icon: 'people-outline', activeIcon: 'people' },
+          { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+          { id: 'inventory', label: 'المخزون', icon: 'cube-outline', activeIcon: 'cube' },
+          { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+        ]}
+      />
+    </View>
   ) : null;
 
   const renderMainShell = (content: React.ReactNode) => (
@@ -657,6 +581,8 @@ export function DshPartnerSurface({
         onOpenOperationalFlow={(flowId) => openSupportCommandFromOperationalFlow(flowId, 'hub')}
         onOpenSupportScreen={(screenId) => openSupportScreen(screenId, 'hub')}
         onOpenStoreCourierSetup={openStoreCourier}
+        dshAuthBearerToken={dshAuthBearerToken}
+        dshClientId={dshClientId}
       />,
     );
   }
@@ -692,8 +618,11 @@ export function DshPartnerSurface({
   if (route === 'inbox') {
     return renderMainShell(
       <OrdersInboxScreen
+        state={partnerOrdersState}
+        items={partnerOrders}
         searchMode={ordersSearchMode}
         onCloseSearch={() => setOrdersSearchMode(false)}
+        onMarkReady={handleMarkReady}
         onRetry={() => setRoute('inbox')}
       />,
     );
@@ -703,10 +632,66 @@ export function DshPartnerSurface({
     return renderSurfaceShell(
       <InventoryCatalogScreen
         onBack={() => openAccountHub('hub')}
+        onNavigateToProductEdit={(prodId) => {
+          setEditingProductId(prodId);
+          setRoute('product-edit');
+        }}
+        onNavigateToCategoryManagement={() => {
+          setRoute('category-management');
+        }}
+        onNavigateToProductMedia={(prodId) => {
+          setEditingProductId(prodId);
+          setRoute('product-media');
+        }}
+        onNavigateToProductOverrides={(prodId) => {
+          setEditingProductId(prodId);
+          setRoute('product-overrides');
+        }}
         storeName={maintenanceProfile.storeName}
         branchLabel={selectedStoreScope.label}
         activeZoneLabel={maintenanceProfile.activeZoneLabel}
         todayHoursLabel={maintenanceProfile.todayHoursLabel}
+      />,
+    );
+  }
+
+  if (route === 'product-edit') {
+    return renderSurfaceShell(
+      <ProductEditScreen
+        storeId="store-1001"
+        productId={editingProductId}
+        onBack={() => setRoute('inventory-management')}
+        onSaved={() => {
+          setEditingProductId(undefined);
+          setRoute('inventory-management');
+        }}
+      />,
+    );
+  }
+
+  if (route === 'category-management') {
+    return renderSurfaceShell(
+      <CategoryManagementScreen
+        storeId="store-1001"
+        onBack={() => setRoute('inventory-management')}
+      />,
+    );
+  }
+
+  if (route === 'product-media') {
+    return renderSurfaceShell(
+      <ProductMediaScreen
+        productId={editingProductId ?? ''}
+        onBack={() => setRoute('inventory-management')}
+      />,
+    );
+  }
+
+  if (route === 'product-overrides') {
+    return renderSurfaceShell(
+      <ProductOverridesScreen
+        productId={editingProductId ?? ''}
+        onBack={() => setRoute('inventory-management')}
       />,
     );
   }

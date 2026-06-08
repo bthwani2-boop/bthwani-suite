@@ -1,5 +1,0 @@
-
-> bthwani-suite@0.0.0 guard:tamagui-import-boundary C:\bthwani-suite
-> node tools/guards/guard-ui-architecture-boundary.mjs
-
-UI-ARCH-BOUNDARY: PASS (fail=0, warn=0)

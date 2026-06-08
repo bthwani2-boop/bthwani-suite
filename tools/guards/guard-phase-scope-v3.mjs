@@ -17,6 +17,7 @@ const uiPhase = phase === 'UI_UX_FLOW';
 const files = walk(args.root).filter(isTextFile);
 const uiFile = f => /(^|\/)(app-client|app-partner|app-captain|app-field|control-panel|dsh\/frontend|apps\/mobile|apps\/web)\//.test(f.replace(/\\/g,'/'));
 for (const f of files) {
+  if (f.endsWith('.d.ts')) continue;
   if (!uiFile(path.relative(args.root,f))) continue;
   const txt = readText(f);
   let m;

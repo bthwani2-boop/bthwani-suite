@@ -16,6 +16,7 @@
     "dev": "expo start --dev-client --clear",
     "go": "expo start --go --clear",
     "android": "expo run:android",
-    "config": "expo config --json"
+    "config": "expo config --json",
+    "ios": "expo run:ios"
   }
 }

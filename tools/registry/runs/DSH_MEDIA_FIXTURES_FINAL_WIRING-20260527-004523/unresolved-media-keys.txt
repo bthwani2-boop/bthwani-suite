@@ -1,3 +1,0 @@
-All mapped mediaKeys in resolve-dsh-image-source.ts resolve correctly to actual local files under dsh/frontend/media-fixtures/.
-No unresolved media keys exist.
-100% resolution coverage.

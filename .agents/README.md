@@ -19,7 +19,8 @@ Read order:
 1. `AGENTS.md`
 2. `.agents/README.md`
 3. `.agents/AUTHORITY_BOUNDARY.md`
-4. `.agents/INDEX.md`
-5. relevant `SKILL.md`
-6. relevant adapter
-7. relevant `governance/` source
+4. `.agents/GRAPHIFY.md` when the task is about repository structure, relationships, ownership, routing, imports, or cross-surface impact
+5. `.agents/INDEX.md`
+6. relevant `SKILL.md`
+7. relevant adapter
+8. relevant `governance/` source

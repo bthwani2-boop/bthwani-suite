@@ -29,10 +29,10 @@ config.resolver.disableHierarchicalLookup = false;
 config.resolver.unstable_enablePackageExports = false;
 
 config.resolver.blockList = [
-	/.*\.next\/.*/,
-	/.*\.turbo\/.*/,
-	/.*\/tools\/registry\/runs\/.*/,
-	/.*\/build\/cache\/.*/,
+	/.*\.next([/\\]|$).*/,
+	/.*\.turbo([/\\]|$).*/,
+	/.*[/\\]tools[/\\]registry[/\\]runs([/\\]|$).*/,
+	/.*[/\\]build[/\\]cache([/\\]|$).*/,
 ];
 
 module.exports = config;

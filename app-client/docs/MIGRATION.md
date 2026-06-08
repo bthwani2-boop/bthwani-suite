@@ -1,33 +1,29 @@
 # app-client Root Migration Notes
 
-Status: ACTIVE_MIGRATION_NOTE
+Status: MIGRATION_COMPLETED
 
-Phase 3 created only the app-client root scaffold.
-
-No files were moved.
-
-Current runtime remains under:
+Canonical root:
 
 ```text
-apps/mobile/app-client
+app-client
+```
+
+Runtime lives under:
+
+```text
+app-client/runtime
 ```
 
 Target compact structure:
 
 ```text
 app-client
-├── runtime
-├── shell
-├── composition
-└── docs
+â”œâ”€â”€ runtime
+â”œâ”€â”€ shell
+â”œâ”€â”€ composition
+â””â”€â”€ docs
 ```
 
-Next app-client migration phase must be blocked until evidence proves:
+Compatibility bridge:
 
-```text
-imports safe
-runtime command safe
-TypeScript safe
-service implementation not moved into app root
-visual or RTL proof if UI changes
-```
+The compatibility bridge at `apps/mobile/app-client` has been retired. All references now point to the canonical flat active root.

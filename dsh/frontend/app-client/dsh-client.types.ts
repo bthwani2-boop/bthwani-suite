@@ -9,6 +9,7 @@ export type DshRoute =
   | 'notifications'
   | 'store-items'
   | 'cart-get'
+  | 'checkout-intent'
   | 'search'
   | 'store-get'
   | 'bell'
@@ -22,6 +23,7 @@ export type DshRoute =
   | 'orders-list'
   | 'addresses-location'
   | 'identity'
+  | 'appearance'
   | 'tracking';
 
 export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'bell' | 'create-order' | 'cart-get';
@@ -35,6 +37,8 @@ export type DshClientSurfaceProps = {
   command: DshNavigationCommand;
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
+  authToken?: string;
+  devClientId?: string;
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
 };
 

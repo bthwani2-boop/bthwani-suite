@@ -6,10 +6,22 @@ import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 
+import { DshOrderLifecycleClient } from '../../shared/dsh-order-lifecycle-client';
+import { type DshOperationScreenState } from '../../app-client/parts/OperationScreen';
+
 type CaptainFieldStage = 'to-store' | 'to-customer' | 'near-customer' | 'at-door' | 'bell-rang' | 'proof';
 type CaptainHeartbeatState = { lastUpdateMinutesAgo: number; etaMinutes: number | null };
 
 const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
+
+const STAGE_COORDINATES: Record<CaptainFieldStage, { lat: number; lng: number }> = {
+  'to-store': { lat: 15.3200, lng: 44.1200 },
+  'to-customer': { lat: 15.3220, lng: 44.1220 },
+  'near-customer': { lat: 15.3240, lng: 44.1240 },
+  'at-door': { lat: 15.3250, lng: 44.1250 },
+  'bell-rang': { lat: 15.3251, lng: 44.1251 },
+  'proof': { lat: 15.3252, lng: 44.1252 },
+};
 
 function useCaptainHeartbeat(stage: CaptainFieldStage): CaptainHeartbeatState {
   const [state, setState] = React.useState<CaptainHeartbeatState>({
@@ -82,17 +94,88 @@ const STAGE_CONFIG: Record<CaptainFieldStage, { title: string; description: stri
   },
 };
 
-export function DshCaptainMapScreen() {
+export interface DshCaptainMapScreenProps {
+  readonly orderId: string;
+  readonly captainId?: string;
+  readonly onBack: () => void;
+  readonly orderLifecycleClient: DshOrderLifecycleClient;
+}
+
+export function DshCaptainMapScreen({
+  orderId,
+  captainId = 'captain-1',
+  onBack,
+  orderLifecycleClient,
+}: DshCaptainMapScreenProps) {
   const [taskStage, setTaskStage] = React.useState<CaptainFieldStage>('to-store');
   const [stagesVisible, setStagesVisible] = React.useState(false);
+  const [screenState, setScreenState] = React.useState<DshOperationScreenState>('ready');
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+
   const heartbeat = useCaptainHeartbeat(taskStage);
   const config = STAGE_CONFIG[taskStage];
   const mapFlowPolicy = getDshCaptainFlowPolicy('captain-map-navigation');
   const mapFlowSummary = getDshFlowPolicySummary('captain-map-navigation');
 
-  const advanceStage = () => {
-    if (config.nextStage) {
-      setTaskStage(config.nextStage);
+  const advanceStage = async () => {
+    const next = config.nextStage;
+    if (!next) return;
+
+    setScreenState('loading');
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    let nextOrderStatus: 'EN_ROUTE' | 'ARRIVED' | undefined;
+    if (next === 'to-customer') {
+      nextOrderStatus = 'EN_ROUTE';
+    } else if (next === 'proof') {
+      nextOrderStatus = 'ARRIVED';
+    }
+
+    try {
+      await orderLifecycleClient.pushLocation(orderId, {
+        captain_id: captainId,
+        latitude: STAGE_COORDINATES[next].lat,
+        longitude: STAGE_COORDINATES[next].lng,
+        lifecycle_status: STAGE_CONFIG[next].lifecycleStatus,
+        order_status: nextOrderStatus,
+      });
+      setTaskStage(next);
+      setScreenState('ready');
+      setSuccessMessage(`تم تحديث المرحلة إلى ${STAGE_CONFIG[next].title} بنجاح.`);
+    } catch (err: any) {
+      setScreenState('ready');
+      setErrorMessage(err?.body || 'فشل تحديث موقع الكابتن.');
+    }
+  };
+
+  const handleStageSelect = async (stage: CaptainFieldStage) => {
+    setScreenState('loading');
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    let nextOrderStatus: 'EN_ROUTE' | 'ARRIVED' | undefined;
+    if (stage === 'to-customer') {
+      nextOrderStatus = 'EN_ROUTE';
+    } else if (stage === 'proof') {
+      nextOrderStatus = 'ARRIVED';
+    }
+
+    try {
+      await orderLifecycleClient.pushLocation(orderId, {
+        captain_id: captainId,
+        latitude: STAGE_COORDINATES[stage].lat,
+        longitude: STAGE_COORDINATES[stage].lng,
+        lifecycle_status: STAGE_CONFIG[stage].lifecycleStatus,
+        order_status: nextOrderStatus,
+      });
+      setTaskStage(stage);
+      setScreenState('ready');
+      setSuccessMessage(`تم الانتقال إلى ${STAGE_CONFIG[stage].title} بنجاح.`);
+    } catch (err: any) {
+      setScreenState('ready');
+      setErrorMessage(err?.body || 'فشل الانتقال إلى المرحلة المحددة.');
     }
   };
 
@@ -106,10 +189,22 @@ export function DshCaptainMapScreen() {
 
   return (
     <DshOperationScreen
+      state={screenState}
       title="التنفيذ الميداني"
-      subtitle="شاشة داخلية للكابتن — لا تُعرض للعميل. تحديث الموقع كل 3 دقائق بدون خريطة حية."
+      subtitle={`شاشة داخلية للكابتن للطلب ${orderId} — تحديث الموقع كل 3 دقائق.`}
       content={
         <Box gap={3}>
+          {errorMessage && (
+            <Surface tone="error" padding={3} radiusToken="md">
+              <Text role="bodySm" style={{ color: 'red', textAlign: 'right' }}>{errorMessage}</Text>
+            </Surface>
+          )}
+          {successMessage && (
+            <Surface tone="brand" padding={3} radiusToken="md">
+              <Text role="bodySm" style={{ color: 'green', textAlign: 'right' }}>{successMessage}</Text>
+            </Surface>
+          )}
+
           <Surface tone="brand" gap={3}>
             <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
               <Text role="bodyStrong">{config.title}</Text>
@@ -136,6 +231,7 @@ export function DshCaptainMapScreen() {
               items={[
                 { label: 'آخر تحديث', value: heartbeat.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${heartbeat.lastUpdateMinutesAgo} دقيقة` },
                 { label: 'الوقت التقريبي', value: heartbeat.etaMinutes !== null ? `${heartbeat.etaMinutes} دقيقة` : 'وصلت' },
+                { label: 'إحداثيات الكابتن', value: `(${STAGE_COORDINATES[taskStage].lat.toFixed(4)}, ${STAGE_COORDINATES[taskStage].lng.toFixed(4)})` },
                 { label: 'حالة المرحلة', value: config.lifecycleStatus, tone: 'brand' },
               ]}
             />
@@ -159,7 +255,7 @@ export function DshCaptainMapScreen() {
                     tone={taskStage === stage ? 'primary' : 'secondary'}
                     size="sm"
                     fullWidth={false}
-                    onPress={() => setTaskStage(stage)}
+                    onPress={() => handleStageSelect(stage)}
                   />
                 ))}
               </Box>
@@ -173,8 +269,10 @@ export function DshCaptainMapScreen() {
       }
       primaryActionLabel={config.action}
       secondaryActionLabel={config.nextStage ? 'المرحلة التالية' : undefined}
+      tertiaryActionLabel="العودة للتفاصيل"
       onPrimaryAction={advanceStage}
       onSecondaryAction={config.nextStage ? advanceStage : undefined}
+      onTertiaryAction={onBack}
     />
   );
 }

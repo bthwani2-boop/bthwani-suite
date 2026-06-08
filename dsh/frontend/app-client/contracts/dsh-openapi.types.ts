@@ -4,6 +4,226 @@
  */
 
 export interface paths {
+    "/stores/{store_id}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List products for a store
+         * @description Returns all product records for the given store, ordered by creation date descending.
+         */
+        get: operations["listProducts"];
+        put?: never;
+        /**
+         * Create product for a store
+         * @description Creates a new product identity record for the given store. The product starts in `partner_submitted` approval status and enters the catalog review pipeline. WLT boundary: base_price_label is a display label only — no financial mutation occurs inside DSH.
+         */
+        post: operations["createProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a single product
+         * @description Returns one product identity record by ID, including DSH catalog status and display-only price label.
+         */
+        get: operations["getProduct"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update product identity
+         * @description Updates product name, SKU, GTIN, barcode, description, base_price_label, or category_id. All fields are optional — only provided fields are updated. WLT boundary: base_price_label is a display label only.
+         */
+        patch: operations["updateProduct"];
+        trace?: never;
+    };
+    "/stores/{store_id}/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List categories for a store
+         * @description Returns all categories for the given store.
+         */
+        get: operations["listCategories"];
+        put?: never;
+        /**
+         * Create category for a store
+         * @description Creates a new category (and optional subcategory via parent_id) for the given store.
+         */
+        post: operations["createCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a single category
+         * @description Returns one store category by ID, including hierarchy metadata used by DSH catalog surfaces.
+         */
+        get: operations["getCategory"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete category
+         * @description Deletes the category. Products assigned to this category will have their category_id set to null.
+         */
+        delete: operations["deleteCategory"];
+        options?: never;
+        head?: never;
+        /**
+         * Update category
+         * @description Updates category details (name, parent_id, description).
+         */
+        patch: operations["updateCategory"];
+        trace?: never;
+    };
+    "/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload product media record
+         * @description Creates/attaches a new product media record validated against the local media manifest.
+         */
+        post: operations["uploadProductMedia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete product media
+         * @description Deletes/removes a product media record.
+         */
+        delete: operations["deleteProductMedia"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{store_id}/catalog-overrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Apply catalog overrides for a store
+         * @description Applies local overrides (price, stock, availability) for products in the given store's catalog. These local overrides do not mutate the central product definitions.
+         */
+        patch: operations["updateCatalogOverrides"];
+        trace?: never;
+    };
+    "/catalog-approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve, reject, or request fix for a catalog item
+         * @description Performs an approval action (approve, reject, needs-fix) on a catalog product, category suggestion, or media upload. Updates the approval_status of the referenced item. WLT boundary: displays and logs approval outcome only — no financial mutation.
+         */
+        post: operations["recordCatalogApprovalAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalog-conflicts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List catalog overrides conflicts
+         * @description Returns a list of pending or resolved conflicts between central catalog and partner local overrides.
+         */
+        get: operations["listConflicts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalog-conflicts/{id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve a catalog override conflict
+         * @description Resolves a catalog override conflict by either accepting the partner local override or reverting it to central.
+         */
+        post: operations["resolveConflict"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stores": {
         parameters: {
             query?: never;
@@ -17,7 +237,648 @@ export interface paths {
          */
         get: operations["listDiscoveryStores"];
         put?: never;
+        /**
+         * Create field store onboarding file
+         * @description Create a new field-collected store file and place it in pending review without financial mutation.
+         */
+        post: operations["createFieldStore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get discovery store details
+         * @description Retrieve detailed information for a single store, including contact info, hours, and catalog summary.
+         */
+        get: operations["getDiscoveryStore"];
+        put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/field-visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit field visit evidence references
+         * @description Submit field visit notes and evidence media key references for an onboarded store. Raw media upload and document proof stay in the downstream media slice.
+         */
+        post: operations["createFieldVisit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload field document reference
+         * @description Upload field agent document or photo proof reference for a store.
+         */
+        post: operations["createFieldDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/readiness-escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Escalates incomplete readiness submission
+         * @description Escalate store readiness to a target team for resolution.
+         */
+        post: operations["createFieldReadinessEscalation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readiness-escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List readiness escalations
+         * @description Returns a list of escalations for control-panel operator queue.
+         */
+        get: operations["listFieldReadinessEscalations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/readiness-escalations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update readiness escalation status
+         * @description Updates the status of a readiness escalation.
+         */
+        patch: operations["updateFieldReadinessEscalation"];
+        trace?: never;
+    };
+    "/stores/{id}/readiness-approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject store readiness
+         * @description Performs a formal readiness approval or rejection.
+         */
+        post: operations["createFieldReadinessApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/readiness-approvals/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get latest readiness approval decision
+         * @description Returns the latest approval or rejection record for a store.
+         */
+        get: operations["getLatestFieldReadinessApproval"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stores/{id}/partner-readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update store partner readiness
+         * @description Update the partner readiness status gate for a store.
+         */
+        patch: operations["updatePartnerReadiness"];
+        trace?: never;
+    };
+    "/stores/{id}/catalog-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update store catalog approval status
+         * @description Update the catalog quality and catalog pricing status gates for a store.
+         */
+        patch: operations["updateStoreCatalogApproval"];
+        trace?: never;
+    };
+    "/stores/{id}/marketing-visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update store marketing visibility status
+         * @description Update the marketing visibility status gate for a store.
+         */
+        patch: operations["updateMarketingVisibility"];
+        trace?: never;
+    };
+    "/cart/serviceability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check cart serviceability
+         * @description Checks whether the client's cart items and store are serviceable before checkout.
+         *     Client auth required — cart must be associated with authenticated client identity.
+         *     WLT boundary: no financial data. Serviceability is operational only.
+         *
+         *     Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+         *     Production: BearerAuth token verified against auth service GET /auth/session.
+         *     DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
+         *     x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+         */
+        get: operations["getCartServiceability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkout/intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create checkout intent
+         * @description Creates a checkout session for the authenticated client's cart.
+         *     Returns a session_token to be passed to WLT payment bridge (DSH-SLICE-003C).
+         *     Requires: client auth (003A dependency) + serviceability confirmed (003A passed).
+         *     WLT boundary: no financial mutation at this step. Creates operational session only.
+         *     DSH stores the intent; WLT receives session_token to associate the payment.
+         *
+         *     Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+         *     Production: BearerAuth token verified against auth service GET /auth/session.
+         *     DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
+         *     x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+         */
+        post: operations["createCheckoutIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkout/intent/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Cancel checkout intent
+         * @description Cancels a checkout intent and preserves the client's cart.
+         *     Used when payment fails (DSH-SLICE-003E) or client cancels before payment.
+         *     WLT boundary: no financial mutation. Cart is preserved in DSH state.
+         *     If payment was already confirmed before cancellation, refund is WLT-owned (DSH-SLICE-004E).
+         */
+        delete: operations["cancelCheckoutIntent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkout/payment-callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Receive WLT payment decision callback
+         * @description DSH backend endpoint that receives WLT payment decision.
+         *     This is the PRIMARY flow — WLT calls this after financial decision (confirmed or failed).
+         *     Polling GET /wlt/dsh/client/payment-sessions/{sessionId} is the FALLBACK only.
+         *
+         *     DSH responsibilities (only):
+         *       - Validate X-WLT-Event-Id (idempotency — persist event ID and acknowledge repeated events)
+         *       - Validate X-WLT-Callback-Token against configured WLT_CALLBACK_SECRET
+         *       - Store wlt_payment_ref_id as operational reference (no financial mutation)
+         *       - Update intent status (payment_confirmed or payment_failed)
+         *       - DSH-SLICE-003D (order creation) is a SEPARATE subsequent step, not triggered here
+         *
+         *     Boundary contract: DSH_PAYMENT_INPUT_ONLY — WLT_OWNS_FINAL_FINANCIAL_TRUTH.
+         *
+         *     Security headers required from WLT:
+         *       X-WLT-Callback-Token: configured shared secret; final production HMAC/signature hardening remains WLT security proof before PASS
+         *       X-WLT-Event-Id: unique event UUID for idempotency
+         *       Idempotency-Key: same as the payment session Idempotency-Key
+         */
+        post: operations["receivePaymentCallback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new order
+         * @description Creates a new order in CREATED status.
+         *     Production: BearerAuth token supplies the client identity.
+         *     DEV_ONLY: X-Client-Id header supplies temporary client identity until auth runtime is live.
+         *     The request body's client_id is optional compatibility input and is never the trusted identity source.
+         *     WLT boundary: local order creation is enabled to unblock testing order states and cancellations, but does NOT perform any external financial callback/WLT balance deduction.
+         */
+        post: operations["createOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get order details
+         * @description Returns the order record, items, status history events, and support tickets.
+         */
+        get: operations["getOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update order status
+         * @description Updates the status of an order and records a status event.
+         */
+        patch: operations["updateOrderStatus"];
+        trace?: never;
+    };
+    "/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel an order
+         * @description Sets the status of an order to CANCELLED and records a status event.
+         */
+        post: operations["cancelOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/refund-callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Handle refund callback from WLT
+         * @description Incoming webhook triggered by WLT to notify DSH of a refund status.
+         *     WLT boundary: WLT owns refund execution. DSH stores reference ID only.
+         *     Requires X-WLT-Callback-Token matching WLT_CALLBACK_SECRET; DEV_ONLY accepts dev-secret.
+         */
+        post: operations["refundOrderCallback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/assign-captain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assign a captain to an order
+         * @description Assigns a captain to the order.
+         */
+        post: operations["assignCaptain"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/accept-task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept a delivery task by captain
+         * @description Allows an assigned captain to accept the delivery task.
+         */
+        post: operations["acceptTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/decline-task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decline a delivery task by captain
+         * @description Allows an assigned captain to decline the delivery task, triggering reassignment.
+         */
+        post: operations["declineTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm order pickup by captain
+         * @description Allows the assigned captain to confirm that they have picked up the order from the store.
+         */
+        post: operations["confirmPickup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get captain location and delivery lifecycle status
+         * @description Returns the latest captain location coordinates and lifecycle status for the order.
+         */
+        get: operations["getCaptainLocation"];
+        put?: never;
+        /**
+         * Update captain location and delivery lifecycle status
+         * @description Allows the assigned captain to push coordinate updates and delivery lifecycle stage updates (e.g. EN_ROUTE, ARRIVED).
+         */
+        post: operations["updateCaptainLocation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/deliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit proof of delivery (DSH-SLICE-005E)
+         * @description Captain submits proof-of-delivery media key and transitions order status from ARRIVED to DELIVERED.
+         *     Precondition: order must be in ARRIVED state and assigned to the calling captain.
+         *     WLT BOUNDARY: this endpoint does NOT trigger payout or any financial mutation.
+         *     Payout is WLT responsibility, triggered externally when WLT observes the DELIVERED event.
+         */
+        post: operations["deliverOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/fail-delivery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report delivery failure (DSH-SLICE-005F)
+         * @description Captain reports that delivery could not be completed (client unreachable, wrong address, refused, etc.).
+         *     Precondition: order must be in ARRIVED state and assigned to the calling captain.
+         *     failure_reason is mandatory.
+         *     If return_required is true: transitions ARRIVED → RETURNING_TO_STORE.
+         *     If return_required is false: transitions ARRIVED → FAILED_DELIVERY.
+         *     WLT BOUNDARY: wlt_refund_trigger_ref is a bridge reference ID stored by DSH only.
+         *     DSH does NOT execute refunds. WLT (004E) owns refund execution after observing this event.
+         */
+        post: operations["failDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/orders/{id}/confirm-return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm item returned to store (DSH-SLICE-005F)
+         * @description Captain confirms item has been returned to the store.
+         *     Precondition: order must be in RETURNING_TO_STORE state.
+         *     Transitions RETURNING_TO_STORE → RETURNED.
+         *     WLT BOUNDARY: no financial mutation. Refund bridge reference was already set in fail-delivery.
+         */
+        post: operations["confirmReturn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support/escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a support escalation ticket
+         * @description Creates a support escalation ticket for a specific order.
+         */
+        post: operations["createSupportEscalation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -35,6 +896,109 @@ export interface components {
                 offset: number;
                 total: number;
             };
+        };
+        CreateFieldStoreRequest: {
+            name: string;
+            address: string;
+            category_id?: string;
+            supports_pickup: boolean;
+            supports_partner_delivery: boolean;
+        };
+        CreateFieldStoreResponse: {
+            id: string;
+            name: string;
+            address: string;
+            category_id?: string;
+            /** @example pending_review */
+            publish_stage: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CreateFieldVisitRequest: {
+            field_agent_id?: string;
+            visit_summary: string;
+            follow_up_action: string;
+            /** @description Media key references only; raw uploads are governed by the downstream media/documents slice. */
+            evidence_media_keys?: string[];
+            location_confidence?: string;
+        };
+        CreateFieldVisitResponse: {
+            id: string;
+            store_id: string;
+            field_agent_id?: string;
+            visit_summary: string;
+            follow_up_action: string;
+            evidence_media_keys?: string[];
+            location_confidence?: string;
+            /** @enum {string} */
+            status: "submitted";
+            /** Format: date-time */
+            created_at: string;
+        };
+        CreateFieldDocumentRequest: {
+            /** @enum {string} */
+            document_kind: "commercial_registration" | "tax_certificate" | "identity_proof" | "storefront_photo" | "interior_photo";
+            /** @description Media key of the uploaded document in S3 or local media storage. */
+            media_key: string;
+        };
+        FieldDocumentRecord: {
+            id: string;
+            store_id: string;
+            /** @enum {string} */
+            document_kind: "commercial_registration" | "tax_certificate" | "identity_proof" | "storefront_photo" | "interior_photo";
+            media_key: string;
+            /** @enum {string} */
+            status: "pending" | "approved" | "rejected";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        CreateFieldReadinessEscalationRequest: {
+            field_agent_id?: string;
+            reason: string;
+            /** @enum {string} */
+            target_team: "partner-management" | "control-panel" | "marketing";
+        };
+        FieldReadinessEscalationRecord: {
+            id: string;
+            store_id: string;
+            field_agent_id?: string;
+            reason: string;
+            /** @enum {string} */
+            target_team: "partner-management" | "control-panel" | "marketing";
+            /** @enum {string} */
+            status: "escalated" | "info_requested" | "resolved" | "rejected";
+            operator_note?: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        UpdateFieldReadinessEscalationRequest: {
+            /** @enum {string} */
+            status: "info_requested" | "resolved" | "rejected";
+            operator_note?: string;
+        };
+        ListFieldReadinessEscalationsResponse: {
+            escalations: components["schemas"]["FieldReadinessEscalationRecord"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        CreateFieldReadinessApprovalRequest: {
+            operator_id?: string;
+            /** @enum {string} */
+            decision: "approved" | "rejected";
+            reason?: string;
+        };
+        FieldReadinessApprovalRecord: {
+            id: string;
+            store_id: string;
+            operator_id?: string;
+            /** @enum {string} */
+            decision: "approved" | "rejected";
+            reason?: string;
+            /** Format: date-time */
+            created_at: string;
         };
         DiscoveryStore: {
             id: string;
@@ -54,9 +1018,437 @@ export interface components {
             offer_label?: string;
             publish_stage: string;
         };
+        DiscoveryStoreDetail: {
+            id: string;
+            name: string;
+            address: string;
+            category_id?: string;
+            image_url?: string;
+            logo_image_url?: string;
+            rating?: number;
+            distance_label: string;
+            delivery_label: string;
+            service_label: string;
+            status_label: string;
+            /** @enum {string} */
+            status_tone: "open" | "closed";
+            has_offer: boolean;
+            offer_label?: string;
+            publish_stage: string;
+            contact_number?: string;
+            opening_hours?: string;
+            catalog_summary?: string;
+            /** @enum {string} */
+            partner_readiness_status: "ready" | "not_ready" | "paused";
+            /** @enum {string} */
+            catalog_quality_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            catalog_pricing_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            marketing_visibility_status: "active" | "inactive" | "paused";
+        };
+        PartnerReadinessUpdateRequest: {
+            /**
+             * @description The readiness status of the store partner.
+             * @enum {string}
+             */
+            status: "ready" | "not_ready" | "paused";
+        };
+        CatalogApprovalUpdateRequest: {
+            /**
+             * @description The quality approval status of the store catalog.
+             * @enum {string}
+             */
+            quality_status: "approved" | "pending" | "rejected";
+            /**
+             * @description The pricing approval status of the store catalog.
+             * @enum {string}
+             */
+            pricing_status: "approved" | "pending" | "rejected";
+        };
+        MarketingVisibilityUpdateRequest: {
+            /**
+             * @description The marketing visibility status of the store.
+             * @enum {string}
+             */
+            status: "active" | "inactive" | "paused";
+        };
+        StoreVisibilityGateResponse: {
+            store_id: string;
+            /** @enum {string} */
+            partner_readiness_status: "ready" | "not_ready" | "paused";
+            /** @enum {string} */
+            catalog_quality_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            catalog_pricing_status: "approved" | "pending" | "rejected";
+            /** @enum {string} */
+            marketing_visibility_status: "active" | "inactive" | "paused";
+            client_visible: boolean;
+            /** Format: date-time */
+            updated_at: string;
+        };
         ErrorResponse: {
             code: string;
             message: string;
+        };
+        ProductRecord: {
+            id: string;
+            store_id: string;
+            name: string;
+            sku?: string;
+            gtin?: string;
+            barcode?: string;
+            description?: string;
+            /** @description Display label only — no financial mutation. WLT owns price semantics. */
+            base_price_label: string;
+            category_id?: string;
+            /** @enum {string} */
+            approval_status: "field_draft" | "partner_submitted" | "partner_review" | "partner_approved" | "marketing_review" | "marketing_approved" | "catalog_adopted" | "client_visible" | "needs_fix" | "rejected";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            media?: components["schemas"]["ProductMediaRecord"][];
+            /** @description Display-only local price override. */
+            price_override?: string;
+            /** @description Local stock count override. */
+            stock_override?: number;
+            /** @description Local availability override. */
+            available_override?: boolean;
+        };
+        CreateProductRequest: {
+            name: string;
+            sku?: string;
+            gtin?: string;
+            barcode?: string;
+            description?: string;
+            base_price_label: string;
+            category_id?: string;
+        };
+        UpdateProductRequest: {
+            name?: string;
+            sku?: string;
+            gtin?: string;
+            barcode?: string;
+            description?: string;
+            base_price_label?: string;
+            category_id?: string;
+        };
+        ListProductsResponse: {
+            products: components["schemas"]["ProductRecord"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        CategoryRecord: {
+            id: string;
+            store_id: string;
+            parent_id?: string;
+            name: string;
+            description?: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        CreateCategoryRequest: {
+            parent_id?: string;
+            name: string;
+            description?: string;
+        };
+        UpdateCategoryRequest: {
+            parent_id?: string;
+            name?: string;
+            description?: string;
+        };
+        ListCategoriesResponse: {
+            categories: components["schemas"]["CategoryRecord"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        ProductMediaRecord: {
+            id: string;
+            product_id: string;
+            media_key: string;
+            url: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        UploadProductMediaRequest: {
+            product_id: string;
+            media_key: string;
+        };
+        UpdateCatalogOverridesRequest: {
+            overrides: components["schemas"]["CatalogOverrideInput"][];
+        };
+        CatalogOverrideInput: {
+            product_id: string;
+            /** @description Partner-specific price override label (display-only, WLT boundary). */
+            price_override?: string;
+            /** @description Partner-specific inventory stock override count. */
+            stock_override?: number;
+            /** @description Toggle availability override for the product. */
+            available_override?: boolean;
+        };
+        UpdateCatalogOverridesResponse: {
+            store_id: string;
+            updated_count: number;
+            overrides: components["schemas"]["CatalogOverrideRecord"][];
+        };
+        CatalogOverrideRecord: {
+            store_id: string;
+            product_id: string;
+            price_override?: string;
+            stock_override?: number;
+            available_override?: boolean;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        UpdateCatalogApprovalRequest: {
+            /** @description ID of the product, category, or media to act upon. */
+            item_id: string;
+            /**
+             * @description The approval action to apply.
+             * @enum {string}
+             */
+            action: "approve" | "reject" | "needs-fix";
+            /** @description Reviewer note/evidence (required if action is reject or needs-fix). */
+            note?: string;
+        };
+        CatalogApprovalRecord: {
+            id: string;
+            item_id: string;
+            action: string;
+            note?: string;
+            operator_id: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CatalogConflict: {
+            id: string;
+            store_id: string;
+            product_id: string;
+            product_name: string;
+            /** @enum {string} */
+            conflict_type: "price_divergence" | "availability_divergence";
+            central_value: string;
+            override_value: string;
+            /** @enum {string} */
+            status: "pending" | "resolved_accept_local" | "resolved_reverted";
+            /** Format: date-time */
+            resolved_at?: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        ResolveConflictRequest: {
+            /**
+             * @description How to resolve the conflict.
+             * @enum {string}
+             */
+            resolution: "accept_local" | "revert_to_central";
+        };
+        ResolveConflictResponse: {
+            conflict_id: string;
+            /** @enum {string} */
+            status: "resolved_accept_local" | "resolved_reverted";
+        };
+        ListConflictsResponse: {
+            conflicts: components["schemas"]["CatalogConflict"][];
+            limit: number;
+            offset: number;
+            total: number;
+        };
+        OrderRecord: {
+            id: string;
+            store_id: string;
+            client_id: string;
+            /** @enum {string} */
+            status: "CREATED" | "ACCEPTED" | "READY_FOR_PICKUP" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "ACCEPTED_BY_CAPTAIN" | "PICKED_UP" | "EN_ROUTE" | "ARRIVED";
+            total_price: number;
+            wlt_payment_ref_id?: string;
+            wlt_refund_ref_id?: string;
+            captain_id?: string;
+            captain_latitude?: number;
+            captain_longitude?: number;
+            captain_lifecycle_status?: string;
+            /** @description Proof-of-delivery media key reference (set on DELIVERED). DSH stores reference only, not the raw binary. */
+            pod_media_key?: string | null;
+            /** @description Reason delivery failed (set on FAILED_DELIVERY or RETURNING_TO_STORE). */
+            delivery_failure_reason?: string | null;
+            /** @description WLT bridge reference ID. DSH stores only — WLT (004E) owns refund execution independently. */
+            wlt_refund_trigger_ref?: string | null;
+            /** @description WLT settlement transaction reference. */
+            wlt_settlement_ref_id?: string | null;
+            /**
+             * @default NOT_SETTLED
+             * @enum {string}
+             */
+            settlement_status: "NOT_SETTLED" | "SETTLEMENT_PENDING" | "SETTLED" | "SETTLEMENT_FAILED";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        OrderItemRecord: {
+            id: string;
+            order_id: string;
+            product_id: string;
+            quantity: number;
+            price: number;
+        };
+        OrderStatusEventRecord: {
+            id: string;
+            order_id: string;
+            /** @enum {string} */
+            actor: "client" | "partner" | "captain" | "operator" | "system";
+            from_status: string;
+            to_status: string;
+            note?: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        SupportEscalationRecord: {
+            id: string;
+            order_id: string;
+            /** @enum {string} */
+            actor: "client" | "partner";
+            /** @enum {string} */
+            issue_type: "delayed_delivery" | "wrong_items" | "missing_items" | "payment_issue" | "other";
+            description: string;
+            /** @enum {string} */
+            status: "open" | "in-review" | "resolved";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            resolved_at?: string;
+        };
+        OrderItemInput: {
+            product_id: string;
+            quantity: number;
+            price: number;
+        };
+        CreateOrderRequest: {
+            store_id: string;
+            /** @description Optional DEV compatibility value only. Backend derives trusted client identity from BearerAuth or DEV_ONLY X-Client-Id. */
+            client_id?: string;
+            total_price: number;
+            wlt_payment_ref_id?: string;
+            items: components["schemas"]["OrderItemInput"][];
+        };
+        CreateOrderResponse: {
+            order: {
+                id: string;
+                store_id: string;
+                client_id: string;
+                status: string;
+                total_price: number;
+                wlt_payment_ref_id?: string;
+                /** Format: date-time */
+                created_at?: string;
+                /** Format: date-time */
+                updated_at?: string;
+                items: components["schemas"]["OrderItemRecord"][];
+            };
+        };
+        UpdateOrderStatusRequest: {
+            /** @enum {string} */
+            actor: "client" | "partner" | "captain" | "operator" | "system";
+            /** @enum {string} */
+            status: "CREATED" | "ACCEPTED" | "READY_FOR_PICKUP" | "DELIVERED" | "CANCELLED" | "REFUNDED" | "ACCEPTED_BY_CAPTAIN" | "PICKED_UP" | "EN_ROUTE" | "ARRIVED";
+            note?: string;
+        };
+        AssignCaptainRequest: {
+            captain_id: string;
+        };
+        CreateSupportEscalationRequest: {
+            order_id: string;
+            /** @enum {string} */
+            actor: "client" | "partner";
+            /** @enum {string} */
+            issue_type: "delayed_delivery" | "wrong_items" | "missing_items" | "payment_issue" | "other";
+            description: string;
+        };
+        OrderDetailsResponse: {
+            order: components["schemas"]["OrderRecord"];
+            items: components["schemas"]["OrderItemRecord"][];
+            status_events: components["schemas"]["OrderStatusEventRecord"][];
+            support_tickets: components["schemas"]["SupportEscalationRecord"][];
+        };
+        Pagination: {
+            limit: number;
+            offset: number;
+            total: number;
+        };
+        CartServiceabilityResponse: {
+            serviceable: boolean;
+            store_id: string;
+            /**
+             * @description Present only when serviceable=false
+             * @enum {string}
+             */
+            reason_code?: "store_closed" | "delivery_zone_unavailable" | "items_unavailable" | "partner_not_ready";
+            /** @description Item IDs that are unavailable — present when reason_code=items_unavailable */
+            unavailable_item_ids?: string[];
+        };
+        CheckoutIntentItem: {
+            product_id: string;
+            quantity: number;
+        };
+        CheckoutIntentRequest: {
+            store_id: string;
+            items: components["schemas"]["CheckoutIntentItem"][];
+            delivery_address: string;
+            /** @description Optional requested delivery time slot identifier */
+            delivery_time_slot?: string;
+            client_note?: string;
+        };
+        CheckoutIntentResponse: {
+            /** @description DSH checkout session identifier */
+            intent_id: string;
+            /** @description Token passed to WLT payment bridge to associate payment with this intent */
+            session_token: string;
+            /** @enum {string} */
+            status: "pending_payment" | "payment_confirmed" | "payment_failed" | "cancelled" | "expired";
+            /** Format: date-time */
+            expires_at: string;
+        };
+        CancelCheckoutIntentResponse: {
+            intent_id: string;
+            /** @enum {string} */
+            status: "cancelled";
+            /** @description Always true — DSH preserves cart items on intent cancellation */
+            cart_preserved: boolean;
+        };
+        PaymentCallbackRequest: {
+            /** @description DSH checkout intent ID matching the session_token issued in createCheckoutIntent */
+            intent_id: string;
+            /** @description WLT payment reference ID — DSH stores as operational reference only; no financial mutation */
+            wlt_payment_ref_id: string;
+            /** @enum {string} */
+            status: "confirmed" | "failed";
+            /**
+             * @description Present only when status=failed
+             * @enum {string}
+             */
+            failure_reason?: "insufficient_balance" | "policy_block" | "fraud_hold" | "expired";
+        };
+        PaymentCallbackResponse: {
+            acknowledged: boolean;
+            intent_id: string;
+            /**
+             * @description create_order: payment confirmed — DSH will trigger POST /orders internally.
+             *     show_failure: payment failed — DSH surfaces failure_reason to client via 003E flow.
+             * @enum {string}
+             */
+            next_action?: "create_order" | "show_failure";
+        };
+        RefundCallbackRequest: {
+            /** @description WLT refund reference ID - DSH stores as reference only; no local financial mutation. */
+            refund_ref_id: string;
+            /** @description Amount refunded. Must match the refund request. */
+            amount: number;
+            /**
+             * @description CONFIRMED triggers order status transition to REFUNDED. FAILED logs the failure event but keeps the status unchanged.
+             * @enum {string}
+             */
+            status: "CONFIRMED" | "FAILED";
         };
     };
     responses: never;
@@ -67,6 +1459,623 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    listProducts: {
+        parameters: {
+            query?: {
+                /** @description Filter products by approval status (e.g. catalog_adopted) */
+                approval_status?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListProductsResponse"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProductRequest"];
+            };
+        };
+        responses: {
+            /** @description Product created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductRecord"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductRecord"];
+                };
+            };
+            /** @description Product not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProductRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated product record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductRecord"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Product not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listCategories: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Categories list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListCategoriesResponse"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Category created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryRecord"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Category record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryRecord"];
+                };
+            };
+            /** @description Category not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Category deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Category not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated category record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryRecord"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Category not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    uploadProductMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadProductMediaRequest"];
+            };
+        };
+        responses: {
+            /** @description Media created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductMediaRecord"];
+                };
+            };
+            /** @description Validation error or invalid media key */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Product not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteProductMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Media record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCatalogOverrides: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCatalogOverridesRequest"];
+            };
+        };
+        responses: {
+            /** @description Overrides updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateCatalogOverridesResponse"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    recordCatalogApprovalAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCatalogApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Approval action recorded successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogApprovalRecord"];
+                };
+            };
+            /** @description Validation or parameter error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Catalog item not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listConflicts: {
+        parameters: {
+            query?: {
+                store_id?: string;
+                status?: "pending" | "resolved_accept_local" | "resolved_reverted";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conflicts list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListConflictsResponse"];
+                };
+            };
+            /** @description Invalid parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    resolveConflict: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveConflictRequest"];
+            };
+        };
+        responses: {
+            /** @description Conflict resolved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResolveConflictResponse"];
+                };
+            };
+            /** @description Validation or parameter error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     listDiscoveryStores: {
         parameters: {
             query?: {
@@ -106,6 +2115,1722 @@ export interface operations {
                 };
             };
             /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldStore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldStoreRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateFieldStoreResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getDiscoveryStore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscoveryStoreDetail"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldVisit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldVisitRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateFieldVisitResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldDocumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldDocumentRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldReadinessEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldReadinessEscalationRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessEscalationRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listFieldReadinessEscalations: {
+        parameters: {
+            query?: {
+                status?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListFieldReadinessEscalationsResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateFieldReadinessEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The escalation ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFieldReadinessEscalationRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessEscalationRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Escalation Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createFieldReadinessApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFieldReadinessApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessApprovalRecord"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getLatestFieldReadinessApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FieldReadinessApprovalRecord"];
+                };
+            };
+            /** @description No approval record found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updatePartnerReadiness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartnerReadinessUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreVisibilityGateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateStoreCatalogApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CatalogApprovalUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreVisibilityGateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateMarketingVisibility: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The store ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarketingVisibilityUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreVisibilityGateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Store Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCartServiceability: {
+        parameters: {
+            query: {
+                store_id: string;
+                item_ids?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Serviceability result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CartServiceabilityResponse"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthenticated — client identity required for cart association */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createCheckoutIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutIntentRequest"];
+            };
+        };
+        responses: {
+            /** @description Checkout intent created — pass session_token to WLT payment bridge */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutIntentResponse"];
+                };
+            };
+            /** @description Validation error or serviceability not confirmed */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthenticated — client identity required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Active checkout session already exists for this client+store */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cancelCheckoutIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Intent cancelled — cart preserved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancelCheckoutIntentResponse"];
+                };
+            };
+            /** @description Invalid request or intent already confirmed (cannot cancel after payment) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Intent not found or expired */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    receivePaymentCallback: {
+        parameters: {
+            query?: never;
+            header: {
+                /**
+                 * @description WLT shared callback secret. DEV: "dev-secret". Current backend validates against
+                 *     WLT_CALLBACK_SECRET before processing; final production HMAC/signature semantics remain
+                 *     pending WLT security proof before PASS.
+                 */
+                "X-WLT-Callback-Token": string;
+                /**
+                 * @description Unique event UUID issued by WLT for idempotency. DSH persists the event ID on the
+                 *     checkout intent and acknowledges repeated delivery of the same event.
+                 */
+                "X-WLT-Event-Id": string;
+                /** @description Same Idempotency-Key used in the originating WLT payment session. */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentCallbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Callback acknowledged — DSH will process asynchronously */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentCallbackResponse"];
+                };
+            };
+            /** @description Invalid callback payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Intent not found — may have expired */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Order created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateOrderResponse"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Missing or invalid client identity */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order details response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderDetailsResponse"];
+                };
+            };
+            /** @description Missing or invalid client identity */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateOrderStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrderStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Status updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cancelOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default client
+                     * @enum {string}
+                     */
+                    actor?: "client" | "partner" | "operator" | "system";
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Order cancelled successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    refundOrderCallback: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-WLT-Callback-Token": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefundCallbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Refund callback processed successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Missing or invalid WLT callback token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    assignCaptain: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignCaptainRequest"];
+            };
+        };
+        responses: {
+            /** @description Captain assigned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    acceptTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Task accepted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    declineTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Task declined successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    confirmPickup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Order pickup confirmed successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCaptainLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Captain location record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        latitude: number;
+                        longitude: number;
+                        lifecycle_status: string;
+                        order_status: string;
+                    };
+                };
+            };
+            /** @description Order or location not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCaptainLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                    latitude: number;
+                    longitude: number;
+                    lifecycle_status: string;
+                    /** @enum {string} */
+                    order_status: "EN_ROUTE" | "ARRIVED";
+                };
+            };
+        };
+        responses: {
+            /** @description Location updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deliverOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description ID of the assigned captain submitting the proof. */
+                    captain_id: string;
+                    /** @description Media-fixtures key referencing the proof-of-delivery photo. DSH stores only the key reference, never the raw binary. */
+                    pod_media_key?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order marked as DELIVERED; pod_media_key recorded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Missing or invalid captain_id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not assigned to this captain. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order is not in ARRIVED state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    failDelivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                    /** @description Reason for failure: CLIENT_UNREACHABLE, WRONG_ADDRESS, REFUSED, OTHER */
+                    failure_reason: string;
+                    /** @description WLT bridge reference ID. DSH stores only — WLT executes refund independently. */
+                    wlt_refund_trigger_ref?: string | null;
+                    /**
+                     * @description If true, captain must return item to store (transitions to RETURNING_TO_STORE).
+                     * @default false
+                     */
+                    return_required?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Delivery failure recorded. Status is FAILED_DELIVERY or RETURNING_TO_STORE. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Missing required fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not assigned to this captain. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order is not in ARRIVED state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    confirmReturn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    captain_id: string;
+                    /** @description Optional note about the return. */
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Return confirmed. Status is RETURNED. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderRecord"];
+                };
+            };
+            /** @description Missing captain_id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not assigned to this captain. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order is not in RETURNING_TO_STORE state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createSupportEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSupportEscalationRequest"];
+            };
+        };
+        responses: {
+            /** @description Support ticket created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportEscalationRecord"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
             500: {
                 headers: {
                     [name: string]: unknown;

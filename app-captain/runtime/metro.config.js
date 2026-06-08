@@ -13,10 +13,10 @@ config.resolver.nodeModulesPaths = [
 ];
 config.resolver.unstable_enableSymlinks = true;
 config.resolver.blockList = [
-	/.*\.next\/.*/,
-	/.*\.turbo\/.*/,
-	/.*\/tools\/registry\/runs\/.*/,
-	/.*\/build\/cache\/.*/,
+	/.*\.next([/\\]|$).*/,
+	/.*\.turbo([/\\]|$).*/,
+	/.*[/\\]tools[/\\]registry[/\\]runs([/\\]|$).*/,
+	/.*[/\\]build[/\\]cache([/\\]|$).*/,
 ];
 
 

@@ -1,8 +1,4 @@
-/* process.env access managed by runtime/metro polyfills */
-
-declare const process: {
-	env: Record<string, string | undefined>;
-};
+import { PlatformVarsRegistry } from '../../shared/platform/PlatformVarsProvider';
 
 export function resolveDevMediaUrl(path: string): string | null {
 	const trimmedPath = path.trim();
@@ -11,14 +7,7 @@ export function resolveDevMediaUrl(path: string): string | null {
 		return null;
 	}
 
-	const baseUrl =
-		process.env.EXPO_PUBLIC_DEV_MEDIA_BASE_URL ??
-		process.env.EXPO_PUBLIC_DEV_MEDIA_BASE ??
-		process.env.NEXT_PUBLIC_DEV_MEDIA_BASE_URL ??
-		process.env.NEXT_PUBLIC_DEV_MEDIA_BASE ??
-		process.env.DEV_MEDIA_BASE_URL ??
-		process.env.DEV_MEDIA_BASE ??
-		'';
+	const baseUrl = PlatformVarsRegistry.get('devMediaBaseUrl') ?? '';
 
 	if (!baseUrl.trim()) {
 		return null;

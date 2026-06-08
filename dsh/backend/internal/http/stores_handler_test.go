@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -61,12 +62,263 @@ func TestStoresHandlerInvalidLimit(t *testing.T) {
 	}
 }
 
+func TestStoresHandlerVisibilityGates(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	// Step 1: Initial list returns store-1001 (Haddah Central Market)
+	getReq := httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
+	getResp := httptest.NewRecorder()
+	handler.ServeHTTP(getResp, getReq)
+
+	if getResp.Code != http.StatusOK {
+		t.Fatalf("expected GET /stores status 200, got %d", getResp.Code)
+	}
+	var initStores domain.DiscoveryStoresResponse
+	decodeBody(t, getResp, &initStores)
+
+	found1001 := false
+	for _, s := range initStores.Stores {
+		if s.ID == "store-1001" {
+			found1001 = true
+			break
+		}
+	}
+	if !found1001 {
+		t.Fatal("expected store-1001 to be visible initially")
+	}
+
+	// Step 2: Patch partner readiness to paused
+	patchBody := domain.PartnerReadinessUpdateRequest{Status: "paused"}
+	resp := patchStore(t, handler, "PATCH", "/stores/store-1001/partner-readiness", patchBody)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected PATCH readiness status 200, got %d", resp.Code)
+	}
+
+	var gateResp domain.StoreVisibilityGateResponse
+	decodeBody(t, resp, &gateResp)
+	if gateResp.PartnerReadinessStatus != "paused" || gateResp.ClientVisible {
+		t.Fatalf("unexpected gate response: %+v", gateResp)
+	}
+
+	// Step 3: Verify store-1001 is now hidden
+	getReq = httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
+	getResp = httptest.NewRecorder()
+	handler.ServeHTTP(getResp, getReq)
+	var hiddenStores domain.DiscoveryStoresResponse
+	decodeBody(t, getResp, &hiddenStores)
+
+	for _, s := range hiddenStores.Stores {
+		if s.ID == "store-1001" {
+			t.Fatal("expected store-1001 to be hidden after setting readiness to paused")
+		}
+	}
+
+	// Step 4: Patch readiness back to ready
+	patchBody = domain.PartnerReadinessUpdateRequest{Status: "ready"}
+	resp = patchStore(t, handler, "PATCH", "/stores/store-1001/partner-readiness", patchBody)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected PATCH readiness status 200, got %d", resp.Code)
+	}
+	decodeBody(t, resp, &gateResp)
+	if gateResp.PartnerReadinessStatus != "ready" || !gateResp.ClientVisible {
+		t.Fatalf("unexpected gate response after restore: %+v", gateResp)
+	}
+
+	// Step 5: Patch catalog approval to rejected (quality)
+	catBody := domain.CatalogApprovalUpdateRequest{QualityStatus: "rejected", PricingStatus: "approved"}
+	resp = patchStore(t, handler, "PATCH", "/stores/store-1001/catalog-approval", catBody)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected PATCH catalog status 200, got %d", resp.Code)
+	}
+	decodeBody(t, resp, &gateResp)
+	if gateResp.CatalogQualityStatus != "rejected" || gateResp.ClientVisible {
+		t.Fatalf("expected client visible false after catalog quality reject, got %+v", gateResp)
+	}
+
+	// Verify hidden again
+	getReq = httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
+	getResp = httptest.NewRecorder()
+	handler.ServeHTTP(getResp, getReq)
+	decodeBody(t, getResp, &hiddenStores)
+	for _, s := range hiddenStores.Stores {
+		if s.ID == "store-1001" {
+			t.Fatal("expected store-1001 to be hidden after catalog quality reject")
+		}
+	}
+
+	// Restore catalog approval
+	catBody = domain.CatalogApprovalUpdateRequest{QualityStatus: "approved", PricingStatus: "approved"}
+	resp = patchStore(t, handler, "PATCH", "/stores/store-1001/catalog-approval", catBody)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected PATCH status 200, got %d", resp.Code)
+	}
+
+	// Step 6: Patch marketing visibility to inactive
+	mktBody := domain.MarketingVisibilityUpdateRequest{Status: "inactive"}
+	resp = patchStore(t, handler, "PATCH", "/stores/store-1001/marketing-visibility", mktBody)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected PATCH marketing status 200, got %d", resp.Code)
+	}
+	decodeBody(t, resp, &gateResp)
+	if gateResp.MarketingVisibilityStatus != "inactive" || gateResp.ClientVisible {
+		t.Fatalf("expected client visible false after marketing visibility inactive, got %+v", gateResp)
+	}
+
+	// Verify hidden again
+	getReq = httptest.NewRequest(http.MethodGet, "/stores", nil)
+	getReq.Header.Set("X-Client-Id", "client-123")
+	getReq.Header.Set("X-Actor-Type", "client")
+	getResp = httptest.NewRecorder()
+	handler.ServeHTTP(getResp, getReq)
+	decodeBody(t, getResp, &hiddenStores)
+	for _, s := range hiddenStores.Stores {
+		if s.ID == "store-1001" {
+			t.Fatal("expected store-1001 to be hidden after marketing visibility inactive")
+		}
+	}
+
+	// Restore marketing visibility
+	mktBody = domain.MarketingVisibilityUpdateRequest{Status: "active"}
+	resp = patchStore(t, handler, "PATCH", "/stores/store-1001/marketing-visibility", mktBody)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected PATCH marketing status 200, got %d", resp.Code)
+	}
+}
+
+func TestStoresHandlerValidationAndErrorCases(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	// Case 1: Invalid status for partner readiness (returns 400)
+	badBody := domain.PartnerReadinessUpdateRequest{Status: "invalid-status"}
+	resp := patchStore(t, handler, "PATCH", "/stores/store-1001/partner-readiness", badBody)
+	if resp.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 Bad Request, got %d", resp.Code)
+	}
+	var errResp domain.ErrorResponse
+	decodeBody(t, resp, &errResp)
+	if errResp.Code != domain.ErrorCodeInvalidParameter {
+		t.Fatalf("expected invalid parameter error code, got %s", errResp.Code)
+	}
+
+	// Case 2: Unknown store ID (returns 404)
+	okBody := domain.PartnerReadinessUpdateRequest{Status: "paused"}
+	resp = patchStore(t, handler, "PATCH", "/stores/store-9999/partner-readiness", okBody)
+	if resp.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 Not Found for unknown store, got %d", resp.Code)
+	}
+
+	// Case 3: Unsupported HTTP methods (returns 405 Method Not Allowed)
+	// Note: Because we register specific methods on serve mux:
+	// GET /stores/{id}/partner-readiness should return 405 or 404.
+	// Let's call the endpoint directly with GET.
+	getReq := httptest.NewRequest(http.MethodGet, "/stores/store-1001/partner-readiness", nil)
+	getResp := httptest.NewRecorder()
+	handler.ServeHTTP(getResp, getReq)
+	if getResp.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("expected 405 Method Not Allowed, got %d", getResp.Code)
+	}
+}
+
+func TestCreateFieldStoreValidationAndRepositoryFailure(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores", bytes.NewReader([]byte("{")))
+	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSON.Header.Set("X-Client-Id", "field-123")
+	invalidJSON.Header.Set("X-Actor-Type", "field")
+	invalidJSONResp := httptest.NewRecorder()
+	handler.ServeHTTP(invalidJSONResp, invalidJSON)
+	if invalidJSONResp.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid JSON to return 400, got %d", invalidJSONResp.Code)
+	}
+
+	missingName := createFieldStore(t, handler, domain.CreateFieldStoreRequest{
+		Address:                 "Haddah Street",
+		SupportsPickup:          false,
+		SupportsPartnerDelivery: true,
+	})
+	if missingName.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing name to return 400, got %d", missingName.Code)
+	}
+
+	missingAddress := createFieldStore(t, handler, domain.CreateFieldStoreRequest{
+		Name:                    "Field Intake Store",
+		SupportsPickup:          false,
+		SupportsPartnerDelivery: true,
+	})
+	if missingAddress.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing address to return 400, got %d", missingAddress.Code)
+	}
+
+	validMemoryFallback := createFieldStore(t, handler, domain.CreateFieldStoreRequest{
+		Name:                    "Field Intake Store",
+		Address:                 "Haddah Street",
+		CategoryID:              "grocery",
+		SupportsPickup:          false,
+		SupportsPartnerDelivery: true,
+	})
+	if validMemoryFallback.Code != http.StatusInternalServerError {
+		t.Fatalf("expected memory repository fallback to return 500, got %d", validMemoryFallback.Code)
+	}
+}
+
+func TestCreateFieldVisitValidationAndRepositoryFailure(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores/store-1001/field-visits", bytes.NewReader([]byte("{")))
+	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSON.Header.Set("X-Client-Id", "field-123")
+	invalidJSON.Header.Set("X-Actor-Type", "field")
+	invalidJSONResp := httptest.NewRecorder()
+	handler.ServeHTTP(invalidJSONResp, invalidJSON)
+	if invalidJSONResp.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid JSON to return 400, got %d", invalidJSONResp.Code)
+	}
+
+	missingSummary := createFieldVisit(t, handler, "store-1001", domain.CreateFieldVisitRequest{
+		FollowUpAction: "Confirm owner approval",
+	})
+	if missingSummary.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing visit_summary to return 400, got %d", missingSummary.Code)
+	}
+
+	missingFollowUp := createFieldVisit(t, handler, "store-1001", domain.CreateFieldVisitRequest{
+		VisitSummary: "Store front and owner availability confirmed",
+	})
+	if missingFollowUp.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing follow_up_action to return 400, got %d", missingFollowUp.Code)
+	}
+
+	validMemoryFallback := createFieldVisit(t, handler, "store-1001", domain.CreateFieldVisitRequest{
+		FieldAgentID:       "field-local",
+		VisitSummary:       "Store front and owner availability confirmed",
+		FollowUpAction:     "Confirm owner approval",
+		EvidenceMediaKeys:  []string{"field.visit.front.v1", "field.visit.owner-note.v1"},
+		LocationConfidence: "manual_confirmed",
+	})
+	if validMemoryFallback.Code != http.StatusInternalServerError {
+		t.Fatalf("expected memory repository fallback to return 500, got %d", validMemoryFallback.Code)
+	}
+}
+
 func getStores(t *testing.T, target string) *httptest.ResponseRecorder {
 	t.Helper()
 
 	repository := store.NewMemoryRepository()
 	handler := NewStoresHandler(repository)
 	request := httptest.NewRequest(http.MethodGet, target, nil)
+	request.Header.Set("X-Client-Id", "client-123")
+	request.Header.Set("X-Actor-Type", "client")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)
@@ -74,10 +326,169 @@ func getStores(t *testing.T, target string) *httptest.ResponseRecorder {
 	return response
 }
 
+func createFieldVisit(t *testing.T, handler *StoresHandler, storeID string, body domain.CreateFieldVisitRequest) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/stores/"+storeID+"/field-visits", bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "field-123")
+	request.Header.Set("X-Actor-Type", "field")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+	return response
+}
+
+func createFieldStore(t *testing.T, handler *StoresHandler, body domain.CreateFieldStoreRequest) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/stores", bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "field-123")
+	request.Header.Set("X-Actor-Type", "field")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+	return response
+}
+
+func patchStore(t *testing.T, handler *StoresHandler, method string, path string, body any) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(method, path, bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "operator-123")
+	request.Header.Set("X-Actor-Type", "operator")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+	return response
+}
+
 func decodeBody(t *testing.T, response *httptest.ResponseRecorder, body any) {
 	t.Helper()
 
 	if err := json.NewDecoder(response.Body).Decode(body); err != nil {
-		t.Fatalf("decode response body: %v", err)
+		t.Fatalf("decode response body: %v. Body was: %s", err, response.Body.String())
 	}
+}
+
+func TestGetStoreDetail(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	// Case 1: Get store-1001 details successfully
+	request := httptest.NewRequest(http.MethodGet, "/stores/store-1001", nil)
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.Code)
+	}
+
+	var body domain.StoreDetail
+	decodeBody(t, response, &body)
+
+	if body.ID != "store-1001" {
+		t.Fatalf("expected store ID store-1001, got %s", body.ID)
+	}
+	if body.ContactNumber != "+967-1-444333" {
+		t.Fatalf("expected contact number +967-1-444333, got %s", body.ContactNumber)
+	}
+	if body.OpeningHours != "08:00 - 23:00" {
+		t.Fatalf("expected opening hours 08:00 - 23:00, got %s", body.OpeningHours)
+	}
+	if body.CatalogSummary != "Over 1,200 fresh groceries and daily essentials" {
+		t.Fatalf("expected catalog summary, got %s", body.CatalogSummary)
+	}
+	if body.PartnerReadinessStatus != "ready" || body.CatalogQualityStatus != "approved" {
+		t.Fatalf("unexpected visibility statuses: %+v", body)
+	}
+
+	// Case 2: Store not found (returns 404)
+	requestNotFound := httptest.NewRequest(http.MethodGet, "/stores/store-9999", nil)
+	responseNotFound := httptest.NewRecorder()
+	handler.ServeHTTP(responseNotFound, requestNotFound)
+
+	if responseNotFound.Code != http.StatusNotFound {
+		t.Fatalf("expected status 404, got %d", responseNotFound.Code)
+	}
+}
+
+func TestCreateFieldDocumentValidationAndRepositoryFailure(t *testing.T) {
+	repository := store.NewMemoryRepository()
+	handler := NewStoresHandler(repository)
+
+	invalidJSON := httptest.NewRequest(http.MethodPost, "/stores/store-1001/documents", bytes.NewReader([]byte("{")))
+	invalidJSON.Header.Set("Content-Type", "application/json")
+	invalidJSON.Header.Set("X-Client-Id", "field-123")
+	invalidJSON.Header.Set("X-Actor-Type", "field")
+	invalidJSONResp := httptest.NewRecorder()
+	handler.ServeHTTP(invalidJSONResp, invalidJSON)
+	if invalidJSONResp.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid JSON to return 400, got %d", invalidJSONResp.Code)
+	}
+
+	missingKind := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		MediaKey: "field.doc.registration.v1",
+	})
+	if missingKind.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing document_kind to return 400, got %d", missingKind.Code)
+	}
+
+	missingMediaKey := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		DocumentKind: "commercial_registration",
+	})
+	if missingMediaKey.Code != http.StatusBadRequest {
+		t.Fatalf("expected missing media_key to return 400, got %d", missingMediaKey.Code)
+	}
+
+	invalidKind := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		DocumentKind: "invalid_document_type",
+		MediaKey:     "field.doc.registration.v1",
+	})
+	if invalidKind.Code != http.StatusBadRequest {
+		t.Fatalf("expected invalid document_kind to return 400, got %d", invalidKind.Code)
+	}
+
+	validMemoryFallback := createFieldDocument(t, handler, "store-1001", domain.CreateFieldDocumentRequest{
+		DocumentKind: "commercial_registration",
+		MediaKey:     "field.doc.registration.v1",
+	})
+	if validMemoryFallback.Code != http.StatusInternalServerError {
+		t.Fatalf("expected memory repository fallback to return 500, got %d", validMemoryFallback.Code)
+	}
+}
+
+func createFieldDocument(t *testing.T, handler *StoresHandler, storeID string, body domain.CreateFieldDocumentRequest) *httptest.ResponseRecorder {
+	t.Helper()
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("marshal body: %v", err)
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/stores/"+storeID+"/documents", bytes.NewReader(bodyBytes))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client-Id", "field-123")
+	request.Header.Set("X-Actor-Type", "field")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+	return response
 }

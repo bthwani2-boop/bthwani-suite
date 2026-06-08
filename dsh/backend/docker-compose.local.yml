@@ -7,16 +7,79 @@ services:
       POSTGRES_USER: dsh_local
       POSTGRES_PASSWORD: dsh_local_password
     ports:
-      - "55432:5432"
+      - "${POSTGRES_PORT:-15432}:5432"
     volumes:
       - dsh-postgres-data:/var/lib/postgresql/data
-      - ./migrations/001_store_discovery.sql:/docker-entrypoint-initdb.d/001_store_discovery.sql:ro
-      - ./seed/002_store_discovery_seed.sql:/docker-entrypoint-initdb.d/002_store_discovery_seed.sql:ro
+      - ./docker/initdb/001_apply_dsh_sql.sh:/docker-entrypoint-initdb.d/001_apply_dsh_sql.sh:ro
+      - ./migrations:/dsh-migrations:ro
+      - ./seed:/dsh-seed:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dsh_local -d dsh_local"]
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - bthwani-local
+
+  auth-service:
+    # BTHWANI_AUTH_SERVICE: Real DB-backed auth (login/session/refresh/revoke/permissions).
+    # Contract: dsh/backend/cmd/auth-service/main.go — auth.openapi.yaml routes.
+    # Port 8082 internal — set DSH_AUTH_SERVICE_URL=http://auth-service:8082 in dsh-api env.
+    # DEV_ONLY: password_hash seed in 027_auth_sessions.sql accepts username==password fallback.
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile.auth-service
+    container_name: bthwani-auth-service-local
+    restart: unless-stopped
+    environment:
+      AUTH_PORT: "8082"
+      DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
+    ports:
+      - "${DSH_AUTH_SERVICE_HOST_PORT:-18082}:8082"
+    depends_on:
+      dsh-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    networks:
+      - bthwani-local
+
+  dsh-api:
+    # BTHWANI_DSH_API: Operations/dispatch backend. Stores, orders, products, checkout.
+    # Port 8080 internal — host port default 8080. Reserved exclusively for DSH (not Expo).
+    # media-fixtures endpoint (/media-fixtures/) is NOT served inside Docker (dev-only path).
+    # To run DSH from host instead: comment out this service and set
+    #   WLT_DSH_BASE_URL=http://host.docker.internal:8080 in wlt/backend/docker-compose.local.yml
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile.dsh-api
+    container_name: bthwani-dsh-api-local
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      DATABASE_URL: "postgres://dsh_local:dsh_local_password@dsh-postgres:5432/dsh_local?sslmode=disable"
+      DSH_AUTH_SERVICE_URL: "http://auth-service:8082"
+    ports:
+      - "${DSH_API_HOST_PORT:-8080}:8080"
+    depends_on:
+      dsh-postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/stores || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    networks:
+      - bthwani-local
 
 volumes:
   dsh-postgres-data:
+
+networks:
+  bthwani-local:
+    name: bthwani-local

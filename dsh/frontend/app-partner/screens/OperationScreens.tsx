@@ -5,6 +5,10 @@ import {
   type DshPartnerOperationalFlowId,
   type DshPartnerSupportIssueCategoryId,
 } from '../dsh-partner.types';
+import {
+  DSH_ORDER_LIFECYCLE_HANDOFFS,
+  getSurfaceObservation,
+} from '../../shared/dsh-order-lifecycle-handoffs';
 import { DshPartnerInventoryActionPanel, type PartnerInventoryFlowId } from '../parts/PartnerInventoryActionPanel';
 import { DshPartnerOnboardingActionPanel, type PartnerOnboardingFlowId } from '../parts/PartnerOnboardingActionPanel';
 import { DshPartnerOrderActionPanel, type PartnerOrderActionFlowId } from '../parts/PartnerOrderActionPanel';
@@ -434,6 +438,22 @@ const orderActionFlowCopy: Record<PartnerOrderActionFlowId, { title: string; sub
 export function OrderActionScreen({ activeFlowId = 'order-accept', onBack, onOpenScreen, onSecondaryAction }: OrderActionScreenProps) {
   const activeCopy = orderActionFlowCopy[activeFlowId];
 
+  // SSoT Handoff lookup dynamically matching the flow state
+  const matchedHandoff = React.useMemo(() => {
+    if (activeFlowId === 'order-accept') {
+      return DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.handoffId === 'operations_approved');
+    }
+    if (activeFlowId === 'order-ready') {
+      return DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.handoffId === 'pickup_ready_client_collect' || h.handoffId === 'ready_for_pickup_captain_assigned');
+    }
+    if (activeFlowId === 'order-handoff') {
+      return DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.handoffId === 'picked_up' || h.handoffId === 'partner_delivery_dispatched');
+    }
+    return undefined;
+  }, [activeFlowId]);
+
+  const observation = matchedHandoff ? getSurfaceObservation(matchedHandoff, 'app-partner') : undefined;
+
   return (
     <Box gap={4}>
       <OperationHeader
@@ -446,6 +466,17 @@ export function OrderActionScreen({ activeFlowId = 'order-accept', onBack, onOpe
           </>
         }
       />
+
+      {observation ? (
+        <Surface tone="info" padding={3} gap={1}>
+          <Text role="bodyStrong" tone="brand" style={{ textAlign: 'right' }}>
+            {`ملاحظة النقل (SSoT): ${observation.label}`}
+          </Text>
+          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
+            {`سلوك الواجهة المقترح: ${observation.uiStateHint} ${observation.actionRequired ? '— الإجراء مطلوب!' : ''}`}
+          </Text>
+        </Surface>
+      ) : null}
 
       <DshPartnerOrderActionPanel
         activeFlowId={activeFlowId}

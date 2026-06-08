@@ -1,0 +1,278 @@
+'use client';
+
+import React from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import {
+	Box,
+	Button,
+	Card,
+	Divider,
+	ListItem,
+	StateView,
+	Surface,
+	Text,
+	TextField,
+	useTheme,
+	Badge,
+	colorPalette,
+	radius,
+	spacing,
+} from '@bthwani/ui-kit';
+import { useWltDshWalletPreview } from './useWltDshWalletPreview';
+import { listLedgerEntries } from './wlt-dsh-client.adapter';
+import { formatWltYer } from '../control-panel/financeContracts';
+
+export type CustomerWalletScreenProps = {
+	clientId?: string;
+	bearerToken?: string;
+};
+
+export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken }: CustomerWalletScreenProps) {
+	const { theme } = useTheme();
+	const wallet = useWltDshWalletPreview(clientId, bearerToken);
+	const [transactions, setTransactions] = React.useState<any[]>([]);
+	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
+	const [rechargeAmount, setRechargeAmount] = React.useState<string>('');
+	const [rechargeError, setRechargeError] = React.useState<string | null>(null);
+	const [rechargeSuccess, setRechargeSuccess] = React.useState<boolean>(false);
+
+	const fetchTransactions = React.useCallback(async () => {
+		if (!wallet.linked) return;
+		setLoadingTx(true);
+		try {
+			const res = await listLedgerEntries(clientId, bearerToken, 20, 0);
+			setTransactions(res.entries || []);
+		} catch (err) {
+			console.error('Failed to fetch ledger entries:', err);
+		} finally {
+			setLoadingTx(false);
+		}
+	}, [wallet.linked, clientId, bearerToken]);
+
+	React.useEffect(() => {
+		void fetchTransactions();
+	}, [fetchTransactions]);
+
+	const handleRefresh = async () => {
+		await wallet.refresh();
+		await fetchTransactions();
+	};
+
+	const handleRecharge = async () => {
+		setRechargeError(null);
+		setRechargeSuccess(false);
+		const amount = parseFloat(rechargeAmount);
+		if (isNaN(amount) || amount <= 0) {
+			setRechargeError('يرجى إدخال مبلغ صحيح أكبر من صفر');
+			return;
+		}
+
+		try {
+			// Convert YER to minor units (multiply by 100)
+			const res = await wallet.topUp(amount * 100);
+			if (res.success) {
+				setRechargeSuccess(true);
+				setRechargeAmount('');
+				await handleRefresh();
+			} else {
+				setRechargeError(res.error || 'فشلت عملية الشحن، يرجى المحاولة مرة أخرى');
+			}
+		} catch (err) {
+			setRechargeError('حدث خطأ غير متوقع أثناء الشحن');
+		}
+	};
+
+	if (!wallet.hydrated) {
+		return (
+			<Surface tone="default" style={styles.centerContainer}>
+				<Text role="body" tone="muted" style={{ textAlign: 'center' }}>
+					جاري تحميل بيانات المحفظة...
+				</Text>
+			</Surface>
+		);
+	}
+
+	return (
+		<ScrollView
+			style={[styles.container, { backgroundColor: theme.surface }]}
+			refreshControl={
+				<RefreshControl refreshing={wallet.refreshing || loadingTx} onRefresh={handleRefresh} />
+			}
+		>
+			<Box gap={4} style={{ padding: spacing[4] }}>
+				{/* Modern Arabic Header */}
+				<View style={styles.headerRow}>
+					<Text role="title" style={{ textAlign: 'right', color: theme.text }}>
+						المحفظة الإلكترونية
+					</Text>
+				</View>
+
+				{/* Wallet status banner */}
+				{!wallet.linked ? (
+					<Card tone="warning" gap={3} padding={4}>
+						<Text role="bodyStrong" style={{ textAlign: 'right' }}>
+							المحفظة غير متصلة
+						</Text>
+						<Text role="body" tone="muted" style={{ textAlign: 'right' }}>
+							يرجى ربط محفظتك لتتمكن من إيداع المبالغ واستخدامها في عمليات الدفع السريع للطلبات.
+						</Text>
+						<Button
+							label="ربط وتفعيل المحفظة الآن"
+							tone="primary"
+							onPress={async () => {
+								await wallet.link();
+								await handleRefresh();
+							}}
+						/>
+					</Card>
+				) : (
+					<>
+						{/* Main Balance Display */}
+						<Surface tone="raised" padding={4} gap={3} style={styles.balanceCard}>
+							<Text role="label" tone="muted" style={{ textAlign: 'right' }}>
+								الرصيد المتاح
+							</Text>
+							<Text role="hero" style={[styles.balanceText, { color: theme.brand }]}>
+								{formatWltYer(wallet.balance ?? 0)}
+							</Text>
+							<View style={styles.badgeRow}>
+								<Badge label="محفظة نشطة" tone="success" />
+								<Badge label="YER (ريال يمني)" tone="info" />
+							</View>
+						</Surface>
+
+						{/* Quick Recharge Form */}
+						<Surface tone="inset" padding={4} gap={3} style={styles.rechargeCard}>
+							<Text role="bodyStrong" style={{ textAlign: 'right' }}>
+								شحن رصيد المحفظة
+							</Text>
+							<View style={styles.rechargeInputRow}>
+								<TextField
+									value={rechargeAmount}
+									onChangeText={setRechargeAmount}
+									placeholder="أدخل المبلغ بالريال اليمني"
+									keyboardType="numeric"
+									style={{ flex: 1 }}
+								/>
+								<Button
+									label="شحن"
+									tone="primary"
+									onPress={handleRecharge}
+									disabled={!rechargeAmount}
+								/>
+							</View>
+							{rechargeError && (
+								<Text role="bodySm" style={{ color: colorPalette.red600, textAlign: 'right' }}>
+									{rechargeError}
+								</Text>
+							)}
+							{rechargeSuccess && (
+								<Text role="bodySm" style={{ color: colorPalette.green600, textAlign: 'right' }}>
+									تم شحن الرصيد بنجاح!
+								</Text>
+							)}
+						</Surface>
+
+						{/* Transactions Ledger */}
+						<Box gap={2}>
+							<Text role="bodyStrong" style={{ textAlign: 'right', marginBottom: spacing[2] }}>
+								سجل العمليات الأخير
+							</Text>
+							{transactions.length === 0 ? (
+								<StateView
+									kind="empty"
+									title="لا توجد عمليات سابقة"
+									description="عند قيامك بأي عمليات شحن أو دفع، ستظهر تفاصيلها هنا."
+								/>
+							) : (
+								<Surface tone="default" style={styles.txListContainer}>
+									{transactions.map((tx, idx) => {
+										const isCredit = tx.transaction_type === 'CREDIT';
+										const dateLabel = new Date(tx.created_at).toLocaleDateString('ar-YE', {
+											month: 'short',
+											day: 'numeric',
+											hour: '2-digit',
+											minute: '2-digit',
+										});
+										return (
+											<React.Fragment key={tx.id}>
+												{idx > 0 && <Divider />}
+												<ListItem
+													title={tx.description || (isCredit ? 'شحن رصيد' : 'دفع قيمة طلب')}
+													subtitle={dateLabel}
+													meta={
+														<View style={{ alignItems: 'flex-start' }}>
+															<Text
+																role="bodyStrong"
+																style={{
+																	color: isCredit ? colorPalette.green600 : colorPalette.red600,
+																}}
+															>
+																{isCredit ? '+' : '-'} {formatWltYer(tx.amount * 100)}
+															</Text>
+															<Badge
+																label={tx.status === 'COMPLETED' ? 'مكتمل' : 'معلق'}
+																tone={tx.status === 'COMPLETED' ? 'success' : 'warning'}
+																size="sm"
+															/>
+														</View>
+													}
+												/>
+											</React.Fragment>
+										);
+									})}
+								</Surface>
+							)}
+						</Box>
+					</>
+				)}
+			</Box>
+		</ScrollView>
+	);
+}
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+	centerContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: spacing[4],
+	},
+	headerRow: {
+		flexDirection: 'row-reverse',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginTop: spacing[2],
+	},
+	balanceCard: {
+		borderRadius: radius.xl,
+		alignItems: 'flex-end',
+	},
+	balanceText: {
+		fontSize: 32,
+		fontWeight: '800',
+		textAlign: 'right',
+		marginVertical: spacing[2],
+	},
+	badgeRow: {
+		flexDirection: 'row-reverse',
+		gap: spacing[2],
+	},
+	rechargeCard: {
+		borderRadius: radius.xl,
+	},
+	rechargeInputRow: {
+		flexDirection: 'row-reverse',
+		gap: spacing[2],
+		alignItems: 'center',
+	},
+	txListContainer: {
+		borderRadius: radius.xl,
+		overflow: 'hidden',
+	},
+});
+
+export default CustomerWalletScreen;

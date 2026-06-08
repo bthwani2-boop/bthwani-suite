@@ -1,0 +1,22 @@
+# BTHWANI_MANAGED_LOCAL_COMPOSE: REDIS_SHARED_LOCAL_ADDON
+# Purpose: optional local Redis addon.
+# Boundary: not owned by DSH or WLT unless a future slice assigns ownership with evidence.
+# Activation: root compose with profile `redis` only.
+
+services:
+  redis:
+    profiles: ["redis"]
+    image: redis:7-alpine
+    container_name: bthwani-redis-local
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - bthwani-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  bthwani-redis-data:

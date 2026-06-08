@@ -1,0 +1,1285 @@
+package store
+
+import (
+	"context"
+	"fmt"
+	"math/rand"
+	"strings"
+	"sync"
+	"time"
+
+	"bthwani.local/wlt/domain"
+)
+
+// MemoryRepository is the in-memory WLT store for dev/test.
+// All state is lost on restart. Thread-safe.
+type MemoryRepository struct {
+	mu                   sync.RWMutex
+	payments             map[string]domain.PaymentSession  // id → session
+	paymentByIdem        map[string]string                 // idempotency_key → id
+	refunds              map[string]domain.Refund          // id → refund
+	refundByIdem         map[string]string                 // idempotency_key → id
+	settlements          map[string]domain.Settlement      // id → settlement
+	settlementByIdem     map[string]string                 // idempotency_key → id
+	wallets              map[string]domain.Wallet          // subject → wallet
+	ledger               []domain.LedgerEntry
+	reconciliations      []domain.ReconciliationRun
+	reconciliationByIdem map[string]domain.ReconciliationRun
+	payoutDecisions      map[string]domain.PayoutDecision
+	payoutByIdem         map[string]string
+	financeCloses        map[string]domain.FinanceClose
+	callbackEvents       []domain.CallbackEvent
+}
+
+func NewMemoryRepository() *MemoryRepository {
+	return &MemoryRepository{
+		payments:             make(map[string]domain.PaymentSession),
+		paymentByIdem:        make(map[string]string),
+		refunds:              make(map[string]domain.Refund),
+		refundByIdem:         make(map[string]string),
+		settlements:          make(map[string]domain.Settlement),
+		settlementByIdem:     make(map[string]string),
+		wallets:              make(map[string]domain.Wallet),
+		ledger:               nil,
+		reconciliationByIdem: make(map[string]domain.ReconciliationRun),
+		payoutDecisions:      make(map[string]domain.PayoutDecision),
+		payoutByIdem:         make(map[string]string),
+		financeCloses:        make(map[string]domain.FinanceClose),
+	}
+}
+
+func newID(prefix string) string {
+	return fmt.Sprintf("%s-%d-%04d", prefix, time.Now().UnixMilli(), rand.Intn(9999)) //nolint:gosec
+}
+
+func now() time.Time { return time.Now().UTC() }
+
+// ─── Payment Sessions ─────────────────────────────────────────────────────────
+
+func (r *MemoryRepository) CreatePaymentSession(_ context.Context, req domain.CreatePaymentSessionRequest) (domain.PaymentSession, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if req.CheckoutIntentID == "" || req.ClientID == "" || req.Amount <= 0 || req.IdempotencyKey == "" {
+		return domain.PaymentSession{}, fmt.Errorf("checkout_intent_id, client_id, amount > 0, and idempotency_key are required")
+	}
+	if req.Currency == "" {
+		req.Currency = "YER"
+	}
+	if req.PaymentMethod == "" {
+		req.PaymentMethod = "wallet"
+	}
+
+	if id, ok := r.paymentByIdem[req.IdempotencyKey]; ok {
+		return r.payments[id], nil
+	}
+
+	n := now()
+	ps := domain.PaymentSession{
+		ID:               newID("pay"),
+		CheckoutIntentID: req.CheckoutIntentID,
+		ClientID:         req.ClientID,
+		Amount:           req.Amount,
+		Currency:         req.Currency,
+		Status:           domain.PaymentStatusPending,
+		PaymentMethod:    req.PaymentMethod,
+		DshBaseURL:       req.DshBaseURL,
+		IdempotencyKey:   req.IdempotencyKey,
+		CreatedAt:        n,
+		ExpiresAt:        n.Add(15 * time.Minute),
+	}
+	r.payments[ps.ID] = ps
+	r.paymentByIdem[req.IdempotencyKey] = ps.ID
+	return ps, nil
+}
+
+func (r *MemoryRepository) GetPaymentSession(_ context.Context, id string) (domain.PaymentSession, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	ps, ok := r.payments[id]
+	if !ok {
+		return domain.PaymentSession{}, fmt.Errorf("payment session not found")
+	}
+	return ps, nil
+}
+
+func (r *MemoryRepository) GetPaymentSessionByIdempotency(_ context.Context, key string) (domain.PaymentSession, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	id, ok := r.paymentByIdem[key]
+	if !ok {
+		return domain.PaymentSession{}, false, nil
+	}
+	return r.payments[id], true, nil
+}
+
+func (r *MemoryRepository) ConfirmPaymentSession(_ context.Context, id string, req domain.ConfirmPaymentRequest) (domain.PaymentSession, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ps, ok := r.payments[id]
+	if !ok {
+		return domain.PaymentSession{}, fmt.Errorf("payment session not found")
+	}
+	if ps.Status != domain.PaymentStatusPending {
+		return domain.PaymentSession{}, fmt.Errorf("payment session is not in PENDING state: current=%s", ps.Status)
+	}
+	n := now()
+	ps.Status = domain.PaymentStatusConfirmed
+	ps.ConfirmedAt = &n
+	if req.ProviderRef != "" {
+		ps.ProviderRef = &req.ProviderRef
+	}
+	r.payments[id] = ps
+
+	isTopup := strings.HasPrefix(strings.ToLower(ps.CheckoutIntentID), "topup") || strings.HasPrefix(strings.ToLower(ps.CheckoutIntentID), "dsh-client-topup")
+
+	if isTopup {
+		wallet, ok := r.wallets[ps.ClientID]
+		if !ok {
+			wallet = domain.Wallet{
+				ID:        newID("wal"),
+				Subject:   ps.ClientID,
+				ActorType: "client",
+				Balance:   0,
+				Currency:  "YER",
+				CreatedAt: n,
+				UpdatedAt: n,
+			}
+		}
+		wallet.Balance += ps.Amount
+		wallet.UpdatedAt = n
+		r.wallets[ps.ClientID] = wallet
+
+		ledgerID := newID("led")
+		r.ledger = append(r.ledger, domain.LedgerEntry{
+			ID:              ledgerID,
+			WalletID:        wallet.ID,
+			Subject:         ps.ClientID,
+			TransactionType: domain.TxTypeCredit,
+			Amount:          ps.Amount,
+			Currency:        ps.Currency,
+			ReferenceType:   "payment_session",
+			ReferenceID:     ps.ID,
+			OrderID:         &ps.CheckoutIntentID,
+			Description:     "Wallet top-up via " + ps.PaymentMethod,
+			Status:          domain.TxStatusCompleted,
+			CreatedAt:       n,
+			CompletedAt:     &n,
+		})
+	} else {
+		if ps.PaymentMethod == "wallet" {
+			wallet, ok := r.wallets[ps.ClientID]
+			if !ok {
+				return domain.PaymentSession{}, fmt.Errorf("wallet not found for client: %s", ps.ClientID)
+			}
+			if wallet.Balance < ps.Amount {
+				return domain.PaymentSession{}, fmt.Errorf("insufficient balance: current=%.2f required=%.2f", wallet.Balance, ps.Amount)
+			}
+			wallet.Balance -= ps.Amount
+			wallet.UpdatedAt = n
+			r.wallets[ps.ClientID] = wallet
+
+			ledgerID := newID("led")
+			r.ledger = append(r.ledger, domain.LedgerEntry{
+				ID:              ledgerID,
+				WalletID:        wallet.ID,
+				Subject:         ps.ClientID,
+				TransactionType: domain.TxTypeDebit,
+				Amount:          ps.Amount,
+				Currency:        ps.Currency,
+				ReferenceType:   "payment_session",
+				ReferenceID:     ps.ID,
+				OrderID:         &ps.CheckoutIntentID,
+				Description:     "Payment for order checkout",
+				Status:          domain.TxStatusCompleted,
+				CreatedAt:       n,
+				CompletedAt:     &n,
+			})
+		}
+	}
+
+	return ps, nil
+}
+
+func (r *MemoryRepository) FailPaymentSession(_ context.Context, id string, reason string) (domain.PaymentSession, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ps, ok := r.payments[id]
+	if !ok {
+		return domain.PaymentSession{}, fmt.Errorf("payment session not found")
+	}
+	if ps.Status != domain.PaymentStatusPending {
+		return domain.PaymentSession{}, fmt.Errorf("payment session is not in PENDING state: current=%s", ps.Status)
+	}
+	n := now()
+	ps.Status = domain.PaymentStatusFailed
+	ps.FailedAt = &n
+	ps.FailureReason = &reason
+	r.payments[id] = ps
+	return ps, nil
+}
+
+// ─── Refunds ─────────────────────────────────────────────────────────────────
+
+func (r *MemoryRepository) CreateRefund(_ context.Context, req domain.CreateRefundRequest) (domain.Refund, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if req.OrderID == "" || req.ClientID == "" || req.Amount <= 0 || req.IdempotencyKey == "" {
+		return domain.Refund{}, fmt.Errorf("order_id, client_id, amount > 0, and idempotency_key are required")
+	}
+	if req.Currency == "" {
+		req.Currency = "YER"
+	}
+
+	if id, ok := r.refundByIdem[req.IdempotencyKey]; ok {
+		return r.refunds[id], nil
+	}
+
+	n := now()
+	ref := domain.Refund{
+		ID:               newID("ref"),
+		OrderID:          req.OrderID,
+		PaymentSessionID: req.PaymentSessionID,
+		ClientID:         req.ClientID,
+		Amount:           req.Amount,
+		Currency:         req.Currency,
+		Reason:           req.Reason,
+		Status:           domain.RefundStatusPending,
+		TriggerRef:       req.TriggerRef,
+		DshBaseURL:       req.DshBaseURL,
+		IdempotencyKey:   req.IdempotencyKey,
+		CreatedAt:        n,
+		UpdatedAt:        n,
+	}
+	r.refunds[ref.ID] = ref
+	r.refundByIdem[req.IdempotencyKey] = ref.ID
+	return ref, nil
+}
+
+func (r *MemoryRepository) GetRefund(_ context.Context, id string) (domain.Refund, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	ref, ok := r.refunds[id]
+	if !ok {
+		return domain.Refund{}, fmt.Errorf("refund not found")
+	}
+	return ref, nil
+}
+
+func (r *MemoryRepository) GetRefundByIdempotency(_ context.Context, key string) (domain.Refund, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	id, ok := r.refundByIdem[key]
+	if !ok {
+		return domain.Refund{}, false, nil
+	}
+	return r.refunds[id], true, nil
+}
+
+func (r *MemoryRepository) ListRefunds(_ context.Context, q domain.ListRefundsQuery) (domain.ListRefundsResponse, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if q.Limit <= 0 {
+		q.Limit = 50
+	}
+	if q.Limit > 200 {
+		q.Limit = 200
+	}
+
+	var all []domain.Refund
+	for _, ref := range r.refunds {
+		if q.Status != "" && ref.Status != q.Status {
+			continue
+		}
+		if q.ClientID != "" && ref.ClientID != q.ClientID {
+			continue
+		}
+		if q.OrderID != "" && ref.OrderID != q.OrderID {
+			continue
+		}
+		all = append(all, ref)
+	}
+
+	total := len(all)
+	start := q.Offset
+	if start > total {
+		start = total
+	}
+	end := start + q.Limit
+	if end > total {
+		end = total
+	}
+
+	return domain.ListRefundsResponse{
+		Refunds: all[start:end],
+		Total:   total,
+	}, nil
+}
+
+func (r *MemoryRepository) ProcessRefund(_ context.Context, id string) (domain.Refund, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ref, ok := r.refunds[id]
+	if !ok {
+		return domain.Refund{}, fmt.Errorf("refund not found")
+	}
+	if ref.Status != domain.RefundStatusPending {
+		return domain.Refund{}, fmt.Errorf("refund is not in PENDING state: current=%s", ref.Status)
+	}
+	ref.Status = domain.RefundStatusProcessing
+	ref.UpdatedAt = now()
+	r.refunds[id] = ref
+	return ref, nil
+}
+
+func (r *MemoryRepository) ConfirmRefund(_ context.Context, id string) (domain.Refund, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ref, ok := r.refunds[id]
+	if !ok {
+		return domain.Refund{}, fmt.Errorf("refund not found")
+	}
+	if ref.Status != domain.RefundStatusProcessing {
+		return domain.Refund{}, fmt.Errorf("refund is not in PROCESSING state: current=%s", ref.Status)
+	}
+	n := now()
+	ref.Status = domain.RefundStatusConfirmed
+	ref.UpdatedAt = n
+	ref.CompletedAt = &n
+	r.refunds[id] = ref
+
+	wallet, ok := r.wallets[ref.ClientID]
+	if !ok {
+		wallet = domain.Wallet{
+			ID:        newID("wal"),
+			Subject:   ref.ClientID,
+			ActorType: "client",
+			Balance:   0,
+			Currency:  "YER",
+			CreatedAt: n,
+			UpdatedAt: n,
+		}
+	}
+	wallet.Balance += ref.Amount
+	wallet.UpdatedAt = n
+	r.wallets[ref.ClientID] = wallet
+
+	ledgerID := newID("led")
+	r.ledger = append(r.ledger, domain.LedgerEntry{
+		ID:              ledgerID,
+		WalletID:        wallet.ID,
+		Subject:         ref.ClientID,
+		TransactionType: domain.TxTypeCredit,
+		Amount:          ref.Amount,
+		Currency:        ref.Currency,
+		ReferenceType:   "refund",
+		ReferenceID:     ref.ID,
+		OrderID:         &ref.OrderID,
+		Description:     "Refund for order: " + ref.OrderID,
+		Status:          domain.TxStatusCompleted,
+		CreatedAt:       n,
+		CompletedAt:     &n,
+	})
+
+	return ref, nil
+}
+
+func (r *MemoryRepository) FailRefund(_ context.Context, id string, reason string) (domain.Refund, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ref, ok := r.refunds[id]
+	if !ok {
+		return domain.Refund{}, fmt.Errorf("refund not found")
+	}
+	n := now()
+	ref.Status = domain.RefundStatusFailed
+	ref.UpdatedAt = n
+	ref.FailureReason = &reason
+	r.refunds[id] = ref
+	return ref, nil
+}
+
+func (r *MemoryRepository) MarkRefundCallbackSent(_ context.Context, id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	ref, ok := r.refunds[id]
+	if !ok {
+		return fmt.Errorf("refund not found")
+	}
+	n := now()
+	ref.DshCallbackSentAt = &n
+	r.refunds[id] = ref
+	return nil
+}
+
+// ─── Settlements ─────────────────────────────────────────────────────────────
+
+func (r *MemoryRepository) CreateSettlement(_ context.Context, req domain.CreateSettlementRequest) (domain.Settlement, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if req.OrderID == "" || req.PartnerID == "" || req.GrossAmount <= 0 || req.IdempotencyKey == "" {
+		return domain.Settlement{}, fmt.Errorf("order_id, partner_id, gross_amount > 0, and idempotency_key are required")
+	}
+	if req.Currency == "" {
+		req.Currency = "YER"
+	}
+	if req.PlatformFeeRate < 0 || req.PlatformFeeRate > 1 {
+		return domain.Settlement{}, fmt.Errorf("platform_fee_rate must be between 0 and 1")
+	}
+	if req.CaptainFeeRate < 0 || req.CaptainFeeRate > 1 {
+		return domain.Settlement{}, fmt.Errorf("captain_fee_rate must be between 0 and 1")
+	}
+
+	if id, ok := r.settlementByIdem[req.IdempotencyKey]; ok {
+		return r.settlements[id], nil
+	}
+
+	platformFee := req.GrossAmount * req.PlatformFeeRate
+	captainPayout := req.GrossAmount * req.CaptainFeeRate
+	partnerPayout := req.GrossAmount - platformFee - captainPayout
+
+	n := now()
+	s := domain.Settlement{
+		ID:             newID("set"),
+		OrderID:        req.OrderID,
+		PartnerID:      req.PartnerID,
+		CaptainID:      req.CaptainID,
+		GrossAmount:    req.GrossAmount,
+		PlatformFee:    platformFee,
+		PartnerPayout:  partnerPayout,
+		CaptainPayout:  captainPayout,
+		Currency:       req.Currency,
+		Status:         domain.SettlementStatusPending,
+		IdempotencyKey: req.IdempotencyKey,
+		DshBaseURL:     req.DshBaseURL,
+		CreatedAt:      n,
+		UpdatedAt:      n,
+	}
+	r.settlements[s.ID] = s
+	r.settlementByIdem[req.IdempotencyKey] = s.ID
+	return s, nil
+}
+
+func (r *MemoryRepository) GetSettlement(_ context.Context, id string) (domain.Settlement, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	s, ok := r.settlements[id]
+	if !ok {
+		return domain.Settlement{}, fmt.Errorf("settlement not found")
+	}
+	return s, nil
+}
+
+func (r *MemoryRepository) GetSettlementByIdempotency(_ context.Context, key string) (domain.Settlement, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	id, ok := r.settlementByIdem[key]
+	if !ok {
+		return domain.Settlement{}, false, nil
+	}
+	return r.settlements[id], true, nil
+}
+
+func (r *MemoryRepository) ListSettlements(_ context.Context, q domain.ListSettlementsQuery) (domain.ListSettlementsResponse, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if q.Limit <= 0 {
+		q.Limit = 50
+	}
+	if q.Limit > 200 {
+		q.Limit = 200
+	}
+
+	var all []domain.Settlement
+	for _, s := range r.settlements {
+		if q.Status != "" && s.Status != q.Status {
+			continue
+		}
+		if q.PartnerID != "" && s.PartnerID != q.PartnerID {
+			continue
+		}
+		if q.CaptainID != "" && (s.CaptainID == nil || *s.CaptainID != q.CaptainID) {
+			continue
+		}
+		all = append(all, s)
+	}
+
+	total := len(all)
+	start := q.Offset
+	if start > total {
+		start = total
+	}
+	end := start + q.Limit
+	if end > total {
+		end = total
+	}
+
+	return domain.ListSettlementsResponse{
+		Settlements: all[start:end],
+		Total:       total,
+	}, nil
+}
+
+func (r *MemoryRepository) ProcessSettlement(_ context.Context, id string) (domain.Settlement, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.settlements[id]
+	if !ok {
+		return domain.Settlement{}, fmt.Errorf("settlement not found")
+	}
+	if s.Status != domain.SettlementStatusPending {
+		return domain.Settlement{}, fmt.Errorf("settlement is not in PENDING state: current=%s", s.Status)
+	}
+	s.Status = domain.SettlementStatusProcessing
+	s.UpdatedAt = now()
+	r.settlements[id] = s
+	return s, nil
+}
+
+func (r *MemoryRepository) CompleteSettlement(_ context.Context, id string) (domain.Settlement, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.settlements[id]
+	if !ok {
+		return domain.Settlement{}, fmt.Errorf("settlement not found")
+	}
+	if s.Status != domain.SettlementStatusProcessing {
+		return domain.Settlement{}, fmt.Errorf("settlement is not in PROCESSING state: current=%s", s.Status)
+	}
+	n := now()
+	s.Status = domain.SettlementStatusCompleted
+	s.UpdatedAt = n
+	s.CompletedAt = &n
+	r.settlements[id] = s
+
+	if s.PartnerPayout > 0 {
+		wallet, ok := r.wallets[s.PartnerID]
+		if !ok {
+			wallet = domain.Wallet{
+				ID:        newID("wal"),
+				Subject:   s.PartnerID,
+				ActorType: "partner",
+				Balance:   0,
+				Currency:  "YER",
+				CreatedAt: n,
+				UpdatedAt: n,
+			}
+		}
+		wallet.Balance += s.PartnerPayout
+		wallet.UpdatedAt = n
+		r.wallets[s.PartnerID] = wallet
+
+		ledgerID := newID("led")
+		r.ledger = append(r.ledger, domain.LedgerEntry{
+			ID:              ledgerID,
+			WalletID:        wallet.ID,
+			Subject:         s.PartnerID,
+			TransactionType: domain.TxTypeCredit,
+			Amount:          s.PartnerPayout,
+			Currency:        s.Currency,
+			ReferenceType:   "settlement",
+			ReferenceID:     s.ID,
+			OrderID:         &s.OrderID,
+			Description:     "Partner settlement payout for order: " + s.OrderID,
+			Status:          domain.TxStatusCompleted,
+			CreatedAt:       n,
+			CompletedAt:     &n,
+		})
+	}
+
+	if s.CaptainID != nil && *s.CaptainID != "" && s.CaptainPayout > 0 {
+		wallet, ok := r.wallets[*s.CaptainID]
+		if !ok {
+			wallet = domain.Wallet{
+				ID:        newID("wal"),
+				Subject:   *s.CaptainID,
+				ActorType: "captain",
+				Balance:   0,
+				Currency:  "YER",
+				CreatedAt: n,
+				UpdatedAt: n,
+			}
+		}
+		wallet.Balance += s.CaptainPayout
+		wallet.UpdatedAt = n
+		r.wallets[*s.CaptainID] = wallet
+
+		ledgerID := newID("led")
+		r.ledger = append(r.ledger, domain.LedgerEntry{
+			ID:              ledgerID,
+			WalletID:        wallet.ID,
+			Subject:         *s.CaptainID,
+			TransactionType: domain.TxTypeCredit,
+			Amount:          s.CaptainPayout,
+			Currency:        s.Currency,
+			ReferenceType:   "settlement",
+			ReferenceID:     s.ID,
+			OrderID:         &s.OrderID,
+			Description:     "Captain settlement payout for order: " + s.OrderID,
+			Status:          domain.TxStatusCompleted,
+			CreatedAt:       n,
+			CompletedAt:     &n,
+		})
+	}
+
+	return s, nil
+}
+
+func (r *MemoryRepository) FailSettlement(_ context.Context, id string, reason string) (domain.Settlement, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.settlements[id]
+	if !ok {
+		return domain.Settlement{}, fmt.Errorf("settlement not found")
+	}
+	n := now()
+	s.Status = domain.SettlementStatusFailed
+	s.UpdatedAt = n
+	s.FailureReason = &reason
+	r.settlements[id] = s
+	return s, nil
+}
+
+func (r *MemoryRepository) MarkSettlementCallbackSent(_ context.Context, id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.settlements[id]
+	if !ok {
+		return fmt.Errorf("settlement not found")
+	}
+	n := now()
+	s.DshCallbackSentAt = &n
+	r.settlements[id] = s
+	return nil
+}
+
+// ─── Wallets ─────────────────────────────────────────────────────────────────
+
+func (r *MemoryRepository) GetOrCreateWallet(_ context.Context, subject, actorType string) (domain.Wallet, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if w, ok := r.wallets[subject]; ok {
+		return w, nil
+	}
+	n := now()
+	w := domain.Wallet{
+		ID:        newID("wal"),
+		Subject:   subject,
+		ActorType: actorType,
+		Balance:   0,
+		Currency:  "YER",
+		CreatedAt: n,
+		UpdatedAt: n,
+	}
+	r.wallets[subject] = w
+	return w, nil
+}
+
+func (r *MemoryRepository) GetWalletSummary(_ context.Context, subject string) (domain.WalletSummary, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	w, ok := r.wallets[subject]
+	if !ok {
+		return domain.WalletSummary{}, fmt.Errorf("wallet not found")
+	}
+
+	var totalCredit, totalDebit, pendingCredit, pendingDebit float64
+	var count int
+	for _, e := range r.ledger {
+		if e.Subject != subject {
+			continue
+		}
+		count++
+		switch e.TransactionType {
+		case domain.TxTypeCredit:
+			if e.Status == domain.TxStatusCompleted {
+				totalCredit += e.Amount
+			} else if e.Status == domain.TxStatusPending {
+				pendingCredit += e.Amount
+			}
+		case domain.TxTypeDebit:
+			if e.Status == domain.TxStatusCompleted {
+				totalDebit += e.Amount
+			} else if e.Status == domain.TxStatusPending {
+				pendingDebit += e.Amount
+			}
+		}
+	}
+
+	return domain.WalletSummary{
+		Subject:          w.Subject,
+		ActorType:        w.ActorType,
+		Balance:          w.Balance,
+		Currency:         w.Currency,
+		TotalCredit:      totalCredit,
+		TotalDebit:       totalDebit,
+		PendingCredit:    pendingCredit,
+		PendingDebit:     pendingDebit,
+		TransactionCount: count,
+	}, nil
+}
+
+// ─── Ledger ──────────────────────────────────────────────────────────────────
+
+func (r *MemoryRepository) CreateLedgerEntry(_ context.Context, entry domain.LedgerEntry) (domain.LedgerEntry, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if entry.ID == "" {
+		entry.ID = newID("led")
+	}
+	if entry.CreatedAt.IsZero() {
+		entry.CreatedAt = now()
+	}
+	r.ledger = append(r.ledger, entry)
+	return entry, nil
+}
+
+func (r *MemoryRepository) ListLedger(_ context.Context, q domain.ListLedgerQuery) (domain.ListLedgerResponse, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if q.Limit <= 0 {
+		q.Limit = 50
+	}
+	if q.Limit > 200 {
+		q.Limit = 200
+	}
+
+	var filtered []domain.LedgerEntry
+	for _, e := range r.ledger {
+		if q.Subject != "" && e.Subject != q.Subject {
+			continue
+		}
+		filtered = append(filtered, e)
+	}
+
+	total := len(filtered)
+	start := q.Offset
+	if start > total {
+		start = total
+	}
+	end := start + q.Limit
+	if end > total {
+		end = total
+	}
+
+	return domain.ListLedgerResponse{
+		Entries: filtered[start:end],
+		Total:   total,
+	}, nil
+}
+
+// ─── Health ──────────────────────────────────────────────────────────────────
+
+func (r *MemoryRepository) Ping(_ context.Context) error { return nil }
+
+// ─── Operator Features ───────────────────────────────────────────────────
+
+func (r *MemoryRepository) RunReconciliation(ctx context.Context, idempotencyKey string) (domain.ReconciliationRun, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if idempotencyKey != "" {
+		if run, ok := r.reconciliationByIdem[idempotencyKey]; ok {
+			return run, nil
+		}
+	}
+
+	var totalDebit, totalCredit float64
+	var count int
+	for _, e := range r.ledger {
+		if e.Status == domain.TxStatusCompleted {
+			count++
+			if e.TransactionType == domain.TxTypeDebit {
+				totalDebit += e.Amount
+			} else if e.TransactionType == domain.TxTypeCredit {
+				totalCredit += e.Amount
+			}
+		}
+	}
+
+	status := "failed"
+	if totalDebit == totalCredit {
+		status = "passed"
+	}
+
+	run := domain.ReconciliationRun{
+		ID:          newID("rec"),
+		Status:      status,
+		EntryCount:  count,
+		TotalDebit:  totalDebit,
+		TotalCredit: totalCredit,
+		CreatedAt:   now(),
+	}
+	if idempotencyKey != "" {
+		run.IdempotencyKey = &idempotencyKey
+	}
+
+	r.reconciliations = append(r.reconciliations, run)
+	if idempotencyKey != "" {
+		r.reconciliationByIdem[idempotencyKey] = run
+	}
+	return run, nil
+}
+
+func (r *MemoryRepository) ListReconciliationRuns(_ context.Context) ([]domain.ReconciliationRun, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	runs := make([]domain.ReconciliationRun, len(r.reconciliations))
+	copy(runs, r.reconciliations)
+	return runs, nil
+}
+
+func (r *MemoryRepository) CreateReconciliationRun(_ context.Context, run domain.ReconciliationRun) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if run.ID == "" {
+		run.ID = newID("rec")
+	}
+	if run.CreatedAt.IsZero() {
+		run.CreatedAt = now()
+	}
+	r.reconciliations = append(r.reconciliations, run)
+	if run.IdempotencyKey != nil && *run.IdempotencyKey != "" {
+		r.reconciliationByIdem[*run.IdempotencyKey] = run
+	}
+	return nil
+}
+
+func (r *MemoryRepository) GetReconciliationRunByIdempotency(_ context.Context, key string) (domain.ReconciliationRun, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	run, ok := r.reconciliationByIdem[key]
+	return run, ok, nil
+}
+
+func (r *MemoryRepository) CreatePayoutDecision(_ context.Context, req domain.CreatePayoutDecisionRequest) (domain.PayoutDecision, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if req.OwnerID == "" || req.SettlementCycleID == "" || req.Amount <= 0 {
+		return domain.PayoutDecision{}, fmt.Errorf("owner_id, settlement_cycle_id, and amount are required")
+	}
+
+	if id, ok := r.payoutByIdem[req.IdempotencyKey]; ok {
+		return r.payoutDecisions[id], nil
+	}
+
+	pd := domain.PayoutDecision{
+		ID:                newID("po"),
+		OwnerID:           req.OwnerID,
+		OwnerKind:         req.OwnerKind,
+		SettlementCycleID: req.SettlementCycleID,
+		Amount:            req.Amount,
+		Currency:          "YER",
+		Status:            "approved",
+		CreatedAt:         now(),
+	}
+	if req.IdempotencyKey != "" {
+		pd.IdempotencyKey = &req.IdempotencyKey
+	}
+
+	r.payoutDecisions[pd.ID] = pd
+	if req.IdempotencyKey != "" {
+		r.payoutByIdem[req.IdempotencyKey] = pd.ID
+	}
+	return pd, nil
+}
+
+func (r *MemoryRepository) GetPayoutDecisionByIdempotency(_ context.Context, key string) (domain.PayoutDecision, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	id, ok := r.payoutByIdem[key]
+	if !ok {
+		return domain.PayoutDecision{}, false, nil
+	}
+	return r.payoutDecisions[id], true, nil
+}
+
+func (r *MemoryRepository) GetFinanceClose(_ context.Context, businessDate string) (domain.FinanceClose, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	fc, ok := r.financeCloses[businessDate]
+	return fc, ok, nil
+}
+
+func (r *MemoryRepository) GetLatestFinanceClose(_ context.Context) (domain.FinanceClose, bool, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var latest domain.FinanceClose
+	var found bool
+	for _, fc := range r.financeCloses {
+		if !found || fc.CreatedAt.After(latest.CreatedAt) {
+			latest = fc
+			found = true
+		}
+	}
+	return latest, found, nil
+}
+
+func (r *MemoryRepository) UpsertFinanceClose(_ context.Context, fc domain.FinanceClose) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if fc.ID == "" {
+		fc.ID = newID("close")
+	}
+	if fc.CreatedAt.IsZero() {
+		fc.CreatedAt = now()
+	}
+	r.financeCloses[fc.BusinessDate] = fc
+	return nil
+}
+
+func (r *MemoryRepository) ListAuditEvents(_ context.Context) ([]domain.CallbackEvent, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	events := make([]domain.CallbackEvent, len(r.callbackEvents))
+	copy(events, r.callbackEvents)
+	return events, nil
+}
+
+func (r *MemoryRepository) CreateCallbackEvent(_ context.Context, event domain.CallbackEvent) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if event.EventID == "" {
+		event.EventID = newID("evt")
+	}
+	if event.CreatedAt.IsZero() {
+		event.CreatedAt = now()
+	}
+	r.callbackEvents = append(r.callbackEvents, event)
+	return nil
+}
+
+// ─── Reporting and Accounting Methods ─────────────────────────────────────────
+
+func (r *MemoryRepository) GetControlPanelFinanceCenter(ctx context.Context) (domain.ControlPanelFinanceCenter, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var totalSettled float64
+	for _, s := range r.settlements {
+		totalSettled += s.PartnerPayout + s.CaptainPayout
+	}
+
+	var openSettlements int
+	for _, s := range r.settlements {
+		if s.Status == "ready_for_payout" || s.Status == "PENDING" {
+			openSettlements++
+		}
+	}
+
+	return domain.ControlPanelFinanceCenter{
+		BusinessDate:  time.Now().Format("2006-01-02"),
+		Currency:      "YER",
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+		Sections: []map[string]any{
+			{
+				"name":                    "ملخص اليوم المالي",
+				"totalPaymentsMinorUnits": float64(len(r.payments)),
+				"totalRefundsMinorUnits":  float64(len(r.refunds)),
+				"totalSettledMinorUnits":  totalSettled,
+				"openSettlements":         openSettlements,
+			},
+		},
+	}, nil
+}
+
+func (r *MemoryRepository) ListStoreSettlementStatements(ctx context.Context, partnerID string) ([]domain.StoreSettlementStatement, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var list []domain.StoreSettlementStatement
+	for _, s := range r.settlements {
+		if partnerID != "" && s.PartnerID != partnerID {
+			continue
+		}
+		list = append(list, domain.StoreSettlementStatement{
+			StatementID:        s.ID,
+			StoreID:            s.PartnerID,
+			StoreName:          "متجر تجريبي",
+			SettlementCycleID:  s.ID,
+			Frequency:          "biweekly",
+			PeriodStart:        s.CreatedAt.Format("2006-01-02"),
+			PeriodEnd:          s.CreatedAt.Format("2006-01-02"),
+			ExpectedPayoutDate: s.CreatedAt.Add(7 * 24 * time.Hour).Format("2006-01-02"),
+			NetPayable: domain.MoneyAmount{
+				AmountMinorUnits: s.PartnerPayout,
+				Currency:         s.Currency,
+			},
+			Orders:        []domain.StoreSettlementOrderRow{},
+			ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+		})
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListControlPanelAccountStatements(ctx context.Context, actorKind string) ([]domain.AccountStatement, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	grouped := make(map[string]*domain.AccountStatement)
+	for _, e := range r.ledger {
+		actorType := ""
+		if strings.Contains(e.Subject, "partner") {
+			actorType = "partner"
+		} else if strings.Contains(e.Subject, "captain") {
+			actorType = "captain"
+		} else {
+			actorType = "client"
+		}
+
+		if actorKind != "" && actorType != actorKind {
+			continue
+		}
+
+		stmt, ok := grouped[e.Subject]
+		if !ok {
+			stmt = &domain.AccountStatement{
+				StatementID: "stmt-" + e.Subject,
+				Actor:       actorType,
+				ActorID:     e.Subject,
+				PeriodStart: time.Now().Add(-30 * 24 * time.Hour).Format("2006-01-02"),
+				PeriodEnd:   time.Now().Format("2006-01-02"),
+				OpeningBalance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         e.Currency,
+				},
+				ClosingBalance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         e.Currency,
+				},
+				Lines:         []domain.AccountStatementLine{},
+				ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+			}
+			grouped[e.Subject] = stmt
+		}
+
+		line := domain.AccountStatementLine{
+			LineID:      e.ID,
+			Date:        e.CreatedAt.Format("2006-01-02"),
+			SourceType:  e.ReferenceType,
+			SourceID:    e.ReferenceID,
+			Description: e.Description,
+			RunningBalance: domain.MoneyAmount{
+				AmountMinorUnits: 0,
+				Currency:         e.Currency,
+			},
+			Status: "posted_preview",
+		}
+
+		amt := domain.MoneyAmount{
+			AmountMinorUnits: e.Amount,
+			Currency:         e.Currency,
+		}
+
+		if e.TransactionType == domain.TxTypeDebit {
+			line.Debit = &amt
+			stmt.PeriodDebit = &domain.MoneyAmount{
+				AmountMinorUnits: func() float64 {
+					if stmt.PeriodDebit != nil {
+						return stmt.PeriodDebit.AmountMinorUnits + e.Amount
+					}
+					return e.Amount
+				}(),
+				Currency: e.Currency,
+			}
+		} else {
+			line.Credit = &amt
+			stmt.PeriodCredit = &domain.MoneyAmount{
+				AmountMinorUnits: func() float64 {
+					if stmt.PeriodCredit != nil {
+						return stmt.PeriodCredit.AmountMinorUnits + e.Amount
+					}
+					return e.Amount
+				}(),
+				Currency: e.Currency,
+			}
+		}
+		stmt.Lines = append(stmt.Lines, line)
+	}
+
+	var list []domain.AccountStatement
+	for _, stmt := range grouped {
+		list = append(list, *stmt)
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListChartOfAccounts(ctx context.Context) ([]domain.ChartOfAccount, error) {
+	return []domain.ChartOfAccount{
+		{AccountCode: "1100", AccountName: "محافظ العملاء", AccountType: "asset", NormalBalance: "debit", Currency: "YER"},
+		{AccountCode: "2100", AccountName: "مستحقات الكباتن (COD)", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "2200", AccountName: "مستحقات الشركاء", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "2300", AccountName: "مستحقات المناديب", AccountType: "liability", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "3100", AccountName: "إيرادات المنصة", AccountType: "revenue", NormalBalance: "credit", Currency: "YER"},
+		{AccountCode: "4100", AccountName: "استردادات العملاء", AccountType: "expense", NormalBalance: "debit", Currency: "YER"},
+	}, nil
+}
+
+func (r *MemoryRepository) ListSubledgerBalances(ctx context.Context) ([]domain.SubledgerBalance, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	byKind := make(map[string]*domain.SubledgerBalance)
+	for _, e := range r.ledger {
+		sub, ok := byKind[e.ReferenceType]
+		if !ok {
+			sub = &domain.SubledgerBalance{
+				SubledgerID:        "sub-" + e.ReferenceType,
+				ControlAccountCode: "1100",
+				Balance: domain.MoneyAmount{
+					AmountMinorUnits: 0,
+					Currency:         e.Currency,
+				},
+				CloseGateImpact: "none",
+			}
+			byKind[e.ReferenceType] = sub
+		}
+		if e.TransactionType == domain.TxTypeCredit {
+			sub.Balance.AmountMinorUnits += e.Amount
+		} else {
+			sub.Balance.AmountMinorUnits -= e.Amount
+		}
+	}
+
+	var list []domain.SubledgerBalance
+	for _, sub := range byKind {
+		list = append(list, *sub)
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListPostingRules(ctx context.Context) ([]domain.PostingRule, error) {
+	return []domain.PostingRule{
+		{EventKind: "payment_captured", DebitAccountCode: "1100", CreditAccountCode: "3100", StatementImpact: "debit customer, credit platform", SettlementImpact: "none"},
+		{EventKind: "refund_confirmed", DebitAccountCode: "4100", CreditAccountCode: "1100", StatementImpact: "debit refunds, credit customer", SettlementImpact: "none"},
+		{EventKind: "partner_settlement", DebitAccountCode: "3100", CreditAccountCode: "2200", StatementImpact: "debit platform, credit partner", SettlementImpact: "payout"},
+		{EventKind: "captain_payout", DebitAccountCode: "3100", CreditAccountCode: "2100", StatementImpact: "debit platform, credit captain", SettlementImpact: "payout"},
+	}, nil
+}
+
+func (r *MemoryRepository) GetTrialBalance(ctx context.Context) (domain.TrialBalance, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var totalDebit, totalCredit float64
+	for _, e := range r.ledger {
+		if e.TransactionType == domain.TxTypeDebit {
+			totalDebit += e.Amount
+		} else {
+			totalCredit += e.Amount
+		}
+	}
+
+	return domain.TrialBalance{
+		BusinessDate: time.Now().Format("2006-01-02"),
+		TotalDebit: domain.MoneyAmount{
+			AmountMinorUnits: totalDebit,
+			Currency:         "YER",
+		},
+		TotalCredit: domain.MoneyAmount{
+			AmountMinorUnits: totalCredit,
+			Currency:         "YER",
+		},
+		IsBalanced:    totalDebit == totalCredit,
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+	}, nil
+}
+
+func (r *MemoryRepository) ListSettlementCalendar(ctx context.Context) ([]domain.SettlementCalendarCycle, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var list []domain.SettlementCalendarCycle
+	for _, s := range r.settlements {
+		list = append(list, domain.SettlementCalendarCycle{
+			CycleID:            s.ID,
+			OwnerKind:          "partner",
+			Frequency:          "biweekly",
+			PeriodStart:        s.CreatedAt.Format("2006-01-02"),
+			PeriodEnd:          s.CreatedAt.Format("2006-01-02"),
+			CutoffDate:         s.CreatedAt.Format("2006-01-02"),
+			ExpectedPayoutDate: s.CreatedAt.Add(7 * 24 * time.Hour).Format("2006-01-02"),
+			Status:             "open_preview",
+			NetPayable: domain.MoneyAmount{
+				AmountMinorUnits: s.PartnerPayout,
+				Currency:         s.Currency,
+			},
+		})
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) ListRefundLedger(ctx context.Context) ([]domain.RefundLedgerCase, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var list []domain.RefundLedgerCase
+	for _, ref := range r.refunds {
+		list = append(list, domain.RefundLedgerCase{
+			RefundCaseID: ref.ID,
+			OrderID:      ref.OrderID,
+			CustomerID:   ref.ClientID,
+			StoreID:      "store-demo",
+			OriginalAmount: domain.MoneyAmount{
+				AmountMinorUnits: ref.Amount,
+				Currency:         ref.Currency,
+			},
+			Status:           "approved_preview",
+			LedgerImpact:     "debit",
+			WalletImpact:     "credit",
+			SettlementImpact: "hold",
+		})
+	}
+	return list, nil
+}
+
+func (r *MemoryRepository) GetAuditPack(ctx context.Context) (domain.AuditPack, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var events []domain.AuditEvent
+	for i, ev := range r.callbackEvents {
+		events = append(events, domain.AuditEvent{
+			ID:        ev.EventID,
+			EventType: "callback_sent",
+			ActorID:   "system",
+			CreatedAt: ev.CreatedAt,
+		})
+		if i >= 50 {
+			break
+		}
+	}
+
+	return domain.AuditPack{
+		AuditPackID:   newID("audit"),
+		Status:        "passed",
+		Events:        events,
+		ContractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY",
+	}, nil
+}
+
+func (r *MemoryRepository) GetStoreDeliveryFinanceSummary(ctx context.Context, captainID string) (domain.StoreDeliveryFinanceSummary, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var earned float64
+	for _, s := range r.settlements {
+		if s.CaptainID != nil && *s.CaptainID == captainID {
+			earned += s.CaptainPayout
+		}
+	}
+
+	return domain.StoreDeliveryFinanceSummary{
+		TotalEarningsMinorUnits: earned,
+		Currency:                "YER",
+		PeriodDate:              time.Now().Format("2006-01-02"),
+		Deliveries:              []domain.FieldCommission{},
+	}, nil
+}

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import {
 	Badge,
 	Box,
 	Button,
+	Divider,
 	Icon,
 	KeyValueList,
 	ListItem,
@@ -227,7 +228,7 @@ function renderOrdersState(state: DshCaptainOrdersScreenState, onRetry?: () => v
 	return null;
 }
 
-function OrderInboxSection({
+const OrderInboxSection = React.memo(function OrderInboxSection({
 	items = demoBellItems,
 	onOpenOrder,
 	onOpenNextOrder,
@@ -253,56 +254,62 @@ function OrderInboxSection({
 		return <DshOperationScreen state="empty" title="صندوق طلبات الكابتن" subtitle="مسار الصندوق أولًا يبقي الطلب الفوري واضحًا ويزيل ضجيج اللوحة." onRetry={onRetry} />;
 	}
 
+	const { theme } = useTheme();
+
 	return (
-		<DshOperationScreen
-			title="صندوق طلبات الكابتن"
-			subtitle="هذا الصندوق يعرض طلبات توصيل بثواني فقط — لا تظهر هنا طلبات توصيل المتجر أو الاستلام الذاتي."
-			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
-						<SectionHeader title="الطلب التالي" subtitle="إجراء واحد واضح قبل مسح بقية الصف." />
-						<Box gap={1}>
-							<Text role="bodyStrong">{nextOrder.title}</Text>
-							<Text role="bodySm" tone="muted">
-								{nextOrder.subtitle}
-							</Text>
-							<Text role="caption" tone="soft">
-								{nextOrder.meta}
-							</Text>
-						</Box>
-					</Surface>
+		<MobileScrollView padding={4} gap={5} contentContainerStyle={{ paddingBottom: 40 }}>
+			<Box gap={2}>
+				<Text role="bodyStrong" style={{ textAlign: 'right' }}>{nextOrder.title}</Text>
+				<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{nextOrder.subtitle}</Text>
+				<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{nextOrder.meta}</Text>
+			</Box>
 
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title="الطلبات في الصف" subtitle="الحد الأدنى للقائمة: الاستلام والتسليم والوقت والخطوة التالية." />
-						<Box gap={2}>
-							{items.map((item) => {
-								const { badgeLabel, badgeTone } = resolveServiceTypeBadge(item.serviceType);
-								return (
-									<ListItem
-										key={item.id}
-										title={item.title}
-										subtitle={item.subtitle}
-										meta={`${item.meta}`}
-										badgeLabel={badgeLabel}
-										badgeTone={badgeTone}
-										onPress={() => onOpenOrder?.(item.id)}
-									/>
-								);
-							})}
-						</Box>
-					</Surface>
-				</Box>
-			}
-			primaryActionLabel="فتح الطلب التالي"
-			secondaryActionLabel={onRetry ? 'تحديث الطلبات' : undefined}
-			onPrimaryAction={handleOpenNextOrder}
-			onSecondaryAction={onRetry}
-			onRetry={onRetry}
-		/>
+			<Box gap={2}>
+				<Button label="فتح الطلب التالي" onPress={handleOpenNextOrder} />
+				{onRetry ? <Button label="تحديث الطلبات" tone="secondary" onPress={onRetry} /> : null}
+			</Box>
+
+			{items.length > 1 ? (
+				<>
+					<Divider />
+					<Text role="label" tone="muted" style={{ textAlign: 'right', color: theme.textMuted }}>الطلبات في الصف</Text>
+					<Box padding={0} gap={0}>
+						{items.map((item, index, arr) => {
+							const { badgeLabel, badgeTone } = resolveServiceTypeBadge(item.serviceType);
+							return (
+								<Pressable
+									key={item.id}
+									onPress={() => onOpenOrder?.(item.id)}
+									style={({ pressed }) => ({
+										flexDirection: 'row-reverse',
+										alignItems: 'flex-start',
+										justifyContent: 'space-between',
+										paddingVertical: 14,
+										backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+										borderBottomWidth: index === arr.length - 1 ? 0 : 1,
+										borderBottomColor: theme.line,
+										gap: 12,
+									})}
+								>
+									<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
+										<Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>{item.title}</Text>
+										<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>{item.subtitle}</Text>
+										<Text role="caption" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>{item.meta}</Text>
+									</View>
+									<View style={{ paddingTop: 2, flexShrink: 0 }}>
+										<Badge label={badgeLabel} tone={badgeTone} />
+									</View>
+								</Pressable>
+							);
+						})}
+					</Box>
+				</>
+			) : null}
+		</MobileScrollView>
 	);
-}
+});
 
-function OrderDetailSection({
+const OrderDetailSection = React.memo(function OrderDetailSection({
 	summary = demoSummary,
 	onConfirmPickup,
 	onConfirmDelivery,
@@ -332,9 +339,9 @@ function OrderDetailSection({
 			title="تفاصيل الطلب"
 			subtitle="مهمة نشطة مع تواصل متكامل وجرس تنبيه ذكي مباشر داخل نفس شاشة الطلب."
 			content={
-				<Box gap={3}>
+				<Box gap={4} style={{ paddingHorizontal: 4 }}>
 					{/* بطاقة تفاصيل الطلب الرئيسية */}
-					<Surface tone="brand" gap={3}>
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<Box gap={1} style={{ alignItems: 'flex-end' }}>
 							<Badge label="طلب الكابتن" tone="warning" />
 							<Text role="titleLg" style={{ textAlign: 'right' }}>{summary.orderId}</Text>
@@ -351,9 +358,11 @@ function OrderDetailSection({
 								{ label: 'الخطوة التالية', value: summary.nextActionLabel, tone: 'success' },
 							]}
 						/>
-					</Surface>
+					</Box>
 
-					<Surface tone="inset" gap={3}>
+					<Divider />
+
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<SectionHeader title="قواعد الالتقاط والتسليم" subtitle="أسباب الرفض والفشل وإثباتات التسليم تبقى إلزامية داخل نفس المسار." />
 						<KeyValueList
 							items={[
@@ -362,10 +371,12 @@ function OrderDetailSection({
 								{ label: 'PoD states', value: 'idle → required → uploaded', tone: 'success' },
 							]}
 						/>
-					</Surface>
+					</Box>
+
+					<Divider />
 
 					{/* جرس تنبيه الكابتن المدمج والمباشر */}
-					<Surface tone={bellRung ? 'success' : 'raised'} gap={2} style={{ padding: 14, borderLeftWidth: 4, borderLeftColor: bellRung ? theme.success : theme.warning }}>
+					<Box gap={2} style={{ paddingVertical: 8, paddingHorizontal: 12, borderLeftWidth: 4, borderLeftColor: bellRung ? theme.success : theme.warning }}>
 						<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
 							<Badge label={bellRung ? 'تم إرسال التنبيه' : 'جرس تنبيه الكابتن'} tone={bellRung ? 'success' : 'warning'} />
 							<Icon name="notifications-outline" size={20} tone={bellRung ? 'success' : 'warning'} />
@@ -394,10 +405,12 @@ function OrderDetailSection({
 								}}
 							/>
 						)}
-					</Surface>
+					</Box>
+
+					<Divider />
 
 					{/* قسم المحادثة والمراسلة المتكامل */}
-					<Surface tone="raised" gap={3} style={{ padding: 14 }}>
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<SectionHeader
 							title="مراسلة وتواصل الطلب"
 							subtitle="دردشة مباشرة ثنائية بين الكابتن والعميل في سياق الطلب."
@@ -420,14 +433,16 @@ function OrderDetailSection({
 											width: 'auto'
 										}}
 									>
-										<Surface
-											tone={isSystem ? 'inset' : isOutbound ? 'brand' : 'default'}
+										<Box
 											style={{
 												padding: 10,
 												borderRadius: 12,
 												borderTopRightRadius: isOutbound && !isSystem ? 2 : 12,
 												borderTopLeftRadius: !isOutbound && !isSystem ? 2 : 12,
-												direction: 'rtl'
+												direction: 'rtl',
+												backgroundColor: isSystem ? theme.surfaceInset : isOutbound ? theme.brand : theme.surface,
+												borderWidth: isSystem || isOutbound ? 0 : 1,
+												borderColor: theme.line,
 											}}
 										>
 											<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 12 }}>
@@ -441,7 +456,7 @@ function OrderDetailSection({
 											<Text role="bodySm" style={{ textAlign: 'right', color: isOutbound ? theme.textInverse : theme.text }}>
 												{msg.text}
 											</Text>
-										</Surface>
+										</Box>
 									</Box>
 								);
 							})}
@@ -478,7 +493,7 @@ function OrderDetailSection({
 								</Text>
 							</Box>
 						</Box>
-					</Surface>
+					</Box>
 				</Box>
 			}
 			primaryActionLabel={primaryActionLabel}
@@ -490,9 +505,9 @@ function OrderDetailSection({
 			onRetry={onRetry}
 		/>
 	);
-}
+});
 
-function ComposerActionButton({
+const ComposerActionButton = React.memo(function ComposerActionButton({
 	iconName,
 	accessibilityLabel,
 	disabled = false,
@@ -527,14 +542,24 @@ function ComposerActionButton({
 			<Icon name={iconName} size={18} tone={disabled ? 'soft' : 'brand'} />
 		</Pressable>
 	);
-}
+});
 
-function OrderChatBubble({ message }: { message: DshCaptainOrderMessage }) {
+const OrderChatBubble = React.memo(function OrderChatBubble({ message }: { message: DshCaptainOrderMessage }) {
 	const isOutbound = message.side === 'end';
+	const { theme } = useTheme();
 
 	return (
 		<Box style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
-			<Surface tone={isOutbound ? 'brand' : 'raised'} padding={3} gap={2} radiusToken="xl" border={false}>
+			<Box
+				style={{
+					padding: 12,
+					borderRadius: 16,
+					backgroundColor: isOutbound ? theme.brand : theme.surface,
+					borderWidth: isOutbound ? 0 : 1,
+					borderColor: theme.line,
+					gap: 8,
+				}}
+			>
 				<Box layoutDirection="row" justify="space-between" align="center" gap={2}>
 					<Badge label={message.sender} tone={isOutbound ? 'brand' : 'default'} />
 					<Text role="caption" tone={isOutbound ? 'inverse' : 'soft'}>{message.time}</Text>
@@ -542,12 +567,12 @@ function OrderChatBubble({ message }: { message: DshCaptainOrderMessage }) {
 				<Text role="bodySm" tone={isOutbound ? 'inverse' : 'default'}>
 					{message.text}
 				</Text>
-			</Surface>
+			</Box>
 		</Box>
 	);
-}
+});
 
-function OrderChatSection({
+const OrderChatSection = React.memo(function OrderChatSection({
 	orderId = demoSummary.orderId,
 	pickupLabel = demoSummary.pickupLabel,
 	dropoffLabel = demoSummary.dropoffLabel,
@@ -558,6 +583,7 @@ function OrderChatSection({
 	dropoffLabel?: string;
 	state?: 'active' | 'readOnly';
 }) {
+	const { theme } = useTheme();
 	const isReadOnly = state === 'readOnly';
 	const [draft, setDraft] = React.useState('');
 	const [attachments, setAttachments] = React.useState<Array<'voice' | 'camera' | 'video' | 'attachment'>>([]);
@@ -665,7 +691,7 @@ function OrderChatSection({
 						</Text>
 					</Box>
 
-					<Surface tone="raised" padding={4} gap={3} radiusToken="xl">
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<Box gap={1}>
 							<Text role="titleSm">سجل تواصل الطلب</Text>
 							<Text role="bodySm" tone="muted">
@@ -679,7 +705,18 @@ function OrderChatSection({
 							))}
 						</ScrollView>
 
-						<Surface tone={isReadOnly ? 'inset' : 'default'} padding={3} gap={2} radiusToken="lg">
+						<Divider />
+
+						<Box
+							style={{
+								padding: 12,
+								borderRadius: 12,
+								backgroundColor: isReadOnly ? theme.surfaceInset : theme.surface,
+								borderWidth: 1,
+								borderColor: theme.line,
+								gap: 8,
+							}}
+						>
 							<TextField
 								value={draft}
 								onChangeText={setDraft}
@@ -709,15 +746,15 @@ function OrderChatSection({
 							<Text role="caption" tone="muted">
 								{composerHint}
 							</Text>
-						</Surface>
-					</Surface>
+						</Box>
+					</Box>
 				</Box>
 			}
 		/>
 	);
-}
+});
 
-function OrderBellSection({
+const OrderBellSection = React.memo(function OrderBellSection({
 	items = demoBellItems,
 	onOpenInbox,
 	onOpenNextOrder,
@@ -730,6 +767,7 @@ function OrderBellSection({
 	onRetry?: () => void;
 	onBack?: () => void;
 }) {
+	const { theme } = useTheme();
 	const summary = {
 		inboxLabel: 'صندوق طلبات الكابتن',
 		approvalLabel: 'بحاجة إلى موافقة',
@@ -742,8 +780,8 @@ function OrderBellSection({
 			title="جرس الطلبات الجديدة للكابتن"
 			subtitle="تنبيه واضح ومختصر يدفع نحو الصندوق أو أول طلب يحتاج قرارًا سريعًا."
 			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
+				<Box gap={4} style={{ paddingHorizontal: 4 }}>
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<Box gap={1} style={{ alignItems: 'flex-end' }}>
 							<Badge label="طلبات جديدة" tone="warning" />
 							<Text role="titleLg" style={{ textAlign: 'right' }}>جرس الطلبات الجديدة للكابتن</Text>
@@ -753,47 +791,89 @@ function OrderBellSection({
 						</Box>
 
 						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
-							<Surface tone="default" padding={3} gap={1} radiusToken="lg">
+							<Box
+								style={{
+									padding: 12,
+									borderRadius: 12,
+									backgroundColor: theme.surface,
+									borderWidth: 1,
+									borderColor: theme.line,
+									flex: 1,
+									minWidth: 80,
+									gap: 4,
+								}}
+							>
 								<Text role="caption" tone="muted">طلبات جديدة</Text>
 								<Text role="titleSm">{String(items.length)}</Text>
-							</Surface>
-							<Surface tone="default" padding={3} gap={1} radiusToken="lg">
+							</Box>
+							<Box
+								style={{
+									padding: 12,
+									borderRadius: 12,
+									backgroundColor: theme.surface,
+									borderWidth: 1,
+									borderColor: theme.line,
+									flex: 1,
+									minWidth: 80,
+									gap: 4,
+								}}
+							>
 								<Text role="caption" tone="muted">بحاجة إلى موافقة</Text>
 								<Text role="titleSm">2</Text>
-							</Surface>
-							<Surface tone="default" padding={3} gap={1} radiusToken="lg">
+							</Box>
+							<Box
+								style={{
+									padding: 12,
+									borderRadius: 12,
+									backgroundColor: theme.surface,
+									borderWidth: 1,
+									borderColor: theme.line,
+									flex: 1,
+									minWidth: 80,
+									gap: 4,
+								}}
+							>
 								<Text role="caption" tone="muted">رنات عاجلة</Text>
 								<Text role="titleSm">1</Text>
-							</Surface>
+							</Box>
 						</Box>
-					</Surface>
+					</Box>
 
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title={summary.inboxLabel} subtitle="افتح الصندوق أو انتقل إلى أول طلب من نفس الجرس." />
-						<KeyValueList
-							items={[
-								{ label: 'الحالة', value: summary.approvalLabel, tone: 'brand' },
-								{ label: 'الأولوية', value: summary.urgentLabel, tone: 'warning' },
-								{ label: 'الخطوة التالية', value: 'فتح الطلب والقبول أو الرفض السريع', tone: 'success' },
-							]}
-						/>
-					</Surface>
+					<Divider />
 
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title="الرنات الحالية" subtitle="كل صف يوضح الطلب القادم من دون ضوضاء إضافية." />
-						<Box gap={2}>
-							{items.map((item) => (
-								<ListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
-							))}
-						</Box>
-					</Surface>
+					<KeyValueList
+						items={[
+							{ label: 'الحالة', value: summary.approvalLabel, tone: 'brand' },
+							{ label: 'الأولوية', value: summary.urgentLabel, tone: 'warning' },
+						]}
+					/>
 
-					<Surface tone="inset" gap={2}>
-						<Text role="bodyStrong" style={{ textAlign: 'right' }}>{summary.nextActionLabel}</Text>
-						<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-							هذا الجرس لا يضيف ضوضاء. هو مجرد دفعة واضحة نحو صندوق الطلبات أو أول طلب يحتاج قرارًا.
-						</Text>
-					</Surface>
+					<Divider />
+
+					<Box padding={0} gap={0}>
+						{items.map((item, index, arr) => (
+							<Pressable
+								key={item.id}
+								style={({ pressed }) => ({
+									flexDirection: 'row-reverse',
+									alignItems: 'flex-start',
+									justifyContent: 'space-between',
+									paddingVertical: 14,
+									backgroundColor: pressed ? theme.surfaceInset : theme.surface,
+									borderBottomWidth: index === arr.length - 1 ? 0 : 1,
+									borderBottomColor: theme.line,
+									gap: 12,
+								})}
+							>
+								<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
+									<Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>{item.title}</Text>
+									{item.subtitle ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>{item.subtitle}</Text> : null}
+									{item.meta ? <Text role="caption" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>{item.meta}</Text> : null}
+								</View>
+								{item.badgeLabel ? <View style={{ paddingTop: 2, flexShrink: 0 }}><Badge label={item.badgeLabel} /></View> : null}
+							</Pressable>
+						))}
+					</Box>
 				</Box>
 			}
 			primaryActionLabel={onOpenNextOrder ? 'فتح أول طلب' : undefined}
@@ -805,9 +885,9 @@ function OrderBellSection({
 			onRetry={onRetry}
 		/>
 	);
-}
+});
 
-function OrderActionSection({
+const OrderActionSection = React.memo(function OrderActionSection({
 	action,
 	summary = demoSummary,
 	onActionPress,
@@ -856,26 +936,14 @@ function OrderActionSection({
 			title={copy.title}
 			subtitle={copy.subtitle}
 			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
-						<SectionHeader title={copy.title} subtitle={copy.subtitle} />
-						<KeyValueList
-							items={[
-								{ label: 'الطلب', value: summary.orderId, tone: 'brand' },
-								{ label: 'الاستلام', value: summary.pickupLabel },
-								{ label: 'التسليم', value: summary.dropoffLabel },
-								{ label: 'المرحلة', value: copy.kind, tone: 'warning' },
-							]}
-						/>
-					</Surface>
-
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title="الإجراء التالي" subtitle="حافظ على الخطوة التشغلية واحدة واضحة." />
-						<Text role="bodySm" tone="muted">
-							يبقى القرار التنفيذي في شريط الإجراءات السفلي حتى تتطابق بنية التفاعل مع نمط العميل.
-						</Text>
-					</Surface>
-				</Box>
+				<KeyValueList
+					items={[
+						{ label: 'الطلب', value: summary.orderId, tone: 'brand' },
+						{ label: 'الاستلام', value: summary.pickupLabel },
+						{ label: 'التسليم', value: summary.dropoffLabel },
+						{ label: 'المرحلة', value: summary.currentStageLabel, tone: 'warning' },
+					]}
+				/>
 			}
 			primaryActionLabel={copy.primaryLabel}
 			secondaryActionLabel={copy.secondaryLabel}
@@ -883,9 +951,10 @@ function OrderActionSection({
 			onSecondaryAction={onBackToInbox}
 		/>
 	);
-}
 
-function OrderProofSection({
+});
+
+const OrderProofSection = React.memo(function OrderProofSection({
 	summary = demoSummary,
 	status = 'idle',
 	onActionPress,
@@ -903,23 +972,16 @@ function OrderProofSection({
 			title="رفع الإثبات"
 			subtitle="التقط الإثبات عندما يحتاج تأكيد التسليم النهائي إلى دعم وسائط."
 			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
-						<SectionHeader title="رفع الإثبات" subtitle="التقط الإثبات عندما يحتاج تأكيد التسليم النهائي إلى دعم وسائط." />
-						<KeyValueList
-							items={[
-								{ label: 'الطلب', value: summary.orderId, tone: 'brand' },
-								{ label: 'الصيغة المطلوبة', value: 'صورة أو تأكيد موقّع' },
-								{ label: 'الحالة الحالية', value: status, tone: 'warning' },
-								{ label: 'المتابعة', value: 'أغلق المسار بعد الإثبات' },
-							]}
-						/>
-					</Surface>
-
-					<Surface tone="raised" gap={3}>
-						<SectionHeader title="إدخال الإثبات" subtitle="أرفق أو اكتب وصفًا قصيرًا قبل الإرسال." />
-						<TextField value={draft} onChangeText={setDraft} placeholder="وصف الإثبات..." multiline numberOfLines={3} />
-					</Surface>
+				<Box gap={4}>
+					<KeyValueList
+						items={[
+							{ label: 'الطلب', value: summary.orderId, tone: 'brand' },
+							{ label: 'الصيغة', value: 'صورة أو تأكيد موقّع' },
+							{ label: 'الحالة', value: status, tone: 'warning' },
+						]}
+					/>
+					<Divider />
+					<TextField value={draft} onChangeText={setDraft} placeholder="وصف الإثبات..." multiline numberOfLines={3} />
 				</Box>
 			}
 			primaryActionLabel="رفع الإثبات"
@@ -928,7 +990,7 @@ function OrderProofSection({
 			onSecondaryAction={onBackToInbox}
 		/>
 	);
-}
+});
 
 function renderSection({
 	section,
@@ -1029,14 +1091,16 @@ function renderSection({
 			title="طلبات الكابتن"
 			subtitle="نظرة موحدة على الصندوق والمهمة النشطة والجرس بنفس الغلاف البصري المستخدم في تطبيق العميل."
 			content={
-				<Box gap={3}>
-					<Surface tone="brand" gap={3}>
+				<Box gap={4} style={{ paddingHorizontal: 4 }}>
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<SectionHeader title="الطلب التالي" subtitle="أولوية واحدة واضحة قبل أي انتقال آخر." />
 						<Text role="bodyStrong">{activeItems[0]?.title ?? `طلب #${activeSummary.orderId}`}</Text>
 						<Text role="bodySm" tone="muted">{activeItems[0]?.subtitle ?? activeSummary.currentStageLabel}</Text>
-					</Surface>
+					</Box>
 
-					<Surface tone="raised" gap={3}>
+					<Divider />
+
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<SectionHeader title="المهمة النشطة" subtitle="تفاصيل مختصرة للمهمة الجارية." />
 						<KeyValueList
 							items={[
@@ -1046,23 +1110,27 @@ function renderSection({
 								{ label: 'الخطوة التالية', value: activeSummary.nextActionLabel, tone: 'success' },
 							]}
 						/>
-					</Surface>
+					</Box>
 
-					<Surface tone="raised" gap={3}>
+					<Divider />
+
+					<Box gap={3} style={{ paddingVertical: 4 }}>
 						<SectionHeader title="الرنات الحالية" subtitle="أقصر قائمة ممكنة للطلبات التي تنتظر قرارًا." />
 						<Box gap={2}>
 							{activeItems.slice(0, 3).map((item) => (
 								<ListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} onPress={() => onOpenOrder?.(item.id)} />
 							))}
 						</Box>
-					</Surface>
+					</Box>
 
-					<Surface tone="inset" gap={2}>
+					<Divider />
+
+					<Box gap={2} style={{ paddingVertical: 4 }}>
 						<Text role="bodyStrong">حالة الإثبات: {proofStatus ?? 'idle'}</Text>
 						<Text role="bodySm" tone="muted">
 							عندما تصل المهمة إلى الإغلاق، انتقل إلى رفع الإثبات من شريط الإجراءات السفلي بدل تناثر الأزرار داخل الصفحة.
 						</Text>
-					</Surface>
+					</Box>
 				</Box>
 			}
 			primaryActionLabel="فتح الطلب التالي"
@@ -1122,19 +1190,41 @@ export function CaptainOrderDetailScreen({
 	);
 }
 
-export function CaptainPickupConfirmSheet({ visible, orderTitle, onConfirm, onCancel }: { visible: boolean; orderTitle: string; onConfirm: () => void; onCancel: () => void; }) {
+export function CaptainPickupConfirmSheet({
+	visible,
+	orderTitle,
+	state = 'ready',
+	onConfirm,
+	onCancel,
+}: {
+	visible: boolean;
+	orderTitle: string;
+	state?: 'ready' | 'loading' | 'success' | 'error';
+	onConfirm: () => void;
+	onCancel: () => void;
+}) {
 	if (!visible) {
 		return null;
 	}
 
 	return (
 		<Surface tone="raised" padding={4} gap={3} radiusToken="xl">
-			<SectionHeader title="تأكيد الاستلام" subtitle="أقر باستلام الطلب قبل نقله إلى المرحلة التالية." />
-			<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
-			<Box gap={2}>
-				<Button label="تأكيد الاستلام" onPress={onConfirm} />
-				<Button label="إلغاء" tone="ghost" onPress={onCancel} />
-			</Box>
+			{state === 'loading' ? (
+				<StateView stateId="loading" title="جاري تأكيد الاستلام..." description="" />
+			) : state === 'success' ? (
+				<StateView stateId="success" title="تم الاستلام بنجاح" description="تم تحديث حالة الطلب إلى مستلم." actionLabel="موافق" onActionPress={onConfirm} />
+			) : state === 'error' ? (
+				<StateView stateId="error" title="فشل تأكيد الاستلام" description="حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً." actionLabel="إغلاق" onActionPress={onCancel} />
+			) : (
+				<>
+					<SectionHeader title="تأكيد الاستلام" subtitle="أقر باستلام الطلب قبل نقله إلى المرحلة التالية." />
+					<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{orderTitle}</Text>
+					<Box gap={2}>
+						<Button label="تأكيد الاستلام" onPress={onConfirm} />
+						<Button label="إلغاء" tone="ghost" onPress={onCancel} />
+					</Box>
+				</>
+			)}
 		</Surface>
 	);
 }
@@ -1255,52 +1345,76 @@ function SimpleSupportScreen({
 	onBack?: () => void;
 	onRetry?: () => void;
 }) {
+	const { theme } = useTheme();
 	const [draftValue, setDraftValue] = React.useState('');
 
 	return (
-		<MobileScrollView padding={4} gap={4}>
+		<MobileScrollView padding={4} gap={5} contentContainerStyle={{ paddingBottom: 40 }}>
+			{/* Hero — flat label + description, no card */}
 			<Box gap={2}>
-				<Text role="titleLg">{title}</Text>
-				<Text role="bodyMd" tone="muted">{subtitle}</Text>
+				<Text role="bodyStrong" style={{ textAlign: 'right' }}>{heroTitle}</Text>
+				<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{heroDescription}</Text>
 			</Box>
 
-			<Surface tone="brand" gap={3}>
-				<SectionHeader title={heroTitle} subtitle={heroDescription} />
-			</Surface>
-
+			{/* Key values — plain rows with borderBottom separator */}
 			{keyValues?.length ? (
-				<Surface tone="raised" gap={3}>
-					<SectionHeader title="تفاصيل المسار" subtitle="تبقى فقط التفاصيل اللازمة لإجراء الكابتن الفوري ظاهرة." />
+				<>
+					<Divider />
 					<KeyValueList items={keyValues} />
-				</Surface>
+				</>
 			) : null}
 
+			{/* List items — flat pressable rows */}
 			{listItems?.length ? (
-				<Surface tone="default" gap={3}>
-					<SectionHeader title="الصف الحالي" subtitle="كل عنصر يحافظ على قرار المسار التالي واضحًا." />
-					<Box gap={2}>
-						{listItems.map((item) => (
-							<ListItem key={`${title}-${item.title}`} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} />
+				<>
+					<Divider />
+					<Box padding={0} gap={0}>
+						{listItems.map((item, index, arr) => (
+							<View
+								key={`${title}-${item.title}`}
+								style={{
+									flexDirection: 'row-reverse',
+									alignItems: 'flex-start',
+									justifyContent: 'space-between',
+									paddingVertical: 12,
+									borderBottomWidth: index === arr.length - 1 ? 0 : 1,
+									borderBottomColor: theme.line,
+									gap: 12,
+								}}
+							>
+								<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
+									<Text role="bodyStrong" style={{ textAlign: 'right' }}>{item.title}</Text>
+									<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{item.subtitle}</Text>
+									<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{item.meta}</Text>
+								</View>
+								{item.badgeLabel ? <View style={{ paddingTop: 2, flexShrink: 0 }}><Badge label={item.badgeLabel} tone="brand" /></View> : null}
+							</View>
 						))}
 					</Box>
-				</Surface>
+				</>
 			) : null}
 
+			{/* Input — plain, no Surface wrapper */}
 			{inputLabel ? (
-				<Surface tone="raised" gap={3}>
-					<SectionHeader title="إدخال المسودة" subtitle="إدخال واحد موجز من الكابتن يبقي المسار مركزًا." />
+				<>
+					<Divider />
 					<TextField
 						label={inputLabel}
 						value={draftValue}
 						onChangeText={setDraftValue}
 						hint={inputHint}
 					/>
-				</Surface>
+				</>
 			) : null}
 
-			<Button label={primaryLabel} onPress={onPrimaryAction} />
-			{secondaryLabel ? <Button label={secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} /> : null}
-			{onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+			<Divider />
+
+			{/* Actions */}
+			<Box gap={2}>
+				<Button label={primaryLabel} onPress={onPrimaryAction} />
+				{secondaryLabel ? <Button label={secondaryLabel} tone="secondary" onPress={onSecondaryAction ?? onBack} /> : null}
+				{onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
+			</Box>
 		</MobileScrollView>
 	);
 }
@@ -1383,13 +1497,54 @@ export function DshCaptainOrdersOffersListScreen(props: { onBack?: () => void; o
 	);
 }
 
-export function DshCaptainOrderAcceptScreen(props: { onBack?: () => void; onSecondaryAction?: () => void }) {
+export type DshCaptainOrderAcceptScreenProps = {
+	orderId?: string;
+	onBack?: () => void;
+	onAccept?: (orderId: string) => void;
+	onDecline?: (orderId: string) => void;
+	onSecondaryAction?: () => void; // fallback compatibility
+};
+
+export function DshCaptainOrderAcceptScreen({
+	orderId = 'captain-order-9021',
+	onBack,
+	onAccept,
+	onDecline,
+	onSecondaryAction,
+}: DshCaptainOrderAcceptScreenProps) {
+	const customSummary = {
+		orderId: orderId,
+		pickupLabel: 'Burger Lab - فرع حطين',
+		dropoffLabel: 'حي العليا، طريق الملك فهد',
+		etaLabel: 'مدة الوصول إلى الاستلام: 8 دقائق',
+		currentStageLabel: 'في انتظار قبول الكابتن',
+		nextActionLabel: 'اقبل المهمة لبدء التوصيل',
+	};
+
 	return (
-		<OrderActionSection
-			action="accept"
-			onActionPress={() => props.onSecondaryAction?.()}
-			onBackToInbox={props.onBack}
-		/>
+		<Box gap={4} style={{ flex: 1 }}>
+			<OrderActionSection
+				action="accept"
+				summary={customSummary}
+				onActionPress={() => {
+					if (onAccept) {
+						onAccept(orderId);
+					} else {
+						onSecondaryAction?.();
+					}
+				}}
+				onBackToInbox={onBack}
+			/>
+			{onDecline && (
+				<Box paddingHorizontal={4} paddingBottom={4}>
+					<Button
+						label="رفض المهمة (Decline)"
+						tone="danger"
+						onPress={() => onDecline(orderId)}
+					/>
+				</Box>
+			)}
+		</Box>
 	);
 }
 

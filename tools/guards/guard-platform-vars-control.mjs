@@ -87,6 +87,22 @@ for (const [serviceId, service] of serviceEntries) {
     if (routePath.test(relativePath) && routeSignal.test(text) && routeAction.test(text) && !routeAllowed.test(text)) {
       result.add('INFO', 'control_panel_route_sprawl_signal', file, `Potential control-panel route/page sprawl signal for service "${serviceId}".`, null, 'Verify control-room ownership and progressive disclosure before adding new routes.');
     }
+
+    // Zero scattered process.env reads enforcement (DSH-SLICE-008A)
+    if (/\.(tsx|ts)$/.test(relativePath) && relativePath.startsWith('dsh/frontend/') && relativePath !== 'dsh/frontend/shared/platform/PlatformVarsProvider.tsx' && relativePath !== 'dsh/frontend/shared/platform/FeatureFlagProvider.tsx') {
+      const processEnvRegex = /process\.env|env\?\.(EXPO_PUBLIC_|NEXT_PUBLIC_)/g;
+      let envMatch;
+      while ((envMatch = processEnvRegex.exec(text))) {
+        result.add(
+          'FAIL',
+          'direct_env_read_violation',
+          file,
+          `Direct environment variable read found in UI/frontend code. All environment access must go through PlatformVarsProvider/PlatformVarsRegistry.`,
+          lineOf(text, envMatch.index),
+          'Refactor to use PlatformVarsRegistry or usePlatformVars Hook.'
+        );
+      }
+    }
   }
 
   for (const expectedPath of service.expectedVarsPaths ?? []) {

@@ -4,6 +4,7 @@ import type { DshHomeGetStore } from '../contracts/dsh-home-types';
 import type { DshListDiscoveryStoresResponse } from './dsh-discovery-stores-client';
 
 export type DshDiscoveryApiStore = components['schemas']['DiscoveryStore'];
+export type DshDiscoveryApiStoreDetail = components['schemas']['DiscoveryStoreDetail'];
 
 function parseDistanceKm(distanceLabel: string): number {
   const parsed = Number.parseFloat(distanceLabel.replace(/[^\d.]/g, ''));

@@ -45,6 +45,7 @@ export {
 	WebControlPanelStatusTag,
 } from './web/index';
 export type {
+	WebSearchItem,
 	WebControlPanelFrameProps,
 	WebControlPanelKpiItem,
 	WebControlPanelKpiStripProps,

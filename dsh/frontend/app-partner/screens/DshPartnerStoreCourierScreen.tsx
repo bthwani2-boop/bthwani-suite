@@ -22,6 +22,7 @@ import type {
   StoreDeliveryPolicy,
   StoreDeliveryPricingSource,
 } from '../contracts/dsh-partner-binding.contracts';
+import { getSurfaceModeCapability, getSurfaceRoleSummaryForMode } from '../../shared/dsh-fulfillment-surface-visibility';
 
 type PolicyOption = { id: StoreDeliveryPolicy; label: string; description: string };
 type PricingOption = { id: StoreDeliveryPricingSource; label: string; description: string };
@@ -150,6 +151,13 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
         <Icon name="information-circle-outline" size={14} tone="muted" />
         <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
           إعداد الموصل يتم محليًا هنا. أي تسعير أو عمولات أو تسويات مرجعها مركزيًا هو WLT/Finance/Control Panel.
+        </Text>
+      </Box>
+
+      {/* SSoT visibility capability badge */}
+      <Box padding={2} background="surfaceInset" radiusToken="md">
+        <Text role="caption" tone="brand" align={direction === 'rtl' ? 'right' : 'left'}>
+          {`الدور المعتمد بالمنظومة (SSoT): ${getSurfaceRoleSummaryForMode('app-partner', 'partner_delivery')}`}
         </Text>
       </Box>
 

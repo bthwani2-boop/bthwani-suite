@@ -7,6 +7,7 @@ import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 
 import { PREVIEW_ROLLOUT_RECORDS, type RolloutLevel, type RolloutRecord } from '../../../data/platform.preview-data';
+import { FeatureFlagsRegistry } from '../../../shared';
 
 function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
   return (
@@ -30,10 +31,19 @@ export function DshPlatformRolloutsWorkspace() {
 
   const [rolloutStates, setRolloutStates] = React.useState<Record<string, {
     activeStage: string;
-  }>>({
-    'DSH:sanaa-pilot': { activeStage: 'تفعيل تجريبي (Pilot)' },
-    'DSH:capability:store-pickup': { activeStage: 'داخلي فقط (Internal Only)' },
-    'DSH:capability:awnak': { activeStage: 'نشط (Active)' },
+  }>>(() => {
+    FeatureFlagsRegistry.initialize();
+    return {
+      'DSH:sanaa-pilot': {
+        activeStage: FeatureFlagsRegistry.get('DSH:sanaa-pilot') ? 'تفعيل تجريبي (Pilot)' : 'موقوف في المعاينة (Kill preview)'
+      },
+      'DSH:capability:store-pickup': {
+        activeStage: FeatureFlagsRegistry.get('DSH:capability:store-pickup') ? 'فتح للجميع' : 'داخلي فقط (Internal Only)'
+      },
+      'DSH:capability:awnak': {
+        activeStage: FeatureFlagsRegistry.get('DSH:capability:awnak') ? 'نشط (Active)' : 'موقوف في المعاينة (Kill preview)'
+      },
+    };
   });
 
   const selectedRecord = PREVIEW_ROLLOUT_RECORDS.find((r) => r.key === selectedKey) || PREVIEW_ROLLOUT_RECORDS[0];
@@ -55,6 +65,22 @@ export function DshPlatformRolloutsWorkspace() {
       ...prev,
       [selectedRecord.key]: { activeStage: newStage },
     }));
+
+    // Determine flag state based on newStage name
+    const isKilled = newStage.includes('Kill') || newStage.includes('موقوف') || newStage.includes('إيقاف') || newStage.includes('داخلي فقط');
+    const enabled = !isKilled;
+
+    // Propagate feature flag change to the active app runtime
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('dsh-flag-override', {
+          detail: {
+            key: selectedRecord.key,
+            enabled,
+          },
+        })
+      );
+    }
 
     addAuditEvent({
       action: `إطلاق تدريجي محاكٍ (${selectedRecord.key}): ${action}`,

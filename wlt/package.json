@@ -1,0 +1,10 @@
+{
+  "name": "@bthwani/wlt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "echo \"@bthwani/wlt orchestration package\"",
+    "openapi:lint": "spectral lint wlt.openapi.yaml --ruleset ../.spectral.yaml"
+  }
+}

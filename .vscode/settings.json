@@ -1,5 +1,6 @@
 {
   "python.terminal.activateEnvironment": false,
   "python.terminal.activateEnvInCurrentTerminal": false,
-  "snyk.advanced.autoSelectOrganization": true
+  "snyk.advanced.autoSelectOrganization": true,
+  "go.toolsGopath": "C:\\Users\\b\\go"
 }

@@ -39,4 +39,5 @@ jobs:
       - name: Run BThwani governance guards
         shell: pwsh
         run: |
-          pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/guards/RUN_GOVERNANCE_GUARDS.ps1" -Mode CI
+          pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/guards/RUN_GOVERNANCE_GUARDS.ps1" -Mode CI -Profile Governance
+          pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/guards/RUN_AGENT_GUARDS.ps1" -Mode CI

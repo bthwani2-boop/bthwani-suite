@@ -3,6 +3,8 @@ import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWind
 import { Box, Icon, Text, colorPalette } from '@bthwani/ui-kit';
 import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
 
+import { usePlatformVars } from '../../shared';
+
 export type DshHomeApprovedVideoReelsViewerProps = {
 	visible: boolean;
 	items: MarketingVideoRecord[];
@@ -12,7 +14,7 @@ export type DshHomeApprovedVideoReelsViewerProps = {
 	onItemImpression?: (item: MarketingVideoRecord) => void;
 };
 
-function resolveMediaUri(uri?: string) {
+function resolveMediaUri(uri?: string, mediaBaseUrl?: string | null) {
 	if (!uri) {
 		return undefined;
 	}
@@ -21,13 +23,14 @@ function resolveMediaUri(uri?: string) {
 		return uri;
 	}
 
-	const baseUrl = process.env.EXPO_PUBLIC_MEDIA_BASE_URL?.trim();
+	const baseUrl = mediaBaseUrl?.trim();
 	if (baseUrl) {
 		return `${baseUrl.replace(/\/$/, '')}/${uri.replace(/^\/+/, '')}`;
 	}
 
 	return uri;
 }
+
 
 function clampIndex(index: number, length: number) {
 	if (length <= 0) {
@@ -81,6 +84,7 @@ export function DshHomeApprovedVideoReelsViewer({
 	onCtaPress,
 	onItemImpression,
 }: DshHomeApprovedVideoReelsViewerProps) {
+	const { mediaBaseUrl } = usePlatformVars();
 	const { height } = useWindowDimensions();
 	const safeIndex = clampIndex(initialIndex, items.length);
 	const listRef = React.useRef<FlatList<MarketingVideoRecord>>(null);
@@ -175,8 +179,8 @@ export function DshHomeApprovedVideoReelsViewer({
 					viewabilityConfig={viewabilityConfig}
 					onViewableItemsChanged={handleViewableItemsChanged}
 					renderItem={({ item, index }) => {
-						const videoUri = resolveMediaUri(item.videoUrl);
-						const posterUri = resolveMediaUri(item.posterUrl ?? item.videoUrl);
+						const videoUri = resolveMediaUri(item.videoUrl, mediaBaseUrl);
+						const posterUri = resolveMediaUri(item.posterUrl ?? item.videoUrl, mediaBaseUrl);
 						const isActive = index === activeIndex;
 
 						return (

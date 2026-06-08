@@ -17,6 +17,8 @@ export * from './offers.preview-data';
 export * from './subscriptions.preview-data';
 export * from './support.preview-data';
 export * from './operational-statuses.preview-data';
+export * from './operational.preview-data';
 export * from './marketing.preview-data';
 export * from './platform.preview-data';
 export * from './partner.preview-data';
+export * from './finance.preview-data';

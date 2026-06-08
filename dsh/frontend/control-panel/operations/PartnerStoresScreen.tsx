@@ -11,12 +11,37 @@ import {
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
+import {
+  createDshStoreVisibilityHttpClient,
+  resolveDshStoreVisibilityBaseUrl,
+} from '../../shared/dsh-store-visibility-transport';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
 import { PARTNER_STORES_PREVIEW } from '../../data';
 
-const STORES = PARTNER_STORES_PREVIEW;
+const STORES = [
+  ...PARTNER_STORES_PREVIEW,
+  {
+    id: 'store-1001',
+    name: 'Haddah Central Market',
+    branch: 'Sanaa',
+    status: 'مفتوح',
+    deliveryMode: 'bthwani_delivery' as const,
+    prepTime: '15 دقيقة',
+    readyOrders: 2,
+    issue: '',
+    suggestion: {
+      label: 'لا تدخل مطلوب',
+      reason: 'وضع المتجر مستقر',
+      confidence: 'high' as const,
+      action: 'عرض التفاصيل',
+      secondary: null,
+      auditRequired: false,
+    },
+    statusTone: 'success' as const,
+  },
+];
 
 export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: PartnerStoresScreenProps) {
   const router = useRouter();
@@ -41,6 +66,70 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
   const activeStore = rows.find((s) => s.id === selectedStoreId);
   const [actionStatus, setActionStatus] = React.useState<'idle' | 'pending' | 'success'>('idle');
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+
+  // Catalog approval gate — wires PATCH /stores/{id}/catalog-approval
+  const [catalogGateStatus, setCatalogGateStatus] = React.useState<
+    'idle' | 'loading' | 'approved' | 'rejected' | 'error'
+  >('idle');
+  const [catalogGateFeedback, setCatalogGateFeedback] = React.useState<string | null>(null);
+
+  const handleCatalogApproval = React.useCallback(
+    async (storeId: string, approve: boolean) => {
+      const baseUrl = resolveDshStoreVisibilityBaseUrl();
+      if (!baseUrl) {
+        setCatalogGateStatus('error');
+        setCatalogGateFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
+        return;
+      }
+      setCatalogGateStatus('loading');
+      setCatalogGateFeedback(null);
+      try {
+        const client = createDshStoreVisibilityHttpClient(baseUrl);
+        const status = approve ? 'approved' : 'rejected';
+        const res = await client.updateCatalogApproval(storeId, status, status);
+        setCatalogGateStatus(approve ? 'approved' : 'rejected');
+        setCatalogGateFeedback(
+          `catalog-approval → ${res.catalog_quality_status} · client_visible: ${res.client_visible}`,
+        );
+      } catch {
+        setCatalogGateStatus('error');
+        setCatalogGateFeedback('فشل تحديث اعتماد الكتالوج.');
+      }
+    },
+    [],
+  );
+
+  // Marketing visibility gate — wires PATCH /stores/{id}/marketing-visibility
+  const [marketingGateStatus, setMarketingGateStatus] = React.useState<
+    'idle' | 'loading' | 'active' | 'inactive' | 'error'
+  >('idle');
+  const [marketingGateFeedback, setMarketingGateFeedback] = React.useState<string | null>(null);
+
+  const handleMarketingVisibility = React.useCallback(
+    async (storeId: string, activate: boolean) => {
+      const baseUrl = resolveDshStoreVisibilityBaseUrl();
+      if (!baseUrl) {
+        setMarketingGateStatus('error');
+        setMarketingGateFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
+        return;
+      }
+      setMarketingGateStatus('loading');
+      setMarketingGateFeedback(null);
+      try {
+        const client = createDshStoreVisibilityHttpClient(baseUrl);
+        const status = activate ? 'active' : 'inactive';
+        const res = await client.updateMarketingVisibility(storeId, status);
+        setMarketingGateStatus(activate ? 'active' : 'inactive');
+        setMarketingGateFeedback(
+          `marketing-visibility → ${res.marketing_visibility_status} · client_visible: ${res.client_visible}`,
+        );
+      } catch {
+        setMarketingGateStatus('error');
+        setMarketingGateFeedback('فشل تحديث الظهور التسويقي.');
+      }
+    },
+    [],
+  );
 
   const handleTriggerAction = React.useCallback((storeId: string, actionLabel: string) => {
     setActionStatus('pending');
@@ -241,6 +330,62 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
                 {actionStatus === 'pending' ? 'جاري الإيقاف...' : 'إيقاف مؤقت استقبال الطلبات'}
               </button>
             )}
+          </div>
+
+          {/* Catalog Approval Gate — PATCH /stores/{id}/catalog-approval */}
+          <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--bthwani-control-panel-text)' }}>⚙️ اعتماد الكتالوج</div>
+            {catalogGateFeedback && (
+              <div style={{ fontSize: '11px', fontWeight: 700, color: catalogGateStatus === 'error' ? 'var(--bthwani-control-panel-danger)' : catalogGateStatus === 'approved' ? 'var(--bthwani-control-panel-success)' : 'var(--bthwani-control-panel-warning)' }}>
+                {catalogGateFeedback}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                disabled={catalogGateStatus === 'loading'}
+                onClick={() => handleCatalogApproval(activeStore.id, true)}
+                style={{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: 700, background: 'var(--bthwani-control-panel-success)', color: 'var(--bthwani-text-inverse)', border: 'none', borderRadius: '6px', cursor: catalogGateStatus === 'loading' ? 'not-allowed' : 'pointer' }}
+              >
+                {catalogGateStatus === 'loading' ? 'جارٍ...' : 'اعتماد الكتالوج'}
+              </button>
+              <button
+                type="button"
+                disabled={catalogGateStatus === 'loading'}
+                onClick={() => handleCatalogApproval(activeStore.id, false)}
+                style={{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: 700, background: 'var(--bthwani-control-panel-danger)', color: 'var(--bthwani-text-inverse)', border: 'none', borderRadius: '6px', cursor: catalogGateStatus === 'loading' ? 'not-allowed' : 'pointer' }}
+              >
+                {catalogGateStatus === 'loading' ? 'جارٍ...' : 'رفض الكتالوج'}
+              </button>
+            </div>
+          </div>
+
+          {/* Marketing Visibility Gate — PATCH /stores/{id}/marketing-visibility */}
+          <div style={{ background: 'var(--bthwani-control-panel-surface-inset)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--bthwani-control-panel-text)' }}>📢 الظهور التسويقي</div>
+            {marketingGateFeedback && (
+              <div style={{ fontSize: '11px', fontWeight: 700, color: marketingGateStatus === 'error' ? 'var(--bthwani-control-panel-danger)' : marketingGateStatus === 'active' ? 'var(--bthwani-control-panel-success)' : 'var(--bthwani-control-panel-warning)' }}>
+                {marketingGateFeedback}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                disabled={marketingGateStatus === 'loading'}
+                onClick={() => handleMarketingVisibility(activeStore.id, true)}
+                style={{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: 700, background: 'var(--bthwani-control-panel-success)', color: 'var(--bthwani-text-inverse)', border: 'none', borderRadius: '6px', cursor: marketingGateStatus === 'loading' ? 'not-allowed' : 'pointer' }}
+              >
+                {marketingGateStatus === 'loading' ? 'جارٍ...' : 'تنشيط التسويق'}
+              </button>
+              <button
+                type="button"
+                disabled={marketingGateStatus === 'loading'}
+                onClick={() => handleMarketingVisibility(activeStore.id, false)}
+                style={{ flex: 1, padding: '8px', fontSize: '11px', fontWeight: 700, background: 'var(--bthwani-control-panel-warning)', color: 'var(--bthwani-text-inverse)', border: 'none', borderRadius: '6px', cursor: marketingGateStatus === 'loading' ? 'not-allowed' : 'pointer' }}
+              >
+                {marketingGateStatus === 'loading' ? 'جارٍ...' : 'إيقاف التسويق'}
+              </button>
+            </div>
           </div>
 
         </div>

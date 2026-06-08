@@ -195,6 +195,131 @@ export {
 } from './dsh-flow-registry';
 
 export type {
+  DshAnyOperationalRecord,
+  DshCaptainAssignment,
+  DshCaptainAssignmentStatus,
+  DshCatalogOperationalItem,
+  DshCatalogReadinessStatus,
+  DshCodCollectionEvent,
+  DshCodCollectionStatus,
+  DshControlPanelOperationRecord,
+  DshControlPanelOperationalWorkspace,
+  DshControlPanelSideEffectClassification,
+  DshDeliveryProof,
+  DshDeliveryProofStatus,
+  DshDeliveryTrip,
+  DshDeliveryTripStatus,
+  DshOperationalActionPolicy,
+  DshOperationalAuditPolicy,
+  DshOperationalAuditState,
+  DshOperationalBaseRecord,
+  DshOperationalBoundaryPolicy,
+  DshOperationalClosureStatus,
+  DshOperationalDataClassification,
+  DshOperationalEntityId,
+  DshOperationalEntityKind,
+  DshOperationalException,
+  DshOperationalExceptionStatus,
+  DshOperationalExceptionType,
+  DshOperationalProofRequirement,
+  DshOperationalRollbackHint,
+  DshOperationalWltImpact,
+  DshOrderOperationalRecord,
+  DshOrderOperationalStatus,
+  DshPartnerStoreOnboardingStatus,
+  DshPartnerStoreOperationalRecord,
+  DshPickupHandoffProof,
+  DshPickupHandoffStatus,
+  DshSettlementInputEvent,
+  DshSettlementInputEventType,
+  DshSettlementInputStatus,
+  DshStorePreparationRecord,
+  DshStorePreparationStatus,
+  DshSupportEscalationLink,
+  DshSupportEscalationStatus,
+  DshWltOwnershipBoundary,
+} from './dsh-operational.contract';
+export { dshOperationalContractMeta } from './dsh-operational.contract';
+
+export type {
+  DshOperationalLifecycleSource,
+  DshOperationalRegistryEntry,
+} from './dsh-operational-registry';
+export {
+  DSH_OPERATIONAL_REGISTRY,
+  assertDshDoesNotOwnFinancialMutation,
+  dshOperationalRegistryMeta,
+  getDshOperationalEntriesBySurface,
+  getDshOperationalEntriesByWorkspace,
+  getDshOperationalEntriesWithWltImpact,
+  getDshOperationalEntryById,
+  getDshOperationalRegistry,
+} from './dsh-operational-registry';
+
+export type {
+  DshControlPanelOperationsPreview,
+  DshOperationalSurfaceSummary,
+} from './dsh-operational-preview-adapter';
+export {
+  buildDshCodQueuePreview,
+  buildDshControlPanelOperationsPreview,
+  buildDshExceptionQueuePreview,
+  buildDshOperationalSummaryForSurface,
+  buildDshPodReviewPreview,
+  buildDshSettlementInputPreview,
+  buildDshTripPreviewForOrder,
+  dshOperationalPreviewAdapterMeta,
+  getDshOperationalPreviewRegistryEntry,
+} from './dsh-operational-preview-adapter';
+
+export type {
+  DshOperationalRuntimeBindingStatus,
+  DshOperationalScreenBinding,
+} from './dsh-operational-surface-binding';
+export {
+  DSH_OPERATIONAL_SCREEN_BINDINGS,
+  dshOperationalSurfaceBindingMeta,
+  getDshOperationalPreviewSummariesForScreen,
+  getDshOperationalScreenBindingByScreenId,
+  getDshOperationalScreenBindings,
+  getDshOperationalScreenBindingsByRegistryEntry,
+  getDshOperationalScreenBindingsBySurface,
+} from './dsh-operational-surface-binding';
+
+export type {
+  DshOperationsRoomWorkspace,
+  DshOperationsRoomWorkspaceStatus,
+} from './dsh-control-panel-operations-room';
+export {
+  DSH_CONTROL_PANEL_OPERATIONS_ROOM,
+  dshControlPanelOperationsRoomMeta,
+  getDshControlPanelOperationsRoom,
+  getDshOperationsRoomWorkspaceById,
+  getDshOperationsRoomWorkspacesByGroup,
+  getDshOperationsRoomWorkspacesForRegistryEntry,
+} from './dsh-control-panel-operations-room';
+
+export type {
+  DshWltSettlementBridgeRule,
+  DshWltSettlementInputCandidate,
+  DshWltSettlementInputReadiness,
+  DshWltSettlementInputValidationResult,
+  DshWltSettlementSourceEntity,
+  DshWltTargetCapability,
+} from './dsh-wlt-settlement-bridge.contract';
+export {
+  DSH_WLT_SETTLEMENT_BRIDGE_RULES,
+  assertNoDshFinancialSettlementOwnership,
+  buildWltSettlementInputCandidate,
+  buildWltSettlementInputCandidateFromEvent,
+  classifyWltTargetCapability,
+  dshWltSettlementBridgeContractMeta,
+  getDshWltSettlementBridgeRule,
+  getDshWltSettlementBridgeRules,
+  validateDshSettlementInputReadiness,
+} from './dsh-wlt-settlement-bridge.contract';
+
+export type {
   AwnakStage,
   CartItem,
   DshAssistedOrderCartItem,
@@ -431,6 +556,17 @@ export type {
   DshFieldVisitEvidenceItem,
 } from './dsh-field-visit.contract';
 export { dshFieldVisitContractMeta } from './dsh-field-visit.contract';
+export type {
+  DshCreateFieldVisitRequest,
+  DshCreateFieldVisitResponse,
+  DshFieldVisitClient,
+  DshFieldVisitError,
+} from './dsh-field-visit-client';
+export {
+  createDshFieldVisitHttpClient,
+  isDshFieldVisitOfflineError,
+  resolveDshFieldVisitBaseUrl,
+} from './dsh-field-visit-client';
 
 export type {
   AppearanceStatus,
@@ -503,3 +639,112 @@ export {
   buildCentralPartnerInventoryItems,
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
 } from './catalog-central-adapter';
+
+// --- Checkout client (J-003A / 003B / 003E) ---
+export type {
+  DshCheckoutFetchFn,
+  DshCheckoutAuthContext,
+  DshCheckoutOfflineError,
+  DshCheckoutHttpError,
+  DshCheckoutError,
+  DshCartServiceabilityResponse,
+  DshCheckoutIntentItem,
+  DshCheckoutIntentRequest,
+  DshCheckoutIntentResponse,
+  DshCancelCheckoutIntentResponse,
+  DshCheckoutClient,
+} from './dsh-checkout-client';
+export {
+  isDshCheckoutOfflineError,
+  createDshCheckoutHttpClient,
+} from './dsh-checkout-client';
+
+// --- Order Lifecycle client ---
+export type {
+  DshOrderRecord,
+  DshOrderItemRecord,
+  DshOrderStatusEventRecord,
+  DshSupportEscalationRecord,
+  DshOrderItemInput,
+  DshCreateOrderRequest,
+  DshCreateOrderResponse,
+  DshUpdateOrderStatusRequest,
+  DshCreateSupportEscalationRequest,
+  DshOrderDetailsResponse,
+  DshListOrdersQuery,
+  DshListOrdersResponse,
+  DshOrderLifecycleClient,
+} from './dsh-order-lifecycle-client';
+export {
+  isDshOrderApiOfflineError,
+  resolveDshOrderApiBaseUrl,
+  createDshOrderLifecycleHttpClient,
+} from './dsh-order-lifecycle-client';
+
+export type {
+  DshCreateFieldStoreRequest,
+  DshCreateFieldStoreResponse,
+  DshFieldStoreOnboardingClient,
+  DshFieldStoreOnboardingError,
+} from './dsh-field-store-onboarding-client';
+export {
+  createDshFieldStoreOnboardingHttpClient,
+  isDshFieldStoreOnboardingOfflineError,
+  resolveDshFieldStoreOnboardingBaseUrl,
+} from './dsh-field-store-onboarding-client';
+
+export type {
+  DshFieldDocumentKind,
+  DshFieldDocumentStatus,
+  DshCreateFieldDocumentRequest,
+  DshFieldDocumentRecord,
+  DshFieldDocumentClient,
+  DshFieldDocumentError,
+} from './dsh-field-document-client';
+export {
+  createDshFieldDocumentHttpClient,
+  isDshFieldDocumentOfflineError,
+  resolveDshFieldDocumentBaseUrl,
+} from './dsh-field-document-client';
+
+
+export type {
+  CreateFieldReadinessEscalationRequest,
+  FieldReadinessEscalationRecord,
+  UpdateFieldReadinessEscalationRequest,
+  ListFieldReadinessEscalationsResponse,
+  CreateFieldReadinessApprovalRequest,
+  FieldReadinessApprovalRecord,
+  DshFieldReadinessClient,
+} from './dsh-field-readiness-client';
+export {
+  resolveDshFieldReadinessBaseUrl,
+  createDshFieldReadinessHttpClient,
+} from './dsh-field-readiness-client';
+
+// --- Operations Runtime Adapter ---
+export type {
+  DshRuntimeOrderRow,
+  DshRuntimeOrdersResult,
+} from './dsh-operational-runtime-adapter';
+export {
+  dshOperationalRuntimeAdapterMeta,
+  fetchDshRuntimeOrders,
+  isDshRuntimeAvailable,
+} from './dsh-operational-runtime-adapter';
+
+// --- Platform Vars Infrastructure (DSH-SLICE-008A) ---
+export type { PlatformVarsConfig } from './platform/PlatformVarsProvider';
+export {
+  PlatformVarsProvider,
+  usePlatformVars,
+  PlatformVarsRegistry,
+} from './platform/PlatformVarsProvider';
+
+// --- Feature Flags & Rollout (DSH-SLICE-008B) ---
+export type { FeatureFlagsConfig } from './platform/FeatureFlagProvider';
+export {
+  FeatureFlagProvider,
+  useFeatureFlag,
+  FeatureFlagsRegistry,
+} from './platform/FeatureFlagProvider';

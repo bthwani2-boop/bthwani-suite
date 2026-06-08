@@ -1,33 +1,25 @@
+// DSH finance â€” barrel re-export only.
+// All logic (registry, types, api-matrix, hub rendering) lives in wlt/frontend/dsh/control-panel/.
+
+// Hub screen
+export { WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../../../wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost';
+export type { WltDshFinanceHubHostProps as ControlPanelDshFinanceScreenProps } from '../../../../wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost';
+
+// Finance routing types
 export type {
   CanonicalFinanceGroupId,
-  FinanceGroupMeta,
-  FinanceNormalizationResult,
   FinancePanelId,
   FinanceViewState,
-} from './finance.types';
+  FinanceGroupMeta,
+  FinanceNormalizationResult,
+} from '../../../../wlt/frontend/dsh/control-panel/models/financeRouting.types';
+
+// Finance routing helpers
 export {
   FINANCE_CANONICAL_GROUPS,
   FINANCE_CANONICAL_GROUP_IDS,
+  FINANCE_NAV_GROUPS,
   buildFinanceHref,
   getFinanceGroupMeta,
   normalizeFinanceLocation,
-} from './finance.registry';
-export { ControlPanelDshFinanceHubScreen, default as ControlPanelDshFinanceScreen } from './FinanceHubScreen';
-export type { ControlPanelDshFinanceScreenProps } from './FinanceHubScreen';
-export {
-  ControlPanelDshSettlementScreen,
-  ControlPanelDshCodReconciliationScreen,
-  ControlPanelDshRefundQueueScreen,
-  ControlPanelDshRiskAuditScreen,
-  ControlPanelDshCaptainFinanceScreen,
-  ControlPanelDshStoreDeliveryFinanceScreen,
-} from './FinanceHubScreens';
-
-// WLT bridge workspaces — view-only surfaces; all financial truth owned by WLT
-export { WltBoundaryBanner } from './WltBoundaryBanner';
-export { PartnerSettlementWorkspace } from './PartnerSettlementWorkspace';
-export { CaptainPayoutWorkspace } from './CaptainPayoutWorkspace';
-export { RefundQueueWorkspace } from './RefundQueueWorkspace';
-export { CommissionBreakdownWorkspace } from './CommissionBreakdownWorkspace';
-export { PlatformFeeAuditWorkspace } from './PlatformFeeAuditWorkspace';
-export { FieldCommissionWorkspace } from './FieldCommissionWorkspace';
+} from '../../../../wlt/frontend/dsh/control-panel/constants/finance.registry';

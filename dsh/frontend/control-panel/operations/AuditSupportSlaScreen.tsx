@@ -13,6 +13,7 @@ import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
@@ -34,11 +35,33 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
   const dynamicAudits = getDynamicUiAudits();
   const allAudits = [...dynamicAudits, ...preview.audits];
 
+  const [runtimeAuditState, setRuntimeAuditState] = React.useState<{
+    orders: readonly DshRuntimeOrderRow[];
+    loaded: boolean;
+  }>({ orders: [], loaded: false });
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchDshRuntimeOrders({ limit: 50 }).then((result) => {
+      if (cancelled) return;
+      if (result.kind === 'ok') {
+        const auditNeeded = result.orders.filter((o) =>
+          o.status === 'FAILED_DELIVERY' ||
+          o.status === 'RETURNING_TO_STORE' ||
+          o.status === 'RETURNED' ||
+          o.status === 'CANCELLED'
+        );
+        setRuntimeAuditState({ orders: auditNeeded, loaded: true });
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
+
   const summaryKpi = [
+    { id: 'runtime-audit', label: 'تدقيقات Runtime', value: runtimeAuditState.loaded ? String(runtimeAuditState.orders.length) : '—', tone: 'warning' as const },
     { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits + dynamicAudits.length), tone: 'neutral' as const },
-    { id: 'support', label: 'تذاكر الدعم', value: String(preview.summary.supportTickets), tone: 'neutral' as const },
     { id: 'sla', label: 'خطر SLA', value: String(preview.summary.slaRisk), tone: 'danger' as const },
-    { id: 'evidence', label: 'اكتمال الإثبات', value: `${preview.summary.evidenceComplete}%`, tone: 'success' as const },
+    { id: 'source', label: 'مصدر البيانات', value: runtimeAuditState.loaded ? 'DSH Runtime' : 'Preview', tone: runtimeAuditState.loaded ? 'success' as const : 'warning' as const },
   ];
 
   return (
@@ -65,8 +88,55 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
       {/* ── Split Layout ── */}
       <div className={styles.surfaceSplitGrid}>
         <Box gap={3}>
+          {/* Runtime Audit Queue — real orders needing audit from DSH backend */}
+          {runtimeAuditState.loaded && runtimeAuditState.orders.length > 0 && (
+            <WebControlPanelQueue
+              title="تدقيق Runtime — طلبات تحتاج مراجعة"
+              meta={`${runtimeAuditState.orders.length} طلب من DSH`}
+            >
+              {runtimeAuditState.orders.map((order) => (
+                <div
+                  key={order.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.2fr 1.5fr 1fr 1.2fr auto',
+                    gap: '8px',
+                    padding: '10px 12px',
+                    background: detailOrderId === order.id ? 'var(--bthwani-brand-surface)' : 'var(--bthwani-control-panel-surface)',
+                    border: detailOrderId === order.id ? '1px solid var(--bthwani-brand)' : '1px solid var(--bthwani-control-panel-border)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    alignItems: 'center',
+                  }}
+                  onClick={() => setDetailOrderId(detailOrderId === order.id ? null : order.id)}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <strong style={{ color: 'var(--bthwani-control-panel-brand)', fontSize: '11px' }} dir="ltr">{order.id}</strong>
+                    <span style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>متجر: {order.storeId}</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text)' }}>{order.status}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+                    {order.captainId ? `كابتن: ${order.captainId}` : '—'}
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+                    {new Date(order.updatedAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                  <button
+                    type="button"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--bthwani-control-panel-brand)', cursor: 'pointer', fontSize: '14px', width: '40px', textAlign: 'center' }}
+                    onClick={(e) => { e.stopPropagation(); setDetailOrderId(detailOrderId === order.id ? null : order.id); }}
+                    aria-label="فتح التفاصيل"
+                  >
+                    {detailOrderId === order.id ? '◀' : '►'}
+                  </button>
+                </div>
+              ))}
+            </WebControlPanelQueue>
+          )}
+
           <WebControlPanelQueue
-            title="سجل التدقيق والمتابعة"
+            title={runtimeAuditState.loaded ? 'سجل التدقيق والمتابعة (Preview)' : 'سجل التدقيق والمتابعة'}
             meta={`${allAudits.length} تدقيقات نشطة`}
           >
             {/* Table Column Headers */}
@@ -181,7 +251,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
               title="تفاصيل سجل التدقيق"
               reason="اختر أحد التدقيقات التشغيلية من سجل التدقيق لمعاينة تفاصيل الإثبات ومراجعة SLA."
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_RUNTIME_EVIDENCE"
             />
           )}
         </Box>

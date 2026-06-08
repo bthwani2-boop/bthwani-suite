@@ -1,17 +1,667 @@
 openapi: 3.1.0
 info:
   title: BThwani DSH API
-  version: 0.1.0
-  description: API contract for client-facing store discovery and storefront visibility.
-x-bthwani-status: READY_FOR_ONE_OPENAPI_ENDPOINT
+  version: 0.3.0
+  description: API contract for client-facing store discovery, catalog management, and checkout flow.
+  contact:
+    name: BThwani DSH API Governance
+    url: https://bthwani.internal/governance/dsh
+servers:
+  - url: https://api.bthwani.internal/dsh
+    description: Production DSH API boundary
+  - url: http://localhost:8080
+    description: Local DSH backend runtime
+x-bthwani-status: DSH_SLICE003_CHECKOUT_CONTRACT_DESIGNED
 x-bthwani:
   service: dsh
   migrationPhase: DSH pilot
   currentImplementationRoot: dsh
   targetRoot: dsh
+tags:
+  - name: Product Identity
+    description: Product identity, catalog records, and non-financial display labels.
+  - name: Category Structure
+    description: Store category hierarchy and category assignment contract.
+  - name: Product Media
+    description: Product media upload and catalog media references.
+  - name: Partner Local Overrides
+    description: Partner-scoped local catalog overrides and approval flow inputs.
+  - name: Catalog Approval
+    description: Catalog approval actions and operator audit contract.
+  - name: Catalog Conflict Audit
+    description: Conflict detection and resolution audit entries for catalog governance.
+  - name: Store Discovery
+    description: Client-facing store list and store details discovery endpoints.
+  - name: Field Readiness
+    description: Field onboarding, visit evidence references, and readiness handoff endpoints.
+  - name: Store Visibility
+    description: Store publication, visibility, and client exposure controls.
+  - name: Checkout
+    description: Checkout intent lifecycle, WLT bridge callbacks, and non-financial DSH order handoff.
+  - name: Order Lifecycle
+    description: Order status, captain assignment, delivery progress, and support transitions.
+  - name: Support Escalation
+    description: Support ticket creation and escalation references.
+  - name: WLT Finance
+    description: WLT-owned read-only finance references, callbacks, and settlement candidate signals.
 paths:
-  /stores:
+  # ─── J-002 / DSH-SLICE-002A: Product Identity ─────────────────────────────
+
+  /stores/{store_id}/products:
+    post:
+      tags:
+        - Product Identity
+      summary: Create product for a store
+      description: >
+        Creates a new product identity record for the given store.
+        The product starts in `partner_submitted` approval status and enters the catalog review pipeline.
+        WLT boundary: base_price_label is a display label only — no financial mutation occurs inside DSH.
+      operationId: createProduct
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
     get:
+      tags:
+        - Product Identity
+      summary: List products for a store
+      description: Returns all product records for the given store, ordered by creation date descending.
+      operationId: listProducts
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: approval_status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter products by approval status (e.g. catalog_adopted)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Products list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProductsResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}:
+    get:
+      tags:
+        - Product Identity
+      summary: Get a single product
+      description: Returns one product identity record by ID, including DSH catalog status and display-only price label.
+      operationId: getProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRecord'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Product Identity
+      summary: Update product identity
+      description: >
+        Updates product name, SKU, GTIN, barcode, description, base_price_label, or category_id.
+        All fields are optional — only provided fields are updated.
+        WLT boundary: base_price_label is a display label only.
+      operationId: updateProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Updated product record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+               schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002B: Category Structure ─────────────────────────────
+
+  /stores/{store_id}/categories:
+    post:
+      tags:
+        - Category Structure
+      summary: Create category for a store
+      description: Creates a new category (and optional subcategory via parent_id) for the given store.
+      operationId: createCategory
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Category Structure
+      summary: List categories for a store
+      description: Returns all categories for the given store.
+      operationId: listCategories
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Categories list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCategoriesResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{id}:
+    get:
+      tags:
+        - Category Structure
+      summary: Get a single category
+      description: Returns one store category by ID, including hierarchy metadata used by DSH catalog surfaces.
+      operationId: getCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRecord'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Category Structure
+      summary: Update category
+      description: Updates category details (name, parent_id, description).
+      operationId: updateCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: Updated category record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRecord'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Category Structure
+      summary: Delete category
+      description: Deletes the category. Products assigned to this category will have their category_id set to null.
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Category deleted
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002C: Product Media ──────────────────────────────────
+  /media:
+    post:
+      tags:
+        - Product Media
+      summary: Upload product media record
+      description: Creates/attaches a new product media record validated against the local media manifest.
+      operationId: uploadProductMedia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadProductMediaRequest'
+      responses:
+        '201':
+          description: Media created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductMediaRecord'
+        '400':
+          description: Validation error or invalid media key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /media/{id}:
+    delete:
+      tags:
+        - Product Media
+      summary: Delete product media
+      description: Deletes/removes a product media record.
+      operationId: deleteProductMedia
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Media deleted
+        '404':
+          description: Media record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
+  /stores/{store_id}/catalog-overrides:
+    patch:
+      tags:
+        - Partner Local Overrides
+      summary: Apply catalog overrides for a store
+      description: >
+        Applies local overrides (price, stock, availability) for products in the given store's catalog.
+        These local overrides do not mutate the central product definitions.
+      operationId: updateCatalogOverrides
+      parameters:
+        - name: store_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCatalogOverridesRequest'
+      responses:
+        '200':
+          description: Overrides updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCatalogOverridesResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002E: Approval Workflow ──────────────────────────────
+  /catalog-approvals:
+    post:
+      tags:
+        - Catalog Approval
+      summary: Approve, reject, or request fix for a catalog item
+      description: >
+        Performs an approval action (approve, reject, needs-fix) on a catalog product, category suggestion, or media upload.
+        Updates the approval_status of the referenced item.
+        WLT boundary: displays and logs approval outcome only — no financial mutation.
+      operationId: recordCatalogApprovalAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCatalogApprovalRequest'
+      responses:
+        '200':
+          description: Approval action recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogApprovalRecord'
+        '400':
+          description: Validation or parameter error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Catalog item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-002 / DSH-SLICE-002G: Catalog Conflict Audit ─────────────────────────
+  /catalog-conflicts:
+    get:
+      tags:
+        - Catalog Conflict Audit
+      summary: List catalog overrides conflicts
+      description: Returns a list of pending or resolved conflicts between central catalog and partner local overrides.
+      operationId: listConflicts
+      parameters:
+        - name: store_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, resolved_accept_local, resolved_reverted]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Conflicts list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListConflictsResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /catalog-conflicts/{id}/resolve:
+    post:
+      tags:
+        - Catalog Conflict Audit
+      summary: Resolve a catalog override conflict
+      description: Resolves a catalog override conflict by either accepting the partner local override or reverting it to central.
+      operationId: resolveConflict
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveConflictRequest'
+      responses:
+        '200':
+          description: Conflict resolved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveConflictResponse'
+        '400':
+          description: Validation or parameter error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Conflict not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-001 / Store Discovery ───────────────────────────────────────────────
+  /stores:
+    post:
+      tags:
+        - Store Discovery
+      summary: Create field store onboarding file
+      description: Create a new field-collected store file and place it in pending review without financial mutation.
+      operationId: createFieldStore
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldStoreRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFieldStoreResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+
       tags:
         - Store Discovery
       summary: List discovery stores
@@ -68,15 +718,1585 @@ paths:
         '400':
           description: Bad Request
           content:
-             application/json:
-               schema:
-                 $ref: '#/components/schemas/ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal Server Error
           content:
-             application/json:
-               schema:
-                 $ref: '#/components/schemas/ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}:
+    get:
+      tags:
+        - Store Discovery
+      summary: Get discovery store details
+      description: Retrieve detailed information for a single store, including contact info, hours, and catalog summary.
+      operationId: getDiscoveryStore
+      security:
+        - BearerAuth: []
+        - {} # Guest-safe / Optional authentication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryStoreDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/field-visits:
+    post:
+      tags:
+        - Field Readiness
+      summary: Submit field visit evidence references
+      description: Submit field visit notes and evidence media key references for an onboarded store. Raw media upload and document proof stay in the downstream media slice.
+      operationId: createFieldVisit
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldVisitRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFieldVisitResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/documents:
+    post:
+      tags:
+        - Field Readiness
+      summary: Upload field document reference
+      description: Upload field agent document or photo proof reference for a store.
+      operationId: createFieldDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldDocumentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDocumentRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/readiness-escalations:
+    post:
+      tags:
+        - Field Readiness
+      summary: Escalates incomplete readiness submission
+      description: Escalate store readiness to a target team for resolution.
+      operationId: createFieldReadinessEscalation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldReadinessEscalationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessEscalationRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /readiness-escalations:
+    get:
+      tags:
+        - Field Readiness
+      summary: List readiness escalations
+      description: Returns a list of escalations for control-panel operator queue.
+      operationId: listFieldReadinessEscalations
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFieldReadinessEscalationsResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /readiness-escalations/{id}:
+    patch:
+      tags:
+        - Field Readiness
+      summary: Update readiness escalation status
+      description: Updates the status of a readiness escalation.
+      operationId: updateFieldReadinessEscalation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The escalation ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldReadinessEscalationRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessEscalationRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Escalation Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/readiness-approvals:
+    post:
+      tags:
+        - Field Readiness
+      summary: Approve or reject store readiness
+      description: Performs a formal readiness approval or rejection.
+      operationId: createFieldReadinessApproval
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldReadinessApprovalRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessApprovalRecord'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/readiness-approvals/latest:
+    get:
+      tags:
+        - Field Readiness
+      summary: Get latest readiness approval decision
+      description: Returns the latest approval or rejection record for a store.
+      operationId: getLatestFieldReadinessApproval
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldReadinessApprovalRecord'
+        '404':
+          description: No approval record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/partner-readiness:
+    patch:
+      tags:
+        - Store Visibility
+      summary: Update store partner readiness
+      description: Update the partner readiness status gate for a store.
+      operationId: updatePartnerReadiness
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerReadinessUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreVisibilityGateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/catalog-approval:
+    patch:
+      tags:
+        - Store Visibility
+      summary: Update store catalog approval status
+      description: Update the catalog quality and catalog pricing status gates for a store.
+      operationId: updateStoreCatalogApproval
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogApprovalUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreVisibilityGateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/{id}/marketing-visibility:
+    patch:
+      tags:
+        - Store Visibility
+      summary: Update store marketing visibility status
+      description: Update the marketing visibility status gate for a store.
+      operationId: updateMarketingVisibility
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The store ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketingVisibilityUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreVisibilityGateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Store Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003A: Cart Serviceability ───────────────────────────
+  /cart/serviceability:
+    get:
+      tags:
+        - Checkout
+      summary: Check cart serviceability
+      description: |
+        Checks whether the client's cart items and store are serviceable before checkout.
+        Client auth required — cart must be associated with authenticated client identity.
+        WLT boundary: no financial data. Serviceability is operational only.
+
+        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+        Production: BearerAuth token verified against auth service GET /auth/session.
+        DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
+        x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+      operationId: getCartServiceability
+      security:
+        - BearerAuth: []
+      x-bthwani-auth-dev-note: DEV_ONLY — backend currently accepts X-Client-Id header; BearerAuth enforcement pending auth runtime
+      parameters:
+        - name: store_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: item_ids
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Serviceability result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartServiceabilityResponse'
+        '401':
+          description: Unauthenticated — client identity required for cart association
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003B: Checkout Intent ─────────────────────────────
+  /checkout/intent:
+    post:
+      tags:
+        - Checkout
+      summary: Create checkout intent
+      description: |
+        Creates a checkout session for the authenticated client's cart.
+        Returns a session_token to be passed to WLT payment bridge (DSH-SLICE-003C).
+        Requires: client auth (003A dependency) + serviceability confirmed (003A passed).
+        WLT boundary: no financial mutation at this step. Creates operational session only.
+        DSH stores the intent; WLT receives session_token to associate the payment.
+
+        Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
+        Production: BearerAuth token verified against auth service GET /auth/session.
+        DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
+        x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+      operationId: createCheckoutIntent
+      security:
+        - BearerAuth: []
+      x-bthwani-auth-dev-note: DEV_ONLY — backend currently accepts X-Client-Id header; BearerAuth enforcement pending auth runtime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutIntentRequest'
+      responses:
+        '201':
+          description: Checkout intent created — pass session_token to WLT payment bridge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutIntentResponse'
+        '400':
+          description: Validation error or serviceability not confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthenticated — client identity required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Active checkout session already exists for this client+store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003E: Cancel Checkout Intent ─────────────────────
+  /checkout/intent/{id}:
+    delete:
+      tags:
+        - Checkout
+      summary: Cancel checkout intent
+      description: |
+        Cancels a checkout intent and preserves the client's cart.
+        Used when payment fails (DSH-SLICE-003E) or client cancels before payment.
+        WLT boundary: no financial mutation. Cart is preserved in DSH state.
+        If payment was already confirmed before cancellation, refund is WLT-owned (DSH-SLICE-004E).
+      operationId: cancelCheckoutIntent
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Intent cancelled — cart preserved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelCheckoutIntentResponse'
+        '400':
+          description: Invalid request or intent already confirmed (cannot cancel after payment)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Intent not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003 / DSH-SLICE-003C: WLT Payment Callback ───────────────────────
+  /checkout/payment-callback:
+    post:
+      tags:
+        - Checkout
+      summary: Receive WLT payment decision callback
+      description: |
+        DSH backend endpoint that receives WLT payment decision.
+        This is the PRIMARY flow — WLT calls this after financial decision (confirmed or failed).
+        Polling GET /wlt/dsh/client/payment-sessions/{sessionId} is the FALLBACK only.
+
+        DSH responsibilities (only):
+          - Validate X-WLT-Event-Id (idempotency — persist event ID and acknowledge repeated events)
+          - Validate X-WLT-Callback-Token against configured WLT_CALLBACK_SECRET
+          - Store wlt_payment_ref_id as operational reference (no financial mutation)
+          - Update intent status (payment_confirmed or payment_failed)
+          - DSH-SLICE-003D (order creation) is a SEPARATE subsequent step, not triggered here
+
+        Boundary contract: DSH_PAYMENT_INPUT_ONLY — WLT_OWNS_FINAL_FINANCIAL_TRUTH.
+
+        Security headers required from WLT:
+          X-WLT-Callback-Token: configured shared secret; final production HMAC/signature hardening remains WLT security proof before PASS
+          X-WLT-Event-Id: unique event UUID for idempotency
+          Idempotency-Key: same as the payment session Idempotency-Key
+      operationId: receivePaymentCallback
+      security: []
+      x-bthwani-callback-security:
+        required_headers:
+          - X-WLT-Callback-Token
+          - X-WLT-Event-Id
+          - Idempotency-Key
+        dev_mode: X-WLT-Callback-Token=dev-secret accepted in DEV_ONLY mode
+        prod_mode: WLT_CALLBACK_SECRET shared-token validation implemented; HMAC-SHA256/signature hardening pending final WLT security spec before PASS
+      parameters:
+        - in: header
+          name: X-WLT-Callback-Token
+          required: true
+          schema:
+            type: string
+          description: |
+            WLT shared callback secret. DEV: "dev-secret". Current backend validates against
+            WLT_CALLBACK_SECRET before processing; final production HMAC/signature semantics remain
+            pending WLT security proof before PASS.
+        - in: header
+          name: X-WLT-Event-Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: |
+            Unique event UUID issued by WLT for idempotency. DSH persists the event ID on the
+            checkout intent and acknowledges repeated delivery of the same event.
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+          description: Same Idempotency-Key used in the originating WLT payment session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCallbackRequest'
+      responses:
+        '200':
+          description: Callback acknowledged — DSH will process asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCallbackResponse'
+        '400':
+          description: Invalid callback payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Intent not found — may have expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── J-003D / J-004: Order Lifecycle & Support ─────────────────────────────────
+  /orders:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Create a new order
+      description: |
+        Creates a new order in CREATED status.
+        Production: BearerAuth token supplies the client identity.
+        DEV_ONLY: X-Client-Id header supplies temporary client identity until auth runtime is live.
+        The request body's client_id is optional compatibility input and is never the trusted identity source.
+        WLT boundary: local order creation is enabled to unblock testing order states and cancellations, but does NOT perform any external financial callback/WLT balance deduction.
+      security:
+        - BearerAuth: []
+      x-bthwani-auth-dev-note: DEV_ONLY — backend accepts X-Client-Id header; BearerAuth runtime proof remains required before production closure
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid client identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}:
+    get:
+      tags:
+        - Order Lifecycle
+      summary: Get order details
+      description: Returns the order record, items, status history events, and support tickets.
+      security:
+        - BearerAuth: []
+      x-bthwani-auth-dev-note: DEV_ONLY — backend accepts X-Client-Id header; actor scoping remains blocked on production auth roles
+      operationId: getOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailsResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid client identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/status:
+    patch:
+      tags:
+        - Order Lifecycle
+      summary: Update order status
+      description: Updates the status of an order and records a status event.
+      operationId: updateOrderStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderStatusRequest'
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/cancel:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Cancel an order
+      description: Sets the status of an order to CANCELLED and records a status event.
+      operationId: cancelOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actor:
+                  type: string
+                  enum: [client, partner, operator, system]
+                  default: client
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Order cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/refund-callback:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Handle refund callback from WLT
+      description: |
+        Incoming webhook triggered by WLT to notify DSH of a refund status.
+        WLT boundary: WLT owns refund execution. DSH stores reference ID only.
+        Requires X-WLT-Callback-Token matching WLT_CALLBACK_SECRET; DEV_ONLY accepts dev-secret.
+      operationId: refundOrderCallback
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-WLT-Callback-Token
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundCallbackRequest'
+      responses:
+        '200':
+          description: Refund callback processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid WLT callback token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/assign-captain:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Assign a captain to an order
+      description: Assigns a captain to the order.
+      operationId: assignCaptain
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignCaptainRequest'
+      responses:
+        '200':
+          description: Captain assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/accept-task:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Accept a delivery task by captain
+      description: Allows an assigned captain to accept the delivery task.
+      operationId: acceptTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+              properties:
+                captain_id:
+                  type: string
+      responses:
+        '200':
+          description: Task accepted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/decline-task:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Decline a delivery task by captain
+      description: Allows an assigned captain to decline the delivery task, triggering reassignment.
+      operationId: declineTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+                - reason
+              properties:
+                captain_id:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Task declined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/pickup:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Confirm order pickup by captain
+      description: Allows the assigned captain to confirm that they have picked up the order from the store.
+      operationId: confirmPickup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+              properties:
+                captain_id:
+                  type: string
+      responses:
+        '200':
+          description: Order pickup confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/location:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Update captain location and delivery lifecycle status
+      description: Allows the assigned captain to push coordinate updates and delivery lifecycle stage updates (e.g. EN_ROUTE, ARRIVED).
+      operationId: updateCaptainLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+                - latitude
+                - longitude
+                - lifecycle_status
+                - order_status
+              properties:
+                captain_id:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                lifecycle_status:
+                  type: string
+                order_status:
+                  type: string
+                  enum: [EN_ROUTE, ARRIVED]
+      responses:
+        '200':
+          description: Location updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Order Lifecycle
+      summary: Get captain location and delivery lifecycle status
+      description: Returns the latest captain location coordinates and lifecycle status for the order.
+      operationId: getCaptainLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Captain location record
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - latitude
+                  - longitude
+                  - lifecycle_status
+                  - order_status
+                properties:
+                  latitude:
+                    type: number
+                  longitude:
+                    type: number
+                  lifecycle_status:
+                    type: string
+                  order_status:
+                    type: string
+        '404':
+          description: Order or location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/deliver:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Submit proof of delivery (DSH-SLICE-005E)
+      description: |
+        Captain submits proof-of-delivery media key and transitions order status from ARRIVED to DELIVERED.
+        Precondition: order must be in ARRIVED state and assigned to the calling captain.
+        WLT BOUNDARY: this endpoint does NOT trigger payout or any financial mutation.
+        Payout is WLT responsibility, triggered externally when WLT observes the DELIVERED event.
+      operationId: deliverOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+              properties:
+                captain_id:
+                  type: string
+                  description: ID of the assigned captain submitting the proof.
+                pod_media_key:
+                  type: string
+                  nullable: true
+                  description: Media-fixtures key referencing the proof-of-delivery photo. DSH stores only the key reference, never the raw binary.
+      responses:
+        '200':
+          description: Order marked as DELIVERED; pod_media_key recorded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Missing or invalid captain_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Order not assigned to this captain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Order is not in ARRIVED state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/fail-delivery:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Report delivery failure (DSH-SLICE-005F)
+      description: |
+        Captain reports that delivery could not be completed (client unreachable, wrong address, refused, etc.).
+        Precondition: order must be in ARRIVED state and assigned to the calling captain.
+        failure_reason is mandatory.
+        If return_required is true: transitions ARRIVED → RETURNING_TO_STORE.
+        If return_required is false: transitions ARRIVED → FAILED_DELIVERY.
+        WLT BOUNDARY: wlt_refund_trigger_ref is a bridge reference ID stored by DSH only.
+        DSH does NOT execute refunds. WLT (004E) owns refund execution after observing this event.
+      operationId: failDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+                - failure_reason
+              properties:
+                captain_id:
+                  type: string
+                failure_reason:
+                  type: string
+                  description: "Reason for failure: CLIENT_UNREACHABLE, WRONG_ADDRESS, REFUSED, OTHER"
+                wlt_refund_trigger_ref:
+                  type: string
+                  nullable: true
+                  description: WLT bridge reference ID. DSH stores only — WLT executes refund independently.
+                return_required:
+                  type: boolean
+                  default: false
+                  description: If true, captain must return item to store (transitions to RETURNING_TO_STORE).
+      responses:
+        '200':
+          description: Delivery failure recorded. Status is FAILED_DELIVERY or RETURNING_TO_STORE.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Missing required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Order not assigned to this captain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Order is not in ARRIVED state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}/confirm-return:
+    post:
+      tags:
+        - Order Lifecycle
+      summary: Confirm item returned to store (DSH-SLICE-005F)
+      description: |
+        Captain confirms item has been returned to the store.
+        Precondition: order must be in RETURNING_TO_STORE state.
+        Transitions RETURNING_TO_STORE → RETURNED.
+        WLT BOUNDARY: no financial mutation. Refund bridge reference was already set in fail-delivery.
+      operationId: confirmReturn
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - captain_id
+              properties:
+                captain_id:
+                  type: string
+                note:
+                  type: string
+                  nullable: true
+                  description: Optional note about the return.
+      responses:
+        '200':
+          description: Return confirmed. Status is RETURNED.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRecord'
+        '400':
+          description: Missing captain_id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Order not assigned to this captain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Order is not in RETURNING_TO_STORE state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /support/escalations:
+    post:
+      tags:
+        - Support Escalation
+      summary: Create a support escalation ticket
+      description: Creates a support escalation ticket for a specific order.
+      operationId: createSupportEscalation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSupportEscalationRequest'
+      responses:
+        '201':
+          description: Support ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportEscalationRecord'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -108,6 +2328,259 @@ components:
               type: integer
             total:
               type: integer
+    CreateFieldStoreRequest:
+      type: object
+      required:
+        - name
+        - address
+        - supports_pickup
+        - supports_partner_delivery
+      properties:
+        name:
+          type: string
+          minLength: 1
+        address:
+          type: string
+          minLength: 1
+        category_id:
+          type: string
+        supports_pickup:
+          type: boolean
+        supports_partner_delivery:
+          type: boolean
+
+    CreateFieldStoreResponse:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - publish_stage
+        - created_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        category_id:
+          type: string
+        publish_stage:
+          type: string
+          example: pending_review
+        created_at:
+          type: string
+          format: date-time
+
+    CreateFieldVisitRequest:
+      type: object
+      required:
+        - visit_summary
+        - follow_up_action
+      properties:
+        field_agent_id:
+          type: string
+        visit_summary:
+          type: string
+          minLength: 1
+        follow_up_action:
+          type: string
+          minLength: 1
+        evidence_media_keys:
+          type: array
+          description: Media key references only; raw uploads are governed by the downstream media/documents slice.
+          items:
+            type: string
+        location_confidence:
+          type: string
+
+    CreateFieldVisitResponse:
+      type: object
+      required:
+        - id
+        - store_id
+        - visit_summary
+        - follow_up_action
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        field_agent_id:
+          type: string
+        visit_summary:
+          type: string
+        follow_up_action:
+          type: string
+        evidence_media_keys:
+          type: array
+          items:
+            type: string
+        location_confidence:
+          type: string
+        status:
+          type: string
+          enum: [submitted]
+        created_at:
+          type: string
+          format: date-time
+
+    CreateFieldDocumentRequest:
+      type: object
+      required:
+        - document_kind
+        - media_key
+      properties:
+        document_kind:
+          type: string
+          enum: [commercial_registration, tax_certificate, identity_proof, storefront_photo, interior_photo]
+        media_key:
+          type: string
+          description: Media key of the uploaded document in S3 or local media storage.
+
+    FieldDocumentRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - document_kind
+        - media_key
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        document_kind:
+          type: string
+          enum: [commercial_registration, tax_certificate, identity_proof, storefront_photo, interior_photo]
+        media_key:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+
+    CreateFieldReadinessEscalationRequest:
+      type: object
+      required:
+        - reason
+        - target_team
+      properties:
+        field_agent_id:
+          type: string
+        reason:
+          type: string
+        target_team:
+          type: string
+          enum: [partner-management, control-panel, marketing]
+
+    FieldReadinessEscalationRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - reason
+        - target_team
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        field_agent_id:
+          type: string
+        reason:
+          type: string
+        target_team:
+          type: string
+          enum: [partner-management, control-panel, marketing]
+        status:
+          type: string
+          enum: [escalated, info_requested, resolved, rejected]
+        operator_note:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UpdateFieldReadinessEscalationRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [info_requested, resolved, rejected]
+        operator_note:
+          type: string
+
+    ListFieldReadinessEscalationsResponse:
+      type: object
+      required:
+        - escalations
+        - pagination
+      properties:
+        escalations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldReadinessEscalationRecord'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CreateFieldReadinessApprovalRequest:
+      type: object
+      required:
+        - decision
+      properties:
+        operator_id:
+          type: string
+        decision:
+          type: string
+          enum: [approved, rejected]
+        reason:
+          type: string
+
+    FieldReadinessApprovalRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - decision
+        - created_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        operator_id:
+          type: string
+        decision:
+          type: string
+          enum: [approved, rejected]
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+
     DiscoveryStore:
       type: object
       required:
@@ -153,6 +2626,141 @@ components:
           type: string
         publish_stage:
           type: string
+
+    DiscoveryStoreDetail:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - distance_label
+        - delivery_label
+        - service_label
+        - status_label
+        - status_tone
+        - has_offer
+        - publish_stage
+        - partner_readiness_status
+        - catalog_quality_status
+        - catalog_pricing_status
+        - marketing_visibility_status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        category_id:
+          type: string
+        image_url:
+          type: string
+        logo_image_url:
+          type: string
+        rating:
+          type: number
+        distance_label:
+          type: string
+        delivery_label:
+          type: string
+        service_label:
+          type: string
+        status_label:
+          type: string
+        status_tone:
+          type: string
+          enum: [open, closed]
+        has_offer:
+          type: boolean
+        offer_label:
+          type: string
+        publish_stage:
+          type: string
+        contact_number:
+          type: string
+        opening_hours:
+          type: string
+        catalog_summary:
+          type: string
+        partner_readiness_status:
+          type: string
+          enum: [ready, not_ready, paused]
+        catalog_quality_status:
+          type: string
+          enum: [approved, pending, rejected]
+        catalog_pricing_status:
+          type: string
+          enum: [approved, pending, rejected]
+        marketing_visibility_status:
+          type: string
+          enum: [active, inactive, paused]
+
+    PartnerReadinessUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready, paused]
+          description: The readiness status of the store partner.
+
+    CatalogApprovalUpdateRequest:
+      type: object
+      required:
+        - quality_status
+        - pricing_status
+      properties:
+        quality_status:
+          type: string
+          enum: [approved, pending, rejected]
+          description: The quality approval status of the store catalog.
+        pricing_status:
+          type: string
+          enum: [approved, pending, rejected]
+          description: The pricing approval status of the store catalog.
+
+    MarketingVisibilityUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [active, inactive, paused]
+          description: The marketing visibility status of the store.
+
+    StoreVisibilityGateResponse:
+      type: object
+      required:
+        - store_id
+        - partner_readiness_status
+        - catalog_quality_status
+        - catalog_pricing_status
+        - marketing_visibility_status
+        - client_visible
+        - updated_at
+      properties:
+        store_id:
+          type: string
+        partner_readiness_status:
+          type: string
+          enum: [ready, not_ready, paused]
+        catalog_quality_status:
+          type: string
+          enum: [approved, pending, rejected]
+        catalog_pricing_status:
+          type: string
+          enum: [approved, pending, rejected]
+        marketing_visibility_status:
+          type: string
+          enum: [active, inactive, paused]
+        client_visible:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+
     ErrorResponse:
       type: object
       required:
@@ -163,3 +2771,842 @@ components:
           type: string
         message:
           type: string
+
+    # ─── J-002 / DSH-SLICE-002A: Product Identity ─────────────────────────────
+
+    ProductRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - name
+        - base_price_label
+        - approval_status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        name:
+          type: string
+        sku:
+          type: string
+        gtin:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        base_price_label:
+          type: string
+          description: Display label only — no financial mutation. WLT owns price semantics.
+        category_id:
+          type: string
+        approval_status:
+          type: string
+          enum:
+            - field_draft
+            - partner_submitted
+            - partner_review
+            - partner_approved
+            - marketing_review
+            - marketing_approved
+            - catalog_adopted
+            - client_visible
+            - needs_fix
+            - rejected
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductMediaRecord'
+        price_override:
+          type: string
+          description: Display-only local price override.
+        stock_override:
+          type: integer
+          description: Local stock count override.
+        available_override:
+          type: boolean
+          description: Local availability override.
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - base_price_label
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        gtin:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        base_price_label:
+          type: string
+        category_id:
+          type: string
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        gtin:
+          type: string
+        barcode:
+          type: string
+        description:
+          type: string
+        base_price_label:
+          type: string
+        category_id:
+          type: string
+
+    ListProductsResponse:
+      type: object
+      required:
+        - products
+        - pagination
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductRecord'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── J-002 / DSH-SLICE-002B: Category Structure ─────────────────────────────
+
+    CategoryRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - name
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        parent_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        parent_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        parent_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    ListCategoriesResponse:
+      type: object
+      required:
+        - categories
+        - pagination
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryRecord'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── J-002 / DSH-SLICE-002C: Product Media ──────────────────────────────────
+
+    ProductMediaRecord:
+      type: object
+      required:
+        - id
+        - product_id
+        - media_key
+        - url
+        - created_at
+      properties:
+        id:
+          type: string
+        product_id:
+          type: string
+        media_key:
+          type: string
+        url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    UploadProductMediaRequest:
+      type: object
+      required:
+        - product_id
+        - media_key
+      properties:
+        product_id:
+          type: string
+        media_key:
+          type: string
+
+    # ─── J-002 / DSH-SLICE-002D: Partner Local Overrides ────────────────────────
+    UpdateCatalogOverridesRequest:
+      type: object
+      required:
+        - overrides
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogOverrideInput'
+
+    CatalogOverrideInput:
+      type: object
+      required:
+        - product_id
+      properties:
+        product_id:
+          type: string
+        price_override:
+          type: string
+          description: Partner-specific price override label (display-only, WLT boundary).
+        stock_override:
+          type: integer
+          description: Partner-specific inventory stock override count.
+        available_override:
+          type: boolean
+          description: Toggle availability override for the product.
+
+    UpdateCatalogOverridesResponse:
+      type: object
+      required:
+        - store_id
+        - updated_count
+        - overrides
+      properties:
+        store_id:
+          type: string
+        updated_count:
+          type: integer
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogOverrideRecord'
+
+    CatalogOverrideRecord:
+      type: object
+      required:
+        - store_id
+        - product_id
+        - updated_at
+      properties:
+        store_id:
+          type: string
+        product_id:
+          type: string
+        price_override:
+          type: string
+        stock_override:
+          type: integer
+        available_override:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+
+    UpdateCatalogApprovalRequest:
+      type: object
+      required:
+        - item_id
+        - action
+      properties:
+        item_id:
+          type: string
+          description: ID of the product, category, or media to act upon.
+        action:
+          type: string
+          enum: [approve, reject, needs-fix]
+          description: The approval action to apply.
+        note:
+          type: string
+          description: Reviewer note/evidence (required if action is reject or needs-fix).
+
+    CatalogApprovalRecord:
+      type: object
+      required:
+        - id
+        - item_id
+        - action
+        - operator_id
+        - created_at
+      properties:
+        id:
+          type: string
+        item_id:
+          type: string
+        action:
+          type: string
+        note:
+          type: string
+        operator_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # ─── J-002 / DSH-SLICE-002G: Catalog Conflict Audit ─────────────────────────
+    CatalogConflict:
+      type: object
+      required:
+        - id
+        - store_id
+        - product_id
+        - product_name
+        - conflict_type
+        - central_value
+        - override_value
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        product_id:
+          type: string
+        product_name:
+          type: string
+        conflict_type:
+          type: string
+          enum: [price_divergence, availability_divergence]
+        central_value:
+          type: string
+        override_value:
+          type: string
+        status:
+          type: string
+          enum: [pending, resolved_accept_local, resolved_reverted]
+        resolved_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    ResolveConflictRequest:
+      type: object
+      required:
+        - resolution
+      properties:
+        resolution:
+          type: string
+          enum: [accept_local, revert_to_central]
+          description: How to resolve the conflict.
+
+    ResolveConflictResponse:
+      type: object
+      required:
+        - conflict_id
+        - status
+      properties:
+        conflict_id:
+          type: string
+        status:
+          type: string
+          enum: [resolved_accept_local, resolved_reverted]
+
+    ListConflictsResponse:
+      type: object
+      required:
+        - conflicts
+        - limit
+        - offset
+        - total
+      properties:
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogConflict'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+
+    OrderRecord:
+      type: object
+      required:
+        - id
+        - store_id
+        - client_id
+        - status
+        - total_price
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        store_id:
+          type: string
+        client_id:
+          type: string
+        status:
+          type: string
+          enum: [CREATED, ACCEPTED, READY_FOR_PICKUP, DELIVERED, CANCELLED, REFUNDED, ACCEPTED_BY_CAPTAIN, PICKED_UP, EN_ROUTE, ARRIVED]
+        total_price:
+          type: number
+        wlt_payment_ref_id:
+          type: string
+        wlt_refund_ref_id:
+          type: string
+        captain_id:
+          type: string
+        captain_latitude:
+          type: number
+        captain_longitude:
+          type: number
+        captain_lifecycle_status:
+          type: string
+        pod_media_key:
+          type: string
+          nullable: true
+          description: Proof-of-delivery media key reference (set on DELIVERED). DSH stores reference only, not the raw binary.
+        delivery_failure_reason:
+          type: string
+          nullable: true
+          description: Reason delivery failed (set on FAILED_DELIVERY or RETURNING_TO_STORE).
+        wlt_refund_trigger_ref:
+          type: string
+          nullable: true
+          description: WLT bridge reference ID. DSH stores only — WLT (004E) owns refund execution independently.
+        wlt_settlement_ref_id:
+          type: string
+          nullable: true
+          description: WLT settlement transaction reference.
+        settlement_status:
+          type: string
+          enum: [NOT_SETTLED, SETTLEMENT_PENDING, SETTLED, SETTLEMENT_FAILED]
+          default: NOT_SETTLED
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    OrderItemRecord:
+      type: object
+      required:
+        - id
+        - order_id
+        - product_id
+        - quantity
+        - price
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        product_id:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+
+    OrderStatusEventRecord:
+      type: object
+      required:
+        - id
+        - order_id
+        - actor
+        - from_status
+        - to_status
+        - created_at
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        actor:
+          type: string
+          enum: [client, partner, captain, operator, system]
+        from_status:
+          type: string
+        to_status:
+          type: string
+        note:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    SupportEscalationRecord:
+      type: object
+      required:
+        - id
+        - order_id
+        - actor
+        - issue_type
+        - description
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        actor:
+          type: string
+          enum: [client, partner]
+        issue_type:
+          type: string
+          enum: [delayed_delivery, wrong_items, missing_items, payment_issue, other]
+        description:
+          type: string
+        status:
+          type: string
+          enum: [open, in-review, resolved]
+        created_at:
+          type: string
+          format: date-time
+        resolved_at:
+          type: string
+          format: date-time
+
+    OrderItemInput:
+      type: object
+      required:
+        - product_id
+        - quantity
+        - price
+      properties:
+        product_id:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - store_id
+        - total_price
+        - items
+      properties:
+        store_id:
+          type: string
+        client_id:
+          type: string
+          description: Optional DEV compatibility value only. Backend derives trusted client identity from BearerAuth or DEV_ONLY X-Client-Id.
+        total_price:
+          type: number
+        wlt_payment_ref_id:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemInput'
+
+    CreateOrderResponse:
+      type: object
+      required:
+        - order
+      properties:
+        order:
+          type: object
+          required:
+            - id
+            - store_id
+            - client_id
+            - status
+            - total_price
+            - items
+          properties:
+            id:
+              type: string
+            store_id:
+              type: string
+            client_id:
+              type: string
+            status:
+              type: string
+            total_price:
+              type: number
+            wlt_payment_ref_id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderItemRecord'
+
+    UpdateOrderStatusRequest:
+      type: object
+      required:
+        - actor
+        - status
+      properties:
+        actor:
+          type: string
+          enum: [client, partner, captain, operator, system]
+        status:
+          type: string
+          enum: [CREATED, ACCEPTED, READY_FOR_PICKUP, DELIVERED, CANCELLED, REFUNDED, ACCEPTED_BY_CAPTAIN, PICKED_UP, EN_ROUTE, ARRIVED]
+        note:
+          type: string
+
+    AssignCaptainRequest:
+      type: object
+      required:
+        - captain_id
+      properties:
+        captain_id:
+          type: string
+
+    CreateSupportEscalationRequest:
+      type: object
+      required:
+        - order_id
+        - actor
+        - issue_type
+        - description
+      properties:
+        order_id:
+          type: string
+        actor:
+          type: string
+          enum: [client, partner]
+        issue_type:
+          type: string
+          enum: [delayed_delivery, wrong_items, missing_items, payment_issue, other]
+        description:
+          type: string
+
+    OrderDetailsResponse:
+      type: object
+      required:
+        - order
+        - items
+        - status_events
+        - support_tickets
+      properties:
+        order:
+          $ref: '#/components/schemas/OrderRecord'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemRecord'
+        status_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStatusEventRecord'
+        support_tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportEscalationRecord'
+
+    Pagination:
+      type: object
+      required:
+        - limit
+        - offset
+        - total
+      properties:
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+
+    # ─── J-003 / Checkout Schemas ─────────────────────────────────────────────
+    CartServiceabilityResponse:
+      type: object
+      required:
+        - serviceable
+        - store_id
+      properties:
+        serviceable:
+          type: boolean
+        store_id:
+          type: string
+        reason_code:
+          type: string
+          enum: [store_closed, delivery_zone_unavailable, items_unavailable, partner_not_ready]
+          description: Present only when serviceable=false
+        unavailable_item_ids:
+          type: array
+          items:
+            type: string
+          description: Item IDs that are unavailable — present when reason_code=items_unavailable
+
+    CheckoutIntentItem:
+      type: object
+      required:
+        - product_id
+        - quantity
+      properties:
+        product_id:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+
+    CheckoutIntentRequest:
+      type: object
+      required:
+        - store_id
+        - items
+        - delivery_address
+      properties:
+        store_id:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckoutIntentItem'
+        delivery_address:
+          type: string
+        delivery_time_slot:
+          type: string
+          description: Optional requested delivery time slot identifier
+        client_note:
+          type: string
+
+    CheckoutIntentResponse:
+      type: object
+      required:
+        - intent_id
+        - session_token
+        - status
+        - expires_at
+      properties:
+        intent_id:
+          type: string
+          description: DSH checkout session identifier
+        session_token:
+          type: string
+          description: Token passed to WLT payment bridge to associate payment with this intent
+        status:
+          type: string
+          enum: [pending_payment, payment_confirmed, payment_failed, cancelled, expired]
+        expires_at:
+          type: string
+          format: date-time
+
+    CancelCheckoutIntentResponse:
+      type: object
+      required:
+        - intent_id
+        - status
+        - cart_preserved
+      properties:
+        intent_id:
+          type: string
+        status:
+          type: string
+          enum: [cancelled]
+        cart_preserved:
+          type: boolean
+          description: Always true — DSH preserves cart items on intent cancellation
+
+    PaymentCallbackRequest:
+      type: object
+      required:
+        - intent_id
+        - wlt_payment_ref_id
+        - status
+      properties:
+        intent_id:
+          type: string
+          description: DSH checkout intent ID matching the session_token issued in createCheckoutIntent
+        wlt_payment_ref_id:
+          type: string
+          description: WLT payment reference ID — DSH stores as operational reference only; no financial mutation
+        status:
+          type: string
+          enum: [confirmed, failed]
+        failure_reason:
+          type: string
+          enum: [insufficient_balance, policy_block, fraud_hold, expired]
+          description: Present only when status=failed
+
+    PaymentCallbackResponse:
+      type: object
+      required:
+        - acknowledged
+        - intent_id
+      properties:
+        acknowledged:
+          type: boolean
+        intent_id:
+          type: string
+        next_action:
+          type: string
+          enum: [create_order, show_failure]
+          description: |
+            create_order: payment confirmed — DSH will trigger POST /orders internally.
+            show_failure: payment failed — DSH surfaces failure_reason to client via 003E flow.
+
+    RefundCallbackRequest:
+      type: object
+      required:
+        - refund_ref_id
+        - amount
+        - status
+      properties:
+        refund_ref_id:
+          type: string
+          description: WLT refund reference ID - DSH stores as reference only; no local financial mutation.
+        amount:
+          type: number
+          description: Amount refunded. Must match the refund request.
+        status:
+          type: string
+          enum: [CONFIRMED, FAILED]
+          description: CONFIRMED triggers order status transition to REFUNDED. FAILED logs the failure event but keeps the status unchanged.

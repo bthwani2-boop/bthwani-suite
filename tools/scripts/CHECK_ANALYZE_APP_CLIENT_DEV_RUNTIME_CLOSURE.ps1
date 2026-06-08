@@ -9,7 +9,7 @@ $RunRoot = Join-Path $RepoRoot ("tools\registry\runs\" + $SessionId)
 New-Item -ItemType Directory -Force -Path $RunRoot | Out-Null
 
 $PackageName = "com.bthwani.client.dev"
-$AppDir = Join-Path $RepoRoot "apps\mobile\app-client"
+$AppDir = Join-Path $RepoRoot "app-client\runtime"
 $Port = 8081
 
 function To-SafeText($Value) {
@@ -131,7 +131,7 @@ try {
   }
 }
 
-$BundleUrl = "http://127.0.0.1:$Port/apps/mobile/app-client/index.bundle?platform=android&dev=true&minify=false"
+$BundleUrl = "http://127.0.0.1:$Port/app-client/runtime/index.bundle?platform=android&dev=true&minify=false"
 $BundleProbe = $null
 try {
   $BundleResponse = Invoke-WebRequest -Uri $BundleUrl -UseBasicParsing -TimeoutSec 30
@@ -181,7 +181,7 @@ $ExpoProcesses = Get-CimInstance Win32_Process |
   Where-Object {
     $_.CommandLine -match "expo" -or
     $_.CommandLine -match "metro" -or
-    $_.CommandLine -match "apps/mobile/app-client"
+    $_.CommandLine -match "app-client/runtime"
   } |
   Select-Object ProcessId, Name, CommandLine
 
@@ -254,7 +254,7 @@ $DecisionText = switch ($FinalResult) {
     "Install the app-client development build for package $PackageName on the intended device before opening Expo. Do not press 'a' until package presence is proven."
   }
   "FAIL_METRO_NOT_RUNNING_ON_8081" {
-    "Start Metro from apps/mobile/app-client on port 8081, then re-run this gate. Do not open the app before Metro ownership is proven."
+    "Start Metro from app-client/runtime on port 8081, then re-run this gate. Do not open the app before Metro ownership is proven."
   }
   "FAIL_METRO_BUNDLE_500_OR_UNAVAILABLE" {
     "Metro is running, but bundle generation is failing. This is now a code/config/Metro error, not a device-install error. Read BUNDLE_ERROR_MESSAGE and BUNDLE_ERROR_BODY below."
@@ -323,7 +323,7 @@ CANONICAL_NEXT_COMMAND_EXAMPLES:
   `$env:ANDROID_SERIAL="$RecommendedTarget"
 
 - To start Metro:
-  pnpm --dir apps/mobile/app-client exec expo start --dev-client --port 8081 --clear
+  pnpm --dir app-client/runtime exec expo start --dev-client --port 8081 --clear
 
 - If multiple devices are connected, do not launch without explicit target.
 "@ | Tee-Object -FilePath $SummaryPath

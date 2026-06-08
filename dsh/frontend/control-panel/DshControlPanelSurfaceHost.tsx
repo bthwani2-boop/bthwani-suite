@@ -10,8 +10,8 @@ import {
 } from './operations';
 import { ControlPanelDshClosureDashboardScreen } from './dashboard';
 import { ControlPanelDshSupportHubScreen } from './support/SupportHubScreens';
-import { ControlPanelDshFinanceHubScreen } from './finance/FinanceHubScreen';
-import type { CanonicalFinanceGroupId, FinancePanelId } from './finance/finance.types';
+import { ControlPanelDshFinanceHubScreen } from './finance';
+import type { CanonicalFinanceGroupId, FinancePanelId } from '../../../wlt/frontend/dsh/control-panel/models/financeRouting.types';
 import { ControlPanelDshCatalogScreen } from './catalogs/catalogs.screen';
 import { ControlPanelDshPartnerApprovalsScreen } from './partners/ControlPanelDshPartnerApprovalsScreen';
 import { ControlPanelDshMarketingScreen } from './marketing/ControlPanelDshMarketingScreen';
@@ -19,6 +19,8 @@ import { ControlPanelDshPlatformScreen } from './platform/ControlPanelDshPlatfor
 import { ControlPanelDshAdministrationScreen } from './administration/ControlPanelDshAdministrationScreen';
 import { ControlPanelHrScreen } from './hr/ControlPanelHrScreen';
 import type { DshControlPanelSectionId } from './shared/dsh-control-panel-governance.map';
+
+import { PlatformVarsProvider, FeatureFlagProvider } from '../shared';
 
 export type DshControlPanelSurfaceHostProps = {
   section?: DshControlPanelSectionId;
@@ -29,12 +31,22 @@ export type DshControlPanelSurfaceHostProps = {
   financePanel?: FinancePanelId;
 };
 
-export function DshControlPanelSurfaceHost({
+export function DshControlPanelSurfaceHost(props: DshControlPanelSurfaceHostProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshControlPanelSurfaceHostInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshControlPanelSurfaceHostInner({
   section = 'operations',
   workspace = 'overview',
   orderId,
   orderOverlayMode,
-  financeGroup = 'overview',
+  financeGroup = 'financial-command-center',
   financePanel,
 }: DshControlPanelSurfaceHostProps) {
   const router = useRouter();

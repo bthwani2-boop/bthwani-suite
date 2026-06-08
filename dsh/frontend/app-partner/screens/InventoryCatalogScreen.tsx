@@ -31,6 +31,12 @@ import {
   buildCentralPartnerInventoryItems,
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
 } from '../../shared/catalog-central-adapter';
+import {
+  createDshStoreVisibilityHttpClient,
+  resolveDshStoreVisibilityBaseUrl,
+  type DshStoreVisibilityTransportError,
+} from '../../shared/dsh-store-visibility-transport';
+import type { PartnerReadinessStatus } from '../../shared/dsh-store-visibility-client';
 
 import {
   BThwaniFilterRail,
@@ -385,6 +391,106 @@ function getAvailableProductFacets(items: InventoryCatalogListItem[]): DshProduc
   return Array.from(seen);
 }
 
+// ── Store Readiness Gate ──────────────────────────────────────────────
+// Wires PATCH /stores/{id}/partner-readiness to the partner surface.
+// Only rendered when canonicalStoreId is present.
+
+type ReadinessGateState =
+  | { kind: 'idle'; status: PartnerReadinessStatus }
+  | { kind: 'loading' }
+  | { kind: 'success'; clientVisible: boolean; status: PartnerReadinessStatus }
+  | { kind: 'error'; message: string };
+
+function StoreReadinessGate({ storeId }: { storeId: string }) {
+  const { direction } = useDirection();
+  const [gate, setGate] = React.useState<ReadinessGateState>({
+    kind: 'idle',
+    status: 'ready',
+  });
+
+  const handleToggle = React.useCallback(
+    async (nextStatus: PartnerReadinessStatus) => {
+      const baseUrl = resolveDshStoreVisibilityBaseUrl();
+      if (!baseUrl) {
+        setGate({ kind: 'error', message: 'لم يُعثر على عنوان API — تحقق من EXPO_PUBLIC_DSH_API_BASE_URL.' });
+        return;
+      }
+      setGate({ kind: 'loading' });
+      try {
+        const client = createDshStoreVisibilityHttpClient(baseUrl);
+        const res = await client.updatePartnerReadiness(storeId, nextStatus);
+        setGate({ kind: 'success', clientVisible: res.client_visible, status: res.partner_readiness_status });
+      } catch (err: unknown) {
+        const typedErr = err as Partial<DshStoreVisibilityTransportError>;
+        if (typedErr.kind === 'offline') {
+          setGate({ kind: 'error', message: 'لا يوجد اتصال بالشبكة.' });
+        } else if (typedErr.kind === 'http') {
+          setGate({ kind: 'error', message: `خطأ من الخادم (${(typedErr as { status: number }).status}).` });
+        } else {
+          setGate({ kind: 'error', message: 'حدث خطأ غير متوقع.' });
+        }
+      }
+    },
+    [storeId],
+  );
+
+  const currentStatus =
+    gate.kind === 'idle' || gate.kind === 'error'
+      ? gate.kind === 'idle' ? gate.status : 'ready'
+      : gate.kind === 'success' ? gate.status : 'ready';
+
+  const isReady = currentStatus === 'ready';
+
+  return (
+    <Surface tone={isReady ? 'default' : 'warning'} padding={2} gap={2} border>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+        <Box style={{ flex: 1, gap: 2 }}>
+          <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
+            جاهزية المتجر للعميل
+          </Text>
+          {gate.kind === 'success' ? (
+            <Text role="caption" tone={gate.clientVisible ? 'success' : 'warning'} align={direction === 'rtl' ? 'end' : 'start'}>
+              {gate.clientVisible ? 'المتجر ظاهر للعميل' : 'المتجر مخفي عن العميل'}
+              {' · client_visible: '}
+              {gate.clientVisible ? 'true' : 'false'}
+            </Text>
+          ) : gate.kind === 'error' ? (
+            <Text role="caption" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
+              {gate.message}
+            </Text>
+          ) : gate.kind === 'loading' ? (
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              جاري التحديث...
+            </Text>
+          ) : (
+            <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
+              {isReady ? 'الوضع الحالي: جاهز' : 'الوضع الحالي: موقوف'}
+            </Text>
+          )}
+        </Box>
+        <Box style={{ flexDirection: resolveRowDirection(direction), gap: 6 }}>
+          <Button
+            label="جاهز"
+            size="sm"
+            tone={isReady ? 'success' : 'secondary'}
+            fullWidth={false}
+            disabled={gate.kind === 'loading' || isReady}
+            onPress={() => handleToggle('ready')}
+          />
+          <Button
+            label="إيقاف مؤقت"
+            size="sm"
+            tone={!isReady ? 'warning' : 'secondary'}
+            fullWidth={false}
+            disabled={gate.kind === 'loading' || !isReady}
+            onPress={() => handleToggle('paused')}
+          />
+        </Box>
+      </Box>
+    </Surface>
+  );
+}
+
 // ── Props ─────────────────────────────────────────────────────────────
 
 type InventoryCatalogContentProps = {
@@ -393,6 +499,10 @@ type InventoryCatalogContentProps = {
   activeZoneLabel: string;
   todayHoursLabel: string;
   canonicalStoreId?: string;
+  onNavigateToProductEdit?: (productId?: string) => void;
+  onNavigateToCategoryManagement?: () => void;
+  onNavigateToProductMedia?: (productId: string) => void;
+  onNavigateToProductOverrides?: (productId: string) => void;
 };
 
 export type InventoryCatalogScreenProps = InventoryCatalogContentProps & {
@@ -861,6 +971,9 @@ function InventoryCatalogCardPanel({
   onApplyOverride,
   onSendForReview,
   onMatchCatalog,
+  onEditIdentity,
+  onEditMedia,
+  onEditOverrides,
 }: {
   item: InventoryCatalogListItem;
   detail?: InventoryCatalogItemDetail;
@@ -873,6 +986,9 @@ function InventoryCatalogCardPanel({
   onApplyOverride: () => void;
   onSendForReview: () => void;
   onMatchCatalog: () => void;
+  onEditIdentity?: () => void;
+  onEditMedia?: () => void;
+  onEditOverrides?: () => void;
 }) {
   const { direction } = useDirection();
   const isRejected = item.publishStage === 'rejected';
@@ -963,6 +1079,33 @@ function InventoryCatalogCardPanel({
               fullWidth={false}
               onPress={onToggleDetails}
             />
+            {onEditIdentity ? (
+              <Button
+                label="تعديل الهوية"
+                size="sm"
+                tone="secondary"
+                fullWidth={false}
+                onPress={onEditIdentity}
+              />
+            ) : null}
+            {onEditMedia ? (
+              <Button
+                label="إدارة الوسائط"
+                size="sm"
+                tone="secondary"
+                fullWidth={false}
+                onPress={onEditMedia}
+              />
+            ) : null}
+            {onEditOverrides ? (
+              <Button
+                label="تعديل الأسعار والتوفر"
+                size="sm"
+                tone="secondary"
+                fullWidth={false}
+                onPress={onEditOverrides}
+              />
+            ) : null}
             {!item.catalogLinked ? (
               <Button label="مطابقة بالكتالوج" size="sm" tone="secondary" fullWidth={false} onPress={onMatchCatalog} />
             ) : null}
@@ -1009,7 +1152,10 @@ function InventoryCatalogContent({
   branchLabel,
   activeZoneLabel: _activeZoneLabel,
   todayHoursLabel: _todayHoursLabel,
-  canonicalStoreId,
+  canonicalStoreId = 'store-1001',
+  onNavigateToProductEdit,
+  onNavigateToProductMedia,
+  onNavigateToProductOverrides,
 }: InventoryCatalogContentProps) {
   const { direction } = useDirection();
   const [query, setQuery] = React.useState('');
@@ -1135,6 +1281,9 @@ function InventoryCatalogContent({
   return (
     <Box gap={2} dir="rtl">
 
+      {/* Store readiness gate — wires PATCH /stores/{id}/partner-readiness */}
+      {canonicalStoreId ? <StoreReadinessGate storeId={canonicalStoreId} /> : null}
+
       {/* Summary tiles */}
       <Surface tone="raised" padding={1} gap={0} border={false}>
         <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 4 }}>
@@ -1255,6 +1404,9 @@ function InventoryCatalogContent({
                 onApplyOverride={() => handleApplyOverride(item)}
                 onSendForReview={() => handleSendForReview(item)}
                 onMatchCatalog={() => handleMatchCatalog(item)}
+                onEditIdentity={onNavigateToProductEdit ? () => onNavigateToProductEdit(item.id) : undefined}
+                onEditMedia={onNavigateToProductMedia ? () => onNavigateToProductMedia(item.id) : undefined}
+                onEditOverrides={onNavigateToProductOverrides ? () => onNavigateToProductOverrides(item.id) : undefined}
               />
             );
           })
@@ -1359,7 +1511,8 @@ function InventoryCatalogContent({
 
 // ── Screen shell ──────────────────────────────────────────────────────
 
-export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScreenProps) {
+export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001', ...props }: InventoryCatalogScreenProps) {
+  const { direction } = useDirection();
   return (
     <MobileScrollView fill padding={2} gap={2} contentContainerStyle={{ paddingBottom: 120 }}>
       <TopBar
@@ -1386,7 +1539,29 @@ export function InventoryCatalogScreen({ onBack, ...props }: InventoryCatalogScr
           المالك المركزي هو {resolveDshControlPanelSectionLabel('catalogs')}. يعدل الشريك السعر والمخزون والتوفر محليًا فقط، بينما الهوية والباركود والنشر وتعارضات الميديا تُراجع on-demand داخل لوحة التحكم.
         </Text>
       </Surface>
-      <InventoryCatalogContent {...props} />
+
+      <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8, justifyContent: 'flex-start', marginVertical: 4 }}>
+        {props.onNavigateToCategoryManagement ? (
+          <Button
+            label="إدارة هيكلية الفئات"
+            tone="secondary"
+            size="sm"
+            fullWidth={false}
+            onPress={props.onNavigateToCategoryManagement}
+          />
+        ) : null}
+        {props.onNavigateToProductEdit ? (
+          <Button
+            label="إضافة منتج جديد"
+            tone="primary"
+            size="sm"
+            fullWidth={false}
+            onPress={() => props.onNavigateToProductEdit?.()}
+          />
+        ) : null}
+      </Box>
+
+      <InventoryCatalogContent canonicalStoreId={canonicalStoreId} {...props} />
     </MobileScrollView>
   );
 }

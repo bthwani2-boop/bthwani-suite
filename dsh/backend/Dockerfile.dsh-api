@@ -1,0 +1,22 @@
+# BTHWANI_DSH_API Dockerfile
+# Multi-stage build: compiles Go binary then runs on alpine.
+# Context: dsh/ (workspace root/dsh directory — contains domain/ and backend/).
+# PORT env var: defaults to 8080 inside container.
+# DATABASE_URL: optional; omit to run with in-memory repository (dev/smoke mode).
+# Note: /media-fixtures/ static serving is NOT available inside Docker — dev-only path.
+
+FROM golang:1.24-alpine AS builder
+WORKDIR /src
+COPY domain/ ./domain/
+COPY backend/go.mod backend/go.sum ./backend/
+WORKDIR /src/backend
+RUN go mod download
+COPY backend/ ./
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /out/dsh-api ./cmd/dsh-api/
+
+FROM alpine:3.20
+RUN apk add --no-cache wget ca-certificates
+WORKDIR /app
+COPY --from=builder /out/dsh-api ./dsh-api
+EXPOSE 8080
+ENTRYPOINT ["./dsh-api"]

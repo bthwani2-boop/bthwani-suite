@@ -6,7 +6,8 @@ export type DshFieldRoute =
   | 'profile'
   | 'history'
   | 'finance'
-  | 'readiness-escalation';
+  | 'readiness-escalation'
+  | 'document-upload';
 
 export type DshFieldRouteState =
   | { kind: 'stores' }
@@ -16,7 +17,8 @@ export type DshFieldRouteState =
   | { kind: 'profile' }
   | { kind: 'history' }
   | { kind: 'finance' }
-  | { kind: 'readiness-escalation'; storeId: string };
+  | { kind: 'readiness-escalation'; storeId: string }
+  | { kind: 'document-upload'; storeId: string };
 
 export type DshFieldCommandTarget = DshFieldRoute;
 

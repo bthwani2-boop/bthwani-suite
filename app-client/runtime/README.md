@@ -1,15 +1,13 @@
 # app-client Runtime
 
-Status: MIGRATION_SCAFFOLD
+Status: MIGRATION_COMPLETED
 
 Target root for app-client runtime boot, environment wiring, and platform entry.
 
-Current runtime remains under:
+Runtime lives under:
 
 ```text
-apps/mobile/app-client
+app-client/runtime
 ```
 
-Current known runtime commands remain owned by the existing app project until a later verified migration phase.
-
-Phase 3 app-client pilot does not move runtime files and does not change Nx or project configuration.
+All references to the historical `apps/mobile/app-client` have been retired.

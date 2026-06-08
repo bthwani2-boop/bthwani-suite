@@ -1,4 +1,5 @@
 packages:
+  # Active workspace packages — central install from monorepo root only (pnpm install from C:\bthwani-suite)
   - webapp/runtime
   - website/runtime
   - app-client/runtime
@@ -9,11 +10,13 @@ packages:
   - ui-kit
   - dsh
   - wlt
-  - knz
-  - arb
-  - amn
-  - esf
-  - mrf
-  - snd
-  - kwd
+  # Reserved service slots — activate by adding package.json when real implementation begins
+  # Do NOT uncomment without: (1) a real package.json, (2) a verifiable check script, (3) a SERVICE_BLUEPRINT.md
+  # - knz
+  # - arb
+  # - amn
+  # - esf
+  # - mrf
+  # - snd
+  # - kwd
 nodeLinker: hoisted

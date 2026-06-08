@@ -24,7 +24,7 @@ $packageMap = @{
 }
 
 $workspaceRoot = Split-Path -Path $PSScriptRoot -Parent | Split-Path -Parent
-$appRoot = Join-Path $workspaceRoot (Join-Path 'apps/mobile' $App)
+$appRoot = Join-Path $workspaceRoot (Join-Path $App 'runtime')
 $targetPort = $portMap[$App]
 $expectedPackage = $packageMap[$App]
 $requestedModeFlag = "--$Mode"

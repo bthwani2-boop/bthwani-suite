@@ -29,12 +29,12 @@ import {
   getWltDshPartnerCommissionLabel,
   getWltDshPartnerOperationalModeCommission,
   wltDshPartnerUiCopy,
-} from '../../../../wlt/frontend/app-partner/dsh/wlt-dsh-partner.ui-copy';
+} from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../data/canonical.preview-data';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
-import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/app-partner/dsh';
+import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/dsh/app-partner';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
@@ -1482,9 +1482,11 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     onOpenStoreCourierSetup,
     onToggleAvailability,
     canonicalStoreId,
+    dshAuthBearerToken,
+    dshClientId,
     // ML-T1: partner lifecycle stage for readiness status summary (read-only, summary-only per on-demand contract)
     partnerLifecycleStage = 'partner-review' as DshPartnerLifecycleStage,
-  } = props as DshPartnerHubSurfaceProps & { partnerLifecycleStage?: DshPartnerLifecycleStage };
+  } = props as DshPartnerHubSurfaceProps & { partnerLifecycleStage?: DshPartnerLifecycleStage; dshAuthBearerToken?: string | null; dshClientId?: string | null };
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
@@ -1636,6 +1638,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
           onOpenExpandedWallet={onOpenWalletHub}
           onOpenSettlementReview={onOpenWalletHub}
           onOpenFinancialReport={onOpenWalletHub}
+          dshAuthBearerToken={dshAuthBearerToken}
+          dshClientId={dshClientId}
         />
       );
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StateView } from '@bthwani/ui-kit';
-import { WltDshFieldBridge } from '../../../../wlt/frontend/app-field/dsh';
+import { WltDshFieldBridge } from '../../../../wlt/frontend/dsh/app-field';
 import { resolveFieldStoreStatus, type FieldStoreFile } from '../../data/stores.preview-data';
 
 type DshFieldFinanceScreenProps = {

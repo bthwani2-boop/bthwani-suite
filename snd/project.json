@@ -1,0 +1,6 @@
+{
+  "name": "snd",
+  "root": "snd",
+  "projectType": "library",
+  "targets": {}
+}

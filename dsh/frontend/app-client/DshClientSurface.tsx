@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { BottomNavBar, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
@@ -12,21 +12,23 @@ import {
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
-import { DshOrdersListScreen, DshTrackingScreen } from './screens/OrdersTrackingScreens';
+import { DshOrdersListScreen } from './screens/DshOrdersListScreen';
+import { DshTrackingScreen } from './screens/DshTrackingScreen';
 import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
-import {
-  type ClientOperationScreenId,
-  DshConversationHubScreen,
-  DshOrderIssueHubScreen,
-  DshProxyHubScreen,
-  DshServiceSettingsHubScreen,
-  DshZoneSetScreen,
-  DshListingStatusUpdateScreen,
-} from './screens/OperationScreens';
+import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
+import { useWltDshWalletPreview } from '../../../wlt/frontend/dsh/app-client';
+import type { ClientOperationScreenId } from './screens/parts/OperationScreenView';
+import { DshConversationHubScreen } from './screens/DshConversationHubScreen';
+import { DshOrderIssueHubScreen } from './screens/DshOrderIssueHubScreen';
+import { DshProxyHubScreen } from './screens/DshProxyHubScreen';
+import { DshServiceSettingsHubScreen } from './screens/DshServiceSettingsHubScreen';
+import { DshZoneSetScreen } from './screens/DshZoneSetScreen';
+import { DshListingStatusUpdateScreen } from './screens/DshListingStatusUpdateScreen';
 import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
-import { DshIdentityHubScreen, DshPreferencesHubScreen } from './screens/MySpaceSubScreens';
+import { DshIdentityHubScreen } from './screens/DshIdentityHubScreen';
+import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { dshHomeGetFixtureStores } from '../data/stores.preview-data';
 import {
   buildStoreCategories,
@@ -48,346 +50,96 @@ import {
 } from '../data/marketing.preview-data';
 import { getDshClientStateMeta, type DshClientState } from '../data/operational-statuses.preview-data';
 import { getPublishedHomePromos } from '../data/marketing.preview-data';
-import { dshCategoryFixtures, dshCategoryListFixtures } from '../data/categories.preview-data';
+import { dshCategoryListFixtures } from '../data/categories.preview-data';
 import {
   isDshFulfillmentDeliveryMode,
-  type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
 } from './contracts/dsh-client-binding.contracts';
 import { resolveDshDiscoveryStoresBridge, type DshDiscoveryStoresBridgeResult } from './shared/dsh-discovery-stores-bridge';
 import { resolveDshDiscoveryStoresRuntimeConfig } from './shared/dsh-discovery-stores-runtime-config';
 import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from './shared/dsh-discovery-stores-transport';
 import { resolveDshStoreClientVisibility } from '../shared/dsh-client-visibility.model';
-import { dshPartnerIntakeItems } from '../shared/workflow';
+import { createDshProductApiHttpClient } from '../shared/dsh-product-api.transport';
+import {
+  createDshOrderLifecycleHttpClient,
+  type DshOrderItemInput,
+  createDshCheckoutHttpClient,
+  type DshCheckoutAuthContext,
+  PlatformVarsProvider,
+  usePlatformVars,
+  FeatureFlagProvider,
+  useFeatureFlag,
+} from '../shared';
 import type { DshClientSurfaceProps, DshCommandTarget, DshRoute } from './dsh-client.types';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
-import { WltHomeGetScreen } from '../../../wlt/frontend/app-client';
+import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
 
-type CreateOrderValues = Pick<
-  DshClientCreateOrderRequest,
-  'fulfillmentMode' | 'pickupAddress' | 'dropoffAddress' | 'contactName' | 'contactPhone' | 'note'
->;
-
-type HostOrderSummary = {
-  id: string;
-  title: string;
-  subtitle: string;
-  statusLabel: string;
-  meta: string;
-  clientState: DshClientState;
-  fulfillmentMode: DshFulfillmentDeliveryMode;
-  pickupAddress: string;
-  dropoffAddress: string;
-  note?: string;
-  orderNumber?: string;
-  summary?: string;
-  total?: string;
-  location?: string;
-};
-
-type HostCartItem = {
-  id: string;
-  title: string;
-  priceLabel?: string;
-  qty: number;
-  storeId: string;
-  storeName: string;
-  canonicalStoreId?: string;
-  canonicalProductId?: string;
-  sourceRecordId?: string;
-  publishStage?: string;
-};
-
-type HostCanonicalMetadata = {
-  canonicalStoreId?: string;
-  canonicalProductId?: string;
-  sourceRecordId?: string;
-  publishStage?: string;
-};
-
-type HostCartInputItem = {
-  id: string;
-  name?: string;
-  title?: string;
-  priceLabel?: string;
-  canonicalStoreId?: string;
-  canonicalProductId?: string;
-  sourceRecordId?: string;
-  publishStage?: string;
-};
-
-const publishedCategoryIds = new Set(
-  dshPartnerIntakeItems
-    .filter((item) => item.stage === 'published')
-    .map((item) => dshCategoryFixtures.find((category) => category.label === item.categoryLabel)?.id)
-    .filter((categoryId): categoryId is string => Boolean(categoryId)),
-);
-
-const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publishedCategoryIds.has(category.id));
-const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
-const clientVisibleDiscoveryPreviewStores = dshDiscoveryStores.filter((store) => (
-  resolveDshStoreClientVisibility({
-    publishStage: store.publishStage,
-    supportsPickup: store.supportsPickup,
-    supportsPartnerDelivery: store.supportsPartnerDelivery,
-    serviceLabel: store.serviceLabel,
-    deliveryLabel: store.deliveryLabel,
-    storeOpen: !store.statusLabel.includes('مغلق'),
-  }).visible
-));
-const clientVisibleHomePreviewStores = dshHomeGetFixtureStores.filter((store) => (
-  resolveDshStoreClientVisibility({
-    publishStage: store.publishStage,
-    supportsPickup: store.supportsPickup,
-    supportsPartnerDelivery: store.supportsPartnerDelivery,
-    serviceLabel: store.serviceLabel,
-    deliveryLabel: store.deliveryLabel,
-    storeOpen: store.statusTone === 'open',
-  }).visible
-));
-
-const CLIENT_BOTTOM_NAV_ITEMS = [
-  { id: 'favorites', label: 'المفضلة', icon: 'heart-outline', activeIcon: 'heart' },
-  { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
-  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
-  { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
-];
-
-type DshWebWindow = {
-  history: {
-    state: unknown;
-    pushState: (data: unknown, unused: string, url?: string | null) => void;
-    replaceState: (data: unknown, unused: string, url?: string | null) => void;
-  };
-  addEventListener: (type: 'popstate', listener: () => void) => void;
-  removeEventListener: (type: 'popstate', listener: () => void) => void;
-};
-
-function getDshWebWindow(): DshWebWindow | undefined {
-  if (Platform.OS !== 'web') {
-    return undefined;
-  }
-
-  return (globalThis as typeof globalThis & { window?: DshWebWindow }).window;
-}
-
-// clientVisibleDiscoveryPreviewStores and clientVisibleHomePreviewStores are kept at
-// module level as static preview data seeds. Bridge resolution, derived store lists, and
-// route-validation helpers are moved inside the component so they close over the runtime
-// bridge state and react correctly when the transport delivers a real response.
-
-function resolveStorePickupAddress(store: { subtitle?: string; name?: string }) {
-  const subtitle = store.subtitle?.trim();
-  if (subtitle) {
-    return subtitle;
-  }
-
-  const name = store.name?.trim();
-  if (name) {
-    return name;
-  }
-
-  return 'موقع المتجر غير محدد';
-}
-
-const initialCreateOrderValues: CreateOrderValues = {
-  fulfillmentMode: 'bthwani_delivery',
-  pickupAddress: 'رياض بارك، البوابة 2',
-  dropoffAddress: 'العليا، طريق الملك فهد',
-  contactName: 'أحمد',
-  contactPhone: '770000000',
-  note: 'لا توجد ملاحظات',
-};
-
-const hostClientStates = {
-  quote: 'quote',
-  serviceability: 'serviceability',
-  areaUnserviceable: 'area_unserviceable',
-  cartEmpty: 'cart_empty',
-  cartReady: 'cart_ready',
-  checkoutReady: 'checkout_ready',
-  paymentPending: 'payment_pending',
-  paymentFailed: 'payment_failed',
-  itemUnavailable: 'item_unavailable',
-  orderCreated: 'order_created',
-  orderConfirmed: 'order_confirmed',
-  trackingActive: 'tracking_active',
-  delivered: 'delivered',
-  cancelled: 'cancelled',
-  failed: 'failed',
-  refundPending: 'refund_pending',
-  refunded: 'refunded',
-  supportRequired: 'support_required',
-  walletCreditVisible: 'wallet_credit_visible',
-  walletRefundVisible: 'wallet_refund_visible',
-} as const;
-
-const initialOrders: HostOrderSummary[] = [
-  {
-    id: 'dsh-10021',
-    title: 'مطعم حدة المركزي',
-    orderNumber: '10021',
-    subtitle: 'من حدة إلى باب اليمن',
-    statusLabel: getDshClientStateMeta(hostClientStates.trackingActive).label,
-    meta: 'الوصول المتوقع خلال 18 دقيقة',
-    clientState: hostClientStates.trackingActive,
-    fulfillmentMode: 'bthwani_delivery',
-    pickupAddress: 'مطعم حدة المركزي',
-    dropoffAddress: 'حدة، شارع الستين',
-    note: 'اتصل قبل الوصول.',
-    summary: 'برجر دجاج + بطاطس',
-    total: '34.50 ر.ي',
-    location: 'المنزل',
-  },
-  {
-    id: 'dsh-10019',
-    title: 'مخبز السبعين',
-    orderNumber: '10019',
-    subtitle: 'من السبعين إلى التحرير',
-    statusLabel: getDshClientStateMeta(hostClientStates.delivered).label,
-    meta: 'اليوم 03:10 م',
-    clientState: hostClientStates.delivered,
-    fulfillmentMode: 'partner_delivery',
-    pickupAddress: 'مخبز السبعين',
-    dropoffAddress: 'التحرير، شارع الزبيري',
-    summary: '٣ منتجات طازجة',
-    total: '22.00 ر.ي',
-    location: 'العمل',
-  },
-  {
-    id: 'dsh-10017',
-    title: 'متجر شميلة',
-    orderNumber: '10017',
-    subtitle: 'من شميلة إلى التحرير',
-    statusLabel: getDshClientStateMeta(hostClientStates.cancelled).label,
-    meta: 'تم الإلغاء مع توضيح سبب الحالة',
-    clientState: hostClientStates.cancelled,
-    fulfillmentMode: 'pickup',
-    pickupAddress: 'متجر شميلة',
-    dropoffAddress: '',
-    summary: 'شاورما دبل + عصير طازج',
-    total: '15.00 ر.ي',
-    location: 'فرع التحرير',
-  },
-  {
-    id: 'dsh-10016',
-    title: 'مطبخ مذبح السريع',
-    orderNumber: '10016',
-    subtitle: 'من مذبح إلى باب السلام',
-    statusLabel: getDshClientStateMeta(hostClientStates.failed).label,
-    meta: 'توجد حاجة إلى مسار تعافٍ أو دعم واضح',
-    clientState: hostClientStates.failed,
-    fulfillmentMode: 'bthwani_delivery',
-    pickupAddress: 'مطبخ مذبح السريع',
-    dropoffAddress: 'باب السلام، شارع 14',
-    summary: 'وجبة غداء عائلية',
-    total: '45.00 ر.ي',
-    location: 'المنزل',
-  },
-  {
-    id: 'dsh-10015',
-    title: 'كافيه السنينة',
-    orderNumber: '10015',
-    subtitle: 'من السنينة إلى سعوان',
-    statusLabel: getDshClientStateMeta(hostClientStates.refundPending).label,
-    meta: 'الاسترداد ما يزال قيد المعالجة',
-    clientState: hostClientStates.refundPending,
-    fulfillmentMode: 'partner_delivery',
-    pickupAddress: 'كافيه السنينة',
-    dropoffAddress: 'سعوان، الشارع العام',
-    summary: '١ قهوة تركية + دونات زعتر',
-    total: '28.00 ر.ي',
-    location: 'العمل',
-  },
-  {
-    id: 'dsh-10014',
-    title: 'متجر التحرير',
-    orderNumber: '10014',
-    subtitle: 'من التحرير إلى الجامعة',
-    statusLabel: getDshClientStateMeta(hostClientStates.refunded).label,
-    meta: 'تم تثبيت الأثر المالي النهائي للطلب',
-    clientState: hostClientStates.refunded,
-    fulfillmentMode: 'pickup',
-    pickupAddress: 'متجر التحرير',
-    dropoffAddress: '',
-    summary: 'عصير برتقال عائلي',
-    total: '12.00 ر.ي',
-    location: 'فرع التحرير',
-  },
-  {
-    id: 'dsh-10013',
-    title: 'فرع الحصبة',
-    orderNumber: '10013',
-    subtitle: 'من الحصبة إلى بيت بوس',
-    statusLabel: getDshClientStateMeta(hostClientStates.supportRequired).label,
-    meta: 'هذه الحالة تحتاج متابعة دعم واضحة',
-    clientState: hostClientStates.supportRequired,
-    fulfillmentMode: 'partner_delivery',
-    pickupAddress: 'فرع الحصبة',
-    dropoffAddress: 'بيت بوس، شارع الخمسين',
-    summary: 'معجنات مشكلة صفيحة',
-    total: '32.00 ر.ي',
-    location: 'العمل',
-  },
-  {
-    id: 'dsh-10012',
-    title: 'فرع فج عطان',
-    orderNumber: '10012',
-    subtitle: 'من فج عطان إلى السبعين',
-    statusLabel: getDshClientStateMeta(hostClientStates.walletCreditVisible).label,
-    meta: 'يوجد رصيد ظاهر للعميل داخل المحفظة',
-    clientState: hostClientStates.walletCreditVisible,
-    fulfillmentMode: 'bthwani_delivery',
-    pickupAddress: 'فرع فج عطان',
-    dropoffAddress: 'السبعين، شارع الجزائر',
-    summary: 'بيتزا سوبر سوبريم وسط',
-    total: '38.00 ر.ي',
-    location: 'المنزل',
-  },
-  {
-    id: 'dsh-10011',
-    title: 'متجر باب اليمن',
-    orderNumber: '10011',
-    subtitle: 'من باب اليمن إلى حدة',
-    statusLabel: getDshClientStateMeta(hostClientStates.walletRefundVisible).label,
-    meta: 'تظهر معلومة الاسترداد المالي ضمن المسار',
-    clientState: hostClientStates.walletRefundVisible,
-    fulfillmentMode: 'pickup',
-    pickupAddress: 'متجر باب اليمن',
-    dropoffAddress: '',
-    summary: 'كيكة الشوكولاتة الفاخرة',
-    total: '55.00 ر.ي',
-    location: 'فرع التحرير',
-  },
-];
+import {
+  type CreateOrderValues,
+  type HostOrderSummary,
+  type HostCartItem,
+  type HostCanonicalMetadata,
+  hostClientStates,
+  clientVisibleDiscoveryPreviewStores,
+  clientVisibleHomePreviewStores,
+  initialOrders,
+  initialCreateOrderValues,
+  commandTargetToRoute,
+  resolveStorePickupAddress,
+  publishedPromoCategoryIds,
+} from './dsh-client.navigation-bridge';
+import {
+  getClientWltIntentForState,
+  type DshClientWltIntentEntry,
+} from './dsh-client-wlt-payment-bridge';
+import { useDshNavigation, useDshOrderTracking, useDshCheckout } from './hooks';
 
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
-function commandTargetToRoute(target: DshCommandTarget): DshRoute {
-  switch (target) {
-    case 'home':
-      return 'home';
-    case 'cart-get':
-      return 'cart-get';
-    case 'orders-list':
-      return 'orders-list';
-    case 'tracking':
-      return 'tracking';
-    case 'bell':
-      return 'bell';
-    case 'create-order':
-      return 'cart-get';
-    default:
-      return 'home';
-  }
+function parsePrice(priceLabel?: string): number {
+  if (!priceLabel) return 10.0;
+  const match = priceLabel.match(/\d+(\.\d+)?/);
+  return match ? parseFloat(match[0]) : 10.0;
 }
 
-export function DshClientSurface({ command, onExit, onOpenService, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
+function resolveCheckoutAuthContext(
+  authToken?: string,
+  devClientId?: string,
+  dshAuthBearerToken?: string | null,
+  dshClientId?: string | null,
+): DshCheckoutAuthContext {
+  const bearerToken = (authToken ?? dshAuthBearerToken ?? undefined)?.trim();
+  if (bearerToken) return { bearerToken };
+
+  const clientId = (devClientId ?? dshClientId ?? 'client-101').trim();
+  return { clientId };
+}
+
+const CLIENT_BOTTOM_NAV_ITEMS = [
+  { id: 'favorites', label: 'الرئيسية', icon: 'home-outline', activeIcon: 'home' },
+  { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', activeIcon: 'receipt' },
+  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', activeIcon: 'wallet' },
+  { id: 'profile', label: 'حسابي', icon: 'person-outline', activeIcon: 'person' },
+] as const;
+
+export function DshClientSurface(props: DshClientSurfaceProps) {
+  return (
+    <PlatformVarsProvider>
+      <FeatureFlagProvider>
+        <DshClientSurfaceInner {...props} />
+      </FeatureFlagProvider>
+    </PlatformVarsProvider>
+  );
+}
+
+function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devClientId, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
+  const { dshAuthBearerToken, dshClientId } = usePlatformVars();
+  const isAwnakEnabled = useFeatureFlag('DSH:capability:awnak');
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
 
-  // ── Runtime bridge state ────────────────────────────────────────────────────
+  // â”€â”€ Runtime bridge state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Initialise with preview fallback so the first render is always populated.
-  // The transport useEffect below switches to loading → success/error/offline
+  // The transport useEffect below switches to loading â†’ success/error/offline
   // when a runtime config (EXPO_PUBLIC_DSH_API_BASE_URL) is present.
   const [runtimeBridge, setRuntimeBridge] = React.useState<DshDiscoveryStoresBridgeResult>(() =>
     resolveDshDiscoveryStoresBridge({
@@ -396,13 +148,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     }),
   );
 
+  const [homeRetryToken, setHomeRetryToken] = React.useState(0);
+
   // Aliases that match the previous module-level names so all downstream code
   // reads from the live bridge state instead of static preview constants.
   const clientDiscoveryStoresBridge = runtimeBridge;
   const clientVisibleDiscoveryStores = runtimeBridge.discoveryStores;
   const clientVisibleHomeStores = runtimeBridge.homeStores;
 
-  // ── Route-validation helpers (closed over the live store list) ──────────────
+  // â”€â”€ Route-validation helpers (closed over the live store list) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const hasStoreTarget = React.useCallback((storeId?: string): boolean => {
     return typeof storeId === 'string' && clientVisibleDiscoveryStores.some((store) => store.id === storeId);
   }, [clientVisibleDiscoveryStores]);
@@ -475,161 +229,79 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   }, [getStoreCanonicalMetadata]);
 
   const initialCanonicalStore = getStoreCanonicalMetadata('store-1001');
+  const checkoutAuth = React.useMemo(
+    () => resolveCheckoutAuthContext(authToken, devClientId, dshAuthBearerToken, dshClientId),
+    [authToken, devClientId, dshAuthBearerToken, dshClientId],
+  );
+  const walletPreview = useWltDshWalletPreview(checkoutAuth.clientId, checkoutAuth.bearerToken);
+
+  // Navigation: route, back-stack, Android BackHandler, web popstate
+  const {
+    route, setRoute,
+    sheinInlineOpen, setSheinInlineOpen,
+    awnakInlineOpen, setAwnakInlineOpen,
+    homeSearchAutoOpenToken, openHomeInlineSearch,
+    handleRegisterBackHandler,
+  } = useDshNavigation({ command, onExit });
+
+  // Shared order/cart/store state (not owned by any hook)
   const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
-  const [route, setRoute] = React.useState<DshRoute>('home');
-  const [sheinInlineOpen, setSheinInlineOpen] = React.useState(false);
-  const [awnakInlineOpen, setAwnakInlineOpen] = React.useState(false);
+  const [selectedFulfillmentMode, setSelectedFulfillmentMode] = React.useState<DshFulfillmentDeliveryMode>(defaultFulfillmentMode);
   const [cartItems, setCartItems] = React.useState<HostCartItem[]>([]);
   const [createOrderValues, setCreateOrderValues] = React.useState<CreateOrderValues>(initialCreateOrderValues);
-  const [trackingOrderOverride, setTrackingOrderOverride] = React.useState<Partial<CreateOrderValues> | null>(null);
-  const [selectedFulfillmentMode, setSelectedFulfillmentMode] = React.useState<DshFulfillmentDeliveryMode>(defaultFulfillmentMode);
-  const [trackingClientState, setTrackingClientState] = React.useState<DshClientState>(hostClientStates.trackingActive);
-  const [ordersQuery, setOrdersQuery] = React.useState('');
+  const [serviceabilityLoading, setServiceabilityLoading] = React.useState(false);
   const [itemsQuery, setItemsQuery] = React.useState('');
   const [itemsCategory, setItemsCategory] = React.useState('all');
-  const [homeSearchAutoOpenToken, setHomeSearchAutoOpenToken] = React.useState(0);
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
+  const [activeStoreDetail, setActiveStoreDetail] = React.useState<any | null>(null);
+  const [storeDetailState, setStoreDetailState] = React.useState<'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'not-found'>('loading');
+  const [activeStoreItemsState, setActiveStoreItemsState] = React.useState<any[]>([]);
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>(initialCanonicalStore.canonicalStoreId);
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [, setSelectedItemId] = React.useState<string>('');
-  const [selectedOrderId, setSelectedOrderId] = React.useState<string>(defaultTrackingOrderId);
   const [favoriteOverrides, setFavoriteOverrides] = React.useState<Record<string, boolean>>({});
   const [reorderAlertMessage, setReorderAlertMessage] = React.useState<string | undefined>(undefined);
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('entitlements-get');
   const [serviceDialTrigger, setServiceDialTrigger] = React.useState(0);
-  const routeHistoryRef = React.useRef<DshRoute[]>(['home']);
-  const routeTransitionFromBackRef = React.useRef(false);
-  const homeBackResolverRef = React.useRef<(() => boolean) | null>(null);
-  const handleRegisterBackHandler = React.useCallback((handler: (() => boolean) | null) => {
-    homeBackResolverRef.current = handler;
-  }, []);
-  const openHomeInlineSearch = React.useCallback(() => {
-    setRoute('home');
-    setHomeSearchAutoOpenToken((token) => token + 1);
-  }, []);
 
+  // Active store — computed early so tracking + checkout hooks can receive it
+  const activeStore = React.useMemo(
+    () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
+    [activeStoreId, clientVisibleDiscoveryStores],
+  );
+
+  // Order tracking: selectedOrderId, ordersListState, live polling, timeline, callbacks
+  const {
+    selectedOrderId, setSelectedOrderId,
+    ordersListState, setOrdersListState,
+    liveOrderDetails,
+    trackingClientState, setTrackingClientState,
+    trackingOrderOverride, setTrackingOrderOverride,
+    ordersQuery, setOrdersQuery,
+    filteredOrders, activeTrackedOrder,
+    trackingOrderValues, trackingTimeline, trackingWltIntent,
+    openTrackedOrder, reopenTracking, returnOrdersList,
+    handleCancelOrder, handleSupportEscalation,
+  } = useDshOrderTracking({
+    route, checkoutAuth, createOrderValues, selectedFulfillmentMode,
+    defaultFulfillmentMode, setRoute, setSelectedFulfillmentMode, setCreateOrderValues,
+  });
+
+  // When a command drives to tracking, reset to the default order
   React.useEffect(() => {
-    const nextRoute = commandTargetToRoute(command.target);
-
-    if (nextRoute === 'tracking') {
+    if (commandTargetToRoute(command.target) === 'tracking') {
       setSelectedOrderId(defaultTrackingOrderId);
       setTrackingClientState(hostClientStates.trackingActive);
     }
+  }, [command, setSelectedOrderId, setTrackingClientState]);
 
-    setRoute(nextRoute);
-  }, [command]);
 
-  React.useEffect(() => {
-    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
-
-    if (route !== previousRoute) {
-      if (routeTransitionFromBackRef.current) {
-        routeTransitionFromBackRef.current = false;
-      } else {
-        if (route === 'home') {
-          routeHistoryRef.current = ['home'];
-        } else {
-          // Prevent navigation loops by trimming history if route already exists in stack
-          const routeIndex = routeHistoryRef.current.indexOf(route);
-          if (routeIndex !== -1) {
-            routeHistoryRef.current = routeHistoryRef.current.slice(0, routeIndex + 1);
-          } else {
-            routeHistoryRef.current.push(route);
-          }
-        }
-        const webWindow = getDshWebWindow();
-        if (webWindow) {
-          webWindow.history.pushState({ route }, '');
-        }
-      }
-    }
-  }, [route]);
-
-  React.useEffect(() => {
-    if (Platform.OS !== 'android') {
-      return undefined;
-    }
-
-    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Priority 1: dismiss transient modal overlays inside HomeScreen (categories, shorts, search, service dial).
-      if (homeBackResolverRef.current?.()) return true;
-
-      // Priority 2: close inline order forms (shein/awnak proxy).
-      if (sheinInlineOpen) { setSheinInlineOpen(false); return true; }
-      if (awnakInlineOpen) { setAwnakInlineOpen(false); return true; }
-
-      // Priority 3: navigate back through route history.
-      if (routeHistoryRef.current.length > 1) {
-        routeTransitionFromBackRef.current = true;
-        routeHistoryRef.current.pop();
-        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
-        setRoute(previousRoute);
-        return true;
-      }
-
-      // Priority 4: at root with no open panels — delegate to host exit handler.
-      if (onExit) { onExit(); return true; }
-
-      return false;
-    });
-
-    return () => subscription.remove();
-  }, [onExit, sheinInlineOpen, awnakInlineOpen]);
-
-  React.useEffect(() => {
-    const webWindow = getDshWebWindow();
-    if (!webWindow) {
-      return undefined;
-    }
-
-    const handlePopState = () => {
-      // Priority 1: dismiss transient modal overlays inside HomeScreen.
-      if (homeBackResolverRef.current?.()) {
-        webWindow.history.pushState({ route }, '');
-        return;
-      }
-
-      // Priority 2: close inline order forms.
-      if (sheinInlineOpen) {
-        setSheinInlineOpen(false);
-        webWindow.history.pushState({ route }, '');
-        return;
-      }
-      if (awnakInlineOpen) {
-        setAwnakInlineOpen(false);
-        webWindow.history.pushState({ route }, '');
-        return;
-      }
-
-      // Priority 3: navigate back through route history.
-      if (routeHistoryRef.current.length > 1) {
-        routeTransitionFromBackRef.current = true;
-        routeHistoryRef.current.pop();
-        const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
-        setRoute(previousRoute);
-      } else if (onExit) {
-        onExit();
-      }
-    };
-
-    webWindow.addEventListener('popstate', handlePopState);
-
-    // Initialize/sync history state if empty
-    if (!webWindow.history.state || (webWindow.history.state as { route?: DshRoute }).route !== route) {
-      webWindow.history.replaceState({ route }, '');
-    }
-
-    return () => {
-      webWindow.removeEventListener('popstate', handlePopState);
-    };
-  }, [route, onExit, sheinInlineOpen, awnakInlineOpen]);
-
-  // ── Runtime transport effect ────────────────────────────────────────────────
+  // â”€â”€ Runtime transport effect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Runs once on mount. When EXPO_PUBLIC_DSH_API_BASE_URL is set:
   //   1. Immediately signals loading state (bridge.state = 'loading').
   //   2. Calls GET /stores via the typed client + HTTP transport.
-  //   3. On success: passes the real API response into the bridge → 'ready'/'empty'.
+  //   3. On success: passes the real API response into the bridge â†’ 'ready'/'empty'.
   //   4. On network failure: bridge.state = 'offline'.
   //   5. On HTTP/parse error: bridge.state = 'error'.
   // When no config is set the bridge stays on 'preview-fallback' (initial state).
@@ -637,7 +309,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     const config = resolveDshDiscoveryStoresRuntimeConfig();
 
     if (!config) {
-      // No API base URL configured — stay on the preview fallback path.
+      // No API base URL configured â€” stay on the preview fallback path.
       return undefined;
     }
 
@@ -678,57 +350,9 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return () => {
       cancelled = true;
     };
-  }, []); // Run once on mount; preview seeds are module-level constants.
+  }, [homeRetryToken]);
 
-  const filteredOrders = React.useMemo(() => {
-    const query = ordersQuery.trim().toLowerCase();
-    if (!query) {
-      return initialOrders;
-    }
 
-    return initialOrders.filter((order) => {
-      const haystack = `${order.title} ${order.orderNumber || ''} ${order.summary || ''} ${order.subtitle} ${order.statusLabel} ${order.meta}`.toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [ordersQuery]);
-
-  const activeTrackedOrder = React.useMemo(
-    () => initialOrders.find((order) => order.id === selectedOrderId) ?? initialOrders[0],
-    [selectedOrderId],
-  );
-
-  const trackingOrderValues = React.useMemo<CreateOrderValues>(() => ({
-    fulfillmentMode: trackingOrderOverride?.fulfillmentMode ?? activeTrackedOrder?.fulfillmentMode ?? createOrderValues.fulfillmentMode ?? selectedFulfillmentMode,
-    pickupAddress: trackingOrderOverride?.pickupAddress ?? activeTrackedOrder?.pickupAddress ?? createOrderValues.pickupAddress,
-    dropoffAddress: trackingOrderOverride?.dropoffAddress ?? activeTrackedOrder?.dropoffAddress ?? createOrderValues.dropoffAddress,
-    contactName: createOrderValues.contactName,
-    contactPhone: createOrderValues.contactPhone,
-    note: trackingOrderOverride?.note ?? activeTrackedOrder?.note ?? createOrderValues.note,
-  }), [activeTrackedOrder, createOrderValues, selectedFulfillmentMode, trackingOrderOverride]);
-
-  const trackingTimeline = React.useMemo(() => {
-    const mode = trackingOrderValues.fulfillmentMode;
-    if (mode === 'partner_delivery') {
-      return [
-        { id: 'track-store-prep', title: 'يجهّز المتجر الطلب', detail: 'المتجر يجهّز طلبك ويسلّمه لموصله.', done: true },
-        { id: 'track-store-courier', title: 'موصل المتجر في الطريق', detail: 'موصل المتجر يتجه إليك — هذا ليس كابتن بثواني.', done: false },
-        { id: 'track-delivered-partner', title: 'تم التوصيل', detail: 'استلمت طلبك من موصل المتجر.', done: false },
-      ];
-    }
-    if (mode === 'pickup') {
-      return [
-        { id: 'track-pickup-prep', title: 'يجهّز المتجر الطلب', detail: 'طلبك قيد التجهيز في المتجر.', done: true },
-        { id: 'track-pickup-ready', title: 'الطلب جاهز للاستلام', detail: 'توجّه للمتجر لاستلام طلبك.', done: false },
-        { id: 'track-pickup-done', title: 'استلمت طلبك', detail: 'تم تأكيد استلامك للطلب من المتجر.', done: false },
-      ];
-    }
-    // bthwani_delivery
-    return [
-      { id: 'track-captain-route', title: 'الكابتن في الطريق', detail: 'كابتن بثواني متجه إليك الآن.', done: true },
-      { id: 'track-captain-arrived', title: 'وصل الكابتن', detail: 'الكابتن وصل وينتظر تسليم الطلب.', done: false },
-      { id: 'track-client-received', title: 'استلمت طلبك', detail: 'بعد الاستلام تظهر تقييمات المنتج والكابتن.', done: false },
-    ];
-  }, [trackingOrderValues.fulfillmentMode]);
 
   const openCreateOrderJourney = React.useCallback(() => {
     setReorderAlertMessage(undefined);
@@ -749,7 +373,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
     // 3. Find matches by summary keywords
     const summaryText = order.summary || '';
-    const keywords = summaryText.split(/[\s+\u2014\u2022•,]+/);
+    const keywords = summaryText.split(/[\s+\u2014\u2022â€¢,]+/);
     let matchedProducts = storeProducts.filter((p) =>
       keywords.some((kw) => kw.length > 1 && (p.name.includes(kw) || (p.subtitle && p.subtitle.includes(kw))))
     );
@@ -790,102 +414,249 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     setRoute('cart-get');
   }, [clientVisibleDiscoveryStores]);
 
-  const openTrackedOrder = React.useCallback((
-    orderId?: string,
-    launchOverrides?: {
-      fulfillmentMode?: DshFulfillmentDeliveryMode;
-      orderDraft?: Partial<CreateOrderValues>;
-    },
-  ) => {
-    const nextOrder = initialOrders.find((order) => order.id === orderId) ?? initialOrders[0];
-    const nextFulfillmentMode = orderId
-      ? nextOrder.fulfillmentMode
-      : launchOverrides?.fulfillmentMode ?? selectedFulfillmentMode ?? nextOrder.fulfillmentMode ?? defaultFulfillmentMode;
-    const nextOrderDraft = orderId
-      ? {
-          fulfillmentMode: nextOrder.fulfillmentMode,
-          pickupAddress: nextOrder.pickupAddress,
-          dropoffAddress: nextOrder.dropoffAddress,
-          note: nextOrder.note ?? createOrderValues.note,
-        }
-      : launchOverrides?.orderDraft;
-
-    setSelectedOrderId(nextOrder.id);
-    setTrackingClientState(hostClientStates.trackingActive);
-    setSelectedFulfillmentMode(nextFulfillmentMode);
-    setTrackingOrderOverride(orderId ? null : nextOrderDraft ?? null);
-    setCreateOrderValues((currentValues) => ({
-      ...currentValues,
-      ...nextOrderDraft,
-      fulfillmentMode: nextFulfillmentMode,
-    }));
-    setRoute('tracking');
-  }, [createOrderValues.note, defaultFulfillmentMode, selectedFulfillmentMode]);
-
-  const openSupportFlow = React.useCallback(() => {
-    setSelectedOperationScreen('order-issue-flag');
-    setRoute('order-issue-workspace');
-  }, []);
-
-  const returnHome = React.useCallback(() => {
-    setRoute('home');
-  }, []);
-
-  const returnOrdersList = React.useCallback(() => {
-    setRoute('orders-list');
-  }, []);
 
   const handleConfirmedOrderExecution = React.useCallback((payload?: {
     fulfillmentMode?: DshFulfillmentDeliveryMode;
     orderDraft?: Partial<CreateOrderValues>;
+    wltPaymentRefId?: string;
   }) => {
-    openTrackedOrder(undefined, {
-      fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
-      orderDraft: payload?.orderDraft,
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (config && cartItems.length > 0) {
+      const totalPrice = cartItems.reduce(
+        (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+        0
+      );
+
+      const items: DshOrderItemInput[] = cartItems.map((item) => ({
+        product_id: item.id,
+        quantity: item.qty,
+        price: parsePrice(item.priceLabel),
+      }));
+
+      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
+      orderClient.createOrder({
+        store_id: activeStore.id,
+        client_id: checkoutAuth.clientId ?? 'client-101',
+        total_price: totalPrice,
+        wlt_payment_ref_id: payload?.wltPaymentRefId,
+        items,
+      }).then((resp) => {
+        const liveOrder = resp.order;
+        const nextOrderSummary: HostOrderSummary = {
+          id: liveOrder.id,
+          title: activeStore.name,
+          subtitle: activeStore.subtitle || activeStore.name,
+          statusLabel: 'مباشر',
+          meta: `التوصيل Â· ${totalPrice} ر.ي`,
+          clientState: hostClientStates.trackingActive,
+          fulfillmentMode: (payload?.fulfillmentMode ?? selectedFulfillmentMode) as DshFulfillmentDeliveryMode,
+          pickupAddress: activeStore.name,
+          dropoffAddress: payload?.orderDraft?.dropoffAddress || '',
+          note: payload?.orderDraft?.note || 'تم الإنشاء برمجياً',
+          orderNumber: liveOrder.id.replace('ord-', '').slice(0, 8),
+          summary: cartItems.map(item => `${item.qty}x ${item.title}`).join(' ، '),
+          total: `${totalPrice} ر.ي`,
+        };
+
+        setOrdersListState((current) => [nextOrderSummary, ...current]);
+        setSelectedOrderId(liveOrder.id);
+        setTrackingClientState(hostClientStates.trackingActive);
+        setTrackingOrderOverride(null);
+        setCreateOrderValues((current) => ({
+          ...current,
+          fulfillmentMode: nextOrderSummary.fulfillmentMode,
+          dropoffAddress: nextOrderSummary.dropoffAddress,
+          note: nextOrderSummary.note,
+        }));
+        setSelectedFulfillmentMode(nextOrderSummary.fulfillmentMode);
+        setCartItems([]);
+        setRoute('tracking');
+      }).catch((err) => {
+        console.error("Failed to place live order:", err);
+        openTrackedOrder(undefined, {
+          fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
+          orderDraft: payload?.orderDraft,
+        });
+      });
+    } else {
+      openTrackedOrder(undefined, {
+        fulfillmentMode: payload?.fulfillmentMode ?? payload?.orderDraft?.fulfillmentMode ?? selectedFulfillmentMode,
+        orderDraft: payload?.orderDraft,
+      });
+    }
+  }, [checkoutAuth, openTrackedOrder, selectedFulfillmentMode, cartItems, activeStore,
+    setOrdersListState, setSelectedOrderId, setTrackingClientState, setTrackingOrderOverride,
+    setCreateOrderValues, setSelectedFulfillmentMode, setCartItems, setRoute]);
+
+  // Payment state, wallet intent, checkout confirmation
+  const {
+    selectedPaymentMethod, setSelectedPaymentMethod,
+    checkoutState, setCheckoutState,
+    paymentErrorMessage,
+    checkoutIntentId, setCheckoutIntentId,
+    checkoutClientMemo,
+    handleConfirmCheckout,
+  } = useDshCheckout({
+    cartItems, activeStore, selectedFulfillmentMode, checkoutAuth, walletPreview,
+    createOrderValues, onOrderExecute: handleConfirmedOrderExecution,
+  });
+
+  const fetchStoreDetail = React.useCallback((storeId: string, store: typeof dshDiscoveryStores[number]) => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (!config) {
+      setActiveStoreDetail({
+        id: store.id,
+        name: store.name,
+        address: store.subtitle,
+        category_id: undefined,
+        image_url: store.imageUri,
+        logo_image_url: store.logoImageUri,
+        rating: store.rating,
+        distance_label: store.distanceKm ? `${store.distanceKm} كم` : '0 كم',
+        delivery_label: store.deliveryLabel,
+        service_label: store.serviceLabel,
+        status_label: store.statusLabel,
+        status_tone: store.statusLabel?.includes('مغلق') ? 'closed' : 'open',
+        has_offer: store.isOffer,
+        offer_label: store.offerLabel,
+        publish_stage: store.publishStage || 'published-preview',
+        contact_number: store.id === 'store-1001' ? '+967-1-444333' : store.id === 'store-1002' ? '+967-1-555666' : store.id === 'store-1003' ? '+967-1-777888' : '+967-1-999000',
+        opening_hours: store.id === 'store-1001' ? '08:00 - 23:00' : store.id === 'store-1002' ? '06:00 - 22:00' : store.id === 'store-1003' ? '09:00 - 21:00' : '16:00 - 02:00',
+        catalog_summary: store.id === 'store-1001' ? 'Over 1,200 fresh groceries and daily essentials' : store.id === 'store-1002' ? 'Fresh bread, cakes, and pastries baked daily' : store.id === 'store-1003' ? 'Convenient local grocery staples and snacks' : 'Late-night snacks, soft drinks, and convenience items',
+        partner_readiness_status: 'ready',
+        catalog_quality_status: 'approved',
+        catalog_pricing_status: 'approved',
+        marketing_visibility_status: 'active',
+      });
+      setActiveStoreItemsState([]);
+      setStoreDetailState('ready');
+      return () => {};
+    }
+
+    setStoreDetailState('loading');
+    let cancelled = false;
+
+    const client = createDshDiscoveryStoresClient(config);
+    const prodClient = createDshProductApiHttpClient(config.baseUrl);
+
+    Promise.all([
+      client.getDiscoveryStore(storeId),
+      prodClient.listProducts(storeId, { limit: 100 })
+    ]).then(([storeResp, productsResp]) => {
+      if (cancelled) return;
+      setActiveStoreDetail(storeResp);
+
+      const mappedItems = (productsResp.products || []).map((p: any) => {
+        const isAvailable = p.available_override !== false;
+        let clientVisibilityStatus: 'visible' | 'unavailable' | 'hidden' | 'removed' = 'hidden';
+        if (p.approval_status === 'catalog_adopted' || p.approval_status === 'client_visible') {
+          clientVisibilityStatus = isAvailable ? 'visible' : 'unavailable';
+        } else if (p.approval_status === 'rejected') {
+          clientVisibilityStatus = 'removed';
+        } else {
+          clientVisibilityStatus = 'hidden';
+        }
+        return {
+          id: p.id,
+          name: p.name,
+          subtitle: p.description || '',
+          priceLabel: p.price_override || p.base_price_label,
+          categoryId: p.category_id || 'general',
+          categoryLabel: p.category_id === 'grocery' || p.category_id === 'fresh' ? 'بقالة' : p.category_id === 'bakery' ? 'مخبوزات' : 'عام',
+          isAvailable,
+          clientVisibilityStatus,
+          publishStage: (p.approval_status || '').replace(/_/g, '-') as any,
+        };
+      });
+
+      setActiveStoreItemsState(mappedItems);
+      setStoreDetailState('ready');
+    }).catch((err) => {
+      if (cancelled) return;
+      let detailErrorState: 'offline' | 'not-found' | 'error' = 'error';
+      if (isDshDiscoveryStoresOfflineError(err) || (typeof err === 'object' && err !== null && (err as any).kind === 'offline')) {
+        detailErrorState = 'offline';
+      } else if (typeof err === 'object' && err !== null && (err as any).kind === 'http' && (err as any).status === 404) {
+        detailErrorState = 'not-found';
+      }
+      setStoreDetailState(detailErrorState);
     });
-  }, [openTrackedOrder, selectedFulfillmentMode]);
 
-  const activeStore = React.useMemo(
-    () => clientVisibleDiscoveryStores.find((store) => store.id === activeStoreId) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0],
-    [activeStoreId, clientVisibleDiscoveryStores],
-  );
+    return () => { cancelled = true; };
+  }, []);
 
-  const activeStoreItems = React.useMemo(() => storeItemsByStoreId[activeStore.id] ?? [], [activeStore.id]);
+  React.useEffect(() => {
+    if (route !== 'store-get') return undefined;
+    if (!activeStoreId) return undefined;
+    return fetchStoreDetail(activeStoreId, activeStore);
+  }, [activeStoreId, route, activeStore, fetchStoreDetail]);
+
+  const activeStoreItems = React.useMemo(() => activeStoreItemsState.length > 0 ? activeStoreItemsState : (storeItemsByStoreId[activeStore.id] ?? []), [activeStoreItemsState, activeStore.id]);
   const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
   const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
   const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
-  const activeStoreScreenStore = React.useMemo(() => ({
-    id: activeStore.id,
-    name: activeStore.name,
-    subtitle: activeStore.subtitle,
-    statusLabel: activeStore.statusLabel,
-    etaLabel: activeStore.meta,
-    deliveryFeeLabel: activeStore.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
-    followersCount: activeStore.followerCount,
-    priceMatchLabel: activeStore.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
-    imageUri: activeStore.imageUri,
-    deliveryLabel: activeStore.deliveryLabel,
-    serviceLabel: activeStore.serviceLabel,
-    subscriptionPackageChips: activeStore.subscriptionPackageChips,
-    hasBthwaniPro: activeStore.hasBthwaniPro,
-    tags: activeStoreTags,
-    categories: activeStoreCategories,
-    deliveryModes: activeStoreDeliveryModes,
-  }), [activeStore, activeStoreCategories, activeStoreDeliveryModes, activeStoreTags]);
-  const reopenTracking = React.useCallback(() => {
-    openTrackedOrder(
-      trackingOrderOverride ? undefined : activeTrackedOrder?.id,
-      trackingOrderOverride
-        ? {
-            fulfillmentMode: trackingOrderValues.fulfillmentMode,
-            orderDraft: trackingOrderOverride,
-          }
-        : undefined,
-    );
-  }, [activeTrackedOrder?.id, openTrackedOrder, trackingOrderOverride, trackingOrderValues.fulfillmentMode]);
+
+  const activeStoreScreenStore = React.useMemo(() => {
+    const s = activeStoreDetail || activeStore;
+    const tags = activeStoreDetail ? buildStoreTags({
+      id: s.id,
+      name: s.name,
+      subtitle: s.address || '',
+      statusLabel: s.status_label || '',
+      meta: s.delivery_label || '',
+      etaMinutes: 0,
+      distanceKm: Number.parseFloat(s.distance_label) || 0,
+      rating: s.rating ?? 0,
+      isOffer: s.has_offer || false,
+      isFavorite: false,
+      isFollowing: false,
+      imageUri: s.image_url || '',
+      deliveryLabel: s.delivery_label || '',
+      serviceLabel: s.service_label || '',
+      followerCount: 0,
+      multiplierLabel: 'x1',
+      subscriptionPackageChips: [],
+      offerLabel: s.offer_label || '',
+      hasBthwaniPro: false,
+      hasNewProducts: false,
+      hasCouponAvailable: false,
+      supportsPickup: s.supports_pickup || false,
+      supportsPartnerDelivery: s.supports_partner_delivery || false,
+      publishStage: s.publish_stage || '',
+      logoImageUri: s.logo_image_url || '',
+    } as any) : activeStoreTags;
+
+    const deliveryModes = activeStoreDetail ? buildStoreDeliveryModes({
+      meta: s.delivery_label || '',
+      supportsPickup: s.supports_pickup || false,
+      supportsPartnerDelivery: s.supports_partner_delivery || false,
+    }) : activeStoreDeliveryModes;
+
+    return {
+      id: s.id,
+      name: s.name,
+      subtitle: s.address || s.subtitle || '',
+      statusLabel: s.status_label || s.statusLabel || '',
+      etaLabel: s.delivery_label || s.meta || s.etaLabel || '',
+      deliveryFeeLabel: s.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
+      followersCount: s.followerCount || 0,
+      priceMatchLabel: s.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
+      imageUri: s.image_url || s.imageUri || '',
+      deliveryLabel: s.delivery_label || s.deliveryLabel || '',
+      serviceLabel: s.service_label || s.serviceLabel || '',
+      subscriptionPackageChips: s.subscriptionPackageChips || [],
+      hasBthwaniPro: s.hasBthwaniPro || false,
+      tags: tags,
+      categories: activeStoreCategories,
+      deliveryModes: deliveryModes,
+      contactNumber: s.contact_number || s.contactNumber || '',
+      openingHours: s.opening_hours || s.openingHours || '',
+      catalogSummary: s.catalog_summary || s.catalogSummary || '',
+    };
+  }, [activeStoreDetail, activeStore, activeStoreTags, activeStoreDeliveryModes, activeStoreCategories]);
 
   const addItemToHostCart = React.useCallback((
-    item: HostCartInputItem,
+    item: HostCartItem & { name?: string },
     _payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string },
   ) => {
     setReorderAlertMessage(undefined);
@@ -962,7 +733,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001',
       title: 'الطلب النشط',
       subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة',
-      meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
+      meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} Â· ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
       statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
     },
     {
@@ -970,7 +741,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002',
       title: 'آخر طلب',
       subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء',
-      meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`,
+      meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} Â· ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`,
       statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
     },
   ], [clientVisibleHomeStores]);
@@ -1032,12 +803,13 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       return;
     }
     if (categoryId === 'awnak') {
+      if (!isAwnakEnabled) return;
       setAwnakInlineOpen(true);
       setRoute('home');
       return;
     }
     setRoute('home');
-  }, []);
+  }, [isAwnakEnabled]);
 
   const handleOpenHomeStoreCategory = React.useCallback((storeId: string, categoryId: string) => {
     const nextStoreMetadata = getStoreCanonicalMetadata(storeId);
@@ -1088,6 +860,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     setServiceDialTrigger((token) => token + 1);
   }, []);
 
+
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {
     return (
@@ -1099,7 +872,47 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
   }
 
   if (route === 'wlt-home') {
-    return <WltHomeGetScreen onBack={() => setRoute('home')} />;
+    return (
+      <WltHomeGetScreen
+        onBack={() => setRoute('home')}
+        dshAuthBearerToken={dshAuthBearerToken}
+        dshClientId={dshClientId}
+      />
+    );
+  }
+
+  if (route === 'checkout-intent') {
+    const cartSubtotal = cartItems.reduce(
+      (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+      0
+    );
+    const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
+    const cartTotal = cartSubtotal + deliveryFeeNum;
+
+    const formattedBalance = walletPreview.balance !== null ? `${walletPreview.balance} ر.ي` : '...';
+
+    const paymentMethods = [
+      { id: 'wallet', label: `المحفظة (الرصيد: ${formattedBalance})`, icon: 'wallet-outline', isSelected: selectedPaymentMethod === 'wallet' },
+      { id: 'cod', label: 'الدفع عند الاستلام (COD)', icon: 'cash-outline', isSelected: selectedPaymentMethod === 'cod' },
+    ];
+
+    return (
+      <DshCheckoutIntentScreen
+        state={checkoutState}
+        address={createOrderValues.dropoffAddress || 'مسقط، الخوير، شارع المها، بناية رقم 123'}
+        subtotal={`${cartSubtotal} ر.ي`}
+        deliveryFee={`${deliveryFeeNum} ر.ي`}
+        total={`${cartTotal} ر.ي`}
+        eta={selectedFulfillmentMode === 'pickup' ? '15 - 20 دقيقة' : '30 - 45 دقيقة'}
+        paymentMethods={paymentMethods}
+        paymentErrorMessage={paymentErrorMessage}
+        onBack={() => setRoute('cart-get')}
+        onConfirm={handleConfirmCheckout}
+        onSelectPaymentMethod={(id) => setSelectedPaymentMethod(id)}
+        onChangeAddress={() => setRoute('addresses-location')}
+        onRetry={() => setCheckoutState('ready')}
+      />
+    );
   }
 
   if (route === 'entry') {
@@ -1133,7 +946,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onOpenAddressesLocation={() => setRoute('addresses-location')}
         onOpenIdentity={() => setRoute('identity')}
         onOpenCommercial={() => { setSelectedOperationScreen('promo-apply'); setRoute('benefits'); }}
-        onOpenAppearance={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
+        onOpenAppearance={() => setRoute('appearance')}
         onOpenPreferences={() => setRoute('preferences')}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
@@ -1163,6 +976,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     return (
       <DshStoreGetScreen
         appearanceMode={appearanceMode}
+        state={storeDetailState}
         store={activeStoreScreenStore}
         menuItems={activeStoreItems}
         onAddItemToCart={addItemToHostCart}
@@ -1173,7 +987,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
           setRoute('benefits');
         }}
         onBack={() => setRoute('home')}
-        onRetry={() => setRoute('store-get')}
+        onRetry={() => fetchStoreDetail(activeStoreId, activeStore)}
         onSupport={openSupportFlow}
       />
     );
@@ -1227,10 +1041,19 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         }}
         statusTitle={cartClientStateMeta.label}
         statusDescription={cartClientStateMeta.description}
+        checkoutClient={checkoutClientMemo}
+        clientId={checkoutAuth.clientId}
+        bearerToken={checkoutAuth.bearerToken}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={handleConfirmedOrderExecution}
-        onContinue={handleConfirmedOrderExecution}
+        onOpenOrder={async () => {
+          setCheckoutIntentId(null);
+          setRoute('checkout-intent');
+        }}
+        onContinue={async () => {
+          setCheckoutIntentId(null);
+          setRoute('checkout-intent');
+        }}
         onRetry={() => setRoute('cart-get')}
       />
       );
@@ -1285,6 +1108,17 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
         onPrimaryAction={returnHome}
         onSecondaryAction={returnHome}
         onRetry={() => setRoute('listing-status-update')}
+      />
+    );
+  }
+
+  if (route === 'appearance') {
+    return (
+      <DshAppearanceHubScreen
+        appearanceMode={appearanceMode}
+        onAppearanceModeChange={setAppearanceMode}
+        onBack={() => setRoute('my-space')}
+        onRetry={() => setRoute('appearance')}
       />
     );
   }
@@ -1348,18 +1182,44 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     );
   }
 
+
   if (route === 'tracking') {
+    let liveClientState = trackingClientState;
+    let liveStatusLabel = activeTrackedOrder?.statusLabel ?? trackingWltIntent?.clientUiHint;
+
+    if (liveOrderDetails) {
+      const order = liveOrderDetails.order;
+      if (order.status === 'CREATED') {
+        liveClientState = hostClientStates.orderCreated;
+        liveStatusLabel = 'قيد المراجعة';
+      } else if (order.status === 'ACCEPTED') {
+        liveClientState = hostClientStates.orderConfirmed;
+        liveStatusLabel = 'تم القبول';
+      } else if (order.status === 'READY_FOR_PICKUP') {
+        liveClientState = hostClientStates.trackingActive;
+        liveStatusLabel = 'جاهز للاستلام';
+      } else if (order.status === 'DELIVERED') {
+        liveClientState = hostClientStates.delivered;
+        liveStatusLabel = 'تم التوصيل';
+      } else if (order.status === 'CANCELLED') {
+        liveClientState = hostClientStates.cancelled;
+        liveStatusLabel = 'تم الإلغاء';
+      }
+    }
+
     return (
       <DshTrackingScreen
         values={trackingOrderValues}
-        clientState={trackingClientState}
-        currentStatusLabel={activeTrackedOrder?.statusLabel}
+        clientState={liveClientState}
+        currentStatusLabel={liveStatusLabel}
         fulfillmentMode={trackingOrderValues.fulfillmentMode}
         timeline={trackingTimeline}
         onSupport={openSupportFlow}
         onRetry={reopenTracking}
         onNextAction={() => setRoute('orders-list')}
         onReorder={openCreateOrderJourney}
+        onCancelOrder={handleCancelOrder}
+        onCreateSupportEscalation={handleSupportEscalation}
       />
     );
   }
@@ -1375,9 +1235,15 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
     );
   }
 
+  const bottomNavActiveId: 'favorites' | 'orders' | 'wallet' | 'profile' =
+    route === 'orders-list' ? 'orders'
+    : route === 'wlt-home' ? 'wallet'
+    : route === 'my-space' ? 'profile'
+    : 'favorites';
+
   const clientBottomNavBar = (
     <BottomNavBar
-      activeId="home"
+      activeId={bottomNavActiveId}
       direction="rtl"
       launcherLabel="الخدمات"
       launcherIcon="grid"
@@ -1389,7 +1255,7 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
 
   return (
     <View style={{ flex: 1, position: 'relative' }}>
-      <View style={{ flex: 1, paddingBottom: 80 }}>
+      <View style={{ flex: 1, paddingBottom: Platform.OS === 'android' ? 112 : 80 }}>
         <DshHomeGetScreen
           state={clientDiscoveryStoresBridge.state}
           serviceDialTrigger={serviceDialTrigger}
@@ -1434,7 +1300,10 @@ export function DshClientSurface({ command, onExit, onOpenService, renderApprove
       onCloseAwnakInline={() => setAwnakInlineOpen(false)}
       onRegisterBackHandler={handleRegisterBackHandler}
       renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
-      onRetry={() => setRoute('home')}
+      onRetry={() => {
+        setRoute('home');
+        setHomeRetryToken((t) => t + 1);
+      }}
     />
       </View>
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>

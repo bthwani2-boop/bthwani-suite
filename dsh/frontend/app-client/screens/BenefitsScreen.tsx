@@ -21,12 +21,14 @@ import { DshOperationScreen, type DshOperationScreenProps } from '../parts/Opera
 import { DshSubscriptionsScreen } from '../parts/SubscriptionsScreen';
 import { getCampaignItems } from '../../data/marketing.preview-data';
 import {
+  isClientVisibleStatus,
+} from '../../shared/commercial.preview-contract';
+import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
-  isClientVisibleStatus,
   isMarketingRenderable,
-} from '../../shared/commercial.preview-contract';
+} from '../../shared/marketing-visibility.contract';
 import { getEntitlements, getLoyaltyRewards, getLoyaltyTiers } from '../../data/subscriptions.preview-data';
 import { getPartnerOfferItems } from '../../data/offers.preview-data';
 

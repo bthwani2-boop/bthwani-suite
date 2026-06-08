@@ -36,9 +36,39 @@ func main() {
 	}
 
 	httpapi.RegisterRoutes(mux, repository)
+	httpapi.RegisterReadinessRoutes(mux, repository)
+	httpapi.RegisterProductRoutes(mux, repository)
+	httpapi.RegisterCategoryRoutes(mux, repository)
+	httpapi.RegisterMediaRoutes(mux, repository)
+	httpapi.RegisterOverridesRoutes(mux, repository)
+	httpapi.RegisterApprovalsRoutes(mux, repository)
+	httpapi.RegisterConflictsRoutes(mux, repository)
+	httpapi.RegisterOrderRoutes(mux, repository)
+	httpapi.RegisterSupportRoutes(mux, repository)
+	httpapi.RegisterCheckoutRoutes(mux, repository)
+	// WLT routes are NOT registered here — DSH backend does not own wallet state.
+	// Financial operations are delegated to WLT service via payment session handoff.
+
+	// Serve static media fixtures under /media-fixtures/
+	mediaFixturesDir := "../frontend/media-fixtures"
+	if _, err := os.Stat(mediaFixturesDir); os.IsNotExist(err) {
+		mediaFixturesDir = "dsh/frontend/media-fixtures"
+	}
+	mux.Handle("GET /media-fixtures/", http.StripPrefix("/media-fixtures/", http.FileServer(http.Dir(mediaFixturesDir))))
+
+	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id, X-Actor-Type, X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		mux.ServeHTTP(w, r)
+	})
 
 	log.Printf("dsh-api listening on :%s", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	if err := http.ListenAndServe(":"+port, corsHandler); err != nil {
 		log.Fatal(err)
 	}
 }

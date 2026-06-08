@@ -7,7 +7,7 @@ import {
   Icon,
   KeyValueList,
   SectionHeader,
-  Surface,
+  Divider,
   Text,
   TextField,
   useTheme,
@@ -166,8 +166,8 @@ export function DshCaptainPickupDropoffScreen({
       subtitle={config.subtitle}
       onBack={onBack}
       content={
-        <Box gap={3}>
-          <Surface tone="brand" gap={3}>
+        <Box gap={4} style={{ paddingHorizontal: 4 }}>
+          <Box gap={3}>
             <Box layoutDirection="row" justify="space-between" align="center">
               <Badge label={config.badge} tone="warning" />
               <Text role="caption" tone="soft">#{orderId}</Text>
@@ -180,7 +180,10 @@ export function DshCaptainPickupDropoffScreen({
                 { label: 'عدد الأصناف', value: `${itemsCount} أصناف`, tone: 'success' },
               ]}
             />
-            <Surface tone="inset" padding={3} radiusToken="lg" gap={2} style={{ borderWidth: 1, borderColor: theme.line }}>
+
+            <Divider />
+
+            <Box gap={2} paddingVertical={2}>
               <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
                 <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
                   <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة تنفيذ الاستلام والتسليم</Text>
@@ -198,7 +201,7 @@ export function DshCaptainPickupDropoffScreen({
                   handoff يظهر هنا فقط ضمن سياق الاستلام أو التسليم، وليس كمسار شريك داخلي مستقل.
                 </Text>
               ) : null}
-            </Surface>
+            </Box>
             <Button
               label={detailsVisible ? 'إخفاء قائمة التحقق' : 'فتح قائمة التحقق'}
               tone={detailsVisible ? 'secondary' : 'ghost'}
@@ -206,30 +209,34 @@ export function DshCaptainPickupDropoffScreen({
               fullWidth={false}
               onPress={() => setDetailsVisible((current) => !current)}
             />
-          </Surface>
+          </Box>
 
           {detailsVisible ? (
-            <Surface tone="raised" gap={3}>
-              <SectionHeader
-                title="قائمة التحقق"
-                subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة."
-              />
-              <Box gap={2}>
-                {config.checklist.map((item, index) => (
-                  <View key={index} style={styles.checkItem}>
-                    <View style={styles.checkCircle}>
-                      <Icon name="checkmark" size={12} color={colorPalette.white} />
+            <>
+              <Divider />
+              <Box gap={3} style={{ paddingVertical: 4 }}>
+                <SectionHeader
+                  title="قائمة التحقق"
+                  subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة."
+                />
+                <Box gap={2}>
+                  {config.checklist.map((item, index) => (
+                    <View key={index} style={styles.checkItem}>
+                      <View style={styles.checkCircle}>
+                        <Icon name="checkmark" size={12} color={colorPalette.white} />
+                      </View>
+                      <Text role="bodySm" style={styles.checkText}>{item}</Text>
                     </View>
-                    <Text role="bodySm" style={styles.checkText}>{item}</Text>
-                  </View>
-                ))}
+                  ))}
+                </Box>
               </Box>
-            </Surface>
+            </>
           ) : null}
 
           {mode === 'arrival' && (
             <>
-              <Surface tone={bellRung ? 'success' : 'brand'} gap={2} padding={3} radiusToken="lg" style={{ borderWidth: 1, borderColor: bellRung ? theme.success : theme.brand }}>
+              <Divider />
+              <Box gap={2} paddingVertical={2}>
                 <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
                   <Badge label={bellRung ? 'تم قرع الجرس' : 'جرس الوصول'} tone={bellRung ? 'success' : 'warning'} />
                   <Icon name="notifications-outline" size={20} tone={bellRung ? 'success' : 'brand'} />
@@ -242,44 +249,47 @@ export function DshCaptainPickupDropoffScreen({
                 {!bellRung && (
                   <Button label="قرع الجرس" tone="primary" size="sm" fullWidth={false} onPress={handleRingBell} />
                 )}
-              </Surface>
+              </Box>
 
               {dropoffOtp ? (
-                <Surface tone={otpVerified ? 'success' : 'raised'} gap={2} padding={3} radiusToken="lg" style={{ borderWidth: 1, borderColor: otpVerified ? theme.success : theme.line }}>
-                  <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
-                    <Badge label={otpVerified ? 'تم التحقق' : 'OTP التسليم'} tone={otpVerified ? 'success' : 'warning'} />
-                    <Icon name="shield-checkmark-outline" size={18} tone={otpVerified ? 'success' : 'default'} />
+                <>
+                  <Divider />
+                  <Box gap={2} paddingVertical={2}>
+                    <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
+                      <Badge label={otpVerified ? 'تم التحقق' : 'OTP التسليم'} tone={otpVerified ? 'success' : 'warning'} />
+                      <Icon name="shield-checkmark-outline" size={18} tone={otpVerified ? 'success' : 'default'} />
+                    </Box>
+                    {otpVerified ? (
+                      <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.success }}>
+                        تم التحقق من رمز التسليم. يمكنك تأكيد التسليم الآن.
+                      </Text>
+                    ) : (
+                      <>
+                        <TextField
+                          label="رمز التسليم (OTP)"
+                          value={otpInput}
+                          onChangeText={(v) => { setOtpInput(v); setOtpError(false); }}
+                          placeholder="أدخل الرمز المرسل للعميل"
+                          keyboardType="number-pad"
+                          maxLength={6}
+                        />
+                        {otpError && (
+                          <Text role="caption" style={{ color: theme.danger, textAlign: 'right' }}>
+                            الرمز غير صحيح. تحقق من العميل وأعد المحاولة.
+                          </Text>
+                        )}
+                        <Button
+                          label="تحقق من الرمز"
+                          tone="primary"
+                          size="sm"
+                          fullWidth={false}
+                          disabled={otpInput.trim().length === 0}
+                          onPress={handleVerifyOtp}
+                        />
+                      </>
+                    )}
                   </Box>
-                  {otpVerified ? (
-                    <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.success }}>
-                      تم التحقق من رمز التسليم. يمكنك تأكيد التسليم الآن.
-                    </Text>
-                  ) : (
-                    <>
-                      <TextField
-                        label="رمز التسليم (OTP)"
-                        value={otpInput}
-                        onChangeText={(v) => { setOtpInput(v); setOtpError(false); }}
-                        placeholder="أدخل الرمز المرسل للعميل"
-                        keyboardType="number-pad"
-                        maxLength={6}
-                      />
-                      {otpError && (
-                        <Text role="caption" style={{ color: theme.danger, textAlign: 'right' }}>
-                          الرمز غير صحيح. تحقق من العميل وأعد المحاولة.
-                        </Text>
-                      )}
-                      <Button
-                        label="تحقق من الرمز"
-                        tone="primary"
-                        size="sm"
-                        fullWidth={false}
-                        disabled={otpInput.trim().length === 0}
-                        onPress={handleVerifyOtp}
-                      />
-                    </>
-                  )}
-                </Surface>
+                </>
               ) : null}
             </>
           )}

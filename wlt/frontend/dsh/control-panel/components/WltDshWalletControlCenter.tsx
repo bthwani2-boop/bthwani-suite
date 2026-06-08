@@ -1,0 +1,267 @@
+'use client';
+
+import React from 'react';
+import { Box, Text } from '@bthwani/ui-kit';
+import {
+  getWltDshAccountStatementsPreview,
+  getWltDshCaptainSettlementStatementsPreview,
+  getWltFieldCommissionStatementsPreview,
+  getWltDshPartnerSettlementStatementsPreview,
+  formatWltYer,
+} from '../financeContracts';
+import wltStyles from '../styles/wlt-dsh-finance.module.css';
+
+type WalletSummaryRow = {
+  actorLabel: string;
+  actorId: string;
+  actorType: string;
+  availableLabel: string;
+  pendingLabel: string;
+  heldLabel: string;
+  status: 'ready' | 'needs_action' | 'blocked';
+  statusLabel: string;
+  nextAction?: string;
+};
+
+function buildClientWalletRows(): WalletSummaryRow[] {
+  const statements = getWltDshAccountStatementsPreview();
+  return statements
+    .filter((s) => s.actor === 'customer_wallet')
+    .map((s) => ({
+      actorLabel: s.actorLabel,
+      actorId: s.actorId,
+      actorType: 'عميل',
+      availableLabel: s.closingBalanceLabel,
+      pendingLabel: s.holdsLabel,
+      heldLabel: s.holdsLabel,
+      status: 'ready' as const,
+      statusLabel: 'نشط',
+    }));
+}
+
+function buildPartnerWalletRows(): WalletSummaryRow[] {
+  const statements = getWltDshPartnerSettlementStatementsPreview();
+  return statements.map((s) => ({
+    actorLabel: s.partnerName,
+    actorId: s.partnerId,
+    actorType: 'شريك',
+    availableLabel: s.netSettlementLabel,
+    pendingLabel: s.remainingPayableLabel,
+    heldLabel: s.status === 'held' ? s.remainingPayableLabel : formatWltYer(0),
+    status: (s.status === 'held' ? 'blocked' : s.status === 'ready_for_payout' ? 'needs_action' : 'ready') as WalletSummaryRow['status'],
+    statusLabel: s.status === 'held' ? 'محجوز' : s.status === 'ready_for_payout' ? 'جاهز للصرف' : 'نشط',
+    nextAction: s.status === 'ready_for_payout' ? 'صرف مستحقات' : s.status === 'held' ? 'مراجعة سبب الحجز' : undefined,
+  }));
+}
+
+function buildCaptainWalletRows(): WalletSummaryRow[] {
+  const statements = getWltDshCaptainSettlementStatementsPreview();
+  return statements.map((s) => ({
+    actorLabel: s.captainName,
+    actorId: s.captainId,
+    actorType: 'كابتن',
+    availableLabel: s.grossEarningsLabel,
+    pendingLabel: s.outstandingCodLiabilityLabel,
+    heldLabel: s.hasEligibilityBlock ? s.eligibilityShortfallLabel : formatWltYer(0),
+    status: (s.status === 'blocked' ? 'blocked' : s.hasEligibilityBlock || s.outstandingCodLiabilityLabel !== formatWltYer(0) ? 'needs_action' : 'ready') as WalletSummaryRow['status'],
+    statusLabel: s.status === 'blocked' ? 'موقوف' : s.hasEligibilityBlock ? 'رصيد ضامن غير كافٍ' : 'نشط',
+    nextAction: s.hasEligibilityBlock ? 'شحن رصيد ضامن' : s.status === 'pending_clearance' ? 'إيداع COD' : undefined,
+  }));
+}
+
+function buildFieldWalletRows(): WalletSummaryRow[] {
+  const statements = getWltFieldCommissionStatementsPreview();
+  return statements.map((s) => ({
+    actorLabel: s.fieldAgentName,
+    actorId: s.fieldAgentId,
+    actorType: 'ميداني',
+    availableLabel: formatWltYer(s.totalCommissionMinorUnits),
+    pendingLabel: formatWltYer(s.remainingMinorUnits),
+    heldLabel: formatWltYer(s.heldMinorUnits),
+    status: (s.heldMinorUnits > 0 ? 'needs_action' : s.status === 'paid_preview' ? 'ready' : 'needs_action') as WalletSummaryRow['status'],
+    statusLabel: s.heldMinorUnits > 0 ? 'محجوز جزئي' : s.status === 'paid_preview' ? 'مدفوع' : 'قيد المراجعة',
+    nextAction: s.heldMinorUnits > 0 ? 'مراجعة سبب الحجز' : undefined,
+  }));
+}
+
+function resolveStatusClass(status: WalletSummaryRow['status']): string {
+  if (status === 'blocked') return wltStyles.walletRowStatusBlocked;
+  if (status === 'needs_action') return wltStyles.walletRowStatusAction;
+  return wltStyles.walletRowStatusReady;
+}
+
+function resolveCardClass(status: WalletSummaryRow['status']): string {
+  if (status === 'blocked') return wltStyles.walletCardBlocked;
+  if (status === 'needs_action') return wltStyles.walletCardAction;
+  return wltStyles.walletCardReady;
+}
+
+function WalletRowCard({ row, onSelect }: { row: WalletSummaryRow; onSelect: (row: WalletSummaryRow) => void }) {
+  return (
+    <div
+      onClick={() => onSelect(row)}
+      className={`${wltStyles.accordionCard} ${resolveCardClass(row.status)}`}
+    >
+      <div className={wltStyles.accordionCardHeader}>
+        <div className={wltStyles.infoGroupRight}>
+          <div className={wltStyles.walletRowCardInfo}>
+            <span className={wltStyles.walletRowCardTitle}>
+              {row.actorLabel}
+            </span>
+            <span className={wltStyles.walletRowCardSubtitle}>
+              {row.actorType} · {row.actorId}
+            </span>
+          </div>
+        </div>
+        <div className={wltStyles.infoGroupLeft}>
+          <div className={wltStyles.walletRowAmountGroup}>
+            <span className={wltStyles.walletRowAmount}>
+              {row.availableLabel}
+            </span>
+            <span className={`${wltStyles.walletRowStatus} ${resolveStatusClass(row.status)}`}>
+              {row.statusLabel}
+            </span>
+            {row.nextAction && (
+              <span className={wltStyles.walletRowNextAction}>
+                {row.nextAction} ←
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className={wltStyles.walletRowMeta}>
+        <span className={wltStyles.walletRowMetaLabel}>
+          معلق: <strong className={wltStyles.walletRowMetaPending}>{row.pendingLabel}</strong>
+        </span>
+        <span className={wltStyles.walletRowMetaLabel}>
+          محجوز: <strong className={wltStyles.walletRowMetaHeld}>{row.heldLabel}</strong>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export function WltDshWalletControlCenter() {
+  const [selectedRow, setSelectedRow] = React.useState<WalletSummaryRow | null>(null);
+  const [activeFilter, setActiveFilter] = React.useState<'all' | 'client' | 'partner' | 'captain' | 'field'>('all');
+
+  const allRows = React.useMemo<WalletSummaryRow[]>(() => [
+    ...buildClientWalletRows(),
+    ...buildPartnerWalletRows(),
+    ...buildCaptainWalletRows(),
+    ...buildFieldWalletRows(),
+  ], []);
+
+  const filteredRows = React.useMemo(() => {
+    if (activeFilter === 'all') return allRows;
+    const map: Record<string, string> = { client: 'عميل', partner: 'شريك', captain: 'كابتن', field: 'ميداني' };
+    return allRows.filter((r) => r.actorType === map[activeFilter]);
+  }, [allRows, activeFilter]);
+
+  const blockedCount = allRows.filter((r) => r.status === 'blocked').length;
+  const needsActionCount = allRows.filter((r) => r.status === 'needs_action').length;
+
+  const filterLabels: Array<{ id: typeof activeFilter; label: string }> = [
+    { id: 'all', label: `الكل (${allRows.length})` },
+    { id: 'client', label: 'عملاء' },
+    { id: 'partner', label: 'شركاء' },
+    { id: 'captain', label: 'كباتن' },
+    { id: 'field', label: 'ميدانيون' },
+  ];
+
+  return (
+    <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
+      <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
+        <div className={wltStyles.walletCenterHeader}>
+          <div>
+            <Text role="titleMd" style={{ fontWeight: 800 }}>مركز تحكم المحافظ</Text>
+            <Text role="bodySm" tone="soft" style={{ marginTop: 4 }}>
+              نظرة موحدة على جميع محافظ العملاء والشركاء والكباتن والميدانيين
+            </Text>
+          </div>
+          <div className={wltStyles.walletCenterBadges}>
+            {blockedCount > 0 && (
+              <span className={wltStyles.walletBadgeBlocked}>
+                {blockedCount} محجوب
+              </span>
+            )}
+            {needsActionCount > 0 && (
+              <span className={wltStyles.walletBadgeNeedsAction}>
+                {needsActionCount} يحتاج إجراء
+              </span>
+            )}
+          </div>
+        </div>
+      </Box>
+
+      <div className={wltStyles.walletFilterBar}>
+        {filterLabels.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setActiveFilter(f.id)}
+            className={`${wltStyles.walletFilterBtn} ${activeFilter === f.id ? wltStyles.walletFilterBtnActive : ''}`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      <div className={selectedRow ? `${wltStyles.walletGrid} ${wltStyles.walletGridWithDetail}` : wltStyles.walletGrid}>
+        <Box gap={2}>
+          {filteredRows.length === 0 ? (
+            <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line">
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>
+                لا توجد محافظ لهذا التصفية
+              </Text>
+            </Box>
+          ) : (
+            filteredRows.map((row) => (
+              <WalletRowCard
+                key={`${row.actorType}-${row.actorId}`}
+                row={row}
+                onSelect={setSelectedRow}
+              />
+            ))
+          )}
+        </Box>
+
+        {selectedRow && (
+          <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={3}>
+            <div className={wltStyles.walletDetailHeader}>
+              <span className={wltStyles.walletDetailTitle}>
+                تفاصيل المحفظة
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedRow(null)}
+                className={wltStyles.walletDetailCloseBtn}
+              >
+                ✕
+              </button>
+            </div>
+            <hr className={wltStyles.walletDetailSeparator} />
+            <div className={wltStyles.walletDetailPanel}>
+              {[
+                { label: 'الطرف', value: `${selectedRow.actorLabel} (${selectedRow.actorType})` },
+                { label: 'المعرّف', value: selectedRow.actorId },
+                { label: 'الرصيد المتاح', value: selectedRow.availableLabel },
+                { label: 'المعلق', value: selectedRow.pendingLabel },
+                { label: 'المحجوز', value: selectedRow.heldLabel },
+                { label: 'الحالة', value: selectedRow.statusLabel },
+                ...(selectedRow.nextAction ? [{ label: 'الإجراء التالي', value: selectedRow.nextAction }] : []),
+              ].map(({ label, value }) => (
+                <div key={label} className={wltStyles.walletDetailRow}>
+                  <span className={wltStyles.walletDetailKey}>{label}</span>
+                  <span className={wltStyles.walletDetailVal}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </Box>
+        )}
+      </div>
+    </Box>
+  );
+}
+
+export default WltDshWalletControlCenter;

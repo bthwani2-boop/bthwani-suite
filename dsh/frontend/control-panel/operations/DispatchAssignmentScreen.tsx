@@ -11,15 +11,23 @@ import {
 import {
   DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
 } from '../../data/orders.preview-data';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
+import {
+  resolveDshOrderApiBaseUrl,
+  createDshOrderLifecycleHttpClient,
+} from '../../shared';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
-// Delivery mode boundary: dispatch applies to bthwani_delivery only.
-// partner_delivery and pickup orders do not enter the captain dispatch queue.
-// Reference: dsh/frontend/shared/dsh-delivery-mode.model.ts → requiresDispatch
-import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
 import { getDshLifecycleStateMetadata } from '../../shared/dsh-order-journey.model';
+// SSoT: dispatch queue visibility is owned by dsh-fulfillment-surface-visibility.
+// Do not duplicate delivery-mode dispatch logic inline — use these helpers.
+import {
+  shouldEnterDispatchQueueForMode,
+  shouldShowCaptainAssignmentInCP,
+  getSurfaceRoleSummaryForMode,
+} from '../../shared/dsh-fulfillment-surface-visibility';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
 
@@ -30,8 +38,11 @@ const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
   brand: 'neutral',
 };
 
-// Resolved once at module level — no runtime cost.
-const BTHWANI_DELIVERY_META = getDshDeliveryModeDefinition('bthwani_delivery');
+// SSoT: resolved once at module level — bthwani_delivery is the only mode
+// that enters the captain dispatch queue.
+const DISPATCH_QUEUE_APPLIES_TO_BTHWANI = shouldEnterDispatchQueueForMode('bthwani_delivery');
+const SHOW_CAPTAIN_ASSIGNMENT_IN_CP = shouldShowCaptainAssignmentInCP('bthwani_delivery');
+const DISPATCH_SCOPE_LABEL = getSurfaceRoleSummaryForMode('control-panel', 'bthwani_delivery');
 
 const alternativesMap: Record<string, Array<{ name: string; distance: string; status: string }>> = {
   'DA-2001': [
@@ -50,13 +61,51 @@ const alternativesMap: Record<string, Array<{ name: string; distance: string; st
   ],
 };
 
+type DispatchRowState = {
+  id: string;
+  captain: string;
+  distance: string;
+  confidence: string;
+  statusTone: string;
+  status: string;
+  recommendation: string;
+  note: string;
+  blocker: string;
+  pickupEta: string;
+  dropoffEta: string;
+  assignedCaptain: string | null;
+  customStatus: string | null;
+  customStatusTone: 'warning' | 'success' | 'danger' | 'neutral' | null;
+  [key: string]: unknown;
+};
+
+function buildRuntimeDispatchRow(o: DshRuntimeOrderRow): DispatchRowState {
+  return {
+    id: o.id,
+    captain: o.captainId ?? 'لا يوجد',
+    distance: '—',
+    confidence: '—',
+    statusTone: o.status === 'CREATED' ? 'warning' : 'brand',
+    status: o.status,
+    recommendation: o.status === 'CREATED' ? 'يحتاج إسناد كابتن' : `الحالة: ${o.status}`,
+    note: `متجر: ${o.storeId} | عميل: ${o.clientId}`,
+    blocker: 'لا يوجد',
+    pickupEta: '—',
+    dropoffEta: '—',
+    assignedCaptain: o.captainId ?? null,
+    customStatus: null,
+    customStatusTone: null,
+  };
+}
+
 export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlOrderId = searchParams.get('orderId') ?? null;
   const [selectedRowId, setSelectedRowId] = React.useState<string | null>(null);
+  const [runtimeLoaded, setRuntimeLoaded] = React.useState(false);
 
-  const [rows, setRows] = React.useState(() =>
+  const [rows, setRows] = React.useState<DispatchRowState[]>(() =>
     DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows.map((row) => ({
       ...row,
       assignedCaptain: null as string | null,
@@ -64,6 +113,18 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
       customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
     }))
   );
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchDshRuntimeOrders({ status: 'CREATED', limit: 100 }).then((result) => {
+      if (cancelled) return;
+      if (result.kind === 'ok' && result.orders.length > 0) {
+        setRows(result.orders.map(buildRuntimeDispatchRow));
+        setRuntimeLoaded(true);
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   React.useEffect(() => {
     if (urlOrderId) {
@@ -85,32 +146,63 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const handleConfirmAssignment = React.useCallback((orderId: string, captainName: string) => {
     setActionStatus('pending');
 
-    setTimeout(() => {
-      setActionStatus('success');
+    const baseUrl = resolveDshOrderApiBaseUrl();
+    if (baseUrl) {
+      const client = createDshOrderLifecycleHttpClient(baseUrl);
+      client.assignCaptain(orderId, { captain_id: captainName })
+        .then(() => {
+          setActionStatus('success');
+          setTimeout(() => {
+            setRows((prevRows) =>
+              prevRows.map((r) =>
+                r.id === orderId
+                  ? {
+                      ...r,
+                      assignedCaptain: captainName,
+                      customStatus: 'تم الإسناد للكابتن',
+                      customStatusTone: 'success',
+                    }
+                  : r
+              )
+            );
+            setActionStatus('idle');
+            setSelectedRowId(null);
+            router.push(buildOperationsHref('dispatch-assignment'));
+          }, 1000);
+        })
+        .catch((err) => {
+          console.error('Failed to assign captain via API:', err);
+          setActionStatus('idle');
+        });
+    } else {
+      // Fallback for preview/local dev without active API
       setTimeout(() => {
-        setRows((prevRows) =>
-          prevRows.map((r) =>
-            r.id === orderId
-              ? {
-                  ...r,
-                  assignedCaptain: captainName,
-                  customStatus: 'تم الإسناد للكابتن',
-                  customStatusTone: 'success',
-                }
-              : r
-          )
-        );
-        setActionStatus('idle');
-        setSelectedRowId(null);
-        router.push(buildOperationsHref('dispatch-assignment'));
-      }, 1000);
-    }, 1200);
+        setActionStatus('success');
+        setTimeout(() => {
+          setRows((prevRows) =>
+            prevRows.map((r) =>
+              r.id === orderId
+                ? {
+                    ...r,
+                    assignedCaptain: captainName,
+                    customStatus: 'تم الإسناد للكابتن',
+                    customStatusTone: 'success',
+                  }
+                : r
+            )
+          );
+          setActionStatus('idle');
+          setSelectedRowId(null);
+          router.push(buildOperationsHref('dispatch-assignment'));
+        }, 1000);
+      }, 1200);
+    }
   }, [router]);
 
   const summaryKpi = [
     { id: 'waiting', label: 'بانتظار الإسناد', value: String(rows.filter(r => !r.assignedCaptain && r.statusTone !== 'danger').length), tone: 'danger' as const },
-    { id: 'captains', label: 'كباتن متاحون', value: String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.availableCaptains), tone: 'success' as const },
-    { id: 'ready', label: 'جاهزون للاستلام', value: String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.readyForPickup), tone: 'neutral' as const },
+    { id: 'captains', label: 'كباتن متاحون', value: runtimeLoaded ? '—' : String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.availableCaptains), tone: 'success' as const },
+    { id: 'source', label: 'مصدر البيانات', value: runtimeLoaded ? 'DSH Runtime' : 'Preview', tone: runtimeLoaded ? 'success' as const : 'warning' as const },
     { id: 'blockers', label: 'معوقات الإسناد', value: String(rows.filter(r => r.statusTone === 'danger').length), tone: 'warning' as const },
   ];
 
@@ -221,12 +313,14 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
 
   return (
     <Box gap={3}>
-      {/* Delivery mode scope boundary — explicit, not implied */}
-      <Box paddingX={3} paddingY={1}>
-        <Text role="bodySm" tone="muted">
-          {`نطاق الإسناد: ${BTHWANI_DELIVERY_META.label} — توصيل المتجر والاستلام الذاتي لا يحتاجان تعيين كابتن.`}
-        </Text>
-      </Box>
+      {/* SSoT: dispatch queue scope — derived from dsh-fulfillment-surface-visibility */}
+      {DISPATCH_QUEUE_APPLIES_TO_BTHWANI && SHOW_CAPTAIN_ASSIGNMENT_IN_CP && (
+        <Box paddingX={3} paddingY={1}>
+          <Text role="bodySm" tone="muted">
+            {`نطاق الإسناد: ${DISPATCH_SCOPE_LABEL} — توصيل المتجر والاستلام الذاتي لا يحتاجان تعيين كابتن.`}
+          </Text>
+        </Box>
+      )}
 
       {/* KPI summary strip */}
       <WebControlPanelKpiStrip items={summaryKpi} />

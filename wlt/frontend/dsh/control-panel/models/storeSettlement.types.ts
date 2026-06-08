@@ -1,0 +1,57 @@
+import type { WltDshControlPanelPreviewContract } from './financeContract.types';
+
+export type WltDshSettlementOrderRow = {
+  readonly orderId: string;
+  readonly orderDate: string;
+  readonly deliveryDate: string;
+  readonly paymentMethod: 'wallet' | 'cod' | 'card' | 'manual';
+  readonly orderGrossMinorUnits: number;
+  readonly orderGrossLabel: string;
+  readonly deliveryFeeMinorUnits: number;
+  readonly deliveryFeeLabel: string;
+  readonly platformCommissionMinorUnits: number;
+  readonly platformCommissionLabel: string;
+  readonly discountMinorUnits: number;
+  readonly discountLabel: string;
+  readonly refundMinorUnits: number;
+  readonly refundLabel: string;
+  readonly netSettlementImpactMinorUnits: number;
+  readonly netSettlementImpactLabel: string;
+  readonly includedInCycle: boolean;
+  readonly settlementStatus: 'included' | 'held' | 'next_cycle' | 'disputed';
+  readonly evidenceRef: string;
+};
+
+export type WltDshStoreSettlementStatement = {
+  readonly statementId: string;
+  readonly storeId: string;
+  readonly storeName: string;
+  readonly settlementCycleId: string;
+  readonly frequency: 'weekly' | 'biweekly' | 'monthly';
+  readonly periodStart: string;
+  readonly periodEnd: string;
+  readonly cutoffDate: string;
+  readonly expectedPayoutDate: string;
+  readonly status: 'draft_preview' | 'ready_for_review' | 'held_by_wlt' | 'paid_preview';
+  readonly grossOrdersTotalMinorUnits: number;
+  readonly grossOrdersTotalLabel: string;
+  readonly orderCount: number;
+  readonly deliveryFeesTotalMinorUnits: number;
+  readonly deliveryFeesTotalLabel: string;
+  readonly platformCommissionTotalMinorUnits: number;
+  readonly platformCommissionTotalLabel: string;
+  readonly discountsTotalMinorUnits: number;
+  readonly discountsTotalLabel: string;
+  readonly refundsTotalMinorUnits: number;
+  readonly refundsTotalLabel: string;
+  readonly holdsTotalMinorUnits: number;
+  readonly holdsTotalLabel: string;
+  readonly netPayableMinorUnits: number;
+  readonly netPayableLabel: string;
+  readonly paidToDateMinorUnits: number;
+  readonly paidToDateLabel: string;
+  readonly remainingPayableMinorUnits: number;
+  readonly remainingPayableLabel: string;
+  readonly orders: readonly WltDshSettlementOrderRow[];
+  readonly contract: WltDshControlPanelPreviewContract;
+};

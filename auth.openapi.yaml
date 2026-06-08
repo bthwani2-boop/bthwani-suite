@@ -1,6 +1,620 @@
 openapi: 3.1.0
 info:
-  title: Auth API
-  version: 0.1.0
-x-bthwani-contract-state: CONTRACT_TBD
-paths: {}
+  title: BThwani Auth API
+  version: 0.3.0
+  description: |
+    Auth contract for BThwani platform. Covers session verification, actor
+    identification, and the role-based permission matrix used by DSH and WLT
+    middleware to enforce access control.
+
+    ## Actor Types
+
+    | Role | Subject Prefix | Description |
+    |------|---------------|-------------|
+    | `client` | `client-*` | End customer placing orders |
+    | `partner` | `partner-*` | Store / merchant owner |
+    | `captain` | `captain-*` | Delivery captain (bthwani-owned fleet) |
+    | `field` | `field-*` | Field operations agent (store onboarding / evidence) |
+    | `operator` | `operator-*` | Internal control-panel staff with full read + limited write |
+    | `system` | `system-*` | Internal service-to-service identity (WLT → DSH callbacks) |
+
+    ## Token Modes
+
+    **Development (`DSH_AUTH_MODE=dev`, `WLT_AUTH_MODE=dev`):**
+    - Header `X-Client-Id: <subject>` accepted without Bearer token.
+    - Optional header `X-Actor-Type: captain|partner|field|operator` overrides role.
+    - Used for local integration testing only.
+
+    **Production (`DSH_AUTH_MODE=production`, `WLT_AUTH_MODE=production`):**
+    - Requires `Authorization: Bearer <token>` on every request.
+    - Token introspected at `GET /auth/session` on the auth service.
+    - 401 returned for missing/expired/invalid tokens.
+    - Role claim in session response (`roles[]`) drives all access decisions.
+
+    ## DSH Permission Matrix
+
+    | Operation | client | partner | captain | field | operator |
+    |-----------|--------|---------|---------|-------|----------|
+    | GET /stores (discovery) | ✓ | ✓ | ✓ | ✓ | ✓ |
+    | GET /catalog (read) | ✓ | own stores only | ✓ | ✓ | ✓ |
+    | POST/PUT /catalog (write) | ✗ | own stores only | ✗ | ✗ | ✓ |
+    | POST /checkout/intent | ✓ | ✗ | ✗ | ✗ | ✓ |
+    | POST /checkout/payment-callback | system (WLT) | ✗ | ✗ | ✗ | ✗ |
+    | POST /orders (create) | ✓ | ✗ | ✗ | ✗ | ✓ |
+    | GET /orders (list) | own orders | own store orders | assigned orders | ✗ | ✓ all |
+    | GET /orders/{id} | own order | own store | assigned | ✗ | ✓ |
+    | PUT /orders/{id}/status | ✗ | own store | assigned | ✗ | ✓ |
+    | POST /orders/{id}/refund-callback | system (WLT) | ✗ | ✗ | ✗ | ✗ |
+    | POST /orders/{id}/cancel | own order | own store | ✗ | ✗ | ✓ |
+    | GET /captain/assignments | ✗ | ✗ | own | ✗ | ✓ |
+    | POST /field/evidence | ✗ | ✗ | ✗ | own | ✓ |
+    | GET /control-panel/* | ✗ | ✗ | ✗ | ✗ | ✓ |
+
+    ## WLT Permission Matrix
+
+    | Operation | client | partner | captain | field | operator |
+    |-----------|--------|---------|---------|-------|----------|
+    | GET /wallets/{subject}/summary | own only | ✗ | own only | ✗ | ✓ any |
+    | GET /wallets/{subject}/transactions | own only | ✗ | own only | own only | ✓ any |
+    | GET /ledger | ✗ | ✗ | ✗ | ✗ | ✓ |
+    | POST /payment/sessions | ✓ | ✗ | ✗ | ✗ | ✓ |
+    | GET /payment/sessions/{id} | own only | ✗ | ✗ | ✗ | ✓ any |
+    | POST /payment/sessions/{id}/confirm | ✗ | ✗ | ✗ | ✗ | operator/system |
+    | POST /payment/sessions/{id}/fail | ✗ | ✗ | ✗ | ✗ | operator/system |
+    | GET /refunds | own only | ✗ | ✗ | ✗ | ✓ any |
+    | POST /refunds | ✗ | ✗ | ✗ | ✗ | ✓ |
+    | GET /refunds/{id} | own only | ✗ | ✗ | ✗ | ✓ |
+    | POST /refunds/{id}/process | ✗ | ✗ | ✗ | ✗ | ✓ |
+    | POST /refunds/{id}/confirm | ✗ | ✗ | ✗ | ✗ | ✓ |
+    | POST /refunds/{id}/fail | ✗ | ✗ | ✗ | ✗ | ✓ |
+    | GET /settlements | ✗ | ✗ | ✗ | ✗ | ✓ |
+    | POST /settlements | ✗ | ✗ | ✗ | ✗ | ✓ |
+
+x-bthwani-contract-state: AUTH_CONTRACT_ROLE_MATRIX_V3
+x-bthwani-auth-service-port: 8082
+x-bthwani-dev-tokens:
+  - token: dev-client-token-001
+    subject: client-dev-001
+    roles: [client]
+  - token: dev-client-token-002
+    subject: client-dev-002
+    roles: [client]
+  - token: dev-captain-token-001
+    subject: captain-dev-001
+    roles: [captain]
+  - token: dev-partner-token-001
+    subject: partner-dev-001
+    roles: [partner]
+  - token: dev-field-token-001
+    subject: field-dev-001
+    roles: [field]
+  - token: dev-operator-token-001
+    subject: operator-dev-001
+    roles: [operator]
+
+paths:
+  /auth/session:
+    get:
+      summary: Verify Bearer token and return actor identity
+      description: |
+        Core session endpoint. Called by DSH and WLT middleware on every
+        authenticated request in production mode.
+
+        Returns the actor's subject, roles, and authentication state.
+        The `roles` array drives all access-control decisions in DSH and WLT.
+      operationId: getAuthSession
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            pattern: "^Bearer .+"
+          description: "Bearer token issued at login. Format: Bearer <token>"
+      responses:
+        '200':
+          description: Session verified — actor identity returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+              examples:
+                client:
+                  summary: Client actor
+                  value:
+                    subject: client-dev-001
+                    authState: authenticated
+                    roles: [client]
+                    verifiedIdentifier: "+9671234567"
+                captain:
+                  summary: Captain actor
+                  value:
+                    subject: captain-dev-001
+                    authState: authenticated
+                    roles: [captain]
+                partner:
+                  summary: Partner actor
+                  value:
+                    subject: partner-dev-001
+                    authState: authenticated
+                    roles: [partner]
+                field:
+                  summary: Field agent actor
+                  value:
+                    subject: field-dev-001
+                    authState: authenticated
+                    roles: [field]
+                operator:
+                  summary: Operator (control panel)
+                  value:
+                    subject: operator-dev-001
+                    authState: authenticated
+                    roles: [operator]
+        '401':
+          description: Unauthenticated — missing, expired, or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+              examples:
+                missing:
+                  value: { error: unauthenticated }
+                expired:
+                  value: { error: token_expired }
+                invalid:
+                  value: { error: token_invalid }
+        '403':
+          description: Forbidden — token valid but lacks required permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+
+  /auth/permissions:
+    get:
+      summary: Return the set of permitted operations for the current session
+      description: |
+        Returns a structured permission map for the authenticated actor.
+        Used by frontends to gate UI elements without making separate API calls.
+
+        DSH surfaces call this once on app load to cache the permission set.
+        WLT surfaces call this to decide which finance sections to render.
+
+        Permissions are grouped by service (`dsh`, `wlt`) and surface
+        (`app-client`, `app-partner`, `app-captain`, `app-field`, `control-panel`).
+      operationId: getAuthPermissions
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      responses:
+        '200':
+          description: Permission map for the current session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+              examples:
+                client_permissions:
+                  summary: Permissions for a client actor
+                  value:
+                    subject: client-dev-001
+                    roles: [client]
+                    surfaces:
+                      app-client:
+                        canViewCatalog: true
+                        canCheckout: true
+                        canViewOwnOrders: true
+                        canCancelOwnOrder: true
+                        canViewOwnWallet: true
+                        canInitiatePayment: true
+                        canRequestRefund: false
+                        canAccessControlPanel: false
+                      app-captain:
+                        canViewAssignedOrders: false
+                        canAcceptOrder: false
+                        canUpdateDeliveryStatus: false
+                      app-partner:
+                        canManageCatalog: false
+                        canViewStoreOrders: false
+                      app-field:
+                        canUploadFieldEvidence: false
+                      control-panel:
+                        canViewOperationsQueue: false
+                        canViewFinanceOverview: false
+                captain_permissions:
+                  summary: Permissions for a captain actor
+                  value:
+                    subject: captain-dev-001
+                    roles: [captain]
+                    surfaces:
+                      app-client:
+                        canViewCatalog: false
+                        canCheckout: false
+                        canViewOwnOrders: false
+                        canCancelOwnOrder: false
+                        canViewOwnWallet: false
+                        canInitiatePayment: false
+                        canRequestRefund: false
+                        canAccessControlPanel: false
+                      app-captain:
+                        canViewAssignedOrders: true
+                        canAcceptOrder: true
+                        canUpdateDeliveryStatus: true
+                        canViewOwnWallet: true
+                        canViewOwnEarnings: true
+                      app-partner:
+                        canManageCatalog: false
+                        canViewStoreOrders: false
+                      app-field:
+                        canUploadFieldEvidence: false
+                      control-panel:
+                        canViewOperationsQueue: false
+                        canViewFinanceOverview: false
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /auth/register:
+    post:
+      summary: Register a new user and create an actor identity
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, roles]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum: [client, partner, captain, field, operator]
+                verified_identifier:
+                  type: string
+                  description: Optional phone/email identifier
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, username, roles]
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  verified_identifier:
+                    type: string
+        '400':
+          description: Missing or invalid request parameters
+        '409':
+          description: Username already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+              example:
+                error: forbidden
+
+  /auth/login:
+    post:
+      summary: Authenticate user credentials and issue token
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                device_fingerprint:
+                  type: string
+      responses:
+        '200':
+          description: Login successful — token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expires_at]
+                properties:
+                  token:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+              example:
+                error: unauthenticated
+
+  /auth/refresh:
+    post:
+      summary: Refresh active session token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+                device_fingerprint:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expires_at]
+                properties:
+                  token:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthErrorResponse'
+
+  /auth/revoke:
+    post:
+      summary: Revoke session/refresh token
+      operationId: revokeToken
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Optional token to revoke; defaults to active Bearer token
+      responses:
+        '200':
+          description: Token revoked successfully
+
+  /auth/introspect:
+    post:
+      summary: Introspect session token status (alternative to GET /auth/session)
+      operationId: introspectToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Token details returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+
+  /health:
+    get:
+      summary: Auth service liveness probe
+      operationId: getAuthHealth
+      security: []
+      responses:
+        '200':
+          description: Service alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: auth-service
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Production token. Issued at login. Introspected via GET /auth/session.
+        Required when `DSH_AUTH_MODE=production` or `WLT_AUTH_MODE=production`.
+    DevClientId:
+      type: apiKey
+      in: header
+      name: X-Client-Id
+      description: |
+        Dev-only override. Accepted when `DSH_AUTH_MODE=dev` (default) or
+        `WLT_AUTH_MODE=dev`. Value is the actor subject (e.g. `client-dev-001`).
+        NEVER accepted in production mode.
+
+  schemas:
+    SessionResponse:
+      type: object
+      required: [subject, authState, roles]
+      properties:
+        subject:
+          type: string
+          description: "Unique actor identity. Format: {role}-{id} (e.g. client-dev-001)"
+          example: client-dev-001
+        authState:
+          type: string
+          enum: [authenticated, guest, unauthenticated]
+          description: Current authentication state of the token
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [client, partner, captain, field, operator, system]
+          description: |
+            Role list drives all DSH + WLT access-control decisions.
+            An actor may hold multiple roles (rare, used for internal services).
+          minItems: 1
+        verifiedIdentifier:
+          type: string
+          description: "Verified phone/email if present. Optional."
+          example: "+9671234567"
+
+    PermissionsResponse:
+      type: object
+      required: [subject, roles, surfaces]
+      properties:
+        subject:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        surfaces:
+          type: object
+          description: Keyed by surface name; each value is a flat map of permission flags.
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: boolean
+
+    AuthErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum:
+            - unauthenticated
+            - token_expired
+            - token_invalid
+            - forbidden
+          description: Machine-readable error code
+
+  responses:
+    Unauthenticated:
+      description: Bearer token missing, expired, or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthErrorResponse'
+
+x-bthwani-role-definitions:
+  client:
+    description: End customer placing and tracking orders
+    allowedSurfaces: [app-client]
+    dshScopes:
+      - catalog:read
+      - order:create:own
+      - order:read:own
+      - order:cancel:own
+      - checkout:initiate
+    wltScopes:
+      - wallet:read:own
+      - payment:create
+      - payment:read:own
+      - refund:read:own
+
+  partner:
+    description: Store / merchant managing catalog and viewing store orders
+    allowedSurfaces: [app-partner]
+    dshScopes:
+      - catalog:read
+      - catalog:write:own-stores
+      - order:read:own-stores
+      - order:status:update:own-stores
+    wltScopes:
+      - wallet:read:own
+      - settlement:read:own
+
+  captain:
+    description: Delivery captain accepting and executing deliveries
+    allowedSurfaces: [app-captain]
+    dshScopes:
+      - order:read:assigned
+      - order:status:update:assigned
+      - captain:assignment:read:own
+    wltScopes:
+      - wallet:read:own
+      - ledger:read:own
+
+  field:
+    description: Field operations agent for store onboarding and evidence
+    allowedSurfaces: [app-field]
+    dshScopes:
+      - field:evidence:upload:own
+      - store:onboarding:read
+    wltScopes:
+      - wallet:read:own
+      - ledger:read:own
+
+  operator:
+    description: Internal control-panel staff. Read-all + limited write via WLT.
+    allowedSurfaces: [control-panel]
+    dshScopes:
+      - order:read:all
+      - order:status:update:all
+      - catalog:read:all
+      - control-panel:read
+      - control-panel:exception:manage
+    wltScopes:
+      - wallet:read:all
+      - ledger:read:all
+      - payment:confirm
+      - payment:fail
+      - refund:create
+      - refund:process
+      - refund:confirm
+      - refund:fail
+      - settlement:create
+      - settlement:process
+      - settlement:complete
+      - settlement:fail
+
+  system:
+    description: Service-to-service identity. Used by WLT for DSH callbacks.
+    allowedSurfaces: []
+    dshScopes:
+      - checkout:payment-callback:receive
+      - order:refund-callback:receive
+    wltScopes:
+      - payment:confirm
+      - payment:fail
+      - refund:confirm
+      - refund:fail

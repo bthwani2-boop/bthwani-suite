@@ -256,7 +256,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                   { label: 'نوع الكيان', value: 'منطقة تشغيلية' },
                   { label: 'الحالة الحالية', value: selectedRecommendation?.status ?? 'غير محدد' },
                   { label: 'الخطر', value: selectedRecommendation?.risk ?? 'مستقر' },
-                  { label: 'حالة الربط', value: translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY') },
+                  { label: 'حالة الربط', value: translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'NEEDS_RUNTIME_EVIDENCE') },
                   { label: 'الدليل', value: selectedRecommendation?.evidence ?? 'لا يوجد تحديد بعد' },
                   { label: 'الأثر المتوقع', value: selectedRecommendation?.expectedImpact ?? 'لا يوجد تقدير بعد' },
                 ].map(({ label, value }) => (
@@ -271,7 +271,7 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
                 title="التوصية الحالية"
                 reason={selectedRecommendation ? `${selectedRecommendation.reason} · ${selectedRecommendation.evidence}` : 'اختر منطقة لعرض التوصية.'}
                 confidence={selectedRecommendation?.confidence ?? 'medium'}
-                auditTag={translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'UI_PREVIEW_ONLY')}
+                auditTag={translateDshRuntimeBindingStatus(selectedRecommendation?.runtimeBindingStatus ?? 'NEEDS_RUNTIME_EVIDENCE')}
                 primaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-primary`, label: selectedRecommendation.primaryActionLabel, onAction: () => handleApplyPlan(selectedZone.id, selectedRecommendation.nextAction) } : undefined}
                 secondaryAction={selectedRecommendation ? { id: `${selectedRecommendation.id}-secondary`, label: selectedRecommendation.secondaryActionLabel, onAction: () => handleShowEvidence(selectedZone.id) } : undefined}
               />

@@ -1,2 +1,0 @@
-CLEAN — no unstaged changes in tracked files.
-(git diff --stat produced no output)

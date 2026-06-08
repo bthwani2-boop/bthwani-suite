@@ -6,6 +6,8 @@ import {
   Button,
   StateView,
   Text,
+  useTheme,
+  useDirection,
 } from '@bthwani/ui-kit';
 import type { FieldDocumentPreviewStatus } from '../../data/stores.preview-data';
 
@@ -38,6 +40,10 @@ export function DocumentVerificationSection({
   onUploadDocument,
   onConfirm,
 }: DocumentVerificationSectionProps) {
+  const { theme } = useTheme();
+  const { direction } = useDirection();
+  const isRtl = direction === 'rtl';
+
   if (state === 'loading') {
     return <StateView stateId="loading" title="جاري التحقق من المستندات..." description="" />;
   }
@@ -76,18 +82,28 @@ export function DocumentVerificationSection({
 
   return (
     <Box gap={4}>
-      <Text role="titleSm">التحقق من المستندات</Text>
-      <Text role="caption" tone="muted">المراجع والحالات هنا preview-only؛ قرار الاعتماد النهائي يبقى لدى control-panel/partners.</Text>
-      <Box gap={2}>
+      <Text role="titleSm" style={{ textAlign: isRtl ? 'right' : 'left' }}>التحقق من المستندات</Text>
+      <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>المراجع والحالات هنا preview-only؛ قرار الاعتماد النهائي يبقى لدى control-panel/partners.</Text>
+      <Box gap={0}>
         {documents.map((doc) => (
-          <Box key={doc.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} padding={3} background="surfaceRaised" radiusToken="md">
-            <Box gap={0}>
-              <Text role="bodyMd">{doc.label}</Text>
-              {doc.required && <Text role="bodySm" tone="danger">مطلوب</Text>}
-              {doc.referenceLabel ? <Text role="caption" tone="muted">{doc.referenceLabel}</Text> : null}
+          <Box
+            key={doc.id}
+            paddingVertical={3}
+            style={{
+              flexDirection: isRtl ? 'row-reverse' : 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottomWidth: 1,
+              borderBottomColor: theme.line,
+            }}
+          >
+            <Box gap={0} style={{ alignItems: isRtl ? 'flex-end' : 'flex-start' }}>
+              <Text role="bodyMd" style={{ textAlign: isRtl ? 'right' : 'left' }}>{doc.label}</Text>
+              {doc.required && <Text role="bodySm" tone="danger" style={{ textAlign: isRtl ? 'right' : 'left' }}>مطلوب</Text>}
+              {doc.referenceLabel ? <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>{doc.referenceLabel}</Text> : null}
             </Box>
-            <Box gap={1} style={{ alignItems: 'flex-end' }}>
-              <Text role="bodySm" tone={resolveStatusTone(doc.status)}>{resolveStatusLabel(doc.status)}</Text>
+            <Box gap={1} style={{ alignItems: isRtl ? 'flex-start' : 'flex-end' }}>
+              <Text role="bodySm" tone={resolveStatusTone(doc.status)} style={{ textAlign: isRtl ? 'left' : 'right' }}>{resolveStatusLabel(doc.status)}</Text>
               <Button
                 label={doc.status === 'missing' ? 'رفع' : 'تحديث'}
                 size="sm"

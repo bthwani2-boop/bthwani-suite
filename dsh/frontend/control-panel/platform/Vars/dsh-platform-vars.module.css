@@ -1,255 +1,741 @@
-.noticeText {
-  line-height: 1.6;
-}
-
 .varsSplit {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) 380px;
-  gap: 16px;
+  grid-template-columns: minmax(280px, 420px) 1fr;
+  gap: 0;
   align-items: start;
+  min-height: 600px;
 }
 
+/* ─── LEFT RAIL (list) ─── */
 .varsList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 0;
+  gap: 0;
+  border-left: 1px solid var(--bthwani-control-panel-border);
+  height: 100%;
+  min-height: 600px;
+  overflow-y: auto;
 }
 
-.varCard {
-  width: 100%;
+.listHeader {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 0;
   background: var(--bthwani-control-panel-surface);
+  z-index: 2;
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.kpiCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 10px;
   border: 1px solid var(--bthwani-control-panel-border);
-  border-radius: 16px;
-  padding: 16px;
+  background: var(--bthwani-control-panel-surface-inset);
+}
+
+.kpiValue {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--bthwani-control-panel-text);
+  line-height: 1;
+}
+
+.kpiLabel {
+  font-size: 10px;
+  color: var(--bthwani-control-panel-text-muted);
+  text-align: center;
+  font-weight: 600;
+}
+
+.kpiCellSuccess .kpiValue { color: var(--bthwani-success); }
+.kpiCellWarning .kpiValue { color: var(--bthwani-warning); }
+.kpiCellDanger  .kpiValue { color: var(--bthwani-danger); }
+
+.scopeTabsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.scopeTab {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: transparent;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scopeTab:hover {
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-brand);
+}
+
+.scopeTabActive {
+  background: var(--bthwani-brand);
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-text-inverse);
+}
+
+/* ─── VAR ROW (compact list item) ─── */
+.varRow {
+  width: 100%;
+  padding: 12px 16px;
   text-align: right;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.varCard:hover {
-  border-color: var(--bthwani-brand);
-  transform: translateY(-1px);
-}
-
-.varCardActive {
-  border-color: var(--bthwani-brand);
-  box-shadow: 0 12px 24px var(--bthwani-overlay);
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.cardTextBlock {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
-  min-width: 0;
+  border: none;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  background: transparent;
+  transition: background 0.15s ease;
 }
 
-.cardTitle {
-  color: var(--bthwani-control-panel-text);
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.5;
+.varRow:last-child {
+  border-bottom: none;
 }
 
-.cardCode {
-  color: var(--bthwani-control-panel-text-muted);
-  font-size: 11px;
-  word-break: break-word;
+.varRow:hover {
+  background: var(--bthwani-control-panel-surface-inset);
 }
 
-.chipRow {
+.varRowActive {
+  background: var(--bthwani-control-panel-surface-inset);
+  border-right: 3px solid var(--bthwani-brand);
+}
+
+.varRowTop {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
 
-.chip {
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--bthwani-control-panel-border);
-  background: var(--bthwani-control-panel-surface-inset);
-  color: var(--bthwani-control-panel-text);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.valueGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.valueCard {
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--bthwani-control-panel-border);
-  background: var(--bthwani-control-panel-surface-inset);
-}
-
-.valueLabel {
-  color: var(--bthwani-control-panel-text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.valueText {
-  color: var(--bthwani-control-panel-text);
+.varRowName {
   font-size: 13px;
-  font-weight: 800;
-  line-height: 1.5;
-}
-
-.summaryLine {
-  color: var(--bthwani-control-panel-text-muted);
-  font-size: 12px;
-  line-height: 1.65;
-}
-
-.detailPanel {
-  background: var(--bthwani-control-panel-surface);
-  border: 1px solid var(--bthwani-control-panel-border);
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.detailHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.detailTitle {
+  font-weight: 700;
   color: var(--bthwani-control-panel-text);
-  font-size: 16px;
-  font-weight: 900;
-  line-height: 1.5;
+  line-height: 1.4;
+  text-align: right;
+  flex: 1;
+  min-width: 0;
 }
 
-.detailFieldGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+.varRowBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
-.detailField {
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--bthwani-control-panel-border);
-  background: var(--bthwani-control-panel-surface-inset);
+.badgeBinding {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--bthwani-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badgeContract {
+  background: rgba(232, 160, 32, 0.15);
+  color: var(--bthwani-warning);
+  border: 1px solid rgba(232, 160, 32, 0.3);
+}
+
+.badgePreview {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--bthwani-brand);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.varRowMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.varRowMetaItem {
+  font-size: 10px;
+  color: var(--bthwani-control-panel-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.varRowDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--bthwani-control-panel-border);
+  flex-shrink: 0;
+}
+
+.varRowValuePreview {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bthwani-brand);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Risk indicator dot */
+.riskDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.riskLow      { background: var(--bthwani-success); }
+.riskMedium   { background: var(--bthwani-warning); }
+.riskHigh     { background: var(--bthwani-brand); }
+.riskFinancial{ background: var(--bthwani-danger); }
+
+/* ─── RIGHT DETAIL PANEL ─── */
+.detailPanel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  height: 100%;
+  min-height: 600px;
+  overflow-y: auto;
 }
 
-.detailSection {
+.detailEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bthwani-control-panel-text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 40px;
+  line-height: 1.7;
+}
+
+/* Detail header with gradient accent */
+.detailHero {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.detailLabel {
-  color: var(--bthwani-control-panel-text-muted);
+.detailHeroTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detailTitle {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--bthwani-control-panel-text);
+  line-height: 1.4;
+}
+
+.detailOwnerBadge {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 800;
+  background: var(--bthwani-control-panel-surface-inset);
+  border: 1px solid var(--bthwani-control-panel-border);
+  color: var(--bthwani-control-panel-text-muted);
 }
 
-.detailValue {
+.detailKeyCode {
+  font-size: 11px;
+  color: var(--bthwani-control-panel-text-muted);
+  font-family: monospace;
+  direction: ltr;
+  text-align: left;
+}
+
+.detailSummaryText {
+  font-size: 12px;
+  color: var(--bthwani-control-panel-text-muted);
+  line-height: 1.7;
+}
+
+/* Value comparison row */
+.valueCompareRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+}
+
+.valueBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+}
+
+.valueBoxActive {
+  border-color: var(--bthwani-brand);
+  background: rgba(var(--bthwani-brand-rgb, 30, 64, 124), 0.06);
+}
+
+.valueBoxLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.valueBoxNumber {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--bthwani-control-panel-text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.valueBoxNumberNew {
+  color: var(--bthwani-brand);
+}
+
+.valueBoxNumberEmpty {
+  font-size: 13px;
+  color: var(--bthwani-control-panel-text-muted);
+  font-weight: 500;
+}
+
+.valueArrow {
+  font-size: 18px;
+  color: var(--bthwani-control-panel-text-muted);
+  text-align: center;
+}
+
+/* Controls section */
+.detailControls {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+}
+
+.controlsLabel {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.quickPickRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.quickPickBtn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quickPickBtn:hover {
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-brand);
+  background: rgba(var(--bthwani-brand-rgb, 30, 64, 124), 0.06);
+}
+
+.quickPickBtnSelected {
+  background: var(--bthwani-brand);
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-text-inverse);
+}
+
+.valueInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
   color: var(--bthwani-control-panel-text);
   font-size: 13px;
-  line-height: 1.65;
+  font-weight: 600;
+  text-align: right;
+  direction: rtl;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
 }
 
+.valueInput:focus {
+  outline: none;
+  border-color: var(--bthwani-brand);
+}
+
+/* Primary action bar */
+.actionBar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.actionBarSingle {
+  grid-template-columns: 1fr;
+}
+
+.btnPrimary {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--bthwani-brand);
+  color: var(--bthwani-text-inverse);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+  color: var(--bthwani-control-panel-text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  border-color: var(--bthwani-brand);
+  color: var(--bthwani-brand);
+}
+
+.btnSecondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnDanger {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.07);
+  color: var(--bthwani-danger);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.btnDanger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Confirm overlay */
+.confirmBanner {
+  margin: 0 24px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 160, 32, 0.4);
+  background: rgba(232, 160, 32, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirmText {
+  font-size: 13px;
+  color: var(--bthwani-control-panel-text);
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Metadata section */
+.metaSection {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+}
+
+.metaSectionTitle {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.metaCell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.metaCellLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.metaCellValue {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text);
+  line-height: 1.4;
+}
+
+.metaCellValueCode {
+  font-family: monospace;
+  font-size: 11px;
+  direction: ltr;
+  text-align: left;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+/* Surface chips in meta */
+.surfaceChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.surfaceChip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--bthwani-control-panel-surface-inset);
+  border: 1px solid var(--bthwani-control-panel-border);
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+/* Scenarios */
+.scenarioItem {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--bthwani-control-panel-border);
+  background: var(--bthwani-control-panel-surface-inset);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scenarioTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--bthwani-control-panel-text);
+}
+
+.scenarioText {
+  font-size: 11px;
+  color: var(--bthwani-control-panel-text-muted);
+  line-height: 1.6;
+}
+
+/* Policy tab content */
 .policyStack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
 }
 
 .policySection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
 }
 
 .sectionTitle {
-  color: var(--bthwani-control-panel-text);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 900;
+  color: var(--bthwani-control-panel-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
 }
 
 .policyGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .referenceList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .referenceCard {
-  padding: 12px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid var(--bthwani-control-panel-border);
   background: var(--bthwani-control-panel-surface-inset);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .referenceTitle {
-  color: var(--bthwani-control-panel-text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
+  color: var(--bthwani-control-panel-text);
 }
 
 .referenceText {
-  color: var(--bthwani-control-panel-text);
-  font-size: 12px;
-  line-height: 1.65;
-}
-
-.referenceFooter {
-  color: var(--bthwani-control-panel-text-muted);
   font-size: 11px;
+  color: var(--bthwani-control-panel-text-muted);
   line-height: 1.6;
 }
 
+.referenceFooter {
+  font-size: 10px;
+  color: var(--bthwani-control-panel-text-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
 .emptyState {
-  padding: 18px;
-  border-radius: 16px;
+  padding: 24px 16px;
+  border-radius: 12px;
   border: 1px dashed var(--bthwani-control-panel-border);
   background: var(--bthwani-control-panel-surface-inset);
   color: var(--bthwani-control-panel-text-muted);
   text-align: center;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* Domain tab bar (top of list) */
+.domainTabBar {
+  display: flex;
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+}
+
+.domainTab {
+  flex: 1;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+  line-height: 1.3;
+}
+
+.domainTab:hover {
+  color: var(--bthwani-control-panel-text);
+  background: var(--bthwani-control-panel-surface-inset);
+}
+
+.domainTabActive {
+  color: var(--bthwani-brand);
+  border-bottom-color: var(--bthwani-brand);
+  background: rgba(var(--bthwani-brand-rgb, 30, 64, 124), 0.05);
+}
+
+/* Noticetext compat */
+.noticeText { line-height: 1.6; }
+
+/* Rollback hint row */
+.rollbackHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.rollbackHintIcon {
+  font-size: 14px;
+}
+
+.rollbackHintText {
+  font-size: 11px;
+  color: var(--bthwani-danger);
+  line-height: 1.5;
+  font-weight: 600;
 }
 
 @media (max-width: 1100px) {
   .varsSplit {
     grid-template-columns: 1fr;
   }
-
-  .policyGrid,
-  .valueGrid,
-  .detailFieldGrid {
+  .varsList {
+    border-left: none;
+    border-bottom: 1px solid var(--bthwani-control-panel-border);
+    min-height: 0;
+    max-height: 400px;
+  }
+  .policyGrid {
+    grid-template-columns: 1fr;
+  }
+  .metaGrid {
     grid-template-columns: 1fr;
   }
 }

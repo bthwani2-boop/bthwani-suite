@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 import type { DshPartnerPreparationStage } from '../../shared/dsh-order-journey.model';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../../shared/dsh-delivery-mode.model';
+import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
 
 type PartnerFulfillmentMode = DshFulfillmentDeliveryMode;
 
@@ -61,7 +62,7 @@ export function DshPartnerOrderActionPanel({ activeFlowId, fulfillmentMode, onSe
         <Text role="bodySm" tone="muted">{modeInfo.instruction}</Text>
       </Surface>
 
-      {resolvedMode === 'partner_delivery' ? (
+      {getSurfaceModeCapability(resolvedMode).partner.manageCourier ? (
         <Surface tone="raised" gap={2}>
           <SectionHeader
             title="موصل الشريك"

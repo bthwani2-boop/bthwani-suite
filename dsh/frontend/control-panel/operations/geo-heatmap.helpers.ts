@@ -108,6 +108,6 @@ export function buildRecommendation(zone: GeoHeatmapZone, subTabId: GeoSubTabId,
     primaryActionLabel: 'تثبيت الإجراء',
     secondaryActionLabel: 'عرض الدليل',
     counterpartRouteHint: resolveRouteHint(hubHref, zone.id),
-    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
   };
 }

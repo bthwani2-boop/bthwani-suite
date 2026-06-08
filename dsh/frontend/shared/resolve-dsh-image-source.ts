@@ -44,6 +44,7 @@ const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.banner.home.promo-5.v1': require('../media-fixtures/banners/dsh-banner-home-promo-5-v1.png') as ImageSourcePropType,
   'dsh.banner.home.promo-6.v1': require('../media-fixtures/banners/dsh-banner-home-promo-6-v1.png') as ImageSourcePropType,
   'dsh.banner.home.promo-7.v1': require('../media-fixtures/banners/dsh-banner-home-promo-7-v1.png') as ImageSourcePropType,
+  'dsh.proof.delivery.preview.v1': require('../media-fixtures/banners/dsh-banner-home-promo-1-v1.png') as ImageSourcePropType,
 
   // Main Categories
   'dsh.category.main.restaurants.v1': require('../media-fixtures/categories/main/dsh-category-main-restaurants-v1.png') as ImageSourcePropType,
@@ -76,6 +77,22 @@ const dshSeedMediaSources: Record<string, ImageSourcePropType> = {
   'dsh.category.sub.gas_refill_repair.v1': require('../media-fixtures/categories/sub/dsh-category-sub-gas_refill_repair-v1.png') as ImageSourcePropType,
   'dsh.category.sub.gas_refill_buy.v1': require('../media-fixtures/categories/sub/dsh-category-sub-gas_refill_buy-v1.png') as ImageSourcePropType,
 };
+
+export const DSH_PRODUCT_MEDIA_FIXTURE_KEYS = [
+  'dsh.product.apple.v1',
+  'dsh.product.bread.v1',
+  'dsh.product.chicken.v1',
+  'dsh.product.choco.v1',
+  'dsh.product.croissant.v1',
+  'dsh.product.milk.v1',
+  'dsh.product.pasta.v1',
+  'dsh.product.roll.v1',
+  'dsh.product.lead-5.dates-box.v1',
+  'dsh.product.salad.v1',
+  'dsh.product.yogurt.v1',
+] as const;
+
+export type DshProductMediaFixtureKey = (typeof DSH_PRODUCT_MEDIA_FIXTURE_KEYS)[number];
 
 /**
  * Category key namespace router.

@@ -245,13 +245,13 @@ function Get-NextGhbSequenceNumber {
         #
         # Rejected as sequence:
         #   ghb/20260408-...  => date-like mistake, not a sequence.
-        if ($name -match '^ghb/\(([0-9]{1,4})\)-') {
+        if ($name -match '^ghb[/-]\(([0-9]{1,4})\)-') {
             $n = [int]$Matches[1]
             if ($n -gt $max) { $max = $n }
             continue
         }
 
-        if ($name -match '^ghb/([0-9]{4})-') {
+        if ($name -match '^ghb[/-]([0-9]{4})-') {
             $candidate = [int]$Matches[1]
 
             # Reject date-like accidental branch names such as 20260408.
@@ -451,8 +451,17 @@ try {
         $seq = Get-NextGhbSequenceNumber
         $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
         $slug = Get-BranchSlug -Text $Message -ChangedPaths $changedPaths
-        $BranchName = ('ghb/{0:D4}-{1}-{2}' -f $seq, $stamp, $slug)
+        $BranchName = ('ghb-{0:D4}-{1}-{2}' -f $seq, $stamp, $slug)
     }
+
+    # Normalize generated or manually supplied checkpoint branch names.
+    # Git allows slash-separated branch namespaces, but this tool intentionally
+    # writes flat ghb-* branch names to avoid branch-search/ref lookup ambiguity.
+    $BranchName = ([string]$BranchName).Trim() -replace '[\\/]+', '-'
+    $BranchName = $BranchName -replace '-{2,}', '-'
+    $BranchName = $BranchName.Trim('-')
+    if ([string]::IsNullOrWhiteSpace($BranchName)) { throw 'BranchName became empty after slash normalization.' }
+
     $newBranch = $BranchName
     $Script:Facts['new_branch'] = $newBranch
     $Script:Facts['message'] = $Message

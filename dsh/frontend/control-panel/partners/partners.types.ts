@@ -2,6 +2,8 @@ export type PartnerWorkspaceTabId =
   | 'inbox'
   | 'activation'
   | 'documents'
+  | 'readiness_escalations'
+  | 'readiness_approvals'
   | 'overrides'
   | 'performance'
   | 'eligibility'
@@ -23,6 +25,8 @@ export const PARTNER_PRIMARY_TABS: readonly PartnerWorkspaceTabItem[] = [
   { id: 'inbox', label: 'الوارد الجديد' },
   { id: 'activation', label: 'تفعيل الشريك' },
   { id: 'documents', label: 'وثائق الشركاء' },
+  { id: 'readiness_escalations', label: 'تصعيد الجاهزية' },
+  { id: 'readiness_approvals', label: 'اعتماد الجاهزية' },
   { id: 'overrides', label: 'تجاوزات الكتالوج' },
   { id: 'performance', label: 'الأداء والامتثال' },
   { id: 'eligibility', label: 'أهلية الترويج' },

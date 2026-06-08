@@ -33,6 +33,8 @@ const PartnerCatalogOverridesWorkspace = React.lazy(() => import('./PartnerCatal
 const PartnerPerformanceWorkspace = React.lazy(() => import('./PartnerPerformanceWorkspace'));
 const PartnerModificationsWorkspace = React.lazy(() => import('./PartnerModificationsWorkspace'));
 const PartnerComplaintsWorkspace = React.lazy(() => import('./PartnerComplaintsWorkspace'));
+const ReadinessEscalationsWorkspace = React.lazy(() => import('./ReadinessEscalationsWorkspace').then(m => ({ default: m.ReadinessEscalationsWorkspace })));
+const ReadinessApprovalsWorkspace = React.lazy(() => import('./ReadinessApprovalsWorkspace').then(m => ({ default: m.ReadinessApprovalsWorkspace })));
 
 function WorkspaceSkeleton() {
   return (
@@ -388,6 +390,10 @@ export function ControlPanelDshPartnerHubScreen() {
                 <ControlPanelDshPartnerActivationScreen />
               ) : activeTab === 'documents' ? (
                 <ControlPanelDshPartnerDocumentReviewScreen />
+              ) : activeTab === 'readiness_escalations' ? (
+                <ReadinessEscalationsWorkspace />
+              ) : activeTab === 'readiness_approvals' ? (
+                <ReadinessApprovalsWorkspace />
               ) : activeTab === 'overrides' ? (
                 <PartnerCatalogOverridesWorkspace />
               ) : activeTab === 'inbox' ? (

@@ -215,7 +215,12 @@ export type DshPartnerRoute =
   | 'support-screen'
   | 'inventory-management'
   | 'order-rejection' // Intentionally hidden compatibility-only route; keep for legacy registry consumers.
-  | 'store-courier';
+  | 'store-courier'
+  | 'product-edit' // J-002 / DSH-SLICE-002A — Product identity create/edit
+  | 'category-management' // J-002 / DSH-SLICE-002B — Category structure management
+  | 'product-media' // J-002 / DSH-SLICE-002C — Product media management
+  | 'product-overrides'; // J-002 / DSH-SLICE-002D — Partner local overrides
+
 
 export type DshPartnerSurfaceProps = {
   initialRoute?: DshPartnerRoute;
