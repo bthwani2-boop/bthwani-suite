@@ -14,7 +14,6 @@ import {
   TextField,
   TopBar,
   useTheme,
-  colorPalette,
   spacing,
   radius,
 } from '@bthwani/ui-kit';
@@ -116,7 +115,7 @@ export function DshFieldReadinessEscalationScreen({
         <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
-            stateId="blocked"
+            stateId="blockingError"
             title="تم رفض التصعيد"
             description="لم يتم قبول بلاغ عدم الجاهزية. يُرجى مراجعة المتطلبات وإعادة المحاولة."
             actionLabel="إعادة التصعيد"
@@ -163,7 +162,7 @@ export function DshFieldReadinessEscalationScreen({
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>
           {/* Section 1: متطلبات المتجر */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title={storeName}
               subtitle="المتجر حالياً غير جاهز لاستلام الطلبات."
@@ -179,7 +178,7 @@ export function DshFieldReadinessEscalationScreen({
           <Divider />
 
           {/* Section 2: سياق التصعيد */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title={readinessFlow.title}
               subtitle={`هذا التصعيد يبقى field-owned في التجميع، لكن مالك القرار والسياسة هو ${resolveDshControlPanelSectionLabel('partners')}.`}
@@ -202,7 +201,7 @@ export function DshFieldReadinessEscalationScreen({
               {fieldFollowUpFlows.map((flow, index) => (
                 <View key={flow.flowId}>
                   {index > 0 && <Divider style={{ marginVertical: 8 }} />}
-                  <Box gap={1} paddingVertical={2}>
+                  <Box gap={1} paddingY={2}>
                     <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                         <Text role="bodyStrong" style={{ textAlign: 'right' }}>{flow.title}</Text>
@@ -211,7 +210,7 @@ export function DshFieldReadinessEscalationScreen({
                       </View>
                       <Badge
                         label={flow.requiresEvidence ? 'يتطلب إثباتًا' : 'متابعة'}
-                        tone={flow.requiresEvidence ? 'warning' : 'neutral'}
+                        tone={flow.requiresEvidence ? 'warning' : 'default'}
                       />
                     </View>
                   </Box>
@@ -223,7 +222,7 @@ export function DshFieldReadinessEscalationScreen({
           <Divider />
 
           {/* Section 3: توجيه التصعيد */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="توجيه التصعيد"
               subtitle="اختر الجهة المسؤولة عن معالجة هذا العائق."
@@ -235,13 +234,32 @@ export function DshFieldReadinessEscalationScreen({
                   onPress={() => onSelectTarget(target.id)}
                   style={[
                     styles.targetItem,
-                    target.isSelected && styles.targetItemSelected,
+                    { borderColor: theme.line },
+                    target.isSelected && {
+                      borderColor: theme.brand,
+                      backgroundColor: theme.brandSurface,
+                    },
                   ]}
                 >
-                  <View style={[styles.radioCircle, target.isSelected && styles.radioCircleActive]}>
-                    {target.isSelected && <View style={styles.radioInner} />}
+                  <View
+                    style={[
+                      styles.radioCircle,
+                      { borderColor: theme.line },
+                      target.isSelected && { borderColor: theme.brand },
+                    ]}
+                  >
+                    {target.isSelected && (
+                      <View style={[styles.radioInner, { backgroundColor: theme.brand }]} />
+                    )}
                   </View>
-                  <Text role="bodyMd" style={[styles.targetLabel, target.isSelected && { color: colorPalette.deepBlue }]}>
+                  <Text
+                    role="bodyMd"
+                    style={[
+                      styles.targetLabel,
+                      { color: theme.textMuted },
+                      target.isSelected && { color: theme.text },
+                    ]}
+                  >
                     {target.label}
                   </Text>
                 </Pressable>
@@ -252,7 +270,7 @@ export function DshFieldReadinessEscalationScreen({
           <Divider />
 
           {/* Section 4: تفاصيل إضافية */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="تفاصيل إضافية"
               subtitle="يرجى كتابة ملاحظات دقيقة لمساعدة فريق المعالجة."
@@ -296,34 +314,23 @@ const styles = StyleSheet.create({
     padding: spacing[3],
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colorPalette.line,
     gap: spacing[3],
-  },
-  targetItemSelected: {
-    borderColor: colorPalette.deepBlue,
-    backgroundColor: colorPalette.lightSurface,
   },
   targetLabel: {
     flex: 1,
     textAlign: 'right',
-    color: colorPalette.deepBlueLighter,
   },
   radioCircle: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: colorPalette.line,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  radioCircleActive: {
-    borderColor: colorPalette.deepBlue,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: colorPalette.deepBlue,
   },
 });

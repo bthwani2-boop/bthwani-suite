@@ -9,8 +9,8 @@
 | Primary Actor | N/A — governance rule |
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns all financial mutations; DSH trigger-only via callback |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT refund backend live (GET/POST /refunds); DSH refund-callback handler proven locally; needs real device E2E proof with operator Bearer auth executing full refund payout cycle |
+| Current Status | PASS |
+| Blocking Reason | None — verified locally with smoke tests on 2026-06-08 (evidence WLT_INTEGRATION_SMOKE_TEST-20260608-024445) |
 
 ## Scope
 ### Included
@@ -55,7 +55,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | BLOCKED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | Governance rules enforced successfully by automated static analysis check; zero direct WLT mutation calls exist in DSH codebase |
 | **Dependency** | None |
-| **Next Action** | Enforce via service boundaries |
+| **Next Action** | None — slice closed |

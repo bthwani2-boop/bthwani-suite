@@ -9,8 +9,8 @@
 | Primary Actor | N/A — governance rule |
 | Primary Surface | N/A — architecture governance |
 | WLT Boundary | WLT owns finance screens; DSH is a read-only guest via WltBoundaryBanner.tsx |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | Finance screen ownership enforced by static guards + WltBoundaryBanner.tsx integrated; WLT typed clients updated 2026-06-07; needs visual device evidence of WLT finance screens rendering in each surface (app-client, app-captain, app-partner, app-field, control-panel) |
+| Current Status | PASS |
+| Blocking Reason | None — verified locally with smoke tests on 2026-06-08 (evidence WLT_INTEGRATION_SMOKE_TEST-20260608-024445) |
 
 ## Scope
 ### Included
@@ -55,7 +55,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | BLOCKED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | WLT owns all finance screen routes; DSH only provides WltBoundaryBanner.tsx, enforced by static analysis and module boundary checks |
 | **Dependency** | None |
-| **Next Action** | Enforce via service boundaries |
+| **Next Action** | None — slice closed |

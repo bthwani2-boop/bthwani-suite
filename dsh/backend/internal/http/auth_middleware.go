@@ -40,10 +40,10 @@ func authServiceURL() string {
 
 // authSessionResponse mirrors auth.openapi.yaml GET /auth/session response.
 type authSessionResponse struct {
-	Subject             string   `json:"subject"`
-	AuthState           string   `json:"authState"`
-	Roles               []string `json:"roles"`
-	VerifiedIdentifier  string   `json:"verifiedIdentifier"`
+	Subject            string   `json:"subject"`
+	AuthState          string   `json:"authState"`
+	Roles              []string `json:"roles"`
+	VerifiedIdentifier string   `json:"verifiedIdentifier"`
 }
 
 // verifyBearerToken calls auth service GET /auth/session with the provided token.
@@ -97,6 +97,7 @@ func min(a, b int) int {
 }
 
 type authContextKey string
+
 const authSessionKey authContextKey = "auth_session"
 
 type AuthSession struct {
@@ -168,17 +169,19 @@ func verifyBearerTokenSession(ctx context.Context, token string) *AuthSession {
 // resolveClientIdentity extracts the client identity from the request.
 //
 // DEV mode (DSH_AUTH_MODE not set or != production):
-//   Accepts X-Client-Id header as a temporary DEV_ONLY identity mechanism.
-//   Returns empty string if the header is absent.
+//
+//	Accepts X-Client-Id header as a temporary DEV_ONLY identity mechanism.
+//	Returns empty string if the header is absent.
 //
 // Production mode (DSH_AUTH_MODE=production):
-//   Requires a Bearer token in the Authorization header.
-//   Token format: "Bearer <token>" where <token> is a JWT or opaque session token.
-//   In production this should call auth.openapi.yaml GET /auth/session to validate
-//   the token and return the subject/clientId from the session response.
-//   Calls verifyBearerToken → DSH_AUTH_SERVICE_URL/auth/session.
-//   DSH_AUTH_SERVICE_URL MUST be set in production; if unset all requests denied.
-//   REMAINING GATE before 003A/003B PASS: real auth service + runtime proof.
+//
+//	Requires a Bearer token in the Authorization header.
+//	Token format: "Bearer <token>" where <token> is a JWT or opaque session token.
+//	In production this should call auth.openapi.yaml GET /auth/session to validate
+//	the token and return the subject/clientId from the session response.
+//	Calls verifyBearerToken → DSH_AUTH_SERVICE_URL/auth/session.
+//	DSH_AUTH_SERVICE_URL MUST be set in production; if unset all requests denied.
+//	REMAINING GATE before 003A/003B PASS: real auth service + runtime proof.
 func resolveClientIdentity(r *http.Request) string {
 	var session *AuthSession
 

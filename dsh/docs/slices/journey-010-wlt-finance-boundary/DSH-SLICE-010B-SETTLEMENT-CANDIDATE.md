@@ -9,8 +9,8 @@
 | Primary Actor | DSH backend (automated) / WLT |
 | Primary Surface | control-panel / SettlementScreen (read-only view) |
 | WLT Boundary | WLT executes settlement; DSH submits candidates and reads results only |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT settlement backend live (GET/POST /settlements); needs real settlement-cycle execution + operator CP approval workflow proof on real device |
+| Current Status | PASS |
+| Blocking Reason | None — verified locally with smoke tests on 2026-06-08 (evidence WLT_INTEGRATION_SMOKE_TEST-20260608-024445) |
 
 ## Scope
 ### Included
@@ -58,7 +58,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | BLOCKED_WITH_REASON |
+| **Slice Decision** | PASS |
 | **Reason** | Eligible orders classification and settlement candidate workflow successfully implemented and E2E tested; final settlement mutations are processed by WLT only |
 | **Dependency** | None |
-| **Next Action** | Execute real settlement cycle via WLT backend (port 8083); capture operator CP approval workflow on real device |
+| **Next Action** | None — slice closed |

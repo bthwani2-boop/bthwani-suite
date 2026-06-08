@@ -12,7 +12,7 @@ const STATUS_LABEL: Record<string, string> = {
   disputed: 'نزاع',
 };
 
-export function WltDshRefundLedger() {
+export function WltDshRefundLedger({ subGroup }: { subGroup?: string } = {}) {
   const previewCases = React.useMemo(() => getWltDshRefundLedgerPreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
@@ -29,19 +29,62 @@ export function WltDshRefundLedger() {
   const runtimeData = runtimeFinance?.state === 'runtime' ? runtimeFinance.data : null;
   const runtimeCases = runtimeData?.refunds ?? null;
 
+  const filteredPreviewCases = React.useMemo(() => {
+    if (!subGroup) return previewCases;
+    if (subGroup === 'refunds') {
+      return previewCases.filter(
+        (c) => c.status === 'pending_wlt_review' || c.status === 'approved_preview',
+      );
+    }
+    if (subGroup === 'disputes') {
+      return previewCases.filter((c) => c.status === 'disputed');
+    }
+    if (subGroup === 'cancellations') {
+      return previewCases.filter(
+        (c) => c.status === 'rejected_preview' || c.reason.includes('إلغاء') || c.reason.includes('نقص'),
+      );
+    }
+    if (subGroup === 'holds') {
+      return previewCases.filter(
+        (c) => c.ledgerImpact.includes('Pending') || c.settlementImpact.includes('حجز'),
+      );
+    }
+    return previewCases;
+  }, [previewCases, subGroup]);
+
+  const filteredRuntimeCases = React.useMemo(() => {
+    if (!runtimeCases) return null;
+    if (!subGroup) return runtimeCases;
+    if (subGroup === 'refunds') {
+      return runtimeCases.filter(
+        (c) => c.status === 'PENDING' || c.status === 'CONFIRMED',
+      );
+    }
+    if (subGroup === 'disputes') {
+      return runtimeCases.filter((c) => c.status === 'FAILED');
+    }
+    if (subGroup === 'cancellations') {
+      return runtimeCases.filter((c) => c.status === 'FAILED' || c.reason.includes('إلغاء'));
+    }
+    if (subGroup === 'holds') {
+      return runtimeCases.filter((c) => c.status === 'PROCESSING');
+    }
+    return runtimeCases;
+  }, [runtimeCases, subGroup]);
+
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <Text role="titleMd" style={{ fontWeight: 800 }}>سجل الاستردادات والنزاعات</Text>
         <Text role="bodySm" tone="soft">
-          {runtimeCases
+          {filteredRuntimeCases
             ? `مرتبط بقائمة WLT runtime للاستردادات · ${runtimeData?.baseUrl ?? 'WLT runtime'}`
             : 'Fallback preview عند تعذر WLT runtime.'}
         </Text>
       </Box>
 
       <div style={{ display: 'grid', gap: 12 }}>
-        {runtimeCases ? runtimeCases.map((item) => (
+        {filteredRuntimeCases ? filteredRuntimeCases.map((item) => (
           <Box key={item.id} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div>
@@ -58,7 +101,7 @@ export function WltDshRefundLedger() {
               <Text role="caption" tone="muted">Created: {item.created_at}</Text>
             </Box>
           </Box>
-        )) : previewCases.map((item) => (
+        )) : filteredPreviewCases.map((item) => (
           <Box key={item.refundCaseId} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div>

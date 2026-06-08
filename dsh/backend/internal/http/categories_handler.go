@@ -103,7 +103,6 @@ func (h *CategoriesHandler) CreateCategory(w http.ResponseWriter, r *http.Reques
 	writeJSON(w, http.StatusCreated, record)
 }
 
-
 func (h *CategoriesHandler) ListCategories(w http.ResponseWriter, r *http.Request) {
 	storeID := r.PathValue("store_id")
 	log.Printf("dsh-api: GET /stores/%s/categories", storeID)

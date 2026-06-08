@@ -1,18 +1,9 @@
 import React from 'react';
-import { DshOperationScreen } from '../parts/OperationScreen';
+import { DshAddressLocationScreen } from './AddressLocationScreen';
 import type { DshMySpaceSubScreenProps } from './DshWalletHubScreen';
 
-export function DshLocationHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="الموقع الحالي"
-      subtitle="تحديد وتحديث موقعك الميداني"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
-      onRetry={onRetry}
-    />
-  );
+export function DshLocationHubScreen({ onBack }: DshMySpaceSubScreenProps) {
+  return <DshAddressLocationScreen onBack={onBack} />;
 }
 
 export default DshLocationHubScreen;

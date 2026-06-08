@@ -477,7 +477,6 @@ func (handler *StoresHandler) CreateFieldDocument(writer http.ResponseWriter, re
 	writeJSON(writer, http.StatusCreated, res)
 }
 
-
 func writeError(writer http.ResponseWriter, status int, code domain.ErrorCode, message string) {
 	writeJSON(writer, status, domain.ErrorResponse{
 		Code:    code,

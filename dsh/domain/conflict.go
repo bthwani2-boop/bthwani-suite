@@ -25,8 +25,8 @@ type ResolveConflictResponse struct {
 }
 
 type ListConflictsResponse struct {
-	Conflicts  []CatalogConflict `json:"conflicts"`
-	Limit      int               `json:"limit"`
-	Offset     int               `json:"offset"`
-	Total      int               `json:"total"`
+	Conflicts []CatalogConflict `json:"conflicts"`
+	Limit     int               `json:"limit"`
+	Offset    int               `json:"offset"`
+	Total     int               `json:"total"`
 }

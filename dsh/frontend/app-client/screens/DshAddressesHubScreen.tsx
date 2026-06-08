@@ -1,18 +1,9 @@
 import React from 'react';
-import { DshOperationScreen } from '../parts/OperationScreen';
+import { DshAddressLocationScreen } from './AddressLocationScreen';
 import type { DshMySpaceSubScreenProps } from './DshWalletHubScreen';
 
-export function DshAddressesHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
-  return (
-    <DshOperationScreen
-      state={state}
-      title="العناوين المحفوظة"
-      subtitle="إدارة مواقع التوصيل والاستلام"
-      primaryActionLabel="العودة لمساحتي"
-      onPrimaryAction={onBack}
-      onRetry={onRetry}
-    />
-  );
+export function DshAddressesHubScreen({ onBack }: DshMySpaceSubScreenProps) {
+  return <DshAddressLocationScreen onBack={onBack} />;
 }
 
 export default DshAddressesHubScreen;

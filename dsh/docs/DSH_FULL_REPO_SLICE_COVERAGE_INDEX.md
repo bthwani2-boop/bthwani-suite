@@ -415,7 +415,7 @@ These contradictions exist between source files and must be resolved in the appr
 | J-005 implementation status | **DEFERRED_WITH_REASON** â€” deferred pending J-004/J-009 runtime; ready for local smoke testing; evidence under `tools/registry/runs/DSH_SLICE_DEFERRED_CLOSURES_BATCH2-20260606-LOCAL/` |
 | J-006 implementation status | **BLOCKED_WITH_REASON** â€” field onboarding, visit evidence, documents/media proof, readiness escalation, and CP approval/partner readiness pending production auth validation and WLT E2E callback proof |
 | J-007 implementation status | ACTIVE_GOVERNANCE â€” no runtime slice; guard-proven 2026-06-06 with `guard-dsh-shared-foundations-final` PASS and `guard-dsh-media-manifest` PASS |
-| J-010 implementation status | **BLOCKED_WITH_REASON** â€” full WLT finance ownership; DSH reads only (settlements/payouts bridge ready for local testing) |
+| J-010 implementation status | **PASS** — full WLT finance ownership; DSH reads only (settlements/payouts bridge verified locally with smoke tests; evidence WLT_INTEGRATION_SMOKE_TEST-20260608-024445) |
 | Full universal protocol closures (DEFERRED) | 0 |
 
 ---
@@ -424,7 +424,7 @@ These contradictions exist between source files and must be resolved in the appr
 
 `PASS_WITH_WARNINGS`
 
-The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001 and DSH-SLICE-002 are closed with PASS decisions. Slices for J-003, J-004, J-005, J-006, J-008, J-009, and J-010 are deferred/blocked at production-ready level, but ready for controlled local smoke testing. J-007 is active perpetual governance and is guard-proven, not a runtime closure slice. WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
+The coverage index is structurally complete for all major DSH source areas. All areas are mapped to a journey/slice or classified OUT_OF_SCOPE_WITH_REASON. All 4 known contradictions (CONTRA-001 through CONTRA-004) are resolved. DSH-SLICE-001, DSH-SLICE-002, and J-010 (DSH-SLICE-010A-D) are closed with PASS decisions. Slices for J-003, J-004, J-005, J-006, J-008, and J-009 are deferred/blocked at production-ready level, but ready for controlled local smoke testing. J-007 is active perpetual governance and is guard-proven, not a runtime closure slice. WLT boundary enforced with zero drift. No CLOSED or 100% claimed for production.
 
 DSH-SLICE-003 (A-E) blocked 2026-06-06: Checkout & payment flow E2E verified locally with live auth-service running on port 8091 and WLT callback simulation. Production release blocked. Evidence: `tools/registry/runs/DSH_J003_AUTH_RUNTIME_PROOF-20260606-LOCAL/`.
 DSH-SLICE-004 (A-F) deferred 2026-06-06: Order lifecycle, tracking, cancellation, support escalation, and WLT refund callback integration verified locally. Production release deferred pending J-003.

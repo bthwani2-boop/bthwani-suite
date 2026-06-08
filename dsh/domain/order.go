@@ -31,27 +31,27 @@ const (
 )
 
 type OrderRecord struct {
-	ID                     string    `json:"id"`
-	StoreID                string    `json:"store_id"`
-	ClientID               string    `json:"client_id"`
-	Status                 string    `json:"status"`
-	TotalPrice             float64   `json:"total_price"`
-	WltPaymentRefID        *string   `json:"wlt_payment_ref_id,omitempty"`
-	WltRefundRefID         *string   `json:"wlt_refund_ref_id,omitempty"`
-	CheckoutIntentID       *string   `json:"checkout_intent_id,omitempty"`
-	CaptainID              *string   `json:"captain_id,omitempty"`
-	CaptainLatitude        *float64  `json:"captain_latitude,omitempty"`
-	CaptainLongitude       *float64  `json:"captain_longitude,omitempty"`
-	CaptainLifecycleStatus *string   `json:"captain_lifecycle_status,omitempty"`
-	PodMediaKey            *string   `json:"pod_media_key,omitempty"`
+	ID                     string   `json:"id"`
+	StoreID                string   `json:"store_id"`
+	ClientID               string   `json:"client_id"`
+	Status                 string   `json:"status"`
+	TotalPrice             float64  `json:"total_price"`
+	WltPaymentRefID        *string  `json:"wlt_payment_ref_id,omitempty"`
+	WltRefundRefID         *string  `json:"wlt_refund_ref_id,omitempty"`
+	CheckoutIntentID       *string  `json:"checkout_intent_id,omitempty"`
+	CaptainID              *string  `json:"captain_id,omitempty"`
+	CaptainLatitude        *float64 `json:"captain_latitude,omitempty"`
+	CaptainLongitude       *float64 `json:"captain_longitude,omitempty"`
+	CaptainLifecycleStatus *string  `json:"captain_lifecycle_status,omitempty"`
+	PodMediaKey            *string  `json:"pod_media_key,omitempty"`
 	// DSH-SLICE-005F: delivery failure fields.
 	// WltRefundTriggerRef is a bridge reference for WLT to execute refund — DSH does NOT mutate finances.
 	DeliveryFailureReason *string `json:"delivery_failure_reason,omitempty"`
 	WltRefundTriggerRef   *string `json:"wlt_refund_trigger_ref,omitempty"`
 	// Settlement bridge fields (J-010). WLT owns all settlement computation.
 	// DSH records the WLT settlement ID and the current settlement status as read-only bridge values.
-	WltSettlementRefID *string `json:"wlt_settlement_ref_id,omitempty"`
-	SettlementStatus   string  `json:"settlement_status,omitempty"`
+	WltSettlementRefID *string   `json:"wlt_settlement_ref_id,omitempty"`
+	SettlementStatus   string    `json:"settlement_status,omitempty"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`
 }

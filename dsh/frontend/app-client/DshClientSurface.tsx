@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Platform, View } from 'react-native';
 import { BottomNavBar, Text, colorPalette } from '@bthwani/ui-kit';
 import { DshEntryScreen } from './screens/EntryScreen';
@@ -946,7 +946,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
         onOpenAddressesLocation={() => setRoute('addresses-location')}
         onOpenIdentity={() => setRoute('identity')}
         onOpenCommercial={() => { setSelectedOperationScreen('promo-apply'); setRoute('benefits'); }}
-        onOpenAppearance={() => { setSelectedOperationScreen('service-modes-resolve'); setRoute('service-settings'); }}
+        onOpenAppearance={() => setRoute('appearance')}
         onOpenPreferences={() => setRoute('preferences')}
         onOpenTracking={() => openTrackedOrder()}
         onRepeatOrder={openCreateOrderJourney}
@@ -1108,6 +1108,17 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
         onPrimaryAction={returnHome}
         onSecondaryAction={returnHome}
         onRetry={() => setRoute('listing-status-update')}
+      />
+    );
+  }
+
+  if (route === 'appearance') {
+    return (
+      <DshAppearanceHubScreen
+        appearanceMode={appearanceMode}
+        onAppearanceModeChange={setAppearanceMode}
+        onBack={() => setRoute('my-space')}
+        onRetry={() => setRoute('appearance')}
       />
     );
   }

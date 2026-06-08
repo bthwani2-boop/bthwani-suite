@@ -87,7 +87,14 @@ try {
 $Encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($AuthScript))
 $AuthProcess = Start-Process -FilePath "powershell" -ArgumentList "-NoProfile", "-EncodedCommand", $Encoded -NoNewWindow -PassThru
 
-# # Run Postgres migrations and seeds
+# Set environment variables
+$Env:PORT = "8080"
+$Env:DSH_AUTH_MODE = "production"
+$Env:DSH_AUTH_SERVICE_URL = "http://localhost:8081"
+$Env:WLT_CALLBACK_SECRET = "dev-secret"
+$Env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:56432/dsh_local?sslmode=disable"
+
+# Run Postgres migrations and seeds
 Log-Msg "Applying migrations and seeds to Postgres..."
 Push-Location -Path "C:\bthwani-suite\dsh\backend"
 go test -count=1 -run TestApplyMigrations ./internal/store
@@ -95,13 +102,6 @@ Pop-Location
 
 # 2. Start DSH API Server in Production Auth Mode (port 8080)
 Log-Msg "Launching DSH Go API Server on http://localhost:8080 (DSH_AUTH_MODE=production with Postgres)..."
-
-# Set environment variables for the new process
-$Env:PORT = "8080"
-$Env:DSH_AUTH_MODE = "production"
-$Env:DSH_AUTH_SERVICE_URL = "http://localhost:8081"
-$Env:WLT_CALLBACK_SECRET = "dev-secret"
-$Env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
 
 # Spawn Go DSH backend process
 $DshProcess = Start-Process -FilePath "go" -ArgumentList "run", "cmd/dsh-api/main.go" -NoNewWindow -PassThru -WorkingDirectory "C:\bthwani-suite\dsh\backend"

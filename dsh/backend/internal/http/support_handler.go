@@ -80,7 +80,23 @@ func (h *SupportHandler) CreateSupportEscalation(w http.ResponseWriter, r *http.
 		return
 	}
 
-	// Verify client ownership of order if client
+	// Validate issue_type BEFORE any DB lookup so bad input returns 400 immediately.
+	issueType := strings.ToLower(strings.TrimSpace(req.IssueType))
+	if issueType != "delayed_delivery" &&
+		issueType != "wrong_items" &&
+		issueType != "missing_items" &&
+		issueType != "payment_issue" &&
+		issueType != "other" {
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid issue_type")
+		return
+	}
+
+	if strings.TrimSpace(req.Description) == "" {
+		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "description is required")
+		return
+	}
+
+	// Verify client ownership of order (after input validation to avoid DB round-trip on bad input).
 	if HasRole(r, "client") {
 		order, _, err := h.repository.GetOrder(r.Context(), req.OrderID)
 		if err != nil {
@@ -96,21 +112,6 @@ func (h *SupportHandler) CreateSupportEscalation(w http.ResponseWriter, r *http.
 			writeSupportError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "cannot escalate support for another client's order")
 			return
 		}
-	}
-
-	issueType := strings.ToLower(strings.TrimSpace(req.IssueType))
-	if issueType != "delayed_delivery" &&
-		issueType != "wrong_items" &&
-		issueType != "missing_items" &&
-		issueType != "payment_issue" &&
-		issueType != "other" {
-		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "invalid issue_type")
-		return
-	}
-
-	if strings.TrimSpace(req.Description) == "" {
-		writeSupportError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "description is required")
-		return
 	}
 
 	record, err := h.repository.CreateSupportEscalation(r.Context(), req)

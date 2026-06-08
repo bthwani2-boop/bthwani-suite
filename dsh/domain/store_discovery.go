@@ -32,19 +32,19 @@ const (
 )
 
 type StoreSummary struct {
-	ID            string          `json:"id"`
-	Name          string          `json:"name"`
-	Address       string          `json:"address"`
-	CategoryID    string          `json:"category_id,omitempty"`
-	ImageURL      string          `json:"image_url,omitempty"`
-	LogoImageURL  string          `json:"logo_image_url,omitempty"`
-	Rating        *float64        `json:"rating,omitempty"`
-	DistanceLabel string          `json:"distance_label"`
-	DeliveryLabel string          `json:"delivery_label"`
-	ServiceLabel  string          `json:"service_label"`
-	StatusLabel   string          `json:"status_label"`
-	StatusTone    StoreStatusTone `json:"status_tone"`
-	HasOffer      bool            `json:"has_offer"`
+	ID                      string          `json:"id"`
+	Name                    string          `json:"name"`
+	Address                 string          `json:"address"`
+	CategoryID              string          `json:"category_id,omitempty"`
+	ImageURL                string          `json:"image_url,omitempty"`
+	LogoImageURL            string          `json:"logo_image_url,omitempty"`
+	Rating                  *float64        `json:"rating,omitempty"`
+	DistanceLabel           string          `json:"distance_label"`
+	DeliveryLabel           string          `json:"delivery_label"`
+	ServiceLabel            string          `json:"service_label"`
+	StatusLabel             string          `json:"status_label"`
+	StatusTone              StoreStatusTone `json:"status_tone"`
+	HasOffer                bool            `json:"has_offer"`
 	OfferLabel              string          `json:"offer_label,omitempty"`
 	PublishStage            string          `json:"publish_stage"`
 	SupportsPickup          bool            `json:"supports_pickup"`
@@ -220,14 +220,14 @@ type FieldReadinessEscalationRecord struct {
 
 // UpdateFieldReadinessEscalationRequest — CP operator updates escalation status.
 type UpdateFieldReadinessEscalationRequest struct {
-	Status       string `json:"status"`        // info_requested | resolved | rejected
+	Status       string `json:"status"` // info_requested | resolved | rejected
 	OperatorNote string `json:"operator_note,omitempty"`
 }
 
 // ListFieldReadinessEscalationsResponse — paginated list for CP operator view.
 type ListFieldReadinessEscalationsResponse struct {
 	Escalations []FieldReadinessEscalationRecord `json:"escalations"`
-	Pagination  Pagination                        `json:"pagination"`
+	Pagination  Pagination                       `json:"pagination"`
 }
 
 // ListFieldReadinessEscalationsQuery — filter params for CP queue.

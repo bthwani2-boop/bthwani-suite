@@ -22,6 +22,8 @@ import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { LedgerScreen } from './LedgerScreen';
 import { AuditCloseScreen } from './AuditCloseScreen';
 import { DailyReconciliationWorkbench } from './DailyReconciliationWorkbench';
+import { CommissionBreakdownWorkspace } from './CommissionBreakdownWorkspace';
+import { PlatformFeeAuditWorkspace } from './PlatformFeeAuditWorkspace';
 import { WltDshAccountStatement } from '../components/WltDshAccountStatement';
 import { WltDshRefundLedger } from '../components/WltDshRefundLedger';
 import { WltDshSettlementCalendar } from '../components/WltDshSettlementCalendar';
@@ -272,6 +274,18 @@ export function WltDshFinanceHubHost({
         if (activeSub === 'payments') {
           return <WltDshWalletControlCenter />;
         }
+        if (activeSub === 'client-wallets') {
+          return <WltDshAccountStatement actorId="CUS-553" />;
+        }
+        if (activeSub === 'partner-wallets') {
+          return <WltDshAccountStatement actorId="STORE-99" />;
+        }
+        if (activeSub === 'captain-wallets') {
+          return <WltDshAccountStatement actorId="CAP-42" />;
+        }
+        if (activeSub === 'platform-wallet') {
+          return <WltDshAccountStatement actorId="DSH-PLATFORM" />;
+        }
         return <WltDshAccountStatement />;
 
       case 'settlements-payouts':
@@ -293,9 +307,15 @@ export function WltDshFinanceHubHost({
         return <WltDshSettlementCalendar />;
 
       case 'refunds-disputes-holds':
-        return <WltDshRefundLedger />;
+        return <WltDshRefundLedger subGroup={activeSub} />;
 
       case 'commissions-fees-promo':
+        if (activeSub === 'commissions') {
+          return <CommissionBreakdownWorkspace />;
+        }
+        if (activeSub === 'fees') {
+          return <PlatformFeeAuditWorkspace />;
+        }
         return <WltDshFieldCommissionStatement />;
 
       case 'reconciliation-risk':

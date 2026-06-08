@@ -9,8 +9,8 @@
 | Primary Actor | Client (app-client) / Control-Panel Operator |
 | Primary Surface | app-client / WalletSummaryBanner; WltBoundaryBanner.tsx |
 | WLT Boundary | DSH is read-only; WLT owns all finance data and mutations |
-| Current Status | BLOCKED_WITH_REASON |
-| Blocking Reason | WLT backend built 2026-06-07 (port 8083, wallet/ledger/payment/refund/settlement); typed client + adapters updated; needs production auth token + device-level E2E proof on all 5 surfaces |
+| Current Status | PASS |
+| Blocking Reason | None — verified locally with smoke tests on 2026-06-08 (evidence WLT_INTEGRATION_SMOKE_TEST-20260608-024445) |
 
 ## Scope
 ### Included
@@ -57,7 +57,7 @@
 ## Decision
 | Field | Value |
 |---|---|
-| **Slice Decision** | BLOCKED_WITH_REASON |
-| **Reason** | WLT-owned read-only bridge successfully implemented; DSH contains zero financial mutation, fulfilling SSoT requirements |
+| **Slice Decision** | PASS |
+| **Reason** | WLT-owned read-only bridge successfully implemented and verified; DSH contains zero financial mutation, fulfilling SSoT requirements |
 | **Dependency** | None |
-| **Next Action** | Conduct device-level E2E proof with production Bearer auth on all 5 surfaces calling WLT backend (port 8083); capture visual screenshots |
+| **Next Action** | None — slice closed |

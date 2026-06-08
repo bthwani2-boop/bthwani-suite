@@ -27,10 +27,10 @@ type CartServiceabilityQuery struct {
 
 // CartServiceabilityResponse — 003A
 type CartServiceabilityResponse struct {
-	Serviceable          bool     `json:"serviceable"`
-	StoreID              string   `json:"store_id"`
-	ReasonCode           string   `json:"reason_code,omitempty"`
-	UnavailableItemIDs   []string `json:"unavailable_item_ids,omitempty"`
+	Serviceable        bool     `json:"serviceable"`
+	StoreID            string   `json:"store_id"`
+	ReasonCode         string   `json:"reason_code,omitempty"`
+	UnavailableItemIDs []string `json:"unavailable_item_ids,omitempty"`
 }
 
 // CheckoutIntentItem — 003B request
@@ -50,19 +50,19 @@ type CheckoutIntentRequest struct {
 
 // CheckoutIntentRecord — stored record
 type CheckoutIntentRecord struct {
-	ID                       string     `json:"intent_id"`
-	ClientID                 string     `json:"client_id"`
-	StoreID                  string     `json:"store_id"`
-	Status                   string     `json:"status"`
-	SessionToken             string     `json:"session_token"`
+	ID           string `json:"intent_id"`
+	ClientID     string `json:"client_id"`
+	StoreID      string `json:"store_id"`
+	Status       string `json:"status"`
+	SessionToken string `json:"session_token"`
 	// Non-authoritative display snapshot. WLT owns final amount, ledger, settlement.
-	RequestedAmountSnapshotMinorUnits int64 `json:"requested_amount_snapshot_minor_units"`
-	WltPaymentRefID          *string    `json:"wlt_payment_ref_id,omitempty"`
-	WltCallbackEventID       string     `json:"wlt_callback_event_id,omitempty"`
-	FailureReason            *string    `json:"failure_reason,omitempty"`
-	ExpiresAt                time.Time  `json:"expires_at"`
-	CreatedAt                time.Time  `json:"created_at"`
-	UpdatedAt                time.Time  `json:"updated_at"`
+	RequestedAmountSnapshotMinorUnits int64     `json:"requested_amount_snapshot_minor_units"`
+	WltPaymentRefID                   *string   `json:"wlt_payment_ref_id,omitempty"`
+	WltCallbackEventID                string    `json:"wlt_callback_event_id,omitempty"`
+	FailureReason                     *string   `json:"failure_reason,omitempty"`
+	ExpiresAt                         time.Time `json:"expires_at"`
+	CreatedAt                         time.Time `json:"created_at"`
+	UpdatedAt                         time.Time `json:"updated_at"`
 }
 
 // CheckoutIntentResponse — 003B response
