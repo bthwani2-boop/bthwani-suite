@@ -90,6 +90,7 @@ export class WltDshFinanceRuntime {
 		if (!wallet) {
 			return {
 				balanceMinorUnits: 0,
+				balance: 0,
 				currency: DEFAULT_CURRENCY,
 				linked: false,
 				frozenMinorUnits: 0,
@@ -97,7 +98,10 @@ export class WltDshFinanceRuntime {
 			};
 		}
 		const { clientId: _clientId, ...summary } = wallet;
-		return summary;
+		return {
+			...summary,
+			balance: summary.balanceMinorUnits / 100,
+		};
 	}
 
 	createPaymentSession(request: PaymentIntentRequest, idempotencyKey: string): PaymentIntentResponse {

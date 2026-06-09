@@ -36,7 +36,10 @@ export const getBalance = async (clientId?: string, bearerToken?: string): Promi
 	const cid = clientId || DEFAULT_CLIENT_ID;
 	const summary = await getClient(bearerToken, cid).getClientWalletSummary(cid);
 	// YER has no sub-units (ISO 4217 exponent 0). Return balance as integer YER units.
-	return Math.round(summary.balance);
+	const rawBalance = typeof summary.balance === 'number' && !isNaN(summary.balance)
+		? summary.balance
+		: ((summary as any).balanceMinorUnits ?? 0) / 100;
+	return Math.round(rawBalance);
 };
 
 export const link = async (clientId?: string, bearerToken?: string): Promise<{ success: boolean; account?: WalletAccount; error?: string }> => {

@@ -39,11 +39,13 @@ export type PaymentDecisionOption = {
 export type PaymentDecisionCardProps = {
   item: PaymentDecisionOption;
   style?: StyleProp<ViewStyle>;
+  flat?: boolean;
 };
 
 export type PaymentDecisionListProps = {
   items: PaymentDecisionOption[];
   style?: StyleProp<ViewStyle>;
+  flat?: boolean;
 };
 
 function resolveBadgeTone(tone: BadgeProps['tone'] | undefined, selected: boolean): BadgeProps['tone'] {
@@ -70,7 +72,7 @@ function resolveAmountTone(tone: PaymentDecisionAmountTone | undefined, theme: R
   return theme.text;
 }
 
-export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
+export function PaymentDecisionCard({ item, style, flat }: PaymentDecisionCardProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const rowDirection = resolveRowDirection(direction);
@@ -96,21 +98,29 @@ export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
       disabled={!canSelect}
       onPress={item.onSelect}
       style={({ pressed }) => [
-        {
-          borderWidth: borders.hairline,
-          borderColor: item.selected ? theme.brand : theme.line,
-          borderRadius: radius.xl,
-          backgroundColor: theme.surface,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
-          gap: spacing[2],
-          opacity: item.disabled && !item.selected ? 0.68 : pressed && canSelect ? 0.96 : 1,
-          shadowColor: item.selected ? colorPalette.brandStrong : undefined,
-          shadowOpacity: item.selected ? 0.06 : 0,
-          shadowRadius: item.selected ? 10 : 0,
-          shadowOffset: item.selected ? { width: 0, height: 4 } : undefined,
-          elevation: item.selected ? 2 : 0,
-        },
+        flat
+          ? {
+              backgroundColor: item.selected ? theme.brandSurface : theme.surface,
+              paddingHorizontal: spacing[4],
+              paddingVertical: spacing[3],
+              gap: spacing[2],
+              opacity: item.disabled && !item.selected ? 0.68 : pressed && canSelect ? 0.96 : 1,
+            }
+          : {
+              borderWidth: borders.hairline,
+              borderColor: item.selected ? theme.brand : theme.line,
+              borderRadius: radius.xl,
+              backgroundColor: theme.surface,
+              paddingHorizontal: spacing[4],
+              paddingVertical: spacing[3],
+              gap: spacing[2],
+              opacity: item.disabled && !item.selected ? 0.68 : pressed && canSelect ? 0.96 : 1,
+              shadowColor: item.selected ? colorPalette.brandStrong : undefined,
+              shadowOpacity: item.selected ? 0.06 : 0,
+              shadowRadius: item.selected ? 10 : 0,
+              shadowOffset: item.selected ? { width: 0, height: 4 } : undefined,
+              elevation: item.selected ? 2 : 0,
+            },
         style,
       ]}
     >
@@ -131,7 +141,7 @@ export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
       </View>
 
       {item.amountRows?.length ? (
-        <View style={{ paddingTop: spacing[1], borderTopWidth: borders.hairline, borderTopColor: item.selected ? theme.brandSurface : theme.line, flexDirection: rowDirection, gap: spacing[2] }}>
+        <View style={{ paddingTop: spacing[1], borderTopWidth: borders.hairline, borderTopColor: (flat || item.selected) ? theme.brandSurface : theme.line, flexDirection: rowDirection, gap: spacing[2] }}>
           {item.amountRows.map((amountRow) => (
             <View
               key={`${item.id}-${amountRow.label}`}
@@ -172,7 +182,42 @@ export function PaymentDecisionCard({ item, style }: PaymentDecisionCardProps) {
   );
 }
 
-export function PaymentDecisionList({ items, style }: PaymentDecisionListProps) {
+export function PaymentDecisionList({ items, style, flat }: PaymentDecisionListProps) {
+  const { theme } = useTheme();
+
+  if (flat) {
+    return (
+      <View
+        style={[
+          {
+            borderWidth: borders.hairline,
+            borderColor: theme.line,
+            borderRadius: radius.xl,
+            backgroundColor: theme.surface,
+            overflow: 'hidden',
+          },
+          style,
+        ]}
+      >
+        {items.map((item, index) => (
+          <PaymentDecisionCard
+            key={item.id}
+            item={item}
+            flat
+            style={
+              index < items.length - 1
+                ? {
+                    borderBottomWidth: borders.hairline,
+                    borderBottomColor: theme.line,
+                  }
+                : undefined
+            }
+          />
+        ))}
+      </View>
+    );
+  }
+
   return (
     <View style={[{ gap: spacing[1] }, style]}>
       {items.map((item) => (

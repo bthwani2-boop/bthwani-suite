@@ -6,6 +6,7 @@
 // Wallet balance as read-only visibility for DSH (display only, not financial truth source).
 export interface WalletBalance {
 	balanceMinorUnits: number;
+	balance?: number; // added for adapter/preview compatibility
 	currency: string;
 	linked: boolean;
 	frozenMinorUnits: number;

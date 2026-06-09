@@ -214,10 +214,11 @@ function getClientWalletSummary(clientId = 'client-demo') {
     const t = now();
     db.prepare('INSERT INTO wlt_wallets (client_id, balance_minor_units, currency, linked, frozen_minor_units, updated_at) VALUES (?,?,?,?,?,?)')
       .run(clientId, 0, DEFAULT_CURRENCY, 0, 0, t);
-    return { balanceMinorUnits: 0, currency: DEFAULT_CURRENCY, linked: false, frozenMinorUnits: 0, updatedAt: t };
+    return { balanceMinorUnits: 0, balance: 0, currency: DEFAULT_CURRENCY, linked: false, frozenMinorUnits: 0, updatedAt: t };
   }
   return {
     balanceMinorUnits: wallet.balance_minor_units,
+    balance: Math.round(wallet.balance_minor_units) / 100,
     currency: wallet.currency,
     linked: wallet.linked === 1,
     frozenMinorUnits: wallet.frozen_minor_units,

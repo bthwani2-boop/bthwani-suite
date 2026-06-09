@@ -2292,7 +2292,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right', paddingHorizontal: spacing[1] }}>
             معاينة دفع — غير منفذة ماليًا · WLT يملك منطق الدفع الفعلي
           </Text>
-          <PaymentDecisionList items={paymentDecisionOptions} />
+          <PaymentDecisionList items={paymentDecisionOptions} flat />
         </View>
 
         <RecommendedSection
