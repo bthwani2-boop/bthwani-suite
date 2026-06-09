@@ -16,7 +16,7 @@ import {
 	TextField,
 	useTheme,
 } from '@bthwani/ui-kit';
-import { DshOperationScreen } from '../parts/OperationScreen';
+import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
 import type {
 	DshCaptainOrderAction,
 	DshCaptainOrderBellItem,
@@ -870,7 +870,7 @@ const OrderBellSection = React.memo(function OrderBellSection({
 									{item.subtitle ? <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>{item.subtitle}</Text> : null}
 									{item.meta ? <Text role="caption" tone="muted" style={{ textAlign: 'right' }} numberOfLines={1}>{item.meta}</Text> : null}
 								</View>
-								{item.badgeLabel ? <View style={{ paddingTop: 2, flexShrink: 0 }}><Badge label={item.badgeLabel} /></View> : null}
+								{item.serviceType ? <View style={{ paddingTop: 2, flexShrink: 0 }}><Badge label={resolveServiceTypeBadge(item.serviceType).badgeLabel} tone={resolveServiceTypeBadge(item.serviceType).badgeTone} /></View> : null}
 							</Pressable>
 						))}
 					</Box>
@@ -1009,7 +1009,8 @@ function renderSection({
 			return renderOrdersState(state, onRetry);
 		}
 
-		return <DshOperationScreen state={state} title="طلبات الكابتن" subtitle="مسار الطلبات النشطة داخل تطبيق الكابتن." onRetry={onRetry} />;
+		const mappedState: DshOperationScreenState = (state === 'empty' || state === 'error' || state === 'loading') ? state : 'loading';
+		return <DshOperationScreen state={mappedState} title="طلبات الكابتن" subtitle="مسار الطلبات النشطة داخل تطبيق الكابتن." onRetry={onRetry} />;
 	}
 
 	const resolvedSection = section ?? 'full';
@@ -1118,7 +1119,7 @@ function renderSection({
 						<SectionHeader title="الرنات الحالية" subtitle="أقصر قائمة ممكنة للطلبات التي تنتظر قرارًا." />
 						<Box gap={2}>
 							{activeItems.slice(0, 3).map((item) => (
-								<ListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={item.badgeLabel} onPress={() => onOpenOrder?.(item.id)} />
+								<ListItem key={item.id} title={item.title} subtitle={item.subtitle} meta={item.meta} badgeLabel={resolveServiceTypeBadge(item.serviceType).badgeLabel} badgeTone={resolveServiceTypeBadge(item.serviceType).badgeTone} onPress={() => onOpenOrder?.(item.id)} />
 							))}
 						</Box>
 					</Box>
@@ -1214,7 +1215,7 @@ export function CaptainPickupConfirmSheet({
 			) : state === 'success' ? (
 				<StateView stateId="success" title="تم الاستلام بنجاح" description="تم تحديث حالة الطلب إلى مستلم." actionLabel="موافق" onActionPress={onConfirm} />
 			) : state === 'error' ? (
-				<StateView stateId="error" title="فشل تأكيد الاستلام" description="حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً." actionLabel="إغلاق" onActionPress={onCancel} />
+				<StateView stateId="blockingError" title="فشل تأكيد الاستلام" description="حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة لاحقاً." actionLabel="إغلاق" onActionPress={onCancel} />
 			) : (
 				<>
 					<SectionHeader title="تأكيد الاستلام" subtitle="أقر باستلام الطلب قبل نقله إلى المرحلة التالية." />
@@ -1536,7 +1537,7 @@ export function DshCaptainOrderAcceptScreen({
 				onBackToInbox={onBack}
 			/>
 			{onDecline && (
-				<Box paddingHorizontal={4} paddingBottom={4}>
+				<Box paddingX={4} style={{ paddingBottom: 16 }}>
 					<Button
 						label="رفض المهمة (Decline)"
 						tone="danger"

@@ -367,6 +367,8 @@
     "dsh/frontend/shared/dev-fixtures-isolation-guard.ts",
     "dsh/frontend/media-fixtures",
     "wlt/frontend/media-fixtures",
+    "dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx",
+    "dsh/frontend/app-client/screens/NotificationsScreen.tsx",
     "dsh/frontend/app-client/screens/MySpaceScreen.tsx",
     "dsh/frontend/app-field/screens/DshFieldReadinessEscalationScreen.tsx",
     "dsh/frontend/app-partner/parts/PartnerOrderActionPanel.tsx",

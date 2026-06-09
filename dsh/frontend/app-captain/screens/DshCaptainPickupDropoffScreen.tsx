@@ -164,7 +164,6 @@ export function DshCaptainPickupDropoffScreen({
     <DshOperationScreen
       title={config.title}
       subtitle={config.subtitle}
-      onBack={onBack}
       content={
         <Box gap={4} style={{ paddingHorizontal: 4 }}>
           <Box gap={3}>
@@ -183,7 +182,7 @@ export function DshCaptainPickupDropoffScreen({
 
             <Divider />
 
-            <Box gap={2} paddingVertical={2}>
+            <Box gap={2} paddingY={2}>
               <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
                 <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
                   <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة تنفيذ الاستلام والتسليم</Text>
@@ -236,7 +235,7 @@ export function DshCaptainPickupDropoffScreen({
           {mode === 'arrival' && (
             <>
               <Divider />
-              <Box gap={2} paddingVertical={2}>
+              <Box gap={2} paddingY={2}>
                 <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
                   <Badge label={bellRung ? 'تم قرع الجرس' : 'جرس الوصول'} tone={bellRung ? 'success' : 'warning'} />
                   <Icon name="notifications-outline" size={20} tone={bellRung ? 'success' : 'brand'} />
@@ -254,7 +253,7 @@ export function DshCaptainPickupDropoffScreen({
               {dropoffOtp ? (
                 <>
                   <Divider />
-                  <Box gap={2} paddingVertical={2}>
+                  <Box gap={2} paddingY={2}>
                     <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
                       <Badge label={otpVerified ? 'تم التحقق' : 'OTP التسليم'} tone={otpVerified ? 'success' : 'warning'} />
                       <Icon name="shield-checkmark-outline" size={18} tone={otpVerified ? 'success' : 'default'} />
@@ -294,9 +293,9 @@ export function DshCaptainPickupDropoffScreen({
             </>
           )}
 
-          <Box paddingVertical={spacing[2]}>
+          <Box paddingY={2}>
             <Pressable onPress={onReportIssue} style={styles.issueButton}>
-              <Icon name="warning-outline" size={16} color={colorPalette.orange} />
+              <Icon name="warning-outline" size={16} color={colorPalette.brand} />
               <Text role="bodySm" style={styles.issueText}>أواجه مشكلة في {mode === 'pickup' ? 'الاستلام' : 'التسليم'}</Text>
             </Pressable>
           </Box>
@@ -321,14 +320,14 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: colorPalette.deepBlue,
+    backgroundColor: colorPalette.brandStrong,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
   checkText: {
     flex: 1,
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
     textAlign: 'right',
   },
   issueButton: {
@@ -338,11 +337,11 @@ const styles = StyleSheet.create({
     gap: spacing[2],
     padding: spacing[3],
     borderWidth: 1,
-    borderColor: colorPalette.orange,
+    borderColor: colorPalette.brand,
     borderRadius: radius.md,
     borderStyle: 'dashed',
   },
   issueText: {
-    color: colorPalette.orange,
+    color: colorPalette.brand,
   },
 });

@@ -62,6 +62,7 @@
     "@tamagui/cli": "2.0.0-rc.41",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@react-native-async-storage/async-storage": "3.0.2",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
     "@typescript-eslint/parser": "^8.24.1",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
@@ -84,6 +85,7 @@
   "dependencies": {
     "@expo/vector-icons": "15.1.1",
     "@tamagui/config": "2.0.0-rc.41",
+    "@tamagui/native": "2.0.0-rc.41",
     "tamagui": "2.0.0-rc.41"
   }
 }

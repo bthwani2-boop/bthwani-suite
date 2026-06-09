@@ -19,6 +19,12 @@ import {
   spacing,
   ActionStrip,
   useTheme,
+  TopBar,
+  safeArea,
+  OperationalStatusHero,
+  Chip,
+  DeferredReviewBlock,
+  StickyActionBar,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
 import { getDshClientStateMeta, type DshClientState } from '../../../data/operational-statuses.preview-data';
@@ -384,7 +390,7 @@ export const StageRail = React.memo(function StageRail({ activeStepId, steps }: 
           <Box key={step.id} layoutDirection="row" gap={3} align="center" style={{ flexDirection: 'row-reverse' }}>
             <Box style={{ width: 32, alignItems: 'center' }}>
               <Surface
-                tone={isActive ? 'brand' : 'success' ? (isDone ? 'success' : 'default') : 'default'}
+                tone={isActive ? 'brand' : (isDone ? 'success' : 'default')}
                 padding={0}
                 style={{
                   width: 28,
@@ -1690,7 +1696,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
           <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row-reverse' }}>
             {!isPickup && (
               <Button
-                label={isChatExpanded ? 'إغلاق الدردشة' : chatActionLabel}
+                label={isChatExpanded ? 'إغلاق الدردشة' : chatTitle}
                 leadingAccessory={<Icon name="chatbubbles-outline" size={18} color={isChatExpanded ? theme.brandContrast : theme.brand} />}
                 onPress={() => setIsChatExpanded(!isChatExpanded)}
                 style={{ flex: 1, minWidth: 120 }}

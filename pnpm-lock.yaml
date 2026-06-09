@@ -20,10 +20,16 @@ importers:
       '@tamagui/config':
         specifier: 2.0.0-rc.41
         version: 2.0.0-rc.41(react-dom@19.1.0)(react-native-reanimated@4.3.0)(react-native@0.81.0)(react@19.1.0)
+      '@tamagui/native':
+        specifier: 2.0.0-rc.41
+        version: 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       tamagui:
         specifier: 2.0.0-rc.41
         version: 2.0.0-rc.41(react-dom@19.1.0)(react-native@0.81.0)(react@19.1.0)
     devDependencies:
+      '@react-native-async-storage/async-storage':
+        specifier: 3.0.2
+        version: 3.0.2(react-native@0.81.0)(react@19.1.0)
       '@stoplight/spectral-cli':
         specifier: 6.16.0
         version: 6.16.0
@@ -219,6 +225,9 @@ importers:
       '@tamagui/config':
         specifier: 2.0.0-rc.41
         version: 2.0.0-rc.41(react-dom@19.1.0)(react-native-reanimated@4.3.0)(react-native@0.81.0)(react@19.1.0)
+      '@tamagui/native':
+        specifier: 2.0.0-rc.41
+        version: 2.0.0-rc.41(react-native@0.81.0)(react@19.1.0)
       next:
         specifier: 16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@playwright/test@1.58.2)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0)(react@19.1.0)
@@ -2792,7 +2801,6 @@ packages:
       idb: 8.0.3
       react: 19.1.0
       react-native: 0.81.0(@babel/core@7.29.0)(@react-native/metro-config@0.85.0)(@types/react@19.2.14)(react@19.1.0)
-    dev: false
 
   /@react-native/assets-registry@0.81.0:
     resolution: {integrity: sha512-rZs8ziQ1YRV3Z5Mw5AR7YcgI3q1Ya9NIx6nyuZAT9wDSSjspSi+bww+Hargh/a4JfV2Ajcxpn9X9UiFJr1ddPw==}
@@ -9509,7 +9517,6 @@ packages:
 
   /idb@8.0.3:
     resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
-    dev: false
 
   /ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}

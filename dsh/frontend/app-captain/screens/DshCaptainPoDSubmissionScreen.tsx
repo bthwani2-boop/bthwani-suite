@@ -78,7 +78,7 @@ export function DshCaptainPoDSubmissionScreen({
     return (
       <View style={styles.root}>
         <StateView
-          stateId="blocked"
+          stateId="blockingError"
           title="فشل إثبات التسليم"
           description="الصورة المرفوعة غير واضحة أو لا تستوفي المعايير المطلوبة. يرجى إعادة المحاولة."
           actionLabel="إعادة المحاولة"
@@ -93,7 +93,7 @@ export function DshCaptainPoDSubmissionScreen({
     return (
       <View style={styles.root}>
         <StateView
-          stateId="blocked"
+          stateId="blockingError"
           title="مطلوب إعادة التقاط الإثبات"
           description="رفضت العمليات الإثبات المرفوع. يُرجى التقاط صورة جديدة واضحة وإعادة الإرسال."
           actionLabel="التقاط صورة جديدة"
@@ -121,7 +121,6 @@ export function DshCaptainPoDSubmissionScreen({
     <DshOperationScreen
       title="إثبات التسليم (PoD)"
       subtitle="يجب التقاط صورة واضحة للطلب عند باب العميل أو مع المستلم."
-      onBack={onBack}
       content={
         <Box gap={4} style={{ paddingHorizontal: 4 }}>
           <Box gap={3}>
@@ -135,7 +134,7 @@ export function DshCaptainPoDSubmissionScreen({
 
             <Divider />
 
-            <Box gap={2} paddingVertical={2}>
+            <Box gap={2} paddingY={2}>
               <Box layoutDirection="row" align="center" justify="space-between" gap={2} style={{ flexDirection: 'row-reverse' }}>
                 <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
                   <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة الإثبات من السجل المركزي</Text>
@@ -153,7 +152,7 @@ export function DshCaptainPoDSubmissionScreen({
 
           <Divider />
 
-          <Box overflow="hidden" style={{ paddingVertical: 4 }}>
+          <Box style={{ paddingVertical: 4, overflow: 'hidden' }}>
             <Pressable onPress={onCapturePhoto} style={styles.photoContainer}>
               {photoUri && proofPreviewVisible ? (
                 <View style={styles.previewWrapper}>
@@ -191,7 +190,7 @@ export function DshCaptainPoDSubmissionScreen({
 
           <Divider />
 
-          <Box gap={2} paddingVertical={2}>
+          <Box gap={2} paddingY={2}>
             <SectionHeader title="شروط الإثبات الصحيح" subtitle="تأكد من النقاط التالية لتجنب رفض الإثبات." />
             <Button
               label={proofGuideVisible ? 'إخفاء الشروط' : 'فتح الشروط'}
@@ -213,7 +212,7 @@ export function DshCaptainPoDSubmissionScreen({
             )}
           </Box>
 
-          <Box paddingVertical={spacing[2]}>
+          <Box paddingY={2}>
             <Button
               label="لا يمكنني التقاط صورة"
               tone="secondary"
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     height: 240,
-    backgroundColor: colorPalette.lightSurface,
+    backgroundColor: colorPalette.surfaceInset,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
     gap: spacing[2],
   },
   placeholderText: {
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
   },
   previewWrapper: {
     width: '100%',

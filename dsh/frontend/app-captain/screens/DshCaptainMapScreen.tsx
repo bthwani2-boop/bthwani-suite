@@ -195,7 +195,7 @@ export function DshCaptainMapScreen({
       content={
         <Box gap={3}>
           {errorMessage && (
-            <Surface tone="error" padding={3} radiusToken="md">
+            <Surface tone="danger" padding={3} radiusToken="md">
               <Text role="bodySm" style={{ color: 'red', textAlign: 'right' }}>{errorMessage}</Text>
             </Surface>
           )}

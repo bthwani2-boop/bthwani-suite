@@ -42,9 +42,9 @@ function CheckoutContextNotice({
   body: string;
 }) {
   return (
-    <Box margin={spacing[4]} padding={spacing[4]} backgroundColor={colorPalette.lightSurface} borderRadius={radius.md}>
-      <Text role="titleSm" style={{ color: colorPalette.deepBlue, marginBottom: spacing[1] }}>{title}</Text>
-      <Text role="bodySm" style={{ color: colorPalette.deepBlueLighter, lineHeight: 20 }}>{body}</Text>
+    <Box margin={spacing[4]} padding={spacing[4]} backgroundColor={colorPalette.surfaceInset} borderRadius={radius.md}>
+      <Text role="titleSm" style={{ color: colorPalette.brandStrong, marginBottom: spacing[1] }}>{title}</Text>
+      <Text role="bodySm" style={{ color: colorPalette.textMuted, lineHeight: 20 }}>{body}</Text>
     </Box>
   );
 }
@@ -198,7 +198,7 @@ export function DshCheckoutIntentScreen({
             <Text role="titleMd" style={styles.sectionTitle}>عنوان التوصيل</Text>
           </View>
           <View style={[styles.addressCard, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
-            <Icon name="location" size={24} color={colorPalette.orange} style={styles.sectionIcon} />
+            <Icon name="location" size={24} color={colorPalette.brand} style={styles.sectionIcon} />
             <View style={styles.addressInfo}>
               <Text role="bodyMd" style={styles.addressText} numberOfLines={2}>{address}</Text>
             </View>
@@ -206,10 +206,10 @@ export function DshCheckoutIntentScreen({
         </Box>
 
         {/* Section: ETA Preview */}
-        <Box padding={spacing[4]} backgroundColor={colorPalette.lightSurface} margin={spacing[4]} borderRadius={radius.md}>
+        <Box padding={spacing[4]} backgroundColor={colorPalette.surfaceInset} margin={spacing[4]} borderRadius={radius.md}>
           <View style={[styles.etaRow, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
-            <Icon name="time-outline" size={20} color={colorPalette.deepBlue} />
-            <Text role="bodyMd" style={styles.etaText}>الوقت المتوقع للوصول: <Text role="titleSm" style={{ color: colorPalette.orange }}>{eta}</Text></Text>
+            <Icon name="time-outline" size={20} color={colorPalette.brandStrong} />
+            <Text role="bodyMd" style={styles.etaText}>الوقت المتوقع للوصول: <Text role="titleSm" style={{ color: colorPalette.brand }}>{eta}</Text></Text>
           </View>
         </Box>
 
@@ -236,17 +236,17 @@ export function DshCheckoutIntentScreen({
                   {method.isSelected && <View style={styles.radioInner} />}
                 </View>
                 <View style={[styles.paymentInfo, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
-                  <Text role="bodyMd" style={[styles.paymentLabel, method.isSelected && { color: colorPalette.deepBlue }]}>
+                  <Text role="bodyMd" style={[styles.paymentLabel, method.isSelected && { color: colorPalette.brandStrong }]}>
                     {method.label}
                   </Text>
-                  <Icon name={method.icon as string} size={24} color={method.isSelected ? colorPalette.deepBlue : colorPalette.deepBlueLighter} />
+                  <Icon name={method.icon as string} size={24} color={method.isSelected ? colorPalette.brandStrong : colorPalette.textMuted} />
                 </View>
               </Pressable>
             ))}
           </View>
           {paymentMethods.find(m => m.id === 'cod' && m.isSelected) && (
-            <Box marginTop={spacing[2]} padding={spacing[3]} backgroundColor={colorPalette.orangeSurface} borderRadius={radius.sm}>
-              <Text role="bodySm" style={{ color: colorPalette.orange, textAlign: isRtl ? 'right' : 'left' }}>
+            <Box marginTop={spacing[2]} padding={spacing[3]} backgroundColor={colorPalette.brandSurface} borderRadius={radius.sm}>
+              <Text role="bodySm" style={{ color: colorPalette.brand, textAlign: isRtl ? 'right' : 'left' }}>
                 * سيتم إضافة رسوم بسيطة عند اختيار الدفع عند الاستلام.
               </Text>
             </Box>
@@ -298,13 +298,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing[4],
   },
   sectionTitle: {
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
   },
   sectionIcon: {
     marginHorizontal: spacing[2],
   },
   actionText: {
-    color: colorPalette.orange,
+    color: colorPalette.brand,
   },
   addressCard: {
     alignItems: 'flex-start',
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   addressText: {
-    color: colorPalette.deepBlueLighter,
+    color: colorPalette.textMuted,
     lineHeight: 22,
   },
   etaRow: {
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     gap: spacing[2],
   },
   etaText: {
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
   },
   paymentList: {
     marginTop: spacing[4],
@@ -336,8 +336,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   paymentItemSelected: {
-    borderColor: colorPalette.deepBlue,
-    backgroundColor: colorPalette.lightSurface,
+    borderColor: colorPalette.brandStrong,
+    backgroundColor: colorPalette.surfaceInset,
   },
   paymentInfo: {
     flex: 1,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing[3],
   },
   paymentLabel: {
-    color: colorPalette.deepBlueLighter,
+    color: colorPalette.textMuted,
   },
   radioCircle: {
     width: 20,
@@ -358,16 +358,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioCircleActive: {
-    borderColor: colorPalette.deepBlue,
+    borderColor: colorPalette.brandStrong,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: colorPalette.deepBlue,
+    backgroundColor: colorPalette.brandStrong,
   },
   summaryCard: {
-    backgroundColor: colorPalette.lightSurface,
+    backgroundColor: colorPalette.surfaceInset,
     borderRadius: 16,
     padding: spacing[4],
     marginTop: spacing[3],
@@ -377,10 +377,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing[3],
   },
   summaryLabel: {
-    color: colorPalette.deepBlueLighter,
+    color: colorPalette.textMuted,
   },
   summaryValue: {
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
   },
   divider: {
     height: 1,
@@ -388,18 +388,18 @@ const styles = StyleSheet.create({
     marginVertical: spacing[2],
   },
   totalLabel: {
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
   },
   totalValue: {
-    color: colorPalette.orange,
+    color: colorPalette.brand,
   },
   confirmButton: {
     height: 56,
     borderRadius: 28,
-    backgroundColor: colorPalette.deepBlue,
+    backgroundColor: colorPalette.brandStrong,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colorPalette.deepBlue,
+    shadowColor: colorPalette.brandStrong,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, TextField, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../../shared/dsh-order-preview.contract';
 import type { DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
@@ -8,6 +8,7 @@ import {
 	getOperationsSupportFlowsForSurface,
 	type DshOperationsSupportFlowId,
 } from '../../data/support.preview-data';
+import { type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 
 
 
