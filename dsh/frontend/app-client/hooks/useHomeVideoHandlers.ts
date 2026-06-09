@@ -42,7 +42,9 @@ export function useHomeVideoHandlers({
       onVideoCtaClick?.(item.id);
       setShortsVisible(false);
 
-      if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
+      const target = item.routeTarget as string;
+
+      if (target === 'main_category' || target === 'sub_category') {
         const nextHomeContext = resolveHomeCategoryContext(categoryItems, item.routeTargetId);
 
         if (nextHomeContext) {
@@ -60,7 +62,7 @@ export function useHomeVideoHandlers({
         return;
       }
 
-      if (item.routeTarget === 'store') {
+      if (target === 'store') {
         if (item.routeTargetId && onOpenStore) {
           onOpenStore(item.routeTargetId);
           return;
@@ -70,7 +72,7 @@ export function useHomeVideoHandlers({
         return;
       }
 
-      if (item.routeTarget === 'store_category') {
+      if (target === 'store_category') {
         if (item.routeTargetId && item.routeTargetExtra && onOpenStoreCategory) {
           onOpenStoreCategory(item.routeTargetId, item.routeTargetExtra);
           return;
@@ -85,7 +87,7 @@ export function useHomeVideoHandlers({
         return;
       }
 
-      if (item.routeTarget === 'product') {
+      if (target === 'product') {
         if (item.routeTargetExtra && item.routeTargetId && onOpenProduct) {
           onOpenProduct(item.routeTargetExtra, item.routeTargetId);
           return;
@@ -100,17 +102,17 @@ export function useHomeVideoHandlers({
         return;
       }
 
-      if (item.routeTarget === 'subscription' || item.routeTarget === 'subscription-family-get' || item.routeTarget === 'entitlements-get') {
-        onOpenBenefits?.(item.routeTarget);
+      if (target === 'subscription' || target === 'subscription-family-get' || target === 'entitlements-get') {
+        onOpenBenefits?.(target);
         return;
       }
 
-      if (item.routeTarget === 'search') {
+      if (target === 'search') {
         onOpenSearch?.();
         return;
       }
 
-      if (item.routeTarget === 'promo-apply') {
+      if (target === 'promo-apply') {
         onOpenBenefits?.('offers');
         return;
       }

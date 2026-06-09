@@ -16,6 +16,7 @@ import {
   useTheme,
   spacing,
   radius,
+  borders,
 } from '@bthwani/ui-kit';
 import {
   getOperationsSupportFlowPreview,
@@ -313,7 +314,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing[3],
     borderRadius: radius.md,
-    borderWidth: 1,
+    borderWidth: borders.hairline,
     gap: spacing[3],
   },
   targetLabel: {
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: borders.strong,
     alignItems: 'center',
     justifyContent: 'center',
   },

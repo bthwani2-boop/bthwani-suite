@@ -47,6 +47,7 @@ import {
   Chip,
   Icon,
   KeyValueList,
+  type KeyValueItem,
   MobileScrollView,
   MobileStickyPrimaryAction,
   ProductCard as UiProductCard,
@@ -101,9 +102,9 @@ type InventoryCatalogListItem = {
 type InventoryCatalogItemDetail = {
   id: string;
   sku: string;
-  gtin: string;
-  barcode: string;
-  manufacturerCode: string;
+  gtin?: string;
+  barcode?: string;
+  manufacturerCode?: string;
   canonicalProductId?: string;
   canonicalStoreId?: string;
   sourceRecordId?: string;
@@ -296,7 +297,7 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
         isPrivateStoreProduct: isPrivate,
         isCatalogOwned: r.stage === 'client-visible' || r.stage === 'catalog-adopted',
         catalogLinked,
-        priceLabel: r.metadata?.priceLabel || '0.00 ر.ي',
+        priceLabel: (r.metadata as any)?.priceLabel || '0.00 ر.ي',
         stockCount: 0,
         available: true,
         lowStock: false,
@@ -1031,7 +1032,7 @@ function InventoryCatalogCardPanel({
   const rejectReason = partnerRecord?.metadata?.rejectionReason ?? detail?.internalNote;
   const nextAction = resolveNextActionLabel(item.publishStage, item.available, item.stockCount);
   const summaryLine = resolveInventoryCardSummary(item);
-  const detailItems = [
+  const detailItems: KeyValueItem[] = [
     { label: 'SKU', value: detail?.sku },
     { label: 'GTIN', value: detail?.gtin },
     { label: 'الباركود', value: detail?.barcode },
@@ -1043,7 +1044,7 @@ function InventoryCatalogCardPanel({
     {
       label: 'ملكية الوسائط',
       value: item.isCatalogOwned ? 'كتالوج مركزي' : isPartnerOwnedException(item.publishStage as ApprovalStage, 'product-media') ? 'استثناء شريك' : 'بحاجة مراجعة',
-      tone: (item.isCatalogOwned ? 'info' : 'warning') as const,
+      tone: (item.isCatalogOwned ? 'info' : 'warning') as 'info' | 'warning',
     },
   ].filter((entry) => entry.value);
 

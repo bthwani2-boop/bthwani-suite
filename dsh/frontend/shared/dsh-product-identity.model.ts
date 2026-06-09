@@ -412,7 +412,7 @@ export function getDshProductApprovalStatusLabel(
  */
 export function getDshProductApprovalStatusTone(
   status: DshProductIdentityApprovalStatus,
-): 'success' | 'warning' | 'danger' | 'muted' {
+): 'success' | 'warning' | 'danger' | 'default' {
   switch (status) {
     case 'client_visible':   return 'success';
     case 'catalog_adopted':
@@ -420,6 +420,6 @@ export function getDshProductApprovalStatusTone(
     case 'partner_approved': return 'warning';
     case 'needs_fix':        return 'warning';
     case 'rejected':         return 'danger';
-    default:                 return 'muted';
+    default:                 return 'default';
   }
 }

@@ -235,7 +235,7 @@ export function useHomePromoHandlers({
   ), [promos, resolveBannerImageSource, resolveBannerPress]);
 
   const activePromo = bannerItems.length ? bannerItems[activePromoIndex % bannerItems.length] ?? null : null;
-  const tickerAction = activePromo ? resolveBannerPress(activePromo) : undefined;
+  const tickerAction = activePromo ? activePromo.onPress : undefined;
 
   React.useEffect(() => {
     if (!activePromo?.id || !onPromoImpression) return;

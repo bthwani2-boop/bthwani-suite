@@ -4,12 +4,12 @@ import { Text, colorPalette } from '@bthwani/ui-kit';
 
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
-import {
-  DshHomeGetScreen,
-  type DshHomeCategory,
-  type DshHomeGetPromo,
-  type DshHomeGetStore,
-} from './screens/HomeScreen';
+import { DshHomeGetScreen } from './screens/HomeScreen';
+import type {
+  DshHomeCategory,
+  DshHomeGetPromo,
+  DshHomeGetStore,
+} from './contracts/dsh-home-types';
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
@@ -60,6 +60,7 @@ type DshClientRouteRendererProps = {
   createOrderValues: CreateOrderValues;
   setCreateOrderValues: React.Dispatch<React.SetStateAction<CreateOrderValues>>;
   handleConfirmCheckout: () => void;
+  handleConfirmedOrderExecution: (payload?: any) => void;
   appearanceHydrated: boolean;
   appearanceMode: any;
   setAppearanceMode: (mode: any) => void;
@@ -148,6 +149,7 @@ export function DshClientRouteRenderer({
   createOrderValues,
   setCreateOrderValues,
   handleConfirmCheckout,
+  handleConfirmedOrderExecution,
   appearanceHydrated,
   appearanceMode,
   setAppearanceMode,
@@ -424,11 +426,39 @@ export function DshClientRouteRenderer({
         bearerToken={checkoutAuth.bearerToken}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={async () => {
-          setRoute('checkout-intent');
+        onOpenOrder={async (payload) => {
+          if (payload) {
+            setSelectedPaymentMethod(payload.paymentMethod);
+            setCreateOrderValues((current) => ({
+              ...current,
+              fulfillmentMode: payload.orderDraft.fulfillmentMode,
+              pickupAddress: payload.orderDraft.pickupAddress,
+              dropoffAddress: payload.orderDraft.dropoffAddress,
+              note: payload.orderDraft.note ?? current.note,
+            }));
+            handleConfirmedOrderExecution({
+              fulfillmentMode: payload.fulfillmentMode,
+              orderDraft: payload.orderDraft,
+              wltPaymentRefId: payload.wltPaymentRefId,
+            });
+          }
         }}
-        onContinue={async () => {
-          setRoute('checkout-intent');
+        onContinue={async (payload) => {
+          if (payload) {
+            setSelectedPaymentMethod(payload.paymentMethod);
+            setCreateOrderValues((current) => ({
+              ...current,
+              fulfillmentMode: payload.orderDraft.fulfillmentMode,
+              pickupAddress: payload.orderDraft.pickupAddress,
+              dropoffAddress: payload.orderDraft.dropoffAddress,
+              note: payload.orderDraft.note ?? current.note,
+            }));
+            handleConfirmedOrderExecution({
+              fulfillmentMode: payload.fulfillmentMode,
+              orderDraft: payload.orderDraft,
+              wltPaymentRefId: payload.wltPaymentRefId,
+            });
+          }
         }}
         onRetry={() => setRoute('cart-get')}
       />

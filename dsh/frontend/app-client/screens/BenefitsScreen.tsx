@@ -14,6 +14,7 @@ import {
   Divider,
   Icon,
   TopBar,
+  type IconName,
 } from '@bthwani/ui-kit';
 import { dshNotificationsFixtures } from '../../data/support.preview-data';
 import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
@@ -154,7 +155,7 @@ function BenefitListRow({
 }) {
   const [expanded, setExpanded] = React.useState(false);
   const { theme } = useTheme();
-  const iconMap: Record<string, import('@bthwani/ui-kit/src/components/icons').IconName> = {
+  const iconMap: Record<string, IconName> = {
     subscription: 'star-outline',
     offers: 'pricetag-outline',
     loyalty: 'wallet-outline',

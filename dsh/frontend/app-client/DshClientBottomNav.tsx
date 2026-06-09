@@ -33,7 +33,7 @@ export function DshClientBottomNav({
       launcherIcon="grid"
       onLauncherPress={handleServiceLauncherPress}
       onSelect={handleClientBottomNavSelect}
-      items={CLIENT_BOTTOM_NAV_ITEMS}
+      items={CLIENT_BOTTOM_NAV_ITEMS as any}
     />
   );
 }

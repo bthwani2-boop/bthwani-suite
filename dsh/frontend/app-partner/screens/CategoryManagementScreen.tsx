@@ -287,7 +287,7 @@ export function CategoryManagementScreen({
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.bg }}
+      style={{ flex: 1, backgroundColor: theme.background }}
       contentContainerStyle={{ paddingBottom: 160 }}
       keyboardShouldPersistTaps="handled"
     >

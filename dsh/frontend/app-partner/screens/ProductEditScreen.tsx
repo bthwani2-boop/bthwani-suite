@@ -13,7 +13,7 @@ import {
   useTheme,
 } from '@bthwani/ui-kit';
 import {
-  type DshProductApprovalStatus,
+  type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusLabel,
   getDshProductApprovalStatusTone,
 } from '../../shared/dsh-product-identity.model';
@@ -103,7 +103,7 @@ export function ProductEditScreen({
   const [form, setForm] = React.useState<ProductFormState>(emptyForm);
   const [savedRecord, setSavedRecord] = React.useState<DshProductRecord | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [approvalStatus, setApprovalStatus] = React.useState<DshProductApprovalStatus>('partner_submitted');
+  const [approvalStatus, setApprovalStatus] = React.useState<DshProductIdentityApprovalStatus>('partner_submitted');
 
   const client = React.useMemo(
     () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
@@ -272,7 +272,7 @@ export function ProductEditScreen({
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.bg }}
+      style={{ flex: 1, backgroundColor: theme.background }}
       contentContainerStyle={{ paddingBottom: 160 }}
       keyboardShouldPersistTaps="handled"
     >

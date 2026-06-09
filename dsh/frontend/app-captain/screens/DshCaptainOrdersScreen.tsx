@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
 	Badge,
+	borders,
 	Box,
 	Button,
 	Divider,
@@ -434,22 +435,22 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 										}}
 									>
 										<Box
+											background={isSystem ? 'surfaceInset' : isOutbound ? 'brand' : 'surface'}
+											border={!isSystem && !isOutbound}
+											borderTone="line"
+											radiusToken="md"
 											style={{
 												padding: 10,
-												borderRadius: 12,
 												borderTopRightRadius: isOutbound && !isSystem ? 2 : 12,
 												borderTopLeftRadius: !isOutbound && !isSystem ? 2 : 12,
 												direction: 'rtl',
-												backgroundColor: isSystem ? theme.surfaceInset : isOutbound ? theme.brand : theme.surface,
-												borderWidth: isSystem || isOutbound ? 0 : 1,
-												borderColor: theme.line,
 											}}
 										>
 											<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 12 }}>
-												<Text role="caption" style={{ fontWeight: '700', color: isOutbound ? theme.textInverse : theme.brand }}>
+												<Text role="caption" weight="bold" style={{ color: isOutbound ? theme.textInverse : theme.brand }}>
 													{msg.sender}
 												</Text>
-												<Text role="caption" tone="muted" style={{ fontSize: 9 }}>
+												<Text role="caption" tone="muted">
 													{msg.time}
 												</Text>
 											</Box>
@@ -534,7 +535,7 @@ const ComposerActionButton = React.memo(function ComposerActionButton({
 				alignItems: 'center',
 				justifyContent: 'center',
 				backgroundColor: disabled ? theme.disabledSurface : pressed ? theme.surfaceInset : theme.surface,
-				borderWidth: 1,
+				borderWidth: borders.hairline,
 				borderColor: disabled ? theme.line : theme.lineStrong,
 				opacity: disabled ? 0.55 : 1,
 			})}
@@ -551,12 +552,12 @@ const OrderChatBubble = React.memo(function OrderChatBubble({ message }: { messa
 	return (
 		<Box style={{ alignSelf: isOutbound ? 'flex-end' : 'flex-start', width: '100%', maxWidth: '86%' }}>
 			<Box
+				background={isOutbound ? 'brand' : 'surface'}
+				border={!isOutbound}
+				borderTone="line"
+				radiusToken="lg"
 				style={{
 					padding: 12,
-					borderRadius: 16,
-					backgroundColor: isOutbound ? theme.brand : theme.surface,
-					borderWidth: isOutbound ? 0 : 1,
-					borderColor: theme.line,
 					gap: 8,
 				}}
 			>
@@ -708,12 +709,12 @@ const OrderChatSection = React.memo(function OrderChatSection({
 						<Divider />
 
 						<Box
+							background={isReadOnly ? 'surfaceInset' : 'surface'}
+							border
+							borderTone="line"
+							radiusToken="md"
 							style={{
 								padding: 12,
-								borderRadius: 12,
-								backgroundColor: isReadOnly ? theme.surfaceInset : theme.surface,
-								borderWidth: 1,
-								borderColor: theme.line,
 								gap: 8,
 							}}
 						>
@@ -792,12 +793,12 @@ const OrderBellSection = React.memo(function OrderBellSection({
 
 						<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
 							<Box
+								background="surface"
+								border
+								borderTone="line"
+								radiusToken="md"
 								style={{
 									padding: 12,
-									borderRadius: 12,
-									backgroundColor: theme.surface,
-									borderWidth: 1,
-									borderColor: theme.line,
 									flex: 1,
 									minWidth: 80,
 									gap: 4,
@@ -807,12 +808,12 @@ const OrderBellSection = React.memo(function OrderBellSection({
 								<Text role="titleSm">{String(items.length)}</Text>
 							</Box>
 							<Box
+								background="surface"
+								border
+								borderTone="line"
+								radiusToken="md"
 								style={{
 									padding: 12,
-									borderRadius: 12,
-									backgroundColor: theme.surface,
-									borderWidth: 1,
-									borderColor: theme.line,
 									flex: 1,
 									minWidth: 80,
 									gap: 4,
@@ -822,12 +823,12 @@ const OrderBellSection = React.memo(function OrderBellSection({
 								<Text role="titleSm">2</Text>
 							</Box>
 							<Box
+								background="surface"
+								border
+								borderTone="line"
+								radiusToken="md"
 								style={{
 									padding: 12,
-									borderRadius: 12,
-									backgroundColor: theme.surface,
-									borderWidth: 1,
-									borderColor: theme.line,
 									flex: 1,
 									minWidth: 80,
 									gap: 4,

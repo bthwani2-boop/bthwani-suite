@@ -130,6 +130,7 @@ type CheckoutActionPayload = {
   financeEventKind: WltDshFinanceEventKind;
   fulfillmentMode: DshFulfillmentDeliveryMode;
   orderDraft: CheckoutOrderDraft;
+  wltPaymentRefId?: string;
 };
 
 export type DshCartUnifiedScreenProps = {
@@ -339,7 +340,7 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
             <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', ...shadowPresets.raised }}>
               <Icon name="calendar-outline" size={22} color={ACCENT_ORANGE} />
             </View>
-            <Box style={{ flex: 1 }} gap={0.5}>
+            <Box style={{ flex: 1 }} gap={1}>
               <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{dateLabel}</Text>
               <Text role="caption" style={{ color: TEXT_SECONDARY }}>الساعة {timeLabel}</Text>
             </Box>
@@ -425,7 +426,7 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
           borderColor: BORDER_SOFT,
           backgroundColor: colorPalette.surfacePrimary,
           padding: spacing[2],
-          gap: spacing[1.5],
+          gap: spacing[2],
           position: 'relative',
           justifyContent: 'space-between',
         }}
@@ -497,7 +498,7 @@ function RecommendedSection({
   const horizontalProducts = dshCartRecommendedProductsFixture.slice(0, 4);
 
   return (
-    <View style={{ gap: spacing[1.5] }}>
+    <View style={{ gap: spacing[2] }}>
       <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[1], gap: spacing[1] }}>
         <View style={{ flex: 1, gap: 2, alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
           <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
@@ -631,7 +632,7 @@ function ProductPreviewModal({
             }}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[2] }}>
-              <View style={{ flex: 1, gap: spacing[0.5] }}>
+              <View style={{ flex: 1, gap: spacing[1] }}>
                 <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
                   معاينة المنتج
                 </Text>
@@ -679,7 +680,7 @@ function ProductPreviewModal({
               </View>
 
               <View style={{ gap: spacing[2], padding: spacing[3] }}>
-                <View style={{ gap: spacing[0.5] }}>
+                <View style={{ gap: spacing[1] }}>
                   <Text role="titleSm" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }} numberOfLines={2}>
                     {product.title}
                   </Text>
@@ -694,7 +695,7 @@ function ProductPreviewModal({
                   </Text>
                 ) : null}
 
-                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2], borderRadius: 14, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: hasCartQty ? colorPalette.successSoft : colorPalette.surfaceSecondary, paddingHorizontal: spacing[2], paddingVertical: spacing[1.5] }}>
+                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2], borderRadius: 14, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: hasCartQty ? colorPalette.successSoft : colorPalette.surfaceSecondary, paddingHorizontal: spacing[2], paddingVertical: spacing[2] }}>
                   <Text role="bodySm" style={{ flex: 1, color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
                     {hasCartQty ? 'موجود في السلة' : 'غير موجود في السلة'}
                   </Text>
@@ -704,7 +705,7 @@ function ProductPreviewModal({
                 </View>
 
                 {feedback ? (
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 14, borderWidth: 1, borderColor: feedback.tone === 'success' ? colorPalette.success : BORDER_SOFT, backgroundColor: feedback.tone === 'success' ? colorPalette.successSoft : colorPalette.brandSoft, paddingHorizontal: spacing[2], paddingVertical: spacing[1.5] }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 14, borderWidth: 1, borderColor: feedback.tone === 'success' ? colorPalette.success : BORDER_SOFT, backgroundColor: feedback.tone === 'success' ? colorPalette.successSoft : colorPalette.brandSoft, paddingHorizontal: spacing[2], paddingVertical: spacing[2] }}>
                     <Icon name={feedback.tone === 'success' ? 'checkmark-circle-outline' : 'information-circle-outline'} size={14} color={feedback.tone === 'success' ? colorPalette.success : ACCENT_BLUE} />
                     <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
                       {feedback.message}
@@ -953,7 +954,7 @@ function CartItemEditor({
           <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[1] }} />
 
           {/* Integrated Live Pricing Summary */}
-          <View style={{ gap: spacing[1.5], paddingHorizontal: spacing[1] }}>
+          <View style={{ gap: spacing[2], paddingHorizontal: spacing[1] }}>
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>إجمالي المنتجات</Text>
               <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(subtotal)}</Text>
@@ -972,7 +973,7 @@ function CartItemEditor({
             )}
 
             {/* Grand Total Divider */}
-            <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[0.5] }} />
+            <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[1] }} />
 
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 15, textAlign: isRTL ? 'right' : 'left' }}>الإجمالي النهائي</Text>
@@ -1771,7 +1772,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           return;
         }
 
-        await Promise.resolve(checkoutAction?.(checkoutPayload));
+        await Promise.resolve(checkoutAction?.({
+          ...checkoutPayload,
+          wltPaymentRefId: paymentResult.txId,
+        }));
         return;
       } finally {
         setCheckoutLoading(false);
@@ -2037,10 +2041,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               borderColor: colorPalette.warning,
               borderRadius: 16,
               paddingHorizontal: spacing[2],
-              paddingVertical: spacing[1.5],
+              paddingVertical: spacing[2],
               flexDirection: isRTL ? 'row-reverse' : 'row',
               alignItems: 'center',
-              gap: spacing[1.5],
+              gap: spacing[2],
             }}
           >
             <Icon name="alert-circle-outline" size={20} color={colorPalette.warningStrong} />
@@ -2057,8 +2061,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           gap={1}
           style={{ backgroundColor: colorPalette.surfaceSecondary, borderRadius: 16, borderWidth: 1, borderColor: BORDER_SOFT }}
         >
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5] }}>
-            <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+            <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
               <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
                 سياسة تأكيد الطلب
               </Text>
@@ -2078,9 +2082,9 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
           <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[1.5], flex: 1 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[2], flex: 1 }}>
                 <Icon name={fulfillmentModeMeta.icon} size={18} color={TEXT_PRIMARY} style={{ marginTop: 2, flexShrink: 0 }} />
-                <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
                   <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
                     خيار التوصيل
                   </Text>
@@ -2116,12 +2120,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                         backgroundColor: isSelected ? SURFACE_WARM : colorPalette.surfacePrimary,
                         borderRadius: 16,
                         paddingHorizontal: spacing[2],
-                        paddingVertical: spacing[1.5],
+                        paddingVertical: spacing[2],
                       }}
                     >
-                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5] }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                         <Icon name={option.icon} size={18} color={isSelected ? ACCENT_ORANGE : TEXT_PRIMARY} style={{ flexShrink: 0 }} />
-                        <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                        <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
                           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
                             <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
                               {option.label}
@@ -2165,7 +2169,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           )}
           <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-              <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+              <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
                 <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
                   {locationTitle}
                 </Text>
@@ -2195,7 +2199,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             </View>
           )}
           {deliveryNotice ? (
-            <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[1.5], backgroundColor: colorPalette.surfaceSecondary, borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[2], backgroundColor: colorPalette.surfaceSecondary, borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
               <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
                 {deliveryNotice}
               </Text>

@@ -1238,7 +1238,7 @@ Stop before final closure claim.
 - experimental assets classified and isolated before deletion
 - webapp/website not redesigned prematurely
 - visual evidence exists for visible changes
-- evidence zip exists
+- evidence registry folder exists
 - human approval recorded
 ```
 
@@ -1263,14 +1263,6 @@ Every phase must generate evidence under:
 ```text
 tools\registry\runs\{SESSION_ID}\
 ```
-
-Zip name must be exactly:
-
-```text
-{SESSION_ID}.zip
-```
-
-No `_HANDOFF.zip` naming.
 
 ---
 
@@ -1303,12 +1295,6 @@ pnpm run guard:ui-kit-central-design-ownership > (Join-Path $RunRoot "guard-ui-k
   note = "Phase evidence only. Review logs before claiming pass."
 } | ConvertTo-Json -Depth 5 | Out-File -Encoding UTF8 (Join-Path $RunRoot "evidence.json")
 
-$Zip = Join-Path $RunRoot "$SessionId.zip"
-Get-ChildItem -LiteralPath $RunRoot -File |
-  Where-Object { $_.Name -ne "$SessionId.zip" } |
-  Compress-Archive -DestinationPath $Zip -Force
-
 Write-Host "SESSION_ID=$SessionId"
 Write-Host "EVIDENCE_ROOT=$RunRoot"
-Write-Host "EVIDENCE_ZIP=$Zip"
 ```

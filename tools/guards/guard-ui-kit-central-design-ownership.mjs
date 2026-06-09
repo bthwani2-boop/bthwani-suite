@@ -189,6 +189,35 @@ function findFontFamilyDrift(relative, text) {
   }
 }
 
+function findTypographyPropertyDrift(relative, text) {
+  const typographyKeysRegex = /\b(fontSize|fontWeight|lineHeight|letterSpacing)\s*[:=]\s*(\d+|['"`]\w+['"`])/g;
+  let match;
+  while ((match = typographyKeysRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.warn(
+      relative,
+      'Potential direct typography property usage outside ui-kit. Prefer central ui-kit Text roles.',
+      `line ${line}: ${match[1]} = ${match[2]}`
+    );
+  }
+}
+
+function findListPerformanceRisk(relative, text) {
+  if (/List|FlatList|SectionList|ScrollView/i.test(text)) {
+    const animationRegex = /\b(animation|transition|blur|shadowOffset|shadowRadius)\b/g;
+    let match;
+    while ((match = animationRegex.exec(text)) !== null) {
+      const line = lineNumber(text, match.index);
+      report.warn(
+        relative,
+        'Potential list performance risk: inline animation/blur/shadow properties detected in a file containing list elements.',
+        `line ${line}: ${match[1]}`
+      );
+    }
+  }
+}
+
+
 function findReusableStyleSheetRecipes(relative, text) {
   const styleKeysRegex = /StyleSheet\.create\(\s*\{[\s\S]*?\b(button|card|header|tab|badge|chip)\s*:/gi;
   let match;
@@ -289,6 +318,8 @@ for (const file of files) {
   findLocalStyleFactories(relative, text);
   findIconDrift(relative, text);
   findFontFamilyDrift(relative, text);
+  findTypographyPropertyDrift(relative, text);
+  findListPerformanceRisk(relative, text);
   findReusableStyleSheetRecipes(relative, text);
   checkLaneMisuse(relative, text);
   checkFreeDesignVars(relative, text);

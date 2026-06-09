@@ -8,7 +8,8 @@ import { HomeCategoryDialSection, HomeServiceDialSection } from './HomeOrbitSect
 import { HomePromoSection } from './HomePromoSection';
 import { HomeStoreFeedSection, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { HomeVideoReelsSection } from './HomeVideoReelsSection';
-import type { DshHomeGetScreenProps, DshHomeCategory } from '../../contracts/dsh-home-types';
+import type { DshHomeCategory } from '../../contracts/dsh-home-types';
+import type { DshHomeGetScreenProps } from '../../contracts/dsh-home-screen-props';
 import type { useHomeState } from '../../hooks/useHomeState';
 import type { useHomeDerivedStores } from '../../hooks/useHomeDerivedStores';
 import type { useHomePromoHandlers } from '../../hooks/useHomePromoHandlers';

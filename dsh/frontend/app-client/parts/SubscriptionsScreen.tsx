@@ -14,9 +14,15 @@ import {
 } from '@bthwani/ui-kit';
 import { subscriptionHeroCopy, subscriptionPlanCards } from '../../data/subscriptions.preview-data';
 
-export type DshSubscriptionsScreenProps = {};
+export type DshSubscriptionsScreenProps = {
+  compact?: boolean;
+  onStatusChange?: (message: string) => void;
+};
 
-export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
+export function DshSubscriptionsScreen({
+  compact = false,
+  onStatusChange,
+}: DshSubscriptionsScreenProps = {}) {
   const { theme } = useTheme();
 
   // Core Plan States
@@ -72,6 +78,7 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
     setCurrentPlanId(selectedPlanId);
     setExpandedSection(null);
     setSuccessMessage('تم تأكيد التغييرات وتحديث حالة الاشتراك بنجاح!');
+    onStatusChange?.('تم تأكيد التغييرات وتحديث حالة الاشتراك بنجاح!');
     setTimeout(() => setSuccessMessage(null), 6000);
   };
 

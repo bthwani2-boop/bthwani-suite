@@ -512,7 +512,7 @@ function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
 
       {/* SSoT handoff lookup */}
       {item.linkedFlowId ? (() => {
-        const handoff = DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.signalKind === item.linkedFlowId || h.handoffId === item.linkedFlowId || item.linkedFlowId.includes(h.handoffId));
+        const handoff = DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.signalKind === item.linkedFlowId || h.handoffId === item.linkedFlowId || item.linkedFlowId?.includes(h.handoffId));
         if (!handoff) return null;
         return (
           <Box padding={2} background="surface" border borderTone="info" radiusToken="sm" style={{ marginVertical: 4 }}>

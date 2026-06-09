@@ -52,7 +52,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
   styles,
   onBack,
 }: any) {
-  const isProBlocked = store?.commercialSourceMap?.['hasBthwaniPro']?.conflictStatus === 'blocker';
+  const isProBlocked = store?.commercialSourceMap?.['hasBthwaniPro']?.conflictSeverity === 'blocker';
   const benefitChips = React.useMemo(
     () =>
       Array.from(

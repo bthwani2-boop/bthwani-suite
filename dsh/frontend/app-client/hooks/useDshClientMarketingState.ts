@@ -6,7 +6,7 @@ import {
   type MarketingGrowthRecord,
 } from '../../data/marketing.preview-data';
 import { publishedPromoCategoryIds } from '../dsh-client.navigation-bridge';
-import type { DshHomeGetPromo } from './screens/HomeScreen';
+import type { DshHomeGetPromo } from '../contracts/dsh-home-types';
 
 type UseDshClientMarketingStateOptions = {
   hasStoreTarget: (storeId?: string) => boolean;
@@ -21,30 +21,31 @@ export function useDshClientMarketingState({
 }: UseDshClientMarketingStateOptions) {
 
   const isMarketingGrowthRouteValid = React.useCallback((item: MarketingGrowthRecord): boolean => {
+    const target = item.routeTarget as string;
     if (
-      item.routeTarget === 'home'
-      || item.routeTarget === 'search'
-      || item.routeTarget === 'promo-apply'
-      || item.routeTarget === 'subscription'
-      || item.routeTarget === 'subscription-family-get'
-      || item.routeTarget === 'entitlements-get'
+      target === 'home'
+      || target === 'search'
+      || target === 'promo-apply'
+      || target === 'subscription'
+      || target === 'subscription-family-get'
+      || target === 'entitlements-get'
     ) {
       return true;
     }
 
-    if (item.routeTarget === 'main_category' || item.routeTarget === 'sub_category') {
+    if (target === 'main_category' || target === 'sub_category') {
       return item.routeTargetId ? publishedPromoCategoryIds.has(item.routeTargetId) : false;
     }
 
-    if (item.routeTarget === 'store') {
+    if (target === 'store') {
       return hasStoreTarget(item.routeTargetId);
     }
 
-    if (item.routeTarget === 'store_category') {
+    if (target === 'store_category') {
       return hasStoreCategoryTarget(item.routeTargetId, item.routeTargetExtra);
     }
 
-    if (item.routeTarget === 'product') {
+    if (target === 'product') {
       return hasProductTarget(item.routeTargetExtra, item.routeTargetId);
     }
 

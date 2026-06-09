@@ -1,6 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, borders, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { resolveFieldFilterCounts, type FieldStoreFile } from '../../data/stores.preview-data';
 
@@ -88,7 +88,7 @@ export function DshFieldProfileHomeScreen({
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: theme.surfaceInset,
-                    borderWidth: 1,
+                    borderWidth: borders.hairline,
                     borderColor: theme.line,
                     flexShrink: 0,
                   }}
@@ -109,7 +109,7 @@ export function DshFieldProfileHomeScreen({
                   backgroundColor: theme.surfaceInset,
                   borderRadius: 12,
                   padding: 3,
-                  borderWidth: 1,
+                  borderWidth: borders.hairline,
                   borderColor: theme.line,
                   gap: 4,
                 }}

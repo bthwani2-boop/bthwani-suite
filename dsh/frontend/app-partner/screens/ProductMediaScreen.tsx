@@ -288,11 +288,10 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 									flexDirection: resolveRowDirection(direction),
 									alignItems: 'center',
 									justifyContent: 'space-between',
-									padding: 12,
-									backgroundColor: theme.line + '08',
-									borderRadius: 8,
-									borderWidth: 1,
-									borderColor: theme.line,
+									paddingVertical: 12,
+									paddingHorizontal: 4,
+									borderBottomWidth: 1,
+									borderBottomColor: theme.line,
 									gap: 12,
 								}}
 							>

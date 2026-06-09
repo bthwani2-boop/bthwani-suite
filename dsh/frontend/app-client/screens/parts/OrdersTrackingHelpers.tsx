@@ -1653,8 +1653,9 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
       >
         {/* Operational Status Hero Banner */}
         <OperationalStatusHero
+          statusLabel={currentStatusLabel ?? clientStateMeta.label}
           title={heroTitle}
-          description={heroSummary}
+          summary={heroSummary}
           items={heroDetailItems}
           statusTone={isDeliveredState || phase === 'received' ? 'success' : 'brand'}
         />

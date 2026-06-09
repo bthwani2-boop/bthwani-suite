@@ -368,9 +368,8 @@ export function PromotionsScreen({
         tone="raised"
         padding={3}
         gap={3}
+        border={false}
         style={{
-          borderWidth: 1,
-          borderColor: theme.line,
           borderRadius: 22,
         }}
       >
@@ -442,9 +441,8 @@ export function PromotionsScreen({
         tone="raised"
         padding={3}
         gap={3}
+        border={false}
         style={{
-          borderWidth: 1,
-          borderColor: theme.line,
           borderRadius: 22,
         }}
       >

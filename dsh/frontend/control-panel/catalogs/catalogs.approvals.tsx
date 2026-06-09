@@ -537,7 +537,7 @@ export function ItemApprovalScreen({
                     <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{item.submittedAt}</Text>
                   </td>
                   <td style={{ padding: '12px' }}>
-                    <WebControlPanelStatusTag label={statusLabel[item.status]} tone={(approvalTone === 'muted' || approvalTone === 'default') ? 'neutral' : approvalTone as 'success' | 'warning' | 'danger'} />
+                    <WebControlPanelStatusTag label={statusLabel[item.status]} tone={approvalTone === 'default' ? 'neutral' : approvalTone as 'success' | 'warning' | 'danger'} />
                   </td>
                   <td style={{ padding: '12px' }}>
                     {item.status === 'pending' ? (

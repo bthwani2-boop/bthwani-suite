@@ -44,7 +44,7 @@ export type StoreMeasurementAppearance = {
 
 export type StoreMeasurementSheetProps = {
   pickerItem: DshStoreGetMenuItem | null;
-  activeMeasurementOptions: string[];
+  activeMeasurementOptions: readonly string[];
   selectedMeasureOption: string | null;
   setSelectedMeasureOption: (option: string | null) => void;
   selectedMeasureQty: number;

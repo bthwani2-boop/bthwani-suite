@@ -103,7 +103,8 @@ export type DshPartnerSupportCommandFilterId =
   | 'order-issues'
   | 'conversations'
   | 'inventory-branch'
-  | 'escalation';
+  | 'escalation'
+  | 'urgent';
 
 export type DshPartnerSupportCommandContext = {
   filterId: DshPartnerSupportCommandFilterId;
@@ -197,13 +198,13 @@ export function mapDshPartnerSupportRouteToOperationalFlow(
 export function isDshPartnerHiddenCompatOperationalFlow(
   flowId: DshPartnerOperationalFlowId
 ): boolean {
-  return DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS.includes(flowId);
+  return (DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS as readonly DshPartnerOperationalFlowId[]).includes(flowId);
 }
 
 export function isDshPartnerHiddenCompatSupportRoute(
   routeId: DshPartnerSupportRouteId
 ): boolean {
-  return DSH_PARTNER_HIDDEN_COMPAT_SUPPORT_ROUTE_IDS.includes(routeId);
+  return (DSH_PARTNER_HIDDEN_COMPAT_SUPPORT_ROUTE_IDS as readonly DshPartnerSupportRouteId[]).includes(routeId);
 }
 
 export type DshPartnerRoute =
@@ -259,4 +260,6 @@ export type DshPartnerHubSurfaceProps = {
   onOpenStoreCourierSetup?: () => void;
   onToggleAvailability?: (isAvailable: boolean) => void;
   canonicalStoreId?: string;
+  dshAuthBearerToken?: string | null;
+  dshClientId?: string | null;
 };

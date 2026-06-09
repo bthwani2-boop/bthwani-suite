@@ -76,7 +76,7 @@ function resolveExpoAv(): ExpoAvModule | null {
 	}
 }
 
-export function DshHomeApprovedVideoReelsViewer({
+function DshHomeApprovedVideoReelsViewer({
 	visible,
 	items,
 	initialIndex = 0,
@@ -221,7 +221,7 @@ export function DshHomeApprovedVideoReelsViewer({
 												<Text role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</Text>
 
 												<Pressable
-													style={[styles.ctaButton, { backgroundColor: item.accentColor }]}
+													style={[styles.ctaButton, { backgroundColor: (item as any).accentColor ?? colorPalette.accentOrange }]}
 													onPress={() => onCtaPress(item)}
 													accessibilityRole="button"
 													accessibilityLabel={item.ctaLabel}

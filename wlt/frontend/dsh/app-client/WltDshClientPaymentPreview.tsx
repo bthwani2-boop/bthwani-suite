@@ -11,6 +11,7 @@ import {
   Surface,
   Text,
   useTheme,
+  type KeyValueItem,
 } from '@bthwani/ui-kit';
 import {
   formatWltYer,
@@ -87,15 +88,15 @@ function WalletBalancePanel({
   heldMinorUnits?: number;
   pendingMinorUnits?: number;
 }) {
-  const items = walletLinked
+  const items: KeyValueItem[] = walletLinked
     ? [
-        { label: 'الرصيد المتاح', value: formatWltYer(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' as const },
-        { label: 'محجوز', value: heldMinorUnits > 0 ? formatWltYer(heldMinorUnits) : 'لا يوجد', tone: heldMinorUnits > 0 ? 'warning' : 'default' as const },
-        { label: 'معلق', value: pendingMinorUnits > 0 ? formatWltYer(pendingMinorUnits) : 'لا يوجد', tone: 'default' as const },
-        { label: 'حالة المحفظة', value: 'مرتبطة', tone: 'success' as const },
+        { label: 'الرصيد المتاح', value: formatWltYer(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' },
+        { label: 'محجوز', value: heldMinorUnits > 0 ? formatWltYer(heldMinorUnits) : 'لا يوجد', tone: heldMinorUnits > 0 ? 'warning' : 'default' },
+        { label: 'معلق', value: pendingMinorUnits > 0 ? formatWltYer(pendingMinorUnits) : 'لا يوجد', tone: 'default' },
+        { label: 'حالة المحفظة', value: 'مرتبطة', tone: 'success' },
       ]
     : [
-        { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'warning' as const },
+        { label: 'حالة المحفظة', value: 'غير مرتبطة', tone: 'warning' },
       ];
 
   return (
@@ -139,12 +140,12 @@ function CheckoutSummaryPanel({
   summaryLabel: string;
   walletBalanceAfterMinorUnits: number;
 }) {
-  const items = [
-    { label: 'إجمالي الطلب', value: formatWltYer(orderTotalMinorUnits), tone: 'info' as const },
+  const items: KeyValueItem[] = [
+    { label: 'إجمالي الطلب', value: formatWltYer(orderTotalMinorUnits), tone: 'info' },
     ...(walletAmountMinorUnits > 0 ? [{ label: 'من المحفظة', value: formatWltYer(walletAmountMinorUnits), tone: 'success' as const }] : []),
     ...(codAmountMinorUnits > 0 ? [{ label: 'نقداً عند الاستلام', value: formatWltYer(codAmountMinorUnits), tone: 'brand' as const }] : []),
     ...(isSplitPayment ? [{ label: 'نوع الدفع', value: 'مختلط (محفظة + كاش)', tone: 'info' as const }] : []),
-    ...(walletAmountMinorUnits > 0 ? [{ label: 'رصيد المحفظة بعد الدفع', value: formatWltYer(walletBalanceAfterMinorUnits), tone: walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger' as const }] : []),
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'رصيد المحفظة بعد الدفع', value: formatWltYer(walletBalanceAfterMinorUnits), tone: (walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger') as KeyValueItem['tone'] }] : []),
   ];
 
   return (

@@ -40,6 +40,19 @@ function isBoundaryStatement(context) {
   return /PREVIEW_ONLY|read[- ]only|readOnly|reference only|visibility only|no\s+[^.\n]*(ledger|wallet|refund|settlement|reconciliation|mutation|write|update)|mutationForbidden|forbidden actions|forbiddenActions|WLT-only|لا يوجد|لا تنشئ|بدون|مرجعية|محاكاة/i.test(context);
 }
 
+const ALLOWED_VAR_UI_NAMES = new Set([
+  'VAR_UI_APPEARANCE_MODE',
+  'VAR_UI_FONT_PROFILE',
+  'VAR_UI_DENSITY_PROFILE',
+  'VAR_UI_RADIUS_PROFILE',
+  'VAR_UI_ELEVATION_PROFILE',
+  'VAR_UI_MOTION_PROFILE',
+  'VAR_UI_MARKETING_EMPHASIS',
+  'VAR_UI_CONTROL_PANEL_DENSITY',
+  'VAR_UI_MEDIA_LOADING_POLICY',
+  'VAR_UI_DATA_DENSITY_POLICY'
+]);
+
 const config = loadConfig();
 const serviceEntries = Object.entries(config.services ?? {})
   .filter(([id]) => !serviceFilter || id === serviceFilter);
@@ -86,6 +99,23 @@ for (const [serviceId, service] of serviceEntries) {
 
     if (routePath.test(relativePath) && routeSignal.test(text) && routeAction.test(text) && !routeAllowed.test(text)) {
       result.add('INFO', 'control_panel_route_sprawl_signal', file, `Potential control-panel route/page sprawl signal for service "${serviceId}".`, null, 'Verify control-room ownership and progressive disclosure before adding new routes.');
+    }
+
+    // Enforce allowed VAR_UI_* variable names
+    const varUiRegex = /\bVAR_UI_[A-Z_0-9]+\b/g;
+    let varMatch;
+    while ((varMatch = varUiRegex.exec(text))) {
+      const varName = varMatch[0];
+      if (!ALLOWED_VAR_UI_NAMES.has(varName)) {
+        result.add(
+          'FAIL',
+          'forbidden_var_ui_name',
+          file,
+          `Forbidden VAR_UI_* variable name detected: "${varName}". Only approved presets are allowed.`,
+          lineOf(text, varMatch.index),
+          'Align design variable names to the central allowlist in governance/08_UI_KIT_AND_BRAND.md.'
+        );
+      }
     }
 
     // Zero scattered process.env reads enforcement (DSH-SLICE-008A)

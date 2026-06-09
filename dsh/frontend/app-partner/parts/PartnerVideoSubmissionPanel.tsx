@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, SectionHeader, Surface, Text, TextField, Chip, Box } from '@bthwani/ui-kit';
-import { ApprovalStage } from '../shared/workflow';
+import { ApprovalStage } from '../../shared/workflow';
 import type { DshPartnerOperationalFlowId } from '../dsh-partner.types';
 
 export type DshPartnerVideoSubmissionPanelProps = {

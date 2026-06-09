@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import {
   Badge,
+  borders,
   Box,
   Button,
   Icon,
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing[2],
     padding: spacing[3],
-    borderWidth: 1,
+    borderWidth: borders.hairline,
     borderColor: colorPalette.brand,
     borderRadius: radius.md,
     borderStyle: 'dashed',

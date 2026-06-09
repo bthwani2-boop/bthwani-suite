@@ -222,7 +222,7 @@ export function ConversationScreen({ activeFlowId = 'chat-send', onBack, onOpenS
         onOpenFlow={(flowId) => {
           const routeId = mapDshPartnerOperationalFlowToSupportRoute(flowId);
           if (routeId) {
-            onOpenScreen?.(routeId);
+            onOpenScreen?.(routeId as PartnerConversationRouteId);
           }
         }}
       />

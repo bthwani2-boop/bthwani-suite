@@ -74,7 +74,6 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9,
-    elevation: 8,
     ...shadowPresets.raised,
   },
 

@@ -346,3 +346,121 @@ The following guards enforce this contract. They must be run on every relevant c
 | `guard-central-i18n-direction.mjs` | RTL direction imports | strict |
 
 **Promotion Rule:** A guard category moves from advisory to strict only after the corresponding debt has been remediated and human approval is recorded. No broad strict-fail before remediation.
+
+---
+
+## 22. Premium Visual Identity & Performance Standards
+
+To ensure a visual identity that combines luxury, practicality, and high performance across all surfaces, the following standards must be strictly enforced:
+
+### A. Central Brand Colors & Visual Contrast (الألوان والتباين البصري)
+* **Core Brand Identity:** Trust via `deepBlue` (`#0A2F5C`), primary action emphasis via `orange` (`#FF500D`), and clean surfaces via `white` (`#FFFFFF`).
+* **Visual depth:** Enhance premium quality and depth using semantic roles and secondary colors from `lightPremium` and `darkGlass` (e.g. `deepBlueElevated` or `offWhite`).
+* **High Contrast:** Ensure strong readability and high contrast (e.g., white text on `deepBlue` backgrounds, or `deepBlue`/`ink` text on light surfaces).
+* **No local colors:** Hardcoded, raw color hexes are forbidden outside `@bthwani/ui-kit`.
+
+### B. Typography & Text Relationships (الخطوط وتنسيق النصوص)
+* **Standardized Roles:** Use typography scale and text roles defined in `foundation.ts` (e.g. `hero`, `titleXl`, `bodyMd`). No custom font families, inline `fontFamily` strings, or manual font size overrides.
+* **Hierarchical Balance:** Maintain visual balance between headlines (using bold display weights) and readable body copy (using regular weights). Ensure proper matching of corresponding text styles and weights in both Arabic and Latin (e.g. using `hero` or `titleXl` for luxury promotional titles, and `bodyMd` for long body copy).
+
+### C. Iconography & Graphical Integrity (العناصر الرسومية والأيقونات)
+* **Unified Icons:** All icons and icon buttons must reside within the central design system and be exported via `@bthwani/ui-kit/Icon` or `IconButton`.
+* **Standard sizing:** Sizing must align to the scale specified in `rawSizingScale` (16, 20, 24 pixels).
+* **No raw styling:** Developers must not override size or color values manually; instead, specify the centralized `tone` and `size` properties.
+
+### D. Spacing, Radius, & Depth (الفراغات والأركان والظلال)
+* **Generous spacing:** Follow raw spacing scale (`rawSpacingScale`). Maintain adequate margins and paddings around components (employing the "double space" rule around main headings and primary content cards to let layouts breathe).
+* **Consistent corners:** Utilize standard radius sizes (`radius md` or `lg` from `rawRadiusScale`).
+* **Cohesive depth:** Use central `shadowPresets` (raised, overlay, floating) to build depth without creating visual clutter or battery/perf drain.
+
+### E. Component Architecture & Header Law (مكونات وهندسة الواجهات)
+* **Reusable Primitives:** Elements such as buttons, cards, headers, status tags, sheets, and banners must be centralized in `@bthwani/ui-kit`.
+* **Header Law Compliance:** Orange headers for top-level pages, white headers for sub-pages, and dense admin top bars for control panels.
+* **Appearance & Customization:** Every screen and surface is considered incomplete if it does not support both `lightPremium` and `darkGlass` appearance modes from day one. Control room configuration must strictly pass through pre-defined profiles (no free HEX or font-family inputs allowed) to preserve basic token integrity.
+
+### F. RTL Alignment & Logical Flow (محاذاة الاتجاهات واللغة العربية)
+* **RTL correctness:** Align text to the right for Arabic content. Keep icon + label clustered as a single unit on the right side in rows, with action/chevron buttons on the left.
+* **Layout integrity:** Avoid `space-between` layouts that separate icons from their associated text. Ensure zero text-clipping.
+
+### G. Performance, Loading, & Lazy-first Policy (الأداء والتحميل الفائق)
+* **Asset Optimization:** Use SVG icons or icon fonts instead of heavy images. Minimize the number of external resources and use a single font format to avoid multiple font-file downloads.
+* **Eager vs Lazy rendering:** Implement lazy loading for images and list views. Adopt lightweight, performance-aware components like virtualized lists for large datasets, and minimize repaints, CPU consumption, and unnecessary layout interactions. Ensure screen loading, empty, and error states consume central `StateView` primitives.
+* **Lean Motion:** Utilize motion values from `rawMotionScale` (120ms to 320ms) for transitions. Avoid heavy CSS filter shadows or computationally expensive visual animations.
+
+### H. Verification & Visual Evidence Gate (بوابة التحقق البصري)
+* **Evidence contract:** Every UI change must document before/after screenshots, viewport size, RTL alignment validation, CTA visibility check, and zero-clipping verification.
+
+---
+
+## 23. معايير الهوية البصرية الفاخرة والعملية
+
+لتصميم هوية بصرية فخمة وعملية وجذابة مع الحفاظ على سرعة الأداء والانسجام عبر جميع الأسطح، تستند المعايير إلى ثلاثة محاور: استخدام الموارد البراندية المعتمدة، الالتزام بعقود التصميم المركزية، والعمل وفق منهجيات تمنح سرعة استجابة عالية.
+
+### 23.1 الألوان والعناصر البصرية
+- اعتمد لوحة الألوان المركزية المعرَّفة في ملفات الحوكمة: `deepBlue` للثقة والعناوين الرئيسية، والبرتقالي للأفعال الأساسية والتأكيد، والأبيض للأسطح النظيفة.
+- لضمان الفخامة، عزِّز العمق باستخدام ألوان ثانوية من لوحات `lightPremium` و`darkGlass` (مثل `deepBlueElevated` أو `offWhite`) واستعمال contrast عالٍ (نص أبيض على خلفية `deepBlue`، أو نص `deepBlue` على surface فاتح).
+- ابتعد عن استخدام درجات عشوائية أو تدرجات ثقيلة — العناصر المصرح بها فقط تُسخدم للحفاظ على وحدة الهوية ولقطع الحاجة إلى تحميل صور وخلفيات ثقيلة.
+- التزم بأدوار الألوان الدلالية في `foundation.ts` للاستخدام الثانوي: النجاح والتحذير والخطر والمعلومات — لها معاني ثابتة لا تتغير بين الشاشات.
+- `darkGlass` لا يحتوي cards بيضاء صلبة أو text غامق على خلفية غامقة.
+
+### 23.2 الخطوط والتنضيد
+- استخدم أنظمة النصوص المعرّفة في `ui-kit`: تعريف موحَّد لعائلات الخطوط، أوزانها، وتباعد الحروف.
+- أدوار نصية إلزامية: `display / hero / title / body / caption / label / metric` — استخدمها ولا تضف أحجامًا أو خطوطًا محلية.
+- الاعتماد على النصوص المقابلة في العربية واللاتينية مع الوزن المناسب: `hero` أو `titleXl` للعناوين الترويجية، `bodyMd` للنصوص الطويلة.
+- وظيفة اختيار الخطوط تُدار عبر سياسات مسبقة ضمن الحوكمة لضبط القراءة بالعربية واللاتينية ومنع تحميل خطوط إضافية غير ضرورية.
+- لا تضف خطوطًا أو أحجامًا محلية — هذا يزيد من حجم الموارد ويضعف الأداء.
+
+### 23.3 الأيقونات والعناصر الرسومية
+- استخدم `Icon` و`IconButton` و`DirectionalIcon` فقط من `@bthwani/ui-kit` — الأيقونات خارج المكتبة ممنوعة.
+- أحجام الأيقونات من `rawSizingScale` فقط (16، 20، 24 نقطة).
+- لا تختر لون الأيقونة أو حجمها يدويًا — استخدم متغيرات `tone` و`size` المتاحة في `Icon` و`IconButton`.
+- icon tones: `default / brand / muted / success / warning / danger / info / inverse`.
+- chevron/back/forward يلتزم RTL — لا circle/background محلي حول الأيقونات إذا كان pattern متكررًا.
+
+### 23.4 المكوّنات والأنماط
+- كل عنصر متكرر — الزر والبطاقة والهيدر والشارة والحالات وشريط التنقل والبنرات — له مالك مركزي في `@bthwani/ui-kit`.
+- هذا يمنع التكرار ويتيح إعادة استخدام الشيفرة وتحميل الأنماط مرة واحدة بدلاً من تكرارها في كل تطبيق.
+- عند بناء الصفحات: استخدم الأنماط الجاهزة مثل `ScreenHeader`، `BottomNavBar`، `Card`، `StateView` بدل إنشاء عناصر محلية جديدة.
+- **قانون الهيدر:** الهيدر البرتقالي للشاشات العليا، الأبيض للشاشات الفرعية، الكثيف للويب الإداري.
+- one-off screen layout يبقى داخل surface — لا نسخ محلية لنفس الكرت أو الزر أو الشارة في عدة أسطح.
+
+### 23.5 المسافات والأركان والظلال والعمق
+- الفخامة تأتي من فراغات سخية حول العناصر وإتاحة هواء للمحتوى (قاعدة "ضاعف مساحة الفراغ" حول العناوين الرئيسية والبطاقات الأساسية).
+- استخدم مقاييس المسافات (`rawSpacingScale`) والأنصاف أقطار (`rawRadiusScale`: `radius md` أو `lg`) والظلال (`shadowPresets`: raised، overlay، floating).
+- الظلال الدقيقة تضفي عمقًا دون استنزاف المعالج أو استهلاك البطارية.
+- لا blur/glass/shadow ثقيل داخل lists أو repeated cards — depth يخدم hierarchy لا يكون decoration.
+
+### 23.6 الترتيب وتوافق RTL
+- نص عربي محاذٍ لليمين، وأيقونة + عنوان كتلة واحدة في الجانب الأيمن للقوائم، والسهم أو الفعل في الجهة المقابلة.
+- تجنب `space-between` بطرق تفصل الأيقونة عن النص.
+- اختبر الأسطح في وضع RTL للتأكد من خلوها من القطع أو التداخل.
+- numbers/currency/status mixed content لا يكسر الاتجاه.
+
+### 23.7 سياسات المظهر والتخصيص
+- كل شاشة أو سطح يعتبر غير مكتمل إذا لم يدعم حالتي `lightPremium` و`darkGlass` منذ اليوم الأول.
+- عند التخصيص من لوحة التحكم: لا يُسمح بتغيير الألوان أو الخطوط عشوائيًا — يُختار واحد من ملفات تعريف محددة مسبقًا (نمط خط عربي مميز أو كثافة تحكم في الفراغات) بحيث تبقى التوكنات الأساسية محفوظة عبر محوّل في `ui-kit`.
+
+### 23.8 السرعة والأداء
+الفخامة لا تعني البطء — التصميم ممنوع يسبب بطءًا:
+- قلل عدد الخطوط والموارد الخارجية، استخدم صيغة واحدة للخط لتجنب تعدد التحميلات.
+- استخدم الأيقونات SVG أو خطوط أيقونات بدلاً من الصور النقطية الكبيرة.
+- طبق lazy loading للصور وقوائم البيانات غير المرئية فورًا.
+- تجنب المؤثرات البصرية المكلفة: ظلال غامقة متعددة، حركات ثقيلة، blur مستمر في القوائم.
+- استخدم قيم الحركة في `rawMotionScale` (120–320 مللي ثانية) للانتقالات.
+- اعتمد مكوّنات خفيفة ومراعية للأداء: قوائم افتراضية (virtualized lists) لكميات بيانات كبيرة.
+- قلل إعادة الرسم والتفاعلات غير الضرورية.
+- لا تكرار للأصول ولا كائنات inline ثقيلة داخل المكوّنات المتكررة.
+- قس الأداء قبل/بعد أي تغيير visible في UI.
+
+### 23.9 التحقق والإثبات
+طبّق بوابة الدليل البصري المنصوص عليها في الحوكمة — أي تعديل في الواجهة يرفق بـ:
+```text
+لقطة قبل (when available) + لقطة بعد
+الجهاز أو المتصفح أو viewport
+تحليل القص والفراغات والمحاذاة
+تأكيد رؤية الـ CTA الرئيسية
+تأكيد RTL صحيح
+تأكيد عدم وجود انحرافات بصرية غير مقصودة
+git diff evidence
+```
+هذا لا يحسن المظهر فقط، بل يكشف أي تدهور في الأداء مبكرًا.

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ScrollView, View, Pressable } from 'react-native';
 import {
   Badge,
@@ -18,6 +18,7 @@ import {
   TopBar,
   useTheme,
   colorPalette,
+  borders,
 } from '@bthwani/ui-kit';
 import {
   fieldSectionLabels,
@@ -1052,7 +1053,7 @@ export function DshFieldStoreOnboardingScreen({
                           : theme.surfaceSecondary,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderWidth: isActive ? 0 : 1.5,
+                        borderWidth: isActive ? 0 : borders.hairline,
                         borderColor: isComplete ? theme.success : theme.line,
                         zIndex: 2,
                       }}
@@ -1081,7 +1082,7 @@ export function DshFieldStoreOnboardingScreen({
                         padding: 12,
                         borderRadius: 12,
                         backgroundColor: isActive ? theme.brandSurface : theme.surface,
-                        borderWidth: 1.5,
+                        borderWidth: borders.hairline,
                         borderColor: isActive ? theme.brand : theme.line,
                         gap: 4,
                         alignItems: 'flex-end',

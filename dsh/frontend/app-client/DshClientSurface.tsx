@@ -382,6 +382,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           createOrderValues={createOrderValues}
           setCreateOrderValues={setCreateOrderValues}
           handleConfirmCheckout={handleConfirmCheckout}
+          handleConfirmedOrderExecution={handleConfirmedOrderExecution}
           appearanceHydrated={appearanceHydrated}
           appearanceMode={appearanceMode}
           setAppearanceMode={setAppearanceMode}

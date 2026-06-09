@@ -80,7 +80,7 @@ type SummaryItem = {
   id: string;
   label: string;
   value: string;
-  tone?: 'default' | 'brand' | 'success' | 'warning' | 'info';
+  tone?: 'default' | 'brand' | 'success' | 'warning' | 'info' | 'danger';
 };
 
 type NotificationPreferenceId =
@@ -289,6 +289,8 @@ function PromotionCandidateRow({
   selected: boolean;
   onPress: () => void;
 }) {
+  const { theme } = useTheme();
+  const { direction } = useDirection();
   const tone = item.eligibility === 'eligible' ? 'success' : item.eligibility === 'review' ? 'warning' : 'danger';
 
   const statusLabel =
@@ -304,25 +306,38 @@ function PromotionCandidateRow({
     'default';
 
   return (
-    <Surface tone="default" padding={3} gap={2} style={{ borderWidth: 1, borderColor: selected ? colorPalette.brand : undefined }}>
-      <Box gap={1}>
-        <Text role="bodyStrong">{item.title}</Text>
-        <Text role="bodySm" tone="muted">{item.subtitle}</Text>
-      </Box>
+    <Pressable onPress={onPress}>
+      <Box
+        padding={3}
+        gap={2}
+        background={selected ? 'surfaceRaised' : 'surface'}
+        radiusToken="md"
+        elevationToken={selected ? 'raised' : 'flat'}
+        border={false}
+        style={{
+          borderStartWidth: 4,
+          borderStartColor: selected ? theme.brand : 'transparent',
+        }}
+      >
+        <Box gap={1}>
+          <Text role="bodyStrong" align="start">{item.title}</Text>
+          <Text role="bodySm" tone="muted" align="start">{item.subtitle}</Text>
+        </Box>
 
-      <Box gap={1}>
-        <Text role="caption" tone="muted">{item.availability}</Text>
-        <Text role="caption" tone="muted">{item.offerHint}</Text>
-      </Box>
+        <Box gap={1}>
+          <Text role="caption" tone="muted" align="start">{item.availability}</Text>
+          <Text role="caption" tone="muted" align="start">{item.offerHint}</Text>
+        </Box>
 
-      <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
-        <Chip label={item.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" selected />
-        <Chip label={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب'} tone={tone} />
-        <Chip label={statusLabel} tone={statusTone} />
-      </Box>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
+          <Chip label={item.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" selected />
+          <Chip label={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب'} tone={tone} />
+          <Chip label={statusLabel} tone={statusTone} />
+        </Box>
 
-      <Button label={selected ? 'العنصر مفتوح' : 'اختيار العنصر'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
-    </Surface>
+        <Button label={selected ? 'العنصر مفتوح' : 'اختيار العنصر'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
+      </Box>
+    </Pressable>
   );
 }
 
@@ -431,11 +446,13 @@ function SummaryCell({ label, value, tone = 'default' }: Omit<SummaryItem, 'id'>
       ? theme.success
       : tone === 'warning'
         ? theme.warning
-        : tone === 'brand'
-          ? theme.brand
-          : tone === 'info'
-            ? theme.info
-            : theme.lineStrong;
+        : tone === 'danger'
+          ? theme.danger
+          : tone === 'brand'
+            ? theme.brand
+            : tone === 'info'
+              ? theme.info
+              : theme.lineStrong;
 
   return (
     <Box
@@ -843,7 +860,7 @@ function OperationsPanel({
   const { theme } = useTheme();
   const teamMembers = partnerTeamPreviewMembers;
   const coverageZones = partnerCoveragePreviewZones;
-  const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
+  const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id'] | ''>('pickup');
   const [modeOverrides, setModeOverrides] = React.useState<Partial<Record<PartnerOperationalMode['id'], boolean>>>({});
   const [teamPanelOpen, setTeamPanelOpen] = React.useState(false);
   const [coveragePanelOpen, setCoveragePanelOpen] = React.useState(false);
@@ -1001,7 +1018,7 @@ function OperationsPanel({
                 </Pressable>
 
                 {isSelected && (
-                  <Box paddingHorizontal={4} paddingBottom={3} gap={2} style={{ paddingTop: 2 }}>
+                  <Box paddingX={4} gap={2} style={{ paddingTop: 2, paddingBottom: 12 }}>
                     <Text role="caption" tone="muted" align="start">
                       حالة الوضع: {mode.enabled ? 'نشط ويستقبل الطلبات' : 'موقف مؤقتًا'}.
                     </Text>
@@ -1108,7 +1125,7 @@ function OperationsPanel({
                     </Pressable>
 
                     {isMemberSelected && (
-                      <Box paddingHorizontal={4} paddingTop={2} gap={2}>
+                      <Box paddingX={4} gap={2} style={{ paddingTop: 12 }}>
                         <KeyValueList
                           dense
                           items={[
@@ -1261,7 +1278,7 @@ function OperationsPanel({
                     </Pressable>
 
                     {isZoneSelected && (
-                      <Box paddingHorizontal={4} paddingTop={2} gap={2}>
+                      <Box paddingX={4} gap={2} style={{ paddingTop: 12 }}>
                         <KeyValueList
                           dense
                           items={[
@@ -1404,8 +1421,15 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Opportunity spotlight */}
       <Box
         padding={3}
-        gap={2}
-        style={{ backgroundColor: theme.warning + '11', borderRadius: 12 }}
+        gap={3}
+        background="surfaceRaised"
+        elevationToken="raised"
+        radiusToken="md"
+        border={false}
+        style={{
+          borderStartWidth: 4,
+          borderStartColor: theme.warning,
+        }}
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
           <Icon name="bulb-outline" size={18} tone="warning" />
@@ -1429,8 +1453,15 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Smart recommendation */}
       <Box
         padding={3}
-        gap={2}
-        style={{ backgroundColor: theme.brand + '11', borderRadius: 12 }}
+        gap={3}
+        background="surfaceRaised"
+        elevationToken="raised"
+        radiusToken="md"
+        border={false}
+        style={{
+          borderStartWidth: 4,
+          borderStartColor: theme.brand,
+        }}
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
           <Icon name="trending-up-outline" size={18} tone="brand" />
@@ -1439,7 +1470,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
         <Text role="bodySm" align="start">{d.smartRecommendation}</Text>
         <Button
           label="فعّل العرض"
-          tone="primary"
+          tone="brand"
           fullWidth={false}
           onPress={() => {/* promotion intent — UI only, no backend */}}
         />
@@ -1841,14 +1872,14 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
               <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
                 التفضيلات الحالية
               </Text>
-              {[
-                { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: (notificationPreferences.priorityOnly ? 'warning' : 'success') as const },
-                { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.sound ? 'success' : 'warning') as const },
-                { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.dailyDigest ? 'info' : 'default') as const },
-                { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: (listingEnabled ? 'success' : 'warning') as const },
-                { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: (storeOpen ? 'success' : 'warning') as const },
-                { label: 'ساعات العمل', value: todayHoursLabel, tone: 'default' as const },
-              ].map((item, index, arr) => (
+              {([
+                { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: notificationPreferences.priorityOnly ? 'warning' : 'success' },
+                { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: notificationPreferences.sound ? 'success' : 'warning' },
+                { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: notificationPreferences.dailyDigest ? 'info' : 'default' },
+                { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: listingEnabled ? 'success' : 'warning' },
+                { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
+                { label: 'ساعات العمل', value: todayHoursLabel, tone: 'default' },
+              ] as const).map((item, index, arr) => (
                 <View
                   key={item.label}
                   style={{
@@ -1862,7 +1893,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     borderBottomColor: theme.line,
                   }}
                 >
-                  <Text role="body" style={{ color: theme.text }}>
+                  <Text role="bodyMd" style={{ color: theme.text }}>
                     {item.label}
                   </Text>
                   <Chip label={item.value} tone={item.tone} />

@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
@@ -371,7 +371,7 @@ function CaptainAccountNavRow({
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: theme.brandSurface,
-            borderWidth: 1,
+            borderWidth: borders.hairline,
             borderColor: theme.brand + '33',
             flexShrink: 0,
           }}
@@ -1003,7 +1003,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
                 backgroundColor: theme.brandSurface,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderWidth: 1,
+                borderWidth: borders.hairline,
                 borderColor: theme.brand + '44',
               }}
             >
@@ -1169,7 +1169,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.surfaceInset,
-              borderWidth: 1,
+              borderWidth: borders.hairline,
               borderColor: theme.line,
               flexShrink: 0,
             }}
@@ -1191,7 +1191,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             backgroundColor: theme.surfaceInset,
             borderRadius: 12,
             padding: 3,
-            borderWidth: 1,
+            borderWidth: borders.hairline,
             borderColor: theme.line,
             gap: 4,
           }}
@@ -1249,7 +1249,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.surfaceInset,
-              borderWidth: 1,
+              borderWidth: borders.hairline,
               borderColor: theme.line,
               flexShrink: 0,
             }}
@@ -1851,7 +1851,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
                 height: zone.size,
                 borderRadius: zone.size / 2,
                 backgroundColor: zone.color,
-                borderWidth: 1,
+                borderWidth: borders.hairline,
                 borderColor: withAlpha(colorPalette.brand, 0.12),
                 ...(zone.top != null ? { top: zone.top } : {}),
                 ...(zone.bottom != null ? { bottom: zone.bottom } : {}),
@@ -1870,7 +1870,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
                 height: zone.size,
                 borderRadius: zone.size / 2,
                 backgroundColor: zone.color,
-                borderWidth: 1,
+                borderWidth: borders.hairline,
                 borderColor: withAlpha(colorPalette.brandStrong, 0.12),
                 ...(zone.top != null ? { top: zone.top } : {}),
                 ...(zone.bottom != null ? { bottom: zone.bottom } : {}),

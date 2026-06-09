@@ -372,6 +372,8 @@
     "dsh/frontend/app-client/screens/MySpaceScreen.tsx",
     "dsh/frontend/app-field/screens/DshFieldReadinessEscalationScreen.tsx",
     "dsh/frontend/app-partner/parts/PartnerOrderActionPanel.tsx",
+    "dsh/frontend/app-partner/screens/DshPartnerOrderRejectionScreen.tsx",
+    "dsh/frontend/app-partner/screens/PromotionsScreen.tsx",
     "dsh/frontend/app-partner/screens/OperationScreens.tsx",
     "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx",
     "dsh/frontend/app-partner/DshPartnerSurface.tsx",

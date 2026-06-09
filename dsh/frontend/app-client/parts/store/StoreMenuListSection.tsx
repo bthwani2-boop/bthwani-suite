@@ -113,7 +113,7 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
         label: normalizeDisplayText(category.label),
         icon: CATEGORY_ICON[category.id]
           ? <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
-          : ({ selected }) => (
+          : ({ selected }: { selected: boolean }) => (
               <Icon
                 name={
                   category.id === 'all' ? 'reorder-three-outline' :

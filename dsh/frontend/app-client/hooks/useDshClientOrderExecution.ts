@@ -99,7 +99,7 @@ export function useDshClientOrderExecution({
           ...current,
           fulfillmentMode: nextOrderSummary.fulfillmentMode,
           dropoffAddress: nextOrderSummary.dropoffAddress,
-          note: nextOrderSummary.note,
+          note: nextOrderSummary.note ?? '',
         }));
         setSelectedFulfillmentMode(nextOrderSummary.fulfillmentMode);
         setCartItems([]);

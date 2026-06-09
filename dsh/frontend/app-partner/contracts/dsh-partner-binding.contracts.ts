@@ -20,7 +20,7 @@ export type StoreCourierCompensation =
   | 'fixed_per_delivery'
   | 'percentage_of_delivery_fee';
 
-export type DshPartnerSurfaceId = DshPartnerRoute | 'wallet-bridge';
+export type DshPartnerSurfaceId = DshPartnerRoute | 'wallet-bridge' | 'detail';
 
 export type DshPartnerBindingContract = {
   surfaceId: DshPartnerSurfaceId;

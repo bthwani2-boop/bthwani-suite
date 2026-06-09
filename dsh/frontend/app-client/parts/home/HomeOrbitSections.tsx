@@ -149,7 +149,6 @@ export const HomeCategoryDialSection = React.memo(function HomeCategoryDialSecti
   return (
     <DshCategoryOrbitCarouselBase
       visible={homeState.categoriesSheetVisible}
-      anchorLayout={homeState.categoriesDialLayout}
       items={categoriesDialItems}
       onClose={() => homeState.setCategoriesSheetVisible(false)}
       onSelect={(item: DshCategoryDialItem) => {

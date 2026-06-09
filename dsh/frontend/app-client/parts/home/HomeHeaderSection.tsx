@@ -36,7 +36,6 @@ export const HomeHeaderSection = React.memo(function HomeHeaderSection({
       onCartPress={handleOpenCartFromHeader}
       onNotificationsPress={props.onOpenNotifications}
       onProfilePress={handleOpenMySpace}
-      onLauncherPress={openServiceDial}
       notificationCount={props.notificationCount}
       cartCount={props.cartCount}
       searchPlaceholder="ماذا تريد أن تطلب اليوم؟"

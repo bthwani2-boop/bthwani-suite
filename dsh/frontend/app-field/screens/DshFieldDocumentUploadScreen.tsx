@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import {
   Badge,
@@ -15,6 +15,7 @@ import {
   TopBar,
   useTheme,
   useDirection,
+  borders,
 } from '@bthwani/ui-kit';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
@@ -264,14 +265,14 @@ const styles = StyleSheet.create({
   kindRow: {
     padding: 12,
     borderRadius: 8,
-    borderWidth: 1.5,
+    borderWidth: borders.hairline,
     alignItems: 'center',
   },
   radioOuter: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: borders.strong,
     justifyContent: 'center',
     alignItems: 'center',
   },

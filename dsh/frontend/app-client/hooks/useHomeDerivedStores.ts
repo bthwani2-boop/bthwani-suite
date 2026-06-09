@@ -171,11 +171,11 @@ export function useHomeDerivedStores({
 
     return activeStorePage.stores.map((store, index) => {
       const sm = store.commercialSourceMap;
-      const isOfferBlocked = sm?.['offerLabel']?.conflictStatus === 'blocker';
-      const isProBlocked = sm?.['hasBthwaniPro']?.conflictStatus === 'blocker';
-      const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictStatus === 'blocker';
-      const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictStatus === 'blocker';
-      const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictStatus === 'blocker' || sm?.['new-product-leak']?.conflictStatus === 'blocker';
+      const isOfferBlocked = sm?.['offerLabel']?.conflictSeverity === 'blocker';
+      const isProBlocked = sm?.['hasBthwaniPro']?.conflictSeverity === 'blocker';
+      const isCouponBlocked = sm?.['hasCouponAvailable']?.conflictSeverity === 'blocker';
+      const isPriceMatchBlocked = sm?.['priceMatchLabel']?.conflictSeverity === 'blocker';
+      const isNewProductsBlocked = sm?.['hasNewProducts']?.conflictSeverity === 'blocker' || sm?.['new-product-leak']?.conflictSeverity === 'blocker';
 
       return {
         item: {
@@ -186,8 +186,8 @@ export function useHomeDerivedStores({
           rating: store.rating ?? null,
           distanceKm: Number.parseFloat((store.distanceLabel || '').replace(/[^\d.]/g, '')) || null,
           isOpen: store.statusTone === 'open',
-          supportsPickup: sm?.['supportsPickup']?.conflictStatus !== 'blocker',
-          supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictStatus !== 'blocker',
+          supportsPickup: sm?.['supportsPickup']?.conflictSeverity !== 'blocker',
+          supportsPartnerDelivery: sm?.['supportsPartnerDelivery']?.conflictSeverity !== 'blocker',
           serviceTokens: [
             { label: store.deliveryLabel },
             { label: isPriceMatchBlocked ? undefined : store.serviceLabel }

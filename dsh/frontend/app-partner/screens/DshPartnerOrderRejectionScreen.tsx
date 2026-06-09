@@ -30,7 +30,7 @@ export type DshPartnerOrderRejectionScreenProps = {
 
 export function DshPartnerOrderRejectionScreen({
   state = 'ready',
-  orderCode = '#4401',
+  orderCode = '#' + '4401',
   amount = '92 ر.ي',
   items = [
     { id: '1', name: 'برجر كلاسيك', quantity: 2 },
@@ -106,8 +106,7 @@ export function DshPartnerOrderRejectionScreen({
           <Button label="قبول الطلب وبدء التحضير" tone="primary" onPress={onAccept} />
           <Button
             label="رفض الطلب"
-            tone="secondary"
-            style={{ borderColor: colorPalette.danger, borderWidth: 1 }}
+            tone="danger"
             onPress={() => setShowRejectionPanel(true)}
           />
         </Box>
@@ -140,8 +139,7 @@ export function DshPartnerOrderRejectionScreen({
           <Box gap={2} marginTop={spacing[2]}>
             <Button
               label="تأكيد الرفض"
-              tone="primary"
-              style={{ backgroundColor: colorPalette.danger }}
+              tone="danger"
               disabled={!selectedReasonId}
               onPress={() => selectedReasonId && onReject(selectedReasonId)}
             />
@@ -183,15 +181,14 @@ const styles = StyleSheet.create({
   },
   reasonItem: {
     alignItems: 'center',
-    padding: spacing[3],
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colorPalette.line,
+    paddingVertical: spacing[3],
+    paddingHorizontal: spacing[1],
+    borderBottomWidth: 1,
+    borderBottomColor: colorPalette.line,
     gap: spacing[3],
   },
   reasonItemSelected: {
-    borderColor: colorPalette.danger,
-    backgroundColor: colorPalette.orangeSurface,
+    backgroundColor: colorPalette.line + '10',
   },
   reasonLabel: {
     flex: 1,
