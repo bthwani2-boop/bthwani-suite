@@ -46,7 +46,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 			<Box gap={4} style={{ padding: spacing[4] }}>
 				{/* Header */}
 				<View style={styles.headerRow}>
-					<Text role="title" style={{ textAlign: 'right', color: theme.text }}>
+					<Text role="titleMd" style={{ textAlign: 'right', color: theme.text }}>
 						تسويات المتجر والمالية
 					</Text>
 				</View>
@@ -54,7 +54,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 				{/* Errors/Warnings */}
 				{hasError && (
 					<Card tone="danger" padding={3}>
-						<Text role="body" style={{ color: colorPalette.red600, textAlign: 'right' }}>
+						<Text role="bodyMd" style={{ color: theme.danger, textAlign: 'right' }}>
 							{warnings[0]}
 						</Text>
 					</Card>
@@ -75,7 +75,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
 							صافي مستحقات التسوية
 						</Text>
-						<Text role="bodyStrong" style={[styles.metricValue, { color: colorPalette.green600 }]}>
+						<Text role="bodyStrong" style={[styles.metricValue, { color: theme.success }]}>
 							{formatWltYer(partnerPreview.netSettlementMinorUnits)}
 						</Text>
 					</Surface>
@@ -126,29 +126,23 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 					) : (
 						<Surface tone="default" style={styles.listContainer}>
 							{previewTransactions.map((tx, idx) => {
-								const dateLabel = tx.date
-									? new Date(tx.date).toLocaleDateString('ar-YE', {
-											month: 'short',
-											day: 'numeric',
-											year: 'numeric',
-									  })
-									: 'تاريخ غير محدد';
 								return (
 									<React.Fragment key={tx.id}>
 										{idx > 0 && <Divider />}
 										<ListItem
-											title={tx.description || `تسوية الطلب #${tx.orderId || ''}`}
-											subtitle={`${dateLabel} • ${tx.typeLabel || 'مبيعات'}`}
+											title={tx.title}
+											subtitle={`${tx.timeLabel} • ${tx.subtitle}`}
 											meta={
 												<View style={{ alignItems: 'flex-start' }}>
-													<Text role="bodyStrong" style={{ color: colorPalette.green600 }}>
-														+ {formatWltYer(tx.amountMinorUnits)}
+													<Text role="bodyStrong" style={{ color: tx.amountTone === 'success' ? theme.success : theme.danger }}>
+														{tx.amountLabel}
 													</Text>
-													<Badge
-														label={tx.status === 'COMPLETED' ? 'مكتمل' : 'معلق'}
-														tone={tx.status === 'COMPLETED' ? 'success' : 'warning'}
-														size="sm"
-													/>
+													{tx.statusLabel ? (
+														<Badge
+															label={tx.statusLabel}
+															tone={tx.statusTone ?? 'warning'}
+														/>
+													) : null}
 												</View>
 											}
 										/>

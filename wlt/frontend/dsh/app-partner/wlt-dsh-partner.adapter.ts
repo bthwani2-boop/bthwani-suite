@@ -30,6 +30,9 @@ export type WltDshPartnerWalletTransaction = {
   isStoreCourierCompensation?: boolean;
   isCaptainPayout?: boolean;
   policyLabel?: string;
+  sourceTruthLabel?: string;
+  runtimeBindingLabel?: string;
+  previewNoticeLabel?: string;
 };
 
 function mapAmountTone(tone: WltDshFinanceTone): WltDshPartnerTransactionTone {

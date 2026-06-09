@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { View } from 'react-native';
@@ -27,7 +27,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
     : 'info';
 
   return (
-    <Box gap={2} paddingVertical={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+    <Box gap={2} paddingY={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
         <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>
@@ -58,7 +58,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
 
 function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) {
   return (
-    <Box gap={3} paddingVertical={2}>
+    <Box gap={3} paddingY={2}>
       <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
         ملخص العمولات المالية
       </Text>
@@ -119,7 +119,7 @@ export function WltDshFieldFinancePreview({
           <CommissionSummary snapshot={snapshot} />
 
           {commissionRecords.length > 0 && (
-            <Box gap={3} paddingVertical={2}>
+            <Box gap={3} paddingY={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
                 عمولات الاستقطاب المعتمدة
               </Text>
@@ -130,7 +130,7 @@ export function WltDshFieldFinancePreview({
           )}
 
           {pendingRecords.length > 0 && (
-            <Box gap={3} paddingVertical={2}>
+            <Box gap={3} paddingY={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
                 عمولات قيد المراجعة
               </Text>
@@ -146,7 +146,7 @@ export function WltDshFieldFinancePreview({
           )}
 
           {rejectedRecords.length > 0 && (
-            <Box gap={3} paddingVertical={2}>
+            <Box gap={3} paddingY={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
                 عمولات مرفوضة / موقوفة
               </Text>
@@ -157,7 +157,7 @@ export function WltDshFieldFinancePreview({
           )}
 
           {payoutRecords.length > 0 && (
-            <Box gap={3} paddingVertical={2}>
+            <Box gap={3} paddingY={2}>
               <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
                 سجل الصرف
               </Text>
@@ -169,7 +169,7 @@ export function WltDshFieldFinancePreview({
 
           <Divider />
 
-          <Box gap={2} paddingVertical={2}>
+          <Box gap={2} paddingY={2}>
             <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
               الإجراءات المالية
             </Text>

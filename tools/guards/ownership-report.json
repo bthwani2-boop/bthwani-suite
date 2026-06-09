@@ -1,0 +1,248 @@
+{
+  "guardId": "GUARD_UI_KIT_CENTRAL_DESIGN_OWNERSHIP",
+  "policySource": [
+    "governance/08_UI_KIT_AND_BRAND.md",
+    "governance/14_GUARDS_CATALOG.md"
+  ],
+  "status": "WARN",
+  "failCount": 0,
+  "warnCount": 39,
+  "infoCount": 0,
+  "issues": [
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/app-client/parts/home/home-screen.styles.ts",
+      "message": "Potential local reusable style factory/design system outside ui-kit. Centralize reusable visual logic.",
+      "evidence": "line 3: createStyles"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/app-client/screens/BenefitsScreen.tsx",
+      "message": "Potential reusable design component declared outside ui-kit. Centralize in @bthwani/ui-kit or justify as service-specific composition.",
+      "evidence": "line 121: ScreenHeader"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerEditorSection.tsx",
+      "message": "Potential local reusable style factory/design system outside ui-kit. Centralize reusable visual logic.",
+      "evidence": "line 1008: createStyles"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Potential local reusable style factory/design system outside ui-kit. Centralize reusable visual logic.",
+      "evidence": "line 135: createStyles"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 151: shadowOffset"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 152: shadowOpacity"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 153: shadowRadius"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 196: shadowRadius"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 204: shadowRadius"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 246: shadowOpacity"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannerPreview.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 247: shadowRadius"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannersCommandDeckScreen.tsx",
+      "message": "Potential local reusable style factory/design system outside ui-kit. Centralize reusable visual logic.",
+      "evidence": "line 561: createStyles"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannersCommandDeckScreen.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 588: shadowOpacity"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/BannersCommandDeckScreen.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 589: shadowRadius"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/CampaignsCommandDeckScreen.tsx",
+      "message": "Potential local StyleSheet reusable style key outside ui-kit. Move common styling to central ui-kit foundation.",
+      "evidence": "line 279: chip"
+    },
+    {
+      "severity": "WARN",
+      "file": "dsh/frontend/control-panel/marketing/VideosCommandDeckScreen.tsx",
+      "message": "Potential local reusable style factory/design system outside ui-kit. Centralize reusable visual logic.",
+      "evidence": "line 308: createStyles"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 98: shadowOpacity"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 99: shadowRadius"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx",
+      "message": "Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.",
+      "evidence": "line 100: shadowOffset"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/components/WltDshCaptainStatement.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 11: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/components/WltDshFieldCommissionStatement.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 11: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/components/WltDshFinanceControlPanelPreview.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 16: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/components/WltDshPartnerStatement.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 9: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/components/WltDshStoreSettlementStatement.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 9: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/components/WltDshWalletControlCenter.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 12: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/CaptainPayoutWorkspace.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 7: ../components/WltBoundaryBanner"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/DailyReconciliationWorkbench.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 7: ../styles/wlt-dsh-finance.module.css"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/LedgerScreen.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 12: ../components/LedgerEntriesTable"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/LedgerScreen.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 13: ../components/TrialBalancePanel"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/PlatformFeeAuditWorkspace.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 6: ../components/WltBoundaryBanner"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 27: ../components/WltDshAccountStatement"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 28: ../components/WltDshRefundLedger"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 29: ../components/WltDshSettlementCalendar"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 30: ../components/WltDshStoreSettlementStatement"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 31: ../components/WltDshPartnerStatement"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 32: ../components/WltDshFieldCommissionStatement"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 33: ../components/WltDshCaptainStatement"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 34: ../components/WltDshWalletControlCenter"
+    },
+    {
+      "severity": "WARN",
+      "file": "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx",
+      "message": "Potential local reusable design import outside ui-kit public exports. Use @bthwani/ui-kit for reusable UI patterns.",
+      "evidence": "line 37: ../styles/wlt-dsh-finance.module.css"
+    }
+  ],
+  "generatedAt": "2026-06-09T06:32:26.833Z"
+}

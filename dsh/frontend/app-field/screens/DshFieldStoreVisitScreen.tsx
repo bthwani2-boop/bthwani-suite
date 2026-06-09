@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, View } from 'react-native';
 import {
   Badge,
@@ -156,7 +156,7 @@ export function DshFieldStoreVisitScreen({
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 120 }}>
         <Box padding={4} gap={4}>
           {/* Section 1: سياسة الزيارة من السجل */}
-          <Box gap={2} paddingVertical={2}>
+          <Box gap={2} paddingY={2}>
             <SectionHeader
               title="سياسة الزيارة من السجل"
               subtitle="الأدلة والوثائق تبقى on-demand، ولا تتحول الشاشة إلى معرض دائم."
@@ -177,7 +177,7 @@ export function DshFieldStoreVisitScreen({
           <Divider />
 
           {/* Section 2: سياق الزيارة الميدانية */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="سياق الزيارة الميدانية"
               subtitle="Checklist الجاهزية ودرجة الأدلة ومسودة offline وثقة الموقع تبقى داخل الزيارة نفسها."
@@ -196,7 +196,7 @@ export function DshFieldStoreVisitScreen({
           <Divider />
 
           {/* Section 3: ملخص الزيارة */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="ملخص الزيارة"
               subtitle="الملخص يجب أن يوضح ما تم التحقق منه وما الذي بقي مفتوحًا."
@@ -222,7 +222,7 @@ export function DshFieldStoreVisitScreen({
           <Divider />
 
           {/* Section 4: أدلة الزيارة */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="أدلة الزيارة"
               subtitle="كل دليل يبقى قابلًا للفتح دون تحويل الصفحة إلى معرض."
@@ -237,7 +237,7 @@ export function DshFieldStoreVisitScreen({
                       onOpenEvidence?.(item.id);
                     }}
                   >
-                    <Box gap={1} paddingVertical={2}>
+                    <Box gap={1} paddingY={2}>
                       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                         <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                           <Text role="bodyStrong" style={{ textAlign: 'right' }}>{item.title}</Text>
@@ -258,7 +258,7 @@ export function DshFieldStoreVisitScreen({
           {selectedEvidenceItem ? (
             <>
               <Divider />
-              <Box gap={2} paddingVertical={2}>
+              <Box gap={2} paddingY={2}>
                 <SectionHeader
                   title="تفاصيل الدليل المفتوح"
                   subtitle="هذا الجزء يظهر فقط بعد اختيار دليل محدد من القائمة."
@@ -282,7 +282,7 @@ export function DshFieldStoreVisitScreen({
           <Divider />
 
           {/* Section 5: التقاط أدلة الزيارة */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="التقاط أدلة الزيارة"
               subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
@@ -293,7 +293,7 @@ export function DshFieldStoreVisitScreen({
           <Divider />
 
           {/* Section 6: إغلاق الزيارة */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="إغلاق الزيارة"
               subtitle="يجب أن تبقى الخطوة التالية واضحة وقابلة للمساءلة."

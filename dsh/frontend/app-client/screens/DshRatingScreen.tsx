@@ -104,7 +104,7 @@ export function DshRatingScreen({
           <Text role="bodyMd" style={styles.subtitle}>رأيك يساعدنا في تحسين جودة الخدمة المقدمة لك.</Text>
         </Box>
 
-        <Box paddingHorizontal={spacing[4]} paddingVertical={spacing[6]} alignItems="center">
+        <Box paddingHorizontal={spacing[4]} paddingY={spacing[6]} alignItems="center">
           <View style={[styles.starsContainer, { flexDirection: isRtl ? 'row-reverse' : 'row' }]}>
             {[1, 2, 3, 4, 5].map((item) => (
               <Pressable key={item} onPress={() => handleRatingPress(item)} style={styles.starPressable}>

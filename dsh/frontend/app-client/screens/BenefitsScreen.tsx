@@ -13,6 +13,7 @@ import {
   ActionStrip,
   Divider,
   Icon,
+  TopBar,
 } from '@bthwani/ui-kit';
 import { dshNotificationsFixtures } from '../../data/support.preview-data';
 import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
@@ -120,29 +121,7 @@ function resolveStateSubtitle(section: DshBenefitsSection) {
   return 'أهم ما يمكنك الاستفادة منه الآن';
 }
 
-function ScreenHeader({ title }: { title: string }) {
-  const { theme } = useTheme();
 
-  return (
-    <Surface
-      tone="raised"
-      padding={3}
-      gap={0}
-      style={{
-        borderRadius: 0,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.line,
-        paddingTop: safeArea.comfortable + spacing[2],
-        minHeight: 44 + safeArea.comfortable + spacing[2],
-        justifyContent: 'flex-end',
-      }}
-    >
-      <Text role="titleMd" style={{ textAlign: 'right' }}>
-        {title}
-      </Text>
-    </Surface>
-  );
-}
 
 function ContentCard({
   hint,
@@ -226,6 +205,7 @@ function BenefitListRow({
 
 export function DshBenefitsHubScreen({
   initialSection,
+  onBack,
   onPrimaryAction,
   onRetry,
   onSecondaryAction,
@@ -458,7 +438,17 @@ export function DshBenefitsHubScreen({
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
-      <ScreenHeader title={sectionLabels[focusedSection] ?? 'مزاياي'} />
+      <TopBar
+        variant="surface"
+        title={sectionLabels[focusedSection] ?? 'مزاياي'}
+        subtitle={resolveStateSubtitle(focusedSection)}
+        actions={onBack ? [{
+          id: 'back',
+          icon: <Icon name="chevron-back" mirrored size={18} />,
+          accessibilityLabel: 'العودة',
+          onPress: onBack,
+        }] : []}
+      />
 
       <MobileScrollView
         fill

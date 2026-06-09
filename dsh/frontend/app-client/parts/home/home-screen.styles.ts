@@ -20,12 +20,12 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       paddingTop: 12,
       paddingBottom: 12,
       paddingHorizontal: 16,
-      backgroundColor: colorPalette.brand,
+      backgroundColor: theme.brand,
       borderWidth: 0,
       borderColor: 'transparent',
       ...shadowPresets.overlay,
       borderBottomWidth: 1,
-      borderBottomColor: withAlpha(colorPalette.white, 0.1),
+      borderBottomColor: theme.brandHeaderStroke,
     },
     premiumBannerSection: {
       marginTop: spacing[0],
@@ -40,7 +40,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     premiumBannerCard: {
       borderRadius: 24,
       overflow: 'hidden',
-      backgroundColor: colorPalette.surfaceRaised,
+      backgroundColor: theme.surfaceRaised,
       ...shadowPresets.raised,
     },
     premiumBannerCardActive: {
@@ -51,7 +51,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     premiumBannerImageWrap: {
       flex: 1,
       position: 'relative',
-      backgroundColor: colorPalette.surfaceRaised,
+      backgroundColor: theme.surfaceRaised,
     },
     premiumBannerImage: {
       ...StyleSheet.absoluteFillObject,
@@ -260,9 +260,9 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       flex: 1.6,
       height: 74, // Matches the height of CategorySelectorItem (56 icon + 4 gap + 14 text)
       borderRadius: 18,
-      backgroundColor: colorPalette.surfaceAlt,
+      backgroundColor: theme.surfaceInset,
       borderWidth: 1,
-      borderColor: colorPalette.surfaceInset,
+      borderColor: theme.line,
       paddingHorizontal: 12,
       justifyContent: 'center',
       overflow: 'hidden',
@@ -299,14 +299,14 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       gap: 1, // Tight vertical spacing to prevent distortion
     },
     heroPromoTitle: {
-      color: colorPalette.brandStrong,
+      color: theme.brand,
       fontWeight: '900',
       fontSize: 15, // Slightly larger for prominence
       lineHeight: 18,
       textAlign: 'right',
     },
     heroPromoSubtitle: {
-      color: colorPalette.inkMuted,
+      color: theme.textMuted,
       fontSize: 9,
       fontWeight: '700',
       marginTop: 0,

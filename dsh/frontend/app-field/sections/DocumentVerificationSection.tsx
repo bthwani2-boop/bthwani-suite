@@ -1,4 +1,4 @@
-// ML-002: Field document verification section skeleton — used within DshFieldStoreOnboardingScreen
+﻿// ML-002: Field document verification section skeleton — used within DshFieldStoreOnboardingScreen
 // BLOCKED_BY_CONTRACT: implement document capture and upload when upload API contract is proven
 import React from 'react';
 import {
@@ -88,7 +88,7 @@ export function DocumentVerificationSection({
         {documents.map((doc) => (
           <Box
             key={doc.id}
-            paddingVertical={3}
+            paddingY={3}
             style={{
               flexDirection: isRtl ? 'row-reverse' : 'row',
               justifyContent: 'space-between',

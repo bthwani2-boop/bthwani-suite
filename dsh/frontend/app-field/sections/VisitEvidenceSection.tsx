@@ -1,4 +1,4 @@
-// ML-003: Field visit evidence capture section — used within DshFieldStoreVisitScreen
+﻿// ML-003: Field visit evidence capture section — used within DshFieldStoreVisitScreen
 import React from 'react';
 import {
   Box,
@@ -88,7 +88,7 @@ export function VisitEvidenceSection({
         {items.map((item) => (
           <Box
             key={item.id}
-            paddingVertical={3}
+            paddingY={3}
             style={{
               flexDirection: isRtl ? 'row-reverse' : 'row',
               justifyContent: 'space-between',

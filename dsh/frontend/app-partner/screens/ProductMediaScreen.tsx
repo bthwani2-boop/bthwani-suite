@@ -8,6 +8,7 @@ import {
 	resolveRowDirection,
 	useDirection,
 	useTheme,
+	Chip,
 } from '@bthwani/ui-kit';
 import {
 	createDshMediaApiHttpClient,
@@ -183,7 +184,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 
 	if (screenState === 'loading' && assets.length === 0) {
 		return (
-			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.bg }}>
+			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.background }}>
 				<ActivityIndicator size="large" color={theme.brand} />
 				<Text role="bodyStrong" tone="muted" align="center" style={{ marginTop: 12 }}>
 					جارٍ تحميل وسائط المنتج…
@@ -194,7 +195,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 
 	if (screenState === 'offline') {
 		return (
-			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16, backgroundColor: theme.bg }}>
+			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16, backgroundColor: theme.background }}>
 				<Text role="bodyStrong" tone="warning" align="center">لا يوجد اتصال بالشبكة</Text>
 				<Text role="bodySm" tone="muted" align="center">يرجى التحقق من الاتصال والمحاولة مرة أخرى.</Text>
 				<Button label="إعادة المحاولة" tone="primary" onPress={loadAssets} />
@@ -205,7 +206,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 
 	if (screenState === 'disabled' || !client) {
 		return (
-			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.bg }}>
+			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.background }}>
 				<Text role="bodyStrong" tone="muted" align="center">واجهة API غير متاحة — تحقق من DSH_API_BASE_URL.</Text>
 				{onBack && <Button label="رجوع" tone="ghost" onPress={onBack} style={{ marginTop: 16 }} />}
 			</Box>
@@ -214,7 +215,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 
 	return (
 		<ScrollView
-			style={{ flex: 1, backgroundColor: theme.bg }}
+			style={{ flex: 1, backgroundColor: theme.background }}
 			contentContainerStyle={{ paddingBottom: 120 }}
 			keyboardShouldPersistTaps="handled"
 		>
@@ -310,7 +311,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 									<Box style={{ flex: 1 }}>
 										<Text role="bodyStrong" align="start" style={{ fontSize: 12 }}>{asset.id}</Text>
 										<Text role="caption" tone="muted" align="start">{formatMediaLabel(asset)}</Text>
-										<Chip label={asset.status} tone={asset.status === 'uploaded' ? 'success' : 'default'} size="sm" />
+										<Chip label={asset.status} tone={asset.status === 'uploaded' ? 'success' : 'default'} />
 									</Box>
 								</Box>
 

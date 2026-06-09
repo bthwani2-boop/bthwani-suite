@@ -15,6 +15,8 @@
  *   GET  /settlements/{id}
  */
 
+declare const process: any;
+
 // ─── Domain types (mirror wlt/domain/wallet.go JSON tags) ────────────────────
 
 export interface WltWalletSummary {

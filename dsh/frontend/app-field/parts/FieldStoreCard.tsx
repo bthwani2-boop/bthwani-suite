@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Badge, Box, colorPalette, Icon, Text, useDirection, useTheme, withAlpha } from '@bthwani/ui-kit';
 import {
@@ -23,7 +23,7 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
   return (
     <Pressable onPress={onPress}>
       <Box
-        paddingVertical={3}
+        paddingY={3}
         gap={3}
         style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}
       >

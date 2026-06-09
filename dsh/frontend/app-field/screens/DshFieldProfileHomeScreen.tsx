@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Badge, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
@@ -47,7 +47,7 @@ export function DshFieldProfileHomeScreen({
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
               <Badge label="DSH" tone="success" />
               <Badge label="الميداني" tone="brand" />
@@ -65,7 +65,7 @@ export function DshFieldProfileHomeScreen({
 
           <Divider />
 
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
               المظهر والتحكم
             </Text>
@@ -148,7 +148,7 @@ export function DshFieldProfileHomeScreen({
 
           <Box gap={0}>
             <Pressable onPress={onOpenProfile}>
-              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+              <Box paddingY={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                     <Text role="bodyStrong">بيانات الميداني</Text>
@@ -160,7 +160,7 @@ export function DshFieldProfileHomeScreen({
             </Pressable>
 
             <Pressable onPress={onOpenHistory}>
-              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+              <Box paddingY={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                     <Text role="bodyStrong">السجل</Text>
@@ -172,7 +172,7 @@ export function DshFieldProfileHomeScreen({
             </Pressable>
 
             <Pressable onPress={onOpenFinance}>
-              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+              <Box paddingY={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                     <Text role="bodyStrong">المالية</Text>

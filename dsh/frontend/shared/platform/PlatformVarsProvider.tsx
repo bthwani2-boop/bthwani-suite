@@ -1,5 +1,7 @@
 import React from 'react';
 
+declare const process: any;
+
 export interface PlatformVarsConfig {
   dshApiBaseUrl: string | null;
   dshAuthBearerToken: string | null;

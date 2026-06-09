@@ -796,7 +796,7 @@ function InlineLocalEdit({
         value={override.price}
         onChangeText={(v: string) => onChange('price', v)}
         placeholder="18.00"
-        dir="ltr"
+        style={{ textAlign: 'left' }}
         keyboardType="decimal-pad"
       />
       <TextField
@@ -805,7 +805,7 @@ function InlineLocalEdit({
         onChangeText={(v: string) => onChange('stock', v)}
         placeholder="42"
         keyboardType="numeric"
-        dir="ltr"
+        style={{ textAlign: 'left' }}
       />
       <TextField
         label="ملاحظة داخلية"
@@ -1043,7 +1043,7 @@ function InventoryCatalogCardPanel({
     {
       label: 'ملكية الوسائط',
       value: item.isCatalogOwned ? 'كتالوج مركزي' : isPartnerOwnedException(item.publishStage as ApprovalStage, 'product-media') ? 'استثناء شريك' : 'بحاجة مراجعة',
-      tone: item.isCatalogOwned ? 'info' : 'warning',
+      tone: (item.isCatalogOwned ? 'info' : 'warning') as const,
     },
   ].filter((entry) => entry.value);
 
@@ -1303,7 +1303,7 @@ function InventoryCatalogContent({
   const publishLabel = reviewCount > 0 || lowStockCount > 0 ? 'مراجعة ونشر التغييرات' : 'حفظ تحديثات المخزون';
 
   return (
-    <Box gap={2} dir="rtl">
+    <Box gap={2}>
 
       {/* Store readiness gate — wires PATCH /stores/{id}/partner-readiness */}
       {canonicalStoreId ? <StoreReadinessGate storeId={canonicalStoreId} /> : null}
@@ -1472,7 +1472,7 @@ function InventoryCatalogContent({
               value={bulkPrice.value}
               onChangeText={(v: string) => { setBulkPrice({ ...bulkPrice, value: v }); setBulkPreviewMessage(null); }}
               placeholder={bulkPrice.kind === 'percent' ? '+10' : '+2.00'}
-              dir="ltr"
+              style={{ textAlign: 'left' }}
               keyboardType="decimal-pad"
             />
             <Button

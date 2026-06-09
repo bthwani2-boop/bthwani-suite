@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView, View, Pressable } from 'react-native';
 import {
   Badge,
@@ -1000,7 +1000,7 @@ export function DshFieldStoreOnboardingScreen({
           <Divider />
 
           {/* Section 2: Smart Linear Progress */}
-          <Box gap={3} paddingVertical={1}>
+          <Box gap={3} paddingY={1}>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text role="titleSm" style={{ textAlign: 'right', fontWeight: '900' }}>
                 التقدم الإجمالي لملف الانضمام

@@ -838,7 +838,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     if (tokens.length === 0) return null;
 
     return (
-      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center' }} gap={2} paddingVertical={2}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center' }} gap={2} paddingY={2}>
         {tokens.map((token) => (
           <Chip
             key={token.id}

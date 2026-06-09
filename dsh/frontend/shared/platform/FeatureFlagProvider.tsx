@@ -1,5 +1,7 @@
 import React from 'react';
 
+declare const process: any;
+
 export interface FeatureFlagsConfig {
   'DSH:sanaa-pilot': boolean;
   'DSH:capability:store-pickup': boolean;

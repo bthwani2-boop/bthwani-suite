@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scanRoots": [
     "app-client/runtime",
     "app-partner/runtime",
@@ -7,7 +7,9 @@
     "app-field/runtime",
     "control-panel/runtime",
     "webapp/runtime",
+    "webapp/shell",
     "website/runtime",
+    "website/shell",
     "ui-kit",
     "dsh",
     "wlt",

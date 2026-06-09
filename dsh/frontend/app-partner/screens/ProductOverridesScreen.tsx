@@ -145,7 +145,7 @@ export function ProductOverridesScreen({
 
   if (screenState === 'loading') {
     return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.bg, padding: 24 }}>
+      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background, padding: 24 }}>
         <ActivityIndicator size="large" color={theme.brand} />
         <Text role="bodyStrong" tone="muted" align="center" style={{ marginTop: 12 }}>
           جارٍ تحميل تفاصيل الكتالوج والتجاوزات…
@@ -156,7 +156,7 @@ export function ProductOverridesScreen({
 
   if (screenState === 'offline') {
     return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.bg, padding: 24, gap: 16 }}>
+      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background, padding: 24, gap: 16 }}>
         <Text role="bodyStrong" tone="warning" align="center">لا يوجد اتصال بالشبكة</Text>
         <Text role="bodySm" tone="muted" align="center">
           يرجى التحقق من اتصال الإنترنت وإعادة المحاولة.
@@ -169,7 +169,7 @@ export function ProductOverridesScreen({
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.bg }}
+      style={{ flex: 1, backgroundColor: theme.background }}
       contentContainerStyle={{ paddingBottom: 160 }}
       keyboardShouldPersistTaps="handled"
     >
@@ -237,7 +237,7 @@ export function ProductOverridesScreen({
               onChangeText={(v) => setForm((prev) => ({ ...prev, priceOverride: v }))}
               placeholder="مثال: 15.00"
               keyboardType="decimal-pad"
-              dir="ltr"
+              style={{ textAlign: 'left' }}
               editable={screenState !== 'saving'}
             />
 
@@ -247,7 +247,7 @@ export function ProductOverridesScreen({
               onChangeText={(v) => setForm((prev) => ({ ...prev, stockOverride: v.replace(/[^0-9]/g, '') }))}
               placeholder="مثال: 100"
               keyboardType="numeric"
-              dir="ltr"
+              style={{ textAlign: 'left' }}
               editable={screenState !== 'saving'}
             />
 

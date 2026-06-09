@@ -294,9 +294,9 @@ export function StoreProfileScreen({
                     {check.label}
                   </Text>
                   {check.satisfied ? (
-                    <Chip label="مكتمل" tone="success" size="sm" />
+                    <Chip label="مكتمل" tone="success" />
                   ) : (
-                    <Chip label="غير مكتمل" tone="danger" size="sm" />
+                    <Chip label="غير مكتمل" tone="danger" />
                   )}
                 </Box>
                 {!check.satisfied && check.blockedReason ? (

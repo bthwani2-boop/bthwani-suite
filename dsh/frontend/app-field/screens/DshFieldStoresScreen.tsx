@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
@@ -92,7 +92,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 128 }}>
         <Box padding={4} gap={4}>
           {/* Section 1: خط الميداني الحالي */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Box gap={1}>
               <Text role="bodyStrong" style={{ textAlign: 'right' }}>خط الميداني الحالي</Text>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
@@ -124,7 +124,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
           <Divider />
 
           {/* Section 2: مؤشر الملفات اليوم */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Box gap={1}>
               <Text role="bodyStrong" style={{ textAlign: 'right' }}>مؤشر الملفات اليوم</Text>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
@@ -142,7 +142,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
           <Divider />
 
           {/* Section 3: قائمة المتاجر */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Box gap={3}>
               <SearchField
                 label="ابحث في المتاجر"
@@ -189,7 +189,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
                     <FieldStoreCard key={store.id} store={store} onPress={() => onOpenStore(store.id)} />
                   ))
                 ) : (
-                  <Box gap={2} paddingVertical={2}>
+                  <Box gap={2} paddingY={2}>
                     <Text role="bodyStrong" style={{ textAlign: 'right' }}>لا توجد نتائج مطابقة</Text>
                     <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
                       بقي نمط البحث والشرائح والبطاقات كما هو، لكن لا توجد بطاقة تطابق الشرط الحالي.

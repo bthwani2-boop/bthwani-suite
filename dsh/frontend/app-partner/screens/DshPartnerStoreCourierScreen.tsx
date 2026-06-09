@@ -147,7 +147,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       />
 
       {/* 1) Flat boundaries notice */}
-      <Box paddingVertical={1} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+      <Box paddingY={1} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
         <Icon name="information-circle-outline" size={14} tone="muted" />
         <Text role="caption" tone="muted" align={direction === 'rtl' ? 'right' : 'left'} style={{ flex: 1 }}>
           إعداد الموصل يتم محليًا هنا. أي تسعير أو عمولات أو تسويات مرجعها مركزيًا هو WLT/Finance/Control Panel.
@@ -164,7 +164,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       <Divider />
 
       {/* 2) Flat Basic Info */}
-      <Box gap={3} paddingVertical={2}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>بيانات الموصل</Text>
         <TextField
           label="اسم موصل المتجر"
@@ -190,7 +190,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       <Divider />
 
       {/* 3) Flat Branch Scope */}
-      <Box gap={3} paddingVertical={2}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>الفروع المخصصة</Text>
         <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
           {BRANCH_OPTIONS.map((branch) => {
@@ -211,7 +211,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       <Divider />
 
       {/* 4) Flat Delivery Policy selection */}
-      <Box gap={3} paddingVertical={2}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>سياسة التوصيل</Text>
         <SelectionBlock
           options={POLICY_OPTIONS}
@@ -224,7 +224,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       <Divider />
 
       {/* 5) Flat Pricing Source selection */}
-      <Box gap={3} paddingVertical={2}>
+      <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مصدر التسعير</Text>
         <SelectionBlock
           options={PRICING_OPTIONS}
@@ -238,7 +238,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       {requiresCompensation ? (
         <>
           <Divider />
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>مستحق الموصل</Text>
             <SelectionBlock
               options={COMPENSATION_OPTIONS}
@@ -254,7 +254,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       {canSave ? (
         <>
           <Divider />
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Text role="bodyStrong" align={direction === 'rtl' ? 'right' : 'left'}>ملخص قبل الحفظ</Text>
             <KeyValueList
               items={[

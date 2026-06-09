@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import {
   Badge,
@@ -155,7 +155,7 @@ export function DshFieldDocumentUploadScreen({
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={styles.scrollContent}>
         <Box padding={4} gap={4}>
           {/* Policy context */}
-          <Box gap={2} paddingVertical={2}>
+          <Box gap={2} paddingY={2}>
             <SectionHeader
               title="سياسة المستندات والجاهزية"
               subtitle="الوثائق والصور المرفوعة تظل on-demand للتأكد من حماية خصوصية الشركاء."
@@ -173,7 +173,7 @@ export function DshFieldDocumentUploadScreen({
           <Divider />
 
           {/* Selector */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="نوع المستند المطلوب"
               subtitle="اختر نوع المرفق أو الصورة لإضافتها كإثبات."
@@ -215,7 +215,7 @@ export function DshFieldDocumentUploadScreen({
           <Divider />
 
           {/* Media Key Field */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <SectionHeader
               title="تفاصيل الملف المرفق"
               subtitle="مستندات الإثبات مسجلة بواسطة مفاتيح الوسائط الفريدة."
@@ -233,7 +233,7 @@ export function DshFieldDocumentUploadScreen({
           <Divider />
 
           {/* Submit */}
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <KeyValueList
               dense
               items={[
