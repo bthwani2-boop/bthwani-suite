@@ -166,7 +166,7 @@ function MySpacePrimaryRow({
 export function DshMySpaceScreen({
   state = 'ready',
   appearanceHydrated,
-  appearanceMode = 'light',
+  appearanceMode = 'lightPremium',
   onAppearanceModeChange,
   onOpenBenefits,
   onOpenOrders,
@@ -258,7 +258,7 @@ export function DshMySpaceScreen({
                     { value: 'lightPremium', label: 'فاتح' },
                     { value: 'darkGlass', label: 'داكن' },
                   ]}
-                  value={appearanceMode === 'darkGlass' || appearanceMode === 'dark' ? 'darkGlass' : 'lightPremium'}
+                  value={appearanceMode === 'darkGlass' ? 'darkGlass' : 'lightPremium'}
                   onValueChange={(nextValue) => {
                     onAppearanceModeChange?.(nextValue as BThwaniAppearanceMode);
                   }}

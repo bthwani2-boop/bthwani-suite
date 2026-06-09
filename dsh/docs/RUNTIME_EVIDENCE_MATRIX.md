@@ -77,7 +77,7 @@ Runtime/API/L7 closure remains deferred until API binding and E2E cross-surface 
 Prior app-client / GET /stores L7 evidence does not equal full cross-surface Slice 001 L7 closure.
 
 Go API Startup & E2E Proof (2026-06-03):
-`LOCAL_GO_API_E2E_PROVEN` for `DSH-SLICE-001` / `GET /stores` only. Verified scope: Documented start command, live Go API listening on port 8080, connected to Postgres on port 55432, and captured HTTP GET /stores evidence.
+`LOCAL_GO_API_E2E_PROVEN` for `DSH-SLICE-001` / `GET /stores` only. Verified scope: Documented start command, live Go API listening on port 8080, connected to Postgres on port 15432 (was 55432 before port standardization 2026-06-08), and captured HTTP GET /stores evidence.
 
 app-client Live Mobile Runtime Proof (2026-06-03):
 `APP_CLIENT_MOBILE_RUNTIME_PROVEN` for `DSH-SLICE-001` / `GET /stores` only. Verified scope: Physical Android device running via ADB and reverse port-forwarding tcp:8080 + tcp:8081, app-client successfully loaded live data from the Go API without preview fallback (fetched 3 stores), and screenshots captured under `DSH_SLICE001_BACKEND_E2E-20260603`. Overall cross-surface Slice 001 closure remains deferred.
@@ -106,7 +106,7 @@ Summary:
 - 10 PATCH marketing active → client_visible: true (restored)
 - 11 GET /stores final → 3 stores restored
 - go test -count=1 ./...: ok bthwani.local/dsh/backend/internal/http (0.041s)
-- Server: dsh-api using postgres repository (live Postgres on port 55432)
+- Server: dsh-api using postgres repository (live Postgres on port 15432; was 55432 before port standardization 2026-06-08)
 
 Rows updated: DSH-RUN-P014-04 → BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING; DSH-RUN-P014-07 → BACKEND_LIVE_E2E_PROVEN_FRONTEND_BINDING_PENDING; DSH-RUN-P014-09 → DSH_SLICE001_BACKEND_LIVE_E2E_PROVEN
 Remaining blocker: app-partner frontend endpoint binding + control-panel frontend endpoint binding + screen evidence after wiring.

@@ -20,17 +20,9 @@
 إنفاذ على CI:
 - يوجد ملف GitHub Action: `.github/workflows/validate-scripts-location.yml` يقوم بتشغيل الفحص على Pull Requests ويمنع قبول PR يحتوي على سكربتات جديدة/معدلة خارج `tools/scripts`.
 
-ملاحظات تشغيلية:
-- السكربت الجديد `tools/scripts/replace-BTH-with-bthwani.ps1` تم نسخُه إلى `tools/scripts`.
-- إذا رغبت بترحيل سكربتات حالية من `tools/` إلى `tools/scripts/` يمكنني تنفيذ نقل منظّم وتحديث أية مراجع تلقائياً.
-
-
 استثناء legacy محدود:
-- يبقى 	ools/ghb.ps1 كـ wrapper صغير متوافق مع الاستخدام القديم، ويجب أن يستدعي التنفيذ الفعلي من 	ools/scripts/GHB_CHECKPOINT_VERIFY.ps1.
+- يبقى tools/ghb.ps1 كـ wrapper صغير متوافق مع الاستخدام القديم، ويجب أن يستدعي التنفيذ الفعلي من tools/scripts/GHB_CHECKPOINT_VERIFY.ps1.
 
-
-استثناء legacy محدود:
-- يبقى 	ools/ghb.ps1 كـ wrapper صغير متوافق مع الاستخدام القديم، ويجب أن يستدعي التنفيذ الفعلي من 	ools/scripts/GHB_CHECKPOINT_VERIFY.ps1.
 
 ## Final-index PS1 validation
 

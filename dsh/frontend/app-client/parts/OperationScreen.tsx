@@ -15,6 +15,8 @@ export type DshOperationScreenProps = {
   onSecondaryAction?: () => void;
   onTertiaryAction?: () => void;
   onRetry?: () => void;
+  primaryActionDisabled?: boolean;
+  primaryActionLoading?: boolean;
 };
 
 function renderNonReadyState(state: DshOperationScreenState, onRetry?: () => void) {
@@ -49,6 +51,8 @@ export function DshOperationScreen({
   onSecondaryAction,
   onTertiaryAction,
   onRetry,
+  primaryActionDisabled,
+  primaryActionLoading,
 }: DshOperationScreenProps) {
   const hasActions = Boolean(primaryActionLabel || secondaryActionLabel || tertiaryActionLabel);
 
@@ -70,7 +74,7 @@ export function DshOperationScreen({
           <Divider />
           <SectionHeader title="الإجراء" subtitle="زر رئيسي واحد مع مسار رجوع صغير وواضح." />
           <Box gap={2}>
-            {primaryActionLabel ? <Button label={primaryActionLabel} onPress={onPrimaryAction} /> : null}
+            {primaryActionLabel ? <Button label={primaryActionLabel} onPress={onPrimaryAction} disabled={primaryActionDisabled} loading={primaryActionLoading} /> : null}
             {secondaryActionLabel ? <Button label={secondaryActionLabel} tone="secondary" onPress={onSecondaryAction} /> : null}
             {tertiaryActionLabel ? <Button label={tertiaryActionLabel} tone="ghost" onPress={onTertiaryAction} /> : null}
           </Box>

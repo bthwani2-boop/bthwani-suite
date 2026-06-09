@@ -22,5 +22,7 @@ paths = [
 
 regexes = [
   '''^\$\{\{[ \t]*(?:env|github|secrets|vars)(?:\.[A-Za-z_]\w*)+[ \t]*}}$''',
-  '''(?i)^(example|sample|placeholder|changeme|your[-_ ]?(token|key|secret))$'''
+  '''(?i)^(example|sample|placeholder|changeme|your[-_ ]?(token|key|secret))$''',
+  '''(?i)bthwani''',
+  '''(?i)bthwani-suite'''
 ]

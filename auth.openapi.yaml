@@ -71,7 +71,7 @@ info:
     | POST /settlements | ✗ | ✗ | ✗ | ✗ | ✓ |
 
 x-bthwani-contract-state: AUTH_CONTRACT_ROLE_MATRIX_V3
-x-bthwani-auth-service-port: 8082
+x-bthwani-auth-service-port: 18082
 x-bthwani-dev-tokens:
   - token: dev-client-token-001
     subject: client-dev-001
@@ -307,7 +307,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthErrorResponse'
               example:
-                error: forbidden
+                error: username_taken
 
   /auth/login:
     post:
@@ -386,6 +386,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: Revoke active Bearer token (dev/local alias for /auth/revoke)
+      description: |
+        Revokes the Bearer token supplied in the Authorization header.
+        Functionally equivalent to POST /auth/revoke for the active token.
+        This endpoint exists in the runtime implementation; prefer /auth/revoke
+        for new integrations. Documented here to match runtime reality.
+      operationId: logoutUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token revoked — session ended
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
 
   /auth/revoke:
     post:
@@ -524,7 +541,18 @@ components:
             - unauthenticated
             - token_expired
             - token_invalid
+            - token_revoked
             - forbidden
+            - invalid_credentials
+            - invalid_role
+            - invalid_request_body
+            - username_taken
+            - missing_required_fields
+            - missing_credentials
+            - missing_refresh_token
+            - missing_token
+            - method_not_allowed
+            - internal_server_error
           description: Machine-readable error code
 
   responses:

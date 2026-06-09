@@ -32,7 +32,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
   const { theme } = useTheme();
 
   const amountTone = record.tone === 'positive' ? 'success'
-    : record.tone === 'negative' ? 'error'
+    : record.tone === 'negative' ? 'danger'
     : 'info';
 
   const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
@@ -42,7 +42,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
   const oppositeTextAlign = direction === 'rtl' ? 'left' : 'right';
 
   return (
-    <Box gap={2} paddingVertical={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+    <Box gap={2} paddingY={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
       <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12 }}>
         <View style={{ flex: 1, gap: 3, alignItems: alignSide }}>
           <Text role="bodyStrong" style={{ textAlign }} numberOfLines={1}>
@@ -64,7 +64,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
           <Text role="bodyStrong" tone={amountTone} style={{ textAlign: oppositeTextAlign }}>
             {record.amountLabel}
           </Text>
-          <Badge label={record.statusLabel} tone={record.statusTone} />
+          <Badge label={record.statusLabel} tone={record.statusTone === 'error' ? 'danger' : record.statusTone} />
         </View>
       </View>
     </Box>
@@ -128,7 +128,7 @@ function EligibilitySection({
   }, [success]);
 
   return (
-    <Box gap={3} paddingVertical={2}>
+    <Box gap={3} paddingY={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         أهلية استقبال الطلبات
       </Text>
@@ -228,7 +228,7 @@ function EligibilitySection({
         </Surface>
       ) : (
         !success && (
-          <Box gap={2} paddingVertical={1}>
+          <Box gap={2} paddingY={1}>
             <Button
               label={snapshot.eligibilityShortfallMinorUnits > 0
                 ? `اشحن ${snapshot.eligibilityShortfallLabel} للتأهل`
@@ -264,7 +264,7 @@ function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanc
   const isRtl = direction === 'rtl';
 
   return (
-    <Box gap={3} paddingVertical={2}>
+    <Box gap={3} paddingY={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         تحصيل الدفع عند الاستلام — ذمة مستحقة
       </Text>
@@ -307,7 +307,7 @@ function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSna
   const isRtl = direction === 'rtl';
 
   return (
-    <Box gap={3} paddingVertical={2}>
+    <Box gap={3} paddingY={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         الأرباح والمكاسب التشغيلية
       </Text>
@@ -365,7 +365,7 @@ function SettlementSection({
   }, [success]);
 
   return (
-    <Box gap={3} paddingVertical={2}>
+    <Box gap={3} paddingY={2}>
       <Text role="label" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>
         التسوية والدورة المالية
       </Text>
@@ -388,7 +388,7 @@ function SettlementSection({
 
       {snapshot.pendingPayoutMinorUnits > 0 ? (
         !success && (
-          <Box gap={2} paddingVertical={1}>
+          <Box gap={2} paddingY={1}>
             <Button
               label={`طلب تسوية المستحقات (${snapshot.pendingPayoutLabel})`}
               tone="primary"

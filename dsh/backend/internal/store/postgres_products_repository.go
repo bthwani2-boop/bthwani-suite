@@ -221,36 +221,6 @@ func scanProductRow(row *sql.Row) (domain.ProductRecord, error) {
 }
 
 // scanProductRowColumns scans a *sql.Rows into a ProductRecord (no overrides).
-func scanProductRowColumns(rows *sql.Rows) (domain.ProductRecord, error) {
-	var r domain.ProductRecord
-	var sku, gtin, barcode, description, categoryID sql.NullString
-	err := rows.Scan(
-		&r.ID, &r.StoreID, &r.Name,
-		&sku, &gtin, &barcode, &description,
-		&r.BasePriceLabel, &r.BasePriceMinorUnits, &categoryID,
-		&r.ApprovalStatus,
-		&r.CreatedAt, &r.UpdatedAt,
-	)
-	if err != nil {
-		return domain.ProductRecord{}, err
-	}
-	if sku.Valid {
-		r.SKU = &sku.String
-	}
-	if gtin.Valid {
-		r.GTIN = &gtin.String
-	}
-	if barcode.Valid {
-		r.Barcode = &barcode.String
-	}
-	if description.Valid {
-		r.Description = &description.String
-	}
-	if categoryID.Valid {
-		r.CategoryID = &categoryID.String
-	}
-	return r, nil
-}
 
 var manifestMap map[string]string
 

@@ -1,6 +1,6 @@
 # BTHWANI_AUTH_SERVICE Dockerfile
 # Multi-stage build: compiles Go binary then runs on alpine.
-# Context: dsh/backend/ (docker-compose build context is the backend dir).
+# Context: dsh/ (workspace root/dsh directory — contains domain/ and backend/).
 
 FROM golang:1.24-alpine AS builder
 WORKDIR /src
@@ -12,8 +12,14 @@ COPY backend/ ./
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /out/auth-service ./cmd/auth-service/
 
 FROM alpine:3.20
-RUN apk add --no-cache wget ca-certificates
+LABEL org.opencontainers.image.title="bthwani-auth-service" \
+      org.opencontainers.image.description="BThwani DSH authentication service" \
+      org.opencontainers.image.source="https://github.com/bthwani2-boop/bthwani-suite"
+RUN apk add --no-cache wget ca-certificates \
+ && addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 COPY --from=builder /out/auth-service ./auth-service
-EXPOSE 8082
+RUN chown appuser:appgroup ./auth-service
+USER appuser
+EXPOSE 18082
 ENTRYPOINT ["./auth-service"]

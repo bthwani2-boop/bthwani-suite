@@ -393,8 +393,7 @@ export function getCanonicalDestination(screenId: ClientOperationScreenId): Clie
   }
 
   if (
-    screenId === 'order-create'
-    || screenId === 'order-cancel'
+    screenId === 'order-cancel'
     || screenId === 'order-accept'
     || screenId === 'order-complete'
     || screenId === 'reviews-list'

@@ -15,8 +15,14 @@ COPY backend/ ./
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /out/dsh-api ./cmd/dsh-api/
 
 FROM alpine:3.20
-RUN apk add --no-cache wget ca-certificates
+LABEL org.opencontainers.image.title="bthwani-dsh-api" \
+      org.opencontainers.image.description="BThwani DSH operations/dispatch backend" \
+      org.opencontainers.image.source="https://github.com/bthwani2-boop/bthwani-suite"
+RUN apk add --no-cache wget ca-certificates \
+ && addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 COPY --from=builder /out/dsh-api ./dsh-api
+RUN chown appuser:appgroup ./dsh-api
+USER appuser
 EXPOSE 8080
 ENTRYPOINT ["./dsh-api"]

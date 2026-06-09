@@ -14,7 +14,8 @@
 import React from 'react';
 import { getCanonicalPreviewProductCard } from '../../data/canonical.preview-data';
 import type { DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
-import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
+import { createDshMediaApiHttpClient } from '../../shared/dsh-media-api.client';
+import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -991,6 +992,29 @@ function InventoryCatalogCardPanel({
   onEditOverrides?: () => void;
 }) {
   const { direction } = useDirection();
+
+  const _mediaBaseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
+  const _mediaClient = React.useMemo(
+    () => (_mediaBaseUrl ? createDshMediaApiHttpClient(_mediaBaseUrl) : null),
+    [_mediaBaseUrl],
+  );
+  const [thumbnailUrl, setThumbnailUrl] = React.useState<string | undefined>(undefined);
+  React.useEffect(() => {
+    if (!_mediaClient) return;
+    let cancelled = false;
+    _mediaClient
+      .listMedia({ owner_type: 'product', owner_id: item.id })
+      .then((resp) => {
+        if (cancelled) return;
+        const asset =
+          resp.items.find((a) => a.status === 'uploaded' && a.purpose === 'primary') ??
+          resp.items.find((a) => a.status === 'uploaded');
+        setThumbnailUrl(asset?.public_url ?? undefined);
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [_mediaClient, item.id]);
+
   const isRejected = item.publishStage === 'rejected';
   const isNeedsFix = item.publishStage === 'needs-fix';
   const isPanelOpen = expanded || showDetails;
@@ -1029,7 +1053,7 @@ function InventoryCatalogCardPanel({
         id={item.id}
         title={item.name}
         subtitle={nextAction}
-        imageSource={item.mediaKey ? resolveDshImageSource(item.mediaKey) : undefined}
+        imageSource={thumbnailUrl ? { uri: thumbnailUrl } : undefined}
         emoji={item.name.slice(0, 1)}
         statusLabel={cardStatus.label}
         statusTone={cardStatus.tone}

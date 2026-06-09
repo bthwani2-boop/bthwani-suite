@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 	"database/sql"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -20,7 +19,7 @@ func TestFieldReadinessPostgresRuntimeEvidence(t *testing.T) {
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+		dbURL = "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 	}
 
 	db, err := sql.Open("pgx", dbURL)
@@ -41,7 +40,7 @@ func TestFieldReadinessPostgresRuntimeEvidence(t *testing.T) {
 		"022_field_readiness_escalation.sql",
 		"023_field_readiness_approval.sql",
 	} {
-		content, err := ioutil.ReadFile(filepath.Join("../../migrations", filename))
+		content, err := os.ReadFile(filepath.Join("../../migrations", filename))
 		if err != nil {
 			t.Fatalf("failed to read migration %s: %v", filename, err)
 		}

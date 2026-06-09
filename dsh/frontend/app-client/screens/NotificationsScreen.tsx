@@ -271,7 +271,7 @@ function renderContent(
       <MobileScrollView fill padding={3} gap={3}>
         {topAttention ? (
           <View style={{ gap: 2 }}>
-            <Text role="titleXs" align="end" style={{ textAlign: 'right', paddingHorizontal: 12, marginTop: 4 }}>
+            <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: 12, marginTop: 4 }}>
               يحتاج انتباهك الآن
             </Text>
             <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
@@ -281,7 +281,7 @@ function renderContent(
         ) : null}
 
         <View style={{ gap: 2 }}>
-          <Text role="titleXs" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
+          <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
             اليوم
           </Text>
           <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
@@ -303,7 +303,7 @@ function renderContent(
         </View>
 
         <View style={{ gap: 2 }}>
-          <Text role="titleXs" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
+          <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
             سابقًا
           </Text>
           <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>

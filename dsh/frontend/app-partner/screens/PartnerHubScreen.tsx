@@ -54,7 +54,8 @@ import {
   type DshPartnerLifecycleStage,
 } from '../../shared/dsh-partner-onboarding-journey.map';
 import { getDshPartnerActivationStatusLabel } from '../../shared/dsh-partner-activation.model';
-import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
+import { createDshMediaApiHttpClient, type DshMediaAsset } from '../../shared/dsh-media-api.client';
+import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -1490,6 +1491,13 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
+  const _mediaBaseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
+  const _mediaClient = React.useMemo(
+    () => (_mediaBaseUrl ? createDshMediaApiHttpClient(_mediaBaseUrl) : null),
+    [_mediaBaseUrl],
+  );
+  const [storeMediaAssets, setStoreMediaAssets] = React.useState<DshMediaAsset[]>([]);
+
   const { direction } = useDirection();
   const { theme } = useTheme();
   const partnersGovernance = React.useMemo(() => getDshControlPanelGovernanceEntry('partners'), []);
@@ -1513,6 +1521,22 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     return activeCanonicalStoreId ? getCanonicalPreviewStoreCard(activeCanonicalStoreId) : undefined;
   }, [canonicalStoreId]);
   const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
+
+  React.useEffect(() => {
+    const storeId = activeCanonicalStore?.id ?? canonicalStoreId;
+    if (!_mediaClient || !storeId) return;
+    let cancelled = false;
+    _mediaClient
+      .listMedia({ owner_type: 'store', owner_id: storeId })
+      .then((resp) => {
+        if (!cancelled) setStoreMediaAssets(resp.items.filter((a) => a.status === 'uploaded'));
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [_mediaClient, activeCanonicalStore?.id, canonicalStoreId]);
+
+  const storeCoverUrl = storeMediaAssets.find((a) => a.purpose === 'cover')?.public_url;
+  const storeLogoUrl = storeMediaAssets.find((a) => a.purpose === 'logo')?.public_url;
 
   const [selectedModeId, setSelectedModeId] = React.useState<string>('pickup');
   const resolvedStoreName = activeCanonicalStore?.storeName ?? storeName;
@@ -2015,8 +2039,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     <Box style={{ flex: 1, position: 'relative' }} background="background">
       <MobileScrollView fill padding={0} gap={4} contentContainerStyle={{ paddingBottom: partnerHubBottomInset }}>
         <StoreHero
-          coverImage={resolveDshImageSource(activeCanonicalStore?.imageUri || 'dsh.store.malqa.cover.v1')}
-          logoImage={resolveDshImageSource(activeCanonicalStore?.logoImageUri || 'dsh.store.malqa.logo.v1')}
+          coverImage={storeCoverUrl ? { uri: storeCoverUrl } : undefined}
+          logoImage={storeLogoUrl ? { uri: storeLogoUrl } : undefined}
           name={resolvedStoreName}
           locationLabel={`${resolvedBranchLabel} · ${resolvedActiveZoneLabel}`}
           isOpen={isAvailable}

@@ -15,8 +15,10 @@ info:
 x-bthwani-contract-state: WLT_SERVICE_V1_LIVE
 
 servers:
-  - url: http://localhost:8083
-    description: Local dev (WLT service port 8083)
+  - url: http://localhost:18083
+    description: Local dev host port (WLT host port 18083 -> container 8083)
+  - url: http://wlt-api:8083
+    description: Internal/container only — use from other Docker services
 
 components:
   securitySchemes:

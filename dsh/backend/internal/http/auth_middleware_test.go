@@ -44,6 +44,26 @@ func withProductionAuth(t *testing.T, authServiceURL string) {
 	t.Setenv("DSH_AUTH_SERVICE_URL", authServiceURL)
 }
 
+// ─── authServiceURL dev fallback ─────────────────────────────────────────────
+
+func TestAuthServiceURL_DevFallbackIs18082(t *testing.T) {
+	t.Setenv("DSH_AUTH_MODE", "")
+	t.Setenv("DSH_AUTH_SERVICE_URL", "")
+	got := authServiceURL()
+	if got != "http://localhost:18082" {
+		t.Fatalf("expected http://localhost:18082, got %q", got)
+	}
+}
+
+func TestAuthServiceURL_ProductionWithNoURLReturnsEmpty(t *testing.T) {
+	t.Setenv("DSH_AUTH_MODE", "production")
+	t.Setenv("DSH_AUTH_SERVICE_URL", "")
+	got := authServiceURL()
+	if got != "" {
+		t.Fatalf("expected empty URL in production mode with no env, got %q", got)
+	}
+}
+
 // ─── authMode ────────────────────────────────────────────────────────────────
 
 func TestAuthMode_DefaultIsDev(t *testing.T) {

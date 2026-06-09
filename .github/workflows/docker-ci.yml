@@ -1,0 +1,134 @@
+# BTHWANI_DOCKER_CI: Docker compose config validation and build gate.
+# Runs on PRs and pushes that touch Docker/Compose/DSH/WLT/infra/workflow files.
+# No secrets required. No push. No deploy.
+# Purpose: catch broken Dockerfiles, invalid compose config, and forbidden port assignments.
+
+name: docker-ci
+
+on:
+  pull_request:
+    paths:
+      - "docker/**"
+      - "docker-compose*.yml"
+      - "dsh/backend/Dockerfile*"
+      - "dsh/backend/docker-compose*.yml"
+      - "wlt/backend/Dockerfile*"
+      - "wlt/backend/docker-compose*.yml"
+      - "infra/local/**"
+      - ".github/workflows/docker-ci.yml"
+      - ".github/workflows/deploy.yml"
+  push:
+    branches:
+      - main
+      - "fix/**"
+      - "feat/**"
+      - "chore/**"
+    paths:
+      - "docker/**"
+      - "docker-compose*.yml"
+      - "dsh/backend/Dockerfile*"
+      - "dsh/backend/docker-compose*.yml"
+      - "wlt/backend/Dockerfile*"
+      - "wlt/backend/docker-compose*.yml"
+      - "infra/local/**"
+      - ".github/workflows/docker-ci.yml"
+      - ".github/workflows/deploy.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  docker-policy-gate:
+    name: Docker compose config + build + port policy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate compose config
+        run: docker compose -f ./docker-compose.local.yml config
+
+      - name: Build service images (no push)
+        run: |
+          docker compose -f ./docker-compose.local.yml build dsh-api auth-service wlt-api
+
+      - name: Port policy — no stale/forbidden postgres ports
+        run: |
+          echo "Scanning for forbidden postgres host ports: 55432 55433 56432 56433"
+          FOUND=$(grep -rE '(55432|55433|56432|56433)' \
+            docker-compose.local.yml \
+            dsh/backend/docker-compose.local.yml \
+            wlt/backend/docker-compose.local.yml \
+            infra/local/ 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "POLICY VIOLATION: forbidden postgres port found:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "OK: no forbidden postgres ports."
+
+      - name: Port policy — no Expo collision on backend host ports
+        run: |
+          echo "Scanning for forbidden backend host ports (Expo range): 8081 8082 8083 8084"
+          FOUND=$(grep -rEn '^\s+-\s+"?(8081|8082|8083|8084):' \
+            docker-compose.local.yml \
+            dsh/backend/docker-compose.local.yml \
+            wlt/backend/docker-compose.local.yml \
+            infra/local/ 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "POLICY VIOLATION: forbidden Expo-collision host port found:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "OK: no Expo-collision host ports."
+
+      - name: Profile policy — Mongo/Redis must use profiles
+        run: |
+          echo "Checking Mongo/Redis use optional profiles..."
+          MONGO_PROFILE=$(grep -c 'profiles:.*mongo' infra/local/mongo/docker-compose.local.yml 2>/dev/null || true)
+          REDIS_PROFILE=$(grep -c 'profiles:.*redis' infra/local/redis/docker-compose.local.yml 2>/dev/null || true)
+          if [ "$MONGO_PROFILE" -lt 1 ]; then
+            echo "POLICY VIOLATION: Mongo service must use profiles: [\"mongo\"]"
+            exit 1
+          fi
+          if [ "$REDIS_PROFILE" -lt 1 ]; then
+            echo "POLICY VIOLATION: Redis service must use profiles: [\"redis\"]"
+            exit 1
+          fi
+          echo "OK: Mongo profile=mongo, Redis profile=redis."
+
+      - name: Port policy — Auth service must not use port 8082 (reserved for app-partner/Expo)
+        run: |
+          echo "Scanning Auth Dockerfile and Compose for forbidden port 8082..."
+          FOUND=$(grep -En 'EXPOSE 8082|AUTH_PORT.*[^0-9]8082|auth-service.*[^0-9]8082' \
+            dsh/backend/Dockerfile.auth-service \
+            dsh/backend/docker-compose.local.yml \
+            wlt/backend/docker-compose.local.yml 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "POLICY VIOLATION: Auth service must not use port 8082 (reserved for app-partner/Expo):"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "OK: Auth service not using port 8082."
+
+      - name: Dockerfile hardening — non-root user present
+        run: |
+          echo "Checking non-root user in runtime stages..."
+          for f in dsh/backend/Dockerfile.dsh-api dsh/backend/Dockerfile.auth-service wlt/backend/Dockerfile.wlt-api; do
+            if ! grep -q 'USER appuser' "$f"; then
+              echo "POLICY VIOLATION: $f is missing 'USER appuser'"
+              exit 1
+            fi
+            echo "OK: $f has non-root USER."
+          done
+
+      - name: Dockerfile hardening — OCI labels present
+        run: |
+          echo "Checking OCI labels in Dockerfiles..."
+          for f in dsh/backend/Dockerfile.dsh-api dsh/backend/Dockerfile.auth-service wlt/backend/Dockerfile.wlt-api; do
+            if ! grep -q 'org.opencontainers.image.title' "$f"; then
+              echo "POLICY VIOLATION: $f is missing OCI image.title label"
+              exit 1
+            fi
+            echo "OK: $f has OCI labels."
+          done

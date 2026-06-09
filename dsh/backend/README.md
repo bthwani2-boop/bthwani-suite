@@ -22,6 +22,6 @@ To start the local Go API server on port 8080, run the following PowerShell comm
 ```powershell
 Set-Location -LiteralPath "C:\bthwani-suite\dsh\backend"
 $env:PORT = "8080"
-$env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+$env:DATABASE_URL = "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 go run ./cmd/dsh-api
 ```

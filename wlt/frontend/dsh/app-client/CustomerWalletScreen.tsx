@@ -85,7 +85,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 	if (!wallet.hydrated) {
 		return (
 			<Surface tone="default" style={styles.centerContainer}>
-				<Text role="body" tone="muted" style={{ textAlign: 'center' }}>
+				<Text role="bodyMd" tone="muted" style={{ textAlign: 'center' }}>
 					جاري تحميل بيانات المحفظة...
 				</Text>
 			</Surface>
@@ -102,7 +102,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 			<Box gap={4} style={{ padding: spacing[4] }}>
 				{/* Modern Arabic Header */}
 				<View style={styles.headerRow}>
-					<Text role="title" style={{ textAlign: 'right', color: theme.text }}>
+					<Text role="titleLg" style={{ textAlign: 'right', color: theme.text }}>
 						المحفظة الإلكترونية
 					</Text>
 				</View>
@@ -113,7 +113,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 						<Text role="bodyStrong" style={{ textAlign: 'right' }}>
 							المحفظة غير متصلة
 						</Text>
-						<Text role="body" tone="muted" style={{ textAlign: 'right' }}>
+						<Text role="bodyMd" tone="muted" style={{ textAlign: 'right' }}>
 							يرجى ربط محفظتك لتتمكن من إيداع المبالغ واستخدامها في عمليات الدفع السريع للطلبات.
 						</Text>
 						<Button
@@ -162,12 +162,12 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 								/>
 							</View>
 							{rechargeError && (
-								<Text role="bodySm" style={{ color: colorPalette.red600, textAlign: 'right' }}>
+								<Text role="bodySm" style={{ color: colorPalette.danger, textAlign: 'right' }}>
 									{rechargeError}
 								</Text>
 							)}
 							{rechargeSuccess && (
-								<Text role="bodySm" style={{ color: colorPalette.green600, textAlign: 'right' }}>
+								<Text role="bodySm" style={{ color: colorPalette.success, textAlign: 'right' }}>
 									تم شحن الرصيد بنجاح!
 								</Text>
 							)}
@@ -205,7 +205,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 															<Text
 																role="bodyStrong"
 																style={{
-																	color: isCredit ? colorPalette.green600 : colorPalette.red600,
+																	color: isCredit ? colorPalette.success : colorPalette.danger,
 																}}
 															>
 																{isCredit ? '+' : '-'} {formatWltYer(tx.amount * 100)}
@@ -213,7 +213,6 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 															<Badge
 																label={tx.status === 'COMPLETED' ? 'مكتمل' : 'معلق'}
 																tone={tx.status === 'COMPLETED' ? 'success' : 'warning'}
-																size="sm"
 															/>
 														</View>
 													}

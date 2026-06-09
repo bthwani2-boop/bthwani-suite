@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 	"database/sql"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,7 +16,7 @@ import (
 func TestApplyMigrations(t *testing.T) {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+		dbURL = "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 	}
 
 	db, err := sql.Open("pgx", dbURL)
@@ -34,7 +33,7 @@ func TestApplyMigrations(t *testing.T) {
 	_, _ = db.ExecContext(context.Background(), "DROP TABLE IF EXISTS dsh_support_escalations, dsh_order_status_events, dsh_order_items, dsh_orders, dsh_catalog_override_products, dsh_catalog_overrides, dsh_product_media, dsh_catalog_products, dsh_catalog_categories, dsh_store_discovery_stores, dsh_checkout_intent_items, dsh_checkout_intents, dsh_checkout_callback_idempotency CASCADE;")
 
 	migrationsDir := "../../migrations"
-	files, err := ioutil.ReadDir(migrationsDir)
+	files, err := os.ReadDir(migrationsDir)
 	if err != nil {
 		t.Fatalf("failed to read migrations directory: %v", err)
 	}
@@ -51,7 +50,7 @@ func TestApplyMigrations(t *testing.T) {
 
 	for _, filename := range sqlFiles {
 		filePath := filepath.Join(migrationsDir, filename)
-		content, err := ioutil.ReadFile(filePath)
+		content, err := os.ReadFile(filePath)
 		if err != nil {
 			t.Fatalf("failed to read migration file %s: %v", filename, err)
 		}
@@ -80,7 +79,7 @@ func TestApplyMigrations(t *testing.T) {
 
 	// Also run seeds if present
 	seedDir := "../../seed"
-	seedFiles, err := ioutil.ReadDir(seedDir)
+	seedFiles, err := os.ReadDir(seedDir)
 	if err == nil {
 		var seeds []string
 		for _, f := range seedFiles {
@@ -91,7 +90,7 @@ func TestApplyMigrations(t *testing.T) {
 		sort.Strings(seeds)
 		for _, filename := range seeds {
 			filePath := filepath.Join(seedDir, filename)
-			content, err := ioutil.ReadFile(filePath)
+			content, err := os.ReadFile(filePath)
 			if err != nil {
 				t.Fatalf("failed to read seed file %s: %v", filename, err)
 			}

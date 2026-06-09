@@ -49,13 +49,13 @@ export function OfferDeclineSheet({
   }
 
   return (
-    <SheetFrame visible={visible} title="رفض العرض" onClose={onClose}>
+    <SheetFrame visible={visible} title="رفض العرض" onClose={onClose ?? (() => {})}>
       {state === 'loading' ? (
         <StateView stateId="loading" title="جاري تسجيل الرفض..." description="" />
       ) : state === 'success' ? (
         <StateView stateId="success" title="تم رفض العرض" description="سيتم إعادة توجيه العرض لكابتن آخر." actionLabel="إغلاق" onActionPress={onClose} />
       ) : state === 'error' ? (
-        <StateView stateId="error" title="فشل الرفض" description="يُرجى المحاولة مرة أخرى." actionLabel="إغلاق" onActionPress={onClose} />
+        <StateView stateId="blockingError" title="فشل الرفض" description="يُرجى المحاولة مرة أخرى." actionLabel="إغلاق" onActionPress={onClose} />
       ) : (
         <Box gap={4} padding={4}>
           <Text role="bodyMd" tone="muted">لماذا تريد رفض هذا العرض؟</Text>

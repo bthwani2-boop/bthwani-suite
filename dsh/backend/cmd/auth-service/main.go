@@ -6,7 +6,7 @@ package main
 // POST /auth/login — authenticates user and issues session token.
 // POST /auth/logout — revokes session token.
 //
-// Contract: auth.openapi.yaml (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT)
+// Contract: auth.openapi.yaml (AUTH_CONTRACT_ROLE_MATRIX_V3)
 
 import (
 	"crypto/rand"
@@ -45,12 +45,12 @@ func generateSessionToken() string {
 func main() {
 	port := strings.TrimSpace(os.Getenv("AUTH_PORT"))
 	if port == "" {
-		port = "8082"
+		port = "18082"
 	}
 
 	dbURL := strings.TrimSpace(os.Getenv("DATABASE_URL"))
 	if dbURL == "" {
-		dbURL = "postgres://dsh_local:dsh_local_password@localhost:55432/dsh_local?sslmode=disable"
+		dbURL = "postgres://dsh_local:dsh_local_password@localhost:15432/dsh_local?sslmode=disable"
 	}
 
 	db, err := sql.Open("pgx", dbURL)

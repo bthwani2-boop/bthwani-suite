@@ -5,6 +5,7 @@ info:
   description: Root index of service OpenAPI documents. No endpoints are defined here.
 paths: {}
 x-bthwani-service-contracts:
+  auth: ./auth.openapi.yaml
   dsh: ./dsh/dsh.openapi.yaml
   wlt: ./wlt/wlt.openapi.yaml
   knz: ./knz/knz.openapi.yaml

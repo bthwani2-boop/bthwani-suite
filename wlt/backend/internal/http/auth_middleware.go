@@ -21,7 +21,7 @@ func authMode() string {
 }
 
 // authServiceURL returns the auth service base URL.
-// WLT_AUTH_SERVICE_URL must be set in production; dev defaults to localhost:8082.
+// WLT_AUTH_SERVICE_URL must be set in production; dev defaults to localhost:18082.
 func authServiceURL() string {
 	if u := strings.TrimRight(strings.TrimSpace(os.Getenv("WLT_AUTH_SERVICE_URL")), "/"); u != "" {
 		return u
@@ -29,7 +29,7 @@ func authServiceURL() string {
 	if authMode() == "production" {
 		return ""
 	}
-	return "http://localhost:8082"
+	return "http://localhost:18082"
 }
 
 // wltCallbackSecret returns the shared secret WLT uses to authenticate callbacks to DSH.

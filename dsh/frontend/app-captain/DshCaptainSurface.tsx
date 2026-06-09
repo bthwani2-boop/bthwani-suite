@@ -17,7 +17,7 @@ try {
   // fallback is already a zero-insets function
 }
 import { Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
-import type { DshCaptainBellEvent } from '../../shared/dsh-order-journey.model';
+import type { DshCaptainBellEvent } from '../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
@@ -1431,11 +1431,6 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
     <ModernPremiumHeader
       title={isStoreCourierMode ? 'موصل المتجر' : captainDisplayName}
       locationLabel={isStoreCourierMode ? 'وضع موصل المتجر — طلبات المتجر فقط' : wltDshCaptainUiCopy.topBarLocationLabel}
-      locationIcon={
-        isStoreCourierMode
-          ? <Icon name="storefront-outline" size={14} color={colorPalette.white} />
-          : <Icon name="wallet-outline" size={14} color={colorPalette.white} />
-      }
       actions={[
         {
           id: 'account',
@@ -1459,10 +1454,20 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           onPress: () => openCaptainSupportScreen('cod-liability'),
         }]),
       ]}
-      ticker={
+      tickerStatus={
         isStoreCourierMode
-          ? { statusLabel: 'موصل المتجر', message: 'انتظر تعيين الطلب التالي من المتجر.', marquee: false }
-          : homeTicker
+          ? 'موصل المتجر'
+          : homeTicker?.statusLabel
+      }
+      tickerMessage={
+        isStoreCourierMode
+          ? 'انتظر تعيين الطلب التالي من المتجر.'
+          : homeTicker?.message
+      }
+      onTickerPress={
+        isStoreCourierMode
+          ? undefined
+          : homeTicker?.onPress
       }
       direction="rtl"
     />
