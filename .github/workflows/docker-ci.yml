@@ -100,7 +100,7 @@ jobs:
       - name: Port policy — Auth service must not use port 8082 (reserved for app-partner/Expo)
         run: |
           echo "Scanning Auth Dockerfile and Compose for forbidden port 8082..."
-          FOUND=$(grep -En 'EXPOSE 8082|AUTH_PORT.*8082|auth-service.*:8082' \
+          FOUND=$(grep -En 'EXPOSE 8082|AUTH_PORT.*[^0-9]8082|auth-service.*[^0-9]8082' \
             dsh/backend/Dockerfile.auth-service \
             dsh/backend/docker-compose.local.yml \
             wlt/backend/docker-compose.local.yml 2>/dev/null || true)
