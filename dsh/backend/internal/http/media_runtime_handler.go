@@ -15,6 +15,12 @@ import (
 	"bthwani.local/dsh/domain"
 )
 
+const (
+	errMsgMediaIDRequired  = "media_id is required"
+	errMsgMediaNotFound    = "media asset not found"
+	errMsgMediaNotFoundRaw = "not found"
+)
+
 type MediaRuntimeHandler struct {
 	repo store.PostgresMediaRepository
 	cfg  store.MediaStorageConfig
@@ -27,6 +33,8 @@ func NewMediaRuntimeHandler(repo store.PostgresMediaRepository, cfg store.MediaS
 	h.mux.HandleFunc("POST /media/{media_id}/complete", h.CompleteUpload)
 	h.mux.HandleFunc("GET /media/{media_id}", h.GetMedia)
 	h.mux.HandleFunc("GET /media", h.ListMedia)
+	// DELETE /media/{media_id} is the canonical runtime soft-delete.
+	// Dev-fixture hard-delete moved to DELETE /dev-fixtures/product-media/{id}.
 	h.mux.HandleFunc("DELETE /media/{media_id}", h.DeleteMedia)
 	return h
 }
@@ -43,16 +51,14 @@ func (h *MediaRuntimeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 }
 
 // RegisterMediaRuntimeRoutes wires the runtime media handler when PostgreSQL repo is available.
-// Registers under separate patterns from the dev-fixture POST /media handler.
 func RegisterMediaRuntimeRoutes(mux *http.ServeMux, repo store.PostgresMediaRepository, cfg store.MediaStorageConfig) {
 	h := NewMediaRuntimeHandler(repo, cfg)
 	mux.Handle("POST /media/upload-intents", h)
 	mux.Handle("POST /media/{media_id}/complete", h)
 	mux.Handle("GET /media/{media_id}", h)
 	mux.Handle("GET /media", h)
-	// DELETE /media/{media_id} is handled by media_handler.go for fixture-delete compatibility.
-	// Runtime soft-delete is separate: registered as DELETE /media/{media_id}/soft-delete.
-	mux.Handle("DELETE /media/{media_id}/soft-delete", h)
+	// DELETE /media/{media_id}: canonical runtime soft-delete on dsh_media_assets.
+	mux.Handle("DELETE /media/{media_id}", h)
 }
 
 // POST /media/upload-intents
@@ -79,12 +85,33 @@ func (h *MediaRuntimeHandler) CreateUploadIntent(w http.ResponseWriter, r *http.
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "owner_type, owner_id, purpose, filename are required")
 		return
 	}
+	if !validOwnerType(req.OwnerType) {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter,
+			"owner_type must be one of: product, store, banner, campaign, order, field_visit, support_ticket, dispute")
+		return
+	}
 	if req.MediaType != "image" && req.MediaType != "video" && req.MediaType != "document" {
 		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "media_type must be image, video, or document")
 		return
 	}
+	if !validPurpose(req.Purpose) {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter,
+			"purpose must be one of: primary, gallery, thumbnail, logo, cover, pickup_proof, delivery_proof, issue_proof, inspection, quality, attachment, evidence")
+		return
+	}
+	if req.FileSizeBytes != nil && *req.FileSizeBytes > 104857600 {
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "file_size_bytes exceeds 100MB limit")
+		return
+	}
 	if req.ActorID == "" {
 		req.ActorID = actorID
+	}
+
+	// Storage readiness guard: reject upload-intent if MinIO/S3 is not configured.
+	// Returning 503 prevents creating orphaned pending_upload records with empty upload_url.
+	if !h.cfg.IsConfigured() {
+		writeError(w, http.StatusServiceUnavailable, "MEDIA_STORAGE_UNAVAILABLE", "media storage is not configured — upload intent cannot be created")
+		return
 	}
 
 	// Scope guard: partner role limited to their own scope; operator unrestricted.
@@ -119,15 +146,15 @@ func (h *MediaRuntimeHandler) CompleteUpload(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if mediaID == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "media_id is required")
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, errMsgMediaIDRequired)
 		return
 	}
 
 	asset, err := h.repo.CompleteMediaUpload(r.Context(), mediaID, h.cfg, actorID)
 	if err != nil {
 		log.Printf("dsh-api: complete upload error %s: %v", mediaID, err)
-		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), "not found") {
-			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "media asset not found")
+		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), errMsgMediaNotFoundRaw) {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, errMsgMediaNotFound)
 			return
 		}
 		if strings.Contains(err.Error(), "cannot complete media in status") {
@@ -147,14 +174,14 @@ func (h *MediaRuntimeHandler) GetMedia(w http.ResponseWriter, r *http.Request) {
 	log.Printf("dsh-api: GET /media/%s", mediaID)
 
 	if mediaID == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "media_id is required")
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, errMsgMediaIDRequired)
 		return
 	}
 
 	asset, err := h.repo.GetMediaAsset(r.Context(), mediaID)
 	if err != nil {
-		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), "not found") {
-			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "media asset not found")
+		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), errMsgMediaNotFoundRaw) {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, errMsgMediaNotFound)
 			return
 		}
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to get media asset")
@@ -186,10 +213,10 @@ func (h *MediaRuntimeHandler) ListMedia(w http.ResponseWriter, r *http.Request) 
 	writeJSON(w, http.StatusOK, map[string]any{"items": assets, "total": len(assets)})
 }
 
-// DELETE /media/{media_id}/soft-delete
+// DELETE /media/{media_id}
 func (h *MediaRuntimeHandler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	mediaID := r.PathValue("media_id")
-	log.Printf("dsh-api: DELETE /media/%s/soft-delete (runtime)", mediaID)
+	log.Printf("dsh-api: DELETE /media/%s (runtime soft-delete)", mediaID)
 
 	actorID := requireClientIdentity(w, r)
 	if actorID == "" {
@@ -200,13 +227,13 @@ func (h *MediaRuntimeHandler) DeleteMedia(w http.ResponseWriter, r *http.Request
 		return
 	}
 	if mediaID == "" {
-		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "media_id is required")
+		writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, errMsgMediaIDRequired)
 		return
 	}
 
 	if err := h.repo.SoftDeleteMediaAsset(r.Context(), mediaID); err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, "media asset not found")
+		if strings.Contains(err.Error(), errMsgMediaNotFoundRaw) {
+			writeError(w, http.StatusNotFound, domain.ErrorCodeInvalidParameter, errMsgMediaNotFound)
 			return
 		}
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to delete media asset")
@@ -218,4 +245,22 @@ func (h *MediaRuntimeHandler) DeleteMedia(w http.ResponseWriter, r *http.Request
 
 func ownerScopeAllowed(ownerType string) bool {
 	return ownerType == "store" || ownerType == "product"
+}
+
+func validOwnerType(t string) bool {
+	switch t {
+	case "product", "store", "banner", "campaign", "order", "field_visit", "support_ticket", "dispute":
+		return true
+	}
+	return false
+}
+
+func validPurpose(p string) bool {
+	switch p {
+	case "primary", "gallery", "thumbnail", "logo", "cover",
+		"pickup_proof", "delivery_proof", "issue_proof",
+		"inspection", "quality", "attachment", "evidence":
+		return true
+	}
+	return false
 }

@@ -1,145 +1,187 @@
 import React from 'react';
-import { ScrollView, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Platform, ScrollView, Image, ActivityIndicator } from 'react-native';
 import {
 	Box,
 	Button,
-	Chip,
 	Divider,
 	Text,
 	resolveRowDirection,
 	useDirection,
 	useTheme,
 } from '@bthwani/ui-kit';
-import { type DshProductRecord, type DshProductMediaRecord } from '../../shared/dsh-product-api.client';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
 import {
-	DSH_PRODUCT_MEDIA_FIXTURE_KEYS,
-	resolveDshImageSource,
-	type DshProductMediaFixtureKey,
-} from '../../shared/resolve-dsh-image-source';
+	createDshMediaApiHttpClient,
+	type DshMediaAsset,
+	type DshMediaApiError,
+} from '../../shared/dsh-media-api.client';
+import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
 
-export type ProductMediaScreenProps = {
+// DEV_ALLOWED: resolveDshProductApiBaseUrl is the shared DSH API base — same base URL for media.
+// RUNTIME_VIOLATION_FIXED: removed DSH_PRODUCT_MEDIA_FIXTURE_KEYS, resolveDshImageSource, Manifest selector.
+// TRACKING: RETIRE_DEV_FIXTURES_AFTER_RUNTIME_MEDIA_CLOSURE
+
+export type ProductMediaScreenProps = Readonly<{
 	productId: string;
+	/** partnerId used for X-Client-Id in dev mode. Required for operator-scoped writes. */
+	partnerId?: string;
 	onBack?: () => void;
-};
+}>;
 
-export type ProductMediaScreenState = 'loading' | 'idle' | 'saving' | 'error' | 'offline';
+type ScreenState =
+	| 'loading'
+	| 'idle'
+	| 'picking'
+	| 'uploading'
+	| 'error'
+	| 'offline'
+	| 'storage_unavailable'
+	| 'disabled';
 
-const PRODUCT_MEDIA_LABEL_BY_KEY: Record<DshProductMediaFixtureKey, string> = {
-	'dsh.product.apple.v1': 'تفاحة (Apple)',
-	'dsh.product.bread.v1': 'خبز (Bread)',
-	'dsh.product.chicken.v1': 'دجاج (Chicken)',
-	'dsh.product.choco.v1': 'شوكولاتة (Choco)',
-	'dsh.product.croissant.v1': 'كرواسون (Croissant)',
-	'dsh.product.milk.v1': 'حليب (Milk)',
-	'dsh.product.pasta.v1': 'معكرونة (Pasta)',
-	'dsh.product.roll.v1': 'رول خبز (Roll)',
-	'dsh.product.lead-5.dates-box.v1': 'صندوق تمور (Dates Box)',
-	'dsh.product.salad.v1': 'سلطة (Salad)',
-	'dsh.product.yogurt.v1': 'زبادي (Yogurt)',
-};
+function buildAuthHeaders(partnerId?: string): Record<string, string> {
+	if (!partnerId) return {};
+	return { 'X-Client-Id': partnerId, 'X-Actor-Type': 'partner' };
+}
 
-const PRODUCT_MEDIA_MANIFEST_KEYS = DSH_PRODUCT_MEDIA_FIXTURE_KEYS.map((key) => ({
-	key,
-	label: PRODUCT_MEDIA_LABEL_BY_KEY[key],
-	source: resolveDshImageSource(key),
-}));
+function isOfflineError(err: unknown): boolean {
+	return typeof err === 'object' && err !== null && (err as DshMediaApiError).kind === 'offline';
+}
 
-export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProps) {
+function isStorageUnavailableError(err: unknown): boolean {
+	return typeof err === 'object' && err !== null && (err as DshMediaApiError).kind === 'storage_unavailable';
+}
+
+function formatMediaLabel(asset: DshMediaAsset): string {
+	const parts: string[] = [];
+	if (asset.purpose) parts.push(asset.purpose);
+	if (asset.mime_type) parts.push(asset.mime_type);
+	if (asset.file_size_bytes) parts.push(`${Math.round(asset.file_size_bytes / 1024)} KB`);
+	return parts.join(' · ');
+}
+
+export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMediaScreenProps) {
 	const { direction } = useDirection();
 	const { theme } = useTheme();
 
 	const baseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
-	const client = React.useMemo(() => createDshProductApiHttpClient(baseUrl), [baseUrl]);
+	const client = React.useMemo(
+		() => (baseUrl ? createDshMediaApiHttpClient(baseUrl) : null),
+		[baseUrl],
+	);
 
-	const [screenState, setScreenState] = React.useState<ProductMediaScreenState>('loading');
-	const [product, setProduct] = React.useState<DshProductRecord | null>(null);
+	const [screenState, setScreenState] = React.useState<ScreenState>('loading');
+	const [assets, setAssets] = React.useState<DshMediaAsset[]>([]);
 	const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-	const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
+	const [uploadProgress, setUploadProgress] = React.useState<number>(0);
 
-	// Load product details and media
-	const loadProductDetails = React.useCallback(async () => {
+	const authHeaders = React.useMemo(() => buildAuthHeaders(partnerId), [partnerId]);
+
+	const loadAssets = React.useCallback(async () => {
+		if (!client) {
+			setScreenState('disabled');
+			return;
+		}
 		setScreenState('loading');
 		setErrorMessage(null);
 		try {
-			const record = await client.getProduct(productId);
-			setProduct(record);
+			const resp = await client.listMedia({ owner_type: 'product', owner_id: productId });
+			setAssets(resp.items);
 			setScreenState('idle');
-		} catch (err: unknown) {
-			const isOffline =
-				typeof err === 'object' &&
-				err !== null &&
-				(err as { kind?: unknown }).kind === 'offline';
-			setErrorMessage(
-				isOffline
-					? 'لا يوجد اتصال بالشبكة — تحقق من الاتصال وأعد المحاولة.'
-					: 'تعذر تحميل بيانات المنتج أو الصور المرتبطة به.',
-			);
-			setScreenState(isOffline ? 'offline' : 'error');
+		} catch (err) {
+			if (isOfflineError(err)) {
+				setScreenState('offline');
+			} else {
+				setErrorMessage('تعذر تحميل وسائط المنتج.');
+				setScreenState('error');
+			}
 		}
 	}, [client, productId]);
 
 	React.useEffect(() => {
-		loadProductDetails();
-	}, [loadProductDetails]);
+		loadAssets();
+	}, [loadAssets]);
 
-	// Assign media
-	const handleAssignMedia = React.useCallback(async () => {
-		if (!selectedKey) return;
-		setScreenState('saving');
+	const handlePickAndUpload = React.useCallback(async () => {
+		if (!client) return;
+
+		if (Platform.OS !== 'web') {
+			setErrorMessage('رفع الملفات من الجهاز متاح فقط عبر واجهة الويب حالياً. (يتطلب expo-image-picker على الجهاز)');
+			setScreenState('error');
+			return;
+		}
+
+		// Web: use hidden file input
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = 'image/*,video/*';
+		input.onchange = async () => {
+			const file = input.files?.[0];
+			if (!file) return;
+
+			setScreenState('uploading');
+			setUploadProgress(0);
+			setErrorMessage(null);
+
+			try {
+				// 1. Create upload intent
+				const intentResp = await client.createUploadIntent(
+					{
+						owner_type: 'product',
+						owner_id: productId,
+						media_type: file.type.startsWith('video/') ? 'video' : 'image',
+						purpose: 'primary',
+						filename: file.name,
+						mime_type: file.type,
+						file_size_bytes: file.size,
+					},
+					authHeaders,
+				);
+
+				setUploadProgress(20);
+
+				// 2. PUT binary to MinIO presigned URL
+				await client.putToPresignedUrl(intentResp.intent.upload_url, file, file.type);
+				setUploadProgress(80);
+
+				// 3. Complete upload — transitions status pending_upload → uploaded
+				await client.completeUpload(intentResp.intent.media_id, {}, authHeaders);
+				setUploadProgress(100);
+
+				// 4. Refresh list
+				await loadAssets();
+			} catch (err) {
+				if (isOfflineError(err)) {
+					setScreenState('offline');
+				} else if (isStorageUnavailableError(err)) {
+					setErrorMessage('خدمة تخزين الوسائط غير متاحة حالياً (MinIO). يرجى التأكد من تشغيل الخدمة.');
+					setScreenState('storage_unavailable');
+				} else {
+					setErrorMessage('فشل رفع الصورة. يرجى التحقق من الاتصال والمحاولة مرة أخرى.');
+					setScreenState('error');
+				}
+			}
+		};
+		input.click();
+	}, [client, productId, authHeaders, loadAssets]);
+
+	const handleDelete = React.useCallback(async (mediaId: string) => {
+		if (!client) return;
 		setErrorMessage(null);
 		try {
-			await client.uploadProductMedia({
-				product_id: productId,
-				media_key: selectedKey,
-			});
-			setSelectedKey(null);
-			// Refresh list
-			const record = await client.getProduct(productId);
-			setProduct(record);
-			setScreenState('idle');
-		} catch (err: unknown) {
-			const isOffline =
-				typeof err === 'object' &&
-				err !== null &&
-				(err as { kind?: unknown }).kind === 'offline';
-			setErrorMessage(
-				isOffline
-					? 'لا يوجد اتصال بالشبكة — تعذر رفع وتحديث الوسائط.'
-					: 'فشل ربط الصورة — يرجى التأكد من أن الصورة معتمدة في Manifest.',
-			);
-			setScreenState('error');
+			await client.deleteMedia(mediaId, authHeaders);
+			await loadAssets();
+		} catch (err) {
+			if (isOfflineError(err)) {
+				setScreenState('offline');
+			} else {
+				setErrorMessage('فشل حذف الوسائط.');
+				setScreenState('error');
+			}
 		}
-	}, [client, productId, selectedKey]);
+	}, [client, authHeaders, loadAssets]);
 
-	// Delete media
-	const handleDeleteMedia = React.useCallback(async (mediaId: string) => {
-		setScreenState('saving');
-		setErrorMessage(null);
-		try {
-			await client.deleteProductMedia(mediaId);
-			// Refresh list
-			const record = await client.getProduct(productId);
-			setProduct(record);
-			setScreenState('idle');
-		} catch (err: unknown) {
-			const isOffline =
-				typeof err === 'object' &&
-				err !== null &&
-				(err as { kind?: unknown }).kind === 'offline';
-			setErrorMessage(
-				isOffline
-					? 'لا يوجد اتصال بالشبكة — تعذر حذف الوسائط.'
-					: 'فشل حذف الصورة من خوادم النظام.',
-			);
-			setScreenState('error');
-		}
-	}, [client, productId]);
+	const isWorking = screenState === 'loading' || screenState === 'uploading';
 
-	const isRTL = direction === 'rtl';
-
-	// Loading/Spinner state
-	if (screenState === 'loading' && !product) {
+	if (screenState === 'loading' && assets.length === 0) {
 		return (
 			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.bg }}>
 				<ActivityIndicator size="large" color={theme.brand} />
@@ -150,21 +192,25 @@ export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProp
 		);
 	}
 
-	// Offline UI
 	if (screenState === 'offline') {
 		return (
 			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16, backgroundColor: theme.bg }}>
 				<Text role="bodyStrong" tone="warning" align="center">لا يوجد اتصال بالشبكة</Text>
-				<Text role="bodySm" tone="muted" align="center">
-					يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.
-				</Text>
-				<Button label="إعادة المحاولة" tone="primary" onPress={loadProductDetails} />
+				<Text role="bodySm" tone="muted" align="center">يرجى التحقق من الاتصال والمحاولة مرة أخرى.</Text>
+				<Button label="إعادة المحاولة" tone="primary" onPress={loadAssets} />
 				{onBack && <Button label="رجوع" tone="ghost" onPress={onBack} />}
 			</Box>
 		);
 	}
 
-	const mediaList = product?.media ?? [];
+	if (screenState === 'disabled' || !client) {
+		return (
+			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.bg }}>
+				<Text role="bodyStrong" tone="muted" align="center">واجهة API غير متاحة — تحقق من DSH_API_BASE_URL.</Text>
+				{onBack && <Button label="رجوع" tone="ghost" onPress={onBack} style={{ marginTop: 16 }} />}
+			</Box>
+		);
+	}
 
 	return (
 		<ScrollView
@@ -180,17 +226,15 @@ export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProp
 						<Button label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
 					)}
 					<Box style={{ flex: 1, minWidth: 0 }}>
-						<Text role="titleSm" align="start">إدارة وسائط المنتج</Text>
-						{product && (
-							<Text role="bodySm" tone="muted" align="start">
-								المنتج الحالي: {product.name} ({product.id})
-							</Text>
-						)}
+						<Text role="titleSm" align="start">وسائط المنتج</Text>
+						<Text role="bodySm" tone="muted" align="start">
+							معرف المنتج: {productId}
+						</Text>
 					</Box>
 				</Box>
 
-				{/* ── Error Banner ── */}
-				{errorMessage && (
+				{/* ── Error/Storage Banner ── */}
+				{!!(errorMessage || screenState === 'storage_unavailable') && (
 					<Box
 						style={{
 							backgroundColor: theme.danger + '15',
@@ -201,42 +245,44 @@ export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProp
 							gap: 8,
 						}}
 					>
-						<Text role="bodySm" tone="danger" align="start">{errorMessage}</Text>
-						<Button label="إعادة المحاولة والتحميل" tone="secondary" size="sm" fullWidth={false} onPress={loadProductDetails} />
+						<Text role="bodySm" tone="danger" align="start">
+							{errorMessage ?? 'خدمة تخزين الوسائط غير متاحة.'}
+						</Text>
+						<Button label="إعادة المحاولة" tone="secondary" size="sm" fullWidth={false} onPress={loadAssets} />
 					</Box>
 				)}
 
-				{/* ── WLT Context Alert ── */}
-				<Box
-					style={{
-						backgroundColor: theme.line + '12',
-						borderRadius: 8,
-						padding: 12,
-						borderStartWidth: 3,
-						borderStartColor: theme.brand,
-					}}
-				>
-					<Text role="caption" tone="muted" align="start">
-						نظام إدارة الوسائط المحلي: الصور يتم التحقق من سلامتها وموافقتها لمفاتيح الصور المسجلة في Manifest. لا يتم تخزين نسخ صور محلية مكررة.
-					</Text>
-				</Box>
+				{/* ── Upload Progress ── */}
+				{screenState === 'uploading' && (
+					<Box
+						style={{
+							backgroundColor: theme.brand + '12',
+							borderRadius: 8,
+							padding: 12,
+							borderStartWidth: 3,
+							borderStartColor: theme.brand,
+							gap: 8,
+						}}
+					>
+						<Text role="bodyStrong" tone="brand" align="start">جارٍ الرفع… {uploadProgress}%</Text>
+						<ActivityIndicator size="small" color={theme.brand} />
+					</Box>
+				)}
 
 				<Divider />
 
-				{/* ── Current Media List ── */}
+				{/* ── Media List ── */}
 				<Box gap={2}>
-					<Text role="bodyStrong" align="start">الوسائط الحالية للمنتج ({mediaList.length})</Text>
+					<Text role="bodyStrong" align="start">وسائط المنتج الحالية ({assets.length})</Text>
 
-					{mediaList.length === 0 ? (
+					{assets.length === 0 ? (
 						<Box style={{ padding: 24, borderStyle: 'dashed', borderWidth: 1, borderColor: theme.line, borderRadius: 8, alignItems: 'center' }}>
-							<Text role="bodySm" tone="muted" align="center">
-								لا توجد صور مرتبطة بهذا المنتج حاليًا.
-							</Text>
+							<Text role="bodySm" tone="muted" align="center">لا توجد وسائط مرتبطة بهذا المنتج.</Text>
 						</Box>
 					) : (
-						mediaList.map((media: DshProductMediaRecord) => (
+						assets.map((asset) => (
 							<Box
-								key={media.id}
+								key={asset.id}
 								style={{
 									flexDirection: resolveRowDirection(direction),
 									alignItems: 'center',
@@ -249,31 +295,32 @@ export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProp
 									gap: 12,
 								}}
 							>
-								{/* Thumbnail & Info Right-Aligned */}
 								<Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12, flex: 1 }}>
-									<Image
-										source={{ uri: `${baseUrl}${media.url}` }}
-										style={{ width: 64, height: 64, borderRadius: 6, backgroundColor: theme.line + '20' }}
-										resizeMode="cover"
-									/>
+									{asset.public_url ? (
+										<Image
+											source={{ uri: asset.public_url }}
+											style={{ width: 64, height: 64, borderRadius: 6, backgroundColor: theme.line + '20' }}
+											resizeMode="cover"
+										/>
+									) : (
+										<Box style={{ width: 64, height: 64, borderRadius: 6, backgroundColor: theme.line + '20', justifyContent: 'center', alignItems: 'center' }}>
+											<Text role="caption" tone="muted" align="center">{asset.status}</Text>
+										</Box>
+									)}
 									<Box style={{ flex: 1 }}>
-										<Text role="bodyStrong" align="start" style={{ fontSize: 13 }}>
-											{media.media_key}
-										</Text>
-										<Text role="caption" tone="muted" align="start">
-											معرف الصورة: {media.id}
-										</Text>
+										<Text role="bodyStrong" align="start" style={{ fontSize: 12 }}>{asset.id}</Text>
+										<Text role="caption" tone="muted" align="start">{formatMediaLabel(asset)}</Text>
+										<Chip label={asset.status} tone={asset.status === 'uploaded' ? 'success' : 'default'} size="sm" />
 									</Box>
 								</Box>
 
-								{/* Delete Action Left-Aligned */}
 								<Button
 									label="حذف"
 									tone="danger"
 									size="sm"
 									fullWidth={false}
-									disabled={screenState === 'saving'}
-									onPress={() => handleDeleteMedia(media.id)}
+									disabled={isWorking}
+									onPress={() => handleDelete(asset.id)}
 								/>
 							</Box>
 						))
@@ -282,60 +329,22 @@ export function ProductMediaScreen({ productId, onBack }: ProductMediaScreenProp
 
 				<Divider />
 
-				{/* ── Selector for Approved Media Keys ── */}
+				{/* ── Upload Action ── */}
 				<Box gap={2}>
-					<Text role="bodyStrong" align="start">إضافة صورة معتمدة من الكتالوج</Text>
+					<Text role="bodyStrong" align="start">رفع وسائط جديدة</Text>
 					<Text role="bodySm" tone="muted" align="start">
-						اختر أحد مفاتيح الصور المعتمدة في Manifest لرفعها وربطها بالمنتج:
+						{Platform.OS === 'web'
+							? 'اختر صورة أو فيديو من جهازك لرفعه مباشرةً إلى خادم الوسائط.'
+							: 'رفع الملفات من الجهاز يتطلب expo-image-picker (متاح قريباً).'}
 					</Text>
 
-					<Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 8 }}>
-						{PRODUCT_MEDIA_MANIFEST_KEYS.map((item) => {
-							const isSelected = selectedKey === item.key;
-							return (
-								<TouchableOpacity
-									key={item.key}
-									activeOpacity={0.8}
-									disabled={screenState === 'saving'}
-									onPress={() => setSelectedKey(item.key)}
-									style={{
-										width: '47%',
-										borderWidth: 2,
-										borderColor: isSelected ? theme.brand : theme.line,
-										borderRadius: 8,
-										padding: 8,
-										backgroundColor: isSelected ? theme.brand + '08' : theme.bg,
-										alignItems: 'center',
-										gap: 6,
-									}}
-								>
-									<Image
-										source={item.source}
-										style={{ width: 70, height: 70, borderRadius: 4, backgroundColor: theme.line + '10' }}
-										resizeMode="cover"
-									/>
-									<Text
-										role="caption"
-										align="center"
-										tone={isSelected ? 'brand' : 'default'}
-										style={{ fontWeight: isSelected ? 'bold' : 'normal', fontSize: 11 }}
-									>
-										{item.label}
-									</Text>
-								</TouchableOpacity>
-							);
-						})}
-					</Box>
-
-					{/* Action Trigger */}
-					<Box style={{ marginTop: 12 }}>
-						<Button
-							label={screenState === 'saving' ? 'جاري الربط والتحقق...' : 'ربط وإضافة الصورة المحددة'}
-							tone="primary"
-							disabled={!selectedKey || screenState === 'saving'}
-							onPress={handleAssignMedia}
-						/>
-					</Box>
+					<Button
+						label={screenState === 'uploading' ? `جارٍ الرفع… ${uploadProgress}%` : 'اختر ملف ورفعه'}
+						tone="primary"
+						disabled={isWorking || Platform.OS !== 'web'}
+						onPress={handlePickAndUpload}
+						style={{ marginTop: 12 }}
+					/>
 				</Box>
 
 			</Box>

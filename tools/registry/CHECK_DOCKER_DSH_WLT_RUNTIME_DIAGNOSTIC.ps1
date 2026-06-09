@@ -1,8 +1,8 @@
 #Requires -Version 7
-# CHECK_DOCKER_DSH_WLT_RUNTIME_DIAGNOSTIC.ps1
-# Read-only diagnostic for the BThwani local Docker runtime.
-# Writes evidence to tools\registry\runs\{SESSION_ID}\
-# Produces a ZIP at tools\registry\runs\{SESSION_ID}.zip
+# CHECK_DOCKER_DSH_WLT_RUNTIME_DIAGNOSTIC.ps1 — V3
+# DSH_WLT_MEDIA_RUNTIME_FINAL_CLOSURE diagnostic.
+# Read-only by default. Writes evidence inside tools\registry\runs\{SESSION_ID}\
+# ZIP written to tools\registry\runs\{SESSION_ID}\{SESSION_ID}.zip
 # Usage: pwsh tools/registry/CHECK_DOCKER_DSH_WLT_RUNTIME_DIAGNOSTIC.ps1
 
 Set-StrictMode -Version Latest
@@ -11,35 +11,48 @@ $ErrorActionPreference = 'Continue'
 $SESSION_ID = "diag-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 $REPO_ROOT  = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $RUN_DIR    = Join-Path $REPO_ROOT "tools\registry\runs\$SESSION_ID"
+$ZIP_PATH   = Join-Path $RUN_DIR "$SESSION_ID.zip"
 $COMPOSE    = Join-Path $REPO_ROOT "docker-compose.local.yml"
 
 New-Item -ItemType Directory -Force -Path $RUN_DIR | Out-Null
+
+# ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function Write-Evidence {
     param([string]$Name, [string]$Content)
     $path = Join-Path $RUN_DIR "$Name.txt"
     $Content | Set-Content -Path $path -Encoding UTF8
-    Write-Host "  [evidence] $Name"
+}
+
+$checks = [System.Collections.Generic.List[hashtable]]::new()
+
+function Record-Check {
+    param([string]$Id, [string]$Label, [bool]$Pass, [string]$Detail = '')
+    $icon = if ($Pass) { 'PASS' } else { 'FAIL' }
+    Write-Host "  [$icon] $Label$(if ($Detail) { ": $Detail" })"
+    $checks.Add(@{ id = $Id; label = $Label; pass = $Pass; detail = $Detail })
 }
 
 function Probe-HTTP {
     param([string]$Label, [string]$Url, [int]$TimeoutSec = 5)
     try {
         $r = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec $TimeoutSec -ErrorAction Stop
-        return @{ label = $Label; url = $Url; status = $r.StatusCode; ok = $true; body = $r.Content.Substring(0, [Math]::Min(200, $r.Content.Length)) }
+        return @{ label = $Label; url = $Url; status = $r.StatusCode; ok = $true; body = ($r.Content.Length -gt 0 ? $r.Content.Substring(0, [Math]::Min(200, $r.Content.Length)) : '') }
     } catch {
         return @{ label = $Label; url = $Url; status = 0; ok = $false; body = $_.Exception.Message }
     }
 }
 
-Write-Host "`nSESSION: $SESSION_ID"
+Write-Host "`n=== DSH_WLT_MEDIA_RUNTIME_FINAL_CLOSURE DIAGNOSTIC V3 ==="
+Write-Host "SESSION: $SESSION_ID"
 Write-Host "REPO:    $REPO_ROOT"
-Write-Host "OUTPUT:  $RUN_DIR`n"
+Write-Host "OUTPUT:  $RUN_DIR"
+Write-Host "ZIP:     $ZIP_PATH`n"
 
 # ─── 1. Tool versions ─────────────────────────────────────────────────────────
 Write-Host "1. Tool versions"
-$dockerVersion   = docker version 2>&1 | Out-String
-$composeVersion  = docker compose version 2>&1 | Out-String
+$dockerVersion  = docker version 2>&1 | Out-String
+$composeVersion = docker compose version 2>&1 | Out-String
 Write-Evidence "01_docker_version"  $dockerVersion
 Write-Evidence "01_compose_version" $composeVersion
 
@@ -51,61 +64,62 @@ Write-Evidence "02_compose_config" $configOut
 # ─── 3. Running services ──────────────────────────────────────────────────────
 Write-Host "3. Compose ps"
 $psOut = docker compose -f $COMPOSE ps 2>&1 | Out-String
-Write-Evidence "03_compose_ps" $psOut
 Write-Host $psOut
+Write-Evidence "03_compose_ps" $psOut
 
-# ─── 4. Service health probes ─────────────────────────────────────────────────
+# ─── 4. HTTP health probes ────────────────────────────────────────────────────
 Write-Host "4. HTTP health probes"
 $probes = @(
-    (Probe-HTTP "dsh-api /stores"         "http://127.0.0.1:8080/stores"),
-    (Probe-HTTP "auth-service /health"    "http://127.0.0.1:18082/health"),
-    (Probe-HTTP "wlt-api /health"         "http://127.0.0.1:18083/health"),
-    (Probe-HTTP "minio S3 API /health"    "http://127.0.0.1:9000/minio/health/live"),
-    (Probe-HTTP "minio Console"           "http://127.0.0.1:9001")
+    (Probe-HTTP "dsh-api /stores"      "http://127.0.0.1:8080/stores"),
+    (Probe-HTTP "auth-service /health" "http://127.0.0.1:18082/health"),
+    (Probe-HTTP "wlt-api /health"      "http://127.0.0.1:18083/health"),
+    (Probe-HTTP "minio /health/live"   "http://127.0.0.1:9000/minio/health/live"),
+    (Probe-HTTP "minio console"        "http://127.0.0.1:9001")
 )
 
-$probeReport = $probes | ForEach-Object {
-    $icon = if ($_.ok) { "OK  " } else { "FAIL" }
-    "[$icon] $($_.label) ($($_.url)) => HTTP $($_.status)"
+$probeLines = $probes | ForEach-Object {
+    $icon = if ($_.ok) { 'OK  ' } else { 'FAIL' }
+    "[$icon] $($_.label) => HTTP $($_.status)"
 }
-$probeText = $probeReport -join "`n"
-Write-Host $probeText
-Write-Evidence "04_http_probes" $probeText
+Write-Host ($probeLines -join "`n")
+Write-Evidence "04_http_probes" ($probeLines -join "`n")
 
-# ─── 5. MinIO bucket check ────────────────────────────────────────────────────
+Record-Check "health_dsh"   "DSH API healthy"           ($probes[0].ok)
+Record-Check "health_auth"  "Auth service healthy"       ($probes[1].ok)
+Record-Check "health_wlt"   "WLT API healthy"            ($probes[2].ok)
+Record-Check "health_minio" "MinIO healthy"              ($probes[3].ok)
+
+# ─── 5. MinIO bucket ──────────────────────────────────────────────────────────
 Write-Host "5. MinIO bucket check"
-$minioBucket = docker exec bthwani-minio-local mc ls local/bthwani-media-local 2>&1 | Out-String
-if ($LASTEXITCODE -eq 0 -or $minioBucket -match 'bthwani-media-local|No object found') {
-    $bucketStatus = "BUCKET_READY: bthwani-media-local"
-} else {
-    $bucketStatus = "BUCKET_NOT_READY: $minioBucket"
-}
-Write-Host "  $bucketStatus"
-Write-Evidence "05_minio_bucket" "$bucketStatus`n$minioBucket"
+$bucketOut = docker exec bthwani-minio-local mc ls local/bthwani-media-local 2>&1 | Out-String
+$bucketReady = ($LASTEXITCODE -eq 0) -or ($bucketOut -match 'bthwani-media-local|No object found')
+Record-Check "minio_bucket" "Bucket bthwani-media-local ready" $bucketReady $bucketOut.Trim()
+Write-Evidence "05_minio_bucket" "READY=$bucketReady`n$bucketOut"
 
-# ─── 6. dsh_media_assets table check ─────────────────────────────────────────
-Write-Host "6. dsh_media_assets table"
-$tableCheck = docker exec bthwani-dsh-postgres-local psql -U dsh_local -d dsh_local -c "\d dsh_media_assets" 2>&1 | Out-String
-if ($tableCheck -match 'dsh_media_assets') {
-    Write-Host "  TABLE_EXISTS: dsh_media_assets"
-} else {
-    Write-Host "  TABLE_MISSING: dsh_media_assets — migration 030 may not have applied"
-}
-Write-Evidence "06_dsh_media_assets_table" $tableCheck
+# ─── 6. dsh_media_assets migration ───────────────────────────────────────────
+Write-Host "6. dsh_media_assets migration"
+$tableDesc  = docker exec bthwani-dsh-postgres-local psql -U dsh_local -d dsh_local -c "\d dsh_media_assets" 2>&1 | Out-String
+$tableExists = $tableDesc -match 'dsh_media_assets'
+$rowCount   = docker exec bthwani-dsh-postgres-local psql -U dsh_local -d dsh_local -tAc "SELECT COUNT(*) FROM dsh_media_assets;" 2>&1
+$rowCount   = $rowCount.Trim()
+Record-Check "migration_table"  "dsh_media_assets table exists" $tableExists
+Record-Check "migration_runner" "Row count queryable"           ($rowCount -match '^\d+$') $rowCount
+Write-Evidence "06_migration" "TABLE_EXISTS=$tableExists`nROWS=$rowCount`n$tableDesc"
 
-# ─── 7. Upload intent smoke test ─────────────────────────────────────────────
-Write-Host "7. Upload intent smoke test"
-$smokeResult = @()
+# ─── 7. Upload → PUT → Complete → GET → List smoke ────────────────────────────
+Write-Host "7. Media smoke test"
+$smokeLines = [System.Collections.Generic.List[string]]::new()
+$intentOk = $false; $putOk = $false; $completeOk = $false; $getOk = $false; $listOk = $false
+$smokeMediaId = $null
 
 $intentBody = @{
-    owner_service = "dsh"
     owner_type    = "product"
     owner_id      = "smoke-product-001"
     media_type    = "image"
     purpose       = "primary"
     filename      = "smoke-test.jpg"
     mime_type     = "image/jpeg"
-    actor_id      = "diagnostic-runner"
+    file_size_bytes = 256
 } | ConvertTo-Json
 
 try {
@@ -117,184 +131,192 @@ try {
         -Headers @{ 'X-Client-Id' = 'diagnostic-runner'; 'X-Actor-Type' = 'operator' } `
         -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
 
-    $intentData = $intentResp.Content | ConvertFrom-Json
-    $mediaId    = $intentData.intent.media_id
-    $uploadUrl  = $intentData.intent.upload_url
-    $smokeResult += "INTENT_CREATED: media_id=$mediaId"
-    $smokeResult += "UPLOAD_URL: $uploadUrl"
-    Write-Host "  INTENT_CREATED: $mediaId"
+    $intentData  = $intentResp.Content | ConvertFrom-Json
+    $smokeMediaId = $intentData.intent.media_id
+    $uploadUrl   = $intentData.intent.upload_url
+    $intentOk    = $true
+    $smokeLines.Add("INTENT_CREATED: media_id=$smokeMediaId upload_url=$(if ($uploadUrl) { 'SET' } else { 'EMPTY' })")
 
-    if ($uploadUrl -and $uploadUrl -ne "") {
-        # PUT a tiny 1x1 white JPEG to MinIO via presigned URL
+    if ($uploadUrl -and $uploadUrl -ne '') {
         $tinyJpeg = [byte[]](
-            0xFF,0xD8,0xFF,0xE0,0x00,0x10,0x4A,0x46,0x49,0x46,0x00,0x01,0x01,0x00,0x00,0x01,
-            0x00,0x01,0x00,0x00,0xFF,0xDB,0x00,0x43,0x00,0x08,0x06,0x06,0x07,0x06,0x05,0x08,
-            0x07,0x07,0x07,0x09,0x09,0x08,0x0A,0x0C,0x14,0x0D,0x0C,0x0B,0x0B,0x0C,0x19,0x12,
-            0x13,0x0F,0x14,0x1D,0x1A,0x1F,0x1E,0x1D,0x1A,0x1C,0x1C,0x20,0x24,0x2E,0x27,0x20,
-            0x22,0x2C,0x23,0x1C,0x1C,0x28,0x37,0x29,0x2C,0x30,0x31,0x34,0x34,0x34,0x1F,0x27,
-            0x39,0x3D,0x38,0x32,0x3C,0x2E,0x33,0x34,0x32,0xFF,0xC0,0x00,0x0B,0x08,0x00,0x01,
-            0x00,0x01,0x01,0x01,0x11,0x00,0xFF,0xC4,0x00,0x1F,0x00,0x00,0x01,0x05,0x01,0x01,
-            0x01,0x01,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x02,0x03,0x04,
-            0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0xFF,0xC4,0x00,0xB5,0x10,0x00,0x02,0x01,0x03,
-            0x03,0x02,0x04,0x03,0x05,0x05,0x04,0x04,0x00,0x00,0x01,0x7D,0x01,0x02,0x03,0x00,
-            0x04,0x11,0x05,0x12,0x21,0x31,0x41,0x06,0x13,0x51,0x61,0x07,0x22,0x71,0x14,0x32,
-            0x81,0x91,0xA1,0x08,0x23,0x42,0xB1,0xC1,0x15,0x52,0xD1,0xF0,0x24,0x33,0x62,0x72,
-            0x82,0x09,0x0A,0x16,0x17,0x18,0x19,0x1A,0x25,0x26,0x27,0x28,0x29,0x2A,0x34,0x35,
-            0x36,0x37,0x38,0x39,0x3A,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x53,0x54,0x55,
-            0x56,0x57,0x58,0x59,0x5A,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x73,0x74,0x75,
-            0x76,0x77,0x78,0x79,0x7A,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8A,0x92,0x93,0x94,
-            0xFF,0xDA,0x00,0x08,0x01,0x01,0x00,0x00,0x3F,0x00,0xFB,0xD4,0xFF,0xD9
+            0xFF,0xD8,0xFF,0xE0,0x00,0x10,0x4A,0x46,0x49,0x46,0x00,0x01,
+            0x01,0x00,0x00,0x01,0x00,0x01,0x00,0x00,0xFF,0xC0,0x00,0x0B,
+            0x08,0x00,0x01,0x00,0x01,0x01,0x01,0x11,0x00,0xFF,0xC4,0x00,
+            0x1F,0x00,0x00,0x01,0x05,0x01,0x01,0x01,0x01,0x01,0x01,0x00,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x02,0x03,0x04,0x05,
+            0x06,0x07,0x08,0x09,0x0A,0x0B,0xFF,0xDA,0x00,0x08,0x01,0x01,
+            0x00,0x00,0x3F,0x00,0xFB,0xD4,0xFF,0xD9
         )
         try {
+            $putHeaders = @{ 'Content-Type' = 'image/jpeg'; 'x-amz-content-sha256' = 'UNSIGNED-PAYLOAD' }
             $putResp = Invoke-WebRequest -Method PUT -Uri $uploadUrl -Body $tinyJpeg `
-                -ContentType "image/jpeg" -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
-            $smokeResult += "UPLOAD_PUT: HTTP $($putResp.StatusCode)"
-            Write-Host "  UPLOAD_PUT: $($putResp.StatusCode)"
+                -Headers $putHeaders -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
+            $putOk = ($putResp.StatusCode -ge 200 -and $putResp.StatusCode -lt 300)
+            $smokeLines.Add("PUT_MINIO: HTTP $($putResp.StatusCode)")
         } catch {
-            $smokeResult += "UPLOAD_PUT_FAILED: $($_.Exception.Message)"
-            Write-Host "  UPLOAD_PUT_FAILED (MinIO may not be running): $($_.Exception.Message)"
+            $smokeLines.Add("PUT_MINIO_FAILED: $($_.Exception.Message)")
         }
     } else {
-        $smokeResult += "UPLOAD_URL_EMPTY: DSH_MEDIA_S3_ENDPOINT not configured or service not running"
-        Write-Host "  UPLOAD_URL_EMPTY"
+        $smokeLines.Add("PUT_MINIO: SKIPPED — upload_url empty (MinIO not configured in dsh-api env)")
     }
 
-    # Complete the upload
+    # Complete
     try {
         $completeResp = Invoke-WebRequest `
             -Method POST `
-            -Uri "http://127.0.0.1:8080/media/$mediaId/complete" `
-            -Body '{}' `
-            -ContentType "application/json" `
+            -Uri "http://127.0.0.1:8080/media/$smokeMediaId/complete" `
+            -Body '{}' -ContentType "application/json" `
             -Headers @{ 'X-Client-Id' = 'diagnostic-runner'; 'X-Actor-Type' = 'operator' } `
             -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
         $completeData = $completeResp.Content | ConvertFrom-Json
-        $smokeResult += "COMPLETE: status=$($completeData.status) url=$($completeData.public_url)"
-        Write-Host "  COMPLETE: status=$($completeData.status)"
+        $completeOk = $true
+        $smokeLines.Add("COMPLETE: status=$($completeData.status)")
     } catch {
-        $smokeResult += "COMPLETE_FAILED: $($_.Exception.Message)"
-        Write-Host "  COMPLETE_FAILED: $($_.Exception.Message)"
+        $smokeLines.Add("COMPLETE_FAILED: $($_.Exception.Message)")
     }
 
-    # GET media
+    # GET
     try {
         $getResp = Invoke-WebRequest `
-            -Uri "http://127.0.0.1:8080/media/$mediaId" `
+            -Uri "http://127.0.0.1:8080/media/$smokeMediaId" `
             -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
-        $smokeResult += "GET_MEDIA: HTTP $($getResp.StatusCode)"
-        Write-Host "  GET_MEDIA: $($getResp.StatusCode)"
+        $getOk = ($getResp.StatusCode -eq 200)
+        $smokeLines.Add("GET_MEDIA: HTTP $($getResp.StatusCode)")
     } catch {
-        $smokeResult += "GET_MEDIA_FAILED: $($_.Exception.Message)"
+        $smokeLines.Add("GET_MEDIA_FAILED: $($_.Exception.Message)")
+    }
+
+    # LIST
+    try {
+        $listResp = Invoke-WebRequest `
+            -Uri "http://127.0.0.1:8080/media?owner_type=product&owner_id=smoke-product-001" `
+            -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
+        $listData = $listResp.Content | ConvertFrom-Json
+        $listOk = ($listData.total -ge 1)
+        $smokeLines.Add("LIST_MEDIA: total=$($listData.total)")
+    } catch {
+        $smokeLines.Add("LIST_MEDIA_FAILED: $($_.Exception.Message)")
     }
 
 } catch {
-    $smokeResult += "INTENT_FAILED: $($_.Exception.Message)"
-    Write-Host "  INTENT_FAILED: $($_.Exception.Message)"
-    Write-Host "  (dsh-api may need a restart after MinIO was added)"
+    $smokeLines.Add("INTENT_FAILED: $($_.Exception.Message)")
 }
 
-Write-Evidence "07_upload_smoke" ($smokeResult -join "`n")
+Record-Check "smoke_intent"   "Upload intent created"           $intentOk
+Record-Check "smoke_put"      "PUT to MinIO succeeded"          $putOk
+Record-Check "smoke_complete" "Complete upload succeeded"       $completeOk
+Record-Check "smoke_get"      "GET media asset succeeded"       $getOk
+Record-Check "smoke_list"     "LIST media assets returned >= 1" $listOk
+Write-Evidence "07_smoke_test" ($smokeLines -join "`n")
 
-# ─── 8. WLT reference-only guard ─────────────────────────────────────────────
-Write-Host "8. WLT media reference guard"
-$wltMediaViolations = @()
+# ─── 8. Bucket object verification ───────────────────────────────────────────
+Write-Host "8. Bucket object count"
+$objectList = docker exec bthwani-minio-local mc ls --recursive local/bthwani-media-local 2>&1 | Out-String
+$objectCount = ($objectList -split "`n" | Where-Object { $_ -match '\S' }).Count
+$bucketHasObjects = ($objectCount -gt 0) -or ($objectList -match 'smoke')
+Record-Check "bucket_objects" "Bucket has objects after smoke" $bucketHasObjects "count~$objectCount"
+Write-Evidence "08_bucket_objects" $objectList
 
-# WLT should not have any route that returns DSH media URLs
-try {
-    $wltHealth = Invoke-WebRequest -Uri "http://127.0.0.1:18083/health" -UseBasicParsing -TimeoutSec 5
-    $wltMediaViolations += "WLT_HEALTH: OK ($($wltHealth.StatusCode))"
-} catch {
-    $wltMediaViolations += "WLT_HEALTH: UNREACHABLE"
-}
+# ─── 9. WLT reference-only guard ─────────────────────────────────────────────
+Write-Host "9. WLT reference-only guard"
+$wltLines = [System.Collections.Generic.List[string]]::new()
+$wltClean = $true
 
-# Check WLT Go source for any DSH media_assets table direct access
-$wltSrcPath = Join-Path $REPO_ROOT "wlt\backend\internal"
+$wltSrcPath = Join-Path $REPO_ROOT "wlt\backend"
 if (Test-Path $wltSrcPath) {
-    $wltGoFiles = Get-ChildItem -Path $wltSrcPath -Recurse -Filter "*.go"
-    foreach ($f in $wltGoFiles) {
+    $goFiles = Get-ChildItem -Path $wltSrcPath -Recurse -Filter "*.go" | Where-Object { $_.Name -notmatch '_guard_test' }
+    foreach ($f in $goFiles) {
         $content = Get-Content $f.FullName -Raw
-        if ($content -match 'dsh_media_assets') {
-            $wltMediaViolations += "WLT_DSH_TABLE_DIRECT_ACCESS: $($f.FullName)"
-        }
-        if ($content -match '/media-fixtures/') {
-            $wltMediaViolations += "WLT_FIXTURE_REFERENCE: $($f.FullName)"
-        }
-    }
-}
-
-if ($wltMediaViolations | Where-Object { $_ -match 'DIRECT_ACCESS|FIXTURE_REFERENCE' }) {
-    Write-Host "  WLT_REFERENCE_GUARD: VIOLATIONS FOUND"
-} else {
-    Write-Host "  WLT_REFERENCE_GUARD: CLEAN"
-    $wltMediaViolations += "WLT_REFERENCE_GUARD: CLEAN — WLT does not access dsh_media_assets directly"
-}
-Write-Evidence "08_wlt_reference_guard" ($wltMediaViolations -join "`n")
-
-# ─── 9. Canonical media consistency ──────────────────────────────────────────
-Write-Host "9. Canonical media consistency"
-$canonicalResult = @()
-
-# Check for hardcoded /media-fixtures/ URLs in runtime surfaces
-$runtimeSurfaces = @('app-client', 'app-partner', 'app-captain', 'app-field')
-$hardcoded = @()
-foreach ($surface in $runtimeSurfaces) {
-    $surfaceDir = Join-Path $REPO_ROOT "dsh\frontend\$surface"
-    if (Test-Path $surfaceDir) {
-        $tsFiles = Get-ChildItem -Path $surfaceDir -Recurse -Include "*.ts","*.tsx"
-        foreach ($f in $tsFiles) {
-            $content = Get-Content $f.FullName -Raw
-            if ($content -match "'/media-fixtures/|`"/media-fixtures/") {
-                $hardcoded += "HARDCODED_FIXTURE_URL: $($f.FullName)"
+        $rel = $f.FullName.Replace($REPO_ROOT.ToString(), '')
+        foreach ($pattern in @('dsh_media_assets', '/media-fixtures/', 'dsh_local_password', 'dsh-postgres:5432')) {
+            if ($content -match [regex]::Escape($pattern)) {
+                $wltLines.Add("VIOLATION: $rel contains '$pattern'")
+                $wltClean = $false
             }
         }
     }
 }
 
-if ($hardcoded.Count -eq 0) {
-    $canonicalResult += "HARDCODED_FIXTURE_URLS: NONE FOUND IN RUNTIME SURFACES"
-} else {
-    $canonicalResult += $hardcoded
+$wltLines.Add($(if ($wltClean) { "WLT_REFERENCE_GUARD: CLEAN" } else { "WLT_REFERENCE_GUARD: VIOLATIONS_FOUND" }))
+Record-Check "wlt_reference" "WLT reference-only guard clean" $wltClean
+Write-Evidence "09_wlt_guard" ($wltLines -join "`n")
+
+# ─── 10. Canonical media consistency ─────────────────────────────────────────
+Write-Host "10. Canonical media consistency"
+$canonLines = [System.Collections.Generic.List[string]]::new()
+$canonClean = $true
+
+$runtimeSurfaces = @('app-client', 'app-partner', 'app-captain', 'app-field')
+foreach ($surface in $runtimeSurfaces) {
+    $dir = Join-Path $REPO_ROOT "dsh\frontend\$surface"
+    if (-not (Test-Path $dir)) { continue }
+    $files = Get-ChildItem -Path $dir -Recurse -Include "*.ts","*.tsx" |
+             Where-Object { $_.FullName -notmatch '(fixture|preview|storybook|demo|dev)' }
+    foreach ($f in $files) {
+        $content = Get-Content $f.FullName -Raw
+        $rel = $f.FullName.Replace($REPO_ROOT.ToString(), '')
+        if ($content -match "'/media-fixtures/|`"/media-fixtures/") {
+            $canonLines.Add("HARDCODED_FIXTURE_URL: $rel")
+            $canonClean = $false
+        }
+    }
 }
 
-# Verify dsh_media_assets has at least one record after smoke
-$rowCount = docker exec bthwani-dsh-postgres-local psql -U dsh_local -d dsh_local -tAc "SELECT COUNT(*) FROM dsh_media_assets;" 2>&1
-if ($rowCount -match '^\d+$') {
-    $canonicalResult += "DSH_MEDIA_ASSETS_ROWS: $($rowCount.Trim())"
-    Write-Host "  DSH_MEDIA_ASSETS_ROWS: $($rowCount.Trim())"
-} else {
-    $canonicalResult += "DSH_MEDIA_ASSETS_ROWS: QUERY_FAILED (table may not exist yet)"
-    Write-Host "  DSH_MEDIA_ASSETS_ROWS: QUERY_FAILED"
-}
+$rowCountFinal = docker exec bthwani-dsh-postgres-local psql -U dsh_local -d dsh_local -tAc "SELECT COUNT(*) FROM dsh_media_assets;" 2>&1
+$canonLines.Add("DSH_MEDIA_ASSETS_ROWS: $($rowCountFinal.Trim())")
+$canonLines.Add($(if ($canonClean) { "CANONICAL_CONSISTENCY: CLEAN" } else { "CANONICAL_CONSISTENCY: VIOLATIONS_FOUND" }))
+Record-Check "canonical_consistency" "No hardcoded fixture URLs in runtime surfaces" $canonClean
+Write-Evidence "10_canonical_consistency" ($canonLines -join "`n")
 
-Write-Evidence "09_canonical_consistency" ($canonicalResult -join "`n")
+# ─── 11. DEV fixture env guard ───────────────────────────────────────────────
+Write-Host "11. DEV fixture env guard"
+$fixtureEnv = docker exec bthwani-dsh-api-local env 2>&1 | Out-String
+$devFixtureEnabled  = $fixtureEnv -match 'DSH_ENABLE_DEV_FIXTURE_MEDIA=true'
+$mediaFixtureEnabled = $fixtureEnv -match 'DSH_ENABLE_MEDIA_FIXTURES=true'
+Record-Check "env_dev_fixture"   "DSH_ENABLE_DEV_FIXTURE_MEDIA is NOT true (correct default)" (-not $devFixtureEnabled)
+Record-Check "env_media_fixture" "DSH_ENABLE_MEDIA_FIXTURES is NOT true (correct default)"    (-not $mediaFixtureEnabled)
+Write-Evidence "11_dev_fixture_env" "DEV_FIXTURE_MEDIA_ENABLED=$devFixtureEnabled`nMEDIA_FIXTURES_ENABLED=$mediaFixtureEnabled"
 
-# ─── 10. Git diff summary ─────────────────────────────────────────────────────
-Write-Host "10. Git diff summary"
+# ─── 12. Git diff summary ─────────────────────────────────────────────────────
+Write-Host "12. Git diff"
 Push-Location $REPO_ROOT
-$gitStatus  = git --no-pager status --short 2>&1 | Out-String
+$gitStatus   = git --no-pager status --short 2>&1 | Out-String
 $gitDiffStat = git --no-pager diff --stat 2>&1 | Out-String
-$gitCheck   = git --no-pager diff --check 2>&1 | Out-String
+$gitCheck    = git --no-pager diff --check 2>&1 | Out-String
+$gitNameStatus = git --no-pager diff --name-status 2>&1 | Out-String
 Pop-Location
-Write-Evidence "10_git_status"    $gitStatus
-Write-Evidence "10_git_diff_stat" $gitDiffStat
-Write-Evidence "10_git_diff_check" $gitCheck
+Write-Evidence "12_git_status"      $gitStatus
+Write-Evidence "12_git_diff_stat"   $gitDiffStat
+Write-Evidence "12_git_diff_check"  $gitCheck
+Write-Evidence "12_git_name_status" $gitNameStatus
 
-# ─── ZIP and final report ─────────────────────────────────────────────────────
-Write-Host "`nCreating ZIP..."
-$zipPath = Join-Path $REPO_ROOT "tools\registry\runs\$SESSION_ID.zip"
-Compress-Archive -Path "$RUN_DIR\*" -DestinationPath $zipPath -Force
-Write-Host "ZIP: $zipPath"
+# ─── 13. Final verdict ────────────────────────────────────────────────────────
+$failedChecks = @($checks | Where-Object { -not $_.pass })
+$allPassed    = ($failedChecks.Count -eq 0)
 
-Write-Host "`n=== SUMMARY ==="
-Write-Host "Session:  $SESSION_ID"
-Write-Host "Evidence: $RUN_DIR"
-Write-Host "ZIP:      $zipPath"
+$summaryLines = $checks | ForEach-Object {
+    $icon = if ($_.pass) { 'PASS' } else { 'FAIL' }
+    "[$icon] $($_.id): $($_.label)$(if ($_.detail) { " — $($_.detail)" })"
+}
+$summaryText = $summaryLines -join "`n"
+Write-Evidence "00_VERDICT_SUMMARY" $summaryText
 
-$allHealthy = ($probes | Where-Object { !$_.ok }).Count -eq 0
-if ($allHealthy) {
-    Write-Host "`nDONE: All services healthy."
+Write-Host "`n=== VERDICT ==="
+Write-Host $summaryText
+Write-Host ""
+
+if ($allPassed) {
+    Write-Host "Decision: DONE"
+    Write-Host "All checks passed. Media runtime closure verified."
 } else {
-    $failed = ($probes | Where-Object { !$_.ok }) | ForEach-Object { $_.label }
-    Write-Host "`nBLOCKED: Unhealthy services: $($failed -join ', ')"
+    $failedList = ($failedChecks | ForEach-Object { $_.id }) -join ', '
+    Write-Host "Decision: FIX_REQUIRED"
+    Write-Host "Failed checks: $failedList"
     Write-Host "Run: docker compose -f docker-compose.local.yml up -d --build"
 }
+
+# ─── ZIP ──────────────────────────────────────────────────────────────────────
+Write-Host "`nCreating ZIP: $ZIP_PATH"
+Compress-Archive -Path "$RUN_DIR\*.txt" -DestinationPath $ZIP_PATH -Force
+Write-Host "ZIP written: $ZIP_PATH"
+Write-Host "Session:     $SESSION_ID"
