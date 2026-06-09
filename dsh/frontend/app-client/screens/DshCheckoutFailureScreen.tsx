@@ -116,11 +116,11 @@ export function DshCheckoutFailureScreen({
       </Box>
 
       <Box padding={spacing[4]} style={styles.actions}>
-        <Button label="إعادة المحاولة" tone="primary" onPress={onRetry} style={styles.button} />
+        <Button label="إعادة المحاولة" tone="primary" onPress={onRetry} style={styles.actionButton} />
         {(failureReason === 'policy_block' || failureReason === 'fraud_hold') && (
-          <Button label="التواصل مع الدعم" tone="secondary" onPress={onContactSupport} style={styles.button} />
+          <Button label="التواصل مع الدعم" tone="secondary" onPress={onContactSupport} style={styles.actionButton} />
         )}
-        <Button label="إلغاء والعودة للسلة" tone="ghost" onPress={onCancel} style={styles.button} />
+        <Button label="إلغاء والعودة للسلة" tone="ghost" onPress={onCancel} style={styles.actionButton} />
       </Box>
     </Surface>
   );
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   actions: {
     gap: spacing[3],
   },
-  button: {
+  actionButton: {
     width: '100%',
   },
 });

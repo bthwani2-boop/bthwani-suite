@@ -13,6 +13,7 @@ import {
   useDirection,
   useTheme,
   StateView,
+  shadowPresets,
 } from '@bthwani/ui-kit';
 
 export type DshRatingScreenProps = {
@@ -214,11 +215,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colorPalette.deepBlue,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...shadowPresets.raised,
   },
   submitButtonText: {
     color: colorPalette.white,

@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo, useState } from 'react';
-import { Image, Pressable, ScrollView, Switch as RNSwitch, TextInput, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Switch as RNSwitch, TextInput, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { borders, radius, resolveLogicalPadding, resolveTextAlign, resolveRowDirection, sizes, spacing, type SpacingToken } from '../foundation';
 import { useDirection, useTheme } from '../providers';
 import { Button } from './button';
@@ -361,18 +361,34 @@ export type OptionRowProps = {
   actionLabel?: string;
   onAction?: () => void;
   style?: StyleProp<ViewStyle>;
+  flat?: boolean;
 };
 
-export function OptionRow({ title, subtitle, actionLabel, onAction, style }: OptionRowProps) {
+export function OptionRow({ title, subtitle, actionLabel, onAction, style, flat }: OptionRowProps) {
+  const { direction } = useDirection();
+  const isRTL = direction === 'rtl';
+
+  const content = (
+    <View style={{ flexDirection: resolveRowDirection(direction), justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
+      <View style={{ gap: spacing[1], flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
+        <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: isRTL ? 'right' : 'left' }}>{title}</Text>
+        {subtitle ? <Text role="bodySm" tone="muted" numberOfLines={2} style={{ textAlign: isRTL ? 'right' : 'left' }}>{subtitle}</Text> : null}
+      </View>
+      {actionLabel ? <Button label={actionLabel} size="sm" tone="secondary" fullWidth={false} onPress={onAction} /> : null}
+    </View>
+  );
+
+  if (flat) {
+    return (
+      <View style={StyleSheet.flatten([{ paddingVertical: spacing[3], paddingHorizontal: spacing[3] }, style])}>
+        {content}
+      </View>
+    );
+  }
+
   return (
     <Surface tone="inset" padding={2} gap={0} style={style}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
-        <View style={{ gap: spacing[1], flex: 1 }}>
-          <Text role="bodyStrong" numberOfLines={1}>{title}</Text>
-          {subtitle ? <Text role="bodySm" tone="muted" numberOfLines={2}>{subtitle}</Text> : null}
-        </View>
-        {actionLabel ? <Button label={actionLabel} size="sm" tone="secondary" fullWidth={false} onPress={onAction} /> : null}
-      </View>
+      {content}
     </Surface>
   );
 }

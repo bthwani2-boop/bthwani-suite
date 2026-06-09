@@ -7,7 +7,7 @@ import {
   View,
   type ImageSourcePropType,
 } from 'react-native';
-import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, withAlpha } from '@bthwani/ui-kit';
+import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, withAlpha, shadowPresets } from '@bthwani/ui-kit';
 import { Text } from '@bthwani/ui-kit';
 
 import type { DshServiceId } from '../../contracts/dsh-home-types';
@@ -44,7 +44,7 @@ function DshCategoryTile({
   return (
     <View style={tileStyles.slot}>
       <Pressable onPress={onPress} style={({ pressed }) => [tileStyles.pressable, { opacity: pressed ? 0.94 : 1 }]}>
-        <View style={tileStyles.card}>
+        <View style={tileStyles.tileCard}>
           <View style={tileStyles.iconBox}>
             {imageSource ? (
               <Image source={imageSource} style={tileStyles.icon} resizeMode="cover" />
@@ -208,7 +208,7 @@ const tileStyles = StyleSheet.create({
   pressable: {
     flex: 1,
   },
-  card: {
+  tileCard: {
     flex: 1,
     borderRadius: radius.lg,
     backgroundColor: colorPalette.white,
@@ -265,11 +265,7 @@ const carouselStyles = StyleSheet.create({
     width: '90%',
     maxWidth: 560,
     maxHeight: 520,
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.16,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 16,
+    ...shadowPresets.floating,
   },
   hubHeader: {
     paddingTop: spacing[5],

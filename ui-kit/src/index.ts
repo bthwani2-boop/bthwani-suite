@@ -75,6 +75,8 @@ export {
 	resolveTextRole,
 	safeArea,
 	semanticThemeByMode,
+	shadowByElevation,
+	shadowPresets,
 	sizes,
 	spacing,
 	successPalette,

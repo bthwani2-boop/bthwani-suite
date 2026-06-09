@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
-import { Box, Icon, Text, colorPalette } from '@bthwani/ui-kit';
+import { Box, Icon, Text, colorPalette, shadowPresets } from '@bthwani/ui-kit';
 import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
 
 import { usePlatformVars } from '../../shared';
@@ -350,11 +350,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: 8,
-		shadowColor: colorPalette.black,
-		shadowOpacity: 0.22,
-		shadowRadius: 12,
-		shadowOffset: { width: 0, height: 6 },
-		elevation: 5,
+		...shadowPresets.raised,
 	},
 	ctaText: {
 		color: colorPalette.white,

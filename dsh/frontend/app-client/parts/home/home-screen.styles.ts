@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colorPalette, withAlpha, resolveRowDirection, resolveTextAlign, type Direction, spacing } from '@bthwani/ui-kit';
+import { colorPalette, withAlpha, resolveRowDirection, resolveTextAlign, type Direction, spacing, shadowPresets } from '@bthwani/ui-kit';
 import { useTheme } from '@bthwani/ui-kit';
 
 export function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['theme']) {
@@ -23,10 +23,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       backgroundColor: colorPalette.brand,
       borderWidth: 0,
       borderColor: 'transparent',
-      shadowColor: colorPalette.black,
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      elevation: 8,
+      ...shadowPresets.overlay,
       borderBottomWidth: 1,
       borderBottomColor: withAlpha(colorPalette.white, 0.1),
     },
@@ -44,17 +41,12 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       borderRadius: 24,
       overflow: 'hidden',
       backgroundColor: colorPalette.surfaceRaised,
-      elevation: 6,
-      shadowColor: colorPalette.black,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12,
-      shadowRadius: 16,
+      ...shadowPresets.raised,
     },
     premiumBannerCardActive: {
       borderColor: withAlpha(colorPalette.white, 0.2),
       borderWidth: 1,
-      shadowOpacity: 0.18,
-      shadowRadius: 20,
+      ...shadowPresets.overlay,
     },
     premiumBannerImageWrap: {
       flex: 1,
@@ -132,7 +124,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       fontWeight: '900',
       textShadowColor: withAlpha(colorPalette.black, 0.4),
       textShadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4,
+      textShadowRadius: 4,
       lineHeight: 20,
       textAlign,
     },
@@ -143,7 +135,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       marginTop: 3,
       textShadowColor: withAlpha(colorPalette.black, 0.3),
       textShadowOffset: { width: 0, height: 1 },
-      shadowRadius: 2,
+      textShadowRadius: 2,
       lineHeight: 13,
       textAlign,
     },
@@ -244,10 +236,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       overflow: 'hidden',
       borderWidth: 0.5,
       borderColor: withAlpha(colorPalette.black, 0.05),
-      shadowColor: colorPalette.black,
-      shadowOpacity: 0.08,
-      shadowRadius: 12,
-      elevation: 2,
+      ...shadowPresets.raised,
     },
     categoryIconContainerSelected: {
       backgroundColor: theme.brandSurface,
@@ -277,11 +266,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       paddingHorizontal: 12,
       justifyContent: 'center',
       overflow: 'hidden',
-      elevation: 2,
-      shadowColor: colorPalette.black,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
+      ...shadowPresets.raised,
     },
     heroPromoBackground: {
       ...StyleSheet.absoluteFillObject,

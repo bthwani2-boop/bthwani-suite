@@ -23,6 +23,7 @@ import {
   Toast,
   TopBar,
   useDirection,
+  shadowPresets,
   type PaymentDecisionOption,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
@@ -335,7 +336,7 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
       <Pressable onPress={() => setVisible(true)}>
         <Surface tone="default" padding={3} gap={2} radiusToken="lg" style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER, borderStyle: 'dashed', borderWidth: 1.5 }}>
           <Box layoutDirection="row" align="center" gap={3}>
-            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', shadowColor: colorPalette.black, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', ...shadowPresets.raised }}>
               <Icon name="calendar-outline" size={22} color={ACCENT_ORANGE} />
             </View>
             <Box style={{ flex: 1 }} gap={0.5}>
@@ -618,11 +619,7 @@ function ProductPreviewModal({
             backgroundColor: colorPalette.surfacePrimary,
             overflow: 'hidden',
             maxHeight: '90%',
-            shadowColor: colorPalette.black,
-            shadowOpacity: 0.16,
-            shadowRadius: 24,
-            shadowOffset: { width: 0, height: 10 },
-            elevation: 16,
+            ...shadowPresets.floating,
           }}
         >
           <ScrollView
@@ -1190,7 +1187,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
     : safeArea.comfortable;
   const footerSafePadding = androidSystemBottomInset + spacing[2];
-  const resolvedFooterHeight = footerHeight > 0 ? footerHeight : sizes.controlMd + footerSafePadding + spacing[4];
+  const resolvedFooterHeight = footerHeight > 0 ? footerHeight : 140;
   const actionBarBottomPadding = resolvedFooterHeight + spacing[2];
   const activePreviewCartItem = useMemo(
     () => (previewProduct ? findCartItemForProduct(items, previewProduct) : undefined),
@@ -1998,7 +1995,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const handleOpenFirstRecommendationPreview = () => {
-    const firstProduct = RECOMMENDED_PRODUCTS[0];
+    const firstProduct = dshCartRecommendedProductsFixture[0];
     if (firstProduct) {
       openProductPreview(firstProduct);
     }
@@ -2079,34 +2076,32 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         </Surface>
 
         <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
-          <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[2], gap: spacing[1.5], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
-            <Surface tone="inset" padding={2} gap={1} style={{ borderRadius: 16 }}>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[1.5], flex: 1 }}>
-                  <Icon name={fulfillmentModeMeta.icon} size={18} color={TEXT_PRIMARY} />
-                  <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
-                    <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
-                      خيار التوصيل
-                    </Text>
-                    <Text role="caption" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
-                      {deliveryModeSelectionSummary}
-                    </Text>
-                    <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-                      إذا أردت تغييره اضغط هنا
-                    </Text>
-                  </View>
+          <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[1.5], flex: 1 }}>
+                <Icon name={fulfillmentModeMeta.icon} size={18} color={TEXT_PRIMARY} style={{ marginTop: 2, flexShrink: 0 }} />
+                <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                  <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                    خيار التوصيل
+                  </Text>
+                  <Text role="caption" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
+                    {deliveryModeSelectionSummary}
+                  </Text>
+                  <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                    إذا أردت تغييره اضغط هنا
+                  </Text>
                 </View>
-                <Button
-                  label="تغيير"
-                  tone="secondary"
-                  size="sm"
-                  fullWidth={false}
-                  onPress={toggleDeliveryModePicker}
-                />
               </View>
-            </Surface>
+              <Button
+                label="تغيير"
+                tone="secondary"
+                size="sm"
+                fullWidth={false}
+                onPress={toggleDeliveryModePicker}
+              />
+            </View>
             {deliveryModePickerOpen && (
-              <View style={{ gap: spacing[1] }}>
+              <View style={{ gap: spacing[1], marginTop: spacing[2] }}>
                 {fulfillmentModeOptions.map((option) => {
                   const isSelected = option.value === selectedFulfillmentMode;
 
@@ -2125,7 +2120,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                       }}
                     >
                       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1.5] }}>
-                        <Icon name={option.icon} size={18} color={isSelected ? ACCENT_ORANGE : TEXT_PRIMARY} />
+                        <Icon name={option.icon} size={18} color={isSelected ? ACCENT_ORANGE : TEXT_PRIMARY} style={{ flexShrink: 0 }} />
                         <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
                           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
                             <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
@@ -2153,10 +2148,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             subtitle={couponCode ? `القسيمة الحالية: ${couponCode}` : 'أدخل رمز التخفيض إن وجد'}
             actionLabel={couponCode ? 'تعديل' : 'إضافة'}
             onAction={() => openQuickAction('coupon')}
-            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+            flat
+            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[3], paddingHorizontal: spacing[3] }}
           />
           {quickActionKey === 'coupon' && quickActionMeta && (
-            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: spacing[3] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -2167,30 +2163,28 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               />
             </View>
           )}
-          <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[1], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
-            <Surface tone="inset" padding={2} gap={1} style={{ borderRadius: 16 }}>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
-                  <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
-                    {locationTitle}
-                  </Text>
-                  <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-                    {locationSubtitle}
-                  </Text>
-                </View>
-                <Button
-                  label={isPickupMode ? 'عرض الموقع' : 'تغيير'}
-                  tone="secondary"
-                  size="sm"
-                  fullWidth={false}
-                  disabled={isPickupMode && !hasStorePickupLocation}
-                  onPress={isPickupMode ? handlePickupLocationPreview : () => openQuickAction('address')}
-                />
+          <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+              <View style={{ flex: 1, gap: spacing[0.5], alignItems: 'flex-end' }}>
+                <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                  {locationTitle}
+                </Text>
+                <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                  {locationSubtitle}
+                </Text>
               </View>
-            </Surface>
+              <Button
+                label={isPickupMode ? 'عرض الموقع' : 'تغيير'}
+                tone="secondary"
+                size="sm"
+                fullWidth={false}
+                disabled={isPickupMode && !hasStorePickupLocation}
+                onPress={isPickupMode ? handlePickupLocationPreview : () => openQuickAction('address')}
+              />
+            </View>
           </View>
           {quickActionKey === 'address' && quickActionMeta && (
-            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: spacing[3] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -2200,20 +2194,23 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               />
             </View>
           )}
-          <View style={{ paddingHorizontal: spacing[3], paddingBottom: spacing[2] }}>
-            <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-              {deliveryNotice}
-            </Text>
-          </View>
+          {deliveryNotice ? (
+            <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[1.5], backgroundColor: colorPalette.surfaceSecondary, borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
+              <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
+                {deliveryNotice}
+              </Text>
+            </View>
+          ) : null}
           <OptionRow
             title="ملاحظات الطلب"
             subtitle={note}
             actionLabel={note === 'لا يوجد ملاحظة' ? 'إضافة' : 'تعديل'}
             onAction={() => openQuickAction('note')}
-            style={{ borderBottomWidth: 1, borderColor: BORDER_SOFT, paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+            flat
+            style={{ borderBottomWidth: selectedFulfillmentMode === 'bthwani_delivery' ? 1 : 0, borderColor: BORDER_SOFT, paddingVertical: spacing[3], paddingHorizontal: spacing[3] }}
           />
           {quickActionKey === 'note' && quickActionMeta && (
-            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: spacing[3] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -2229,11 +2226,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               subtitle={extraRequest || 'أضف شيئًا بسيطًا من طريق الكابتن'}
               actionLabel={extraRequest ? 'تعديل' : 'إضافة'}
               onAction={() => openQuickAction('extra')}
-              style={{ paddingVertical: spacing[1], paddingHorizontal: spacing[3] }}
+              flat
+              style={{ paddingVertical: spacing[3], paddingHorizontal: spacing[3] }}
             />
           )}
           {quickActionKey === 'extra' && quickActionMeta && (
-            <View style={{ paddingHorizontal: spacing[2], paddingBottom: spacing[2] }}>
+            <View style={{ paddingHorizontal: spacing[3], paddingBottom: spacing[3] }}>
               <InlineActionEditor
                 meta={quickActionMeta}
                 value={quickActionDraft}
@@ -2332,11 +2330,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           borderTopWidth: 1,
           borderColor: BORDER_SOFT,
           zIndex: 5,
-          elevation: 12,
-          shadowColor: colorPalette.black,
-          shadowOpacity: 0.1,
-          shadowRadius: 20,
-          shadowOffset: { width: 0, height: -4 },
+           ...shadowPresets.overlay,
         }}
       >
         {!canCheckout ? (

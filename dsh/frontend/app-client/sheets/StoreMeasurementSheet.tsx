@@ -12,6 +12,7 @@ import {
   Icon,
   Text,
   colorPalette,
+  shadowPresets,
 } from '@bthwani/ui-kit';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import {
@@ -291,17 +292,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colorPalette.line,
     gap: 6,
-    ...Platform.select({
-      ios: {
-        shadowColor: colorPalette.black,
-        shadowOpacity: 0.08,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...shadowPresets.raised,
   },
   measurePopoverHeader: {
     alignItems: 'flex-end',

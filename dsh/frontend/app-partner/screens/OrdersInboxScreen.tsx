@@ -13,6 +13,7 @@ import {
   StateView,
   Tabs,
   Text,
+  colorPalette,
   resolveRowDirection,
   useBThwaniAppearance,
   useDirection,
@@ -568,7 +569,7 @@ function CommandCenterOrderRow({
           <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
               <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
-                <Text role="bodyStrong" style={{ textAlign, fontSize: 15, color: '#0A2F5C' }}>
+                <Text role="bodyStrong" style={{ textAlign, fontSize: 15, color: colorPalette.textPrimary }}>
                   {item.orderCode}
                 </Text>
                 {isNewUnread ? (
@@ -976,7 +977,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
             </View>
 
             <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start', width: '100%' }}>
-              <Text role="bodyStrong" style={{ textAlign, fontSize: 16, color: '#0A2F5C' }}>
+              <Text role="bodyStrong" style={{ textAlign, fontSize: 16, color: colorPalette.textPrimary }}>
                 {focusOrder.orderCode}
               </Text>
               <Text role="caption" tone="muted" style={{ textAlign }}>

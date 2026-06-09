@@ -14,6 +14,7 @@ import {
   StateView,
   radius,
   Icon,
+  shadowPresets,
 } from '@bthwani/ui-kit';
 
 export type DshCheckoutIntentScreenProps = {
@@ -399,11 +400,7 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.brandStrong,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colorPalette.brandStrong,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...shadowPresets.raised,
   },
   confirmButtonText: {
     color: colorPalette.white,

@@ -25,6 +25,7 @@ import {
   Chip,
   DeferredReviewBlock,
   StickyActionBar,
+  shadowPresets,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
 import { getDshClientStateMeta, type DshClientState } from '../../../data/operational-statuses.preview-data';
@@ -398,11 +399,7 @@ export const StageRail = React.memo(function StageRail({ activeStepId, steps }: 
                   borderRadius: 14,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  shadowColor: indicatorTone,
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: isActive ? 0.6 : 0,
-                  shadowRadius: 6,
-                  elevation: isActive ? 4 : 0,
+                  ...(isActive ? shadowPresets.raised : {}),
                 }}
               >
                 {isDone ? (
@@ -1320,11 +1317,7 @@ export const HorizontalMilestones = React.memo(function HorizontalMilestones({ a
                 backgroundColor: bulletColor,
                 borderWidth: isActive ? 3 : 0,
                 borderColor: theme.brandSurface,
-                shadowColor: color,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: isActive ? 0.4 : 0,
-                shadowRadius: 4,
-                elevation: isActive ? 3 : 0,
+                ...(isActive ? shadowPresets.raised : {}),
               }}
             />
             <Text

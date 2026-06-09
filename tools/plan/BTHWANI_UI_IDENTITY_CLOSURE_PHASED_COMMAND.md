@@ -208,7 +208,9 @@ No provider switching
 No financial var mutation
 ```
 
-Binding Platform Vars to real runtime design behavior is a later phase and requires separate human approval.
+- **Appearance Modes:** Every screen and surface is considered incomplete unless it supports both `lightPremium` and `darkGlass` appearance modes from day one.
+- **Customization Restrictions:** Under no circumstances may arbitrary customization of colors or font families be allowed via the control panel. Control room configuration must strictly pass through pre-defined profiles (e.g. customized Arabic font profile or spacing density) to preserve basic token integrity resolved centrally via `ui-kit`.
+- **Precedence:** Binding Platform Vars to real runtime design behavior is a later phase and requires separate human approval.
 
 ---
 
@@ -264,13 +266,13 @@ To ensure a visual identity that combines luxury, practicality, and high perform
 
 ### A. Central Brand Colors & Visual Contrast (الألوان والتباين البصري)
 * **Core Brand Identity:** Trust via `deepBlue` (`#0A2F5C`), primary action emphasis via `orange` (`#FF500D`), and clean surfaces via `white` (`#FFFFFF`).
-* **Visual depth:** Enhance premium quality using semantic roles and presets from `lightPremium` and `darkGlass` (e.g. `deepBlueElevated` or `offWhite`).
-* **High Contrast:** Ensure strong readability (e.g., white text on `deepBlue` backgrounds, or `deepBlue`/`ink` text on light surfaces).
+* **Visual depth:** Enhance premium quality and depth using semantic roles and secondary colors from `lightPremium` and `darkGlass` (e.g. `deepBlueElevated` or `offWhite`).
+* **High Contrast:** Ensure strong readability and high contrast (e.g., white text on `deepBlue` backgrounds, or `deepBlue`/`ink` text on light surfaces).
 * **No local colors:** Hardcoded, raw color hexes are forbidden outside `@bthwani/ui-kit`.
 
 ### B. Typography & Text Relationships (الخطوط وتنسيق النصوص)
 * **Standardized Roles:** Use typography scale and text roles defined in `foundation.ts` (e.g. `hero`, `titleXl`, `bodyMd`). No custom font families, inline `fontFamily` strings, or manual font size overrides.
-* **Hierarchical Balance:** Maintain visual balance between headlines (using bold display weights) and readable body copy (using regular weights).
+* **Hierarchical Balance:** Maintain visual balance between headlines (using bold display weights) and readable body copy (using regular weights). Ensure proper matching of corresponding text styles and weights in both Arabic and Latin (e.g. using `hero` or `titleXl` for luxury promotional titles, and `bodyMd` for long body copy).
 
 ### C. Iconography & Graphical Integrity (العناصر الرسومية والأيقونات)
 * **Unified Icons:** All icons and icon buttons must reside within the central design system and be exported via `@bthwani/ui-kit/Icon` or `IconButton`.
@@ -278,22 +280,25 @@ To ensure a visual identity that combines luxury, practicality, and high perform
 * **No raw styling:** Developers must not override size or color values manually; instead, specify the centralized `tone` and `size` properties.
 
 ### D. Spacing, Radius, & Depth (الفراغات والأركان والظلال)
-* **Generous spacing:** Follow raw spacing scale (`rawSpacingScale`). Maintain adequate margins and paddings around components (such as doubling space around key headings).
+* **Generous spacing:** Follow raw spacing scale (`rawSpacingScale`). Maintain adequate margins and paddings around components (employing the "double space" rule around main headings and primary content cards to let layouts breathe).
 * **Consistent corners:** Utilize standard radius sizes (`radius md` or `lg` from `rawRadiusScale`).
 * **Cohesive depth:** Use central `shadowPresets` (raised, overlay, floating) to build depth without creating visual clutter or battery/perf drain.
 
 ### E. Component Architecture & Header Law (مكونات وهندسة الواجهات)
 * **Reusable Primitives:** Elements such as buttons, cards, headers, status tags, sheets, and banners must be centralized in `@bthwani/ui-kit`.
 * **Header Law Compliance:** Orange headers for top-level pages, white headers for sub-pages, and dense admin top bars for control panels.
+* **Appearance & Customization:** Every screen and surface is considered incomplete if it does not support both `lightPremium` and `darkGlass` appearance modes from day one. Control room configuration must strictly pass through pre-defined profiles (no free HEX or font-family inputs allowed) to preserve basic token integrity.
+
 
 ### F. RTL Alignment & Logical Flow (محاذاة الاتجاهات واللغة العربية)
 * **RTL correctness:** Align text to the right for Arabic content. Keep icon + label clustered as a single unit on the right side in rows, with action/chevron buttons on the left.
 * **Layout integrity:** Avoid `space-between` layouts that separate icons from their associated text. Ensure zero text-clipping.
 
 ### G. Performance, Loading, & Lazy-first Policy (الأداء والتحميل الفائق)
-* **Asset Optimization:** Use SVG icons or icon fonts instead of heavy images.
-* **Eager vs Lazy rendering:** Implement lazy loading for images and list views. Ensure screen loading, empty, and error states consume central `StateView` primitives.
-* **Lean Motion:** Utilize motion values from `rawMotionScale` (120ms to 320ms) for transitions. Avoid heavy CSS filter shadows.
+* **Asset Optimization:** Use SVG icons or icon fonts instead of heavy images. Minimize the number of external resources and use a single font format to avoid multiple font-file downloads.
+* **Eager vs Lazy rendering:** Implement lazy loading for images and list views. Adopt lightweight, performance-aware components like virtualized lists for large datasets, and minimize repaints, CPU consumption, and unnecessary layout interactions. Ensure screen loading, empty, and error states consume central `StateView` primitives.
+* **Lean Motion:** Utilize motion values from `rawMotionScale` (120ms to 320ms) for transitions. Avoid heavy CSS filter shadows or computationally expensive visual animations.
+
 
 ### H. Verification & Visual Evidence Gate (بوابة التحقق البصري)
 * **Evidence contract:** Every UI change must document before/after screenshots, viewport size, RTL alignment validation, CTA visibility check, and zero-clipping verification.
@@ -558,11 +563,15 @@ Only strengthen existing ui-kit components/types/variants where audit proves nec
 ```text
 - Icon / IconButton / DirectionalIcon
 - Text roles / typography resolver
-- Button variants
-- Card/Surface variants
-- Badge/Chip status tones
-- StateView families
-- navigation/header variants
+- Button / StickyActionBar variants
+- Card / Surface / SheetFrame / Dialog / Modal variants
+- Badge / Chip / WebControlPanelStatusTag tones
+- StateView / LoadingState / EmptyState / ErrorState / SuccessState families
+- ScreenHeader / MobileWorkspaceHeader / TopBar / SearchTopBar / ModernPremiumHeader (navigation/header variants)
+- BottomNavBar / Web rail / tabs (navigation chrome)
+- NewsTickerBar
+- Banner / BannerCarousel / OrbitCarousel / StoreHero / WebMissionHeroCard (banners/marketing)
+- TextField / SelectField / Checkbox / Radio / Switch (forms/inputs)
 ```
 
 ### Forbidden

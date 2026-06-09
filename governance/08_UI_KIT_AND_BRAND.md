@@ -57,8 +57,9 @@ Every visual pattern category must have a single central definition to prevent v
   | `deepBlue` | `#0A2F5C` | Trust, headers, primary app structure |
   | `orange` | `#FF500D` | Primary actions, brand emphasis |
   | `white` | `#FFFFFF` | Clean surfaces, secondary headers |
-* **Visual Depth Palette:** Premium surfaces should utilize the semantic roles and elevations defined in `lightPremium` and `darkGlass` (e.g. `deepBlueElevated` or `offWhite`) to create structural hierarchy.
+* **Visual Depth & Contrast:** Premium surfaces must utilize the semantic roles and elevations defined in `lightPremium` and `darkGlass` (e.g. `deepBlueElevated` or `offWhite`) to create structural hierarchy. A high contrast ratio must be strictly enforced for readability (e.g. white text on a `deepBlue` background, or `deepBlue`/`ink` text on light surfaces).
 * **Central Color System:** Random grays, blues, gradients, or one-off color hexes are forbidden unless tokenized centrally. All components must consume colors through approved semantic roles.
+
 
 ---
 
@@ -72,6 +73,7 @@ Every visual pattern category must have a single central definition to prevent v
 3. **Forbidden Custom Fonts:** The property `fontFamily` must not be used outside `@bthwani/ui-kit` unless explicitly allowlisted for technical bridge code.
 4. **Typography Standardization:** Repeated `fontSize`, `fontWeight`, and `lineHeight` declarations outside `ui-kit` must be replaced by Text roles or tokenized variants.
 5. **Brand Font Files:** No font files may be downloaded, embedded, or added to the repository without explicit human approval. Font files must not be shared back to the user or checked into source control without verification of licensing.
+6. **Arabic & Latin Alignment:** Corresponding and fitting text styles and weights must be used for both Arabic and Latin (e.g. `hero` or `titleXl` for luxury promotional titles, and `bodyMd` for long body copy).
 
 ---
 
@@ -120,6 +122,8 @@ Platform Variables (Platform Vars) may control approved design policies, profile
    * Mutating configuration or runtime rules without backend/API/DB schema contracts.
 4. **Current Policy Scope:**
    * Design Vars are limited to preview and control-room simulation. No backend database writes, runtime bindings, provider switching, or financial ledger mutations are allowed during this stage.
+5. **Appearance Modes Requirement:** Every screen and surface is considered incomplete unless it supports both `lightPremium` and `darkGlass` appearance modes from day one.
+6. **No Arbitrary Customization:** Under no circumstances may arbitrary customization of colors or font families be allowed via the control panel. Control room configuration must strictly pass through pre-defined profiles (e.g. customized Arabic font profile or spacing density) to preserve basic token integrity resolved centrally via `ui-kit`.
 
 ---
 
@@ -153,10 +157,11 @@ All Arabic user interfaces must be directionally and structurally correct:
 
 ## 11. Performance, Asset Optimization, & Motion
 
-1. **Asset Selection:** Use lightweight SVG vectors or icon-font bundles instead of raster PNG/JPG assets for UI decorations.
-2. **Lazy Rendering:** Eager loading of heavy screen visual trees is forbidden. Apply lazy loading to off-screen elements, heavy lists, and drawer panels.
+1. **Asset Selection:** Use lightweight SVG vectors or icon-font bundles instead of raster PNG/JPG assets for UI decorations. Minimize the number of external resources and utilize a single font format to prevent multiple font-file downloads.
+2. **Lazy Rendering:** Eager loading of heavy screen visual trees is forbidden. Apply lazy loading to off-screen elements, heavy lists, and drawer panels. Adopt lightweight, performance-aware virtualized lists for large datasets, minimizing repaints, CPU consumption, and layout interactions.
 3. **Performance States:** All screens must map empty, loading, error, and offline states utilizing the lightweight `StateView` components to prevent rendering layout shifts.
-4. **Motion Durations:** Transitions and micro-animations must utilize transitions from `rawMotionScale` constrained between 120ms (quick) and 320ms (emphasized) to maintain responsiveness without visual lag.
+4. **Motion Durations:** Transitions and micro-animations must utilize transitions from `rawMotionScale` constrained between 120ms (quick) and 320ms (emphasized) to maintain responsiveness without visual lag. Avoid heavy CSS filter shadows or computationally expensive visual animations.
+
 
 ---
 

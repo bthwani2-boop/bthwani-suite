@@ -16,7 +16,7 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { Badge, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
@@ -1497,7 +1497,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           padding={panelPadding}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+          style={{ ...shadowPresets.overlay, ...panelMinHeightStyle }}
         >
           <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
           <Box gap={1}>
@@ -1521,7 +1521,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           padding={3}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={shadowPresets.overlay}
         >
           <Badge label="تحميل" tone="info" />
           <Box gap={1}>
@@ -1541,7 +1541,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           padding={3}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={shadowPresets.overlay}
         >
           <Badge label="تنبيه" tone="danger" />
           <Box gap={1}>
@@ -1565,7 +1565,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           padding={3}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={shadowPresets.overlay}
         >
           <Badge label="انتظار" tone="warning" />
           <Box gap={1}>
@@ -1589,7 +1589,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           padding={3}
           gap={2}
           radiusToken="xl"
-          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4 }}
+          style={shadowPresets.overlay}
         >
           <Badge label="مغلق" tone="default" />
           <Box gap={1}>
@@ -1613,7 +1613,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           padding={panelPadding}
           gap={3}
           radiusToken="xl"
-          style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+          style={{ ...shadowPresets.overlay, ...panelMinHeightStyle }}
         >
           <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
             <Box gap={1} style={{ flex: 1 }}>
@@ -1708,7 +1708,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             padding={panelPadding}
             gap={2}
             radiusToken="xl"
-            style={{ shadowColor: colorPalette.black, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 4, ...panelMinHeightStyle }}
+            style={{ ...shadowPresets.overlay, ...panelMinHeightStyle }}
           >
             <Box layoutDirection="row" align="center" justify="space-between" gap={2}>
               <Box gap={1} style={{ flex: 1 }}>
@@ -1894,11 +1894,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
               radiusToken="xl"
               style={{
                 alignSelf: 'stretch',
-                shadowColor: colorPalette.black,
-                shadowOpacity: 0.05,
-                shadowRadius: 14,
-                shadowOffset: { width: 0, height: 5 },
-                elevation: 2,
+                ...shadowPresets.raised,
               }}
             >
               <Box layoutDirection="row" align="center" gap={1} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-start' }}>

@@ -1,5 +1,5 @@
 import { StyleSheet, Platform } from 'react-native';
-import { colorPalette } from '@bthwani/ui-kit';
+import { colorPalette, shadowPresets } from '@bthwani/ui-kit';
 
 function hexToRgba(hex: string, opacity: number) {
   let r = 0, g = 0, b = 0;
@@ -75,17 +75,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 9,
     elevation: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: colorPalette.brandStrong,
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 3 },
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...shadowPresets.raised,
   },
 
   // PREMIUM HERO 2026
@@ -222,17 +212,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.black,
-        shadowOpacity: 0.15,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    ...shadowPresets.raised,
   },
   heroLogoImage: {
     width: '100%',
@@ -419,11 +399,7 @@ export const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
     borderBottomWidth: 1.5,
-    elevation: 8,
-    shadowColor: stylesTokens.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
+    ...shadowPresets.overlay,
   },
   stickyCategoriesContent: {
     width: '100%',
@@ -476,17 +452,7 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     alignSelf: 'center',
     backgroundColor: stylesTokens.white,
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.black,
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.2,
-        shadowRadius: 16,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
+    ...shadowPresets.floating,
   },
   previewImageWrap: {
     flex: 1,
@@ -518,17 +484,7 @@ export const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.black,
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 3 },
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...shadowPresets.raised,
   },
   previewPartnerBadgeImageContainer: {
     width: 54,
@@ -553,17 +509,7 @@ export const styles = StyleSheet.create({
   },
   previewDetailsBox: {
     zIndex: 1,
-    ...Platform.select({
-      ios: {
-        shadowColor: stylesTokens.black,
-        shadowOpacity: 0.12,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    ...shadowPresets.overlay,
   },
   previewDetailsContent: {
     flex: 1,
