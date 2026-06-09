@@ -161,14 +161,139 @@ function findLocalStyleFactories(relative, text) {
   }
 }
 
+const allowedUiKitFiles = new Set(config.allowedUiKitFiles ?? []);
+
+function findIconDrift(relative, text) {
+  const iconImportRegex = /from\s+['"](@expo\/vector-icons|lucide-react|lucide-react-native|react-native-vector-icons|@tamagui\/lucide-icons)['"]/g;
+  let match;
+  while ((match = iconImportRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.warn(
+      relative,
+      'Direct icon library import outside @bthwani/ui-kit. Use central Icon/IconButton/DirectionalIcon instead.',
+      `line ${line}: ${match[1]}`
+    );
+  }
+}
+
+function findFontFamilyDrift(relative, text) {
+  const fontFamilyRegex = /\bfontFamily\s*[:=]\s*['"`]([^'"`]+)['"`]/g;
+  let match;
+  while ((match = fontFamilyRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.fail(
+      relative,
+      'Direct fontFamily property usage outside ui-kit. fontFamily is forbidden; consume central ui-kit Text roles instead.',
+      `line ${line}: ${match[1]}`
+    );
+  }
+}
+
+function findReusableStyleSheetRecipes(relative, text) {
+  const styleKeysRegex = /StyleSheet\.create\(\s*\{[\s\S]*?\b(button|card|header|tab|badge|chip)\s*:/gi;
+  let match;
+  while ((match = styleKeysRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.warn(
+      relative,
+      'Potential local StyleSheet reusable style key outside ui-kit. Move common styling to central ui-kit foundation.',
+      `line ${line}: ${match[1]}`
+    );
+  }
+}
+
+function checkLaneMisuse(relative, text) {
+  const laneImports = /import\s+.*?from\s+['"]\.\.\/\.\.\/(app-client|app-partner|app-captain|app-field|control-panel|webapp|website)\/runtime/g;
+  let match;
+  while ((match = laneImports.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    const targetLane = match[1];
+    report.fail(
+      relative,
+      `Lane misuse: importing across different app runtimes is forbidden. Target lane: ${targetLane}`,
+      `line ${line}: ${match[0]}`
+    );
+  }
+
+  if (relative.startsWith('webapp/runtime') || relative.startsWith('website/runtime') || relative.startsWith('control-panel/runtime')) {
+    const mobileSpecificRegex = /import\s+.*?from\s+['"](react-native|expo|@react-native\/[^'"]+)['"]/g;
+    let mobMatch;
+    while ((mobMatch = mobileSpecificRegex.exec(text)) !== null) {
+      const line = lineNumber(text, mobMatch.index);
+      report.fail(
+        relative,
+        'Web lane importing mobile-specific package (react-native/expo) is forbidden.',
+        `line ${line}: ${mobMatch[1]}`
+      );
+    }
+  }
+}
+
+function checkFreeDesignVars(relative, text) {
+  const directHexRegex = /VAR_UI_[A-Z_]*?\s*=\s*['"]#[0-9a-fA-F]{3,8}['"]/g;
+  let match;
+  while ((match = directHexRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.fail(
+      relative,
+      'Bypassing design policy by defining raw hex values in VAR settings is forbidden.',
+      `line ${line}: ${match[0]}`
+    );
+  }
+}
+
+function findRawShadowDrift(relative, text) {
+  const shadowRegex = /\b(shadowOffset|shadowRadius|shadowOpacity)\b/g;
+  let match;
+  while ((match = shadowRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.warn(
+      relative,
+      'Raw inline shadow property usage outside ui-kit. Use central shadowPresets or shadowByElevation.',
+      `line ${line}: ${match[1]}`
+    );
+  }
+}
+
+function findRasterAssetDrift(relative, text) {
+  const rasterRegex = /import\s+.*?from\s+['"].*?\.(png|jpg|jpeg)['"]/g;
+  let match;
+  while ((match = rasterRegex.exec(text)) !== null) {
+    const line = lineNumber(text, match.index);
+    report.warn(
+      relative,
+      'Raster image (PNG/JPG) imported inside code. Prefer vector SVGs or central DSH/media policy constants.',
+      `line ${line}: ${match[0]}`
+    );
+  }
+}
+
 for (const file of files) {
   const relative = rel(root, file);
-  if (isUiKit(relative) || shouldSkip(relative)) continue;
+  if (isUiKit(relative)) {
+    if (!allowedUiKitFiles.has(relative) && !shouldSkip(relative)) {
+      report.fail(
+        relative,
+        'ui-kit file inflation detected. Creating new ui-kit files is forbidden without explicit human approval.',
+        `File not in allowed list: ${relative}`
+      );
+    }
+    continue;
+  }
+  if (shouldSkip(relative)) continue;
+
   const text = readText(file);
   findReusableComponentDeclarations(relative, text);
   findLocalDesignObjects(relative, text);
   findLocalReusableImports(relative, text);
   findLocalStyleFactories(relative, text);
+  findIconDrift(relative, text);
+  findFontFamilyDrift(relative, text);
+  findReusableStyleSheetRecipes(relative, text);
+  checkLaneMisuse(relative, text);
+  checkFreeDesignVars(relative, text);
+  findRawShadowDrift(relative, text);
+  findRasterAssetDrift(relative, text);
 }
 
 finalize(report, args);

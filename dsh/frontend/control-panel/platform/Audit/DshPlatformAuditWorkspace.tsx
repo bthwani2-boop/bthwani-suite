@@ -6,19 +6,24 @@ import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-export function DshPlatformAuditWorkspace() {
+export function DshPlatformAuditWorkspace({ activeFilter }: { activeFilter: string }) {
   const { auditEvents, rollbackEvent } = useDemoPlatformState();
   const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
 
+  const filteredEvents = auditEvents.filter((event) => {
+    if (activeFilter === 'all') return true;
+    return event.status === activeFilter;
+  });
+
   React.useEffect(() => {
-    if (auditEvents.length > 0) {
-      if (!selectedEventId || !auditEvents.some((e) => e.id === selectedEventId)) {
-        setSelectedEventId(auditEvents[0].id);
+    if (filteredEvents.length > 0) {
+      if (!selectedEventId || !filteredEvents.some((e) => e.id === selectedEventId)) {
+        setSelectedEventId(filteredEvents[0].id);
       }
     } else {
       setSelectedEventId(null);
     }
-  }, [auditEvents, selectedEventId]);
+  }, [filteredEvents, selectedEventId]);
 
   const selectedEvent = auditEvents.find((e) => e.id === selectedEventId) || null;
 
@@ -32,13 +37,13 @@ export function DshPlatformAuditWorkspace() {
           {/* Left Column: Timeline List */}
           <div className={styles.surfaceListColumn}>
             <Box gap={2}>
-              <Text role="titleMd">الجدول الزمني للأحداث ({auditEvents.length})</Text>
-              {auditEvents.length === 0 ? (
+              <Text role="titleMd">الجدول الزمني للأحداث ({filteredEvents.length})</Text>
+              {filteredEvents.length === 0 ? (
                 <Surface tone="default" border padding={4} radiusToken="xl">
                   <Text role="bodySm" tone="muted" align="center">لا توجد أحداث تدقيق حتى الآن.</Text>
                 </Surface>
               ) : (
-                auditEvents.map((event) => {
+                filteredEvents.map((event) => {
                   const isActive = event.id === selectedEventId;
                   return (
                     <button

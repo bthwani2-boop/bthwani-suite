@@ -374,7 +374,9 @@ export function DailyReconciliationWorkbench() {
                   style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', userSelect: 'none', flexWrap: 'wrap', gap: 12 }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 160 }}>
-                    <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontWeight: '700' }}>{row.id}</span>
+                    <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: 4, fontWeight: '700' }}>
+                      <Text family="mono" style={{ fontSize: 10 }}>{row.id}</Text>
+                    </span>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ fontSize: 13, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>{row.owner}</span>
                       <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>{EVENT_KIND_LABEL[row.eventKind] || row.eventKind}</span>
@@ -435,15 +437,21 @@ export function DailyReconciliationWorkbench() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>الحساب المدين (Debit)</span>
-                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.debitAccountId || 'wlt:escrow'}</code>
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.debitAccountId || 'wlt:escrow'}</Text>
+                            </span>
                           </div>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>الحساب الدائن (Credit)</span>
-                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.creditAccountId || 'wlt:payout'}</code>
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.creditAccountId || 'wlt:payout'}</Text>
+                            </span>
                           </div>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>رقم مرجع قيد اليومية</span>
-                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.ledgerEntryRef || `LED-PRV-${row.id}`}</code>
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.ledgerEntryRef || `LED-PRV-${row.id}`}</Text>
+                            </span>
                           </div>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>سند المصدر المتوقع ➔ الفعلي</span>
@@ -791,7 +799,7 @@ export function DailyReconciliationWorkbench() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {(auditTrails[row.id] || getInitialAuditLogs(row)).map((log, index) => (
                           <div key={index} style={{ display: 'flex', gap: 6, fontSize: 9, alignItems: 'center' }}>
-                            <span style={{ color: 'var(--bthwani-control-panel-text-muted)', fontFamily: 'monospace' }}>[{log.timestamp}]</span>
+                            <Text family="mono" style={{ color: 'var(--bthwani-control-panel-text-muted)', fontSize: 9 }}>[{log.timestamp}]</Text>
                             <span style={{ fontWeight: '700', color: 'var(--bthwani-brand-primary)' }}>{log.actor}:</span>
                             <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{log.action}</span>
                             {log.note && <span style={{ color: 'var(--bthwani-control-panel-text-muted)', fontStyle: 'italic' }}>({log.note})</span>}

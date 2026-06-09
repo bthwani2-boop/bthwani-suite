@@ -107,7 +107,7 @@ export function CatalogProductsTable({
                 <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
               </td>
               <td style={{ padding: '8px' }}>
-                <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
+                <Text role="code" tone="muted" style={{ fontSize: 10 }}>{p.sku}</Text>
               </td>
               <td style={{ padding: '8px' }}>
                 <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>

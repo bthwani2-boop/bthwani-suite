@@ -739,3 +739,15 @@
     grid-template-columns: 1fr;
   }
 }
+
+.validationNotice {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(232, 160, 32, 0.08);
+  border: 1px solid rgba(232, 160, 32, 0.3);
+  color: var(--bthwani-warning);
+  font-size: 11px;
+  line-height: 1.5;
+  font-weight: 700;
+  text-align: right;
+}

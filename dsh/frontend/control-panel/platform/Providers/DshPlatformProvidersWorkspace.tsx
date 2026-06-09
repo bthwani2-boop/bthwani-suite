@@ -96,7 +96,7 @@ function resolveActionImpact(
   return `محاكاة تطبيق التراجع الفوري من الحالة ${statusLabel} إلى خط الأساس المعتمد.`;
 }
 
-export function DshPlatformProvidersWorkspace() {
+export function DshPlatformProvidersWorkspace({ activeFilter }: { activeFilter: string }) {
   const { addAuditEvent } = useDemoPlatformState();
   const [selectedProviderId, setSelectedProviderId] = React.useState<string>('maps');
   const [showConfirm, setShowConfirm] = React.useState<ProviderPreviewActionId | null>(null);
@@ -106,6 +106,25 @@ export function DshPlatformProvidersWorkspace() {
     tone: ProviderTone;
     lastTestLabel: string;
   }>>({});
+
+  React.useEffect(() => {
+    const filtered = PREVIEW_PROVIDER_RECORDS.filter((record) => {
+      if (activeFilter === 'all') return true;
+      const rState = providerStates[record.id] || {
+        statusLabel: resolveProviderStatusLabel(record.status),
+        tone: resolveProviderTone(record),
+        lastTestLabel: resolveLastTestLabel(record.lastTestResult),
+      };
+      if (activeFilter === 'active') return rState.tone === 'success';
+      if (activeFilter === 'pending') return rState.tone === 'warning' || rState.tone === 'default';
+      if (activeFilter === 'inactive') return rState.tone === 'danger';
+      return true;
+    });
+    if (filtered.length > 0) {
+      setSelectedProviderId(filtered[0].id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFilter]);
 
   const selectedRecord = PREVIEW_PROVIDER_RECORDS.find((r) => r.id === selectedProviderId) || PREVIEW_PROVIDER_RECORDS[0];
 
@@ -182,7 +201,18 @@ export function DshPlatformProvidersWorkspace() {
         <div className={styles.surfaceSplitGrid}>
           {/* Left Column: Providers list */}
           <div className={styles.surfaceListColumn}>
-            {PREVIEW_PROVIDER_RECORDS.map((record) => {
+            {PREVIEW_PROVIDER_RECORDS.filter((record) => {
+              if (activeFilter === 'all') return true;
+              const rState = providerStates[record.id] || {
+                statusLabel: resolveProviderStatusLabel(record.status),
+                tone: resolveProviderTone(record),
+                lastTestLabel: resolveLastTestLabel(record.lastTestResult),
+              };
+              if (activeFilter === 'active') return rState.tone === 'success';
+              if (activeFilter === 'pending') return rState.tone === 'warning' || rState.tone === 'default';
+              if (activeFilter === 'inactive') return rState.tone === 'danger';
+              return true;
+            }).map((record) => {
               const rState = providerStates[record.id] || {
                 statusLabel: resolveProviderStatusLabel(record.status),
                 tone: resolveProviderTone(record),

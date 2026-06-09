@@ -151,7 +151,6 @@ export const styles = StyleSheet.create({
   stickyHeaderTitle: {
     fontSize: 18,
     fontWeight: '900',
-    fontFamily: 'Outfit-Bold',
   },
   heroLuxuryCard: {
     paddingTop: 16,
@@ -212,7 +211,6 @@ export const styles = StyleSheet.create({
   heroLuxuryDeliveryTitle: {
     fontSize: 11,
     fontWeight: '800',
-    fontFamily: 'Outfit-Bold',
   },
   heroLogoWrap: {
     width: 68,
@@ -244,7 +242,6 @@ export const styles = StyleSheet.create({
   heroNameText: {
     fontSize: 22,
     fontWeight: '900',
-    fontFamily: 'Outfit-Bold',
     textAlign: 'right',
     lineHeight: 28,
     letterSpacing: -0.4,
@@ -257,7 +254,6 @@ export const styles = StyleSheet.create({
   heroLocationText: {
     fontSize: 13,
     color: 'rgba(255, 255, 255, 0.9)',
-    fontFamily: 'Outfit-Medium',
     fontWeight: '700',
   },
   heroStatusBadge: {
@@ -279,7 +275,6 @@ export const styles = StyleSheet.create({
   heroStatusText: {
     fontSize: 10.5,
     fontWeight: '900',
-    fontFamily: 'Outfit-Bold',
   },
   heroFeatureChip: {
     flexDirection: 'row-reverse',
@@ -297,7 +292,6 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     color: stylesTokens.white,
-    fontFamily: 'Outfit-Bold',
   },
   heroBadgePro: {
     backgroundColor: DARK_BLUE,
@@ -307,7 +301,6 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '900',
     color: stylesTokens.white,
-    fontFamily: 'Outfit-Bold',
   },
   sectionHeader: {
     flexDirection: 'row-reverse',
@@ -317,7 +310,6 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '900',
-    fontFamily: 'Outfit-Bold',
   },
   storeStateNotice: {
     flexDirection: 'row-reverse',
@@ -352,13 +344,11 @@ export const styles = StyleSheet.create({
   storeStateNoticeTitle: {
     fontSize: 14,
     fontWeight: '800',
-    fontFamily: 'Outfit-Bold',
   },
   storeStateNoticeDescription: {
     color: stylesTokens.muted,
     fontSize: 11.5,
     lineHeight: 17,
-    fontFamily: 'Outfit-Regular',
   },
   storeStateNoticeAction: {
     paddingHorizontal: 8,
@@ -367,7 +357,6 @@ export const styles = StyleSheet.create({
   storeStateNoticeActionText: {
     fontSize: 13,
     fontWeight: '700',
-    fontFamily: 'Outfit-Bold',
   },
   contentBlock: {
     width: '100%',

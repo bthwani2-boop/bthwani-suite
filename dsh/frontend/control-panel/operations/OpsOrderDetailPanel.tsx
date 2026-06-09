@@ -7,7 +7,7 @@
 // This surface owns only rendering logic; zero fixture data lives here.
 
 import React from 'react';
-import { useTheme } from '@bthwani/ui-kit';
+import { useTheme, Text } from '@bthwani/ui-kit';
 import type { DshOperationsDecisionKind } from '../../shared/dsh-order-journey.model';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
@@ -182,24 +182,24 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
               {showPreviewDoc && (
                 <div style={{ marginTop: '8px', padding: '10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: theme.text }}>مستند الإثبات: {ticketData.attachmentRef}</div>
-                  <div style={{ width: '100%', height: '140px', background: 'var(--bthwani-control-panel-background)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '6px', display: 'flex', flexDirection: 'column', padding: '12px', justifyContent: 'space-between', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: '10px' }}>
+                  <div style={{ width: '100%', height: '140px', background: 'var(--bthwani-control-panel-background)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '6px', display: 'flex', flexDirection: 'column', padding: '12px', justifyContent: 'space-between', boxSizing: 'border-box', fontSize: '10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed var(--bthwani-control-panel-border)', paddingBottom: '4px' }}>
-                      <span>فاتورة المتجر مبسطة</span>
-                      <span dir="ltr">#INV-9823</span>
+                      <Text family="mono" style={{ fontSize: 10 }}>فاتورة المتجر مبسطة</Text>
+                      <Text family="mono" style={{ fontSize: 10 }}>#INV-9823</Text>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>دجاج فحم تركي</span>
-                        <span>1x 3,000 ر.ي</span>
+                        <Text family="mono" style={{ fontSize: 10 }}>دجاج فحم تركي</Text>
+                        <Text family="mono" style={{ fontSize: 10 }}>1x 3,000 ر.ي</Text>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>كريسبي رول</span>
-                        <span>2x 1,500 ر.ي</span>
+                        <Text family="mono" style={{ fontSize: 10 }}>كريسبي رول</Text>
+                        <Text family="mono" style={{ fontSize: 10 }}>2x 1,500 ر.ي</Text>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: '4px', fontWeight: 800 }}>
-                      <span>الإجمالي</span>
-                      <span>6,000 ر.ي</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: '4px' }}>
+                      <Text family="mono" style={{ fontSize: 10, fontWeight: '800' }}>الإجمالي</Text>
+                      <Text family="mono" style={{ fontSize: 10, fontWeight: '800' }}>6,000 ر.ي</Text>
                     </div>
                   </div>
                 </div>

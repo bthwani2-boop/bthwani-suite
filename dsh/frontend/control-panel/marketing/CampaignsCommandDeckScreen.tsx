@@ -249,7 +249,6 @@ export function CampaignsCommandDeckScreen() {
       color: theme.brandHeaderBackground,
       fontSize: '13px',
       fontWeight: '600',
-      fontFamily: 'inherit',
       outline: 'none',
       textAlign: 'right',
     } as React.CSSProperties,

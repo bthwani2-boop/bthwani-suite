@@ -24,10 +24,20 @@ function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
   );
 }
 
-export function DshPlatformRolloutsWorkspace() {
+export function DshPlatformRolloutsWorkspace({ activeFilter }: { activeFilter: string }) {
   const { addAuditEvent } = useDemoPlatformState();
   const [selectedKey, setSelectedKey] = React.useState<string>('DSH:sanaa-pilot');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const filtered = PREVIEW_ROLLOUT_RECORDS.filter((record) => {
+      if (activeFilter === 'all') return true;
+      return record.level === activeFilter;
+    });
+    if (filtered.length > 0) {
+      setSelectedKey(filtered[0].key);
+    }
+  }, [activeFilter]);
 
   const [rolloutStates, setRolloutStates] = React.useState<Record<string, {
     activeStage: string;
@@ -106,7 +116,10 @@ export function DshPlatformRolloutsWorkspace() {
           {/* Left Column: Rollouts List */}
           <div className={styles.surfaceListColumn}>
             <Box gap={2}>
-              {PREVIEW_ROLLOUT_RECORDS.map((record) => {
+              {PREVIEW_ROLLOUT_RECORDS.filter((record) => {
+                if (activeFilter === 'all') return true;
+                return record.level === activeFilter;
+              }).map((record) => {
                 const rState = rolloutStates[record.key] || { activeStage: record.initialStage };
                 const isActive = record.key === selectedKey;
                 const rIsKill = rState.activeStage.includes('Kill') || rState.activeStage.includes('موقوف');

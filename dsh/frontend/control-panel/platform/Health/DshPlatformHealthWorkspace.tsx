@@ -8,14 +8,18 @@ import styles from '../../shared/control-panel-surface.module.css';
 
 import { PREVIEW_SYSTEM_WARNINGS, type SystemWarning } from '../../../data/platform.preview-data';
 
-export function DshPlatformHealthWorkspace() {
+export function DshPlatformHealthWorkspace({ activeFilter }: { activeFilter: string }) {
   const { addAuditEvent } = useDemoPlatformState();
   const [dismissedWarnings, setDismissedWarnings] = React.useState<Set<string>>(new Set());
   const [selectedWarningId, setSelectedWarningId] = React.useState<string | null>('store-pickup');
   const [lastHealthCheck, setLastHealthCheck] = React.useState<string>('لم يتم الفحص بعد');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 
-  const activeWarnings = PREVIEW_SYSTEM_WARNINGS.filter((w) => !dismissedWarnings.has(w.id));
+  const activeWarnings = PREVIEW_SYSTEM_WARNINGS.filter((w) => {
+    if (dismissedWarnings.has(w.id)) return false;
+    if (activeFilter === 'all') return true;
+    return w.severity === activeFilter;
+  });
 
   React.useEffect(() => {
     if (activeWarnings.length > 0) {

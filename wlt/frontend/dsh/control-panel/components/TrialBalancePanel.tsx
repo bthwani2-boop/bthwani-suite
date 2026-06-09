@@ -47,7 +47,7 @@ export function TrialBalancePanel({ entries, businessDate }: {
             {tb.lines.map((line, i) => (
               <tr key={line.accountCode} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.012)', borderBottom: '1px solid var(--bthwani-control-panel-border)' }}>
                 <td style={{ padding: '5px 10px' }}>
-                  <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)', marginLeft: 4 }}>{line.accountCode}</span>
+                  <Text family="mono" style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)', marginLeft: 4 }}>{line.accountCode}</Text>
                   {line.accountLabel}
                 </td>
                 <td style={{ padding: '5px 10px', color: 'var(--bthwani-control-panel-text-muted)', fontSize: 10 }}>{line.accountType}</td>

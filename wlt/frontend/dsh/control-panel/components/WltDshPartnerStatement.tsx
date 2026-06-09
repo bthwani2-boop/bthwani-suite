@@ -198,7 +198,7 @@ export function WltDshPartnerStatement() {
             <Box gap={1}>
               <span className={wltStyles.inspectorMetaKey}>الحساب البنكي المرتبط بصرف المتجر</span>
               <span className={wltStyles.inspectorMetaVal}>
-                بنك اليمن والكويت - حساب رقم: <code style={{ fontSize: 11, fontFamily: 'monospace' }}>2020-77981-01</code>
+                بنك اليمن والكويت - حساب رقم: <Text family="mono" style={{ fontSize: 11 }}>2020-77981-01</Text>
               </span>
             </Box>
 

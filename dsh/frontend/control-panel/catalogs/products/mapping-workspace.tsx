@@ -217,7 +217,7 @@ export function MappingWorkspaceView({
                         <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
                       </td>
                       <td style={{ padding: '10px 12px' }}>
-                        <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
+                        <Text role="caption" tone="muted" family="mono" style={{ fontSize: 10 }}>{p.sku}</Text>
                       </td>
                       <td style={{ padding: '10px 12px' }}>
                         <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>

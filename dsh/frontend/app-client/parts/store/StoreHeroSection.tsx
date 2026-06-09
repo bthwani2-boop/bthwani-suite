@@ -222,7 +222,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
           {store.openingHours ? (
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
               <Icon name="time-outline" size={16} color={appearanceChrome.secondaryText} />
-              <Text style={{ color: appearanceChrome.primaryText, fontSize: 13, fontFamily: 'Outfit-Medium' }}>
+              <Text role="label" style={{ color: appearanceChrome.primaryText }}>
                 {isRTL ? `أوقات العمل: ${store.openingHours}` : `Opening Hours: ${store.openingHours}`}
               </Text>
             </View>
@@ -230,7 +230,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
           {store.catalogSummary ? (
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
               <Icon name="basket-outline" size={16} color={appearanceChrome.secondaryText} />
-              <Text style={{ color: appearanceChrome.primaryText, fontSize: 13, fontFamily: 'Outfit-Medium' }}>
+              <Text role="label" style={{ color: appearanceChrome.primaryText }}>
                 {isRTL ? `ملخص المتجر: ${store.catalogSummary}` : `Store Summary: ${store.catalogSummary}`}
               </Text>
             </View>

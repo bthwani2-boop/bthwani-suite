@@ -2078,7 +2078,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
               accessibilityLabel="اختيار الفرع"
             >
               <Icon name="git-branch-outline" size={14} color={theme.textInverse} />
-              <Text style={{ fontSize: 12, fontWeight: '700', color: theme.textInverse, fontFamily: 'Outfit-Bold' }}>
+              <Text role="caption" weight="bold" style={{ color: theme.textInverse }}>
                 اختيار الفرع
               </Text>
             </Pressable>

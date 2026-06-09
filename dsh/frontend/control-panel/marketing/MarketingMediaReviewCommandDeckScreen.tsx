@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, useTheme } from '@bthwani/ui-kit';
@@ -212,7 +212,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
             </Surface>
             {selected.mediaKey ? (
               <Box padding={2} style={{ direction: 'ltr', backgroundColor: theme.overlaySoft, borderRadius: 6 }}>
-                <Text style={{ fontSize: 10, fontFamily: 'monospace' }}>
+                <Text family="mono" style={{ fontSize: 10 }}>
                   {selected.mediaKey}
                 </Text>
               </Box>

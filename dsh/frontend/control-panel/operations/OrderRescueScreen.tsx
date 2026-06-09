@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Box } from '@bthwani/ui-kit';
+import { Box, Text } from '@bthwani/ui-kit';
 import { WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
 import {
   DSH_ORDER_RESCUE_PREVIEW,
@@ -404,8 +404,8 @@ function RescueCaseRow({
             <div className={styles.rescueSupportBar}>
               <div className={styles.rescueSupportBarCell}>
                 <span className={styles.rescueSupportBarCellLabel}>التذكرة</span>
-                <span className={styles.rescueSupportBarCellValue} dir="ltr" style={{ fontFamily: 'monospace', display: 'inline-block' }}>
-                  {item.supportHandoff.ticketLink}
+                <span className={styles.rescueSupportBarCellValue} dir="ltr" style={{ display: 'inline-block' }}>
+                  <Text family="mono" style={{ fontSize: 11 }}>{item.supportHandoff.ticketLink}</Text>
                 </span>
               </div>
               <div className={styles.rescueSupportBarCell}>

@@ -3,7 +3,7 @@ import { Box, Surface, Text, Divider } from '../primitives';
 import { useDirection, useTheme } from '../providers';
 import { Icon, type IconName } from '../components/icons';
 import { Button } from '../components/button';
-import { colorPalette, withAlpha } from '../foundation';
+import { colorPalette, withAlpha, neutralPalette, successPalette, dangerPalette } from '../foundation';
 
 /**
  * WebControlPanelShell: The root container for a control panel interface.
@@ -28,7 +28,7 @@ export function WebControlPanelShell({ children, rail, topBar }: WebControlPanel
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#F8FAFC'
+        backgroundColor: neutralPalette[50]
       }}
     >
       {topBar}
@@ -268,7 +268,7 @@ export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControl
           <Text
             role="caption"
             weight="bold"
-            style={{ color: trend.positive ? '#16A34A' : '#DC2626' }}
+            style={{ color: trend.positive ? successPalette[600] : dangerPalette[600] }}
           >
             {trend.positive ? '↑' : '↓'} {trend.value}
           </Text>
@@ -301,7 +301,7 @@ export function WebControlPanelCommandCard({ title, description, icon, onPress, 
         cursor: onPress ? 'pointer' : 'default',
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
         border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}`,
-        background: `linear-gradient(180deg, ${colorPalette.white} 0%, #F8FAFC 100%)` /* #F8FAFC: NEEDS_PHASE_2 — slate-50, no canonical match */
+        background: `linear-gradient(180deg, ${colorPalette.white} 0%, ${neutralPalette[50]} 100%)`
       }}
       elevationToken="flat"
       // @ts-ignore
@@ -360,7 +360,7 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
       radiusToken="xl"
       style={{ width: '100%', overflow: 'hidden', border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}` }}
     >
-      <Box padding={4} style={{ backgroundColor: '#F1F5F9' /* NEEDS_PHASE_2: slate-100 */, borderBottom: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}` }}>
+      <Box padding={4} style={{ backgroundColor: neutralPalette[100], borderBottom: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}` }}>
         <Text role="labelLg" weight="black">{title}</Text>
       </Box>
       <Box>

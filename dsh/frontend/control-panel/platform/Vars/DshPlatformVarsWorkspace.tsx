@@ -11,6 +11,7 @@ import {
   DSH_PLATFORM_SCOPE_PRECEDENCE,
   DSH_PLATFORM_SIMULATION_PREVIEW,
   DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
+  DSH_PLATFORM_DESIGN_POLICY_VARS,
 } from '../../../data/platform.preview-data';
 import type {
   DshPlatformProviderControlRecord,
@@ -20,12 +21,13 @@ import type {
 } from './vars.types';
 import styles from './dsh-platform-vars.module.css';
 
-type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy';
+type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy' | 'design';
 
 const DOMAIN_TABS: { id: VarsDomainId; label: string }[] = [
   { id: 'dsh',      label: 'عمليات DSH' },
   { id: 'wlt',      label: 'جسر WLT' },
   { id: 'provider', label: 'المزودين' },
+  { id: 'design',   label: 'سياسات الهوية' },
   { id: 'policy',   label: 'الأسبقية' },
 ];
 
@@ -65,6 +67,7 @@ function resolveDomainRecords(domain: VarsDomainId): readonly DshPlatformVarReco
   if (domain === 'dsh')      return DSH_PLATFORM_OPERATIONAL_VARS;
   if (domain === 'wlt')      return DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS;
   if (domain === 'provider') return DSH_PLATFORM_PROVIDER_CONTROL_VARS;
+  if (domain === 'design')   return DSH_PLATFORM_DESIGN_POLICY_VARS;
   return [];
 }
 
@@ -102,6 +105,13 @@ const QUICK_PICKS: Record<string, string[]> = {
   VAR_DSH_PARTNER_ACCEPTANCE_TIMEOUT_SECS:['45 ثانية', '60 ثانية', '90 ثانية'],
   VAR_DSH_DISPATCH_SEARCH_RADIUS_KM:      ['2.5 كم', '3.5 كم', '5.0 كم'],
   VAR_DSH_PARTNER_SETTLEMENT_SCHEDULE:    ['يومياً 10:00 ص', 'كل أحد 10:00 ص', 'كل ثلاثاء 10:00 ص'],
+  VAR_UI_APPEARANCE_MODE:                 ['lightPremium', 'darkGlass'],
+  VAR_UI_FONT_PROFILE:                    ['arabic-system', 'arabic-premium', 'arabic-readable'],
+  VAR_UI_DENSITY_PROFILE:                 ['compact', 'comfortable', 'spacious'],
+  VAR_UI_RADIUS_PROFILE:                  ['soft', 'balanced', 'sharp'],
+  VAR_UI_MOTION_PROFILE:                  ['reduced', 'standard', 'expressive'],
+  VAR_UI_MARKETING_EMPHASIS:              ['calm', 'premium', 'campaign'],
+  VAR_UI_CONTROL_PANEL_DENSITY:           ['compact', 'balanced'],
 };
 
 /* ─── VAR ROW (compact list item) ─── */
@@ -149,10 +159,10 @@ function RefCard({ title, desc, footer }: { title: string; desc: string; footer?
 }
 
 /* ─── MAIN ─── */
-export function DshPlatformVarsWorkspace() {
+export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainFilter: VarsDomainId }) {
   const { addAuditEvent } = useDemoPlatformState();
 
-  const [activeDomain, setActiveDomain] = React.useState<VarsDomainId>('dsh');
+  const activeDomain = activeDomainFilter;
   const [activeScope,  setActiveScope]  = React.useState<string>('all');
   const [selectedId,   setSelectedId]   = React.useState<string | null>(
     DSH_PLATFORM_OPERATIONAL_VARS[0]?.id ?? null
@@ -166,6 +176,7 @@ export function DshPlatformVarsWorkspace() {
       ...DSH_PLATFORM_OPERATIONAL_VARS,
       ...DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
       ...DSH_PLATFORM_PROVIDER_CONTROL_VARS,
+      ...DSH_PLATFORM_DESIGN_POLICY_VARS,
     ];
     for (const v of all) {
       init[v.id] = {
@@ -210,6 +221,7 @@ export function DshPlatformVarsWorkspace() {
       ...DSH_PLATFORM_OPERATIONAL_VARS,
       ...DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
       ...DSH_PLATFORM_PROVIDER_CONTROL_VARS,
+      ...DSH_PLATFORM_DESIGN_POLICY_VARS,
     ];
     const found = all.find((r) => r.id === selectedId);
     if (found) {
@@ -246,6 +258,9 @@ export function DshPlatformVarsWorkspace() {
     let nextStatus   = prev.status;
 
     if (action === 'save-proposed') {
+      if (selectedVar.key.startsWith('VAR_UI_') && !QUICK_PICKS[selectedVar.key]?.includes(editVal)) {
+        return;
+      }
       nextProposed = editVal || null;
     } else if (action === 'apply') {
       if (prev.proposed) { nextCurrent = prev.proposed; nextProposed = null; }
@@ -275,6 +290,8 @@ export function DshPlatformVarsWorkspace() {
   };
 
   const hasProposed = Boolean(selectedVar?.proposedPreviewValue);
+  const isDesignVar = Boolean(selectedVar?.key.startsWith('VAR_UI_'));
+  const isValidDesignVal = isDesignVar && selectedVar ? (QUICK_PICKS[selectedVar.key]?.includes(editVal)) : true;
 
   return (
     <Box gap={4}>
@@ -286,20 +303,6 @@ export function DshPlatformVarsWorkspace() {
 
           {/* ─── LEFT RAIL ─── */}
           <div className={styles.varsList}>
-
-            {/* Domain tab bar */}
-            <div className={styles.domainTabBar}>
-              {DOMAIN_TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  className={`${styles.domainTab} ${activeDomain === tab.id ? styles.domainTabActive : ''}`.trim()}
-                  onClick={() => setActiveDomain(tab.id)}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
 
             {/* KPIs + scope filter */}
             <div className={styles.listHeader}>
@@ -453,21 +456,27 @@ export function DshPlatformVarsWorkspace() {
                     </div>
                   )}
 
-                  <input
-                    type="text"
-                    className={styles.valueInput}
-                    value={editVal}
-                    onChange={(e) => setEditVal(e.target.value)}
-                    placeholder="أو اكتب قيمة مخصصة..."
-                    disabled={showConfirm !== null}
-                  />
+                  {isDesignVar ? (
+                    <div className={styles.validationNotice}>
+                      ⚠️ يُسمح بالاختيار من القوالب المعتمدة فقط لسياسات التصميم لمنع الانحراف البصري.
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      className={styles.valueInput}
+                      value={editVal}
+                      onChange={(e) => setEditVal(e.target.value)}
+                      placeholder="أو اكتب قيمة مخصصة..."
+                      disabled={showConfirm !== null}
+                    />
+                  )}
 
                   {/* Action bar */}
                   <div className={styles.actionBar}>
                     <button
                       type="button"
                       className={styles.btnSecondary}
-                      disabled={showConfirm !== null}
+                      disabled={showConfirm !== null || !isValidDesignVal}
                       onClick={() => setShowConfirm('save-proposed')}
                     >
                       حفظ المقترح

@@ -106,7 +106,7 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
                     }}
                   >
                     <Text role="bodySm" tone={item.applies ? 'default' : 'muted'}>{label}</Text>
-                    <Text role="bodySm" style={{ fontWeight: item.applies ? 700 : 400, color: item.applies ? theme.brand : theme.textMuted, fontFamily: 'monospace', direction: 'ltr', textAlign: 'right' }}>
+                    <Text role="bodySm" family="mono" style={{ fontWeight: item.applies ? 700 : 400, color: item.applies ? theme.brand : theme.textMuted, direction: 'ltr', textAlign: 'right' }}>
                       {item.applies ? item.label : `— ${item.reason}`}
                     </Text>
                   </div>
@@ -130,9 +130,9 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
                     {WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW.map((row) => (
                       <tr key={row.partnerId} style={{ borderTop: `1px solid ${theme.line}` }}>
                         <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 600, color: theme.text }}>{row.storeLabel}</td>
-                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand, fontFamily: 'monospace' }}>{row.rates.bthwani_delivery}</td>
-                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand, fontFamily: 'monospace' }}>{row.rates.partner_delivery}</td>
-                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand, fontFamily: 'monospace' }}>{row.rates.pickup}</td>
+                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand }}><Text family="mono">{row.rates.bthwani_delivery}</Text></td>
+                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand }}><Text family="mono">{row.rates.partner_delivery}</Text></td>
+                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand }}><Text family="mono">{row.rates.pickup}</Text></td>
                       </tr>
                     ))}
                   </tbody>

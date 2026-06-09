@@ -237,8 +237,8 @@ export function TaxonomyNodeInspector({
                   {bindedProducts.slice(0, 10).map(p => (
                     <tr key={p.id} style={{ borderTop: `1px solid ${theme.line}` }}>
                       <td style={{ padding: '4px 6px', color: theme.brandHeaderBackground }}>{p.name}</td>
-                      <td style={{ padding: '4px 6px', color: theme.textMuted, fontFamily: 'monospace' }}>
-                        <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{p.sku}</Text>
+                      <td style={{ padding: '4px 6px', color: theme.textMuted }}>
+                        <Text role="caption" tone="muted" family="mono" style={{ fontSize: 10 }}>{p.sku}</Text>
                       </td>
                     </tr>
                   ))}
