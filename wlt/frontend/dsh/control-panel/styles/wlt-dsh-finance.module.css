@@ -1282,11 +1282,11 @@
   padding: 10px 14px;
   border-radius: 8px;
   background: var(--bth-warning-surface, #fffbeb);
-  border: 1px solid var(--bth-warning-border, #fcd34d);
+  border: 1px solid var(--bth-warning-border, #FEF3C7);
   max-width: 480px;
   font-size: 12px;
   line-height: 1.5;
-  color: var(--bth-warning-text, #92400e);
+  color: var(--bth-warning-text, #B45309);
   direction: rtl;
 }
 
