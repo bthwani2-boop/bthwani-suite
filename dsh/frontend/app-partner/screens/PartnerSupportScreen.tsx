@@ -753,17 +753,6 @@ export function PartnerSupportScreen({
         title="العمليات والدعم"
         subtitle="لوحة الأولوية"
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
       />
 
       <Box gap={1} paddingY={1}>

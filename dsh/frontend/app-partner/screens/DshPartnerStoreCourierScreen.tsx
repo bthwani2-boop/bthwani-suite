@@ -137,13 +137,6 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
         title="إعداد موصل المتجر"
         subtitle="منح صلاحية التوصيل الداخلي"
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: onBack,
-        }}
       />
 
       {/* 1) Flat boundaries notice */}

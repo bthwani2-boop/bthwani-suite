@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
 import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../data/stores.preview-data';
@@ -17,7 +17,6 @@ export function DshFieldStoresHistoryScreen({ stores, onBack }: DshFieldStoresHi
         variant="surface"
         title="سجل المتاجر"
         subtitle="آخر حالة لكل متجر مرتبط بالميدان"
-        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={0}>

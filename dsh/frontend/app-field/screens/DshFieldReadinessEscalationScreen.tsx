@@ -79,7 +79,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'pending-response') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="loading"
@@ -96,7 +96,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'approved') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="success"
@@ -113,7 +113,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'rejected') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="blockingError"
@@ -138,7 +138,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'success') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="success"
@@ -158,7 +158,6 @@ export function DshFieldReadinessEscalationScreen({
         variant="surface"
         title="تصعيد عدم الجاهزية"
         subtitle="إبلاغ الفريق المختص بالعوائق الميدانية للمتجر"
-        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>

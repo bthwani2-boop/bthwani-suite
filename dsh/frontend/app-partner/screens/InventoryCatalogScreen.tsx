@@ -1544,17 +1544,6 @@ export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001'
         variant="secondary"
         title="كتالوج المخزون"
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
       />
       <Surface tone="inset" padding={3} gap={2}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>

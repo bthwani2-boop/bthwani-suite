@@ -15,7 +15,6 @@ export function DshFieldProfileScreen({ onBack }: DshFieldProfileScreenProps) {
         variant="surface"
         title="بيانات الميداني"
         subtitle="بيانات عملية يحتاجها الحساب فقط"
-        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>

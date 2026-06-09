@@ -110,7 +110,7 @@ export function DshFieldDocumentUploadScreen({
   if (state === 'success' || successDocId) {
     return (
       <View style={[styles.container, { backgroundColor: theme.surface }]}>
-        <TopBar variant="surface" title="تم الرفع" onBack={onBack} />
+        <TopBar variant="surface" title="تم الرفع" />
         <StateView
           stateId="success"
           title="تم إرسال المستند بنجاح"
@@ -125,7 +125,7 @@ export function DshFieldDocumentUploadScreen({
   if (state === 'offline') {
     return (
       <View style={[styles.container, { backgroundColor: theme.surface }]}>
-        <TopBar variant="surface" title="وضع عدم الاتصال" onBack={onBack} />
+        <TopBar variant="surface" title="وضع عدم الاتصال" />
         <StateView
           stateId="offline"
           title="تعذر الرفع"
@@ -145,13 +145,6 @@ export function DshFieldDocumentUploadScreen({
         variant="surface"
         title="إثبات الوثائق والصور"
         subtitle={`معرف المتجر: ${storeId}`}
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: onBack,
-        }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={styles.scrollContent}>
         <Box padding={4} gap={4}>

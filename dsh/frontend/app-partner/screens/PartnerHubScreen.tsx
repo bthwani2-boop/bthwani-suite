@@ -899,13 +899,6 @@ function OperationsPanel({
         title="المتجر والفريق"
         subtitle={`${storeName} · ${branchLabel}`}
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: onBack,
-        }}
       />
 
       <Box gap={3} paddingY={2}>

@@ -918,13 +918,6 @@ export function DshFieldStoreOnboardingScreen({
         variant="surface"
         title={store.name}
         subtitle={`${resolveFieldStoreStatusLabel(store)} · ${resolveFieldStoreLifecycleLabel(store)}`}
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'العودة',
-          onPress: onBack,
-        }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 148 }}>
         <Box padding={4} gap={4}>
