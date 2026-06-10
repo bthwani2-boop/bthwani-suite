@@ -13,18 +13,24 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import { subscriptionHeroCopy, subscriptionPlanCards } from '../../data/subscriptions.preview-data';
+import type { SubscriptionClientCard } from '../../shared/commercial.preview-contract';
 
 export type DshSubscriptionsScreenProps = {
   compact?: boolean;
+  plans?: SubscriptionClientCard[];
+  heroCopy?: { eyebrow?: string; title?: string; subtitle?: string; note?: string };
   onStatusChange?: (message: string) => void;
 };
 
 export function DshSubscriptionsScreen({
   compact = false,
+  plans = [],
+  heroCopy,
   onStatusChange,
 }: DshSubscriptionsScreenProps = {}) {
   const { theme } = useTheme();
+  const subscriptionPlanCards = plans;
+  const subscriptionHeroCopy = heroCopy ?? { eyebrow: 'بثواني برو', title: 'الاشتراكات', subtitle: 'دفع وتبديل وإدارة من نفس الصفحة.', note: '' };
 
   // Core Plan States
   const initialCurrentPlanId = subscriptionPlanCards.find((plan) => plan.current)?.id ?? 'weekly';

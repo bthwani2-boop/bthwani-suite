@@ -585,7 +585,6 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     listCardSelected: {
       borderColor: theme.brand,
       backgroundColor: theme.surface,
-      elevation: 4,
       ...shadowPresets.raised,
       shadowColor: theme.brand,
     },

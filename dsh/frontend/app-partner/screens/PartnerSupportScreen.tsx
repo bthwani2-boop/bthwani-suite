@@ -415,6 +415,7 @@ function InlineActionPanel({
 }) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   return (
     <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
@@ -493,6 +494,7 @@ function InlineActionPanel({
 function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   return (
     <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
@@ -568,6 +570,7 @@ function CommandCenterCaseRow({
 }) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const category = getPartnerOrderIssueCategorySpec(item.issueCategoryId);
 
   return (
@@ -659,6 +662,7 @@ export function PartnerSupportScreen({
 }: PartnerSupportScreenProps) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   const [selectedFilterId, setSelectedFilterId] = React.useState<DshPartnerSupportCommandFilterId>(initialFilterId);
   const [supportQuery, setSupportQuery] = React.useState('');

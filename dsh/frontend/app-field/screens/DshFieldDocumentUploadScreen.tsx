@@ -185,7 +185,7 @@ export function DshFieldDocumentUploadScreen({
                       styles.kindRow,
                       {
                         borderColor: isSelected ? theme.brand : theme.line,
-                        backgroundColor: isSelected ? theme.surfaceHover : 'transparent',
+                        backgroundColor: isSelected ? theme.surfaceInset : 'transparent',
                         flexDirection: isRtl ? 'row-reverse' : 'row',
                       },
                     ]}

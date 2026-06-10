@@ -115,7 +115,7 @@ export function useHomeDerivedStores({
       (homePromos ?? []).filter((promo) => {
         const visibility = getHomePromoVisibilityRecord(promo, {
           targetSurface: 'home',
-          partnerStatus: resolveTargetPartnerStatus(promo.targetType, promo.targetId),
+          partnerStatus: promo.targetType ? resolveTargetPartnerStatus(promo.targetType, promo.targetId) : undefined,
         });
         return (
           isMarketingRenderable(visibility) &&

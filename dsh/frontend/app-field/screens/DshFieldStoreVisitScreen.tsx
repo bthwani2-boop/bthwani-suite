@@ -187,7 +187,7 @@ export function DshFieldStoreVisitScreen({
               items={[
                 { label: 'visit checklist', value: 'الواجهة · المالك · ساعات العمل · نقطة الاستلام' },
                 { label: 'evidence score', value: `${evidenceItems.length}/4`, tone: evidenceItems.length >= 2 ? 'success' : 'warning' },
-                { label: 'offline draft', value: state === 'offline' ? 'مسودة محلية' : 'غير نشط', tone: state === 'offline' ? 'warning' : 'default' },
+                { label: 'offline draft', value: 'غير نشط', tone: 'default' as const },
                 { label: 'location confidence', value: 'manual confirmation required', tone: 'brand' },
               ]}
             />

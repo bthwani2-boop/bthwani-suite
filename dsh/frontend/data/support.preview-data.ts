@@ -1,25 +1,5 @@
-// Re-export domain types and constants from shared/ so existing imports keep working.
-export {
-  DSH_OPERATIONS_SUPPORT_FLOW_IDS,
-  DSH_OPERATIONS_SUPPORT_PREVIEW,
-  DSH_OPERATIONS_SUPPORT_HIDDEN_COMPAT_FLOW_IDS,
-  DSH_OPERATIONS_SUPPORT_PREVIEW_BY_ID,
-  getOperationsSupportFlowPreview,
-  getOperationsSupportSurfaceEntry,
-  getOperationsSupportFlowsForSurface,
-  isOperationsSupportHiddenCompatFlow,
-  DSH_SUPPORT_ISSUE_TYPES,
-} from '../shared/support-flows';
-export type {
-  DshOperationsSupportSurfaceId,
-  DshOperationsSupportVisibilityMode,
-  DshOperationsSupportEscalationOwner,
-  DshOperationsSupportSeverity,
-  DshOperationsSupportFlowId,
-  DshOperationsSupportFlowVisibility,
-  DshOperationsSupportFlowPreview,
-  DshSupportIssueType,
-} from '../shared/support-flows';
+export { DSH_SUPPORT_ISSUE_TYPES } from '../shared/support-flows';
+export type { DshSupportIssueType } from '../shared/support-flows';
 
 import type { DshControlPanelSectionId } from '../shared/dsh-governance.map';
 import type { DshOnDemandPolicy } from '../shared/dsh-flow-registry';

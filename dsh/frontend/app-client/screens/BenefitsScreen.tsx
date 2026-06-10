@@ -17,14 +17,15 @@ import {
   type IconName,
   radius,
 } from '@bthwani/ui-kit';
-import { dshNotificationsFixtures } from '../../data/support.preview-data';
-import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
 import { DshLoyaltyRewardsScreen } from '../parts/LoyaltyRewardsScreen';
 import { DshOperationScreen, type DshOperationScreenProps } from '../parts/OperationScreen';
 import { DshSubscriptionsScreen } from '../parts/SubscriptionsScreen';
-import { getCampaignItems } from '../../data/marketing.preview-data';
 import {
   isClientVisibleStatus,
+  type LoyaltyTier,
+  type LoyaltyReward,
+  type CommercialEntitlement,
+  type SubscriptionClientCard,
 } from '../../shared/commercial.preview-contract';
 import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
@@ -32,8 +33,9 @@ import {
   getPartnerOfferVisibilityRecord,
   isMarketingRenderable,
 } from '../../shared/marketing-visibility.contract';
-import { getEntitlements, getLoyaltyRewards, getLoyaltyTiers } from '../../data/subscriptions.preview-data';
-import { getPartnerOfferItems } from '../../data/offers.preview-data';
+import type { DshNotificationItem } from './NotificationsScreen';
+import type { PartnerOfferRecord } from '../../data/offers.preview-data';
+import type { CampaignRecord } from '../../data/marketing.preview-data';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 
@@ -43,6 +45,13 @@ export type DshBenefitsHubScreenProps = Omit<DshOperationScreenProps, 'title' | 
   initialSection?: DshBenefitsInitialSection;
   onBack?: () => void;
   screenId?: string;
+  loyaltyTiers?: LoyaltyTier[];
+  loyaltyRewards?: LoyaltyReward[];
+  entitlements?: CommercialEntitlement[];
+  subscriptionPlans?: SubscriptionClientCard[];
+  partnerOffers?: PartnerOfferRecord[];
+  campaigns?: CampaignRecord[];
+  notifications?: DshNotificationItem[];
 };
 
 type BenefitRow = {
@@ -213,6 +222,13 @@ export function DshBenefitsHubScreen({
   onSecondaryAction,
   screenId,
   state = 'ready',
+  loyaltyTiers: loyaltyTiersProp = [],
+  loyaltyRewards: loyaltyRewardsProp = [],
+  entitlements: entitlementsProp = [],
+  subscriptionPlans = [],
+  partnerOffers = [],
+  campaigns = [],
+  notifications: notificationsProp = [],
 }: DshBenefitsHubScreenProps) {
   const { theme } = useTheme();
   const resolvedInitialSection = normalizeBenefitsSection(screenId, initialSection);
@@ -240,18 +256,18 @@ export function DshBenefitsHubScreen({
     );
   }
 
-  const loyaltyTiers = getLoyaltyTiers();
+  const loyaltyTiers = loyaltyTiersProp;
   const activeTier = loyaltyTiers[loyaltyTiers.length - 1];
-  const activeRewards = getLoyaltyRewards().filter((reward) => isClientVisibleStatus(reward.status));
-  const activeEntitlements = getEntitlements().filter((entitlement) => entitlement.status === 'active');
-  const currentPlan = subscriptionPlanCards.find((plan) => plan.current) ?? subscriptionPlanCards[0];
-  const liveOffers = getPartnerOfferItems().filter((offer) => (
+  const activeRewards = loyaltyRewardsProp.filter((reward) => isClientVisibleStatus(reward.status));
+  const activeEntitlements = entitlementsProp.filter((entitlement) => entitlement.status === 'active');
+  const currentPlan = subscriptionPlans.find((plan) => plan.current) ?? subscriptionPlans[0];
+  const liveOffers = partnerOffers.filter((offer) => (
     isMarketingRenderable(getPartnerOfferVisibilityRecord(offer, { targetSurface: 'benefits' }))
   ));
-  const liveCampaigns = getCampaignItems().filter((campaign) => (
+  const liveCampaigns = campaigns.filter((campaign) => (
     isMarketingRenderable(getCampaignVisibilityRecord(campaign, { targetSurface: 'benefits' }))
   ));
-  const commercialNotifications = dshNotificationsFixtures
+  const commercialNotifications = notificationsProp
     .filter((item) => item.category === 'offer' || item.category === 'subscription')
     .slice(0, 3);
   const couponReward = activeRewards.find((reward) => reward.title.includes('كوبون'));

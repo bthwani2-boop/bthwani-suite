@@ -79,11 +79,12 @@ function resolveCommandRoute(command?: DshFieldNavigationCommand): DshFieldRoute
     return null;
   }
 
-  if (command.target === 'onboarding' || command.target === 'visit') {
+  if (command.target === 'onboarding' || command.target === 'visit' ||
+      command.target === 'readiness-escalation' || command.target === 'document-upload') {
     return command.storeId ? { kind: command.target, storeId: command.storeId } : { kind: 'stores' };
   }
 
-  return { kind: command.target };
+  return { kind: command.target as 'stores' | 'account' | 'profile' | 'history' | 'finance' };
 }
 
 export function DshFieldSurface(props: DshFieldSurfaceProps) {
@@ -333,7 +334,7 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
 
           // SSoT: visit_completed → history (via dsh-field.navigation-bridge)
           const visitCompletedRoute = getFieldRouteForLifecycle('visit_completed').primaryRoute;
-          pushRoute({ kind: visitCompletedRoute as DshFieldRouteState['kind'] });
+          pushRoute({ kind: 'history' });
         }}
       />
     );

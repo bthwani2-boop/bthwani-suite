@@ -99,7 +99,7 @@ export function DshFieldStoreOnboardingScreen({
   if (screenState === 'activated') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تم تفعيل المتجر" onBack={onBack} />
+        <TopBar variant="surface" title="تم تفعيل المتجر" />
         <StateView
           stateId="success"
           title="تم تفعيل المتجر بنجاح"
@@ -114,7 +114,7 @@ export function DshFieldStoreOnboardingScreen({
   if (screenState === 'exit') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="الخروج" onBack={onBack} />
+        <TopBar variant="surface" title="الخروج" />
         <StateView
           stateId="empty"
           title="لم يكتمل التسجيل بعد"
@@ -776,12 +776,12 @@ export function DshFieldStoreOnboardingScreen({
                                 ? 'success'
                                 : agreement.operationalReadiness === 'pending'
                                 ? 'warning'
-                                : 'neutral'
+                                : 'default'
                             }
                           />
                           <Badge
                             label={agreement.enabled ? 'مفعّل' : 'معطّل'}
-                            tone={agreement.enabled ? 'success' : 'neutral'}
+                            tone={agreement.enabled ? 'success' : 'default'}
                           />
                         </Box>
                       </Box>

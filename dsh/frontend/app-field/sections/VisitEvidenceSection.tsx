@@ -68,7 +68,7 @@ export function VisitEvidenceSection({
   if (sectionState === 'error') {
     return (
       <StateView
-        stateId="error"
+        stateId="recoverableError"
         title="فشل رفع الأدلة"
         description="تعذّر رفع بعض الصور. يُرجى المحاولة مجدداً."
         actionLabel="إعادة المحاولة"

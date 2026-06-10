@@ -24,7 +24,7 @@ import { useWltDshFieldFinancePreview } from './useWltDshFieldFinancePreview';
 function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
   const { theme } = useTheme();
   const amountTone = record.tone === 'positive' ? 'success'
-    : record.tone === 'negative' ? 'error'
+    : record.tone === 'negative' ? 'danger'
     : 'info';
 
   return (
@@ -50,7 +50,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
           <Text role="bodyStrong" tone={amountTone} style={{ textAlign: 'left' }}>
             {record.amountLabel}
           </Text>
-          <Badge label={record.statusLabel} tone={record.statusTone} />
+          <Badge label={record.statusLabel} tone={record.statusTone === 'error' ? 'danger' : record.statusTone} />
         </View>
       </View>
     </Box>
@@ -68,7 +68,7 @@ function CommissionSummary({ snapshot }: { snapshot: WltFieldFinanceSnapshot }) 
         items={[
           { label: 'عمولات معتمدة', value: snapshot.totalCommissionLabel, tone: 'success' },
           { label: 'عمولات معلقة', value: snapshot.pendingCommissionsLabel, tone: 'warning' },
-          { label: 'عمولات مرفوضة', value: snapshot.rejectedCommissionsLabel, tone: 'error' },
+          { label: 'عمولات مرفوضة', value: snapshot.rejectedCommissionsLabel, tone: 'danger' },
           { label: 'المتاجر المؤهلة', value: String(snapshot.eligibleFilesCount), tone: 'default' as const },
           { label: 'آخر صرف', value: snapshot.lastPayoutLabel, tone: 'info' },
           { label: 'تاريخ آخر صرف', value: snapshot.lastPayoutDate, tone: 'default' as const },

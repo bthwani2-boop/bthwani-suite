@@ -436,6 +436,7 @@ function ReadOnlyMetaLabel({
 function InlineOrderDetailsPanel({ item }: { item: PartnerOrderItem }) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   return (
     <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
@@ -482,6 +483,7 @@ function InlineOrderActionPanel({
 }) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   return (
     <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
@@ -543,6 +545,7 @@ function CommandCenterOrderRow({
 }) {
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const statusLabel = resolveStatusLabel(item.status, item.orderMode);
   const statusTone = resolveStatusTone(item.status);
   const isNewUnread = item.unread;
@@ -661,6 +664,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
   } = props;
   const { direction } = useDirection();
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   const enrichedItems = React.useMemo(() => {
     return items.map(enrichOrderItemWithSSoT);

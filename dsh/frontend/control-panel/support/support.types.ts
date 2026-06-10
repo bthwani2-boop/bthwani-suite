@@ -17,7 +17,7 @@ export type SupportSubTabItem = {
 };
 
 export type SupportVerificationStatus = 'verified' | 'required' | 'blocked' | string;
-export type SupportTone = 'success' | 'warning' | 'danger' | 'default';
+export type SupportTone = 'success' | 'warning' | 'danger' | 'neutral';
 
 export const SUPPORT_VERIFICATION_STATUS_META: Record<string, { label: string; tone: SupportTone }> = {
   verified: { label: 'موثق', tone: 'success' },

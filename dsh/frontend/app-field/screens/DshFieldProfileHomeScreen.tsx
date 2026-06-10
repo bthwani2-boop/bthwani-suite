@@ -150,7 +150,7 @@ export function DshFieldProfileHomeScreen({
                     <Text role="bodyStrong">بيانات الميداني</Text>
                     <Text role="bodySm" tone="muted">الهوية، التغطية، والوردية الحالية.</Text>
                   </View>
-                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                  <Icon name="chevron-back" size={20} tone="muted" mirrored />
                 </View>
               </Box>
             </Pressable>
@@ -162,7 +162,7 @@ export function DshFieldProfileHomeScreen({
                     <Text role="bodyStrong">السجل</Text>
                     <Text role="bodySm" tone="muted">آخر حالة لكل متجر والتقدم المرتبط به.</Text>
                   </View>
-                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                  <Icon name="chevron-back" size={20} tone="muted" mirrored />
                 </View>
               </Box>
             </Pressable>
@@ -174,7 +174,7 @@ export function DshFieldProfileHomeScreen({
                     <Text role="bodyStrong">المالية</Text>
                     <Text role="bodySm" tone="muted">المستحقات والملخص المالي بعد اكتمال الاعتماد.</Text>
                   </View>
-                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                  <Icon name="chevron-back" size={20} tone="muted" mirrored />
                 </View>
               </Box>
             </Pressable>

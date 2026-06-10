@@ -29,7 +29,7 @@ export function normalizeHomePromoActionType(targetType: string): DshHomeBannerA
   }
 }
 
-export function resolveHomePromoPublishStage(status: HomePromoRecord['status']) {
+export function resolveHomePromoPublishStage(status: string) {
   return status === 'published' ? 'published-preview' : 'draft';
 }
 

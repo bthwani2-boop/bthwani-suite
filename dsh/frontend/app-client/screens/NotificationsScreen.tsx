@@ -5,7 +5,7 @@ import { Box, Button, Divider, MobileScrollView, Text, TopBar,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
-import { dshNotificationsFixtures } from '../../data/support.preview-data';
+
 
 export type DshNotificationActionTarget = 'benefits' | 'tracking' | 'orders-list' | 'search' | 'none';
 
@@ -345,7 +345,7 @@ function renderContent(
 
 export function DshNotificationsScreen({
   state = 'ready',
-  items = dshNotificationsFixtures,
+  items = [],
   onOpenBenefits,
   onOpenTracking,
   onOpenOrders,
