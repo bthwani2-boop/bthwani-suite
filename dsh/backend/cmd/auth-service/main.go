@@ -608,6 +608,62 @@ func main() {
 		json.NewEncoder(w).Encode(perms) //nolint:errcheck
 	})
 
+	// GET /auth/profile — returns the authenticated user's profile (subject, username, roles).
+	mux.HandleFunc("/auth/profile", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		type profileResponse struct {
+			Subject  string   `json:"subject"`
+			Username string   `json:"username"`
+			Roles    []string `json:"roles"`
+		}
+
+		authHeader := strings.TrimSpace(r.Header.Get("Authorization"))
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			token := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+			var subject, username, rolesStr string
+			var isRevoked bool
+			var expiresAt time.Time
+			err := db.QueryRowContext(r.Context(), `
+				SELECT u.id, u.username, u.roles, s.is_revoked, s.expires_at
+				FROM auth_sessions s
+				JOIN auth_users u ON s.subject = u.id
+				WHERE s.id = $1`, token).Scan(&subject, &username, &rolesStr, &isRevoked, &expiresAt)
+			if err == nil && !isRevoked && time.Now().Before(expiresAt) {
+				roles := strings.Split(rolesStr, ",")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(profileResponse{Subject: subject, Username: username, Roles: roles}) //nolint:errcheck
+				return
+			}
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "unauthenticated"}) //nolint:errcheck
+			return
+		}
+
+		// dev mode fallback
+		clientID := strings.TrimSpace(r.Header.Get("X-Client-Id"))
+		actorType := strings.ToLower(strings.TrimSpace(r.Header.Get("X-Actor-Type")))
+		if clientID == "" {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(errorResponse{Error: "unauthenticated"}) //nolint:errcheck
+			return
+		}
+		if actorType == "" {
+			actorType = "client"
+		}
+		var username string
+		err := db.QueryRowContext(r.Context(), "SELECT username FROM auth_users WHERE id = $1", clientID).Scan(&username)
+		if err != nil {
+			username = clientID
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(profileResponse{Subject: clientID, Username: username, Roles: []string{actorType}}) //nolint:errcheck
+	})
+
 	// GET /health — service liveness probe
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

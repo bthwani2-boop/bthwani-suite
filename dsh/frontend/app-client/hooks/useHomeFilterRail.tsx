@@ -4,8 +4,8 @@ import { CategoryIconImage } from '../parts/home/HomeCategoryCarousel';
 import {
   DSH_CATEGORY_ICONS as categoryIconMap,
   DSH_SUBCATEGORY_ICONS as subcategoryIconMap,
-} from '../../data/categories.preview-data';
-import { dshHomeDiscoveryFilterFixtures as discoveryFilters } from '../../data/stores.preview-data';
+} from '../../shared/category-icons';
+import { DSH_HOME_DISCOVERY_FILTERS as discoveryFilters } from '../../shared/home-service-config';
 import { getDshCategoryIconUrl } from '../shared/get-dsh-category-icon-url';
 import {
   buildHomeCategoryFilterId,

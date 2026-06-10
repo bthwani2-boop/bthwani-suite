@@ -5,17 +5,17 @@ import type {
   DiscoveryFilter,
   StorePagerPage,
 } from '../contracts/dsh-home-types';
-import type { HomePromoRecord } from '../../data/marketing.preview-data';
 import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
 import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import {
   getHomePromoVisibilityRecord,
   isMarketingRenderable,
+  type HomePromoRecord,
 } from '../../shared/marketing-visibility.contract';
 import { resolveHomePromoPublishStage } from '../shared/home-promo-mappers';
 import { resolveHomeStoresForCategory } from '../shared/home-search-helpers';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
-import { getPublishedHomePromos } from '../../data/marketing.preview-data';
+// getPublishedHomePromos removed — home promos come from API.
 import { canRenderInClientSurface } from '../../shared/workflow';
 
 type UseHomeDerivedStoresParams = {
@@ -112,7 +112,7 @@ export function useHomeDerivedStores({
 
   const resolvedHomePromos = React.useMemo(
     () =>
-      (homePromos ?? getPublishedHomePromos()).filter((promo) => {
+      (homePromos ?? []).filter((promo) => {
         const visibility = getHomePromoVisibilityRecord(promo, {
           targetSurface: 'home',
           partnerStatus: resolveTargetPartnerStatus(promo.targetType, promo.targetId),

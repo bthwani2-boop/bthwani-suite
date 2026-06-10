@@ -471,4 +471,4 @@ import {
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
-} from '../data/stores.preview-data';
+} from '../shared/dsh-store-builders';

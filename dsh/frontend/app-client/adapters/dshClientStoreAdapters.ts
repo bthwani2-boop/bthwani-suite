@@ -1,4 +1,4 @@
-import { buildStoreTags, buildStoreDeliveryModes } from '../../data/stores.preview-data';
+import { buildStoreTags, buildStoreDeliveryModes } from '../../shared/dsh-store-builders';
 
 export function mapProductRecordToItem(p: any) {
   const isAvailable = p.available_override !== false;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable } from 'react-native';
 import { Box, Button, Chip, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId, DshPartnerSupportIssueCategoryId } from '../dsh-partner.types';
-import { getOperationsSupportFlowPreview } from '../../data/support.preview-data';
+import { getOperationsSupportFlowPreview } from '../../shared/support-flows';
 
 export type PartnerOrderIssueFlowId = 'order-issue-queue' | 'order-reject';
 

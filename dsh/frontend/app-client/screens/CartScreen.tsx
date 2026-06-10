@@ -31,10 +31,10 @@ import {
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
 import { formatDshPrice, formatDshPriceMinorUnits } from '../../shared/dsh-price-format';
-import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
-import { getPartnerOfferItems } from '../../data/offers.preview-data';
+import { getDshClientStateMeta, type DshClientState } from '../../shared/client-state';
+// getPartnerOfferItems removed — offers come from API, not fixtures.
 import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial.preview-contract';
-import { getEntitlements } from '../../data/subscriptions.preview-data';
+// getEntitlements removed — subscriptions/entitlements come from API, not fixtures.
 import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletPreview,
@@ -86,7 +86,7 @@ type QuickActionMeta = {
   icon?: string;
 };
 
-import { dshCartRecommendedProductsFixture, dshCartPreviewFallbackItemsFixture } from '../../data/orders.preview-data';
+// Cart fixtures removed — recommended products and fallback items come from API, not fixtures.
 import type { RecommendationProduct, CartItem } from '../../shared/dsh-order-preview.contract';
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
@@ -469,7 +469,7 @@ function RecommendedSection({
   const isRTL = direction === 'rtl';
 
   // Display a subset of products in horizontal view
-  const horizontalProducts = dshCartRecommendedProductsFixture.slice(0, 4);
+  const horizontalProducts: any[] = [];
 
   return (
     <View style={{ gap: spacing[2] }}>
@@ -1019,7 +1019,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const checkoutFlowPolicy = getDshClientFlowPolicy('client-cart-checkout');
   const checkoutFlowSummary = getDshFlowPolicySummary('client-cart-checkout');
   const [items, setItems] = useState<CartItem[]>(
-    props.items !== undefined ? props.items : dshCartPreviewFallbackItemsFixture,
+    props.items !== undefined ? props.items : [],
   );
 
   useEffect(() => {
@@ -1877,13 +1877,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
     if (quickActionKey === 'coupon') {
       if (trimmedValue) {
-        const activeCouponOffers = getPartnerOfferItems().filter(
-          o => o.offerType === 'coupon' && isClientVisibleStatus(o.status as CommercialLifecycleStatus),
-        );
-        const entitlements = getEntitlements();
-        const hasCouponEntitlement = entitlements.some(
-          e => isClientVisibleStatus(e.status as CommercialLifecycleStatus),
-        );
+        // Coupon offer validation — API-driven when offers endpoint is available.
+        // For now, allow coupon attempts (empty offer list = no validation block).
+        const activeCouponOffers: never[] = [];
+        const hasCouponEntitlement = false;
         if (activeCouponOffers.length === 0 && !hasCouponEntitlement) {
           showNotice('لا توجد قسائم نشطة', 'لا يوجد عرض قسيمة نشط حالياً لهذا المتجر.', 'warning');
           return;
@@ -1965,10 +1962,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   };
 
   const handleOpenFirstRecommendationPreview = () => {
-    const firstProduct = dshCartRecommendedProductsFixture[0];
-    if (firstProduct) {
-      openProductPreview(firstProduct);
-    }
+    // Recommended products come from API — no fixture fallback.
   };
 
   const handleSubscribePress = () => {

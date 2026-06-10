@@ -29,7 +29,7 @@ type PartnerOfferRecord = {
   category?: string;
 };
 
-type HomePromoRecord = {
+export type HomePromoRecord = {
   status: string;
   targetType?: string;
   actionType?: string;

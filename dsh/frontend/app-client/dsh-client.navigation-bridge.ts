@@ -1,20 +1,5 @@
 import { Platform } from 'react-native';
-import { dshHomeGetFixtureStores } from '../data/stores.preview-data';
-import {
-  dshDiscoveryStores,
-  storeItemsByStoreId,
-} from '../data/stores.preview-data';
-import {
-  type MarketingGrowthRecord,
-} from '../data/marketing.preview-data';
-import { getDshClientStateMeta, type DshClientState } from '../data/operational-statuses.preview-data';
-import { dshCategoryFixtures } from '../data/categories.preview-data';
-import { dshPartnerIntakeItems } from '../shared/workflow';
-import { resolveDshStoreClientVisibility } from '../shared/dsh-client-visibility.model';
-import {
-  dshClientInitialOrdersFixture,
-  dshClientInitialCreateOrderValuesFixture,
-} from '../data/orders.preview-data';
+import type { DshClientState } from '../data/operational-statuses.preview-data';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
@@ -86,41 +71,26 @@ export const hostClientStates = {
   walletRefundVisible: 'wallet_refund_visible',
 } as const;
 
-const publishedCategoryIds = new Set(
-  dshPartnerIntakeItems
-    .filter((item) => item.stage === 'published')
-    .map((item) => dshCategoryFixtures.find((category) => category.label === item.categoryLabel)?.id)
-    .filter((categoryId): categoryId is string => Boolean(categoryId)),
-);
+// Category IDs available for promo display — populated at runtime from GET /catalog/categories API.
+// Empty on first load; components should fetch from API and update state.
+export const publishedPromoCategoryIds = new Set<string>();
 
-const publishedCategoryFixtures = dshCategoryFixtures.filter((category) => publishedCategoryIds.has(category.id));
-export const publishedPromoCategoryIds = new Set(publishedCategoryFixtures.map((category) => category.id));
+// Store lists — populated at runtime from GET /stores API.
+// Empty on first load; components should render loading state until API responds.
+export const clientVisibleDiscoveryPreviewStores: never[] = [];
+export const clientVisibleHomePreviewStores: never[] = [];
 
-export const clientVisibleDiscoveryPreviewStores = dshDiscoveryStores.filter((store) => (
-  resolveDshStoreClientVisibility({
-    publishStage: store.publishStage,
-    supportsPickup: store.supportsPickup,
-    supportsPartnerDelivery: store.supportsPartnerDelivery,
-    serviceLabel: store.serviceLabel,
-    deliveryLabel: store.deliveryLabel,
-    storeOpen: !store.statusLabel.includes('مغلق'),
-  }).visible
-));
+// Order and cart initial state — empty; populated from GET /orders API.
+export const initialOrders: HostOrderSummary[] = [];
 
-export const clientVisibleHomePreviewStores = dshHomeGetFixtureStores.filter((store) => (
-  resolveDshStoreClientVisibility({
-    publishStage: store.publishStage,
-    supportsPickup: store.supportsPickup,
-    supportsPartnerDelivery: store.supportsPartnerDelivery,
-    serviceLabel: store.serviceLabel,
-    deliveryLabel: store.deliveryLabel,
-    storeOpen: store.statusTone === 'open',
-  }).visible
-));
-
-export const initialOrders: HostOrderSummary[] = dshClientInitialOrdersFixture as unknown as HostOrderSummary[];
-
-export const initialCreateOrderValues: CreateOrderValues = dshClientInitialCreateOrderValuesFixture as unknown as CreateOrderValues;
+export const initialCreateOrderValues: CreateOrderValues = {
+  fulfillmentMode: 'bthwani_delivery',
+  pickupAddress: '',
+  dropoffAddress: '',
+  contactName: '',
+  contactPhone: '',
+  note: '',
+};
 
 export function commandTargetToRoute(target: DshCommandTarget): DshRoute {
   switch (target) {

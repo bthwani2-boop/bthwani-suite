@@ -9,7 +9,7 @@ import {
 } from '@bthwani/ui-kit';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import { MenuItemCard } from './StoreMenuItemCard';
-import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../data/categories.preview-data';
+import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../shared/category-icons';
 import { normalizeDisplayText } from '../../shared/store-formatting';
 import { StoreFilterRailSection } from './StoreFilterRailSection';
 

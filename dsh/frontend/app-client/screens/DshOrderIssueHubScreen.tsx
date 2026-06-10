@@ -18,7 +18,7 @@ import {
   getOperationsSupportFlowsForSurface,
   getOperationsSupportSurfaceEntry,
   type DshOperationsSupportFlowId,
-} from '../../data/support.preview-data';
+} from '../../shared/support-flows';
 import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';

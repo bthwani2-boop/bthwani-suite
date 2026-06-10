@@ -10,7 +10,7 @@ import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding
 import type { CreateOrderValues, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { initialOrders, hostClientStates } from '../dsh-client.navigation-bridge';
 import { getClientWltIntentForState, type DshClientWltIntentEntry } from '../dsh-client-wlt-payment-bridge';
-import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
+import { getDshClientStateMeta, type DshClientState } from '../../shared/client-state';
 import type { DshRoute } from '../dsh-client.types';
 
 const TERMINAL_STATUSES = new Set(['DELIVERED', 'CANCELLED', 'REFUNDED', 'FAILED_DELIVERY', 'RETURNED']);

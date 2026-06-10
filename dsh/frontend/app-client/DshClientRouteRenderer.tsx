@@ -33,7 +33,6 @@ import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
 import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
 
-import { dshCategoryListFixtures } from '../data/categories.preview-data';
 import type { ClientOperationScreenId } from './screens/parts/OperationScreenView';
 import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
 import { hostClientStates, type CreateOrderValues, type HostCartItem } from './dsh-client.navigation-bridge';
@@ -649,7 +648,7 @@ export function DshClientRouteRenderer({
       serviceDialTrigger={serviceDialTrigger}
       favoriteOverrides={favoriteOverrides}
       onToggleFavorite={handleToggleFavorite}
-      categories={dshCategoryListFixtures as DshHomeCategory[]}
+      categories={[] as DshHomeCategory[]}
       promos={homeMarketingPromos}
       homePromos={homePromos}
       approvedVideoShorts={liveMarketingShorts}
@@ -697,4 +696,4 @@ export function DshClientRouteRenderer({
 }
 
 // Private helper to lookup operational states
-import { getDshClientStateMeta } from '../data/operational-statuses.preview-data';
+import { getDshClientStateMeta } from '../shared/client-state';

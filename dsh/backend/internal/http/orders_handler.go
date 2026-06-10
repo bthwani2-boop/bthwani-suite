@@ -387,6 +387,17 @@ func (h *OrdersHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// State guard: only allow cancellation from pre-delivery states.
+	// Clients and partners cannot cancel DELIVERED, REFUNDED, CANCELLED, or terminal states.
+	// Operators and system retain the ability to cancel any non-terminal state for admin overrides.
+	if actor == "client" || actor == "partner" {
+		if !isCancellableStatus(order.Status) {
+			writeError(w, http.StatusConflict, domain.ErrorCodeInvalidParameter,
+				"order cannot be cancelled in status: "+order.Status)
+			return
+		}
+	}
+
 	updatedOrder, err := h.repository.UpdateOrderStatus(r.Context(), id, actor, domain.StatusCancelled, req.Note)
 	if err != nil {
 		log.Printf("dsh-api: cancel order error: %v", err)
@@ -395,6 +406,15 @@ func (h *OrdersHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, updatedOrder)
+}
+
+func isCancellableStatus(status string) bool {
+	switch status {
+	case domain.StatusCreated, domain.StatusAccepted, domain.StatusReadyForPickup:
+		return true
+	default:
+		return false
+	}
 }
 
 func (h *OrdersHandler) RefundOrderCallback(w http.ResponseWriter, r *http.Request) {

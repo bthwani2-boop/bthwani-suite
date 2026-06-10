@@ -29,7 +29,7 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
-import { getDshClientStateMeta, type DshClientState } from '../../../data/operational-statuses.preview-data';
+import { getDshClientStateMeta, type DshClientState } from '../../../shared/client-state';
 import type {
   DshClientAddressSnapshot,
   DshClientCreateOrderRequest,

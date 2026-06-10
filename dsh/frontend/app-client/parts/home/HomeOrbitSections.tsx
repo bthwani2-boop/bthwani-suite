@@ -13,7 +13,7 @@ import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, with
 import { Text } from '@bthwani/ui-kit';
 
 import type { DshServiceId } from '../../contracts/dsh-home-types';
-import { dshHomeServiceDialFixtures } from '../../../data/stores.preview-data';
+import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from '../../../shared/home-service-config';
 import { resolveDshImageSource } from '../../../shared/resolve-dsh-image-source';
 
 // --------------------------------------------------------------------------

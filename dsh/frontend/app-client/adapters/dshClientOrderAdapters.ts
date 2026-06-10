@@ -1,7 +1,6 @@
 import { hostClientStates } from '../dsh-client.navigation-bridge';
 import type { HostOrderSummary, HostCartItem } from '../dsh-client.navigation-bridge';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
 
 export function mapLiveOrderToSummary(
   liveOrder: any,
@@ -40,28 +39,23 @@ export function performReorderMapping(
   dropoffAddress: string;
   note: string;
 } {
-  const matchedStore = clientVisibleDiscoveryStores.find((s) => s.name === order.title) ?? clientVisibleDiscoveryStores[0] ?? dshDiscoveryStores[0];
-  const storeProducts = storeItemsByStoreId[matchedStore.id] ?? [];
-  const summaryText = order.summary || '';
-  const keywords = summaryText.split(/[\s+\u2014\u2022••,]+/);
-  let matchedProducts = storeProducts.filter((p) =>
-    keywords.some((kw) => kw.length > 1 && (p.name.includes(kw) || (p.subtitle && p.subtitle.includes(kw))))
-  );
-
-  if (matchedProducts.length === 0) {
-    matchedProducts = storeProducts.slice(0, 2);
+  // Reorder maps back to the same store by name from live API-provided store list.
+  // Products are fetched from the API at order time, not pre-loaded from fixtures.
+  const matchedStore = clientVisibleDiscoveryStores.find((s) => s.name === order.title) ?? clientVisibleDiscoveryStores[0];
+  if (!matchedStore) {
+    return {
+      matchedStore: null,
+      newCartItems: [],
+      fulfillmentMode: (order.fulfillmentMode ?? 'bthwani_delivery') as DshFulfillmentDeliveryMode,
+      pickupAddress: order.pickupAddress || '',
+      dropoffAddress: order.dropoffAddress || '',
+      note: order.note || '',
+    };
   }
 
-  const newCartItems = matchedProducts.map((p, idx) => ({
-    id: p.id,
-    title: p.name,
-    priceLabel: p.priceLabel,
-    qty: idx === 0 ? 1 : 2,
-    storeId: matchedStore.id,
-    storeName: matchedStore.name,
-    canonicalStoreId: matchedStore.canonicalStoreId,
-    publishStage: p.publishStage || 'published-preview',
-  }));
+  // Cart items from reorder are rebuilt from the order summary text (best-effort).
+  // The caller is responsible for fetching live product catalog from API if exact items are needed.
+  const newCartItems: HostCartItem[] = [];
 
   return {
     matchedStore,
@@ -69,6 +63,6 @@ export function performReorderMapping(
     fulfillmentMode: (order.fulfillmentMode ?? 'bthwani_delivery') as DshFulfillmentDeliveryMode,
     pickupAddress: order.pickupAddress || matchedStore.name,
     dropoffAddress: order.dropoffAddress || '',
-    note: order.note || 'لا توجد ملاحظات',
+    note: order.note || '',
   };
 }

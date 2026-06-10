@@ -474,7 +474,11 @@
     "dsh/frontend/app-client/parts/CartDetails.tsx",
     "dsh/frontend/app-partner/screens/StoreProfileScreen.tsx",
     "dsh/frontend/control-panel/shared/ControlPanelDshActionQueue.tsx",
-    "dsh/frontend/control-panel/support/SupportEscalationQueueScreen.tsx"
+    "dsh/frontend/control-panel/support/SupportEscalationQueueScreen.tsx",
+    "dsh/frontend/app-partner/parts/PartnerOrderIssuePanel.tsx",
+    "dsh/frontend/shared/client-state.ts",
+    "dsh/frontend/shared/home-service-config.ts",
+    "dsh/frontend/shared/support-flows.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",
